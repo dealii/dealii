@@ -14,6 +14,7 @@
 
 #include <base/quadrature_lib.h>
 #include <cmath>
+#include <limits>
 
 
 // please note: for a given dimension, we need the quadrature formulae
@@ -34,15 +35,29 @@ QGauss<1>::QGauss (const unsigned int n)
                 Quadrature<1> (n)
 {
   const unsigned int m = (n+1)/2;
-  long double z;
-  long double pp;
-  long double p1, p2, p3;
 
-  for (unsigned int i=1;i<=m;++i)
+                                   // tolerance for the Newton
+                                   // iteration below. we need to make
+                                   // it adaptive since on some
+                                   // machines (for example PowerPC)
+                                   // long double is the same as
+                                   // double -- in that case we can
+                                   // only get to a certain multiple
+                                   // of the accuracy of double there,
+                                   // while on other machines we'd
+                                   // like to go further down
+  const long double tolerance
+    = std::max (static_cast<long double>(std::numeric_limits<double>::epsilon() / 100),
+                static_cast<long double>(std::numeric_limits<long double>::epsilon() * 5));
+  
+  for (unsigned int i=1; i<=m; ++i)
     {
-      z = std::cos(deal_II_numbers::PI * (i-.25)/(n+.5));
+      long double z = std::cos(deal_II_numbers::PI * (i-.25)/(n+.5));
 
-				       // Newton-iteration
+      long double pp;
+      long double p1, p2, p3;
+
+                                       // Newton iteration
       do
 	{
 					   // compute L_n (z)
@@ -57,7 +72,7 @@ QGauss<1>::QGauss (const unsigned int n)
 	  pp = n*(z*p1-p2)/(z*z-1);
 	  z = z-p1/pp;
 	}
-      while (abs(p1/pp) > 1.e-19);
+      while (abs(p1/pp) > tolerance);
 
       double x = .5*z;
       this->quadrature_points[i-1] = Point<1>(.5-x);
