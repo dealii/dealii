@@ -45,6 +45,12 @@ all: 1d 2d 3d
 3d: ../lib/libdeal_II_3d.g.a ../lib/libdeal_II_3d.a
 
 
+# rule how to make the file containing all the forward declarations
+../include/basic/forward-declarations.h: $(filter-out %forward-declarations.h,$(h-files))
+	@echo ============================ Generating $@
+	@perl ../Make_forward_declarations $(filter-out %forward-declarations.h,$(h-files)) > $@
+
+
 
 # rules how to generate object files from source files. note that
 # there are some files which needs exceptional rules; these are
@@ -77,7 +83,7 @@ all: 1d 2d 3d
 
 
 
-
+# rules how to make the libraries themselves
 ../lib/libdeal_II_1d.g.a: $(go-files-1d)
 	@echo ======================================== Updating library:   $@
 	@ar ruv $@ $(go-files-1d)
