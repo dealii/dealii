@@ -62,6 +62,15 @@ struct CellData
 				      * counter-clockwise. The
 				      * function is presently not
 				      * implemented for 3d.
+				      *
+				      * Note that in general the
+				      * result will be different if
+				      * you rotate a cell twice or
+				      * once with the number of times
+				      * added. While this is not true
+				      * in 2d, in 3d rotations are
+				      * neither cumulative nor
+				      * exchangable.
 				      */
     void rotate (const unsigned int times);
 
@@ -77,6 +86,7 @@ struct CellData
 		    << "The requested number of rotations, " << arg1
 		    << " is not possible in the present space dimension.");
 };
+
 
 
 /**
@@ -102,7 +112,8 @@ struct CellData
  *  will result in an error, as well as giving an interior line a boundary
  *  indicator.
  */
-struct SubCellData {
+struct SubCellData
+{
 				     /**
 				      * Each record of this vector describes
 				      * a line on the boundary and its boundary
