@@ -1212,9 +1212,11 @@ FE_Q<dim>::base_element (const unsigned int index) const
 
 template <int dim>
 bool
-FE_Q<dim>::has_support_on_face (unsigned int shape_index,
-				  const unsigned int face_index) const
+FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
+				const unsigned int face_index) const
 {
+  unsigned int shape_index = shape_index_;
+    
   if (dim==1)
     return true;
   const unsigned int cell_start = (dim==2)
