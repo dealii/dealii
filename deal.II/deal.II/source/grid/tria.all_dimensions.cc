@@ -12,11 +12,15 @@
 //----------------------------  tria.all_dimensions.cc  ---------------------------
 
 
-//TODO:[WB]Remove the comment signs in the monitor_* functions
-//    as early as possible. These were inserted, since at home the
-//    program did some strange things in the reserve_memory
-//    functions (allocated more memory than told), such that the
-//    memory checks failed.
+/*
+ * Single out some functions which are needed by all dimensions, but
+ * which are not template. They thus have the same name and when we
+ * try to link with the libraries for different dimensions at the same
+ * time, we get linker errors for functions defined more than once. By
+ * putting these functions in a single file, the linker is allowed to
+ * use it only once and throw away all other versions of this file in
+ * the other libraries.
+ */
 
 
 #include <base/memory_consumption.h>
@@ -29,19 +33,10 @@
 #include <numeric>
 
 
-/**
- * Single out some functions which are needed by all dimensions, but
- * which are not template. They thus have the same name and when we
- * try to link with the libraries for different dimensions at the same
- * time, we get linker errors for functions defined more than once. By
- * putting these functions in a single file, the linker is allowed to
- * use it only once and throw away all other versions of this file in
- * the other libraries.
- */
-
 
 template <>
-void CellData<1>::rotate (const unsigned int)
+void
+CellData<1>::rotate (const unsigned int)
 {
   Assert (false, ExcNotPossible());
 };
@@ -49,7 +44,8 @@ void CellData<1>::rotate (const unsigned int)
 
 
 template <>
-void CellData<2>::rotate (const unsigned int times)
+void
+CellData<2>::rotate (const unsigned int times)
 {
   Assert (times < 4, ExcInvalidRotation(times));
   
@@ -66,7 +62,8 @@ void CellData<2>::rotate (const unsigned int times)
 
 
 template <>
-void CellData<3>::rotate (const unsigned int times)
+void
+CellData<3>::rotate (const unsigned int times)
 {
   Assert (times < 24, ExcInvalidRotation(times));
   
@@ -118,7 +115,8 @@ void CellData<3>::rotate (const unsigned int times)
 
 
 
-bool SubCellData::check_consistency (const unsigned int dim) const
+bool
+SubCellData::check_consistency (const unsigned int dim) const
 {
   switch (dim) 
     {
@@ -133,8 +131,9 @@ bool SubCellData::check_consistency (const unsigned int dim) const
 
 
 
-void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
-					   const unsigned int dimension)
+void
+TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
+				      const unsigned int dimension)
 {
 				   // we need space for total_cells
 				   // cells. Maybe we have more already
@@ -164,20 +163,28 @@ void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
 
 
 
-void TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) const
+void
+TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) const
 {
-//  Assert (refine_flags.size() == refine_flags.capacity() ||
-//	  refine_flags.size()<256,
-//	  ExcMemoryWasted ("refine_flags",
-//			   refine_flags.size(), refine_flags.capacity()));
-//  Assert (coarsen_flags.size() == coarsen_flags.capacity() ||
-//	  coarsen_flags.size()<256,
-//	  ExcMemoryWasted ("coarsen_flags",
-//			   coarsen_flags.size(), coarsen_flags.capacity()));
-//  Assert (neighbors.size() ==  neighbors.capacity() ||
-//	  neighbors.size()<256,
-//	  ExcMemoryWasted ("neighbors",
-//			   neighbors.size(), neighbors.capacity()));
+				   // check that we have not allocated
+				   // too much memory. note that bool
+				   // vectors allocate their memory in
+				   // chunks of whole integers, so
+				   // they may over-allocate by up to
+				   // as many elements as an integer
+				   // has bits
+  Assert (refine_flags.size() <= refine_flags.capacity() + sizeof(int)*8 ||
+	  refine_flags.size()<256,
+	  ExcMemoryWasted ("refine_flags",
+			   refine_flags.size(), refine_flags.capacity()));
+  Assert (coarsen_flags.size() <= coarsen_flags.capacity() + sizeof(int)*8 ||
+	  coarsen_flags.size()<256,
+	  ExcMemoryWasted ("coarsen_flags",
+			   coarsen_flags.size(), coarsen_flags.capacity()));
+  Assert (neighbors.size() ==  neighbors.capacity() ||
+	  neighbors.size()<256,
+	  ExcMemoryWasted ("neighbors",
+			   neighbors.size(), neighbors.capacity()));
   Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
 	  ExcMemoryInexact (refine_flags.size(), neighbors.size()));
   Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),
@@ -196,7 +203,8 @@ TriangulationLevel<0>::memory_consumption () const
 
 
 
-void TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
+void
+TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
 {
   const unsigned int new_size = new_lines +
 				std::count_if (lines.used.begin(),
@@ -207,19 +215,11 @@ void TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
 				   // allocate space if necessary
   if (new_size>lines.lines.size()) 
     {
-//  cout << "  lines: pre: siz=" << lines.lines.size() << ", cap=" << lines.lines.capacity();
       lines.lines.reserve (new_size);
-//  cout << " inter: siz=" << lines.lines.size() << ", cap=" << lines.lines.capacity()
-//       << " (newsize=" << new_size << ")";
       lines.lines.insert (lines.lines.end(), new_size-lines.lines.size(), Line());
-//  cout << " post: siz=" << lines.lines.size() << ", cap=" << lines.lines.capacity() << endl;
   
-//  cout << "  used : pre: siz=" << lines.used.size() << ", cap=" << lines.used.capacity();
       lines.used.reserve (new_size);
-//  cout << " inter: siz=" << lines.used.size() << ", cap=" << lines.used.capacity()
-//       << " (newsize=" << new_size << ")";
       lines.used.insert (lines.used.end(), new_size-lines.used.size(), false);
-//  cout << " post: siz=" << lines.used.size() << ", cap=" << lines.used.capacity() << endl;
   
       lines.user_flags.reserve (new_size);
       lines.user_flags.insert (lines.user_flags.end(),
@@ -242,24 +242,32 @@ void TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
 
 
 
-void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) const
+void
+TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) const
 {
-//  Assert (lines.lines.size() == lines.lines.capacity() ||
-//	  lines.lines.size()<256,
-//	  ExcMemoryWasted ("lines",
-//			   lines.lines.size(), lines.lines.capacity()));
-//  Assert (lines.children.size() == lines.children.capacity() ||
-//	  lines.children.size()<256,
-//	  ExcMemoryWasted ("children",
-//			   lines.children.size(), lines.children.capacity()));
-//  Assert (lines.used.size() == lines.used.capacity() ||
-//	  lines.used.size()<256,
-//	  ExcMemoryWasted ("used",
-//			   lines.used.size(), lines.used.capacity()));
-//  Assert (lines.user_flags.size() == lines.user_flags.capacity() ||
-//	  lines.user_flags.size()<256,
-//	  ExcMemoryWasted ("user_flags",
-//			   lines.user_flags.size(), lines.user_flags.capacity()));
+				   // check that we have not allocated
+				   // too much memory. note that bool
+				   // vectors allocate their memory in
+				   // chunks of whole integers, so
+				   // they may over-allocate by up to
+				   // as many elements as an integer
+				   // has bits
+  Assert (lines.lines.size() == lines.lines.capacity() ||
+	  lines.lines.size()<256,
+	  ExcMemoryWasted ("lines",
+			   lines.lines.size(), lines.lines.capacity()));
+  Assert (lines.children.size() == lines.children.capacity() ||
+	  lines.children.size()<256,
+	  ExcMemoryWasted ("children",
+			   lines.children.size(), lines.children.capacity()));
+  Assert (lines.used.size() <= lines.used.capacity() + sizeof(int)*8 ||
+	  lines.used.size()<256,
+	  ExcMemoryWasted ("used",
+			   lines.used.size(), lines.used.capacity()));
+  Assert (lines.user_flags.size() <= lines.user_flags.capacity() + sizeof(int)*8 ||
+	  lines.user_flags.size()<256,
+	  ExcMemoryWasted ("user_flags",
+			   lines.user_flags.size(), lines.user_flags.capacity()));
   Assert (lines.lines.size() == lines.used.size(),
 	  ExcMemoryInexact (lines.lines.size(), lines.used.size()));
   Assert (lines.lines.size() == lines.user_flags.size(),
@@ -289,7 +297,9 @@ TriangulationLevel<1>::memory_consumption () const
 };
   
 
-void TriangulationLevel<2>::reserve_space (const unsigned int new_quads)
+
+void
+TriangulationLevel<2>::reserve_space (const unsigned int new_quads)
 {
   const unsigned int new_size = new_quads +
 				std::count_if (quads.used.begin(),
@@ -326,24 +336,32 @@ void TriangulationLevel<2>::reserve_space (const unsigned int new_quads)
 
 
 
-void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) const
+void
+TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) const
 {
-//  Assert (quads.quads.size() == quads.quads.capacity() ||
-//	  quads.quads.size()<256,
-//	  ExcMemoryWasted ("quads",
-//			   quads.quads.size(), quads.quads.capacity()));
-//  Assert (quads.children.size() == quads.children.capacity() ||
-//	  quads.children.size()<256,
-//	  ExcMemoryWasted ("children",
-//			   quads.children.size(), quads.children.capacity()));
-//  Assert (quads.used.size() == quads.used.capacity() ||
-//	  quads.used.size()<256,
-//	  ExcMemoryWasted ("used",
-//			   quads.used.size(), quads.used.capacity()));
-//  Assert (quads.user_flags.size() == quads.user_flags.capacity() ||
-//	  quads.user_flags.size()<256,
-//	  ExcMemoryWasted ("user_flags",
-//			   quads.user_flags.size(), quads.user_flags.capacity()));
+				   // check that we have not allocated
+				   // too much memory. note that bool
+				   // vectors allocate their memory in
+				   // chunks of whole integers, so
+				   // they may over-allocate by up to
+				   // as many elements as an integer
+				   // has bits
+  Assert (quads.quads.size() == quads.quads.capacity() ||
+	  quads.quads.size()<256,
+	  ExcMemoryWasted ("quads",
+			   quads.quads.size(), quads.quads.capacity()));
+  Assert (quads.children.size() == quads.children.capacity() ||
+	  quads.children.size()<256,
+	  ExcMemoryWasted ("children",
+			   quads.children.size(), quads.children.capacity()));
+  Assert (quads.used.size() <= quads.used.capacity() + sizeof(int)*8 ||
+	  quads.used.size()<256,
+	  ExcMemoryWasted ("used",
+			   quads.used.size(), quads.used.capacity()));
+  Assert (quads.user_flags.size() <= quads.user_flags.capacity() + sizeof(int)*8 ||
+	  quads.user_flags.size()<256,
+	  ExcMemoryWasted ("user_flags",
+			   quads.user_flags.size(), quads.user_flags.capacity()));
   Assert (quads.quads.size() == quads.used.size(),
 	  ExcMemoryInexact (quads.quads.size(), quads.used.size()));
   Assert (quads.quads.size() == quads.user_flags.size(),
@@ -374,7 +392,8 @@ TriangulationLevel<2>::memory_consumption () const
 
 
 
-void TriangulationLevel<3>::reserve_space (const unsigned int new_hexes)
+void
+TriangulationLevel<3>::reserve_space (const unsigned int new_hexes)
 {
   const unsigned int new_size = new_hexes +
 				std::count_if (hexes.used.begin(),
@@ -411,24 +430,32 @@ void TriangulationLevel<3>::reserve_space (const unsigned int new_hexes)
 
 
 
-void TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) const
+void
+TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) const
 {
-//  Assert (hexes.hexes.size() == hexes.hexes.capacity() ||
-//	  hexes.hexes.size()<256,
-//	  ExcMemoryWasted ("hexes",
-//			   hexes.hexes.size(), hexes.hexes.capacity()));
-//  Assert (hexes.children.size() == hexes.children.capacity() ||
-//	  hexes.children.size()<256,
-//	  ExcMemoryWasted ("children",
-//			   hexes.children.size(), hexes.children.capacity()));
-//  Assert (hexes.used.size() == hexes.used.capacity() ||
-//	  hexes.used.size()<256,
-//	  ExcMemoryWasted ("used",
-//			   hexes.used.size(), hexes.used.capacity()));
-//  Assert (hexes.user_flags.size() == hexes.user_flags.capacity() ||
-//	  hexes.user_flags.size()<256,
-//	  ExcMemoryWasted ("user_flags",
-//			   hexes.user_flags.size(), hexes.user_flags.capacity()));
+				   // check that we have not allocated
+				   // too much memory. note that bool
+				   // vectors allocate their memory in
+				   // chunks of whole integers, so
+				   // they may over-allocate by up to
+				   // as many elements as an integer
+				   // has bits
+  Assert (hexes.hexes.size() == hexes.hexes.capacity() ||
+	  hexes.hexes.size()<256,
+	  ExcMemoryWasted ("hexes",
+			   hexes.hexes.size(), hexes.hexes.capacity()));
+  Assert (hexes.children.size() == hexes.children.capacity() ||
+	  hexes.children.size()<256,
+	  ExcMemoryWasted ("children",
+			   hexes.children.size(), hexes.children.capacity()));
+  Assert (hexes.used.size() <= hexes.used.capacity() + sizeof(int)*8 ||
+	  hexes.used.size()<256,
+	  ExcMemoryWasted ("used",
+			   hexes.used.size(), hexes.used.capacity()));
+  Assert (hexes.user_flags.size() <= hexes.user_flags.capacity() + sizeof(int)*8 ||
+	  hexes.user_flags.size()<256,
+	  ExcMemoryWasted ("user_flags",
+			   hexes.user_flags.size(), hexes.user_flags.capacity()));
   Assert (hexes.hexes.size() == hexes.used.size(),
 	  ExcMemoryInexact (hexes.hexes.size(), hexes.used.size()));
   Assert (hexes.hexes.size() == hexes.user_flags.size(),
