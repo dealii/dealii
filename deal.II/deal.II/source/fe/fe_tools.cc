@@ -56,9 +56,11 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 						phantom_weights);
 
 				   // This is a bad workaround as we
-				   // can't ask the FEs for their shape
-				   // values any more.
-				   // TODO: do this better.
+				   // can't ask the FEs for their
+				   // shape values any more.
+// TODO: do this better. don't create a triangulation and dofhandler here!
+// maybe we can get it work by passing an end_iterator or something to the
+// FEValues::reinit function?  
   Triangulation<dim> tria;
   DoFHandler<dim> dof_handler(tria);
   GridGenerator::hyper_cube(tria);
@@ -69,15 +71,12 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
   
   for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)	
     {
-      const unsigned int i1
-	= fe2.system_to_component_index(i).first;
+      const unsigned int i1 = fe2.system_to_component_index(i).first;
       for (unsigned int j=0; j<fe1.dofs_per_cell; ++j)
 	{
-	  const unsigned int j1
-	    = fe1.system_to_component_index(j).first;
+	  const unsigned int j1 = fe1.system_to_component_index(j).first;
 	  if (i1==j1)
-	    interpolation_matrix(i,j) =
-	      fe_values.shape_value (j,i);
+	    interpolation_matrix(i,j) = fe_values.shape_value (j,i);
 	  else
 	    interpolation_matrix(i,j)=0.;
 	}  
@@ -279,30 +278,38 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
   
   for (unsigned int level=0; level<tria.n_levels()-1; ++level)
     {
-      DoFHandler<dim>::cell_iterator cell=dof2.begin(level),
-				     endc=dof2.end(level);
+      typename DoFHandler<dim>::cell_iterator cell=dof2.begin(level),
+					      endc=dof2.end(level);
 
       for (; cell!=endc; ++cell)
-	{
-	  if (!cell->active())
-	    {
-	      bool active_children=false;
-	      for (unsigned int child_n=0;
-		   child_n<GeometryInfo<dim>::children_per_cell; ++child_n)
-		if (cell->child(child_n)->active())
-		  {
-		    active_children=true;
-		    break;
-		  }
-	      
-	      if (active_children)
+	if (!cell->active())
+	  {
+					     // check whether this
+					     // cell has active
+					     // children
+	    bool active_children=false;
+	    for (unsigned int child_n=0;
+		 child_n<GeometryInfo<dim>::children_per_cell; ++child_n)
+	      if (cell->child(child_n)->active())
 		{
-		  cell->get_interpolated_dof_values(u3, dof_values);
-		  cell->set_dof_values_by_interpolation(dof_values, u2);
+		  active_children=true;
+		  break;
 		}
-	    }
-	}
-    }  
+
+					     // if there are active
+					     // children, the we have
+					     // to work on this
+					     // cell. get the data
+					     // from the one vector
+					     // and set it on the
+					     // other
+	    if (active_children)
+	      {
+		cell->get_interpolated_dof_values(u3, dof_values);
+		cell->set_dof_values_by_interpolation(dof_values, u2);
+	      }
+	  }
+    }
 }
 
 
