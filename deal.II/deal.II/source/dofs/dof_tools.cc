@@ -2179,19 +2179,21 @@ template
 void
 DoFTools::distribute_cell_to_dof_vector (const DoFHandler<deal_II_dimension> &dof_handler,
 					 const Vector<float>  &cell_data,
-					 Vector<double>       &dof_data);
+					 Vector<double>       &dof_data,
+					 const unsigned int    component);
 
 template
 void
 DoFTools::distribute_cell_to_dof_vector (const DoFHandler<deal_II_dimension> &dof_handler,
 					 const Vector<double> &cell_data,
-					 Vector<double>       &dof_data);
+					 Vector<double>       &dof_data,
+					 const unsigned int    component);
 
 
 template void DoFTools::extract_dofs(const DoFHandler<deal_II_dimension>& dof,
 				     const std::vector<bool>& component_select,
 				     std::vector<bool>& selected_dofs);
-template void DoFTools::extract_level_dofs(unsigned int level,
+template void DoFTools::extract_level_dofs(const unsigned int level,
 					   const MGDoFHandler<deal_II_dimension>& dof,
 					   const std::vector<bool>& component_select,
 					   std::vector<bool>& selected_dofs);
@@ -2202,7 +2204,8 @@ template
 void
 DoFTools::extract_boundary_dofs (const DoFHandler<deal_II_dimension> &,
 				 const std::vector<bool>                  &,
-				 std::vector<bool>                        &);
+				 std::vector<bool>                        &,
+				 const std::set<unsigned char> &);
 #endif 
 
 
