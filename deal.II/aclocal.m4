@@ -235,7 +235,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	              else
   
                         dnl  Aw, nothing suitable found...
-                        AC_MSG_RESULT(Unrecognized compiler --- you will probably run into trouble. Try to go ahead and get help from developers@dealii.org)
+                        AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
                         GXX_VERSION=unknown_cc
                       fi
                     fi
@@ -629,8 +629,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           ;;
 
       *)
-          AC_MSG_ERROR(No compiler options for this C++ compiler
-                       specified at present)
+	CXXFLAGSG="$CXXFLAGS -DDEBUG"
+	CXXFLAGSO="$CXXFLAGS -O2"
+        AC_MSG_RESULT(Unknown C++ compiler - using generic options)
           ;;
     esac
   fi
@@ -945,8 +946,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
   	              else
   
                         dnl  Aw, nothing suitable found...
-                        AC_MSG_ERROR([Unrecognized compiler -- sorry])
-                        exit 1
+                        AC_MSG_RESULT([Unrecognized compiler -- still trying])
+			CC_VERSION=unknown_cc
                       fi
                     fi
                   fi
@@ -1041,8 +1042,8 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
           ;;
 
       *)
-          AC_MSG_ERROR(No compiler options for this C compiler
-                       specified at present)
+          AC_MSG_RESULT(Unknown C compiler - using generic options)
+	  CFLAGS="$CFLAGS -O2"
           ;;
     esac
   fi

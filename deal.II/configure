@@ -3035,8 +3035,8 @@ echo "${ECHO_T}C++ compiler is KAI C++" >&6
   	                GXX_VERSION=kai_cc
   	              else
 
-                                                echo "$as_me:$LINENO: result: Unrecognized compiler --- you will probably run into trouble. Try to go ahead and get help from developers@dealii.org" >&5
-echo "${ECHO_T}Unrecognized compiler --- you will probably run into trouble. Try to go ahead and get help from developers@dealii.org" >&6
+                                                echo "$as_me:$LINENO: result: Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org" >&5
+echo "${ECHO_T}Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org" >&6
                         GXX_VERSION=unknown_cc
                       fi
                     fi
@@ -3442,11 +3442,10 @@ echo "$as_me: error: Attention! deal.II is not known to work with Borland C++!
           ;;
 
       *)
-          { { echo "$as_me:$LINENO: error: No compiler options for this C++ compiler
-                       specified at present" >&5
-echo "$as_me: error: No compiler options for this C++ compiler
-                       specified at present" >&2;}
-   { (exit 1); exit 1; }; }
+	CXXFLAGSG="$CXXFLAGS -DDEBUG"
+	CXXFLAGSO="$CXXFLAGS -O2"
+        echo "$as_me:$LINENO: result: Unknown C++ compiler - using generic options" >&5
+echo "${ECHO_T}Unknown C++ compiler - using generic options" >&6
           ;;
     esac
   fi
@@ -3819,10 +3818,9 @@ echo "${ECHO_T}C compiler is KAI C" >&6
   	                CC_VERSION=kai_cc
   	              else
 
-                                                { { echo "$as_me:$LINENO: error: Unrecognized compiler -- sorry" >&5
-echo "$as_me: error: Unrecognized compiler -- sorry" >&2;}
-   { (exit 1); exit 1; }; }
-                        exit 1
+                                                echo "$as_me:$LINENO: result: Unrecognized compiler -- still trying" >&5
+echo "${ECHO_T}Unrecognized compiler -- still trying" >&6
+			CC_VERSION=unknown_cc
                       fi
                     fi
                   fi
@@ -3888,11 +3886,9 @@ echo "$as_me: error: Unrecognized compiler -- sorry" >&2;}
           ;;
 
       *)
-          { { echo "$as_me:$LINENO: error: No compiler options for this C compiler
-                       specified at present" >&5
-echo "$as_me: error: No compiler options for this C compiler
-                       specified at present" >&2;}
-   { (exit 1); exit 1; }; }
+          echo "$as_me:$LINENO: result: Unknown C compiler - using generic options" >&5
+echo "${ECHO_T}Unknown C compiler - using generic options" >&6
+	  CFLAGS="$CFLAGS -O2"
           ;;
     esac
   fi
@@ -11442,3 +11438,20 @@ if test "x$doxygen_not_found" = "xyes" ; then
   echo "     WARNING: however."
   echo
 fi
+
+if test "x$CC_VERSION" = "xunknown_cc" ; then
+  echo ----------------------------------------------------------------------
+  echo "     WARNING: The C compiler used for configuration is unknown!"
+  echo "     WARNING: configure has used a generic set of parameters."
+  echo "     WARNING: Still, you have to expect trouble during compilation."
+  echo "     WARNING: If so, report to dealii@dealii.org!"
+fi
+
+if test "x$GXX_VERSION" = "xunknown_cc" ; then
+  echo ----------------------------------------------------------------------
+  echo "     WARNING: The C++ compiler used for configuration is unknown!"
+  echo "     WARNING: configure has used a generic set of parameters."
+  echo "     WARNING: Still, you have to expect trouble during compilation."
+  echo "     WARNING: If so, report to dealii@dealii.org!"
+fi
+

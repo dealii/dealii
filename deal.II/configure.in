@@ -635,3 +635,20 @@ if test "x$doxygen_not_found" = "xyes" ; then
   echo "     WARNING: however."
   echo
 fi
+
+if test "x$CC_VERSION" = "xunknown_cc" ; then
+  echo ----------------------------------------------------------------------
+  echo "     WARNING: The C compiler used for configuration is unknown!"
+  echo "     WARNING: configure has used a generic set of parameters."
+  echo "     WARNING: Still, you have to expect trouble during compilation."
+  echo "     WARNING: If so, report to dealii@dealii.org!"
+fi
+
+if test "x$GXX_VERSION" = "xunknown_cc" ; then
+  echo ----------------------------------------------------------------------
+  echo "     WARNING: The C++ compiler used for configuration is unknown!"
+  echo "     WARNING: configure has used a generic set of parameters."
+  echo "     WARNING: Still, you have to expect trouble during compilation."
+  echo "     WARNING: If so, report to dealii@dealii.org!"
+fi
+
