@@ -78,7 +78,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				 const Quadrature<dim>    &quadrature,
 				 const FiniteElement<dim> &fe,
 				 const UpdateFlags         update_flags,
-				 const DirichletBC        &dirichlet_bc,
+				 const FunctionMap        &dirichlet_bc,
 				 const Boundary<dim>      &boundary) {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
@@ -369,7 +369,7 @@ template <int dim>
 void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 					   dVector  &solution,
 					   dVector  &right_hand_side,
-					   const DirichletBC &dirichlet_bc,
+					   const FunctionMap &dirichlet_bc,
 					   const FiniteElement<dim> &fe,
 					   const Boundary<dim>      &boundary) {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
@@ -471,7 +471,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 
 
 void
-ProblemBase<1>::make_boundary_value_list (const DirichletBC &,
+ProblemBase<1>::make_boundary_value_list (const FunctionMap &,
 					  const FiniteElement<1> &,
 					  const Boundary<1> &,
 					  map<int,double>   &) const {
@@ -484,7 +484,7 @@ ProblemBase<1>::make_boundary_value_list (const DirichletBC &,
 
 template <int dim>
 void
-ProblemBase<dim>::make_boundary_value_list (const DirichletBC        &dirichlet_bc,
+ProblemBase<dim>::make_boundary_value_list (const FunctionMap        &dirichlet_bc,
 					    const FiniteElement<dim> &fe,
 					    const Boundary<dim>      &boundary,
 					    map<int,double>   &boundary_values) const {
@@ -496,7 +496,7 @@ ProblemBase<dim>::make_boundary_value_list (const DirichletBC        &dirichlet_
   DoFHandler<dim>::active_face_iterator face = dof_handler->begin_active_face(),
 					endf = dof_handler->end_face();
   
-  DirichletBC::const_iterator function_ptr;
+  FunctionMap::const_iterator function_ptr;
 
 				   // field to store the indices of dofs
 				   // initialize once to get the size right
