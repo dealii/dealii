@@ -566,8 +566,8 @@ class ConstraintMatrix : public Subscriptor
 				      * @p condensed be zero.
 				      *
 				      * The @p VectorType may be a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>,
+				      * Vector<float>,
+				      * Vector<double>,
 				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
@@ -579,8 +579,8 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Condense the given vector
 				      * in-place. The @p VectorType may be a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>,
+				      * Vector<float>,
+				      * Vector<double>,
 				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
@@ -603,8 +603,8 @@ class ConstraintMatrix : public Subscriptor
 				      * @p condense.
 				      *
 				      * The @p VectorType may be a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>,
+				      * Vector<float>,
+				      * Vector<double>,
 				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
@@ -616,8 +616,8 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Re-distribute the elements of the
 				      * vector in-place. The @p VectorType
-				      * may be a Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>,
+				      * may be a Vector<float>,
+				      * Vector<double>,
 				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
@@ -629,8 +629,8 @@ class ConstraintMatrix : public Subscriptor
 				      * Delete hanging nodes in a vector.
 				      * Sets all hanging node values to
 				      * zero. The @p VectorType may be a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>,
+				      * Vector<float>,
+				      * Vector<double>,
 				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.

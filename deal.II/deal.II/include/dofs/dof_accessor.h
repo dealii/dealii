@@ -328,8 +328,8 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      *
 				      * The input vector may be either a
 				      * <tt>Vector<float></tt>,
-				      * Vector<tt><double></tt>, or a
-				      * BlockVector<tt><double></tt>, or a
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -365,9 +365,9 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * to this function.
 				      *
 				      * The output vector may be either a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>, or a
-				      * BlockVector<tt><double></tt>, or a
+				      * Vector<float>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -585,9 +585,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>, or a
-				      * BlockVector<tt><double></tt>, or a
+				      * Vector<float>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -622,9 +622,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>, or a
-				      * BlockVector<tt><double></tt>, or a
+				      * Vector<float>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -779,9 +779,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>, or a
-				      * BlockVector<tt><double></tt>, or a
+				      * Vector<float>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -816,9 +816,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>, or a
-				      * BlockVector<tt><double></tt>, or a
+				      * Vector<float>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -981,9 +981,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>, or a
-				      * BlockVector<tt><double></tt>, or a
+				      * Vector<float>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -1018,9 +1018,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>, or a
-				      * BlockVector<tt><double></tt>, or a
+				      * Vector<float>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -1329,9 +1329,9 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * objects.
 				      *
 				      * The output vector may be either a
-				      * Vector<tt><float></tt>,
-				      * Vector<tt><double></tt>, or a
-				      * BlockVector<tt><double></tt>, or a
+				      * Vector<float>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
