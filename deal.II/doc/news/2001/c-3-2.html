@@ -85,6 +85,14 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: The <code class="class">OutputStyle</code> enum used
+       to indicate the output format has been moved into the
+       <code class="class">ParameterHandler</code> class.
+       <br>
+       (WB 2001/11/30)
+       </p>
+
+  <li> <p>
        Fixed: In the <code class="class">ParameterHandler</code>
        class, we leaked 8 or 12 bytes of memory per declared
        parameter. This is now fixed.
@@ -228,7 +236,7 @@ documentation, etc</a>.
        you now have to prefix it by <code
        class="class">IteratorState::</code>.
        <br>
-       (RH, WB 2001/11/30)
+       (WB 2001/11/30)
        </p>
 
   <li> <p>
@@ -240,7 +248,7 @@ documentation, etc</a>.
        therefore have to prefix the members of this enum by the
        respective class name.
        <br>
-       (RH, WB 2001/11/29)
+       (WB 2001/11/29)
        </p>
 
   <li> <p>
