@@ -173,6 +173,10 @@ class FETools
 				      * as if it were a subset then
 				      * @p{u1_interpolated} would be
 				      * equal to @p{u1}.
+				      *
+				      * Note, that this function does
+				      * not work on continuous
+				      * elements at hanging nodes.
 				      */
     template <int dim, typename number>
     static void back_interpolate (const DoFHandler<dim>    &dof1,
@@ -186,6 +190,10 @@ class FETools
 				      * is the interpolation from @p{fe1}
 				      * to @p{fe2}. $(Id-I_h)z1$ is
 				      * denoted by @p{z1_difference}.
+				      *
+				      * Note, that this function does
+				      * not work on continuous
+				      * elements at hanging nodes.
 				      */
     template <int dim, typename number>
     static void interpolation_difference(const DoFHandler<dim> &dof1,
