@@ -689,7 +689,8 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
   const unsigned int  n            = src.size();
   const unsigned int *rowstart_ptr = &cols->rowstart[0];
   somenumber         *dst_ptr      = &dst(0);
-  
+
+				   // forward sweep
   for (unsigned int row=0; row<n; ++row, ++dst_ptr, ++rowstart_ptr)
     {
       *dst_ptr = src(row);
@@ -708,6 +709,8 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
 				       
       for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
 	*dst_ptr -= om* val[j] * dst(cols->colnums[j]);
+
+				       // divide by diagonal element
       *dst_ptr /= val[*rowstart_ptr];
     };
   
@@ -716,6 +719,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
   for (unsigned int row=0; row<n; ++row, ++rowstart_ptr, ++dst_ptr)
     *dst_ptr *= (2.-om)*val[*rowstart_ptr];
 
+				   // backward sweep
   rowstart_ptr = &cols->rowstart[n-1];
   dst_ptr      = &dst(n-1);
   for (int row=n-1; row>=0; --row, --rowstart_ptr, --dst_ptr)
