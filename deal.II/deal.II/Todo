@@ -181,13 +181,9 @@ Maybe single out the epsgrid from DataOut and the write_gnuplot from
   does only write grids, without any data.
 
 
-Look at this code from error_estimator.cc:
-  	  vector<vector<Tensor<1,dim> > > tmp (n_components,
-					       neighbor_psi);
-	  fe_face_values_neighbor.get_function_grads (solution, tmp);
-	  neighbor_psi.swap (tmp[selected_component]);
-  I believe it is wrong in that it assumes that the outermost index
-  in tmp runs over the components, but get_function_grads returns it
-  the other way round, so it should only work if
-  n_components==n_q_points. there are several such places, fix them.
+In 'KellyErrorEstimator' add new argument 'const vector<double> weight_
+components' for using the error indicators of all components of a 
+system in a linear combination. This vector must have the size of the
+number of components and includes the weights. This could replace the 
+old argument 'const unsigned int selected_component'.
 
