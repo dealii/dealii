@@ -1,16 +1,13 @@
 # $Id$
 
 
-all: deal.II deal doc examples
+all: deal.II doc examples
 
 clean: lib-clean doc-clean examples-clean
 
 
 deal.II:
 	cd source ; make
-
-deal:
-	cd deal ; make
 
 doc:
 	cd doc ; make
@@ -30,5 +27,5 @@ examples-clean:
 
 
 
-.PHONY: all deal.II deal doc examples
+.PHONY: all deal.II doc examples
 .PHONY: clean lib-clean doc-clean examples-clean
