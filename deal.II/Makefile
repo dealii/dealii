@@ -65,10 +65,13 @@ laco: baseo contrib
 3do: baseo laco
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3d
 
-deps: 
+deps: common/scripts/make_dependencies
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/lac && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) Makefile.dep
+
+common/scripts/make_dependencies:
+	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS)
 
 base: baseg baseo
 lac: lacg laco
