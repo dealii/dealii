@@ -16,13 +16,6 @@
 
 /**
  *  Vector of data. 
- *  Memory for Components is supplied explicitly <p>
- *  ( ! Amount of memory needs not to comply with actual dimension due to reinitializations ! ) <p>
- *  - all necessary methods for Vectors are supplied <p>
- *  - operators available are `=` , `*` and `( )` <p>
- *  CONVENTIONS for used `equations` : <p>
- *  - THIS vector is always named `U` <p>
- *  - vectors are always uppercase , scalars are lowercase
  *
  * @author Roland Becker, Guido Kanschat, Franz-Theo Suttmeier, revised and extended by Wolfgang Bangerth, documented by Klaus Mampel and Wolfgang Bangerth
  */
@@ -86,9 +79,12 @@ class Vector {
     Vector (const unsigned int n);
     
 				     /**
-				      * Destructor. Clears memory
+				      * Destructor, deallocates
+				      * memory. Made virtual to allow
+				      * for derived classes to behave
+				      * properly.
 				      */
-    ~Vector ();
+    virtual ~Vector ();
 
 				     /**
 				      * Set all entries to zero. Equivalent to
