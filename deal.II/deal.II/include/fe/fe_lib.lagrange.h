@@ -29,7 +29,8 @@
  *
  * @author Wolfgang Bangerth, Ralf Hartmann, 2001
  */
-template<int dim> class FEQ1: public FE_Q<dim>
+template<int dim>
+class FEQ1 : public FE_Q<dim>
 {
   public:
 				     /**
@@ -51,7 +52,8 @@ template<int dim> class FEQ1: public FE_Q<dim>
  *
  * @author Wolfgang Bangerth, Ralf Hartmann, 2001
  */
-template<int dim> class FEQ2: public FE_Q<dim>
+template<int dim>
+class FEQ2 : public FE_Q<dim>
 {
   public:
 				     /**
@@ -73,7 +75,8 @@ template<int dim> class FEQ2: public FE_Q<dim>
  *
  * @author Wolfgang Bangerth, Ralf Hartmann, 2001
  */
-template<int dim> class FEQ3: public FE_Q<dim>
+template<int dim>
+class FEQ3 : public FE_Q<dim>
 {
   public:
 				     /**
@@ -95,7 +98,8 @@ template<int dim> class FEQ3: public FE_Q<dim>
  *
  * @author Wolfgang Bangerth, Ralf Hartmann, 2001
  */
-template<int dim> class FEQ4: public FE_Q<dim>
+template<int dim>
+class FEQ4 : public FE_Q<dim>
 {
   public:
 				     /**
