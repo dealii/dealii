@@ -5679,7 +5679,7 @@ Triangulation<3>::execute_refinement ()
 					       // it might be that the
 					       // quad itself is not
 					       // at the boundary, but
-					       // that one of its line
+					       // that one of its lines
 					       // actually is. in this
 					       // case, the newly
 					       // created vertices at
@@ -5958,7 +5958,11 @@ Triangulation<3>::execute_refinement ()
 	      vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1) *
 					      7./192.;
 					     // finally add centers of
-					     // faces
+					     // faces. note that
+					     // vertex 2 is an
+					     // invariant with respect
+					     // to the face
+					     // orientation
 	    for (unsigned int face=0;
 		 face<GeometryInfo<dim>::faces_per_cell; ++face)
 	      vertices[next_unused_vertex] += hex->face(face)->child(0)->vertex(2) *
@@ -5967,7 +5971,7 @@ Triangulation<3>::execute_refinement ()
 					     // now that we created
 					     // the right point, make
 					     // up the six lines
-					     // interior to the quad
+					     // interior to the hex
 					     // (++ takes care of the
 					     // end of the vector)
 	    raw_line_iterator new_lines[6];
@@ -5979,7 +5983,8 @@ Triangulation<3>::execute_refinement ()
 		new_lines[i] = next_unused_line;
 		++next_unused_line;
 
-		Assert (new_lines[i]->used() == false, ExcCellShouldBeUnused());
+		Assert (new_lines[i]->used() == false,
+                        ExcCellShouldBeUnused());
 	      };
 
 					     // set the data of the
@@ -6004,6 +6009,14 @@ Triangulation<3>::execute_refinement ()
 					     //   *3-*-1*     *3-*-1*
 					     //  /  0  /      |  4  |
 					     // *--*--*       *--*--*
+                                             //
+                                             // note that both asking
+                                             // for child 0 and for
+                                             // vertex 2 within that
+                                             // is invariant with
+                                             // respect to the face
+                                             // orientation, so we do
+                                             // not have to ask here
 	    const unsigned int vertex_indices[7]
 	      = { hex->face(0)->child(0)->vertex_index(2),
 		  hex->face(3)->child(0)->vertex_index(2),
@@ -6102,46 +6115,85 @@ Triangulation<3>::execute_refinement ()
 					     //              | *          | *
 					     //              |/           |/
 					     //              *            *
-	       
+                                             //
+                                             // this time we have to
+                                             // take into account
+                                             // whether the different
+                                             // faces are oriented
+                                             // correctly or in the
+                                             // opposite direction, so
+                                             // store that up front
+            const bool face_orientation[6]
+              = { hex->get_face_orientation (0),
+                  hex->get_face_orientation (1),
+                  hex->get_face_orientation (2),
+                  hex->get_face_orientation (3),
+                  hex->get_face_orientation (4),
+                  hex->get_face_orientation (5) };
+                    
 	    const unsigned int line_indices[30]
 	      = {
-		    hex->face(0)->child(0)->line_index(1),   //0
-		    hex->face(0)->child(1)->line_index(2),   //1
-		    hex->face(0)->child(2)->line_index(3),   //2
-		    hex->face(0)->child(3)->line_index(0),   //3
+		    hex->face(0)->child(0                          )
+                    ->line_index(face_orientation[0] ? 1 : 2),   //0
+		    hex->face(0)->child(face_orientation[0] ? 1 : 3)
+                    ->line_index(face_orientation[0] ? 2 : 1),   //1
+		    hex->face(0)->child(2                          )
+                    ->line_index(face_orientation[0] ? 3 : 0),   //2
+		    hex->face(0)->child(face_orientation[0] ? 3 : 1)
+                    ->line_index(face_orientation[0] ? 0 : 3),   //3
 
-		    hex->face(2)->child(0)->line_index(2),   //4
-		    hex->face(2)->child(1)->line_index(2),   //5
-		    hex->face(3)->child(0)->line_index(1),   //6
-		    hex->face(3)->child(3)->line_index(1),   //7
+		    hex->face(2)->child(0                          )
+                    ->line_index(face_orientation[2] ? 2 : 1),   //4
+		    hex->face(2)->child(face_orientation[2] ? 1 : 3)
+                    ->line_index(face_orientation[2] ? 2 : 1),   //5
+		    hex->face(3)->child(0                          )
+                    ->line_index(face_orientation[3] ? 1 : 2),   //6
+		    hex->face(3)->child(face_orientation[3] ? 3 : 1)
+                    ->line_index(face_orientation[3] ? 1 : 2),   //7
 
-		    hex->face(4)->child(1)->line_index(2),   //8
-		    hex->face(4)->child(0)->line_index(2),   //9
-		    hex->face(5)->child(3)->line_index(1),   //10
-		    hex->face(5)->child(0)->line_index(1),   //11
+		    hex->face(4)->child(face_orientation[4] ? 1 : 3)
+                    ->line_index(face_orientation[4] ? 2 : 1),   //8
+		    hex->face(4)->child(0                          )
+                    ->line_index(face_orientation[4] ? 2 : 1),   //9
+		    hex->face(5)->child(face_orientation[5] ? 3 : 1)
+                    ->line_index(face_orientation[5] ? 1 : 2),   //10
+		    hex->face(5)->child(0                          )
+                    ->line_index(face_orientation[5] ? 1 : 2),   //11
 
 		    new_lines[4]->index(),                   //12
 		    new_lines[1]->index(),                   //13
 		    new_lines[5]->index(),                   //14
 		    new_lines[3]->index(),                   //15
 
-		    hex->face(1)->child(0)->line_index(1),   //16
-		    hex->face(1)->child(1)->line_index(2),   //17
-		    hex->face(1)->child(2)->line_index(3),   //18
-		    hex->face(1)->child(3)->line_index(0),   //19
+		    hex->face(1)->child(0                          )
+                    ->line_index(face_orientation[1] ? 1 : 2),   //16
+		    hex->face(1)->child(face_orientation[1] ? 1 : 3)
+                    ->line_index(face_orientation[1] ? 2 : 1),   //17
+		    hex->face(1)->child(2                          )
+                    ->line_index(face_orientation[1] ? 3 : 0),   //18
+		    hex->face(1)->child(face_orientation[1] ? 3 : 1)
+                    ->line_index(face_orientation[1] ? 0 : 3),   //19
 
-		    hex->face(5)->child(0)->line_index(2),   //20
-		    hex->face(5)->child(1)->line_index(2),   //21
-		    hex->face(4)->child(0)->line_index(1),   //22
-		    hex->face(4)->child(3)->line_index(1),   //23
+		    hex->face(5)->child(0                          )
+                    ->line_index(face_orientation[5] ? 2 : 1),   //20
+		    hex->face(5)->child(face_orientation[5] ? 1 : 3)
+                    ->line_index(face_orientation[5] ? 2 : 1),   //21
+		    hex->face(4)->child(0                          )
+                    ->line_index(face_orientation[4] ? 1 : 2),   //22
+		    hex->face(4)->child(face_orientation[4] ? 3 : 1)
+                    ->line_index(face_orientation[4] ? 1 : 2),   //23
 
 		    new_lines[0]->index(),                   //24
 		    new_lines[2]->index(),                   //25
-		    hex->face(2)->child(0)->line_index(1),   //26
-		    hex->face(2)->child(3)->line_index(1),   //27
+		    hex->face(2)->child(0                          )
+                    ->line_index(face_orientation[2] ? 1 : 2),   //26
+		    hex->face(2)->child(face_orientation[2] ? 3 : 1)
+                    ->line_index(face_orientation[2] ? 1 : 2),   //27
 
-		    hex->face(3)->child(0)->line_index(2),   //28
-		    hex->face(3)->child(1)->line_index(2)    //29
+		    hex->face(3)->child(0                          )
+                    ->line_index(face_orientation[3] ? 2 : 1),   //28
+		    hex->face(3)->child(face_orientation[3] ? 1 : 3)
+                    ->line_index(face_orientation[3] ? 2 : 1)    //29
 	      };
 	    
 					     // find some space for
@@ -6156,7 +6208,8 @@ Triangulation<3>::execute_refinement ()
 		new_quads[i] = next_unused_quad;
 		++next_unused_quad;
 
-		Assert (new_quads[i]->used() == false, ExcCellShouldBeUnused());
+		Assert (new_quads[i]->used() == false,
+                        ExcCellShouldBeUnused());
 	      };
 
 					     // set up the 12 quads,
@@ -6309,6 +6362,17 @@ Triangulation<3>::execute_refinement ()
 					     //  32/       /      |       |24
 					     //  |/20   21/       |12   13|/
 					     //  *-------*        *-------*
+                                             //
+                                             // note that we have to
+                                             // take care of the
+                                             // orientation of
+                                             // faces. as an
+                                             // optimization: asking
+                                             // for child 0 or 2 of a
+                                             // face is invariant
+                                             // under the orientation,
+                                             // so we don't have to
+                                             // ask for it then
 	    const unsigned int quad_indices[36]
 	      = {
 		    new_quads[0]->index(),     //0
@@ -6325,34 +6389,34 @@ Triangulation<3>::execute_refinement ()
 		    new_quads[11]->index(),    //11
 
 		    hex->face(0)->child_index(0),  //12
-		    hex->face(0)->child_index(1),
+		    hex->face(0)->child_index(face_orientation[0] ? 1 : 3),
 		    hex->face(0)->child_index(2),
-		    hex->face(0)->child_index(3),
+		    hex->face(0)->child_index(face_orientation[0] ? 3 : 1),
 
 		    hex->face(1)->child_index(0),  //16
-		    hex->face(1)->child_index(1),
+		    hex->face(1)->child_index(face_orientation[1] ? 1 : 3),
 		    hex->face(1)->child_index(2),
-		    hex->face(1)->child_index(3),
+		    hex->face(1)->child_index(face_orientation[1] ? 3 : 1),
 
 		    hex->face(2)->child_index(0),  //20
-		    hex->face(2)->child_index(1),
+		    hex->face(2)->child_index(face_orientation[2] ? 1 : 3),
 		    hex->face(2)->child_index(2),
-		    hex->face(2)->child_index(3),
+		    hex->face(2)->child_index(face_orientation[2] ? 3 : 1),
 
 		    hex->face(3)->child_index(0),  //24
-		    hex->face(3)->child_index(1),
+		    hex->face(3)->child_index(face_orientation[3] ? 1 : 3),
 		    hex->face(3)->child_index(2),
-		    hex->face(3)->child_index(3),
+		    hex->face(3)->child_index(face_orientation[3] ? 3 : 1),
 
 		    hex->face(4)->child_index(0),  //28
-		    hex->face(4)->child_index(1),
+		    hex->face(4)->child_index(face_orientation[4] ? 1 : 3),
 		    hex->face(4)->child_index(2),
-		    hex->face(4)->child_index(3),
+		    hex->face(4)->child_index(face_orientation[4] ? 3 : 1),
 
 		    hex->face(5)->child_index(0),  //32
-		    hex->face(5)->child_index(1),
+		    hex->face(5)->child_index(face_orientation[5] ? 1 : 3),
 		    hex->face(5)->child_index(2),
-		    hex->face(5)->child_index(3)
+		    hex->face(5)->child_index(face_orientation[5] ? 3 : 1)
 	      };
 
 
@@ -6371,7 +6435,8 @@ Triangulation<3>::execute_refinement ()
 	    for (unsigned int i=0; i<8; ++i)
 	      {
 		new_hexes[i] = next_unused_hex;
-		Assert (new_hexes[i]->used() == false, ExcCellShouldBeUnused());
+		Assert (new_hexes[i]->used() == false,
+                        ExcCellShouldBeUnused());
 		++next_unused_hex;
 	      };
 

@@ -507,33 +507,36 @@ TriaObjectAccessor<3,dim>::line (const unsigned int i) const
   Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   Assert (i<12, ExcIndexRange (i,0,12));
 
-				   // egcs 1.1.2 gets into trouble if we
-				   // omit the this-> here, if one tries to
-				   // inline this function into another
-				   // function where the variable name
-				   // quad is also used.. It then complains
-				   // that the name look-up for
-				   // for-loop-variables has changed. using
-				   // this-> as here works around the problem
-  if (i<4)
-    return this->quad(0)->line(i);
-  else
-    if (i<8)
-      return this->quad(1)->line(i-4);
-    else
-      switch (i) 
-	{
-	  case 8:
-		return this->quad(2)->line(3);
-	  case 9:
-		return this->quad(2)->line(1);
-	  case 10:
-		return this->quad(4)->line(1);
-	  case 11:
-		return this->quad(4)->line(3);
-	};
-  Assert (false, ExcIndexRange(i,0,12));
-  return TriaIterator<dim,TriaObjectAccessor<1,dim> >(this->tria, -1, -1, 0);
+                                   // get the line index by asking the
+                                   // quads. make sure we handle
+                                   // reverted faces correctly
+                                   //
+                                   // so set up a table that for each
+                                   // line describes a) from which
+                                   // quad to take it, b) which line
+                                   // therein it is if the face is
+                                   // oriented correctly, and c) if in
+                                   // the opposite direction
+  static const unsigned int lookup_table[12][3] =
+    { { 0, 0, 3 }, // take first four lines from front face
+      { 0, 1, 2 },
+      { 0, 2, 1 },
+      { 0, 3, 0 },
+
+      { 1, 0, 3 }, // second four lines from back face
+      { 1, 1, 2 },
+      { 1, 2, 1 },
+      { 1, 3, 0 },
+
+      { 2, 3, 0 }, // the rest randomly
+      { 2, 1, 2 },
+      { 4, 1, 2 },
+      { 4, 3, 0 }};
+
+  return (this->quad(lookup_table[i][0])
+          ->line(get_face_orientation(lookup_table[i][0]) ?
+                 lookup_table[i][1] :
+                 lookup_table[i][2]));
 }
 
 
@@ -562,25 +565,36 @@ TriaObjectAccessor<3,dim>::line_index (const unsigned int i) const
 {
   Assert (i<12, ExcIndexRange(i,0,12));
 
-  if (i<4)
-    return quad(0)->line_index(i);
-  else
-    if (i<8)
-      return quad(1)->line_index(i-4);
-    else
-      switch (i) 
-	{
-	  case 8:
-		return quad(2)->line_index(3);
-	  case 9:
-		return quad(2)->line_index(1);
-	  case 10:
-		return quad(4)->line_index(1);
-	  case 11:
-		return quad(4)->line_index(3);
-	};
-  Assert (false, ExcIndexRange(i,0,12));
-  return 0;
+                                   // get the line index by asking the
+                                   // quads. make sure we handle
+                                   // reverted faces correctly
+                                   //
+                                   // so set up a table that for each
+                                   // line describes a) from which
+                                   // quad to take it, b) which line
+                                   // therein it is if the face is
+                                   // oriented correctly, and c) if in
+                                   // the opposite direction
+  static const unsigned int lookup_table[12][3] =
+    { { 0, 0, 3 }, // take first four lines from front face
+      { 0, 1, 2 },
+      { 0, 2, 1 },
+      { 0, 3, 0 },
+
+      { 1, 0, 3 }, // second four lines from back face
+      { 1, 1, 2 },
+      { 1, 2, 1 },
+      { 1, 3, 0 },
+
+      { 2, 3, 0 }, // the rest randomly
+      { 2, 1, 2 },
+      { 4, 1, 2 },
+      { 4, 3, 0 }};
+
+  return (this->quad(lookup_table[i][0])
+          ->line_index(get_face_orientation(lookup_table[i][0]) ?
+                       lookup_table[i][1] :
+                       lookup_table[i][2]));
 }
 
 
