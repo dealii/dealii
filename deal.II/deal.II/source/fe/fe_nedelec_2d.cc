@@ -23,48 +23,46 @@
 // the child cell are obtained from the degrees of freedom on the
 // mother cell
 //
-// TODO: [Anna] check whether the following paragraph is correct. if so, then please multiply the values in the four following matrices by two
-
 // note the following: since the shape functions themselves and not
 // only the gradients are transformed using the mapping object from
 // the unit cell to the real cell, the actual values of the function
 // on the real cell is degree of freedom times value of the shape
-// function on the unit cell times Jacobian. Thus, what has the DoF
-// value 1 on the mother cell must have the DoF value 2 on the child
-// cell since the latter is smaller by a (linear scaling) factor of
-// two.
+// function on the unit cell times inverse Jacobian. Thus, what has
+// the DoF value 1 on the mother cell must have the DoF value 1/2 on
+// the child cell since the latter is smaller by a (linear scaling)
+// factor of two.
 namespace FE_Nedelec_2d
 {
   static const double q1_into_q1_refined_0[] =
   {
-	1.,  0,  0,  0,
-	0,   0.5,0,  0.5,
-	0.5, 0,  0.5,0,
-	0,   0,  0,  1 
+	.5,   0,   0 ,  0,
+	0,    0.25,0,   0.25,
+	0.25, 0,   0.25,0,
+	0,    0,   0,   .5 
   };
 
   static const double q1_into_q1_refined_1[] =
   {
-  	1., 0., 0., 0.,
-  	0., 1., 0., 0.,
-  	0.5, 0., 0.5, 0.,
-	0., 0.5, 0., 0.5,
+  	.5,   0.,   0.,   0.,
+  	0.,   .5,   0.,   0.,
+  	0.25, 0.,   0.25, 0.,
+	0.,   0.25, 0.,   0.25,
   };
 
   static const double q1_into_q1_refined_2[] =
   {
-  	0.5, 0., 0.5, 0.,
- 	0., 1., 0., 0.,
-	0., 0., 1., 0.,
-  	0., 0.5, 0., 0.5,
+  	0.25, 0.,   0.25, 0.,
+ 	0.,   .5,   0.,   0.,
+	0.,   0.,   .5,   0.,
+  	0.,   0.25, 0.,   0.25,
   };
 
   static const double q1_into_q1_refined_3[] =
   {
-  	0.5, 0., 0.5, 0.,
-  	0., 0.5, 0., 0.5,
-	0., 0., 1., 0.,
-  	0., 0., 0., 1.,
+  	0.25, 0.,   0.25, 0.,
+  	0.,   0.25, 0.,   0.25,
+	0.,   0.,   .5,   0.,
+  	0.,   0.,   0.,   .5,
   };
 };  // namespace FE_Nedelec_2d
 
