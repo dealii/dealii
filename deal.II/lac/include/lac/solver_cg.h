@@ -256,9 +256,6 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
 
       print_vectors(it, x, g, d);
       
-      if (additional_data.log_coefficients)
-	deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
-      
       conv = control().check(it,res);
       if (conv)
 	break;
@@ -268,6 +265,9 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
       beta = gh;
       gh   = g*h;
       beta = gh/beta;
+      
+      if (additional_data.log_coefficients)
+	deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
       
       d.sadd(beta,-1.,h);
     };
