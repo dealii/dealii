@@ -1,5 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
-   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
+   "http://www.w3.org/TR/REC-html40/frameset.dtd">
 <html>
   <head>
     <link href="screen.css" rel="StyleSheet" media="screen">
@@ -40,7 +40,8 @@
   </ol>
 
 
-  <h3><a name="compiler"></a>How do I change the compiler?</h3>
+  <a name="compiler"></a>
+  <h3>How do I change the compiler?</h3>
 
   <p>
   <acronym>deal.II</acronym> can be compiled by a number of compilers
@@ -53,7 +54,8 @@
   </p>
 
 
-  <h3><a name="gcc296"></a>I cannot compile <acronym>deal.II</acronym>
+  <a name="gcc296"></a>
+  <h3>I cannot compile <acronym>deal.II</acronym>
   with gcc version 2.96!</h3>
 
   <p>
@@ -72,7 +74,9 @@
   to gcc version 2.95, all of which work with <acronym>deal.II</acronym>.
   </p>
   
-  <h3><a name="windows">Can I use <acronym>deal.II</acronym> on a
+
+  <a name="windows">
+  <h3>Can I use <acronym>deal.II</acronym> on a
   Windows platform?</a></h3>
 
   <p>
@@ -82,11 +86,11 @@
   provided by the <a href="http://www.cygwin.com/">cygwin
   compiler</a>. People reported successful compilation with the
   following combination of tools:
+  </p>
   <ul>
   <li> cygwin 1.3.9-1
   <li> make 3.79.1-5
   </ul>
-  </p>
 
   <p>
   Earlier versions of "make" caused trouble, still you should try the latest
@@ -131,8 +135,8 @@
   </p>
 
 
-  <h3><a name="perl-bug">I can't build the online documentation under
-                         Cygwin!</a></h3>
+  <a name="perl-bug">
+  <h3>I can't build the online documentation under Cygwin!</a></h3>
 
   <p>
   The Perl utility from Cygwin distribution (up to version 5.6.1-2)
@@ -151,8 +155,9 @@
 
 
 
-  <h3><a name="triangles"></a>Can I use/implement
-  triangles/tetrahedra in <acronym>deal.II</acronym>?</h3>
+  <a name="triangles"></a>
+  <h3>Can I use/implement triangles/tetrahedra in
+  <acronym>deal.II</acronym>?</h3>
 
   <p>
   No, you cannot do either. The basic data structures are too much
@@ -161,12 +166,12 @@
   scratch. On the other hand, the restriction to quadrilaterals and
   hexahedra avoids a large number of run-time computations and makes
   the library as fast as it is.
-  <p>
+  </p>
 
 
 
-  <h3><a name="problem-types"></a>Can I solve problem XXX
-  with <acronym>deal.II</acronym>?</h3>
+  <a name="problem-types"></a>
+  <h3>Can I solve problem XXX with <acronym>deal.II</acronym>?</h3>
 
   <p>
   The simple answer is: if it can be written as a PDE, then this is
@@ -214,13 +219,15 @@
   <li> Time dependent large deformation problems for metal forming;
   <li> Eulerian coordinates problems in biomechanical modeling.
   </ul>
+  <p>
   Probably, many other problem types are solved by the many users
   which we do not know of directly. If someone would like to have his
   project added to this page, just contact us.
   </p>
 
 
-  <h3><a name="problem-howto"></a>How do I solve problem XXX
+  <a name="problem-howto"></a>
+  <h3>How do I solve problem XXX
   with <acronym>deal.II</acronym>?</h3>
 
   <p>
@@ -241,7 +248,8 @@
   </p>
 
 
-  <h3><a name="contribute"></a>I want to contribute to the development
+  <a name="contribute"></a>
+  <h3>I want to contribute to the development
       of <acronym>deal.II</acronym>!</h3>
 
   <p>
@@ -257,12 +265,14 @@
   others as well, you are invited to send it to the list for possible
   inclusion into the library and use by others as well. Such additions
   useful to others are, for example: 
+  </p>
   <ul>
   <li> new backends for output in a new graphical format;
   <li> input filters for some kind of data;
   <li> tool classes that do something that might be interesting to use
        in other programs as well.
   </ul>
+  <p>
   In general, once you start to use something you wrote for one
   project in a second project, this is something that would make up a
   good addition to the entire library!
