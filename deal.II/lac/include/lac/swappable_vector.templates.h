@@ -214,6 +214,8 @@ void SwappableVector<number>::reload_vector (const bool set_flag)
   if (set_flag)
     data_is_preloaded = true;
   lock.release ();
+#else
+  (void)set_flag;
 #endif
 };
 
