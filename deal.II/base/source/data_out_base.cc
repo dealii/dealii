@@ -27,6 +27,8 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
 {
   AssertThrow (out, ExcIO());
 
+  Assert (patches.size() > 0, ExcNoPatches());
+  
   const unsigned int n_data_sets = data_names.size();
   
 				   // first count the number of cells
@@ -403,6 +405,8 @@ void DataOutBase::write_gnuplot (const vector<Patch<dim> > &patches,
 {
   AssertThrow (out, ExcIO());
   
+  Assert (patches.size() > 0, ExcNoPatches());
+
   const unsigned int n_data_sets = data_names.size();
   
   				   // write preamble
@@ -687,8 +691,9 @@ void DataOutBase::write_povray (const vector<Patch<dim> > &patches,
 				const PovrayFlags         &flags,
 				ostream                   &out) 
 {
-
   AssertThrow (out, ExcIO());
+  
+  Assert (patches.size() > 0, ExcNoPatches());
   Assert (dim==2, ExcNotImplemented());        // only for 2-D  
 
   const unsigned int n_data_sets = data_names.size();
@@ -988,6 +993,10 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 			     const EpsFlags            &flags,
 			     ostream                   &out) 
 {
+  Assert (out, ExcIO());
+  
+  Assert (patches.size() > 0, ExcNoPatches());
+  
   switch (dim) 
     {
       case 2:
@@ -1324,6 +1333,8 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 {
   AssertThrow (out, ExcIO());
 
+  Assert (patches.size() > 0, ExcNoPatches());
+ 
   const unsigned int n_data_sets = data_names.size();
   
 				   ///////////////////////

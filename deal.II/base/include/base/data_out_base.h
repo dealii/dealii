@@ -960,6 +960,10 @@ class DataOutBase
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcNoPatches);
+				     /**
+				      * Exception
+				      */
     DeclException0 (ExcIO);
 
   private:
