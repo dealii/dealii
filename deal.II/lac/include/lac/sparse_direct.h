@@ -622,7 +622,7 @@ class SparseDirectMA27 : public Subscriptor
  *
  * The constructor of this class takes several arguments. Their
  * meaning is equivalent to those of the constructor of the
- * @ref{SparseDirectMA27} class; see there for more information.
+ * SparseDirectMA27 class; see there for more information.
  *
  *
  * @section SPDMA47c Note on parallelization

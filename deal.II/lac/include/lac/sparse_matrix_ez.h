@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -884,7 +884,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * integers.
 				      *
 				      * This function
-				      * may produce @em{large} amounts of
+				      * may produce @em large amounts of
 				      * output if applied to a large matrix!
 				      */
 //      void print_formatted (std::ostream       &out,
