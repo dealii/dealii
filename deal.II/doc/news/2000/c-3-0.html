@@ -14,6 +14,15 @@
 <ol>
 
   <li> <p>
+       Improved: Dependence on the files <code
+       class="file">forward_declarations.h</code> has been widely
+       removed to improve compilation time
+       <br>
+       (GK 2000/05/24)
+       </p>
+
+
+  <li> <p>
        Fix: <code class="program">configure</code> now uses 
        <code class="program">config.guess</code> to determine the
        operating system and hardware platform.
@@ -27,6 +36,14 @@
 
 <ol>
   <li> <p>
+       New: There is now a function <code class="member">invert
+       (Tensor<2,dim>)</code> that returns the inverse of a tensor of
+       rank 2.
+       <br>
+       (WB 2000/04/14)
+       </p>
+
+  <li> <p>
        New multithreading scheme is implemented.
        <br>
        (WB 2000/04/13)
@@ -38,14 +55,6 @@
        <br>
        (GK 2000/04/12)
        </p>
-
-  <li> <p>
-       New: There is now a function <code class="member">invert
-       (Tensor<2,dim>)</code> that returns the inverse of a tensor of
-       rank 2.
-       <br>
-       (WB 2000/04/14)
-       </p>
 </ol>
 
 
@@ -53,6 +62,93 @@
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       New: Class <code class="class">PreconditionBlockJacobi</code>
+       <br>
+       (GK 2000/05/24)
+
+  <li> <p>
+       New: <code class="class">SolverControl</code> has an interface
+       to <code class="class">ParameterHandler</code>, definining and
+       reading parameters from a file automatically.
+       <br>
+       (GK 2000/05/24)
+       </p>
+
+  <li> <p>
+       New: <code class="class">BlockIndices</code>: Class that
+       manages the conversion of global indices into a block
+       vector/matrix/... to the indices local to each of the blocks. 
+       <br>
+       (WB 2000/05/08)
+       </p>  
+
+  <li> <p>
+       New: <code class="class">BlockSparsityPattern</code> and
+       <code class="class">BlockSparseMatrix</code>: Classes that
+       represent matrices that are composed of sparse matrices.
+       <br>
+       (WB 2000/05/08)
+       </p>  
+
+  <li> <p>
+       Fix: the 
+       <code class="member">FullMatrix::mmult</code> and
+       <code class="member">FullMatrix::Tmmult</code> code don't
+       resize their output argument any more, as this is not common
+       style in the library. Furthermore, 
+       <code class="member">FullMatrix::Tmmult</code> was utterly
+       broken. 
+       <br>
+       (WB 2000/05/08)
+       </p>
+
+  <li> <p>
+       Change: the <code class="member">matrix_norm</code> functions
+       of sparse and full matrices are renamed to 
+       <code class="member">matrix_norm_square</code>, since they in
+       fact return the square of the norm. This should avoid confusion
+       in some cases.
+       <br>
+       (WB 2000/05/05)
+       </p>
+
+  <li> <p>
+       Fix: the ``copy-like'' constructor of 
+       <code class="class">SparsityPattern</code> that copies another
+       object and adds some off-diagonals had a bug that caused an
+       exception in some cases. This is now fixed.
+       <br>
+       (WB 2000/05/04)
+       </p>
+
+  <li> <p>
+       New: <code class="class">SwappableVector</code>: Class that
+       allows to swap out the data of a vector to disk and reload it
+       later on. It also has a function to preload the data before its
+       use in a separate thread if the library is configured for
+       multi-threading.
+       <br>
+       (WB 2000/05/03)
+       </p>
+
+  <li> <p>
+       New: there are now functions <code class="member">Vector::swap</code> 
+       and <code class="member">BlockVector::swap</code>, as well as
+       global functions <code class="member">swap(u,v)</code> that
+       exchange the data of two vectors without needing a temporary
+       vector and without copying around data. Their run-time is
+       therefore independent of the length of the vectors.
+       <br>
+       (WB 2000/05/02)
+       </p>
+
+  <li> <p>
+       Fix: <code class="class">SolverCG</code> counts steps properly.
+       <br>
+       (GK 2000/04/25)
+       </p>
+
   <li> <p>
        Change: the solver classes in LAC lost their first template
        argument. Their names are now 
@@ -87,12 +183,6 @@
        </p>
 
   <li> <p>
-       Fix: <code class="class">SolverCG</code> counts steps properly.
-       <br>
-       (GK 2000/04/25)
-       </p>
-
-  <li> <p>
        New: <code class="class">SolverXX</code>: There is a virtual function
        <code>print_vectors</code> called in every step. It is void in the
        solver itself but can be used to print intermediate iteration
@@ -101,73 +191,6 @@
        (GK 2000/04/05)
        </p>
 
-  <li> <p>
-       New: there are now functions <code class="member">Vector::swap</code> 
-       and <code class="member">BlockVector::swap</code>, as well as
-       global functions <code class="member">swap(u,v)</code> that
-       exchange the data of two vectors without needing a temporary
-       vector and without copying around data. Their run-time is
-       therefore independent of the length of the vectors.
-       <br>
-       (WB 2000/05/02)
-       </p>
-
-  <li> <p>
-       New: <code class="class">BlockIndices</code>: Class that
-       manages the conversion of global indices into a block
-       vector/matrix/... to the indices local to each of the blocks. 
-       <br>
-       (WB 2000/05/08)
-       </p>  
-
-  <li> <p>
-       New: <code class="class">BlockSparsityPattern</code> and
-       <code class="class">BlockSparseMatrix</code>: Classes that
-       represent matrices that are composed of sparse matrices.
-       <br>
-       (WB 2000/05/08)
-       </p>  
-
-  <li> <p>
-       New: <code class="class">SwappableVector</code>: Class that
-       allows to swap out the data of a vector to disk and reload it
-       later on. It also has a function to preload the data before its
-       use in a separate thread if the library is configured for
-       multi-threading.
-       <br>
-       (WB 2000/05/03)
-       </p>
-
-  <li> <p>
-       Fix: the ``copy-like'' constructor of 
-       <code class="class">SparsityPattern</code> that copies another
-       object and adds some off-diagonals had a bug that caused an
-       exception in some cases. This is now fixed.
-       <br>
-       (WB 2000/05/04)
-       </p>
-
-  <li> <p>
-       Fix: the 
-       <code class="member">FullMatrix::mmult</code> and
-       <code class="member">FullMatrix::Tmmult</code> code don't
-       resize their output argument any more, as this is not common
-       style in the library. Furthermore, 
-       <code class="member">FullMatrix::Tmmult</code> was utterly
-       broken. 
-       <br>
-       (WB 2000/05/08)
-       </p>
-
-  <li> <p>
-       Change: the <code class="member">matrix_norm</code> functions
-       of sparse and full matrices are renamed to 
-       <code class="member">matrix_norm_square</code>, since they in
-       fact return the square of the norm. This should avoid confusion
-       in some cases.
-       <br>
-       (WB 2000/05/05)
-       </p>
 </ol>
 
 
@@ -176,106 +199,61 @@
 
 <ol>
   <li> <p>
-       New: <code class="member">DataOut::clear_data_vectors</code>
-       allows to re-use an object without deleting the <code
-       class="class">DoFHandler</code>
+       Changed: <code class="member">FE_DGx::restriction</code> is
+       not an interpolation any more but a local projection which is
+       more reasonable for DG elements.
        <br>
-       (GK 2000/04/05)
+       (Ralf Hartmann 2000/05/22)
        </p>
 
   <li> <p>
-       New: <code class="class">class DoFPrintSolverStep</code> prints
-       intermediate vectors of a solver as finite element functions using
-       <code class="class">DataOut</code>.
+       Changed: enum 
+       <code class="class">MeshSmoothing</code> is moved into the 
+       <code class="class">Triangulation</code> class.
        <br>
-       (GK 2000/04/05)
+       (Ralf Hartmann 2000/05/18)
+       </p>
+
+  <li> <p> 
+       New: <code class="member">Triangulation<dim>::patch_level_1</code>
+       is a new mesh smoothing. A mesh of patch level 1 consists of
+       patches, i.e. they consists of cells that are all refined at
+       least once.
+       </p>
+
+       <p>
+       Changed: As follows from the existence of this new smoothing,
+       <code class="member">maximum_smoothing</code> will include this
+       smoothing.
+       </p>
+
+       <p>
+       (Ralf Hartmann 2000/05/18)
        </p>
 
   <li> <p>
-       New: <code class="class">class GradientEstimator</code>
-       estimates the norm of the gradient on each cell from finite
-       difference approximations. 
-       <br>
-       (WB 2000/04/14)
+       Changed: the 
+       <code class="member">MatrixTools::apply_boundary_values</code>
+       now uses a much faster algorithm when working on matrices with
+       symmetric sparsity patterns. On the other hand, it does no more
+       eliminate whole rows when a matrix has a non-symmetric sparsity
+       pattern, or if the user (through a new flag) tells the function
+       that this is not necessary, for example if the matrix itself is
+       non-symmetric. 
        </p>
 
-  <li> <p>
-       New: <code class="member">DoFTools::extract_boundary_dofs</code> 
-       finds all degrees of freedom which are at the boundary and belong to
-       specified components.
-       <br>
-       (WB 2000/04/17)
+       <p>
+       For symmetric sparsity patterns, the algorithm now eliminates
+       each boundary value in O(m*log(m)) steps instead of
+       O(N*log(m)), where N=number of rows of the matrix, and m=number
+       of entries per row. Note that m is roughly constant,
+       irrespective of N, so the old algorithm became slower with
+       finer grids, while the new one is O(1) for each boundary degree
+       of freedom.
        </p>
 
-  <li> <p>
-       New: <code class="member">DoFTools::compute_intergrid_constraints</code> 
-       allows to use different discretization grids for different
-       variables.
-       <br>
-       (WB 2000/04/15)
-       </p>
-
-  <li> <p> 
-       New: <code class="member">IntergridMap::get_{source,destination}_grid</code> 
-       functions return the grids for which the map was created.
-       <br>
-       (WB 2000/04/19)
-       </p>
-
-  <li> <p> 
-       Fix: <code class="member">FESystem::reinit()</code> generated
-       an exception if <code class="member">update_support_points</code> 
-       was set.
-       <br>
-       (WB 2000/05/10)
-       </p>
-
-  <li> <p> 
-       Change: the return value of
-       <code class="member">DoFHandler::max_couplings_between_dofs ()</code>
-       is bounded by <code class="member">DoFHandler::n_dofs()</code>.
-       <br>
-       (Ralf Hartmann 2000/05/11)
-       </p>
-
-  <li> <p> 
-       New: <code class="member">FEValuesBase::get_cell ()</code>
-       returns present cell.
-       <br>
-       (Ralf Hartmann 2000/05/11)
-       </p>
-
-  <li> <p> 
-       New: <code class="member">DoFTools::extract_hanging_node_dofs ()</code>
-       identifies nodes that will be constrained by hanging node constraints.
-       <br>
-       (WB 2000/05/12)
-       </p>
-
-  <li> <p> 
-       New: <code class="member">DoFRenumbering::sort_selected_dofs_back ()</code>
-       sorts selected degrees of freedom to the end of the index
-       range.
-       <br>
-       (WB 2000/05/12)
-       </p>
-
-  <li> <p> 
-       Change: <code class="member">DoFTools::make_hanging_node_constraints ()</code>
-       does not use the user flags any more, and can thus run in
-       parallel more than once. 
-       <br>
-       (WB 2000/05/15)
-       </p>
-
-  <li> <p> 
-       Extended: <code class="member">DoFTools::make_sparsity_pattern ()</code>
-       now accepts a template parameter as sparsity pattern. This
-       allows to use this function for the usual 
-       <code class="class">SparsityPattern</code>, or for 
-       <code class="class">BlockSparsityPattern</code> arguments.
-       <br>
-       (WB 2000/05/15)
+       <p>
+       (John Burnell, WB 2000/05/17)
        </p>
 
   <li> <p>
@@ -306,7 +284,7 @@
        Several functions in <code class="class">ConstraintMatrix</code>.
        </ul>
        <br>
-       (WB 2000/05/16 and later)
+       (WB 2000/05/16 ...)
        </p>
 
   <li> <p>
@@ -318,62 +296,107 @@
        (John Burnell, WB 2000/05/16)
        </p>
 
-  <li> <p>
-       Changed: the 
-       <code class="member">MatrixTools::apply_boundary_values</code>
-       now uses a much faster algorithm when working on matrices with
-       symmetric sparsity patterns. On the other hand, it does no more
-       eliminate whole rows when a matrix has a non-symmetric sparsity
-       pattern, or if the user (through a new flag) tells the function
-       that this is not necessary, for example if the matrix itself is
-       non-symmetric. 
-       </p>
-
-       <p>
-       For symmetric sparsity patterns, the algorithm now eliminates
-       each boundary value in O(m*log(m)) steps instead of
-       O(N*log(m)), where N=number of rows of the matrix, and m=number
-       of entries per row. Note that m is roughly constant,
-       irrespective of N, so the old algorithm became slower with
-       finer grids, while the new one is O(1) for each boundary degree
-       of freedom.
-       </p>
-
-       <p>
-       (John Burnell, WB 2000/05/17)
-       </p>
-
-  <li> <p>
-       Changed: enum 
-       <code class="class">MeshSmoothing</code> is moved into the 
-       <code class="class">Triangulation</code> class.
+  <li> <p> 
+       Change: <code class="member">DoFTools::make_hanging_node_constraints ()</code>
+       does not use the user flags any more, and can thus run in
+       parallel more than once. 
        <br>
-       (Ralf Hartmann 2000/05/18)
+       (WB 2000/05/15)
        </p>
 
   <li> <p> 
-       New: <code class="member">Triangulation<dim>::patch_level_1</code>
-       is a new mesh smoothing. A mesh of patch level 1 consists of
-       patches, i.e. they consists of cells that are all refined at
-       least once.
+       Extended: <code class="member">DoFTools::make_sparsity_pattern ()</code>
+       now accepts a template parameter as sparsity pattern. This
+       allows to use this function for the usual 
+       <code class="class">SparsityPattern</code>, or for 
+       <code class="class">BlockSparsityPattern</code> arguments.
+       <br>
+       (WB 2000/05/15)
        </p>
 
-       <p>
-       Changed: As follows from the existence of this new smoothing,
-       <code class="member">maximum_smoothing</code> will include this
-       smoothing.
+  <li> <p> 
+       New: <code class="member">DoFTools::extract_hanging_node_dofs ()</code>
+       identifies nodes that will be constrained by hanging node constraints.
+       <br>
+       (WB 2000/05/12)
        </p>
 
-       <p>
-       (Ralf Hartmann 2000/05/18)
+  <li> <p> 
+       New: <code class="member">DoFRenumbering::sort_selected_dofs_back ()</code>
+       sorts selected degrees of freedom to the end of the index
+       range.
+       <br>
+       (WB 2000/05/12)
+       </p>
+
+  <li> <p> 
+       Change: the return value of
+       <code class="member">DoFHandler::max_couplings_between_dofs ()</code>
+       is bounded by <code class="member">DoFHandler::n_dofs()</code>.
+       <br>
+       (Ralf Hartmann 2000/05/11)
+       </p>
+
+  <li> <p> 
+       New: <code class="member">FEValuesBase::get_cell ()</code>
+       returns present cell.
+       <br>
+       (Ralf Hartmann 2000/05/11)
+       </p>
+
+  <li> <p> 
+       Fix: <code class="member">FESystem::reinit()</code> generated
+       an exception if <code class="member">update_support_points</code> 
+       was set.
+       <br>
+       (WB 2000/05/10)
        </p>
 
   <li> <p>
-       Changed: <code class="member">FE_DGx::restriction</code> is
-       not an interpolation any more but a local projection which is
-       more reasonable for DG elements.
+       New: <code class="member">DataOut::clear_data_vectors</code>
+       allows to re-use an object without deleting the <code
+       class="class">DoFHandler</code>
        <br>
-       (Ralf Hartmann 2000/05/22)
+       (GK 2000/04/05)
+       </p>
+
+  <li> <p>
+       New: <code class="class">class DoFPrintSolverStep</code> prints
+       intermediate vectors of a solver as finite element functions using
+       <code class="class">DataOut</code>.
+       <br>
+       (GK 2000/04/05)
+       </p>
+
+  <li> <p>
+       New: <code class="member">DoFTools::extract_boundary_dofs</code> 
+       finds all degrees of freedom which are at the boundary and belong to
+       specified components.
+       <br>
+       (WB 2000/04/17)
+       </p>
+
+  <li> <p>
+       New: <code class="member">DoFTools::compute_intergrid_constraints</code> 
+       allows to use different discretization grids for different
+       variables.
+       <br>
+       (WB 2000/04/15)
+       </p>
+
+  <li> <p>
+       New: <code class="class">class GradientEstimator</code>
+       estimates the norm of the gradient on each cell from finite
+       difference approximations. 
+       <br>
+       (WB 2000/04/14)
+       </p>
+
+  <li> <p> 
+       New: <code class="member">IntergridMap::get_{source,destination}_grid</code> 
+       functions return the grids for which the map was created.
+       <br>
+       (WB 2000/04/19)
        </p>
 
 </ol>
