@@ -62,4 +62,5 @@ endif
 
 include ../lib/Makefile.dep
 
-include $D/deal.II/Make.forward-declarations
+include $D/common/Makescripts/forward_declarations
+
