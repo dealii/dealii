@@ -63,11 +63,12 @@
 
 <ol>
   <li> <p>
-       Fix: slight bug in 
-       <code class="member">DataOut::build_patches</code>
-       in multithreaded mode fixed.
+       Fix: 
+       <code class="member">SparsityPattern::print_gnuplot</code>
+       wrote rows and columns exchanged. Since most matrices have
+       symmetric sparsity patterns, this has gone unnoticed by now.
        <br>
-       (Ralf Hartmann, 2000/05/29)
+       (WB 2000/05/30)
        </p>
 
   <li> <p>
@@ -209,7 +210,6 @@
        <br>
        (GK 2000/04/05)
        </p>
-
 </ol>
 
 
@@ -217,6 +217,14 @@
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Fix: slight bug in 
+       <code class="member">DataOut::build_patches</code>
+       in multithreaded mode fixed.
+       <br>
+       (Ralf Hartmann, 2000/05/29)
+       </p>
+
   <li> <p>
        New: class <code class="class">FETools</code> performs
        interpolations and extrapolations of discrete functions from one
