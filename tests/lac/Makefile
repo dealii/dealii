@@ -41,9 +41,19 @@ libraries = $(libs)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
+%.go : %.cc Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(flags) -c $< -o $@
+%.o : %.cc Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(flags) -c $< -o $@
+
 all: solver.check mgbase.check mg.check
 exe: $(all:.check=.testcase) benchmark
 run: $(all:.check=.output)
+
+
+
 ############################################################
 # Typical block for building a running program
 #
@@ -158,15 +168,3 @@ clean:
 veryclean: clean
 	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
 
-############################################################
-# Automatic generation of dependencies
-############################################################
-
-all-cc-files = $(shell echo *.cc)
-
-Make.depend: $(all-cc-files)
-	@echo =====Dependencies== Make.depend
-	@$(CXX) $(flags) $^ -M > $@
-	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
-
-include Make.depend
