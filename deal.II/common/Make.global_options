@@ -31,8 +31,8 @@ CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
 
 ifeq ($(DEAL_II_USE_MT),true)
   INCLUDE    += -I$(ACE_ROOT)
-  CXXFLAGS.g += -DDEAL_II_USE_MT -threads
-  CXXFLAGS.o += -DDEAL_II_USE_MT -threads
+  CXXFLAGS.g += -DDEAL_II_USE_MT -threads -D__USE_MALLOC
+  CXXFLAGS.o += -DDEAL_II_USE_MT -threads -D__USE_MALLOC
 
   user-libs  += $(ACE_ROOT)/ace/libACE.so
 endif
