@@ -112,7 +112,7 @@ lib-contrib-hsl = $(LIBDIR)/libhsl$(lib-suffix)
 lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
 lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
 lib-contrib-petsc.g = $(LIBDIR)/libpetsc.g$(lib-suffix)
-lib-contrib-petsc.o = $(LIBDIR)/libpetsc.o$(lib-suffix)
+lib-contrib-petsc.o = $(LIBDIR)/libpetsc$(lib-suffix)
 
 # same for metis, except that there is only one library in that case
 lib-contrib-metis = $(DEAL_II_METIS_DIR)/libmetis.a

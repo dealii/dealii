@@ -60,8 +60,8 @@ endif
 	@echo "======================debug============= Linking library:   libpetsc.g.so"
 	@$(CXX) -shared -o libpetsc.g.so \
 		-Wl,-rpath,$(lib-contrib-petsc-path.g) $(xlib.g)
-	@echo "======================optimized========= Linking library:   libpetsc.o.so"
-	@$(CXX) -shared -o libpetsc.o.so \
+	@echo "======================optimized========= Linking library:   libpetsc.so"
+	@$(CXX) -shared -o libpetsc.so \
 		-Wl,-rpath,$(lib-contrib-petsc-path.o) $(xlib.o)
 
 else
