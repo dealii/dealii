@@ -1228,8 +1228,8 @@ FE_Q<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
-	if (flags & update_values)
+      if (flags & update_values)
+        for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)
@@ -1272,15 +1272,15 @@ FE_Q<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping
 				   // offset determines which data set
 				   // to take (all data sets for all
 				   // sub-faces are stored contiguously)
-  const unsigned int offset = (face * GeometryInfo<dim>::subfaces_per_face + subface)
-			      * quadrature.n_quadrature_points;
+  const unsigned int offset = ((face * GeometryInfo<dim>::subfaces_per_face + subface)
+                               * quadrature.n_quadrature_points);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
-	if (flags & update_values)
+      if (flags & update_values)
+        for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)
