@@ -4,6 +4,7 @@
 #include <grid/dof.h>
 #include <grid/tria.h>
 #include <fe/fe_lib.h>
+#include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <lac/dsmatrix.h>
@@ -105,7 +106,7 @@ void TestCases<dim>::create_new (const unsigned int) {
   if (dof  != 0) delete dof;
 
   tria = new Triangulation<dim>();
-  tria->create_unit_hypercube();
+  tria->create_hypercube();
 
   dof = new DoFHandler<dim> (tria);
 };

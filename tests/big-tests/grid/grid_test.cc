@@ -1,5 +1,6 @@
 /* $Id$ */
 
+#include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <cmath>
@@ -69,7 +70,7 @@ class CurvedLine :
 template <int dim>
 void test (const int test_case, const Point<dim> &) {
   Triangulation<dim> tria;
-  tria.create_unit_hypercube();
+  tria.create_hypercube();
   
   if ((dim==1) && ((test_case==2) || (test_case==3)))
     {
