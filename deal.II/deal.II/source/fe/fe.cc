@@ -47,7 +47,7 @@ FiniteElementBase<1>::FiniteElementBase (const unsigned int dofs_per_vertex,
   Assert (dofs_per_quad==0, ExcInternalError());
 
   const unsigned int dim=1;
-  for (unsigned int i=0; i<(1<<dim); ++i) 
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
     {
       restriction[i].reinit (total_dofs, total_dofs);
       prolongation[i].reinit (total_dofs, total_dofs);
@@ -67,7 +67,7 @@ FiniteElementBase<2>::FiniteElementBase (const unsigned int dofs_per_vertex,
 				      dofs_per_quad)
 {
   const unsigned int dim=2;
-  for (unsigned int i=0; i<(1<<dim); ++i) 
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
     {
       restriction[i].reinit (total_dofs, total_dofs);
       prolongation[i].reinit (total_dofs, total_dofs);
@@ -81,7 +81,7 @@ FiniteElementBase<2>::FiniteElementBase (const unsigned int dofs_per_vertex,
 template <int dim>
 const dFMatrix &
 FiniteElementBase<dim>::restrict (const unsigned int child) const {
-  Assert (child<(1<<dim), ExcInvalidIndex(child));
+  Assert (child<GeometryInfo<dim>::children_per_cell, ExcInvalidIndex(child));
   return restriction[child];
 };
 
@@ -90,7 +90,7 @@ FiniteElementBase<dim>::restrict (const unsigned int child) const {
 template <int dim>
 const dFMatrix &
 FiniteElementBase<dim>::prolongate (const unsigned int child) const {
-  Assert (child<(1<<dim), ExcInvalidIndex(child));
+  Assert (child<GeometryInfo<dim>::children_per_cell, ExcInvalidIndex(child));
   return prolongation[child];
 };
 
