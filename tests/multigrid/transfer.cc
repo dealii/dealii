@@ -67,7 +67,8 @@ void check_simple(const FiniteElement<dim>& fe)
 
 template <int dim>
 void check_select(const FiniteElement<dim>& fe,
-		 std::vector<unsigned int> target_component)
+		  std::vector<unsigned int> target_component,
+		  std::vector<unsigned int> mg_target_component)
 {
   deallog << fe.get_name() << std::endl;
   
@@ -79,10 +80,10 @@ void check_select(const FiniteElement<dim>& fe,
   mgdof.distribute_dofs(fe);
   DoFRenumbering::component_wise(mgdof, target_component);
   for (unsigned int l=0;l<tr.n_levels();++l)
-    DoFRenumbering::component_wise(mgdof, l, target_component);
+    DoFRenumbering::component_wise(mgdof, l, mg_target_component);
   
   std::vector<std::vector<unsigned int> > ndofs(mgdof.get_tria().n_levels());
-  MGTools::count_dofs_per_component(mgdof, ndofs, target_component);
+  MGTools::count_dofs_per_component(mgdof, ndofs, mg_target_component);
   for (unsigned int l=0;l<ndofs.size();++l)
     {
       deallog << "Level " << l << " dofs:";
@@ -94,7 +95,7 @@ void check_select(const FiniteElement<dim>& fe,
   
   MGTransferSelect<double> transfer;
   transfer.build_matrices(mgdof, 0,
-			  target_component);
+			  mg_target_component);
 
   Vector<double> u2(ndofs[2][0]);
   Vector<double> u1(ndofs[1][0]);
@@ -117,6 +118,11 @@ void check_select(const FiniteElement<dim>& fe,
 
 int main()
 {
+  std::ofstream logfile("transfer.output");
+  logfile.precision(3);
+  deallog.attach(logfile);
+  deallog.depth_console(100);
+  
 //  check_simple (FE_DGP<2>(0));
 //  check_simple (FE_DGP<2>(1));
   check_simple (FE_DGQ<2>(1));
@@ -134,7 +140,7 @@ int main()
       v3[i] = i/2;
     }
   
-  check_select (FESystem<2>(FE_DGQ<2>(1), 4), v1);
-  check_select (FESystem<2>(FE_DGQ<2>(1), 4), v2);
-  check_select (FESystem<2>(FE_DGQ<2>(1), 4), v3);
+  check_select (FESystem<2>(FE_DGQ<2>(1), 4), v1, v1);
+  check_select (FESystem<2>(FE_DGQ<2>(1), 4), v2, v2);
+  check_select (FESystem<2>(FE_DGQ<2>(1), 4), v3, v3);
 }
