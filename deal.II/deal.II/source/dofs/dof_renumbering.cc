@@ -726,7 +726,12 @@ template <int dim>
 void
 DoFRenumbering::random (DoFHandler<dim> &dof_handler)
 {
-  vector<unsigned int> new_indices (dof_handler.n_dofs());
+  const unsigned int n_dofs = dof_handler.n_dofs();
+  
+  vector<unsigned int> new_indices (n_dofs);
+  for (unsigned i=0; i<n_dofs; ++i)
+    new_indices[i] = i;
+  
   random_shuffle (new_indices.begin(), new_indices.end());
   dof_handler.renumber_dofs(new_indices);  
 };
