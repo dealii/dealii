@@ -19,6 +19,7 @@
 #include <iostream>
 #include <list>
 #include <set>
+#include <cstdio>
 
 
 int
@@ -91,9 +92,13 @@ main ()
 				   // now check for equivalence of sp3 and sp4
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
-      const unsigned int *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
-      const unsigned int *sp4_p=sp4.get_column_numbers()+sp4.get_rowstart_indices()[row];
-      for (; sp3_p != sp3.get_column_numbers()+sp3.get_rowstart_indices()[row+1]; ++sp3_p, ++sp4_p)
+      const unsigned int
+        *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
+      const unsigned int
+        *sp4_p=sp4.get_column_numbers()+sp4.get_rowstart_indices()[row];
+      for (; sp3_p != (sp3.get_column_numbers() +
+                       sp3.get_rowstart_indices()[row+1]);
+           ++sp3_p, ++sp4_p)
 	Assert (*sp3_p == *sp4_p, ExcInternalError());
     };
 
@@ -120,6 +125,35 @@ main ()
 	    Assert (sp.matrix_position(sp(row,col)) ==
 		    std::make_pair(row,col),
 		    ExcInternalError());
+    };
+
+  
+                                   // check block_write/block_read by
+                                   // dumping a sparsity pattern and
+                                   // checking whether the
+                                   // read-back-in pattern is the same
+  std::ofstream tmp_write("sparsity_pattern.tmp");
+  sp3.block_write (tmp_write);
+  tmp_write.close ();
+  
+  std::ifstream tmp_read("sparsity_pattern.tmp");
+  sp4.block_read (tmp_read);
+  tmp_read.close ();
+
+                                   // delete temporary file
+  remove ("sparsity_pattern.tmp");
+  
+				   // now check for equivalence of sp3 and sp4
+  for (unsigned int row=0; row<sp3.n_rows(); ++row)
+    {
+      const unsigned int
+        *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
+      const unsigned int
+        *sp4_p=sp4.get_column_numbers()+sp4.get_rowstart_indices()[row];
+      for (; sp3_p != (sp3.get_column_numbers() +
+                       sp3.get_rowstart_indices()[row+1]);
+           ++sp3_p, ++sp4_p)
+	Assert (*sp3_p == *sp4_p, ExcInternalError());
     };
 };
 

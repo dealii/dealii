@@ -207,7 +207,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
-       New:<code class="class">Vector</code> has a function <code
+       New: <code class="class">SparsityPattern</code> now has functions <code
+       class="member">block_write/block_read</code>, allowing to dump the data
+       of this object in to a file in binary format, and later to re-read it
+       without much need for much parsing.
+       <br>
+       (WB 2002/09/09)
+       </p>
+
+  <li> <p>
+       New: <code class="class">Vector</code> has a function <code
        class="member">lp_norm</code>, computing the <i>l<sub>p</sub></i>-norm
        of a vector for arbitrary <i>p</i>.
        <br>

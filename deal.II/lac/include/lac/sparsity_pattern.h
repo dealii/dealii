@@ -19,6 +19,7 @@
 #include <base/subscriptor.h>
 
 #include <vector>
+#include <iostream>
 
 
 template <typename number> class FullMatrix;
@@ -741,6 +742,54 @@ class SparsityPattern : public Subscriptor
 				      */
     const unsigned int * get_column_numbers () const;
 
+				     /**
+				      * Write the data of this object
+				      * en bloc to a file. This is
+				      * done in a binary mode, so the
+				      * output is neither readable by
+				      * humans nor (probably) by other
+				      * computers using a different
+				      * operating system of number
+				      * format.
+				      *
+				      * The purpose of this function
+				      * is that you can swap out
+				      * matrices and sparsity pattern
+				      * if you are short of memory,
+				      * want to communicate between
+				      * different programs, or allow
+				      * objects to be persistent
+				      * across different runs of the
+				      * program.
+				      */
+    void block_write (ostream &out) const;
+
+				     /**
+				      * Read data that has previously
+				      * been written by
+				      * @p{block_write} en block from
+				      * a file. This is done using the
+				      * inverse operations to the
+				      * above function, so it is
+				      * reasonably fast because the
+				      * bitstream is not interpreted
+				      * except for a few numbers up
+				      * front.
+				      *
+				      * The object is resized on this
+				      * operation, and all previous
+				      * contents are lost.
+				      *
+				      * A primitive form of error
+				      * checking is performed which
+				      * will recognize the bluntest
+				      * attempts to interpret some
+				      * data as a vector stored
+				      * bitwise to a file, but not
+				      * more.
+				      */
+    void block_read (std::istream &in);
+    
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)

@@ -775,6 +775,74 @@ SparsityPattern::bandwidth () const
 
 
 
+void
+SparsityPattern::block_write (ostream &out) const 
+{
+  AssertThrow (out, ExcIO());
+
+                                   // first the simple objects,
+                                   // bracketed in [...]
+  out << '[' << max_dim << ' '
+      << rows << ' '
+      << max_vec_len << ' '
+      << max_row_length << ' '
+      << compressed << "][";
+                                   // then write out real data
+  out.write (reinterpret_cast<const char*>(&rowstart[0]),
+	     reinterpret_cast<const char*>(&rowstart[max_dim])
+	     - reinterpret_cast<const char*>(&rowstart[0]));
+  out << "][";
+  out.write (reinterpret_cast<const char*>(&colnums[0]),
+	     reinterpret_cast<const char*>(&colnums[max_vec_len])
+	     - reinterpret_cast<const char*>(&colnums[0]));
+  out << ']';
+  
+  AssertThrow (out, ExcIO());
+};
+
+
+
+void
+SparsityPattern::block_read (istream &in)
+{
+  AssertThrow (in, ExcIO());
+
+  char c;
+
+                                   // first read in simple data
+  in >> c;
+  AssertThrow (c == '[', ExcIO());
+  in >> max_dim >> rows >> max_vec_len >> max_row_length >> compressed;
+
+  in >> c;
+  AssertThrow (c == ']', ExcIO());
+  in >> c;
+  AssertThrow (c == '[', ExcIO());
+
+                                   // reallocate space
+  delete[] rowstart;
+  delete[] colnums;
+
+  rowstart = new unsigned int[max_dim];
+  colnums  = new unsigned int[max_vec_len];
+  
+                                   // then read data
+  in.read (reinterpret_cast<char*>(&rowstart[0]),
+           reinterpret_cast<char*>(&rowstart[max_dim])
+           - reinterpret_cast<char*>(&rowstart[0]));
+  in >> c;
+  AssertThrow (c == ']', ExcIO());
+  in >> c;
+  AssertThrow (c == '[', ExcIO());
+  in.read (reinterpret_cast<char*>(&colnums[0]),
+           reinterpret_cast<char*>(&colnums[max_vec_len])
+           - reinterpret_cast<char*>(&colnums[0]));
+  in >> c;
+  AssertThrow (c == ']', ExcIO());
+};
+
+
+
 unsigned int
 SparsityPattern::memory_consumption () const
 {
