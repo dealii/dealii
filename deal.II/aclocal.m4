@@ -1306,6 +1306,65 @@ using namespace StandardExceptions;
 
 
 dnl -------------------------------------------------------------
+dnl Gcc and some other compilers have __PRETTY_FUNCTION__, showing
+dnl an unmangled version of the function we are presently in,
+dnl while __FUNCTION__ (or __func__ in ISO C99) simply give the
+dnl function name which would not include the arguments of that
+dnl function, leading to problems in C++ with overloaded function
+dnl names.
+dnl
+dnl If __PRETTY_FUNCTION__ is not available, try to find out whether
+dnl __func__ is available and use the preprocessor to set the first
+dnl thing to the second. If this is also not the case, then set it 
+dnl to something indicating non-availability.
+dnl
+dnl Usage: DEAL_II_HAVE_PRETTY_FUNCTION
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_HAVE_PRETTY_FUNCTION, dnl
+[
+  AC_MSG_CHECKING(for __PRETTY_FUNCTION__)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#	include <iostream>
+    ],
+    [
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
+    ],
+    [
+      AC_MSG_RESULT(available)
+    ],
+    [
+      AC_MSG_RESULT(not available)
+      AC_MSG_CHECKING(for __func__)
+      AC_TRY_COMPILE(
+        [
+#	include <iostream>
+        ],
+        [
+	  std::cout << __func__ << std::endl;
+        ],
+        [
+          AC_MSG_RESULT(available)
+	  x=__func__
+    	],
+        [
+          AC_MSG_RESULT(not available)
+	  x="(not available)"
+        ]) 
+      AC_DEFINE_UNQUOTED(__PRETTY_FUNCTION__, $x, 
+                [If already available, do not define at all. Otherwise, define
+                 to __func__ if that is available. In all other cases,
+                 indicate that no information about the present function
+                 is available for this compiler.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl IBM xlC 5.0 from the VisualAge C++ pack has a bug with the following 
 dnl code. We can work around it if we insert code like "using namespace std;"
 dnl in the right place, but we'd like to do so only if absolutely necessary.
@@ -1342,8 +1401,8 @@ AC_DEFUN(DEAL_II_CHECK_IBM_XLC_ERROR, dnl
       AC_MSG_RESULT(yes. using workaround)
       AC_DEFINE(XLC_WORK_AROUND_STD_BUG, 1, 
                 [Define if we have to work around a bug in IBM's xlC compiler.
-See the aclocal.m4 file in the top-level directory for a description
-of this bug.])
+                 See the aclocal.m4 file in the top-level directory for a
+                 description of this bug.])
     ])
 ])
 

@@ -27,11 +27,6 @@
 #endif
 
 
-#ifndef __GNUC__
-#  define __PRETTY_FUNCTION__ "(unknown)"
-#endif
-
-
 /**
  *  This class should be used as a base class for
  *  all exception classes. Do not use its methods
@@ -140,9 +135,10 @@
  *  @p{ExcDomain}) and transferred to the @p{__IssueError_Assert}
  *  function.
  *
- *  @p{__PRETTY__FUNCTION__} is a macro defined only by the GNU CC
- *  compiler and gives the name of the function. If another compiler
- *  is used, we set @p{__PRETTY_FUNCTION__ = "(unknown)"}.
+ *  @p{__PRETTY__FUNCTION__} is a macro defined by some compilers and
+ *  gives the name of the function. If another compiler is used, we
+ *  try to set this function to something reasonable, if the compiler
+ *  provides us with that, and @p{"(not available)"} otherwise.
  *
  *  In @p{__IssueError} the given data
  *  is transferred into the @p{exc} object by calling the
