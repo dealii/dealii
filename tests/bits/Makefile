@@ -27,6 +27,25 @@ anna_2.exe              : anna_2.g.$(OBJEXT)              $(libraries)
 anna_3.exe              : anna_3.g.$(OBJEXT)              $(libraries)
 anna_4.exe              : anna_4.g.$(OBJEXT)              $(libraries)
 anna_5.exe              : anna_5.g.$(OBJEXT)              $(libraries)
+dof_tools_01a.exe       : dof_tools_01a.g.$(OBJEXT)       $(libraries)
+dof_tools_01b.exe       : dof_tools_01b.g.$(OBJEXT)       $(libraries)
+dof_tools_01c.exe       : dof_tools_01c.g.$(OBJEXT)       $(libraries)
+dof_tools_01d.exe       : dof_tools_01d.g.$(OBJEXT)       $(libraries)
+dof_tools_02a.exe       : dof_tools_02a.g.$(OBJEXT)       $(libraries)
+dof_tools_02b.exe       : dof_tools_02b.g.$(OBJEXT)       $(libraries)
+dof_tools_02c.exe       : dof_tools_02c.g.$(OBJEXT)       $(libraries)
+dof_tools_02d.exe       : dof_tools_02d.g.$(OBJEXT)       $(libraries)
+dof_tools_03.exe        : dof_tools_03.g.$(OBJEXT)        $(libraries)
+dof_tools_04.exe        : dof_tools_04.g.$(OBJEXT)        $(libraries)
+dof_tools_05.exe        : dof_tools_05.g.$(OBJEXT)        $(libraries)
+dof_tools_06.exe        : dof_tools_06.g.$(OBJEXT)        $(libraries)
+dof_tools_07.exe        : dof_tools_07.g.$(OBJEXT)        $(libraries)
+dof_tools_08.exe        : dof_tools_08.g.$(OBJEXT)        $(libraries)
+dof_tools_09.exe        : dof_tools_09.g.$(OBJEXT)        $(libraries)
+dof_tools_10.exe        : dof_tools_10.g.$(OBJEXT)        $(libraries)
+dof_tools_11.exe        : dof_tools_11.g.$(OBJEXT)        $(libraries)
+dof_tools_12.exe        : dof_tools_12.g.$(OBJEXT)        $(libraries)
+dof_tools_13.exe        : dof_tools_13.g.$(OBJEXT)        $(libraries)
 gerold_1.exe            : gerold_1.g.$(OBJEXT)            $(libraries)
 roy_1.exe               : roy_1.g.$(OBJEXT)               $(libraries)
 denis_1.exe             : denis_1.g.$(OBJEXT)             $(libraries)
@@ -34,6 +53,11 @@ unit_support_points.exe : unit_support_points.g.$(OBJEXT) $(libraries)
 parameter_handler_1.exe : parameter_handler_1.g.$(OBJEXT) $(libraries)
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 \
+        dof_tools_01a dof_tools_01b dof_tools_01c dof_tools_01d \
+        dof_tools_02a dof_tools_02b dof_tools_02c dof_tools_02d \
+	dof_tools_03 dof_tools_04 dof_tools_05 dof_tools_06 \
+        dof_tools_07 dof_tools_08 dof_tools_09 dof_tools_10 \
+	dof_tools_11 dof_tools_12 dof_tools_13 \
 	roy_1 \
         denis_1 \
 	unit_support_points parameter_handler_1
