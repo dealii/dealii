@@ -527,7 +527,7 @@ MGDoFCellAccessor<1>::get_mg_dof_values (const Vector<double> &values,
 					 Vector<double>       &dof_values) const {
   Assert (dof_handler != 0, DoFAccessor<1>::DoFAccessor<1>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<1>::DoFAccessor<1>::ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::DoFAccessor<1>::ExcInvalidObject());
   Assert (dof_values.size() == dof_handler->get_fe().total_dofs,
 	  ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
