@@ -278,7 +278,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary warning
     case "$target" in
       *apple-darwin*)
-	CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
+	CXXFLAGSG="$CXXFLAGSG -Wno-long-double"
         ;;
     esac
 
