@@ -161,20 +161,26 @@ class ConstraintMatrix : public Subscriptor
 		      const std::vector<std::pair<unsigned int,double> > &col_val_pairs);
 
 				     /**
-				      * Close the filling of entries. Since the
-				      * lines of a matrix of this type are
-				      * usually filled in an arbitrary order and
-				      * since we do not want to use associative
-				      * constainers to store the lines, we need
-				      * to sort the lines and within the lines
-				      * the columns before usage of the matrix.
-				      * This is done through this function.
+				      * Close the filling of
+				      * entries. Since the lines of a
+				      * matrix of this type are
+				      * usually filled in an arbitrary
+				      * order and since we do not want
+				      * to use associative constainers
+				      * to store the lines, we need to
+				      * sort the lines and within the
+				      * lines the columns before usage
+				      * of the matrix.  This is done
+				      * through this function.
 				      *
-				      * Also, zero entries are discarded, since
-				      * they are not needed.
+				      * Also, zero entries are
+				      * discarded, since they are not
+				      * needed.
 				      *
-				      * After closing, no more entries are
-				      * accepted.
+				      * After closing, no more entries
+				      * are accepted. If the object
+				      * was already closed, then this
+				      * function returns immediately.
 				      */
     void close ();
 

@@ -573,6 +573,14 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> 
+       New: <code class="member">ConstraintMatrix::close</code>
+       now simply returns instead of throwing an exception, if the
+       matrix was already closed.
+       <br>
+       (WB 2001/08/30)
+       </p>
+
   <li> <p>
        New: Member function
        <code class="member">ConstraintMatrix::is_identity_constrained</code>.
