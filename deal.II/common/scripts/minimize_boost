@@ -18,6 +18,16 @@ B=$D/contrib/boost/include
 F="$D/lib/base/data_out_base.g.o $D/lib/base/polynomial.g.o $D/lib/base/subscriptor.g.o $D/lib/base/thread_management.g.o"
 
 ######################################################################
+# Before using this script:
+# - set include-path-contrib-boost=$O in common/Make.global_options
+#   and start compiling. After the Makefile.dep files are produced the
+#   compilation can be stopped
+# - set back to include-path-contrib-boost=$D/contrib/boost/include
+# - add 2>&1 to CXXFLAGS.g in common/Make.global_options
+# - in lines 116... include compiler specific grep and perl commands
+#   which extract the names of missing boost include files from stderr
+#   of the compiler. This is already implemented for gcc and MIPSPro7.4
+#
 # Based on a full (original) boost distribution at $O this script
 # creates a boost directory at $B which includes the minimal but
 # complete set of boost files needed for the deal.II library to be
@@ -27,6 +37,13 @@ F="$D/lib/base/data_out_base.g.o $D/lib/base/polynomial.g.o $D/lib/base/subscrip
 # boost files are updated in $B. No files in $B are removed!
 #
 # Output of this script:
+#   $B/dirs_start.txt       all directories which exist at start
+#   $B/dirs_end.txt         all directories which exist at end
+#   $B/files_start.txt      all files which exist at start
+#   $B/files_end.txt        all files which exist at end
+#
+#   depending on the behaviour of the `find' command following files
+#   might not include what they promise to:
 #   $B/dirs_new.txt:        all directories which were newly created
 #   $B/files_new.txt:       all files which were added to $B
 #   $B/dirs_notneeded.txt:  all directories which (on this platform
@@ -39,15 +56,21 @@ F="$D/lib/base/data_out_base.g.o $D/lib/base/polynomial.g.o $D/lib/base/subscrip
 
 
 # get versions:
-Bversion=`grep "define BOOST_VERSION " $B/boost/version.hpp | perl -p -e 's/.define BOOST_VERSION //g;'`
-Oversion=`grep "define BOOST_VERSION " $O/boost/version.hpp | perl -p -e 's/.define BOOST_VERSION //g;'`
+if test -f $B/boost/version.hpp; then
+  Bversion=`grep "define BOOST_VERSION " $B/boost/version.hpp | perl -p -e 's/.define BOOST_VERSION //g;'`
+else
+  Bversion=none
+fi
+if test -f $O/boost/version.hpp; then
+  Oversion=`grep "define BOOST_VERSION " $O/boost/version.hpp | perl -p -e 's/.define BOOST_VERSION //g;'`
+fi
 
 # output paths and versions
 if test -d $O; then
   echo "boost (version $Oversion) library path:"
   echo "  $O"
 else
-  echo "Error (Line 6)"
+  echo "Error (Line 9)"
   echo "Path of original boost library not set!"
   exit
 fi
@@ -58,17 +81,21 @@ echo "  $B"
 echo 
 
 # version controls:
-if [ $Oversion = $Bversion ]; then
+if test $Oversion -eq $Bversion; then
   echo "version numbers match"
 elif test $Oversion -lt $Bversion; then
   echo "Error: deal.II already uses a higher version of boost"
   exit
 elif test $Oversion -gt $Bversion; then
-  echo "Updating $B/boost from boost version $Bversion to $Oversion ..."
+  echo "Updating $B/boost"
+  echo "from boost version $Bversion to $Oversion ..."
   echo "Error: Not Implemented"
   exit
+elif [ $Bversion = "none" ]; then
+  echo "There is currently no version of boost in deal.II"
 fi
 
+exit
 
 # If there is already a boost directory:
 # 1. take inventory, which will be compared with the inventory at the end
@@ -140,6 +167,8 @@ fi
 
 # output of diffs
 echo "Output of log files in $B ..."
+echo "  dirs_start.txt"
+echo "  dirs_end.txt"
 echo "  dirs_new.txt"
 cd $B && diff dirs_start.txt dirs_end.txt | \
   perl -p -e 's/^[^>].*$/LineToBeRemoved/g; s/^> //g;' | grep -v "LineToBeRemoved"  > dirs_new.txt
@@ -147,6 +176,8 @@ echo "  dirs_notneeded.txt"
 cd $B && diff dirs_start.txt dirs_end.txt | \
   perl -p -e 's/^[^<].*$/LineToBeRemoved/g; s/^< //g;' | \
   grep -v "LineToBeRemoved" | grep -v CVS > dirs_notneeded.txt
+echo "  files_start.txt"
+echo "  files_end.txt"
 echo "  files_new.txt"
 cd $B && diff files_start.txt files_end.txt | \
   perl -p -e 's/^[^>].*$/LineToBeRemoved/g; s/^> //g;' | grep -v "LineToBeRemoved"  > files_new.txt
@@ -154,6 +185,5 @@ echo "  files_notneeded.txt"
 cd $B && diff files_start.txt files_end.txt | \
   perl -p -e 's/^[^<].*$/LineToBeRemoved/g; s/^< //g;' | \
   grep -v "LineToBeRemoved" | grep -v CVS > files_notneeded.txt
-rm dirs_start.txt dirs_end.txt files_start.txt files_end.txt
 
 echo done
