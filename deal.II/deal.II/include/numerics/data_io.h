@@ -299,11 +299,9 @@ class DataIn {
  *
  * \subsection{Encapsulated Postscript format}
  *
- * There are two functions for generating encapsulated Postscript
- * (EPS) without the need for another graphics tool.
- * #write_epsgrid# writes just the 2d grid - This is obsolete and
- * should be removed. The functionality is provided through #write_eps#
- * and #EpsOutputData# now. 
+ * There is a function for generating encapsulated Postscript
+ * (EPS) without the need for another graphics tool. This functionality
+ * is provided through #write_eps# and #EpsOutputData#. 
  * #write_eps# can use one data vector for height information and one
  * cell vector for shading information. Control is done through an
  * object of class #EpsOutputData# as follows or by default.
@@ -384,7 +382,7 @@ class DataOut {
 				      * Provide a data type specifying the
 				      * presently supported output formats.
 				      */
-    enum OutputFormat { ucd, gnuplot, gnuplot_draft, povray_mesh, eps, epsgrid, gmv };
+    enum OutputFormat { ucd, gnuplot, gnuplot_draft, povray_mesh, eps, gmv };
     
 				     /**
 				      * Constructor
@@ -486,12 +484,6 @@ class DataOut {
     void write_eps (ostream &out,
 		    const EpsOutputData &eod = EpsOutputData()) const;
 
-				   /**
-				    * Write grid in Encapsulated
-				    * postscript format.
-				    */
-    void write_epsgrid (ostream &out) const;
-
     				   /**
 				    * Write data and grid in GMV format.
 				    */
@@ -505,7 +497,8 @@ class DataOut {
 				      *
 				      * In case of gnuplot output, the
 				      * standard accuracy of 1 is
-				      * chosen.  */
+				      * chosen.
+				      */
     void write (ostream &out, const OutputFormat output_format) const;
     
 				     /**
@@ -518,7 +511,7 @@ class DataOut {
 				      * \item #gnuplot# and #gnuplot_draft#:
 				      *    #.gnuplot#
 				      * \item #povray_mesh#: #.pov#
-				      * \item #eps# and #epsgrid#: #.eps#
+				      * \item #eps#: #.eps#
 				      * \item #gmv#: #.gmv#.
 				      * \end{itemize}
 				      *
@@ -549,7 +542,7 @@ class DataOut {
 				      * #ParameterHandler# class, use the
 				      * function #get_output_format_names ()#.
 				      */
-    static OutputFormat parse_output_format (const string format_name);
+    static OutputFormat parse_output_format (const string &format_name);
 
 				     /**
 				      * Return a list of implemented output

@@ -12,6 +12,7 @@
 #include <grid/grid_generator.h>
 #include <base/function.h>
 #include <basic/data_io.h>
+#include <basic/grid_io.h>
 #include <base/parameter_handler.h>
 #include <fe/fe_lib.lagrange.h>
 #include <base/quadrature_lib.h>
@@ -629,7 +630,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   filename += "finest_mesh.gnuplot";
   cout << "    Writing finest grid to <" << filename << ">... " << endl;
   ofstream finest_mesh (filename.c_str());
-  tria->print_gnuplot (finest_mesh);
+  GridOut::write_gnuplot (tria, finest_mesh);
   finest_mesh.close();
 
   print_history (prm, refine_mode);

@@ -7,6 +7,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
+#include <basic/grid_io.h>
 #include <fstream>
 #include <string>
 #include <cmath>
@@ -220,9 +221,13 @@ void test (const int test_case) {
 	Ball<dim>       ball;
 	CurvedLine<dim> curved_line;
 	if (test_case==2)
-	  tria.set_boundary (&ball);
-	else
-	  tria.set_boundary (&curved_line);
+	  {
+	    tria.set_boundary (0, ball);
+	    tria.set_boundary (1, ball);
+	  } else {
+	    tria.set_boundary (0, curved_line);
+	    tria.set_boundary (1, curved_line);
+	  };
 	
 					 // refine once
 	tria.begin_active()->set_refine_flag();
@@ -245,6 +250,8 @@ void test (const int test_case) {
  	  };
 
 	tria.set_boundary (0);
+	tria.set_boundary (1);
+	
 	break;
       }
 
@@ -287,7 +294,7 @@ void test (const int test_case) {
   filename += ('0'+test_case);
   
   ofstream out(filename.c_str());
-  tria.print_gnuplot (out);
+  GridOut::write_gnuplot (tria, out);
     
   cout << "     Total number of cells        = " << tria.n_cells() << endl
        << "     Total number of active cells = " << tria.n_active_cells() << endl;

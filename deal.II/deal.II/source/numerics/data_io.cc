@@ -1036,77 +1036,6 @@ void DataOut<dim>::write_povray_mesh (ostream &) const {
 #if deal_II_dimension == 2
 
 template <>
-void DataOut<2>::write_epsgrid (ostream &out) const {
-  Assert (dofs != 0, ExcNoDoFHandlerSelected());
-  
-				   // write preamble
-  if (true) 
-    {
-				       // block this to have local
-				       // variables destroyed after
-				       // use
-      time_t  time1= time (0);
-      tm     *time = localtime(&time1); 
-      out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
-	  << "%%Title: deal.II Output" << endl
-	  << "%%Creator: the deal.II library" << endl
-	  << "%%Creation Date: " 
-	  << time->tm_year+1900 << "/"
-	  << time->tm_mon+1 << "/"
-	  << time->tm_mday << " - "
-	  << time->tm_hour << ":"
-	  << setw(2) << time->tm_min << ":"
-	  << setw(2) << time->tm_sec << endl
-	  << "%%BoundingBox: 0 0 310 310" << endl;
-    };  
-
-				   // Get scaling factors for Bounding Box 310 x 310
-  
-  DoFHandler<2>::active_cell_iterator cell;
-  DoFHandler<2>::active_cell_iterator endc = dofs->end();
-  double x, y, xmin=0, xmax=0, ymin=0, ymax=0, scale, xofs, yofs;
-  int i;
-
-  for (cell=dofs->begin_active(); cell!=endc; ++cell)
-    {
-      for (i=0; i<4; i++)
-	{
-	  x=cell->vertex(i)(0);
-	  y=cell->vertex(i)(1);
-	  xmin = ( x < xmin ? x : xmin );
-	  xmax = ( x > xmax ? x : xmax );
-	  ymin = ( y < ymin ? y : ymin );
-	  ymax = ( y > ymax ? y : ymax );
-	}
-    }
-  x = xmax - xmin;
-  y = ymax - ymin;
-  scale = 300 / (x > y ? x : y);
-  xofs = -(xmin*scale)+5;
-  yofs = -(ymin*scale)+5;
-
-  for (cell=dofs->begin_active(); cell!=endc; ++cell) 
-    {
-      out << (cell->vertex(0)(0))*scale+xofs << " " 
-	  << (cell->vertex(0)(1))*scale+yofs << " moveto "
-	  << (cell->vertex(1)(0))*scale+xofs << " " 
-	  << (cell->vertex(1)(1))*scale+yofs << " lineto "
-	  << (cell->vertex(2)(0))*scale+xofs << " " 
-	  << (cell->vertex(2)(1))*scale+yofs << " lineto "
-	  << (cell->vertex(3)(0))*scale+xofs << " " 
-	  << (cell->vertex(3)(1))*scale+yofs << " lineto "
-	  << (cell->vertex(0)(0))*scale+xofs << " " 
-	  << (cell->vertex(0)(1))*scale+yofs << " lineto "
-	  << " closepath stroke" << endl;
-    };
-  out << "showpage" << endl;     
-
-  AssertThrow (out, ExcIO());
-};
-
-
-
-template <>
 void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
 
@@ -1359,14 +1288,6 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 #endif
 
 
-
-
-template <int dim>
-void DataOut<dim>::write_epsgrid (ostream &/*out*/) const {
-				   // this is for all other dimensions that
-				   // are not explicitely specialized
-  Assert (false, ExcNotImplemented());
-};
 
 
 template <int dim>
@@ -1629,10 +1550,6 @@ void DataOut<dim>::write (ostream &out,
 	    write_eps(out);
 	    break;
 	    
-      case epsgrid:
-	    write_epsgrid(out);
-	    break;
-
       case gmv:
 	    write_gmv (out);
 	    break;
@@ -1660,7 +1577,6 @@ string DataOut<dim>::default_suffix (const OutputFormat output_format)
 	    return ".pov";
 	    
       case eps: 
-      case epsgrid: 
 	    return ".eps";
 
       case gmv:
@@ -1676,7 +1592,7 @@ string DataOut<dim>::default_suffix (const OutputFormat output_format)
 
 template <int dim>
 DataOut<dim>::OutputFormat
-DataOut<dim>::parse_output_format (const string format_name) {
+DataOut<dim>::parse_output_format (const string &format_name) {
   if (format_name == "ucd")
     return ucd;
 
@@ -1692,19 +1608,19 @@ DataOut<dim>::parse_output_format (const string format_name) {
   if (format_name == "eps")
     return eps;
 
-  if (format_name == "epsgrid")
-    return epsgrid;
-
   if (format_name == "gmv")
     return gmv;
   
   AssertThrow (false, ExcInvalidState ());
+
+				   // return something invalid
+  return OutputFormat(-1);
 };
 
 
 template <int dim>
 string DataOut<dim>::get_output_format_names () {
-  return "ucd|gnuplot|gnuplot draft|povray mesh|eps|epsgrid|gmv";
+  return "ucd|gnuplot|gnuplot draft|povray mesh|eps|gmv";
 };
 
 

@@ -456,7 +456,7 @@ class TriaDimensionInfo<3> {
  *      };
  *                                       // output the grid
  *    ofstream out("grid.1");
- *    tria.print_gnuplot (out);
+ *    GridOut::write_gnuplot (tria, out);
  *  };  
  *  \end{verbatim}
  *
@@ -2536,31 +2536,6 @@ class Triangulation
 				     /*@}*/
 
 				     /*---------------------------------------*/
-
-				     /**
-				      *  @name Input/Output functions
-				      */
-				     /*@{*/
-				     /**
-				      *  Print the triangulation in GNUPLOT
-				      *  format to #out#.
-				      */
-    void print_gnuplot (ostream &) const;
-
-				     /**
-				      *  Print level #level# in GNUPLOT
-				      *  format to #out#.
-				      */
-    void print_gnuplot (ostream &, const unsigned int level) const;
-
-				     /**
-				      *  Print cell #cell# in GNUPLOT format
-				      *  to #out#.
-				      */
-    void print_gnuplot (ostream &, const active_cell_iterator &cell) const;
-    				     /*@}
-				      */
-
     
 				     /**
 				      * @name Information about the triangulation
@@ -2587,8 +2562,7 @@ class Triangulation
     unsigned int n_lines (const unsigned int level) const;
     
 				     /**
-				      *  Return total number of active lines,
-				      *  active or not.
+				      * Return total number of active lines.
 				      *
 				      * Regarding the computational effort of
 				      * this function, the same applies as
@@ -2598,7 +2572,7 @@ class Triangulation
     
 				     /**
 				      *  Return total number of active lines,
-				      *  active or not on level #level#.
+				      *  on level #level#.
 				      *
 				      * Regarding the computational effort of
 				      * this function, the same applies as

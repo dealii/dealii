@@ -3,6 +3,7 @@
 
 
 
+#include <basic/grid_io.h>
 #include <grid/dof.h>
 #include <grid/tria.h>
 #include <fe/fe_lib.lagrange.h>
@@ -345,7 +346,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   
   cout << "    Writing grid..." << endl;
   ofstream out((file_prefix + prm.get("Grid file")).c_str());
-  tria->print_gnuplot (out);
+  GridOut::write_gnuplot (tria, out);
 
 
 
