@@ -326,7 +326,27 @@ class BlockSparseMatrix : public Subscriptor
 				      * be square for this operation.
 				      */
     template <typename somenumber>
-    somenumber matrix_norm (const BlockVector<rows,somenumber> &v) const;
+    somenumber matrix_norm_square (const BlockVector<rows,somenumber> &v) const;
+    
+				     /**
+				      * Return a (constant) reference
+				      * to the underlying sparsity
+				      * pattern of this matrix.
+				      *
+				      * Though the return value is
+				      * declared #const#, you should
+				      * be aware that it may change if
+				      * you call any nonconstant
+				      * function of objects which
+				      * operate on it.
+				      */
+    const BlockSparsityPattern<rows,columns> &
+    get_sparsity_pattern () const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcMatrixNotBlockSquare);
     
   private:
     				     /**
@@ -629,6 +649,38 @@ Tvmult_add (BlockVector<columns,somenumber>    &/*dst*/,
 				   // now.
   Assert (false, ExcNotImplemented());
 };
+
+
+
+template <typename number, int  rows, int columns>
+template <typename somenumber>
+somenumber
+BlockSparseMatrix<number,rows,columns>::
+matrix_norm_square (const BlockVector<rows,somenumber> &v) const
+{
+  Assert (rows == columns, ExcMatrixNotBlockSquare());
+
+  somenumber norm_sqr = 0;
+  for (unsigned int row=0; row<rows; ++row)
+    for (unsigned int col=0; col<columns; ++col)
+      if (row==col)
+	norm_sqr += block(row,col).matrix_norm_square (v.block(row));
+      else
+	norm_sqr += block(row,col).matrix_scalar_product (v.block(row),
+							  v.block(col));
+  return norm_sqr;
+};
+
+
+
+template <typename number, int  rows, int columns>
+const BlockSparsityPattern<rows,columns> &
+BlockSparseMatrix<number,rows,columns>::get_sparsity_pattern () const
+{
+  return *sparsity_pattern;
+};
+
+
 
 
 
