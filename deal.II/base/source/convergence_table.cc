@@ -13,7 +13,7 @@
 
 
 #include <base/convergence_table.h>
-#include <math.h>
+#include <cmath>
 
 
 ConvergenceTable::ConvergenceTable()  
