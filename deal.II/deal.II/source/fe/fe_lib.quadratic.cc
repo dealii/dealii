@@ -885,8 +885,8 @@ void FEQuadraticSub<2>::get_unit_support_points (vector<Point<2> > &unit_points)
 
 template <>
 void FEQuadraticSub<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
-					   const Boundary<2>&,
-					   vector<Point<2> >  &support_points) const {
+					    const Boundary<2>&,
+					    vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
   
@@ -898,16 +898,16 @@ void FEQuadraticSub<2>::get_support_points (const typename DoFHandler<2>::cell_i
 				   // to the mean coordinates of the vertices
   for (unsigned int line=0; line<4; ++line)
     support_points[4+line] = (cell->line(line)->vertex(0) +
-			     cell->line(line)->vertex(1)) / 2;
+			      cell->line(line)->vertex(1)) / 2;
 				   // same for the center of the square:
 				   // since all four linear basis functions
 				   // take on the value 1/4 at the center,
 				   // the center is mapped to the mean
 				   // coordinates of the four vertices
   support_points[8] = (support_points[0] +
-		      support_points[1] +
-		      support_points[2] +
-		      support_points[3]) / 4;
+		       support_points[1] +
+		       support_points[2] +
+		       support_points[3]) / 4;
 };
 
 

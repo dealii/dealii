@@ -332,9 +332,9 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     QProjector<dim>::project_to_face (quadrature, face, unit_quadrature_points[face]);
 
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int i=0; i<fe.total_dofs; ++i)
-      for (unsigned int j=0; j<n_quadrature_points; ++j) 
+  for (unsigned int i=0; i<fe.total_dofs; ++i)
+    for (unsigned int j=0; j<n_quadrature_points; ++j) 
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	{
 	  shape_values[face](i,j)
 	    = fe.shape_value(i, unit_quadrature_points[face][j]);
@@ -342,15 +342,15 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 	    = fe.shape_grad(i, unit_quadrature_points[face][j]);
 	};
 
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int i=0; i<n_transform_functions; ++i)
-      for (unsigned int j=0; j<n_quadrature_points; ++j)
+  for (unsigned int i=0; i<n_transform_functions; ++i)
+    for (unsigned int j=0; j<n_quadrature_points; ++j)
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	{
 	  shape_values_transform[face] (i,j)
 	    = fe.shape_value_transform (i, unit_quadrature_points[face][j]);
 	  unit_shape_gradients_transform[face][i][j]
 	    = fe.shape_grad_transform(i, unit_quadrature_points[face][j]);
-      };
+	};
 };
 
 
@@ -456,25 +456,37 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 					   face, subface,
 					   unit_quadrature_points[face*(1<<(dim-1))+subface]);
 
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-      for (unsigned int i=0; i<fe.total_dofs; ++i)
-	for (unsigned int j=0; j<n_quadrature_points; ++j) 
+  for (unsigned int i=0; i<fe.total_dofs; ++i)
+    for (unsigned int j=0; j<n_quadrature_points; ++j) 
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
 	  {
 	    shape_values[face*GeometryInfo<dim>::subfaces_per_face+subface](i,j)
-	      = fe.shape_value(i, unit_quadrature_points[face*GeometryInfo<dim>::subfaces_per_face+subface][j]);
+	      = fe.shape_value(i, unit_quadrature_points[face *
+							GeometryInfo<dim>::
+							subfaces_per_face+subface][j]);
 	    unit_shape_gradients[face*GeometryInfo<dim>::subfaces_per_face+subface][i][j]
-	      = fe.shape_grad(i, unit_quadrature_points[face*GeometryInfo<dim>::subfaces_per_face+subface][j]);
+	      = fe.shape_grad(i, unit_quadrature_points[face *
+						       GeometryInfo<dim>::
+						       subfaces_per_face+subface][j]);
 	  };
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-      for (unsigned int i=0; i<n_transform_functions; ++i)
-	for (unsigned int j=0; j<n_quadrature_points; ++j)
+  for (unsigned int i=0; i<n_transform_functions; ++i)
+    for (unsigned int j=0; j<n_quadrature_points; ++j)
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
 	  {
 	    shape_values_transform[face*GeometryInfo<dim>::subfaces_per_face+subface] (i,j)
-	      = fe.shape_value_transform (i, unit_quadrature_points[face*GeometryInfo<dim>::subfaces_per_face+subface][j]);
-	    unit_shape_gradients_transform[face*GeometryInfo<dim>::subfaces_per_face+subface][i][j]
-	      = fe.shape_grad_transform(i, unit_quadrature_points[face*GeometryInfo<dim>::subfaces_per_face+subface][j]);
+	      = fe.shape_value_transform (i, unit_quadrature_points[face *
+								   GeometryInfo<dim>::
+								   subfaces_per_face +
+								   subface][j]);
+	    unit_shape_gradients_transform[face *
+					  GeometryInfo<dim>::subfaces_per_face +
+					  subface][i][j]
+	      = fe.shape_grad_transform(i, unit_quadrature_points[face *
+								 GeometryInfo<dim>::
+								 subfaces_per_face +
+								 subface][j]);
 	  };
 };
 
