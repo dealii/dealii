@@ -96,6 +96,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: The old class <code class="class">vector2d</code>, implementing a
+       two-dimensional array of objects is now gone. Instead, there is the new
+       <code class="class">Table</code> class that implements tables of
+       arbitrary dimension. Transition is painless: where there was
+       <code>vector2d&lt;type&gt;</code> before, use
+       <code>Table&lt;2,type&gt;</code> now (and don't forget to update the
+       name of the header file, of course). If you have a three-dimensional
+       array, you can use <code class="class">Table&lt;3,type&gt;</code> now.
+       <br>
+       (WB 2002/09/03)
+       </p>
+
+  <li> <p> 
        New: There are now functions returning the transpose of <code
        class="class">Tensor</code> objects of rank 2.
        <br>
