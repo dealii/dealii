@@ -669,6 +669,27 @@ local_apply_boundary_values (const std::map<unsigned int,double> &boundary_value
                                    // otherwise traverse all the dofs used in
                                    // the local matrices and vectors and see
                                    // what's there to do
+
+                                   // if we need to treat an entry, then we
+                                   // set the diagonal entry to its absolute
+                                   // value. if it is zero, we used to set it
+                                   // to one, which is a really terrible
+                                   // choice that can lead to hours of
+                                   // searching for bugs in programs (I
+                                   // experienced this :-( ) if the matrix
+                                   // entries are otherwise very large. this
+                                   // is so since iterative solvers would
+                                   // simply not correct boundary nodes for
+                                   // their correct values since the residual
+                                   // contributions of their rows of the
+                                   // linear system is almost zero if the
+                                   // diagonal entry is one. thus, set it to
+                                   // the average absolute value of the
+                                   // nonzero diagonal elements.
+                                   //
+                                   // we only compute this value lazily the
+                                   // first time we need it.
+  double average_diagonal = 0;
   const unsigned int n_local_dofs = local_dof_indices.size();
   for (unsigned int i=0; i<n_local_dofs; ++i)
     {
@@ -685,9 +706,35 @@ local_apply_boundary_values (const std::map<unsigned int,double> &boundary_value
                                            // replace diagonal entry by its
                                            // absolute value to make sure that
                                            // everything remains positive, or
-                                           // by one if zero
+                                           // by the average diagonal value if
+                                           // zero
           if (local_matrix(i,i) == 0.)
-            local_matrix(i,i) = 1.;
+            {
+                                               // if average diagonal hasn't
+                                               // yet been computed, do so now
+              if (average_diagonal == 0.)
+                {
+                  unsigned int nonzero_diagonals = 0;
+                  for (unsigned int k=0; k<n_local_dofs; ++k)
+                    if (local_matrix(k,k) != 0.)
+                      {
+                        average_diagonal += std::fabs(local_matrix(k,k));
+                        ++nonzero_diagonals;
+                      }
+                  if (nonzero_diagonals != 0)
+                    average_diagonal /= nonzero_diagonals;
+                  else
+                    average_diagonal = 0;
+                }
+
+                                               // only if all diagonal entries
+                                               // are zero, then resort to the
+                                               // last measure: choose one
+              if (average_diagonal == 0.)
+                average_diagonal = 1.;
+
+              local_matrix(i,i) = average_diagonal;
+            }
           else
             local_matrix(i,i) = std::fabs(local_matrix(i,i));
           
