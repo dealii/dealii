@@ -431,6 +431,13 @@ class DoFTools
 				SparsityPattern       &sparsity_pattern);
 
 				     /**
+				      * Same function, but for 1d.
+				      */
+    static void
+    make_flux_sparsity_pattern (const DoFHandler<1> &dof_handler,
+				SparsityPattern     &sparsity_pattern);
+    
+				     /**
 				      * This function does the same as
 				      * the other with the same name,
 				      * but it gets two additional

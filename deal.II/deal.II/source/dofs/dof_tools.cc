@@ -289,6 +289,7 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 };
 
 
+
 template<int dim>
 void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
@@ -381,6 +382,54 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
     }
 }
 
+
+#if deal_II_dimension == 1
+
+void
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<1> &dof,
+				      SparsityPattern     &sparsity)
+{
+  typedef DoFHandler<1>::cell_iterator        cell_iterator;
+  typedef DoFHandler<1>::active_cell_iterator active_cell_iterator;
+
+  const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> neighbor_dof_indices (dofs_per_cell);
+  
+  active_cell_iterator cell = dof.begin_active(),
+		       endc = dof.end();
+  for (; cell!=endc; ++cell)
+    {
+				       // first do couplings of dofs
+				       // locally on this cell
+      cell->get_dof_indices (local_dof_indices);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  sparsity.add (local_dof_indices[i], local_dof_indices[j]);
+
+				       // then do the same for the up
+				       // to 2 neighbors
+      for (unsigned int nb=0; nb<2; ++nb)
+	if (! cell->at_boundary(nb))
+	  {
+					     // find active neighbor
+	    cell_iterator neighbor = cell->neighbor(nb);
+	    while (neighbor->has_children())
+	      neighbor = neighbor->child(nb==0 ? 1 : 0);
+
+					     // get dofs on it
+	    neighbor->get_dof_indices (neighbor_dof_indices);
+
+					     // compute couplings
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      for (unsigned int j=0; j<dofs_per_cell; ++j)
+		sparsity.add (local_dof_indices[i], neighbor_dof_indices[j]);
+	  };
+    };
+};
+
+
+#endif
 
 
 template<int dim>
