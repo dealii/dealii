@@ -9,7 +9,8 @@
 #   a file to run diff on. send the output of the copy command
 #   (which may fail) to nirvana.
 # - write the forward declarations for the presently available
-#   header files to $@.new
+#   header files to $@.new. Use all header files except the 
+#   forward declarations file itself
 # - compare old and new forward-declarations files. if they
 #   differ (i.e. the result of 'diff' is a nonzero string) copy
 #   the nes file over the old one and thus also change the time 
@@ -22,7 +23,7 @@ $(forward-declarations): $(filter-out %forward-declarations%,$(h-files))
 	@touch $@.old
 	@-cp $@ $@.old > /dev/null 2>&1
 	@perl $D/common/scripts/forward_declarations.pl   \
-              $(filter-out %forward-declarations.h,$(h-files)) \
+              $(filter-out %$(notdir $(forward-declarations)),$(h-files)) \
             > $@.new
 	@if test -n "`diff $(forward-declarations).old $(forward-declarations).new`" ; then \
 	  echo "============================          file remade" ; \
