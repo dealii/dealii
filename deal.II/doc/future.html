@@ -18,12 +18,12 @@
     like to implement in future versions. Among these are the following
     topics:
     <ul>
-    <li> <p>
-         <strong>Multigrid:</strong> We are working on an
+    <li> <p> <strong>Multigrid:</strong> We are working on an
          implementation of multigrid methods for
          <acronym>deal.II</acronym>. While this is running on globally
          refined grids, we are still having problems on locally
-         refined grid. We hope to have them sorted out for the next
+         refined meshes. For those, multigrid is only applicable with
+         DG methods yet. We hope to have them sorted out for the next
          major release.
 	 </p>
 
@@ -36,34 +36,6 @@
          the latter is probably straightforward, the first is a major
          task and is not planned for the immediate future. We would,
          however, offer advice if anyone wanted to implement this.
-	 </p>
-
-    <li> <p>
-         <strong>Linear solvers:</strong>
-	 We already have the most common linear solvers, such as CG,
-         BiCGStab, or Minres. However, there are certainly more
-         proficient implementations of these solvers, but that would
-         need experts in this field which we certainly are not. It
-         would also be of interest to have linear solvers for more
-         complicated applications.
-	 </p>
-
-    <li> <p> 
-         <strong>Faster linear algebra:</strong> The linear
-         algebra implementation in <acronym>deal.II</acronym> is quite
-         fast, at least compared to other C/C++ implementations. We
-         know that Fortran compilers can sometimes do a better job in
-         optimizing some algorithms. We therefore would like to
-         interface from C to Fortran for that purpose.
-	 </p>
-	 
-	 <p>
-	 On the other hand, we have made some initial experiments with
-	 interfacing to BLAS routines on SUN, but it turned out that
-	 our own implementation of the routines we tried was faster
-	 than the ones in the vendor BLAS. Nevertheless, interfacing
-	 to LAPACK or other libraries implementing high level
-	 algorithms would be interesting.
 	 </p>
 
     <li> <p>
