@@ -24,6 +24,8 @@
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
 
+#include <cmath>
+
 /**
  * Power method (von Mises).
  *
@@ -261,7 +263,7 @@ EigenPower<VECTOR>::solve (double       &value,
 	  Assert (i<x.size(), ExcInternalError());
 	  entry = y (i++);
 	}
-      while (fabs(entry) < thresh);
+      while (std::fabs(entry) < thresh);
 
       --i;
 
@@ -361,7 +363,7 @@ EigenInverse<VECTOR>::solve (double       &value,
 	  Assert (i<x.size(), ExcInternalError());
 	  entry = y (i++);
 	}
-      while (fabs(entry) < thresh);
+      while (std::fabs(entry) < thresh);
 
       --i;
 
