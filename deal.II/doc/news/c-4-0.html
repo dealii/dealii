@@ -527,14 +527,24 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
-  Changed: <code
-  class="class">MGTransferSelect</code> uses target components
-  correctly. Unfortunately, the untested class <code
-  class="class">MGTransferBlock</code> does not work anymore. Since its
-  usefulness was not clear anyway, this state may continue for a while.
-  <br>
-  (GK 2004/04/01)
-  </p>
+       Changed: The <code
+       class="member">KellyErrorEstimator::estimate</code> function takes an
+       additional parameter that lets it only compute error indicators for a
+       certain subdomain. This is meant to allow for a better parallelization
+       of efforts in parallel programs.
+       <br>
+       (GK 2004/04/01)
+       </p>
+
+  <li> <p>
+       Changed: <code
+       class="class">MGTransferSelect</code> uses target components
+       correctly. Unfortunately, the untested class <code
+       class="class">MGTransferBlock</code> does not work anymore. Since its
+       usefulness was not clear anyway, this state may continue for a while.
+       <br>
+       (GK 2004/04/01)
+       </p>
 
   <li> <p>
        New: There is now a new <code class="class">FE_Poly</code>

@@ -258,6 +258,38 @@ class KellyErrorEstimator
 				      * Multithreading is only
 				      * implemented in two and three
 				      * dimensions.
+				      *
+				      * The @p subdomain_id parameter
+				      * indicates whether we shall compute
+				      * indicators for all cells (in case its
+				      * value is the default,
+				      * <tt>deal_II_numbers::invalid_unsigned_int</tt>),
+				      * or only for the cells belonging to a
+				      * certain subdomain with the given
+				      * indicator. The latter case is used for
+				      * parallel computations where all
+				      * processor nodes have the global grid
+				      * stored, and could well compute all the
+				      * indicators for all cells themselves,
+				      * but where it is more efficient to have
+				      * each process compute only indicators
+				      * for the cells it owns, and have them
+				      * exchange the resulting information
+				      * afterwards. This is in particular true
+				      * for the case where meshes are very
+				      * large and computing indicators for @em
+				      * every cells is too expensive, while
+				      * computing indicators for only local
+				      * cells is acceptable. Note that if you
+				      * only ask for the indicators of a
+				      * certain subdomain to be computed, you
+				      * must nevertheless make sure that this
+				      * function has access to the correct
+				      * node values of @em all degrees of
+				      * freedom. This is since the function
+				      * needs to access DoF values on
+				      * neighboring cells as well, even if
+				      * they belong to a different subdomain.
 				      */
     template <typename InputVector>
     static void estimate (const Mapping<dim>      &mapping,
@@ -268,7 +300,8 @@ class KellyErrorEstimator
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
-			  const unsigned int       n_threads = multithread_info.n_default_threads);
+			  const unsigned int       n_threads = multithread_info.n_default_threads,
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p{estimate}
@@ -283,7 +316,8 @@ class KellyErrorEstimator
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
-			  const unsigned int       n_threads = multithread_info.n_default_threads);
+			  const unsigned int       n_threads = multithread_info.n_default_threads,
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
     
 				     /**
 				      * Same function as above, but
@@ -321,7 +355,8 @@ class KellyErrorEstimator
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
-			  const unsigned int           n_threads = multithread_info.n_default_threads);
+			  const unsigned int           n_threads = multithread_info.n_default_threads,
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p{estimate}
@@ -336,7 +371,8 @@ class KellyErrorEstimator
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
-			  const unsigned int           n_threads = multithread_info.n_default_threads);
+			  const unsigned int           n_threads = multithread_info.n_default_threads,
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
     
 				     /**
@@ -506,12 +542,19 @@ class KellyErrorEstimator
 					  */
 	std::vector<double>          JxW_values;
 
+                                         /**
+                                          * The subdomain ids we are to care
+                                          * for.
+                                          */
+        const unsigned int subdomain_id;
+        
 					 /**
 					  * Constructor.
 					  */
 	PerThreadData (const unsigned int n_solution_vectors,
 		       const unsigned int n_components,
-		       const unsigned int n_q_points);
+		       const unsigned int n_q_points,
+                       const unsigned int subdomain_id);
     };
 
 
@@ -674,18 +717,18 @@ class KellyErrorEstimator<1>
 				      * entries, or an empty
 				      * bit-vector.
 				      *
-				      * The estimator supports
-				      * multithreading and splits the
-				      * cells to
+				      * The estimator supports multithreading
+				      * and splits the cells to
 				      * @p{multithread_info.n_default_threads}
-				      * (default) threads. The number
-				      * of threads to be used in
-				      * multithreaded mode can be set
-				      * with the last parameter of the
-				      * error estimator.
-				      * Multithreading is only
-				      * implemented in two and three
-				      * dimensions.
+				      * (default) threads. The number of
+				      * threads to be used in multithreaded
+				      * mode can be set with the last
+				      * parameter of the error estimator.
+				      * Multithreading is not presently
+				      * implemented for 1d, but we retain the
+				      * respective parameter for compatibility
+				      * with the function signature in the
+				      * general case.
 				      */
     template <typename InputVector>
     static void estimate (const Mapping<1>      &mapping,
@@ -696,7 +739,8 @@ class KellyErrorEstimator<1>
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
-			  const unsigned int       n_threads = multithread_info.n_default_threads);
+			  const unsigned int       n_threads = multithread_info.n_default_threads,
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p{estimate}
@@ -711,7 +755,8 @@ class KellyErrorEstimator<1>
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
-			  const unsigned int       n_threads = multithread_info.n_default_threads);
+			  const unsigned int       n_threads = multithread_info.n_default_threads,
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
     
 				     /**
 				      * Same function as above, but
@@ -749,7 +794,8 @@ class KellyErrorEstimator<1>
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
-			  const unsigned int           n_threads = multithread_info.n_default_threads);
+			  const unsigned int           n_threads = multithread_info.n_default_threads,
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p{estimate}
@@ -764,7 +810,8 @@ class KellyErrorEstimator<1>
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
-			  const unsigned int           n_threads = multithread_info.n_default_threads);
+			  const unsigned int           n_threads = multithread_info.n_default_threads,
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
     
 				     /**

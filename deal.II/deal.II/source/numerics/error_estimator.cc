@@ -43,60 +43,81 @@ double sqr (const double x)
 }
 
 
+template <int dim>
+static
+void advance_by_n (typename DoFHandler<dim>::active_cell_iterator &cell,
+                   const unsigned int n)
+{
+  for (unsigned int t=0;
+       ((t<n) && (cell!=cell->get_dof_handler().end()));
+       ++t, ++cell);
+}
+
+
+
 #if deal_II_dimension == 1
 
 
 template <typename InputVector>
-void KellyErrorEstimator<1>::estimate (const Mapping<1>      &mapping,
-                                       const DoFHandler<1>   &dof_handler,
-                                       const Quadrature<0> &quadrature,
-                                       const FunctionMap<1>::type &neumann_bc,
-                                       const InputVector       &solution,
-                                       Vector<float>           &error,
-                                       const std::vector<bool> &component_mask,
-                                       const Function<1>     *coefficients,
-                                       const unsigned int       n_threads)
+void
+KellyErrorEstimator<1>::
+estimate (const Mapping<1>      &mapping,
+          const DoFHandler<1>   &dof_handler,
+          const Quadrature<0> &quadrature,
+          const FunctionMap<1>::type &neumann_bc,
+          const InputVector       &solution,
+          Vector<float>           &error,
+          const std::vector<bool> &component_mask,
+          const Function<1>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id)
 {
 				   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
-	    component_mask, coefficients, n_threads);
+	    component_mask, coefficients, n_threads, subdomain_id);
 }
 
 
 template <typename InputVector>
-void KellyErrorEstimator<1>::estimate (const DoFHandler<1>   &dof_handler,
-                                       const Quadrature<0> &quadrature,
-                                       const FunctionMap<1>::type &neumann_bc,
-                                       const InputVector       &solution,
-                                       Vector<float>           &error,
-                                       const std::vector<bool> &component_mask,
-                                       const Function<1>     *coefficients,
-                                       const unsigned int       n_threads)
+void
+KellyErrorEstimator<1>::
+estimate (const DoFHandler<1>   &dof_handler,
+          const Quadrature<0> &quadrature,
+          const FunctionMap<1>::type &neumann_bc,
+          const InputVector       &solution,
+          Vector<float>           &error,
+          const std::vector<bool> &component_mask,
+          const Function<1>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<1> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solution,
-	   error, component_mask, coefficients, n_threads);
+	   error, component_mask, coefficients, n_threads, subdomain_id);
 }
 
 
 
 template <typename InputVector>
-void KellyErrorEstimator<1>::estimate (const DoFHandler<1>   &dof_handler,
-                                       const Quadrature<0> &quadrature,
-                                       const FunctionMap<1>::type &neumann_bc,
-                                       const std::vector<const InputVector*> &solutions,
-                                       std::vector<Vector<float>*> &errors,
-                                       const std::vector<bool> &component_mask,
-                                       const Function<1>     *coefficients,
-                                       const unsigned int       n_threads)
+void
+KellyErrorEstimator<1>::
+estimate (const DoFHandler<1>   &dof_handler,
+          const Quadrature<0> &quadrature,
+          const FunctionMap<1>::type &neumann_bc,
+          const std::vector<const InputVector*> &solutions,
+          std::vector<Vector<float>*> &errors,
+          const std::vector<bool> &component_mask,
+          const Function<1>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<1> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solutions,
-	   errors, component_mask, coefficients, n_threads);
+	   errors, component_mask, coefficients, n_threads, subdomain_id);
 }
 
 
@@ -111,7 +132,8 @@ estimate (const Mapping<1>                    &mapping,
           std::vector<Vector<float>*>              &errors,
           const std::vector<bool>                  &component_mask_,
           const Function<1>                   *coefficient,
-          const unsigned int)
+          const unsigned int,
+          const unsigned int                  subdomain_id)
 {
   const unsigned int n_components       = dof_handler.get_fe().n_components();
   const unsigned int n_solution_vectors = solutions.size();
@@ -192,124 +214,132 @@ estimate (const Mapping<1>                    &mapping,
     for (unsigned int c=0; c<n_components; ++c)
       coefficient_values(c) = 1;
   
-				   // loop over all
-				   // cells. note that the error
-				   // indicator is only a sum over the
-				   // two contributions from the two
-				   // vertices of each cell.
   QTrapez<1> quadrature;
-  FEValues<1> fe_values (mapping, dof_handler.get_fe(), quadrature, update_gradients);
+  FEValues<1> fe_values (mapping, dof_handler.get_fe(), quadrature,
+                         update_gradients);
+  
+				   // loop over all cells and do something on
+				   // the cells which we're told to work
+				   // on. note that the error indicator is
+				   // only a sum over the two contributions
+				   // from the two vertices of each cell.
   DoFHandler<1>::active_cell_iterator cell = dof_handler.begin_active();
-  for (unsigned int cell_index=0; cell != dof_handler.end(); ++cell, ++cell_index)
-    {
-      for (unsigned int n=0; n<n_solution_vectors; ++n)
-	(*errors[n])(cell_index) = 0;
+  for (unsigned int cell_index=0; cell != dof_handler.end();
+       ++cell, ++cell_index)
+    if ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
+        ||
+        (cell->subdomain_id() == subdomain_id))
+      {
+        for (unsigned int n=0; n<n_solution_vectors; ++n)
+          (*errors[n])(cell_index) = 0;
       
-				       // loop over the two points bounding
-				       // this line. n==0 is left point,
-				       // n==1 is right point
-      for (unsigned int n=0; n<2; ++n)
-	{
-					   // find right active neighbor
-	  DoFHandler<1>::cell_iterator neighbor = cell->neighbor(n);
-	  if (neighbor.state() == IteratorState::valid)
-	    while (neighbor->has_children())
-	      neighbor = neighbor->child(n==0 ? 1 : 0);
+                                         // loop over the two points bounding
+                                         // this line. n==0 is left point,
+                                         // n==1 is right point
+        for (unsigned int n=0; n<2; ++n)
+          {
+                                             // find left or right active
+                                             // neighbor
+            DoFHandler<1>::cell_iterator neighbor = cell->neighbor(n);
+            if (neighbor.state() == IteratorState::valid)
+              while (neighbor->has_children())
+                neighbor = neighbor->child(n==0 ? 1 : 0);
       
-					   // now get the gradients on the
-					   // both sides of the point
-	  fe_values.reinit (cell);
+                                             // now get the gradients on the
+                                             // both sides of the point
+            fe_values.reinit (cell);
 
-	  for (unsigned int s=0; s<n_solution_vectors; ++s)
-	    fe_values.get_function_grads (*solutions[s], gradients_here[s]);
+            for (unsigned int s=0; s<n_solution_vectors; ++s)
+              fe_values.get_function_grads (*solutions[s], gradients_here[s]);
 
-	  if (neighbor.state() == IteratorState::valid)
-	    {
-	      fe_values.reinit (neighbor);
+            if (neighbor.state() == IteratorState::valid)
+              {
+                fe_values.reinit (neighbor);
 
-	      for (unsigned int s=0; s<n_solution_vectors; ++s)
-		fe_values.get_function_grads (*solutions[s],
-					      gradients_neighbor[s]);
+                for (unsigned int s=0; s<n_solution_vectors; ++s)
+                  fe_values.get_function_grads (*solutions[s],
+                                                gradients_neighbor[s]);
 
-					       // extract the
-					       // gradients of all the
-					       // components. [0]
-					       // means: x-derivative,
-					       // which is the only
-					       // one here
-	      for (unsigned int s=0; s<n_solution_vectors; ++s)
-		for (unsigned int c=0; c<n_components; ++c)
-		  grad_neighbor[s](c) = gradients_neighbor[s][n==0 ? 1 : 0][c][0];
-	    }
-	  else
-	    if (neumann_bc.find(n) != neumann_bc.end())
-					       // if Neumann b.c., then fill
-					       // the gradients field which
-					       // will be used later on.
-	      {
-		if (n_components==1)
-		  {
-		    const double
-		      v = neumann_bc.find(n)->second->value(cell->vertex(0));
+                                                 // extract the
+                                                 // gradients of all the
+                                                 // components. [0]
+                                                 // means: x-derivative,
+                                                 // which is the only
+                                                 // one here
+                for (unsigned int s=0; s<n_solution_vectors; ++s)
+                  for (unsigned int c=0; c<n_components; ++c)
+                    grad_neighbor[s](c)
+                      = gradients_neighbor[s][n==0 ? 1 : 0][c][0];
+              }
+            else
+              if (neumann_bc.find(n) != neumann_bc.end())
+                                                 // if Neumann b.c., then fill
+                                                 // the gradients field which
+                                                 // will be used later on.
+                {
+                  if (n_components==1)
+                    {
+                      const double
+                        v = neumann_bc.find(n)->second->value(cell->vertex(0));
 		    
-		    for (unsigned int s=0; s<n_solution_vectors; ++s)
-		      grad_neighbor[s](0) = v;
-		  }
-		else
-		  {
-		    Vector<double> v(n_components);
-		    neumann_bc.find(n)->second->vector_value(cell->vertex(0), v);
+                      for (unsigned int s=0; s<n_solution_vectors; ++s)
+                        grad_neighbor[s](0) = v;
+                    }
+                  else
+                    {
+                      Vector<double> v(n_components);
+                      neumann_bc.find(n)->second->vector_value(cell->vertex(0), v);
 		    
-		  for (unsigned int s=0; s<n_solution_vectors; ++s)
-		    grad_neighbor[s] = v;
-		  };
-	      }
-	    else
-					       // fill with zeroes.
-	      for (unsigned int s=0; s<n_solution_vectors; ++s)
-		grad_neighbor[s].clear ();
+                      for (unsigned int s=0; s<n_solution_vectors; ++s)
+                        grad_neighbor[s] = v;
+                    };
+                }
+              else
+                                                 // fill with zeroes.
+                for (unsigned int s=0; s<n_solution_vectors; ++s)
+                  grad_neighbor[s].clear ();
 
-					   // if there is a
-					   // coefficient, then
-					   // evaluate it at the
-					   // present position. if
-					   // there is none, reuse the
-					   // preset values.
-	  if (coefficient != 0)
-	    {
-	      if (coefficient->n_components == 1)
-		{
-		  const double c_value = coefficient->value (cell->vertex(n));
-		  for (unsigned int c=0; c<n_components; ++c)
-		    coefficient_values(c) = c_value;
-		}
-	      else
-		coefficient->vector_value(cell->vertex(n),
-					  coefficient_values);
-	    };
+                                             // if there is a
+                                             // coefficient, then
+                                             // evaluate it at the
+                                             // present position. if
+                                             // there is none, reuse the
+                                             // preset values.
+            if (coefficient != 0)
+              {
+                if (coefficient->n_components == 1)
+                  {
+                    const double c_value = coefficient->value (cell->vertex(n));
+                    for (unsigned int c=0; c<n_components; ++c)
+                      coefficient_values(c) = c_value;
+                  }
+                else
+                  coefficient->vector_value(cell->vertex(n),
+                                            coefficient_values);
+              }
 
 
-	  for (unsigned int s=0; s<n_solution_vectors; ++s)
-	    for (unsigned int component=0; component<n_components; ++component)
-	      if (component_mask[component] == true)
-		{
-						   // get gradient
-						   // here. [0] means
-						   // x-derivative
-						   // (there is no
-						   // other component
-						   // in 1d)
-		  const double grad_here = gradients_here[s][n][component][0];
+            for (unsigned int s=0; s<n_solution_vectors; ++s)
+              for (unsigned int component=0; component<n_components; ++component)
+                if (component_mask[component] == true)
+                  {
+                                                     // get gradient
+                                                     // here. [0] means
+                                                     // x-derivative
+                                                     // (there is no
+                                                     // other component
+                                                     // in 1d)
+                    const double grad_here = gradients_here[s][n][component][0];
 		  
-		  const double jump = ((grad_here - grad_neighbor[s](component)) *
-				       coefficient_values(component));
-		  (*errors[s])(cell_index) += jump*jump * cell->diameter();
-		};
-	};
+                    const double jump = ((grad_here - grad_neighbor[s](component)) *
+                                         coefficient_values(component));
+                    (*errors[s])(cell_index) += jump*jump * cell->diameter();
+                  }
+          }
       
-      for (unsigned int s=0; s<n_solution_vectors; ++s)
-	(*errors[s])(cell_index) = std::sqrt((*errors[s])(cell_index));
-    };
+        for (unsigned int s=0; s<n_solution_vectors; ++s)
+          (*errors[s])(cell_index) = std::sqrt((*errors[s])(cell_index));
+      }
 }
 
 
@@ -320,7 +350,10 @@ template <int dim>
 KellyErrorEstimator<dim>::PerThreadData::
 PerThreadData (const unsigned int n_solution_vectors,
 	       const unsigned int n_components,
-	       const unsigned int n_q_points)
+	       const unsigned int n_q_points,
+               const unsigned int subdomain_id)
+                :
+                subdomain_id (subdomain_id)
 {
 				   // Init the size of a lot of vectors
 				   // needed in the calculations once
@@ -345,8 +378,8 @@ PerThreadData (const unsigned int n_solution_vectors,
 	  phi[i][qp].resize(n_components);
 	  psi[i][qp].resize(n_components);
 	  neighbor_psi[i][qp].resize(n_components);
-	};
-    };
+	}
+    }
 
   for (unsigned int qp=0;qp<n_q_points;++qp)
     coefficient_values[qp].reinit(n_components);
@@ -359,39 +392,45 @@ PerThreadData (const unsigned int n_solution_vectors,
 // calls dimension dependent functions
 template <int dim>
 template <typename InputVector>
-void KellyErrorEstimator<dim>::estimate (const Mapping<dim>      &mapping,
-					 const DoFHandler<dim>   &dof_handler,
-					 const Quadrature<dim-1> &quadrature,
-					 const typename FunctionMap<dim>::type &neumann_bc,
-					 const InputVector       &solution,
-					 Vector<float>           &error,
-					 const std::vector<bool> &component_mask,
-					 const Function<dim>     *coefficients,
-					 const unsigned int       n_threads)
+void
+KellyErrorEstimator<dim>::
+estimate (const Mapping<dim>      &mapping,
+          const DoFHandler<dim>   &dof_handler,
+          const Quadrature<dim-1> &quadrature,
+          const typename FunctionMap<dim>::type &neumann_bc,
+          const InputVector       &solution,
+          Vector<float>           &error,
+          const std::vector<bool> &component_mask,
+          const Function<dim>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id)
 {
 				   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
-	    component_mask, coefficients, n_threads);
+	    component_mask, coefficients, n_threads, subdomain_id);
 }
 
 
 template <int dim>
 template <typename InputVector>
-void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
-					 const Quadrature<dim-1> &quadrature,
-					 const typename FunctionMap<dim>::type &neumann_bc,
-					 const InputVector       &solution,
-					 Vector<float>           &error,
-					 const std::vector<bool> &component_mask,
-					 const Function<dim>     *coefficients,
-					 const unsigned int       n_threads)
+void
+KellyErrorEstimator<dim>::
+estimate (const DoFHandler<dim>   &dof_handler,
+          const Quadrature<dim-1> &quadrature,
+          const typename FunctionMap<dim>::type &neumann_bc,
+          const InputVector       &solution,
+          Vector<float>           &error,
+          const std::vector<bool> &component_mask,
+          const Function<dim>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solution,
-	   error, component_mask, coefficients, n_threads);
+	   error, component_mask, coefficients, n_threads, subdomain_id);
 }
 
 
@@ -412,6 +451,8 @@ estimate_some (const Mapping<dim>                  &mapping,
                PerThreadData                       &per_thread_data)
 {
   const unsigned int n_solution_vectors = solutions.size();
+
+  const unsigned int subdomain_id = per_thread_data.subdomain_id;
   
 				   // make up a fe face values object
 				   // for the restriction of the
@@ -475,12 +516,13 @@ estimate_some (const Mapping<dim>                  &mapping,
 
   
 				   // loop over all cells for this thread
-				   // the iteration of cell is done at the end
-  for (; cell!=dof_handler.end(); )
+  for (; cell!=dof_handler.end();
+       advance_by_n<dim>(cell,this_thread.second))
     {
       
 				       // loop over all faces of this cell
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+      for (unsigned int face_no=0;
+           face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	{
 					   // make sure we do work
 					   // only once: this face
@@ -514,21 +556,23 @@ estimate_some (const Mapping<dim>                  &mapping,
 
 
 					   // if the neighboring cell is less
-					   // refined than the present one, then
-					   // do nothing since we integrate
-					   // over the subfaces when we visit
-					   // the coarse cells.
+					   // refined than the present one,
+					   // then do nothing since we
+					   // integrate over the subfaces when
+					   // we visit the coarse cells.
 	  if (cell->at_boundary(face_no) == false)
 	    if (cell->neighbor(face_no)->level() < cell->level())
 	      continue;
 	  
-					   // if this face is part of the boundary
-					   // but not of the neumann boundary
-					   // -> nothing to do. However, to make
-					   // things easier when summing up the
-					   // contributions of the faces of cells,
-					   // we enter this face into the list
-					   // of faces with contribution zero.
+					   // if this face is part of the
+					   // boundary but not of the neumann
+					   // boundary -> nothing to
+					   // do. However, to make things
+					   // easier when summing up the
+					   // contributions of the faces of
+					   // cells, we enter this face into
+					   // the list of faces with
+					   // contribution zero.
 	  const unsigned char boundary_indicator
 	    = cell->face(face_no)->boundary_indicator();
 	  if (cell->face(face_no)->at_boundary()
@@ -538,16 +582,61 @@ estimate_some (const Mapping<dim>                  &mapping,
 	      for (unsigned int n=0; n<n_solution_vectors; ++n)
 		face_integrals[cell->face(face_no)][n] = 0;
 	      continue;
-	    };
+	    }
 
+                                           // finally: note that we only
+                                           // have to do something if either
+                                           // the present cell is on the
+                                           // subdomain we care for, or if one
+                                           // of the neighbors behind the face
+                                           // is on the subdomain we care for
+          if ( ! ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
+                  ||
+                  (cell->subdomain_id() == subdomain_id)))
+            {
+                                               // ok, cell is unwanted, but
+                                               // maybe its neighbor behind
+                                               // the face we presently work
+                                               // on? oh is there a face at
+                                               // all?
+              if (cell->at_boundary(face_no))
+                continue;
 
+              bool care_for_cell = false;
+              if (cell->neighbor(face_no)->has_children() == false)
+                care_for_cell |= (cell->neighbor(face_no)->subdomain_id()
+                                  == subdomain_id);
+              else
+                {
+                  for (unsigned int sf=0;
+                       sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
+                    if (cell->neighbor_child_on_subface(face_no,sf)
+                        ->subdomain_id() == subdomain_id)
+                      {
+                        care_for_cell = true;
+                        break;
+                      }
+                }
+
+                                               // so if none of the neighbors
+                                               // cares for this subdomain
+                                               // either, then try next face
+              if (care_for_cell == false)
+                continue;
+            }
+              
+
+                                           // so now we know that we care for
+                                           // this face, let's do something
+                                           // about it:
 	  if (cell->face(face_no)->has_children() == false)
-					     // if the face is a regular one, i.e.
-					     // either on the other side there is
-					     // nirvana (face is at boundary), or
-					     // the other side's refinement level
-					     // is the same as that of this side,
-					     // then handle the integration of
+					     // if the face is a regular one,
+					     // i.e.  either on the other side
+					     // there is nirvana (face is at
+					     // boundary), or the other side's
+					     // refinement level is the same
+					     // as that of this side, then
+					     // handle the integration of
 					     // these both cases together
 	    integrate_over_regular_face (dof_handler, quadrature,
                                          neumann_bc, solutions, component_mask,
@@ -571,16 +660,8 @@ estimate_some (const Mapping<dim>                  &mapping,
 					   cell, face_no,
 					   fe_face_values_cell,
 					   fe_subface_values);
-	};
-
-				       // go to next cell for this
-				       // thread. note that the cells
-				       // for each of the threads are
-				       // interleaved.
-      for (unsigned int t=0;
-	   ((t<this_thread.second) && (cell!=dof_handler.end()));
-	   ++t, ++cell);
-    };
+	}
+    }
 }
 
 
@@ -588,15 +669,17 @@ estimate_some (const Mapping<dim>                  &mapping,
 template <int dim>
 template <typename InputVector>
 void
-KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping,
-                                    const DoFHandler<dim>               &dof_handler,
-                                    const Quadrature<dim-1>             &quadrature,
-                                    const typename FunctionMap<dim>::type &neumann_bc,
-                                    const std::vector<const InputVector *> &solutions,
-                                    std::vector<Vector<float>*>              &errors,
-                                    const std::vector<bool>                  &component_mask_,
-                                    const Function<dim>                 *coefficients,
-                                    const unsigned int                   n_threads_)
+KellyErrorEstimator<dim>::
+estimate (const Mapping<dim>                  &mapping,
+          const DoFHandler<dim>               &dof_handler,
+          const Quadrature<dim-1>             &quadrature,
+          const typename FunctionMap<dim>::type &neumann_bc,
+          const std::vector<const InputVector *> &solutions,
+          std::vector<Vector<float>*>              &errors,
+          const std::vector<bool>                  &component_mask_,
+          const Function<dim>                 *coefficients,
+          const unsigned int                   n_threads_,
+          const unsigned int                   subdomain_id)
 {
   const unsigned int n_components = dof_handler.get_fe().n_components();
 
@@ -608,7 +691,8 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
 
   for (typename FunctionMap<dim>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
-    Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());  
+    Assert (i->second->n_components == n_components,
+            ExcInvalidBoundaryFunction());  
   
   Assert ((component_mask_.size() == 0) ||
           (component_mask_.size() == n_components), ExcInvalidComponentMask());
@@ -633,7 +717,7 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
 				    std::vector<bool>(n_components, true) :
 				    component_mask_);
   Assert (component_mask.size() == n_components, ExcInvalidComponentMask());
-  Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
+  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcInvalidComponentMask());
 	  
 				   // if NOT multithreaded, set
@@ -659,10 +743,15 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
 				   // in multithreaded mode. Negative
 				   // value indicates that the face
 				   // has not yet been processed.
-  std::vector<double> default_face_integrals (n_solution_vectors, -10e20);
+  const double invalid_double = -10e20;
+  std::vector<double> default_face_integrals (n_solution_vectors,
+                                              invalid_double);
   FaceIntegrals face_integrals;
-  for (active_cell_iterator cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
-    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+  for (active_cell_iterator cell=dof_handler.begin_active();
+       cell!=dof_handler.end(); ++cell)
+    for (unsigned int face_no=0;
+         face_no<GeometryInfo<dim>::faces_per_cell;
+         ++face_no)
       face_integrals[cell->face(face_no)] = default_face_integrals;
 
 
@@ -676,9 +765,11 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
 				   // components
   std::vector<PerThreadData*> data_structures (n_threads);
   for (unsigned int i=0; i<n_threads; ++i)
-    data_structures[i] = new PerThreadData (solutions.size(),
-					    dof_handler.get_fe().n_components(),
-                                            quadrature.n_quadrature_points);
+    data_structures[i]
+      = new PerThreadData (solutions.size(),
+                           dof_handler.get_fe().n_components(),
+                           quadrature.n_quadrature_points,
+                           subdomain_id);
   
 				   // split all cells into threads if
 				   // multithreading is used and run
@@ -717,7 +808,7 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
     {
       delete data_structures[i];
       data_structures[i] = 0;
-    };
+    }
   
   
 				   // finally add up the contributions of the
@@ -733,27 +824,43 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
     };
 
   unsigned int present_cell=0;
-  
+
+                                   // now walk over all cells and collect
+                                   // information from the faces. only do
+                                   // something if this is a cell we care for
+                                   // based on the subdomain id
   for (active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end();
        ++cell, ++present_cell)
-    {
-				       // loop over all faces of this cell
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
-	   ++face_no)
-	{
-	  Assert(face_integrals.find(cell->face(face_no)) != face_integrals.end(),
-		 ExcInternalError());
-	  const double factor = cell->diameter() / 24;
+    if ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
+        ||
+        (cell->subdomain_id() == subdomain_id))
+      {
+                                         // loop over all faces of this cell
+        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
+             ++face_no)
+          {
+            Assert(face_integrals.find(cell->face(face_no))
+                   != face_integrals.end(),
+                   ExcInternalError());
+            const double factor = cell->diameter() / 24;
 	  
-	  for (unsigned int n=0; n<n_solution_vectors; ++n)
-	    (*errors[n])(present_cell) += (face_integrals[cell->face(face_no)][n] *
-					   factor);
-	};
+            for (unsigned int n=0; n<n_solution_vectors; ++n)
+              {
+                                                 // make sure that we have
+                                                 // written a meaningful value
+                                                 // into this slot
+                Assert (face_integrals[cell->face(face_no)][n] >= 0,
+                        ExcInternalError());
+                
+                (*errors[n])(present_cell)
+                  += (face_integrals[cell->face(face_no)][n] * factor);
+              }
+          }
 
-      for (unsigned int n=0; n<n_solution_vectors; ++n)
-	(*errors[n])(present_cell) = std::sqrt((*errors[n])(present_cell));
-    };
+        for (unsigned int n=0; n<n_solution_vectors; ++n)
+          (*errors[n])(present_cell) = std::sqrt((*errors[n])(present_cell));
+      }
 }
 
 
@@ -766,12 +873,13 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
 					 std::vector<Vector<float>*>              &errors,
 					 const std::vector<bool>                  &component_mask,
 					 const Function<dim>                 *coefficients,
-					 const unsigned int                   n_threads)
+					 const unsigned int                   n_threads,
+                                         const unsigned int       subdomain_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));  
   static const MappingQ1<dim> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solutions,
-	   errors, component_mask, coefficients, n_threads);
+	   errors, component_mask, coefficients, n_threads, subdomain_id);
 }
 
 
@@ -1181,7 +1289,8 @@ estimate<InputVector > (const Mapping<deal_II_dimension>      &,    \
           Vector<float>           &,    \
           const std::vector<bool> &,    \
           const Function<deal_II_dimension>     *,    \
-          const unsigned int       );    \
+          const unsigned int       , \
+          const unsigned int);    \
     \
 template    \
 void    \
@@ -1193,7 +1302,8 @@ estimate<InputVector > (const DoFHandler<deal_II_dimension>   &,    \
           Vector<float>           &,    \
           const std::vector<bool> &,    \
           const Function<deal_II_dimension>     *,    \
-          const unsigned int       );    \
+          const unsigned int       , \
+          const unsigned int);    \
         \
 template    \
 void    \
@@ -1206,7 +1316,8 @@ estimate<InputVector > (const Mapping<deal_II_dimension>          &,    \
           std::vector<Vector<float>*> &,    \
           const std::vector<bool>     &,    \
           const Function<deal_II_dimension>         *,    \
-          const unsigned int           );    \
+          const unsigned int           , \
+          const unsigned int);    \
     \
 template    \
 void    \
@@ -1218,7 +1329,8 @@ estimate<InputVector > (const DoFHandler<deal_II_dimension>       &,    \
           std::vector<Vector<float>*> &,    \
           const std::vector<bool>     &,    \
           const Function<deal_II_dimension>         *,    \
-          const unsigned int           )
+          const unsigned int           , \
+          const unsigned int)
 
 INSTANTIATE(Vector<double>);
 INSTANTIATE(Vector<float>);
