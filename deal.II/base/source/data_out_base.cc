@@ -2086,11 +2086,10 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				   // separate thread and when wanting
 				   // to write out the data, we wait
 				   // for that thread to finish
-  std::vector<std::vector<double> > data_vectors (n_data_sets,
-						  std::vector<double> (n_nodes));
+  Table<2,double> data_vectors (n_data_sets, n_nodes);
   Threads::ThreadManager thread_manager;
   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
-		   std::vector<std::vector<double> >                &)
+		   Table<2,double> &)
     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
   Threads::spawn (thread_manager,
 		  Threads::encapsulate (fun_ptr)
@@ -2443,229 +2442,229 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
       };
   };
 
-
-				    // in Tecplot FEBLOCK format the vertex
-				    // coordinates and the data have an
-				    // order that is a bit unpleasant
-				    // (first all x coordinates, then
-				    // all y coordinate, ...; first all
-				    // data of variable 1, then
-				    // variable 2, etc), so we have to
-				    // copy the data vectors a bit around
-				    //
-				    // note that we copy vectors when
-				    // looping over the patches since we
-				    // have to write them one variable
-				    // at a time and don't want to use
-				    // more than one loop
-				    //
-				    // this copying of data vectors can
-				    // be done while we already output
-				    // the vertices, so do this on a
-				    // separate thread and when wanting
-				    // to write out the data, we wait
-				    // for that thread to finish
   
-   std::vector<std::vector<double> > data_vectors (n_data_sets,
-						   std::vector<double> (n_nodes));
-   Threads::ThreadManager thread_manager;
-   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
-		    std::vector<std::vector<double> >                &)
-     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
-   Threads::spawn (thread_manager,
-		   Threads::encapsulate (fun_ptr)
-		   .collect_args(patches, data_vectors));
+                                   // in Tecplot FEBLOCK format the vertex
+                                   // coordinates and the data have an
+                                   // order that is a bit unpleasant
+                                   // (first all x coordinates, then
+                                   // all y coordinate, ...; first all
+                                   // data of variable 1, then
+                                   // variable 2, etc), so we have to
+                                   // copy the data vectors a bit around
+                                   //
+                                   // note that we copy vectors when
+                                   // looping over the patches since we
+                                   // have to write them one variable
+                                   // at a time and don't want to use
+                                   // more than one loop
+                                   //
+                                   // this copying of data vectors can
+                                   // be done while we already output
+                                   // the vertices, so do this on a
+                                   // separate thread and when wanting
+                                   // to write out the data, we wait
+                                   // for that thread to finish
+  
+  Table<2,double> data_vectors (n_data_sets, n_nodes);
 
-				    ///////////////////////////////
-				    // first make up a list of used
-				    // vertices along with their
-				    // coordinates
+  Threads::ThreadManager thread_manager;
+  void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
+                   Table<2,double> &)
+    = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
+  Threads::spawn (thread_manager,
+                  Threads::encapsulate (fun_ptr)
+                  .collect_args(patches, data_vectors));
+
+                                   ///////////////////////////////
+                                   // first make up a list of used
+                                   // vertices along with their
+                                   // coordinates
 
   
-   for (unsigned int d=1; d<=spacedim; ++d)
-     {       
+  for (unsigned int d=1; d<=spacedim; ++d)
+    {       
           
-       for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	    patch!=patches.end(); ++patch)
-	 {
-	   const unsigned int n_subdivisions = patch->n_subdivisions;
+      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+           patch!=patches.end(); ++patch)
+        {
+          const unsigned int n_subdivisions = patch->n_subdivisions;
 	  
-	   switch (dim)
-	     {
-	       case 1:
-	       {
-		 for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		   out << ((patch->vertices[1](0) * i / n_subdivisions) +
-			   (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
-		       << '\n';
-		 break;
-	       };
+          switch (dim)
+            {
+              case 1:
+              {
+                for (unsigned int i=0; i<n_subdivisions+1; ++i)
+                  out << ((patch->vertices[1](0) * i / n_subdivisions) +
+                          (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
+                      << '\n';
+                break;
+              };
 	      
-	       case 2:
-	       {
-		 for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		   for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		     {
-		       const double x_frac = i * 1./n_subdivisions,
-				    y_frac = j * 1./n_subdivisions;
+              case 2:
+              {
+                for (unsigned int i=0; i<n_subdivisions+1; ++i)
+                  for (unsigned int j=0; j<n_subdivisions+1; ++j)
+                    {
+                      const double x_frac = i * 1./n_subdivisions,
+                                   y_frac = j * 1./n_subdivisions;
 		      
-							// compute coordinates for
-							// this patch point
+                                                       // compute coordinates for
+                                                       // this patch point
 
-		       out << (((patch->vertices[1](d-1) * x_frac) +
-				(patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-			       ((patch->vertices[2](d-1) * x_frac) +
-				(patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
-			   << '\n';
-		     };
-		 break;
-	       };
+                      out << (((patch->vertices[1](d-1) * x_frac) +
+                               (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
+                              ((patch->vertices[2](d-1) * x_frac) +
+                               (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
+                          << '\n';
+                    };
+                break;
+              };
 	      
-	       case 3:
-	       {
-		 for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		   for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		     for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		       {
-							  // note the broken
-							  // design of hexahedra
-							  // in deal.II, where
-							  // first the z-component
-							  // is counted up, before
-							  // increasing the y-
-							  // coordinate
-			 const double x_frac = i * 1./n_subdivisions,
-				      y_frac = k * 1./n_subdivisions,
-				      z_frac = j * 1./n_subdivisions;
+              case 3:
+              {
+                for (unsigned int i=0; i<n_subdivisions+1; ++i)
+                  for (unsigned int j=0; j<n_subdivisions+1; ++j)
+                    for (unsigned int k=0; k<n_subdivisions+1; ++k)
+                      {
+                                                         // note the broken
+                                                         // design of hexahedra
+                                                         // in deal.II, where
+                                                         // first the z-component
+                                                         // is counted up, before
+                                                         // increasing the y-
+                                                         // coordinate
+                        const double x_frac = i * 1./n_subdivisions,
+                                     y_frac = k * 1./n_subdivisions,
+                                     z_frac = j * 1./n_subdivisions;
 			
-							  // compute coordinates for
-							  // this patch point
+                                                         // compute coordinates for
+                                                         // this patch point
 			 
-			 out << ((((patch->vertices[1](d-1) * x_frac) +
-				   (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-				  ((patch->vertices[2](d-1) * x_frac) +
-				   (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
-				 (((patch->vertices[5](d-1) * x_frac) +
-				   (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
-				  ((patch->vertices[6](d-1) * x_frac) +
-				   (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
-			     << '\n';
-		       };
-		 break;
-	       };
+                        out << ((((patch->vertices[1](d-1) * x_frac) +
+                                  (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
+                                 ((patch->vertices[2](d-1) * x_frac) +
+                                  (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
+                                (((patch->vertices[5](d-1) * x_frac) +
+                                  (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
+                                 ((patch->vertices[6](d-1) * x_frac) +
+                                  (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
+                            << '\n';
+                      };
+                break;
+              };
 	      
-	       default:
-		     Assert (false, ExcNotImplemented());
-	     };
-	 };
-       out << std::endl;
-     };
+              default:
+                    Assert (false, ExcNotImplemented());
+            };
+        };
+      out << std::endl;
+    };
 
 
-				    ///////////////////////////////////////
-				    // data output.
-				    //
-				    // now write the data vectors to
-				    // @p{out} first make sure that all
-				    // data is in place
-   thread_manager.wait ();
+                                   ///////////////////////////////////////
+                                   // data output.
+                                   //
+                                   // now write the data vectors to
+                                   // @p{out} first make sure that all
+                                   // data is in place
+  thread_manager.wait ();
 
-				    // then write data.
-   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-     {
+                                   // then write data.
+  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+    {
        
-       copy(data_vectors[data_set].begin(),
-	    data_vectors[data_set].end(),
-	    std::ostream_iterator<double>(out, "\n"));
-       out << std::endl;
-     };
+      copy(data_vectors[data_set].begin(),
+           data_vectors[data_set].end(),
+           std::ostream_iterator<double>(out, "\n"));
+      out << std::endl;
+    };
 
   
-				    /////////////////////////////////
-				    // now for the cells. note that
-				    // vertices are counted from 1 onwards
+                                   /////////////////////////////////
+                                   // now for the cells. note that
+                                   // vertices are counted from 1 onwards
 
-   unsigned int first_vertex_of_patch = 0;
+  unsigned int first_vertex_of_patch = 0;
       
-   for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	patch!=patches.end(); ++patch)
-     {
-       const unsigned int n_subdivisions = patch->n_subdivisions;
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+       patch!=patches.end(); ++patch)
+    {
+      const unsigned int n_subdivisions = patch->n_subdivisions;
       
-					// write out the cells making
-					// up this patch
-       switch (dim)
-	 {
-	   case 1:
-	   {
-	     break;
-	   };
-	   case 2:
-	   {
-	     for (unsigned int i=0; i<n_subdivisions; ++i)
-	       for (unsigned int j=0; j<n_subdivisions; ++j)
-		 {
+                                       // write out the cells making
+                                       // up this patch
+      switch (dim)
+        {
+          case 1:
+          {
+            break;
+          };
+          case 2:
+          {
+            for (unsigned int i=0; i<n_subdivisions; ++i)
+              for (unsigned int j=0; j<n_subdivisions; ++j)
+                {
 
-		   out << first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << ' '
-		       << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1 << ' '
-		       << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1+1 << ' '
-		       << first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1
-		       << std::endl;
-		 };
-	     break;
-	   };
+                  out << first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << ' '
+                      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1 << ' '
+                      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1+1 << ' '
+                      << first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1
+                      << std::endl;
+                };
+            break;
+          };
 	      
-	   case 3:
-	   {
-	     for (unsigned int i=0; i<n_subdivisions; ++i)
-	       for (unsigned int j=0; j<n_subdivisions; ++j)
-		 for (unsigned int k=0; k<n_subdivisions; ++k)
-		   {
-						      // note: vertex indices start with 1!
+          case 3:
+          {
+            for (unsigned int i=0; i<n_subdivisions; ++i)
+              for (unsigned int j=0; j<n_subdivisions; ++j)
+                for (unsigned int k=0; k<n_subdivisions; ++k)
+                  {
+                                                     // note: vertex indices start with 1!
 		     
-		     out << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k  +1 << ' '
-			 << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k  +1 << ' '
-			 << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k  +1 << ' '
-			 << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k  +1 << ' '
-			 << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1+1 << ' '
-			 << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1+1 << ' '
-			 << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1+1 << ' '
-			 << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1 << ' '
-			 << std::endl;
-		   };
-	     break;
-	   };
+                    out << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k  +1 << ' '
+                        << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k  +1 << ' '
+                        << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k  +1 << ' '
+                        << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k  +1 << ' '
+                        << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1+1 << ' '
+                        << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1+1 << ' '
+                        << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1+1 << ' '
+                        << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1 << ' '
+                        << std::endl;
+                  };
+            break;
+          };
 
-	   default:
-		 Assert (false, ExcNotImplemented());
-	 };
+          default:
+                Assert (false, ExcNotImplemented());
+        };
 
 
-					// finally update the number
-					// of the first vertex of this patch
-       switch (dim)
-	 {
-	   case 1:
-		 first_vertex_of_patch += n_subdivisions+1;
-		 break;
-	   case 2:
-		 first_vertex_of_patch += (n_subdivisions+1) *
-					  (n_subdivisions+1);
-		 break;
-	   case 3:
-		 first_vertex_of_patch += (n_subdivisions+1) *
-					  (n_subdivisions+1) *
-					  (n_subdivisions+1);
-		 break;
-	   default:
-		 Assert (false, ExcNotImplemented());
-	 };
+                                       // finally update the number
+                                       // of the first vertex of this patch
+      switch (dim)
+        {
+          case 1:
+                first_vertex_of_patch += n_subdivisions+1;
+                break;
+          case 2:
+                first_vertex_of_patch += (n_subdivisions+1) *
+                                         (n_subdivisions+1);
+                break;
+          case 3:
+                first_vertex_of_patch += (n_subdivisions+1) *
+                                         (n_subdivisions+1) *
+                                         (n_subdivisions+1);
+                break;
+          default:
+                Assert (false, ExcNotImplemented());
+        };
        
-     };
+    };
 
   
-				    // assert the stream is still ok
-   AssertThrow (out, ExcIO());
+                                   // assert the stream is still ok
+  AssertThrow (out, ExcIO());
 };
 
 
@@ -2893,11 +2892,11 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				    // to write out the data, we wait
 				    // for that thread to finish
   
-   std::vector<std::vector<double> > data_vectors (n_data_sets,
-						   std::vector<double> (n_nodes));
+  Table<2,double> data_vectors (n_data_sets, n_nodes);
+
    Threads::ThreadManager thread_manager;
    void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
-		    std::vector<std::vector<double> >                &)
+		    Table<2,dim> &)
      = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
    Threads::spawn (thread_manager,
 		   Threads::encapsulate (fun_ptr)
@@ -3217,11 +3216,11 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				   // separate thread and when wanting
 				   // to write out the data, we wait
 				   // for that thread to finish
-  std::vector<std::vector<double> > data_vectors (n_data_sets,
-						  std::vector<double> (n_nodes));
+  Table<2,double> data_vectors (n_data_sets, n_nodes);
+
   Threads::ThreadManager thread_manager;
   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
-		   std::vector<std::vector<double> >                &)
+		   Table<2,double> &)
     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
   Threads::spawn (thread_manager,
 		  Threads::encapsulate (fun_ptr)
@@ -3456,7 +3455,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 template <int dim, int spacedim>
 void
 DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
-					     std::vector<std::vector<double> >       &data_vectors)
+					     Table<2,double>                         &data_vectors)
 {
 				   // unlike in the main function, we
 				   // don't have here the data_names
@@ -3467,7 +3466,7 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
 				   // in the main function.
   const unsigned int n_data_sets = patches[0].data.n_rows();
 
-  Assert (data_vectors.size() == n_data_sets,
+  Assert (data_vectors.size()[0] == n_data_sets,
 	  ExcInternalError());
   
 				   // loop over all patches

@@ -13,6 +13,7 @@
 
 
 #include <base/table_handler.h>
+#include <base/table.h>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
@@ -123,8 +124,8 @@ void TableHandler::add_column_to_supercolumn (const std::string &key,
 
   if (!supercolumns.count(superkey))
     {
-      std::pair<std::string, std::vector<std::string> > new_column(superkey,
-								   std::vector<std::string>());
+      std::pair<std::string, std::vector<std::string> >
+        new_column(superkey, std::vector<std::string>());
       supercolumns.insert(new_column);
 				       // replace key in column_order
 				       // by superkey
@@ -225,8 +226,7 @@ void TableHandler::write_text(std::ostream &out) const
 				   // first compute the widths of each
 				   // entry of the table, in order to
 				   // have a nicer alignement
-  std::vector<std::vector<unsigned int> >
-    entry_widths (nrows, std::vector<unsigned int>(n_cols));
+  Table<2,unsigned int> entry_widths (nrows, n_cols);
   for (unsigned int i=0; i<nrows; ++i)
     for (unsigned int j=0; j<n_cols; ++j)
       {

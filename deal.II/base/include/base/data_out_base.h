@@ -18,6 +18,7 @@
 #include <base/point.h>
 #include <base/table.h>
 #include <grid/geometry_info.h>
+
 #include <vector>
 #include <string>
 
@@ -1529,15 +1530,16 @@ class DataOutBase
 				      * thus moved into this separate
 				      * function.
 				      *
-				      * Note that because of the close
-				      * similarity of the two formats,
+				      * Note that because of the
+				      * similarity of the formats,
 				      * this function is also used by
-				      * the Vtk output function.
+				      * the Vtk and Tecplot output
+				      * functions.
 				      */
     template <int dim, int spacedim>
     static void
     write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
-				    std::vector<std::vector<double> >       &data_vectors);
+				    Table<2,double>                         &data_vectors);
 
 };
 

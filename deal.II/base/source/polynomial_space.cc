@@ -12,8 +12,9 @@
 //----------------------  polynomial_space.cc  ------------
 
 
-#include <base/exceptions.h>
 #include <base/polynomial_space.h>
+#include <base/exceptions.h>
+#include <base/table.h>
 
 
 template <int dim>
@@ -167,23 +168,18 @@ void PolynomialSpace<dim>::compute(
     }
 
 				   // Store data in a single
-				   // vector. Access is by
+				   // object. Access is by
 				   // v[d][n][o]
 				   //  d: coordinate direction
 				   //  n: number of 1d polynomial
 				   //  o: order of derivative
-  std::vector<std::vector<std::vector<double> > >
-    v(dim,
-      std::vector<std::vector<double> > (n_1d,
-					 std::vector<double> (v_size, 0.)));
-
-  for (unsigned int d=0; d<dim; ++d)
-    {
-      std::vector<std::vector<double> >& v_d=v[d];
-      Assert(v_d.size()==n_1d, ExcInternalError());
-      for (unsigned int i=0; i<n_1d; ++i)
-	polynomials[i].value(p(d), v_d[i]);
-    }
+  Table<2,std::vector<double> > v(dim, n_1d);
+  for (unsigned int d=0; d<v.size()[0]; ++d)
+    for (unsigned int i=0; i<v.size()[1]; ++i)
+      {
+        v(d,i).resize (v_size, 0.);
+        polynomials[i].value(p(d), v(d,i));
+      };
 
   if (update_values)
     {
@@ -207,8 +203,8 @@ void PolynomialSpace<dim>::compute(
 	    {
 	      for (unsigned int d=0;d<dim;++d)
 		grads[k][d] = v[0][ix][(d==0) ? 1 : 0]
-    * ((dim>1) ? v[1][iy][(d==1) ? 1 : 0] : 1.)
-    * ((dim>2) ? v[2][iz][(d==2) ? 1 : 0] : 1.);
+                              * ((dim>1) ? v[1][iy][(d==1) ? 1 : 0] : 1.)
+                              * ((dim>2) ? v[2][iz][(d==2) ? 1 : 0] : 1.);
 	      ++k;
 	    }
     }

@@ -12,8 +12,10 @@
 //----------------------  tensor_product_polynomials.cc  ------------
 
 
-#include <base/exceptions.h>
 #include <base/tensor_product_polynomials.h>
+#include <base/exceptions.h>
+#include <base/table.h>
+
 
 
 
@@ -50,9 +52,12 @@ TensorProductPolynomials<dim>::compute_grad(const unsigned int i,
 					    const Point<dim> &p) const
 {
   const unsigned int n_pols=polynomials.size();
-  
-  std::vector<std::vector<double> > v(dim, std::vector<double> (2));
 
+                                   // compute values and
+                                   // uni-directional derivatives at
+                                   // the given point in each
+                                   // co-ordinate direction
+  std::vector<std::vector<double> > v(dim, std::vector<double> (2));
   for (unsigned int d=0; d<dim; ++d)
     polynomials[(i/n_pols_to[d])%n_pols].value(p(d), v[d]);
   
@@ -140,16 +145,13 @@ void TensorProductPolynomials<dim>::compute(
       v_size=3;
     }
 
-  std::vector<std::vector<std::vector<double> > > v(
-    dim, std::vector<std::vector<double> > (n_pols, std::vector<double> (v_size)));
-
-  for (unsigned int d=0; d<dim; ++d)
-    {
-      std::vector<std::vector<double> > &v_d=v[d];
-      Assert(v_d.size()==n_pols, ExcInternalError());
-      for (unsigned int i=0; i<n_pols; ++i)
-	polynomials[i].value(p(d), v_d[i]);
-    }
+  Table<2,std::vector<double> > v(dim, n_pols);
+  for (unsigned int d=0; d<v.size()[0]; ++d)
+    for (unsigned int i=0; i<v.size()[1]; ++i)
+      {
+        v(d,i).resize (v_size, 0.);
+        polynomials[i].value(p(d), v(d,i));
+      };
   
   if (update_values)
     {
