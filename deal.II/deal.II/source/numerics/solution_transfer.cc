@@ -145,11 +145,6 @@ void SolutionTransfer<dim, number>::prepare_for_coarsening_and_refinement(
 	     ExcWrongVectorSize(all_in[i].size(),n_dofs_old));
     }
   vecs_ptr=&all_in;
-
-				   // sollte vorher passiert sein
-//  dof_handler->get_tria().prepare_coarsening();
-
-
 				   // first count the number
 				   // of cells that'll be coarsened
 				   // and that'll stay or be refined
@@ -180,19 +175,7 @@ void SolutionTransfer<dim, number>::prepare_for_coarsening_and_refinement(
   dof_values_on_cell=vector<vector<Vector<number> > > (
        n_coarsen_fathers, vector<Vector<number> > (
 	 in_size, Vector<number> (total_dofs)));
-//  dof_values_on_cell=<vector<Vector<number> > (in_size, Vector<number> (total_dofs))> (vector<vector<Vector<number> > >, n_coarsen_fathers);
-  
 
-  cout << "dof_values_on_cell.size()=" << dof_values_on_cell.size()
-       << ",  n_coarsen_fathers=" << n_coarsen_fathers << endl;  
-  if (dof_values_on_cell.size())
-    {
-      cout << endl << "dof_values_on_cell[0].size()=" << dof_values_on_cell[0].size()
-	   << ",  in_size=" << in_size << endl;
-      cout << "dof_values_on_cell[0][0].size()=" << dof_values_on_cell[0][0].size()
-	   << ",  total_dofs=" << total_dofs << endl;
-    }
-  
   all_pointerstructs=vector<Pointerstruct> (
     n_cells_to_stay_or_refine+n_coarsen_fathers);
 
@@ -203,7 +186,6 @@ void SolutionTransfer<dim, number>::prepare_for_coarsening_and_refinement(
 				   // and all the cells where a
 				   // #Pointerstruct# is needed 'n'
   unsigned int n_sr=0, n_cf=0, n=0;
-//  Vector<number> values(total_dofs);
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin();  
   for (; cell!=endc; ++cell) 
     {
@@ -273,7 +255,6 @@ void SolutionTransfer<dim, number>::interpolate (
 
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();
-  unsigned int counter=0;
   
   for (; cell!=endc; ++cell) 
     {
@@ -294,9 +275,7 @@ void SolutionTransfer<dim, number>::interpolate (
 					   // children of cell were deleted
 	  else if (valuesptr=structptr->dof_values_ptr)
 	    {
-//	      Assert(!cell->has_children(), ExcInternalError());
-	      if (cell->has_children())
-		cout << "counter=" << ++counter << endl;
+	      Assert(!cell->has_children(), ExcInternalError());
 	      cell->get_dof_indices(dofs);
 	      for (unsigned int j=0; j<out_size; ++j)
 		{
@@ -309,9 +288,6 @@ void SolutionTransfer<dim, number>::interpolate (
 	    Assert(false, ExcInternalError());
 	}
     }
-				   // delete all stored data
-				   // should be called outside
-//  reinit();
 }
 
 
