@@ -1091,15 +1091,7 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
 				   // least neighbors
   unsigned int min_neighbors           = cells[0].count_neighbors();
   unsigned int cell_with_min_neighbors = 0;
-  for (unsigned int i=1; i<cells.size(); ++i)
-    if (min_neighbors > cells[i].count_neighbors())
-      {  
-	min_neighbors = cells[i].count_neighbors();
-	cell_with_min_neighbors = i;
-	if (min_neighbors == 1)
-					   // better is not possible
-	  break;
-      };
+
 
 				   // have an array into which we
 				   // insert the new cells numbers of
@@ -1107,69 +1099,102 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
   const unsigned int invalid_cell_number = static_cast<unsigned int>(-1);
   std::vector<unsigned int> new_cell_numbers (cells.size(), invalid_cell_number);
 
-				   // and have an array of the next
-				   // cells to be numbered (old numbers)
-  std::vector<unsigned int> next_round_cells (1, cell_with_min_neighbors);
-
   unsigned int next_free_new_number = 0;
   
-				   // while there are still cells to
-				   // be renumbered:
-  while (next_round_cells.size() != 0)
-    {
-      for (unsigned int i=0; i<next_round_cells.size(); ++i)
-	{
-	  Assert (new_cell_numbers[next_round_cells[i]] == invalid_cell_number,
-		  ExcInternalError());
-	  
-	  new_cell_numbers[next_round_cells[i]] = next_free_new_number;
-	  ++next_free_new_number;
-	};
+  
+                                   // loop over each connected part of
+                                   // the domain. since the domain may
+                                   // consist of different unconnected
+                                   // parts, we have to loop until
+                                   // there are no more unnumbered
+                                   // cells
+  while (next_free_new_number < cells.size())
+   {
+				      // for initialization of
+				      // min_neighbors, go to the
+				      // first cell of this part of
+				      // the domain that has an
+				      // invalid cell number, i.e. has
+				      // not yet been renumbered
+     for (unsigned int i=0; i<cells.size(); ++i)
+       if (new_cell_numbers[i]==invalid_cell_number)
+	 {
+	   min_neighbors           = cells[i].count_neighbors();
+	   cell_with_min_neighbors = i;
+	   break;
+	 }
+     
+				      // check, if we have an as yet
+				      // unnumbered cell with less
+				      // neighbors than the first
+				      // found cell
+     for (unsigned int i=1; i<cells.size(); ++i)
+       if ((min_neighbors > cells[i].count_neighbors()) &&
+	   (new_cell_numbers[i]==invalid_cell_number))
+	 {  
+	   min_neighbors = cells[i].count_neighbors();
+	   cell_with_min_neighbors = i;
+	   if (min_neighbors == 1)
+					      // better is not possible
+	     break;
+	 };
+				      // have an array of the next
+				      // cells to be numbered (old numbers)
+     std::vector<unsigned int> next_round_cells (1, cell_with_min_neighbors);
+  
+				      // while there are still cells to
+				      // be renumbered:
+     while (next_round_cells.size() != 0)
+       {
+	 for (unsigned int i=0; i<next_round_cells.size(); ++i)
+	   {
+	     Assert (new_cell_numbers[next_round_cells[i]] == invalid_cell_number,
+		     ExcInternalError());
+	     
+	     new_cell_numbers[next_round_cells[i]] = next_free_new_number;
+	     ++next_free_new_number;
+	   };
+	 
+					  // for the next round, find all
+					  // neighbors of the cells of
+					  // this round which have not
+					  // yet been renumbered
+	 std::vector<unsigned int> new_next_round_cells;
+	 for (unsigned int i=0; i<next_round_cells.size(); ++i)
+	   for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
+	     if (cells[next_round_cells[i]].neighbors[n] != Cell::invalid_neighbor)
+	       if (new_cell_numbers[cells[next_round_cells[i]].neighbors[n]]
+		   == invalid_cell_number)
+		 new_next_round_cells.push_back (cells[next_round_cells[i]].neighbors[n]);
+	 
+	 
+					  // eliminate duplicates from
+					  // the new_next_round_cells
+					  // array. note that a cell
+					  // which is entered into this
+					  // array might have been
+					  // entered more than once since
+					  // it might be a neighbor of
+					  // more than one cell of the
+					  // present round
+					  //
+					  // in order to eliminate
+					  // duplicates, we first sort
+					  // tha array and then copy over
+					  // only unique elements to the
+					  // next_round_cells array,
+					  // which is needed for the next
+					  // loop iteration anyway
+	 std::sort (new_next_round_cells.begin(), new_next_round_cells.end());
+	 next_round_cells.clear ();
+	 unique_copy (new_next_round_cells.begin(), new_next_round_cells.end(),
+		      back_inserter(next_round_cells));
+       };
+   };   // end of loop over subdomains
+  
 
-				       // for the next round, find all
-				       // neighbors of the cells of
-				       // this round which have not
-				       // yet been renumbered
-      std::vector<unsigned int> new_next_round_cells;
-      for (unsigned int i=0; i<next_round_cells.size(); ++i)
-	for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	  if (cells[next_round_cells[i]].neighbors[n] != Cell::invalid_neighbor)
-	    if (new_cell_numbers[cells[next_round_cells[i]].neighbors[n]]
-		== invalid_cell_number)
-	      new_next_round_cells.push_back (cells[next_round_cells[i]].neighbors[n]);
-
-	    
-      
-				       // if no more cells have been
-				       // found, then we must have
-				       // renumbered all cells already
-      if (new_next_round_cells.size() == 0)
-	Assert (next_free_new_number == cells.size(), ExcInternalError());
-
-				       // eliminate duplicates from
-				       // the new_next_round_cells
-				       // array. note that a cell
-				       // which is entered into this
-				       // array might have been
-				       // entered more than once since
-				       // it might be a neighbor of
-				       // more than one cell of the
-				       // present round
-				       //
-				       // in order to eliminate
-				       // duplicates, we first sort
-				       // tha array and then copy over
-				       // only unique elements to the
-				       // next_round_cells array,
-				       // which is needed for the next
-				       // loop iteration anyway
-      std::sort (new_next_round_cells.begin(), new_next_round_cells.end());
-      next_round_cells.clear ();
-      unique_copy (new_next_round_cells.begin(), new_next_round_cells.end(),
-		   back_inserter(next_round_cells));
-    };
-  Assert (std::find (new_cell_numbers.begin(), new_cell_numbers.end(),
-		     invalid_cell_number)
+    
+  Assert (std::find (new_cell_numbers.begin(), new_cell_numbers.end(), invalid_cell_number)
 	  ==
 	  new_cell_numbers.end(),
 	  ExcInternalError());
@@ -1191,8 +1216,7 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
       Assert (cells[c].cell_no == c, ExcInternalError());
 
       for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	if (cells[c].neighbors[n] != invalid_cell_number)
-	  cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
+	cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
     };
 
   for (typename std::map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
