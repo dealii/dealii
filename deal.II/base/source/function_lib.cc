@@ -163,7 +163,7 @@ PillowFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 	  case 2:
 		gradients[i][0] = -2.*p(0)*(1.-p(1)*p(1));
 		gradients[i][1] = -2.*p(1)*(1.-p(0)*p(0));
-		return;
+		break;
 	  case 3:
 		gradients[i][0] = -2.*p(0)*(1.-p(1)*p(1))*(1.-p(2)*p(2));
 		gradients[i][1] = -2.*p(1)*(1.-p(0)*p(0))*(1.-p(2)*p(2));
