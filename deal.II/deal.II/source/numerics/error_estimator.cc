@@ -322,9 +322,17 @@ void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapp
 					       // if Neumann b.c., then fill
 					       // the gradients field which
 					       // will be used later on.
-	      for (unsigned int s=0; s<n_solution_vectors; ++s)
-		neumann_bc.find(n)->second->vector_value(cell->vertex(0),
-							 grad_neighbor[s]);
+	      {
+//TODO: [WB] Only ask once, then copy		
+		if (n_components==1)
+		  for (unsigned int s=0; s<n_solution_vectors; ++s)
+		    neumann_bc.find(n)->second->value(cell->vertex(0),
+						      grad_neighbor[s](0));
+		else
+		  for (unsigned int s=0; s<n_solution_vectors; ++s)
+		    neumann_bc.find(n)->second->vector_value(cell->vertex(0),
+							     grad_neighbor[s]);
+	      }
 	    else
 					       // fill with zeroes.
 	      for (unsigned int s=0; s<n_solution_vectors; ++s)
@@ -824,16 +832,28 @@ integrate_over_regular_face (Data                       &data,
 				       // get the values of the boundary
 				       // function at the quadrature
 				       // points
-      
-      std::vector<Vector<double> > g(n_q_points, Vector<double>(n_components));
-      data.neumann_bc.find(boundary_indicator)->second
-	->vector_value_list (fe_face_values_cell.get_quadrature_points(),
-			     g);
-      
-      for (unsigned int n=0; n<n_solution_vectors; ++n)
-	for (unsigned int component=0; component<n_components; ++component)
-	  for (unsigned int point=0; point<n_q_points; ++point)
-	    data.phi[n][point][component] -= g[point](component);
+      if (n_components == 1)
+	{
+	  std::vector<double> g(n_q_points);
+	  data.neumann_bc.find(boundary_indicator)->second
+	    ->value_list (fe_face_values_cell.get_quadrature_points(), g);
+	  
+	  for (unsigned int n=0; n<n_solution_vectors; ++n)
+	    for (unsigned int point=0; point<n_q_points; ++point)
+	      data.phi[n][point][0] -= g[point];
+	}
+      else
+	{
+	  std::vector<Vector<double> > g(n_q_points, Vector<double>(n_components));
+	  data.neumann_bc.find(boundary_indicator)->second
+	    ->vector_value_list (fe_face_values_cell.get_quadrature_points(),
+				 g);
+	  
+	  for (unsigned int n=0; n<n_solution_vectors; ++n)
+	    for (unsigned int component=0; component<n_components; ++component)
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		data.phi[n][point][component] -= g[point](component);
+	};
     };
 
 
