@@ -10,59 +10,139 @@
 #ifndef __base_types_h
 #include <base/types.h>
 #endif
-//#ifndef __base_errors_h
-//#include <deal/errors.h>
-//#endif
 
-/*
-CLASS
-   iVector
-   */
+
+
+/**
+ *  Integer Vector.
+ *  Memory for Components is supplied explicitly <p>
+ *  ( ! Amount of memory needs not to comply with actual dimension due to reinitializations ! ) <p>
+ *  - all defined methods for iVectors are supplied <p>
+ *  - operators available are `=` and `( )` <p>
+ *  CONVENTIONS for used `equations` : <p>
+ *  - THIS vector is always named `U` <p>
+ *  - vectors are always uppercase , scalars are lowercase
+ */
 class iVector
 {
   friend class dFMatrix;
+
 protected:
-  //////////
-  int dim, maxdim;
-  //////////
-  int *val;
-public:
-  //////////
-  iVector();
-  //////////
-  iVector(const iVector& v);
-  //////////
-  iVector(int n);
-  //////////
-  ~iVector();
-  //////////
-  void reinit(int n, int fast = 0);
-  //////////
-  void reinit(const iVector&, int fast = 0);
 
-  //////////
-  int n() const; // Abfrage der Dimension
+				     /// Dimension. Actual number of components
+    int dim;
 
-  //////////
-  int operator()(int i) const; //read-only Zugriff
-  //////////
-  int& operator()(int i); //Zugriff auf die Komponenten
-
-  //////////
-  iVector& operator=(int i);
-  //////////
-  iVector& operator=(const iVector& v);
-
-  //////////
-  void add(const iVector&);
-  //////////
-  void add(int, const iVector&);
-
-  // Zuweisung
-
-  //////////
-  void equ(int, const iVector&);
+				     /// Dimension. Determines amount of reserved memory , evtl. >DIM !
+    int maxdim;
+    
+				     /// Component-array.
+    int *val;
+    
+  public:
+    
+				     /**@name 1: Basic Object-handling */
+				     //@{
+				     /**
+				      *  Dummy-Constructor. Dimension=1
+				      */
+    iVector();
+    
+				     /**
+				      *   Copy-Constructor. Dimension set to that of V , <p>
+				      *                     all components are copied from V
+				      */
+    iVector(const iVector& V);
+    
+				     /**
+				      *        Constructor. Dimension = N (>0)
+				      */
+    iVector(int N);
+    
+				     /**
+				      *         Destructor. Clears memory
+				      */
+    ~iVector();
+    
+				     /**
+				      *  U(0-N) = s       . Fill all components
+				      */
+    iVector& operator=(int s);
+    
+				     /**
+				      *  U = V            . Copy all components
+				      */
+    iVector& operator=(const iVector& V);
+    
+				     /**
+				      * Change  Dimension. <p>
+				      * Set dimension to N <p>
+				      * ! reserved memory for This remains unchanged ! <p>
+				      * on fast=0 vector is filled by 0.
+				      */
+    void reinit(int N, int fast = 0);
+    
+				     /**
+				      * Adjust  Dimension. <p>
+				      * Set dimension to n(V) <p>
+				      * ! reserved memory for This remains unchanged ! <p>
+				      * ! components of V are not copied in any case ! <p>
+				      * on fast=0 vector is filled by 0.
+				      */
+    void reinit(const iVector& V, int fast = 0);
+    
+				     /**
+				      *  Inquire Dimension. returns Dimension ,
+				      *             INLINE
+				      */
+    int n() const;
+				     //@}
+    
+    
+				     /**@name 2: Data-Access
+				      */
+				     //@{
+				     /**
+				      *  Access Components. returns U(i) ,
+				      *             INLINE
+				      */
+    int operator()(int i) const;
+    
+				     /**
+				      *  Access Components. returns U(i) ,
+				      *             INLINE
+				      */
+    int& operator()(int i);
+				     //@}
+    
+    
+				     /**@name 3: Modification of vectors
+				      */
+				     //@{
+				     /**
+				      *  U+=V             . Simple addition
+				      */
+    void add(const iVector& V);
+    
+				     /**
+				      *  U+=a*V           . Simple addition
+				      */
+    void add(int a, const iVector& V);
+    
+				     /**
+				      *  U=a*V            . Replacing
+				      */
+    void equ(int a, const iVector& V);
+				     //@}
 };
+
+
+
+
+
+
+
+
+
 
 inline int iVector::n() const
 {
