@@ -17,12 +17,12 @@ ifeq ($(enable-shared),yes)
   3dg: lib/libdeal_II_3d.g.so 
   3d : lib/libdeal_II_3d.so
 else
-  1dg: lib/libdeal_II_1d.g.so
-  1d : lib/libdeal_II_1d.so
-  2dg: lib/libdeal_II_2d.g.so
-  2d : lib/libdeal_II_2d.so
-  3dg: lib/libdeal_II_3d.g.so 
-  3d : lib/libdeal_II_3d.so
+  1dg: lib/libdeal_II_1d.g.a
+  1d : lib/libdeal_II_1d.a
+  2dg: lib/libdeal_II_2d.g.a
+  2d : lib/libdeal_II_2d.a
+  3dg: lib/libdeal_II_3d.g.a
+  3d : lib/libdeal_II_3d.a
 endif
 
 
