@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <iostream>
 #include "testmatrix.h"
 #include <base/logstream.h>
 #include <lac/sparse_matrix.h>

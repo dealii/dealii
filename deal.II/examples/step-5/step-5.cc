@@ -50,8 +50,8 @@
 #include <fstream>
 				 // ... and this is too: We will
 				 // convert integers to strings using
-				 // the the C++ stringstream class
-				 // ``ostringstream''. One slight
+				 // the C++ stringstream class
+				 // ``ostringstream''. One annoying
 				 // complication arises here in that
 				 // the classes ``std::istringstream''
 				 // and ``std::ostringstream'' (with
@@ -62,7 +62,7 @@
 				 // around the time the C++ standard
 				 // was made in 1999. For example, the
 				 // gcc compiler up to and including
-				 // version 2.95.x did not have them,
+				 // version 2.95.2 did not have them,
 				 // but instead provided classes
 				 // ``istrstream'' and ``ostrstream''
 				 // with a similar, but nevertheless
@@ -793,11 +793,11 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // run time using an input file.
 
 				   // Finally, we need the filename to
-				   // which the results is to be
+				   // which the results are to be
 				   // written. We would like to have
 				   // it of the form
 				   // ``solution-N.eps'', where N is
-				   // the number of refinement
+				   // the number of the refinement
 				   // cycle. Thus, we have to convert
 				   // an integer to a part of a
 				   // string; this can be done using
@@ -806,12 +806,13 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // write everything into a special
 				   // stream (just like writing into a
 				   // file or to the screen) and
-				   // retrieve that as a string. This
-				   // applies the usual conversions
-				   // from integer to strings, and one
-				   // could as well give stream
-				   // modifiers such as ``setf'',
-				   // ``setprecision'', and so on.
+				   // retrieve what you wrote as a
+				   // string. This applies the usual
+				   // conversions from integer to
+				   // strings, and one could as well
+				   // give stream modifiers such as
+				   // ``setw'', ``setprecision'', and
+				   // so on.
 				   //
 				   // In C++, you can do this by using
 				   // the so-called stringstream
@@ -836,11 +837,11 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // the two classes which we might
 				   // now be using, depending on which
 				   // one is available, is close
-				   // enough that we need not take
-				   // care about the differences any
-				   // more, so we can use them in a
-				   // straightforward way, even if
-				   // they are not identical.
+				   // enough that we need to take care
+				   // about the differences only once
+				   // below, so we can use them in a
+				   // rather straightforward way, even
+				   // if they are not identical.
 
 				   // In order to now actually
 				   // generate a filename, we fill the
@@ -858,13 +859,15 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   
 				   // We can get whatever we wrote to
 				   // the stream using the ``str()''
-				   // function. If the new stringstream
-                                   // classes are used, then the result is
-                                   // a string which we have to convert to
-                                   // a char* using the ``c_str()''
-                                   // function, otherwise the result is a
-                                   // char* right away.  Use that as filename
-				   // for the output stream:
+				   // function. If the new
+				   // stringstream classes are used,
+				   // then the result is a string
+				   // which we have to convert to a
+				   // char* using the ``c_str()''
+				   // function, otherwise the result
+				   // is a char* right away. Use that
+				   // as filename for the output
+				   // stream:
 #ifdef HAVE_STD_STRINGSTREAM
   std::ofstream output (filename.str().c_str());
 #else

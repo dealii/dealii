@@ -38,6 +38,7 @@
 
 #include <numerics/data_out.h>
 #include <fstream>
+#include <iostream>
 
 				 // This is new, however: in the
 				 // previous example we got some

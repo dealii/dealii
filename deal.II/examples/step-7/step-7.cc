@@ -81,6 +81,7 @@
 				 // slightly more detail below.
 #include <typeinfo>
 #include <fstream>
+#include <iostream>
 
 
 				 // @sect3{Equation data}

@@ -52,6 +52,7 @@
 				 // following file for its
 				 // declaration:
 #include <algorithm>
+#include <iostream>
 #include <iomanip>
 #include <cmath>
 

@@ -52,6 +52,7 @@
 
 				 // This again is C++:
 #include <fstream>
+#include <iostream>
 
 
 				 // The main class is, except for its

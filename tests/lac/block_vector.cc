@@ -17,6 +17,7 @@
 #include <lac/block_sparse_matrix.h>
 #include <lac/block_vector.h>
 #include <fstream>
+#include <iostream>
 #include <vector>
 #include <list>
 

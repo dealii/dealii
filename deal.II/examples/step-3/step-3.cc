@@ -83,9 +83,10 @@
 #include <lac/precondition.h>
 
 				 // Finally, this is for output to a
-				 // file.
+				 // file and to the console:
 #include <numerics/data_out.h>
 #include <fstream>
+#include <iostream>
 
 
 				 // Instead of the procedural

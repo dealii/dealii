@@ -88,6 +88,7 @@
 #include <numerics/error_estimator.h>
 
 #include <fstream>
+#include <iostream>
 
 
 				 // The main class is again almost
