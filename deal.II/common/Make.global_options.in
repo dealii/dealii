@@ -87,6 +87,11 @@ lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)
 lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) @UMFPACK_LIB@
 lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) @UMFPACK_LIB@
 
+ifeq ($(USE_CONTRIB_HSL),yes)
+  lib-lac.o += $(LIBDIR)/libhsl$(lib-suffix) 
+  lib-lac.g += $(LIBDIR)/libhsl$(lib-suffix) 
+endif
+
 lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
 lib-deal2-2d.o = $(LIBDIR)/libdeal_II_2d$(lib-suffix)
 lib-deal2-3d.o = $(LIBDIR)/libdeal_II_3d$(lib-suffix)
