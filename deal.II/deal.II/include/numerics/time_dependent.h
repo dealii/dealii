@@ -457,6 +457,18 @@ class TimeDependent
 				      * There is another function,
 				      * #add_timestep#, which inserts a
 				      * time step at the end of the list.
+				      *
+				      * Note that this function does not
+				      * change the timestep numbers stored
+				      * within the other timestep objects,
+				      * nor does it set the timestep number
+				      * of this new timestep. This is only
+				      * done upon calling the #start_sweep#
+				      * function. In not changing the timestep
+				      * numbers, it is simpler to operate
+				      * on a space-time triangulation since
+				      * one can always use the timestep numbers
+				      * that were used in the previous sweep.
 				      */
     void insert_timestep (TimeStepBase      *new_timestep,
 			  const unsigned int position);
@@ -477,6 +489,19 @@ class TimeDependent
 				      * Deletion of the object by the
 				      * destructor is done through this
 				      * function also.
+				      *
+				      * Note that this function does
+				      * not change the timestep
+				      * numbers stored within the
+				      * other timestep objects. This
+				      * is only done upon calling the
+				      * #start_sweep# function. In not
+				      * changing the timestep numbers,
+				      * it is simpler to operate on a
+				      * space-time triangulation since
+				      * one can always use the
+				      * timestep numbers that were
+				      * used in the previous sweep.
 				      */
     void delete_timestep (const unsigned int position);
     
