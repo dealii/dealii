@@ -5156,15 +5156,18 @@ namespace Threads
 	       const ForwardIterator &end,
 	       const unsigned int     n_intervals)
   {
+    typedef typename std::pair<ForwardIterator,ForwardIterator> IteratorPair;
+
 				     // in non-multithreaded mode, we
 				     // often have the case that this
 				     // function is called with
 				     // n_intervals==1, so have a
 				     // shortcut here to handle that
 				     // case efficiently
+    
     if (n_intervals==1)
-      return (std::vector<std::pair<ForwardIterator,ForwardIterator> >
-	      (1, make_pair<ForwardIterator>(begin, end)));
+      return (typename std::vector<IteratorPair>
+	      (1, IteratorPair(begin, end)));
     
 				     // if more than one interval
 				     // requested, do the full work
@@ -5172,8 +5175,7 @@ namespace Threads
     const unsigned int n_elements_per_interval = n_elements / n_intervals;
     const unsigned int residual                = n_elements % n_intervals;
     
-    std::vector<std::pair<ForwardIterator,ForwardIterator> >
-      return_values (n_intervals);
+    std::vector<IteratorPair> return_values (n_intervals);
 
     return_values[0].first = begin;
     for (unsigned int i=0; i<n_intervals; ++i)
