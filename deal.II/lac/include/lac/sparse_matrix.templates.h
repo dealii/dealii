@@ -593,7 +593,7 @@ number SparseMatrix<number>::l1_norm () const
   const unsigned int n_rows = m();
   for (unsigned int row=0; row<n_rows; ++row)
     for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1] ; ++j)
-      column_sums(cols->colnums[j])+=fabs(val[j]);
+      column_sums(cols->colnums[j]) += std::fabs(val[j]);
 
   return column_sums.linfty_norm();
 };
@@ -614,7 +614,7 @@ number SparseMatrix<number>::linfty_norm () const
       sum=0;
       const number *const val_end_of_row = &val[cols->rowstart[row+1]];
       while (val_ptr != val_end_of_row)
-	sum += fabs(*val_ptr++);
+	sum += std::fabs(*val_ptr++);
       if (sum > max)
 	max = sum;
     }
@@ -680,7 +680,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
       dst(i) = s;
       norm += dst(i)*dst(i);
     }
-  return sqrt(norm);
+  return std::sqrt(norm);
 }
 
 
