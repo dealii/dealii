@@ -39,7 +39,7 @@ class Ball :
 
 	for (int i=0; i<dim; ++i)
 	  middle(i) -= .5;
-	middle /= (sqrt(middle.square())*sqrt(2));
+	middle *= sqrt(dim) / (sqrt(middle.square())*2);
 	for (int i=0; i<dim; ++i)
 	  middle(i) += .5;
 	
