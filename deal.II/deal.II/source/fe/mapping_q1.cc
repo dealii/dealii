@@ -606,7 +606,7 @@ MappingQ1<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &c
   const std::vector<double> &weights=q.get_weights();
 
 				   // Multiply quadrature weights
-                                  // by Jacobian determinants
+				   // by Jacobian determinants
   if (update_flags & update_JxW_values)
     {      
       Assert (JxW_values.size() == npts,
