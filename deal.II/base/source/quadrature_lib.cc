@@ -20,6 +20,59 @@
 // for all lower dimensions as well. That is why in this file the check
 // is for deal_II_dimension >= any_number and not for ==
 
+#ifndef M_PI
+# define M_PI		3.14159265358979323846	/* pi */
+#endif
+
+template <typename number>
+number abs (const number a)
+{
+  return ((a>0) ? a : -a);
+}
+
+
+template <>
+QGauss<1>::QGauss (unsigned int n)
+  : Quadrature<1> (n)
+{
+  const unsigned int m = (n+1)/2;
+  long double z;
+  long double pp;
+  long double p1, p2, p3;
+
+  for (unsigned int i=1;i<=m;++i)
+    {
+      z = cos(M_PI * (i-.25)/(n+.5));
+
+				       // Newton-iteration
+      do
+	{
+					   // compute L_n (z)
+	  p1 = 1.;
+	  p2 = 0.;
+	  for (unsigned int j=0;j<n;++j)
+	    {
+	      p3 = p2;
+	      p2 = p1;
+	      p1 = ((2.*j+1.)*z*p2-j*p3)/(j+1);
+	    }
+	  pp = n*(z*p1-p2)/(z*z-1);
+	  z = z-p1/pp;
+	}
+      while (abs(p1/pp) > 1.e-19);
+
+      double x = .5*z;
+      quadrature_points[i-1] = Point<1>(.5-x);
+      quadrature_points[n-i] = Point<1>(.5+x);
+      
+      double w = 1./((1.-z*z)*pp*pp);
+      weights[i-1] = w;
+      weights[n-i] = w;
+    }
+}
+
+
+
 template <>
 QGauss2<1>::QGauss2 () :
 		Quadrature<1> (2)
@@ -303,6 +356,14 @@ QWeddle<1>::QWeddle () :
 
 // construct the quadrature formulae in higher dimensions by
 // tensor product of lower dimensions
+
+template <int dim>
+QGauss<dim>::QGauss (unsigned int n)
+  :  Quadrature<dim> (QGauss<dim-1>(n), QGauss<1>(n))
+{};
+
+
+
 template <int dim>
 QGauss2<dim>::QGauss2 () :  Quadrature<dim> (QGauss2<dim-1>(), QGauss2<1>())  {};
 
@@ -350,6 +411,7 @@ QWeddle<dim>::QWeddle () :
 
 // explicite specialization
 // note that 1d formulae are specialized by implementation above
+template class QGauss<2>;
 template class QGauss2<2>;
 template class QGauss3<2>;
 template class QGauss4<2>;
@@ -362,6 +424,7 @@ template class QSimpson<2>;
 template class QMilne<2>;
 template class QWeddle<2>;
 
+template class QGauss<3>;
 template class QGauss2<3>;
 template class QGauss3<3>;
 template class QGauss4<3>;

@@ -34,6 +34,10 @@ fill_vector (vector<Quadrature<dim> *>& quadratures)
   quadratures.push_back (new QSimpson<dim>());
   quadratures.push_back (new QMilne<dim>());
   quadratures.push_back (new QWeddle<dim>());
+  for (unsigned int i=1;i<9;++i)
+    {
+      quadratures.push_back (new QGauss<dim>(i));
+    }
 }
 
 template <int dim>
@@ -161,7 +165,7 @@ check_faces (vector<Quadrature<dim-1>*>& quadratures, bool sub)
       
 	  err = fabs(quadrature_int-exact_int);
 	}
-      while (err<1e-14);
+      while (err<1e-16);
 				       // Uncomment here for testing
 //      deallog << " (Int " << quadrature_int << ',' << exact_int << ")";
       deallog << " is exact for polynomials of degree " << i-1 << endl;
