@@ -20,6 +20,20 @@
  * \item the possibility of distributing information to files and the
  *   console.
  * \end{itemize}
+ *
+ * The usual usage of this class is through the pregenerated object
+ * #deallog#. Typical steps are
+ * <OL>
+ * <LI> #deallog.attach(ostream)#: write logging information into a file.
+ * <LI> #deallog.depth_console(n)#: restrict output on screen to outer loops.
+ * <LI> Before entering a new phase of your program, e.g. a new loop,
+ * #deallog.push("loopname")#.
+ * <LI> #deallog << anything << endl;# to write logging information
+ * (Usage of #endl# is mandatory!).
+ * <LI> #deallog.pop()# when leaving that stage entered with #push#.
+ * </OL>
+ *
+ * @author Guido Kanschat, 1999
  */
 class LogStream
 {
@@ -216,10 +230,14 @@ operator << (LogStream& s, const T& t)
 
 
 /**
+ * Replacement of #endl# for #LogStream#.
+ *
  * Overloaded version of the stream manipulator function #endl# which
  * results in calling the original version of #endl# for each of the
  * two streams, if the present prefix number does not exceed the
  * specified maximal number.
+ *
+ * @author Guido Kanschat, 1999
  */
 inline void endl(LogStream& s)
 {
@@ -234,8 +252,11 @@ inline void endl(LogStream& s)
   s.was_endl = true;
 }
 
-
-
+/**
+ * The standard log object of DEAL.
+ *
+ * @author Guido Kanschat, 1999
+ */
 extern LogStream deallog;
 
 
