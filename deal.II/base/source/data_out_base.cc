@@ -2067,15 +2067,17 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
 				   // data is in place
   thread_manager.wait ();
 
-				   // then write data.
-				   // the '1' means: node data (as opposed
-				   // to cell data, which we do not
-				   // support explicitely here)
+				   // then write data.  the
+				   // 'POINTD_DATA' means: node data
+				   // (as opposed to cell data, which
+				   // we do not support explicitely
+				   // here). all following data sets
+				   // are point data
+  out << "POINT_DATA " << n_nodes
+      << std::endl;
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     {
-      out << "POINTDATA " << n_nodes
-	  << std::endl
-	  << "SCALARS "
+      out << "SCALARS "
 	  << data_names[data_set]
 	  << " double 1"
 	  << std::endl
