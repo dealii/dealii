@@ -9,7 +9,7 @@ set ylabel "Error"
 
 set output "criss-cross.eps"
 
-plot "criss-cross.history" using 1:2 title "L1 error","criss-cross.history" using 1:3 title "L2 error","criss-cross.history" using 1:4 title "Linfty error","criss-cross.history" using 1:5 title "H1 seminorm error","criss-cross.history" using 1:6 title "H1 error"
+plot "criss_cross.history" using 1:2 title "L1 error","criss_cross.history" using 1:3 title "L2 error","criss_cross.history" using 1:4 title "Linfty error","criss_cross.history" using 1:5 title "H1 seminorm error","criss_cross.history" using 1:6 title "H1 error"
 
 
 
@@ -40,13 +40,13 @@ plot "quartic.history" using 1:2 title "L1 error","quartic.history" using 1:3 ti
 set output "l2error.eps"
 set ylabel "L2-error"
 
-plot "criss-cross.history" using 1:3 title "Criss-cross elements", "linear.history" using 1:3 title "Linear elements", "quadratic.history" using 1:3 title "Quadratic elements", "cubic.history" using 1:3 title "Cubic elements", "quartic.history" using 1:3 title "Quartic elements"
+plot "criss_cross.history" using 1:3 title "Criss-cross elements", "linear.history" using 1:3 title "Linear elements", "quadratic.history" using 1:3 title "Quadratic elements", "cubic.history" using 1:3 title "Cubic elements", "quartic.history" using 1:3 title "Quartic elements"
 
 
 
 set output "h1error.eps"
 set ylabel "H1-error"
 
-plot "criss-cross.history" using 1:6 title "Criss-cross elements", "linear.history" using 1:6 title "Linear elements", "quadratic.history" using 1:6 title "Quadratic elements", "cubic.history" using 1:6 title "Cubic elements", "quartic.history" using 1:6 title "Quartic elements"
+plot "criss_cross.history" using 1:6 title "Criss-cross elements", "linear.history" using 1:6 title "Linear elements", "quadratic.history" using 1:6 title "Quadratic elements", "cubic.history" using 1:6 title "Cubic elements", "quartic.history" using 1:6 title "Quartic elements"
 
 
