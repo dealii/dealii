@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -535,37 +535,55 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // First, number patches
 				   // consecutively.
   unsigned int patch_no = 0;
-  typename std::vector<typename DataOutBase::Patch<dim> >::iterator patch;
-  for (patch = patches.begin(); patch != patches.end(); ++patch)
+  for (typename std::vector<typename DataOutBase::Patch<dim> >::iterator
+	 patch = patches.begin(); patch != patches.end(); ++patch)
     patch->me = patch_no++;
 
 				   // Traverse the map of cells
 				   // created in build_some_patches
 				   // and enter numbers of neighboring
 				   // patches on the same level.
-  typename PatchMap::iterator map_entry;
-  for (map_entry = patch_map.begin(); map_entry != patch_map.end(); ++map_entry)
+  for (typename PatchMap::iterator map_entry = patch_map.begin();
+       map_entry != patch_map.end();
+       ++map_entry)
     {
-      typename DoFHandler<dim>::cell_iterator cell = map_entry->first;
-      patch = map_entry->second;
+      const typename DoFHandler<dim>::cell_iterator
+	cell = map_entry->first;
+      const typename std::vector<typename DataOutBase::Patch<dim> >::iterator
+	patch = map_entry->second;
 
+				       // loop over all faces and see
+				       // whether there's a cell
+				       // behind that for which we
+				       // need to set neighbor
+				       // information
       for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
 	{
-	  if (cell->at_boundary(i))
+					   // we can't do anything if
+					   // - there is no neighbor
+					   // - the neighbor is coarser
+					   // - or the cell behind the
+					   //   face is refined, i.e. is
+					   //   not inserted into the map
+	  if (cell->at_boundary(i) ||
+	      (cell->level() != cell->neighbor(i)->level()) ||
+	      (patch_map.find(cell->neighbor(i)) == patch_map.end()))
 	    continue;
-	  typename DoFHandler<dim>::cell_iterator
-	    neighbor = cell->neighbor(i);
-	  if (cell->level() != neighbor->level())
-	    continue;
-	  typename PatchMap::iterator
-	    neighbor_entry = patch_map.find(neighbor);
-	  if (neighbor_entry == patch_map.end())
-	    continue;
-	  typename std::vector<typename DataOutBase::Patch<dim> >::iterator
-	    neighbor_patch = neighbor_entry->second;
-	  
+
+					   // if there is a neighbor,
+					   // get its patch...
+	  const typename
+	    std::vector<typename DataOutBase::Patch<dim> >::iterator
+	    neighbor_patch = patch_map.find(cell->neighbor(i))->second;
+					   // ...and set its neighbor
+					   // pointer set
+//TODO:[GK] Shouldn't we use the deal.II (i.e. the unnatural) numbering of the neighbors here as well rather than some new numbering scheme?
 	  switch (dim)
 	    {
+	      case 1:
+		    patch->neighbors[i] = neighbor_patch->me;
+		    break;
+		    
 	      case 2:
 		switch (i)
 		  {
@@ -586,6 +604,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 		    case 5: patch->neighbors[0] = neighbor_patch->me; break;
 		  }
 		break;
+
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
