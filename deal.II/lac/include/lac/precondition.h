@@ -204,7 +204,7 @@ class PreconditionRelaxation : public Subscriptor
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX = SparseMatrix<double> >
-class PreconditionJacobi : public Subscriptor, private PreconditionRelaxation<MATRIX>
+class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
 {
   public:
 				     /**
@@ -221,12 +221,6 @@ class PreconditionJacobi : public Subscriptor, private PreconditionRelaxation<MA
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
-
-				     /**
-				      * Make function of base class
-				      * publicly available.
-				      */
-    PreconditionRelaxation<MATRIX>::initialize;
 };
 
 
@@ -259,7 +253,7 @@ class PreconditionJacobi : public Subscriptor, private PreconditionRelaxation<MA
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX = SparseMatrix<double> >
-class PreconditionSOR : public Subscriptor, private PreconditionRelaxation<MATRIX>
+class PreconditionSOR : public PreconditionRelaxation<MATRIX>
 {
   public:
 				     /**
@@ -274,12 +268,6 @@ class PreconditionSOR : public Subscriptor, private PreconditionRelaxation<MATRI
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
-
-				     /**
-				      * Make function of base class
-				      * publicly available.
-				      */
-    PreconditionRelaxation<MATRIX>::initialize;
 };
 
 
@@ -312,7 +300,7 @@ class PreconditionSOR : public Subscriptor, private PreconditionRelaxation<MATRI
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX = SparseMatrix<double> >
-class PreconditionSSOR : public Subscriptor, private PreconditionRelaxation<MATRIX>
+class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 {
   public:
 				     /**
@@ -330,12 +318,6 @@ class PreconditionSSOR : public Subscriptor, private PreconditionRelaxation<MATR
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
-
-				     /**
-				      * Make function of base class
-				      * publicly available.
-				      */
-    PreconditionRelaxation<MATRIX>::initialize;
 };
 
 
