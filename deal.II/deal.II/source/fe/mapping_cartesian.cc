@@ -235,7 +235,7 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 	}
 				       // furthermore, all normal
 				       // vectors on a face are equal
-      std::fill_n (normal_vectors.begin(), normal_vectors.end(), n);
+      std::fill (normal_vectors.begin(), normal_vectors.end(), n);
     }
   
   data.first_cell = false;
