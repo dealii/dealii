@@ -17,6 +17,9 @@
 #include<fe/fe_q.h>
 
 
+//TODO: briefly document classes and mark them deprecated
+
+
 template<int dim> class FEQ1: public FE_Q<dim>
 {
   public:
