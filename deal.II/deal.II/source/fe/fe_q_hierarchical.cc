@@ -119,49 +119,49 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
       case 2:
 	// vertex node
 	for (unsigned int i=0; i<dofs_1d; ++i)
-	  interface_constraints(0,i) = dofs_subcell[0](1,i); 
+	  this->interface_constraints(0,i) = dofs_subcell[0](1,i); 
 	// edge nodes
 	for (unsigned int c=0; c<GeometryInfo<1>::children_per_cell; ++c)
 	  for (unsigned int i=0; i<dofs_1d; ++i)
 	    for (unsigned int j=2; j<dofs_1d; ++j)
-	      interface_constraints(1 + c*(degree-1) + j - 2,i) = 
+	      this->interface_constraints(1 + c*(degree-1) + j - 2,i) = 
                                        dofs_subcell[c](j,i);
 	break;
       case 3:
 	for (unsigned int i=0; i<dofs_1d * dofs_1d; i++)
 	{
 	  // center vertex node	  
-	  interface_constraints(0,face_renumber[i]) = 
+	  this->interface_constraints(0,face_renumber[i]) = 
 	    dofs_subcell[0](1,i % dofs_1d) * 
 	    dofs_subcell[0](1,(i - (i % dofs_1d)) / dofs_1d);
 
 	  // boundary vertex nodes
-	  interface_constraints(1,face_renumber[i]) = 
+	  this->interface_constraints(1,face_renumber[i]) = 
 	    dofs_subcell[0](1, i % dofs_1d) * 
 	    dofs_subcell[0](0, (i - (i % dofs_1d)) / dofs_1d);
-	  interface_constraints(2,face_renumber[i]) = 
+	  this->interface_constraints(2,face_renumber[i]) = 
 	    dofs_subcell[1](1, i % dofs_1d) * 
 	    dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
-	  interface_constraints(3,face_renumber[i]) = 
+	  this->interface_constraints(3,face_renumber[i]) = 
 	    dofs_subcell[1](0, i % dofs_1d) * 
 	    dofs_subcell[1](1, (i - (i % dofs_1d)) / dofs_1d);
-	  interface_constraints(4,face_renumber[i]) = 
+	  this->interface_constraints(4,face_renumber[i]) = 
 	    dofs_subcell[0](0, i % dofs_1d) * 
 	    dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
 	  
 	  // interior edges
 	  for (unsigned int j=0; j<degree-1; j++)
 	  {
-	    interface_constraints(5 + j,face_renumber[i]) = 
+	    this->interface_constraints(5 + j,face_renumber[i]) = 
 	      dofs_subcell[0](1, i % dofs_1d) * 
 	      dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-	    interface_constraints(5 + (degree-1) + j,face_renumber[i]) = 
+	    this->interface_constraints(5 + (degree-1) + j,face_renumber[i]) = 
 	      dofs_subcell[1](2 + j, i % dofs_1d) * 
 	      dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
-	    interface_constraints(5 + 2*(degree-1) + j,face_renumber[i]) = 
+	    this->interface_constraints(5 + 2*(degree-1) + j,face_renumber[i]) = 
 	      dofs_subcell[0](1,i % dofs_1d) * 
 	      dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-	    interface_constraints(5 + 3*(degree-1) + j,face_renumber[i]) = 
+	    this->interface_constraints(5 + 3*(degree-1) + j,face_renumber[i]) = 
 	      dofs_subcell[0](2 + j,i % dofs_1d) * 
 	      dofs_subcell[1](0, (i - (i % dofs_1d)) / dofs_1d);
 	  }
@@ -170,31 +170,31 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 	  for (unsigned int j=0; j<degree-1; j++)
 	  {
 	    // bottom edge 
-	    interface_constraints(5 + 4*(degree-1) + j,face_renumber[i]) =
+	    this->interface_constraints(5 + 4*(degree-1) + j,face_renumber[i]) =
 	      dofs_subcell[0](2 + j, i % dofs_1d) * 
 	      dofs_subcell[0](0,     (i - (i % dofs_1d)) / dofs_1d);
-	    interface_constraints(5 + 4*(degree-1) + (degree-1) + j,face_renumber[i]) =
+	    this->interface_constraints(5 + 4*(degree-1) + (degree-1) + j,face_renumber[i]) =
 	      dofs_subcell[1](2 + j, i % dofs_1d) * 
 	      dofs_subcell[0](0,     (i - (i % dofs_1d)) / dofs_1d);
 	    // right edge
-	    interface_constraints(5 + 4*(degree-1) + 2*(degree-1) + j,face_renumber[i]) =
+	    this->interface_constraints(5 + 4*(degree-1) + 2*(degree-1) + j,face_renumber[i]) =
 	      dofs_subcell[1](1,     i % dofs_1d) * 
 	      dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-	    interface_constraints(5 + 4*(degree-1) + 3*(degree-1) + j,face_renumber[i]) =
+	    this->interface_constraints(5 + 4*(degree-1) + 3*(degree-1) + j,face_renumber[i]) =
 	      dofs_subcell[1](1,     i % dofs_1d) * 
 	      dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
 	    // top edge
-	    interface_constraints(5 + 4*(degree-1) + 4*(degree-1) + j,face_renumber[i]) =
+	    this->interface_constraints(5 + 4*(degree-1) + 4*(degree-1) + j,face_renumber[i]) =
 	      dofs_subcell[0](2 + j, i % dofs_1d) * 
 	      dofs_subcell[1](1,     (i - (i % dofs_1d)) / dofs_1d);
-	    interface_constraints(5 + 4*(degree-1) + 5*(degree-1) + j,face_renumber[i]) =
+	    this->interface_constraints(5 + 4*(degree-1) + 5*(degree-1) + j,face_renumber[i]) =
 	      dofs_subcell[1](2 + j, i % dofs_1d) * 
 	      dofs_subcell[1](1,     (i - (i % dofs_1d)) / dofs_1d);
 	    // left edge
-	    interface_constraints(5 + 4*(degree-1) + 6*(degree-1) + j,face_renumber[i]) =
+	    this->interface_constraints(5 + 4*(degree-1) + 6*(degree-1) + j,face_renumber[i]) =
 	      dofs_subcell[0](0,     i % dofs_1d) * 
 	      dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-	    interface_constraints(5 + 4*(degree-1) + 7*(degree-1) + j,face_renumber[i]) =
+	    this->interface_constraints(5 + 4*(degree-1) + 7*(degree-1) + j,face_renumber[i]) =
 	      dofs_subcell[0](0,     i % dofs_1d) * 
 	      dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
 	  }
@@ -204,19 +204,19 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 	    for (unsigned int k=0; k<degree-1; k++)
 	    {
 	      // subcell 0
-	      interface_constraints(5 + 12*(degree-1) + j + k*(degree-1),face_renumber[i]) =
+	      this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1),face_renumber[i]) =
 		dofs_subcell[0](2 + j, i % dofs_1d) * 
 		dofs_subcell[0](2 + k, (i - (i % dofs_1d)) / dofs_1d);
 	      // subcell 1
-	      interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + (degree-1)*(degree-1),face_renumber[i]) =
+	      this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + (degree-1)*(degree-1),face_renumber[i]) =
 		dofs_subcell[1](2 + j, i % dofs_1d) * 
 		dofs_subcell[0](2 + k, (i - (i % dofs_1d)) / dofs_1d);
 	      // subcell 2
-	      interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 2*(degree-1)*(degree-1),face_renumber[i]) =
+	      this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 2*(degree-1)*(degree-1),face_renumber[i]) =
 		dofs_subcell[1](2 + j, i % dofs_1d) * 
 		dofs_subcell[1](2 + k, (i - (i % dofs_1d)) / dofs_1d);
 	      // subcell 3
-	      interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 3*(degree-1)*(degree-1),face_renumber[i]) =
+	      this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 3*(degree-1)*(degree-1),face_renumber[i]) =
 		dofs_subcell[0](2 + j, i % dofs_1d) * 
 		dofs_subcell[1](2 + k, (i - (i % dofs_1d)) / dofs_1d);
 	    }
@@ -409,7 +409,7 @@ void FE_Q_Hierarchical<dim>::initialize_unit_support_points ()
   for (unsigned int i=1; i<dim; ++i)
     n *= degree+1;
   
-  unit_support_points.resize(n);
+  this->unit_support_points.resize(n);
   
   Point<dim> p;
                                    // the method of numbering allows
@@ -446,7 +446,7 @@ void FE_Q_Hierarchical<dim>::initialize_unit_support_points ()
 	  else
 	    p(2) = .5;
 	}
-	unit_support_points[renumber[k++]] = p;
+	this->unit_support_points[renumber[k++]] = p;
       };
 };
 
@@ -472,7 +472,7 @@ void FE_Q_Hierarchical<dim>::initialize_unit_face_support_points ()
   for (unsigned int i=1; i<codim; ++i)
     n *= degree+1;
   
-  unit_face_support_points.resize(n);
+  this->unit_face_support_points.resize(n);
   
   Point<codim> p;
   
@@ -505,7 +505,7 @@ void FE_Q_Hierarchical<dim>::initialize_unit_face_support_points ()
 	  else
 	    p(2) = .5;
 	}
-	unit_face_support_points[face_renumber[k++]] = p;
+	this->unit_face_support_points[face_renumber[k++]] = p;
       };
 };
 
@@ -932,7 +932,7 @@ FE_Q_Hierarchical<dim>::fill_fe_values (
     }
 
   if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
 }
 
 
@@ -980,7 +980,7 @@ FE_Q_Hierarchical<dim>::fill_fe_face_values (
     }
 
   if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
 
@@ -1030,7 +1030,7 @@ FE_Q_Hierarchical<dim>::fill_fe_subface_values (
     }
   
   if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
 
@@ -1091,14 +1091,14 @@ FE_Q_Hierarchical<dim>::has_support_on_face (const unsigned int shape_index,
                                        // shape functions, since they
                                        // have no support no-where on
                                        // the boundary
-      if (((dim==2) && (shape_index>=first_quad_index))
+      if (((dim==2) && (shape_index>=this->first_quad_index))
           ||
-          ((dim==3) && (shape_index>=first_hex_index)))
+          ((dim==3) && (shape_index>=this->first_hex_index)))
         return false;
                                        
                                        // let's see whether this is a
                                        // vertex
-      if (shape_index < first_line_index) 
+      if (shape_index < this->first_line_index) 
         {
                                            // for Q elements, there is
                                            // one dof per vertex, so
@@ -1136,11 +1136,11 @@ FE_Q_Hierarchical<dim>::has_support_on_face (const unsigned int shape_index,
                     Assert (false, ExcNotImplemented());
             };
         }
-      else if (shape_index < first_quad_index)
+      else if (shape_index < this->first_quad_index)
                                          // ok, dof is on a line
         {
           const unsigned int line_index
-            = (shape_index - first_line_index) / dofs_per_line;
+            = (shape_index - this->first_line_index) / this->dofs_per_line;
           Assert (line_index < GeometryInfo<dim>::lines_per_cell,
                   ExcInternalError());
 
@@ -1167,12 +1167,13 @@ FE_Q_Hierarchical<dim>::has_support_on_face (const unsigned int shape_index,
           else
             Assert (false, ExcNotImplemented());
         }
-      else if (shape_index < first_hex_index)
+      else if (shape_index < this->first_hex_index)
                                          // dof is on a quad
         {
           const unsigned int quad_index 
-            = (shape_index - first_quad_index) / dofs_per_quad;
-          Assert (quad_index < GeometryInfo<dim>::quads_per_cell,
+            = (shape_index - this->first_quad_index) / this->dofs_per_quad;
+          Assert (static_cast<signed int>(quad_index) <
+                  static_cast<signed int>(GeometryInfo<dim>::quads_per_cell),
                   ExcInternalError());
           
                                            // in 2d, cell bubble are
