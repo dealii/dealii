@@ -49,9 +49,7 @@ cc-files    = $(shell echo source/*.cc)
 o-files     = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.$(OBJEXT))
 go-files    = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.g.$(OBJEXT))
 h-files     = $(wildcard include/*.h)
-lib-h-files = $(shell echo $(include-path-base)/base/*.h    \
-                           $(include-path-lac)/lac/*.h      \
-                           $(include-path-deal2)/*/*.h)
+lib-h-files = $(shell echo $D/base/*.h $D/lac/*.h $D/*/*.h)
 
 # As before, define a list of libraries. This, of course depends on
 # the dimension in which we are working:
