@@ -42,6 +42,18 @@ inconvenience this causes.
 
 
 <ol>
+
+  <li> <p> Changed: The call <code
+  class="class">MGTransferBlock</code>::<code
+  class="member">build_matrices</code> and to the same function in
+  derived classes receaves a <code class="class">DoFHandler</code> as
+  an additional argument. It is needed to prebuild the transfer
+  between vectors and multigrid vectors, since the loop over all cells
+  is to slow.
+  <br>
+  (GK 2004/08/27)
+  </p>
+
   <li> <p>
        Changed: Previously, parallel PETSc matrices only took the sizes of the
        matrix and the number of rows to be stored locally as arguments. They
