@@ -1,0 +1,1 @@
+nm *.g.a | c++filt | perl -pi -e 's/.{8} . (.*)/$1/;' | sort
