@@ -443,8 +443,8 @@ class PreconditionMG
 				      * This is the operator used by
 				      * LAC iterative solvers.
 				      */
-    void operator() (VECTOR       &dst,
-		     const VECTOR &src) const;
+    void vmult (VECTOR       &dst,
+		const VECTOR &src) const;
     
   private:
 				     /**
@@ -583,8 +583,8 @@ PreconditionMG<MG, VECTOR>::PreconditionMG(MG                       &mg,
 
 template<class MG, class VECTOR>
 void
-PreconditionMG<MG,VECTOR>::operator() (VECTOR       &dst,
-				       const VECTOR &src) const
+PreconditionMG<MG,VECTOR>::vmult (VECTOR       &dst,
+				  const VECTOR &src) const
 {
   multigrid->copy_to_mg(src);
   multigrid->vcycle(*pre, *post, *coarse);

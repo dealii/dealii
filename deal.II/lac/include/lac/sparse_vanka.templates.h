@@ -186,13 +186,13 @@ SparseVanka<number>::compute_inverse (const unsigned int    row,
   inverses[row]->gauss_jordan();
 };
 
-
+//TODO: implement Tvmult
 
 template<typename number>
 template<typename number2>
 void
-SparseVanka<number>::operator ()(Vector<number2>       &dst,
-				 const Vector<number2> &src) const
+SparseVanka<number>::vmult (Vector<number2>       &dst,
+			    const Vector<number2> &src) const
 {
 				   // first set output vector to zero
   dst.clear ();
@@ -543,11 +543,12 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
     };
 };
 
+//TODO: implement Tvmult
 
 template <typename number>
 template <typename number2>
-void SparseBlockVanka<number>::operator() (Vector<number2>       &dst,
-					   const Vector<number2> &src) const
+void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
+				      const Vector<number2> &src) const
 {
   dst.clear ();
 

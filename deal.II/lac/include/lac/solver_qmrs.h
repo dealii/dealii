@@ -102,12 +102,12 @@ class SolverQMRS : private Solver<VECTOR>
 				     /**
 				      * Solver method.
 				      */
-    template<class MATRIX, class Preconditioner>
+    template<class MATRIX, class PRECONDITIONER>
     typename Solver<VECTOR>::ReturnState
     solve (const MATRIX &A,
 		       VECTOR       &x,
 		       const VECTOR &b,
-		       const Preconditioner& precondition);
+		       const PRECONDITIONER& precondition);
 
 				     /**
 				      * Interface for derived class.
@@ -168,9 +168,9 @@ class SolverQMRS : private Solver<VECTOR>
 				     /**
 				      * The iteration loop itself.
 				      */
-    template<class MATRIX, class Preconditioner>
+    template<class MATRIX, class PRECONDITIONER>
     typename Solver<VECTOR>::ReturnState 
-    iterate(const MATRIX& A, const Preconditioner& precondition);
+    iterate(const MATRIX& A, const PRECONDITIONER& precondition);
 				     /**
 				      * The current iteration step.
 				      */
@@ -210,12 +210,12 @@ SolverQMRS<VECTOR>::print_vectors(const unsigned int,
 
 
 template<class VECTOR>
-template<class MATRIX, class Preconditioner>
+template<class MATRIX, class PRECONDITIONER>
 typename Solver<VECTOR>::ReturnState 
 SolverQMRS<VECTOR>::solve (const MATRIX &A,
 			   VECTOR       &x,
 			   const VECTOR &b,
-			   const Preconditioner& precondition)
+			   const PRECONDITIONER& precondition)
 {
   deallog.push("QMRS");
   
@@ -266,10 +266,10 @@ SolverQMRS<VECTOR>::solve (const MATRIX &A,
 
 
 template<class VECTOR>
-template<class MATRIX, class Preconditioner>
+template<class MATRIX, class PRECONDITIONER>
 typename Solver<VECTOR>::ReturnState 
 SolverQMRS<VECTOR>::iterate(const MATRIX& A,
-			    const Preconditioner& precondition)
+			    const PRECONDITIONER& precondition)
 {
 /* Remark: the matrix A in the article is the preconditioned matrix.
  * Therefore, we have to precondition x before we compute the first residual.
@@ -296,7 +296,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX& A,
   d.reinit(x);
   
 				   // Apply right preconditioning to x
-  precondition(q,x);  
+  precondition.vmult(q,x);  
 				   // Preconditioned residual
   res = A.residual(v, q, b);
 
@@ -305,7 +305,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX& A,
 
   p = v;
   
-  precondition(q,p);
+  precondition.vmult(q,p);
  
   tau = v.norm_sqr();
   //deallog << "tau:" << tau << endl;
@@ -359,12 +359,12 @@ while (state == SolverControl::iterate)
 	return breakdown;
 				       // Step 7
       rho_old = rho;
-      precondition(q,v);
+      precondition.vmult(q,v);
       rho = q*v;
 
       beta = rho/rho_old;
       p.sadd(beta,v);
-      precondition(q,p);
+      precondition.vmult(q,p);
     }
   return exceeded;
 }

@@ -154,8 +154,8 @@ MGSmootherLAC::smooth (const unsigned int level,
   SolverControl control(2,1.e-300,false,false);
   PrimitiveVectorMemory<> mem;
   SolverRichardson<> rich(control, mem);
-  PreconditionRelaxation<>
-    prec((*matrices)[level], &SparseMatrix<double> ::template precondition_SSOR<double>, 1.);
+  PreconditionSSOR<> prec;
+  prec.initialize((*matrices)[level], 1.);
 
   rich.solve((*matrices)[level], u, rhs, prec);
 }
@@ -377,10 +377,8 @@ void LaplaceProblem<dim>::solve ()
       PrimitiveVectorMemory<> vector_memory;
       SolverCG<>              cg (solver_control, vector_memory);
 
-      PreconditionRelaxation<>
-	preconditioner(global_system_matrix,
-		       &SparseMatrix<double>::template precondition_SSOR<double>,
-		       1.2);
+      PreconditionSSOR<> preconditioner;
+      preconditioner.initialize(global_system_matrix, 1.2);
       
       solution.clear ();
       cg.solve (global_system_matrix, solution, system_rhs,

@@ -203,8 +203,8 @@ class SparseVanka
 				      * update vector in #dst#.
 				      */
     template<typename number2>
-    void operator() (Vector<number2>       &dst,
-		     const Vector<number2> &src) const;
+    void vmult (Vector<number2>       &dst,
+		const Vector<number2> &src) const;
 
 				     /**
 				      * Exception
@@ -256,7 +256,7 @@ class SparseVanka
 				      * function with a
 				      * #vector<bool>(n_dofs,true)#.
 				      *
-				      * The #operator()# of this class
+				      * The #vmult# of this class
 				      * of course calls this function
 				      * with a null pointer
 				      */
@@ -516,7 +516,7 @@ class SparseBlockVanka : public SparseVanka<number>
 				      * Apply the preconditioner.
 				      */
     template<typename number2>
-    void operator() (Vector<number2>       &dst,
+    void vmult (Vector<number2>       &dst,
 		     const Vector<number2> &src) const;
     
   private:

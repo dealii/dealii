@@ -24,7 +24,6 @@
 #include <iomanip>
 #include <algorithm>
 
-
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int n) :
 		val (0),

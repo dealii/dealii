@@ -266,8 +266,8 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::solve ()
   PrimitiveVectorMemory<Vector> vector_memory;
   SolverCG<Vector>        cg (solver_control, vector_memory);
 
-  PreconditionRelaxation<Matrix,Vector> preconditioner
-    (system_matrix, &Matrix::precondition_Jacobi, 0.8);
+  PreconditionJacobi<Matrix> preconditioner;
+  preconditioner.initialize (system_matrix, 0.8);
   
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);

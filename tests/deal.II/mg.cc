@@ -180,8 +180,8 @@ MGSmootherLAC::smooth (const unsigned int level,
   SolverControl control(2,1.e-300,false,false);
   PrimitiveVectorMemory<> mem;
   SolverRichardson<> rich(control, mem);
-  PreconditionRelaxation<>
-    prec((*matrices)[level], &SparseMatrix<double> ::template precondition_SSOR<double>, 1.);
+  PreconditionSSOR<> prec;
+  prec.initialize((*matrices)[level], 1.);
 
   rich.solve((*matrices)[level], u, rhs, prec);
 }

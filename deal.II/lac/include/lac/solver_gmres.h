@@ -271,7 +271,7 @@ unsigned int dim = 0;
       if (left_precondition)
 	{
 	  A.residual(p,x,b);
-	  precondition(v,p);
+	  precondition.vmult(v,p);
 	} else {
 	  A.residual(v,x,b);
 	};
@@ -311,9 +311,9 @@ unsigned int dim = 0;
 	  if (left_precondition)
 	    {
 	      A.vmult(p, *tmp_vectors[inner_iteration]);
-	      precondition(vv,p);
+	      precondition.vmult(vv,p);
 	    } else {
-	      precondition(p,*tmp_vectors[inner_iteration]);
+	      precondition.vmult(p,*tmp_vectors[inner_iteration]);
 	      A.vmult(vv,p);
 	    };
 	  
@@ -376,7 +376,7 @@ unsigned int dim = 0;
 	  p = 0.;
 	  for (unsigned int i=0; i<dim; ++i)
 	    p.add(h(i), *tmp_vectors[i]);
-	  precondition(v,p);
+	  precondition.vmult(v,p);
 	  x.add(1.,v);
 	};
 

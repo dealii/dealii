@@ -63,12 +63,12 @@ class SolverBicgstab : private Solver<VECTOR>
 				     /**
 				      * Solve primal problem only.
 				      */
-    template<class MATRIX, class Preconditioner>
+    template<class MATRIX, class PRECONDITIONER>
     typename Solver<VECTOR>::ReturnState
     solve (const MATRIX &A,
 	   VECTOR       &x,
 	   const VECTOR &b,
-	   const Preconditioner& precondition);
+	   const PRECONDITIONER& precondition);
 
   protected:
 				     /**
@@ -257,7 +257,7 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
       beta   = rhobar * alpha / (rho * omega);
       rho    = rhobar;
       p.sadd(beta, 1., r, -beta*omega, v);
-      precondition(y,p);
+      precondition.vmult(y,p);
       A.vmult(v,y);
       rhobar = rbar * v;
 
@@ -269,7 +269,7 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 	return typename Solver<VECTOR>::ReturnState(breakdown);
     
       s.equ(1., r, -alpha, v);
-      precondition(z,s);
+      precondition.vmult(z,s);
       A.vmult(t,z);
       rhobar = t*s;
       omega = rhobar/(t*t);

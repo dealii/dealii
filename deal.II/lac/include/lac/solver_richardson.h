@@ -73,11 +73,11 @@ class SolverRichardson : private Solver<VECTOR>
 				     /**
 				      * Solve $Ax=b$ for $x$.
 				      */
-    template<class MATRIX, class Preconditioner>
+    template<class MATRIX, class PRECONDITIONER>
     typename Solver<VECTOR>::ReturnState solve (const MATRIX &A,
 						       VECTOR       &x,
 						       const VECTOR &b,
-						       const Preconditioner& precondition);
+						       const PRECONDITIONER& precondition);
 
 				     /**
 				      * Set the damping-coefficient.
@@ -146,12 +146,12 @@ SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
 
 
 template<class VECTOR>
-template<class MATRIX, class Preconditioner>
+template<class MATRIX, class PRECONDITIONER>
 typename Solver<VECTOR>::ReturnState 
 SolverRichardson<VECTOR>::solve (const MATRIX &A,
 				 VECTOR       &x,
 				 const VECTOR &b,
-				 const Preconditioner& precondition)
+				 const PRECONDITIONER& precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -170,7 +170,7 @@ SolverRichardson<VECTOR>::solve (const MATRIX &A,
       if (conv != SolverControl::iterate)
 	break;
 
-      precondition(d,r);
+      precondition.vmult(d,r);
       x.add(additional_data.omega,d);
       print_vectors(iter,x,r,d);
     }

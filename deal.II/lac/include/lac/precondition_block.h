@@ -41,7 +41,7 @@ template <typename number> class Vector;
  * For all matrices that are empty above and below the diagonal
  * blocks (i.e. for all block diagonal matrices) the #BlockJacobi# preconditioner
  * is a direct solver. For all matrices that are empty only above the diagonal blocks
- * (e.g. the matrices one gets by the DG method with downstream numbering) the
+ * (e.g. the matrices one gets by the DG method with downstream numbering)
  * #BlockSOR# is a direct solver.
  * 
  * This first implementation of the #PreconditionBlock# assumes the
@@ -85,6 +85,18 @@ class PreconditionBlock: public Subscriptor
     virtual ~PreconditionBlock();
 
 				     /**
+				      * Initialize matrix and block
+				      * size.  We store the matrix and
+				      * the block size in the
+				      * preconditioner object. In a
+				      * second step, the inverses of
+				      * the diagonal blocks may be
+				      * computed.
+				      */
+    void initialize (const SparseMatrix<number>& A,
+		     const unsigned int block_size);
+
+				     /**
 				      * Deletes the inverse diagonal block
 				      * matrices if existent, sets the
 				      * blocksize to 0, hence leaves the
@@ -95,27 +107,20 @@ class PreconditionBlock: public Subscriptor
     virtual void clear();
 
 				     /**
-				      * Takes the matrix that should be used
-				      * for the preconditioning. A reference
-				      * to it is stored within this class,
-				      * but ownership of the matrix remains
-				      * with the caller of this function.
+				      * Use only the inverse of the
+				      * first diagonal block to save
+				      * memory and computation time.
+				      *
+				      * Possible applications:
+				      * computing on a cartesian grid,
+				      * all diagonal blocks are the
+				      * same or all diagonal blocks
+				      * are at least similar and
+				      * inversion of one of them still
+				      * yields a preconditioner.
 				      */
-    void use_matrix(const SparseMatrix<number> &M);
+    void set_same_diagonal ();
     
-				     /**
-				      * Set the right block size before calling
-				      * #invert_diagblocks# or calling the
-				      * #operator ()# function
-				      * of #PreconditionBlockSOR#
-				      * or #PreconditionBlockJacobi#.
-				      * If #block_size==1# BlockSOR or 
-				      * BlockJacobi are equal to the
-				      * standard SOR or Jacobi 
-				      * preconditioner.
-				      */
-    void set_block_size (const unsigned int bsize);
-
     				     /**
 				      * Stores the inverse of
 				      * the diagonal blocks
@@ -148,6 +153,12 @@ class PreconditionBlock: public Subscriptor
     unsigned int block_size () const;
 
 				     /**
+				      * Determine, whether inverses
+				      * have been computed.
+				      */
+    bool inverses_ready () const;
+    
+				     /**
 				      * Exception
 				      */
     DeclException2 (ExcWrongBlockSize,
@@ -173,26 +184,34 @@ class PreconditionBlock: public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcBlockSizeNotSet);
-
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcMatrixNotSquare);
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNoMatrixGivenToUse);
    
   protected:
+				     /**
+				      * Access to the inverse diagonal blocks.
+				      * 
+				      */
+    const FullMatrix<inverse_type>& inverse (unsigned int i) const;
+    
 				     /**
 				      * Size of the blocks. Each diagonal
 				      * block is assumed to be of the
 				      * same size.
 				      */
     unsigned int blocksize;
-    
+
+				     /**
+				      * Pointer to the matrix. Make sure that
+				      * the matrix exists as long as this class
+				      * needs it, i.e. until calling #invert_diagblocks#,
+				      * or (if the inverse matrices should not be
+				      * stored) until the last call of the 
+				      * preconditoining #vmult# function of the
+				      * derived classes.
+				      */
+    SmartPointer<const SparseMatrix<number> > A;
+
+  private:
 				     /**
 				      * Storage of the inverse matrices of
 				      * the diagonal blocks matrices as
@@ -201,18 +220,13 @@ class PreconditionBlock: public Subscriptor
 				      * using #inverse_type=float# saves memory
 				      * in comparison with #inverse_type=double#.
 				      */
-    vector<FullMatrix<inverse_type> > inverse;
+    vector<FullMatrix<inverse_type> > _inverse;
 
 				     /**
-				      * Pointer to the matrix. Make sure that
-				      * the matrix exists as long as this class
-				      * needs it, i.e. until calling #invert_diagblocks#,
-				      * or (if the inverse matrices should not be
-				      * stored) until the last call of the 
-				      * preconditoining #operator()# function of the
-				      * derived classes.
+				      * Flag for diagonal compression.
+				      * @see set_same_diagonal()
 				      */
-    SmartPointer<const SparseMatrix<number> > A;
+    bool same_diagonal;
 };
 
 
@@ -226,11 +240,6 @@ class PreconditionBlockJacobi : public PreconditionBlock<number,inverse_type>
   public:
 				     /**
 				      * Execute block Jacobi preconditioning.
-				      * Make sure that the right
-				      * block size
-				      * of the matrix is set by
-				      * #set_block_size#
-				      * before calling this function.
 				      *
 				      * This function will automatically use the
 				      * inverse matrices if they exist, if not
@@ -239,7 +248,13 @@ class PreconditionBlockJacobi : public PreconditionBlock<number,inverse_type>
 				      * matrices in each preconditioning step.
 				      */
     template <typename number2>
-    void operator() (Vector<number2>&, const Vector<number2>&) const;
+    void vmult (Vector<number2>&, const Vector<number2>&) const;
+
+				     /**
+				      * Same as #vmult#, since Jacobi is symmetric.
+				      */
+    template <typename number2>
+    void Tvmult (Vector<number2>&, const Vector<number2>&) const;
 };
 
 
@@ -273,11 +288,6 @@ class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
     
 				     /**
 				      * Execute block SOR preconditioning.
-				      * Make sure that the right
-				      * block size
-				      * of the matrix is set by
-				      * #set_block_size#
-				      * before calling this function.
 				      *
 				      * This function will automatically use the
 				      * inverse matrices if they exist, if not
@@ -290,7 +300,7 @@ class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
 				      * BlockSOR is a direct solver.
 				      */
     template <typename number2>
-    void operator() (Vector<number2>&, const Vector<number2>&) const;
+    void vmult (Vector<number2>&, const Vector<number2>&) const;
 
   private:
 				     /**

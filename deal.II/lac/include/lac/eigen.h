@@ -357,6 +357,7 @@ EigenPower<VECTOR>::solve (double       &value,
     }
   
   memory.free(Vy);
+  memory.free(Vr);
 
   deallog.pop();
 				   // Output
@@ -465,7 +466,8 @@ EigenInverse<VECTOR>::solve (double       &value,
     }
 
   memory.free(Vy);
-
+  memory.free(Vr);
+  
   deallog.pop();
 
 				   // Output

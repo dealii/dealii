@@ -192,8 +192,8 @@ class SparseILU : protected SparseMatrix<number>
 				      * Same as #apply_decomposition#, format for LAC.
 				      */
     template <typename somenumber>
-    void operator() (Vector<somenumber>       &dst,
-		     const Vector<somenumber> &src) const;
+    void vmult (Vector<somenumber>       &dst,
+		const Vector<somenumber> &src) const;
 
 				     /**
 				      * Exception
@@ -218,8 +218,8 @@ class SparseILU : protected SparseMatrix<number>
 template <typename number>
 template <typename somenumber>
 void
-SparseILU<number>::operator() (Vector<somenumber>       &dst,
-			       const Vector<somenumber> &src) const
+SparseILU<number>::vmult (Vector<somenumber>       &dst,
+			  const Vector<somenumber> &src) const
 {
   apply_decomposition(dst, src);
 }

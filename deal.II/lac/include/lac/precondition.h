@@ -47,60 +47,6 @@ class PreconditionIdentity
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
-				     /**
-				      * Apply preconditioner.
-				      */
-    template<class VECTOR>
-    void operator () (VECTOR&, const VECTOR&) const;
-};
-
-
-/**
- * Jacobi preconditioner using matrix built-in function.  The MATRIX
- * class used is required to have a function
- * @p{precondition_Jacobi(VECTOR&, const VECTOR&, double}
- *
- * @author Guido Kanschat, 2000
- */
-template <class MATRIX = SparseMatrix<double> >
-class PreconditionJacobi
-{
-  public:
-				     /**
-				      * Initialize matrix and
-				      * relaxation parameter. The
-				      * matrix is just stored in the
-				      * preconditioner object. The
-				      * relaxation parameter should be
-				      * larger than zero and smaller
-				      * than 2 for numerical
-				      * reasons. It defaults to 1.
-				      */
-    void initialize (const MATRIX& A, const double omega = 1.);
-				     /**
-				      * Apply preconditioner.
-				      */
-    template<class VECTOR>
-    void vmult (VECTOR&, const VECTOR&) const;
-				     /**
-				      * Apply transpose
-				      * preconditioner. Since this is
-				      * a symmetric preconditioner,
-				      * this function is the same as
-				      * @ref{vmult}.
-				      */
-    template<class VECTOR>
-    void Tvmult (VECTOR&, const VECTOR&) const;
-
-  private:
-				     /**
-				      * Pointer to the matrix object.
-				      */
-    SmartPointer<const MATRIX> A;
-				     /**
-				      * Relaxation parameter.
-				      */
-    double omega;
 };
 
 
@@ -174,8 +120,8 @@ class PreconditionUseMatrix
 				      * of this object with the two
 				      * arguments given here.
 				      */
-    void operator() (VECTOR       &dst,
-		     const VECTOR &src) const;
+    void vmult (VECTOR       &dst,
+		const VECTOR &src) const;
 
   private:
 				     /**
@@ -192,93 +138,119 @@ class PreconditionUseMatrix
 
 
 /**
- * Preconditioner for builtin relaxation methods.
- * Application of this preconditioner includes
- * use of the #precondition_...# methods of #SparseMatrix#.
+ * Base class for other preconditioners.
+ * Here, only some common features Jacobi, SOR and SSOR preconditioners
+ * are implemented. For preconditioning, refer to derived classes.
  *
- * \subsection{Use}
- * You will usually not want to create a named object of this type,
- * although possible. The most common use is like this:
- * \begin{verbatim}
- *    SolverGMRES<SparseMatrix<double>,
- *                Vector<double> >      gmres(control,memory,500);
- *
- *    gmres.solve (matrix, solution, right_hand_side,
- *		   PreconditionRelaxation<SparseMatrix<double>,Vector<double> >
- *		   (matrix,&SparseMatrix<double>::template precondition_Jacobi,
- *                   0.5));
- * \end{verbatim}
- * This creates an unnamed object to be passed as the fourth parameter to
- * the solver function of the #SolverGMRES# class. It assumes that the
- * #SparseMatrix# class has a function #precondition_Jacobi# taking two
- * vectors (source and destination) and a relaxation value as parameters. (Unlike
- * for the #PreconditionUseMatrix# class, this time it should work, with
- * relaxation parameter $0.5$.)
- *
- * Note that due to the default template parameters, the above example
- * could be written shorter as follows:
- * \begin{verbatim}
- *    ...
- *    gmres.solve (matrix, solution, right_hand_side,
- *		   PreconditionRelaxation<>
- *		     (matrix,
- *                    &SparseMatrix<double>::template precondition_Jacobi,
- *                    0.5));
- * \end{verbatim}
- *
- * @author Guido Kanschat, Wolfgang Bangerth, 1999
+ * @author Guido Kanschat, 2000
  */
-template<class MATRIX = SparseMatrix<double>, class VECTOR = Vector<double> >
+template<class MATRIX = SparseMatrix<double> >
 class PreconditionRelaxation
 {
   public:
 				     /**
-				      * Type of the preconditioning
-				      * function of the matrix.
+				      * Initialize matrix and
+				      * relaxation parameter. The
+				      * matrix is just stored in the
+				      * preconditioner object. The
+				      * relaxation parameter should be
+				      * larger than zero and smaller
+				      * than 2 for numerical
+				      * reasons. It defaults to 1.
 				      */
-    typedef void ( MATRIX::* function_ptr)(VECTOR&, const VECTOR&,
-					   typename MATRIX::value_type) const;
-    
+    void initialize (const MATRIX& A, const double omega = 1.);
+  protected:
 				     /**
-				      * Constructor.
-				      * This constructor stores a
-				      * reference to the matrix object
-				      * for later use and selects a
-				      * preconditioning method, which
-				      * must be a member function of
-				      * that matrix.
+				      * Pointer to the matrix object.
 				      */
-    PreconditionRelaxation(const MATRIX      &M,
-			   const function_ptr method,
-			   const double       omega = 1.);
-    
-				     /**
-				      * Execute preconditioning. Calls the
-				      * function passed to the constructor
-				      * of this object with the two
-				      * arguments given here, and the
-				      * relaxation parameter passed to the
-				      * constructor.
-				      */
-    void operator() (VECTOR&, const VECTOR&) const;
-
-  private:
-				     /**
-				      * Pointer to the matrix in use.
-				      */
-    const MATRIX& matrix;
-    
-				     /**
-				      * Pointer to the preconditioning
-				      * function.
-				      */
-    const function_ptr precondition;
-    
+    SmartPointer<const MATRIX> A;
 				     /**
 				      * Relaxation parameter.
 				      */
     double omega;
 };
+
+/**
+ * Jacobi preconditioner using matrix built-in function.  The MATRIX
+ * class used is required to have a function
+ * @p{precondition_Jacobi(VECTOR&, const VECTOR&, double}
+ *
+ * @author Guido Kanschat, 2000
+ */
+template <class MATRIX = SparseMatrix<double> >
+class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
+{
+  public:
+				     /**
+				      * Apply preconditioner.
+				      */
+    template<class VECTOR>
+    void vmult (VECTOR&, const VECTOR&) const;
+				     /**
+				      * Apply transpose
+				      * preconditioner. Since this is
+				      * a symmetric preconditioner,
+				      * this function is the same as
+				      * @ref{vmult}.
+				      */
+    template<class VECTOR>
+    void Tvmult (VECTOR&, const VECTOR&) const;
+};
+
+
+/**
+ * SOR preconditioner using matrix built-in function.  The MATRIX
+ * class used is required to have functions
+ * @p{precondition_SOR(VECTOR&, const VECTOR&, double)} and
+ * @p{precondition_TSOR(VECTOR&, const VECTOR&, double)}.
+ *
+ * @author Guido Kanschat, 2000
+ */
+template <class MATRIX = SparseMatrix<double> >
+class PreconditionSOR : public PreconditionRelaxation<MATRIX>
+{
+  public:
+				     /**
+				      * Apply preconditioner.
+				      */
+    template<class VECTOR>
+    void vmult (VECTOR&, const VECTOR&) const;
+				     /**
+				      * Apply transpose
+				      * preconditioner.
+				      */
+    template<class VECTOR>
+    void Tvmult (VECTOR&, const VECTOR&) const;
+};
+
+
+/**
+ * SSOR preconditioner using matrix built-in function.  The MATRIX
+ * class used is required to have a function
+ * @p{precondition_SSOR(VECTOR&, const VECTOR&, double}
+ *
+ * @author Guido Kanschat, 2000
+ */
+template <class MATRIX = SparseMatrix<double> >
+class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
+{
+  public:
+				     /**
+				      * Apply preconditioner.
+				      */
+    template<class VECTOR>
+    void vmult (VECTOR&, const VECTOR&) const;
+				     /**
+				      * Apply transpose
+				      * preconditioner. Since this is
+				      * a symmetric preconditioner,
+				      * this function is the same as
+				      * @ref{vmult}.
+				      */
+    template<class VECTOR>
+    void Tvmult (VECTOR&, const VECTOR&) const;
+};
+
 
 /**
  * Preconditioner using an iterative solver.  This preconditioner uses
@@ -307,7 +279,7 @@ class PreconditionLACSolver
 				      * Execute preconditioning.
 				      */
     template<class VECTOR>
-    void operator() (VECTOR&, const VECTOR&) const;
+    void vmult (VECTOR&, const VECTOR&) const;
 
   private:
 				     /**
@@ -351,9 +323,16 @@ class PreconditionedMatrix
 			  VectorMemory<VECTOR>&  mem);
 
 				     /**
-				      * Preconditioned matrix-vector-product.
+				      * Preconditioned
+				      * matrix-vector-product.
 				      */
     void vmult (VECTOR& dst, const VECTOR& src) const;
+
+				     /**
+				      * Transposed preconditioned
+				      * matrix-vector-product.
+				      */
+    void Tvmult (VECTOR& dst, const VECTOR& src) const;
 
 				     /**
 				      * Residual $b-PAx$.
@@ -382,13 +361,6 @@ class PreconditionedMatrix
 
 template<class VECTOR>
 inline void
-PreconditionIdentity::operator () (VECTOR& dst, const VECTOR& src) const
-{
-  dst = src;
-}
-
-template<class VECTOR>
-inline void
 PreconditionIdentity::vmult (VECTOR& dst, const VECTOR& src) const
 {
   dst = src;
@@ -405,19 +377,75 @@ PreconditionIdentity::Tvmult (VECTOR& dst, const VECTOR& src) const
 
 template <class MATRIX>
 inline void
-PreconditionJacobi<MATRIX>::initialize (const MATRIX& rA, double o)
+PreconditionRelaxation<MATRIX>::initialize (const MATRIX& rA, double o)
 {
   A = &rA;
   omega = o;
 }
+
+//----------------------------------------------------------------------//
 
 template <class MATRIX>
 template<class VECTOR>
 inline void
 PreconditionJacobi<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
-//TODO: Assert object not initialized
+  Assert (A!=0, ExcNotInitialized());
   A->precondition_Jacobi (dst, src, omega);
+}
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionJacobi<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
+{
+  Assert (A!=0, ExcNotInitialized());
+  A->precondition_Jacobi (dst, src, omega);
+}
+
+
+//----------------------------------------------------------------------//
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
+{
+  Assert (A!=0, ExcNotInitialized());
+  A->precondition_SOR (dst, src, omega);
+}
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
+{
+  Assert (A!=0, ExcNotInitialized());
+  A->precondition_TSOR (dst, src, omega);
+}
+
+
+//----------------------------------------------------------------------//
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionSSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
+{
+  Assert (A!=0, ExcNotInitialized());
+  A->precondition_SSOR (dst, src, omega);
+}
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionSSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
+{
+  Assert (A!=0, ExcNotInitialized());
+  A->precondition_SSOR (dst, src, omega);
 }
 
 
@@ -434,27 +462,10 @@ PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX& M,
 
 template<class MATRIX, class VECTOR>
 void
-PreconditionUseMatrix<MATRIX,VECTOR>::operator() (VECTOR& dst,
-						   const VECTOR& src) const
+PreconditionUseMatrix<MATRIX,VECTOR>::vmult (VECTOR& dst,
+					     const VECTOR& src) const
 {
   (matrix.*precondition)(dst, src);
-}
-
-template<class MATRIX, class VECTOR>
-PreconditionRelaxation<MATRIX,VECTOR>::PreconditionRelaxation(const MATRIX& M,
-							     function_ptr method,
-							       double omega)
-		:
-		matrix(M), precondition(method), omega(omega)
-{}
-
-
-template<class MATRIX, class VECTOR>
-void
-PreconditionRelaxation<MATRIX,VECTOR>::operator() (VECTOR& dst,
-						   const VECTOR& src) const
-{
-  (matrix.*precondition)(dst, src, omega);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -471,8 +482,8 @@ PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
 template<class SOLVER, class MATRIX, class PRECONDITION>
 template<class VECTOR>
 void
-PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::operator() (VECTOR& dst,
-								 const VECTOR& src) const
+PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::vmult (VECTOR& dst,
+							  const VECTOR& src) const
 {
   solver.solve(matrix, dst, src, precondition);
 }
@@ -499,9 +510,24 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
   VECTOR* h = mem.alloc();
   h->reinit(src);
   A.vmult(*h, src);
-  P(dst, *h);
+  P.vmult(dst, *h);
   mem.free(h);
 }
+
+
+template<class MATRIX, class PRECOND, class VECTOR>
+inline void
+PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
+::Tvmult (VECTOR& dst,
+	 const VECTOR& src) const
+{
+  VECTOR* h = mem.alloc();
+  h->reinit(src);
+  A.Tvmult(*h, src);
+  P.Tvmult(dst, *h);
+  mem.free(h);
+}
+
 
 template<class MATRIX, class PRECOND, class VECTOR>
 inline double
@@ -513,7 +539,7 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
   VECTOR* h = mem.alloc();
   h->reinit(src);
   A.vmult(*h, src);
-  P(dst, *h);
+  P.vmult(dst, *h);
   mem.free(h);
   dst.sadd(-1.,1.,rhs);
   return dst.l2_norm ();

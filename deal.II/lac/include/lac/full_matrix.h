@@ -560,13 +560,6 @@ class FullMatrix : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The given index " << arg1
-		    << " should be less than " << arg2 << ".");
-				     /**
-				      * Exception
-				      */
     DeclException2 (ExcDimensionMismatch,
 		    int, int,
 		    << "The two dimensions " << arg1 << " and " << arg2
@@ -699,8 +692,8 @@ template <typename number>
 inline number
 FullMatrix<number>::operator() (const unsigned int i, const unsigned int j) const
 {  
-  Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
-  Assert (j<dim_range, ExcInvalidIndex (j, dim_range));
+  Assert (i<dim_image, ExcIndexRange (i, 0, dim_image));
+  Assert (j<dim_range, ExcIndexRange (j, 0, dim_range));
   return el(i,j);
 };
 
@@ -710,8 +703,8 @@ template <typename number>
 inline number &
 FullMatrix<number>::operator() (const unsigned int i, const unsigned int j)
 {
-  Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
-  Assert (j<dim_range, ExcInvalidIndex (j, dim_range));
+  Assert (i<dim_image, ExcIndexRange (i, 0, dim_image));
+  Assert (j<dim_range, ExcIndexRange (j, 0, dim_range));
   return el(i,j);
 };
 

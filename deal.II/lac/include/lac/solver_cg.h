@@ -70,12 +70,12 @@ class SolverCG : private Solver<VECTOR>
 				     /**
 				      * Solver method.
 				      */
-    template<class MATRIX, class Preconditioner>
+    template<class MATRIX, class PRECONDITIONER>
     typename Solver<VECTOR>::ReturnState
     solve (const MATRIX &A,
 	   VECTOR       &x,
 	   const VECTOR &b,
-	   const Preconditioner& precondition);
+	   const PRECONDITIONER& precondition);
 
   protected:
 				     /**
@@ -164,12 +164,12 @@ SolverCG<VECTOR>::print_vectors(const unsigned int,
 
 
 template<class VECTOR>
-template<class MATRIX, class Preconditioner>
+template<class MATRIX, class PRECONDITIONER>
 typename Solver<VECTOR>::ReturnState 
 SolverCG<VECTOR>::solve (const MATRIX &A,
 			 VECTOR       &x,
 			 const VECTOR &b,
-			 const Preconditioner& precondition)
+			 const PRECONDITIONER& precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -210,7 +210,7 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
     };
   
   g.scale(-1.);
-  precondition(h,g);
+  precondition.vmult(h,g);
  
   d.equ(-1.,h);
  
@@ -234,7 +234,7 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
       if (conv)
 	break;
       
-      precondition(h,g);
+      precondition.vmult(h,g);
       
       beta = gh;
       gh   = g*h;

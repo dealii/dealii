@@ -74,12 +74,12 @@ class SolverMinRes : private Solver<VECTOR>
 				     /**
 				      * Solver method.
 				      */
-    template<class MATRIX, class Preconditioner>
+    template<class MATRIX, class PRECONDITIONER>
     typename Solver<VECTOR>::ReturnState
     solve (const MATRIX &A,
 	   VECTOR       &x,
 	   const VECTOR &b,
-	   const Preconditioner& precondition);
+	   const PRECONDITIONER& precondition);
 
 				     /**
 				      * Exception
@@ -168,12 +168,12 @@ SolverMinRes<VECTOR>::print_vectors(const unsigned int,
 
 
 template<class VECTOR>
-template<class MATRIX, class Preconditioner>
+template<class MATRIX, class PRECONDITIONER>
 typename Solver<VECTOR>::ReturnState 
 SolverMinRes<VECTOR>::solve (const MATRIX &A,
 			     VECTOR       &x,
 			     const VECTOR &b,
-			     const Preconditioner& precondition)
+			     const PRECONDITIONER& precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -234,7 +234,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX &A,
 				   // positiv definite and symmetric
 
 				   // M v = u[1]
-  precondition (v,u[1]);
+  precondition.vmult (v,u[1]);
   
   delta[1] = v * u[1];
 				   // Preconditioner positive
@@ -270,7 +270,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX &A,
 				       // precondition: solve M v = u[2]
 				       // Preconditioner has to be positiv
 				       // definite and symmetric.
-      precondition(v,u[2]);
+      precondition.vmult(v,u[2]);
  
       delta[2] = v * u[2];
 

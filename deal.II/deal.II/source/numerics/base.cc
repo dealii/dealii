@@ -154,10 +154,8 @@ void ProblemBase<dim>::solve ()
   PrimitiveVectorMemory<> memory;
   SolverCG<>              cg(control,memory);
 
-  PreconditionRelaxation<>
-    prec(system_matrix,
-	 &SparseMatrix<double>::template precondition_SSOR<double>,
-	 1.2);
+  PreconditionSSOR<> prec;
+  prec.initialize (system_matrix, 1.2);
 
 				   // solve
   cg.solve (system_matrix, solution, right_hand_side, prec);
