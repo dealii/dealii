@@ -468,10 +468,11 @@ class BlockSparseMatrix : public Subscriptor
 				      * inverse of the respective
 				      * diagonal element and
 				      * multiplies the result with the
-				      * damping factor @p{omega}.
+				      * relaxation parameter @p{omega}.
 				      *
-				      * The matrix needs to be square
-				      * for this operation.
+				      * All diagonal blocks must be
+				      * square matrices for this
+				      * operation.
 				      */
     template <typename somenumber>
     void precondition_Jacobi (BlockVector<somenumber>       &dst,
