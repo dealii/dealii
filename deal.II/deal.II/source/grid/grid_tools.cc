@@ -219,7 +219,7 @@ GridTools::find_active_cell_around_point (const Container  &container,
     {
       unsigned int c=0;
       for (; c<GeometryInfo<dim>::children_per_cell; ++c)
-        if (cell->point_inside (p))
+        if (cell->child(c)->point_inside (p))
           break;
 
                                        // make sure we found a child
