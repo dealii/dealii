@@ -55,11 +55,11 @@ void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
   clear();
 
   const unsigned int n_active_cells = dof_handler->get_tria().n_active_cells();
-  const unsigned int total_dofs     = dof_handler->get_fe().total_dofs;
+  const unsigned int dofs_per_cell  = dof_handler->get_fe().total_dofs;
   n_dofs_old=dof_handler->n_dofs();
 
   indices_on_cell=vector<vector<int> > (n_active_cells,
-					vector<int> (total_dofs));
+					vector<int> (dofs_per_cell));
 
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();
@@ -98,8 +98,8 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
   Assert(out.size()==dof_handler->n_dofs(),
 	 ExcWrongVectorSize(out.size(),dof_handler->n_dofs()));
 
-  unsigned int total_dofs=dof_handler->get_fe().total_dofs;  
-  Vector<number> local_values(total_dofs);
+  unsigned int dofs_per_cell=dof_handler->get_fe().total_dofs;  
+  Vector<number> local_values(dofs_per_cell);
 
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();
@@ -117,7 +117,7 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
 					 // function
 	{
 	  indexptr=static_cast<vector<int> *>(cell->user_pointer());
-	  for (unsigned int i=0; i<total_dofs; ++i)
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    local_values(i)=in(indexptr->operator[](i));
 	  cell->set_dof_values_by_interpolation(local_values, out);
 	}
@@ -154,7 +154,7 @@ prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
   clear();
 
   const unsigned int n_active_cells = dof_handler->get_tria().n_active_cells();
-  const unsigned int total_dofs     = dof_handler->get_fe().total_dofs;
+  const unsigned int dofs_per_cell  = dof_handler->get_fe().total_dofs;
   n_dofs_old=dof_handler->n_dofs();
 
   for (unsigned int i=0; i<in_size; ++i)
@@ -189,11 +189,11 @@ prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
 
 				   // allocate the needed memory
   indices_on_cell    = vector<vector<int> > (n_cells_to_stay_or_refine,
-					    vector<int> (total_dofs));
+					    vector<int> (dofs_per_cell));
   dof_values_on_cell
     = vector<vector<Vector<number> > > (n_coarsen_fathers,
 					vector<Vector<number> > (in_size,
-								 Vector<number> (total_dofs)));
+								 Vector<number> (dofs_per_cell)));
 
   all_pointerstructs = vector<Pointerstruct> (n_cells_to_stay_or_refine +
 					      n_coarsen_fathers);
@@ -291,13 +291,13 @@ interpolate (const vector<Vector<number> > &all_in,
     };
 
   
-  const unsigned int total_dofs=dof_handler->get_fe().total_dofs;  
-  Vector<number> local_values(total_dofs);
+  const unsigned int dofs_per_cell=dof_handler->get_fe().total_dofs;  
+  Vector<number> local_values(dofs_per_cell);
 
   vector<int>             *indexptr;
   Pointerstruct           *structptr;
   vector<Vector<number> > *valuesptr;
-  vector<int>              dofs(total_dofs);
+  vector<int>              dofs(dofs_per_cell);
 
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();
@@ -319,7 +319,7 @@ interpolate (const vector<Vector<number> > &all_in,
 					       // to its children
 	      for (unsigned int j=0; j<out_size; ++j)
 		{
-		  for (unsigned int i=0; i<total_dofs; ++i)
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
 		    local_values(i)=all_in[j](indexptr->operator[](i));
 		  cell->set_dof_values_by_interpolation(local_values,
 							all_out[j]);
@@ -339,7 +339,7 @@ interpolate (const vector<Vector<number> > &all_in,
 					       // to the new vectors
 	      for (unsigned int j=0; j<out_size; ++j)
 		{
-		  for (unsigned int i=0; i<total_dofs; ++i)
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
 		    all_out[j](dofs[i])=valuesptr->operator[](j)(i);
 		}
 	    }
