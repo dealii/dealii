@@ -38,8 +38,6 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   # There is one gotcha: PETSc has a habit of making incompatible changes by
   # simply changing the names of libraries between different versions. That
   # really is too bad, so we have to conditionalize things.
-  lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
-  lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
 ifeq ($(DEAL_II_PETSC_VERSION_MINOR),1)
   xlib-ksp=libpetscsles
 else
