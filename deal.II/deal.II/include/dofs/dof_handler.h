@@ -588,8 +588,11 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     void renumber_dofs (const vector<int> &new_numbers);
 
 				     /**
-				      * Make up the constraint matrix which
-				      * is used to condensate the global
+				      * Make up the constraints which
+				      * is result from the use of hanging
+				      * nodes. The object into which these
+				      * are inserted is later
+				      * used to condensate the global
 				      * system matrices and to prolong
 				      * the solution vectors from the true
 				      * degrees of freedom also to the
@@ -597,21 +600,26 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      *
 				      * Since this method does not make sense in
 				      * one dimension, the function returns
-				      * immediately after clearing the
-				      * constraint matrix.
-				      * For more than one dimension, the matrix
-				      * is cleared before usage. The constraint
-				      * matrix is closed anyway, no matter of the
-				      * dimension.
+				      * immediately. The object is not cleared
+				      * before use, so you should make sure
+				      * it containts only constraints you still
+				      * want; otherwise call the #clear#
+				      * function.
 				      *
 				      * To condense a given sparsity pattern,
 				      * use #ConstraintMatrix::condense#.
+				      * Before doing so, you need to close
+				      * the constraint object, which must be
+				      * done after all constraints are entered.
+				      * This function does not close the object
+				      * since you may want to enter other
+				      * constraints later on yourself.
 				      *
 				      * This function uses the user flags for
 				      * the faces. If you need the user flags,
 				      * store them beforehand.
 				      */
-    void make_constraint_matrix (ConstraintMatrix &) const;
+    void make_hanging_node_constraints (ConstraintMatrix &) const;
 
 
 				     /**

@@ -84,7 +84,8 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				   // make up sparsity pattern and
 				   // compress with constraints
   constraints.clear ();
-  dof_handler->make_constraint_matrix (constraints);
+  dof_handler->make_hanging_node_constraints (constraints);
+  constraints.close ();
   dof_handler->make_sparsity_pattern (system_sparsity);
   constraints.condense (system_sparsity);
 
@@ -95,12 +96,12 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
   solution.reinit (dof_handler->n_dofs());
   
 				   // create assembler
-  AssemblerData<dim> data (*dof_handler,
-			   true, true, //assemble matrix and rhs
-			   system_matrix,
-			   right_hand_side,
-			   quadrature,
-			   update_flags);
+  Assembler<dim>::AssemblerData data (*dof_handler,
+				      true, true, //assemble matrix and rhs
+				      system_matrix,
+				      right_hand_side,
+				      quadrature,
+				      update_flags);
   active_assemble_iterator assembler (tria,
 				      tria->begin_active()->level(),
 				      tria->begin_active()->index(),

@@ -125,73 +125,6 @@ class Equation {
 
 
 /**
- * Structure to be passed upon
- * construction of an assembler object
- * through the iterator object. See
- * \Ref{TriaRawIterator} for a discussion
- * of this mechanism.
- */
-template <int dim>
-struct AssemblerData {
-				     /**
-				      * Constructor.
-				      */
-    AssemblerData (const DoFHandler<dim>    &dof,
-		   const bool                assemble_matrix,
-		   const bool                assemble_rhs,
-		   SparseMatrix<double>     &matrix,
-		   Vector<double>           &rhs_vector,
-		   const Quadrature<dim>    &quadrature,
-		   const UpdateFlags        &update_flags);
-    
-				     /**
-				      * Pointer to the dof handler object
-				      * to be used to iterate on.
-				      */
-    const DoFHandler<dim>  &dof;
-    
-				     /**
-				      * Flags whether to assemble the matrix
-				      * and right hand sides.
-				      */
-    const bool              assemble_matrix, assemble_rhs;
-
-				     /**
-				      * Pointer to the matrix to be assembled
-				      * by this object. Elements are summed
-				      * up by the assembler, so you may want
-				      * to clear this object (set all entries
-				      * to zero) before use.
-				      */
-    SparseMatrix<double>   &matrix;
-
-				     /**
-				      * Pointer to the vector to be assembled
-				      * by this object. Elements are summed
-				      * up by the assembler, so you may want
-				      * to clear this object (set all entries
-				      * to zero) before use.
-				      */
-    Vector<double>         &rhs_vector;
-    
-				     /**
-				      * Pointer to a quadrature object to be
-				      * used for this assemblage process.
-				      */
-    const Quadrature<dim>  &quadrature;
-    
-				     /**
-				      * Store which of the fields of the
-				      * FEValues object need to be reinitialized
-				      * on each cell.
-				      */
-    const UpdateFlags       update_flags;
-};
-
-
-
-
-/**
  * An #Assembler# is a specialized version of a #DoFCellAccessor# which adds
  * functionality to assemble global matrices and vectors from cell base ones.
  *
@@ -200,12 +133,78 @@ struct AssemblerData {
 template <int dim>
 class Assembler : public DoFCellAccessor<dim> {
   public:
+
+				     /**
+				      * Structure to be passed upon
+				      * construction of an assembler object
+				      * through the iterator object. See
+				      * \Ref{TriaRawIterator} for a discussion
+				      * of this mechanism.
+				      */
+    struct AssemblerData {
+					 /**
+					  * Constructor.
+					  */
+	AssemblerData (const DoFHandler<dim>    &dof,
+		       const bool                assemble_matrix,
+		       const bool                assemble_rhs,
+		       SparseMatrix<double>     &matrix,
+		       Vector<double>           &rhs_vector,
+		       const Quadrature<dim>    &quadrature,
+		       const UpdateFlags        &update_flags);
+	
+					 /**
+					  * Pointer to the dof handler object
+					  * to be used to iterate on.
+					  */
+	const DoFHandler<dim>  &dof;
+	
+					 /**
+					  * Flags whether to assemble the matrix
+					  * and right hand sides.
+					  */
+	const bool              assemble_matrix, assemble_rhs;
+	
+					 /**
+					  * Pointer to the matrix to be assembled
+					  * by this object. Elements are summed
+					  * up by the assembler, so you may want
+					  * to clear this object (set all entries
+					  * to zero) before use.
+					  */
+	SparseMatrix<double>   &matrix;
+	
+					 /**
+					  * Pointer to the vector to be assembled
+					  * by this object. Elements are summed
+					  * up by the assembler, so you may want
+					  * to clear this object (set all entries
+					  * to zero) before use.
+					  */
+	Vector<double>         &rhs_vector;
+	
+					 /**
+					  * Pointer to a quadrature object to be
+					  * used for this assemblage process.
+					  */
+	const Quadrature<dim>  &quadrature;
+	
+					 /**
+					  * Store which of the fields of the
+					  * FEValues object need to be reinitialized
+					  * on each cell.
+					  */
+	const UpdateFlags       update_flags;
+    };
+    
+
+    
 				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef AssemblerData<dim> AccessorData;
+    typedef AssemblerData AccessorData;
     
 				     /**
 				      * Default constructor, unused thus not

@@ -18,6 +18,8 @@
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
+#include <numerics/multigrid.h>
+#include <numerics/mg_smoother.h>
 
 #include <lac/vector.h>
 #include <lac/sparsematrix.h>
@@ -336,9 +338,15 @@ void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
 				   // make up sparsity pattern and
 				   // compress with constraints
   constraints.clear ();
-  dof->DoFHandler<dim>::make_constraint_matrix (constraints);
+  dof->DoFHandler<dim>::make_hanging_node_constraints (constraints);
+  constraints.close ();
   dof->DoFHandler<dim>::make_sparsity_pattern (system_sparsity);
   constraints.condense (system_sparsity);
+
+  MGTransferPrebuilt p;
+  p.build_matrices (*dof);
+//  MGSmoother smoother(*dof);
+  
 
 				   // reinite system matrix
   system_matrix.reinit (system_sparsity);
@@ -347,12 +355,12 @@ void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
   solution.reinit (dof->DoFHandler<dim>::n_dofs());
   
 				   // create assembler
-  AssemblerData<dim> data (*dof,
-			   true, true, //assemble matrix and rhs
-			   system_matrix,
-			   right_hand_side,
-			   quadrature,
-			   update_flags);
+  Assembler<dim>::AssemblerData data (*dof,
+				      true, true, //assemble matrix and rhs
+				      system_matrix,
+				      right_hand_side,
+				      quadrature,
+				      update_flags);
   active_assemble_iterator assembler (tria,
 				      tria->begin_active()->level(),
 				      tria->begin_active()->index(),
@@ -416,13 +424,11 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   cout << ">" << endl;
   
   cout << "    Making grid... ";
-  tria->create_hyper_ball ();
-  HyperBallBoundary<dim> boundary_description;
-  tria->set_boundary (&boundary_description);
+  tria->create_hypercube ();
+  tria->refine_global (level+1);
   tria->begin_active()->set_refine_flag();
   (++(++(tria->begin_active())))->set_refine_flag();
   tria->execute_coarsening_and_refinement ();
-  tria->refine_global (level);
   cout << tria->n_active_cells() << " active cells." << endl;
 
   rhs             = new RHSPoly<dim>();
@@ -575,11 +581,14 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   
   cout << endl;
 
+  const unsigned int n_dofs = dof->DoFHandler<dim>::n_dofs();
+  dof->clear ();
+  tria->set_boundary (0);
   delete fe;
   delete quadrature;
   delete boundary_quadrature;
   
-  return dof->DoFHandler<dim>::n_dofs();
+  return n_dofs;
 };
 
 

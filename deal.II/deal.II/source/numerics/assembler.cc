@@ -47,13 +47,13 @@ void Equation<dim>::assemble (Vector<double>           &,
 
 
 template <int dim>
-AssemblerData<dim>::AssemblerData (const DoFHandler<dim>    &dof,
-				   const bool                assemble_matrix,
-				   const bool                assemble_rhs,
-				   SparseMatrix<double>     &matrix,
-				   Vector<double>           &rhs_vector,
-				   const Quadrature<dim>    &quadrature,
-				   const UpdateFlags        &update_flags) :
+Assembler<dim>::AssemblerData::AssemblerData (const DoFHandler<dim>    &dof,
+					      const bool                assemble_matrix,
+					      const bool                assemble_rhs,
+					      SparseMatrix<double>     &matrix,
+					      Vector<double>           &rhs_vector,
+					      const Quadrature<dim>    &quadrature,
+					      const UpdateFlags        &update_flags) :
 		dof(dof),
 		assemble_matrix(assemble_matrix),
 		assemble_rhs(assemble_rhs),
@@ -67,10 +67,10 @@ AssemblerData<dim>::AssemblerData (const DoFHandler<dim>    &dof,
 
 
 template <int dim>
-Assembler<dim>::Assembler (Triangulation<dim> *tria,
-			   const int           level,
-			   const int           index,
-			   const AssemblerData<dim> *local_data) :
+Assembler<dim>::Assembler (Triangulation<dim>  *tria,
+			   const int            level,
+			   const int            index,
+			   const AssemblerData *local_data) :
 		DoFCellAccessor<dim> (tria,level,index, &local_data->dof),
 		cell_matrix (dof_handler->get_fe().total_dofs),
 		cell_vector (Vector<double>(dof_handler->get_fe().total_dofs)),
@@ -148,7 +148,6 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 // explicit instantiations
 template class Equation<deal_II_dimension>;
 template class Assembler<deal_II_dimension>;
-template class AssemblerData<deal_II_dimension>;
 
 template class TriaRawIterator<deal_II_dimension,Assembler<deal_II_dimension> >;
 template class TriaIterator<deal_II_dimension,Assembler<deal_II_dimension> >;

@@ -1576,7 +1576,8 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
   if (use_constraints) 
     {
       ConstraintMatrix constraints;
-      make_constraint_matrix (constraints);
+      make_hanging_node_constraints (constraints);
+      constraints.close ();
       constraints.condense (sparsity);
     };
     
@@ -1920,10 +1921,7 @@ void DoFHandler<3>::renumber_dofs (const vector<int> &new_numbers) {
 #if deal_II_dimension == 1
 
 template <>
-void DoFHandler<1>::make_constraint_matrix (ConstraintMatrix &cm) const {
-  cm.clear ();
-  cm.close ();
-};
+void DoFHandler<1>::make_hanging_node_constraints (ConstraintMatrix &) const {};
 
 #endif
 
@@ -1932,11 +1930,9 @@ void DoFHandler<1>::make_constraint_matrix (ConstraintMatrix &cm) const {
 #if deal_II_dimension == 2
 
 template <>
-void DoFHandler<2>::make_constraint_matrix (ConstraintMatrix &constraints) const {
+void DoFHandler<2>::make_hanging_node_constraints (ConstraintMatrix &constraints) const {
   const unsigned int dim = 2;
   
-  constraints.clear ();
-
 				   // first mark all faces which are subject
 				   // to constraints. We do so by looping
 				   // over all active cells and checking
@@ -2013,8 +2009,6 @@ void DoFHandler<2>::make_constraint_matrix (ConstraintMatrix &constraints) const
 				     selected_fe->constraints()(row,i));
 	  };
       };
-
-  constraints.close ();
 };
 
 #endif
@@ -2024,11 +2018,9 @@ void DoFHandler<2>::make_constraint_matrix (ConstraintMatrix &constraints) const
 #if deal_II_dimension == 3
 
 template <>
-void DoFHandler<3>::make_constraint_matrix (ConstraintMatrix &constraints) const {
+void DoFHandler<3>::make_hanging_node_constraints (ConstraintMatrix &constraints) const {
   const unsigned int dim = 3;
   
-  constraints.clear ();
-
 				   // first mark all faces which are subject
 				   // to constraints. We do so by looping
 				   // over all active cells and checking
@@ -2170,8 +2162,6 @@ void DoFHandler<3>::make_constraint_matrix (ConstraintMatrix &constraints) const
 				     selected_fe->constraints()(row,i));
 	  };
       };
-
-  constraints.close ();
 };
 
 #endif

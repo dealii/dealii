@@ -28,10 +28,10 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
   UpdateFlags update_flags = update_JxW_values;
   if (a != 0)
     update_flags = UpdateFlags (update_flags | update_q_points);
-  const AssemblerData<dim> data (dof,
-				 true, false,  // assemble matrix but not rhs
-				 matrix, dummy,
-				 q, update_flags);
+  const Assembler<dim>::AssemblerData data (dof,
+					    true, false,  // assemble matrix but not rhs
+					    matrix, dummy,
+					    q, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
@@ -57,10 +57,10 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Function<dim> * const a) {
   UpdateFlags update_flags = UpdateFlags(update_q_points |
 					 update_JxW_values);
-  const AssemblerData<dim> data (dof,
-				 true, true,
-				 matrix, rhs_vector,
-				 q, update_flags);
+  const Assembler<dim>::AssemblerData data (dof,
+					    true, true,
+					    matrix, rhs_vector,
+					    q, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
@@ -323,10 +323,10 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 					 update_JxW_values);
   if (a != 0)
     update_flags = UpdateFlags(update_flags | update_q_points);
-  const AssemblerData<dim> data (dof,
-				 true, false,  // assemble matrix but not rhs
-				 matrix, dummy,
-				 q, update_flags);
+  const Assembler<dim>::AssemblerData data (dof,
+					    true, false,  // assemble matrix but not rhs
+					    matrix, dummy,
+					    q, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
@@ -352,10 +352,10 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
   UpdateFlags update_flags = UpdateFlags(update_q_points  |
 					 update_gradients |
 					 update_JxW_values);
-  const AssemblerData<dim> data (dof,
-				 true, true,
-				 matrix, rhs_vector,
-				 q, update_flags);
+  const Assembler<dim>::AssemblerData data (dof,
+					    true, true,
+					    matrix, rhs_vector,
+					    q, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),

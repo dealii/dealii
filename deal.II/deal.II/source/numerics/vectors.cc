@@ -220,10 +220,10 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
   UpdateFlags update_flags = UpdateFlags(update_q_points |
 					 update_JxW_values);
   SparseMatrix<double> dummy;
-  const AssemblerData<dim> data (dof,
-				 false, true,
-				 dummy, rhs_vector,
-				 quadrature, update_flags);
+  const Assembler<dim>::AssemblerData data (dof,
+					    false, true,
+					    dummy, rhs_vector,
+					    quadrature, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
@@ -360,7 +360,7 @@ void
 VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 					   const FunctionMap        &boundary_functions,
 					   const Quadrature<dim-1>  &q,
-					   map<int,double>   &boundary_values) {
+					   map<int,double>          &boundary_values) {
   vector<int>    dof_to_boundary_mapping;
   dof.map_dof_to_boundary_indices (boundary_functions, dof_to_boundary_mapping);
   

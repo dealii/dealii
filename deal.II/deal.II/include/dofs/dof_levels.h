@@ -52,7 +52,8 @@ class DoFLevel {
  * $\ldots, u_1^m, u_2^m, u_1^{m+1}, u_2^{m+1},\ldots$ with $m$ denoting the
  * $m$th basis function, or $\ldots, u_1^m, u_1^{m+1}, u_1^{m+2}, \ldots,
  * u_2^m, u_2^{m+1}, u_2^{m+2}, \ldots$, respectively). Likewise, the
- * constraint matrix returned by #DoFHandler::make_constraint_matrix ()# is then
+ * constraint matrix returned by #DoFHandler::make_hanging_node_constraints ()#
+ * is then
  * to be understood as a block matrix.
  *
  * The storage format of the degrees of freedom indices (short: DoF indices) is
