@@ -25,7 +25,7 @@
 #include <lac/sparse_ilu.h>
 #include <lac/vector.h>
 
-
+//TODO:[WB] find test that is less sensitive to floating point accuracy
 
 int main()
 {
