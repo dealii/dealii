@@ -58,6 +58,18 @@ int main(int, char)
 	      else
 		deallog << "   false";
 	      deallog << endl;
+
+					       // now also check
+					       // whether the other
+					       // @p{value} function
+					       // returns the same
+					       // result
+	      if (polynom.value(x) != values[0])
+		{
+		  deallog << "The two `value' functions return different results!"
+			  << endl;
+		  abort ();
+		};
 	    }
 	}
     }
