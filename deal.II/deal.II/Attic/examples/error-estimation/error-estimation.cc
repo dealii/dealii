@@ -547,7 +547,29 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       cout << endl << endl;
       ++refine_step;
     };
+
+  String filename = prm.get ("Output base filename");
+  switch (refine_mode) 
+    {
+      case global:
+	    filename += "global.";
+	    break;
+      case true_error:
+	    filename += "true_error.";
+	    break;
+      case error_estimator:
+	    filename += "estimated_error.";
+	    break;
+    };
+
+  cout << endl;
   
+  filename += "finest_mesh.gnuplot";
+  cout << "    Wrinting finest grid to <" << filename << ">... " << endl;
+  ofstream finest_mesh (filename);
+  tria->print_gnuplot (finest_mesh);
+  finest_mesh.close();
+
   print_history (prm, refine_mode);
   cout << endl << endl << endl;
 

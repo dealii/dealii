@@ -2,6 +2,6 @@ set Test case            = Singular
 set Initial refinement   = 1
 set Refinement criterion = { global | estimated error }
 set Refinement fraction  = 0.1
-set Maximum cells        = 10000
+set Maximum cells        = 100000
 set Output base filename = data-singular/
 set Output format        = ucd

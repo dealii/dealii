@@ -2,6 +2,6 @@ set Test case            = Gauss shape
 set Initial refinement   = 2
 set Refinement criterion = { global | true error | estimated error }
 set Refinement fraction  = 0.3
-set Maximum cells        = 3000
+set Maximum cells        = 10000
 set Output base filename = data-gauss/
 set Output format        = ucd

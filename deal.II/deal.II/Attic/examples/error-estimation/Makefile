@@ -23,9 +23,12 @@ run-parameters  = ee.gauss.prm
 
 # To execute additional action apart from running the program, fill
 # in this list:
-additional-run-action = $(target) ee.singular.prm ; \
-                        gnuplot make_ps ; \
-                        perl -pi -e 's/^\#.*$$\\${}n//g' data-*/*.inp
+run-action=\
+	$(target) ee.gauss.prm; \
+	$(target) ee.singular.prm; \
+	$(target) ee.kink.prm; \
+	gnuplot make_ps; \
+	perl -pi -e 's/^\#.*$$\\${}n//g' data-*/*.inp
 
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the
@@ -89,11 +92,8 @@ $(target) : $(libraries)
 	@echo ============================ Linking $@
 	@$(CXX) $(flags) -o $@ $(libraries) -lg++ $(user-libs)
 
-# rule how to run the program
 run: $(target)
-	$(target) $(run-parameters)
-	$(additional-run-action)
-
+	$(run-action)
 
 # rule to make object files
 %.go : %.cc
