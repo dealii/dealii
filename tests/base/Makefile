@@ -34,12 +34,15 @@ tensor.exe         : tensor.g.$(OBJEXT)                             $(libraries)
 timer.exe          : timer.g.$(OBJEXT)                              $(libraries)
 threads.exe        : threads.g.$(OBJEXT)                            $(libraries)
 auto_derivative_function.exe : auto_derivative_function.g.$(OBJEXT) $(libraries)
-
+anisotropic_1.exe  : anisotropic_1.g.$(OBJEXT)                      $(lib-base.g)
+anisotropic_2.exe  : anisotropic_2.g.$(OBJEXT)                      $(lib-base.g)
+hierarchical.exe   : hierarchical.g.$(OBJEXT)                       $(lib-base.g)
 
 tests = $(sort \
           logtest reference quadrature_test table tensor \
           timer threads polynomial1d polynomial_test \
-	  auto_derivative_function)
+	  auto_derivative_function anisotropic_1 anisotropic_2 \
+          hierarchical)
 
 ############################################################
 
