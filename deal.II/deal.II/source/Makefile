@@ -39,10 +39,10 @@ CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -Ddeal_II_dimension=$(deal_II_dimension)
 
 %.go :
-	@echo ============================ Compiling with debugging information:   $<
+	@echo ==============$(deal_II_dimension)d======debug============= $<
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 %.o :
-	@echo ============================ Compiling with optimization:   $<
+	@echo ==============$(deal_II_dimension)d======optimized========= $<
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
