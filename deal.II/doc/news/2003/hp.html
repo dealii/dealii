@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
+   "http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+  <head>
+    <link href="../../screen.css" rel="StyleSheet" media="screen">
+    <link href="../../print.css" rel="StyleSheet" media="print">
+    <title>The deal.II news page</title>
+    <meta name="author" content="the deal.II authors <authors@dealii.org>">
+    <meta name="keywords" content="deal.II"></head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<body>
+
+
+<h2>Changes on the hp branch</h2>
+
+<p>
+This is the list of changes made on the hp branch; this list will be merged
+back into the main document listing changes once the hp branch is merged as
+well. Since the hp branch only exists in the deal.II subdirectory, only this
+category exists below.
+</p>
+
+<p>
+All entries are signed with the names of the author. Regular
+contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
+(Guido Kanschat), RH (Ralf Hartmann).
+</p>
+
+
+<a name="deal.II"></a>
+<h3>deal.II</h3>
+
+<ol>
+  <li> <p> 
+       Changed: There are now overloaded versions of the <code
+       class="member">FEValues::reinit</code> function (and likewise in the
+       <code class="class">FEFaceValues</code> and <code
+       class="class">FESubFaceValues</code> classes) that either take a
+       <code class="member">Triangulation::cell_iterator</code> or a
+       <code class="member">DoFHandler::cell_iterator</code>. That means that
+       you can compute certain data with only the geometrical information the
+       former provides, independent of whether degrees of freedom are
+       associated with this cell or not. However, certain functions of the
+       <code class="class">FEValues</code> class will throw an error if you
+       attempt to use them without DoF data being delivered in the
+       reinitialization call; these functions need to extract values from
+       finite element fields, and are mostly the
+       <code
+       class="member">FEValues::get_function_values/grads/2nd_derivatives</code>
+       functions.
+       <br>
+       (WB 2003/01/20)
+       </p>
+
+  <li> <p> 
+       Changed: The <code
+       class="member">Mapping::transform_real_to_unit_cell</code> and
+       <code class="member">Mapping::transform_unit_to_real_cell</code>
+       now only take a <code class="member">Triangulation::cell_iterator</code>
+       instead of a <code class="member">DoFHandler::cell_iterator</code> as
+       previously. This is also reasonable, since they only need the geometric
+       information.
+       <br>
+       (WB 2003/01/20)
+       </p>
+
+  <li> <p> 
+       Changed: The <code class="member">FiniteElement::fill_fe_*_values</code>
+       now only take a <code class="member">Triangulation::cell_iterator</code>
+       instead of a <code class="member">DoFHandler::cell_iterator</code> as
+       previously. Likewise for <code
+       class="member">FiniteElementBase::compute_2nd</code> and <code
+       class="member">FESystem::compute_fill</code>, and the 
+       <code class="member">Mapping::fill_fe_*_values</code> functions.
+       <br>
+       (WB 2003/01/20)
+       </p>
+</ol>
+
+<hr>
+Last update $Date$
+
+</body>
+</html>
