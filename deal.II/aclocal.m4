@@ -269,3 +269,35 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
     fi
   fi
 )      
+
+
+
+dnl On some systems (well, DEC Alphas are the only ones we know of),
+dnl gcc2.95 throws the hands in the air if it sees one of the AssertThrow
+dnl calls, and dies with an internal compiler error. If this is the case,
+dnl we disable AssertThrow and simply replace it with an `abort' if the
+dnl condition is not satisfied.
+dnl
+dnl Usage: DEAL_II_CHECK_ASSERT_THROW("description of options set",
+dnl                                   "compiler options set",
+dnl                                   action if compiler crashes)
+dnl
+AC_DEFUN(DEAL_II_CHECK_ASSERT_THROW, dnl
+  AC_MSG_CHECKING(whether AssertThrow works with $1 flags)
+  AC_REQUIRE([AC_LANG_CPLUSPLUS])
+  CXXFLAGS=$2
+  AC_TRY_COMPILE(
+    [
+#include "base/include/base/exceptions.h"
+    ],
+    [
+	AssertThrow (false, ExcInternalError());
+    ],
+    [
+	AC_MSG_RESULT("yes")
+    ],
+    [
+	AC_MSG_RESULT("no")
+	$3
+    ])
+)

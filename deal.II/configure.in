@@ -223,6 +223,17 @@ AC_SUBST(CXXFLAGSO)
 
 
 
+dnl On some systems (well, DEC Alphas are the only ones we know of),
+dnl gcc2.95 throws the hands in the air if it sees one of the AssertThrow
+dnl calls, and dies with an internal compiler error. If this is the case,
+dnl we disable AssertThrow and simply replace it with an `abort' if the
+dnl condition is not satisfied. Check this for debug and optimized mode
+dnl compiler flags, and define `DISABLE_ASSERT_THROW' if necessary.
+DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG, CXXFLAGSG="-DDISABLE_ASSERT_THROW $CXXFLAGSG")
+DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO, CXXFLAGSO="-DDISABLE_ASSERT_THROW $CXXFLAGSO")
+
+
+
 
 dnl -------------------------------------------------------------
 dnl Multithreading
