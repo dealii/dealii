@@ -39,6 +39,8 @@ Replace function objects by mem_fun, fun_ptr, ... when member function
 implement ProblemBase::distribute_cell_to_dof_vector
 
 
+Remove gcc2.8 workaround with DoFSubstructAccessor
+
 
 
 

@@ -298,9 +298,29 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 
 /**
   Intermediate, "typedef"-class, not for public use.
+
+  Rationale for the declaration of members for this class: gcc 2.8 has a bug
+  when deriving from explicitely specialized classes which materializes in
+  the calculation of wrong addresses of member variables. By declaring the
+  general template of #DoFSubstructAccessor# to have the same object layout as
+  the specialized versions (using the same base classes), we fool the compiler,
+  which still looks in the wrong place for the addresses but finds the
+  right information. This way, at least ot works.
+
+  Insert a guard, however, in the constructor to avoid that anyone (including
+  the compiler) happens to use this class.
   */
 template <int dim>
-class DoFSubstructAccessor;
+class DoFSubstructAccessor : public DoFAccessor<dim>,
+			     public TriaAccessor<dim> {
+  public:
+    DoFSubstructAccessor () {
+      Assert (false, ExcInternalError());
+    };
+
+    DeclException0 (ExcInternalError);
+};
+
 
 
 
