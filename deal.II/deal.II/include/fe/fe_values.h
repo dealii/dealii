@@ -488,6 +488,14 @@ class FEValuesBase
     const vector<double> & get_JxW_values () const;
 
 				     /**
+				      * Return a constant reference to the
+				      * selected finite element object. This
+				      * function is inline, so it should
+				      * be reasonably fast.
+				      */
+    const FiniteElement<dim> & get_fe () const;
+
+				     /**
 				      * Exception
 				      */
     DeclException2 (ExcInvalidIndex,
@@ -1280,6 +1288,13 @@ FEValuesBase<dim>::get_JxW_values () const {
 };
 
 
+
+template <int dim>
+inline
+const FiniteElement<dim> & 
+FEValuesBase<dim>::get_fe () const {
+  return *fe;
+};
 
 
 /*------------------------ Inline functions: FEFaceValuesBase --------------------*/
