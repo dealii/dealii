@@ -42,8 +42,15 @@
  * ..., P<sub>1</sub>(x)P<sub>2</sub>(y),
  * P<sub>2</sub>(x)P<sub>2</sub>(y), P<sub>3</sub>(x)P<sub>2</sub>(y),
  * ...</i> and likewise in 3d.
+ *
+ * The @ref{output_indices} function prints the ordering of the
+ * dim-dimensional polynomials, i.e. for each polynomial in the
+ * polynomial space it gives the indices i,j,k of the one-dimensional
+ * polynomials in x,y and z direction. The ordering of the
+ * dim-dimensional polynomials can be changed by using the
+ * @p{set_renumbering} function. 
  * 
- * @author Ralf Hartmann, Guido Kanschat, 2000, Wolfgang Bangerth 2003
+ * @author Ralf Hartmann, 2000, 2004, Guido Kanschat, 2000, Wolfgang Bangerth 2003
  */
 template <int dim>
 class TensorProductPolynomials
@@ -60,6 +67,33 @@ class TensorProductPolynomials
 				      */
     template <class Pol>
     TensorProductPolynomials (const std::vector<Pol> &pols);
+    
+				     /**
+				      * Prints the list of the indices
+				      * to <tt>out</tt>.
+				      */
+    void output_indices(std::ostream &out) const;
+
+				     /**
+				      * Sets the ordering of the
+				      * polynomials. Requires
+				      * <tt>renumber.size()==n()</tt>.
+				      * Stores a copy of
+				      * <tt>renumber</tt>.
+				      */
+    void set_renumbering(const std::vector<unsigned int> &renumber);
+
+				     /**
+				      * Gives read access to the
+				      * renumbering vector.
+				      */
+    const std::vector<unsigned int> &get_renumbering() const;
+
+				     /**
+				      * Gives read access to the
+				      * inverse renumbering vector.
+				      */
+    const std::vector<unsigned int> &get_renumbering_inverse() const;
 
 				     /**
 				      * Computes the value and the
@@ -200,6 +234,18 @@ class TensorProductPolynomials
 				      */
     unsigned int n_tensor_pols;
 
+				     /**
+				      * Index map for reordering the
+				      * polynomials.
+				      */
+    std::vector<unsigned int> index_map;
+
+				     /**
+				      * Index map for reordering the
+				      * polynomials.
+				      */
+    std::vector<unsigned int> index_map_inverse;
+
                                      /**
                                       * Each tensor product polynomial
                                       * <i>i</i> is a product of
@@ -223,7 +269,27 @@ class TensorProductPolynomials
     unsigned int x_to_the_dim (const unsigned int x);
 };
 
+/// @if NoDoc
 
+template <int dim>
+inline
+const std::vector<unsigned int> &
+TensorProductPolynomials<dim>::get_renumbering() const
+{
+  return index_map;
+}
+
+
+template <int dim>
+inline
+const std::vector<unsigned int> &
+TensorProductPolynomials<dim>::get_renumbering_inverse() const
+{
+  return index_map_inverse;
+}
+
+
+/// @endif
 
 
 /**
@@ -480,8 +546,20 @@ TensorProductPolynomials<dim>::
 TensorProductPolynomials(const std::vector<Pol> &pols)
 		:
 		polynomials (pols.begin(), pols.end()),
-		n_tensor_pols(x_to_the_dim(pols.size()))
-{}
+		n_tensor_pols(x_to_the_dim(pols.size())),
+		index_map(n_tensor_pols),
+		index_map_inverse(n_tensor_pols)
+{
+				   // per default set this index map
+				   // to identity. This map can be
+				   // changed by the user through the
+				   // set_renumbering function
+  for (unsigned int i=0; i<n_tensor_pols; ++i)
+    {
+      index_map[i]=i;
+      index_map_inverse[i]=i;
+    }  
+}
 
 
 

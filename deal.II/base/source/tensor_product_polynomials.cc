@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,7 +27,7 @@ compute_index (const unsigned int i,
                unsigned int       (&indices)[1]) const
 {
   Assert (i<polynomials.size(), ExcInternalError());
-  indices[0] = i;
+  indices[0] = index_map[i];
 }
 
 
@@ -40,9 +40,10 @@ compute_index (const unsigned int i,
 {
   const unsigned int n_pols = polynomials.size();
   Assert (i<n_pols*n_pols, ExcInternalError());
+  const unsigned int n=index_map[i];
 
-  indices[0] = i % n_pols;
-  indices[1] = i / n_pols;
+  indices[0] = n % n_pols;
+  indices[1] = n / n_pols;
 }
 
 
@@ -55,10 +56,42 @@ compute_index (const unsigned int i,
 {
   const unsigned int n_pols = polynomials.size();
   Assert (i<n_pols*n_pols*n_pols, ExcInternalError());
+  const unsigned int n=index_map[i];
 
-  indices[0] = i % n_pols;
-  indices[1] = (i/n_pols) % n_pols;
-  indices[2] = i / (n_pols*n_pols);
+  indices[0] = n % n_pols;
+  indices[1] = (n/n_pols) % n_pols;
+  indices[2] = n / (n_pols*n_pols);
+}
+
+
+template <int dim>
+void
+TensorProductPolynomials<dim>::output_indices(std::ostream &out) const
+{
+  unsigned int ix[dim];
+  for (unsigned int i=0; i<n_tensor_pols; ++i)
+    {
+      compute_index(i,ix);
+      out << i << "\t";
+      for (unsigned int d=0; d<dim; ++d)
+	out << ix[d] << " ";
+      out << std::endl;
+    }
+}
+
+
+
+template <int dim>
+void
+TensorProductPolynomials<dim>::set_renumbering(
+  const std::vector<unsigned int> &renumber)
+{
+  Assert(renumber.size()==index_map.size(),
+	 ExcDimensionMismatch(renumber.size(), index_map.size()));
+
+  index_map=renumber;
+  for (unsigned int i=0; i<index_map.size(); ++i)
+    index_map_inverse[index_map[i]]=i;
 }
 
 
