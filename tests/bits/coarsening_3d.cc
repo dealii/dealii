@@ -42,6 +42,8 @@ int main ()
        c != coarse_grid.end(); ++c)
     c->set_coarsen_flag ();
   coarse_grid.execute_coarsening_and_refinement ();
+
+  deallog << "ok." << std::endl;
 }
 
   
