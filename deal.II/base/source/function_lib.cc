@@ -859,11 +859,13 @@ LSingularityFunction::gradient (const Point<2>   &p,
 
   if ((x>=0) && (y>=0))
     {
-//TODO: should return infinity, but how to do that?
-      static const double infty[2] = {0., 0.};
+				       // in this region, the gradient
+				       // does not exist, so return
+				       // infinity
+      static const double infty[2] = { atof("Inf"), atof("Inf") };
       return Tensor<1,2>(infty);
     }
-  
+
 //  double phi = atan2(y,-x)+M_PI;
 //  double r2 = x*x+y*y;
 
