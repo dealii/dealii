@@ -469,17 +469,10 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
             CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
           fi
 
-	  dnl For icc 7 and above, add this warning inhibition flag:
-          dnl #1572: `floating-point equality and inequality comparisons are 
-	  dnl        unreliable'
-	  dnl        (while true, this warning also triggers on comparisons
-	  dnl        with zero, or comparing two variables for which one is
-	  dnl        greater; there is about no way to write numeric code
-	  dnl        without triggering this warning many times over)
-          if test "x$GXX_VERSION" != "xintel_icc5" \
-	       -a "x$GXX_VERSION" != "xintel_icc6"; then
-	    CXXFLAGSG="$CXXFLAGSG -wd1572"
-	  fi
+	  dnl Some versions of icc on some platforms issue a lot of warnings
+	  dnl about the unreliability of floating point comparisons. Check 
+	  dnl whether we can switch that off
+	  DEAL_II_ICC_WD_1572
 
           dnl We would really like to use  -ansi -Xc, since that
 	  dnl is _very_ picky about standard C++, and is thus very efficient
@@ -3426,6 +3419,37 @@ AC_DEFUN(DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT, dnl
   fi
 ])
 
+
+
+dnl -------------------------------------------------------------
+dnl Some versions of icc on some platforms issue a lot of warnings
+dnl about the unreliability of floating point comparisons. Check 
+dnl whether we can switch that off by checking whether the compiler
+dnl allows -wdXXXX for this warning:
+dnl #1572: `floating-point equality and inequality comparisons are 
+dnl        unreliable'
+dnl        (while true, this warning also triggers on comparisons
+dnl        with zero, or comparing two variables for which one is
+dnl        greater; there is about no way to write numeric code
+dnl        without triggering this warning many times over)
+dnl
+dnl Usage: DEAL_II_ICC_WD_1572
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_ICC_WD_1572, dnl
+[
+  AC_MSG_CHECKING(whether -wd1572 is allowed)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG -wd1572"
+  AC_TRY_COMPILE( [], [],
+      [
+        AC_MSG_RESULT(yes)
+	CXXFLAGSG="$CXXFLAGSG -wd1572"
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ])
+])
 
 
 dnl -------------------------------------------------------------
