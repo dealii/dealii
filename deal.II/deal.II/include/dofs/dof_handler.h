@@ -298,6 +298,24 @@ enum RenumberingMethod {
  * may be difficult, however, and in many cases will not justify the effort.
  *
  *
+ * \subsection{User defined renumbering schemes}
+ *
+ * The #renumber_dofs# function offers a fixed number of renumbering
+ * schemes like the Cuthill-McKey scheme. Basically, the function sets
+ * up an array in which for each degree of freedom the index is stored
+ * which is to be assigned by the renumbering. Using this array, the
+ * #renumber_dofs(vector<int>)# function is called, which actually
+ * does the change from old DoF indices to the ones given in the
+ * array. In some cases, however, a user may want to compute her own
+ * renumbering order; in this case, allocate an array with one element
+ * per degree of freedom and fill it with the number that the
+ * respective degree of freedom shall be assigned. This number may,
+ * for example, be obtained by sorting the support points of the
+ * degrees of freedom in downwind direction.  Then call the
+ * #renumber_dofs(vector<int>)# with the array, which converts old
+ * into new degree of freedom indices.
+ *
+ *
  * \subsection{Setting up sparsity patterns}
  *
  * When assembling system matrices, the entries are usually of the form
@@ -386,6 +404,10 @@ enum RenumberingMethod {
  *
  * \subsection{Data transfer between grids}
  *
+ * {\bf Note: The functionality described in this section has never been tested
+ * and is expected to be broken or at least incomplete. Contact the author if
+ * you need these functions for more information.}
+ *
  * The #DoFHandler# class offers two functions #make_transfer_matrix# which create
  * a matrix to transform the data of one grid to another. The functions assumes the
  * coarsest mesh of the two grids to be the same. However there are few ways to
@@ -436,8 +458,7 @@ enum RenumberingMethod {
  *
  *
  *
- * @author Wolfgang Bangerth, 1998
- */
+ * @author Wolfgang Bangerth, 1998 */
 template <int dim>
 class DoFHandler : public DoFDimensionInfo<dim> {
   public:
@@ -531,6 +552,27 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 			const bool use_constraints         = false,
 			const vector<int> &starting_points = vector<int>());
     
+				     /**
+				      * Actually do the renumbering based on
+				      * a list of new dof numbers for all the
+				      * dofs.
+				      *
+				      * #new_numbers# is an array of integers
+				      * with size equal to the number of dofs
+				      * on the present grid. It stores the new
+				      * indices after renumbering in the
+				      * order of the old indices.
+				      *
+				      * This function is called by the
+				      * #renumber_dofs# function after computing
+				      * the ordering of the degrees of freedom.
+				      * However, you can call this function
+				      * yourself, which is necessary if a user
+				      * wants to implement an ordering scheme
+				      * herself, for example downwind numbering.
+				      */
+    void renumber_dofs (const vector<int> &new_numbers);
+
 				     /**
 				      * Make up the constraint matrix which
 				      * is used to condensate the global
@@ -1321,6 +1363,13 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 		    int, int,
 		    << "The dimension " << arg1 << " of the vector is wrong. "
 		    << "It should be " << arg2);
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcNewNumbersNotConsecutive,
+		    int,
+		    << "The given list of new dof indices is not consecutive: "
+		    << "the index " << arg1 << " does not exist.");
 
   protected:
     
@@ -1374,20 +1423,6 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      */
     unsigned int distribute_dofs_on_cell (active_cell_iterator &cell,
 					  unsigned int next_free_dof);
-
-				     /**
-				      * Actually do the renumbering prepared
-				      * by the #renumber_dofs# function. Since
-				      * this is dimension specific, we
-				      * need to have another function.
-				      *
-				      * #new_numbers# is an array of integers
-				      * with size equal to the number of dofs
-				      * on the present grid. It stores the new
-				      * indices after renumbering in the
-				      * order of the old indices.
-				      */
-    void do_renumbering (const vector<int> &new_numbers);
 
 				     /**
 				      * Make up part of the sparsity pattern of

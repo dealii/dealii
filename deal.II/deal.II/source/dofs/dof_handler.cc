@@ -1200,15 +1200,29 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 				   // actually perform renumbering;
 				   // this is dimension specific and
 				   // thus needs an own function
-  do_renumbering (new_number);
+  renumber_dofs (new_number);
 };
+
 
 
 #if deal_II_dimension == 1
 
 template <>
-void DoFHandler<1>::do_renumbering (const vector<int> &new_numbers) {
+void DoFHandler<1>::renumber_dofs (const vector<int> &new_numbers) {
   Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
+#ifdef DEBUG
+				   // assert that the new indices are
+				   // consecutively numbered
+  if (true)
+    {
+      vector<int> tmp(new_numbers);
+      sort (tmp.begin(), tmp.end());
+      vector<int>::const_iterator p = tmp.begin();
+      int                         i = 0;
+      for (; p!=tmp.end(); ++p, ++i)
+	Assert (*p == i, ExcNewNumbersNotConsecutive(i));
+    };
+#endif
 
 				   // note that we can not use cell iterators
 				   // in this function since then we would
@@ -1241,8 +1255,21 @@ void DoFHandler<1>::do_renumbering (const vector<int> &new_numbers) {
 #if deal_II_dimension == 2
 
 template <>
-void DoFHandler<2>::do_renumbering (const vector<int> &new_numbers) {
+void DoFHandler<2>::renumber_dofs (const vector<int> &new_numbers) {
   Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
+#ifdef DEBUG
+				   // assert that the new indices are
+				   // consecutively numbered
+  if (true)
+    {
+      vector<int> tmp(new_numbers);
+      sort (tmp.begin(), tmp.end());
+      vector<int>::const_iterator p = tmp.begin();
+      int                         i = 0;
+      for (; p!=tmp.end(); ++p, ++i)
+	Assert (*p == i, ExcNewNumbersNotConsecutive(i));
+    };
+#endif
 
 				   // note that we can not use cell iterators
 				   // in this function since then we would
