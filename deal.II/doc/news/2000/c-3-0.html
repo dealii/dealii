@@ -144,6 +144,22 @@ documentation, etc</a>.
 <h3>base</h3>
 
 <ol>
+
+  <li> <p>
+       Improved: exceptions <code class="class">ExcIO</code> and <code
+       class="class">ExcOutOfMemory</code> are defined globally now.
+       <br>
+       (GK 2000/12/07)
+       </p>
+
+  <li> <p>
+       Improved: <code class="class">ParameterHandler</code> now has a
+       function <code class="member">log_parameters</code> which
+       allows output of all parameters to a log file.
+       <br>
+       (GK 2000/12/07)
+       </p>
+
   <li> <p>
        New: almost all classes that store data now have a function
        <code class="member">memory_consumption</code> that returns an
@@ -250,6 +266,33 @@ documentation, etc</a>.
 <h3>lac</h3>
 
 <ol>
+
+  <li> <p>
+       Improved: block classes have a variable number of blocks now,
+       not a template parameter.
+       <br>
+       (GK 2000/12/07)
+       </p>
+
+  <li> <p>
+       New: <code class="class">BlockDiagonalMatrix</code> is a
+       template that generates a matrix with multiple copies of the
+       same block on the diagonal.
+       <br>
+       (GK 2000/12/07)
+       </p>
+
+  <li> <p>
+
+       Improved: Krylov-space solvers do not use the function residual
+       anymore. This allows easier implementation of new matrix
+       classes. <code class="class">SolverGMRES</code> now also counts
+       the first iteration step. Finally, all solvers inherit a <code
+       class="class">Subscriptor</code>.
+       <br>
+       (GK 2000/12/07)
+       </p>
+
   <li> <p>
        New: There are now functions 
        <code class="member">SparsityPattern::symmetrize</code> and
