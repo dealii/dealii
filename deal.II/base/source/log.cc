@@ -32,6 +32,16 @@
 #  include <strstream>
 #endif
 
+
+// on SunOS 4.x, getrusage is stated in the man pages and exists, but
+// is not declared in resource.h. declare it ourselves
+#ifdef NO_HAVE_GETRUSAGE
+extern "C" { 
+  int getrusage(int who, struct rusage* ru);
+}
+#endif
+
+
 LogStream deallog;
 
 
