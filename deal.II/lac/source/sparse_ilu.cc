@@ -9,7 +9,6 @@
 //----------------------------  sparse_ilu.cc  ---------------------------
 
 
-#include <lac/sparse_ilu.h>
 #include <lac/sparse_ilu.templates.h>
 
 
