@@ -29,6 +29,7 @@ anna_4.exe              : anna_4.g.$(OBJEXT)               $(libraries)
 anna_5.exe              : anna_5.g.$(OBJEXT)               $(libraries)
 anna_6.exe              : anna_6.g.$(OBJEXT)               $(libraries)
 geometry_info_1.exe     : geometry_info_1.g.$(OBJEXT)      $(libraries)
+full_matrix_1.exe       : full_matrix_1.g.$(OBJEXT)        $(libraries)
 data_out_01.exe         : data_out_01.g.$(OBJEXT)          $(libraries)
 data_out_02.exe         : data_out_02.g.$(OBJEXT)          $(libraries)
 data_out_faces_01.exe   : data_out_faces_01.g.$(OBJEXT)    $(libraries)
@@ -105,6 +106,7 @@ cylinder.exe            : cylinder.g.$(OBJEXT)             $(libraries)
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	geometry_info_1 point_inside_1 point_inside_2 \
+	full_matrix_1 \
 	data_out_01 data_out_02 data_out_faces_01 data_out_faces_02 \
 	data_out_rotation_01 data_out_rotation_02 data_out_stack_01 \
 	dof_tools_00a \
