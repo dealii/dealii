@@ -563,7 +563,7 @@ MGDoFCellAccessor<2>::get_mg_dof_values (const Vector<double> &values,
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (dof_values.size() == dof_handler->get_fe().total_dofs,
 	  ExcVectorDoesNotMatch());
-  Assert (values.size() == dof_handler->n_dofs(),
+  Assert (values.size() == mg_dof_handler->n_dofs(present_level),
 	  ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
