@@ -346,8 +346,8 @@ dSMatrixStruct::bandwidth () const
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
       if (colnums[j]>=0) 
 	{
-	  if ((unsigned int)abs(i-colnums[j]) > b)
-	    b = abs(i-colnums[j]);
+	  if (static_cast<unsigned int>(abs(static_cast<int>(i-colnums[j]))) > b)
+	    b = abs(static_cast<int>(i-colnums[j]));
 	}
       else
 					 // leave if at the end of
