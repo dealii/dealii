@@ -1576,6 +1576,11 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      */
 				     /*@{*/
 				     /**
+				      *  Clear all user pointers.
+				      */
+    void clear_user_pointers ();
+
+    				     /**
 				      *  Clear all user flags.
 				      */
     void clear_user_flags ();

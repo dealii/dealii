@@ -948,6 +948,16 @@ void Triangulation<dim>::load_coarsen_flags (const vector<bool> &v) {
 #if deal_II_dimension == 1
 
 template <>
+void Triangulation<1>::clear_user_pointers () {
+  cell_iterator cell = begin(),
+		endc = end();
+  for (; cell!=endc; ++cell)
+    cell->clear_user_pointer ();
+};
+
+
+
+template <>
 void Triangulation<1>::clear_user_flags () {
   cell_iterator cell = begin(),
 		endc = end();
@@ -973,6 +983,21 @@ void Triangulation<1>::save_user_flags (vector<bool> &v) const {
 
 
 #if deal_II_dimension == 2
+
+template <>
+void Triangulation<2>::clear_user_pointers () {
+  line_iterator line = begin_line(),
+		endl = end_line();
+  for (; line!=endl; ++line)
+    line->clear_user_pointer ();
+
+  cell_iterator cell = begin(),
+		endc = end();
+  for (; cell!=endc; ++cell)
+    cell->clear_user_pointer ();
+};
+
+
 
 template <>
 void Triangulation<2>::clear_user_flags () {
