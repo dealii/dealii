@@ -1,0 +1,19 @@
+# $Id$
+# Makefile for the /contrib subdirectory
+
+
+# by default do nothing
+default:
+
+
+# targets for the kdoc package
+kdoc-install:
+	cd kdoc ; $(MAKE) install
+
+kdoc-clean:
+	cd kdoc ; $(MAKE) clean
+
+
+
+# generic targets
+clean: kdoc-clean

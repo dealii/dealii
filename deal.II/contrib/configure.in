@@ -32,6 +32,4 @@ dnl -------------------------------------------------------------
 dnl Output results
 dnl -------------------------------------------------------------
 
-dnl    At present there are no output files. nonetheless, autoconf
-dnl    requires this statement
-AC_OUTPUT()
+AC_OUTPUT(Makefile)
