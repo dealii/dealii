@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,45 +26,48 @@
  * square [0,1]x[0,1], etc.
  *
  * There are a number of derived classes, denoting concrete
- * integration formulae. Their names names prefixed by @p{Q}. By now,
- * there are several Newton-Cotes formulae, @ref{QMidpoint},
- * @ref{QTrapez} and @ref{QSimpson}, as well as N-point Gauss formulae
- * @p{QGaussN}. The names refer to the one-dimensional formulae. The
- * schemes for higher dimensions are tensor products of
- * these. Therefore, a three-dimensional @ref{QGauss5} formula has 125
- * quadrature points.
+ * integration formulae. Their names names prefixed by
+ * <tt>Q</tt>. Refer to the list of derived classes for more details.
  *
- * @sect2{Mathematical background}
- * For each quadrature formula we denote by @p{m}, the maximal degree of
- * polynomials integrated exactly. This number is given in the
- * documentation of each formula. The order of the integration error
- * is @p{m+1}, that is, the error is the size of the cell two the @p{m+1}
- * by the Bramble-Hilbert Lemma. The number @p{m} is to be found in the
- * documentation of each concrete formula. For the optimal formulae
- * @p{QGaussN} we have $m = 2N-1$. The tensor product formulae are
- * exact on tensor product polynomials of degree @p{m} in each space
- * direction, but they are still only of @p{m+1}st order.
+ * The schemes for higher dimensions are tensor products of the
+ * one-dimansional formulae. Therefore, a three-dimensional 5-point
+ * Gauss formula has 125 quadrature points.
  *
- * @sect2{Implementation details}
+ * @section QuadratureBlaBla Mathematical background
+ *
+ * For each quadrature formula we denote by <tt>m</tt>, the maximal
+ * degree of polynomials integrated exactly. This number is given in
+ * the documentation of each formula. The order of the integration
+ * error is <tt>m+1</tt>, that is, the error is the size of the cell
+ * two the <tt>m+1</tt> by the Bramble-Hilbert Lemma. The number
+ * <tt>m</tt> is to be found in the documentation of each concrete
+ * formula. For the optimal formulae QGauss we have $m = 2N-1$, where
+ * N is the constructor parameter to QGauss. The tensor product
+ * formulae are exact on tensor product polynomials of degree
+ * <tt>m</tt> in each space direction, but they are still only of
+ * <tt>m+1</tt>st order.
+ *
+ * @section QuadratureImpl Implementation details
+ *
  * Most integration formulae in more than one space dimension are
  * tensor products of quadrature formulae in one space dimension, or
- * more generally the tensor product of a formula in @p{(dim-1)}
+ * more generally the tensor product of a formula in <tt>(dim-1)</tt>
  * dimensions and one in one dimension. There is a special constructor
  * to generate a quadrature formula from two others.  For example, the
- * @p{QGauss2<dim>} formulae includes $2^dim$ quadrature points in @p{dim}
- * dimensions but is still exact for polynomials of degree 3 and its
- * order of integration is 4.
+ * QGauss@<dim@> formulae include <i>N<sup>dim</sup></i> quadrature
+ * points in <tt>dim</tt> dimensions, where N is the constructor
+ * parameter of QGauss.
  *
  * For some programs it is necessary to have a quadrature object for
  * faces.  These programs fail to link if compiled for only one space
  * dimension, since there quadrature rules for faces just don't make
  * no sense. In order to allow these programs to be linked anyway, for
- * class @p{Quadrature<0>} all functions are provided in the
- * @p{quadrature.cc} file, but they will throw exceptions if actually
+ * class Quadrature@<0@> all functions are provided in the
+ * <tt>quadrature.cc</tt> file, but they will throw exceptions if actually
  * called. The only function which is allowed to be called is the
  * constructor taking one integer, which in this case ignores its
  * parameter, and of course the destructor. Besides this, it is
- * necessary to provide a class @p{Point<0>} to make the compiler
+ * necessary to provide a class Point@<0@> to make the compiler
  * happy. This class also does nothing.
  *
  * @author Wolfgang Bangerth, 1998, 1999, 2000
@@ -99,9 +102,9 @@ class Quadrature : public Subscriptor
 				      * less than the present and a
 				      * formula in one dimension.
 				      *
-				      * @p{SubQuadrature<dim>::type}
+				      * <tt>SubQuadrature<dim>::type</tt>
 				      * expands to
-				      * @p{Quadrature<dim-1>}.
+				      * <tt>Quadrature<dim-1></tt>.
 				      */
     Quadrature (const SubQuadrature &,
 		const Quadrature<1> &);
@@ -149,7 +152,7 @@ class Quadrature : public Subscriptor
     virtual ~Quadrature ();
     
 				     /**
-				      * Return the @p{i}th quadrature
+				      * Return the <tt>i</tt>th quadrature
 				      * point.
 				      */
     const Point<dim> & point (const unsigned int i) const;
@@ -162,7 +165,7 @@ class Quadrature : public Subscriptor
     const std::vector<Point<dim> > & get_points () const;
     
 				     /**
-				      * Return the weight of the @p{i}th
+				      * Return the weight of the <tt>i</tt>th
 				      * quadrature point.
 				      */
     double weight (const unsigned int i) const;
@@ -205,16 +208,16 @@ class Quadrature : public Subscriptor
  * the respective iterated quadrature formula in one space dimension.
  *
  * In one space dimension, the given base formula is copied and scaled onto
- * a given number of subintervals of length @p{1/n_copies}. If the quadrature
+ * a given number of subintervals of length <tt>1/n_copies</tt>. If the quadrature
  * formula uses both end points of the unit interval, then in the interior
  * of the iterated quadrature formula there would be quadrature points which
  * are used twice; we merge them into one with a weight which is the sum
  * of the weights of the left- and the rightmost quadrature point.
  *
  * Since all dimensions higher than one are built up by tensor products of
- * one dimensional and @p{dim-1} dimensional quadrature formulae, the
+ * one dimensional and <tt>dim-1</tt> dimensional quadrature formulae, the
  * argument given to the constructor needs to be a quadrature formula in
- * one space dimension, rather than in @p{dim} dimensions.
+ * one space dimension, rather than in <tt>dim</tt> dimensions.
  *
  * The aim of this class is to provide a
  * low order formula, where the error constant can be tuned by
@@ -229,7 +232,7 @@ class QIterated : public Quadrature<dim>
   public:
 				     /**
 				      * Constructor. Iterate the given
-				      * quadrature formula @p{n_copies} times in
+				      * quadrature formula <tt>n_copies</tt> times in
 				      * each direction.
 				      */
     QIterated (const Quadrature<1> &base_quadrature,
@@ -270,9 +273,9 @@ class QIterated : public Quadrature<dim>
  *  points on the unit cell from a quadrature object for a manifold of
  *  one dimension less than that of the cell and the number of the face.
  *  For example, giving the Simpson rule in one dimension and using the
- *  @p{project_to_face} function with face number 1, the returned points will
- *  be $(1,0)$, $(1,0.5)$ and $(1,1)$. Note that faces have an orientation,
- *  so when projecting to face 3, you will get $(0,0)$, $(0,0.5)$ and $(0,1)$,
+ *  project_to_face() function with face number 1, the returned points will
+ *  be (1,0), (1,0.5) and (1,1). Note that faces have an orientation,
+ *  so when projecting to face 3, you will get (0,0), (0,0.5) and (0,1),
  *  which is in clockwise sense, while for face 1 the points were in
  *  counterclockwise sense.
  *
@@ -282,29 +285,29 @@ class QIterated : public Quadrature<dim>
  *  with the orientation of the face.
  *
  *  The second set of functions generates a quadrature formula by
- *  projecting a given quadrature rule on @em{all} faces and
- *  subfaces. This is used in the @ref{FEFaceValues} and
- *  @ref{FESubfaceValues} classes. Since we now have the quadrature
+ *  projecting a given quadrature rule on <b>all</b> faces and
+ *  subfaces. This is used in the FEFaceValues and
+ *  FESubfaceValues classes. Since we now have the quadrature
  *  points of all faces and subfaces in one array, we need to have a
  *  way to find the starting index of the points and weights
  *  corresponding to one face or subface within this array. This is
- *  done through the @ref{DataSetDescriptor} member class.
+ *  done through the DataSetDescriptor member class.
  *  
  *  The different functions are grouped into a common class to avoid
  *  putting them into global namespace. However, since they have no
- *  local data, all functions are declared @p{static} and can be
+ *  local data, all functions are declared <tt>static</tt> and can be
  *  called without creating an object of this class.
  *
  *  For the 3d case, you should note that the orientation of faces is
  *  even more intricate than for two dimensions. Quadrature formulae
  *  are projected upon the faces in their standard orientation, not to
  *  the inside or outside of the hexahedron. Refer to the
- *  documentation of the @p{Triangulation} class for a description of
+ *  documentation of the <tt>Triangulation</tt> class for a description of
  *  the orientation of the different faces. To make things more
  *  complicated, in 3d we allow faces in two orientations (which can
- *  be identified using @p{cell->face_orientation(face)}), so we have
+ *  be identified using <tt>cell->face_orientation(face)</tt>), so we have
  *  to project quadrature formula onto faces and subfaces in two
- *  orientations. The @ref{DataSetDescriptor} member class is used to
+ *  orientations. The DataSetDescriptor member class is used to
  *  identify where each dataset starts.
  *
  *  @author Wolfgang Bangerth, 1998, 1999, 2003
@@ -326,7 +329,7 @@ class QProjector
 				      * Compute the quadrature points
 				      * on the cell if the given
 				      * quadrature formula is used on
-				      * face @p{face_no}. For further
+				      * face <tt>face_no</tt>. For further
 				      * details, see the general doc
 				      * for this class.
 				      */
@@ -338,8 +341,8 @@ class QProjector
 				      * Compute the quadrature points
 				      * on the cell if the given
 				      * quadrature formula is used on
-				      * face @p{face_no}, subface
-				      * number @p{subface_no}. For
+				      * face <tt>face_no</tt>, subface
+				      * number <tt>subface_no</tt>. For
 				      * further details, see the
 				      * general doc for this class.
 				      */
@@ -406,8 +409,8 @@ class QProjector
 				      * quadrature formula now only
 				      * extends over a fraction of the
 				      * cell, the weights of the
-				      * resulting object are scaled by
-				      * @p{1./GeometryInfo<dim>::children_per_cell}.
+				      * resulting object are divided by
+				      * GeometryInfo@<dim@>::children_per_cell.
 				      */
     static
     Quadrature<dim>
@@ -416,8 +419,8 @@ class QProjector
 
                                      /**
                                       * Since the
-                                      * @p{project_to_all_faces} and
-                                      * @p{project_to_all_subfaces}
+                                      * project_to_all_faces() and
+                                      * project_to_all_subfaces()
                                       * functions chain together the
                                       * quadrature points and weights
                                       * of all projections of a face
@@ -473,7 +476,7 @@ class QProjector
                                           * with the given face
                                           * orientation. This function
                                           * of course is only allowed
-                                          * if @p{dim>=2}, and the
+                                          * if <tt>dim>=2</tt>, and the
                                           * face orientation is
                                           * ignored if the space
                                           * dimension equals 2.
@@ -500,7 +503,7 @@ class QProjector
                                           * cell with the given face
                                           * orientation. This function
                                           * of course is only allowed
-                                          * if @p{dim>=2}, and the
+                                          * if <tt>dim>=2</tt>, and the
                                           * face orientation is
                                           * ignored if the space
                                           * dimension equals 2.
@@ -572,7 +575,7 @@ class QProjector
     static Quadrature<2> reflect (const Quadrature<2> &q);
 };
 
-
+/// @if NoDoc
 
 /* -------------- declaration of explicit specializations ------------- */
 
@@ -649,5 +652,6 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 			 const unsigned int   n_copies);
 
 
+/// @endif
 
 #endif
