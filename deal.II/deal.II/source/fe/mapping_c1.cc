@@ -189,8 +189,8 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 
 template <int dim>
 void
-MappingC1<dim>::add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
-					 typename std::vector<Point<dim> > &a) const
+MappingC1<dim>::add_line_support_points (const typename Triangulation<dim>::cell_iterator &,
+					 typename std::vector<Point<dim> > &) const
 {
   Assert (false, ExcNotImplemented());
 };
