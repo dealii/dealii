@@ -148,10 +148,19 @@ class SparseVanka
 				      * preconditioning are used. This
 				      * may lead to different results,
 				      * obviously, of #M# changes.
+				      *
+				      * The parameter #n_threads#
+				      * determines how many threads
+				      * shall be used in parallel when
+				      * building the inverses of the
+				      * diagonal blocks. This
+				      * parameter is ignored if not in
+				      * multithreaded mode.
 				      */
     SparseVanka(const SparseMatrix<number> &M,
 		const vector<bool>         &selected,
-		const bool                  conserve_memory = false);
+		const bool                  conserve_memory = false,
+		const unsigned int          n_threads       = 1);
     
 				     /**
 				      * Destructor.
@@ -189,7 +198,15 @@ class SparseVanka
 				     /**
 				      * Conserve memory flag.
 				      */
-    bool conserve_mem;
+    const bool conserve_mem;
+
+				     /**
+				      * Number of threads to be used
+				      * when building the
+				      * inverses. Only relevant in
+				      * multithread mode.
+				      */
+    const unsigned int n_threads;
     
 				     /**
 				      * Array of inverse matrices,

@@ -18,12 +18,14 @@
 template<typename number>
 SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 				 const vector<bool>         &selected,
-				 const bool                  conserve_mem)
+				 const bool                  conserve_mem,
+				 const unsigned int          n_threads)
 		:
-		matrix(&M),
-		selected(selected),
-		conserve_mem(conserve_mem),
-		inverses(M.m(),0)
+		matrix (&M),
+		selected (selected),
+		n_threads (n_threads),
+		conserve_mem (conserve_mem),
+		inverses (M.m(), 0)
 {
   Assert (M.m() == M.n(),
 	  ExcMatrixNotSquare ());
@@ -52,7 +54,6 @@ void
 SparseVanka<number>::compute_inverses () 
 {
 #ifdef DEAL_II_USE_MT
-  const unsigned int n_threads  = 4;
   const unsigned int n_inverses = count (selected.begin(),
 					 selected.end(),
 					 true);
