@@ -117,6 +117,22 @@ namespace PETScWrappers
 
 
   void
+  MatrixBase::clear ()
+  {
+                                     // destroy the matrix...
+    int ierr = MatDestroy (matrix);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));    
+                                     // ...and replace it by an empty
+                                     // sequential matrix
+    const int m=0, n=0, n_nonzero_per_row=0;
+    ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
+                           0, &matrix);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+  
+
+
+  void
   MatrixBase::reinit ()
   {
     const int ierr = MatZeroEntries (matrix);

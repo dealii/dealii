@@ -309,6 +309,14 @@ namespace PETScWrappers
       virtual ~MatrixBase ();
       
                                        /**
+                                        * Release all memory and return
+                                        * to a state just like after
+                                        * having called the default
+                                        * constructor.
+                                        */
+      void clear ();
+
+                                       /**
                                         * Set all matrix entries to zero, but
                                         * retain the sparsity pattern and all
                                         * the other properties of the matrix.
