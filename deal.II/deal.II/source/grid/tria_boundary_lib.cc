@@ -45,27 +45,41 @@ CylinderBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>:
 };
 
 
-template <int dim>
-Point<dim>
-CylinderBoundary<dim>::
-get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+#if deal_II_dimension >=3
+
+template<>
+Point<3>
+CylinderBoundary<3>::
+get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 {
-  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
+  Point<3> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
   
 				   // project to boundary
-  if (dim>=3
-      && quad->vertex(0).square()-quad->vertex(0)(0)*quad->vertex(0)(0) >= radius*radius-1.e-12
+  if (quad->vertex(0).square()-quad->vertex(0)(0)*quad->vertex(0)(0) >= radius*radius-1.e-12
       && quad->vertex(1).square()-quad->vertex(1)(0)*quad->vertex(1)(0) >= radius*radius-1.e-12
       && quad->vertex(2).square()-quad->vertex(2)(0)*quad->vertex(2)(0) >= radius*radius-1.e-12
       && quad->vertex(3).square()-quad->vertex(3)(0)*quad->vertex(3)(0) >= radius*radius-1.e-12)
-      
+    
     {
       const double f = radius / std::sqrt(middle.square()-middle(0)*middle(0));
-      for (unsigned int i=1;i<dim;++i)
+      for (unsigned int i=1;i<3;++i)
 	middle(i) *= f;
     }
   return middle;
 };
+
+#endif
+
+
+template <int dim>
+Point<dim>
+CylinderBoundary<dim>::
+get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const
+{
+  Assert(false, Boundary<dim>::ExcFunctionNotUseful(dim));
+  return Point<dim>();
+}
+
 
 
 template <int dim>
