@@ -5,9 +5,9 @@ when a new release shall be issued:
     cvs tag all files with the tag Base-x-y
     cvs tag -r all files with the tag Branch-x-y
 
-- change the content of the `Version' file on both HEAD and branch
-
 - tell your friends to tag their programs
+
+- change the content of the `Version' file on both HEAD and branch
 
 - test the branch thoroughly
 
@@ -16,6 +16,9 @@ when a new release shall be issued:
 - adjust news.html. Crosslink changes file. If necessary link an
   announcement. Do these things on both HEAD and branch. Be sure to
   have the changes file on both HEAD and branch.
+
+- run `make validate-xrefs' on the branch to check that the changes
+  do not point to nirvana
 
 - cvs tag all files with Version-x-y-z
 
