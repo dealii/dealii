@@ -75,6 +75,18 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p> New: The classes <code
+       class="class">TableIndices&lt;N&gt;</code> and <code
+       class="class">Table&lt;N,T&gt;</code> are now implemented also
+       for <code>N=7</code>. The <code
+       class="class">Table&lt;N,T&gt;</code> class represents an
+       <code>N</code>-dimensional array and might replace the
+       N-times-nested-use of the <code
+       class="class">std::vector</code> class. 
+       <br>
+       (RH 2004/08/13)
+       </p>
+
   <li> <p>
        New: Class <code class="class">TableIndices</code> now has
        operators that check for equality and inequality of objects.
