@@ -180,11 +180,15 @@ namespace PETScWrappers
                                         *
                                         * The last argument takes a structure
                                         * with additional, solver dependent
-                                        * flags for tuning.
+                                        * flags for tuning. We specify the
+                                        * (default) value to the constructor
+                                        * call in this default argument
+                                        * because otherwise gcc 2.95 generates
+                                        * a compiler fault.
                                         */
       SolverRichardson (SolverControl        &cn,
                         MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
-                        const AdditionalData &data = AdditionalData());
+                        const AdditionalData &data = AdditionalData(1));
 
     protected:
                                        /**
@@ -422,11 +426,15 @@ namespace PETScWrappers
                                         *
                                         * The last argument takes a structure
                                         * with additional, solver dependent
-                                        * flags for tuning.
+                                        * flags for tuning. We specify the
+                                        * (default) value to the constructor
+                                        * call in this default argument
+                                        * because otherwise gcc 2.95 generates
+                                        * a compiler fault.
                                         */
       SolverGMRES (SolverControl        &cn,
                    MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
-                   const AdditionalData &data = AdditionalData());
+                   const AdditionalData &data = AdditionalData(30));
 
     protected:
                                        /**

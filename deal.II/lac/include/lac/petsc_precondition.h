@@ -177,9 +177,14 @@ namespace PETScWrappers
                                         * is used to form the preconditioner,
                                         * and additional flags if there are
                                         * any.
+                                        *
+                                        * We specify the (default) value to
+                                        * the constructor call in the default
+                                        * argument because otherwise gcc 2.95
+                                        * generates a compiler fault.
                                         */
       PreconditionSOR (const MatrixBase     &matrix,
-                       const AdditionalData &additional_data = AdditionalData());
+                       const AdditionalData &additional_data = AdditionalData(1));
       
     protected:
                                        /**
@@ -234,9 +239,14 @@ namespace PETScWrappers
                                         * is used to form the preconditioner,
                                         * and additional flags if there are
                                         * any.
+                                        *
+                                        * We specify the (default) value to
+                                        * the constructor call in the default
+                                        * argument because otherwise gcc 2.95
+                                        * generates a compiler fault.
                                         */
       PreconditionSSOR (const MatrixBase     &matrix,
-                        const AdditionalData &additional_data = AdditionalData());
+                        const AdditionalData &additional_data = AdditionalData(1));
       
     protected:
                                        /**
@@ -291,9 +301,14 @@ namespace PETScWrappers
                                         * is used to form the preconditioner,
                                         * and additional flags if there are
                                         * any.
+                                        *
+                                        * We specify the (default) value to
+                                        * the constructor call in the default
+                                        * argument because otherwise gcc 2.95
+                                        * generates a compiler fault.
                                         */
       PreconditionEisenstat (const MatrixBase     &matrix,
-                             const AdditionalData &additional_data = AdditionalData());
+                             const AdditionalData &additional_data = AdditionalData(1));
       
     protected:
                                        /**
@@ -348,9 +363,14 @@ namespace PETScWrappers
                                         * is used to form the preconditioner,
                                         * and additional flags if there are
                                         * any.
+                                        *
+                                        * We specify the (default) value to
+                                        * the constructor call in the default
+                                        * argument because otherwise gcc 2.95
+                                        * generates a compiler fault.
                                         */
       PreconditionICC (const MatrixBase     &matrix,
-                       const AdditionalData &additional_data = AdditionalData());
+                       const AdditionalData &additional_data = AdditionalData(0));
       
     protected:
                                        /**
@@ -405,9 +425,14 @@ namespace PETScWrappers
                                         * is used to form the preconditioner,
                                         * and additional flags if there are
                                         * any.
+                                        *
+                                        * We specify the (default) value to
+                                        * the constructor call in the default
+                                        * argument because otherwise gcc 2.95
+                                        * generates a compiler fault.
                                         */
       PreconditionILU (const MatrixBase     &matrix,
-                       const AdditionalData &additional_data = AdditionalData());
+                       const AdditionalData &additional_data = AdditionalData(0));
       
     protected:
                                        /**
