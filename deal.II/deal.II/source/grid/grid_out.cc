@@ -768,72 +768,20 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 	  case 3:
 	  {
 //TODO:[RH] curved boundaries in 3d gnuplot not supported	    
-	    Assert (mapping == 0, ExcNotImplemented());
-	    
-					     // front face
-	    out << cell->vertex(0)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(1)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(2)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(3)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(0)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< std::endl;
-					     // back face
-	    out << cell->vertex(4)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(5)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(6)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(7)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(4)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< std::endl;
-	    
-					     // now for the four connecting lines
-	    out << cell->vertex(0)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(4)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< std::endl;
-	    out << cell->vertex(1)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(5)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< std::endl;
-	    out << cell->vertex(2)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(6)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< std::endl;
-	    out << cell->vertex(3)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< cell->vertex(7)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		<< std::endl;
+	    Assert (mapping == 0, ExcNotImplemented());	    
+            
+            for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+              {
+                const typename Triangulation<dim>::face_iterator
+                  face = cell->face(face_no);
+
+                for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+                  out << face->vertex(v)
+                      << ' ' << cell->level()
+                      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+                out << std::endl;
+                out << std::endl;
+              }
 	    break;
 	  };
 	};
