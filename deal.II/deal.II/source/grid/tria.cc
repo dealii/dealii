@@ -8255,15 +8255,26 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	  std::make_pair(cell->line(9), false),
 	  std::make_pair(cell->line(10), false),
 	  std::make_pair(cell->line(11), false)  };
+  
 				   // if in debug mode: make sure that
 				   // none of the lines of this cell
 				   // is twice refined; else, deleting
 				   // this cell's children will result
-				   // in an invalid state
+				   // in an invalid state. also check
+				   // that each of the lines for which
+				   // we consider deleting the
+				   // children in fact has children
+				   // (the bits/coarsening_3d test
+				   // tripped over this initially)
   for (unsigned int line=0; line<12; ++line)
-    for (unsigned int c=0; c<2; ++c)
-      Assert (!cell->line(line)->child(c)->has_children(),
-	      ExcInternalError());
+    {
+      Assert (cell->line(line)->has_children(),
+              ExcInternalError());
+      for (unsigned int c=0; c<2; ++c)
+        Assert (!cell->line(line)->child(c)->has_children(),
+                ExcInternalError());
+    }
+  
 
 				   // next make a map out of this for
 				   // simpler access to the flag
