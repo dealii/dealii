@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>Porting deal.II</title>
+    <meta name="author" content="Guido Kanschat">
+    <meta name="keywords" content="deal.II porting">
+  </head>
+
+  <body>
+<h1>Porting <acronym>deal.II</acronym> to new systems</h1>
+
+<p> Attention: before starting a port to a new system, check
+the <a href="http:readme.html">readme file</a> for your system.</p>
+
+<h2>Compiler flags</h2>
+
+A configuration by setting the <TT>CXXFLAGS</TT> variable will soon be
+supported.
+
+<h2>Configuration file</h2>
+
+<p>Configurations must be done in the file <TT>configure.in</TT> of
+the root directory of <acronym>deal.II</acronym>. At the end, look for
+a section of the structure
+<pre>
+case "$target" in
+   *-linux*) ...;;
+   *-aix*) ...;;
+esac
+
+case "$target" in
+   alpha*-linux*) ...;;
+esac
+</pre>
+The first case block allows you to adjust parameters for a certain
+operating system, the second for an operating system/machine
+configuration.</p>
+
+<h3>Enable/disable configured options</h3>
+
+<p>Some of the features of the library are turned on and of by
+<TT>--enable-xxx</TT> and <TT>--with-xxx=yyy</TT> options to
+configure. These user-supplied parameters can be changed by modifying
+related variables: for example, to turn of shared libraries on aix,
+enter the following in the operating system case-block
+<pre>
+   *-aix*) enableshared=no ;;
+</pre>
+
+
+<h3>Preprocessor variables</h3>
+
+<p>Some features of the library can be turned on or of by preprocessor
+symbols. The following commands can be used:
+<dl>
+
+<dt><TT>throw_opt=-DNO_THROW</TT></dt>
+<dd>Turn of throwing exceptions in optimized mode.</dd>
+
+<dt><TT>AC_DEFINE(QUIET_SUBSCRIPTOR)</dt>
+<dd>Turn of type information in <CODE class="class">Subscriptor</CODE>.
+Helps to save memory (not much though) and is necessary if your
+compiler does not implement RTTI.
+</dl>
+
+<hr>
+    
+<address>
+<a href="mailto:deal@hermes.iwr.uni-heidelberg.de">The deal.II
+group</a> $Date$
+</address>
+
+</body>
+</html>

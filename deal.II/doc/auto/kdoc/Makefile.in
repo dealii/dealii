@@ -10,7 +10,11 @@ kdocversion = @kdocversion@
 
 include $D/common/Make.global_options
 
+ifeq ($kdocversion,1)
 KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a -p -L $D/doc/auto/kdoc
+else
+KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a -p -L $D/doc/auto/kdoc
+endif
 
 kdoc.base     = $(shell echo $D/base/include/base/*.h)
 kdoc.lac      = $(shell echo $D/lac/include/lac/*.h)
@@ -40,25 +44,25 @@ endif
 kdoc: $(kdoc.library-files)
 
 base.kdoc: $(kdoc.base)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
 	$^
 
 lac.kdoc: $(kdoc.lac)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
 	-l base $^
 
 grid.kdoc: $(kdoc.grid)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
 	-l base $^
 
 dof.kdoc: $(kdoc.dof)
-	$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
 	-l base -llac -lgrid $^
 
 numerics.kdoc: $(kdoc.numerics)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
 	-l base -llac -lgrid -ldof $^
 
 multigrid.kdoc: $(kdoc.multigrid)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
 	-l base -llac -lgrid -ldof -lnumerics $^
