@@ -216,13 +216,20 @@ SolverControl::State
 ReductionControl::check (const unsigned int step,
 			 const double check_value)
 {
+				   // if this is the first time we
+				   // come here, then store the
+				   // residual for later comparisons
   if (step==0)
     {
       initial_val = check_value;
       reduced_tol = check_value * reduce;
     };
 
-  if (check_value < reduced_tol)
+				   // check whether desired reduction
+				   // has been achieved. also check
+				   // for equality in case initial
+				   // residual already was zero
+  if (check_value <= reduced_tol)
     {
       if (_log_result)
 	deallog << "Convergence step " << step
