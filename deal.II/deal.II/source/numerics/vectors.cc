@@ -73,6 +73,202 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 };
 
 
+
+template <int dim>
+void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
+				    const VectorFunction<dim>&vectorfunction,
+				    Vector<double>           &vec)
+{
+  const FiniteElement<dim> &fe = dof.get_fe();
+  
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+					endc = dof.end();
+
+				   // For FESystems many of the
+				   // unit_support_points will
+				   // appear multiply, as a point
+				   // may be unit_support_point
+				   // for several of the components
+				   // of the system.
+				   // The following is rather
+				   // complicated as it is
+				   // avoided to evaluate
+				   // the vectorfunction multiply at
+				   // the same point on a cell.
+  vector<Point<dim> > unit_support_points (fe.total_dofs);
+  fe.get_unit_support_points(unit_support_points);
+
+				   // The following works well
+				   // if #dofs_per_cell<=1# as then
+				   // the multiple support_points
+				   // are placed one after another.
+
+				   // find the support points 
+				   // on a cell that
+				   // are multiply mentioned in 
+				   // #unit_support_points#.
+				   // Mark the first representative
+				   // of each multiply mentioned
+				   // support point by setting
+				   // #true# in the boolean vector 
+				   // #is_representative_point#.
+//   vector<bool>  is_representative_point(fe.total_dofs, false);
+//   is_representative_point[0]=true;
+//   unsigned int n_rep_points=1;
+//   for (unsigned int last_rep_point=0, i=1; i<fe.total_dofs; ++i)
+//     {
+//       if (unit_support_points[i] != unit_support_points[last_rep_point])
+// 	{
+// 	  is_representative_point[i] = true;
+// 	  last_rep_point=i;
+// 	  ++n_rep_points;
+// 	}
+//    };
+
+//   vector<int>         dofs_on_cell (fe.total_dofs);
+//   vector<Point<dim> > support_points (fe.total_dofs);
+
+//   vector<Point<dim> > rep_points (n_rep_points);
+//   vector<Vector<double> > function_values_at_rep_points (
+//     n_rep_points, Vector<double>(fe.n_components));
+
+//   for (; cell!=endc; ++cell)
+//     {
+// 				       // for each cell:
+// 				       // get location of finite element
+// 				       // off-points (support_points)
+//       fe.get_support_points (cell, support_points);
+
+// 				       // pick out the representative
+// 				       // support points
+//       unsigned int j=0;
+//       for (unsigned int i=0; i<fe.total_dofs; ++i)
+// 	if (is_representative_point[i])
+// 	  rep_points[j++]=support_points[i];
+//       Assert(j == n_rep_points, ExcInternalError());
+
+// 				       // get function values at these points
+//       vectorfunction.value_list (rep_points, function_values_at_rep_points);
+  
+// 					     // get indices of the dofs on this cell
+//       cell->get_dof_indices (dofs_on_cell);
+
+// 				       // distribute function values to the
+// 				       // whole vector
+//       int last_rep_point = -1;
+// 				       // it holds `is_representative_point[0]=true'
+// 				       // therefore the first #last_rep_point# is 0
+// 				       // and we need to start with
+// 				       // `last_rep_point = -1'
+//       for (unsigned int i=0; i<fe.total_dofs; ++i)
+// 	{
+// 	  if (is_representative_point[i])
+// 	    ++last_rep_point;
+
+// 	  const unsigned int component
+// 	    = fe.system_to_component_index(i).first;
+// 	  vec(dofs_on_cell[i])
+// 	    = function_values_at_rep_points[last_rep_point](component);
+// 	} 
+//     }
+
+				   // The following is more general.
+				   // It also works if #dofs_per_cell>1#,
+				   // i.e. it is usable also for systems
+				   // including
+				   // FEQ3, FEQ4, FEDG_Qx.
+
+				   // Find the support points 
+				   // on a cell that
+				   // are multiply mentioned in 
+				   // #unit_support_points#.
+				   // Mark the first representative
+				   // of each multiply mentioned
+				   // support point by appending its
+				   // dof index to #dofs_of_rep_points#.
+				   // Each multiple point gets to know
+				   // the dof index of its representative
+				   // point by the #dof_to_rep_dof_table#.
+
+				   // the following vector collects all dofs i,
+				   // 0<=i<fe.total_dofs, for that
+				   // unit_support_points[i] 
+				   // is a representative one.
+  vector<unsigned int> dofs_of_rep_points;
+				   // the following table converts a dof i
+				   // to the dof of the representative
+				   // point.
+  vector<unsigned int> dof_to_rep_dof_table;
+  unsigned int n_rep_points=0;
+  for (unsigned int i=0; i<fe.total_dofs; ++i)
+    {
+      bool representative=true;
+				       // the following loop is looped
+				       // the other way round to get
+				       // the minimal effort of
+				       // O(fe.total_dofs) for multiple
+				       // support points that are placed
+				       // one after the other.
+      for (unsigned int j=dofs_of_rep_points.size(); j>0; --j)
+	if (unit_support_points[i] 
+	    == unit_support_points[dofs_of_rep_points[j-1]])
+	  {
+	    dof_to_rep_dof_table.push_back(j-1);
+	    representative=false;
+	    break;
+	  }
+      
+      if (representative)
+	{
+	  dofs_of_rep_points.push_back(i);
+	  dof_to_rep_dof_table.push_back(i);
+	  ++n_rep_points;
+	}
+    }
+  Assert(dofs_of_rep_points.size()==n_rep_points, ExcInternalError());
+  Assert(dof_to_rep_dof_table.size()==fe.total_dofs, ExcInternalError());
+
+  cout << "n_rep_points=" << n_rep_points << endl;
+
+  vector<int>         dofs_on_cell (fe.total_dofs);
+  vector<Point<dim> > support_points (fe.total_dofs);
+
+  vector<Point<dim> > rep_points (n_rep_points);
+  vector<Vector<double> > function_values_at_rep_points (
+    n_rep_points, Vector<double>(fe.n_components));
+
+  for (; cell!=endc; ++cell)
+    {
+				       // for each cell:
+				       // get location of finite element
+				       // off-points (support_points)
+      fe.get_support_points (cell, support_points);
+      
+				       // pick out the representative
+				       // support points
+      for (unsigned int j=0; j<dofs_of_rep_points.size(); ++j)
+	rep_points[j]=support_points[dofs_of_rep_points[j]];
+
+				       // get function values at these points
+      vectorfunction.value_list (rep_points, function_values_at_rep_points);
+
+				       // get indices of the dofs on this cell
+      cell->get_dof_indices (dofs_on_cell);
+
+				       // distribute the function values to
+				       // the global vector
+      for (unsigned int i=0; i<fe.total_dofs; ++i)
+	{
+	  const unsigned int component
+	    = fe.system_to_component_index(i).first;
+	  const unsigned int rep_dof=dof_to_rep_dof_table[i];
+	  vec(dofs_on_cell[i])
+	    = function_values_at_rep_points[rep_dof](component);
+	}
+    }
+}
+
+
 template <int dim> void
 VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
 			      const DoFHandler<dim>    &low_dof,
@@ -684,6 +880,8 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					const Quadrature<dim>    &q,
 					const NormType           &norm)
 {
+  Assert(norm != mean , ExcNotUseful());
+
   const FiniteElement<dim> &fe = dof.get_fe();
   
   difference.reinit (dof.get_tria().n_active_cells());
@@ -703,102 +901,89 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
  				       // initialize for this cell
       fe_values.reinit (cell);
       
-      switch (norm) 
+      switch (norm)
  	{
  	  case mean:
+		break;
  	  case L1_norm:
  	  case L2_norm:
  	  case Linfty_norm:
  	  case H1_norm:
  	  {
- 					     // we need the finite element
- 					     // function \psi at the different
- 					     // integration points. Compute
- 					     // it like this:
- 					     // \psi(x_j)=\sum_i v_i \phi_i(x_j)
- 					     // with v_i the nodal values of the
- 					     // fe_function and \phi_i(x_j) the
- 					     // matrix of the trial function
- 					     // values at the integration point
- 					     // x_j. Then the vector
- 					     // of the \psi(x_j) is v*Phi with
- 					     // v being the vector of nodal
- 					     // values on this cell and Phi
- 					     // the matrix.
- 					     //
- 					     // we then need the difference:
- 					     // reference_function(x_j)-\psi_j
- 					     // and assign that to the vector
- 					     // \psi.
  	    const unsigned int n_q_points = q.n_quadrature_points;
  	    vector<Vector<double> >  psi (n_q_points);
 
- 					     // in praxi: first compute
- 					     // exact fe_function vector
- 	    exact_solution.value_list (fe_values.get_quadrature_points(),
- 				       psi);
+ 					     // first compute the exact solution
+					     // (vectors) at the quadrature points
+ 	    exact_solution.value_list (fe_values.get_quadrature_points(), psi);
  					     // then subtract finite element
  					     // fe_function
  	    if (true) 
  	      {
- 		vector< Vector<double> > function_values (n_q_points,
-							  Vector<double>(fe.n_components));
+ 		vector< Vector<double> > function_values (
+		  n_q_points, Vector<double>(fe.n_components));
+
  		fe_values.get_function_values (fe_function, function_values);
 
-/* 		transform (psi.begin(), psi.end(),
-		function_values.begin(),
-		psi.begin(),
-		minus<double>());
-*/ 	      };	    
+		for (unsigned int q=0; q<n_q_points; ++q)
+		  psi[q] -= function_values[q];
+ 	      };	    
 
+					     // for L1_norm, Linfty_norm, L2_norm
+					     // and H1_norm take square of the
+					     // vectors psi[q]. Afterwards
  					     // for L1_norm and Linfty_norm:
- 					     // take absolute
- 					     // value, for the L2_norm take
- 					     // square of psi
-/* 	    switch (norm) 
- 	      {
- 		case mean:
- 		      break;
- 		case L1_norm:
+ 					     // take square root to get finally
+					     // the (euclidean) vector norm.
+					     // Use psi_scalar to store the squares
+					     // of the vectors or the vector norms
+					     // respectively.
+ 	    vector<double>  psi_scalar (n_q_points);
+ 	    switch (norm)
+	      {
+		case mean:
+		      break;
+		case L1_norm:
  		case Linfty_norm:
- 		      transform (psi.begin(), psi.end(),
- 				 psi.begin(), ptr_fun(fabs));
- 		      break;
  		case L2_norm:
  		case H1_norm:
- 		      transform (psi.begin(), psi.end(),
- 				 psi.begin(), ptr_fun(sqr));
+		      for (unsigned int q=0; q<n_q_points; ++q)
+			psi_scalar[q]=psi[q].norm_sqr();
+		      
+		      if (norm == L1_norm || norm == Linfty_norm)
+			transform (psi_scalar.begin(), psi_scalar.end(),
+				   psi_scalar.begin(), ptr_fun(sqrt));
  		      break;
  		default:
  		      Assert (false, ExcNotImplemented());
  	      };
-*/
+
  					     // ok, now we have the integrand,
  					     // let's compute the integral,
  					     // which is
  					     // sum_j psi_j JxW_j
  					     // (or |psi_j| or |psi_j|^2
-/* 	    switch (norm) 
+ 	    switch (norm)
  	      {
  		case mean:
+		      break;      
  		case L1_norm:
- 		      diff = inner_product (psi.begin(), psi.end(),
- 					    fe_values.get_JxW_values().begin(),
- 					    0.0);
- 		      break;
  		case L2_norm:
- 		case H1_norm:
- 		      diff = sqrt(inner_product (psi.begin(), psi.end(),
- 						 fe_values.get_JxW_values().begin(),
- 						 0.0));
+		case H1_norm:
+		      diff = inner_product (psi_scalar.begin(), psi_scalar.end(),
+					    fe_values.get_JxW_values().begin(),
+					    0.0);
+		      if (norm == L2_norm)
+			diff=sqrt(diff);
+
  		      break;
  		case Linfty_norm:
- 		      diff = *max_element (psi.begin(), psi.end());
+ 		      diff = *max_element (psi_scalar.begin(), psi_scalar.end());
  		      break;
  		default:
  		      Assert (false, ExcNotImplemented());
  	      };
-*/
+
  					     // note: the H1_norm uses the result
  					     // of the L2_norm and control goes
  					     // over to the next case statement!
@@ -812,44 +997,46 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
  					     // H1_norm starts at the previous
  					     // case statement, but continues
  					     // here!
-
- 					     // for H1_norm: re-square L2_norm.
- 	    diff = sqr(diff);
+					     // Until now, #diff# includes the
+					     // square of the L2_norm.
 
  					     // same procedure as above, but now
- 					     // psi is a vector of gradients
+ 					     // psi is a vector of Jacobians
+					     // i.e. psi is a vector of vectors of
+					     // gradients.
  	    const unsigned int n_q_points = q.n_quadrature_points;
- 	    vector<Tensor<1,dim> >   psi (n_q_points);
-
+ 	    vector<vector<Tensor<1,dim> > >   psi (
+	      n_q_points, vector<Tensor<1,dim> >(fe.n_components, Tensor<1,dim>()));
+	    
  					     // in praxi: first compute
  					     // exact fe_function vector
-/* 	    exact_solution.gradient_list (fe_values.get_quadrature_points(),
-	    psi);
-*/	    
+ 	    exact_solution.gradient_list (fe_values.get_quadrature_points(), psi);
+
  					     // then subtract finite element
- 					     // fe_function
+ 					     // function_grads
  	    if (true) 
  	      {
- 		vector<Tensor<1,dim> > function_grads (n_q_points, Tensor<1,dim>());
+ 		vector<vector<Tensor<1,dim> > > function_grads (
+		  n_q_points, vector<Tensor<1,dim> >(fe.n_components, Tensor<1,dim>()));
  		fe_values.get_function_grads (fe_function, function_grads);
 
-/* 		transform (psi.begin(), psi.end(),
-		function_grads.begin(),
-		psi.begin(),
-		minus<Tensor<1,dim> >());
-*/ 	      };
+		for (unsigned int q=0; q<n_q_points; ++q)
+		  for (unsigned int k=0; k<fe.n_components; ++k)
+		    psi[q][k] -= function_grads[q][k];
+ 	      };
  					     // take square of integrand
  	    vector<double> psi_square (psi.size(), 0.0);
- 	    for (unsigned int i=0; i<n_q_points; ++i)
- 	      psi_square[i] = sqr_point(psi[i]);
+ 	    for (unsigned int q=0; q<n_q_points; ++q)
+	      for (unsigned int k=0; k<fe.n_components; ++k)
+		psi_square[q] += sqr_point(psi[q][k]);
 
  					     // add seminorm to L_2 norm or
  					     // to zero
-/* 	    diff += inner_product (psi_square.begin(), psi_square.end(),
-	    fe_values.get_JxW_values().begin(),
-	    0.0);
+ 	    diff += inner_product (psi_square.begin(), psi_square.end(),
+				   fe_values.get_JxW_values().begin(),
+				   0.0);
  	    diff = sqrt(diff);
-*/
+
  	    break;
  	  };
 					     
