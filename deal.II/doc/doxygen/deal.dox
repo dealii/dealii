@@ -1,0 +1,15 @@
+@INCLUDE = options.dox
+
+PROJECT_NAME = "deal.II library"
+
+INPUT    = headers/deal.II/ \
+	../../deal.II/include/dofs \
+	../../deal.II/include/fe \
+	../../deal.II/include/grid \
+	../../deal.II/include/multigrid \
+	../../deal.II/include/numerics
+TAGFILES = base.tag lac.tag
+
+HTML_OUTPUT      = deal.II
+LATEX_OUTPUT     = latex/deal.II
+GENERATE_TAGFILE = deal.tag

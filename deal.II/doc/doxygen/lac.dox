@@ -1,0 +1,10 @@
+@INCLUDE = options.dox
+
+PROJECT_NAME = "deal.II Linear Algebra Classes (LAC) library"
+
+INPUT    = headers/lac/ ../../lac/include/lac/
+TAGFILES = base.tag
+
+HTML_OUTPUT      = lac
+LATEX_OUTPUT     = latex/lac
+GENERATE_TAGFILE = lac.tag
