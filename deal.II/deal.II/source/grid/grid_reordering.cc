@@ -1,4 +1,4 @@
-//----------------------------  grid_reordering.cc  ---------------------------
+//---------------------------------------------------------------------------
 //   grid_reordering.cc,v 1.27 2002/05/28 07:43:22 wolf Exp
 //   Version: 
 //
@@ -9,7 +9,7 @@
 //   to the file deal.II/doc/license.html for the  text  and
 //   further information on this license.
 //
-//----------------------------  grid_reordering.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 #include <grid/grid_reordering.h>
 #include <grid/grid_reordering_internal.h>
