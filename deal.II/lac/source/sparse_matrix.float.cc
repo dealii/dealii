@@ -43,3 +43,100 @@ template class SparseMatrix<TYPEMAT>;
 //  #include <lac/sparse_matrix.2.templates>
 
 #undef TYPEMAT
+
+
+// instantiate a few more functions. this whole mess in this file (and the
+// other sparse_matrix.* files) really needs to be cleaned up a little
+template void SparseMatrix<float>::
+vmult (Vector<double> &, const Vector<float> &) const;
+template void SparseMatrix<float>::
+Tvmult (Vector<double> &, const Vector<float> &) const;
+template void SparseMatrix<float>::
+vmult_add (Vector<double> &, const Vector<float> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (Vector<double> &, const Vector<float> &) const;
+
+template void SparseMatrix<float>::
+vmult (Vector<float> &, const Vector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult (Vector<float> &, const Vector<double> &) const;
+template void SparseMatrix<float>::
+vmult_add (Vector<float> &, const Vector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (Vector<float> &, const Vector<double> &) const;
+
+
+template void SparseMatrix<float>::
+vmult (BlockVector<double> &, const BlockVector<float> &) const;
+template void SparseMatrix<float>::
+Tvmult (BlockVector<double> &, const BlockVector<float> &) const;
+template void SparseMatrix<float>::
+vmult_add (BlockVector<double> &, const BlockVector<float> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (BlockVector<double> &, const BlockVector<float> &) const;
+
+template void SparseMatrix<float>::
+vmult (BlockVector<float> &, const BlockVector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult (BlockVector<float> &, const BlockVector<double> &) const;
+template void SparseMatrix<float>::
+vmult_add (BlockVector<float> &, const BlockVector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (BlockVector<float> &, const BlockVector<double> &) const;
+
+
+template void SparseMatrix<float>::
+vmult (Vector<double> &, const BlockVector<float> &) const;
+template void SparseMatrix<float>::
+Tvmult (Vector<double> &, const BlockVector<float> &) const;
+template void SparseMatrix<float>::
+vmult_add (Vector<double> &, const BlockVector<float> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (Vector<double> &, const BlockVector<float> &) const;
+
+template void SparseMatrix<float>::
+vmult (BlockVector<float> &, const Vector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult (BlockVector<float> &, const Vector<double> &) const;
+template void SparseMatrix<float>::
+vmult_add (BlockVector<float> &, const Vector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (BlockVector<float> &, const Vector<double> &) const;
+
+
+template void SparseMatrix<float>::
+vmult (BlockVector<double> &, const Vector<float> &) const;
+template void SparseMatrix<float>::
+Tvmult (BlockVector<double> &, const Vector<float> &) const;
+template void SparseMatrix<float>::
+vmult_add (BlockVector<double> &, const Vector<float> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (BlockVector<double> &, const Vector<float> &) const;
+
+template void SparseMatrix<float>::
+vmult (Vector<float> &, const BlockVector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult (Vector<float> &, const BlockVector<double> &) const;
+template void SparseMatrix<float>::
+vmult_add (Vector<float> &, const BlockVector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (Vector<float> &, const BlockVector<double> &) const;
+
+
+template void SparseMatrix<float>::
+vmult (Vector<double> &, const BlockVector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult (Vector<double> &, const BlockVector<double> &) const;
+template void SparseMatrix<float>::
+vmult_add (Vector<double> &, const BlockVector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (Vector<double> &, const BlockVector<double> &) const;
+
+template void SparseMatrix<float>::
+vmult (BlockVector<double> &, const Vector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult (BlockVector<double> &, const Vector<double> &) const;
+template void SparseMatrix<float>::
+vmult_add (BlockVector<double> &, const Vector<double> &) const;
+template void SparseMatrix<float>::
+Tvmult_add (BlockVector<double> &, const Vector<double> &) const;
