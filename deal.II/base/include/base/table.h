@@ -165,6 +165,105 @@ class TableIndices<3> : public TableIndicesBase<3>
 
 
 /**
+ * Array of indices of fixed size used for the @ref{TableBase}
+ * class.
+ *
+ * This is the specialization for a four-dimensional table. This class
+ * only differs in the non-default constructors from the other
+ * specializations. Actual storage of and access to data is done by
+ * the @ref{TableIndicesBase} base class of a specializations.
+ *
+ * @author Wolfgang Bangerth, Ralf Hartmann 2002
+ */
+template <>
+class TableIndices<4> : public TableIndicesBase<4>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * indices to zero.
+                                      */
+    TableIndices ();
+
+                                     /**
+                                      * Constructor. Set indices to
+                                      * the given values.
+                                      */
+    TableIndices (const unsigned int index1,
+                  const unsigned int index2,
+                  const unsigned int index3,
+		  const unsigned int index4);
+};
+
+
+/**
+ * Array of indices of fixed size used for the @ref{TableBase}
+ * class.
+ *
+ * This is the specialization for a five-dimensional table. This class
+ * only differs in the non-default constructors from the other
+ * specializations. Actual storage of and access to data is done by
+ * the @ref{TableIndicesBase} base class of a specializations.
+ *
+ * @author Wolfgang Bangerth, Ralf Hartmann 2002
+ */
+template <>
+class TableIndices<5> : public TableIndicesBase<5>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * indices to zero.
+                                      */
+    TableIndices ();
+
+                                     /**
+                                      * Constructor. Set indices to
+                                      * the given values.
+                                      */
+    TableIndices (const unsigned int index1,
+                  const unsigned int index2,
+                  const unsigned int index3,
+		  const unsigned int index4,
+		  const unsigned int index5);
+};
+
+
+/**
+ * Array of indices of fixed size used for the @ref{TableBase}
+ * class.
+ *
+ * This is the specialization for a four-dimensional table. This class
+ * only differs in the non-default constructors from the other
+ * specializations. Actual storage of and access to data is done by
+ * the @ref{TableIndicesBase} base class of a specializations.
+ *
+ * @author Wolfgang Bangerth, Ralf Hartmann 2002
+ */
+template <>
+class TableIndices<6> : public TableIndicesBase<6>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * indices to zero.
+                                      */
+    TableIndices ();
+
+                                     /**
+                                      * Constructor. Set indices to
+                                      * the given values.
+                                      */
+    TableIndices (const unsigned int index1,
+                  const unsigned int index2,
+                  const unsigned int index3,
+		  const unsigned int index4,
+		  const unsigned int index5,
+		  const unsigned int index6);
+};
+
+
+/**
  * Have a namespace in which we declare some classes that are used to
  * access the elements of tables using the @p{operator[]}. These are
  * quite technical, since they have to do their work recursively (due
@@ -1053,6 +1152,283 @@ class Table<3,T> : public TableBase<3,T>
 
 
 
+/**
+ * A class representing a four-dimensional table of objects (not
+ * necessarily only numbers).
+ *
+ * For the rationale of this class, and a description of the
+ * interface, see the base class.
+ * 
+ * @author Wolfgang Bangerth, Ralf Hartmann 2002
+ */
+template <typename T>
+class Table<4,T> : public TableBase<4,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    Table ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    Table (const unsigned int size1,
+           const unsigned int size2,
+           const unsigned int size3,
+	   const unsigned int size4);
+    
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested two-dimensional
+                                      * subobject of this
+                                      * three-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    TableBaseAccessors::Accessor<4,T,true,3>
+    operator [] (const unsigned int i) const;
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested two-dimensional
+                                      * subobject of this
+                                      * three-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    TableBaseAccessors::Accessor<4,T,false,3>
+    operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+			   const unsigned int l) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j,
+                     const unsigned int k,
+		     const unsigned int l);
+};
+
+
+
+/**
+ * A class representing a five-dimensional table of objects (not
+ * necessarily only numbers).
+ *
+ * For the rationale of this class, and a description of the
+ * interface, see the base class.
+ * 
+ * @author Wolfgang Bangerth, Ralf Hartmann 2002
+ */
+template <typename T>
+class Table<5,T> : public TableBase<5,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    Table ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    Table (const unsigned int size1,
+           const unsigned int size2,
+           const unsigned int size3,
+	   const unsigned int size4,
+	   const unsigned int size5);
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested two-dimensional
+                                      * subobject of this
+                                      * three-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    TableBaseAccessors::Accessor<5,T,true,4>
+    operator [] (const unsigned int i) const;
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested two-dimensional
+                                      * subobject of this
+                                      * three-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    TableBaseAccessors::Accessor<5,T,false,4>
+    operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+			   const unsigned int l,
+			   const unsigned int m) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j,
+                     const unsigned int k,
+		     const unsigned int l,
+		     const unsigned int m);
+};
+
+
+
+/**
+ * A class representing a six-dimensional table of objects (not
+ * necessarily only numbers).
+ *
+ * For the rationale of this class, and a description of the
+ * interface, see the base class.
+ * 
+ * @author Wolfgang Bangerth, Ralf Hartmann 2002
+ */
+template <typename T>
+class Table<6,T> : public TableBase<6,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    Table ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    Table (const unsigned int size1,
+           const unsigned int size2,
+           const unsigned int size3,
+	   const unsigned int size4,
+	   const unsigned int size5,
+	   const unsigned int size6);
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested two-dimensional
+                                      * subobject of this
+                                      * three-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    TableBaseAccessors::Accessor<6,T,true,5>
+    operator [] (const unsigned int i) const;
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested two-dimensional
+                                      * subobject of this
+                                      * three-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    TableBaseAccessors::Accessor<6,T,false,5>
+    operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+			   const unsigned int l,
+			   const unsigned int m,
+			   const unsigned int n) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j,
+                     const unsigned int k,
+		     const unsigned int l,
+		     const unsigned int m,
+		     const unsigned int n);
+};
+
+
+
+
 
 /* --------------------- Template and inline functions ---------------- */
 
@@ -1117,6 +1493,78 @@ TableIndices<3>::TableIndices (const unsigned int index1,
   this->indices[0] = index1;
   this->indices[1] = index2;
   this->indices[2] = index3;
+};
+
+
+inline
+TableIndices<4>::TableIndices () 
+{
+  this->indices[0] = this->indices[1] = this->indices[2] = this->indices[3] = 0;
+};
+
+
+
+inline
+TableIndices<4>::TableIndices (const unsigned int index1,
+                               const unsigned int index2,
+                               const unsigned int index3,
+			       const unsigned int index4)
+{
+  this->indices[0] = index1;
+  this->indices[1] = index2;
+  this->indices[2] = index3;
+  this->indices[3] = index4;
+};
+
+
+
+inline
+TableIndices<5>::TableIndices () 
+{
+  this->indices[0] = this->indices[1] = this->indices[2] = this->indices[3] = this->indices[4] = 0;
+};
+
+
+
+inline
+TableIndices<5>::TableIndices (const unsigned int index1,
+                               const unsigned int index2,
+                               const unsigned int index3,
+			       const unsigned int index4,
+			       const unsigned int index5)
+{
+  this->indices[0] = index1;
+  this->indices[1] = index2;
+  this->indices[2] = index3;
+  this->indices[3] = index4;
+  this->indices[4] = index5;
+};
+
+
+
+inline
+TableIndices<6>::TableIndices () 
+{
+  this->indices[0] = this->indices[1] = this->indices[2]
+		   = this->indices[3] = this->indices[4] = 0;
+};
+
+
+
+inline
+TableIndices<6>::TableIndices (const unsigned int index1,
+                               const unsigned int index2,
+                               const unsigned int index3,
+			       const unsigned int index4,
+			       const unsigned int index5,
+			       const unsigned int index6)
+{
+  this->indices[0] = index1;
+  this->indices[1] = index2;
+  this->indices[2] = index3;
+  this->indices[3] = index4;
+  this->indices[4] = index5;
+  this->indices[5] = index6;
 };
 
 
@@ -1738,7 +2186,8 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (j, 0, this->table_size[1]));
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
-  return this->val[(i*this->table_size[1]+j)*this->table_size[2] + k];
+  return this->val[(i*this->table_size[1]+j)
+		  *this->table_size[2] + k];
 };
 
 
@@ -1756,8 +2205,335 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (j, 0, this->table_size[1]));
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
-  return this->val[(i*this->table_size[1]+j)*this->table_size[2] + k];
+  return this->val[(i*this->table_size[1]+j)
+		  *this->table_size[2] + k];
 };
+
+
+
+template <typename T>
+Table<4,T>::Table () 
+{};
+
+
+
+template <typename T>
+Table<4,T>::Table (const unsigned int size1,
+                   const unsigned int size2,
+                   const unsigned int size3,
+		   const unsigned int size4)
+                :
+                TableBase<4,T> (TableIndices<4> (size1, size2, size3, size4))
+{};
+
+
+
+template <typename T>
+inline
+TableBaseAccessors::Accessor<4,T,true,3>
+Table<4,T>::operator [] (const unsigned int i) const
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  const unsigned int subobject_size = this->table_size[1] *
+                                      this->table_size[2] *
+				      this->table_size[3];
+  return (TableBaseAccessors::Accessor<4,T,true,3>
+          (*this,
+           this->val+i*subobject_size));
+};
+
+
+
+template <typename T>
+inline
+TableBaseAccessors::Accessor<4,T,false,3>
+Table<4,T>::operator [] (const unsigned int i)
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  const unsigned int subobject_size = this->table_size[1] *
+                                      this->table_size[2] *
+				      this->table_size[3];
+  return (TableBaseAccessors::Accessor<4,T,false,3>
+          (*this,
+           this->val+i*subobject_size));
+};
+
+
+
+template <typename T>
+inline
+const T &
+Table<4,T>::operator () (const unsigned int i,
+                         const unsigned int j,
+                         const unsigned int k,
+			 const unsigned int l) const
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  Assert (j < this->table_size[1],
+          ExcIndexRange (j, 0, this->table_size[1]));
+  Assert (k < this->table_size[2],
+          ExcIndexRange (k, 0, this->table_size[2]));
+  Assert (l < this->table_size[3],
+          ExcIndexRange (l, 0, this->table_size[3]));
+  return this->val[((i*this->table_size[1]+j)
+		    *this->table_size[2] + k)
+		  *this->table_size[3] + l];
+};
+
+
+
+template <typename T>
+inline
+T &
+Table<4,T>::operator () (const unsigned int i,
+                         const unsigned int j,
+                         const unsigned int k,
+			 const unsigned int l)
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  Assert (j < this->table_size[1],
+          ExcIndexRange (j, 0, this->table_size[1]));
+  Assert (k < this->table_size[2],
+          ExcIndexRange (k, 0, this->table_size[2]));
+  Assert (l < this->table_size[3],
+          ExcIndexRange (l, 0, this->table_size[3]));
+  return this->val[((i*this->table_size[1]+j)
+		    *this->table_size[2] + k)
+		  *this->table_size[3] + l];
+};
+
+
+
+
+template <typename T>
+Table<5,T>::Table () 
+{};
+
+
+
+template <typename T>
+Table<5,T>::Table (const unsigned int size1,
+                   const unsigned int size2,
+                   const unsigned int size3,
+		   const unsigned int size4,
+		   const unsigned int size5)
+                :
+                TableBase<5,T> (TableIndices<5> (size1, size2, size3, size4, size5))
+{};
+
+
+
+template <typename T>
+inline
+TableBaseAccessors::Accessor<5,T,true,4>
+Table<5,T>::operator [] (const unsigned int i) const
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  const unsigned int subobject_size = this->table_size[1] *
+                                      this->table_size[2] *
+				      this->table_size[3] *
+				      this->table_size[4];
+  return (TableBaseAccessors::Accessor<5,T,true,4>
+          (*this,
+           this->val+i*subobject_size));
+};
+
+
+
+template <typename T>
+inline
+TableBaseAccessors::Accessor<5,T,false,4>
+Table<5,T>::operator [] (const unsigned int i)
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  const unsigned int subobject_size = this->table_size[1] *
+                                      this->table_size[2] *
+				      this->table_size[3] *
+				      this->table_size[4];
+  return (TableBaseAccessors::Accessor<5,T,false,4>
+          (*this,
+           this->val+i*subobject_size));
+};
+
+
+
+template <typename T>
+inline
+const T &
+Table<5,T>::operator () (const unsigned int i,
+                         const unsigned int j,
+                         const unsigned int k,
+			 const unsigned int l,
+			 const unsigned int m) const
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  Assert (j < this->table_size[1],
+          ExcIndexRange (j, 0, this->table_size[1]));
+  Assert (k < this->table_size[2],
+          ExcIndexRange (k, 0, this->table_size[2]));
+  Assert (l < this->table_size[3],
+          ExcIndexRange (l, 0, this->table_size[3]));
+  Assert (m < this->table_size[4],
+          ExcIndexRange (m, 0, this->table_size[4]));
+  return this->val[(((i*this->table_size[1]+j)
+		     *this->table_size[2] + k)
+		    *this->table_size[3] + l)
+		  *this->table_size[4] + m];
+};
+
+
+
+template <typename T>
+inline
+T &
+Table<5,T>::operator () (const unsigned int i,
+                         const unsigned int j,
+                         const unsigned int k,
+			 const unsigned int l,
+			 const unsigned int m)
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  Assert (j < this->table_size[1],
+          ExcIndexRange (j, 0, this->table_size[1]));
+  Assert (k < this->table_size[2],
+          ExcIndexRange (k, 0, this->table_size[2]));
+  Assert (l < this->table_size[3],
+          ExcIndexRange (l, 0, this->table_size[3]));
+  Assert (m < this->table_size[4],
+          ExcIndexRange (m, 0, this->table_size[4]));
+  return this->val[(((i*this->table_size[1]+j)
+		     *this->table_size[2] + k)
+		    *this->table_size[3] + l)
+		  *this->table_size[4] + m];
+};
+
+
+
+template <typename T>
+Table<6,T>::Table () 
+{};
+
+
+
+template <typename T>
+Table<6,T>::Table (const unsigned int size1,
+                   const unsigned int size2,
+                   const unsigned int size3,
+		   const unsigned int size4,
+		   const unsigned int size5,
+		   const unsigned int size6)
+                :
+                TableBase<6,T> (TableIndices<6> (size1, size2, size3, size4, size5, size6))
+{};
+
+
+
+template <typename T>
+inline
+TableBaseAccessors::Accessor<6,T,true,5>
+Table<6,T>::operator [] (const unsigned int i) const
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  const unsigned int subobject_size = this->table_size[1] *
+                                      this->table_size[2] *
+				      this->table_size[3] *
+				      this->table_size[4] *
+				      this->table_size[5];
+  return (TableBaseAccessors::Accessor<6,T,true,5>
+          (*this,
+           this->val+i*subobject_size));
+};
+
+
+
+template <typename T>
+inline
+TableBaseAccessors::Accessor<6,T,false,5>
+Table<6,T>::operator [] (const unsigned int i)
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  const unsigned int subobject_size = this->table_size[1] *
+                                      this->table_size[2] *
+				      this->table_size[3] *
+				      this->table_size[4] *
+				      this->table_size[5];
+  return (TableBaseAccessors::Accessor<6,T,false,5>
+          (*this,
+           this->val+i*subobject_size));
+};
+
+
+
+template <typename T>
+inline
+const T &
+Table<6,T>::operator () (const unsigned int i,
+                         const unsigned int j,
+                         const unsigned int k,
+			 const unsigned int l,
+			 const unsigned int m,
+			 const unsigned int n) const
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  Assert (j < this->table_size[1],
+          ExcIndexRange (j, 0, this->table_size[1]));
+  Assert (k < this->table_size[2],
+          ExcIndexRange (k, 0, this->table_size[2]));
+  Assert (l < this->table_size[3],
+          ExcIndexRange (l, 0, this->table_size[3]));
+  Assert (m < this->table_size[4],
+          ExcIndexRange (m, 0, this->table_size[4]));
+  Assert (n < this->table_size[5],
+          ExcIndexRange (n, 0, this->table_size[5]));
+  return this->val[((((i*this->table_size[1]+j)
+		      *this->table_size[2] + k)
+		     *this->table_size[3] + l)
+		    *this->table_size[4] + m)
+		  *this->table_size[5] + n];
+};
+
+
+
+template <typename T>
+inline
+T &
+Table<6,T>::operator () (const unsigned int i,
+                         const unsigned int j,
+                         const unsigned int k,
+			 const unsigned int l,
+			 const unsigned int m,
+			 const unsigned int n)
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  Assert (j < this->table_size[1],
+          ExcIndexRange (j, 0, this->table_size[1]));
+  Assert (k < this->table_size[2],
+          ExcIndexRange (k, 0, this->table_size[2]));
+  Assert (l < this->table_size[3],
+          ExcIndexRange (l, 0, this->table_size[3]));
+  Assert (m < this->table_size[4],
+          ExcIndexRange (m, 0, this->table_size[4]));
+  Assert (n < this->table_size[5],
+          ExcIndexRange (n, 0, this->table_size[5]));
+  return this->val[((((i*this->table_size[1]+j)
+		      *this->table_size[2] + k)
+		     *this->table_size[3] + l)
+		    *this->table_size[4] + m)
+		  *this->table_size[5] + n];
+};
+
 
 
 #endif

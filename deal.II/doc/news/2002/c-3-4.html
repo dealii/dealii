@@ -143,6 +143,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> New: The classes <code
+       class="class">TableIndices&lt;N&gt;</code> and <code
+       class="class">Table&lt;N,T&gt;</code> are now implemented also
+       for <code>N=4,5</code> and <code>6</code>. The <code
+       class="class">Table&lt;N,T&gt;</code> class represents an
+       <code>N</code>-dimensional array and might replace the
+       N-times-nested-use of the <code
+       class="class">std::vector</code> class.
+       <br>
+       (RH 2002/09/24)
+       </p>
+
   <li> <p> 
        New: The <code class="member">Threads::n_existing_threads</code>
        function returns the present number of existing threads, allowing an
