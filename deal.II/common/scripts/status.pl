@@ -62,6 +62,7 @@ while(<CVS>)
 	$tag = '' if ($tag eq '(none)');
 	$date = '' if ($date eq '(none)');
 	$opt = '' if ($opt eq '(none)');
+	$opt = '' if ($opt eq '-kk');
 	my $stick = $tag . $date . $opt;
 	$stick = "Stick $stick" unless ($stick eq '');
 	$status .= $stick;
