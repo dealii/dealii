@@ -1925,14 +1925,25 @@ namespace internals
     Iterator<number,Constness>::operator++ ()
     {
       Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
-  
+
+                                       // move to next element
       ++accessor.a_index;
-      if (accessor.a_index >=
-          accessor.matrix->get_sparsity_pattern().row_length(accessor.a_row))
+
+                                       // if at end of line: cycle until we
+                                       // find a row with a nonzero number of
+                                       // entries
+      while (accessor.a_index >=
+             accessor.matrix->get_sparsity_pattern().row_length(accessor.a_row))
         {
           accessor.a_index = 0;
-          accessor.a_row++;
+          ++accessor.a_row;
+
+                                           // if we happened to find the end
+                                           // of the matrix, then stop here
+          if (accessor.a_row == accessor.matrix->m())
+            return *this;
         }
+      
       return *this;
     }
 
@@ -1947,12 +1958,22 @@ namespace internals
       const Iterator iter=*this;
   
       ++accessor.a_index;
-      if (accessor.a_index >=
-          accessor.matrix->get_sparsity_pattern().row_length(accessor.a_row))
+
+                                       // if at end of line: cycle until we
+                                       // find a row with a nonzero number of
+                                       // entries
+      while (accessor.a_index >=
+             accessor.matrix->get_sparsity_pattern().row_length(accessor.a_row))
         {
           accessor.a_index = 0;
-          accessor.a_row++;
+          ++accessor.a_row;
+
+                                           // if we happened to find the end
+                                           // of the matrix, then stop here
+          if (accessor.a_row == accessor.matrix->m())
+            return iter;
         }
+
       return iter;
     }
 
@@ -2022,7 +2043,7 @@ SparseMatrix<number>::begin () const
 {
                                    // search for the first line with a nonzero
                                    // number of entries
-  for (unsigned int r=0; r<n(); ++r)
+  for (unsigned int r=0; r<m(); ++r)
     if (cols->row_length(r) > 0)
       return const_iterator(this, r, 0);
 
@@ -2049,7 +2070,7 @@ SparseMatrix<number>::begin ()
 {
                                    // search for the first line with a nonzero
                                    // number of entries
-  for (unsigned int r=0; r<n(); ++r)
+  for (unsigned int r=0; r<m(); ++r)
     if (cols->row_length(r) > 0)
       return iterator(this, r, 0);
 
