@@ -89,9 +89,9 @@ template<int dim>
 void test(const Triangulation<dim> &tria,
 	  const Mapping<dim> &mapping,
 	  const FiniteElement<dim> &fe1,
-	  const string &fe_string1,
+	  const std::string &fe_string1,
 	  const FiniteElement<dim> &fe2,
-	  const string &fe_string2,
+	  const std::string &fe_string2,
 	  const unsigned int testcase)
 {
   DoFHandler<dim> dof_handler1 (tria);
@@ -143,13 +143,13 @@ void test(const Triangulation<dim> &tria,
   data_out.attach_dof_handler (dof_handler1);
   data_out.add_data_vector (function1, fe_string1);
   data_out.build_patches (2);
-  string file1_name=fe_string1+"_function.gnuplot";
-  ofstream file1(file1_name.c_str());
+  std::string file1_name=fe_string1+"_function.gnuplot";
+  std::ofstream file1(file1_name.c_str());
   data_out.write_gnuplot(file1);
   file1.close();
   data_out.clear();
 
-  string file2_name=fe_string1+"_";
+  std::string file2_name=fe_string1+"_";
   switch (testcase)
     {
       case 1:
@@ -170,11 +170,11 @@ void test(const Triangulation<dim> &tria,
       default:
 	    Assert(false, ExcNotImplemented());
     }
-  deallog << file2_name << endl;
+  deallog << file2_name << std::endl;
   
   data_out.build_patches (2);
   data_out.write_gnuplot(deallog.get_file_stream());
-  ofstream file2(file2_name.c_str());
+  std::ofstream file2(file2_name.c_str());
   file2.setf(std::ios::showpoint | std::ios::left);
   data_out.write_gnuplot(file2);
   file2.close();

@@ -46,7 +46,7 @@ int main ()
 
   std::vector<Polynomial<double> > p;
 
-  deallog << "Legendre" << endl;
+  deallog << "Legendre" << std::endl;
   
   for (unsigned int i=0;i<15;++i)
     p.push_back (Legendre<double>(i));
@@ -57,7 +57,7 @@ int main ()
 	      << " =" << scalar_product(p[i], p[j]) << std::endl;
 
 
-  deallog << "LagrangeEquidistant" << endl;
+  deallog << "LagrangeEquidistant" << std::endl;
   
   p.clear();
   for (unsigned int i=0;i<6;++i)

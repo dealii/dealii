@@ -31,7 +31,7 @@ plot_derivatives(Mapping<dim>& mapping,
   Triangulation<dim> tr;
   DoFHandler<dim> dof(tr);
   GridGenerator::hyper_cube(tr, 2., 5.);
-  DoFHandler<dim>::cell_iterator c = dof.begin();
+  typename DoFHandler<dim>::cell_iterator c = dof.begin();
   dof.distribute_dofs(finel);
 
   const unsigned int div = 1;

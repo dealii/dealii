@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -243,7 +243,7 @@ void TestCases<dim>::run (const unsigned int test_case)
 	tria->begin_active()->set_refine_flag ();
 	tria->execute_coarsening_and_refinement ();
 
-	Triangulation<dim>::active_cell_iterator cell;
+	typename Triangulation<dim>::active_cell_iterator cell;
 	for (int i=0; i<(dim==2 ? 3 : 2); ++i) 
 	  {
 					     // refine the presently
@@ -275,7 +275,7 @@ void TestCases<dim>::run (const unsigned int test_case)
 	tria->begin_active()->set_refine_flag();
 	tria->execute_coarsening_and_refinement ();
 	
-	Triangulation<dim>::active_cell_iterator cell, endc;
+	typename Triangulation<dim>::active_cell_iterator cell, endc;
 	for (int i=0; i<4-dim; ++i) 
 	  {
 	    cell = tria->begin_active();

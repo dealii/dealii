@@ -20,14 +20,14 @@ default: run-tests
 
 ############################################################
 
-logtest.exe        : logtest.go            $(lib-base.g)
-polynomial_test.exe: polynomial_test.go    $(lib-base.g)
-polynomial1d.exe   : polynomial1d.go       $(lib-base.g)
-quadrature_test.exe: quadrature_test.go    $(libraries)
-reference.exe      : reference.go abort.go $(libraries)
-tensor.exe         : tensor.go             $(libraries)
-timer.exe          : timer.go              $(libraries)
-vector2d.exe       : vector2d.go           $(libraries)
+logtest.exe        : logtest.go                  $(lib-base.g)
+polynomial_test.exe: polynomial_test.go abort.go $(lib-base.g)
+polynomial1d.exe   : polynomial1d.go             $(lib-base.g)
+quadrature_test.exe: quadrature_test.go          $(libraries)
+reference.exe      : reference.go abort.go       $(libraries)
+tensor.exe         : tensor.go                   $(libraries)
+timer.exe          : timer.go                    $(libraries)
+vector2d.exe       : vector2d.go                 $(libraries)
 auto_derivative_function.exe        : auto_derivative_function.go            $(libraries)
 
 

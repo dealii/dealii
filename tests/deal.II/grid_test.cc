@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -197,7 +197,7 @@ void test (const int test_case)
 	tria.begin_active()->set_refine_flag ();
 	tria.execute_coarsening_and_refinement ();
 
-	Triangulation<dim>::active_cell_iterator cell;
+	typename Triangulation<dim>::active_cell_iterator cell;
 	for (int i=0; i<(dim==2 ? 3 : 2); ++i) 
 	  {
 					     // refine the presently
@@ -234,7 +234,7 @@ void test (const int test_case)
 	tria.begin_active()->set_refine_flag();
 	tria.execute_coarsening_and_refinement ();
 	
- 	Triangulation<dim>::active_cell_iterator cell, endc;
+ 	typename Triangulation<dim>::active_cell_iterator cell, endc;
 	const unsigned int steps[4] = { 0, 2, 2, 2 };
  	for (unsigned int i=0; i<steps[dim]; ++i) 
  	  {

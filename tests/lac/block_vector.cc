@@ -141,7 +141,7 @@ int main ()
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  std::cerr = logfile;
+  std::cerr.rdbuf(logfile.rdbuf());
   
   try
     {

@@ -21,7 +21,14 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include <strstream>
+
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#  define SSTREAM std::ostringstream
+#else
+#  include <strstream>
+#  define SSTREAM std::ostrstream
+#endif
 
 #define PRECISION 2
 
@@ -31,8 +38,8 @@ template<int dim>
 inline void
 plot_transformation(Mapping<dim> &mapping,
 		    FiniteElement<dim> &fe,
-		    DoFHandler<dim>::cell_iterator &cell,
-		    const char* name)
+		    typename DoFHandler<dim>::cell_iterator &cell,
+		    const std::string& name)
 {
   const unsigned int div = 7;
 
@@ -71,8 +78,8 @@ template<int dim>
 inline void
 plot_faces(Mapping<dim> &mapping,
 	   FiniteElement<dim> &fe,
-	   DoFHandler<dim>::cell_iterator &cell,
-	   const char* name)
+	   typename DoFHandler<dim>::cell_iterator &cell,
+	   const std::string& name)
 {
   deallog.push(name);
 
@@ -115,8 +122,8 @@ template<int dim>
 inline void
 plot_subfaces(Mapping<dim> &mapping,
 	      FiniteElement<dim> &fe,
-	      DoFHandler<dim>::cell_iterator &cell,
-	      const char* name)
+	      typename DoFHandler<dim>::cell_iterator &cell,
+	      const std::string& name)
 {
   deallog.push(name);
 
@@ -162,7 +169,7 @@ inline void
 plot_faces(Mapping<1>&,
 	   FiniteElement<1>&,
 	   DoFHandler<1>::cell_iterator&,
-	   const char*)
+	   const std::string&)
 {};
 
 
@@ -172,7 +179,7 @@ inline void
 plot_subfaces(Mapping<1>&,
 	      FiniteElement<1>&,
 	      DoFHandler<1>::cell_iterator&,
-	      const char*)
+	      const std::string&)
 {};
 
 
@@ -181,7 +188,7 @@ template<int dim>
 inline void
 compute_area(Mapping<dim> &mapping,
 	     FiniteElement<dim> &fe,
-	     DoFHandler<dim>::cell_iterator &cell)
+	     typename DoFHandler<dim>::cell_iterator &cell)
 {
   QGauss4<dim> gauss4;
   FEValues<dim> fe_values(mapping, fe, gauss4,
@@ -466,7 +473,7 @@ void mapping_test()
     {
       DoFHandler<dim> dof(*tria_ptr[i]);
       dof.distribute_dofs(fe_q4);      
-      DoFHandler<dim>::cell_iterator cell = dof.begin_active();
+      typename DoFHandler<dim>::cell_iterator cell = dof.begin_active();
       
       deallog << "Triangulation" << i << ":" << std::endl;
 
@@ -474,34 +481,32 @@ void mapping_test()
       for (unsigned int j=0; j<mapping_size; ++j)
 	if (show[i][j])
 	  {
-	    char* st2 = new char[100];
-
 	    if (true)
 	      {
-		std::ostrstream ost(st2, 99);
+		SSTREAM ost;
 		ost << "Mapping" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << std::ends;
-		deallog << st2 << std::endl;
-		plot_transformation(*mapping_ptr[j], fe_q4, cell, st2);
+		    << mapping_strings[j];
+		deallog << ost.str() << std::endl;
+		plot_transformation(*mapping_ptr[j], fe_q4, cell, ost.str());
 		compute_area(*mapping_ptr[j], fe_q4, cell);
 	      }
 	    
 	    if (dim>1)
 	      {
-		std::ostrstream ost(st2, 99);
+		SSTREAM ost;
 		ost << "MappingFace" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << std::ends;
-		deallog << st2 << std::endl;	    
-		plot_faces(*mapping_ptr[j], fe_q4, cell, st2);
+		    << mapping_strings[j];
+		deallog << ost.str() << std::endl;	    
+		plot_faces(*mapping_ptr[j], fe_q4, cell, ost.str());
 	      }
 
 	    if (dim>1)
 	      {
-		std::ostrstream ost(st2, 99);
+		SSTREAM ost;
 		ost << "MappingSubface" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << std::ends;
-		deallog << st2 << std::endl;	    
-		plot_subfaces(*mapping_ptr[j], fe_q4, cell, st2);
+		    << mapping_strings[j];
+		deallog << ost.str() << std::endl;	    
+		plot_subfaces(*mapping_ptr[j], fe_q4, cell, ost.str());
 	      }
 
 	    
@@ -527,9 +532,7 @@ void mapping_test()
 		Point<dim> p_re_unit=mapping.transform_real_to_unit_cell(cell, p_real);
 		deallog << "p_unit=" << p_unit << ",  p_real=" << p_real
 			<< ",  p_re_unit=" << p_re_unit << std::endl;
-	      }
-	    
-	    delete[] st2;
+	      }	    
 	  }    
     }
 

@@ -32,7 +32,7 @@ plot_shape_functions(Mapping<dim>& mapping,
   Triangulation<dim> tr;
   DoFHandler<dim> dof(tr);
   GridGenerator::hyper_cube(tr, 0., 1.);
-  DoFHandler<dim>::cell_iterator c = dof.begin();
+  typename DoFHandler<dim>::cell_iterator c = dof.begin();
   dof.distribute_dofs(finel);
 
   const unsigned int div = 11;
@@ -103,7 +103,7 @@ plot_face_shape_functions(Mapping<dim>& mapping,
   DoFHandler<dim> dof(tr);
   GridGenerator::hyper_cube(tr, 0., 1.);
   tr.refine_global(1);
-  DoFHandler<dim>::active_cell_iterator c = dof.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator c = dof.begin_active();
   ++c;
   c->set_refine_flag();
   tr.execute_coarsening_and_refinement ();
@@ -241,7 +241,7 @@ void test_compute_functions (const Mapping<dim> &mapping,
   FEValues<dim> fe_values(mapping, fe, q, UpdateFlags(update_values|
 						      update_gradients|
 						      update_second_derivatives));
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   fe_values.reinit(cell);
 
   bool coincide=true;

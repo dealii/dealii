@@ -53,7 +53,7 @@ show_values(FiniteElement<dim>& fe,
 				      update_JxW_values |
 				      update_gradients |
 				      update_second_derivatives));
-  DoFHandler<dim>::cell_iterator c = dof.begin();
+  typename DoFHandler<dim>::cell_iterator c = dof.begin();
   fe_values.reinit(c);
 
   for (unsigned int k=0; k<quadrature_formula.n_quadrature_points; ++k)

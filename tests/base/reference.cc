@@ -48,7 +48,7 @@ int main()
   std::ofstream logfile("reference.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  std::cerr = logfile;
+  std::cerr.rdbuf(logfile.rdbuf());
   Test a("A");
   const Test b("B");
   SmartPointer<Test>       r=&a;

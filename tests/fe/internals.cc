@@ -17,6 +17,7 @@
 #include <fe/fe_values.h>
 #include <vector>
 #include <fstream>
+#include <iostream>
 #include <iomanip>
 #include <string>
 
@@ -31,10 +32,10 @@ void print_formatted (const FullMatrix<number> &A,
       for (unsigned int j=0; j<A.n(); ++j)
 	{
 	  if (A(i,j) != 0)
-	    deallog << std::setw(width) << setprecision(precision)
+	    deallog << std::setw(width) << std::setprecision(precision)
 		    << A(i,j);
 	  else
-	    deallog << std::setw(width) << setprecision(precision)
+	    deallog << std::setw(width) << std::setprecision(precision)
 		    << "~";
 	  deallog << ' ';
 	};

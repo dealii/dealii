@@ -57,7 +57,7 @@ class TimeStepBase_Wave :  public TimeStepBase_Tria<dim>{
   public:
     TimeStepBase_Wave ();
     TimeStepBase_Wave (const double                    time,
-		       TimeStepBase_Tria<dim>::Flags   flags,
+		       typename TimeStepBase_Tria<dim>::Flags   flags,
 		       const WaveParameters<dim>      &parameters);
     const TimeStep_Primal<dim> & get_timestep_primal () const;
     const TimeStep_Dual<dim> &   get_timestep_dual () const;
@@ -1888,7 +1888,7 @@ void EndEnergy<dim>::compute_vectors (const PartOfDomain pod,
   final_u_bar.reinit (dof->n_dofs());
   final_v_bar.reinit (dof->n_dofs());
 
-  DoFHandler<dim>::active_cell_iterator cell, primal_cell, endc;
+  typename DoFHandler<dim>::active_cell_iterator cell, primal_cell, endc;
   cell = dof->begin_active ();
   endc = dof->end ();
   primal_cell = primal_dof->begin_active();
@@ -1970,7 +1970,7 @@ void IntegratedValueAtOrigin<dim>::compute_functionals (Vector<double> &j1,
   j1.reinit (dof->n_dofs());
   j2.reinit (dof->n_dofs());
 
-  DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
 					endc = dof->end();
 
   Point<dim> origin;
@@ -2011,8 +2011,8 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
   j1.reinit (dof->n_dofs());
   j2.reinit (dof->n_dofs());
 
-  DoFHandler<dim>::active_cell_iterator cell, endc;
-  DoFHandler<dim>::face_iterator        face;
+  typename DoFHandler<dim>::active_cell_iterator cell, endc;
+  typename DoFHandler<dim>::face_iterator        face;
   cell = dof->begin_active();
   endc = dof->end();
 
@@ -2067,8 +2067,8 @@ void EarthSurface<dim>::compute_functionals (Vector<double> &j1,
   j1.reinit (dof->n_dofs());
   j2.reinit (dof->n_dofs());
 
-  DoFHandler<dim>::active_cell_iterator cell, endc;
-  DoFHandler<dim>::face_iterator        face;
+  typename DoFHandler<dim>::active_cell_iterator cell, endc;
+  typename DoFHandler<dim>::face_iterator        face;
   cell = dof->begin_active();
   endc = dof->end();
 
@@ -2119,8 +2119,8 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
   if ((time<=1.6) || (time>1.8))
     return;
   
-  DoFHandler<dim>::active_cell_iterator cell, endc;
-  DoFHandler<dim>::face_iterator        face;
+  typename DoFHandler<dim>::active_cell_iterator cell, endc;
+  typename DoFHandler<dim>::face_iterator        face;
   cell = dof->begin_active();
   endc = dof->end();
 
@@ -2225,7 +2225,7 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
   if ((time<=2.5-time_step) || (time>2.5))
     return;
 
-  DoFHandler<dim>::active_cell_iterator cell, endc;
+  typename DoFHandler<dim>::active_cell_iterator cell, endc;
   cell = dof->begin_active();
   endc = dof->end();
 
@@ -2267,7 +2267,7 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
   if ((time<=2.4-time_step) || (time>2.4))
     return;
 
-  DoFHandler<dim>::active_cell_iterator cell, endc;
+  typename DoFHandler<dim>::active_cell_iterator cell, endc;
   cell = dof->begin_active();
   endc = dof->end();
 
@@ -2310,14 +2310,14 @@ void HuyghensWave<dim>::compute_functionals (Vector<double> &j1,
   p(0) = 0.75;
   const Point<dim> evaluation_point (p);
 
-  const DoFHandler<dim>::cell_iterator endc = dof->end(3);
+  const typename DoFHandler<dim>::cell_iterator endc = dof->end(3);
   bool point_found = false;
-  for (DoFHandler<dim>::cell_iterator cell=dof->begin(3);
+  for (typename DoFHandler<dim>::cell_iterator cell=dof->begin(3);
        (cell!=endc) && !point_found; ++cell)
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex) 
       if (cell->vertex(vertex) == evaluation_point)
 	{
-	  DoFHandler<dim>::cell_iterator terminal_cell = cell;
+	  typename DoFHandler<dim>::cell_iterator terminal_cell = cell;
 	  while (terminal_cell->has_children())
 	    terminal_cell = terminal_cell->child(vertex);
 	  
@@ -2438,7 +2438,7 @@ template <int dim>
 double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const {
   const double y_offset = 300000000;
 
-  DoFHandler<dim>::active_cell_iterator cell, endc;
+  typename DoFHandler<dim>::active_cell_iterator cell, endc;
   cell = dof->begin_active ();
   endc = dof->end ();
 
@@ -2535,7 +2535,7 @@ void EvaluateIntegratedValueAtOrigin<dim>::reset () {
 
 template <int dim>
 double EvaluateIntegratedValueAtOrigin<dim>::evaluate () {
-  DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
 					endc = dof->end();
 
   double     value_at_origin = 0;
@@ -2603,7 +2603,7 @@ double EvaluateSeismicSignal<dim>::evaluate () {
   std::ofstream out((base_file_name + ".seismic").c_str());
   AssertThrow (out, typename EvaluationBase<dim>::ExcIO());
   
-  DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
 					endc = dof->end();
   double u_integrated=0;
   FEFaceValues<dim> face_values (*fe, *quadrature_face,
@@ -2692,7 +2692,7 @@ double EvaluateSplitSignal<dim>::evaluate () {
     return 0;
 
   const unsigned int n_q_points = quadrature_face->n_quadrature_points;
-  DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
 					endc = dof->end();
   double u_integrated=0;
   FEFaceValues<dim> face_values (*fe, *quadrature_face, UpdateFlags(update_values | update_JxW_values));
@@ -2702,7 +2702,7 @@ double EvaluateSplitSignal<dim>::evaluate () {
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
       if (cell->face(face_no)->center()(0) == 1.5)
 	{
-	  DoFHandler<dim>::face_iterator face=cell->face(face_no);
+	  typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
 	  bool wrong_face = face->center()(1) > 0.0625;
 	  if (!wrong_face)
 	    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
@@ -2907,14 +2907,14 @@ double EvaluateHuyghensWave<dim>::evaluate ()
   p(0) = 0.75;
   const Point<dim> evaluation_point (p);
 
-  const DoFHandler<dim>::cell_iterator endc = dof->end(3);
+  const typename DoFHandler<dim>::cell_iterator endc = dof->end(3);
   bool point_found = false;
-  for (DoFHandler<dim>::cell_iterator cell=dof->begin(3);
+  for (typename DoFHandler<dim>::cell_iterator cell=dof->begin(3);
        (cell!=endc) && !point_found; ++cell)
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       if (cell->vertex(vertex) == evaluation_point)
 	{
-	  DoFHandler<dim>::cell_iterator terminal_cell = cell;
+	  typename DoFHandler<dim>::cell_iterator terminal_cell = cell;
 	  while (terminal_cell->has_children())
 	    terminal_cell = terminal_cell->child(vertex);
 	  
@@ -3775,28 +3775,28 @@ void WaveParameters<dim>::set_initial_functions (const std::string &u_name,
   for (unsigned int i=0; i<2; ++i)
     {
       if (names[i]=="eigenmode")
-	functions[i] = new InitialValues<dim>::EigenMode();
+	functions[i] = new typename InitialValues<dim>::EigenMode();
       else
 	if (names[i]=="zero")
 	  functions[i] = new ZeroFunction<dim>();
 	else
 	  if (names[i]=="center-kink")
-	    functions[i] = new InitialValues<dim>::CenterKink();
+	    functions[i] = new typename InitialValues<dim>::CenterKink();
 	  else
 	    if (names[i]=="bump")
-	      functions[i] = new InitialValues<dim>::Bump();
+	      functions[i] = new typename InitialValues<dim>::Bump();
 	    else
 	      if (names[i]=="small bump")
-		functions[i] = new InitialValues<dim>::SmallBump();
+		functions[i] = new typename InitialValues<dim>::SmallBump();
 	      else
 		if (names[i]=="shifted bump")
-		  functions[i] = new InitialValues<dim>::ShiftedBump();
+		  functions[i] = new typename InitialValues<dim>::ShiftedBump();
 		else
 		  if (names[i]=="plateau")
-		    functions[i] = new InitialValues<dim>::Plateau ();
+		    functions[i] = new typename InitialValues<dim>::Plateau ();
 		  else
 		    if (names[i]=="earthquake")
-		      functions[i] = new InitialValues<dim>::Earthquake ();
+		      functions[i] = new typename InitialValues<dim>::Earthquake ();
 		    else
 		      AssertThrow (false, ExcUnknownName(names[i]));
     };
@@ -3816,13 +3816,13 @@ void WaveParameters<dim>::set_coefficient_functions (const std::string &name) {
   
   if (name=="kink")
     {
-      stiffness = new Coefficients<dim>::Kink();
+      stiffness = new typename Coefficients<dim>::Kink();
       stiffness_constant = false;
     }
   else
     if (name=="gradient")
       {
-	stiffness = new Coefficients<dim>::Gradient();
+	stiffness = new typename Coefficients<dim>::Gradient();
 	stiffness_constant = false;
       }
     else
@@ -3834,13 +3834,13 @@ void WaveParameters<dim>::set_coefficient_functions (const std::string &name) {
       else
 	if (name=="preliminary earth model")
 	  {
-	    stiffness = new Coefficients<dim>::PreliminaryEarthModel();
+	    stiffness = new typename Coefficients<dim>::PreliminaryEarthModel();
 	    stiffness_constant = false;
 	  }
 	else
 	  if (name=="distorted")
 	    {
-	      stiffness = new Coefficients<dim>::Distorted();
+	      stiffness = new typename Coefficients<dim>::Distorted();
 	      stiffness_constant = false;
 	  }
 	  else
@@ -3855,26 +3855,26 @@ void WaveParameters<dim>::set_boundary_functions (const std::string &name) {
   
   if (name=="wave from left") 
     {
-      boundary_values_u = new BoundaryValues<dim>::WaveFromLeft_u ();
-      boundary_values_v = new BoundaryValues<dim>::WaveFromLeft_v ();
+      boundary_values_u = new typename BoundaryValues<dim>::WaveFromLeft_u ();
+      boundary_values_v = new typename BoundaryValues<dim>::WaveFromLeft_v ();
     }
   else
     if (name=="fast wave from left") 
       {
-	boundary_values_u = new BoundaryValues<dim>::FastWaveFromLeft_u ();
-	boundary_values_v = new BoundaryValues<dim>::FastWaveFromLeft_v ();
+	boundary_values_u = new typename BoundaryValues<dim>::FastWaveFromLeft_u ();
+	boundary_values_v = new typename BoundaryValues<dim>::FastWaveFromLeft_v ();
       }
     else
       if (name=="wave from left center")
 	{
-	  boundary_values_u = new BoundaryValues<dim>::WaveFromLeftCenter_u ();
-	  boundary_values_v = new BoundaryValues<dim>::WaveFromLeftCenter_v ();
+	  boundary_values_u = new typename BoundaryValues<dim>::WaveFromLeftCenter_u ();
+	  boundary_values_v = new typename BoundaryValues<dim>::WaveFromLeftCenter_v ();
 	}
       else
 	if (name=="wave from left bottom")
 	  {
-	    boundary_values_u = new BoundaryValues<dim>::WaveFromLeftBottom_u ();
-	    boundary_values_v = new BoundaryValues<dim>::WaveFromLeftBottom_v ();
+	    boundary_values_u = new typename BoundaryValues<dim>::WaveFromLeftBottom_u ();
+	    boundary_values_v = new typename BoundaryValues<dim>::WaveFromLeftBottom_v ();
 	  }
 	else
 	  if (name=="zero")
@@ -3943,7 +3943,7 @@ void WaveParameters<dim>::set_dual_functional (const std::string &name) {
       dual_functional = new IntegratedValueAtOrigin<dim> ();
     else
       if (name == "seismic signature")
-	dual_functional = new SeismicSignal<dim> ();
+	dual_functional = new  SeismicSignal<dim> ();
       else
 	if (name == "split signal")
 	  dual_functional = new SplitSignal<dim> ();
@@ -4003,7 +4003,7 @@ void WaveParameters<1>::make_coarse_grid (const std::string &name) {
 					   cells,
 					   SubCellData());
 
-	Triangulation<dim>::active_cell_iterator cell = coarse_grid->begin_active();
+	typename Triangulation<dim>::active_cell_iterator cell = coarse_grid->begin_active();
 	(++cell)->set_refine_flag ();
 	(++cell)->set_refine_flag ();
 	coarse_grid->execute_coarsening_and_refinement ();
@@ -4694,7 +4694,7 @@ TimeStepBase_Wave<dim>::TimeStepBase_Wave ():
 
 template <int dim>
 TimeStepBase_Wave<dim>::TimeStepBase_Wave (const double                    time,
-					   TimeStepBase_Tria<dim>::Flags   flags,
+					   typename TimeStepBase_Tria<dim>::Flags   flags,
 					   const WaveParameters<dim>      &parameters)
 		:
 		TimeStepBase_Tria<dim> (time,
@@ -4711,7 +4711,7 @@ TimeStepBase_Wave<dim>::TimeStepBase_Wave (const double                    time,
 					 (parameters.refinement_strategy ==
 					  WaveParameters<dim>::dual_estimator),
 					 true)),
-		parameters (parameters)
+					    parameters (parameters)
 {};
 
 
@@ -5054,10 +5054,10 @@ void TimeStep_Wave<dim>::transfer_old_solutions (Vector<double> &old_u,
   
   Assert (old_dof_handler != 0, ExcInternalError());
 
-  DoFHandler<dim>::cell_iterator old_cell = old_dof_handler->begin(),
+  typename DoFHandler<dim>::cell_iterator old_cell = old_dof_handler->begin(),
 				 new_cell = present_dof_handler->begin();
   for (; old_cell != (old_dof_handler->get_tria().n_levels() == 1  ?
-		      static_cast<DoFHandler<dim>::cell_iterator>(old_dof_handler->end()) :
+		      static_cast<typename DoFHandler<dim>::cell_iterator>(old_dof_handler->end()) :
 		      old_dof_handler->begin(1));
        ++old_cell, new_cell)
     transfer_old_solutions (old_cell, new_cell,
@@ -5402,7 +5402,7 @@ void TimeStep_Dual<dim>::build_rhs (Vector<double> &right_hand_side1,
   Assert (previous_time_level.tria->n_cells(0) == tria->n_cells(0),
 	  typename TimeStep_Wave<dim>::ExcCoarsestGridsDiffer());
 
-  typedef DoFHandler<dim>::cell_iterator cell_iterator;
+  typedef typename DoFHandler<dim>::cell_iterator cell_iterator;
 
   FEValues<dim> fe_values (fe, quadrature,
 			   UpdateFlags(update_values |
@@ -5425,12 +5425,13 @@ cell_iterator old_cell = previous_time_level.dof_handler->begin(),
 
 template <int dim>
 void
-TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
-			       const DoFHandler<dim>::cell_iterator &new_cell,
+TimeStep_Dual<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &old_cell,
+			       const typename DoFHandler<dim>::cell_iterator &new_cell,
 			       FEValues<dim>        &fe_values,
 			       Vector<double>       &right_hand_side1,
-			       Vector<double>       &right_hand_side2) {
-  typedef DoFHandler<dim>::cell_iterator cell_iterator;
+			       Vector<double>       &right_hand_side2)
+{
+  typedef typename DoFHandler<dim>::cell_iterator cell_iterator;
 
   if (old_cell->has_children() && new_cell->has_children()) 
     {
@@ -5554,7 +5555,7 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 
 template <int dim>
 unsigned int
-TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator &old_cell,
+TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_iterator &old_cell,
 					   FEValues<dim>  &fe_values,
 					   Vector<double> &rhs1,
 					   Vector<double> &rhs2) const {
@@ -5580,7 +5581,7 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
       
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
     {
-      const DoFHandler<dim>::cell_iterator old_child = old_cell->child(c);
+      const typename DoFHandler<dim>::cell_iterator old_child = old_cell->child(c);
 
       child_rhs1.clear ();
       child_rhs2.clear ();
@@ -5647,7 +5648,7 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 
 template <int dim>
 unsigned int
-TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator &new_cell,
+TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell_iterator &new_cell,
 					    FEValues<dim>         &fe_values,
 					    const Vector<double>  &old_dof_values_u,
 					    const Vector<double>  &old_dof_values_v,
@@ -5675,7 +5676,7 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
     {
-      const DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
+      const typename DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
 
       fe.prolongate(c).vmult (local_old_dof_values_u,
 				   old_dof_values_u);
@@ -5907,9 +5908,9 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 
   if (true)
     {
-      DoFHandler<dim>::active_cell_iterator
+      typename DoFHandler<dim>::active_cell_iterator
 	cell = primal_problem.dof_handler->begin_active();
-      const DoFHandler<dim>::active_cell_iterator
+      const typename DoFHandler<dim>::active_cell_iterator
 	endc = primal_problem.dof_handler->end();
       for (; cell!=endc; ++cell)
 	cell->clear_user_pointer();
@@ -5927,12 +5928,12 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 					   update_JxW_values |
 					   update_q_points));
 
-      DoFHandler<dim>::cell_iterator
+      typename DoFHandler<dim>::cell_iterator
 	primal_cell     = primal_problem.dof_handler->begin(),
 	dual_cell       = dual_problem.dof_handler->begin(),
 	primal_cell_old = primal_problem_old.dof_handler->begin(),
 	dual_cell_old   = dual_problem_old.dof_handler->begin();
-      const DoFHandler<dim>::cell_iterator
+      const typename DoFHandler<dim>::cell_iterator
 	endc            = primal_problem.dof_handler->end(0);
 
       for (; primal_cell!=endc; (++primal_cell, ++dual_cell,
@@ -5950,9 +5951,9 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 
 
   Vector<float>::iterator i = estimated_error_per_cell.begin();
-  DoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::active_cell_iterator
     cell = primal_problem.dof_handler->begin_active();
-  const DoFHandler<dim>::active_cell_iterator
+  const typename DoFHandler<dim>::active_cell_iterator
     endc = primal_problem.dof_handler->end();
   for (; cell!=endc; ++cell, ++i)
     {
@@ -5970,10 +5971,10 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 
 template <int dim>
 void
-TimeStep_ErrorEstimation<dim>::estimate_error_dual (const DoFHandler<dim>::cell_iterator &primal_cell,
-						    const DoFHandler<dim>::cell_iterator &dual_cell,
-						    const DoFHandler<dim>::cell_iterator &primal_cell_old,
-						    const DoFHandler<dim>::cell_iterator &dual_cell_old,
+TimeStep_ErrorEstimation<dim>::estimate_error_dual (const typename DoFHandler<dim>::cell_iterator &primal_cell,
+						    const typename DoFHandler<dim>::cell_iterator &dual_cell,
+						    const typename DoFHandler<dim>::cell_iterator &primal_cell_old,
+						    const typename DoFHandler<dim>::cell_iterator &dual_cell_old,
 						    CellwiseError  &cellwise_error,
 						    FEValues<dim>  &fe_values) const {
   
@@ -6125,8 +6126,8 @@ Assert (false, ExcInternalError());
 
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::
-compute_error_on_new_children (const DoFHandler<dim>::cell_iterator &primal_cell,
-			       const DoFHandler<dim>::cell_iterator &dual_cell,
+compute_error_on_new_children (const typename DoFHandler<dim>::cell_iterator &primal_cell,
+			       const typename DoFHandler<dim>::cell_iterator &dual_cell,
 			       const Vector<double>  &local_u_old,
 			       const Vector<double>  &local_v_old,
 			       const Vector<double>  &local_u_bar_old,
@@ -6150,7 +6151,7 @@ for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
       dual_fe.prolongate(child).vmult (child_u_bar_old, local_u_bar_old);
       dual_fe.prolongate(child).vmult (child_v_bar_old, local_v_bar_old);
 
-      const DoFHandler<dim>::cell_iterator
+      const typename DoFHandler<dim>::cell_iterator
 	new_primal_child = primal_cell->child(child),
 	new_dual_child   = dual_cell->child(child);
 
@@ -6194,8 +6195,8 @@ for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
 
 template <int dim>
 typename TimeStep_ErrorEstimation<dim>::ErrorOnCell
-TimeStep_ErrorEstimation<dim>::collect_error_from_children (const DoFHandler<dim>::cell_iterator &primal_cell_old,
-							    const DoFHandler<dim>::cell_iterator &dual_cell_old,
+TimeStep_ErrorEstimation<dim>::collect_error_from_children (const typename DoFHandler<dim>::cell_iterator &primal_cell_old,
+							    const typename DoFHandler<dim>::cell_iterator &dual_cell_old,
 							    const Vector<double>  &local_u,
 							    const Vector<double>  &local_v,
 							    const Vector<double>  &local_u_bar,
@@ -6231,7 +6232,7 @@ TimeStep_ErrorEstimation<dim>::collect_error_from_children (const DoFHandler<dim
       dual_fe.prolongate(child).vmult (child_Ih_u_bar_old, local_Ih_u_bar_old);
       dual_fe.prolongate(child).vmult (child_Ih_v_bar_old, local_Ih_v_bar_old);
 
-      const DoFHandler<dim>::cell_iterator
+      const typename DoFHandler<dim>::cell_iterator
 	old_primal_child = primal_cell_old->child(child),
 	old_dual_child   = dual_cell_old->child(child);
 
@@ -6287,7 +6288,7 @@ error_sum += error_formula (old_dual_child,
 
 template <int dim>
 typename TimeStep_ErrorEstimation<dim>::ErrorOnCell
-TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell_iterator &cell,
+TimeStep_ErrorEstimation<dim>::error_formula (const typename DoFHandler<dim>::active_cell_iterator &cell,
 					      const Vector<double>  &local_u,
 					      const Vector<double>  &local_v,
 					      const Vector<double>  &local_u_bar,
@@ -6322,7 +6323,7 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 
 template <int dim>
 typename TimeStep_ErrorEstimation<dim>::ErrorOnCell
-TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell_iterator &cell,
+TimeStep_ErrorEstimation<dim>::error_formula (const typename DoFHandler<dim>::active_cell_iterator &cell,
 					      const Vector<double>  &local_u,
 					      const Vector<double>  &local_v,
 					      const Vector<double>  &local_u_bar,
@@ -7156,7 +7157,7 @@ void TimeStep_Primal<dim>::build_rhs (Vector<double> &right_hand_side1,
   Assert (previous_time_level.tria->n_cells(0) == tria->n_cells(0),
 	  typename TimeStep_Wave<dim>::ExcCoarsestGridsDiffer());
 
-  typedef DoFHandler<dim>::cell_iterator cell_iterator;
+  typedef typename DoFHandler<dim>::cell_iterator cell_iterator;
 
   FEValues<dim> fe_values (fe, quadrature,
 			   UpdateFlags(update_values |
@@ -7179,12 +7180,12 @@ cell_iterator old_cell = previous_time_level.dof_handler->begin(),
 
 template <int dim>
 void
-TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
-				 const DoFHandler<dim>::cell_iterator &new_cell,
+TimeStep_Primal<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &old_cell,
+				 const typename DoFHandler<dim>::cell_iterator &new_cell,
 				 FEValues<dim>        &fe_values,
 				 Vector<double>       &right_hand_side1,
 				 Vector<double>       &right_hand_side2) {
-  typedef DoFHandler<dim>::cell_iterator cell_iterator;
+  typedef typename DoFHandler<dim>::cell_iterator cell_iterator;
   
   if (old_cell->has_children() && new_cell->has_children()) 
     {
@@ -7310,10 +7311,11 @@ rhs1 = local_M_u;
 
 template <int dim>
 unsigned int
-TimeStep_Primal<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator &old_cell,
+TimeStep_Primal<dim>::collect_from_children (const typename DoFHandler<dim>::cell_iterator &old_cell,
 					     FEValues<dim>  &fe_values,
 					     Vector<double> &rhs1,
-					     Vector<double> &rhs2) const {
+					     Vector<double> &rhs2) const
+{
   unsigned int level_difference = 1;  
   
   const TimeStep_Primal<dim> &previous_time_level
@@ -7337,7 +7339,7 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
     {
-      const DoFHandler<dim>::cell_iterator old_child = old_cell->child(c);
+      const typename DoFHandler<dim>::cell_iterator old_child = old_cell->child(c);
 
       child_rhs1.clear ();
       child_rhs2.clear ();
@@ -7405,7 +7407,7 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 
 template <int dim>
 unsigned int
-TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator &new_cell,
+TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::cell_iterator &new_cell,
 					      FEValues<dim>         &fe_values,
 					      const Vector<double>  &old_dof_values_u,
 					      const Vector<double>  &old_dof_values_v,
@@ -7433,7 +7435,7 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
     {
-      const DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
+      const typename DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
 
       fe.prolongate(c).vmult (local_old_dof_values_u,
 			      old_dof_values_u);

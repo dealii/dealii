@@ -19,21 +19,15 @@
 #include <base/tensor_product_polynomials.h>
 #include <base/polynomial_space.h>
 
-//using std;
-
-extern "C"
-void abort()
-{}
-
 
 template<int dim, class POLY>
 void check_poly(const Point<dim>& x,
 		const POLY& p)
 {
   const unsigned int n = p.n();
-  vector<double> values (n);
-  vector<Tensor<1,dim> > gradients(n);
-  vector<Tensor<2,dim> > second(n);
+  std::vector<double> values (n);
+  std::vector<Tensor<1,dim> > gradients(n);
+  std::vector<Tensor<2,dim> > second(n);
   
   p.compute (x, values, gradients, second);
   
@@ -50,15 +44,15 @@ void check_poly(const Point<dim>& x,
       for (unsigned int d1=0;d1<dim;++d1)
 	for (unsigned int d2=0;d2<dim;++d2)
 	  deallog << second[k][d1][d2] << '\t';
-      deallog << endl;
+      deallog << std::endl;
     }
-  deallog << endl;
+  deallog << std::endl;
 }
 
 
 template <int dim>
 void
-check_tensor (const vector<Polynomial<double> >& v,
+check_tensor (const std::vector<Polynomial<double> >& v,
 	      const Point<dim>& x)
 {
   deallog.push("Tensor");
@@ -70,7 +64,7 @@ check_tensor (const vector<Polynomial<double> >& v,
 
 template <int dim>
 void
-check_poly (const vector<Polynomial<double> >& v,
+check_poly (const std::vector<Polynomial<double> >& v,
 	    const Point<dim>& x)
 {
   deallog.push("Polyno");
@@ -81,7 +75,7 @@ check_poly (const vector<Polynomial<double> >& v,
 
 
 void
-check_dimensions (const vector<Polynomial<double> >& p)
+check_dimensions (const std::vector<Polynomial<double> >& p)
 {
   deallog.push("1d");
   check_tensor(p, Point<1>(.5));
@@ -104,7 +98,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  vector<Polynomial<double> > p;
+  std::vector<Polynomial<double> > p;
   for (unsigned int i=0;i<3;++i)
     p.push_back (LagrangeEquidistant(3, i));
 
