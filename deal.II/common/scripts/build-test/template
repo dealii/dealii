@@ -93,7 +93,7 @@ cd deal.II
 
 # Echo system information for later parsing
 
-echo "CONFIG " $sysname $compiler $options > log
+echo "CONFIG " $sysname $compiler $options | tee -a log
 
 echo "RUNNING CONFIGURE AT " `date '+%Y-%m-%d %T'` | tee -a log
 (./configure $options 2>&1) | tee -a log
