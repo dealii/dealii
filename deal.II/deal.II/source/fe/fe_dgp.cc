@@ -26,11 +26,11 @@ template <int dim>
 FE_DGP<dim>::FE_DGP (const unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
-				    std::vector<bool>(1,true),
+				    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,true),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
-								      degree(degree),
-								      polynomial_space (Legendre<double>::generate_complete_basis(degree))
+                degree(degree),
+                polynomial_space (Legendre<double>::generate_complete_basis(degree))
 {
 				   // if defined, copy over matrices
 				   // from precomputed arrays
@@ -41,7 +41,15 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
   else
     for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
       this->prolongation[i].reinit(0,0);
-  
+
+                                   // restriction can be defined
+                                   // through projection for
+                                   // discontinuous elements, but is
+                                   // presently not implemented for DGP
+                                   // elements.
+                                   //
+                                   // if it were, then the following
+                                   // snippet would be the right code
 //    if ((degree < Matrices::n_projection_matrices) &&
 //        (Matrices::projection_matrices[degree] != 0))
 //      {
@@ -50,7 +58,16 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
 //    else
 //  				     // matrix undefined, set size to zero
 //      for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-//        restriction[i].reinit(0);  
+//        restriction[i].reinit(0, 0);
+                                   // since not implemented, set to
+                                   // "empty"
+  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+    restriction[i].reinit(0, 0);
+
+                                   // note further, that these
+                                   // elements have neither support
+                                   // nor face-support points, so
+                                   // leave these fields empty
 };
 
 

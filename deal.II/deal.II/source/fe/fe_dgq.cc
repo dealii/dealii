@@ -28,7 +28,8 @@ template <int dim>
 FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
-				    std::vector<bool>(1,true),
+				    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
+                                                      true),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
 								      degree(degree),
@@ -47,6 +48,12 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 				   // from precomputed arrays and
 				   // generate all other matrices by
 				   // permutations
+                                   //
+                                   // (note: the matrix is defined if
+                                   // something was entered into the
+                                   // respective table, and what was
+                                   // entered is not a NULL pointer --
+                                   // this would allow for "holes")
   if ((degree < Matrices::n_embedding_matrices) &&
       (Matrices::embedding[degree] != 0))
     {

@@ -27,7 +27,8 @@ template <int dim>
 FE_Q<dim>::FE_Q (const unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
-				    std::vector<bool> (1,false),
+				    std::vector<bool> (FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
+                                                       false),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
 								      degree(degree),

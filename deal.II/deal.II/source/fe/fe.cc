@@ -108,34 +108,35 @@ FiniteElementBase<dim>::InternalDataBase::~InternalDataBase ()
 
 
 template <int dim>
-FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data,
-					   const std::vector<bool> &restriction_is_additive_flags,
-					   const std::vector<std::vector<bool> > &nonzero_components)
+FiniteElementBase<dim>::
+FiniteElementBase (const FiniteElementData<dim> &fe_data,
+                   const std::vector<bool> &restriction_is_additive_flags,
+                   const std::vector<std::vector<bool> > &nonzero_components)
 		:
 		FiniteElementData<dim> (fe_data),
-  system_to_component_table(this->dofs_per_cell),
-  face_system_to_component_table(this->dofs_per_face),
-  system_to_base_table(this->dofs_per_cell),
-  face_system_to_base_table(this->dofs_per_face),		
-  component_to_system_table(this->components,
-			    std::vector<unsigned>(this->dofs_per_cell)),
-			      face_component_to_system_table(this->components,
-							     std::vector<unsigned>(this->dofs_per_face)),
-							       component_to_base_table (this->components,
-											std::make_pair(0U, 0U)),
-							       restriction_is_additive_flags(restriction_is_additive_flags),
-							       nonzero_components (nonzero_components),
-							       n_nonzero_components_table (compute_n_nonzero_components(nonzero_components)),
-							       cached_primitivity (std::find_if (n_nonzero_components_table.begin(),
-												 n_nonzero_components_table.end(),
-												 std::bind2nd(std::not_equal_to<unsigned int>(),
-													      1U))
-										   ==
-										   n_nonzero_components_table.end())
+                system_to_component_table (this->dofs_per_cell),
+                face_system_to_component_table(this->dofs_per_face),
+                system_to_base_table(this->dofs_per_cell),
+                face_system_to_base_table(this->dofs_per_face),		
+                component_to_system_table(this->components,
+                                          std::vector<unsigned>(this->dofs_per_cell)),
+		face_component_to_system_table(this->components,
+                                               std::vector<unsigned>(this->dofs_per_face)),
+                component_to_base_table (this->components,
+                                         std::make_pair(0U, 0U)),
+                restriction_is_additive_flags(restriction_is_additive_flags),
+		nonzero_components (nonzero_components),
+		n_nonzero_components_table (compute_n_nonzero_components(nonzero_components)),
+		cached_primitivity (std::find_if (n_nonzero_components_table.begin(),
+                                                  n_nonzero_components_table.end(),
+                                                  std::bind2nd(std::not_equal_to<unsigned int>(),
+                                                               1U))
+                                    ==
+                                    n_nonzero_components_table.end())
 {
-  Assert (restriction_is_additive_flags.size()==fe_data.components,
+  Assert (restriction_is_additive_flags.size() == this->dofs_per_cell,
 	  ExcDimensionMismatch(restriction_is_additive_flags.size(),
-			       fe_data.components));
+			       this->dofs_per_cell));
   Assert (nonzero_components.size() == this->dofs_per_cell,
 	  ExcInternalError());
   for (unsigned int i=0; i<nonzero_components.size(); ++i)

@@ -1680,11 +1680,13 @@ std::vector<bool>
 FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
 						      const unsigned int n_elements) 
 {
-  std::vector<bool> tmp;
-  for (unsigned int i=0; i<n_elements; ++i)
-    for (unsigned int component=0; component<fe.n_components(); ++component)
-      tmp.push_back (fe.restriction_is_additive (component));
-  return tmp;
+  std::vector<const FiniteElement<dim>*> fe_list;
+  std::vector<unsigned int>              multiplicities;
+
+  fe_list.push_back (&fe);
+  multiplicities.push_back (n_elements);
+  
+  return compute_restriction_is_additive_flags (fe_list, multiplicities);
 };
 
 
@@ -1696,14 +1698,16 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 						      const FiniteElement<dim> &fe2,
 						      const unsigned int        N2) 
 {
-  std::vector<bool> tmp;
-  for (unsigned int i=0; i<N1; ++i)
-    for (unsigned int component=0; component<fe1.n_components(); ++component)
-      tmp.push_back (fe1.restriction_is_additive (component));
-  for (unsigned int i=0; i<N2; ++i)
-    for (unsigned int component=0; component<fe2.n_components(); ++component)
-      tmp.push_back (fe2.restriction_is_additive (component));
-  return tmp;
+  std::vector<const FiniteElement<dim>*> fe_list;
+  std::vector<unsigned int>              multiplicities;
+
+  fe_list.push_back (&fe1);
+  multiplicities.push_back (N1);
+
+  fe_list.push_back (&fe2);
+  multiplicities.push_back (N2);
+  
+  return compute_restriction_is_additive_flags (fe_list, multiplicities);
 };
 
 
@@ -1717,17 +1721,151 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 						      const FiniteElement<dim> &fe3,
 						      const unsigned int        N3) 
 {
-  std::vector<bool> tmp;
-  for (unsigned int i=0; i<N1; ++i)
-    for (unsigned int component=0; component<fe1.n_components(); ++component)
-      tmp.push_back (fe1.restriction_is_additive (component));
-  for (unsigned int i=0; i<N2; ++i)
-    for (unsigned int component=0; component<fe2.n_components(); ++component)
-      tmp.push_back (fe2.restriction_is_additive (component));
-  for (unsigned int i=0; i<N3; ++i)
-    for (unsigned int component=0; component<fe3.n_components(); ++component)
-      tmp.push_back (fe3.restriction_is_additive (component));
-  return tmp;
+  std::vector<const FiniteElement<dim>*> fe_list;
+  std::vector<unsigned int>              multiplicities;
+
+  fe_list.push_back (&fe1);
+  multiplicities.push_back (N1);
+
+  fe_list.push_back (&fe2);
+  multiplicities.push_back (N2);
+
+  fe_list.push_back (&fe3);
+  multiplicities.push_back (N3);
+  
+  return compute_restriction_is_additive_flags (fe_list, multiplicities);
+};
+
+
+
+template <int dim>
+std::vector<bool>
+FESystem<dim>::
+compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim>*> &fes,
+                                       const std::vector<unsigned int>              &multiplicities)
+{
+  Assert (fes.size() == multiplicities.size(), ExcInternalError());
+
+				   // first count the number of dofs
+				   // and components that will emerge
+				   // from the given FEs
+  unsigned int n_shape_functions = 0;
+  for (unsigned int i=0; i<fes.size(); ++i)
+    n_shape_functions += fes[i]->dofs_per_cell * multiplicities[i];
+
+				   // generate the array that will
+				   // hold the output
+  std::vector<bool> retval (n_shape_functions, false);
+
+				   // finally go through all the shape
+				   // functions of the base elements,
+				   // and copy their flags. this
+				   // somehow copies the code in
+				   // build_cell_table, which is not
+				   // nice as it uses too much
+				   // implicit knowledge about the
+				   // layout of the individual bases
+				   // in the composed FE, but there
+				   // seems no way around...
+				   //
+				   // for each shape function, copy
+				   // the flags from the base element
+				   // to this one, taking into account
+				   // multiplicities, and other
+				   // complications
+  unsigned int total_index = 0;
+  for (unsigned int vertex_number=0;
+       vertex_number<GeometryInfo<dim>::vertices_per_cell;
+       ++vertex_number)
+    {
+      for(unsigned int base=0; base<fes.size(); ++base)
+	for (unsigned int m=0; m<multiplicities[base]; ++m)
+	  for (unsigned int local_index = 0;
+	       local_index < fes[base]->dofs_per_vertex;
+	       ++local_index, ++total_index)
+	    {
+	      const unsigned int index_in_base
+		= (fes[base]->dofs_per_vertex*vertex_number + 
+		   local_index);
+
+              Assert (index_in_base < fes[base]->dofs_per_cell,
+                      ExcInternalError());
+              retval[total_index] = fes[base]->restriction_is_additive(index_in_base);
+	    }
+    }
+  
+				   // 2. Lines
+  if (GeometryInfo<dim>::lines_per_cell > 0)
+    for (unsigned int line_number= 0;
+	 line_number != GeometryInfo<dim>::lines_per_cell;
+	 ++line_number)
+      {
+	for (unsigned int base=0; base<fes.size(); ++base)
+	  for (unsigned int m=0; m<multiplicities[base]; ++m)
+	    for (unsigned int local_index = 0;
+		 local_index < fes[base]->dofs_per_line;
+		 ++local_index, ++total_index)
+	      {
+		const unsigned int index_in_base
+		  = (fes[base]->dofs_per_line*line_number + 
+		     local_index +
+		     fes[base]->first_line_index);
+
+                Assert (index_in_base < fes[base]->dofs_per_cell,
+                        ExcInternalError());
+                retval[total_index] = fes[base]->restriction_is_additive(index_in_base);
+	      }
+      }
+  
+				   // 3. Quads
+  if (GeometryInfo<dim>::quads_per_cell > 0)
+    for (unsigned int quad_number= 0;
+	 quad_number != GeometryInfo<dim>::quads_per_cell;
+	 ++quad_number)
+      {
+	for (unsigned int base=0; base<fes.size(); ++base)
+	  for (unsigned int m=0; m<multiplicities[base]; ++m)
+	    for (unsigned int local_index = 0;
+		 local_index < fes[base]->dofs_per_quad;
+		 ++local_index, ++total_index)
+	      {
+		const unsigned int index_in_base
+		  = (fes[base]->dofs_per_quad*quad_number + 
+		     local_index +
+		     fes[base]->first_quad_index);
+
+                Assert (index_in_base < fes[base]->dofs_per_cell,
+                        ExcInternalError());
+                retval[total_index] = fes[base]->restriction_is_additive(index_in_base);
+	      }
+      }
+  
+				   // 4. Hexes
+  if (GeometryInfo<dim>::hexes_per_cell > 0)
+    for (unsigned int hex_number= 0;
+	 hex_number != GeometryInfo<dim>::hexes_per_cell;
+	 ++hex_number)
+      {
+	for(unsigned int base=0; base<fes.size(); ++base)
+	  for (unsigned int m=0; m<multiplicities[base]; ++m)
+	    for (unsigned int local_index = 0;
+		 local_index < fes[base]->dofs_per_hex;
+		 ++local_index, ++total_index)
+	      {
+		const unsigned int index_in_base
+		  = (fes[base]->dofs_per_hex*hex_number + 
+		     local_index +
+		     fes[base]->first_hex_index);
+
+                Assert (index_in_base < fes[base]->dofs_per_cell,
+                        ExcInternalError());
+                retval[total_index] = fes[base]->restriction_is_additive(index_in_base);
+	      }
+      }
+
+  Assert (total_index == n_shape_functions, ExcInternalError());
+  
+  return retval;
 };
 
 
@@ -1970,10 +2108,11 @@ compute_nonzero_components (const std::vector<const FiniteElement<dim>*> &fes,
 	      }
       }
 
-  Assert (total_index == retval.size(), ExcInternalError());
+  Assert (total_index == n_shape_functions, ExcInternalError());
   
   return retval;
 };
+
 
 
 

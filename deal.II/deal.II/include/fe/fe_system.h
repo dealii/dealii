@@ -525,12 +525,15 @@ class FESystem : public FiniteElement<dim>
 
 
 				     /**
-				      * Helper function used in the constructor:
-				      * takes a @p{FiniteElement} object
-				      * and returns an boolean vector including
-				      * the @p{restriction_is_additive_flags} of
-				      * the mixed element consisting of @p{N}
-				      * elements of the sub-element @p{fe}.
+				      * Helper function used in the
+				      * constructor: takes a
+				      * @p{FiniteElement} object and
+				      * returns an boolean vector
+				      * including the
+				      * @p{restriction_is_additive_flags}
+				      * of the mixed element
+				      * consisting of @p{N} elements
+				      * of the sub-element @p{fe}.
 				      */
     static std::vector<bool>
     compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
@@ -558,6 +561,19 @@ class FESystem : public FiniteElement<dim>
 					   const FiniteElement<dim> &fe3,
 					   const unsigned int        N3);
 
+				     /**
+				      * Compute the named flags for a
+				      * list of finite elements with
+				      * multiplicities given in the
+				      * second argument. This function
+				      * is called from all the above
+				      * functions.
+				     */
+    static std::vector<bool>
+    compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim>*> &fes,
+                                           const std::vector<unsigned int>              &multiplicities);
+    
+    
 				     /**
 				      * Compute the non-zero vector
 				      * components of a composed

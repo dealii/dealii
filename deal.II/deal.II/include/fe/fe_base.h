@@ -409,11 +409,17 @@ class FiniteElementBase : public Subscriptor,
   
 				     /**
 				      * Construct an object of this
-				      * type.  You have to set some
+				      * type. You have to set some
 				      * member variables, for example
 				      * some matrices, explicitly
 				      * after calling this base class'
-				      * constructor.
+				      * constructor. For this see the
+				      * existing finite element
+				      * classes. For the second and
+				      * third parameter of this
+				      * constructor, see the document
+				      * of the respective member
+				      * variables.
 				      */
     FiniteElementBase (const FiniteElementData<dim> &fe_data,
 		       const std::vector<bool> &restriction_is_additive_flags,
@@ -816,11 +822,16 @@ class FiniteElementBase : public Subscriptor,
     component_to_base (unsigned int component) const;
 
 				     /**
-				      * Access the @p{restriction_is_additive_flag}
-				      * field. See there for more information on 
-				      * its contents.
+				      * Access the
+				      * @p{restriction_is_additive_flag}
+				      * field. See there for more
+				      * information on its contents.
+				      *
+				      * The index must be between zero
+				      * and the number of shape
+				      * functions of this element.
 				      */
-    bool restriction_is_additive (const unsigned int component) const;
+    bool restriction_is_additive (const unsigned int index) const;
 
 				     /**
 				      * Return the support points of
@@ -1187,18 +1198,20 @@ class FiniteElementBase : public Subscriptor,
 				      *
 				      * This array has valid values
 				      * also in the case of
-				      * vector-value
+				      * vector-valued
 				      * (i.e. non-primitive) shape
 				      * functions, in contrast to the
 				      * @p{system_to_component_table}.
 				      */
-    std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> > system_to_base_table;
+    std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> >
+    system_to_base_table;
 
 				     /**
 				      * Likewise for the indices on
 				      * faces.
 				      */
-    std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> > face_system_to_base_table;
+    std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> >
+    face_system_to_base_table;
     
 				     /**
 				      * Map between component and
@@ -1278,9 +1291,48 @@ class FiniteElementBase : public Subscriptor,
 				      * build the complete matrix. The
 				      * flag should be @p{true}.
 				      *
-				      * There is one flag per
-				      * component in vector valued
-				      * elements.
+				      * For examples of use of these
+				      * flags, see the places in the
+				      * library where it is queried.
+				      * 
+				      * There is one flag per shape
+				      * function, indicating whether
+				      * it belongs to the class of
+				      * shape functions that are
+				      * additive in the restriction or
+				      * not.
+				      *
+				      * Note that in previous versions
+				      * of the library, there was one
+				      * flag per vector component of
+				      * the element. This is based on
+				      * the fact that all the shape
+				      * functions that belong to the
+				      * same vector component must
+				      * necessarily behave in the same
+				      * way, to make things
+				      * reasonable. However, the
+				      * problem is that it is
+				      * sometimes impossible to query
+				      * this flag in the vector-valued
+				      * case: this used to be done
+				      * with the
+				      * @p{system_to_component_index}
+				      * function that returns which
+				      * vector component a shape
+				      * function is associated
+				      * with. The point is that since
+				      * we now support shape functions
+				      * that are associated with more
+				      * than one vector component (for
+				      * example the shape functions of
+				      * Raviart-Thomas, or Nedelec
+				      * elements), that function can
+				      * no more be used, so it can be
+				      * difficult to find out which
+				      * for vector component we would
+				      * like to query the
+				      * restriction-is-additive flags.
 				      */
     const std::vector<bool> restriction_is_additive_flags;
 
@@ -1558,11 +1610,11 @@ FiniteElementBase<dim>::component_to_base (unsigned int index) const
 template <int dim>
 inline
 bool
-FiniteElementBase<dim>::restriction_is_additive (const unsigned int component) const
+FiniteElementBase<dim>::restriction_is_additive (const unsigned int index) const
 {
-  Assert(component<this->n_components(),
-	 ExcIndexRange(component, 0, this->n_components()));
-  return restriction_is_additive_flags[component];
+  Assert(index < this->dofs_per_cell,
+	 ExcIndexRange(index, 0, this->dofs_per_cell));
+  return restriction_is_additive_flags[index];
 }
 
 
