@@ -9,7 +9,7 @@ default:
 # clean everything
 clean: clean-objects
 
-# only clean object files, not libraries
+# only clean object files, not libraries and executables
 clean-objects:  clean-base clean-lac \
 		clean-1d clean-2d clean-3d \
 		clean-contrib
@@ -25,7 +25,7 @@ clean-contrib:
 	-rm contrib/*/*.o
 
 veryclean: clean
-	-rm -f lib*
+	-rm -f lib* bin/*
 
 .PHONY: clean clean-objects 
 .PHONY: clean-base clean-lac clean-1d clean-2d clean-3d
