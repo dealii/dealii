@@ -41,6 +41,8 @@ FEValuesData<dim>::initialize (const unsigned int n_quadrature_points,
 			       const unsigned int n_shapes,
 			       const UpdateFlags  flags)
 {
+  update_flags = flags;
+  
   if (flags & update_values)
     shape_values.reinit(n_shapes, n_quadrature_points);
 
@@ -433,7 +435,7 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 		FEValuesBase<dim> (q.n_quadrature_points,
 				   fe.dofs_per_cell,
 				   1,
-				   update_flags,
+				   update_default,
 				   mapping,
 				   fe),
 		quadrature (q)
@@ -449,8 +451,9 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 				   // ask the finite element and mapping.
 				   // elements are first since they
 				   // might require update in mapping
-  UpdateFlags flags = fe.update_once (update_flags)
-			    | fe.update_each (update_flags);
+  UpdateFlags flags = update_flags
+		      | fe.update_once (update_flags)
+		      | fe.update_each (update_flags);
   flags |= mapping.update_once (flags)
 	   | mapping.update_each (flags);
 
@@ -477,7 +480,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		FEValuesBase<dim> (q.n_quadrature_points,
 				   fe.dofs_per_cell,
 				   1,
-				   update_flags,
+				   update_default,
 				   mapping_q1,
 				   fe),
                 quadrature (q)
@@ -493,8 +496,9 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 				   // ask the finite element and mapping.
 				   // elements are first since they
 				   // might require update in mapping
-  UpdateFlags flags = fe.update_once (update_flags)
-			    | fe.update_each (update_flags);
+  UpdateFlags flags = update_flags
+		      | fe.update_once (update_flags)
+		      | fe.update_each (update_flags);
   flags |= mapping->update_once (flags)
 	   | mapping->update_each (flags);
 
@@ -558,7 +562,7 @@ template <int dim>
 FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 					 const unsigned int dofs_per_cell,
 					 const unsigned int n_faces_or_subfaces,
-					 const UpdateFlags update_flags,
+					 const UpdateFlags,
 					 const Mapping<dim> &mapping,      
 					 const FiniteElement<dim> &fe,
 					 const Quadrature<dim-1>& quadrature)
@@ -566,7 +570,7 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 		FEValuesBase<dim> (n_q_points,
 				   dofs_per_cell,
 				   n_faces_or_subfaces,
-				   update_flags,
+				   update_default,
 				   mapping,
 				   fe),
                 quadrature(quadrature)
@@ -618,8 +622,9 @@ FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 				   // ask the finite element and mapping.
 				   // elements are first since they
 				   // might require update in mapping
-  UpdateFlags flags = fe.update_once (update_flags)
-			    | fe.update_each (update_flags);
+  UpdateFlags flags = update_flags
+		      | fe.update_once (update_flags)
+		      | fe.update_each (update_flags);
   flags |= mapping.update_once (flags)
 	   | mapping.update_each (flags);
 
@@ -656,8 +661,9 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				   // ask the finite element and mapping.
 				   // elements are first since they
 				   // might require update in mapping
-  UpdateFlags flags = fe.update_once (update_flags)
-			    | fe.update_each (update_flags);
+  UpdateFlags flags = update_flags
+		      | fe.update_once (update_flags)
+		      | fe.update_each (update_flags);
   flags |= mapping->update_once (flags)
 	   | mapping->update_each (flags);
 
@@ -733,8 +739,9 @@ FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 				   // ask the finite element and mapping.
 				   // elements are first since they
 				   // might require update in mapping
-  UpdateFlags flags = fe.update_once (update_flags)
-			    | fe.update_each (update_flags);
+  UpdateFlags flags = update_flags
+		      | fe.update_once (update_flags)
+		      | fe.update_each (update_flags);
   flags |= mapping.update_once (flags)
 	   | mapping.update_each (flags);
 
@@ -772,8 +779,9 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				   // ask the finite element and mapping.
 				   // elements are first since they
 				   // might require update in mapping
-  UpdateFlags flags = fe.update_once (update_flags)
-			    | fe.update_each (update_flags);
+  UpdateFlags flags = update_flags
+		      | fe.update_once (update_flags)
+		      | fe.update_each (update_flags);
   flags |= mapping->update_once (flags)
 	   | mapping->update_each (flags);
 
