@@ -211,9 +211,14 @@ LogStream::push (const string& text)
 
 
 
+// sorry for the weird following declaration spanning 5 lines, but
+// doc++ gets confused if we be more compact :-(
+
 template <class T>
-inline LogStream&
-LogStream::operator << (const T& t)
+inline
+LogStream &
+LogStream::
+operator<< (const T& t)
 {
 				   // if the previous command was an
 				   // #endl#, print the topmost prefix
