@@ -34,7 +34,7 @@ void test (Vector<double> &v,
         w(i) = i+1.;
     }
 
-  Assert (v!=w, ExcInternalError());
+  Assert (v.operator != (w), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

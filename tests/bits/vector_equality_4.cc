@@ -36,7 +36,7 @@ void test (Vector<double> &v,
                                    // but then copy elements and make sure the
                                    // vectors are actually equal
   v = w;
-  Assert (! (v!=w), ExcInternalError());
+  Assert (! (v.operator != (w)), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
