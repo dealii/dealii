@@ -101,3 +101,4 @@ foreach $filename (@ARGV) {
    }
 }
 
+print "---- All local links found to be ok.\n\n";
