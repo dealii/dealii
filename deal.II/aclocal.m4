@@ -104,23 +104,31 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             GXX_VERSION=compaq_cxx
           else
   
-  	  dnl Sun Workshop?
+  	    dnl Sun Workshop?
             is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
             if test "x$is_sun_cc" != "x" ; then
               AC_MSG_RESULT(C++ compiler is Sun Workshop compiler)
               GXX_VERSION=sun_workshop
             else
   
-  	    dnl KAI C++?
-  	    is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
-  	    if test "x$is_kai_cc" != "x" ; then
-  	      AC_MSG_RESULT(compile is KAI C++)
-  	      GXX_VERSSION=kai_cc
-  	    else
+  	      dnl Sun Forte?
+              is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
+              if test "x$is_sun_forte_cc" != "x" ; then
+                AC_MSG_RESULT(C++ compiler is Sun Forte compiler)
+                GXX_VERSION=sun_forte
+              else
   
-                dnl  Aw, nothing suitable found...
-                AC_MSG_ERROR(Unrecognized compiler, sorry)
-                exit 1
+  	      dnl KAI C++?
+  	      is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
+  	      if test "x$is_kai_cc" != "x" ; then
+  	        AC_MSG_RESULT(compile is KAI C++)
+  	        GXX_VERSSION=kai_cc
+  	      else
+  
+                  dnl  Aw, nothing suitable found...
+                  AC_MSG_ERROR(Unrecognized compiler, sorry)
+                  exit 1
+                fi
               fi
   	    fi
           fi
@@ -310,7 +318,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           LDFLAGSPIC="-shared"
           ;;
   
-      sun_workshop)
+      sun_workshop | sun_forte)
           CXXFLAGSG="$CXXFLAGS -DDEBUG"
           CXXFLAGSO="$CXXFLAGS -fast"
           CXXFLAGSPIC="-KPIC"
