@@ -22,14 +22,28 @@ void FEValuesBase<deal_II_dimension>::get_function_values<IN>
 template
 void FEValuesBase<deal_II_dimension>::get_function_values<IN>
 (const IN&, std::vector<float>&) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_values<IN>
+(const IN&, const std::vector<unsigned int>&, std::vector<double>&) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_values<IN>
+(const IN&, const std::vector<unsigned int>&, std::vector<float>&) const;
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_values<IN>
 (const IN&, std::vector<Vector<double> > &) const;
-
 template
 void FEValuesBase<deal_II_dimension>::get_function_values<IN>
 (const IN&, std::vector<Vector<float> > &) const;
+
+template
+void FEValuesBase<deal_II_dimension>::get_function_values<IN>
+(const IN&, const std::vector<unsigned int>&,
+ std::vector<Vector<double> > &) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_values<IN>
+(const IN&, const std::vector<unsigned int>&,
+ std::vector<Vector<float> > &) const;
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
