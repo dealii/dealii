@@ -24,7 +24,6 @@
 #include <iomanip>
 #include <base/logstream.h>
 #include <lac/sparse_matrix.h>
-#include <lac/sparse_matrix.templates.h>
 #include <lac/vector.h>
 #include <lac/vector_memory.h>
 #include <lac/solver_control.h>
