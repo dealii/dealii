@@ -1151,7 +1151,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				       // to true if this is an
 				       // interesting dof. finally count
 				       // how many true's there
-      vector<bool>          dof_is_interesting (fine_grid.n_dofs(), false);
+      vector<bool> dof_is_interesting (fine_grid.n_dofs(), false);
       vector<unsigned int>  local_dof_indices (fine_fe.dofs_per_cell);
       
       for (DoFHandler<dim>::active_cell_iterator cell=fine_grid.begin_active();
@@ -1164,10 +1164,23 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 	};
 
       n_parameters_on_fine_grid = count (dof_is_interesting.begin(),
-					    dof_is_interesting.end(),
-					    true);
+					 dof_is_interesting.end(),
+					 true);
     };
 
+				   // get an array in which we store
+				   // which dof on the coarse grid is
+				   // a parameter and which is not
+  vector<bool> coarse_dof_is_parameter (coarse_grid.n_dofs());
+  if (true)
+    {
+      vector<bool> mask (coarse_grid.get_fe().n_components(),
+			 false);
+      mask[coarse_component] = true;
+      extract_dofs (coarse_grid, mask, coarse_dof_is_parameter);
+    };
+  
+  
 
 				   // store the weights with which a dof
 				   // on the parameter grid contributes
@@ -1296,28 +1309,40 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // possibly others)
   vector<int> representants(weights.m(), -1);
   for (unsigned int parameter_dof=0; parameter_dof<weights.m(); ++parameter_dof)
-    {
-      unsigned int column=0;
-      for (; column<weights.n(); ++column)
-	if (weights(parameter_dof,column) == 1)
-	  break;
-      Assert (column < weights.n(), ExcInternalError());
-
-				       // now we know in which column of
-				       // weights the representant is, but
-				       // we don't know its global index. get
-				       // it using the inverse operation of
-				       // the weight_mapping
-      unsigned int global_dof=0;
-      for (; global_dof<weight_mapping.size(); ++global_dof)
-	if (weight_mapping[global_dof] == static_cast<int>(column))
-	  break;
-      Assert (global_dof < weight_mapping.size(), ExcInternalError());
-
-				       // now enter the representants global
-				       // index into our list
-      representants[parameter_dof] = global_dof;
-    };
+    if (coarse_dof_is_parameter[parameter_dof] == true)
+      {
+	unsigned int column=0;
+	for (; column<weights.n(); ++column)
+	  if (weights(parameter_dof,column) == 1)
+	    break;
+	Assert (column < weights.n(), ExcInternalError());
+	
+					 // now we know in which column of
+					 // weights the representant is, but
+					 // we don't know its global index. get
+					 // it using the inverse operation of
+					 // the weight_mapping
+	unsigned int global_dof=0;
+	for (; global_dof<weight_mapping.size(); ++global_dof)
+	  if (weight_mapping[global_dof] == static_cast<int>(column))
+	    break;
+	Assert (global_dof < weight_mapping.size(), ExcInternalError());
+	
+					 // now enter the representants global
+					 // index into our list
+	representants[parameter_dof] = global_dof;
+      }
+    else
+      {
+					 // consistency check: if this
+					 // is no parameter dof on the
+					 // coarse grid, then the
+					 // respective row must be
+					 // empty!
+	for (unsigned int col=0; col<weights.n(); ++col)
+	  Assert (weights(parameter_dof,col) == 0, ExcInternalError());
+      };
+  
 
 
 				   // note for people that want to
@@ -1508,13 +1533,19 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 				       // loop over all dofs on this
 				       // cell and check whether they
 				       // are interesting for us
-      for (unsigned int local_parameter_dof=0;
-	   local_parameter_dof<coarse_dofs_per_cell_component;
-	   ++local_parameter_dof)
-	if (coarse_fe.system_to_component_index(local_parameter_dof).first
+      for (unsigned int local_dof=0;
+	   local_dof<coarse_fe.dofs_per_cell;
+	   ++local_dof)
+	if (coarse_fe.system_to_component_index(local_dof).first
 	    ==
 	    coarse_component)
 	  {
+					     // the how-many-th
+					     // parameter is this on
+					     // this cell?
+	    const unsigned int local_parameter_dof
+	      = coarse_fe.system_to_component_index(local_dof).second;
+	    
 	    global_parameter_representation.clear ();
 	    
 					     // distribute the representation of
@@ -1560,7 +1591,7 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 						   // zero
 		  if (global_parameter_representation(i) != 0)
 		    {
-		      const unsigned int wi = parameter_dof_indices[local_parameter_dof],
+		      const unsigned int wi = parameter_dof_indices[local_dof],
 					 wj = weight_mapping[i];
 		      weights(wi,wj) = global_parameter_representation(i);
 		    };
