@@ -1942,15 +1942,33 @@ double sqr(double a) {
 template <int dim>
 void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
 						const double       fraction_of_error,
-						const unsigned int n_sorting_parts) {
+						const unsigned int n_sorting_steps) {
 				   // correct number of cells is
 				   // checked in #refine#
   Assert ((fraction_of_error>0) && (fraction_of_error<=1),
 	  ExcInvalidParameterValue());
 
+				   // rename variable since we have to change it
+  unsigned n_sorting_parts = n_sorting_steps;
+  
+
 				   // number of cells to be sorted per part
-  const unsigned cells_per_part
-    = static_cast<int>(fraction_of_error * criteria.size() / n_sorting_parts);
+  unsigned cells_per_part
+    = static_cast<int>(rint(fraction_of_error * criteria.size() / n_sorting_parts));
+
+				   // if number of elements is so small or the
+				   // fraction so high that we will get into trouble
+				   // with the maximum number of elements to be
+				   // sorted, fall back to only one sorting step.
+				   // Do so also if cells_per_part was rounded
+				   // to zero
+  if ((cells_per_part*n_sorting_parts > criteria.size()) ||
+      (cells_per_part == 0)) 
+    {
+      cells_per_part = criteria.size();
+      n_sorting_parts = 1;
+    };
+  
 				   // let tmp be the cellwise square of the
 				   // error, which is what we have to sum
 				   // up and compare with
@@ -2018,7 +2036,12 @@ void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
 				   // used more cells than the given fraction
 				   // to reach the fraction_of_error, or
 				   // something has gone terribly wrong.
-  Assert (false, ExcInternalError());
+				   //
+				   // Only exception: there are so few cells
+				   // that fraction*n_cells == n_cells
+				   // (integer arithmetic!)
+  Assert (n_sorting_parts * cells_per_part == criteria.size(),
+	  ExcInternalError());
 };
 
 

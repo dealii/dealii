@@ -275,7 +275,7 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 					   const Boundary<dim>      &boundary,
 					   map<int,double>   &boundary_values) {
   vector<int>    dof_to_boundary_mapping;
-  dof.map_dof_to_boundary_indices (dof_to_boundary_mapping);
+  dof.map_dof_to_boundary_indices (boundary_functions, dof_to_boundary_mapping);
   
 				   // set up sparsity structure
   dSMatrixStruct sparsity(dof.n_boundary_dofs(boundary_functions),

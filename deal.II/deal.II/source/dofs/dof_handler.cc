@@ -1794,7 +1794,8 @@ void DoFHandler<dim>::map_dof_to_boundary_indices (const FunctionMap &boundary_i
 	    mapping[dofs_on_face[i]] = next_boundary_index++;
       };
 
-  Assert (static_cast<unsigned int>(next_boundary_index) == n_boundary_dofs(),
+  Assert (static_cast<unsigned int>(next_boundary_index)
+	  == n_boundary_dofs(boundary_indicators),
 	  ExcInternalError());
 };
 
