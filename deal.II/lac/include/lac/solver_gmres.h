@@ -347,8 +347,8 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 				   // as expected...
   
 //TODO:[?] Check, why there are two different start residuals.
-//TODO:[?] Allocate vectors only when needed.
-
+//TODO:[GK] Make sure the parameter in the constructor means maximum basis size
+  
   deallog.push("GMRES");
   const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
 
