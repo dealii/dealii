@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id$ */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
 /* 
    Purpose: check some things with the intergrid map
