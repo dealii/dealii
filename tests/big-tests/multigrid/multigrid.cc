@@ -427,7 +427,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   tria->set_boundary (&boundary_description);
   tria->begin_active()->set_refine_flag();
   (++(++(tria->begin_active())))->set_refine_flag();
-  tria->execute_refinement ();
+  tria->execute_coarsening_and_refinement ();
   tria->refine_global (level);
   cout << tria->n_active_cells() << " active cells." << endl;
 

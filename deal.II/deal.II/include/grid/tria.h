@@ -412,7 +412,7 @@ class TriaDimensionInfo<3> {
  *
  *        for (; cell != endc; ++cell)
  *          cell->set_refine_flag ();
- *        execute_refinement ();
+ *        execute_coarsening_and_refinement ();
  *      };
  *    \end{verbatim}
  *  \end{itemize}
@@ -435,13 +435,13 @@ class TriaDimensionInfo<3> {
  *                                     // refine first cell
  *    tria.begin_active()->set_refine_flag();
  *    tria.save_refine_flags (history);
- *    tria.execute_refinement ();
+ *    tria.execute_coarsening_and_refinement ();
  *
  *                                     // refine first active cell
  *                                     // on coarsest level
  *    tria.begin_active()->set_refine_flag ();
  *    tria.save_refine_flags (history);
- *    tria.execute_refinement ();
+ *    tria.execute_coarsening_and_refinement ();
  *    
  *    Triangulation<2>::active_cell_iterator cell;
  *    for (int i=0; i<17; ++i) 
@@ -453,7 +453,7 @@ class TriaDimensionInfo<3> {
  *        --cell;
  *        cell->set_refine_flag ();
  *        tria.save_refine_flags (history);
- *        tria.execute_refinement ();
+ *        tria.execute_coarsening_and_refinement ();
  *      };
  *                                       // output the grid
  *    ofstream out("grid.1");
@@ -616,22 +616,24 @@ class TriaDimensionInfo<3> {
  *   refinement. Marking non-active cells results in an error.
  *
  *   After all the cells you wanted to mark for refinement, call the
- *   #execute_refinement# function to actually perform the refinement. This
- *   function itself first calls the #prepare_refinement# function to regularise
- *   the resulting triangulation: since a face between two adjacent cells may
- *   only be subdivided once (i.e. the levels of two adjacent cells may
- *   differ by one at most; it is not possible to have a cell refined twice
- *   while the neighboring one is not refined), some additional cells are
- *   flagged for refinement to smooth the grid. This enlarges the number of
- *   resulting cells but makes the grid more regular, thus leading to better
- *   approximationonal properties and, above all, making the handling of data
- *   structures and algorithms much much easier. To be honest, this is mostly
- *   an algorithmic step than one needed by the finite element method.
+ *   #execute_coarsening_and_refinement# function to actually perform
+ *   the refinement. This function itself first calls the
+ *   #prepare_coarsening_and_refinement# function to regularise the resulting
+ *   triangulation: since a face between two adjacent cells may only
+ *   be subdivided once (i.e. the levels of two adjacent cells may
+ *   differ by one at most; it is not possible to have a cell refined
+ *   twice while the neighboring one is not refined), some additional
+ *   cells are flagged for refinement to smooth the grid. This
+ *   enlarges the number of resulting cells but makes the grid more
+ *   regular, thus leading to better approximationonal properties and,
+ *   above all, making the handling of data structures and algorithms
+ *   much much easier. To be honest, this is mostly an algorithmic
+ *   step than one needed by the finite element method.
  *
  *   To coarsen a grid, the same way as above is possible by using
- *   #i->set_coarsen_flag# and calling #execute_coarsening#. You can use
- *   #execute_coarsening_and_refinement# to get both actions done, first
- *   coarsening and refinement. The reason for this order is that the
+ *   #i->set_coarsen_flag# and calling #execute_coarsening_and_refinement#.
+ *
+ *   The reason for first coarsening, then refining is that the
  *   refinement usually adds some additional cells to keep the triangulation
  *   regular and thus satifies all refinement requests, while the coarsening
  *   does not delete cells not requested for; therefore the refinement will
@@ -731,14 +733,13 @@ class TriaDimensionInfo<3> {
  *   \subsection{Smoothing of a triangulation}
  *
  *   Some degradation of approximation properties has been observed
- *   for grids which are too unstructured. Therefore, the #prepare_refinement#
- *   function which is automatically called by the #execute_refinement# function
- *   can do some smoothing of the triangulation. The same holds for the
- *   #prepare_coarsening# function called by #execute_coarsening#.Note that
- *   mesh smoothing is only done for two or more space dimensions, no smoothing
- *   is available at present for one spatial dimension. In the sequel,
- *   let #execute_*# stand for any of #execute_refinement#, #execute_coarsening#
- *   or #execute_refinement_and_coarsening#.
+ *   for grids which are too unstructured. Therefore, the
+ *   #prepare_refinement# function which is automatically called by
+ *   the #execute_coarsening_and_refinement# function can do some
+ *   smoothing of the triangulation. Note that mesh smoothing is only
+ *   done for two or more space dimensions, no smoothing is available
+ *   at present for one spatial dimension. In the sequel, let
+ *   #execute_*# stand for #execute_coarsening_and_refinement#.
  *
  *   For the purpose of smoothing, the
  *   #Triangulation# constructor takes an argument specifying whether a
@@ -924,7 +925,7 @@ class TriaDimensionInfo<3> {
  *       // flag cells according to some criterion
  *       ...;
  *       tria.save_refine_flags (history);
- *       tria.execute_refinement ();
+ *       tria.execute_coarsening_and_refinement ();
  *     };        
  *   \end{verbatim}
  *
@@ -935,7 +936,7 @@ class TriaDimensionInfo<3> {
  *                                 // do 10 refinement steps
  *     for (int step=0; step<10; ++step) {
  *       tria.load_refine_flags (history);
- *       tria.execute_refinement ();
+ *       tria.execute_coarsening_and_refinement ();
  *     };        
  *   \end{verbatim}
  *
@@ -1039,7 +1040,7 @@ class TriaDimensionInfo<3> {
  *             if (cell->at_boundary())
  *               cell->set_refine_flag();
  *
- *           tria.execute_refinement();
+ *           tria.execute_coarsening_and_refinement();
  *         };
  *     };            
  *   \end{verbatim}
@@ -1065,10 +1066,11 @@ class TriaDimensionInfo<3> {
  *   each step of the mesh history, when coming to the point of refining it
  *   further the assumptions also hold.
  *
- *   The regularisation and smoothing is done in the #prepare_refinement#
- *   function, which is called by #execute_refinement# at the very beginning.
- *   It decides which additional cells to flag for refinement by looking at the
- *   old grid and the refinement flags for each cell.
+ *   The regularisation and smoothing is done in the
+ *   #prepare_refinement# function, which is called by
+ *   #execute_coarsening_and_refinement# at the very beginning.  It
+ *   decides which additional cells to flag for refinement by looking
+ *   at the old grid and the refinement flags for each cell.
  *
  *   \begin{itemize}
  *   \item {\it Regularisation:} The algorithm walks over all cells checking
@@ -1410,8 +1412,7 @@ class TriaDimensionInfo<3> {
  *
  *   @memo Implementation of a multilevel triangulation of a domain
  *   @see TriaRawIterator
- *   @author Wolfgang Bangerth, 1998
- */
+ *   @author Wolfgang Bangerth, 1998 */
 template <int dim>
 class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
   public:
@@ -1472,7 +1473,7 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      *  object remains with the caller of this
 				      *  function, i.e. you have to make sure
 				      *  that it is not destroyed before
-				      *  #Triangulation<>::execute_refinement()#
+				      *  #Triangulation<>::execute_refinement_and_refinement()#
 				      *  is called the last time. Checking this
 				      *  is mostly done by the library by
 				      *  using a #Subscriptor# object as base
@@ -1635,7 +1636,7 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				     /**
 				      *  Refine all cells #times# times, by
 				      *  alternatingly calling #refine_global()#
-				      *  and #execute_refinement()#.
+				      *  and #execute_coarsening_and_refinement()#.
 				      *  This function actually starts the
 				      *  refinement process, so you have no way
 				      *  to store the refinement flags.
@@ -1663,7 +1664,7 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * The cells are only flagged for
 				      * refinement, they are not actually
 				      * refined. To do so, you have to call the
-				      * #execute_refinement# function.
+				      * #execute_coarsening_and_refinement# function.
 				      *
 				      * There are more sophisticated strategies
 				      * for mesh refinement; refer to the
@@ -1704,7 +1705,7 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * the fraction #bottom_fraction_of_cells#
 				      * with the least error. To actually
 				      * perform the refinement, call
-				      * #execute_refinement#.
+				      * #execute_coarsening_and_refinement#.
 				      *
 				      * #fraction_of_cells# shall be a value
 				      * between zero and one.
@@ -1750,23 +1751,6 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 					    const double         bottom_fraction);
     
 				     /**
-				      *  Refine all cells on all levels which
-				      *  were previously flagged for refinement.
-				      *
-				      *  The function resets all refinement
-				      *  flags to false. In three spatial
-				      *  dimensions, the user flag is used
-				      *  for lines and quads, but not for
-				      *  cells.
-				      *
-                                      *  See the general docs for more
-                                      *  information.
-                                      *
-				      *  This function is dimension specific.
-				      */ 
-    void execute_refinement ();
-
-				     /**
 				      *  Prepare the refinement process by
 				      *  fixing the
 				      *  closure of the refinement in #dim>=2#
@@ -1788,24 +1772,6 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      *  #prepare_refinement_dim_dependent#.
 				      */
     bool prepare_refinement ();
-
-				     /**
-				      * Coarsen all cells which were flagged for
-				      * coarsening, or rather: delete all
-				      * children of those cells of which all
-				      * child cells are flagged for coarsening
-				      * and several other constraints hold (see
-				      * the general doc of this class).
-				      *
-				      * The function resets all coarsen
-				      * flags to false. It uses the user flags,
-                                      * so make sure to save them if you still
-                                      * need them after calling this function.
-				      *
-                                      * See the general docs for more
-                                      * information.
-				      */
-    void execute_coarsening ();
 
     				     /**
 				      * This function does the analogue
@@ -1839,6 +1805,14 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				     /**
 				      * Execute both refinement and coarsening
 				      * of the triangulation.
+				      *
+				      * The function resets all
+				      * refinement and coarsening
+				      * flags to false. It uses the
+				      * user flags.
+				      *
+                                      * See the general docs for more
+                                      * information.
 				      */
     void execute_coarsening_and_refinement ();
 				     /*@}*/
@@ -2922,6 +2896,22 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
     DeclException0 (ExcIO);
 				     //@}
   protected:
+
+				     /**
+				      *  Refine all cells on all levels which
+				      *  were previously flagged for refinement.
+				      */ 
+    void execute_refinement ();
+
+				     /**
+				      * Coarsen all cells which were flagged for
+				      * coarsening, or rather: delete all
+				      * children of those cells of which all
+				      * child cells are flagged for coarsening
+				      * and several other constraints hold (see
+				      * the general doc of this class).
+				      */
+    void execute_coarsening ();
 
 				     /**
 				      *  Write a bool vector to the given stream,

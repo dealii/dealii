@@ -379,7 +379,7 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 	      {
 		tria->begin_active(tria->n_levels()-1)->set_refine_flag();
 		(--(tria->last_active()))->set_refine_flag();
-		tria->execute_refinement ();
+		tria->execute_coarsening_and_refinement ();
 	      };
 	    break;
       case 7:
@@ -408,11 +408,11 @@ void PoissonProblem<dim>::make_zoom_in_grid () {
   tria->create_hypercube ();
 				   // refine first cell
   tria->begin_active()->set_refine_flag();
-  tria->execute_refinement ();
+  tria->execute_coarsening_and_refinement ();
 				   // refine first active cell
 				   // on coarsest level
   tria->begin_active()->set_refine_flag ();
-  tria->execute_refinement ();
+  tria->execute_coarsening_and_refinement ();
   
   Triangulation<dim>::active_cell_iterator cell;
   for (int i=0; i<(dim==3 ? 5 : 17); ++i) 
@@ -423,7 +423,7 @@ void PoissonProblem<dim>::make_zoom_in_grid () {
       cell = tria->last_active(tria->n_levels()-1);
       --cell;
       cell->set_refine_flag ();
-      tria->execute_refinement ();
+      tria->execute_coarsening_and_refinement ();
     };
 };
 
@@ -453,7 +453,7 @@ void PoissonProblem<dim>::make_random_grid () {
 	    cell->set_refine_flag ();
 	};
       
-      tria->execute_refinement ();
+      tria->execute_coarsening_and_refinement ();
     };
 };
   
@@ -529,7 +529,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   if (!set_boundary_values (prm))
     return;
   
-  FEQuadraticSub<dim>                   fe;
+  FELinear<dim>                   fe;
   PoissonEquation<dim>            equation (*rhs);
   QGauss2<dim>                    quadrature;
   

@@ -249,11 +249,11 @@ void TestCases<dim>::run (ParameterHandler &prm) {
       {
 					 // refine first cell
 	tria->begin_active()->set_refine_flag();
-	tria->execute_refinement ();
+	tria->execute_coarsening_and_refinement ();
 					 // refine first active cell
 					 // on coarsest level
 	tria->begin_active()->set_refine_flag ();
-	tria->execute_refinement ();
+	tria->execute_coarsening_and_refinement ();
 
 	Triangulation<dim>::active_cell_iterator cell;
 	for (int i=0; i<17; ++i) 
@@ -264,7 +264,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 	    cell = tria->last_active(tria->n_levels()-1);
 	    --cell;
 	    cell->set_refine_flag ();
-	    tria->execute_refinement ();
+	    tria->execute_coarsening_and_refinement ();
 	  };
 
 	break;
@@ -287,7 +287,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 	
 					 // refine once
 	tria->begin_active()->set_refine_flag();
-	tria->execute_refinement ();
+	tria->execute_coarsening_and_refinement ();
 	
 	Triangulation<dim>::active_cell_iterator cell, endc;
 	for (int i=0; i<6-dim; ++i) 
@@ -301,7 +301,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 	      if (cell->at_boundary())
 		cell->set_refine_flag();
 	    
-	    tria->execute_refinement();
+	    tria->execute_coarsening_and_refinement();
 	  };
 	
 	break;
@@ -311,7 +311,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
       {
 					 // refine once
 	tria->begin_active()->set_refine_flag();
-	tria->execute_refinement ();
+	tria->execute_coarsening_and_refinement ();
 	
 	Triangulation<dim>::active_cell_iterator cell, endc;
 	for (int i=0; i<(dim==2 ? 12 : (dim==3 ? 7 : 20)); ++i) 
@@ -331,7 +331,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 		  cell->set_refine_flag ();
 	      };
 	    
-	    tria->execute_refinement ();
+	    tria->execute_coarsening_and_refinement ();
 	  };
 	break;	
       }

@@ -178,13 +178,13 @@ void test (const int test_case) {
 					 // refine first cell
 	tria.begin_active()->set_refine_flag();
 //	tria.save_refine_flags (history);
-	tria.execute_refinement ();
+	tria.execute_coarsening_and_refinement ();
 	
 					 // refine first active cell
 					 // on coarsest level
 	tria.begin_active()->set_refine_flag ();
 //	tria.save_refine_flags (history);
-	tria.execute_refinement ();
+	tria.execute_coarsening_and_refinement ();
 
 	Triangulation<dim>::active_cell_iterator cell;
 	for (int i=0; i<17; ++i) 
@@ -196,7 +196,7 @@ void test (const int test_case) {
 	    --cell;
 	    cell->set_refine_flag ();
 //	    tria.save_refine_flags (history);
-	    tria.execute_refinement ();
+	    tria.execute_coarsening_and_refinement ();
 	  };
 
 //	tria.refine_global (5);
@@ -224,7 +224,7 @@ void test (const int test_case) {
 	
 					 // refine once
 	tria.begin_active()->set_refine_flag();
-	tria.execute_refinement ();
+	tria.execute_coarsening_and_refinement ();
 	
  	Triangulation<dim>::active_cell_iterator cell, endc;
 	const unsigned int steps[4] = { 0, 10, 7, 2 };
@@ -239,7 +239,7 @@ void test (const int test_case) {
  	      if (cell->at_boundary())
  		cell->set_refine_flag();
 	    
- 	    tria.execute_refinement();
+ 	    tria.execute_coarsening_and_refinement();
  	  };
 
 	tria.set_boundary (0);
@@ -250,7 +250,7 @@ void test (const int test_case) {
       {
 					 // refine once
 	tria.begin_active()->set_refine_flag();
-	tria.execute_refinement ();
+	tria.execute_coarsening_and_refinement ();
 	
 	Triangulation<dim>::active_cell_iterator cell, endc;
 	for (int i=0; i<(dim==2 ? 13 : (dim==3 ? 7 : 30)); ++i) 
@@ -270,7 +270,7 @@ void test (const int test_case) {
 		  cell->set_refine_flag ();
 	      };
 	    
-	    tria.execute_refinement ();
+	    tria.execute_coarsening_and_refinement ();
 	  };
 	break;	
       }
