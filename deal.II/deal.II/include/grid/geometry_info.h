@@ -32,11 +32,244 @@
 template <int dim>
 struct GeometryInfo
 {
+				     /**
+				      * Present dimension. Does not
+				      * look useful, but might be.
+				      */
+    static const unsigned int dim;
+
+				     /**
+				      * Number of children of a refined cell.
+				      */
+    static const unsigned int children_per_cell;
+
+				     /**
+				      * Number of faces of a cell.
+				      */
+    static const unsigned int faces_per_cell;
+
+				     /**
+				      * Number of children of a face
+				      * of a refined cell.
+				      */
+    static const unsigned int subfaces_per_face;
+
+				     /**
+				      * Number of vertices of a cell.
+				      */
+    static const unsigned int vertices_per_cell;
+
+				     /**
+				      * Number of vertices on each face.
+				      * 
+				      */
+    static const unsigned int vertices_per_face;
+
+				     /**
+				      * Number of lines on each face.
+				      */
+    static const unsigned int lines_per_face;
+    
+				     /**
+				      * Number of quads on each face.
+				      */
+    static const unsigned int quads_per_face;
+
+				     /**
+				      * Number of lines of a cell.
+				      */
+    static const unsigned int lines_per_cell
+
+				     /**
+				      * Number of quadrilaterals of a
+				      * cell.
+				      */
+    static const unsigned int quads_per_cell;
+
+				     /**
+				      * Number of hexahedra of a
+				      * cell.
+				      */
+    static const unsigned int hexes_per_cell;
+
+				     /**
+				      * List of numbers which
+				      * denotes which face is opposite
+				      * to a given face. In 1d, this
+				      * list is @p{{1,0}}, in 2d @p{{2, 3, 0, 1}},
+				      * in 3d @p{{1, 0, 4, 5, 2, 3}}.
+				      */
+    static const unsigned int opposite_face[faces_per_cell];
+    
+
+				     /**
+				      * Rearrange verices for OpenDX
+				      * output.  For a cell being
+				      * written in OpenDX format, each
+				      * entry in this field contains
+				      * the number of a vertex in
+				      * @p{deal.II} that corresponds
+				      * to the DX numbering at this
+				      * location.
+				      *
+				      * Typical example: write a cell
+				      * and arrange the vertices, such
+				      * that OpenDX understands them.
+				      *
+				      * \begin{verbatim}
+				      * for (i=0; i< n_vertices; ++i)
+				      *   out << cell->vertex(dx_to_deal[i]);
+				      * \end{verbatim}
+				      */
+    static const unsigned int dx_to_deal[vertices_per_cell];
+
+				     /**
+				      * This field store which child cells
+				      * are adjacent to a certain face of
+				      * the mother cell.
+				      *
+				      * For example, in 2D the layout of
+				      * a cell is as follows:
+				      * @begin{verbatim}
+				      * .      2
+				      * .   3-->--2
+				      * .   |     |
+				      * . 3 ^     ^ 1
+				      * .   |     |
+				      * .   0-->--1
+				      * .      0
+				      * @end{verbatim}
+				      * Vertices and faces are indicated
+				      * with their numbers, faces also with
+				      * their directions.
+				      *
+				      * Now, when refined, the layout is
+				      * like this:
+				      * @begin{verbatim}
+				      * *--*--*
+				      * | 3|2 |
+				      * *--*--*
+				      * | 0|1 |
+				      * *--*--*
+				      * @end{verbatim}
+				      *
+				      * Thus, the child cells on face zero
+				      * are (ordered in the direction of the
+				      * face) 0 and 1, on face 2 they are
+				      * 3 and 2, etc.
+				      *
+				      * For three spatial dimensions,
+				      * the exact order of the children is
+				      * laid down in the documentation of
+				      * the @ref{Triangulation} class.
+				      */
+    static unsigned int child_cell_on_face (const unsigned int face,
+					    const unsigned int subface);
+
+				     /**
+				      * Return the position of the
+				      * @p{i}th vertex on the unit
+				      * cell. The order of vertices is
+				      * the canonical one in deal.II,
+				      * as described in the
+				      * documentation of the
+				      * @ref{Triangulation} class.
+				      */
+    static Point<dim> unit_cell_vertex (const unsigned int vertex);
+
+				     /**
+				      * Report, for @p{vertex=0,1} the
+				      * indices of the two vertices
+				      * adjacent to the line with
+				      * index @p{line} among the lines
+				      * forming this cell. In 1d, the
+				      * only line is the cell itself,
+				      * while in 2d and 3d there are 4
+				      * and 12 lines, respectively.
+				      *
+				      * The positions of these
+				      * vertices in the unit cell can
+				      * be obtained using the
+				      * @p{unit_cell_vertex} function.
+				      *
+				      * The order of the lines, as
+				      * well as their direction (which
+				      * in turn determines which is
+				      * the first and which the second
+				      * vertex on a line) is the
+				      * canonical one in deal.II, as
+				      * described in the documentation
+				      * of the @ref{Triangulation}
+				      * class.
+				      */
+    static unsigned int vertices_adjacent_to_line (const unsigned int line,
+						   const unsigned int vertex);
+
+				     /**
+				      * Given a point @p{p} in unit
+				      * coordinates, return the number
+				      * of the child cell in which it
+				      * would lie in. If the point
+				      * lies on the interface of two
+				      * children, return any one of
+				      * their indices. The result is
+				      * always less than
+				      * @p{GeometryInfo<dim>::children_per_cell}.
+				      *
+				      * The order of child cells is
+				      * described the documentation of
+				      * the @ref{Triangulation} class.
+				      */
+    static unsigned int child_cell_from_point (const Point<dim> &p);
+
+				     /**
+				      * Given coordinates @p{p} on the
+				      * unit cell, return the values
+				      * of the coordinates of this
+				      * point in the coordinate system
+				      * of the given child. Neither
+				      * original nor returned
+				      * coordinates need actually be
+				      * inside the cell, we simply
+				      * perform a scale-and-shift
+				      * operation with a shift that
+				      * depends on the number of the
+				      * child.
+				      */
+    static Point<dim> cell_to_child_coordinates (const Point<dim>    &p,
+						 const unsigned int child_index);
+
+				     /**
+				      * The reverse function to the
+				      * one above: take a point in the
+				      * coordinate system of the
+				      * child, and transform it to the
+				      * coordinate system of the
+				      * mother cell.
+				      */
+    static Point<dim> child_to_cell_coordinates (const Point<dim>    &p,
+						 const unsigned int child_index);
+
+				     /**
+				      * Return true if the given point
+				      * is inside the unit cell of the
+				      * present space dimension.
+				      */
+    static bool is_inside_unit_cell (const Point<dim> &p);
+    
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidCoordinate,
+		    double,
+		    << "The coordinates must satisfy 0 <= x_i <= 1, "
+		    << "but here we have x_i=" << arg1);
 };
 
 
 
 /**
+ * @internal
  * Topological description of zero dimensional cells,
  * i.e. points. This class might not look too useful but often is if
  * in a certain dimension we would like to enquire information about
@@ -127,6 +360,7 @@ struct GeometryInfo<0>
 
 
 /**
+ * @internal
  * Topological description of one dimensional cells.
  *
  * This class contains as static members information on vertices and
@@ -386,6 +620,7 @@ struct GeometryInfo<1>
 
 
 /**
+ * @internal
  * Topological description of two dimensional cells.
  *
  * This class contains as static members information on vertices and
@@ -646,6 +881,7 @@ struct GeometryInfo<2>
 
 
 /**
+ * @internal
  * Topological description of three dimensional cells.
  *
  * This class contains as static members information on vertices and
@@ -904,6 +1140,7 @@ struct GeometryInfo<3>
 
 
 /**
+ * @internal
  * Topological description of four dimensional cells. This class is
  * required in some exotic cases where we compute information in a
  * one-larger dimension than the present, and do so also in 3d (for
