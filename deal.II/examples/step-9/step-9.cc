@@ -323,7 +323,7 @@ AdvectionField<dim>::value (const Point<dim> &p) const
   Point<dim> value;
   value[0] = 2;
   for (unsigned int i=1; i<dim; ++i)
-    value[i] = 1+0.8*sin(8*M_PI*p[0]);
+    value[i] = 1+0.8*std::sin(8*M_PI*p[0]);
 
   return value;
 };
@@ -420,7 +420,7 @@ RightHandSide<dim>::value (const Point<dim>   &p,
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   const double diameter = 0.1;
   return ( (p-center_point).square() < diameter*diameter ?
-	   .1/pow(diameter,dim) :
+	   .1/std::pow(diameter,dim) :
 	   0);
 };
 
@@ -466,8 +466,8 @@ BoundaryValues<dim>::value (const Point<dim>   &p,
 {
   Assert (component == 0, ExcIndexRange (component, 0, 1));
 
-  const double sine_term = sin(16*M_PI*sqrt(p.square()));
-  const double weight    = exp(-5*p.square()) / exp(-5.);
+  const double sine_term = std::sin(16*M_PI*std::sqrt(p.square()));
+  const double weight    = std::exp(-5*p.square()) / std::exp(-5.);
   return sine_term * weight;
 };
 

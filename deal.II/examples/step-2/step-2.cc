@@ -106,9 +106,9 @@ void make_grid (Triangulation<2> &triangulation)
 	    const Point<2> vector_to_center
 	      = (cell->vertex(vertex) - center);
 	    const double distance_from_center
-	      = sqrt(vector_to_center.square());
+	      = std::sqrt(vector_to_center.square());
 	    
-	    if (fabs(distance_from_center - inner_radius) < 1e-10)
+	    if (std::fabs(distance_from_center - inner_radius) < 1e-10)
 	      {
 		cell->set_refine_flag ();
 		break;

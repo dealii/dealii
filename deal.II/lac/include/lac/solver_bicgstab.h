@@ -311,7 +311,7 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 
 //TODO:[?] Find better breakdown criterion
 
-      if (fabs(alpha) > 1.e10)
+      if (std::fabs(alpha) > 1.e10)
 	return true;
     
       s.equ(1., r, -alpha, v);

@@ -217,7 +217,7 @@ double Solution<dim>::value (const Point<dim>   &p,
 				       // offers a member function
 				       // ``square'' that does what
 				       // it's name suggests.
-      return_value += exp(-shifted_point.square() / (width*width));
+      return_value += std::exp(-shifted_point.square() / (width*width));
     };
   
   return return_value;
@@ -264,7 +264,7 @@ Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
 				       // vector, where the factor is
 				       // given by the exponentials.
       return_value += (-2 / (width*width) *
-		       exp(-shifted_point.square() / (width*width)) *
+		       std::exp(-shifted_point.square() / (width*width)) *
 		       shifted_point);
     };
   
@@ -313,10 +313,10 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 				       // the Laplacian:
       return_value += ((2*dim - 4*shifted_point.square()/(width*width)) / 
 		       (width*width) *
-		       exp(-shifted_point.square() / (width*width)));
+		       std::exp(-shifted_point.square() / (width*width)));
 				       // And the second is the
 				       // solution itself:
-      return_value += exp(-shifted_point.square() / (width*width));
+      return_value += std::exp(-shifted_point.square() / (width*width));
     };
   
   return return_value;
