@@ -4,6 +4,7 @@
 #define __multigrid_H
 /*----------------------------   multigrid.h     ---------------------------*/
 
+#include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/forward-declarations.h>
 #include <basic/forward-declarations.h>
@@ -12,7 +13,7 @@
 
 #include <vector>
 class MGTransferBase;
-class MGSmoother;
+class MGSmootherBase;
 
 
 /**
@@ -44,12 +45,12 @@ class MultiGridBase
     const MultiGridBase& operator=(const MultiGridBase&);
     
 				     /**
-				      * Auxiliary vector.
+				      * Auxiliary vector, defect.
 				      */
     vector<Vector<float> > d;
 
 				     /**
-				      * Auxiliary vector.
+				      * Auxiliary vector, solution.
 				      */
     vector<Vector<float> > s;
 
@@ -59,32 +60,21 @@ class MultiGridBase
     Vector<float> t;
     
 				     /**
+				      * Prolongation and restriction object.
+				      */
+    SmartPointer<const MGTransferBase> transfer;
+    
+  protected:
+				     /**
 				      * Highest level of cells.
 				      */
-    unsigned maxlevel;
+    unsigned int maxlevel;
 
 				     /**
 				      * Level for coarse grid solution.
 				      */
-    unsigned minlevel;
+    unsigned int minlevel;
 
-				     /**
-				      * Prolongation and restriction object.
-				      */
-    SmartPointer<MGTransferBase> transfer;
-    
-  protected:
-				     /**
-				      * Number of pre-smoothing steps. Is used
-				      * as a parameter to #pre_smooth#.
-				      */
-    unsigned n_pre_smooth;
-  
-				     /**
-				      * Number of post-smoothing steps Is used
-				      * as a parameter to #post_smooth#.
-				      */
-    unsigned n_post_smooth;
 				     /**
 				      * The actual v-cycle multigrid method.
 				      * This function is called on the
@@ -94,7 +84,9 @@ class MultiGridBase
 				      * #coarse_grid_solution# and
 				      * proceeds back up.
 				      */
-    void level_mgstep(unsigned level, MGSmoother& smoother);  
+    void level_mgstep(unsigned int level,
+		      const MGSmootherBase& pre_smooth,
+		      const MGSmootherBase& post_smooth);  
 
 				     /**
 				      * Apply residual operator on all
@@ -102,7 +94,7 @@ class MultiGridBase
 				      * This is implemented in a
 				      * derived class.
 				      */
-    virtual void level_residual(unsigned level,
+    virtual void level_residual(unsigned int level,
 			     Vector<float>& dst,
 			     const Vector<float>& src,
 			     const Vector<float>& rhs) = 0;
@@ -118,7 +110,7 @@ class MultiGridBase
 				      * n_post_smooth)#
 				      * smoothing steps of #pre_smooth#.
 				      */
-    virtual void coarse_grid_solution(unsigned l,
+    virtual void coarse_grid_solution(unsigned int l,
 				      Vector<float>& dst,
 				      const Vector<float>& src);
   
@@ -130,9 +122,8 @@ class MultiGridBase
 				     /**
 				      * Constructor, subject to change.
 				      */
-    MultiGridBase(MGTransferBase& transfer,
-		  unsigned maxlevel, unsigned minlevel,
-		  unsigned pre_smooth, unsigned post_smooth);
+    MultiGridBase(const MGTransferBase& transfer,
+		  unsigned int maxlevel, unsigned int minlevel);
     virtual ~MultiGridBase();
     
 };
@@ -191,6 +182,30 @@ class MGTransferBase  :  public Subscriptor
 };
 
 /**
+ * An array of matrices for each level.
+ * This class provides the functionality of #vector<SparseMatrix<float> ># combined
+ * with a subscriptor for smart pointers.
+ * @author Guido Kanschat, 1999
+ */
+class MGMatrix
+  :
+  public Subscriptor,
+  public Vector<SparseMatrix<float> >
+{
+  public:
+				     /**
+				      * Standard constructor.
+				      */
+    MGMatrix() 
+      {}
+				     /**
+				      * Constructor allowing to initialize the number of levels.
+				      */
+    MGMatrix(unsigned int n_levels);
+};
+
+
+/**
  * Implementation of multigrid with matrices.
  * While #MultiGridBase# was only an abstract framework for the v-cycle,
  * here we have the implementation of the pure virtual functions defined there.
@@ -198,11 +213,13 @@ class MGTransferBase  :  public Subscriptor
  * 
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-template<int dim, class Matrix>
+template<int dim>
 class MultiGrid
+  :
+  public MultiGridBase
 {
   public:
-    MultiGrid(const MGDoFHandler<dim>&);
+    MultiGrid(const MGDoFHandler<dim>&, const MGTransferBase& transfer);
     
 				     /** Transfer from dVector to
 				      * MGVector.
@@ -230,11 +247,32 @@ class MultiGrid
     template<typename number>
     void copy_from_mg(Vector<number>& dst,
 		      const vector<Vector<float> >& src) const;
+
+				     /**
+				      * Access to matrix structure.
+				      */
+    SparseMatrixStruct& get_sparsity_pattern(unsigned int level);
+
+				     /**
+				      * Read-only access to matrix structure.
+				      */
+    const SparseMatrixStruct& get_sparsity_pattern(unsigned int level) const;
+
+				     /**
+				      * Access to level matrices.
+				      */
+    SparseMatrix<float>& get_matrix(unsigned int level);
+
+				     /**
+				      * Read-only access to level matrices.
+				      */
+    const SparseMatrix<float>& get_matrix(unsigned int level) const;
+
   private:
 				     /**
 				      * Associated #MGDoFHandler#.
 				      */
-    SmartPointer<MGDoFHandler<dim> > dofs;
+    SmartPointer<const MGDoFHandler<dim> > dofs;
 
 				     /**
 				      * Matrix structures for each level.
@@ -326,6 +364,26 @@ class MGTransferPrebuilt : public MGTransferBase
 					  */
     vector<SparseMatrix<float> > prolongation_matrices;
 };
+
+template<int dim>
+inline
+SparseMatrix<float>&
+MultiGrid<dim>::get_matrix(unsigned int level)
+{
+  Assert((level>=minlevel) && (level<maxlevel), ExcIndexRange(level, minlevel, maxlevel));
+  
+  return matrices[level];
+}
+
+template<int dim>
+inline
+const SparseMatrix<float>&
+MultiGrid<dim>::get_matrix(unsigned int level) const
+{
+  Assert((level>=minlevel) && (level<maxlevel), ExcIndexRange(level, minlevel, maxlevel));
+  
+  return matrices[level];
+}
 
 
 

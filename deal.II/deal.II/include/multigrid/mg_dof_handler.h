@@ -121,7 +121,10 @@ class MGDoFDimensionInfo<3> {
 
 
 template <int dim>
-class MGDoFHandler : public DoFHandler<dim> {
+class MGDoFHandler
+  :
+  public DoFHandler<dim>
+{
   public:
     typedef typename MGDoFDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
     typedef typename MGDoFDimensionInfo<dim>::line_iterator line_iterator;

@@ -4,6 +4,7 @@
 // deal_II_libraries=-ldeal_II_2d
 
 #include <numerics/multigrid.h>
+#include <numerics/mg_smoother.h>
 
 class TransferTest
   :
@@ -18,13 +19,27 @@ class TransferTest
     friend class MultiGridBase;
 };
 
+class SmoothTest
+  :
+  public MGSmootherBase
+{
+  public:
+        virtual void smooth (const unsigned int  level,
+			     Vector<float>      &u,
+			     const Vector<float>& rhs) const;
+};
+
+
 class MGTest
   :
   public MultiGridBase
 {
+    MGSmootherBase& smoother;
+    
   public:
-    MGTest(TransferTest& t)
-		    : MultiGridBase(t, 9, 3, 2, 4)
+    MGTest(TransferTest& t, SmoothTest& s)
+		    : MultiGridBase(t, 9, 3),
+		      smoother(s)
       {}
     
     virtual void level_residual(unsigned level,
@@ -32,20 +47,17 @@ class MGTest
 				const Vector<float>& src,
 				const Vector<float>& rhs);
     
-    virtual void smooth(unsigned level,
-			Vector<float>& x,
-			const Vector<float>& b,
-			unsigned steps);
     void doit()
       {
-	level_mgstep(9);
+	level_mgstep(9, smoother, smoother);
       }
 };
 
 main()
 {
   TransferTest tr;
-  MGTest mg(tr);
+  SmoothTest s;
+  MGTest mg(tr, s);
   mg.doit();
   
 }
@@ -67,19 +79,18 @@ TransferTest::restrict(unsigned l,
 }
 
 void
+SmoothTest::smooth (const unsigned int  level,
+		    Vector<float>      &,
+		    const Vector<float>&) const
+{
+  cout << "Smoothing on" << level << endl;
+}
+
+void
 MGTest::level_residual(unsigned l,
 		       Vector<float>&,
 		       const Vector<float>&,
 		       const Vector<float>&)
 {
   cout << "Residual on  " << l << endl;
-}
-
-void
-MGTest::smooth(unsigned l,
-	       Vector<float>&,
-	       const Vector<float>&,
-	       unsigned steps)
-{
-  cout << "Smooth on    " << l << " : " << steps << " steps" << endl;
 }

@@ -5,6 +5,7 @@
 #include <grid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
+#include <numerics/multigrid.h>
 #include <numerics/mg_smoother.h>
 #include <lac/vector.h>
 
@@ -13,7 +14,9 @@
 
 #if deal_II_dimension == 1
 
-MGSmoother::MGSmoother (const MGDoFHandler<1> &/*mg_dof*/) 
+MGSmoother::MGSmoother (const MGDoFHandler<1> &/*mg_dof*/, unsigned int steps)
+		:
+		steps(steps)
 {
   Assert (false, ExcNotImplemented());
 };
@@ -24,7 +27,9 @@ MGSmoother::MGSmoother (const MGDoFHandler<1> &/*mg_dof*/)
 #if deal_II_dimension > 1
 
 template <int dim>
-MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof) 
+MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps)
+		:
+		steps(steps)
 {
   const unsigned int n_levels = mg_dof.get_tria().n_levels();
   
@@ -83,12 +88,12 @@ MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof)
 
 #endif
 
+//////////////////////////////////////////////////////////////////////
 
-
-MGSmoother::~MGSmoother () 
+MGSmootherBase::~MGSmootherBase () 
 {};
 
-
+//////////////////////////////////////////////////////////////////////
 
 void
 MGSmoother::set_zero_interior_boundary (const unsigned int  level,
@@ -102,22 +107,32 @@ MGSmoother::set_zero_interior_boundary (const unsigned int  level,
       u(*p) = 0;
 };
 
+//////////////////////////////////////////////////////////////////////
 
-
+template<int dim>
+MGSmootherSOR::MGSmootherSOR(const MGDoFHandler<dim> &mg_dof,
+			     const MGMatrix& matrix,
+			     unsigned int steps)
+		:
+		MGSmoother(mg_dof, steps),
+		matrix(&matrix)
+{}
 
 void
-MGSmoother::post_smooth (const unsigned int  level,
-			 Vector<float>      &u) const
+MGSmootherSOR::smooth (const unsigned int   /*level*/,
+		       Vector<float>       &/*u*/,
+		       const Vector<float> &/*rhs*/) const
 {
-  pre_smooth (level, u);
-};
 
-
-
+}
 
 // explicit instantiations
 // don't do the following instantiation in 1d, since there is a specialized
 // function there
 #if deal_II_dimension > 1
-template MGSmoother::MGSmoother (const MGDoFHandler<deal_II_dimension>&);
+template MGSmoother::MGSmoother (const MGDoFHandler<deal_II_dimension>&, unsigned int);
 #endif
+
+template MGSmootherSOR::MGSmootherSOR(const MGDoFHandler<deal_II_dimension> &mg_dof,
+				      const MGMatrix& matrix, unsigned int steps);
+

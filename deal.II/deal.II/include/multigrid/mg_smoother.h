@@ -7,21 +7,55 @@
 
 #include <lac/forward-declarations.h>
 #include <basic/forward-declarations.h>
-#include <base/subscriptor.h>
+#include <base/smartpointer.h>
 #include <vector>
 
 
+/**
+ * Abstract base class for multigrid smoothers.
+ * In fact, this class only provides the interface of the smoothing function.
+ * Using deal.II grid handling, #MGSmoother# is a good point to start.
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ */
+class MGSmootherBase
+  :
+  public Subscriptor 
+{  
+  public:
+				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~MGSmootherBase();
+    
+				     /**
+				      * Smoothen the residual of #u# on the given
+				      * level. This function should keep the interior
+				      * level boundary values, so you may want
+				      * to call #set_zero_interior_boundary#
+				      * in the derived class #MGSmoother#
+				      * somewhere in your derived function,
+				      * or another function doing similar
+				      * things.
+				      */
+    virtual void smooth (const unsigned int   level,
+			 Vector<float>       &u,
+			 const Vector<float> &rhs) const = 0;
+
+};
 
 /**
- * Abstract base class for multigrid smoothers. It declares the interface
- * to smoothers and implements some functionality for setting the values
+ * Base class for multigrid smoothers. It declares the interface
+ * to smoothers by inheriting #MGSmootherBase# and implements some functionality for setting
+ * the values
  * of vectors at interior boundaries (i.e. boundaries between differing
  * levels of the triangulation) to zero, by building a list of these degrees
  * of freedom's indices at construction time.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-class MGSmoother :  public Subscriptor 
+class MGSmoother
+  :  public MGSmootherBase
 {
   private:
 				     /**
@@ -60,44 +94,12 @@ class MGSmoother :  public Subscriptor
 				      * the different levels, which are
 				      * needed by the function
 				      * #set_zero_interior_boundaries#.
+				      *
+				      * The parameter steps indicates the number of smoothing
+				      * steps to be executed by #smooth#.
 				      */
     template <int dim>
-    MGSmoother (const MGDoFHandler<dim> &mg_dof);
-
-				     /**
-				      * Destructor, made virtual.
-				      */
-    virtual ~MGSmoother ();
-    
-				     /**
-				      * Smooth the vector #u# on the given
-				      * level. This function should set the
-				      * interior boundary values of u to zero
-				      * at the end of its work, so you may want
-				      * to call #set_zero_interior_boundary#
-				      * at the end of your derived function,
-				      * or another function doing similar
-				      * things.
-				      *
-				      * This function is responsible for the
-				      * presmoothing, postsmoothing is done
-				      * by another function, which, however,
-				      * calls this function if not overloaded.
-				      */
-    virtual void pre_smooth (const unsigned int  level,
-			     Vector<float>      &u) const = 0;
-
-				     /**
-				      * Postsmoothing; the same applies as for
-				      * the presmoothing function. If you
-				      * want pre- and postsmoothing to do the
-				      * same operations, you may want to not
-				      * overload this function, since its
-				      * default implementation simply calls
-				      * #pre_smooth#.
-				      */
-    virtual void post_smooth (const unsigned int  level,
-			      Vector<float>      &u) const;
+    MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps);    
 
 				     /**
 				      * Reset the values of the degrees of
@@ -111,8 +113,20 @@ class MGSmoother :  public Subscriptor
 				      */
     void set_zero_interior_boundary (const unsigned int  level,
 				     Vector<float>      &u) const;
+				     /**
+				      * Modify the number of smoothing steps.
+				      */
+    void set_steps(unsigned int steps);
+				     /**
+				      * How many steps should be used?
+				      */
+    unsigned int get_steps() const;
 
   private:
+				     /**
+				      * Number of smoothing steps.
+				      */
+    unsigned int steps;
 				     /**
 				      * For each level, we store a list of
 				      * degree of freedom indices which are
@@ -123,11 +137,66 @@ class MGSmoother :  public Subscriptor
 				      * entry refers to the second level.
 				      *
 				      * These arrays are set by the constructor.
+				      * The entries for each level are sorted ascendingly.
 				      */
     vector<vector<int> > interior_boundary_dofs;
 };
 
+/**
+ * Implementation of an SOR smoother.
+ *
+ * This class is an implementation of a smootin algorithm for multigrid. It
+ * knows the actual instance of the multigrid matrix and uses the SOR method of the level
+ * matrices.
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ */
+class MGSmootherSOR
+  :
+  public MGSmoother
+{
+  public:
+				     /**
+				      * Constructor.
+				      * The constructor uses an #MGDoFHandler# to initialize
+				      * data structures for interior level boundary handling
+				      * in #MGSmoother#. Furthermore, it takes a pointer to the
+				      * matrices and the number of SOR steps required in each
+				      * smoothing operation.
+				      */
+
+    template<int dim>
+    MGSmootherSOR(const MGDoFHandler<dim> &mg_dof,
+		  const MGMatrix& matrix,
+		  unsigned int steps);
     
+				     /**
+				      * Implementation of the interface in #MGSmootherBase#.
+				      * We use the SOR method in #SparseMatrix# for the real work
+				      * and find a way to keep the boundary values.
+				      */
+    virtual void smooth (const unsigned int   level,
+			 Vector<float>       &u,
+			 const Vector<float> &rhs) const;
+  private:
+				     /**
+				      * Pointer to the matrices.
+				      */
+    SmartPointer< const MGMatrix > matrix;
+};
+
+inline
+void
+MGSmoother::set_steps(unsigned int i)
+{
+  steps = i;
+}
+
+inline
+unsigned int
+MGSmoother::get_steps() const
+{
+  return steps;
+}
 
 
 /*----------------------------   mg_smoother.h     ---------------------------*/

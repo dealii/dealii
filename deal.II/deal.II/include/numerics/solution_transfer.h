@@ -328,7 +328,13 @@ class SolutionTransfer
 				      */
     enum PreparationState {
 	  none, pure_refinement, coarsening_and_refinement
-    } prepared_for;
+    };
+
+				     /**
+				      * ???
+				      */
+    PreparationState prepared_for;
+
 
 				     /**
 				      * Is used for #prepare_for_refining#

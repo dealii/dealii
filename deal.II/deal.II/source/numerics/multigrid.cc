@@ -7,6 +7,8 @@
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <numerics/multigrid.h>
+#include <numerics/multigrid.templates.h>
+#include <numerics/mg_smoother.h>
 #include <lac/vector.h>
 
 
@@ -15,19 +17,19 @@ MultiGridBase::~MultiGridBase ()
 
 
 
-MultiGridBase::MultiGridBase(MGTransferBase& transfer,
-			     unsigned maxlevel, unsigned minlevel,
-			     unsigned pre_smooth, unsigned post_smooth)
+MultiGridBase::MultiGridBase(const MGTransferBase& transfer,
+			     unsigned maxlevel, unsigned minlevel)
 		:
 		d(maxlevel-minlevel),
 		s(maxlevel-minlevel),
-		maxlevel(maxlevel), minlevel(minlevel),
 		transfer(&transfer),
-		n_pre_smooth(pre_smooth), n_post_smooth(post_smooth)
+		maxlevel(maxlevel), minlevel(minlevel)
 {}
 
 void
-MultiGridBase::level_mgstep(unsigned level, MGSmoother& smoother)
+MultiGridBase::level_mgstep(unsigned level,
+			    const MGSmootherBase& pre_smooth,
+			    const MGSmootherBase& post_smooth)
 {
   if (level == minlevel)
     {
@@ -36,7 +38,7 @@ MultiGridBase::level_mgstep(unsigned level, MGSmoother& smoother)
     }
   
 				   // smoothing of the residual by modifying s
-//  smooth(level, d[level], s[level], n_pre_smooth);
+  pre_smooth.smooth(level, s[level], d[level]);
 
 				   // t = d-As
   level_residual(level, t, s[level], d[level]);
@@ -44,12 +46,12 @@ MultiGridBase::level_mgstep(unsigned level, MGSmoother& smoother)
 				   // make t rhs of lower level
   transfer->restrict(level, t, d[level-1]);
 				   // do recursion
-  level_mgstep(level-1, smoother);
+  level_mgstep(level-1, pre_smooth, post_smooth);
 				   // do coarse grid correction
   transfer->prolongate(level, s[level], s[level-1]);
 
 				   // smoothing (modify s again)
-//  post_smooth(level, d[level], s[level], n_post_smooth);
+  post_smooth.smooth(level, s[level], d[level]);
 }
 
 
@@ -223,4 +225,4 @@ void MGTransferPrebuilt::restrict (const unsigned int   from_level,
 template
 void MGTransferPrebuilt::build_matrices (const MGDoFHandler<deal_II_dimension> &mg_dof);
 
-
+template MultiGrid<deal_II_dimension>;

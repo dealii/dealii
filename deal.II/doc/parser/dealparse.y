@@ -12,7 +12,8 @@ stack<string> class_stack;
 stack<string> access_stack;
 
 int yylex();
-void yy_push_fargs();
+void enterfunction();
+void enterbaseinitializers();  
 
 void yyerror(const char* s)
   {
@@ -20,6 +21,7 @@ void yyerror(const char* s)
   }
 %}
 
+%token NAMESPACE
 %token CLASS
 %token TYPEDEF
 %token ACCESS
@@ -42,6 +44,7 @@ void yyerror(const char* s)
 %token COMTEMP
 %token DECLEXCEPTION
 %token INLINE
+%token THREEDOTS
 %token ENDOFDECL
 %%
 
@@ -52,49 +55,56 @@ all:  declaration_list
 
 declaration_list: declaration
   | declaration_list { cout << "@@@" << endl; } declaration
+  | NAMESPACE '{' declaration_list '}' ';'
   | declaration_list ';'
 ;
 
 declaration:
   class_declaration ';'
+  | function_declaration '{' { enterfunction(); }
+  | function_declaration ':' { enterbaseinitializers(); }
   | function_declaration ';'
-  | function_declaration '{' '}' ';'
-  | function_declaration '{' '}'
   | variable_declaration ';'
   | enum_declaration ';'
   | typedef_declaration ';'
   | template_declaration class_declaration ';'
-    { cout << setw(OUTW) << "Template-Description:" << $1 << endl; }
+    { cout << setw(OUTW) << "@Template-Description:" << $1 << endl; }
   | template_declaration function_declaration ';'
-    { cout << setw(OUTW) << "Template-Description:" << $1 << endl; }
+    { cout << setw(OUTW) << "@Template-Description:" << $1 << endl; }
+  | template_declaration function_declaration '{' { enterfunction(); 
+      cout << setw(OUTW) << "@Template-Description:" << $1 << endl; }
+  | template_declaration function_declaration ':' { enterbaseinitializers(); 
+      cout << setw(OUTW) << "@Template-Description:" << $1 << endl; }
   | deal_exception_declaration ';'
+  | ';'
 ;
 
 variable_declaration:
   vartype identifier
-    { cout << setw(OUTW) << "Variable-Declaration:" << $2 << endl
-	   << setw(OUTW) << "Type:" << $1 << endl
-	   << setw(OUTW) << "In-Class:" << class_stack.top() << endl
-	   << setw(OUTW) << "Access:" << access_stack.top() << endl; }
+    { cout << setw(OUTW) << "@Variable-Declaration:" << $2 << endl
+	   << setw(OUTW) << "@Type:" << $1 << endl
+	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
+	   << setw(OUTW) << "@Access:" << access_stack.top() << endl; }
   | vartype identifier array_dimensions
-    { cout << setw(OUTW) << "Variable-Declaration:" << $2 << endl
-	   << setw(OUTW) << "Type:" << $1 << endl
-	   << setw(OUTW) << "In-Class:" << class_stack.top() << endl
-	   << setw(OUTW) << "Access:" << access_stack.top() << endl
-	   << setw(OUTW) << "Array-Dimension:" << $3 << endl; }
+    { cout << setw(OUTW) << "@Variable-Declaration:" << $2 << endl
+	   << setw(OUTW) << "@Type:" << $1 << endl
+	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
+	   << setw(OUTW) << "@Access:" << access_stack.top() << endl
+	   << setw(OUTW) << "@Array-Dimension:" << $3 << endl; }
   | variable_declaration '=' expression
+/*  | enum_declaration identifier*/
 ;
 
 typedef_declaration:
     TYPEDEF vartype identifier
-      { cout << setw(OUTW) << "Typedef:" << $3 << endl
-	     << setw(OUTW) << "Type:" << $2 << endl
-	     << setw(OUTW) << "Access:" << access_stack.top() << endl; }
+      { cout << setw(OUTW) << "@Typedef:" << $3 << endl
+	     << setw(OUTW) << "@Type:" << $2 << endl
+	     << setw(OUTW) << "@Access:" << access_stack.top() << endl; }
     | TYPEDEF vartype identifier array_dimensions
-      { cout << setw(OUTW) << "Typedef:" << $3 << endl
-	     << setw(OUTW) << "Type:" << $2 << endl
-	     << setw(OUTW) << "Access:" << access_stack.top() << endl
-	     << setw(OUTW) << "Array-Dimension:" << $4 << endl; }
+      { cout << setw(OUTW) << "@Typedef:" << $3 << endl
+	     << setw(OUTW) << "@Type:" << $2 << endl
+	     << setw(OUTW) << "@Access:" << access_stack.top() << endl
+	     << setw(OUTW) << "@Array-Dimension:" << $4 << endl; }
 ;
 
 array_dimensions:
@@ -107,22 +117,22 @@ array_dimensions:
 function_declaration:
   function_name argument_declaration
     {
-      cout << setw(OUTW) << "Function-Definition:" << $1 << endl
-	   << setw(OUTW) << "Function-Parameters:" << $2 << endl
-	   << setw(OUTW) << "In-Class:" << class_stack.top() << endl
-	   << setw(OUTW) << "Access:" << access_stack.top() << endl;
+      cout << setw(OUTW) << "@Function-Definition:" << $1 << endl
+	   << setw(OUTW) << "@Function-Parameters:" << $2 << endl
+	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
+	   << setw(OUTW) << "@Access:" << access_stack.top() << endl;
     }
   | function_name argument_declaration CONST
     {
-      cout << setw(OUTW) << "Function-Definition:" << $1 << endl
-	   << setw(OUTW) << "Function-Parameters:" << $2 << endl
-	   << setw(OUTW) << "Const:" << "const" << endl
-	   << setw(OUTW) << "In-Class:" << class_stack.top() << endl
-	   << setw(OUTW) << "Access:" << access_stack.top() << endl;
+      cout << setw(OUTW) << "@Function-Definition:" << $1 << endl
+	   << setw(OUTW) << "@Function-Parameters:" << $2 << endl
+	   << setw(OUTW) << "@Const:" << "const" << endl
+	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
+	   << setw(OUTW) << "@Access:" << access_stack.top() << endl;
     }
   | vartype function_declaration
     {
-      cout << setw(OUTW) << "Return-Type:" << $1 << endl;
+      cout << setw(OUTW) << "@Return-Type:" << $1 << endl;
     }
 ;
 
@@ -131,7 +141,7 @@ function_name:
   | '~' identifier { $$ = string("~") + $2; }
   | OPERATOR operator { $$ = string("operator") + $2; }
   | OPERATOR vartype { $$ = string("operator") + $2; }
-  
+  | identifier ':' ':' function_name { $$ = $1 + string("::") + $4; }
 ;
 
 operator: OP
@@ -147,6 +157,7 @@ operator: OP
 
 argument_declaration:
   '(' ')' { $$ = string(""); }
+  | '(' THREEDOTS ')' { $$ = $2; }
   | '(' arguments ')'
     { $$ = $2; }
 ;
@@ -193,8 +204,8 @@ class_declaration: class_head
     {
       class_stack.pop();
       access_stack.pop();
-      cout << "@@@" << endl << setw(OUTW) << "Class-Definition:" << $1 << endl
-	   << setw(OUTW) << "In-Class:" << class_stack.top() << endl;
+      cout << "@@@" << endl << setw(OUTW) << "@Class-Definition:" << $1 << endl
+	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl;
     }
 ;
 
@@ -231,11 +242,11 @@ member_declaration:
   declaration
   | VIRTUAL declaration
     {
-      cout << setw(OUTW) << "Virtual:" << "virtual" << endl;
+      cout << setw(OUTW) << "@Virtual:" << "virtual" << endl;
     }
   | VIRTUAL function_declaration '=' INT
     {
-      cout << setw(OUTW) << "Virtual:" << "pure" << endl;
+      cout << setw(OUTW) << "@Virtual:" << "pure" << endl;
     }
   | ACCESS ':' { access_stack.top() = $1; }
   | friend_declaration
@@ -250,7 +261,7 @@ vartype:
   identifier { $$ = $1; }
   | UNSIGNED IDENTIFIER { $$ = string("unsigned ") + $2; }
   | CONST vartype { $$ = string("const ") + $2; }
-/*  | vartype CONST { $$ = $1 +  string(" const"); } */
+  | vartype '*' CONST { $$ = $1 +  string("* const"); }
   | vartype '&' { $$ = $1 + string("&"); }
   | vartype '*' { $$ = $1 + string("*"); }
   | STATIC vartype { $$ = string("static ") + $2; }
@@ -276,6 +287,7 @@ expression:
   | expression OP expression { $$ = $1 + $2 + $3; }
   | expression INT { $$ = $1 + $2; }
   | identifier argument_declaration { $$ = $1 + $2; }
+  | '(' expression ')' { $$ = $1 + $2 + $3; }
 ;
 
 literal:
@@ -300,8 +312,13 @@ template_arg:
   | CLASS IDENTIFIER { $$ = $1 + SPC + $2; }
 ;
 
-template_declaration:
+template_statement:
   TEMPLATE '<' arguments '>' { $$ = $3; }
+;
+
+template_declaration:
+  template_statement
+  | template_declaration template_statement { $$ = $1 + $2; }
 ;
 
 deal_exception_declaration:

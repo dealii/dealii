@@ -637,7 +637,7 @@ class TimeStepBase : public Subscriptor
 				      * Enum denoting the type of problem
 				      * which will have to be solved next.
 				      */
-    enum {
+    enum SolutionState {
 	  primal_problem = 0x0,
 	  dual_problem   = 0x1,
 	  postprocess    = 0x2
@@ -681,7 +681,7 @@ class TimeStepBase : public Subscriptor
 				      * can take effect of the triangulation
 				      * already existing.
 				      */
-    virtual void wake_up (const unsigned);
+    virtual void wake_up (const unsigned int);
 
 				     /**
 				      * This is the opposite function
@@ -700,7 +700,7 @@ class TimeStepBase : public Subscriptor
 				      * By default, this function does
 				      * nothing.
 				      */
-    virtual void sleep (const unsigned);
+    virtual void sleep (const unsigned int);
 
 				     /**
 				      * This function is called each time
@@ -991,7 +991,7 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * cass denoting the next action to be
 				      * done.
 				      */
-    enum {
+    enum SolutionState {
 	  grid_refinement = 0x1000
     };
     
@@ -1081,7 +1081,7 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * can take effect of the triangulation
 				      * already existing.
 				      */
-    virtual void wake_up (const unsigned wakeup_level);
+    virtual void wake_up (const unsigned int wakeup_level);
 
 				     /**
 				      * This is the opposite function
@@ -1108,7 +1108,7 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * that your function can use the
 				      * triangulation as long as ou need it.
 				      */
-    virtual void sleep (const unsigned);
+    virtual void sleep (const unsigned int);
 
 				     /**
 				      * Do the refinement according to the
@@ -1218,7 +1218,12 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * vectors therefore hold the history
 				      * of the grid.
 				      */
-    vector<vector<bool> >   refine_flags, coarsen_flags;
+    vector<vector<bool> >   refine_flags;
+
+				     /**
+				      * @see refine_flags
+				      */
+    vector<vector<bool> >   coarsen_flags;
 
     				     /**
 				      * Restore the grid according to the saved
@@ -1504,7 +1509,11 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 				      * (first: top deviation, second: bottom
 				      * deviation).
 				      */
-    const double        cell_number_corridor_top, cell_number_corridor_bottom;
+    const double        cell_number_corridor_top;
+				     /**
+				      * @see cell_number_corridor_top
+				      */
+    const double        cell_number_corridor_bottom;
 
 				     /**
 				      * List of relaxations to the correction

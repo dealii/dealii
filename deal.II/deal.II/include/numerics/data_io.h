@@ -391,7 +391,7 @@ class DataOut {
 				      * Write a patch for each grid cell using
 				      * #accuracy# subintervals per dimension.
 				      */
-    void write_gnuplot (ostream &out, const unsigned accuracy=1) const;
+    void write_gnuplot (ostream &out, const unsigned int accuracy=1) const;
 
 				     /**
 				      * Write data and grid in GNUPLOT format.

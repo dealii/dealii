@@ -16,8 +16,10 @@ extern int yydebug;
 %x LINECOMMENT
 %x EXC_IGNORE
 %x INSTRING
+%x INFUNCTION
+%x BASEINIT
 
-NAME  [a-zA-Z][_a-zA-Z0-9]*
+NAME  [_a-zA-Z][_a-zA-Z0-9]*
 INT   [+-]?[0-9]+
 WHITE [ \t\n\f\v]
 CLASS (class)|(struct)|(union)
@@ -49,9 +51,21 @@ DeclException[0-9]  { return(DECLEXCEPTION); }
 <LINECOMMENT>.
 <LINECOMMENT>\n     { yy_pop_state(); }
 
+ /* Ignore function bodies */
+
+<INFUNCTION>"{" { yy_push_state(INFUNCTION); }
+<INFUNCTION>"}" { yy_pop_state(); }
+<INFUNCTION>.
+<INFUNCTION>\n
+
+ /* Ignore base initializers */
+<BASEINIT>"{" { yy_pop_state(); yy_push_state(INFUNCTION); }
+<BASEINIT>.
+<BASEINIT>\n
+
  /* Ignore preprocessor commands */
 
-^#.*\n
+^#.*(\\\n.*)*\n
 
  /* Ignore friend declarations so far */
 
@@ -69,6 +83,7 @@ template { return TEMPLATE; }
 enum     { return ENUM; }
 friend   { return FRIEND; }
 typedef  { return TYPEDEF; }
+namespace { return NAMESPACE; }
 typename {}
 
 {CLASS}  { yylval = string(yytext); return CLASS; }
@@ -92,5 +107,15 @@ typename {}
              cerr << "[" << yylval << "]"; return IDENTIFIER; }
 . { yylval = string(yytext); return yytext[0]; }
 
+"..."    { yylval = string(yytext); return THREEDOTS; }
 %%
 
+void enterfunction()
+{
+  yy_push_state(INFUNCTION);
+}
+
+void enterbaseinitializers()
+{
+  yy_push_state(BASEINIT);
+}
