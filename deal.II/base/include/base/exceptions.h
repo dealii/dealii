@@ -968,6 +968,19 @@ namespace StandardExceptions
 		  << arg1 << " switch. You should either use an\n"
 		  << "alternative function, or configure again without\n"
 		  << "this switch and recompile the library.");
+
+				   /**
+				    * Some of our numerical classes
+				    * allow for setting alll entries
+				    * to zero using the assignment
+				    * operator <tt>=</tt>.
+				    *
+				    * In many cases, this assignment
+				    * operator makes sense <b>only</b>
+				    * for the argument zero. In other
+				    * cases, this exception is thrown.
+				    */
+  DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
 }
 
 
