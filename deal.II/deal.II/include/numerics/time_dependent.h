@@ -713,8 +713,8 @@ class TimeDependent
 				      * for some timesteps only. This
 				      * is useful in multithread mode.
 				      */
-    void * end_sweep (const unsigned int begin_timestep,
-		      const unsigned int end_timestep);
+    void end_sweep (const unsigned int begin_timestep,
+		    const unsigned int end_timestep);
 };
 
 

@@ -25,3 +25,8 @@ Someone should take a look at the handling of the sparsity variable
   in the sparse matrix: it is subscribed to twice (explicitely and 
   through the subscriptor); the explicit subscription is redundant,
   but I don't have the time to look into that now.
+
+
+Change the threaded* functions of the SparseMatrix to return void
+  instead of void* when the respective classes in ThreadManager are
+  updated.

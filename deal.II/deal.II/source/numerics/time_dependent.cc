@@ -239,12 +239,11 @@ void TimeDependent::end_sweep (const unsigned int n_threads)
 
 
 
-void * TimeDependent::end_sweep (const unsigned int begin,
-				 const unsigned int end)
+void TimeDependent::end_sweep (const unsigned int begin,
+			       const unsigned int end)
 {     
   for (unsigned int step=begin; step<end; ++step)
     timesteps[step]->end_sweep ();
-  return 0;
 };
   
 
