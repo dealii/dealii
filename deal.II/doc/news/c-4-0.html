@@ -177,7 +177,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        quadrature formula based on a string argument and possibly a
        number indicating the order of the formula.
        <br>
-       (Ralf B. Schulz 2002/10/29)
+       (Ralf B. Schulz 2003/10/29)
        </p>
 
   <li> <p> Fixed: The constructor of the <code class="class">QGauss</code> class
@@ -186,14 +186,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        never reached the requested accuracy, in effect leading to an infinite loop.
        This is now fixed.
        <br>
-       (WB 2002/09/19)
+       (WB 2003/09/19)
        </p>
 
   <li> <p> New: The <code class="class">Function</code> class now
        exports the value of its template argument through the static
        member variable <code class="member">dimension</code>.
        <br>
-       (WB 2002/09/15)
+       (WB 2003/09/15)
        </p>
 
   <li> <p> Changed: The <code
@@ -202,7 +202,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        declared. This can be used to override a default value
        previously set.
        <br>
-       (WB 2002/09/03)
+       (WB 2003/09/03)
        </p>
 
   <li> <p> Improved: The <code
@@ -214,7 +214,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        can be used to generate a virginial parameter file, or one that contains
        the settings of all parameters used in a computation.
        <br>
-       (WB 2002/08/13)
+       (WB 2003/08/13)
        </p>
 
   <li> <p> Changed: The <code
@@ -226,7 +226,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        least in debug mode, so the return value was meaningless. The function
        has now no return type any more.
        <br>
-       (WB 2002/08/13)
+       (WB 2003/08/13)
        </p>
 
   <li> <p> Improved: <code class="class">Logstream</code>::<code
@@ -247,13 +247,21 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+
+  <li> <p> Improved: Initialization routines of class <code
+  class="class">SparseMatrix</code> have an additional parameter
+  controlling the storage of diagonal entries.
+  <br>
+  (GK 2003/11/18)
+  </p>
+
   <li> <p> New: 
        <code class="class">SolverFGMRES</code> implements the flexible
        GMRES method with varying preconditioner from the right. It is
        also accessible in <code
        class="class">SolverSelector</code> by choosing <tt>fgmres</tt>.
        <br>
-       (GK 2002/10/07)
+       (GK 2003/10/07)
        </p>
 
   <li> <p> Changed: The <code class="class">SparseDirectMA27</code>
@@ -261,7 +269,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        matrix. It now releases this as soon as it doesn't need it any
        more.
        <br>
-       (WB 2002/09/09)
+       (WB 2003/09/09)
        </p>
 
   <li> <p> New: Some of the member matrix-vector functions of the
@@ -271,14 +279,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        usual <code class="class">Vector</code> class provided the
        block matrix has only one block row or column.
        <br>
-       (WB 2002/09/09)
+       (WB 2003/09/09)
        </p>
 
   <li> <p> Fixed: <code class="class">FullMatrix</code>::<code
        class="member">copy_from</code> didn't compile when copying
        from a sparse matrix. This is now fixed.
        <br>
-       (Ralf B. Schulz 2002/09/04)
+       (Ralf B. Schulz 2003/09/04)
        </p>
 
   <li> <p> New: The classes <code class="class">FullMatrix</code> and
@@ -387,7 +395,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">point_inside</code> function is now also
        implemented in 3d.
        <br>
-       (Joerg Weimar, WB 2002/09/04)
+       (Joerg Weimar, WB 2003/09/04)
        </p>
 
   <li> <p> New: The <code class="class">TriaAccessor</code>::<code
@@ -395,7 +403,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        the material id of the present cell and of all its children,
        grandchildren, etc to the given value.
        <br>
-       (WB 2002/09/04)
+       (WB 2003/09/04)
        </p>
 
   <li> <p> New: The new <code class="class">FETools</code>::<code
@@ -405,7 +413,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        parses it to regenerate a finite element from it. Useful for
        parsing finite element names from input files.
        <br>
-       (WB 2002/07/08)
+       (WB 2003/07/08)
        </p>
 
   <li> <p> New: The <code class="class">DataOut_DoFData</code>::<code
@@ -417,7 +425,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        other <code class="class">DataOut_DoFData</code> that create
        the same type of patches but are otherwise different.
        <br>
-       (WB 2002/06/30)
+       (WB 2003/06/30)
        </p>
 
   <li> <p> Fixed: The <code class="class">FETools</code>::<code
@@ -427,7 +435,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        wrong results. It now checks for this, and if the grid has
        unrefined coarse grid cells, an exception is generated.
        <br>
-       (WB 2002/06/25)
+       (WB 2003/06/25)
        </p>
 
   <li> <p>
