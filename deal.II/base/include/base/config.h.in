@@ -36,6 +36,11 @@
    the details, look at aclocal.m4 in the top-level directory. */
 #undef DEAL_II_ANON_NAMESPACE_BUG
 
+/* Another test if the compiler needs to see the static keyword even for
+   functions in anonymous namespaces, to avoid duplicate symbol errors when
+   linking. For the details, look at aclocal.m4 in the top-level directory. */
+#undef DEAL_II_ANON_NAMESPACE_LINKAGE_BUG
+
 /* Defined if the compiler has a problem with assigning arrays in conditionals
    */
 #undef DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG

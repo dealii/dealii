@@ -2545,6 +2545,51 @@ AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl A second test in this direction: if the name of a function is
+dnl not mangled differently for each compiler invokation, then
+dnl it should at least result in a weak symbol. Test this.
+dnl
+dnl Note that this is not a problem in itself if the name is
+dnl mangled differently each time a file is compiled.
+dnl
+dnl Usage: DEAL_II_CHECK_ANON_NAMESPACE_BUG2
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG2, dnl
+[
+  AC_MSG_CHECKING(for anonymous namespace and weak linkage bug)
+
+  dnl Create the testfile
+  echo "namespace { int SYMBOL() {return 1;}; }" >  conftest.cc
+  echo "static int f() { return SYMBOL(); }"     >> conftest.cc
+
+  dnl Compile it
+  $CXX -c conftest.cc -o conftest.$ac_objext
+
+  dnl Then look for lines in the output of "nm" that have the name of
+  dnl SYMBOL in them. Then make sure that we don't find a line with
+  dnl " T " in it, i.e. a text symbol with strong linkage
+  check="`nm conftest.$ac_objext | grep SYMBOL | grep ' T '`"
+
+  dnl Then try to link everything
+  if test "x$check" = "x" ;
+  then
+      AC_MSG_RESULT(no)
+  else
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG, 1, 
+                     [Another test if the compiler needs to see the static
+	              keyword even for functions in anonymous namespaces,
+                      to avoid duplicate symbol errors when linking.
+                      For the details, look at aclocal.m4 in the
+                      top-level directory.])
+  fi
+  rm -f conftest.$ac_objext 
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl We have so many templates in deal.II that sometimes we need
 dnl to make it clear with which types a template parameter can
 dnl be instantiated. There is a neat trick to do this: SFINAE
