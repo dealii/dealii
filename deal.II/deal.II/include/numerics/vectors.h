@@ -270,35 +270,19 @@ class VectorTools
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
 
 				     /**
-				      * Data type for vector valued boundary function map.
-				      */
-    typedef map<unsigned char,const VectorFunction<dim>*> VectorFunctionMap;
-    
-				     /**
 				      * Compute the interpolation of
-				      * #function# at the support points to
-				      * the finite element space.
+				      * #function# at the support
+				      * points to the finite element
+				      * space. It is assumed that the
+				      * number of components of
+				      * #function# matches that of the
+				      * finite element used by #dof#.
 				      *
 				      * See the general documentation of this
 				      * class for further information.
 				      */
     static void interpolate (const DoFHandler<dim>    &dof,
 			     const Function<dim>      &function,
-			     Vector<double>           &vec);
-
-				     /**
-				      * Compute the interpolation of
-				      * #vectorfunction# at the support points to
-				      * the finite element space. This is the
-				      * analogue for vectorfunctions
-				      * to the #interpolate# function for scalar
-				      * functions above.
-				      *
-				      * See the general documentation of this
-				      * class for further information.
-				      */
-    static void interpolate (const DoFHandler<dim>    &dof,
-			     const VectorFunction<dim>&vectorfunction,
 			     Vector<double>           &vec);
 
 				     /**
@@ -383,20 +367,17 @@ class VectorTools
 				      * of the boundary part to be projected
 				      * on already was in the variable.
 				      *
+				      * It is assumed that the number
+				      * of components of the functions
+				      * in #dirichlet_bc# matches that
+				      * of the finite element used by
+				      * #dof#.
+				      *
 				      * See the general doc for more
 				      * information.
 				      */
     static void interpolate_boundary_values (const DoFHandler<dim> &dof,
 					     const FunctionMap     &dirichlet_bc,
-					     map<int,double>       &boundary_values);
-
-				     /**
-				      * Create boundary value information for vector
-				      * valued functions.
-				      * See the other #interpolate_boundary_values#.
-				      */
-    static void interpolate_boundary_values (const DoFHandler<dim> &dof,
-					     const VectorFunctionMap     &dirichlet_bc,
 					     map<int,double>       &boundary_values);
 
 				     /**
@@ -406,8 +387,14 @@ class VectorTools
 				      * #boundary_values# contained values
 				      * before, the new ones are added, or
 				      * the old one overwritten if a node
-				      * of the boundary part to be prjected
+				      * of the boundary part to be projected
 				      * on already was in the variable.
+				      *
+				      * It is assumed that the number
+				      * of components of the functions
+				      * in #boundary_functions#
+				      * matches that of the finite
+				      * element used by #dof#.
 				      *
 				      * See the general documentation of this
 				      * class for further information.
@@ -434,18 +421,28 @@ class VectorTools
 				      * accuracy of the #double# data type is
 				      * used.
 				      *
-				      * The additional argument #weight# allows
-				      * to evaluate weighted norms. This is useful
-				      * for weighting the error of different parts
-				      * differently. A special use is
-				      * to have #weight=0# in some parts of the 
-				      * domain, e.g. at
-				      * the location of a shock and #weight=1#
-				      * elsewhere. This allows convergence tests
-				      * in smooth parts of in general discontinuous
-				      * solutions.
-				      * By default, no weighting function is given,
-				      * i.e. weight=1 in the whole domain.
+				      * The additional argument
+				      * #weight# allows to evaluate
+				      * weighted norms. This is useful
+				      * for weighting the error of
+				      * different parts differently. A
+				      * special use is to have
+				      * #weight=0# in some parts of
+				      * the domain, e.g. at the
+				      * location of a shock and
+				      * #weight=1# elsewhere. This
+				      * allows convergence tests in
+				      * smooth parts of in general
+				      * discontinuous solutions.  By
+				      * default, no weighting function
+				      * is given, i.e. weight=1 in the
+				      * whole domain.
+				      *
+				      * It is assumed that the number
+				      * of components of the function
+				      * #exact_solution# matches that
+				      * of the finite element used by
+				      * #dof#.
 				      *
 				      * See the general documentation of this
 				      * class for more information.
@@ -457,18 +454,6 @@ class VectorTools
 				      const Quadrature<dim>    &q,
 				      const NormType           &norm,
 				      const Function<dim>      *weight=0);
-
-				     /**
-				      * Compute the error for the solution of a system.
-				      * See the other #integrate_difference#.
-				      */
-    static void integrate_difference (const DoFHandler<dim>   &dof,
- 				      const Vector<double>     &fe_function,
- 				      const VectorFunction<dim>&exact_solution,
- 				      Vector<float>            &difference,
- 				      const Quadrature<dim>    &q,
- 				      const NormType           &norm,
-				      const Function<dim> *weight=0);
 
 				     /**
 				      * Mean-value filter for Stokes.
@@ -497,16 +482,18 @@ class VectorTools
 				      * Exception
 				      */
     DeclException0 (ExcNotUseful);
-
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidFE);
-
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidBoundaryIndicator);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcComponentMismatch);
 };
 
 

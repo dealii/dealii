@@ -94,7 +94,8 @@ class RHSPoly : public Function<dim> {
 				      * Return the value of the function
 				      * at the given point.
 				      */
-    virtual double operator () (const Point<dim> &p) const;
+    virtual double value (const Point<dim> &p,
+			  const unsigned int component) const;
 };
 
 
@@ -106,19 +107,22 @@ class Solution : public Function<dim> {
 				      * Return the value of the function
 				      * at the given point.
 				      */
-    virtual double operator () (const Point<dim> &p) const;
+    virtual double value (const Point<dim> &p,
+			  const unsigned int component) const;
 				     /**
 				      * Return the gradient of the function
 				      * at the given point.
 				      */
-    virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
+    virtual Tensor<1,dim> gradient (const Point<dim> &p,
+				    const unsigned int component) const;
 };
 
 
 
 
 template <>
-double RHSPoly<2>::operator () (const Point<2> &p) const {
+double RHSPoly<2>::value (const Point<2> &p,
+			  const unsigned int) const {
   const double x = p(0),
 	       y = p(1);
   const double pi= 3.1415926536;
@@ -128,7 +132,8 @@ double RHSPoly<2>::operator () (const Point<2> &p) const {
 
 
 template <>
-double Solution<2>::operator () (const Point<2> &p) const {
+double Solution<2>::value (const Point<2> &p,
+			   const unsigned int) const {
   const double x = p(0),
 	       y = p(1);
   const double pi= 3.1415926536;
@@ -137,7 +142,8 @@ double Solution<2>::operator () (const Point<2> &p) const {
 
 
 template <>
-Tensor<1,2> Solution<2>::gradient (const Point<2> &p) const {
+Tensor<1,2> Solution<2>::gradient (const Point<2> &p,
+				   const unsigned int) const {
   const double x = p(0),
 	       y = p(1);
   const double pi= 3.1415926536;
@@ -162,7 +168,7 @@ void PoissonEquation<2>::assemble (FullMatrix<double>  &cell_matrix,
 			       fe_values.shape_grad(j,point)) *
 			      fe_values.JxW(point);
 	rhs(i) += fe_values.shape_value(i,point) *
-		  right_hand_side(fe_values.quadrature_point(point)) *
+		  right_hand_side.value(fe_values.quadrature_point(point)) *
 		  fe_values.JxW(point);
       };
 };
@@ -376,8 +382,11 @@ int PoissonProblem<dim>::run (const unsigned int level) {
 
   if (dof->n_dofs()<=5000) 
     {
-      Vector<double> l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
-      Vector<double> h1_seminorm_error_per_dof, h1_error_per_dof;
+      Vector<double> l1_error_per_dof(dof->n_dofs());
+      Vector<double> l2_error_per_dof(dof->n_dofs());
+      Vector<double> linfty_error_per_dof(dof->n_dofs());
+      Vector<double> h1_seminorm_error_per_dof(dof->n_dofs());
+      Vector<double> h1_error_per_dof(dof->n_dofs());
       dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
       dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
       dof->distribute_cell_to_dof_vector (linfty_error_per_cell,

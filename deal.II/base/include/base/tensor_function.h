@@ -13,154 +13,9 @@
 #include <base/function.h>
 #include <base/point.h>
 #include <base/functiontime.h>
-#include <base/tensorindex.h>
 #include <base/forward-declarations.h>
 
-template <typename number> class Vector;
-template <int dim> class VectorFunction;
-template <int rank, int dim> class TensorFunction;
 
-/**
- * Base class for multi-valued functions.
- * While #TensorFunction# provides a highly structured class for multi-valued
- * functions, #VectorFunction# is on a lower level. The results are #Vectors# of
- * values without further structure. The dimension of the result is determined at
- * execution time.
- * @author Guido Kanschat, 1999
- */
-template <int dim>
-class VectorFunction : public FunctionTime,
-		       public Subscriptor
-{
-  public:
-				     /**
-				      * Number of vector components.
-				      */
-    const unsigned int n_components;
-
-				     /**
-				      * Constructor. May take an initial vakue
-				      * for the time variable, which defaults
-				      * to zero.
-				      */
-    VectorFunction (const unsigned int n_components,
-		    const double       initial_time = 0.0);
-    
-				     /**
-				      * Virtual destructor; absolutely
-				      * necessary in this case.
-				      */
-    virtual ~VectorFunction ();
-    
-				     /**
-				      * Set #values# to the point values
-				      * of the function at points #p#.
-				      * It is assumed that #values#
-				      * already has the right size, i.e.
-				      * the same size as the #n_components#
-				      * array.
-				      *
-				      * Usually only #value_list# is called,
-				      * e.g. by #FEValues#. So, to avoid 
-				      * multiple calling of this virtual function
-				      * by #value_list#, implement the vectorfunction
-				      * directly in #value_list# of the derived
-				      * class.
-				      */
-    virtual void value (const Point<dim> &p,
-			Vector<double>   &values) const;
-
-				     /**
-				      * Set #values# to the point values
-				      * of the function at the #points#.
-				      * It is assumed that #values#
-				      * already has the right size, i.e.
-				      * the same size as the #points#
-				      * array.
-				      *
-				      * This function uses multiple calling
-				      * of the virtual function #value# (see there).
-				      * If possible, overload this function.
-				      */
-    virtual void value_list (const vector<Point<dim> > &points,
-			     vector<Vector<double> >   &values) const;
-
-				     /**
-				      * Set #gradients# to the gradients of
-				      * the function at the #points#.
-				      * It is assumed that #values# 
-				      * already has the right size, i.e.
-				      * the same size as the #points# array.
-				      */
-    virtual void gradient_list (const vector<Point<dim> >       &points,
-				vector<vector<Tensor<1,dim> > > &gradients) const;
-    
-				     /**
-				      * Access #VectorFunction# as a #Function#.
-				      * This class allows to store a reference to a
-				      * #VectorFunction# and an #index#. Later on, it
-				      * can be used as a normal single valued #Function#.
-				      */
-    class Extractor : public Function<dim>
-    {
-      public:
-					 /**
-					  * Constructor.
-					  * The arguments are the #VectorFunction# to be
-					  * accessed and the component index.
-					  */
-	Extractor(const VectorFunction<dim>& f, unsigned int index);
-
-					 /**
-					  * Compute function value.
-					  */
-	virtual double operator() (const Point<dim>& p) const;
-
-					 /**
-					  * Compute several values.
-					  */
-	virtual void value_list (const vector<Point<dim> > &points,
-				 vector<double> &values) const;
-	
-
-					 /**
-					  * Compute derivative.
-					  */
-	virtual Tensor<1,dim> gradient (const Point<dim>& p) const;
-
-					 /**
-					  * Compute several derivatives.
-					  */
-	virtual void gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> > &gradients) const;
-	
-      private:
-					 /**
-					  * Pointer to the #VectorFunction#.
-					  */
-	const SmartPointer<VectorFunction<dim> > vectorfunction;
-	
-					 /**
-					  * Index in #VectorFunction#.
-					  */
-	const unsigned int index;
-    };
-    
-      
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcPureFunctionCalled);
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcVectorHasWrongSize,
-		    int, int,
-		    << "The vector has size " << arg1 << " but should have "
-		    << arg2 << " elements.");
-    
-};
-  
 
 
 /**
@@ -184,7 +39,8 @@ class VectorFunction : public FunctionTime,
  *  @author Guido Kanschat, 1999
  */
 template <int rank, int dim>
-class TensorFunction : public VectorFunction<dim>
+class TensorFunction : public FunctionTime,
+		       public Subscriptor
 {
   public:
 				     /**
@@ -204,7 +60,7 @@ class TensorFunction : public VectorFunction<dim>
 				      * Return the value of the function
 				      * at the given point.
 				      */
-    virtual Tensor<rank, dim> operator () (const Point<dim> &p) const;
+    virtual Tensor<rank, dim> value (const Point<dim> &p) const;
 
 				     /**
 				      * Set #values# to the point values
@@ -218,8 +74,8 @@ class TensorFunction : public VectorFunction<dim>
 			     vector<Tensor<rank,dim> > &values) const;
 
 				     /**
-				      * Return the gradient of the function
-				      * at the given point.
+				      * Return the gradient of the
+				      * function at the given point.
 				      */
     virtual Tensor<rank+1,dim> gradient (const Point<dim> &p) const;
 
@@ -232,24 +88,6 @@ class TensorFunction : public VectorFunction<dim>
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Tensor<rank+1,dim> > &gradients) const;
-
-				     /**
-				      * See #VectorFunction#.
-				      */  
-    virtual void value (const Point<dim> &points,
-			     Vector<double> &values) const;
-
-				     /**
-				      * See #VectorFunction#.
-				      */  
-    virtual void value_list (const vector<Point<dim> > &points,
-			     vector<Vector<double> > &values) const;
-
-				     /**
-				      * See #VectorFunction#.
-				      */  
-    virtual void gradient_list (const vector<Point<dim> > &points,
-				vector<vector<Tensor<1,dim> > > &gradients) const;
 
 				     /**
 				      * Exception

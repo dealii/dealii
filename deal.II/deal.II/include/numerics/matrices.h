@@ -67,21 +67,25 @@
  *   cross coupling of shape functions belonging to different subelements.
  *
  *   If the finite element for which the mass matrix is to be built
- *   has more than one component, the resulting matrix will not
- *   couple the different components. It will furthermore accept
- *   a single coefficient through the #Function# parameter for all
+ *   has more than one component, the resulting matrix will not couple
+ *   the different components. It will furthermore accept a single
+ *   coefficient through the #Function# parameter for all
  *   components. If you want different coefficients for the different
- *   parameters, you need to call the respective function accepting
- *   a #VectorFunction# argument.
+ *   parameters, you need to pass a function object representing the
+ *   respective number of components.
  *
  * \item #create_laplace_matrix#: there are two versions of this; the
  *   one which takes the #Function<dim># object creates
  *   $a_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \nabla\phi_j(x) dx$,
  *   $a$ being the given function, while the other one assumes that
- *   $a=1$ which enables some optimzations. In fact the two versions
+ *   $a=1$ which enables some optimizations. In fact the two versions
  *   are in one function, the coefficient being given as a defaulted
  *   argument, which is a pointer to a function and defaults to zero.
  *   This function uses the #LaplaceMatrix# class.
+ *
+ *   If the finite element in use presently has more than only one
+ *   component, this function may not be overly useful and presently
+ *   throws an error.
  * \end{itemize}
  *
  * All created matrices are `raw': they are not condensed, i.e. hanging
@@ -320,6 +324,10 @@ class MatrixCreator
 				      * Exception
 				      */
     DeclException0 (ExcInvalidFE);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcComponentMismatch);
 };
 
 

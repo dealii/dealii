@@ -39,7 +39,9 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
 {
   Assert (selected_component < dof.get_fe().n_components,
 	  ExcInvalidComponent (selected_component, dof.get_fe().n_components));
-
+  Assert (coefficient->n_components == 1,
+	  ExcInternalError());
+  
   const unsigned int dim=1;
 
 				   // reserve one slot for each cell and set
@@ -68,7 +70,8 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
       
 					   // now get the gradients on the
 					   // both sides of the point
-	  vector<vector<Tensor<1,dim> > > gradients (2, vector<Tensor<1,1> >(dof.get_fe().n_components));
+	  vector<vector<Tensor<1,dim> > >
+	    gradients (2, vector<Tensor<1,1> >(dof.get_fe().n_components));
 	  
 	  fe_values.reinit (cell);
 	  fe_values.get_function_grads (solution, gradients);
@@ -83,13 +86,13 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
 	    }
 	  else
 	    if (neumann_bc.find(n) != neumann_bc.end())
-	      grad_neighbor = neumann_bc.find(n)->second->operator()(cell->vertex(0));
+	      grad_neighbor = neumann_bc.find(n)->second->value(cell->vertex(0));
 	    else
 	      grad_neighbor = 0;
 	    
 	  const double jump = (grad_here - grad_neighbor) *
 			      (coefficient != 0 ?
-			       (*coefficient)(cell->vertex(n)) :
+			       coefficient->value(cell->vertex(n)) :
 			       1);
 	  error(cell_index) += jump*jump * cell->diameter();
 	};

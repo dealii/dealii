@@ -1186,8 +1186,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     void main () {
  *       Triangulation<2> tria;
  *                                        // set the boundary function
+ *                                        // for all boundaries with
+ *                                        // boundary indicator 0
  *       Ball ball;
- *       tria.set_boundary (&ball);
+ *       tria.set_boundary (0, &ball);
  *
  *       // read some coarse grid
  *

@@ -128,7 +128,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 						      vector<int>              &dof_to_boundary_mapping,
 						      const Function<dim>      *a) {
   const FiniteElement<dim> &fe = dof.get_fe();
-
+  const unsigned int n_components  = fe.n_components;
+  const bool         fe_is_system  = (n_components != 1);
+  
   Assert (matrix.n() == dof.n_boundary_dofs(rhs), ExcInternalError());
   Assert (matrix.n() == matrix.m(), ExcInternalError());
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
@@ -138,12 +140,11 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   Assert (*max_element(dof_to_boundary_mapping.begin(),dof_to_boundary_mapping.end()) ==
 	  (signed int)matrix.n()-1,
 	  ExcInternalError());
+  Assert (n_components == rhs.begin()->second->n_components,
+	  ExcComponentMismatch());
   
   const unsigned int dofs_per_cell = fe.total_dofs,
 		     dofs_per_face = fe.dofs_per_face;
-  
-  const unsigned int n_components  = fe.n_components;
-  Assert (n_components == 1, ExcNotImplemented());
   
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_vector(dofs_per_cell);
@@ -151,7 +152,22 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   
   UpdateFlags update_flags = UpdateFlags (update_JxW_values | update_q_points);
   FEFaceValues<dim> fe_values (fe, q, update_flags);
-  
+
+				   // two variables for the coefficient,
+				   // one for the two cases indicated in
+				   // the name
+  vector<double>          coefficient_values_scalar (fe_values.n_quadrature_points);
+  vector<Vector<double> > coefficient_values_system (fe_values.n_quadrature_points,
+						     Vector<double>(n_components));
+
+  vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
+  vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
+					     Vector<double>(n_components));
+
+  vector<int> dofs (dofs_per_cell);
+  vector<int> dofs_on_face_vector (dofs_per_face);
+  set<int> dofs_on_face;
+
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active (),
 					endc = dof.end ();
   for (; cell!=endc; ++cell)
@@ -167,39 +183,95 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 
 	  const FullMatrix<double> &values    = fe_values.get_shape_values ();
 	  const vector<double>     &weights   = fe_values.get_JxW_values ();
-	  vector<double>           rhs_values (fe_values.n_quadrature_points);
-	  rhs.find(cell->face(face)->boundary_indicator())
-	    ->second->value_list (fe_values.get_quadrature_points(), rhs_values);
-	  
-	  if (a != 0)
+
+	  if (fe_is_system)
+					     // FE has several components
 	    {
-	      vector<double> coefficient_values (fe_values.n_quadrature_points);
-	      a->value_list (fe_values.get_quadrature_points(), coefficient_values);
-	      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
-		  {
-		    for (unsigned int j=0; j<fe_values.total_dofs; ++j)
-		      cell_matrix(i,j) += (values(i,point) *
-					   values(j,point) *
-					   weights[point] *
-					   coefficient_values[point]);
-		    cell_vector(i) += values(i,point) *
-				      rhs_values[point] *
-				      weights[point];
-		  };
+	      rhs.find(cell->face(face)->boundary_indicator())
+		->second->vector_value_list (fe_values.get_quadrature_points(),
+					     rhs_values_system);
+
+	      if (a != 0)
+		{
+		  a->vector_value_list (fe_values.get_quadrature_points(),
+					coefficient_values_system);
+		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		      {
+			for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+			  if (fe.system_to_component_index(i).first ==
+			      fe.system_to_component_index(j).first)
+			    {
+			      cell_matrix(i,j)
+				+= (values(i,point) *
+				    values(j,point) *
+				    weights[point] *
+				    coefficient_values_system[point](
+				      fe.system_to_component_index(i).first));
+			    };
+			
+			cell_vector(i) += values(i,point) *
+					  rhs_values_system[point](
+					    fe.system_to_component_index(i).first) *
+					  weights[point];
+		      };
+		}
+	      else
+		for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		  for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		    {
+		      for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+			if (fe.system_to_component_index(i).first ==
+			    fe.system_to_component_index(j).first)
+			  {
+			    cell_matrix(i,j) += (values(i,point) *
+						 values(j,point) *
+						 weights[point]);
+			  };
+		      
+		      cell_vector(i) += values(i,point) *
+					rhs_values_system[point](
+					  fe.system_to_component_index(i).first) *
+					weights[point];
+		    };
 	    }
 	  else
-	    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-	      for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+					     // FE is a scalar one
+	    {
+	      rhs.find(cell->face(face)->boundary_indicator())
+		->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
+
+	      if (a != 0)
 		{
-		  for (unsigned int j=0; j<fe_values.total_dofs; ++j)
-		    cell_matrix(i,j) += (values(i,point) *
-					 values(j,point) *
-					 weights[point]);
-		  cell_vector(i) += values(i,point) *
-				    rhs_values[point] *
-				    weights[point];
-		};
+		  a->value_list (fe_values.get_quadrature_points(),
+				 coefficient_values_scalar);
+		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		      {
+			for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+			  cell_matrix(i,j) += (values(i,point) *
+					       values(j,point) *
+					       weights[point] *
+					       coefficient_values_scalar[point]);
+			cell_vector(i) += values(i,point) *
+					  rhs_values_scalar[point] *
+					  weights[point];
+		      };
+		}
+	      else
+		for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		  for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		    {
+		      for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+			cell_matrix(i,j) += (values(i,point) *
+					     values(j,point) *
+					     weights[point]);
+		      cell_vector(i) += values(i,point) *
+					rhs_values_scalar[point] *
+					weights[point];
+		    };
+	    };
+	  
 
 
 					   // now transfer cell matrix and vector
@@ -249,13 +321,13 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 					   // inefficient, so we copy the dofs
 					   // into a set, which enables binary
 					   // searches.
-	  vector<int> dofs (dofs_per_cell);
 	  cell->get_dof_indices (dofs);
-
-	  vector<int> dofs_on_face_vector (dofs_per_face);
 	  cell->face(face)->get_dof_indices (dofs_on_face_vector);
-	  set<int> dofs_on_face (dofs_on_face_vector.begin(),
-				 dofs_on_face_vector.end());
+
+  	  dofs_on_face.clear ();
+	  dofs_on_face.insert (dofs_on_face_vector.begin(),
+			       dofs_on_face_vector.end());
+	  
 #ifdef DEBUG
 					   // in debug mode: compute an element
 					   // in the matrix which is
@@ -312,8 +384,6 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 	      };
 	};
 };
-
-
 
 
 
@@ -593,24 +663,53 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
   
   if (coefficient != 0)
     {
-      vector<double> coefficient_values (fe_values.n_quadrature_points);
-      coefficient->value_list (fe_values.get_quadrature_points(),
-			       coefficient_values);
-      for (unsigned int i=0; i<total_dofs; ++i) 
-	for (unsigned int j=0; j<total_dofs; ++j)
-	  if ((n_components == 1)
-	      ||
-	      (fe.system_to_component_index(i).first ==
-	       fe.system_to_component_index(j).first))
-	    {
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		cell_matrix(i,j) += (values(i,point) *
-				     values(j,point) *
-				     weights[point] *
-				     coefficient_values[point]);
-	    };
+      if (coefficient->n_components == 1)
+					 // scalar coefficient given
+	{
+	  vector<double> coefficient_values (fe_values.n_quadrature_points);
+	  coefficient->value_list (fe_values.get_quadrature_points(),
+				   coefficient_values);
+	  for (unsigned int i=0; i<total_dofs; ++i) 
+	    for (unsigned int j=0; j<total_dofs; ++j)
+	      if ((n_components == 1)
+		  ||
+		  (fe.system_to_component_index(i).first ==
+		   fe.system_to_component_index(j).first))
+		{
+		  for (unsigned int point=0; point<n_q_points; ++point)
+		    cell_matrix(i,j) += (values(i,point) *
+					 values(j,point) *
+					 weights[point] *
+					 coefficient_values[point]);
+		};
+	}
+      else
+					 // vectorial coefficient
+					 // given
+	{
+	  vector<Vector<double> > coefficient_values (fe_values.n_quadrature_points,
+						      Vector<double>(n_components));
+	  coefficient->vector_value_list (fe_values.get_quadrature_points(),
+					  coefficient_values);
+	  for (unsigned int i=0; i<total_dofs; ++i) 
+	    for (unsigned int j=0; j<total_dofs; ++j)
+	      if ((n_components == 1)
+		  ||
+		  (fe.system_to_component_index(i).first ==
+		   fe.system_to_component_index(j).first))
+		{
+		  for (unsigned int point=0; point<n_q_points; ++point)
+		    cell_matrix(i,j) += (values(i,point) *
+					 values(j,point) *
+					 weights[point] *
+					 coefficient_values[point](
+					   fe.system_to_component_index(i).first));
+		};
+	};
+      
     }
   else
+				     // no coefficient given
     for (unsigned int i=0; i<total_dofs; ++i) 
       for (unsigned int j=0; j<total_dofs; ++j)
 	if ((n_components == 1)
@@ -639,8 +738,8 @@ void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components;
 
-				   // for system elements: need
-				   // VectorFunction for rhs
+				   // for system elements: not
+				   // implemented at present
   Assert (n_components==1, ExcNotImplemented());
   
   Assert (cell_matrix.n() == total_dofs,
@@ -704,8 +803,8 @@ void MassMatrix<dim>::assemble (Vector<double>      &rhs,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components;
 
-				   // for system elements: need
-				   // VectorFunction for rhs
+				   // for system elements: not
+				   // implemented at present
   Assert (n_components==1, ExcNotImplemented());
 
   Assert (rhs.size() == total_dofs,
@@ -749,8 +848,9 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components;
 
-				   // for system elements: need
-				   // VectorFunction for rhs
+				   // for system elements: might be
+				   // not so useful, not implemented
+				   // at present
   Assert (n_components==1, ExcNotImplemented());
 
   Assert (cell_matrix.n() == total_dofs,
@@ -815,8 +915,9 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components;
 
-				   // for system elements: need
-				   // VectorFunction for coefficient
+				   // for system elements: might be
+				   // not so useful, not implemented
+				   // at present
   Assert ((n_components==1) || (coefficient==0), ExcNotImplemented());
 
   Assert (cell_matrix.n() == total_dofs,
@@ -870,8 +971,9 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components;
 
-				   // for system elements: need
-				   // VectorFunction for rhs
+				   // for system elements: might be
+				   // not so useful, not implemented
+				   // at present
   Assert (n_components==1, ExcNotImplemented());
 
   Assert (rhs.size() == total_dofs,

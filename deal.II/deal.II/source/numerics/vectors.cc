@@ -4,7 +4,6 @@
 
 
 #include <base/function.h>
-#include <base/tensorfunction.h>
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
@@ -42,56 +41,18 @@ inline double sqr_point (const Tensor<1,dim> &p) {
 
 
 
-
-
 template <int dim>
-void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
-				    const Function<dim>      &function,
-				    Vector<double>           &vec)
+void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
+				    const Function<dim>   &function,
+				    Vector<double>        &vec)
 {
-  const FiniteElement<dim> &fe = dof.get_fe();
-
-				   // use #interpolate# function with
-				   // #VectorFunction# param for system
-				   // elements
-  Assert (fe.n_components == 1, ExcNotUseful());
+  Assert (dof.get_fe().n_components == function.n_components,
+	  ExcComponentMismatch());
   
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
-  vector<int>         dofs_on_cell (fe.total_dofs);
-  vector<double>      dof_values_on_cell (fe.total_dofs);
-  vector<Point<dim> > support_points (fe.total_dofs);
-  for (; cell!=endc; ++cell) 
-    {
-				       // for each cell:
-				       // get location of finite element
-				       // off-points
-      fe.get_support_points (cell, support_points);
-				       // get function values at these points
-      function.value_list (support_points, dof_values_on_cell);
-				       // get indices of the dofs on this cell
-      cell->get_dof_indices (dofs_on_cell);
-				       // distribute function values to the
-				       // whole vector
-      for (unsigned int i=0; i<fe.total_dofs; ++i)
-	vec(dofs_on_cell[i]) = dof_values_on_cell[i];
-    };
-};
-
-
-
-template <int dim>
-void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
-				    const VectorFunction<dim>&vectorfunction,
-				    Vector<double>           &vec)
-{
-  const FiniteElement<dim> &fe = dof.get_fe();
+  const FiniteElement<dim> &fe           = dof.get_fe();
+  const unsigned int        n_components = fe.n_components;
+  const bool                fe_is_system = (n_components != 1);
   
-				   // use #interpolate# function with
-				   // #Function# param for non-system
-				   // elements
-  Assert (fe.n_components == vectorfunction.n_components, ExcNotUseful());
-
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
 
@@ -185,7 +146,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 //     }
 
 				   // The following is more general.
-				   // It also works if #dofs_per_cell>1#,
+				   // It also works if #dofs_per_x>1#,
 				   // i.e. it is usable also for systems
 				   // including
 				   // FEQ3, FEQ4, FEDG_Qx.
@@ -248,8 +209,16 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
   vector<Point<dim> > support_points (fe.total_dofs);
 
   vector<Point<dim> > rep_points (n_rep_points);
-  vector<Vector<double> > function_values_at_rep_points (
-    n_rep_points, Vector<double>(fe.n_components));
+
+				   // get space for the values of the
+				   // function at the rep support points.
+				   //
+				   // have two versions, one for system fe
+				   // and one for scalar ones, to take the
+				   // more efficient one respectively
+  vector<double>          function_values_scalar (n_rep_points);
+  vector<Vector<double> > function_values_system (n_rep_points,
+						  Vector<double>(fe.n_components));
 
   for (; cell!=endc; ++cell)
     {
@@ -263,24 +232,46 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
       for (unsigned int j=0; j<dofs_of_rep_points.size(); ++j)
 	rep_points[j]=support_points[dofs_of_rep_points[j]];
 
-				       // get function values at these points
-      vectorfunction.value_list (rep_points, function_values_at_rep_points);
-
 				       // get indices of the dofs on this cell
       cell->get_dof_indices (dofs_on_cell);
 
-				       // distribute the function values to
-				       // the global vector
-      for (unsigned int i=0; i<fe.total_dofs; ++i)
+
+				       
+      if (fe_is_system)
 	{
-	  const unsigned int component
-	    = fe.system_to_component_index(i).first;
-	  const unsigned int rep_dof=dof_to_rep_index_table[i];
-	  vec(dofs_on_cell[i])
-	    = function_values_at_rep_points[rep_dof](component);
+					   // get function values at
+					   // these points. Here: get
+					   // all components
+	  function.vector_value_list (rep_points, function_values_system);
+					   // distribute the function
+					   // values to the global
+					   // vector
+	  for (unsigned int i=0; i<fe.total_dofs; ++i)
+	    {
+	      const unsigned int component
+		= fe.system_to_component_index(i).first;
+	      const unsigned int rep_dof=dof_to_rep_index_table[i];
+	      vec(dofs_on_cell[i])
+		= function_values_system[rep_dof](component);
+	    };
 	}
+      
+      else
+	{
+					   // get first component only,
+					   // which is the only component
+					   // in the function anyway
+	  function.value_list (rep_points, function_values_scalar, 0);
+					   // distribute the function
+					   // values to the global
+					   // vector
+	  for (unsigned int i=0; i<fe.total_dofs; ++i)
+	    vec(dofs_on_cell[i]) 
+	      = function_values_scalar[dof_to_rep_index_table[i]];
+	};
     }
 }
+
 
 
 template <int dim> void
@@ -342,7 +333,8 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				const Quadrature<dim-1>  &q_boundary,
 				const bool                project_to_boundary_first)
 {
-  Assert (dof.get_fe().n_components == 1, ExcNotUseful());
+  Assert (dof.get_fe().n_components == function.n_components,
+	  ExcInvalidFE());
   
   const FiniteElement<dim> &fe = dof.get_fe();
 
@@ -364,6 +356,10 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 	    for (unsigned int i=0; i<fe.dofs_per_face; ++i)
 					       // enter zero boundary values
 					       // for all boundary nodes
+					       //
+					       // we need not care about
+					       // vector valued elements here,
+					       // since we set all components
 	      boundary_values[face_dof_indices[i]] = 0.;
 	  };
     }
@@ -412,8 +408,9 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 
   constraints.condense (mass_matrix);
   constraints.condense (tmp);
-  MatrixTools<dim>::apply_boundary_values (boundary_values,
-					   mass_matrix, vec, tmp);
+  if (boundary_values.size() != 0)
+    MatrixTools<dim>::apply_boundary_values (boundary_values,
+					     mass_matrix, vec, tmp);
 
   SolverControl                    control(1000,1e-16);
   PrimitiveVectorMemory<Vector<double> >   memory;
@@ -438,7 +435,8 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 					       const Function<dim>      &rhs,
 					       Vector<double>           &rhs_vector)
 {
-  Assert (dof.get_fe().n_components == 1, ExcNotUseful());
+  Assert (dof.get_fe().n_components == rhs.n_components,
+	  ExcComponentMismatch());
   
   UpdateFlags update_flags = UpdateFlags(update_q_points |
 					 update_JxW_values);
@@ -468,15 +466,17 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 template <>
 void
 VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
-					     const FunctionMap &dirichlet_bc,
-					     map<int,double>   &boundary_values)
+					     const FunctionMap   &dirichlet_bc,
+					     map<int,double>     &boundary_values)
 {
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
 	  ExcInvalidBoundaryIndicator());
 
   const FiniteElement<1> &fe = dof.get_fe();
-  Assert (fe.dofs_per_vertex == 1, ExcInvalidFE());
-  Assert (fe.n_components == 1, ExcInvalidFE());
+  Assert (fe.n_components == dirichlet_bc.begin()->second->n_components,
+	  ExcComponentMismatch());
+  Assert (fe.dofs_per_vertex == fe.n_components,
+	  ExcComponentMismatch());
   
 				   // check whether boundary values at the
 				   // left boundary of the line are requested
@@ -495,8 +495,9 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
 
 				       // now set the value of the leftmost
 				       // degree of freedom
-      boundary_values[leftmost_cell->vertex_dof_index(0,0)]
-	= dirichlet_bc.find(0)->second->operator()(leftmost_cell->vertex(0));
+      for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
+	boundary_values[leftmost_cell->vertex_dof_index(0,i)]
+	  = dirichlet_bc.find(0)->second->value(leftmost_cell->vertex(0), i);
     };
 
 				   // same for the right boundary of
@@ -516,21 +517,13 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
 
 				       // now set the value of the rightmost
 				       // degree of freedom
-      boundary_values[rightmost_cell->vertex_dof_index(1,0)]
-	= dirichlet_bc.find(1)->second->operator()(rightmost_cell->vertex(1));
+      for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
+	boundary_values[rightmost_cell->vertex_dof_index(1,i)]
+	  = dirichlet_bc.find(1)->second->value(rightmost_cell->vertex(1), i);
     };
   
 };
 
-
-
-template <>
-void VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
-						  const VectorFunctionMap&,
-						  map<int,double>&)
-{
-  Assert (false, ExcNotImplemented());
-};
 
 #endif
 
@@ -540,64 +533,32 @@ template <int dim>
 void
 VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					       const FunctionMap     &dirichlet_bc,
-					       map<int,double>   &boundary_values) {
-  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
-	  ExcInvalidBoundaryIndicator());
-
-  const FiniteElement<dim> &fe = dof.get_fe();
-  Assert (fe.dofs_per_vertex == 1, ExcInvalidFE());
-  Assert (fe.n_components == 1, ExcInvalidFE());
-
-  typename FunctionMap::const_iterator function_ptr;
-
-				   // field to store the indices of dofs
-  vector<int>         face_dofs (fe.dofs_per_face);
-  vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
-  vector<double>      dof_values (fe.dofs_per_face);
-	
-  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-					endf = dof.end_face();  
-  for (; face!=endf; ++face)
-    if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
-	dirichlet_bc.end()) 
-				       // face is subject to one of the
-				       // bc listed in #dirichlet_bc#
-      {
-					 // get indices, physical location and
-					 // boundary values of dofs on this
-					 // face
-	face->get_dof_indices (face_dofs);
-	fe.get_face_support_points (face, dof_locations);
-	function_ptr->second->value_list (dof_locations, dof_values);
-
-					 // enter into list
-	for (unsigned int i=0; i<face_dofs.size(); ++i)
-	  boundary_values[face_dofs[i]] = dof_values[i];
-      };
-};
-
-
-
-template <int dim>
-void
-VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
-					       const VectorFunctionMap     &dirichlet_bc,
-					       map<int,double>   &boundary_values)
+					       map<int,double>       &boundary_values)
 {
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
 	  ExcInvalidBoundaryIndicator());
 
-  const FiniteElement<dim> &fe = dof.get_fe();
-  Assert (fe.n_components == dirichlet_bc.begin()->second->n_components,
+  const FiniteElement<dim> &fe           = dof.get_fe();
+  const unsigned int        n_components = fe.n_components;
+  const bool                fe_is_system = (n_components != 1);
+  
+  Assert (n_components == dirichlet_bc.begin()->second->n_components,
 	  ExcInvalidFE());
 
-  typename VectorFunctionMap::const_iterator function_ptr;
+  typename FunctionMap::const_iterator function_ptr;
 
 				   // field to store the indices of dofs
   vector<int>         face_dofs (fe.dofs_per_face, -1);
   vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
-  vector< Vector<double> > dof_values (fe.dofs_per_face,
-				       Vector<double>(fe.n_components));
+				   // array to store the values of
+				   // the boundary function at the
+				   // boundary points. have to arrays
+				   // for scalar and vector functions
+				   // to use the more efficient one
+				   // respectively
+  vector<double>          dof_values_scalar (fe.dofs_per_face);
+  vector<Vector<double> > dof_values_system (fe.dofs_per_face,
+					     Vector<double>(fe.n_components));
 	
   DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
 					endf = dof.end_face();
@@ -612,13 +573,32 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					 // face
 	face->get_dof_indices (face_dofs);
 	fe.get_face_support_points (face, dof_locations);
-	function_ptr->second->value_list (dof_locations, dof_values);
 
-					 // enter into list
-
-	for (unsigned int i=0; i<face_dofs.size(); ++i)
-	  boundary_values[face_dofs[i]]
-	    = dof_values[i](fe.face_system_to_component_index(i).first);
+	if (fe_is_system)
+	  {
+	    function_ptr->second->vector_value_list (dof_locations, dof_values_system);
+	    
+					     // enter into list
+	    
+	    for (unsigned int i=0; i<face_dofs.size(); ++i)
+	      boundary_values[face_dofs[i]]
+		= dof_values_system[i](fe.face_system_to_component_index(i).first);
+	  }
+	else
+					   // fe has only one component,
+					   // so save some computations
+	  {
+					     // get only the one component that
+					     // this function has
+	    function_ptr->second->value_list (dof_locations,
+					      dof_values_scalar,
+					      0);
+	    
+					     // enter into list
+	    
+	    for (unsigned int i=0; i<face_dofs.size(); ++i)
+	      boundary_values[face_dofs[i]] = dof_values_scalar[i];
+	  };
       };
 }
 
@@ -630,7 +610,8 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 					   const FunctionMap        &boundary_functions,
 					   const Quadrature<dim-1>  &q,
 					   map<int,double>          &boundary_values) {
-  Assert (dof.get_fe().n_components == 1, ExcInvalidFE());
+  Assert (dof.get_fe().n_components == boundary_functions.begin()->second->n_components,
+	  ExcComponentMismatch());
   
   vector<int>    dof_to_boundary_mapping;
   dof.map_dof_to_boundary_indices (boundary_functions, dof_to_boundary_mapping);
@@ -703,233 +684,24 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 
 
 
-
-template <int dim>
-void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
-					     const Vector<double>     &fe_function,
-					     const Function<dim>      &exact_solution,
-					     Vector<float>            &difference,
-					     const Quadrature<dim>    &q,
-					     const NormType           &norm,
-					     const Function<dim>      *weight=0)
-{
-  const FiniteElement<dim> &fe = dof.get_fe();
-    
-  difference.reinit (dof.get_tria().n_active_cells());
-  
-  UpdateFlags update_flags = UpdateFlags (update_q_points  |
-					  update_JxW_values);
-  if ((norm==H1_seminorm) || (norm==H1_norm))
-    update_flags = UpdateFlags (update_flags | update_gradients);
-  FEValues<dim> fe_values(fe, q, update_flags);
-  
-				   // loop over all cells
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
-  for (unsigned int index=0; cell != endc; ++cell, ++index)
-    {
-      double diff=0;
-				       // initialize for this cell
-      fe_values.reinit (cell);
-
-      switch (norm) 
-	{
-	  case mean:
-	  case L1_norm:
-	  case L2_norm:
-	  case Linfty_norm:
-	  case H1_norm:
-	  {
-					     // we need the finite element
-					     // function \psi at the different
-					     // integration points. Compute
-					     // it like this:
-					     // \psi(x_j)=\sum_i v_i \phi_i(x_j)
-					     // with v_i the nodal values of the
-					     // fe_function and \phi_i(x_j) the
-					     // matrix of the trial function
-					     // values at the integration point
-					     // x_j. Then the vector
-					     // of the \psi(x_j) is v*Phi with
-					     // v being the vector of nodal
-					     // values on this cell and Phi
-					     // the matrix.
-					     //
-					     // we then need the difference:
-					     // reference_function(x_j)-\psi_j
-					     // and assign that to the vector
-					     // \psi.
-	    const unsigned int n_q_points = q.n_quadrature_points;
-	    vector<double>   psi (n_q_points);
-
-					     // in praxi: first compute
-					     // exact fe_function vector
-	    exact_solution.value_list (fe_values.get_quadrature_points(),
-				       psi);
-					     // then subtract finite element
-					     // fe_function
-	    if (true) 
-	      {
-		vector<double> function_values (n_q_points, 0);
-		fe_values.get_function_values (fe_function, function_values);
-
-		transform (psi.begin(), psi.end(),
-			   function_values.begin(),
-			   psi.begin(),
-			   minus<double>());
-	      };	    
-
-					     // for L1_norm and Linfty_norm:
-					     // take absolute
-					     // value, for the L2_norm take
-					     // square of psi
-	    switch (norm) 
-	      {
-		case mean:
-		      break;
-		case L1_norm:
-		case Linfty_norm:
-		      transform (psi.begin(), psi.end(),
-				 psi.begin(), ptr_fun(fabs));
-		      break;
-		case L2_norm:
-		case H1_norm:
-		      transform (psi.begin(), psi.end(),
-				 psi.begin(), ptr_fun(sqr));
-		      break;
-		default:
-		      Assert (false, ExcNotImplemented());
-	      };
-
-					     // now weight the values
-					     // at the quadrature points due
-					     // to the weighting function
-	    if (weight)
-	      {
-		vector<double> w(n_q_points);
-		weight->value_list(fe_values.get_quadrature_points(),w);
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  psi[q]*=w[q];
-	      }
-
-					     // ok, now we have the integrand,
-					     // let's compute the integral,
-					     // which is
-					     // sum_j psi_j JxW_j
-					     // (or |psi_j| or |psi_j|^2
-	    switch (norm) 
-	      {
-		case mean:
-		case L1_norm:
-		      diff = inner_product (psi.begin(), psi.end(),
-					    fe_values.get_JxW_values().begin(),
-					    0.0);
-		      break;
-		case L2_norm:
-		case H1_norm:
-		      diff = sqrt(inner_product (psi.begin(), psi.end(),
-						 fe_values.get_JxW_values().begin(),
-						 0.0));
-		      break;
-		case Linfty_norm:
-		      diff = *max_element (psi.begin(), psi.end());
-		      break;
-		default:
-		      Assert (false, ExcNotImplemented());
-	      };
-
-					     // note: the H1_norm uses the result
-					     // of the L2_norm and control goes
-					     // over to the next case statement!
-	    if (norm != H1_norm)
-	      break;
-	  };
-
-	  case H1_seminorm:
-	  {
-					     // note: the computation of the
-					     // H1_norm starts at the previous
-					     // case statement, but continues
-					     // here!
-
-					     // for H1_norm: re-square L2_norm.
-	    diff = sqr(diff);
-
-					     // same procedure as above, but now
-					     // psi is a vector of gradients
-	    const unsigned int n_q_points = q.n_quadrature_points;
-	    vector<Tensor<1,dim> >   psi (n_q_points);
-
-					     // in praxi: first compute
-					     // exact fe_function vector
-	    exact_solution.gradient_list (fe_values.get_quadrature_points(),
-					  psi);
-	    
-					     // then subtract finite element
-					     // fe_function
-	    if (true) 
-	      {
-		vector<Tensor<1,dim> > function_grads (n_q_points, Tensor<1,dim>());
-		fe_values.get_function_grads (fe_function, function_grads);
-
-		transform (psi.begin(), psi.end(),
-			   function_grads.begin(),
-			   psi.begin(),
-			   minus<Tensor<1,dim> >());
-	      };
-					     // take square of integrand
-	    vector<double> psi_square (psi.size(), 0.0);
-	    for (unsigned int i=0; i<n_q_points; ++i)
-	      psi_square[i] = sqr_point(psi[i]);
-
-					     // now weight the values
-					     // at the quadrature points due
-					     // to the weighting function
-	    if (weight)
-	      {
-		vector<double> w(n_q_points);
-		weight->value_list(fe_values.get_quadrature_points(),w);
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  psi_square[q]*=w[q];
-	      }
-
-					     // add seminorm to L_2 norm or
-					     // to zero
-	    diff += inner_product (psi_square.begin(), psi_square.end(),
-				   fe_values.get_JxW_values().begin(),
-				   0.0);
-	    diff = sqrt(diff);
-
-	    break;
-	  };
-					     
-	  default:
-		Assert (false, ExcNotImplemented());
-	};
-
-      
-				       // append result of this cell
-				       // to the end of the vector
-      difference(index) = diff;
-    };
-};
-
-
-
 template <int dim>
 void
 VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					const Vector<double>     &fe_function,
-					const VectorFunction<dim>&exact_solution,
+					const Function<dim>      &exact_solution,
 					Vector<float>            &difference,
 					const Quadrature<dim>    &q,
 					const NormType           &norm,
 					const Function<dim>      *weight)
 {
-  Assert(norm != mean , ExcNotUseful());
+  const unsigned int        n_q_points   = q.n_quadrature_points;
+  const FiniteElement<dim> &fe           = dof.get_fe();
+  const unsigned int        n_components = fe.n_components;
+  const bool                fe_is_system = (n_components != 1);
 
-  const FiniteElement<dim> &fe = dof.get_fe();
-  
+  Assert( !((n_components == 1) && (norm == mean)),
+	  ExcNotUseful());
+
   difference.reinit (dof.get_tria().n_active_cells());
   
   UpdateFlags update_flags = UpdateFlags (update_q_points  |
@@ -937,6 +709,25 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
   if ((norm==H1_seminorm) || (norm==H1_norm))
     update_flags = UpdateFlags (update_flags | update_gradients);
   FEValues<dim> fe_values(fe, q, update_flags);
+
+  vector< Vector<double> >        function_values (n_q_points,
+						   Vector<double>(n_components));
+  vector<vector<Tensor<1,dim> > > function_grads (n_q_points,
+						  vector<Tensor<1,dim> >(n_components));
+  vector<double> weight_values (n_q_points);
+  
+  vector<Vector<double> >         psi_values (n_q_points,
+					      Vector<double>(n_components));
+  vector<vector<Tensor<1,dim> > > psi_grads (n_q_points,
+					     vector<Tensor<1,dim> >(n_components));
+  vector<double> psi_scalar (n_q_points);
+  vector<double> psi_square (n_q_points);
+	    
+				   // tmp vector when we use the
+				   // Function<dim> functions for
+				   // scalar functions
+  vector<double>         tmp_values (fe_values.n_quadrature_points);
+  vector<Tensor<1,dim> > tmp_gradients (fe_values.n_quadrature_points);
   
  				   // loop over all cells
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
@@ -950,30 +741,34 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
       switch (norm)
  	{
  	  case mean:
-		break;
  	  case L1_norm:
  	  case L2_norm:
  	  case Linfty_norm:
  	  case H1_norm:
  	  {
- 	    const unsigned int n_q_points = q.n_quadrature_points;
- 	    vector<Vector<double> >  psi (n_q_points, Vector<double>(fe.n_components));
-
  					     // first compute the exact solution
 					     // (vectors) at the quadrature points
- 	    exact_solution.value_list (fe_values.get_quadrature_points(), psi);
+					     // try to do this as efficient as
+					     // possible by avoiding a second
+					     // virtual function call in case
+					     // the function really has only
+					     // one component
+	    if (fe_is_system)
+	      exact_solution.vector_value_list (fe_values.get_quadrature_points(),
+						psi_values);
+	    else
+	      {
+		exact_solution.value_list (fe_values.get_quadrature_points(),
+					   tmp_values);
+		for (unsigned int i=0; i<n_q_points; ++i)
+		  psi_values[i](0) = tmp_values[i];
+	      };
+	    
  					     // then subtract finite element
  					     // fe_function
- 	    if (true) 
- 	      {
- 		vector< Vector<double> > function_values (
-		  n_q_points, Vector<double>(fe.n_components));
-
- 		fe_values.get_function_values (fe_function, function_values);
-
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  psi[q] -= function_values[q];
- 	      };	    
+	    fe_values.get_function_values (fe_function, function_values);
+	    for (unsigned int q=0; q<n_q_points; ++q)
+	      psi_values[q] -= function_values[q];
 
 					     // for L1_norm, Linfty_norm, L2_norm
 					     // and H1_norm take square of the
@@ -984,7 +779,6 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     // Use psi_scalar to store the squares
 					     // of the vectors or the vector norms
 					     // respectively.
- 	    vector<double>  psi_scalar (n_q_points);
  	    switch (norm)
 	      {
 		case mean:
@@ -994,7 +788,7 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
  		case L2_norm:
  		case H1_norm:
 		      for (unsigned int q=0; q<n_q_points; ++q)
-			psi_scalar[q]=psi[q].norm_sqr();
+			psi_scalar[q] = psi_values[q].norm_sqr();
 		      
 		      if (norm == L1_norm || norm == Linfty_norm)
 			transform (psi_scalar.begin(), psi_scalar.end(),
@@ -1009,10 +803,10 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     // to the weighting function
 	    if (weight)
 	      {
-		vector<double> w(n_q_points);
-		weight->value_list(fe_values.get_quadrature_points(),w);
+		weight->value_list(fe_values.get_quadrature_points(),
+				   weight_values);
 		for (unsigned int q=0; q<n_q_points; ++q)
-		  psi_scalar[q]*=w[q];
+		  psi_scalar[q] *= weight_values[q];
 	      }
 
  					     // ok, now we have the integrand,
@@ -1023,7 +817,6 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
  	    switch (norm)
  	      {
  		case mean:
-		      break;      
  		case L1_norm:
  		case L2_norm:
 		case H1_norm:
@@ -1057,45 +850,48 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     // Until now, #diff# includes the
 					     // square of the L2_norm.
 
- 					     // same procedure as above, but now
- 					     // psi is a vector of Jacobians
-					     // i.e. psi is a vector of vectors of
-					     // gradients.
- 	    const unsigned int n_q_points = q.n_quadrature_points;
- 	    vector<vector<Tensor<1,dim> > >   psi (
-	      n_q_points, vector<Tensor<1,dim> >(fe.n_components, Tensor<1,dim>()));
-	    
  					     // in praxi: first compute
  					     // exact fe_function vector
- 	    exact_solution.gradient_list (fe_values.get_quadrature_points(), psi);
+					     //
+					     // try to be a little clever
+					     // to avoid recursive virtual
+					     // function calls when calling
+					     // #gradient_list# for functions
+					     // that are really scalar
+					     // functions
+	    if (fe_is_system)
+	      exact_solution.vector_gradient_list (fe_values.get_quadrature_points(),
+						   psi_grads);
+	    else
+	      {
+		exact_solution.gradient_list (fe_values.get_quadrature_points(),
+					      tmp_gradients);
+		for (unsigned int i=0; i<n_q_points; ++i)
+		  psi_grads[i][0] = tmp_gradients[i];
+	      };
 
  					     // then subtract finite element
  					     // function_grads
- 	    if (true) 
- 	      {
- 		vector<vector<Tensor<1,dim> > > function_grads (
-		  n_q_points, vector<Tensor<1,dim> >(fe.n_components, Tensor<1,dim>()));
- 		fe_values.get_function_grads (fe_function, function_grads);
+	    fe_values.get_function_grads (fe_function, function_grads);
+	    for (unsigned int k=0; k<n_components; ++k)
+	      for (unsigned int q=0; q<n_q_points; ++q)
+		psi_grads[q][k] -= function_grads[q][k];
 
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  for (unsigned int k=0; k<fe.n_components; ++k)
-		    psi[q][k] -= function_grads[q][k];
- 	      };
- 					     // take square of integrand
- 	    vector<double> psi_square (psi.size(), 0.0);
- 	    for (unsigned int q=0; q<n_q_points; ++q)
-	      for (unsigned int k=0; k<fe.n_components; ++k)
-		psi_square[q] += sqr_point(psi[q][k]);
+					     // take square of integrand
+	    fill_n (psi_square.begin(), n_q_points, 0.0);
+	    for (unsigned int k=0; k<n_components; ++k)
+	      for (unsigned int q=0; q<n_q_points; ++q)
+		psi_square[q] += sqr_point(psi_grads[q][k]);
 
 					     // now weight the values
 					     // at the quadrature points due
 					     // to the weighting function
 	    if (weight)
 	      {
-		vector<double> w(n_q_points);
-		weight->value_list(fe_values.get_quadrature_points(),w);
+		weight->value_list(fe_values.get_quadrature_points(),
+				   weight_values);
 		for (unsigned int q=0; q<n_q_points; ++q)
-		  psi_square[q]*=w[q];
+		  psi_square[q] *= weight_values[q];
 	      }
 
  					     // add seminorm to L_2 norm or

@@ -16,12 +16,31 @@ class BoundaryValuesSine : public Function<dim> {
 				      * Return the value of the function
 				      * at the given point.
 				      */
-    virtual double operator () (const Point<dim> &p) const {
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component) const {
+      Assert (component==0, ExcIndexRange (component, 0, 1));
+
       double x = 1;
       
       for (unsigned int i=0; i<dim; ++i)
 	x *= cos(2*3.1415926536*p(i));
       return x;
+    };
+
+    				     /**
+				      * Return the value of the function
+				      * at the given point.
+				      */
+    virtual void value (const Point<dim> &p,
+			Vector<double>   &values) const {
+      Assert (values.size()==1, ExcVectorHasWrongSize (values.size(), 1));
+
+      double x = 1;
+      
+      for (unsigned int i=0; i<dim; ++i)
+	x *= cos(2*3.1415926536*p(i));
+
+      values(0) = x;
     };
     
 
@@ -32,11 +51,12 @@ class BoundaryValuesSine : public Function<dim> {
 				      * empty.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
-			     vector<double>            &values) const {
+			     vector<double>            &values,
+			     const unsigned int         component) const {
       Assert (values.size() == points.size(),
 	      ExcVectorHasWrongSize(values.size(), points.size()));
       for (unsigned int i=0; i<points.size(); ++i) 
-	values[i] = BoundaryValuesSine<dim>::operator() (points[i]);
+	values[i] = BoundaryValuesSine<dim>::value (points[i], component);
     };
 };
 
@@ -49,7 +69,9 @@ class BoundaryValuesJump : public Function<dim> {
 				      * Return the value of the function
 				      * at the given point.
 				      */
-    virtual double operator () (const Point<dim> &p) const {
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component) const {
+      Assert (component==0, ExcIndexRange (component, 0, 1));
       switch (dim) 
 	{
 	  case 1:
@@ -73,7 +95,8 @@ class RHSTrigPoly : public Function<dim> {
 				      * Return the value of the function
 				      * at the given point.
 				      */
-    virtual double operator () (const Point<dim> &p) const;
+    virtual double value (const Point<dim> &p,
+			  const unsigned int) const;
 };
 
 
@@ -89,7 +112,8 @@ class RHSPoly : public Function<dim> {
 				      * Return the value of the function
 				      * at the given point.
 				      */
-    virtual double operator () (const Point<dim> &p) const;
+    virtual double value (const Point<dim> &p,
+			  const unsigned int) const;
 };
 
 
@@ -200,7 +224,10 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
 
 
 template <int dim>
-double RHSTrigPoly<dim>::operator () (const Point<dim> &p) const {
+double RHSTrigPoly<dim>::value (const Point<dim>   &p,
+				const unsigned int  component) const {
+  Assert (component==0, ExcIndexRange (component, 0, 1));
+
   const double pi = 3.1415926536;
   switch (dim) 
     {
@@ -219,7 +246,10 @@ double RHSTrigPoly<dim>::operator () (const Point<dim> &p) const {
 
 
 template <int dim>
-double RHSPoly<dim>::operator () (const Point<dim> &p) const {
+double RHSPoly<dim>::value (const Point<dim>   &p,
+			    const unsigned int  component) const {
+  Assert (component==0, ExcIndexRange (component, 0, 1));
+
   double ret_val = 0;
   for (unsigned int i=0; i<dim; ++i)
     ret_val += 2*p(i)*(1.-p(i));

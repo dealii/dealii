@@ -26,3 +26,6 @@ Fill in docs for the timer class. Hopefully finally find a way to
   let it measure times larger than half an hour.
 
 
+Review the TensorIndex class. Better documentation, remove general
+  template. Move constructors to the back of the file, rather than
+  inline in the classes. Find out whether it is really needed.

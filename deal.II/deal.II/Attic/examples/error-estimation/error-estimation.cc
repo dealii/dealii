@@ -114,25 +114,32 @@ class Solution {
 
     class GaussShape : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const;
-	virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
+	virtual double value (const Point<dim> &p,
+			      const unsigned int component) const;
+	virtual Tensor<1,dim> gradient (const Point<dim> &p,
+					const unsigned int component) const;
     };
 
     class Singular : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const;
-	virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
+	virtual double value (const Point<dim> &p,
+			      const unsigned int component) const;
+	virtual Tensor<1,dim> gradient (const Point<dim> &p,
+					const unsigned int component) const;
     };
 
     class Kink : public Function<dim> {
       public:
 	class Coefficient : public Function<dim> {
 	  public:
-	    virtual double operator () (const Point<dim> &p) const;
+	    virtual double value (const Point<dim> &p,
+				  const unsigned int component) const;
 	};
 	
-	virtual double operator () (const Point<dim> &p) const;
-	virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
+	virtual double value (const Point<dim> &p,
+			      const unsigned int component) const;
+	virtual Tensor<1,dim> gradient (const Point<dim> &p,
+					const unsigned int component) const;
     };
 };
 
@@ -150,7 +157,8 @@ class RHS {
 				      */
     class GaussShape : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const;
+	virtual double value (const Point<dim> &p,
+			      const unsigned int component) const;
     };
 
     				     /**
@@ -160,7 +168,8 @@ class RHS {
 				      */
     class Singular : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const;
+	virtual double value (const Point<dim> &p,
+			      const unsigned int component) const;
     };
 
     				     /**
@@ -171,7 +180,8 @@ class RHS {
 				      */
     class Kink : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const;
+	virtual double value (const Point<dim> &p,
+			      const unsigned int component) const;
     };
 };
 
@@ -179,13 +189,15 @@ class RHS {
 
 
 template <>
-double Solution<2>::GaussShape::operator () (const Point<2> &p) const {
+double Solution<2>::GaussShape::value (const Point<2> &p,
+				       const unsigned int) const {
   return p(0)*p(1)*exp(-40*p.square());
 };
 
 
 template <>
-Tensor<1,2> Solution<2>::GaussShape::gradient (const Point<2> &p) const {
+Tensor<1,2> Solution<2>::GaussShape::gradient (const Point<2> &p,
+					       const unsigned int) const {
   return Point<2> ((1-80.*p(0)*p(0))*p(1)*exp(-40*p.square()),
 		   (1-80.*p(1)*p(1))*p(0)*exp(-40*p.square()));
 };
@@ -193,13 +205,15 @@ Tensor<1,2> Solution<2>::GaussShape::gradient (const Point<2> &p) const {
 
 
 template <>
-double Solution<2>::Singular::operator () (const Point<2> &p) const {
+double Solution<2>::Singular::value (const Point<2> &p,
+				     const unsigned int) const {
   return pow(p.square(), 1./3.);
 };
 
 
 template <>
-Tensor<1,2> Solution<2>::Singular::gradient (const Point<2> &p) const {
+Tensor<1,2> Solution<2>::Singular::gradient (const Point<2> &p,
+					     const unsigned int) const {
   return 2./3.*pow(p.square(), -2./3.) * p;
 };
 
@@ -213,21 +227,24 @@ inline double theta(const double x) {
 
 
 template <>
-double Solution<2>::Kink::operator () (const Point<2> &p) const {
+double Solution<2>::Kink::value (const Point<2> &p,
+				 const unsigned int) const {
   const double s = p(1)-p(0)*p(0);
   return (1+4*theta(s))*s;
 };
 
 
 template <>
-Tensor<1,2> Solution<2>::Kink::gradient (const Point<2> &p) const {
+Tensor<1,2> Solution<2>::Kink::gradient (const Point<2> &p,
+					 const unsigned int) const {
   const double s = p(1)-p(0)*p(0);
   return (1+4*theta(s))*Point<2>(-2*p(0),1);
 };
 
 
 template <>
-double Solution<2>::Kink::Coefficient::operator () (const Point<2> &p) const {
+double Solution<2>::Kink::Coefficient::value (const Point<2> &p,
+					      const unsigned int) const {
   const double s = p(1)-p(0)*p(0);
   return 1./(1.+4.*theta(s));
 };
@@ -235,19 +252,22 @@ double Solution<2>::Kink::Coefficient::operator () (const Point<2> &p) const {
 
 
 template <>
-double RHS<2>::GaussShape::operator () (const Point<2> &p) const {
+double RHS<2>::GaussShape::value (const Point<2> &p,
+				  const unsigned int) const {
   return (480.-6400.*p.square())*p(0)*p(1)*exp(-40.*p.square());
 };
 
 
 template <>
-double RHS<2>::Singular::operator () (const Point<2> &p) const {
+double RHS<2>::Singular::value (const Point<2> &p,
+				const unsigned int) const {
   return -4./9. * pow(p.square(), -2./3.);
 };
 
 
 template <>
-double RHS<2>::Kink::operator () (const Point<2> &) const {
+double RHS<2>::Kink::value (const Point<2> &,
+			    const unsigned int) const {
   return 2;
 };
 
@@ -266,7 +286,7 @@ void PoissonEquation<2>::assemble (FullMatrix<double>  &cell_matrix,
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point) 
     {
       const double c = (use_coefficient ?
-			coefficient(fe_values.quadrature_point(point)) :
+			coefficient.value(fe_values.quadrature_point(point)) :
 			1);
       for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
 	{
@@ -276,7 +296,7 @@ void PoissonEquation<2>::assemble (FullMatrix<double>  &cell_matrix,
 				fe_values.JxW(point) *
 				c;
 	  rhs(i) += fe_values.shape_value(i,point) *
-		    right_hand_side(fe_values.quadrature_point(point)) *
+		    right_hand_side.value(fe_values.quadrature_point(point)) *
 		    fe_values.JxW(point);
 	};
     };
@@ -535,8 +555,8 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       cout << estimated_error_per_cell.l2_norm() << endl;
       estimated_error.push_back (estimated_error_per_cell.l2_norm());
 
-      Vector<double> l2_error_per_dof, linfty_error_per_dof;
-      Vector<double> h1_error_per_dof, estimated_error_per_dof;
+      Vector<double> l2_error_per_dof(dof->n_dofs()), linfty_error_per_dof(dof->n_dofs());
+      Vector<double> h1_error_per_dof(dof->n_dofs()), estimated_error_per_dof(dof->n_dofs());
       Vector<double> error_ratio (dof->n_dofs());
       dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
       dof->distribute_cell_to_dof_vector (linfty_error_per_cell,

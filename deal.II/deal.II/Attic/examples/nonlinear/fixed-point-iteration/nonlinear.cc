@@ -33,7 +33,7 @@ template <int dim>
 class RightHandSide :  public Function<dim> 
 {
   public:
-    double operator () (const Point<dim> &p) const 
+    double value (const Point<dim> &p) const 
       {
 	double x = 80;
 	for (unsigned int d=0; d<dim; ++d)

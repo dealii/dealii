@@ -55,7 +55,7 @@
  * offering iterator functions and some minor additional requirements is
  * simple.
  *
- * Note that this class could in principle be base on the C++ #map<Key,Value>#
+ * Note that this class could in principle be based on the C++ #map<Key,Value>#
  * data type. Instead, it uses another data format which is more effective both
  * in terms of computing time for access as well as with regard to memory
  * consumpion.
