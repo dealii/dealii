@@ -36,15 +36,16 @@ template <int dim> class FESubfaceValues;
  * The following paragraph applies to the implementation of
  * @ref{FEValues}. Usage of the class is as follows: first, call the
  * functionss @p{update_once} and @p{update_each} with the update
- * flags you need.  Then call @p{get_*_data} and with the result of
- * @p{update_once}. This will initialize some internal data
+ * flags you need. This includes the flags needed by the
+ * @ref{FiniteElement}. Then call @p{get_*_data} and with the or'd
+ * results.  This will initialize and return some internal data
  * structures.  On the first cell, call @p{fill_fe_*_values} with the
  * result of @p{update_once}. Finally, on each cell, use
  * @p{fill_fe_*_values} with the result of @p{update_each} to compute
  * values for a special cell.
  *
- * A hint to implementators: no function except the two functions @p{update_once}
- * and @p{update_each} may add any flags.
+ * A hint to implementators: no function except the two functions
+ * @p{update_once} and @p{update_each} may add any flags.
  *
  * @author Guido Kanschat, Ralf Hartmann 2000, 2001
  */
@@ -144,11 +145,14 @@ class Mapping : public Subscriptor
     };
     
 				     /**
-				      * Tranform a field of covariant vectors.
-				      * There must be one vector for each quadrature
-				      * point. Alternatively, for faces and subfaces,
-				      * the first quadrature point can be
-				      * given as additional argument.
+				      * Tranform a field of covariant
+				      * vectors.  There must be one
+				      * vector for each quadrature
+				      * point. Alternatively, for
+				      * faces and subfaces, the number
+				      * of the first quadrature point
+				      * can be given as additional
+				      * argument.
 				      */
     virtual void transform_covariant (std::vector<Tensor<1,dim> >       &dst,
 				      const std::vector<Tensor<1,dim> > &src,
@@ -156,11 +160,15 @@ class Mapping : public Subscriptor
 				      const unsigned int src_offset) const = 0;
     
 				     /**
-				      * Tranform a field of contravariant vectors.
-				      * There must be one vector for each quadrature
-				      * point. Alternatively, for faces and subfaces,
-				      * the first quadrature point can be
-				      * given as additional argument.
+				      * Tranform a field of
+				      * contravariant vectors.  There
+				      * must be one vector for each
+				      * quadrature
+				      * point. Alternatively, for
+				      * faces and subfaces, the number
+				      * of the first quadrature point
+				      * can be given as additional
+				      * argument.
 				      */
     virtual void transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
 					  const std::vector<Tensor<1,dim> > &src,

@@ -506,6 +506,6 @@ template class DataOut<deal_II_dimension>;
 
 
 // for 3d, also generate an extra class
-#if deal_II_dimension >= 3
+#if deal_II_dimension >= 2
 template class DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>;
 #endif

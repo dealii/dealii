@@ -289,7 +289,7 @@ DataOutFaces<dim>::next_face (const FaceDescriptor &old_face)
 
 // explicit instantiations
 // don't instantiate anything for the 1d and 2d cases
-#if deal_II_dimension >=3
+#if deal_II_dimension >=2
 template class DataOutFaces<deal_II_dimension>;
 #endif
 
