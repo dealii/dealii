@@ -2266,6 +2266,9 @@ class DataOutInterface : private DataOutBase
  * be merged, while this is almost impossible once the data has been
  * written out in any of the supported established graphics formats.
  *
+ * This second use scenario is explained in some detail in the step-18
+ * example program.
+ *
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, int spacedim=dim>
