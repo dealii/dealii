@@ -32,7 +32,7 @@
 
 
 template <typename T>
-static T sqr (const T t)
+static inline T sqr (const T t)
 {
   return t*t;
 }
