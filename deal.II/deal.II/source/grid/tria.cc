@@ -1116,10 +1116,8 @@ typename TriaDimensionInfo<dim>::raw_line_iterator
 Triangulation<dim>::begin_raw_line (unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
-
-				   // does this level have cells?
-  if (levels[level]->lines.lines.size() == 0)
-    return end_line();
+  Assert (levels[level]->lines.lines.size() != 0,
+	  ExcEmptyLevel (level));
   
   return raw_line_iterator ((Triangulation<dim>*)this,
 			    level,
@@ -1142,10 +1140,8 @@ typename TriaDimensionInfo<dim>::raw_quad_iterator
 Triangulation<dim>::begin_raw_quad (unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
-  
-  if (levels[level]->quads.quads.size() == 0)
-    return end_quad();
-  
+  Assert (levels[level]->quads.quads.size() != 0,
+	  ExcEmptyLevel (level));
   return raw_quad_iterator ((Triangulation<dim>*)this,
 			    level,
 			    0);
@@ -1264,8 +1260,9 @@ Triangulation<dim>::end_quad () const {
 template <int dim>
 typename TriaDimensionInfo<dim>::raw_line_iterator
 Triangulation<dim>::last_raw_line (const unsigned int level) const {
-  Assert (level<levels.size(),
-	  ExcInvalidLevel(level));
+  Assert (level<levels.size(), ExcInvalidLevel(level));
+  Assert (levels[level]->lines.lines.size() != 0,
+	  ExcEmptyLevel (level));
   
   return raw_line_iterator ((Triangulation<dim>*)this,
 			    level,
@@ -1289,7 +1286,9 @@ typename TriaDimensionInfo<dim>::raw_quad_iterator
 Triangulation<dim>::last_raw_quad (const unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
-  
+  Assert (levels[level]->quads.quads.size() != 0,
+	  ExcEmptyLevel (level));
+
   return raw_quad_iterator ((Triangulation<dim>*)this,
 			    level,
 			    levels[level]->quads.quads.size()-1);

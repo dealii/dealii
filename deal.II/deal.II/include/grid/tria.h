@@ -1880,6 +1880,13 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      * Exception
 				      */
     DeclException0 (ExcInternalError);
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcEmptyLevel,
+		    int,
+		    << "You tried to do something on level " << arg1
+		    << ", but this level is empty.");
 				     //@}
   protected:
 				     /**
