@@ -320,7 +320,7 @@ template <>
 void QProjector<1>::project_to_subface (const Quadrature<0> &,
 					const unsigned int,
 					const unsigned int,
-					vector<Point<1> > &)
+					std::vector<Point<1> > &)
 {
   Assert(false, ExcNotImplemented());
 }

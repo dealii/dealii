@@ -137,7 +137,7 @@ class Boundary : public Subscriptor
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     vector<Point<dim> > &points) const;
+				     typename std::vector<Point<dim> > &points) const;
     
 				     /**
 				      * Return intermediate points
@@ -166,7 +166,7 @@ class Boundary : public Subscriptor
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     vector<Point<dim> > &points) const;
+				     typename std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Exception.
@@ -236,7 +236,7 @@ class StraightBoundary : public Boundary<dim> {
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     vector<Point<dim> > &points) const;
+				     typename std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Gives @p{n=points.size()=m*m}
@@ -251,7 +251,7 @@ class StraightBoundary : public Boundary<dim> {
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     vector<Point<dim> > &points) const;
+				     typename std::vector<Point<dim> > &points) const;
 
 };
 

@@ -59,7 +59,7 @@ FullMatrix<number>::FullMatrix (const unsigned int m,
   reinit (m,n);
 
   if (dim_range*dim_image != 0)
-    copy (entries, entries+dim_image*dim_range, val);
+    std::copy (entries, entries+dim_image*dim_range, val);
 };
 
 
@@ -1338,11 +1338,11 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
   unsigned int actual_width = width;
   if (scientific)
     {
-      out.setf (ios::scientific, ios::floatfield);
+      out.setf (std::ios::scientific, std::ios::floatfield);
       if (!width)
 	actual_width = precision+7;
     } else {
-      out.setf (ios::fixed, ios::floatfield);
+      out.setf (std::ios::fixed, std::ios::floatfield);
       if (!width)
 	actual_width = precision+2;
     }
