@@ -415,7 +415,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 	      for (std::vector<std::pair<unsigned int, double> >::const_iterator
 		     j=tmp_other_lines[i]->entries.begin();
 		   j!=tmp_other_lines[i]->entries.end(); ++j)
-		tmp.push_back (make_pair(j->first, j->second*weight));
+		tmp.push_back (std::make_pair(j->first, j->second*weight));
 	    };
 	};
 				       // finally exchange old and
