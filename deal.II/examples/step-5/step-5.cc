@@ -38,11 +38,64 @@
 
 				 // This is C++ ...
 #include <fstream>
-				 // ... and this is too. We will
+				 // ... and this is too: We will
 				 // convert integers to strings using
-				 // the classes inside this file:
-#include <strstream>
-
+				 // the the C++ stringstream class
+				 // ``ostringstream''. One slight
+				 // complication arises here in that
+				 // the classes ``std::istringstream''
+				 // and ``std::ostringstream'' (with
+				 // these names) have not been part of
+				 // standard libraries of C++
+				 // compilers for long. They have only
+				 // been part of C++ compilers since
+				 // around the time the C++ standard
+				 // was made in 1999. For example, the
+				 // gcc compiler up to and including
+				 // version 2.95.x did not have them,
+				 // but instead provided classes
+				 // ``istrstream'' and ``ostrstream''
+				 // with a similar, but nevertheless
+				 // slightly different
+				 // interface. Furthermore, they were
+				 // declared in the include file
+				 // ``<strstream>'', while the new
+				 // standards conforming classes are
+				 // declared in ``<sstream>''. Many
+				 // other compilers followed the gcc
+				 // scheme, so whenever we want to
+				 // support versions of compilers that
+				 // appeared before approximately
+				 // 2000/2001, we have to support
+				 // these old classes.
+				 //
+				 // Since we do want to support these
+				 // compilers, the ``./configure''
+				 // script you run as the very first
+				 // step of installing the library
+				 // determines whether the compiler
+				 // you want to use supports the new
+				 // classes, or whether we have to
+				 // fall back on the old ones. If the
+				 // new classes are supported, then
+				 // the preprocessor variable
+				 // ``HAVE_STD_STRINGSTREAM'' is set
+				 // in the ``base/config.h'' include
+				 // file, that all include files in
+				 // the library also include. Since we
+				 // have included quite a number of
+				 // files from the library at this
+				 // point, the definition or
+				 // non-definition of this
+				 // preprocessor variable can now be
+				 // used to decide whether old or new
+				 // header names have to be used to
+				 // import string stream classes:
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
 				 // The main class is mostly as in the
@@ -749,7 +802,42 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // could as well give stream
 				   // modifiers such as ``setf'',
 				   // ``setprecision'', and so on.
+				   //
+				   // In C++, you can do this by using
+				   // the so-called stringstream
+				   // classes. As already discussed at
+				   // the point of inclusion of the
+				   // respective header file above,
+				   // there is some historical
+				   // confusion we have to work around
+				   // here, since the class we'd like
+				   // to use used to be called
+				   // ``ostrstream'', but now is named
+				   // ``ostringstream''. In the same
+				   // way as done above in deciding
+				   // which file to include, we here
+				   // decide which class name to use:
+#ifdef HAVE_STD_STRINSTREAM
+  std::ostringstream filename;
+#else
   std::ostrstream filename;
+#endif
+				   // Fortunately, the interface of
+				   // the two classes which we might
+				   // now be using, depending on which
+				   // one is available, is close
+				   // enough that we need not take
+				   // care about the differences any
+				   // more, so we can use them in a
+				   // straightforward way, even if
+				   // they are not identical.
+
+				   // In order to now actually
+				   // generate a filename, we fill the
+				   // stringstream variable with the
+				   // base of the filename, then the
+				   // number part, and finally the
+				   // suffix indicating the file type:
   filename << "solution-"
 	   << cycle
 	   << ".eps";
