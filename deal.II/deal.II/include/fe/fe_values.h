@@ -20,7 +20,7 @@ template <int dim> class Quadrature;
 
 
 /**
-   This class offers a multitude of arrays and other fields which are used by
+  This class offers a multitude of arrays and other fields which are used by
    the derived classes #FEValues# and #FEFaceValues#. In principle, it is the
    back end of the front end for the unification of a certain finite element
    and a quadrature formula which evaluates certain aspects of the finite
@@ -40,6 +40,65 @@ template <int dim> class Quadrature;
    like providing those fields that are common to the derived classes and
    access to these fields. Any computations are in the derived classes. See there
    for more information.
+
+   It has support for the restriction of finite elements to faces of cells or
+   even to subfaces (i.e. refined faces). For this purpose, it offers an array
+   of matrices of ansatz function values, rather than one. Since the value of
+   a function at a quadrature point is an invariant under the transformation
+   from the unit cell to the real cell, it is only evaluated once upon startup.
+   However, when considering the restriction of a finite element to a face of
+   a cell (using a given quadrature rule), we may be tempted to compute the
+   restriction to all faces at startup (thus ending in four array of ansatz
+   function values in two dimensions, one per face, and even more in higher
+   dimensions) and let the respective #reinit# function of the derived classes
+   set a number which of the fields is to be taken when the user requests the
+   function values. This is done through the #selected_dataset# variable. See
+   the derived classes and the #get_values# function for the exact usage of
+   this variable.
+
+   
+   {\bf Member functions}
+
+   The functions of this class fall into different cathegories:
+   \begin{itemize}
+   \item #shape_value#, #shape_grad#, etc: return one of the values
+     of this object at a time. In many cases you will want to get
+     a whole bunch at a time for performance or convenience reasons,
+     then use the #get_*# functions.
+    
+   \item #get_shape_values#, #get_shape_grads#, etc: these return
+     a reference to a whole field. Usually these fields contain
+     the values of all ansatz functions at all quadrature points.
+
+   \item #get_function_values#, #get_function_gradients#: these
+     two functions offer a simple way to avoid the detour of the
+     ansatz functions, if you have a finite solution (resp. the
+     vector of values associated with the different ansatz functions.)
+     Then you may want to get information from the restriction of
+     the finite element function to a certain cell, e.g. the values
+     of the function at the quadrature points or the values of its
+     gradient. These two functions provide the information needed:
+     you pass it a vector holding the finite element solution and the
+     functions return the values or gradients of the finite element
+     function restricted to the cell which was given last time the
+     #reinit# function was given.
+    
+     Though possible in principle, these functions do not call the
+     #reinit# function, you have to do so yourself beforehand. On the
+     other hand, a copy of the cell iterator is stored which was used
+     last time the #reinit# function was called. This frees us from
+     the need to pass the cell iterator again to these two functions,
+     which guarantees that the cell used here is in sync with that used
+     for the #reinit# function. You should, however, make sure that
+     nothing substantial happens to the #DoFHandler# object or any
+     other involved instance between the #reinit# and the #get_function_*#
+     functions are called.
+
+   \item #reinit#: initialize the #FEValues# object for a certain cell.
+     This function is not in the present class but only in the derived
+     classes and has a variable call syntax. 
+     See the docs for the derived classes for more information.
+  \end{itemize}
 
    @author Wolfgang Bangerth, 1998
 */
@@ -79,8 +138,48 @@ class FEValuesBase {
     FEValuesBase (const unsigned int n_q_points,
 		  const unsigned int n_ansatz_points,
 		  const unsigned int n_dofs,
+		  const unsigned int n_values_array,
 		  const UpdateFlags update_flags);
     
+
+				     /**
+				      * Return the value of the #i#th shape
+				      * function at the #j# quadrature point
+				      * on the cell, face or subface selected
+				      * the last time the #reinit# function
+				      * of the derived class was called.
+				      */
+    double shape_value (const unsigned int i,
+			const unsigned int j) const;
+
+				     /**
+				      * Return a pointer to the matrix holding
+				      * all values of shape functions at all
+				      * integration points, on the present cell,
+				      * face or subface selected
+				      * the last time the #reinit# function
+				      * of the derived class was called.
+				      * For the format of this matrix, see the
+				      * documentation for the matrix itself.
+				      */
+    const dFMatrix & get_shape_values () const;
+
+				     /**
+				      * Return the values of the finite
+				      * element function characterized
+				      * by #fe_function# restricted to
+				      * the cell, face or subface selected
+				      * the last time the #reinit# function
+				      * of the derived class was called,
+				      * at the quadrature points.
+				      *
+				      * The function assumes that the
+				      * #values# object already has the
+				      * right size.
+				      */
+    void get_function_values (const dVector      &fe_function,
+			      vector<double>     &values) const;
+
     				     /**
 				      * Return the gradient of the #i#th shape
 				      * function at the #j# quadrature point.
@@ -226,6 +325,26 @@ class FEValuesBase {
     DeclException0 (ExcNotImplemented);
     
   protected:
+				     /**
+				      * Store the values of the shape functions
+				      * at the quadrature points. Rows in the
+				      * matrices denote the values of a single
+				      * shape function at the different points,
+				      * columns are for a single point with the
+				      * different shape functions.
+				      *
+				      * For cell values, the vector contains
+				      * only one entry, representing the
+				      * restriction of the finite element ansatz
+				      * space to a cell. For face values, the
+				      * vector contains as many elements as
+				      * there are faces, for subfaces the same
+				      * applies. Which of the matrices is active
+				      * is determined by the #selected_dataset#
+				      * variable.
+				      */
+    vector<dFMatrix>     shape_values;
+
     				     /**
 				      * Store the gradients of the shape
 				      * functions at the quadrature points.
@@ -300,6 +419,16 @@ class FEValuesBase {
     vector<dFMatrix>     jacobi_matrices;
 
 				     /**
+				      * Store which of the data sets in the
+				      * #shape_values# array is presently
+				      * active. This variable is set by the
+				      * #reinit# functions of the derived
+				      * classes. For the exact meaning see
+				      * there and in the doc for this class.
+				      */
+    unsigned int         selected_dataset;
+    
+				     /**
 				      * Store which fields are to be updated by
 				      * the reinit function.
 				      */
@@ -352,49 +481,7 @@ class FEValuesBase {
   return values from the different fields, check whether the required field
   was initialized, thus avoiding use of unitialized data.
 
-
-  {\bf Member functions}
-
-  The functions of this class fall into different cathegories:
-  \begin{itemize}
-  \item #shape_value#, #shape_grad#, etc: return one of the values
-    of this object at a time. In many cases you will want to get
-    a whole bunch at a time for performance or convenience reasons,
-    then use the #get_*# functions.
-    
-  \item #get_shape_values#, #get_shape_grads#, etc: these return
-    a reference to a whole field. Usually these fields contain
-    the values of all ansatz functions at all quadrature points.
-
-  \item #get_function_values#, #get_function_gradients#: these
-    two functions offer a simple way to avoid the detour of the
-    ansatz functions, if you have a finite solution (resp. the
-    vector of values associated with the different ansatz functions.)
-    Then you may want to get information from the restriction of
-    the finite element function to a certain cell, e.g. the values
-    of the function at the quadrature points or the values of its
-    gradient. These two functions provide the information needed:
-    you pass it a vector holding the finite element solution and the
-    functions return the values or gradients of the finite element
-    function restricted to the cell which was given last time the
-    #reinit# function was given.
-    
-    Though possible in principle, these functions do not call the
-    #reinit# function, you have to do so yourself beforehand. On the
-    other hand, a copy of the cell iterator is stored which was used
-    last time the #reinit# function was called. This frees us from
-    the need to pass the cell iterator again to these two functions,
-    which guarantees that the cell used here is in sync with that used
-    for the #reinit# function. You should, however, make sure that
-    nothing substantial happens to the #DoFHandler# object or any
-    other involved instance between the #reinit# and the #get_function_*#
-    functions are called.
-
-  \item #reinit#: initialize the #FEValues# object for a certain cell.
-    See above for more information.
-  \end{itemize}
-
-   @author Wolfgang Bangerth, 1998  
+  @author Wolfgang Bangerth, 1998  
   */
 template <int dim>
 class FEValues : public FEValuesBase<dim> {
@@ -419,36 +506,6 @@ class FEValues : public FEValuesBase<dim> {
     FEValues (const FiniteElement<dim> &,
 	      const Quadrature<dim> &,
 	      const UpdateFlags);
-
-				     /**
-				      * Return the value of the #i#th shape
-				      * function at the #j# quadrature point.
-				      */
-    double shape_value (const unsigned int i,
-			const unsigned int j) const;
-
-				     /**
-				      * Return a pointer to the matrix holding
-				      * all values of shape functions at all
-				      * integration points, on the present cell.
-				      * For the format of this matrix, see the
-				      * documentation for the matrix itself.
-				      */
-    const dFMatrix & get_shape_values () const;
-    
-				     /**
-				      * Return the values of the finite
-				      * element function characterized
-				      * by #fe_function# restricted to
-				      * #cell# at the quadrature points.
-				      *
-				      * The function assumes that the
-				      * #values# object already has the
-				      * right size.
-				      */
-    void get_function_values (const dVector      &fe_function,
-			      vector<double>     &values) const;
-
     
 				     /**
 				      * Reinitialize the gradients, Jacobi
@@ -473,16 +530,6 @@ class FEValues : public FEValuesBase<dim> {
 		 const Boundary<dim> &);
 
   private:
-				     /**
-				      * Store the values of the shape functions
-				      * at the quadrature points. Rows in this
-				      * matrix denote the values of a single
-				      * shape function at the different points,
-				      * columns are for a single point with the
-				      * different shape functions.
-				      */
-    dFMatrix             shape_values;
-
 				     /**
 				      * Store the gradients of the shape
 				      * functions at the quadrature points on
@@ -570,7 +617,7 @@ class FEValues : public FEValuesBase<dim> {
   (also easily derived, since they have an appealingly easy form for the unit
   cell ;-), it is more efficiently done by the finite element class itself.
   For example for (bi-, tri-)linear mappings the normal vector is readily
-  available without compicated matrix-vector-multiplications.
+  available without complicated matrix-vector-multiplications.
   */
 template <int dim>
 class FEFaceValues : public FEValuesBase<dim> {
@@ -594,35 +641,6 @@ class FEFaceValues : public FEValuesBase<dim> {
     FEFaceValues (const FiniteElement<dim> &,
 		  const Quadrature<dim-1> &,
 		  const UpdateFlags);
-
-				     /**
-				      * Return the value of the #i#th shape
-				      * function at the #j# quadrature point.
-				      */
-    double shape_value (const unsigned int i,
-			const unsigned int j) const;
-
-				     /**
-				      * Return a pointer to the matrix holding
-				      * all values of shape functions at all
-				      * integration points, on the present cell.
-				      * For the format of this matrix, see the
-				      * documentation for the matrix itself.
-				      */
-    const dFMatrix & get_shape_values () const;
-
-				     /**
-				      * Return the values of the finite
-				      * element function characterized
-				      * by #fe_function# restricted to
-				      * #cell# at the quadrature points.
-				      *
-				      * The function assumes that the
-				      * #values# object already has the
-				      * right size.
-				      */
-    void get_function_values (const dVector      &fe_function,
-			      vector<double>     &values) const;
 
 				     /**
 				      * Return the outward normal vector to
@@ -664,18 +682,6 @@ class FEFaceValues : public FEValuesBase<dim> {
 		 const Boundary<dim>                  &boundary);
 
   private:
-				     /**
-				      * Store the values of the shape functions
-				      * at the quadrature points. Rows in this
-				      * matrix denote the values of a single
-				      * shape function at the different points,
-				      * columns are for a single point with the
-				      * different shape functions.
-				      *
-				      * There is one matrix for each face.
-				      */
-    dFMatrix             shape_values[2*dim];
-
 				     /**
 				      * Store the gradients of the shape
 				      * functions at the quadrature points on
@@ -724,13 +730,6 @@ class FEFaceValues : public FEValuesBase<dim> {
 				      * in by the finite element class.
 				      */
     vector<Point<dim> >  normal_vectors;
-    
-				     /**
-				      * Store the number of the face selected
-				      * last time the #reinit# function was
-				      * called.
-				      */
-    unsigned int         selected_face;
 };
 
 
@@ -739,6 +738,16 @@ class FEFaceValues : public FEValuesBase<dim> {
 
 /*------------------------ Inline functions: FEValuesBase ------------------------*/
 
+
+
+
+template <int dim>
+inline
+const dFMatrix & FEValuesBase<dim>::get_shape_values () const {
+  Assert (selected_dataset<shape_values.size(),
+	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+  return shape_values[selected_dataset];
+};
 
 
 
@@ -783,26 +792,7 @@ FEValuesBase<dim>::get_JxW_values () const {
 
 
 
-/*------------------------ Inline functions: FEValues ----------------------------*/
-
-
-template <int dim>
-inline
-const dFMatrix & FEValues<dim>::get_shape_values () const {
-  return shape_values;
-};
-
-
-
 /*------------------------ Inline functions: FEFaceValues ------------------------*/
-
-
-template <int dim>
-inline
-const dFMatrix & FEFaceValues<dim>::get_shape_values () const {
-  return shape_values[selected_face];
-};
-
 
 
 template <int dim>

@@ -17,17 +17,61 @@ template <int dim>
 FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 				 const unsigned int n_ansatz_points,
 				 const unsigned int n_dofs,
+				 const unsigned int n_values_arrays,
 				 const UpdateFlags update_flags) :
 		n_quadrature_points (n_q_points),
 		total_dofs (n_dofs),
+		shape_values (n_values_arrays, dFMatrix(n_dofs, n_q_points)),
 		shape_gradients (n_dofs, vector<Point<dim> >(n_q_points)),
 		weights (n_q_points, 0),
 		JxW_values (n_q_points, 0),
 		quadrature_points (n_q_points, Point<dim>()),
 		ansatz_points (n_ansatz_points, Point<dim>()),
 		jacobi_matrices (n_q_points, dFMatrix(dim,dim)),
+		selected_dataset (0),
 		update_flags (update_flags) {};
 
+
+
+
+template <int dim>
+double FEValuesBase<dim>::shape_value (const unsigned int i,
+				       const unsigned int j) const {
+  Assert (selected_dataset<shape_values.size(),
+	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+  Assert (i<shape_values[selected_dataset].m(),
+	  ExcInvalidIndex (i, shape_values[selected_dataset].m()));
+  Assert (j<shape_values[selected_dataset].n(),
+	  ExcInvalidIndex (j, shape_values[selected_dataset].n()));
+
+  return shape_values[selected_dataset](i,j);
+};
+
+
+
+template <int dim>
+void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
+					     vector<double> &values) const {
+  Assert (selected_dataset<shape_values.size(),
+	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+  Assert (values.size() == n_quadrature_points,
+	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+
+				   // get function values of dofs
+				   // on this cell
+  vector<double> dof_values (total_dofs, 0);
+  present_cell->get_dof_values (fe_function, dof_values);
+
+				   // initialize with zero
+  fill_n (values.begin(), n_quadrature_points, 0);
+
+				   // add up contributions of ansatz
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+      values[point] += (dof_values[shape_func] *
+			shape_values[selected_dataset](shape_func, point));
+};
 
 
 
@@ -110,8 +154,8 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		FEValuesBase<dim> (quadrature.n_quadrature_points,
 				   fe.total_dofs,
 				   fe.total_dofs,
+				   1,
 				   update_flags),
-		shape_values(fe.total_dofs, quadrature.n_quadrature_points),
 		unit_shape_gradients(fe.total_dofs,
 				     vector<Point<dim> >(quadrature.n_quadrature_points)),
 		unit_quadrature_points(quadrature.get_quad_points())
@@ -119,7 +163,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
   for (unsigned int i=0; i<fe.total_dofs; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j) 
       {
-	shape_values(i,j) = fe.shape_value(i, quadrature.quad_point(j));
+	shape_values[0](i,j) = fe.shape_value(i, quadrature.quad_point(j));
 	unit_shape_gradients[i][j]
 	  = fe.shape_grad(i, quadrature.quad_point(j));
       };
@@ -131,39 +175,6 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 };
 
 
-
-template <int dim>
-double FEValues<dim>::shape_value (const unsigned int i,
-				   const unsigned int j) const {
-  Assert (i<shape_values.m(), ExcInvalidIndex (i, shape_values.m()));
-  Assert (j<shape_values.n(), ExcInvalidIndex (j, shape_values.n()));
-
-  return shape_values(i,j);
-};
-
-
-
-template <int dim>
-void FEValues<dim>::get_function_values (const dVector  &fe_function,
-					 vector<double> &values) const {
-  Assert (values.size() == n_quadrature_points,
-	  ExcWrongVectorSize(values.size(), n_quadrature_points));
-
-				   // get function values of dofs
-				   // on this cell
-  vector<double> dof_values (total_dofs, 0);
-  present_cell->get_dof_values (fe_function, dof_values);
-
-				   // initialize with zero
-  fill_n (values.begin(), n_quadrature_points, 0);
-
-				   // add up contributions of ansatz
-				   // functions
-  for (unsigned int point=0; point<n_quadrature_points; ++point)
-    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
-      values[point] += (dof_values[shape_func] *
-			shape_values(shape_func, point));
-};
 
 
 
@@ -239,17 +250,17 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 		FEValuesBase<dim> (quadrature.n_quadrature_points,
 				   fe.dofs_per_face,
 				   fe.total_dofs,
+				   2*dim,
 				   update_flags),
 		unit_quadrature_points(quadrature.get_quad_points()),
 		face_jacobi_determinants (quadrature.n_quadrature_points,0),
-		normal_vectors (quadrature.n_quadrature_points,Point<dim>()),
-		selected_face(0)
+		normal_vectors (quadrature.n_quadrature_points,Point<dim>())
 {
   for (unsigned int face=0; face<2*dim; ++face)
     {
-      shape_values[face].reinit(fe.total_dofs, quadrature.n_quadrature_points);
       unit_shape_gradients[face].resize (fe.total_dofs,
-					 vector<Point<dim> >(quadrature.n_quadrature_points));
+					 vector<Point<dim> >(quadrature.
+							     n_quadrature_points));
       global_unit_quadrature_points[face].resize (quadrature.n_quadrature_points,
 						  Point<dim>());
     };
@@ -295,10 +306,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 	};
 
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
-    {
-      weights[i] = quadrature.weight(i);
-      unit_quadrature_points[i] = quadrature.quad_point(i);
-    };
+    weights[i] = quadrature.weight(i);
 
   for (unsigned int face=0; face<2*dim; ++face)
     for (unsigned int i=0; i<fe.total_dofs; ++i)
@@ -309,43 +317,6 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 	  unit_shape_gradients[face][i][j]
 	    = fe.shape_grad(i, global_unit_quadrature_points[face][j]);
 	};
-};
-
-
-
-template <int dim>
-double FEFaceValues<dim>::shape_value (const unsigned int i,
-				       const unsigned int j) const {
-  Assert (i<shape_values[selected_face].m(),
-	  ExcInvalidIndex (i, shape_values[selected_face].m()));
-  Assert (j<shape_values[selected_face].n(),
-	  ExcInvalidIndex (j, shape_values[selected_face].n()));
-
-  return shape_values[selected_face](i,j);
-};
-
-
-
-template <int dim>
-void FEFaceValues<dim>::get_function_values (const dVector  &fe_function,
-					     vector<double> &values) const {
-  Assert (values.size() == n_quadrature_points,
-	  ExcWrongVectorSize(values.size(), n_quadrature_points));
-
-				   // get function values of dofs
-				   // on this cell
-  vector<double> dof_values (total_dofs, 0);
-  present_cell->get_dof_values (fe_function, dof_values);
-
-				   // initialize with zero
-  fill_n (values.begin(), n_quadrature_points, 0);
-
-				   // add up contributions of ansatz
-				   // functions
-  for (unsigned int point=0; point<n_quadrature_points; ++point)
-    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
-      values[point] += (dof_values[shape_func] *
-			shape_values[selected_face](shape_func, point));
 };
 
 
@@ -367,7 +338,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				const FiniteElement<dim>                      &fe,
 				const Boundary<dim>                           &boundary) {
   present_cell  = cell;
-  selected_face = face_no;
+  selected_dataset = face_no;
 				   // fill jacobi matrices and real
 				   // quadrature points
   if ((update_flags & update_jacobians) ||
