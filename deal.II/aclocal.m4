@@ -490,7 +490,7 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
         F77_VERSION_STRING=`($F77 -V 2>&1)`
         if test -n "`echo $F77_VERSION_STRING | grep \"WorkShop Compilers\"`" \
                 -o \
-                -n "`echo $F77_VERSION_STRING | grep \"Sun WorkShop\"`"
+                -n "`echo $F77_VERSION_STRING | grep \"Sun WorkShop\"`" \
                 -o \
                 -n "`echo $F77_VERSION_STRING | grep \"Forte Developer\"`" ; then
           dnl OK, this is the Sun Fortran77 compiler

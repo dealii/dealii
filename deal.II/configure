@@ -4185,7 +4185,7 @@ echo "${ECHO_T}F77 compiler is AIX Fortran77" >&6
                         F77_VERSION_STRING=`($F77 -V 2>&1)`
         if test -n "`echo $F77_VERSION_STRING | grep \"WorkShop Compilers\"`" \
                 -o \
-                -n "`echo $F77_VERSION_STRING | grep \"Sun WorkShop\"`"
+                -n "`echo $F77_VERSION_STRING | grep \"Sun WorkShop\"`" \
                 -o \
                 -n "`echo $F77_VERSION_STRING | grep \"Forte Developer\"`" ; then
             	  echo "$as_me:4191: result: F77 compiler is Sun WorkShop f77" >&5
