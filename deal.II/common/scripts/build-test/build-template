@@ -1,0 +1,128 @@
+#!/bin/bash
+######################################################################
+# Template for an automatic build test of the deal.II library
+######################################################################
+# cvs login must have been executed before calling this script!
+######################################################################
+#
+# For a new test copy this file to a new one with distinct name and
+# set the following parameters accordingly.
+#
+# Please, register tests by writing to info@dealii.org in advance.
+#
+# For the setup in Heidelberg, refer to build-script2
+#
+# author: Wolfgang Bangerth, Guido Kanschat 2002
+######################################################################
+
+######################################################################
+# Configuration variables
+######################################################################
+
+# Your deal CVS access. Replace 'deal' by your name if necessary.
+
+export CVSROOT=:pserver:deal@eris:/home/people/cvs/deal
+
+# System name is detected automatically. Only change in case of trouble
+
+sysname=`./config.guess`
+
+# Compiler tag for output. Please ask if you are not sure
+
+compiler=gcc295
+
+# Options for configure
+
+options='-'
+
+# Name of the target directory (must be unique if you run several
+# tests on the same computer). Change the value below if you use the
+# same compiler with different configure options
+
+target="${sysname}+${compiler}"
+
+######################################################################
+# Additional path configuration if compiler is in a strange place
+# Modify if needed
+######################################################################
+
+# Name of the C++ compiler
+
+export CXX=CC
+
+# Name of the C compiler
+
+export CC=cc
+
+# Make sure the right compiler, linker and libraries are found first
+
+#export PATH=/mypath/bin:$PATH
+#export LD_LIBRARY_PATH=/mypath/lib:$LD_LIBRARY_PATH
+
+######################################################################
+# Mail program setup:
+#  $MAIL may be any command that takes an email address as parameter
+#  and sends a message from STDIN to this address.
+######################################################################
+MAIL='mail'
+
+# If you cannot send mail directly from your computer, try this:
+
+#MAIL='ssh mailhost mail'
+
+######################################################################
+# End of manual configuration
+# Don't modify below
+######################################################################
+######################################################################
+######################################################################
+
+mkdir $target
+cd $target
+cvs co deal.II
+cd deal.II
+
+# Echo system information for later parsing
+
+echo "CONFIG " $sysname $compiler $options > log
+
+echo "RUNNING CONFIGURE AT " `date` | tee -a log
+(./configure $options 2>&1) | tee -a log
+
+echo "BUILDING LIBRARY AT " `date` | tee -a log
+
+# now build the library. either write "succeeded" or "failed"
+# into the file "result", and append all the output into "log"
+
+(if (nice -19 make all -k 2>&1) ; then 
+	echo "BUILDING EXAMPLES AT " `date` | tee -a log
+        if (cd examples ; nice -19 make -k 2>&1) ; then
+		result=succeeded ;
+	else
+		result=failed ;
+	fi
+else
+	result=failed ;
+fi ; echo $result > result ) | tee -a log 
+
+echo "CHECKING RESULTS AT " `date` | tee -a log
+
+# now decide what to do with the output. if the build succeeded then
+# simply delete it and replace it by a success message for mailing to
+# the result server. Otherwise store it under a name that identifies
+# the build and is given by the calling site
+
+if test "`cat result`" = "failed" ; then
+	$MAIL build-failure@dealii.org < log
+else
+	rm -f log
+	echo "CONFIG " $sysname $compiler $options > log
+	echo "OK AT " `date` >> log
+	$MAIL build-success@dealii.org < log
+fi
+
+echo "CLEANING UP AT " `date` | tee -a log
+
+# finally clean up
+cd ../../
+rm -rf $target
