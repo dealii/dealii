@@ -71,8 +71,6 @@ FEValuesData<dim>::initialize (const unsigned int n_quadrature_points,
 
   if (flags & update_normal_vectors)
     normal_vectors.resize(n_quadrature_points);
-
-//Todo:[?] support points missing
 }
 
 
