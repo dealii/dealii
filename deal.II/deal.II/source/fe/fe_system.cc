@@ -2222,8 +2222,8 @@ bool
 FESystem<dim>::has_support_on_face (const unsigned int shape_index,
 				    const unsigned int face_index) const
 {
-  return (base_element(system_to_base_index(shape_index).first.first)
-          .has_support_on_face(system_to_base_index(shape_index).second,
+  return (base_element(this->system_to_base_index(shape_index).first.first)
+          .has_support_on_face(this->system_to_base_index(shape_index).second,
                                face_index));
 }
 
@@ -2235,8 +2235,8 @@ FESystem<dim>::unit_support_point (const unsigned index) const
 {
   Assert (index < this->dofs_per_cell,
           ExcIndexRange (index, 0, this->dofs_per_cell));
-  Assert ((unit_support_points.size() == this->dofs_per_cell) ||
-          (unit_support_points.size() == 0),
+  Assert ((this->unit_support_points.size() == this->dofs_per_cell) ||
+          (this->unit_support_points.size() == 0),
           typename FiniteElementBase<dim>::ExcFEHasNoSupportPoints ());
 
                                    // let's see whether we have the
@@ -2247,8 +2247,8 @@ FESystem<dim>::unit_support_point (const unsigned index) const
                                      // no. ask the base element
                                      // whether it would like to
                                      // provide this information
-    return (base_element(system_to_base_index(index).first.first)
-            .unit_support_point(system_to_base_index(index).second));
+    return (base_element(this->system_to_base_index(index).first.first)
+            .unit_support_point(this->system_to_base_index(index).second));
 };
 
 
@@ -2259,8 +2259,8 @@ FESystem<dim>::unit_face_support_point (const unsigned index) const
 {
   Assert (index < this->dofs_per_face,
           ExcIndexRange (index, 0, this->dofs_per_face));
-  Assert ((unit_face_support_points.size() == this->dofs_per_face) ||
-          (unit_face_support_points.size() == 0),
+  Assert ((this->unit_face_support_points.size() == this->dofs_per_face) ||
+          (this->unit_face_support_points.size() == 0),
           typename FiniteElementBase<dim>::ExcFEHasNoSupportPoints ());
 
                                    // let's see whether we have the
@@ -2271,8 +2271,8 @@ FESystem<dim>::unit_face_support_point (const unsigned index) const
                                      // no. ask the base element
                                      // whether it would like to
                                      // provide this information
-    return (base_element(face_system_to_base_index(index).first.first)
-            .unit_face_support_point(face_system_to_base_index(index).second));
+    return (base_element(this->face_system_to_base_index(index).first.first)
+            .unit_face_support_point(this->face_system_to_base_index(index).second));
 };
 
 

@@ -88,9 +88,11 @@ template<typename number>
 void
 SparseLUDecomposition<number>::prebuild_lower_bound()
 {
-  const unsigned int* const column_numbers = get_sparsity_pattern().get_column_numbers();
-  const unsigned int* const rowstart_indices = get_sparsity_pattern().get_rowstart_indices();
-  const unsigned int N = m();
+  const unsigned int * const
+    column_numbers = this->get_sparsity_pattern().get_column_numbers();
+  const unsigned int * const
+    rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
+  const unsigned int N = this->m();
 
   prebuilt_lower_bound.resize (N);
 
@@ -108,8 +110,8 @@ void
 SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber>& matrix)
 {
                                    // preset the elements
-  std::fill_n (&global_entry(0),
-               n_nonzero_elements(),
+  std::fill_n (&this->global_entry(0),
+               this->n_nonzero_elements(),
                0);
 
                                    // note: pointers to the sparsity
@@ -120,10 +122,10 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber>& matrix
   const unsigned int * const column_numbers
     = matrix.get_sparsity_pattern().get_column_numbers();
 
-  for (unsigned int row=0; row<m(); ++row)
+  for (unsigned int row=0; row<this->m(); ++row)
     for (const unsigned int * col = &column_numbers[rowstart_indices[row]];
          col != &column_numbers[rowstart_indices[row+1]]; ++col)
-      set (row, *col, matrix.global_entry(col-column_numbers));
+      this->set (row, *col, matrix.global_entry(col-column_numbers));
 }
 
 
@@ -132,19 +134,20 @@ template <typename number>
 void
 SparseLUDecomposition<number>::strengthen_diagonal_impl ()
 {
-  for (unsigned int row=0; row<m(); ++row)
+  for (unsigned int row=0; row<this->m(); ++row)
     {
                                        // get the length of the row
                                        // (without the diagonal element)
-      const unsigned int rowlength = get_sparsity_pattern().get_rowstart_indices()[row+1]
-                                     -get_sparsity_pattern().get_rowstart_indices()[row]
-                                     -1;
+      const unsigned int rowlength
+        = (this->get_sparsity_pattern().get_rowstart_indices()[row+1]
+           -this->get_sparsity_pattern().get_rowstart_indices()[row]
+           -1);
 	
                                        // get the global index of the first
                                        // non-diagonal element in this row
       const unsigned int rowstart
         = get_sparsity_pattern().get_rowstart_indices()[row] + 1;
-      number * const diagonal_element = &global_entry(rowstart-1);
+      number * const diagonal_element = &this->global_entry(rowstart-1);
 
       number rowsum = 0;
       for (unsigned int global_index=rowstart;

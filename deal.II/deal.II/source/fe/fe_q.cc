@@ -1355,14 +1355,14 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
                                        // shape functions, since they
                                        // have no support no-where on
                                        // the boundary
-      if (((dim==2) && (shape_index>=first_quad_index))
+      if (((dim==2) && (shape_index>=this->first_quad_index))
           ||
-          ((dim==3) && (shape_index>=first_hex_index)))
+          ((dim==3) && (shape_index>=this->first_hex_index)))
         return false;
                                        
                                        // let's see whether this is a
                                        // vertex
-      if (shape_index < first_line_index) 
+      if (shape_index < this->first_line_index) 
         {
                                            // for Q elements, there is
                                            // one dof per vertex, so
@@ -1404,7 +1404,7 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
                                          // ok, dof is on a line
         {
           const unsigned int line_index
-            = (shape_index - first_line_index) / dofs_per_line;
+            = (shape_index - first_line_index) / this->dofs_per_line;
           Assert (line_index < GeometryInfo<dim>::lines_per_cell,
                   ExcInternalError());
 
@@ -1435,7 +1435,7 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
                                          // dof is on a quad
         {
           const unsigned int quad_index 
-            = (shape_index - first_quad_index) / dofs_per_quad;
+            = (shape_index - first_quad_index) / this->dofs_per_quad;
           Assert (static_cast<signed int>(quad_index) <
                   static_cast<signed int>(GeometryInfo<dim>::quads_per_cell),
                   ExcInternalError());

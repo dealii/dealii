@@ -46,10 +46,10 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   
   Assert (strengthen_diagonal>=0, ExcInvalidStrengthening (strengthen_diagonal));
 
-  copy_from (matrix);
+  this->copy_from (matrix);
 
-  if(strengthen_diagonal>0)
-    strengthen_diagonal_impl();
+  if (strengthen_diagonal>0)
+    this->strengthen_diagonal_impl();
 
   const SparsityPattern             &sparsity = this->get_sparsity_pattern();
   const unsigned int * const rowstart_indices = sparsity.get_rowstart_indices();
@@ -93,7 +93,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				       // diagonal element at start
       const unsigned int * first_of_row
 	= &column_numbers[rowstart_indices[row]+1];
-      const unsigned int * first_after_diagonal = prebuilt_lower_bound[row];
+      const unsigned int * first_after_diagonal = this->prebuilt_lower_bound[row];
 
 				       // k := *col_ptr
       for (const unsigned int * col_ptr = first_of_row;
@@ -184,7 +184,7 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
       const unsigned int * const rowstart = &column_numbers[rowstart_indices[row]+1];
 				       // find the position where the part
 				       // right of the diagonal starts
-      const unsigned int * const first_after_diagonal = prebuilt_lower_bound[row];
+      const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
       
       for (const unsigned int * col=rowstart; col!=first_after_diagonal; ++col)
 	dst(row) -= this->global_entry (col-column_numbers) * dst(*col);
@@ -204,7 +204,7 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
       const unsigned int * const rowend = &column_numbers[rowstart_indices[row+1]];
 				       // find the position where the part
 				       // right of the diagonal starts
-      const unsigned int * const first_after_diagonal = prebuilt_lower_bound[row];
+      const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
       
       for (const unsigned int * col=first_after_diagonal; col!=rowend; ++col)
 	dst(row) -= this->global_entry (col-column_numbers) * dst(*col);

@@ -834,7 +834,7 @@ BlockSparseMatrix<number>::const_iterator::operator++ ()
 	  this->col_start = 0;
 	  this->a_index = 0;
 	  ++local_row;
-	  if (local_row>=this->matrix->block(block_row,0).m())
+	  if (local_row>=this->matrix->block(this->block_row,0).m())
 	    {
 					       // If final row in
 					       // block, go to next

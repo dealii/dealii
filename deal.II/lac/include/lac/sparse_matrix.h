@@ -1387,10 +1387,11 @@ inline
 typename SparseMatrix<number>::const_iterator&
 SparseMatrix<number>::const_iterator::operator++ ()
 {
-  Assert (this->a_row < matrix->m(), ExcIteratorPastEnd());
+  Assert (this->a_row < this->matrix->m(), ExcIteratorPastEnd());
   
   ++this->a_index;
-  if (this->a_index >= this->matrix->get_sparsity_pattern().row_length(this->a_row))
+  if (this->a_index >=
+      this->matrix->get_sparsity_pattern().row_length(this->a_row))
     {
       this->a_index = 0;
       this->a_row++;

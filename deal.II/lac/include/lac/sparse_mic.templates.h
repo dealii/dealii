@@ -95,13 +95,13 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
   SparseLUDecomposition<number>::decompose(matrix, strengthen_diagonal);
 
   Assert (matrix.m()==matrix.n(), ExcMatrixNotSquare ());
-  Assert (m()==n(),               ExcMatrixNotSquare ());
-  Assert (matrix.m()==m(),        ExcSizeMismatch(matrix.m(), m()));
+  Assert (this->m()==this->n(),   ExcMatrixNotSquare ());
+  Assert (matrix.m()==this->m(),  ExcSizeMismatch(matrix.m(), this->m()));
 
   Assert (strengthen_diagonal>=0, ExcInvalidStrengthening (strengthen_diagonal));
 
   if (strengthen_diagonal > 0)
-    strengthen_diagonal_impl ();
+    this->strengthen_diagonal_impl ();
 
                                    // MIC implementation: (S. Margenov lectures)
                                    // x[i] = a[i][i] - sum(k=1, i-1,
@@ -112,22 +112,22 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
                                    // implementation would store this
                                    // values in the underlying sparse
                                    // matrix itself.
-  diag.resize (m());
-  inv_diag.resize (m());
-  inner_sums.resize (m());
+  diag.resize (this->m());
+  inv_diag.resize (this->m());
+  inner_sums.resize (this->m());
 
                                    // precalc sum(j=k+1, N, a[k][j]))
   for(unsigned int row=0; row<m(); row++) {
     inner_sums[row] = get_rowsum(row);
   }
 
-  const unsigned int* const col_nums = get_sparsity_pattern().get_column_numbers();
-  const unsigned int* const rowstarts = get_sparsity_pattern().get_rowstart_indices();
+  const unsigned int* const col_nums = this->get_sparsity_pattern().get_column_numbers();
+  const unsigned int* const rowstarts = this->get_sparsity_pattern().get_rowstart_indices();
 
-  for(unsigned int row=0; row<m(); row++) {
-    number temp = diag_element(row);
+  for(unsigned int row=0; row<this->m(); row++) {
+    number temp = this->diag_element(row);
     number temp1 = 0;
-    const unsigned int * const first_after_diagonal = prebuilt_lower_bound[row];
+    const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
 
     unsigned int k = 0;
     for (const unsigned int * col=&col_nums[rowstarts[row]+1];
@@ -146,19 +146,19 @@ template <typename number>
 inline number
 SparseMIC<number>::get_rowsum (const unsigned int row) const
 {
-  Assert(m()==n(), ExcMatrixNotSquare());
+  Assert(this->m()==this->n(), ExcMatrixNotSquare());
                                    // get start of this row. skip the
                                    // diagonal element
-  const unsigned int * const column_numbers = get_sparsity_pattern().get_column_numbers();
-  const unsigned int * const rowstart_indices = get_sparsity_pattern().get_rowstart_indices();
+  const unsigned int * const column_numbers = this->get_sparsity_pattern().get_column_numbers();
+  const unsigned int * const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
   const unsigned int * const rowend = &column_numbers[rowstart_indices[row+1]];
 
                                    // find the position where the part
                                    // right of the diagonal starts
-  const unsigned int * const first_after_diagonal = prebuilt_lower_bound[row];
+  const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
   number rowsum =  0;
   for (const unsigned int * col=first_after_diagonal; col!=rowend; ++col)
-    rowsum += global_entry (col-column_numbers);
+    rowsum += this->global_entry (col-column_numbers);
 
   return rowsum;	
 };
@@ -173,11 +173,11 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
 {
   SparseLUDecomposition<number>::vmult (dst, src);
   Assert (dst.size() == src.size(), ExcSizeMismatch(dst.size(), src.size()));
-  Assert (dst.size() == m(), ExcSizeMismatch(dst.size(), m()));
+  Assert (dst.size() == this->m(), ExcSizeMismatch(dst.size(), this->m()));
 
   const unsigned int N=dst.size();
-  const unsigned int * const rowstart_indices = get_sparsity_pattern().get_rowstart_indices();
-  const unsigned int * const column_numbers   = get_sparsity_pattern().get_column_numbers();
+  const unsigned int * const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
+  const unsigned int * const column_numbers   = this->get_sparsity_pattern().get_column_numbers();
                                    // We assume the underlying matrix A is:
                                    // A = X - L - U, where -L and -U are
                                    // strictly lower- and upper- diagonal
@@ -193,9 +193,9 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
                                        // get start of this row. skip
                                        // the diagonal element
       const unsigned int * const rowstart = &column_numbers[rowstart_indices[row]+1];
-      const unsigned int * const fad = prebuilt_lower_bound[row];
+      const unsigned int * const fad = this->prebuilt_lower_bound[row];
       for (const unsigned int * col=rowstart; col!=fad; ++col)
-        dst(row) -= global_entry (col-column_numbers) * dst(*col);
+        dst(row) -= this->global_entry (col-column_numbers) * dst(*col);
       
       dst(row) *= inv_diag[row];
     };
@@ -209,9 +209,9 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
     {
 				       // get end of this row
       const unsigned int * const rowend = &column_numbers[rowstart_indices[row+1]];
-      const  unsigned int * const fad = prebuilt_lower_bound[row];
+      const  unsigned int * const fad = this->prebuilt_lower_bound[row];
       for (const unsigned int * col=fad; col!=rowend; ++col)
-        dst(row) -= global_entry (col-column_numbers) * dst(*col);
+        dst(row) -= this->global_entry (col-column_numbers) * dst(*col);
 
       dst(row) *= inv_diag[row];
     };

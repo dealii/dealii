@@ -575,7 +575,7 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
 				   // if no blocking is required, pass
 				   // down to the underlying class
   if (n_blocks == 1)
-    apply_preconditioner (dst, src);
+    this->apply_preconditioner (dst, src);
   else
 				     // otherwise: blocking requested
     {
@@ -610,8 +610,8 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
         }
       else
         for (unsigned int block=0; block<n_blocks; ++block)
-          apply_preconditioner (dst, src,
-                                &dof_masks[block]);
+          this->apply_preconditioner (dst, src,
+                                      &dof_masks[block]);
     }
 }
 
