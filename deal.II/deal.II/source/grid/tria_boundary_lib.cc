@@ -23,7 +23,7 @@
 template <int dim>
 HyperBallBoundary<dim>::HyperBallBoundary (const Point<dim> p,
 					   const double     radius) :
-		center(p), radius(radius)
+		center(p), radius(radius), compute_radius_automatically(false)
 {};
 
 
@@ -35,8 +35,17 @@ HyperBallBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>
   Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
   
   middle -= center;
+
+  double r=0;
+  if (compute_radius_automatically)
+    {
+      const Point<dim> vertex_relative = line->vertex(0) - center;
+      r = sqrt(vertex_relative.square());
+    }
+  else
+    r=radius;
 				   // project to boundary
-  middle *= radius / sqrt(middle.square());
+  middle *= r / sqrt(middle.square());
   
   middle += center;
   return middle;
@@ -67,8 +76,17 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
   Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
   
   middle -= center;
+
+  double r=0;
+  if (compute_radius_automatically)
+    {
+      const Point<dim> vertex_relative = quad->vertex(0) - center;
+      r = sqrt(vertex_relative.square());
+    }
+  else
+    r=radius;
 				   // project to boundary
-  middle *= radius / sqrt(middle.square());
+  middle *= r / sqrt(middle.square());
   
   middle += center;
   return middle;
@@ -83,7 +101,7 @@ HyperBallBoundary<1>::get_intermediate_points_on_line (
   const Triangulation<1>::line_iterator &,
   std::vector<Point<1> > &) const
 {
-  Assert(false, ExcInternalError());
+  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
 }
 
 #else
@@ -116,8 +134,17 @@ HyperBallBoundary<dim>::get_intermediate_points_between_points (
   const double length=sqrt((v1-v0).square());
   
   double eps=1e-14;
-  Assert(fabs(v0.square()-radius*radius)<eps, ExcInternalError());
-  Assert(fabs(v1.square()-radius*radius)<eps, ExcInternalError());
+  double r=0;
+  if (compute_radius_automatically)
+    {
+      const Point<dim> vertex_relative = p0 - center;
+      r = sqrt(vertex_relative.square());
+    }
+  else
+    r=radius;
+
+  Assert(fabs(v0.square()-r*r)<eps, ExcInternalError());
+  Assert(fabs(v1.square()-r*r)<eps, ExcInternalError());
   
   const double alpha=acos((v0*v1)/sqrt(v0.square()*v1.square()));
   const double d_alpha=alpha/(n+1);
@@ -165,7 +192,7 @@ HyperBallBoundary<dim>::get_intermediate_points_between_points (
 				   // HyperBallBoundary
   for (unsigned int i=0; i<n; ++i)
     {
-      points[i] *= radius / sqrt(points[i].square());
+      points[i] *= r / sqrt(points[i].square());
       points[i] += center;
     }
 }
@@ -209,7 +236,7 @@ HyperBallBoundary<dim>::get_intermediate_points_on_quad (
   const Triangulation<dim>::quad_iterator &,
   typename std::vector<Point<dim> > &) const
 {
-  Assert(false,ExcNotImplemented());
+  Assert(false, Boundary<dim>::ExcFunctionNotUseful(dim));
 }
 
 
@@ -253,6 +280,7 @@ template <int dim>
 double
 HyperBallBoundary<dim>::get_radius () const 
 {
+  Assert(!compute_radius_automatically, ExcRadiusNotSet());
   return radius;
 };
 
@@ -405,99 +433,10 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 
 template <int dim>
 HyperShellBoundary<dim>::HyperShellBoundary (const Point<dim> &center) :
-		center (center) 
-{};
-
-
-
-template <int dim>
-Point<dim>
-HyperShellBoundary<dim>::
-get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
+		HyperBallBoundary<dim>(center, 0.)
 {
-  const Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
-				   // compute the position of the
-				   // points relative to the origin
-  const Point<dim> middle_relative = middle - center,
-		   vertex_relative = line->vertex(0) - center;
-  
-				   // take vertex(0) to gauge the
-				   // radius corresponding to the line
-				   // under consideration
-  const double radius = sqrt(vertex_relative.square());
-
-				   // scale and shift back to the
-				   // original coordinate system
-  return (middle_relative * (radius / sqrt(middle_relative.square()))) + center;
+  compute_radius_automatically=true;
 };
-
-
-
-#if deal_II_dimension == 1
-
-template <>
-Point<1>
-HyperShellBoundary<1>::
-get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
-{
-  Assert (false, ExcInternalError());
-  return Point<1>();
-};
-
-#endif
-
-
-
-template <int dim>
-Point<dim>
-HyperShellBoundary<dim>::
-get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
-{
-  const Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
-				   // compute the position of the points relative to the origin
-  const Point<dim> middle_relative = middle - center,
-		   vertex_relative = quad->vertex(0) - center;
-  
-				   // take vertex(0) to gauge the
-				   // radius corresponding to the line
-				   // under consideration
-  const double radius = sqrt(vertex_relative.square());
-
-				   // scale and shift back to the
-				   // original coordinate system
-  return (middle_relative * (radius / sqrt(middle_relative.square()))) + center;
-};
-
-
-
-#if deal_II_dimension == 1
-
-template <>
-void
-HyperShellBoundary<1>::
-get_normals_at_vertices (const Triangulation<1>::face_iterator &,
-			 Boundary<1>::FaceVertexNormals &) const
-{
-  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
-};
-
-#endif
-
-
-template <int dim>
-void
-HyperShellBoundary<dim>::
-get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
-{
-				   // this is equivalent to the case
-				   // in the hyperball boundary. note
-				   // that we need not normalize nor
-				   // direct the normal
-  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
-    face_vertex_normals[vertex] = face->vertex(vertex)-center;
-};
-
 
 
 /* ---------------------------------------------------------------------- */

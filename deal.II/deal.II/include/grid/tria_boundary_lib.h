@@ -107,8 +107,48 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * Return the radius of the ball.
 				      */
     double get_radius () const;
+
+				     /**
+				      * Exception. Thrown by the
+				      * @p{get_radius} if the
+				      * @p{compute_radius_automatically},
+				      * see below, flag is set true.
+				      */
+    DeclException0 (ExcRadiusNotSet);
+    
     
   protected:
+    
+				     /**
+				      * Center point of the hyperball.
+				      */
+    const Point<dim> center;
+
+				     /**
+				      * Radius of the hyperball.
+				      */
+    const double radius;
+
+				     /**
+				      * This flag is @p{false} for
+				      * this class and for all derived
+				      * classes that set the radius by
+				      * the constructor. For example
+				      * this flag is @p{false} for the
+				      * @ref{HalfHyperBallBoundary}
+				      * class but it is @p{true} for
+				      * the @ref{HyperShellBoundary}
+				      * class, for example.  The
+				      * latter class doesn't get its
+				      * radii by the constructor but
+				      * need to compute the radii
+				      * automatically each time one of
+				      * the virtual functions is
+				      * called.
+				      */
+    bool compute_radius_automatically;
+
+  private:
 
 				     /**
 				      * Called by
@@ -123,18 +163,7 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * base class.
 				      */
     void get_intermediate_points_between_points (const Point<dim> &p0, const Point<dim> &p1,
-						 typename std::vector<Point<dim> > &points) const;
-    
-    
-				     /**
-				      * Center point of the hyperball.
-				      */
-    const Point<dim> center;
-
-				     /**
-				      * Radius of the hyperball.
-				      */
-    const double radius;
+						 typename std::vector<Point<dim> > &points) const;    
 };
 
 
@@ -227,47 +256,21 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
-class HyperShellBoundary : public StraightBoundary<dim> 
+class HyperShellBoundary : public HyperBallBoundary<dim>
 {
   public:
 				     /**
 				      * Constructor. The center of the
 				      * spheres defaults to the
 				      * origin.
+				      *
+				      * Calls the constructor of its
+				      * base @p{HyperBallBoundary}
+				      * class with a dummy radius as
+				      * argument. This radius will be
+				      * ignored
 				      */
     HyperShellBoundary (const Point<dim> &center = Point<dim>());
-    
-				     /**
-				      * Construct a new point on a line.
-				      */
-    virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;  
-    
-				     /**
-				      * Construct a new point on a quad.
-				      */
-    virtual Point<dim>
-    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
-
-				     /**
-				      * Compute the normals to the
-				      * boundary at the vertices of
-				      * the given face.
-				      *
-				      * Refer to the general
-				      * documentation of this class
-				      * and the documentation of the
-				      * base class.
-				      */
-    virtual void
-    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
-
-  private:
-				     /**
-				      * Store the center of the spheres.
-				      */
-    const Point<dim> center;
 };
 
 
