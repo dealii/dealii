@@ -247,7 +247,7 @@ DeclException1 (ExcDimTooSmall,
 		<< "Given dimensions must be >= 1, but was " << arg1);
 
 
-/**
+				 /**
 				  *  Prints the values of this point in the
 				  *  form #x1 x2 x3 etc#.
 				  */
