@@ -52,7 +52,8 @@ tests_x = anna_? \
 	  solver_selector \
 	  deal_solver_* \
 	  vector_* \
-	  subdomain_ids_*
+	  subdomain_ids_* \
+	  dof_constraints_*
 
 ifeq ($(USE_CONTRIB_PETSC),yes)
   tests_x += petsc_*
