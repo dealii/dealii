@@ -46,7 +46,8 @@ void
 TimeDependent::insert_timestep (const TimeStepBase *position,
 				TimeStepBase       *new_timestep) 
 {
-  Assert (find(timesteps.begin(), timesteps.end(), position) != timesteps.end(),
+  Assert ((find(timesteps.begin(), timesteps.end(), position) != timesteps.end()) ||
+	  (position == 0),
 	  ExcInvalidPosition());
 
 				   // lock this timestep from deletion
