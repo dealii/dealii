@@ -1324,6 +1324,10 @@ void FESubfaceValues<dim>::do_reinit (const unsigned int face_no,
 template class FEValuesData<deal_II_dimension>;
 template class FEValuesBase<deal_II_dimension>;
 template class FEValues<deal_II_dimension>;
+template class FEValuesBase<deal_II_dimension>::
+  CellIterator<DoFHandler<deal_II_dimension>::cell_iterator>;
+template class FEValuesBase<deal_II_dimension>::
+  CellIterator<MGDoFHandler<deal_II_dimension>::cell_iterator>;
 
 #if deal_II_dimension >= 2
 template class FEFaceValuesBase<deal_II_dimension>;
