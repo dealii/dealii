@@ -47,8 +47,7 @@ kdoc.library-files = kdoc/base.kdoc         \
 kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
 
 
-#KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
-KDOCFLAGS = /home/people/wolf/tmp/kdoc-a12/bin/kdoc
+KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
 ifeq ($(shell uname),SunOS)
 DOCPP = /home/people/wolf/Config/doc++/doc++
 #DOCPP = /home/people/kanschat/bin/doc++
