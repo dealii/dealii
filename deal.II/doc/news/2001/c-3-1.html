@@ -235,6 +235,18 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Changed: The syntax of the <code
+       class="member">FiniteElemente<dim>::get_unit_support_points</code>
+       function is changed; it returns a reference to the vector of
+       points. These points are now computed by the constructor of the
+       <code class="class">FiniteElement</code> and not on each <code
+       class="member">FiniteElemente<dim>::get_unit_support_points</code>
+       function call as before.
+       <br>
+       (WB 2001/03/14)
+       </p>
+
   <li> <p> 
        Removed: The function <code
        class="member">FiniteElemente<dim>::get_support_points</code>
