@@ -573,7 +573,7 @@ FE_Q<dim>::initialize_restriction ()
                   this->restriction[0](0,0) = 1;
                   this->restriction[0](2,1) = 1;
                   this->restriction[1](1,1) = 1;
-                  this->restriction[1](1,1) = 1;
+                  this->restriction[1](2,0) = 1;
                   break;
             case 3:
                   this->restriction[0](0,0) = 1;
