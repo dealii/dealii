@@ -1,15 +1,15 @@
-// $Id$
+/*----------------------------   dvector.h     ---------------------------*/
+/*      $Id$                 */
+#ifndef __dvector_H
+#define __dvector_H
+/*----------------------------   dvector.h     ---------------------------*/
 
 // This file is part of the DEAL Library
 // DEAL is Copyright(1995) by
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
-
-
-#ifndef __lac_dvector_h
-#define __lac_dvector_h
+// Revised by Wolfgang Bangerth
 
 #include <cstdio>
-#include <base/types.h>
 #include <base/exceptions.h>
 
 
@@ -526,5 +526,11 @@ inline double& dVector::operator() (const unsigned int i)
   return val[i];
 }
 
-#endif
 
+
+
+
+/*----------------------------   dvector.h     ---------------------------*/
+/* end of #ifndef __dvector_H */
+#endif
+/*----------------------------   dvector.h     ---------------------------*/

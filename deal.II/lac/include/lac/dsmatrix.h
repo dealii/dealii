@@ -8,6 +8,7 @@
 // This file is part of the DEAL Library
 // DEAL is Copyright(1995) by
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
+// Revised by Wolfgang Bangerth
 
 
 #ifndef __lac_dvector_h

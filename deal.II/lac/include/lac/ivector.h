@@ -7,9 +7,6 @@
 
 #ifndef __lac_ivector_h
 #define __lac_ivector_h
-#ifndef __base_types_h
-#include <base/types.h>
-#endif
 
 #include <base/exceptions.h>
 

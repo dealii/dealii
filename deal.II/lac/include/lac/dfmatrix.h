@@ -4,6 +4,11 @@
 #define __dfmatrix_H
 /*----------------------------   dfmatrix.h     ---------------------------*/
 
+// This file is part of the DEAL Library
+// DEAL is Copyright(1995) by
+// Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
+// Revised by Wolfgang Bangerth
+
 
 #include <lac/dvector.h>
 #include <lac/ivector.h>
