@@ -60,6 +60,11 @@ void check ()
 					 :
 					 0);
 
+				   // define composed finite
+				   // elements. to limit memory
+				   // consumption in 3d to reasonable
+				   // values, use simpler finite
+				   // elements there
   const FESystem<dim>
     *fe_1 = (dim != 3
 	     ?
@@ -67,9 +72,8 @@ void check ()
 			       *fe_dq_quadratic, 2,
 			       fe_constant,      12)
 	     :
-	     new FESystem<dim>(fe_quadratic,     4,
-			       fe_dq_linear,     2,
-			       fe_constant,      12)
+	     new FESystem<dim>(fe_dq_linear,     1,
+			       fe_constant,      1)
 	     );
 
   const FESystem<dim>
@@ -80,8 +84,7 @@ void check ()
 			       fe_quadratic,     5)
 	     :
 	     new FESystem<dim>(fe_constant,      1,
-			       fe_dq_linear,     2,
-			       fe_quadratic,     5)
+			       fe_dq_linear,     1)
 	     );
   
 				   // make several loops to refine the
@@ -95,8 +98,18 @@ void check ()
 
       dof_1.distribute_dofs (*fe_1);
       dof_2.distribute_dofs (*fe_2);
-      DoFRenumbering::Cuthill_McKee (dof_1);
-      DoFRenumbering::Cuthill_McKee (dof_2);
+
+				       // if not in 3d, check
+				       // renumbering functions as
+				       // well. in 3d, elements are
+				       // entirely discontinuous here,
+				       // so renumbering functions
+				       // don't work
+      if (dim != 3)
+	{
+	  DoFRenumbering::Cuthill_McKee (dof_1);
+	  DoFRenumbering::Cuthill_McKee (dof_2);
+	};
 
       deallog << "  Grid 1: " << tria_1.n_active_cells() << " cells, "
 	      << dof_1.n_dofs() << " dofs" << std::endl;
@@ -108,14 +121,32 @@ void check ()
       InterGridMap<DoFHandler,dim> intergrid_map;
       intergrid_map.make_mapping (dof_1, dof_2);
       ConstraintMatrix intergrid_constraints;
-				       // dq quadratic
-      DoFTools::compute_intergrid_constraints (dof_1, 5, dof_2, 2, 
-					       intergrid_map,
-					       intergrid_constraints);
-				       // dq constant
-      DoFTools::compute_intergrid_constraints (dof_1, 8, dof_2, 0, 
-					       intergrid_map,
-					       intergrid_constraints);
+
+      if (dim != 3)
+	{
+					   // dq quadratic
+	  DoFTools::compute_intergrid_constraints (dof_1, 5, dof_2, 2, 
+						   intergrid_map,
+						   intergrid_constraints);
+					   // dq constant
+	  DoFTools::compute_intergrid_constraints (dof_1, 8, dof_2, 0, 
+						   intergrid_map,
+						   intergrid_constraints);
+	}
+      else
+					 // 3d
+	{
+					   // dq linear
+	  DoFTools::compute_intergrid_constraints (dof_1, 0, dof_2, 1, 
+						   intergrid_map,
+						   intergrid_constraints);
+					   // dq constant
+	  DoFTools::compute_intergrid_constraints (dof_1, 1, dof_2, 0, 
+						   intergrid_map,
+						   intergrid_constraints);
+	};
+
+      
 				       // continuous
 				       // quadratic. continuous
 				       // elements only work for 1d at
