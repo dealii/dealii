@@ -429,7 +429,7 @@ FE_Nedelec<1>::shape_grad_component (const unsigned int ,
 				     const unsigned int ) const
 {
   Assert (false, ExcNotImplemented());
-  return 0.;
+  return Tensor<1,1>();
 }
 
 #endif
@@ -571,7 +571,7 @@ FE_Nedelec<1>::shape_grad_grad_component (const unsigned int ,
 					  const unsigned int ) const
 {
   Assert (false, ExcNotImplemented());
-  return 0.;
+  return Tensor<2,1>();
 }
 
 #endif
