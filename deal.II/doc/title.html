@@ -5,26 +5,29 @@
 <title>deal.II Title Bar</title>
     <link href="screen.css" rel="StyleSheet" media="screen">
     <link href="print.css" rel="StyleSheet" media="print">
-    <meta name="author" content="Jan Schrage and others <deal@iwr.uni-heidelberg.de>">
-    <meta name="keywords" content="deal.II">
+    <meta name="author" content="deal.II <info@dealii.org>">
 </head>
 
 <!-- Page Body -->
-<body style="background-image:url(pictures/title-background.jpg);" lang="en">
-
-<!-- Title Frame -->
-
-<h1 style="text-align: center;">
-The deal.II homepage
-
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-<b style="color:red">New web home (2002/03/07): www.dealii.org</b>
-</h1>
-
+<body style="background-image:url(pictures/title-background.jpg);">
+  <script type="text/javascript">
+  <!--
+  var version = "$Name$";
+  version=version.replace(/\$.*: */,"");
+  version=version.replace(/.*Version-/,"");
+  version=version.replace(/\$/, "");
+  version=version.replace(/-/g, ".");
+  version=version.replace(/ /g, "");
+  document.close();
+  document.open();
+  if (version != "")
+  {
+    document.writeln("<h1 style=\"text-align: center;\">The deal.II Homepage Version "+ version + "</h1>");
+  } else {
+    document.writeln("<h1 style=\"text-align: center;\">The deal.II Homepage</h1>");
+  }
+  //-->
+  </script>
 </body>
 </html>
 
