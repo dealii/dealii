@@ -597,8 +597,8 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 		= dof->second * matrix.diag_element(dof_number);
       else
 	{
-	  matrix.set (dof_number, dof_number,
-		      first_nonzero_diagonal_entry);
+	  matrix.SparseMatrix<double>::set (dof_number, dof_number,
+					    first_nonzero_diagonal_entry);
 	  new_rhs = right_hand_side(dof_number)
 		  = dof->second * first_nonzero_diagonal_entry;
 	};
