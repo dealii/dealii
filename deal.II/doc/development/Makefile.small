@@ -66,17 +66,15 @@ libs.o   = $(lib-deal2-2d.o) \
 
 
 # We now use the variable defined above which switch between debug and
-# optimized mode to select the correct compiler flags and the set of
-# libraries to link with. Included in the list of libraries is the
-# name of the object file which we will produce from the single C++
-# file. Note that by default we use the extension .go for object files
-# compiled in debug mode and .o for object files in optimized mode.
+# optimized mode to select the set of libraries to link with. Included
+# in the list of libraries is the name of the object file which we
+# will produce from the single C++ file. Note that by default we use
+# the extension .go for object files compiled in debug mode and .o for
+# object files in optimized mode.
 ifeq ($(debug-mode),on)
-  libraries = $(target).go $(libs.g)
-  flags     = $(CXXFLAGS.g)
+  libraries = $(target).g.o $(libs.g)
 else
   libraries = $(target).o $(libs.o)
-  flags     = $(CXXFLAGS.o)
 endif
 
 
@@ -114,10 +112,10 @@ clean:
 # compiler are usually not of much interest, we suppress the actual
 # command line using the `at' sign in the first column of the rules
 # and write the string indicating what we do instead.
-%.go : %.cc
+./%.g.o :
 	@echo ==============debug========= $(<F)
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-%.o : %.cc
+./%.o :
 	@echo ==============optimized===== $(<F)
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
@@ -137,19 +135,12 @@ clean:
 # the executable. This file is automagically remade whenever needed,
 # i.e. whenever one of the cc-/h-files changed. Make detects whether
 # to remake this file upon inclusion at the bottom of this file.
-#
-# The dependency file is created using a perl script.  Since the
-# script prefixes the output names by `lib/o' or `lib/go' (it was
-# written for the sublibraries' Makefile), we have to strip that again
-# since object files are placed in the present directory for this
-# application. All these things are made in the next rule:
 Makefile.dep: $(target).cc Makefile \
               $(shell echo $(include-path-base)/base/*.h    \
-                           $(include-path-lac)/lac/*.h     \
+                           $(include-path-lac)/lac/*.h      \
                            $(include-path-deal2)/*/*.h)
-	@echo ============================ Remaking Makefile
-	@$(PERL) $D/common/scripts/make_dependencies.pl  $(INCLUDE) $(target).cc \
-		| $(PERL) -pi -e 's!lib/g?o/!!g;' \
+	@echo ============================ Remaking $@
+	@$(PERL) $D/common/scripts/make_dependencies.pl  $(INCLUDE) -B. $(target).cc \
 		> Makefile.dep
 
 # To make the dependencies known to `make', we finally have to include
