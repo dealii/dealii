@@ -1222,9 +1222,9 @@ Point<dim> MappingQ<dim>::transform_unit_to_real_cell (
 
   compute_mapping_support_points(cell, p_data->mapping_support_points);
   
-  const Point<dim> p=transform_unit_to_real_cell_internal(*p_data);
+  const Point<dim> q=transform_unit_to_real_cell_internal(*p_data);
   delete mdata;
-  return p;
+  return q;
 }
 
 
