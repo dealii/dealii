@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -108,6 +108,8 @@ class MappingC1 : public MappingQ<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
+/// @if NoDoc
+
 template <> void MappingC1<1>::add_line_support_points (
   const Triangulation<1>::cell_iterator &,
   std::vector<Point<1> > &) const;
@@ -123,6 +125,6 @@ template <> void MappingC1<2>::add_quad_support_points (
   std::vector<Point<2> > &) const;
 
 
-
+/// @endif
 
 #endif

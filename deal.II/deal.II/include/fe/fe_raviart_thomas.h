@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -574,6 +574,8 @@ class FE_RaviartThomas : public FiniteElement<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
+/// @if NoDoc
+
 template <>
 void FE_RaviartThomas<1>::initialize_unit_face_support_points ();
 
@@ -637,5 +639,7 @@ void
 FE_RaviartThomas<1>::
 get_interpolation_matrix (const FiniteElementBase<1> &,
 			  FullMatrix<double>         &) const;
+
+/// @endif
 
 #endif

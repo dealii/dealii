@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -294,7 +294,6 @@ struct GeometryInfo
 
 
 /**
- * @internal
  * Topological description of zero dimensional cells,
  * i.e. points. This class might not look too useful but often is if
  * in a certain dimension we would like to enquire information about
@@ -385,7 +384,6 @@ struct GeometryInfo<0>
 
 
 /**
- * @internal
  * Topological description of one dimensional cells.
  *
  * This class contains as static members information on vertices and
@@ -671,7 +669,6 @@ struct GeometryInfo<1>
 
 
 /**
- * @internal
  * Topological description of two dimensional cells.
  *
  * This class contains as static members information on vertices and
@@ -958,7 +955,6 @@ struct GeometryInfo<2>
 
 
 /**
- * @internal
  * Topological description of three dimensional cells.
  *
  * This class contains as static members information on vertices and
@@ -1242,7 +1238,6 @@ struct GeometryInfo<3>
 
 
 /**
- * @internal
  * Topological description of four dimensional cells. This class is
  * required in some exotic cases where we compute information in a
  * one-larger dimension than the present, and do so also in 3d (for

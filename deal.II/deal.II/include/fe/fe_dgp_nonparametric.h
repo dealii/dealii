@@ -440,9 +440,9 @@ class FE_DGPNonparametric : public FiniteElement<dim>
     friend class MappingQ<dim>;
 };
 
-/*@}
- @if NoDoc
-*/
+/*@}*/
+
+/// @if NoDoc
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
@@ -485,4 +485,5 @@ const unsigned int FE_DGPNonparametric<3>::Matrices::n_projection_matrices;
 #endif
 
 /// @endif
+
 #endif

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,24 +28,83 @@ template <int dim>              class MGDoFObjectAccessor<2, dim>;
 template <int dim>              class MGDoFObjectAccessor<3, dim>;
 
 /**
- * Define some types which differ between the dimensions. This class
- * is analogous to the @ref{TriaDimensionInfo} class hierarchy.
- * 
- * @ref MGDoFDimensionInfo<1>
- * @ref MGDoFDimensionInfo<2>
+ * @brief Iterators for MDDoFHandler
+ *
+ * Depending on the dimension, this class defines the iterator types for
+ * MGDoFHandler objects.
+ *
+ * @note The typedefs in this class are only for reference. Their real
+ * values are to be found in the specializations for different
+ * dimensions.
  */
 template <int dim>
 class MGDoFDimensionInfo
 {
+				     /// Line iterator for internal use
+    typedef void * raw_line_iterator;
+				     /// Line iterator for all lines of hierarchy
+    typedef void * line_iterator;
+				     /// Iterator for active lines
+    typedef void * active_line_iterator;
+    
+				     /// Quad iterator for internal use
+    typedef void * raw_quad_iterator;
+				     /// Quad iterator for all quadrilaterals of hierarchy
+    typedef void * quad_iterator;
+				     /// Iterator for active quadrilaterals
+    typedef void * active_quad_iterator;
+
+				     /// Hex iterator for internal use
+    typedef void * raw_hex_iterator;
+				     /// Hex iterator for all hexahedra of hierarchy
+    typedef void * hex_iterator;
+				     /// Iterator for active hexahedra
+    typedef void * active_hex_iterator;
+
+				     /** Cell iterator for internal
+				      * use. It is defined as one of
+				      * the raw iterators above,
+				      * depending on the dimension.
+				      */
+    typedef void * raw_cell_iterator;
+				     /** Cell iterator for all cells
+				      * of hierarchy. It is defined as
+				      * one of the iterators above,
+				      * depending on the dimension.
+				      */
+    typedef void * cell_iterator;
+				     /** Iterator for active cells. It
+				      * is defined as one of the
+				      * active iterators above,
+				      * depending on the dimension.
+				      */
+    typedef void * active_cell_iterator;
+
+ 				     /** Face iterator for internal
+				      * use. It is defined as one of
+				      * the raw iterators above,
+				      * depending on the dimension.
+				      */
+   typedef void * raw_face_iterator;
+				     /** Face iterator for all faces
+				      * of hierarchy. It is defined as
+				      * one of the iterators above,
+				      * depending on the dimension.
+				      */
+    typedef void * face_iterator;
+				     /** Iterator for active faces. It
+				      * is defined as one of the
+				      * active iterators above,
+				      * depending on the dimension.
+				      */
+    typedef void * active_face_iterator;
 };
 
 
 
 /**
- * Define some types for the DoF handling in one dimension.
- *
- * The types have the same meaning as those declared in
- * @ref{TriaDimensionInfo<2>}.
+ * Iterators for MGDofHandler in one dimension. See the template
+ * MGDoFDimensionInfo for further explanation.
  */
 template <>
 class MGDoFDimensionInfo<1>
@@ -75,10 +134,8 @@ class MGDoFDimensionInfo<1>
 
 
 /**
- * Define some types for the DoF handling in two dimensions.
- *
- * The types have the same meaning as those declared in
- * @ref{TriaDimensionInfo<2>}.
+ * Iterators for MGDofHandler in one dimension. See the template
+ * MGDoFDimensionInfo for further explanation.
  */
 template <>
 class MGDoFDimensionInfo<2>
@@ -108,10 +165,8 @@ class MGDoFDimensionInfo<2>
 
 
 /**
- * Define some types for the DoF handling in two dimensions.
- *
- * The types have the same meaning as those declared in
- * @ref{TriaDimensionInfo<2>}.
+ * Iterators for MGDofHandler in one dimension. See the template
+ * MGDoFDimensionInfo for further explanation.
  */
 template <>
 class MGDoFDimensionInfo<3>

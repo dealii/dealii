@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -670,6 +670,7 @@ MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 
 /* -------------- declaration of explicit specializations ------------- */
 
+/// @if NoDoc
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
@@ -729,5 +730,6 @@ template <> void MappingQ1<1>::fill_fe_subface_values (
   std::vector<Tensor<1,1> >&,
   std::vector<Point<1> >&) const;
 
+/// @endif
 
 #endif
