@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,29 +41,29 @@
  * require several helper classes handed over as template parameters.
  * These classes have to meet the following requirements:
  *
- * @p{MATRIX} is a matrix as specified for LAC-solvers, that is, it
+ * <tt>MATRIX</tt> is a matrix as specified for LAC-solvers, that is, it
  * has a function
- * \begin{verbatim}
+ * @code
  *   void MATRIX::vmult(VECTOR& x, const VECTOR& b)
- * \end{verbatim}
- * performing the matrix vector product @p{x=Ab}.
+ * @endcode
+ * performing the matrix vector product <i>x=Ab</i>.
  *
- * @p{SMOOTH} is a class with a function
- * \begin{verbatim}
+ * <tt>SMOOTH</tt> is a class with a function
+ * @code
  *   void SMOOTH::smooth (unsigned int level, VECTOR& x, const VECTOR& b)
- * \end{verbatim}
- * modifying the vector @p{x} such that the residual @{b-Ax}
- * on level @p{l} is smoothened. Refer to @ref{MGSmootherRelaxation}
+ * @endcode
+ * modifying the vector <i>x</i> such that the residual <i>b-Ax</i>
+ * on level <i>l</i> is smoothened. Refer to MGSmootherRelaxation
  * for an example.
  *
- * @p{COARSE} has an
- * \begin{verbatim}
+ * <tt>COARSE</tt> has an
+ * @code
  *   void COARSE::operator() (VECTOR& x, const VECTOR& b)
- * \end{verbatim}
+ * @endcode
  * returning the solution to the system @p{Ax=b} on the coarsest level
- * in @p{x}.
+ * in <i>x</i>.
  * 
- * @author Guido Kanschat, 1999, 2001, 2002, Ralf Hartmann 2002, 2003.
+ * @author Guido Kanschat, 1999 - 2004
  */
 template <class VECTOR>
 class Multigrid : public Subscriptor
@@ -142,12 +142,6 @@ class Multigrid : public Subscriptor
     void set_edge_matrices (const MGMatrixBase<VECTOR>& edge_down,
 			    const MGMatrixBase<VECTOR>& edge_up);
 
-#ifdef MG_DEBUG
-    void print_vector (const unsigned int level,
-		       const VECTOR &v,
-		       const char *name) const;
-#endif
-    
   private:
     
 				     /**
@@ -232,16 +226,6 @@ class Multigrid : public Subscriptor
 				      */
     SmartPointer<const MGMatrixBase<VECTOR> > edge_up;
 
-				     /**
-				      * Pointer to the MGDoFHandler
-				      * given to the constructor. Only
-				      * needed for @p{MG_DEBUG}
-				      * defined.
-				      */
-//TODO[GK]: This won't fly: deal_II_dimension can't be used in header files
-#ifdef MG_DEBUG
-    SmartPointer<const MGDoFHandler<deal_II_dimension> > mg_dof_handler;
-#endif
 				     /**
 				      * Exception.
 				      */
@@ -371,9 +355,6 @@ Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 		post_smooth(&post_smooth),
 		edge_down(0),
 		edge_up(0)
-#ifdef MG_DEBUG  
-                , mg_dof_handler(&mg_dof_handler)
-#endif
 {}
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,18 +13,6 @@
 #ifndef __deal2__multigrid_templates_h
 #define __deal2__multigrid_templates_h
 #include <multigrid/multigrid.h>
-
-#ifdef MG_DEBUG
-#  include <fe/fe.h>
-#  include <dofs/dof_accessor.h>
-#  include <numerics/data_out.h>
-#  include <multigrid/mg_dof_accessor.h>
-#  include <multigrid/mg_dof_handler.h>
-
-#  include <fstream>
-#endif
-
-
 
 
 template <class VECTOR>
@@ -43,21 +31,11 @@ template <class VECTOR>
 void
 Multigrid<VECTOR>::level_mgstep(const unsigned int level)
 {
-#ifdef MG_DEBUG
-  char *name = new char[100];
-  sprintf(name, "MG%d-defect",level);
-  print_vector(level, defect[level], name);
-#endif
-
   solution[level] = 0.;
   
   if (level == minlevel)
     {
       (*coarse)(level, solution[level], defect[level]);
-#ifdef MG_DEBUG
-      sprintf(name, "MG%d-solution",level);
-      print_vector(level, solution[level], name);
-#endif
       return;
     }
 
@@ -65,11 +43,6 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
 				   // modifying s
   pre_smooth->smooth(level, solution[level], defect[level]);
 
-#ifdef MG_DEBUG
-  sprintf(name, "MG%d-pre",level);
-  print_vector(level, solution[level], name);
-#endif
-  
 				   // t = A*solution[level]
   matrix->vmult(level, t[level], solution[level]);
   
@@ -101,12 +74,7 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
 				   // do coarse grid correction
 
   transfer->prolongate(level, t[level], solution[level-1]);
-
-#ifdef MG_DEBUG
-  sprintf(name, "MG%d-cgc",level);
-  print_vector(level, t[level], name);
-#endif
-
+  
   solution[level] += t[level];
 
   if (edge_up != 0)
@@ -117,13 +85,6 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
   
 				   // post-smoothing
   post_smooth->smooth(level, solution[level], defect[level]);
-
-#ifdef MG_DEBUG
-  sprintf(name, "MG%d-post",level);
-  print_vector(level, solution[level], name);
-
-  delete[] name;
-#endif
 }
 
 
