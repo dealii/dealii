@@ -21,6 +21,9 @@
 
 #include <lac/petsc_matrix_base.h>
 
+/*! @addtogroup PETSc
+ *@{
+ */
 
 
 namespace PETScWrappers
@@ -47,6 +50,8 @@ namespace PETScWrappers
                   const unsigned int n);
   };
 }
+
+/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

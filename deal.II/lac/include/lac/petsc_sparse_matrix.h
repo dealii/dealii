@@ -23,6 +23,10 @@
 
 #include <vector>
 
+/*! @addtogroup PETSc
+ *@{
+ */
+
 
 namespace PETScWrappers
 {
@@ -162,6 +166,8 @@ namespace PETScWrappers
                       const bool                       is_symmetric = false);
   };
 }
+
+/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

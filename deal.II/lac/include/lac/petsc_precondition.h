@@ -21,6 +21,11 @@
 #include <petscpc.h>
 
 
+/*! @addtogroup PETSc
+ *@{
+ */
+
+
 namespace PETScWrappers
 {
                                    // forward declarations
@@ -505,6 +510,7 @@ namespace PETScWrappers
 
 }
 
+/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

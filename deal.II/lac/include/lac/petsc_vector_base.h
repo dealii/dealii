@@ -22,6 +22,9 @@
 
 #include <petscvec.h>
 
+/*! @addtogroup PETSc
+ *@{
+ */
 
                                  // forward declaration
 template <typename number> class Vector;
@@ -855,6 +858,8 @@ namespace PETScWrappers
 
 
 }
+
+/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

@@ -23,7 +23,9 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-
+/*! @addtogroup PETSc
+ *@{
+ */
 
 namespace PETScWrappers
 {
@@ -883,6 +885,8 @@ namespace PETScWrappers
   }
       
 }
+
+/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

@@ -24,6 +24,10 @@
 #include <lac/petsc_vector_base.h>
 
 
+/*! @addtogroup PETSc
+ *@{
+ */
+
 namespace PETScWrappers
 {
 /**
@@ -45,6 +49,95 @@ namespace PETScWrappers
  * functions). Only the functions creating a vector of specific type differ,
  * and are implemented in this particular class.
  *
+ * @section 1 Parallel communication model
+ *
+ * The parallel functionality of PETSc is built on top of the Message Passing
+ * Interface (MPI). MPI's communication model is built on collective
+ * communications: if one process wants something from another, that other
+ * process has to be willing to accept this communication. A process cannot
+ * query data from another process by calling a remote function, without that
+ * other process expecting such a transaction. The consequence is that most of
+ * the operations in the base class of this class have to be called
+ * collectively. For example, if you want to compute the l2 norm of a parallel
+ * vector, @em all processes across which this vector is shared have to call
+ * the @p l2_norm function. If you don't do this, but instead only call the @p
+ * l2_norm function on one process, then the following happens: This one
+ * process will call one of the collective MPI functions and wait for all the
+ * other processes to join in on this. Since the other processes don't call
+ * this function, you will either get a time-out on the first process, or,
+ * worse, by the time the next a callto a PETSc function generates an MPI
+ * message on the other processes , you will get a cryptic message that only a
+ * subset of processes attempted a communication. These bugs can be very hard
+ * to figure out, unless you are well-acquainted with the communication model
+ * of MPI, and know which functions may generate MPI messages.
+ *
+ * One particular case, where an MPI message may be generated unexpectedly is
+ * discussed below.
+ *
+ *
+ * @section 2 Accessing individual elements of a vector
+ *
+ * PETSc does allow read access to individual elements of a vector, but in the
+ * distributed case only to elements that are stored locally. We implement
+ * this through calls like <tt>d=vec(i)</tt>. However, if you access an
+ * element outside the locally stored range, an exception is generated.
+ *
+ * In contrast to read access, PETSc (and the respective deal.II wrapper
+ * classes) allow to write (or add) to individual elements of vectors, even if
+ * they are stored on a different process. You can do this writing, for
+ * example, <tt>vec(i)=d</tt> or <tt>vec(i)+=d</tt>, or similar
+ * operations. There is one catch, however, that may lead to very confusing
+ * error messages: PETSc requires application programs to call the compress()
+ * function when they switch from adding, to elements to writing to
+ * elements. The reasoning is that all processes might accumulate addition
+ * operations to elements, even if multiple processes write to the same
+ * elements. By the time we call compress() the next time, all these additions
+ * are executed. However, if one process adds to an element, and another
+ * overwrites to it, the order of execution would yield non-deterministic
+ * behavior if we don't make sure that a synchronisation with compress()
+ * happens in between.
+ *
+ * In order to make sure these calls to compress() happen at the appropriate
+ * time, the deal.II wrappers keep a state variable that store which is the
+ * presently allowed operation: additions or writes. If it encounters an
+ * operation of the opposite kind, it calls compress() and flips the
+ * state. This can sometimes lead to very confusing behavior, in code that may
+ * for example look like this:
+ * @verbatim
+ *   PETScWrappers::MPI::Vector vector;
+ *   ...
+ *                   // do some write operations on the vector
+ *   for (unsigned int i=0; i<vector.size(); ++i)
+ *     vector(i) = i;
+ *
+ *                   // do some additions to vector elements, but
+ *                   // only for some elements
+ *   for (unsigned int i=0; i<vector.size(); ++i)
+ *     if (some_condition(i) == true)
+ *       vector(i) += 1;
+ *
+ *                   // do another collective operation
+ *   const double norm = vector.l2_norm();
+ * @endverbatim
+ *
+ * This code can run into trouble: by the time we see the first addition
+ * operation, we need to flush the overwrite buffers for the vector, and the
+ * deal.II library will do so by calling compress(). However, it will only do
+ * so for all processes that actually do an addition -- if the condition is
+ * never true for one of the processes, then this one will not get to the
+ * actual compress() call, whereas all the other ones do. This gets us into
+ * trouble, since all the other processes hang in the call to flush the write
+ * buffers, while the one other process advances to the call to compute the l2
+ * norm. At this time, you will get an error that some operation was attempted
+ * by only a subset of processes. This behavior may seem surprising, unless
+ * you know that write/addition operations on single elements may trigger this
+ * behavior.
+ *
+ * The problem described here may be avoided by placing additional calls to
+ * compress(), or making sure that all processes do the same type of
+ * operations at the same time, for example by placing zero additions if
+ * necessary.
+ * 
  * @author Wolfgang Bangerth, 2004
  */
     class Vector : public VectorBase
@@ -373,6 +466,7 @@ namespace PETScWrappers
   
 }
 
+/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

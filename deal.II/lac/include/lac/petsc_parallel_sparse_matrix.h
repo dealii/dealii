@@ -24,6 +24,10 @@
 #include <vector>
 
 
+/*! @addtogroup PETSc
+ *@{
+ */
+
 
 namespace PETScWrappers
 {
@@ -40,6 +44,10 @@ namespace PETScWrappers
  * functions). Only the functions creating a matrix of specific type differ,
  * and are implemented in this particular class.
  *
+ * There are a number of comments on the communication model as well as access
+ * to individual elements in the documentation to the parallel vector
+ * class. These comments apply here as well.
+ * 
  * @author Wolfgang Bangerth, 2004
  */
     class SparseMatrix : public MatrixBase
@@ -187,6 +195,8 @@ namespace PETScWrappers
   }
   
 }
+
+/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

@@ -24,6 +24,10 @@
 #include <lac/petsc_vector_base.h>
 #include <lac/petsc_parallel_vector.h>
 
+/*! @addtogroup PETSc
+ *@{
+ */
+
 
 namespace PETScWrappers
 {
@@ -288,6 +292,7 @@ namespace PETScWrappers
   }
 }
 
+/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 
