@@ -4,7 +4,7 @@ available from the deal.II home-page at
 
                    http://www.dealii.org
 
-This versions features many new components. The most outstanding
+This version features many new components. The most outstanding
 additions are
 - Support for Nedelec edge elements; in general, we now support
   vector-valued elements where the vector components are coupled
@@ -12,7 +12,6 @@ additions are
 - A new and simpler-to-use multi-threading scheme
 - A much faster scheme to read in grids in 2d
 - Support for more compilers and operating systems
-- ...
 
 A comprehensive list of new features can be found at
      http://www.dealii.org/news/3.4.0-vs-4.0.0.html
