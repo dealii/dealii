@@ -96,7 +96,8 @@ template <int dim> class Triangulation;
  * is, cells used somewhere in the triangulation hierarchy.
  *
  * <li> TriaActiveIterator objects which only loop over active cells.
- *   
+ * </ul>
+ *
  * @section TIPurpose Purpose
  *
  * Iterators are not much slower than operating directly on the data
