@@ -9,6 +9,7 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <fe/quadrature.h>
+#include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <lac/dvector.h>
@@ -75,8 +76,8 @@ template <>
 void VectorTools<1>::project (const DoFHandler<1>    &,
 			      const ConstraintMatrix &,
 			      const FiniteElement<1> &,
-			      const Quadrature<1>    &,
 			      const Boundary<1>      &,
+			      const Quadrature<1>    &,
 			      const Function<1>      &,
 			      dVector                &,
 			      const bool              ,
@@ -98,8 +99,8 @@ template <int dim>
 void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				const ConstraintMatrix   &constraints,
 				const FiniteElement<dim> &fe,
-				const Quadrature<dim>    &q,
 				const Boundary<dim>      &boundary,
+				const Quadrature<dim>    &q,
 				const Function<dim>      &function,
 				dVector                  &vec,
 				const bool                enforce_zero_boundary,
@@ -153,8 +154,8 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   
   dSMatrix mass_matrix (sparsity);
   dVector tmp (mass_matrix.n());
-  MatrixCreator<dim>::create_mass_matrix (dof, fe, q, boundary,
-					  mass_matrix, function, tmp);
+  MatrixCreator<dim>::create_mass_matrix (dof, fe, boundary, mass_matrix);
+  VectorTools<dim>::create_right_hand_side (dof, fe, q, boundary, function, tmp);
 
   constraints.condense (mass_matrix);
   MatrixTools<dim>::apply_boundary_values (boundary_values,
@@ -170,6 +171,35 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   cg (mass_matrix, vec, tmp);
 				   // distribute solution
   constraints.distribute (vec);
+};
+
+
+
+template <int dim>
+void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
+					       const FiniteElement<dim> &fe,
+					       const Quadrature<dim>    &q,
+					       const Boundary<dim>      &boundary,
+					       const Function<dim>      &rhs,
+					       dVector                  &rhs_vector) {
+  UpdateFlags update_flags = UpdateFlags(update_q_points |
+					 update_JxW_values);
+  dSMatrix dummy;
+  const AssemblerData<dim> data (dof,
+				 false, true,
+				 dummy, rhs_vector,
+				 q, fe,	 update_flags, boundary);
+  TriaActiveIterator<dim, Assembler<dim> >
+    assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
+	       dof.get_tria().begin_active()->level(),
+	       dof.get_tria().begin_active()->index(),
+	       &data);
+  MassMatrix<dim> equation(&rhs,0);
+  do 
+    {
+      assembler->assemble (equation);
+    }
+  while ((++assembler).state() == valid);
 };
 
 
