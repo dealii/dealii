@@ -146,14 +146,11 @@
 	   </p>
 
       <li> <p>
-           In case you want the printable documentation, however, you
-           need <a href="http://www.linuxsupportline.com/~doc++/" target="_top">Doc++</a>
-	   and LaTeX installed. It is known that Doc++
-           version 3.3.13 is broken and generates invalid Tex, but
-           3.4 is OK. Note that the printed documentation of the
-           classes alone is far more than 1000 pages, so you may not
-           want to print it usually. All printable documentation is
-           also available online.
+           Previous versions of the library supported generation of
+           printable documentation. However, due to the size (around
+           2000 pages) which refrains most people from printing, and
+           the high cost of supporting this option, we dropped the
+           possibility of printable documentation.
 	   </p>
 
       <li> <p>
@@ -233,9 +230,6 @@
     =  1d 2d 3d: (2) and deal.II for specified dimension                 =
     =  all: base, lac 1d, 2d and 3d                                      =
     =  online-doc: generate the documentation in HTML format             =
-    =  printable-doc: generate the documentation in Postscript format.   =
-    =      You need to have Doc++ and LaTeX installed for that.          =
-    =  tex-doc: same, but only generate the LaTeX file, don't compile it =
     =  TODO: create a TODO file from TODO lines in the source files      =
     =  TAGS: create a TAGS file from include and source files            =
     =  clean: removes all object files, libraries, etc in all subdirs    =
@@ -468,16 +462,6 @@
       experimental. While <acronym>deal.II</acronym> runs on a variety
       of Unix systems, we presently support detection of the number of
       CPUs in your system only for Linux and Solaris.
-      </p>
-
-    <li>
-      <p>
-      <code>--with-docxx=doc++-path</code>: if you give the full path
-      (including file name of the executable) to the configure script,
-      then deal.II will use that file as the Doc++ executable for the
-      generation of printable documentation. If you don't specify that
-      flag and Doc++ is not in your PATH variable, then it is not
-      possible to generate printable documentation.
       </p>
 
     <li>
