@@ -1,8 +1,11 @@
 /* $Id$ */
 
+#include <grid/dof_accessor.h>
+#include <grid/tria_iterator.h>
 #include <grid/dof.h>
 #include <grid/mg_dof.h>
 #include <grid/dof_constraints.h>
+#include <fe/fe.h>
 #include <numerics/dof_renumbering.h>
 #include <lac/sparsematrix.h>
 
@@ -361,6 +364,102 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
 
 
 
+template <int dim>
+void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
+				     const vector<unsigned int> &component_order_arg)
+{
+  const unsigned int total_dofs = dof_handler.get_fe().total_dofs;
+
+				   // do nothing if the FE has only
+				   // one component
+  if (dof_handler.get_fe().n_components == 1)
+    return;
+  
+  vector<unsigned int> component_order (component_order_arg);
+  if (component_order.size() == 0)
+    for (unsigned int i=0; i<dof_handler.get_fe().n_components; ++i)
+      component_order.push_back (i);
+
+				   // check whether the component list has
+				   // the right length and contains all
+				   // component numbers
+  Assert (component_order.size() == dof_handler.get_fe().n_components,
+	  ExcInvalidComponentOrder());
+  for (unsigned int i=0; i<dof_handler.get_fe().n_components; ++i)
+    Assert (find (component_order.begin(), component_order.end(), i)
+	    != component_order.end(),
+	    ExcInvalidComponentOrder ());
+
+				   // vector to hold the dof indices on
+				   // the cell we visit at a time
+  vector<int> local_dof_indices(total_dofs);
+				   // prebuilt list to which component
+				   // a given dof on a cell belongs
+  vector<unsigned int> component_list (total_dofs);
+  for (unsigned int i=0; i<component_list.size(); ++i)
+    component_list[i] = dof_handler.get_fe().system_to_component_index(i).first;
+  
+				   // set up a map where for each component
+				   // the respective degrees of freedom are
+				   // collected.
+				   //
+				   // note that this map is sorted by component
+				   // but that within each component it is NOT
+				   // sorted by dof index. note also that some
+				   // dof indices are entered multiply, so we
+				   // will have to take care of that
+  vector<vector<int> > component_to_dof_map (dof_handler.get_fe().n_components);
+  for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active();
+       cell!=dof_handler.end(); ++cell)
+    {
+				       // on each cell: get dof indices
+				       // and insert them into the global
+				       // list using their component
+      cell->get_dof_indices (local_dof_indices);
+      for (unsigned int i=0; i<total_dofs; ++i)
+	component_to_dof_map[component_list[i]].push_back (local_dof_indices[i]);
+    };
+  
+				   // now we've got all indices sorted into
+				   // buckets labelled with their component
+				   // number. we've only got to traverse this
+				   // list and assign the new indices
+				   //
+				   // however, we first want to sort the
+				   // indices entered into the buckets to
+				   // preserve the order within each component
+				   // and during this also remove duplicate
+				   // entries
+  for (unsigned int component=0; component<dof_handler.get_fe().n_components; ++component)
+    {
+      sort (component_to_dof_map[component].begin(),
+	    component_to_dof_map[component].end());
+      component_to_dof_map[component].erase (unique (component_to_dof_map[component].begin(),
+						     component_to_dof_map[component].end()),
+					     component_to_dof_map[component].end());
+    };
+  
+  int next_free_index = 0;
+  vector<int> new_indices (dof_handler.n_dofs(), -1);
+  for (unsigned int component=0; component<dof_handler.get_fe().n_components; ++component)
+    {
+      const typename vector<int>::const_iterator
+	begin_of_component = component_to_dof_map[component].begin(),
+	end_of_component   = component_to_dof_map[component].end();
+            
+      for (typename vector<int>::const_iterator dof_index = begin_of_component;
+	   dof_index != end_of_component; ++dof_index)
+	new_indices[*dof_index] = next_free_index++;
+    };
+
+  Assert (next_free_index == static_cast<int>(dof_handler.n_dofs()),
+	  ExcInternalError());
+
+  dof_handler.renumber_dofs (new_indices);
+};
+
+  
+  
 
 
 
@@ -377,3 +476,6 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<deal_II_dimension> &dof_handler
 				    const bool                       reversed_numbering,
 				    const vector<int>               &starting_indices);
 
+template
+void DoFRenumbering::component_wise (DoFHandler<deal_II_dimension> &dof_handler,
+				     const vector<unsigned int>    &component_order_arg);
