@@ -164,6 +164,11 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 		    int,
 		    << "The number of subdivisions per patch, " << arg1
 		    << ", is not valid.");
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcCellNotActiveForCellData);
     
   private:
 				     /**

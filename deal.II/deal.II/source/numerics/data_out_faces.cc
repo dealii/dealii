@@ -44,7 +44,6 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
-  unsigned int face_number = 0;
   typename std::vector< ::DataOutBase::Patch<dim-1,dim> >::iterator patch = this->patches.begin();
   FaceDescriptor face=first_face();
 
@@ -52,7 +51,6 @@ void DataOutFaces<dim>::build_some_patches (Data data)
   for (unsigned int i=0; (i<data.this_thread)&&(face.first != this->dofs->end()); ++i)
     {
       ++patch;
-      ++face_number;
       face=next_face(face);
     }
 
@@ -105,14 +103,29 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 					   // then do the cell data
 	  for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
 	    {
+					       // we need to get at
+					       // the number of the
+					       // cell to which this
+					       // face belongs in
+					       // order to access the
+					       // cell data. this is
+					       // not readily
+					       // available, so choose
+					       // the following rather
+					       // inefficient way:
+	      Assert (face.first->active(), ExcCellNotActiveForCellData());
+	      const unsigned int cell_number
+		= std::distance (this->dofs->begin_active(),
+				 typename DoFHandler<dim>::active_cell_iterator(face.first));
+	      
 	      if (this->cell_data[dataset].has_block)
 		{
-		  const double value = (*this->cell_data[dataset].block_data)(face_number);
+		  const double value = (*this->cell_data[dataset].block_data)(cell_number);
 		  for (unsigned int q=0; q<n_q_points; ++q)
 		    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
 		      value;
 		} else {
-		  const double value = (*this->cell_data[dataset].single_data)(face_number);
+		  const double value = (*this->cell_data[dataset].single_data)(cell_number);
 		  for (unsigned int q=0; q<n_q_points; ++q)
 		    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
 		      value;
@@ -124,7 +137,6 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	   (i<data.n_threads)&&(face.first != this->dofs->end()); ++i)
 	{
 	  ++patch;
-	  ++face_number;
 	  face=next_face(face);
 	}
     };

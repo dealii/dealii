@@ -740,6 +740,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The <code class="class">DataOutFaces</code> class was
+       broken for cell data. It should now be correct, although the
+       algorithm used is not optimal, being approximately quadratic in
+       runtime.
+       <br>
+       (WB 2003/02/25)
+       </p>
+
+  <li> <p>
        New: The <code class="member">ConstraintMatrix::shift</code>
        function shifts and translates the elements of the constraint
        matrix by a certain number of indices.
