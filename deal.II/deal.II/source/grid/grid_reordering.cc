@@ -1212,7 +1212,7 @@ namespace internal
                                       */
     struct Edge 
     {
-        unsigned int v0, v1;
+        const unsigned int v0, v1;
         bool operator < (const Edge &e) const
           {
             return ((v0 < e.v0) || ((v0 == e.v0) && (v1 < e.v1)));
@@ -1225,15 +1225,11 @@ namespace internal
     {
       std::set<Edge> edges;
 
-      for (std::vector<CellData<2> >::const_iterator c = cells.begin();
-           c != cells.end(); ++c)
+      std::vector<CellData<2> >::const_iterator c = cells.begin();
+      for (; c != cells.end(); ++c)
         {
                                            // construct the four edges
-          const Edge cell_edges[4] = { { c->vertices[0], c->vertices[1] },
-                                       { c->vertices[1], c->vertices[2] },
-                                       { c->vertices[3], c->vertices[2] },
-                                       { c->vertices[0], c->vertices[3] } };
-                                           // and the reverse edges
+	                                   // in reverse order
           const Edge reverse_edges[4] = { { c->vertices[1], c->vertices[0] },
                                           { c->vertices[2], c->vertices[1] },
                                           { c->vertices[2], c->vertices[3] },
@@ -1241,14 +1237,27 @@ namespace internal
                                            // for each of them, check
                                            // whether they are already
                                            // in the set
-          for (unsigned int i=0; i<4; ++i)
-            if (edges.find (reverse_edges[i]) != edges.end())
-              return false;
+	                                   //
+	                                   // unroll the loop by hand to
+	                                   // avoid a nasty compiler error
+	                                   // in gcc2.95 that generated
+	                                   // duplicate	assembler labels
+	                                   // otherwise	  
+	  if ((edges.find (reverse_edges[0]) != edges.end()) ||
+	      (edges.find (reverse_edges[1]) != edges.end()) ||
+	      (edges.find (reverse_edges[2]) != edges.end()) ||
+	      (edges.find (reverse_edges[3]) != edges.end()))
+            return false;
                                            // ok, not. insert them
+	                                   // in the order in which
+	                                   // we want them
                                            // (std::set eliminates
                                            // duplicated by itself)
           for (unsigned int i=0; i<4; ++i)
-            edges.insert (cell_edges[i]);
+	    {
+	      const Edge e = { reverse_edges[i].v1, reverse_edges[i].v0 };  
+	      edges.insert (e);
+	    }
                                            // then go on with next
                                            // cell
         }
