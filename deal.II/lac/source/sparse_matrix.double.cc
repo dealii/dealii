@@ -43,3 +43,22 @@ template class SparseMatrix<TYPEMAT>;
 //  #include <lac/sparse_matrix.2.templates>
 
 #undef TYPEMAT
+
+
+template void SparseMatrix<double>::
+vmult (Vector<double> &, const Vector<float> &) const;
+template void SparseMatrix<double>::
+Tvmult (Vector<double> &, const Vector<float> &) const;
+template void SparseMatrix<double>::
+vmult_add (Vector<double> &, const Vector<float> &) const;
+template void SparseMatrix<double>::
+Tvmult_add (Vector<double> &, const Vector<float> &) const;
+
+template void SparseMatrix<double>::
+vmult (Vector<float> &, const Vector<double> &) const;
+template void SparseMatrix<double>::
+Tvmult (Vector<float> &, const Vector<double> &) const;
+template void SparseMatrix<double>::
+vmult_add (Vector<float> &, const Vector<double> &) const;
+template void SparseMatrix<double>::
+Tvmult_add (Vector<float> &, const Vector<double> &) const;
