@@ -321,9 +321,9 @@ namespace Patterns
 				     // first split the input list
     while (tmp.length() != 0)
       {
-	std::string name;
+        std::string name;
 	name = tmp;
-      
+
 	if (name.find(",") != std::string::npos)
 	  {
 	    name.erase (name.find(","), std::string::npos);
@@ -335,6 +335,7 @@ namespace Patterns
 	while ((name.length() != 0) &&
 	       (name[0] == ' '))
 	  name.erase (0,1);
+
 	while (name[name.length()-1] == ' ')
 	  name.erase (name.length()-1, 1);
 
@@ -421,7 +422,7 @@ namespace Patterns
 	if (name.find(",") != std::string::npos)
 	  {
 	    name.erase (name.find(","), std::string::npos);
-	    tmp.erase (0, test_string_list.find(",")+1);
+	    tmp.erase (0, tmp.find(",")+1);
 	  }
 	else
 	  tmp = "";
