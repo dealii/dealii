@@ -47,7 +47,7 @@ clean:
 ../lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 ifneq (1,${recursive-make-fwd-decl})
 	@echo ============================ Remaking Makefile
-	@perl ../Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files) \
+	@perl ../Make_dep.pl ../lib/libbase $(INCLUDE) $(cc-files) \
 		> ../lib/Makefile.dep
 else
 	@echo ============================ Not remaking Makefile since in nested mode
