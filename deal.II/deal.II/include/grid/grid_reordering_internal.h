@@ -114,8 +114,10 @@ namespace internal
     {
       public:
 					 /**
-					  * v0 - v3 are indexes of the vertices of the quad,
-					  * s0 - s3   are indexes for the sides of the quad
+					  * v0 - v3 are indexes of the
+					  * vertices of the quad, s0 -
+					  * s3 are indexes for the
+					  * sides of the quad
 					  */
 	MQuad (const unsigned int  v0,
 	       const unsigned int  v1,
@@ -247,11 +249,14 @@ namespace internal
 					  * orientation algorith is as
 					  * follows
 					  *
-					  * 1) Find an unoriented quad (A)
+					  * 1) Find an unoriented quad
+                                          (A)
 					  *
-					  * 2) Orient an un_oriented side (s) of (A)
+					  * 2) Orient an un_oriented
+                                          side (s) of (A)
 					  *
-					  * 3) side hop on (s) of (A) to get (B)
+					  * 3) side hop on (s) of (A)
+                                          to get (B)
 					  *
 					  * 4) if opposite side to (s)
 					  * of (B) is unoriented
@@ -384,250 +389,382 @@ namespace internal
 
 /**
  * Implement the algorithm described in the documentation of the
- * GridReordering<2> class.
+ * GridReordering<3> class.
  *
  * @author Michael Anderson, 2003
  */
   namespace GridReordering3d
   {
 
-  /**
-   * During building the conectivity information we 
-   * dont need all the heavy duty information about 
-   * edges that we will need later. So we can save 
-   * memory and time by using these light-weight edges.
-   **/
-  class CheapEdge
-  {
-    public:
-      //! The first node
-      int node0;
-      //! The second node
-      int node1;
-      //! A simple constructor
-      CheapEdge(int n0, int n1);
-      //! Need a partial ordering for the STL
-      bool operator<(const CheapEdge & e2) const;
-  };
+                                     /**
+                                      * During building the
+                                      * conectivity information we
+                                      * don't need all the heavy duty
+                                      * information about edges that
+                                      * we will need later. So we can
+                                      * save memory and time by using
+                                      * a light-weight class for edges.
+                                      */
+    struct CheapEdge
+    {
+                                         /**
+                                          * The first node
+                                          */
+        int node0;
+                                         /**
+                                          * The second node
+                                          */
+        int node1;
+                                         /**
+                                          * A simple constructor
+                                          */
+        CheapEdge(int n0, int n1);
+                                         /**
+                                          * Need a partial ordering
+                                          * for the STL
+                                          */
+        bool operator< (const CheapEdge & e2) const;
+    };
 
   
-  class ElementInfo
+    class ElementInfo
     {
-  public:
-    // The numbers of the edges coming into node i
-    // are given by edge_to_node[i][k] where k=0,1,2
-    int edge_to_node[8][3];
+      public:
+                                         /**
+                                          * The numbers of the edges
+                                          * coming into node i are
+                                          * given by
+                                          * edge_to_node[i][k] where
+                                          * k=0,1,2.
+                                          */
+        int edge_to_node[8][3];
 
-    //the orientation of edge coming into node i
-    //is given by edge_to_node_orient[i][k] where k=0,1,2
-    //  1 means the given node is the start of the edge
-    // -1 means the end of the edge
-    int edge_to_node_orient[8][3];
+                                         /**
+                                          * The orientation of edge
+                                          * coming into node i is
+                                          * given by
+                                          * edge_to_node_orient[i][k]
+                                          * where k=0,1,2. 1 means the
+                                          * given node is the start of
+                                          * the edge -1 means the end
+                                          * of the edge.
+                                          */
+        int edge_to_node_orient[8][3];
 
-    // nodesonedge[i][0] is the start node for edge i
-    // nodesonedge[i][1] is the end node for edge i
-    int nodes_on_edge[12][2];
-    int nodes_on_face[6][4];
-};
+                                         /**
+                                          * nodesonedge[i][0] is the
+                                          * start node for edge i.
+                                          * nodesonedge[i][1] is the
+                                          * end node for edge i.
+                                          */
+        int nodes_on_edge[12][2];
+        int nodes_on_face[6][4];
+    };
 
-class DealElemInfo : public ElementInfo
-{
-  public:
-    DealElemInfo();
-};
+    class DealElemInfo : public ElementInfo
+    {
+      public:
+        DealElemInfo();
+    };
 
 
 
  
-  //! A conectivity and orientation aware edge class
-  class Edge
-  {
-    public:
-      //! Simple constructor
-      Edge(int n0, int n1, int orient=0): orientation_flag(orient), group(0),
-                                          num_neighbouring_cubes(0), neighbouring_cubes(NULL)
-      {nodes[0]=n0; nodes[1]=n1;};
+                                     /**
+                                      * A conectivity and orientation
+                                      * aware edge class.
+                                      */
+    class Edge
+    {
+      public:
+                                         /**
+                                          * Simple constructor
+                                          */
+        Edge (int n0, int n1, int orient=0)
+                        :
+                        orientation_flag(orient),
+                        group(0),
+                        num_neighbouring_cubes(0),
+                        neighbouring_cubes(NULL)
+          {nodes[0]=n0; nodes[1]=n1;};
       
-      //! Simple Destructor
-      ~Edge();
+                                         /**
+                                          * Simple Destructor
+                                          */
+        ~Edge();
       
-      //! The IDs for the end nodes
-      
-      int nodes[2];
-      /** 
-       * Whether the edge has been oriented (0), 
-       * points from node 0 to node 1 (1), 
-       * or the reverse (-1)
-       **/
-      int orientation_flag;
+                                         /**
+                                          * The IDs for the end nodes
+                                          */
+        int nodes[2];
+                                         /** 
+                                          * Whether the edge has been
+                                          * oriented (0), points from
+                                          * node 0 to node 1 (1), or
+                                          * the reverse (-1).
+                                          */
+        int orientation_flag;
 
-      /** 
-       * Used to determine which "sheet" of parallel edges the edge falls in
-       * when oriented. 0 means not yet decided.  
-       **/
-      int group;
+                                         /** 
+                                          * Used to determine which
+                                          * "sheet" of parallel edges
+                                          * the edge falls in when
+                                          * oriented. 0 means not yet
+                                          * decided.
+                                          */
+        int group;
 
-      unsigned int num_neighbouring_cubes;
-      unsigned int * neighbouring_cubes;
-  };
+        unsigned int num_neighbouring_cubes;
+        unsigned int * neighbouring_cubes;
+    };
 
-  //! A conectivity an orientation aware cell
-  /**
-   * The connectivity of the cell is not contained within
-   * (This was for flexability in using deal's ordering of 
-   * edges or the XDA format etc) For this information we 
-   * need the ElemInfo class. 
-   *
-   * One thing we do know is that the first four edges in 
-   * the edge class are parallel, as are the second four, 
-   * and the third four.
-   *
-   * \todo TODO: Need to move conectivity information out 
-   *             of cell and into edge.
-   **/
-  class Cell
-      {
-	public:
-	  int edges[12]; //!< The IDs for each of the edges
-	  int nodes[8];  //!< The IDs for each of the nodes
-	  //! Which way do the edges point.
-	  /**
-	   * Whether node 0 of the edge is the base of 
-	   * the edge in local element (1) or node 1 is 
-	   * the base (-1)
-	   **/
-	  int local_orientation_flags[12]; 
-	  /**
-	   * An internal flag used to determine whether the cell is in the
-	   * queue of cells to be orriented in the current sheet. 
-	   **/
-	  bool waiting_to_be_processed;  
+                                     /**
+                                      * A connectivity and orientation
+                                      * aware cell.
+                                      *
+                                      * The connectivity of the cell
+                                      * is not contained within. (This
+                                      * was for flexibility in using
+                                      * deal.II's ordering of edges or
+                                      * the XDA format etc.) For this
+                                      * information we need the
+                                      * ElemInfo class.
+                                      *
+                                      * One thing we do know is that
+                                      * the first four edges in the
+                                      * edge class are parallel, as
+                                      * are the second four, and the
+                                      * third four.
+                                      *
+                                      * TODO: Need to move conectivity information out 
+                                      *       of cell and into edge.
+                                      */
+    class Cell
+    {
+      public:
+                                         /**
+                                          * The IDs for each of the edges.
+                                          */
+        int edges[12];
+        
+                                         /**
+                                          * The IDs for each of the nodes.
+                                          */        
+        int nodes[8];  
 
-	  //! Copy Constructor
-	  Cell(const Cell& c)
+                                         /**
+                                          * Which way do the edges
+                                          * point.  Whether node 0 of
+                                          * the edge is the base of
+                                          * the edge in local element
+                                          * (1) or node 1 is the base
+                                          * (-1).
+                                          */
+        int local_orientation_flags[12];
+        
+                                         /**
+                                          * An internal flag used to
+                                          * determine whether the cell
+                                          * is in the queue of cells
+                                          * to be oriented in the
+                                          * current sheet.
+                                          */
+        bool waiting_to_be_processed;  
+
+                                         /**
+                                          * Copy Constructor
+                                          */
+        Cell (const Cell &c)
 	  {
 	    for(int i=0;i<12;++i)
-	    {
-	      edges[i]=c.edges[i];
-	      local_orientation_flags[i]=c.local_orientation_flags[i];
-	    }
+              {
+                edges[i]=c.edges[i];
+                local_orientation_flags[i]=c.local_orientation_flags[i];
+              }
 	    for(int i=0;i<8;++i)
-	    {
-	      nodes[i]=c.nodes[i];
-	    }
+              {
+                nodes[i]=c.nodes[i];
+              }
 	    waiting_to_be_processed=c.waiting_to_be_processed;
 	  }
 
-	  //! Default Constructor
-	  Cell()
+                                         /**
+                                          * Default Constructor
+                                          */
+        Cell()
 	  {
 	    for(int i=0;i<12;++i)
-	    {
-	      edges[i]=-1;
-	      local_orientation_flags[i]=1;
-	    }
+              {
+                edges[i]=-1;
+                local_orientation_flags[i]=1;
+              }
 	    for(int i=0;i<8;++i)
-	    {
-	      nodes[i]=-1;
-	    }
+              {
+                nodes[i]=-1;
+              }
 	    waiting_to_be_processed=false;
 	  }
-      };
+    };
 
 
-  //! This holds all the pieces for orientation together..
-  /**
-   * Contains lists of nodes, edges and cells. 
-   * As well as the information about how they all connect together.
-   **/
-  class Mesh
-  {
-    public:
-      //! Information about how a cell is built up from nodes and edges.
-      const ElementInfo & info;
+                                     /**
+                                      * This holds all the pieces for
+                                      * orientation together.
+                                      * 
+                                      * Contains lists of nodes, edges
+                                      * and cells.  As well as the
+                                      * information about how they all
+                                      * connect together.
+                                      */
+    class Mesh
+    {
+      public:
+                                         /**
+                                          * Information about how a
+                                          * cell is built up from
+                                          * nodes and edges.
+                                          */
+        const ElementInfo & info;
       
-      //! The list of nodes
-      std::vector< Point<3> > node_list;
-      //! The list of edges 
-      std::vector<Edge> edge_list;
-      //! The list of cells
-      std::vector<Cell> cell_list;
+                                         /**
+                                          * The list of nodes
+                                          */
+        std::vector< Point<3> > node_list;
+                                         /**
+                                          * The list of edges 
+                                          */
+        std::vector<Edge> edge_list;
+                                         /**
+                                          * The list of cells
+                                          */
+        std::vector<Cell> cell_list;
 
-      //! Checks whether every cell in the mesh is sensible
-      /**
-       * By calling sanity_check(cell_num) on every cell.
-       **/
-      bool sanity_check() const;
-      //! Checks that every node matches with its edges
-      /**
-       * By calling sanity_check(cell_num,node_num) for each node
-       **/
-      bool sanity_check(int cell_num) const;
-      //! Checks that each edge going into a node is correctly setup
-      bool sanity_check_node(int cell_num, int i) const;
+                                         /**
+                                          * Checks whether every cell
+                                          * in the mesh is sensible. By
+                                          * calling
+                                          * sanity_check(cell_num) on
+                                          * every cell.
+                                          */
+        bool sanity_check() const;
+        
+                                         /**
+                                          * Checks that every node
+                                          * matches with its edges. By
+                                          * calling
+                                          * sanity_check(cell_num,node_num)
+                                          * for each node.
+                                          */
+        bool sanity_check(int cell_num) const;
+        
+                                         /**
+                                          * Checks that each edge
+                                          * going into a node is
+                                          * correctly setup.
+                                          */
+        bool sanity_check_node(int cell_num, int i) const;
 
-      //! Default Constructor
-      Mesh(const ElementInfo & INFO): info(INFO) { }
+                                         /**
+                                          * Default Constructor
+                                          */
+        Mesh(const ElementInfo & INFO): info(INFO) { }
 
-      //! Prints all information about the mesh
-      void dump() const;
-      //! Prints all information about the cell
-      void dump_cell(const Cell &c) const;
-      //! Writes edge information to a file.
-      void dump_edges(char const * const fname) const;
+                                         /**
+                                          * Prints all information
+                                          * about the mesh
+                                          */
+        void dump() const;
+        
+                                         /**
+                                          * Prints all information
+                                          * about the cell
+                                          */
+        void dump_cell(const Cell &c) const;
 
-    private:
-      //! Unimplemented private copy constructor to disable it.
-      Mesh(const Mesh&);
-      //! Unimplemented private assignemnet operator to disable it.
-      Mesh& operator=(const Mesh&);
-  };
+                                         /**
+                                          * Writes edge information to
+                                          * a file.
+                                          */
+        void dump_edges(char const * const fname) const;
+
+      private:
+                                         /**
+                                          * Unimplemented private copy
+                                          * constructor to disable it.
+                                          */
+        Mesh(const Mesh&);
+                                         /**
+                                          * Unimplemented private
+                                          * assignemnet operator to
+                                          * disable it.
+                                          */
+        Mesh& operator=(const Mesh&);
+    };
 
 
     class Orienter
-  {
-    public:
+    {
+      public:
+                                         /**
+                                          * Constructor.
+                                          */
+        Orienter()
+          {
+            for (unsigned int i=0; i<12; ++i)
+              edge_orient_array[i]=false;
+          }
 
-      Orienter()
-      {
-	for(int i=0;i<12;++i)
-	  edge_orient_array[i]=false;
-      }
 
-      //The cube we're looking at now.
-      unsigned int cur_posn; 
-      //We have fully oriented all cubes before this one.
-      unsigned int marker_cube;
+                                         /**
+                                          * The cube we're looking at now.
+                                          */
+        unsigned int cur_posn;
+        
+                                         /**
+                                          * We have fully oriented all
+                                          * cubes before this one.
+                                          */
+        unsigned int marker_cube;
 
-      std::vector<int> SheetToProcess;
+        std::vector<int> SheetToProcess;
 
-      int cur_edge_group;
+        int cur_edge_group;
 
-      bool edge_orient_array[12];
+        bool edge_orient_array[12];
       
-      bool orient_edges(Mesh &m);
-      void orient_cubes(Mesh &m);
+        bool orient_edges (Mesh &m);
+        void orient_cubes (Mesh &m);
       
-      bool GetNextUnorientedCube(Mesh &m);
-      bool is_oriented(const Mesh &m, int cell_num);
+        bool GetNextUnorientedCube (Mesh &m);
+        bool is_oriented (const Mesh &m,
+                          int cell_num);
 
-      bool OrientEdgesInCurrentCube(Mesh &m);
-      bool OrientEdgeSetInCurrentCube(Mesh &m, int edge_set);
-      bool OrientNextUnorientedEdge(Mesh &m);
-      bool Consistant(Mesh &m, int cell_num);
-
-
-      void GetAdjacentCubes(Mesh &m);
-      bool GetNextActiveCube(Mesh &m);
-
-      bool CheckCellEdgeGroupConsistancy(const Mesh &m, const Cell &c) const;
-      bool CheckCellEdgeGroupConsistancy(const Mesh &m, const Cell & c, int egrp) const;
-
-  };
+        bool OrientEdgesInCurrentCube (Mesh &m);
+        bool OrientEdgeSetInCurrentCube (Mesh &m,
+                                         int edge_set);
+        bool OrientNextUnorientedEdge (Mesh &m);
+        bool Consistant (Mesh &m,
+                         int cell_num);
 
 
-  //! Creates the connectivity information for the mesh m.
-  void build_mesh(Mesh &m);
+        void GetAdjacentCubes (Mesh &m);
+        bool GetNextActiveCube (Mesh &m);
+
+        bool CheckCellEdgeGroupConsistancy (const Mesh &m,
+                                            const Cell &c) const;
+        
+        bool CheckCellEdgeGroupConsistancy (const Mesh &m,
+                                            const Cell & c,
+                                            int egrp) const;
+
+    };
+
+
+                                     /**
+                                      * Creates the connectivity
+                                      * information for the mesh m.
+                                      */
+    void build_mesh (Mesh &m);
 
 
     
