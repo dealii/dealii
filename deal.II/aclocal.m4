@@ -2000,6 +2000,59 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_TEMPLATE_TYPEDEF_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl gcc 2.95 does not correctly implement the resolution of 
+dnl defect report #45 to the C++ standard (see
+dnl http://anubis.dkuug.dk/jtc1/sc22/wg21/docs/cwg_active.html#45).
+dnl try to detect this, and set a flag correspondingly. in short,
+dnl the DR says that this is allowed, since member classes are
+dnl implicitly also friends:
+dnl -----------------------------
+dnl class X {
+dnl     static int i;
+dnl    
+dnl     struct Y {
+dnl         int f() { return i; };
+dnl     };
+dnl };
+dnl -----------------------------
+dnl
+dnl We work around this problem, if we encounter it.
+dnl
+dnl Usage: DEAL_II_CHECK_NESTED_CLASS_FRIEND_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_NESTED_CLASS_FRIEND_BUG, dnl
+[
+  AC_MSG_CHECKING(for nested classes are implicit friends bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	class X {
+	    static int i;
+   
+	    struct Y {
+	        int f() { return i; };
+	    };
+	};
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_NESTED_CLASS_FRIEND_BUG, 1, 
+                     [Defined if the compiler does not properly implement
+                      the resolution of defect report #45 to the C++
+                      standard, which makes nested types implicit friends
+                      of the enclosing class.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Many compilers get this wrong (see Section 14.7.3.1, number (4)):
 dnl ---------------------------------
 dnl   template <int dim> struct T {
