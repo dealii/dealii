@@ -304,7 +304,9 @@ SolverQMRS<VECTOR>::iterate(const MATRIX& A,
 				   // Apply right preconditioning to x
   precondition.vmult(q,x);  
 				   // Preconditioned residual
-  res = A.residual(v, q, b);
+  A.vmult(v,q);
+  v.sadd(-1.,1.,b);
+  res = v.l2_norm();
 
   if (control().check(step, res) == SolverControl::success)
     return success;
@@ -352,7 +354,11 @@ while (state == SolverControl::iterate)
       print_vectors(step,x,v,d);
 				       // Step 5
       if (additional_data.exact_residual)
-	res = A.residual(q,x,b);
+	{
+	  A.vmult(q,x);
+	  q.sadd(-1.,1.,b);
+	  res = q.l2_norm();
+	}
       else
 	res = sqrt((it+1)*tau);
       state = control().check(step,res);

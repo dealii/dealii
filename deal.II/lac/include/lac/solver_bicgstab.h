@@ -241,7 +241,10 @@ template <class MATRIX>
 double
 SolverBicgstab<VECTOR>::criterion (const MATRIX& A, const VECTOR& x, const VECTOR& b)
 {
-  res = A.residual(*Vt, x, b);
+  A.vmult(*Vt, x);
+  Vt->sadd(-1.,1.,b);
+  res = Vt->l2_norm();
+  
   return res;
 }
 
@@ -252,7 +255,10 @@ template <class MATRIX>
 SolverControl::State
 SolverBicgstab<VECTOR>::start(const MATRIX& A)
 {
-  res = A.residual(*Vr, *Vx, *Vb);
+  A.vmult(*Vr, *Vx);
+  Vr->sadd(-1.,1.,*Vb);
+  res = Vr->l2_norm();
+  
   Vp->reinit(*Vx);
   Vv->reinit(*Vx);
   Vrbar->equ(1.,*Vr);

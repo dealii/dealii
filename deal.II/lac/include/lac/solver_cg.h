@@ -199,8 +199,11 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
 				   // library
   int  it=0;
   double res,gh,alpha,beta;
- 
-  res = A.residual(g,x,b);
+
+  A.vmult(g,x);
+  g.sadd(-1.,1.,b);
+  res = g.l2_norm();
+  
   conv = control().check(0,res);
   if (conv) 
     {

@@ -279,10 +279,12 @@ unsigned int dim = 0;
       
       if (left_precondition)
 	{
-	  A.residual(p,x,b);
+	  A.vmult(p,x);
+	  p.sadd(-1.,1.,b);
 	  precondition.vmult(v,p);
 	} else {
-	  A.residual(v,x,b);
+	  A.vmult(v,x);
+	  v.sadd(-1.,1.,b);
 	};
  
       double rho = v.l2_norm();
