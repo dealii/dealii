@@ -96,14 +96,16 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 	  if (c==0)
 	  {
 	    dofs_subcell[c](j,k) = ((k+j) % 2 == 0) ? 
-	      std::pow(.5,k)*factor : -std::pow(.5,k)*factor;
-	    dofs_cell[c](j,k) = std::pow(2.,j)*factor;
+                                   std::pow(.5,static_cast<double>(k))*factor :
+                                   -std::pow(.5,static_cast<double>(k))*factor;
+	    dofs_cell[c](j,k) = std::pow(2.,static_cast<double>(j))*factor;
 	  }
 	  else
 	  {
-	    dofs_subcell[c](j,k) = std::pow(.5,k)*factor;
+	    dofs_subcell[c](j,k) = std::pow(.5,static_cast<double>(k))*factor;
 	    dofs_cell[c](j,k) = ((k+j) % 2 == 0) ? 
-	      std::pow(2.,j)*factor : -std::pow(2.,j)*factor;
+                                std::pow(2.,static_cast<double>(j))*factor :
+                                -std::pow(2.,static_cast<double>(j))*factor;
 	  }
 	}
       }
