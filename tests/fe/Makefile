@@ -24,6 +24,7 @@ default: run-tests
 
 derivatives.exe         : derivatives.go         $(libraries)
 fe_data_test.exe        : fe_data_test.go        $(libraries)
+fe_tools_test.exe       : fe_tools_test.go       $(libraries)
 fe_traits.exe           : fe_traits.go           $(libraries)
 internals.exe           : internals.go           $(libraries)
 mapping.exe             : mapping.go             $(libraries)
@@ -33,9 +34,8 @@ non_primitive_1.exe     : non_primitive_1.go     $(libraries)
 numbering.exe           : numbering.go           $(libraries)
 shapes.exe              : shapes.go              $(libraries)
 
-tests = derivatives fe_data_test fe_traits internals \
-        mapping mapping_c1 mapping_q1_eulerian  \
-        non_primitive_1 numbering shapes 
+tests = derivatives fe_data_test fe_traits fe_tools_test mapping \
+        mapping_c1 shapes numbering mapping_q1_eulerian internals
 
 ############################################################
 
