@@ -49,6 +49,7 @@ grid_tools.exe               : grid_tools.g.$(OBJEXT)        $(lib-1d) $(lib-2d)
 subdomain_ids.exe            : subdomain_ids.g.$(OBJEXT)     $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 filtered_iterator.exe        : filtered_iterator.g.$(OBJEXT)           $(lib-2d)           $(libraries)
 grid_in.exe                  : grid_in.g.$(OBJEXT)                     $(lib-2d)           $(libraries)
+grid_in_3d.exe               : grid_in_3d.g.$(OBJEXT)                            $(lib-3d) $(libraries)
 
 
 tests = $(sort \
@@ -57,7 +58,7 @@ tests = $(sort \
           matrices error_estimator intergrid_constraints intergrid_map \
           wave-test-3 dof_renumbering support_point_map filtered_matrix \
 	  boundaries sparsity_pattern grid_tools subdomain_ids \
-	  filtered_iterator grid_out grid_in)
+	  filtered_iterator grid_out grid_in grid_in_3d)
 
 ############################################################
 
