@@ -270,7 +270,7 @@ class SymmetricTensor<2,dim>
 				      *  instead since this does not need the
 				      *  creation of a temporary.
 				      */
-    SymmetricTensor   operator + (const SymmetricTensor &) const;
+    SymmetricTensor   operator + (const SymmetricTensor &s) const;
 
 				     /**
 				      *  Subtract two tensors. If possible,
@@ -278,7 +278,7 @@ class SymmetricTensor<2,dim>
 				      *  instead since this does not need the
 				      *  creation of a temporary.
 				      */
-    SymmetricTensor   operator - (const SymmetricTensor &) const;
+    SymmetricTensor   operator - (const SymmetricTensor &s) const;
 
 				     /**
 				      * Unary minus operator. Negate all
@@ -286,6 +286,18 @@ class SymmetricTensor<2,dim>
 				      */
     SymmetricTensor   operator - () const;
 
+                                     /**
+                                      * Scalar product between two symmetric
+                                      * tensors. It is the contraction
+                                      * <tt>a<sub>ij</sub>b<sub>ij</sub></tt>
+                                      * over all indices <tt>i,j</tt>. While
+                                      * it is possible to define other scalar
+                                      * products (and associated induced
+                                      * norms), this one seems to be the most
+                                      * appropriate one.
+                                      */
+    double operator * (const SymmetricTensor &s) const;
+    
                                      /**
                                       * Access the elements of a row of this
                                       * symmetric tensor. This function is
@@ -305,7 +317,9 @@ class SymmetricTensor<2,dim>
                                      /**
                                       * Return the Frobenius-norm of a tensor,
                                       * i.e. the square root of the sum of
-                                      * squares of all entries.
+                                      * squares of all entries. This norm is
+                                      * induced by the scalar product defined
+                                      * above for two symmetric tensors.
                                       */
     double norm () const;
     
@@ -583,6 +597,23 @@ SymmetricTensor<2,dim>::memory_consumption ()
   return StorageType::memory_consumption ();
 }
 
+
+
+template <int dim>
+double
+SymmetricTensor<2,dim>::operator * (const SymmetricTensor &s) const
+{
+  double t = 0;
+  unsigned int i=0;
+  for (; i<dim; ++i)
+    t += data[i] * s.data[i];
+
+  for (; i<n_tensor_components; ++i)
+    t += 2 * data[i] * s.data[i];
+
+  return t;
+}
+  
 
 
 template <int dim>
