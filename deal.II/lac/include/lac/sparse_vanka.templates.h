@@ -116,7 +116,8 @@ SparseVanka<number>::compute_inverses ()
         };
       blocking[n_threads-1].second = matrix->m();
 
-      typedef void (SparseVanka<number>::*FunPtr)(unsigned int, unsigned int);
+      typedef void (SparseVanka<number>::*FunPtr)(const unsigned int,
+                                                  const unsigned int);
       FunPtr fun_ptr = &SparseVanka<number>::compute_inverses;
   
                                        // Now spawn the threads
