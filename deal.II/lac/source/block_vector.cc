@@ -16,3 +16,13 @@
 // explicit instantiations
 template class BlockVector<double>;
 template class BlockVector<float>;
+
+namespace BlockVectorIterators
+{
+  template class Iterator<double,false>;
+  template class Iterator<double,true>;
+
+  template class Iterator<float,false>;
+  template class Iterator<float,true>;
+};
+

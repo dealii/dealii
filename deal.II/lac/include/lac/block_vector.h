@@ -19,12 +19,560 @@
 #include <base/exceptions.h>
 #include <cstdio>
 #include <vector>
+#include <iterator>
+
+
+// forward declaration
+template <typename Number>
+class BlockVector;
 
 
 /**
- * Several vectors of data. 
+ * Namespace in which iterators in block vectors are implemented.
  *
- * The BlockVector is a collection of normal LAC-@p{Vector}s. Each of
+ * @author Wolfgang Bangerth, 2001
+ */
+namespace BlockVectorIterators
+{
+				   /**
+				    * Declaration of the general
+				    * template of a structure which is
+				    * used to determine some types
+				    * based on the template arguments
+				    * of other classes.
+				    */
+  template <typename number, bool constness>
+  struct Types
+  {};
+
+
+  
+				   /**
+				    * Declaration of a specialized
+				    * template of a structure which is
+				    * used to determine some types
+				    * based on the template arguments
+				    * of other classes.
+				    *
+				    * This is for the use of non-const
+				    * iterators.
+				    */
+  template <typename number>
+  struct Types<number,false>
+  {
+				       /**
+					* Type of the vector
+					* underlying the block vector
+					* used in non-const
+					* iterators. There, the
+					* vector must not be constant.
+					*/
+      typedef Vector<number>      Vector;
+
+				       /**
+					* Type of the block vector
+					* used in non-const
+					* iterators. There, the block
+					* vector must not be constant.
+					*/
+      typedef BlockVector<number> BlockVector;
+
+				       /**
+					* Type of the numbers we point
+					* to. Here, they are not
+					* constant.
+					*/
+      typedef number              NumberType;
+  };
+
+
+  
+				   /**
+				    * Declaration of a specialized
+				    * template of a structure which is
+				    * used to determine some types
+				    * based on the template arguments
+				    * of other classes.
+				    *
+				    * This is for the use of
+				    * @p{const_iterator}s.
+				    */
+  template <typename number>
+  struct Types<number,true>
+  {
+				       /**
+					* Type of the vector
+					* underlying the block vector
+					* used in
+					* @p{const_iterators}. There,
+					* the vector must be
+					* constant.
+					*/
+      typedef const Vector<number>      Vector;
+
+				       /**
+					* Type of the block vector
+					* used in
+					* @p{const_iterator}s. There,
+					* the block vector must be
+					* constant.
+					*/
+      typedef const BlockVector<number> BlockVector;
+
+				       /**
+					* Type of the numbers we point
+					* to. Here, they are constant
+					* since the block vector we
+					* use is constant.
+					*/
+      typedef const number              NumberType;
+  };
+
+
+				   /**
+				    * General random-access iterator
+				    * class for block vectors. Since
+				    * we do not want to have two
+				    * classes for non-const
+				    * @p{iterator}s and
+				    * @p{const_iterator}s, we take a
+				    * second template argument which
+				    * denotes whether the vector we
+				    * point into is a constant object
+				    * or not. The first template
+				    * argument is always the number
+				    * type of the block vector in use.
+				    *
+				    * This class satisfies all
+				    * requirements of random access
+				    * iterators defined in the C++
+				    * standard. Operations on these
+				    * iterators are constant in the
+				    * number of elements in the block
+				    * vector. However, they are
+				    * sometimes linear in the number
+				    * of blocks in the vector, but
+				    * since that does rarely change
+				    * dynamically within an
+				    * application, this is a constant
+				    * and we again have that the
+				    * iterator satisfies the
+				    * requirements of a random access
+				    * iterator.
+				    *
+				    * The implementation of this class
+				    * has to work around some problems
+				    * in compilers and standard
+				    * libraries. One of these requires
+				    * us to write all comparison
+				    * operators twice, once comparison
+				    * with iterators of the same type
+				    * and once with iterators pointing
+				    * to numbers of opposite constness
+				    * specification. The reason is
+				    * that if we would have written
+				    * the comparison operators as a
+				    * template on the constness of the
+				    * right hand side, then gcc2.95
+				    * signals an error that these
+				    * operators ambiguate operators
+				    * declared somewhere within the
+				    * standard library. Likewise, we
+				    * have to work around some
+				    * problems with granting other
+				    * iterators friendship. This makes
+				    * the implementation somewhat
+				    * non-optimal at places, but at
+				    * least everything works.
+				    *
+				    * @author Wolfgang Bangerth, 2001
+				    */
+  template <typename number, bool constness>
+  class Iterator :
+#ifdef HAVE_STD_ITERATOR_CLASS  
+               public std::iterator<std::random_access_iterator_tag,
+				    typename Types<number,constness>::NumberType>
+#else
+               random_access_iterator<typename Types<number,constness>::NumberType,int>
+#endif      
+  {
+    private:
+				       /**
+					* Typedef an iterator with
+					* opposite constness
+					* requirements on the elements
+					* it points to.
+					*/
+      typedef Iterator<number,!constness> InverseConstnessIterator;
+
+    public:
+				       /**
+					* Declare some typedefs which
+					* are standard for iterators
+					* and are used by algorithms
+					* to enquire about the
+					* specifics of the iterators
+					* they work on.
+					*/
+      typedef std::random_access_iterator_tag               iterator_type;
+      typedef typename Types<number,constness>::NumberType  value_type;
+      typedef ptrdiff_t                                     difference_type;
+      typedef value_type                                   &reference;
+      typedef value_type                                   *pointer;
+      
+				       /**
+					* Typedef the type of the
+					* block vector (which differs
+					* in constness, depending on
+					* the second template
+					* parameter).
+					*/
+      typedef typename Types<number,constness>::BlockVector BlockVectorType;
+
+				       /**
+					* Type of the number this
+					* iterator points
+					* to. Depending on the value
+					* of the second template
+					* parameter, this is either a
+					* constant or non-const
+					* number.
+					*/
+      typedef typename Types<number,constness>::NumberType NumberType;
+	
+				       /**
+					* Construct an iterator from
+					* a vector to which we point
+					* and the global index of
+					* the element pointed to.
+					*
+					* Depending on the value of
+					* the @p{constness} template
+					* argument of this class,
+					* the first argument of this
+					* constructor is either is a
+					* @p{const} or non-@p{const}
+					* reference.
+					*/
+      Iterator (BlockVectorType    &parent,
+		const unsigned int  global_index);
+	
+				       /**
+					* Copy constructor.
+					*/
+      Iterator (const Iterator<number,constness> &c);
+
+				       /**
+					* Copy constructor for
+					* conversion between iterators
+					* with different constness
+					* requirements. This
+					* constructor throws an error
+					* if an attempt is made at
+					* converting a constant to a
+					* non-constant iterator.
+					*/
+      template <bool constness2>
+      Iterator (const Iterator<number,constness2> &c);
+
+    private:
+				       /**
+					* Constructor used internally
+					* in this class. The arguments
+					* match exactly the values of
+					* the respective member
+					* variables.
+					*/
+      Iterator (BlockVectorType    &parent,
+		const unsigned int  global_index,
+		const unsigned int  current_block,
+		const unsigned int  index_within_block,
+		const unsigned int  next_break_forward,
+		const unsigned int  next_break_backward);
+      
+    public:
+      
+				       /**
+					* Copy operator.
+					*/
+      Iterator & operator = (const Iterator &c);
+
+				       /**
+					* Dereferencing operator. If
+					* the template argument
+					* @p{constness} is @p{true},
+					* then no writing to the
+					* result is possible, making
+					* this a @p{const_iterator}.
+					*/
+      reference operator * () const;
+
+				       /**
+					* Dereferencing operator. If
+					* the template argument
+					* @p{constness} is @p{true},
+					* then no writing to the
+					* result is possible, making
+					* this a @p{const_iterator}.
+					*/ 
+      pointer operator -> () const;
+
+				       /**
+					* Random access operator,
+					* grant access to arbitrary
+					* elements relative to the one
+					* presently pointed to.
+					*/
+      reference operator [] (const difference_type d) const;
+      
+				       /**
+					* Prefix @p{++} operator:
+					* @p{++i}. This operator
+					* advances the iterator to
+					* the next element and
+					* returns a reference to
+					* @p{*this}.
+					*/
+      Iterator & operator ++ ();
+
+				       /**
+					* Postfix @p{++} operator:
+					* @p{i++}. This operator
+					* advances the iterator to
+					* the next element and
+					* returns a copy of the old
+					* value of this iterator.
+					*/
+      Iterator operator ++ (int);
+
+				       /**
+					* Prefix @p{--} operator:
+					* @p{--i}. This operator
+					* retracts the iterator to
+					* the previous element and
+					* returns a reference to
+					* @p{*this}.
+					*/
+      Iterator & operator -- ();
+
+				       /**
+					* Postfix @p{--} operator:
+					* @p{i--}. This operator
+					* retracts the iterator to
+					* the previous element and
+					* returns a copy of the old
+					* value of this iterator.
+					*/
+      Iterator operator -- (int);
+
+				       /**
+					* Compare for equality of
+					* iterators. This operator
+					* checks whether the vectors
+					* pointed to are the same,
+					* and if not it throws an
+					* exception.					 
+					*/
+      bool operator == (const Iterator &i) const;
+      
+				       /**
+					* Same, but compare with an
+					* iterator of different
+					* constness.
+					*/
+      bool operator == (const InverseConstnessIterator &i) const;
+
+				       /**
+					* Compare for inequality of
+					* iterators. This operator
+					* checks whether the vectors
+					* pointed to are the same,
+					* and if not it throws an
+					* exception.					 
+					*/
+      bool operator != (const Iterator &i) const;
+
+				       /**
+					* Same, but compare with an
+					* iterator of different
+					* constness.
+					*/
+      bool operator != (const InverseConstnessIterator &i) const;      
+
+				       /**
+					* Check whether this
+					* iterators points to an
+					* element previous to the
+					* one pointed to by the
+					* given argument. This
+					* operator checks whether
+					* the vectors pointed to are
+					* the same, and if not it
+					* throws an exception.
+					*/
+      bool operator < (const Iterator &i) const;
+
+				       /**
+					* Same, but compare with an
+					* iterator of different
+					* constness.
+					*/
+      bool operator < (const InverseConstnessIterator &i) const;      
+
+				       /**
+					* Comparison operator alike
+					* to the one above.
+					*/
+      bool operator <= (const Iterator &i) const;
+
+				       /**
+					* Same, but compare with an
+					* iterator of different
+					* constness.
+					*/
+      bool operator <= (const InverseConstnessIterator &i) const;      
+
+				       /**
+					* Comparison operator alike
+					* to the one above.
+					*/
+      bool operator > (const Iterator &i) const;
+
+				       /**
+					* Same, but compare with an
+					* iterator of different
+					* constness.
+					*/
+      bool operator > (const InverseConstnessIterator &i) const;      
+
+				       /**
+					* Comparison operator alike
+					* to the one above.
+					*/
+      bool operator >= (const Iterator &i) const;
+
+				       /**
+					* Same, but compare with an
+					* iterator of different
+					* constness.
+					*/
+      bool operator >= (const InverseConstnessIterator &i) const;
+
+				       /**
+					* Return the distance between
+					* the two iterators, in
+					* elements.
+					*/
+      difference_type operator - (const Iterator &i) const;
+
+				       /**
+					* Same, but for iterators of
+					* opposite constness.
+					*/
+      difference_type operator - (const InverseConstnessIterator &i) const;
+
+				       /**
+					* Return an iterator which is
+					* the given number of elements
+					* in front of the present one.
+					*/
+      Iterator operator + (const difference_type &d) const;
+      
+				       /**
+					* Return an iterator which is
+					* the given number of elements
+					* behind the present one.
+					*/
+      Iterator operator - (const difference_type &d) const;
+
+				       /**
+					* Move the iterator @p{d}
+					* elements forward at once,
+					* and return the result.
+					*/
+      Iterator & operator += (const difference_type &d);
+
+				       /**
+					* Move the iterator @p{d}
+					* elements backward at once,
+					* and return the result.
+					*/
+      Iterator & operator -= (const difference_type &d);
+      
+				       /**
+					* Exception.
+					*/
+      DeclException0 (ExcPointerToDifferentVectors);
+				       /**
+					* Exception.
+					*/
+      DeclException0 (ExcCastingAwayConstness);
+	
+    private:
+				       /**
+					* Pointer to the block
+					* vector object to which
+					* this iterator
+					* points. Depending on the
+					* value of the @p{constness}
+					* template argument of this
+					* class, this is a @p{const}
+					* or non-@p{const} pointer.
+					*/
+      BlockVectorType *parent;
+
+				       /**
+					* Global index of the
+					* element to which we
+					* presently point.
+					*/
+      unsigned int     global_index;
+
+				       /**
+					* Current block and index
+					* within this block of the
+					* element presently pointed
+					* to.
+					*/
+      unsigned int current_block;
+      unsigned int index_within_block;
+
+				       /**
+					* Indices of the global
+					* element address at which
+					* we have to move on to
+					* another block when moving
+					* forward and
+					* backward. These indices
+					* are kept as a cache since
+					* this is much more
+					* efficient than always
+					* asking the parent object.
+					*/
+      unsigned int next_break_forward;
+      unsigned int next_break_backward;
+
+				       /**
+					* Move forward one element.
+					*/
+      void move_forward ();
+
+				       /**
+					* Move backward one element.
+					*/
+      void move_backward ();
+
+      friend class InverseConstnessIterator;
+  };
+};
+
+
+
+/**
+ * A vector composed of several blocks each representing a vector of
+ * its own.
+ *
+ * The @p{BlockVector} is a collection of normal LAC-@p{Vector}s. Each of
  * the vectors inside can have a different size. The special case of a
  * block vector with constant block size is supported by constructor
  * and reinit functions.
@@ -50,187 +598,6 @@
 template <typename Number>
 class BlockVector
 {
-    template <typename Pointee>
-    class Iterator
-    {
-      public:
-					 /**
-					  * Construct an iterator from
-					  * a vector to which we point
-					  * and the global index of
-					  * the element pointed to.
-					  */
-	Iterator (BlockVector<Number> &parent,
-		  const unsigned       global_index);
-	
-					 /**
-					  * Copy constructor.
-					  */
-	Iterator (const Iterator &c);
-
-					 /**
-					  * Copy operator.
-					  */
-	Iterator & operator = (const Iterator &c);
-
-					 /**
-					  * Dereferencing operator. If
-					  * the template argument
-					  * @p{Pointee} has a
-					  * @p{const} specification,
-					  * then no writing to the
-					  * result is possible, making
-					  * this a @p{const_iterator}.
-					  */
-	Pointee & operator * () const;
-
-					 /**
-					  * Prefix @p{++} operator:
-					  * @p{++i}. This operator
-					  * advances the iterator to
-					  * the next element and
-					  * returns a reference to
-					  * @p{*this}.
-					  */
-	Iterator & operator ++ ();
-
-					 /**
-					  * Postfix @p{++} operator:
-					  * @p{i++}. This operator
-					  * advances the iterator to
-					  * the next element and
-					  * returns a copy of the old
-					  * value of this iterator.
-					  */
-	Iterator operator ++ (int);
-
-					 /**
-					  * Prefix @p{--} operator:
-					  * @p{--i}. This operator
-					  * retracts the iterator to
-					  * the previous element and
-					  * returns a reference to
-					  * @p{*this}.
-					  */
-	Iterator & operator -- ();
-
-					 /**
-					  * Postfix @p{--} operator:
-					  * @p{i--}. This operator
-					  * retracts the iterator to
-					  * the previous element and
-					  * returns a copy of the old
-					  * value of this iterator.
-					  */
-	Iterator operator -- (int);
-
-					 /**
-					  * Compare for equality of
-					  * iterators. This operator
-					  * checks whether the vectors
-					  * pointed to are the same,
-					  * and if not it throws an
-					  * exception.					 
-					  */
-	bool operator == (const Iterator &i) const;
-
-					 /**
-					  * Compare for inequality of
-					  * iterators. This operator
-					  * checks whether the vectors
-					  * pointed to are the same,
-					  * and if not it throws an
-					  * exception.					 
-					  */
-	bool operator != (const Iterator &i) const;
-
-					 /**
-					  * Check whether this
-					  * iterators points to an
-					  * element previous to the
-					  * one pointed to by the
-					  * given argument. This
-					  * operator checks whether
-					  * the vectors pointed to are
-					  * the same, and if not it
-					  * throws an exception.
-					  */
-	bool operator < (const Iterator &i) const;
-
-					 /**
-					  * Comparison operator alike
-					  * to the one above.
-					  */
-	bool operator <= (const Iterator &i) const;
-
-					 /**
-					  * Comparison operator alike
-					  * to the one above.
-					  */
-	bool operator > (const Iterator &i) const;
-
-					 /**
-					  * Comparison operator alike
-					  * to the one above.
-					  */
-	bool operator >= (const Iterator &i) const;
-	
-					 /**
-					  * Exception.
-					  */
-	DeclException0 (ExcPointerToDifferentVectors);
-
-	
-      private:
-					 /**
-					  * Pointer to the block
-					  * vector object to which
-					  * this iterator points.
-					  */
-	BlockVector<Number> *parent;
-
-					 /**
-					  * Global index of the
-					  * element to which we
-					  * presently point.
-					  */
-	unsigned int         global_index;
-
-					 /**
-					  * Current block and index
-					  * within this block of the
-					  * element presently pointed
-					  * to.
-					  */
-	unsigned int current_block;
-	unsigned int index_within_block;
-
-					 /**
-					  * Indices of the global
-					  * element address at which
-					  * we have to move on to
-					  * another block when moving
-					  * forward and
-					  * backward. These indices
-					  * are kept as a cache since
-					  * this is much more
-					  * efficient than always
-					  * asking the parent object.
-					  */
-	unsigned int next_break_forward;
-	unsigned int next_break_backward;
-
-					 /**
-					  * Move forward one element.
-					  */
-	void move_forward ();
-
-					 /**
-					  * Move backward one element.
-					  */
-	void move_backward ();
-    };
-    
   public:
 				     /**
 				      * Declare standard types used in
@@ -247,8 +614,8 @@ class BlockVector
     typedef Number                  value_type;
     typedef value_type             *pointer;
     typedef const value_type       *const_pointer;
-    typedef Iterator<Number>        iterator;
-    typedef Iterator<const Number>  const_iterator;
+    typedef BlockVectorIterators::Iterator<Number,false> iterator;
+    typedef BlockVectorIterators::Iterator<Number,true>  const_iterator;
     typedef value_type             &reference;
     typedef const value_type       &const_reference;
     typedef size_t                  size_type;
@@ -428,7 +795,7 @@ class BlockVector
 				     /**
 				      * Access to a single block.
 				      */
-    Vector<Number>& block (const unsigned int i);
+    Vector<Number> & block (const unsigned int i);
     
 				     /**
 				      * Read-only access to a single block.
@@ -552,6 +919,18 @@ class BlockVector
 				      */
     const_iterator begin () const;
     
+				     /**
+				      * Return an iterator pointing to
+				      * the element past the end.
+				      */
+    iterator end ();
+
+				     /**
+				      * Return an iterator pointing to
+				      * the element past the end of a
+				      * constant block vector.
+				      */
+    const_iterator end () const;    
 				     //@}
 
 
@@ -748,7 +1127,8 @@ class BlockVector
 				      * Make the iterator class a
 				      * friend.
 				      */
-    template <typename Pointee> friend class Iterator;
+    friend class iterator;
+    friend class const_iterator;
 };
 
 
@@ -859,6 +1239,464 @@ BlockVector<Number>::get_block_indices () const
 {
   return block_indices;
 }
+
+
+namespace BlockVectorIterators
+{
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness>::
+  Iterator (const Iterator<number,constness> &c)
+		  :
+		  parent (c.parent),
+		  global_index (c.global_index),
+		  current_block (c.current_block),
+		  index_within_block (c.index_within_block),
+		  next_break_forward (c.next_break_forward),
+		  next_break_backward (c.next_break_backward)
+  {};
+
+
+
+  template <typename number, bool constness>
+  template <bool constness2>
+  inline
+  Iterator<number,constness>::
+  Iterator (const Iterator<number,constness2> &c)
+		  :
+		  parent (c.parent),
+		  global_index (c.global_index),
+		  current_block (c.current_block),
+		  index_within_block (c.index_within_block),
+		  next_break_forward (c.next_break_forward),
+		  next_break_backward (c.next_break_backward)
+  {
+    Assert (! ((constness==false) && (constness2==true)),
+	    ExcCastingAwayConstness());
+  };
+  
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness>::
+  Iterator (BlockVectorType    &parent,
+	    const unsigned int  global_index,
+	    const unsigned int  current_block,
+	    const unsigned int  index_within_block,
+	    const unsigned int  next_break_forward,
+	    const unsigned int  next_break_backward)
+		  :
+		  parent (&parent),
+		  global_index (global_index),
+		  current_block (current_block),
+		  index_within_block (index_within_block),
+		  next_break_forward (next_break_forward),
+		  next_break_backward (next_break_backward)
+  {
+  };
+  
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness> &
+  Iterator<number,constness>::
+  operator = (const Iterator &c)
+  {
+    parent              = c.parent;
+    global_index        = c.global_index;
+    index_within_block  = c.index_within_block;
+    current_block       = c.current_block;
+    next_break_forward  = c.next_break_forward;
+    next_break_backward = c.next_break_backward;
+
+    return *this;
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  typename Iterator<number,constness>::reference
+  Iterator<number,constness>::operator * () const
+  {
+				     // we might want to return the
+				     // following directly, but if we do
+				     // that we run into a gcc bug where
+				     // it complains that we return a
+				     // reference to a temporary
+    const reference p = parent->block(current_block)(index_within_block);
+    return p;
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  typename Iterator<number,constness>::pointer
+  Iterator<number,constness>::operator -> () const
+  {
+				     // we might want to return the
+				     // following directly, but if we do
+				     // that we run into a gcc bug where
+				     // it complains that we return a
+				     // reference to a temporary
+    const reference p = parent->block(current_block)(index_within_block);
+    return &p;
+  };
+  
+
+
+  template <typename number, bool constness>
+  inline
+  typename Iterator<number,constness>::reference
+  Iterator<number,constness>::operator [] (const difference_type d) const
+  {
+				     // if the index pointed to is
+				     // still within the block we
+				     // currently point into, then we
+				     // can save the computation of
+				     // the block
+    if ((global_index+d >= next_break_backward) &&
+	(global_index+d <= next_break_forward))
+      {
+	const reference p = parent->block(current_block)(index_within_block + d);
+	return p;
+      };
+    
+    
+				     // if the index is not within the
+				     // block of the block vector into
+				     // which we presently point, then
+				     // there is no way: we have to
+				     // search for the block. this can
+				     // be done through the parent
+				     // class as well.
+    const reference p = (*parent)(global_index+d);
+    return p;
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness> &
+  Iterator<number,constness>::operator ++ ()
+  {
+    move_forward ();
+    return *this;
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness>
+  Iterator<number,constness>::operator ++ (int)
+  {
+    const Iterator old_value = *this;
+    move_forward ();
+    return old_value;
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness> &
+  Iterator<number,constness>::operator -- ()
+  {
+    move_backward ();
+    return *this;
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness>
+  Iterator<number,constness>::operator -- (int)
+  {
+    const Iterator old_value = *this;
+    move_backward ();
+    return old_value;
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator == (const Iterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index == i.global_index);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator == (const InverseConstnessIterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index == i.global_index);
+  };
+  
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator != (const Iterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index != i.global_index);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator != (const InverseConstnessIterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index != i.global_index);
+  };
+  
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator < (const Iterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index < i.global_index);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator < (const InverseConstnessIterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index < i.global_index);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator <= (const Iterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index <= i.global_index);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator <= (const InverseConstnessIterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index <= i.global_index);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator > (const Iterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index > i.global_index);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator > (const InverseConstnessIterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index > i.global_index);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator >= (const Iterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index >= i.global_index);
+  };  
+
+
+
+  template <typename number, bool constness>
+  inline
+  bool
+  Iterator<number,constness>::operator >= (const InverseConstnessIterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (global_index >= i.global_index);
+  };  
+
+
+
+  template <typename number, bool constness>
+  inline
+  typename Iterator<number,constness>::difference_type
+  Iterator<number,constness>::operator - (const Iterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (static_cast<signed int>(global_index) -
+	    static_cast<signed int>(i.global_index));
+  };  
+
+
+
+  template <typename number, bool constness>
+  inline
+  typename Iterator<number,constness>::difference_type
+  Iterator<number,constness>::operator - (const InverseConstnessIterator &i) const
+  {
+    Assert (parent == i.parent, ExcPointerToDifferentVectors());
+
+    return (static_cast<signed int>(global_index) -
+	    static_cast<signed int>(i.global_index));
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness>
+  Iterator<number,constness>::operator + (const difference_type &d) const
+  {
+				     // if the index pointed to is
+				     // still within the block we
+				     // currently point into, then we
+				     // can save the computation of
+				     // the block
+    if ((global_index+d >= next_break_backward) &&
+	(global_index+d <= next_break_forward))
+      return Iterator (*parent, global_index+d, current_block,
+		       index_within_block+d,
+		       next_break_forward, next_break_backward);
+    else
+				       // outside present block, so
+				       // have to seek new block
+				       // anyway
+      return Iterator (*parent, global_index+d);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness>
+  Iterator<number,constness>::operator - (const difference_type &d) const
+  {
+				     // if the index pointed to is
+				     // still within the block we
+				     // currently point into, then we
+				     // can save the computation of
+				     // the block
+    if ((global_index-d >= next_break_backward) &&
+	(global_index-d <= next_break_forward))
+      return Iterator (*parent, global_index-d, current_block,
+		       index_within_block-d,
+		       next_break_forward, next_break_backward);
+    else
+				       // outside present block, so
+				       // have to seek new block
+				       // anyway
+      return Iterator (*parent, global_index-d);
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness> &
+  Iterator<number,constness>::operator += (const difference_type &d)
+  {
+				     // if the index pointed to is
+				     // still within the block we
+				     // currently point into, then we
+				     // can save the computation of
+				     // the block
+    if ((global_index+d >= next_break_backward) &&
+	(global_index+d <= next_break_forward))
+      {
+	global_index       += d;
+	index_within_block += d;
+      }
+    else
+				       // outside present block, so
+				       // have to seek new block
+				       // anyway
+      *this = Iterator (*parent, global_index+d);
+
+    return *this;
+  };
+
+
+
+  template <typename number, bool constness>
+  inline
+  Iterator<number,constness> &
+  Iterator<number,constness>::operator -= (const difference_type &d)
+  {
+				     // if the index pointed to is
+				     // still within the block we
+				     // currently point into, then we
+				     // can save the computation of
+				     // the block
+    if ((global_index-d >= next_break_backward) &&
+	(global_index-d <= next_break_forward))
+      {
+	global_index       -= d;
+	index_within_block -= d;
+      }
+    else
+				       // outside present block, so
+				       // have to seek new block
+				       // anyway
+      *this = Iterator (*parent, global_index-d);
+
+    return *this;
+  };
+  
+};
 
 
 /**
