@@ -60,8 +60,9 @@
  *
  * @author Wolfgang Bangerth
  */
-template<class Matrix, class VECTOR>
-class SolverGMRES : public Solver<Matrix, VECTOR>
+template <class MATRIX = SparseMatrix<double>,
+          class VECTOR = Vector<double> >
+class SolverGMRES : public Solver<MATRIX, VECTOR>
 {
   public:
     				     /**
@@ -98,7 +99,7 @@ class SolverGMRES : public Solver<Matrix, VECTOR>
 				      * Solver method.
 				      */
     template<class Preconditioner>
-    typename Solver<Matrix,VECTOR>::ReturnState solve (const Matrix &A,
+    typename Solver<MATRIX,VECTOR>::ReturnState solve (const MATRIX &A,
 						       VECTOR       &x,
 						       const VECTOR &b,
 						       const Preconditioner& precondition);
@@ -139,11 +140,11 @@ class SolverGMRES : public Solver<Matrix, VECTOR>
 /* --------------------- Inline and template functions ------------------- */
 
 
-template <class Matrix, class VECTOR>
-SolverGMRES<Matrix,VECTOR>::SolverGMRES (SolverControl        &cn,
+template <class MATRIX, class VECTOR>
+SolverGMRES<MATRIX,VECTOR>::SolverGMRES (SolverControl        &cn,
 					 VectorMemory<VECTOR> &mem,
 					 const AdditionalData &data) :
-		Solver<Matrix,VECTOR> (cn,mem),
+		Solver<MATRIX,VECTOR> (cn,mem),
 		additional_data(data)
 {
   Assert (additional_data.max_n_tmp_vectors >= 10, 
@@ -152,10 +153,10 @@ SolverGMRES<Matrix,VECTOR>::SolverGMRES (SolverControl        &cn,
 
 
 
-template <class Matrix, class VECTOR>
+template <class MATRIX, class VECTOR>
 inline
 void
-SolverGMRES<Matrix,VECTOR>::givens_rotation (Vector<double> &h,
+SolverGMRES<MATRIX,VECTOR>::givens_rotation (Vector<double> &h,
 					     Vector<double> &b,
 					     Vector<double> &ci,
 					     Vector<double> &si, 
@@ -181,10 +182,10 @@ SolverGMRES<Matrix,VECTOR>::givens_rotation (Vector<double> &h,
 
 
 
-template<class Matrix, class VECTOR>
+template<class MATRIX, class VECTOR>
 template<class Preconditioner>
-typename Solver<Matrix,VECTOR>::ReturnState
-SolverGMRES<Matrix,VECTOR>::solve (const Matrix& A,
+typename Solver<MATRIX,VECTOR>::ReturnState
+SolverGMRES<MATRIX,VECTOR>::solve (const MATRIX& A,
 				   VECTOR      & x,
 				   const VECTOR& b,
 				   const Preconditioner& precondition)
@@ -396,9 +397,9 @@ SolverGMRES<Matrix,VECTOR>::solve (const Matrix& A,
   
 
 
-template<class Matrix, class VECTOR>
+template<class MATRIX, class VECTOR>
 double
-SolverGMRES<Matrix,VECTOR>::criterion () 
+SolverGMRES<MATRIX,VECTOR>::criterion () 
 {
 				   // dummy implementation. this function is
 				   // not needed for the present implementation

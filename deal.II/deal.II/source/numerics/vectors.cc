@@ -412,11 +412,11 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
     MatrixTools<dim>::apply_boundary_values (boundary_values,
 					     mass_matrix, vec, tmp);
 
-  SolverControl                    control(1000,1e-16);
-  PrimitiveVectorMemory<Vector<double> >   memory;
-  SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
+  SolverControl           control(1000,1e-16);
+  PrimitiveVectorMemory<> memory;
+  SolverCG<>              cg(control,memory);
 
-  PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
+  PreconditionRelaxation<>
     prec(mass_matrix,
 	 &SparseMatrix<double>::template precondition_SSOR<double>,
 	 1.2);
@@ -684,11 +684,11 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   
   Vector<double> boundary_projection (rhs.size());
 
-  SolverControl                    control(1000, 1e-16);
-  PrimitiveVectorMemory<Vector<double> >   memory;
-  SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
+  SolverControl           control(1000, 1e-16);
+  PrimitiveVectorMemory<> memory;
+  SolverCG<>              cg(control,memory);
 
-  PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
+  PreconditionRelaxation<>
     prec(mass_matrix,
 	 &SparseMatrix<double>::template precondition_SSOR<double>,
 	 1.2);

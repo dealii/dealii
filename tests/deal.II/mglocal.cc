@@ -116,9 +116,9 @@ int main()
 
 	  Vector<double> u;
 	  u.reinit(f);
-	  PrimitiveVectorMemory<Vector<double> > mem;
+	  PrimitiveVectorMemory<> mem;
 	  SolverControl control(20, 1.e-12, true);
-	  SolverRichardson<SparseMatrix<double>, Vector<double> >solver(control, mem);
+	  SolverRichardson<> solver(control, mem);
 	  
 	  vector<SparseMatrixStruct> mgstruct(tr.n_levels());
 	  MGMatrix<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
@@ -134,11 +134,10 @@ int main()
 	  equation.build_mgmatrix(mgA, mgdof, quadrature);
 	  
 	  SolverControl cgcontrol(20,0., false, false);
-	  PrimitiveVectorMemory<Vector<double> > cgmem;
-	  SolverCG<SparseMatrix<double>, Vector<double> > cgsolver(cgcontrol, cgmem);
+	  PrimitiveVectorMemory<> cgmem;
+	  SolverCG<> cgsolver(cgcontrol, cgmem);
 	  PreconditionIdentity cgprec;
-	  MGCoarseGridLACIteration<SolverCG<SparseMatrix<double>, Vector<double> >,
-	    SparseMatrix<double>, PreconditionIdentity>
+	  MGCoarseGridLACIteration<SolverCG<>, SparseMatrix<double>, PreconditionIdentity>
 	    coarse(cgsolver, mgA[tr.n_levels()-2], cgprec);
 	  
 	  MGSmootherRelaxation<double>
@@ -151,7 +150,7 @@ int main()
 	  
 	  
 	  MG<2> multigrid(mgdof, hanging_nodes, mgA, transfer, tr.n_levels()-2);
-	  PreconditionMG<MG<2>, Vector<double> >
+	  PreconditionMG<MG<2> >
 	    mgprecondition(multigrid, smoother, smoother, coarse);
 
 	   u = 0.;

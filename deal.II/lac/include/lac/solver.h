@@ -6,16 +6,14 @@
 
 
 
-// forward declaration
-class SolverControl;
-template <class Vector> class VectorMemory;
+#include <lac/forward-declarations.h>
 
 
 
 /**
  * Base class for iterative solvers.
  *
- * HAS TO BE UPDATED!
+//TODO: * HAS TO BE UPDATED!
  *
  * This class defines possible
  * return states of linear solvers and provides interfaces to a memory
@@ -124,7 +122,8 @@ template <class Vector> class VectorMemory;
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997, 1998, 1999
  */
-template <class Matrix, class Vector>
+template <class Matrix = SparseMatrix<double>,
+          class Vector = Vector<double> >
 class Solver
 {
   public:

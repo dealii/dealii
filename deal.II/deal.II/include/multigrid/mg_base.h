@@ -253,7 +253,7 @@ class MGVector : public Subscriptor
  * with a subscriptor for smart pointers.
  * @author Guido Kanschat, 1999
  */
-template<class MATRIX>
+template<class MATRIX = SparseMatrix<double> >
 class MGMatrix : public Subscriptor,
 		 public vector<MATRIX>
 {

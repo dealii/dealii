@@ -34,14 +34,14 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   
-  GrowingVectorMemory<Vector<double>  > mem;
+  GrowingVectorMemory<> mem;
   SolverControl control(100, 1.e-5);
   SolverControl verbose_control(100, 1.e-5, true);
-  SolverCG<SparseMatrix<float> , Vector<double>  > cg(control, mem);
-  SolverGMRES<SparseMatrix<float> , Vector<double>  > gmres(control, mem,20);
-  SolverBicgstab<SparseMatrix<float> , Vector<double>  > bicgstab(control, mem);
-  SolverRichardson<SparseMatrix<float> , Vector<double>  > rich(control, mem);
-  SolverQMRS<SparseMatrix<float> , Vector<double>  > qmrs(control, mem);
+  SolverCG<> cg(control, mem);
+  SolverGMRES<> gmres(control, mem,20);
+  SolverBicgstab<> bicgstab(control, mem);
+  SolverRichardson<> rich(control, mem);
+  SolverQMRS<> qmrs(control, mem);
 
   for (unsigned int size=4; size <= 40; size *= 3)
     {
@@ -54,15 +54,15 @@ int main()
       SparseMatrixStruct structure(dim, dim, 5);
       testproblem.build_structure(structure);
       structure.compress();
-      SparseMatrix<float>  A(structure);
+      SparseMatrix<double>  A(structure);
       testproblem.laplacian(A);
 
       PreconditionIdentity
 	prec_no;
-      PreconditionRelaxation<SparseMatrix<float> , Vector<double> >
-	prec_sor(A, &SparseMatrix<float> ::template precondition_SOR<double>, 1.2);
-      PreconditionRelaxation<SparseMatrix<float> , Vector<double> >
-	prec_ssor(A, &SparseMatrix<float> ::template precondition_SSOR<double>, 1.2);
+      PreconditionRelaxation<>
+	prec_sor(A, &SparseMatrix<double>::template precondition_SOR<double>, 1.2);
+      PreconditionRelaxation<>
+	prec_ssor(A, &SparseMatrix<double>::template precondition_SSOR<double>, 1.2);
       
       Vector<double>  f(dim);
       Vector<double>  u(dim);

@@ -36,7 +36,8 @@
  *
  * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
  */
-template<class Matrix, class Vector>
+template <class Matrix = SparseMatrix<double>,
+          class Vector = Vector<double> >
 class SolverCG : public Solver<Matrix,Vector>
 {
   public:

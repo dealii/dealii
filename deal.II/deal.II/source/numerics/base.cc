@@ -144,11 +144,11 @@ void ProblemBase<dim>::solve ()
 {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
-  SolverControl                    control(4000, 1e-16);
-  PrimitiveVectorMemory<Vector<double> >   memory;
-  SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
+  SolverControl           control(4000, 1e-16);
+  PrimitiveVectorMemory<> memory;
+  SolverCG<>              cg(control,memory);
 
-  PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
+  PreconditionRelaxation<>
     prec(system_matrix,
 	 &SparseMatrix<double>::template precondition_SSOR<double>,
 	 1.2);

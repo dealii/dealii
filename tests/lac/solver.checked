@@ -77,7 +77,7 @@ DEAL:no:cg::Starting
 DEAL:no:cg::Starting 
 DEAL:no:cg::Convergence step 58 
 DEAL:no:Bicgstab::Starting 
-DEAL:no:Bicgstab::Convergence step 45 
+DEAL:no:Bicgstab::Convergence step 44 
 DEAL:no:GMRES::Starting 
 DEAL:no:GMRES::Starting 
 DEAL:no:GMRES::Failure step 100 

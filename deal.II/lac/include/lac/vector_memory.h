@@ -24,7 +24,7 @@
  * sophisticated management of vectors. One of these has to be
  * applied by the user according to his needs.
  */
-template<class Vector>
+template<class Vector = Vector<double> >
 class VectorMemory : public Subscriptor
 {
   public:
@@ -67,7 +67,7 @@ class VectorMemory : public Subscriptor
  * vectors as needed from the global heap, i.e. performs no
  * specially adapted actions to the purpose of this class.
  */
-template<class Vector>
+template<class Vector = Vector<double> >
 class PrimitiveVectorMemory : public VectorMemory<Vector>
 {
   public:
@@ -103,8 +103,7 @@ class PrimitiveVectorMemory : public VectorMemory<Vector>
  * 
  * @author Guido Kanschat, 1999
  */
-
-template<class Vector>
+template<class Vector = Vector<double> >
 class GrowingVectorMemory : public VectorMemory<Vector>
 {
   public:
@@ -115,6 +114,7 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * of vectors.
 				      */
     GrowingVectorMemory(unsigned int initial_size = 0);
+
 				     /**
 				      * Destructor.
 				      * Release all vectors.
@@ -127,6 +127,7 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * are allocated vectors left.
 				      */
     ~GrowingVectorMemory();
+    
 				     /**
 				      * Return new vector from the pool.
 				      */
@@ -146,19 +147,25 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * vector itself.
 				      */
     typedef pair<bool, Vector* > entry_type;
+
 				     /**
 				      * Array of allocated vectors.
 				      */
     vector<entry_type> pool;
+    
 				     /**
 				      * Overall number of allocations.
 				      */
     unsigned int n_alloc;
 };
 
+
+
+/* --------------------- inline functions ---------------------- */
+
+
 template<typename Vector>
-GrowingVectorMemory<Vector>::GrowingVectorMemory(unsigned int
-						 initial_size)
+GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size)
 		: pool(initial_size)
 {
   for (vector<entry_type>::iterator i=pool.begin();i != pool.end()
@@ -169,6 +176,8 @@ GrowingVectorMemory<Vector>::GrowingVectorMemory(unsigned int
     }
   n_alloc = 0;
 }
+
+
 
 template<typename Vector>
 GrowingVectorMemory<Vector>::~GrowingVectorMemory()

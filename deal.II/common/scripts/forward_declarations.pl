@@ -40,16 +40,39 @@ sub parse_class_declarations {
     
     open (FILE, $filename);
     while (<FILE>) {
-
 	# if the lines contains a "template" at the 
 	# beginning and no semicolon at the end: join it
 	# with the next line.
 	if ( /^\s*template/ && !/;\s*$/ ) {
+	    # if this is a multiline template, then join following lines as well
+	    # find out by looking at the last char of the line
+	    while ( ! />\s*$/ ) {
+		# more concise check: find out whether the number of '<' is
+		# not equal to the number of '>'
+		my ( $tmp1, $tmp2 ) = ($_, $_);
+		$tmp1 =~ s/[^<]//g;
+		$tmp2 =~ s/[^>]//g;
+		if ( length ($tmp1) ==  length ($tmp2) ) {
+		    last;
+		}
+		else
+		{
+		    s/\n//;
+		    $_ = $_ . " " . <FILE>;
+		    s/ \s+/ /g;
+		}
+	    }
 	    s/\n//;
+	    s/ \s+/ /g;
 	    $_ = $_ . " " . <FILE>;
 	}
 
-	if ( /^\s*((template\s*<(([-\w,_\s]|<([-\w_,+\s])+>)+)>\s*)?(class|struct))(.*)/ ) {
+	if ( /^\s*((template\s*<
+                     (
+                        ([-\w,_=\s]   |
+                         <([-\w_,=\s])+>  )+ 
+                     )>\s*)?
+                   (class|struct))(.*)/x ) {
 	    # this is the declaration of a class, possibly a template
 	    $basepart = $1;
 	    $rest     = $7;
@@ -58,7 +81,7 @@ sub parse_class_declarations {
 	    # $rest contains the name of the class and what comes after that
 	    #
 	    # first extract the name of the class
-	    $rest =~ /([\w_]+(\s*<(([-\w,_\s]|<([-\w,+\s])+>)+)>)?)(.*)/;
+	    $rest =~ /([\w_]+(\s*<(([-\w,_\s]|<([-\w,\s])+>)+)>)?)(.*)/;
 
 	    $name = $1;
 	    $rest = $6;
@@ -74,6 +97,10 @@ sub parse_class_declarations {
 		$declaration =~ s/\s\s+/ /g;
 		$declaration =~ s/^\s+//g;
 		$declaration =~ s/\s+$//g;
+
+		# strip default template parameters
+		while ( $declaration =~ s/<(.*)=\s[-\w,_\s]+(<[^.]*>)?(.*)>/<$1 $3 > / ) {
+		}
 
 		# impose a negativ-list of names we do not want to
 		# have in this file. this is due to a compiler bug in

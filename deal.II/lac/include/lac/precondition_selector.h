@@ -70,7 +70,8 @@
  *
  * @author Ralf Hartmann, 1999
  */
-template <class Matrix, class Vector>
+template <class Matrix = SparseMatrix<double>,
+          class Vector = Vector<double> >
 class PreconditionSelector
 {
   public:

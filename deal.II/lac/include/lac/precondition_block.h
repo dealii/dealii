@@ -43,7 +43,8 @@
  * store the inverted blocks with less accuracy than the original matrix;
  * for example, #number==double, inverse_type=float# might be a viable choice.
  */
-template<typename number, typename inverse_type>
+template<typename number,
+         typename inverse_type = number>
 class PreconditionBlock: public Subscriptor
 {
   public:
@@ -197,7 +198,8 @@ class PreconditionBlock: public Subscriptor
  * (of arbitray structure) below the diagonal blocks are used
  * in the #operator ()# function of this class.
  */
-template<typename number, typename inverse_type>
+template<typename number,
+         typename inverse_type = number>
 class PreconditionBlockSOR : public PreconditionBlock<number, inverse_type>
 {
   public:

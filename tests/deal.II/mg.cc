@@ -100,9 +100,9 @@ int main()
 	  
 	  Vector<double> u;
 	  u.reinit(f);
-	  PrimitiveVectorMemory<Vector<double> > mem;
+	  PrimitiveVectorMemory<> mem;
 	  SolverControl control(100, 1.e-12);
-	  SolverCG<SparseMatrix<double>, Vector<double> >solver(control, mem);
+	  SolverCG<>    solver(control, mem);
 	  
 	  PreconditionIdentity precondition;
 	  solver.solve(A,u,f,precondition);
@@ -122,11 +122,10 @@ int main()
 	  equation.build_mgmatrix(mgA, mgdof, quadrature);
 	  
 	  SolverControl cgcontrol(10,0., false, false);
-	  PrimitiveVectorMemory<Vector<double> > cgmem;
-	  SolverCG<SparseMatrix<double>, Vector<double> > cgsolver(cgcontrol, cgmem);
+	  PrimitiveVectorMemory<> cgmem;
+	  SolverCG<> cgsolver(cgcontrol, cgmem);
 	  PreconditionIdentity cgprec;
-	  MGCoarseGridLACIteration<SolverCG<SparseMatrix<double>, Vector<double> >,
-	    SparseMatrix<double>, PreconditionIdentity>
+	  MGCoarseGridLACIteration<SolverCG<>, SparseMatrix<double>, PreconditionIdentity>
 	    coarse(cgsolver, mgA[0], cgprec);
 	  
 	  MGSmootherLAC smoother(mgA);
@@ -135,7 +134,7 @@ int main()
 	  
 	  
 	  MG<2> multigrid(mgdof, hanging_nodes, mgA, transfer);
-	  PreconditionMG<MG<2>, Vector<double> >
+	  PreconditionMG<MG<2> >
 	    mgprecondition(multigrid, smoother, smoother, coarse);
 	  
 	  solver.solve(A, u, f, mgprecondition);
@@ -163,9 +162,9 @@ MGSmootherLAC::smooth (const unsigned int level,
 		       const Vector<double> &rhs) const
 {
   SolverControl control(2,1.e-300,false,false);
-  PrimitiveVectorMemory<Vector<double> > mem;
-  SolverRichardson<SparseMatrix<double> , Vector<double>  > rich(control, mem);
-  PreconditionRelaxation<SparseMatrix<double> , Vector<double> >
+  PrimitiveVectorMemory<> mem;
+  SolverRichardson<> rich(control, mem);
+  PreconditionRelaxation<>
     prec((*matrices)[level], &SparseMatrix<double> ::template precondition_SSOR<double>, 1.);
 
   rich.solve((*matrices)[level], u, rhs, prec);

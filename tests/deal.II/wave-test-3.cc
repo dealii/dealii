@@ -5478,13 +5478,13 @@ template <int dim>
 unsigned int TimeStep_Wave<dim>::solve (const UserMatrix       &matrix,
 					Vector<double>         &solution,
 					const Vector<double>   &rhs) const {
-  SolverControl                    control(2000, 1.e-12);
-  PrimitiveVectorMemory<Vector<double> >   memory;
-  SolverCG<UserMatrix,Vector<double> >     pcg(control,memory);
+  SolverControl            control(2000, 1.e-12);
+  PrimitiveVectorMemory<>  memory;
+  SolverCG<UserMatrix>     pcg(control,memory);
 
 				   // solve
   pcg.solve (matrix, solution, rhs,
-	     PreconditionUseMatrix<UserMatrix,Vector<double> >
+	     PreconditionUseMatrix<UserMatrix>
 	     (matrix,
 	      &UserMatrix::precondition));
 				   // distribute solution

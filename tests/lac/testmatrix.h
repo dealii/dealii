@@ -73,9 +73,9 @@ class FDMGTransfer
 				      * Implementation of abstract
 				      * function in #MGTranferBase#.
 				      */
-    virtual void restrict (const unsigned int   from_level,
-			   Vector<double>       &dst,
-			   const Vector<double> &src) const;
+    virtual void restrict_and_add (const unsigned int   from_level,
+				   Vector<double>       &dst,
+				   const Vector<double> &src) const;
 
 				     /**
 				      * Exception.

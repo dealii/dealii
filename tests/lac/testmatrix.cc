@@ -221,9 +221,9 @@ FDMGTransfer::prolongate (const unsigned int   to_level,
 
 
 void
-FDMGTransfer::restrict (const unsigned int   from_level,
-	 		Vector<double>       &dst,
-			const Vector<double> &src) const
+FDMGTransfer::restrict_and_add (const unsigned int   from_level,
+				Vector<double>       &dst,
+				const Vector<double> &src) const
 {
   Assert((from_level>0) && (from_level<=matrices.size()),
 	 ExcIndexRange(from_level, 0, matrices.size()+1));
