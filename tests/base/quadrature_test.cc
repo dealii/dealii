@@ -19,58 +19,170 @@
 #include <base/quadrature_lib.h>
 #include <cmath>
 
-int main(int,char)
+template <int dim>
+void
+fill_vector (vector<Quadrature<dim> *>& quadratures)
 {
-  ofstream logfile("quadrature_test.output");
-  deallog.attach(logfile);
-  deallog.depth_console(0);
-  vector<Quadrature<2> *> quadratures;
-  quadratures.push_back (new QGauss2<2>());
-  quadratures.push_back (new QGauss3<2>());
-  quadratures.push_back (new QGauss4<2>());
-  quadratures.push_back (new QGauss5<2>());
-  quadratures.push_back (new QGauss6<2>());
-  quadratures.push_back (new QGauss7<2>());
-  quadratures.push_back (new QMidpoint<2>());
-  quadratures.push_back (new QTrapez<2>());
-  quadratures.push_back (new QSimpson<2>());
-  quadratures.push_back (new QMilne<2>());
-  quadratures.push_back (new QWeddle<2>());
-  
+  quadratures.push_back (new QGauss2<dim>());
+  quadratures.push_back (new QGauss3<dim>());
+  quadratures.push_back (new QGauss4<dim>());
+  quadratures.push_back (new QGauss5<dim>());
+  quadratures.push_back (new QGauss6<dim>());
+  quadratures.push_back (new QGauss7<dim>());
+  quadratures.push_back (new QMidpoint<dim>());
+  quadratures.push_back (new QTrapez<dim>());
+  quadratures.push_back (new QSimpson<dim>());
+  quadratures.push_back (new QMilne<dim>());
+  quadratures.push_back (new QWeddle<dim>());
+}
+
+template <int dim>
+void
+check_cells (vector<Quadrature<dim>*>& quadratures)
+{
   for (unsigned int n=0; n<quadratures.size(); ++n)
     {
-      Quadrature<2> *quadrature=quadratures[n];
-      const vector<Point<2> > &points=quadrature->get_points();
-      const vector<double> &weights=quadrature->get_weights();
+      Quadrature<dim>& quadrature = *quadratures[n];
+      const vector<Point<dim> > &points=quadrature.get_points();
+      const vector<double> &weights=quadrature.get_weights();
 
       deallog << "Quadrature no." << n
-	      << " (" << typeid(*quadrature).name() << ")";
-      
+	      << " (" << typeid(*quadratures[n]).name() << ")";
+
       unsigned int i=0;
       double quadrature_int=0;
       double exact_int=0;
       double err = 0;
+      
       do
 	{
 	  ++i;
 
 	  quadrature_int=0;
-
 					   // Check the polynomial x^i*y^i
 
-	  for (unsigned int x=0; x<quadrature->n_quadrature_points; ++x)
-	    quadrature_int+=pow(points[x](0), i)*pow(points[x](1), i)*weights[x];
-
+	  for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
+	    {
+	      double f=1.;
+	      switch (dim)
+		{
+		case 3:
+		  f *= pow(points[x](2), i);
+		case 2:
+		  f *= pow(points[x](1), i);
+		case 1:
+		  f *= pow(points[x](0), i);
+		}
+	      quadrature_int+=f*weights[x];
+	    }
+	  
 					   // the exact integral is 1/(i+1)
-	  exact_int=1./(i+1)/(i+1);
+	  exact_int=1./pow(i+1,dim);	  
 	  err = fabs(quadrature_int-exact_int);
 	}
       while (err<1e-15);
-
 				       // Uncomment here for testing
-//      deallog << " (Error " << err << ")";
+//      deallog << " (Int " << quadrature_int << ',' << exact_int << ")";
+      deallog << " is exact for polynomials of degree " << i-1 << endl;
+
+    }  
+}
+
+
+template <int dim>
+void
+check_faces (vector<Quadrature<dim-1>*>& quadratures, bool sub)
+{
+  if (sub)
+    deallog.push("subfaces");
+  else
+    deallog.push("faces");
+
+  for (unsigned int n=0; n<quadratures.size(); ++n)
+    {
+      QProjector<dim> quadrature(*quadratures[n], sub);
+      const vector<Point<dim> > &points=quadrature.get_points();
+      const vector<double> &weights=quadrature.get_weights();
+
+      deallog << "Quadrature no." << n
+	      << " (" << typeid(*quadratures[n]).name() << ")";
+
+      unsigned int i=0;
+      double quadrature_int=0;
+      double exact_int=0;
+      double err = 0;
+
+      do
+	{
+	  ++i;
+
+	  quadrature_int=0;
+					   // Check the polynomial x^i*y^i
+
+	  for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
+	    {
+	      double f=1.;
+	      switch (dim)
+		{
+		case 3:
+		  f *= pow(points[x](2), i);
+		case 2:
+		  f *= pow(points[x](1), i);
+		case 1:
+		  f *= pow(points[x](0), i);
+		}
+	      quadrature_int+=f*weights[x];
+	    }
+	  
+					   // the exact integral is 1/(i+1)
+      switch (dim)
+	{
+	case 2:
+	  exact_int = 2 * (sub ? 2:1) / pow(i+1,dim-1);
+	  break;
+	case 3:
+	  exact_int = 3 * (sub ? 4:1) / pow(i+1,dim-1);
+	  break;
+	}
+      
+	  err = fabs(quadrature_int-exact_int);
+	}
+      while (err<1e-14);
+				       // Uncomment here for testing
+//      deallog << " (Int " << quadrature_int << ',' << exact_int << ")";
       deallog << " is exact for polynomials of degree " << i-1 << endl;
     }
+  deallog.pop();
+}
+
+int main(int,char)
+{
+  ofstream logfile("quadrature_test.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
+  vector<Quadrature<1> *> q1;
+  vector<Quadrature<2> *> q2;
+  vector<Quadrature<3> *> q3;
+  fill_vector (q1);
+  fill_vector (q2);
+  fill_vector (q3);
+
+  deallog.push("1d");
+  check_cells(q1);
+  deallog.pop();
+
+  deallog.push("2d");
+  check_cells(q2);
+  check_faces(q1,false);
+  check_faces(q1,true);
+  deallog.pop();
+
+  deallog.push("3d");
+  check_cells(q3);
+  check_faces(q2,false);
+  check_faces(q2,true);
+  deallog.pop();
 }
 
 
