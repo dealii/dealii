@@ -24,6 +24,7 @@
        with gcc version 2.96!</a>
   <li> <a href="#windows">Can I use <acronym>deal.II</acronym> on a
        Windows platform?</a>       
+  <li> <a href="#perl-bug">Building online documentation under Cygwin.</a>
   <li> <a href="#triangles">Can I use/implement triangles/tetrahedra
        in <acronym>deal.II</acronym>?</a> 
   <li> <a href="#problem-types">Can I solve problem XXX with
@@ -96,6 +97,26 @@
   simple and clean way to make <acronym>deal.II</acronym> work with
   any other Windows compiler, get in contact!
   </p>
+
+
+  <h3><a name="perl-bug"></a>Building online documentation under
+                             Cygwin.</h3>
+
+  <p>
+  The Perl utility from Cygwin distribution (up to version 5.6.1-2)
+  contains a bug that causes a "permission denied" error when inplace
+  editing (using the <code>-pi</code> switch). This bug prevents
+  building the online documentation from the source files. To solve
+  this problem there are two workarounds as described in <a
+  href="http://sources.redhat.com/ml/cygwin-apps/2001-11/msg00750.html">
+  Cygnus Solutions mailing list</a>.  First, one should specify an
+  explicit extension in all makefiles, i.e.  replace all
+  <code>-npi</code> or <code>-pi</code> options with
+  <code>-npi~</code> or <code>-pi~</code> for example. Second, apply a
+  patch to source code of perl utility and recompile.
+  </p>
+
+
 
   <h3><a name="triangles"></a>Can I use/implement
   triangles/tetrahedra in <acronym>deal.II</acronym>?</h3>
