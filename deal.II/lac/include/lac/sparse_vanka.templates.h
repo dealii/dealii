@@ -8,9 +8,9 @@
 
 #ifdef DEAL_II_USE_MT
 #  include <base/thread_manager.h>
-#  include <algorithm>
 #endif
 
+#include <algorithm>
 #include <map>
 
 
