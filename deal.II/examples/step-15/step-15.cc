@@ -1134,29 +1134,111 @@ void MinimizationProblem<1>::refine_grid ()
                                     std::pow(u_prime_right,5));
           error_indicators(cell_index) += right_jump * right_jump *
                                           cell->diameter();
-        }
-      
+        }      
     } 
-  
+
+                                   // Now we have all the refinement
+                                   // indicators computed, and want to refine
+                                   // the grid. In contrast to previous
+                                   // examples, however, we would like to
+                                   // transfer the solution vector from the
+                                   // old to the new grid. This is what the
+                                   // ``SolutionTransfer'' class is good for,
+                                   // but it requires some preliminary
+                                   // work. First, we need to tag the cells
+                                   // that we want to refine or coarsen, as
+                                   // usual:
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						   error_indicators,
 						   0.3, 0.03);
-
-  SolutionTransfer<dim,double> solution_transfer(dof_handler);
+                                   // Then, however, we need an additional
+                                   // step: if, for example, you flag a cell
+                                   // that is once more refined than its
+                                   // neighbor, and that neighbor is not
+                                   // flagged for refinement, we would end up
+                                   // with a jump of two refinement levels
+                                   // across a cell interface. In 1d, this
+                                   // would in general be allowed, but not in
+                                   // higher space dimensions, and some mesh
+                                   // smoothing algorithms in 1d may also
+                                   // disallow this. To avoid these
+                                   // situations, the library will silently
+                                   // also have to refine the neighbor cell
+                                   // once. It does so by calling the
+                                   // ``Triangulation<dim>::prepare_coarsening_and_refinement''
+                                   // function before actually doing the
+                                   // refinement and coarsening. This function
+                                   // flags a set of additional cells for
+                                   // refinement or coarsening, to enforce
+                                   // rules like the one-hanging-node
+                                   // rule. The cells that are flagged for
+                                   // refinement and coarsening after calling
+                                   // this function are exactly the ones that
+                                   // will actually be refined or
+                                   // coarsened. Since the
+                                   // ``SolutionTransfer'' class needs this
+                                   // information in order to store the data
+                                   // from the old mesh and transfer to the
+                                   // new one.
   triangulation.prepare_coarsening_and_refinement();
+
+                                   // With this out of the way, we initialize
+                                   // a ``SolutionTransfer'' object with the
+                                   // present ``DoFHandler'' and attach the
+                                   // solution vector to it:
+  SolutionTransfer<dim,double> solution_transfer(dof_handler);
   solution_transfer.prepare_for_coarsening_and_refinement (present_solution);
+
+                                   // Then we do the actual refinement, and
+                                   // distribute degrees of freedom on the new
+                                   // mesh:
   triangulation.execute_coarsening_and_refinement ();
   dof_handler.distribute_dofs (fe);
 
+                                   // Finally, we retrieve the old solution
+                                   // interpolated to the new mesh. Since the
+                                   // ``SolutionTransfer'' function does not
+                                   // actually store the values of the old
+                                   // solution, but rather indices, we need to
+                                   // preserve the old solution vector until
+                                   // we have gotten the new interpolated
+                                   // values. Thus, we have the new values
+                                   // written into a temporary vector, and
+                                   // only afterwards write them into the
+                                   // solution vector object:
   Vector<double> tmp (dof_handler.n_dofs());
   solution_transfer.interpolate (present_solution, tmp);
   present_solution = tmp;
 
+                                   // Here is some final thing, that is
+                                   // actually unnecessary in 1d, but
+                                   // necessary for higher space dimensions,
+                                   // so we show it anyway: the result of what
+                                   // the ``SolutionTransfer'' class provides
+                                   // is a vector that is interpolated from
+                                   // the old to the new mesh. Unfortunately,
+                                   // it does not necessarily have the right
+                                   // values at constrained (hanging) nodes,
+                                   // so we have to fix this up to make the
+                                   // solution conforming again. The simplest
+                                   // way to do this is this:
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
   hanging_node_constraints.close ();  
   hanging_node_constraints.distribute (present_solution);
+                                   // This is wasteful, since we create a
+                                   // ``ConstraintMatrix'' object that will be
+                                   // recreated again in the next call to
+                                   // ``setup_system_on_mesh'' immediately
+                                   // afterwards. A more efficient
+                                   // implementation would make sure that it
+                                   // is created only once. We don't care so
+                                   // much here, since in 1d there are no
+                                   // constraints, so all of these operations
+                                   // are really cheap, but we do not
+                                   // recommend this as general programming
+                                   // strategy.
 }
 
 
