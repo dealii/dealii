@@ -140,42 +140,49 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
   values.resize(n());
 
   for (unsigned int face=0;face<2*dim;++face)
-    for (unsigned int k=0;k<qface.n_quadrature_points;++k)
-      {
-	const double w = qface.weight(k);
-	const double x = qface.point(k)(0);
-	Point<dim> p;
-	switch (face)
-	  {
-	    case 2:
-	      p(1) = 1.;
-	    case 0:
-	      p(0) = x;
-	      break;
-	    case 1:
-	      p(0) = 1.;
-	    case 3:
-	      p(1) = x;
-	      break;	      
-	  }
+    {
+      double orientation = 1.;
+      if ((face==0) || (face==3))
+	orientation = -1.;
+      
+      for (unsigned int k=0;k<qface.n_quadrature_points;++k)
+	{
+	  const double w = qface.weight(k) * orientation;
+	  const double x = qface.point(k)(0);
+	  Point<dim> p;
+	  switch (face)
+	    {
+	      case 2:
+		p(1) = 1.;
+	      case 0:
+		p(0) = x;
+		break;
+	      case 1:
+		p(0) = 1.;
+	      case 3:
+		p(1) = x;
+		break;	      
+	    }
 //	std::cerr << p
 //		  << '\t' << moment_weight[0].value(x)
 //		  << '\t' << moment_weight[1].value(x)
 //	  ;
-	
-	compute (p, values, grads, grad_grads);
-
-	for (unsigned int i=0;i<n();++i)
-	  {
+	  
+	  compute (p, values, grads, grad_grads);
+	  
+	  for (unsigned int i=0;i<n();++i)
+	    {
 //	    std::cerr << '\t' << std::setw(6) << values[i][1-face%2];
-					     // Integrate normal component.
-					     // This is easy on the unit square
-	    for (unsigned int j=0;j<moment_weight.size();++j)
-	      A(moment_weight.size()*face+j,i)
-		+= w * values[i][1-face%2] * moment_weight[j].value(x);
-	  }
+					       // Integrate normal component.
+					       // This is easy on the unit square
+	      for (unsigned int j=0;j<moment_weight.size();++j)
+		A(moment_weight.size()*face+j,i)
+		  += w * values[i][1-face%2] * moment_weight[j].value(x);
+	    }
 //	std::cerr << std::endl;
-      }
+	}
+    }
+  
 				   // Volume integrals are missing
 				   //
 				   // This degree is one larger
