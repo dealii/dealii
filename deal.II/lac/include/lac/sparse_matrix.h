@@ -435,11 +435,22 @@ class SparseMatrix : public Subscriptor
     somenumber residual (Vector<somenumber>       &dst,
 			 const Vector<somenumber> &x,
 			 const Vector<somenumber> &b) const;
-				     //
+    
+				     /**
+				      * Apply the Jacobi
+				      * preconditioner, which
+				      * multiplies every element of
+				      * the #src# vector by the
+				      * inverse of the respective
+				      * diagonal element and
+				      * multiplies the result with the
+				      * damping factor #omega#.
+				      */
     template <typename somenumber>
     void precondition_Jacobi (Vector<somenumber>       &dst,
 			      const Vector<somenumber> &src,
-			      const number              om = 1.) const;
+			      const number              omega = 1.) const;
+
 				     /**
 				      * Apply SOR preconditioning to
 				      * #src#.
