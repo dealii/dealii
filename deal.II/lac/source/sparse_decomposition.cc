@@ -1,5 +1,5 @@
-//----------------------------  sparse_decomposition.cc  ---------------------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+//---------------------------------------------------------------------------
+//    Copyright (C) 2002, 2003 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -7,7 +7,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_decomposition.h  ---------------------------
+//---------------------------------------------------------------------------
 
 #include <lac/sparse_decomposition.templates.h>
 

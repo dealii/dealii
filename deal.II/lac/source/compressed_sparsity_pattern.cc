@@ -1,4 +1,4 @@
-//----------------------------  compressed_sparsity_pattern.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  compressed_sparsity_pattern.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
 #include <lac/compressed_sparsity_pattern.h>
