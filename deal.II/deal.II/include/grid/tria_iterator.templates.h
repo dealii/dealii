@@ -30,7 +30,7 @@ template <int dim, typename Accessor>
 TriaRawIterator<dim,Accessor>::TriaRawIterator (Triangulation<dim> *parent,
 						const int           level,
 						const int           index,
-						const void         *local_data) :
+						const typename Accessor::AccessorData *local_data) :
 		accessor (parent, level, index, local_data) {};
 
 
@@ -121,7 +121,7 @@ template <int dim, typename Accessor>
 TriaIterator<dim,Accessor>::TriaIterator (Triangulation<dim> *parent,
 					  const int           level,
 					  const int           index,
-					  const void         *local_data) :
+					  const typename Accessor::AccessorData *local_data) :
 		TriaRawIterator<dim,Accessor> (parent, level, index, local_data)
 {
 #ifdef DEBUG
@@ -273,7 +273,7 @@ template <int dim, typename Accessor>
 TriaActiveIterator<dim,Accessor>::TriaActiveIterator (Triangulation<dim> *parent,
 						      const int           level,
 						      const int           index,
-						      const void         *local_data) :
+						      const typename Accessor::AccessorData *local_data) :
 		TriaIterator<dim,Accessor> (parent, level, index, local_data)
 {
 #ifdef DEBUG

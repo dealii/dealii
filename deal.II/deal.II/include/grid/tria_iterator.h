@@ -134,10 +134,13 @@ template <int dim> class Triangulation;
  *     \item For the #TriaIterator# and the #TriaActiveIterator# class, it must
  *       have a member function #bool used()#, for the latter a member function
  *       #bool active()#.
- *     \item It should not modify the #present_level# and #present_index# fields,
- *       since this is what the iterator classes do, but it should use them to
- *       dereference the data it points to.
- *     \item It must have void operators #++# and #--#.	
+ *     \item It must have void operators #++# and #--#.
+ *     \item It must declare a local #typedef# #AccessorData# which states
+ *       the data type the accessor expects to get passed as fourth constructor
+ *       argument. By declaring a local data type, the respective iterator
+ *       class may type-safely enforce that data type to be one of its own
+ *       constructor argument types. If an accessor class does not need
+ *       additional data, this type shall be #void#.
  *   \end{itemize}
  *   Then the iterator is able to do what it is supposed to. All of the necessary
  *   functions are implemented in the #Accessor# base class, but you may write
@@ -154,33 +157,10 @@ template <int dim> class Triangulation;
  *   Derived accessor classes may need additional data (e.g. the #DoFAccessor#
  *   needs a pointer to the #DoFHandler# to work on). This data can be
  *   set upon construction through the last argument of the constructors.
- *   Ideally, its type is a local type to the accessor and must have the name
- *   #Accessor::LocalData#. In the standard implementation, this type is
- *   declared to be a void pointer. The iterator constructors take their
- *   last argument carrying the additional data by default as zero, so unless
- *   #Accessor::LocalData# is a number or a pointer you may not construct
- *   such an iterator without giving the last argument. If you want to use
- *   the additional data, you also have to overload the #TriaAccessor::copy_data#
- *   function.
- *
- *   Unfortunately, the skeched way does not work, since gcc is not able to
- *   recognize the type defined local to the template argument (it does not
- *   suport the #typename# keyword at present), so we can only pass a voie
- *   pointer. You may, however, convert this to any type, normally to another
- *   pointer or to a pointer to a structure pointing to the data to be passed.
- *   The mechanism may be changed if the mentioned features appear in gcc.
- *
- *   Another possibility would be to have a function, say #set_local_data(...)#
- *   in the accessor classes which need additional data. You could then create
- *   an iterator like this:
- *   \begin{verbatim}
- *     TriaIterator<1,MyAccesor> i;
- *     i->set_local_data (1,2,3);
- *   \end{verbatim}
- *   But this will not always work: if the iterator #i# is not a valid one, then
- *   the library will forbid you to dereference it (which normally is a good
- *   idea), thus resulting in an error when you dereference it in the second
- *   line.
+ *   The data type of this additional data is given by the local data type
+ *   #AccessorData# explained above. The iterator classes take a pointer to
+ *   an object of that data type; by default, this parameter equals the
+ *   #NULL# pointer.
  *   
  *   
  *   \subsection{Warning}
@@ -261,12 +241,14 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
 				      *  Proper constructor, initialized
 				      *  with the triangulation, the
 				      *  level and index of the object
-				      *  pointed to.
+				      *  pointed to. The last parameter is
+				      *  of a type declared by the accessor
+				      *  class.
 				      */
     TriaRawIterator (Triangulation<dim> *parent,
 		     const int           level,
 		     const int           index,
-		     const void         *local_data=0);
+		     const typename Accessor::AccessorData *local_data = 0);
 
 				     /**
 				      *  @name Dereferencing
@@ -484,7 +466,9 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
 				      *  Proper constructor, initialized
 				      *  with the triangulation, the
 				      *  level and index of the object
-				      *  pointed to.
+				      *  pointed to. The last parameter is
+				      *  of a type declared by the accessor
+				      *  class.
 				      *
 				      *  If the object pointed to is not
 				      *  past-the-end and is not
@@ -494,7 +478,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
     TriaIterator (Triangulation<dim> *parent,
 		  const int           level,
 		  const int           index,
-		  const void         *local_data=0);
+		  const typename Accessor::AccessorData *local_data = 0);
     
     				     /**
 				      *  Assignment operator.
@@ -613,7 +597,9 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
 				      *  Proper constructor, initialized
 				      *  with the triangulation, the
 				      *  level and index of the object
-				      *  pointed to.
+				      *  pointed to. The last parameter is
+				      *  of a type declared by the accessor
+				      *  class.
 				      *
 				      *  If the object pointed to is not
 				      *  past-the-end and is not
@@ -623,7 +609,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
     TriaActiveIterator (Triangulation<dim> *parent,
 			const int           level,
 			const int           index,
-			const void         *local_data=0);
+			const typename Accessor::AccessorData *local_data = 0);
 
     				     /**
 				      *  Assignment operator.

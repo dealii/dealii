@@ -71,20 +71,19 @@ template <int dim>
 Assembler<dim>::Assembler (Triangulation<dim> *tria,
 			   const int           level,
 			   const int           index,
-			   const void         *local_data) :
-		DoFCellAccessor<dim> (tria,level,index,
-				      &((AssemblerData<dim>*)local_data)->dof),
+			   const AssemblerData<dim> *local_data) :
+		DoFCellAccessor<dim> (tria,level,index, &local_data->dof),
 		cell_matrix (dof_handler->get_selected_fe().total_dofs),
 		cell_vector (dVector(dof_handler->get_selected_fe().total_dofs)),
-		assemble_matrix (((AssemblerData<dim>*)local_data)->assemble_matrix),
-		assemble_rhs (((AssemblerData<dim>*)local_data)->assemble_rhs),
-		matrix(((AssemblerData<dim>*)local_data)->matrix),
-		rhs_vector(((AssemblerData<dim>*)local_data)->rhs_vector),
-		fe(((AssemblerData<dim>*)local_data)->fe),
-		fe_values (((AssemblerData<dim>*)local_data)->fe,
-			   ((AssemblerData<dim>*)local_data)->quadrature,
-			   ((AssemblerData<dim>*)local_data)->update_flags),
-		boundary(((AssemblerData<dim>*)local_data)->boundary)
+		assemble_matrix (local_data->assemble_matrix),
+		assemble_rhs (local_data->assemble_rhs),
+		matrix(local_data->matrix),
+		rhs_vector(local_data->rhs_vector),
+		fe(local_data->fe),
+		fe_values (local_data->fe,
+			   local_data->quadrature,
+			   local_data->update_flags),
+		boundary(local_data->boundary)
 {
   Assert (!assemble_matrix || (matrix.m() == dof_handler->n_dofs()),
 	  ExcInvalidData());

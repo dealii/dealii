@@ -226,6 +226,13 @@ template <int dim>
 class Assembler : public DoFCellAccessor<dim> {
   public:
 				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef AssemblerData<dim> AccessorData;
+    
+				     /**
 				      * Default constructor, unused thus not
 				      * implemented.
 				      */
@@ -241,7 +248,7 @@ class Assembler : public DoFCellAccessor<dim> {
     Assembler (Triangulation<dim> *tria,
 	       const int           level,
 	       const int           index,
-	       const void         *local_data);
+	       const AccessorData *local_data);
     
 				     /**
 				      * Assemble on the present cell using

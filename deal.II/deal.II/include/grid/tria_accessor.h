@@ -59,6 +59,15 @@ template <int dim>
 class TriaAccessor {
   protected:
 				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes. Since the pure
+				      * triangulation iterators need no
+				      * additional data, this data type is
+				      * #void#.
+				      */
+    typedef void AccessorData;
+				     /**
 				      *  Constructor. Protected, thus
 				      *  only callable from friend
 				      *  classes.

@@ -53,9 +53,16 @@ class DoFAccessor {
 
 				     /**
 				      * This should be the default constructor.
+				      * We cast away the #const#ness of the
+				      * pointer which clearly is EVIL but
+				      * we can't help without making all
+				      * functions which could somehow use
+				      * iterators (directly or indirectly) make
+				      * non-const, even if they preserve
+				      * constness.
 				      */
-    DoFAccessor (DoFHandler<dim> *dof_handler) :
-		    dof_handler(dof_handler) {};
+    DoFAccessor (const DoFHandler<dim> *dof_handler) :
+		    dof_handler(const_cast<DoFHandler<dim>*>(dof_handler)) {};
 
 				     /**
 				      * Reset the DoF handler pointer.
@@ -166,6 +173,13 @@ template <int dim, typename BaseClass>
 class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
   public:
 				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef DoFHandler<dim> AccessorData;
+    
+				     /**
 				      * Default constructor, unused thus
 				      * not implemented.
 				      */
@@ -179,8 +193,8 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
     DoFLineAccessor (Triangulation<dim> *tria,
 		     const int           level,
 		     const int           index,
-		     const void         *local_data) :
-		    DoFAccessor<dim> ((DoFHandler<dim>*)local_data),
+		     const AccessorData *local_data) :
+		    DoFAccessor<dim> (local_data),
 		    BaseClass(tria,level,index) {};
     
 				     /**
@@ -277,6 +291,13 @@ template <int dim, typename BaseClass>
 class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
   public:
 				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef DoFHandler<dim> AccessorData;
+    
+				     /**
 				      * Default constructor, unused thus
 				      * not implemented.
 				      */
@@ -290,8 +311,8 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
     DoFQuadAccessor (Triangulation<dim> *tria,
 		     const int           level,
 		     const int           index,
-		     const void         *local_data) :
-		    DoFAccessor<dim> ((DoFHandler<dim>*)local_data),
+		     const AccessorData *local_data) :
+		    DoFAccessor<dim> (local_data),
 		    BaseClass        (tria,level,index) {};
     
 				     /**
@@ -441,13 +462,20 @@ class DoFSubstructAccessor : public DoFAccessor<dim>,
 template <>
 class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
   public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef typename DoFLineAccessor<1,CellAccessor<1> >::AccessorData AccessorData;
+    
     				     /**
 				      * Constructor
 				      */
     DoFSubstructAccessor (Triangulation<1> *tria,
 			  const int         level,
 			  const int         index,
-			  const void       *local_data) :
+			  const AccessorData *local_data) :
 		    DoFLineAccessor<1,CellAccessor<1> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
@@ -468,13 +496,19 @@ class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
 template <>
 class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
   public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef typename DoFQuadAccessor<2,CellAccessor<2> >::AccessorData AccessorData;
     				     /**
 				      * Constructor
 				      */
     DoFSubstructAccessor (Triangulation<2> *tria,
 			  const int         level,
 			  const int         index,
-			  const void       *local_data) :
+			  const AccessorData *local_data) :
 		    DoFQuadAccessor<2,CellAccessor<2> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
@@ -506,13 +540,20 @@ class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
 template <int dim>
 class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
   public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef typename DoFSubstructAccessor<dim>::AccessorData AccessorData;
+    
     				     /**
 				      * Constructor
 				      */
     DoFCellAccessor (Triangulation<dim> *tria,
 		     const int           level,
 		     const int           index,
-		     const void         *local_data) :
+		     const AccessorData *local_data) :
 		     DoFSubstructAccessor<dim> (tria,level,index,local_data) {};
 
 				     /**
