@@ -289,7 +289,7 @@ EigenPower<VECTOR>::solve (double       &value,
 
 				       // Check the change of the eigenvalue
 				       // Brrr, this is not really a good criterion
-      conv = this->control().check (iter, fabs(1./length-1./old_length));
+      conv = this->control().check (iter, std::fabs(1./length-1./old_length));
     }
   
   this->memory.free(Vy);
@@ -405,7 +405,7 @@ EigenInverse<VECTOR>::solve (double       &value,
 					   // Check the residual
 	  conv = this->control().check (iter, res);
 	} else {
-	  conv = this->control().check (iter, fabs(1./value-1./old_value));
+	  conv = this->control().check (iter, std::fabs(1./value-1./old_value));
 	}
       old_value = value;
     }
