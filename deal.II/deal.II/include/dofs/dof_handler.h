@@ -237,7 +237,12 @@ enum RenumberingMethod {
   Finally it offers a starting point for the assemblage of the matrices
   by offering #begin()# and #end()# functions which return iterators
   to walk on the DoF structures as well as the triangulation data.
-
+  These iterators work much like those described in the documentation
+  of the #Triangulation# class and of the iterator classes themselved,
+  but offer more functionality than pure triangulation iterators. The
+  order in which dof iterators are presented by the #++# and #--# operators
+  is the same as that for the alike triangulation iterators.
+  
   
   {\bf Distribution of degrees of freedom}
 

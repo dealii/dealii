@@ -11,13 +11,6 @@
 
 
 
-//#ifdef __GNUC__
-//#  include <bvector.h>
-//class vector<bool> :
-//public bit_vector {};
-//#endif
-
-
 //forward declaration needed
 template <int dim> class Boundary;
 
@@ -35,6 +28,8 @@ template <int dim> class DoFHandler;
 
 template <int dim> struct CellData;
 struct SubCellData;
+
+class dVector;
 
 
 class istream;
@@ -817,6 +812,86 @@ class TriaDimensionInfo<2> {
     interface between regions of different materials.
 
 
+    {\bf Refinement of a triangulation}
+
+    Refinement of a triangulation may be done through several ways. The most
+    low-level way is directly through iterators: let #i# be an iterator to
+    an active cell (i.e. the cell pointed to has no children), then the
+    function call #i->set_refine_flag()# marks the respective cell for
+    refinement. Marking non-active cells results in an error.
+
+    After all the cells you wanted to mark for refinement, call the
+    #execute_refinement# function to actually perform the refinement. This
+    function itself first calls the #prepare_refinement# function to smooth
+    the resulting triangulation: since a face between to adjacent cells may
+    only be subdivided once (i.e. the levels of two adjacent cells may
+    differ by one at most; it is not possible to have a cell refined twice
+    while the neighboring one is not refined), some additional cells are
+    flagged for refinement to smooth the grid. This enlarges the number of
+    resulting cells but makes the grid more regular, thus leading to better
+    approximationonal properties and, above all, making the handling of data
+    structures and algorithms much much easier.
+    
+    Marking cells for refinement 'by hand' through iterators is one way to
+    produce a new grid, especially if you know what kind of grid you are
+    looking for, e.g. if you want to have a grid successively refined
+    towards the boundary or always at the center (see the example programs,
+    they do exactly these things). There are more advanced functions,
+    however, which are more suitable for automatic generation of hierarchical
+    grids in the context of a-posteriori error estimation and adaptive finite
+    elements.
+    
+    The central function to this is
+    #refine (const dVector &criterion, const double threshold)#: it takes a
+    vector of values, one per active cell, which denote the criterion according
+    to which the triangulation is to be refined. It marks all cells for which
+    the criterion is greater than the threshold being given as the second
+    argument.
+    
+    There are two variations of this function, which rely on #refine# by
+    computing the threshold from other information:
+    \begin{itemize}
+    \item #refine_fixed_number#: this function takes a vector as above and
+      a value between zero and one denoting the fraction of cells to be
+      refined. For this purpose, it sorts the criteria per cell and takes
+      the threshold to be the one belonging to the cell with the
+      #fraction times n_active_cells# highest criterion. For example, if
+      the fraction is $0.3$, the threshold is computed to a value such that
+      30 per cent of cells have a criterion higher than the threshold and are
+      thus flagged for refinement. The flagging for refinement is done through
+      the central #refine# function.
+
+      The sorting of criteria is not done actually, since we only need one
+      value, in the example above the criterion of the cell which is at
+      30 per cent in the sorted list of cells. The order of cells with higher
+      and of those with lower criteria is irrelevant. Getting this value is
+      accomplished by the #nth_element# function of the #C++# standard
+      library, which takes only linear time in the number of elements, rather
+      than #N log N# for sorting all values.
+
+      A typical value for the fraction of cells to be refined is 0.3.
+
+    \item #refine_fixed_fraction#: this function computes the threshold such
+      that the number of cells getting flagged for refinement makes up for a
+      certain fraction of the total error. If this fraction is 50 per cent,
+      for example, the threshold is computed such that the cells with a
+      criterion greater than the threshold together account for half of the
+      total error.
+      
+      It is assumed that the criterion is a value in a certain norm over each
+      element, such that the square of the total error is the sum over the
+      squares of the criteria on the cells.
+
+      ** Fix me: implementation
+
+      A typical value for the fraction of the total error is 0.5.
+    \end{itemize}
+
+    For a more thorough discussion of advantages and disadvantages of the
+    different strategies for refinement, see the paper of R. Becker and
+    R. Rannacher titled "A Feed-Back Approach to Error Control in Finite
+    Element Methods: Basic Analysis and Examples".
+
 
     {\bf Material and boundary information}
 
@@ -1147,6 +1222,63 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      */
     void refine_global (const unsigned int times);
 
+				     /**
+				      * Refine the triangulation according to
+				      * the given criteria. The criterion is a
+				      * #double# value for each cell which
+				      * determines which cells are to be refine
+				      * by comparison with the threshold: if the
+				      * value for a cell is larger than the
+				      * threshold, the cell is flagged for
+				      * refinement. It is your duty to guarantee
+				      * that the threshold value is in a
+				      * resonable range.
+				      *
+				      * The cells are only flagged for
+				      * refinement, they are not actually
+				      * refined. To do so, you have to call the
+				      * #execute_refinement# function.
+				      *
+				      * There are more sophisticated strategies
+				      * for mesh refinement; refer to the
+				      * following functions and to the general
+				      * doc for this class for more information.
+				      */
+    void refine (const dVector &criteria,
+		 const double   threshold);
+
+				     /**
+				      * Refine the triangulation by refining
+				      * a certain fraction #fraction_of_cells#
+				      * with the highest error. To actually
+				      * perform the refinement, call
+				      * #execute_refinement#.
+				      *
+				      * #fraction_of_cells# shall be a value
+				      * between zero and one.
+				      *
+				      * Refer to the general doc of this class
+				      * for more information.
+				      */
+    void refine_fixed_number (const dVector &criteria,
+			      const double   fraction_of_cells);
+
+				     /**
+				      * Refine the triangulation by flagging
+				      * those cells which make up a certain
+				      * #fraction_of_error# of the total error.
+				      * To actually perform the refinement, call
+				      * #execute_refinement#.
+				      *
+				      * #fraction_of_error# shall be a value
+				      * between zero and one.
+				      *
+				      * Refer to the general doc of this class
+				      * for more information.
+				      */
+    void refine_fixed_fraction (const dVector &criteria,
+				const double   fraction_of_error);
+    
 				     /**
 				      *  Refine all cells on all levels which
 				      *  were previously flagged for refinement.
@@ -1887,6 +2019,13 @@ class Triangulation : public TriaDimensionInfo<dim> {
 		    int,
 		    << "You tried to do something on level " << arg1
 		    << ", but this level is empty.");
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidVectorSize,
+		    int, int,
+		    << "The given vector has " << arg1
+		    << " elements, but " << arg2 << " were expected.");
 				     //@}
   protected:
 				     /**
