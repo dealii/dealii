@@ -41,16 +41,13 @@ FE_DGP<dim>::FE_DGP (unsigned int degree)
 
 				   // if defined, copy over matrices
 				   // from precomputed arrays
-//    if ((degree < Matrices::n_embedding_matrices) &&
-//        (Matrices::embedding[degree] != 0))
-//      {
-//        prolongation[0].fill (Matrices::embedding[degree]);
-//      }
-//    else
-//  				     // matrix undefined, set size to zero
-//      for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-//        prolongation[i].reinit(0);
-
+  if ((degree < Matrices::n_embedding_matrices) &&
+      (Matrices::embedding[degree][0] != 0))
+    for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+      prolongation[c].fill (Matrices::embedding[degree][c]);
+  else
+    for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
+      prolongation[i].reinit(0,0);
 //  				   // same as above: copy over matrix
 //  				   // from predefined values and
 //  				   // generate all others by rotation

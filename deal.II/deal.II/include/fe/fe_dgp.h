@@ -1,4 +1,4 @@
-//---------------------------------------------------------------
+//----------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -217,7 +217,7 @@ class FE_DGP : public FiniteElement<dim>
 					  * polynomial degree starting
 					  * from constant elements
 					  */
-	static const double * const embedding[];
+	static const double * const embedding[][GeometryInfo<dim>::children_per_cell];
 
 					 /**
 					  * Number of elements (first
@@ -234,7 +234,7 @@ class FE_DGP : public FiniteElement<dim>
 					  * As @p{embedding} but for
 					  * projection matrices.
 					  */
-	static const double * const projection_matrices[];
+	static const double * const projection_matrices[][GeometryInfo<dim>::children_per_cell];
 
 					 /**
 					  * As
@@ -325,37 +325,37 @@ class FE_DGP : public FiniteElement<dim>
 // declaration of explicit specializations
 
 template <> 
-const double * const FE_DGP<1>::Matrices::embedding[];
+const double * const FE_DGP<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
 
 template <>
 const unsigned int FE_DGP<1>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGP<1>::Matrices::projection_matrices[];
+const double * const FE_DGP<1>::Matrices::projection_matrices[][GeometryInfo<1>::children_per_cell];
 
 template <>
 const unsigned int FE_DGP<1>::Matrices::n_projection_matrices;
 
 template <> 
-const double * const FE_DGP<2>::Matrices::embedding[];
+const double * const FE_DGP<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell];
 
 template <>
 const unsigned int FE_DGP<2>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGP<2>::Matrices::projection_matrices[];
+const double * const FE_DGP<2>::Matrices::projection_matrices[][GeometryInfo<2>::children_per_cell];
 
 template <>
 const unsigned int FE_DGP<2>::Matrices::n_projection_matrices;
 
 template <> 
-const double * const FE_DGP<3>::Matrices::embedding[];
+const double * const FE_DGP<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell];
 
 template <>
 const unsigned int FE_DGP<3>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGP<3>::Matrices::projection_matrices[];
+const double * const FE_DGP<3>::Matrices::projection_matrices[][GeometryInfo<3>::children_per_cell];
 
 template <>
 const unsigned int FE_DGP<3>::Matrices::n_projection_matrices;
