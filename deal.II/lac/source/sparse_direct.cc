@@ -380,7 +380,7 @@ struct SparseDirectMA27::DetachedModeData
         
         fflush (NULL);
         CommunicationsLog::
-          record_communication<T> (CommunicationsLog::put, N, ret, debug_info);
+          record_communication<T> (CommunicationsLog::put, N, count, debug_info);
       };
 
     
