@@ -75,6 +75,6 @@ DEAL::MappingSubface3d-3-Q3.output
 DEAL::Triangulation4:
 DEAL::exact_area=4.50
 DEAL::Mapping3d-4-Cartesian.output
-DEAL::  area=1.00
+DEAL::  area=4.50
 DEAL::MappingFace3d-4-Cartesian.output
 DEAL::MappingSubface3d-4-Cartesian.output
