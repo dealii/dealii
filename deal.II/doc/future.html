@@ -14,11 +14,12 @@
     <h2>Plans for the future of deal.II</h2>
 
     <p>
-    While we believe that <acronym>deal.II</acronym> is quite usable
+    While we consider <acronym>deal.II</acronym> quite useful
     in the present form, there are still many things that we would
-    implement for future versions. Among these are the following
+    like to implement in future versions. Among these are the following
     topics:
     <ul>
+<!--
     <li> <p>
          <strong>Multigrid:</strong> Guido Kanschat is working on an
          implementation of multigrid methods for
@@ -26,7 +27,7 @@
          refined grids, we are still having problems on locally
          refined grid. We hope to have them sorted out soon.
 	 </p>
-
+--!>
     <li> <p>
          <strong>Non-conforming elements:</strong> While
          <acronym>deal.II</acronym> is quite flexible with respect to
@@ -48,6 +49,13 @@
 	 mapping from unit to real cell from the actual finite element
 	 code.
 	 </p>
+
+    <li> <p>
+         <strong>The <I>hp</I>-method of finite elements:</strong>
+	 This will need a major restructuring of the basic classes
+	 handling degrees of freedom and is therefore not planned for
+	 the immediate future.
+
 
     <li> <p>
          <strong>Linear solvers:</strong>
@@ -82,10 +90,12 @@
 	 </p>
 
     <li> <p>
-         <strong>More example programs:</strong>
+         <strong>More example and test programs:</strong>
 	 There are still many aspects of the library that are not yet
          covered by the example programs. This is certainly something
-         that should be improved, but is time consuming.
+         that should be improved, but is time consuming. A complete
+	 test-suite for the library would be quite valuable for ports
+	 to new computer systems. 
 	 </p>
 
     <li> <p>

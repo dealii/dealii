@@ -14,7 +14,7 @@
 	
     This document contains the following sections:
     <ul>
-      <li> <a href="#prerequisites">Prerequisites</a>
+      <li> <a href="#prerequisites">System requirements</a>
       <li> <a href="#installation">Installation</a>
       <li> <a href="#compiler">Compiler flags</a>
       <li> <a href="#problems">Problems, questions, further information</a>
@@ -24,10 +24,18 @@
 
     
     <a name="prerequisites">
-    <h2>Prerequisites</h2>
+    <h2>System requirements</h2>
 
-    In order to use the deal.II library (and its sub-libraries /base
-    and /lac) you need to have the following programs installed:
+    By this time (February 2000), <acronym>deal.II</acronym> has been
+    developed and tested on Unix systems only. It can be used positively on
+    <ul>
+      <li>Linux ELF with gcc 2.95.x
+      <li>Sun Solaris 2.5 / 2.6 with egcs 1.1.2 and gcc 2.95.x
+    </ul>
+
+    In order to compile and use the <acronym>deal.II</acronym> library
+    (and its sub-libraries /base and /lac) you need to have the
+    following programs installed:
     <ul>
       <li> A fairly complete C++ compiler. We use 
            <a href="http://gcc.gnu.org">egcs1.1.2 and
@@ -47,7 +55,7 @@
            <code>$(wildcard ...)</code> function which prevented us
            from compiling some parts of the library (most of our
            Makefiles use a workaround, though). Other make programs
-           (i.e. non-GNU flavors) are not standardized and will
+           (i.e. non-GNU) will
            probably fail to work.
 
       <li> In case you want to generate the documentation from the
@@ -75,13 +83,13 @@
            platforms. AVS is a commercial program available for most
            Unix flavors.
     </ul>
-
+<!--
     Note that we have only tested the library under Unix (extensively
     under SunOS and Linux). We believe that it should be possible with
     little effort to use it on other platforms as well. In that case
     it may be necessary to change some settings in the configure.in
     script or in the file common/Make.global_options.in.
-
+--!>
     <p>
 
     In case you didn't find your favorite graphics format above it
@@ -98,7 +106,7 @@
 
     The whole library usually comes as a .tar.gz file, that is a
     tarred file archive which is compressed with gzip. After unpacking
-    it with gunzip and tar (or tar -xzf if you use GNU tar), you will
+    it with gunzip and tar (or <tt>tar xzf</tt> if you use GNU tar), you will
     find several subdirectories. First run the script 
     <pre><code>
          ./configure
@@ -402,9 +410,10 @@
 
       <li>
         Scientific publications presenting results obtained with these
-        libraries shall state the names of the library and their
-        principle authors (at present Wolfgang Bangerth and Guido
-        Kanschat).
+        libraries should acknowledge the use of the library and name
+        its principle authors (at present Wolfgang Bangerth and Guido
+        Kanschat). Citation of the reports named on the homepage is
+        appreciated.
     </ul>
 
     Note that since our institute is evaluated at regular intervals,
