@@ -80,6 +80,10 @@ class LaplaceProblem
   private:
     void setup_system ();
     void assemble_system ();
+				     // We add this function for
+				     // assembling the multilevel
+				     // matrices.
+    void assemble_multigrid ();
     void solve ();
     void output_results (const unsigned int cycle) const;
 
@@ -90,7 +94,12 @@ class LaplaceProblem
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
+				     // Here are the new objects for
+				     // handling level matrices.
     MGLevelObject<SparsityPattern> mg_sparsity;
+				     // We use number type float to
+				     // save memory. It's only a
+				     // preconditioner!
     MGLevelObject<SparseMatrix<float> > mg_matrices;
     
     Vector<double>       solution;
@@ -140,41 +149,33 @@ void LaplaceProblem<dim>::setup_system ()
   const unsigned int nlevels = triangulation.n_levels();
   mg_sparsity.resize(0, nlevels-1);
   mg_matrices.resize(0, nlevels-1);
-  
+
+				   // Now, we have to build a matrix
+				   // on each level. Technically, we
+				   // could use the matrix initialized
+				   // above on the finest
+				   // level. Beware that this is not
+				   // true anymore with local
+				   // refinement!
   for (unsigned int level=0;level<nlevels;++level)
     {
+      mg_sparsity[level].reinit (mg_dof_handler.n_dofs(level),
+				 mg_dof_handler.n_dofs(level),
+				 mg_dof_handler.max_couplings_between_dofs());
+      MGTools:::make_sparsity_pattern (mg_dof_handler, mg_sparsity[level], level);
+      mg_sparsity[level].compress();
+      mg_matrices[level].reinit(mg_sparsity[level]);
     }
 }
 
-
-
-				 // As in the previous examples, this
-				 // function is not changed much with
-				 // regard to its functionality, but
-				 // there are still some optimizations
-				 // which we will show. For this, it
-				 // is important to note that if
-				 // efficient solvers are used (such
-				 // as the preconditions CG method),
-				 // assembling the matrix and right
-				 // hand side can take a comparable
-				 // time, and you should think about
-				 // using one or two optimizations at
-				 // some places.
+				 // This is the standard assemble
+				 // function you have seen a lot of
+				 // times before.
 				 //
-				 // What we will show here is how we
-				 // can avoid calls to the
-				 // shape_value, shape_grad, and
-				 // quadrature_point functions of the
-				 // FEValues object, and in particular
-				 // optimize away most of the virtual
-				 // function calls of the Function
-				 // object. The way to do so will be
-				 // explained in the following, while
-				 // those parts of this function that
-				 // are not changed with respect to
-				 // the previous example are not
-				 // commented on.
+				 // A small difference, though: we
+				 // assemble the matrix for Helmholtz'
+				 // equation so we can solve the
+				 // Neumann boundary value problem.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
@@ -270,6 +271,95 @@ void LaplaceProblem<dim>::assemble_system ()
 }
 
 
+				 // Here is another assemble
+				 // function. The integration core is
+				 // the same as above. Only the loop
+				 // goes over all existing cells now
+				 // and the results must be entered
+				 // into the right matrix.
+
+				 // Since we only do multi-level
+				 // preconditioning, no right-hand
+				 // side is assembled here.
+template <int dim>
+void LaplaceProblem<dim>::assemble_multigrid () 
+{  
+  QGauss2<dim>  quadrature_formula;
+
+  FEValues<dim> fe_values (fe, quadrature_formula, 
+			   UpdateFlags(update_gradients |
+				       update_q_points  |
+				       update_JxW_values));
+
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
+
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+				   // 
+  typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
+					  endc = mg_dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+				       // Remember the level of the
+				       // current cell.
+      const unsigned int level = cell->level()
+      cell_matrix.clear ();
+
+				       // Compute the values specified
+				       // by update flags above.
+      fe_values.reinit (cell);
+
+				       // This is exactly the
+				       // integration loop of the cell
+				       // matrix above.
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  {
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
+	      cell_matrix(i,j) += (fe_values.shape_grad(i,q_point)
+				   * fe_values.shape_grad(j,q_point)
+				   * fe_values.JxW(q_point));
+	  };
+
+
+				       // Oops! This is a tiny
+				       // difference easily
+				       // forgotten. The indices we
+				       // want here are the ones for
+				       // that special level, not for
+				       // the global
+				       // matrix. Therefore, a little
+				       // 'mg' entered into the
+				       // function call.
+      cell->get_mg_dof_indices (local_dof_indices);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	{
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+					     // And now add everything
+					     // to the matrix on the
+					     // right level.
+	    mg_matrices[level]..add (local_dof_indices[i],
+				     local_dof_indices[j],
+				     cell_matrix(i,j));
+	};
+    };
+
+				   // Again use zero boundary values:
+  std::map<unsigned int,double> boundary_values;
+  VectorTools::interpolate_boundary_values (mg_dof_handler,
+					    0,
+					    ZeroFunction<dim>(),
+					    boundary_values);
+  MatrixTools::apply_boundary_values (boundary_values,
+				      system_matrix,
+				      solution,
+				      system_rhs);
+}
+
+
 
 				 // The solution process again looks
 				 // mostly like in the previous
@@ -332,184 +422,47 @@ void LaplaceProblem<dim>::solve ()
 
 
 
-				 // Writing output to a file is mostly
-				 // the same as for the previous
-				 // example, but here we will show how
-				 // to modify some output options and
-				 // how to construct a different
-				 // filename for each refinement
-				 // cycle.
+				 // Here is the data output, which is
+				 // a simplified version of step 5. We
+				 // do a standard gnuplot output for
+				 // each grid produced in the
+				 // refinement process.
 template <int dim>
 void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
+				   // Construct and initialize a DataOut object
   DataOut<dim> data_out;
 
   data_out.attach_dof_handler (mg_dof_handler);
   data_out.add_data_vector (solution, "solution");
-
   data_out.build_patches ();
 
-				   // For this example, we would like
-				   // to write the output directly to
-				   // a file in Encapsulated
-				   // Postscript (EPS) format. The
-				   // library supports this, but
-				   // things may be a bit more
-				   // difficult sometimes, since EPS
-				   // is a printing format, unlike
-				   // most other supported formats
-				   // which serve as input for
-				   // graphical tools. Therefore, you
-				   // can't scale or rotate the image
-				   // after it has been written to
-				   // disk, and you have to decide
-				   // about the viewpoint or the
-				   // scaling in advance.
-				   //
-				   // The defaults in the library are
-				   // usually quite reasonable, and
-				   // regarding viewpoint and scaling
-				   // they coincide with the defaults
-				   // of Gnuplot. However, since this
-				   // is a tutorial, we will
-				   // demonstrate how to change
-				   // them. For this, we first have to
-				   // generate an object describing
-				   // the flags for EPS output:
-  DataOutBase::EpsFlags eps_flags;
-				   // They are initialized with the
-				   // default values, so we only have
-				   // to change those that we don't
-				   // like. For example, we would like
-				   // to scale the z-axis differently
-				   // (stretch each data point in
-				   // z-direction by a factor of four):
-  eps_flags.z_scaling = 4;
-				   // Then we would also like to alter
-				   // the viewpoint from which we look
-				   // at the solution surface. The
-				   // default is at an angle of 60
-				   // degrees down from the vertical
-				   // axis, and 30 degrees rotated
-				   // against it in mathematical
-				   // positive sense. We raise our
-				   // viewpoint a bit and look more
-				   // along the y-axis:
-  eps_flags.azimut_angle = 40;
-  eps_flags.turn_angle   = 10;
-				   // That shall suffice. There are
-				   // more flags, for example whether
-				   // to draw the mesh lines, which
-				   // data vectors to use for
-				   // colorization of the interior of
-				   // the cells, and so on. You may
-				   // want to take a look at the
-				   // documentation of the EpsFlags
-				   // structure to get an overview of
-				   // what is possible.
-				   //
-				   // The only thing still to be done,
-				   // is to tell the output object to
-				   // use these flags:
-  data_out.set_flags (eps_flags);
-				   // The above way to modify flags
-				   // requires recompilation each time
-				   // we would like to use different
-				   // flags. This is inconvenient, and
-				   // we will see more advanced ways
-				   // in following examples where the
-				   // output flags are determined at
-				   // run time using an input file.
-
-				   // Finally, we need the filename to
-				   // which the results are to be
-				   // written. We would like to have
-				   // it of the form
-				   // ``solution-N.eps'', where N is
-				   // the number of the refinement
-				   // cycle. Thus, we have to convert
-				   // an integer to a part of a
-				   // string; this can be done using
-				   // the ``sprintf'' function, but in
-				   // C++ there is a more elegant way:
-				   // write everything into a special
-				   // stream (just like writing into a
-				   // file or to the screen) and
-				   // retrieve what you wrote as a
-				   // string. This applies the usual
-				   // conversions from integer to
-				   // strings, and one could as well
-				   // give stream modifiers such as
-				   // ``setw'', ``setprecision'', and
-				   // so on.
-				   //
-				   // In C++, you can do this by using
-				   // the so-called stringstream
-				   // classes. As already discussed at
-				   // the point of inclusion of the
-				   // respective header file above,
-				   // there is some historical
-				   // confusion we have to work around
-				   // here, since the class we'd like
-				   // to use used to be called
-				   // ``ostrstream'', but now is named
-				   // ``ostringstream''. In the same
-				   // way as done above in deciding
-				   // which file to include, we here
-				   // decide which class name to use:
+				   // The following block generates
+				   // the file name and opens the
+				   // file. This looks awkward because
+				   // of a change in the handling of
+				   // string streams (See step 5 for explanation).
+  
 #ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream filename;
 #else
   std::ostrstream filename;
 #endif
-				   // Fortunately, the interface of
-				   // the two classes which we might
-				   // now be using, depending on which
-				   // one is available, is close
-				   // enough that we need to take care
-				   // about the differences only once
-				   // below, so we can use them in a
-				   // rather straightforward way, even
-				   // if they are not identical.
-
-				   // In order to now actually
-				   // generate a filename, we fill the
-				   // stringstream variable with the
-				   // base of the filename, then the
-				   // number part, and finally the
-				   // suffix indicating the file type:
   filename << "solution-"
 	   << cycle
-	   << ".eps";
-  
-				   // For the old string stream
-				   // classes, we have to append the
-				   // final '\0' that appears at the
-				   // end of ``char *''
-				   // variables. This is done by the
-				   // following construct:
+	   << ".gnuplot";
+
 #ifndef HAVE_STD_STRINGSTREAM
   filename << std::ends;
 #endif
-				   // We can get whatever we wrote to
-				   // the stream using the ``str()''
-				   // function. If the new
-				   // stringstream classes are used,
-				   // then the result is a string
-				   // which we have to convert to a
-				   // char* using the ``c_str()''
-				   // function, otherwise the result
-				   // is a char* right away. Use that
-				   // as filename for the output
-				   // stream:
+
 #ifdef HAVE_STD_STRINGSTREAM
   std::ofstream output (filename.str().c_str());
 #else
   std::ofstream output (filename.str());
 #endif
-				   // And then write the data to the
-				   // file.
-  data_out.write_eps (output);
+
+  data_out.write_gnuplot (output);
 }
 
 
@@ -521,35 +474,11 @@ void LaplaceProblem<dim>::run ()
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
-				       // If this is the first round,
-				       // then we have no grid yet,
-				       // and we will create it
-				       // here. In previous examples,
-				       // we have already used some of
-				       // the functions from the
-				       // GridGenerator class. Here we
-				       // would like to read a grid
-				       // from a file where the cells
-				       // are stored and which may
-				       // originate from someone else,
-				       // or may be the product of a
-				       // mesh generator tool.
-				       //
-				       // In order to read a grid from
-				       // a file, we generate an
-				       // object of data type GridIn
-				       // and associate the
-				       // triangulation to it (i.e. we
-				       // tell it to fill our
-				       // triangulation object when we
-				       // ask it to read the
-				       // file). Then we open the
-				       // respective file and
-				       // initialize the triangulation
-				       // with the data in the file:
       if (cycle == 0)
 	{
-					   // Generate grid here!
+					   // Generate a simple hypercube grid.
+	  GridGenerator::hyper_cube(tr);
+	  
 	}
 				       // If this is not the first
 				       // cycle, then simply refine

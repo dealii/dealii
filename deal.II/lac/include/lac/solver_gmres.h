@@ -14,7 +14,6 @@
 #define __deal2__solver_gmres_h
 
 
-/*----------------------------   solver_pgmres.h     ---------------------------*/
 
 #include <base/config.h>
 #include <base/subscriptor.h>
@@ -288,6 +287,85 @@ class SolverGMRES : public Solver<VECTOR>
     SolverGMRES (const SolverGMRES<VECTOR>&);
 };
 
+
+/**
+ * Flexible GMRES.
+ *
+ * This version of the GMRES method allows for the use of a different
+ * preconditioner in each iteration step. Therefore, it is also more
+ * robust with respect to inaccurate evaluation of the
+ * preconditioner. An important application is also the use of a
+ * Krylov space method inside the preconditioner.
+ *
+ * FGMRES needs two vectors in each iteration steps yielding a total
+ * of @p{2*AdditionalData::max_basis_size+1} auxiliary vectors.
+ */
+template <class VECTOR = Vector<double> >
+class SolverFGMRES : public Solver<VECTOR>
+{
+  public:
+    				     /**
+				      * Standardized data struct to
+				      * pipe additional data to the
+				      * solver.
+				      */
+    struct AdditionalData 
+    {
+					 /**
+					  * Constructor. By default,
+					  * set the number of
+					  * temporary vectors to 30,
+					  * preconditioning from left
+					  * and the residual of the
+					  * stopping criterion to the
+					  * default residual
+					  * (cf. class documentation).
+					  */
+	AdditionalData(const unsigned int max_basis_size = 30,
+		       bool use_default_residual = true)
+			:
+			max_basis_size(max_basis_size)
+	  {};
+	
+					 /**
+					  * Maximum number of
+					  * tmp vectors.
+					  */
+	unsigned int    max_basis_size;
+    };
+    
+				     /**
+				      * Constructor.
+				      */
+    SolverFGMRES (SolverControl        &cn,
+		  VectorMemory<VECTOR> &mem,
+		  const AdditionalData &data=AdditionalData());
+
+				     /**
+				      * Solve the linear system $Ax=b$
+				      * for x.
+				      */
+    template<class MATRIX, class PRECONDITIONER>
+    void
+    solve (const MATRIX         &A,
+	   VECTOR               &x,
+	   const VECTOR         &b,
+	   const PRECONDITIONER &precondition);
+
+  private:
+                                     /**
+				      * Additional flags.
+				      */
+    AdditionalData additional_data;
+				     /**
+				      * Projected system matrix
+				      */
+    FullMatrix<double> H;
+				     /**
+				      * Auxiliary matrix for inverting @p{H}
+				      */
+    FullMatrix<double> H1;
+};
 
 /* --------------------- Inline and template functions ------------------- */
 
@@ -708,7 +786,112 @@ SolverGMRES<VECTOR>::criterion ()
 }
 
 
-/*----------------------------   solver_pgmres.h     ---------------------------*/
+//----------------------------------------------------------------------//
+
+template <class VECTOR>
+SolverFGMRES<VECTOR>::SolverFGMRES (SolverControl        &cn,
+				    VectorMemory<VECTOR> &mem,
+				    const AdditionalData &data)
+		:
+		Solver<VECTOR> (cn, mem),
+  additional_data(data)
+{}
+
+
+template<class VECTOR>
+template<class MATRIX, class PRECONDITIONER>
+void
+SolverFGMRES<VECTOR>::solve (
+  const MATRIX& A,
+  VECTOR& x,
+  const VECTOR& b,
+  const PRECONDITIONER& precondition)
+{
+  deallog.push("FGMRES");
+  
+  SolverControl::State iteration_state = SolverControl::iterate;  
+
+  const unsigned int basis_size = additional_data.max_basis_size;
+
+				   // Generate an object where basis
+				   // vectors are stored.
+  typename SolverGMRES<VECTOR>::TmpVectors v (basis_size, this->memory);
+  typename SolverGMRES<VECTOR>::TmpVectors z (basis_size, this->memory);
+  
+				   // number of the present iteration; this
+				   // number is not reset to zero upon a
+				   // restart
+  unsigned int accumulated_iterations = 0;
+  
+				   // matrix used for the orthogonalization
+				   // process later
+  H.reinit(basis_size+1, basis_size);
+
+				   // Vectors for projected system
+  Vector<double> projected_rhs;
+  Vector<double> y;
+
+  // Iteration starts here
+
+  do
+    {
+      VECTOR* aux = this->memory.alloc();
+      aux->reinit(x);
+      A.vmult(*aux, x);
+      aux->sadd(-1., 1., b);
+      
+      double beta = aux->l2_norm();
+      if (this->control().check(accumulated_iterations,beta)
+	  == SolverControl::success)
+	break;
+      
+      H.reinit(basis_size+1, basis_size);
+      double a = beta;
+      
+      for (unsigned int j=0;j<basis_size;++j)
+	{
+	  v(j,x).equ(1./a, *aux);
+	  
+	  precondition.vmult(z(j,x), v[j]);
+	  A.vmult(*aux, z[j]);
+	  
+					   // Gram-Schmidt
+	  for (unsigned int i=0;i<=j;++i)
+	    {
+	      H(i,j) = *aux * v[i];
+	      aux->add(-H(i,j), v[i]);
+	    }
+	  H(j+1,j) = a = aux->l2_norm();
+	  
+					   // Compute projected solution
+	  
+	  if (j>0)
+	    {
+	      H1.reinit(j+1,j);
+	      projected_rhs.reinit(j+1);
+	      y.reinit(j);	  
+	      projected_rhs(0) = beta;
+	      H1.fill(H);
+	      
+	      double res = H1.least_squares(y, projected_rhs);
+	      iteration_state = this->control().check(++accumulated_iterations, res);
+	      if (iteration_state != SolverControl::iterate)
+		break;
+	    }
+	}
+				       // Update solution vector
+      for (unsigned int j=0;j<y.size();++j)
+	x.add(y(j), z[j]);
+      
+      this->memory.free(aux);
+    } while (iteration_state == SolverControl::iterate);
+  
+  deallog.pop();
+				   // in case of failure: throw
+				   // exception
+  if (this->control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
+}
 
 #endif
-/*----------------------------   solver_pgmres.h     ---------------------------*/

@@ -26,7 +26,7 @@
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe.h>
-#include <numerics/dof_renumbering.h>
+#include <dofs/dof_renumbering.h>
 
 #ifdef ENABLE_MULTIGRID
 #include <multigrid/mg_dof_handler.h>

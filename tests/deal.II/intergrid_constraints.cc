@@ -9,7 +9,7 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
-#include <numerics/dof_renumbering.h>
+#include <dofs/dof_renumbering.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>

@@ -56,7 +56,7 @@
 				 // We will want to use a special
 				 // algorithm to renumber degrees of
 				 // freedom. It is declared here:
-#include <numerics/dof_renumbering.h>
+#include <dofs/dof_renumbering.h>
 
 				 // This is needed for C++ output:
 #include <fstream>

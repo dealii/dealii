@@ -32,7 +32,7 @@
 #include <fe/fe_nedelec.h>
 #include <fe/fe_base.h>
 #include <dofs/dof_tools.h>
-#include <numerics/dof_renumbering.h>
+#include <dofs/dof_renumbering.h>
 #include <iostream>
 #include <fstream>
 

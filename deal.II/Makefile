@@ -117,11 +117,13 @@ TODO:
              > $@
 
 
-TAGS: $(shell echo $D/base/source/*.cc $D/base/include/*/*.h    \
-                   $D/lac/source/*.cc $D/lac/include/*/*.h      \
-                   $D/deal.II/source/*/*.cc $D/deal.II/include/*/*.h \
-                   $D/tests/*/*.cc $D/tests/*/*.h )
-	@cd $D/common ; etags $^
+TAGS:
+	@cd $D/common ; etags $D/base/source/*.cc $D/base/include/*/*.h \
+	$D/lac/source/*.cc $D/lac/include/*/*.h \
+	$D/deal.II/source/*/*.cc $D/deal.II/include/*/*.h \
+	$D/tests/*/*.cc $D/tests/*/*.h \
+	$D/examples/*/*.cc
+
 
 
 clean: clean-contrib clean-base clean-lac clean-dealII clean-doc clean-examples clean-lib clean-tests

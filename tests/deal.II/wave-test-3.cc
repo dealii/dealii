@@ -4468,7 +4468,7 @@ void SweepInfo::write_summary (const std::list<EvaluationBase<2>*> &eval_list,
 #include <fe/fe_values.h>
 #include <fe/fe_update_flags.h>
 #include <numerics/matrices.h>
-#include <numerics/dof_renumbering.h>
+#include <dofs/dof_renumbering.h>
 
 
 #include <fstream>

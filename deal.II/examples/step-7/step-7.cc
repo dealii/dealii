@@ -47,7 +47,7 @@
 				 // Cuthill-McKee algorithm. The
 				 // necessary functions are declared
 				 // in the following file:
-#include <numerics/dof_renumbering.h>
+#include <dofs/dof_renumbering.h>
 				 // Then we will show a little trick
 				 // how we can make sure that objects
 				 // are not deleted while they are

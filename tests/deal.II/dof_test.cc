@@ -22,7 +22,7 @@
 #include <lac/sparse_matrix.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
-#include <numerics/dof_renumbering.h>
+#include <dofs/dof_renumbering.h>
 #include <dofs/dof_tools.h>
 #include <base/logstream.h>
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,12 +24,12 @@
 #include <grid/grid_generator.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_handler.h>
+#include <dofs/dof_renumbering.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_dof_handler.h>
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_system.h>
-#include <numerics/dof_renumbering.h>
 
 #include <fstream>
 
