@@ -12,7 +12,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
 #include <grid/grid_generator.h>
-#include <numerics/data_io.h>
+#include <numerics/data_out.h>
 #include <base/function.h>
 #include <fe/fe_lib.lagrange.h>
 #include <base/quadrature_lib.h>
@@ -110,9 +110,9 @@ void PoissonEquation<dim>::assemble (FullMatrix<double>  &cell_matrix,
   right_hand_side.value_list (fe_values.get_quadrature_points(), rhs_values);
    
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
       {
-	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+	for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 	  cell_matrix(i,j) += (gradients[i][point] *
 			       gradients[j][point]) *
 			      weights[point] /
@@ -158,7 +158,7 @@ void NonlinearProblem<dim>::run () {
   clear ();
   
   tria = new Triangulation<dim>();
-  dof = new DoFHandler<dim> (tria);
+  dof = new DoFHandler<dim> (*tria);
   set_tria_and_dof (tria, dof);
 
 
@@ -166,7 +166,7 @@ void NonlinearProblem<dim>::run () {
   ZeroFunction<dim>     boundary_values;
   StraightBoundary<dim> boundary;
   
-  FELinear<dim>                   fe;
+  FEQ1<dim>                       fe;
   PoissonEquation<dim>            equation (rhs, last_solution);
   QGauss2<dim>                    quadrature;
   
@@ -174,7 +174,7 @@ void NonlinearProblem<dim>::run () {
   dirichlet_bc[0] = &boundary_values;
 
 
-  GridGenerator::hypercube (*tria);
+  GridGenerator::hyper_cube (*tria);
   tria->refine_global (4);
 
   for (unsigned int refinement_step=0; refinement_step<10; ++refinement_step)
@@ -198,7 +198,7 @@ void NonlinearProblem<dim>::run () {
 	{
 	  cout << "    Nonlinear step " << nonlinear_step << endl;
 	  cout << "        Assembling matrices..." << endl;
-	  assemble (equation, quadrature, fe,
+	  assemble (equation, quadrature,
 		    UpdateFlags(update_values | update_gradients |
 				update_JxW_values | update_q_points),
 		    dirichlet_bc);
@@ -228,10 +228,10 @@ void NonlinearProblem<dim>::run () {
       Vector<float> error_indicator;
       KellyErrorEstimator<dim> ee;
       QSimpson<dim-1> eq;
-      ee.estimate_error (*dof, eq, fe,
-			 KellyErrorEstimator<dim>::FunctionMap(),
-			 solution,
-			 error_indicator);
+      ee.estimate (*dof, eq,
+		   KellyErrorEstimator<dim>::FunctionMap(),
+		   solution,
+		   error_indicator);
       tria->refine_and_coarsen_fixed_number (error_indicator, 0.3, 0);
       tria->execute_coarsening_and_refinement ();
     };

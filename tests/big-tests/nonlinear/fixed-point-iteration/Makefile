@@ -43,7 +43,7 @@ delete-files = gnuplot* *.eps
 # Internals
 
 
-include $D/Make.global_options
+include $D/common/Make.global_options
 
 
 
@@ -52,7 +52,9 @@ cc-files    = $(filter-out *%, $(shell echo *.cc))
 o-files     = $(cc-files:.cc=.o)
 go-files    = $(cc-files:.cc=.go)
 h-files     = $(filter-out *%, $(shell echo *.h))
-lib-h-files = $(filter-out *%, $(shell echo ../../include/*.h))
+lib-h-files = $(filter-out *%, $(shell echo $D/base/include/base/*.h \
+                                            $D/lac/include/lac/*.h  \
+                                            $D/deal.II/include/*/*.h))
 
 # list of libraries needed to link with
 libs.g   = ./Obj.g.a         \
@@ -102,7 +104,7 @@ run: $(target)
 %.o : %.cc
 	@echo ============================ Compiling with optimization:   $<
 	@echo $(CXX) ... -c $< -o $@
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
 # rules which files the libraries depend upon
@@ -129,7 +131,7 @@ clean:
 #rather for libnumerics.a(tria.o)
 Makefile.dep: $(cc-files) $(h-files) $(lib-h-files)
 	@echo ============================ Remaking Makefile
-	@perl ../../../Make_dep.pl ./Obj $(INCLUDE) $(cc-files) \
+	@$(PERL) $D/common/scripts/Make_dep.pl ./Obj $(INCLUDE) $(cc-files) \
 		> Makefile.dep
 
 
