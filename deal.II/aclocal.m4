@@ -400,7 +400,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl       inaccessible'
 	  dnl       (valid, but annoying and sometimes hard to work around)
           CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -ip -unroll -w0 -wd424 -wd11"
+          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll -w0 -wd424 -wd11"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC"
 
