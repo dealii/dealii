@@ -131,6 +131,13 @@ class BlockMatrixArray : public Subscriptor
 		      VectorMemory<Vector<number> >& mem);
 
 				     /**
+				      * Adjust the matrix to a new
+				      * size and delete all blocks.
+				      */
+    void reinit (const unsigned int n_block_rows,
+		 const unsigned int n_block_cols);
+    
+				     /**
 				      * Add a block matrix entry. The
 				      * <tt>matrix</tt> is entered
 				      * into a list of blocks for
@@ -154,7 +161,7 @@ class BlockMatrixArray : public Subscriptor
 		const unsigned int col,
 		const double       prefix = 1.,
 		const bool         transpose = false);
-
+    
 				     /**
 				      * Delete all entries, i.e. reset
 				      * the matrix to an empty state.
@@ -390,7 +397,12 @@ class BlockTrianglePrecondition
 			      VectorMemory<Vector<number> >& mem,
 			      bool backward = false);
 
- 
+				     /**
+				      * Resize preconditioner to a new
+				      * size and clear all blocks.
+				      */
+    void reinit(const unsigned int n_block_rows);
+    
 				     /**
 				      * Preconditioning.
 				      */
@@ -482,7 +494,7 @@ BlockMatrixArray<MATRIX,number>::Entry::Entry (const MATRIX& matrix,
 		col (col),
 		prefix (prefix),
 		transpose (transpose),
-		matrix (&matrix)
+		matrix (&matrix, typeid(*this).name())
 {}
 
 
@@ -495,10 +507,22 @@ BlockMatrixArray<MATRIX,number>::BlockMatrixArray (
   VectorMemory<Vector<number> >& mem)
 		: block_rows (n_block_rows),
 		  block_cols (n_block_cols),
-		  mem(&mem)
+		  mem(&mem, typeid(*this).name())
 {}
 
 
+
+template <class MATRIX, typename number>
+inline
+void
+BlockMatrixArray<MATRIX,number>::reinit (
+  const unsigned int n_block_rows,
+  const unsigned int n_block_cols)
+{
+  clear();
+  block_rows = n_block_rows;
+  block_cols = n_block_cols;
+}
 
 template <class MATRIX, typename number>
 inline
@@ -767,6 +791,15 @@ BlockTrianglePrecondition<MATRIX,number>::BlockTrianglePrecondition(
 		backward(backward)
 {}
 
+
+template <class MATRIX, typename number>
+inline
+void
+BlockTrianglePrecondition<MATRIX,number>::reinit (
+  const unsigned int n)
+{
+  BlockMatrixArray<MATRIX,number>::reinit(n,n);
+}
 
 template <class MATRIX, typename number>
 inline
