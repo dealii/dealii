@@ -13,6 +13,9 @@ h1 { text-align:center;
       color:#008000;
    }
 
+h2 { color:#a00000;
+   }
+
 td { vertical-align: top; }
 
 dt { font-weight: bold; }
