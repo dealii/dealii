@@ -4,12 +4,16 @@
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/geometry_info.h>
 #include <fe/quadrature.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <numerics/matrices.h>
 #include <numerics/assembler.h>
 #include <lac/dsmatrix.h>
+
+#include <algorithm>
+#include <set>
 
 
 
@@ -74,6 +78,20 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
 
 
+void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
+						    const FiniteElement<1> &,
+						    const Quadrature<0>    &,
+						    const Boundary<1>      &,
+						    dSMatrix               &,
+						    const FunctionMap      &,
+						    dVector                &,
+						    vector<int>            &,
+						    const Function<1>      *) {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
 template <int dim>
 void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
 						      const FiniteElement<dim> &fe,
@@ -82,8 +100,141 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 						      dSMatrix                 &matrix,
 						      const FunctionMap        &rhs,
 						      dVector                  &rhs_vector,
-						      vector<int>              &vec_to_dof_mapping,
-						      const Function<dim>      *a) {};
+						      vector<int>              &dof_to_boundary_mapping,
+						      const Function<dim>      *a) {
+  Assert (matrix.n() == dof.n_boundary_dofs(rhs), ExcInternalError());
+  Assert (matrix.n() == matrix.m(), ExcInternalError());
+  Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
+  Assert (rhs.size() != 0, ExcInternalError());
+  Assert (dof.get_selected_fe() == fe, ExcInternalError());
+  Assert (dof_to_boundary_mapping.size() == dof.n_dofs(), ExcInternalError());
+  Assert (*max_element(dof_to_boundary_mapping.begin(),dof_to_boundary_mapping.end()) ==
+	  (signed int)matrix.n()-1,
+	  ExcInternalError());
+  
+  const unsigned int dofs_per_cell = fe.total_dofs,
+		     dofs_per_face = fe.dofs_per_face;
+  dFMatrix cell_matrix(dofs_per_cell, dofs_per_cell);
+  dVector  cell_vector(dofs_per_cell);
+  
+  
+  UpdateFlags update_flags = UpdateFlags (update_JxW_values | update_q_points);
+  FEFaceValues<dim> fe_values (fe, q, update_flags);
+  
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active (),
+					endc = dof.end ();
+  for (; cell!=endc; ++cell)
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+				       // check if this face is on that part of
+				       // the boundary we are interested in
+      if (rhs.find(cell->face(face)->boundary_indicator()) != rhs.end())
+	{
+	  cell_matrix.clear ();
+	  cell_vector.clear ();
+	  
+	  fe_values.reinit (cell, face, fe, boundary);
+
+	  const dFMatrix       &values    = fe_values.get_shape_values ();
+	  const vector<double> &weights   = fe_values.get_JxW_values ();
+	  vector<double>        rhs_values (fe_values.n_quadrature_points);
+	  rhs.find(cell->face(face)->boundary_indicator())
+	    ->second->value_list (fe_values.get_quadrature_points(), rhs_values);
+	  
+	  if (a != 0)
+	    {
+	      vector<double> coefficient_values (fe_values.n_quadrature_points);
+	      a->value_list (fe_values.get_quadrature_points(), coefficient_values);
+	      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		  {
+		    for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+		      cell_matrix(i,j) += (values(i,point) *
+					   values(j,point) *
+					   weights[point] *
+					   coefficient_values[point]);
+		    cell_vector(i) += values(i,point) *
+				      rhs_values[point] *
+				      weights[point];
+		  };
+	    }
+	  else
+	    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+	      for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		{
+		  for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+		    cell_matrix(i,j) += (values(i,point) *
+					 values(j,point) *
+					 weights[point]);
+		  cell_vector(i) += values(i,point) *
+				    rhs_values[point] *
+				    weights[point];
+		};
+
+
+					   // now transfer cell matrix and vector
+					   // to the whole boundary matrix
+					   //
+					   // in the following: dof[i] holds the
+					   // global index of the i-th degree of
+					   // freedom on the present cell. If it
+					   // is also a dof on the boundary, it
+					   // must be a nonzero entry in the
+					   // dof_to_boundary_mapping and then
+					   // the boundary index of this dof is
+					   // dof_to_boundary_mapping[dof[i]].
+					   //
+					   // if dof[i] is not on the boundary,
+					   // it should be zero on the boundary
+					   // therefore on all quadrature
+					   // points and finally all of its
+					   // entries in the cell matrix and
+					   // vector should be zero. If not, we
+					   // throw an error
+					   //
+					   // the main problem here is that the
+					   // matrix or vector entry should also
+					   // be zero if the degree of freedom
+					   // dof[i] is on the boundary, but not
+					   // on the present face, i.e. on
+					   // another face of the same cell also
+					   // on the boundary. We can therefore
+					   // not rely on the
+					   // dof_to_boundary_mapping[dof[i]]
+					   // being !=-1, we really have to
+					   // determine whether dof[i] is a
+					   // dof on the present face. We do so
+					   // by getting the dofs on the
+					   // face into #dofs_on_face_vector#,
+					   // a vector as always. Usually,
+					   // searching in a vector is
+					   // inefficient, so we copy the dofs
+					   // into a set, which enables binary
+					   // searches.
+	  vector<int> dofs (dofs_per_cell);
+	  cell->get_dof_indices (dofs);
+
+	  vector<int> dofs_on_face_vector (dofs_per_face);
+	  cell->face(face)->get_dof_indices (dofs_on_face_vector);
+	  set<int> dofs_on_face (dofs_on_face_vector.begin(),
+				 dofs_on_face_vector.end());
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
+	      if ((dofs_on_face.find(dofs[i]) != dofs_on_face.end()) &&
+		  (dofs_on_face.find(dofs[j]) != dofs_on_face.end()))
+		matrix.add(dof_to_boundary_mapping[dofs[i]],
+			   dof_to_boundary_mapping[dofs[j]],
+			   cell_matrix(i,j));
+	      else
+		Assert (cell_matrix(i,j)==0, ExcInternalError ());
+	  
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	    if (dofs_on_face.find(dofs[j]) != dofs_on_face.end())
+	      rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
+	    else
+	      Assert (cell_vector(j)==0, ExcInternalError());
+	};
+};
 
 
 

@@ -107,14 +107,8 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 		    boundary);
   const unsigned int n_dofs = dof_handler->get_selected_fe().total_dofs;
 
-				   // clear cell matrix
   if (assemble_matrix)
-    for (unsigned int i=0; i<n_dofs; ++i)
-      for (unsigned int j=0; j<n_dofs; ++j)
-	cell_matrix(i,j) = 0;
-  
-
-				   // clear cell vector
+    cell_matrix.clear ();
   if (assemble_rhs)
     cell_vector.clear ();
   

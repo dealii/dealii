@@ -242,7 +242,15 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 				   // in this case the boundary mass matrix has
 				   // to be condensed and the solution is to
 				   // be distributed afterwards, which is not
-				   // yet implemented
+				   // yet implemented. The reason for this is
+				   // that we cannot simply use the #condense#
+				   // family of functions, since the matrices
+				   // and vectors do not use the global
+				   // numbering but rather the boundary
+				   // numbering, i.e. the condense function
+				   // needs to use another indirection. There
+				   // should be not many technical problems,
+				   // but it needs to be implemented
   if (dim<3)
     sparsity.compress();
   else
@@ -257,7 +265,34 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   MatrixTools<dim>::create_boundary_mass_matrix (dof, fe, q, boundary,
 						 mass_matrix, boundary_functions,
 						 rhs, dof_to_boundary_mapping);
+
+				   // same thing as above: if dim>=3 we need
+				   // to consider constraints
+  Assert (dim<3, ExcNotImplemented());
+
   
+  dVector boundary_projection (rhs.size());
+
+  int    max_iter  = 1000;
+  double tolerance = 1.e-16;
+  Control                          control1(max_iter,tolerance);
+  PrimitiveVectorMemory<dVector>   memory(rhs.size());
+  CG<dSMatrix,dVector>             cg(control1,memory);
+
+				   // solve
+  cg (mass_matrix, boundary_projection, rhs);
+
+				   // fill in boundary values
+  for (unsigned int i=0; i<dof_to_boundary_mapping.size(); ++i)
+    if (dof_to_boundary_mapping[i] != -1)
+				       // this dof is on one of the
+				       // interesting boundary parts
+				       //
+				       // remember: #i# is the global dof
+				       // number, #dof_to_boundary_mapping[i]#
+				       // is the number on the boundary and
+				       // thus in the solution vector
+      boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
 };
 
 
