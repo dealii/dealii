@@ -210,6 +210,28 @@
            upon configuration of the deal.II library.
            </p>
       </dd>    
+
+
+      <dt> <code>USE_CONTRIB_METIS</code> </dt>
+      <dd> <p>
+           <code>yes</code> indicates whether the METIS library has been
+           detected upon configuration, and whether we shall interface with
+           it. <code>no</code> otherwise. (See the
+	   <a href="../readme.html#external-libs" target="body">ReadMe</a>
+	   file for more information on installation of METIS.)
+           </p>
+      </dd>    
+
+
+      <dt> <code>DEAL_II_METIS_DIR</code> </dt>
+      <dd> <p>
+           If <code>USE_CONTRIB_METIS</code> is <code>yes</code>, then this
+           variable has the path to the METIS library, as either given by the
+           <code>METIS_DIR</code> environment variable, or the
+           <code>--with-metis</code> switch on the command line upon 
+	   configuration of the deal.II library.
+           </p>
+      </dd>
     </dl>
 
 
@@ -321,6 +343,16 @@
 	   file for more information on installation of PETSc.)
            </p>
       </dd>
+
+      <dt> <code>lib-contrib-metis</code> </dt>
+      <dd> <p>
+           Path and name of the METIS libraries, if
+           found and used at configuration time.
+	   (See the
+	   <a href="../readme.html#external-libs" target="body">ReadMe</a>
+	   file for more information on installation of METIS.)
+           </p>
+      </dd>
     </dl>
 
 
@@ -346,6 +378,14 @@
            Same for the /lac library. The files are in
 	   <code>$(include-path-lac)/lac</code>.
            </p>
+      </dd>
+
+
+      <dt> <code>include-path-deal2</code> </dt>
+      <dd> <p>
+           Same for the /deal.II library. Include files are in
+           <code>$(include-path-deal2)/*</code>.
+	   </p>
       </dd>
 
 
@@ -377,11 +417,14 @@
       </dd>
 
 
-      <dt> <code>include-path-deal2</code> </dt>
+      <dt> <code>include-path-contrib-metis
+           </code> </dt>
       <dd> <p>
-           Same for the /deal.II library. Include files are in
-           <code>$(include-path-deal2)/*</code>.
-	   </p>
+           If METIS is used, then this variable has the path to the METIS
+           include files. (See the
+	   <a href="../readme.html#external-libs" target="body">ReadMe</a>
+	   file for more information on installation of METIS.)
+           </p>
       </dd>
 
 

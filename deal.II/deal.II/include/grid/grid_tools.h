@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,7 @@
  * cell that contains a given point. See the descriptions of the
  * individual functions for more information.
  *
- * @author Wolfgang Bangerth, 2001, 2003
+ * @author Wolfgang Bangerth, 2001, 2003, 2004
  */
 class GridTools
 {
@@ -233,7 +233,38 @@ class GridTools
     typename Container::active_cell_iterator
     find_active_cell_around_point (const Container  &container,
                                    const Point<dim> &p);
-    
+
+                                     /**
+                                      * Use the METIS partitioner to generate
+                                      * a partitioning of the active cells
+                                      * making up the entire domain. After
+                                      * calling this function, the subdomain
+                                      * ids of all active cells will have
+                                      * values between zero and
+                                      * @p{n_partitions-1}. You can access the
+                                      * subdomain id of a cell by using
+                                      * @p{cell->subdomain_id()}.
+                                      *
+                                      * This function will generate an error
+                                      * if METIS is not installed unless
+                                      * @p{n_partitions} is one. I.e., you can
+                                      * write a program so that it runs in the
+                                      * single-processor single-partition case
+                                      * without METIS installed, and only
+                                      * requires METIS when multiple
+                                      * partitions are required.
+                                      */
+    template <int dim>
+    static
+    void partition_triangulation (Triangulation<dim> &triangulation,
+                                  const unsigned int  n_partitions);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException1 (ExcInvalidNumberOfPartitions,
+                    int,
+                    << "The number of partitions you gave is " << arg1
+                    << ", but must be greater than zero.");
 				     /**
 				      * Exception
 				      */

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,8 +17,12 @@
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
+#include <dofs/dof_tools.h>
+#include <fe/fe_dgq.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 
@@ -238,6 +242,85 @@ GridTools::find_active_cell_around_point (const Container  &container,
 
 
 
+template <int dim>
+void
+GridTools::
+partition_triangulation (Triangulation<dim> &triangulation,
+                         const unsigned int  n_partitions)
+{
+  Assert (n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+
+                                   // check for an easy return
+  if (n_partitions == 1)
+    {
+      for (typename Triangulation<dim>::active_cell_iterator
+             cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell)
+        cell->set_subdomain_id (0);
+      return;
+    }
+
+                                   // we decompose the domain by first
+                                   // generating the connection graph of all
+                                   // cells with their neighbors, and then
+                                   // passing this graph off to METIS. To make
+                                   // things a little simpler and more
+                                   // general, we let the function
+                                   // DoFTools:make_flux_sparsity_pattern
+                                   // function generate the connection graph
+                                   // for us and reuse the SparsityPattern
+                                   // data structure for the connection
+                                   // graph. The connection structure of the
+                                   // mesh is obtained by using a fake
+                                   // piecewise constant finite element
+                                   //
+                                   // Since in 3d the generation of a
+                                   // sparsity pattern can be expensive, we
+                                   // take the detour of the compressed
+                                   // sparsity pattern, which is a little
+                                   // slower but more efficient in terms of
+                                   // memory
+  FE_DGQ<dim> fake_q0(0);
+  DoFHandler<dim> dof_handler (triangulation);
+  dof_handler.distribute_dofs (fake_q0);
+  Assert (dof_handler.n_dofs() == triangulation.n_active_cells(),
+          ExcInternalError());
+  
+  CompressedSparsityPattern csp (dof_handler.n_dofs(),
+                                 dof_handler.n_dofs());
+  DoFTools::make_flux_sparsity_pattern (dof_handler, csp);
+  
+  SparsityPattern sparsity_pattern;
+  sparsity_pattern.copy_from (csp);
+
+                                   // partition this connection graph and get
+                                   // back a vector of indices, one per degree
+                                   // of freedom (which is associated with a
+                                   // cell)
+  std::vector<unsigned int> partition_indices (triangulation.n_active_cells());
+  sparsity_pattern.partition (n_partitions,  partition_indices);
+
+                                   // finally loop over all cells and set the
+                                   // subdomain ids. for this, get the DoF
+                                   // index of each cell and extract the
+                                   // subdomain id from the vector obtained
+                                   // above
+  std::vector<unsigned int> dof_indices(1);
+  for (typename DoFHandler<dim>::active_cell_iterator
+         cell = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    {
+      cell->get_dof_indices(dof_indices);
+      Assert (dof_indices[0] < triangulation.n_active_cells(),
+              ExcInternalError());
+      Assert (partition_indices[dof_indices[0]] < n_partitions,
+              ExcInternalError());
+      
+      cell->set_subdomain_id (partition_indices[dof_indices[0]]);
+    }
+}
+
+
 
 #if deal_II_dimension != 1
 template
@@ -267,3 +350,8 @@ template
 MGDoFHandler<deal_II_dimension>::active_cell_iterator
 GridTools::find_active_cell_around_point (const MGDoFHandler<deal_II_dimension> &,
                                           const Point<deal_II_dimension> &p);
+
+template
+void
+GridTools::partition_triangulation (Triangulation<deal_II_dimension> &,
+                                    const unsigned int);

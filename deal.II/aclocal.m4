@@ -3717,3 +3717,60 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
        ])
   fi
 ])
+
+
+
+dnl ------------------------------------------------------------
+dnl Check whether Metis is installed, and if so store the 
+dnl respective links
+dnl
+dnl Usage: DEAL_II_CONFIGURE_METIS
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
+[
+  dnl First check for the Metis directory
+  AC_MSG_CHECKING(for Metis library directory)
+
+  AC_ARG_WITH(metis,
+  [  --with-metis=/path/to/metis   Specify the path to the Metis installation,
+                                   of which the include and library directories
+                                   are subdirs; use this if you want to
+                                   override the METIS_DIR environment variable],
+     [
+	USE_CONTRIB_METIS=yes
+        DEAL_II_METIS_DIR=$withval
+	AC_MSG_RESULT($DEAL_II_METIS_DIR)
+
+        dnl Make sure that what was specified is actually correct
+        if test ! -d $DEAL_II_METIS_DIR/Lib ; then
+          AC_MSG_ERROR([Path to Metis specified with --with-metis does not
+ 			point to a complete Metis installation])
+	fi
+     ],
+     [
+        dnl Take something from the environment variables, if it is there
+        if test "x$METIS_DIR" != "x" ; then
+  	  USE_CONTRIB_METIS=yes
+          DEAL_II_METIS_DIR="$METIS_DIR"
+	  AC_MSG_RESULT($DEAL_II_METIS_DIR)
+
+          dnl Make sure that what this is actually correct
+          if test ! -d $DEAL_II_METIS_DIR/include \
+               -o ! -d $DEAL_II_METIS_DIR/lib ; then
+            AC_MSG_ERROR([The path to Metis specified in the METIS_DIR
+	  		  environment variable does not
+ 			  point to a complete Metis installation])
+	  fi
+        else
+	  USE_CONTRIB_METIS=no
+          DEAL_II_METIS_DIR=""
+          AC_MSG_RESULT(not found)
+        fi
+     ])
+  if test "$USE_CONTRIB_METIS" = "yes" ; then
+    AC_DEFINE(DEAL_II_USE_METIS, 1,
+              [Defined if a Metis installation was found and is going
+               to be used])
+  fi
+])

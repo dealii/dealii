@@ -164,6 +164,9 @@
    provided by the compiler. */
 #undef DEAL_II_USE_DIRECT_ERRNO_H
 
+/* Defined if a Metis installation was found and is going to be used */
+#undef DEAL_II_USE_METIS
+
 /* Flag indicating whether the library shall be compiled for multithreaded
    applications. If so, then it is set to one, otherwise to zero. */
 #undef DEAL_II_USE_MT
