@@ -18,7 +18,6 @@ h-files  = $(wildcard ../include/*/*.h)
 forward-declarations = ../include/basic/forward-declarations.h
 
 include $D/deal.II/Make.global_options
-include $D/deal.II/Make.forward-declarations
 
 
 
@@ -201,3 +200,5 @@ clean:
 
 
 include ../lib/Makefile.dep
+
+include $D/deal.II/Make.forward-declarations

@@ -17,7 +17,6 @@ h-files  = $(wildcard ../include/*/*.h)
 forward-declarations = ../include/lac/forward-declarations.h
 
 D=../..
-include $D/deal.II/Make.forward-declarations
 
 
 %.go : %.cc Makefile
@@ -31,9 +30,9 @@ include $D/deal.II/Make.forward-declarations
 lib: lib.g.a lib.a
 
 
-lib.a: ../lib/liblac.a($(o-files))
+lib.a: $(forward-declarations) ../lib/liblac.a($(o-files))
 
-lib.g.a: ../lib/liblac.g.a($(go-files))
+lib.g.a: $(forward-declarations) ../lib/liblac.g.a($(go-files))
 
 clean:
 	rm -f *.o *.go *~ Makefile.dep ../lib/lib*
@@ -61,3 +60,5 @@ clean:
 
 
 include ../lib/Makefile.dep
+
+include $D/deal.II/Make.forward-declarations

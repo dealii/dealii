@@ -10,7 +10,6 @@ h-files  = $(wildcard ../include/*/*.h)
 forward-declarations = ../include/base/forward-declarations.h
 
 include $D/deal.II/Make.global_options
-include $D/deal.II/Make.forward-declarations
 
 
 
@@ -25,9 +24,9 @@ include $D/deal.II/Make.forward-declarations
 lib: lib.g.a lib.a
 
 
-lib.a: ../lib/libbase.a($(o-files))
+lib.a: $(forward-declarations) ../lib/libbase.a($(o-files))
 
-lib.g.a: ../lib/libbase.g.a($(go-files))
+lib.g.a: $(forward-declarations) ../lib/libbase.g.a($(go-files))
 
 clean:
 	rm -f *.o *.go *~ Makefile.dep ../lib/lib*
@@ -53,3 +52,5 @@ clean:
 
 
 include ../lib/Makefile.dep
+
+include $D/deal.II/Make.forward-declarations
