@@ -103,7 +103,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * coarse grid in future. Copy smoothing
 				      * flags, etc from that grid as well.
 				      * Note that the initial state of the
-				      * triangulation is empty, unless
+				      * triangulation is empty, until
 				      * @p{restore_grid} is called for the
 				      * first time.
 				      *
