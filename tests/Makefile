@@ -2,11 +2,11 @@
 # Common Makefile for all test directories
 
 all:
-	cd base ; make
-	cd lac ; make
-	cd deal.II ; make
+	cd base ; $(MAKE)
+	cd lac ; $(MAKE)
+	cd deal.II ; $(MAKE)
 
 clean:
-	cd base ; make clean
-	cd lac ; make clean
-	cd deal.II ; make clean
+	cd base ; $(MAKE) clean
+	cd lac ; $(MAKE) clean
+	cd deal.II ; $(MAKE) clean
