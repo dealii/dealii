@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -879,26 +879,37 @@ class VectorTools
 				  const Point<dim>&      point);
     
 				     /**
-				      * Mean-value filter for Stokes.
-				      * The pressure in Stokes'
+				      * Subtract the (algebraic) mean value
+				      * from a vector. This function is most
+				      * frequently used as a mean-value filter
+				      * for Stokes: The pressure in Stokes'
 				      * equations with only Dirichlet
-				      * boundaries for the velocities
-				      * is determined up to a constant
-				      * only. This function allows to
-				      * subtract the mean value of the
-				      * pressure. It is usually called
-				      * in a preconditioner and
-				      * generates updates with mean
-				      * value zero. The mean value is
-				      * understood in the l1-sense.
+				      * boundaries for the velocities is only
+				      * determined up to a constant. This
+				      * function allows to subtract the mean
+				      * value of the pressure. It is usually
+				      * called in a preconditioner and
+				      * generates updates with mean value
+				      * zero. The mean value is computed as
+				      * the mean value of the degree of
+				      * freedom values as given by the input
+				      * vector; they are not weighted by the
+				      * area of cells, i.e. the mean is
+				      * computed as <tt>sum_i v_i</tt>, rather
+				      * than as <tt>int_Omega v(x) = int_Omega
+				      * sum_i v_i phi_i(x)</tt>.
 				      *
-				      * Apart from the vector @p v to
-				      * operate on, this function
-				      * takes a bit vector. This has a
-				      * true entry for every component
-				      * for which the mean value shall
-				      * be computed and later
-				      * subtracted.
+				      * Apart from the vector @p v to operate
+				      * on, this function takes a bit
+				      * vector. This has a true entry for
+				      * every component for which the mean
+				      * value shall be computed and later
+				      * subtracted. The argument is used to
+				      * denote which components of the
+				      * solution vector correspond to the
+				      * pressure, and avoid touching all other
+				      * components of the vector, such as the
+				      * velocity components.
 				      */
     static void subtract_mean_value(Vector<double>          &v,
 				    const std::vector<bool> &p_select);
