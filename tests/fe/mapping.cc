@@ -25,9 +25,11 @@
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
 #  define SSTREAM std::ostringstream
+#  define ENDSTRING
 #else
 #  include <strstream>
 #  define SSTREAM std::ostrstream
+#  define ENDSTRING << std::ends
 #endif
 
 #define PRECISION 2
@@ -485,7 +487,7 @@ void mapping_test()
 	      {
 		SSTREAM ost;
 		ost << "Mapping" << dim << "d-" << i << '-'
-		    << mapping_strings[j];
+		    << mapping_strings[j] ENDSTRING;
 		deallog << ost.str() << std::endl;
 		plot_transformation(*mapping_ptr[j], fe_q4, cell, ost.str());
 		compute_area(*mapping_ptr[j], fe_q4, cell);
@@ -495,7 +497,7 @@ void mapping_test()
 	      {
 		SSTREAM ost;
 		ost << "MappingFace" << dim << "d-" << i << '-'
-		    << mapping_strings[j];
+		    << mapping_strings[j] ENDSTRING;
 		deallog << ost.str() << std::endl;	    
 		plot_faces(*mapping_ptr[j], fe_q4, cell, ost.str());
 	      }
@@ -504,7 +506,7 @@ void mapping_test()
 	      {
 		SSTREAM ost;
 		ost << "MappingSubface" << dim << "d-" << i << '-'
-		    << mapping_strings[j];
+		    << mapping_strings[j] ENDSTRING;
 		deallog << ost.str() << std::endl;	    
 		plot_subfaces(*mapping_ptr[j], fe_q4, cell, ost.str());
 	      }
