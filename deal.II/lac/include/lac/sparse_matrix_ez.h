@@ -644,16 +644,16 @@ class SparseMatrixEZ : public Subscriptor
 				      * Obviously, the matrix needs to
 				      * be square for this operation.
 				      */
-    template <typename somenumber>
-    somenumber matrix_norm_square (const Vector<somenumber> &v) const;
+//    template <typename somenumber>
+//    somenumber matrix_norm_square (const Vector<somenumber> &v) const;
 
 				     /**
 				      * Compute the matrix scalar
 				      * product $\left(u,Mv\right)$.
 				      */
-    template <typename somenumber>
-    somenumber matrix_scalar_product (const Vector<somenumber> &u,
-				      const Vector<somenumber> &v) const;
+//    template <typename somenumber>
+//    somenumber matrix_scalar_product (const Vector<somenumber> &u,
+//				      const Vector<somenumber> &v) const;
 
 				     /**
 				      * Frobenius-norm of the matrix.
@@ -732,6 +732,15 @@ class SparseMatrixEZ : public Subscriptor
 			    const number              om = 1.) const;
 
 				     /**
+				      * Add the matrix @p{A}
+				      * conjugated by @p{B}, that is,
+				      * $B A B^T$ to this object.
+				      */
+    template <class MATRIXA, class MATRIXB>
+    void conjugate_add (const MATRIXA& A,
+			const MATRIXB& B);
+    
+				     /**
 				      * STL-like iterator with the
 				      * first entry.
 				      */
@@ -774,7 +783,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * nonzero entry of the matrix
 				      * per line.
 				      */
-    void print (std::ostream &out) const;
+//    void print (std::ostream &out) const;
 
 				     /**
 				      * Print the matrix in the usual
@@ -815,12 +824,12 @@ class SparseMatrixEZ : public Subscriptor
 				      * may produce @em{large} amounts of
 				      * output if applied to a large matrix!
 				      */
-    void print_formatted (std::ostream       &out,
-			  const unsigned int  precision   = 3,
-			  const bool          scientific  = true,
-			  const unsigned int  width       = 0,
-			  const char         *zero_string = " ",
-			  const double        denominator = 1.) const;
+//      void print_formatted (std::ostream       &out,
+//  			  const unsigned int  precision   = 3,
+//  			  const bool          scientific  = true,
+//  			  const unsigned int  width       = 0,
+//  			  const char         *zero_string = " ",
+//  			  const double        denominator = 1.) const;
 
 				     /**
 				      * Determine an estimate for the
@@ -913,24 +922,6 @@ class SparseMatrixEZ : public Subscriptor
 					 const unsigned int        begin_row,
 					 const unsigned int        end_row,
 					 somenumber               *partial_sum) const;
-
-				     /**
-				      * Version of @p{residual} which
-				      * only performs its actions on
-				      * the region defined by
-				      * @p{[begin_row,end_row)} (these
-				      * numbers are the components of
-				      * @p{interval}). This function is
-				      * called by @p{residual} in the
-				      * case of enabled
-				      * multithreading.
-				      */
-    template <typename somenumber>
-    void threaded_residual (Vector<somenumber>       &dst,
-			    const Vector<somenumber> &u,
-			    const Vector<somenumber> &b,
-			    const std::pair<unsigned int,unsigned int> interval,
-			    somenumber               *partial_norm) const;
 
 				     /**
 				      * Number of columns. This is
@@ -1346,7 +1337,8 @@ SparseMatrixEZ<number>::copy_from (const MATRIX& M)
 
   while (start != final)
     {
-      set(start->row(), start->column(), start->value());
+      if (start->value() != 0.)
+	set(start->row(), start->column(), start->value());
       ++start;
     }
   return *this;
@@ -1361,14 +1353,50 @@ SparseMatrixEZ<number>::add_scaled (number factor,
 {
   Assert (M.m() == m(), ExcDimensionMismatch(M.m(), m()));
   Assert (M.n() == n(), ExcDimensionMismatch(M.n(), n()));
+
+  if (factor == 0.)
+    return;
   
   typename MATRIX::const_iterator start = M.begin();
   const typename MATRIX::const_iterator final = M.end();
 
   while (start != final)
     {
-      add(start->row(), start->column(), factor * start->value());
+      if (start->value() != 0.)
+	add(start->row(), start->column(), factor * start->value());
       ++start;
+    }
+}
+
+
+template<typename number>
+template <class MATRIXA, class MATRIXB>
+void
+SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
+				       const MATRIXB& B)
+{
+// Compute the result
+// r_ij = \sum_kl b_ik b_jl a_kl
+  
+  typename MATRIXB::const_iterator b1 = B.begin();
+  typename MATRIXB::const_iterator b2 = B.begin();
+  const typename MATRIXB::const_iterator b_final = B.end();
+  while (b1 != b_final)
+    {
+      const unsigned int i = b->row();
+      const unsigned int k = b->column();
+      while (b2 != b_final)
+	{
+	  const unsigned int j = b->row();
+	  const unsigned int l = b->column();
+	  
+	  const typename MATRIXA::value_type a = A.el(k,l);
+	  
+	  if (a != 0.)
+	    add (i, j, a * b1->value() * b2->value());
+	  ++b2;
+	}
+      ++b1;
     }
 }
 
