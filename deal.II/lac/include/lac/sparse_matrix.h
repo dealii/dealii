@@ -764,7 +764,8 @@ SparseMatrix<number>::raw_entry (const unsigned int row,
 				 const unsigned int index) const
 {
   Assert(row<cols->rows, ExcIndexRange(row,0,cols->rows));
-  Assert(index<cols->row_length(row), ExcIndexRange(index,0,cols->row_length(row)));
+  Assert(index<cols->row_length(row),
+	 ExcIndexRange(index,0,cols->row_length(row)));
 
   return val[cols->rowstart[row]+index];
 };
@@ -775,6 +776,9 @@ inline
 number SparseMatrix<number>::global_entry (const unsigned int j) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (j < cols->n_nonzero_elements(),
+	  ExcIndexRange (j, 0, cols->n_nonzero_elements()));
+  
   return val[j];
 };
 
@@ -784,6 +788,9 @@ inline
 number & SparseMatrix<number>::global_entry (const unsigned int j)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (j < cols->n_nonzero_elements(),
+	  ExcIndexRange (j, 0, cols->n_nonzero_elements()));
+
   return val[j];
 };
 
