@@ -192,7 +192,7 @@ HyperBallBoundary<dim>::get_intermediate_points_between_points (
 				   // HyperBallBoundary
   for (unsigned int i=0; i<n; ++i)
     {
-      points[i] *= r / sqrt(points[i].square());
+      points[i] *= r / std::sqrt(points[i].square());
       points[i] += center;
     }
 }
@@ -208,7 +208,7 @@ HyperBallBoundary<3>::get_intermediate_points_on_quad (
   const Triangulation<3>::quad_iterator &quad,
   std::vector<Point<3> > &points) const
 {
-  unsigned int m=static_cast<unsigned int> (sqrt(points.size()));
+  unsigned int m=static_cast<unsigned int> (std::sqrt(points.size()));
   Assert(points.size()==m*m, ExcInternalError());
 
   std::vector<Point<3> > lp3(m);

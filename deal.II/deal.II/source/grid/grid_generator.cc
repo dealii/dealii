@@ -656,9 +656,9 @@ GridGenerator::hyper_ball (Triangulation<3> &tria,
 				   // altogether
   Assert(false, ExcNotImplemented());
   
-  const double a = 1./(1+sqrt(3)); // equilibrate cell sizes at transition
-				   // from the inner part to the radial
-				   // cells
+  const double a = 1./(1+std::sqrt(3)); // equilibrate cell sizes at transition
+				        // from the inner part to the radial
+				        // cells
   const unsigned int n_vertices = 16;
   const Point<3> vertices[n_vertices]
     = {

@@ -386,7 +386,7 @@ void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapp
 	};
       
       for (unsigned int s=0; s<n_solution_vectors; ++s)
-	(*errors[s])(cell_index) = sqrt((*errors[s])(cell_index));
+	(*errors[s])(cell_index) = std::sqrt((*errors[s])(cell_index));
     };
 };
 

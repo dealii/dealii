@@ -771,10 +771,10 @@ bool TriaObjectAccessor<3, dim>::at_boundary () const
 template <int dim>
 double TriaObjectAccessor<3, dim>::diameter () const
 {
-  return sqrt(std::max( std::max((vertex(6)-vertex(0)).square(),
-				 (vertex(7)-vertex(1)).square()),
-		   std::max((vertex(4)-vertex(2)).square(),
-			    (vertex(5)-vertex(3)).square()) ));
+  return std::sqrt(std::max( std::max((vertex(6)-vertex(0)).square(),
+				      (vertex(7)-vertex(1)).square()),
+			     std::max((vertex(4)-vertex(2)).square(),
+				      (vertex(5)-vertex(3)).square()) ));
 };
 
 

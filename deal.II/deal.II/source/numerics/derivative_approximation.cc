@@ -125,7 +125,7 @@ double
 DerivativeApproximation::SecondDerivative<1>::
 derivative_norm (const Derivative &d)
 {
-  return fabs (d[0][0]);
+  return std::fabs (d[0][0]);
 };
 
 #endif
