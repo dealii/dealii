@@ -493,7 +493,17 @@ BoundaryValues<dim>::value_list (const vector<Point<dim> > &points,
 				 // approximation of the gradient on
 				 // each cell and weighs that with a
 				 // power of the mesh size, as
-				 // described in the introduction. The
+				 // described in the introduction.
+				 // This class is a simple version of
+				 // the ``DerivativeApproximation''
+				 // class in the library, that uses
+				 // similar techniques to obtain
+				 // finite difference approximations
+				 // of the gradient of a finite
+				 // element field, or if higher
+				 // derivatives.
+				 //
+				 // The
 				 // class has one public static
 				 // function ``estimate'' that is
 				 // called to compute a vector of
