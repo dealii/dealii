@@ -117,16 +117,78 @@ namespace Threads
       inline void wait () const {};
   };
 
+
+  
+/**
+ * This class is used instead of a true barrier class when not using
+ * multithreading. It allows to write programs such that they use the
+ * same class names in multithreading and non-MT mode and thus may be
+ * compiled with or without thread-support without the need to use
+ * conditional compilation. Since a barrier class only makes sense in
+ * non-multithread mode if only one thread is to be synchronised
+ * (otherwise, the barrier could not be left, since the one thread is
+ * waiting for some other part of the program to reach a certain point
+ * of execution), the constructor of this class throws an exception if
+ * the @p{count} argument denoting the number of threads that need to
+ * be synchronised is not equal to one.
+ *
+ * @author Wolfgang Bangerth, 2001
+ */
+  class DummyBarrier
+  {
+    public:
+				       /**
+					* Constructor. Since barriers
+					* are only useful in
+					* single-threaded mode if the
+					* number of threads to be
+					* synchronised is one, this
+					* constructor raises an
+					* exception if the @p{count}
+					* argument is one.
+					*/
+      DummyBarrier (const unsigned int  count,
+		    const char         *name = 0,
+		    void               *arg  = 0);
+
+				       /**
+					* Wait for all threads to
+					* reach this point. Since
+					* there may only be one
+					* thread, return immediately,
+					* i.e. this function is a
+					* no-op.
+					*/
+      int wait () { return 0; };
+
+				       /**
+					* Dump the state of this
+					* object. Here: do nothing.
+					*/
+      void dump () {};
+
+				       /**
+					* Exception.
+					*/
+      DeclException1 (ExcBarrierSizeNotUseful,
+		      int,
+		      << "In single-thread mode, other barrier sizes than 1 are not "
+		      << "useful. You gave " << arg1);
+  };
+  
   
 #ifdef DEAL_II_USE_MT
 				   /**
 				    * In multithread mode, we alias
 				    * the mutex and thread management
 				    * classes to the respective
-				    * classes of the ACE library.
+				    * classes of the ACE
+				    * library. Likewise for the
+				    * barrier class.
 				    */
   typedef ACE_Thread_Mutex   ThreadMutex;
   typedef ACE_Thread_Manager ThreadManager;
+  typedef ACE_Barrier        Barrier;
 #else
 				   /**
 				    * In non-multithread mode, the
@@ -134,10 +196,13 @@ namespace Threads
 				    * classes are aliased to dummy
 				    * classes that actually do
 				    * nothing, in particular not lock
-				    * objects or start new threads.
+				    * objects or start new
+				    * threads. Likewise for the
+				    * barrier class.
 				    */
   typedef DummyThreadMutex   ThreadMutex;
   typedef DummyThreadManager ThreadManager;
+  typedef DummyBarrier       Barrier;
 #endif
 
   

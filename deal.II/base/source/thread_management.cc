@@ -27,6 +27,15 @@ namespace Threads
   
 
   
+  DummyBarrier::DummyBarrier (const unsigned int  count,
+			      const char         *,
+			      void               *)
+  {
+    Assert (count == 1, ExcBarrierSizeNotUseful(count));
+  };
+
+  
+  
   FunDataCounter::FunDataCounter () :
 		  n_fun_encapsulation_objects (0),
 		  n_fun_data_base_objects (0)
