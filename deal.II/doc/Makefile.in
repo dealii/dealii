@@ -1,7 +1,13 @@
 # $Id$
 
+###############################
+# Configured variables
 
-D = ..
+D        = @top_srcdir@
+multigrid= @enablemultigrid@
+
+
+
 include $D/common/Make.global_options
 
 
@@ -14,11 +20,11 @@ all: default autogen-doc-all
 
 # specific targets
 autogen-doc:
-	cd auto ; $(MAKE)
+	cd auto ; $(MAKE) multigrid=$(multigrid)
 
 
 autogen-doc-all: 
-	cd auto ; $(MAKE) all
+	cd auto ; $(MAKE) all multigrid=$(multigrid)
 
 
 tutorial:

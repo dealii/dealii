@@ -14,6 +14,10 @@ kdoc.dof      = $(shell echo ../../deal.II/include/dofs/*.h) \
                 $(shell echo ../../deal.II/include/fe/*.h)
 kdoc.numerics = $(shell echo ../../deal.II/include/numerics/*.h)
 
+ifeq ($(multigrid),yes)
+kdoc.multigrid= $(shell echo ../../deal.II/include/multigrid/*.h)
+endif
+
 # for latex-output, we join the different libraries of the
 # deal.II library into just one file
 kdoc.dealII = $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
@@ -24,7 +28,8 @@ kdoc.library-files = kdoc/base.kdoc         \
                      kdoc/basic.kdoc        \
                      kdoc/grid.kdoc         \
                      kdoc/dof.kdoc          \
-                     kdoc/numerics.kdoc
+                     kdoc/numerics.kdoc     \
+                     kdoc/multigrid.kdoc
 
 ##########################################################################
 # End of changeable section                                              #

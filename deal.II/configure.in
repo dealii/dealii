@@ -1,17 +1,21 @@
 dnl $Id$
 dnl
 dnl    This is the input for the ./configure script of the deal.II
-dnl    libraries. The only output file is common/Make.global_options
-dnl    where all options and pathes are stored.
+dnl    libraries. The file is common/Make.global_options
+dnl    where all options and paths are stored.
+dnl
+dnl    In doc/Makefile some information on the kind of documentation
+dnl    is stored.
 dnl
 dnl
-dnl author: Wolfgang Bangerth, 1999
+dnl author: Wolfgang Bangerth, Guido Kanschat 1999, 2000
 dnl
 
 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_INIT(base)
+AC_CONFIG_SUBDIRS(tests)
 
 
 dnl    Set the path to the deal.II libraries to `pwd`
@@ -109,10 +113,21 @@ else
 fi
 AC_SUBST(enableshared)
 
+dnl    Test if multigrid should be enabled
+dnl    default is no
+AC_ARG_ENABLE(multigrid,
+[  --enable-multigrid Include multigrid code in library],
+    enablemultigrid=$enableval,
+    if test -r deal.II/source/multigrid ; then
+      enablemultigrid=yes ;
+    else
+      enablemultigrid=no ;
+    fi)
+if test $enablemultigrid = yes ; then
+   AC_MSG_RESULT(Configuring multigrid)
+fi
+AC_SUBST(enablemultigrid)
 
 
 dnl    Write output to the global options file
-AC_OUTPUT(common/Make.global_options)
-
-
-
+AC_OUTPUT(common/Make.global_options doc/Makefile)
