@@ -510,7 +510,7 @@ AH_BOTTOM(
  * volatile. We do this here in a very old-fashioned C-style, but still
  * convenient way.
  */
-#ifdef DEAL_II_USE_MT
+#if DEAL_II_USE_MT != 0
 #  define DEAL_VOLATILE volatile
 #else
 #  define DEAL_VOLATILE
