@@ -25,6 +25,7 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>lib-path-deal2=$(lib-path-deal2)</code>' >> $@
 	@echo '<li><code>lib-path-contrib-hsl=$(lib-path-contrib-hsl)</code>' >> $@
 	@echo '<li><code>LIBPATH=$(LIBPATH)</code>' >> $@
+	@echo '<li><code>LIBS=$(LIBS)</code>' >> $@
 	@echo '<li><code>lib-base.o=$(lib-base.o)</code>' >> $@
 	@echo '<li><code>lib-base.g=$(lib-base.g)</code>' >> $@
 	@echo '<li><code>lib-lac.o=$(lib-lac.o)</code>' >> $@
@@ -46,7 +47,7 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>F77FLAGS.g=$(F77FLAGS.g)</code>' >> $@
 	@echo '<li><code>F77FLAGS.o=$(F77FLAGS.o)</code>' >> $@
 	@echo '<li><code>LDFLAGS=$(LDFLAGS)</code>' >> $@
-	@echo '<li><code>F77LDFLAGS=$(F77LDFLAGS)</code>' >> $@
+	@echo '<li><code>F77LIBS=$(F77LIBS)</code>' >> $@
 	@echo '<li><code>ACE_ROOT=$(ACE_ROOT)</code>' >> $@
 	@echo '<li><code>lib-ACE=$(lib-ACE)</code>' >> $@
 	@echo '<li><code>with-multithreading=$(with-multithreading)</code>' >> $@

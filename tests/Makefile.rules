@@ -18,12 +18,6 @@ verbose = off
 # flags:
 ############################################################
 
-# If in multithread mode, add the ACE library to the libraries which
-# we need to link with:
-ifneq ($(with-multithreading),no)
-  LIBS += $(lib-ACE)
-endif
-
 flags     = $(CXXFLAGS.g)
 
 ifeq ($(findstring gcc,$(GXX_VERSION)),gcc)

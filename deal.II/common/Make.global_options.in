@@ -25,7 +25,7 @@ GXX-VERSION          = @GXX_VERSION@
 LDFLAGS              = @LDFLAGS@
 F77                  = @F77@
 F77-VERSION          = @F77_VERSION@
-F77LDFLAGS           = @F77LDFLAGS@
+F77LIBS              = @F77LIBS@
 LIBS                 = @LIBS@
 LIBDIR               = $D/lib
 PERL                 = @PERL@
@@ -39,6 +39,7 @@ USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 # if HSL sublibs are used, add F77 libs to linker flags
 ifeq ($(USE_CONTRIB_HSL),yes)
   LDFLAGS += $(F77LDFLAGS)
+  LIBS    += $(F77LIBS)
 endif
 
 ######################################################
@@ -122,6 +123,7 @@ ifneq ($(with-multithreading),no)
   LIBPATH    += -L$(ACE_ROOT)/ace
 
   lib-ACE     = $(ACE_ROOT)/ace/libACE.so
+  LIBS       += -l$(lib-ACE)
 
   vpath %.a $(ACE_ROOT)
 endif

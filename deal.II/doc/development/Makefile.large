@@ -91,13 +91,6 @@ endif
 flags += -Ddeal_II_dimension=$(deal_II_dimension)
 
 
-# If in multithread mode, add the ACE library to the libraries which
-# we need to link with:
-ifneq ($(with-multithreading),no)
-  libraries += $(lib-ACE)
-endif
-
-
 # The following two rules define how to compile C++ files into object
 # files:
 lib/$(deal_II_dimension)d/%.go :

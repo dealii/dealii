@@ -82,14 +82,6 @@ else
 endif
 
 
-# If in multithread mode, add the ACE library to the libraries which
-# we need to link with:
-ifneq ($(with-multithreading),no)
-  libraries += $(lib-ACE)
-endif
-
-
-
 # Now comes the first production rule: how to link the single object
 # file produced from the single C++ file into the executable. Since
 # this is the first rule in the Makefile, it is the one `make' selects

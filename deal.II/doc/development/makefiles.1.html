@@ -189,6 +189,22 @@
            was in $(LIBPATH) before.
            </p>
       </dd>
+
+      <dt> <code>LIBS</code> </dt>
+      <dd> <p>
+           Additional libraries to be linked in, such as Fortran
+           support or the ACE library when multithreading is enabled.
+           </p>
+      </dd>
+
+      <dt> <code>F77LIBS</code> </dt>
+      <dd> <p>
+           Libraries to be linked in when we link with Fortran
+           files. These libraries are checked at configuration time,
+           and are included into <code>$(LIBS)</code> when they are
+           actually needed
+           </p>
+      </dd>
     </dl>
 
 
@@ -332,14 +348,6 @@
       <dt> <code>LDFLAGS</code> </dt>
       <dd> <p>
            General linker flags
-           </p>
-      </dd>
-
-      <dt> <code>F77LDFLAGS</code> </dt>
-      <dd> <p>
-           Linker flags when linking Fortran 77 code into the
-           executable where the main part is C++. This includes
-           libraries as <code>libg2c</code> for g77, or vendor libraries
            </p>
       </dd>
     </dl>

@@ -290,6 +290,9 @@ fi
 
 AC_SUBST(CXXFLAGSG)
 AC_SUBST(CXXFLAGSO)
+AC_SUBST(LIBS)
+AC_SUBST(LDFLAGS)
+
 
 dnl ======================================================================
 dnl Check for operating system properties like header files and
@@ -624,7 +627,7 @@ if test "x$F77" != "x" ; then
     dnl Then we have to set the set of libraries we have to link with
     dnl when linking C++ and Fortran code with the C++ compiler. For
     dnl g77, this is only libg2c
-    LIBS="$LIBS -lg2c"
+    F77LIBS="$F77LIBS -lg2c"
 
   else
 
@@ -636,7 +639,7 @@ if test "x$F77" != "x" ; then
       AC_MSG_RESULT(compiler is AIX Fortran77)
       F77FLAGSG="$FFLAGS -g"
       F77FLAGSO="$FFLAGS -O3 -w"
-      LIBS="$LIBS -lxlf90"  
+      F77LIBS="$F77LIBS -lxlf90"  
 
       dnl Note: presently, we don't support shared libs on AIX, so we don't need
       dnl to set -PIC or the like for this compiler (nonetheless, I couldn't find
@@ -654,7 +657,7 @@ if test "x$F77" != "x" ; then
 	F77_VERSION="SunF77"
 	F77FLAGSG="$FFLAGS -silent -g"
 	F77FLAGSO="$FFLAGS -silent -O3 -w"
-	LIBS="$LIBS -lF77 -lsunmath -lM77"
+	F77LIBS="$F77LIBS -lF77 -lsunmath -lM77"
 
 	dnl If necessary, add shared lib flags
 	if test $enableshared = yes ; then
@@ -672,7 +675,7 @@ if test "x$F77" != "x" ; then
 	  F77_VERSION="MIPSproF77"
 	  F77FLAGSG="$FFLAGS -ansi -g"
 	  F77FLAGSO="$FFLAGS -O3 -woffall"
-	  LIBS="$LIBS -lftn"
+	  F77LIBS="$F77LIBS -lftn"
 
 	  dnl If necessary, add shared lib flags
 	  if test $enableshared = yes ; then
@@ -696,8 +699,7 @@ fi
 AC_SUBST(F77_VERSION)
 AC_SUBST(F77FLAGSO)
 AC_SUBST(F77FLAGSG)
-AC_SUBST(F77LDFLAGS)
-AC_SUBST(LIBS)
+AC_SUBST(F77LIBS)
 
 
 dnl    Find path to perl
@@ -737,45 +739,6 @@ fi
 AC_SUBST(USE_CONTRIB_HSL)
 
 
-
-dnl ------------------------------------------------------------
-dnl   Check for LAPACK and BLAS
-dnl   Consider this part experimental!
-dnl ------------------------------------------------------------
-AC_ARG_WITH(blas,
-[  --with-blas=LIB use the BLAS-library file LIB],
-  if test "$withval" != no ; then
-    AC_MSG_CHECKING(for BLAS)
-    if test -r "$withval" ; then
-      AC_MSG_RESULT(found)
-    else
-      AC_MSG_RESULT(not found)
-      AC_MSG_ERROR(BLAS library $withval not readable)
-    fi
-    AC_DEFINE(HAVE_LIBBLAS)
-    LIBS="$withval -lg2c $LIBS";
-  fi
-  ,
-  AC_CHECK_LIB(blas, daxpy_,
-               LIBS="-lblas -lg2c $LIBS" ; AC_DEFINE(HAVE_LIBBLAS),,-lg2c)
-)
-
-AC_ARG_WITH(lapack,
-[  --with-lapack=LIB use the LAPACK-library file LIB],
-  if test "$withval" != no ; then
-    AC_MSG_CHECKING(for LAPACK)
-    if test -r "$withval" ; then
-      AC_MSG_RESULT(found)
-    else
-      AC_MSG_RESULT(not found)
-      AC_MSG_ERROR(LAPACK library $withval not readable)
-    fi
-    AC_DEFINE(HAVE_LIBLAPACK)
-    LIBS="$withval $LIBS";
-  fi
-  ,
-  AC_CHECK_LIB(lapack, dgels_,,$LIBS)
-)
 
 dnl -------------------------------------------------------------
 dnl Multigrid
