@@ -110,38 +110,15 @@ class SparseVanka
     ~SparseVanka();
     
 				     /**
-				      * Do the preconditioning. This
-				      * function contains a dispatch
-				      * mechanism to use the
-				      * multiplicative version by
-				      * default and the additive version
-				      * if requested by #set_additive#.
+				      * Do the preconditioning.
+				      * This function takes the residual
+				      * in #src# and returns the resulting
+				      * update vector in #dst#.
 				      */
     template<typename number2>
     void operator() (Vector<number2>       &dst,
 		     const Vector<number2> &src) const;
 
-				     /**
-				      * Application of the Vanka operator.
-				      * This function takes the residual
-				      * in #src# and returns the resulting
-				      * update vector in #dst#.
-				      */
-    template<typename number2>
-    void forward (Vector<number2>       &dst,
-		  const Vector<number2> &src) const;
-    
-				     /**
-				      * Application of the transpose
-				      * Vanka operator.
-				      * This function takes the residual
-				      * in #src# and returns the resulting
-				      * update vector in #dst#.
-				      */
-    template<typename number2>
-    void backward (Vector<number2>       &dst,
-		   const Vector<number2> &src) const;
-    
 				     /**
 				      * Minimize memory consumption.
 				      * Activating this option reduces
@@ -186,19 +163,6 @@ class SparseVanka
 };
 
 
-
-/* ---------------------------- Inline functions -----------------------*/
-
-template<typename number>
-template<typename number2>
-inline
-void
-SparseVanka<number>::operator() (Vector<number2>& dst,
-				 const Vector<number2>& src) const
-{
-  dst = 0.;
-  forward(dst, src);
-}
 
 
 

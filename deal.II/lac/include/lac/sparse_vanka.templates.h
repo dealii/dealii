@@ -41,9 +41,11 @@ SparseVanka<number>::~SparseVanka()
 template<typename number>
 template<typename number2>
 void
-SparseVanka<number>::forward(Vector<number2>& dst,
-			   const Vector<number2>& src) const
+SparseVanka<number>::operator ()(Vector<number2>       &dst,
+				 const Vector<number2> &src) const
 {
+				   // first set output vector to zero
+  dst.clear ();
 				   // first define an alias to the sparsity
 				   // pattern of the matrix, since this
 				   // will be used quite often
