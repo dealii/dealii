@@ -37,6 +37,8 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
   Assert (m.max_len==0, ExcInvalidConstructorCall());
 };
 
+
+
 template <typename number>
 SparseMatrix<number>&
 SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
@@ -47,7 +49,8 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 
   return *this;
 };
-  
+
+
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparseMatrixStruct &c) :
@@ -55,6 +58,7 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrixStruct &c) :
 		val(0),
 		max_len(0)
 {
+  cols->subscribe ();
   reinit();
 };
 
@@ -63,7 +67,11 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrixStruct &c) :
 template <typename number>
 SparseMatrix<number>::~SparseMatrix ()
 {
-  delete[] val;
+  if (cols != 0)
+    cols->unsubscribe();
+  
+  if (val != 0)
+    delete[] val;
 };
 
 
@@ -100,7 +108,12 @@ template <typename number>
 void
 SparseMatrix<number>::reinit (const SparseMatrixStruct &sparsity)
 {
+  if (cols != 0)
+    cols->unsubscribe();
+  
   cols = &sparsity;
+  cols->subscribe();
+  
   reinit ();
 };
 

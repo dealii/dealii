@@ -17,10 +17,6 @@ Let dSMatrixStruct::compress free the memory of colnums which is
   no longer needed.
 
 
-Let dSMatrixStruct be derived from Subscriptor and let the dSMatrix
-  subscribe to that. The present behaviour is just about to dangerous.
-
-
 Use memcpy in dSMatrix::copy_from instead of elementwise copying.
   This should yield a significant speed-up.
 
