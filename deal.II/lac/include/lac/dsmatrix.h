@@ -402,7 +402,7 @@ class dSMatrix
 				      * release the memory of the sparsity
 				      * structure.
 				      */
-    ~dSMatrix ();
+    virtual ~dSMatrix ();
     
 
 				     /**
@@ -420,7 +420,7 @@ class dSMatrix
 				      * dimensions are zero), then all memory
 				      * is freed.
 				      */
-    void reinit ();
+    virtual void reinit ();
 
 				     /**
 				      * Reinitialize the sparse matrix with the
@@ -437,7 +437,7 @@ class dSMatrix
 				      * long as #reinit# is not called with a
 				      * new sparsity structure.
 				      */
-    void reinit (const dSMatrixStruct &sparsity);
+    virtual void reinit (const dSMatrixStruct &sparsity);
 
 				     /**
 				      * Release all memory and return to a state
@@ -446,7 +446,7 @@ class dSMatrix
 				      * sparsity pattern it was previously tied
 				      * to.
 				      */
-    void clear ();
+    virtual void clear ();
     
 				     /**
 				      * Return the dimension of the image space.
