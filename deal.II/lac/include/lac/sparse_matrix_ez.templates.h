@@ -70,6 +70,13 @@ SparseMatrixEZ<number>::reinit(const unsigned int n_rows,
 			       unsigned int default_increment)
 {
   clear();
+
+                                   // replace (invalid) default values
+                                   // by true defaults; note that
+                                   // these defaults are also
+                                   // documented in the docs of this
+                                   // function as well as in the docs
+                                   // of the constructor!
   if (default_row_length == Entry::invalid)
     default_row_length = 5;
   if (default_increment == Entry::invalid)

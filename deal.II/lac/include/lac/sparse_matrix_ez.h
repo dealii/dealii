@@ -358,6 +358,10 @@ class SparseMatrixEZ : public Subscriptor
 				      * properly is essential for an
 				      * efficient assembling of the
 				      * matrix.
+				      *
+				      * The default values are
+				      * @p{default_row_length=5},
+				      * @p{default_increment=4}.
 				      */
     explicit SparseMatrixEZ (const unsigned int n_rows,
 			     const unsigned int n_columns,
@@ -390,6 +394,10 @@ class SparseMatrixEZ : public Subscriptor
 				      * properly is essential for an
 				      * efficient assembling of the
 				      * matrix.
+				      *
+				      * The default values are
+				      * @p{default_row_length=5},
+				      * @p{default_increment=4}.
 				      */
     void reinit (const unsigned int n_rows,
 		 const unsigned int n_columns,
@@ -433,7 +441,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * Set the element @p{(i,j)} to
 				      * @p{value}. Allocates the entry
 				      * if it does not exist. Filters
-				      * out zero automatically.
+				      * out zeroes automatically.
 				      */
     void set (const unsigned int i, const unsigned int j,
 	      const number value);
@@ -442,7 +450,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * Add @p{value} to the element
 				      * @p{(i,j)}. Allocates the entry
 				      * if it does not exist. Filters
-				      * out zero automatically.
+				      * out zeroes automatically.
 				      */
     void add (const unsigned int i, const unsigned int j,
 	      const number value);
