@@ -43,8 +43,8 @@
  *
  * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
  */
-template <class Matrix = SparseMatrix<double>, class Vector = Vector<double> >
-class SolverCG : public Solver<Matrix,Vector>
+template <class VECTOR = Vector<double> >
+class SolverCG : private Solver<VECTOR>
 {
   public:
     				     /**
@@ -59,7 +59,7 @@ class SolverCG : public Solver<Matrix,Vector>
 				      * Constructor.
 				      */
     SolverCG (SolverControl &cn,
-	      VectorMemory<Vector> &mem,
+	      VectorMemory<VECTOR> &mem,
 	      const AdditionalData &data=AdditionalData());
 
 				     /**
@@ -70,11 +70,11 @@ class SolverCG : public Solver<Matrix,Vector>
 				     /**
 				      * Solver method.
 				      */
-    template<class Preconditioner>
-    typename Solver<Matrix,Vector>::ReturnState
-    solve (const Matrix &A,
-	   Vector       &x,
-	   const Vector &b,
+    template<class MATRIX, class Preconditioner>
+    typename Solver<VECTOR>::ReturnState
+    solve (const MATRIX &A,
+	   VECTOR       &x,
+	   const VECTOR &b,
 	   const Preconditioner& precondition);
 
   protected:
@@ -96,9 +96,9 @@ class SolverCG : public Solver<Matrix,Vector>
 				      * convergence history.
 				      */
     virtual void print_vectors(const unsigned int step,
-			       const Vector& x,
-			       const Vector& r,
-			       const Vector& d) const;
+			       const VECTOR& x,
+			       const VECTOR& r,
+			       const VECTOR& d) const;
 
 				     /**
 				      * Temporary vectors, allocated through
@@ -106,10 +106,10 @@ class SolverCG : public Solver<Matrix,Vector>
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
-    Vector *Vr;
-    Vector *Vp;
-    Vector *Vz;
-    Vector *VAp;
+    VECTOR *Vr;
+    VECTOR *Vp;
+    VECTOR *Vz;
+    VECTOR *VAp;
     
 				     /**
 				      * Within the iteration loop, the
@@ -128,48 +128,48 @@ class SolverCG : public Solver<Matrix,Vector>
 /*------------------------- Implementation ----------------------------*/
 
 
-template<class Matrix, class Vector>
-SolverCG<Matrix,Vector>::SolverCG(SolverControl &cn,
-				  VectorMemory<Vector> &mem,
-				  const AdditionalData &)
+template<class VECTOR>
+SolverCG<VECTOR>::SolverCG(SolverControl &cn,
+			   VectorMemory<VECTOR> &mem,
+			   const AdditionalData &)
 		:
-		Solver<Matrix,Vector>(cn,mem)
+		Solver<VECTOR>(cn,mem)
 {}
 
 
 
-template<class Matrix, class Vector>
-SolverCG<Matrix,Vector>::~SolverCG ()
+template<class VECTOR>
+SolverCG<VECTOR>::~SolverCG ()
 {}
 
 
 
-template<class Matrix, class Vector>
+template<class VECTOR>
 double
-SolverCG<Matrix,Vector>::criterion()
+SolverCG<VECTOR>::criterion()
 {
   return sqrt(res2);
 }
 
 
 
-template<class Matrix, class Vector>
+template<class VECTOR>
 void
-SolverCG<Matrix,Vector>::print_vectors(const unsigned int,
-				       const Vector&,
-				       const Vector&,
-				       const Vector&) const
+SolverCG<VECTOR>::print_vectors(const unsigned int,
+				const VECTOR&,
+				const VECTOR&,
+				const VECTOR&) const
 {}
 
 
 
-template<class Matrix, class Vector>
-template<class Preconditioner>
-typename Solver<Matrix,Vector>::ReturnState 
-SolverCG<Matrix,Vector>::solve (const Matrix &A,
-				Vector       &x,
-				const Vector &b,
-				const Preconditioner& precondition)
+template<class VECTOR>
+template<class MATRIX, class Preconditioner>
+typename Solver<VECTOR>::ReturnState 
+SolverCG<VECTOR>::solve (const MATRIX &A,
+			 VECTOR       &x,
+			 const VECTOR &b,
+			 const Preconditioner& precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -181,10 +181,10 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
   Vz  = memory.alloc();
   VAp = memory.alloc();
 				   // define some aliases for simpler access
-  Vector& g  = *Vr; 
-  Vector& h  = *Vp; 
-  Vector& d  = *Vz; 
-  Vector& Ad = *VAp;
+  VECTOR& g  = *Vr; 
+  VECTOR& h  = *Vp; 
+  VECTOR& d  = *Vz; 
+  VECTOR& Ad = *VAp;
 				   // resize the vectors, but do not set
 				   // the values since they'd be overwritten
 				   // soon anyway.

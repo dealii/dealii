@@ -129,8 +129,7 @@
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997, 1998, 1999
  */
-template <class Matrix = SparseMatrix<double>,
-          class Vector = Vector<double> >
+template <class Vector = Vector<double> >
 class Solver
 {
   public:
@@ -179,17 +178,18 @@ class Solver
 
 /*-------------------------------- Inline functions ------------------------*/
 
-template <class Matrix, class Vector>
+template <class Vector>
 inline
-SolverControl & Solver<Matrix,Vector>::control() const
+SolverControl &
+Solver<Vector>::control() const
 {
   return cntrl;
 };
 
 
-template<class Matrix, class Vector>
+template<class Vector>
 inline
-Solver<Matrix, Vector>::Solver(SolverControl &cn, VectorMemory<Vector> &mem)
+Solver<Vector>::Solver(SolverControl &cn, VectorMemory<Vector> &mem)
 		: cntrl(cn),
 		  memory(mem)
 {};

@@ -89,9 +89,8 @@ class ShiftedMatrix
  *
  * @author Guido Kanschat, 2000
  */
-template <class MATRIX = SparseMatrix<double>,
-          class VECTOR = Vector<double> >
-class EigenPower : private Solver<MATRIX,VECTOR>
+template <class VECTOR = Vector<double> >
+class EigenPower : private Solver<VECTOR>
 {
   public:
     				     /**
@@ -139,7 +138,8 @@ class EigenPower : private Solver<MATRIX,VECTOR>
 				      * corresponding eigenvector,
 				      * normalized with respect to the l2-norm.
 				      */
-    typename Solver<MATRIX,VECTOR>::ReturnState
+    template <class MATRIX>
+    typename Solver<VECTOR>::ReturnState
     solve (double       &value,
 	   const MATRIX &A,
 	   VECTOR       &x);
@@ -158,21 +158,38 @@ class EigenPower : private Solver<MATRIX,VECTOR>
  *
  * This class implements an adaptive version of the inverse iteration by Wieland.
  *
+ * There are two choices for the stopping criterion: by default, the
+ * norm of the residual $A x - l x$ is computed. Since this might not
+ * converge to zero for non-symmetric matrices with non-trivial Jordan
+ * blocks, it can be replaced by checking the difference of successive
+ * eigenvalues. Use @p{AdditionalData::use_residual} for switching
+ * these options.
+ *
  * @author Guido Kanschat, 2000
  */
-template <class MATRIX = SparseMatrix<double>,
-          class VECTOR = Vector<double> >
-class EigenInverse : private Solver<MATRIX, VECTOR>
+template <class VECTOR = Vector<double> >
+class EigenInverse : private Solver<VECTOR>
 {
   public:
       				     /**
 				      * Standardized data struct to
 				      * pipe additional data to the
-				      * solver. This solver does not
-				      * need additional data yet.
+				      * solver.
 				      */
     struct AdditionalData
-    {};
+    {
+					 /**
+					  * Flag for the stopping criterion.
+					  */
+	bool use_residual;
+					 /**
+					  * Constructor.
+					  */
+	AdditionalData (bool use_residual = true):
+			use_residual(use_residual)
+	  {}
+	
+    };
     
   				     /**
 				      * Constructor.
@@ -200,7 +217,8 @@ class EigenInverse : private Solver<MATRIX, VECTOR>
 				      * normalized with respect to the
 				      * l2-norm.
 				      */
-    typename Solver<MATRIX,VECTOR>::ReturnState
+    template <class MATRIX>
+    typename Solver<VECTOR>::ReturnState
     solve (double       &value,
 	   const MATRIX &A,
 	   VECTOR       &x);
@@ -267,25 +285,26 @@ ShiftedMatrix<MATRIX>::residual (VECTOR& dst,
 //----------------------------------------------------------------------
 
 
-template <class MATRIX, class VECTOR>
-EigenPower<MATRIX, VECTOR>::EigenPower (SolverControl &cn,
-					VectorMemory<VECTOR> &mem,
-					const AdditionalData &data):
-		Solver<MATRIX, VECTOR>(cn, mem),
+template <class VECTOR>
+EigenPower<VECTOR>::EigenPower (SolverControl &cn,
+				VectorMemory<VECTOR> &mem,
+				const AdditionalData &data):
+		Solver<VECTOR>(cn, mem),
 		additional_data(data)
 {}
 
 
-template <class MATRIX, class VECTOR>
-EigenPower<MATRIX, VECTOR>::~EigenPower ()
+template <class VECTOR>
+EigenPower<VECTOR>::~EigenPower ()
 {}
 
 
-template <class MATRIX, class VECTOR>
-typename Solver<MATRIX,VECTOR>::ReturnState
-EigenPower<MATRIX, VECTOR>::solve (double       &value,
-				   const MATRIX &A,
-				   VECTOR       &x)
+template <class VECTOR>
+template <class MATRIX>
+typename Solver<VECTOR>::ReturnState
+EigenPower<VECTOR>::solve (double       &value,
+			   const MATRIX &A,
+			   VECTOR       &x)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -350,25 +369,26 @@ EigenPower<MATRIX, VECTOR>::solve (double       &value,
 
 //----------------------------------------------------------------------//
 
-template <class MATRIX, class VECTOR>
-EigenInverse<MATRIX, VECTOR>::EigenInverse (SolverControl &cn,
+template <class VECTOR>
+EigenInverse<VECTOR>::EigenInverse (SolverControl &cn,
 					    VectorMemory<VECTOR> &mem,
 					    const AdditionalData &data):
-		Solver<MATRIX, VECTOR>(cn, mem),
+		Solver<VECTOR>(cn, mem),
 		additional_data(data)
 {}
 
 
-template <class MATRIX, class VECTOR>
-EigenInverse<MATRIX, VECTOR>::~EigenInverse ()
+template <class VECTOR>
+EigenInverse<VECTOR>::~EigenInverse ()
 {}
 
 
-template <class MATRIX, class VECTOR>
-typename Solver<MATRIX,VECTOR>::ReturnState
-EigenInverse<MATRIX, VECTOR>::solve (double       &value,
-				     const MATRIX &A,
-				     VECTOR       &x)
+template <class VECTOR>
+template <class MATRIX>
+typename Solver<VECTOR>::ReturnState
+EigenInverse<VECTOR>::solve (double       &value,
+			     const MATRIX &A,
+			     VECTOR       &x)
 {
   deallog.push("Wieland");
 
@@ -380,7 +400,7 @@ EigenInverse<MATRIX, VECTOR>::solve (double       &value,
 				   // Define solver
   ReductionControl inner_control (100, 1.e-16, 1.e-8, false, false);
   PreconditionIdentity prec;
-  SolverQMRS<ShiftedMatrix <MATRIX>, VECTOR>
+  SolverCG<VECTOR>
     solver(inner_control, memory);
 
 				   // Next step for recomputing the shift
@@ -433,11 +453,15 @@ EigenInverse<MATRIX, VECTOR>::solve (double       &value,
 				       // Update normalized eigenvector
       x.equ (1./length, y);
 				       // Compute residual
-      y.equ (value, x);
-      double res = A.residual (r,x,y);
-
-				       // Check the residual
-      conv = control().check (iter, res);
+      if (additional_data.use_residual)
+	{
+	  y.equ (value, x);
+	  double res = A.residual (r,x,y);
+					   // Check the residual
+	  conv = control().check (iter, res);
+	} else {
+	  conv = control().check (iter, fabs(1.-old_value/value));
+	}
       old_value = value;
     }
 

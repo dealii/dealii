@@ -155,8 +155,8 @@ for (unsigned int level = 0; level <= maxlevel; ++level)
       PreconditionMG<FDMG, Vector<TYPE> >
 	precondition(multigrid, smoother, smoother, coarsegrid);
 
-//      SolverRichardson<SparseMatrix<double> , Vector<TYPE> > solver(control, mem);
-      SolverCG<SparseMatrix<double> , Vector<TYPE> > solver(control, mem);
+//      SolverRichardson<Vector<TYPE> > solver(control, mem);
+      SolverCG<Vector<TYPE> > solver(control, mem);
 
       Vector<TYPE> u(dim);
       Vector<TYPE> f(dim);

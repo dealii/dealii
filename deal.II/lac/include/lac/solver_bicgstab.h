@@ -36,8 +36,8 @@
  * has a default argument, so you may call it without the additional
  * parameter.
  */
-template <class Matrix = SparseMatrix<double>, class Vector = Vector<double> >
-class SolverBicgstab : public Solver<Matrix,Vector>
+template <class VECTOR = Vector<double> >
+class SolverBicgstab : private Solver<VECTOR>
 {
   public:
     				     /**
@@ -52,7 +52,7 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 				      * Constructor.
 				      */
     SolverBicgstab (SolverControl &cn,
-		    VectorMemory<Vector> &mem,
+		    VectorMemory<VECTOR> &mem,
 		    const AdditionalData &data=AdditionalData());
 
 				     /**
@@ -63,18 +63,19 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 				     /**
 				      * Solve primal problem only.
 				      */
-    template<class Preconditioner>
-    typename Solver<Matrix,Vector>::ReturnState
-    solve (const Matrix &A,
-	   Vector       &x,
-	   const Vector &b,
+    template<class MATRIX, class Preconditioner>
+    typename Solver<VECTOR>::ReturnState
+    solve (const MATRIX &A,
+	   VECTOR       &x,
+	   const VECTOR &b,
 	   const Preconditioner& precondition);
 
   protected:
 				     /**
 				      * Computation of the stopping criterion.
 				      */
-    virtual double criterion();
+    template <class MATRIX>
+    double criterion (const MATRIX& A, const VECTOR& x, const VECTOR& b);
 
 				     /**
 				      * Interface for derived class.
@@ -86,55 +87,50 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 				      * convergence history.
 				      */
     virtual void print_vectors(const unsigned int step,
-			       const Vector& x,
-			       const Vector& r,
-			       const Vector& d) const;
+			       const VECTOR& x,
+			       const VECTOR& r,
+			       const VECTOR& d) const;
 
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector *Vx;
+    VECTOR *Vx;
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector *Vr;
+    VECTOR *Vr;
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector *Vrbar;
+    VECTOR *Vrbar;
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector *Vp;
+    VECTOR *Vp;
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector *Vy;
+    VECTOR *Vy;
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector *Vz;
+    VECTOR *Vz;
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector *Vs;
+    VECTOR *Vs;
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector *Vt;
+    VECTOR *Vt;
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector *Vv;
+    VECTOR *Vv;
 				     /**
 				      * Right hand side vector.
 				      */
-    const Vector *Vb;
-  
-				     /**
-				      * Pointer to the system matrix.
-				      */
-    const Matrix *MA;
+    const VECTOR *Vb;
   
 				     /**
 				      * Auxiliary value.
@@ -171,50 +167,53 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 				     /**
 				      * Everything before the iteration loop.
 				      */
-    SolverControl::State start();
+    template <class MATRIX>
+    SolverControl::State start(const MATRIX& A);
 
 				     /**
 				      * The iteration loop itself.
 				      */
-    template<class Preconditioner>
-    typename Solver<Matrix,Vector>::ReturnState 
-    iterate(const Preconditioner& precondition);
+    template<class MATRIX, class PRECONDITIONER>
+    typename Solver<VECTOR>::ReturnState 
+    iterate(const MATRIX& A, const PRECONDITIONER& precondition);
   
 };
 
 /*-------------------------Inline functions -------------------------------*/
 
-template<class Matrix, class Vector>
-SolverBicgstab<Matrix, Vector>::SolverBicgstab (SolverControl &cn,
-					       VectorMemory<Vector> &mem,
-					       const AdditionalData &)
+template<class VECTOR>
+SolverBicgstab<VECTOR>::SolverBicgstab (SolverControl &cn,
+					VectorMemory<VECTOR> &mem,
+					const AdditionalData &)
 		:
-		Solver<Matrix,Vector>(cn,mem)
+		Solver<VECTOR>(cn,mem)
 {}
 
 
 
-template<class Matrix, class Vector>
-SolverBicgstab<Matrix, Vector>::~SolverBicgstab ()
+template<class VECTOR>
+SolverBicgstab<VECTOR>::~SolverBicgstab ()
 {}
 
 
 
-template<class Matrix, class Vector>
+template <class VECTOR>
+template <class MATRIX>
 double
-SolverBicgstab<Matrix, Vector>::criterion()
+SolverBicgstab<VECTOR>::criterion (const MATRIX& A, const VECTOR& x, const VECTOR& b)
 {
-  res = MA->residual(*Vt, *Vx, *Vb);
+  res = A.residual(*Vt, x, b);
   return res;
 }
 
 
 
-template < class Matrix, class Vector >
+template <class VECTOR >
+template <class MATRIX>
 SolverControl::State
-SolverBicgstab<Matrix, Vector>::start()
+SolverBicgstab<VECTOR>::start(const MATRIX& A)
 {
-  res = MA->residual(*Vr, *Vx, *Vb);
+  res = A.residual(*Vr, *Vx, *Vb);
   Vp->reinit(*Vx);
   Vv->reinit(*Vx);
   Vrbar->equ(1.,*Vr);
@@ -224,32 +223,33 @@ SolverBicgstab<Matrix, Vector>::start()
 
 
 
-template<class Matrix, class Vector>
+template<class VECTOR>
 void
-SolverBicgstab<Matrix,Vector>::print_vectors(const unsigned int,
-					     const Vector&,
-					     const Vector&,
-					     const Vector&) const
+SolverBicgstab<VECTOR>::print_vectors(const unsigned int,
+				      const VECTOR&,
+				      const VECTOR&,
+				      const VECTOR&) const
 {}
 
 
 
-template<class Matrix, class Vector>
-template<class Preconditioner>
-typename Solver<Matrix,Vector>::ReturnState
-SolverBicgstab<Matrix, Vector>::iterate(const Preconditioner& precondition)
+template<class VECTOR>
+template<class MATRIX, class PRECONDITIONER>
+typename Solver<VECTOR>::ReturnState
+SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
+				const PRECONDITIONER& precondition)
 {
   SolverControl::State state = SolverControl::iterate;
   alpha = omega = rho = 1.;
 
-  Vector& r = *Vr;
-  Vector& rbar = *Vrbar;
-  Vector& p = *Vp;
-  Vector& y = *Vy;
-  Vector& z = *Vz;
-  Vector& s = *Vs;
-  Vector& t = *Vt;
-  Vector& v = *Vv;
+  VECTOR& r = *Vr;
+  VECTOR& rbar = *Vrbar;
+  VECTOR& p = *Vp;
+  VECTOR& y = *Vy;
+  VECTOR& z = *Vz;
+  VECTOR& s = *Vs;
+  VECTOR& t = *Vt;
+  VECTOR& v = *Vv;
   
   do
     {
@@ -258,7 +258,7 @@ SolverBicgstab<Matrix, Vector>::iterate(const Preconditioner& precondition)
       rho    = rhobar;
       p.sadd(beta, 1., r, -beta*omega, v);
       precondition(y,p);
-      MA->vmult(v,y);
+      A.vmult(v,y);
       rhobar = rbar * v;
 
       alpha = rho/rhobar;
@@ -269,13 +269,13 @@ SolverBicgstab<Matrix, Vector>::iterate(const Preconditioner& precondition)
     
       s.equ(1., r, -alpha, v);
       precondition(z,s);
-      MA->vmult(t,z);
+      A.vmult(t,z);
       rhobar = t*s;
       omega = rhobar/(t*t);
       Vx->add(alpha, y, omega, z);
       r.equ(1., s, -omega, t);
 
-      state = control().check(++step, criterion());
+      state = control().check(++step, criterion(A, *Vx, *Vb));
       print_vectors(step, *Vx, r, y);
     }
   while (state == SolverControl::iterate);
@@ -284,13 +284,13 @@ SolverBicgstab<Matrix, Vector>::iterate(const Preconditioner& precondition)
 }
 
 
-template<class Matrix, class Vector>
-template<class Preconditioner>
-typename Solver<Matrix,Vector>::ReturnState
-SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
-				      Vector       &x,
-				      const Vector &b,
-				      const Preconditioner& precondition)
+template<class VECTOR>
+template<class MATRIX, class PRECONDITIONER>
+typename Solver<VECTOR>::ReturnState
+SolverBicgstab<VECTOR>::solve(const MATRIX &A,
+			      VECTOR       &x,
+			      const VECTOR &b,
+			      const PRECONDITIONER& precondition)
 {
   deallog.push("Bicgstab");
   Vr    = memory.alloc(); Vr->reinit(x);
@@ -302,7 +302,6 @@ SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
   Vt    = memory.alloc(); Vt->reinit(x);
   Vv    = memory.alloc();
 
-  MA = &A;
   Vx = &x;
   Vb = &b;
 
@@ -314,8 +313,8 @@ SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
     {
       if (step)
 	deallog << "Restart step " << step << endl;
-      if (start() == SolverControl::success) break;  
-      state = iterate(precondition);
+      if (start(A) == SolverControl::success) break;  
+      state = iterate(A, precondition);
     }
   while (state == breakdown);
 

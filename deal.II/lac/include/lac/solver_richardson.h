@@ -37,8 +37,8 @@
  *
  * @author Ralf Hartmann
  */
-template <class Matrix = SparseMatrix<double>, class Vector = Vector<double> >
-class SolverRichardson : public Solver<Matrix, Vector>
+template <class VECTOR = Vector<double> >
+class SolverRichardson : private Solver<VECTOR>
 {
   public:
 				     /**
@@ -67,16 +67,16 @@ class SolverRichardson : public Solver<Matrix, Vector>
 				      * Constructor.
 				      */
     SolverRichardson (SolverControl &cn,
-		      VectorMemory<Vector> &mem,
+		      VectorMemory<VECTOR> &mem,
 		      const AdditionalData &data=AdditionalData());
 
 				     /**
 				      * Solve $Ax=b$ for $x$.
 				      */
-    template<class Preconditioner>
-    typename Solver<Matrix,Vector>::ReturnState solve (const Matrix &A,
-						       Vector       &x,
-						       const Vector &b,
+    template<class MATRIX, class Preconditioner>
+    typename Solver<VECTOR>::ReturnState solve (const MATRIX &A,
+						       VECTOR       &x,
+						       const VECTOR &b,
 						       const Preconditioner& precondition);
 
 				     /**
@@ -95,9 +95,9 @@ class SolverRichardson : public Solver<Matrix, Vector>
 				      * convergence history.
 				      */
     virtual void print_vectors(const unsigned int step,
-			       const Vector& x,
-			       const Vector& r,
-			       const Vector& d) const;
+			       const VECTOR& x,
+			       const VECTOR& r,
+			       const VECTOR& d) const;
     
   protected:
 				     /**
@@ -112,8 +112,8 @@ class SolverRichardson : public Solver<Matrix, Vector>
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
-    Vector *Vr;
-    Vector *Vd;
+    VECTOR *Vr;
+    VECTOR *Vd;
 
 				     /**
 				      * Damping parameter.
@@ -137,27 +137,27 @@ class SolverRichardson : public Solver<Matrix, Vector>
 /*----------------- Implementation of the Richardson Method ------------------*/
 
 
-template<class Matrix, class Vector>
-SolverRichardson<Matrix,Vector>::SolverRichardson(SolverControl &cn,
-						  VectorMemory<Vector> &mem,
-						  const AdditionalData &data):
-		Solver<Matrix,Vector> (cn,mem),
+template<class VECTOR>
+SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
+					   VectorMemory<VECTOR> &mem,
+					   const AdditionalData &data):
+		Solver<VECTOR> (cn,mem),
 		additional_data(data)  {};
 
 
-template<class Matrix,class Vector>
-template<class Preconditioner>
-typename Solver<Matrix,Vector>::ReturnState 
-SolverRichardson<Matrix,Vector>::solve (const Matrix &A,
-					Vector       &x,
-					const Vector &b,
-					const Preconditioner& precondition)
+template<class VECTOR>
+template<class MATRIX, class Preconditioner>
+typename Solver<VECTOR>::ReturnState 
+SolverRichardson<VECTOR>::solve (const MATRIX &A,
+				 VECTOR       &x,
+				 const VECTOR &b,
+				 const Preconditioner& precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
 				   // Memory allocation
-  Vr  = memory.alloc(); Vector& r  = *Vr; r.reinit(x);
-  Vd  = memory.alloc(); Vector& d  = *Vd; d.reinit(x);
+  Vr  = memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
+  Vd  = memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
 
   deallog.push("Richardson");
 
@@ -188,27 +188,27 @@ SolverRichardson<Matrix,Vector>::solve (const Matrix &A,
 }
 
 
-template<class Matrix, class Vector>
+template<class VECTOR>
 void
-SolverRichardson<Matrix,Vector>::print_vectors(const unsigned int,
-					       const Vector&,
-					       const Vector&,
-					       const Vector&) const
+SolverRichardson<VECTOR>::print_vectors(const unsigned int,
+					const VECTOR&,
+					const VECTOR&,
+					const VECTOR&) const
 {}
 
 
 
-template<class Matrix,class Vector>
+template<class VECTOR>
 inline double
-SolverRichardson<Matrix,Vector>::criterion()
+SolverRichardson<VECTOR>::criterion()
 {
   return res;
 }
 
 
-template<class Matrix,class Vector>
+template<class VECTOR>
 inline void
-SolverRichardson<Matrix,Vector>::set_omega(double om)
+SolverRichardson<VECTOR>::set_omega(double om)
 {
   additional_data.omega=om;
 }

@@ -47,8 +47,8 @@
  *
  * @author Thomas Richter, 2000
  */
-template <class Matrix = SparseMatrix<double>, class Vector = Vector<double> >
-class SolverMinRes : public Solver<Matrix,Vector>
+template <class VECTOR = Vector<double> >
+class SolverMinRes : private Solver<VECTOR>
 {
   public:
     				     /**
@@ -63,7 +63,7 @@ class SolverMinRes : public Solver<Matrix,Vector>
 				      * Constructor.
 				      */
     SolverMinRes (SolverControl &cn,
-		  VectorMemory<Vector> &mem,
+		  VectorMemory<VECTOR> &mem,
 		  const AdditionalData &data=AdditionalData());
 
 				     /**
@@ -74,11 +74,11 @@ class SolverMinRes : public Solver<Matrix,Vector>
 				     /**
 				      * Solver method.
 				      */
-    template<class Preconditioner>
-    typename Solver<Matrix,Vector>::ReturnState
-    solve (const Matrix &A,
-	   Vector       &x,
-	   const Vector &b,
+    template<class MATRIX, class Preconditioner>
+    typename Solver<VECTOR>::ReturnState
+    solve (const MATRIX &A,
+	   VECTOR       &x,
+	   const VECTOR &b,
 	   const Preconditioner& precondition);
 
 				     /**
@@ -103,9 +103,9 @@ class SolverMinRes : public Solver<Matrix,Vector>
 				      * convergence history.
 				      */
     virtual void print_vectors(const unsigned int step,
-			       const Vector& x,
-			       const Vector& r,
-			       const Vector& d) const;
+			       const VECTOR& x,
+			       const VECTOR& r,
+			       const VECTOR& d) const;
 
 				     /**
 				      * Temporary vectors, allocated through
@@ -113,9 +113,9 @@ class SolverMinRes : public Solver<Matrix,Vector>
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
-    Vector *Vu0, *Vu1, *Vu2;
-    Vector *Vm0, *Vm1, *Vm2;   
-    Vector *Vv;
+    VECTOR *Vu0, *Vu1, *Vu2;
+    VECTOR *Vm0, *Vm1, *Vm2;   
+    VECTOR *Vv;
     
 				     /**
 				      * Within the iteration loop, the
@@ -134,46 +134,46 @@ class SolverMinRes : public Solver<Matrix,Vector>
 /*------------------------- Implementation ----------------------------*/
 
 
-template<class Matrix, class Vector>
-SolverMinRes<Matrix,Vector>::SolverMinRes (SolverControl &cn,
-					  VectorMemory<Vector> &mem,
-					  const AdditionalData &)
+template<class VECTOR>
+SolverMinRes<VECTOR>::SolverMinRes (SolverControl &cn,
+				    VectorMemory<VECTOR> &mem,
+				    const AdditionalData &)
 		:
-		Solver<Matrix,Vector>(cn,mem)
+		Solver<VECTOR>(cn,mem)
 {}
 
 
-template<class Matrix, class Vector>
-SolverMinRes<Matrix,Vector>::~SolverMinRes ()
+template<class VECTOR>
+SolverMinRes<VECTOR>::~SolverMinRes ()
 {}
 
 
 
-template<class Matrix, class Vector>
+template<class VECTOR>
 double
-SolverMinRes<Matrix,Vector>::criterion()
+SolverMinRes<VECTOR>::criterion()
 {
   return res2;
 };
 
 
-template<class Matrix, class Vector>
+template<class VECTOR>
 void
-SolverMinRes<Matrix,Vector>::print_vectors(const unsigned int,
-					   const Vector&,
-					   const Vector&,
-					   const Vector&) const
+SolverMinRes<VECTOR>::print_vectors(const unsigned int,
+				    const VECTOR&,
+				    const VECTOR&,
+				    const VECTOR&) const
 {}
 
 
 
-template<class Matrix, class Vector>
-template<class Preconditioner>
-typename Solver<Matrix,Vector>::ReturnState 
-SolverMinRes<Matrix,Vector>::solve (const Matrix &A,
-				    Vector       &x,
-				    const Vector &b,
-				    const Preconditioner& precondition)
+template<class VECTOR>
+template<class MATRIX, class Preconditioner>
+typename Solver<VECTOR>::ReturnState 
+SolverMinRes<VECTOR>::solve (const MATRIX &A,
+			     VECTOR       &x,
+			     const VECTOR &b,
+			     const Preconditioner& precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -192,7 +192,7 @@ SolverMinRes<Matrix,Vector>::solve (const Matrix &A,
   Vm1  = memory.alloc();
   Vm2  = memory.alloc();
 				   // define some aliases for simpler access
-  typedef Vector vecref;
+  typedef VECTOR vecref;
   vecref u[3] = {*Vu0, *Vu1, *Vu2};
   vecref m[3] = {*Vm0, *Vm1, *Vm2};
   vecref v    = *Vv;

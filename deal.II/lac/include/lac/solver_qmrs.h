@@ -48,8 +48,8 @@
  *
  * @author Guido Kanschat, 1999
  */
-template <class Matrix = SparseMatrix<double>, class Vector = Vector<double> >
-class SolverQMRS : public Solver<Matrix,Vector>
+template <class VECTOR = Vector<double> >
+class SolverQMRS : private Solver<VECTOR>
 {
   public:
     				     /**
@@ -96,17 +96,17 @@ class SolverQMRS : public Solver<Matrix,Vector>
 				      * Constructor.
 				      */
     SolverQMRS (SolverControl &cn,
-	      VectorMemory<Vector> &mem,
+	      VectorMemory<VECTOR> &mem,
 	      const AdditionalData &data=AdditionalData());
 
 				     /**
 				      * Solver method.
 				      */
-    template<class Preconditioner>
-    typename Solver<Matrix,Vector>::ReturnState
-    solve (const Matrix &A,
-		       Vector       &x,
-		       const Vector &b,
+    template<class MATRIX, class Preconditioner>
+    typename Solver<VECTOR>::ReturnState
+    solve (const MATRIX &A,
+		       VECTOR       &x,
+		       const VECTOR &b,
 		       const Preconditioner& precondition);
 
 				     /**
@@ -119,9 +119,9 @@ class SolverQMRS : public Solver<Matrix,Vector>
 				      * convergence history.
 				      */
     virtual void print_vectors(const unsigned int step,
-			       const Vector& x,
-			       const Vector& r,
-			       const Vector& d) const;
+			       const VECTOR& x,
+			       const VECTOR& r,
+			       const VECTOR& d) const;
    protected:
 				     /**
 				      * Implementation of the computation of
@@ -135,24 +135,20 @@ class SolverQMRS : public Solver<Matrix,Vector>
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
-    Vector *Vv;
-    Vector *Vp;
-    Vector *Vq;
-    Vector *Vt;
-    Vector *Vd;
+    VECTOR *Vv;
+    VECTOR *Vp;
+    VECTOR *Vq;
+    VECTOR *Vt;
+    VECTOR *Vd;
 				     /**
 				      * Iteration vector.
 				      */
-    Vector *Vx;
+    VECTOR *Vx;
 				     /**
 				      * RHS vector.
 				      */
-    const Vector *Vb;
+    const VECTOR *Vb;
     
-				     /**
-				      * Pointer to the matrix to be inverted.
-				      */
-    const Matrix* MA;
 				     /**
 				      * Within the iteration loop, the
 				      * square of the residual vector is
@@ -172,9 +168,9 @@ class SolverQMRS : public Solver<Matrix,Vector>
 				     /**
 				      * The iteration loop itself.
 				      */
-    template<class Preconditioner>
-    typename Solver<Matrix,Vector>::ReturnState 
-    iterate(const Preconditioner& precondition);
+    template<class MATRIX, class Preconditioner>
+    typename Solver<VECTOR>::ReturnState 
+    iterate(const MATRIX& A, const Preconditioner& precondition);
 				     /**
 				      * The current iteration step.
 				      */
@@ -185,41 +181,41 @@ class SolverQMRS : public Solver<Matrix,Vector>
 /*------------------------- Implementation ----------------------------*/
 
 
-template<class Matrix, class Vector>
-SolverQMRS<Matrix,Vector>::SolverQMRS(SolverControl &cn,
-				  VectorMemory<Vector> &mem,
-				  const AdditionalData &data) :
-		Solver<Matrix,Vector>(cn,mem),
+template<class VECTOR>
+SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
+			       VectorMemory<VECTOR> &mem,
+			       const AdditionalData &data) :
+		Solver<VECTOR>(cn,mem),
 		additional_data(data)
 {};
 
 
-template<class Matrix, class Vector>
+template<class VECTOR>
 double
-SolverQMRS<Matrix,Vector>::criterion()
+SolverQMRS<VECTOR>::criterion()
 {
   return sqrt(res2);
 }
 
 
 
-template<class Matrix, class Vector>
+template<class VECTOR>
 void
-SolverQMRS<Matrix,Vector>::print_vectors(const unsigned int,
-					       const Vector&,
-					       const Vector&,
-					       const Vector&) const
+SolverQMRS<VECTOR>::print_vectors(const unsigned int,
+				  const VECTOR&,
+				  const VECTOR&,
+				  const VECTOR&) const
 {}
 
 
 
-template<class Matrix, class Vector>
-template<class Preconditioner>
-typename Solver<Matrix,Vector>::ReturnState 
-SolverQMRS<Matrix,Vector>::solve (const Matrix &A,
-				  Vector       &x,
-				  const Vector &b,
-				  const Preconditioner& precondition)
+template<class VECTOR>
+template<class MATRIX, class Preconditioner>
+typename Solver<VECTOR>::ReturnState 
+SolverQMRS<VECTOR>::solve (const MATRIX &A,
+			   VECTOR       &x,
+			   const VECTOR &b,
+			   const Preconditioner& precondition)
 {
   deallog.push("QMRS");
   
@@ -230,7 +226,6 @@ SolverQMRS<Matrix,Vector>::solve (const Matrix &A,
   Vt  = memory.alloc();
   Vd  = memory.alloc();
 
-  MA = &A;
   Vx = &x;
   Vb = &b;
 				   // resize the vectors, but do not set
@@ -249,7 +244,7 @@ SolverQMRS<Matrix,Vector>::solve (const Matrix &A,
     {
       if (step)
 	deallog << "Restart step " << step << endl;
-      state = iterate(precondition);
+      state = iterate(A, precondition);
     }
   while (state == breakdown);
     
@@ -268,10 +263,11 @@ SolverQMRS<Matrix,Vector>::solve (const Matrix &A,
   return state;
 };
 
-template<class Matrix, class Vector>
-template<class Preconditioner>
-typename Solver<Matrix,Vector>::ReturnState 
-SolverQMRS<Matrix,Vector>::iterate(const Preconditioner& precondition)
+template<class VECTOR>
+template<class MATRIX, class Preconditioner>
+typename Solver<VECTOR>::ReturnState 
+SolverQMRS<VECTOR>::iterate(const MATRIX& A,
+			    const Preconditioner& precondition)
 {
 /* Remark: the matrix A in the article is the preconditioned matrix.
  * Therefore, we have to precondition x before we compute the first residual.
@@ -282,15 +278,13 @@ SolverQMRS<Matrix,Vector>::iterate(const Preconditioner& precondition)
   SolverControl::State state = SolverControl::iterate;
 
 				   // define some aliases for simpler access
-  Vector& v  = *Vv; 
-  Vector& p  = *Vp; 
-  Vector& q  = *Vq; 
-  Vector& t  = *Vt;
-  Vector& d  = *Vd;
-  Vector& x  = *Vx;
-  const Vector& b = *Vb;
-  
-  const Matrix& A  = *MA;
+  VECTOR& v  = *Vv; 
+  VECTOR& p  = *Vp; 
+  VECTOR& q  = *Vq; 
+  VECTOR& t  = *Vt;
+  VECTOR& d  = *Vd;
+  VECTOR& x  = *Vx;
+  const VECTOR& b = *Vb;
   
   int  it=0;
  

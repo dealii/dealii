@@ -71,9 +71,8 @@
  *
  * @author Wolfgang Bangerth
  */
-template <class MATRIX = SparseMatrix<double>,
-          class VECTOR = Vector<double> >
-class SolverGMRES : public Solver<MATRIX, VECTOR>
+template <class VECTOR = Vector<double> >
+class SolverGMRES : private Solver<VECTOR>
 {
   public:
     				     /**
@@ -109,11 +108,11 @@ class SolverGMRES : public Solver<MATRIX, VECTOR>
 				     /**
 				      * Solver method.
 				      */
-    template<class Preconditioner>
-    typename Solver<MATRIX,VECTOR>::ReturnState solve (const MATRIX &A,
+    template<class MATRIX, class PRECONDITIONER>
+    typename Solver<VECTOR>::ReturnState solve (const MATRIX &A,
 						       VECTOR       &x,
 						       const VECTOR &b,
-						       const Preconditioner& precondition);
+						       const PRECONDITIONER& precondition);
 
     DeclException1 (ExcTooFewTmpVectors,
 		    int,
@@ -149,11 +148,11 @@ class SolverGMRES : public Solver<MATRIX, VECTOR>
 /* --------------------- Inline and template functions ------------------- */
 
 
-template <class MATRIX, class VECTOR>
-SolverGMRES<MATRIX,VECTOR>::SolverGMRES (SolverControl        &cn,
+template <class VECTOR>
+SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
 					 VectorMemory<VECTOR> &mem,
 					 const AdditionalData &data) :
-		Solver<MATRIX,VECTOR> (cn,mem),
+		Solver<VECTOR> (cn,mem),
 		additional_data(data)
 {
   Assert (additional_data.max_n_tmp_vectors >= 10, 
@@ -161,14 +160,14 @@ SolverGMRES<MATRIX,VECTOR>::SolverGMRES (SolverControl        &cn,
 };
 
 
-template <class MATRIX, class VECTOR>
+template <class VECTOR>
 inline
 void
-SolverGMRES<MATRIX,VECTOR>::givens_rotation (Vector<double> &h,
-					     Vector<double> &b,
-					     Vector<double> &ci,
-					     Vector<double> &si, 
-					     int     col) const
+SolverGMRES<VECTOR>::givens_rotation (Vector<double> &h,
+				      Vector<double> &b,
+				      Vector<double> &ci,
+				      Vector<double> &si, 
+				      int     col) const
 {
   for (int i=0 ; i<col ; i++)
     {
@@ -188,13 +187,13 @@ SolverGMRES<MATRIX,VECTOR>::givens_rotation (Vector<double> &h,
 }
 
 
-template<class MATRIX, class VECTOR>
-template<class Preconditioner>
-typename Solver<MATRIX,VECTOR>::ReturnState
-SolverGMRES<MATRIX,VECTOR>::solve (const MATRIX& A,
+template<class VECTOR>
+template<class MATRIX, class PRECONDITIONER>
+typename Solver<VECTOR>::ReturnState
+SolverGMRES<VECTOR>::solve (const MATRIX& A,
 				   VECTOR      & x,
 				   const VECTOR& b,
-				   const Preconditioner& precondition)
+				   const PRECONDITIONER& precondition)
 {
 				   // this code was written by the fathers of
 				   // DEAL. I take absolutely no guarantees
@@ -400,9 +399,9 @@ unsigned int dim = 0;
 };
 
 
-template<class MATRIX, class VECTOR>
+template<class VECTOR>
 double
-SolverGMRES<MATRIX,VECTOR>::criterion () 
+SolverGMRES<VECTOR>::criterion () 
 {
 				   // dummy implementation. this function is
 				   // not needed for the present implementation
