@@ -87,7 +87,7 @@ class AdvectionField
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcVectorHasWrongSize,
+    DeclException2 (ExcDimensionMismatch,
 		    int, int,
 		    << "The vector has size " << arg1 << " but should have "
 		    << arg2 << " elements.");
@@ -115,7 +115,7 @@ AdvectionField<dim>::value_list (const vector<Point<dim> > &points,
 				 vector<Point<dim> >       &values) const 
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize (values.size(), points.size()));
+	  ExcDimensionMismatch (values.size(), points.size()));
   
   for (unsigned int i=0; i<points.size(); ++i)
     values[i] = AdvectionField<dim>::value (points[i]);
@@ -156,7 +156,7 @@ double
 RightHandSide<dim>::value (const Point<dim>   &p,
 			   const unsigned int  component) const 
 {
-  Assert (component == 0, ExcWrongComponent (component, 1));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
   const double diameter = 0.1;
   return ( (p-center_point).square() < diameter*diameter ?
 	   .1/pow(diameter,dim) :
@@ -172,7 +172,7 @@ RightHandSide<dim>::value_list (const vector<Point<dim> > &points,
 				const unsigned int         component) const 
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize (values.size(), points.size()));
+	  ExcDimensionMismatch (values.size(), points.size()));
   
   for (unsigned int i=0; i<points.size(); ++i)
     values[i] = RightHandSide<dim>::value (points[i], component);
@@ -199,7 +199,7 @@ double
 BoundaryValues<dim>::value (const Point<dim>   &p,
 			    const unsigned int  component) const 
 {
-  Assert (component == 0, ExcWrongComponent (component, 1));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
 
   const double sine_term = sin(16*M_PI*sqrt(p.square()));
   const double weight    = exp(-5*p.square()) / exp(-5.);
@@ -215,7 +215,7 @@ BoundaryValues<dim>::value_list (const vector<Point<dim> > &points,
 				 const unsigned int         component) const 
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize (values.size(), points.size()));
+	  ExcDimensionMismatch (values.size(), points.size()));
   
   for (unsigned int i=0; i<points.size(); ++i)
     values[i] = BoundaryValues<dim>::value (points[i], component);
