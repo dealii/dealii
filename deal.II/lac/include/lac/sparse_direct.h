@@ -366,6 +366,10 @@ class SparseDirectMA27 : public Subscriptor
                     << "Error while reading in detached mode. Return value "
                     << "for 'read' was " << arg1
                     << ", errno has value " << arg2);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcMatrixNotSymmetric);
     
   private:
                                      /**
@@ -813,6 +817,10 @@ class SparseDirectMA47 : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcDifferentMatrices);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcMatrixNotSymmetric);
     
   private:
                                      /**

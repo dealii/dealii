@@ -950,8 +950,23 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
 	  
 	  A[global_index] = matrix(row,*col);
 	  ++global_index;
-	};
-//TODO[WB]: make sure that the matrix really _is_ symmetric. would have saved me a lot of work previously. also, discard zeros, just as in MA47
+
+                                           // make sure that the symmetric
+                                           // entry exists and has the same
+                                           // value, unless this one is zero
+          Assert ((matrix(row,*col) == 0)
+                  ||
+                  (matrix(row,*col) == matrix(*col,row)),
+                  ExcMatrixNotSymmetric());
+	}
+      else
+                                         // lower left part. just check
+                                         // symmetry
+        Assert ((matrix(row,*col) == 0)
+                ||
+                (matrix(row,*col) == matrix(*col,row)),
+                ExcMatrixNotSymmetric());
+        
   Assert (global_index == n_nonzero_elements, ExcInternalError());  
 }
 
@@ -1450,8 +1465,22 @@ SparseDirectMA47::fill_A (const SparseMatrix<double> &matrix)
 	  
 	  A[global_index] = matrix(row,*col);
 	  ++global_index;
-	};
-//TODO[WB]: make sure that the matrix really _is_ symmetric. would have saved me a lot of work previously
+
+                                           // make sure that the symmetric
+                                           // entry exists and has the same
+                                           // value, unless this one is zero
+          Assert ((matrix(row,*col) == 0)
+                  ||
+                  (matrix(row,*col) == matrix(*col,row)),
+                  ExcMatrixNotSymmetric());
+	}
+      else
+                                         // lower left part. just check
+                                         // symmetry
+        Assert ((matrix(row,*col) == 0)
+                ||
+                (matrix(row,*col) == matrix(*col,row)),
+                ExcMatrixNotSymmetric());
   
   Assert (global_index == n_nonzero_elements, ExcInternalError());  
 }
