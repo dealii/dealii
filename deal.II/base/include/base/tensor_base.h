@@ -358,9 +358,6 @@ ostream & operator << (ostream &out, const Tensor<1,dim> &p) {
     out << p[i] << ' ';
   out << p[dim-1];
 
-  if (!out)
-    throw GlobalExcIO ();
-
   return out;
 };
 
@@ -369,9 +366,6 @@ template <>
 inline
 ostream & operator << (ostream &out, const Tensor<1,1> &p) {
   out << p[0];
-
-  if (!out)
-    throw GlobalExcIO ();
 
   return out;
 };

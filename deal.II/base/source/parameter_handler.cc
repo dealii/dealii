@@ -131,8 +131,7 @@ ParameterHandler::~ParameterHandler () {};
 
 
 bool ParameterHandler::read_input (istream &input) {
-  if (!input)
-    throw GlobalExcIO ();
+  AssertThrow (input, ExcIO());
 
   string line;
   int lineno=0;
@@ -361,9 +360,8 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style) {
 				   // given as "style"
   Assert ((style == Text) || (style == LaTeX), ExcNotImplemented());
 
-  if (!out)
-    throw GlobalExcIO ();
-
+  AssertThrow (out, ExcIO());
+  
   switch (style) 
     {
       case Text:
@@ -406,8 +404,7 @@ void ParameterHandler::print_parameters_section (ostream &out,
 				   // given as "style"
   Assert ((style == Text) || (style == LaTeX), ExcNotImplemented());
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 
   Section *pd = get_present_defaults_subsection ();
   Section *pc = get_present_changed_subsection ();
@@ -728,8 +725,7 @@ MultipleParameterLoop::~MultipleParameterLoop () {};
 
 
 bool MultipleParameterLoop::read_input (istream &input) {
-  if (!input)
-    throw GlobalExcIO ();
+  AssertThrow (input, ExcIO());
 
   bool x = ParameterHandler::read_input (input);
   if (x) init_branches ();

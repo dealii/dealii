@@ -512,8 +512,7 @@ void dVector::print (ostream &out) const {
   for (unsigned int i=0; i<size(); ++i)
     out << val[i] << endl;
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 };
 
 

@@ -170,6 +170,10 @@ class DataIn {
 				      * Exception
 				      */
     DeclException0 (ExcInternalError);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcIO);
     
   private:
 				     /**
@@ -423,6 +427,37 @@ class DataOut {
 				      * object of this class.
 				      */
     static string default_suffix (const OutputFormat output_format);
+
+				     /**
+				      * Return the #OutputFormat# value
+				      * corresponding to the given string. If
+				      * the string does not match any known
+				      * format, an exception is thrown.
+				      *
+				      * Since this function does not need data
+				      * from this object, it is static and can
+				      * thus be called without creating an
+				      * object of this class. Its main purpose
+				      * is to allow a program to use any
+				      * implemented output format without the
+				      * need to extend the program's parser
+				      * each time a new format is implemented.
+				      *
+				      * To get a list of presently available
+				      * format names, e.g. to give it to the
+				      * #ParameterHandler# class, use the
+				      * function #get_output_format_names ()#.
+				      */
+    static OutputFormat parse_output_format (const string format_name);
+
+				     /**
+				      * Return a list of implemented output
+				      * formats. The different names are
+				      * separated by vertical bar signs (#`|'#)
+				      * as used by the #ParameterHandler#
+				      * classes.
+				      */
+    static string get_output_format_names ();
     
 				     /**
 				      * Exception
@@ -452,6 +487,14 @@ class DataOut {
 		    << "Please use only the characters [a-zA-Z0-9_<>()] for" << endl
 		    << "description strings since AVS will only accept these." << endl
 		    << "The string you gave was <" << arg1 << ">.");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcIO);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidState);
     
   private:
 

@@ -721,7 +721,10 @@ class ParameterHandler {
 				      * Exception
 				      */
     DeclException0 (ExcInternalError);
-
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcIO);
     
   private:
 				     /**

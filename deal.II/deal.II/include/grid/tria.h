@@ -2423,6 +2423,10 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * Exception
 				      */
     DeclException0 (ExcInvalidParameterValue);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcIO);
 				     //@}
   protected:
 

@@ -410,6 +410,10 @@ class dVector {
 				      * Exception
 				      */
     DeclException0 (ExcEmptyVector);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcIO);
 };
 
 

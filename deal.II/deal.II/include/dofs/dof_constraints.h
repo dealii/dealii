@@ -289,6 +289,10 @@ class ConstraintMatrix {
 				      * Exception
 				      */
     DeclException0 (ExcWrongDimension);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcIO);
     
   private:
 

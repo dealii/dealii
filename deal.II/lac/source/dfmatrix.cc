@@ -1111,8 +1111,7 @@ void dFMatrix::print_formatted (ostream &out, const unsigned int precision) cons
       out << endl;
     };
 
-  if (!out)
-    throw GlobalExcIO ();
-
+  AssertThrow (out, ExcIO());
+  
   out.setf (0, ios::floatfield);                 // reset output format
 };

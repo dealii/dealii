@@ -317,6 +317,10 @@ class dSMatrixStruct
 				      * Exception
 				      */
     DeclException0 (ExcInternalError);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcIO);
 
   private:
     unsigned int max_dim;
@@ -693,7 +697,11 @@ class dSMatrix
 				      * Exception
 				      */
     DeclException0 (ExcDifferentSparsityPatterns);
-
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcIO);
+    
   private:
     const dSMatrixStruct * cols;
     double* val;

@@ -42,9 +42,8 @@ void DataIn<dim>::read_ucd (istream &in) {
   Assert (tria != 0, ExcNoTriangulationSelected());
   Assert ((1<=dim) && (dim<=2), ExcNotImplemented());
 
-  if (!in)
-    throw GlobalExcIO ();
-
+  AssertThrow (in, ExcIO());
+  
 				   // skip comments at start of file
   char c;
   while (in.get(c), c=='#') 
@@ -164,8 +163,7 @@ void DataIn<dim>::read_ucd (istream &in) {
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
-  if (!in)
-    throw GlobalExcIO ();
+  AssertThrow (in, ExcIO());
 
   tria->create_triangulation (vertices, cells, subcelldata);
 };
@@ -388,9 +386,9 @@ void DataOut<dim>::write_ucd (ostream &out) const {
     };
 				   // no cell data
 				   // no model data
-  if (!out)
-    throw GlobalExcIO ();
 
+				   // assert the stream is still ok
+  AssertThrow (out, ExcIO());
 };
 
 
@@ -461,8 +459,7 @@ void DataOut<dim>::write_ucd_faces (ostream &out,
 	++index;
       };	  
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 };
 
       
@@ -589,9 +586,8 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
     out << endl;
     }
   delete [] values;
-  
-  if (!out)
-    throw GlobalExcIO ();
+
+  AssertThrow (out, ExcIO());
 }
 
 
@@ -701,8 +697,7 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 	};
     };
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 };
 
 
@@ -797,8 +792,7 @@ void DataOut<2>::write_povray (ostream &out) const {
     };
   out << "}";     
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 };
 
       
@@ -844,6 +838,32 @@ string DataOut<dim>::default_suffix (const OutputFormat output_format) {
     };
 };
   
+
+
+template <int dim>
+DataOut<dim>::OutputFormat
+DataOut<dim>::parse_output_format (const string format_name) {
+  if (format_name == "ucd")
+    return ucd;
+
+  if (format_name == "gnuplot")
+    return gnuplot;
+
+  if (format_name == "gnuplot draft")
+    return gnuplot_draft;
+
+  if (format_name == "povray")
+    return povray;
+
+  AssertThrow (false, ExcInvalidState ());
+};
+
+
+
+template <int dim>
+string DataOut<dim>::get_output_format_names () {
+  return "ucd|gnuplot|gnuplot draft|povray";
+};
 
 
 

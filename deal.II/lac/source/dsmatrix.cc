@@ -332,8 +332,7 @@ dSMatrixStruct::print_gnuplot (ostream &out) const
       if (colnums[j]>=0)
 	out << i << " " << -colnums[j] << endl;
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 }
 
 
@@ -756,8 +755,7 @@ void dSMatrix::print (ostream &out) const {
     for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
       out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << endl;
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 };
 
 
@@ -778,8 +776,7 @@ void dSMatrix::print_formatted (ostream &out, const unsigned int precision) cons
 	  out << setw(precision+8) << " ";
       out << endl;
     };
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 
   out.setf (0, ios::floatfield);                 // reset output format
 };

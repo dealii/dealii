@@ -2225,16 +2225,14 @@ void Triangulation<dim>::print_gnuplot (ostream &out, const unsigned int level) 
 			       active_cell_iterator(end()) :
 			       begin_active (level+1));
 
-  if (!out)
-    throw GlobalExcIO ();
-
+  AssertThrow (out, ExcIO());
+  
   out << "#Active cells on level " << level
       << ": " << n_active_cells (level) << endl;
   for (; cell != endc; ++cell)
     print_gnuplot (out, cell);
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 };
 
 
@@ -2244,15 +2242,13 @@ void Triangulation<dim>::print_gnuplot (ostream &out, const unsigned int level) 
 template <>
 void Triangulation<1>::print_gnuplot (ostream &out,
 				      const active_cell_iterator & cell) const {
-  if (!out)
-    throw GlobalExcIO ();
-
+  AssertThrow (out, ExcIO());
+  
   out << cell->vertex(0) << " " << cell->level() << endl
       << cell->vertex(1) << " " << cell->level() << endl
       << endl;
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 };
 
 #endif
@@ -2263,9 +2259,8 @@ void Triangulation<1>::print_gnuplot (ostream &out,
 template <>
 void Triangulation<2>::print_gnuplot (ostream &out,
 				      const active_cell_iterator & cell) const {
-  if (!out)
-    throw GlobalExcIO ();
-
+  AssertThrow (out, ExcIO());
+  
   out << cell->vertex(0) << " " << cell->level() << endl
       << cell->vertex(1) << " " << cell->level() << endl
       << cell->vertex(2) << " " << cell->level() << endl
@@ -2274,8 +2269,7 @@ void Triangulation<2>::print_gnuplot (ostream &out,
       << endl  // double new line for gnuplot 3d plots
       << endl;
 
-  if (!out)
-    throw GlobalExcIO ();  
+  AssertThrow (out, ExcIO());
 };
 
 #endif
@@ -3861,9 +3855,8 @@ void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
   for (unsigned int position=0; position<N; ++position)
     flags[position/8] |= (v[position] ? (1<<(position%8)) : 0);
 
-  if (!out)
-    throw GlobalExcIO ();
-
+  AssertThrow (out, ExcIO());
+  
 				   // format:
 				   // 0. magic number
 				   // 1. number of flags
@@ -3877,8 +3870,7 @@ void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
   
   delete[] flags;
 
-  if (!out)
-    throw GlobalExcIO ();
+  AssertThrow (out, ExcIO());
 };
 
 
@@ -3888,8 +3880,7 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
 					   vector<bool>       &v,
 					   const unsigned int  magic_number2,
 					   istream            &in) {
-  if (!in)
-    throw GlobalExcIO ();
+  AssertThrow (in, ExcIO());
 
   unsigned int magic_number;
   in >> magic_number;
@@ -3915,8 +3906,7 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
 
   delete[] flags;
 
-  if (!in)
-    throw GlobalExcIO ();
+  AssertThrow (in, ExcIO());
 };
 
 
