@@ -50,6 +50,7 @@ plot_transformation(FiniteElement<dim>& finel,
 }
 
 
+int
 main()
 {
   Triangulation<2> tr;
@@ -67,4 +68,6 @@ main()
   v(1) = 2.;
   
   plot_transformation(q1,c,"Transform-Q1");
+
+  return 0;
 }

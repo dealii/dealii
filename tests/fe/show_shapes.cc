@@ -49,6 +49,7 @@ plot_shape_functions(FiniteElement<dim>& finel, const char* name)
 }
 
 
+int
 main()
 {
   FEQ1<2> q1;
@@ -59,4 +60,6 @@ main()
   plot_shape_functions(q3,"Q3");
   FEQ4<2> q4;
   plot_shape_functions(q4,"Q4");
+
+  return 0;
 }
