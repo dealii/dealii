@@ -1188,9 +1188,17 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe,
   reserve_space ();
   mg_used_dofs.resize (this->tria->n_levels(), 0);
 
-				   // clear user flags because we will
-				   // need them
-  this->tria->clear_user_flags ();
+				   // Clear user flags because we will
+				   // need them. But first we save
+				   // them and make sure that we
+				   // restore them later such that at
+				   // the end of this function the
+				   // Triangulation will be in the
+				   // same state as it was at the
+				   // beginning of this function.
+  std::vector<bool> user_flags;
+  tria->save_user_flags(user_flags);
+  const_cast<Triangulation<dim> &>(*(this->tria)).clear_user_flags ();
 
 				   // now distribute indices on each level
 				   // separately
@@ -1205,6 +1213,9 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe,
   
       mg_used_dofs[level] = next_free_dof;
     };
+  
+				   // finally restore the user flags
+  const_cast<Triangulation<dim> &>(*(this->tria)).load_user_flags(user_flags);
 };
 
 
