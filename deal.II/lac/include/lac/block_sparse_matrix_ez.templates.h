@@ -58,8 +58,10 @@ BlockSparseMatrixEZ<number> &
 BlockSparseMatrixEZ<number>::
 operator = (const BlockSparseMatrixEZ<number> &m) 
 {
-  Assert (n_block_rows() == m.n_block_rows(), ExcIncompatibleObjects());
-  Assert (n_block_cols() == m.n_block_cols(), ExcIncompatibleObjects());
+  Assert (n_block_rows() == m.n_block_rows(),
+	  ExcDimensionMismatch(n_block_rows(), m.n_block_rows()));
+  Assert (n_block_cols() == m.n_block_cols(),
+	  ExcDimensionMismatch(n_block_cols(), m.n_block_cols()));
 				   // this operator does not do
 				   // anything except than checking
 				   // whether the base objects want to
@@ -131,14 +133,14 @@ BlockSparseMatrixEZ<number>::collect_sizes ()
 				   // first find out the row sizes
 				   // from the first block column
   for (unsigned int r=0; r<rows; ++r)
-    row_sizes[r] = blocks[r][0].n_rows();
+    row_sizes[r] = blocks[r][0].m();
 				   // then check that the following
 				   // block columns have the same
 				   // sizes
   for (unsigned int c=1; c<columns; ++c)
     for (unsigned int r=0; r<rows; ++r)
-      Assert (row_sizes[r] == blocks[r][c].n_rows(),
-	      ExcIncompatibleRowNumbers (r,0,r,c));
+      Assert (row_sizes[r] == blocks[r][c].m(),
+	      ExcDimensionMismatch (row_sizes[r], blocks[r][c].m()));
 
 				   // finally initialize the row
 				   // indices with this array
@@ -147,11 +149,11 @@ BlockSparseMatrixEZ<number>::collect_sizes ()
   
 				   // then do the same with the columns
   for (unsigned int c=0; c<columns; ++c)
-    col_sizes[c] = blocks[0][c].n_cols();
+    col_sizes[c] = blocks[0][c].n();
   for (unsigned int r=1; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
-      Assert (col_sizes[c] == blocks[r][c].n_cols(),
-	      ExcIncompatibleRowNumbers (0,c,r,c));
+      Assert (col_sizes[c] == blocks[r][c].n(),
+	      ExcDimensionMismatch (col_sizes[c], blocks[r][c].n()));
 
 				   // finally initialize the row
 				   // indices with this array
