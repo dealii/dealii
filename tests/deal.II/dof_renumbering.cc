@@ -21,9 +21,11 @@
 #include <lac/vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
+#include <dofs/dof_accessor.h>
 #include <dofs/dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
+#include <multigrid/mg_dof_handler.h>
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_system.h>
@@ -53,6 +55,24 @@ print_dofs (const DoFHandler<dim> &dof)
 
 template <int dim>
 void
+print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
+{
+  std::vector<unsigned int> v (dof.get_fe().dofs_per_cell);
+  for (typename MGDoFHandler<dim>::cell_iterator cell=dof.begin(level);
+       cell != dof.end(level); ++cell)
+    {
+      deallog << "Cell " << cell << " -- ";
+      cell->get_mg_dof_indices (v);
+      for (unsigned int i=0; i<v.size(); ++i)
+	deallog << v[i] << ' ';
+      deallog << std::endl;
+    }
+}
+
+
+
+template <int dim>
+void
 check ()
 {
   Functions::CosineFunction<dim> cosine;
@@ -69,23 +89,47 @@ check ()
     tr.refine_global(2);
   
   FESystem<dim> element (FE_Q<dim>(2), 2, FE_DGQ<dim>(1), 1);
-  DoFHandler<dim> dof(tr);
+  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim>& dof = mgdof;
   dof.distribute_dofs(element);
 
-  print_dofs (dof);
-  
-  DoFRenumbering::Cuthill_McKee (dof);              print_dofs (dof);
-  DoFRenumbering::Cuthill_McKee (dof, true);        print_dofs (dof);
-  DoFRenumbering::Cuthill_McKee (dof, true, true);  print_dofs (dof);
-
+				   // Prepare a reordering of
+				   // components for later use
   std::vector<unsigned int> order(element.n_components());
   for (unsigned int i=0; i<order.size(); ++i) order[i] = order.size()-i-1;
-  DoFRenumbering::component_wise (dof, order);      print_dofs (dof);
+
+				   // Check global ordering
+  print_dofs (dof);
+  
+  DoFRenumbering::Cuthill_McKee (dof);
+  print_dofs (dof);
+  DoFRenumbering::Cuthill_McKee (dof, true);
+  print_dofs (dof);
+  DoFRenumbering::Cuthill_McKee (dof, true, true);
+  print_dofs (dof);
+
+  DoFRenumbering::component_wise (dof, order);
+  print_dofs (dof);
 
   std::vector<bool> selected_dofs (dof.n_dofs(), false);
   for (unsigned int i=0; i<dof.n_dofs(); ++i) if (i%2==0) selected_dofs[i] = true;
   DoFRenumbering::sort_selected_dofs_back (dof, selected_dofs);
   print_dofs (dof);
+
+				   // Check level ordering
+  for (unsigned int level=0;level<tr.n_levels();++level)
+    {
+      print_dofs (mgdof, level);
+
+// Reinsert after fixing
+//        DoFRenumbering::Cuthill_McKee (mgdof, level);
+//        print_dofs (mgdof, level);
+//        DoFRenumbering::Cuthill_McKee (mgdof, level, true);
+//        print_dofs (mgdof, level);
+
+      DoFRenumbering::component_wise (mgdof, order);
+      print_dofs (mgdof, level);
+    }
 }
 
 
