@@ -63,7 +63,7 @@
  * function) to the respective component of the finite element, without interaction
  * of the different components.
  *
- * @author Wolfgang Bangerth, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
 template <int dim>
 class FESystem : public FiniteElement<dim>
@@ -95,8 +95,19 @@ class FESystem : public FiniteElement<dim>
 				      * class needs to be of the same dimension
 				      * as is this object.
 				      */
-    template <typename FE>
+    template <class FE>
     FESystem (const FE &fe, const unsigned int n_elements);
+
+				     /** 
+				      * Constructor for mixed
+				      * discretizations with two
+				      * components.
+				      *
+				      * See the other constructor.
+				      */
+    template <class FE1, class FE2>
+    FESystem (const FE1 &fe1, const unsigned int n1,
+	      const FE2 &fe2, const unsigned int n2);
 
 				     /**
 				      * Destructor.
@@ -378,6 +389,15 @@ class FESystem : public FiniteElement<dim>
 			  const unsigned int            N);
     
 				     /**
+				      * Same as above for mixed elements.
+				      */
+    static FiniteElementData<dim>
+    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+			  const unsigned int            N1,
+			  const FiniteElementData<dim> &fe2,
+			  const unsigned int            N2);
+    
+				     /**
 				      * This function is simply singled out of
 				      * the constructor. It sets up the
 				      * index table for the system as well as
@@ -429,8 +449,23 @@ FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
 		FiniteElement (multiply_dof_numbers(fe, n_elements)),
 		base_elements(1)
 {
-  base_elements[0] = ElementPair(&fe, n_elements);
+  base_elements[0] = ElementPair(new FE, n_elements);
   base_elements[0].first -> subscribe ();
+  initialize ();
+};
+
+template <int dim>
+template <class FE1, class FE2>
+FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
+			 const FE2 &fe2, const unsigned int n2)
+		:
+		FiniteElement (multiply_dof_numbers(fe1, n1, fe2, n2)),
+		base_elements(2)
+{
+  base_elements[0] = ElementPair(new FE1, n1);
+  base_elements[0].first -> subscribe ();
+  base_elements[1] = ElementPair(new FE2, n2);
+  base_elements[1].first -> subscribe ();
   initialize ();
 };
 
