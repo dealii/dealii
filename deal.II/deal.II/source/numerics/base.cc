@@ -124,8 +124,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 						 boundary_value_list);
   MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					   system_matrix, solution,
-					   right_hand_side);
-  
+					   right_hand_side);  
 };
 
 
