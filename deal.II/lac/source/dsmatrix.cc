@@ -572,13 +572,16 @@ dSMatrix::precondition_Jacobi (dVector& dst, const dVector& src,
   Assert (m() == n(), ExcMatrixNotSquare());
 
   const unsigned int n = src.size();
-
-  for (unsigned int i=0; i<n; ++i)
+  double             *dst_ptr = dst.begin();
+  const double       *src_ptr = src.begin();
+  const unsigned int *rowstart_ptr = &cols->rowstart[0];
+  
+  for (unsigned int i=0; i<n; ++i, ++dst_ptr, ++src_ptr, ++rowstart_ptr)
 				     // note that for square matrices,
 				     // the diagonal entry is the first
 				     // in each row, i.e. at index
 				     // rowstart[i]
-    dst(i) = om * src(i) / val[cols->rowstart[i]];
+    *dst_ptr = om * *src_ptr / val[*rowstart_ptr];
 };
 
 
