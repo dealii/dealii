@@ -668,6 +668,68 @@ void Triangulation<2>::create_hyper_ball (const Point<2> &p, const double radius
 
 
 
+template <int dim>
+void Triangulation<dim>::distort_random (const double factor,
+					 const bool   keep_boundary) {
+				   // note number of lines adjacent
+				   // to a vertex
+  vector<short unsigned int> adjacent_lines (vertices.size(), 0);
+				   // sum up the length of the lines
+				   // adjecent to the vertex
+  vector<double>             cumulated_length (vertices.size(), 0);
+				   // also note if a vertex is at
+				   // the boundary
+  vector<bool>               at_boundary (vertices.size(), false);
+  
+  for (active_line_iterator line=begin_active_line();
+       line != end_line(); ++line)
+    {
+      if (keep_boundary && line->at_boundary())
+	{
+	  at_boundary[line->vertex_index(0)] = true;
+	  at_boundary[line->vertex_index(1)] = true;
+	};
+      
+      adjacent_lines[line->vertex_index(0)]++;
+      adjacent_lines[line->vertex_index(1)]++;
+      cumulated_length[line->vertex_index(0)] += line->diameter();
+      cumulated_length[line->vertex_index(1)] += line->diameter();
+    };
+
+
+  const unsigned int n_vertices = vertices.size();
+  Point<dim> shift_vector;
+  
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+    {
+				       // ignore this vertex if we whall keep
+				       // the boundary and this vertex *is* at
+				       // the boundary
+      if (keep_boundary && at_boundary[vertex])
+	continue;
+      
+				       // first compute a random shift vector
+      for (unsigned int d=0; d<dim; ++d)
+	shift_vector(d) = rand()*1.0/RAND_MAX;
+
+				       // bring the random vector to the
+				       // specified length by dividing
+				       // through its original length, then
+				       // multiplication by the average length
+				       // of the adjacent lines times the given
+				       // factor
+      shift_vector *= (factor *
+		       cumulated_length[vertex]) /
+		      (adjacent_lines[vertex] *
+		       sqrt(shift_vector.square()));
+
+				       // finally move the vertex
+      vertices[vertex] += shift_vector;
+    };
+};
+
+
+
 
 template <int dim>
 void Triangulation<dim>::set_all_refine_flags () {

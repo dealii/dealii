@@ -550,6 +550,13 @@ class TriaDimensionInfo<2> {
  *   coarse level cells so, that the interface between cells is also the
  *   interface between regions of different materials.
  *
+ *   Finally, there is a special function for folks who like bad grids:
+ *   #Triangulation<dim>::distort_random#. It moves all the vertices in the
+ *   grid a bit around by a random value, leaving behind a distorted mesh.
+ *   Note that you should apply this function to the final mesh, since refinement
+ *   smoothes the mesh a bit.
+ *
+ *
  *
  *   \subsection{Refinement and coarsening of a triangulation}
  *
@@ -1281,6 +1288,24 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      */
     void create_hyper_ball (const Point<dim> &center = Point<dim>(),
 			    const double radius = 1.);
+
+				     /**
+				      * Distort the grid by randomly moving
+				      * around all the vertices of the grid.
+				      * The direction of moving is random,
+				      * while the length of the shift vector
+				      * has a value of #factor# times the
+				      * average length of the active lines
+				      * adjacent to this vertex. Note that
+				      * #factor# should obviously be well
+				      * below #0.5#.
+				      *
+				      * If #keep_boundary# is set to #true#
+				      * (which is the default), then boundary
+				      * vertices are not moved.
+				      */
+    void distort_random (const double factor,
+			 const bool   keep_boundary=true);
     
 				      
 				     /**
