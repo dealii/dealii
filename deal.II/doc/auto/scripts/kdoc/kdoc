@@ -566,9 +566,9 @@ sub processClass
 
 	#### Member Function
 
-	elsif ( /^\s*([^\(]*)\s+([^\s\(]+)\s*\((.*)(\/\/.*)?$/ ) 
+	elsif ( /^\s*((template\s*<[^>]*>\s*\n?\s*)?[^\(]*)\s+([^\s\(]+)\s*\((.*)(\/\/.*)?$/ ) 
 	{
-		processMethod( $1, $2, $3 );
+		processMethod( $1, $3, $4 );
 	}
 
     }
