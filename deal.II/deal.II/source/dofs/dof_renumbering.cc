@@ -182,6 +182,8 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
       last_round_dofs = next_round_dofs;
     };
 
+//TODO: Allow incomplete renumbering for non-discretization values
+
 #ifdef DEBUG
 				   //  test for all indices numbered
   if (find (new_number.begin(), new_number.end(), -1) != new_number.end())

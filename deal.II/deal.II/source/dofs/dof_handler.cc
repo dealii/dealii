@@ -1366,7 +1366,9 @@ const Triangulation<dim> & DoFHandler<dim>::get_tria () const {
 
 
 template <int dim>
-void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &ff) {
+void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &ff,
+				       unsigned int offset)
+{
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
   
   selected_fe = &ff;
@@ -1377,7 +1379,7 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &ff) {
 				   // need them
   tria->clear_user_flags ();
   
-  unsigned int next_free_dof = 0;   
+  unsigned int next_free_dof = offset;   
   active_cell_iterator cell = begin_active(),
 		       endc = end();
 

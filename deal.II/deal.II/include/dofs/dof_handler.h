@@ -345,6 +345,11 @@ class DoFHandler  :  public Subscriptor,
 				      * according to the given distribution
 				      * method.
 				      *
+				      * The additional optional parameter #offset#
+				      * allows you to reserve space for a finite number
+				      * of additional vector entries in the beginning
+				      * of all discretization vectors.
+				      *
 				      * A pointer of the transferred finite
 				      * element is stored. Therefore, the
 				      * lifetime of the finite element object
@@ -360,7 +365,8 @@ class DoFHandler  :  public Subscriptor,
 				      * don't need them after calling this
 				      * function, or if so store them.
 				      */
-    virtual void distribute_dofs (const FiniteElement<dim> &);
+    virtual void distribute_dofs (const FiniteElement<dim> &,
+				  unsigned int offset = 0);
 
 				     /**
 				      * Clear all data of this object and

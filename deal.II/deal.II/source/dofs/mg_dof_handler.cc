@@ -1331,9 +1331,11 @@ MGDoFHandler<dim>::last_active_hex () const {
 
 
 template <int dim>
-void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe) {
+void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe,
+					 unsigned int offset)
+{
 				   // first distribute global dofs
-  DoFHandler<dim>::distribute_dofs (fe);
+  DoFHandler<dim>::distribute_dofs (fe, offset);
 
 
 				   // reserve space for the MG dof numbers
@@ -1348,7 +1350,7 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe) {
 				   // separately
   for (unsigned int level=0; level<tria->n_levels(); ++level)
     {
-      unsigned int next_free_dof = 0;   
+      unsigned int next_free_dof = offset;
       cell_iterator cell = begin(level),
 		    endc = end(level);
 

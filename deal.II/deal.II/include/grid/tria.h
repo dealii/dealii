@@ -14,7 +14,6 @@
 //#include <grid/tria_boundary.h>
 #include <base/subscriptor.h>
 
-
 /**
  * Declare some symbolic names for mesh smoothing algorithms. The meaning of
  * these flags is documented in the #Triangulation# class.

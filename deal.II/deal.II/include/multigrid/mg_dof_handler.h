@@ -174,7 +174,7 @@ class MGDoFHandler
 				      * don't need them after calling this
 				      * function, or if so store them.
 				      */
-    virtual void distribute_dofs (const FiniteElement<dim> &);
+    virtual void distribute_dofs (const FiniteElement<dim> &, unsigned int offset=0);
 
 				     /**
 				      * Actually do the renumbering based on
