@@ -57,6 +57,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       New: Function <code class="class">FETools</code>::<code
+       class="member">compute_embedding_matrices</code> allows for
+       automatic computation of embedding matrices under the sole
+       assumption that the coarse grid space is embedded into the fine
+       grid space. In particular, no interpolation points are required.
+       <br> 
+       (GK, 2005/02/08)
+       </p>
+
+  <li> <p>
        Fixed: Several wrong assertions in the Raviart-Thomas finite element
        class have been fixed, that were triggered when integrating face terms.
        <br> 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,7 @@
 
 
 #include <base/quadrature_lib.h>
+#include <base/logstream.h>
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
@@ -30,6 +31,7 @@
 #include <fe/fe_raviart_thomas.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
+#include <fe/mapping_cartesian.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
@@ -468,6 +470,117 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
     }
 }
 
+
+template<int dim, typename number>
+void
+FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
+				    FullMatrix<number>* matrices)
+{
+  const unsigned int nc = GeometryInfo<dim>::children_per_cell;
+  const unsigned int n  = fe.dofs_per_cell;
+  const unsigned int degree = fe.degree;
+  
+  for (unsigned int i=0;i<nc;++i)
+    {
+      Assert(matrices[i].n() == n, ExcDimensionMismatch(matrices[i].n(),n));
+      Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(),n));
+    }
+  
+				   /*
+				    * Set up two meshes, one with a
+				    * single reference cell and the
+				    * other refined, together with
+				    * DoFHandler and finite elements.
+				    */
+  Triangulation<dim> tr_coarse;
+  Triangulation<dim> tr_fine;
+  GridGenerator::hyper_cube (tr_coarse, 0, 1);
+  GridGenerator::hyper_cube (tr_fine, 0, 1);
+  tr_fine.refine_global(1);
+  DoFHandler<dim> dof_coarse(tr_coarse);
+  dof_coarse.distribute_dofs(fe);
+  DoFHandler<dim> dof_fine(tr_fine);
+  dof_fine.distribute_dofs(fe);
+
+  MappingCartesian<dim> mapping;
+  QGauss<dim> q_fine(degree+1);
+  const unsigned int nq = q_fine.n_quadrature_points;
+  
+  FEValues<dim> fine (mapping, fe, q_fine,
+		      update_q_points | update_JxW_values | update_values);
+  
+  typename DoFHandler<dim>::active_cell_iterator coarse_cell
+    = dof_coarse.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator fine_cell;
+
+				   /**
+				    * We search for the polynomial on
+				    * the small cell, being equal to
+				    * the coarse polynomial in all
+				    * quadrature points.
+				    *
+				    * First build the matrix for this
+				    * least squares problem. This
+				    * contains the values of the fine
+				    * cell polynomials in the fine
+				    * cell grid points.
+				    *
+				    * This matrix is the same for all
+				    * children.
+				    */
+  fine.reinit(dof_fine.begin_active());
+  FullMatrix<number> A(nq, n);
+  for (unsigned int i=0;i<nq;++i)
+    for (unsigned int j=0;j<n;++j)
+      A(i,j) = fine.shape_value(j,i);
+  
+  Vector<number> v_coarse(nq);
+  Vector<number> v_fine(n);
+  
+  unsigned int cell_number = 0;
+  for (fine_cell = dof_fine.begin_active();
+       fine_cell != dof_fine.end();
+       ++fine_cell, ++cell_number)
+    {
+      FullMatrix<number>& matrix = matrices[cell_number];
+      fine.reinit(fine_cell);
+      Quadrature<dim> q_coarse (fine.get_quadrature_points(),
+				fine.get_JxW_values());
+      FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
+      coarse.reinit(coarse_cell);
+
+				       // Compute this once for each
+				       // coarse grid basis function
+      for (unsigned int i=0;i<n;++i)
+	{
+					   // The right hand side of
+					   // the least squares
+					   // problem consists of the
+					   // function values of the
+					   // coarse grid function in
+					   // each quadrature point.
+	  for (unsigned int k=0;k<nq;++k)
+	    v_coarse(k) = coarse.shape_value(i,k);
+
+					   // Copy the matrix and
+					   // solve the least squares
+					   // problem.
+	  FullMatrix<number> B = A;
+	  const double result = B.least_squares(v_fine, v_coarse);
+	  Assert (result < 1.e-10, ExcLeastSquaresError(result));
+	    
+					   // Finally copy into the
+					   // result matrix. Since the
+					   // matrix maps a coarse
+					   // grid function to a fine
+					   // grid function, the
+					   // columns are fine grid.
+	  for (unsigned int j=0;j<n;++j)
+	    matrix(j,i) = v_fine(j);
+	}
+    }
+  
+}
 
 
 template <int dim,
@@ -1658,6 +1771,10 @@ void FETools::get_projection_matrix<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &,
  const FiniteElement<deal_II_dimension> &,
  FullMatrix<double> &);
+
+template
+void FETools::compute_embedding_matrices<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &, FullMatrix<double>*);
 
 template
 void FETools::interpolate<deal_II_dimension>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -160,6 +160,36 @@ class FETools
 				      const FiniteElement<dim> &fe2,
 				      FullMatrix<number> &matrix);
 
+				     /**
+				      * Compute the embedding matrices
+				      * from a coarse cell to
+				      * 2<sup>dim</sup> child cells.
+				      *
+				      * This function computes the
+				      * coarse grid function in a
+				      * sufficiently large number of
+				      * quadrature points and fits the
+				      * fine grid functions using
+				      * least squares
+				      * approximation. Therefore, the
+				      * use of this function is
+				      * restricted to the case that
+				      * the finite element spaces are
+				      * actually nested.
+				      *
+				      * @arg fe The finite element
+				      * class for which we compute the
+				      * embedding matrices.
+				      * @arg matrices A pointer to
+				      * 2<sup>dim</sup> FullMatrix
+				      * objects. This is the format
+				      * used in FiniteElementBase,
+				      * where we want to use ths
+				      * function mostly.
+				      */
+    template <int dim, typename number>
+    static void compute_embedding_matrices(const FiniteElement<dim> &fe,
+					   FullMatrix<number>* matrices);
     
 				     /**
 				      * Gives the interpolation of a the
@@ -666,6 +696,14 @@ class FETools
     static
     std::pair<FiniteElement<dim> *, unsigned int>
     get_fe_from_name_aux (const std::string &name);    
+
+				     /**
+				      * Exception thrown if an
+				      * embedding matrix was computed
+				      * inaccurately.
+				      */
+    DeclException1(ExcLeastSquaresError, double,
+		   << "Least squares fit leaves a gap of " << arg1);
 };
 
 /*@}*/
