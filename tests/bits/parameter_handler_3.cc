@@ -17,6 +17,7 @@
 #include <base/logstream.h>
 #include <base/parameter_handler.h>
 #include <fstream>
+#include <iostream>
 
 
 int main () 
