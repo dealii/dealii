@@ -8,6 +8,9 @@
 #include <base/subscriptor.h>
 #include <base/logstream.h>
 
+#include <vector>
+
+
 
 /**
  * Memory management for vectors. This class is used by all
