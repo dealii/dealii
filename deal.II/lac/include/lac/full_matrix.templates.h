@@ -1334,25 +1334,27 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
 				   // set output format, but store old
 				   // state
   std::ios::fmtflags old_flags = out.flags();
+
+  unsigned int actual_width = width;
   if (scientific)
     {
       out.setf (ios::scientific, ios::floatfield);
       if (!width)
-	width = precision+7;
+	actual_width = precision+7;
     } else {
       out.setf (ios::fixed, ios::floatfield);
       if (!width)
-	width = precision+2;
+	actual_width = precision+2;
     }
   
   for (unsigned int i=0; i<m(); ++i) 
     {
       for (unsigned int j=0; j<n(); ++j)
 	if (el(i,j) != 0)
-	  out << std::setw(width)
+	  out << std::setw(actual_width)
 	      << el(i,j) * denominator << ' ';
 	else
-	  out << std::setw(width) << zero_string << ' ';
+	  out << std::setw(actual_width) << zero_string << ' ';
       out << std::endl;
     };
 
