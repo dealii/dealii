@@ -671,12 +671,9 @@ void Triangulation<2>::create_hyper_ball (const Point<2> &p, const double radius
 template <int dim>
 void Triangulation<dim>::distort_random (const double factor,
 					 const bool   keep_boundary) {
-				   // note number of lines adjacent
-				   // to a vertex
-  vector<short unsigned int> adjacent_lines (vertices.size(), 0);
-				   // sum up the length of the lines
+				   // find the smallest length of the lines
 				   // adjecent to the vertex
-  vector<double>             cumulated_length (vertices.size(), 0);
+  vector<double>             minimal_length (vertices.size(), 1e308);
 				   // also note if a vertex is at
 				   // the boundary
   vector<bool>               at_boundary (vertices.size(), false);
@@ -690,10 +687,10 @@ void Triangulation<dim>::distort_random (const double factor,
 	  at_boundary[line->vertex_index(1)] = true;
 	};
       
-      adjacent_lines[line->vertex_index(0)]++;
-      adjacent_lines[line->vertex_index(1)]++;
-      cumulated_length[line->vertex_index(0)] += line->diameter();
-      cumulated_length[line->vertex_index(1)] += line->diameter();
+      minimal_length[line->vertex_index(0)]
+	= min(line->diameter(), minimal_length[line->vertex_index(0)]);
+      minimal_length[line->vertex_index(1)]
+	= min(line->diameter(), minimal_length[line->vertex_index(1)]);
     };
 
 
@@ -712,16 +709,8 @@ void Triangulation<dim>::distort_random (const double factor,
       for (unsigned int d=0; d<dim; ++d)
 	shift_vector(d) = rand()*1.0/RAND_MAX;
 
-				       // bring the random vector to the
-				       // specified length by dividing
-				       // through its original length, then
-				       // multiplication by the average length
-				       // of the adjacent lines times the given
-				       // factor
-      shift_vector *= (factor *
-		       cumulated_length[vertex]) /
-		      (adjacent_lines[vertex] *
-		       sqrt(shift_vector.square()));
+      shift_vector *= factor * minimal_length[vertex] /
+		      sqrt(shift_vector.square());
 
 				       // finally move the vertex
       vertices[vertex] += shift_vector;
