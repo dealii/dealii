@@ -42,6 +42,9 @@ subdirectories. Go to the /common subdirectory and type 'make', to
 obtain the following help (this output may change slightly over time,
 just try it):
 
+=========================================================================
+=Global Makefile for the deal.II libraries                              =
+=========================================================================
 =Possible Targets                                                       =
 = (1) baseg lacg: debug libraries base and lac                          =
 = (2) base lac: debug and optimized libraries base and lac              =
@@ -52,6 +55,12 @@ just try it):
 = (7) printable-doc: generate the documentation in Postscript format.   =
 =     You need to have Doc++ and LaTeX installed for that.              =
 = (8) tex-doc: same, but only generate the LaTeX file, don't compile it =
+= (9) clean: removes all object files, libraries, etc in all subdirs    =
+=                                                                       =
+=The following additional parameters may be specified to make:          =
+=  PAR=-jn where n is the number of parallel processes for parallel     =
+=          builds.                                                      =
+=========================================================================
 
 To execute one of the commands, type 'make target-name'. Please note
 that building all libraries in debug and optimized mode takes about an
