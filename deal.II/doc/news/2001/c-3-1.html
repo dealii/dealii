@@ -281,7 +281,14 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Removed: the <code class="class">ProblemBase</code> class,
+       which has been deprecated since before the release of 
+       <acronym>deal.II</acronym> 3.0 has finally been removed.
+       <br>
+       (WB 2001/03/27)
        </p>
+
+  <li> <p>
        New: There is now a class <code class="class">MappingC1</code>
        that implements a continous C<sup>1</sup> mapping of the
        boundary by using a cubic mapping with continuous derivatives
@@ -311,7 +318,6 @@ documentation, etc</a>.
        (RH 2001/03/27)
 
   <li> <p>
-       </p>
        New: <code class="class">Boundary</code> and derived classes
        now have a function <code
        class="member">get_tangents_at_vertices</code> that returns a

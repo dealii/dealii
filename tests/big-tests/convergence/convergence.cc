@@ -16,7 +16,7 @@
 #include <numerics/data_out.h>
 #include <fe/fe_lib.lagrange.h>
 #include <base/quadrature_lib.h>
-#include <numerics/base.h>
+#include "../problem_base.h"
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <lac/vector.h>
