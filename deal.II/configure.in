@@ -743,6 +743,7 @@ if test "x$F77" != "x" ; then
 	F77FLAGSG="$FFLAGS -silent -g"
 	F77FLAGSO="$FFLAGS -silent -O3 -w"
 	F77LIBS="$F77LIBS -lF77 -lsunmath -lM77"
+	LDFLAGS="$LDFLAGS -L/opt/SUNWspro/lib"
 
 	dnl If necessary, add shared lib flags
 	if test $enableshared = yes ; then
