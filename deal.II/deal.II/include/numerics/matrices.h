@@ -714,10 +714,35 @@ class MatrixTools : public MatrixCreator
 				      * the classes that are used to wrap
 				      * PETSc objects.
 				      *
-				      * For a replacement function,
-				      * see the documentation of the
-				      * @ref{FilteredMatrix} class in
-				      * the @p{LAC} sublibrary.
+				      * Note that this function is not very
+				      * efficient: it needs to alternatingly
+				      * read and write into the matrix, a
+				      * situation that PETSc does not handle
+				      * too well. In addition, we only get rid
+				      * of rows corresponding to boundary
+				      * nodes, but the corresponding case of
+				      * deleting the respective columns
+				      * (i.e. if @arg eliminate_columns is @p
+				      * true) is not presently implemented,
+				      * and probably will never because it is
+				      * too expensive without direct access to
+				      * the PETSc data structures. A third
+				      * reason against this function is that
+				      * it doesn't handle the case where the
+				      * matrix is distributed across an MPI
+				      * system.
+				      *
+				      * In order to still be able to eliminate
+				      * boundary values, it is better to get
+				      * rid of them before the local matrices
+				      * and vectors are distributed to the
+				      * global ones, because then we don't
+				      * have to mess with the sparse data
+				      * structures. The
+				      * local_apply_boundary_values() function
+				      * does that, and is recommended for use
+				      * instead of the global one for PETSc
+				      * matrices and vectors.
 				      */
 #ifdef DEAL_II_USE_PETSC
     static void
@@ -727,6 +752,36 @@ class MatrixTools : public MatrixCreator
 			   PETScWrappers::VectorBase  &right_hand_side,
 			   const bool             eliminate_columns = true);
 #endif
+
+                                     /**
+                                      * Rather than applying boundary values
+                                      * to the global matrix and vector after
+                                      * assembly, this function does so @em
+                                      * before assembling, by modifying the
+                                      * local matrix and vector
+                                      * contributions. If you call this
+                                      * function on all local contributions,
+                                      * the resulting matrix will have the
+                                      * same entries, and the final call to
+                                      * apply_boundary_values() on the global
+                                      * system will not be necessary.
+                                      *
+                                      * Since this function does not have to
+                                      * work on the complicated data
+                                      * structures of sparse matrices, it is
+                                      * relatively cheap. It may therefore be
+                                      * a win if you have many fixed degrees
+                                      * of freedom (e.g. boundary nodes), or
+                                      * if access to the sparse matrix is
+                                      * expensive (e.g. for block sparse
+                                      * matrices, or for PETSc matrices).
+                                      */
+    static void
+    local_apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+                                 const std::vector<unsigned int> &local_dof_indices,
+                                 FullMatrix<double> &local_matrix,
+                                 Vector<double>     &local_rhs,
+                                 const bool          eliminate_columns);
     
 				     /**
 				      * Exception

@@ -13,6 +13,7 @@
 
 
 #include <numerics/matrices.h>
+#include <lac/full_matrix.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
@@ -640,6 +641,74 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 }
 
 #endif
+
+
+void
+MatrixTools::
+local_apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+                             const std::vector<unsigned int> &local_dof_indices,
+                             FullMatrix<double> &local_matrix,
+                             Vector<double>     &local_rhs,
+                             const bool          eliminate_columns)
+{
+  Assert (local_dof_indices.size() == local_matrix.m(),
+          ExcDimensionMismatch(local_dof_indices.size(),
+                               local_matrix.m()));
+  Assert (local_dof_indices.size() == local_matrix.n(),
+          ExcDimensionMismatch(local_dof_indices.size(),
+                               local_matrix.n()));
+  Assert (local_dof_indices.size() == local_rhs.size(),
+          ExcDimensionMismatch(local_dof_indices.size(),
+                               local_rhs.size()));
+
+                                   // if there is nothing to do, then exit
+                                   // right away
+  if (boundary_values.size() == 0)
+    return;
+
+                                   // otherwise traverse all the dofs used in
+                                   // the local matrices and vectors and see
+                                   // what's there to do
+  const unsigned int n_local_dofs = local_dof_indices.size();
+  for (unsigned int i=0; i<n_local_dofs; ++i)
+    {
+      const std::map<unsigned int, double>::const_iterator
+        boundary_value = boundary_values.find (local_dof_indices[i]);
+      if (boundary_value != boundary_values.end())
+        {
+                                           // remove this row, except for the
+                                           // diagonal element
+          for (unsigned j=0; j<n_local_dofs; ++j)
+            if (i != j)
+              local_matrix(i,j) = 0;
+
+                                           // replace diagonal entry by its
+                                           // absolute value to make sure that
+                                           // everything remains positive, or
+                                           // by one if zero
+          if (local_matrix(i,i) == 0.)
+            local_matrix(i,i) = 1.;
+          else
+            local_matrix(i,i) = std::fabs(local_matrix(i,i));
+          
+                                           // and replace rhs entry by correct
+                                           // value
+          local_rhs(i) = local_matrix(i,i) * boundary_value->second;
+
+                                           // finally do the elimination step
+                                           // if requested
+          if (eliminate_columns == true)
+            {
+              for (unsigned int row=0; row<n_local_dofs; ++row)
+                if (row != i)
+                  {
+                    local_rhs(row) -= local_matrix(row,i) * boundary_value->second;
+                    local_matrix(row,i) = 0;
+                  }
+            }
+        }
+    }
+}
 
 
 
