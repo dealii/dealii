@@ -257,12 +257,15 @@
 
   <p>
   On the other hand, newer versions of <acronym>deal.II</acronym> have
-  interfaces to the <a href="http://www.mcs.anl.gov/petsc/">PETSc</a> library
-  that implements a lot of functionality for distributed linear algebra,
-  i.e. for operations on vectors and matrices that are distributed across a
-  cluster of machines coupled via MPI. By using these wrapper classes for
-  linear algebra, it is possible to implement programs that work on truly
-  large problems by distributing computations.
+  interfaces to the <a href="http://www.mcs.anl.gov/petsc/"
+  target="_top">PETSc</a> library that implements a lot of functionality for
+  distributed linear algebra, i.e. for operations on vectors and matrices that
+  are distributed across a cluster of machines coupled via MPI. By using these
+  wrapper classes for linear algebra, it is possible to implement programs
+  that work on truly large problems by distributing computations. In addition,
+  we have functions that call into <a
+  href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
+  target="_top">METIS</a> to generate partitionings of triangulations.
   </p>
 
   <p>
