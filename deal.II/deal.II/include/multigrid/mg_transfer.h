@@ -299,7 +299,7 @@ class MGTransferBlockBase
 				   /**
 				    * Sizes of the multi-level vectors.
 				    */
-    std::vector<std::vector<unsigned int> > sizes;
+    mutable std::vector<std::vector<unsigned int> > sizes;
   
 				   /**
 				    * Start index of each component.
@@ -347,7 +347,12 @@ class MGTransferBlockBase
     std::vector<boost::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
 #endif
 
-    std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+				     /**
+				      * Unused now, but intended to
+				      * hold the mapping for the
+				      * <tt>copy_to/from_mg</tt>-functions.
+				      */
+    std::vector<std::map<unsigned int, unsigned int> >
     copy_to_and_from_indices;
 };
 

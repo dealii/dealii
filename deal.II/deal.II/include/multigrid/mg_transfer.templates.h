@@ -356,7 +356,7 @@ MGTransferSelect<number>::do_copy_to_mg (
 	 ExcMatricesNotBuilt());
 
   MGTools::reinit_vector(mg_dof_handler, dst,
-			 mg_selected, mg_target_component);
+			 mg_selected, mg_target_component, sizes);
   
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
@@ -386,7 +386,8 @@ MGTransferSelect<number>::do_copy_to_mg (
 				   // already have built.
   for (int level=maxlevel; level>=static_cast<signed int>(minlevel); --level)
     {
-      typename MGDoFHandler<dim>::active_cell_iterator
+
+  typename MGDoFHandler<dim>::active_cell_iterator
 	level_cell = mg_dof_handler.begin_active(level);
       const typename MGDoFHandler<dim>::active_cell_iterator
 	level_end  = mg_dof_handler.end_active(level);
@@ -423,6 +424,7 @@ MGTransferSelect<number>::do_copy_to_mg (
 		= src(global_dof_indices[*i] - offset);
 	    }
 	}
+
 				       // for that part of the level
 				       // which is further refined:
 				       // get the defect by

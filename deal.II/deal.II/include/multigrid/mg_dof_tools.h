@@ -180,10 +180,10 @@ class MGTools
 				      */
     template <int dim, typename number>
       static void
-      reinit_vector (const MGDoFHandler<dim> &mg_dof,
-		     MGLevelObject<BlockVector<number> > &v,
-		     const std::vector<bool> &selected = std::vector<bool>(),
-		     const std::vector<unsigned int> &target_component
+      reinit_vector (const MGDoFHandler<dim>& mg_dof,
+		     MGLevelObject<BlockVector<number> >& v,
+		     const std::vector<bool>& selected = std::vector<bool>(),
+		     const std::vector<unsigned int>& target_component
 		     = std::vector<unsigned int>());
 				     /**
 				      * Adjust vectors on all levels
@@ -216,7 +216,9 @@ class MGTools
       reinit_vector (const MGDoFHandler<dim> &mg_dof,
 		     MGLevelObject<Vector<number> > &v,
 		     const std::vector<bool> &selected,
-		     const std::vector<unsigned int> &target_component);
+		     const std::vector<unsigned int> &target_component,
+		     std::vector<std::vector<unsigned int> >& cached_sizes
+		     = std::vector<std::vector<unsigned int> >());
 };
 
 

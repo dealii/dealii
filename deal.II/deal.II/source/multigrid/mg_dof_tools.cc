@@ -13,6 +13,7 @@
 
 
 #include <base/multithread_info.h>
+#include <base/logstream.h>
 #include <base/thread_management.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>
@@ -353,7 +354,7 @@ MGTools::count_dofs_per_component (
                                                   dofs_in_component[i]);
 	    };
 	  threads.join_all();
-	  
+
 					   // next count what we got
 	  for (unsigned int i=0; i<n_components; ++i)
 	      result[l][target_component[i]]
@@ -462,7 +463,8 @@ void
 MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
                         MGLevelObject<Vector<number> > &v,
                         const std::vector<bool> &selected,
-			const std::vector<unsigned int> &target_component)
+			const std::vector<unsigned int> &target_component,
+			std::vector<std::vector<unsigned int> >& ndofs)
 {
   Assert (selected.size() == target_component.size(),
 	  ExcDimensionMismatch(selected.size(), target_component.size()));
@@ -479,12 +481,15 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
   unsigned int selected_block = 0;
   while (!selected[selected_block])
     ++selected_block;
-  
-  std::vector<std::vector<unsigned int> >
-    ndofs(mg_dof.get_tria().n_levels(),
-	  std::vector<unsigned int>(target_component.size()));
 
-  count_dofs_per_component (mg_dof, ndofs, target_component);
+  if (ndofs.size() == 0)
+    {
+      std::vector<std::vector<unsigned int> >
+	new_dofs(mg_dof.get_tria().n_levels(),
+		 std::vector<unsigned int>(target_component.size()));
+      std::swap(ndofs, new_dofs);
+      count_dofs_per_component (mg_dof, ndofs, target_component);
+    }
   
   for (unsigned int level=v.get_minlevel();
        level<=v.get_maxlevel();++level)
@@ -610,12 +615,14 @@ template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<Vector<double> >&,
   const std::vector<bool>&,
-  const std::vector<unsigned int>&);
+  const std::vector<unsigned int>&,
+  std::vector<std::vector<unsigned int> >&);
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<Vector<float> >&,
   const std::vector<bool>&,
-  const std::vector<unsigned int>&);
+  const std::vector<unsigned int>&,
+  std::vector<std::vector<unsigned int> >&);
 
 
 template void MGTools::count_dofs_per_component<deal_II_dimension> (

@@ -31,7 +31,7 @@
 
 template <int dim>
 void MGTransferBlockBase::build_matrices (
-  const DoFHandler<dim>& dof,
+  const DoFHandler<dim>&,
   const MGDoFHandler<dim>& mg_dof)
 {
 				   // Fill target component with
@@ -127,6 +127,8 @@ void MGTransferBlockBase::build_matrices (
 				   // be prebuilt, since the
 				   // get_dof_indices functions are
 				   // too slow
+
+  copy_to_and_from_indices.resize(n_levels);
   
 // Building the prolongation matrices starts here!
   
@@ -356,6 +358,7 @@ void MGTransferSelect<number>::build_matrices (
   const std::vector<unsigned int>& t_component,
   const std::vector<unsigned int>& mg_t_component)
 {
+  const FiniteElement<dim>& fe = mg_dof.get_fe();
   unsigned int ncomp = mg_dof.get_fe().n_components();
   
   target_component = t_component;
@@ -389,6 +392,45 @@ void MGTransferSelect<number>::build_matrices (
 	}
     }    
   MGTransferBlockBase::build_matrices (dof, mg_dof);
+//TODO:[GK] Rewrite this to suit MGTransferBlock and move to base class
+  
+  std::vector<unsigned int> global_dof_indices (fe.dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices  (fe.dofs_per_cell);
+  for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
+    {
+      typename MGDoFHandler<dim>::active_cell_iterator
+	level_cell = mg_dof.begin_active(level);
+      const typename MGDoFHandler<dim>::active_cell_iterator
+	level_end  = mg_dof.end_active(level);
+      
+				       // Compute coarse level right hand side
+				       // by restricting from fine level.
+      for (; level_cell!=level_end; ++level_cell)
+	{
+	  DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
+					   // get the dof numbers of
+					   // this cell for the global
+					   // and the level-wise
+					   // numbering
+	  global_cell.get_dof_indices(global_dof_indices);
+	  level_cell->get_mg_dof_indices (level_dof_indices);
+	  
+	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	    {
+	      const unsigned int component
+		= mg_target_component[fe.system_to_component_index(i).first];
+	      if (mg_selected[component])
+		{
+		  const unsigned int level_start
+		    = mg_component_start[level][component];
+		  copy_to_and_from_indices[level].insert(
+		    std::make_pair(global_dof_indices[i]
+				   - component_start[selected_component],
+				   level_dof_indices[i]-level_start));
+		}
+	    }
+	}
+    }
 }
 
 
