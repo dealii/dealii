@@ -54,6 +54,9 @@ namespace Patterns
   
 
 
+  const int Integer::min_int_value;
+  const int Integer::max_int_value;
+  
 
   Integer::Integer (const int lower_bound,
 		    const int upper_bound) :
@@ -124,8 +127,22 @@ namespace Patterns
 
 
 
-  Double::Double (const int lower_bound,
-		  const int upper_bound) :
+  const double Double::min_double_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<double>::min();
+#else
+          1;
+#endif
+  
+  const double Double::max_double_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<double>::max();
+#else
+          0;
+#endif
+  
+  Double::Double (const double lower_bound,
+		  const double upper_bound) :
 		  lower_bound (lower_bound),
 		  upper_bound (upper_bound)
   {};
