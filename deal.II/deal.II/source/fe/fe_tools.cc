@@ -113,8 +113,8 @@ namespace
   {
     Assert (position < name.size(), ExcInternalError());
     
-    std::string test_string (name.begin()+position,
-			     name.end());
+    const std::string test_string (name.begin()+position,
+				   name.end());
     
 #ifdef HAVE_STD_STRINGSTREAM
     std::istringstream str(test_string);
@@ -147,6 +147,52 @@ namespace
       }
     else
       return std::make_pair (-1, static_cast<unsigned int>(-1));
+  }
+
+
+
+				   // return how many characters
+				   // starting at the given position
+				   // of the string match either the
+				   // generic string "<dim>" or the
+				   // specialized string with "dim"
+				   // replaced with the numeric value
+				   // of the template argument
+  template <int dim>
+  unsigned int match_dimension (const std::string &name,
+				const unsigned int position)
+  {
+    if (position >= name.size())
+      return 0;
+
+    if ((position+5 < name.size())
+	&&
+	(name[position] == '<')
+	&&
+	(name[position+1] == 'd')
+	&&
+	(name[position+2] == 'i')
+	&&
+	(name[position+3] == 'm')
+	&&
+	(name[position+4] == '>'))
+      return 5;
+
+    Assert (dim<10, ExcNotImplemented());
+    const char dim_char = '0'+dim;
+    
+    if ((position+3 < name.size())
+	&&
+	(name[position] == '<')
+	&&
+	(name[position+1] == dim_char)
+	&&
+	(name[position+2] == '>'))
+      return 3;
+
+				     // some other string that doesn't
+				     // match
+    return 0;
   }
 }
 
@@ -1040,20 +1086,7 @@ FETools::get_fe_from_name (const std::string &name)
 template <int dim>
 std::pair<FiniteElement<dim> *, unsigned int>
 FETools::get_fe_from_name_aux (const std::string &name)
-{
-#ifdef HAVE_STD_STRINGSTREAM
-  std::ostringstream s;
-#else
-  std::ostrstream s;
-#endif
-	
-  s << '<' << dim << '>';
-#ifndef HAVE_STD_STRINGSTREAM
-  s << std::ends;
-#endif
-
-  const std::string dim_name = s.str();
-  
+{  
 				   // so, let's see what's at position
 				   // 0 of this string, and create a
 				   // respective finite element
@@ -1062,9 +1095,21 @@ FETools::get_fe_from_name_aux (const std::string &name)
 				   // make sure we don't match FE_Q
 				   // when it's actually a
 				   // FE_Q_Hierarchic
-  if (match_at_string_start (name, std::string("FE_Q_Hierarchical")+dim_name))
+  if (match_at_string_start (name, std::string("FE_Q_Hierarchical")))
     {
-      unsigned int position = (std::string("FE_Q_Hierarchical")+dim_name).size();
+      unsigned int position = std::string("FE_Q_Hierarchical").size();
+				       // as described in the
+				       // documentation, at this point
+				       // we may have either a) no
+				       // dimension specification, b)
+				       // the correct dimension (like
+				       // <2>), or c) a generic
+				       // <dim>. check how many of
+				       // these characters match, and
+				       // advance the cursor by the
+				       // respective amount
+      position += match_dimension<dim> (name, position);
+      
 				       // make sure the next character
 				       // is an opening parenthesis
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
@@ -1089,9 +1134,10 @@ FETools::get_fe_from_name_aux (const std::string &name)
     }
 				   // check other possibilities in
 				   // exactly the same way
-  else if (match_at_string_start (name, std::string("FE_RaviartThomas")+dim_name))
+  else if (match_at_string_start (name, std::string("FE_RaviartThomas")))
     {
-      unsigned int position = (std::string("FE_RaviartThomas")+dim_name).size();
+      unsigned int position = std::string("FE_RaviartThomas").size();
+      position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
       const std::pair<int,unsigned int> tmp = get_integer (name, position);
@@ -1102,9 +1148,10 @@ FETools::get_fe_from_name_aux (const std::string &name)
       return std::make_pair (new FE_RaviartThomas<dim>(tmp.first),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_Nedelec")+dim_name))
+  else if (match_at_string_start (name, std::string("FE_Nedelec")))
     {
-      unsigned int position = (std::string("FE_Nedelec")+dim_name).size();
+      unsigned int position = std::string("FE_Nedelec").size();
+      position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
       const std::pair<int,unsigned int> tmp = get_integer (name, position);
@@ -1115,9 +1162,10 @@ FETools::get_fe_from_name_aux (const std::string &name)
       return std::make_pair (new FE_Nedelec<dim>(tmp.first),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_DGPNonparametric")+dim_name))
+  else if (match_at_string_start (name, std::string("FE_DGPNonparametric")))
     {
-      unsigned int position = (std::string("FE_DGPNonparametric")+dim_name).size();
+      unsigned int position = std::string("FE_DGPNonparametric").size();
+      position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
       const std::pair<int,unsigned int> tmp = get_integer (name, position);
@@ -1128,9 +1176,10 @@ FETools::get_fe_from_name_aux (const std::string &name)
       return std::make_pair (new FE_DGPNonparametric<dim>(tmp.first),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_DGP")+dim_name))
+  else if (match_at_string_start (name, std::string("FE_DGP")))
     {
-      unsigned int position = (std::string("FE_DGP")+dim_name).size();
+      unsigned int position = std::string("FE_DGP").size();
+      position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
       const std::pair<int,unsigned int> tmp = get_integer (name, position);
@@ -1141,9 +1190,10 @@ FETools::get_fe_from_name_aux (const std::string &name)
       return std::make_pair (new FE_DGP<dim>(tmp.first),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_DGQ")+dim_name))
+  else if (match_at_string_start (name, std::string("FE_DGQ")))
     {
-      unsigned int position = (std::string("FE_DGQ")+dim_name).size();
+      unsigned int position = std::string("FE_DGQ").size();
+      position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
       const std::pair<int,unsigned int> tmp = get_integer (name, position);
@@ -1154,9 +1204,10 @@ FETools::get_fe_from_name_aux (const std::string &name)
       return std::make_pair (new FE_DGQ<dim>(tmp.first),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_Q")+dim_name))
+  else if (match_at_string_start (name, std::string("FE_Q")))
     {
-      unsigned int position = (std::string("FE_Q")+dim_name).size();
+      unsigned int position = std::string("FE_Q").size();
+      position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
       const std::pair<int,unsigned int> tmp = get_integer (name, position);
@@ -1175,9 +1226,10 @@ FETools::get_fe_from_name_aux (const std::string &name)
 				     // have to figure out what the
 				     // base elements are. this can
 				     // only be done recursively
-    if (match_at_string_start (name, std::string("FESystem")+dim_name))
+    if (match_at_string_start (name, std::string("FESystem")))
       {
-	unsigned int position = (std::string("FESystem")+dim_name).size();
+	unsigned int position = std::string("FESystem").size();
+	position += match_dimension<dim> (name, position);
 
 					 // FESystem puts the names of
 					 // the basis elements into

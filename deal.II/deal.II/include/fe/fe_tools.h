@@ -484,6 +484,31 @@ class FETools
 				      * @p{FETools::ExcInvalidFEName}
 				      * is thrown.
 				      *
+				      * There is one exception,
+				      * however, where the names must
+				      * not match exactly: while the
+				      * finite elements write the
+				      * space dimension in the form of
+				      * a template argument after the
+				      * name of the class (for example
+				      * @p{FE_Q<2>}, you can omit the
+				      * dimension argument altogether,
+				      * or replace it with the string
+				      * @p{<dim>}. The reason is that
+				      * the dimension argument may be
+				      * cumbersome if the name of a
+				      * finite element is given in an
+				      * input file that may be used to
+				      * control operation of the
+				      * program in different space
+				      * dimensions. Running the
+				      * program in another space
+				      * dimension would then require
+				      * changing the input file as
+				      * well. With above exception,
+				      * there is a canonical spelling
+				      * that doesn't require this.
+				      *
 				      * The function returns a pointer
 				      * to a newly create finite
 				      * element. It is in the callers
