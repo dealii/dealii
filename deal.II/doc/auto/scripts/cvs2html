@@ -27,6 +27,16 @@
 # Changelog
 # Ver  Date        Who did it            What happened
 # -------------------------------------------------------------------------
+# 1.94 2002-06-25  Magnus Ahlman	 Added a option argument -R CVS Reposity
+#					 specified in the cvsweb.conf
+#					 so you can integrate with cvsweb
+#
+# 1.93 2002-05-25  John Hardin           Patch against freezing problem
+#                                        with cvs log would report "nothing
+#                                        known about"
+#
+# 1.92 2002-03-25  Anna Jonna            Typos removed
+#                  Armannsdottir       
 #
 # 1.91 2002-01-13  Jacob Sparre Andersen Major overhaul of the code
 #                  and Peter Toft        in order to generate HTML 4.0
@@ -161,8 +171,12 @@
 #  Peter V. Pretsch <pvp@pe.dk>
 #  Grzegorz Pawelczak <gpawel@adlex.com>
 #  Stefan Kost <st_kost@gmx.de>
+#  Anna Jonna Armannsdottir <a@sleepy.dk>
+#  John Hardin <johnh@aproposretail.com>
+#  Magnus Ahlman <magnus.ahlman@eds.com>
+
 #
-# Copyright under GPL 1997,1998,1999,2000,2001 by
+# Copyright under GPL 1997 - 2002 by
 # Peter Toft (pto@sslug.dk) + the persons above
 #
 # Join the cvs2html mailing list <sslug-cvs2html@sslug.dk>
@@ -197,7 +211,7 @@ else {
 
 # now get the options. The ones with a colon means the an extra argument follows.
 # all options given will override the ones specified in cfgfile
-&Getopts('r:abc:C:d:efhkl:n:N:s:vo:D:E:L:O:w:i:pP:V:');
+&Getopts('R:r:abc:C:d:efhkl:n:N:s:vo:D:E:L:O:w:i:pP:V:');
 
 ###############################################################
 # graphic related default variables that you can change
@@ -351,7 +365,7 @@ sub shorthelp {
   print "         [-e] [-f] [-d \"MMM DD [YYYY]\"] [-D DD] [-i IMAGE] [-h]\n";
   print "         [-v] [-w FRAMEWIDTH] [-s PERCENTAGE] [-N MAXCHRONO]\n";
   print "         [-rREV1:REV2] [-c/-C CFILENAME] -O/o HTMLNAME\n";
-  print "         [-P CVSPATH] [-V VERBOSITY]\n";
+  print "         [-P CVSPATH] [-V VERBOSITY]\n [-R CVSWEB ROOT ";
 
   print "\n\nTry: cvs2html -help\n";
 }
@@ -385,8 +399,8 @@ sub showhelp {
   print " If -a is specified additional fields and files are generated\n";
   print " containing differences betweeen versions\n";
   print " in a xdiff-like side by side manner.\n";
-  print " The -n NUMDIF will only output the lastest NUMDIF diff files\.n";
-  print " The -N MAXCHRONO will only show thw last MAXCHRONO file changes\n";
+  print " The -n NUMDIF will only output the lastest NUMDIF diff files.\n";
+  print " The -N MAXCHRONO will only show the last MAXCHRONO file changes\n";
   print " in the chronological list of changes.\n";
   print "\n";
 
@@ -398,7 +412,7 @@ sub showhelp {
   print " are ignored.\n";
 
   print " If an option -l ftphome is given links to the files relative\n";
-  print " to the URL ftphome is made. Use -L ftphtmlhome to do the same as";
+  print " to the URL ftphome is made. Use -L ftphtmlhome to do the same as\n";
   print " -l, but substitutes file extension with .html\n";
   print "\n";
 
@@ -433,6 +447,9 @@ sub showhelp {
   print " value of 0 means be quiet and bigger numbers means more output.\n";
   print " This is especially useful, when something went wrong.\n";
   print "\n";
+
+  print " Use -R CVSWEBROOT to make reports intergrated with cvsweb.\n";
+  print " The argument should be the symbolic_name in cvsweb.conf.\n";
 
   print " The html file also contains anchors, if a file foo.html\n";
   print " containing a file e.g., foofoo.m is generated then it is\n";
@@ -1267,6 +1284,11 @@ for ($dd=0;$dd<=$#alldirs;$dd++) {
     else  {
       print STDERR "Error 1 in processing the output of cvs log in $currentdir\n";
       print STDERR $line;
+      print STDERR "\n";
+      if ($line =~ /nothing known about/) {
+        print STDERR "No log info for file.\n";
+        last;
+      }
     }
 
     # Find the next separator...
@@ -1439,10 +1461,14 @@ for ($dd=0;$dd<=$#alldirs;$dd++) {
 
 		  $Ls = "";
 		  $Le = "";
-		  if ($opt_l) {
+		  if (($opt_l) && ($opt_R)) {
+			$Ls = "<a href=\"$opt_l$cdir/$filename/\?cvsroot\=$opt_R\">";
+		   	$Le = "</a>\n";
+		  } elsif (($opt_l) && (! opt_R)) {
 			$Ls = "<a href=\"$opt_l$cdir/$filename\">";
 			$Le = "</a>\n";
 		  }
+			
 		  print OUTFILE $Ls.$filename.$Le;
 		  print OUTFILE "</font></B><br></td></tr>\n";
 		}
