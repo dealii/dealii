@@ -1,5 +1,16 @@
 # $Id$
 
+################################################################ This example
+# program will only work if PETSc is installed. If this is not the case, then
+# simply redefine the main targets to to nothing
+ifeq ($(USE_CONTRIB_PETSC),yes)
+default:
+run:
+endif
+#
+################################################################
+
+
 
 # For the small projects Makefile, you basically need to fill in only
 # four fields.
