@@ -30,7 +30,7 @@ tests_x = anna_? \
 	  data_out_0* \
           data_out_faces_0* \
 	  data_out_rotation_0* \
-	  data_out_stack_01 \
+	  data_out_stack_0* \
 	  dof_tools_[0-9]* \
 	  fe_tools_[0-9]* \
 	  roy_1 \
