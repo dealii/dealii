@@ -39,8 +39,9 @@
 
 template <int dim, class SparsityPattern>
 void
-DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
-				 SparsityPattern       &sparsity)
+DoFTools::make_sparsity_pattern (
+  const DoFHandler<dim> &dof,
+  SparsityPattern       &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -68,9 +69,10 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
 
 template <int dim, class SparsityPattern>
 void
-DoFTools::make_sparsity_pattern (const DoFHandler<dim>                 &dof,
-				 const std::vector<std::vector<bool> > &mask,
-				 SparsityPattern                       &sparsity)
+DoFTools::make_sparsity_pattern (
+  const DoFHandler<dim>                 &dof,
+  const std::vector<std::vector<bool> > &mask,
+  SparsityPattern                       &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -146,10 +148,11 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>                 &dof,
 
 template <class SparsityPattern>
 void
-DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>             &dof_handler,
-					  const FunctionMap<1>::type      &function_map,
-					  const std::vector<unsigned int> &dof_to_boundary_mapping,
-					  SparsityPattern                 &sparsity)
+DoFTools::make_boundary_sparsity_pattern (
+  const DoFHandler<1>             &dof_handler,
+  const FunctionMap<1>::type      &function_map,
+  const std::vector<unsigned int> &dof_to_boundary_mapping,
+  SparsityPattern                 &sparsity)
 {
   const unsigned int dofs_per_vertex = dof_handler.get_fe().dofs_per_vertex;
   std::vector<unsigned int> boundary_dof_boundary_indices (dofs_per_vertex);
@@ -189,9 +192,10 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>             &dof_h
 
 
 template <class SparsityPattern>
-void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
-					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					       SparsityPattern    &sparsity)
+void DoFTools::make_boundary_sparsity_pattern (
+  const DoFHandler<1> &dof_handler,
+  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+  SparsityPattern    &sparsity)
 {
 				   // there are only 2 boundary
 				   // indicators in 1d, so it is no
@@ -210,9 +214,10 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
 
 template <int dim, class SparsityPattern>
 void
-DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
-					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					  SparsityPattern    &sparsity)
+DoFTools::make_boundary_sparsity_pattern (
+  const DoFHandler<dim>& dof,
+  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+  SparsityPattern    &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -266,10 +271,11 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 
 template <int dim, class SparsityPattern>
-void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
-					       const typename FunctionMap<dim>::type  &boundary_indicators,
-					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					       SparsityPattern    &sparsity)
+void DoFTools::make_boundary_sparsity_pattern (
+  const DoFHandler<dim>& dof,
+  const typename FunctionMap<dim>::type  &boundary_indicators,
+  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+  SparsityPattern    &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -316,8 +322,9 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 template <int dim, class SparsityPattern>
 void
-DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
-				      SparsityPattern       &sparsity)
+DoFTools::make_flux_sparsity_pattern (
+  const DoFHandler<dim> &dof,
+  SparsityPattern       &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
   
@@ -425,8 +432,9 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 
 template <class SparsityPattern>
 void
-DoFTools::make_flux_sparsity_pattern (const DoFHandler<1> &dof,
-				      SparsityPattern     &sparsity)
+DoFTools::make_flux_sparsity_pattern (
+  const DoFHandler<1> &dof,
+  SparsityPattern     &sparsity)
 {
   typedef DoFHandler<1>::cell_iterator        cell_iterator;
   typedef DoFHandler<1>::active_cell_iterator active_cell_iterator;
@@ -473,10 +481,11 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<1> &dof,
 
 template <int dim, class SparsityPattern>
 void
-DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim>& dof,
-				      SparsityPattern&       sparsity,
-				      const Table<2,Coupling>& int_mask,
-				      const Table<2,Coupling>& flux_mask)
+DoFTools::make_flux_sparsity_pattern (
+  const DoFHandler<dim>& dof,
+  SparsityPattern&       sparsity,
+  const Table<2,Coupling>& int_mask,
+  const Table<2,Coupling>& flux_mask)
 {
   const unsigned int n_dofs = dof.n_dofs();
   const FiniteElement<dim>& fe = dof.get_fe();
@@ -733,8 +742,9 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim>& dof,
 
 #if deal_II_dimension == 1
 
-void DoFTools::make_hanging_node_constraints (const DoFHandler<1> &,
-					      ConstraintMatrix &)
+void DoFTools::make_hanging_node_constraints (
+  const DoFHandler<1> &,
+  ConstraintMatrix &)
 {
 				   // nothing to be done here
 }
@@ -745,8 +755,9 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<1> &,
 
 #if deal_II_dimension == 2
 
-void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
-					      ConstraintMatrix    &constraints)
+void DoFTools::make_hanging_node_constraints (
+  const DoFHandler<2> &dof_handler,
+  ConstraintMatrix    &constraints)
 {
   const unsigned int dim = 2;
   
@@ -832,8 +843,9 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
 
 #if deal_II_dimension == 3
 
-void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
-					      ConstraintMatrix    &constraints)
+void DoFTools::make_hanging_node_constraints (
+  const DoFHandler<3> &dof_handler,
+  ConstraintMatrix    &constraints)
 {
   const unsigned int dim = 3;
   
@@ -972,10 +984,11 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 
 
 template <int dim, typename Number>
-void DoFTools::distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler,
-					      const Vector<Number>  &cell_data,
-					      Vector<double>        &dof_data,
-					      const unsigned int     component)
+void DoFTools::distribute_cell_to_dof_vector (
+  const DoFHandler<dim> &dof_handler,
+  const Vector<Number>  &cell_data,
+  Vector<double>        &dof_data,
+  const unsigned int     component)
 {
   const Triangulation<dim> &tria = dof_handler.get_tria();
   const FiniteElement<dim> &fe   = dof_handler.get_fe();
@@ -1672,9 +1685,9 @@ get_subdomain_association (const DoFHandler<dim>     &dof_handler,
 
 template <int dim>
 unsigned int
-DoFTools::
-count_dofs_with_subdomain_association (const DoFHandler<dim> &dof_handler,
-                                       const unsigned int     subdomain)
+DoFTools::count_dofs_with_subdomain_association (
+  const DoFHandler<dim> &dof_handler,
+  const unsigned int     subdomain)
 {
                                    // in debug mode, make sure that there are
                                    // some cells at least with this subdomain
@@ -1707,10 +1720,10 @@ count_dofs_with_subdomain_association (const DoFHandler<dim> &dof_handler,
 
 template <int dim>
 void
-DoFTools::
-count_dofs_per_component (const DoFHandler<dim>&     dof_handler,
-                          std::vector<unsigned int>& dofs_per_component,
-			  std::vector<unsigned int>  target_component)
+DoFTools::count_dofs_per_component (
+  const DoFHandler<dim>&     dof_handler,
+  std::vector<unsigned int>& dofs_per_component,
+  std::vector<unsigned int>  target_component)
 {
   const unsigned int n_components = dof_handler.get_fe().n_components();
   dofs_per_component.resize (n_components);
@@ -1785,12 +1798,13 @@ count_dofs_per_component (const DoFHandler<dim>&     dof_handler,
 
 template <int dim>
 void
-DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coarse_grid,
-					 const unsigned int                  coarse_component,
-					 const DoFHandler<dim>              &fine_grid,
-					 const unsigned int                  fine_component,
-					 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-					 ConstraintMatrix                   &constraints)
+DoFTools::compute_intergrid_constraints (
+  const DoFHandler<dim>              &coarse_grid,
+  const unsigned int                  coarse_component,
+  const DoFHandler<dim>              &fine_grid,
+  const unsigned int                  fine_component,
+  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  ConstraintMatrix                   &constraints)
 {
 				   // store the weights with which a dof
 				   // on the parameter grid contributes
@@ -2008,12 +2022,13 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 template <int dim>
 void
 DoFTools::
-compute_intergrid_transfer_representation (const DoFHandler<dim>              &coarse_grid,
-					   const unsigned int                  coarse_component,
-					   const DoFHandler<dim>              &fine_grid,
-					   const unsigned int                  fine_component,
-					   const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-					   std::vector<std::map<unsigned int, float> > &transfer_representation)
+compute_intergrid_transfer_representation (
+  const DoFHandler<dim>              &coarse_grid,
+  const unsigned int                  coarse_component,
+  const DoFHandler<dim>              &fine_grid,
+  const unsigned int                  fine_component,
+  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  std::vector<std::map<unsigned int, float> > &transfer_representation)
 {
 				   // store the weights with which a dof
 				   // on the parameter grid contributes
@@ -2117,13 +2132,14 @@ compute_intergrid_transfer_representation (const DoFHandler<dim>              &c
 
 template <int dim>
 unsigned int
-DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coarse_grid,
-				       const unsigned int                  coarse_component,
-				       const DoFHandler<dim>              &fine_grid,
-				       const unsigned int                  fine_component,
-				       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-				       std::vector<std::map<unsigned int, float> > &weights,
-				       std::vector<int>                   &weight_mapping)
+DoFTools::compute_intergrid_weights_1 (
+  const DoFHandler<dim>              &coarse_grid,
+  const unsigned int                  coarse_component,
+  const DoFHandler<dim>              &fine_grid,
+  const unsigned int                  fine_component,
+  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  std::vector<std::map<unsigned int, float> > &weights,
+  std::vector<int>                   &weight_mapping)
 {
 				   // aliases to the finite elements
 				   // used by the dof handlers:
@@ -2353,12 +2369,13 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 
 template <int dim>
 void
-DoFTools::compute_intergrid_weights_2 (const DoFHandler<dim>              &coarse_grid,
-				       const unsigned int                  coarse_component,
-				       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-				       const std::vector<Vector<double> > &parameter_dofs,
-				       const std::vector<int>             &weight_mapping,
-				       std::vector<std::map<unsigned int,float> > &weights)
+DoFTools::compute_intergrid_weights_2 (
+  const DoFHandler<dim>              &coarse_grid,
+  const unsigned int                  coarse_component,
+  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  const std::vector<Vector<double> > &parameter_dofs,
+  const std::vector<int>             &weight_mapping,
+  std::vector<std::map<unsigned int,float> > &weights)
 {
 				   // simply distribute the range of
 				   // cells to different threads
@@ -2393,14 +2410,15 @@ DoFTools::compute_intergrid_weights_2 (const DoFHandler<dim>              &coars
 
 template <int dim>
 void
-DoFTools::compute_intergrid_weights_3 (const DoFHandler<dim>              &coarse_grid,
-				       const unsigned int                  coarse_component,
-				       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-				       const std::vector<Vector<double> > &parameter_dofs,
-				       const std::vector<int>             &weight_mapping,
-				       std::vector<std::map<unsigned int, float> > &weights,
-				       const typename DoFHandler<dim>::active_cell_iterator &begin,
-				       const typename DoFHandler<dim>::active_cell_iterator &end)
+DoFTools::compute_intergrid_weights_3 (
+  const DoFHandler<dim>              &coarse_grid,
+  const unsigned int                  coarse_component,
+  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  const std::vector<Vector<double> > &parameter_dofs,
+  const std::vector<int>             &weight_mapping,
+  std::vector<std::map<unsigned int, float> > &weights,
+  const typename DoFHandler<dim>::active_cell_iterator &begin,
+  const typename DoFHandler<dim>::active_cell_iterator &end)
 {
 				   // aliases to the finite elements
 				   // used by the dof handlers:
@@ -2581,9 +2599,10 @@ DoFTools::compute_intergrid_weights_3 (const DoFHandler<dim>              &coars
 #if deal_II_dimension == 1
 
 
-void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
-					    const std::set<unsigned char> &boundary_indicators,
-					    std::vector<unsigned int> &mapping)
+void DoFTools::map_dof_to_boundary_indices (
+  const DoFHandler<1> &dof_handler,
+  const std::set<unsigned char> &boundary_indicators,
+  std::vector<unsigned int> &mapping)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
 
@@ -2684,9 +2703,10 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>     &dof_handl
 
 
 template <int dim>
-void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>         &dof_handler,
-					    const std::set<unsigned char> &boundary_indicators,
-					    std::vector<unsigned int>     &mapping)
+void DoFTools::map_dof_to_boundary_indices (
+  const DoFHandler<dim>         &dof_handler,
+  const std::set<unsigned char> &boundary_indicators,
+  std::vector<unsigned int>     &mapping)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
   Assert (boundary_indicators.find (255) == boundary_indicators.end(),
@@ -3096,28 +3116,23 @@ count_dofs_with_subdomain_association (const DoFHandler<deal_II_dimension> &,
 
 template
 void
-DoFTools::count_dofs_per_component<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &dof_handler,
- std::vector<unsigned int>           &dofs_per_component,
- std::vector<unsigned int>            guidos_special_arg);
-
+DoFTools::count_dofs_per_component<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
 
 template
 void
-DoFTools::compute_intergrid_constraints<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const unsigned int                   ,
- const DoFHandler<deal_II_dimension> &,
- const unsigned int                   ,
- const InterGridMap<DoFHandler,deal_II_dimension> &,
- ConstraintMatrix                    &);
+DoFTools::compute_intergrid_constraints<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension> &, const unsigned int,
+  const DoFHandler<deal_II_dimension> &, const unsigned int,
+  const InterGridMap<DoFHandler,deal_II_dimension> &,
+  ConstraintMatrix&);
+
 template
 void
 DoFTools::compute_intergrid_transfer_representation<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const unsigned int                   ,
- const DoFHandler<deal_II_dimension> &,
- const unsigned int                   ,
+(const DoFHandler<deal_II_dimension> &, const unsigned int,
+ const DoFHandler<deal_II_dimension> &, const unsigned int,
  const InterGridMap<DoFHandler,deal_II_dimension> &,
  std::vector<std::map<unsigned int, float> > &);
 
