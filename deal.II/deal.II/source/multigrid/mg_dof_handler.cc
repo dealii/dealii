@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1658,7 +1658,7 @@ void MGDoFHandler<2>::reserve_space () {
       };
 
 
-// now allocate the needed space
+                                   // now allocate the needed space
   for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
     {
 //TODO:[WB,GK] These conditions are violated on unused vertices
