@@ -24,21 +24,6 @@
 #include <fe/fe_values.h>
 
 
-// Include embedding matrices (produced by tests/fe/embedding with
-// postprocessing
-
-#if (deal_II_dimension == 1)
-#include "mat_q.1"
-#endif
-
-#if (deal_II_dimension == 2)
-#include "mat_q.2"
-#endif
-
-#if (deal_II_dimension == 3)
-#include "mat_q.3"
-#endif
-
 
 //TODO: move build_renumbering to mapping class
 
