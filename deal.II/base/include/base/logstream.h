@@ -88,6 +88,11 @@ class LogStream
     std::ostream& get_file_stream ();
 
 				     /**
+				      * Reroutes cerr to LogStream.
+				      */
+    void log_cerr ();
+    
+				     /**
 				      * Return the prefix string.
 				      */
     const std::string& get_prefix () const;

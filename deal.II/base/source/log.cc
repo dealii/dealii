@@ -72,6 +72,12 @@ void LogStream::detach ()
 }
 
 
+void LogStream::log_cerr ()
+{
+  std::cerr.rdbuf(file->rdbuf());
+}
+
+
 std::ostream&
 LogStream::get_console()
 {
