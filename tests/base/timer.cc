@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,9 +37,9 @@ void compare (double t1, double t2, double ratio)
 
 // burn computer time
 
+double s = 0.;
 void burn (unsigned int n)
 {
-  double s = 0.;
   for (unsigned int i=0 ; i<n ; ++i)
     {
       for (unsigned int j=1 ; j<100000 ; ++j)
