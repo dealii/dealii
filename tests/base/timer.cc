@@ -44,19 +44,23 @@ int main ()
   deallog.depth_console(0);
 
   Timer t1,t2;
-  burn (100);
+  burn (20);
   double s01 = t1.stop();
   double s02 = t2();
-  burn (100);
+  burn (20);
   double s11 = t1.stop();
   double s12 = t2();
   t1.start();
-  burn (100);
-  double s21 = t1.stop();
+  burn (20);
+  double s21 = t1();
   double s22 = t2();
+  burn (20);
+  double s31 = t1();
+  double s32 = t2();
 
   compare (s01,s02,1.);
   compare (s11,s12,2.);
   compare (s21,s22,3./2.);
+  compare (s31,s32,4./3.);
 }
 
