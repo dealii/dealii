@@ -34,6 +34,31 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: A longstanding bug in the documentation system has been fixed: if
+       a namespace was ended with <code>}</code> instead of <code>};</code>
+       (note the semicolon), then the documentation tool assumed that the
+       following entities were still part of the namespace just left. This was
+       since the closing brace alone was not accepted as ending a namespace
+       (after all, structures, classes, and enums -- the other entities that
+       can enclose other declarations -- need the semicolon). This led to some
+       classes not showing up in the class index of the sublibraries. This is
+       now fixed.
+       <br>
+       (WB 2003/02/02)
+       </p>
+
+  <li> <p> 
+       Changed: Class and structures that are declared inside namespaces named
+       <code class="class">internal</code> are now no longer shown in the class
+       index view of the documentation of each of the sublibraries. Since they
+       are supposed to be used internally only, this is no drawback for the
+       general public. However, they are documented as members of these
+       namespaces.
+       <br>
+       (WB 2003/02/02)
+       </p>
+
+  <li> <p> 
        Fixed: Some of the formulas in the step-14 tutorial were obviously 
        scrambled a little. This is now fixed.
        <br>
