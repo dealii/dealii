@@ -114,28 +114,28 @@ class SolverSelector
 				      * info see the #Solver# class.
 				      */
     void set_data(const typename SolverRichardson<Matrix,Vector>
-		  ::AdditionalData &data) { richardson_data=data; };
+		  ::AdditionalData &data);
 
 				     /**
 				      * Set the additional data. For more
 				      * info see the #Solver# class.
 				      */
     void set_data(const typename SolverCG<Matrix,Vector>
-		  ::AdditionalData &data) { cg_data=data; };
+		  ::AdditionalData &data);
 
 				     /**
 				      * Set the additional data. For more
 				      * info see the #Solver# class.
 				      */
     void set_data(const typename SolverBicgstab<Matrix,Vector>
-		  ::AdditionalData &data) { bicgstab_data=data; }; 
+		  ::AdditionalData &data); 
 
 				     /**
 				      * Set the additional data. For more
 				      * info see the #Solver# class.
 				      */
     void set_data(const typename SolverGMRES<Matrix,Vector>
-		  ::AdditionalData &data) { gmres_data=data; };
+		  ::AdditionalData &data);
 
 				     /**
 				      * Get the names of all implemented
@@ -223,22 +223,26 @@ SolverSelector<Matrix, Vector>::solve(const Matrix &A,
 {
   if (solver_name=="richardson")
     {
-      SolverRichardson<Matrix,Vector> solver(*control,*vector_memory);
+      SolverRichardson<Matrix,Vector> solver(*control,*vector_memory,
+					     richardson_data);
       return solver.solve(A,x,b,precond);
     }       
   else if (solver_name=="cg")
     {
-      SolverCG<Matrix,Vector> solver(*control,*vector_memory);
+      SolverCG<Matrix,Vector> solver(*control,*vector_memory,
+				     cg_data);
       return solver.solve(A,x,b,precond);
     }
   else if (solver_name=="bicgstab")
     {
-      SolverBicgstab<Matrix,Vector> solver(*control,*vector_memory);
+      SolverBicgstab<Matrix,Vector> solver(*control,*vector_memory,
+					   bicgstab_data);
       return solver.solve(A,x,b,precond);
     }
   else if (solver_name=="gmres")
     {
-      SolverGMRES<Matrix,Vector> solver(*control,*vector_memory,100);
+      SolverGMRES<Matrix,Vector> solver(*control,*vector_memory,
+					gmres_data);
       return solver.solve(A,x,b,precond);
     }
   else
@@ -254,6 +258,40 @@ string SolverSelector<Matrix, Vector>::get_solver_names()
 {
   return "richardson|cg|bicgstab|gmres";
 };
+
+
+
+template <class Matrix, class Vector>
+void SolverSelector<Matrix, Vector>::set_data(
+  const typename SolverGMRES<Matrix,Vector>::AdditionalData &data)
+{ 
+  gmres_data=data; 
+}
+
+
+template <class Matrix, class Vector>
+void SolverSelector<Matrix, Vector>::set_data(
+  const typename SolverRichardson<Matrix,Vector>::AdditionalData &data)
+{ 
+  richardson_data=data; 
+}
+
+
+template <class Matrix, class Vector>
+void SolverSelector<Matrix, Vector>::set_data(
+  const typename SolverCG<Matrix,Vector>::AdditionalData &data) 
+{ 
+  cg_data=data; 
+}
+
+
+template <class Matrix, class Vector>
+void SolverSelector<Matrix, Vector>::set_data(
+  const typename SolverBicgstab<Matrix,Vector>::AdditionalData &data) 
+{ 
+  bicgstab_data=data; 
+};
+
 
 
 /*----------------------------   solver_selector.h     ---------------------------*/
