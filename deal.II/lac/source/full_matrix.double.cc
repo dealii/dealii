@@ -22,7 +22,8 @@ template class FullMatrix<TYPEMAT>;
 #define TYPEMAT2 double
 
 //template FullMatrix<TYPEMAT>& FullMatrix<TYPEMAT>::operator =(const FullMatrix<TYPEMAT2>&);
-template void FullMatrix<TYPEMAT>::fill<TYPEMAT2> (const FullMatrix<TYPEMAT2>&, const unsigned, const unsigned);
+template void FullMatrix<TYPEMAT>::fill<TYPEMAT2> (
+  const FullMatrix<TYPEMAT2>&, const unsigned, const unsigned, const unsigned, const unsigned);
 template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::mmult<TYPEMAT2> (FullMatrix<TYPEMAT2>&, const FullMatrix<TYPEMAT2>&, const bool) const;

@@ -563,6 +563,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p> Improved: <code class="class">FullMatrix</code>::<code
+  class="member">fill</code> now copies the largest possible block,
+  whether the destination or source matrix is bigger. Additionally, an
+  offset inside the source matrix may be specified.
+  <br>
+  (GK 2003/03/31)
+  </p>
+
   <li> <p>
        New/Changed: The <code class="class">SparseILU</code>, <code
        class="class">SparseMIC</code> and <code

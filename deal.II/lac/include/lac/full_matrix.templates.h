@@ -386,15 +386,23 @@ void FullMatrix<number>::backward (Vector<number2>       &dst,
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::fill (const FullMatrix<number2> &src,
-			       const unsigned int         i,
-			       const unsigned int         j)
+			       const unsigned int dst_offset_i,
+			       const unsigned int dst_offset_j,
+			       const unsigned int src_offset_i,
+			       const unsigned int src_offset_j)
 {
-  Assert (n() >= src.n() + j, ExcInvalidDestination(n(), src.n(), j));
-  Assert (m() >= src.m() + i, ExcInvalidDestination(m(), src.m(), i));
-
-  for (unsigned int ii=0; ii<src.m() ; ++ii)
-    for (unsigned int jj=0; jj<src.n() ; ++jj)
-      this->el(ii+i,jj+j) = src.el(ii,jj);
+				   // Compute maximal size of copied block
+  const unsigned int rows = (m() - dst_offset_i >= src.m() - src_offset_i)
+			    ? src.m()
+			    : m();
+  const unsigned int cols = (n() - dst_offset_j >= src.n() - src_offset_j)
+			    ? src.n()
+			    : n();
+  
+  for (unsigned int i=0; i<rows ; ++i)
+    for (unsigned int j=0; j<cols ; ++j)
+      this->el(dst_offset_i+i,dst_offset_j+j)
+	= src.el(src_offset_i+i,src_offset_j+j);
 }
 
 

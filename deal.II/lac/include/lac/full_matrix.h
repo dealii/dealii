@@ -154,23 +154,27 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Fill rectangular block.
 				      *
-				      * The matrix @p{src} is copied
-				      * into the target. The optional
-				      * values @p{i} and @p{j}
-				      * determine the upper left
-				      * corner of the image of
-				      * @p{src}.
-				      *
-				      * This function requires that
-				      * @p{i+src.m()<=m()} and
-				      * @p{j+src.n()<=n()}, that is,
-				      * the image fits into the space
-				      * of @p{this}.
+				      * A rectangular block of the
+				      * matrix @p{src} is copied into
+				      * @p{this}. The upper left
+				      * corner of the block being
+				      * copied is
+				      * @p{(src_offset_i,src_offset_j)}.
+				      * The upper left corner of the
+				      * copied block is
+				      * @p{(dst_offset_i,dst_offset_j)}.
+				      * The size of the rectangular
+				      * block being copied is the
+				      * maximum size possible,
+				      * determined either by the size
+				      * of @p{this} or @p{src}.
 				      */
     template<typename number2>
     void fill (const FullMatrix<number2> &src,
-	       const unsigned int         i=0,
-	       const unsigned int         j=0);
+	       const unsigned int dst_offset_i = 0,
+	       const unsigned int dst_offset_j = 0,
+	       const unsigned int src_offset_i = 0,
+	       const unsigned int src_offset_j = 0);
     
 
 				     /**
@@ -628,7 +632,9 @@ class FullMatrix : public Table<2,number>
 
 				     /**
 				      * Least-Squares-Approximation by
-				      * QR-factorization.
+				      * QR-factorization. The return
+				      * value is the Euclidean norm of
+				      * the approximation error.
 				      */
     template<typename number2>
     double least_squares (Vector<number2> &dst,
