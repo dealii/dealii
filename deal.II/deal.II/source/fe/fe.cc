@@ -405,11 +405,11 @@ FiniteElementBase<dim>::memory_consumption () const
 {
   return (sizeof(FiniteElementData<dim>) +
 	  MemoryConsumption::
-	  memory_consumption<FullMatrix<double>,
-                             GeometryInfo<dim>::children_per_cell>(restriction)+
-	  MemoryConsumption::
-          memory_consumption<FullMatrix<double>,
-                             GeometryInfo<dim>::children_per_cell>(prolongation) +
+	  memory_consumption<FullMatrix<double>, sizeof(restriction)/sizeof(restriction[0])>
+	  (restriction)+
+	  MemoryConsumption::memory_consumption
+	  <FullMatrix<double>, sizeof(prolongation)/sizeof(prolongation[0])>
+	  (prolongation) +
 	  MemoryConsumption::memory_consumption (interface_constraints) +
 	  MemoryConsumption::memory_consumption (system_to_component_table) +
 	  MemoryConsumption::memory_consumption (face_system_to_component_table) +
