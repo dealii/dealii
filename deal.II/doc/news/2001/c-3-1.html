@@ -175,6 +175,27 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       We now unconditionally include
+       <code>deal.II/include/grid/tria_accessor.templates.h</code>
+       (which containts some inline functions for triangulation
+       accessor classes) into 
+       <code>deal.II/include/grid/tria_accessor.h</code> to work
+       around a problem with gcc3.0 which does not place a copy of
+       these functions into the library. Previously we only included
+       the file in optimized mode.
+       <br>
+       (RH 2001/03/14)
+       </p>
+
+  <li> <p>
+       The class <code class="class">GridReordering::Cell</code> has
+       now a copy constructor to work around a bug in a gcc3.0
+       snapshot.
+       <br>
+       (RH, WB 2001/03/14)
+       </p>
+
+  <li> <p>
        Changed: when refining a hexahedron in 3d, the rules by which
        the new vertices at the centers of the faces and at the center
        of the cell are placed, are changed. They are changed in a way
