@@ -335,7 +335,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 					   vector<Tensor<2,dim> >(quadrature.n_quadrature_points)),
 		unit_shape_gradients_transform(fe.n_transform_functions(),
 					       vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
-		unit_quadrature_points(quadrature.get_quad_points())
+		unit_quadrature_points(quadrature.get_points())
 {
   Assert ((update_flags & update_normal_vectors) == false,
 	  ExcInvalidUpdateFlag());
@@ -519,7 +519,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				       update_flags,
 				       fe)
 {
-  unit_face_quadrature_points = quadrature.get_quad_points();
+  unit_face_quadrature_points = quadrature.get_points();
   weights = quadrature.get_weights ();  
 
   				   // set up an array of the unit points
@@ -680,7 +680,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
   Assert ((update_flags & update_support_points) == false,
 	  ExcInvalidUpdateFlag());
   
-  unit_face_quadrature_points = quadrature.get_quad_points();
+  unit_face_quadrature_points = quadrature.get_points();
   weights = quadrature.get_weights ();  
 
   				   // set up an array of the unit points

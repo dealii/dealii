@@ -37,7 +37,7 @@ int main(int,char)
   for (unsigned int n=2; n<9; ++n)
     {
       Quadrature<1> *quadrature=gauss_quadratures[n];
-      const vector<Point<1> > &points=quadrature->get_quad_points();
+      const vector<Point<1> > &points=quadrature->get_points();
       const vector<double> &weights=quadrature->get_weights();
 
       deallog << "Gauss" << n;
