@@ -259,6 +259,16 @@ class PreconditionBlockJacobi : public Subscriptor,
     PreconditionBlock<number,inverse_type>::initialize;
     
 				     /**
+				      * Make function of base class public again.
+				      */
+    PreconditionBlock<number,inverse_type>::clear;
+
+				     /**
+				      * Make function of base class public again.
+				      */
+    PreconditionBlock<number,inverse_type>::set_same_diagonal;
+
+				     /**
 				      * Make function public.
 				      */
     PreconditionBlock<number,inverse_type>::invert_diagblocks;
@@ -308,7 +318,7 @@ class PreconditionBlockSOR : public  Subscriptor,
 				     /**
 				      * Destructor.
 				      */
-    virtual ~PreconditionBlockSOR();
+    ~PreconditionBlockSOR();
 
 				     /**
 				      * Make initialization function
@@ -317,7 +327,17 @@ class PreconditionBlockSOR : public  Subscriptor,
     PreconditionBlock<number,inverse_type>::initialize;
     
 				     /**
-				      * Make function public.
+				      * Make function of base class public again.
+				      */
+    PreconditionBlock<number,inverse_type>::clear;
+
+				     /**
+				      * Make function of base class public again.
+				      */
+    PreconditionBlock<number,inverse_type>::set_same_diagonal;
+
+				     /**
+				      * Make function of base class public again.
 				      */
     PreconditionBlock<number,inverse_type>::invert_diagblocks;
 
