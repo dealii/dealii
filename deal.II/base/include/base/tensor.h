@@ -722,6 +722,28 @@ void contract (Tensor<4,dim>       &dest,
 
 
 /**
+ * Contract three tensors, corresponding to the matrix vector product
+ * <i>u<sup>T</sup> A v</i>.
+ *
+ * @relates Tensor
+ * @author Guido Kanschat, 2004
+ */
+template <int dim>
+inline
+double contract3 (const Tensor<1,dim>& u,
+		  const Tensor<2,dim>& A,
+		  const Tensor<1,dim>& v)
+{
+  double result = 0.;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      result += u[i] * A[i][j] * v[j];
+  return result;
+}
+
+
+/**
  * Form the outer product of two tensors of rank 1 and 1, i.e.
  * <tt>dst[i][j] = src1[i] * src2[j]</tt>.
  *
@@ -1069,7 +1091,7 @@ transpose (const Tensor<2,dim> &t)
   return tt;
 }
 
-
+/// @if NoDoc
 
 /**
  * Return the transpose of the given tensor. This is the
@@ -1123,7 +1145,7 @@ transpose (const Tensor<2,3> &t)
   return Tensor<2,3>(x);
 }
 
-
+/// @endif
 
 
 /**
