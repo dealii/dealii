@@ -105,6 +105,17 @@
 
 <ol>
   <li> <p>
+       Improved: The interface of preconditioner classes has changed.
+       Preconditioners are now considered linear operators like
+       matrices: they have members <code class="member">vmult</code>
+       and <code class="member">Tvmult</code> instead of the old <code
+       class="member">operator()</code>. This will allow the
+       implementation of further non-symmetric solvers.
+       <br>
+       (GK 2000/06/20)
+       </p>
+
+  <li> <p>
        New: there is now a function
        <code class="member">SparseMatrix::el</code> that does mostly
        the same as <code class="member">SparseMatrix::operator()</code>,
@@ -273,6 +284,16 @@
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: classes <code class="class">FEDG_Px</code> implement
+       complete polynomial spaces of degree <em>x</em> on
+       quadrilaterals. Since they have less degrees of freedom than
+       <code class="class">FEDG_Qx</code>, there is no continuous
+       version for these elements. Implementation for P4 and 3D is
+       still incomplete.
+       <br>
+       (GK 2000/06/20)
+
   <li> <p>
        Fix: slight bug in 
        <code class="member">DataOut::build_patches</code>
