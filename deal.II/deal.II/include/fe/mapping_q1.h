@@ -90,14 +90,78 @@ class MappingQ1 : public Mapping<dim>
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
+				      *
+				      * Description of effects:
+				      * @begin{itemize}
+				      * @item if @p{update_q_points}
+				      * is required, the output will
+				      * contain
+				      * @p{update_transformation_values}. This
+				      * computes the values of the
+				      * transformation basis
+				      * polynomials at the unit cell
+				      * quadrature points.
+				      * @item if any of
+				      * @p{update_covariant_transformation},
+				      * @p{update_contravariant_transformation},
+				      * @p{update_JxW_values},
+				      * @p{update_boundary_forms},
+				      * @p{update_normal_vectors} is
+				      * required, the output will
+				      * contain
+				      * @p{update_transformation_gradients}
+				      * to compute derivatives of the
+				      * transformation basis
+				      * polynomials.
+				      * @end{itemize}
 				      */
-    virtual UpdateFlags update_once (const UpdateFlags) const;
+    virtual UpdateFlags update_once (const UpdateFlags flags) const;
     
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
+				      *
+				      * Description of effects if
+				      * @p{flags} contains:
+				      * @begin{itemize}
+				      * @item p{update_q_points} is
+				      * copied to the output to
+				      * compute the quadrature points
+				      * on the real cell.
+				      * @item p{update_JxW_values} is
+				      * copied and requires
+				      * @p{update_boundary_forms} on
+				      * faces. The latter, because the
+				      * surface element is just the
+				      * norm of the boundary form.
+				      * @item p{update_normal_vectors}
+				      * is copied and requires
+				      * @p{update_boundary_forms}. The
+				      * latter, because the normal
+				      * vector is the normalized
+				      * boundary form.
+				      * @item
+				      * p{update_covariant_transformation}
+				      * is copied and requires
+				      * @p{update_contravariant_transformation},
+				      * since it is computed as the
+				      * inverse of the latter.
+				      * @item p{update_JxW_values} is
+				      * copied and requires
+				      * @p{update_contravariant_transformation},
+				      * since it is computed as one
+				      * over determinant of the
+				      * latter.
+				      * @item p{update_boundary_forms}
+				      * is copied and requires
+				      * @p{update_contravariant_transformation},
+				      * since the boundary form is
+				      * computed as the contravariant
+				      * image of the normal vector to
+				      * the unit cell.
+				      * @end{itemize}
 				      */
-    virtual UpdateFlags update_each (const UpdateFlags) const;
+    virtual UpdateFlags update_each (const UpdateFlags flags) const;
 
 				     /** 
 				      * Storage for internal data of
