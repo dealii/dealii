@@ -277,9 +277,9 @@ class MGTransferPrebuilt : public MGTransferBase
 				      * are degrees of freedom on the finer
 				      * level.
 				      */
-    virtual void prolongate (const unsigned int  to_level,
+    virtual void prolongate (const unsigned int   to_level,
 			     Vector<float>       &dst,
-			     const Vector<float> &src) const = 0;
+			     const Vector<float> &src) const;
 
 				     /**
 				      * Restrict a vector from level
@@ -296,7 +296,7 @@ class MGTransferPrebuilt : public MGTransferBase
 				      */
     virtual void restrict (const unsigned int   from_level,
 			   Vector<float>       &dst,
-			   const Vector<float> &src) const = 0;
+			   const Vector<float> &src) const;
 
   private:
 

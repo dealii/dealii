@@ -82,7 +82,7 @@ MGTransferBase::~MGTransferBase ()
 /* ----------------------------- MGTransferPrebuilt ------------------------ */
 
 
-/*
+
 MGTransferPrebuilt::~MGTransferPrebuilt () 
 {};
 
@@ -148,7 +148,8 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 	      };
 	  };
 
-      prolongation_matrices[level].matrix.reinit (prolongation_matrices[level].sparsity);
+      prolongation_matrices.push_back (SparseMatrix<float>());
+      prolongation_matrices[level].reinit (prolongation_sparsities[level]);
 
 
 				       // now actually build the matrices
@@ -175,7 +176,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    if (prolongation(i,j) != 0)
 		      {
-			prolongation_matrices[level]
+			prolongation_matrices[level].set
 			  (dof_indices_child[i],
 			   dof_indices_mother[j],
 			   prolongation(i,j));
@@ -187,10 +188,32 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 
 
 
+void MGTransferPrebuilt::prolongate (const unsigned int   to_level,
+				     Vector<float>       &dst,
+				     const Vector<float> &src) const 
+{
+  Assert ((to_level >= 1) && (to_level<prolongation_matrices.size()-1),
+	  ExcIndexRange (to_level, 1, prolongation_matrices.size()-1));
+
+  prolongation_matrices[to_level-1].vmult (dst, src);
+};
+
+
+
+void MGTransferPrebuilt::restrict (const unsigned int   from_level,
+				   Vector<float>       &dst,
+				   const Vector<float> &src) const 
+{
+  Assert ((from_level >= 1) && (from_level<prolongation_matrices.size()-1),
+	  ExcIndexRange (from_level, 1, prolongation_matrices.size()-1));
+
+  prolongation_matrices[from_level-1].Tvmult (dst, src);
+};
+
 
 
 // explicit instatations
 template
 void MGTransferPrebuilt::build_matrices (const MGDoFHandler<deal_II_dimension> &mg_dof);
 
-*/
+
