@@ -245,7 +245,6 @@ MappingQ1<dim>::update_once (const UpdateFlags in) const
   if (in & (update_covariant_transformation
 	    | update_contravariant_transformation
 	    | update_JxW_values
-	    | update_gradients
 	    | update_boundary_forms
 	    | update_normal_vectors))
     out |= update_transformation_gradients;
