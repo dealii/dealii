@@ -550,6 +550,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 					  KellyErrorEstimator<dim>::FunctionMap(),
 					  solution,
 					  estimated_error_per_cell,
+					  vector<bool>(), // all components
 					  ((prm.get("Test case")=="Kink") ?
 					   &kink_coefficient : 0 ));
       cout << estimated_error_per_cell.l2_norm() << endl;
