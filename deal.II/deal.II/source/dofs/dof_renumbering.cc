@@ -370,7 +370,7 @@ template <int dim>
 void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 				     const vector<unsigned int> &component_order_arg)
 {
-  const unsigned int total_dofs = dof_handler.get_fe().total_dofs;
+  const unsigned int dofs_per_cell = dof_handler.get_fe().total_dofs;
 
 				   // do nothing if the FE has only
 				   // one component
@@ -394,10 +394,10 @@ void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 
 				   // vector to hold the dof indices on
 				   // the cell we visit at a time
-  vector<int> local_dof_indices(total_dofs);
+  vector<int> local_dof_indices(dofs_per_cell);
 				   // prebuilt list to which component
 				   // a given dof on a cell belongs
-  vector<unsigned int> component_list (total_dofs);
+  vector<unsigned int> component_list (dofs_per_cell);
   for (unsigned int i=0; i<component_list.size(); ++i)
     component_list[i] = dof_handler.get_fe().system_to_component_index(i).first;
   
@@ -418,7 +418,7 @@ void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 				       // and insert them into the global
 				       // list using their component
       cell->get_dof_indices (local_dof_indices);
-      for (unsigned int i=0; i<total_dofs; ++i)
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
 	component_to_dof_map[component_list[i]].push_back (local_dof_indices[i]);
     };
   
