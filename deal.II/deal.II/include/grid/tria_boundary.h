@@ -17,7 +17,11 @@
 /*----------------------------   boundary-function.h     ---------------------------*/
 
 #include <base/subscriptor.h>
-#include <grid/tria.h>
+#include <base/point.h>
+
+
+template <int dim> class Triangulation;
+
 
 
 /**
