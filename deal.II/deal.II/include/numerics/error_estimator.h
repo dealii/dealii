@@ -476,7 +476,7 @@ class KellyErrorEstimator
 					  * The normal vectors of the finite
 					  * element function on one face
 					  */
-	vector<std::Tensor<1,dim> > normal_vectors;
+	vector<std::Point<dim> > normal_vectors;
 
 					 /**
 					  * Two arrays needed for the
