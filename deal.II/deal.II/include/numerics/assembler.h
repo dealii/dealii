@@ -4,14 +4,17 @@
 #define __problem_assembler_H
 /*----------------------------   problem_assembler.h     ---------------------------*/
 
+#include <base/exceptions.h>
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
-#include <fe/fe.h>
-#include <base/exceptions.h>
+#include <fe/fe_values.h>
 #include <vector>
 
 
 // forward declarations
+template <int dim> class FiniteElement;
+template <int dim> class Quadrature;
+
 class dFMatrix;
 class dVector;
 

@@ -654,12 +654,6 @@ class FEFaceValues {
     vector<dFMatrix>     jacobi_matrices;
 
 				     /**
-				      * Store a pointer to the object describing
-				      * the boundary of the domain.
-				      */
-    const Boundary<dim> &boundary;
-
-				     /**
 				      * Store which fields are to be updated by
 				      * the reinit function.
 				      */
@@ -670,7 +664,7 @@ class FEFaceValues {
 
 
 
-/*------------------------ Inline functions -----------------------------------*/
+/*------------------------ Inline functions: FEValues ----------------------------*/
 
 
 
@@ -721,6 +715,59 @@ FEValues<dim>::get_JxW_values () const {
   return JxW_values;
 };
 
+
+
+
+
+/*------------------------ Inline functions: FEFaceValues ------------------------*/
+
+
+template <int dim>
+inline
+const dFMatrix & FEFaceValues<dim>::get_shape_values () const {
+  return shape_values;
+};
+
+
+
+
+template <int dim>
+inline
+const vector<vector<Point<dim> > > &
+FEFaceValues<dim>::get_shape_grads () const {
+  Assert (update_flags | update_gradients, ExcAccessToUninitializedField());
+  return shape_gradients;
+};
+
+
+
+template <int dim>
+inline
+const vector<Point<dim> > &
+FEFaceValues<dim>::get_quadrature_points () const {
+  Assert (update_flags | update_q_points, ExcAccessToUninitializedField());
+  return quadrature_points;
+};
+
+
+
+template <int dim>
+inline
+const vector<Point<dim> > &
+FEFaceValues<dim>::get_ansatz_points () const {
+  Assert (update_flags | update_ansatz_points, ExcAccessToUninitializedField());
+  return ansatz_points;
+};
+
+
+
+template <int dim>
+inline
+const vector<double> &
+FEFaceValues<dim>::get_JxW_values () const {
+  Assert (update_flags | update_JxW_values, ExcAccessToUninitializedField());
+  return JxW_values;
+};
 
 
 
