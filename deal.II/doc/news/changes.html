@@ -71,14 +71,33 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
-       Fixed: On certain systems running CygWin, a call to
-       <code>gethostname()</code> could cause deal.II to hang. The reason
+       New: The configuration script can now enable special optimizations for
+       x86-like processors if called with the <code>--with-cpu=...</code> option.
+       This can decrease computation time by up to 30% on certain systems. 
+       See the documentation for details.
+       <br>
+       (Ralf B. Schulz, 2005/03/10)
+       </p>
+
+  <li> <p>
+       Fixed: When compiling shared libraries on CygWin systems, warnings
+       considering the <code>-fPIC</code> option were issued by the compiler.
+       This is now fixed.
+       <br>
+       (Ralf B. Schulz, 2005/03/10)
+       </p>
+
+  <li> <p>
+       Fixed: On certain systems running CygWin, a call to socket functions
+       like <code>gethostname()</code> could cause deal.II to hang. The reason
        seems to be that the call disables long double computations which
        revert to just double precision. This then leads to an endless loop in
        computing weights for quadrature points because the convergence
        criterion cannot be reached with simple double precision. This is now
        fixed by disabling the call to <code>gethostname()</code> on these
-       systems.
+       systems. A new preprocessor variable, <code>DEAL_II_BROKEN_SOCKETS</code>
+       has been added to <code>base/config.h</code> which is defined on
+       affected systems.
        <br> 
        (Ralf B. Schulz, WB, 2005/03/02)
        </p>
