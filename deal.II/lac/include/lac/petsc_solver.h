@@ -47,6 +47,14 @@ namespace PETScWrappers
                                         * control object and the MPI
                                         * communicator over which parallel
                                         * computations are to happen.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverBase (SolverControl &cn,
                   MPI_Comm      &mpi_communicator);
@@ -185,6 +193,14 @@ namespace PETScWrappers
                                         * call in this default argument
                                         * because otherwise gcc 2.95 generates
                                         * a compiler fault.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverRichardson (SolverControl        &cn,
                         MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -242,6 +258,14 @@ namespace PETScWrappers
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverChebychev (SolverControl        &cn,
                        MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -299,6 +323,14 @@ namespace PETScWrappers
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverCG (SolverControl        &cn,
                 MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -356,6 +388,14 @@ namespace PETScWrappers
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverBiCG (SolverControl        &cn,
                   MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -431,6 +471,14 @@ namespace PETScWrappers
                                         * call in this default argument
                                         * because otherwise gcc 2.95 generates
                                         * a compiler fault.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverGMRES (SolverControl        &cn,
                    MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -488,6 +536,14 @@ namespace PETScWrappers
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverBicgstab (SolverControl        &cn,
                       MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -545,6 +601,14 @@ namespace PETScWrappers
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverCGS (SolverControl        &cn,
                  MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -602,6 +666,14 @@ namespace PETScWrappers
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverTFQMR (SolverControl        &cn,
                    MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -664,6 +736,14 @@ namespace PETScWrappers
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverTCQMR (SolverControl        &cn,
                    MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -721,6 +801,14 @@ namespace PETScWrappers
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverCR (SolverControl        &cn,
                 MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
@@ -778,6 +866,14 @@ namespace PETScWrappers
                                         * The last argument takes a structure
                                         * with additional, solver dependent
                                         * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors.
                                         */
       SolverLSQR (SolverControl        &cn,
                   MPI_Comm             &mpi_communicator = PETSC_COMM_SELF,
