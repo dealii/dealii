@@ -322,12 +322,7 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
 				      estimated_error_per_dof);
   
   
-  string filename = "gnuplot.";
-  filename += ('0'+start_level);
-  cout << "    Writing error plots to <" << filename << ">..." << endl;
-  
   DataOut<dim> out;
-  ofstream gnuplot(filename.c_str());
   fill_data (out);
   out.add_data_vector (l1_error_per_dof, "L1-Error");
   out.add_data_vector (l2_error_per_dof, "L2-Error");
@@ -335,8 +330,18 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
   out.add_data_vector (h1_seminorm_error_per_dof, "H1-seminorm-Error");
   out.add_data_vector (h1_error_per_dof, "H1-Error");
   out.add_data_vector (estimated_error_per_dof, "Estimated Error");
-  out.write_gnuplot (gnuplot);
-  gnuplot.close ();
+//  string filename = "gnuplot.";
+  string filename = "ee.";
+  filename += ('0'+start_level);
+  filename += ".inp";
+  cout << "    Writing error plots to <" << filename << ">..." << endl;
+  
+//  ofstream gnuplot(filename.c_str());
+//  out.write_gnuplot (gnuplot);
+//  gnuplot.close ();
+  ofstream ucd(filename.c_str());
+  out.write_ucd (ucd);
+  ucd.close();
   
   cout << endl;
 };
