@@ -510,39 +510,44 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     void set_boundary_indicator (unsigned char) const;
 
 				     /**
-				      * Return whether this object is at the
-				      * boundary. This is checked via
-				      * the boundary indicator field, which
-				      * is always 255 if the hex is in the
-				      * interior of the domain. Obviously,
-				      * the use of this function is only
-				      * possible for @p{dim>celldim};
-				      * however, for @p{dim==celldim}, an object is
-				      * a cell and the @ref{CellAccessor} class
+				      * Return whether this object is
+				      * at the boundary. This is
+				      * checked via the boundary
+				      * indicator field, which is
+				      * always 255 if the object is in
+				      * the interior of the
+				      * domain. Obviously, the use of
+				      * this function is only possible
+				      * for @p{dim>celldim}; however,
+				      * for @p{dim==celldim}, an
+				      * object is a cell and the
+				      * @ref{CellAccessor} class
 				      * offers another possibility to
-				      * determine whether a cell is at the
-				      * boundary or not.
+				      * determine whether a cell is at
+				      * the boundary or not.
 				      */
     bool at_boundary () const;
 
 				     /**
 				      * Diameter of the object.
 				      *
-				      * The diameter of an object is computed to
-				      * be the largest diagonal. This
-				      * is not necessarily the true
-				      * diameter, but completely
-				      * sufficient for computations.
+				      * The diameter of an object is
+				      * computed to be the largest
+				      * diagonal. This is not
+				      * necessarily the true diameter,
+				      * but completely sufficient for
+				      * computations.
 				      */
     double diameter () const;
 
     				     /**
 				      * Center of the object. The
-				      * center of an object is defined to be
-				      * the average of the vertices,
-				      * which is also where the
-				      * (dim-)linear mapping places the midpoint
-				      * of the unit cell in real space.
+				      * center of an object is defined
+				      * to be the average of the
+				      * vertices, which is also where
+				      * the (dim-)linear mapping
+				      * places the midpoint of the
+				      * unit cell in real space.
 				      * However, this may not be the
 				      * barycenter of the object.
 				      */
@@ -554,28 +559,30 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     Point<dim> barycenter () const;
 
 				     /**
-				      * Volume of the object.
-				      * Here, the volume is defined to
-				      * be confined by the (dim-)linear
-				      * mapping of the unit cell.
-				      * No information
-				      * about the boundary is used. If
-				      * a more sophisticated computation
-				      * is needed, try the volume of an
-				      * appropriate finite element class.
+				      * Volume of the object.  Here,
+				      * the volume is defined to be
+				      * confined by the (dim-)linear
+				      * mapping of the unit cell.  No
+				      * information about the boundary
+				      * is used. If a more
+				      * sophisticated computation is
+				      * needed, try the volume of an
+				      * appropriate finite element
+				      * class.
 				      */
     double measure () const;
 
 				     /**
-				      * Number of active
-				      * descendants.
-				      * This function only counts the number
-				      * of active descendants, i.e. the number
-				      * of descendants which are not further
-				      * refined. Thus, if all of the eight
-				      * children of a hex are further
-				      * refined exactly once, the returned
-				      * number will be 64, not 80.
+				      * Number of active descendants.
+				      * This function only counts the
+				      * number of active descendants,
+				      * i.e. the number of descendants
+				      * which are not further
+				      * refined. Thus, if all of the
+				      * eight children of a hex are
+				      * further refined exactly once,
+				      * the returned number will be
+				      * 64, not 80.
 				      *
 				      * If the present cell is not refined,
 				      * one is returned.
@@ -874,42 +881,49 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     void set_boundary_indicator (unsigned char) const;
 
 				     /**
-				      * Return whether this line is at the
-				      * boundary. This is checked via the
-				      * the boundary indicator field, which
-				      * is always 255 if the line is in the
-				      * interior of the domain. Obviously,
-				      * this is only possible for @p{dim>1};
-				      * however, for @p{dim==1}, a line is
-				      * a cell and the @ref{CellAccessor} class
+				      * Return whether this line is at
+				      * the boundary. This is checked
+				      * via the the boundary indicator
+				      * field, which is always 255 if
+				      * the line is in the interior of
+				      * the domain. Obviously, this is
+				      * only possible for @p{dim>1};
+				      * however, for @p{dim==1}, a
+				      * line is a cell and the
+				      * @ref{CellAccessor} class
 				      * offers another possibility to
-				      * determine whether a cell is at the
-				      * boundary or not.
+				      * determine whether a cell is at
+				      * the boundary or not.
 				      */
     bool at_boundary () const;
 
     				     /**
-				      * Return the length of the line. If the
-				      * line describes part of the boundary
-				      * (e.g. if it is face to a cell in 2D)
-				      * and is not a straight one, ask the
-				      * finite element class for the correct
-				      * length!
+				      * Return the length of the
+				      * line. If the line describes
+				      * part of the boundary (e.g. if
+				      * it is face to a cell in 2D)
+				      * and is not a straight one, ask
+				      * the finite element class for
+				      * the correct length!
 				      */
     double diameter () const;
 
 				     /**
-				      * Return the center of the line. This
-				      * is the average of the two vertices,
-				      * which is the obvious definition for
-				      * straight lines. However, if you use
-				      * higher order mappings from the unit
-				      * cell to the real cell (in more than
-				      * one space dimension), the bounding
-				      * lines may not necessarily be straight.
-				      * In that case ask the finite element
-				      * class for the correct place of the
-				      * midpoint of the line in real space.
+				      * Return the center of the
+				      * line. This is the average of
+				      * the two vertices, which is the
+				      * obvious definition for
+				      * straight lines. However, if
+				      * you use higher order mappings
+				      * from the unit cell to the real
+				      * cell (in more than one space
+				      * dimension), the bounding lines
+				      * may not necessarily be
+				      * straight.  In that case ask
+				      * the finite element class for
+				      * the correct place of the
+				      * midpoint of the line in real
+				      * space.
 				      */
     Point<dim> center () const;
 
@@ -1230,19 +1244,23 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     void set_boundary_indicator (unsigned char) const;
 
 				     /**
-				      * Return whether this line is at the
-				      * boundary. This is checked via the
-				      * the boundary indicator field, which
-				      * is always 255 if the quad is in the
-				      * interior of the domain. Obviously,
-				      * this function is only useful for @p{dim>2};
-				      * however, for @p{dim==2}, a quad is
-				      * a cell and the @ref{CellAccessor} class
-				      * offers another possibility to
-				      * determine whether a cell is at the
+				      * Return whether this quad is at
+				      * the boundary. This is checked
+				      * via the the boundary indicator
+				      * field, which is always 255 if
+				      * the quad is in the interior of
+				      * the domain. Obviously, this
+				      * function is only useful for
+				      * @p{dim>2}; however, for
+				      * @p{dim==2}, a quad is a cell
+				      * and the @ref{CellAccessor}
+				      * class offers another
+				      * possibility to determine
+				      * whether a cell is at the
 				      * boundary or not.
 				      */
     bool at_boundary () const;
+    
 				     /**
 				      * Return the diameter of the quad. If the
 				      * quad describes part of the boundary
@@ -1618,33 +1636,37 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     void set_boundary_indicator (unsigned char) const;
 
 				     /**
-				      * Return whether this hex is at the
-				      * boundary. This is checked via
-				      * the boundary indicator field, which
-				      * is always 255 if the hex is in the
-				      * interior of the domain. Obviously,
-				      * the use of this function is only
+				      * Return whether this hex is at
+				      * the boundary. This is checked
+				      * via the boundary indicator
+				      * field, which is always 255 if
+				      * the hex is in the interior of
+				      * the domain. Obviously, the use
+				      * of this function is only
 				      * possible for @p{dim>3};
-				      * however, for @p{dim==3}, a hex is
-				      * a cell and the @ref{CellAccessor} class
+				      * however, for @p{dim==3}, a hex
+				      * is a cell and the
+				      * @ref{CellAccessor} class
 				      * offers another possibility to
-				      * determine whether a cell is at the
-				      * boundary or not.
+				      * determine whether a cell is at
+				      * the boundary or not.
 				      */
     bool at_boundary () const;
 
 				     /**
 				      * Return the diameter of the hex.
 				      *
-				      * The diameter of a hex is computed to
-				      * be the largest diagonal. You
-				      * should absolutely be clear about the
-				      * fact that this definitely is not the
-				      * diameter of all hexahedra; however
-				      * it may serve as an approximation and
-				      * is exact in many cases, especially
-				      * if the hexahedron is not too much
-				      * distorted.
+				      * The diameter of a hex is
+				      * computed to be the largest
+				      * diagonal. You should
+				      * absolutely be clear about the
+				      * fact that this definitely is
+				      * not the diameter of all
+				      * hexahedra; however it may
+				      * serve as an approximation and
+				      * is exact in many cases,
+				      * especially if the hexahedron
+				      * is not too much distorted.
 				      */
     double diameter () const;
 
@@ -1845,18 +1867,49 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     unsigned int neighbor_of_neighbor (const unsigned int neighbor) const;
     
 				     /**
-				      *  Return whether the @p{i}th vertex or
-				      *  face (depending on the dimension) is
-				      *  part of the boundary. This is true, if
-				      *  the @p{i}th neighbor does not exist.
+				      *  Return whether the @p{i}th
+				      *  vertex or face (depending on
+				      *  the dimension) is part of the
+				      *  boundary. This is true, if
+				      *  the @p{i}th neighbor does not
+				      *  exist.
 				      */
     bool at_boundary (const unsigned int i) const;
 
 				     /**
-				      *  Return whether the cell is at the
-				      *  boundary.
+				      *  Return whether the cell is at
+				      *  the boundary. Being at the
+				      *  boundary is defined by one
+				      *  face being on the
+				      *  boundary. Note that this does
+				      *  not catches where only one
+				      *  vertex of a quad or of a hex
+				      *  is at the boundary, or where
+				      *  only one line of a hex is at
+				      *  the boundary while the
+				      *  interiors of all faces are in
+				      *  the interior of the
+				      *  domain. For the latter case,
+				      *  the @p{Has_boundary_lines}
+				      *  function is the right one to
+				      *  ask.
 				      */
     bool at_boundary () const;
+
+				     /**
+				      * This is a slight variation to
+				      * the @p{at_boundary} function:
+				      * for 1 and 2 space dimensions,
+				      * it is equivalent, for three
+				      * space dimensions it returns
+				      * whether at least one of the 12
+				      * lines of the hexahedron is at
+				      * a boundary. This, of course,
+				      * includes the case where a
+				      * whole face is at the boundary,
+				      * but also some other cases.
+				      */
+    bool has_boundary_lines () const;
 
 				     /**
 				      *  Return whether the refinement flag

@@ -1798,6 +1798,29 @@ bool CellAccessor<dim>::at_boundary (const unsigned int i) const
 
 
 
+#if deal_II_dimension == 1
+
+template <>
+bool CellAccessor<1>::has_boundary_lines () const
+{
+  return at_boundary();
+};
+
+#else
+
+template <int dim>
+bool CellAccessor<dim>::has_boundary_lines () const
+{
+  for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+    if (line(l)->at_boundary())
+      return true;
+  
+  return false;
+};
+
+#endif
+
+
 // explicit instantiations
 template class TriaAccessor<deal_II_dimension>;
 template class TriaObjectAccessor<1, deal_II_dimension>;
