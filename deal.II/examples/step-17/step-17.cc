@@ -770,7 +770,8 @@ unsigned int ElasticProblem<dim>::solve ()
                                    // number of blocks on the diagonal and the
                                    // preconditioner is the ILU(0) of each of
                                    // these blocks.
-  SolverControl           solver_control (1000, 1e-10);
+  SolverControl           solver_control (solution.size(), 
+                                          1e-8*system_rhs.l2_norm());
   PETScWrappers::SolverCG cg (solver_control,
                               mpi_communicator);
 
@@ -1248,7 +1249,7 @@ void ElasticProblem<dim>::run ()
       if (this_mpi_process == 0)
         std::cout << "   Solver converged in " << n_iterations
                   << " iterations." << std::endl;
-      
+
       output_results (cycle);
     }
 }
