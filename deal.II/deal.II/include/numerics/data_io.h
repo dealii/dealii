@@ -437,6 +437,54 @@ class DataOut {
 				      * List of data elements.
 				      */
     vector<DataEntry>  data;
+
+
+				     /**
+				      * Return the number of faces in the
+				      * triangulation which have a boundary
+				      * indicator not equal to zero. Only
+				      * these faces are explicitely printed
+				      * in the #write_*# functions;
+				      * all faces with indicator 255 are
+				      * interior ones and an indicator with
+				      * value zero for faces at the boundary
+				      * are considered default.
+				      *
+				      * This function always returns an empty
+				      * list in one dimension.
+				      *
+				      * The reason for this function is the
+				      * same as for #write_ucd_faces#. See
+				      * there for more information.
+				      */
+    unsigned int n_boundary_faces () const;
+
+				     /**
+				      * Write the grid information about
+				      * faces to #out#. Only those faces
+				      * are printed which are on the boundary
+				      * and which have a boundary indicator
+				      * not equal to zero, since the latter
+				      * is the default for boundary faces.
+				      *
+				      * Since cells and faces are continuously
+				      * numbered, the #starting_index# for
+				      * the numbering of the faces is passed
+				      * also.
+				      *
+				      * This function unfortunately can not
+				      * be included in the regular #write_ucd#
+				      * function, since it needs special
+				      * treatment for the case #dim==1#, in
+				      * which case the face iterators are
+				      * #void*#'s and lack the member functions
+				      * which are called. We would not actually
+				      * call these functions, but the compiler
+				      * would complain anyway when compiling
+				      * the function for #dim==1#. Bad luck.
+				      */
+    void write_ucd_faces (ostream &out,
+			  const unsigned int starting_index) const;
 };
 
 

@@ -231,7 +231,7 @@ void DataOut<dim>::write_ucd (ostream &out) const {
   DoFHandler<dim>::active_cell_iterator cell,
 					endc = dofs->end();
   unsigned int n_vertex_dofs;
-  
+
 				   // first loop over all cells to
 				   // find out how many degrees of
 				   // freedom there are located on
@@ -275,7 +275,7 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 
 				   // start with ucd data
   out << n_vertex_dofs << ' '
-      << dofs->get_tria().n_active_cells() << ' '
+      << dofs->get_tria().n_active_cells() + n_boundary_faces() << ' '
       << data.size() << ' '
       << 0 << ' '                  // no cell data
       << 0                         // no model data
@@ -309,21 +309,26 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 				   // we do not use cell data)
   if (true)
     {
-      unsigned int c;
-      for (cell=dofs->begin_active(), c=0; cell!=endc; ++cell, ++c)
+      unsigned int index;
+      for (cell=dofs->begin_active(), index=0; cell!=endc; ++cell, ++index)
 	{
-	  out << c << ' '
-	      << 1 << "   ";             // material id (unused)
+	  out << index << ' '
+	      << static_cast<unsigned int>(cell->material_id())
+	      << " ";
 	  switch (dim) 
 	    {
-	      case 1:  out << "line  "; break;
-	      case 2:  out << "quad  "; break;
-	      case 3:  out << "hex   "; break;
+	      case 1:  out << "line    "; break;
+	      case 2:  out << "quad    "; break;
+	      case 3:  out << "hex     "; break;
+	      default:
+		    Assert (false, ExcNotImplemented());
 	    };
 	  for (unsigned int vertex=0; vertex<(1<<dim); ++vertex)
 	    out << cell->vertex_dof_index(vertex,0) << ' ';
 	  out << endl;
 	};
+
+      write_ucd_faces (out, index);
     };
 
 				   // if data given: write data, else
@@ -351,6 +356,69 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 				   // no cell data
 				   // no model data
 };
+
+
+
+template <>
+unsigned int DataOut<1>::n_boundary_faces () const {
+  return 0;
+};
+
+
+
+template <int dim>
+unsigned int DataOut<dim>::n_boundary_faces () const {
+  typename DoFHandler<dim>::active_face_iterator face, endf;
+  unsigned long int n_faces = 0;
+
+  for (face=dofs->begin_active_face(), endf=dofs->end_face();
+       face != endf; ++face)
+    if ((face->boundary_indicator() != 0) &&
+	(face->boundary_indicator() != 255))
+      n_faces++;
+
+  return n_faces;
+};
+
+
+
+template <>
+void DataOut<1>::write_ucd_faces (ostream &, const unsigned int) const {
+  return;
+};
+
+
+
+template <int dim>
+void DataOut<dim>::write_ucd_faces (ostream &out,
+				    const unsigned int starting_index) const {
+  typename DoFHandler<dim>::active_face_iterator face, endf;
+  unsigned int index=starting_index;
+
+  for (face=dofs->begin_active_face(), endf=dofs->end_face();
+       face != endf; ++face)
+    if ((face->boundary_indicator() != 0) &&
+	(face->boundary_indicator() != 255)) 
+      {
+	out << index << "  "
+	    << static_cast<unsigned int>(face->boundary_indicator())
+	    << "  ";
+	switch (dim) 
+	  {
+	    case 2: out << "line    ";  break;
+	    case 3: out << "quad    ";  break;
+	    default:
+		  Assert (false, ExcNotImplemented());
+	  };
+	for (unsigned int vertex=0; vertex<(1<<(dim-1)); ++vertex)
+	  out << face->vertex_dof_index(vertex,0) << ' ';
+	out << endl;
+
+	++index;
+      };	  
+};
+
+      
 
 
 
