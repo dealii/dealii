@@ -41,7 +41,7 @@ print_dofs (const DoFHandler<dim> &dof)
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
        cell != dof.end(); ++cell)
     {
-      deallog << "Cell " << cell << std::endl;
+      deallog << "Cell " << cell;
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
 	deallog << v[i] << ' ';
@@ -68,7 +68,7 @@ check ()
   if (dim==1)
     tr.refine_global(2);
   
-  FESystem<dim> element (FE_Q<dim>(3), 2, FE_DGQ<dim>(1), 1);
+  FESystem<dim> element (FE_Q<dim>(2), 2, FE_DGQ<dim>(1), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
