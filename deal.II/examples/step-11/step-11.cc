@@ -129,7 +129,7 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int mapping_degree) :
 	    << std::endl
 	    << "============================"
 	    << std::endl;
-};
+}
 
 
 
@@ -333,7 +333,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // ``copy_from'' call.
   sparsity_pattern.copy_from (csp);
   system_matrix.reinit (sparsity_pattern);
-};
+}
 
 
 
@@ -587,7 +587,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
   output_table.add_value ("cells", triangulation.n_active_cells());
   output_table.add_value ("|u|_1", norm);
   output_table.add_value ("error", std::fabs(norm-std::sqrt(3.14159265358/2)));
-};
+}
 
 
 
@@ -607,7 +607,7 @@ void LaplaceProblem<dim>::solve ()
 
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
-};
+}
 
 
 
@@ -659,7 +659,7 @@ void LaplaceProblem<dim>::run ()
   output_table.set_precision("error", 6);
   output_table.write_text (std::cout);
   std::cout << std::endl;
-};
+}
 
     
 
@@ -715,4 +715,4 @@ int main ()
     };
 
   return 0;
-};
+}

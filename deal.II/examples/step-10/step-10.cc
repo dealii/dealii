@@ -527,7 +527,7 @@ void compute_pi_by_area ()
 
       std::cout << std::endl;
     };
-};
+}
 
 
 				 // The following, second function also
@@ -632,7 +632,7 @@ void compute_pi_by_perimeter ()
 
       std::cout << std::endl;
     };
-};
+}
 
 
 				 // The following main function just
@@ -648,4 +648,4 @@ int main ()
   compute_pi_by_perimeter<2> ();
   
   return 0;
-};
+}

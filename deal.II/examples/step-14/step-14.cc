@@ -88,7 +88,7 @@ namespace Evaluation
 
   template <int dim>
   EvaluationBase<dim>::~EvaluationBase ()
-  {};
+  {}
   
 
   
@@ -97,7 +97,7 @@ namespace Evaluation
   EvaluationBase<dim>::set_refinement_cycle (const unsigned int step)
   {
     refinement_cycle = step;
-  };
+  }
 
 
 				   // @sect4{The PointValueEvaluation class}
@@ -124,7 +124,7 @@ namespace Evaluation
   PointValueEvaluation (const Point<dim>   &evaluation_point)
 		  :
 		  evaluation_point (evaluation_point)
-  {};
+  {}
   
 
 
@@ -159,7 +159,7 @@ namespace Evaluation
 
     std::cout << "   Point value=" << point_value
 	      << std::endl;
-  };
+  }
 
 
 				   // @sect4{The PointXDerivativeEvaluation class}
@@ -208,7 +208,7 @@ namespace Evaluation
   PointXDerivativeEvaluation (const Point<dim>   &evaluation_point)
 		  :
 		  evaluation_point (evaluation_point)
-  {};
+  {}
   
 
 				   // The more interesting things
@@ -369,7 +369,7 @@ namespace Evaluation
     point_derivative /= evaluation_point_hits;
     std::cout << "   Point x-derivative=" << point_derivative
 	      << std::endl;
-  };
+  }
 
 
   
@@ -416,7 +416,7 @@ namespace Evaluation
   GridOutput (const std::string &output_name_base)
 		  :
 		  output_name_base (output_name_base)
-  {};
+  {}
   
 
   template <int dim>
@@ -440,8 +440,8 @@ namespace Evaluation
 #endif
     
     GridOut().write_eps (dof_handler.get_tria(), out);
-  };  
-};
+  }
+}
 
   
 				 // @sect3{The Laplace solver classes}
@@ -506,12 +506,12 @@ namespace LaplaceSolver
   Base<dim>::Base (Triangulation<dim> &coarse_grid)
 		  :
 		  triangulation (&coarse_grid)
-  {};
+  {}
 
 
   template <int dim>
   Base<dim>::~Base () 
-  {};
+  {}
 
 
 
@@ -520,7 +520,7 @@ namespace LaplaceSolver
   Base<dim>::set_refinement_cycle (const unsigned int cycle)
   {
     refinement_cycle = cycle;
-  };
+  }
   
 
 				   // @sect4{The Laplace Solver class}
@@ -600,14 +600,14 @@ namespace LaplaceSolver
                   face_quadrature (&face_quadrature),    
 		  dof_handler (triangulation),
 		  boundary_values (&boundary_values)
-  {};
+  {}
 
 
   template <int dim>
   Solver<dim>::~Solver () 
   {
     dof_handler.clear ();
-  };
+  }
 
 
   template <int dim>
@@ -620,7 +620,7 @@ namespace LaplaceSolver
     LinearSystem linear_system (dof_handler);
     assemble_linear_system (linear_system);
     linear_system.solve (solution);
-  };
+  }
 
 
   template <int dim>
@@ -629,7 +629,7 @@ namespace LaplaceSolver
   postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
   {
     postprocessor (dof_handler, solution);
-  };
+  }
 
 
   template <int dim>
@@ -637,7 +637,7 @@ namespace LaplaceSolver
   Solver<dim>::n_dofs () const
   {
     return dof_handler.n_dofs();
-  };
+  }
   
 
   template <int dim>
@@ -682,7 +682,7 @@ namespace LaplaceSolver
 					linear_system.matrix,
 					solution,
 					linear_system.rhs);
-  };
+  }
 
 
   template <int dim>
@@ -727,7 +727,7 @@ namespace LaplaceSolver
 				      cell_matrix(i,j));
 	mutex.release ();
       };
-  };
+  }
 
 
   template <int dim>
@@ -758,7 +758,7 @@ namespace LaplaceSolver
     sparsity_pattern.compress();
     matrix.reinit (sparsity_pattern);
     rhs.reinit (dof_handler.n_dofs());
-  };
+  }
 
 
 
@@ -776,7 +776,7 @@ namespace LaplaceSolver
     cg.solve (matrix, solution, rhs, preconditioner);
 
     hanging_node_constraints.distribute (solution);
-  };
+  }
 
 
 
@@ -897,7 +897,7 @@ namespace LaplaceSolver
 			       quadrature, face_quadrature,
 			       boundary_values),
                   rhs_function (&rhs_function)
-  {};
+  {}
 
 
   template <int dim>
@@ -905,7 +905,7 @@ namespace LaplaceSolver
   PrimalSolver<dim>::solve_problem ()
   {
     Solver<dim>::solve_problem ();
-  };
+  }
 
 
 
@@ -914,7 +914,7 @@ namespace LaplaceSolver
   PrimalSolver<dim>::n_dofs() const
   {
     return Solver<dim>::n_dofs();
-  };
+  }
 
 
   template <int dim>
@@ -923,7 +923,7 @@ namespace LaplaceSolver
   postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
   {
     Solver<dim>::postprocess(postprocessor);
-  };
+  }
 
 
   template <int dim>
@@ -951,7 +951,7 @@ namespace LaplaceSolver
 #endif
     
     data_out.write (out, DataOut<dim>::gnuplot);
-  };
+  }
   
 
 
@@ -994,7 +994,7 @@ namespace LaplaceSolver
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  rhs(local_dof_indices[i]) += cell_rhs(i);
       };
-  };
+  }
 
 
 				   // @sect4{The RefinementGlobal and RefinementKelly classes}
@@ -1032,7 +1032,7 @@ namespace LaplaceSolver
                   PrimalSolver<dim> (coarse_grid, fe, quadrature,
 				     face_quadrature, rhs_function,
 				     boundary_values)
-  {};
+  {}
 
 
 
@@ -1041,7 +1041,7 @@ namespace LaplaceSolver
   RefinementGlobal<dim>::refine_grid ()
   {
     this->triangulation->refine_global (1);
-  };
+  }
 
 
 
@@ -1074,7 +1074,7 @@ namespace LaplaceSolver
                   PrimalSolver<dim> (coarse_grid, fe, quadrature,
 				     face_quadrature,
 				     rhs_function, boundary_values)
-  {};
+  {}
 
 
 
@@ -1092,7 +1092,7 @@ namespace LaplaceSolver
 						     estimated_error_per_cell,
 						     0.3, 0.03);
     this->triangulation->execute_coarsening_and_refinement ();
-  };
+  }
 
 
 
@@ -1155,7 +1155,7 @@ namespace LaplaceSolver
 				     face_quadrature,
 				     rhs_function, boundary_values),
                   weighting_function (&weighting_function)
-  {};
+  {}
 
 
 
@@ -1195,9 +1195,9 @@ namespace LaplaceSolver
 						     estimated_error,
 						     0.3, 0.03);
     this->triangulation->execute_coarsening_and_refinement ();
-  };
+  }
 
-};
+}
 
 
 				 // @sect3{Equation data}
@@ -1404,7 +1404,7 @@ namespace Data
   SetUp<Traits,dim>::get_boundary_values () const 
   {
     return boundary_values;
-  };
+  }
 
 
   template <class Traits, int dim>
@@ -1412,7 +1412,7 @@ namespace Data
   SetUp<Traits,dim>::get_right_hand_side () const 
   {
     return right_hand_side;
-  };
+  }
 
 
   template <class Traits, int dim>
@@ -1421,7 +1421,7 @@ namespace Data
   create_coarse_grid (Triangulation<dim> &coarse_grid) const 
   {
     Traits::create_coarse_grid (coarse_grid);
-  };
+  }
   
 
 				   // @sect4{The CurvedRidges class}
@@ -1471,7 +1471,7 @@ namespace Data
       q += std::sin(10*p(i)+5*p(0)*p(0));
     const double exponential = std::exp(q);
     return exponential;
-  };
+  }
 
 
 
@@ -1498,7 +1498,7 @@ namespace Data
     t1 = t1*t1;
     
     return -u*(t1+t2+t3);
-  };
+  }
 
 
   template <int dim>
@@ -1508,7 +1508,7 @@ namespace Data
   {
     GridGenerator::hyper_cube (coarse_grid, -1, 1);
     coarse_grid.refine_global (2);
-  };
+  }
   
 
 				   // @sect4{The Exercise_2_3 class}
@@ -1720,8 +1720,8 @@ namespace Data
 				     // this example is a grid point,
 				     // we refine once globally:
     coarse_grid.refine_global (1);
-  };
-};
+  }
+}
 
 				 // @sect4{Discussion}
 				 //
@@ -1896,7 +1896,7 @@ namespace DualFunctional
   PointValueEvaluation (const Point<dim> &evaluation_point)
 		  :
 		  evaluation_point (evaluation_point)
-  {};
+  {}
   
 
 				   // As for doing the main purpose of
@@ -1966,7 +1966,7 @@ namespace DualFunctional
 				     // point, so raise an exception
 				     // unconditionally:
     AssertThrow (false, ExcEvaluationPointNotFound(evaluation_point));
-  };
+  }
 
 
 				   // @sect4{The PointValueEvaluation class}
@@ -2005,7 +2005,7 @@ namespace DualFunctional
   PointXDerivativeEvaluation (const Point<dim> &evaluation_point)
 		  :
 		  evaluation_point (evaluation_point)
-  {};
+  {}
   
 
 				   // What is interesting is the
@@ -2143,10 +2143,10 @@ namespace DualFunctional
 				     // measure of the volume over
 				     // which we have integrated:
     rhs.scale (1./total_volume);
-  };
+  }
   
 
-};
+}
 
 
 				 // @sect3{Extending the LaplaceSolver namespace}
@@ -2240,7 +2240,7 @@ namespace LaplaceSolver
 			       quadrature, face_quadrature,
 			       boundary_values),
                   dual_functional (&dual_functional)
-  {};
+  {}
 
 
   template <int dim>
@@ -2248,7 +2248,7 @@ namespace LaplaceSolver
   DualSolver<dim>::solve_problem ()
   {
     Solver<dim>::solve_problem ();
-  };
+  }
 
 
 
@@ -2257,7 +2257,7 @@ namespace LaplaceSolver
   DualSolver<dim>::n_dofs() const
   {
     return Solver<dim>::n_dofs();
-  };
+  }
 
 
   template <int dim>
@@ -2266,7 +2266,7 @@ namespace LaplaceSolver
   postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
   {
     Solver<dim>::postprocess(postprocessor);
-  };
+  }
   
 
 
@@ -2276,7 +2276,7 @@ namespace LaplaceSolver
   assemble_rhs (Vector<double> &rhs) const 
   {
     dual_functional->assemble_rhs (this->dof_handler, rhs);
-  };
+  }
 
 
 				   // @sect4{The WeightedResidual class}
@@ -2584,7 +2584,7 @@ namespace LaplaceSolver
     rhs_values.resize(n_q_points);    
     dual_weights.resize(n_q_points);    
     cell_grad_grads.resize(n_q_points);
-  };
+  }
   
   
 
@@ -2613,7 +2613,7 @@ namespace LaplaceSolver
     dual_weights.resize(n_face_q_points);    
     cell_grads.resize(n_face_q_points);
     neighbor_grads.resize(n_face_q_points);
-  };
+  }
   
 
 
@@ -2636,7 +2636,7 @@ namespace LaplaceSolver
                   DualSolver<dim> (coarse_grid, dual_fe,
 				   quadrature, face_quadrature,
 				   dual_functional)
-  {};
+  {}
 
 
 				   // The next five functions are
@@ -2660,7 +2660,7 @@ namespace LaplaceSolver
 		    Threads::encapsulate (&WeightedResidual<2>::solve_dual_problem)
 		    .collect_args (this));
     thread_manager.wait ();
-  };
+  }
 
   
   template <int dim>
@@ -2668,14 +2668,14 @@ namespace LaplaceSolver
   WeightedResidual<dim>::solve_primal_problem ()
   {
     PrimalSolver<dim>::solve_problem ();
-  };
+  }
 
   template <int dim>
   void
   WeightedResidual<dim>::solve_dual_problem ()
   {
     DualSolver<dim>::solve_problem ();
-  };
+  }
   
 
   template <int dim>
@@ -2684,7 +2684,7 @@ namespace LaplaceSolver
   postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
   {
     PrimalSolver<dim>::postprocess (postprocessor);
-  };
+  }
   
   
   template <int dim>
@@ -2692,7 +2692,7 @@ namespace LaplaceSolver
   WeightedResidual<dim>::n_dofs () const
   {
     return PrimalSolver<dim>::n_dofs();
-  };
+  }
 
 
 
@@ -2738,7 +2738,7 @@ namespace LaplaceSolver
 						       error_indicators,
 						       0.8, 0.02);
     this->triangulation->execute_coarsening_and_refinement ();
-  };
+  }
   
 
 				   // Since we want to output both the
@@ -2874,7 +2874,7 @@ namespace LaplaceSolver
 #endif
     
     data_out.write (out, DataOut<dim>::gnuplot);
-  };
+  }
 
 
 				   // @sect3{Estimating errors}
@@ -3076,7 +3076,7 @@ namespace LaplaceSolver
 	      << std::accumulate (error_indicators.begin(),
 				  error_indicators.end(), 0.)
 	      << std::endl;
-  };
+  }
 
 
 				   // @sect4{Estimating on a subset of cells}
@@ -3297,7 +3297,7 @@ namespace LaplaceSolver
 	if (cell == dual_solver.dof_handler.end())
 	  break;
       };
-  };
+  }
 
 
 				   // @sect4{Computing cell term error contributions}
@@ -3343,7 +3343,7 @@ namespace LaplaceSolver
 	      cell_data.dual_weights[p] *
 	      cell_data.fe_values.JxW (p));
     error_indicators(cell_index) += sum;
-  };
+  }
 
 
 				   // @sect4{Computing edge term error contributions - 1}
@@ -3482,7 +3482,7 @@ namespace LaplaceSolver
 				     // sum up the contributions for
 				     // each cell individually.
     face_integrals[cell->face(face_no)] = face_integral;
-  };
+  }
 
 
   				   // @sect4{Computing edge term error contributions - 2}
@@ -3639,9 +3639,9 @@ namespace LaplaceSolver
 				     // Finally store the value with
 				     // the parent face.
     face_integrals[face] = sum;
-  };
+  }
   
-};
+}
 
 
 				 // @sect3{A simulation framework}
@@ -3823,7 +3823,7 @@ Framework<dim>::ProblemDescription::ProblemDescription ()
 		dual_fe_degree (2),
 		refinement_criterion (dual_weighted_error_estimator),
 		max_degrees_of_freedom (20000)
-{};
+{}
 
 
 
@@ -3954,7 +3954,7 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
   std::cout << std::endl;
   delete solver;
   solver = 0;
-};
+}
 
 
 
@@ -4101,4 +4101,4 @@ int main ()
     };
 
   return 0;
-};
+}

@@ -85,7 +85,7 @@ void first_grid ()
   std::ofstream out ("grid-1.eps");
   GridOut grid_out;
   grid_out.write_eps (triangulation, out);
-};
+}
 
 
 
@@ -229,7 +229,7 @@ void second_grid ()
                                    // default object, over which the
                                    // triangulation has full control.
   triangulation.set_boundary (0);
-};
+}
 
 
 
@@ -240,5 +240,5 @@ int main ()
 {
   first_grid ();
   second_grid ();
-};
+}
 

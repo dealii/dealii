@@ -104,7 +104,7 @@ double InitializationValues::value (const Point<1> &p,
                                     const unsigned int) const 
 {
   return std::pow(p(0), 1./3.);
-};
+}
 
 
 
@@ -112,14 +112,14 @@ template <int dim>
 MinimizationProblem<dim>::MinimizationProblem () :
                 fe (1),
 		dof_handler (triangulation)
-{};
+{}
 
 
 template <int dim>
 MinimizationProblem<dim>::~MinimizationProblem () 
 {
   dof_handler.clear ();
-};
+}
 
 
 
@@ -139,7 +139,7 @@ void MinimizationProblem<dim>::setup_system ()
   hanging_node_constraints.condense (sparsity_pattern);
 
   sparsity_pattern.compress();
-};
+}
 
 
 template <int dim>
@@ -151,7 +151,7 @@ double gradient_power (const Tensor<1,dim> &v,
   for (unsigned int k=0; k<n; k+=2)
     p += (v*v);
   return p;
-};
+}
 
 
 template <int dim>
@@ -290,7 +290,7 @@ void MinimizationProblem<dim>::assemble_newton_step (const bool p)
 				      newton_update,
 				      newton_residual);
 //  std::cout << "  res=" << newton_residual.l2_norm() << std::endl;
-};
+}
 
 
 
@@ -318,7 +318,7 @@ void MinimizationProblem<dim>::solve ()
 
   present_solution += newton_update;
   hanging_node_constraints.distribute (present_solution);
-};
+}
 
 
 
@@ -330,7 +330,7 @@ void MinimizationProblem<dim>::initialize ()
   VectorTools::interpolate (dof_handler,
                             InitializationValues(),
                             present_solution);
-};
+}
 
 
 
@@ -360,7 +360,7 @@ void MinimizationProblem<dim>::refine_grid ()
   Vector<double> tmp (dof_handler.n_dofs());
   solution_transfer.interpolate (present_solution, tmp);
   present_solution = tmp;
-};
+}
 
 
 
@@ -404,7 +404,7 @@ double MinimizationProblem<dim>::energy () const
     };
   
   return energy;
-};
+}
 
 
 
@@ -432,7 +432,7 @@ void MinimizationProblem<dim>::output_results (const unsigned int cycle) const
 #endif
 
   data_out.write_gnuplot (out);
-};
+}
 
 
 
@@ -474,7 +474,7 @@ void MinimizationProblem<dim>::run ()
       
       refine_grid ();
     };
-};
+}
 
     
 int main () 
@@ -510,4 +510,4 @@ int main ()
       return 1;
     };
   return 0;
-};
+}

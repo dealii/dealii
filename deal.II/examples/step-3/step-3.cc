@@ -170,7 +170,7 @@ class LaplaceProblem
 LaplaceProblem::LaplaceProblem () :
                 fe (1),
 		dof_handler (triangulation)
-{};
+{}
 
 
 				 // Now, the first thing we've got to
@@ -295,7 +295,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // values:
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 				 // Now comes the difficult part:
@@ -684,7 +684,7 @@ void LaplaceProblem::assemble_system ()
 				      system_matrix,
 				      solution,
 				      system_rhs);
-};
+}
 
 
 				 // The following function simply
@@ -756,7 +756,7 @@ void LaplaceProblem::solve ()
 				   // job, the solution variable
 				   // contains the nodal values of the
 				   // solution function.
-};
+}
 
 
 				 // The last part of a typical finite
@@ -820,7 +820,7 @@ void LaplaceProblem::output_results () const
 				   // GMV, or some other format):
   std::ofstream output ("solution.gpl");
   data_out.write_gnuplot (output);
-};
+}
 
 
 				 // The following function is the main
@@ -838,7 +838,7 @@ void LaplaceProblem::run ()
   assemble_system ();
   solve ();
   output_results ();
-};
+}
 
     
 
@@ -856,4 +856,4 @@ int main ()
   LaplaceProblem laplace_problem;
   laplace_problem.run ();
   return 0;
-};
+}

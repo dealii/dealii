@@ -173,7 +173,7 @@ class RightHandSide :  public Function<dim>
 template <int dim>
 RightHandSide<dim>::RightHandSide () :
 		Function<dim> (dim)
-{};
+{}
 
 
 				 // This is the function that returns
@@ -238,7 +238,7 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
     values(1) = 1;
   else
     values(1) = 0;    
-};
+}
 
 
 
@@ -301,7 +301,7 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				   // resulting code can in principle
 				   // be as fast as if we had
 				   // duplicated the code.
-};
+}
 
 
 
@@ -361,7 +361,7 @@ ElasticProblem<dim>::ElasticProblem () :
 				 // constructor only needs the
 				 // parameter to generate a copy of
 				 // the finite element from this.
-{};
+{}
 
 
 
@@ -369,7 +369,7 @@ template <int dim>
 ElasticProblem<dim>::~ElasticProblem () 
 {
   dof_handler.clear ();
-};
+}
 
 
 				 // Setting up the system of equations
@@ -417,7 +417,7 @@ void ElasticProblem<dim>::setup_system ()
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 				 // The big changes in this program
@@ -734,7 +734,7 @@ void ElasticProblem<dim>::assemble_system ()
 				      system_matrix,
 				      solution,
 				      system_rhs);
-};
+}
 
 
 
@@ -760,7 +760,7 @@ void ElasticProblem<dim>::solve ()
 	    preconditioner);
 
   hanging_node_constraints.distribute (solution);
-};
+}
 
 
 
@@ -801,7 +801,7 @@ void ElasticProblem<dim>::refine_grid ()
 						   0.3, 0.03);
 
   triangulation.execute_coarsening_and_refinement ();
-};
+}
 
 
 				 // The output happens mostly as has
@@ -911,7 +911,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
   data_out.add_data_vector (solution, solution_names);
   data_out.build_patches ();
   data_out.write_gmv (output);
-};
+}
 
 
 
@@ -1048,7 +1048,7 @@ void ElasticProblem<dim>::run ()
       solve ();
       output_results (cycle);
     };
-};
+}
 
 
 				 // The main function is again exactly
@@ -1089,4 +1089,4 @@ int main ()
     };
 
   return 0;
-};
+}

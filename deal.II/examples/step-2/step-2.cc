@@ -127,7 +127,7 @@ void make_grid (Triangulation<2> &triangulation)
 
       triangulation.execute_coarsening_and_refinement ();
     };
-};
+}
 
 
 				 // Up to now, we only have a grid,
@@ -280,7 +280,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // all distributed symmetrically
 				   // around the origin, this shows up
 				   // again in the sparsity pattern.
-};
+}
 
 
 
@@ -350,7 +350,7 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 				   // 1260 rows and columns, but large
 				   // matrices often have several
 				   // 100,000s).
-};
+}
 
 
 
@@ -381,4 +381,4 @@ int main ()
 				   // of degrees of freedom to the
 				   // sparsity pattern of the matrix.
   renumber_dofs (dof_handler);
-};
+}

@@ -195,7 +195,7 @@ double Coefficient<dim>::value (const Point<dim> &p,
     return 20;
   else
     return 1;
-};
+}
 
 
 
@@ -321,7 +321,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
       else
 	values[i] = 1;
     };
-};
+}
 
 
 				 // This function is as before.
@@ -329,7 +329,7 @@ template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
                 fe (1),
 		dof_handler (triangulation)
-{};
+{}
 
 
 
@@ -357,7 +357,7 @@ void LaplaceProblem<dim>::setup_system ()
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 
@@ -522,7 +522,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				      system_matrix,
 				      solution,
 				      system_rhs);
-};
+}
 
 
 
@@ -583,7 +583,7 @@ void LaplaceProblem<dim>::solve ()
   std::cout << "   " << solver_control.last_step()
 	    << " CG iterations needed to obtain convergence."
 	    << std::endl;
-};
+}
 
 
 
@@ -765,7 +765,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // And then write the data to the
 				   // file.
   data_out.write_eps (output);
-};
+}
 
 
 
@@ -923,7 +923,7 @@ void LaplaceProblem<dim>::run ()
       solve ();
       output_results (cycle);
     };
-};
+}
 
     
 
@@ -963,4 +963,4 @@ int main ()
 */
   
   return 0;
-};
+}

@@ -341,7 +341,7 @@ AdvectionField<dim>::value (const Point<dim> &p) const
     value[i] = 1+0.8*std::sin(8*M_PI*p[0]);
 
   return value;
-};
+}
 
 
 
@@ -355,7 +355,7 @@ AdvectionField<dim>::value_list (const std::vector<Point<dim> > &points,
   
   for (unsigned int i=0; i<points.size(); ++i)
     values[i] = AdvectionField<dim>::value (points[i]);
-};
+}
 
 
 
@@ -439,7 +439,7 @@ RightHandSide<dim>::value (const Point<dim>   &p,
   return ( (p-center_point).square() < diameter*diameter ?
 	   .1/std::pow(diameter,dim) :
 	   0);
-};
+}
 
 
 
@@ -454,7 +454,7 @@ RightHandSide<dim>::value_list (const std::vector<Point<dim> > &points,
   
   for (unsigned int i=0; i<points.size(); ++i)
     values[i] = RightHandSide<dim>::value (points[i], component);
-};
+}
 
 
 
@@ -488,7 +488,7 @@ BoundaryValues<dim>::value (const Point<dim>   &p,
   const double sine_term = std::sin(16*M_PI*std::sqrt(p.square()));
   const double weight    = std::exp(-5*p.square()) / std::exp(-5.);
   return sine_term * weight;
-};
+}
 
 
 
@@ -503,7 +503,7 @@ BoundaryValues<dim>::value_list (const std::vector<Point<dim> > &points,
   
   for (unsigned int i=0; i<points.size(); ++i)
     values[i] = BoundaryValues<dim>::value (points[i], component);
-};
+}
 
 
 
@@ -648,7 +648,7 @@ template <int dim>
 AdvectionProblem<dim>::AdvectionProblem () :
 		dof_handler (triangulation),
 		fe(1)
-{};
+{}
 
 
 
@@ -656,7 +656,7 @@ template <int dim>
 AdvectionProblem<dim>::~AdvectionProblem () 
 {
   dof_handler.clear ();
-};
+}
 
 
 
@@ -683,7 +683,7 @@ void AdvectionProblem<dim>::setup_system ()
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 
@@ -897,7 +897,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // due to the fact that we have
 				   // included them into the weak
 				   // formulation of the problem.
-};
+}
 
 
  
@@ -1280,7 +1280,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				       // therefore also operate on
 				       // the same ``lock''.
     };
-};
+}
 
 
 
@@ -1310,7 +1310,7 @@ void AdvectionProblem<dim>::solve ()
 		  preconditioner);
 
   hanging_node_constraints.distribute (solution);
-};
+}
 
 
 				 // The following function refines the
@@ -1337,7 +1337,7 @@ void AdvectionProblem<dim>::refine_grid ()
 						   0.5, 0.03);
 
   triangulation.execute_coarsening_and_refinement ();
-};
+}
 
 
 
@@ -1356,7 +1356,7 @@ void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
 
   GridOut grid_out;
   grid_out.write_eps (triangulation, output);
-};
+}
 
 
 				 // ... as is the main loop (setup -
@@ -1401,7 +1401,7 @@ void AdvectionProblem<dim>::run ()
   
   std::ofstream output ("final-solution.gmv");
   data_out.write_gmv (output);
-};
+}
 
 
 
@@ -1514,7 +1514,7 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 				   // eliminating the need to write
 				   // code included in conditional
 				   // preprocessor sections.
-};
+}
 
 
 				 // Following now the function that
@@ -2023,7 +2023,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				      1+1.0*dim/2) *
 			     std::sqrt(gradient.square()));
     };
-};
+}
 
 
 				 // @sect3{Main function}
@@ -2067,4 +2067,4 @@ int main ()
     };
 
   return 0;
-};
+}

@@ -202,7 +202,7 @@ double RightHandSide<dim>::value (const Point<dim> &p,
     return_value += 4*std::pow(p(i), 4);
 
   return return_value;
-};
+}
 
 
 				 // The boundary values were to be
@@ -219,7 +219,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 				   const unsigned int) const 
 {
   return p.square();
-};
+}
 
 
 
@@ -235,7 +235,7 @@ template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
                 fe (1),
 		dof_handler (triangulation)
-{};
+{}
 
 
 
@@ -302,7 +302,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 
@@ -483,7 +483,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				      system_matrix,
 				      solution,
 				      system_rhs);
-};
+}
 
 
 				 // Solving the linear system of
@@ -510,7 +510,7 @@ void LaplaceProblem<dim>::solve ()
   std::cout << "   " << solver_control.last_step()
 	    << " CG iterations needed to obtain convergence."
 	    << std::endl;
-};
+}
 
 
 
@@ -543,7 +543,7 @@ void LaplaceProblem<dim>::output_results () const
 			"solution-2d.gmv" :
 			"solution-3d.gmv");
   data_out.write_gmv (output);
-};
+}
 
 
 
@@ -561,7 +561,7 @@ void LaplaceProblem<dim>::run ()
   assemble_system ();
   solve ();
   output_results ();
-};
+}
 
     
 
@@ -632,4 +632,4 @@ int main ()
   laplace_problem_3d.run ();
   
   return 0;
-};
+}

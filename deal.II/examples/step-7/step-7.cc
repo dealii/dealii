@@ -269,7 +269,7 @@ double Solution<dim>::value (const Point<dim>   &p,
     };
   
   return return_value;
-};
+}
 
 
 
@@ -318,7 +318,7 @@ Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
     };
   
   return return_value;
-};
+}
 
 
 
@@ -372,7 +372,7 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
     };
   
   return return_value;
-};
+}
 
 
 				 // @sect3{The Laplace solver class}
@@ -678,7 +678,7 @@ LaplaceProblem<dim>::LaplaceProblem (const FiniteElement<dim> &fe,
 		dof_handler (triangulation),
 		fe (&fe),
 		refinement_mode (refinement_mode)
-{};
+{}
 
 
 
@@ -686,7 +686,7 @@ template <int dim>
 LaplaceProblem<dim>::~LaplaceProblem () 
 {
   dof_handler.clear ();
-};
+}
 
 
 				 // The following function sets up the
@@ -745,7 +745,7 @@ void LaplaceProblem<dim>::setup_system ()
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 
@@ -1048,7 +1048,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				      system_matrix,
 				      solution,
 				      system_rhs);
-};
+}
 
 
 				 // Solving the system of equations is
@@ -1067,7 +1067,7 @@ void LaplaceProblem<dim>::solve ()
 	    preconditioner);
 
   hanging_node_constraints.distribute (solution);
-};
+}
 
 
 				 // Now for the function doing grid
@@ -1128,7 +1128,7 @@ void LaplaceProblem<dim>::refine_grid ()
 	break;
       };
     };
-};
+}
 
 
 
@@ -1311,7 +1311,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				   // used:
   convergence_table.set_tex_format("cells", "r");
   convergence_table.set_tex_format("dofs", "r");
-};
+}
 
 
 
@@ -1754,7 +1754,7 @@ void LaplaceProblem<dim>::run ()
       convergence_table.write_tex(table_file);
       table_file.close();
     }
-};
+}
 
 				 // @sect3{Main function}
 
@@ -1843,4 +1843,4 @@ int main ()
     };
 
   return 0;
-};
+}

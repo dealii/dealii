@@ -257,7 +257,7 @@ DGTransportEquation<dim>::DGTransportEquation ()
 		beta_function (),
 		rhs_function (),
 		boundary_function ()
-{};
+{}
 
 
 				 // @sect4{Function: assemble_cell_term}
@@ -640,7 +640,7 @@ template <int dim>
 DGMethod<dim>::~DGMethod () 
 {
   dof_handler.clear ();
-};
+}
 
 
 template <int dim>
@@ -677,7 +677,7 @@ void DGMethod<dim>::setup_system ()
   solution1.reinit (dof_handler.n_dofs());
   solution2.reinit (dof_handler.n_dofs());
   right_hand_side.reinit (dof_handler.n_dofs());
-};
+}
 
 
 				 // @sect4{Function: assemble_system1}
@@ -1182,7 +1182,7 @@ void DGMethod<dim>::assemble_system1 ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	right_hand_side(dofs[i]) += cell_vector(i);
     }
-};
+}
 
 
 				 // @sect4{Function: assemble_system2}
@@ -1408,7 +1408,7 @@ void DGMethod<dim>::assemble_system2 ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	right_hand_side(dofs[i]) += cell_vector(i);
     }
-};
+}
 
 
 				 // @sect3{All the rest}
@@ -1466,7 +1466,7 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 				   // ready to start the linear solver.
   solver.solve (system_matrix, solution, right_hand_side,
 		preconditioner);
-};
+}
 
 
 				 // We refine the grid according to a
@@ -1584,7 +1584,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   data_out.build_patches ();
   
   data_out.write_gnuplot(gnuplot_output);
-};
+}
 
 
 				 // The following ``run'' function is
@@ -1715,6 +1715,6 @@ int main ()
     };
   
   return 0;
-};
+}
 
 

@@ -171,7 +171,7 @@ double Coefficient<dim>::value (const Point<dim> &p,
     return 20;
   else
     return 1;
-};
+}
 
 
 
@@ -195,7 +195,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
       else
 	values[i] = 1;
     };
-};
+}
 
 
 				 // This is mostly the same as before,
@@ -210,7 +210,7 @@ template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
                 fe (2),
 		dof_handler (triangulation)
-{};
+{}
 
 
 				 // Here comes the added destructor of
@@ -335,7 +335,7 @@ template <int dim>
 LaplaceProblem<dim>::~LaplaceProblem () 
 {
   dof_handler.clear ();
-};
+}
 
 
 
@@ -434,7 +434,7 @@ void LaplaceProblem<dim>::setup_system ()
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 
@@ -588,7 +588,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				      system_matrix,
 				      solution,
 				      system_rhs);
-};
+}
 
 
 
@@ -614,7 +614,7 @@ void LaplaceProblem<dim>::solve ()
 				   // the solutions of the linear
 				   // system just solved.
   hanging_node_constraints.distribute (solution);
-};
+}
 
 
 				 // Instead of global refinement, we
@@ -813,7 +813,7 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // perform the actions for which
 				   // the cells are flagged.
   triangulation.execute_coarsening_and_refinement ();
-};
+}
 
 
 
@@ -843,7 +843,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // each grid as a postscript file.
   GridOut grid_out;
   grid_out.write_eps (triangulation, output);
-};
+}
 
 
 
@@ -945,7 +945,7 @@ void LaplaceProblem<dim>::run ()
   
   std::ofstream output ("final-solution.eps");
   data_out.write_eps (output);
-};
+}
 
     
 				 // The main function is unaltered in
@@ -1073,4 +1073,4 @@ int main ()
 				   // performed as was expected and we
 				   // can return without error.
   return 0;
-};
+}

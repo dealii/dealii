@@ -196,7 +196,7 @@ namespace Evaluation
 				   // straightforward:
   template <int dim>
   EvaluationBase<dim>::~EvaluationBase ()
-  {};
+  {}
   
 
   
@@ -205,7 +205,7 @@ namespace Evaluation
   EvaluationBase<dim>::set_refinement_cycle (const unsigned int step)
   {
     refinement_cycle = step;
-  };
+  }
 
 
 				   // @sect4{Point evaluation}
@@ -290,7 +290,7 @@ namespace Evaluation
 		  :
 		  evaluation_point (evaluation_point),
 		  results_table (results_table)
-  {};
+  {}
   
 
 
@@ -507,7 +507,7 @@ namespace Evaluation
 				     // into the table of results:
     results_table.add_value ("DoFs", dof_handler.n_dofs());
     results_table.add_value ("u(x_0)", point_value);
-  };
+  }
 
 
 
@@ -639,7 +639,7 @@ namespace Evaluation
 		  :
 		  output_name_base (output_name_base),
 		  output_format (output_format)
-  {};
+  {}
   
 
 				   // After the description above, the
@@ -706,7 +706,7 @@ namespace Evaluation
 #endif
     
     data_out.write (out, output_format);
-  };
+  }
 
 
 
@@ -720,7 +720,7 @@ namespace Evaluation
 				   // example, that much shall be
 				   // sufficient, so we close the
 				   // namespace.
-};
+}
 
   
 				 // @sect3{The Laplace solver classes}
@@ -888,12 +888,12 @@ namespace LaplaceSolver
   Base<dim>::Base (Triangulation<dim> &coarse_grid)
 		  :
 		  triangulation (&coarse_grid)
-  {};
+  {}
 
 
   template <int dim>
   Base<dim>::~Base () 
-  {};
+  {}
   
 
 				   // @sect4{A general solver class}
@@ -1093,7 +1093,7 @@ namespace LaplaceSolver
                   quadrature (&quadrature),
 		  dof_handler (triangulation),
 		  boundary_values (&boundary_values)
-  {};
+  {}
 
 
 				   // The destructor is simple, it
@@ -1104,7 +1104,7 @@ namespace LaplaceSolver
   Solver<dim>::~Solver () 
   {
     dof_handler.clear ();
-  };
+  }
 
 
 				   // The next function is the one
@@ -1130,7 +1130,7 @@ namespace LaplaceSolver
     LinearSystem linear_system (dof_handler);
     assemble_linear_system (linear_system);
     linear_system.solve (solution);
-  };
+  }
 
 
 				   // As stated above, the
@@ -1147,7 +1147,7 @@ namespace LaplaceSolver
   postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
   {
     postprocessor (dof_handler, solution);
-  };
+  }
 
 
 				   // The ``n_dofs'' function should
@@ -1157,7 +1157,7 @@ namespace LaplaceSolver
   Solver<dim>::n_dofs () const
   {
     return dof_handler.n_dofs();
-  };
+  }
   
 
 				   // The following function assembles
@@ -1258,7 +1258,7 @@ namespace LaplaceSolver
 					solution,
 					linear_system.rhs);
 
-  };
+  }
 
 
 				   // The second of this pair of
@@ -1311,7 +1311,7 @@ namespace LaplaceSolver
 				      cell_matrix(i,j));
 	mutex.release ();
       };
-  };
+  }
 
 
 				   // Now for the functions that
@@ -1408,7 +1408,7 @@ namespace LaplaceSolver
     sparsity_pattern.compress();
     matrix.reinit (sparsity_pattern);
     rhs.reinit (dof_handler.n_dofs());
-  };
+  }
 
 
 
@@ -1433,7 +1433,7 @@ namespace LaplaceSolver
     cg.solve (matrix, solution, rhs, preconditioner);
 
     hanging_node_constraints.distribute (solution);
-  };
+  }
 
 
 
@@ -1503,7 +1503,7 @@ namespace LaplaceSolver
 		  Solver<dim> (triangulation, fe,
 			       quadrature, boundary_values),
                   rhs_function (&rhs_function)
-  {};
+  {}
 
 
 
@@ -1549,7 +1549,7 @@ namespace LaplaceSolver
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  rhs(local_dof_indices[i]) += cell_rhs(i);
       };
-  };
+  }
 
 
 				   // @sect4{Global refinement}
@@ -1608,7 +1608,7 @@ namespace LaplaceSolver
 		  Base<dim> (coarse_grid),
                   PrimalSolver<dim> (coarse_grid, fe, quadrature,
 				     rhs_function, boundary_values)
-  {};
+  {}
 
 
 
@@ -1617,7 +1617,7 @@ namespace LaplaceSolver
   RefinementGlobal<dim>::refine_grid ()
   {
     this->triangulation->refine_global (1);
-  };
+  }
 
 
 				   // @sect4{Local refinement by the Kelly error indicator}
@@ -1667,7 +1667,7 @@ namespace LaplaceSolver
 		  Base<dim> (coarse_grid),
                   PrimalSolver<dim> (coarse_grid, fe, quadrature,
 				     rhs_function, boundary_values)
-  {};
+  {}
 
 
 
@@ -1685,9 +1685,9 @@ namespace LaplaceSolver
 						     estimated_error_per_cell,
 						     0.3, 0.03);
     this->triangulation->execute_coarsening_and_refinement ();
-  };
+  }
 
-};
+}
 
 
 
@@ -1749,7 +1749,7 @@ Solution<dim>::value (const Point<dim>   &p,
     q += std::sin(10*p(i)+5*p(0)*p(0));
   const double exponential = std::exp(q);
   return exponential;
-};
+}
 
 
 
@@ -1787,7 +1787,7 @@ RightHandSide<dim>::value (const Point<dim>   &p,
   t1 = t1*t1;
   
   return -u*(t1+t2+t3);
-};
+}
 
 
 
@@ -1873,7 +1873,7 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 				   // Finally end the line in which we
 				   // displayed status reports:
   std::cout << std::endl;
-};
+}
 
 
 
@@ -1978,7 +1978,7 @@ void solve_problem (const std::string &solver_name)
 				   // And one blank line after all
 				   // results:
   std::cout << std::endl;
-};
+}
 
 
 
@@ -2024,4 +2024,4 @@ int main ()
     };
 
   return 0;
-};
+}
