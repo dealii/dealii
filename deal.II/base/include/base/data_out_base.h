@@ -311,11 +311,7 @@ class DataOutBase
 					  * is the same as for cells
 					  * in the triangulation.
 					  */
-#if ! ((__GNUC__==2) && (__GNUC_MINOR__==95))  
 	Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-#else
-	Point<dim> vertices[1<<dim];
-#endif
 	
 					 /**
 					  * Number of subdivisions with
@@ -404,8 +400,7 @@ class DataOutBase
 					  * Default constructor. Sets
 					  * @p{n_subdivisions} to one.
 					  */
-	Patch () :
-			n_subdivisions(1) {};
+	Patch ();
     };
 
 
@@ -1013,6 +1008,24 @@ class DataOutBase
 	bool operator < (const EpsCell2d &) const;
     };
 
+
+				     /**
+				      * This is a helper function for
+				      * the @p{write_gmv}
+				      * function. There, the data in
+				      * the patches needs to be copied
+				      * around as output is one
+				      * variable globally at a time,
+				      * rather than all data on each
+				      * vertex at a time. This copying
+				      * around can be done detached
+				      * from the main thread, and is
+				      * thus moved into this separate
+				      * function.
+				      */
+    template <int dim>
+    static void write_gmv_reorder_data_vectors (const vector<Patch<dim> > &patches,
+						vector<vector<double> >   &data_vectors);
 };
 
 
@@ -1341,10 +1354,12 @@ class DataOutInterface : private DataOutBase
 
   private:
 				     /**
-				      * Standard output format.
-				      * Use this format, if output format default_format is
-				      * requested. It can be changed by the @p{set_format}
-				      * function or in a parameter file.
+				      * Standard output format.  Use
+				      * this format, if output format
+				      * default_format is
+				      * requested. It can be changed
+				      * by the @p{set_format} function
+				      * or in a parameter file.
 				      */
     OutputFormat default_fmt;
     
@@ -1383,7 +1398,7 @@ class DataOutInterface : private DataOutBase
 				      * changed by using the @p{set_flags}
 				      * function.
 				      */
-    GmvFlags     gmv_flags;    
+    GmvFlags     gmv_flags;
 };
 
 

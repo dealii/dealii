@@ -14,19 +14,20 @@
 
 #include <base/data_out_base.h>
 #include <base/parameter_handler.h>
+#include <base/thread_management.h>
+
 #include <iomanip>
 #include <ctime>
 #include <cmath>
 #include <set>
 
 
-// egcs does not understand this at present.
-//
-// template <int dim>
-// DataOut::Patch<dim>::Patch () :
-// 		n_subdivisions (1)
-// 				 // all the rest has a constructor of its own
-// {};
+template <int dim>
+DataOutBase::Patch<dim>::Patch () :
+		n_subdivisions (1)
+				 // all the other data has a
+				 // constructor of its own
+{};
 
 
 template <int dim>
@@ -40,7 +41,7 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
   Assert (patches.size() > 0, ExcNoPatches());
   
   const unsigned int n_data_sets = data_names.size();
-  
+
 				   // first count the number of cells
 				   // and cells for later use
   unsigned int n_cells = 0,
@@ -1341,6 +1342,13 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
   Assert (patches.size() > 0, ExcNoPatches());
  
   const unsigned int n_data_sets = data_names.size();
+				   // check against # of data sets in
+				   // first patch. checks against all
+				   // other patches are made in
+				   // write_gmv_reorder_data_vectors
+  Assert (n_data_sets == patches[0].data.m(),
+	  ExcUnexpectedNumberOfDatasets (patches[0].data.m(), n_data_sets));
+  
   
 				   ///////////////////////
 				   // preamble
@@ -1378,6 +1386,35 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 	      Assert (false, ExcNotImplemented());
       };
 
+
+				   // in gmv format the vertex
+				   // coordinates and the data have an
+				   // order that is a bit unpleasant
+				   // (first all x coordinates, then
+				   // all y coordinate, ...; first all
+				   // data of variable 1, then
+				   // variable 2, etc), so we have to
+				   // copy the data vectors a bit around
+				   //
+				   // note that we copy vectors when
+				   // looping over the patches since we
+				   // have to write them one variable
+				   // at a time and don't want to use
+				   // more than one loop
+				   //
+				   // this copying of data vectors can
+				   // be done while we already output
+				   // the vertices, so do this on a
+				   // separate thread and when wanting
+				   // to write out the data, we wait
+				   // for that thread to finish
+  vector<vector<double> > data_vectors (n_data_sets,
+					vector<double> (n_nodes));
+  Threads::ThreadManager thread_manager;
+  Threads::spawn (thread_manager,
+		  Threads::encapsulate (&DataOutBase::template
+					write_gmv_reorder_data_vectors<dim>)
+		  .collect_args(patches, data_vectors));
 
 				   ///////////////////////////////
 				   // first make up a list of used
@@ -1573,98 +1610,23 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 				   // data output.
   out << "variable" << endl;
 
-				   // since here as with the vertex
-				   // coordinates the order is a bit
-				   // unpleasant (first all data of
-				   // variable 1, then variable 2, etc)
-				   // we have to copy them a bit around
-				   //
-				   // note that we copy vectors when
-				   // looping over the patches since we
-				   // have to write them one variable
-				   // at a time and don't want to use
-				   // more than one loop
-  if (true)
+				   // now write the data vectors to
+				   // @p{out} first make sure that all
+				   // data is in place
+  thread_manager.wait ();
+
+				   // then write data.
+				   // the '1' means: node data (as opposed
+				   // to cell data, which we do not
+				   // support explicitely here)
+  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     {
-      vector<vector<double> > data_vectors (n_data_sets,
-					    vector<double> (n_nodes));
-				       // loop over all patches
-      unsigned int next_value = 0;
-      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
-	   patch != patches.end(); ++patch)
-	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-	  
-	  Assert (patch->data.m() == n_data_sets,
-		  ExcUnexpectedNumberOfDatasets (patch->data.m(), n_data_sets));
-	  Assert (patch->data.n() == (dim==1 ?
-				      n_subdivisions+1 :
-				      (dim==2 ?
-				       (n_subdivisions+1)*(n_subdivisions+1) :
-				       (dim==3 ?
-					(n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
-					0))),
-		  ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
-	  
-	  switch (dim)
-	    {
-	      case 1:
-	      {      
-		for (unsigned int i=0; i<n_subdivisions+1; ++i, ++next_value) 
-		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		    data_vectors[data_set][next_value] = patch->data(data_set,i);
-		
-		break;
-	      };
-		     
-	      case 2:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    {
-		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			data_vectors[data_set][next_value]
-			  = patch->data(data_set,i*(n_subdivisions+1) + j);
-		      ++next_value;
-		    };
-		
-		break;
-	      };
-	       
-	      case 3:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		      {
-			for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			  data_vectors[data_set][next_value]
-			    = patch->data(data_set,
-					  (i*(n_subdivisions+1)+j)*(n_subdivisions+1)+k);
-			++next_value;
-		      };
-
-		break;
-	      };
-	       
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    };
-	};
-
-				       // now write the data vectors to @p{out}
-				       // the '1' means: node data (as opposed
-				       // to cell data, which we do not
-				       // support explicitely here)
-      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-	{
-	  out << data_names[data_set] << " 1" << endl;
-	  copy(data_vectors[data_set].begin(),
-	       data_vectors[data_set].end(),
-	       ostream_iterator<double>(out, " "));
-	  out << endl
-	      << endl;
-	};
+      out << data_names[data_set] << " 1" << endl;
+      copy(data_vectors[data_set].begin(),
+	   data_vectors[data_set].end(),
+	   ostream_iterator<double>(out, " "));
+      out << endl
+	  << endl;
     };
 
 
@@ -1679,6 +1641,95 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
 };
+
+
+
+template <int dim>
+void DataOutBase::write_gmv_reorder_data_vectors (const vector<Patch<dim> > &patches,
+						  vector<vector<double> >   &data_vectors)
+{
+				   // unlike in the main function, we
+				   // don't have here the data_names
+				   // field, so we initialize it with
+				   // the number of data sets in the
+				   // first patch. the equivalence of
+				   // these two definitions is checked
+				   // in the main function.
+  const unsigned int n_data_sets = patches[0].data.m();
+
+  Assert (data_vectors.size() == n_data_sets,
+	  ExcInternalError());
+  
+				   // loop over all patches
+  unsigned int next_value = 0;
+  for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+       patch != patches.end(); ++patch)
+    {
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+	  
+      Assert (patch->data.m() == n_data_sets,
+	      ExcUnexpectedNumberOfDatasets (patch->data.m(), n_data_sets));
+      Assert (patch->data.n() == (dim==1 ?
+				  n_subdivisions+1 :
+				  (dim==2 ?
+				   (n_subdivisions+1)*(n_subdivisions+1) :
+				   (dim==3 ?
+				    (n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
+				    0))),
+	      ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
+	  
+      switch (dim)
+	{
+	  case 1:
+	  {      
+	    for (unsigned int i=0; i<n_subdivisions+1; ++i, ++next_value) 
+	      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+		data_vectors[data_set][next_value] = patch->data(data_set,i);
+		
+	    break;
+	  };
+		     
+	  case 2:
+	  {
+	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		{
+		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+		    data_vectors[data_set][next_value]
+		      = patch->data(data_set,i*(n_subdivisions+1) + j);
+		  ++next_value;
+		};
+		
+	    break;
+	  };
+	       
+	  case 3:
+	  {
+	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		for (unsigned int k=0; k<n_subdivisions+1; ++k)
+		  {
+		    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+		      data_vectors[data_set][next_value]
+			= patch->data(data_set,
+				      (i*(n_subdivisions+1)+j)*(n_subdivisions+1)+k);
+		    ++next_value;
+		  };
+
+	    break;
+	  };
+	       
+	  default:
+		Assert (false, ExcNotImplemented());
+	};
+    };
+
+  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+    Assert (data_vectors[data_set].size() == next_value,
+	    ExcInternalError());
+};
+
+
 
 
 /* --------------------------- class DataOutInterface ---------------------- */
@@ -1924,4 +1975,4 @@ void DataOutInterface<dim>::parse_parameters (ParameterHandler &prm)
 // explicit instantiations. functions in DataOutBase are instantiated by
 // the respective functions in DataOut_Interface
 template class DataOutInterface<data_out_dimension>;
-
+template class DataOutBase::Patch<data_out_dimension>;
