@@ -70,7 +70,10 @@ class PoissonProblem : public ProblemBase<dim> {
     Function<dim>      *rhs;
     Function<dim>      *boundary_values;
 
-    vector<double> l1_error, l2_error, linfty_error, h1_seminorm_error, h1_error;
+    HyperBallBoundary<dim> boundary;
+    
+    vector<double> l1_error, l2_error, linfty_error;
+    vector<double> h1_seminorm_error, h1_error, estimated_error;
     vector<int>    n_dofs;
 };
 
@@ -178,7 +181,8 @@ void PoissonEquation<dim>::assemble (dVector             &,
 
 template <int dim>
 PoissonProblem<dim>::PoissonProblem () :
-		tria(0), dof(0), rhs(0), boundary_values(0) {};
+		tria(0), dof(0), rhs(0),
+		boundary_values(0), boundary(Point<dim>(),1) {};
 
 
 
@@ -235,7 +239,8 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
        << endl;
   
   cout << "    Making grid... ";
-  tria->create_hypercube (-1,+1);
+  tria->set_boundary (&boundary);
+  tria->create_hyper_ball (Point<dim>(),+1);
   tria->refine_global (start_level);
   cout << tria->n_active_cells() << " active cells." << endl;
 
@@ -266,6 +271,7 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
   Solution<dim> sol;
   dVector       l1_error_per_cell, l2_error_per_cell, linfty_error_per_cell;
   dVector       h1_seminorm_error_per_cell, h1_error_per_cell;
+  dVector       estimated_error_per_cell;
   QGauss3<dim>  q;
   
   cout << "    Calculating L1 error... ";
@@ -293,23 +299,25 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
   cout << h1_error_per_cell.l2_norm() << endl;
   h1_error.push_back (h1_error_per_cell.l2_norm());
 
+  cout << "    Estimating H1 error... ";
+  KellyErrorEstimator<dim> ee;
+  QTrapez<dim-1> eq;
+  ee.estimate_error (*dof, eq, fe, StraightBoundary<dim>(),
+		     KellyErrorEstimator<dim>::FunctionMap(),
+		     solution,
+		     estimated_error_per_cell);
+  cout << estimated_error_per_cell.l2_norm();
+  estimated_error.push_back (estimated_error_per_cell.l2_norm());
+  
   cout << "    Writing to file..." << endl;
   dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
-  dVector h1_seminorm_error_per_dof, h1_error_per_dof;
+  dVector h1_seminorm_error_per_dof, h1_error_per_dof, estimated_error_per_dof;
   dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
   dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
   dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
   dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell,
 				      h1_seminorm_error_per_dof);
   dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
-
-  KellyErrorEstimator<dim> ee;
-  QTrapez<dim-1> eq;
-  dVector estimated_error_per_cell, estimated_error_per_dof;
-  ee.estimate_error (*dof, eq, fe, StraightBoundary<dim>(),
-		     KellyErrorEstimator<dim>::FunctionMap(),
-		     solution,
-		     estimated_error_per_cell);
   dof->distribute_cell_to_dof_vector (estimated_error_per_cell,
 				      estimated_error_per_dof);
   
@@ -337,7 +345,8 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
 template <int dim>
 void PoissonProblem<dim>::print_history () const {
   ofstream out("gnuplot.history");
-  out << "# n_dofs    l1_error l2_error linfty_error h1_seminorm_error h1_error"
+  out << "# n_dofs    l1_error l2_error linfty_error "
+      << "h1_seminorm_error h1_error estimated_error"
       << endl;
   for (unsigned int i=0; i<n_dofs.size(); ++i)
     out << n_dofs[i]
@@ -346,13 +355,17 @@ void PoissonProblem<dim>::print_history () const {
 	<< l2_error[i] << "  "
 	<< linfty_error[i] << "  "
 	<< h1_seminorm_error[i] << "  "
-	<< h1_error[i] << endl;
+	<< h1_error[i] << "  "
+	<< estimated_error[i]
+	<< endl;
 
   double average_l1=0,
 	 average_l2=0,
      average_linfty=0,
     average_h1_semi=0,
-	 average_h1=0;
+	 average_h1=0,
+	average_est=0;
+  
   for (unsigned int i=1; i<n_dofs.size(); ++i) 
     {
       average_l1 += l1_error[i]/l1_error[i-1];
@@ -360,6 +373,7 @@ void PoissonProblem<dim>::print_history () const {
       average_linfty += linfty_error[i]/linfty_error[i-1];
       average_h1_semi += h1_seminorm_error[i]/h1_seminorm_error[i-1];
       average_h1 += h1_error[i]/h1_error[i-1];
+      average_est += estimated_error[i]/estimated_error[i-1];
     };
 
   average_l1 /= (l1_error.size()-1);
@@ -367,13 +381,15 @@ void PoissonProblem<dim>::print_history () const {
   average_linfty /= (l1_error.size()-1);
   average_h1_semi /= (l1_error.size()-1);
   average_h1 /= (l1_error.size()-1);
+  average_est /= (l1_error.size()-1);
 
   cout << "Average error reduction rates for h->h/2:" << endl;
   cout << "    L1 error         : " << 1./average_l1 << endl
        << "    L2 error         : " << 1./average_l2 << endl
        << "    Linfty error     : " << 1./average_linfty << endl
        << "    H1 seminorm error: " << 1./average_h1_semi << endl
-       << "    H1 error         : " << 1./average_h1 << endl;
+       << "    H1 error         : " << 1./average_h1 << endl
+       << "    Estimated error  : " << 1./average_est << endl;
 };
 
 
@@ -382,7 +398,7 @@ void PoissonProblem<dim>::print_history () const {
 int main () {
   PoissonProblem<2> problem;
 
-  for (unsigned int level=3; level<7; ++level)
+  for (unsigned int level=2; level<6; ++level)
     problem.run (level);
 
   cout << endl << "Printing convergence history to <gnuplot.history>..." << endl;
