@@ -139,6 +139,36 @@ void LineAccessor<dim>::set_user_flag () const {
 
 
 template <int dim>
+void LineAccessor<dim>::clear_user_flag () const {
+  Assert (used(), ExcCellNotUsed());
+  tria->levels[present_level]->lines.user_flags[present_index] = false;
+};
+
+
+
+template <int dim>
+void LineAccessor<dim>::recursively_set_user_flag () const {
+  set_user_flag ();
+
+  if (has_children())
+    for (unsigned int c=0; c<2; ++c)
+      child(c)->recursively_set_user_flag ();
+};
+
+
+
+template <int dim>
+void LineAccessor<dim>::recursively_clear_user_flag () const {
+  clear_user_flag ();
+
+  if (has_children())
+    for (unsigned int c=0; c<2; ++c)
+      child(c)->recursively_clear_user_flag ();
+};
+
+
+
+template <int dim>
 void LineAccessor<dim>::set_user_pointer (void *p) const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->lines.user_pointers[present_index] = p;
@@ -161,14 +191,6 @@ void * LineAccessor<dim>::user_pointer () const {
 };
 
   
-
-
-template <int dim>
-void LineAccessor<dim>::clear_user_flag () const {
-  Assert (used(), ExcCellNotUsed());
-  tria->levels[present_level]->lines.user_flags[present_index] = false;
-};
-
 
 
 template <int dim>
@@ -411,6 +433,28 @@ template <int dim>
 void QuadAccessor<dim>::clear_user_flag () const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->quads.user_flags[present_index] = false;
+};
+
+
+
+template <int dim>
+void QuadAccessor<dim>::recursively_set_user_flag () const {
+  set_user_flag ();
+
+  if (has_children())
+    for (unsigned int c=0; c<4; ++c)
+      child(c)->recursively_set_user_flag ();
+};
+
+
+
+template <int dim>
+void QuadAccessor<dim>::recursively_clear_user_flag () const {
+  clear_user_flag ();
+
+  if (has_children())
+    for (unsigned int c=0; c<4; ++c)
+      child(c)->recursively_clear_user_flag ();
 };
 
 

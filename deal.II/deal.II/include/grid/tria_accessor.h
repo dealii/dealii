@@ -342,6 +342,20 @@ class LineAccessor :  public TriaAccessor<dim> {
     void clear_user_flag () const;
 
 				     /**
+				      *  set the user flag of this object
+				      *  and of all its children and their
+				      *  children, etc.
+				      */
+    void recursively_set_user_flag () const;
+
+    				     /**
+				      *  Clear the user flag of this object
+				      *  and of all its children and their
+				      *  children, etc.
+				      */
+    void recursively_clear_user_flag () const;
+
+				     /**
 				      * Set the user pointer of this line
 				      * to #p#.
 				      */
@@ -655,6 +669,20 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      *  Clear the user flag.
 				      */
     void clear_user_flag () const;
+
+				     /**
+				      *  set the user flag of this object
+				      *  and of all its children and their
+				      *  children, etc.
+				      */
+    void recursively_set_user_flag () const;
+
+    				     /**
+				      *  Clear the user flag of this object
+				      *  and of all its children and their
+				      *  children, etc.
+				      */
+    void recursively_clear_user_flag () const;
 
 				     /**
 				      * Set the user pointer of this line
