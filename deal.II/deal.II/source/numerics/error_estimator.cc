@@ -1037,13 +1037,22 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
       fe_face_values.reinit (neighbor_child, neighbor_neighbor);
 
                                        // make sure that quadrature
-                                       // points match
+                                       // points match. note that this
+                                       // won't hold in 3d if one of
+                                       // the lines of the cell is at
+                                       // the boundary and if this is
+                                       // a curved boundary, since
+                                       // then the four subfaces don't
+                                       // exactly make up the mother
+                                       // cell. so exclude this case
       for (unsigned int q=0; q<n_q_points; ++q)
         Assert ((fe_face_values.quadrature_point(q) -
                  fe_subface_values.quadrature_point(q)).square()
                 <
                 1.e-15 * (fe_face_values.quadrature_point(q).square() + 
-                          fe_subface_values.quadrature_point(q).square()),
+                          fe_subface_values.quadrature_point(q).square())
+                ||
+                cell->has_boundary_lines(),
                 ExcInternalError());
 
                                        // store the gradient of the
