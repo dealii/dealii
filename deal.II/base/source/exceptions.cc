@@ -80,7 +80,8 @@ const char * ExceptionBase::what () const {
   PrintInfo (converter);
   
   converter << "--------------------------------------------------------"
-	    << endl;
+	    << endl
+	    << ends;
 
   description = converter.str();
 
