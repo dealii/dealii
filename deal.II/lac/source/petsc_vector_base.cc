@@ -22,11 +22,15 @@
 namespace PETScWrappers
 {
   VectorBase::VectorBase ()
+                  :
+                  last_action (LastAction::none)
   {}
   
 
   
   VectorBase::VectorBase (const VectorBase &v)
+                  :
+                  last_action (LastAction::none)
   {
     int ierr = VecDuplicate (v.vector, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
