@@ -511,7 +511,66 @@ namespace PETScWrappers
       virtual void set_preconditioner_type (PC &pc) const;      
   };
 
+
+
+/**
+ * A class that implements the interface to use the PETSc LU
+ * preconditioner. The LU decomposition is only implemented for single
+ * processor machines. It should provide a convenient interface to
+ * another direct solver.
+ *
+ * @ingroup PETScWrappers
+ * @author Oliver Kayser-Herold, 2004
+ */
+  class PreconditionLU : public PreconditionerBase
+  {
+    public:
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional flags to the
+                                        * preconditioner.
+                                        */      
+      struct AdditionalData
+      {
+                                           /**
+                                            * Constructor. 
+                                            */
+          AdditionalData ();
+      };
+
+                                       /**
+                                        * Constructor. Take the matrix which
+                                        * is used to form the preconditioner,
+                                        * and additional flags if there are
+                                        * any.
+                                        *
+                                        * We specify the (default) value to
+                                        * the constructor call in the default
+                                        * argument because otherwise gcc 2.95
+                                        * generates a compiler fault.
+                                        */
+      PreconditionLU (const MatrixBase     &matrix,
+		      const AdditionalData &additional_data = AdditionalData());
+      
+    protected:
+                                       /**
+                                        * Store a copy of the flags for this
+                                        * particular preconditioner.
+                                        */
+      const AdditionalData additional_data;
+
+                                       /**
+                                        * Function that takes a Krylov
+                                        * Subspace Preconditioner context
+                                        * object, and sets the type of
+                                        * preconditioner that is appropriate
+                                        * for the present class.
+                                        */
+      virtual void set_preconditioner_type (PC &pc) const;      
+  };
+
 }
+
 
 #endif // DEAL_II_USE_PETSC
 
