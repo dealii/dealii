@@ -180,7 +180,7 @@ class FiniteElementData
 				     /**
 				      * Comparison operator. It is not clear to
 				      * me (WB) why we have to declare and implement
-				      * this one explicitely.
+				      * this one explicitly.
 				      */
 //TODO:[WB] (compiler) remove operator and let the compiler generate it as soon as it is willing to do so    
     bool operator == (const FiniteElementData<dim> &) const;
@@ -206,7 +206,7 @@ class FiniteElementData
  * The implementation of this base class is split into two parts:
  * those fields which are not common to all dimensions
  * (@p{dofs_per_quad} for example are only useful for @p{dim>=2}) are put
- * into the @p{FiniteElementData<dim>} class which is explicitely
+ * into the @p{FiniteElementData<dim>} class which is explicitly
  * specialized for all used dimensions, while those fields which may
  * be formulated in a dimension-independent way are put into the
  * present class.
@@ -402,7 +402,7 @@ class FiniteElementBase : public Subscriptor,
 				     /**
 				      * Construct an object of this type.
 				      * You have to set the
-				      * matrices explicitely after calling
+				      * matrices explicitly after calling
 				      * this base class' constructor.
 				      */
     FiniteElementBase (const FiniteElementData<dim> &fe_data,

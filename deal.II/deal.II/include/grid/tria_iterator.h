@@ -312,7 +312,7 @@ class TriaRawIterator :
 				      *  Usage is thus like @p{(*i).index ();}
 				      *
 				      *  This function has to be specialized
-				      *  explicitely for the different
+				      *  explicitly for the different
 				      *  @p{Pointee}s, to allow an
 				      *  @p{iterator<1,TriangulationLevel<1>::LinesData>}
 				      *  to point to @p{tria->lines.lines[index]} while

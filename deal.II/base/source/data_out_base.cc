@@ -1769,7 +1769,7 @@ void DataOutBase::write_gmv (const typename std::vector<Patch<dim,spacedim> > &p
 				   // then write data.
 				   // the '1' means: node data (as opposed
 				   // to cell data, which we do not
-				   // support explicitely here)
+				   // support explicitly here)
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     {
       out << data_names[data_set] << " 1" << std::endl;
@@ -2099,7 +2099,7 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
 				   // then write data.  the
 				   // 'POINTD_DATA' means: node data
 				   // (as opposed to cell data, which
-				   // we do not support explicitely
+				   // we do not support explicitly
 				   // here). all following data sets
 				   // are point data
   out << "POINT_DATA " << n_nodes

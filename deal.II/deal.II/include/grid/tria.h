@@ -149,7 +149,7 @@ struct SubCellData
  *  This class implements some types which differ between the
  *  dimensions.  Declare it to have a template parameter, but do not
  *  actually declare anything concrete apart from the other classes
- *  which are explicitely instantiated ones with the same name.
+ *  which are explicitly instantiated ones with the same name.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -779,7 +779,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   etc.) denote all cells the material id zero. You may change that afterwards,
  *   but you should not use the material id 255. When reading a triangulation,
  *   the material id must be specified in the input file (UCD format) or is
- *   otherwise set to zero. When creating explicitely, the material id must
+ *   otherwise set to zero. When creating explicitly, the material id must
  *   be given to the creation function.
  *
  *   Regarding the boundary indicator for lines in two dimensions and quads
@@ -790,7 +790,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   different boundary indicators to the triangulation creation function.
  *   The standard domain functions assume all faces to have boundary indicator
  *   zero, which you may change manually afterwards. When reading from a file,
- *   you have to give boundary indicators other than zero explicitely, e.g. in
+ *   you have to give boundary indicators other than zero explicitly, e.g. in
  *   UCD format by giving a list of lines with material id in the input file.
  *
  *   Lines in two dimensions and quads in three dimensions inherit their

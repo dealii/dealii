@@ -638,7 +638,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * @p{MappingQ1} object. Needed
 				      * by constructors of derived
 				      * classes that uses
-				      * @p{MappingQ1} implicitely.
+				      * @p{MappingQ1} implicitly.
 				      */
     static const Mapping<dim> &get_default_mapping();
 };

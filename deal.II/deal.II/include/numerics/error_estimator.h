@@ -174,7 +174,7 @@ template <int dim> class FESubfaceValues;
  *  abovementioned map of integrals as well. This consumes some memory more
  *  than needed, but makes the summing up of the face contributions to the
  *  cells easier, since then we have the information from all faces of all
- *  cells at hand and need not think about explicitely determining whether
+ *  cells at hand and need not think about explicitly determining whether
  *  a face was refined or not. The same applies for boundary faces, see
  *  above.
  *

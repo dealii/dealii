@@ -34,7 +34,7 @@ class BlockIndices;
  *
  * The matrix is organized in lines (rows), but only those lines are stored
  * where constraints are present. Lines where only one entry (identity) is
- * present are not stored if not explicitely inserted.
+ * present are not stored if not explicitly inserted.
  *
  * Constraint matrices are used to handle hanging nodes and other constrained
  * degrees of freedom. When building the global system matrix and the right
@@ -85,7 +85,7 @@ class BlockIndices;
  *   with zeroes in the lines subject to constraints. Additionally, the vector
  *   size is larger than in the first possibility, resulting in more memory
  *   consumption for those iterative solution methods using a larger number of
- *   auxiliary vectors (e.g. methods using explicite orthogonalization
+ *   auxiliary vectors (e.g. methods using explicit orthogonalization
  *   procedures).
  * @end{itemize}
  *
@@ -619,7 +619,7 @@ class ConstraintMatrix : public Subscriptor
 					  * Number of this line. Since only very
 					  * few lines are stored, we can not
 					  * assume a specific order and have
-					  * to store the line number explicitely.
+					  * to store the line number explicitly.
 					  */
 	unsigned int line;
 

@@ -1762,5 +1762,5 @@ void MGDoFHandler<3>::reserve_space () {
 #endif
 
 
-// explicite instantiations
+// explicit instantiations
 template class MGDoFHandler<deal_II_dimension>;

@@ -594,7 +594,7 @@ class TimeDependent
 				      * function call teh given function with
 				      * the specified parameter. Note that you
 				      * need to bind the second parameter since
-				      * the first one implicitely contains
+				      * the first one implicitly contains
 				      * the object which the function is to
 				      * be called for.
 				      */

@@ -409,7 +409,7 @@ QWeddle<dim>::QWeddle () :
 		Quadrature<dim> (QWeddle<dim-1>(), QWeddle<1>()){};
 
 
-// explicite specialization
+// explicit specialization
 // note that 1d formulae are specialized by implementation above
 template class QGauss<2>;
 template class QGauss2<2>;

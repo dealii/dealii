@@ -1063,7 +1063,7 @@ class DoFTools
 				      * order in the space of points
 				      * (except for the 1d case), you
 				      * have to provide a map with an
-				      * explicitely specified
+				      * explicitly specified
 				      * comparator object. This
 				      * function is therefore
 				      * templetized on the comparator

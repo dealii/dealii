@@ -60,7 +60,7 @@
  * if we call @p{memory_consumption(v)} on a vector @p{v} of type
  * @p{FullMatrix<double>}, we first reduce this to a loop in which we
  * call @p{memory_consumption(v[i])}, and because there is no such
- * function handling this explicitely, we try to call
+ * function handling this explicitly, we try to call
  * @p{v[i].memory_consumption()}.
  *
  *
@@ -346,7 +346,7 @@ namespace MemoryConsumption
     
 				   /**
 				    * For all other types which are
-				    * not explicitely listed: try if
+				    * not explicitly listed: try if
 				    * there is a member function
 				    * called
 				    * @p{memory_consumption}. If

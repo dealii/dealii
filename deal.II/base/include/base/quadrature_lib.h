@@ -105,7 +105,7 @@ class QGauss5 : public Quadrature<dim>
 
 /**
  *  6-Point-Gauss quadrature formula, exact for polynomials of degree 11.
- *  I have not found explicite
+ *  We have not found explicit
  *  representations of the zeros of the Legendre functions of sixth
  *  and higher degree. If anyone finds them, please replace the existing
  *  numbers by these expressions.
@@ -125,7 +125,7 @@ class QGauss6 : public Quadrature<dim>
 
 /**
  *  7-Point-Gauss quadrature formula, exact for polynomials of degree 13.
- *  I have not found explicite
+ *  We have not found explicit
  *  representations of the zeros of the Legendre functions of sixth
  *  and higher degree. If anyone finds them, please replace the existing
  *  numbers by these expressions.

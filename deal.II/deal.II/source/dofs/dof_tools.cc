@@ -1762,7 +1762,7 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 				   // respective dofs of the other
 				   // components have sum of weights
 				   // zero, of course. we do not
-				   // explicitely ask which component
+				   // explicitly ask which component
 				   // a dof belongs to, but this at
 				   // least tests some errors
 #ifdef DEBUG

@@ -70,7 +70,7 @@ template <int dim> class MappingQ;
  * numbering. However, the shape functions on a cell are renumbered
  * beginning with the shape functions whose support points are at the
  * vertices, then on the line, on the quads, and finally (for 3d) on
- * the hexes. To be explicite, these numberings are listed in the
+ * the hexes. To be explicit, these numberings are listed in the
  * following:
  *
  * @sect4{Q1 elements}

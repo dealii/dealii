@@ -20,7 +20,7 @@
 /**
  * Store the indices of the degrees of freedom which are located on the lines.
  * Declare it to have a template parameter, but do not actually declare
- * other types than those explicitely instantiated.
+ * other types than those explicitly instantiated.
  *
  * @author Wolfgang Bangerth, 1998
  */

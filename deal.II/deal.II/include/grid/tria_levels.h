@@ -306,7 +306,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 				      *  append the needed elements.
 				      *  There are pendants for higher
 				      *  dimensions, which you have to call
-				      *  explicitely (they can't hand down the
+				      *  explicitly (they can't hand down the
 				      *  call because there is no easy relation
 				      *  between the number of new quads and
 				      *  the number of new lines, etc.). Also

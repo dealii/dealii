@@ -23,7 +23,7 @@
  *
  *   A heaxhedron itself has one index, as far as the topological part handled in
  *   the triangulation is concerned: the index in the level
- *   it belongs to. The level index is implicitely given by the position
+ *   it belongs to. The level index is implicitly given by the position
  *   in the @p{hexes.hexes} list attached to the information of each level
  *   of the triangulation.
  *

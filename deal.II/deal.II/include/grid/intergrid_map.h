@@ -98,7 +98,7 @@
  * @end{verbatim}
  *
  * Note that the template parameters to this class have to be given as
- * @p{InterGridMap<DoFHandler,2>}, i.e. the dimension is given explicitely and
+ * @p{InterGridMap<DoFHandler,2>}, i.e. the dimension is given explicitly and
  * no dimension is attributed to the first parameter, which here is
  * @ref{DoFHandler} (and could equally well be @ref{Triangulation} or @ref{MGDoFHandler}).
  *

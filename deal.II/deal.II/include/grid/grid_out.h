@@ -55,7 +55,7 @@ namespace GridOutFlags
       
 				       /**
 					* When writing a mesh, write boundary
-					* faces explicitely if their boundary
+					* faces explicitly if their boundary
 					* indicator is not the default
 					* boundary indicator, which is zero.
 					* This is necessary if you later
@@ -201,7 +201,7 @@ namespace GridOutFlags
 				   /**
 				    * Flags describing the details of
 				    * output for encapsulated postscript
-				    * for all dimensions not explicitely
+				    * for all dimensions not explicitly
 				    * specialized below. Some flags that
 				    * are common to all dimensions are
 				    * listed in the base class.
@@ -476,7 +476,7 @@ class GridOut
 				      * whether boundary faces with
 				      * non-zero boundary indicator
 				      * shall be written to the file
-				      * explicitely. This is useful,
+				      * explicitly. This is useful,
 				      * if you want to re-read the
 				      * grid later on, since
 				      * @p{deal.II} sets the boundary
@@ -485,7 +485,7 @@ class GridOut
 				      * same triangulation as before,
 				      * you have to specify faces
 				      * with differing boundary
-				      * indicators explicitely, which
+				      * indicators explicitly, which
 				      * is done by this flag.
 				      *
 				      * Names and values of further
@@ -755,7 +755,7 @@ class GridOut
 				      * Return the number of faces in the
 				      * triangulation which have a boundary
 				      * indicator not equal to zero. Only
-				      * these faces are explicitely printed
+				      * these faces are explicitly printed
 				      * in the @p{write_*} functions;
 				      * all faces with indicator 255 are
 				      * interior ones and an indicator with

@@ -6129,7 +6129,7 @@ void Triangulation<dim>::fix_coarsen_flags () {
 				   // coarsening is possible or deleted
 				   // otherwise. Coarsen flags of cells with
 				   // no mother cell, i.e. on the
-				   // coarsest level are deleted explicitely.
+				   // coarsest level are deleted explicitly.
   clear_user_flags ();
 				   // number of active children of @p{cell}.
 				   // number of children of @p{cell} which are
