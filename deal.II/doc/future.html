@@ -28,28 +28,6 @@
 	 </p>
 
     <li> <p>
-         <strong>Non-conforming elements:</strong> While
-         <acronym>deal.II</acronym> is quite flexible with respect to
-         the finite element to be used, it was written with Lagrange
-         elements in mind. The basic problems in the implementation of
-         other elements would therefore be the computation of shape
-         function values if the shape functions depend on the shape of
-         the cell. Since this is not the case for the usual continuous
-         elements, the present implementation does not provide all
-         information necessary for the computation of these values.
-	 </p>
-
-	 <p>
-	 In order to implement these elements, it would therefore be
-	 necessary to review the interface between the
-	 <code>FEValues</code> class and the
-	 <code>FiniteElement</code> class. This would probably also be
-	 the right time to further separate the implementation of the
-	 mapping from unit to real cell from the actual finite element
-	 code.
-	 </p>
-
-    <li> <p>
          <strong>The <I>hp</I>-method of finite elements:</strong>
 	 Implementing this will need a class analogous to the
          <code>DoFHandler</code> class, as well as extensions to the finite
