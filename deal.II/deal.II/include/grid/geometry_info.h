@@ -194,50 +194,69 @@ struct GeometryInfo<0>
 
 
 
-/* -------------- declaration of explicit specializations ------------- */
-
-
-template <> const unsigned int GeometryInfo<1>::opposite_face[GeometryInfo<1>::faces_per_cell];
-template <> const unsigned int GeometryInfo<2>::opposite_face[GeometryInfo<2>::faces_per_cell];
-template <> const unsigned int GeometryInfo<3>::opposite_face[GeometryInfo<3>::faces_per_cell];
-
-
-
-
-/*---------------------------- Inline functions --------------------------------*/
-
-template<>
-inline unsigned int
-GeometryInfo<2>::child_cell_on_face (const unsigned int face,
-                                     const unsigned int subface)
+//TODO:[WB] Document new classes, and reference in old one.
+template <>
+struct GeometryInfo<1> 
 {
-  Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
-  Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
-  
-  const unsigned subcells[faces_per_cell][subfaces_per_face] = {{0,1},
-								{1,2},
-								{3,2},
-								{0,3}};
-  return subcells[face][subface];
+    static const unsigned int dim               = 1;
+    static const unsigned int children_per_cell = 2;
+    static const unsigned int faces_per_cell    = 2;
+    static const unsigned int subfaces_per_face = 0;
+    static const unsigned int vertices_per_cell = 2;
+    static const unsigned int vertices_per_face = 1;
+    static const unsigned int lines_per_face    = 0;
+    static const unsigned int quads_per_face    = 0;
+    static const unsigned int lines_per_cell    = 1;
+    static const unsigned int quads_per_cell    = 0;
+    static const unsigned int hexes_per_cell    = 0;
+    static const unsigned int opposite_face[faces_per_cell];
+    static unsigned int child_cell_on_face (const unsigned int face,
+					    const unsigned int subface);
 };
 
 
-template<>
-inline
-unsigned int GeometryInfo<3>::child_cell_on_face (const unsigned int face,
-						  const unsigned int subface)
+
+template <>
+struct GeometryInfo<2>
 {
-  Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
-  Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
-  
-  const unsigned subcells[faces_per_cell][subfaces_per_face] = {{0, 1, 2, 3},
-								{4, 5, 6, 7},
-								{0, 1, 5, 4},
-								{1, 5, 6, 2},
-								{3, 2, 6, 7},
-								{0, 4, 7, 3}};
-  return subcells[face][subface];
+    static const unsigned int dim               = 2;
+    static const unsigned int children_per_cell = 4;
+    static const unsigned int faces_per_cell    = 4;
+    static const unsigned int subfaces_per_face = 2;
+    static const unsigned int vertices_per_cell = 4;
+    static const unsigned int vertices_per_face = 2;
+    static const unsigned int lines_per_face    = 1;
+    static const unsigned int quads_per_face    = 0;
+    static const unsigned int lines_per_cell    = 4;
+    static const unsigned int quads_per_cell    = 1;
+    static const unsigned int hexes_per_cell    = 0;
+    static const unsigned int opposite_face[faces_per_cell];
+    static unsigned int child_cell_on_face (const unsigned int face,
+					    const unsigned int subface);
 };
+
+
+
+template <>
+struct GeometryInfo<3> 
+{
+    static const unsigned int dim               = 3;
+    static const unsigned int children_per_cell = 8;
+    static const unsigned int faces_per_cell    = 6;
+    static const unsigned int subfaces_per_face = 4;
+    static const unsigned int vertices_per_cell = 8;
+    static const unsigned int vertices_per_face = 4;
+    static const unsigned int lines_per_face    = 4;
+    static const unsigned int quads_per_face    = 1;
+    static const unsigned int lines_per_cell    = 12;
+    static const unsigned int quads_per_cell    = 6;
+    static const unsigned int hexes_per_cell    = 1;
+    static const unsigned int opposite_face[faces_per_cell];
+    static unsigned int child_cell_on_face (const unsigned int face,
+					    const unsigned int subface);
+};
+
+
 
 
 #endif
