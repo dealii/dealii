@@ -20,6 +20,8 @@ template <int dim> class FiniteElement;
 template <int dim> class DoFHandler;
 template <typename number> class Vector;
 template <int dim> class FE_Q;
+class ConstraintMatrix;
+
 
 #include <base/config.h>
 #include <base/exceptions.h>
@@ -127,7 +129,12 @@ class FETools
 				      * at the DoF values on the
 				      * discontinuities.
 				      *
-				      * Note that the resulting output
+				      * Note that for continuous
+				      * elements on grids with hanging
+				      * nodes (i.e. locally refined
+				      * grids) this function does not
+				      * give the expected output.
+				      * Indeed, the resulting output
 				      * vector does not necessarily
 				      * respect continuity
 				      * requirements at hanging nodes:
@@ -144,12 +151,17 @@ class FETools
 				      * triangulation, although it is
 				      * of course Q1 on each cell.
 				      *
-				      * To make the field conforming
-				      * again, you have to have a
-				      * hanging node constraints
-				      * object, and call its
-				      * @p{distribute} function on the
-				      * result of this function.
+				      * For this case (continuous
+				      * elements on grids with hanging
+				      * nodes), please use the
+				      * @p{interpolate} function with
+				      * an additional
+				      * @p{ConstraintMatrix} argument,
+				      * see below, or make the field
+				      * conforming yourself by calling
+				      * the @p{distribute} function of
+				      * your hanging node constraints
+				      * object.
 				      */
     template <int dim, typename number>
     static void interpolate (const DoFHandler<dim> &dof1,
@@ -158,6 +170,47 @@ class FETools
 			     Vector<number>        &u2);
     
 				     /**
+				      * Gives the interpolation of a
+				      * the @p{dof1}-function @p{u1}
+				      * to a @p{dof2}-function
+				      * @p{u2}. @p{dof1} and @p{dof2}
+				      * need to be @ref{DoFHandler}s
+				      * based on the same
+				      * triangulation.
+				      * @p{constraints} is a hanging
+				      * node constraints object
+				      * corresponding to
+				      * @p{dof2}. This object is
+				      * particular important when
+				      * interpolating onto continuous
+				      * elements on grids with hanging
+				      * nodes (locally refined grids).
+				      *
+				      * If the elements @p{fe1} and @p{fe2}
+				      * are either both continuous or
+				      * both discontinuous then this
+				      * interpolation is the usual point
+				      * interpolation. The same is true
+				      * if @p{fe1} is a continuous and
+				      * @p{fe2} is a discontinuous finite
+				      * element. For the case that @p{fe1}
+				      * is a discontinuous and @p{fe2} is
+				      * a continuous finite element
+				      * there is no point interpolation
+				      * defined at the discontinuities.
+				      * Therefore the meanvalue is taken
+				      * at the DoF values on the
+				      * discontinuities.
+				      */
+    template <int dim, typename number>
+    static void interpolate (const DoFHandler<dim>  &dof1,
+			     const Vector<number>   &u1,
+			     const DoFHandler<dim>  &dof2,
+			     const ConstraintMatrix &constraints,
+			     Vector<number>         &u2);
+    
+
+				     /**
 				      * Gives the interpolation of the
 				      * @p{fe1}-function @p{u1} to a
 				      * @p{fe2}-function, and
@@ -165,23 +218,63 @@ class FETools
 				      * @p{fe1}-function named
 				      * @p{u1_interpolated}.
 				      *
-				      * Note, that this function only
-				      * makes sense if the finite
-				      * element space due to @p{fe1}
-				      * is not a subset of the finite
-				      * element space due to @p{fe2},
-				      * as if it were a subset then
-				      * @p{u1_interpolated} would be
-				      * equal to @p{u1}.
-				      *
 				      * Note, that this function does
 				      * not work on continuous
-				      * elements at hanging nodes.
+				      * elements at hanging nodes. For
+				      * that case use the
+				      * @p{back_interpolate} function,
+				      * below, that takes an
+				      * additional
+				      * @p{ConstraintMatrix} object.
+				      *
+				      * Furthermore note, that for the
+				      * specific case when the finite
+				      * element space corresponding to
+				      * @p{fe1} is a subset of the
+				      * finite element space
+				      * corresponding to @p{fe2}, this
+				      * function is simply an identity
+				      * mapping.
 				      */
     template <int dim, typename number>
     static void back_interpolate (const DoFHandler<dim>    &dof1,
 				  const Vector<number>     &u1,
 				  const FiniteElement<dim> &fe2,
+				  Vector<number>           &u1_interpolated);
+
+				     /**
+				      * Gives the interpolation of the
+				      * @p{dof1}-function @p{u1} to a
+				      * @p{dof2}-function, and
+				      * interpolates this to a second
+				      * @p{dof1}-function named
+				      * @p{u1_interpolated}.
+				      * @p{constraints1} and
+				      * @p{constraints2} are the
+				      * hanging node constraints
+				      * corresponding to @p{dof1} and
+				      * @p{dof2}, respectively. These
+				      * objects are particular
+				      * important when continuous
+				      * elements on grids with hanging
+				      * nodes (locally refined grids)
+				      * are involved.
+				      *
+				      * Furthermore note, that for the
+				      * specific case when the finite
+				      * element space corresponding to
+				      * @p{dof1} is a subset of the
+				      * finite element space
+				      * corresponding to @p{dof2}, this
+				      * function is simply an identity
+				      * mapping.
+				      */
+    template <int dim, typename number>
+    static void back_interpolate (const DoFHandler<dim>    &dof1,
+				  const ConstraintMatrix   &constraints1,
+				  const Vector<number>     &u1,
+				  const DoFHandler<dim>    &dof2,
+				  const ConstraintMatrix   &constraints2,
 				  Vector<number>           &u1_interpolated);
 
 				     /**
@@ -193,7 +286,12 @@ class FETools
 				      *
 				      * Note, that this function does
 				      * not work on continuous
-				      * elements at hanging nodes.
+				      * elements at hanging nodes. For
+				      * that case use the
+				      * @p{interpolation_difference}
+				      * function, below, that takes an
+				      * additional
+				      * @p{ConstraintMatrix} object.
 				      */
     template <int dim, typename number>
     static void interpolation_difference(const DoFHandler<dim> &dof1,
@@ -201,6 +299,31 @@ class FETools
 					 const FiniteElement<dim> &fe2,
 					 Vector<number> &z1_difference);    
     
+				     /**
+				      * Gives $(Id-I_h)z1$ for a given
+				      * @p{dof1}-function @p{z1}, where $I_h$
+				      * is the interpolation from @p{fe1}
+				      * to @p{fe2}. $(Id-I_h)z1$ is
+				      * denoted by @p{z1_difference}.
+				      * @p{constraints1} and
+				      * @p{constraints2} are the
+				      * hanging node constraints
+				      * corresponding to @p{dof1} and
+				      * @p{dof2}, respectively. These
+				      * objects are particular
+				      * important when continuous
+				      * elements on grids with hanging
+				      * nodes (locally refined grids)
+				      * are involved.
+				      */
+    template <int dim, typename number>
+    static void interpolation_difference(const DoFHandler<dim> &dof1,
+					 const ConstraintMatrix &constraints1,
+					 const Vector<number> &z1,
+					 const DoFHandler<dim> &dof2,
+					 const ConstraintMatrix &constraints2,
+					 Vector<number> &z1_difference);    
+
 				     /**
 				      * Gives the patchwise
 				      * extrapolation of a @p{dof1}
@@ -306,6 +429,11 @@ class FETools
 				      * Exception
 				      */
     DeclException0 (ExcTriangulationMismatch);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcHangingNodesNotAllowed);
   
 				     /**
 				      * Exception

@@ -105,6 +105,22 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: The existing <code
+       class="member">FETools::interpolate</code>, <code
+       class="member">FETools::back_interpolate</code> and <code
+       class="member">FETools::interpolate_difference</code> functions
+       do not take into account hanging node constraints. Therefore,
+       they have been working for continuous elements on globally
+       refined grids and on discontinuous elements, only. Now, there
+       are new functions with the same names but additional <code
+       class="class">ConstraintMatrix</code> arguments for the hanging
+       node constraints. These new functions now work for continuous
+       as well as for discontinuous elements. But, the old functions
+       are still supported.
+       <br>
+       (RH 2002/06/13)
+       </p>
+
   <li> <p> Change: The constructor of <code
        class="class">DoFHandler</code> now takes a reference to a
        <tt>const</tt> <code class="class">Triangulation</code>.
