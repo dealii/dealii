@@ -91,13 +91,18 @@ template<>
 void
 FullMatrix<double>::invert (const FullMatrix<double> &M)
 {
+  double* val = const_cast<double*> (data());
+
   Assert (val != 0, ExcEmptyMatrix());
   
+  unsigned int dim_range = n_cols ();
+  unsigned int dim_image = n_rows ();
+  
   Assert (dim_range == dim_image, ExcNotQuadratic());
-  Assert (dim_range == M.dim_range,
-          ExcDimensionMismatch(dim_range,M.dim_range));
-  Assert (dim_image == M.dim_image,
-	  ExcDimensionMismatch(dim_image,M.dim_image));
+  Assert (dim_range == M.n_cols(),
+          ExcDimensionMismatch(dim_range,M.n_cols()));
+  Assert (dim_image == M.n_rows(),
+	  ExcDimensionMismatch(dim_image,M.n_rows()));
 
   clear();
   diagadd(1.);
@@ -112,7 +117,7 @@ FullMatrix<double>::invert (const FullMatrix<double> &M)
   double* s = new double[dim_range];
   
   double* matrix = new double[dim_range*dim_range];
-  std::copy (&M.val[0], &M.val[dim_image*dim_range], matrix);
+  std::copy (M.data(), M.data()+dim_image*dim_range, matrix);
   
 
   int erg = dgelss_ (&dim_range, &dim_range, &dim_range,
