@@ -256,8 +256,8 @@ void gnuplot_output()
 				 // computational domain, i.e. by
 				 // computing the areas $\int_K 1
 				 // dx=\int_{\hat K} 1 J(\hat x) d\hat
-				 // x\approx\sum J(\hat x)w(\hat x)$
-				 // of all active cells of
+				 // x \approx \sum J(\hat x)w(\hat x)$
+				 // of all active cells of the
 				 // triangulation and summing up these
 				 // contributions to gain the area of
 				 // the overall domain. The integrals
