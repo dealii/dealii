@@ -476,6 +476,35 @@ HexAccessor<dim>::quad (const unsigned int i) const {
 template <int dim>
 inline
 unsigned int
+HexAccessor<dim>::line_index (unsigned int i) const {
+  Assert (i<12, ExcInvalidIndex(i,0,11));
+
+  if (i<4)
+    return quad(0)->line_index(i);
+  else
+    if (i<8)
+      return quad(1)->line_index(i-4);
+    else
+      switch (i) 
+	{
+	  case 8:
+		return quad(2)->line_index(3);
+	  case 9:
+		return quad(2)->line_index(1);
+	  case 10:
+		return quad(4)->line_index(1);
+	  case 11:
+		return quad(4)->line_index(3);
+	};
+  Assert (false, ExcInvalidIndex(i,0,11));
+  return 0;
+};
+
+
+
+template <int dim>
+inline
+unsigned int
 HexAccessor<dim>::quad_index (unsigned int i) const {
   Assert (i<6, ExcInvalidIndex(i,0,5));
 

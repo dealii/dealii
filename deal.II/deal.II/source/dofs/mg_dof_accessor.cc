@@ -299,6 +299,177 @@ MGDoFQuadAccessor<dim,BaseClass>::copy_from (const MGDoFQuadAccessor<dim,BaseCla
 
 
 
+/* ------------------------ MGDoFHexAccessor --------------------------- */
+
+template <int dim, typename BaseClass>
+MGDoFHexAccessor<dim,BaseClass>::MGDoFHexAccessor (Triangulation<dim> *tria,
+						   const int           level,
+						   const int           index,
+						   const AccessorData *local_data) :
+		MGDoFAccessor<dim> (local_data),
+		DoFHexAccessor(tria,level,index,local_data) {};
+
+
+
+template <int dim, typename BaseClass>
+inline
+int MGDoFHexAccessor<dim,BaseClass>::mg_dof_index (const unsigned int i) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (mg_dof_handler != 0, ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (i<dof_handler->get_fe().dofs_per_hex,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_hex));
+
+  return mg_dof_handler->mg_levels[present_level]
+    ->hex_dofs[present_index*dof_handler->get_fe().dofs_per_hex+i];
+};
+
+
+
+template <int dim, typename BaseClass>
+void MGDoFHexAccessor<dim,BaseClass>::set_mg_dof_index (const unsigned int i,
+							const int index) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (mg_dof_handler != 0, ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (i<dof_handler->get_fe().dofs_per_hex,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_hex));
+
+  mg_dof_handler->mg_levels[present_level]
+    ->hex_dofs[present_index*dof_handler->get_fe().dofs_per_hex+i] = index;
+};
+
+
+
+template <int dim, typename BaseClass>
+inline
+int MGDoFHexAccessor<dim,BaseClass>::mg_vertex_dof_index (const unsigned int vertex,
+							  const unsigned int i) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (mg_dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (vertex<8, ExcInvalidIndex (i,0,8));
+  Assert (i<dof_handler->get_fe().dofs_per_vertex,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_vertex));
+  
+  return (mg_dof_handler->mg_vertex_dofs[vertex_index(vertex)]
+	  .get_index (present_level, i, dof_handler->get_fe().dofs_per_vertex));
+};
+
+
+  
+template <int dim, typename BaseClass>
+void MGDoFHexAccessor<dim,BaseClass>::set_mg_vertex_dof_index (const unsigned int vertex,
+							       const unsigned int i,
+							       const int index) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (mg_dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (vertex<4, ExcInvalidIndex (i,0,4));
+  Assert (i<dof_handler->get_fe().dofs_per_vertex,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_vertex));
+
+  mg_dof_handler->mg_vertex_dofs[vertex_index(vertex)]
+    .set_index (present_level, i, dof_handler->get_fe().dofs_per_vertex, index);
+};
+
+
+
+template <int dim, typename BaseClass>
+void
+MGDoFHexAccessor<dim,BaseClass>::get_mg_dof_indices (vector<int> &dof_indices) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (mg_dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_indices.size() == (8*dof_handler->get_fe().dofs_per_vertex +
+				 12*dof_handler->get_fe().dofs_per_line +
+				 6*dof_handler->get_fe().dofs_per_quad +
+				 dof_handler->get_fe().dofs_per_hex),
+	  ExcVectorDoesNotMatch());
+
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
+  vector<int>::iterator next = dof_indices.begin();
+  for (unsigned int vertex=0; vertex<8; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next++ = mg_vertex_dof_index(vertex,d);
+  for (unsigned int line=0; line<12; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      *next++ = this->line(line)->mg_dof_index(d);
+  for (unsigned int quad=0; quad<12; ++quad)
+    for (unsigned int d=0; d<dofs_per_quad; ++d)
+      *next++ = this->quad(quad)->mg_dof_index(d);
+  for (unsigned int d=0; d<dofs_per_hex; ++d)
+    *next++ = mg_dof_index(d);
+};
+
+
+
+template <int dim, typename BaseClass>
+TriaIterator<dim,MGDoFLineAccessor<dim,LineAccessor<dim> > >
+MGDoFHexAccessor<dim,BaseClass>::line (const unsigned int i) const {
+  Assert (i<12, ExcInvalidIndex (i, 0, 12));
+
+  return TriaIterator<dim,MGDoFLineAccessor<dim,LineAccessor<dim> > >
+    (
+      tria,
+      present_level,
+      line_index (i),
+      mg_dof_handler
+    );
+};
+
+
+
+template <int dim, typename BaseClass>
+TriaIterator<dim,MGDoFQuadAccessor<dim,QuadAccessor<dim> > >
+MGDoFHexAccessor<dim,BaseClass>::quad (const unsigned int i) const {
+  Assert (i<12, ExcInvalidIndex (i, 0, 6));
+
+  return TriaIterator<dim,MGDoFQuadAccessor<dim,QuadAccessor<dim> > >
+    (
+      tria,
+      present_level,
+      quad_index (i),
+      mg_dof_handler
+    );
+};
+
+
+
+template <int dim, typename BaseClass>
+TriaIterator<dim,MGDoFHexAccessor<dim,BaseClass> >
+MGDoFHexAccessor<dim,BaseClass>::child (const unsigned int i) const {
+  TriaIterator<dim,MGDoFHexAccessor<dim,BaseClass> > q (tria,
+							present_level+1,
+							child_index (i),
+							mg_dof_handler);
+  
+#ifdef DEBUG
+  if (q.state() != past_the_end)
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+#endif
+  return q;
+};
+
+
+
+template <int dim, typename BaseClass>
+void
+MGDoFHexAccessor<dim,BaseClass>::copy_from (const MGDoFHexAccessor<dim,BaseClass> &a) {
+  DoFHexAccessor::copy_from (a);
+  set_mg_dof_handler (a.mg_dof_handler);
+};
+
+
+
+
 
 /*------------------------- Functions: MGDoFCellAccessor -----------------------*/
 
@@ -437,6 +608,26 @@ template class TriaIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > >;
 template class TriaIterator<2,MGDoFCellAccessor<2> >;
 template class TriaActiveIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > >;
 template class TriaActiveIterator<2,MGDoFCellAccessor<2> >;
+#endif
+
+
+#if deal_II_dimension == 3
+template class MGDoFLineAccessor<3,LineAccessor<3> >;
+template class MGDoFQuadAccessor<3,QuadAccessor<3> >;
+template class MGDoFHexAccessor<3,HexAccessor<3> >;
+template class MGDoFHexAccessor<3,CellAccessor<3> >;
+template class MGDoFCellAccessor<3>;
+
+template class TriaRawIterator<3,MGDoFLineAccessor<3,LineAccessor<3> > >;
+template class TriaRawIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > >;
+template class TriaRawIterator<3,MGDoFHexAccessor<3,HexAccessor<3> > >;
+template class TriaRawIterator<3,MGDoFCellAccessor<3> >;
+template class TriaIterator<3,MGDoFLineAccessor<3,LineAccessor<3> > >;
+template class TriaIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > >;
+template class TriaIterator<3,MGDoFCellAccessor<3> >;
+template class TriaActiveIterator<3,MGDoFLineAccessor<3,LineAccessor<3> > >;
+template class TriaActiveIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > >;
+template class TriaActiveIterator<3,MGDoFCellAccessor<3> >;
 #endif
 
 

@@ -416,7 +416,7 @@ class MGDoFHexAccessor :  public MGDoFAccessor<dim>, public DoFHexAccessor<dim, 
 				      * Return a pointer to the #i#th quad
 				      * bounding this #Hex#.
 				      */
-    TriaIterator<dim,MGDoFLineAccessor<dim,QuadAccessor<dim> > >
+    TriaIterator<dim,MGDoFQuadAccessor<dim,QuadAccessor<dim> > >
     quad (const unsigned int i) const;
 
 				     /**
@@ -673,6 +673,8 @@ class MGDoFCellAccessor :  public MGDoFSubstructAccessor<dim> {
 				      */
     DeclException0 (ExcNotUsefulForThisDimension);
 };
+
+
 
 
 

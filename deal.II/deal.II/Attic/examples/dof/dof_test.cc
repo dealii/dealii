@@ -12,7 +12,7 @@
 #include <lac/sparsematrix.h>
 #include <base/parameter_handler.h>
 #include <grid/dof_constraints.h>
-
+#include <numerics/dof_renumbering.h>
 
 #include <fstream>
 #include <cmath>
@@ -354,7 +354,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   dof->distribute_dofs (fe);
 
   cout << "    Renumbering degrees of freedom..." << endl;
-  dof->renumber_dofs (Cuthill_McKee, false);
+  DoFRenumbering::renumber_Cuthill_McKee (*dof);
     
   SparseMatrixStruct sparsity (dof->n_dofs(),
 			       dof->max_couplings_between_dofs());

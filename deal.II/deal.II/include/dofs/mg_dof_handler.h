@@ -131,6 +131,10 @@ class MGDoFHandler : public DoFHandler<dim> {
     typedef typename MGDoFDimensionInfo<dim>::quad_iterator quad_iterator;
     typedef typename MGDoFDimensionInfo<dim>::active_quad_iterator active_quad_iterator;
 
+    typedef typename MGDoFDimensionInfo<dim>::raw_hex_iterator raw_hex_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::hex_iterator hex_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::active_hex_iterator active_hex_iterator;
+
     typedef typename MGDoFDimensionInfo<dim>::raw_cell_iterator raw_cell_iterator;
     typedef typename MGDoFDimensionInfo<dim>::cell_iterator cell_iterator;
     typedef typename MGDoFDimensionInfo<dim>::active_cell_iterator active_cell_iterator;
@@ -170,20 +174,18 @@ class MGDoFHandler : public DoFHandler<dim> {
     virtual void distribute_dofs (const FiniteElement<dim> &);
 
 				     /**
-				      * Renumber the degrees of freedom according
-				      * to the given scheme, eventually
-				      * using the given
-				      * starting points. The starting points
-				      * default to an empty list, the use of
-				      * constraint information defaults to
-				      * false.
+				      * Actually do the renumbering based on
+				      * a list of new dof numbers for all the
+				      * dofs. 
 				      *
-				      * See the general documentation of the
-				      * #DoFHandler# class for more details.
+				      * #new_numbers# is an array of integers
+				      * with size equal to the number of dofs
+				      * on the present level. It stores the new
+				      * indices after renumbering in the
+				      * order of the old indices.
 				      */
-    void renumber_dofs (const unsigned int       level,
-			const RenumberingMethod  method,
-			const vector<int>       &starting_points = vector<int>());
+    void renumber_dofs (const unsigned int level,
+			const vector<int> &new_numbers);
 
 				     /**
 				      * Write the sparsity structure of the
@@ -653,6 +655,103 @@ class MGDoFHandler : public DoFHandler<dim> {
 
 				     /*---------------------------------------*/
 
+				     /**
+				      *  @name Hex iterator functions*/
+    				     /*@{
+				      */
+    				     /**
+				      *  Return iterator to the first hex, used
+				      *  or not, on level #level#. If a level
+				      *  has no hexs, a past-the-end iterator
+				      *  is returned.
+				      */
+    raw_hex_iterator    begin_raw_hex   (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first used hex
+				      *  on level #level#.
+				      */
+    hex_iterator        begin_hex       (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first active
+				      *  hex on level #level#.
+				      */
+    active_hex_iterator begin_active_hex(const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator past the end; this
+				      *  iterator serves for comparisons of
+				      *  iterators with past-the-end or
+				      *  before-the-beginning states.
+				      */
+    raw_hex_iterator    end_hex () const;
+
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    hex_iterator        end_hex (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_hex_iterator    end_raw_hex (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_hex_iterator end_active_hex (const unsigned int level) const;
+
+
+				     /**
+				      *  Return an iterator pointing to the
+				      *  last hex, used or not.
+				      */
+    raw_hex_iterator    last_raw_hex () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  hex of the level #level#, used or not.
+
+				      */
+    raw_hex_iterator    last_raw_hex (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used hex.
+				      */
+    hex_iterator        last_hex () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used hex on level #level#.
+				      */
+    hex_iterator        last_hex (const unsigned int level) const;
+
+    				     /**
+				      *  Return an iterator pointing to the last
+				      *  active hex.
+				      */
+    active_hex_iterator last_active_hex () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  active hex on level #level#.
+				      */
+    active_hex_iterator last_active_hex (const unsigned int level) const;
+				     /*@}*/
+    
+				     /*---------------------------------------*/
+
     				     /**
 				      * Return the number of degrees of freedom
 				      * on the specified level.
@@ -832,22 +931,6 @@ class MGDoFHandler : public DoFHandler<dim> {
 					  unsigned int   next_free_dof);
     
 				     /**
-				      * Actually do the renumbering prepared
-				      * by the #renumber_dofs# function on
-				      * the given #level#. Since
-				      * this is dimension specific, we
-				      * need to have another function.
-				      *
-				      * #new_numbers# is an array of integers
-				      * with size equal to the number of dofs
-				      * on the present level. It stores the new
-				      * indices after renumbering in the
-				      * order of the old indices.
-				      */
-    void do_renumbering (const unsigned int level,
-			 const vector<int> &new_numbers);
-
-				     /**
 				      * Reserve enough space for the MG dof
 				      * indices for a given triangulation.
 				      */
@@ -881,6 +964,8 @@ class MGDoFHandler : public DoFHandler<dim> {
     friend class MGDoFLineAccessor<dim, CellAccessor<dim> >;
     friend class MGDoFQuadAccessor<dim, QuadAccessor<dim> >;
     friend class MGDoFQuadAccessor<dim, CellAccessor<dim> >;
+    friend class MGDoFHexAccessor<dim, HexAccessor<dim> >;
+    friend class MGDoFHexAccessor<dim, CellAccessor<dim> >;
 };
 
     
