@@ -46,9 +46,9 @@ void PoissonEquation<dim>::assemble (FullMatrix<double>  &cell_matrix,
   right_hand_side.value_list (fe_values.get_quadrature_points(), rhs_values);
    
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
       {
-	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+	for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 	  cell_matrix(i,j) += (gradients[i][point] *
 			       gradients[j][point]) *
 			      weights[point];

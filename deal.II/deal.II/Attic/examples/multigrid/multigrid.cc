@@ -247,9 +247,9 @@ void PoissonEquation<2>::assemble (FullMatrix<double>  &cell_matrix,
 				   const FEValues<2>   &fe_values,
 				   const DoFHandler<2>::cell_iterator &) const {
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
       {
-	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+	for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 	  cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
 			       fe_values.shape_grad(j,point)) *
 			      fe_values.JxW(point);
