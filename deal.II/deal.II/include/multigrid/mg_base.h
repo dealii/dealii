@@ -110,6 +110,30 @@ class MGCoarseGridBase : public Subscriptor
  * context. This class is an abstract one and has no implementations of
  * possible algorithms for these operations.
  *
+ * There are several derived classes, reflecting the fact that vector
+ * types and numbering of the fine-grid discretization and of the
+ * multi-level implementation are independent.
+ *
+ * If you use multigrid for your complete system of equations, you
+ * will use @ref{MGTransferPrebuilt} together with Multigrid for
+ * Vector objects. The fine-grid vectors may still be of type
+ * BlockVector.
+ *
+ * For mixed systems, it may be required to do multigrid only for a
+ * single component or for some components. The classes
+ * @ref{MGTransferSelect} and @ref{MGTransferBlock} handle these cases.
+ *
+ * MGTransferSelect is used if you use mutligrid (on Vector oblects)
+ * for a single component, possibly grouped using
+ * @p{mg_target_component}.
+ *
+ * The class MGTransferBlock handles the case where your multigrid
+ * method operates on BlockVector objects. These can contain all or a
+ * consecutive set of the blocks of the complete system. Since most
+ * smoothers cannot operate on block structures, it is not clear
+ * whether this case is really useful. Therefore, a tested
+ * implementation of this case will be supplied when needed.
+ *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002
  */
  template <class VECTOR>

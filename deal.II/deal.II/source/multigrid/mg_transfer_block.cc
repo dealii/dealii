@@ -34,12 +34,16 @@ void MGTransferBlockBase::build_matrices (
   const MGDoFHandler<dim>& mg_dof,
   const std::vector<bool>& select)
 {
+				   // Fill target component with
+				   // standard values (identity) if it
+				   // is empty
   if (target_component.size() == 0)
     {
       target_component.resize(mg_dof.get_fe().n_components());
       for (unsigned int i=0;i<target_component.size();++i)
 	target_component[i] = i;
     } else {
+				       // otherwise, check it for consistency
       Assert (target_component.size() == mg_dof.get_fe().n_components(),
 	      ExcDimensionMismatch(target_component.size(),
 				   mg_dof.get_fe().n_components()));
@@ -50,21 +54,76 @@ void MGTransferBlockBase::build_matrices (
 		 ExcIndexRange(i,0,target_component.size()));
 	}
     }
+				   // Do the same for the multilevel
+				   // components. These may be
+				   // different.
+  if (mg_target_component.size() == 0)
+    {
+      mg_target_component.resize(mg_dof.get_fe().n_components());
+      for (unsigned int i=0;i<mg_target_component.size();++i)
+	mg_target_component[i] = i;
+    } else {
+      Assert (mg_target_component.size() == mg_dof.get_fe().n_components(),
+	      ExcDimensionMismatch(mg_target_component.size(),
+				   mg_dof.get_fe().n_components()));
+      
+      for (unsigned int i=0;i<mg_target_component.size();++i)
+	{
+	  Assert(i<mg_target_component.size(),
+		 ExcIndexRange(i,0,mg_target_component.size()));
+	}
+    }
   
   const FiniteElement<dim>& fe = mg_dof.get_fe();
 
+				   // Effective number of components
+				   // is the maximum entry in
+				   // mg_target_component. This
+				   // assumes that the values in that
+				   // vector don't have holes.
   const unsigned int n_components  =
-    *std::max_element(target_component.begin(), target_component.end()) + 1;
+    *std::max_element(mg_target_component.begin(), mg_target_component.end()) + 1;
   const unsigned int dofs_per_cell = fe.dofs_per_cell;  
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   
+				   // Selected refers to the component
+				   // in mg_target_component.
   selected = select;
   
   Assert (selected.size() == fe.n_components(),
-	  ExcDimensionMismatch(selected.size(), fe.n_components()))
-
+	  ExcDimensionMismatch(selected.size(), fe.n_components()));
+  
+				   // Compute the lengths of all blocks
   sizes.resize(n_levels);
-  MGTools::count_dofs_per_component(mg_dof, sizes, target_component);
+  MGTools::count_dofs_per_component(mg_dof, sizes, mg_target_component);
+
+				   // Fill some index vectors
+				   // for later use.
+  mg_component_start = sizes;
+				   // Compute start indices from sizes
+  for (unsigned int l=0;l<mg_component_start.size();++l)
+    {
+      unsigned int k=0;
+      for (unsigned int i=0;i<mg_component_start[l].size();++i)
+	{
+	  const unsigned int t=mg_component_start[l][i];
+	  mg_component_start[l][i] = k;
+	  k += t;
+	}
+    }
+
+  component_start.resize(target_component.size());
+  DoFTools::count_dofs_per_component(mg_dof, component_start, target_component);
+
+  unsigned int k=0;
+  for (unsigned int i=0;i<component_start.size();++i)
+    {
+      const unsigned int t=component_start[i];
+      component_start[i] = k;
+      k += t;
+    }
+
+// Building the matrices starts here!
   
 				   // reset the size of the array of
 				   // matrices. call resize(0) first,
@@ -181,7 +240,7 @@ void MGTransferBlockBase::build_matrices (
 			  = fe.system_to_component_index(i).first;
 			const unsigned int jcomp
 			  = fe.system_to_component_index(j).first;
-			if ((icomp==jcomp) && selected[target_component[icomp]])
+			if ((icomp==jcomp) && selected[mg_target_component[icomp]])
 			  prolongation_sparsities[level]->add(dof_indices_child[i],
 							      dof_indices_parent[j]);
 		      };
@@ -217,7 +276,7 @@ void MGTransferBlockBase::build_matrices (
 		      {
 			const unsigned int icomp = fe.system_to_component_index(i).first;
 			const unsigned int jcomp = fe.system_to_component_index(j).first;
-			if ((icomp==jcomp) && selected[target_component[icomp]])
+			if ((icomp==jcomp) && selected[mg_target_component[icomp]])
 			  prolongation_matrices[level]->set(dof_indices_child[i],
 							    dof_indices_parent[j],
 							    prolongation(i,j));
@@ -225,31 +284,6 @@ void MGTransferBlockBase::build_matrices (
 	      };
 	  };
     };
-				   // Finally, fill some index vectors
-				   // for later use.
-  mg_component_start = sizes;
-				   // Compute start indices from sizes
-  for (unsigned int l=0;l<mg_component_start.size();++l)
-    {
-      unsigned int k=0;
-      for (unsigned int i=0;i<mg_component_start[l].size();++i)
-	{
-	  const unsigned int t=mg_component_start[l][i];
-	  mg_component_start[l][i] = k;
-	  k += t;
-	}
-    }
-
-  component_start.resize(n_components);
-  DoFTools::count_dofs_per_component(mg_dof, component_start);
-
-  unsigned int k=0;
-  for (unsigned int i=0;i<component_start.size();++i)
-    {
-      const unsigned int t=component_start[i];
-      component_start[i] = k;
-      k += t;
-    }
 #if defined(DEAL_PREFER_MATRIX_EZ) && 1 == 0
   deallog.push("Transfer");
   for (unsigned int level=0;level<n_levels-1; ++level)
@@ -271,12 +305,14 @@ template <int dim>
 void MGTransferBlock<number>::build_matrices (
   const MGDoFHandler<dim> &mg_dof,
   std::vector<bool> select,
-  const std::vector<unsigned int>& t_component)
+  const std::vector<unsigned int>& t_component,
+  const std::vector<unsigned int>& mg_t_component)
 {
   if (select.size() == 0)
     select = std::vector<bool> (mg_dof.get_fe().n_components(), true);
 
   target_component = t_component;
+  mg_target_component = mg_t_component;
 
   MGTransferBlockBase::build_matrices (mg_dof, select);
 }
@@ -287,15 +323,19 @@ template <int dim>
 void MGTransferSelect<number>::build_matrices (
   const MGDoFHandler<dim> &mg_dof,
   unsigned int select,
-  const std::vector<unsigned int>& t_component)
+  unsigned int mg_select,
+  const std::vector<unsigned int>& t_component,
+  const std::vector<unsigned int>& mg_t_component)
 {
   unsigned int ncomp = mg_dof.get_fe().n_components();
   
-  selected = select;
+  selected_component = select;
   std::vector<bool> s(ncomp, false);
-  s[select] = true;
-
+  s[mg_select] = true;
+//TODO:[GK] Assert that select and mg_select access the same component
+// or figure out how to use different components
   target_component = t_component;
+  mg_target_component = mg_t_component;
   
   MGTransferBlockBase::build_matrices (mg_dof, s);
 }
@@ -312,7 +352,7 @@ void MGTransferBlock<float>::build_matrices<deal_II_dimension>
 template
 void MGTransferSelect<float>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- unsigned int, const std::vector<unsigned int>&);
+ unsigned int, unsigned int, const std::vector<unsigned int>&);
 
 template
 void MGTransferBlock<double>::build_matrices<deal_II_dimension>
@@ -322,7 +362,7 @@ void MGTransferBlock<double>::build_matrices<deal_II_dimension>
 template
 void MGTransferSelect<double>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- unsigned int, const std::vector<unsigned int>&);
+ unsigned int, unsigned int, const std::vector<unsigned int>&);
 
 
 template void

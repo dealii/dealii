@@ -41,6 +41,9 @@ template <int dim> class MGDoFHandler;
  * once by looping over all cells and storing the result in a matrix for
  * each level, but requires additional memory.
  *
+ * See @ref{MGTransferBase} to find out which of the transfer classes
+ * is best for your needs.
+ *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999-2003
  */
 template <typename number>
@@ -164,11 +167,6 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
   private:
 
 				   /**
-				    * Selected component.
-				    */
-    unsigned int selected;
-
-				   /**
 				    * Sizes of the multi-level vectors.
 				    */
     std::vector<unsigned int> sizes;
@@ -253,7 +251,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 
 /**
  * Implementation of matrix generation for @ref{MGTransferBlock} and
- * @p{MGTransferSelected}.
+ * @p{MGTransferSelect}.
  *
  * @author Guido Kanschat, 2001-2003
  */
@@ -290,6 +288,13 @@ class MGTransferBlockBase
 				      * Target component if renumbering is required.
 				      */
     std::vector<unsigned int> target_component;
+    
+				     /**
+				      * Target component if
+				      * renumbering of level vectors
+				      * is required.
+				      */
+    std::vector<unsigned int> mg_target_component;
     
 				   /**
 				    * Sizes of the multi-level vectors.
@@ -343,17 +348,27 @@ class MGTransferBlockBase
 #endif
 };
 
-
+//TODO:[GK] Update this class
 
 /**
  * Implementation of the @p{MGTransferBase} interface for block
- * matrices and block vectors.  In addition to the functionality of
+ * matrices and block vectors.
+ *
+ * Warning! Due to additional requirements on MGTransferSelect, the
+ * implementation in the base class has changed. Therefore, this class
+ * is left in an untested state. If you use it and you encounter
+ * problems, please contact Guido Kanschat.
+ *
+ * In addition to the functionality of
  * @ref{MGTransferPrebuilt}, the operation may be restricted to
  * certain blocks of the vector.
  *
  * If the restricted mode is chosen, block vectors used in the
  * transfer routines may only have as many components as there are
  * @p{true}s in the selected-field.
+ *
+ * See @ref{MGTransferBase} to find out which of the transfer classes
+ * is best for your needs.
  *
  * @author Guido Kanschat, 2001, 2002
  */
@@ -391,6 +406,8 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
     void build_matrices (const MGDoFHandler<dim> &mg_dof,
 			 std::vector<bool> selected = std::vector<bool>(),
 			 const std::vector<unsigned int>& target_component
+			 = std::vector<unsigned int>(),
+			 const std::vector<unsigned int>& mg_target_component
 			 =std::vector<unsigned int>());
 
 				     /**
@@ -534,13 +551,17 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 };
 
 
+//TODO:[GK] Update documentation for copy_* functions
 
 /**
  * Implementation of the @p{MGTransferBase} interface for block
- * matrices and simple vectors. This class uses @ref{MGTransferBlock}
+ * matrices and simple vectors. This class uses @ref{MGTransferBlockBase}
  * selecting a single component or grouping several components into a
  * single block. The transfer operators themselves are implemented for
- * simple vectors again.
+ * Vector and BlockVector objects.
+ *
+ * See @ref{MGTransferBase} to find out which of the transfer classes
+ * is best for your needs.
  *
  * @author Guido Kanschat, 2001, 2002, 2003
  */
@@ -558,8 +579,13 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Actually build the prolongation
 				      * matrices for grouped components.
 				      *
-				      * @p{selected} is the number of
-				      * the component for which the
+				      * @p{selected} tells the copy
+				      * functions operating on single
+				      * vectors, which component this
+				      * vector belongs to.
+				      *
+				      * @p{mg_selected} is the number
+				      * of the component for which the
 				      * transfer matrices should be
 				      * built.
 				      *
@@ -580,9 +606,18 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     template <int dim>
     void build_matrices (const MGDoFHandler<dim> &mg_dof,
 			 unsigned int selected,
+			 unsigned int mg_selected,
 			 const std::vector<unsigned int>& target_component
+			 = std::vector<unsigned int>(),
+			 const std::vector<unsigned int>& mg_target_component
 			 = std::vector<unsigned int>());
 
+				     /**
+				      * Change selected
+				      * component. Handle with care!
+				      */
+    void select (const unsigned int component);
+    
 				     /**
 				      * Prolongate a vector from level
 				      * @p{to_level-1} to level
@@ -648,12 +683,89 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * on each of the levels
 				      * separately, i.a. an @p{MGVector}.
 				      */
-    template <int dim, class InVector>
+    template <int dim, typename number2>
     void
     copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
 		MGLevelObject<Vector<number> > &dst,
-		const InVector                 &src) const;
+		const Vector<number2>          &src) const;
 
+				     /**
+				      * Transfer from multi-level vector to
+				      * normal vector.
+				      *
+				      * Copies data from active
+				      * portions of an MGVector into
+				      * the respective positions of a
+				      * @p{Vector<number>}. In order to
+				      * keep the result consistent,
+				      * constrained degrees of freedom
+				      * are set to zero.
+				      */
+    template <int dim, typename number2>
+    void
+    copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
+		  Vector<number2>                      &dst,
+		  const MGLevelObject<Vector<number> > &src) const;
+
+				     /**
+				      * Add a multi-level vector to a
+				      * normal vector.
+				      *
+				      * Works as the previous
+				      * function, but probably not for
+				      * continuous elements.
+				      */
+    template <int dim, typename number2>
+    void
+    copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
+		      Vector<number2>                      &dst,
+		      const MGLevelObject<Vector<number> > &src) const;
+
+    				     /**
+				      * Transfer from a vector on the
+				      * global grid to vectors defined
+				      * on each of the levels
+				      * separately, i.a. an @p{MGVector}.
+				      */
+    template <int dim, typename number2>
+    void
+    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+		MGLevelObject<Vector<number> > &dst,
+		const BlockVector<number2>     &src) const;
+
+				     /**
+				      * Transfer from multi-level vector to
+				      * normal vector.
+				      *
+				      * Copies data from active
+				      * portions of an MGVector into
+				      * the respective positions of a
+				      * @p{Vector<number>}. In order to
+				      * keep the result consistent,
+				      * constrained degrees of freedom
+				      * are set to zero.
+				      */
+    template <int dim, typename number2>
+    void
+    copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
+		  BlockVector<number2>                 &dst,
+		  const MGLevelObject<Vector<number> > &src) const;
+
+				     /**
+				      * Add a multi-level vector to a
+				      * normal vector.
+				      *
+				      * Works as the previous
+				      * function, but probably not for
+				      * continuous elements.
+				      */
+    template <int dim, typename number2>
+    void
+    copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
+		      BlockVector<number2>                 &dst,
+		      const MGLevelObject<Vector<number> > &src) const;
+
+  private:
 				     /**
 				      * Transfer from multi-level vector to
 				      * normal vector.
@@ -668,9 +780,10 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      */
     template <int dim, class OutVector>
     void
-    copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
-		  OutVector                            &dst,
-		  const MGLevelObject<Vector<number> > &src) const;
+    do_copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
+		     OutVector                            &dst,
+		     const MGLevelObject<Vector<number> > &src,
+		     const unsigned int offset) const;
 
 				     /**
 				      * Add a multi-level vector to a
@@ -682,16 +795,10 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      */
     template <int dim, class OutVector>
     void
-    copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
-		      OutVector                            &dst,
-		      const MGLevelObject<Vector<number> > &src) const;
-
-  private:
-                                     /**
-                                      * Selected component.
-                                      */
-    unsigned int selected;
-
+    do_copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
+			 OutVector                            &dst,
+			 const MGLevelObject<Vector<number> > &src,
+			 const unsigned int offset) const;
 
 				     /**
 				      * Implementation of the
@@ -712,10 +819,11 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      */
     template <int dim, class InVector>
     void
-    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
-		MGLevelObject<Vector<number> > &dst,
-		const InVector                 &src,
-		const is_1d<true>              &) const;
+    do_copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+		   MGLevelObject<Vector<number> > &dst,
+		   const InVector                 &src,
+		   const unsigned int              offset,
+		   const is_1d<true>              &) const;
 
 				     /**
 				      * Same for all other space
@@ -723,12 +831,25 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      */
     template <int dim, class InVector>
     void
-    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
-		MGLevelObject<Vector<number> > &dst,
-		const InVector                 &src,
-		const is_1d<false>             &) const;
+    do_copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+		   MGLevelObject<Vector<number> > &dst,
+		   const InVector                 &src,
+		   const unsigned int              offset,
+		   const is_1d<false>             &) const;
+
+                                     /**
+                                      * Selected component.
+                                      */
+    unsigned int selected_component;
 };
 
+//----------------------------------------------------------------------//
+template <typename number>
+inline void
+MGTransferSelect<number>::select(const unsigned int component)
+{
+  selected_component = component;
+}
 
 
 #endif

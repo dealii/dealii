@@ -180,6 +180,38 @@ class MGTools
 		     MGLevelObject<BlockVector<number> >& v,
 		     const std::vector<bool>& selected,
 		     const std::vector<unsigned int>& target_component);
+				     /**
+				      * Adjust vectors on all levels
+				      * to correct size.  Count the
+				      * numbers of degrees of freedom
+				      * on each level component-wise
+				      * in a single component. Then,
+				      * assign @p{vector} the
+				      * corresponding size.
+				      *
+				      * The boolean field @p{selected}
+				      * may be nonzero in a single
+				      * component, indicating the
+				      * block of a block vector the
+				      * argument @p{v} corresponds to.
+				      *
+				      * Degrees of freedom must be
+				      * sorted by component in order
+				      * to obtain reasonable results
+				      * from this function.
+				      *
+				      * The argument
+				      * @p{target_component} allows to
+				      * re-sort and groupt components
+				      * as in
+				      * @p{DoFRenumbering::component_wise}.
+				      */
+    template <int dim, typename number>
+      static void
+      reinit_vector (const MGDoFHandler<dim>& mg_dof,
+		     MGLevelObject<Vector<number> >& v,
+		     const std::vector<bool>& selected,
+		     const std::vector<unsigned int>& target_component);
 };
 
 
