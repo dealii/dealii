@@ -154,6 +154,7 @@ class Solver
 				      */
     SolverControl& control() const;
 
+//TODO: [WB] move this class to SolverControl to avoid forcing templatized class qualification when catching such exceptions
     DeclException2(ExcNoConvergence, int, double,
 		   << "Iteration did not converge after " << arg1
 		   << " steps. Final residual " << arg2);
