@@ -187,8 +187,8 @@ class FiniteElementData
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcDimensionMismatch, int, int,
-		    << "used " << arg1 << "-d constructor for " << arg2 << "-d object");
+    DeclException2 (ExcSpaceDimensionMismatch, int, int,
+		    << "used " << arg1 << "-d function for " << arg2 << "-d object");
 };
 
 

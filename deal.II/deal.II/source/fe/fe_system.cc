@@ -484,13 +484,13 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 
       if (face_no==invalid_face_number)
 	{
-	  Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
+	  Assert(dim_1==dim, ExcSpaceDimensionMismatch(dim_1,dim));
 	  cell_quadrature=dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer);
 	  Assert (cell_quadrature != 0, ExcInternalError());
 	}
       else
 	{
-	  Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
+	  Assert(dim_1==dim-1, ExcSpaceDimensionMismatch(dim_1,dim-1));
 	  face_quadrature=dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
 	  Assert (face_quadrature != 0, ExcInternalError());
 	}
