@@ -287,13 +287,12 @@ interpolate (const std::vector<Vector<number> > &all_in,
 	    ExcWrongVectorSize(all_in[i].size(), n_dofs_old));
 
   
-  const unsigned int out_size=all_out.size();
-  const unsigned int in_size=all_in.size();
+  const unsigned int in_size = all_in.size();
 
-				   // resize the output vector
-  if (out_size != in_size)
-    all_out=std::vector<Vector<number> >(
-      in_size, Vector<number>(dof_handler->n_dofs()));
+				   // resize the output vector if
+				   // necessary
+  if (all_out.size() != in_size)
+    all_out.resize (in_size, Vector<number>(dof_handler->n_dofs()));
   else
     for (unsigned int i=0; i<in_size; ++i)
       if (all_out[i].size() != dof_handler->n_dofs())
@@ -336,7 +335,7 @@ interpolate (const std::vector<Vector<number> > &all_in,
 					       // data vectors on this
 					       // cell and prolong it
 					       // to its children
-	      for (unsigned int j=0; j<out_size; ++j)
+	      for (unsigned int j=0; j<in_size; ++j)
 		{
 		  for (unsigned int i=0; i<dofs_per_cell; ++i)
 		    local_values(i)=all_in[j](indexptr->operator[](i));
@@ -359,7 +358,7 @@ interpolate (const std::vector<Vector<number> > &all_in,
 					       // distribute the
 					       // stored data to the
 					       // new vectors
-	      for (unsigned int j=0; j<out_size; ++j)
+	      for (unsigned int j=0; j<in_size; ++j)
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  all_out[j](dofs[i])=valuesptr->operator[](j)(i);
 	    }

@@ -266,6 +266,12 @@ class SolutionTransfer
 				      * NOT allowed. Interpolating
 				      * several functions can be
 				      * performed in one step.
+				      *
+				      * If the number of output
+				      * vectors is different from the
+				      * number of input vectors, or if
+				      * their sizes are not correct,
+				      * then this is corrected.
 				      */
     void interpolate (const std::vector<Vector<number> >&all_in,
 		      std::vector<Vector<number> >      &all_out) const;

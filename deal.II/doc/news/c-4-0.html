@@ -258,6 +258,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <ol>
   <li> <p>
        Fixed: The <code
+       class="member">SolutionTransfer::interpolate</code>
+       function did not compute all output vectors if the number of
+       output vectors was different from the number of output
+       vectors. This was due to the fact that it stored the number of
+       output vectors before resizing that array. This is now fixed.
+       <br>
+       (Brent Bailey, WB 2003/10/22)
+       </p>
+
+  <li> <p>
+       Fixed: The <code
        class="member">FEFaceValuesBase::boundary_form</code>
        function was declared but not implemented. This is now fixed.
        <br>
