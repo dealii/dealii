@@ -331,6 +331,10 @@ class BlockSparsityPatternBase : public Subscriptor
 		    int, int,
 		    << "The number of blocks " << arg1 << " and " << arg2
 		    << " are different.");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidConstructorCall);
     
   protected:
 
@@ -494,6 +498,8 @@ SparsityPatternBase &
 BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
 						  const unsigned int column)
 {
+  Assert (row<rows, ExcIndexRange(row,0,rows));
+  Assert (column<columns, ExcIndexRange(column,0,columns));
   return *sub_objects[row][column];
 };
 
@@ -505,6 +511,8 @@ const SparsityPatternBase &
 BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
 			     const unsigned int column) const
 {
+  Assert (row<rows, ExcIndexRange(row,0,rows));
+  Assert (column<columns, ExcIndexRange(column,0,columns));
   return *sub_objects[row][column];
 };
 
