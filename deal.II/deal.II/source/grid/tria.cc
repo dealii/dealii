@@ -67,6 +67,7 @@ Triangulation<dim>::~Triangulation ()
 template <int dim>
 void Triangulation<dim>::clear () 
 {
+//TODO: Why ??? Should be like making a new grid, not? (G->W)
 				   // only allow this operation if there
 				   // are no subscribers any more
   Assert (n_subscriptions() == 0, ExcInternalError());
