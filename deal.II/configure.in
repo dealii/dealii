@@ -267,6 +267,13 @@ fi
 AC_SUBST(CXXFLAGSG)
 AC_SUBST(CXXFLAGSO)
 
+dnl ======================================================================
+dnl Check for operating system properties like header files and
+dnl special functions.
+dnl ======================================================================
+AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_FUNCS(gethostname)
+
 
 
 dnl We still need to set the flag for debug output. We will usually

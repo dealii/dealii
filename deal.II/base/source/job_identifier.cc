@@ -15,6 +15,9 @@
 #include <base/job_identifier.h>
 #include <ctime>
 
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
 
 JobIdentifier dealjobid;
 
@@ -22,7 +25,15 @@ JobIdentifier dealjobid;
 JobIdentifier::JobIdentifier()
 {
   time_t t = time(0);
-  id = std::string(program_id()) + std::string(ctime(&t));
+  id = std::string(program_id());
+
+#if HAVE_GETHOSTNAME
+  char name[100];
+  gethostname(name,99);
+  id += std::string(name) + std::string(" ");
+#endif
+
+  id += std::string(ctime(&t));
 }
 
 
