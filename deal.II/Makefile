@@ -130,7 +130,7 @@ tex-doc:
 
 TODO:
 	@cat $D/base/Todo $D/lac/Todo $D/deal.II/Todo > $@
-	@grep //TODO $D/base/include/*/*.h $D/base/source/*.cc \
+	@egrep -i '// *todo' $D/base/include/*/*.h $D/base/source/*.cc \
                      $D/lac/include/*/*.h $D/lac/source/*.cc   \
                      $D/deal.II/include/*/*.h $D/deal.II/source/*/*.cc \
              >> $@
