@@ -37,7 +37,7 @@ plot_shape_functions(FiniteElement<dim>& finel, const char* name)
     {
       for (unsigned int n=0;n<=div;++n)
 	{
-	  gnuplot << q.quad_point(k);
+	  gnuplot << q.point(k);
 	  
 	  for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 	    {
