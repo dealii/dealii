@@ -13,8 +13,6 @@
 
 #include <fe/fe_q.h>
 
-#include <memory>
-
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
 #else
@@ -1385,8 +1383,7 @@ FE_Q<3>::initialize_constraints ()
   for (unsigned int i=0;i<=this->degree;++i)
     v.push_back(Polynomials::LagrangeEquidistant(this->degree,i));
 
-  const std::auto_ptr<const TensorProductPolynomials<dim-1> >
-    poly_f (new TensorProductPolynomials<dim-1> (v));
+  const TensorProductPolynomials<dim-1> face_polynomial(v);
 
   this->interface_constraints
     .TableBase<2,double>::reinit (this->interface_constraints_size());
@@ -1478,7 +1475,7 @@ FE_Q<3>::initialize_constraints ()
             new_index = indices[1] * (this->degree + 1) + indices[0];
 
           this->interface_constraints(j,i) = 
-            poly_f->compute_value (new_index, constraint_point);
+            face_polynomial.compute_value (new_index, constraint_point);
 	    
                                            // if the value is small up
                                            // to round-off, then
