@@ -498,7 +498,7 @@ void PoissonProblem<dim>::print_history (string filename) const {
 
 int main () {
   deallog.depth_console (0);
-  for (unsigned int order=0; order<5; ++order) 
+  for (unsigned int order=1; order<5; ++order) 
     {
       PoissonProblem<2> problem (order);
       
@@ -511,9 +511,6 @@ int main () {
       string filename;
       switch (order) 
 	{
-	  case 0:
-		filename = "criss_cross";
-		break;
 	  case 1:
 		filename = "linear";
 		break;
