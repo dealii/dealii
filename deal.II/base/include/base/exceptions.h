@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -333,7 +333,7 @@ class ExceptionBase : public exception
 				      *  @p{DeclException*} macros with the @p{throw}
 				      *  mechanism or the @p{AssertThrow} macro.
 				      */
-    virtual const char * what () const;
+    virtual const char * what () const throw ();
 
   protected:
 				     /**

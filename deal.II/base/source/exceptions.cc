@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,8 @@ void ExceptionBase::SetFields (const char* f,
 			       const int l,
 			       const char *func,
 			       const char *c,
-			       const char *e) {
+			       const char *e)
+{
   file = f;
   line = l;
   function = func;
@@ -41,7 +42,9 @@ void ExceptionBase::SetFields (const char* f,
 };
 
 
-void ExceptionBase::PrintExcData (ostream &out) const {
+
+void ExceptionBase::PrintExcData (ostream &out) const
+{
   out << "An error occurred in line <" << line
       << "> of file <" << file
       << "> in function" << endl
@@ -54,12 +57,16 @@ void ExceptionBase::PrintExcData (ostream &out) const {
 };
 
 
-void ExceptionBase::PrintInfo (ostream &out) const {
+
+void ExceptionBase::PrintInfo (ostream &out) const
+{
   out << "(none)" << endl;
 };
 
 
-const char * ExceptionBase::what () const {
+
+const char * ExceptionBase::what () const throw ()
+{
 				   // have a place where to store the
 				   // description of the exception as a char *
 				   //
