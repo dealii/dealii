@@ -73,6 +73,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The class <code>Triangulation::RefinementListener</code> had only
+       virtual abstract functions but no virtual destructor. This caused
+       warnings with some compilers, and is generally bad practice
+       anyway. This is now fixed.
+       <br> 
+       (WB, 2005/02/22)
+       </p>
+
+  <li> <p>
        New: Function <code class="class">FETools</code>::<code
        class="member">compute_embedding_matrices</code> allows for
        automatic computation of embedding matrices under the sole

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1596,11 +1596,37 @@ class Triangulation : public Subscriptor
 				      *  For an example see hpDoFHandler().
 				      */
     class RefinementListener
-	{
-	public:
-	    virtual void pre_refinement_notification (const Triangulation<dim> &tria);
-	    virtual void post_refinement_notification (const Triangulation<dim> &tria);
-	};
+    {
+      public:
+                                         /**
+                                          * Destructor. Does nothing, but is
+                                          * declared virtual because this
+                                          * class also has virtual functions.
+                                          */
+        virtual ~RefinementListener ();
+        
+                                         /**
+                                          * Before refinement is actually
+                                          * performed, the triangulation class
+                                          * calls this method on all objects
+                                          * derived from this class and
+                                          * registered with the triangulation.
+                                          */
+        virtual
+        void
+        pre_refinement_notification (const Triangulation<dim> &tria);
+        
+                                         /**
+                                          * After refinement is actually
+                                          * performed, the triangulation class
+                                          * calls this method on all objects
+                                          * derived from this class and
+                                          * registered with the triangulation.
+                                          */
+        virtual
+        void
+        post_refinement_notification (const Triangulation<dim> &tria);
+    };
     
 				     /**
 				      *  Create a triangulation and create
