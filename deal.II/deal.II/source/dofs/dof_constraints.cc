@@ -376,7 +376,11 @@ unsigned int ConstraintMatrix::max_constraint_indirections () const
   unsigned int return_value = 0;
   for (vector<ConstraintLine>::const_iterator i=lines.begin();
        i!=lines.end(); ++i)
-    return_value = max(return_value, i->entries.size());
+				     // use static cast, since
+				     // typeof(size)==size_t, which is
+				     // != unsigned int on AIX
+    return_value = max(return_value,
+		       static_cast<unsigned int>(i->entries.size()));
 
   return return_value;
 };
