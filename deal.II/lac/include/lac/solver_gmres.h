@@ -226,7 +226,6 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 //TODO:[?] Allocate vectors only when needed.
 
   deallog.push("GMRES");
-  
   const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
 
 				   // allocate an array of n_tmp_vectors

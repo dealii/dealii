@@ -270,18 +270,30 @@ SparsityPattern::reinit (const unsigned int               m,
       return;
     };
 
-				   // find out how many entries we
+				   // first, if the matrix is
+				   // quadratic, we will have to make
+				   // sure that each row has at least
+				   // one entry for the diagonal
+				   // element. make this more obvious
+				   // by having a variable which we
+				   // can query
+  const bool matrix_is_quadratic = (m == n ? true : false);
+
+  				   // find out how many entries we
 				   // need in the @p{colnums} array. if
 				   // this number is larger than
 				   // @p{max_vec_len}, then we will need
 				   // to reallocate memory
 				   //
 				   // note that the number of elements
-				   // is bounded by the number of
-				   // columns
+				   // per row is bounded by the number
+				   // of columns
   unsigned int vec_len = 0;
   for (unsigned int i=0; i<m; ++i)
-    vec_len += std::min(row_lengths[i], n);
+    vec_len += std::min((matrix_is_quadratic ?
+			 std::max(row_lengths[i], 1U) :
+			 row_lengths[i]),
+			n);
 
 				   // sometimes, no entries are
 				   // requested in the matrix (this
@@ -298,6 +310,8 @@ SparsityPattern::reinit (const unsigned int               m,
 		    std::min (*std::max_element(row_lengths.begin(), row_lengths.end()),
 			      n));
 
+  if (matrix_is_quadratic && (max_row_length==0) && (m!=0))
+    max_row_length = 1;
 
 				   // allocate memory for the rowstart
 				   // values, if necessary
@@ -320,7 +334,10 @@ SparsityPattern::reinit (const unsigned int               m,
 				   // set the rowstart array 
   rowstart[0] = 0;
   for (unsigned int i=1; i<=rows; ++i)
-    rowstart[i] = rowstart[i-1]+std::min(row_lengths[i-1],n);
+    rowstart[i] = rowstart[i-1] +
+		  (matrix_is_quadratic ?
+		   std::max(std::min(row_lengths[i-1],n),1U) :
+		   std::min(row_lengths[i-1],n));
   Assert ((rowstart[rows]==vec_len)
 	  ||
 	  ((vec_len == 1) && (rowstart[rows] == 0)),
@@ -393,9 +410,13 @@ SparsityPattern::compress ()
 				       // this case only sort the
 				       // remaining entries, otherwise
 				       // sort all
-      std::sort ((rows==cols) ? tmp_entries.begin()+1 : tmp_entries.begin(),
-		 tmp_entries.begin()+row_length);
 
+				       // if this line is empty or has
+				       // only one entry, don't sort
+      if (row_length > 1)
+	std::sort ((rows==cols) ? tmp_entries.begin()+1 : tmp_entries.begin(),
+		   tmp_entries.begin()+row_length);
+      
 				       // insert column numbers
 				       // into the new field
       for (unsigned int j=0; j<row_length; ++j)
@@ -406,7 +427,13 @@ SparsityPattern::compress ()
       rowstart[line] = next_row_start;
       next_row_start = next_free_entry;
 
-				       // some internal checks
+				       // some internal checks: either
+				       // the matrix is not quadratic,
+				       // or if it is, then the first
+				       // element of this row must be
+				       // the diagonal element
+				       // (i.e. with column
+				       // index==line number)
       Assert ((rows!=cols) ||
 	      (new_colnums[rowstart[line]] == line),
 	      ExcInternalError());
