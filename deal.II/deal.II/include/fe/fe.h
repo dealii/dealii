@@ -106,7 +106,7 @@ class FiniteElementData
     const unsigned int transform_functions;
 
 
-/**
+				     /**
 				      * Number of components and dimension of
 				      * the image space.
 				      */
@@ -199,7 +199,7 @@ class FiniteElementData
     unsigned int n_transform_functions () const;
 
 
-/**
+				     /**
 				      * Comparison operator. It is not clear to
 				      * me (WB) why we have to declare and implement
 				      * this one explicitely.

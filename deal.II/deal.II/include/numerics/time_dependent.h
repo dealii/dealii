@@ -434,7 +434,7 @@ class TimeDependent
 		   const TimeSteppingData &data_postprocess);
 
 
-/**
+				     /**
 				      * Destructor. This will delete the
 				      * objects pointed to by the pointers
 				      * given to the #insert_*# and
@@ -604,7 +604,7 @@ class TimeDependent
 		  const Direction         direction);
 
 
-/**
+				     /**
 				      * Initialize the objects for the next
 				      * sweep. This function specifically does
 				      * the following: assign each time
@@ -1075,7 +1075,7 @@ class TimeStepBase : public Subscriptor
     void set_sweep_no (const unsigned int sweep_no);
 
 
-/**
+				     /**
 				      * Copy constructor. I can see no reason
 				      * why someone might want to use it, so
 				      * I don't provide it. Since this class
@@ -1138,7 +1138,7 @@ class TimeStepBase_Tria :  public TimeStepBase
     };
 
 
-/**
+				     /**
 				      * Default constructor. Does nothing but
 				      * throws an exception. We need to have
 				      * such a constructor in order to satisfy
@@ -1633,7 +1633,7 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
     const unsigned int  first_sweep_with_correction;
 
 
-/**
+				     /**
 				      * Apply cell number correction with the
 				      * previous time level only if there are
 				      * more than this number of cells.
@@ -1788,7 +1788,7 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
       };
 
 
-// wake up the first few time levels
+				   // wake up the first few time levels
   for (int step=-timestepping_data.look_ahead; step<0; ++step)
     for (int look_ahead=0;
 	 look_ahead<=static_cast<int>(timestepping_data.look_ahead); ++look_ahead)
@@ -1805,7 +1805,7 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 	};
 
 
-for (unsigned int step=0; step<n_timesteps; ++step)
+  for (unsigned int step=0; step<n_timesteps; ++step)
     {
 				       // first thing: wake up the
 				       // timesteps ahead as necessary
@@ -1824,7 +1824,7 @@ for (unsigned int step=0; step<n_timesteps; ++step)
 	  };
 
 
-// actually do the work
+				       // actually do the work
       switch (direction)
 	{
 	  case forward:

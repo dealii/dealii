@@ -49,7 +49,7 @@ class Vector {
     typedef size_t size_type;
 
 
-/**
+				     /**
 				      * @name 1: Basic Object-handling 
 				      */
 				     //@{
@@ -159,7 +159,7 @@ class Vector {
     Number linfty_norm () const;
 
 
-/**
+				     /**
 				      * Change the dimension of the vector to
 				      * #N#. The reserved memory for this vector
 				      * remains unchanged if possible, to make
@@ -239,7 +239,7 @@ class Vector {
 				     //@}
 
 
-/**
+				     /**
 				      * @name 2: Data-Access
 				      */
 				     //@{
@@ -256,7 +256,7 @@ class Vector {
 				     //@}
 
 
-/**
+				     /**
 				      * @name 3: Modification of vectors
 				      */
 				     //@{
@@ -364,7 +364,7 @@ class Vector {
 				     //@}
 
 
-/**
+				     /**
 				      * @name 5: Mixed stuff
 				      */
 				     //@{

@@ -259,7 +259,7 @@ class FEValuesBase
 		  const FiniteElement<dim> &fe);
 
 
-/**
+				     /**
 				      * Return the value of the #i#th shape
 				      * function at the #j# quadrature point
 				      * on the cell, face or subface selected
@@ -738,7 +738,7 @@ class FEValues : public FEValuesBase<dim>
   public:
 
 
-/**
+				     /**
 				      * Constructor. Fill all arrays with the
 				      * values of the shape functions of the
 				      * specified finite element using the
@@ -883,7 +883,7 @@ class FEValues : public FEValuesBase<dim>
  *  available without complicated matrix-vector-multiplications.
  *    
  *  @author Wolfgang Bangerth, 1998
-*/
+ */
 template <int dim>
 class FEFaceValuesBase : public FEValuesBase<dim>
 {

@@ -720,7 +720,7 @@ class DoFHandler  :  public Subscriptor,
 				     //@}
 
 
-/*---------------------------------------*/
+				     /*---------------------------------------*/
 
 				     /**
 				      *  @name Line iterator functions
@@ -779,7 +779,7 @@ class DoFHandler  :  public Subscriptor,
     active_line_iterator end_active_line (const unsigned int level) const;
 
 
-/**
+				     /**
 				      *  Return an iterator pointing to the
 				      *  last line, used or not.
 				      */
@@ -876,7 +876,7 @@ class DoFHandler  :  public Subscriptor,
     active_quad_iterator end_active_quad (const unsigned int level) const;
 
 
-/**
+				     /**
 				      *  Return an iterator pointing to the
 				      *  last quad, used or not.
 				      */
@@ -1023,7 +1023,7 @@ class DoFHandler  :  public Subscriptor,
 				     /*---------------------------------------*/
 
 
-/**
+				     /**
 				      * Return number of degrees of freedom.
 				      * Included in this number are those
 				      * DoFs which are constrained by

@@ -1781,7 +1781,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 			 const bool   keep_boundary=true);
 
 
-/**
+				     /**
 				      *  @name Mesh refinement
 				      */
 				     /*@{*/
@@ -2042,7 +2042,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     				     /*@}*/
 
 
-/**
+				     /**
 				      *  @name User flag handling
 				      */
 				     /*@{*/
@@ -2226,7 +2226,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     active_cell_iterator end_active (const unsigned int level) const;
 
 
-/**
+				     /**
 				      *  Return an iterator pointing to the
 				      *  last cell, used or not.
 				      *
@@ -2408,7 +2408,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /*@}*/
 
 
-/*---------------------------------------*/
+				     /*---------------------------------------*/
 
 				     /**
 				      *  @name Line iterator functions
@@ -2888,7 +2888,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     				     /*@}*/
 
 
-/**
+				     /**
 				      *  @name Exceptions
 				      */
 				     /*@{*/
@@ -3115,7 +3115,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     void update_number_cache_hexes ();
 
 
-/**
+				     /**
 				      *  Array of pointers pointing to the
 				      *  #TriangulationLevel<dim># objects
 				      *  storing the data on the different

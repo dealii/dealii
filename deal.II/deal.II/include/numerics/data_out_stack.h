@@ -178,7 +178,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 			      const VectorType      vector_type);
 
 
-/**
+				     /**
 				      * Add a data vector for the presently
 				      * set value of the parameter.
 				      *
@@ -391,7 +391,7 @@ class DataOutStack : public DataOutInterface<dim+1>
     virtual const vector<DataOutBase::Patch<dim+1> > & get_patches () const;
 
 
-/**
+				     /**
 				      * Virtual function through
 				      * which the names of data sets are
 				      * obtained by the output functions

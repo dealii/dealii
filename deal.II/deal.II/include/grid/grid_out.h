@@ -213,7 +213,7 @@ class GridOut
     };
 
 
-/**
+				     /**
 				      * Flags describing the details of
 				      * output in GNUPLOT format.
 				      */
@@ -313,7 +313,7 @@ class GridOut
     };
 
 
-/**
+				     /**
 				      * Flags describing the details of
 				      * output for encapsulated postscript
 				      * for all dimensions not explicitely
@@ -371,7 +371,7 @@ class GridOut
 //#endif
 
 
-/**
+				     /**
 				      * Declaration of a name for each of the
 				      * different output formats.
 				      */
@@ -498,7 +498,7 @@ class GridOut
     static string get_output_format_names ();
 
 
-/**
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidState);
@@ -548,7 +548,7 @@ class GridOut
     EpsFlags<3>  eps_flags_3;
 
 
-/**
+				     /**
 				      * Write the grid information about
 				      * faces to #out#. Only those faces
 				      * are printed which are on the boundary

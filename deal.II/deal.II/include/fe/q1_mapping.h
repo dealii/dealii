@@ -177,7 +177,7 @@ class FEQ1Mapping : public FiniteElement<dim>
 					    vector<Tensor<3,dim> >               &jacobians);
 
 
-/**
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInternalError);

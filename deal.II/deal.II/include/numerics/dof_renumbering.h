@@ -246,7 +246,7 @@ class DoFRenumbering
 				const vector<unsigned int> &component_order = vector<unsigned int>());
 
 
-/**
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcRenumberingIncomplete);

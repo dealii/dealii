@@ -345,7 +345,9 @@ class FESystem : public FiniteElement<dim>
 				     vector<Point<dim> >         &normal_vectors) const;
 
 				     /**
-				      * Implementation of the corresponding function of #FiniteElement#.
+				      * Implementation of the
+				      * corresponding function of
+				      * #FiniteElement#.
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >            &unit_points,
@@ -399,7 +401,8 @@ class FESystem : public FiniteElement<dim>
   private:
 
 				     /**
-				      * Pairs of multiplicity and element type.
+				      * Pairs of multiplicity and
+				      * element type.
 				      */
     typedef pair<const FiniteElement<dim> *, unsigned int> ElementPair;
     
@@ -417,7 +420,7 @@ class FESystem : public FiniteElement<dim>
     vector< ElementPair > base_elements;
 
 
-/**
+				     /**
 				      * Helper function used in the constructor:
 				      * take a #FiniteElementData# object
 				      * and return an object of the same type
@@ -455,7 +458,7 @@ class FESystem : public FiniteElement<dim>
 			  const unsigned int            N3);
 
 
-/**
+				     /**
 				      * Helper function used in the constructor:
 				      * takes a #FiniteElement# object
 				      * and returns an boolean vector including
@@ -466,6 +469,7 @@ class FESystem : public FiniteElement<dim>
     static vector<bool>
     compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
 					   const unsigned int        N);
+    
     				     /**
 				      * Same as above for mixed elements
 				      * with two different sub-elements.

@@ -393,7 +393,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 	vector<unsigned char> material_id;
 
 
-/**
+					 /**
 					  * Pointer which is not used by the
 					  * library but may be accessed an set
 					  * by the user to handle data local to
@@ -499,7 +499,7 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 	vector<unsigned char> material_id;
 
 
-/**
+					 /**
 					  * Pointer which is not used by the
 					  * library but may be accessed an set
 					  * by the user to handle data local to

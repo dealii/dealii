@@ -511,7 +511,7 @@ class VectorTools
 				    const vector<bool> &p_select);
 
 
-/**
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcNotUseful);

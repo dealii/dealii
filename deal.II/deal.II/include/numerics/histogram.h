@@ -72,7 +72,7 @@ class Histogram
     };
 
 
-/**
+				     /**
 				      * Take several lists of values, each on
 				      * to produce one histogram that will
 				      * then be arrange one behind each other.
