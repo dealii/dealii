@@ -89,14 +89,16 @@ void
 DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_indices.size() == 0, ExcVectorNotEmpty());
-  
-  dof_indices.reserve (dof_handler->get_selected_fe().total_dofs);
+  Assert (dof_indices.size() == (2*dof_handler->get_selected_fe().dofs_per_vertex +
+				 dof_handler->get_selected_fe().dofs_per_line),
+	  ExcVectorDoesNotMatch());
+
+  vector<int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
-      dof_indices.push_back (vertex_dof_index(vertex,d));
+      *next++ = vertex_dof_index(vertex,d);
   for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
-    dof_indices.push_back (dof_index(d));
+    *next++ = dof_index(d);
 };
 
 
@@ -200,17 +202,20 @@ void
 DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_indices.size() == 0, ExcVectorNotEmpty());
-  
-  dof_indices.reserve (dof_handler->get_selected_fe().total_dofs);
+  Assert (dof_indices.size() == (4*dof_handler->get_selected_fe().dofs_per_vertex +
+				 4*dof_handler->get_selected_fe().dofs_per_line +
+				 dof_handler->get_selected_fe().dofs_per_quad),
+	  ExcVectorDoesNotMatch());
+
+  vector<int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
-      dof_indices.push_back (vertex_dof_index(vertex,d));
+      *next++ = vertex_dof_index(vertex,d);
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
-      dof_indices.push_back (this->line(line)->dof_index(d));
+      *next++ = this->line(line)->dof_index(d);
   for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_quad; ++d)
-    dof_indices.push_back (dof_index(d));
+    *next++ = dof_index(d);
 };
 
 

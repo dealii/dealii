@@ -163,7 +163,7 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 
   if (coefficient != 0)
     {
-      vector<double> coefficient_values;
+      vector<double> coefficient_values (fe_values.n_quadrature_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -194,12 +194,12 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
   
   const dFMatrix       &values    = fe_values.get_shape_values ();
   const vector<double> &weights   = fe_values.get_JxW_values ();
-  vector<double>        rhs_values;
+  vector<double>        rhs_values (fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
   if (coefficient != 0)
     {
-      vector<double> coefficient_values;
+      vector<double> coefficient_values (fe_values.n_quadrature_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -239,7 +239,7 @@ void MassMatrix<dim>::assemble (dVector             &rhs,
   
   const dFMatrix       &values    = fe_values.get_shape_values ();
   const vector<double> &weights   = fe_values.get_JxW_values ();
-  vector<double>        rhs_values;
+  vector<double>        rhs_values(fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -270,13 +270,13 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
   
   const vector<vector<Point<dim> > >&gradients = fe_values.get_shape_grads ();
   const dFMatrix       &values    = fe_values.get_shape_values ();
-  vector<double>        rhs_values;
+  vector<double>        rhs_values(fe_values.n_quadrature_points);
   const vector<double> &weights   = fe_values.get_JxW_values ();
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
   if (coefficient != 0)
     {
-      vector<double> coefficient_values;
+      vector<double> coefficient_values(fe_values.n_quadrature_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -318,7 +318,7 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
    
   if (coefficient != 0)
     {
-      vector<double> coefficient_values;
+      vector<double> coefficient_values(fe_values.n_quadrature_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -348,7 +348,7 @@ void LaplaceMatrix<dim>::assemble (dVector             &rhs,
   
   const dFMatrix       &values    = fe_values.get_shape_values ();
   const vector<double> &weights   = fe_values.get_JxW_values ();
-  vector<double>        rhs_values;
+  vector<double>        rhs_values(fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
    
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)

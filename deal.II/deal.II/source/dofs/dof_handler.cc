@@ -1193,13 +1193,10 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
     if (new_cell->active() && old_cell->active())
 				       // both cells have no children
       {
-	vector<int> old_dofs, new_dofs;
+	vector<int> old_dofs(selected_fe->total_dofs);
+	vector<int> new_dofs(selected_fe->total_dofs);
 	old_cell->get_dof_indices (old_dofs);
 	new_cell->get_dof_indices (new_dofs);
-	Assert (old_dofs.size() == selected_fe->total_dofs,
-		ExcInternalError ());
-	Assert (new_dofs.size() == selected_fe->total_dofs,
-		ExcInternalError ());
 
 					 // copy dofs one-by-one
 	for (unsigned int j=0; j<old_dofs.size(); ++j)
@@ -1218,20 +1215,14 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    };
 	  
 					   // numbers of old dofs
-	  vector<int> old_dof_indices;
+	  vector<int> old_dof_indices (selected_fe->total_dofs);
 	  old_cell->get_dof_indices (old_dof_indices);
-
-	  Assert (old_dof_indices.size() == selected_fe->total_dofs,
-		  ExcInternalError ());
 
 	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
 					       // numbers of child dofs
-	      vector<int> child_dof_indices;
+	      vector<int> child_dof_indices(selected_fe->total_dofs);
 	      child[c]->get_dof_indices (child_dof_indices);
-
-	      Assert (child_dof_indices.size() == selected_fe->total_dofs,
-		      ExcInternalError ());
 
 	      for (unsigned int k=0; k<selected_fe->total_dofs; ++k)
 		for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
@@ -1250,20 +1241,14 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    };
 	  
 	      					   // numbers of new dofs
-	  vector<int> new_dof_indices;
+	  vector<int> new_dof_indices(selected_fe->total_dofs);
 	  new_cell->get_dof_indices(new_dof_indices);
-
-	  Assert (new_dof_indices.size() == selected_fe->total_dofs,
-		  ExcInternalError ());
 	  
 	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
 					       // numbers of child dofs
-	      vector<int> child_dof_indices;
+	      vector<int> child_dof_indices (selected_fe->total_dofs);
 	      child[c]->get_dof_indices (child_dof_indices);
-
-	      Assert (child_dof_indices.size() == selected_fe->total_dofs,
-		      ExcInternalError ());
 
 	      for (unsigned int k=0; k<selected_fe->total_dofs; ++k)
 		for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
@@ -1289,13 +1274,10 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
     if (new_cell->active() && old_cell->active())
 				       // both cells have no children
       {
-	vector<int> old_dofs, new_dofs;
+	vector<int> old_dofs (selected_fe->total_dofs);
+	vector<int> new_dofs (selected_fe->total_dofs);
 	old_cell->get_dof_indices (old_dofs);
 	new_cell->get_dof_indices (new_dofs);
-	Assert (old_dofs.size() == selected_fe->total_dofs,
-		ExcInternalError ());
-	Assert (new_dofs.size() == selected_fe->total_dofs,
-		ExcInternalError ());
 
 					 // copy dofs one-by-one
 	for (unsigned int j=0; j<old_dofs.size(); ++j)
@@ -1314,20 +1296,14 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    };
 	  
 					   // numbers of old dofs
-	  vector<int> old_dof_indices;
+	  vector<int> old_dof_indices (selected_fe->total_dofs);
 	  old_cell->get_dof_indices (old_dof_indices);
-
-	  Assert (old_dof_indices.size() == selected_fe->total_dofs,
-		  ExcInternalError ());
 
 	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
 					       // numbers of child dofs
-	      vector<int> child_dof_indices;
+	      vector<int> child_dof_indices (selected_fe->total_dofs);
 	      child[c]->get_dof_indices (child_dof_indices);
-
-	      Assert (child_dof_indices.size() == selected_fe->total_dofs,
-		      ExcInternalError ());
 
 	      for (unsigned int k=0; k<selected_fe->total_dofs; ++k)
 		for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
@@ -1347,20 +1323,14 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    };
 	  
 	      					   // numbers of new dofs
-	  vector<int> new_dof_indices;
+	  vector<int> new_dof_indices (selected_fe->total_dofs);
 	  new_cell->get_dof_indices(new_dof_indices);
-
-	  Assert (new_dof_indices.size() == selected_fe->total_dofs,
-		  ExcInternalError ());
 	  
 	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
 					       // numbers of child dofs
-	      vector<int> child_dof_indices;
+	      vector<int> child_dof_indices (selected_fe->total_dofs);
 	      child[c]->get_dof_indices (child_dof_indices);
-
-	      Assert (child_dof_indices.size() == selected_fe->total_dofs,
-		      ExcInternalError ());
 
 	      for (unsigned int k=0; k<selected_fe->total_dofs; ++k)
 		for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
@@ -1482,12 +1452,11 @@ void DoFHandler<dim>::distribute_cell_to_dof_vector (const dVector &cell_data,
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   unsigned int present_cell = 0;
-  vector<int> dof_indices;
   const unsigned int total_dofs = selected_fe->total_dofs;
+  vector<int> dof_indices (total_dofs);
   
   for (; cell!=endc; ++cell, ++present_cell) 
     {
-      dof_indices.resize (0);
       cell->get_dof_indices (dof_indices);
       for (unsigned int i=0; i<total_dofs; ++i)
 	{

@@ -87,6 +87,10 @@ class DoFAccessor {
 				      * Exception
 				      */
     DeclException0 (ExcVectorNotEmpty);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcVectorDoesNotMatch);
 
   protected:
 				     /**
@@ -202,9 +206,8 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * on vertex 0, dofs on vertex 1, 
 				      * dofs on line.
 				      *
-				      * The dof indices are appended to the end
-				      * of the vector. It is assumed that
-				      * the vector be empty beforehand.
+				      * It is assumed that the vector already
+				      * has the right size beforehand.
 				      */
     void get_dof_indices (vector<int> &dof_indices) const;
 
@@ -289,9 +292,8 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * dofs on line 0, dofs on line 1, etc,
 				      * dofs on quad 0, etc.
 				      *
-				      * The dof indices are appended to the end
-				      * of the vector. It is assumed that
-				      * the vector be empty beforehand.
+				      * It is assumed that the vector already
+				      * has the right size beforehand.
 				      */
     void get_dof_indices (vector<int> &dof_indices) const;
 
@@ -489,10 +491,6 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
     void get_dof_values (const dVector  &values,
 			 vector<double> &dof_values) const;
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcVectorDoesNotMatch);
     				     /**
 				      *  Exception
 				      */

@@ -59,10 +59,10 @@ template <int dim>
 void ProblemBase<dim>::clear () {
   tria        = 0;
   dof_handler = 0;
-  system_sparsity.reinit (0,0,0);
+  system_sparsity.reinit (1,1,1);
   system_matrix.clear ();
-  right_hand_side.reinit (0);
-  solution.reinit (0);
+  right_hand_side.reinit (1);
+  solution.reinit (1);
   constraints.clear ();
 };
 
@@ -212,7 +212,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 					     // and assign that to the vector
 					     // \psi.
 	    const unsigned int n_q_points = q.n_quadrature_points;
-	    vector<double>   psi;
+	    vector<double>   psi (n_q_points);
 
 					     // in praxi: first compute
 					     // exact solution vector
@@ -300,7 +300,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 					     // same procedure as above, but now
 					     // psi is a vector of gradients
 	    const unsigned int n_q_points = q.n_quadrature_points;
-	    vector<Point<dim> >   psi;
+	    vector<Point<dim> >   psi (n_q_points);
 
 					     // in praxi: first compute
 					     // exact solution vector
@@ -503,12 +503,9 @@ ProblemBase<dim>::make_boundary_value_list (const FunctionMap        &dirichlet_
   FunctionMap::const_iterator function_ptr;
 
 				   // field to store the indices of dofs
-				   // initialize once to get the size right
-				   // for the following fields.
-  vector<int>         face_dofs;
-  face->get_dof_indices (face_dofs);
+  vector<int>         face_dofs (fe.dofs_per_face);
   vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
-  vector<double>      dof_values;
+  vector<double>      dof_values (fe.dofs_per_face);
 	
   for (; face!=endf; ++face)
     if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
@@ -519,8 +516,6 @@ ProblemBase<dim>::make_boundary_value_list (const FunctionMap        &dirichlet_
 					 // get indices, physical location and
 					 // boundary values of dofs on this
 					 // face
-	face_dofs.erase (face_dofs.begin(), face_dofs.end());
-	dof_values.erase (dof_values.begin(), dof_values.end());
 	face->get_dof_indices (face_dofs);
 	fe.get_face_ansatz_points (face, boundary, dof_locations);
 	function_ptr->second->value_list (dof_locations, dof_values);
