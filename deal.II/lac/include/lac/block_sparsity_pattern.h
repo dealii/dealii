@@ -127,6 +127,24 @@ class BlockSparsityPattern : public Subscriptor
     const SparsityPattern &
     block (const unsigned int row,
 	   const unsigned int column) const;    
+
+				     /**
+				      * Grant access to the object
+				      * describing the distribution of
+				      * row indices to the individual
+				      * blocks.
+				      */
+    const BlockIndices<rows> &
+    get_row_indices () const;
+
+				     /**
+				      * Grant access to the object
+				      * describing the distribution of
+				      * column indices to the individual
+				      * blocks.
+				      */
+    const BlockIndices<columns> &
+    get_column_indices () const;
     
 				     /**
 				      * This function compresses the
@@ -301,6 +319,26 @@ BlockSparsityPattern<rows,columns>::block (const unsigned int row,
 					   const unsigned int column) const
 {
   return sub_objects[row][column];
+};
+
+
+
+template <int rows, int columns>
+inline
+const BlockIndices<rows> &
+BlockSparsityPattern<rows,columns>::get_row_indices () const
+{
+  return row_indices;
+};
+
+
+
+template <int rows, int columns>
+inline
+const BlockIndices<columns> &
+BlockSparsityPattern<rows,columns>::get_column_indices () const
+{
+  return column_indices;
 };
 
 
