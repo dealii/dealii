@@ -471,6 +471,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: The new functions <code
+       class="member">SparsityPattern::partition</code>, <code
+       class="member">GridTools::partition_triangulation</code>, <code
+       class="member">DoFTools::get_subdomain_association</code>, and <code
+       class="member">DoFRenumbering::subdomain_wise</code> can now be used to
+       generate partitions of a triangulation and its associated degrees of
+       freedom suitable for parallel computations with PETSc.
+       <br>
+       (WB 2004/03/08)
+       </p>
+
   <li> <p> Changed: The classes <code class="class">DataOut*</code> and <code
        class="class">KellyErrorEstimator</code> have been generalized to take
        more and different vector types as input parameters. In particular,
