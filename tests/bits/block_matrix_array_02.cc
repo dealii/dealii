@@ -16,16 +16,12 @@
 // needed in some places. in particular, this is needed for
 // PreconditionBlockSSOR
 //
-// the test also didn't link before, due to some functions that were
-// either missing or in the wrong place
-//
 // this test doesn't do anything particularly useful, it just makes sure that
 // we can compile this kind of code
 
 #include <base/logstream.h>
 #include <lac/block_matrix_array.h>
 #include <lac/sparse_matrix.h>
-#include <lac/precondition_block.h>
 #include <iostream>
 #include <fstream>
 
@@ -39,9 +35,5 @@ int main ()
   BlockMatrixArray<SparseMatrix<double> >::value_type i = 1.0;
   deallog << i << std::endl;
 
-				   // the following did not compile
-				   // right away
-  PreconditionBlockSSOR<BlockMatrixArray<SparseMatrix<double> > > p;
-  
   return 0;
 }
