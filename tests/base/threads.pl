@@ -1,4 +1,4 @@
-#----------------------------  timer.cc  ---------------------------
+#----------------------------  threads.pl  ---------------------------
 #    $Id$
 #    Version: $Name$
 #
@@ -9,7 +9,7 @@
 #    to the file deal.II/doc/license.html for the  text  and
 #    further information on this license.
 #
-#----------------------------  timer.cc  ---------------------------
+#----------------------------  threads.pl  ---------------------------
 
 # This is the script with which threads.cc is generated
 #
