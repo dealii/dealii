@@ -11388,7 +11388,7 @@ FEQ3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
   Assert (local_mass_matrix.m() == dofs_per_cell,
 	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
 
-  AssertThrow (false, ExcComputationNotUseful(3));
+  throw ExcComputationNotUseful(3);
 };
 
 
