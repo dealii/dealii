@@ -27,20 +27,35 @@ documentation, etc</a>.
 
 <ol>
   <li> <p> Changed: The build system was entirely revised. Object
-       files in debug more now have the suffix <code>.g.o</code>
-       instead of <code>.go</code>. All object files from the
-       subdirectories are now placed into the <code>/lib</code>
-       top-level directory, rather than in library directories in the
-       individual subdirs.
-       <br>
-       (WB 2002/02/1)
-       </p>
+  files in debug more now have the suffix <code>.g.o</code> instead of
+  <code>.go</code>. All object files from the subdirectories are now
+  placed into the <code>/lib</code> top-level directory, rather than
+  in library directories in the individual subdirs.
+  <br>
+  (WB 2002/02/11)
+  </p>
 </ol>
 
 
 
 <a name="base"></a>
 <h3>base</h3>
+
+  <li> <p> Changed: The quite logorrhoeic function name <code
+  class="class">TensorProductPolynomials</code>::<code
+  class="member">n_tensor_product_polynomials</code> was changed to
+  <code class="member">n</code> to be compliant wth the new class <code
+  class="class">PolynomialSpace</code>.
+  <br>
+  GK 2002/02/11)
+  </p>
+
+  <li> <p> New: The class <code class="class">PolynomialSpace</code>
+  implements the space of polynomials at most a certain degree in
+  arbitrary space dimensions.
+  <br>
+  GK 2002/02/11)
+  </p>
 
 <ol>
 </ol>
@@ -52,18 +67,24 @@ documentation, etc</a>.
 
 <ol>
   <li> <p> New: Functions <code
-       class="member">SparsityPattern::copy_from</code> and <code
-       class="member">SparseMatrix::copy_from</code> allow to copy a
-       full matrix into a sparse matrix.
-       <br>
-       (WB 2002/02/06)
-       </p>
+  class="member">SparsityPattern::copy_from</code> and <code
+  class="member">SparseMatrix::copy_from</code> allow to copy a full
+  matrix into a sparse matrix.
+  <br>
+  (WB 2002/02/06)
+  </p>
 </ol>
 
 
 
 <a name="deal.II"></a>
 <h3>deal.II</h3>
+
+  <li> <p> New: Finite element family with complete polynomial spaces
+  for discontinuous Galerkin: <code class="class">FE_DGP</code>
+  <br>
+  GK 2002/02/11)
+  </p>
 
 <ol>
 </ol>
