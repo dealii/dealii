@@ -47,20 +47,115 @@ class TensorProductPolynomials
     TensorProductPolynomials(const std::vector<Pol> &pols);
 
 				     /**
-				      * Calculates the polynomials
-				      * and their derivatives at
-				      * @p{unit_point}.
+				      * Computes the value and the
+				      * first and second derivatives
+				      * of each tensor product
+				      * polynomial at @p{unit_point}.
 				      *
-				      * The vectors must either have
-				      * length @p{0} or number of
-				      * polynomials. In the first
-				      * case, the function will not
-				      * compute these values.
+				      * The size of the vectors must
+				      * either be equal @p{0} or equal
+				      * @p{n_tensor_pols}.  In the
+				      * first case, the function will
+				      * not compute these values.
+				      *
+				      * If you need values or
+				      * derivatives of all tensor
+				      * product polynomials then use
+				      * this function, rather than
+				      * using any of the
+				      * @p{compute_value},
+				      * @p{compute_grad} or
+				      * @p{compute_grad_grad}
+				      * functions, see below, in a
+				      * loop over all tensor product
+				      * polynomials.
 				      */
-    void compute (const Point<dim>                     &unit_point,
-		  std::vector<double>                  &values,
-		  typename std::vector<Tensor<1,dim> > &grads,
-		  typename std::vector<Tensor<2,dim> > &grad_grads) const;
+    void compute(const Point<dim>                     &unit_point,
+		 std::vector<double>                  &values,
+		 typename std::vector<Tensor<1,dim> > &grads,
+		 typename std::vector<Tensor<2,dim> > &grad_grads) const;
+    
+				     /**
+				      * Computes the value of the
+				      * @p{i}th tensor product
+				      * polynomial at
+				      * @p{unit_point}. Here @p{i} is
+				      * given in tensor product
+				      * numbering.
+				      *
+				      * Note, that using this function
+				      * within a loop over all tensor
+				      * product polynomials is not
+				      * efficient, because then each
+				      * point value of the underlying
+				      * (one-dimensional) polynomials
+				      * is (unnecessarily) computed
+				      * several times.  Instead use
+				      * the @p{compute} function, see
+				      * above, with
+				      * @p{values.size()==n_tensor_pols}
+				      * to get the point values of all
+				      * tensor polynomials all at once
+				      * and in a much more efficient
+				      * way.
+				      */
+    double compute_value (const unsigned int i,
+			  const Point<dim> &p) const;
+
+				     /**
+				      * Computes the grad of the
+				      * @p{i}th tensor product
+				      * polynomial at
+				      * @p{unit_point}. Here @p{i} is
+				      * given in tensor product
+				      * numbering.
+				      *
+				      * Note, that using this function
+				      * within a loop over all tensor
+				      * product polynomials is not
+				      * efficient, because then each
+				      * derivative value of the
+				      * underlying (one-dimensional)
+				      * polynomials is (unnecessarily)
+				      * computed several times.
+				      * Instead use the @p{compute}
+				      * function, see above, with
+				      * @p{grads.size()==n_tensor_pols}
+				      * to get the point value of all
+				      * tensor polynomials all at once
+				      * and in a much more efficient
+				      * way.
+				      */
+    Tensor<1,dim> compute_grad (const unsigned int i,
+				const Point<dim> &p) const;
+
+				     /**
+				      * Computes the second
+				      * derivative (grad_grad) of the
+				      * @p{i}th tensor product
+				      * polynomial at
+				      * @p{unit_point}. Here @p{i} is
+				      * given in tensor product
+				      * numbering.
+				      *
+				      * Note, that using this function
+				      * within a loop over all tensor
+				      * product polynomials is not
+				      * efficient, because then each
+				      * derivative value of the
+				      * underlying (one-dimensional)
+				      * polynomials is (unnecessarily)
+				      * computed several times.
+				      * Instead use the @p{compute}
+				      * function, see above, with
+				      * @p{grad_grads.size()==n_tensor_pols}
+				      * to get the point value of all
+				      * tensor polynomials all at once
+				      * and in a much more efficient
+				      * way.
+				      */
+    Tensor<2,dim> compute_grad_grad(const unsigned int i,
+				    const Point<dim> &p) const;
 
 				     /**
 				      * Returns the number of tensor
@@ -92,11 +187,17 @@ class TensorProductPolynomials
 				      */
     const unsigned int n_tensor_pols;
 
-
+				     /**
+				      * @p{n_pols_to[n]=polynomials.size()^n}
+				      * Filled by the constructor.
+				      *
+				      * For internal use only. 
+				      */
+    std::vector<unsigned int> n_pols_to;
+    
+    
     static unsigned int power(const unsigned int x, const unsigned int y);
 };
-
-
 
 
 
@@ -105,8 +206,16 @@ template <class Pol>
 TensorProductPolynomials<dim>::TensorProductPolynomials(
   const std::vector<Pol> &pols):
 		polynomials (pols.begin(), pols.end()),
-		n_tensor_pols(power(pols.size(), dim))
-{}
+		n_tensor_pols(power(pols.size(), dim)),
+		n_pols_to(dim+1)
+{
+  const unsigned int n_pols=polynomials.size();
+
+  n_pols_to[0]=1;
+  for (unsigned int i=0; i<dim; ++i)
+    n_pols_to[i+1]=n_pols_to[i]*n_pols;
+  Assert(n_pols_to[dim]==n_tensor_pols, ExcInternalError());
+}
 
 
 

@@ -17,6 +17,7 @@
 
 
 
+
 template <int dim>
 unsigned int TensorProductPolynomials<dim>::power(const unsigned int x,
 						  const unsigned int y)
@@ -28,6 +29,84 @@ unsigned int TensorProductPolynomials<dim>::power(const unsigned int x,
 }
 
 
+
+template <int dim>
+double
+TensorProductPolynomials<dim>::compute_value(const unsigned int i,
+					     const Point<dim> &p) const
+{
+  const unsigned int n_pols=polynomials.size();
+  
+  double value=1.;
+  for (unsigned int d=0; d<dim; ++d)
+    value *= polynomials[(i/n_pols_to[d])%n_pols].value(p(d));
+  
+  return value;
+}
+
+  
+template <int dim>
+Tensor<1,dim>
+TensorProductPolynomials<dim>::compute_grad(const unsigned int i,
+					    const Point<dim> &p) const
+{
+  const unsigned int n_pols=polynomials.size();
+  
+  std::vector<std::vector<double> > v(dim, std::vector<double> (2));
+
+  for (unsigned int d=0; d<dim; ++d)
+    polynomials[(i/n_pols_to[d])%n_pols].value(p(d), v[d]);
+  
+  Tensor<1,dim> grad;
+  for (unsigned int d=0; d<dim; ++d)
+    grad[d]=1.;
+  
+  for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int x=0; x<dim; ++x)
+      grad[d]*=v[x][d==x];
+  
+  return grad;
+}
+
+
+template <int dim>
+Tensor<2,dim>
+TensorProductPolynomials<dim>::compute_grad_grad(const unsigned int i,
+						 const Point<dim> &p) const
+{
+  const unsigned int n_pols=polynomials.size();
+    
+  std::vector<std::vector<double> > v(dim, std::vector<double> (3));
+  for (unsigned int d=0; d<dim; ++d)
+    polynomials[(i/n_pols_to[d])%n_pols].value(p(d), v[d]);
+  
+  Tensor<2,dim> grad_grad;
+
+  for (unsigned int d1=0; d1<dim; ++d1)
+    for (unsigned int d2=0; d2<dim; ++d2)
+      grad_grad[d1][d2]=1.;
+  
+  for (unsigned int x=0; x<dim; ++x)
+    for (unsigned int d1=0; d1<dim; ++d1)
+      for (unsigned int d2=0; d2<dim; ++d2)
+	{
+	  unsigned int derivative=0;
+	  if (d1==x || d2==x)
+	    {
+	      if (d1==d2)
+		derivative=2;
+	      else
+		derivative=1;
+	    } 
+	  grad_grad[d1][d2]*=v[x][derivative];
+	}
+
+  return grad_grad;
+}
+
+
+
+
 template <int dim>
 void TensorProductPolynomials<dim>::compute(
   const Point<dim>                     &p,
@@ -35,12 +114,7 @@ void TensorProductPolynomials<dim>::compute(
   typename std::vector<Tensor<1,dim> > &grads,
   typename std::vector<Tensor<2,dim> > &grad_grads) const
 {
-  unsigned int n_pols=polynomials.size();
-  std::vector<unsigned int> n_pols_to(dim+1);
-  n_pols_to[0]=1;
-  for (unsigned int i=0; i<dim; ++i)
-    n_pols_to[i+1]=n_pols_to[i]*n_pols;
-  Assert(n_pols_to[dim]==n_tensor_pols, ExcInternalError());
+  const unsigned int n_pols=polynomials.size();
   
   Assert(values.size()==n_tensor_pols || values.size()==0,
 	 ExcDimensionMismatch2(values.size(), n_tensor_pols, 0));
