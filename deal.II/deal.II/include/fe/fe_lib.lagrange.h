@@ -297,6 +297,313 @@ class FEQuadraticSub : public FiniteElement<dim> {
 
 
 
+/**
+ * Define a (bi-, tri-, etc)cubic finite element in #dim# space dimensions.
+ * A linear (subparametric) mapping from the unit cell
+ * to the real cell is implemented.
+ *
+ * The numbering of degrees of freedom in one spatial dimension is as follows:
+ * \begin{verbatim}
+ *   0--2--3--1
+ * \end{verbatim}
+ *
+ * The numbering of degrees of freedom in two spatial dimension is as follows:
+ * \begin{verbatim}
+ *   3--8--9--2
+ *   |        |
+ *   11 15 14 7
+ *   |        |
+ *   10 12 13 6
+ *   |        |
+ *   0--4--5--1
+ * \end{verbatim}
+ * Note the reverse ordering of degrees of freedom on the left and upper
+ * line and the counterclockwise numbering of the interior degrees of
+ * freedom.
+ */
+template <int dim>
+class FECubicSub : public FiniteElement<dim> {
+  public:
+				     /**
+				      * Constructor
+				      */
+    FECubicSub ();
+
+				     /**
+				      * Return the value of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      */
+    virtual double shape_value(const unsigned int i,
+			       const Point<dim>& p) const;
+
+				     /**
+				      * Return the gradient of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      */
+    virtual Point<dim> shape_grad(const unsigned int i,
+				  const Point<dim>& p) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      *
+				      * For one dimensional elements, this
+				      * function simply passes through to
+				      * the one implemented in the base class.
+				      */
+    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+				 const vector<Point<dim> >            &unit_points,
+				 vector<dFMatrix>    &jacobians,
+				 const bool           compute_jacobians,
+				 vector<Point<dim> > &ansatz_points,
+				 const bool           compute_ansatz_points,
+				 vector<Point<dim> > &q_points,
+				 const bool           compute_q_points,
+				 const Boundary<dim> &boundary) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+				    const Boundary<dim> &boundary,
+				    vector<Point<dim> > &ansatz_points) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+					 const Boundary<dim> &boundary,
+					 vector<Point<dim> > &ansatz_points) const;
+
+    				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
+				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<double>      &face_jacobi_determinants) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+					const unsigned int           subface_no,
+					const vector<Point<dim-1> > &unit_points,
+					vector<double>      &face_jacobi_determinants) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+				     const unsigned int          face_no,
+				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<Point<dim> >         &normal_vectors) const;    
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+				     const unsigned int           subface_no,
+				     const unsigned int           face_no,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<Point<dim> >         &normal_vectors) const;    
+
+    				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+					const Boundary<dim> &boundary,
+					dFMatrix &local_mass_matrix) const;
+
+  private:
+    				     /**
+				      * Return the value of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      * Here, the (bi-)linear basis functions
+				      * are meant, which are used for the
+				      * computation of the transformation from
+				      * unit cell to real space cell.
+				      */
+    double linear_shape_value(const unsigned int i,
+			      const Point<dim>& p) const;
+
+				     /**
+				      * Return the gradient of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      * Here, the (bi-)linear basis functions
+				      * are meant, which are used for the
+				      * computation of the transformation from
+				      * unit cell to real space cell.
+				      */
+    Point<dim> linear_shape_grad(const unsigned int i,
+				 const Point<dim>& p) const;
+};
+
+
+
+/**
+ * Define a (bi-, tri-, etc)cubic finite element in #dim# space dimensions.
+ * A linear (subparametric) mapping from the unit cell
+ * to the real cell is implemented.
+ *
+ * The numbering of degrees of freedom in one spatial dimension is as follows:
+ * \begin{verbatim}
+ *   0--2--3--4--1
+ * \end{verbatim}
+ *
+ * The numbering of degrees of freedom in two spatial dimension is as follows:
+ * \begin{verbatim}
+ *   3--10-11-12-2
+ *   |           |
+ *   15 19 22 18 9
+ *   |           |
+ *   14 23 24 21 8
+ *   |           |
+ *   13 16 20 17 7
+ *   |           |
+ *   0--4--5--6--1
+ * \end{verbatim}
+ * Note the reverse ordering of degrees of freedom on the left and upper
+ * line and the numbering of the interior degrees of
+ * freedom.
+ */
+template <int dim>
+class FEQuarticSub : public FiniteElement<dim> {
+  public:
+				     /**
+				      * Constructor
+				      */
+    FEQuarticSub ();
+
+				     /**
+				      * Return the value of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      */
+    virtual double shape_value(const unsigned int i,
+			       const Point<dim>& p) const;
+
+				     /**
+				      * Return the gradient of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      */
+    virtual Point<dim> shape_grad(const unsigned int i,
+				  const Point<dim>& p) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      *
+				      * For one dimensional elements, this
+				      * function simply passes through to
+				      * the one implemented in the base class.
+				      */
+    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+				 const vector<Point<dim> >            &unit_points,
+				 vector<dFMatrix>    &jacobians,
+				 const bool           compute_jacobians,
+				 vector<Point<dim> > &ansatz_points,
+				 const bool           compute_ansatz_points,
+				 vector<Point<dim> > &q_points,
+				 const bool           compute_q_points,
+				 const Boundary<dim> &boundary) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+				    const Boundary<dim> &boundary,
+				    vector<Point<dim> > &ansatz_points) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+					 const Boundary<dim> &boundary,
+					 vector<Point<dim> > &ansatz_points) const;
+
+    				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
+				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<double>      &face_jacobi_determinants) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+					const unsigned int           subface_no,
+					const vector<Point<dim-1> > &unit_points,
+					vector<double>      &face_jacobi_determinants) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+				     const unsigned int          face_no,
+				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<Point<dim> >         &normal_vectors) const;    
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+				     const unsigned int           subface_no,
+				     const unsigned int           face_no,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<Point<dim> >         &normal_vectors) const;    
+
+    				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+					const Boundary<dim> &boundary,
+					dFMatrix &local_mass_matrix) const;
+
+  private:
+    				     /**
+				      * Return the value of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      * Here, the (bi-)linear basis functions
+				      * are meant, which are used for the
+				      * computation of the transformation from
+				      * unit cell to real space cell.
+				      */
+    double linear_shape_value(const unsigned int i,
+			      const Point<dim>& p) const;
+
+				     /**
+				      * Return the gradient of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      * Here, the (bi-)linear basis functions
+				      * are meant, which are used for the
+				      * computation of the transformation from
+				      * unit cell to real space cell.
+				      */
+    Point<dim> linear_shape_grad(const unsigned int i,
+				 const Point<dim>& p) const;
+};
+
+
+
+
 
 /*----------------------------   fe_lib.h     ---------------------------*/
 /* end of #ifndef __fe_lib_H */

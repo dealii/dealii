@@ -454,6 +454,14 @@ struct FiniteElementBase : public FiniteElementData<dim> {
  *   since wrong results will most likely lead to internal errors through
  *   the #Assert# mechanism, but the first places will lead to undiscovered
  *   errors if not thought of properly.
+ *
+ *   This assumption also comes into play when computing the constraints of
+ *   hanging nodes. If functions not located on a certain face vanish on
+ *   that face (they do for Lagrange elements), then the distribution of
+ *   constrained nodes happens with the face nodes on the large call. If
+ *   the assumption does not hold, then the distribution has to happen
+ *   with all nodes on the small and the large cells. This is not
+ *   implemented in the #DoFHandler# class as of now.
  * \end{itemize}
  *
  * @author Wolfgang Bangerth, 1998
