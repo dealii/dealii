@@ -36,6 +36,8 @@ JobIdentifier::JobIdentifier()
   char name[100];
   gethostname(name,99);
   id += std::string(name) + std::string(" ");
+#else
+  id += std::string("unknown ");
 #endif
 
   id += std::string(std::ctime(&t));
