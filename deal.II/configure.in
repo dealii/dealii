@@ -341,7 +341,7 @@ dnl -------------------------------------------------------------
 AC_MSG_RESULT()
 AC_MSG_RESULT(------------------ checking compiler flags ------------------)
 
-dnl Possible add some flags is optimizations are requested
+dnl Possibly add some flags is optimizations are requested
 DEAL_II_CHECK_CPU_OPTIMIZATIONS
 
 dnl Last check: test whether CXXFLAGS and F77FLAGS are ok
