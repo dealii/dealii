@@ -110,7 +110,7 @@ class Solution : public Function<dim> {
 				      * Return the gradient of the function
 				      * at the given point.
 				      */
-    virtual Point<dim> gradient (const Point<dim> &p) const;
+    virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
 };
 
 
@@ -133,7 +133,7 @@ double Solution<2>::operator () (const Point<2> &p) const {
 };
 
 
-Point<2> Solution<2>::gradient (const Point<2> &p) const {
+Tensor<1,2> Solution<2>::gradient (const Point<2> &p) const {
   const double x = p(0),
 	       y = p(1);
   const double pi= 3.1415926536;

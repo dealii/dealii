@@ -112,13 +112,13 @@ class Solution {
     class GaussShape : public Function<dim> {
       public:
 	virtual double operator () (const Point<dim> &p) const;
-	virtual Point<dim> gradient (const Point<dim> &p) const;
+	virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
     };
 
     class Singular : public Function<dim> {
       public:
 	virtual double operator () (const Point<dim> &p) const;
-	virtual Point<dim> gradient (const Point<dim> &p) const;
+	virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
     };
 
     class Kink : public Function<dim> {
@@ -129,7 +129,7 @@ class Solution {
 	};
 	
 	virtual double operator () (const Point<dim> &p) const;
-	virtual Point<dim> gradient (const Point<dim> &p) const;
+	virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
     };
 };
 
@@ -181,7 +181,7 @@ double Solution<2>::GaussShape::operator () (const Point<2> &p) const {
 };
 
 
-Point<2> Solution<2>::GaussShape::gradient (const Point<2> &p) const {
+Tensor<1,2> Solution<2>::GaussShape::gradient (const Point<2> &p) const {
   return Point<2> ((1-80.*p(0)*p(0))*p(1)*exp(-40*p.square()),
 		   (1-80.*p(1)*p(1))*p(0)*exp(-40*p.square()));
 };
@@ -193,7 +193,7 @@ double Solution<2>::Singular::operator () (const Point<2> &p) const {
 };
 
 
-Point<2> Solution<2>::Singular::gradient (const Point<2> &p) const {
+Tensor<1,2> Solution<2>::Singular::gradient (const Point<2> &p) const {
   return 2./3.*pow(p.square(), -2./3.) * p;
 };
 
@@ -211,7 +211,7 @@ double Solution<2>::Kink::operator () (const Point<2> &p) const {
 };
 
 
-Point<2> Solution<2>::Kink::gradient (const Point<2> &p) const {
+Tensor<1,2> Solution<2>::Kink::gradient (const Point<2> &p) const {
   const double s = p(1)-p(0)*p(0);
   return (1+4*theta(s))*Point<2>(-2*p(0),1);
 };
