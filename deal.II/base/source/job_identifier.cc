@@ -26,12 +26,8 @@ JobIdentifier dealjobid;
 JobIdentifier::JobIdentifier()
 {
   time_t t = std::time(0);
-  id = std::string(program_id());
+  id = std::string("JobId ");
 
-//TODO:[GK] try to avoid this hack
-// It should be possible not to check DEBUG, but there is this
-// tedious -ansi, which causes problems with linux headers
-  
 #if defined(HAVE_GETHOSTNAME) && !defined(DEAL_II_BROKEN_GETHOSTNAME) && !defined(DEBUG)
   char name[100];
   gethostname(name,99);
