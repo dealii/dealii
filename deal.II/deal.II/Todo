@@ -55,15 +55,14 @@ Look at the fill_fe_values functions for possible optimizations
 
 Try to find out what happens if DoFAccessor::get_dof_values is
   called for a non-active object: what about dof numbers
-  on non-active lines/quads? Are they all zero? Can we check for
-  that.
+  on non-active lines/quads? Are they all -1? Can we check for
+  that. The problem is that we can't really check for activity
+  for faces and the like, since they may have children but be
+  part of active cells anyway.
 
 
 Change <iostream> to <ostream> in grid/point.h and
   grid/tria_iterator.h when this becomes possible.
-
-
-Fix all those workarounds in Tria::refine_fixed_fraction
 
 
 Fill in docs for the timer class.
@@ -115,6 +114,10 @@ Revert istrstream(p.c_str()) to istrstream(p) when possible
   (parameter_handler.cc)
 
 
+Fully implement the POVRAY format, i.e. use textures, a better angle
+  of view, etc. The present implementation is only a rudimentary hack.
+
+
 
 
 
@@ -134,7 +137,7 @@ Let all the reinit functions in /lac free their memory, if reinit
   classes.]
 
 Why are there all these unsafe casts from VectorBase to dVector
-  in dvector.cc?
+  in dvector.cc? What is VectorBase there for anyway
 
 Use unsigned integers for the colnums array in dSMatrixStruct. This
   would enhance safety since colnum=-1 would no longer point to a
@@ -142,3 +145,4 @@ Use unsigned integers for the colnums array in dSMatrixStruct. This
 
 Let dSMatrixStruct::compress free the memory of colnums which is
   no longer needed.
+
