@@ -56,6 +56,43 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> 
+       Changed: Embedding and restriction matrices for intergrid transfer are
+       now computed in the constructor of most elements, rather than taken from
+       precomputed and tabulated values. This removes restrictions on which
+       elements are available since the old tables were only precomputed for
+       certain polynomial degrees and are now available for all.
+       <br>
+       (WB 2002/06/09)
+       </p>
+
+  <li> <p> 
+       New: Finite elements got a function <code
+       class="member">get_interpolation_matrix</class>, with which they can
+       compute interpolations between different finite elements. Most will use
+       this to compute interpolations between finite elements of the same kind
+       but different polynomial degrees. The <code
+       class="member">FETools::get_interpolation_matrix</code> makes use of
+       this function if it implements the desired interpolation, and falls back
+       to the old algorithm if this is not the case.
+       <br>
+       (WB 2002/06/09)
+       </p>
+
+  <li> <p> 
+       New: Finite elements got a function <code
+       class="member">get_name</class>, which can be used to identify a finite
+       element by its name.
+       <br>
+       (WB 2002/06/09)
+       </p>
+
+  <li> <p> 
+       New: Raviart-Thomas elements are now implemented in the <code
+       class="class">FE_RaviartThomas</class> class.
+       <br>
+       (WB 2002/06/09)
+       </p>
 </ol>
 
 <hr>
