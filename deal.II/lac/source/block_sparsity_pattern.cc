@@ -39,6 +39,16 @@ BlockSparsityPatternBase (const unsigned int r,
 
 
 template <class SparsityPatternBase>
+BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase (
+  const BlockSparsityPatternBase<SparsityPatternBase>&)
+{
+//TODO: Find out if this is really needed
+  abort();
+};
+
+
+
+template <class SparsityPatternBase>
 BlockSparsityPatternBase<SparsityPatternBase>::~BlockSparsityPatternBase ()
 {
 				   // clear all memory
