@@ -34,6 +34,22 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Changed: The main Makefile has been changed to sequentialize building 
+       the base, lac, and deal.II subibraries. We changed this, since on some
+       systems (notably AIX), the latter libraries need to be linked against
+       the former ones, when creating shared libraries.
+       <br>
+       (WB 2003/01/24)
+       </p>
+
+  <li> <p> 
+       New: Changes have been made to support compiling and using 
+       <acronym>deal.II</acronym> on AIX 5 systems.
+       <br>
+       (WB 2003/01/24)
+       </p>
+
+  <li> <p> 
        Removed: Thread support now relies solely on the use of POSIX
        functions. The use of the
        <a href="http://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
