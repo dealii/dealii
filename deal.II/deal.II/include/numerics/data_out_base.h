@@ -147,9 +147,46 @@
  *
  * \subsection{EPS format}
  *
- * To be filled in.
- * precision=5; viewpoint=gnuplot default; no border
- * shade or not; grid or not; grid shaded; data vector; memory; color=one per cell
+ * Output in this format circumvents the use of auxiliary graphic programs
+ * converting some output format into a graphics format. This has the advantage
+ * that output is easy and fast, and the disadvantage that you have to give a
+ * whole bunch of parameters which determine the direction of sight, the mode of
+ * colorization, the scaling of the height axis, etc. (Of course, all these
+ * parameters have reasonable default values, which you may want to change from
+ * time to time.) At present, this format only supports output for two-dimensional
+ * data, with values in the third direction taken from a data vector.
+ *
+ * Basically, output consists of the mesh and the cells in between them. You can
+ * draw either of these, or both, or none if you are really interested in an empty
+ * picture. If written, the mesh uses black lines. The cells in between the mesh
+ * are either not printed (this will result in a loss of hidden line removal, i.e.
+ * you can "see through" the cells to lines behind), printed in white (which does
+ * nothing apart from the hidden line removal), or colorized using one of the
+ * data vectors (which need not be the same as the one used for computing the
+ * height information) and a customizable color function. The default color
+ * functions chooses the color between black, blue, green, red and white, with
+ * growing values of the data field chosen for colorization. At present, cells
+ * are displayed with one color per cell only, which is taken from the value of
+ * the data field at the center of the cell; bilinear interpolation of the color
+ * on a cell is not used.
+ *
+ * By default, the viewpoint is chosen like the default viewpoint in GNUPLOT, i.e.
+ * with an angle of 60 degrees with respect to the positive z-axis and rotated
+ * 30 degrees in positive sense (as seen from above) away from the negative y-axis.
+ * Of course you can change these settings.
+ *
+ * EPS output is written without a border around the picture, i.e. the bounding box
+ * is close to the output on all four sides. Coordinates are written using at most
+ * five digits, to keep picture size at a reasonable size.
+ *
+ * All parameters along with their default values are listed in the documentation
+ * of the #EpsFlags# member class of this class. See there for more and detailed
+ * information.
+ *
+ * Please note that due to the various transformations each patch has to undergo
+ * before actual outut, memory requirements may be rather large for large numbers
+ * of patches.
+ *
  *
  * \subsection{GMV format}
  *
