@@ -723,7 +723,7 @@ DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
 // lrand48 to be declared (rather than do so itself. however,
 // inclusion of <cstdlib> or <stdlib.h> does not help, so we declare
 // that function ourselves
-extern "C" long int lrand48 (void) throw();
+extern "C" long int lrand48 (void);
 
 
 template <int dim>
