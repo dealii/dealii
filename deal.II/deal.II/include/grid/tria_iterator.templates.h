@@ -94,7 +94,7 @@ TriaIterator<dim,Accessor>::TriaIterator () :
 template <int dim, typename Accessor>
 TriaIterator<dim,Accessor>::
 TriaIterator (const TriaIterator<dim,Accessor> &i) :
-		TriaRawIterator<dim,Accessor> ((TriaRawIterator<dim,Accessor>)i) {};
+		TriaRawIterator<dim,Accessor> (static_cast<TriaRawIterator<dim,Accessor> >(i)) {};
 
 
 
@@ -221,7 +221,7 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator () :
 template <int dim, typename Accessor>
 TriaActiveIterator<dim,Accessor>::
 TriaActiveIterator (const TriaActiveIterator<dim,Accessor> &i) :
-		TriaIterator<dim,Accessor> ((TriaIterator<dim,Accessor>) i) {};
+		TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,Accessor> >(i)) {};
 
 
 
