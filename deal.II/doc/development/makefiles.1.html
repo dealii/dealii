@@ -141,22 +141,29 @@
       <dt> <code>include-path-base</code> </dt>
       <dd> <p>
            Same as for lib-path-base, but contains the paths
-           to the include files of the /base library
+           to the include files of the /base library. Note, however,
+	   that since files are usually included as <code>#include
+	   &lt;base/xxx.h&gt;</code>, the value of the
+	   <code>include-path-base</code> only leads up to the directory
+	   directly above the include files. They are thus located in
+	   <code>$(include-path-base)/base</code>.
            </p>
       </dd>
 
 
       <dt> <code>include-path-lac</code> </dt>
       <dd> <p>
-           Same for the /lac library
+           Same for the /lac library. The files are in
+	   <code>$(include-path-lac)/lac</code>.
            </p>
       </dd>
 
 
       <dt> <code>include-path-deal2</code> </dt>
       <dd> <p>
-           Same for the /deal.II library
-           </p>
+           Same for the /deal.II library. Include files are in
+           <code>$(include-path-deal2)/*</code>.
+	   </p>
       </dd>
 
 
