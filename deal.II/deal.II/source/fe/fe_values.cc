@@ -633,6 +633,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
       (update_flags & update_q_points)           ||
       (update_flags & update_gradients)          ||
       (update_flags & update_second_derivatives) ||
+      (update_flags & update_normal_vectors)     ||
       (update_flags & update_JxW_values))
     fe->fill_fe_subface_values (cell,
 				face_no,
