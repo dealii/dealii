@@ -484,7 +484,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
             CXXFLAGSO="$CXXFLAGSO -ansi_alias -vec_report0"
           fi fi
 	
-	  dnl If we are on an x86 platform, add -tpp6 -axiMK to optimization
+	  dnl If we are on an x86 platform, add -tpp6 to optimization
 	  dnl flags
 	  case "$target" in
 	    *86*)
