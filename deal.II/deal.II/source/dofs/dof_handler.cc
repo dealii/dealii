@@ -1982,16 +1982,16 @@ void DoFHandler<dim>::make_sparsity_pattern (SparseMatrixStruct &sparsity) const
   Assert (sparsity.n_cols() == n_dofs(),
 	  ExcDifferentDimensions (sparsity.n_cols(), n_dofs()));
 
-  const unsigned int total_dofs = selected_fe->total_dofs;
-  vector<int> dofs_on_this_cell(total_dofs);
+  const unsigned int dofs_per_cell = selected_fe->total_dofs;
+  vector<int> dofs_on_this_cell(dofs_per_cell);
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   for (; cell!=endc; ++cell) 
     {
       cell->get_dof_indices (dofs_on_this_cell);
 				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<total_dofs; ++i)
-	for (unsigned int j=0; j<total_dofs; ++j)
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  sparsity.add (dofs_on_this_cell[i],
 			dofs_on_this_cell[j]);
     };
@@ -2004,7 +2004,7 @@ void
 DoFHandler<dim>::make_sparsity_pattern (const vector<vector<bool> > &mask,
 					SparseMatrixStruct          &sparsity) const
 {
-  const unsigned int total_dofs = selected_fe->total_dofs;
+  const unsigned int dofs_per_cell = selected_fe->total_dofs;
 
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (sparsity.n_rows() == n_dofs(),
@@ -2020,24 +2020,24 @@ DoFHandler<dim>::make_sparsity_pattern (const vector<vector<bool> > &mask,
 				   // first build a mask for each dof,
 				   // not like the one given which represents
 				   // components
-  vector<vector<bool> > dof_mask(total_dofs,
-				 vector<bool>(total_dofs, false));
-  for (unsigned int i=0; i<total_dofs; ++i)
-    for (unsigned int j=0; j<total_dofs; ++j)
+  vector<vector<bool> > dof_mask(dofs_per_cell,
+				 vector<bool>(dofs_per_cell, false));
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    for (unsigned int j=0; j<dofs_per_cell; ++j)
       dof_mask[i][j] = mask
 		       [selected_fe->system_to_component_index(i).first]
 		       [selected_fe->system_to_component_index(j).first];
   
   
-  vector<int> dofs_on_this_cell(total_dofs);
+  vector<int> dofs_on_this_cell(dofs_per_cell);
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   for (; cell!=endc; ++cell) 
     {
       cell->get_dof_indices (dofs_on_this_cell);
 				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<total_dofs; ++i)
-	for (unsigned int j=0; j<total_dofs; ++j)
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  if (dof_mask[i][j] == true)
 	    sparsity.add (dofs_on_this_cell[i],
 			  dofs_on_this_cell[j]);
@@ -2083,8 +2083,8 @@ void DoFHandler<dim>::make_boundary_sparsity_pattern (const vector<int>  &dof_to
 		       dof_to_boundary_mapping.end()) == (signed int)sparsity.n_rows()-1,
 	  ExcInternalError());
 
-  const unsigned int total_dofs = selected_fe->dofs_per_face;
-  vector<int> dofs_on_this_face(total_dofs);
+  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  vector<int> dofs_on_this_face(dofs_per_face);
   active_face_iterator face = begin_active_face(),
 		       endf = end_face();
   for (; face!=endf; ++face)
@@ -2099,8 +2099,8 @@ void DoFHandler<dim>::make_boundary_sparsity_pattern (const vector<int>  &dof_to
 		ExcInternalError());
 	
 					 // make sparsity pattern for this cell
-	for (unsigned int i=0; i<total_dofs; ++i)
-	  for (unsigned int j=0; j<total_dofs; ++j) 
+	for (unsigned int i=0; i<dofs_per_face; ++i)
+	  for (unsigned int j=0; j<dofs_per_face; ++j) 
 	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
 			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
       };
@@ -2124,8 +2124,8 @@ void DoFHandler<dim>::make_boundary_sparsity_pattern (const FunctionMap  &bounda
 		       dof_to_boundary_mapping.end()) == (signed int)sparsity.n_rows()-1,
 	  ExcInternalError());
 
-  const unsigned int total_dofs = selected_fe->dofs_per_face;
-  vector<int> dofs_on_this_face(total_dofs);
+  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  vector<int> dofs_on_this_face(dofs_per_face);
   active_face_iterator face = begin_active_face(),
 		       endf = end_face();
   for (; face!=endf; ++face)
@@ -2140,8 +2140,8 @@ void DoFHandler<dim>::make_boundary_sparsity_pattern (const FunctionMap  &bounda
 			     dofs_on_this_face.end()) >=0,
 		ExcInternalError());
 					 // make sparsity pattern for this cell
-	for (unsigned int i=0; i<total_dofs; ++i)
-	  for (unsigned int j=0; j<total_dofs; ++j)
+	for (unsigned int i=0; i<dofs_per_face; ++i)
+	  for (unsigned int j=0; j<dofs_per_face; ++j)
 	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
 			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
       };
@@ -2320,13 +2320,13 @@ void DoFHandler<dim>::distribute_cell_to_dof_vector (const Vector<Number> &cell_
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   unsigned int present_cell = 0;
-  const unsigned int total_dofs = selected_fe->total_dofs;
-  vector<int> dof_indices (total_dofs);
+  const unsigned int dofs_per_cell = selected_fe->total_dofs;
+  vector<int> dof_indices (dofs_per_cell);
 
   for (; cell!=endc; ++cell, ++present_cell) 
     {
       cell->get_dof_indices (dof_indices);
-      for (unsigned int i=0; i<total_dofs; ++i)
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
 					 // consider this dof only if it
 					 // is the right component. if there
 					 // is only one component, short cut
