@@ -50,7 +50,3 @@ template void Vector<float>::equ<double>(const float, const Vector<double>&);
 template void Vector<float>::equ<float>(const float, const Vector<float>&);
 template void Vector<float>::scale<double>(const Vector<double>&);
 template void Vector<float>::scale<float>(const Vector<float>&);
-
-// see the .h file for why these functions are disabled.
-// template Vector<float>::Vector (const Vector<double>& v);
-// template Vector<double>::Vector (const Vector<float>& v);
