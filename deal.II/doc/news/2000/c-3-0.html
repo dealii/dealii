@@ -13,9 +13,13 @@
 <h3>General</h3>
 <ol>
 
-  <li> Fix: <code class="program">configure</code> now uses <code
-  class="program">config.guess</code> to determine the operating
-  system and hardware platform.
+  <li> <p>
+       Fix: <code class="program">configure</code> now uses 
+       <code class="program">config.guess</code> to determine the
+       operating system and hardware platform.
+       <br>
+       (GK 2000/04/05)
+       </p>
 
 </ol>
 
@@ -24,12 +28,14 @@
 <ol>
   <li> <p>
        New multithreading scheme is implemented.
+       <br>
        (WB 2000/04/13)
        </p>
 
   <li> <p>
        Improved: <code class="class">Subscriptor</code> prints the
        real class name if a subscribed object is deleted.
+       <br>
        (GK 2000/04/12)
        </p>
 
@@ -37,6 +43,8 @@
        There is now a function <code class="member">invert
        (Tensor<2,dim>)</code> that returns the inverse of a tensor of
        rank 2.
+       <br>
+       (WB 2000/04/14)
        </p>
 </ol>
 
@@ -53,27 +61,35 @@
        (e.g. CG, GMRES, etc). Furthermore, the
        inheritance from <code class="class">Solver</code> was made private
        to reflect the logical structure.
+       <br>
+       (GK 2000/04/25)
        </p>
 
   <li> <p>
        New: <code class="class">EigenInverse</code> implements inverse
        iteration by Wieland.
+       <br>
+       (GK 2000/04/20)
        </p>
 
   <li> <p>
        New: <code class="class">EigenPower</code> implements power
        method by von Mises
+       <br>
        (GK 2000/04/19)
        </p>
 
   <li> <p>
        New: <code class="member">PreconditionBlockSSOR::set_omega</code>
        allows to change the relaxation parameter.
+       <br>
        (GK 2000/04/12)
        </p>
 
   <li> <p>
        Fix: <code class="class">SolverCG</code> counts steps properly.
+       <br>
+       (GK 2000/04/25)
        </p>
 
   <li> <p>
@@ -81,6 +97,8 @@
        <code>print_vectors</code> called in every step. It is void in the
        solver itself but can be used to print intermediate iteration
        vectors.
+       <br>
+       (GK 2000/04/05)
        </p>
 
   <li> <p>
@@ -90,6 +108,7 @@
        exchange the data of two vectors without needing a temporary
        vector and without copying around data. Their run-time is
        therefore independent of the length of the vectors.
+       <br>
        (WB 2000/05/02)
        </p>
 
@@ -97,12 +116,16 @@
        New: <code class="class">BlockIndices</code>: Class that
        manages the conversion of global indices into a block
        vector/matrix/... to the indices local to each of the blocks. 
+       <br>
+       (WB 2000/05/08)
        </p>  
 
   <li> <p>
        New: <code class="class">BlockSparsityPattern</code> and
        <code class="class">BlockSparseMatrix</code>: Classes that
        represent matrices that are composed of sparse matrices.
+       <br>
+       (WB 2000/05/08)
        </p>  
 
   <li> <p>
@@ -111,6 +134,7 @@
        later on. It also has a function to preload the data before its
        use in a separate thread if the library is configured for
        multi-threading.
+       <br>
        (WB 2000/05/03)
        </p>
 
@@ -119,6 +143,7 @@
        <code class="class">SparsityPattern</code> that copies another
        object and adds some off-diagonals had a bug that caused an
        exception in some cases. This is now fixed.
+       <br>
        (WB 2000/05/04)
        </p>
 
@@ -130,6 +155,7 @@
        style in the library. Furthermore, 
        <code class="member">FullMatrix::Tmmult</code> was utterly
        broken. 
+       <br>
        (WB 2000/05/08)
        </p>
 
@@ -139,6 +165,7 @@
        <code class="member">matrix_norm_square</code>, since they in
        fact return the square of the norm. This should avoid confusion
        in some cases.
+       <br>
        (WB 2000/05/05)
        </p>
 </ol>
@@ -152,18 +179,23 @@
        New: <code class="member">DataOut::clear_data_vectors</code>
        allows to re-use an object without deleting the <code
        class="class">DoFHandler</code>
+       <br>
+       (GK 2000/04/05)
        </p>
 
   <li> <p>
        New: <code class="class">class DoFPrintSolverStep</code> prints
        intermediate vectors of a solver as finite element functions using
        <code class="class">DataOut</code>.
+       <br>
+       (GK 2000/04/05)
        </p>
 
   <li> <p>
        New: <code class="class">class GradientEstimator</code>
        estimates the norm of the gradient on each cell from finite
        difference approximations. 
+       <br>
        (WB 2000/04/14)
        </p>
 
@@ -171,6 +203,7 @@
        New: <code class="member">DoFTools::extract_boundary_dofs</code> 
        finds all degrees of freedom which are at the boundary and belong to
        specified components.
+       <br>
        (WB 2000/04/17)
        </p>
 
@@ -178,12 +211,14 @@
        New: <code class="member">DoFTools::compute_intergrid_constraints</code> 
        allows to use different discretization grids for different
        variables.
+       <br>
        (WB 2000/04/15)
        </p>
 
   <li> <p> 
        New: <code class="member">IntergridMap::get_{source,destination}_grid</code> 
        functions return the grids for which the map was created.
+       <br>
        (WB 2000/04/19)
        </p>
 
@@ -191,6 +226,7 @@
        Fix: <code class="member">FESystem::reinit()</code> generated
        an exception if <code class="member">update_support_points</code> 
        was set.
+       <br>
        (WB 2000/05/10)
        </p>
 
@@ -198,18 +234,21 @@
        Change: the return value of
        <code class="member">DoFHandler::max_couplings_between_dofs ()</code>
        is bounded by <code class="member">DoFHandler::n_dofs()</code>.
+       <br>
        (Ralf Hartmann 2000/05/11)
        </p>
 
   <li> <p> 
        New: <code class="member">FEValuesBase::get_cell ()</code>
        returns present cell.
+       <br>
        (Ralf Hartmann 2000/05/11)
        </p>
 
   <li> <p> 
        New: <code class="member">DoFTools::extract_hanging_node_dofs ()</code>
        identifies nodes that will be constrained by hanging node constraints.
+       <br>
        (WB 2000/05/12)
        </p>
 
@@ -217,13 +256,16 @@
        New: <code class="member">DoFRenumbering::sort_selected_dofs_back ()</code>
        sorts selected degrees of freedom to the end of the index
        range.
+       <br>
        (WB 2000/05/12)
        </p>
 
   <li> <p> 
        Change: <code class="member">DoFTools::make_hanging_node_constraints ()</code>
        does not use the user flags any more, and can thus run in
-       parallel more than once. (WB 2000/05/15)
+       parallel more than once. 
+       <br>
+       (WB 2000/05/15)
        </p>
 
   <li> <p> 
@@ -231,7 +273,9 @@
        now accepts a template parameter as sparsity pattern. This
        allows to use this function for the usual 
        <code class="class">SparsityPattern</code>, or for 
-       <code class="class">BlockSparsityPattern</code> arguments. (WB 2000/05/15)
+       <code class="class">BlockSparsityPattern</code> arguments.
+       <br>
+       (WB 2000/05/15)
        </p>
 </ol>
 
