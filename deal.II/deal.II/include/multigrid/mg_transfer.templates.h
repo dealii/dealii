@@ -15,9 +15,12 @@
 #define __deal2__mg_transfer_templates_h
 
 #include <lac/sparse_matrix.h>
+#include <grid/tria_iterator.h>
+#include <fe/fe.h>
 #include <dofs/dof_constraints.h>
 #include <numerics/data_out.h>
 #include <multigrid/mg_base.h>
+#include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_transfer.h>
 
 #include <algorithm>
