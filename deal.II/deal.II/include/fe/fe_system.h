@@ -353,13 +353,13 @@ class FESystem //<dim>
 				      * of finite elements composed
 				      * into this structure.
 				      */
-    virtual unsigned n_base_elements() const;
+    virtual unsigned int n_base_elements() const;
 
 				     /**
 				      * How often is a composing element used.
 				      *
 				      */
-    unsigned element_multiplicity(unsigned index) const;
+    unsigned int element_multiplicity(unsigned int index) const;
 
 				     /**
 				      * Access to a composing element.
@@ -376,14 +376,14 @@ class FESystem //<dim>
 				      * by index.
 				      *
 				      */
-    virtual const FiniteElement<dim>& base_element(unsigned index) const;
+    virtual const FiniteElement<dim>& base_element(unsigned int index) const;
 
   private:
 
 				     /**
 				      * Pairs of multiplicity and element type.
 				      */
-    typedef pair<const FiniteElement<dim> *, unsigned > ElementPair;
+    typedef pair<const FiniteElement<dim> *, unsigned int> ElementPair;
     
 				     /**
 				      * Pointer to underlying finite
@@ -411,7 +411,7 @@ class FESystem //<dim>
 				      * shape functions of the base
 				      * element.
 				      */
-    vector<unsigned> component_to_base_table;
+    vector<unsigned int> component_to_base_table;
     
 				     /**
 				      * Helper function used in the constructor:
@@ -493,7 +493,7 @@ class FESystem //<dim>
 /* ------------------------- template functions ------------------------- */
 
 template<int dim>
-inline unsigned
+inline unsigned int
 FESystem<dim>::n_base_elements() const
 {
   return base_elements.size();
@@ -502,8 +502,8 @@ FESystem<dim>::n_base_elements() const
 
 
 template<int dim>
-inline unsigned
-FESystem<dim>::element_multiplicity(unsigned index) const
+inline unsigned int
+FESystem<dim>::element_multiplicity(unsigned int index) const
 {
   Assert (index < base_elements.size(), 
 	  ExcIndexRange(index, 0, base_elements.size()));
@@ -514,7 +514,7 @@ FESystem<dim>::element_multiplicity(unsigned index) const
 
 template <int dim>
 inline const FiniteElement<dim>&
-FESystem<dim>::base_element(unsigned index) const
+FESystem<dim>::base_element(unsigned int index) const
 {
   Assert (index < base_elements.size(), 
 	  ExcIndexRange(index, 0, base_elements.size()));
