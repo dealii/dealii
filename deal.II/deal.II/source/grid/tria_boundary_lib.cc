@@ -113,7 +113,7 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 template <>
 Point<1>
 HalfHyperBallBoundary<1>::
-get_new_point_on_quad (const typename Triangulation<1>::quad_iterator &) const 
+get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const 
 {
   Assert (false, ExcInternalError());
   return Point<1>();
