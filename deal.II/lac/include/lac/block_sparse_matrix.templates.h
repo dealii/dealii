@@ -96,7 +96,6 @@ BlockSparseMatrix<number>::operator = (const double d)
 
 
 template <typename number>
-inline
 void
 BlockSparseMatrix<number>::clear () 
 {
