@@ -111,31 +111,39 @@ void LogStream::pop ()
 }
 
 
-void
+unsigned int
 LogStream::depth_console (const unsigned n)
 {
+  const unsigned int h = std_depth;
   std_depth = n;
+  return h;
 }
 
 
-void
+unsigned int
 LogStream::depth_file (const unsigned n)
 {
+  const unsigned int h = file_depth;
   file_depth = n;
+  return h;
 }
 
 
-void
+bool
 LogStream::log_execution_time (const bool flag)
 {
+  const bool h = print_utime;
   print_utime = flag;
+  return h;
 }
 
 
-void
+bool
 LogStream::log_time_differences (const bool flag)
 {
+  const bool h = diff_utime;
   diff_utime = flag;
+  return h;
 }
 
 

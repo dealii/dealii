@@ -50,7 +50,7 @@
  * @item @p{deallog.pop()} when leaving that stage entered with @p{push}.
  * @end{itemize}
  *
- * @author Guido Kanschat, Wolfgang Bangerth, 1999
+ * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003
  */
 class LogStream
 {
@@ -116,8 +116,11 @@ class LogStream
 				      * prefixes is printed. By calling
 				      * this function with @p{n=0}, no
 				      * console output will be written.
+				      *
+				      * The previous value of this
+				      * parameter is returned.
 				      */
-    void depth_console (const unsigned int n);
+    unsigned int depth_console (const unsigned int n);
      
 				     /**
 				      * Maximum number of levels to be
@@ -127,16 +130,22 @@ class LogStream
 				      * this function should be used
 				      * with care, since it may spoile
 				      * the value of a log file.
+				      *
+				      * The previous value of this
+				      * parameter is returned.
 				      */
-    void depth_file (const unsigned int n);
+    unsigned int depth_file (const unsigned int n);
 
                                      /**
 				      * Set time printing flag. If this flag
 				      * is true, each output line will
 				      * be prepended by the user time used
 				      * by the running program so far.
+				      *
+				      * The previous value of this
+				      * parameter is returned.
 				      */
-    void log_execution_time (const bool flag);
+    bool log_execution_time (const bool flag);
 
 				     /**
 				      * Output time differences
@@ -154,8 +163,11 @@ class LogStream
 				      * The measurement of times is
 				      * not changed by this function,
 				      * just the output.
+				      *
+				      * The previous value of this
+				      * parameter is returned.
 				      */
-    void log_time_differences (const bool flag);
+    bool log_time_differences (const bool flag);
     
 				     /**
 				      * Output a constant something
