@@ -164,7 +164,7 @@ class MGTools
       static void
       reinit_vector (const MGDoFHandler<dim>& mg_dof,
 		     MGLevelObject<BlockVector<number> >& vector,
-		     const vector<bool>& selected);
+		     const std::vector<bool>& selected);
 };
 
 
