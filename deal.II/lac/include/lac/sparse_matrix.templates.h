@@ -498,7 +498,7 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 				       // accumulate the partial results
       return std::accumulate (partial_sums.begin(),
 			      partial_sums.end(),
-			      0.);
+			      static_cast<somenumber>(0.));
     }
   else
     {
@@ -612,7 +612,7 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 				       // accumulate the partial results
       return std::accumulate (partial_sums.begin(),
 			      partial_sums.end(),
-			      0.);
+			      static_cast<somenumber>(0.));
     }
   else
     {
@@ -771,7 +771,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 				       // accumulate the partial results
       return std::sqrt(std::accumulate (partial_norms.begin(),
 					partial_norms.end(),
-					0.));
+					static_cast<somenumber>(0.)));
     }
   else
     {
