@@ -29,6 +29,7 @@ SparseMatrixStruct::SparseMatrixStruct () :
 
 
 SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &s) :
+		Subscriptor(),
 		max_dim(0),
 		max_vec_len(0),
 		rowstart(0),
