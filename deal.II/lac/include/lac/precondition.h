@@ -183,7 +183,7 @@ class PreconditionRelaxation
  * @p{precondition_Jacobi(VECTOR&, const VECTOR&, double}
  *
  * @sect2{Usage example}
- * <pre>
+ * @begin{itemize}
  *     // Declare related objects
  *
  * SparseMatrix<double> A;
@@ -199,7 +199,7 @@ class PreconditionRelaxation
  * precondition.initialize (A, .6);
  *
  * solver.solve (A, x, b, precondition);
- * </pre>
+ * @end{itemize}
  *
  * @author Guido Kanschat, 2000
  */
@@ -238,7 +238,7 @@ class PreconditionJacobi : private PreconditionRelaxation<MATRIX>
  *
  *
  * @sect2{Usage example}
- * <pre>
+ * @begin{itemize}
  *     // Declare related objects
  *
  * SparseMatrix<double> A;
@@ -254,7 +254,7 @@ class PreconditionJacobi : private PreconditionRelaxation<MATRIX>
  * precondition.initialize (A, .6);
  *
  * solver.solve (A, x, b, precondition);
- * </pre>
+ * @end{itemize}
  *
  * @author Guido Kanschat, 2000
  */
@@ -291,7 +291,7 @@ class PreconditionSOR : private PreconditionRelaxation<MATRIX>
  *
  *
  * @sect2{Usage example}
- * <pre>
+ * @begin{itemize}
  *     // Declare related objects
  *
  * SparseMatrix<double> A;
@@ -307,7 +307,7 @@ class PreconditionSOR : private PreconditionRelaxation<MATRIX>
  * precondition.initialize (A, .6);
  *
  * solver.solve (A, x, b, precondition);
- * </pre>
+ * @end{itemize}
  *
  * @author Guido Kanschat, 2000
  */
@@ -359,7 +359,7 @@ class PreconditionSSOR : private PreconditionRelaxation<MATRIX>
  * errors. The inner loop is an appropriate Krylov space method, since
  * it is fast.
  *
- * <pre>
+ * @begin{itemize}
  *     // Declare related objects
  *
  * SparseMatrix<double> A;
@@ -379,7 +379,7 @@ class PreconditionSSOR : private PreconditionRelaxation<MATRIX>
  * SolverRichardson<Vector<double> > outer_iteration;
  *
  * outer_iteration.solve (A, x, b, precondition);
- * </pre>
+ * @end{itemize}
  *
  * Each time we call the inner loop, reduction of the residual by a
  * factor @p{1.e-2} is attempted. Since the right hand side vector of
@@ -598,7 +598,7 @@ PreconditionSSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 
 template<class MATRIX, class VECTOR>
 PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX& M,
-							     function_ptr method)
+							    function_ptr method)
 		:
 		matrix(M), precondition(method)
 {}
