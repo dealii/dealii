@@ -3440,6 +3440,7 @@ rm -f conftest.$ac_objext conftest.$ac_ext
         intel_icc*)
             CXXFLAGSG="$CXXFLAGSG"
             CXXFLAGSO="$CXXFLAGSO -parallel"
+	    LDFLAGS="$LDFLAGS -lpthread"
 	    ;;
 
 	*)
