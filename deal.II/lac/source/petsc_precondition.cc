@@ -112,7 +112,6 @@ namespace PETScWrappers
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCSOR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags as given
     ierr = PCSORSetOmega (pc, additional_data.omega);
@@ -249,7 +248,6 @@ namespace PETScWrappers
                                      // preconditioner
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCILU));
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags
