@@ -148,5 +148,17 @@ Review DoFCellAccessor<dim>::get_interpolated_dof_values: it may be
   really be written but are not because the nodal value was zero.
 
 
+Add tests in Triangulation<3>::create_triangulation for faces (quads)
+  which are entered twice: once and once again in a rotated or
+  mirrored direction.
+
+
+Implement boundary information for Triangulation<3>::create_triangulation
+
+
+Better estimates for DoFHandler<3>::max_couplings_between_dofs
+
+
 Check optimized code with -Winline and act accordingly. Unfortunately,
   most warnings are from the STL.
+
