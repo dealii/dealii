@@ -119,7 +119,7 @@ int main()
   B.block(0,0) /= 10.;
   B.print_formatted (deallog.get_file_stream (),3,false);
 
-  B.clear();
+  B = 0;
   
   return 0;
 }
