@@ -12,7 +12,21 @@
 #include <dofs/dof_handler.h>
 #include <map>
 
-
+				 // if multithreaded set number
+				 // of threads to use.
+				 // The default number of threads can
+				 // be set during the compiling with
+				 // the flag N_THREADS.
+#ifdef DEAL_II_USE_MT
+ #ifndef N_THREADS
+  #define N_THREADS 4
+ #endif
+#else
+ #ifdef N_THREADS
+  #undef N_THREADS
+ #endif
+ #define N_THREADS 1
+#endif
 
 
 /**
@@ -172,7 +186,8 @@
 template <int dim>
 class KellyErrorEstimator {
   public:
-    				     /**
+
+				     /**
 				      *	Declare a data type which denotes a
 				      *	mapping between a boundary indicator
 				      *	and the function denoting the boundary
@@ -180,9 +195,10 @@ class KellyErrorEstimator {
 				      *	Only one boundary function may be given
 				      *	for each boundary indicator, which is
 				      *	guaranteed by the #map# data type.
-				      */
+				      */    
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
 
+    
 				     /**
 				      * Implementation of the error
 				      * estimator described above. You
@@ -219,14 +235,28 @@ class KellyErrorEstimator {
 				      * bit-vector with all-set
 				      * entries, or an empty
 				      * bit-vector.
+				      *
+				      * The estimator supports
+				      * multithreading and splits
+				      * the cells to 4 (default)
+				      * threads. The number of threads
+				      * to be used in multithreaded
+				      * mode can be set with the
+				      * last parameter of the
+				      * error estimator.
+				      * Multithreading is only
+				      * implemented in two and three
+				      * dimensions. 
 				      */
+
     static void estimate (const DoFHandler<dim>   &dof,
 			  const Quadrature<dim-1> &quadrature,
 			  const FunctionMap       &neumann_bc,
 			  const Vector<double>    &solution,
 			  Vector<float>           &error,
-			  const vector<bool>      &component_mask = vector<bool>(),
-			  const Function<dim>     *coefficients   = 0);
+			  const vector<bool>      &component_mask_ = vector<bool>(),
+			  const Function<dim>     *coefficients   = 0,
+			  unsigned int            n_threads=N_THREADS);
     
 				     /**
 				      * Exception
@@ -245,8 +275,12 @@ class KellyErrorEstimator {
 				      */
     DeclException0 (ExcInvalidBoundaryFunction);
     
+
+
   private:
-				     /**
+
+
+    				     /**
 				      * Declare a data type to represent the
 				      * mapping between faces and integrated
 				      * jumps of gradients. See the general
@@ -254,12 +288,107 @@ class KellyErrorEstimator {
 				      */
     typedef map<typename DoFHandler<dim>::face_iterator,double> FaceIntegrals;
 
+
 				     /**
 				      * Redeclare an active cell iterator.
 				      * This is simply for convenience.
 				      */
     typedef DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+
+
+    				     /**
+				      * All data needed by the several functions
+				      * of the error estimator is gathered in
+				      * this struct. It is passed as an reference
+				      * to the seperate functions in the object.
+				      * Global data is not possible because no
+				      * real object is created.
+				      */
+    struct Data
+    {
+	const DoFHandler<dim>   &dof;
+	const Quadrature<dim-1> &quadrature;
+	const FunctionMap       &neumann_bc;
+	const Vector<double>    &solution;
+	vector<bool>            component_mask;
+	const Function<dim>     *coefficients;
+	unsigned int            n_threads;
     
+	DoFHandler<dim>::active_cell_iterator endc;
+	unsigned int            n_components;
+	unsigned int            n_q_points;
+	FaceIntegrals           face_integrals;  
+
+					 /**
+					  * A vector to store the jump of the
+					  * normal vectors in the quadrature
+					  * points.
+					  * There is one vector for every
+					  * thread used in the estimator.
+					  * The allocation of memory has to
+					  * be global to enable fast use
+					  * of multithreading	  
+					  */ 
+	vector< vector<vector<double> > >         phi;
+					 /**
+					  * A vector for the gradients of
+					  * the finite element function
+					  * on one cell
+					  *
+					  * Let psi be a short name for
+					  * #a grad u_h#, where the second
+					  * index be the component of the
+					  * finite element, and the first
+					  * index the number of the
+					  * quadrature point.
+					  */
+	vector< vector<vector<Tensor<1,dim> > > > psi;
+					 /**
+					  * The same vector for a neighbor cell
+					  */
+	vector< vector<vector<Tensor<1,dim> > > > neighbor_psi;
+					 /**
+					  * The normal vectors of the finite
+					  * element function on one face
+					  */
+	vector< vector<Point<dim> > > normal_vectors;
+	
+	vector< vector<double> >                  coefficient_values1;
+	vector< vector<Vector<double> > >         coefficient_values;
+
+	vector< vector<double> >                  JxW_values;
+
+					 /**
+					  * A constructor of the
+					  * class Data. All variables are
+					  * passed as references.
+					  */
+	Data(const DoFHandler<dim>   &dof,
+	     const Quadrature<dim-1> &quadrature,
+	     const FunctionMap       &neumann_bc,
+	     const Vector<double>    &solution,
+	     vector<bool>            component_mask_,
+	     const Function<dim>     *coefficients,
+	     unsigned int            n_threads);
+    };
+
+    
+				     /**
+				      * Computates the error on all cells
+				      * of the domain with the number n,
+				      * satisfying
+				      * #n=this_thread (mod n_threads)#
+				      * This enumeration is choosen to
+				      * generate a random distribution
+				      * of all cells.
+				      *
+				      * This function is only needed in
+				      * two or three dimensions.
+				      * The Errorestimator in one dimension
+				      * is implemented seperatly.
+				      */
+    static void * estimate_some(Data &data, unsigned int this_thread);
+    				
 				     /**
 				      * Actually do the computation on a face
 				      * which has no hanging nodes (it is
@@ -278,17 +407,16 @@ class KellyErrorEstimator {
 				      * to avoid ending up with a function
 				      * of 500 lines of code.
 				      */
-    static void integrate_over_regular_face (const active_cell_iterator &cell,
-					     const unsigned int   face_no,
-					     const FunctionMap   &neumann_bc,
-					     const unsigned int   n_q_points,
-					     FEFaceValues<dim>   &fe_face_values_cell,
-					     FEFaceValues<dim>   &fe_face_values_neighbor,
-					     FaceIntegrals       &face_integrals,
-					     const Vector<double>&solution,
-					     const vector<bool>  &component_mask,
-					     const Function<dim> *coefficient);
 
+
+    static void integrate_over_regular_face (Data &data,
+					     int this_thread,
+					     const active_cell_iterator &cell,
+					     const unsigned int   face_no,
+					     FEFaceValues<dim>   &fe_face_values_cell,
+					     FEFaceValues<dim>   &fe_face_values_neighbor);
+    
+    
 				     /**
 				      * The same applies as for the function
 				      * above, except that integration is
@@ -297,15 +425,12 @@ class KellyErrorEstimator {
 				      * so that the integration is a bit more
 				      * complex.
 				      */
-    static void integrate_over_irregular_face (const active_cell_iterator &cell,
+    static void integrate_over_irregular_face (Data &data,
+					       int this_thread,
+					       const active_cell_iterator &cell,
 					       const unsigned int   face_no,
-					       const unsigned int    n_q_points,
 					       FEFaceValues<dim>    &fe_face_values,
-					       FESubfaceValues<dim> &fe_subface_values,
-					       FaceIntegrals        &face_integrals,
-					       const Vector<double> &solution,
-					       const vector<bool>   &component_mask,
-					       const Function<dim>  *coefficient);
+					       FESubfaceValues<dim> &fe_subface_values);
 };
 
 
@@ -316,3 +441,5 @@ class KellyErrorEstimator {
 /* end of #ifndef __error_estimator_H */
 #endif
 /*----------------------------   error_estimator.h     ---------------------------*/
+
+
