@@ -2,7 +2,7 @@
 //    rt_5.cc,v 1.1 2003/06/09 15:59:07 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,7 +36,7 @@ test(const unsigned int degree)
 
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
     {
-      const FullMatrix<double> & m = fe_rt.restrict(c);
+      const FullMatrix<double> & m = fe_rt.get_restriction_matrix(c);
 
       for (unsigned int i=0; i<m.m(); ++i)
 	{

@@ -5439,8 +5439,8 @@ TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_
 			  local_A_v);
 	};
       
-      this->fe.prolongate(c).Tvmult (rhs1, child_rhs1, true);
-      this->fe.prolongate(c).Tvmult (rhs2, child_rhs2, true);
+      this->fe.get_prolongation_matrix(c).Tvmult (rhs1, child_rhs1, true);
+      this->fe.get_prolongation_matrix(c).Tvmult (rhs2, child_rhs2, true);
     };
 
   return level_difference;
@@ -5479,9 +5479,9 @@ TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell
     {
       const typename DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
 
-      this->fe.prolongate(c).vmult (local_old_dof_values_u,
+      this->fe.get_prolongation_matrix(c).vmult (local_old_dof_values_u,
 				   old_dof_values_u);
-      this->fe.prolongate(c).vmult (local_old_dof_values_v,
+      this->fe.get_prolongation_matrix(c).vmult (local_old_dof_values_v,
 				   old_dof_values_v);
 
       if (new_child->has_children())
@@ -5947,10 +5947,10 @@ for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
       Vector<double> child_u_old(dofs_per_cell_dual), child_v_old(dofs_per_cell_dual);
       Vector<double> child_u_bar_old(dofs_per_cell_dual), child_v_bar_old(dofs_per_cell_dual);
 
-      dual_fe.prolongate(child).vmult (child_u_old, local_u_old);
-      dual_fe.prolongate(child).vmult (child_v_old, local_v_old);
-      dual_fe.prolongate(child).vmult (child_u_bar_old, local_u_bar_old);
-      dual_fe.prolongate(child).vmult (child_v_bar_old, local_v_bar_old);
+      dual_fe.get_prolongation_matrix(child).vmult (child_u_old, local_u_old);
+      dual_fe.get_prolongation_matrix(child).vmult (child_v_old, local_v_old);
+      dual_fe.get_prolongation_matrix(child).vmult (child_u_bar_old, local_u_bar_old);
+      dual_fe.get_prolongation_matrix(child).vmult (child_v_bar_old, local_v_bar_old);
 
       const typename DoFHandler<dim>::cell_iterator
 	new_primal_child = primal_cell->child(child),
@@ -6024,14 +6024,14 @@ TimeStep_ErrorEstimation<dim>::collect_error_from_children (const typename DoFHa
       Vector<double> child_Ih_u_bar(dofs_per_cell_dual), child_Ih_v_bar(dofs_per_cell_dual);
       Vector<double> child_Ih_u_bar_old(dofs_per_cell_dual), child_Ih_v_bar_old(dofs_per_cell_dual);      
 
-      dual_fe.prolongate(child).vmult (child_u, local_u);
-      dual_fe.prolongate(child).vmult (child_v, local_v);
-      dual_fe.prolongate(child).vmult (child_u_bar, local_u_bar);
-      dual_fe.prolongate(child).vmult (child_v_bar, local_v_bar);
-      dual_fe.prolongate(child).vmult (child_Ih_u_bar, local_Ih_u_bar);
-      dual_fe.prolongate(child).vmult (child_Ih_v_bar, local_Ih_v_bar);
-      dual_fe.prolongate(child).vmult (child_Ih_u_bar_old, local_Ih_u_bar_old);
-      dual_fe.prolongate(child).vmult (child_Ih_v_bar_old, local_Ih_v_bar_old);
+      dual_fe.get_prolongation_matrix(child).vmult (child_u, local_u);
+      dual_fe.get_prolongation_matrix(child).vmult (child_v, local_v);
+      dual_fe.get_prolongation_matrix(child).vmult (child_u_bar, local_u_bar);
+      dual_fe.get_prolongation_matrix(child).vmult (child_v_bar, local_v_bar);
+      dual_fe.get_prolongation_matrix(child).vmult (child_Ih_u_bar, local_Ih_u_bar);
+      dual_fe.get_prolongation_matrix(child).vmult (child_Ih_v_bar, local_Ih_v_bar);
+      dual_fe.get_prolongation_matrix(child).vmult (child_Ih_u_bar_old, local_Ih_u_bar_old);
+      dual_fe.get_prolongation_matrix(child).vmult (child_Ih_v_bar_old, local_Ih_v_bar_old);
 
       const typename DoFHandler<dim>::cell_iterator
 	old_primal_child = primal_cell_old->child(child),
@@ -7194,8 +7194,8 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 			  local_A_u);
 	};
       
-      this->fe.prolongate(c).Tvmult (rhs1, child_rhs1, true);
-      this->fe.prolongate(c).Tvmult (rhs2, child_rhs2, true);
+      this->fe.get_prolongation_matrix(c).Tvmult (rhs1, child_rhs1, true);
+      this->fe.get_prolongation_matrix(c).Tvmult (rhs2, child_rhs2, true);
     };
 
   return level_difference;
@@ -7234,9 +7234,9 @@ TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::ce
     {
       const typename DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
 
-      this->fe.prolongate(c).vmult (local_old_dof_values_u,
+      this->fe.get_prolongation_matrix(c).vmult (local_old_dof_values_u,
 			      old_dof_values_u);
-      this->fe.prolongate(c).vmult (local_old_dof_values_v,
+      this->fe.get_prolongation_matrix(c).vmult (local_old_dof_values_v,
 			      old_dof_values_v);
 
       if (new_child->has_children())

@@ -91,9 +91,9 @@ check_matrices (FiniteElement<dim>& fe, const char* name)
   for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
     {
       deallog << name << '<' << dim << '>' << " restriction " << i << std::endl;
-      print_formatted (fe.restrict(i), 3, 6);
+      print_formatted (fe.get_restriction_matrix(i), 3, 6);
       deallog << name << '<' << dim << '>' << " embedding " << i << std::endl;
-      print_formatted (fe.prolongate(i), 3, 6);
+      print_formatted (fe.get_prolongation_matrix(i), 3, 6);
     }
 }
 

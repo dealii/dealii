@@ -60,7 +60,7 @@ check ()
        c!=dof.end(); ++c)
     {
       Vector<double> tmp (fe_ned.dofs_per_cell);
-      fe_ned.prolongate (c->index()).vmult (tmp, coarse_grid_values);
+      fe_ned.get_prolongation_matrix (c->index()).vmult (tmp, coarse_grid_values);
       c->set_dof_values (tmp, values);
     };
   
