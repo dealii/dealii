@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,18 +26,22 @@
 /**
  * Tensor product of given polynomials.
  *
- * Given a vector of $n$ one-dimensional polynomials $P_1$ to $P_n$,
- * this class generates $n$ to the power of @p{dim} polynomials of
- * the form $Q_{ijk}(x,y,z) = P_i(x)P_j(y)P_k(z)$. If the base
- * polynomials are mutually orthogonal on the interval $[-1,1]$ or
- * $[0,d]$, then the tensor product polynomials are orthogonal on
- * $[-1,1]^d$ or $[0,1]^d$, respectively.
+ * Given a vector of <i>n</i> one-dimensional polynomials
+ * <i>P<sub>1</sub></i> to <i>P<sub>n</sub></i>, this class generates
+ * <i>n<sup>dim</sup></i> polynomials of the form
+ * <i>Q<sub>ijk</sub>(x,y,z) =
+ * P<sub>i</sub>(x)P<sub>j</sub>(y)P<sub>k</sub>(z)</i>. If the base
+ * polynomials are mutually orthogonal on the interval [-1,1] or
+ * [0,1], then the tensor product polynomials are orthogonal on
+ * [-1,1]<sup>dim</sup> or [0,1]<sup>dim</sup>, respectively.
  *
- * Indexing is as follows: the order of dim-dimensional polynomials
- * is x-coordinates running fastest, then y-coordinate, etc. The first
- * few polynomials are thus $P_1(x)P_1(y), P_2(x)P_1(y),
- * P_3(x)P_1(y), ..., P_1(x)P_2(y), P_2(x)P_2(y),
- * P_3(x)P_2(y), ...$ and likewise in 3d.
+ * Indexing is as follows: the order of dim-dimensional polynomials is
+ * x-coordinates running fastest, then y-coordinate, etc. The first
+ * few polynomials are thus <i>P<sub>1</sub>(x)P<sub>1</sub>(y),
+ * P<sub>2</sub>(x)P<sub>1</sub>(y), P<sub>3</sub>(x)P<sub>1</sub>(y),
+ * ..., P<sub>1</sub>(x)P<sub>2</sub>(y),
+ * P<sub>2</sub>(x)P<sub>2</sub>(y), P<sub>3</sub>(x)P<sub>2</sub>(y),
+ * ...</i> and likewise in 3d.
  * 
  * @author Ralf Hartmann, Guido Kanschat, 2000, Wolfgang Bangerth 2003
  */
@@ -46,13 +50,13 @@ class TensorProductPolynomials
 {
   public:
 				     /**
-				      * Constructor. @p{pols} is a
-				      * vector of objects that should
-				      * be derived or otherwise
+				      * Constructor. <tt>pols</tt> is
+				      * a vector of objects that
+				      * should be derived or otherwise
 				      * convertible to one-dimensional
-				      * polynomial objects and will be
-				      * copied into the member
-				      * variable @p{polynomials}.
+				      * polynomial objects. It will be
+				      * copied element by element into
+				      * a private variable.
 				      */
     template <class Pol>
     TensorProductPolynomials (const std::vector<Pol> &pols);
@@ -61,22 +65,22 @@ class TensorProductPolynomials
 				      * Computes the value and the
 				      * first and second derivatives
 				      * of each tensor product
-				      * polynomial at @p{unit_point}.
+				      * polynomial at <tt>unit_point</tt>.
 				      *
 				      * The size of the vectors must
-				      * either be equal @p{0} or equal
-				      * @p{n_tensor_pols}.  In the
-				      * first case, the function will
-				      * not compute these values.
+				      * either be equal 0 or equal
+				      * n(). In the first case, the
+				      * function will not compute
+				      * these values.
 				      *
 				      * If you need values or
 				      * derivatives of all tensor
 				      * product polynomials then use
 				      * this function, rather than
 				      * using any of the
-				      * @p{compute_value},
-				      * @p{compute_grad} or
-				      * @p{compute_grad_grad}
+				      * compute_value(),
+				      * compute_grad() or
+				      * compute_grad_grad()
 				      * functions, see below, in a
 				      * loop over all tensor product
 				      * polynomials.
@@ -88,9 +92,9 @@ class TensorProductPolynomials
     
 				     /**
 				      * Computes the value of the
-				      * @p{i}th tensor product
+				      * <tt>i</tt>th tensor product
 				      * polynomial at
-				      * @p{unit_point}. Here @p{i} is
+				      * <tt>unit_point</tt>. Here <tt>i</tt> is
 				      * given in tensor product
 				      * numbering.
 				      *
@@ -102,9 +106,8 @@ class TensorProductPolynomials
 				      * (one-dimensional) polynomials
 				      * is (unnecessarily) computed
 				      * several times.  Instead use
-				      * the @p{compute} function, see
-				      * above, with
-				      * @p{values.size()==n_tensor_pols}
+				      * the compute() function with
+				      * <tt>values.size()==</tt>n()
 				      * to get the point values of all
 				      * tensor polynomials all at once
 				      * and in a much more efficient
@@ -115,9 +118,9 @@ class TensorProductPolynomials
 
 				     /**
 				      * Computes the grad of the
-				      * @p{i}th tensor product
+				      * <tt>i</tt>th tensor product
 				      * polynomial at
-				      * @p{unit_point}. Here @p{i} is
+				      * <tt>unit_point</tt>. Here <tt>i</tt> is
 				      * given in tensor product
 				      * numbering.
 				      *
@@ -129,9 +132,9 @@ class TensorProductPolynomials
 				      * underlying (one-dimensional)
 				      * polynomials is (unnecessarily)
 				      * computed several times.
-				      * Instead use the @p{compute}
+				      * Instead use the compute()
 				      * function, see above, with
-				      * @p{grads.size()==n_tensor_pols}
+				      * <tt>grads.size()==</tt>n()
 				      * to get the point value of all
 				      * tensor polynomials all at once
 				      * and in a much more efficient
@@ -143,9 +146,9 @@ class TensorProductPolynomials
 				     /**
 				      * Computes the second
 				      * derivative (grad_grad) of the
-				      * @p{i}th tensor product
+				      * <tt>i</tt>th tensor product
 				      * polynomial at
-				      * @p{unit_point}. Here @p{i} is
+				      * <tt>unit_point</tt>. Here <tt>i</tt> is
 				      * given in tensor product
 				      * numbering.
 				      *
@@ -157,9 +160,9 @@ class TensorProductPolynomials
 				      * underlying (one-dimensional)
 				      * polynomials is (unnecessarily)
 				      * computed several times.
-				      * Instead use the @p{compute}
+				      * Instead use the compute()
 				      * function, see above, with
-				      * @p{grad_grads.size()==n_tensor_pols}
+				      * <tt>grad_grads.size()==</tt>n()
 				      * to get the point value of all
 				      * tensor polynomials all at once
 				      * and in a much more efficient
@@ -170,8 +173,8 @@ class TensorProductPolynomials
 
 				     /**
 				      * Returns the number of tensor
-				      * product polynomials. For $n$
-				      * 1d polynomials this is $n^dim$.
+				      * product polynomials. For <i>n</i>
+				      * 1d polynomials this is <i>n<sup>dim</sup></i>.
 				      */
     unsigned int n () const;
 
@@ -185,7 +188,7 @@ class TensorProductPolynomials
 	    
   private:
 				     /**
-				      * Copy of the vector @p{pols} of
+				      * Copy of the vector <tt>pols</tt> of
 				      * polynomials given to the
 				      * constructor.
 				      */
@@ -193,28 +196,28 @@ class TensorProductPolynomials
 
 				     /**
 				      * Number of tensor product
-				      * polynomials. For $n$ 1d
-				      * polynomials this is $n^dim$.
+				      * polynomials. See n().
 				      */
     unsigned int n_tensor_pols;
 
                                      /**
                                       * Each tensor product polynomial
-                                      * @þ{i} is a product of
+                                      * <i>i</i> is a product of
                                       * one-dimensional polynomials in
                                       * each space direction. Compute
                                       * the indices of these
                                       * one-dimensional polynomials
                                       * for each space direction,
-                                      * given the index @p{i}.
+                                      * given the index <i>i</i>.
                                       */
     void compute_index (const unsigned int i,
                         unsigned int       (&indices)[dim]) const;
     
 				     /**
-				      * Computes @p{x} to the power of
-				      * @p{dim} for unsigned int @p{x}.
-				      * Used in the constructor.
+				      * Computes
+				      * <i>x<sup>dim</sup></i> for
+				      * unsigned int <i>x</i>. Used in
+				      * the constructor.
 				      */
     static
     unsigned int x_to_the_dim (const unsigned int x);
@@ -226,19 +229,19 @@ class TensorProductPolynomials
 /**
  * Anisotropic tensor product of given polynomials.
  *
- * Given one-dimensional polynomials @p{Px1}, @p{Px2}, ... in
- * x-direction, @p{Py1}, @p{Py2}, ... in y-direction, and so on, this
- * class generates polynomials of the form @p{ Qijk(x,y,z) =
- * Pxi(x)Pyj(y)Pzk(z)}. If the base polynomials are mutually
+ * Given one-dimensional polynomials <tt>Px1</tt>, <tt>Px2</tt>, ... in
+ * x-direction, <tt>Py1</tt>, <tt>Py2</tt>, ... in y-direction, and so on, this
+ * class generates polynomials of the form  <i>Q<sub>ijk</sub>(x,y,z) =
+ * Pxi(x)Pyj(y)Pzk(z)</i>. If the base polynomials are mutually
  * orthogonal on the interval $[-1,1]$ or $[0,d]$, then the tensor
  * product polynomials are orthogonal on $[-1,1]^d$ or $[0,1]^d$,
  * respectively.
  *
  * Indexing is as follows: the order of dim-dimensional polynomials
  * is x-coordinates running fastest, then y-coordinate, etc. The first
- * few polynomials are thus @p{Px1(x)Py1(y)}, @p{Px2(x)Py1(y)},
- * @p{Px3(x)Py1(y)}, ..., @p{Px1(x)Py2(y)}, @p{Px2(x)Py2(y)},
- * @p{Px3(x)Py2(y)}, ..., and likewise in 3d.
+ * few polynomials are thus <tt>Px1(x)Py1(y)</tt>, <tt>Px2(x)Py1(y)</tt>,
+ * <tt>Px3(x)Py1(y)</tt>, ..., <tt>Px1(x)Py2(y)</tt>, <tt>Px2(x)Py2(y)</tt>,
+ * <tt>Px3(x)Py2(y)</tt>, ..., and likewise in 3d.
  * 
  * @author Wolfgang Bangerth 2003
  */
@@ -247,7 +250,7 @@ class AnisotropicPolynomials
 {
   public:
 				     /**
-				      * Constructor. @p{pols} is a
+				      * Constructor. <tt>pols</tt> is a
 				      * table of one-dimensional
 				      * polynomials. The number of
 				      * rows in this table should be
@@ -266,11 +269,11 @@ class AnisotropicPolynomials
 				      * Computes the value and the
 				      * first and second derivatives
 				      * of each tensor product
-				      * polynomial at @p{unit_point}.
+				      * polynomial at <tt>unit_point</tt>.
 				      *
 				      * The size of the vectors must
-				      * either be equal @p{0} or equal
-				      * @p{n_tensor_pols}.  In the
+				      * either be equal <tt>0</tt> or equal
+				      * <tt>n_tensor_pols</tt>.  In the
 				      * first case, the function will
 				      * not compute these values.
 				      *
@@ -279,9 +282,9 @@ class AnisotropicPolynomials
 				      * product polynomials then use
 				      * this function, rather than
 				      * using any of the
-				      * @p{compute_value},
-				      * @p{compute_grad} or
-				      * @p{compute_grad_grad}
+				      * <tt>compute_value</tt>,
+				      * <tt>compute_grad</tt> or
+				      * <tt>compute_grad_grad</tt>
 				      * functions, see below, in a
 				      * loop over all tensor product
 				      * polynomials.
@@ -293,9 +296,9 @@ class AnisotropicPolynomials
     
 				     /**
 				      * Computes the value of the
-				      * @p{i}th tensor product
+				      * <tt>i</tt>th tensor product
 				      * polynomial at
-				      * @p{unit_point}. Here @p{i} is
+				      * <tt>unit_point</tt>. Here <tt>i</tt> is
 				      * given in tensor product
 				      * numbering.
 				      *
@@ -307,9 +310,9 @@ class AnisotropicPolynomials
 				      * (one-dimensional) polynomials
 				      * is (unnecessarily) computed
 				      * several times.  Instead use
-				      * the @p{compute} function, see
+				      * the <tt>compute</tt> function, see
 				      * above, with
-				      * @p{values.size()==n_tensor_pols}
+				      * <tt>values.size()==n_tensor_pols</tt>
 				      * to get the point values of all
 				      * tensor polynomials all at once
 				      * and in a much more efficient
@@ -320,9 +323,9 @@ class AnisotropicPolynomials
 
 				     /**
 				      * Computes the grad of the
-				      * @p{i}th tensor product
+				      * <tt>i</tt>th tensor product
 				      * polynomial at
-				      * @p{unit_point}. Here @p{i} is
+				      * <tt>unit_point</tt>. Here <tt>i</tt> is
 				      * given in tensor product
 				      * numbering.
 				      *
@@ -334,9 +337,9 @@ class AnisotropicPolynomials
 				      * underlying (one-dimensional)
 				      * polynomials is (unnecessarily)
 				      * computed several times.
-				      * Instead use the @p{compute}
+				      * Instead use the <tt>compute</tt>
 				      * function, see above, with
-				      * @p{grads.size()==n_tensor_pols}
+				      * <tt>grads.size()==n_tensor_pols</tt>
 				      * to get the point value of all
 				      * tensor polynomials all at once
 				      * and in a much more efficient
@@ -348,9 +351,9 @@ class AnisotropicPolynomials
 				     /**
 				      * Computes the second
 				      * derivative (grad_grad) of the
-				      * @p{i}th tensor product
+				      * <tt>i</tt>th tensor product
 				      * polynomial at
-				      * @p{unit_point}. Here @p{i} is
+				      * <tt>unit_point</tt>. Here <tt>i</tt> is
 				      * given in tensor product
 				      * numbering.
 				      *
@@ -362,9 +365,9 @@ class AnisotropicPolynomials
 				      * underlying (one-dimensional)
 				      * polynomials is (unnecessarily)
 				      * computed several times.
-				      * Instead use the @p{compute}
+				      * Instead use the <tt>compute</tt>
 				      * function, see above, with
-				      * @p{grad_grads.size()==n_tensor_pols}
+				      * <tt>grad_grads.size()==n_tensor_pols</tt>
 				      * to get the point value of all
 				      * tensor polynomials all at once
 				      * and in a much more efficient
@@ -398,7 +401,7 @@ class AnisotropicPolynomials
 	    
   private:
 				     /**
-				      * Copy of the vector @p{pols} of
+				      * Copy of the vector <tt>pols</tt> of
 				      * polynomials given to the
 				      * constructor.
 				      */
@@ -407,7 +410,7 @@ class AnisotropicPolynomials
 				     /**
 				      * Number of tensor product
 				      * polynomials. This is
-				      * @p{Nx*Ny*Nz}, or with terms
+				      * <tt>Nx*Ny*Nz</tt>, or with terms
 				      * dropped if the number of space
 				      * dimensions is less than 3.
 				      */
@@ -421,7 +424,7 @@ class AnisotropicPolynomials
                                       * the indices of these
                                       * one-dimensional polynomials
                                       * for each space direction,
-                                      * given the index @p{i}.
+                                      * given the index <tt>i</tt>.
                                       */
     void compute_index (const unsigned int i,
                         unsigned int       (&indices)[dim]) const;
@@ -429,7 +432,7 @@ class AnisotropicPolynomials
 				     /**
 				      * Given the input to the
 				      * constructor, compute
-				      * @p{n_tensor_pols}.
+				      * <tt>n_tensor_pols</tt>.
 				      */
     static
     unsigned int
@@ -437,7 +440,7 @@ class AnisotropicPolynomials
 };
 
 
-
+/// @if NoDoc
 
 /* -------------- declaration of explicit specializations --- */
 
@@ -495,6 +498,6 @@ void
 AnisotropicPolynomials<3>::compute_index(const unsigned int n,
                                          unsigned int      (&index)[3]) const;
 
-
+/// @endif
 
 #endif
