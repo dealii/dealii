@@ -399,7 +399,7 @@ class VectorTools
 				      * information.
 				      */
     static void interpolate_boundary_values (const DoFHandler<dim> &dof,
-					     unsigned char          boundary_component,
+					     const unsigned char    boundary_component,
 					     const Function<dim>   &boundary_function,
 					     map<int,double>       &boundary_values,
 					     const vector<bool>    &component_mask = vector<bool>());

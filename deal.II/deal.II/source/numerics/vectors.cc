@@ -466,7 +466,7 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 template <>
 void
 VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
-					     unsigned char        boundary_component,
+					     const unsigned char  boundary_component,
 					     const Function<1>   &boundary_function,
 					     map<int,double>     &boundary_values,
 					     const vector<bool>  &component_mask_)
@@ -549,7 +549,7 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
 template <int dim>
 void
 VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
-					       unsigned char          boundary_component,
+					       const unsigned char    boundary_component,
 					       const Function<dim>   &boundary_function,
 					       map<int,double>       &boundary_values,
 					       const vector<bool>    &component_mask_)
