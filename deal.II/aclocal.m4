@@ -875,7 +875,7 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
       withcpu=$withval,
       withcpu=)
   AC_MSG_CHECKING(for CPU to optimize for)
-  case $withcpu in
+  case "$withcpu" in
     PowerPC64)
         AC_MSG_RESULT(PowerPC64)
 	case $GXX_VERSION in
@@ -906,6 +906,7 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
 
     *)
         AC_MSG_RESULT(none given or not recognized)
+	;;
   esac
 ])
 
