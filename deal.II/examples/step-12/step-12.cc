@@ -273,8 +273,6 @@ void DGTransportEquation<dim>::assemble_cell_term(
 				   // First we ask ``fe_v'' for the
 				   // shape gradients, shape values and
 				   // quadrature weights,
-  const std::vector<std::vector<Tensor<1,dim> > > &grad_v = fe_v.get_shape_grads ();
-  const FullMatrix<double> &v = fe_v.get_shape_values ();
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
 
 				   // Then the flow field beta and the
@@ -294,11 +292,11 @@ void DGTransportEquation<dim>::assemble_cell_term(
     for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) 
       {
 	for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-	  u_v_matrix(i,j) -= beta[point]*grad_v[i][point]*
-			      v[j][point] *
+	  u_v_matrix(i,j) -= beta[point]*fe_v.shape_grad(i,point)*
+			      fe_v.shape_value(j,point) *
 			      JxW[point];
 	
-	cell_vector(i) += rhs[point] * v[i][point] * JxW[point];
+	cell_vector(i) += rhs[point] * fe_v.shape_value(i,point) * JxW[point];
       }
 }
 
@@ -328,7 +326,6 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 				   // function, we ask the ``FEValues''
 				   // object for the shape values and
 				   // the quadrature weights
-  const FullMatrix<double> &v = fe_v.get_shape_values ();
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
 				   // but here also for the normals.
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
@@ -356,8 +353,8 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	    u_v_matrix(i,j) += beta_n *
-			       v[j][point] *
-			       v[i][point] *
+			       fe_v.shape_value(j,point) *
+			       fe_v.shape_value(i,point) *
 			       JxW[point];
       else
 					 // and the term $(\beta\cdot
@@ -366,7 +363,7 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  cell_vector(i) -= beta_n *
 			    g[point] *
-			    v[i][point] *
+			    fe_v.shape_value(i,point) *
 			    JxW[point];
     }
 }
@@ -420,8 +417,6 @@ void DGTransportEquation<dim>::assemble_face_term1(
 				   // objects for the shape values,
 				   // the quadrature weights and the
 				   // normals
-  const FullMatrix<double> &v = fe_v.get_shape_values ();
-  const FullMatrix<double> &v_neighbor = fe_v_neighbor.get_shape_values ();  
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
 
@@ -444,8 +439,8 @@ void DGTransportEquation<dim>::assemble_face_term1(
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	    u_v_matrix(i,j) += beta_n *
-			       v[j][point] *
-			       v[i][point] *
+			       fe_v.shape_value(j,point) *
+			       fe_v.shape_value(i,point) *
 			       JxW[point];
       else
 					 // and the
@@ -455,8 +450,8 @@ void DGTransportEquation<dim>::assemble_face_term1(
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
 	    un_v_matrix(i,k) += beta_n *
-				v_neighbor[k][point] *
-				v[i][point] *
+				fe_v_neighbor.shape_value(k,point) *
+				fe_v.shape_value(i,point) *
 				JxW[point];
     }
 }
@@ -488,8 +483,6 @@ void DGTransportEquation<dim>::assemble_face_term2(
   FullMatrix<double> &un_vn_matrix) const
 {
 				   // the first few lines are the same
-  const FullMatrix<double> &v = fe_v.get_shape_values ();
-  const FullMatrix<double> &v_neighbor = fe_v_neighbor.get_shape_values ();  
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
 
@@ -506,8 +499,8 @@ void DGTransportEquation<dim>::assemble_face_term2(
 	  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	      u_v_matrix(i,j) += beta_n *
-				 v[j][point] *
-				 v[i][point] *
+				 fe_v.shape_value(j,point) *
+				 fe_v.shape_value(i,point) *
 				 JxW[point];
 
 					   // We additionally assemble
@@ -517,8 +510,8 @@ void DGTransportEquation<dim>::assemble_face_term2(
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
 	    for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	      u_vn_matrix(k,j) -= beta_n *
-				  v[j][point] *
-				  v_neighbor[k][point] *
+				  fe_v.shape_value(j,point) *
+				  fe_v_neighbor.shape_value(k,point) *
 				  JxW[point];
 	}
       else
@@ -528,8 +521,8 @@ void DGTransportEquation<dim>::assemble_face_term2(
 	  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	    for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
 	      un_v_matrix(i,l) += beta_n *
-				  v_neighbor[l][point] *
-				  v[i][point] *
+				  fe_v_neighbor.shape_value(l,point) *
+				  fe_v.shape_value(i,point) *
 				  JxW[point];
 
 					   // And this is another new
@@ -539,8 +532,8 @@ void DGTransportEquation<dim>::assemble_face_term2(
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
 	    for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
 	      un_vn_matrix(k,l) -= beta_n *
-				   v_neighbor[l][point] *
-				   v_neighbor[k][point] *
+				   fe_v_neighbor.shape_value(l,point) *
+				   fe_v_neighbor.shape_value(k,point) *
 				   JxW[point];
 	}
     }
