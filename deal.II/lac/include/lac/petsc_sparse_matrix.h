@@ -24,7 +24,6 @@
 #include <vector>
 
 
-
 namespace PETScWrappers
 {
 /**
@@ -99,7 +98,6 @@ namespace PETScWrappers
                     const unsigned int               n,
                     const std::vector<unsigned int> &row_lengths,
                     const bool                       is_symmetric = false);
-      
   };
 }
 

@@ -20,6 +20,39 @@
 
 namespace PETScWrappers
 {
+  namespace MatrixIterators
+  {
+    void
+    MatrixBase::const_iterator::Accessor::
+    visit_present_row ()
+    {
+      const int a_row_int = this->a_row;  // need signed int for PETSc?
+
+                                       // get a representation of the present
+                                       // row
+      int          ncols;
+      int         *colnums;
+      PetscScalar *values;
+      int ierr;
+      ierr = MatGetRow(*matrix, a_row_int, &ncols, &colnums, &values);
+      AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+
+                                       // copy it into our caches
+      colnum_cache =
+        boost::shared_ptr<std::vector<unsigned int> >
+        ( new std::vector<unsigned int> (colnums, colnums+ncols));
+      value_cache =
+        boost::shared_ptr<std::vector<PetscScalar> >
+        ( new std::vector<PetscScalar> (values, values+ncols));
+
+                                       // and finally restore the matrix
+      ierr = MatRestoreRow(*matrix, a_row_int, &ncols, &colnums, &values);
+      AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+    }
+  }
+
+
+  
   MatrixBase::MatrixBase ()
                   :
                   last_action (LastAction::none)

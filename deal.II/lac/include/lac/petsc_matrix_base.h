@@ -20,12 +20,218 @@
 #ifdef DEAL_II_USE_PETSC
 
 #include <petscmat.h>
+#include <boost/shared_ptr.hpp>
+#include <vector>
+
 
 
 namespace PETScWrappers
 {
-                                   // forward declaration
+                                   // forward declarations
   class VectorBase;
+  class MatrixBase;
+
+  namespace MatrixIterators
+  {
+/**
+ * STL conforming iterator. This class acts as an iterator walking over the
+ * elements of PETSc matrices. Since PETSc offers a uniform interface for all
+ * types of matrices, this iterator can be used to access both sparse and full
+ * matrices.
+ *
+ * Note that PETSc does not give any guarantees as to the order of elements
+ * within each row. Note also that accessing the elements of a full matrix
+ * surprisingly only shows the nonzero elements of the matrix, not all
+ * elements.
+ *
+ * @author Guido Kanschat, Roy Stogner, Wolfgang Bangerth, 2004
+ */
+    class const_iterator
+    {
+      private:
+                                         /**
+                                          * Accessor class for iterators
+                                          */
+        class Accessor
+        {
+          public:
+                                             /**
+                                              * Constructor. Since we use
+                                              * accessors only for read
+                                              * access, a const matrix
+                                              * pointer is sufficient.
+                                              */
+            Accessor (const MatrixBase    *matrix,
+                      const unsigned int   row,
+                      const unsigned short index);
+
+                                             /**
+                                              * Row number of the element
+                                              * represented by this
+                                              * object.
+                                              */
+            unsigned int row() const;
+
+                                             /**
+                                              * Index in row of the element
+                                              * represented by this
+                                              * object.
+                                              */
+            unsigned short index() const;
+
+                                             /**
+                                              * Column number of the
+                                              * element represented by
+                                              * this object.
+                                              */
+            unsigned int column() const;
+
+                                             /**
+                                              * Value of this matrix entry.
+                                              */
+            PetscScalar value() const;
+
+                                             /**
+                                              * Exception
+                                              */
+            DeclException0 (ExcBeyondEndOfMatrix);
+            
+          private:
+                                             /**
+                                              * The matrix accessed.
+                                              */
+            const MatrixBase *matrix;
+
+                                             /**
+                                              * Current row number.
+                                              */
+            unsigned int a_row;
+
+                                             /**
+                                              * Current index in row.
+                                              */
+            unsigned int a_index;
+
+                                             /**
+                                              * Cache where we store the
+                                              * column indices of the present
+                                              * row. This is necessary, since
+                                              * PETSc makes access to the
+                                              * elements of its matrices
+                                              * rather hard, and it is much
+                                              * more efficient to copy all
+                                              * column entries of a row once
+                                              * when we enter it than
+                                              * repeatedly asking PETSc for
+                                              * individual ones. This also
+                                              * makes some sense since it is
+                                              * likely that we will access
+                                              * them sequentially anyway.
+                                              *
+                                              * In order to make copying of
+                                              * iterators/accessor of
+                                              * acceptable performance, we
+                                              * keep a shared pointer to these
+                                              * entries so that more than one
+                                              * accessor can access this data
+                                              * if necessary.
+                                              */
+            boost::shared_ptr<const std::vector<unsigned int> > colnum_cache;
+
+                                             /**
+                                              * Similar cache for the values
+                                              * of this row.
+                                              */
+            boost::shared_ptr<const std::vector<PetscScalar> > value_cache;
+            
+                                             /**
+                                              * Discard the old row caches
+                                              * (they may still be used by
+                                              * other accessors) and generate
+                                              * new ones for the row pointed
+                                              * to presently by this accessor.
+                                              */
+            void visit_present_row ();
+
+                                             /**
+                                              * Make enclosing class a
+                                              * friend.
+                                              */
+            friend class const_iterator;
+        };
+        
+      public:
+          
+                                         /**
+                                          * Constructor. Create an iterator
+                                          * into the matrix @p matrix for the
+                                          * given row and the index within it.
+                                          */ 
+        const_iterator (const MatrixBase    *matrix,
+                        const unsigned int   row,
+                        const unsigned short index);
+          
+                                         /**
+                                          * Prefix increment.
+                                          */
+        const_iterator& operator++ ();
+
+                                         /**
+                                          * Postfix increment.
+                                          */
+        const_iterator operator++ (int);
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+        const Accessor& operator* () const;
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+        const Accessor* operator-> () const;
+
+                                         /**
+                                          * Comparison. True, if
+                                          * both iterators point to
+                                          * the same matrix
+                                          * position.
+                                          */
+        bool operator == (const const_iterator&) const;
+                                         /**
+                                          * Inverse of <tt>==</tt>.
+                                          */
+        bool operator != (const const_iterator&) const;
+
+                                         /**
+                                          * Comparison
+                                          * operator. Result is true
+                                          * if either the first row
+                                          * number is smaller or if
+                                          * the row numbers are
+                                          * equal and the first
+                                          * index is smaller.
+                                          */
+        bool operator < (const const_iterator&) const;
+
+                                         /**
+                                          * Exception
+                                          */
+        DeclException2 (ExcInvalidIndexWithinRow,
+                        int, int,
+                        << "Attempt to access element " << arg2
+                        << " of row " << arg1
+                        << " which doesn't have that many elements.");
+        
+      private:
+                                         /**
+                                          * Store an object of the
+                                          * accessor class.
+                                          */
+        Accessor accessor;
+    };
+    
+  }
   
   
 /**
@@ -61,6 +267,8 @@ namespace PETScWrappers
   class MatrixBase 
   {
     public:
+      typedef MatrixIterators::const_iterator const_iterator;
+      
                                        /**
                                         * Default constructor.
                                         */
@@ -338,6 +546,29 @@ namespace PETScWrappers
                             const VectorBase &b) const;
 
                                        /**
+                                        * STL-like iterator with the
+                                        * first entry.
+                                        */
+      const_iterator begin () const;
+
+                                       /**
+                                        * Final iterator.
+                                        */
+      const_iterator end () const;
+
+                                       /**
+                                        * STL-like iterator with the
+                                        * first entry of row <tt>r</tt>.
+                                        */
+      const_iterator begin (const unsigned int r) const;
+
+                                       /**
+                                        * Final iterator of row
+                                        * <tt>r</tt>.
+                                        */
+      const_iterator end (const unsigned int r) const;
+      
+                                       /**
                                         * Conversion operator to gain access
                                         * to the underlying PETSc type. If you
                                         * do this, you cut this class off some
@@ -408,6 +639,157 @@ namespace PETScWrappers
 
 // -------------------------- inline and template functions ----------------------
 
+
+  namespace MatrixIterators
+  {
+
+    inline
+    const_iterator::Accessor::
+    Accessor (const MatrixBase    *matrix,
+              const unsigned int   row,
+              const unsigned short index)
+                    :
+                    matrix(matrix),
+                    a_row(row),
+                    a_index(index)
+    {
+      visit_present_row ();
+      Assert (index < colnum_cache->size(),
+              ExcInvalidIndexWithinRow (index, row));
+    }
+
+
+    inline
+    unsigned int
+    const_iterator::Accessor::row() const
+    {
+      Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      return a_row;
+    }
+
+
+    inline
+    unsigned int
+    const_iterator::Accessor::column() const
+    {
+      Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      return (*colnum_cache)[a_index];
+    }
+
+
+    inline
+    unsigned short
+    const_iterator::Accessor::index() const
+    {
+      Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      return a_index;
+    }
+
+
+    inline
+    PetscScalar
+    const_iterator::Accessor::value() const
+    {
+      Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      return (*value_cache)[a_index];
+    }
+
+
+    inline
+    const_iterator::
+    const_iterator(const MatrixBase    *matrix,
+                   const unsigned int   row,
+                   const unsigned short index)
+                    :
+                    accessor(matrix, row, index)
+    {}
+
+
+
+    inline
+    const_iterator &
+    const_iterator::operator++ ()
+    {
+      Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
+
+      ++accessor.a_index;
+      if (accessor.a_index >= accessor.colnum_cache->size())
+        {
+          accessor.a_index = 0;
+          accessor.a_row++;
+          accessor.visit_present_row();
+        }
+      return *this;
+    }
+
+
+    inline
+    const_iterator
+    const_iterator::operator++ (int)
+    {
+      const const_iterator old_state = *this;
+    
+      Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
+
+      ++accessor.a_index;
+      if (accessor.a_index >= accessor.colnum_cache->size())
+        {
+          accessor.a_index = 0;
+          accessor.a_row++;
+          accessor.visit_present_row();
+        }
+      return old_state;
+    }
+
+
+    inline
+    const const_iterator::Accessor &
+    const_iterator::operator* () const
+    {
+      return accessor;
+    }
+
+
+    inline
+    const const_iterator::Accessor *
+    const_iterator::operator-> () const
+    {
+      return &accessor;
+    }
+
+
+    inline
+    bool
+    const_iterator::
+    operator == (const const_iterator& other) const
+    {
+      return (accessor.row() == other.accessor.row() &&
+              accessor.index() == other.accessor.index());
+    }
+
+
+    inline
+    bool
+    const_iterator::
+    operator != (const const_iterator& other) const
+    {
+      return ! (*this == other);
+    }
+
+
+    inline
+    bool
+    const_iterator::
+    operator < (const const_iterator& other) const
+    {
+      return (accessor.row() < other.accessor.row() ||
+              (accessor.row() == other.accessor.row() &&
+               accessor.index() < other.accessor.index()));
+    }
+    
+  }
+  
+  
   inline
   PetscScalar
   MatrixBase::operator() (const unsigned int i,
@@ -415,8 +797,42 @@ namespace PETScWrappers
   {
     return el(i,j);
   }
+
   
-  
+
+  inline
+  MatrixBase::const_iterator
+  MatrixBase::begin() const
+  {
+    return const_iterator(this, 0, 0);
+  }
+
+
+  inline
+  MatrixBase::const_iterator
+  MatrixBase::end() const
+  {
+    return const_iterator(this, m(), 0);
+  }
+
+
+  inline
+  MatrixBase::const_iterator
+  MatrixBase::begin(const unsigned int r) const
+  {
+    Assert (r < m(), ExcIndexRange(r, 0, m()));
+    return const_iterator(this, r, 0);
+  }
+
+
+  inline
+  MatrixBase::const_iterator
+  MatrixBase::end(const unsigned int r) const
+  {
+    Assert (r < m(), ExcIndexRange(r, 0, m()));
+    return const_iterator(this, r+1, 0);
+  }
+      
 }
 
 #endif // DEAL_II_USE_PETSC
