@@ -3104,45 +3104,47 @@ namespace
     unsigned int n_cells;
     unsigned int n_vert;
   };
+
+
+  inline
+  TecplotMacros::TecplotMacros(const unsigned int n_nodes,
+			       const unsigned int n_vars,
+			       const unsigned int n_cells,
+			       const unsigned int n_vert) :
+		  n_nodes(n_nodes),
+		  n_vars(n_vars),
+		  n_cells(n_cells),
+		  n_vert(n_vert)
+  {
+    nodalData.resize(n_nodes*n_vars);
+    connData.resize(n_cells*n_vert);
+  }
+
+
+
+  inline
+  TecplotMacros::~TecplotMacros()
+  {
+  }
+
+
+
+  inline
+  float & TecplotMacros::nd(const unsigned int i, const unsigned int j)
+  {
+    return nodalData[(i)*(n_nodes) + (j)]; 
+  }
+
+
+
+  inline
+  int & TecplotMacros::cd(const unsigned int i, const unsigned int j)
+  {
+    return connData[(i) + (j)*(n_vert)]; 
+  }
+ 
 }
 
-
-inline
-TecplotMacros::TecplotMacros(const unsigned int n_nodes,
-			     const unsigned int n_vars,
-			     const unsigned int n_cells,
-			     const unsigned int n_vert) :
-  n_nodes(n_nodes),
-  n_vars(n_vars),
-  n_cells(n_cells),
-  n_vert(n_vert)
-{
-  nodalData.resize(n_nodes*n_vars);
-  connData.resize(n_cells*n_vert);
-};
-
-
-
-inline
-TecplotMacros::~TecplotMacros()
-{
-};
-
-
-
-inline
-float & TecplotMacros::nd(const unsigned int i, const unsigned int j)
-{
-  return nodalData[(i)*(n_nodes) + (j)]; 
-};
-
-
-
-inline
-int & TecplotMacros::cd(const unsigned int i, const unsigned int j)
-{
-  return connData[(i) + (j)*(n_vert)]; 
-};
 
 #endif
 //--------------------------------------------------------
