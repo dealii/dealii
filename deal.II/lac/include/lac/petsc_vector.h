@@ -102,7 +102,8 @@ namespace PETScWrappers
                                        /**
                                         * Create a vector of length @p{n}. For
                                         * this class, we create a sequential
-                                        * vector.
+                                        * vector. @arg n denotes the total
+                                        * size of the vector to be created.
                                         */
       virtual void create_vector (const unsigned int n);
   };
