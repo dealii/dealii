@@ -581,10 +581,10 @@ AC_DEFUN(DEAL_II_THREAD_CPPFLAGS, dnl
 	;
    ],
    [
-	AC_MSG_RESULT("not necessary")
+	AC_MSG_RESULT(not necessary)
    ],
    [
-	AC_MSG_RESULT("-D_REENTRANT -D_THREAD_SAFE")
+	AC_MSG_RESULT(-D_REENTRANT -D_THREAD_SAFE)
 	CXXFLAGSG="$CXXFLAGSG -D_REENTRANT -D_THREAD_SAFE"
 	CXXFLAGSO="$CXXFLAGSO -D_REENTRANT -D_THREAD_SAFE"
    ])
@@ -620,10 +620,10 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
    	])
   done
   if test "$thread_flag" = invalid_last_entry ; then
-	AC_MSG_RESULT("no flag found!")
-	AC_MSG_ERROR("Could not determine multithreading flag for this platform. Aborting!")
+	AC_MSG_RESULT(no flag found!)
+	AC_MSG_ERROR(Could not determine multithreading flag for this platform. Aborting!)
   fi
-  AC_MSG_RESULT("-$thread_flag")
+  AC_MSG_RESULT(-$thread_flag)
 ])
 
 
@@ -1258,6 +1258,39 @@ AC_DEFUN(DEAL_II_HAVE_STD_STRINGSTREAM, dnl
       AC_DEFINE(HAVE_STD_STRINGSTREAM, 1, 
                 [Define if the compiler's library in use provides
                  std::i/ostringstream classes (early gcc versions did not)])
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Check for existence of the __builtin_expect facility of newer
+dnl gcc compilers. This can be used to hint the compiler's branch
+dnl prediction unit in some cases. We use it in the AssertThrow
+dnl macros.
+dnl
+dnl Usage: DEAL_II_HAVE_BUILTIN_EXPECT
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_HAVE_BUILTIN_EXPECT, dnl
+[
+  AC_MSG_CHECKING(for __builtin_expect)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	bool f();
+    ],
+    [
+	if (__builtin_expect(f(),false));
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_BUILTIN_EXPECT, 1, 
+                [Define if the compiler provides __builtin_expect])
     ],
     [
       AC_MSG_RESULT(no)

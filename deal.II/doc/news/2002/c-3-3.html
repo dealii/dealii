@@ -67,6 +67,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> 
+       Improved: The <code class="member">AssertThrow</code> macro now
+       uses <code class="member">__builtin_expect</code> if the
+       compiler supports this. This indicates to the compiler that we
+       expect the condition to be true and that throwing an exception
+       is a rare case.
+       <br>
+       (WB 2002/03/13)
+       </p>
+
   <li> <p>
        New: The <code class="class">vector2d</code> class now not only
        allows access to elements through the <code

@@ -590,20 +590,31 @@ namespace deal_II_exceptions
  * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
 #ifndef DISABLE_ASSERT_THROW
-#define AssertThrow(cond, exc)                                   \
-  {                                                              \
-    if (!(cond))                                                 \
-      deal_II_exceptions::internals::                            \
-      issue_error_throw (__FILE__,                               \
-			 __LINE__,                               \
-			 __PRETTY_FUNCTION__, #cond, #exc, exc); \
-  }
+#  ifndef HAVE_BUILTIN_EXPECT
+#    define AssertThrow(cond, exc)                                   \
+      {                                                              \
+        if (!(cond))                                                 \
+          deal_II_exceptions::internals::                            \
+          issue_error_throw (__FILE__,                               \
+		  	     __LINE__,                               \
+			     __PRETTY_FUNCTION__, #cond, #exc, exc); \
+      }
+#  else // HAVE_BUILTIN_EXPECT
+#    define AssertThrow(cond, exc)                                   \
+      {                                                              \
+        if (__builtin_expect(!cond, false))                          \
+          deal_II_exceptions::internals::                            \
+          issue_error_throw (__FILE__,                               \
+		  	     __LINE__,                               \
+			     __PRETTY_FUNCTION__, #cond, #exc, exc); \
+      }
+#  endif
 #else
-#define AssertThrow(cond, exc)                                    \
-  {                                                               \
-    if (!(cond))                                                  \
-      deal_II_exceptions::internals::abort ();                    \
-  }
+#  define AssertThrow(cond, exc)                                    \
+    {                                                               \
+      if (!(cond))                                                  \
+        deal_II_exceptions::internals::abort ();                    \
+    }
 #endif
 
 
