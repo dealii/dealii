@@ -29,5 +29,4 @@ $CVS tag -r Base-$1-$2 -b Branch-$1-$2
 # 3. Remove sensitive files and directories from branch
 ######################################################################
 
-$CVS tag -d Branch-$1-$2 doc/RELEASE \
-   deal.II/include/multigrid deal.II/source/multigrid
+$CVS tag -d Branch-$1-$2 doc/RELEASE
