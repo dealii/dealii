@@ -252,7 +252,7 @@ void PoissonProblem<dim>::run (const unsigned int level) {
 
   cout << "    Assembling matrices..." << endl;
   UpdateFlags update_flags = UpdateFlags(update_q_points  | update_gradients |
-					 update_jacobians | update_JxW_values);
+					 update_JxW_values);
   
   ProblemBase<dim>::FunctionMap dirichlet_bc;
   dirichlet_bc[0] = boundary_values;

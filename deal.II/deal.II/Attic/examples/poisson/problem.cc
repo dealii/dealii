@@ -459,7 +459,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   dirichlet_bc[0] = boundary_values;
   assemble (equation, quadrature, fe,
 	    UpdateFlags(update_gradients | update_JxW_values |
-			update_jacobians | update_q_points),
+			update_q_points),
 	    dirichlet_bc, *boundary);
 
   cout << "    Solving..." << endl;

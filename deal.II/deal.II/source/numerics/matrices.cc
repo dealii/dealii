@@ -21,8 +21,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     dSMatrix                 &matrix,
 					     const Function<dim> * const a) {
   dVector dummy;    // no entries, should give an error if accessed
-  UpdateFlags update_flags = UpdateFlags(update_jacobians |
-					 update_JxW_values);
+  UpdateFlags update_flags = update_JxW_values;
   if (a != 0)
     update_flags = UpdateFlags (update_flags | update_q_points);
   const AssemblerData<dim> data (dof,
@@ -55,7 +54,6 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     dVector                  &rhs_vector,
 					     const Function<dim> * const a) {
   UpdateFlags update_flags = UpdateFlags(update_q_points |
-					 update_jacobians |
 					 update_JxW_values);
   const AssemblerData<dim> data (dof,
 				 true, true,
@@ -86,7 +84,6 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Function<dim> * const a) {
   dVector dummy;   // no entries, should give an error if accessed
   UpdateFlags update_flags = UpdateFlags(update_gradients |
-					 update_jacobians |
 					 update_JxW_values);
   if (a != 0)
     update_flags = UpdateFlags(update_flags | update_q_points);
@@ -120,7 +117,6 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Function<dim> * const a) {
   UpdateFlags update_flags = UpdateFlags(update_q_points  |
 					 update_gradients |
-					 update_jacobians |
 					 update_JxW_values);
   const AssemblerData<dim> data (dof,
 				 true, true,

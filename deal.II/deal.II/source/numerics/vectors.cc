@@ -124,7 +124,6 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
   difference.reinit (dof.get_tria().n_active_cells());
   
   UpdateFlags update_flags = UpdateFlags (update_q_points  |
-					  update_jacobians |
 					  update_JxW_values);
   if ((norm==H1_seminorm) || (norm==H1_norm))
     update_flags = UpdateFlags (update_flags | update_gradients);
