@@ -1,0 +1,46 @@
+# This script checks all CVS/Entries recursively and extracts all
+# filenames (including path), where the file is part of the branch.
+
+# The branch is given as command line argument to the script.
+
+# The result is a shell script that, applied to a directory with the head
+# revision, moves all files found to the branch.
+
+# provide directory to check as argument.
+
+sub get_directory
+{
+    my $dir = shift(@_);
+    my $direntry;
+    local *DIR;
+#    printf STDERR "$dir\n";
+    # recursion
+    opendir DIR, ".";
+    while($direntry = readdir(DIR))
+    {
+	if (-d $direntry)
+	{
+	    next if ($direntry eq '.' or $direntry eq '..' or $direntry eq 'CVS');
+	    $newdir = $dir . '/' . $direntry;
+	    chdir $direntry;
+	    get_directory($newdir);
+	    chdir '..';
+	}
+    }
+    closedir DIR;
+
+    # find Entries in branch
+
+    open ENTRIES, "CVS/Entries";
+    while(<ENTRIES>)
+    {
+	printf "cvs update -r $branch $dir/$1\n" if (m!^/([^/]+)/.*/T$branch!);
+    }
+    close ENTRIES;
+}
+
+$branch = @ARGV[0];
+
+printf STDERR "Retrieving branch: %s\n", $branch;
+
+get_directory(".");
