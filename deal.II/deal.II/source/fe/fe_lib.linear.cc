@@ -289,6 +289,23 @@ FELinear<2>::shape_grad_grad (const unsigned int i,
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
 
+  switch (i)
+    {
+      case 0:
+      case 2:
+      {
+	    const double initializer[2][2] = {{0, 1},{1,0}};
+	    return Tensor<2,2>(initializer);
+      };
+       
+      case 1:
+      case 3:
+      {
+	    const double initializer[2][2] = {{0, -1},{-1,0}};
+	    return Tensor<2,2>(initializer);
+      };
+    };    
+	    
   return Tensor<2,2>();
 };
 
