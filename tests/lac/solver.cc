@@ -190,28 +190,22 @@ int main()
 	  
 	  deallog.push("psor");
 
-	  if(false)
-	    {
-	      
 	  check_Tsolve(rich,A,u,f,prec_psor);
 	  check_solve(rich,A,u,f,prec_psor);
 	  check_solve(cg,A,u,f,prec_psor);
 	  check_solve(bicgstab,A,u,f,prec_psor);
 	  check_solve(gmres,A,u,f,prec_psor);
 	  check_solve(gmresright,A,u,f,prec_psor);
-	    }
 	  
 	  deallog.pop();
 	}
       catch (std::exception& e)
 	{
-	  std::cerr << e.what() << std::endl;
+	  std::cerr << "Exception: " << e.what() << std::endl;
 	}
     };
 
 				   // Solve advection problem
-
-				   // Disabled for the time being
   for (unsigned int size=4; size <= 3; size *= 3)
     {
       unsigned int dim = (size-1)*(size-1);

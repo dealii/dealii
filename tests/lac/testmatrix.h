@@ -41,6 +41,12 @@ class FDMatrix
     template <typename MATRIX>
     void nine_point(MATRIX&, bool nonsymmetric = false) const;
 
+				     /**
+				      * Fill the matrix with values.
+				      */
+    template <typename MATRIX>
+    void upwind(MATRIX&, bool back = false) const;
+
     template <typename number>
     void gnuplot_print(std::ostream&, const Vector<number>&) const;
     

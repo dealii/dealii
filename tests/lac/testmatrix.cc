@@ -207,6 +207,27 @@ FDMatrix::five_point(MATRIX& A, bool nonsymmetric) const
     } 
 }
 
+template<typename MATRIX>
+void
+FDMatrix::upwind(MATRIX& A, bool back) const
+{
+   for(unsigned int i=0;i<=ny-2;i++)
+    {
+      for(unsigned int j=0;j<=nx-2; j++)
+	{
+					   // Number of the row to be entered
+	  unsigned int row = j+(nx-1)*i;
+	  A.set(row, row, 3.);
+
+	  if (j>0 && !back)
+	    A.set(row, row-1, -1.);
+
+	  if (j<nx-2 && back)
+	      A.set(row, row+1, -1.);
+	}
+    } 
+}
+
 template<typename number>
 void
 FDMatrix::gnuplot_print(std::ostream& s, const Vector<number>& V) const
@@ -234,6 +255,10 @@ template void FDMatrix::nine_point(SparseMatrix<long double>&, bool) const;
 template void FDMatrix::nine_point(SparseMatrix<double>&, bool) const;
 template void FDMatrix::nine_point(SparseMatrixEZ<double>&, bool) const;
 template void FDMatrix::nine_point(SparseMatrix<float>&, bool) const;
+template void FDMatrix::upwind(SparseMatrix<long double>&, bool) const;
+template void FDMatrix::upwind(SparseMatrix<double>&, bool) const;
+template void FDMatrix::upwind(SparseMatrixEZ<double>&, bool) const;
+template void FDMatrix::upwind(SparseMatrix<float>&, bool) const;
 template void FDMatrix::gnuplot_print(std::ostream& s, const Vector<long double>& V) const;
 template void FDMatrix::gnuplot_print(std::ostream& s, const Vector<double>& V) const;
 template void FDMatrix::gnuplot_print(std::ostream& s, const Vector<float>& V) const;
