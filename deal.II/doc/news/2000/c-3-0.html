@@ -692,6 +692,14 @@
        </p>
 
   <li> <p>
+       Fix: in three space dimensions, the triangulation class
+       over-estimated the necessary amount of memory needed upon
+       refinement and allocated too much.
+       <br>
+       (WB 2000/04/19)
+       </p>
+
+  <li> <p>
        New: <code class="member">DoFTools::extract_boundary_dofs</code> 
        finds all degrees of freedom which are at the boundary and belong to
        specified components.
