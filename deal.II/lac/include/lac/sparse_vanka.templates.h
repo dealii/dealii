@@ -52,6 +52,8 @@ SparseVanka<number>::compute_inverses ()
   const SparseMatrixStruct &structure
     = matrix->get_sparsity_pattern();
 
+  map<unsigned int, unsigned int> local_index;
+
 				   // traverse all rows of the matrix
 				   // which are selected
   for (unsigned int row=0; row< matrix->m() ; ++row)
@@ -73,7 +75,7 @@ SparseVanka<number>::compute_inverses ()
 					 // of each entry simply denotes
 					 // all degrees of freedom that
 					 // couple with #row#.
-	map<unsigned int, unsigned int> local_index;
+	local_index.clear ();
 	for (unsigned int i=0; i<row_length; ++i)
 	  local_index.insert(pair<unsigned int, unsigned int>
 			     (structure.column_number(row, i), i));
@@ -93,9 +95,6 @@ SparseVanka<number>::compute_inverses ()
 					     // irow (including irow itself)
 	    const unsigned int irow_length = structure.row_length(irow);
 	    
-					     // copy rhs
-//	    b(i) = src(irow);
-	    
 					     // for all the DoFs that irow
 					     // couples with
 	    for (unsigned int j=0; j<irow_length; ++j)
@@ -110,16 +109,8 @@ SparseVanka<number>::compute_inverses ()
 						 // #row#.
 		const map<unsigned int, unsigned int>::const_iterator js
 		  = local_index.find(col);
-						 // if not, then still use
-						 // this dof to modify the rhs
-						 //
-						 // note that if so, we already
-						 // have copied the entry above
-		if (js == local_index.end())
-;//b(i) -= matrix->raw_entry(irow,j) * dst(col);
-		else
-						     // if so, then build the
-						     // matrix out of it
+
+		if (js != local_index.end())
 		  (*inverses[row])(i,js->second) = matrix->raw_entry(irow,j);
 	      };
 	  };
@@ -156,6 +147,8 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
   Vector<float> b (structure.max_entries_per_row());
   Vector<float> x (structure.max_entries_per_row());
   
+  map<unsigned int, unsigned int> local_index;
+
 				   // traverse all rows of the matrix
 				   // which are selected
   for (unsigned int row=0; row< matrix->m() ; ++row)
@@ -190,7 +183,7 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 					 // of each entry simply denotes
 					 // all degrees of freedom that
 					 // couple with #row#.
-	map<unsigned int, unsigned int> local_index;
+	local_index.clear ();
 	for (unsigned int i=0; i<row_length; ++i)
 	  local_index.insert(pair<unsigned int, unsigned int>
 			     (structure.column_number(row, i), i));
