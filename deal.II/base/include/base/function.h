@@ -507,6 +507,7 @@ class ConstantFunction : public ZeroFunction<dim>
  * It is especially useful as a weight function for
  * @p{VectorTools::integrate_difference}, where it allows to integrate
  * only one component.
+ *
  * @author Guido Kanschat, 2000
  */
 template <int dim>
@@ -520,7 +521,7 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 				      * number of components.
 				      */
     ComponentSelectFunction (const unsigned int selected,
-			     const double value,
+			     const double       value,
 			     const unsigned int n_components);
 
     				     /**
@@ -562,6 +563,9 @@ class ComponentSelectFunction : public ConstantFunction<dim>
     unsigned int memory_consumption () const;
 
   protected:
+				     /**
+				      * Index of the selected component.
+				      */
     const unsigned int selected;
 };
 
