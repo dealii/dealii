@@ -20,11 +20,24 @@
 #include <sys/resource.h>
 #include <sys/time.h>
 
+
+// on SunOS 4.x, getrusage is stated in the man pages and exists, but
+// is not declared in resource.h. declare it ourselves
+#ifdef NO_HAVE_GETRUSAGE
+extern "C" { 
+  int getrusage(int who, struct rusage* ru);
+}
+#endif
+
+
+
+
 Timer::Timer()
   : cumulative_time (0.)
 {
   start();
 }
+
 
 
 void Timer::start ()
@@ -34,6 +47,7 @@ void Timer::start ()
   getrusage (RUSAGE_SELF, &usage);
   start_time = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
 }
+
 
 
 double Timer::stop ()
@@ -50,6 +64,7 @@ double Timer::stop ()
 }
 
 
+
 double Timer::operator() () const
 {
   if (running)
@@ -63,6 +78,7 @@ double Timer::operator() () const
   else
     return cumulative_time;
 }
+
 
 
 void Timer::reset ()

@@ -76,3 +76,34 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
   done
   AC_MSG_RESULT("$thread_flag")
 ])
+
+
+
+
+dnl On SunOS 4.x, the `getrusage' function exists, but is not declared
+dnl in the respective header file `resource.h', as one would think when
+dnl reading the man pages. Then we have to declare this function 
+dnl ourselves...
+AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
+  AC_MSG_CHECKING(whether getrusage is properly declared)
+  AC_REQUIRE([AC_LANG_CPLUSPLUS])
+  AC_TRY_COMPILE(
+    [
+#include <sys/resource.h>
+    ],
+    [
+      rusage *ru;
+      getrusage(0,ru);
+    ],
+    [
+	AC_MSG_RESULT("yes")
+    ],
+    [
+	AC_MSG_RESULT("no")
+	CXXFLAGSG="$CXXFLAGSG -DNO_HAVE_GETRUSAGE"
+	CXXFLAGSO="$CXXFLAGSO -DNO_HAVE_GETRUSAGE"
+    ])
+)      
+
+
+
