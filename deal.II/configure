@@ -1316,8 +1316,8 @@ typedef map<string,map<string,pair<string,string> > > T;
 
 
 const T* f(T& t1, const T* t2) {
-  t1[0] = map<string,pair<string,string> >();
   const map<string,map<string,pair<string,string> > >::const_iterator i=t1.begin();
+  *i = t1[0] = map<string,pair<string,string> >();
   return t2;
 }
 	  
