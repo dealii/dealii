@@ -13,8 +13,6 @@
 
 
 #include <algorithm>
-#include <stack>
-
 #include <grid/grid_reordering.h>
 
 
