@@ -1,0 +1,61 @@
+# Maple script to compute the coefficients of the LagrangeEquidistant
+# basis functions of degree p. These are used as shape functions for
+# Qp elements. For higher p just change variable p in line 10.
+# Call   
+#   perl -p -e 's/ *t0 = (.*);\n/ $1/g;' lagrange_txt
+# to get a c-code ready to be copied into the source codes.
+# $Id$
+# Ralf Hartmann, 2001
+
+  p := 10:
+
+  n_functions := p+1:
+	
+  # first compute the support points
+  support_points := array(0..n_functions-1):
+  for i from 0 to n_functions-1 do
+    support_points[i] := i/(n_functions-1):  
+  od;	
+
+  poly := array(0..n_functions-1):
+
+  for i from 0 to n_functions-1 do
+    # note that the interp function wants vectors indexed from
+    #   one and not from zero. 
+    values := array(1..n_functions):
+    for j from 1 to n_functions do
+      values[j] := 0:
+    od:  
+    values[i+1] := 1:
+
+    shifted_support_points := array (1..n_functions):
+    for j from 1 to n_functions do
+      shifted_support_points[j] := support_points[j-1]:
+    od:
+    
+    poly[i] := interp (shifted_support_points, values, x):
+  od:
+	
+  readlib(C):
+  writeto(lagrange_output):
+  printf(`      case %d:\n      {\n		static const double x%d[%d]=\n	{`, p,p,(p+1)*(p+1)):
+  a := array(0..n_functions-1, 0..n_functions-1):
+  b := array(0..n_functions-1):
+  # a[i,j] is the jth coefficient of the ith base function.
+  for i from 0 to n_functions-1 do
+    for j from 0 to n_functions-1 do
+      b[j] := coeff(poly[i], x, j):
+    od:
+    C(b[0]):
+    for j from 1 to n_functions-1 do
+      printf(`,`):	
+      C(b[j]):
+    od:
+    if (i<n_functions-1) then
+      printf(`,`):
+    fi:
+  od:
+  printf(`};\n		 x=&x%d[0];\n	 break;\n         }\n`, p):
+
+
+
