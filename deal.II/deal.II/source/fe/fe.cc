@@ -403,7 +403,7 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
   Assert (global_unit_points.size() == unit_points.size(),
 	  ExcWrongFieldDimension(global_unit_points.size(), unit_points.size()));
 
-  static vector<Point<dim> > dummy(total_dofs);
+  vector<Point<dim> > dummy(total_dofs);
   fill_fe_values (cell, global_unit_points,
 		  jacobians, compute_jacobians,
 		  dummy, false,
