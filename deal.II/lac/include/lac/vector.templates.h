@@ -17,6 +17,7 @@
 #include <lac/vector.h>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 
 /*

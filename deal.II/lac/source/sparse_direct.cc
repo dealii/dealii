@@ -17,6 +17,9 @@
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 
+#include <iostream>
+
+
 // if we know that at least one of the HSL functions are there,
 // include the respective include file. Otherwise save some CPU cycles
 // in the compiler
