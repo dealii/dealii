@@ -12,30 +12,53 @@
 //----------------------------  denis_1.cc  ---------------------------
 
 
-// check for a bug in DerivativeApproximation::approximate_gradient
+// check for something in
+// DerivativeApproximation::approximate_gradient. the original report
+// stated it was a bug, but it was not (see the archives), but since
+// the program is already there let's make use of it.
 //
 // this program is a modified version of one by
 // Denis Danilov <danilovdenis@yandex.ru>, 
 
 
 #include <base/logstream.h>
+#include <base/function.h>
 #include <lac/vector.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
-#include <numerics/data_out.h>
+#include <numerics/vectors.h>
 #include <fe/fe_q.h>
 #include <numerics/derivative_approximation.h>
 #include <fstream>
 #include <iostream>
+
+
+class F : public Function<2>
+{
+  public:
+    virtual double value (const Point<2> &p, const unsigned int) const
+      {
+        double delta = 0.05;
+        double x, y, r;
+        x = p(0);
+        y = p(1);
+        r = sqrt( x*x + y*y );
+        return 0.5 * ( 1 - tanh( ( r - 0.5 )
+                                 /( 2*M_SQRT2 * delta ) ) ) ;
+      };
+};
+
 
 int main() 
 {
   std::ofstream logfile("denis_1.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  logfile.precision (2);
+  logfile.setf(std::ios::fixed);  
 
   Triangulation<2>   triangulation;
   FE_Q<2>            fe(2);
@@ -43,7 +66,6 @@ int main()
   Vector<double>       phi_solution;
   Vector<float>        gradient_phi;
   float                gradient_phi_min, gradient_phi_max;
-  double delta = 0.05;
 
   GridGenerator::hyper_cube(triangulation, 0, 1);
   triangulation.refine_global(5);
@@ -53,22 +75,7 @@ int main()
   DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(), endc = dof_handler.end();
   
   phi_solution.reinit(dof_handler.n_dofs());
-
-  for(; cell!=endc; ++cell)
-    {
-      for(unsigned int vertex=0;
-  	   vertex < GeometryInfo<2>::vertices_per_cell;
-  	   ++vertex)                               
-  	{
-  	  double x, y, r;
-	  x = cell->vertex(vertex)(0);
-  	  y = cell->vertex(vertex)(1);
-	  r = sqrt( x*x + y*y );
-	  phi_solution( cell->vertex_dof_index(vertex,0) )
-	    = 0.5 * ( 1 - tanh( ( r - 0.5 )
-				/( 2*M_SQRT2 * delta ) ) ) ;
-  	}
-    }
+  VectorTools::interpolate (dof_handler, F(), phi_solution);
 
   gradient_phi.reinit(triangulation.n_active_cells());
   DerivativeApproximation::approximate_gradient(dof_handler, phi_solution, gradient_phi);
