@@ -7,7 +7,7 @@
 
 /**
  * No preconditioning.
- * This class halps you, if you want to use a linear solver without
+ * This class helps you, if you want to use a linear solver without
  * preconditioning. Since this is a strange idea, the documentation
  * here stays quite short.
  *
