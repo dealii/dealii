@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>The deal.II Readme -- Installation Instructions</title>
+    <meta name="author" content="Wolfgang Bangerth <deal@iwr.uni-heidelberg.de>">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+
+
+    <h1>Installation instructions for SGI IRIX</h1>
+
+    <p>
+    <acronym>deal.II</acronym> works without problems with shared
+    libraries on this platform, if you list the paths
+    <code>$D/base/lib</code>, <code>$D/lac/lib</code>, and
+    <code>$D/deal.II/lib</code> in your <code>$LD_LIBRARY_PATH</code>
+    environment variable, where <code>$D</code> is the path to your
+    installation of the <acronym>deal.II</acronym> library. The
+    necessary actions can be done with the commands
+    <pre>
+    <code>
+      setenv LD_LIBRARY_PATH $D/base/lib:$D/lac/lib:$D/deal.II/lib:$LD_LIBRARY_PATH
+    </code>
+    </pre>
+    for csh-like shells, or by
+    <pre>
+    <code>
+      export LD_LIBRARY_PATH=$D/base/lib:$D/lac/lib:$D/deal.II/lib:$LD_LIBRARY_PATH
+    </code>
+    </pre>
+    if you use the ``bash'' shell. Please substitute <code>$D</code>
+    by whatever is the appropriate path on your installation.
+    </p>
+
+    <p>
+    These actions are necessary, since on SGI IRIX it seems not
+    possible to link a program to a shared library by giving the full
+    path of the latter. On all other systems where we use shared
+    libraries, the full path to the shared library is given on the
+    command line and stored somewhere in the executable, so that the
+    linker finds the library irrespective of the fact that the path is
+    specified in LD_LIBRARY_PATH or not. However, on SGI IRIX, as it
+    seems, only the library's name, not its path seems to be stored in
+    the executable, so LD_LIBRARY_PATH has to be modified.
+    </p>
+
+    <p>
+    We note that this might lead to problems if, for whatever reason,
+    you have multiple versions of <acronym>deal.II</acronym> installed
+    and compiled with different flags; then, to ensure that you link
+    to the correct library at execution time, you will have to
+    redefine LD_LIBRARY_PATH before execution of your program. Another
+    possibility would be to used statically linked libraries instead
+    of shared ones (see the 
+    <a href="../readme.html#options" target="body">ReadMe</a> file to
+    find out how to do that).
+    </p>
+
+
+  </body>
+</html>
