@@ -30,6 +30,7 @@ internals.exe           : internals.go           $(libraries)
 mapping.exe             : mapping.go             $(libraries)
 mapping_c1.exe          : mapping_c1.go          $(libraries)
 mapping_q1_eulerian.exe : mapping_q1_eulerian.go $(libraries)
+nedelec.exe             : nedelec.go             $(libraries)
 non_primitive_1.exe     : non_primitive_1.go     $(libraries)
 numbering.exe           : numbering.go           $(libraries)
 shapes.exe              : shapes.go              $(libraries)
@@ -38,7 +39,7 @@ transfer.exe		: transfer.go		 $(libraries)
 tests = derivatives fe_data_test fe_traits fe_tools_test mapping \
         mapping_c1 shapes numbering mapping_q1_eulerian \
         transfer internals \
-        non_primitive_1
+        non_primitive_1 nedelec
 
 ############################################################
 
