@@ -332,7 +332,7 @@ while (state == SolverControl::iterate)
 				       // Step 2
       sigma = q*t;
       
-//TODO:[GK] Find a really good breakdown criterion. The absolute one detects breakdown instead of convergence
+//TODO:[?] Find a really good breakdown criterion. The absolute one detects breakdown instead of convergence
       if (fabs(sigma/rho) < additional_data.breakdown)
 	return true;
 				       // Step 3

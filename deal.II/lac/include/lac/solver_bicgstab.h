@@ -309,7 +309,7 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 
       alpha = rho/rhobar;
 
-//TODO:[GK] Find better breakdown criterion
+//TODO:[?] Find better breakdown criterion
 
       if (fabs(alpha) > 1.e10)
 	return true;
