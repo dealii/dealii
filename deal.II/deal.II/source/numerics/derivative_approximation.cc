@@ -36,6 +36,13 @@ static T sqr (const T t)
 
 
 
+// static variables
+template <int dim>
+const UpdateFlags DerivativeApproximation::Gradient<dim>::update_flags;
+
+template <int dim>
+const UpdateFlags DerivativeApproximation::SecondDerivative<dim>::update_flags;
+
 
 
 template <int dim>
