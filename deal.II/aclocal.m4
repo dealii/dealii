@@ -119,13 +119,13 @@ dnl simply declared in <math.h> (or <cmath>, for what it's worth), but
 dnl on Linux for example, it is only declared if we specifically require
 dnl support for ISO C 99. This macro checks whether `isnan' is declared
 dnl or whether we have to pass special compiler flags, namely 
-dnl -D_ISOC99_SOURCE. Note that when checking we have to use the strict
-dnl compiler flags including -ansi -pedantic.
+dnl -D_ISOC99_SOURCE. Note that when checking we have to use the two
+dnl sets of compiler flags.
 dnl
 dnl Usage: DEAL_II_CHECK_ISNAN
 dnl
 AC_DEFUN(DEAL_II_CHECK_ISNAN, dnl
-  AC_MSG_CHECKING(whether isnan is declared)
+  AC_MSG_CHECKING(whether isnan is declared with debug flags)
   AC_REQUIRE([AC_LANG_CPLUSPLUS])
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
@@ -142,6 +142,23 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN, dnl
     [
 	AC_MSG_RESULT("no")
 	CXXFLAGSG="$CXXFLAGSG -D_ISOC99_SOURCE"
+    ])
+  AC_MSG_CHECKING(whether isnan is declared with optimized flags)
+  AC_REQUIRE([AC_LANG_CPLUSPLUS])
+  CXXFLAGS="$CXXFLAGSO"
+  AC_TRY_COMPILE(
+    [
+#include <cmath>
+    ],
+    [
+	double d;
+	isnan (d);
+    ],
+    [
+	AC_MSG_RESULT("yes")
+    ],
+    [
+	AC_MSG_RESULT("no")
 	CXXFLAGSO="$CXXFLAGSO -D_ISOC99_SOURCE"
     ])
 )      
