@@ -194,12 +194,14 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 				   // the following vector collects all dofs i,
 				   // 0<=i<fe.total_dofs, for that
 				   // unit_support_points[i] 
-				   // is a representative one.
+				   // is a representative one. i.e.
+				   // the following vector collects all rep dofs.
+				   // the position of a rep dof within this vector
+				   // is called rep index.
   vector<unsigned int> dofs_of_rep_points;
 				   // the following table converts a dof i
-				   // to the dof of the representative
-				   // point.
-  vector<unsigned int> dof_to_rep_dof_table;
+				   // to the rep index.
+  vector<unsigned int> dof_to_rep_index_table;
   unsigned int n_rep_points=0;
   for (unsigned int i=0; i<fe.total_dofs; ++i)
     {
@@ -214,20 +216,22 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 	if (unit_support_points[i] 
 	    == unit_support_points[dofs_of_rep_points[j-1]])
 	  {
-	    dof_to_rep_dof_table.push_back(j-1);
+	    dof_to_rep_index_table.push_back(j-1);
 	    representative=false;
 	    break;
 	  }
       
       if (representative)
 	{
+					   // rep_index=dofs_of_rep_points.size()
+	  dof_to_rep_index_table.push_back(dofs_of_rep_points.size());
+					   // dofs_of_rep_points[rep_index]=i
 	  dofs_of_rep_points.push_back(i);
-	  dof_to_rep_dof_table.push_back(i);
 	  ++n_rep_points;
 	}
     }
   Assert(dofs_of_rep_points.size()==n_rep_points, ExcInternalError());
-  Assert(dof_to_rep_dof_table.size()==fe.total_dofs, ExcInternalError());
+  Assert(dof_to_rep_index_table.size()==fe.total_dofs, ExcInternalError());
 
   cout << "n_rep_points=" << n_rep_points << endl;
 
@@ -262,7 +266,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 	{
 	  const unsigned int component
 	    = fe.system_to_component_index(i).first;
-	  const unsigned int rep_dof=dof_to_rep_dof_table[i];
+	  const unsigned int rep_dof=dof_to_rep_index_table[i];
 	  vec(dofs_on_cell[i])
 	    = function_values_at_rep_points[rep_dof](component);
 	}
@@ -941,7 +945,7 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
  	  case H1_norm:
  	  {
  	    const unsigned int n_q_points = q.n_quadrature_points;
- 	    vector<Vector<double> >  psi (n_q_points);
+ 	    vector<Vector<double> >  psi (n_q_points, Vector<double>(fe.n_components));
 
  					     // first compute the exact solution
 					     // (vectors) at the quadrature points
