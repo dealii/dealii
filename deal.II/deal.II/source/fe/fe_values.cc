@@ -93,7 +93,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double> &fe_function,
 
 template <int dim>
 void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_function,
-					     vector< vector<double> > &values) const
+					     vector< Vector<double> > &values) const
 {
   Assert (n_quadrature_points == values.size(),
 	  ExcWrongNoOfComponents());
@@ -116,7 +116,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_functi
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
-      values[point][fe->system_to_component_index(shape_func).first]
+      values[point](fe->system_to_component_index(shape_func).first)
 	+= (dof_values(shape_func) * shape_values[selected_dataset](shape_func, point));
 };
 
