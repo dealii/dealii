@@ -7,19 +7,13 @@
 ######################################################################
 # cvs login must have been executed before calling this script!
 ######################################################################
-#
-# For a new test copy this file to a new one with distinct name and
-# set the following parameters accordingly.
-#
 # Please, register tests by writing to info@dealii.org in advance.
 #
-# For the setup in Heidelberg, refer to build-script2
-#
-# author: Wolfgang Bangerth, Guido Kanschat 2002
+# Copyright: Wolfgang Bangerth, Guido Kanschat 2002
 ######################################################################
 
 ######################################################################
-# Configuration variables
+# Configuration variables (modified by the configuration script)
 ######################################################################
 
 # Your deal CVS access. Replace 'deal' by your name if necessary.
@@ -74,10 +68,6 @@ MAKE=make
 ######################################################################
 MAIL='mail'
 
-# If you cannot send mail directly from your computer, try this:
-
-#MAIL='ssh mailhost mail'
-
 ######################################################################
 # End of manual configuration
 # Don't modify below
@@ -88,7 +78,7 @@ MAIL='mail'
 if test -d $target ; then rm -rf $target ; fi
 mkdir $target 2>&1
 cd $target
-$CVS co deal.II 2>&1
+$CVS checkout deal.II 2>&1
 cd deal.II
 
 # Echo system information for later parsing
