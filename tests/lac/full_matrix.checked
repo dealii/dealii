@@ -1,4 +1,7 @@
 
+11. 12. 13. 
+21. 22. 23. 
+31. 32. 33. 
 DEAL::Inverse(dim=1):
 DEAL::Inverse(dim=2):
 DEAL::Inverse(dim=3):
@@ -65,22 +68,14 @@ DEAL::Frobenius-norm: 2.24
 4.093e-01  6.399e-01  1.636e+00  2.203e-01  -2.551e-01 
 -3.813e-02 -5.962e-02 2.203e-01  4.552e+00  5.184e-01  
 4.415e-02  6.903e-02  -2.551e-01 5.184e-01  4.400e+00  
-DEAL:Power method::Starting 
-DEAL:Power method::Convergence step 21 
 DEAL::Eigen
-DEAL:Power method::Starting 
-DEAL:Power method::Convergence step 27 
 DEAL::Eigen
 6.460e-01  9.460e-02  -2.046e-01 1.907e-02  -2.208e-02 
 9.460e-02  4.235e-01  -1.951e-01 1.817e-02  -2.104e-02 
 -2.046e-01 -1.951e-01 7.536e-01  -4.693e-02 5.433e-02  
 1.907e-02  1.817e-02  -4.693e-02 2.257e-01  -2.980e-02 
 -2.208e-02 -2.104e-02 5.433e-02  -2.980e-02 2.345e-01  
-DEAL:Power method::Starting 
-DEAL:Power method::Convergence step 17 
 DEAL::Eigen
-DEAL:Power method::Starting 
-DEAL:Power method::Convergence step 177 
 DEAL::Eigen
 DEAL::GrowingVectorMemory:Overall allocated vectors: 8
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 2

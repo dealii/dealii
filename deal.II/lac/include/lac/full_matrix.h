@@ -56,7 +56,7 @@ template<typename number> class Vector;
  * corresponding ``.templates.h'' file and instantiate the respective
  * class yourself.
  *
- * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
+ * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2001
  */
 template<typename number>
 class FullMatrix : public Subscriptor
@@ -82,12 +82,22 @@ class FullMatrix : public Subscriptor
     FullMatrix (const unsigned int rows, const unsigned int cols);
     
 				     /** 
-				      * Copy constructor. Be very careful with
-				      * this constructor, since it may take a
-				      * huge amount of computing time for large
-				      * matrices!!
+				      * Copy constructor. This constructor does
+				      * a deep copy of the matrix. Therefore,
+				      * it poses an efficiency problem.
 				      */
     FullMatrix (const FullMatrix&);
+
+				     /**
+				      * Constructor initializing from
+				      * an array of numbers. The array
+				      * is arranged line by line. No
+				      * range checking is performed.
+				      */
+    FullMatrix (const unsigned int rows,
+		const unsigned int cols,
+		const number* entries);
+
 
 				     /**
 				      * Destructor. Release all memory.
@@ -537,30 +547,50 @@ class FullMatrix : public Subscriptor
     void print (ostream& s, int width=5, int precision=2) const;
 
 				     /**
-				      * Print the matrix in the usual format,
-				      * i.e. as a matrix and not as a list of
-				      * nonzero elements. For better
-				      * readability, zero elements
-				      * are displayed as empty space.
+			      * Print the matrix in the usual
+				      * format, i.e. as a matrix and
+				      * not as a list of nonzero
+				      * elements. For better
+				      * readability, elements not in
+				      * the matrix are displayed as
+				      * empty space, while matrix
+				      * elements which are explicitely
+				      * set to zero are displayed as
+				      * such.
 				      *
-				      * Each entry is printed in scientific
-				      * format, with one pre-comma digit and
-				      * the number of digits given by
-				      * @p{precision} after the comma, with one
-				      * space following.
-				      * The precision defaults to four, which
-				      * suffices for most cases. The precision
-				      * and output format are @em{not}
-				      * properly reset to the old values
-				      * when the function exits.
+				      * The parameters allow for a
+				      * flexible setting of the output
+				      * format: @p{precision} and
+				      * @p{scientific} are used to
+				      * determine the number format,
+				      * where @p{scientific} = @p{false}
+				      * means fixed point notation.  A
+				      * zero entry for @p{width} makes
+				      * the function compute a width,
+				      * but it may be changed to a
+				      * positive value, if output is
+				      * crude.
 				      *
-				      * You should be aware that this function
+				      * Additionally, a character for
+				      * an empty value may be
+				      * specified.
+				      *
+				      * Finally, the whole matrix can
+				      * be multiplied with a common
+				      * denominator to produce more
+				      * readable output, even
+				      * integers.
+				      *
+				      * This function
 				      * may produce @em{large} amounts of
 				      * output if applied to a large matrix!
-				      * Be careful with it.
 				      */
     void print_formatted (ostream &out,
-			  const unsigned int presicion=3) const;
+			  const unsigned int presicion=3,
+			  const bool          scientific  = true,
+			  const unsigned int  width       = 0,
+			  const char         *zero_string = " ",
+			  const double        denominator = 1.) const;
     
 				     /**
 				      * Determine an estimate for the

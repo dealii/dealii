@@ -22,6 +22,8 @@
 #include <lac/full_matrix.h>
 #include <lac/eigen.h>
 
+const double entries[9] = { 11,12,13,21,22,23,31,32,33 };
+
 // Create a positive definite random matrix
 
 void random_matrix(FullMatrix<double>& A)
@@ -44,6 +46,9 @@ main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   srand(3391466);
+
+  FullMatrix<double> T(3,3,entries);
+  T.print_formatted(logfile, 0, false);
   
   for (unsigned int i=1;i<10;++i)
     {
@@ -108,7 +113,7 @@ main ()
       Vector<double> u(5);
       GrowingVectorMemory<Vector<double> > mem;
       
-      SolverControl control (500,1.e-8, false, true);
+      SolverControl control (500,1.e-8, false, false);
       
       if (true)
 	{

@@ -48,6 +48,22 @@ FullMatrix<number>::FullMatrix (const unsigned int m,
 
 
 template <typename number>
+FullMatrix<number>::FullMatrix (const unsigned int m,
+				const unsigned int n,
+				const number* entries) :
+		val (0),
+		dim_range (0),
+		dim_image (0),
+		val_size (0)
+{
+  reinit (m,n);
+
+  if (dim_range*dim_image != 0)
+    copy (entries, entries+dim_image*dim_range, val);
+};
+
+
+template <typename number>
 FullMatrix<number>::FullMatrix (const FullMatrix &m) :
 		Subscriptor (),
 		val (0),
@@ -1304,26 +1320,41 @@ FullMatrix<number>::invert (const FullMatrix<number> &M)
 
 template <typename number>
 void
-FullMatrix<number>::print_formatted (ostream &out, const unsigned int precision) const
+FullMatrix<number>::print_formatted (ostream &out,
+				     const unsigned int precision,
+				     bool scientific,
+				     unsigned int width,
+				     const char* zero_string,
+				     const double denominator) const
 {
   Assert (val != 0, ExcEmptyMatrix());
   
-  out.precision (precision);
-  out.setf (ios::scientific, ios::floatfield);   // set output format
+  unsigned int old_precision = out.precision (precision);
+  if (scientific)
+    {
+      out.setf (ios::scientific, ios::floatfield);
+      if (!width)
+	width = precision+7;
+    } else {
+      out.setf (ios::fixed, ios::floatfield);
+      if (!width)
+	width = precision+2;
+    }
   
   for (unsigned int i=0; i<m(); ++i) 
     {
       for (unsigned int j=0; j<n(); ++j)
 	if (el(i,j) != 0)
-	  out << setw(precision+7)
-	      << el(i,j) << ' ';
+	  out << setw(width)
+	      << el(i,j) * denominator << ' ';
 	else
-	  out << setw(precision+8) << " ";
+	  out << setw(width) << zero_string << ' ';
       out << endl;
     };
 
   AssertThrow (out, ExcIO());
-  
+
+  out.precision(old_precision);
   out.setf (0, ios::floatfield);                 // reset output format
 };
 
