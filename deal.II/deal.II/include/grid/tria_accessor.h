@@ -2521,7 +2521,9 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
                                       * asking
                                       * @p GeometryInfo::child_cell_on_subface
                                       * for the index of the
-                                      * child. However, the function
+                                      * child.
+                                      *
+                                      * However, the function
                                       * is more complicated in 3d,
                                       * since there faces may have
                                       * more than one orientation, and
@@ -2530,6 +2532,33 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
                                       * this and the neighbor cell to
                                       * figure out which cell we want
                                       * to have.
+                                      *
+                                      * This can lead to surprising results:
+                                      * if we are sitting on a cell and are
+                                      * asking for a cell behind subface @sf,
+                                      * then this means that we are
+                                      * considering the subface for the face
+                                      * in the natural direction for the
+                                      * present cell. However, if the face as
+                                      * seen from this cell has
+                                      * <tt>face_orientation()==false</tt>,
+                                      * then the child of the face that
+                                      * separates the present cell from the
+                                      * neighboring cell's child is not
+                                      * necessarily the @p sf-th child of the
+                                      * face of this cell. This is so because
+                                      * the @p subface_no parameter to this
+                                      * function corresponds to the subface
+                                      * with respect to the intrinsic ordering
+                                      * of the present cell, whereas children
+                                      * of face iterators are computed with
+                                      * respect to the intrinsic ordering of
+                                      * faces; these two orderings are only
+                                      * identical if the face orientation is
+                                      * @p true, and reversed otherwise.
+                                      *
+                                      * Fortunately, this is only very rarely
+                                      * of concern.
                                       */
     TriaIterator<dim,CellAccessor<dim> >
     neighbor_child_on_subface (const unsigned int face_no,
