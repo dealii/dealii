@@ -1202,9 +1202,9 @@ ConstraintMatrix::memory_consumption () const
 // syntax...
 
 #define vector_functions \
-  template void ConstraintMatrix::condense<>(const VectorType &uncondensed,\
+  template void ConstraintMatrix::condense<VectorType>(const VectorType &uncondensed,\
 					     VectorType       &condensed) const;\
-  template void ConstraintMatrix::condense<>(VectorType &vec) const;\
+  template void ConstraintMatrix::condense<VectorType>(VectorType &vec) const;\
   template void ConstraintMatrix::set_zero<>(VectorType &vec) const;\
   template void ConstraintMatrix::distribute<>(const VectorType &condensed,\
 					       VectorType       &uncondensed) const;\
