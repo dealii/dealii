@@ -381,12 +381,34 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
   std::map<unsigned int,double> boundary_values;
 
   if (enforce_zero_boundary == true) 
-				     // no need to project boundary values, but
-				     // enforce homogeneous boundary values
+				     // no need to project boundary
+				     // values, but enforce
+				     // homogeneous boundary values
 				     // anyway
     {
-      DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-					    endf = dof.end_face();
+				       // loop over all boundary faces
+				       // to get all dof indices of
+				       // dofs on the boundary. note
+				       // that in 3d there are cases
+				       // where a face is not at the
+				       // boundary, yet one of its
+				       // lines is, and we should
+				       // consider the degrees of
+				       // freedom on it as boundary
+				       // nodes. likewise, in 2d and
+				       // 3d there are cases where a
+				       // cell is only at the boundary
+				       // by one vertex. nevertheless,
+				       // since we do not support
+				       // boundaries with dimension
+				       // less or equal to dim-2, each
+				       // such boundary dof is also
+				       // found from some other face
+				       // that is actually wholly on
+				       // the boundary, not only by
+				       // one line or one vertex
+      typename DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
+						     endf = dof.end_face();
       std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
       for (; face!=endf; ++face)
 	if (face->at_boundary())

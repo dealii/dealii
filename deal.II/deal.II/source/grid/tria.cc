@@ -29,7 +29,7 @@
 
 
 template <int dim>
-const StraightBoundary<dim>& Triangulation<dim>::straight_boundary
+const StraightBoundary<dim> & Triangulation<dim>::straight_boundary
 = StraightBoundary<dim>();
 
 
@@ -1312,8 +1312,24 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // interior
   for (line_iterator line=begin_line(); line!=end_line(); ++line)
     line->set_boundary_indicator (255);
-				   // next reset all lines bounding boundary
-				   // quads as on the boundary also
+				   // next reset all lines bounding
+				   // boundary quads as on the
+				   // boundary also. note that since
+				   // we are in 3d, there are cases
+				   // where one or more lines of a
+				   // quad that is not on the
+				   // boundary, are actually boundary
+				   // lines. they will not be marked
+				   // when visiting this
+				   // face. however, since we do not
+				   // support dim-2 dimensional
+				   // boundaries (i.e. internal lines
+				   // constituting boundaries), every
+				   // such line is also part of a face
+				   // that is actually on the
+				   // boundary, so sooner or later we
+				   // get to mark that line for being
+				   // on the boundary
   for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
     if (quad->at_boundary())
       for (unsigned int l=0; l<4; ++l)
@@ -1533,11 +1549,11 @@ void Triangulation<1>::distort_random (const double factor,
   for (cell_iterator cell=begin(0); cell!=end(0); ++cell)
     almost_infinite_length += cell->diameter();
   
-  std::vector<double>             minimal_length (vertices.size(),
-						  almost_infinite_length);
+  std::vector<double> minimal_length (vertices.size(),
+				      almost_infinite_length);
 				   // also note if a vertex is at
 				   // the boundary
-  std::vector<bool>               at_boundary (vertices.size(), false);
+  std::vector<bool>   at_boundary (vertices.size(), false);
   
   for (active_line_iterator line=begin_active_line();
        line != end_line(); ++line)
@@ -1585,7 +1601,8 @@ void Triangulation<1>::distort_random (const double factor,
 
 template <int dim>
 void Triangulation<dim>::distort_random (const double factor,
-					 const bool   keep_boundary) {
+					 const bool   keep_boundary)
+{
 				   // this function is mostly equivalent to
 				   // that for the general dimensional case
 				   // the only difference being the correction
@@ -1607,12 +1624,12 @@ void Triangulation<dim>::distort_random (const double factor,
   for (cell_iterator cell=begin(0); cell!=end(0); ++cell)
     almost_infinite_length += cell->diameter();
   
-  std::vector<double>             minimal_length (vertices.size(),
-						  almost_infinite_length);
+  std::vector<double> minimal_length (vertices.size(),
+				      almost_infinite_length);
 
 				   // also note if a vertex is at
 				   // the boundary
-  std::vector<bool>               at_boundary (vertices.size(), false);
+  std::vector<bool>   at_boundary (vertices.size(), false);
   
   for (active_line_iterator line=begin_active_line();
        line != end_line(); ++line)
@@ -1683,8 +1700,10 @@ void Triangulation<dim>::distort_random (const double factor,
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::set_all_refine_flags () {
+void Triangulation<dim>::set_all_refine_flags ()
+{
   active_cell_iterator cell = begin_active(),
 		       endc = end();
 
@@ -1696,14 +1715,17 @@ void Triangulation<dim>::set_all_refine_flags () {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::refine_global (const unsigned int times) {
+void Triangulation<dim>::refine_global (const unsigned int times)
+{
   for (unsigned int i=0; i<times; ++i)
     {
       set_all_refine_flags();
       execute_coarsening_and_refinement ();
     };
 };
+
 
 
 // if necessary try to work around a bug in the IBM xlC compiler
@@ -4515,7 +4537,8 @@ void Triangulation<2>::execute_refinement () {
 #if deal_II_dimension == 3
 
 template <>
-void Triangulation<3>::execute_refinement () {
+void Triangulation<3>::execute_refinement ()
+{
   const unsigned int dim = 3;
 
 				   // check whether a new level is needed
@@ -4818,9 +4841,44 @@ void Triangulation<3>::execute_refinement () {
 	      vertices[next_unused_vertex]
 		= boundary[quad->boundary_indicator()]->get_new_point_on_quad (quad);
 	    else
+					       // it might be that the
+					       // quad itself is not
+					       // at the boundary, but
+					       // that one of its line
+					       // actually is. in this
+					       // case, the newly
+					       // created vertices at
+					       // the centers of the
+					       // lines are not
+					       // necessarily the mean
+					       // values of the
+					       // adjacent vertices,
+					       // so do not compute
+					       // the new vertex as
+					       // the mean value of
+					       // the 4 vertices of
+					       // the face, but rather
+					       // as the mean value of
+					       // the 8 vertices which
+					       // we already have (the
+					       // four old ones, and
+					       // the four ones
+					       // inserted as middle
+					       // points for the four
+					       // lines). summing up
+					       // some more points is
+					       // generally cheaper
+					       // than first asking
+					       // whether one of the
+					       // lines is at the
+					       // boundary
 	      vertices[next_unused_vertex]
 		= (quad->vertex(0) + quad->vertex(1) +
-		   quad->vertex(2) + quad->vertex(3)) / 4;
+		   quad->vertex(2) + quad->vertex(3) +
+		   quad->line(0)->child(0)->vertex(1) +
+		   quad->line(1)->child(0)->vertex(1) +
+		   quad->line(2)->child(0)->vertex(1) +
+		   quad->line(3)->child(0)->vertex(1)   ) / 8;
 	  
 					     // now that we created the right
 					     // point, make up the four

@@ -1180,6 +1180,17 @@ unsigned int DoFHandler<dim>::n_boundary_dofs () const
 
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
   std::vector<unsigned int> dofs_on_face(dofs_per_face);
+
+				   // loop over all faces to check
+				   // whether they are at a
+				   // boundary. note that we need not
+				   // take special care of single
+				   // lines (using
+				   // @p{cell->has_boundary_lines}),
+				   // since we do not support
+				   // boundaries of dimension dim-2,
+				   // and so every boundary line is
+				   // also part of a boundary face.
   active_face_iterator face = begin_active_face (),
 		       endf = end_face();
   for (; face!=endf; ++face)

@@ -157,8 +157,19 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
   const unsigned int dofs_per_face = dof.get_fe().dofs_per_face;
   std::vector<unsigned int> dofs_on_this_face(dofs_per_face);
-  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-					endf = dof.end_face();
+
+				   // loop over all faces to check
+				   // whether they are at a
+				   // boundary. note that we need not
+				   // take special care of single
+				   // lines (using
+				   // @p{cell->has_boundary_lines}),
+				   // since we do not support
+				   // boundaries of dimension dim-2,
+				   // and so every boundary line is
+				   // also part of a boundary face.
+  typename DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
+						 endf = dof.end_face();
   for (; face!=endf; ++face)
     if (face->at_boundary())
       {
@@ -250,7 +261,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
 
-  (const_cast<Triangulation<dim>& > (dof.get_tria())).clear_user_flags();
+				   // clear user flags for further use
+  const_cast<Triangulation<dim>&>(dof.get_tria()).clear_user_flags();
   
   for (; cell!=endc; ++cell)
     {
@@ -850,6 +862,20 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
   selected_dofs.clear ();
   selected_dofs.resize (dof_handler.n_dofs(), false);
   std::vector<unsigned int> face_dof_indices (dof_handler.get_fe().dofs_per_face);
+
+				   // now loop over all cells and
+				   // check whether their faces are at
+				   // the boundary. note that we need
+				   // not take special care of single
+				   // lines being at the boundary
+				   // (using
+				   // @p{cell->has_boundary_lines}),
+				   // since we do not support
+				   // boundaries of dimension dim-2,
+				   // and so every isolated boundary
+				   // line is also part of a boundary
+				   // face which we will be visiting
+				   // sooner or later
   for (DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -1706,6 +1732,19 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>     &dof_handl
   std::vector<unsigned int> dofs_on_face(dofs_per_face);
   unsigned int next_boundary_index = 0;
   
+				   // now loop over all cells and
+				   // check whether their faces are at
+				   // the boundary. note that we need
+				   // not take special care of single
+				   // lines being at the boundary
+				   // (using
+				   // @p{cell->has_boundary_lines}),
+				   // since we do not support
+				   // boundaries of dimension dim-2,
+				   // and so every isolated boundary
+				   // line is also part of a boundary
+				   // face which we will be visiting
+				   // sooner or later
   typename DoFHandler<dim>::active_face_iterator face = dof_handler.begin_active_face(),
 						 endf = dof_handler.end_face();
   for (; face!=endf; ++face)
