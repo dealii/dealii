@@ -89,7 +89,7 @@ void Histogram::evaluate (const typename std::vector<Vector<number> > &values,
 	    
       case logarithmic:
 	    min_value = *std::min_element(values[0].begin(),
-				     values[0].end(),
+					  values[0].end(),
 #if (__GNUC__-0==2) && (__GNUC_MINOR__-0 < 95)
 				     &logarithmic_less<number>
 #else
