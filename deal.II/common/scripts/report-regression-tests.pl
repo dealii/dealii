@@ -68,7 +68,7 @@ print REPORT_FILE <<"EOT"
 <title>Regression tests</title>
 </head>
 
-<frameset rows="120,*,300" border=2>
+<frameset rows="20%,40%,40%" border=2>
 <frame name="report_head"    src="tests_report_head.html"    frameborder="yes">
 <frame name="report_results" src="tests_report_${default_year}_${default_month}.html" frameborder="yes">
 <frame name="report_names"   src="tests_report_names.html"   frameborder="yes">
