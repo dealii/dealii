@@ -39,17 +39,46 @@ namespace Functions
 {
 
   using namespace std;
+
+
   
   template<int dim>
-  CutOffFunctionLinfty<dim>::CutOffFunctionLinfty (const double r,
-						   const Point<dim> p,
-						   const unsigned int n_components,
-						   const unsigned int select)
+  CutOffFunctionBase<dim>::CutOffFunctionBase (const double r,
+					       const Point<dim> p,
+					       const unsigned int n_components,
+					       unsigned int select)
 		  :
 		  Function<dim> (n_components),
     center(p),
     radius(r),
     selected(select)
+  {}
+
+
+  template<int dim>
+  void
+  CutOffFunctionBase<dim>::new_center (const Point<dim>& p)
+  {
+    center = p;
+  }
+
+
+  template<int dim>
+  void
+  CutOffFunctionBase<dim>::new_radius (const double r)
+  {
+    radius = r;
+  }
+
+//////////////////////////////////////////////////////////////////////
+  
+  template<int dim>
+  CutOffFunctionLinfty<dim>::CutOffFunctionLinfty (const double r,
+						   const Point<dim> p,
+						   const unsigned int n_components,
+						   unsigned int select)
+		  :
+		  CutOffFunctionBase<dim> (r, p, n_components, select)
   {}
 
 
@@ -113,10 +142,7 @@ namespace Functions
 					   const unsigned int n_components,
 					   const unsigned int select)
 		  :
-		  Function<dim> (n_components),
-                  center(p),
-                  radius(r),
-    selected(select)
+		  CutOffFunctionBase<dim> (r, p, n_components, select)
   {}
 
 
@@ -185,10 +211,7 @@ namespace Functions
 						   const unsigned int n_components,
 						   const unsigned int select)
 		  :
-		  Function<dim> (n_components),
-                  center(p),
-                  radius(r),
-    selected(select)
+		  CutOffFunctionBase<dim> (r, p, n_components, select)
   {}
 
 

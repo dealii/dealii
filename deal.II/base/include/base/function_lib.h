@@ -786,6 +786,71 @@ namespace Functions
 
 
 /**
+ * Base function for cut-off function. This class stores the center
+ * and the radius of the supporting ball of a cut-off function. It
+ * also stores the number of the non-zero component, if the function
+ * is vector-valued.
+ *
+ * @author Guido Kanschat, 2002
+ */
+  template <int dim>
+  class CutOffFunctionBase : public Function<dim>
+  {
+    public:
+  				       /**
+					* Constructor. Arguments are the
+					* center of the ball and its
+					* radius.
+					*
+					* If an argument @p{select} is
+					* given and not -1, the
+					* cut-off function will be
+					* non-zero for this component
+					* only.
+					*/
+      CutOffFunctionBase (const double radius = 1.,
+			  Point<dim> = Point<dim>(),
+			  const unsigned int n_components = 1,
+			  const unsigned int select = no_component);
+      
+				       /**
+					* Move the center of the ball
+					* to new point @p{p}.
+					*/
+      void new_center (const Point<dim>& p);
+      
+				       /**
+					* Set the radius of the ball to @p{r}.
+					*/
+      void new_radius (const double r);
+
+    protected:
+      				       /**
+					* Center of the integration ball.
+					*/
+      const Point<dim> center;
+
+				       /**
+					* Radius of the ball.
+					*/
+      const double radius;
+
+				       /**
+					* Component selected. If
+					* @p{no_component}, the function is
+					* the same in all components.
+					*/
+      const unsigned int selected;
+				       /**
+					* Value for no selected component.
+					*/
+      static const unsigned int no_component = static_cast<unsigned int>(-1);
+
+  };
+  
+  
+  
+/**
  * Cut-off function in L-infinity for an arbitrary ball.  This
  * function is the characteristic function of a ball around @p{center}
  * with a specified @p{radius}. If vector valued, it can be restricted
@@ -794,7 +859,7 @@ namespace Functions
  * @author Guido Kanschat, 2001, 2002
  */
   template<int dim>
-  class CutOffFunctionLinfty : public Function<dim>
+  class CutOffFunctionLinfty : public CutOffFunctionBase<dim>
   {
     public:
 				       /**
@@ -831,28 +896,6 @@ namespace Functions
 					*/
       virtual void vector_value_list (const typename std::vector<Point<dim> > &points,
 				      std::vector<Vector<double> >           &values) const;
-
-    private:
-				       /**
-					* Center of the integration ball.
-					*/
-      const Point<dim> center;
-
-				       /**
-					* Radius of the ball.
-					*/
-      const double radius;
-
-				       /**
-					* Component selected. If
-					* @p{no_component}, the function is
-					* the same in all components.
-					*/
-      const unsigned int selected;
-				       /**
-					* Value for no selected component.
-					*/
-      static const unsigned int no_component = static_cast<unsigned int>(-1);
   };
   
   
@@ -865,7 +908,7 @@ namespace Functions
  * @author Guido Kanschat, 2001, 2002
  */
   template<int dim>
-  class CutOffFunctionW1 : public Function<dim>
+  class CutOffFunctionW1 : public CutOffFunctionBase<dim>
   {
     public:
 				       /**
@@ -902,29 +945,6 @@ namespace Functions
 					*/
       virtual void vector_value_list (const typename std::vector<Point<dim> > &points,
 				      std::vector<Vector<double> >           &values) const;
-
-    private:
-				       /**
-					* Center of the integration ball.
-					*/
-      const Point<dim> center;
-
-				       /**
-					* Radius of the ball.
-					*/
-      const double radius;
-
-				       /**
-					* Component selected. If
-					* @p{no_component}, the
-					* function is the same in all
-					* components.
-					*/
-      const unsigned int selected;
-				       /**
-					* Value for no selected component.
-					*/
-      static const unsigned int no_component = static_cast<unsigned int>(-1);
   };
   
   
@@ -938,7 +958,7 @@ namespace Functions
  * @author Guido Kanschat, 2001, 2002
  */
   template<int dim>
-  class CutOffFunctionCinfty : public Function<dim>
+  class CutOffFunctionCinfty : public CutOffFunctionBase<dim>
   {
     public:
 				       /**
@@ -981,32 +1001,7 @@ namespace Functions
 					*/
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
 				      const unsigned int  component = 0) const;
-      
-    private:
-				       /**
-					* Center of the integration ball.
-					*/
-      const Point<dim> center;
-
-				       /**
-					* Radius of the ball.
-					*/
-      const double radius;
-
-				       /**
-					* Component selected. If
-					* @p{no_component}, the function is
-					* the same in all components.
-					*/
-      const unsigned int selected;
-
-				       /**
-					* Value for no selected component.
-					*/
-      static const unsigned int no_component = static_cast<unsigned int>(-1);      
   };
-  
-};
-
+}
 
 #endif
