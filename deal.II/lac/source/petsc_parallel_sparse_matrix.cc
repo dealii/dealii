@@ -222,7 +222,8 @@ namespace PETScWrappers
                                        // tricks with conversions of pointers
       const std::vector<signed int> int_row_lengths (row_lengths.begin(),
                                                      row_lengths.end());
-                                       
+
+//TODO: There must be a significantly better way to provide information about the off-diagonal blocks of the matrix. this way, petsc keeps allocating tiny chunks of memory, and gets completely hung up over this
       const int ierr
         = MatCreateMPIAIJ(communicator,
 			  local_rows, local_columns,
