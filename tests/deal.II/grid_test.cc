@@ -271,10 +271,9 @@ void test (const int test_case)
 
 int main ()
 {
+  logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
-				   // limit output a bit
-  logfile.precision (4);
   
   for (unsigned int i=1; i<=3; ++i)
     test<2> (i);

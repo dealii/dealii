@@ -30,6 +30,8 @@
 int main ()
 {
   ofstream logfile("gradients.output");
+				   // limit output a bit
+  logfile.precision (3);
   deallog.attach(logfile);
   deallog.depth_console(0);
 

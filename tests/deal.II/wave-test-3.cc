@@ -9167,10 +9167,10 @@ int main ()
 {
 				   // no additional output to console
   deallog.attach(logfile);
+  logfile.setf(ios::fixed);
+  logfile.precision (3);
   deallog.depth_console(0);
 
-  logfile.precision(4);
-  
   WaveProblem<2> waves;
   MultipleParameterLoop input_data;
 

@@ -63,6 +63,8 @@ extern void write_gnuplot (const MGDoFHandler<2>& dofs,
 int main()
 {
   ofstream logfile("mglocal.output");
+  logfile.setf(ios::fixed);
+  logfile.precision (3);
   deallog.attach(logfile);
   deallog.depth_console(0);
 

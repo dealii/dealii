@@ -265,13 +265,18 @@ target1: $(target1-o-files) $(libraries)
 # Postprocessing
 ############################################################
 
+wavetest.output:%.testcase
+	@echo =====Running======= $<
+	@./$<
+	@perl -pi~ -e 's/JobId.*//;s/value.*//;s/(\.\d\d)\d*/\1/g;' $@
+
 %.output:%.testcase
 	@echo =====Running======= $<
 	@./$<
 	@perl -pi -e 's/JobId.*//;s/value.*//;' $@
 
 %.check:%.output
-	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
+	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============' $<
 ############################################################
 # Cleanup targets
 ############################################################
