@@ -17,6 +17,7 @@
 #include <base/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
+#include <numerics/error_estimator.h>
 
 #include <map>
 #include <fstream>
@@ -33,10 +34,12 @@ class RightHandSide :  public Function<dim>
   public:
     double operator () (const Point<dim> &p) const 
       {
-	double x = 6;
+	double x = 80;
 	for (unsigned int d=0; d<dim; ++d)
 	  if (p(d) < 0.5)
-	    x *= -1;
+	    x *= -p(d);
+	  else
+	    x *= (1-p(d));
 	
 	return x;
       };
@@ -170,51 +173,68 @@ void NonlinearProblem<dim>::run () {
   dirichlet_bc[0] = &boundary_values;
 
 
-  cout << "    Making grid... ";
   tria->create_hypercube ();
-  tria->refine_global (6);
-  cout << tria->n_active_cells() << " active cells." << endl;
-  
-  cout << "    Distributing dofs... "; 
-  dof->distribute_dofs (fe);
-  cout << dof->n_dofs() << " degrees of freedom." << endl;
+  tria->refine_global (4);
 
-				   // set the starting values for the iteration
-				   // to a constant value of 1
-  last_solution.reinit (dof->n_dofs());
-  for (unsigned int i=0; i<dof->n_dofs(); ++i)
-    last_solution(i) = 1;
-  
-
-				   // here comes the fixed point iteration
-  for (unsigned int nonlinear_step=0; nonlinear_step<40; ++nonlinear_step)
+  for (unsigned int refinement_step=0; refinement_step<10; ++refinement_step)
     {
-      cout << "    Nonlinear step " << nonlinear_step << endl;
-      cout << "        Assembling matrices..." << endl;
-      assemble (equation, quadrature, fe,
-		UpdateFlags(update_gradients | update_JxW_values |
-			    update_q_points),
-		dirichlet_bc, boundary);
+      cout << "Refinement step " << refinement_step << endl
+	   << "  Grid has " << tria->n_active_cells() << " active cells." << endl;
+  
+      cout << "    Distributing dofs... "; 
+      dof->distribute_dofs (fe);
+      cout << dof->n_dofs() << " degrees of freedom." << endl;
+      
+				       // set the starting values for the iteration
+				       // to a constant value of 1
+      last_solution.reinit (dof->n_dofs());
+      for (unsigned int i=0; i<dof->n_dofs(); ++i)
+	last_solution(i) = 1;
+  
 
-      cout << "        Solving..." << endl;
-      solve ();
-
-      if (nonlinear_step % 4 == 0)
+				       // here comes the fixed point iteration
+      for (unsigned int nonlinear_step=0; nonlinear_step<10; ++nonlinear_step)
 	{
-	  string filename = "nonlinear.";
-	  filename += ('0' + (nonlinear_step/4));
-	  filename += ".gnuplot";
-	  cout << "        Writing to file <" << filename << ">..." << endl;
+	  cout << "    Nonlinear step " << nonlinear_step << endl;
+	  cout << "        Assembling matrices..." << endl;
+	  assemble (equation, quadrature, fe,
+		    UpdateFlags(update_gradients | update_JxW_values |
+				update_q_points),
+		    dirichlet_bc, boundary);
 	  
-	  DataOut<dim> out;
-	  ofstream gnuplot(filename.c_str());
-	  fill_data (out);
-	  out.write_gnuplot (gnuplot);
-	  gnuplot.close ();
+	  cout << "        Solving..." << endl;
+	  solve ();
+	  
+	  if (nonlinear_step % 2 == 0)
+	    {
+	      string filename = "nonlinear.";
+	      filename += ('0' + refinement_step);
+	      filename += '.';
+	      filename += ('0' + (nonlinear_step/2));
+	      filename += ".gnuplot";
+	      cout << "        Writing to file <" << filename << ">..." << endl;
+	      
+	      DataOut<dim> out;
+	      ofstream gnuplot(filename.c_str());
+	      fill_data (out);
+	      out.write_gnuplot (gnuplot);
+	      gnuplot.close ();
+	    };
+	  
+	  last_solution = solution;
 	};
 
-      last_solution = solution;
+      Vector<float> error_indicator;
+      KellyErrorEstimator<dim> ee;
+      QSimpson<dim-1> eq;
+      ee.estimate_error (*dof, eq, fe, boundary,
+			 KellyErrorEstimator<dim>::FunctionMap(),
+			 solution,
+			 error_indicator);
+      tria->refine_and_coarsen_fixed_number (error_indicator, 0.3, 0);
+      tria->execute_coarsening_and_refinement ();
     };
+  
   
   delete dof;
   delete tria;
