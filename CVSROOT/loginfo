@@ -17,23 +17,23 @@
 #
 # For example:
 #
-DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default.1999.html > /tmp/Tdefault; mv /tmp/Tdefault $CVSROOT/LOG/default.1999.html
+DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default.1999.html > /tmp/Tdefault; mv /tmp/Tdefault $CVSROOT/LOG/default.1999.html; chmod a+r $CVSROOT/LOG/default.1999.html
 #
 # The various DEAL libraries
 #
-^base.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/base.html > /tmp/Tbase; mv /tmp/Tbase $CVSROOT/LOG/base.html
+^base.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/base.html > /tmp/Tbase; mv /tmp/Tbase $CVSROOT/LOG/base.html; chmod a+r $CVSROOT/LOG/base.html
 #
-^reports.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/reports.html > /tmp/Treports; mv /tmp/Treports $CVSROOT/LOG/reports.html
+^reports.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/reports.html > /tmp/Treports; mv /tmp/Treports $CVSROOT/LOG/reports.html; chmod a+r $CVSROOT/LOG/reports.html
 #
-^tests.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/tests.html > /tmp/Ttests; mv /tmp/Ttests $CVSROOT/LOG/tests.html
+^tests.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/tests.html > /tmp/Ttests; mv /tmp/Ttests $CVSROOT/LOG/tests.html; chmod a+r $CVSROOT/LOG/tests.html
 #
-^lac.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/lac.html > /tmp/Tlac; mv /tmp/Tlac $CVSROOT/LOG/lac.html
+^lac.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/lac.html > /tmp/Tlac; mv /tmp/Tlac $CVSROOT/LOG/lac.html; chmod a+r $CVSROOT/LOG/lac.html
 #
-^deal.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/deal.1999.html > /tmp/Tdeal; mv /tmp/Tdeal $CVSROOT/LOG/deal.1999.html
+^deal.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/deal.1999.html > /tmp/Tdeal; mv /tmp/Tdeal $CVSROOT/LOG/deal.1999.html; chmod a+r $CVSROOT/LOG/deal.html
 #
-^examples.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/examples.html > /tmp/Texamples; mv /tmp/Texamples $CVSROOT/LOG/examples.html
+^examples.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/examples.html > /tmp/Texamples; mv /tmp/Texamples $CVSROOT/LOG/examples.html; chmod a+r $CVSROOT/LOG/examples.html
 #
-^doc.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/doc.html > /tmp/Tdoc; mv /tmp/Tdoc $CVSROOT/LOG/doc.html
+^doc.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/doc.html > /tmp/Tdoc; mv /tmp/Tdoc $CVSROOT/LOG/doc.html; chmod a+r $CVSROOT/LOG/doc.html
 
 
 
