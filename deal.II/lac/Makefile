@@ -43,6 +43,14 @@ else
   libo: $(LIBDIR)/liblac.a
 endif
 
+# if we use HSL, then we need to link against libhsl.so. if we don't, then
+# don't set this variable
+ifeq ($(USE_CONTRIB_HSL),yes)
+  LIBHSL=$(lib-contrib-hsl)
+else
+  LIBHSL=
+endif
+
 $(LIBDIR)/liblac.a: $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files)
@@ -56,11 +64,11 @@ $(LIBDIR)/liblac.g.a: $(go-files)
 
 $(LIBDIR)/liblac.so: $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files) $(lib-base.o) $(LIBHSL)
 
 $(LIBDIR)/liblac.g.so: $(go-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files) $(lib-base.g) $(LIBHSL)
 
 
 

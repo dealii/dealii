@@ -41,28 +41,28 @@ baseg:
 baseo:
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libo
 
-lacg: 
+lacg: baseg contrib
 	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
 
-laco:
+laco: baseo contrib
 	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libo
 
-1dg:
+1dg: baseg lacg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
 
-2dg:
+2dg: baseg lacg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
 
-3dg:
+3dg: baseg lacg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
 
-1do:
+1do:baseo laco
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
 
-2do:
+2do:baseo laco
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
 
-3do:
+3do: baseo laco
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
 deps: 
