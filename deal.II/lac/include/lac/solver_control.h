@@ -45,9 +45,11 @@ class SolverControl : public Subscriptor
   public:
 
 				     /**
-				      * #Enum# denoting the different states
-				      * a solver can be in. See the general
-				      * documentation for more information.
+				      * #Enum# denoting the different
+				      * states a solver can be in. See
+				      * the general documentation of
+				      * this class for more
+				      * information.
 				      */
     enum State {
       iterate = 0, success, failure
@@ -164,11 +166,17 @@ class SolverControl : public Subscriptor
 
 
 /**
- * Specialization  of #SolverControl# which returns #success# if either
- * the specified tolerance is achieved or if the
- * initial residual (or whatever criterion was chosen by the solver
- * class) is reduced by a given factor. This is useful in cases where
- * you don't want to solve exactly, but rather want to gain two digits.
+ * Specialization of #SolverControl# which returns #success# if either
+ * the specified tolerance is achieved or if the initial residual (or
+ * whatever criterion was chosen by the solver class) is reduced by a
+ * given factor. This is useful in cases where you don't want to solve
+ * exactly, but rather want to gain two digits or if the maximal
+ * number of iterations is achived.  For exemple: The maximal number
+ * of iterations is 20, the reduction factor is 1% und the tolerance
+ * is 0.1%. The initial residual is 2.5. The process will break if 20
+ * iteration are comleted or the new residual is less then 2.5*1% or
+ * if it is less then 0.1%.
+ 
  */
 class ReductionControl : public SolverControl
 {
