@@ -525,10 +525,10 @@ template <int dim>
 template <typename number>
 void
 MatrixTools<dim>::apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-					 SparseMatrix<number>  &matrix,
-					 Vector<number>   &solution,
-					 Vector<number>   &right_hand_side,
-					 const bool        preserve_symmetry)
+					 SparseMatrix<number> &matrix,
+					 Vector<number>       &solution,
+					 Vector<number>       &right_hand_side,
+					 const bool            preserve_symmetry)
 {
   Assert (matrix.n() == matrix.m(),
 	  ExcDimensionsDontMatch(matrix.n(), matrix.m()));
@@ -652,8 +652,8 @@ MatrixTools<dim>::apply_boundary_values (const std::map<unsigned int,double> &bo
 					       // (row,dof_number)
 	      const unsigned int *
 		p = std::lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
-				&sparsity_colnums[sparsity_rowstart[row+1]],
-				dof_number);
+				     &sparsity_colnums[sparsity_rowstart[row+1]],
+				     dof_number);
 
 					       // check whether this line has
 					       // an entry in the regarding column
