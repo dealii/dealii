@@ -192,14 +192,14 @@ class AdvectionProblem
 				 // vector field with as many compents
 				 // as there are space dimensions. One
 				 // could now use a class derived from
-				 // the @p{Function} base class, as we
+				 // the ``Function'' base class, as we
 				 // have done for boundary values and
 				 // coefficients in previous examples,
 				 // but there is another possibility
 				 // in the library, namely a base
 				 // class that describes tensor valued
 				 // functions. In contrast to the
-				 // usual @p{Function} objects, we
+				 // usual ``Function'' objects, we
 				 // provide the compiler with
 				 // knowledge on the size of the
 				 // objects of the return type. This
@@ -208,7 +208,7 @@ class AdvectionProblem
 				 // simple for usual vector-valued
 				 // functions where memory has to be
 				 // allocated on the heap (thus, the
-				 // @p{Function::vector_value}
+				 // ``Function::vector_value''
 				 // function has to be given the
 				 // address of an object into which
 				 // the result is to be written, in
