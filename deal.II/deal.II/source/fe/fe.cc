@@ -99,7 +99,6 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 };
 
 
-
 template<int dim>
 bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 {
@@ -241,11 +240,13 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				       const dFMatrix       &,
 				       const vector<vector<Tensor<1,1> > > &,
 				       const Boundary<1> &boundary) const {
-  Assert (jacobians.size() == unit_points.size(),
+  Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
-  Assert (q_points.size() == unit_points.size(),
+  Assert ((!compute_jacobians_grad) || (jacobians_grad.size() == unit_points.size()),
+	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
+  Assert ((!compute_q_points) || (q_points.size() == unit_points.size()),
 	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert (support_points.size() == total_dofs,
+  Assert ((!compute_support_points) || (support_points.size() == total_dofs),
 	  ExcWrongFieldDimension(support_points.size(), total_dofs));
 
 

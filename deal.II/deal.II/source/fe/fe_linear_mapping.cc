@@ -567,12 +567,15 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 					   const bool           compute_q_points,
 					   const dFMatrix      &shape_values_transform,
 					   const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/,
-					   const Boundary<dim> &boundary) const {
-  Assert (jacobians.size() == unit_points.size(),
+					   const Boundary<dim> &boundary) const
+{
+  Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
-  Assert (q_points.size() == unit_points.size(),
+  Assert ((!compute_jacobians_grad) || (jacobians_grad.size() == unit_points.size()),
+	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
+  Assert ((!compute_q_points) || (q_points.size() == unit_points.size()),
 	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert (support_points.size() == total_dofs,
+  Assert ((!compute_support_points) || (support_points.size() == total_dofs),
 	  ExcWrongFieldDimension(support_points.size(), total_dofs));
 
   

@@ -939,7 +939,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 					vector<Tensor<3,dim> > &jacobians_grad,
 					const bool              compute_jacobians_grad,
 					vector<Point<dim> >    &support_points,
-					const bool,
+					const bool compute_support_points,
 					vector<Point<dim> >    &q_points,
 					const bool              compute_q_points,
 					const dFMatrix         &shape_values_transform,
@@ -957,7 +957,8 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 
 				   // we need the support points in any
 				   // way, wanted or not by the user
-  get_support_points (cell, boundary, support_points);
+  if (compute_support_points)
+    get_support_points (cell, boundary, support_points);
 
   if (compute_q_points) 
     {

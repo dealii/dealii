@@ -23,7 +23,7 @@ examples-clean:
 source-clean:
 	cd source ; make clean
 TAGS:
-	etags include/*/* source/*/*
+	etags include/*/*.h source/*/*.cc
 
 
 .PHONY: all deal.II examples TAGS

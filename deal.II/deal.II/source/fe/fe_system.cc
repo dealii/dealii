@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1990 */
+/* Copyright W. Bangerth, G. Kanschat University of Heidelberg, 1990 */
 
 
 #include <fe/fe_system.h>
@@ -196,7 +196,7 @@ FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe1,
 {
   return FiniteElementData<1> (fe1.dofs_per_vertex * N1 + fe2.dofs_per_vertex * N2 ,
 			       fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2 ,
-			       fe1.n_transform_functions + fe2.n_transform_functions ,
+			       fe1.n_transform_functions,
 			       fe1.n_components * N1 + fe2.n_components * N2 );
 };
 
@@ -227,7 +227,7 @@ FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe1,
   return FiniteElementData<2> (fe1.dofs_per_vertex * N1 + fe2.dofs_per_vertex * N2 ,
 			       fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2 ,
 			       fe1.dofs_per_quad * N1 + fe2.dofs_per_quad * N2 ,
-			       fe1.n_transform_functions + fe2.n_transform_functions ,
+			       fe1.n_transform_functions,
 			       fe1.n_components * N1 + fe2.n_components * N2 );
 };
 
@@ -374,82 +374,126 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 
 
 template <int dim>
-double FESystem<dim>::shape_value_transform (const unsigned int /*i*/,
-					     const Point<dim>  &/*p*/) const
+double FESystem<dim>::shape_value_transform (const unsigned int i,
+					     const Point<dim>  &p) const
 {
-  Assert(false, ExcNotImplemented());
-  return 0.;
+  return base_elements[0].first->shape_value_transform(i,p);
 };
 
 
 template <int dim>
-Tensor<1,dim> FESystem<dim>::shape_grad_transform (const unsigned int /*i*/,
-						   const Point<dim>  &/*p*/) const
+Tensor<1,dim> FESystem<dim>::shape_grad_transform (const unsigned int i,
+						   const Point<dim>  &p) const
 {
-  Assert(false, ExcNotImplemented());
-  return Tensor<1,dim>();
-
-//  return base_element->shape_grad_transform (i, p);
+  return base_elements[0].first->shape_grad_transform (i, p);
 };
 
 
 
 template <int dim>
-void FESystem<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &/*face*/,
-					const Boundary<dim>         &/*boundary*/,
-					const vector<Point<dim-1> > &/*unit_points*/,
-					vector<double>      &/*face_jacobi_determinants*/) const
+void FESystem<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
+					const Boundary<dim>         &boundary,
+					const vector<Point<dim-1> > &unit_points,
+					vector<double>      &face_jacobi_determinants) const
 {
-  Assert(false, ExcNotImplemented());
-
-//  base_element->get_face_jacobians (face, boundary, unit_points, face_jacobi_determinants);
+  base_elements[0].first->get_face_jacobians (face, boundary, unit_points,
+					face_jacobi_determinants);
 };
 
 
 
 template <int dim>
-void FESystem<dim>::get_subface_jacobians (const DoFHandler<dim>::face_iterator &/*face*/,
-					   const unsigned int           /*subface_no*/,
-					   const vector<Point<dim-1> > &/*unit_points*/,
-					   vector<double>      &/*face_jacobi_determinants*/) const
+void FESystem<dim>::get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+					   const unsigned int           subface_no,
+					   const vector<Point<dim-1> > &unit_points,
+					   vector<double>      &face_jacobi_determinants) const
 {
-  Assert(false, ExcNotImplemented());
-
-//  base_element->get_subface_jacobians (face, subface_no, unit_points, face_jacobi_determinants);
+  base_elements[0].first->get_subface_jacobians (face, subface_no, unit_points,
+					   face_jacobi_determinants);
 };
 
 
 
 
 template <int dim>
-void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &/*cell*/,
-					const unsigned int          /*face_no*/,
-					const Boundary<dim>         &/*boundary*/,
-					const vector<Point<dim-1> > &/*unit_points*/,
-					vector<Point<dim> >         &/*normal_vectors*/) const
+void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+					const unsigned int          face_no,
+					const Boundary<dim>         &boundary,
+					const vector<Point<dim-1> > &unit_points,
+					vector<Point<dim> >         &normal_vectors) const
 {
-  Assert(false, ExcNotImplemented());
-
-//  base_element->get_normal_vectors (cell, face_no, boundary, unit_points, normal_vectors);
+  base_elements[0].first->get_normal_vectors (cell, face_no, boundary, unit_points,
+					normal_vectors);
 };
 
 
 
 template <int dim>
-void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &/*cell*/,
-					const unsigned int          /*face_no*/,
-					const unsigned int          /*subface_no*/,
-					const vector<Point<dim-1> > &/*unit_points*/,
-					vector<Point<dim> >         &/*normal_vectors*/) const
+void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+					const unsigned int          face_no,
+					const unsigned int          subface_no,
+					const vector<Point<dim-1> > &unit_points,
+					vector<Point<dim> >         &normal_vectors) const
 {
-  Assert(false, ExcNotImplemented());
-
-//  base_element->get_normal_vectors (cell, face_no, subface_no, unit_points, normal_vectors);
+  base_elements[0].first->get_normal_vectors (cell, face_no, subface_no, unit_points,
+				    normal_vectors);
 };
 
 
+template <int dim>
+void
+FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+			       const vector<Point<dim> >            &unit_points,
+			       vector<Tensor<2,dim> >               &jacobians,
+			       const bool              compute_jacobians,
+			       vector<Tensor<3,dim> > &jacobians_grad,
+			       const bool              compute_jacobians_grad,
+			       vector<Point<dim> > &support_points,
+			       const bool           compute_support_points,
+			       vector<Point<dim> > &q_points,
+			       const bool           compute_q_points,
+			       const dFMatrix      &shape_values_transform,
+			       const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
+			       const Boundary<dim> &boundary) const
+{
+  vector<Point<dim> > supp(base_elements[0].first->total_dofs);
 
+  base_elements[0].first->fill_fe_values (cell, unit_points, jacobians, compute_jacobians,
+					  jacobians_grad, compute_jacobians_grad,
+					  support_points, compute_support_points,
+					  q_points, compute_q_points,
+					  shape_values_transform, shape_grad_transform, boundary);
+  
+  if (compute_support_points)
+    {
+      unsigned component = 0;
+      
+      for (unsigned m=0 ; m < element_multiplicity(0) ; ++ m)
+	{
+	  for (unsigned i=0 ; i < base_element(0).total_dofs ; ++i)
+	    support_points[component_to_system_index(component,i)] = supp[i];
+	  ++component;
+	}
+      for (unsigned base=1 ; base < n_base_elements() ; ++base)
+	{
+	  supp.resize(base_elements[base].first->total_dofs);
+	  base_elements[base].first->fill_fe_values (cell, unit_points, jacobians, false,
+						     jacobians_grad, false,
+						     supp, true,
+						     q_points, false,
+						     shape_values_transform, shape_grad_transform, boundary);
+	  
+	  for (unsigned m=0 ; m < element_multiplicity(base) ; ++ m)
+	    {
+	      for (unsigned i=0 ; i < base_element(base).total_dofs ; ++i)
+		support_points[component_to_system_index(component,i)] = supp[i];
+	      ++component;
+	    }
+	}    
+    }
+}
 
+    
 
 // explicit instantiations
 template class FESystem<deal_II_dimension>;

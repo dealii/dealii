@@ -92,8 +92,9 @@ class FiniteElementData
 				      */
     const unsigned int n_transform_functions;
 
+    
 				     /**
-				      * Number of components.
+				      * Number of components and dimension of the image space.
 				      */
     const unsigned int n_components;
 
@@ -853,7 +854,12 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      *
 				      * The function assumes that the fields
 				      * already have the right number of
-				      * elements.
+				      * elements. It has to be
+				      * guaranteed, that fields that are
+				      * not requested for update are not changed.
+				      * This also means, that these
+				      * fields have to be filled with
+				      * the correct values beforehand.
 				      *
 				      * This function is more or less an
 				      * interface to the #FEValues# class and

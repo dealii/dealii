@@ -19,6 +19,7 @@ template <int dim> class Boundary;
 template <int dim> class StraightBoundary;
 class ConstraintMatrix;
 class dVector;
+class VectorFunction;
 
 
 /**
@@ -376,6 +377,7 @@ class VectorTools {
 					 map<int,double>          &boundary_values);
     
     				     /**
+				      * Compute the error of the finite element solution.
 				      * Integrate the difference between
 				      * a finite element function and
 				      * the reference function, which
@@ -392,6 +394,20 @@ class VectorTools {
 				      const Quadrature<dim>    &q,
 				      const NormType           &norm,
 				      const Boundary<dim> &boundary=StraightBoundary<dim>());
+
+				     /**
+				      * Compute the error for the solution of a system.
+				      * See the other #integrate_difference#.
+				      */
+    static void integrate_difference (const DoFHandler<dim>    &dof,
+				      const dVector            &fe_function,
+				      const VectorFunction     &exact_solution,
+				      dVector                  &difference,
+				      const Quadrature<dim>    &q,
+				      const FiniteElement<dim> &fe,
+				      const NormType           &norm,
+				      const Boundary<dim>      &boundary);
+    
 
 				     /**
 				      * Exception

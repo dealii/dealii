@@ -88,11 +88,42 @@ void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
 };
 
 
+template <int dim>
+void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
+					     vector< vector<double> > &values) const
+{
+  Assert (fe->n_components == values.size(),
+	  ExcWrongNoOfComponents());
+  Assert (selected_dataset<shape_values.size(),
+	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+  for (unsigned i=0;i<values.size();++i)
+    Assert (values[i].size() == n_quadrature_points,
+	    ExcWrongVectorSize(values.size(), n_quadrature_points));
+
+				   // get function values of dofs
+				   // on this cell
+  dVector dof_values (total_dofs);
+  present_cell->get_dof_values (fe_function, dof_values);
+
+				   // initialize with zero
+  for (unsigned i=0;i<values.size();++i)
+    fill_n (values[i].begin(), n_quadrature_points, 0);
+
+				   // add up contributions of trial
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+      values[fe->system_to_component_index(shape_func).first][point]
+	+= (dof_values(shape_func) * shape_values[selected_dataset](shape_func, point));
+};
+
+
 
 template <int dim>
 const Tensor<1,dim> &
 FEValuesBase<dim>::shape_grad (const unsigned int i,
-			       const unsigned int j) const {
+			       const unsigned int j) const
+{
   Assert (i<shape_gradients.size(),
 	  ExcInvalidIndex (i, shape_gradients.size()));
   Assert (j<shape_gradients[i].size(),

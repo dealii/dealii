@@ -543,7 +543,8 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
   
   FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points));
   const StraightBoundary<dim> boundary;
-  vector<double> *values = new vector<double> [data.size()];
+  vector< vector <vector<double> > >
+    values (data.size(), vector< vector<double> >(dofs->get_fe().n_components, vector<double>(points.n_quadrature_points)));
 
   for (cell=dofs->begin_active(); cell!=endc; ++cell) 
     {
@@ -551,7 +552,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 
       for (unsigned i=0; i<data.size(); ++i)
       {
-	values[i].resize(points.n_quadrature_points);
+//	values[i].resize(points.n_quadrature_points);
 	fe.get_function_values(*data[i].data, values[i]);
       }
       
@@ -568,8 +569,9 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		    Point<dim> pt = fe.quadrature_point(supp_pt);
 		    out << pt << "  ";
 		    for (unsigned int i=0; i!=data.size(); ++i)
-		      out << values[i][supp_pt]
-			  << ' ';
+		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
+			out << values[i][j][supp_pt]
+			    << ' ';
 		    out << endl;
 		  };
 		
@@ -589,8 +591,9 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		    out << pt << "  ";
 		    
 		    for (unsigned int i=0; i!=data.size(); ++i)
-		      out << values[i][supp_pt]
-			  << ' ';
+		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
+			out << values[i][j][supp_pt]
+			    << ' ';
 		    out << endl;
 		  }
 		  out << endl;
@@ -621,8 +624,9 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 			    out << pt << "  ";
 			    
 			    for (unsigned int i=0; i!=data.size(); ++i)
-			      out << values[i][supp_pt]
-				  << ' ';
+			      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
+				out << values[i][j][supp_pt]
+				    << ' ';
 			    out << endl;
 			  }
 			out << endl;
@@ -638,7 +642,6 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 	}
     out << endl;
     }
-  delete [] values;
 
   AssertThrow (out, ExcIO());
 }

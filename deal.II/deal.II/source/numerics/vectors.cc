@@ -555,5 +555,193 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
     };
 };
 
+template <int dim>
+void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
+					     const dVector            &fe_function,
+					     const TensorFunction<1,dim>      &exact_solution,
+					     dVector                  &difference,
+					     const Quadrature<dim>    &q,
+					     const FiniteElement<dim> &fe,
+					     const NormType           &norm,
+					     const Boundary<dim>      &boundary) {
+  Assert (fe == dof.get_fe(), ExcInvalidFE());
+  
+  difference.reinit (dof.get_tria().n_active_cells());
+  
+  UpdateFlags update_flags = UpdateFlags (update_q_points  |
+					  update_JxW_values);
+  if ((norm==H1_seminorm) || (norm==H1_norm))
+    update_flags = UpdateFlags (update_flags | update_gradients);
+  FEValues<dim> fe_values(fe, q, update_flags);
+  
+				   // loop over all cells
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+					endc = dof.end();
+  for (unsigned int index=0; cell != endc; ++cell, ++index)
+    {
+      double diff=0;
+				       // initialize for this cell
+      fe_values.reinit (cell, boundary);
+
+      switch (norm) 
+	{
+	  case mean:
+	  case L1_norm:
+	  case L2_norm:
+	  case Linfty_norm:
+	  case H1_norm:
+	  {
+					     // we need the finite element
+					     // function \psi at the different
+					     // integration points. Compute
+					     // it like this:
+					     // \psi(x_j)=\sum_i v_i \phi_i(x_j)
+					     // with v_i the nodal values of the
+					     // fe_function and \phi_i(x_j) the
+					     // matrix of the trial function
+					     // values at the integration point
+					     // x_j. Then the vector
+					     // of the \psi(x_j) is v*Phi with
+					     // v being the vector of nodal
+					     // values on this cell and Phi
+					     // the matrix.
+					     //
+					     // we then need the difference:
+					     // reference_function(x_j)-\psi_j
+					     // and assign that to the vector
+					     // \psi.
+	    const unsigned int n_q_points = q.n_quadrature_points;
+	    vector<double>   psi (n_q_points);
+
+					     // in praxi: first compute
+					     // exact fe_function vector
+	    exact_solution.value_list (fe_values.get_quadrature_points(),
+				       psi);
+					     // then subtract finite element
+					     // fe_function
+	    if (true) 
+	      {
+		vector< vector<double> > function_values (fe.n_components, vector<double>(n_q_points, 0));
+		fe_values.get_function_values (fe_function, function_values);
+
+		transform (psi.begin(), psi.end(),
+			   function_values.begin(),
+			   psi.begin(),
+			   minus<double>());
+	      };	    
+
+					     // for L1_norm and Linfty_norm:
+					     // take absolute
+					     // value, for the L2_norm take
+					     // square of psi
+	    switch (norm) 
+	      {
+		case mean:
+		      break;
+		case L1_norm:
+		case Linfty_norm:
+		      transform (psi.begin(), psi.end(),
+				 psi.begin(), ptr_fun(fabs));
+		      break;
+		case L2_norm:
+		case H1_norm:
+		      transform (psi.begin(), psi.end(),
+				 psi.begin(), ptr_fun(sqr));
+		      break;
+		default:
+		      Assert (false, ExcNotImplemented());
+	      };
+
+					     // ok, now we have the integrand,
+					     // let's compute the integral,
+					     // which is
+					     // sum_j psi_j JxW_j
+					     // (or |psi_j| or |psi_j|^2
+	    switch (norm) 
+	      {
+		case mean:
+		case L1_norm:
+		      diff = inner_product (psi.begin(), psi.end(),
+					    fe_values.get_JxW_values().begin(),
+					    0.0);
+		      break;
+		case L2_norm:
+		case H1_norm:
+		      diff = sqrt(inner_product (psi.begin(), psi.end(),
+						 fe_values.get_JxW_values().begin(),
+						 0.0));
+		      break;
+		case Linfty_norm:
+		      diff = *max_element (psi.begin(), psi.end());
+		      break;
+		default:
+		      Assert (false, ExcNotImplemented());
+	      };
+
+					     // note: the H1_norm uses the result
+					     // of the L2_norm and control goes
+					     // over to the next case statement!
+	    if (norm != H1_norm)
+	      break;
+	  };
+
+	  case H1_seminorm:
+	  {
+					     // note: the computation of the
+					     // H1_norm starts at the previous
+					     // case statement, but continues
+					     // here!
+
+					     // for H1_norm: re-square L2_norm.
+	    diff = sqr(diff);
+
+					     // same procedure as above, but now
+					     // psi is a vector of gradients
+	    const unsigned int n_q_points = q.n_quadrature_points;
+	    vector<Tensor<1,dim> >   psi (n_q_points);
+
+					     // in praxi: first compute
+					     // exact fe_function vector
+	    exact_solution.gradient_list (fe_values.get_quadrature_points(),
+					  psi);
+	    
+					     // then subtract finite element
+					     // fe_function
+	    if (true) 
+	      {
+		vector<Tensor<1,dim> > function_grads (n_q_points, Tensor<1,dim>());
+		fe_values.get_function_grads (fe_function, function_grads);
+
+		transform (psi.begin(), psi.end(),
+			   function_grads.begin(),
+			   psi.begin(),
+			   minus<Tensor<1,dim> >());
+	      };
+					     // take square of integrand
+	    vector<double> psi_square (psi.size(), 0.0);
+	    for (unsigned int i=0; i<n_q_points; ++i)
+	      psi_square[i] = sqr_point(psi[i]);
+
+					     // add seminorm to L_2 norm or
+					     // to zero
+	    diff += inner_product (psi_square.begin(), psi_square.end(),
+				   fe_values.get_JxW_values().begin(),
+				   0.0);
+	    diff = sqrt(diff);
+
+	    break;
+	  };
+					     
+	  default:
+		Assert (false, ExcNotImplemented());
+	};
+
+      
+				       // append result of this cell
+				       // to the end of the vector
+      difference(index) = diff;
+    };
+};
+
 
 template VectorTools<deal_II_dimension>;

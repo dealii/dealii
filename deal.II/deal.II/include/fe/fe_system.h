@@ -316,6 +316,23 @@ class FESystem : public FiniteElement<dim>
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;
 
+				     /**
+				      * Implementation of the corresponding function of #FiniteElement#.
+				      */
+    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+				 const vector<Point<dim> >            &unit_points,
+				 vector<Tensor<2,dim> >               &jacobians,
+				 const bool              compute_jacobians,
+				 vector<Tensor<3,dim> > &jacobians_grad,
+				 const bool              compute_jacobians_grad,
+				 vector<Point<dim> > &support_points,
+				 const bool           compute_support_points,
+				 vector<Point<dim> > &q_points,
+				 const bool           compute_q_points,
+				 const dFMatrix      &shape_values_transform,
+				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
+				 const Boundary<dim> &boundary) const;
+    
 				     /** 
 				      * Number of different base
 				      * elements of this object.
@@ -425,6 +442,10 @@ class FESystem : public FiniteElement<dim>
 				      * the #.h# file.
 				      */
     void initialize();
+				     /**
+				      *Exception.
+				      */
+    DeclException0(ExcElementTransformNotEqual);
 };
 
 
@@ -478,6 +499,9 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 		base_elements(2),
 		component_to_base_table(n_components)
 {
+  Assert(fe1.n_transform_functions == fe2.n_transform_functions,
+	 ExcElementTransformNotEqual());
+  
   base_elements[0] = ElementPair(new FE1, n1);
   base_elements[0].first -> subscribe ();
   base_elements[1] = ElementPair(new FE2, n2);
