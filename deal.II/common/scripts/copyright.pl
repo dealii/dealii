@@ -13,8 +13,6 @@ use strict;
 
 my $file = $ARGV[0];
 
-print "# $file\n";
-
 my @log = `cvs log $file`;
 my %years;
 
@@ -56,7 +54,7 @@ while(<>)
     }
 }
 
-print "# OK: $copystring\n" if ($ok);
+# print "# OK: $copystring\n" if ($ok);
 
-print "# no copyright found\n" unless ($found);
+print "# $file: no copyright found\n" unless ($found);
 
