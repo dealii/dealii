@@ -3476,72 +3476,55 @@ unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const
 
 #if deal_II_dimension < 3
 
-template <>
-unsigned int Triangulation<1>::n_hexs () const {
+template <int dim>
+unsigned int Triangulation<dim>::n_hexs () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
 
-
-template <>
-unsigned int Triangulation<1>::n_hexs (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
-  return 0;
-};
-
-
-template <>
-unsigned int Triangulation<1>::n_active_hexs () const {
-  Assert (false, ExcFunctionNotUseful());
-  return 0;
-};
-
-
-template <>
-unsigned int Triangulation<1>::n_active_hexs (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
-  return 0;
-};
-
-
-template <>
-unsigned int Triangulation<2>::n_hexs () const {
-  Assert (false, ExcFunctionNotUseful());
-  return 0;
-};
-
-
-template <>
-unsigned int Triangulation<2>::n_hexs (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
-  return 0;
-};
-
-
-template <>
-unsigned int Triangulation<2>::n_active_hexs () const {
-  Assert (false, ExcFunctionNotUseful());
-  return 0;
-};
-
-
-template <>
-unsigned int Triangulation<2>::n_active_hexs (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
-  return 0;
-};
-
-#endif
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_hexs () const {
+unsigned int Triangulation<dim>::n_hexs (const unsigned int) const
+{
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_active_hexs () const
+{
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_active_hexs (const unsigned int) const
+{
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+#else
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_hexs () const
+{
   return number_cache.n_hexes;
 };
 
 
+
 template <int dim>
-unsigned int Triangulation<dim>::n_hexs (const unsigned int level) const {
+unsigned int Triangulation<dim>::n_hexs (const unsigned int level) const
+{
   Assert (level < number_cache.n_hexes_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_hexes_level.size()));
   
@@ -3549,14 +3532,18 @@ unsigned int Triangulation<dim>::n_hexs (const unsigned int level) const {
 };
 
 
+
 template <int dim>
-unsigned int Triangulation<dim>::n_active_hexs () const {
+unsigned int Triangulation<dim>::n_active_hexs () const
+{
   return number_cache.n_active_hexes;
 };
 
 
+
 template <int dim>
-unsigned int Triangulation<dim>::n_active_hexs (const unsigned int level) const {
+unsigned int Triangulation<dim>::n_active_hexs (const unsigned int level) const
+{
   Assert (level < number_cache.n_hexes_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_hexes_level.size()));
   
@@ -3564,8 +3551,12 @@ unsigned int Triangulation<dim>::n_active_hexs (const unsigned int level) const 
 };
 
 
+#endif
+
+
 template <int dim>
-unsigned int Triangulation<dim>::n_levels () const {
+unsigned int Triangulation<dim>::n_levels () const
+{
   if (levels.size() == 0)
     return 0;
 				   // check whether there are
