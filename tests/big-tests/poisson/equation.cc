@@ -4,24 +4,6 @@
 
 
 
-template <int dim>
-double RightHandSide<dim>::operator () (const Point<dim> &p) const {
-  const double pi = 3.1415926536;
-  switch (dim) 
-    {
-      case 1:
-	    return p(0)*p(0)*p(0)-3./2.*p(0)*p(0)-6*p(0)+3;
-      case 2:
-	    return (-2.0*cos(pi*p(0)/2)*p(1)*sin(pi*p(1)) +
-		    2.0*p(0)*sin(pi*p(0)/2)*pi*p(1)*sin(pi*p(1)) +
-		    5.0/4.0*p(0)*p(0)*cos(pi*p(0)/2)*pi*pi*p(1)*sin(pi*p(1)) -
-		    2.0*p(0)*p(0)*cos(pi*p(0)/2)*cos(pi*p(1))*pi);
-      default:
-	    return 0;
-    };
-};
-
-
 
 
 
@@ -82,9 +64,6 @@ void PoissonEquation<dim>::assemble (dVector             &,
 
 
 
-
-template class RightHandSide<1>;
-template class RightHandSide<2>;
 
 
 template class PoissonEquation<1>;

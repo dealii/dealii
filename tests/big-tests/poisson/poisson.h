@@ -35,21 +35,6 @@ extern "C" {
 
 
 template <int dim>
-class RightHandSide : public Function<dim> {
-  public:
-    				     /**
-				      * Return the value of the function
-				      * at the given point.
-				      */
-    virtual double operator () (const Point<dim> &p) const;
-};
-
-
-
-
-
-
-template <int dim>
 class PoissonEquation :  public Equation<dim> {
   public:
     PoissonEquation (const Function<dim> &rhs) :
@@ -89,14 +74,18 @@ class PoissonProblem : public ProblemBase<dim>,
 
 
     bool make_grid (ParameterHandler &prm);
-    void make_ball_grid ();
-    void make_curved_line_grid ();
     void make_zoom_in_grid ();
     void make_random_grid ();
 
+    bool set_right_hand_side (ParameterHandler &prm);
+    bool set_boundary_values (ParameterHandler &prm);
+    
   protected:
     Triangulation<dim> *tria;
     DoFHandler<dim>    *dof;
+    
+    Function<dim>      *rhs;
+    Function<dim>      *boundary_values;
 };
 
 

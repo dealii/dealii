@@ -5,6 +5,52 @@
 
 
 
+template <int dim>
+class BoundaryValuesSine : public Function<dim> {
+  public:
+    				     /**
+				      * Return the value of the function
+				      * at the given point.
+				      */
+    virtual double operator () (const Point<dim> &p) const {
+      return cos(2*3.1415926536*p(0))*cos(2*3.1415926536*p(1));
+    };
+    
+
+				     /**
+				      * Set #values# to the point values
+				      * of the function at the #points#.
+				      * It is assumed that #values# be
+				      * empty.
+				      */
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<double>            &values) const {
+      for (unsigned int i=0; i<points.size(); ++i) 
+	values.push_back (cos(2*3.1415926536*points[i](0)) *
+			  cos(2*3.1415926536*points[i](1)));
+    };
+};
+
+
+
+
+template <int dim>
+class RHSTrigPoly : public Function<dim> {
+  public:
+    				     /**
+				      * Return the value of the function
+				      * at the given point.
+				      */
+    virtual double operator () (const Point<dim> &p) const;
+};
+
+
+
+
+
+
+
+
 
 template <int dim>
 class CurvedLine :
@@ -35,16 +81,56 @@ class CurvedLine :
 
 
 template <int dim>
+double RHSTrigPoly<dim>::operator () (const Point<dim> &p) const {
+  const double pi = 3.1415926536;
+  switch (dim) 
+    {
+      case 1:
+	    return p(0)*p(0)*cos(2*pi*p(0));
+      case 2:
+	    return (-2.0*cos(pi*p(0)/2)*p(1)*sin(pi*p(1)) +
+		    2.0*p(0)*sin(pi*p(0)/2)*pi*p(1)*sin(pi*p(1)) +
+		    5.0/4.0*p(0)*p(0)*cos(pi*p(0)/2)*pi*pi*p(1)*sin(pi*p(1)) -
+		    2.0*p(0)*p(0)*cos(pi*p(0)/2)*cos(pi*p(1))*pi);
+      default:
+	    return 0;
+    };
+};
+
+
+
+
+
+template <int dim>
 PoissonProblem<dim>::PoissonProblem () :
-		tria(0), dof(0) {};
+		tria(0), dof(0), rhs(0), boundary_values(0) {};
 
 
 
 
 template <int dim>
 void PoissonProblem<dim>::clear () {
-  if (tria != 0) delete tria;
-  if (dof  != 0) delete dof;
+  if (tria != 0) {
+    delete tria;
+    tria = 0;
+  };
+  
+  if (dof != 0) {
+    delete dof;
+    dof = 0;
+  };
+
+  if (rhs != 0) 
+    {
+      delete rhs;
+      rhs = 0;
+    };
+
+  if (boundary_values != 0) 
+    {
+      delete boundary_values;
+      boundary_values = 0;
+    };
 
   ProblemBase<dim>::clear ();
 };
@@ -67,12 +153,17 @@ void PoissonProblem<dim>::create_new (const unsigned int) {
 template <int dim>
 void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
   if (dim>=2)
-    prm.declare_entry ("Test run", "zoom in", "zoom in\\|ball\\|curved line\\|random");
+    prm.declare_entry ("Test run", "zoom in",
+		       "tensor\\|zoom in\\|ball\\|curved line\\|random");
   else
-    prm.declare_entry ("Test run", "zoom in", "zoom in\\|random");
+    prm.declare_entry ("Test run", "zoom in", "tensor\\|zoom in\\|random");
 
   prm.declare_entry ("Global refinement", "0",
 		     ParameterHandler::RegularExpressions::Integer);
+  prm.declare_entry ("Right hand side", "zero",
+		     "zero\\|constant\\|trigpoly");
+  prm.declare_entry ("Boundary values", "zero",
+		     "zero\\|sine");
   prm.declare_entry ("Output file", "gnuplot.1");
 };
 
@@ -90,11 +181,13 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
       if (test=="curved line") test_case = 3;
       else
 	if (test=="random") test_case = 4;
-	else 
-	  {
-	    cerr << "This test seems not to be implemented!" << endl;
-	    return false;
-	  };
+	else
+	  if (test=="tensor") test_case = 5;
+	  else
+	    {
+	      cerr << "This test seems not to be implemented!" << endl;
+	      return false;
+	    };
 
   switch (test_case) 
     {
@@ -102,13 +195,28 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 	    make_zoom_in_grid ();
 	    break;
       case 2:
-	    make_ball_grid ();
+					     // make ball grid around origin with
+					     // unit radius
+      {
+	    static const Point<dim> origin;
+	    static const HyperBallBoundary<dim> boundary(origin, 1.);
+	    tria->create_hyper_ball (origin, 1.);
+	    tria->set_boundary (&boundary);
 	    break;
+      };
       case 3:
-	    make_curved_line_grid ();
+					     // set the boundary function
+      {
+	    static const CurvedLine<dim> boundary;
+	    tria->create_hypercube ();
+	    tria->set_boundary (&boundary);
 	    break;
+      };
       case 4:
 	    make_random_grid ();
+	    break;
+      case 5:
+	    tria->create_hypercube ();
 	    break;
       default:
 	    return false;
@@ -152,30 +260,6 @@ void PoissonProblem<dim>::make_zoom_in_grid () {
 
 
 
-template <int dim>
-void PoissonProblem<dim>::make_ball_grid () {
-				   // make ball grid around origin with
-				   // unit radius
-  const Point<dim> origin;
-  static const HyperBallBoundary<dim> boundary(origin, 1.);
-  
-  tria->create_hyper_ball (origin, 1.);
-  tria->set_boundary (&boundary);
-};
-
-
-
-
-template <int dim>
-void PoissonProblem<dim>::make_curved_line_grid () {
-				   // set the boundary function
-  static const CurvedLine<dim> boundary;
-
-  tria->create_hypercube ();
-  tria->set_boundary (&boundary);
-};
-
-
 
 template <int dim>
 void PoissonProblem<dim>::make_random_grid () {
@@ -203,7 +287,50 @@ void PoissonProblem<dim>::make_random_grid () {
       tria->execute_refinement ();
     };
 };
+  
 
+
+
+template <int dim>
+bool PoissonProblem<dim>::set_right_hand_side (ParameterHandler &prm) {
+  String rhs_name = prm.get ("Right hand side");
+
+  if (rhs_name == "zero")
+    rhs = new ZeroFunction<dim>();
+  else
+    if (rhs_name == "constant")
+      rhs = new ConstantFunction<dim>(1.);
+    else
+      if (rhs_name == "trigpoly")
+	rhs = new RHSTrigPoly<dim>();
+      else
+	return false;
+
+  if (rhs != 0)
+    return true;
+  else
+    return false;
+};
+
+
+
+template <int dim>
+bool PoissonProblem<dim>::set_boundary_values (ParameterHandler &prm) {
+  String bv_name = prm.get ("Boundary values");
+
+  if (bv_name == "zero")
+    boundary_values = new ZeroFunction<dim> ();
+  else
+    if (bv_name == "sine")
+      boundary_values = new BoundaryValuesSine<dim> ();
+    else
+      return false;
+
+  if (boundary_values != 0)
+    return true;
+  else
+    return false;
+};
 
 
 
@@ -217,10 +344,14 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   if (!make_grid (prm))
     return;
   
+  if (!set_right_hand_side (prm))
+    return;
 
+  if (!set_boundary_values (prm))
+    return;
+  
   FELinear<dim>                   fe;
-  static const RightHandSide<dim> rhs;
-  PoissonEquation<dim>            equation (rhs);
+  PoissonEquation<dim>            equation (*rhs);
   QGauss4<dim>                    quadrature;
   
   cout << "    Distributing dofs... "; 
@@ -233,8 +364,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   update_flags.jacobians = update_flags.JxW_values = true;
   
   ProblemBase<dim>::DirichletBC dirichlet_bc;
-  ZeroFunction<dim> zero;
-  dirichlet_bc[0] = &zero;
+  dirichlet_bc[0] = boundary_values;
   assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
 
   cout << "    Solving..." << endl;
