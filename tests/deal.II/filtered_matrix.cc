@@ -98,7 +98,7 @@ check ()
 {
   Triangulation<dim> tr;
 
-  CosineFunction<dim> cosine;
+  Functions::CosineFunction<dim> cosine;
   
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);

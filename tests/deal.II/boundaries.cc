@@ -120,7 +120,7 @@ check ()
 				   // FE2: a linear element, to make
 				   // things simple
   fe_list.push_back (new FE_Q<dim> (1));
-  function_list.push_back (new SquareFunction<dim>());
+  function_list.push_back (new Functions::SquareFunction<dim>());
   
 				   // check all of them
   for (unsigned int i=0; i<fe_list.size(); ++i)
