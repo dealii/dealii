@@ -1291,7 +1291,7 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 				     // component the call of this
 				     // function refers
     return this->shape_gradients[this->shape_function_to_row_table[i]][j];
-};
+}
 
 
 
@@ -1489,7 +1489,7 @@ const Quadrature<dim> &
 FEValues<dim>::get_quadrature () const 
 {
   return quadrature;
-};
+}
 
 
 /*------------------------ Inline functions: FEFaceValuesBase --------------------*/
@@ -1501,10 +1501,10 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 {
   Assert (i<this->normal_vectors.size(), ExcIndexRange(i, 0, this->normal_vectors.size()));
   Assert (this->update_flags & update_normal_vectors,
-	  FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   
   return this->normal_vectors[i];
-};
+}
 
 
 template <int dim>
@@ -1513,7 +1513,7 @@ typename DoFHandler<dim>::face_iterator
 FEFaceValuesBase<dim>::get_face() const 
 {
   return present_face;
-};
+}
 
 
 
@@ -1523,7 +1523,7 @@ const Quadrature<dim-1> &
 FEFaceValuesBase<dim>::get_quadrature () const 
 {
   return quadrature;
-};
+}
 
 
 

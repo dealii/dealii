@@ -45,7 +45,7 @@ SparseMatrix<number>::SparseMatrix () :
 		cols(0),
 		val(0),
 		max_len(0)
-{};
+{}
 
 
 
@@ -59,7 +59,7 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
   Assert (m.cols==0, ExcInvalidConstructorCall());
   Assert (m.val==0, ExcInvalidConstructorCall());
   Assert (m.max_len==0, ExcInvalidConstructorCall());
-};
+}
 
 
 
@@ -72,7 +72,7 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
   Assert (m.max_len==0, ExcInvalidConstructorCall());
 
   return *this;
-};
+}
 
 
 
@@ -83,7 +83,7 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c) :
 		max_len(0)
 {
   reinit();
-};
+}
 
 
 
@@ -94,7 +94,7 @@ SparseMatrix<number>::~SparseMatrix ()
   
   if (val != 0)
     delete[] val;
-};
+}
 
 
 
@@ -133,7 +133,7 @@ SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
 {
   cols = &sparsity;
   reinit ();
-};
+}
 
 
 
@@ -145,7 +145,7 @@ SparseMatrix<number>::clear ()
   if (val) delete[] val;
   val = 0;
   max_len = 0;
-};
+}
 
 
 
@@ -157,7 +157,7 @@ SparseMatrix<number>::empty () const
     return true;
   else
     return cols->empty();
-};
+}
 
 
 
@@ -167,7 +167,7 @@ SparseMatrix<number>::n_nonzero_elements () const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   return cols->n_nonzero_elements ();
-};
+}
 
 
 
@@ -178,7 +178,7 @@ SparseMatrix<number>::n_actually_nonzero_elements () const
   Assert (cols != 0, ExcMatrixNotInitialized());
   return std::count_if(&val[0], &val[n_nonzero_elements ()],
 		       std::bind2nd(std::not_equal_to<double>(), 0));
-};
+}
 
 
 
@@ -215,7 +215,7 @@ SparseMatrix<number>::symmetrize ()
 	  ++colnum_ptr;
 	};
     };
-};
+}
 
 
 
@@ -232,7 +232,7 @@ SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
 	     &val[0]);
   
   return *this;
-};
+}
 
 
 
@@ -249,7 +249,7 @@ SparseMatrix<number>::copy_from (const FullMatrix<somenumber> &matrix)
     for (unsigned int col=0; col<matrix.n(); ++col)
       if (matrix(row,col) != 0)
 	set (row, col, matrix(row,col));
-};
+}
 
 
 
@@ -269,7 +269,7 @@ SparseMatrix<number>::add_scaled (const number factor,
 
   while (val_ptr != end_ptr)
     *val_ptr++ += factor * *matrix_ptr++;
-};
+}
 
 
 template <typename number>
@@ -342,7 +342,7 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst,
 	  *dst_ptr++ = s;
 	};
     };
-};
+}
 
 
 template <typename number>
@@ -368,7 +368,7 @@ SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 	s += *val_ptr++ * src(*colnum_ptr++);
       *dst_ptr++ = s;
     };
-};
+}
 
 
 template <typename number>
@@ -416,7 +416,7 @@ SparseMatrix<number>::vmult_add (Vector<somenumber>& dst, const Vector<somenumbe
 	s += *val_ptr++ * src(*colnum_ptr++);
       *dst_ptr++ += s;
     };
-};
+}
 
 
 template <typename number>
@@ -519,7 +519,7 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
       
       return sum;
     };
-};
+}
 
 
 
@@ -548,7 +548,7 @@ SparseMatrix<number>::threaded_matrix_norm_square (const Vector<somenumber> &v,
       sum += s* v(row);
     };
   *partial_sum = sum;
-};
+}
 
 
 
@@ -633,7 +633,7 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
       
       return sum;
     };
-};
+}
 
 
 
@@ -663,7 +663,7 @@ SparseMatrix<number>::threaded_matrix_scalar_product (const Vector<somenumber> &
       sum += s* u(row);
     };
   *partial_sum = sum;
-};
+}
 
 
 
@@ -682,7 +682,7 @@ number SparseMatrix<number>::l1_norm () const
       column_sums(cols->colnums[j]) += std::fabs(val[j]);
 
   return column_sums.linfty_norm();
-};
+}
 
 
 template <typename number>
@@ -705,7 +705,7 @@ number SparseMatrix<number>::linfty_norm () const
 	max = sum;
     }
   return max;
-};
+}
 
 
 template <typename number>
@@ -824,7 +824,7 @@ SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
     };
 
   *partial_norm = norm;
-};
+}
 
 
 
@@ -852,7 +852,7 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
 				     // in each row, i.e. at index
 				     // rowstart[i]
     *dst_ptr = om * *src_ptr / val[*rowstart_ptr];
-};
+}
 
 
 
@@ -938,7 +938,7 @@ SparseMatrix<number>::precondition_SOR (Vector<somenumber>& dst, const Vector<so
 
   dst = src;
   SOR(dst,om);
-};
+}
 
 
 template <typename number>
@@ -953,7 +953,7 @@ SparseMatrix<number>::precondition_TSOR (Vector<somenumber>& dst, const Vector<s
 
   dst = src;
   TSOR(dst,om);
-};
+}
 
 
 template <typename number>
@@ -1113,7 +1113,7 @@ SparseMatrix<number>::get_sparsity_pattern () const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   return *cols;
-};
+}
 
 
 
@@ -1128,7 +1128,7 @@ void SparseMatrix<number>::print (std::ostream &out) const
       out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
 
   AssertThrow (out, ExcIO());
-};
+}
 
 
 template <typename number>
@@ -1173,7 +1173,7 @@ void SparseMatrix<number>::print_formatted (std::ostream &out,
 				   // reset output format
   out.precision(old_precision);
   out.flags (old_flags);
-};
+}
 
 
 
@@ -1193,7 +1193,7 @@ SparseMatrix<number>::block_write (std::ostream &out) const
   out << ']';
   
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -1225,7 +1225,7 @@ SparseMatrix<number>::block_read (std::istream &in)
            - reinterpret_cast<char*>(&val[0]));
   in >> c;
   AssertThrow (c == ']', ExcIO());
-};
+}
 
 
 
@@ -1234,7 +1234,7 @@ unsigned int
 SparseMatrix<number>::memory_consumption () const
 {
   return sizeof(*this) + max_len*sizeof(number);
-};
+}
 
 
 #endif

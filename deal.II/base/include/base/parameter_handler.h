@@ -738,7 +738,7 @@ namespace Patterns
 					*/
       virtual PatternBase * clone () const;
   };
-};
+}
 
 
 /**

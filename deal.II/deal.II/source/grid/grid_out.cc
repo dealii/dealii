@@ -364,7 +364,7 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
     write_ucd_faces (tria, cell_index, out);
     
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -373,7 +373,7 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
 {
   return 0;
-};
+}
 
 #endif
 
@@ -392,7 +392,7 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim> &tria) const
       n_faces++;
 
   return n_faces;
-};
+}
 
 
 
@@ -403,7 +403,7 @@ void GridOut::write_ucd_faces (const Triangulation<1> &,
 			       std::ostream &) const
 {
   return;
-};
+}
 
 #endif
 
@@ -439,7 +439,7 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 
 	++index;
       };	  
-};
+}
 
 #if deal_II_dimension==1
 
@@ -688,7 +688,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
   
   
   AssertThrow (out, ExcIO());
-};
+}
 
 #endif
 
@@ -1111,7 +1111,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
   out << "showpage" << std::endl;
   
   AssertThrow (out, ExcIO());
-};
+}
 
 #endif
 
@@ -1142,7 +1142,7 @@ void GridOut::write (const Triangulation<dim> &tria,
     };
 
   Assert (false, ExcInternalError());
-};
+}
 
 
 

@@ -376,7 +376,7 @@ namespace GridOutFlags
 	   const double       azimut_angle    = 60,
 	   const double       turn_angle      = 30);
   };
-};
+}
 
 
 

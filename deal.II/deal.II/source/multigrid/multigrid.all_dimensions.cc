@@ -22,7 +22,7 @@
 
 template <typename number>
 MGTransferPrebuilt<number>::~MGTransferPrebuilt () 
-{};
+{}
 
 
 template <typename number>
@@ -35,7 +35,7 @@ void MGTransferPrebuilt<number>::prolongate (
 	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
 
   prolongation_matrices[to_level-1].vmult (dst, src);
-};
+}
 
 
 template <typename number>
@@ -48,7 +48,7 @@ void MGTransferPrebuilt<number>::restrict_and_add (
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
 
   prolongation_matrices[from_level-1].Tvmult_add (dst, src);
-};
+}
 
 
 
@@ -56,7 +56,7 @@ void MGTransferPrebuilt<number>::restrict_and_add (
 
 template <typename number>
 MGTransferBlock<number>::~MGTransferBlock () 
-{};
+{}
 
 
 template <typename number>
@@ -76,7 +76,7 @@ void MGTransferBlock<number>::prolongate (
       prolongation_matrices[to_level-1].block(k,k).vmult (dst.block(b), src.block(b));
       ++k;
     }
-};
+}
 
 
 template <typename number>
@@ -96,14 +96,14 @@ void MGTransferBlock<number>::restrict_and_add (
       prolongation_matrices[from_level-1].block(k,k).Tvmult_add (dst.block(b), src.block(b));
       ++k;
     }
-};
+}
 
 
 
 
 template <typename number>
 MGTransferSelect<number>::~MGTransferSelect () 
-{};
+{}
 
 
 template <typename number>
@@ -117,7 +117,7 @@ void MGTransferSelect<number>::prolongate (
 
       prolongation_matrices[to_level-1].block(selected, selected)
 	.vmult (dst, src);
-};
+}
 
 
 template <typename number>
@@ -131,7 +131,7 @@ void MGTransferSelect<number>::restrict_and_add (
 
   prolongation_matrices[from_level-1].block(selected, selected)
     .Tvmult_add (dst, src);
-};
+}
 
 
 // Explicit instantiations

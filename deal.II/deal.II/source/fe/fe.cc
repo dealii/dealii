@@ -169,7 +169,7 @@ FiniteElementBase (const FiniteElementData<dim> &fe_data,
       face_system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
       face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
     }
-};
+}
 
 
 template <int dim>
@@ -248,7 +248,7 @@ FiniteElementBase<dim>::restrict (const unsigned int child) const
 	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
   Assert (restriction[child].n() != 0, ExcProjectionVoid());
   return restriction[child];
-};
+}
 
 
 
@@ -260,7 +260,7 @@ FiniteElementBase<dim>::prolongate (const unsigned int child) const
 	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
   Assert (prolongation[child].n() != 0, ExcEmbeddingVoid());
   return prolongation[child];
-};
+}
 
 
 
@@ -277,7 +277,7 @@ FiniteElementBase<dim>::constraints () const
 					interface_constraints.n()));
   
   return interface_constraints;
-};
+}
 
 
 
@@ -303,7 +303,7 @@ FiniteElementBase<dim>::interface_constraints_size () const
     };
   return TableIndices<2> (static_cast<unsigned int>(-1),
                           static_cast<unsigned int>(-1));
-};
+}
 
                                    
 
@@ -314,7 +314,7 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
   return ((static_cast<const FiniteElementData<dim>&>(*this) ==
 	   static_cast<const FiniteElementData<dim>&>(f)) &&
 	  (interface_constraints == f.interface_constraints));
-};
+}
 
 
 
@@ -330,7 +330,7 @@ FiniteElementBase<dim>::get_unit_support_points () const
 	  (unit_support_points.size() == this->dofs_per_cell),
 	  ExcInternalError());
   return unit_support_points;
-};
+}
 
 
 
@@ -339,7 +339,7 @@ bool
 FiniteElementBase<dim>::has_support_points () const
 {
   return (unit_support_points.size() != 0);
-};
+}
 
 
 
@@ -352,7 +352,7 @@ FiniteElementBase<dim>::unit_support_point (const unsigned index) const
   Assert (unit_support_points.size() == this->dofs_per_cell,
           ExcFEHasNoSupportPoints ());
   return unit_support_points[index];
-};
+}
 
 
 
@@ -368,7 +368,7 @@ FiniteElementBase<dim>::get_unit_face_support_points () const
 	  (unit_face_support_points.size() == this->dofs_per_face),
 	  ExcInternalError());
   return unit_face_support_points;
-};
+}
 
 
 
@@ -377,7 +377,7 @@ bool
 FiniteElementBase<dim>::has_face_support_points () const
 {
   return (unit_face_support_points.size() != 0);
-};
+}
 
 
 
@@ -390,7 +390,7 @@ FiniteElementBase<dim>::unit_face_support_point (const unsigned index) const
   Assert (unit_face_support_points.size() == this->dofs_per_face,
           ExcFEHasNoSupportPoints ());
   return unit_face_support_points[index];
-};
+}
 
 
 
@@ -414,7 +414,7 @@ FiniteElementBase<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (restriction_is_additive_flags) +
 	  MemoryConsumption::memory_consumption (nonzero_components) +
 	  MemoryConsumption::memory_consumption (n_nonzero_components_table));
-};
+}
 
 
 
@@ -552,7 +552,7 @@ compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_com
 			    nonzero_components[i].end(),
 			    true);
   return retval;
-};
+}
 
 
 

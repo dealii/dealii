@@ -134,7 +134,7 @@ namespace FE_DGP_1d
 	0, 0, 0, 0, 0, 1./32., 5.044891251/27.,
 	0, 0, 0, 0, 0., 0., 1./64.,
   };
-};
+}
 
 
 template <>
@@ -172,5 +172,5 @@ const unsigned int FE_DGP<1>::Matrices::n_projection_matrices
 #else // #if deal_II_dimension
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-namespace { void dummy () {}; };
+namespace { void dummy () {} }
 #endif // #if deal_II_dimension

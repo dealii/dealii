@@ -40,56 +40,65 @@ MGDoFObjectAccessor<1, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 						  const AccessorData       *local_data) :
 		MGDoFAccessor<dim> (local_data),
 		MGDoFObjectAccessor_Inheritance<1,dim>::BaseClass(tria,level,index,local_data)
-{};
+{}
 
 
 template <int dim>
 unsigned int MGDoFObjectAccessor<1, dim>::mg_dof_index (const unsigned int i) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_line,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
 
   return this->mg_dof_handler->mg_levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
-};
+}
 
 
 template <int dim>
 void MGDoFObjectAccessor<1, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_line,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
 
   this->mg_dof_handler->mg_levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i] = index;
-};
+}
 
 
 template <int dim>
 unsigned int MGDoFObjectAccessor<1, dim>::mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   return (this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
 	  .get_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex));
-};
+}
 
 
 template <int dim>
@@ -97,28 +106,34 @@ void MGDoFObjectAccessor<1, dim>::set_mg_vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int index) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
     .set_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
-};
+}
 
 
 template <int dim>
 void
 MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (dof_indices.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
 				 this->dof_handler->get_fe().dofs_per_line),
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
@@ -131,7 +146,7 @@ MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
-};
+}
 
 
 template <int dim>
@@ -159,7 +174,7 @@ MGDoFObjectAccessor<1,dim>::get_mg_dof_values (const Vector<number> &values,
   
   Assert (next_dof_value == dof_values.end(),
 	  ExcInternalError());
-};
+}
 
 
 template <int dim>
@@ -176,7 +191,7 @@ MGDoFObjectAccessor<1, dim>::child (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
-};
+}
 
 
 template <int dim>
@@ -185,7 +200,7 @@ MGDoFObjectAccessor<1, dim>::copy_from (const MGDoFObjectAccessor<1, dim> &a)
 {
   DoFObjectAccessor<1, dim>::copy_from (a);
   this->set_mg_dof_handler (a.mg_dof_handler);
-};
+}
 
 
 /* ------------------------ MGDoFQuadAccessor --------------------------- */
@@ -197,56 +212,65 @@ MGDoFObjectAccessor<2, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 						  const AccessorData       *local_data) :
 		MGDoFAccessor<dim> (local_data),
 		MGDoFObjectAccessor_Inheritance<2,dim>::BaseClass(tria,level,index,local_data)
-{};
+{}
 
 
 template <int dim>
 unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_quad,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_quad));
 
   return this->mg_dof_handler->mg_levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i];
-};
+}
 
 
 template <int dim>
 void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_quad,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_quad));
 
   this->mg_dof_handler->mg_levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i] = index;
-};
+}
 
 
 template <int dim>
 unsigned int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
   
   return (this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
 	  .get_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex));
-};
+}
 
 
 template <int dim>
@@ -254,25 +278,31 @@ void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int index) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
     .set_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
-};
+}
 
 
 template <int dim>
 void
 MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (dof_indices.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
 				 4*this->dof_handler->get_fe().dofs_per_line +
 				 this->dof_handler->get_fe().dofs_per_quad),
@@ -293,7 +323,7 @@ MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
-};
+}
 
 
 template <int dim>
@@ -325,7 +355,7 @@ MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
   
   Assert (next_dof_value == dof_values.end(),
 	  ExcInternalError());
-};
+}
 
 
 template <int dim>
@@ -341,7 +371,7 @@ MGDoFObjectAccessor<2, dim>::line (const unsigned int i) const
       this->line_index (i),
       this->mg_dof_handler
     );
-};
+}
 
 
 template <int dim>
@@ -358,7 +388,7 @@ MGDoFObjectAccessor<2, dim>::child (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
-};
+}
 
 
 template <int dim>
@@ -367,7 +397,7 @@ MGDoFObjectAccessor<2, dim>::copy_from (const MGDoFObjectAccessor<2, dim> &a)
 {
   DoFObjectAccessor<2, dim>::copy_from (a);
   this->set_mg_dof_handler (a.mg_dof_handler);
-};
+}
 
 
 /* ------------------------ MGDoFHexAccessor --------------------------- */
@@ -379,56 +409,65 @@ MGDoFObjectAccessor<3, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 						  const AccessorData       *local_data) :
 		MGDoFAccessor<dim> (local_data),
 		MGDoFObjectAccessor_Inheritance<3,dim>::BaseClass(tria,level,index,local_data)
-{};
+{}
 
 
 template <int dim>
 unsigned int MGDoFObjectAccessor<3, dim>::mg_dof_index (const unsigned int i) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_hex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_hex));
 
   return this->mg_dof_handler->mg_levels[this->present_level]
     ->hex_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_hex+i];
-};
+}
 
 
 template <int dim>
 void MGDoFObjectAccessor<3, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_hex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_hex));
 
   this->mg_dof_handler->mg_levels[this->present_level]
     ->hex_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_hex+i] = index;
-};
+}
 
 
 template <int dim>
 unsigned int MGDoFObjectAccessor<3, dim>::mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<8, ExcIndexRange (i,0,8));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
   
   return (this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
 	  .get_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex));
-};
+}
 
 
 template <int dim>
@@ -436,25 +475,31 @@ void MGDoFObjectAccessor<3, dim>::set_mg_vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int index) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
     .set_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
-};
+}
 
 
 template <int dim>
 void
 MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->mg_dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (dof_indices.size() == (8*this->dof_handler->get_fe().dofs_per_vertex +
 				 12*this->dof_handler->get_fe().dofs_per_line +
 				 6*this->dof_handler->get_fe().dofs_per_quad +
@@ -480,7 +525,7 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
-};
+}
 
 
 template <int dim>
@@ -516,7 +561,7 @@ MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const Vector<number> &values,
   
   Assert (next_dof_value == dof_values.end(),
 	  ExcInternalError());
-};
+}
 
 
 template <int dim>
@@ -531,7 +576,7 @@ MGDoFObjectAccessor<3, dim>::line (const unsigned int i) const {
       this->line_index (i),
       this->mg_dof_handler
     );
-};
+}
 
 
 template <int dim>
@@ -546,7 +591,7 @@ MGDoFObjectAccessor<3, dim>::quad (const unsigned int i) const {
       this->quad_index (i),
       this->mg_dof_handler
     );
-};
+}
 
 
 template <int dim>
@@ -562,7 +607,7 @@ MGDoFObjectAccessor<3, dim>::child (const unsigned int i) const {
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
-};
+}
 
 
 template <int dim>
@@ -570,7 +615,7 @@ void
 MGDoFObjectAccessor<3, dim>::copy_from (const MGDoFObjectAccessor<3, dim> &a) {
   DoFObjectAccessor<3, dim>::copy_from (a);
   this->set_mg_dof_handler (a.mg_dof_handler);
-};
+}
 
 
 /*------------------------- Functions: MGDoFCellAccessor -----------------------*/
@@ -588,7 +633,7 @@ MGDoFCellAccessor<dim>::neighbor (const unsigned int i) const {
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
 #endif
   return q;
-};
+}
 
 
 template <int dim>
@@ -604,7 +649,7 @@ MGDoFCellAccessor<dim>::child (const unsigned int i) const {
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
-};
+}
 
 
 #if deal_II_dimension == 1
@@ -615,7 +660,7 @@ MGDoFCellAccessor<1>::face (const unsigned int) const
 {
   Assert (false, ExcNotUsefulForThisDimension());
   return face_iterator();
-};
+}
 
 #endif
 
@@ -627,7 +672,7 @@ MGDoFCellAccessor<2>::face_iterator
 MGDoFCellAccessor<2>::face (const unsigned int i) const
 {
   return this->line(i);
-};
+}
 
 #endif
 
@@ -639,7 +684,7 @@ MGDoFCellAccessor<3>::face_iterator
 MGDoFCellAccessor<3>::face (const unsigned int i) const
 {
   return this->quad(i);
-};
+}
 
 #endif
 

@@ -1268,7 +1268,7 @@ map_support_points_to_dofs (const Mapping<dim>       &mapping,
   point_to_index_map.clear ();
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     point_to_index_map[support_points[i]] = i;
-};
+}
 
 
 

@@ -31,14 +31,14 @@ using namespace std;
 
 template <int dim>
 GridIn<dim>::GridIn () :
-		tria(0) {};
+		tria(0) {}
 
 
 template <int dim>
 void GridIn<dim>::attach_triangulation (Triangulation<dim> &t)
 {
   tria = &t;
-};
+}
 
 
 template <int dim>
@@ -202,7 +202,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
 				   // ... and cells
   GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);
-};
+}
 
 
 
@@ -366,7 +366,7 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
 				   // ...and cells
   GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);
-};
+}
 
 
 
@@ -394,7 +394,7 @@ void GridIn<dim>::skip_empty_lines (std::istream &in)
 
 				       // else: go on with next line
     };
-};
+}
 
 
 
@@ -413,7 +413,7 @@ void GridIn<dim>::skip_comment_lines (std::istream &in,
 				   // put back first character of
 				   // first non-comment line
   in.putback (c);
-};
+}
 
 
 
@@ -469,7 +469,7 @@ GridIn<dim>::delete_unused_vertices (std::vector<Point<dim> >    &vertices,
     if (vertex_used[v] == true)
       tmp.push_back (vertices[v]);
   swap (vertices, tmp);
-};
+}
 
 
 
@@ -479,7 +479,7 @@ void GridIn<dim>::debug_output_grid (const std::vector<CellData<dim> > &/*cells*
 				     std::ostream                      &/*out*/)
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 #if deal_II_dimension == 2
@@ -550,7 +550,7 @@ GridIn<2>::debug_output_grid (const std::vector<CellData<2> > &cells,
       << min_y << ':' << max_y <<  "] "
       << min_y << std::endl
       << "pause -1" << std::endl;
-};
+}
 
 #endif
 
@@ -626,7 +626,7 @@ GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
 	  << vertices[cells[cell].vertices[7]]
 	  << std::endl << std::endl << std::endl;
     };
-};
+}
 
 #endif
 

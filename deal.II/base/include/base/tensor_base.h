@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -312,7 +312,7 @@ Tensor<1,dim>::Tensor (const bool initialize)
   if (initialize)
     for (unsigned int i=0; i!=dim; ++i)
       values[i] = 0;
-};
+}
 
 
 
@@ -322,7 +322,7 @@ Tensor<1,dim>::Tensor (const array_type &initializer)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = initializer[i];
-};
+}
 
 
 
@@ -332,7 +332,7 @@ Tensor<1,dim>::Tensor (const Tensor<1,dim> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
-};
+}
 
 
 
@@ -350,7 +350,7 @@ Tensor<1,0>::Tensor (const Tensor<1,0> &)
 				   // function that the loop end check
 				   // always fails, we implement this
 				   // function here
-};
+}
 
 
 
@@ -360,7 +360,7 @@ double Tensor<1,dim>::operator [] (const unsigned int index) const
 {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
-};
+}
 
 
 
@@ -370,7 +370,7 @@ double & Tensor<1,dim>::operator [] (const unsigned int index)
 {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
-};
+}
 
 
 
@@ -381,7 +381,7 @@ Tensor<1,dim> & Tensor<1,dim>::operator = (const Tensor<1,dim> &p)
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
   return *this;
-};
+}
 
 
 
@@ -400,7 +400,7 @@ Tensor<1,0> & Tensor<1,0>::operator = (const Tensor<1,0> &)
 				   // always fails, we implement this
 				   // function here
   return *this;
-};
+}
 
 
 
@@ -411,7 +411,7 @@ bool Tensor<1,dim>::operator == (const Tensor<1,dim> &p) const
   for (unsigned int i=0; i<dim; ++i)
     if (values[i] != p.values[i]) return false;
   return true;
-};
+}
 
 
 
@@ -420,7 +420,7 @@ inline
 bool Tensor<1,dim>::operator != (const Tensor<1,dim> &p) const
 {
   return !((*this) == p);
-};
+}
 
 
 
@@ -431,7 +431,7 @@ Tensor<1,dim> & Tensor<1,dim>::operator += (const Tensor<1,dim> &p)
   for (unsigned int i=0; i<dim; ++i)
     values[i] += p.values[i];
   return *this;
-};
+}
 
 
 
@@ -442,7 +442,7 @@ Tensor<1,dim> & Tensor<1,dim>::operator -= (const Tensor<1,dim> &p)
   for (unsigned int i=0; i<dim; ++i)
     values[i] -= p.values[i];
   return *this;
-};
+}
 
 
 
@@ -453,7 +453,7 @@ Tensor<1,dim> & Tensor<1,dim>::operator *= (const double &s)
   for (unsigned int i=0; i<dim; ++i)
     values[i] *= s;
   return *this;
-};
+}
 
 
 
@@ -464,7 +464,7 @@ Tensor<1,dim> & Tensor<1,dim>::operator /= (const double &s)
   for (unsigned int i=0; i<dim; ++i)
     values[i] /= s;
   return *this;
-};
+}
 
 
 
@@ -476,7 +476,7 @@ double Tensor<1,dim>::operator * (const Tensor<1,dim> &p) const
   for (unsigned int i=0; i<dim; ++i)
     q += values[i] * p.values[i];
   return q;
-};
+}
 
 
 
@@ -485,7 +485,7 @@ inline
 Tensor<1,dim> Tensor<1,dim>::operator + (const Tensor<1,dim> &p) const
 {
   return (Tensor<1,dim>(*this) += p);
-};
+}
 
 
 
@@ -494,7 +494,7 @@ inline
 Tensor<1,dim> Tensor<1,dim>::operator - (const Tensor<1,dim> &p) const
 {
   return (Tensor<1,dim>(*this) -= p);
-};
+}
 
 
 
@@ -506,7 +506,7 @@ Tensor<1,dim> Tensor<1,dim>::operator - () const
   for (unsigned int i=0; i<dim; ++i)
     result.values[i] = -values[i];
   return result;
-};
+}
 
 
 
@@ -516,7 +516,7 @@ void Tensor<1,dim>::clear ()
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = 0;
-};
+}
 
 
 
@@ -526,7 +526,7 @@ unsigned int
 Tensor<1,dim>::memory_consumption ()
 {
   return sizeof(Tensor<1,dim>);
-};
+}
 
 
 
@@ -543,7 +543,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<1,dim> &p)
   out << p[dim-1];
 
   return out;
-};
+}
 
 
 
@@ -558,7 +558,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<1,1> &p)
   out << p[0];
 
   return out;
-};
+}
 
 
 
@@ -575,7 +575,7 @@ operator * (const Tensor<1,dim> &t,
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] * factor;
   return tt;
-};
+}
 
 
 
@@ -592,7 +592,7 @@ operator * (const double         factor,
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] * factor;
   return tt;
-};
+}
 
 
 
@@ -609,7 +609,7 @@ operator / (const Tensor<1,dim> &t,
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] / factor;
   return tt;
-};
+}
 
 
 

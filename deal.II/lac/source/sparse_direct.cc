@@ -64,7 +64,7 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };
+    }
 
     
     extern "C"
@@ -85,7 +85,7 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };
+    }
 
 
     extern "C"
@@ -103,7 +103,7 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };
+    }
 
 
     extern "C" void ma27x1_ (unsigned int *)
@@ -111,7 +111,7 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };
+    }
       
 
     extern "C" void ma27x2_ (unsigned int *)
@@ -119,7 +119,7 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };
+    }
       
     
     extern "C" void ma27x3_ (const unsigned int *)
@@ -127,9 +127,9 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };
+    }
   }
-};
+}
 #endif  // ifndef HAVE_HSL_MA27
 
 
@@ -145,7 +145,7 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };
+    }
     
 
     extern "C"
@@ -163,7 +163,7 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };
+    }
 
       
     extern "C"
@@ -184,7 +184,7 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };
+    }
 
     
     extern "C"
@@ -201,9 +201,9 @@ namespace HSL
       AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
-    };    
+    }
   }
-};
+}
 #endif   // ifndef HAVE_HSL_MA47
 
 
@@ -264,7 +264,7 @@ namespace CommunicationsLog
     list_access_lock.acquire ();
     communication_log.push_back (record);
     list_access_lock.release ();
-  };
+  }
 
 
                                    /**
@@ -294,7 +294,7 @@ namespace CommunicationsLog
     std::cerr << "++++++++++++++++++++++++++++++" << std::endl;
 
     list_access_lock.release ();
-  };
+  }
 
 
                                    /**
@@ -314,8 +314,8 @@ namespace CommunicationsLog
       if (i->child_pid == child_pid)
         communication_log.erase (i);
     list_access_lock.release ();
-  };
-};
+  }
+}
 
 
 
@@ -331,7 +331,7 @@ namespace
               << std::endl;
     CommunicationsLog::list_communication (child);
     std::abort ();
-  };
+  }
 
 
 /**
@@ -349,8 +349,8 @@ namespace
               << std::endl;
     CommunicationsLog::list_communication (child);
     std::abort ();
-  };
-};
+  }
+}
 
 
 
@@ -476,7 +476,7 @@ SparseDirectMA27::SparseDirectMA27 (const double LIW_factor_1,
 		initialize_called (false),
 		factorize_called (false),
 		sparsity_pattern (0)
-{};
+{}
 
 
 
@@ -502,7 +502,7 @@ SparseDirectMA27::~SparseDirectMA27()
         delete detached_mode_data;
         detached_mode_data = 0;
       };
-};
+}
 
 
 
@@ -511,7 +511,7 @@ SparseDirectMA27::set_detached_mode ()
 {
   Assert (initialize_called == false, ExcInitializeAlreadyCalled());
   detached_mode = true;
-};
+}
 
 
 
@@ -519,7 +519,7 @@ bool
 SparseDirectMA27::detached_mode_set () const
 {
   return detached_mode;
-};
+}
 
 
 
@@ -703,7 +703,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
 				   // note that we have already been
 				   // in this function
   initialize_called = true;
-};
+}
 
 
 
@@ -848,7 +848,7 @@ SparseDirectMA27::factorize (const SparseMatrix<double> &matrix)
 				   // note that we have been here
 				   // already
   factorize_called = true;
-};
+}
 
 
 
@@ -861,7 +861,7 @@ SparseDirectMA27::solve (Vector<double> &rhs_and_solution) const
   call_ma27cd (&n_rows, &A[0], &LA,
                &IW[0], &LIW, &MAXFRT,
                &rhs_and_solution(0), &IW1[0], &NSTEPS);
-};
+}
 
 
 
@@ -872,7 +872,7 @@ SparseDirectMA27::solve (const SparseMatrix<double> &matrix,
   initialize (matrix.get_sparsity_pattern());
   factorize (matrix);
   solve (rhs_and_solution);
-};
+}
 
 
 
@@ -886,7 +886,7 @@ SparseDirectMA27::memory_consumption () const
 	  MemoryConsumption::memory_consumption (IW) +
 	  MemoryConsumption::memory_consumption (IKEEP) +
 	  MemoryConsumption::memory_consumption (IW1));
-};
+}
 
 
 
@@ -897,7 +897,7 @@ SparseDirectMA27::get_synchronisation_lock () const
     return non_static_synchronisation_lock;
   else
     return static_synchronisation_lock;    
-};
+}
 
 
 
@@ -928,7 +928,7 @@ SparseDirectMA27::fill_A (const SparseMatrix<double> &matrix)
 	  ++global_index;
 	};
   Assert (global_index == n_nonzero_elements, ExcInternalError());  
-};
+}
 
 
 
@@ -975,7 +975,7 @@ void SparseDirectMA27::call_ma27ad (const unsigned int *N,
       
       detached_mode_data->mutex.release ();
     };
-};
+}
 
 
 
@@ -1013,7 +1013,7 @@ void SparseDirectMA27::call_ma27bd (const unsigned int *N,
       
       detached_mode_data->mutex.release ();
     };
-};
+}
 
 
 
@@ -1041,7 +1041,7 @@ void SparseDirectMA27::call_ma27cd (const unsigned int *N,
       detached_mode_data->put (RHS, *N, "RHS");
       detached_mode_data->get (RHS, *N, "RHS");
     };
-};
+}
 
 
 
@@ -1059,7 +1059,7 @@ void SparseDirectMA27::call_ma27x1 (unsigned int *NRLNEC)
       detached_mode_data->get (NRLNEC, 1, "NRLNEC");
       detached_mode_data->mutex.release ();
     };
-};
+}
 
 
 
@@ -1077,7 +1077,7 @@ void SparseDirectMA27::call_ma27x2 (unsigned int *NIRNEC)
       detached_mode_data->get (NIRNEC, 1, "NIRNEC");
       detached_mode_data->mutex.release ();
     };
-};
+}
 
 
 
@@ -1095,7 +1095,7 @@ void SparseDirectMA27::call_ma27x3 (const unsigned int *LP)
       detached_mode_data->put (LP, 1, "LP");
       detached_mode_data->mutex.release ();
     };
-};
+}
 
   
 
@@ -1124,7 +1124,7 @@ SparseDirectMA47::SparseDirectMA47 (const double LIW_factor_1,
 		initialize_called (false),
 		factorize_called (false),
 		matrix (0)
-{};
+{}
 
 
 
@@ -1224,7 +1224,7 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
 				   // note that we have already been
 				   // in this function
   initialize_called = true;
-};
+}
 
 
 
@@ -1357,7 +1357,7 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
 				   // note that we have been here
 				   // already
   factorize_called = true;
-};
+}
 
 
 
@@ -1370,7 +1370,7 @@ SparseDirectMA47::solve (Vector<double> &rhs_and_solution)
   call_ma47cd (&n_rows, &A[0], &LA,
                &IW[0], &LIW,
                &rhs_and_solution(0), &IW1[0], &ICNTL[0]);
-};
+}
 
 
 
@@ -1381,7 +1381,7 @@ SparseDirectMA47::solve (const SparseMatrix<double> &matrix,
   initialize (matrix);
   factorize (matrix);
   solve (rhs_and_solution);
-};
+}
 
 
 
@@ -1395,7 +1395,7 @@ SparseDirectMA47::memory_consumption () const
 	  MemoryConsumption::memory_consumption (IW) +
 	  MemoryConsumption::memory_consumption (KEEP) +
 	  MemoryConsumption::memory_consumption (IW1));
-};
+}
 
 
 
@@ -1403,7 +1403,7 @@ Threads::ThreadMutex &
 SparseDirectMA47::get_synchronisation_lock () const
 {
   return synchronisation_lock;
-};
+}
 
 
 
@@ -1434,7 +1434,7 @@ SparseDirectMA47::fill_A (const SparseMatrix<double> &matrix)
 	  ++global_index;
 	};
   Assert (global_index == n_nonzero_elements, ExcInternalError());  
-};
+}
 
 
 
@@ -1443,7 +1443,7 @@ SparseDirectMA47::call_ma47id (double       *CNTL,   // length 2
                                unsigned int *ICNTL)  // length 7
 {
   HSL::MA47::ma47id_ (CNTL, ICNTL);
-};
+}
 
 
 
@@ -1464,7 +1464,7 @@ call_ma47ad (const unsigned int *n_rows,             //scalar
                      row_numbers, column_numbers,
                      IW, LIW, KEEP,
                      ICNTL, &RINFO[0], INFO);
-};
+}
 
 
 
@@ -1488,7 +1488,7 @@ call_ma47bd (const unsigned int *n_rows,             //scalar
                      A, LA,
                      IW, LIW, KEEP, CNTL, ICNTL,
                      IW1, &RINFO[0], INFO);
-};
+}
 
 
 
@@ -1507,4 +1507,4 @@ call_ma47cd (const unsigned int *n_rows,           //scalar
   HSL::MA47::ma47cd_(n_rows, A, LA,
 		     IW, LIW, &W[0],
 		     rhs_and_solution, IW1, ICNTL);  
-};
+}

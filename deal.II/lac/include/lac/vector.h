@@ -595,7 +595,7 @@ Vector<Number>::Vector (const InputIterator first, const InputIterator last)
 				   // over to it in a second
   reinit (std::distance (first, last), true);
   std::copy (first, last, begin());
-};
+}
 
 
 
@@ -675,7 +675,7 @@ typename Vector<Number>::iterator
 Vector<Number>::begin () 
 {
   return &val[0];
-};
+}
 
 
 
@@ -685,7 +685,7 @@ typename Vector<Number>::const_iterator
 Vector<Number>::begin () const 
 {
   return &val[0];
-};
+}
 
 
 
@@ -695,7 +695,7 @@ typename Vector<Number>::iterator
 Vector<Number>::end () 
 {
   return &val[dim];
-};
+}
 
 
 
@@ -705,7 +705,7 @@ typename Vector<Number>::const_iterator
 Vector<Number>::end () const 
 {
   return &val[dim];
-};
+}
 
 
 
@@ -735,7 +735,7 @@ Vector<Number> & Vector<Number>::operator *= (const Number factor)
 {
   scale (factor);
   return *this;
-};
+}
 
 
 
@@ -763,7 +763,7 @@ inline
 void swap (Vector<Number> &u, Vector<Number> &v)
 {
   u.swap (v);
-};
+}
 
 
 

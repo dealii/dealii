@@ -27,7 +27,7 @@ bool Histogram::logarithmic_less (const number n1,
   return (((n1<n2) && (n1>0)) ||
 	  ((n1<n2) && (n2<=0)) ||
 	  ((n2<n1) && (n1>0) && (n2<=0)));
-};
+}
 
 
 
@@ -36,7 +36,7 @@ Histogram::Interval::Interval (const double left_point,
 		left_point (left_point),
 		right_point (right_point),
 		content (0)
-{};
+{}
 
 
 
@@ -44,7 +44,7 @@ unsigned int
 Histogram::Interval::memory_consumption () const
 {
   return sizeof(*this);
-};
+}
 
 
 
@@ -195,7 +195,7 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
 	      break;
 	    };
       };
-};
+}
 
 
 
@@ -207,7 +207,7 @@ void Histogram::evaluate (const Vector<number>    &values,
   std::vector<Vector<number> > values_list (1,
 				       values);
   evaluate (values_list, std::vector<double>(1,0.), n_intervals, interval_spacing);
-};
+}
 
 
 
@@ -279,14 +279,14 @@ void Histogram::write_gnuplot (std::ostream &out) const
       };
 
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
 std::string Histogram::get_interval_spacing_names () 
 {
   return "linear|logarithmic";
-};
+}
 
 
 
@@ -304,7 +304,7 @@ Histogram::parse_interval_spacing (const std::string &name)
 
 	return linear;
       };
-};
+}
 
 
 
@@ -313,7 +313,7 @@ Histogram::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (intervals) +
 	  MemoryConsumption::memory_consumption (y_values));
-};
+}
 
 
 

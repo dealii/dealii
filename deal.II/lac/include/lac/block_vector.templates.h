@@ -138,7 +138,7 @@ void BlockVector<Number>::swap (BlockVector<Number> &v)
   for (unsigned int i=0; i<num_blocks; ++i)
     ::swap (components[i], v.components[i]);
   ::swap (block_indices, v.block_indices);
-};
+}
 
 
 
@@ -185,7 +185,7 @@ typename BlockVector<Number>::iterator
 BlockVector<Number>::begin()
 {
   return iterator(*this, 0U);
-};
+}
 
 
 
@@ -194,7 +194,7 @@ typename BlockVector<Number>::const_iterator
 BlockVector<Number>::begin() const
 {
   return const_iterator(*this, 0U);
-};
+}
 
 
 template <typename Number>
@@ -202,7 +202,7 @@ typename BlockVector<Number>::iterator
 BlockVector<Number>::end()
 {
   return iterator(*this, size());
-};
+}
 
 
 
@@ -211,7 +211,7 @@ typename BlockVector<Number>::const_iterator
 BlockVector<Number>::end() const
 {
   return const_iterator(*this, size());
-};
+}
 
 
 
@@ -224,7 +224,7 @@ Number BlockVector<Number>::norm_sqr () const
       sum += components[i].norm_sqr();
     }
   return sum;
-};
+}
 
 
 
@@ -583,7 +583,7 @@ BlockVector<Number>::memory_consumption () const
     mem += MemoryConsumption::memory_consumption (components[i]);
   mem += MemoryConsumption::memory_consumption (block_indices);
   return mem;
-};
+}
 
 
 
@@ -700,7 +700,7 @@ namespace BlockVectorIterators
   
     --global_index;
   }
-};
+}
 
 
 #endif

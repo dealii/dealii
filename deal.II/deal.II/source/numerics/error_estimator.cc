@@ -44,7 +44,7 @@ inline
 double sqr (const double x)
 {
   return x*x;
-};
+}
 
 
 
@@ -105,7 +105,7 @@ void KellyErrorEstimator<dim>::estimate (const Mapping<dim>      &mapping,
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
 	    component_mask, coefficients, n_threads);
-};
+}
 
 
 template <int dim>
@@ -122,7 +122,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
   static const MappingQ1<dim> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solution,
 	   error, component_mask, coefficients, n_threads);
-};
+}
 
 
 
@@ -358,7 +358,7 @@ estimate (const Mapping<1>                    &mapping,
       for (unsigned int s=0; s<n_solution_vectors; ++s)
 	(*errors[s])(cell_index) = std::sqrt((*errors[s])(cell_index));
     };
-};
+}
 
 
 #else // #if deal_II_dimension !=1
@@ -539,7 +539,7 @@ estimate_some (const Mapping<dim>                  &mapping,
 	   ((t<this_thread.second) && (cell!=dof_handler.end()));
 	   ++t, ++cell);
     };
-};
+}
 
 
 
@@ -697,7 +697,7 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
       for (unsigned int n=0; n<n_solution_vectors; ++n)
 	(*errors[n])(present_cell) = std::sqrt((*errors[n])(present_cell));
     };
-};
+}
 
 #endif
 
@@ -737,7 +737,7 @@ integrate_over_regular_face (const DoFHandler<1>               &,
                              FEFaceValues<1>        &)
 {
   Assert (false, ExcInternalError());
-};
+}
 
 
 template <>
@@ -755,7 +755,7 @@ integrate_over_irregular_face (const DoFHandler<1>               &,
 			       FESubfaceValues<1>         &)
 {
   Assert (false, ExcInternalError());
-};
+}
 
 #endif
 
@@ -946,7 +946,7 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
   Assert (face_integrals[face][0] < 0, ExcInternalError());
   
   face_integrals[face] = face_integral;
-};
+}
 
 
 
@@ -1131,7 +1131,7 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
     };
 
   face_integrals[face] = sum;
-};
+}
 
 
 // explicit instantiations

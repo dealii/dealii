@@ -185,7 +185,7 @@ namespace FE_Q_2d
 	0., 0., 0., 0., 1.6875/27., 0., 0., 0., 8.4375/27., 0., 0., 0., -8.4375/27., 0., 25.3125/27., 0.,
   };
  
-};  // namespace FE_Q_2d
+}  // namespace FE_Q_2d
 
 
 // embedding matrices
@@ -244,7 +244,7 @@ namespace FE_Q_2d
 	0., 0., 0., 0., 1.,
 	-0.0390625, 0.2734375, 0.21875, -0.546875, 1.09375
   };
-};
+}
 
 
 template <>
@@ -269,5 +269,5 @@ FE_Q<2>::Matrices::n_constraint_matrices
 #else // #if deal_II_dimension
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-namespace { void dummy () {}; };
+namespace { void dummy () {} }
 #endif // #if deal_II_dimension == 2

@@ -314,7 +314,7 @@ get_strengthen_diagonal(const number /*rowsum*/,
 			const unsigned int /*row*/) const
 {
   return strengthen_diagonal;
-};
+}
 
 
 

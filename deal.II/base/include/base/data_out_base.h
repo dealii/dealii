@@ -2062,7 +2062,7 @@ bool
 DataOutBase::EpsFlags::RgbValues::is_grey () const 
 {
   return (red == green) && (red == blue);
-};
+}
 
 
 

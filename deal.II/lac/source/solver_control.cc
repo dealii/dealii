@@ -32,7 +32,7 @@ SolverControl::NoConvergence::NoConvergence (const unsigned int last_step,
 		:
 		last_step (last_step),
 		last_residual (last_residual)
-{};
+{}
 
 
 const char *
@@ -85,12 +85,12 @@ SolverControl::SolverControl (const unsigned int maxiter,
 		m_log_history(m_log_history),
 		m_log_frequency(1),
 		m_log_result(m_log_result)
-{};
+{}
 
 
 
 SolverControl::~SolverControl() 
-{};
+{}
 
 
 
@@ -211,17 +211,17 @@ ReductionControl::ReductionControl(const unsigned int n,
 		:
 		SolverControl (n, tol, m_log_history, m_log_result),
 		reduce(red)
-{};
+{}
 
 
 ReductionControl::~ReductionControl()
-{};
+{}
 
 
 double
 ReductionControl::initial_value() const {
   return initial_val;
-};
+}
 
 
 SolverControl::State
@@ -254,7 +254,7 @@ ReductionControl::check (const unsigned int step,
     }
   else
     return SolverControl::check(step, check_value);
-};
+}
 
 
 

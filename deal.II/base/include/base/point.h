@@ -176,7 +176,7 @@ class Point : public Tensor<1,dim>
 template <int dim>
 inline
 Point<dim>::Point ()
-{};
+{}
 
 
 
@@ -184,7 +184,7 @@ template <int dim>
 inline
 Point<dim>::Point (const bool initialize) :
 		Tensor<1,dim>(initialize) 
-{};
+{}
 
 
 
@@ -192,7 +192,7 @@ template <int dim>
 inline
 Point<dim>::Point (const Tensor<1,dim> &t) :
 		Tensor<1,dim>(t) 
-{};
+{}
 
 
 
@@ -202,7 +202,7 @@ Point<dim>::Point (const double x)
 {
   Assert (dim==1, ExcInvalidConstructorCalled());
   this->values[0] = x;
-};
+}
 
 
 
@@ -213,7 +213,7 @@ Point<dim>::Point (const double x, const double y)
   Assert (dim==2, ExcInvalidConstructorCalled());
   this->values[0] = x;
   this->values[1] = y;
-};
+}
 
 
 
@@ -225,7 +225,7 @@ Point<dim>::Point (const double x, const double y, const double z)
   this->values[0] = x;
   this->values[1] = y;
   this->values[2] = z;
-};
+}
 
 
 
@@ -235,7 +235,7 @@ double Point<dim>::operator () (const unsigned int index) const
 {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return this->values[index];
-};
+}
 
 
 
@@ -245,7 +245,7 @@ double & Point<dim>::operator () (const unsigned int index)
 {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return this->values[index];
-};
+}
 
 
 
@@ -254,7 +254,7 @@ inline
 Point<dim> Point<dim>::operator + (const Tensor<1,dim> &p) const 
 {
   return (Point<dim>(*this) += p);
-};
+}
 
 
 
@@ -263,7 +263,7 @@ inline
 Point<dim> Point<dim>::operator - (const Tensor<1,dim> &p) const 
 {
   return (Point<dim>(*this) -= p);
-};
+}
 
 
 
@@ -275,7 +275,7 @@ Point<dim> Point<dim>::operator - () const
   for (unsigned int i=0; i<dim; ++i)
     result.values[i] = -this->values[i];
   return result;
-};
+}
 
 
 
@@ -284,7 +284,7 @@ inline
 Point<dim> Point<dim>::operator * (const double factor) const 
 {
   return (Point<dim>(*this) *= factor);
-};
+}
 
 
 
@@ -294,7 +294,7 @@ double Point<dim>::operator * (const Tensor<1,dim> &p) const
 {
 				   // simply pass down
   return Tensor<1,dim>::operator * (p);
-};
+}
 
 
 template <int dim>
@@ -305,7 +305,7 @@ double Point<dim>::square () const
   for (unsigned int i=0; i<dim; ++i)
     q += this->values[i] * this->values[i];
   return q;
-};
+}
 
 
 template <int dim>
@@ -328,7 +328,7 @@ inline
 Point<dim> Point<dim>::operator / (const double factor) const 
 {
   return (Point<dim>(*this) /= factor);
-};
+}
 
 
 
@@ -343,7 +343,7 @@ inline
 Point<dim> operator * (const double factor, const Point<dim> &p) 
 {
   return p*factor;
-};
+}
 
 
 /**
@@ -359,7 +359,7 @@ std::ostream & operator << (std::ostream &out, const Point<dim> &p)
   out << p[dim-1];
 
   return out;
-};
+}
 
 
 
@@ -374,6 +374,6 @@ std::ostream & operator << (std::ostream &out, const Point<1> &p)
   out << p[0];
 
   return out;
-};
+}
 
 #endif

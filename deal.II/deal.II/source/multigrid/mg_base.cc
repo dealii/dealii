@@ -23,17 +23,17 @@
 
 template <class VECTOR>
 MGTransfer<VECTOR>::~MGTransfer()
-{};
+{}
 
 
 template <class VECTOR>
 MGMatrixBase<VECTOR>::~MGMatrixBase()
-{};
+{}
 
 
 template <class VECTOR>
 MGCoarseGrid<VECTOR>::~MGCoarseGrid()
-{};
+{}
 
 
 // Explicit instantiations

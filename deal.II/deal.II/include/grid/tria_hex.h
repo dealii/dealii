@@ -98,7 +98,7 @@ Hexahedron::Hexahedron (const int i0, const int i1,
   quads[3] = i3;
   quads[4] = i4;
   quads[5] = i5;
-};
+}
 
 
 
@@ -108,7 +108,7 @@ int Hexahedron::quad (const int i) const
   Assert ((i>=0) && (i<6),
 	  ExcRange(i));
   return quads[i];
-};
+}
 
 
 
@@ -118,7 +118,7 @@ void Hexahedron::set_quad (const int i, const int index)
   Assert ((i>=0) && (i<6),
 	  ExcRange(i));
   quads[i] = index;
-};
+}
 
 
 
@@ -127,6 +127,6 @@ unsigned int
 Hexahedron::memory_consumption ()
 {
   return sizeof(Hexahedron);
-};
+}
 
 #endif

@@ -171,7 +171,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector            &fe_fu
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       values[point] += (dof_values(shape_func) *
 			this->shape_value(shape_func, point));
-};
+}
 
 
 
@@ -218,7 +218,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector                  
 	for (unsigned int c=0; c<n_components; ++c)
 	  values[point](c) += (dof_values(shape_func) *
 			       shape_value_component(shape_func, point, c));
-};
+}
 
 
 
@@ -228,7 +228,7 @@ FEValuesBase<dim>::get_quadrature_points () const
 {
   Assert (this->update_flags & update_q_points, ExcAccessToUninitializedField());
   return this->quadrature_points;
-};
+}
 
 
 
@@ -282,7 +282,7 @@ get_function_grads (const InputVector                    &fe_function,
 	tmp *= dof_values(shape_func);
 	gradients[point] += tmp;
       };
-};
+}
 
 
 
@@ -338,7 +338,7 @@ get_function_grads (const InputVector                         &fe_function,
 	    tmp *= dof_values(shape_func);
 	    gradients[point][c] += tmp;
 	  };
-};
+}
 
 
 
@@ -381,7 +381,7 @@ get_function_2nd_derivatives (const InputVector                    &fe_function,
 	tmp *= dof_values(shape_func);
 	second_derivatives[point] += tmp;
       };
-};
+}
 
 
 
@@ -433,7 +433,7 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
 	    tmp *= dof_values(shape_func);
 	    second_derivs[point][c] += tmp;
 	  };
-};
+}
 
 
 
@@ -445,7 +445,7 @@ FEValuesBase<dim>::quadrature_point (const unsigned int i) const
   Assert (i<this->quadrature_points.size(), ExcIndexRange(i, 0, this->quadrature_points.size()));
   
   return this->quadrature_points[i];
-};
+}
 
 
 
@@ -457,7 +457,7 @@ double FEValuesBase<dim>::JxW (const unsigned int i) const
   Assert (i<this->JxW_values.size(), ExcIndexRange(i, 0, this->JxW_values.size()));
   
   return this->JxW_values[i];
-};
+}
 
 
 
@@ -483,7 +483,7 @@ FEValuesBase<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (fe_data) +
 	  MemoryConsumption::memory_consumption (*fe_data) +
 	  MemoryConsumption::memory_consumption (this->shape_function_to_row_table));
-};
+}
 
 
 
@@ -505,7 +505,7 @@ FEValuesBase<dim>::compute_update_flags (const UpdateFlags update_flags) const
 	   | mapping->update_each (flags);
 
   return flags;
-};
+}
 
 
 
@@ -536,7 +536,7 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
   quadrature (q)
 {
   initialize (update_flags);
-};
+}
 
 
 
@@ -554,7 +554,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
-};
+}
 
 
 
@@ -578,7 +578,7 @@ FEValues<dim>::initialize (const UpdateFlags update_flags)
 
 				   // set up objects within this class
   FEValuesData<dim>::initialize (this->n_quadrature_points, *this->fe, flags);
-};
+}
 
 
 
@@ -620,7 +620,7 @@ FEValues<dim>::memory_consumption () const
 {
   return (FEValuesBase<dim>::memory_consumption () +
 	  MemoryConsumption::memory_consumption (quadrature));
-};
+}
 
 
 /*------------------------------- FEFaceValuesBase --------------------------*/
@@ -640,7 +640,7 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 				   mapping,
 				   fe),
   quadrature(quadrature)
-{};
+{}
 
 
 
@@ -651,7 +651,7 @@ FEFaceValuesBase<dim>::get_normal_vectors () const
   Assert (this->update_flags & update_normal_vectors,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   return this->normal_vectors;
-};
+}
 
 
 
@@ -660,9 +660,9 @@ const std::vector<Tensor<1,dim> > &
 FEFaceValuesBase<dim>::get_boundary_forms () const
 {
   Assert (this->update_flags & update_boundary_forms,
-	  FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   return this->boundary_forms;
-};
+}
 
 
 
@@ -673,7 +673,7 @@ FEFaceValuesBase<dim>::memory_consumption () const
   return (FEValuesBase<dim>::memory_consumption () +
 	  MemoryConsumption::memory_consumption (quadrature) +
 	  MemoryConsumption::memory_consumption (present_face));
-};
+}
 
 
 /*------------------------------- FEFaceValues -------------------------------*/
@@ -692,7 +692,7 @@ FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 				       fe, quadrature)
 {
   initialize (update_flags);
-};
+}
 
 
 
@@ -709,7 +709,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
-};
+}
 
 
 
@@ -728,7 +728,7 @@ FEFaceValues<dim>::initialize (const UpdateFlags update_flags)
 
 				   // set up objects within this class
   FEValuesData<dim>::initialize(this->n_quadrature_points, *this->fe, flags);
-};
+}
 
 
 
@@ -764,7 +764,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 
   this->fe_data->clear_first_cell ();
   this->mapping_data->clear_first_cell ();
-};
+}
 
 
 /*------------------------------- FESubFaceValues -------------------------------*/
@@ -800,7 +800,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
-};
+}
 
 
 
@@ -821,7 +821,7 @@ FESubfaceValues<dim>::initialize (const UpdateFlags update_flags)
 
 				   // set up objects within this class
   FEValuesData<dim>::initialize(this->n_quadrature_points, *this->fe, flags);
-};
+}
 
 
 
@@ -862,7 +862,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 
   this->fe_data->clear_first_cell ();
   this->mapping_data->clear_first_cell ();
-};
+}
 
 
 /*------------------------------- Explicit Instantiations -------------*/

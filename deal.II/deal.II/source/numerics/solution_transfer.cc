@@ -398,7 +398,7 @@ SolutionTransfer<dim, number>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (indices_on_cell) +
 	  MemoryConsumption::memory_consumption (all_pointerstructs) +
 	  MemoryConsumption::memory_consumption (dof_values_on_cell));
-};
+}
 
 
 
@@ -407,7 +407,7 @@ unsigned int
 SolutionTransfer<dim, number>::Pointerstruct::memory_consumption () const
 {
   return sizeof(*this);
-};
+}
 
 
 

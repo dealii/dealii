@@ -32,7 +32,7 @@ template <typename T>
 static T sqr (const T t)
 {
   return t*t;
-};
+}
 
 
 
@@ -66,7 +66,7 @@ get_projected_derivative (const FEValues<dim>  &fe_values,
       fe_values.get_function_values (solution, values);
       return values[0](component);
     };
-};
+}
 
 
 
@@ -79,7 +79,7 @@ DerivativeApproximation::Gradient<dim>::derivative_norm (const Derivative &d)
   for (unsigned int i=0; i<dim; ++i)
     s += d[i]*d[i];
   return std::sqrt(s);
-};
+}
 
 
 
@@ -89,7 +89,7 @@ void
 DerivativeApproximation::Gradient<dim>::symmetrize (Derivative &)
 {
 				   // nothing to do here
-};
+}
 
 
 
@@ -114,7 +114,7 @@ get_projected_derivative (const FEValues<dim>  &fe_values,
       fe_values.get_function_grads (solution, values);
       return values[0][component];
     };
-};
+}
 
 
 #if deal_II_dimension == 1
@@ -126,7 +126,7 @@ DerivativeApproximation::SecondDerivative<1>::
 derivative_norm (const Derivative &d)
 {
   return std::fabs (d[0][0]);
-};
+}
 
 #endif
 
@@ -153,7 +153,7 @@ derivative_norm (const Derivative &d)
   
   return std::max (std::fabs (eigenvalues[0]),
 		   std::fabs (eigenvalues[1]));
-};
+}
 
 #endif
 
@@ -334,7 +334,7 @@ C DEFINE A TEST MATRIX
   return std::max (std::fabs (EE[0]),
 		   std::max (std::fabs (EE[1]),
 			     std::fabs (EE[2])));
-};
+}
 
 #endif
 
@@ -360,7 +360,7 @@ derivative_norm (const Derivative &)
 				   // suffice?
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 
@@ -376,7 +376,7 @@ DerivativeApproximation::SecondDerivative<dim>::symmetrize (Derivative &d)
 	const double s = (d[i][j] + d[j][i]) / 2;
 	d[i][j] = d[j][i] = s;
       };
-};
+}
 
 
 
@@ -395,7 +395,7 @@ approximate_gradient (const Mapping<dim>    &mapping,
 					     solution,
 					     component,
 					     derivative_norm);
-};
+}
 
 
 template <int dim>
@@ -413,7 +413,7 @@ approximate_gradient (const DoFHandler<dim> &dof_handler,
 					     solution,
 					     component,
 					     derivative_norm);
-};
+}
 
 
 template <int dim>
@@ -430,7 +430,7 @@ approximate_second_derivative (const Mapping<dim>    &mapping,
 						     solution,
 						     component,
 						     derivative_norm);
-};
+}
 
 
 template <int dim>
@@ -448,7 +448,7 @@ approximate_second_derivative (const DoFHandler<dim> &dof_handler,
 						     solution,
 						     component,
 						     derivative_norm);
-};
+}
 
 
 template <class DerivativeDescription, int dim>
@@ -483,7 +483,7 @@ approximate_derivative (const Mapping<dim>    &mapping,
 				   index_intervals[i],
 				   derivative_norm));
   thread_manager.wait ();
-};
+}
 
 
 
@@ -702,7 +702,7 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
       *derivative_norm_on_this_cell
 	= DerivativeDescription::derivative_norm (derivative);
     };
-};
+}
 
 
 

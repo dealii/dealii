@@ -30,7 +30,7 @@ PreconditionBlock<MATRIX,inverse_type>::PreconditionBlock ():
 		A(0),
 		store_diagonals(false),
 		same_diagonal(false)
-{};
+{}
 
 
 template <class MATRIX, typename inverse_type>
@@ -237,7 +237,7 @@ PreconditionBlock<MATRIX,inverse_type>::memory_consumption () const
   for (unsigned int i=0; i<var_diagonal.size(); ++i)
     mem += MemoryConsumption::memory_consumption(var_diagonal[i]);
   return mem;
-};
+}
 
 
 

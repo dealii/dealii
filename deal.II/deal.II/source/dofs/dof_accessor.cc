@@ -34,16 +34,18 @@ template <int dim>
 void DoFObjectAccessor<1, dim>::set_dof_index (const unsigned int i,
 					       const unsigned int index) const
 {
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (this->dof_handler->selected_fe != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->selected_fe->dofs_per_line,
 	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_line));
 
   this->dof_handler->levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_line+i] = index;
-};
+}
 
 
 
@@ -76,7 +78,7 @@ void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   this->dof_handler->selected_fe->dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
-};
+}
 
 
 
@@ -115,7 +117,7 @@ distribute_local_to_global (const Vector<double> &local_source,
 				   // distribute cell vector
   for (unsigned int j=0; j<n_dofs; ++j)
     global_destination(dofs[j]) += local_source(j);
-};
+}
 
 
 
@@ -159,7 +161,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   for (unsigned int i=0; i<n_dofs; ++i)
     for (unsigned int j=0; j<n_dofs; ++j)
       global_destination.add(dofs[i], dofs[j], local_source(i,j));
-};
+}
 
 
 
@@ -190,7 +192,7 @@ DoFObjectAccessor<1,dim>::get_dof_values (const InputVector &values,
 
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
-};
+}
 
 
 
@@ -221,7 +223,7 @@ DoFObjectAccessor<1,dim>::set_dof_values (const Vector<number> &local_values,
 
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
-};
+}
 
 
 /*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
@@ -242,7 +244,7 @@ void DoFObjectAccessor<2, dim>::set_dof_index (const unsigned int i,
 
   this->dof_handler->levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_quad+i] = index;
-};
+}
 
 
 
@@ -264,7 +266,7 @@ DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   this->dof_handler->selected_fe->dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
-};
+}
 
 
 
@@ -292,7 +294,7 @@ distribute_local_to_global (const Vector<double> &local_source,
 				   // distribute cell vector
   for (unsigned int j=0; j<n_dofs; ++j)
     global_destination(dofs[j]) += local_source(j);
-};
+}
 
 
 
@@ -325,7 +327,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   for (unsigned int i=0; i<n_dofs; ++i)
     for (unsigned int j=0; j<n_dofs; ++j)
       global_destination.add(dofs[i], dofs[j], local_source(i,j));
-};
+}
 
 
 
@@ -363,7 +365,7 @@ DoFObjectAccessor<2,dim>::get_dof_values (const InputVector &values,
 
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
-};
+}
 
 
 
@@ -401,7 +403,7 @@ DoFObjectAccessor<2,dim>::set_dof_values (const Vector<number> &local_values,
 
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
-};
+}
 
 
 /*------------------------- Functions: DoFObjectAccessor<3,dim> -----------------------*/
@@ -422,7 +424,7 @@ void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
 
   this->dof_handler->levels[this->present_level]
     ->hex_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_hex+i] = index;
-};
+}
 
 
 
@@ -444,7 +446,7 @@ void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   this->dof_handler->selected_fe->dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
-};
+}
 
 
 
@@ -474,7 +476,7 @@ distribute_local_to_global (const Vector<double> &local_source,
 				   // distribute cell vector
   for (unsigned int j=0; j<n_dofs; ++j)
     global_destination(dofs[j]) += local_source(j);
-};
+}
 
 
 
@@ -509,7 +511,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   for (unsigned int i=0; i<n_dofs; ++i)
     for (unsigned int j=0; j<n_dofs; ++j)
       global_destination.add(dofs[i], dofs[j], local_source(i,j));
-};
+}
 
 
 
@@ -549,7 +551,7 @@ DoFObjectAccessor<3,dim>::get_dof_values (const InputVector &values,
 
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
-};
+}
 
 
 
@@ -591,7 +593,7 @@ DoFObjectAccessor<3,dim>::set_dof_values (const Vector<number> &local_values,
 
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
-};
+}
 
 
 
@@ -606,7 +608,7 @@ DoFCellAccessor<1>::face (const unsigned int) const
 {
   Assert (false, ExcNotUsefulForThisDimension());
   return TriaIterator<1, DoFObjectAccessor<0,1> >();
-};
+}
 
 #endif
 
@@ -618,7 +620,7 @@ TriaIterator<2, DoFObjectAccessor<1,2> >
 DoFCellAccessor<2>::face (const unsigned int i) const
 {
   return this->line(i);
-};
+}
 
 #endif
 
@@ -630,7 +632,7 @@ TriaIterator<3, DoFObjectAccessor<2, 3> >
 DoFCellAccessor<3>::face (const unsigned int i) const
 {
   return this->quad(i);
-};
+}
 
 #endif
 
@@ -645,12 +647,14 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
   const unsigned int        dofs_per_cell = fe.dofs_per_cell;
   
   
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&fe != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (interpolated_values.size() == dofs_per_cell,
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   if (!this->has_children())
 				     // if this cell has no children: simply
@@ -737,7 +741,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
                 interpolated_values(i) = tmp2(i);
 	};
     };
-};
+}
 
 
 
@@ -749,12 +753,14 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
 {
   const unsigned int dofs_per_cell = this->dof_handler->get_fe().dofs_per_cell;
   
-  Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (this->dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_values.size() == dofs_per_cell,
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   if (!this->has_children())
                                      // if this cell has no children: simply
@@ -774,7 +780,7 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
 	  this->child(child)->set_dof_values_by_interpolation (tmp, values);
 	};
     };
-};
+}
 
 
 

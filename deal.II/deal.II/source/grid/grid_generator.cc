@@ -106,7 +106,7 @@ void
 GridGenerator::colorize_hyper_rectangle (Triangulation<1> &)
 {
 				   // nothing to do in 1d
-};
+}
 
 
 #else
@@ -137,7 +137,7 @@ GridGenerator::colorize_hyper_rectangle (Triangulation<dim> &tria)
       default:
 	    Assert(false, ExcNotImplemented());
     };
-};
+}
 
 #endif
 
@@ -166,7 +166,7 @@ void GridGenerator::hyper_cube_slit (Triangulation<1> &,
 				     const bool)
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 
@@ -175,7 +175,7 @@ void GridGenerator::hyper_L (Triangulation<1> &,
 			     const double)
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 
@@ -184,7 +184,7 @@ void GridGenerator::hyper_ball (Triangulation<1> &,
 				const double)
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 
@@ -193,7 +193,7 @@ void GridGenerator::cylinder (Triangulation<1> &,
 			      const double)
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 
@@ -204,7 +204,7 @@ void GridGenerator::hyper_shell (Triangulation<1> &,
 				 const unsigned int)
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 #endif
 
@@ -294,7 +294,7 @@ GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
       ++cell;
       cell->face(3)->set_boundary_indicator(2);
     }
-};
+}
 
 
 
@@ -328,7 +328,7 @@ GridGenerator::hyper_L (Triangulation<2> &tria,
   tria.create_triangulation (std::vector<Point<dim> >(&vertices[0], &vertices[8]),
 			     cells,
 			     SubCellData());       // no boundary information
-};
+}
 
 
 
@@ -368,7 +368,7 @@ GridGenerator::hyper_ball (Triangulation<2> &tria,
   tria.create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[8]),
 			     cells,
 			     SubCellData());       // no boundary information
-};
+}
 
 
 
@@ -428,7 +428,7 @@ void GridGenerator::hyper_shell (Triangulation<2>   &tria,
     };
   
   tria.create_triangulation (vertices, cells, SubCellData());
-};
+}
 
 
 
@@ -499,7 +499,7 @@ GridGenerator::half_hyper_ball (Triangulation<2> &tria,
   tria.create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[8]),
 			     cells,
 			     SubCellData());       // no boundary information
-};
+}
 
 
 
@@ -568,7 +568,7 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
     };
   
   tria.create_triangulation (vertices, cells, SubCellData());
-};
+}
 
 
 
@@ -584,7 +584,7 @@ void GridGenerator::hyper_cube_slit (Triangulation<3> &,
 				     const bool)
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 
@@ -705,7 +705,7 @@ GridGenerator::hyper_L (Triangulation<3> &tria,
   tria.create_triangulation (std::vector<Point<dim> >(&vertices[0], &vertices[26]),
 			     cells,
 			     SubCellData());       // no boundary information
-};
+}
 
 
 
@@ -786,7 +786,7 @@ GridGenerator::hyper_ball (Triangulation<3> &/*tria*/,
 			     cells,
 			     SubCellData());       // no boundary information
 */			     
-};
+}
 
 
 
@@ -868,7 +868,7 @@ GridGenerator::cylinder (Triangulation<3> &tria,
 	cell->face(1)->set_boundary_indicator(2);
       ++cell;
     }
-};
+}
 
 
 
@@ -879,7 +879,7 @@ void GridGenerator::hyper_shell (Triangulation<3>   &,
 				 const unsigned int  )
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 #endif

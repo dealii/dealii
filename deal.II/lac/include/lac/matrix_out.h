@@ -315,7 +315,7 @@ MatrixOut::get_element (const SparseMatrix<number> &matrix,
 			const unsigned int          j)
 {
   return matrix.el(i,j);
-};
+}
 
 
 
@@ -328,7 +328,7 @@ MatrixOut::get_element (const BlockSparseMatrix<number> &matrix,
 			const unsigned int               j)
 {
   return matrix.el(i,j);
-};
+}
 
 
 
@@ -341,7 +341,7 @@ MatrixOut::get_element (const Matrix       &matrix,
 			const unsigned int  j)
 {
   return matrix(i,j);
-};
+}
 
 
 
@@ -378,7 +378,7 @@ MatrixOut::get_gridpoint_value (const Matrix       &matrix,
 	average += get_element (matrix, row, col);
   average /= n_elements;
   return average;
-};
+}
 
 
 
@@ -468,7 +468,7 @@ MatrixOut::build_patches (const Matrix      &matrix,
 
 				   // finally set the name
   this->name = name;
-};
+}
 
 
 

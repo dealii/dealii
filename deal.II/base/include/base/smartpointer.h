@@ -185,7 +185,7 @@ class SmartPointer
 template <typename T>
 SmartPointer<T>::SmartPointer () :
 		t (0)
-{};
+{}
 
 
 
@@ -195,7 +195,7 @@ SmartPointer<T>::SmartPointer (T *t) :
 {
   if (t != 0)
     t->subscribe();
-};
+}
 
 
 
@@ -205,7 +205,7 @@ SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt) :
 {
   if (t != 0)
     t->subscribe();
-};
+}
 
 
 
@@ -214,7 +214,7 @@ SmartPointer<T>::~SmartPointer ()
 {
   if (t != 0)
     t->unsubscribe();
-};
+}
 
 
 
@@ -232,7 +232,7 @@ SmartPointer<T> & SmartPointer<T>::operator = (T *tt)
   if (tt != 0)
     tt->subscribe();
   return *this;
-};
+}
 
 
 
@@ -251,7 +251,7 @@ SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt)
   if (tt != 0)
     tt->subscribe();
   return *this;
-};
+}
 
 
 
@@ -260,7 +260,7 @@ inline
 SmartPointer<T>::operator T* () const
 {
   return t;
-};
+}
 
 
 
@@ -269,7 +269,7 @@ inline
 T & SmartPointer<T>::operator * () const
 {
   return *t;
-};
+}
 
 
 
@@ -278,7 +278,7 @@ inline
 T * SmartPointer<T>::operator -> () const
 {
   return t;
-};
+}
 
 
 
@@ -287,7 +287,7 @@ inline
 void SmartPointer<T>::swap (SmartPointer<T> &tt)
 {
   swap (t, tt.t);
-};
+}
 
 
 
@@ -302,7 +302,7 @@ void SmartPointer<T>::swap (T *&tt)
 
   if (t != 0)
     t->subscribe ();
-};
+}
 
 
 
@@ -311,7 +311,7 @@ inline
 unsigned int SmartPointer<T>::memory_consumption () const
 {
   return sizeof(SmartPointer<T>);
-};
+}
 
 
 
@@ -326,7 +326,7 @@ inline
 void swap (SmartPointer<T> &t1, SmartPointer<T> &t2)
 {
   t1.swap (t2);
-};
+}
 
 
 
@@ -342,7 +342,7 @@ inline
 void swap (SmartPointer<T> &t1, T *&t2)
 {
   t1.swap (t2);
-};
+}
 
 
 
@@ -358,7 +358,7 @@ inline
 void swap (T *&t1, SmartPointer<T> &t2)
 {
   t2.swap (t1);
-};
+}
 
 
 #endif

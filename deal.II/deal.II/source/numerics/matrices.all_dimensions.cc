@@ -183,7 +183,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				       // preset solution vector
       solution(dof_number) = dof->second;
     };
-};
+}
 
 
 
@@ -502,7 +502,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				       // preset solution vector
       solution.block(block_index.first)(block_index.second) = dof->second;
     };
-};
+}
 
 
 

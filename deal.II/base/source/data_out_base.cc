@@ -49,7 +49,7 @@ DataOutBase::Patch<dim,spacedim>::Patch () :
   
   Assert (dim<=spacedim, ExcInvalidCombinationOfDimensions(dim,spacedim));
   Assert (spacedim<=3, ExcNotImplemented());
-};
+}
 
 
 
@@ -63,13 +63,13 @@ DataOutBase::Patch<dim,spacedim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption(n_subdivisions)
 	  +
 	  MemoryConsumption::memory_consumption(data));
-};
+}
 
 
 
 DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
 		write_preamble (write_preamble)
-{};
+{}
 
 
 
@@ -79,7 +79,7 @@ DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 		smooth (smooth),
 		bicubic_patch(bicubic_patch),
 		external_data(external_data)
-{};
+{}
 
 
 DataOutBase::DXFlags::DXFlags (const bool write_multigrid,
@@ -93,7 +93,7 @@ void DataOutBase::DXFlags::declare_parameters (ParameterHandler &prm)
 {
   prm.declare_entry ("Write multigrid", "true", Patterns::Bool());
   prm.declare_entry ("Write neighbors", "true", Patterns::Bool());
-};
+}
 
 
 
@@ -101,7 +101,7 @@ void DataOutBase::DXFlags::parse_parameters (ParameterHandler &prm)
 {
   write_multigrid = prm.get_bool ("Write multigrid");
   write_neighbors = prm.get_bool ("Write neighbors");
-};
+}
 
 
 
@@ -111,7 +111,7 @@ DataOutBase::DXFlags::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 
@@ -119,14 +119,14 @@ DataOutBase::DXFlags::memory_consumption () const
 void DataOutBase::UcdFlags::declare_parameters (ParameterHandler &prm)
 {
   prm.declare_entry ("Write preamble", "true", Patterns::Bool());
-};
+}
 
 
 
 void DataOutBase::UcdFlags::parse_parameters (ParameterHandler &prm)
 {
   write_preamble = prm.get_bool ("Write preamble");
-};
+}
 
 
 unsigned int
@@ -135,17 +135,17 @@ DataOutBase::UcdFlags::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 
 void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
-{};
+{}
 
 
 
 void DataOutBase::GnuplotFlags::parse_parameters (ParameterHandler &/*prm*/)
-{};
+{}
 
 
 
@@ -155,7 +155,7 @@ DataOutBase::GnuplotFlags::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 
@@ -168,7 +168,7 @@ void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &prm)
 		     Patterns::Bool());
   prm.declare_entry ("Include external file", "true",
 		     Patterns::Bool ());
-};
+}
 
 
 
@@ -177,7 +177,7 @@ void DataOutBase::PovrayFlags::parse_parameters (ParameterHandler &prm)
   smooth        = prm.get_bool ("Use smooth triangles");
   bicubic_patch = prm.get_bool ("Use bicubic patches");
   external_data = prm.get_bool ("Include external file");
-};
+}
 
 
 
@@ -187,7 +187,7 @@ DataOutBase::PovrayFlags::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 
@@ -215,7 +215,7 @@ DataOutBase::EpsFlags::EpsFlags (const unsigned int  height_vector,
 		draw_cells(draw_cells),
 		shade_cells(shade_cells),
 		color_function(color_function)
-{};
+{}
 
 
 
@@ -302,7 +302,7 @@ DataOutBase::EpsFlags::default_color_function (const double x,
     rgb_values.red = rgb_values.green = rgb_values.blue = 1;
 
   return rgb_values;
-};
+}
 
 
 
@@ -315,7 +315,7 @@ DataOutBase::EpsFlags::grey_scale_color_function (const double x,
   rgb_values.red = rgb_values.blue = rgb_values.green
 		 = (x-xmin)/(xmax-xmin);
   return rgb_values;
-};
+}
 
 
 
@@ -328,7 +328,7 @@ DataOutBase::EpsFlags::reverse_grey_scale_color_function (const double x,
   rgb_values.red = rgb_values.blue = rgb_values.green
 		 = 1-(x-xmin)/(xmax-xmin);
   return rgb_values;
-};
+}
 
 
 
@@ -337,7 +337,7 @@ bool DataOutBase::EpsCell2d::operator < (const EpsCell2d &e) const
 				   // note the "wrong" order in
 				   // which we sort the elements
   return depth > e.depth;
-};
+}
 
 
 
@@ -367,7 +367,7 @@ void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
 		     Patterns::Bool());
   prm.declare_entry ("Color function", "default",
 		     Patterns::Selection ("default|grey scale|reverse grey scale"));
-};
+}
 
 
 
@@ -399,7 +399,7 @@ void DataOutBase::EpsFlags::parse_parameters (ParameterHandler &prm)
 				     // already have checked that the
 				     // given value is valid
     Assert (false, ExcInternalError());
-};
+}
 
 
 
@@ -409,17 +409,17 @@ DataOutBase::EpsFlags::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 
 void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
-{};
+{}
 
 
 
 void DataOutBase::GmvFlags::parse_parameters (ParameterHandler &/*prm*/)
-{};
+{}
 
 
 unsigned int
@@ -428,24 +428,24 @@ DataOutBase::GmvFlags::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 
 DataOutBase::TecplotFlags::TecplotFlags (const char* tecplot_binary_file_name) :
   tecplot_binary_file_name(tecplot_binary_file_name)
 {
-};
+}
 
 
 
 void DataOutBase::TecplotFlags::declare_parameters (ParameterHandler &/*prm*/)
-{};
+{}
 
 
 
 void DataOutBase::TecplotFlags::parse_parameters (ParameterHandler &/*prm*/)
-{};
+{}
 
 
 unsigned int
@@ -454,17 +454,17 @@ DataOutBase::TecplotFlags::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 
 void DataOutBase::VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
-{};
+{}
 
 
 
 void DataOutBase::VtkFlags::parse_parameters (ParameterHandler &/*prm*/)
-{};
+{}
 
 
 unsigned int
@@ -473,14 +473,14 @@ DataOutBase::VtkFlags::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 
 unsigned int DataOutBase::memory_consumption ()
 {
   return 0;
-};
+}
 
 
 
@@ -890,7 +890,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -1388,7 +1388,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
   out << "end" << std::endl;
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -1676,7 +1676,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
     };
 
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -2038,7 +2038,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
     }
   
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -2422,7 +2422,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
       default:
 	    Assert (false, ExcNotImplemented());
     };
-};
+}
 
 
 
@@ -2736,7 +2736,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
   
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -3082,7 +3082,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
   
                                    // assert the stream is still ok
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -3534,7 +3534,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
    delete [] tecVarNames;
          
 #endif
-};
+}
 
 
 
@@ -3863,7 +3863,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
   
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -3952,7 +3952,7 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     Assert (data_vectors[data_set].size() == next_value,
 	    ExcInternalError());
-};
+}
 
 
 
@@ -3964,7 +3964,7 @@ void DataOutInterface<dim,spacedim>::write_dx (std::ostream &out) const
 {
   DataOutBase::write_dx (get_patches(), get_dataset_names(),
 			 dx_flags, out);
-};
+}
 
 
 
@@ -3973,7 +3973,7 @@ void DataOutInterface<dim,spacedim>::write_ucd (std::ostream &out) const
 {
   DataOutBase::write_ucd (get_patches(), get_dataset_names(),
 			  ucd_flags, out);
-};
+}
 
 
 
@@ -3982,7 +3982,7 @@ void DataOutInterface<dim,spacedim>::write_gnuplot (std::ostream &out) const
 {
   DataOutBase::write_gnuplot (get_patches(), get_dataset_names(),
 			      gnuplot_flags, out);
-};
+}
 
 
 
@@ -3991,7 +3991,7 @@ void DataOutInterface<dim,spacedim>::write_povray (std::ostream &out) const
 {
   DataOutBase::write_povray (get_patches(), get_dataset_names(),
 			     povray_flags, out);
-};
+}
 
 
 
@@ -4000,7 +4000,7 @@ void DataOutInterface<dim,spacedim>::write_eps (std::ostream &out) const
 {
   DataOutBase::write_eps (get_patches(), get_dataset_names(),
 			  eps_flags, out);
-};
+}
 
 
 
@@ -4009,7 +4009,7 @@ void DataOutInterface<dim,spacedim>::write_gmv (std::ostream &out) const
 {
   DataOutBase::write_gmv (get_patches(), get_dataset_names(),
 			  gmv_flags, out);
-};
+}
 
 
 
@@ -4018,7 +4018,7 @@ void DataOutInterface<dim,spacedim>::write_tecplot (std::ostream &out) const
 {
   DataOutBase::write_tecplot (get_patches(), get_dataset_names(),
 			      tecplot_flags, out);
-};
+}
 
 
 
@@ -4027,7 +4027,7 @@ void DataOutInterface<dim,spacedim>::write_tecplot_binary (std::ostream &out) co
 {
   DataOutBase::write_tecplot_binary (get_patches(), get_dataset_names(),
 				     tecplot_flags, out);
-};
+}
 
 
 
@@ -4036,7 +4036,7 @@ void DataOutInterface<dim,spacedim>::write_vtk (std::ostream &out) const
 {
   DataOutBase::write_vtk (get_patches(), get_dataset_names(),
 			  vtk_flags, out);
-};
+}
 
 
 
@@ -4090,7 +4090,7 @@ DataOutInterface<dim,spacedim>::write (std::ostream &out,
       default:
 	    Assert (false, ExcNotImplemented());
     };
-};
+}
 
 
 
@@ -4107,7 +4107,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::set_flags (const DXFlags &flags) 
 {
   dx_flags = flags;
-};
+}
 
 
 
@@ -4115,7 +4115,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::set_flags (const UcdFlags &flags) 
 {
   ucd_flags = flags;
-};
+}
 
 
 
@@ -4123,7 +4123,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::set_flags (const GnuplotFlags &flags) 
 {
   gnuplot_flags = flags;
-};
+}
 
 
 
@@ -4131,7 +4131,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::set_flags (const PovrayFlags &flags) 
 {
   povray_flags = flags;
-};
+}
 
 
 
@@ -4139,7 +4139,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::set_flags (const EpsFlags &flags) 
 {
   eps_flags = flags;
-};
+}
 
 
 
@@ -4147,7 +4147,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::set_flags (const GmvFlags &flags) 
 {
   gmv_flags = flags;
-};
+}
 
 
 
@@ -4155,7 +4155,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::set_flags (const TecplotFlags &flags) 
 {
   tecplot_flags = flags;
-};
+}
 
 
 
@@ -4163,7 +4163,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::set_flags (const VtkFlags &flags) 
 {
   vtk_flags = flags;
-};
+}
 
 
 
@@ -4208,7 +4208,7 @@ DataOutInterface<dim,spacedim>::default_suffix (const OutputFormat output_format
 	    Assert (false, ExcNotImplemented()); 
 	    return "";
     };
-};
+}
 
 
 
@@ -4247,7 +4247,7 @@ DataOutInterface<dim,spacedim>::parse_output_format (const std::string &format_n
 
 				   // return something invalid
   return OutputFormat(-1);
-};
+}
 
 
 
@@ -4353,7 +4353,7 @@ DataOutInterface<dim,spacedim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (gmv_flags) +
 	  MemoryConsumption::memory_consumption (tecplot_flags) +
 	  MemoryConsumption::memory_consumption (vtk_flags));
-};
+}
 
 
 

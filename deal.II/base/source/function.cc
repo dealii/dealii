@@ -23,12 +23,12 @@ Function<dim>::Function (const unsigned int n_components,
 			 const double       initial_time) :
 		FunctionTime(initial_time),
 		n_components(n_components)
-{};
+{}
 
 
 template <int dim>
 Function<dim>::~Function ()
-{};
+{}
 
 
 template <int dim>
@@ -37,7 +37,7 @@ double Function<dim>::value (const Point<dim> &,
 {
   Assert (false, ExcPureFunctionCalled());
   return 0;
-};
+}
 
 
 template <int dim>
@@ -45,7 +45,7 @@ void Function<dim>::vector_value (const Point<dim> &,
 				  Vector<double>   &) const
 {
   Assert (false, ExcPureFunctionCalled());
-};
+}
 
 
 // if necessary try to work around a bug in the IBM xlC compiler
@@ -66,7 +66,7 @@ void Function<dim>::value_list (const std::vector<Point<dim> > &points,
 
   for (unsigned int i=0; i<points.size(); ++i)
     values[i]  = this->value (points[i], component);
-};
+}
 
 
 template <int dim>
@@ -81,7 +81,7 @@ void Function<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 
   for (unsigned int i=0; i<points.size(); ++i)
     this->vector_value (points[i], values[i]);
-};
+}
 
 
 template <int dim>
@@ -90,7 +90,7 @@ Tensor<1,dim> Function<dim>::gradient (const Point<dim> &,
 {
   Assert (false, ExcPureFunctionCalled());
   return Point<dim>();
-};
+}
 
 
 template <int dim>
@@ -98,7 +98,7 @@ void Function<dim>::vector_gradient (const Point<dim>       &,
 				     std::vector<Tensor<1,dim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
-};
+}
 
 
 template <int dim>
@@ -111,7 +111,7 @@ void Function<dim>::gradient_list (const std::vector<Point<dim> > &points,
 
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i] = gradient(points[i], component);
-};
+}
 
 
 template <int dim>
@@ -189,7 +189,7 @@ Function<dim>::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 //------------------------------------------------------------//
@@ -210,7 +210,7 @@ double ZeroFunction<dim>::value (const Point<dim> &,
 				 const unsigned int) const
 {
   return 0.;
-};
+}
 
 
 template <int dim>
@@ -221,7 +221,7 @@ void ZeroFunction<dim>::vector_value (const Point<dim> &,
 	  ExcDimensionMismatch (return_value.size(), this->n_components));
 
   std::fill (return_value.begin(), return_value.end(), 0.0);
-};
+}
 
 
 template <int dim>
@@ -232,7 +232,7 @@ void ZeroFunction<dim>::value_list (const std::vector<Point<dim> > &points,
 	  ExcDimensionMismatch(values.size(), points.size()));
 
   std::fill (values.begin(), values.end(), 0.);
-};
+}
 
 
 template <int dim>
@@ -248,7 +248,7 @@ void ZeroFunction<dim>::vector_value_list (const std::vector<Point<dim> > &point
 	      ExcDimensionMismatch(values[i].size(), this->n_components));
       std::fill (values[i].begin(), values[i].end(), 0.);
     };
-};
+}
 
 
 template <int dim>
@@ -256,7 +256,7 @@ Tensor<1,dim> ZeroFunction<dim>::gradient (const Point<dim> &,
 					   const unsigned int) const
 {
   return Tensor<1,dim>();
-};
+}
 
 
 template <int dim>
@@ -268,7 +268,7 @@ void ZeroFunction<dim>::vector_gradient (const Point<dim>       &,
 
   for (unsigned int c=0; c<this->n_components; ++c)
     gradients[c].clear ();
-};
+}
 
 
 template <int dim>
@@ -281,7 +281,7 @@ void ZeroFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
 
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i].clear ();
-};
+}
 
 
 template <int dim>
@@ -297,7 +297,7 @@ void ZeroFunction<dim>::vector_gradient_list (const std::vector<Point<dim> >    
       for (unsigned int c=0; c<this->n_components; ++c)
 	gradients[i][c].clear ();
     };
-};
+}
 
 //------------------------------------------------------------//
 
@@ -307,11 +307,11 @@ ConstantFunction<dim>::ConstantFunction (const double value,
 					 const unsigned int n_components) :
 		ZeroFunction<dim> (n_components),
   function_value    (value)
-{};
+{}
 
 
 template <int dim>
-ConstantFunction<dim>::~ConstantFunction () {};
+ConstantFunction<dim>::~ConstantFunction () {}
 
 
 template <int dim>
@@ -319,7 +319,7 @@ double ConstantFunction<dim>::value (const Point<dim> &,
 				     const unsigned int) const
 {
   return function_value;
-};
+}
 
 
 template <int dim>
@@ -330,7 +330,7 @@ void ConstantFunction<dim>::vector_value (const Point<dim> &,
 	  ExcDimensionMismatch (return_value.size(), this->n_components));
 
   std::fill (return_value.begin(), return_value.end(), function_value);
-};
+}
 
 
 template <int dim>
@@ -342,7 +342,7 @@ void ConstantFunction<dim>::value_list (const std::vector<Point<dim> > &points,
 	  ExcDimensionMismatch(values.size(), points.size()));
 
   std::fill (values.begin(), values.end(), function_value);
-};
+}
 
 
 template <int dim>
@@ -358,7 +358,7 @@ void ConstantFunction<dim>::vector_value_list (const std::vector<Point<dim> > &p
 	      ExcDimensionMismatch(values[i].size(), this->n_components));
       std::fill (values[i].begin(), values[i].end(), function_value);
     };
-};
+}
 
 
 
@@ -369,7 +369,7 @@ ConstantFunction<dim>::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 //------------------------------------------------------------//
 
@@ -421,7 +421,7 @@ ComponentSelectFunction<dim>::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 // explicit instantiations

@@ -1488,4 +1488,4 @@ namespace Functions
   template class FourierSineSum<1>;
   template class FourierSineSum<2>;
   template class FourierSineSum<3>;
-};
+}

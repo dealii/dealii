@@ -27,12 +27,12 @@ template <int rank, int dim>
 TensorFunction<rank, dim>::TensorFunction (const double initial_time)
 		:
 		FunctionTime (initial_time)
-{};
+{}
 
 
 template <int rank, int dim>
 TensorFunction<rank, dim>::~TensorFunction ()
-{};
+{}
 
 
 template <int rank, int dim>
@@ -41,7 +41,7 @@ TensorFunction<rank, dim>::value (const Point<dim> &) const
 {
   Assert (false, ExcPureFunctionCalled());
   return Tensor<rank,dim>();
-};
+}
 
 
 // if necessary try to work around a bug in the IBM xlC compiler
@@ -60,7 +60,7 @@ TensorFunction<rank, dim>::value_list (const std::vector<Point<dim> > &points,
 
   for (unsigned int i=0; i<points.size(); ++i)
     values[i]  = this->value (points[i]);
-};
+}
 
 
 template <int rank, int dim>
@@ -69,7 +69,7 @@ TensorFunction<rank, dim>::gradient (const Point<dim> &) const
 {
   Assert (false, ExcPureFunctionCalled());
   return Tensor<rank+1,dim>();
-};
+}
 
 
 template <int rank, int dim>
@@ -82,7 +82,7 @@ TensorFunction<rank, dim>::gradient_list (const std::vector<Point<dim> >   &poin
 
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i] = gradient(points[i]);
-};
+}
 
 
 template class TensorFunction<1,1>;

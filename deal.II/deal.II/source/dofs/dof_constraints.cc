@@ -41,7 +41,7 @@ bool
 ConstraintMatrix::check_zero_weight (const std::pair<unsigned int, double> &p)
 {
   return (p.second == 0);
-};
+}
 
 
 
@@ -50,7 +50,7 @@ bool
 ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 {
   return line < a.line;
-};
+}
 
 
 
@@ -59,7 +59,7 @@ bool
 ConstraintMatrix::ConstraintLine::operator == (const ConstraintLine &a) const
 {
   return line == a.line;
-};
+}
 
 
 
@@ -68,14 +68,14 @@ ConstraintMatrix::ConstraintLine::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (line) +
 	  MemoryConsumption::memory_consumption (entries));
-};
+}
 
 
 
 ConstraintMatrix::ConstraintMatrix () :
 		lines(),
 		sorted(false)
-{};
+{}
 
 
 void ConstraintMatrix::add_line (const unsigned int line)
@@ -92,7 +92,7 @@ void ConstraintMatrix::add_line (const unsigned int line)
 				   // list
   lines.push_back (ConstraintLine());
   lines.back().line = line;
-};
+}
 
 
 
@@ -135,7 +135,7 @@ void ConstraintMatrix::add_entry (const unsigned int line,
       };
   
   line_ptr->entries.push_back (std::make_pair(column,value));
-};
+}
 
 
 
@@ -185,7 +185,7 @@ void ConstraintMatrix::add_entries (const unsigned int                        li
       
       line_ptr->entries.push_back (*col_val_pair);
     };
-};
+}
 
 
 
@@ -246,7 +246,7 @@ void ConstraintMatrix::close ()
 #endif
   
   sorted = true;
-};
+}
 
 
 
@@ -446,7 +446,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 				   // state
   if (object_was_sorted == true)
     close ();
-};
+}
 
 
 
@@ -455,7 +455,7 @@ void ConstraintMatrix::clear ()
   std::vector<ConstraintLine> tmp;
   lines.swap (tmp);
   sorted = false;
-};
+}
 
 
 
@@ -565,7 +565,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
       };
 
   condensed.compress();
-};
+}
 
 
 
@@ -679,7 +679,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
     };
   
   sparsity.compress();
-};
+}
 
 
 
@@ -812,7 +812,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
 				.entries[q].first);
 	  };
     };
-};
+}
 
 
 
@@ -955,7 +955,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
     };
   
   sparsity.compress();
-};
+}
 
 
 
@@ -1087,14 +1087,14 @@ void ConstraintMatrix::condense (CompressedBlockSparsityPattern &sparsity) const
 	    };
 	};
     };
-};
+}
 
 
 
 unsigned int ConstraintMatrix::n_constraints () const
 {
   return lines.size();
-};
+}
 
 
 
@@ -1118,7 +1118,7 @@ bool ConstraintMatrix::is_constrained (const unsigned int index) const
 
       return false;
     };
-};
+}
 
 
 
@@ -1147,7 +1147,7 @@ bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const
 
       return false;
     };
-};
+}
 
 
 
@@ -1163,7 +1163,7 @@ unsigned int ConstraintMatrix::max_constraint_indirections () const
 			    static_cast<unsigned int>(i->entries.size()));
 
   return return_value;
-};
+}
 
     
 
@@ -1176,7 +1176,7 @@ void ConstraintMatrix::print (std::ostream &out) const
 	  << ":  " << lines[i].entries[j].second << std::endl;
 
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -1185,7 +1185,7 @@ ConstraintMatrix::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (lines) +
 	  MemoryConsumption::memory_consumption (sorted));
-};
+}
 
 
 
@@ -1216,19 +1216,19 @@ ConstraintMatrix::memory_consumption () const
 
 
 #define VectorType Vector<float>
-vector_functions;
+vector_functions
 #undef VectorType
 
 #define VectorType Vector<double>
-vector_functions;
+vector_functions
 #undef VectorType
 
 #define VectorType BlockVector<double>
-vector_functions;
+vector_functions
 #undef VectorType
 
 #define VectorType BlockVector<float>
-vector_functions;
+vector_functions
 #undef VectorType
 
 

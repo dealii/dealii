@@ -173,6 +173,6 @@ SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
                                         const Vector<somenumber> &src) const
 {
   vmult (dst, src);
-};
+}
 
 #endif // __deal2__sparse_ilu_h

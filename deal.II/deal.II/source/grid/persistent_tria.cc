@@ -29,7 +29,7 @@ template <int dim>
 PersistentTriangulation<dim>::
 PersistentTriangulation (const Triangulation<dim> &coarse_grid) :
 		coarse_grid (&coarse_grid) 
-{};
+{}
 
 
 template <int dim>
@@ -44,12 +44,12 @@ PersistentTriangulation (const PersistentTriangulation<dim> &old_tria) :
   coarsen_flags (old_tria.coarsen_flags)
 {
   Assert (old_tria.n_levels() == 0, ExcTriaNotEmpty ());
-};
+}
 
 
 template <int dim>
 PersistentTriangulation<dim>::~PersistentTriangulation () 
-{};
+{}
 
 
 template <int dim>
@@ -64,7 +64,7 @@ PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
 
 				   // then refine triangulation
   Triangulation<dim>::execute_coarsening_and_refinement ();
-};
+}
 
 
 template <int dim>
@@ -75,7 +75,7 @@ PersistentTriangulation<dim>::restore ()
 				   // refinement sweeps
   for (unsigned int i=0; i<refine_flags.size()+1; ++i) 
     restore(i);
-};
+}
 
 
 template <int dim>
@@ -100,7 +100,7 @@ PersistentTriangulation<dim>::restore (const unsigned int step) {
 
       Triangulation<dim>::execute_coarsening_and_refinement ();
     };
-};
+}
 
 
 
@@ -120,7 +120,7 @@ PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_
   coarse_grid  = &old_grid;
   refine_flags.clear ();
   coarsen_flags.clear ();
-};
+}
 
 
 template <int dim>
@@ -130,7 +130,7 @@ PersistentTriangulation<dim>::create_triangulation (const std::vector<Point<dim>
 						    const SubCellData                 &)
 {
   Assert (false, ExcFunctionNotUseful());
-};
+}
 
 
 template <int dim>
@@ -207,7 +207,7 @@ PersistentTriangulation<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (coarse_grid) +
 	  MemoryConsumption::memory_consumption (refine_flags) +
 	  MemoryConsumption::memory_consumption (coarsen_flags));
-};
+}
 
 
 // explicit instantiations

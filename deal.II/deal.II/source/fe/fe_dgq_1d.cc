@@ -126,7 +126,7 @@ namespace FE_DGQ_1d
 	-0.012439378, 0.040990099, -0.017439155, -0.050376157, 0.0042995099, 0.054999345, 0.038394855, -0.001831157,
 	-0.050934606, 0.18647931, -0.15057292, -0.1043873, -0.016304977, 0.28934245, 0.015028935, -0.031932147,
   };
-};
+}
 
 
 
@@ -174,5 +174,5 @@ const unsigned int FE_DGQ<1>::Matrices::n_projection_matrices
 #else // #if deal_II_dimension
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-namespace { void dummy () {}; };
+namespace { void dummy () {} }
 #endif // #if deal_II_dimension == 1

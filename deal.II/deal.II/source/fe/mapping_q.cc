@@ -52,7 +52,7 @@ MappingQ<dim>::InternalData::memory_consumption () const
 	  MemoryConsumption::memory_consumption (unit_normals) +
 	  MemoryConsumption::memory_consumption (use_mapping_q1_on_current_cell) +
 	  MemoryConsumption::memory_consumption (mapping_q1_data));
-};
+}
 
 
 
@@ -864,7 +864,7 @@ MappingQ<dim>::add_line_support_points (const typename Triangulation<dim>::cell_
 	  a.insert (a.end(), line_points.begin(), line_points.end());
 	}
     }
-};
+}
 
 
 
@@ -1255,7 +1255,7 @@ unsigned int
 MappingQ<dim>::get_degree() const
 {
   return degree;
-};
+}
 
   
 // explicit instantiation

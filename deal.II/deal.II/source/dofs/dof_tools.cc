@@ -163,7 +163,7 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>             &dof_h
 	  sparsity.add (boundary_dof_boundary_indices[i],
 			boundary_dof_boundary_indices[j]);
     };
-};
+}
 
 
 
@@ -181,7 +181,7 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
   boundary_indicators[1] = 0;
   make_boundary_sparsity_pattern (dof_handler, boundary_indicators,
 				  dof_to_boundary_mapping, sparsity);
-};
+}
 
 
 #endif
@@ -240,7 +240,7 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
 			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
       };
-};
+}
 
 
 
@@ -254,7 +254,7 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
   Assert (dof_to_boundary_mapping.size() == n_dofs, ExcInternalError());
   Assert (boundary_indicators.find(255) == boundary_indicators.end(),
-	  DoFHandler<dim>::ExcInvalidBoundaryIndicator());
+	  typename DoFHandler<dim>::ExcInvalidBoundaryIndicator());
   Assert (sparsity.n_rows() == dof.n_boundary_dofs(boundary_indicators),
 	  ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs(boundary_indicators)));
   Assert (sparsity.n_cols() == dof.n_boundary_dofs(boundary_indicators),
@@ -289,7 +289,7 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
 			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
       };
-};
+}
 
 
 
@@ -443,7 +443,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<1> &dof,
 		sparsity.add (local_dof_indices[i], neighbor_dof_indices[j]);
 	  };
     };
-};
+}
 
 
 #endif
@@ -734,7 +734,7 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<1> &,
 					      ConstraintMatrix &)
 {
 				   // nothing to be done here
-};
+}
 
 #endif
 
@@ -821,7 +821,7 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
 				       fe.constraints()(row,i));
 	    };
 	};
-};
+}
 
 #endif
 
@@ -962,7 +962,7 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 				       fe.constraints()(row,i));
 	    };
 	};
-};
+}
 
 #endif
 
@@ -1036,7 +1036,7 @@ void DoFTools::distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler
       if (touch_count[i] != 0)
 	dof_data(i) /=  touch_count[i];
     };
-};
+}
 
 
 template<int dim>
@@ -1301,7 +1301,7 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
                    == true))
 		selected_dofs[face_dof_indices[i]] = true;
 	  };
-};
+}
 
 
 #else
@@ -1366,7 +1366,7 @@ DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
                                   face_system_to_component_index(i).first] == true))
 	      selected_dofs[cell->vertex_dof_index(1,i)] = true;
     };
-};
+}
 
 
 #endif
@@ -1385,7 +1385,7 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
   std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
 				   // there are no hanging nodes in 1d
-};
+}
 
 #endif
 
@@ -1423,7 +1423,7 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
 	    for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
 	      selected_dofs[line->child(child)->dof_index(dof)] = true;
 	};
-};
+}
 
 #endif
 
@@ -1490,7 +1490,7 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
 	    for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
 	      selected_dofs[face->child(child)->dof_index(dof)] = true;
 	};
-};
+}
 
 #endif
 
@@ -1524,7 +1524,7 @@ DoFTools::extract_subdomain_dofs (const DoFHandler<dim> &dof_handler,
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  selected_dofs[local_dof_indices[i]] = true;
       };
-};
+}
 
 
 
@@ -1588,7 +1588,7 @@ count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
            == dof_handler.n_dofs()),
 	  ExcInternalError());
 	  
-};
+}
 
 
 
@@ -1806,7 +1806,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 	
 	constraints.add_entries (global_dof, constraint_line);
       };
-};
+}
 
 
 
@@ -1916,7 +1916,7 @@ compute_intergrid_transfer_representation (const DoFHandler<dim>              &c
 	  transfer_representation[p][i] = j->second;
 	};
     };
-};
+}
 
 
 
@@ -2151,7 +2151,7 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 
   
   return n_parameters_on_fine_grid;
-};
+}
 
 
 
@@ -2194,7 +2194,7 @@ DoFTools::compute_intergrid_weights_2 (const DoFHandler<dim>              &coars
 
 				   // wait for the threads to finish
   thread_manager.wait ();
-};
+}
 
 
 
@@ -2380,7 +2380,7 @@ DoFTools::compute_intergrid_weights_3 (const DoFHandler<dim>              &coars
 	    mutex.release ();
 	  };
     };
-};
+}
 
 
 
@@ -2424,7 +2424,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
       for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_vertex; ++i)
 	mapping[cell->vertex_dof_index(direction,i)] = next_free_index++;
     };
-};
+}
 
 
 
@@ -2441,7 +2441,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
   boundary_indicators.insert (0U);
   boundary_indicators.insert (1U);
   map_dof_to_boundary_indices (dof_handler, boundary_indicators, mapping);
-};
+}
 
 #else
 
@@ -2486,7 +2486,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>     &dof_handl
 
   Assert (next_boundary_index == dof_handler.n_boundary_dofs(),
 	  ExcInternalError());
-};
+}
 
 
 
@@ -2525,7 +2525,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>         &dof_h
 
   Assert (next_boundary_index == dof_handler.n_boundary_dofs(boundary_indicators),
 	  ExcInternalError());
-};
+}
 
 #endif
 
@@ -2575,7 +2575,7 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	support_points[local_dof_indices[i]] = points[i];
     };
-};
+}
 
 
 

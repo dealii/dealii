@@ -50,7 +50,7 @@ template <int dim>
 inline double sqr_point (const Tensor<1,dim> &p)
 {
   return p * p;
-};
+}
 
 
 
@@ -299,7 +299,7 @@ void VectorTools::project (const Mapping<1>       &,
 				   // zero boundary values into the
 				   // project_boundary_values function?
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 #endif
@@ -418,7 +418,7 @@ void VectorTools::project (const Mapping<dim>       &mapping,
   
 				   // distribute solution
   constraints.distribute (vec);
-};
+}
 
 
 template <int dim>
@@ -523,7 +523,7 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 	    rhs_vector(dofs[i]) += cell_vector(i);
 	}
     }
-};
+}
 
 
 template <int dim>
@@ -636,7 +636,7 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 		rhs_vector(dofs[i]) += cell_vector(i);
 	    }
     }
-};
+}
 
 #else
 
@@ -649,7 +649,7 @@ VectorTools::create_boundary_right_hand_side (const Mapping<1>    &,
 					      const std::set<unsigned char> &)
 {
   Assert (false, ExcImpossibleInDim(1));
-};
+}
 
 #endif
 
@@ -741,7 +741,7 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
     if (component_mask[fe.face_system_to_component_index(i).first])
       boundary_values[outermost_cell->vertex_dof_index(direction,i)]
 	= function_values(fe.face_system_to_component_index(i).first);
-};
+}
 
 
 
@@ -756,7 +756,7 @@ VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping
        i!=function_map.end(); ++i)
     interpolate_boundary_values (mapping, dof, i->first, *i->second,
 				 boundary_values, component_mask);
-};
+}
 
 
 #endif
@@ -914,7 +914,7 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
   function_map[boundary_component] = &boundary_function;
   interpolate_boundary_values (mapping, dof, function_map, boundary_values,
 			       component_mask);
-};
+}
 
 
   
@@ -961,7 +961,7 @@ VectorTools::project_boundary_values (const Mapping<1>       &mapping,
 				   // to interpolation
   interpolate_boundary_values (mapping, dof, boundary_functions,
 			       boundary_values, std::vector<bool>());
-};
+}
 
 #endif
 
@@ -1056,7 +1056,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				       // is the number on the boundary and
 				       // thus in the solution vector
       boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
-};
+}
 
 
 template <int dim>
@@ -1469,7 +1469,7 @@ VectorTools::compute_mean_value (const Mapping<dim>    &mapping,
     };
   
   return (mean/area);
-};
+}
 
 
 template <int dim, class InVector>

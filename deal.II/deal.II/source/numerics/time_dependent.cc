@@ -31,7 +31,7 @@ TimeDependent::TimeSteppingData::TimeSteppingData (const unsigned int look_ahead
 		:
 		look_ahead (look_ahead),
 		look_back (look_back)
-{};
+{}
 
 
 TimeDependent::TimeDependent (const TimeSteppingData &data_primal,
@@ -41,14 +41,14 @@ TimeDependent::TimeDependent (const TimeSteppingData &data_primal,
 		timestepping_data_primal (data_primal),
 		timestepping_data_dual (data_dual),
 		timestepping_data_postprocess (data_postprocess)
-{};
+{}
 
 
 TimeDependent::~TimeDependent ()
 {
   while (timesteps.size() != 0)
     delete_timestep (0);
-};
+}
 
 
 void
@@ -108,14 +108,14 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
 		     timesteps.end() :
 		     std::find(timesteps.begin(), timesteps.end(), position)),
 		    new_timestep);
-};
+}
 
 
 void
 TimeDependent::add_timestep (TimeStepBase *new_timestep)
 {
   insert_timestep (0, new_timestep);
-};
+}
 
 
 void TimeDependent::delete_timestep (const unsigned int position)
@@ -143,7 +143,7 @@ void TimeDependent::delete_timestep (const unsigned int position)
     timesteps[position]->set_previous_timestep ((position!=0) ?
 						timesteps[position-1] :
 						0);
-};
+}
 
 
 void
@@ -153,7 +153,7 @@ TimeDependent::solve_primal_problem ()
 	   std::mem_fun(&TimeStepBase::solve_primal_problem),
 	   timestepping_data_primal,
 	   forward);
-};
+}
 
 
 void
@@ -163,7 +163,7 @@ TimeDependent::solve_dual_problem ()
 	   std::mem_fun(&TimeStepBase::solve_dual_problem),
 	   timestepping_data_dual,
 	   backward);
-};
+}
 
 
 void
@@ -173,7 +173,7 @@ TimeDependent::postprocess ()
 	   std::mem_fun(&TimeStepBase::postprocess_timestep),
 	   timestepping_data_postprocess,
 	   forward);
-};
+}
 
 
 
@@ -196,7 +196,7 @@ void TimeDependent::start_sweep (const unsigned int s)
 
   for (unsigned int step=0; step<timesteps.size(); ++step)
     timesteps[step]->start_sweep ();
-};
+}
 
 
 
@@ -229,7 +229,7 @@ void TimeDependent::end_sweep (const unsigned int begin,
 {     
   for (unsigned int step=begin; step<end; ++step)
     timesteps[step]->end_sweep ();
-};
+}
 
 
 
@@ -244,7 +244,7 @@ unsigned int TimeDependent::memory_consumption () const
     mem += MemoryConsumption::memory_consumption (*timesteps[i]);
 
   return mem;
-};
+}
 
 
 
@@ -257,36 +257,36 @@ TimeStepBase::TimeStepBase (const double time) :
 		sweep_no (static_cast<unsigned int>(-1)),
 		timestep_no (static_cast<unsigned int>(-1)),
 		time (time)
-{};
+{}
 
 
 
 TimeStepBase::~TimeStepBase () 
-{};
+{}
 
 
 
 void
 TimeStepBase::wake_up (const unsigned )
-{};
+{}
 
 
 
 void
 TimeStepBase::sleep (const unsigned)
-{};
+{}
 
 
 
 void
 TimeStepBase::start_sweep () 
-{};
+{}
 
 
 
 void
 TimeStepBase::end_sweep () 
-{};
+{}
 
 
 
@@ -294,7 +294,7 @@ void
 TimeStepBase::init_for_primal_problem () 
 {
   next_action = primal_problem;
-};
+}
 
 
 
@@ -302,7 +302,7 @@ void
 TimeStepBase::init_for_dual_problem () 
 {
   next_action = dual_problem;
-};
+}
 
 
 
@@ -310,7 +310,7 @@ void
 TimeStepBase::init_for_postprocessing () 
 {
   next_action = postprocess;
-};
+}
 
 
 
@@ -318,7 +318,7 @@ void
 TimeStepBase::solve_dual_problem () 
 {
   Assert (false, ExcPureVirtualFunctionCalled());
-};
+}
 
 
 
@@ -326,7 +326,7 @@ void
 TimeStepBase::postprocess_timestep () 
 {
   Assert (false, ExcPureVirtualFunctionCalled());
-};
+}
 
 
 
@@ -334,7 +334,7 @@ double
 TimeStepBase::get_time () const 
 {
   return time;
-};
+}
 
 
 
@@ -342,7 +342,7 @@ unsigned int
 TimeStepBase::get_timestep_no () const 
 {
   return timestep_no;
-};
+}
 
 
 
@@ -351,7 +351,7 @@ TimeStepBase::get_backward_timestep () const
 {
   Assert (previous_timestep != 0, ExcCantComputeTimestep());
   return time - previous_timestep->time;
-};
+}
 
 
 
@@ -360,7 +360,7 @@ TimeStepBase::get_forward_timestep () const
 {
   Assert (next_timestep != 0, ExcCantComputeTimestep());
   return next_timestep->time - time;
-};
+}
 
 
 
@@ -368,7 +368,7 @@ void
 TimeStepBase::set_previous_timestep (const TimeStepBase *previous)
 {
   previous_timestep = previous;
-};
+}
 
 
 
@@ -376,7 +376,7 @@ void
 TimeStepBase::set_next_timestep (const TimeStepBase *next)
 {
   next_timestep     = next;
-};
+}
 
 
 
@@ -384,7 +384,7 @@ void
 TimeStepBase::set_timestep_no (const unsigned int step_no)
 {
   timestep_no = step_no;
-};
+}
 
 
 
@@ -392,7 +392,7 @@ void
 TimeStepBase::set_sweep_no (const unsigned int sweep)
 {
   sweep_no = sweep;
-};
+}
 
 
 
@@ -401,7 +401,7 @@ TimeStepBase::memory_consumption () const
 {
 				   // only simple data types
   return sizeof(*this);
-};
+}
 
 
 /* ------------------------------------------------------------------------- */
@@ -416,7 +416,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria() :
 		refinement_flags(0)
 {
   Assert (false, ExcPureVirtualFunctionCalled());
-};
+}
 
 
 
@@ -430,7 +430,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria (const double              time,
 		coarse_grid (&coarse_grid),
 		flags (flags),
 		refinement_flags (refinement_flags)
-{};
+{}
 
 
 
@@ -446,7 +446,7 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
     Assert (tria==0, ExcInternalError());
   
   coarse_grid = 0;
-};
+}
 
 
 
@@ -459,7 +459,7 @@ TimeStepBase_Tria<dim>::wake_up (const unsigned wakeup_level)
   if (wakeup_level == flags.wakeup_level_to_build_grid)
     if (flags.delete_and_rebuild_tria || !tria)
       restore_grid ();
-};
+}
 
 
 
@@ -480,7 +480,7 @@ TimeStepBase_Tria<dim>::sleep (const unsigned sleep_level)
     };
 
   TimeStepBase::sleep (sleep_level);
-};
+}
 
 
 
@@ -493,7 +493,7 @@ void TimeStepBase_Tria<dim>::save_refine_flags ()
   coarsen_flags.push_back (std::vector<bool>());
   tria->save_refine_flags (refine_flags.back());
   tria->save_coarsen_flags (coarsen_flags.back());
-};
+}
 
 
 
@@ -534,7 +534,7 @@ void TimeStepBase_Tria<dim>::restore_grid ()
 
       tria->execute_coarsening_and_refinement ();
     };
-};
+}
 
 
 
@@ -581,7 +581,7 @@ mirror_refinement_flags (const typename Triangulation<dim>::cell_iterator &new_c
   if (old_cell->has_children() && new_cell->has_children()) 
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
       ::mirror_refinement_flags<dim> (new_cell->child(c), old_cell->child(c));
-};
+}
 
 
 
@@ -686,7 +686,7 @@ adapt_grid_cells (const typename Triangulation<dim>::cell_iterator &cell1,
 
   Assert (false, ExcInternalError());
   return false;
-};    
+}
 
 
 
@@ -707,7 +707,7 @@ adapt_grids (Triangulation<dim> &tria1,
     grids_changed |= ::adapt_grid_cells<dim> (cell1, cell2);
 
   return grids_changed;
-};
+}
 
 
 
@@ -1104,7 +1104,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 				       // than the present one and vica versa.
       ::adapt_grids<dim> (*previous_tria, *tria);
     };
-};
+}
 
 
 
@@ -1112,7 +1112,7 @@ template <int dim>
 void TimeStepBase_Tria<dim>::init_for_refinement () 
 {
   next_action = grid_refinement;
-};
+}
 
 
 
@@ -1126,7 +1126,7 @@ TimeStepBase_Tria<dim>::memory_consumption () const
 	  sizeof(flags) + sizeof(refinement_flags) +
 	  MemoryConsumption::memory_consumption (refine_flags) +
 	  MemoryConsumption::memory_consumption (coarsen_flags));
-};
+}
 
 
 
@@ -1138,7 +1138,7 @@ TimeStepBase_Tria_Flags::Flags<dim>::Flags ()
 		sleep_level_to_delete_grid (0)
 {
   Assert (false, ExcInternalError());
-};
+}
 
 
 
@@ -1154,7 +1154,7 @@ TimeStepBase_Tria_Flags::Flags<dim>::Flags (const bool delete_and_rebuild_tria,
 // 	  ExcInvalidParameter(wakeup_level_to_build_grid));
 //   Assert (!delete_and_rebuild_tria || (sleep_level_to_delete_grid>=1),
 // 	  ExcInvalidParameter(sleep_level_to_delete_grid));
-};
+}
 
 
 template <int dim>
@@ -1193,7 +1193,7 @@ RefinementFlags (const unsigned int max_refinement_level,
   Assert (cell_number_corridor_top>=0, ExcInvalidValue (cell_number_corridor_top));
   Assert (cell_number_corridor_bottom>=0, ExcInvalidValue (cell_number_corridor_bottom));
   Assert (cell_number_corridor_bottom<=1, ExcInvalidValue (cell_number_corridor_bottom));
-};
+}
 
 
 template <int dim>
@@ -1231,7 +1231,7 @@ RefinementData (const double         _refinement_threshold,
   Assert ((coarsening_threshold < refinement_threshold) ||
 	  ((coarsening_threshold == 0) && (refinement_threshold == 0)),
 	  ExcInvalidValue (coarsening_threshold));
-};
+}
 
 
 // explicit instantiations
@@ -1242,4 +1242,4 @@ namespace TimeStepBase_Tria_Flags
   template class Flags<deal_II_dimension>;
   template class RefinementFlags<deal_II_dimension>;
   template class RefinementData<deal_II_dimension>;
-};
+}

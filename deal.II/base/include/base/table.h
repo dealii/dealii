@@ -615,7 +615,7 @@ namespace TableBaseAccessors
       friend class Accessor<N,T,C,2>;
 #endif
   };
-};
+}
   
 
 
@@ -1552,7 +1552,7 @@ TableIndicesBase<N>::operator [] (const unsigned int i) const
 {
   Assert (i < N, ExcIndexRange (i, 0, N));
   return indices[i];
-};
+}
 
 
 
@@ -1560,7 +1560,7 @@ inline
 TableIndices<1>::TableIndices () 
 {
   this->indices[0] = 0;
-};
+}
 
 
 
@@ -1568,7 +1568,7 @@ inline
 TableIndices<1>::TableIndices (const unsigned int index1) 
 {
   this->indices[0] = index1;
-};
+}
 
 
 
@@ -1576,7 +1576,7 @@ inline
 TableIndices<2>::TableIndices () 
 {
   this->indices[0] = this->indices[1] = 0;
-};
+}
 
 
 
@@ -1586,7 +1586,7 @@ TableIndices<2>::TableIndices (const unsigned int index1,
 {
   this->indices[0] = index1;
   this->indices[1] = index2;
-};
+}
 
 
 
@@ -1594,7 +1594,7 @@ inline
 TableIndices<3>::TableIndices () 
 {
   this->indices[0] = this->indices[1] = this->indices[2] = 0;
-};
+}
 
 
 
@@ -1606,14 +1606,14 @@ TableIndices<3>::TableIndices (const unsigned int index1,
   this->indices[0] = index1;
   this->indices[1] = index2;
   this->indices[2] = index3;
-};
+}
 
 
 inline
 TableIndices<4>::TableIndices () 
 {
   this->indices[0] = this->indices[1] = this->indices[2] = this->indices[3] = 0;
-};
+}
 
 
 
@@ -1627,7 +1627,7 @@ TableIndices<4>::TableIndices (const unsigned int index1,
   this->indices[1] = index2;
   this->indices[2] = index3;
   this->indices[3] = index4;
-};
+}
 
 
 
@@ -1635,7 +1635,7 @@ inline
 TableIndices<5>::TableIndices () 
 {
   this->indices[0] = this->indices[1] = this->indices[2] = this->indices[3] = this->indices[4] = 0;
-};
+}
 
 
 
@@ -1651,7 +1651,7 @@ TableIndices<5>::TableIndices (const unsigned int index1,
   this->indices[2] = index3;
   this->indices[3] = index4;
   this->indices[4] = index5;
-};
+}
 
 
 
@@ -1660,7 +1660,7 @@ TableIndices<6>::TableIndices ()
 {
   this->indices[0] = this->indices[1] = this->indices[2]
 		   = this->indices[3] = this->indices[4] = 0;
-};
+}
 
 
 
@@ -1678,7 +1678,7 @@ TableIndices<6>::TableIndices (const unsigned int index1,
   this->indices[3] = index4;
   this->indices[4] = index5;
   this->indices[5] = index6;
-};
+}
 
 
 
@@ -1687,7 +1687,7 @@ TableBase<N,T>::TableBase ()
                 :
                 val (0),
                 val_size (0)
-{};
+{}
 
 
 
@@ -1698,7 +1698,7 @@ TableBase<N,T>::TableBase (const TableIndices<N> &sizes)
                 val_size (0)
 {
   reinit (sizes);
-};
+}
 
 
 
@@ -1712,7 +1712,7 @@ TableBase<N,T>::TableBase (const TableBase<N,T> &src)
   reinit (src.table_size);
   if (src.n_elements() != 0)
     fill (src.data());
-};
+}
 
 
 
@@ -1726,7 +1726,7 @@ TableBase<N,T>::TableBase (const TableBase<N,T2> &src)
   reinit (src.table_size);
   if (src.n_elements() != 0)
     fill (src.data());
-};
+}
 
 
 
@@ -1739,7 +1739,7 @@ namespace TableBaseAccessors
                   :
                   table (table),
                   data (data)
-  {};
+  {}
 
 
 
@@ -1754,7 +1754,7 @@ namespace TableBaseAccessors
                                      // temporary objects, so should
                                      // not need to be copied around
     Assert (false, ExcInternalError());
-  };
+  }
   
 
   
@@ -1769,7 +1769,7 @@ namespace TableBaseAccessors
                                      // temporary objects, so should
                                      // not need to be copied around
     Assert (false, ExcInternalError());
-  };
+  }
   
 
   
@@ -1797,7 +1797,7 @@ namespace TableBaseAccessors
         const pointer new_data = data + i*subobject_size;
         return Accessor<N,T,C,P-1> (table, new_data);
       };
-  };
+  }
 
 
 
@@ -1808,7 +1808,7 @@ namespace TableBaseAccessors
                   :
                   table (table),
                   data (data)
-  {};
+  {}
 
 
 
@@ -1823,7 +1823,7 @@ namespace TableBaseAccessors
                                      // temporary objects, so should
                                      // not need to be copied around
     Assert (false, ExcInternalError());
-  };
+  }
   
 
 
@@ -1838,7 +1838,7 @@ namespace TableBaseAccessors
                                      // temporary objects, so should
                                      // not need to be copied around
     Assert (false, ExcInternalError());
-  };  
+  }
 
 
   
@@ -1850,7 +1850,7 @@ namespace TableBaseAccessors
     Assert (i < table.size()[N-1],
             ExcIndexRange (i, 0, table.size()[N-1]));
     return data[i];
-  };
+  }
 
 
   
@@ -1860,7 +1860,7 @@ namespace TableBaseAccessors
   Accessor<N,T,C,1>::size () const
   {
     return table.size()[N-1];
-  };
+  }
 
 
 
@@ -1870,7 +1870,7 @@ namespace TableBaseAccessors
   Accessor<N,T,C,1>::begin () const
   {
     return data;
-  };
+  }
 
 
 
@@ -1880,8 +1880,8 @@ namespace TableBaseAccessors
   Accessor<N,T,C,1>::end () const
   {
     return data+table.size()[N-1];
-  };
-};
+  }
+}
 
 
 
@@ -1891,7 +1891,7 @@ TableBase<N,T>::~TableBase ()
 {
   if (val != 0)
     delete[] val;
-};
+}
 
 
 
@@ -1929,7 +1929,7 @@ TableBase<N,T>::clear ()
 {
   if (n_elements() != 0)
     std::fill_n (val, n_elements(), T());
-};
+}
 
 
 
@@ -1975,7 +1975,7 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes)
                                    // reinitialize contents of old or
                                    // new memory.
   clear ();
-};
+}
 
 
 
@@ -1984,7 +1984,7 @@ const TableIndices<N> &
 TableBase<N,T>::size () const
 {
   return table_size;
-};
+}
 
 
 
@@ -1996,7 +1996,7 @@ TableBase<N,T>::n_elements () const
   for (unsigned int n=0; n<N; ++n)
     s *= table_size[n];
   return s;
-};
+}
 
 
 
@@ -2005,7 +2005,7 @@ bool
 TableBase<N,T>::empty () const
 {
   return (n_elements() == 0);
-};
+}
 
 
 
@@ -2058,7 +2058,7 @@ TableBase<N,T>::position (const TableIndices<N> &indices) const
         return s;
       };
     };
-};
+}
 
 
 
@@ -2071,7 +2071,7 @@ TableBase<N,T>::operator() (const TableIndices<N> &indices) const
     Assert (indices[n] < table_size[n],
             ExcIndexRange (indices[n], 0, table_size[n]));
   return el(indices);
-};
+}
 
 
 
@@ -2083,7 +2083,7 @@ TableBase<N,T>::operator() (const TableIndices<N> &indices)
     Assert (indices[n] < table_size[n],
             ExcIndexRange (indices[n], 0, table_size[n]));
   return el(indices);
-};
+}
 
 
 
@@ -2092,7 +2092,7 @@ inline const T &
 TableBase<N,T>::el (const TableIndices<N> &indices) const
 {  
   return val[position(indices)];
-};
+}
 
 
 
@@ -2101,7 +2101,7 @@ inline T &
 TableBase<N,T>::el (const TableIndices<N> &indices)
 {
   return val[position(indices)];
-};
+}
 
 
 
@@ -2118,7 +2118,7 @@ TableBase<N,T>::data () const
 
 template <typename T>
 Table<1,T>::Table () 
-{};
+{}
 
 
 
@@ -2126,7 +2126,7 @@ template <typename T>
 Table<1,T>::Table (const unsigned int size)
                 :
                 TableBase<1,T> (TableIndices<1> (size))
-{};
+{}
 
 
 
@@ -2137,7 +2137,7 @@ Table<1,T>::operator [] (const unsigned int i) const
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   return this->val[i];
-};
+}
 
 
 
@@ -2148,7 +2148,7 @@ Table<1,T>::operator [] (const unsigned int i)
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   return this->val[i];
-};
+}
 
 
 
@@ -2160,7 +2160,7 @@ Table<1,T>::operator () (const unsigned int i) const
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   return this->val[i];
-};
+}
 
 
 
@@ -2172,14 +2172,14 @@ Table<1,T>::operator () (const unsigned int i)
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   return this->val[i];
-};
+}
 
 
 
 
 template <typename T>
 Table<2,T>::Table ()
-{};
+{}
 
 
 
@@ -2188,7 +2188,7 @@ Table<2,T>::Table (const unsigned int size1,
                    const unsigned int size2)
                 :
                 TableBase<2,T> (TableIndices<2> (size1, size2))
-{};
+{}
 
 
 
@@ -2198,7 +2198,7 @@ Table<2,T>::reinit (const unsigned int size1,
                     const unsigned int size2)
 {
   this->TableBase<2,T>::reinit (TableIndices<2> (size1, size2));
-};
+}
 
 
 
@@ -2211,7 +2211,7 @@ Table<2,T>::operator [] (const unsigned int i) const
           ExcIndexRange (i, 0, this->table_size[0]));
   return TableBaseAccessors::Accessor<2,T,true,1>(*this,
                                                   this->val+i*n_cols());
-};
+}
 
 
 
@@ -2224,7 +2224,7 @@ Table<2,T>::operator [] (const unsigned int i)
           ExcIndexRange (i, 0, this->table_size[0]));
   return TableBaseAccessors::Accessor<2,T,false,1>(*this,
                                                    this->val+i*n_cols());
-};
+}
 
 
 
@@ -2239,7 +2239,7 @@ Table<2,T>::operator () (const unsigned int i,
   Assert (j < this->table_size[1],
           ExcIndexRange (j, 0, this->table_size[1]));
   return this->val[i*this->table_size[1]+j];
-};
+}
 
 
 
@@ -2254,7 +2254,7 @@ Table<2,T>::operator () (const unsigned int i,
   Assert (j < this->table_size[1],
           ExcIndexRange (j, 0, this->table_size[1]));
   return this->val[i*this->table_size[1]+j];
-};
+}
 
 
 
@@ -2265,7 +2265,7 @@ Table<2,T>::el (const unsigned int i,
                 const unsigned int j) const
 {
   return this->val[i*this->table_size[1]+j];
-};
+}
 
 
 
@@ -2276,7 +2276,7 @@ Table<2,T>::el (const unsigned int i,
                 const unsigned int j)
 {
   return this->val[i*this->table_size[1]+j];
-};
+}
 
 
 
@@ -2286,7 +2286,7 @@ unsigned int
 Table<2,T>::n_rows () const
 {
   return this->table_size[0];
-};
+}
 
 
 
@@ -2296,7 +2296,7 @@ unsigned int
 Table<2,T>::n_cols () const
 {
   return this->table_size[1];
-};
+}
 
 
 
@@ -2304,7 +2304,7 @@ Table<2,T>::n_cols () const
 
 template <typename T>
 Table<3,T>::Table () 
-{};
+{}
 
 
 
@@ -2314,7 +2314,7 @@ Table<3,T>::Table (const unsigned int size1,
                    const unsigned int size3)
                 :
                 TableBase<3,T> (TableIndices<3> (size1, size2, size3))
-{};
+{}
 
 
 
@@ -2330,7 +2330,7 @@ Table<3,T>::operator [] (const unsigned int i) const
   return (TableBaseAccessors::Accessor<3,T,true,2>
           (*this,
            this->val+i*subobject_size));
-};
+}
 
 
 
@@ -2346,7 +2346,7 @@ Table<3,T>::operator [] (const unsigned int i)
   return (TableBaseAccessors::Accessor<3,T,false,2>
           (*this,
            this->val+i*subobject_size));
-};
+}
 
 
 
@@ -2365,7 +2365,7 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (k, 0, this->table_size[2]));
   return this->val[(i*this->table_size[1]+j)
 		  *this->table_size[2] + k];
-};
+}
 
 
 
@@ -2384,13 +2384,13 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (k, 0, this->table_size[2]));
   return this->val[(i*this->table_size[1]+j)
 		  *this->table_size[2] + k];
-};
+}
 
 
 
 template <typename T>
 Table<4,T>::Table () 
-{};
+{}
 
 
 
@@ -2401,7 +2401,7 @@ Table<4,T>::Table (const unsigned int size1,
 		   const unsigned int size4)
                 :
                 TableBase<4,T> (TableIndices<4> (size1, size2, size3, size4))
-{};
+{}
 
 
 
@@ -2418,7 +2418,7 @@ Table<4,T>::operator [] (const unsigned int i) const
   return (TableBaseAccessors::Accessor<4,T,true,3>
           (*this,
            this->val+i*subobject_size));
-};
+}
 
 
 
@@ -2435,7 +2435,7 @@ Table<4,T>::operator [] (const unsigned int i)
   return (TableBaseAccessors::Accessor<4,T,false,3>
           (*this,
            this->val+i*subobject_size));
-};
+}
 
 
 
@@ -2458,7 +2458,7 @@ Table<4,T>::operator () (const unsigned int i,
   return this->val[((i*this->table_size[1]+j)
 		    *this->table_size[2] + k)
 		  *this->table_size[3] + l];
-};
+}
 
 
 
@@ -2481,14 +2481,14 @@ Table<4,T>::operator () (const unsigned int i,
   return this->val[((i*this->table_size[1]+j)
 		    *this->table_size[2] + k)
 		  *this->table_size[3] + l];
-};
+}
 
 
 
 
 template <typename T>
 Table<5,T>::Table () 
-{};
+{}
 
 
 
@@ -2500,7 +2500,7 @@ Table<5,T>::Table (const unsigned int size1,
 		   const unsigned int size5)
                 :
                 TableBase<5,T> (TableIndices<5> (size1, size2, size3, size4, size5))
-{};
+{}
 
 
 
@@ -2518,7 +2518,7 @@ Table<5,T>::operator [] (const unsigned int i) const
   return (TableBaseAccessors::Accessor<5,T,true,4>
           (*this,
            this->val+i*subobject_size));
-};
+}
 
 
 
@@ -2536,7 +2536,7 @@ Table<5,T>::operator [] (const unsigned int i)
   return (TableBaseAccessors::Accessor<5,T,false,4>
           (*this,
            this->val+i*subobject_size));
-};
+}
 
 
 
@@ -2563,7 +2563,7 @@ Table<5,T>::operator () (const unsigned int i,
 		     *this->table_size[2] + k)
 		    *this->table_size[3] + l)
 		  *this->table_size[4] + m];
-};
+}
 
 
 
@@ -2590,13 +2590,13 @@ Table<5,T>::operator () (const unsigned int i,
 		     *this->table_size[2] + k)
 		    *this->table_size[3] + l)
 		  *this->table_size[4] + m];
-};
+}
 
 
 
 template <typename T>
 Table<6,T>::Table () 
-{};
+{}
 
 
 
@@ -2609,7 +2609,7 @@ Table<6,T>::Table (const unsigned int size1,
 		   const unsigned int size6)
                 :
                 TableBase<6,T> (TableIndices<6> (size1, size2, size3, size4, size5, size6))
-{};
+{}
 
 
 
@@ -2628,7 +2628,7 @@ Table<6,T>::operator [] (const unsigned int i) const
   return (TableBaseAccessors::Accessor<6,T,true,5>
           (*this,
            this->val+i*subobject_size));
-};
+}
 
 
 
@@ -2647,7 +2647,7 @@ Table<6,T>::operator [] (const unsigned int i)
   return (TableBaseAccessors::Accessor<6,T,false,5>
           (*this,
            this->val+i*subobject_size));
-};
+}
 
 
 
@@ -2678,7 +2678,7 @@ Table<6,T>::operator () (const unsigned int i,
 		     *this->table_size[3] + l)
 		    *this->table_size[4] + m)
 		  *this->table_size[5] + n];
-};
+}
 
 
 
@@ -2709,7 +2709,7 @@ Table<6,T>::operator () (const unsigned int i,
 		     *this->table_size[3] + l)
 		    *this->table_size[4] + m)
 		  *this->table_size[5] + n];
-};
+}
 
 
 

@@ -27,19 +27,19 @@
 
 ExceptionBase::ExceptionBase () :
 		file(""), line(0), function(""), cond(""), exc("")
-{};
+{}
 
 
 
 ExceptionBase::ExceptionBase (const char* f, const int l, const char *func,
 			      const char* c, const char *e) :
 		file(f), line(l), function(func), cond(c), exc(e)
-{};
+{}
 
 
 
 ExceptionBase::~ExceptionBase () throw ()
-{};
+{}
 
 
 
@@ -54,7 +54,7 @@ void ExceptionBase::SetFields (const char* f,
   function = func;
   cond = c;
   exc  = e;
-};
+}
 
 
 
@@ -69,14 +69,14 @@ void ExceptionBase::PrintExcData (std::ostream &out) const
       << "The name and call sequence of the exception was:" << std::endl
       << "    " << exc  << std::endl
       << "Additional Information: " << std::endl;
-};
+}
 
 
 
 void ExceptionBase::PrintInfo (std::ostream &out) const
 {
   out << "(none)" << std::endl;
-};
+}
 
 
 
@@ -146,7 +146,7 @@ const char * ExceptionBase::what () const throw ()
       std::abort ();
       return 0;
     }
-};
+}
 
 
 
@@ -158,7 +158,7 @@ namespace deal_II_exceptions
   void set_additional_assert_output (const char * const p)
   {
     additional_assert_output = p;
-  };
+  }
 
   
   
@@ -245,18 +245,18 @@ namespace deal_II_exceptions
 	}
       else
 	std::abort ();
-    };
+    }
 
 
 
     void abort ()
     {
       std::abort ();
-    };
+    }
     
   }
   
-};
+}
 
 
 // from the aclocal file:

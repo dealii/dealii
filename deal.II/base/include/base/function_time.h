@@ -105,7 +105,7 @@ inline double
 FunctionTime::get_time () const
 {
   return time;
-};
+}
 
 
 #endif

@@ -35,7 +35,7 @@ SparsityPattern::SparsityPattern () :
 		colnums(0)
 {
   reinit (0,0,0);
-};
+}
 
 
 
@@ -52,7 +52,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &s) :
   Assert (s.cols == 0, ExcInvalidConstructorCall());
   
   reinit (0,0,0);
-};
+}
 
 
 
@@ -65,7 +65,7 @@ SparsityPattern::SparsityPattern (const unsigned int m,
 		  colnums(0)
 {
   reinit (m,n,max_per_row);
-};
+}
 
 
 
@@ -78,7 +78,7 @@ SparsityPattern::SparsityPattern (const unsigned int               m,
 		  colnums(0)
 {
   reinit (m, n, row_lengths);
-};
+}
 
 
 
@@ -90,7 +90,7 @@ SparsityPattern::SparsityPattern (const unsigned int n,
 		  colnums(0)
 {
   reinit (n,n,max_per_row);
-};
+}
 
 
 
@@ -102,7 +102,7 @@ SparsityPattern::SparsityPattern (const unsigned int               m,
 		  colnums(0)
 {
   reinit (m, m, row_lengths);
-};
+}
 
 
 
@@ -203,7 +203,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
       Assert (next_free_slot <= &colnums[rowstart[row+1]],
 	      ExcNotEnoughSpace (0,rowstart[row+1]-rowstart[row]));
     };
-};
+}
 
 
 
@@ -229,7 +229,7 @@ SparsityPattern::operator = (const SparsityPattern &s)
   Assert (cols == 0, ExcInvalidConstructorCall());
 
   return *this;
-};
+}
 
 
 
@@ -242,7 +242,7 @@ SparsityPattern::reinit (const unsigned int m,
 				   // other @p{reinit} function
   const std::vector<unsigned int> row_lengths (m, max_per_row);
   reinit (m, n, row_lengths);
-};
+}
 
 
 
@@ -483,7 +483,7 @@ SparsityPattern::compress ()
   max_vec_len = nonzero_elements;
   
   compressed = true;
-};
+}
 
 
 
@@ -493,7 +493,7 @@ SparsityPattern::copy_from (const CompressedSparsityPattern &csp)
   copy_from (csp.n_rows(), csp.n_cols(),
 	     csp.column_indices.begin(),
 	     csp.column_indices.end());
-};
+}
 
 
 template <typename number>
@@ -516,7 +516,7 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
 
 				   // finally compress
   compress ();
-};
+}
 
 
 
@@ -543,7 +543,7 @@ SparsityPattern::empty () const
       return true;
     };
   return false;
-};
+}
 
 
 
@@ -565,7 +565,7 @@ SparsityPattern::max_entries_per_row () const
     m = std::max (m, rowstart[i]-rowstart[i-1]);
 
   return m;
-};
+}
 
 
 
@@ -641,7 +641,7 @@ SparsityPattern::add (const unsigned int i,
 				   // wrong: there was not enough space
 				   // in this line
   Assert (false, ExcNotEnoughSpace(i, rowstart[i+1]-rowstart[i]));
-};
+}
 
 
 bool
@@ -689,7 +689,7 @@ SparsityPattern::matrix_position (const unsigned int global_index) const
 
 				   // so return the respective pair
   return std::make_pair (row,col);
-};
+}
 
 
 
@@ -729,7 +729,7 @@ SparsityPattern::symmetrize ()
 	if (colnums[k] != row)
 	  add (colnums[k], row);
       };
-};
+}
 
 
 
@@ -771,7 +771,7 @@ SparsityPattern::bandwidth () const
 					 // the entries of this line
 	break;
   return b;
-};
+}
 
 
 
@@ -798,7 +798,7 @@ SparsityPattern::block_write (std::ostream &out) const
   out << ']';
   
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -839,7 +839,7 @@ SparsityPattern::block_read (std::istream &in)
            - reinterpret_cast<char*>(&colnums[0]));
   in >> c;
   AssertThrow (c == ']', ExcIO());
-};
+}
 
 
 
@@ -849,7 +849,7 @@ SparsityPattern::memory_consumption () const
   return (sizeof(*this) +
 	  max_dim * sizeof(unsigned int) +
 	  max_vec_len * sizeof(unsigned int));
-};
+}
 
 
 

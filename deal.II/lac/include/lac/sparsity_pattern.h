@@ -1140,7 +1140,7 @@ unsigned int
 SparsityPattern::n_rows () const
 {
   return rows;
-};
+}
 
 
 inline
@@ -1148,7 +1148,7 @@ unsigned int
 SparsityPattern::n_cols () const
 {
   return cols;
-};
+}
 
 
 inline
@@ -1156,7 +1156,7 @@ bool
 SparsityPattern::is_compressed () const
 {
   return compressed;
-};
+}
 
 
 inline
@@ -1164,7 +1164,7 @@ const unsigned int *
 SparsityPattern::get_rowstart_indices () const
 {
   return rowstart;
-};
+}
 
 
 inline
@@ -1172,7 +1172,7 @@ const unsigned int *
 SparsityPattern::get_column_numbers () const
 {
   return colnums;
-};
+}
 
 
 inline
@@ -1203,7 +1203,7 @@ SparsityPattern::n_nonzero_elements () const
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (compressed, ExcNotCompressed());
   return rowstart[rows]-rowstart[0];
-};
+}
 
 
 
@@ -1212,7 +1212,7 @@ unsigned int
 SparsityPattern::get_column_index_from_iterator (const unsigned int i)
 {
   return i;
-};
+}
 
 
 
@@ -1223,7 +1223,7 @@ SparsityPattern::
 get_column_index_from_iterator (const std::pair<unsigned int, value> &i)
 {
   return i.first;
-};
+}
 
 
 
@@ -1233,7 +1233,7 @@ unsigned int
 SparsityPattern::get_column_index_from_iterator (const std::pair<const unsigned int, value> &i)
 {
   return i.first;
-};
+}
 
 
 
@@ -1295,7 +1295,7 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 				   // everything. this also sorts the
 				   // entries within each row
   compress ();
-};
+}
 
 
 #endif

@@ -360,7 +360,7 @@ unsigned int
 CompressedSparsityPattern::n_rows () const
 {
   return rows;
-};
+}
 
 
 inline
@@ -368,6 +368,6 @@ unsigned int
 CompressedSparsityPattern::n_cols () const
 {
   return cols;
-};
+}
 
 #endif

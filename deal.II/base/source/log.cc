@@ -69,7 +69,7 @@ LogStream::attach(std::ostream& o)
 void LogStream::detach ()
 {
   file = 0;
-};
+}
 
 
 std::ostream&
@@ -101,28 +101,28 @@ LogStream::push (const std::string& text)
   pre += text;
   pre += std::string(":");
   prefixes.push(pre);
-};
+}
 
 
 void LogStream::pop ()
 {
   if (prefixes.size() > 1)
     prefixes.pop();
-};
+}
 
 
 void
 LogStream::depth_console(unsigned n)
 {
   std_depth = n;
-};
+}
 
 
 void
 LogStream::depth_file(unsigned n)
 {
   file_depth = n;
-};
+}
 
 
 void
@@ -242,4 +242,4 @@ LogStream::memory_consumption () const
     };
   
   return mem;
-};
+}

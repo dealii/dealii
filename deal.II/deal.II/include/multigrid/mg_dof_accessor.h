@@ -78,7 +78,7 @@ class MGDoFAccessor {
 				      * Reset the DoF handler pointer.
 				      */
     void set_mg_dof_handler (MGDoFHandler<dim> *dh) {
-      Assert (dh != 0, DoFAccessor<dim>::ExcInvalidObject());
+      Assert (dh != 0, typename DoFAccessor<dim>::ExcInvalidObject());
       mg_dof_handler = dh;
     };
 

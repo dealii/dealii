@@ -69,7 +69,7 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
                                    // elements have neither support
                                    // nor face-support points, so
                                    // leave these fields empty
-};
+}
 
 
 
@@ -424,7 +424,7 @@ unsigned int
 FE_DGP<dim>::n_base_elements () const
 {
   return 1;
-};
+}
 
 
 
@@ -434,7 +434,7 @@ FE_DGP<dim>::base_element (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return *this;
-};
+}
 
 
 
@@ -444,7 +444,7 @@ FE_DGP<dim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return 1;
-};
+}
 
 
 
@@ -473,7 +473,7 @@ unsigned int
 FE_DGP<dim>::get_degree () const
 {
   return degree;
-};
+}
 
 
 

@@ -23,7 +23,7 @@ SparseMIC<number>::SparseMIC ()
                 diag(0),
                 inv_diag(0),
                 inner_sums(0)
-{};
+{}
 
 
 
@@ -34,7 +34,7 @@ SparseMIC<number>::SparseMIC (const SparsityPattern &sparsity)
                 diag(0),
                 inv_diag(0),
                 inner_sums(0)
-{};
+{}
 
 
 
@@ -138,7 +138,7 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
     inv_diag[row] = 1.0/diag[row];
     Assert(diag[row]>0, ExcInternal());
   }
-};
+}
 
 
 
@@ -161,7 +161,7 @@ SparseMIC<number>::get_rowsum (const unsigned int row) const
     rowsum += this->global_entry (col-column_numbers);
 
   return rowsum;	
-};
+}
 
 
 
@@ -215,7 +215,7 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
 
       dst(row) *= inv_diag[row];
     };
-};
+}
 
 
 
@@ -227,7 +227,7 @@ SparseMIC<number>::memory_consumption () const
           MemoryConsumption::memory_consumption(diag) +
           MemoryConsumption::memory_consumption(inv_diag) +
           MemoryConsumption::memory_consumption(inner_sums));
-};
+}
 
 
 

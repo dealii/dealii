@@ -253,7 +253,7 @@ inline void
 MGSmootherIdentity<VECTOR>::smooth (
   const unsigned int, VECTOR&,
   const VECTOR&) const
-{};
+{}
 
 /*----------------------------------------------------------------------*/
 

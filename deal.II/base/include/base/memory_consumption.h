@@ -393,7 +393,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const bool) 
   {
     return sizeof(bool);
-  };
+  }
   
   
   
@@ -401,7 +401,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const char)
   {
     return sizeof(char);
-  };
+  }
   
 
 
@@ -409,7 +409,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const short int) 
   {
     return sizeof(short int);
-  };
+  }
   
 
 
@@ -417,7 +417,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const short unsigned int) 
   {
     return sizeof(short unsigned int);
-  };
+  }
 
 
 
@@ -425,7 +425,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const int) 
   {
     return sizeof(int);
-  };
+  }
   
 
 
@@ -433,7 +433,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const unsigned int) 
   {
     return sizeof(unsigned int);
-  };
+  }
 
 
 
@@ -441,7 +441,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const float)
   {
     return sizeof(float);
-  };
+  }
 
 
 
@@ -449,7 +449,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const double)
   {
     return sizeof(double);
-  };
+  }
 
 
   
@@ -457,7 +457,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const std::string &s)
   {
     return sizeof(s) + s.length();
-  };  
+  }
 
 
 // if necessary try to work around a bug in the IBM xlC compiler

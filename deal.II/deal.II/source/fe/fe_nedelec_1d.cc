@@ -48,6 +48,6 @@ FE_Nedelec<1>::Matrices::constraint_matrices[] = {};
 #else // #if deal_II_dimension
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-namespace { void dummy () {}; };
+namespace { void dummy () {} }
 #endif // #if deal_II_dimension == 1
 

@@ -205,7 +205,7 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 
 				   // note: no face support points for
 				   // DG elements
-};
+}
 
 
 
@@ -639,7 +639,7 @@ unsigned int
 FE_DGQ<dim>::n_base_elements () const
 {
   return 1;
-};
+}
 
 
 
@@ -649,7 +649,7 @@ FE_DGQ<dim>::base_element (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return *this;
-};
+}
 
 
 
@@ -659,7 +659,7 @@ FE_DGQ<dim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return 1;
-};
+}
 
 
 
@@ -751,7 +751,7 @@ unsigned int
 FE_DGQ<dim>::get_degree () const
 {
   return degree;
-};
+}
 
 
 

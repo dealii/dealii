@@ -27,7 +27,7 @@ namespace GridOutFlags
     write_diameter (write_diameter),
     write_measure (write_measure),
     write_all_faces (write_all_faces)
-  {};
+  {}
 
   
   
@@ -35,7 +35,7 @@ namespace GridOutFlags
 	    const bool write_faces) :
 		  write_preamble (write_preamble),
 		  write_faces (write_faces)
-  {};
+  {}
 
   
   
@@ -43,7 +43,7 @@ namespace GridOutFlags
 		    const unsigned int n_boundary_face_points) :
 		  write_cell_numbers (write_cell_numbers),
 		  n_boundary_face_points(n_boundary_face_points)
-  {};
+  {}
 
   
   
@@ -57,7 +57,7 @@ namespace GridOutFlags
 		  line_width (line_width),
 		  color_lines_on_user_flag(color_lines_on_user_flag),
 		  n_boundary_face_points(n_boundary_face_points)
-  {};
+  {}
   
 
   
@@ -70,7 +70,7 @@ namespace GridOutFlags
 		  EpsFlagsBase(size_type, size, line_width,
 			       color_lines_on_user_flag,
 			       n_boundary_face_points)
-  {};
+  {}
 
   
   
@@ -89,7 +89,7 @@ namespace GridOutFlags
 		  write_cell_numbers (write_cell_numbers),
 		  write_cell_number_level (write_cell_number_level),
 		  write_vertex_numbers (write_vertex_numbers)
-  {};
+  {}
 
 
   
@@ -106,50 +106,50 @@ namespace GridOutFlags
 			       n_boundary_face_points),
 		  azimut_angle (azimut_angle),
 		  turn_angle (turn_angle)
-  {};
-};  // end namespace GridOutFlags
+  {}
+}  // end namespace GridOutFlags
 
 
 
 void GridOut::set_flags (const GridOutFlags::DX &flags) 
 {
   dx_flags = flags;
-};
+}
 
 
 
 void GridOut::set_flags (const GridOutFlags::Ucd &flags) 
 {
   ucd_flags = flags;
-};
+}
 
 
 
 void GridOut::set_flags (const GridOutFlags::Gnuplot &flags) 
 {
   gnuplot_flags = flags;
-};
+}
 
 
 
 void GridOut::set_flags (const GridOutFlags::Eps<1> &flags) 
 {
   eps_flags_1 = flags;
-};
+}
 
 
 
 void GridOut::set_flags (const GridOutFlags::Eps<2> &flags) 
 {
   eps_flags_2 = flags;
-};
+}
 
 
 
 void GridOut::set_flags (const GridOutFlags::Eps<3> &flags) 
 {
   eps_flags_3 = flags;
-};
+}
 
 
 
@@ -173,7 +173,7 @@ GridOut::default_suffix (const OutputFormat output_format)
 	    Assert (false, ExcNotImplemented()); 
 	    return "";
     };
-};
+}
 
 
 
@@ -195,14 +195,14 @@ GridOut::parse_output_format (const std::string &format_name)
   AssertThrow (false, ExcInvalidState ());
 				   // return something weird
   return OutputFormat(-1);
-};
+}
 
 
 
 std::string GridOut::get_output_format_names () 
 {
   return "dx|gnuplot|eps|ucd";
-};
+}
 
 
 
@@ -214,4 +214,4 @@ GridOut::memory_consumption () const
 	  sizeof(eps_flags_1) +
 	  sizeof(eps_flags_2) +
 	  sizeof(eps_flags_3));
-};
+}

@@ -602,7 +602,7 @@ FETools::hierarchic_to_lexicographic_numbering (const FE_Q<dim>           &fe,
       default:
 	    Assert (false, ExcNotImplemented());
     };
-};
+}
 
 
 
@@ -849,7 +849,7 @@ FETools::lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
 		  }  
 	  } 
     }
-};
+}
 
 
 

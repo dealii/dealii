@@ -69,7 +69,7 @@ get_column_entries (const unsigned int           index,
 						       (*matrix)(row,index)));
 	  };
     };
-};
+}
 
 
 
@@ -83,7 +83,7 @@ get_column_entries (const unsigned int           /*index*/,
 				   // presently not implemented, but
 				   // should be fairly simple to do
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 
@@ -96,7 +96,7 @@ allocate_tmp_vector ()
   tmp_mutex.acquire ();
   tmp_vector.reinit (matrix->n(), true);
   tmp_mutex.release ();
-};
+}
 
 
 
@@ -108,7 +108,7 @@ allocate_tmp_vector ()
   tmp_mutex.acquire ();
   tmp_vector.reinit (matrix->n(), true);
   tmp_mutex.release ();
-};
+}
 
 
 
@@ -124,7 +124,7 @@ allocate_tmp_vector ()
   tmp_mutex.acquire ();
   tmp_vector.reinit (block_sizes, true);
   tmp_mutex.release ();
-};
+}
 
 
 
@@ -140,7 +140,7 @@ allocate_tmp_vector ()
   tmp_mutex.acquire ();
   tmp_vector.reinit (block_sizes, true);
   tmp_mutex.release ();
-};
+}
 
 
 template class FilteredMatrix<SparseMatrix<double>,Vector<double> >;

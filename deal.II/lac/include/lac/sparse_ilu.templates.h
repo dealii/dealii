@@ -23,14 +23,14 @@
 
 template <typename number>
 SparseILU<number>::SparseILU ()
-{};
+{}
 
 
 
 template <typename number>
 SparseILU<number>::SparseILU (const SparsityPattern &sparsity) :
 		SparseLUDecomposition<number> (sparsity)
-{};
+{}
 
 
 
@@ -145,7 +145,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				   // because the for-loop doesn't do
 				   // it...
   this->diag_element(this->m()-1) = 1./this->diag_element(this->m()-1);
-};
+}
 
 
 
@@ -214,7 +214,7 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
 				       // was stored inverted
       dst(row) *= this->diag_element(row);
     };
-};
+}
 
 
 
@@ -223,7 +223,7 @@ unsigned int
 SparseILU<number>::memory_consumption () const
 {
   return SparseLUDecomposition<number>::memory_consumption ();
-};
+}
 
 
 

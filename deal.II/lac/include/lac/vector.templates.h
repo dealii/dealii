@@ -34,7 +34,7 @@ template <typename Number>
 static inline Number sqr (const Number x)
 {
   return x*x;
-};
+}
 
 
 
@@ -76,7 +76,7 @@ template <typename Number2>
 void Vector<Number>::reinit (const Vector<Number2>& v, const bool fast)
 {
   reinit (v.size(), fast);
-};
+}
 
 
 
@@ -87,7 +87,7 @@ Vector<Number>::swap (Vector<Number> &v)
   std::swap (dim,    v.dim);
   std::swap (maxdim, v.maxdim);
   std::swap (val,    v.val);
-};
+}
 
 
 
@@ -102,7 +102,7 @@ bool Vector<Number>::all_zero () const
     if (*p++ != 0.0)
       return false;
   return true;
-};
+}
 
 
 template <typename Number>
@@ -169,7 +169,7 @@ Number Vector<Number>::norm_sqr () const
     sum0 += ::sqr(*ptr++);
   
   return sum0+sum1+sum2+sum3;
-};
+}
 
 
 template <typename Number>
@@ -199,7 +199,7 @@ Number Vector<Number>::mean_value () const
     sum0 += *ptr++;
   
   return (sum0+sum1+sum2+sum3)/size();
-};
+}
 
 
 template <typename Number>
@@ -229,14 +229,14 @@ Number Vector<Number>::l1_norm () const
     sum0 += std::fabs(*ptr++);
   
   return sum0+sum1+sum2+sum3;
-};
+}
 
 
 template <typename Number>
 Number Vector<Number>::l2_norm () const
 {
   return std::sqrt(norm_sqr());
-};
+}
 
 
 template <typename Number>
@@ -267,7 +267,7 @@ Number Vector<Number>::lp_norm (const Number p) const
   
   return std::pow(sum0+sum1+sum2+sum3,
 		  static_cast<Number>(1./p));
-};
+}
 
 
 template <typename Number>
@@ -292,7 +292,7 @@ Number Vector<Number>::linfty_norm () const {
 
   return std::max (std::max(max0, max1),
 		   std::max(max2, max3));
-};
+}
 
 
 template <typename Number>
@@ -516,7 +516,7 @@ void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b)
 		 b_ptr = b.begin();
   while (i_ptr!=i_end)
     *i_ptr++ = *a_ptr++ / *b_ptr++;
-};
+}
 
 
 
@@ -584,7 +584,7 @@ void Vector<Number>::print (std::ostream      &out,
   out << std::endl;
   
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -615,7 +615,7 @@ void Vector<Number>::block_write (std::ostream &out) const
   out.write (&outro, 1);
   
   AssertThrow (out, ExcIO());
-};
+}
 
 
 
@@ -657,7 +657,7 @@ unsigned int
 Vector<Number>::memory_consumption () const
 {
   return sizeof(*this) + (maxdim * sizeof(Number));
-};
+}
 
 
 #endif

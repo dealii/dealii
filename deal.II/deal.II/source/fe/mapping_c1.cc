@@ -27,7 +27,7 @@ MappingC1<dim>::MappingC1 ()
 		MappingQ<dim> (3)
 {
   Assert (dim > 1, ExcImpossibleInDim(dim));
-};
+}
 
 
 #if deal_II_dimension == 1
@@ -39,7 +39,7 @@ MappingC1<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
 {
   const unsigned int dim = 1;
   Assert (dim > 1, ExcImpossibleInDim(dim));
-};
+}
 
 #endif
 
@@ -183,7 +183,7 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 	  a.insert (a.end(), line_points.begin(), line_points.end());
 	};
     };
-};
+}
 
 #endif
 
@@ -195,7 +195,7 @@ MappingC1<dim>::add_line_support_points (const typename Triangulation<dim>::cell
 					 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 
@@ -209,7 +209,7 @@ MappingC1<1>::add_quad_support_points (const Triangulation<1>::cell_iterator &,
 {
   const unsigned int dim = 1;
   Assert (dim > 2, ExcImpossibleInDim(dim));
-};
+}
 
 #endif
 
@@ -224,7 +224,7 @@ MappingC1<2>::add_quad_support_points (const Triangulation<2>::cell_iterator &,
 {
   const unsigned int dim = 2;
   Assert (dim > 2, ExcImpossibleInDim(dim));
-};
+}
 
 #endif
 
@@ -237,7 +237,7 @@ MappingC1<dim>::add_quad_support_points (const typename Triangulation<dim>::cell
 					 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 

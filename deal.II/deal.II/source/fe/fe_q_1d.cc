@@ -83,7 +83,7 @@ namespace FE_Q_1d
 	-1.0546875/27., 7.3828125/27., 5.90625/27., -14.765625/27., 29.53125/27.,
   };
  
-};   // namespace FE_Q_1d
+}   // namespace FE_Q_1d
 
 
 
@@ -124,5 +124,5 @@ FE_Q<1>::Matrices::constraint_matrices[] = { 0 };
 #else // #if deal_II_dimension
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-namespace { void dummy () {}; };
+namespace { void dummy () {} }
 #endif // #if deal_II_dimension == 1

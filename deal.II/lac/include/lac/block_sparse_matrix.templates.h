@@ -25,7 +25,7 @@ BlockSparseMatrix<number>::BlockSparseMatrix () :
 		rows (0),
 		columns (0),
 		sparsity_pattern (0)
-{};
+{}
 
 
 
@@ -36,7 +36,7 @@ BlockSparseMatrix (const BlockSparsityPattern &sparsity) :
 		columns (0)
 {
   reinit (sparsity);
-};
+}
 
 
 
@@ -52,7 +52,7 @@ BlockSparseMatrix<number>::~BlockSparseMatrix ()
 	sub_objects[r][c] = 0;
 	delete p;
       };
-};
+}
 
 
 
@@ -71,7 +71,7 @@ operator = (const BlockSparseMatrix<number> &m)
     for (unsigned int c=0; c<columns; ++c)
       block(r,c) = m.block(r,c);
   return *this;
-};
+}
 
  
 
@@ -82,7 +82,7 @@ BlockSparseMatrix<number>::reinit ()
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       block(r,c).reinit ();
-};
+}
 
 
 
@@ -116,7 +116,7 @@ reinit (const BlockSparsityPattern &sparsity)
 	sub_objects[r][c] = new SparseMatrix<number>();
 	block(r,c).reinit (sparsity.block(r,c));
       };
-};
+}
 
 
 
@@ -128,7 +128,7 @@ BlockSparseMatrix<number>::clear ()
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       block(r,c).clear ();
-};
+}
 
 
 
@@ -141,7 +141,7 @@ BlockSparseMatrix<number>::empty () const
       if (block(r,c).empty () == false)
 	return false;
   return true;
-};
+}
 
 
 
@@ -151,7 +151,7 @@ unsigned int
 BlockSparseMatrix<number>::n_nonzero_elements () const
 {
   return sparsity_pattern->n_nonzero_elements ();
-};
+}
 
 
 
@@ -164,7 +164,7 @@ BlockSparseMatrix<number>::n_actually_nonzero_elements () const
     for (unsigned int j=0; j<columns; ++j)
       count += sub_objects[i][j]->n_actually_nonzero_elements ();
   return count;
-};
+}
 
 
 
@@ -173,7 +173,7 @@ const BlockSparsityPattern &
 BlockSparseMatrix<number>::get_sparsity_pattern () const
 {
   return *sparsity_pattern;
-};
+}
 
 
 template <typename number>
@@ -186,7 +186,7 @@ BlockSparseMatrix<number>::memory_consumption () const
     for (unsigned int c=0; c<columns; ++c)
       mem += MemoryConsumption::memory_consumption(*sub_objects[r][c]);
   return mem;
-};
+}
 
 
 

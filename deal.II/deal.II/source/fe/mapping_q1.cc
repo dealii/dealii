@@ -56,13 +56,13 @@ MappingQ1<dim>::InternalData::memory_consumption () const
 	  MemoryConsumption::memory_consumption (cell_of_current_support_points) +
 	  MemoryConsumption::memory_consumption (is_mapping_q1_data) +
 	  MemoryConsumption::memory_consumption (n_shape_functions));
-};
+}
 
 
 
 template <int dim>
 MappingQ1<dim>::MappingQ1 ()
-{};
+{}
 
 
 

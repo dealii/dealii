@@ -128,7 +128,7 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	  face=next_face(face);
 	}
     };
-};
+}
 
 
 
@@ -211,7 +211,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
   else
 				   // just one thread
     build_some_patches(thread_data[0]);
-};
+}
 
 
 
@@ -232,7 +232,7 @@ DataOutFaces<dim>::first_face ()
   Assert (false, ExcInternalError());
   
   return FaceDescriptor();
-};
+}
 
 
 
@@ -288,7 +288,7 @@ DataOutFaces<dim>::next_face (const FaceDescriptor &old_face)
   face.first  = this->dofs->end();
   face.second = 0;
   return face;
-};
+}
 
 
 // explicit instantiations

@@ -26,7 +26,7 @@
 template <class Matrix, class Vector>
 FilteredMatrix<Matrix,Vector>::
 FilteredMatrix () 
-{};
+{}
 
 
 
@@ -38,7 +38,7 @@ FilteredMatrix (const FilteredMatrix &fm)
 		constraints (fm.constraints)
 {
   set_referenced_matrix (*fm.matrix);
-};
+}
 
 
 
@@ -47,7 +47,7 @@ FilteredMatrix<Matrix,Vector>::
 FilteredMatrix (const Matrix &m)
 {
   set_referenced_matrix (m);
-};
+}
 
 
 
@@ -58,7 +58,7 @@ FilteredMatrix<Matrix,Vector>::operator = (const FilteredMatrix &fm)
   set_referenced_matrix (*fm.matrix);
   constraints = fm.constraints;
   return *this;
-};
+}
 
 
 
@@ -69,7 +69,7 @@ set_referenced_matrix (const Matrix &m)
 {
   matrix = &m;
   allocate_tmp_vector ();
-};
+}
 
 
 
@@ -80,7 +80,7 @@ FilteredMatrix<Matrix,Vector>::clear_constraints ()
 				   // swap vectors to release memory
   std::vector<IndexValuePair> empty;
   constraints.swap (empty);
-};
+}
 
 
 
@@ -137,7 +137,7 @@ apply_constraints (Vector     &v,
 				       // each other
   for (i=constraints.begin(); i!=e; ++i)
     v(i->first) = i->second;
-};
+}
 
 
 
@@ -151,7 +151,7 @@ FilteredMatrix<Matrix,Vector>::pre_filter (Vector &v) const
   const const_index_value_iterator e = constraints.end();
   for (; i!=e; ++i)
     v(i->first) = 0;
-};
+}
 
 
 
@@ -166,7 +166,7 @@ FilteredMatrix<Matrix,Vector>::post_filter (const Vector &in,
   const const_index_value_iterator e = constraints.end();
   for (; i!=e; ++i)
     out(i->first) = in(i->first);
-};
+}
 
 
 
@@ -186,7 +186,7 @@ FilteredMatrix<Matrix,Vector>::vmult (Vector       &dst,
   tmp_mutex.release ();
 				   // finally do post-filtering
   post_filter (src, dst);
-};
+}
 
 
 
@@ -221,7 +221,7 @@ FilteredMatrix<Matrix,Vector>::residual (Vector       &dst,
   
   Assert (res2>=0, ExcInternalError());
   return std::sqrt (res2);
-};
+}
 
 
 
@@ -241,7 +241,7 @@ FilteredMatrix<Matrix,Vector>::Tvmult (Vector       &dst,
   tmp_mutex.release ();
 				   // finally do post-filtering
   post_filter (src, dst);
-};
+}
 
   
 
@@ -263,7 +263,7 @@ FilteredMatrix<Matrix,Vector>::matrix_norm_square (const Vector &v) const
   const value_type ret = matrix->matrix_norm_square (tmp_vector);
   tmp_mutex.release ();
   return ret;
-};
+}
 
 
 
@@ -288,7 +288,7 @@ precondition_Jacobi (Vector           &dst,
   const const_index_value_iterator e = constraints.end();
   for (; i!=e; ++i)
     dst(i->first) = src(i->first);
-};
+}
 
 
 
@@ -299,7 +299,7 @@ FilteredMatrix<Matrix,Vector>::memory_consumption () const
   return (MemoryConsumption::memory_consumption (matrix) +
 	  MemoryConsumption::memory_consumption (constraints) +
 	  MemoryConsumption::memory_consumption (tmp_vector));
-};
+}
 
 
 

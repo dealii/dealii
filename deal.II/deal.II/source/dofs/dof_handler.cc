@@ -44,7 +44,7 @@ template <int dim>
 DoFHandler<dim>::DoFHandler (const Triangulation<dim> &tria) :
 		tria(&tria),
 		used_dofs (0)
-{};
+{}
 
 
 template <int dim>
@@ -52,7 +52,7 @@ DoFHandler<dim>::~DoFHandler ()
 {
 				   // release allocated memory
   clear ();
-};
+}
 
 
 #if deal_II_dimension == 1
@@ -61,70 +61,70 @@ template <>
 DoFHandler<1>::raw_cell_iterator
 DoFHandler<1>::begin_raw (const unsigned int level) const {
   return begin_raw_line (level);
-};
+}
 
 
 template <>
 DoFHandler<1>::cell_iterator
 DoFHandler<1>::begin (const unsigned int level) const {
   return begin_line (level);
-};
+}
 
 
 template <>
 DoFHandler<1>::active_cell_iterator
 DoFHandler<1>::begin_active (const unsigned int level) const {
   return begin_active_line (level);
-};
+}
 
 
 template <>
 DoFHandler<1>::raw_cell_iterator
 DoFHandler<1>::end () const {
   return end_line ();
-};
+}
 
 
 template <>
 DoFHandler<1>::raw_cell_iterator
 DoFHandler<1>::last_raw () const {
   return last_raw_line ();
-};
+}
 
 
 template <>
 DoFHandler<1>::raw_cell_iterator
 DoFHandler<1>::last_raw (const unsigned int level) const {
   return last_raw_line (level);
-};
+}
 
 
 template <>
 DoFHandler<1>::cell_iterator
 DoFHandler<1>::last () const {
   return last_line ();
-};
+}
 
 
 template <>
 DoFHandler<1>::cell_iterator
 DoFHandler<1>::last (const unsigned int level) const {
   return last_line (level);
-};
+}
 
 
 template <>
 DoFHandler<1>::active_cell_iterator
 DoFHandler<1>::last_active () const {
   return last_active_line ();
-};
+}
 
 
 template <>
 DoFHandler<1>::active_cell_iterator
 DoFHandler<1>::last_active (const unsigned int level) const {
   return last_active_line (level);
-};
+}
 
 
 template <>
@@ -132,7 +132,7 @@ DoFDimensionInfo<1>::raw_face_iterator
 DoFHandler<1>::begin_raw_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -140,7 +140,7 @@ DoFDimensionInfo<1>::face_iterator
 DoFHandler<1>::begin_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -148,7 +148,7 @@ DoFDimensionInfo<1>::active_face_iterator
 DoFHandler<1>::begin_active_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -156,7 +156,7 @@ DoFDimensionInfo<1>::raw_face_iterator
 DoFHandler<1>::end_face () const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -164,7 +164,7 @@ DoFDimensionInfo<1>::raw_face_iterator
 DoFHandler<1>::last_raw_face () const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -172,7 +172,7 @@ DoFDimensionInfo<1>::raw_face_iterator
 DoFHandler<1>::last_raw_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -180,7 +180,7 @@ DoFDimensionInfo<1>::face_iterator
 DoFHandler<1>::last_face () const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -188,7 +188,7 @@ DoFDimensionInfo<1>::face_iterator
 DoFHandler<1>::last_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -196,7 +196,7 @@ DoFDimensionInfo<1>::active_face_iterator
 DoFHandler<1>::last_active_face () const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -204,7 +204,7 @@ DoFDimensionInfo<1>::active_face_iterator
 DoFHandler<1>::last_active_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
-};
+}
 
 
 template <>
@@ -212,7 +212,7 @@ DoFHandler<1>::raw_quad_iterator
 DoFHandler<1>::begin_raw_quad (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -220,7 +220,7 @@ DoFHandler<1>::quad_iterator
 DoFHandler<1>::begin_quad (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -228,7 +228,7 @@ DoFHandler<1>::active_quad_iterator
 DoFHandler<1>::begin_active_quad (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -236,7 +236,7 @@ DoFHandler<1>::raw_quad_iterator
 DoFHandler<1>::end_quad () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -244,7 +244,7 @@ DoFHandler<1>::raw_quad_iterator
 DoFHandler<1>::last_raw_quad (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -252,7 +252,7 @@ DoFHandler<1>::quad_iterator
 DoFHandler<1>::last_quad (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -260,7 +260,7 @@ DoFHandler<1>::active_quad_iterator
 DoFHandler<1>::last_active_quad (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -268,7 +268,7 @@ DoFHandler<1>::raw_quad_iterator
 DoFHandler<1>::last_raw_quad () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -276,7 +276,7 @@ DoFHandler<1>::quad_iterator
 DoFHandler<1>::last_quad () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -284,7 +284,7 @@ DoFHandler<1>::active_quad_iterator
 DoFHandler<1>::last_active_quad () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -292,7 +292,7 @@ DoFHandler<1>::raw_hex_iterator
 DoFHandler<1>::begin_raw_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -300,7 +300,7 @@ DoFHandler<1>::hex_iterator
 DoFHandler<1>::begin_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -308,7 +308,7 @@ DoFHandler<1>::active_hex_iterator
 DoFHandler<1>::begin_active_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -316,7 +316,7 @@ DoFHandler<1>::raw_hex_iterator
 DoFHandler<1>::end_hex () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -324,7 +324,7 @@ DoFHandler<1>::raw_hex_iterator
 DoFHandler<1>::last_raw_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -332,7 +332,7 @@ DoFHandler<1>::raw_hex_iterator
 DoFHandler<1>::last_raw_hex () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -340,7 +340,7 @@ DoFHandler<1>::hex_iterator
 DoFHandler<1>::last_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -348,7 +348,7 @@ DoFHandler<1>::hex_iterator
 DoFHandler<1>::last_hex () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -356,7 +356,7 @@ DoFHandler<1>::active_hex_iterator
 DoFHandler<1>::last_active_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -364,7 +364,7 @@ DoFHandler<1>::active_hex_iterator
 DoFHandler<1>::last_active_hex () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 #endif
 
@@ -375,140 +375,140 @@ template <>
 DoFHandler<2>::raw_cell_iterator
 DoFHandler<2>::begin_raw (const unsigned int level) const {
   return begin_raw_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<2>::cell_iterator
 DoFHandler<2>::begin (const unsigned int level) const {
   return begin_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<2>::active_cell_iterator
 DoFHandler<2>::begin_active (const unsigned int level) const {
   return begin_active_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<2>::raw_cell_iterator
 DoFHandler<2>::end () const {
   return end_quad ();
-};
+}
 
 
 template <>
 DoFHandler<2>::raw_cell_iterator
 DoFHandler<2>::last_raw () const {
   return last_raw_quad ();
-};
+}
 
 
 template <>
 DoFHandler<2>::raw_cell_iterator
 DoFHandler<2>::last_raw (const unsigned int level) const {
   return last_raw_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<2>::cell_iterator
 DoFHandler<2>::last () const {
   return last_quad ();
-};
+}
 
 
 template <>
 DoFHandler<2>::cell_iterator
 DoFHandler<2>::last (const unsigned int level) const {
   return last_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<2>::active_cell_iterator
 DoFHandler<2>::last_active () const {
   return last_active_quad ();
-};
+}
 
 
 template <>
 DoFHandler<2>::active_cell_iterator
 DoFHandler<2>::last_active (const unsigned int level) const {
   return last_active_quad (level);
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::raw_face_iterator
 DoFHandler<2>::begin_raw_face (const unsigned int level) const {
   return begin_raw_line (level);
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::face_iterator
 DoFHandler<2>::begin_face (const unsigned int level) const {
   return begin_line (level);
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::active_face_iterator
 DoFHandler<2>::begin_active_face (const unsigned int level) const {
   return begin_active_line (level);
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::raw_face_iterator
 DoFHandler<2>::end_face () const {
   return end_line ();
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::raw_face_iterator
 DoFHandler<2>::last_raw_face () const {
   return last_raw_line ();
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::raw_face_iterator
 DoFHandler<2>::last_raw_face (const unsigned int level) const {
   return last_raw_line (level);
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::face_iterator
 DoFHandler<2>::last_face () const {
   return last_line ();
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::face_iterator
 DoFHandler<2>::last_face (const unsigned int level) const {
   return last_line (level);
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::active_face_iterator
 DoFHandler<2>::last_active_face () const {
   return last_active_line ();
-};
+}
 
 
 template <>
 DoFDimensionInfo<2>::active_face_iterator
 DoFHandler<2>::last_active_face (const unsigned int level) const {
   return last_active_line (level);
-};
+}
 
 
 template <>
@@ -516,7 +516,7 @@ DoFHandler<2>::raw_hex_iterator
 DoFHandler<2>::begin_raw_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -524,7 +524,7 @@ DoFHandler<2>::hex_iterator
 DoFHandler<2>::begin_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -532,7 +532,7 @@ DoFHandler<2>::active_hex_iterator
 DoFHandler<2>::begin_active_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -540,7 +540,7 @@ DoFHandler<2>::raw_hex_iterator
 DoFHandler<2>::end_hex () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -548,7 +548,7 @@ DoFHandler<2>::raw_hex_iterator
 DoFHandler<2>::last_raw_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -556,7 +556,7 @@ DoFHandler<2>::raw_hex_iterator
 DoFHandler<2>::last_raw_hex () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -564,7 +564,7 @@ DoFHandler<2>::hex_iterator
 DoFHandler<2>::last_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -572,7 +572,7 @@ DoFHandler<2>::hex_iterator
 DoFHandler<2>::last_hex () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -580,7 +580,7 @@ DoFHandler<2>::active_hex_iterator
 DoFHandler<2>::last_active_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 template <>
@@ -588,7 +588,7 @@ DoFHandler<2>::active_hex_iterator
 DoFHandler<2>::last_active_hex () const {
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 
 #endif
@@ -600,140 +600,140 @@ template <>
 DoFHandler<3>::raw_cell_iterator
 DoFHandler<3>::begin_raw (const unsigned int level) const {
   return begin_raw_hex (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::cell_iterator
 DoFHandler<3>::begin (const unsigned int level) const {
   return begin_hex (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::active_cell_iterator
 DoFHandler<3>::begin_active (const unsigned int level) const {
   return begin_active_hex (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::raw_cell_iterator
 DoFHandler<3>::end () const {
   return end_hex ();
-};
+}
 
 
 template <>
 DoFHandler<3>::raw_cell_iterator
 DoFHandler<3>::last_raw () const {
   return last_raw_hex ();
-};
+}
 
 
 template <>
 DoFHandler<3>::raw_cell_iterator
 DoFHandler<3>::last_raw (const unsigned int level) const {
   return last_raw_hex (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::cell_iterator
 DoFHandler<3>::last () const {
   return last_hex ();
-};
+}
 
 
 template <>
 DoFHandler<3>::cell_iterator
 DoFHandler<3>::last (const unsigned int level) const {
   return last_hex (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::active_cell_iterator
 DoFHandler<3>::last_active () const {
   return last_active_hex ();
-};
+}
 
 
 template <>
 DoFHandler<3>::active_cell_iterator
 DoFHandler<3>::last_active (const unsigned int level) const {
   return last_active_hex (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::raw_face_iterator
 DoFHandler<3>::begin_raw_face (const unsigned int level) const {
   return begin_raw_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::face_iterator
 DoFHandler<3>::begin_face (const unsigned int level) const {
   return begin_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::active_face_iterator
 DoFHandler<3>::begin_active_face (const unsigned int level) const {
   return begin_active_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::raw_face_iterator
 DoFHandler<3>::end_face () const {
   return end_quad ();
-};
+}
 
 
 template <>
 DoFHandler<3>::raw_face_iterator
 DoFHandler<3>::last_raw_face () const {
   return last_raw_quad ();
-};
+}
 
 
 template <>
 DoFHandler<3>::raw_face_iterator
 DoFHandler<3>::last_raw_face (const unsigned int level) const {
   return last_raw_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::face_iterator
 DoFHandler<3>::last_face () const {
   return last_quad ();
-};
+}
 
 
 template <>
 DoFHandler<3>::face_iterator
 DoFHandler<3>::last_face (const unsigned int level) const {
   return last_quad (level);
-};
+}
 
 
 template <>
 DoFHandler<3>::active_face_iterator
 DoFHandler<3>::last_active_face () const {
   return last_active_quad ();
-};
+}
 
 
 template <>
 DoFHandler<3>::active_face_iterator
 DoFHandler<3>::last_active_face (const unsigned int level) const {
   return last_active_quad (level);
-};
+}
 
 
 #endif
@@ -746,7 +746,7 @@ DoFHandler<dim>::begin_raw_line (const unsigned int level) const {
 			    tria->begin_raw_line(level)->level(),
 			    tria->begin_raw_line(level)->index(),
 			    this);
-};
+}
 
 
 template <int dim>
@@ -756,7 +756,7 @@ DoFHandler<dim>::begin_line (const unsigned int level) const {
 			tria->begin_line(level)->level(),
 			tria->begin_line(level)->index(),
 			this);
-};
+}
 
 
 template <int dim>
@@ -766,7 +766,7 @@ DoFHandler<dim>::begin_active_line (const unsigned int level) const {
 			       tria->begin_active_line(level)->level(),
 			       tria->begin_active_line(level)->index(),
 			       this);
-};
+}
 
 
 template <int dim>
@@ -776,7 +776,7 @@ DoFHandler<dim>::begin_raw_quad (const unsigned int level) const {
 			    tria->begin_raw_quad(level)->level(),
 			    tria->begin_raw_quad(level)->index(),
 			    this);
-};
+}
 
 
 template <int dim>
@@ -786,7 +786,7 @@ DoFHandler<dim>::begin_quad (const unsigned int level) const {
 			tria->begin_quad(level)->level(),
 			tria->begin_quad(level)->index(),
 			this);
-};
+}
 
 
 template <int dim>
@@ -796,7 +796,7 @@ DoFHandler<dim>::begin_active_quad (const unsigned int level) const {
 			       tria->begin_active_quad(level)->level(),
 			       tria->begin_active_quad(level)->index(),
 			       this);
-};
+}
 
 
 template <int dim>
@@ -806,7 +806,7 @@ DoFHandler<dim>::begin_raw_hex (const unsigned int level) const {
 			   tria->begin_raw_hex(level)->level(),
 			   tria->begin_raw_hex(level)->index(),
 			   this);
-};
+}
 
 
 template <int dim>
@@ -816,7 +816,7 @@ DoFHandler<dim>::begin_hex (const unsigned int level) const {
 		       tria->begin_hex(level)->level(),
 		       tria->begin_hex(level)->index(),
 		       this);
-};
+}
 
 
 template <int dim>
@@ -826,28 +826,28 @@ DoFHandler<dim>::begin_active_hex (const unsigned int level) const {
 			      tria->begin_active_hex(level)->level(),
 			      tria->begin_active_hex(level)->index(),
 			      this);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::raw_line_iterator
 DoFHandler<dim>::end_line () const {
   return raw_line_iterator (tria, -1, -1, this);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::raw_quad_iterator
 DoFHandler<dim>::end_quad () const {
   return raw_quad_iterator (tria, -1, -1, this);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::raw_hex_iterator
 DoFHandler<dim>::end_hex () const {
   return raw_hex_iterator (tria, -1, -1, this);
-};
+}
 
 
 template <int dim>
@@ -856,7 +856,7 @@ DoFHandler<dim>::end_raw (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end() :
 	  begin_raw (level+1));
-};
+}
 
 
 template <int dim>
@@ -865,7 +865,7 @@ DoFHandler<dim>::end (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  cell_iterator(end()) :
 	  begin (level+1));
-};
+}
 
 
 template <int dim>
@@ -874,7 +874,7 @@ DoFHandler<dim>::end_active (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  active_cell_iterator(end()) :
 	  begin_active (level+1));
-};
+}
 
 
 template <int dim>
@@ -883,7 +883,7 @@ DoFHandler<dim>::end_raw_face (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end_face() :
 	  begin_raw_face (level+1));
-};
+}
 
 
 template <int dim>
@@ -892,7 +892,7 @@ DoFHandler<dim>::end_face (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  face_iterator(end_face()) :
 	  begin_face (level+1));
-};
+}
 
 
 template <int dim>
@@ -901,7 +901,7 @@ DoFHandler<dim>::end_active_face (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  active_face_iterator(end_face()) :
 	  begin_active_face (level+1));
-};
+}
 
 
 template <int dim>
@@ -910,7 +910,7 @@ DoFHandler<dim>::end_raw_line (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end_line() :
 	  begin_raw_line (level+1));
-};
+}
 
 
 template <int dim>
@@ -919,7 +919,7 @@ DoFHandler<dim>::end_line (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  line_iterator(end_line()) :
 	  begin_line (level+1));
-};
+}
 
 
 template <int dim>
@@ -928,7 +928,7 @@ DoFHandler<dim>::end_active_line (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  active_line_iterator(end_line()) :
 	  begin_active_line (level+1));
-};
+}
 
 
 template <int dim>
@@ -937,7 +937,7 @@ DoFHandler<dim>::end_raw_quad (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end_quad() :
 	  begin_raw_quad (level+1));
-};
+}
 
 
 template <int dim>
@@ -946,7 +946,7 @@ DoFHandler<dim>::end_quad (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  quad_iterator(end_quad()) :
 	  begin_quad (level+1));
-};
+}
 
 
 template <int dim>
@@ -955,7 +955,7 @@ DoFHandler<dim>::end_active_quad (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  active_quad_iterator(end_quad()) :
 	  begin_active_quad (level+1));
-};
+}
 
 
 template <int dim>
@@ -964,7 +964,7 @@ DoFHandler<dim>::end_raw_hex (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end_hex() :
 	  begin_raw_hex (level+1));
-};
+}
 
 
 template <int dim>
@@ -973,7 +973,7 @@ DoFHandler<dim>::end_hex (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  hex_iterator(end_hex()) :
 	  begin_hex (level+1));
-};
+}
 
 
 template <int dim>
@@ -982,7 +982,7 @@ DoFHandler<dim>::end_active_hex (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  active_hex_iterator(end_hex()) :
 	  begin_active_hex (level+1));
-};
+}
 
 
 template <int dim>
@@ -992,7 +992,7 @@ DoFHandler<dim>::last_raw_line (const unsigned int level) const {
 			    tria->last_raw_line(level)->level(),
 			    tria->last_raw_line(level)->index(),
 			    this);
-};
+}
 
 
 template <int dim>
@@ -1002,7 +1002,7 @@ DoFHandler<dim>::last_line (const unsigned int level) const {
 			tria->last_line(level)->level(),
 			tria->last_line(level)->index(),
 			this);
-};
+}
 
 
 template <int dim>
@@ -1012,7 +1012,7 @@ DoFHandler<dim>::last_active_line (const unsigned int level) const {
 			       tria->last_active_line(level)->level(),
 			       tria->last_active_line(level)->index(),
 			       this);
-};
+}
 
 
 template <int dim>
@@ -1022,7 +1022,7 @@ DoFHandler<dim>::last_raw_quad (const unsigned int level) const {
 			    tria->last_raw_quad(level)->level(),
 			    tria->last_raw_quad(level)->index(),
 			    this);
-};
+}
 
 
 template <int dim>
@@ -1032,7 +1032,7 @@ DoFHandler<dim>::last_quad (const unsigned int level) const {
 			tria->last_quad(level)->level(),
 			tria->last_quad(level)->index(),
 			this);
-};
+}
 
 
 template <int dim>
@@ -1042,7 +1042,7 @@ DoFHandler<dim>::last_active_quad (const unsigned int level) const {
 			       tria->last_active_quad(level)->level(),
 			       tria->last_active_quad(level)->index(),
 			       this);
-};
+}
 
 
 template <int dim>
@@ -1052,7 +1052,7 @@ DoFHandler<dim>::last_raw_hex (const unsigned int level) const {
 			   tria->last_raw_hex(level)->level(),
 			   tria->last_raw_hex(level)->index(),
 			   this);
-};
+}
 
 
 template <int dim>
@@ -1062,7 +1062,7 @@ DoFHandler<dim>::last_hex (const unsigned int level) const {
 		       tria->last_hex(level)->level(),
 		       tria->last_hex(level)->index(),
 		       this);
-};
+}
 
 
 template <int dim>
@@ -1072,70 +1072,70 @@ DoFHandler<dim>::last_active_hex (const unsigned int level) const {
 			      tria->last_active_hex(level)->level(),
 			      tria->last_active_hex(level)->index(),
 			      this);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::raw_line_iterator
 DoFHandler<dim>::last_raw_line () const {
   return last_raw_line (levels.size()-1);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::raw_quad_iterator
 DoFHandler<dim>::last_raw_quad () const {
   return last_raw_quad (levels.size()-1);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::raw_hex_iterator
 DoFHandler<dim>::last_raw_hex () const {
   return last_raw_hex (levels.size()-1);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::line_iterator
 DoFHandler<dim>::last_line () const {
   return last_line (levels.size()-1);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::quad_iterator
 DoFHandler<dim>::last_quad () const {
   return last_quad (levels.size()-1);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::hex_iterator
 DoFHandler<dim>::last_hex () const {
   return last_hex (levels.size()-1);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::active_line_iterator
 DoFHandler<dim>::last_active_line () const {
   return last_active_line (levels.size()-1);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::active_quad_iterator
 DoFHandler<dim>::last_active_quad () const {
   return last_active_quad (levels.size()-1);
-};
+}
 
 
 template <int dim>
 typename DoFHandler<dim>::active_hex_iterator
 DoFHandler<dim>::last_active_hex () const {
   return last_active_hex (levels.size()-1);
-};
+}
 
 
 //------------------------------------------------------------------
@@ -1148,7 +1148,7 @@ unsigned int DoFHandler<1>::n_boundary_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   return 2*selected_fe->dofs_per_vertex;
-};
+}
 
 
 
@@ -1166,7 +1166,7 @@ unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicat
 	    ExcInvalidBoundaryIndicator());
 
   return boundary_indicators.size()*selected_fe->dofs_per_vertex;
-};
+}
 
 
 
@@ -1184,7 +1184,7 @@ unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &boun
 	    ExcInvalidBoundaryIndicator());
 
   return boundary_indicators.size()*selected_fe->dofs_per_vertex;
-};
+}
 
 #endif
 
@@ -1219,7 +1219,7 @@ unsigned int DoFHandler<dim>::n_boundary_dofs () const
 	  boundary_dofs.insert(dofs_on_face[i]);
       };
   return boundary_dofs.size();
-};    
+}
 
 
 
@@ -1246,7 +1246,7 @@ DoFHandler<dim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
 	  boundary_dofs.insert(dofs_on_face[i]);
       };
   return boundary_dofs.size();
-};    
+}
 
 
 
@@ -1275,7 +1275,7 @@ DoFHandler<dim>::n_boundary_dofs (const std::set<unsigned char> &boundary_indica
 	  boundary_dofs.insert(dofs_on_face[i]);
       };
   return boundary_dofs.size();
-};    
+}
 
 
 
@@ -1283,7 +1283,7 @@ template <int dim>
 const Triangulation<dim> & DoFHandler<dim>::get_tria () const
 {
   return *tria;
-};
+}
 
 
 
@@ -1301,7 +1301,7 @@ DoFHandler<dim>::memory_consumption () const
     mem += MemoryConsumption::memory_consumption (*levels[i]);
   
   return mem;
-};
+}
 
 
 
@@ -1338,7 +1338,7 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &ff,
 
 				   // finally restore the user flags
   const_cast<Triangulation<dim> &>(*tria).load_user_flags(user_flags);
-};
+}
 
 
 template <int dim>
@@ -1348,7 +1348,7 @@ void DoFHandler<dim>::clear () {
 
 				   // release memory
   clear_space ();
-};
+}
 
 
 #if deal_II_dimension == 1
@@ -1400,7 +1400,7 @@ unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
   cell->set_user_flag ();
   
   return next_free_dof;
-};
+}
 
 #endif
 
@@ -1446,7 +1446,7 @@ unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
   cell->set_user_flag ();
   
   return next_free_dof;
-};
+}
 
 #endif
 
@@ -1507,7 +1507,7 @@ unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
   cell->set_user_flag ();
   
   return next_free_dof;
-};
+}
 
 #endif
 
@@ -1555,7 +1555,7 @@ void DoFHandler<1>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 	 i!=levels[level]->line_dofs.end(); ++i)
       if (*i != invalid_dof_index)
 	*i = new_numbers[*i];
-};
+}
 
 #endif
 
@@ -1609,7 +1609,7 @@ void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
     };
-};
+}
 
 #endif
 
@@ -1667,7 +1667,7 @@ void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
     };
-};
+}
 
 #endif
 
@@ -1680,7 +1680,7 @@ unsigned int DoFHandler<1>::max_couplings_between_dofs () const
   Assert (selected_fe != 0, ExcNoFESelected());
   return std::min(3*selected_fe->dofs_per_vertex +
 		  2*selected_fe->dofs_per_line, n_dofs());
-};
+}
 
 
 
@@ -1689,7 +1689,7 @@ unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   return selected_fe->dofs_per_vertex;
-};
+}
 
 #endif
 
@@ -1755,7 +1755,7 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const
 	    max_couplings=0;
     };
   return std::min(max_couplings,n_dofs());
-};
+}
 
 
 
@@ -1764,7 +1764,7 @@ unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   return 3*selected_fe->dofs_per_vertex + 2*selected_fe->dofs_per_line;
-};
+}
 
 #endif
 
@@ -1801,7 +1801,7 @@ unsigned int DoFHandler<3>::max_couplings_between_dofs () const
     }
   
   return std::min(max_couplings,n_dofs());
-};
+}
 
 
 template <>
@@ -1823,7 +1823,7 @@ unsigned int DoFHandler<3>::max_couplings_between_boundary_dofs () const {
   return (19*selected_fe->dofs_per_vertex +
 	  28*selected_fe->dofs_per_line +
 	  8*selected_fe->dofs_per_quad);
-};
+}
 
 
 #endif
@@ -1854,7 +1854,7 @@ void DoFHandler<1>::reserve_space () {
 							   selected_fe->dofs_per_line,
 							   invalid_dof_index);
     };
-};
+}
 
 
 #endif
@@ -1887,7 +1887,7 @@ void DoFHandler<2>::reserve_space () {
 							    selected_fe->dofs_per_quad,
 							    invalid_dof_index);
     };
-};
+}
 
 #endif
 
@@ -1922,7 +1922,7 @@ void DoFHandler<3>::reserve_space () {
 							   selected_fe->dofs_per_hex,
 							   invalid_dof_index);
     };
-};
+}
 
 #endif
 
@@ -1935,7 +1935,7 @@ void DoFHandler<dim>::clear_space () {
 
   std::vector<unsigned int> tmp;
   std::swap (vertex_dofs, tmp);
-};
+}
 
 
 /*-------------- Explicit Instantiations -------------------------------*/

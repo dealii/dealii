@@ -188,7 +188,7 @@ void GridTools::transform (const Predicate    &predicate,
 					   // and mark it as treated
 	  treated_vertices[cell->vertex_index(v)] = true;
 	};
-};
+}
 
 
 

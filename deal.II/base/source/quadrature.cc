@@ -21,13 +21,13 @@
 template <>
 Quadrature<0>::Quadrature (const unsigned int)
               : n_quadrature_points(0)
-{};
+{}
 
 
 
 template <>
 Quadrature<0>::~Quadrature ()
-{};
+{}
 
 
 
@@ -87,7 +87,7 @@ Quadrature<0>::Quadrature (const Quadrature<-1> &,
 		: n_quadrature_points (0)
 {
   Assert (false, ExcInternalError());
-};
+}
 
 
 
@@ -97,7 +97,7 @@ Quadrature<1>::Quadrature (const Quadrature<0> &,
                 n_quadrature_points (0)
 {
   Assert (false, ExcInternalError());
-};
+}
 
 
 
@@ -137,13 +137,13 @@ Quadrature<dim>::Quadrature (const SubQuadrature &q1,
 				   // near that. 
   Assert ((sum>0.999999) && (sum<1.000001), ExcInternalError());
 #endif
-};
+}
 
 
 
 template <int dim>
 Quadrature<dim>::~Quadrature ()
-{};
+{}
 
 
 
@@ -153,7 +153,7 @@ const Point<0> & Quadrature<0>::point (const unsigned int) const
   Assert (false, ExcInternalError());
   static const Point<0> dummy;
   return dummy;
-};
+}
 
 
 
@@ -162,7 +162,7 @@ const Point<dim> & Quadrature<dim>::point (const unsigned int i) const
 {
   Assert (i<n_quadrature_points, ExcIndexRange(i, 0, n_quadrature_points));
   return quadrature_points[i];
-};
+}
 
 
 
@@ -171,7 +171,7 @@ const std::vector<Point<0> > & Quadrature<0>::get_points () const
 {
   Assert (false, ExcInternalError());
   return quadrature_points;
-};
+}
 
 
 
@@ -179,7 +179,7 @@ template <int dim>
 const std::vector<Point<dim> > & Quadrature<dim>::get_points () const
 {
   return quadrature_points;
-};
+}
 
 
 
@@ -188,7 +188,7 @@ double Quadrature<0>::weight (const unsigned int) const
 {
   Assert (false, ExcInternalError());
   return 0;
-};
+}
 
 
 
@@ -197,7 +197,7 @@ double Quadrature<dim>::weight (const unsigned int i) const
 {
   Assert (i<n_quadrature_points, ExcIndexRange(i, 0, n_quadrature_points));
   return weights[i];
-};
+}
 
 
 
@@ -205,7 +205,7 @@ template <int dim>
 const std::vector<double> & Quadrature<dim>::get_weights () const
 {
   return weights;
-};
+}
 
 
 
@@ -214,7 +214,7 @@ const std::vector<double> & Quadrature<0>::get_weights () const
 {
   Assert (false, ExcInternalError());
   return weights;
-};
+}
 
 
 
@@ -224,7 +224,7 @@ Quadrature<dim>::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (quadrature_points) +
 	  MemoryConsumption::memory_consumption (weights));
-};
+}
 
 
 //----------------------------------------------------------------------//
@@ -268,7 +268,7 @@ void QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
 	default:
 	      Assert (false, ExcInternalError());
       };
-};
+}
 
 
 
@@ -319,7 +319,7 @@ void QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
 	default:
 	      Assert (false, ExcInternalError());
       };
-};
+}
 
 
 
@@ -406,7 +406,7 @@ void QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
 	default:
 	      Assert (false, ExcInternalError());
       };
-};
+}
 
 
 
@@ -566,7 +566,7 @@ void QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
 	default:
 	      Assert (false, ExcInternalError());
       };
-};
+}
 
 
 
@@ -576,7 +576,7 @@ QProjector<1>::project_to_all_faces (const Quadrature<0> &)
 {
   Assert (false, ExcImpossibleInDim(1));
   return Quadrature<1>(0);
-};
+}
 
 
 
@@ -617,7 +617,7 @@ QProjector<1>::project_to_all_subfaces (const Quadrature<0> &)
 {
   Assert (false, ExcImpossibleInDim(1));
   return Quadrature<1>(0);
-};
+}
 
 
 
@@ -706,7 +706,7 @@ QProjector<dim>::project_to_child (const Quadrature<dim>    &quadrature,
     weights[i] *= (1./GeometryInfo<dim>::children_per_cell);
 
   return Quadrature<dim> (q_points, weights);
-};
+}
 
 
 
@@ -728,7 +728,7 @@ QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature)
     };
 
   return (at_left && at_right);
-};
+}
 
 
 
@@ -829,7 +829,7 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
   Assert (std::fabs(sum_of_weights-1) < 1e-15,
 	  ExcSumOfWeightsNotOne());
 #endif
-};
+}
 
 
 
@@ -840,7 +840,7 @@ QIterated<dim>::QIterated (const Quadrature<1> &base_quadrature,
 			   const unsigned int   N) :
 		Quadrature<dim> (QIterated<dim-1>(base_quadrature, N),
 				 QIterated<1>(base_quadrature, N))
-{};
+{}
 
 
 

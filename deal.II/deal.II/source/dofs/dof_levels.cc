@@ -20,7 +20,7 @@ unsigned int
 DoFLevel<1>::memory_consumption () const
 {
   return MemoryConsumption::memory_consumption (line_dofs);
-};
+}
 
 
 
@@ -29,7 +29,7 @@ DoFLevel<2>::memory_consumption () const
 {
   return (DoFLevel<1>::memory_consumption () +
 	  MemoryConsumption::memory_consumption (quad_dofs));
-};
+}
 
 
 
@@ -38,4 +38,4 @@ DoFLevel<3>::memory_consumption () const
 {
   return (DoFLevel<2>::memory_consumption () +
 	  MemoryConsumption::memory_consumption (hex_dofs));
-};
+}

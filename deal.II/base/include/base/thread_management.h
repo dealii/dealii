@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -4773,7 +4773,7 @@ namespace Threads
                                     */
   void handle_unknown_exception ();
   
-};   // end declarations of namespace Threads
+}   // end declarations of namespace Threads
 
 
 
@@ -4827,7 +4827,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
 
 
 				     // copying of parameters is done,
@@ -4927,7 +4927,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
 
 
@@ -5031,7 +5031,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
 
@@ -5141,7 +5141,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
     Arg3              arg3    = fun_data->arg3;
@@ -5256,7 +5256,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
     Arg3              arg3    = fun_data->arg3;
@@ -5376,7 +5376,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
     Arg3              arg3    = fun_data->arg3;
@@ -5502,7 +5502,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
     Arg3              arg3    = fun_data->arg3;
@@ -5634,7 +5634,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
     Arg3              arg3    = fun_data->arg3;
@@ -5773,7 +5773,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
     Arg3              arg3    = fun_data->arg3;
@@ -5916,7 +5916,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
     Arg3              arg3    = fun_data->arg3;
@@ -6067,7 +6067,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
     Arg3              arg3    = fun_data->arg3;
@@ -6193,7 +6193,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
 
 				     // copying of parameters is done,
@@ -6306,7 +6306,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
 
@@ -6424,7 +6424,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -6550,7 +6550,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -6683,7 +6683,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -6821,7 +6821,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -6966,7 +6966,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -7119,7 +7119,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -7275,7 +7275,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -7437,7 +7437,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -7606,7 +7606,7 @@ namespace Threads
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
 				     // copy the parameters
-    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -8064,7 +8064,7 @@ namespace Threads
 
 
 	    
-};   // end of implementation of namespace Threads
+}   // end of implementation of namespace Threads
 
 
 

@@ -106,7 +106,7 @@ void GridRefinement::refine (Triangulation<dim>   &tria,
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
     if (std::fabs(criteria(index)) >= new_threshold)
       cell->set_refine_flag();
-};
+}
 
 
 
@@ -127,7 +127,7 @@ void GridRefinement::coarsen (Triangulation<dim>   &tria,
     if (std::fabs(criteria(index)) <= threshold)
       if (!cell->refine_flag_set())
         cell->set_coarsen_flag();
-};
+}
 
 
 
@@ -168,7 +168,7 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim>   &tria,
 	  coarsen (tria, criteria, *(tmp.begin() + tmp.size() - coarsen_cells));
 	};
     };
-};
+}
 
 
 
@@ -256,7 +256,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
   
   if (bottom_threshold > *std::min_element(criteria.begin(), criteria.end()))
     coarsen (tria, criteria, bottom_threshold);
-};
+}
 
 
 
@@ -316,7 +316,7 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim>   &tria,
 	}
     }
   refine(tria,criteria,criteria(tmp[minArg]));
-};
+}
 
 // explicit instantiations
 template void GridRefinement

@@ -90,7 +90,7 @@ Quad::Quad (const int i0, const int i1, const int i2, const int i3)
   lines[1] = i1;
   lines[2] = i2;
   lines[3] = i3;
-};
+}
 
 
 
@@ -100,7 +100,7 @@ int Quad::line (const int i) const
   Assert ((i>=0) && (i<4),
 	  ExcRange(i));
   return lines[i];
-};
+}
 
 
 
@@ -110,7 +110,7 @@ void Quad::set_line (const int i, const int index)
   Assert ((i>=0) && (i<4),
 	  ExcRange(i));
   lines[i] = index;
-};
+}
 
 
 
@@ -119,6 +119,6 @@ unsigned int
 Quad::memory_consumption ()
 {
   return sizeof(Quad);
-};
+}
 
 #endif

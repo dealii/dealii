@@ -263,7 +263,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler
 				   // this is dimension specific and
 				   // thus needs an own function
   dof_handler.renumber_dofs (new_number);
-};
+}
 
 
 #ifdef ENABLE_MULTIGRID
@@ -430,7 +430,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
 				   // this is dimension specific and
 				   // thus needs an own function
   dof_handler.renumber_dofs (level, new_number);
-};
+}
 #endif
 
 
@@ -582,7 +582,7 @@ DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handler,
 	  ExcInternalError());
 
   dof_handler.renumber_dofs (new_indices);
-};
+}
 
 
 
@@ -733,7 +733,7 @@ void DoFRenumbering::component_wise (MGDoFHandler<dim>& dof_handler,
           ExcInternalError());
 
   dof_handler.renumber_dofs (level, new_indices);
-};
+}
 
 
 
@@ -771,7 +771,7 @@ DoFRenumbering::sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
 
 				   // now perform the renumbering
   dof_handler.renumber_dofs (new_dof_indices);
-};
+}
 
 
 template <int dim>
@@ -965,7 +965,7 @@ DoFRenumbering::random (DoFHandler<dim> &dof_handler)
   
   std::random_shuffle (new_indices.begin(), new_indices.end());
   dof_handler.renumber_dofs(new_indices);  
-};
+}
 
 
 

@@ -336,7 +336,7 @@ MGLevelObject<Object>::MGLevelObject(const unsigned int min,
 		minlevel(0)
 {
   resize (min, max);
-};
+}
 
 
 template<class Object>
@@ -369,7 +369,7 @@ MGLevelObject<Object>::resize (const unsigned int new_minlevel,
 
   minlevel = new_minlevel;
   objects.resize (new_maxlevel - new_minlevel + 1);
-};
+}
 
 
 template<class Object>
@@ -379,7 +379,7 @@ MGLevelObject<Object>::clear ()
   typename std::vector<Object>::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
     v->clear();  
-};
+}
 
 
 template<class Object>
@@ -387,7 +387,7 @@ unsigned int
 MGLevelObject<Object>::get_minlevel () const
 {
   return minlevel;
-};
+}
 
 
 template<class Object>
@@ -395,7 +395,7 @@ unsigned int
 MGLevelObject<Object>::get_maxlevel () const
 {
   return minlevel + objects.size() - 1;
-};
+}
 
 /*----------------------------------------------------------------------*/
 

@@ -1285,7 +1285,7 @@ inline
 unsigned int DoFHandler<dim>::n_dofs () const
 {
   return used_dofs;
-};
+}
 
 
 
@@ -1295,7 +1295,7 @@ const FiniteElement<dim> & DoFHandler<dim>::get_fe () const
 {
   Assert(selected_fe!=0, ExcNoFESelected());
   return *selected_fe;
-};
+}
 
 
 /*----------------------------   dof.h     ---------------------------*/

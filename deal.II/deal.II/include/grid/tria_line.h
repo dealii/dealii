@@ -84,7 +84,7 @@ Line::Line (const int i0, const int i1)
 {
   end_points[0] = i0;
   end_points[1] = i1;
-};
+}
 
 
 
@@ -94,7 +94,7 @@ int Line::vertex (const int i) const
   Assert ((i==0) || (i==1),
 	  ExcRange(i));
   return end_points[i];
-};
+}
 
 
 
@@ -104,7 +104,7 @@ void Line::set_vertex (const int i, const int index)
   Assert ((i==0) || (i==1),
 	  ExcRange(i));
   end_points[i] = index;
-};
+}
 
 
 
@@ -113,7 +113,7 @@ unsigned int
 Line::memory_consumption ()
 {
   return sizeof(Line);
-};
+}
 
 
 #endif

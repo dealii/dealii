@@ -40,7 +40,7 @@ get_n_levels (const GridClass &grid)
 				   // of this object, there is a
 				   // specialization of this function
   return grid.get_tria().n_levels();
-};
+}
 
 
 // specialization for grid==tria
@@ -51,7 +51,7 @@ get_n_levels (const Triangulation<dim> &grid)
 				   // if GridClass==Triangulation, then
 				   // we can ask directly.
   return grid.n_levels();
-};
+}
 
 
 template <template <int> class GridClass, int dim>
@@ -107,7 +107,7 @@ void InterGridMap<GridClass,dim>::make_mapping (const GridClass<dim> &source_gri
 				   // are indeed related:
   Assert (dst_cell == destination_grid.end(0),
 	  ExcIncompatibleGrids ());
-};
+}
 
 
 
@@ -138,7 +138,7 @@ InterGridMap<GridClass,dim>::set_mapping (const cell_iterator &src_cell,
 				   // else (no cell is refined or
 				   // dst_cell is refined): no pointers
 				   // to be set
-};
+}
 
 
 
@@ -156,7 +156,7 @@ InterGridMap<GridClass,dim>::set_entries_to_cell (const cell_iterator &src_cell,
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
       set_entries_to_cell (src_cell->child(c),
 			   dst_cell);
-};
+}
 
 
 template <template <int> class GridClass, int dim>
@@ -171,7 +171,7 @@ InterGridMap<GridClass,dim>::operator [] (const cell_iterator &source_cell) cons
 	  ExcInvalidKey (source_cell));
 
   return mapping[source_cell->level()][source_cell->index()];
-};
+}
 
 
 
@@ -181,7 +181,7 @@ void InterGridMap<GridClass,dim>::clear ()
   mapping.clear ();
   source_grid      = 0;
   destination_grid = 0;
-};
+}
 
 
 
@@ -190,7 +190,7 @@ const GridClass<dim> &
 InterGridMap<GridClass,dim>::get_source_grid () const
 {
   return *source_grid;
-};
+}
 
 
 
@@ -199,7 +199,7 @@ const GridClass<dim> &
 InterGridMap<GridClass,dim>::get_destination_grid () const
 {
   return *destination_grid;
-};
+}
 
 
 
@@ -210,7 +210,7 @@ InterGridMap<GridClass,dim>::memory_consumption () const
   return (MemoryConsumption::memory_consumption (mapping) +
 	  MemoryConsumption::memory_consumption (source_grid) +
 	  MemoryConsumption::memory_consumption (destination_grid));
-};
+}
 
 
   

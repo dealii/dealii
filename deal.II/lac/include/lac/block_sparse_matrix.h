@@ -949,7 +949,7 @@ unsigned int
 BlockSparseMatrix<number>::n_block_cols () const
 {
   return columns;
-};
+}
 
 
 
@@ -959,7 +959,7 @@ unsigned int
 BlockSparseMatrix<number>::n_block_rows () const
 {
   return rows;
-};
+}
 
 
 template <typename number>
@@ -972,7 +972,7 @@ BlockSparseMatrix<number>::block (const unsigned int row,
   Assert (column<columns, ExcIndexRange (column, 0, columns));
   
   return *sub_objects[row][column];
-};
+}
 
 
 
@@ -986,7 +986,7 @@ BlockSparseMatrix<number>::block (const unsigned int row,
   Assert (column<columns, ExcIndexRange (column, 0, columns));
   
   return *sub_objects[row][column];
-};
+}
 
 
 
@@ -996,7 +996,7 @@ unsigned int
 BlockSparseMatrix<number>::m () const
 {
   return sparsity_pattern->n_rows();
-};
+}
 
 
 
@@ -1006,7 +1006,7 @@ unsigned int
 BlockSparseMatrix<number>::n () const
 {
   return sparsity_pattern->n_cols();
-};
+}
 
 
 
@@ -1023,7 +1023,7 @@ BlockSparseMatrix<number>::set (const unsigned int i,
   block(row_index.first,col_index.first).set (row_index.second,
 					      col_index.second,
 					      value);
-};
+}
 
 
 
@@ -1040,7 +1040,7 @@ BlockSparseMatrix<number>::add (const unsigned int i,
   block(row_index.first,col_index.first).add (row_index.second,
 					      col_index.second,
 					      value);
-};
+}
 
 
 
@@ -1055,7 +1055,7 @@ BlockSparseMatrix<number>::operator () (const unsigned int i,
     col_index = sparsity_pattern->column_indices.global_to_local (j);
   return block(row_index.first,col_index.first) (row_index.second,
 						 col_index.second);
-};
+}
 
 
 
@@ -1070,7 +1070,7 @@ BlockSparseMatrix<number>::el (const unsigned int i,
     col_index = sparsity_pattern->column_indices.global_to_local (j);
   return block(row_index.first,col_index.first).el (row_index.second,
 						    col_index.second);
-};
+}
 
 
 
@@ -1086,7 +1086,7 @@ copy_from (const BlockSparseMatrix<somenumber> &source)
       block(r,c).copy_from (source.block(r,c));
   
   return *this;
-};
+}
 
 
 
@@ -1100,7 +1100,7 @@ add_scaled (const number factor,
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       block(r,c).add_scaled (factor, matrix.block(r,c));
-};
+}
 
 
 
@@ -1124,7 +1124,7 @@ BlockSparseMatrix<number>::vmult (BlockVector<somenumber>       &dst,
 	block(row,col).vmult_add (dst.block(row),
 				  src.block(col));
     };
-};
+}
 
 
 
@@ -1147,7 +1147,7 @@ BlockSparseMatrix<number>::vmult_add (BlockVector<somenumber>       &dst,
 	block(row,col).vmult_add (dst.block(row),
 				  src.block(col));
     };
-};
+}
 
 
 
@@ -1171,7 +1171,7 @@ BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>& dst,
 	block(row,col).Tvmult_add (dst.block(col),
 				   src.block(row));
     };
-};
+}
 
 
 
@@ -1192,7 +1192,7 @@ BlockSparseMatrix<number>::Tvmult_add (BlockVector<somenumber>& dst,
 	block(row,col).Tvmult_add (dst.block(col),
 				   src.block(row));
     };
-};
+}
 
 
 
@@ -1214,7 +1214,7 @@ BlockSparseMatrix<number>::matrix_norm_square (const BlockVector<somenumber> &v)
 	norm_sqr += block(row,col).matrix_scalar_product (v.block(row),
 							  v.block(col));
   return norm_sqr;
-};
+}
 
 
 
@@ -1236,7 +1236,7 @@ matrix_scalar_product (const BlockVector<somenumber>    &u,
       result += block(row,col).matrix_scalar_product (u.block(row),
 						      v.block(col));
   return result;
-};
+}
 
 
 
@@ -1289,7 +1289,7 @@ residual (BlockVector<somenumber>          &dst,
   for (unsigned int row=0; row<rows; ++row)
     res += dst.block(row).norm_sqr ();
   return std::sqrt(res);
-};
+}
 
 
 
@@ -1311,7 +1311,7 @@ precondition_Jacobi (BlockVector<somenumber>          &dst,
     block(i,i).precondition_Jacobi (dst.block(i),
 				    src.block(i),
 				    omega);
-};
+}
 
 
 template <typename number>

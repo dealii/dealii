@@ -88,7 +88,7 @@ FullMatrix<number>::all_zero () const
       return false;
 
   return true;
-};
+}
 
 
 
@@ -102,7 +102,7 @@ FullMatrix<number>::operator *= (const double factor)
     *p++ *= factor;
 
   return *this;
-};
+}
 
 
 
@@ -271,7 +271,7 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
 	  };
       };
   };
-};
+}
 
 
 
@@ -605,7 +605,7 @@ number2 FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
     };
 
   return sum;
-};
+}
 
 
 template <typename number>
@@ -636,7 +636,7 @@ number2 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
     };
 
   return sum;
-};
+}
 
 
 
@@ -653,7 +653,7 @@ FullMatrix<number>::symmetrize ()
 	const number t = (this->el(i,j) + this->el(j,i)) / 2;
 	this->el(i,j) = this->el(j,i) = t;
       };
-};
+}
 
 
 template <typename number>
@@ -673,7 +673,7 @@ number FullMatrix<number>::l1_norm () const
 	max = sum;
     }
   return max;
-};
+}
 
 
 template <typename number>
@@ -693,7 +693,7 @@ number FullMatrix<number>::linfty_norm () const
 	max = sum;
     }
   return max;
-};
+}
 
 
 template <typename number>
@@ -1107,7 +1107,7 @@ FullMatrix<number>::operator == (const FullMatrix<number> &M) const
 			 M.data()));
   
   return result;
-};
+}
 
 
 template <typename number>
@@ -1137,7 +1137,7 @@ FullMatrix<number>::determinant () const
       default:
             return 0;
     };
-};
+}
 
 
 template <typename number>
@@ -1335,7 +1335,7 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 	    *this = M;
 	    gauss_jordan();
     };    
-};
+}
 
 
 template <typename number>
@@ -1355,7 +1355,7 @@ FullMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   
   for (unsigned int i=0; i<n; ++i, ++dst_ptr, ++src_ptr)
     *dst_ptr = om * *src_ptr / this->el(i,i);
-};
+}
 
 
 
@@ -1404,7 +1404,7 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
 				   // reset output format
   out.flags (old_flags);
   out.precision(old_precision);
-};
+}
 
 
 
@@ -1567,7 +1567,7 @@ FullMatrix<number>::memory_consumption () const
 {
   return sizeof(*this) - sizeof (Table<2,number>)
     + Table<2,number>::memory_consumption();
-};
+}
 
 
 #endif

@@ -31,7 +31,7 @@ template <typename number>
 SwappableVector<number>::SwappableVector ()
 		:
 		data_is_preloaded (false)
-{};
+{}
 
 
 
@@ -42,7 +42,7 @@ SwappableVector<number>::SwappableVector (const SwappableVector<number> &v) :
                 data_is_preloaded (false)
 {
   Assert (v.filename == "", ExcInvalidCopyOperation());
-};
+}
 
 
 
@@ -58,7 +58,7 @@ SwappableVector<number>::~SwappableVector ()
 
   if (filename != "")
     kill_file ();
-};
+}
 
 
 
@@ -81,7 +81,7 @@ SwappableVector<number>::operator= (const SwappableVector<number> &v)
   lock.release ();
   
   return *this;
-};
+}
 
 
 
@@ -117,7 +117,7 @@ void SwappableVector<number>::swap_out (const std::string &name)
   this->reinit (0);
 
   lock.release ();
-};
+}
 
 
 
@@ -149,7 +149,7 @@ void SwappableVector<number>::reload ()
 				       // branch of the if-clause
       lock.release ();
     };
-};
+}
 
 
 
@@ -182,7 +182,7 @@ void SwappableVector<number>::alert ()
 		    .collect_args(this, true));
 				   // note that reload_vector also
 				   // releases the lock
-};
+}
 
 
 
@@ -206,7 +206,7 @@ void SwappableVector<number>::reload_vector (const bool set_flag)
         data_is_preloaded = true;
       lock.release ();
     };
-};
+}
 
 
 
@@ -235,7 +235,7 @@ void SwappableVector<number>::kill_file ()
     };
 
   lock.release ();
-};
+}
 
 
 
@@ -244,7 +244,7 @@ const std::string &
 SwappableVector<number>::get_filename () const 
 {
   return filename;
-};
+}
 
 
 
@@ -256,7 +256,7 @@ SwappableVector<number>::memory_consumption () const
 	  sizeof(lock) +
 	  MemoryConsumption::memory_consumption (data_is_preloaded) +
 	  Vector<number>::memory_consumption ());
-};
+}
 
 
 

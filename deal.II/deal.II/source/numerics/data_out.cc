@@ -47,7 +47,7 @@ DataEntry (const Vector<double> *data,
 		single_data(data),
 		has_block(false),
 		names(names)
-{};
+{}
 
 
 
@@ -58,7 +58,7 @@ DataEntry (const BlockVector<double> *data,
 		block_data(data),
 		has_block(true),
 		names(names)
-{};
+{}
 
 
 
@@ -69,7 +69,7 @@ DataEntry::memory_consumption () const
 {
   return (sizeof (single_data) + sizeof (block_data) +
 	  MemoryConsumption::memory_consumption (names));
-};
+}
 
 
 
@@ -78,7 +78,7 @@ DataEntry::memory_consumption () const
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataOut_DoFData () :
 		dofs(0)
-{};
+{}
 
 
 
@@ -86,7 +86,7 @@ template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::~DataOut_DoFData ()
 {
   clear ();
-};
+}
 
 
 
@@ -104,7 +104,7 @@ attach_dof_handler (const DoFHandler<dof_handler_dim> &d)
   dofs = &d;
   if (dofs != 0)
     dofs->subscribe ();
-};
+}
 
 
 
@@ -177,7 +177,7 @@ add_data_vector (const VECTOR                   &vec,
     dof_data.push_back (new_entry);
   else
     cell_data.push_back (new_entry);
-};
+}
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
@@ -258,7 +258,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_input_data_ref
       dofs->unsubscribe ();
       dofs = 0;
     };
-};
+}
 
 
 
@@ -301,7 +301,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_dataset_names ()
     };
 
   return names;
-};
+}
 
 
 
@@ -310,7 +310,7 @@ const std::vector< ::DataOutBase::Patch<patch_dim, patch_space_dim> > &
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;
-};
+}
 
 
 
@@ -323,7 +323,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::memory_consumption (
 	  MemoryConsumption::memory_consumption (dof_data) +
 	  MemoryConsumption::memory_consumption (cell_data) +
 	  MemoryConsumption::memory_consumption (patches));
-};
+}
 
 
 

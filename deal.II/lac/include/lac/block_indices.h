@@ -162,7 +162,7 @@ BlockIndices::BlockIndices (const unsigned int n_blocks)
 {
   for (unsigned int i=0; i<=n_blocks; ++i)
     start_indices[i] = 0;
-};
+}
 
 
 
@@ -173,7 +173,7 @@ BlockIndices::BlockIndices (const std::vector<unsigned int> &n)
 		start_indices(n.size()+1)
 {
   reinit (n);
-};
+}
 
 
 
@@ -184,7 +184,7 @@ BlockIndices::reinit (const unsigned int n_blocks,
 {
   const std::vector<unsigned int> v(n_blocks, n_elements_per_block);
   reinit (v);
-};
+}
 
 
 
@@ -200,7 +200,7 @@ BlockIndices::reinit (const std::vector<unsigned int> &n)
   start_indices[0] = 0;
   for (unsigned int i=1; i<=n_blocks; ++i)
     start_indices[i] = start_indices[i-1] + n[i-1];
-};
+}
 
 
 
@@ -215,7 +215,7 @@ BlockIndices::global_to_local (const unsigned int i) const
     --block;
 
   return std::make_pair<unsigned int>(block, i-start_indices[block]);
-};
+}
 
 
 inline
@@ -228,7 +228,7 @@ BlockIndices::local_to_global (const unsigned int block,
 	  ExcIndexRange (index, 0, start_indices[block+1]-start_indices[block]));
 
   return start_indices[block]+index;
-};
+}
 
 
 inline
@@ -245,7 +245,7 @@ unsigned int
 BlockIndices::total_size () const
 {
   return start_indices[n_blocks];
-};
+}
 
 
 
@@ -255,7 +255,7 @@ BlockIndices::block_size (const unsigned int block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   return start_indices[block+1]-start_indices[block];
-};
+}
 
 
 
@@ -266,7 +266,7 @@ BlockIndices::operator = (const BlockIndices &b)
   start_indices = b.start_indices;
   n_blocks = b.n_blocks;
   return *this;
-};
+}
 
 
 
@@ -282,7 +282,7 @@ BlockIndices::operator == (const BlockIndices &b) const
       return false;
   
   return true;
-};
+}
 
 
 
@@ -295,7 +295,7 @@ BlockIndices::swap (BlockIndices &b)
 
   for (unsigned int i=0; i<=n_blocks; ++i)
     std::swap (start_indices[i], b.start_indices[i]);
-};
+}
 
 
 
@@ -305,7 +305,7 @@ BlockIndices::memory_consumption () const
 {
   return (sizeof(*this) + 
 	  start_indices.size() * sizeof(start_indices[0]));
-};
+}
 
 
 
@@ -323,7 +323,7 @@ inline
 void swap (BlockIndices &u, BlockIndices &v)
 {
   u.swap (v);
-};
+}
 
 
 

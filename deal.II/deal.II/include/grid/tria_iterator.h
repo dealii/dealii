@@ -871,7 +871,7 @@ template <int dim, typename Accessor>
 inline
 TriaRawIterator<dim,Accessor>::TriaRawIterator (const Accessor &a) :
 		accessor (a)
-{};
+{}
 
 
 
@@ -880,7 +880,7 @@ template <typename OtherAccessor>
 inline
 TriaRawIterator<dim,Accessor>::TriaRawIterator (const TriaRawIterator<dim,OtherAccessor> &i)
 		: accessor (i.accessor)
-{};
+{}
 
 
 
@@ -892,7 +892,7 @@ TriaRawIterator<dim,Accessor>::operator * () const
   Assert (state() == IteratorState::valid,
 	  ExcDereferenceInvalidObject(accessor));
   return accessor;
-};
+}
 
 
 
@@ -904,7 +904,7 @@ TriaRawIterator<dim,Accessor>::operator * ()
   Assert (state() == IteratorState::valid,
 	  ExcDereferenceInvalidObject(accessor));
   return accessor;
-};
+}
 
 
 
@@ -914,7 +914,7 @@ const Accessor *
 TriaRawIterator<dim,Accessor>::operator -> () const
 {
   return &(this->operator* ());
-};
+}
 
 
 
@@ -924,7 +924,7 @@ Accessor *
 TriaRawIterator<dim,Accessor>::operator -> ()
 {
   return &(this->operator* ());
-};
+}
 
 
 
@@ -934,7 +934,7 @@ IteratorState::IteratorStates
 TriaRawIterator<dim,Accessor>::state () const
 {
   return accessor.state ();
-};
+}
 
 
 
@@ -957,7 +957,7 @@ TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const
 	   (i.state()==IteratorState::valid)                 ) ||
 	  ((state()==IteratorState::valid) &&
 	   (i.state()==IteratorState::past_the_end)));
-};
+}
 
 
 template <int dim, typename Accessor>
@@ -969,7 +969,7 @@ TriaRawIterator<dim,Accessor>::operator ++ ()
 
   ++accessor;
   return *this;
-};
+}
 
 
 
@@ -982,7 +982,7 @@ TriaRawIterator<dim,Accessor>::operator -- ()
 
   --accessor;
   return *this;
-};
+}
 
 
 
@@ -992,7 +992,7 @@ void
 TriaRawIterator<dim,Accessor>::print (std::ostream &out) const
 {
   out << accessor.level() << "." << accessor.index();
-};
+}
 
 
 
@@ -1002,7 +1002,7 @@ unsigned int
 TriaRawIterator<dim,Accessor>::memory_consumption () const
 {
   return sizeof(TriaRawIterator<dim,Accessor>);
-};
+}
 
 
 
@@ -1011,7 +1011,7 @@ template <typename OtherAccessor>
 inline
 TriaIterator<dim,Accessor>::TriaIterator (const TriaIterator<dim,OtherAccessor> &i)
 		: TriaRawIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
-{};
+{}
 
 
 
@@ -1032,7 +1032,7 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,OtherAccesso
     Assert (this->accessor.used(),
 	    ExcAssignmentOfUnusedObject());
 #endif
-};
+}
 
 
 
@@ -1041,7 +1041,7 @@ template <typename OtherAccessor>
 inline
 TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i)
 		: TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
-{};
+{}
 
 
 
@@ -1062,7 +1062,7 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
     Assert (this->accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif
-};
+}
 
 
 
@@ -1081,7 +1081,7 @@ std::ostream & operator << (std::ostream                        &out,
 {
   i.print(out);
   return out;
-};
+}
 
 
 
@@ -1100,7 +1100,7 @@ std::ostream & operator << (std::ostream                     &out,
 {
   i.print(out);
   return out;
-};
+}
 
 
 
@@ -1119,7 +1119,7 @@ std::ostream & operator << (std::ostream                           &out,
 {
   i.print(out);
   return out;
-};
+}
 
 
 

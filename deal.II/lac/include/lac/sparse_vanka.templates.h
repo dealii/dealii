@@ -129,7 +129,7 @@ SparseVanka<number>::compute_inverses ()
   
       thread_manager.wait ();
     };
-};
+}
 
 
 template <typename number>
@@ -147,7 +147,7 @@ SparseVanka<number>::compute_inverses (const unsigned int begin,
   for (unsigned int row=begin; row<end; ++row)
     if (selected[row] == true)
       compute_inverse (row, local_indices);
-};
+}
 
 
 
@@ -191,7 +191,7 @@ SparseVanka<number>::compute_inverse (const unsigned int         row,
   
 				   // Compute inverse
   inverses[row]->gauss_jordan();
-};
+}
 
 
 template<typename number>
@@ -205,7 +205,7 @@ SparseVanka<number>::vmult (Vector<number2>       &dst,
 				   // then pass on to the function
 				   // that actually does the work
   apply_preconditioner (dst, src);
-};
+}
 
 
 
@@ -366,7 +366,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
 	if (conserve_mem == true)
 	  inverses[row] = 0;
       };
-};
+}
 
 
 
@@ -380,7 +380,7 @@ SparseVanka<number>::memory_consumption () const
     mem += MemoryConsumption::memory_consumption (*inverses[i]);
   
   return mem;
-};
+}
 
 
 
@@ -399,7 +399,7 @@ SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
 		           std::vector<bool>(M.m(), false))
 {
   compute_dof_masks (M, selected, blocking_strategy);
-};
+}
 
 
 template <typename number>
@@ -561,7 +561,7 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
       default:
 	    Assert (false, ExcInternalError());
     };
-};
+}
 
 
 
@@ -625,7 +625,7 @@ SparseBlockVanka<number>::memory_consumption () const
   for (unsigned int i=0; i<dof_masks.size(); ++i)
     mem += MemoryConsumption::memory_consumption (dof_masks[i]);
   return mem;
-};
+}
 
 	  
 

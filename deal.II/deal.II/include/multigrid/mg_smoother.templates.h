@@ -30,7 +30,7 @@ MGSmootherRelaxation<MATRIX, VECTOR>
 		matrix(&matrix),
 		relaxation(relaxation),
 		omega(omega)
-{};
+{}
 
 
 template<class MATRIX, class VECTOR>

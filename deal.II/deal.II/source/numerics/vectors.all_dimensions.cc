@@ -44,4 +44,4 @@ VectorTools::subtract_mean_value(Vector<double>     &v,
   for (unsigned int i=0; i<n; ++i)
     if (p_select[i])
       v(i) -= s;  
-};
+}

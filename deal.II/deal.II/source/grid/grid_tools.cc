@@ -70,7 +70,7 @@ GridTools::diameter (const Triangulation<dim> &tria)
     };
 
   return std::sqrt(max_distance_sqr);
-};
+}
 
 
 #else
@@ -88,7 +88,7 @@ GridTools::diameter (const Triangulation<1> &tria)
   while (!rightmost->at_boundary(1)) rightmost = rightmost->neighbor(1);
 
   return std::sqrt((leftmost->vertex(0) - rightmost->vertex(1)).square());
-};
+}
 
 #endif
 
@@ -151,7 +151,7 @@ namespace
     private:
       const double factor;
   };
-};
+}
 
 
 template <int dim>
@@ -160,7 +160,7 @@ GridTools::shift (const Point<dim>   &shift_vector,
 		  Triangulation<dim> &triangulation)
 {
   transform (ShiftPoint<dim>(shift_vector), triangulation);
-};
+}
 
 
 #if deal_II_dimension == 2
@@ -170,7 +170,7 @@ GridTools::rotate (const double      angle,
 		   Triangulation<2> &triangulation)
 {
   transform (Rotate2d(angle), triangulation);
-};
+}
 
 #endif
 
@@ -182,7 +182,7 @@ GridTools::scale (const double        scaling_factor,
 {
   Assert (scaling_factor>0, ExcScalingFactorNotPositive (scaling_factor));
   transform (ScalePoint<dim>(scaling_factor), triangulation);
-};
+}
 
 
 

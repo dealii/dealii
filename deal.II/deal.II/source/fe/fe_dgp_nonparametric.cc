@@ -72,7 +72,7 @@ FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
                                    // elements have neither support
                                    // nor face-support points, so
                                    // leave these fields empty
-};
+}
 
 
 
@@ -378,7 +378,7 @@ unsigned int
 FE_DGPNonparametric<dim>::n_base_elements () const
 {
   return 1;
-};
+}
 
 
 
@@ -388,7 +388,7 @@ FE_DGPNonparametric<dim>::base_element (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return *this;
-};
+}
 
 
 
@@ -398,7 +398,7 @@ FE_DGPNonparametric<dim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return 1;
-};
+}
 
 
 
@@ -427,7 +427,7 @@ unsigned int
 FE_DGPNonparametric<dim>::get_degree () const
 {
   return degree;
-};
+}
 
 
 

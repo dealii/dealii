@@ -34,7 +34,7 @@ namespace IteratorState
 	past_the_end,
 	invalid
   };
-};
+}
 
 
 

@@ -28,7 +28,7 @@ namespace
 // include the huge <thread_management.h> file into the
 // <subscriptor.h> file).
   Threads::ThreadMutex subscription_lock;
-};
+}
 
 
 
@@ -87,13 +87,13 @@ ActiveObjectMonitor::deregister_object (const Subscriptor *p)
 Subscriptor::Subscriptor () :
 		counter (0),
 		object_info (0)
-{};
+{}
 
 
 Subscriptor::Subscriptor (const Subscriptor &) :
 		counter (0),
 		object_info (0)
-{};
+{}
 
 
 Subscriptor::~Subscriptor ()
@@ -118,7 +118,7 @@ Subscriptor & Subscriptor::operator = (const Subscriptor &s)
 {
   object_info = s.object_info;
   return *this;
-};
+}
 
 
 
@@ -132,7 +132,7 @@ void Subscriptor::subscribe () const
   subscription_lock.acquire();
   ++counter;
   subscription_lock.release();
-};
+}
 
 
 void Subscriptor::unsubscribe () const {
@@ -140,10 +140,10 @@ void Subscriptor::unsubscribe () const {
   subscription_lock.acquire();
   --counter;
   subscription_lock.release();
-};
+}
 
 
 unsigned int Subscriptor::n_subscriptions () const 
 {
   return counter;
-};
+}

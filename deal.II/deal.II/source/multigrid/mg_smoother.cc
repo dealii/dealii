@@ -47,7 +47,7 @@ MGSmootherContinuous<VECTOR>::MGSmootherContinuous (
 		steps(steps)
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 #endif
 
@@ -115,7 +115,7 @@ MGSmootherContinuous<VECTOR>::MGSmootherContinuous (
 				       // for this level its destination
       interior_boundary_dofs[level-1] = boundary_dofs;
     };      
-};
+}
 
 #endif
 
@@ -132,7 +132,7 @@ MGSmootherContinuous<VECTOR>::set_zero_interior_boundary (const unsigned int lev
     for (std::vector<unsigned int>::const_iterator p=interior_boundary_dofs[level-1].begin();
 	 p!=interior_boundary_dofs[level-1].end(); ++p)
       u(*p) = 0;
-};
+}
 
 //////////////////////////////////////////////////////////////////////
 

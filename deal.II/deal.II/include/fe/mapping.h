@@ -550,7 +550,7 @@ Mapping<dim>::InternalDataBase::current_update_flags () const
     }
   else
     return update_each;
-};
+}
 
 
 
@@ -560,7 +560,7 @@ bool
 Mapping<dim>::InternalDataBase::is_first_cell () const
 {
   return first_cell;
-};
+}
 
 
 
@@ -570,7 +570,7 @@ void
 Mapping<dim>::InternalDataBase::clear_first_cell ()
 {
   first_cell = false;
-};
+}
 
 
 #endif

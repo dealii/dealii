@@ -470,7 +470,7 @@ namespace deal_II_numbers {
                                               * 1/sqrt(2)
                                               */
   static const double  SQRT1_2 = 0.70710678118654752440;
-};
+}
 #endif
 ])
 

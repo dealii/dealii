@@ -306,7 +306,7 @@ LogStream::operator<< (const T& t)
 				   // the two operator<< functions
   print (t);
   return *this;
-};
+}
 
 
 
@@ -326,7 +326,7 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream&))
     was_endl = true;
 
   return *this;
-};
+}
 
 
 

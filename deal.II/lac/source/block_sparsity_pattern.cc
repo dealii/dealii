@@ -21,7 +21,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase ()
 		:
 		rows (0),
 		columns (0)
-{};
+{}
 
 
 
@@ -34,7 +34,7 @@ BlockSparsityPatternBase (const unsigned int r,
 		columns (0)
 {
   reinit (r,c);
-};
+}
 
 
 
@@ -48,7 +48,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase (
 
   rows = 0;
   columns=0;
-};
+}
 
 
 
@@ -57,7 +57,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::~BlockSparsityPatternBase ()
 {
 				   // clear all memory
   reinit (0,0);
-};
+}
 
 
 
@@ -85,7 +85,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::reinit (const unsigned int r,
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)
       sub_objects[i][j] = new SparsityPatternBase;
-};
+}
 
 
 
@@ -104,7 +104,7 @@ operator = (const BlockSparsityPatternBase<SparsityPatternBase> &bsp)
   collect_sizes ();
 
   return *this;
-};
+}
   
 
 
@@ -143,7 +143,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::collect_sizes ()
 				   // finally initialize the row
 				   // indices with this array
   column_indices.reinit (col_sizes);
-};
+}
 
 
 
@@ -154,7 +154,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::compress ()
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)
       sub_objects[i][j]->compress ();
-};
+}
 
 
 
@@ -167,7 +167,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::empty () const
       if (sub_objects[i][j]->empty () == false)
 	return false;
   return true;
-};
+}
 
 
 
@@ -186,7 +186,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::max_entries_per_row () const
 	max_entries = this_row;
     };
   return max_entries;
-};
+}
 
 
 
@@ -200,7 +200,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_rows () const
   for (unsigned int r=0; r<rows; ++r)
     count += sub_objects[r][0]->n_rows();
   return count;
-};
+}
 
 
 
@@ -214,7 +214,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_cols () const
   for (unsigned int c=0; c<columns; ++c)
     count += sub_objects[0][c]->n_cols();
   return count;
-};
+}
 
 
 
@@ -227,12 +227,12 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_nonzero_elements () const
     for (unsigned int j=0; j<columns; ++j)
       count += sub_objects[i][j]->n_nonzero_elements ();
   return count;
-};
+}
 
 
 
 BlockSparsityPattern::BlockSparsityPattern ()
-{};
+{}
 
 
 
@@ -241,7 +241,7 @@ BlockSparsityPattern::BlockSparsityPattern (const unsigned int n_rows,
 		:
 		BlockSparsityPatternBase<SparsityPattern>(n_rows,
 							  n_columns)
-{};
+{}
 
 
 
@@ -253,7 +253,7 @@ BlockSparsityPattern::is_compressed () const
       if (sub_objects[i][j]->is_compressed () == false)
 	return false;
   return true;
-};
+}
 
 
 
@@ -271,7 +271,7 @@ BlockSparsityPattern::memory_consumption () const
       mem += MemoryConsumption::memory_consumption (*sub_objects[r][c]);
   
   return mem;
-};
+}
 
 
 
@@ -290,12 +290,12 @@ BlockSparsityPattern::copy_from  (const CompressedBlockSparsityPattern &csp)
 				   // and finally enquire their new
 				   // sizes
   collect_sizes();
-};
+}
 
 
 
 CompressedBlockSparsityPattern::CompressedBlockSparsityPattern ()
-{};
+{}
 
 
 
@@ -305,7 +305,7 @@ CompressedBlockSparsityPattern (const unsigned int n_rows,
 		:
 		BlockSparsityPatternBase<CompressedSparsityPattern>(n_rows,
 								    n_columns)
-{};
+{}
 
 
 

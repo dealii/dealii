@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -531,7 +531,7 @@ namespace deal_II_exceptions
 
   }
   
-};
+}
 
 
 
@@ -934,7 +934,7 @@ namespace StandardExceptions
 		  << arg1 << " switch. You should either use an\n"
 		  << "alternative function, or configure again without\n"
 		  << "this switch and recompile the library.");
-};
+}
 
 
 using namespace StandardExceptions;

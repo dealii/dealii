@@ -108,7 +108,7 @@ unsigned int MultithreadInfo::get_n_cpus()
 MultithreadInfo::MultithreadInfo () :
                 n_cpus (get_n_cpus()),
                 n_default_threads (n_cpus)
-{};
+{}
 
 
 
@@ -118,7 +118,7 @@ MultithreadInfo::memory_consumption ()
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (MultithreadInfo);
-};
+}
 
 
 

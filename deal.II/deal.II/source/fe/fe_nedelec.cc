@@ -260,7 +260,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
   std::vector<std::pair<unsigned,unsigned> > tmp1, tmp2;
   this->system_to_component_table.swap (tmp1);
   this->face_system_to_component_table.swap (tmp2);
-};
+}
 
 
 
@@ -643,7 +643,7 @@ void FE_Nedelec<dim>::initialize_unit_support_points ()
 					     // right now
 	    Assert (false, ExcNotImplemented());
     };
-};
+}
 
 
 #if deal_II_dimension == 1
@@ -652,7 +652,7 @@ template <>
 void FE_Nedelec<1>::initialize_unit_face_support_points ()
 {
 				   // no faces in 1d, so nothing to do
-};
+}
 
 #endif
 
@@ -691,7 +691,7 @@ void FE_Nedelec<dim>::initialize_unit_face_support_points ()
 					     // right now
 	    Assert (false, ExcNotImplemented());
     };	    
-};
+}
 
 
 
@@ -938,7 +938,7 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 
   if (flags & update_second_derivatives)
     this->compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
-};
+}
 
 
 
@@ -1222,7 +1222,7 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
 
   if (flags & update_second_derivatives)
     this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
-};
+}
 
 
 
@@ -1231,7 +1231,7 @@ unsigned int
 FE_Nedelec<dim>::n_base_elements () const
 {
   return 1;
-};
+}
 
 
 
@@ -1241,7 +1241,7 @@ FE_Nedelec<dim>::base_element (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return *this;
-};
+}
 
 
 
@@ -1251,7 +1251,7 @@ FE_Nedelec<dim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return 1;
-};
+}
 
 
 
@@ -1332,7 +1332,7 @@ unsigned int
 FE_Nedelec<dim>::get_degree () const
 {
   return degree;
-};
+}
 
 
 

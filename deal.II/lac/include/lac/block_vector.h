@@ -586,7 +586,7 @@ namespace BlockVectorIterators
       friend class InverseConstnessIterator;
 #endif
   };
-};
+}
 
 
 
@@ -1250,7 +1250,7 @@ BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n,
       start = end;
     };
   Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
-};
+}
 
 
 
@@ -1300,7 +1300,7 @@ BlockVector<Number> & BlockVector<Number>::operator *= (const Number factor)
 {
   scale (factor);
   return *this;
-};
+}
 
 
 
@@ -1795,7 +1795,7 @@ namespace BlockVectorIterators
     return *this;
   }
   
-};
+}
 
 
 /**
@@ -1811,7 +1811,7 @@ void swap (BlockVector<Number> &u,
 	   BlockVector<Number> &v)
 {
   u.swap (v);
-};
+}
 
 
 

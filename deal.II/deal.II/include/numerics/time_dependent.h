@@ -1545,7 +1545,7 @@ namespace TimeStepBase_Tria_Flags
 		      double,
 		      << "The following value does not fulfill the requirements: " << arg1);
   };
-};
+}
 
 
 
@@ -1975,7 +1975,7 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 		  timesteps[n_timesteps-(step-look_back)-1]->sleep(look_back);
 		break;
 	};
-};
+}
 
 
 /*----------------------------   time-dependent.h     ---------------------------*/

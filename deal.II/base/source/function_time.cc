@@ -27,10 +27,10 @@ void
 FunctionTime::set_time (const double new_time)
 {
   time = new_time;
-};
+}
 
 void
 FunctionTime::advance_time (const double delta_t)
 {
   set_time (time+delta_t);
-};
+}

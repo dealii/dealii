@@ -24,7 +24,7 @@
 CompressedSparsityPattern::CompressedSparsityPattern () :
 		rows(0),
 		cols(0)
-{};
+{}
 
 
 
@@ -35,7 +35,7 @@ CompressedSparsityPattern::CompressedSparsityPattern (const CompressedSparsityPa
 {
   Assert (s.rows == 0, ExcInvalidConstructorCall());
   Assert (s.cols == 0, ExcInvalidConstructorCall());
-};
+}
 
 
 
@@ -45,7 +45,7 @@ CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int m,
 		  cols(0)
 {
   reinit (m,n);
-};
+}
 
 
 
@@ -54,7 +54,7 @@ CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int n)
 		  cols(0)
 {
   reinit (n,n);
-};
+}
 
 
 
@@ -68,7 +68,7 @@ CompressedSparsityPattern::operator = (const CompressedSparsityPattern &s)
   Assert (cols == 0, ExcInvalidConstructorCall());
 
   return *this;
-};
+}
 
 
 
@@ -87,7 +87,7 @@ CompressedSparsityPattern::reinit (const unsigned int m,
 
 void
 CompressedSparsityPattern::compress ()
-{};
+{}
 
 
 
@@ -95,7 +95,7 @@ bool
 CompressedSparsityPattern::empty () const
 {
   return ((rows==0) && (cols==0));
-};
+}
 
 
 
@@ -107,7 +107,7 @@ CompressedSparsityPattern::max_entries_per_row () const
     m = std::max (m, static_cast<unsigned int>(column_indices[i].size()));
 
   return m;
-};
+}
 
 
 
@@ -122,7 +122,7 @@ CompressedSparsityPattern::add (const unsigned int i,
 				   // assures uniqueness and
 				   // sortedness of the column indices
   column_indices[i].insert (j);
-};
+}
 
 
 bool 
@@ -159,7 +159,7 @@ CompressedSparsityPattern::symmetrize ()
 				       // this is not the diagonal
       if (row != *i)
 	add (*i, row);
-};
+}
 
 
 
@@ -187,7 +187,7 @@ unsigned int
 CompressedSparsityPattern::row_length (const unsigned int row) const
 {
   return column_indices[row].size();
-};
+}
 
 
 
@@ -200,7 +200,7 @@ CompressedSparsityPattern::column_number (const unsigned int row,
   std::set<unsigned int>::const_iterator p = column_indices[row].begin();
   std::advance (p, index);
   return *p;
-};
+}
 
 
 
@@ -215,7 +215,7 @@ CompressedSparsityPattern::bandwidth () const
 	b = std::abs(static_cast<signed int>(row-*i));
 
   return b;
-};
+}
 
 
 
@@ -226,4 +226,4 @@ CompressedSparsityPattern::n_nonzero_elements () const
   for (unsigned int i=0; i<rows; ++i)
     n += column_indices[i].size();
   return n;
-};
+}

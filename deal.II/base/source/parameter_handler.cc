@@ -36,7 +36,7 @@ namespace Patterns
 {  
 
   PatternBase::~PatternBase ()
-  {};
+  {}
 
 
   unsigned int
@@ -52,7 +52,7 @@ namespace Patterns
       return sizeof(Anything);
     else
       return sizeof(*this) + 32;
-  };
+  }
   
 
 
@@ -75,7 +75,7 @@ namespace Patterns
 		    const int upper_bound) :
 		  lower_bound (lower_bound),
 		  upper_bound (upper_bound)
-  {};
+  {}
 
 
 
@@ -101,7 +101,7 @@ namespace Patterns
       };
   
     return false;
-  };
+  }
 
 
 
@@ -130,7 +130,7 @@ namespace Patterns
 				       // if no bounds were given, then
 				       // return generic string
       return "[Integer]";
-  };
+  }
 
 
 
@@ -138,7 +138,7 @@ namespace Patterns
   Integer::clone () const
   {
     return new Integer(lower_bound, upper_bound);
-  };
+  }
 
 
 
@@ -160,7 +160,7 @@ namespace Patterns
 		  const double upper_bound) :
 		  lower_bound (lower_bound),
 		  upper_bound (upper_bound)
-  {};
+  {}
 
 
 
@@ -185,7 +185,7 @@ namespace Patterns
 	  return true;
       };
     return false;
-  };
+  }
 
 
 
@@ -214,14 +214,14 @@ namespace Patterns
 				       // if no bounds were given, then
 				       // return generic string
       return "[Double]";
-  };
+  }
 
 
   PatternBase *
   Double::clone () const
   {
     return new Double(lower_bound, upper_bound);
-  };
+  }
 
 
 
@@ -233,7 +233,7 @@ namespace Patterns
       sequence.replace (sequence.find(" |"), 2, "|");
     while (sequence.find("| ") != std::string::npos)
       sequence.replace (sequence.find("| "), 2, "|");
-  };
+  }
 
 
 
@@ -255,14 +255,14 @@ namespace Patterns
 
 				     // not found
     return false;
-  };
+  }
 
 
 
   std::string Selection::description () const
   {
     return sequence;
-  };
+  }
 
 
 
@@ -270,7 +270,7 @@ namespace Patterns
   Selection::clone () const
   {
     return new Selection(sequence);
-  };
+  }
 
 
   unsigned int
@@ -278,7 +278,7 @@ namespace Patterns
   {
     return (sizeof(PatternBase) +
 	    MemoryConsumption::memory_consumption(sequence));
-  };
+  }
   
 
 
@@ -300,7 +300,7 @@ namespace Patterns
   {
     Assert (min_elements <= max_elements,
             ExcInvalidRange (min_elements, max_elements));
-  };
+  }
 
 
 
@@ -308,7 +308,7 @@ namespace Patterns
   {
     delete pattern;
     pattern = 0;
-  };
+  }
 
 
 
@@ -353,7 +353,7 @@ namespace Patterns
         return false;
 
     return true;
-  };
+  }
 
 
 
@@ -374,7 +374,7 @@ namespace Patterns
 #endif
 
     return description.str();
-  };
+  }
 
 
 
@@ -382,7 +382,7 @@ namespace Patterns
   List::clone () const
   {
     return new List(*pattern, min_elements, max_elements);
-  };
+  }
 
 
   unsigned int
@@ -390,7 +390,7 @@ namespace Patterns
   {
     return (sizeof(PatternBase) +
 	    MemoryConsumption::memory_consumption(*pattern));
-  };
+  }
 
   
   
@@ -403,7 +403,7 @@ namespace Patterns
       sequence.replace (sequence.find(" |"), 2, "|");
     while (sequence.find("| ") != std::string::npos)
       sequence.replace (sequence.find("| "), 2, "|");
-  };
+  }
 
 
 
@@ -467,14 +467,14 @@ namespace Patterns
       };
 
     return true;
-  };
+  }
 
 
 
   std::string MultipleSelection::description () const
   {
     return sequence;
-  };
+  }
 
 
 
@@ -482,7 +482,7 @@ namespace Patterns
   MultipleSelection::clone () const
   {
     return new MultipleSelection(sequence);
-  };
+  }
 
 
   unsigned int
@@ -490,13 +490,13 @@ namespace Patterns
   {
     return (sizeof(PatternBase) +
 	    MemoryConsumption::memory_consumption(sequence));
-  };
+  }
 
 
 
   Bool::Bool () :
 		  Selection ("true|false")
-  {};
+  {}
 
 
 
@@ -504,26 +504,26 @@ namespace Patterns
   Bool::clone () const
   {
     return new Bool();
-  };
+  }
 
 
 
   Anything::Anything ()
-  {};
+  {}
 
 
 
   bool Anything::match (const std::string &) const
   {
     return true;
-  };
+  }
 
 
 
   std::string Anything::description () const
   {
     return "[Anything]";
-  };
+  }
 
 
 
@@ -531,19 +531,19 @@ namespace Patterns
   Anything::clone () const
   {
     return new Anything();
-  };
+  }
  
 }   // end namespace Patterns
 
 
 
 ParameterHandler::ParameterHandler () :
-		status(true) {};
+		status(true) {}
 
 
 
 ParameterHandler::~ParameterHandler ()
-{};
+{}
 
 
 
@@ -562,7 +562,7 @@ bool ParameterHandler::read_input (std::istream &input)
     };
 
   return status;
-};
+}
 
 
 
@@ -619,7 +619,7 @@ bool ParameterHandler::read_input_from_string (const char *s)
     };
 
   return status;
-};
+}
 
 
 
@@ -644,7 +644,7 @@ void ParameterHandler::clear ()
 
   defaults.subsections.clear ();
   changed_entries.subsections.clear ();
-};
+}
 
 
 
@@ -675,7 +675,7 @@ bool ParameterHandler::declare_entry (const std::string           &entry,
     return false;
 
   return true;
-};
+}
 
 
 
@@ -697,7 +697,7 @@ void ParameterHandler::enter_subsection (const std::string &subsection)
 
 				   // finally enter subsection
   subsection_path.push_back (subsection);
-};
+}
 
 
 
@@ -716,7 +716,7 @@ bool ParameterHandler::leave_subsection ()
 
   subsection_path.pop_back ();
   return true;
-};
+}
 
 
 
@@ -747,7 +747,7 @@ const std::string & ParameterHandler::get (const std::string &entry_string) cons
 				   // not changed
   ptr = pd->entries.find (entry_string);
   return ptr->second.first;
-};
+}
 
 
 
@@ -761,7 +761,7 @@ long int ParameterHandler::get_integer (const std::string &entry_string) const
 	       ExcConversionError(s));
 
   return i;
-};
+}
 
 
 
@@ -775,7 +775,7 @@ double ParameterHandler::get_double (const std::string &entry_string) const
 	       ExcConversionError(s));
 
   return d;
-};
+}
 
 
 
@@ -788,7 +788,7 @@ bool ParameterHandler::get_bool (const std::string &entry_string) const
     return true;
   else
     return false;
-};
+}
 
 
 
@@ -832,7 +832,7 @@ std::ostream & ParameterHandler::print_parameters (std::ostream &out,
     };
   
   return out;
-};
+}
 
 
 void
@@ -843,7 +843,7 @@ ParameterHandler::log_parameters (LogStream &out)
   log_parameters_section (out);
 
   out.pop();
-};
+}
 
 
 
@@ -970,7 +970,7 @@ void ParameterHandler::print_parameters_section (std::ostream      &out,
 		Assert (false, ExcNotImplemented());
 	};
     };
-};
+}
 
 
 
@@ -1008,7 +1008,7 @@ void ParameterHandler::log_parameters_section (LogStream &out)
       leave_subsection ();
       out.pop();
     };
-};
+}
 
 
 
@@ -1141,7 +1141,7 @@ bool ParameterHandler::scan_line (std::string        line,
   std::cerr << "Line " << lineno << ": This line matched nothing known:" << std::endl
 	    << "    " << line << std::endl;
   return false;
-};
+}
 
 
 
@@ -1157,7 +1157,7 @@ ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection ()
     };
 
   return sec;
-};
+}
 
 
 
@@ -1174,7 +1174,7 @@ const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsecti
     };
 
   return sec;
-};
+}
 
 
 
@@ -1190,7 +1190,7 @@ ParameterHandler::Section* ParameterHandler::get_present_changed_subsection ()
     };
 
   return sec;
-};
+}
 
 
 
@@ -1206,7 +1206,7 @@ const ParameterHandler::Section* ParameterHandler::get_present_changed_subsectio
     };
 
   return sec;
-};
+}
 
 
 
@@ -1217,7 +1217,7 @@ ParameterHandler::memory_consumption () const
 	  MemoryConsumption::memory_consumption (subsection_path) +
 	  MemoryConsumption::memory_consumption (defaults) +
 	  MemoryConsumption::memory_consumption (changed_entries));
-};
+}
 
 
 
@@ -1239,7 +1239,7 @@ ParameterHandler::Section::~Section ()
     delete p->second;
 
   subsections.clear ();
-};
+}
 
 
 
@@ -1255,19 +1255,19 @@ ParameterHandler::Section::memory_consumption () const
     mem += (MemoryConsumption::memory_consumption (i->first) +
 	    MemoryConsumption::memory_consumption (*(i->second)));
   return mem;
-};
+}
 
 
 
 
 MultipleParameterLoop::MultipleParameterLoop() :
 		n_branches(0)
-{};
+{}
 
 
 
 MultipleParameterLoop::~MultipleParameterLoop ()
-{};
+{}
 
 
 
@@ -1279,7 +1279,7 @@ bool MultipleParameterLoop::read_input (std::istream &input)
   if (x)
     init_branches ();
   return x;
-};
+}
 
 
 
@@ -1290,7 +1290,7 @@ bool MultipleParameterLoop::read_input (const std::string &filename)
 				   // function calls
 				   // MultipleParameterLoop::Readinput(std::istream &, std::ostream &)
 				   // which itself calls init_branches.
-};
+}
 
 
 
@@ -1299,7 +1299,7 @@ bool MultipleParameterLoop::read_input_from_string (const char *s)
   bool x = ParameterHandler::read_input (s);
   init_branches ();
   return x;
-};
+}
 
 
 
@@ -1312,7 +1312,7 @@ void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc)
       fill_entry_values (run_no);
       uc.run (*this);
     };
-};
+}
 
 
 
@@ -1369,7 +1369,7 @@ void MultipleParameterLoop::init_branches ()
 				   // other output)
   for (unsigned int i=0; i<n_branches; ++i) 
     fill_entry_values (i);
-};
+}
 
 
 
@@ -1393,7 +1393,7 @@ void MultipleParameterLoop::init_branches_section (const ParameterHandler::Secti
       init_branches_section (*s->second);
       leave_subsection ();
     };
-};
+}
 
 
 
@@ -1464,7 +1464,7 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 	possibilities *= choice->different_values.size();
     };
   
-};
+}
 
 
 
@@ -1477,7 +1477,7 @@ MultipleParameterLoop::memory_consumption () const
     mem += multiple_choices[i].memory_consumption ();
   
   return mem;
-};
+}
 
 
 
@@ -1485,7 +1485,7 @@ MultipleParameterLoop::Entry::Entry (const std::vector<std::string> &ssp,
 				     const std::string              &Name,
 				     const std::string              &Value) :
 		subsection_path (ssp), entry_name(Name), entry_value(Value)
-{};
+{}
 
 
 
@@ -1533,7 +1533,7 @@ void MultipleParameterLoop::Entry::split_different_values ()
     type = Entry::array;
   else
     type = Entry::variant;
-};
+}
 
 
 unsigned int 
@@ -1544,4 +1544,4 @@ MultipleParameterLoop::Entry::memory_consumption () const
 	  MemoryConsumption::memory_consumption (entry_value) +
 	  MemoryConsumption::memory_consumption (different_values) +
 	  sizeof (type));
-};
+}

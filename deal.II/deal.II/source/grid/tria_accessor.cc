@@ -29,7 +29,7 @@ template <int dim>
 void TriaObjectAccessor<1, dim>::set (const Line &line) const
 {
   this->tria->levels[this->present_level]->lines.lines[this->present_index] = line;
-};
+}
 
 
 
@@ -38,7 +38,7 @@ int TriaObjectAccessor<1, dim>::vertex_index (const unsigned int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
   return this->tria->levels[this->present_level]->lines.lines[this->present_index].vertex (i);
-};
+}
 
 
 
@@ -47,7 +47,7 @@ Point<dim> &
 TriaObjectAccessor<1, dim>::vertex (const unsigned int i) const
 {
   return const_cast<Point<dim> &> (this->tria->vertices[vertex_index(i)]);
-};
+}
 
 
 
@@ -57,7 +57,7 @@ void TriaObjectAccessor<1, dim>::set_used_flag () const
   Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   this->tria->levels[this->present_level]->lines.used[this->present_index] = true;
-};
+}
 
 
 
@@ -67,7 +67,7 @@ void TriaObjectAccessor<1, dim>::clear_used_flag () const
   Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   this->tria->levels[this->present_level]->lines.used[this->present_index] = false;
-};
+}
 
 
 
@@ -79,7 +79,7 @@ void TriaObjectAccessor<1, dim>::recursively_set_user_flag () const
   if (has_children())
     for (unsigned int c=0; c<2; ++c)
       child(c)->recursively_set_user_flag ();
-};
+}
 
 
 
@@ -91,7 +91,7 @@ void TriaObjectAccessor<1, dim>::recursively_clear_user_flag () const
   if (has_children())
     for (unsigned int c=0; c<2; ++c)
       child(c)->recursively_clear_user_flag ();
-};
+}
 
 
 
@@ -100,7 +100,7 @@ void TriaObjectAccessor<1, dim>::set_user_pointer (void *p) const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->lines.user_pointers[this->present_index] = p;
-};
+}
 
 
 
@@ -109,7 +109,7 @@ void TriaObjectAccessor<1, dim>::clear_user_pointer () const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->lines.user_pointers[this->present_index] = 0;
-};
+}
 
 
 
@@ -118,7 +118,7 @@ void * TriaObjectAccessor<1, dim>::user_pointer () const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->lines.user_pointers[this->present_index];
-};
+}
 
 
 
@@ -131,7 +131,7 @@ void TriaObjectAccessor<1, dim>::set_children (const int index) const
 	  typename TriaAccessor<dim>::ExcCantSetChildren(index));
   
   this->tria->levels[this->present_level]->lines.children[this->present_index] = index;
-};
+}
 
 
 
@@ -139,7 +139,7 @@ template <int dim>
 void TriaObjectAccessor<1, dim>::clear_children () const
 {
   set_children (-1);
-};
+}
 
 
 
@@ -150,7 +150,7 @@ unsigned char TriaObjectAccessor<1, dim>::boundary_indicator () const
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   return this->tria->levels[this->present_level]->lines.material_id[this->present_index];
-};
+}
 
 
 
@@ -161,7 +161,7 @@ void TriaObjectAccessor<1, dim>::set_boundary_indicator (unsigned char boundary_
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   this->tria->levels[this->present_level]->lines.material_id[this->present_index] = boundary_ind;
-};
+}
 
 
 
@@ -171,7 +171,7 @@ bool TriaObjectAccessor<1, dim>::at_boundary () const
 				   // error checking is done
 				   // in boundary_indicator()
   return (boundary_indicator() != 255);
-};
+}
 
 
 
@@ -179,7 +179,7 @@ template <int dim>
 double TriaObjectAccessor<1, dim>::diameter () const
 {
   return std::sqrt((vertex(1)-vertex(0)).square());
-};
+}
 
 
 
@@ -187,7 +187,7 @@ template <int dim>
 Point<dim> TriaObjectAccessor<1, dim>::center () const
 {
   return (vertex(1)+vertex(0))/2.;
-};
+}
 
 
 
@@ -195,7 +195,7 @@ template <int dim>
 Point<dim> TriaObjectAccessor<1, dim>::barycenter () const
 {
   return (vertex(1)+vertex(0))/2.;
-};
+}
 
 
 
@@ -203,7 +203,7 @@ template <int dim>
 double TriaObjectAccessor<1, dim>::measure () const
 {
   return std::sqrt((vertex(1)-vertex(0)).square());
-};
+}
 
 
 
@@ -219,7 +219,7 @@ unsigned int TriaObjectAccessor<1, dim>::number_of_children () const
 	sum += child(c)->number_of_children();
       return sum;
     };
-};
+}
 
 
 /*------------------------ Functions: QuadAccessor ---------------------------*/
@@ -228,7 +228,7 @@ template <int dim>
 void TriaObjectAccessor<2, dim>::set (const Quad &quad) const
 {
   this->tria->levels[this->present_level]->quads.quads[this->present_index] = quad;
-};
+}
 
 
 
@@ -239,7 +239,7 @@ int TriaObjectAccessor<2, dim>::vertex_index (const unsigned int corner) const
 
   const int corner_convention[4] = { 0,0,1,1 };
   return line(corner)->vertex_index(corner_convention[corner]);
-};
+}
 
 
 
@@ -248,7 +248,7 @@ Point<dim> &
 TriaObjectAccessor<2, dim>::vertex (const unsigned int i) const
 {
   return const_cast<Point<dim> &> (this->tria->vertices[vertex_index(i)]);
-};
+}
 
 
 
@@ -259,7 +259,7 @@ TriaObjectAccessor<2, dim>::set_used_flag () const
   Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   this->tria->levels[this->present_level]->quads.used[this->present_index] = true;
-};
+}
 
 
 
@@ -269,7 +269,7 @@ void TriaObjectAccessor<2, dim>::clear_used_flag () const
   Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   this->tria->levels[this->present_level]->quads.used[this->present_index] = false;
-};
+}
 
 
 
@@ -281,7 +281,7 @@ void TriaObjectAccessor<2, dim>::recursively_set_user_flag () const
   if (has_children())
     for (unsigned int c=0; c<4; ++c)
       child(c)->recursively_set_user_flag ();
-};
+}
 
 
 
@@ -293,7 +293,7 @@ void TriaObjectAccessor<2, dim>::recursively_clear_user_flag () const
   if (has_children())
     for (unsigned int c=0; c<4; ++c)
       child(c)->recursively_clear_user_flag ();
-};
+}
 
 
 
@@ -302,7 +302,7 @@ void TriaObjectAccessor<2, dim>::set_user_pointer (void *p) const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->quads.user_pointers[this->present_index] = p;
-};
+}
 
 
 
@@ -311,7 +311,7 @@ void TriaObjectAccessor<2, dim>::clear_user_pointer () const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->quads.user_pointers[this->present_index] = 0;
-};
+}
 
 
 
@@ -320,7 +320,7 @@ void * TriaObjectAccessor<2, dim>::user_pointer () const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->quads.user_pointers[this->present_index];
-};
+}
 
 
 
@@ -334,7 +334,7 @@ void TriaObjectAccessor<2, dim>::set_children (const int index) const
 	  typename TriaAccessor<dim>::ExcCantSetChildren(index));
 
   this->tria->levels[this->present_level]->quads.children[this->present_index] = index;
-};
+}
 
 
 
@@ -342,7 +342,7 @@ template <int dim>
 void TriaObjectAccessor<2, dim>::clear_children () const
 {
   set_children (-1);
-};
+}
 
 
 
@@ -353,7 +353,7 @@ unsigned char TriaObjectAccessor<2, dim>::boundary_indicator () const
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   return this->tria->levels[this->present_level]->quads.material_id[this->present_index];
-};
+}
 
 
 
@@ -364,7 +364,7 @@ void TriaObjectAccessor<2, dim>::set_boundary_indicator (unsigned char boundary_
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   this->tria->levels[this->present_level]->quads.material_id[this->present_index] = boundary_ind;
-};
+}
 
 
 
@@ -374,7 +374,7 @@ bool TriaObjectAccessor<2, dim>::at_boundary () const
 				   // error checking is done
 				   // in boundary_indicator()
   return (boundary_indicator() != 255);
-};
+}
 
 
 
@@ -383,7 +383,7 @@ double TriaObjectAccessor<2, dim>::diameter () const
 {
   return std::sqrt(std::max((vertex(2)-vertex(0)).square(),
 			    (vertex(3)-vertex(1)).square()));
-};
+}
 
 
 
@@ -391,7 +391,7 @@ template <int dim>
 Point<dim> TriaObjectAccessor<2, dim>::center () const
 {
   return (vertex(0)+vertex(1)+vertex(2)+vertex(3))/4.;
-};
+}
 
 
 #if deal_II_dimension == 2
@@ -469,7 +469,7 @@ Point<2> TriaObjectAccessor<2, 2>::barycenter () const
 		     +t42*y[2]-t44*y[1]+t38*y[0]-x[1]*t50+x[0]*t52
 		     -x[3]*t54+x[2]*t56+x[3]*t50-x[2]*t52+x[1]*t54-x[0]*t56;
   return Point<2> (t25*t35/3.0, t62*t35/3.0);
-};
+}
 
 
 
@@ -518,7 +518,7 @@ double TriaObjectAccessor<2, 2>::measure () const
 
   return (-x[0]*y[3]/2.0-x[1]*y[0]/2.0+x[2]*y[3]/2.0+x[3]*y[0]/2.0+
 	  x[0]*y[1]/2.0-x[3]*y[2]/2.0+x[1]*y[2]/2.0-x[2]*y[1]/2.0);
-};
+}
 
 #endif
 
@@ -577,7 +577,7 @@ Point<3> TriaObjectAccessor<2, 3>::barycenter () const
   Assert (false, ExcNotImplemented());
   
   return Point<3> ();
-};
+}
 
 
 
@@ -593,7 +593,7 @@ double TriaObjectAccessor<2, 3>::measure () const
 				   // function above.
   Assert (false, ExcNotImplemented());
   return 0;
-};
+}
 
 #endif
 
@@ -610,7 +610,7 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const
 	sum += child(c)->number_of_children();
       return sum;
     };
-};
+}
 
 
 /*------------------------ Functions: TriaObjectAccessor ---------------------------*/
@@ -619,7 +619,7 @@ template <int dim>
 void TriaObjectAccessor<3, dim>::set (const Hexahedron &hex) const
 {
   this->tria->levels[this->present_level]->hexes.hexes[this->present_index] = hex;
-};
+}
 
 
 
@@ -635,7 +635,7 @@ int TriaObjectAccessor<3, dim>::vertex_index (const unsigned int corner) const
     return quad(0)->vertex_index(corner);
   else
     return quad(1)->vertex_index(corner-4);
-};
+}
 
 
 
@@ -644,7 +644,7 @@ Point<dim> &
 TriaObjectAccessor<3, dim>::vertex (const unsigned int i) const
 {
   return const_cast<Point<dim> &> (this->tria->vertices[vertex_index(i)]);
-};
+}
 
 
 
@@ -654,7 +654,7 @@ void TriaObjectAccessor<3, dim>::set_used_flag () const
   Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   this->tria->levels[this->present_level]->hexes.used[this->present_index] = true;
-};
+}
 
 
 
@@ -664,7 +664,7 @@ void TriaObjectAccessor<3, dim>::clear_used_flag () const
   Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   this->tria->levels[this->present_level]->hexes.used[this->present_index] = false;
-};
+}
 
 
 
@@ -676,7 +676,7 @@ void TriaObjectAccessor<3, dim>::recursively_set_user_flag () const
   if (has_children())
     for (unsigned int c=0; c<8; ++c)
       child(c)->recursively_set_user_flag ();
-};
+}
 
 
 
@@ -688,7 +688,7 @@ void TriaObjectAccessor<3, dim>::recursively_clear_user_flag () const
   if (has_children())
     for (unsigned int c=0; c<8; ++c)
       child(c)->recursively_clear_user_flag ();
-};
+}
 
 
 
@@ -697,7 +697,7 @@ void TriaObjectAccessor<3, dim>::set_user_pointer (void *p) const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->hexes.user_pointers[this->present_index] = p;
-};
+}
 
 
 
@@ -706,7 +706,7 @@ void TriaObjectAccessor<3, dim>::clear_user_pointer () const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->hexes.user_pointers[this->present_index] = 0;
-};
+}
 
 
 
@@ -715,7 +715,7 @@ void * TriaObjectAccessor<3, dim>::user_pointer () const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->hexes.user_pointers[this->present_index];
-};
+}
 
 
 
@@ -728,7 +728,7 @@ void TriaObjectAccessor<3, dim>::set_children (const int index) const
 	  typename TriaAccessor<dim>::ExcCantSetChildren(index));
 
   this->tria->levels[this->present_level]->hexes.children[this->present_index] = index;
-};
+}
 
 
 
@@ -736,7 +736,7 @@ template <int dim>
 void TriaObjectAccessor<3, dim>::clear_children () const
 {
   set_children (-1);
-};
+}
 
 
 
@@ -747,7 +747,7 @@ unsigned char TriaObjectAccessor<3, dim>::boundary_indicator () const
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   return this->tria->levels[this->present_level]->hexes.material_id[this->present_index];
-};
+}
 
 
 
@@ -758,7 +758,7 @@ void TriaObjectAccessor<3, dim>::set_boundary_indicator (unsigned char boundary_
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   this->tria->levels[this->present_level]->hexes.material_id[this->present_index] = boundary_ind;
-};
+}
 
 
 
@@ -768,7 +768,7 @@ bool TriaObjectAccessor<3, dim>::at_boundary () const
 				   // error checking is done
 				   // in boundary_indicator()
   return (boundary_indicator() != 255);
-};
+}
 
 
 
@@ -779,7 +779,7 @@ double TriaObjectAccessor<3, dim>::diameter () const
 				      (vertex(7)-vertex(1)).square()),
 			     std::max((vertex(4)-vertex(2)).square(),
 				      (vertex(5)-vertex(3)).square()) ));
-};
+}
 
 
 
@@ -788,7 +788,7 @@ Point<dim> TriaObjectAccessor<3, dim>::center () const
 {
   return (vertex(0)+vertex(1)+vertex(2)+vertex(3)+
 	  vertex(4)+vertex(5)+vertex(6)+vertex(7))/8.;
-};
+}
 
 
 #if deal_II_dimension == 3
@@ -1439,7 +1439,7 @@ Point<3> TriaObjectAccessor<3, 3>::barycenter () const
   const double unknown2 = s1*s2;
 
   return Point<3> (unknown0, unknown1, unknown2);
-};
+}
 
 
 
@@ -1526,7 +1526,7 @@ double TriaObjectAccessor<3, 3>::measure () const
     *x[4]*y[1]/12.0-z[5]*x[4]*y[6]/12.0-x[6]*y[7]*z[3]/12.0-x[4]*y[3]*z[7]/12.0+x
     [4]*y[7]*z[3]/12.0-x[1]*y[5]*z[6]/12.0-y[6]*x[7]*z[4]/12.0-y[1]*x[2]*z[6]/12.0-
     y[2]*x[3]*z[6]/12.0+s2+s1+x[2]*y[0]*z[3]/12.0);
-};
+}
 
 #endif
 
@@ -1544,7 +1544,7 @@ unsigned int TriaObjectAccessor<3, dim>::number_of_children () const
 	sum += child(c)->number_of_children();
       return sum;
     };
-};
+}
 
 
 /*------------------------ Functions: CellAccessor<1> -----------------------*/
@@ -1556,7 +1556,7 @@ template <>
 bool CellAccessor<1>::at_boundary () const
 {
   return at_boundary(0) || at_boundary(1);
-};
+}
 
 
 
@@ -1566,7 +1566,7 @@ unsigned char CellAccessor<1>::material_id () const
   Assert (this->used(), TriaAccessor<1>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]
     ->lines.material_id[this->present_index];
-};
+}
 
 
 
@@ -1576,7 +1576,7 @@ void CellAccessor<1>::set_material_id (const unsigned char mat_id) const
   Assert (this->used(), TriaAccessor<1>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->lines.material_id[this->present_index]
     = mat_id;
-};
+}
 
 
 template <>
@@ -1608,7 +1608,7 @@ template <>
 bool CellAccessor<2>::at_boundary () const
 {
   return at_boundary(0) || at_boundary(1) || at_boundary(2) || at_boundary(3);
-};
+}
 
 
 
@@ -1617,7 +1617,7 @@ unsigned char CellAccessor<2>::material_id () const
 {
   Assert (this->used(), TriaAccessor<2>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->quads.material_id[this->present_index];
-};
+}
 
 
 
@@ -1627,7 +1627,7 @@ void CellAccessor<2>::set_material_id (const unsigned char mat_id) const
   Assert (this->used(), TriaAccessor<2>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->quads.material_id[this->present_index]
     = mat_id;						 
-};
+}
 
 
 
@@ -1693,7 +1693,7 @@ bool CellAccessor<3>::at_boundary () const
   return (at_boundary(0) || at_boundary(1) ||
 	  at_boundary(2) || at_boundary(3) ||
 	  at_boundary(4) || at_boundary(5));
-};
+}
 
 
 
@@ -1702,7 +1702,7 @@ unsigned char CellAccessor<3>::material_id () const
 {
   Assert (this->used(), TriaAccessor<3>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->hexes.material_id[this->present_index];
-};
+}
 
 
 
@@ -1712,7 +1712,7 @@ void CellAccessor<3>::set_material_id (const unsigned char mat_id) const
   Assert (this->used(), TriaAccessor<3>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->hexes.material_id[this->present_index]
     = mat_id;						 
-};
+}
 
 
 template <>
@@ -1734,7 +1734,7 @@ unsigned int CellAccessor<dim>::subdomain_id () const
 {
   Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->subdomain_ids[this->present_index];
-};
+}
 
 
 
@@ -1745,7 +1745,7 @@ CellAccessor<dim>::set_subdomain_id (const unsigned int new_subdomain_id) const
   Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index]
     = new_subdomain_id;
-};
+}
 
 
 
@@ -1774,7 +1774,7 @@ void CellAccessor<dim>::set_neighbor (const unsigned int i,
 	neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].second
 	= -1;
     };
-};
+}
 
 
 
@@ -1826,7 +1826,7 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
       Assert (false, ExcInternalError());
       return static_cast<unsigned int>(-1);
     };
-};
+}
 
 
 
@@ -1891,7 +1891,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
   Assert (false, ExcInternalError());
   return std::make_pair (static_cast<unsigned int>(-1),
 			 static_cast<unsigned int>(-1));
-};
+}
 
 
 
@@ -1903,7 +1903,7 @@ bool CellAccessor<dim>::at_boundary (const unsigned int i) const
 	  ExcIndexRange (i,0,GeometryInfo<dim>::faces_per_cell));
   
   return (neighbor_index(i) == -1);
-};
+}
 
 
 
@@ -1913,7 +1913,7 @@ template <>
 bool CellAccessor<1>::has_boundary_lines () const
 {
   return at_boundary();
-};
+}
 
 #else
 
@@ -1925,7 +1925,7 @@ bool CellAccessor<dim>::has_boundary_lines () const
       return true;
   
   return false;
-};
+}
 
 #endif
 

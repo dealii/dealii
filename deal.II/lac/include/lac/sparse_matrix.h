@@ -1139,7 +1139,7 @@ unsigned int SparseMatrix<number>::m () const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   return cols->rows;
-};
+}
 
 
 template <typename number>
@@ -1148,7 +1148,7 @@ unsigned int SparseMatrix<number>::n () const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   return cols->cols;
-};
+}
 
 
 template <typename number>
@@ -1169,7 +1169,7 @@ void SparseMatrix<number>::set (const unsigned int i,
 
   if (index != SparsityPattern::invalid_entry)
     val[index] = value;
-};
+}
 
 
 
@@ -1188,7 +1188,7 @@ void SparseMatrix<number>::add (const unsigned int i,
 
   if (value != 0.)
     val[index] += value;
-};
+}
 
 
 
@@ -1201,7 +1201,7 @@ number SparseMatrix<number>::operator () (const unsigned int i,
   Assert (cols->operator()(i,j) != SparsityPattern::invalid_entry,
 	  ExcInvalidIndex(i,j));
   return val[cols->operator()(i,j)];
-};
+}
 
 
 
@@ -1217,7 +1217,7 @@ number SparseMatrix<number>::el (const unsigned int i,
     return val[index];
   else
     return 0;
-};
+}
 
 
 
@@ -1233,7 +1233,7 @@ number SparseMatrix<number>::diag_element (const unsigned int i) const
 				   // row of a square matrix is the main
 				   // diagonal
   return val[cols->rowstart[i]];
-};
+}
 
 
 
@@ -1249,7 +1249,7 @@ number & SparseMatrix<number>::diag_element (const unsigned int i)
 				   // row of a square matrix is the main
 				   // diagonal
   return val[cols->rowstart[i]];
-};
+}
 
 
 
@@ -1264,7 +1264,7 @@ SparseMatrix<number>::raw_entry (const unsigned int row,
 	 ExcIndexRange(index,0,cols->row_length(row)));
 
   return val[cols->rowstart[row]+index];
-};
+}
 
 
 
@@ -1277,7 +1277,7 @@ number SparseMatrix<number>::global_entry (const unsigned int j) const
 	  ExcIndexRange (j, 0, cols->n_nonzero_elements()));
   
   return val[j];
-};
+}
 
 
 
@@ -1290,7 +1290,7 @@ number & SparseMatrix<number>::global_entry (const unsigned int j)
 	  ExcIndexRange (j, 0, cols->n_nonzero_elements()));
 
   return val[j];
-};
+}
 
 
 
@@ -1315,7 +1315,7 @@ SparseMatrix<number>::copy_from (const ForwardIterator begin,
 					 // write entries
 	set (row, j->first, j->second);
     };
-};
+}
 
 
 //----------------------------------------------------------------------//

@@ -48,7 +48,7 @@ FiniteElementData<dim>::FiniteElementData (const std::vector<unsigned int> &dofs
 		components(n_components)
 {
   Assert(dofs_per_object.size()==dim+1, ExcDimensionMismatch(dofs_per_object.size()-1,dim));
-};
+}
 
 
 
@@ -60,7 +60,7 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 	  (dofs_per_quad == f.dofs_per_quad) &&
 	  (dofs_per_hex == f.dofs_per_hex) &&
 	  (components == f.components));
-};
+}
 
 
 template class FiniteElementData<1>;

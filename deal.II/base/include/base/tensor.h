@@ -224,7 +224,7 @@ Tensor<rank_,dim>::Tensor ()
 // default constructor. not specifying an initializer list calls
 // the default constructor of the subobjects, which initialize them
 // selves. therefore, the tensor is set to zero this way
-};
+}
 
 
 template <int rank_, int dim>
@@ -233,7 +233,7 @@ Tensor<rank_,dim>::Tensor (const array_type &initializer)
 {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] =  Tensor<rank_-1,dim>(initializer[i]);
-};
+}
 
 
 template <int rank_, int dim>
@@ -244,7 +244,7 @@ Tensor<rank_,dim>::operator[] (const unsigned int i)
   Assert (i<dim, ExcIndexRange(i, 0, dim));
   
   return subtensor[i];
-};
+}
 
 
 template <int rank_, int dim>
@@ -255,7 +255,7 @@ Tensor<rank_,dim>::operator[] (const unsigned int i) const
   Assert (i<dim, ExcIndexRange(i, 0, dim));
   
   return subtensor[i];
-};
+}
 
 
 template <int rank_, int dim>
@@ -266,7 +266,7 @@ Tensor<rank_,dim>::operator = (const Tensor<rank_,dim> &t)
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] = t.subtensor[i];
   return *this;
-};
+}
 
 
 template <int rank_, int dim>
@@ -277,7 +277,7 @@ Tensor<rank_,dim>::operator == (const Tensor<rank_,dim> &p) const
   for (unsigned int i=0; i<dim; ++i)
     if (subtensor[i] != p.subtensor[i]) return false;
   return true;
-};
+}
 
 
 template <int rank_, int dim>
@@ -286,7 +286,7 @@ bool
 Tensor<rank_,dim>::operator != (const Tensor<rank_,dim> &p) const
 {
   return !((*this) == p);
-};
+}
 
 
 template <int rank_, int dim>
@@ -297,7 +297,7 @@ Tensor<rank_,dim>::operator += (const Tensor<rank_,dim> &p)
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] += p.subtensor[i];
   return *this;
-};
+}
 
 
 template <int rank_, int dim>
@@ -308,7 +308,7 @@ Tensor<rank_,dim>::operator -= (const Tensor<rank_,dim> &p)
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] -= p.subtensor[i];
   return *this;
-};
+}
 
 
 template <int rank_, int dim>
@@ -319,7 +319,7 @@ Tensor<rank_,dim>::operator *= (const double &s)
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] *= s;
   return *this;
-};
+}
 
 
 template <int rank_, int dim>
@@ -330,7 +330,7 @@ Tensor<rank_,dim>::operator /= (const double &s)
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] /= s;
   return *this;
-};
+}
 
 
 template <int rank_, int dim>
@@ -344,7 +344,7 @@ Tensor<rank_,dim>::operator + (const Tensor<rank_,dim> &t) const
     tmp.subtensor[i] += t.subtensor[i];
 
   return tmp;
-};
+}
 
 
 template <int rank_, int dim>
@@ -358,7 +358,7 @@ Tensor<rank_,dim>::operator - (const Tensor<rank_,dim> &t) const
     tmp.subtensor[i] -= t.subtensor[i];
 
   return tmp;
-};
+}
 
 
 template <int rank_, int dim>
@@ -372,7 +372,7 @@ Tensor<rank_,dim>::operator - () const
     tmp.subtensor[i] = -subtensor[i];
 
   return tmp;
-};
+}
 
 
 template <int rank_, int dim>
@@ -381,7 +381,7 @@ void Tensor<rank_,dim>::clear ()
 {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i].clear();
-};
+}
 
 
 
@@ -391,7 +391,7 @@ unsigned int
 Tensor<rank_,dim>::memory_consumption ()
 {
   return sizeof(Tensor<rank_,dim>);
-};
+}
 
 
 /* ----------------- Non-member functions operating on tensors. ------------ */
@@ -412,7 +412,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<rank_,dim> &p)
   out << p[dim-1];
 
   return out;
-};
+}
 
 
 /**
@@ -425,7 +425,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<rank_,1> &p)
   out << p[0];
 
   return out;
-};
+}
 
 
 
@@ -464,7 +464,7 @@ void contract (Tensor<1,dim>       &dest,
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       dest[i] += src1[i][j] * src2[j];
-};
+}
 
 
 
@@ -484,7 +484,7 @@ void contract (Tensor<1,dim>       &dest,
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       dest[i] += src1[j] * src2[j][i];
-};
+}
 
 
 
@@ -505,7 +505,7 @@ void contract (Tensor<2,dim>       &dest,
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
 	dest[i][j] += src1[i][k] * src2[k][j];
-};
+}
 
 
 
@@ -578,7 +578,7 @@ void contract (Tensor<2,dim>       &dest,
       default:
 	    Assert (false, (typename Tensor<2,dim>::ExcInvalidTensorIndex (index1)));
     };
-};
+}
 
 
 
@@ -627,7 +627,7 @@ void contract (Tensor<2,dim>       &dest,
 	    Assert (false,
                     (typename Tensor<2,dim>::ExcInvalidTensorIndex (index1)));
     };
-};
+}
 
 
 
@@ -649,7 +649,7 @@ void contract (Tensor<3,dim>       &dest,
       for (unsigned int k=0; k<dim; ++k)
 	for (unsigned int l=0; l<dim; ++l)
 	  dest[i][j][k] += src1[i][j][l] * src2[l][k];
-};
+}
 
 
 
@@ -671,7 +671,7 @@ void contract (Tensor<3,dim>       &dest,
       for (unsigned int k=0; k<dim; ++k)
 	for (unsigned int l=0; l<dim; ++l)
 	  dest[i][j][k] += src1[i][l] * src2[l][j][k];
-};
+}
 
 
 /**
@@ -693,7 +693,7 @@ void contract (Tensor<4,dim>       &dest,
 	for (unsigned int l=0; l<dim; ++l)
 	  for (unsigned int m=0; m<dim; ++m)
 	    dest[i][j][k][l] += src1[i][j][m] * src2[m][k][l];
-};
+}
 
 
 
@@ -711,7 +711,7 @@ void outer_product (Tensor<2,dim>       &dst,
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       dst[i][j] = src1[i] * src2[j];
-};
+}
 
 
 
@@ -730,7 +730,7 @@ void outer_product (Tensor<3,dim>       &dst,
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
 	dst[i][j][k] = src1[i] * src2[j][k];
-};
+}
 
 
 
@@ -749,7 +749,7 @@ void outer_product (Tensor<3,dim>       &dst,
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
 	dst[i][j][k] = src1[i][j] * src2[k];
-};
+}
 
 
 
@@ -770,7 +770,7 @@ void outer_product (Tensor<1,dim>       &dst,
 {
   for (unsigned int i=0; i<dim; ++i)
     dst[i] = src1 * src2[i];
-};
+}
 
 
 
@@ -791,7 +791,7 @@ void outer_product (Tensor<1,dim>       &dst,
 {
   for (unsigned int i=0; i<dim; ++i)
     dst[i] = src1[i] * src2;
-};
+}
 
 
 
@@ -866,7 +866,7 @@ double determinant (const Tensor<rank,1> &t)
 				   // computable in the general
 				   // template
   return determinant(t[0]);
-};
+}
 
 
 
@@ -881,7 +881,7 @@ inline
 double determinant (const Tensor<1,1> &t)
 {
   return t[0];
-};
+}
 
 
 
@@ -895,7 +895,7 @@ double determinant (const Tensor<2,2> &t)
 {
   return ((t[0][0] * t[1][1]) -
 	  (t[1][0] * t[0][1]));
-};
+}
 
 
 
@@ -920,7 +920,7 @@ double determinant (const Tensor<2,3> &t)
 	   +t[1][0]*t[0][2]*t[2][1]
 	   +t[2][0]*t[0][1]*t[1][2]
 	   -t[2][0]*t[0][2]*t[1][1] );
-};
+}
 
 
 
@@ -937,7 +937,7 @@ double trace (const Tensor<2,dim> &d)
   for (unsigned int i=0; i<dim; ++i)
     t += d[i][i];
   return t;
-};
+}
 
 
 
@@ -1002,7 +1002,7 @@ invert (const Tensor<2,dim> &t)
 	    AssertThrow (false, ExcNotImplemented());
     };    
   return return_tensor;
-};
+}
 
 
 
@@ -1029,7 +1029,7 @@ transpose (const Tensor<2,dim> &t)
         tt[j][i] = x;
       };
   return tt;
-};
+}
 
 
 
@@ -1044,7 +1044,7 @@ Tensor<2,1>
 transpose (const Tensor<2,1> &t) 
 {
   return t;
-};
+}
 
 
 
@@ -1061,7 +1061,7 @@ transpose (const Tensor<2,2> &t)
 {
   const double x[2][2] = {{t[0][0], t[1][0]}, {t[0][1], t[1][1]}};
   return Tensor<2,2>(x);
-};
+}
 
 
 
@@ -1080,7 +1080,7 @@ transpose (const Tensor<2,3> &t)
                           {t[0][1], t[1][1], t[2][1]},
                           {t[0][2], t[1][2], t[2][2]}};
   return Tensor<2,3>(x);
-};
+}
 
 
 
@@ -1098,7 +1098,7 @@ operator * (const Tensor<rank,dim> &t,
   Tensor<rank,dim> tt = t;
   tt *= factor;
   return tt;
-};
+}
 
 
 
@@ -1115,7 +1115,7 @@ operator * (const double            factor,
   Tensor<rank,dim> tt = t;
   tt *= factor;
   return tt;
-};
+}
 
 
 
@@ -1131,7 +1131,7 @@ operator / (const Tensor<rank,dim> &t,
   Tensor<rank,dim> tt = t;
   tt /= factor;
   return tt;
-};
+}
 
 
 #endif

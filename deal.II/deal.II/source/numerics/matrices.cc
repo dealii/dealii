@@ -50,7 +50,7 @@ IteratorRange (const active_cell_iterator &first,
 		:
 		first (first),
 		second (second)
-{};
+{}
 
 
 
@@ -60,7 +60,7 @@ MatrixCreator::IteratorRange<dim>::IteratorRange (const iterator_pair &ip)
 		:
 		first (ip.first),
 		second (ip.second)
-{};
+{}
 
 
 
@@ -106,7 +106,7 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 		    .collect_args (mapping, dof, q, matrix, coefficient,
 				   thread_ranges[thread], mutex));
   thread_manager.wait ();  
-};
+}
 
 
 
@@ -228,7 +228,7 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
 			cell_matrix(i,j));
       mutex.release ();
     };
-};
+}
 
 
 template <int dim>
@@ -289,7 +289,7 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 				   rhs_vector, coefficient,
 				   thread_ranges[thread], mutex));
   thread_manager.wait ();  
-};
+}
 
 
 
@@ -426,7 +426,7 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 	rhs_vector(dof_indices[i]) += local_rhs(i);
       mutex.release ();
     };
-};
+}
 
 
 template <int dim>
@@ -458,7 +458,7 @@ void MatrixCreator::create_boundary_mass_matrix (const Mapping<1>          &,
 				   // identity matrix on the boundary
 				   // dofs?
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 #endif
@@ -511,7 +511,7 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 				   dof_to_boundary_mapping, coefficient,
 				   thread_ranges[thread], mutex));
   thread_manager.wait ();  
-};
+}
 
 
 
@@ -872,7 +872,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	      };
 	  mutex.release ();
 	};
-};
+}
 
 
 template <int dim>
@@ -933,7 +933,7 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 		    .collect_args (mapping, dof, q, matrix, coefficient,
 				   thread_ranges[thread], mutex));
   thread_manager.wait ();  
-};
+}
 
 
 
@@ -1119,7 +1119,7 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 				   rhs_vector, coefficient,
 				   thread_ranges[thread], mutex));
   thread_manager.wait ();  
-};
+}
 
 
 
@@ -1259,7 +1259,7 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 	rhs_vector(dof_indices[i]) += local_rhs(i);
       mutex.release ();
     };
-};
+}
 
 
 

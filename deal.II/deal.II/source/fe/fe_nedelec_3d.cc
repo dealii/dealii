@@ -165,7 +165,7 @@ namespace FE_Nedelec_3d
 	0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.5,
   };
 
-};  // namespace FE_Nedelec_3d
+}  // namespace FE_Nedelec_3d
 
 
 // embedding matrices
@@ -214,7 +214,7 @@ namespace FE_Nedelec_3d
 	0, 0, 0, .5,
 	0, 0, 0, .5
   };
-};
+}
 
 
 
@@ -238,5 +238,5 @@ sizeof(FE_Nedelec<3>::Matrices::constraint_matrices[0]);
 #else // #if deal_II_dimension
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-namespace { void dummy () {}; };
+namespace { void dummy () {} }
 #endif // #if deal_II_dimension == 3

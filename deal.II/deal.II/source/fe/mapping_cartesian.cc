@@ -49,7 +49,7 @@ MappingCartesian<dim>::InternalData::memory_consumption () const
 	  MemoryConsumption::memory_consumption (quadrature_points) +
 	  MemoryConsumption::memory_consumption (unit_tangentials) +
 	  MemoryConsumption::memory_consumption (aux));
-};
+}
 
 
 

@@ -26,7 +26,7 @@
 
 template <int dim>
 Boundary<dim>::~Boundary ()
-{};
+{}
 
 
 
@@ -36,7 +36,7 @@ Boundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_it
 {
   Assert (false, ExcPureVirtualFunctionCalled());
   return Point<dim>();
-};
+}
 
 
 
@@ -47,7 +47,7 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
 				 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
-};
+}
 
 
 
@@ -58,7 +58,7 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 				 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
-};
+}
 
 
 
@@ -69,7 +69,7 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &,
 			 FaceVertexNormals                                &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
-};
+}
 
 
 
@@ -78,7 +78,7 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &,
 
 template <int dim>
 StraightBoundary<dim>::StraightBoundary ()
-{};
+{}
 
 
 
@@ -87,7 +87,7 @@ Point<dim>
 StraightBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
 {
   return (line->vertex(0) + line->vertex(1)) / 2;
-};
+}
 
 
 #if deal_II_dimension < 3
@@ -98,7 +98,7 @@ StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>:
 {
   Assert (false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
   return Point<dim>();
-};
+}
 
 
 #else
@@ -115,7 +115,7 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 	  quad->line(1)->child(0)->vertex(1) +
   	  quad->line(2)->child(0)->vertex(1) +
   	  quad->line(3)->child(0)->vertex(1)) / 8;
-};
+}
 
 #endif
 
@@ -152,7 +152,7 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
   
   for (unsigned int i=0; i<n; ++i, x+=dx)
     points[i] = (1-x)*vertices[0] + x*vertices[1];
-};
+}
 
 #endif
 
@@ -214,7 +214,7 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 			 Boundary<1>::FaceVertexNormals &) const
 {
   Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
-};
+}
 
 #endif
 
@@ -233,7 +233,7 @@ get_normals_at_vertices (const Triangulation<2>::face_iterator &face,
 				     // compute normals from tangent
     face_vertex_normals[vertex] = Point<dim>(tangent[1],
 					     -tangent[0]);
-};
+}
 
 #endif
 
@@ -270,7 +270,7 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
       cross_product (face_vertex_normals[vertex],
 		     tangents[0], tangents[1]);
     };
-};
+}
 
 #endif
 

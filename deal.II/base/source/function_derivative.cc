@@ -205,7 +205,7 @@ FunctionDerivative<dim>::memory_consumption () const
 				   // only simple data elements, so
 				   // use sizeof operator
   return sizeof (*this);
-};
+}
 
 
 

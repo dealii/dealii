@@ -93,7 +93,7 @@ GeometryInfo<2>::child_cell_on_face (const unsigned int face,
 								{3,2},
 								{0,3}};
   return subcells[face][subface];
-};
+}
 
 
 
@@ -112,4 +112,4 @@ GeometryInfo<3>::child_cell_on_face (const unsigned int face,
 								{3, 2, 6, 7},
 								{0, 4, 7, 3}};
   return subcells[face][subface];
-};
+}

@@ -58,7 +58,7 @@ FESystem<dim>::InternalData::~InternalData()
 	delete base_fe_values_datas[i];
 	base_fe_values_datas[i] = 0;
       };
-};
+}
 
 
 
@@ -70,7 +70,7 @@ InternalData::get_fe_data (const unsigned int base_no) const
   Assert(base_no<base_fe_datas.size(),
 	 ExcIndexRange(base_no,0,base_fe_datas.size()));
   return *base_fe_datas[base_no];
-};
+}
 
 
 
@@ -83,7 +83,7 @@ InternalData::set_fe_data (const unsigned int base_no,
   Assert(base_no<base_fe_datas.size(),
 	 ExcIndexRange(base_no,0,base_fe_datas.size()));
   base_fe_datas[base_no]=ptr;
-};
+}
 
 
 
@@ -96,7 +96,7 @@ InternalData::get_fe_values_data (const unsigned int base_no) const
 	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
   Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
   return *base_fe_values_datas[base_no];
-};
+}
 
 
 
@@ -109,7 +109,7 @@ InternalData::set_fe_values_data (const unsigned int base_no,
   Assert(base_no<base_fe_values_datas.size(),
 	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
   base_fe_values_datas[base_no]=ptr;
-};
+}
 
 
 
@@ -138,7 +138,7 @@ FESystem<dim>::InternalData::clear_first_cell ()
                                    // sub-objects
   for (unsigned int i=0; i<base_fe_datas.size(); ++i)
     base_fe_datas[i]->clear_first_cell ();
-};
+}
 
 
 /* ---------------------------------- FESystem ------------------- */
@@ -159,7 +159,7 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe,
   base_elements[0] = ElementPair(fe.clone(), n_elements);
   base_elements[0].first->subscribe ();
   initialize ();
-};
+}
 
 
 
@@ -180,7 +180,7 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
   base_elements[1] = ElementPair(fe2.clone(), n2);
   base_elements[1].first->subscribe ();
   initialize ();
-};
+}
 
 
 
@@ -209,7 +209,7 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
   base_elements[2] = ElementPair(fe3.clone(), n3);
   base_elements[2].first->subscribe ();
   initialize ();
-};
+}
 
 
 
@@ -224,7 +224,7 @@ FESystem<dim>::~FESystem ()
       delete base_elements[i].first;
       base_elements[i].first = 0;
     }
-};
+}
 
 
 
@@ -553,7 +553,7 @@ fill_fe_values (const Mapping<dim>                   &mapping,
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
 	       quadrature, mapping_data, fe_data, data);
-};
+}
 
 
 
@@ -570,7 +570,7 @@ fill_fe_face_values (const Mapping<dim>                   &mapping,
 {
   compute_fill (mapping, cell, face_no, invalid_face_number,
                 quadrature, mapping_data, fe_data, data);
-};
+}
 
 
 
@@ -1041,7 +1041,7 @@ FESystem<dim>::build_cell_tables()
 		  this->system_to_component_table[total_index] = non_primitive_index;
 	      }
       }
-};
+}
 
 
 
@@ -1223,7 +1223,7 @@ FESystem<dim>::build_face_tables()
 	  ExcInternalError());
   Assert (total_index == this->face_system_to_base_table.size(),
 	  ExcInternalError());
-};
+}
 
 
 
@@ -1477,7 +1477,7 @@ void FESystem<dim>::build_interface_constraints ()
 	    = (base_element(n_index.first.first).constraints()(m_index.second,
 							       n_index.second));
       };
-};
+}
 
 
 
@@ -1580,7 +1580,7 @@ void FESystem<dim>::initialize ()
 				   // on cell and face
   initialize_unit_support_points ();
   initialize_unit_face_support_points ();
-};
+}
 
 
 
@@ -1596,7 +1596,7 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
   if (dim>2) dpo.push_back(fe_data.dofs_per_hex * N);
   
   return FiniteElementData<dim> (dpo, fe_data.n_components() * N);
-};
+}
 
 
 
@@ -1647,7 +1647,7 @@ FESystem<1>::
 initialize_unit_face_support_points ()
 {
 				   // no faces no work
-};
+}
 
 #endif
 
@@ -1710,7 +1710,7 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
   return FiniteElementData<dim> (dpo,
 				 fe1.n_components() * N1 +
 				 fe2.n_components() * N2);
-};
+}
 
 
 
@@ -1741,7 +1741,7 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				 fe1.n_components() * N1 +
 				 fe2.n_components() * N2 +
 				 fe3.n_components() * N3);
-};
+}
 
 
 
@@ -1757,7 +1757,7 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
   multiplicities.push_back (n_elements);
   
   return compute_restriction_is_additive_flags (fe_list, multiplicities);
-};
+}
 
 
 
@@ -1778,7 +1778,7 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
   multiplicities.push_back (N2);
   
   return compute_restriction_is_additive_flags (fe_list, multiplicities);
-};
+}
 
 
 
@@ -1804,7 +1804,7 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
   multiplicities.push_back (N3);
   
   return compute_restriction_is_additive_flags (fe_list, multiplicities);
-};
+}
 
 
 
@@ -1936,7 +1936,7 @@ compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim
   Assert (total_index == n_shape_functions, ExcInternalError());
   
   return retval;
-};
+}
 
 
 
@@ -1952,7 +1952,7 @@ FESystem<dim>::compute_nonzero_components (const FiniteElement<dim> &fe1,
   multiplicities.push_back (N1);
   
   return compute_nonzero_components (fe_list, multiplicities);
-};
+}
 
 
 
@@ -1973,7 +1973,7 @@ FESystem<dim>::compute_nonzero_components (const FiniteElement<dim> &fe1,
   multiplicities.push_back (N2);
   
   return compute_nonzero_components (fe_list, multiplicities);
-};
+}
 
 
 
@@ -1999,7 +1999,7 @@ FESystem<dim>::compute_nonzero_components (const FiniteElement<dim> &fe1,
   multiplicities.push_back (N3);
   
   return compute_nonzero_components (fe_list, multiplicities);
-};
+}
 
 
 
@@ -2181,7 +2181,7 @@ compute_nonzero_components (const std::vector<const FiniteElement<dim>*> &fes,
   Assert (total_index == n_shape_functions, ExcInternalError());
   
   return retval;
-};
+}
 
 
 
@@ -2193,7 +2193,7 @@ FESystem<dim>::base_element (const unsigned int index) const
   Assert (index < base_elements.size(), 
 	  ExcIndexRange(index, 0, base_elements.size()));
   return *base_elements[index].first;
-};
+}
 
 
 
@@ -2202,7 +2202,7 @@ unsigned int
 FESystem<dim>::n_base_elements () const
 {
   return base_elements.size();
-};
+}
 
 
 
@@ -2213,7 +2213,7 @@ FESystem<dim>::element_multiplicity (const unsigned int index) const
   Assert (index < base_elements.size(), 
 	  ExcIndexRange(index, 0, base_elements.size()));
   return base_elements[index].second;
-};
+}
 
 
 
@@ -2249,7 +2249,7 @@ FESystem<dim>::unit_support_point (const unsigned index) const
                                      // provide this information
     return (base_element(this->system_to_base_index(index).first.first)
             .unit_support_point(this->system_to_base_index(index).second));
-};
+}
 
 
 
@@ -2273,7 +2273,7 @@ FESystem<dim>::unit_face_support_point (const unsigned index) const
                                      // provide this information
     return (base_element(this->face_system_to_base_index(index).first.first)
             .unit_face_support_point(this->face_system_to_base_index(index).second));
-};
+}
 
 
 
@@ -2293,7 +2293,7 @@ FESystem<dim>::memory_consumption () const
   for (unsigned int i=0; i<base_elements.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*base_elements[i].first);
   return mem;
-};
+}
 
 
 

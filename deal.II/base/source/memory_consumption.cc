@@ -23,7 +23,7 @@ namespace MemoryConsumption
     for (unsigned int i=0; i<v.size(); ++i)
       mem += memory_consumption(v[i]);
     return mem;
-  };
+  }
   
 
-};
+}

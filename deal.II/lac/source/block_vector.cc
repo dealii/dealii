@@ -49,4 +49,4 @@ namespace BlockVectorIterators
 
   template class Iterator<float,false>;
   template class Iterator<float,true>;
-};
+}

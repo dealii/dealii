@@ -315,7 +315,7 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 				   // on cell and face
   initialize_unit_support_points ();
   initialize_unit_face_support_points ();
-};
+}
 
 
 
@@ -452,7 +452,7 @@ void FE_Q_Hierarchical<dim>::initialize_unit_support_points ()
 	}
 	this->unit_support_points[renumber[k++]] = p;
       };
-};
+}
 
 
 #if deal_II_dimension == 1
@@ -461,7 +461,7 @@ template <>
 void FE_Q_Hierarchical<1>::initialize_unit_face_support_points ()
 {
 				   // no faces in 1d, so nothing to do
-};
+}
 
 #endif
 
@@ -511,7 +511,7 @@ void FE_Q_Hierarchical<dim>::initialize_unit_face_support_points ()
 	}
 	this->unit_face_support_points[face_renumber[k++]] = p;
       };
-};
+}
 
 
                                            // we use same dpo_vector as FE_Q
@@ -1044,7 +1044,7 @@ unsigned int
 FE_Q_Hierarchical<dim>::n_base_elements () const
 {
   return 1;
-};
+}
 
 
 
@@ -1054,7 +1054,7 @@ FE_Q_Hierarchical<dim>::base_element (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return *this;
-};
+}
 
 
 
@@ -1064,7 +1064,7 @@ FE_Q_Hierarchical<dim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return 1;
-};
+}
 
 
 
@@ -1336,7 +1336,7 @@ unsigned int
 FE_Q_Hierarchical<dim>::get_degree () const
 {
   return degree;
-};
+}
 
 
 

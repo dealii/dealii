@@ -821,7 +821,7 @@ GeometryInfo<1>::unit_cell_vertex (const unsigned int vertex)
   const Point<dim> vertices[vertices_per_cell] =
     { Point<dim>(0.), Point<dim>(1.) };
   return vertices[vertex];
-};
+}
 
 
 
@@ -836,7 +836,7 @@ GeometryInfo<2>::unit_cell_vertex (const unsigned int vertex)
     { Point<dim>(0., 0.), Point<dim>(1., 0.),
       Point<dim>(1.,1.), Point<dim>(0.,1.) };
   return vertices[vertex];
-};
+}
 
 
 
@@ -853,7 +853,7 @@ GeometryInfo<3>::unit_cell_vertex (const unsigned int vertex)
       Point<dim>(0., 1., 0.), Point<dim>(1., 1., 0.),
       Point<dim>(1., 1., 1.), Point<dim>(0., 1., 1.) };
   return vertices[vertex];
-};
+}
 
 
 
@@ -868,7 +868,7 @@ GeometryInfo<1>::vertices_adjacent_to_line (const unsigned int line,
 	  ExcIndexRange (vertex, 0, 2));
 
   return vertex;
-};
+}
 
 
 
@@ -886,7 +886,7 @@ GeometryInfo<2>::vertices_adjacent_to_line (const unsigned int line,
     { {0, 1}, {1, 2}, {3, 2}, {0, 3} };
 
   return vertex_indices[line][vertex];
-};
+}
 
 
 
@@ -906,7 +906,7 @@ GeometryInfo<3>::vertices_adjacent_to_line (const unsigned int line,
       {0, 4}, {1, 5}, {2, 6}, {3, 7}  };
 
   return vertex_indices[line][vertex];
-};
+}
 
 
 

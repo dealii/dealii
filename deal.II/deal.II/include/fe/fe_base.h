@@ -1569,7 +1569,7 @@ unsigned int
 FiniteElementData<dim>::n_dofs_per_vertex () const
 {
   return dofs_per_vertex;
-};
+}
 
 
 template <int dim>
@@ -1578,7 +1578,7 @@ unsigned int
 FiniteElementData<dim>::n_dofs_per_line () const
 {
   return dofs_per_line;
-};
+}
 
 
 template <int dim>
@@ -1587,7 +1587,7 @@ unsigned int
 FiniteElementData<dim>::n_dofs_per_quad () const
 {
   return dofs_per_quad;
-};
+}
 
 
 template <int dim>
@@ -1596,7 +1596,7 @@ unsigned int
 FiniteElementData<dim>::n_dofs_per_hex () const
 {
   return dofs_per_hex;
-};
+}
 
 
 template <int dim>
@@ -1605,7 +1605,7 @@ unsigned int
 FiniteElementData<dim>::n_dofs_per_face () const
 {
   return dofs_per_face;
-};
+}
 
 
 template <int dim>
@@ -1614,7 +1614,7 @@ unsigned int
 FiniteElementData<dim>::n_dofs_per_cell () const
 {
   return dofs_per_cell;
-};
+}
 
 
 template <int dim>
@@ -1623,7 +1623,7 @@ unsigned int
 FiniteElementData<dim>::n_components () const
 {
   return components;
-};
+}
 
 
 
@@ -1712,7 +1712,7 @@ FiniteElementBase<dim>::face_system_to_component_index (const unsigned int index
           typename FiniteElementBase<dim>::ExcShapeFunctionNotPrimitive(index));
 
   return face_system_to_component_table[index];
-};
+}
 
 
 
@@ -1737,7 +1737,7 @@ FiniteElementBase<dim>::face_system_to_base_index (const unsigned int index) con
   Assert(index < face_system_to_base_table.size(),
 	 ExcIndexRange(index, 0, face_system_to_base_table.size()));
   return face_system_to_base_table[index];
-};
+}
 
 
 
@@ -1771,7 +1771,7 @@ FiniteElementBase<dim>::get_nonzero_components (const unsigned int i) const
 {
   Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
   return nonzero_components[i];
-};
+}
 
 
 
@@ -1782,7 +1782,7 @@ FiniteElementBase<dim>::n_nonzero_components (const unsigned int i) const
 {
   Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
   return n_nonzero_components_table[i];
-};
+}
 
 
 
@@ -1803,7 +1803,7 @@ FiniteElementBase<dim>::is_primitive (const unsigned int i) const
 				   // probably more expensive than
 				   // just comparing against 1
   return (n_nonzero_components_table[i] == 1);
-};
+}
 
 
 template <int dim>
@@ -1812,7 +1812,7 @@ bool
 FiniteElementBase<dim>::is_primitive () const
 {
   return cached_primitivity;
-};
+}
 
 
 

@@ -147,7 +147,7 @@ void MGTransferPrebuilt<number>::build_matrices (
 	      };
 	  };
     };
-};
+}
 
 
 /* ----------------------------- MGTransferBlock ------------------------ */
@@ -314,7 +314,7 @@ void MGTransferBlockBase::build_matrices (
       k += t;
     }
   
-};
+}
 
 
 template <typename number>

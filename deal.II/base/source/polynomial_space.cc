@@ -28,7 +28,7 @@ PolynomialSpace<dim>::compute_n_pols (const unsigned int n)
       n_pols /= (i+1);
     }
   return n_pols;
-};
+}
 
 
 template <int dim>

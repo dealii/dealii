@@ -51,7 +51,7 @@ GridReordering<dim>::Cell::Cell () :
 {
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     neighbors[i] = invalid_neighbor;
-};
+}
 
 
 
@@ -62,7 +62,7 @@ GridReordering<dim>::Cell::Cell (const CellData<dim> &cd,
 {
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     neighbors[i] = invalid_neighbor;
-};
+}
 
 
 template <int dim>
@@ -89,7 +89,7 @@ unsigned int GridReordering<dim>::Cell::count_neighbors () const
     if (neighbors[i] != invalid_neighbor)
       ++n;
   return n;
-};
+}
 
 
 
@@ -98,7 +98,7 @@ void
 GridReordering<dim>::Cell::insert_faces (std::map<Face,FaceData> &/*global_faces*/)
 {
   Assert (false, ExcNotImplemented());
-};
+}
 
 
 #if deal_II_dimension == 2
@@ -212,7 +212,7 @@ GridReordering<2>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 	  faces[2][face]->second.adjacent_cells[1] = cell_no;
 	};
     };
-};
+}
 
 #endif
 
@@ -555,7 +555,7 @@ GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
       faces[rot][face] = new_faces_ptr
 			 [cell_orientation_faces[rot][face].second]
 			 [cell_orientation_faces[rot][face].first];
-};
+}
 
 #endif
 
@@ -580,7 +580,7 @@ void GridReordering<dim>::Cell::fix_cell_neighbors ()
       else
 	neighbors[face] = faces[0][face]->second.adjacent_cells[0];
     };
-};
+}
 
 
 
@@ -627,7 +627,7 @@ void GridReordering<dim>::Cell::find_backtracking_point ()
   else
     if (track_back_to_cell == FaceData::invalid_adjacent_cell)
       track_back_to_cell = cell_no-1;
-};
+}
 
 
 
@@ -655,7 +655,7 @@ bool GridReordering<dim>::Cell::check_consistency (const unsigned int rot) const
 
 				   // no conflicts found
   return true;
-};
+}
 
 
 
@@ -669,7 +669,7 @@ void GridReordering<dim>::Cell::mark_faces_used (const unsigned int rot)
 	      ExcInternalError());
       ++faces[rot][face]->second.use_count;
     };
-};
+}
 
 
 
@@ -683,7 +683,7 @@ void GridReordering<dim>::Cell::mark_faces_unused (const unsigned int rot)
 	      ExcInternalError());
       --faces[rot][face]->second.use_count;
     };
-};
+}
 
 
 
@@ -707,7 +707,7 @@ bool GridReordering<dim>::Face::operator < (const Face &face) const
 
 				   // if all indices are equal:
   return false;
-};
+}
 
 
 
@@ -718,7 +718,7 @@ bool GridReordering<dim>::Face::operator == (const Face &face) const
     if (vertices[v] != face.vertices[v])
       return false;
   return true;
-};
+}
 
 
 
@@ -727,7 +727,7 @@ GridReordering<dim>::FaceData::FaceData () :
 		use_count (0)
 {
   adjacent_cells[0] = adjacent_cells[1] = invalid_adjacent_cell;
-};
+}
 
 
 
@@ -807,7 +807,7 @@ void GridReordering<dim>::track_back (std::vector<Cell> &cells,
 				       // as a goto.
       goto top_of_function;
     };
-};
+}
 
 
 
@@ -923,7 +923,7 @@ bool GridReordering<dim>::try_rotate_single_neighbors (std::vector<Cell> &cells,
 				   // backtracking
 //  cout << "Unsuccessfully tried to rotate neighbors of cell " << cell_no << endl;
   return false;
-};
+}
 
 
 
@@ -1110,7 +1110,7 @@ void GridReordering<dim>::find_reordering (std::vector<Cell>           &cells,
     };
 
 //  cout << "Done!" << endl;
-};
+}
 
 
 
@@ -1265,7 +1265,7 @@ GridReordering<dim>::presort_cells (std::vector<Cell>       &cells,
 	i->second.adjacent_cells[k] = new_cell_numbers[i->second.adjacent_cells[k]];
 
   return new_cell_numbers;
-};
+}
 
 		      
 
@@ -1330,7 +1330,7 @@ void GridReordering<dim>::reorder_cells (std::vector<CellData<dim> > &original_c
 				   // of
   for (typename std::map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
     Assert (i->second.use_count == 0, ExcInternalError());
-};
+}
 
 
 
@@ -1341,7 +1341,7 @@ void GridReordering<1>::reorder_cells (std::vector<CellData<1> > &)
 {
 				   // there should not be much to do
 				   // in 1d...
-};
+}
 
 #endif
 

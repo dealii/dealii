@@ -577,7 +577,7 @@ operator () (const IndexValuePair &i1,
 	     const IndexValuePair &i2) const
 {
   return (i1.first < i2.first);
-};
+}
 
 
 
@@ -599,7 +599,7 @@ add_constraints (const ConstraintList &new_constraints)
 		      constraints.begin()+old_size,
 		      constraints.end(),
 		      PairComparison());
-};
+}
 
 
 
@@ -609,7 +609,7 @@ const Matrix &
 FilteredMatrix<Matrix,Vector>::get_referenced_matrix () const
 {
   return *matrix;
-};
+}
 
 
 
@@ -618,7 +618,7 @@ inline
 unsigned int FilteredMatrix<Matrix,Vector>::m () const
 {
   return matrix->m();
-};
+}
 
 
 
@@ -627,7 +627,7 @@ inline
 unsigned int FilteredMatrix<Matrix,Vector>::n () const
 {
   return matrix->n();
-};
+}
 
 
 

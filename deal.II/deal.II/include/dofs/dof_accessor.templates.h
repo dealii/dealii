@@ -32,7 +32,7 @@ DoFAccessor<dim>::DoFAccessor () :
 		dof_handler(0)
 {
   Assert (false, ExcInvalidObject());
-};
+}
 
 
 
@@ -40,7 +40,7 @@ template <int dim>
 inline
 DoFAccessor<dim>::DoFAccessor (const DoFHandler<dim> *dof_handler) :
 		dof_handler(const_cast<DoFHandler<dim>*>(dof_handler))
-{};
+{}
 
 
 
@@ -50,7 +50,7 @@ DoFAccessor<dim>::set_dof_handler (DoFHandler<dim> *dh)
 {
   Assert (dh != 0, ExcInvalidObject());
   dof_handler = dh;
-};
+}
 
 
 
@@ -59,7 +59,7 @@ const DoFHandler<dim> &
 DoFAccessor<dim>::get_dof_handler () const
 {
   return *dof_handler;
-};
+}
 
 
 
@@ -70,7 +70,7 @@ DoFAccessor<dim>::operator = (const DoFAccessor<dim> &da)
 {
   this->set_dof_handler (da.dof_handler);
   return *this;
-};
+}
 
 
 
@@ -102,7 +102,7 @@ DoFObjectAccessor<1,dim>::dof_index (const unsigned int i) const
 
   return this->dof_handler->levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_line+i];
-};
+}
 
 
 template <int dim>
@@ -132,7 +132,7 @@ DoFObjectAccessor<1,dim>::vertex_dof_index (const unsigned int vertex,
 				   this->dof_handler->selected_fe->dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
-};
+}
 
 
 template <int dim>
@@ -178,7 +178,7 @@ DoFObjectAccessor<1,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
       *next++ = vertex_dof_index(vertex,d);
   for (unsigned int d=0; d<dofs_per_line; ++d)
     *next++ = dof_index(d);
-};
+}
 
 
 template <int dim>
@@ -196,7 +196,7 @@ DoFObjectAccessor<1,dim>::child (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
-};
+}
 
 
 template <int dim>
@@ -206,7 +206,7 @@ DoFObjectAccessor<1,dim>::copy_from (const DoFObjectAccessor<1,dim> &a)
 {
   BaseClass::copy_from (a);
   this->set_dof_handler (a.dof_handler);
-};
+}
 
 
 /*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
@@ -226,7 +226,7 @@ unsigned int DoFObjectAccessor<2,dim>::dof_index (const unsigned int i) const
 
   return this->dof_handler->levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_quad+i];
-};
+}
 
 
 template <int dim>
@@ -247,7 +247,7 @@ DoFObjectAccessor<2,dim>::vertex_dof_index (const unsigned int vertex,
 				   this->dof_handler->selected_fe->dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
-};
+}
 
 
 // if necessary try to work around a bug in the IBM xlC compiler
@@ -296,7 +296,7 @@ DoFObjectAccessor<2,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
       *next++ = this->line(line)->dof_index(d);
   for (unsigned int d=0; d<dofs_per_quad; ++d)
     *next++ = dof_index(d);
-};
+}
 
 
 template <int dim>
@@ -313,7 +313,7 @@ DoFObjectAccessor<2,dim>::line (const unsigned int i) const
       this->line_index (i),
       this->dof_handler
     );
-};
+}
 
 
 template <int dim>
@@ -331,7 +331,7 @@ DoFObjectAccessor<2,dim>::child (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
-};
+}
 
 
 template <int dim>
@@ -341,7 +341,7 @@ DoFObjectAccessor<2,dim>::copy_from (const DoFObjectAccessor<2,dim> &a)
 {
   BaseClass::copy_from (a);
   this->set_dof_handler (a.dof_handler);
-};
+}
 
 
 /*------------------------- Functions: DoFObjectAccessor<3,dim> -----------------------*/
@@ -363,7 +363,7 @@ DoFObjectAccessor<3,dim>::dof_index (const unsigned int i) const
 
   return this->dof_handler->levels[this->present_level]
     ->hex_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_hex+i];
-};
+}
 
 
 template <int dim>
@@ -384,7 +384,7 @@ DoFObjectAccessor<3,dim>::vertex_dof_index (const unsigned int vertex,
 				   this->dof_handler->selected_fe->dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
-};
+}
 
 
 template <int dim>
@@ -431,7 +431,7 @@ DoFObjectAccessor<3,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
       *next++ = this->quad(quad)->dof_index(d);
   for (unsigned int d=0; d<dofs_per_hex; ++d)
     *next++ = dof_index(d);
-};
+}
 
 
 
@@ -448,7 +448,7 @@ DoFObjectAccessor<3,dim>::line (const unsigned int i) const
       l->index(),
       this->dof_handler
     );
-};
+}
 
 
 template <int dim>
@@ -465,7 +465,7 @@ DoFObjectAccessor<3,dim>::quad (const unsigned int i) const
       this->quad_index (i),
       this->dof_handler
     );
-};
+}
 
 
 template <int dim>
@@ -483,7 +483,7 @@ DoFObjectAccessor<3,dim>::child (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
-};
+}
 
 
 template <int dim>
@@ -491,7 +491,7 @@ void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a)
 {
   BaseClass::copy_from (a);
   this->set_dof_handler (a.dof_handler);
-};
+}
 
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
@@ -512,7 +512,7 @@ DoFCellAccessor<dim>::neighbor (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
 #endif
   return q;
-};
+}
 
 
 template <int dim>
@@ -530,7 +530,7 @@ DoFCellAccessor<dim>::child (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
-};
+}
 
 
 #endif

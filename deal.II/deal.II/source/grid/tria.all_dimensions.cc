@@ -39,7 +39,7 @@ void
 CellData<1>::rotate (const unsigned int)
 {
   Assert (false, ExcNotPossible());
-};
+}
 
 
 
@@ -57,7 +57,7 @@ CellData<2>::rotate (const unsigned int times)
       vertices[2] = vertices[3];
       vertices[3] = x;
     };
-};
+}
 
 
 
@@ -111,7 +111,7 @@ CellData<3>::rotate (const unsigned int times)
 				   // order
   for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
     vertices[i] = old_vertices[rotations[times][i]];
-};
+}
 
 
 
@@ -127,7 +127,7 @@ SubCellData::check_consistency (const unsigned int dim) const
 	    return (boundary_quads.size() == 0);
     };
   return true;
-};
+}
 
 
 
@@ -164,7 +164,7 @@ TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
 			total_cells*(2*dimension) - neighbors.size(),
 			std::make_pair(-1,-1));
     };
-};
+}
 
 
 
@@ -198,7 +198,7 @@ TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) const
 	  ExcMemoryInexact (refine_flags.size(), neighbors.size()));
   Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),
 	  ExcMemoryInexact (coarsen_flags.size(), neighbors.size()));
-};
+}
 
 
 
@@ -208,7 +208,7 @@ TriangulationLevel<0>::memory_consumption () const
   return (MemoryConsumption::memory_consumption (refine_flags) +
 	  MemoryConsumption::memory_consumption (coarsen_flags) +
 	  MemoryConsumption::memory_consumption (neighbors));
-};
+}
 
 
 
@@ -247,7 +247,7 @@ TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
       lines.user_pointers.insert (lines.user_pointers.end(),
 				  new_size-lines.user_pointers.size(), 0);
     };
-};
+}
 
 
 
@@ -289,7 +289,7 @@ TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) const
 	  ExcMemoryInexact (lines.lines.size(), lines.user_pointers.size()));
 
   TriangulationLevel<0>::monitor_memory (true_dimension);
-};
+}
 
 
 
@@ -303,7 +303,7 @@ TriangulationLevel<1>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (lines.user_flags) +
 	  MemoryConsumption::memory_consumption (lines.material_id) +
 	  MemoryConsumption::memory_consumption (lines.user_pointers));
-};
+}
   
 
 
@@ -341,7 +341,7 @@ TriangulationLevel<2>::reserve_space (const unsigned int new_quads)
       quads.user_pointers.insert (quads.user_pointers.end(),
 				  new_size-quads.user_pointers.size(), 0);
     };
-};
+}
 
 
 
@@ -383,7 +383,7 @@ TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) const
 	  ExcMemoryInexact (quads.quads.size(), quads.user_pointers.size()));
 
   TriangulationLevel<1>::monitor_memory (true_dimension);
-};
+}
 
 
 
@@ -397,7 +397,7 @@ TriangulationLevel<2>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (quads.user_flags) +
 	  MemoryConsumption::memory_consumption (quads.material_id) +
 	  MemoryConsumption::memory_consumption (quads.user_pointers));
-};
+}
 
 
 
@@ -435,7 +435,7 @@ TriangulationLevel<3>::reserve_space (const unsigned int new_hexes)
       hexes.user_pointers.insert (hexes.user_pointers.end(),
 				  new_size-hexes.user_pointers.size(), 0);
     };
-};
+}
 
 
 
@@ -477,7 +477,7 @@ TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) const
 	  ExcMemoryInexact (hexes.hexes.size(), hexes.user_pointers.size()));
 
   TriangulationLevel<2>::monitor_memory (true_dimension);
-};
+}
 
 
 
@@ -491,7 +491,7 @@ TriangulationLevel<3>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (hexes.user_flags) +
 	  MemoryConsumption::memory_consumption (hexes.material_id) +
 	  MemoryConsumption::memory_consumption (hexes.user_pointers));
-};
+}
 
 
 
@@ -500,7 +500,7 @@ TriaNumberCache<1>::TriaNumberCache () :
 		n_active_lines (0) 
 				   // all other fields are
 				   // default constructed
-{};
+{}
 
 
 
@@ -511,7 +511,7 @@ TriaNumberCache<1>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (n_lines_level) +
 	  MemoryConsumption::memory_consumption (n_active_lines) +
 	  MemoryConsumption::memory_consumption (n_active_lines_level));
-};
+}
 
 
 TriaNumberCache<2>::TriaNumberCache () :
@@ -519,7 +519,7 @@ TriaNumberCache<2>::TriaNumberCache () :
 		n_active_quads (0) 
 				   // all other fields are
 				   // default constructed
-{};
+{}
 
 
 
@@ -531,7 +531,7 @@ TriaNumberCache<2>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (n_quads_level) +
 	  MemoryConsumption::memory_consumption (n_active_quads) +
 	  MemoryConsumption::memory_consumption (n_active_quads_level));
-};
+}
 
 
 
@@ -540,7 +540,7 @@ TriaNumberCache<3>::TriaNumberCache () :
 		n_active_hexes (0) 
 				   // all other fields are
 				   // default constructed
-{};
+{}
 
 
 
@@ -552,4 +552,4 @@ TriaNumberCache<3>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (n_hexes_level) +
 	  MemoryConsumption::memory_consumption (n_active_hexes) +
 	  MemoryConsumption::memory_consumption (n_active_hexes_level));
-};
+}

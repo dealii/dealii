@@ -181,7 +181,7 @@ SolverControl &
 Solver<Vector>::control() const
 {
   return cntrl;
-};
+}
 
 
 template<class Vector>
@@ -189,7 +189,7 @@ inline
 Solver<Vector>::Solver(SolverControl &cn, VectorMemory<Vector> &mem)
 		: cntrl(cn),
 		  memory(mem)
-{};
+{}
 
 
 #endif

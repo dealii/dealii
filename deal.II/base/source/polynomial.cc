@@ -30,7 +30,7 @@
 namespace 
 {
   Threads::ThreadMutex coefficients_lock;
-};
+}
 
 
 namespace Polynomials
@@ -494,7 +494,7 @@ namespace Polynomials
           v.push_back(LagrangeEquidistant(degree,i));
         return v;
       };
-  };
+  }
 
 
 
@@ -682,7 +682,7 @@ namespace Polynomials
     for (unsigned int i=0; i<=degree; ++i)
       v.push_back (Legendre<double>(i));
     return v;
-  };
+  }
 
 
 
@@ -800,7 +800,7 @@ namespace Polynomials
 				   // now, everything is done, so
 				   // release the lock again
     coefficients_lock.release ();
-  };
+  }
 
 
 
@@ -821,7 +821,7 @@ namespace Polynomials
 				   // change any more once computed,
 				   // this is MT safe
     return *p;
-  };
+  }
 
 
 
@@ -842,7 +842,7 @@ namespace Polynomials
     for (unsigned int i=0; i<=degree; ++i)
       v.push_back (Hierarchical<double>(i));
     return v;
-  };
+  }
 }
 
 

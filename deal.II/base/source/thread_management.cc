@@ -40,7 +40,7 @@ namespace Threads
     n_existing_threads_mutex.acquire ();
     ++n_existing_threads_counter;
     n_existing_threads_mutex.release ();
-  };
+  }
 
 
   
@@ -51,7 +51,7 @@ namespace Threads
     Assert (n_existing_threads_counter >= 1,
             ExcInternalError());
     n_existing_threads_mutex.release ();
-  };
+  }
 
 
 
@@ -73,7 +73,7 @@ namespace Threads
               << "---------------------------------------------------------"
               << std::endl;
     std::abort ();
-  };
+  }
 
 
 
@@ -94,7 +94,7 @@ namespace Threads
               << "---------------------------------------------------------"
               << std::endl;
     std::abort ();
-  };
+  }
   
 
   
@@ -104,7 +104,7 @@ namespace Threads
     const unsigned int n = n_existing_threads_counter;
     n_existing_threads_mutex.release ();
     return n;
-  };
+  }
   
   
 #if DEAL_II_USE_MT != 1
@@ -113,7 +113,7 @@ namespace Threads
 				  int          /*flags*/) const
   {
     (*fun_ptr) (fun_data);
-  };
+  }
   
 
   
@@ -122,7 +122,7 @@ namespace Threads
 			      void               *)
   {
     Assert (count == 1, ExcBarrierSizeNotUseful(count));
-  };
+  }
 
 
 #else
@@ -267,7 +267,7 @@ namespace Threads
   FunDataCounter::FunDataCounter () :
 		  n_fun_encapsulation_objects (0),
 		  n_fun_data_base_objects (0)
-  {};
+  {}
   
 
   
@@ -277,7 +277,7 @@ namespace Threads
 		 ExcObjectsExist("FunEncapsulation", n_fun_encapsulation_objects));
     AssertThrow (n_fun_data_base_objects == 0,
 		 ExcObjectsExist("FunDataBase", n_fun_data_base_objects));
-  };
+  }
       
 
 
@@ -295,7 +295,7 @@ namespace Threads
 				     // keep some statistics on the
 				     // number of variables around
     ++fun_data_counter.n_fun_encapsulation_objects;
-  };
+  }
 
 
 
@@ -305,7 +305,7 @@ namespace Threads
 				     // keep some statistics on the
 				     // number of variables around
     ++fun_data_counter.n_fun_encapsulation_objects;
-  };
+  }
 
 
 
@@ -315,7 +315,7 @@ namespace Threads
 				     // keep some statistics on the
 				     // number of variables around
     ++fun_data_counter.n_fun_encapsulation_objects;
-  };
+  }
 
 
   FunEncapsulation::~FunEncapsulation ()
@@ -332,7 +332,7 @@ namespace Threads
 				   // keep some statistics on the
 				   // number of variables around
     --fun_data_counter.n_fun_encapsulation_objects;
-  };
+  }
     
 
   const FunEncapsulation &
@@ -344,7 +344,7 @@ namespace Threads
     Assert (false, ExcNotImplemented());
     const FunEncapsulation * const p = 0;
     return *p;
-  };
+  }
 
 
 
@@ -354,7 +354,7 @@ namespace Threads
 				     // keep some statistics on the
 				     // number of variables around
     ++fun_data_counter.n_fun_data_base_objects;
-  };
+  }
 
 
 
@@ -364,7 +364,7 @@ namespace Threads
 				     // keep some statistics on the
 				     // number of variables around
     ++fun_data_counter.n_fun_data_base_objects;
-  };
+  }
 
 
 
@@ -379,7 +379,7 @@ namespace Threads
 				     // keep some statistics on the
 				     // number of variables around
     --fun_data_counter.n_fun_data_base_objects;
-  };
+  }
 
 
     
@@ -414,7 +414,7 @@ namespace Threads
 			  (void*)&fun_data,
 			  0);
 #endif
-  };
+  }
 
 
   
@@ -424,7 +424,7 @@ namespace Threads
   {
     for (unsigned int i=0; i<n_threads; ++i)
       spawn (thread_manager, fun_data);
-  };
+  }
   
 
 
@@ -461,8 +461,8 @@ namespace Threads
 	  return_values[i].second = end;
       };
     return return_values;
-  };  
+  };
   
   
  
-};   // end namespace Threads
+};   // end namespace Thread

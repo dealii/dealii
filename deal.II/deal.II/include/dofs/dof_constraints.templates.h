@@ -145,7 +145,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	
 	++next_constraint;
       };
-};
+}
 
 
 
@@ -258,7 +258,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 	      };
 	  };
     };
-};
+}
 
 
 
@@ -440,7 +440,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 	    };
 	};
     };
-};
+}
 
 
 
@@ -514,7 +514,7 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
 
 	++next_constraint;
       };
-};
+}
 
 
 
@@ -545,7 +545,7 @@ ConstraintMatrix::condense (VectorType &vec) const
 					   // nothing more to do
 	  break;
       };
-};
+}
 
 
 
@@ -571,7 +571,7 @@ ConstraintMatrix::set_zero (VectorType &vec) const
 					   // nothing more to do
 	  break;
       };
-};
+}
 
 
 
@@ -644,7 +644,7 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 				next_constraint->entries[i].second);
 	++next_constraint;
       };
-};
+}
 
 
 
@@ -665,7 +665,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
 	vec(next_constraint->line) += (vec(next_constraint->entries[i].first) *
 				       next_constraint->entries[i].second);
     };
-};
+}
 
 
 #endif

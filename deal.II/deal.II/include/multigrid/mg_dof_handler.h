@@ -1126,7 +1126,7 @@ void MGDoFHandler<dim>::MGVertexDoFs::set_index  (const unsigned int level,
 	  ExcIndexRange(dof_number, 0, dofs_per_vertex));
   
   indices[(level-coarsest_level)*dofs_per_vertex + dof_number] = index;
-};
+}
 
 
 template <int dim>
@@ -1141,7 +1141,7 @@ MGDoFHandler<dim>::MGVertexDoFs::get_index  (const unsigned int level,
 	  ExcIndexRange (dof_number, 0, dofs_per_vertex));
   
   return indices[(level-coarsest_level)*dofs_per_vertex + dof_number];
-};
+}
 
 
 template <>

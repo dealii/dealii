@@ -508,7 +508,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
   Assert (row<rows, ExcIndexRange(row,0,rows));
   Assert (column<columns, ExcIndexRange(column,0,columns));
   return *sub_objects[row][column];
-};
+}
 
 
 
@@ -521,7 +521,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
   Assert (row<rows, ExcIndexRange(row,0,rows));
   Assert (column<columns, ExcIndexRange(column,0,columns));
   return *sub_objects[row][column];
-};
+}
 
 
 
@@ -531,7 +531,7 @@ const BlockIndices &
 BlockSparsityPatternBase<SparsityPatternBase>::get_row_indices () const
 {
   return row_indices;
-};
+}
 
 
 
@@ -541,7 +541,7 @@ const BlockIndices &
 BlockSparsityPatternBase<SparsityPatternBase>::get_column_indices () const
 {
   return column_indices;
-};
+}
 
 
 
@@ -559,7 +559,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::add (const unsigned int i,
     col_index = column_indices.global_to_local (j);
   sub_objects[row_index.first][col_index.first]->add (row_index.second,
 						      col_index.second);
-};
+}
 
 
 
@@ -577,7 +577,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::exists (const unsigned int i,
     col_index = column_indices.global_to_local (j);
   return sub_objects[row_index.first][col_index.first]->exists (row_index.second,
 								col_index.second);
-};
+}
 
 
 
