@@ -200,15 +200,16 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 					 GeometryInfo<dim>::children_per_cell;
 
 				   // allocate the needed memory
-  indices_on_cell    = std::vector<std::vector<unsigned int> > (n_cells_to_stay_or_refine,
-						      std::vector<unsigned int> (dofs_per_cell));
-  dof_values_on_cell
-    = std::vector<std::vector<Vector<number> > > (n_coarsen_fathers,
-					std::vector<Vector<number> > (in_size,
-								 Vector<number> (dofs_per_cell)));
+  indices_on_cell=std::vector<std::vector<unsigned int> > (
+    n_cells_to_stay_or_refine,
+    std::vector<unsigned int> (dofs_per_cell));
+  
+  dof_values_on_cell=std::vector<std::vector<Vector<number> > > (
+    n_coarsen_fathers,
+    std::vector<Vector<number> > (in_size, Vector<number> (dofs_per_cell)));
 
-  all_pointerstructs = std::vector<Pointerstruct> (n_cells_to_stay_or_refine +
-					      n_coarsen_fathers);
+  all_pointerstructs=std::vector<Pointerstruct> (
+    n_cells_to_stay_or_refine+n_coarsen_fathers);
 
 
 				   // we need counters for
@@ -288,50 +289,54 @@ interpolate (const std::vector<Vector<number> > &all_in,
 	    ExcWrongVectorSize(all_in[i].size(), n_dofs_old));
 
   
-  unsigned int out_size=all_out.size();
+  const unsigned int out_size=all_out.size();
+  const unsigned int in_size=all_in.size();
 
 				   // resize the output vector
-  if (all_out.size() != all_in.size())
-    all_out = std::vector<Vector<number> >(all_in.size(),
-				      Vector<number>(dof_handler->n_dofs()));
+  if (out_size != in_size)
+    all_out=std::vector<Vector<number> >(
+      in_size, Vector<number>(dof_handler->n_dofs()));
   else
-    {
-      for (unsigned int i=0; i<all_in.size(); ++i)
-	if (all_out[i].size() != dof_handler->n_dofs())
-	  all_out[i].reinit (dof_handler->n_dofs());
-    };
+    for (unsigned int i=0; i<in_size; ++i)
+      if (all_out[i].size() != dof_handler->n_dofs())
+	all_out[i].reinit (dof_handler->n_dofs());
 
-  for (unsigned int i=0; i<all_in.size(); ++i)
-    for (unsigned int j=0; j<all_in.size(); ++j)
+  for (unsigned int i=0; i<in_size; ++i)
+    for (unsigned int j=0; j<in_size; ++j)
       Assert(&all_in[i] != &all_out[j],
              ExcMessage ("Vectors cannot be used as input and output"
                          " at the same time!"));
 
   const unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
   Vector<number> local_values(dofs_per_cell);
-
-  std::vector<unsigned int>    *indexptr;
-  Pointerstruct           *structptr;
-  std::vector<Vector<number> > *valuesptr;
-  std::vector<unsigned int>     dofs(dofs_per_cell);
+  std::vector<unsigned int> dofs(dofs_per_cell);
 
   typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 					  endc = dof_handler->end();
-  
   for (; cell!=endc; ++cell) 
     {
       if (cell->user_pointer())
 	{
-	  structptr=static_cast<Pointerstruct *>(cell->user_pointer());
-					   // cell stayed or is refined
-	  if (indexptr=structptr->indices_ptr)
+	  const Pointerstruct * const structptr
+	    =static_cast<Pointerstruct *>(cell->user_pointer());
+
+	  const std::vector<unsigned int> * const indexptr
+	    =structptr->indices_ptr;
+
+	  const std::vector<Vector<number> > * const valuesptr
+	    =structptr->dof_values_ptr;
+
+					   // cell stayed or is
+					   // refined
+	  if (indexptr)
 	    {
 	      Assert (structptr->dof_values_ptr == 0,
 		      ExcInternalError());
-
-					       // get the values of each of
-					       // the input data vectors on
-					       // this cell and prolong it
+	      
+					       // get the values of
+					       // each of the input
+					       // data vectors on this
+					       // cell and prolong it
 					       // to its children
 	      for (unsigned int j=0; j<out_size; ++j)
 		{
@@ -341,23 +346,24 @@ interpolate (const std::vector<Vector<number> > &all_in,
 							all_out[j]);
 		}
 	    }
-					   // children of cell were deleted
-	  else if (valuesptr=structptr->dof_values_ptr)
+					   // children of cell were
+					   // deleted
+	  else if (valuesptr)
 	    {
 	      Assert (!cell->has_children(), ExcInternalError());
 	      Assert (structptr->indices_ptr == 0,
 		      ExcInternalError());
 
-					       // get the local indices
+					       // get the local
+					       // indices
 	      cell->get_dof_indices(dofs);
 
-					       // distribute the stored data
-					       // to the new vectors
+					       // distribute the
+					       // stored data to the
+					       // new vectors
 	      for (unsigned int j=0; j<out_size; ++j)
-		{
-		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    all_out[j](dofs[i])=valuesptr->operator[](j)(i);
-		}
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  all_out[j](dofs[i])=valuesptr->operator[](j)(i);
 	    }
 					   // undefined status
 	  else
