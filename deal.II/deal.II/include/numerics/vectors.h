@@ -313,12 +313,28 @@ class VectorTools //<dim>
 				      * boundary first, but that you must if you
 				      * want to do so.
 				      *
+				      * This function needs the mass matrix
+				      * of the finite element space on the
+				      * present grid. To this end, the mass
+				      * matrix is assembled exactly using the
+				      * #create_mass_matrix# function in the
+				      * #MatrixTools# collection. This function
+				      * uses the #get_local_mass_matrix#
+				      * function of the finite element; however,
+				      * this function is not supported by all
+				      * finite elements, in which case we
+				      * resort to numerical quadrature using the
+				      * given quadrature rule; you should
+				      * therefore make sure that the given
+				      * quadrature formula is also sufficient
+				      * for the integration of the mass matrix.
+				      *
 				      * See the general documentation of this
 				      * class for further information.
 				      */
     static void project (const DoFHandler<dim>    &dof,
 			 const ConstraintMatrix   &constraints,
-			 const Quadrature<dim>    &q,
+			 const Quadrature<dim>    &quadrature,
 			 const Function<dim>      &function,
 			 Vector<double>           &vec,
 			 const bool                enforce_zero_boundary = false,
