@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,10 +16,19 @@
 #include <grid/geometry_info.h>
 
 
+
 template <int dim>
-FiniteElementData<dim>::FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
-					   const unsigned int n_components,
-					   const unsigned int degree) :
+FiniteElementData<dim>::FiniteElementData ()
+{}
+
+
+
+template <int dim>
+FiniteElementData<dim>::
+FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
+                   const unsigned int n_components,
+                   const unsigned int degree)
+                :
 		dofs_per_vertex(dofs_per_object[0]),
 		dofs_per_line(dofs_per_object[1]),
 		dofs_per_quad(dim>1? dofs_per_object[2]:0),
