@@ -43,7 +43,41 @@ class FE_DGQ : public FiniteElement<dim>
 				      * Destructor.
 				      */
     ~FE_DGQ ();
+    
+				     /**
+				      * Return the value of the
+				      * @p{i}th shape function at the
+				      * point @p{p}.  @p{p} is a point
+				      * on the reference element.
+				      */
+    virtual double shape_value (const unsigned int i,
+			        const Point<dim> &p) const;
+    
+				     /**
+				      * Return the gradient of the
+				      * @p{i}th shape function at the
+				      * point @p{p}. @p{p} is a point
+				      * on the reference element, and
+				      * likewise the gradient is the
+				      * gradient on the unit cell with
+				      * respect to unit cell
+				      * coordinates.
+				      */
+    virtual Tensor<1,dim> shape_grad (const unsigned int  i,
+				      const Point<dim>   &p) const;
 
+				     /**
+				      * Return the tensor of second
+				      * derivatives of the @p{i}th
+				      * shape function at point @p{p}
+				      * on the unit cell. The
+				      * derivatives are derivatives on
+				      * the unit cell with respect to
+				      * unit cell coordinates.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+					   const Point<dim> &p) const;
+    
 				     /**
 				      * Return the polynomial degree
 				      * of this finite element,

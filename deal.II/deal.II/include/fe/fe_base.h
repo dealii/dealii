@@ -380,6 +380,64 @@ class FiniteElementBase : public Subscriptor,
 		       const std::vector<bool> &restriction_is_additive_flags);
 
 				     /**
+				      * Return the value of the
+				      * @p{i}th shape function at the
+				      * point @p{p}.  @p{p} is a point
+				      * on the reference element.
+				      *
+				      * An
+				      * @p{ExcUnitShapeValuesDoNotExist}
+				      * is thrown if the shape values
+				      * of the @p{FiniteElement} under
+				      * consideration depend on the
+				      * shape of the cell in real
+				      * space.
+				      */
+    virtual double shape_value (const unsigned int i,
+			        const Point<dim> &p) const;
+    
+				     /**
+				      * Return the gradient of the
+				      * @p{i}th shape function at the
+				      * point @p{p}. @p{p} is a point
+				      * on the reference element, and
+				      * likewise the gradient is the
+				      * gradient on the unit cell with
+				      * respect to unit cell
+				      * coordinates.
+				      *
+				      * An
+				      * @p{ExcUnitShapeValuesDoNotExist}
+				      * is thrown if the shape values
+				      * of the @p{FiniteElement} under
+				      * consideration depend on the
+				      * shape of the cell in real
+				      * space.
+				      */
+    virtual Tensor<1,dim> shape_grad (const unsigned int  i,
+				      const Point<dim>   &p) const;
+
+				     /**
+				      * Return the tensor of second
+				      * derivatives of the @p{i}th
+				      * shape function at point @p{p}
+				      * on the unit cell. The
+				      * derivatives are derivatives on
+				      * the unit cell with respect to
+				      * unit cell coordinates.
+				      *
+				      * An
+				      * @p{ExcUnitShapeValuesDoNotExist}
+				      * is thrown if the shape values
+				      * of the @p{FiniteElement} under
+				      * consideration depend on the
+				      * shape of the cell in real
+				      * space.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+					   const Point<dim> &p) const;
+
+				     /**
 				      * Projection from a fine grid
 				      * space onto a coarse grid
 				      * space. If this projection
@@ -662,6 +720,11 @@ class FiniteElementBase : public Subscriptor,
 				      * concrete element.
 				      */
     unsigned int memory_consumption () const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcUnitShapeValuesDoNotExist);
 
 				     /**
 				      * Exception

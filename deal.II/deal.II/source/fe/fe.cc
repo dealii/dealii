@@ -167,6 +167,37 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 };
 
 
+template <int dim>
+double
+FiniteElementBase<dim>::shape_value (const unsigned int,
+				     const Point<dim> &) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return 0.;
+}
+
+
+
+template <int dim>
+Tensor<1,dim>
+FiniteElementBase<dim>::shape_grad (const unsigned int,
+				    const Point<dim> &) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<1,dim> ();
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+FiniteElementBase<dim>::shape_grad_grad (const unsigned int,
+					 const Point<dim> &) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<2,dim> ();
+}
+
 
 template <int dim>
 const FullMatrix<double> &

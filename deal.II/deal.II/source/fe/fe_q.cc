@@ -34,6 +34,7 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 				    std::vector<bool> (1,false)),
 		degree(degree),
 		renumber(dofs_per_cell, 0),
+		renumber_inverse(dofs_per_cell, 0),
 		face_renumber(dofs_per_face, 0),
 		poly(0)
 {
@@ -52,6 +53,11 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 				   // face function is empty
   build_renumbering (*this, degree, renumber);
   build_face_renumbering (degree, face_renumber);
+  
+				   // build inverse of renumbering
+				   // vector
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    renumber_inverse[renumber[i]]=i;
 
 				   // copy constraint matrices if they
 				   // are defined. otherwise set them
@@ -594,6 +600,35 @@ FE_Q<dim>::clone() const
   return new FE_Q<dim>(degree);
 }
 
+
+
+template <int dim>
+double
+FE_Q<dim>::shape_value (const unsigned int i,
+			const Point<dim> &p) const
+{
+  return poly->compute_value(renumber_inverse[i], p);
+}
+
+
+
+template <int dim>
+Tensor<1,dim>
+FE_Q<dim>::shape_grad (const unsigned int i,
+		       const Point<dim> &p) const
+{
+  return poly->compute_grad(renumber_inverse[i], p);
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+FE_Q<dim>::shape_grad_grad (const unsigned int i,
+			    const Point<dim> &p) const
+{
+  return poly->compute_grad_grad(renumber_inverse[i], p);
+}
 
 
 //----------------------------------------------------------------------

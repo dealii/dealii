@@ -248,11 +248,54 @@ class FE_Q : public FiniteElement<dim>
 				      * Destructor.
 				      */
     ~FE_Q ();
+    
+				     /**
+				      * Return the value of the
+				      * @p{i}th shape function at the
+				      * point @p{p}.  @p{p} is a point
+				      * on the reference element.
+				      */
+    virtual double shape_value (const unsigned int i,
+			        const Point<dim> &p) const;
+    
+				     /**
+				      * Return the gradient of the
+				      * @p{i}th shape function at the
+				      * point @p{p}. @p{p} is a point
+				      * on the reference element, and
+				      * likewise the gradient is the
+				      * gradient on the unit cell with
+				      * respect to unit cell
+				      * coordinates.
+				      */
+    virtual Tensor<1,dim> shape_grad (const unsigned int  i,
+				      const Point<dim>   &p) const;
+
+				     /**
+				      * Return the tensor of second
+				      * derivatives of the @p{i}th
+				      * shape function at point @p{p}
+				      * on the unit cell. The
+				      * derivatives are derivatives on
+				      * the unit cell with respect to
+				      * unit cell coordinates.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+					   const Point<dim> &p) const;
 
 //TODO:[RH] make get_renumber private or move it some other place    
 				     /**
 				      * Read-only access to the
 				      * renumber vector.
+				      *
+				      * This function shouldn't be
+				      * used, i.e. the users code
+				      * shouldn't rely on the actual
+				      * numbering of the degrees of
+				      * dreedom on each cell. This,
+				      * because this internal
+				      * numbering might change in
+				      * future.
 				      */
     const std::vector<unsigned int> & get_renumber() const;
 
@@ -514,7 +557,15 @@ class FE_Q : public FiniteElement<dim>
 				      * shape function numbering.
 				      */
     std::vector<unsigned int> renumber;
-    
+
+				     /**
+				      * Inverse renumber
+				      * vector. i.e. mapping from
+				      * shape function numbering to
+				      * lexicographic numbering.
+				      */
+    std::vector<unsigned int> renumber_inverse;
+             
 				     /**
 				      * Mapping from lexicographic to
 				      * shape function numbering on first face.

@@ -233,6 +233,52 @@ FESystem<dim>::clone() const
 
 
 template <int dim>
+double
+FESystem<dim>::shape_value (const unsigned int i,
+			    const Point<dim> &p) const
+{
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
+
+  pair<unsigned,unsigned> comp = system_to_component_index(i);
+  
+  return base_element(component_to_base_table[comp.first])
+    .shape_value(comp.second, p);
+}
+
+
+
+template <int dim>
+Tensor<1,dim>
+FESystem<dim>::shape_grad (const unsigned int i,
+			   const Point<dim> &p) const
+{
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
+
+  pair<unsigned,unsigned> comp = system_to_component_index(i);
+  
+  return base_element(component_to_base_table[comp.first])
+    .shape_grad(comp.second, p);
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+FESystem<dim>::shape_grad_grad (const unsigned int i,
+				const Point<dim> &p) const
+{
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
+
+
+  pair<unsigned,unsigned> comp = system_to_component_index(i);
+  
+  return base_element(component_to_base_table[comp.first])
+    .shape_grad_grad(comp.second, p);
+}
+
+
+
+template <int dim>
 UpdateFlags
 FESystem<dim>::update_once (const UpdateFlags flags) const
 {

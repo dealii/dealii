@@ -214,6 +214,34 @@ FE_DGQ<dim>::clone() const
 
 
 
+template <int dim>
+double
+FE_DGQ<dim>::shape_value (const unsigned int i,
+			  const Point<dim> &p) const
+{
+  return poly->compute_value(i, p);
+}
+
+
+
+template <int dim>
+Tensor<1,dim>
+FE_DGQ<dim>::shape_grad (const unsigned int i,
+			 const Point<dim> &p) const
+{
+  return poly->compute_grad(i, p);
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+FE_DGQ<dim>::shape_grad_grad (const unsigned int i,
+			      const Point<dim> &p) const
+{
+  return poly->compute_grad_grad(i, p);
+}
+
 
 //----------------------------------------------------------------------
 // Auxiliary functions
