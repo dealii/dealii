@@ -60,7 +60,7 @@ void FESystem<dim>::initialize ()
     }
   
 				   // 2. Lines
-  for (unsigned line_number= 0 ; ((line_number < GeometryInfo<dim>::lines_per_cell) &&
+  for (unsigned line_number= 0 ; ((line_number != GeometryInfo<dim>::lines_per_cell) &&
 				  (GeometryInfo<dim>::lines_per_cell > 0));
        ++line_number)
     {
@@ -86,7 +86,7 @@ void FESystem<dim>::initialize ()
     }
   
 				   // 3. Quads
-  for (unsigned quad_number= 0 ; ((quad_number < GeometryInfo<dim>::quads_per_cell) &&
+  for (unsigned quad_number= 0 ; ((quad_number != GeometryInfo<dim>::quads_per_cell) &&
 				  (GeometryInfo<dim>::quads_per_cell > 0));
        ++quad_number)
     {
@@ -112,7 +112,7 @@ void FESystem<dim>::initialize ()
     }
   
 				   // 4. Hex
-  for (unsigned hex_number= 0 ; ((hex_number < GeometryInfo<dim>::hexes_per_cell) &&
+  for (unsigned hex_number= 0 ; ((hex_number != GeometryInfo<dim>::hexes_per_cell) &&
 				 (GeometryInfo<dim>::hexes_per_cell > 0));
        ++hex_number)
     {
