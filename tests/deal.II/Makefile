@@ -20,21 +20,24 @@ lib-h-files = $(wildcard ../../deal_II/include/*/*.h) \
               $(wildcard ../../lac/include/*/*.h) \
               $(wildcard ../../base/include/*/*.h)
 executables = $(cc-files:.cc=.testcase)
+output-files= $(cc-files:.cc=.output)
 
 # list of libraries needed to link with
-libs.g   = $D/deal.II/lib/libdeal_II_2d.g.a $D/lac/lib/liblac.g.a $D/base/lib/libbase.g.a
-libs     = $D/deal.II/lib/libdeal_II_2d.a   $D/lac/lib/liblac.a   $D/base/lib/libbase.a
+libs.g   = $D/lac/lib/liblac.g.a $D/base/lib/libbase.g.a
+libs     = $D/lac/lib/liblac.a   $D/base/lib/libbase.a
 
 
 # check whether we use debug mode or not
 ifeq ($(debug-mode),on)
 libraries = $(libs.g)
-flags     = $(CXXFLAGS.g)
+flags     = $(CXXFLAGS.g) -L$D/deal.II/lib
+lib-tag   = "deal_II_libraries.g="
 endif
 
 ifeq ($(debug-mode),off)
 libraries = $(libs)
-flags     = $(CXXFLAGS)
+flags     = $(CXXFLAGS) -L$D/deal.II/lib
+lib-tag   = "deal_II_libraries="
 endif
 
 
@@ -42,7 +45,7 @@ endif
 # rule to make executables
 %.testcase: %.cc $(libraries)
 	@echo ============================ Compiling Testcase:   $<
-	@$(CXX) $(flags) $< -o $@ $(libraries)
+	@$(CXX) $(flags) $< -o $@ $(shell grep $(lib-tag) $< | perl -pe 's/.*=//;') $(libs)
 
 
 
@@ -56,7 +59,7 @@ targets = $(addsuffix .target, $(executables))
 # the right filename by dropping the suffix added for the make-rule
 %.target : %
 	@echo ============================ Executing Testcase:   $<
-	@./$<
+	./$< > $(subst testcase,output,$<)
 
 # this is the main target
 # make dependence so that it first wants to compile all files then
@@ -66,7 +69,7 @@ check: $(executables) $(targets)
 
 
 clean:
-	-rm -f *.o *.go *~ Makefile.dep $(executables)
+	-rm -f *.o *.go *~ Makefile.dep $(executables) $(output-files)
 
 
 

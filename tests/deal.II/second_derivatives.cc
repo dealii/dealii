@@ -1,5 +1,8 @@
+// 	$Id$	
 // test for correctness of gradients on a given cell
 
+// deal_II_libraries.g=-ldeal_II_2d.g
+// deal_II_libraries=-ldeal_II_2d
 
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>
