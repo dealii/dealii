@@ -262,28 +262,30 @@ void FESystem<dim>::initialize ()
   build_cell_table();
   build_face_table();
 				   // distribute the matrices of the base
-				   // finite element to the matrices of
+				   // finite elements to the matrices of
 				   // this object
-/*  for (unsigned int i=0; i<base_element->total_dofs; ++i)
-    for (unsigned int j=0; j<base_element->total_dofs; ++j)
-      for (unsigned int n=0; n<n_sub_elements; ++n)
-					 // only fill diagonals of the blocks
+  for (unsigned int component=0; component<n_components; ++component)
+    for (unsigned int i=0; i<base_element(component_to_base_table[component]).total_dofs; ++i)
+      for (unsigned int j=0; j<base_element(component_to_base_table[component]).total_dofs; ++j)
+					 // only fill block diagonals, no
+					 // intermixing of subelements
 	{
 	  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
 	    {
-	      restriction[child] (i*n_sub_elements + n,
-				  j*n_sub_elements + n)
-		= base_element->restrict(child)(i,j);
-	      prolongation[child] (i*n_sub_elements + n,
-				   j*n_sub_elements + n)
-		= base_element->prolongate(child)(i,j);
+	      restriction[child] (component_to_system_index (component,i),
+				  component_to_system_index (component, j))
+		= base_element(component_to_base_table[component]).restrict(child)(i,j);
+	      prolongation[child] (component_to_system_index (component,i),
+				   component_to_system_index (component, j))
+		= base_element(component_to_base_table[component]).prolongate(child)(i,j);
 	    };
 
-	  interface_constraints (i*n_sub_elements + n,
-				 j*n_sub_elements + n)
-	    = base_element->constraints()(i,j);
+// still to do:	  
+//	  interface_constraints (// component_to_system_index (component,i),
+// 				 component_to_system_index (component, j))
+// 	    = base_element(component_to_base_table[component]).constraints()(i,j);
 	};
-*/};
+};
 
 
 
