@@ -716,15 +716,24 @@ dnl Usage: DEAL_II_CONFIGURE_TECPLOT
 dnl
 AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
 [
-  AC_CHECK_FILE($TECHOME/lib/tecio.a, TECPLOT_LIBRARY_PATH=$TECHOME/lib/tecio.a)
-  AC_CHECK_FILE($TEC80HOME/lib/tecio.a, TECPLOT_LIBRARY_PATH=$TEC80HOME/lib/tecio.a)
-  AC_CHECK_FILE($TEC90HOME/lib/tecio.a, TECPLOT_LIBRARY_PATH=$TEC90HOME/lib/tecio.a)
+  AC_CHECK_FILE($TECHOME/lib/tecio.a,
+		TECPLOT_LIBRARY_PATH=$TECHOME/lib/tecio.a)
+  AC_CHECK_FILE($TEC80HOME/lib/tecio.a,
+		TECPLOT_LIBRARY_PATH=$TEC80HOME/lib/tecio.a)
+  AC_CHECK_FILE($TEC90HOME/lib/tecio.a,
+		TECPLOT_LIBRARY_PATH=$TEC90HOME/lib/tecio.a)
   AC_SUBST(TECPLOT_LIBRARY_PATH)
-  AC_CHECK_FILE($TECHOME/include/TECIO.h, TECPLOT_INCLUDE_PATH=$TECHOME/include)
-  AC_CHECK_FILE($TEC80HOME/include/TECIO.h, TECPLOT_INCLUDE_PATH=$TEC80HOME/include)
-  AC_CHECK_FILE($TEC90HOME/include/TECIO.h, TECPLOT_INCLUDE_PATH=$TEC90HOME/include)
+  AC_CHECK_FILE($TECHOME/include/TECIO.h,
+		TECPLOT_INCLUDE_PATH=$TECHOME/include)
+  AC_CHECK_FILE($TEC80HOME/include/TECIO.h,
+	        TECPLOT_INCLUDE_PATH=$TEC80HOME/include)
+  AC_CHECK_FILE($TEC90HOME/include/TECIO.h,
+	        TECPLOT_INCLUDE_PATH=$TEC90HOME/include)
   AC_SUBST(TECPLOT_INCLUDE_PATH)
-  if test -r $TECPLOT_LIBRARY_PATH -a -r $TECPLOT_INCLUDE_PATH/TECIO.h ; then
-    AC_DEFINE(DEAL_II_HAVE_TECPLOT, 1,[Flag indicating whether the library shall be compiled to use the Tecplot interface])
+
+  if (test -r $TECPLOT_LIBRARY_PATH && \
+      test -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
+    AC_DEFINE(DEAL_II_HAVE_TECPLOT, 1,
+	      [Flag indicating whether the library shall be compiled to use the Tecplot interface])
   fi
 ])
