@@ -80,7 +80,7 @@ MappingQ<1>::~MappingQ ()
 
 
 template<typename number>
-static number power(const number x, const unsigned int y)
+number power(const number x, const unsigned int y)
 {
 				   // since the power to which x is
 				   // raised is usually the space
