@@ -1997,14 +1997,6 @@ void IntegratedValueAtOrigin<dim>::compute_functionals (Vector<double> &j1,
 /*------------------------ SeismicSignal --------------------------------*/
 
 
-template <>
-void SeismicSignal<1>::compute_functionals (Vector<double> &,
-					    Vector<double> &)
-{
-  Assert (false, ExcNotImplemented());
-}
-
-
 template <int dim>
 void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
 					      Vector<double> &j2) {
@@ -2055,14 +2047,6 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
 /*------------------------ EarthSurface --------------------------------*/
 
 
-template <>
-void EarthSurface<1>::compute_functionals (Vector<double> &,
-					   Vector<double> &)
-{
-  Assert (false, ExcNotImplemented());
-}
-
-
 template <int dim>
 void EarthSurface<dim>::compute_functionals (Vector<double> &j1,
 					     Vector<double> &j2) {
@@ -2101,14 +2085,6 @@ void EarthSurface<dim>::compute_functionals (Vector<double> &j1,
 
 
 /*------------------------ SplitSignal --------------------------------*/
-
-
-template <>
-void SplitSignal<1>::compute_functionals (Vector<double> &,
-					  Vector<double> &)
-{
-  Assert (false, ExcInternalError());
-}
 
 
 template <int dim>
@@ -2172,46 +2148,6 @@ void SplitLine<dim>::compute_endtime_vectors (Vector<double> &,
 }
 
 
-#if 2 == 1
-
-template <>
-void SplitLine<1>::compute_endtime_vectors (Vector<double> &final_u_bar,
-					    Vector<double> &final_v_bar) {
-  const unsigned int dim = 1;
-
-  const double n_q_points = quadrature->n_quadrature_points;
-  const unsigned int dofs_per_cell = fe->dofs_per_cell;
-
-  final_u_bar.reinit (dof->n_dofs());
-  final_v_bar.reinit (dof->n_dofs());
-
-  DoFHandler<dim>::active_cell_iterator cell = dof->begin_active (),
-					endc = dof->end ();
-
-  FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
-  std::vector<unsigned int> cell_dof_indices (dofs_per_cell);
-
-  for (; cell!=endc; ++cell)
-    {
-      if ((cell->vertex(0)(0) < -0.5) ||
-	  (cell->vertex(1)(0)  > 0.5))
-	continue;
-      
-      fe_values.reinit (cell);
-
-      std::vector<double> local_functional (dofs_per_cell, 0);
-      for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
-	for (unsigned int point=0; point<n_q_points; ++point) 
-	  local_functional[shape_func] += fe_values.shape_value(shape_func,point) *
-					   fe_values.JxW(point);
-
-      cell->get_dof_indices (cell_dof_indices);
-      for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
-	final_u_bar(cell_dof_indices[shape_func]) += local_functional[shape_func];
-    };
-};
-
-#endif
 
 
 /*------------------------ OneBranch1d --------------------------------*/
@@ -2592,14 +2528,6 @@ void EvaluateSeismicSignal<dim>::reset () {
 }
 
 
-template <>
-double EvaluateSeismicSignal<1>::evaluate ()
-{
-  Assert (false, ExcNotImplemented());
-  return 0;
-}
-
-
 template <int dim>
 double EvaluateSeismicSignal<dim>::evaluate () {
   const unsigned int n_q_points = this->quadrature_face->n_quadrature_points;
@@ -2679,14 +2607,6 @@ std::string EvaluateSplitSignal<dim>::description () const {
 template <int dim>
 void EvaluateSplitSignal<dim>::reset () {
   result = 0;
-}
-
-
-template <>
-double EvaluateSplitSignal<1>::evaluate ()
-{
-  Assert (false, ExcNotImplemented());
-  return 0;
 }
 
 
@@ -2770,39 +2690,6 @@ double EvaluateOneBranch1d<dim>::evaluate ()
 }
 
 
-#if 2 == 1
-
-template <>
-double EvaluateOneBranch1d<1>::evaluate () {
-  if ((time<=2.5-time_step) || (time>2.5))
-    return 0;
-
-  const unsigned int n_q_points = quadrature->n_quadrature_points;
-  DoFHandler<1>::active_cell_iterator cell = dof->begin_active(),
-				      endc = dof->end();
-  double u_integrated=0;
-  FEValues<1>  fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
-  std::vector<double> cell_u (fe->dofs_per_cell);
-  
-  for (; cell!=endc; ++cell)
-    if ((cell->center()(0) > -0.6) &&
-	(cell->center()(0) < -0.4))
-      {
-	fe_values.reinit (cell);
-	fe_values.get_function_values (*u, cell_u);
-
-	double local_integral = 0;
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  local_integral += cell_u[point] *
-			    fe_values.JxW(point);
-	u_integrated += local_integral;
-      };
-  result += u_integrated;
-  
-  return u_integrated;
-};
-
-#endif
 
 
 /*------------------------- EvaluateSecondCrossing1d --------------------------*/
@@ -2839,40 +2726,6 @@ double EvaluateSecondCrossing1d<dim>::evaluate ()
   return 0;
 }
 
-
-#if 2 == 1
-
-template <>
-double EvaluateSecondCrossing1d<1>::evaluate () {
-  if ((time<=2.4-time_step) || (time>2.4))
-    return 0;
-
-  const unsigned int n_q_points = quadrature->n_quadrature_points;
-  DoFHandler<1>::active_cell_iterator cell = dof->begin_active(),
-				      endc = dof->end();
-  double u_integrated=0;
-  FEValues<1>  fe_values (*fe, *quadrature,
-			  UpdateFlags(update_values | update_JxW_values | update_q_points));
-  std::vector<double> cell_u (fe->dofs_per_cell);
-  
-  for (; cell!=endc; ++cell)
-    if ((cell->center()(0) > -0.03) &&
-	(cell->center()(0) < 0.03))
-      {
-	fe_values.reinit (cell);
-	fe_values.get_function_values (*u, cell_u);
-	double local_integral = 0;
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  local_integral += cell_u[point] *
-			    fe_values.JxW(point);
-	u_integrated += local_integral;
-      };
-  result += u_integrated;
-  
-  return u_integrated;
-};
-
-#endif
 
 
 /*------------------------- EvaluateHuyghensWave --------------------------*/
@@ -3971,63 +3824,6 @@ void WaveParameters<dim>::set_dual_functional (const std::string &name) {
 }
 
 
-#if 2 == 1
-
-template <>
-void WaveParameters<1>::make_coarse_grid (const std::string &name) {
-  const unsigned int dim = 1;
-  
-  coarse_grid = new Triangulation<dim>(MeshSmoothing(smoothing_on_refinement |
-						     eliminate_refined_inner_islands));
-
-  if (name == "line")
-    GridGenerator::hyper_cube (*coarse_grid, -1, 1);
-  else
-    if (name == "split line") 
-      {
-	const Point<1> vertices[4] = { Point<1>(-1.),
-				       Point<1>(-1./3.),
-				       Point<1>(1./3.),
-				       Point<1>(1.) };
-	std::vector<CellData<1> > cells (3, CellData<1>());
-	cells[0].vertices[0] = 0;
-	cells[0].vertices[1] = 1;
-	cells[0].material_id = 0;
-
-	cells[1].vertices[0] = 1;
-	cells[1].vertices[1] = 2;
-	cells[1].material_id = 0;
-
-	cells[2].vertices[0] = 2;
-	cells[2].vertices[1] = 3;
-	cells[2].material_id = 0;
-
-	coarse_grid->create_triangulation (std::vector<Point<1> >(&vertices[0],
-							     &vertices[4]),
-					   cells,
-					   SubCellData());
-
-	typename Triangulation<dim>::active_cell_iterator cell = coarse_grid->begin_active();
-	(++cell)->set_refine_flag ();
-	(++cell)->set_refine_flag ();
-	coarse_grid->execute_coarsening_and_refinement ();
-
-	for (int k=0; k<2; ++k)
-	  {
-	    for (cell=coarse_grid->begin_active(); cell!=coarse_grid->end(); ++cell)
-	      if (cell->level() == k+1)
-		cell->set_refine_flag ();
-	    coarse_grid->execute_coarsening_and_refinement ();
-	  };
-      }
-    else
-      AssertThrow (false, ExcParameterNotInList(name));
-  
-  coarse_grid->refine_global (initial_refinement);
-};
-
-#endif
-
 
 #if 2 == 2
 
@@ -4167,14 +3963,14 @@ void WaveParameters<2>::make_coarse_grid (const std::string &name) {
 		};
 
 
-case uniform_channel:
+		case uniform_channel:
 		{
 		  coarse_grid->refine_global (initial_refinement-1);
 		  break;
 		};
 
 
-default:
+		default:
 		      Assert (false, ExcInternalError());
 	      };
 	  };
@@ -4182,7 +3978,7 @@ default:
       };
 
 
-case square:
+      case square:
       case seismic_square:
       {
 	GridGenerator::hyper_cube (*coarse_grid, -1, 1);
@@ -7601,13 +7397,6 @@ const Quadrature<dim> &FEHelper<dim>::get_quadrature (const std::string &name) {
   Assert (false, ExcInternalError());
 
   return q_gauss_2;
-}
-
-
-template <>
-const Quadrature<0> &FEHelper<1>::get_quadrature_face (const std::string &) {
-  static const Quadrature<0> dummy_quadrature(1);
-  return dummy_quadrature;
 }
 
 
