@@ -504,13 +504,16 @@ class VectorTools
 				     /**
 				      * Mean-value filter for Stokes.
 				      * The pressure in Stokes'
-				      * equations is determined up to a
-				      * constant only. This function
-				      * allows to subtract the mean
-				      * value of the pressure. It is
-				      * usually called in a
-				      * preconditioner and generates
-				      * updates with mean value zero.
+				      * equations with only Dirichlet
+				      * boundaries for the velocities
+				      * is determined up to a constant
+				      * only. This function allows to
+				      * subtract the mean value of the
+				      * pressure. It is usually called
+				      * in a preconditioner and
+				      * generates updates with mean
+				      * value zero. The mean value is
+				      * understood in the l1-sense.
 				      *
 				      * Apart from the vector @p{v} to
 				      * operate on, this function
@@ -522,8 +525,39 @@ class VectorTools
 				      */
     static void subtract_mean_value(Vector<double>     &v,
 				    const vector<bool> &p_select);
-
-
+    
+				     /**
+				      * Compute the mean value of one
+				      * component of the solution.
+				      *
+				      * This function integrates the
+				      * chosen component over the
+				      * whole domain and returns the
+				      * result.
+				      *
+				      * Subtracting this mean value
+				      * from the node vector does not
+				      * generally yield the desired
+				      * result of a finite element
+				      * function with mean value
+				      * zero. In fact, it only works
+				      * for Lagrangian
+				      * elements. Therefore, it is
+				      * necessary to compute the mean
+				      * value and subtract it in the
+				      * evaluation routine.
+				      *
+				      * So far, this is needed only in
+				      * the error evaluation for
+				      * Stokes with complete Dirichlet
+				      * boundaries for the velocities.
+				      */
+    template <int dim>
+    static double compute_mean_value (const DoFHandler<dim> &dof,
+				      const Quadrature<dim> &quadrature,
+				      Vector<double>        &v,
+				      const unsigned int component);
+    
 				     /**
 				      * Exception
 				      */

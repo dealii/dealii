@@ -1110,6 +1110,45 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 };
 
 
+
+template <int dim>
+double
+VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
+				 const Quadrature<dim> &quadrature,
+				 Vector<double>        &v,
+				 const unsigned int component)
+{
+  Assert (component < dof.get_fe().n_components(),
+	  ExcIndexRange(component, 0, dof.get_fe().n_components()));
+  
+  FEValues<dim> fe(dof.get_fe(), quadrature,
+		   UpdateFlags(update_JxW_values
+			       | update_values));
+
+  DoFHandler<dim>::active_cell_iterator c;
+  vector<Vector<double> > values(quadrature.n_quadrature_points,
+				 Vector<double> (dof.get_fe().n_components()));
+  
+  double mean = 0.;
+  double area = 0.;
+				   // Compute mean value
+  for (c = dof.begin_active();
+       c != dof.end();
+       ++c)
+    {
+      fe.reinit (c);
+      fe.get_function_values(v, values);
+      for (unsigned int k=0; k< quadrature.n_quadrature_points; ++k)
+	{
+	  mean += fe.JxW(k) * values[k](component);
+	  area += fe.JxW(k);
+	}
+    }
+  return (mean/area);
+}
+
+
+
 // explicit instantiations
 template
 void VectorTools::integrate_difference (const DoFHandler<deal_II_dimension> &,
@@ -1140,6 +1179,14 @@ template
 void VectorTools::interpolate (const DoFHandler<deal_II_dimension> &,
 			       const Function<deal_II_dimension>   &,
 			       Vector<double>                      &);
+
+template
+double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension> &dof,
+					const Quadrature<deal_II_dimension> &quadrature,
+					Vector<double>        &v,
+					const unsigned int component);
+
+
 
 // the following two functions are not derived from a template in 1d
 // and thus need no explicit instantiation
