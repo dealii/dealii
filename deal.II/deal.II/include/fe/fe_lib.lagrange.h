@@ -25,6 +25,7 @@
  *
  * @author Wolfgang Bangerth, 1998
  */
+
 template <int dim>
 class FELinear : public FELinearMapping<dim> {
   public:
@@ -32,7 +33,19 @@ class FELinear : public FELinearMapping<dim> {
 				      * Constructor
 				      */
     FELinear ();
-
+  protected:
+				     /**
+				      * Constructor that is called by the
+				      * constructor of the derived
+				      * #FEDGLinear# class.
+				      * It uses  no dofs in the vertices and 
+				      * $2^d$ dofs per cell. No constraint
+				      * matrices are build.
+				      * For more detail see class #FEDGLinear#.
+				      */
+    FELinear (const int);
+  public:
+    
 				     /**
 				      * Return the value of the #i#th shape
 				      * function at point #p# on the unit cell.
@@ -106,7 +119,20 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      * Constructor
 				      */
     FEQuadraticSub ();
-
+  protected:
+				     /**
+				      * Constructor that is called by the
+				      * constructor of the derived
+				      * #FEDGQuadraticSub# class.
+				      * It uses no dofs in the vertices, no
+				      * dofs in the lines and 
+				      * $3^d$ dofs per cell. No constraint
+				      * matrices are build.
+				      * For more detail see class 
+				      * #FEDGQuadraticSub#.
+				      */
+    FEQuadraticSub (const int);
+  public:
 				     /**
 				      * Return the value of the #i#th shape
 				      * function at point #p# on the unit cell.
@@ -196,6 +222,20 @@ class FECubicSub : public FELinearMapping<dim> {
 				      * Constructor
 				      */
     FECubicSub ();
+  protected:
+				     /**
+				      * Constructor that is called by the
+				      * constructor of the derived
+				      * #FEDGCubicSub# class.
+				      * It uses  no dofs in the vertices and 
+				      * $4^d$ dofs per cell. No constraint
+				      * matrices are build.
+				      * For more detail see class
+				      * #FEDGCubicSub#.
+				      */
+    FECubicSub (const int);
+  public:
+
 
 				     /**
 				      * Return the value of the #i#th shape
@@ -287,7 +327,19 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      * Constructor
 				      */
     FEQuarticSub ();
-
+  protected:
+				     /**
+				      * Constructor that is called by the
+				      * constructor of the derived
+				      * #FEDGQuarticSub# class.
+				      * It uses  no dofs in the vertices and 
+				      * $5^d$ dofs per cell. No constraint
+				      * matrices are build.
+				      * For more detail see class
+				      * #FEDGQuarticSub#.
+				      */
+    FEQuarticSub (const int);
+  public:
 				     /**
 				      * Return the value of the #i#th shape
 				      * function at point #p# on the unit cell.
