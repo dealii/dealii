@@ -16,7 +16,6 @@
 #include <base/thread_management.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
-#include <numerics/data_out_rotation.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
@@ -24,6 +23,7 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
+#include <numerics/data_out_rotation.h>
 
 #include <cmath>
 
