@@ -1006,9 +1006,11 @@ class SparseDirectMA47 : public Subscriptor
  * direct sparse LU factorization. Matrices may have symmetric or unsymmetrix
  * sparsity patterns, and may have unsymmetric entries.
  *
- * Note that this class only works if configuration of the deal.II library has
- * detected the presence of this solver. Please read the README file on
- * what the configure script is looking for and how to provide it.
+ * @note This class only exists if support for <a
+ * href="http://www.cise.ufl.edu/research/sparse/umfpack">UMFPack</a>
+ * was enabled during configure and if the <a
+ * href="http://www.cise.ufl.edu/research/sparse/umfpack">UMFPack</a>
+ * library was configured.
  *
  * @author Wolfgang Bangerth, 2004
  */
