@@ -73,7 +73,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	new_line.push_back (row-shift);
 
 
-next_constraint = lines.begin();
+  next_constraint = lines.begin();
 				   // note: in this loop we need not check
 				   // whether #next_constraint# is a valid
 				   // iterator, since #next_constraint# is
@@ -141,6 +141,7 @@ next_constraint = lines.begin();
 	++next_constraint;
       };
 };
+
 
 
 template<typename number>
@@ -259,6 +260,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 };
 
 
+
 template<typename number>
 void
 ConstraintMatrix::condense (const Vector<number> &uncondensed,
@@ -306,7 +308,7 @@ ConstraintMatrix::condense (const Vector<number> &uncondensed,
 	new_line.push_back (row-shift);
 
 
-next_constraint = lines.begin();
+  next_constraint = lines.begin();
 				   // note: in this loop we need not check
 				   // whether #next_constraint# is a valid
 				   // iterator, since #next_constraint# is
@@ -330,6 +332,7 @@ next_constraint = lines.begin();
 	++next_constraint;
       };
 };
+
 
 
 template<typename number>
@@ -362,6 +365,7 @@ ConstraintMatrix::condense (Vector<number> &vec) const
 };
 
 
+
 template<typename number>
 void
 ConstraintMatrix::set_zero (Vector<number> &vec) const
@@ -385,6 +389,7 @@ ConstraintMatrix::set_zero (Vector<number> &vec) const
 	  break;
       };
 };
+
 
 
 template<typename number>
@@ -434,7 +439,7 @@ ConstraintMatrix::distribute (const Vector<number> &condensed,
 	old_line.push_back (row-shift);
 
 
-next_constraint = lines.begin();
+  next_constraint = lines.begin();
 				   // note: in this loop we need not check
 				   // whether #next_constraint# is a valid
 				   // iterator, since #next_constraint# is
@@ -457,6 +462,7 @@ next_constraint = lines.begin();
 	++next_constraint;
       };
 };
+
 
 
 template<typename number>
