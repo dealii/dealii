@@ -28,7 +28,8 @@ std::string modify_name (const std::string &name)
 {
   std::string new_name = name;
   std::string dim_name = std::string("<");
-  dim_name += '0'+dim;
+  const char dim_char='0'+dim;
+  dim_name += dim_char;
   dim_name += '>';
 
   unsigned int pos;
