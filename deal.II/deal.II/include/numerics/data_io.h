@@ -332,7 +332,7 @@ class DataIn {
  *
  * The cells can be shaded in four different modes, controlled by the
  * attribute #cell_shading#:
- * \begin{description}
+ * \begin{enumerate}
  *   \item[NoShading] provides transparent shading.
  *   \item[ShadingVector] uses a cell vector to do shading. The number
  *     of the cell vector to be uses is provided in #cell_vector#. To
@@ -348,16 +348,16 @@ class DataIn {
  *     vectors. If there no height information then do no
  *     shading. Otherwise if there is cell_data use this for shading.
  *     Otherwise do light shading.
- * \end{description}
+ * \end{enumerate}
  *
  * Finnaly one can choose to mark the cell boundaries by setting
  * #cell_boundary_shading#. It can take one of four values:
- * \begin{enumerate}
+ * \begin{itemize}
  *   \item NoBoundary for no cell boundaries,
  *   \item DefaultBoundary or
  *   \item BlackBoundary for black cell boundaries,
  *   \item WhiteBoundary for white cell boundaries, 
- * \end{enumerate}
+ * \end{itemize}
  *
  * Another interesting feature is that you can write multiple
  * eps-pictures to one file by just doing several invocations of
@@ -365,7 +365,7 @@ class DataIn {
  * with the #>># Button in GhostView for example.
  *
  *
- * \subsection {GMV format}
+ * \subsection{GMV format}
  *
  * The #write_gmv# function and the #write# function through the #gmv# parameter
  * write the data in a format understood by the GMV (general mesh viewer)
