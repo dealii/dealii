@@ -3957,6 +3957,55 @@ using namespace std;
 
 
 dnl -------------------------------------------------------------
+dnl Check whether the gethostname() function is available. To
+dnl spice up things, some versions of cygwin have a problem in
+dnl that when you call that function on an AMD system, the FPU
+dnl is set into 64bit mode, rather than 80bit mode, and doesn't
+dnl do any long double computations any more, even though the
+dnl compiler still announces that it does through the std::limits
+dnl class. We have to check for this.
+dnl
+dnl Usage: DEAL_II_CHECK_GETHOSTNAME
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_GETHOSTNAME, dnl
+[
+  AC_CHECK_FUNCS(gethostname)
+
+  AC_MSG_CHECKING(for bad gethostname/FPU interaction)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_RUN(
+    [
+#include <unistd.h>
+#include <limits>
+
+int main()
+{
+   char buf\[100\];
+   gethostname(buf,99);
+
+   volatile long double x=1.0;
+   x += std::numeric_limits<long double>::epsilon();
+
+   return (x != 1.0);
+}
+    ],
+    [
+      AC_MSG_RESULT(ok)
+    ],
+    [
+      AC_MSG_RESULT([yes. disabling gethostname()])
+      AC_DEFINE(DEAL_II_BROKEN_GETHOSTNAME, 1, 
+                [Define if the use of gethostname() leads to strange
+                 results with floating point computations on cygwin 
+                 systems.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Check whether CXXFLAGSG and CXXFLAGSO are a valid combination
 dnl of flags or if there are contradicting flags in them.
 dnl
