@@ -301,6 +301,11 @@ class SolverGMRES : public Solver<VECTOR>
  *
  * FGMRES needs two vectors in each iteration steps yielding a total
  * of @p{2*AdditionalData::max_basis_size+1} auxiliary vectors.
+ *
+ * Caveat: documentation of this class is not up to date. There are
+ * also a few parameters of GMRES we would like to introduce here.
+ *
+ * @author Guido Kanschat, 2003
  */
 template <class VECTOR = Vector<double> >
 class SolverFGMRES : public Solver<VECTOR>
@@ -818,8 +823,8 @@ SolverFGMRES<VECTOR>::solve (
 
 				   // Generate an object where basis
 				   // vectors are stored.
-  typename SolverGMRES<VECTOR>::TmpVectors v (basis_size, this->memory);
-  typename SolverGMRES<VECTOR>::TmpVectors z (basis_size, this->memory);
+  typename internal::SolverGMRES::TmpVectors<VECTOR> v (basis_size, this->memory);
+  typename internal::SolverGMRES::TmpVectors<VECTOR> z (basis_size, this->memory);
   
 				   // number of the present iteration; this
 				   // number is not reset to zero upon a

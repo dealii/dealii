@@ -150,6 +150,13 @@ class SolverSelector : public Subscriptor
 		  ::AdditionalData &data);
 
 				     /**
+				      * Set the additional data. For more
+				      * info see the @p{Solver} class.
+				      */
+    void set_data(const typename SolverFGMRES<VECTOR>
+		  ::AdditionalData &data);
+
+				     /**
 				      * Get the names of all implemented
 				      * solvers.
 				      */
@@ -202,6 +209,11 @@ class SolverSelector : public Subscriptor
 				      * Stores the additional data.
 				      */
     typename SolverGMRES<VECTOR>::AdditionalData gmres_data;
+
+				     /**
+				      * Stores the additional data.
+				      */
+    typename SolverFGMRES<VECTOR>::AdditionalData fgmres_data;
 };
 
 /*@}*/
@@ -255,6 +267,12 @@ SolverSelector<VECTOR>::solve(const Matrix &A,
 					gmres_data);
       solver.solve(A,x,b,precond);
     }
+  else if (solver_name=="fgmres")
+    {
+      SolverFGMRES<VECTOR> solver(*control,*vector_memory,
+					fgmres_data);
+      solver.solve(A,x,b,precond);
+    }
   else
     Assert(false,ExcSolverDoesNotExist(solver_name));
 }
@@ -263,7 +281,7 @@ SolverSelector<VECTOR>::solve(const Matrix &A,
 template <class VECTOR>
 std::string SolverSelector<VECTOR>::get_solver_names()
 {
-  return "richardson|cg|bicgstab|gmres";
+  return "richardson|cg|bicgstab|gmres|fgmres";
 }
 
 
@@ -272,6 +290,14 @@ void SolverSelector<VECTOR>::set_data(
   const typename SolverGMRES<VECTOR>::AdditionalData &data)
 { 
   gmres_data=data; 
+}
+
+
+template <class VECTOR>
+void SolverSelector<VECTOR>::set_data(
+  const typename SolverFGMRES<VECTOR>::AdditionalData &data)
+{ 
+  fgmres_data=data; 
 }
 
 
