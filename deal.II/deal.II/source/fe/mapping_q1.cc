@@ -25,6 +25,110 @@
 #include <algorithm>
 
 
+namespace internal
+{
+  template <int dim>
+  DataSetDescriptor<dim>
+  DataSetDescriptor<dim>::cell ()
+  {
+    return 0;
+  }
+
+
+  template <int dim>
+  DataSetDescriptor<dim>
+  DataSetDescriptor<dim>::
+  face (const typename DoFHandler<dim>::cell_iterator &cell,
+        const unsigned int face_no,
+        const unsigned int n_quadrature_points)
+  {
+    switch (dim)
+      {
+        case 1:
+        case 2:
+              return face_no * n_quadrature_points;
+
+                                               // in 3d, we have to
+                                               // account for faces
+                                               // that have reverse
+                                               // orientation. thus,
+                                               // we have to store
+                                               // _two_ data sets per
+                                               // face or subface
+        case 3:
+              return ((face_no +
+                       (cell->get_face_orientation(face_no) == true ?
+                        0 : GeometryInfo<dim>::faces_per_cell))
+                      * n_quadrature_points);
+
+        default:
+              Assert (false, ExcInternalError());
+      }
+    return static_cast<unsigned int>(-1);
+  }
+
+
+
+  template <int dim>
+  DataSetDescriptor<dim>
+  DataSetDescriptor<dim>::
+  sub_face (const typename DoFHandler<dim>::cell_iterator &cell,
+            const unsigned int face_no,
+            const unsigned int subface_no,
+            const unsigned int n_quadrature_points)
+  {
+    switch (dim)
+      {
+        case 1:
+        case 2:
+              return ((face_no * GeometryInfo<dim>::faces_per_cell +
+                       subface_no)
+                      * n_quadrature_points);
+
+                                               // for 3d, same as above:
+        case 3:
+              return (((face_no * GeometryInfo<dim>::faces_per_cell +
+                        subface_no)
+                       + (cell->get_face_orientation(face_no) == true ?
+                          0 :
+                          GeometryInfo<dim>::faces_per_cell *
+                          GeometryInfo<dim>::subfaces_per_face))
+                      * n_quadrature_points);
+        default:
+              Assert (false, ExcInternalError());
+      }
+    return static_cast<unsigned int>(-1);              
+  }
+
+
+  template <int dim>
+  unsigned int
+  DataSetDescriptor<dim>::offset () const
+  {
+    return dataset_offset;
+  }
+
+
+
+  template <int dim>
+  DataSetDescriptor<dim>::
+  DataSetDescriptor (const unsigned int dataset_offset)
+                  :
+                  dataset_offset (dataset_offset)
+  {}
+
+
+  template <int dim>
+  DataSetDescriptor<dim>::
+  DataSetDescriptor ()
+                  :
+                  dataset_offset (static_cast<unsigned int>(-1))
+  {}
+}
+
+  
+  
+
 
 template <int dim>
 const unsigned int MappingQ1<dim>::n_shape_functions;
@@ -291,7 +395,7 @@ MappingQ1<dim>::compute_data (const UpdateFlags      update_flags,
 			      const unsigned int     n_original_q_points,
 			      InternalData          &data) const
 {
-  const unsigned int npts = q.n_quadrature_points;
+  const unsigned int n_q_points = q.n_quadrature_points;
 
   data.update_once = update_once(update_flags);
   data.update_each = update_each(update_flags);
@@ -300,10 +404,10 @@ MappingQ1<dim>::compute_data (const UpdateFlags      update_flags,
   const UpdateFlags flags(data.update_flags);
   
   if (flags & update_transformation_values)
-    data.shape_values.resize(data.n_shape_functions * npts);
+    data.shape_values.resize(data.n_shape_functions * n_q_points);
 
   if (flags & update_transformation_gradients)
-    data.shape_derivatives.resize(data.n_shape_functions * npts);
+    data.shape_derivatives.resize(data.n_shape_functions * n_q_points);
 
   if (flags & update_covariant_transformation)
     data.covariant.resize(n_original_q_points);
@@ -438,17 +542,17 @@ MappingQ1<dim>::get_subface_data (const UpdateFlags update_flags,
 template <int dim>
 void
 MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cell,
-			      const unsigned int   npts,
-			      const unsigned int   offset,
-			      InternalData        &data,
+			      const unsigned int       n_q_points,
+			      const DataSetDescriptor  data_set,
+			      InternalData            &data,
 			      std::vector<Point<dim> > &quadrature_points) const
 {
   const UpdateFlags update_flags(data.current_update_flags());
 
   if (update_flags & update_q_points)
     {
-      Assert (quadrature_points.size() == npts,
-	      ExcDimensionMismatch(quadrature_points.size(), npts));
+      Assert (quadrature_points.size() == n_q_points,
+	      ExcDimensionMismatch(quadrature_points.size(), n_q_points));
       std::fill(quadrature_points.begin(),
 		quadrature_points.end(),
 		Point<dim>());
@@ -456,14 +560,14 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
 
   if (update_flags & update_covariant_transformation)
     {
-      Assert (data.covariant.size() == npts,
-	      ExcDimensionMismatch(data.covariant.size(), npts));
+      Assert (data.covariant.size() == n_q_points,
+	      ExcDimensionMismatch(data.covariant.size(), n_q_points));
     }
   
   if (update_flags & update_contravariant_transformation)
     {
-      Assert (data.contravariant.size() == npts,
-	      ExcDimensionMismatch(data.contravariant.size(), npts));
+      Assert (data.contravariant.size() == n_q_points,
+	      ExcDimensionMismatch(data.contravariant.size(), n_q_points));
       std::fill(data.contravariant.begin(),
 		data.contravariant.end(),
 		Tensor<2,dim>());
@@ -472,8 +576,8 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
   if (update_flags & update_jacobian_grads)
     {
       Assert(false, ExcNotImplemented());
-//      Assert (covariant_grads.size () == npts,
-//	      ExcDimensionMismatch(covariant_grads.size(), npts));
+//      Assert (covariant_grads.size () == n_q_points,
+//	      ExcDimensionMismatch(covariant_grads.size(), n_q_points));
     }
   
 				   // if necessary, recompute the
@@ -498,19 +602,20 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
 
                                    // first compute quadrature points
   if (update_flags & update_q_points)
-    for (unsigned int point=0; point<npts; ++point)
+    for (unsigned int point=0; point<n_q_points; ++point)
       for (unsigned int k=0; k<data.n_shape_functions; ++k)
         quadrature_points[point]
-          += data.shape(point+offset,k) * data.mapping_support_points[k];
+          += data.shape(point+data_set.offset(),k)
+             * data.mapping_support_points[k];
   
                                    // then Jacobians
   if (update_flags & update_contravariant_transformation)
-    for (unsigned int point=0; point<npts; ++point)
+    for (unsigned int point=0; point<n_q_points; ++point)
       for (unsigned int k=0; k<data.n_shape_functions; ++k)
         for (unsigned int i=0; i<dim; ++i)
           for (unsigned int j=0; j<dim; ++j)
             data.contravariant[point][i][j]
-              += (data.derivative(point+offset, k)[j]
+              += (data.derivative(point+data_set.offset(), k)[j]
                   *
                   data.mapping_support_points[k][i]);
 
@@ -518,7 +623,7 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
 				       // covariant transformation
 				       // matrices
   if (update_flags & update_covariant_transformation)
-    for (unsigned int point=0; point<npts; ++point)
+    for (unsigned int point=0; point<n_q_points; ++point)
       data.covariant[point] = invert(data.contravariant[point]);
 }
 
@@ -549,13 +654,10 @@ MappingQ1<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &c
   Assert(data_ptr!=0, ExcInternalError());
   InternalData &data=*data_ptr;
 
-  const unsigned int npts=q.n_quadrature_points;
+  const unsigned int n_q_points=q.n_quadrature_points;
   
-  compute_fill (cell,
-		npts,
-		0,
-		data,
-		quadrature_points);
+  compute_fill (cell, n_q_points, DataSetDescriptor::cell (),
+                data, quadrature_points);
 
   
   const UpdateFlags update_flags(data.current_update_flags());
@@ -565,9 +667,9 @@ MappingQ1<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &c
 				   // by Jacobian determinants
   if (update_flags & update_JxW_values)
     {      
-      Assert (JxW_values.size() == npts,
-	      ExcDimensionMismatch(JxW_values.size(), npts));
-      for (unsigned int point=0; point<npts; ++point)
+      Assert (JxW_values.size() == n_q_points,
+	      ExcDimensionMismatch(JxW_values.size(), n_q_points));
+      for (unsigned int point=0; point<n_q_points; ++point)
 	JxW_values[point]
 	  = determinant(data.contravariant[point])*weights[point];
     }
@@ -580,8 +682,8 @@ void
 MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator &cell,
 				   const unsigned int      face_no,
 				   const bool              is_subface,
-				   const unsigned int      npts,
-				   const unsigned int      offset,
+				   const unsigned int      n_q_points,
+				   const DataSetDescriptor data_set,
 				   const std::vector<double>   &weights,
 				   InternalData           &data,
 				   std::vector<Point<dim> >    &quadrature_points,
@@ -589,24 +691,20 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 				   std::vector<Tensor<1,dim> > &boundary_forms,
 				   std::vector<Point<dim> >    &normal_vectors) const
 {
-  compute_fill (cell,
-		npts,
-		offset,
-		data,
-		quadrature_points);
+  compute_fill (cell, n_q_points, data_set, data, quadrature_points);
 
   const UpdateFlags update_flags(data.current_update_flags());
   
   if (update_flags & update_boundary_forms)
     {
-      Assert (boundary_forms.size()==npts,
-	      ExcDimensionMismatch(boundary_forms.size(), npts));
+      Assert (boundary_forms.size()==n_q_points,
+	      ExcDimensionMismatch(boundary_forms.size(), n_q_points));
       if (update_flags & update_normal_vectors)
-	Assert (normal_vectors.size()==npts,
-		ExcDimensionMismatch(normal_vectors.size(), npts));
+	Assert (normal_vectors.size()==n_q_points,
+		ExcDimensionMismatch(normal_vectors.size(), n_q_points));
       if (update_flags & update_JxW_values)
-	Assert (JxW_values.size() == npts,
-		ExcDimensionMismatch(JxW_values.size(), npts));
+	Assert (JxW_values.size() == n_q_points,
+		ExcDimensionMismatch(JxW_values.size(), n_q_points));
       
       
       Assert (data.aux[0].size() <= data.unit_tangentials[face_no].size(),
@@ -665,7 +763,7 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 	      {
 		JxW_values[i] = f * weights[i];
 		if (is_subface)
-		  JxW_values[i]/=GeometryInfo<dim>::subfaces_per_face;
+		  JxW_values[i] /= GeometryInfo<dim>::subfaces_per_face;
 	      }
 	    if (update_flags & update_normal_vectors)
               normal_vectors[i] = boundary_forms[i] / f;
@@ -689,12 +787,11 @@ MappingQ1<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterat
   Assert(data_ptr!=0, ExcInternalError());
   InternalData &data=*data_ptr;
 
-  const unsigned int npts=q.n_quadrature_points;
-  const unsigned int offset=face_no*npts;
+  const unsigned int n_q_points = q.n_quadrature_points;
   
   compute_fill_face (cell, face_no, false,
-		     npts,
-		     offset,
+		     n_q_points,
+		     DataSetDescriptor::face (cell, face_no, n_q_points),
 		     q.get_weights(),
 		     data,
 		     quadrature_points,
@@ -720,13 +817,11 @@ MappingQ1<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_ite
   Assert(data_ptr!=0, ExcInternalError());
   InternalData &data=*data_ptr;
 
-  const unsigned int npts=q.n_quadrature_points;
-  const unsigned int offset=
-    (face_no*GeometryInfo<dim>::subfaces_per_face + sub_no)*npts;
+  const unsigned int n_q_points = q.n_quadrature_points;
   
   compute_fill_face (cell, face_no, true,
-		     npts,
-		     offset,
+		     n_q_points,
+		     DataSetDescriptor::sub_face (cell, face_no, sub_no, n_q_points),
 		     q.get_weights(),
 		     data,
 		     quadrature_points,
@@ -744,7 +839,7 @@ MappingQ1<1>::compute_fill_face (const DoFHandler<1>::cell_iterator &,
 				 const unsigned int,
 				 const bool,
 				 const unsigned int,
-				 const unsigned int,
+				 const DataSetDescriptor,
 				 const std::vector<double> &,
 				 InternalData &,
 				 std::vector<Point<1> > &,

@@ -25,6 +25,40 @@
 /*!@addtogroup fe */
 /*@{*/
 
+namespace internal
+{
+  template <int dim>
+  class DataSetDescriptor
+  {
+    public:
+      DataSetDescriptor ();
+      
+      static DataSetDescriptor cell ();
+      
+      static
+      DataSetDescriptor
+      face (const typename DoFHandler<dim>::cell_iterator &cell,
+            const unsigned int face_no,
+            const unsigned int n_quadrature_points);
+
+      static
+      DataSetDescriptor
+      sub_face (const typename DoFHandler<dim>::cell_iterator &cell,
+                const unsigned int face_no,
+                const unsigned int subface_no,
+                const unsigned int n_quadrature_points);
+
+      unsigned int offset () const;
+      
+    private:
+      const unsigned int dataset_offset;
+
+      DataSetDescriptor (const unsigned int dataset_offset);
+  };
+}
+
+
+
 /**
  * Mapping of general quadrilateral/hexahedra by d-linear shape
  * functions.
@@ -351,6 +385,12 @@ class MappingQ1 : public Mapping<dim>
     DeclException0 (ExcAccessToUninitializedField);
 
   protected:
+                                     /**
+                                      * Typedef the right data set
+                                      * descriptor to a local type to
+                                      * make use somewhat simpler.
+                                      */
+    typedef internal::DataSetDescriptor<dim> DataSetDescriptor;    
     
 				     /**
 				      * Implementation of the interface in
@@ -442,9 +482,9 @@ class MappingQ1 : public Mapping<dim>
 				      * @p{fill_*} functions.
 				      */
     void compute_fill (const typename DoFHandler<dim>::cell_iterator &cell,
-		       const unsigned int   npts,
-		       const unsigned int   offset,
-		       InternalData        &data,
+		       const unsigned int      npts,
+		       const DataSetDescriptor data_set,
+		       InternalData           &data,
 		       std::vector<Point<dim> > &quadrature_points) const;
     
 				     /**
@@ -455,7 +495,7 @@ class MappingQ1 : public Mapping<dim>
 			    const unsigned int      face_no,
 			    const bool              is_subface,
 			    const unsigned int      npts,
-			    const unsigned int      offset,
+			    const DataSetDescriptor data_set,
 			    const std::vector<double>   &weights,
 			    InternalData           &mapping_data,
 			    std::vector<Point<dim> >    &quadrature_points,
@@ -683,7 +723,7 @@ template <> void MappingQ1<1>::compute_fill_face (
   const unsigned int,
   const bool,
   const unsigned int,
-  const unsigned int,
+  const DataSetDescriptor,
   const std::vector<double> &,
   InternalData &,
   std::vector<Point<1> > &,

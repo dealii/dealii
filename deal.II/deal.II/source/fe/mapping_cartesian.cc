@@ -19,6 +19,7 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <fe/mapping_cartesian.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
 
 #include <cmath>
@@ -137,7 +138,9 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
   UpdateFlags update_flags(data.current_update_flags());
 
   const unsigned int npts = quadrature_points.size ();
-  unsigned int offset = 0;
+
+  typedef typename internal::DataSetDescriptor<dim> DataSetDescriptor;
+  unsigned int offset = DataSetDescriptor::cell().offset();
   
   if (face_no != invalid_face_number)
     {
@@ -150,14 +153,20 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 
       if (sub_no == invalid_face_number)
 					 // called from FEFaceValues
-	offset = face_no * quadrature_points.size();
+	offset = DataSetDescriptor::face (cell, face_no,
+                                          quadrature_points.size()).offset();
       else
 	{
-					   // called from FESubfaceValue
+					   // called from
+                                           // FESubfaceValue (do the
+                                           // +1 trick to avoid a
+                                           // warning about comparison
+                                           // always being false in
+                                           // 1d)
 	  Assert (sub_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
 		  ExcIndexRange (sub_no, 0, GeometryInfo<dim>::subfaces_per_face));
-	  offset = (face_no * GeometryInfo<dim>::subfaces_per_face + sub_no)
-		   * quadrature_points.size();
+	  offset = DataSetDescriptor::sub_face (cell, face_no, sub_no,
+                                                quadrature_points.size()).offset();
 	}
     }
   else

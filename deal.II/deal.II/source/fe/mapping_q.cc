@@ -226,7 +226,7 @@ MappingQ<dim>::get_face_data (const UpdateFlags update_flags,
 			      const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
-  Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
+  const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
   this->compute_face_data (update_flags, q,
                            quadrature.n_quadrature_points, *data);
   if (!use_mapping_q_on_all_cells)
@@ -244,7 +244,7 @@ MappingQ<dim>::get_subface_data (const UpdateFlags update_flags,
 				 const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
-  Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
+  const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
   this->compute_face_data (update_flags, q,
                            quadrature.n_quadrature_points, *data);
   if (!use_mapping_q_on_all_cells)
@@ -327,9 +327,6 @@ MappingQ<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterato
   data.use_mapping_q1_on_current_cell=!(use_mapping_q_on_all_cells
 					|| cell->has_boundary_lines());
 
-  const unsigned int npts=q.n_quadrature_points;
-  const unsigned int offset=face_no*npts;
-
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
@@ -339,8 +336,12 @@ MappingQ<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterato
   else
     p_data=&data;
 
+  const unsigned int n_q_points=q.n_quadrature_points;
   this->compute_fill_face (cell, face_no, false,
-                           npts, offset, q.get_weights(),
+                           n_q_points,
+                           MappingQ1<dim>::DataSetDescriptor::
+                           face (cell, face_no, n_q_points),
+                           q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,
                            exterior_forms, normal_vectors);
@@ -382,10 +383,6 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
   data.use_mapping_q1_on_current_cell=!(use_mapping_q_on_all_cells
 					|| cell->has_boundary_lines());
 
-  const unsigned int npts=q.n_quadrature_points;
-  const unsigned int offset=
-    (face_no*GeometryInfo<dim>::subfaces_per_face + sub_no)*npts;
-
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
@@ -395,8 +392,12 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
   else
     p_data=&data;
 
+  const unsigned int n_q_points=q.n_quadrature_points;
   this->compute_fill_face (cell, face_no, true,
-                           npts, offset, q.get_weights(),
+                           n_q_points,
+                           MappingQ1<dim>::DataSetDescriptor::
+                           sub_face (cell, face_no, sub_no, n_q_points),
+                           q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,
                            exterior_forms, normal_vectors);
