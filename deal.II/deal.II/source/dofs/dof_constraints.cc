@@ -181,10 +181,17 @@ void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
 				   // otherwise, the number states which
 				   // line in the constraint matrix handles
 				   // this index
+				   //
+				   // for gcc2.9: replace this by
+				   // distribute(sparsity.n_rows(), -1)
   vector<int> distribute;
   distribute.reserve (sparsity.n_rows());
-  distribute.insert (distribute.end(), sparsity.n_rows(), -1);
-
+				   // replace the following line, since
+				   // gcc2.8 chokes over it.
+//  distribute.insert (distribute.end(), sparsity.n_rows(), -1);
+  for (unsigned int i=0; i<(unsigned int)sparsity.n_rows(); ++i)
+    distribute.push_back (-1);
+  
   for (int c=0; c<(signed int)lines.size(); ++c)
     distribute[lines[c].line] = c;
 
@@ -350,10 +357,18 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
 				   // otherwise, the number states which
 				   // line in the constraint matrix handles
 				   // this index
+  				   //
+				   // for gcc2.9: replace this by
+				   // distribute(sparsity.n_rows(), -1)
   vector<int> distribute;
   distribute.reserve (sparsity.n_rows());
-  distribute.insert (distribute.end(), sparsity.n_rows(), -1);
+				   // replace the following line, since
+				   // gcc2.8 chokes over it.
+//  distribute.insert (distribute.end(), sparsity.n_rows(), -1);
+  for (unsigned int i=0; i<(unsigned int)sparsity.n_rows(); ++i)
+    distribute.push_back (-1);
 
+  
   for (int c=0; c<(signed int)lines.size(); ++c)
     distribute[lines[c].line] = c;
 

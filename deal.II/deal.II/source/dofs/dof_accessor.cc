@@ -99,7 +99,7 @@ DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsChild());
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
 };
@@ -209,7 +209,7 @@ DoFQuadAccessor<dim,BaseClass>::child (const unsigned int i) const {
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsChild());
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
 };
@@ -238,7 +238,7 @@ DoFCellAccessor<dim>::neighbor (const unsigned int i) const {
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsNeighbor());
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
 #endif
   return q;
 };
@@ -255,7 +255,7 @@ DoFCellAccessor<dim>::child (const unsigned int i) const {
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsChild());
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
 };

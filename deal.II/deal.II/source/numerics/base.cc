@@ -5,10 +5,13 @@
 #include <grid/dof_constraints.h>
 #include <grid/tria_iterator.h>
 #include <basic/data_io.h>
+#include <basic/function.h>
 
 #include "../../../mia/control.h"
 #include "../../../mia/vectormemory.h"
 #include "../../../mia/cg.h"
+
+
 
 
 
@@ -28,6 +31,10 @@ ProblemBase<dim>::ProblemBase (Triangulation<dim> *tria,
   Assert (tria == &dof->get_tria(), ExcDofAndTriaDontMatch());
 };
 
+
+
+template <int dim>
+ProblemBase<dim>::~ProblemBase () {};
 
 
 
@@ -96,12 +103,48 @@ void ProblemBase<dim>::solve () {
 
 
 
+/*
+template <int dim>
+void ProblemBase<dim>::integrate_L1_difference (const Function<dim>      &exact_solution,
+						vector<double>           &difference,
+						const Quadrature<dim>    &q,
+						const FiniteElement<dim> &fe) const {
+  Assert (fe == dof_handler->get_selected_fe(), ExcInvalidFE());
+
+  difference.erase (difference.begin(), difference.end());
+  difference.reserve (tria->n_cells());
+
+				   // loop over all cells
+  DoFHandler<dim>::active_dof_iterator cell = dof_handler->begin_active(),
+				       endc = dof_handler->end();
+  for (; cell != end; ++cell) 
+    {
+      double diff=0;
+      
+      difference.push_back (diff);
+    };
+};
+*/
+
+
+
 template <int dim>
 void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
   out.clear_data_vectors ();
   out.attach_dof_handler (*dof_handler);
-  out.add_data_vector (solution, "solution");
+
+  pair<char*,char*> solution_name = get_solution_name ();
+  out.add_data_vector (solution,
+		       solution_name.first, solution_name.second);
 };
+
+
+/*
+template <int dim>
+pair<char*,char*> ProblemBase<dim>::get_solution_name () const {
+  return make_pair("solution", "");
+};
+*/
 
   
   

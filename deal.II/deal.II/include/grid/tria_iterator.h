@@ -223,7 +223,7 @@ template <int dim> class Triangulation;
     @author Wolfgang Bangerth, 1998
  */
 template <int dim, class Accessor>
-class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
+class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
   public:
 				     /**
 				      *  Empty constructor. Such an object

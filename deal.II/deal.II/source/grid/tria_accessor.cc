@@ -445,103 +445,6 @@ template class QuadAccessor<2>;
 
 
 
-/*------------------------ Functions: CellAccessor<dim> ---------------------*/
-
-template <int dim>
-int CellAccessor<dim>::neighbor_index (const unsigned int i) const {
-  Assert (i<2*dim, ExcInvalidNeighbor(i));
-  return tria->levels[present_level]->neighbors[present_index*2*dim+i].second;
-};
-
-
-
-template <int dim>
-int CellAccessor<dim>::neighbor_level (const unsigned int i) const {
-  Assert (i<2*dim, ExcInvalidNeighbor(i));
-  return tria->levels[present_level]->neighbors[present_index*2*dim+i].first;
-};
-
-
-
-template <int dim>
-void CellAccessor<dim>::set_neighbor (const unsigned int i,
-				      const TriaIterator<dim,CellAccessor<dim> > &pointer) const {
-  Assert (i<2*dim, ExcInvalidNeighbor(i));
-  tria->levels[present_level]->neighbors[present_index*2*dim+i].first
-    = pointer.accessor.present_level;
-  tria->levels[present_level]->neighbors[present_index*2*dim+i].second
-    = pointer.accessor.present_index;
-};
-
-
-
-template <int dim>
-bool CellAccessor<dim>::at_boundary (const unsigned int i) const {
-  Assert (used(), ExcCellNotUsed());
-  Assert (i<2*dim, ExcInvalidIndex (i,0,2*dim-1));
-  
-  return (neighbor(i).state() != valid);
-};
-
-
-
-template <int dim>
-bool CellAccessor<dim>::refine_flag_set () const {
-  Assert (used() && active(), ExcRefineCellNotActive());
-  return tria->levels[present_level]->refine_flags[present_index];
-};
-
-
-
-template <int dim>
-void CellAccessor<dim>::set_refine_flag () const {
-  Assert (used() && active(), ExcRefineCellNotActive());
-  tria->levels[present_level]->refine_flags[present_index] = true;
-};
-
-
-
-template <int dim>
-void CellAccessor<dim>::clear_refine_flag () const {
-  Assert (used() && active(), ExcRefineCellNotActive());
-  tria->levels[present_level]->refine_flags[present_index] = false;
-};
-
-
-
-template <int dim>
-TriaIterator<dim,CellAccessor<dim> >
-CellAccessor<dim>::neighbor (const unsigned int i) const {
-  TriaIterator<dim,CellAccessor<dim> > q (tria, neighbor_level (i), neighbor_index (i));
-
-#ifdef DEBUG
-  if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsNeighbor());
-#endif
-  return q;
-};
-
-
-
-template <int dim>
-TriaIterator<dim,CellAccessor<dim> >
-CellAccessor<dim>::child (const unsigned int i) const {
-  TriaIterator<dim,CellAccessor<dim> > q (tria, present_level+1, child_index (i));
-
-#ifdef DEBUG
-  if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsChild());
-#endif
-  return q;
-};
-
-
-
-template <int dim>
-bool CellAccessor<dim>::active () const {
-  return !has_children();
-};
-
 
 
 /*------------------------ Functions: CellAccessor<1> -----------------------*/
@@ -554,6 +457,102 @@ bool CellAccessor<1>::at_boundary () const {
 
 
 
+int CellAccessor<1>::neighbor_index (const unsigned int i) const {
+  Assert (i<2*1, ExcInvalidNeighbor(i));
+  return tria->levels[present_level]->neighbors[present_index*2*1+i].second;
+};
+
+
+
+
+int CellAccessor<1>::neighbor_level (const unsigned int i) const {
+  Assert (i<2*1, ExcInvalidNeighbor(i));
+  return tria->levels[present_level]->neighbors[present_index*2*1+i].first;
+};
+
+
+
+
+void CellAccessor<1>::set_neighbor (const unsigned int i,
+				      const TriaIterator<1,CellAccessor<1> > &pointer) const {
+  Assert (i<2*1, ExcInvalidNeighbor(i));
+  tria->levels[present_level]->neighbors[present_index*2*1+i].first
+    = pointer.accessor.present_level;
+  tria->levels[present_level]->neighbors[present_index*2*1+i].second
+    = pointer.accessor.present_index;
+};
+
+
+
+
+bool CellAccessor<1>::at_boundary (const unsigned int i) const {
+  Assert (used(), ExcCellNotUsed());
+  Assert (i<2*1, ExcInvalidIndex (i,0,2*1-1));
+  
+  return (neighbor(i).state() != valid);
+};
+
+
+
+
+bool CellAccessor<1>::refine_flag_set () const {
+  Assert (used() && active(), ExcRefineCellNotActive());
+  return tria->levels[present_level]->refine_flags[present_index];
+};
+
+
+
+
+void CellAccessor<1>::set_refine_flag () const {
+  Assert (used() && active(), ExcRefineCellNotActive());
+  tria->levels[present_level]->refine_flags[present_index] = true;
+};
+
+
+
+
+void CellAccessor<1>::clear_refine_flag () const {
+  Assert (used() && active(), ExcRefineCellNotActive());
+  tria->levels[present_level]->refine_flags[present_index] = false;
+};
+
+
+
+
+TriaIterator<1,CellAccessor<1> >
+CellAccessor<1>::neighbor (const unsigned int i) const {
+  TriaIterator<1,CellAccessor<1> > q (tria, neighbor_level (i), neighbor_index (i));
+
+#ifdef DEBUG
+  if (q.state() != past_the_end)
+    Assert (q->used(), ExcUnusedCellAsNeighbor());
+#endif
+  return q;
+};
+
+
+
+
+TriaIterator<1,CellAccessor<1> >
+CellAccessor<1>::child (const unsigned int i) const {
+  TriaIterator<1,CellAccessor<1> > q (tria, present_level+1, child_index (i));
+
+#ifdef DEBUG
+  if (q.state() != past_the_end)
+    Assert (q->used(), ExcUnusedCellAsChild());
+#endif
+  return q;
+};
+
+
+
+
+bool CellAccessor<1>::active () const {
+  return !has_children();
+};
+
+
+
 /*------------------------ Functions: CellAccessor<2> -----------------------*/
 
 
@@ -563,6 +562,100 @@ bool CellAccessor<2>::at_boundary () const {
 
 
 
+
+int CellAccessor<2>::neighbor_index (const unsigned int i) const {
+  Assert (i<2*2, ExcInvalidNeighbor(i));
+  return tria->levels[present_level]->neighbors[present_index*2*2+i].second;
+};
+
+
+
+
+int CellAccessor<2>::neighbor_level (const unsigned int i) const {
+  Assert (i<2*2, ExcInvalidNeighbor(i));
+  return tria->levels[present_level]->neighbors[present_index*2*2+i].first;
+};
+
+
+
+
+void CellAccessor<2>::set_neighbor (const unsigned int i,
+				      const TriaIterator<2,CellAccessor<2> > &pointer) const {
+  Assert (i<2*2, ExcInvalidNeighbor(i));
+  tria->levels[present_level]->neighbors[present_index*2*2+i].first
+    = pointer.accessor.present_level;
+  tria->levels[present_level]->neighbors[present_index*2*2+i].second
+    = pointer.accessor.present_index;
+};
+
+
+
+
+bool CellAccessor<2>::at_boundary (const unsigned int i) const {
+  Assert (used(), ExcCellNotUsed());
+  Assert (i<2*2, ExcInvalidIndex (i,0,2*2-1));
+  
+  return (neighbor(i).state() != valid);
+};
+
+
+
+
+bool CellAccessor<2>::refine_flag_set () const {
+  Assert (used() && active(), ExcRefineCellNotActive());
+  return tria->levels[present_level]->refine_flags[present_index];
+};
+
+
+
+
+void CellAccessor<2>::set_refine_flag () const {
+  Assert (used() && active(), ExcRefineCellNotActive());
+  tria->levels[present_level]->refine_flags[present_index] = true;
+};
+
+
+
+
+void CellAccessor<2>::clear_refine_flag () const {
+  Assert (used() && active(), ExcRefineCellNotActive());
+  tria->levels[present_level]->refine_flags[present_index] = false;
+};
+
+
+
+
+TriaIterator<2,CellAccessor<2> >
+CellAccessor<2>::neighbor (const unsigned int i) const {
+  TriaIterator<2,CellAccessor<2> > q (tria, neighbor_level (i), neighbor_index (i));
+
+#ifdef DEBUG
+  if (q.state() != past_the_end)
+    Assert (q->used(), ExcUnusedCellAsNeighbor());
+#endif
+  return q;
+};
+
+
+
+
+TriaIterator<2,CellAccessor<2> >
+CellAccessor<2>::child (const unsigned int i) const {
+  TriaIterator<2,CellAccessor<2> > q (tria, present_level+1, child_index (i));
+
+#ifdef DEBUG
+  if (q.state() != past_the_end)
+    Assert (q->used(), ExcUnusedCellAsChild());
+#endif
+  return q;
+};
+
+
+
+
+bool CellAccessor<2>::active () const {
+  return !has_children();
+};
 
 
 

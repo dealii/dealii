@@ -32,6 +32,10 @@ ParameterHandler::ParameterHandler () :
 		status(true) {};
 
 
+ParameterHandler::~ParameterHandler () {};
+
+
+
 bool ParameterHandler::read_input (istream &input) {
   String line;
   int lineno=0;
@@ -536,8 +540,7 @@ bool ParameterHandler::scan_line (String line, const unsigned int lineno) {
 
 ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () {
   Section* sec = &defaults;
-  vector<String>::const_iterator SecName;
-  SecName = subsection_path.begin();
+  vector<String>::const_iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -551,20 +554,24 @@ ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () 
 
 
 const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () const {
-				   // simply call the non-const version
-				   // of this function
-  typedef Section* (ParameterHandler::*xptr) ();
-  xptr x = &get_present_defaults_subsection;
+  Section* sec = (Section*)&defaults; // not nice, but needs to be and
+				   // after all: we do not change #sec#
+  vector<String>::const_iterator SecName = subsection_path.begin();
+    
+  while (SecName != subsection_path.end()) 
+    {
+      sec = sec->subsections[*SecName];
+      ++SecName;
+    };
 
-  return x();
+  return sec;
 };
 
 
 
 ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () {
   Section* sec = &changed_entries;
-  vector<String>::iterator SecName;
-  SecName = subsection_path.begin();
+  vector<String>::iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -578,12 +585,16 @@ ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () {
 
 
 const ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () const {
-				   // simply call the non-const version
-				   // of this function
-  typedef Section* (ParameterHandler::*xptr) ();
-  xptr x = &get_present_changed_subsection;
+  Section* sec = (Section*)&changed_entries; // same as in get_present_default_s...
+  vector<String>::const_iterator SecName = subsection_path.begin();
+    
+  while (SecName != subsection_path.end()) 
+    {
+      sec = sec->subsections[*SecName];
+      ++SecName;
+    };
 
-  return x();
+  return sec;
 };
 
 
@@ -606,6 +617,9 @@ ParameterHandler::Section::~Section () {
 
 MultipleParameterLoop::MultipleParameterLoop() :
 		n_branches(0) {};
+
+
+MultipleParameterLoop::~MultipleParameterLoop () {};
 
 
 bool MultipleParameterLoop::read_input (istream &input) {

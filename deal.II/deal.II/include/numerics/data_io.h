@@ -21,7 +21,7 @@ template <int dim> class DoFHandler;
 
 class dVector;
 
-template <class Key, class T, class Compare> class map;
+template <class Key, class T, class Compare, class Alloc = alloc> class map;
 template <class T> struct less;
 
 

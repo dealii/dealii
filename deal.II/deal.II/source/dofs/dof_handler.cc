@@ -620,7 +620,6 @@ int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator   &cell,
 
 
 
-
 template <int dim>
 void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 				     bool use_constraints,
@@ -635,26 +634,38 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
       make_constraint_matrix (constraints);
       constraints.condense (sparsity);
     };
-
+    
   int n_dofs = sparsity.n_rows();
 				   // store the new dof numbers; -1 means
 				   // that no new number was chosen yet
-  vector<int> new_number(sparsity.n_rows(), -1);
-
+				   //
+				   // the commented line is what would be the
+				   // correct way to do, but gcc2.8 chokes
+				   // over that. The other lines are a
+				   // workaround
+//  vector<int> new_number(sparsity.n_rows(), -1);
+  vector<int> new_number;
+  new_number.reserve (sparsity.n_rows());
+  for (unsigned int i=0; i<(unsigned int)sparsity.n_rows(); ++i)
+    new_number.push_back (-1);
+  
 				   // store the indices of the dofs renumbered
 				   // in the last round. Default to starting
 				   // points
   vector<int> last_round_dofs (starting_points);
+  
 				   // delete disallowed elements
   for (unsigned int i=0; i<last_round_dofs.size(); ++i)
     if ((last_round_dofs[i]<0) || (last_round_dofs[i]>=n_dofs))
       last_round_dofs[i] = -1;
+  
   remove_if (last_round_dofs.begin(), last_round_dofs.end(),
 	     bind2nd(equal_to<int>(), 0));
-
+  
 				   // now if no valid points remain:
 				   // find dof with lowest coordination
 				   // number
+  
   if (last_round_dofs.size() == 0)
     {
       int          starting_point   = -1;
@@ -973,7 +984,7 @@ void DoFHandler<2>::make_sparsity_pattern (dSMatrixStruct &sparsity) const {
 	  sparsity.add (dofs_on_this_cell[i],
 			dofs_on_this_cell[j]);
     };
-
+  
   delete[] dofs_on_this_cell;
 };
 
@@ -1034,8 +1045,8 @@ void DoFHandler<dim>::make_transfer_matrix (const DoFHandler<dim> &transfer_from
 
 
 template <int dim>
-void DoFHandler<dim>::transfer_cell (const TriaIterator<dim,DoFCellAccessor<dim> > &old_cell,
-				     const TriaIterator<dim,DoFCellAccessor<dim> > &new_cell,
+void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterator &old_cell,
+				     const typename DoFHandler<dim>::cell_iterator &new_cell,
 				     dSMatrixStruct      &transfer_pattern) const {
   if (!new_cell->active() && !old_cell->active())
 				     // both cells have children; go deeper
@@ -1130,8 +1141,8 @@ void DoFHandler<dim>::transfer_cell (const TriaIterator<dim,DoFCellAccessor<dim>
 
 
 template <int dim>
-void DoFHandler<dim>::transfer_cell (const TriaIterator<dim,DoFCellAccessor<dim> > &old_cell,
-				     const TriaIterator<dim,DoFCellAccessor<dim> > &new_cell,
+void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterator &old_cell,
+				     const typename DoFHandler<dim>::cell_iterator &new_cell,
 				     dSMatrix            &transfer_matrix) const {
   if (!new_cell->active() && !old_cell->active())
 				     // both cells have children; go deeper

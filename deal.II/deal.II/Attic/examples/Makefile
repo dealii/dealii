@@ -14,8 +14,13 @@ LIBS.g    = $(LIBPATH) -lbasic.g -lgrid.g -lfe.g -lnumerics.g -llac.g
 LIBS      = $(LIBS.g:.g=)
 
 ifeq ($(shell uname),SunOS)
-CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
-CXXFLAGS.g:= -V2.7.2.3 $(CXXFLAGS.g)
+#CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
+#CXXFLAGS.g:= -V2.7.2.3 $(CXXFLAGS.g)
+INCLUDE2.8  =  -I/usr/local/source/libstdc++-2.8.0/libstdc++ \
+               -I/usr/local/source/libstdc++-2.8.0/libstdc++/stl \
+               -I/usr/local/source/libstdc++-2.8.0/libio
+CXXFLAGS  := $(CXXFLAGS) -fno-rtti -fno-exceptions $(INCLUDE2.8)
+CXXFLAGS.g:= $(CXXFLAGS.g) -W -fno-rtti -fno-exceptions $(INCLUDE2.8)
 endif
 
 

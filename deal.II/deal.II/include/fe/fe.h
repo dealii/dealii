@@ -238,12 +238,12 @@ class FiniteElementBase {
 				      */
     FiniteElementBase (const FiniteElementBase &f);
 
-//				     /**
-//				      * Destructor. Only declared to have a
-//				      * virtual destructor which the compiler
-//				      * wants to have.
-//				      */
-//    virtual ~FiniteElementBase () {};
+				     /**
+				      * Destructor. Only declared to have a
+				      * virtual destructor which the compiler
+				      * wants to have.
+				      */
+    virtual ~FiniteElementBase () {};
     
 
 				     /**

@@ -6,8 +6,8 @@
 
 
 // public classes; to be declared below
-class                            ParameterHandler;
-template <class UserClass> class MultipleParameterLoop;
+class ParameterHandler;
+class MultipleParameterLoop;
 
 
 #include <map.h>
@@ -465,6 +465,14 @@ class ParameterHandler {
     ParameterHandler ();
 
 				     /**
+				      * Destructor. Declare this only to have
+				      * a virtual destructor, which is safer
+				      * as we have virtual functions.
+				      * It actually does nothing spectacular.
+				      */
+    virtual ~ParameterHandler ();
+    
+				     /**
 				      * Read input from a stream until stream
 				      * returns #eof# condition or error.
 				      *
@@ -720,7 +728,7 @@ class ParameterHandler {
 				      */
     const Section* get_present_changed_subsection () const;
 
-  friend class MultipleParameterLoop;
+    friend class MultipleParameterLoop;
 };
 
 	
@@ -981,6 +989,14 @@ class MultipleParameterLoop : public ParameterHandler {
 				      * Constructor
 				      */
     MultipleParameterLoop ();
+
+				     /**
+				      * Destructor. Declare this only to have
+				      * a virtual destructor, which is safer
+				      * as we have virtual functions.
+				      * It actually does nothing spectacular.
+				      */
+    virtual ~MultipleParameterLoop ();
 
     				     /**
 				      * Read input from a stream until stream

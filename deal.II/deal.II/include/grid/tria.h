@@ -857,6 +857,21 @@ class TriaDimensionInfo<2> {
 template <int dim>
 class Triangulation : public TriaDimensionInfo<dim> {
   public:
+				     // insert these definitions for gcc2.8,
+				     // since it can't inherit typedefs (I
+				     // believe it should, but it can't)
+    typedef typename TriaDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
+    typedef typename TriaDimensionInfo<dim>::line_iterator line_iterator;
+    typedef typename TriaDimensionInfo<dim>::active_line_iterator active_line_iterator;
+
+    typedef typename TriaDimensionInfo<dim>::raw_quad_iterator raw_quad_iterator;
+    typedef typename TriaDimensionInfo<dim>::quad_iterator quad_iterator;
+    typedef typename TriaDimensionInfo<dim>::active_quad_iterator active_quad_iterator;
+
+    typedef typename TriaDimensionInfo<dim>::raw_cell_iterator raw_cell_iterator;
+    typedef typename TriaDimensionInfo<dim>::cell_iterator cell_iterator;
+    typedef typename TriaDimensionInfo<dim>::active_cell_iterator active_cell_iterator;
+
 				     /**
 				      *  Create a triangulation and create
 				      *  the first level of the hierarchy.

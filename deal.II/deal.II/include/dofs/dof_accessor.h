@@ -7,11 +7,9 @@
 
 template <int dim> class Triangulation;
 template <int dim> class DoFHandler;
-template <class T> class vector;
-
 
 #include <grid/tria_accessor.h>
-
+#include <vector.h>
 
 
 
@@ -45,6 +43,16 @@ class DoFAccessor {
 				      * Exception for child classes
 				      */
     DeclException0 (ExcInvalidObject);
+				     /**
+				      * Exception for child classes
+				      */
+    DeclException3 (ExcInvalidIndex,
+		    int,
+		    int,
+		    int,
+		    << "Invalid index " << arg1
+		    << ", index must be between " << arg2
+		    << " and " << arg3 << ".");
 
   protected:
 				     /**

@@ -336,8 +336,8 @@ double
 FEQuadratic<dim>::shape_value (const unsigned int i,
 			       const Point<dim> &) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
-  Assert (false, ExcNotImplemented());
+  Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
+  Assert (false, typename FiniteElementBase<dim>::ExcNotImplemented());
   return 0.;
 };
 
@@ -348,8 +348,8 @@ Point<dim>
 FEQuadratic<dim>::shape_grad (const unsigned int i,
 			      const Point<dim> &) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
-  Assert (false, ExcNotImplemented());
+  Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
+  Assert (false, typename FiniteElementBase<dim>::ExcNotImplemented());
   return Point<dim> ();
 };
 
@@ -359,7 +359,7 @@ void FEQuadratic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				     const vector<Point<2> >               &,
 				     vector<dFMatrix>  &,
 				     vector<Point<2> > &) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, typename FiniteElementBase<2>::ExcNotImplemented());
 };
 
 
@@ -394,8 +394,8 @@ double
 FECubic<dim>::shape_value (const unsigned int i,
 			   const Point<dim> &) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
-  Assert (false, ExcNotImplemented());
+  Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
+  Assert (false, typename FiniteElementBase<dim>::ExcNotImplemented());
   return 0.;
 };
 
@@ -406,8 +406,8 @@ Point<dim>
 FECubic<dim>::shape_grad (const unsigned int i,
 			  const Point<dim> &) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
-  Assert (false, ExcNotImplemented());
+  Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
+  Assert (false, typename FiniteElementBase<dim>::ExcNotImplemented());
   return Point<dim> ();
 };
 
@@ -417,7 +417,7 @@ void FECubic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				 const vector<Point<2> >               &,
 				 vector<dFMatrix>  &,
 				 vector<Point<2> > &) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, typename FiniteElementBase<2>::ExcNotImplemented());
 };
 
 

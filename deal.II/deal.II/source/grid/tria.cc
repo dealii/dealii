@@ -368,7 +368,8 @@ void Triangulation<1>::create_hypercube (const double left,
   vertices.push_back (Point<1> (left));
   vertices.push_back (Point<1> (right));
 
-  vertices_used.insert (vertices_used.end(), 2, true);
+  vertices_used.push_back (true);
+  vertices_used.push_back (true);
   
   levels[0]->lines.lines.push_back (Line(0,1));
   levels[0]->lines.children.push_back (-1);
@@ -377,7 +378,7 @@ void Triangulation<1>::create_hypercube (const double left,
   levels[0]->neighbors.push_back (make_pair(-1,-1));
   levels[0]->neighbors.push_back (make_pair(-1,-1));
 
-  levels[0]->refine_flags.insert (levels[0]->refine_flags.end(), 1, false);
+  levels[0]->refine_flags.push_back (false);
 };
 
 
@@ -388,47 +389,19 @@ void Triangulation<2>::create_hypercube (const double left,
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (n_lines() == 0, ExcTriangulationNotEmpty());
   Assert (n_quads() == 0, ExcTriangulationNotEmpty());
+
+  const Point<2> vertices[4] = { Point<2>(left,left),
+				 Point<2>(right,left),
+				 Point<2>(right,right),
+				 Point<2>(left,right)  };
+  const int cell_vertices[1][4] = { { 0,1,2,3 } };
+  vector<vector<int> > cells (1, vector<int>());
+  cells[0].reserve (4);
+  for (unsigned int j=0; j<4; ++j)
+    cells[0].push_back (cell_vertices[0][j]);
   
-				   // create vertices
-  vertices.push_back (Point<2> (left,left));
-  vertices.push_back (Point<2> (right,left));
-  vertices.push_back (Point<2> (right,right));
-  vertices.push_back (Point<2> (left,right));
-  vertices_used.insert (vertices_used.end(), 4, true);
- 
-				   // create lines
-  levels[0]->lines.lines.push_back (Line (0,1));
-  levels[0]->lines.children.push_back (-1);
-  levels[0]->lines.used.push_back (true);
-  levels[0]->lines.user_flags.push_back (false);
-
-  levels[0]->lines.lines.push_back (Line (1,2));
-  levels[0]->lines.children.push_back (-1);
-  levels[0]->lines.used.push_back (true);
-  levels[0]->lines.user_flags.push_back (false);
-
-  levels[0]->lines.lines.push_back (Line (3,2));
-  levels[0]->lines.children.push_back (-1);
-  levels[0]->lines.used.push_back (true);
-  levels[0]->lines.user_flags.push_back (false);
-
-  levels[0]->lines.lines.push_back (Line (0,3));
-  levels[0]->lines.children.push_back (-1);
-  levels[0]->lines.used.push_back (true);
-  levels[0]->lines.user_flags.push_back (false);
-  
-				   // create quads
-  levels[0]->quads.quads.push_back (Quad (0,1,2,3));
-  levels[0]->quads.children.push_back (-1);
-  levels[0]->quads.used.push_back (true);
-  levels[0]->quads.user_flags.push_back (false);
-  
-  levels[0]->neighbors.push_back (make_pair(-1,-1));
-  levels[0]->neighbors.push_back (make_pair(-1,-1));
-  levels[0]->neighbors.push_back (make_pair(-1,-1));
-  levels[0]->neighbors.push_back (make_pair(-1,-1));
-
-  levels[0]->refine_flags.insert (levels[0]->refine_flags.end(), 1, false);
+  create_triangulation (vector<Point<2> >(&vertices[0], &vertices[8]),
+			cells);
 };
 
 
@@ -452,7 +425,16 @@ void Triangulation<2>::create_hyper_L (const double a, const double b) {
   const int cell_vertices[3][4] = {{0, 1, 4, 3},
 				   {1, 2, 5, 4},
 				   {3, 4, 7, 6}};
-  vector<vector<int> > cells (3, vector<int>(4,-1));
+
+				   // with gcc2.9, uncomment this line
+				   // and delete following workaraound
+//  vector<vector<int> > cells (3, vector<int>(4,-1));
+  vector<int> tmp;
+  tmp.reserve (4);
+  for (unsigned int i=0; i<4; ++i)
+    tmp.push_back (-1);
+  vector<vector<int> > cells (3, tmp);
+  
   for (unsigned int i=0; i<3; ++i)
     for (unsigned int j=0; j<4; ++j)
       cells[i][j] = cell_vertices[i][j];
@@ -485,7 +467,16 @@ void Triangulation<2>::create_hyper_ball (const Point<2> p, const double radius)
 				   {2, 3, 5, 4},
 				   {1, 7, 5, 3},
 				   {6, 4, 5, 7}};
-  vector<vector<int> > cells (5, vector<int>(4,-1));
+
+				   // with gcc2.9, uncomment this line
+				   // and delete following workaraound
+//  vector<vector<int> > cells (5, vector<int>(4,-1));
+  vector<int> tmp;
+  tmp.reserve (4);
+  for (unsigned int i=0; i<4; ++i)
+    tmp.push_back (-1);
+  vector<vector<int> > cells (5, tmp);
+
   for (unsigned int i=0; i<5; ++i)
     for (unsigned int j=0; j<4; ++j)
       cells[i][j] = cell_vertices[i][j];
@@ -550,7 +541,7 @@ void Triangulation<dim>::save_refine_flags (ostream &out) const {
 
 template <int dim>
 void Triangulation<dim>::load_refine_flags (istream &in) {
-  int magic_number;
+  unsigned int magic_number;
   in >> magic_number;
   Assert (magic_number==mn_tria_refine_flags_begin, ExcGridReadError());
 
@@ -655,7 +646,7 @@ void Triangulation<dim>::save_user_flags_line (ostream &out) const {
 
 template <int dim>
 void Triangulation<dim>::load_user_flags_line (istream &in) {
-  int magic_number;
+  unsigned int magic_number;
   in >> magic_number;
   Assert (magic_number==mn_tria_line_user_flags_begin, ExcGridReadError());
 
@@ -734,7 +725,7 @@ void Triangulation<1>::load_user_flags_quad (istream &) {
 
 template <int dim>
 void Triangulation<dim>::load_user_flags_quad (istream &in) {
-  int magic_number;
+  unsigned int magic_number;
   in >> magic_number;
   Assert (magic_number==mn_tria_quad_user_flags_begin, ExcGridReadError());
 
@@ -1664,7 +1655,7 @@ void Triangulation<1>::execute_refinement () {
 	    if (cell->neighbor(1).state() != valid)
 	      second_child->set_neighbor (1, cell->neighbor(1));
 	    else
-	      if (cell->neighbor(1)->active)
+	      if (cell->neighbor(1)->active())
 		second_child->set_neighbor (1, cell->neighbor(1));
 	      else
 						 // right neighbor is refined
