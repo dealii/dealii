@@ -824,6 +824,12 @@ class FEValuesBase : protected FEValuesData<dim>
     const FiniteElement<dim> & get_fe () const;
 
 				     /**
+				      * Constant reference to the
+				      * current cell
+				      */
+    const typename DoFHandler<dim>::cell_iterator & get_cell () const;
+
+				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.
@@ -1541,6 +1547,15 @@ FEValuesBase<dim>::get_mapping () const
   return *mapping;
 }
 
+
+
+template <int dim>
+inline
+const typename DoFHandler<dim>::cell_iterator &
+FEValuesBase<dim>::get_cell () const
+{
+  return present_cell;
+}
 
 /*------------------------ Inline functions: FEValues ----------------------------*/
 
