@@ -369,9 +369,10 @@ class SparseMatrix : public Subscriptor
     void Tvmult_add (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
   
 				     /**
-				      * Return the norm of the vector
-				      * $v$ with respect to the norm
-				      * induced by this matrix,
+				      * Return the square of the norm
+				      * of the vector $v$ with respect
+				      * to the norm induced by this
+				      * matrix,
 				      * i.e. $\left(v,Mv\right)$. This
 				      * is useful, e.g. in the finite
 				      * element context, where the
@@ -380,19 +381,13 @@ class SparseMatrix : public Subscriptor
 				      * respect to the mass matrix of
 				      * the vector representing the
 				      * nodal values of the finite
-				      * element function. Note that
-				      * even though the function's
-				      * name might suggest something
-				      * different, for historic
-				      * reasons not the norm but its
-				      * square is returned, as defined
-				      * above by the scalar product.
+				      * element function.
 				      *
 				      * Obviously, the matrix needs to
 				      * be square for this operation.
 				      */
     template <typename somenumber>
-    somenumber matrix_norm (const Vector<somenumber> &v) const;
+    somenumber matrix_norm_square (const Vector<somenumber> &v) const;
 
 				     /**
 				      * Compute the matrix scalar
@@ -693,19 +688,39 @@ class SparseMatrix : public Subscriptor
 			 const unsigned int        end_row) const;
 
 				     /**
-				      * Version of #matrix_norm# which
+				      * Version of
+				      * #matrix_norm_square# which
 				      * only performs its actions on
 				      * the region defined by
 				      * #[begin_row,end_row)#. This
 				      * function is called by
-				      * #matrix_norm# in the case of
-				      * enabled multithreading.
+				      * #matrix_norm_square# in the
+				      * case of enabled
+				      * multithreading.
 				      */
     template <typename somenumber>
-    void threaded_matrix_norm (const Vector<somenumber> &v,
-			       const unsigned int        begin_row,
-			       const unsigned int        end_row,
-			       somenumber               *partial_sum) const;
+    void threaded_matrix_norm_square (const Vector<somenumber> &v,
+				      const unsigned int        begin_row,
+				      const unsigned int        end_row,
+				      somenumber               *partial_sum) const;
+
+    				     /**
+				      * Version of
+				      * #matrix_scalar_product# which
+				      * only performs its actions on
+				      * the region defined by
+				      * #[begin_row,end_row)#. This
+				      * function is called by
+				      * #matrix_scalar_product# in the
+				      * case of enabled
+				      * multithreading.
+				      */
+    template <typename somenumber>
+    void threaded_matrix_scalar_product (const Vector<somenumber> &u,
+					 const Vector<somenumber> &v,
+					 const unsigned int        begin_row,
+					 const unsigned int        end_row,
+					 somenumber               *partial_sum) const;
 
 				     /**
 				      * Version of #residual# which

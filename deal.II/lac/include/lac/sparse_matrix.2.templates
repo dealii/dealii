@@ -33,7 +33,11 @@ template void SparseMatrix<TYPEMAT>::Tvmult_add (Vector<TYPE2> &,
 					     	const Vector<TYPE2> &) const;
 
 template TYPE2
-SparseMatrix<TYPEMAT>::matrix_norm (const Vector<TYPE2> &) const;
+SparseMatrix<TYPEMAT>::matrix_norm_square (const Vector<TYPE2> &) const;
+
+template TYPE2
+SparseMatrix<TYPEMAT>::matrix_scalar_product (const Vector<TYPE2> &,
+					      const Vector<TYPE2> &) const;
 
 template TYPE2 SparseMatrix<TYPEMAT>::residual (Vector<TYPE2> &,
 					       const Vector<TYPE2> &,

@@ -337,7 +337,7 @@ SparseMatrix<number>::Tvmult_add (Vector<somenumber>& dst, const Vector<somenumb
 template <typename number>
 template <typename somenumber>
 somenumber
-SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
+SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -361,7 +361,7 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
 			Threads::encapsulate (&SparseMatrix<number>::
-					      template threaded_matrix_norm<somenumber>)
+					      template threaded_matrix_norm_square<somenumber>)
 			.collect_args (this, v,
 				       n_rows * i / n_threads,
 				       n_rows * (i+1) / n_threads,
@@ -394,13 +394,14 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
 };
 
 
+
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::threaded_matrix_norm (const Vector<somenumber> &v,
-					    const unsigned int        begin_row,
-					    const unsigned int        end_row,
-					    somenumber               *partial_sum) const
+SparseMatrix<number>::threaded_matrix_norm_square (const Vector<somenumber> &v,
+						   const unsigned int        begin_row,
+						   const unsigned int        end_row,
+						   somenumber               *partial_sum) const
 {
 #ifdef DEAL_II_USE_MT
   somenumber sum = 0.;
@@ -422,6 +423,103 @@ SparseMatrix<number>::threaded_matrix_norm (const Vector<somenumber> &v,
   Assert (false, ExcInternalError());
 #endif
 };
+
+
+
+template <typename number>
+template <typename somenumber>
+somenumber
+SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
+					     const Vector<somenumber>& v) const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
+  Assert(m() == u.size(), ExcDimensionsDontMatch(m(),u.size()));
+  Assert(n() == v.size(), ExcDimensionsDontMatch(n(),v.size()));
+
+  const unsigned int n_rows = m();
+#ifdef DEAL_II_USE_MT
+				   // if in MT mode and size sufficiently
+				   // large: do it in parallel; the limit
+				   // is mostly artificial
+  if (n_rows/multithread_info.n_default_threads > 2000)
+    {
+      const unsigned int n_threads = multithread_info.n_default_threads;
+
+				       // space for the norms of
+				       // the different parts
+      vector<somenumber> partial_sums (n_threads, 0);
+      ACE_Thread_Manager thread_manager;
+				       // spawn some jobs...
+      for (unsigned int i=0; i<n_threads; ++i)
+	Threads::spawn (thread_manager,
+			Threads::encapsulate (&SparseMatrix<number>::
+					      template threaded_matrix_scalar_product<somenumber>)
+			.collect_args (this, u, v,
+				       n_rows * i / n_threads,
+				       n_rows * (i+1) / n_threads,
+				       &partial_sums[i]));
+
+				       // ... and wait until they're finished
+      thread_manager.wait ();
+				       // accumulate the partial results
+      return accumulate (partial_sums.begin(),
+			 partial_sums.end(),
+			 0.);
+    };
+#endif
+				   // if not in MT mode or the matrix is
+				   // too small: do it one-by-one
+  somenumber          sum        = 0.;
+  const number       *val_ptr    = &val[cols->rowstart[0]];
+  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+      somenumber s = 0.;
+      const number *val_end_of_row = &val[cols->rowstart[row+1]];
+      while (val_ptr != val_end_of_row)
+	s += *val_ptr++ * v(*colnum_ptr++);
+
+      sum += s* u(row);
+    };
+
+  return sum;
+};
+
+
+
+template <typename number>
+template <typename somenumber>
+void
+SparseMatrix<number>::threaded_matrix_scalar_product (const Vector<somenumber> &u,
+						      const Vector<somenumber> &v,
+						      const unsigned int        begin_row,
+						      const unsigned int        end_row,
+						      somenumber               *partial_sum) const
+{
+#ifdef DEAL_II_USE_MT
+  somenumber sum = 0.;
+  const number       *val_ptr    = &val[cols->rowstart[begin_row]];
+  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
+  for (unsigned int row=begin_row; row<end_row; ++row)
+    {
+      somenumber s = 0.;
+      const number *val_end_of_row = &val[cols->rowstart[row+1]];
+      while (val_ptr != val_end_of_row)
+	s += *val_ptr++ * v(*colnum_ptr++);
+
+      sum += s* u(row);
+    };
+  *partial_sum = sum;
+  
+#else
+				   // function should not have been called
+  Assert (false, ExcInternalError());
+#endif
+};
+
+
+
 
 
 template <typename number>
@@ -559,6 +657,7 @@ SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 };
 
 
+
 template <typename number>
 template <typename somenumber>
 void
@@ -582,6 +681,7 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>& dst,
 				     // rowstart[i]
     *dst_ptr = om * *src_ptr / val[*rowstart_ptr];
 };
+
 
 
 template <typename number>
