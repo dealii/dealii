@@ -276,6 +276,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: In the <code class="class">SparseDirectMA27</code> class, wrapping 
+       the MA27 solver written in Fortran77 into some structure amenable to C++,
+       we wrote beyond the end of an array on rare inputs. This is now fixed. The
+       same probably holds for the respective code for MA47.
+       <br>
+       (WB 2002/09/30)
+       </p>
+
+  <li> <p>
        New: Since the MA27 sparse direct solver uses Fortran common blocks, it
        was previously impossible to run several instances of this solver in
        parallel, in a multihreaded environment. To solve this problem, the

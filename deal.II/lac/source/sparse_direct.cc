@@ -537,7 +537,8 @@ SparseDirectMA27::factorize (const SparseMatrix<double> &matrix)
   
 				   // set LA and fill the A array of
 				   // values
-  LA = static_cast<int>(NRLNEC * LA_factor);
+  LA = std::max (static_cast<int>(NRLNEC * LA_factor),
+		 static_cast<int>(n_nonzero_elements));
   A.resize (LA);
   fill_A (matrix);
 
@@ -719,7 +720,8 @@ SparseDirectMA27::get_synchronisation_lock () const
 void
 SparseDirectMA27::fill_A (const SparseMatrix<double> &matrix)
 {
-  
+  Assert (n_nonzero_elements <= A.size(), ExcInternalError());
+
   const SparsityPattern &sparsity_pattern = matrix.get_sparsity_pattern ();
   
   const unsigned int n_rows = sparsity_pattern.n_rows();
@@ -1059,7 +1061,8 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
   
 				   // set LA and fill the A array of
 				   // values
-  LA = static_cast<int>(INFO[5] * LA_factor);
+  LA = std::max (static_cast<int>(INFO[5] * LA_factor),
+		 static_cast<int>(n_nonzero_elements));
   A.resize (LA);
   fill_A (m);
   
