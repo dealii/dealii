@@ -15,6 +15,8 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 
+#include <utility>
+
 
 //forward declarations
 template <typename number> class Vector;
@@ -885,7 +887,12 @@ class SparseMatrix : public Subscriptor
 				      * function equals the matrix norm with
 				      * respect to the mass matrix of the vector
 				      * representing the nodal values of the
-				      * finite element function.
+				      * finite element function. Note that
+				      * even though the function's name might
+				      * suggest something different, for historic
+				      * reasons not the norm but its square
+				      * is returned, as defined above by
+				      * the scalar product.
 				      *
 				      * Note the order in which the matrix
 				      * appears. For non-symmetric matrices
@@ -1137,7 +1144,48 @@ class SparseMatrix : public Subscriptor
 				      * function.
 				      */
     unsigned int max_len;
-    
+
+				     /**
+				      * Version of #vmult# which only performs
+				      * its actions on the region defined by
+				      * #[begin_row,end_row)#. This function
+				      * is called by #vmult# in the case
+				      * of enabled multithreading.
+				      */
+    template <typename somenumber>
+    void * threaded_vmult (Vector<somenumber>       &dst,
+			   const Vector<somenumber> &src,
+			   const unsigned int        begin_row,
+			   const unsigned int        end_row) const;
+
+				     /**
+				      * Version of #matrix_norm# which only
+				      * performs its actions on the region
+				      * defined by #[begin_row,end_row)#. This
+				      * function is called by #matrix_norm# in
+				      * the case of enabled multithreading.
+				      */
+    template <typename somenumber>
+    void * threaded_matrix_norm (const Vector<somenumber> &v,
+				 const unsigned int        begin_row,
+				 const unsigned int        end_row,
+				 somenumber               *partial_sum) const;
+
+				     /**
+				      * Version of #residual# which only
+				      * performs its actions on the region
+				      * defined by #[begin_row,end_row)#. This
+				      * function is called by #residual# in
+				      * the case of enabled multithreading.
+				      */
+    template <typename somenumber>
+    void * threaded_residual (Vector<somenumber>       &dst,
+			      const Vector<somenumber> &u,
+			      const Vector<somenumber> &b,
+			      const unsigned int        begin_row,
+			      const unsigned int        end_row,
+			      somenumber               *partial_norm) const;
+
 
 				     // make all other sparse matrices
 				     // friends

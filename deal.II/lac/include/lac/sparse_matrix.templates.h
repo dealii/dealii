@@ -14,6 +14,16 @@
 #include <iomanip>
 #include <algorithm>
 
+#ifdef DEAL_II_USE_MT
+#  include <vector>
+#  include <numeric>
+
+#  include <base/thread_manager.h>
+
+#  define NTHREADS 4
+#endif
+
+
 
 
 
@@ -69,6 +79,7 @@ SparseMatrix<number>::~SparseMatrix ()
 {
   if (cols != 0)
     cols->unsubscribe();
+  cols = 0;
   
   if (val != 0)
     delete[] val;
@@ -123,6 +134,8 @@ template <typename number>
 void
 SparseMatrix<number>::clear ()
 {
+  if (cols != 0)
+    cols->unsubscribe ();
   cols = 0;
   if (val) delete[] val;
   val = 0;
@@ -199,8 +212,53 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionsDontMatch(n(),src.size()));
-
+  
   const unsigned int n_rows = m();
+
+#ifdef DEAL_II_USE_MT
+				   // in MT mode: start new threads only
+				   // if the matrix is sufficiently large.
+				   // the limit is mostly artificial
+  if (n_rows/NTHREADS > 2000)
+    {
+      const unsigned int n_threads = NTHREADS;
+
+      ThreadManager thread_manager;
+      
+      const ThreadManager::Mem_Fun_Data4<const SparseMatrix<number>,
+	                                 Vector<somenumber> &,
+	                                 const Vector<somenumber> &,
+	                                 unsigned int,
+	                                 unsigned int> 
+	mem_fun_data_all (this, dst, src, 0, 0,
+	 	          &SparseMatrix<number>::template threaded_vmult<somenumber>  );
+      vector<ThreadManager::Mem_Fun_Data4<const SparseMatrix<number>,
+                                          Vector<somenumber> &,
+                                          const Vector<somenumber> &,
+                                          unsigned int,
+                                          unsigned int> >
+	mem_fun_data(n_threads, mem_fun_data_all);
+  
+				       // spawn some jobs...
+      for (unsigned int i=0; i<n_threads; ++i)
+	{
+					   // compute the range of rows
+					   // they are to serve
+	  mem_fun_data[i].arg3 = n_rows * i / n_threads;
+	  mem_fun_data[i].arg4 = n_rows * (i+1) / n_threads;
+	  
+	  thread_manager.spawn (&mem_fun_data[i]);
+	};
+      
+				       // ... and wait until they're finished
+      thread_manager.wait ();
+
+      return;
+    };
+#endif
+
+				   // if not in MT mode or size<2000
+				   // do it in an oldfashioned way
   const number *val_ptr = &val[cols->rowstart[0]];
   const int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
   somenumber   *dst_ptr = &dst(0);
@@ -213,6 +271,38 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
       *dst_ptr++ = s;
     };
 };
+
+
+
+template <typename number>
+template <typename somenumber>
+void *
+SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
+				      const Vector<somenumber> &src,
+				      const unsigned int        begin_row,
+				      const unsigned int        end_row) const
+{
+#ifdef DEAL_II_USE_MT
+  const number *val_ptr = &val[cols->rowstart[begin_row]];
+  const int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
+  somenumber   *dst_ptr = &dst(begin_row);
+  for (unsigned int row=begin_row; row<end_row; ++row)
+    {
+      somenumber s = 0.;
+      const number *const val_end_of_row = &val[cols->rowstart[row+1]];
+      while (val_ptr != val_end_of_row)
+	s += *val_ptr++ * src(*colnum_ptr++);
+      *dst_ptr++ = s;
+    };
+#else
+				   // this function should not be called
+				   // when not in parallel mode.
+  Assert (false, ExcInternalError());
+#endif
+
+  return 0;
+};
+
 
 
 template <typename number>
@@ -296,8 +386,58 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
   Assert(m() == v.size(), ExcDimensionsDontMatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionsDontMatch(n(),v.size()));
 
-  somenumber sum = 0.;
   const unsigned int n_rows = m();
+#ifdef DEAL_II_USE_MT
+				   // if in MT mode and size sufficiently
+				   // large: do it in parallel; the limit
+				   // is mostly artificial
+  if (n_rows/NTHREADS > 2000)
+    {
+      const unsigned int n_threads = NTHREADS;
+
+      ThreadManager thread_manager;
+      
+      const ThreadManager::Mem_Fun_Data4<const SparseMatrix<number>,
+	                                 const Vector<somenumber> &,
+	                                 unsigned int,
+	                                 unsigned int,
+	                                 somenumber *> 
+	mem_fun_data_all (this, v, 0, 0, 0,
+	 	          &SparseMatrix<number>::template threaded_matrix_norm<somenumber>  );
+      vector<ThreadManager::Mem_Fun_Data4<const SparseMatrix<number>,
+                                          const Vector<somenumber> &,
+                                          unsigned int,
+                                          unsigned int,
+	                                  somenumber *> >
+	mem_fun_data(n_threads, mem_fun_data_all);
+
+				       // space for the norms of
+				       // the different parts
+      vector<somenumber> partial_sums (n_threads, 0);
+      
+				       // spawn some jobs...
+      for (unsigned int i=0; i<n_threads; ++i)
+	{
+					   // compute the range of rows
+					   // they are to serve
+	  mem_fun_data[i].arg2 = n_rows * i / n_threads;
+	  mem_fun_data[i].arg3 = n_rows * (i+1) / n_threads;
+	  mem_fun_data[i].arg4 = &partial_sums[i];
+	  	  
+	  thread_manager.spawn (&mem_fun_data[i]);
+	};
+      
+				       // ... and wait until they're finished
+      thread_manager.wait ();
+				       // accumulate the partial results
+      return accumulate (partial_sums.begin(),
+			 partial_sums.end(),
+			 0.);
+    };
+#endif
+				   // if not in MT mode or the matrix is
+				   // too small: do it one-by-one
+  somenumber sum = 0.;
   const number *val_ptr = &val[cols->rowstart[0]];
   const int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
   for (unsigned int row=0; row<n_rows; ++row)
@@ -311,6 +451,38 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
     };
 
   return sum;
+};
+
+
+
+template <typename number>
+template <typename somenumber>
+void *
+SparseMatrix<number>::threaded_matrix_norm (const Vector<somenumber> &v,
+					    const unsigned int        begin_row,
+					    const unsigned int        end_row,
+					    somenumber               *partial_sum) const
+{
+#ifdef DEAL_II_USE_MT
+  somenumber sum = 0.;
+  const number *val_ptr = &val[cols->rowstart[begin_row]];
+  const int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
+  for (unsigned int row=begin_row; row<end_row; ++row)
+    {
+      somenumber s = 0.;
+      const number *val_end_of_row = &val[cols->rowstart[row+1]];
+      while (val_ptr != val_end_of_row)
+	s += *val_ptr++ * v(*colnum_ptr++);
+
+      sum += s* v(row);
+    };
+  *partial_sum = sum;
+  
+#else
+				   // function should not have been called
+  Assert (false, ExcInternalError());
+#endif
+  return 0;
 };
 
 
@@ -356,9 +528,9 @@ number SparseMatrix<number>::linfty_norm () const
 template <typename number>
 template <typename somenumber>
 somenumber
-SparseMatrix<number>::residual (Vector<somenumber>& dst,
-				const Vector<somenumber>& u,
-				const Vector<somenumber>& b) const
+SparseMatrix<number>::residual (Vector<somenumber>       &dst,
+				const Vector<somenumber> &u,
+				const Vector<somenumber> &b) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -366,11 +538,65 @@ SparseMatrix<number>::residual (Vector<somenumber>& dst,
   Assert(m() == b.size(), ExcDimensionsDontMatch(m(),b.size()));
   Assert(n() == u.size(), ExcDimensionsDontMatch(n(),u.size()));
 
-  somenumber s,norm=0.;   
-  
-  for (unsigned int i=0;i<m();i++)
+  const unsigned int n_rows = m();
+#ifdef DEAL_II_USE_MT
+				   // if in MT mode and size sufficiently
+				   // large: do it in parallel; the limit
+				   // is mostly artificial
+  if (n_rows/NTHREADS > 2000)
     {
-      s = b(i);
+      const unsigned int n_threads = NTHREADS;
+
+      ThreadManager thread_manager;
+      
+      const ThreadManager::Mem_Fun_Data6<const SparseMatrix<number>,
+ 	                                 Vector<somenumber> &,        // dst
+	                                 const Vector<somenumber> &,  // u
+	                                 const Vector<somenumber> &,  // b
+	                                 unsigned int,        // begin_row
+	                                 unsigned int,        // end_row
+	                                 somenumber *>            // partial norm
+	mem_fun_data_all (this, dst, u, b, 0, 0, 0,
+	 	          &SparseMatrix<number>::template threaded_residual<somenumber>  );
+      vector<ThreadManager::Mem_Fun_Data6<const SparseMatrix<number>,
+                                          Vector<somenumber> &,
+                                          const Vector<somenumber> &,
+                                          const Vector<somenumber> &,
+                                          unsigned int,
+                                          unsigned int,
+	                                  somenumber *> >
+	mem_fun_data(n_threads, mem_fun_data_all);
+
+				       // space for the square norms of
+				       // the different parts
+      vector<somenumber> partial_norms (n_threads, 0);
+      
+				       // spawn some jobs...
+      for (unsigned int i=0; i<n_threads; ++i)
+	{
+					   // compute the range of rows
+					   // they are to serve
+	  mem_fun_data[i].arg4 = n_rows * i / n_threads;
+	  mem_fun_data[i].arg5 = n_rows * (i+1) / n_threads;
+	  mem_fun_data[i].arg6 = &partial_norms[i];
+	  	  
+	  thread_manager.spawn (&mem_fun_data[i]);
+	};
+      
+				       // ... and wait until they're finished
+      thread_manager.wait ();
+				       // accumulate the partial results
+      return sqrt(accumulate (partial_norms.begin(),
+			      partial_norms.end(),
+			      0.));
+    };
+#endif
+  
+  somenumber norm=0.;   
+  
+  for (unsigned int i=0; i<n_rows; ++i)
+    {
+      somenumber s = b(i);
       for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
 	  int p = cols->colnums[j];
@@ -381,6 +607,40 @@ SparseMatrix<number>::residual (Vector<somenumber>& dst,
     }
   return sqrt(norm);
 }
+
+
+template <typename number>
+template <typename somenumber>
+void *
+SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
+					 const Vector<somenumber> &u,
+					 const Vector<somenumber> &b,
+					 const unsigned int        begin_row,
+					 const unsigned int        end_row,
+					 somenumber               *partial_norm) const
+{
+#ifdef DEAL_II_USE_MT
+  somenumber norm=0.;   
+  
+  for (unsigned int i=begin_row; i<end_row; ++i)
+    {
+      somenumber s = b(i);
+      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
+	{
+	  int p = cols->colnums[j];
+	  s -= val[j] * u(p);
+	}
+      dst(i) = s;
+      norm += dst(i)*dst(i);
+    };
+
+  *partial_norm = norm;
+#else
+  Assert (false, ExcInternalError());
+#endif
+
+  return 0;
+};
 
 
 
