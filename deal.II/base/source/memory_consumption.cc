@@ -17,20 +17,6 @@
 
 namespace MemoryConsumption 
 {
-  unsigned int memory_consumption (const std::string &s)
-  {
-    return sizeof(s) + s.length();
-  };
-
-
-   
-  unsigned int memory_consumption (std::string &s)
-  {
-    return sizeof(s) + s.length();
-  };
-
-
-   
   unsigned int memory_consumption (const std::vector<std::string> &v)
   {
     unsigned int mem = sizeof(v);
