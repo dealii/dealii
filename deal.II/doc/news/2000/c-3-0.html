@@ -114,6 +114,16 @@
 <h3>lac</h3>
 
 <ol>
+
+  <li> <p>
+       Improved: <code class="class">FullMatrix&lt;...&gt;</code><code
+       class="member">::invert(...)</code> now inverts matrices of all
+       sizes. If there is no hardcoded inversion, <code
+       class="member">gauss_jordan()</code> is used implicitly.
+       <br>
+       (GK 2000/06/30)
+       </p>
+
   <li> <p> 
        New: For recognizing a diverging solver before the maximum
        number of steps is reached, 
