@@ -232,7 +232,7 @@ SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt)
 		t (tt.t), id(tt.id)
 {
   if (t != 0)
-    t->subscribe();
+    t->subscribe(id);
 }
 
 
