@@ -275,7 +275,7 @@ void die (const std::string &text)
   std::cerr << "+++++ detached_ma27 driver: " << text
             << std::endl;
   CommunicationsLog::list_communication ();
-  abort ();
+  std::abort ();
 };
 
 
@@ -290,7 +290,7 @@ void die (const std::string &text, const T1 t1, const T2 t2)
             << " code1=" << t1 << ", code2=" << t2
             << std::endl;
   CommunicationsLog::list_communication ();
-  abort ();
+  std::abort ();
 };
 
 
@@ -304,7 +304,6 @@ void die (const std::string &text, const T1 t1, const T2 t2)
  * child. if the return value is non-null, then kill couldn't find
  * out about the process, so it is apparently gone
  */
-extern "C"
 void monitor_child_liveness (const pid_t child_pid) 
 {
   while (true)
@@ -380,7 +379,7 @@ struct SparseDirectMA27::DetachedModeData
             count += ret;
           };
         
-        fflush (NULL);
+        std::fflush (NULL);
         CommunicationsLog::
           record_communication<T> (CommunicationsLog::put, N, count, debug_info);
       };
