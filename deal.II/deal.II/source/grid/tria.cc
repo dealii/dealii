@@ -3251,7 +3251,8 @@ bool Triangulation<dim>::prepare_coarsening () {
   
 				   // do some smoothing on the mesh if required
   if (dim>1)
-    if (smooth_grid & eliminate_refined_islands) 
+    if (smooth_grid & (eliminate_refined_inner_islands |
+		       eliminate_refined_boundary_islands)) 
       for (cell=begin(); cell!=endc; ++cell)
 	if (!cell->active() || (cell->active() && cell->refine_flag_set()))
 	  {
@@ -3303,7 +3304,16 @@ bool Triangulation<dim>::prepare_coarsening () {
 						 // mark this
 						 // cell for coarsening or don't
 						 // refine if marked for that
-		if (unrefined_neighbors == total_neighbors)
+						 //
+						 // also do the distinction
+						 // between the two versions of
+						 // the eliminate_refined_*_islands
+						 // flag
+		if ((unrefined_neighbors == total_neighbors) &&
+		    (((unrefined_neighbors==GeometryInfo<dim>::faces_per_cell) &&
+		      (smooth_grid & eliminate_refined_inner_islands)) ||
+		     ((unrefined_neighbors<GeometryInfo<dim>::faces_per_cell) &&
+		      (smooth_grid & eliminate_refined_boundary_islands)) ))
 		  if (!cell->active())
 		    cell->set_user_flag();
 		  else 

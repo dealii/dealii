@@ -45,11 +45,13 @@ enum MeshSmoothing {
       limit_level_difference_at_vertices = 0x1,     
       eliminate_unrefined_islands        = 0x2,
 
-      eliminate_refined_islands          = 0x4,
+      eliminate_refined_inner_islands    = 0x100,
+      eliminate_refined_boundary_islands = 0x200,
       
       smoothing_on_refinement            = (limit_level_difference_at_vertices |
 					    eliminate_unrefined_islands),
-      smoothing_on_coarsening            = (eliminate_refined_islands),
+      smoothing_on_coarsening            = (eliminate_refined_inner_islands |
+					    eliminate_refined_boundary_islands),
       maximum_smoothing                  = 0xffff
 };
 
@@ -688,7 +690,7 @@ class TriaDimensionInfo<2> {
  *     name of the flag may indicate. However, no better name came to mind to
  *     the author by now.
  *
- *   \item #eliminate_refined_islands#:
+ *   \item #eliminate_refined_*_islands#:
  *     This algorithm seeks for isolated cells which are refined or flagged
  *     for refinement. This definition is unlike that for
  *     #eliminate_unrefined_islands#, which would mean that an island is
@@ -709,6 +711,16 @@ class TriaDimensionInfo<2> {
  *     This algorithm also takes into account cells which are not actually
  *     refined but are flagged for refinement. If necessary, it takes away the
  *     refinement flag.
+ *
+ *     Actually there are two versions of this flag,
+ *     #eliminate_refined_inner_islands# and #eliminate_refined_boundary_islands#.
+ *     There first eliminates islands defined by the definition above which are
+ *     in the interior of the domain, while the second eliminates only those
+ *     islands if the cell is at the boundary. The reason for this split of
+ *     flags is that one often wants to eliminate such islands in the interior
+ *     while those at the boundary may well be wanted, for example if one
+ *     refines the mesh according to a criterion associated with a boundary
+ *     integral or if one has rough boundary data.
  *
  *   \item #smoothing_on_refinement#:
  *     This flag sums up all smoothing algorithms which may be performed upon
@@ -966,7 +978,7 @@ class TriaDimensionInfo<2> {
  *       will need refinement, we will need additional loops of regularisation
  *       and smoothing over all cells until nothing changes any more.
  *
- *     \item #eliminate_refined_islands#:
+ *     \item #eliminate_refined_*_islands#:
  *       This one does much the same as the above one, but for coarsening. If
  *       a cell is flagged for refinement or if all of its children are active
  *       and if the number of neighbors which are either active and not flagged
@@ -974,6 +986,10 @@ class TriaDimensionInfo<2> {
  *       equals the total number of neighbors, then this cell's children
  *       are flagged for coarsening or (if this cell was flagged for refinement)
  *       the refine flag is cleared.
+ *
+ *       For a description of the distinction between the two versions of the
+ *       flag see above in the section about mesh smoothing in the general part
+ *       of this class's description.
  *
  *       The same applies as above: several loops may be necessary.
  *     \end{itemize}
