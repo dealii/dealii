@@ -129,7 +129,10 @@ TAGS:
 
 
 
-clean: clean-contrib clean-base clean-lac clean-dealII clean-doc clean-examples clean-lib clean-tests clean-common-scripts
+clean: common/scripts/make_dependencies \
+       clean-contrib clean-base clean-lac clean-dealII \
+       clean-doc clean-examples clean-lib clean-tests \
+       clean-common-scripts
 	-rm -f TODO common/TAGS
 
 clean-contrib:
