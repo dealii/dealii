@@ -130,6 +130,9 @@ class TriaAccessor
     bool operator != (const TriaAccessor &) const;
     
   public:
+
+    double ind_value;
+    
 				     /**
 				      * Data type to be used for passing
 				      * parameters from iterators to the
@@ -1929,6 +1932,15 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * of a cell).
 				      */
     bool active () const;
+
+				     /**
+				      * Test whether the point p is inside
+				      * this cell.
+				      * Up to now, this function is only
+				      * implemented for 2d
+				      */
+    bool point_inside(const Point<dim> &p) const;
+    
     
 				     /**
 				      *  Exception

@@ -1566,6 +1566,12 @@ void CellAccessor<1>::set_material_id (const unsigned char mat_id) const
 };
 
 
+template <>
+bool CellAccessor<1>::point_inside (const Point<1> &) const
+{
+  Assert (false, ExcNotImplemented() );
+}
+
 #endif
 
 
@@ -1598,6 +1604,20 @@ void CellAccessor<2>::set_material_id (const unsigned char mat_id) const
   tria->levels[present_level]->quads.material_id[present_index]
     = mat_id;						 
 };
+
+template <>
+bool CellAccessor<2>::point_inside (const Point<2> &p) const
+{
+  for (unsigned int k=0;k<4;++k)
+    {
+      const Point<2> to_p = p-vertex(k);
+      const Point<2> face = vertex((k+1)%4)-vertex(k);
+      if (-face(1)*to_p(0)+face(0)*to_p(1)<0)
+	return false;
+    }
+  return true;
+}
+
 
 #endif
 
@@ -1633,6 +1653,13 @@ void CellAccessor<3>::set_material_id (const unsigned char mat_id) const
   tria->levels[present_level]->hexes.material_id[present_index]
     = mat_id;						 
 };
+
+template <>
+bool CellAccessor<3>::point_inside (const Point<3> &) const
+{
+  Assert (false, ExcNotImplemented() );
+}
+
 
 #endif
 
