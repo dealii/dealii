@@ -45,3 +45,8 @@ MGBase::level_mgstep(unsigned level,
   post_smooth.smooth(level, s[level], d[level]);
 }
 
+MGTransferBase::~MGTransferBase()
+{}
+
+MGSmootherBase::~MGSmootherBase()
+{}

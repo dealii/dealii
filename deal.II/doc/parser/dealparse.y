@@ -197,6 +197,8 @@ enumerator: IDENTIFIER
 class_declaration: class_head
   | class_head
     {
+      cout << "@@@" << endl << setw(OUTW) << "@Class-Definition:" << $1 << endl
+	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl;
       class_name = class_stack.top() + string("::") + class_name;
       class_stack.push(class_name);
       access_stack.push(string("private"));
@@ -204,8 +206,6 @@ class_declaration: class_head
     {
       class_stack.pop();
       access_stack.pop();
-      cout << "@@@" << endl << setw(OUTW) << "@Class-Definition:" << $1 << endl
-	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl;
     }
 ;
 

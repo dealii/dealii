@@ -41,7 +41,7 @@ libraries = $(libs)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
-all: solver
+all: solver mgbase mg
 
 ############################################################
 # Typical block for building a running program
@@ -66,6 +66,39 @@ endif
 
 solver: $(solver-o-files) $(libraries)
 	$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+
+mgbase-cc-files = mgbase.cc
+
+ifeq ($(debug-mode),on)
+mgbase-o-files = $(mgbase-cc-files:.cc=.go)
+else
+mgbase-o-files = $(mgbase-cc-files:.cc=.o)
+endif
+
+mgbase: $(mgbase-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
+
+
+
+############################################################
+
+
+mg-cc-files = mg.cc testmatrix.cc
+
+ifeq ($(debug-mode),on)
+mg-o-files = $(mg-cc-files:.cc=.go)
+else
+mg-o-files = $(mg-cc-files:.cc=.o)
+endif
+
+mg: $(mg-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
+
+
 
 ############################################################
 # Continue with other targets if needed
@@ -99,7 +132,7 @@ veryclean: clean
 # Automatic generation of dependencies
 ############################################################
 
-all-cc-files = $(solver-cc-files) # $(target2-cc-files) ...
+all-cc-files = $(solver-cc-files) $(mgbase-cc-files) $(mg-cc-files) # $(target2-cc-files) ...
 
 Make.depend: $(all-cc-files)
 	@echo =====Dependecies=== Make.depend

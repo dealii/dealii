@@ -3,6 +3,7 @@
 // Test program for linear solvers.
 
 #include <cmath>
+#include <fstream>
 #include "testmatrix.h"
 #include <base/logstream.h>
 #include <lac/sparsematrix.h>
@@ -15,17 +16,27 @@
 #include <lac/solver_richardson.h>
 #include <lac/precondition.h>
 
-#define MATRIX SparseMatrix<float> 
-#define VECTOR Vector<double> 
+template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
+void
+check_method( SOLVER& solver, const MATRIX& A,
+	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
+{
+  u = 0.;
+  f = 1.;
+  solver.solve(A,u,f,P);
+}
 
 main()
 {
-  PrimitiveVectorMemory<VECTOR > mem;
+  ofstream logfile("solver.output");
+  deallog.attach(logfile);
+  
+  PrimitiveVectorMemory<Vector<double>  > mem;
   SolverControl control(100, 1.e-5, true);
-  SolverCG<MATRIX, VECTOR > cg(control, mem);
-  SolverGMRES<MATRIX, VECTOR > gmres(control, mem,20);
-  SolverBicgstab<MATRIX, VECTOR > bicgstab(control, mem);
-  SolverRichardson<MATRIX, VECTOR > rich(control, mem);
+  SolverCG<SparseMatrix<float> , Vector<double>  > cg(control, mem);
+  SolverGMRES<SparseMatrix<float> , Vector<double>  > gmres(control, mem,20);
+  SolverBicgstab<SparseMatrix<float> , Vector<double>  > bicgstab(control, mem);
+  SolverRichardson<SparseMatrix<float> , Vector<double>  > rich(control, mem);
 
   for (unsigned int size=10; size <= 10; size *= 10)
     {
@@ -38,49 +49,40 @@ main()
       SparseMatrixStruct structure(dim, dim, 5);
       testproblem.build_structure(structure);
       structure.compress();
-      MATRIX A(structure);
+      SparseMatrix<float>  A(structure);
       testproblem.laplacian(A);
 
-      PreconditionIdentity<VECTOR >
+      PreconditionIdentity<Vector<double>  >
 	prec_no;
-      PreconditionRelaxation<MATRIX, VECTOR>
-	prec_ssor(A, &MATRIX::template precondition_SSOR<double>, 1.2);
+      PreconditionRelaxation<SparseMatrix<float> , Vector<double> >
+	prec_sor(A, &SparseMatrix<float> ::template precondition_SOR<double>, 1.2);
+      PreconditionRelaxation<SparseMatrix<float> , Vector<double> >
+	prec_ssor(A, &SparseMatrix<float> ::template precondition_SSOR<double>, 1.2);
       
-      VECTOR f(dim);
-      VECTOR u(dim);
+      Vector<double>  f(dim);
+      Vector<double>  u(dim);
       
       deallog.push("no");
 
-      f = 1.;
-      u = 0.;
-      cg.solve(A,u,f,prec_no);
-
-      f = 1.;
-      u = 0.;
-      bicgstab.solve(A,u,f,prec_no);
-
-      f = 1.;
-      u = 0.;
-      gmres.solve(A,u,f,prec_no);
+      check_method(cg,A,u,f,prec_no);
+      check_method(bicgstab,A,u,f,prec_no);
+      check_method(gmres,A,u,f,prec_no);
 
       deallog.pop();
       deallog.push("ssor");      
 
-      f = 1.;
-      u = 0.;
-      rich.solve(A,u,f,prec_ssor);
+      check_method(rich,A,u,f,prec_ssor);
+      check_method(cg,A,u,f,prec_ssor);
+      check_method(bicgstab,A,u,f,prec_ssor);
+      check_method(gmres,A,u,f,prec_ssor);
 
-      f = 1.;
-      u = 0.;
-      cg.solve(A,u,f,prec_ssor);
+      deallog.pop();
+      deallog.push("sor");      
 
-      f = 1.;
-      u = 0.;
-      bicgstab.solve(A,u,f,prec_ssor);
-
-      f = 1.;
-      u = 0.;
-      gmres.solve(A,u,f,prec_ssor);
+      check_method(rich,A,u,f,prec_sor);
+      check_method(cg,A,u,f,prec_sor);
+      check_method(bicgstab,A,u,f,prec_sor);
+      check_method(gmres,A,u,f,prec_sor);
 
       deallog.pop();
     }

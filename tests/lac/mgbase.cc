@@ -3,8 +3,7 @@
 // deal_II_libraries.g=-ldeal_II_2d.g
 // deal_II_libraries=-ldeal_II_2d
 
-#include <numerics/multigrid.h>
-#include <numerics/mg_smoother.h>
+#include <lac/mgbase.h>
 
 class TransferTest
   :
@@ -16,7 +15,7 @@ class TransferTest
     virtual void restrict(unsigned l,
 			  Vector<float>& dst,
 			  const Vector<float>& src) const;
-    friend class MultiGridBase;
+    friend class MGBase;
 };
 
 class SmoothTest
@@ -29,17 +28,29 @@ class SmoothTest
 			     const Vector<float>& rhs) const;
 };
 
+class MGCoarseGridTest
+  :
+  public MGCoarseGridSolver
+{
+  public:
+    virtual void operator () (unsigned int level,
+			      Vector<float>& dst,
+			      const Vector<float>& src) const ;
+};
+
 
 class MGTest
   :
-  public MultiGridBase
+  public MGBase
 {
     MGSmootherBase& smoother;
-    
+    MGCoarseGridSolver& solver;
+
   public:
-    MGTest(TransferTest& t, SmoothTest& s)
-		    : MultiGridBase(t, 9, 3),
-		      smoother(s)
+    MGTest(TransferTest& t, SmoothTest& s, MGCoarseGridTest& c)
+		    : MGBase(t, 9, 3),
+		      smoother(s),
+		      solver(c)
       {}
     
     virtual void level_residual(unsigned level,
@@ -49,7 +60,7 @@ class MGTest
     
     void doit()
       {
-	level_mgstep(9, smoother, smoother);
+	level_mgstep(9, smoother, smoother, solver);
       }
 };
 
@@ -57,7 +68,9 @@ main()
 {
   TransferTest tr;
   SmoothTest s;
-  MGTest mg(tr, s);
+  MGCoarseGridTest c;
+  
+  MGTest mg(tr, s, c);
   mg.doit();
   
 }
@@ -83,7 +96,7 @@ SmoothTest::smooth (const unsigned int  level,
 		    Vector<float>      &,
 		    const Vector<float>&) const
 {
-  cout << "Smoothing on" << level << endl;
+  cout << "Smoothing on " << level << endl;
 }
 
 void
@@ -93,4 +106,12 @@ MGTest::level_residual(unsigned l,
 		       const Vector<float>&)
 {
   cout << "Residual on  " << l << endl;
+}
+
+void
+MGCoarseGridTest::operator() (unsigned int level,
+			      Vector<float>&,
+			      const Vector<float>&) const
+{
+  cout << "Solving on   " << level << endl;
 }

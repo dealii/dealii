@@ -1,6 +1,8 @@
 // $Id$
 
 #include <lac/forward-declarations.h>
+#include <base/exceptions.h>
+#include <lac/mgbase.h>
 
 /**
  * Finite difference matrix on uniform grid.
@@ -36,4 +38,65 @@ class FDMatrix
 				      * Number of gridpoints in y-direction.
 				      */
     unsigned int ny;
+};
+
+/**
+ * Grid transfer for finite differences on uniform grid.
+ */
+
+class FDMGTransfer
+  :
+  public MGTransferBase
+{
+  public:
+				     /**
+				      * Constructor. Prepares grid
+				      * transfer matrices for #nlevels#
+				      * levels on an #nx# times #ny#
+				      * grid.
+				      */
+    FDMGTransfer(unsigned int nx, unsigned int ny,
+		 unsigned int nlevels);
+
+				     /**
+				      * Implementation of abstract
+				      * function in #MGTranferBase#.
+				      */
+    virtual void prolongate (const unsigned int   to_level,
+			     Vector<float>       &dst,
+			     const Vector<float> &src) const;
+
+				     /**
+				      * Implementation of abstract
+				      * function in #MGTranferBase#.
+				      */
+    virtual void restrict (const unsigned int   from_level,
+			   Vector<float>       &dst,
+			   const Vector<float> &src) const;
+
+				     /**
+				      * Exception.
+				      */
+    DeclException2(ExcDivide, unsigned int, unsigned int,
+		   << "Cannot divide " << arg1 << " by " << arg2);
+    
+  private:
+				     /**
+				      * Prolongation matrix structures.
+				      */
+    vector<SparseMatrixStruct > structures;
+				     /**
+				      * Prolongation matrices.
+				      */
+    vector<SparseMatrix<float> > matrices;
+
+				     /**
+				      * Matrix generator.
+				      * The arguments #nx# and #ny#
+				      * are the numbers on the COARSE level.
+				      * Builds a transfer matrix from
+				      * fine to coarse (#vmult#).
+				      */
+    void build_matrix(unsigned int nx, unsigned int ny,
+		      SparseMatrixStruct&, SparseMatrix<float>&);
 };

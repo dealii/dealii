@@ -131,7 +131,7 @@ template<class MATRIX>
 class MGMatrix
   :
   public Subscriptor,
-  public Vector<MATRIX>
+  public vector<MATRIX>
 {
   public:
 				     /**
@@ -159,7 +159,7 @@ class MGCoarseGridLACIteration
 				      * preconditioning method for later
 				      * use.
 				      */
-    MGCoarseGridLACIteration(const SOLVER&, const MATRIX&, const PRECOND&);
+    MGCoarseGridLACIteration( SOLVER&, const MATRIX&, const PRECOND&);
     
 				     /**
 				      * Implementation of the abstract
@@ -174,7 +174,7 @@ class MGCoarseGridLACIteration
 				     /**
 				      * Reference to the solver.
 				      */
-    const SOLVER& solver;
+    SOLVER& solver;
 				     /**
 				      * Reference to the matrix.
 				      */
@@ -280,7 +280,7 @@ class MGBase
 
 template<class SOLVER, class MATRIX, class PRECOND>
 MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>
-::MGCoarseGridLACIteration(const SOLVER& s, const MATRIX& m, const PRECOND& p)
+::MGCoarseGridLACIteration(SOLVER& s, const MATRIX& m, const PRECOND& p)
 		:
 		solver(s), matrix(m), precondition(p)
 {}
@@ -288,7 +288,7 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>
 template<class SOLVER, class MATRIX, class PRECOND>
 void
 MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>::operator()
-(unsigned int level, Vector<float>& dst, const Vector<float>& src) const
+(unsigned int, Vector<float>& dst, const Vector<float>& src) const
 {
   solver.solve(matrix, dst, src, precondition);
 }
