@@ -28,7 +28,7 @@ cd $DEAL2_CONTRIB_DIR
 
 
 dnl    Configure the HSL subdir
-AC_CONIG_SUBDIRS(hsl)
+AC_CONFIG_SUBDIRS(hsl)
 
 
 dnl -------------------------------------------------------------

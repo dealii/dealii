@@ -1,6 +1,8 @@
 # $Id$
 # Makefile for the /contrib subdirectory
 
+include ../common/Make.global_options
+
 
 # by default make sublibs
 default: hsl
@@ -13,13 +15,19 @@ kdoc-install:
 kdoc-clean:
 	cd kdoc ; $(MAKE) clean
 
+ifeq ($(USE_CONTRIB_HSL),yes)
 hsl:
 	cd hsl ; $(MAKE)
 
+hsl-clean:
+	cd hsl ; $(MAKE) clean
+else
+hsl:
+hsl-clean:
+endif
+
 
 # generic targets
-clean: kdoc-clean
-	cd hsl ; $(MAKE) clean
-
+clean: kdoc-clean hsl-clean
 
 .PHONY: default kdoc-install kdoc-clean hsl clean
