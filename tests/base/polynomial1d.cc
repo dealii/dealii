@@ -44,13 +44,58 @@ double scalar_product (const Polynomial<double>& p1,
   return sum;
 }
 
+
+void polynomial_arithmetic ()
+{
+  std::vector<double> c1(4);
+  c1[0] = 2;
+  c1[1] = 3;
+  c1[2] = 5;
+  c1[3] = 4;
+  Polynomial<double> p1(c1);
+  
+  std::vector<double> c2(3);
+  c2[0] = .4;
+  c2[1] = .7;
+  c2[2] = -1.3;
+  Polynomial<double> p2(c2);
+  Monomial<double> p3(5);
+  std::cerr << "P1" << std::endl;
+  p1.print(std::cerr);
+  std::cerr << "P2" << std::endl;
+  p2.print(std::cerr);
+  p1 += p2;
+  std::cerr << "P1+P2" << std::endl;
+  p1.print(std::cerr);
+  p2 += p1;
+  std::cerr << "P1+2P2" << std::endl;
+  p2.print(std::cerr);
+  std::cerr << "P1+P2+x^5" << std::endl;
+  p1 += p3;
+  p1.print(std::cerr);
+  p1 *= 2.;
+  std::cerr << "*2" << std::endl;
+  p1.print(std::cerr);
+  
+  for (unsigned int i=0;i<7;++i)
+    {
+      std::cerr << "derive" << std::endl;
+      p1 = p1.derivative();
+      p1.print(std::cerr);
+    }
+}
+
+
 int main ()
 {
   std::ofstream logfile("polynomial1d.output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.log_cerr();
 
+  polynomial_arithmetic();
+  
   std::vector<Polynomial<double> > p;
   std::vector<Polynomial<double> > q;
 
