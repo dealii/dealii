@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -100,7 +100,7 @@ check_dimensions (const vector<Polynomial<double> >& p)
 int main()
 {
   std::ofstream logfile("polynomial_test.output");
-  logfile.precision(4);
+  logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
 
