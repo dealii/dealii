@@ -326,7 +326,8 @@ void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapp
 	      {
 		if (n_components==1)
 		  {
-		    double v = neumann_bc.find(n)->second->value(cell->vertex(0));
+		    const double
+		      v = neumann_bc.find(n)->second->value(cell->vertex(0));
 		    
 		    for (unsigned int s=0; s<n_solution_vectors; ++s)
 		      grad_neighbor[s](0) = v;
