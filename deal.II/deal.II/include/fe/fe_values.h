@@ -365,7 +365,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * matrix itself.
 				      *
 				      * Use of this function is
-				      deprecated.
+				      * deprecated.
 				     */
     const typename FEValuesData<dim>::GradientVector & get_shape_grads () const;
 
