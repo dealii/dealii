@@ -238,7 +238,7 @@ SparseMatrixEZ<number>::precondition_Jacobi (Vector<somenumber>       &dst,
 					     const Vector<somenumber> &src,
 					     const number              om) const
 {
-  Assert (m() == n(), ExcNoSquareMatrix());
+  Assert (m() == n(), ExcNotQuadratic());
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
   Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
 
@@ -263,7 +263,7 @@ SparseMatrixEZ<number>::precondition_SOR (Vector<somenumber>       &dst,
 					  const Vector<somenumber> &src,
 					  const number              om) const
 {
-  Assert (m() == n(), ExcNoSquareMatrix());
+  Assert (m() == n(), ExcNotQuadratic());
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
   Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
 
@@ -293,7 +293,7 @@ SparseMatrixEZ<number>::precondition_TSOR (Vector<somenumber>       &dst,
 					  const Vector<somenumber> &src,
 					  const number              om) const
 {
-  Assert (m() == n(), ExcNoSquareMatrix());
+  Assert (m() == n(), ExcNotQuadratic());
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
   Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
 
@@ -325,7 +325,7 @@ SparseMatrixEZ<number>::precondition_SSOR (Vector<somenumber>       &dst,
 					   const Vector<somenumber> &src,
 					   const number              om) const
 {
-  Assert (m() == n(), ExcNoSquareMatrix());
+  Assert (m() == n(), ExcNotQuadratic());
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
   Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
 

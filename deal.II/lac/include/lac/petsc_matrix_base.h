@@ -15,8 +15,8 @@
 
 
 #include <base/config.h>
-#include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <lac/exceptions.h>
 
 #ifdef DEAL_II_USE_PETSC
 
@@ -95,13 +95,6 @@ namespace PETScWrappers
                                               * Exception
                                               */
             DeclException0 (ExcBeyondEndOfMatrix);
-                                             /**
-                                              * Exception
-                                              */
-            DeclException1 (ExcPETScError,
-                            int,
-                            << "An error with error number " << arg1
-                            << " occured while calling a PETSc function");
                                              /**
                                               * Exception
                                               */
@@ -695,10 +688,6 @@ namespace PETScWrappers
                                         * Exception
                                         */
       DeclException0 (ExcSourceEqualsDestination);
-                                       /**
-                                        * Exception
-                                        */
-      DeclException0 (ExcMatrixNotSquare);
       
     protected:
                                        /**

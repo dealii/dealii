@@ -111,9 +111,9 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
 
   SparseLUDecomposition<number>::decompose(matrix, strengthen_diagonal);
 
-  Assert (matrix.m()==matrix.n(), ExcMatrixNotSquare ());
-  Assert (this->m()==this->n(),   ExcMatrixNotSquare ());
-  Assert (matrix.m()==this->m(),  ExcSizeMismatch(matrix.m(), this->m()));
+  Assert (matrix.m()==matrix.n(), ExcNotQuadratic ());
+  Assert (this->m()==this->n(),   ExcNotQuadratic ());
+  Assert (matrix.m()==this->m(),  ExcDimensionMismatch(matrix.m(), this->m()));
 
   Assert (strengthen_diagonal>=0, ExcInvalidStrengthening (strengthen_diagonal));
 
@@ -166,7 +166,7 @@ template <typename number>
 inline number
 SparseMIC<number>::get_rowsum (const unsigned int row) const
 {
-  Assert(this->m()==this->n(), ExcMatrixNotSquare());
+  Assert(this->m()==this->n(), ExcNotQuadratic());
                                    // get start of this row. skip the
                                    // diagonal element
   const unsigned int * const column_numbers = this->get_sparsity_pattern().get_column_numbers();
@@ -192,8 +192,8 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
                           const Vector<somenumber> &src) const
 {
   SparseLUDecomposition<number>::vmult (dst, src);
-  Assert (dst.size() == src.size(), ExcSizeMismatch(dst.size(), src.size()));
-  Assert (dst.size() == this->m(), ExcSizeMismatch(dst.size(), this->m()));
+  Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
+  Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 
   const unsigned int N=dst.size();
   const unsigned int * const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();

@@ -749,6 +749,11 @@ class Exception5 : public ExceptionBase {                             \
 namespace StandardExceptions 
 {
 				   /**
+				    * @addtogroup Exceptions
+				    */
+				   //@{
+  
+				   /**
 				    * Exception denoting a division by
 				    * zero.
 				    *
@@ -878,6 +883,11 @@ namespace StandardExceptions
 				    */
   DeclException0 (ExcNotInitialized);
 
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidState);
+    
 				   /**
 				    * This exception is raised if a
 				    * functionality is not possible in
@@ -906,6 +916,13 @@ namespace StandardExceptions
 		  int, int,
 		  << "Dimension " << arg1 << " not equal to " << arg2);
 
+				     /**
+				      * Exception.
+				      */
+    DeclException3 (ExcDimensionMismatch2,
+		    int, int, int,
+		    << "Dimension " << arg1 << " neither equal to " << arg2 << " nor to " << arg3);
+
 				   /**
 				    * This exception is one of the
 				    * most often used ones, and
@@ -927,6 +944,13 @@ namespace StandardExceptions
 		  << "Index " << arg1 << " is not in ["
 		  << arg2 << "," << arg3 << "[");
 
+				   /**
+				    * A number is too small.
+				    */
+  DeclException2 (ExcLowerRange, int, int,
+		  << "Number " << arg1
+		  << " must be larger or equal " << arg2);
+  
 				   /**
 				    * This exception indicates that
 				    * the first argument should be an
@@ -992,6 +1016,7 @@ namespace StandardExceptions
 				    * cases, this exception is thrown.
 				    */
   DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
+				   //@}
 }
 
 

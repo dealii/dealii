@@ -153,11 +153,14 @@ namespace internals
                                           */
         void advance ();
 
+					 /** @addtogroup Exceptions
+					  * @{ */
+	
                                          /**
                                           * Exception
                                           */
         DeclException0 (ExcInvalidIterator);
-        
+					 //@}        
       protected:
                                          /**
                                           * The sparsity pattern we operate on
@@ -1273,6 +1276,8 @@ class SparsityPattern : public Subscriptor
 				      */
     inline const unsigned int * get_column_numbers () const;
 
+				     /** @addtogroup Exceptions
+				      * @{ */
 				     /**
 				      * Exception
 				      */
@@ -1312,10 +1317,6 @@ class SparsityPattern : public Subscriptor
 				      */
     DeclException0 (ExcInvalidConstructorCall);
 				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotQuadratic);
-				     /**
 				      * This exception is thrown if
 				      * the matrix does not follow the
 				      * convention of storing diagonal
@@ -1350,6 +1351,7 @@ class SparsityPattern : public Subscriptor
                     int, int,
                     << "The array has size " << arg1 << " but should have size "
                     << arg2);
+				     //@}
   private:
 				     /**
 				      * Maximum number of rows that can

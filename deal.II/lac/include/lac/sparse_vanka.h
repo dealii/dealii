@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -211,18 +211,6 @@ class SparseVanka
     template<typename number2>
     void vmult (Vector<number2>       &dst,
 		const Vector<number2> &src) const;
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcMatrixNotSquare);
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidVectorSize,
-		    unsigned int, unsigned int,
-		    << "The dimensions of vectors and matrices, "
-		    << arg1 << " and " << arg2 << " do not match.");
 
   protected:
 				     /**

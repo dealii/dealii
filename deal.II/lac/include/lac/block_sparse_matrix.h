@@ -20,6 +20,8 @@
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
+#include <lac/exceptions.h>
+
 #include <cmath>
 
 
@@ -400,11 +402,14 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      */
     unsigned int memory_consumption () const;
 
+      				     /** @addtogroup Exceptions
+				      * @{ */
+    
                                      /**
                                       * Exception
                                       */
     DeclException0 (ExcBlockDimensionMismatch);
-    
+				     //@}    
   private:
     				     /**
 				      * Pointer to the block sparsity
@@ -531,8 +536,7 @@ precondition_Jacobi (BlockVectorType       &dst,
 		     const BlockVectorType &src,
 		     const number           omega) const
 {
-  Assert (this->n_block_rows() == this->n_block_cols(),
-          typename BaseClass::ExcMatrixNotBlockSquare());
+  Assert (this->n_block_rows() == this->n_block_cols(), ExcNotQuadratic());
   Assert (dst.n_blocks() == this->n_block_rows(),
 	  ExcDimensionMismatch(dst.n_blocks(), this->n_block_rows()));
   Assert (src.n_blocks() == this->n_block_cols(),

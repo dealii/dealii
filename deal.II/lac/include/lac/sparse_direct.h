@@ -329,6 +329,9 @@ class SparseDirectMA27 : public Subscriptor
 				      */
     Threads::ThreadMutex & get_synchronisation_lock () const;
 
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
 				     /**
 				      * Exception.
 				      */
@@ -371,7 +374,7 @@ class SparseDirectMA27 : public Subscriptor
                                       * Exception
                                       */
     DeclException0 (ExcMatrixNotSymmetric);
-    
+				     //@}    
   private:
                                      /**
                                       * Declare a local type which
@@ -788,6 +791,9 @@ class SparseDirectMA47 : public Subscriptor
 				      */
     Threads::ThreadMutex & get_synchronisation_lock () const;
     
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
 				     /**
 				      * Exception.
 				      */
@@ -826,7 +832,7 @@ class SparseDirectMA47 : public Subscriptor
                                       * Exception
                                       */
     DeclException0 (ExcMatrixNotSymmetric);
-    
+				     //@}    
   private:
                                      /**
                                       * Store in the constructor
@@ -1100,10 +1106,6 @@ class SparseDirectUMFPACK : public Subscriptor
     void solve (const SparseMatrix<double> &matrix,
 		Vector<double>             &rhs_and_solution);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcMatrixNotSquare);
                                      /**
                                       * Exception
                                       */

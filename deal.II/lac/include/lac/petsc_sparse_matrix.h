@@ -15,7 +15,7 @@
 
 
 #include <base/config.h>
-#include <base/exceptions.h>
+#include <lac/exceptions.h>
 
 #ifdef DEAL_II_USE_PETSC
 

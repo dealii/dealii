@@ -15,8 +15,8 @@
 
 
 #include <base/config.h>
-#include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <lac/exceptions.h>
 
 template <typename number> class SparseMatrix;
 
@@ -318,22 +318,6 @@ class CompressedSparsityPattern : public Subscriptor
 				      */
     unsigned int n_nonzero_elements () const;
 
-    				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The given index " << arg1
-		    << " should be less than " << arg2 << ".");
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidConstructorCall);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotSquare);
-    
   private:
 				     /**
 				      * Number of rows that this sparsity
@@ -647,8 +631,8 @@ void
 CompressedSparsityPattern::add (const unsigned int i,
 				const unsigned int j)
 {
-  Assert (i<rows, ExcInvalidIndex(i,rows));
-  Assert (j<cols, ExcInvalidIndex(j,cols));
+  Assert (i<rows, ExcIndexRange(i, 0, rows));
+  Assert (j<cols, ExcIndexRange(j, 0, cols));
 
   lines[i].add (j);
 }

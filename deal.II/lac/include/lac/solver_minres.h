@@ -91,11 +91,14 @@ class SolverMinRes : public Solver<VECTOR>
 	   const VECTOR         &b,
 	   const PRECONDITIONER &precondition);
 
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcPreconditionerNotDefinite);
-    
+				     //@}
 
   protected:
 				     /**

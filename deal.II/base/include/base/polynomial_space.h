@@ -168,13 +168,6 @@ class PolynomialSpace
 				      */
     unsigned int degree () const;
     
-				     /**
-				      * Exception.
-				      */
-    DeclException3 (ExcDimensionMismatch2,
-		    int, int, int,
-		    << "Dimension " << arg1 << " not equal to " << arg2 << " nor to " << arg3);
-
   protected:
     
 				     /**

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -752,11 +752,14 @@ namespace Functions
       virtual double laplacian (const Point<dim>   &p,
 				const unsigned int  component = 0) const;
 
+				       /** @addtogroup Exceptions
+					* @{ */
+      
 				       /**
 					* Exception
 					*/
       DeclException0 (ExcInvalidArraySize);
-      
+				       //@}
     private:
 				       /**
 					* Stored Fourier coefficients
@@ -818,11 +821,14 @@ namespace Functions
       virtual double laplacian (const Point<dim>   &p,
 				const unsigned int  component = 0) const;
 
+				       /** @addtogroup Exceptions
+					* @{ */
+
 				       /**
 					* Exception
 					*/
       DeclException0 (ExcInvalidArraySize);
-      
+				       //@}
     private:
 				       /**
 					* Stored Fourier coefficients

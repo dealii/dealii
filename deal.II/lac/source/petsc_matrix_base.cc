@@ -197,7 +197,7 @@ namespace PETScWrappers
   PetscScalar
   MatrixBase::diag_element (const unsigned int i) const
   {
-    Assert (m() == n(), ExcMatrixNotSquare());
+    Assert (m() == n(), ExcNotQuadratic());
     
                                      // this doesn't seem to work any
                                      // different than any other element

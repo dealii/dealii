@@ -164,6 +164,9 @@ class Subscriptor
 				      */
     unsigned int n_subscriptions () const;
 
+    				     /** @addtogroup Exceptions
+				      * @{ */
+    
 				     /**
 				      * Exception:
 				      * Object may not be deleted, since
@@ -179,7 +182,7 @@ class Subscriptor
 				      * when <tt>unsubscribe</tt> is called.
 				      */
     DeclException0(ExcNotUsed);
-
+				     //@}
 
   private:
     				     /**

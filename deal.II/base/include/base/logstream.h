@@ -238,9 +238,9 @@ class LogStream
     unsigned int memory_consumption () const;
 
     				     /**
-				      * Exception
+				      * Exception.
 				      */
-    DeclException0 (ExcNoFileStreamGiven);
+    DeclException0(ExcNoFileStreamGiven);
 
   private:
     

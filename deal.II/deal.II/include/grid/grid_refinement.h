@@ -262,13 +262,6 @@ class GridRefinement
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidVectorSize,
-		    int, int,
-		    << "The given vector has " << arg1
-		    << " elements, but " << arg2 << " were expected.");
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInvalidParameterValue);
 
 

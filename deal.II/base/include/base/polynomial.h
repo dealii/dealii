@@ -177,7 +177,10 @@ namespace Polynomials
                                         * Print coefficients.
                                         */
       void print(std::ostream& out) const;
-				      
+
+      				     /** @addtogroup Exceptions
+				      * @{ */
+
                                        /**
                                         * Exception
                                         */
@@ -187,7 +190,7 @@ namespace Polynomials
                                         * Exception
                                         */
       DeclException0 (ExcVoidPolynomial);
-    
+				       //@}
     protected:
 
                                        /**

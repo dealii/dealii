@@ -239,6 +239,9 @@ namespace Threads
 					*/
       void dump () {};
 
+      				     /** @addtogroup Exceptions
+				      * @{ */
+      
 				       /**
 					* Exception.
 					*/
@@ -246,6 +249,8 @@ namespace Threads
 		      int,
 		      << "In single-thread mode, other barrier sizes than 1 are not "
 		      << "useful. You gave " << arg1);
+
+				       //@}
   };
   
   
@@ -3005,11 +3010,14 @@ namespace Threads
         return thread_descriptor == t.thread_descriptor;
       };
 
+      				     /** @addtogroup Exceptions
+				      * @{ */
+      
                                        /**
                                         * Exception
                                         */
       DeclException0 (ExcNoThread);
-      
+				       //@}
     private:
                                        /**
                                         * Shared pointer to the object

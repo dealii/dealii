@@ -521,6 +521,8 @@ class DataOutBase
 					  * Value for no neighbor.
 					  */
 	static const unsigned int no_neighbor = deal_II_numbers::invalid_unsigned_int;
+					 /** @addtogroup Exceptions
+					  * @{ */
 	
 					 /**
 					  * Exception
@@ -530,8 +532,8 @@ class DataOutBase
 			<< "It is not possible to have a structural dimension of " << arg1
 			<< " to be larger than the space dimension of the surrounding"
 			<< " space " << arg2);
+					 //@}
     };
-
 
     				     /**
 				      * Flags describing the details of
@@ -1430,7 +1432,10 @@ class DataOutBase
 				      * value.
 				      */
     static unsigned int memory_consumption ();
-
+    
+				     /** @addtogroup Exceptions
+				      * @{ */
+    
 				     /**
 				      * Exception
 				      */
@@ -1466,10 +1471,6 @@ class DataOutBase
 				      */
     DeclException0 (ExcNoPatches);
 				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcIO);
-				     /**
 				       * Exception
 				       */
     DeclException0 (ExcTecplotAPIError);
@@ -1481,7 +1482,7 @@ class DataOutBase
 		    << "There was an error opening Tecplot file " << arg1
 		    << " for output");
     
-      
+				     //@}  
   private:
 				     /**
 				      * Class holding the data of one
@@ -1993,11 +1994,6 @@ class DataOutInterface : private DataOutBase
 				      */
     unsigned int memory_consumption () const;
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidState);
-    
   protected:
 				     /**
 				      * This is the abstract function

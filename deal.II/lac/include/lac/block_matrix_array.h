@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -303,6 +303,8 @@ class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
     BlockMatrixArray<MATRIX>::Subscriptor::subscribe;
     BlockMatrixArray<MATRIX>::Subscriptor::unsubscribe;
 
+      				     /** @addtogroup Exceptions
+				      * @{ */
 
 				     /**
 				      * Multiple diagonal element.
@@ -311,7 +313,7 @@ class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
 		   unsigned int,
 		   << "Inverse diagonal entries may not be added in block "
 		   << arg1);
-    
+				     //@}    
   private:
 				     /**
 				      * Add all off-diagonal

@@ -37,9 +37,9 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
   Assert (uncondensed_struct.is_compressed() == true, ExcMatrixNotClosed());
   Assert (condensed.get_sparsity_pattern().is_compressed() == true, ExcMatrixNotClosed());
   Assert (uncondensed_struct.n_rows() == uncondensed_struct.n_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   Assert (condensed.n() == condensed.m(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   Assert (condensed.n()+n_constraints() == uncondensed.n(),
 	  ExcWrongDimension());
 
@@ -161,7 +161,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
 
   double average_diagonal = 0;
   for (unsigned int i=0; i<uncondensed.m(); ++i)
@@ -295,13 +295,13 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   Assert (sparsity.n_block_rows() == sparsity.n_block_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   Assert (sparsity.n_block_rows() == sparsity.n_block_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
 
   double average_diagonal = 0;
   for (unsigned int b=0; b<uncondensed.n_block_rows(); ++b)

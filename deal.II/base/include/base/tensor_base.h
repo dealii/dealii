@@ -249,6 +249,9 @@ class Tensor<1,dim>
 				      */
     static unsigned int memory_consumption ();
 
+    				     /** @addtogroup Exceptions
+				      * @{ */
+    
                                      /**
                                       * Exception
                                       */
@@ -256,6 +259,7 @@ class Tensor<1,dim>
                     int,
                     << "Given dimensions must be >= 1, but was " << arg1);
 
+				     //@}
   private:
 				     /**
 				      * Store the values in a simple

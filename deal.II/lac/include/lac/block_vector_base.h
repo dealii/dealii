@@ -515,6 +515,9 @@ namespace internal
                                           */
         Iterator & operator -= (const difference_type &d);
       
+					 /** @addtogroup Exceptions
+					  * @{ */
+	
                                          /**
                                           * Exception.
                                           */
@@ -523,7 +526,7 @@ namespace internal
                                           * Exception.
                                           */
         DeclException0 (ExcCastingAwayConstness);
-	
+					 //@}	
       private:
                                          /**
                                           * Pointer to the block
@@ -967,11 +970,6 @@ class BlockVectorBase
     void equ (const value_type a, const BlockVectorBase& V,
 	      const value_type b, const BlockVectorBase& W);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcNotmatchingBlockSizes);
-    
   protected:
 				     /**
 				      * Pointer to the array of components.

@@ -18,6 +18,7 @@
 #include <base/table.h>
 #include <base/smartpointer.h>
 #include <lac/block_indices.h>
+#include <lac/exceptions.h>
 
 #include <cmath>
 
@@ -100,11 +101,6 @@ namespace internal
 					  * this object.
 					  */
 	unsigned int block_column() const;
-
-                                         /**
-                                          * Exception
-                                          */
-        DeclException0 (ExcDereferenceEndIterator);
         
       protected:
 					 /**
@@ -601,16 +597,9 @@ class BlockMatrixBase : public Subscriptor
 				      */
     const_iterator end (const unsigned int r) const;
 
+      				     /** @addtogroup Exceptions
+				      * @{ */
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcMatrixNotBlockSquare);
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcMatrixNotInitialized);
                                      /**
                                       * Exception
                                       */
@@ -625,7 +614,7 @@ class BlockMatrixBase : public Subscriptor
                     int, int, int, int,
                     << "The blocks [" << arg1 << ',' << arg2 << "] and ["
                     << arg3 << ',' << arg4 << "] have differing column numbers.");
-
+				     //@}
   protected:
     				     /**
 				      * Release all memory and return
@@ -1402,7 +1391,7 @@ typename BlockMatrixBase<MatrixType>::value_type
 BlockMatrixBase<MatrixType>::diag_element (const unsigned int i) const
 {
   Assert (n_block_rows() == n_block_cols(),
-          ExcMatrixNotBlockSquare());
+          ExcNotQuadratic());
 
   const std::pair<unsigned int,unsigned int>
     index = row_block_indices.global_to_local (i);
@@ -1428,8 +1417,8 @@ inline
 BlockMatrixBase<MatrixType> &
 BlockMatrixBase<MatrixType>::operator *= (const value_type factor)
 {
-  Assert (n_block_cols() != 0, ExcMatrixNotInitialized());
-  Assert (n_block_rows() != 0, ExcMatrixNotInitialized());
+  Assert (n_block_cols() != 0, ExcNotInitialized());
+  Assert (n_block_rows() != 0, ExcNotInitialized());
 
   for (unsigned int r=0; r<n_block_rows(); ++r)
     for (unsigned int c=0; c<n_block_cols(); ++c)
@@ -1445,8 +1434,8 @@ inline
 BlockMatrixBase<MatrixType> &
 BlockMatrixBase<MatrixType>::operator /= (const value_type factor)
 {
-  Assert (n_block_cols() != 0, ExcMatrixNotInitialized());
-  Assert (n_block_rows() != 0, ExcMatrixNotInitialized());
+  Assert (n_block_cols() != 0, ExcNotInitialized());
+  Assert (n_block_rows() != 0, ExcNotInitialized());
   Assert (factor !=0, ExcDivideByZero());
 
   const value_type factor_inv = 1. / factor;
@@ -1689,8 +1678,7 @@ template <class BlockVectorType>
 typename BlockMatrixBase<MatrixType>::value_type
 BlockMatrixBase<MatrixType>::matrix_norm_square (const BlockVectorType &v) const
 {
-  Assert (n_block_rows() == n_block_cols(),
-          ExcMatrixNotBlockSquare());
+  Assert (n_block_rows() == n_block_cols(), ExcNotQuadratic());
   Assert (v.n_blocks() == n_block_rows(),
 	  ExcDimensionMismatch(v.n_blocks(), n_block_rows()));
 

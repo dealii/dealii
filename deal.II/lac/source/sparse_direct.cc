@@ -1648,7 +1648,7 @@ void
 SparseDirectUMFPACK::
 factorize (const SparseMatrix<double> &matrix)
 {
-  Assert (matrix.m() == matrix.n(), ExcMatrixNotSquare())
+  Assert (matrix.m() == matrix.n(), ExcNotQuadratic())
   
   clear ();
 

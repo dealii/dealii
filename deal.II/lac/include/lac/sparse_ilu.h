@@ -1,5 +1,5 @@
 //----------------------------  sparse_ilu.h  ---------------------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -16,7 +16,7 @@
 #include <base/config.h>
 #include <lac/sparse_matrix.h>
 #include <lac/sparse_decomposition.h>
-
+#include <lac/exceptions.h>
 
 /*! @addtogroup Preconditioners
  *@{
@@ -172,17 +172,9 @@ class SparseILU : public SparseLUDecomposition<number>
 				      */
     unsigned int memory_consumption () const;
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcMatrixNotSquare);
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcSizeMismatch,
-		    int, int,
-		    << "The sizes " << arg1 << " and " << arg2
-		    << " of the given objects do not match.");
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
 				     /**
 				      * Exception
 				      */
@@ -190,6 +182,7 @@ class SparseILU : public SparseLUDecomposition<number>
 		    double,
 		    << "The strengthening parameter " << arg1
 		    << " is not greater or equal than zero!");
+				     //@}
 };
 
 /*@}*/

@@ -1184,7 +1184,7 @@ FullMatrix<number>::Tadd (const number s, const FullMatrix<number2>& src)
     val[63] += s * srcval[63];
   }
   else
-    Assert (false, ExcNotImplemented(n()));
+    Assert (false, ExcNotImplemented());
 }
 
 
@@ -1228,8 +1228,7 @@ FullMatrix<number>::determinant () const
                      +this->el(2,0)*this->el(0,1)*this->el(1,2)
                      -this->el(2,0)*this->el(0,2)*this->el(1,1));
       default:
-            Assert (false,
-                    ExcNotImplemented(this->n_cols()));
+            Assert (false, ExcNotImplemented());
             return 0;
     };
 }

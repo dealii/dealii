@@ -14,8 +14,8 @@
 #define __deal2__petsc_parallel_vector_h
 
 #include <base/config.h>
-#include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <lac/exceptions.h>
 
 #include <lac/vector.h>
 
@@ -438,7 +438,7 @@ namespace PETScWrappers
     Vector::operator = (const ::Vector<number> &v) 
     {
       Assert (size() == v.size(),
-              ExcNonMatchingSizes (size(), v.size()));
+              ExcDimensionMismatch (size(), v.size()));
 
                                        // the following isn't necessarily fast,
                                        // but this is due to the fact that PETSc

@@ -527,7 +527,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (uncondensed.is_compressed() == true, ExcMatrixNotClosed());
   Assert (uncondensed.n_rows() == uncondensed.n_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
 
 
 				   // store for each line of the matrix
@@ -636,7 +636,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
@@ -740,7 +740,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
@@ -876,11 +876,11 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   Assert (sparsity.n_block_rows() == sparsity.n_block_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   
   const BlockIndices &
     index_mapping = sparsity.get_column_indices();
@@ -1002,11 +1002,11 @@ void ConstraintMatrix::condense (CompressedBlockSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   Assert (sparsity.n_block_rows() == sparsity.n_block_cols(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
-	  ExcMatrixNotSquare());
+	  ExcNotQuadratic());
   
   const BlockIndices &
     index_mapping = sparsity.get_column_indices();

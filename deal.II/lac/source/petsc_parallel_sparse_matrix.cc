@@ -257,7 +257,7 @@ namespace PETScWrappers
     {
 //TODO[WB]: The next PETSc release should contain a function  MatMPI[B]AIJSetPreallocationCSR that we will want to use here. it may also be worthwhile to look at the functions MatPreallocateXXX in include/petscmat.h
       Assert (local_rows_per_process.size() == local_columns_per_process.size(),
-              ExcInvalidSizes (local_rows_per_process.size(),
+              ExcDimensionMismatch (local_rows_per_process.size(),
                                local_columns_per_process.size()));
       Assert (this_process < local_rows_per_process.size(),
               ExcInternalError());

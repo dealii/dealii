@@ -200,7 +200,10 @@ class ConvergenceTable: public TableHandler
 				      */
     void
     evaluate_all_convergence_rates(const RateMode rate_mode);
-
+    
+				     /** @addtogroup Exceptions
+				      * @{ */
+    
     				     /**
 				      * Exception
 				      */
@@ -212,6 +215,7 @@ class ConvergenceTable: public TableHandler
     DeclException1 (ExcRateColumnAlreadyExists,
 		    std::string,
 		    << "Rate column <" << arg1 << "> does already exist.");
+				     //@}
 };
 
 

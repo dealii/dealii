@@ -128,8 +128,8 @@ bool
 CompressedSparsityPattern::exists (const unsigned int i,
 				   const unsigned int j) const
 {
-  Assert (i<rows, ExcInvalidIndex(i,rows));
-  Assert (j<cols, ExcInvalidIndex(j,cols));
+  Assert (i<rows, ExcIndexRange(i, 0, rows));
+  Assert (j<cols, ExcIndexRange(j, 0, cols));
 
   lines[i].flush_cache();
   return std::binary_search (lines[i].entries.begin(),
@@ -142,7 +142,7 @@ CompressedSparsityPattern::exists (const unsigned int i,
 void
 CompressedSparsityPattern::symmetrize ()
 {
-  Assert (rows==cols, ExcNotSquare());
+  Assert (rows==cols, ExcNotQuadratic());
 
 				   // loop over all elements presently
 				   // in the sparsity pattern and add

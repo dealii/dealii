@@ -14,7 +14,7 @@
 #define __deal2__petsc_precondition_h
 
 #include <base/config.h>
-#include <base/exceptions.h>
+#include <lac/exceptions.h>
 
 #ifdef DEAL_II_USE_PETSC
 
@@ -55,13 +55,6 @@ namespace PETScWrappers
                                         */
       virtual ~PreconditionerBase ();
 
-                                       /**
-                                        * Exception
-                                        */
-      DeclException1 (ExcPETScError,
-                      int,
-                      << "An error with error number " << arg1
-                      << " occured while calling a PETSc function");
 
     protected:
                                        /**

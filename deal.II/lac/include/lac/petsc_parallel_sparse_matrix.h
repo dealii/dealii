@@ -15,7 +15,7 @@
 
 
 #include <base/config.h>
-#include <base/exceptions.h>
+#include <lac/exceptions.h>
 
 #ifdef DEAL_II_USE_PETSC
 
@@ -399,6 +399,8 @@ namespace PETScWrappers
                                           */
         const MPI_Comm & get_mpi_communicator () const;
         
+				     /** @addtogroup Exceptions
+				      * @{ */
 					 /**
 					  * Exception
 					  */
@@ -406,14 +408,7 @@ namespace PETScWrappers
 			int, int,
 			<< "The number of local rows " << arg1
 			<< " must be larger than the total number of rows " << arg2);
-                                         /**
-                                          * Exception
-                                          */
-        DeclException2 (ExcInvalidSizes,
-                        int, int,
-                        << "The sizes " << arg1 << " and " << arg2
-                        << " are supposed to match, but don't.");
-        
+					 //@}        
       private:
 
                                          /**

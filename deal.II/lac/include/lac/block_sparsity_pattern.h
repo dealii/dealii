@@ -327,14 +327,9 @@ class BlockSparsityPatternBase : public Subscriptor
 				      */
     void print (std::ostream &out) const;
 
+      				     /** @addtogroup Exceptions
+				      * @{ */
 
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidSize,
-		    int,
-		    << "The number of blocks must be greater or equal to one, "
-		    << "but is " << arg1);
 				     /**
 				      * Exception
 				      */
@@ -360,6 +355,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcInvalidConstructorCall);
+				     //@}
     
   protected:
 

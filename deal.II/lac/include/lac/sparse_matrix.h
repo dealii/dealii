@@ -15,10 +15,10 @@
 
 
 #include <base/config.h>
-#include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/exceptions.h>
 
 template<typename number> class Vector;
 template<typename number> class FullMatrix;
@@ -1497,14 +1497,13 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     unsigned int memory_consumption () const;
     
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcNotCompressed);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcMatrixNotInitialized);
 				     /**
 				      * Exception
 				      */
@@ -1521,15 +1520,7 @@ class SparseMatrix : public virtual Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcMatrixNotSquare);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcDifferentSparsityPatterns);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidConstructorCall);
 				     /**
 				      * Exception
 				      */
@@ -1541,7 +1532,7 @@ class SparseMatrix : public virtual Subscriptor
                                       * Exception
                                       */
     DeclException0 (ExcSourceEqualsDestination);
-    
+				     //@}    
   private:
 				     /**
 				      * Pointer to the sparsity
@@ -1666,7 +1657,7 @@ template <typename number>
 inline
 unsigned int SparseMatrix<number>::m () const
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
   return cols->rows;
 }
 
@@ -1675,7 +1666,7 @@ template <typename number>
 inline
 unsigned int SparseMatrix<number>::n () const
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
   return cols->cols;
 }
 
@@ -1686,7 +1677,7 @@ void SparseMatrix<number>::set (const unsigned int i,
 				const unsigned int j,
 				const number value)
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
 				   // it is allowed to set elements of
 				   // the matrix that are not part of
 				   // the sparsity pattern, if the
@@ -1708,7 +1699,7 @@ void SparseMatrix<number>::add (const unsigned int i,
 				const unsigned int j,
 				const number value)
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
 
   const unsigned int index = cols->operator()(i,j);
   Assert ((index != SparsityPattern::invalid_entry) ||
@@ -1726,8 +1717,8 @@ inline
 SparseMatrix<number> &
 SparseMatrix<number>::operator *= (const number factor)
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
+  Assert (val != 0, ExcNotInitialized());
 
   number             *val_ptr    = &val[0];
   const number *const end_ptr    = &val[cols->n_nonzero_elements()];
@@ -1745,8 +1736,8 @@ inline
 SparseMatrix<number> &
 SparseMatrix<number>::operator /= (const number factor)
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
+  Assert (val != 0, ExcNotInitialized());
   Assert (factor !=0, ExcDivideByZero());
 
   const number factor_inv = 1. / factor;
@@ -1767,7 +1758,7 @@ inline
 number SparseMatrix<number>::operator () (const unsigned int i,
 					  const unsigned int j) const
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
   AssertThrow (cols->operator()(i,j) != SparsityPattern::invalid_entry,
                ExcInvalidIndex(i,j));
   return val[cols->operator()(i,j)];
@@ -1780,7 +1771,7 @@ inline
 number SparseMatrix<number>::el (const unsigned int i,
 				 const unsigned int j) const
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
   const unsigned int index = cols->operator()(i,j);
 
   if (index != SparsityPattern::invalid_entry)
@@ -1795,8 +1786,8 @@ template <typename number>
 inline
 number SparseMatrix<number>::diag_element (const unsigned int i) const
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (cols->optimize_diagonal(),  ExcMatrixNotSquare());
+  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols->optimize_diagonal(),  ExcNotQuadratic());
   Assert (i<m(), ExcInvalidIndex1(i));
   
 				   // Use that the first element in each
@@ -1811,8 +1802,8 @@ template <typename number>
 inline
 number & SparseMatrix<number>::diag_element (const unsigned int i)
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (cols->optimize_diagonal(),  ExcMatrixNotSquare());
+  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols->optimize_diagonal(),  ExcNotQuadratic());
   Assert (i<m(), ExcInvalidIndex1(i));
   
 				   // Use that the first element in each
@@ -1842,7 +1833,7 @@ template <typename number>
 inline
 number SparseMatrix<number>::global_entry (const unsigned int j) const
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
   Assert (j < cols->n_nonzero_elements(),
 	  ExcIndexRange (j, 0, cols->n_nonzero_elements()));
   
@@ -1855,7 +1846,7 @@ template <typename number>
 inline
 number & SparseMatrix<number>::global_entry (const unsigned int j)
 {
-  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols != 0, ExcNotInitialized());
   Assert (j < cols->n_nonzero_elements(),
 	  ExcIndexRange (j, 0, cols->n_nonzero_elements()));
 

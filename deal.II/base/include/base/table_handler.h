@@ -312,7 +312,10 @@ class TableHandler
                                       * Write table as a tex file.
                                       */
     void write_tex (std::ofstream &file) const;
-   
+
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
                                      /**
                                       * Exception
                                       */
@@ -348,7 +351,7 @@ class TableHandler
     DeclException1 (ExcUndefinedTexFormat,
                     std::string,
                     << "<" << arg1 << "> is not a tex column format. Use l,c,r.");
-
+				     //@}
   protected:
 
                                      /**

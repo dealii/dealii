@@ -296,7 +296,10 @@ class PreconditionBlock : public virtual Subscriptor
 				      * have been computed.
 				      */
     bool inverses_ready () const;
-    
+
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
 				     /**
 				      * Exception
 				      */
@@ -323,13 +326,10 @@ class PreconditionBlock : public virtual Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcMatrixNotSquare);
-
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcDiagonalsNotStored);
-   
+
+				     //@}
+    
 				     /**
 				      * Access to the inverse diagonal
 				      * blocks.

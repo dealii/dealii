@@ -15,8 +15,8 @@
 
 
 #include <base/config.h>
-#include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <lac/exceptions.h>
 
 #ifdef DEAL_II_USE_PETSC
 
@@ -600,21 +600,6 @@ namespace PETScWrappers
                                         * vector.
                                         */
       operator const Vec & () const;
-      
-                                       /**
-                                        * Exception
-                                        */
-      DeclException1 (ExcPETScError,
-                      int,
-                      << "An error with error number " << arg1
-                      << " occured while calling a PETSc function");
-                                       /**
-                                        * Exception
-                                        */
-      DeclException2 (ExcNonMatchingSizes,
-                      int, int,
-                      << "The sizes " << arg1 << " and " << arg2
-                      << " are supposed to be equal, but are not.");
       
     protected:
                                        /**

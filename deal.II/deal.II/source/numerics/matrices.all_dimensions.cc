@@ -209,10 +209,10 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
   Assert (matrix.n() == solution.size(),
 	  ExcDimensionMismatch(matrix.n(), solution.size()));
   Assert (matrix.n_block_rows() == matrix.n_block_cols(),
-	  ExcMatrixNotBlockSquare());
+	  ExcNotQuadratic());
   Assert (matrix.get_sparsity_pattern().get_row_indices() == 
 	  matrix.get_sparsity_pattern().get_column_indices(),
-	  ExcMatrixNotBlockSquare());
+	  ExcNotQuadratic());
   Assert (matrix.get_sparsity_pattern().get_column_indices() ==
 	  solution.get_block_indices (),
 	  ExcBlocksDontMatch ());

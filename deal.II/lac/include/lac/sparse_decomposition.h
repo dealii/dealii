@@ -323,6 +323,9 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				      */
     virtual unsigned int memory_consumption () const;
 
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
                                      /**
                                       * Exception
                                       */
@@ -330,13 +333,7 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 		    double,
 		    << "The strengthening parameter " << arg1
 		    << " is not greater or equal than zero!");
-
-                                     /**
-                                      * Exception. Indicates violation
-                                      * of a state rule().
-                                      */
-    DeclException0 (ExcInvalidState);
-
+				     //@}
   protected:
                                      /**
                                       * Copies the passed SparseMatrix

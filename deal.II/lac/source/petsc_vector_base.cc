@@ -612,7 +612,7 @@ namespace PETScWrappers
                    const VectorBase     &v)
   {
     Assert (size() == v.size(),
-            ExcNonMatchingSizes (size(), v.size()));
+            ExcDimensionMismatch (size(), v.size()));
 
                                      // there is no simple operation for this
                                      // in PETSc. there are multiple ways to
@@ -632,7 +632,7 @@ namespace PETScWrappers
                    const VectorBase     &w)
   {
     Assert (size() == v.size(),
-            ExcNonMatchingSizes (size(), v.size()));
+            ExcDimensionMismatch (size(), v.size()));
 
                                      // there is no simple operation for this
                                      // in PETSc. there are multiple ways to

@@ -124,7 +124,7 @@ void GridRefinement::refine (Triangulation<dim> &tria,
 			     const double        threshold)
 {
   Assert (criteria.size() == tria.n_active_cells(),
-	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
+	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
   Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
 
 				   // when all indicators are zero we
@@ -162,7 +162,7 @@ void GridRefinement::coarsen (Triangulation<dim> &tria,
 			      const double        threshold)
 {
   Assert (criteria.size() == tria.n_active_cells(),
-	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
+	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
   Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
@@ -309,7 +309,7 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim> &tria,
 					     const Vector       &criteria)
 {
   Assert (criteria.size() == tria.n_active_cells(),
-	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
+	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
   Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
   
 				   // get an increasing order on

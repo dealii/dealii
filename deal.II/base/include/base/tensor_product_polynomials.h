@@ -212,13 +212,6 @@ class TensorProductPolynomials
 				      */
     unsigned int n () const;
 
-				     /**
-				      * Exception.
-				      */
-    DeclException3 (ExcDimensionMismatch2,
-		    int, int, int,
-		    << "Dimension " << arg1 << " not equal to " << arg2 << " nor to " << arg3);
-
 	    
   private:
 				     /**
@@ -451,20 +444,6 @@ class AnisotropicPolynomials
 				      */
     unsigned int n () const;
 
-				     /**
-				      * Exception.
-				      */
-    DeclException3 (ExcDimensionMismatch2,
-		    int, int, int,
-		    << "Dimension " << arg1 << " not equal to " << arg2 << " nor to " << arg3);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcInvalidDim,
-                    int,
-                    << "The number of rows in this table must be equal to the "
-                    << "space dimension, but is " << arg1);
-	    
   private:
 				     /**
 				      * Copy of the vector <tt>pols</tt> of

@@ -122,21 +122,13 @@ class SparseMIC : public SparseLUDecomposition<number>
 				      */
     unsigned int memory_consumption () const;
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcMatrixNotSquare);
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
                                      /**
                                       * Exception
                                       */
     DeclException0 (ExcStrengthenDiagonalTooSmall);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException2 (ExcSizeMismatch,
-		    int, int,
-		    << "The sizes " << arg1 << " and " << arg2
-		    << " of the given objects do not match.");
                                      /**
                                       * Exception
                                       */
@@ -150,7 +142,8 @@ class SparseMIC : public SparseLUDecomposition<number>
     DeclException2(ExcDecompositionNotStable, int, double,
 		   << "The diagonal element (" <<arg1<<","<<arg1<<") is "
 		   << arg2 <<", but must be positive");
-    
+
+				     //@}
   private:
                                      /**
                                       * Values of the computed

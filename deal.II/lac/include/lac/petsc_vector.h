@@ -14,8 +14,8 @@
 #define __deal2__petsc_vector_h
 
 #include <base/config.h>
-#include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <lac/exceptions.h>
 
 #include <lac/vector.h>
 

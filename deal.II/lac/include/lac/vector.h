@@ -710,11 +710,14 @@ class Vector
     unsigned int memory_consumption () const;
 				     //@}
 
+				     /** @addtogroup Exceptions
+				      * @{ */
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcEmptyVector);
-
+				     //@}
   protected:
 
 				     /**

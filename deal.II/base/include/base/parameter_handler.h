@@ -551,6 +551,9 @@ namespace Patterns
 					*/
       unsigned int memory_consumption () const;
 
+				       /** @addtogroup Exceptions
+					* @{ */
+      
                                        /**
                                         * Exception.
                                         */
@@ -558,7 +561,7 @@ namespace Patterns
                       int, int,
                       << "The values " << arg1 << " and " << arg2
                       << " do not form a valid range.");
-
+				       //@}
     private:
 				       /**
 					* Copy of the pattern that
@@ -649,6 +652,9 @@ namespace Patterns
 					*/
       unsigned int memory_consumption () const;
 
+				       /** @addtogroup Exceptions
+					* @{ */
+
 				       /**
 					* Exception.
 					*/
@@ -656,7 +662,7 @@ namespace Patterns
 		      int,
 		      << "A comma was found at position " << arg1
 		      << " of your input string, but commas are not allowed here.");
-	
+				       //@}
     private:
 				       /**
 					* List of valid strings as
@@ -1465,6 +1471,9 @@ class ParameterHandler
 				      * object.
 				      */
     unsigned int memory_consumption () const;
+    
+				     /** @addtogroup Exceptions
+				      * @{ */
 
 				     /**
 				      * Exception
@@ -1495,7 +1504,7 @@ class ParameterHandler
     DeclException1 (ExcConversionError,
 		    std::string,
 		    << "Error when trying to convert the following string: " << arg1);
-    
+				     //@}
   private:
 				     /**
 				      * Whatever is in a section:

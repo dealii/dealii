@@ -869,10 +869,6 @@ class MatrixTools : public MatrixCreator
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcMatrixNotBlockSquare);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcBlocksDontMatch);
 };
 

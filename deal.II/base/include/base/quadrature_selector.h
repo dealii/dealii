@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal authors
+//    Copyright (C) 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,7 +58,11 @@ class QuadratureSelector : public Quadrature<dim>
 				      * details).
 				      */
     static std::string get_quadrature_names();
-    
+
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
+
 				     /**
 				      * Exception
 				      */
@@ -82,7 +86,7 @@ class QuadratureSelector : public Quadrature<dim>
 		    std::string,
 		    << arg1
 		    << " is not a valid quadrature name for a quadrature rule");
-
+				     //@}
   private:
 				     /**
 				      * This static function creates a

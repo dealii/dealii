@@ -63,7 +63,7 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   const unsigned int bsize = parameters.block_size;
   
   clear();
-  Assert (M.m() == M.n(), ExcMatrixNotSquare());
+  Assert (M.m() == M.n(), ExcNotQuadratic());
   A = &M;
   Assert (bsize>0, ExcIndexRange(bsize, 1, M.m()));
   Assert (A->m()%bsize==0, ExcWrongBlockSize(bsize, A->m()));
@@ -87,7 +87,7 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   const unsigned int bsize = parameters.block_size;
   
   clear();
-  Assert (M.m() == M.n(), ExcMatrixNotSquare());
+  Assert (M.m() == M.n(), ExcNotQuadratic());
   A = &M;
   Assert (bsize>0, ExcIndexRange(bsize, 1, M.m()));
   Assert (A->m()%bsize==0, ExcWrongBlockSize(bsize, A->m()));

@@ -19,6 +19,8 @@
 #include <lac/block_matrix_base.h>
 #include <lac/petsc_sparse_matrix.h>
 #include <lac/petsc_block_vector.h>
+#include <lac/exceptions.h>
+
 #include <cmath>
 
 
@@ -264,6 +266,9 @@ namespace PETScWrappers
                                         */
       using BlockMatrixBase<SparseMatrix>::clear;
       
+				       /** @addtogroup Exceptions
+					* @{ */
+      
                                        /**
                                         * Exception
                                         */
@@ -278,6 +283,7 @@ namespace PETScWrappers
                       int, int, int, int,
                       << "The blocks [" << arg1 << ',' << arg2 << "] and ["
                       << arg3 << ',' << arg4 << "] have differing column numbers.");
+				       //@}
   };
 
 

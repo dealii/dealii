@@ -37,8 +37,8 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 		n_threads (n_threads),
 		inverses (M.m(), 0)
 {
-  Assert (M.m() == M.n(), ExcMatrixNotSquare ());
-  Assert (M.m() == selected.size(), ExcInvalidVectorSize(M.m(), selected.size()));
+  Assert (M.m() == M.n(), ExcNotQuadratic ());
+  Assert (M.m() == selected.size(), ExcDimensionMismatch(M.m(), selected.size()));
 
   if (conserve_mem == false)
     compute_inverses ();
@@ -211,9 +211,9 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
 					   const std::vector<bool> *const dof_mask) const
 {
   Assert (dst.size() == src.size(),
-	  ExcInvalidVectorSize(dst.size(), src.size()));
+	  ExcDimensionMismatch(dst.size(), src.size()));
   Assert (dst.size() == matrix->m(),
-	  ExcInvalidVectorSize(dst.size(), src.size()));
+	  ExcDimensionMismatch(dst.size(), src.size()));
   
 				   // first define an alias to the sparsity
 				   // pattern of the matrix, since this

@@ -62,6 +62,10 @@ class VectorMemory : public Subscriptor
 				      * for later use.
 				      */
     virtual void free (const VECTOR * const) = 0;
+
+				     /** @addtogroup Exceptions
+				      * @{ */
+    
 				     /**
 				      * No more available vectors.
 				      */
@@ -71,6 +75,7 @@ class VectorMemory : public Subscriptor
 				      * this memory pool.
 				      */
     DeclException0(ExcNotAllocatedHere);
+				     //@}
 };
 
 //! Sample implementation using system memory management.

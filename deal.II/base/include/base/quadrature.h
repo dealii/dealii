@@ -240,6 +240,10 @@ class QIterated : public Quadrature<dim>
     QIterated (const Quadrature<1> &base_quadrature,
 	       const unsigned int   n_copies);
 
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
+
 				     /**
 				      * Exception
 				      */
@@ -255,7 +259,7 @@ class QIterated : public Quadrature<dim>
 		    int,
 		    << "The numbers of copies (" << arg1
 		    << ") of the quadrature formula is not valid.");
-    
+				     //@}    
   private:
 				     /**
 				      * Check whether the given

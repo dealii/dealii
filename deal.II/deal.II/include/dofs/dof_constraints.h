@@ -783,10 +783,6 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcMatrixNotSquare);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcWrongDimension);
 				     /**
 				      * Exception

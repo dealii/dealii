@@ -334,8 +334,11 @@ class Function : public FunctionTime,
 				      */
     unsigned int memory_consumption () const;
 
+				     /** @addtogroup Exceptions
+				      * @{ */
+
                                      /**
-                                      * Exception
+                                      * Number of components does not match.
                                       */
     DeclException2 (ExcNumberOfComponents,
                     int, int,
@@ -350,6 +353,7 @@ class Function : public FunctionTime,
                     int,
                     << "The number of components of a function object must "
                     << "at least be one, but you gave " << arg1);
+				     //@}
 };
 
 

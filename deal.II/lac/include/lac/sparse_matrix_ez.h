@@ -15,9 +15,9 @@
 
 
 #include <base/config.h>
-#include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
+#include <lac/exceptions.h>
 
 #include <vector>
 
@@ -978,13 +978,10 @@ class SparseMatrixEZ : public Subscriptor
 			     std::vector<unsigned int>& used_by_line,
 			     const bool compute_by_line) const;
 			     
-				     /**
-				      * Exception for applying
-				      * inverse-type operators to
-				      * rectangular matrices.
-				      */
-    DeclException0(ExcNoSquareMatrix);
     
+    				     /** @addtogroup Exceptions
+				      * @{ */
+
 				     /**
 				      * Exception for missing diagonal entry.
 				      */
@@ -1002,6 +999,7 @@ class SparseMatrixEZ : public Subscriptor
 		   int, int,
 		   << "An entry with index (" << arg1 << ',' << arg2
 		   << ") cannot be allocated.");
+				     //@}
   private:
 				     /**
 				      * Find an entry and return a

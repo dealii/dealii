@@ -1,5 +1,5 @@
 //----------------------------  sparse_ilu.templates.h  ---------------------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -53,9 +53,9 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				   const double strengthen_diagonal)
 {
   SparseLUDecomposition<number>::decompose (matrix, strengthen_diagonal);
-  Assert (matrix.m()==matrix.n(), ExcMatrixNotSquare ());
-  Assert (this->m()==this->n(),   ExcMatrixNotSquare ());
-  Assert (matrix.m()==this->m(),  ExcSizeMismatch(matrix.m(), this->m()));
+  Assert (matrix.m()==matrix.n(), ExcNotQuadratic ());
+  Assert (this->m()==this->n(),   ExcNotQuadratic ());
+  Assert (matrix.m()==this->m(),  ExcDimensionMismatch(matrix.m(), this->m()));
   
   Assert (strengthen_diagonal>=0,
 	  ExcInvalidStrengthening (strengthen_diagonal));
@@ -171,8 +171,8 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
 {
   SparseLUDecomposition<number>::vmult (dst, src);
 
-  Assert (dst.size() == src.size(), ExcSizeMismatch(dst.size(), src.size()));
-  Assert (dst.size() == this->m(), ExcSizeMismatch(dst.size(), this->m()));
+  Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
+  Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
   
   const unsigned int N=dst.size();
   const unsigned int * const rowstart_indices

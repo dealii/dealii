@@ -14,7 +14,7 @@
 #define __deal2__petsc_solver_h
 
 #include <base/config.h>
-#include <base/exceptions.h>
+#include <lac/exceptions.h>
 #include <lac/solver_control.h>
 
 #ifdef DEAL_II_USE_PETSC

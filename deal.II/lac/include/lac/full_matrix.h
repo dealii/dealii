@@ -17,8 +17,8 @@
 /*----------------------------   fullmatrix.h     ---------------------------*/
 
 #include <base/config.h>
-#include <base/exceptions.h>
 #include <base/table.h>
+#include <lac/exceptions.h>
 
 #include <vector>
 
@@ -968,14 +968,14 @@ class FullMatrix : public Table<2,number>
 			  Vector<number2> &src);
 //@}
 
+				     /** @addtogroup Exceptions
+				      * @{ */
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcEmptyMatrix);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotQuadratic);
+
 				     /**
 				      * Exception
 				      */
@@ -991,18 +991,12 @@ class FullMatrix : public Table<2,number>
 		    << "Target region not in matrix: size in this direction="
 		    << arg1 << ", size of new matrix=" << arg2
 		    << ", offset=" << arg3);
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcNotImplemented,
-		    int,
-		    << "This function is not implemented for the given"
-		    << " matrix dimension " << arg1);
                                      /**
                                       * Exception
                                       */
     DeclException0 (ExcSourceEqualsDestination);
-
+				     //@}
+    
     friend class Accessor;
 };
 

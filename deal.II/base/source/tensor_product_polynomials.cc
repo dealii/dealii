@@ -288,7 +288,7 @@ AnisotropicPolynomials(const std::vector<std::vector<Polynomials::Polynomial<dou
 		polynomials (pols),
 		n_tensor_pols(get_n_tensor_pols(pols))
 {
-  Assert (pols.size() == dim, ExcInvalidDim(pols.size()));
+  Assert (pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
   for (unsigned int d=0; d<dim; ++d)
     Assert (pols[d].size() > 0,
             ExcMessage ("The number of polynomials must be larger than zero "
