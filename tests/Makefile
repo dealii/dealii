@@ -58,6 +58,27 @@ build-deal.II: abort.o
 	cd deal.II ; $(MAKE) exe
 
 
+# compilation and execution of tests only, no comparison with
+# reference values
+
+output: output-base output-lac output-fe output-deal.II output-bits
+
+output-base: abort.o
+	cd base ; $(MAKE) output
+
+output-lac: abort.o
+	cd lac ; $(MAKE) output
+
+output-fe: abort.o
+	cd fe ; $(MAKE) output
+
+output-bits: abort.o
+	cd bits ; $(MAKE) output
+
+output-deal.II: abort.o
+	cd deal.II ; $(MAKE) output
+
+
 # collect all header files, and for each try to do the following:
 # generate a file tmp.cc that contains nothing but "#include <xxx>"
 # with this particular header file. then try to compile it. this 
