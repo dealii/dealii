@@ -414,8 +414,8 @@ long int ParameterHandler::get_integer (const string &entry_string) const {
   char *endptr;
   long int i = strtol (s.c_str(), &endptr, 10);
 				   // assert there was no error
-  Assert ((s.c_str()!='\0') || (*endptr == '\0'),
-	  ExcConversionError(s));
+  AssertThrow ((s.c_str()!='\0') || (*endptr == '\0'),
+	       ExcConversionError(s));
 
   return i;
 };
@@ -427,8 +427,8 @@ double ParameterHandler::get_double (const string &entry_string) const {
   char *endptr;
   double d = strtod (s.c_str(), &endptr);
 				   // assert there was no error
-  Assert ((s.c_str()!='\0') || (*endptr == '\0'),
-	  ExcConversionError(s));
+  AssertThrow ((s.c_str()!='\0') || (*endptr == '\0'),
+	       ExcConversionError(s));
 
   return d;
 };
@@ -438,7 +438,7 @@ double ParameterHandler::get_double (const string &entry_string) const {
 bool ParameterHandler::get_bool (const string &entry_string) const {
   string s = get(entry_string);
 
-  Assert ((s=="true") || (s=="false"), ExcConversionError(s));
+  AssertThrow ((s=="true") || (s=="false"), ExcConversionError(s));
   if (s=="true")
     return true;
   else
