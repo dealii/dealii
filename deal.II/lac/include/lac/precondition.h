@@ -715,7 +715,7 @@ PreconditionPSOR<MATRIX>::initialize (
   typename PreconditionRelaxation<MATRIX>::AdditionalData parameters)
 {
   permutation = &p;
-  PreconditionRelaxation<MATRIX>::initalize(rA, parameters);
+  PreconditionRelaxation<MATRIX>::initialize(rA, parameters);
 }
 
 
