@@ -304,7 +304,7 @@ class DataIn {
  * There exist two functions for generating encapsulated Postscript
  * (EPS) without the need for another graphics tool.
  * #write_epsgrid# writes just the 2d grid. The function
- * #write_eps# uses the first data vector to produce a surface plot.
+ * #write_eps# uses the first data vector to produce a shaded surface plot.
  *
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Stefan Nauber, 1998, 1999
@@ -619,6 +619,27 @@ class DataOut {
 				      */
     void write_ucd_faces (ostream &out,
 			  const unsigned int starting_index) const;
+
+    class eps_vertex_data{
+      public:
+        double x,y,z;
+        eps_vertex_data(){};
+        eps_vertex_data(double a, double b, double c):x(a),y(b),z(c) {};
+        void turn(double azi, double ele);
+    };
+                                     /** 
+				      * Class of cell data for output.
+				      * For eps output some calculations have
+				      * to be done between transformation and
+				      * projection and output. There for all
+				      * output data is put into a STL set.
+				      */
+    class eps_cell_data{
+      public:
+        vector<eps_vertex_data> vertices;
+        void turn(double azi, double ele);
+      bool operator < (const eps_cell_data &) const;
+    };
 };
 
 
@@ -631,3 +652,4 @@ class DataOut {
 /* end of #ifndef __data_io_H */
 #endif
 /*----------------------------   data_io.h     ---------------------------*/
+
