@@ -1579,7 +1579,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_CONST_MEM_FUN_PTR_BUG, dnl
 [
-  AC_MSG_CHECKING(for templates and pointers to const member functions bug)
+  AC_MSG_CHECKING(for const member functions bug)
   AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
