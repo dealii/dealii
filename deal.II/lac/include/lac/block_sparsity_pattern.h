@@ -94,7 +94,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * given number of block rows and
 				      * columns. The blocks themselves
 				      * are still empty, and you have
-				      * to call @p{collect_args} after
+				      * to call @p{collect_sizes} after
 				      * you assign them sizes.
 				      */
     BlockSparsityPatternBase (const unsigned int n_rows,
@@ -417,7 +417,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				      * given number of block rows and
 				      * columns. The blocks themselves
 				      * are still empty, and you have
-				      * to call @p{collect_args} after
+				      * to call @p{collect_sizes} after
 				      * you assign them sizes.
 				      */
     BlockSparsityPattern (const unsigned int n_rows,
@@ -486,7 +486,7 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * given number of block rows and
 				      * columns. The blocks themselves
 				      * are still empty, and you have
-				      * to call @p{collect_args} after
+				      * to call @p{collect_sizes} after
 				      * you assign them sizes.
 				      */
     CompressedBlockSparsityPattern (const unsigned int n_rows,
