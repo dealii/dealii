@@ -1043,7 +1043,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
       last_round_dofs[i] = -1;
   
   remove_if (last_round_dofs.begin(), last_round_dofs.end(),
-	     bind2nd(equal_to<int>(), 0));
+	     bind2nd(equal_to<int>(), -1));
   
 				   // now if no valid points remain:
 				   // find dof with lowest coordination
@@ -1191,16 +1191,20 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 
 template <>
 void DoFHandler<1>::do_renumbering (const vector<int> &new_numbers) {
+  Assert (new_number.size() == n_dofs(level), ExcRenumberingIncomplete());
+
 				   // note that we can not use cell iterators
 				   // in this function since then we would
 				   // renumber the dofs on the interface of
 				   // two cells more than once. Anyway, this
-				   // ways it's not only more correct but also
+				   // way it's not only more correct but also
 				   // faster
   for (vector<int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-    if (*i != -1)
+    {
+      Assert (*i != -1, ExcInternalError());
       *i = new_numbers[*i];
-
+    };
+  
   for (unsigned int level=0; level<levels.size(); ++level) 
     for (vector<int>::iterator i=levels[level]->line_dofs.begin();
 	 i!=levels[level]->line_dofs.end(); ++i)
@@ -1215,10 +1219,14 @@ void DoFHandler<1>::do_renumbering (const vector<int> &new_numbers) {
 
 template <>
 void DoFHandler<2>::do_renumbering (const vector<int> &new_numbers) {
-  for (vector<int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-    if (*i != -1)
-      *i = new_numbers[*i];
+  Assert (new_number.size() == n_dofs(level), ExcRenumberingIncomplete());
 
+  for (vector<int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
+    {
+      Assert (*i != -1, ExcInternalError());
+      *i = new_numbers[*i];
+    };
+  
   for (unsigned int level=0; level<levels.size(); ++level) 
     {
       for (vector<int>::iterator i=levels[level]->line_dofs.begin();
