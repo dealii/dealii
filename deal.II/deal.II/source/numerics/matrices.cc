@@ -362,8 +362,8 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 			       fe.system_to_component_index(j).first))
 			    cell_matrix(i,j) +=
 			      (u * v * weight * coefficient_values[point]);
-			  local_rhs(i) += v * rhs_values[point] * weight;
 			}
+		      local_rhs(i) += v * rhs_values[point] * weight;
 		    }
 		}
 	    }
@@ -387,8 +387,8 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 			    cell_matrix(i,j) +=
 			      (u * v * weight *
 			       coefficient_vector_values[point](component_i));
-			  local_rhs(i) += v * rhs_values[point] * weight;
 			}
+		      local_rhs(i) += v * rhs_values[point] * weight;
 		    }
 		}
 	    }
@@ -407,8 +407,8 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 			(fe.system_to_component_index(i).first ==
 			 fe.system_to_component_index(j).first))
 		      cell_matrix(i,j) += (u * v * weight);
-		    local_rhs(i) += v * rhs_values[point] * weight;
 		  }
+		local_rhs(i) += v * rhs_values[point] * weight;
 	      }
 	  }
 
@@ -629,11 +629,10 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 				      cell_matrix(i,j)
 					+= (u * v * weight * coefficient_values[point]);
 				    }
-				  
-				  cell_vector(i) += v *
-						    rhs_values_system[point](
-						      fe.system_to_component_index(i).first) * weight;
 				}
+			      cell_vector(i) += v *
+						rhs_values_system[point](
+						  fe.system_to_component_index(i).first) * weight;
 			    }
 			}
 		    }
@@ -658,9 +657,8 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 				      cell_matrix(i,j) +=
 					(u * v * weight * coefficient_vector_values[point](component_i));
 				    }
-				  
-				  cell_vector(i) += v * rhs_values_system[point](component_i) * weight;
-				}
+				} 
+			      cell_vector(i) += v * rhs_values_system[point](component_i) * weight;
 			    }
 			}
 		    }
@@ -680,12 +678,11 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 			      {
 				cell_matrix(i,j) += (u * v * weight);
 			      }
-			    
-			    cell_vector(i) += v *
-					      rhs_values_system[point](
-						fe.system_to_component_index(i).first) *
-					      weight;
 			  }
+			cell_vector(i) += v *
+					  rhs_values_system[point](
+					    fe.system_to_component_index(i).first) *
+					  weight;
 		      }
 		  }
 	    }
@@ -709,8 +706,8 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 			    {
 			      const double u = fe_values.shape_value(j,point);
 			      cell_matrix(i,j) += (u * v * weight * coefficient_values[point]);
-			      cell_vector(i) += v * rhs_values_scalar[point] *weight;
 			    }
+			  cell_vector(i) += v * rhs_values_scalar[point] *weight;
 			}
 		    }
 		}
@@ -725,8 +722,8 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 			  {
 			    const double u = fe_values.shape_value(j,point);
 			    cell_matrix(i,j) += (u * v * weight);
-			    cell_vector(i) += v * rhs_values_scalar[point] * weight;
 			  }
+			cell_vector(i) += v * rhs_values_scalar[point] * weight;
 		      }
 		  }
 	    }
@@ -878,7 +875,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 };
 
 
-  template <int dim>
+template <int dim>
 void MatrixCreator::create_boundary_mass_matrix (const DoFHandler<dim>     &dof,
 						 const Quadrature<dim-1>   &q,
 						 SparseMatrix<double>      &matrix,
