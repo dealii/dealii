@@ -98,7 +98,8 @@
  * whether this might pose some problems in the inversion of the local matrices.
  * Maybe someone would like to check this.
  *
- * @author Guido Kanschat, documentation mostly by Wolfgang Bangerth; 1999 */
+ * @author Guido Kanschat, documentation mostly by Wolfgang Bangerth; 1999
+ */
 template<typename number>
 class SparseVanka
 {
