@@ -101,6 +101,18 @@ void dVector::clear () {
 }
 
 
+
+bool dVector::all_zero () const {
+  const_iterator p = begin(),
+		 e = end();
+  while (p!=e)
+    if (*p++ != 0.0)
+      return false;
+  return true;
+};
+
+
+
 double dVector::operator * (const dVector& v) const
 {
   if (&v == this)

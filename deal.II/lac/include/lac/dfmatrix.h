@@ -141,6 +141,17 @@ class dFMatrix
 				      *  Inquire Dimension (Col) . returns Number of Columns
 				      */
     unsigned int n () const { return dim_range; }
+
+    				     /**
+				      * Return whether the matrix contains only
+				      * elements with value zero. This function
+				      * is mainly for internal consistency
+				      * check and should seldomly be used when
+				      * not in debug mode since it uses quite
+				      * some time.
+				      */
+    bool all_zero () const;
+
 				     //@}
     
     

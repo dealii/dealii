@@ -30,6 +30,19 @@ dFMatrix::~dFMatrix ()
   delete[] val;
 }
 
+
+bool dFMatrix::all_zero () const {
+  const double *p = &val[0],
+	       *e = &val[n()*m()];
+  while (p!=e)
+    if (*p++ != 0.0)
+      return false;
+
+  return true;
+};
+
+
+
 void dFMatrix::reinit (const unsigned int mm, const unsigned int nn)
 {
   if (val_size<nn*mm)

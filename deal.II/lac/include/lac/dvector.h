@@ -188,6 +188,16 @@ class dVector : public VectorBase
     unsigned int size () const;
 
 				     /**
+				      * Return whether the vector contains only
+				      * elements with value zero. This function
+				      * is mainly for internal consistency
+				      * check and should seldomly be used when
+				      * not in debug mode since it uses quite
+				      * some time.
+				      */
+    bool all_zero () const;
+    
+				     /**
 				      * Make the #dVector# class a bit like the
 				      * #vector<># class of the C++ standard
 				      * library by returning iterators to
