@@ -641,10 +641,12 @@ void
 DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
 						   Vector<number>    &interpolated_values) const
 {
-  const unsigned int dofs_per_cell = this->dof_handler->get_fe().dofs_per_cell;
+  const FiniteElement<dim> &fe            = this->dof_handler->get_fe();
+  const unsigned int        dofs_per_cell = fe.dofs_per_cell;
+  
   
   Assert (this->dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&fe != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (interpolated_values.size() == dofs_per_cell,
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
@@ -662,6 +664,57 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
       
       interpolated_values.clear ();
 
+                                       // later on we will have to
+                                       // push the values interpolated
+                                       // from the child to the mother
+                                       // cell into the output
+                                       // vector. unfortunately, there
+                                       // are two types of elements:
+                                       // ones where you add up the
+                                       // contributions from the
+                                       // different child cells, and
+                                       // ones where you overwrite.
+                                       //
+                                       // an example for the first is
+                                       // piecewise constant (and
+                                       // discontinuous) elements,
+                                       // where we build the value on
+                                       // the coarse cell by averaging
+                                       // the values from the cell
+                                       // (i.e. by adding up a
+                                       // fraction of the values of
+                                       // their values)
+                                       //
+                                       // and example for the latter
+                                       // are the usual continuous
+                                       // elements. the value on a
+                                       // vertex of a coarse cell must
+                                       // there be the same,
+                                       // irrespective of the adjacent
+                                       // cell we are presently on. so
+                                       // we always overwrite. in
+                                       // fact, we must, since we
+                                       // cannot know in advance how
+                                       // many neighbors there will
+                                       // be, so there is no way to
+                                       // compute the average with
+                                       // fixed factors
+                                       //
+                                       // so we have to find out to
+                                       // which type this element
+                                       // belongs. the difficulty is:
+                                       // the finite element may be a
+                                       // composed one, so we can only
+                                       // hope to do this for each
+                                       // shape function
+                                       // individually. to avoid doing
+                                       // this over and over again, we
+                                       // do this once now and cache
+                                       // the results
+      std::vector<bool> restriction_is_additive (dofs_per_cell);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        restriction_is_additive[i] = fe.restriction_is_additive(i);
+      
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
 	   ++child)
 	{
@@ -672,27 +725,17 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
 							   tmp1);
 					   // interpolate these to the mother
 					   // cell
-	  this->dof_handler->get_fe().restrict(child).vmult (tmp2, tmp1);
-	  
-					   // now write those entries in tmp2
-					   // which are != 0 into the output
-					   // vector. Note that we may not
-					   // add them up, since we would then
-					   // end in adding up the contribution
-					   // from nodes on boundaries of
-					   // children more than once.
+	  fe.restrict(child).vmult (tmp2, tmp1);
+
+                                           // and add up or set them
+                                           // in the output vector
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      const unsigned int component
-		= this->dof_handler->get_fe().system_to_component_index(i).first;
-	  
-	      if (this->dof_handler->get_fe().restriction_is_additive(component)) 
-		interpolated_values(i) += tmp2(i);
-	      else
-		if (tmp2(i) != 0)
-		  interpolated_values(i) = tmp2(i);
-	    } 
-	}
+            if (restriction_is_additive[i]) 
+              interpolated_values(i) += tmp2(i);
+            else
+              if (tmp2(i) != 0)
+                interpolated_values(i) = tmp2(i);
+	};
     };
 };
 
