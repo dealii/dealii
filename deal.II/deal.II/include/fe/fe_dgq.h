@@ -22,7 +22,13 @@ template <int dim> class MappingQ;
 
 /**
  * Discontinuous tensor product elements based on equidistant support points.
-//TODO:[GK,RH] Document node numbering etc. copy from old documentation 
+ *
+ * This is a discontinuous finite element using interpolating tensor
+ * product polynomials. The shape functions are Lagrangian
+ * interpolants of an equidistant grid of points on the unit cell. The
+ * points are numbered in lexicographical order, @p{x} running fastest.
+ *
+ * @author Guido Kanschat, Ralf Hartmann, 2001
  */
 template <int dim>
 class FE_DGQ : public FiniteElement<dim>
@@ -196,7 +202,16 @@ class FE_DGQ : public FiniteElement<dim>
 				     /**
 				      * Compute renumbering for rotation
 				      * of degrees of freedom.
-//TODO:[GK] meaning of direction=[zZxXyY]				      
+				      *
+				      * The direction parameter
+				      * determines the type of
+				      * rotation. It is one character
+				      * of @p{xXyYzZ}. The character
+				      * determines the axis of
+				      * rotation, case determines the
+				      * direction. Lower case is
+				      * counter-clockwise seen in
+				      * direction of the axis.
 				      */
     void rotate_indices (std::vector<unsigned int> &indices,
 			 const char                 direction = 'y') const;
@@ -241,21 +256,6 @@ class FE_DGQ : public FiniteElement<dim>
 					  */				      
 	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
 
-					 /**
-					  * Storage for @p{FEValues}
-					  * objects needed to
-					  * approximate second
-					  * derivatives.
-					  *
-					  * The ordering is @p{p+hx},
-					  * @p{p+hy}, @p{p+hz},
-					  * @p{p-hx}, @p{p-hy},
-					  * @p{p-hz}, where unused
-					  * entries in lower dimensions
-					  * are missing.
-					  */
-//TODO:[GK] what good is this, the base class already has it and it seems never to be used!?
-	std::vector<FEValues<dim>*> differences;
     };
     
 				     /**
