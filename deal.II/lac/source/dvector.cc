@@ -41,7 +41,7 @@ dVector::dVector (const dVector& v) :
     {
       val = new double[maxdim];
       Assert (val != 0, ExcOutOfMemory());
-      for (unsigned int i=0; i<dim; i++)
+      for (unsigned int i=0; i<dim; ++i)
 	val[i] = v.val[i];
     }
 }
@@ -255,7 +255,7 @@ double dVector::linfty_norm () const {
 
 void dVector::add (const double v)
 {
-  for (unsigned int i = 0; i < dim; i++) val[i] += v;
+  for (unsigned int i = 0; i < dim; ++i) val[i] += v;
 }
 
 
@@ -263,7 +263,7 @@ void dVector::add (const double v)
 void dVector::add (const dVector& v)
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i = 0; i < dim; i++) val[i] += v(i);
+  for (unsigned int i = 0; i < dim; ++i) val[i] += v(i);
 }
 
 
@@ -271,7 +271,7 @@ void dVector::add (const dVector& v)
 void dVector::add (const double a, const dVector& v)
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i = 0; i < dim; i++) val[i] += a * v(i);
+  for (unsigned int i = 0; i < dim; ++i) val[i] += a * v(i);
 }
 
 
@@ -281,7 +281,7 @@ void dVector::add (const double a, const dVector& v,
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
-  for (unsigned int i = 0; i < dim; i++)
+  for (unsigned int i = 0; i < dim; ++i)
     val[i] += a * v.val[i] + b * w.val[i];
 }
 
@@ -290,7 +290,7 @@ void dVector::add (const double a, const dVector& v,
 void dVector::sadd (const double x, const dVector& v)
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i = 0; i < dim; i++)
+  for (unsigned int i = 0; i < dim; ++i)
     val[i] = x * val[i] + v.val[i];
 }
 
@@ -299,7 +299,7 @@ void dVector::sadd (const double x, const dVector& v)
 void dVector::sadd (const double x, const double a, const dVector& v)
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i = 0; i < dim; i++)
+  for (unsigned int i = 0; i < dim; ++i)
     val[i] = x * val[i] + a * v.val[i];
 }
 
@@ -310,7 +310,7 @@ void dVector::sadd (const double x, const double a,
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
-  for (unsigned int i = 0; i < dim; i++)
+  for (unsigned int i = 0; i < dim; ++i)
     val[i] = x * val[i] + a * v.val[i] + b * w.val[i];
 }
 
@@ -323,7 +323,7 @@ void dVector::sadd (const double x, const double a,
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
   Assert (dim == y.dim, ExcDimensionsDontMatch(dim, y.dim));
-  for (unsigned int i = 0; i < dim; i++)
+  for (unsigned int i = 0; i < dim; ++i)
     val[i] = x * val[i] + a * v.val[i] + b * w.val[i] 
 	     + c * y.val[i];
 }
@@ -334,7 +334,7 @@ void dVector::equ (const double a, const dVector& u,
 		   const double b, const dVector& v)
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i=0; i<dim; i++)
+  for (unsigned int i=0; i<dim; ++i)
     val[i] = a*u.val[i] + b*v.val[i];
 }
 
@@ -342,7 +342,7 @@ void dVector::equ (const double a, const dVector& u,
 
 void dVector::scale (const double factor)
 {
-  for (unsigned int i=0; i<dim; i++)
+  for (unsigned int i=0; i<dim; ++i)
     val[i] *= factor;
 }
 
@@ -351,7 +351,7 @@ void dVector::scale (const double factor)
 void dVector::equ (const double a, const dVector& u)
 {
   Assert (dim == u.dim, ExcDimensionsDontMatch(dim, u.dim));
-  for (unsigned int i=0; i<dim; i++)
+  for (unsigned int i=0; i<dim; ++i)
     val[i] = a*u.val[i];
 }
 
@@ -359,7 +359,7 @@ void dVector::equ (const double a, const dVector& u)
 
 dVector& dVector::operator = (const double s)
 {
-  for (unsigned int i=0; i<dim; i++)
+  for (unsigned int i=0; i<dim; ++i)
     val[i] = s;
   return *this;
 }
@@ -370,7 +370,7 @@ dVector& dVector::operator = (const dVector& v)
 {
   if (v.dim != dim) reinit(v,1);
 
-  for (unsigned int i=0; i<dim; i++)
+  for (unsigned int i=0; i<dim; ++i)
     val[i] = v.val[i];
   return *this;
 }

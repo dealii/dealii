@@ -31,6 +31,10 @@
  *  CONVENTIONS for used `equations` : <p>
  *  - THIS vector is always named `U` <p>
  *  - vectors are always uppercase , scalars are lowercase
+ *
+ * @authors Roland Becker, Guido Kanschat, Franz-Theo Suttmeier,
+ *          revised and extended by Wolfgang Bangerth, documented by
+ *          Klaus Mampel and Wolfgang Bangerth
  */
 class dVector : public VectorBase
 {
