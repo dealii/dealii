@@ -82,7 +82,7 @@ class Tensor<1,dim>
 				      * likely to overflow memory
 				      * limits.
 				      */
-    typedef double array_type[(dim!=0) ? dim : 1000000000];
+    typedef double array_type[(dim!=0) ? dim : 100000000];
     
 				     /**
 				      * Constructor. Initialize all entries
