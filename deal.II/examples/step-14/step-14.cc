@@ -1,5 +1,3 @@
-// TODO: bv for primal problem wrong!
-//       check Galerkin orthogonality
 /* $Id$ */
 /* Author: Wolfgang Bangerth, ETH Zurich, 2002 */
 
@@ -27,6 +25,7 @@
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
+#include <grid/grid_out.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_refinement.h>
@@ -155,6 +154,50 @@ namespace Evaluation
 	      << 1.594915543-point_value << std::endl;
   };
 
+
+  template <int dim>
+  class GridOutput : public EvaluationBase<dim>
+  {
+    public:
+      GridOutput (const std::string &output_name_base);
+      
+      virtual void operator () (const DoFHandler<dim> &dof_handler,
+				const Vector<double>  &solution) const;
+    private:
+      const std::string output_name_base;
+  };
+
+
+  template <int dim>
+  GridOutput<dim>::
+  GridOutput (const std::string &output_name_base)
+		  :
+		  output_name_base (output_name_base)
+  {};
+  
+
+  template <int dim>
+  void
+  GridOutput<dim>::operator () (const DoFHandler<dim> &dof_handler,
+				const Vector<double>  &/*solution*/) const
+  {
+#ifdef HAVE_STD_STRINGSTREAM
+    std::ostringstream filename;
+#else
+    std::ostrstream filename;
+#endif
+    filename << output_name_base << "-"
+	     << refinement_cycle
+	     << ".eps"
+	     << std::ends;
+#ifdef HAVE_STD_STRINGSTREAM
+    std::ofstream out (filename.str().c_str());
+#else
+    std::ofstream out (filename.str());
+#endif
+    
+    GridOut().write_eps (dof_handler.get_tria(), out);
+  };  
 };
 
   
@@ -685,52 +728,75 @@ namespace LaplaceSolver
 				 // with the same data sets as in the
 				 // previous one, but as it may so
 				 // happen that someone wants to run
-				 // the program with a different
-				 // solution and right hand side
-				 // function, we show a simple
-				 // technique to do exactly that. For
-				 // more clarity, we furthermore pack
-				 // everything that has to do with
-				 // equation data into a namespace of
-				 // its own.
+				 // the program with different
+				 // boundary values and right hand side
+				 // functions, or on a different grid,
+				 // we show a simple technique to do
+				 // exactly that. For more clarity, we
+				 // furthermore pack everything that
+				 // has to do with equation data into
+				 // a namespace of its own.
 				 //
-				 // Basically, the idea is as follows:
-				 // let us have a structure for each
-				 // set of data, in which we have two
+				 // The underlying assumption is that
+				 // this is a research program, and
+				 // that there we often have a number
+				 // of test cases that consist of a
+				 // domain, a right hand side,
+				 // boundary values, possibly a
+				 // specified coefficient, and a
+				 // number of other parameters. They
+				 // often vary all at the same time
+				 // when shifting from one example to
+				 // another. To make handling such
+				 // sets of problem description
+				 // parameters simple is the goal of
+				 // the following.
+				 //
+				 // Basically, the idea is this: let
+				 // us have a structure for each set
+				 // of data, in which we pack
+				 // everything that describes a test
+				 // case: here, these are two
 				 // subclasses, one called
-				 // ``Solution'' for the exact
-				 // solution (and also used as right
-				 // hand side), and one called
-				 // ``RightHandSide''. Since the
-				 // solution of the previous example
-				 // program looked like curved ridges,
-				 // we use this name here for the
-				 // enclosing class. Note that the
-				 // names of the two inner class have
-				 // to be the same for all enclosing
-				 // classes, and also that we have
-				 // attached the dimension template
-				 // argument to the enclosing class
-				 // rather than to the inner ones, to
-				 // make further processing simpler.
-				 // (From a language viewpoint, a
-				 // namespace would be better to
-				 // encapsulate these inner classes,
-				 // rather than a structure. However,
-				 // namespaces cannot be given as
-				 // template arguments, so we use a
-				 // structure to allow a second object
-				 // to select from within its given
+				 // ``BoundaryValues'' for the
+				 // boundary values of the exact
+				 // solution, and one called
+				 // ``RightHandSide'', and then a way
+				 // to generate the coarse grid. Since
+				 // the solution of the previous
+				 // example program looked like curved
+				 // ridges, we use this name here for
+				 // the enclosing class. Note that the
+				 // names of the two inner classes
+				 // have to be the same for all
+				 // enclosing test case classes, and
+				 // also that we have attached the
+				 // dimension template argument to the
+				 // enclosing class rather than to the
+				 // inner ones, to make further
+				 // processing simpler.  (From a
+				 // language viewpoint, a namespace
+				 // would be better to encapsulate
+				 // these inner classes, rather than a
+				 // structure. However, namespaces
+				 // cannot be given as template
+				 // arguments, so we use a structure
+				 // to allow a second object to select
+				 // from within its given
 				 // argument. The enclosing structure,
-				 // of course, has no members apart
-				 // from the classes it declares, and
-				 // will never be instantiated.)
+				 // of course, has no member variables
+				 // apart from the classes it
+				 // declares, and a static function to
+				 // generate the coarse mesh; it will
+				 // in general never be instantiated.)
 				 //
-				 // The idea is then the following: we
-				 // can generate objects for
-				 // solution/boundary values and right
-				 // hand side by simply giving the
-				 // name of the outer class as a
+				 // The idea is then the following
+				 // (this is the right time to also
+				 // take a brief look at the code
+				 // below): we can generate objects
+				 // for boundary values and
+				 // right hand side by simply giving
+				 // the name of the outer class as a
 				 // template argument to a class which
 				 // we call here ``Data::SetUp'', and
 				 // it then creates objects for the
@@ -741,17 +807,17 @@ namespace LaplaceSolver
 				 // ``Data::SetUp<Data::CurvedRidge>'',
 				 // and everything we need to know
 				 // about the solution would be static
-				 // member variables of that object.
+				 // member variables and functions of
+				 // that object.
 				 //
 				 // This approach might seem like
 				 // overkill in this case, but will
 				 // become very handy once a certain
 				 // set up is not only characterized
-				 // by a solution (or Dirichlet
-				 // boundary values) and a right hand
-				 // side function, but in addition by
-				 // material properties, Neumann
-				 // values, different boundary
+				 // by Dirichlet boundary values and a
+				 // right hand side function, but in
+				 // addition by material properties,
+				 // Neumann values, different boundary
 				 // descriptors, etc. In that case,
 				 // the ``SetUp'' class might consist
 				 // of a dozen or more objects, and
@@ -799,10 +865,13 @@ namespace Data
   struct SetUpBase
   {
       virtual
-      const Function<dim> &  get_solution () const = 0;
+      const Function<dim> &  get_boundary_values () const = 0;
 
       virtual
       const Function<dim> &  get_right_hand_side () const = 0;
+
+      virtual
+      void create_coarse_grid (Triangulation<dim> &coarse_grid) const = 0;
   };
 
 
@@ -825,31 +894,35 @@ namespace Data
       SetUp () {};
 
       virtual
-      const Function<dim> &  get_solution () const;
+      const Function<dim> &  get_boundary_values () const;
 
       virtual
       const Function<dim> &  get_right_hand_side () const;
       
+
+      virtual
+      void create_coarse_grid (Triangulation<dim> &coarse_grid) const;
+
     private:
-      static const typename Traits::Solution      solution;
-      static const typename Traits::RightHandSide right_hand_side;
+      static const typename Traits::BoundaryValues boundary_values;
+      static const typename Traits::RightHandSide  right_hand_side;
   };
 
 				   // We have to provide definitions
 				   // for the static member variables
 				   // of the above class:
   template <class Traits, int dim>
-  const typename Traits::Solution      SetUp<Traits,dim>::solution;
+  const typename Traits::BoundaryValues  SetUp<Traits,dim>::boundary_values;
   template <class Traits, int dim>
-  const typename Traits::RightHandSide SetUp<Traits,dim>::right_hand_side;
+  const typename Traits::RightHandSide   SetUp<Traits,dim>::right_hand_side;
 
 				   // And definitions of the member
 				   // functions:
   template <class Traits, int dim>
   const Function<dim> &
-  SetUp<Traits,dim>::get_solution () const 
+  SetUp<Traits,dim>::get_boundary_values () const 
   {
-    return solution;
+    return boundary_values;
   };
 
 
@@ -859,21 +932,32 @@ namespace Data
   {
     return right_hand_side;
   };
+
+
+  template <class Traits, int dim>
+  void
+  SetUp<Traits,dim>::
+  create_coarse_grid (Triangulation<dim> &coarse_grid) const 
+  {
+    Traits::create_coarse_grid (coarse_grid);
+  };
   
 
 				   // @sect4{The CurvedRidges class}
 
 				   // The class that is used to
-				   // describe the solution and right
-				   // hand side of the ``curved
-				   // ridge'' problem is like so:
+				   // describe the boundary values and
+				   // right hand side of the ``curved
+				   // ridge'' problem already used in
+				   // the step-13 example program is
+				   // then like so:
   template <int dim>
   struct CurvedRidges
   {
-      class Solution : public Function<dim>
+      class BoundaryValues : public Function<dim>
       {
 	public:
-	  Solution () : Function<dim> () {};
+	  BoundaryValues () : Function<dim> () {};
 	  
 	  virtual double value (const Point<dim>   &p,
 				const unsigned int  component) const;
@@ -888,13 +972,18 @@ namespace Data
 	  virtual double value (const Point<dim>   &p,
 				const unsigned int  component) const;
       };
+
+      static
+      void
+      create_coarse_grid (Triangulation<dim> &coarse_grid);
   };
   
     
   template <int dim>
   double
-  CurvedRidges<dim>::Solution::value (const Point<dim>   &p,
-				      const unsigned int  /*component*/) const
+  CurvedRidges<dim>::BoundaryValues::
+  value (const Point<dim>   &p,
+	 const unsigned int  /*component*/) const
   {
     double q = p(0);
     for (unsigned int i=1; i<dim; ++i)
@@ -931,10 +1020,318 @@ namespace Data
   };
 
 
-//XXX  
+  template <int dim>
+  void
+  CurvedRidges<dim>::
+  create_coarse_grid (Triangulation<dim> &coarse_grid)
+  {
+    GridGenerator::hyper_cube (coarse_grid, -1, 1);
+    coarse_grid.refine_global (2);
+  };
+  
+
+				   // @sect4{The Exercise_2_3 class}
+  
+				   // This example program was written
+				   // while giving practical courses
+				   // for a lecture on adaptive finite
+				   // element methods and duality
+				   // based error estimates. For these
+				   // courses, we had one exercise,
+				   // which required to solve the
+				   // Laplace equation with constant
+				   // right hand side on a square
+				   // domain with a square hole in the
+				   // center, and zero boundary
+				   // values. Since the implementation
+				   // of the properties of this
+				   // problem is so particularly
+				   // simple here, lets do it. As the
+				   // number of the exercise was 2.3,
+				   // we take the liberty to retain
+				   // this name for the class as well.
+  template <int dim>
+  struct Exercise_2_3
+  {
+				       // We need a class to denote
+				       // the boundary values of the
+				       // problem. In this case, this
+				       // is simple: it's the zero
+				       // function, so don't even
+				       // declare a class, just a
+				       // typedef:
+      typedef ZeroFunction<dim> BoundaryValues;
+
+				       // Second, a class that denotes
+				       // the right hand side. Since
+				       // they are constant, just
+				       // subclass the corresponding
+				       // class of the library and be
+				       // done:
+      class RightHandSide : public ConstantFunction<dim>
+      {
+	public:
+	  RightHandSide () : ConstantFunction<dim> (1.) {};
+      };
+      
+				       // Finally a function to
+				       // generate the coarse
+				       // grid. This is somewhat more
+				       // complicated here, see
+				       // immediately below.
+      static
+      void
+      create_coarse_grid (Triangulation<dim> &coarse_grid);
+  };
+
+
+				   // As stated above, the grid for
+				   // this example is the square
+				   // [-1,1]^2 with the square
+				   // [-1/2,1/2]^2 as hole in it. We
+				   // create the coarse grid as 3
+				   // times 3 cells with the middle
+				   // one missing.
+				   //
+				   // Of course, the example has an
+				   // extension to 3d, but since this
+				   // function cannot be written in a
+				   // dimension independent way we
+				   // choose not to implement this
+				   // here, but rather only specialize
+				   // the template for dim=2. If you
+				   // compile the program for 3d,
+				   // you'll get a message from the
+				   // linker that this function is not
+				   // implemented for 3d, and needs to
+				   // be provided.
+				   //
+				   // For the creation of this
+				   // geometry, the library has no
+				   // predefined method. In this case,
+				   // the geometry is still simple
+				   // enough to do the creation by
+				   // hand, rather than using a mesh
+				   // generator.
+  template <>
+  void
+  Exercise_2_3<2>::
+  create_coarse_grid (Triangulation<2> &coarse_grid)
+  {
+				     // First define the space
+				     // dimension, to allow those
+				     // parts of the function that are
+				     // actually dimension independent
+				     // to use this variable. That
+				     // makes it simpler if you later
+				     // takes this as a starting point
+				     // to implement the 3d version.
+    const unsigned int dim = 2;
+
+				     // Then have a list of
+				     // vertices. Here, they are 24 (5
+				     // times 5, with the middle one
+				     // omitted). It is probably best
+				     // to draw a sketch here. Note
+				     // that we leave the number of
+				     // vertices open at first, but
+				     // then let the compiler compute
+				     // this number afterwards. This
+				     // reduces the possibility of
+				     // having the dimension to large
+				     // and leaving the last ones
+				     // uninitialized.
+    static const Point<2> vertices_1[]
+      = {  Point<2> (-1.,   -1.),
+	     Point<2> (-1./2, -1.),
+	     Point<2> (0.,    -1.),
+	     Point<2> (+1./2, -1.),
+	     Point<2> (+1,    -1.),
+	     
+	     Point<2> (-1.,   -1./2.),
+	     Point<2> (-1./2, -1./2.),
+	     Point<2> (0.,    -1./2.),
+	     Point<2> (+1./2, -1./2.),
+	     Point<2> (+1,    -1./2.),
+	     
+	     Point<2> (-1.,   0.),
+	     Point<2> (-1./2, 0.),
+	     Point<2> (+1./2, 0.),
+	     Point<2> (+1,    0.),
+	     
+	     Point<2> (-1.,   1./2.),
+	     Point<2> (-1./2, 1./2.),
+	     Point<2> (0.,    1./2.),
+	     Point<2> (+1./2, 1./2.),
+	     Point<2> (+1,    1./2.),
+	     
+	     Point<2> (-1.,   1.),
+	     Point<2> (-1./2, 1.),
+	     Point<2> (0.,    1.),			  
+	     Point<2> (+1./2, 1.),
+	     Point<2> (+1,    1.)    };
+    const unsigned int
+      n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
+
+				     // From this static list of
+				     // vertices, we generate an STL
+				     // vector of the vertices, as
+				     // this is the data type the
+				     // library wants to see.
+    const std::vector<Point<dim> > vertices (&vertices_1[0],
+					     &vertices_1[n_vertices]);
+
+				     // Next, we have to define the
+				     // cells and the vertices they
+				     // contain. Here, we have 8
+				     // vertices, but leave the number
+				     // open and let it be computed
+				     // afterwards:
+    static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell]
+      = {{0, 1, 6,5},
+	 {1, 2, 7, 6},
+	 {2, 3, 8, 7},
+	 {3, 4, 9, 8},
+	 {5, 6, 11, 10},
+	 {8, 9, 13, 12},
+	 {10, 11, 15, 14},
+	 {12, 13, 18, 17},
+	 {14, 15, 20, 19},
+	 {15, 16, 21, 20},
+	 {16, 17, 22, 21},
+	 {17, 18, 23, 22}};
+    const unsigned int
+      n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+
+				     // Again, we generate a C++
+				     // vector type from this, but
+				     // this time by looping over the
+				     // cells (yes, this is
+				     // boring). Additionally, we set
+				     // the material indicator to zero
+				     // for all the cells:
+    std::vector<CellData<dim> > cells (n_cells, CellData<dim>());
+    for (unsigned int i=0; i<n_cells; ++i) 
+      {
+	for (unsigned int j=0;
+	     j<GeometryInfo<dim>::vertices_per_cell;
+	     ++j)
+	  cells[i].vertices[j] = cell_vertices[i][j];
+	cells[i].material_id = 0;
+      };
+
+				     // Finally pass all this
+				     // information to the library to
+				     // generate a triangulation. The
+				     // last parameter may be used to
+				     // pass information about
+				     // non-zero boundary indicators
+				     // at certain faces of the
+				     // triangulation to the library,
+				     // but we don't want that here,
+				     // so we give an empty object:
+    coarse_grid.create_triangulation (vertices,
+				      cells,
+				      SubCellData());
+    
+				     // And since we want that the
+				     // evaluation point (3/4,3/4) in
+				     // this example is a grid point,
+				     // we refine once globally:
+    coarse_grid.refine_global (1);
+  };
 };
 
-
+				 // @sect4{Discussion}
+				 //
+				 // As you have now read through this
+				 // framework, you may be wondering
+				 // why we have not chosen to
+				 // implement the classes implementing
+				 // a certain setup (like the
+				 // ``CurvedRidges'' class) directly
+				 // as classes derived from
+				 // ``Data::SetUpBase''. Indeed, we
+				 // could have done very well so. The
+				 // only reason is that then we would
+				 // have to have member variables for
+				 // the solution and right hand side
+				 // classes in the ``CurvedRidges''
+				 // class, as well as member functions
+				 // overloading the abstract functions
+				 // of the base class giving access to
+				 // these member variables. The
+				 // ``SetUp'' class has the sole
+				 // reason to relieve us from the need
+				 // to reiterate these member
+				 // variables and functions that would
+				 // be necessary in all such
+				 // classes. In some way, the template
+				 // mechanism here only provides a way
+				 // to have default implementations
+				 // for a number of functions that
+				 // depend on external quantities and
+				 // can thus not be provided using
+				 // normal virtual functions, at least
+				 // not without the help of templates.
+				 //
+				 // However, there might be good
+				 // reasons to actually implement
+				 // classes derived from
+				 // ``Data::SetUpBase'', for example
+				 // if the solution or right hand side
+				 // classes require constructors that
+				 // take arguments, which the
+				 // ``Data::SetUpBase'' class cannot
+				 // provide. In that case, subclassing
+				 // is a worthwhile strategy. Other
+				 // possibilities for special cases
+				 // are to derive from
+				 // ``Data::SetUp<SomeSetUp>'' where
+				 // ``SomeSetUp'' denotes a class, or
+				 // even to explicitly specialize
+				 // ``Data::SetUp<SomeSetUp>''. The
+				 // latter allows to transparently use
+				 // the way the ``SetUp'' class is
+				 // used for other set-ups, but with
+				 // special actions taken for special
+				 // arguments.
+				 //
+				 // A final observation favoring the
+				 // approach taken here is the
+				 // following: we have found numerous
+				 // times that when starting a
+				 // project, the number of parameters
+				 // (usually boundary values, right
+				 // hand side, coarse grid, just as
+				 // here) was small, and the number of
+				 // test cases was small as well. One
+				 // then starts out by handcoding them
+				 // into a number of ``switch''
+				 // statements. Over time, projects
+				 // grow, and so does the number of
+				 // test cases. The number of
+				 // ``switch'' statements grows with
+				 // that, and their length as well,
+				 // and one starts to find ways to
+				 // consider impossible examples where
+				 // domains, boundary values, and
+				 // right hand sides do not fit
+				 // together any more, and starts
+				 // loosing the overview over the
+				 // whole structure. Encapsulating
+				 // everything belonging to a certain
+				 // test case into a structure of its
+				 // own has proven worthwhile for
+				 // this, as it keeps everything that
+				 // belongs to one test case in one
+				 // place. Furthermore, it allows to
+				 // put these things all in one or
+				 // more files that are only devoted
+				 // to test cases and their data,
+				 // without having to bring their
+				 // actual implementation into contact
+				 // with the rest of the program.
 
 
 
@@ -1503,17 +1900,25 @@ namespace LaplaceSolver
 				     // primal finite element
 				     // space. Fortunately, the
 				     // library provides functions for
-				     // these two actions.
+				     // these two actions. (In
+				     // general, for transformations
+				     // between different finite
+				     // elements, the ``FETools''
+				     // namespace provides a number of
+				     // functions.)
     Vector<double> primal_solution (DualSolver<dim>::dof_handler.n_dofs());
     FETools::interpolate (PrimalSolver<dim>::dof_handler,
 			  PrimalSolver<dim>::solution,
 			  DualSolver<dim>::dof_handler,
 			  primal_solution);    
     Vector<double> dual_weights (DualSolver<dim>::dof_handler.n_dofs());
-    FETools::interpolation_difference (DualSolver<dim>::dof_handler,
-				       DualSolver<dim>::solution,
-				       *PrimalSolver<dim>::fe,
-				       dual_weights);
+//      FETools::interpolation_difference (DualSolver<dim>::dof_handler,
+//  				       DualSolver<dim>::solution,
+//  				       *PrimalSolver<dim>::fe,
+//  				       dual_weights);
+    dual_weights = DualSolver<dim>::solution;
+    abort (); // check Galerkin orthogonality, also for hanging nodes!
+    
     
 				     // Then we set up a map between
 				     // face iterators and their jump
@@ -2197,73 +2602,22 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 
 
 
-void
-create_triangulation (Triangulation<2> &tria)
-{
-  const Point<2>
-    vertices[16] = {  Point<2> (-1.,   -1.),
-		      Point<2> (-1./3, -1.),
-		      Point<2> (+1./3, -1.),
-		      Point<2> (+1,    -1.),
-		      Point<2> (-1.,   -1./3.),
-		      Point<2> (-1./3, -1./3.),
-		      Point<2> (+1./3, -1./3.),
-		      Point<2> (+1,    -1./3.),
-		      Point<2> (-1.,   1./3.),
-		      Point<2> (-1./3, 1./3.),
-		      Point<2> (+1./3, 1./3.),
-		      Point<2> (+1,    1./3.),
-		      Point<2> (-1.,   1.),
-		      Point<2> (-1./3, 1.),
-		      Point<2> (+1./3, 1.),
-		      Point<2> (+1,    1.)    };
-  
-  const int cell_vertices[8][4] = {{0, 1, 5, 4},
-				   {1, 2, 6, 5},
-				   {2, 3, 7, 6},
-				   {4, 5, 9, 8},
-				   {6, 7, 11, 10},
-				   {8,9,13,12},
-				   {9,10,14,13},
-				   {10,11,15,14}};
-
-  std::vector<CellData<2> > cells (8, CellData<2>());
-  
-  for (unsigned int i=0; i<8; ++i) 
-    {
-      for (unsigned int j=0; j<4; ++j)
-	cells[i].vertices[j] = cell_vertices[i][j];
-      cells[i].material_id = 0;
-    };
-  
-  tria.create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[16]),
-			     cells,
-			     SubCellData());       // no boundary information
-};
-
-
 
 template <int dim>
-void solve_problem (const std::string &solver_name) 
+void solve_problem ()
 {
-  const std::string header = "Running tests with \"" + solver_name +
-			     "\" refinement criterion:";
-  std::cout << header << std::endl
-	    << std::string (header.size(), '-') << std::endl;
-
   Triangulation<dim> triangulation (Triangulation<dim>::maximum_smoothing);
-//  create_triangulation (triangulation);
-  GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (5);
   const FE_Q<dim>          primal_fe(1);
   const FE_Q<dim>          dual_fe(2);
   const QGauss4<dim>       quadrature;
   const QGauss4<dim-1>     face_quadrature;
 
   const Data::SetUpBase<dim> *data =
-    new Data::SetUp<Data::CurvedRidges<dim>,dim> ();
+    new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
 
-  const Point<dim> evaluation_point(0.5,0.5);
+  data->create_coarse_grid (triangulation);
+  
+  const Point<dim> evaluation_point(3./4.,3./4.);
   const DualFunctional::PointValueEvaluation<dim>
     dual_functional (evaluation_point);
   
@@ -2274,15 +2628,18 @@ void solve_problem (const std::string &solver_name)
 						     quadrature,
 						     face_quadrature,
 						     data->get_right_hand_side(),
-						     data->get_solution(),
+						     data->get_boundary_values(),
 						     dual_functional);
 
   TableHandler results_table;
   Evaluation::PointValueEvaluation<dim>
-    postprocessor1 (Point<dim>(0.5,0.5), results_table);
+    postprocessor1 (Point<dim>(3./4.,3./4.), results_table);
+  Evaluation::GridOutput<dim>
+    postprocessor2 ("grid");
 
   std::list<Evaluation::EvaluationBase<dim> *> postprocessor_list;
   postprocessor_list.push_back (&postprocessor1);
+  postprocessor_list.push_back (&postprocessor2);  
 
   run_simulation (*solver, postprocessor_list);
 
@@ -2300,7 +2657,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      solve_problem<2> ("global");
+      solve_problem<2> ();
 //      solve_problem<2> ("kelly");      
     }
   catch (std::exception &exc)
