@@ -137,7 +137,7 @@ BlockIndices<n_blocks>::reinit (const vector<unsigned int> &n)
 template <int n_blocks>
 inline
 pair<unsigned int,unsigned int>
-BlockIndices<n_blocks>::find (const unsigned int i) const
+BlockIndices<n_blocks>::global_to_local (const unsigned int i) const
 {
   Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
 
