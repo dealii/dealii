@@ -17,23 +17,15 @@
 
 
 
-template<typename number> static
-number power(number x, unsigned int y)
+template <int dim>
+unsigned int TensorProductPolynomials<dim>::power(const unsigned int x,
+						  const unsigned int y)
 {
-  number value=1;
+  unsigned int value=1;
   for (unsigned int i=0; i<y; ++i)
     value*=x;
   return value;
 }
-
-
-
-template <int dim>
-TensorProductPolynomials<dim>::TensorProductPolynomials(
-  const std::vector<SmartPointer<Polynomial<double> > > &pols):
-		polynomials(pols),
-		n_tensor_pols(power(polynomials.size(), dim))
-{}
 
 
 template <int dim>
@@ -83,7 +75,7 @@ void TensorProductPolynomials<dim>::compute(
       std::vector<std::vector<double> > &v_d=v[d];
       Assert(v_d.size()==n_pols, ExcInternalError());
       for (unsigned int i=0; i<n_pols; ++i)
-	polynomials[i]->value(p(d), v_d[i]);
+	polynomials[i].value(p(d), v_d[i]);
     }
   
   if (update_values)

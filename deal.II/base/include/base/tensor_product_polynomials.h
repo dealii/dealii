@@ -43,7 +43,8 @@ class TensorProductPolynomials
 				      * and will be copied into the
 				      * member variable @p{polynomials}.
 				      */
-    TensorProductPolynomials(const std::vector<SmartPointer<Polynomial<double> > > &pols);
+    template<class Pol>
+    TensorProductPolynomials(const std::vector<Pol> &pols);
 
 				     /**
 				      * Calculates the polynomials
@@ -78,10 +79,11 @@ class TensorProductPolynomials
 	    
   private:
 				     /**
-				      * Pointer to the @p{polynomials}
-				      * given to the constructor.
+				      * Copy of the vector @p{pols} of
+				      * polynomials given to the
+				      * constructor.
 				      */
-    std::vector<SmartPointer<Polynomial<double> > > polynomials;
+    std::vector<Polynomial<double> > polynomials;
 
 				     /**
 				      * Number of tensor product
@@ -89,9 +91,22 @@ class TensorProductPolynomials
 				      * polynomials this is $n^dim$.
 				      */
     const unsigned int n_tensor_pols;
+
+
+    static unsigned int power(const unsigned int x, const unsigned int y);
 };
 
 
+
+
+
+template <int dim>
+template <class Pol>
+TensorProductPolynomials<dim>::TensorProductPolynomials(
+  const std::vector<Pol> &pols):
+		polynomials (pols.begin(), pols.end()),
+		n_tensor_pols(power(pols.size(), dim))
+{}
 
 
 
