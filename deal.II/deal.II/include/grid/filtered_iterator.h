@@ -349,7 +349,7 @@ namespace IteratorFilters
  * FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
  *   cell (FilteredIterator::SubdomainEqualTo(3)),
  *   endc (FilteredIterator::SubdomainEqualTo(3), tria.end());
- * cell.set_to_next_positive (tria.begin_active(3));
+ * cell.set_to_next_positive (tria.begin_active());
  * for (; cell!=endc; ++cell)
  *   assemble_local_matrix (cell);
  * @endverbatim
