@@ -7,6 +7,7 @@
 #include <grid/dof_constraints.h>
 #include <fe/fe.h>
 #include <numerics/dof_renumbering.h>
+#include <basic/dof_tools.h>
 #include <lac/sparsematrix.h>
 
 #include <vector>
@@ -23,7 +24,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
 				   // make the connection graph
   SparseMatrixStruct sparsity (dof_handler.n_dofs(),
 			       dof_handler.max_couplings_between_dofs());
-  dof_handler.make_sparsity_pattern (sparsity);
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity);
 
   if (use_constraints) 
     {

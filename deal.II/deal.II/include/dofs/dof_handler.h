@@ -202,28 +202,6 @@ class DoFDimensionInfo<3> {
  * into new degree of freedom indices.
  *
  *
- * \subsection{Setting up sparsity patterns}
- *
- * When assembling system matrices, the entries are usually of the form
- * $a_{ij} = a(\phi_i, \phi_j)$, where $a$ is a bilinear functional, often an
- * integral. When using sparse matrices, we therefore only need to reserve space
- * for those $a_{ij}$ only, which are nonzero, which is the same as to say that
- * that the basis functions $\phi_i$ and $\phi_j$ have a nonempty intersection of
- * their support. Since the support of basis functions is bound only on cells
- * on which they are located or to which they are adjacent, to determine the
- * sparsity pattern it is sufficient to loop over all cells and connect all
- * basis functions on each cell with all other basis functions on that cell.
- * There may be finite elements for which not all basis functions on a cell
- * connect with each other, but no use of this case is made since no examples
- * where this occurs are known to the author.
- *
- * When setting up sparsity patterns for matrices on the boundary, the same
- * procedure is done, except for the fact that the loop only goes over faces
- * on the boundary and the basis functions thereon. It is assumed that all
- * other basis functions on a cell adjacent to the boundary vanish at the
- * boundary itself, except for those which are located on the boundary.
- *
- *
  * \subsection{Boundaries}
  *
  * When projecting the traces of functions to the boundary or parts thereof, one
@@ -432,121 +410,6 @@ class DoFHandler  :  public Subscriptor,
     void make_hanging_node_constraints (ConstraintMatrix &) const;
 
 
-				     /**
-				      * Write the sparsity structure of the
-				      * full matrix including constrained
-				      * degrees of freedom into the
-				      * matrix structure. The sparsity pattern
-				      * does not include entries introduced by
-				      * the elimination of constrained nodes.
-				      * The sparsity
-				      * pattern is not compressed, since if
-				      * you want to call
-				      * #ConstraintMatrix::condense(1)#
-				      * afterwards, new entries have to be
-				      * added. However, if you don't want to call
-				      * #ConstraintMatrix::condense(1)#, you
-				      * have to compress the matrix yourself,
-				      * using #SparseMatrixStruct::compress()#.
-				      */
-    void make_sparsity_pattern (SparseMatrixStruct &) const;
-
-				     /**
-				      * This function does mistly the same as
-				      * the above one, but it is specialized for
-				      * mixed finite elements and allows to
-				      * specify which variables couple in which
-				      * equation. For example, if wanted to solve
-				      * the Stokes equations,
-				      * \begin{verbatim}
-				      *    -\Delta \vec u + \nabla p = 0,
-				      *    \div u                    = 0
-				      * \end{verbatim}
-				      * in, say, two space dimensions, using
-				      * nonstabilized Q2/Q2/Q1 mixed elements
-				      * (i.e. using the #FESystem# class), then
-				      * you don't want all degrees of freedom
-				      * to couple in each equation. You rather
-				      * may want to give the following pattern
-				      * of couplings:
-				      * \begin{verbatim}
-				      *    1  0  1
-				      *    0  1  1
-				      *    1  1  0
-				      * \end{verbatim}
-				      * where "1" indicates that two variables
-				      * (i.e. components of the #FESystem#)
-				      * couple in the respective equation, and
-				      * a "0" means no coupling, in which case
-				      * it is not necessary to allocate space
-				      * in the matrix structure. Obviously, the
-				      * mask refers to components of the
-				      * composed #FESystem#, rather than to the
-				      * degrees of freedom contained in there.
-				      *
-				      * This function is designed to accept
-				      * a mask, like the one shown above,
-				      * through the #mask# parameter, which
-				      * contains boolean values. It builds
-				      * the matrix structure just like the
-				      * previous function, but does not create
-				      * elements if not specified by the mask.
-				      */
-    void make_sparsity_pattern (const vector<vector<bool> > &mask,
-				SparseMatrixStruct          &) const;
-
-    				     /**
-				      * Write the sparsity structure of the
-				      * matrix composed of the basis functions
-				      * on the boundary into the
-				      * matrix structure. The sparsity pattern
-				      * does not include entries introduced by
-				      * the elimination of constrained nodes.
-				      * The sparsity
-				      * pattern is not compressed, since if
-				      * you want to call
-				      * #ConstraintMatrix::condense(1)#
-				      * afterwards, new entries have to be
-				      * added. However, if you don't want to call
-				      * #ConstraintMatrix::condense(1)#, you
-				      * have to compress the matrix yourself,
-				      * using #SparseMatrixStruct::compress()#.
-				      *
-				      * Since this function is obviously useless
-				      * in one spatial dimension, it is not
-				      * implemented.
-				      */
-    void make_boundary_sparsity_pattern (const vector<int> &dof_to_boundary_mapping,
-					 SparseMatrixStruct &) const; 
-
-				     /**
-				      * Write the sparsity structure of the
-				      * matrix composed of the basis functions
-				      * on the boundary into the
-				      * matrix structure. In contrast to the
-				      * previous function, only those parts
-				      * of the boundary are considered of which
-				      * the boundary indicator is listed in the
-				      * set of numbers passed to this function.
-				      *
-				      * In fact, rather than a #set# of boundary
-				      * indicators, a #map# needs to be passed,
-				      * since most of the functions handling with
-				      * boundary indicators take a mapping of
-				      * boundary indicators and the respective
-				      * boundary functions. The boundary function,
-				      * however, is ignored in this function.
-				      * If you have no functions at hand, but only
-				      * the boundary indicators, set the function
-				      * pointers to null pointers.
-				      *
-				      * Since this function is obviously useless
-				      * in one spatial dimension, it is not
-				      * implemented.
-				      */
-    void make_boundary_sparsity_pattern (const FunctionMap  &boundary_indicators,
-					 const vector<int>  &dof_to_boundary_mapping,
-					 SparseMatrixStruct &sparsity) const; 
 
     
 				     /**
@@ -1270,13 +1133,6 @@ class DoFHandler  :  public Subscriptor,
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcDifferentDimensions,
-		    int, int,
-		    << "One dimension of the matrices is differing: "
-		    << arg1 << " vs. " << arg2);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcNoFESelected);
     				     /**
 				      * Exception
@@ -1318,13 +1174,6 @@ class DoFHandler  :  public Subscriptor,
 		    int,
 		    << "The given list of new dof indices is not consecutive: "
 		    << "the index " << arg1 << " does not exist.");
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidMaskDimension,
-		    int, int,
-		    << "The dimension of the mask " << arg1 << " does not match"
-		    << " the number of components in the finite element object.");    
 				     /**
 				      * Exception
 				      */

@@ -1544,9 +1544,9 @@ void MGDoFHandler<dim>::make_sparsity_pattern (const unsigned int  level,
 					       SparseMatrixStruct &sparsity) const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (sparsity.n_rows() == n_dofs(level),
-	  ExcDifferentDimensions (sparsity.n_rows(), n_dofs(level)));
+	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs(level)));
   Assert (sparsity.n_cols() == n_dofs(level),
-	  ExcDifferentDimensions (sparsity.n_cols(), n_dofs(level)));
+	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs(level)));
 
   const unsigned int dofs_per_cell = selected_fe->dofs_per_cell;
   vector<int> dofs_on_this_cell(dofs_per_cell);

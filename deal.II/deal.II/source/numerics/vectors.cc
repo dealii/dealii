@@ -14,6 +14,7 @@
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
+#include <basic/dof_tools.h>
 #include <lac/vector.h>
 #include <lac/sparsematrix.h>
 #include <lac/precondition.h>
@@ -386,7 +387,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   SparseMatrixStruct sparsity(dof.n_dofs(),
 			      dof.n_dofs(),
 			      dof.max_couplings_between_dofs());
-  dof.make_sparsity_pattern (sparsity);
+  DoFTools::make_sparsity_pattern (dof, sparsity);
   constraints.condense (sparsity);
   
   SparseMatrix<double> mass_matrix (sparsity);
@@ -645,8 +646,10 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 				   // set up sparsity structure
   SparseMatrixStruct sparsity(dof.n_boundary_dofs(boundary_functions),
 			      dof.max_couplings_between_boundary_dofs());
-  dof.make_boundary_sparsity_pattern (boundary_functions, dof_to_boundary_mapping,
-				      sparsity);
+  DoFTools::make_boundary_sparsity_pattern (dof,
+					    boundary_functions,
+					    dof_to_boundary_mapping,
+					    sparsity);
 
 				   // note: for three or more dimensions, there
 				   // may be constrained nodes on the boundary

@@ -9,6 +9,7 @@
 #include <grid/dof_constraints.h>
 #include <grid/tria_iterator.h>
 #include <basic/data_out.h>
+#include <basic/dof_tools.h>
 #include <base/function.h>
 #include <fe/fe.h>
 #include <base/quadrature.h>
@@ -36,7 +37,8 @@ ProblemBase<dim>::ProblemBase () :
 
 template <int dim>
 void ProblemBase<dim>::set_tria_and_dof (Triangulation<dim> *t,
-					 DoFHandler<dim>    *d) {
+					 DoFHandler<dim>    *d)
+{
   tria        = t;
   dof_handler = d;
 
@@ -88,7 +90,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
   constraints.clear ();
   dof_handler->make_hanging_node_constraints (constraints);
   constraints.close ();
-  dof_handler->make_sparsity_pattern (system_sparsity);
+  DoFTools::make_sparsity_pattern (*dof_handler, system_sparsity);
   constraints.condense (system_sparsity);
 
 				   // reinite system matrix
