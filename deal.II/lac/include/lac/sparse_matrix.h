@@ -2042,9 +2042,7 @@ namespace internals
     Iterator<number,Constness>::
     operator == (const Iterator& other) const
     {
-      return (&accessor.get_matrix() == &other.accessor.get_matrix() &&
-              accessor.row()   == other.accessor.row() &&
-              accessor.index() == other.accessor.index());
+      return (accessor == other.accessor);
     }
 
 
@@ -2067,9 +2065,7 @@ namespace internals
       Assert (accessor.matrix == other.accessor.matrix,
               ExcInternalError());
       
-      return (accessor.row() < other.accessor.row() ||
-              (accessor.row() == other.accessor.row() &&
-               accessor.index() < other.accessor.index()));
+      return (accessor < other.accessor);
     }
     
   }

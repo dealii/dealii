@@ -66,30 +66,75 @@ namespace internals
                                          /**
                                           * Row number of the element
                                           * represented by this
-                                          * object.
+                                          * object. This
+                                          * function can only be called for
+                                          * entries for which is_valid_entry() is
+                                          * true.
                                           */
-        unsigned int row() const;
+        unsigned int row () const;
 
                                          /**
                                           * Index in row of the element
                                           * represented by this
-                                          * object.
+                                          * object. This
+                                          * function can only be called for
+                                          * entries for which is_valid_entry() is
+                                          * true.
                                           */
-        unsigned int index() const;
+        unsigned int index () const;
 
                                          /**
-                                          * Column number of the
-                                          * element represented by
-                                          * this object.
-                                          *
-                                          * Note that if the underlying
-                                          * sparsity pattern has not yet been
-                                          * compressed, then this function may
-                                          * return @p
-                                          * SparsityPattern::invalid_index for
-                                          * certain elements of the matrix.
+                                          * Column number of the element
+                                          * represented by this object. This
+                                          * function can only be called for
+                                          * entries for which is_valid_entry() is
+                                          * true.
                                           */
-        unsigned int column() const;
+        unsigned int column () const;
+
+                                         /**
+                                          * Return whether the sparsity
+                                          * pattern entry pointed to by this
+                                          * iterator is valid or not. Note
+                                          * that after compressing the
+                                          * sparsity pattern, all entries are
+                                          * valid. However, before
+                                          * compression, the sparsity pattern
+                                          * allocated some memory to be used
+                                          * while still adding new nonzero
+                                          * entries; if you create iterators
+                                          * in this phase of the sparsity
+                                          * pattern's lifetime, you will
+                                          * iterate over elements that are not
+                                          * valid. If this is so, then this
+                                          * function will return false.
+                                          */
+        bool is_valid_entry () const;
+
+
+                                         /**
+                                          * Comparison. True, if
+                                          * both iterators point to
+                                          * the same matrix
+                                          * position.
+                                          */
+	bool operator == (const Accessor &) const;
+
+
+                                         /**
+                                          * Comparison
+                                          * operator. Result is true
+                                          * if either the first row
+                                          * number is smaller or if
+                                          * the row numbers are
+                                          * equal and the first
+                                          * index is smaller.
+                                          *
+                                          * This function is only valid if
+                                          * both iterators point into the same
+                                          * sparsity pattern.
+                                          */
+	bool operator < (const Accessor &) const;
 
                                          /**
                                           * Move the accessor to the next
@@ -102,7 +147,12 @@ namespace internals
                                           * use it in your own programs.
                                           */
         void advance ();
-	
+
+                                         /**
+                                          * Exception
+                                          */
+        DeclException0 (ExcInvalidIterator);
+        
       protected:
                                          /**
                                           * The sparsity pattern we operate on
@@ -1529,6 +1579,8 @@ namespace internals
     unsigned int
     Accessor::row() const
     {
+      Assert (is_valid_entry() == true, ExcInvalidIterator());
+
       return a_row;
     }
 
@@ -1537,6 +1589,8 @@ namespace internals
     unsigned int
     Accessor::column() const
     {
+      Assert (is_valid_entry() == true, ExcInvalidIterator());
+      
       return (sparsity_pattern
               ->get_column_numbers()[sparsity_pattern
                                      ->get_rowstart_indices()[a_row]+a_index]);
@@ -1547,10 +1601,48 @@ namespace internals
     unsigned int
     Accessor::index() const
     {
+      Assert (is_valid_entry() == true, ExcInvalidIterator());
+
       return a_index;
     }
 
 
+
+    inline
+    bool
+    Accessor::is_valid_entry () const
+    {
+      return (sparsity_pattern
+              ->get_column_numbers()[sparsity_pattern
+                                     ->get_rowstart_indices()[a_row]+a_index]
+              != SparsityPattern::invalid_entry);
+    }
+
+
+
+    inline
+    bool
+    Accessor::operator == (const Accessor& other) const
+    {      
+      return (sparsity_pattern  == other.sparsity_pattern &&
+              a_row   == other.a_row &&
+              a_index == other.a_index);
+    }
+
+
+
+    inline
+    bool
+    Accessor::operator < (const Accessor& other) const
+    {      
+      Assert (sparsity_pattern == other.sparsity_pattern,
+              ExcInternalError());
+      
+      return (a_row < other.a_row ||
+              (a_row == other.a_row &&
+               a_index < other.a_index));
+    }
+    
 
     inline
     void
@@ -1629,9 +1721,7 @@ namespace internals
     bool
     Iterator::operator == (const Iterator& other) const
     {
-      return (accessor.sparsity_pattern  == other.accessor.sparsity_pattern &&
-              accessor.row()   == other.accessor.row() &&
-              accessor.index() == other.accessor.index());
+      return (accessor == other.accessor);
     }
 
 
@@ -1648,12 +1738,7 @@ namespace internals
     bool
     Iterator::operator < (const Iterator& other) const
     {
-      Assert (accessor.sparsity_pattern == other.accessor.sparsity_pattern,
-              ExcInternalError());
-      
-      return (accessor.row() < other.accessor.row() ||
-              (accessor.row() == other.accessor.row() &&
-               accessor.index() < other.accessor.index()));
+      return accessor < other.accessor;
     }
     
   }
