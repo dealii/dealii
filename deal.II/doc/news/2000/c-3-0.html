@@ -201,6 +201,12 @@
        </p>
 
   <li> <p> 
+       Change: <code class="member">DoFTools::make_hanging_node_constraints ()</code>
+       does not use the user flags any more, and can thus run in
+       parallel more than once.
+       </p>
+
+  <li> <p> 
        Extended: <code class="member">DoFTools::make_sparsity_pattern ()</code>
        now accepts a template parameter as sparsity pattern. This
        allows to use this function for the usual 
