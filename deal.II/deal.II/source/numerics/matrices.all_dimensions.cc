@@ -100,15 +100,18 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				       // the gauss step more efficient
       number new_rhs;
       if (matrix.diag_element(dof_number) != 0.0)
-	new_rhs = right_hand_side(dof_number)
-		= dof->second * matrix.diag_element(dof_number);
+        {
+          new_rhs = dof->second * matrix.diag_element(dof_number);
+          right_hand_side(dof_number)
+            = new_rhs;
+        }
       else
 	{
 	  matrix.set (dof_number, dof_number,
                       first_nonzero_diagonal_entry);
 	  new_rhs = right_hand_side(dof_number)
 		  = dof->second * first_nonzero_diagonal_entry;
-	};
+	}
 
 
 				       // if the user wants to have
