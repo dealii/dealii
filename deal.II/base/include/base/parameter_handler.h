@@ -1403,10 +1403,12 @@ class ParameterHandler
 				      * Besides the name and value of
 				      * each entry, the output also
 				      * contains the default value of
-				      * entries as well as the
-				      * documenting string given to
-				      * the @ref{declare_entry}
-				      * function if available.
+				      * entries if it is different
+				      * from the actual value, as well
+				      * as the documenting string
+				      * given to the
+				      * @ref{declare_entry} function
+				      * if available.
 				      */
     std::ostream & print_parameters (std::ostream      &out,
 				     const OutputStyle  style);

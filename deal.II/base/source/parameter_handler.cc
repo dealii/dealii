@@ -921,9 +921,12 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
               out << pd->entries[ptr->first].documentation << ", ";
             
                                              // finally print the
-                                             // default value
-            out << "default: " << pd->entries[ptr->first].value
-                << std::endl;
+                                             // default value, but
+                                             // only if it differs
+                                             // from the actual value
+            if (value != pd->entries[ptr->first].value)
+              out << "default: " << pd->entries[ptr->first].value
+                  << std::endl;
           }
         
         break;
