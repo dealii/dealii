@@ -7,7 +7,7 @@
     <title>The deal.II news page</title>
     <meta name="author" content="Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat and others">
     <meta name="keywords" content="deal.II"></head>
-
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <body>
 
 
@@ -26,6 +26,21 @@ documentation, etc</a>.
 <h3>General</h3>
 
 <ol>
+  <li> <p>
+       New: Output for <a href="http:www.opendx.org">OpenDX</a> has
+       been added. It can be used by choosing output format «dx» (not
+       yet for grid output). The data format is very basic now, but it
+       is planned to improve this to make use of the excellent
+       capabilites of OpenDX.</p>
+       <p>
+       Additionally, a directory <tt>contrib/dx</tt> has been added,
+       containing visual programs for OpenDX. Programs for the
+       existing output of data as a single vector are found in the
+       subdirectory <tt>single</tt>.
+       <br>
+       (GK 2001/12/07)
+       </p>
+
   <li> <p> Fixed: Previously, the $(INCLUDE) variable in Makefiles
        included the values of the $INCLUDE environment variable. This
        is not desirable, since the compiler evaluates that variable
@@ -213,10 +228,9 @@ documentation, etc</a>.
        (WB 2001/09/28)
        </p>
 
-  <li> <p>
-       New: <code class="class">Vector</code>::<code class="member">operator *</code> is now
-       templatized, allowing for scalar products of vectors with
-       different underlying types.
+  <li> <p> New: <code class="class">Vector</code>::<code
+       class="member">operator *</code> is now templatized, allowing
+       for scalar products of vectors with different underlying types.
        <br>
        (WB 2001/09/27)
        </p>
@@ -228,6 +242,26 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Improved: Both functions <code
+       class="class">VectorTools</code>::<code
+       class="member">compute_mean_value</code> take ingoing and
+       outgoing vector types as template arguments. This allows
+       applying them to <code class="class">BlockVector</code>.
+       <br>
+       (GK 2001/12/07)
+       </p>
+
+  <li> <p>
+       New: <code class="class">GridGenerator</code> has a function
+       <code class="member">cylinder</code> for cylinders in three
+       space dimensions. Accoridngly, a class <code
+       class="class">CylinderBoundary</code> has been created.
+       <br>
+       (GK 2001/12/07)
+       </p>
+
+
   <li> <p>
        New: <code class="class">FiniteElement</code>::<code
        class="member">has_support_on_face</code> allows to check
