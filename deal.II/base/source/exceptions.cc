@@ -82,42 +82,70 @@ void ExceptionBase::PrintInfo (std::ostream &out) const
 
 const char * ExceptionBase::what () const throw ()
 {
-				   // have a place where to store the
-				   // description of the exception as a char *
-				   //
-				   // this thing obviously is not multi-threading
-				   // safe, but we don't care about that for now
-				   //
-				   // we need to make this object static, since
-				   // we want to return the data stored in it
-				   // and therefore need a liftime which is
-				   // longer than the execution time of this
-				   // function
-  static std::string description;
-				   // convert the messages printed by the
-				   // exceptions into a std::string
+                                   // if we say that this function
+                                   // does not throw exceptions, we
+                                   // better make sure it does not
+  try 
+    {
+                                       // have a place where to store the
+                                       // description of the exception as
+                                       // a char *
+                                       //
+                                       // this thing obviously is not
+                                       // multi-threading safe, but we
+                                       // don't care about that for now
+                                       //
+                                       // we need to make this object
+                                       // static, since we want to return
+                                       // the data stored in it and
+                                       // therefore need a lifetime which
+                                       // is longer than the execution
+                                       // time of this function
+      static std::string description;
+                                       // convert the messages printed by
+                                       // the exceptions into a
+                                       // std::string
 #ifdef HAVE_STD_STRINGSTREAM
-  std::ostringstream converter;
+      std::ostringstream converter;
 #else
-  std::ostrstream converter;
+      std::ostrstream converter;
 #endif
 
-  converter << "--------------------------------------------------------"
-	    << std::endl;
-				   // put general info into the std::string
-  PrintExcData (converter);
-				   // put in exception specific data
-  PrintInfo (converter);
+      converter << "--------------------------------------------------------"
+                << std::endl;
+                                       // put general info into the std::string
+      PrintExcData (converter);
+                                       // put in exception specific data
+      PrintInfo (converter);
   
-  converter << "--------------------------------------------------------"
-	    << std::endl;
+      converter << "--------------------------------------------------------"
+                << std::endl;
 #ifndef HAVE_STD_STRINGSTREAM
-  converter << std::ends;
+      converter << std::ends;
 #endif
 
-  description = converter.str();
+      description = converter.str();
 
-  return description.c_str();
+      return description.c_str();
+    }
+  catch (std::exception &exc) 
+    {
+      std::cerr << "*** Exception encountered in exception handling routines ***"
+                << std::endl
+                << "*** Message is "   << std::endl
+                << exc.what ()         << std::endl
+                << "*** Aborting! ***" << std::endl;
+      std::abort ();
+      return 0;
+    }
+  catch (...)
+    {
+      std::cerr << "*** Exception encountered in exception handling routines ***"
+                << std::endl
+                << "*** Aborting! ***" << std::endl;
+      std::abort ();
+      return 0;
+    }
 };
 
 
