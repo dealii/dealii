@@ -177,8 +177,30 @@ template <int dim> class FESubfaceValues;
  *  cells at hand and need not think about explicitely determining whether
  *  a face was refined or not. The same applies for boundary faces, see
  *  above.
- *  
- *  @author Wolfgang Bangerth, 1998, 1999; parallelization by Thomas Richter, 2000
+ *
+ *
+ *  @sect3{Multiple solution vectors}
+ *
+ *  In some cases, for example in time-dependent problems, one would
+ *  like to compute the error estimates for several solution vectors
+ *  on the same grid at once, with the same coefficients, etc,
+ *  e.g. for the solutions on several successive time steps. One could
+ *  then call the functions of this class several times for each
+ *  solution. However, it is observed that the largest factor in the
+ *  computation of the error estimates (in terms of computing time) is
+ *  initialization of @ref{FEFaceValues} and @ref{FESubFaceValues}
+ *  objects, and iterating through all faces and subfaces. If the
+ *  solution vectors live on the same grid, this effort can be reduced
+ *  significantly by treating all solution vectors at the same time,
+ *  initializing the @ref{FEFaceValues} objects only once per cell and
+ *  for all solution vectors at once, and also only looping through
+ *  the triangulation only once. For this reason, besides the
+ *  @p{estimate} function in this class that takes a single input
+ *  vector and returns a single output vector, there is also a
+ *  function that accepts several in- and output vectors at the same
+ *  time. 
+ *
+ *  @author Wolfgang Bangerth, 1998, 1999, 2000; parallelization by Thomas Richter, 2000
  */
 template <int dim>
 class KellyErrorEstimator
@@ -254,7 +276,44 @@ class KellyErrorEstimator
 			  Vector<float>           &error,
 			  const vector<bool>      &component_mask = vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
-			  unsigned int            n_threads = multithread_info.n_default_threads);
+			  unsigned int             n_threads = multithread_info.n_default_threads);
+
+				     /**
+				      * Same function as above, but
+				      * accepts more than one solution
+				      * vectors and returns one error
+				      * vector for each solution
+				      * vector. For the reason of
+				      * existence of this function,
+				      * see the general documentation
+				      * of this class.
+				      *
+				      * Since we do not want to force
+				      * the user of this function to
+				      * copy around their solution
+				      * vectors, the vector of
+				      * solution vectors takes
+				      * pointers to the solutions,
+				      * rather than being a vector of
+				      * vectors. This makes it simpler
+				      * to have the solution vectors
+				      * somewhere in memory, rather
+				      * than to have them collected
+				      * somewhere special. (Note that
+				      * it is not possible to
+				      * construct of vector of
+				      * references, so we had to use a
+				      * vector of pointers.)
+				      */
+    static void estimate (const DoFHandler<dim>               &dof,
+			  const Quadrature<dim-1>             &quadrature,
+			  const FunctionMap                   &neumann_bc,
+			  const vector<const Vector<double>*> &solutions,
+			  vector<Vector<float>*>              &errors,
+			  const vector<bool>                  &component_mask = vector<bool>(),
+			  const Function<dim>                 *coefficients   = 0,
+			  unsigned int                         n_threads = multithread_info.n_default_threads);
+
     
 				     /**
 				      * Exception
@@ -272,7 +331,21 @@ class KellyErrorEstimator
 				      * Exception
 				      */
     DeclException0 (ExcInvalidBoundaryFunction);
-
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcIncompatibleNumberOfElements,
+		    int, int,
+		    << "The number of elements " << arg1 << " and " << arg2
+		    << " of the vectors do not match!");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidSolutionVector);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNoSolutions);
 
   private:
 
@@ -281,11 +354,12 @@ class KellyErrorEstimator
 				      * Declare a data type to
 				      * represent the mapping between
 				      * faces and integrated jumps of
-				      * gradients. See the general
-				      * documentation of this class
-				      * for more information.
+				      * gradients of each of the
+				      * solution vectors. See the
+				      * general documentation of this
+				      * class for more information.
 				      */
-    typedef map<typename DoFHandler<dim>::face_iterator,double> FaceIntegrals;
+    typedef map<typename DoFHandler<dim>::face_iterator,vector<double> > FaceIntegrals;
 
 
 				     /**
@@ -341,13 +415,14 @@ class KellyErrorEstimator
 				      */
     struct Data
     {
-	const DoFHandler<dim>   &dof_handler;
-	const Quadrature<dim-1> &quadrature;
-	const FunctionMap       &neumann_bc;
-	const Vector<double>    &solution;
-	const vector<bool>       component_mask;
-	const Function<dim>     *coefficients;
-	const unsigned int       n_threads;
+	const DoFHandler<dim>               &dof_handler;
+	const Quadrature<dim-1>             &quadrature;
+	const FunctionMap                   &neumann_bc;
+	const vector<const Vector<double>*> &solutions;
+	const vector<bool>                   component_mask;
+	const Function<dim>                 *coefficients;
+	const unsigned int                   n_threads;
+	const unsigned int                   n_solution_vectors;
 
 					 /**
 					  * Reference to the global
@@ -359,8 +434,9 @@ class KellyErrorEstimator
 					 /**
 					  * A vector to store the jump
 					  * of the normal vectors in
-					  * the quadrature points
-					  * (i.e. a temporary
+					  * the quadrature points for
+					  * each of the solution
+					  * vectors (i.e. a temporary
 					  * value). This vector is not
 					  * allocated inside the
 					  * functions that use it, but
@@ -371,26 +447,30 @@ class KellyErrorEstimator
 					  * synchronisation makes
 					  * things even slower.
 					  */ 
-	vector<vector<double> >         phi;
+	vector<vector<vector<double> > >         phi;
 
 					 /**
 					  * A vector for the gradients of
 					  * the finite element function
 					  * on one cell
 					  *
-					  * Let psi be a short name for
-					  * @p{a grad u_h}, where the second
-					  * index be the component of the
-					  * finite element, and the first
+					  * Let psi be a short name
+					  * for @p{a grad u_h}, where
+					  * the third index be the
+					  * component of the finite
+					  * element, and the second
 					  * index the number of the
-					  * quadrature point.
+					  * quadrature point. The
+					  * first index denotes the
+					  * index of the solution
+					  * vector.
 					  */
-	vector<vector<Tensor<1,dim> > > psi;
+	vector<vector<vector<Tensor<1,dim> > > > psi;
 
 					 /**
 					  * The same vector for a neighbor cell
 					  */
-	vector<vector<Tensor<1,dim> > > neighbor_psi;
+	vector<vector<vector<Tensor<1,dim> > > > neighbor_psi;
 
 					 /**
 					  * The normal vectors of the finite
@@ -420,14 +500,14 @@ class KellyErrorEstimator
 					  * class Data. All variables are
 					  * passed as references.
 					  */
-	Data(const DoFHandler<dim>   &dof,
-	     const Quadrature<dim-1> &quadrature,
-	     const FunctionMap       &neumann_bc,
-	     const Vector<double>    &solution,
-	     const vector<bool>      &component_mask,
-	     const Function<dim>     *coefficients,
-	     const unsigned int       n_threads,
-	     FaceIntegrals           &face_integrals);
+	Data(const DoFHandler<dim>               &dof,
+	     const Quadrature<dim-1>             &quadrature,
+	     const FunctionMap                   &neumann_bc,
+	     const vector<const Vector<double>*> &solutions,
+	     const vector<bool>                  &component_mask,
+	     const Function<dim>                 *coefficients,
+	     const unsigned int                   n_threads,
+	     FaceIntegrals                       &face_integrals);
     };
 
 
