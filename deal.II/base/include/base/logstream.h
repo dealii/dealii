@@ -96,7 +96,7 @@ class LogStream
 				      * Reroutes cerr to LogStream.
 				      * Works as a switch, turning
 				      * logging of <tt>cerr</tt> on
-				      * and of alternatingly with
+				      * and off alternatingly with
 				      * every call.
 				      */
     void log_cerr ();
@@ -300,6 +300,18 @@ class LogStream
 				      * Time of last output line.
 				      */
     double last_time;
+
+				     /**
+				      * Original buffer of
+				      * <tt>std::cerr</tt>. We store
+				      * the address of that buffer
+				      * when #log_cerr is called, and
+				      * reset it to this value if
+				      * #log_cerr is called a second
+				      * time, or when the destructor
+				      * of this class is run.
+				      */
+    std::ostream::__streambuf_type* old_cerr;
       
                                      /**
 				      * Print head of line. This prints
@@ -317,12 +329,6 @@ class LogStream
 				      */
     template <typename T>
     void print (const T &t);
-				     /**
-				      * Original buffer of
-				      * <tt>cerr</tt> in order to
-				      * leave this class properly.
-				      */
-    std::ostream::__streambuf_type* old_cerr;
 };
 
 
