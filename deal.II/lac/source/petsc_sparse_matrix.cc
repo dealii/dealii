@@ -20,10 +20,74 @@
 
 namespace PETScWrappers
 {
+  SparseMatrix::SparseMatrix ()
+  {
+    const int m=0, n=0, n_nonzero_per_row=0;
+    const int ierr
+      = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
+                        0, &matrix);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
+
+
   SparseMatrix::SparseMatrix (const unsigned int m,
                               const unsigned int n,
                               const unsigned int n_nonzero_per_row,
                               const bool         is_symmetric)
+  {
+    do_reinit (m, n, n_nonzero_per_row, is_symmetric);
+  }
+
+
+
+  SparseMatrix::SparseMatrix (const unsigned int m,
+                              const unsigned int n,
+                              const std::vector<unsigned int> &row_lengths,
+                              const bool         is_symmetric)
+  {
+    do_reinit (m, n, row_lengths, is_symmetric);
+  }
+
+
+
+  void
+  SparseMatrix::reinit (const unsigned int m,
+                        const unsigned int n,
+                        const unsigned int n_nonzero_per_row,
+                        const bool         is_symmetric)
+  {
+                                     // get rid of old matrix and generate a
+                                     // new one
+    const int ierr = MatDestroy (matrix);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));    
+    
+    do_reinit (m, n, n_nonzero_per_row, is_symmetric);
+  }
+
+
+
+  void
+  SparseMatrix::reinit (const unsigned int m,
+                        const unsigned int n,
+                        const std::vector<unsigned int> &row_lengths,
+                        const bool         is_symmetric)
+  {
+                                     // get rid of old matrix and generate a
+                                     // new one
+    const int ierr = MatDestroy (matrix);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));    
+
+    do_reinit (m, n, row_lengths, is_symmetric);
+  }  
+
+
+
+  void
+  SparseMatrix::do_reinit (const unsigned int m,
+                           const unsigned int n,
+                           const unsigned int n_nonzero_per_row,
+                           const bool         is_symmetric)
   {
                                      // use the call sequence indicating only
                                      // a maximal number of elements per row
@@ -44,10 +108,11 @@ namespace PETScWrappers
 
 
 
-  SparseMatrix::SparseMatrix (const unsigned int m,
-                              const unsigned int n,
-                              const std::vector<unsigned int> &row_lengths,
-                              const bool         is_symmetric)
+  void
+  SparseMatrix::do_reinit (const unsigned int m,
+                           const unsigned int n,
+                           const std::vector<unsigned int> &row_lengths,
+                           const bool         is_symmetric)
   {
     Assert (row_lengths.size() == m,
             ExcDimensionMismatch (row_lengths.size(), m));

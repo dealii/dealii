@@ -41,6 +41,12 @@ namespace PETScWrappers
   {
     public:
                                        /**
+                                        * Default constructor. Create an empty
+                                        * matrix.
+                                        */
+      SparseMatrix ();
+      
+                                       /**
                                         * Create a sparse matrix of dimensions
                                         * <tt>m</tt> times <tt>n</tt>, with an
                                         * initial guess of
@@ -98,6 +104,62 @@ namespace PETScWrappers
                     const unsigned int               n,
                     const std::vector<unsigned int> &row_lengths,
                     const bool                       is_symmetric = false);
+
+                                       /**
+                                        * Set all matrix entries to zero, but
+                                        * retain the sparsity pattern. This
+                                        * function simply calls the respective
+                                        * function of the base class.
+                                        */
+      void reinit ();
+
+                                       /**
+                                        * Throw away the present matrix and
+                                        * generate one that has the same
+                                        * properties as if it were created by
+                                        * the constructor of this class with
+                                        * the same argument list as the
+                                        * present function.
+                                        */
+      void reinit (const unsigned int m,
+                   const unsigned int n,
+                   const unsigned int n_nonzero_per_row,
+                   const bool         is_symmetric = false);
+
+                                       /**
+                                        * Throw away the present matrix and
+                                        * generate one that has the same
+                                        * properties as if it were created by
+                                        * the constructor of this class with
+                                        * the same argument list as the
+                                        * present function.
+                                        */
+      void reinit (const unsigned int               m,
+                   const unsigned int               n,
+                   const std::vector<unsigned int> &row_lengths,
+                   const bool                       is_symmetric = false);
+
+    private:
+
+                                       /**
+                                        * Do the actual work for the
+                                        * respective reinit() function and the
+                                        * matching constructor, i.e. create a
+                                        * matrix. Getting rid of the previous
+                                        * matrix is left to the caller.
+                                        */
+      void do_reinit (const unsigned int m,
+                      const unsigned int n,
+                      const unsigned int n_nonzero_per_row,
+                      const bool         is_symmetric = false);
+
+                                       /**
+                                        * Same as previous function.
+                                        */
+      void do_reinit (const unsigned int               m,
+                      const unsigned int               n,
+                      const std::vector<unsigned int> &row_lengths,
+                      const bool                       is_symmetric = false);
   };
 }
 
