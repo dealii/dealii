@@ -1,6 +1,6 @@
 //----------------------------  normals_2.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    normals_2.cc,v 1.1 2003/10/19 22:29:38 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -117,7 +117,7 @@ int main ()
     coarse_grid.set_boundary (0, boundary);
     check (coarse_grid, 1);
     check (coarse_grid, 2);
-    check (coarse_grid, 4);
+    check (coarse_grid, 3);
   }
   
 }
