@@ -715,7 +715,10 @@ DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
 }
 
 
-
+// for whatever reason, the random_shuffle function used below needs
+// lrand48 to be declared (rather than do so itself. however,
+// inclusion of <cstdlib> or <stdlib.h> does not help, so we declare
+// that function ourselves
 extern "C" long int lrand48 (void);
 
 
@@ -727,6 +730,7 @@ DoFRenumbering::random (DoFHandler<dim> &dof_handler)
   random_shuffle (new_indices.begin(), new_indices.end());
   dof_handler.renumber_dofs(new_indices);  
 };
+
 
 
 
