@@ -896,7 +896,7 @@ template <typename Number>
 inline
 Vector<Number> & Vector<Number>::operator /= (const Number factor)
 {
-  scale (1./factor);
+  *this *= (1./factor);
   return *this;
 }
 
