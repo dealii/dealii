@@ -159,14 +159,14 @@ LogStream::print_line_head()
 /*
  * The following lines were used for debugging a memory leak.
  * They work on Linux, not on Solaris, since the /proc filesystem
- * on Solaris is quite cryptic.
+ * on Solaris is quite cryptic. For other systems, we don't know.
  *
  * Unfortunately, the information in /proc/pid/stat is updated slowly,
  * therefore, the information is quite unreliable.
  *
  * Furthermore, the constructor of ifstream caused another memory leak.
  *
- * Still, this code might be usefull sometimes, so I kept it here.
+ * Still, this code might be useful sometimes, so I kept it here.
  * When we have more information about the kernel, this should be
  * incorporated properly. Suggestions are welcome!
  */
