@@ -21,9 +21,9 @@ report:
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
-	echo =======Report: all-headers =======
+	@echo =======Report: all-headers =======
 	@today=`date -u +"%Y-%m-%d %H:%M"` ; \
-	 if $(MAKE) all-headers ; then \
+	 if (($(MAKE) all-headers 2>&1) > /dev/null) ; then \
 		echo $$today + all-headers ; \
 	 else \
 		echo $$today - all-headers ; \
