@@ -213,11 +213,11 @@ void DataOut<dim>::add_data_vector (const dVector &vec,
 	  ExcInvalidVectorSize (vec.size(), dofs->n_dofs()));
   Assert (name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				 "0123456789_") == string::npos,
+				 "0123456789_<>()") == string::npos,
 	  ExcInvalidCharacter (name));
   Assert (units.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				  "0123456789_") == string::npos,
+				  "0123456789_<>()") == string::npos,
 	  ExcInvalidCharacter (units));
   
   DataEntry new_entry (&vec, name, units);

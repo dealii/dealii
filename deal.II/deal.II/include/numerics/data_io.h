@@ -404,7 +404,7 @@ class DataOut {
 				      */
     DeclException1 (ExcInvalidCharacter,
 		    string,
-		    << "Please use only the characters [a-zA-Z0-9_] for" << endl
+		    << "Please use only the characters [a-zA-Z0-9_<>()] for" << endl
 		    << "description strings since AVS will only accept these." << endl
 		    << "The string you gave was <" << arg1 << ">.");
     
