@@ -44,12 +44,12 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  vector<Polynomial<double> > p (15);
+  std::vector<Polynomial<double> > p (15);
   for (unsigned int i=0;i<p.size();++i)
     p[i] = Legendre<double>(i);
   
   for (unsigned int i=0;i<p.size();++i)
     for (unsigned int j=0;j<=i;++j)
       deallog << 'P' << i << " * P" << j
-	      << " =" << scalar_product(p[i], p[j]) << endl;
+	      << " =" << scalar_product(p[i], p[j]) << std::endl;
 }
