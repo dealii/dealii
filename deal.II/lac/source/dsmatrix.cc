@@ -405,12 +405,13 @@ dSMatrix::vmult (dVector& dst, const dVector& src) const
   Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionsDontMatch(n(),src.size()));
 
-  for (unsigned int i=0; i<m(); ++i)
+  const unsigned int n_rows = m();
+  for (unsigned int row=0; row<n_rows; ++row)
     {
       double s = 0.;
-      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j) 
+      for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j) 
 	s += val[j] * src(cols->colnums[j]);
-      dst(i) = s;
+      dst(row) = s;
     }
 }
 
@@ -422,11 +423,9 @@ dSMatrix::Tvmult (dVector& dst, const dVector& src) const
   Assert(n() == dst.size(), ExcDimensionsDontMatch(n(),dst.size()));
   Assert(m() == src.size(), ExcDimensionsDontMatch(m(),src.size()));
 
-  unsigned int i;
-  
-  for (i=0;i<n();i++) dst(i) = 0.;
-  
-  for (i=0;i<m();i++)
+  dst.clear ();
+
+  for (unsigned int i=0;i<m();i++)
     {
       for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
