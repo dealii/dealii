@@ -268,7 +268,7 @@ SparsityPattern::reinit (const unsigned int m,
 		    *max_element(row_lengths.begin(), row_lengths.end()));
 
 
-// allocate memory for the rowstart
+				   // allocate memory for the rowstart
 				   // values, if necessary
   if (rows > max_dim)
     {
@@ -333,7 +333,7 @@ SparsityPattern::compress ()
   unsigned int *new_colnums = new unsigned int[nonzero_elements];
 
 
-// reserve temporary storage to
+				   // reserve temporary storage to
 				   // store the entries of one row
   vector<unsigned int> tmp_entries (max_row_length);
   
