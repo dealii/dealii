@@ -307,12 +307,10 @@ inline VECTOR&
 SolverGMRES<VECTOR>::TmpVectors::operator[] (const unsigned int i) const
 {
   Assert (i+offset<data.size(),
-	  ExcIndexRange(i,-offset, data.size()-offset));
+	  ExcIndexRange(i, -offset, data.size()-offset));
   
-  i -= offset;
-
-  Assert (data[i] != 0, ExcNotInitialized());
-  return *data[i];
+  Assert (data[i-offset] != 0, ExcNotInitialized());
+  return *data[i-offset];
 }
 
 
@@ -323,13 +321,12 @@ SolverGMRES<VECTOR>::TmpVectors::operator() (const unsigned int i,
 {
   Assert (i+offset<data.size(),
 	  ExcIndexRange(i,-offset, data.size()-offset));
-  i -= offset;
-  if (data[i] == 0)
+  if (data[i-offset] == 0)
     {
-      data[i] = mem.alloc();
-      data[i]->reinit(temp);
+      data[i-offset] = mem.alloc();
+      data[i-offset]->reinit(temp);
     }
-  return *data[i];
+  return *data[i-offset];
 }
 
 
