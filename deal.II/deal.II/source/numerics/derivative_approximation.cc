@@ -157,7 +157,7 @@ template <>
 inline
 double
 DerivativeApproximation::SecondDerivative<3>::
-derivative_norm (const Derivative &d)
+derivative_norm (const Derivative &)
 {
 /*
   compute the three eigenvalues of the tensor @p{d} and take the
