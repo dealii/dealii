@@ -1,0 +1,32 @@
+
+DEAL::Smoothing on 9
+DEAL::Residual on  9
+DEAL::Restricting  9 to 8
+DEAL::Smoothing on 8
+DEAL::Residual on  8
+DEAL::Restricting  8 to 7
+DEAL::Smoothing on 7
+DEAL::Residual on  7
+DEAL::Restricting  7 to 6
+DEAL::Smoothing on 6
+DEAL::Residual on  6
+DEAL::Restricting  6 to 5
+DEAL::Smoothing on 5
+DEAL::Residual on  5
+DEAL::Restricting  5 to 4
+DEAL::Smoothing on 4
+DEAL::Residual on  4
+DEAL::Restricting  4 to 3
+DEAL::Solving on   3
+DEAL::Prolongating 3 to 4
+DEAL::Smoothing on 4
+DEAL::Prolongating 4 to 5
+DEAL::Smoothing on 5
+DEAL::Prolongating 5 to 6
+DEAL::Smoothing on 6
+DEAL::Prolongating 6 to 7
+DEAL::Smoothing on 7
+DEAL::Prolongating 7 to 8
+DEAL::Smoothing on 8
+DEAL::Prolongating 8 to 9
+DEAL::Smoothing on 9

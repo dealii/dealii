@@ -17,24 +17,24 @@
 #include <lac/precondition.h>
 #include <lac/mgbase.h>
 
-#define TYPE  long double
-#define ACCURACY 1.e-20
+#define TYPE  double
+#define ACCURACY 1.e-5
 
-template<class VECTOR>
-void print_vector(ostream& s, const VECTOR& v)
-{
-  const unsigned int n = (unsigned int)(sqrt(v.size())+.3);
-  unsigned int k=0;
+// template<class VECTOR>
+// void print_vector(ostream& s, const VECTOR& v)
+// {
+//   const unsigned int n = (unsigned int)(sqrt(v.size())+.3);
+//   unsigned int k=0;
   
-  for (unsigned int i=0;i<n;++i)
-    {
-      for (unsigned int j=0;j<n;++j)
-//	s << ((float)i)/n << '\t' << ((float)j)/n << '\t' << v(k++) << endl;
-	s << '\t' << v(k++);
-      s << endl;
-    }
-  s << endl;
-}
+//   for (unsigned int i=0;i<n;++i)
+//     {
+//       for (unsigned int j=0;j<n;++j)
+// //	s << ((float)i)/n << '\t' << ((float)j)/n << '\t' << v(k++) << endl;
+// 	s << '\t' << v(k++);
+//       s << endl;
+//     }
+//   s << endl;
+// }
 
 class FDMG
   :
@@ -84,12 +84,13 @@ main()
 {
   ofstream logfile("mg.output");
   deallog.attach(logfile);
+  deallog.depth_console(0);
   
   PrimitiveVectorMemory<Vector<TYPE>  > mem;
   SolverControl control(10000, ACCURACY);
 
   const unsigned int base = 3;
-  const unsigned int maxlevel = 8;
+  const unsigned int maxlevel = 5;
   
   const unsigned int maxsize = base * (1 << maxlevel);
   

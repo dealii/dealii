@@ -4,6 +4,9 @@
 // deal_II_libraries=-ldeal_II_2d
 
 #include <lac/mgbase.h>
+#include <base/logstream.h>
+
+#include <fstream>
 
 class TransferTest
   :
@@ -72,6 +75,10 @@ class MGTest
 
 main()
 {
+  ofstream logfile("mgbase.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
   TransferTest tr;
   SmoothTest s;
   MGCoarseGridTest c;
@@ -86,7 +93,7 @@ TransferTest::prolongate(unsigned l,
 			 Vector<double>&,
 			 const Vector<double>&) const
 {
-  cout << "Prolongating " << l-1 << " to " << l << endl;
+  deallog << "Prolongating " << l-1 << " to " << l << endl;
 }
 
 void
@@ -94,7 +101,7 @@ TransferTest::restrict(unsigned l,
 		       Vector<double>&,
 		       const Vector<double>&) const
 {
-  cout << "Restricting  " << l << " to " << l-1 << endl;
+  deallog << "Restricting  " << l << " to " << l-1 << endl;
 }
 
 void
@@ -102,7 +109,7 @@ SmoothTest::smooth (const unsigned int  level,
 		    Vector<double>      &,
 		    const Vector<double>&) const
 {
-  cout << "Smoothing on " << level << endl;
+  deallog << "Smoothing on " << level << endl;
 }
 
 void
@@ -111,7 +118,7 @@ MGTest::level_vmult(unsigned l,
 		       const Vector<double>&,
 		       const Vector<double>&)
 {
-  cout << "Residual on  " << l << endl;
+  deallog << "Residual on  " << l << endl;
 }
 
 void
@@ -119,5 +126,5 @@ MGCoarseGridTest::operator() (unsigned int level,
 			      Vector<double>&,
 			      const Vector<double>&) const
 {
-  cout << "Solving on   " << level << endl;
+  deallog << "Solving on   " << level << endl;
 }

@@ -1,0 +1,13 @@
+
+DEAL::Level 0 size 3
+DEAL:cg::Convergence step 0 
+DEAL::Level 1 size 6
+DEAL:cg::Convergence step 4 
+DEAL::Level 2 size 12
+DEAL:cg::Convergence step 9 
+DEAL::Level 3 size 24
+DEAL:cg::Convergence step 18 
+DEAL::Level 4 size 48
+DEAL:cg::Convergence step 44 
+DEAL::Level 5 size 96
+DEAL:cg::Convergence step 87 

@@ -41,8 +41,9 @@ libraries = $(libs)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
-all: solver mgbase mg benchmark
-
+all: solver.check mgbase.check mg.check
+exe: $(all:.check=.testcase) benchmark
+run: $(all:.check=.output)
 ############################################################
 # Typical block for building a running program
 #
@@ -64,7 +65,7 @@ else
 solver-o-files = $(solver-cc-files:.cc=.o)
 endif
 
-solver: $(solver-o-files) $(libraries)
+solver.testcase: $(solver-o-files) $(libraries)
 	$(CXX) $(flags) -o $@ $^
 
 
@@ -79,7 +80,7 @@ else
 mgbase-o-files = $(mgbase-cc-files:.cc=.o)
 endif
 
-mgbase: $(mgbase-o-files) $(libraries)
+mgbase.testcase: $(mgbase-o-files) $(libraries)
 	$(CXX) $(flags) -o $@ $^
 
 
@@ -95,7 +96,7 @@ else
 mg-o-files = $(mg-cc-files:.cc=.o)
 endif
 
-mg: $(mg-o-files) $(libraries)
+mg.testcase: $(mg-o-files) $(libraries)
 	$(CXX) $(flags) -o $@ $^
 
 
@@ -113,7 +114,7 @@ else
 benchmark-o-files = $(benchmark-cc-files:.cc=.o)
 endif
 
-benchmark: $(benchmark-o-files) $(libraries)
+benchmark.testcase: $(benchmark-o-files) $(libraries)
 	$(CXX) $(flags) -o $@ $^
 
 ############################################################
@@ -133,7 +134,17 @@ target1: $(target1-o-files) $(libraries)
 	$(CXX) $(flags) -o $@ $^
 
 
+############################################################
+# Postprocessing
+############################################################
 
+%.output:%.testcase
+	$<
+	@perl -pi.bak -e 's/JobId.*//;s/value.*//;' $@
+	@rm $@.bak
+
+%.check:%.output
+	@-diff $< $(patsubst %.output,%.checked, $<)
 ############################################################
 # Cleanup targets
 ############################################################

@@ -31,9 +31,10 @@ main()
 {
   ofstream logfile("solver.output");
   deallog.attach(logfile);
+  deallog.depth_console(0);
   
   PrimitiveVectorMemory<Vector<double>  > mem;
-  SolverControl control(50, 1.e-5, true);
+  SolverControl control(50, 1.e-5);
   SolverCG<SparseMatrix<float> , Vector<double>  > cg(control, mem);
   SolverGMRES<SparseMatrix<float> , Vector<double>  > gmres(control, mem,20);
   SolverBicgstab<SparseMatrix<float> , Vector<double>  > bicgstab(control, mem);

@@ -1,0 +1,49 @@
+
+DEAL::Size 4
+DEAL::SOR-diff:0
+DEAL:no:cg::Convergence step 2 
+DEAL:no:Bicgstab::Go!
+DEAL:no:Bicgstab::Convergence step 3 
+DEAL:no:GMRES::Convergence step 2 
+DEAL:ssor:Richardson::Convergence step 15 
+DEAL:ssor:cg::Convergence step 4 
+DEAL:ssor:Bicgstab::Go!
+DEAL:ssor:Bicgstab::Convergence step 3 
+DEAL:ssor:GMRES::Convergence step 3 
+DEAL:sor:Richardson::Convergence step 10 
+DEAL:sor:cg::Failure step 50 
+DEAL:sor:Bicgstab::Go!
+DEAL:sor:Bicgstab::Convergence step 5 
+DEAL:sor:GMRES::Convergence step 4 
+DEAL::Size 12
+DEAL::SOR-diff:0
+DEAL:no:cg::Convergence step 16 
+DEAL:no:Bicgstab::Go!
+DEAL:no:Bicgstab::Convergence step 13 
+DEAL:no:GMRES::Convergence step 16 
+DEAL:ssor:Richardson::Failure step 50 
+DEAL:ssor:cg::Convergence step 10 
+DEAL:ssor:Bicgstab::Go!
+DEAL:ssor:Bicgstab::Convergence step 6 
+DEAL:ssor:GMRES::Convergence step 9 
+DEAL:sor:Richardson::Failure step 50 
+DEAL:sor:cg::Failure step 50 
+DEAL:sor:Bicgstab::Go!
+DEAL:sor:Bicgstab::Convergence step 19 
+DEAL:sor:GMRES::Convergence step 24 
+DEAL::Size 36
+DEAL::SOR-diff:2.21867e-30
+DEAL:no:cg::Failure step 50 
+DEAL:no:Bicgstab::Go!
+DEAL:no:Bicgstab::Convergence step 44 
+DEAL:no:GMRES::Failure step 50 
+DEAL:ssor:Richardson::Failure step 50 
+DEAL:ssor:cg::Convergence step 26 
+DEAL:ssor:Bicgstab::Go!
+DEAL:ssor:Bicgstab::Convergence step 18 
+DEAL:ssor:GMRES::Convergence step 25 
+DEAL:sor:Richardson::Failure step 50 
+DEAL:sor:cg::Failure step 50 
+DEAL:sor:Bicgstab::Go!
+DEAL:sor:Bicgstab::Failure step 50 
+DEAL:sor:GMRES::Failure step 50 
