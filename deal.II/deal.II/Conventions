@@ -13,7 +13,7 @@ Here are some conventions for source code of the deal.II library:
   visibly enough.
 
 4./ Whenever an integer variable can only assume nonnegative values,
-  it has to be marked as unsigned int.
+  it has to be marked as unsigned.
 
 5./ Whenever an argument will not be changed, it should be marked
   const, even if it passed by value. This makes programs more readable
@@ -26,4 +26,16 @@ Here are some conventions for source code of the deal.II library:
 7./ Function and variable names may not consist of only one or two
   letters, unless the variable is a pure counting index.
 
-8./ Each class has to have at least 200 pages of documentation ;-)
+8./ Use the geometry information in GeometryInfo<dim> to get the
+  number of faces per cell, the number of children per cell, the
+  child indices of the child cells adjacent to face 3, etc, rather
+  than writing them into the directly as 2*dim, (1<<dim) and
+  {0,3}. This reduces the possibilities for errors and enhances
+  readability of code. Unfortunately, the GeometryInfo mechanism
+  was not invented right at the start of the program, so there are
+  quite a lot of places where this rule is violated. Of you find
+  such a place, fix it. We have set an amount of 1 cent per fixed
+  place, payable by cheque when the deal.II project is considered
+  finished by the author(s).
+
+9./ Each class has to have at least 200 pages of documentation ;-)
