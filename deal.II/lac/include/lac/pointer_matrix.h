@@ -95,6 +95,12 @@ public:
 				    */
   PointerMatrix (const MATRIX* M=0);
 
+				     /**
+				      * Return whether the object is
+				      * empty. 
+				      */
+  bool empty () const;
+
 				   /**
 				    * Assign a new matrix
 				    * pointer. Deletes the old pointer
@@ -157,6 +163,16 @@ PointerMatrix<MATRIX, VECTOR>::operator= (const MATRIX* M)
 {
   m = M;
   return *this;
+}
+
+
+template<class MATRIX, class VECTOR>
+inline bool
+PointerMatrix<MATRIX, VECTOR>::empty () const
+{
+  if (m == 0)
+    return true;
+  return m->empty();
 }
 
 template<class MATRIX, class VECTOR>
