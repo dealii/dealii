@@ -25,7 +25,7 @@ dnl
 AC_DEFUN(DEAL_II_THREAD_CPPFLAGS, dnl
 [
   AC_MSG_CHECKING(for platform specific multi-threading defines)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   AC_TRY_COMPILE(
    [
 #if !defined (_REENTRANT) && !defined (_THREAD_SAFE)
@@ -59,7 +59,7 @@ dnl
 AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 [
   AC_MSG_CHECKING(for platform specific thread flags)
-  AC_REQUIRE([AC_LANG_CPLUSPLUS])
+  AC_LANG(C++)
   for i in threads mt pthread pthreads mthreads Kthread kthread invalid_last_entry; do
     CXXFLAGS="$CXXFLAGSG -$i"
     DEAL_II_TRY_COMPILER_FLAG(
@@ -128,8 +128,9 @@ dnl
 dnl Usage: DEAL_II_CHECK_GETRUSAGE
 dnl
 AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
+[
   AC_MSG_CHECKING(whether getrusage is properly declared)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   AC_TRY_COMPILE(
     [
 #include <sys/resource.h>
@@ -146,6 +147,7 @@ AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
 	CXXFLAGSG="$CXXFLAGSG -DNO_HAVE_GETRUSAGE"
 	CXXFLAGSO="$CXXFLAGSO -DNO_HAVE_GETRUSAGE"
     ])
+]
 )      
 
 
@@ -162,10 +164,12 @@ dnl
 dnl Usage: DEAL_II_CHECK_ISNAN
 dnl
 AC_DEFUN(DEAL_II_CHECK_ISNAN, dnl
+[
   DEAL_II_CHECK_ISNAN_FLAG(debug, $CXXFLAGSG,
 			   CXXFLAGSG="$deal_II_isnan_flag $CXXFLAGSG")
   DEAL_II_CHECK_ISNAN_FLAG(optimized, $CXXFLAGSO,
 		 	   CXXFLAGSO="$deal_II_isnan_flag $CXXFLAGSO")
+]
 )
 
 
@@ -178,8 +182,9 @@ dnl                                 "compiler options set",
 dnl                                 action when flag is found)
 dnl
 AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
+[
   AC_MSG_CHECKING(whether isnan is declared with $1 flags)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS=$2
   deal_II_isnan_flag=""
   AC_TRY_COMPILE(
@@ -268,7 +273,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
       $3
     fi
   fi
-)      
+])      
 
 
 
@@ -276,7 +281,8 @@ dnl rand_r is defined for some compiler flag combinations, but not for
 dnl others. check that. note that since these are C++ flags, we can't
 dnl just use AC_CHECK_FUNCS
 AC_DEFUN(DEAL_II_CHECK_RAND_R, dnl
-  AC_LANG_CPLUSPLUS
+[
+  AC_LANG(C++)
   CXXFLAGS=$CXXFLAGSG
   AC_MSG_CHECKING(for rand_r)
   AC_TRY_COMPILE(
@@ -296,7 +302,7 @@ int i=rand_r(&i);
 	  AC_MSG_RESULT(no)
 	]
   )
-)
+])
 
 
 
@@ -311,8 +317,9 @@ dnl                                   "compiler options set",
 dnl                                   action if compiler crashes)
 dnl
 AC_DEFUN(DEAL_II_CHECK_ASSERT_THROW, dnl
+[
   AC_MSG_CHECKING(whether AssertThrow works with $1 flags)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS=$2
   AC_TRY_COMPILE(
     [
@@ -396,7 +403,7 @@ using namespace StandardExceptions;
 	AC_MSG_RESULT("no")
 	$3
     ])
-)
+])
 
 
 
@@ -408,8 +415,9 @@ dnl
 dnl Usage: DEAL_II_CHECK_IBM_XLC_ERROR
 dnl
 AC_DEFUN(DEAL_II_CHECK_IBM_XLC_ERROR, dnl
+[
   AC_MSG_CHECKING(for std::vector bug)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
@@ -435,7 +443,7 @@ AC_DEFUN(DEAL_II_CHECK_IBM_XLC_ERROR, dnl
       AC_DEFINE(XLC_WORK_AROUND_STD_BUG, 1, 
                 [Define if we have to work around a bug in IBM's xlC compiler])
     ])
-)
+])
 
 
 dnl gcc2.95 doesn't have the std::iterator class, but the standard requires
@@ -444,8 +452,9 @@ dnl
 dnl Usage: DEAL_II_HAVE_STD_ITERATOR
 dnl
 AC_DEFUN(DEAL_II_HAVE_STD_ITERATOR, dnl
+[
   AC_MSG_CHECKING(for std::iterator class)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
@@ -463,7 +472,7 @@ AC_DEFUN(DEAL_II_HAVE_STD_ITERATOR, dnl
     [
       AC_MSG_RESULT(no)
     ])
-)
+])
 
 
 
@@ -474,8 +483,9 @@ dnl
 dnl Usage: DEAL_II_HAVE_STD_STRINGSTREAM
 dnl
 AC_DEFUN(DEAL_II_HAVE_STD_STRINGSTREAM, dnl
+[
   AC_MSG_CHECKING(for std::i/ostringstream classes)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
@@ -494,7 +504,7 @@ AC_DEFUN(DEAL_II_HAVE_STD_STRINGSTREAM, dnl
     [
       AC_MSG_RESULT(no)
     ])
-)
+])
 
 
 
@@ -505,8 +515,9 @@ dnl
 dnl Usage: DEAL_II_HAVE_LRAND48_DECLARED
 dnl
 AC_DEFUN(DEAL_II_HAVE_LRAND48_DECLARED, dnl
+[
   AC_MSG_CHECKING(whether lrand48 needs to be declared with -ansi)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
@@ -528,7 +539,7 @@ void f()
       AC_DEFINE(DEAL_II_DECLARE_LRAND48, 1, 
                 [Define if you have the rand_r function])
     ])
-)
+])
 
 
 
@@ -539,8 +550,9 @@ dnl $deal_II_ace_remove_ansi and $deal_II_ace_remove_pedantic to "yes".
 dnl
 dnl Usage: DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS
 AC_DEFUN(DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS, dnl
+[
   AC_MSG_CHECKING(whether compilation with ACE disallows flags)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS="-ansi -I$withmultithreading"
   AC_TRY_COMPILE(
     [
@@ -581,7 +593,7 @@ AC_DEFUN(DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS, dnl
       AC_MSG_RESULT(-ansi -pedantic)
     fi
   fi
-)
+])
 
 
 
@@ -597,7 +609,8 @@ dnl This test is only called if gcc is used.
 dnl
 dnl Usage: DEAL_II_CHECK_ADVANCE_WARNING
 AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
-  AC_LANG_CPLUSPLUS
+[
+  AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG -Werror"
   AC_MSG_CHECKING(for std::advance warning)
   AC_TRY_COMPILE(
@@ -620,7 +633,7 @@ AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
           DEAL_II_ADVANCE_WARNING=yes
 	]
   )
-)
+])
 
 
 
@@ -629,8 +642,9 @@ dnl
 dnl Usage: DEAL_II_HAVE_STD_NUMERIC_LIMITS
 dnl
 AC_DEFUN(DEAL_II_HAVE_STD_NUMERIC_LIMITS, dnl
+[
   AC_MSG_CHECKING(for std::numeric_limits classes)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
@@ -648,7 +662,7 @@ AC_DEFUN(DEAL_II_HAVE_STD_NUMERIC_LIMITS, dnl
     [
       AC_MSG_RESULT(no)
     ])
-)
+])
 
 
 
@@ -657,8 +671,9 @@ dnl
 dnl Usage: DEAL_II_HAVE_STD_OSTREAM_HEADER
 dnl
 AC_DEFUN(DEAL_II_HAVE_STD_OSTREAM_HEADER, dnl
+[
   AC_MSG_CHECKING(for <ostream> header)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
@@ -675,7 +690,7 @@ void f (const std::ostream &out);
     [
       AC_MSG_RESULT(no)
     ])
-)
+])
 
 
 
@@ -684,8 +699,9 @@ dnl
 dnl Usage: DEAL_II_HAVE_STD_OSTREAM_HEADER
 dnl
 AC_DEFUN(DEAL_II_HAVE_STD_IOSFWD_HEADER, dnl
+[
   AC_MSG_CHECKING(for <iosfwd> header)
-  AC_LANG_CPLUSPLUS
+  AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
@@ -702,7 +718,8 @@ void f (const std::ostream &out);
     [
       AC_MSG_RESULT(no)
     ])
-)
+])
+
 
 
 dnl Check for the Tecplot API. If it is found we will be able to write
@@ -737,3 +754,4 @@ AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
 	      [Flag indicating whether the library shall be compiled to use the Tecplot interface])
   fi
 ])
+
