@@ -13,8 +13,10 @@
 
 
 #include <lac/petsc_parallel_vector.h>
+#include <lac/petsc_vector.h>
 
 #include <cmath>
+#include <algorithm>
 
 #ifdef DEAL_II_USE_PETSC
 
@@ -105,7 +107,38 @@ namespace PETScWrappers
       
       reinit (v.size(), v.local_size(), fast);
     }
-  
+
+
+
+    Vector &
+    Vector::operator = (const PETScWrappers::Vector &v)
+    {
+      int ierr;
+
+                            // get a pointer to the local memory of this vector
+      PetscScalar *dest_array;
+      ierr = VecGetArray (vector, &dest_array);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                            // then also a pointer to the source vector
+      PetscScalar *src_array;
+      ierr = VecGetArray (static_cast<const Vec &>(v), &src_array);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      // then copy:
+      const std::pair<unsigned int, unsigned int> local_elements = local_range ();
+      std::copy (src_array + local_elements.first, src_array + local_elements.second,
+		 dest_array);
+
+      // finally restore the arrays
+      ierr = VecRestoreArray (vector, &dest_array);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      ierr = VecRestoreArray (static_cast<const Vec &>(v), &src_array);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      return *this;
+    }
 
 
     void

@@ -131,6 +131,43 @@ namespace PETScWrappers
         Vector & operator = (const Vector &v);
 
                                          /**
+					  * Copy the given sequential
+					  * (non-distributed) vector
+					  * into the present parallel
+					  * vector. It is assumed that
+					  * they have the same size,
+					  * and this operation does
+					  * not change the
+					  * partitioning of the
+					  * parallel vector by which
+					  * its elements are
+					  * distributed across several
+					  * MPI processes. What this
+					  * operation therefore does
+					  * is to copy that chunk of
+					  * the given vector @p v that
+					  * corresponds to elements of
+					  * the target vector that are
+					  * stored locally, and copies
+					  * them. Elements that are
+					  * not stored locally are not
+					  * touched.
+					  *
+					  * This being a parallel
+					  * vector, you must make sure
+					  * that @em all processes
+					  * call this function at the
+					  * same time. It is not
+					  * possible to change the
+					  * local part of a parallel
+					  * vector on only one
+					  * process, independent of
+					  * what other processes do,
+					  * with this function.
+					  */
+	Vector & operator = (const PETScWrappers::Vector &v);
+
+                                         /**
                                           * Set all components of the vector to
                                           * the given number @p{s}. Simply pass
                                           * this down to the base class, but we
