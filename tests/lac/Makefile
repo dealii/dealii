@@ -21,9 +21,16 @@ default: run-tests
 ############################################################
 
 tests_x = $(sort \
-            sparse_matrices block_matrices block_vector block_vector_iterator \
+            sparse_matrices \
+            block_matrices \
+            block_vector \
+            block_vector_iterator \
             full_matrix \
-            matrix_out solver eigen sparsity_pattern sparse_ilu \
+            matrix_out \
+            solver \
+            eigen \
+            sparsity_pattern \
+            sparse_ilu \
             vector-vector)
 
 # from above list of regular expressions, generate the real set of
