@@ -16,7 +16,7 @@
 # name and listing the modified file names.
 #
 # For example:
-DEFAULT		(echo ""; echo $USER %s; date; cat) >> $CVSROOT/LOG/default
+DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default.html > /tmp/Tdefault; mv /tmp/Tbase $CVSROOT/LOG/default.html
 ^base.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/base.html > /tmp/Tbase; mv /tmp/Tbase $CVSROOT/LOG/base.html
 ^reports.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/reports.html > /tmp/Treports; mv /tmp/Treports $CVSROOT/LOG/reports.html
 ^tests.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/tests.html > /tmp/Ttests; mv /tmp/Ttests $CVSROOT/LOG/tests.html
