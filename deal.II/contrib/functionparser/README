@@ -1,0 +1,7 @@
+The files in this directory are taken from the fparser distribution, version
+2.7. The code is subject to copyright by its author, Warp. The license is
+given in the file fparser.txt.
+
+In order to update the files to a newer version, just replace the files, but
+make sure you rename the fparser.hh file by fparser.h, to keep with the usual
+naming scheme in deal.II.
