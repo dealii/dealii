@@ -1076,7 +1076,8 @@ BlockMatrixBase<MatrixType>::clear ()
   for (unsigned int r=0; r<n_block_rows(); ++r)
     for (unsigned int c=0; c<n_block_cols(); ++c)
       block(r,c).clear ();
-  sub_objects.clear ();
+  sub_objects.reinit (0,0);
+  row_block_indices = column_block_indices = BlockIndices();
 
                                    // reset block indices to empty
   row_block_indices = column_block_indices = BlockIndices ();

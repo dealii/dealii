@@ -87,6 +87,16 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: <code class="member">BlockSparseMatrix::clear()</code> did not
+       do what it was supposed to do: it emptied the individual blocks and
+       removed them, but it still kept the number of blocks
+       unchanged. Subsequent accesses to these blocks, or to their information
+       yielded segmentation faults.
+       <br> 
+       (WB 2004/06/02)
+       </p>
+
+  <li> <p>
        New: Block matrices and vectors have been factored into abstract base
        classes and concrete implementation classes. While the previous classes
        still exist in all their functionality, this allowed us to now also
