@@ -205,10 +205,10 @@ GeometryInfo<2>::child_cell_on_face (const unsigned int face,
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
   
-  const unsigned subcells[faces_per_cell][subfaces_per_face] = {{0,1},
-								{1,2},
-								{3,2},
-								{0,3}};
+  static const unsigned subcells[faces_per_cell][subfaces_per_face] = {{0,1},
+								       {1,2},
+								       {3,2},
+								       {0,3}};
   return subcells[face][subface];
 };
 
@@ -221,12 +221,12 @@ unsigned int GeometryInfo<3>::child_cell_on_face (const unsigned int face,
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
   
-  const unsigned subcells[faces_per_cell][subfaces_per_face] = {{0, 1, 2, 3},
-								{4, 5, 6, 7},
-								{0, 1, 5, 4},
-								{1, 5, 6, 2},
-								{3, 2, 6, 7},
-								{0, 4, 7, 3}};
+  static const unsigned subcells[faces_per_cell][subfaces_per_face] = {{0, 1, 2, 3},
+								       {4, 5, 6, 7},
+								       {0, 1, 5, 4},
+								       {1, 5, 6, 2},
+								       {3, 2, 6, 7},
+								       {0, 4, 7, 3}};
   return subcells[face][subface];
 };
 
