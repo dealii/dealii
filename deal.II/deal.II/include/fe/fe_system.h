@@ -314,7 +314,7 @@ class FESystem : public FiniteElement<dim>
 				      * @p get_interpolation_matrix
 				      * functions. Otherwise, an
 				      * exception of type
-				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}
+				      * FiniteElementBase<dim>::ExcInterpolationNotImplemented
 				      * is thrown.
 				      */
     virtual void

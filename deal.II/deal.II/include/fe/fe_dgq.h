@@ -68,7 +68,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * element is also a @p FE_DGQ
 				      * element. Otherwise, an
 				      * exception of type
-				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}
+				      * FiniteElementBase<dim>::ExcInterpolationNotImplemented
 				      * is thrown.
 				      */
     virtual void

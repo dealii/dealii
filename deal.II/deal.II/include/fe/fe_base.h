@@ -834,7 +834,7 @@ class FiniteElementBase : public Subscriptor,
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}.
+				      * FiniteElementBase<dim>::ExcInterpolationNotImplemented.
 				      */
     virtual void
     get_interpolation_matrix (const FiniteElementBase<dim> &source,
