@@ -1164,25 +1164,8 @@ class FiniteElement : public FiniteElementBase<dim> {
     DeclException0 (ExcJacobiDeterminantHasWrongSign);
 };
 
-template <int dim>
-inline unsigned
-FiniteElementBase<dim>::component_to_system_index (unsigned component,
-						   unsigned component_index) const
-{
-  Assert(false, ExcInvalidIndex(component));
-  return component_index;
-}
 
 
-template <int dim>  
-inline pair<unsigned,unsigned>
-FiniteElementBase<dim>::system_to_component_index (unsigned index) const
-{
-  Assert(false, ExcInvalidIndex(index));
-  return pair<unsigned,unsigned>(0,0);
-}
-
-    
 
 /*----------------------------   fe.h     ---------------------------*/
 /* end of #ifndef __fe_H */

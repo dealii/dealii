@@ -218,6 +218,26 @@ FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data) :
 
 
 
+template <int dim>
+unsigned
+FiniteElementBase<dim>::component_to_system_index (unsigned component,
+						   unsigned component_index) const
+{
+  Assert(false, ExcInvalidIndex(component));
+  return component_index;
+}
+
+
+template <int dim>  
+pair<unsigned,unsigned>
+FiniteElementBase<dim>::system_to_component_index (unsigned index) const
+{
+  Assert(false, ExcInvalidIndex(index));
+  return pair<unsigned,unsigned>(0,0);
+}
+
+
+
 #if deal_II_dimension == 1
 
 // declare this function to be explicitely specialized before first use
