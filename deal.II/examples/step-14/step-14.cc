@@ -16,7 +16,6 @@
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
-#include <base/table_handler.h>
 #include <base/thread_management.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
@@ -106,8 +105,7 @@ namespace Evaluation
   class PointValueEvaluation : public EvaluationBase<dim>
   {
     public:
-      PointValueEvaluation (const Point<dim>   &evaluation_point,
-			    TableHandler       &results_table);
+      PointValueEvaluation (const Point<dim>   &evaluation_point);
       
       virtual void operator () (const DoFHandler<dim> &dof_handler,
 				const Vector<double>  &solution) const;
@@ -118,17 +116,14 @@ namespace Evaluation
 		      << " was not found among the vertices of the present grid.");
     private:
       const Point<dim>  evaluation_point;
-      TableHandler     &results_table;
   };
 
 
   template <int dim>
   PointValueEvaluation<dim>::
-  PointValueEvaluation (const Point<dim>   &evaluation_point,
-			TableHandler       &results_table)
+  PointValueEvaluation (const Point<dim>   &evaluation_point)
 		  :
-		  evaluation_point (evaluation_point),
-		  results_table (results_table)
+		  evaluation_point (evaluation_point)
   {};
   
 
@@ -159,9 +154,6 @@ namespace Evaluation
 
     AssertThrow (evaluation_point_found,
 		 ExcEvaluationPointNotFound(evaluation_point));
-
-    results_table.add_value ("DoFs", dof_handler.n_dofs());
-    results_table.add_value ("u(x_0)", point_value);
 
     std::cout << "   Point value=" << point_value
 	      << std::endl;
@@ -195,8 +187,7 @@ namespace Evaluation
   class PointXDerivativeEvaluation : public EvaluationBase<dim>
   {
     public:
-      PointXDerivativeEvaluation (const Point<dim>   &evaluation_point,
-				  TableHandler       &results_table);
+      PointXDerivativeEvaluation (const Point<dim>   &evaluation_point);
       
       virtual void operator () (const DoFHandler<dim> &dof_handler,
 				const Vector<double>  &solution) const;
@@ -207,17 +198,14 @@ namespace Evaluation
 		      << " was not found among the vertices of the present grid.");
     private:
       const Point<dim>  evaluation_point;
-      TableHandler     &results_table;
   };
 
 
   template <int dim>
   PointXDerivativeEvaluation<dim>::
-  PointXDerivativeEvaluation (const Point<dim>   &evaluation_point,
-			      TableHandler       &results_table)
+  PointXDerivativeEvaluation (const Point<dim>   &evaluation_point)
 		  :
-		  evaluation_point (evaluation_point),
-		  results_table (results_table)
+		  evaluation_point (evaluation_point)
   {};
   
 
@@ -375,13 +363,7 @@ namespace Evaluation
 				     // contributions of all adjacent
 				     // cells, so we still have to
 				     // compute the mean value. Once
-				     // this is done, enter the result
-				     // into the provided table:
-    point_derivative /= evaluation_point_hits;
-    results_table.add_value ("DoFs", dof_handler.n_dofs());
-    results_table.add_value ("d_x u(x_0)", point_derivative);
-
-				     // At the end report the status:
+				     // this is done, report the status:
     std::cout << "   Point x-derivative=" << point_derivative
 	      << std::endl;
   };
@@ -1192,8 +1174,8 @@ namespace LaplaceSolver
 					 // is only commented out to
 					 // avoid warnings by the
 					 // compiler.
-  	const double x = cell->center()(0); 
-  	const double y = cell->center()(1); 
+/*  	const double x = cell->center()(0); */
+/*  	const double y = cell->center()(1); */
 /*  	const double h = cell->diameter();  */
 
 					 // From this we compute the
@@ -1202,9 +1184,7 @@ namespace LaplaceSolver
 					 // precomputed indicator. My
 					 // default is boring but
 					 // efficient. Do it better!
-	const double weight = 1./((x-0.75)*(x-0.75)+
-				  (y-0.75)*(y-0.75) +
-				  (0.1*0.1));
+	const double weight = 1.;
 
 					 // Finally use this weight:
 	estimated_error(cell_index) *= weight;
@@ -1959,7 +1939,7 @@ namespace DualFunctional
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
-    for (; (cell!=endc) && !evaluation_point_found; ++cell)
+    for (; cell!=endc; ++cell)
       for (unsigned int vertex=0;
 	   vertex<GeometryInfo<dim>::vertices_per_cell;
 	   ++vertex)
@@ -3563,6 +3543,9 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
       solver->solve_problem ();
       solver->output_solution ();
 
+      std::cout << "   Number of degrees of freedom="
+		<< solver->n_dofs() << std::endl;
+      
       for (typename EvaluatorList::const_iterator
 	     e = descriptor.evaluator_list.begin();
 	   e != descriptor.evaluator_list.end(); ++e)
@@ -3651,17 +3634,17 @@ int main ()
 				       // evaluation objects. We
 				       // choose as default the
 				       // evaluation of the
-				       // x-derivative at an
+				       // value at an
 				       // evaluation point,
 				       // represented by the classes
-				       // ``PointXDerivativeEvaluation''
+				       // ``PointValueEvaluation''
 				       // in the namespaces of
 				       // evaluation and dual
 				       // functional classes. You can
 				       // also set the
-				       // ``PointValueEvaluation''
-				       // classes for the value
-				       // instead of the x-derivative
+				       // ``PointXDerivativeEvaluation''
+				       // classes for the x-derivative
+				       // instead of the value
 				       // at the evaluation point.
 				       //
 				       // Note that dual functional
@@ -3677,11 +3660,10 @@ int main ()
 				       // grid in each step.
       const Point<dim> evaluation_point (0.75, 0.75);
       descriptor.dual_functional
-	= new DualFunctional::PointXDerivativeEvaluation<dim> (evaluation_point);
+	= new DualFunctional::PointValueEvaluation<dim> (evaluation_point);
       
-      TableHandler results_table;
-      Evaluation::PointXDerivativeEvaluation<dim>
-	postprocessor1 (evaluation_point, results_table);
+      Evaluation::PointValueEvaluation<dim>
+	postprocessor1 (evaluation_point);
       Evaluation::GridOutput<dim>
 	postprocessor2 ("grid");
       
@@ -3700,8 +3682,6 @@ int main ()
 				       // runs the entire solution
 				       // with it:
       Framework<dim>::run (descriptor);
-      
-      results_table.write_text (std::cout);
     }
 
 				   // Catch exceptions to give
