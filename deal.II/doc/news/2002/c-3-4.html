@@ -34,6 +34,24 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: <acronym>deal.II</acronym> now makes use of some parts of
+       the <a href="http://www.boost.org/">boost</a> library, which is
+       supposed to be a testground for the next generation C++ stanard
+       library. The parts which we use are now in
+       <code>contrib/boost/include/boost_local/</code> and can be
+       referenced from within your programs. The directory contains
+       the string <code>_local</code> since you may still want to use
+       another version or installation of boost in your own programs.
+       </p>
+       
+       <p>
+       Also note that boost is large -- much larger than the subset we
+       have imported --, so we only took what we needed.
+       <br>
+       (WB 2003/02/06)
+       </p>
+
+  <li> <p> 
        Fixed: A longstanding bug in the documentation system has been fixed: if
        a namespace was ended with <code>}</code> instead of <code>};</code>
        (note the semicolon), then the documentation tool assumed that the
