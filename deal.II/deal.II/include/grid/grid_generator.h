@@ -98,6 +98,19 @@ class GridGenerator
     static void hyper_L (Triangulation<dim> &tria,
 			 const double        left = -1.,
 			 const double        right= 1.);
+    
+                                     /**
+				      * Initialize the given
+				      * Triangulation with a hypercube
+				      * with a slit. The slot goes
+				      * from the middle of the top
+				      * boundary to the middle of the
+				      * area.
+				      */
+    template <int dim>
+    static void hyper_cube_slit (Triangulation<dim> &tria,
+				 const double        left = 0.,
+				 const double        right= 1.);
 };
 
 

@@ -29,6 +29,15 @@ void GridGenerator::hyper_cube<> (Triangulation<1> &tria,
 
 
 template <>
+void GridGenerator::hyper_cube_slit<> (Triangulation<1> &,
+				       const double,
+				       const double) {
+  Assert (false, ExcInternalError());
+};
+
+
+
+template <>
 void GridGenerator::hyper_L<> (Triangulation<1> &,
 			       const double,
 			       const double) {
@@ -65,6 +74,39 @@ void GridGenerator::hyper_cube<> (Triangulation<2> &tria,
   cells[0].material_id = 0;
   
   tria.create_triangulation (vector<Point<2> >(&vertices[0], &vertices[4]),
+			     cells,
+			     SubCellData());       // no boundary information
+};
+
+
+
+template <>
+void GridGenerator::hyper_cube_slit<> (Triangulation<2> &tria,
+				       const double left,
+				       const double right) {
+  const double rl2=(right+left)/2;
+  const Point<2> vertices[10] = { Point<2>(left, left ),
+				  Point<2>(rl2,  left ),
+				  Point<2>(rl2,  rl2  ),
+				  Point<2>(left, rl2  ),
+				  Point<2>(right,left ),
+ 				  Point<2>(right,rl2  ),
+	 			  Point<2>(rl2,  right),
+				  Point<2>(left, right),
+				  Point<2>(right,right),
+				  Point<2>(rl2,  left ) };
+  const int cell_vertices[4][4] = { { 0,1,2,3 },
+				    { 9,4,5,2 },
+				    { 3,2,6,7 },
+				    { 2,5,8,6 } };
+  vector<CellData<2> > cells (4, CellData<2>());
+  for (unsigned int i=0; i<4; ++i)
+    {
+      for (unsigned int j=0; j<4; ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
+    };
+  tria.create_triangulation (vector<Point<2> >(&vertices[0], &vertices[10]),
 			     cells,
 			     SubCellData());       // no boundary information
 };
@@ -167,6 +209,15 @@ void GridGenerator::hyper_cube<> (Triangulation<3> &tria,
   tria.create_triangulation (vector<Point<3> >(&vertices[0], &vertices[8]),
 			cells,
 			SubCellData());       // no boundary information
+};
+
+
+
+template <>
+void GridGenerator::hyper_cube_slit<> (Triangulation<3> &,
+				       const double,
+				       const double) {
+  Assert (false, ExcInternalError());
 };
 
 
