@@ -1272,14 +1272,14 @@ const Tensor<1,dim> &
 FEValuesBase<dim>::shape_grad (const unsigned int i,
 			       const unsigned int j) const
 {
-  Assert (i<this->shape_gradients.size(),
-	  ExcIndexRange (i, 0, shape_gradients.size()));
-  Assert (j<shape_gradients[i].size(),
-	  ExcIndexRange (j, 0, shape_gradients[i].size()));
   Assert (this->update_flags & update_gradients,
 	  ExcAccessToUninitializedField());
   Assert (fe->is_primitive (i),
 	  ExcShapeFunctionNotPrimitive(i));
+  Assert (i<this->shape_gradients.size(),
+	  ExcIndexRange (i, 0, shape_gradients.size()));
+  Assert (j<shape_gradients[i].size(),
+	  ExcIndexRange (j, 0, shape_gradients[i].size()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
@@ -1307,7 +1307,7 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 					 const unsigned int j,
 					 const unsigned int component) const
 {
-  Assert (this->update_flags & update_values,
+  Assert (this->update_flags & update_gradients,
 	  ExcAccessToUninitializedField());
   Assert (component < fe->n_components(),
 	  ExcIndexRange(component, 0, fe->n_components()));
@@ -1369,14 +1369,14 @@ const Tensor<2,dim> &
 FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 					 const unsigned int j) const
 {
-  Assert (i<this->shape_2nd_derivatives.size(),
-	  ExcIndexRange (i, 0, shape_2nd_derivatives.size()));
-  Assert (j<this->shape_2nd_derivatives[i].size(),
-	  ExcIndexRange (j, 0, shape_2nd_derivatives[i].size()));
   Assert (this->update_flags & update_second_derivatives,
 	  ExcAccessToUninitializedField());
   Assert (fe->is_primitive (i),
 	  ExcShapeFunctionNotPrimitive(i));
+  Assert (i<this->shape_2nd_derivatives.size(),
+	  ExcIndexRange (i, 0, shape_2nd_derivatives.size()));
+  Assert (j<this->shape_2nd_derivatives[i].size(),
+	  ExcIndexRange (j, 0, shape_2nd_derivatives[i].size()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
@@ -1404,7 +1404,7 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
 						   const unsigned int j,
 						   const unsigned int component) const
 {
-  Assert (this->update_flags & update_values,
+  Assert (this->update_flags & update_second_derivatives,
 	  ExcAccessToUninitializedField());
   Assert (component < fe->n_components(),
 	  ExcIndexRange(component, 0, fe->n_components()));
