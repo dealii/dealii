@@ -1161,7 +1161,7 @@ unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const
 
 
 template <>
-unsigned int DoFHandler<1>::n_boundary_dofs (const set<unsigned char> &) const
+unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());

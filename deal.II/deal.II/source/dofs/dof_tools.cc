@@ -1628,7 +1628,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
 
 template <>
 void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
-					    const set<unsigned char> &,
+					    const std::set<unsigned char> &,
 					    std::vector<unsigned int> &)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());

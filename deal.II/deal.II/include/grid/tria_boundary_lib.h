@@ -67,7 +67,7 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     vector<Point<dim> > &points) const;
+				     typename std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Refer to the general documentation of
@@ -79,7 +79,7 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     vector<Point<dim> > &points) const;
+				     typename std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Return the center of the ball.

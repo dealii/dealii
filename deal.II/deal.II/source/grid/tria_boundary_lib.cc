@@ -81,7 +81,7 @@ template <>
 void
 HyperBallBoundary<2>::get_intermediate_points_on_line (
   const Triangulation<2>::line_iterator &line,
-  vector<Point<2> > &points) const
+  std::vector<Point<2> > &points) const
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
@@ -119,7 +119,7 @@ template <int dim>
 void
 HyperBallBoundary<dim>::get_intermediate_points_on_line (
   const typename Triangulation<dim>::line_iterator &,
-  vector<Point<dim> > &) const
+  typename std::vector<Point<dim> > &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -131,7 +131,7 @@ template <>
 void
 HyperBallBoundary<3>::get_intermediate_points_on_quad (
   const Triangulation<3>::quad_iterator &quad,
-  vector<Point<3> > &points) const
+  std::vector<Point<3> > &points) const
 {
   Assert(points.size()==1, ExcNotImplemented());
   StraightBoundary<3>::get_intermediate_points_on_quad (quad, points);
@@ -151,7 +151,7 @@ template <int dim>
 void
 HyperBallBoundary<dim>::get_intermediate_points_on_quad (
   const Triangulation<dim>::quad_iterator &,
-  vector<Point<dim> > &) const
+  typename std::vector<Point<dim> > &) const
 {
   Assert(false,ExcNotImplemented());
 }

@@ -32,7 +32,7 @@
 
 #include <numeric>
 #include <algorithm>
-#include <vector.h>
+#include <vector>
 #include <cmath>
 
 
