@@ -120,7 +120,7 @@ MappingQ<dim>::MappingQ (const unsigned int p):
     v.push_back(LagrangeEquidistant(degree,i));
 
   tensor_pols = new TensorProductPolynomials<dim> (v);
-  Assert (n_shape_functions==tensor_pols->n_tensor_product_polynomials(),
+  Assert (n_shape_functions==tensor_pols->n(),
 	  ExcInternalError());
   Assert(n_inner+n_outer==n_shape_functions, ExcInternalError());
   

@@ -163,7 +163,7 @@ class TensorProductPolynomials
 				      * product polynomials. For $n$
 				      * 1d polynomials this is $n^dim$.
 				      */
-    unsigned int n_tensor_product_polynomials() const;
+    unsigned int n() const;
 
 				     /**
 				      * Exception.

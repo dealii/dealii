@@ -202,7 +202,7 @@ void TensorProductPolynomials<dim>::compute(
 
 template<int dim>
 unsigned int
-TensorProductPolynomials<dim>::n_tensor_product_polynomials() const
+TensorProductPolynomials<dim>::n() const
 {
   return n_tensor_pols;
 }

@@ -45,6 +45,9 @@ int main ()
   deallog.depth_console(0);
 
   std::vector<Polynomial<double> > p (15);
+
+  deallog << "Legendre" << endl;
+  
   for (unsigned int i=0;i<p.size();++i)
     p[i] = Legendre<double>(i);
   
@@ -52,4 +55,19 @@ int main ()
     for (unsigned int j=0;j<=i;++j)
       deallog << 'P' << i << " * P" << j
 	      << " =" << scalar_product(p[i], p[j]) << std::endl;
+
+
+  deallog << "LagrangeEquidistant" << endl;
+  
+  p.resize(6);
+  for (unsigned int i=0;i<p.size();++i)
+    p[i] = LagrangeEquidistant(p.size(), i);
+
+				   // We add 1.0001 bacuse of bugs in
+				   // the ostream classes
+  for (unsigned int i=0;i<p.size();++i)
+    for (unsigned int j=0;j<p.size();++j)
+      deallog << 'P' << i << "(x" << j
+	      << ") =" << p[i].value((double) j/p.size())+1.0001 << std::endl;
 }
+

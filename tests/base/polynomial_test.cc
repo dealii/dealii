@@ -17,29 +17,85 @@
 
 #include <base/logstream.h>
 #include <base/tensor_product_polynomials.h>
+#include <base/polynomial_space.h>
 
+//using std;
 
 extern "C"
 void abort()
 {}
 
 
-
-bool equals_delta_ij(double value, unsigned int i, unsigned int j)
+template<int dim, class POLY>
+void check_poly(const Point<dim>& x,
+		const POLY& p)
 {
-  double eps=1e-14;
-  if ((i==j && std::fabs(value-1)<eps) || (i!=j && std::fabs(value)<eps))
-    return true;
-  else
-    return false;
+  const unsigned int n = p.n();
+  vector<double> values (n);
+  vector<Tensor<1,dim> > gradients(n);
+  vector<Tensor<2,dim> > second(n);
+  
+  p.compute (x, values, gradients, second);
+  
+  for (unsigned int k=0;k<n;++k)
+    {
+      values[k] *= pow(10, dim);
+      gradients[k] *= pow(10, dim);
+      
+      deallog << 'P' << k << "\t= " << values[k]
+	      << "\tgradient\t";
+      for (unsigned int d=0;d<dim;++d)
+	deallog << gradients[k][d] << '\t';
+      deallog << "\t2nd\t";
+      for (unsigned int d1=0;d1<dim;++d1)
+	for (unsigned int d2=0;d2<dim;++d2)
+	  deallog << second[k][d1][d2] << '\t';
+      deallog << endl;
+    }
+  deallog << endl;
 }
 
-void Q3_4th_shape_function_values_and_grads_dim2(
-  const Point<2> &point, double &v_exact,
-  Tensor<1,2> &grad_exact, Tensor<2,2> &grad2);
+
+template <int dim>
+void
+check_tensor (const vector<Polynomial<double> >& v,
+	      const Point<dim>& x)
+{
+  deallog.push("Tensor");
+  TensorProductPolynomials<dim> p(v);
+  check_poly (x, p);
+  deallog.pop();
+}
 
 
+template <int dim>
+void
+check_poly (const vector<Polynomial<double> >& v,
+	    const Point<dim>& x)
+{
+  deallog.push("Polyno");
+  PolynomialSpace<dim> p(v);
+  check_poly (x, p);
+  deallog.pop();
+}
 
+
+void
+check_dimensions (const vector<Polynomial<double> >& p)
+{
+  deallog.push("1d");
+  check_tensor(p, Point<1>(.5));
+  check_poly(p, Point<1>(.5));
+  deallog.pop();
+  deallog.push("2d");
+  check_tensor(p, Point<2>(.5, .2));
+  check_poly(p, Point<2>(.5, .2));
+  deallog.pop();
+  deallog.push("3d");
+  check_tensor(p, Point<3>(.5, .2, .3));
+  check_poly(p, Point<3>(.5, .2, .3));
+  deallog.pop();
+}
 
 int main()
 {
@@ -47,185 +103,15 @@ int main()
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
-  std::vector<double> values(1);
-  deallog << "LagrangeEquidistant polynoms:" << std::endl;
-  for (unsigned int order=1; order<=4; ++order)
-    {
-      deallog << "Polynomial p of order " << order << std::endl;
-      for (unsigned int s_point=0; s_point<=order; ++s_point)
-	{
-	  LagrangeEquidistant polynom(order, s_point);
 
-					   // support points in vertices
-	  for (unsigned int i=0; i<=order; ++i)
-	    {
-	      double x=static_cast<double>(i)/order;
-	      polynom.value(x, values);
-	      deallog << " p_" << s_point << "(" << x << ")";
-//	      deallog << "=" << values[0];
-	      if (equals_delta_ij(values[0], s_point, i))
-		deallog << "   ok";
-	      else
-		deallog << "   false";
-	      deallog << std::endl;
+  vector<Polynomial<double> > p(3);
+  for (unsigned int i=0;i<p.size();++i)
+    p[i] = LagrangeEquidistant(p.size(), i);
 
-					       // now also check
-					       // whether the other
-					       // @p{value} function
-					       // returns the same
-					       // result
-	      if (polynom.value(x) != values[0])
-		{
-		  deallog << "The two `value' functions return different results!"
-			  << std::endl;
-		  abort ();
-		};
-	    }
-	}
-    }
+  check_dimensions(p);
 
-  deallog << std::endl << "Test derivatives computed by the Horner scheme:" << std::endl;
-  LagrangeEquidistant pol(4, 2);
-  std::vector<double> v_horner(6);
-  for (unsigned int i=0; i<=10; ++i)
-    {
-      double xi=i*0.1;
-      deallog << "x=" << xi << ",    all derivatives: ";
-      std::vector<double> v_exact(6);
-      
-      v_exact[0]=64.0*xi*xi*xi*xi-128.0*xi*xi*xi+76.0*xi*xi-12.0*xi;
-      v_exact[1]=256.0*xi*xi*xi-384.0*xi*xi+152.0*xi-12.0;
-      v_exact[2]=768.0*xi*xi-768.0*xi+152.0;
-      v_exact[3]=1536*xi-768;
-      v_exact[4]=1536;
-      v_exact[5]=0;
+  for (unsigned int i=0;i<p.size();++i)
+    p[i] = Legendre<double>(i);
 
-      pol.value(xi, v_horner);
-
-      bool ok=true;
-      for (unsigned int i=0; i<v_exact.size(); ++i)
-	{
-//    	  deallog << "v_horner[i]=" << v_horner[i]
-//    	       << "   v_exact[i]=" << v_exact[i] << std::endl;
-	  if (std::fabs(v_horner[i]-v_exact[i])>1e-12)
-	    ok=false;
-	}
-
-      if (ok)
-	deallog << "ok";
-      else
-	deallog << "false";
-
-      deallog << std::endl;
-    }
-
-  if (true)
-    {
-      deallog << std::endl << "Derivatives of a polynomial of degree 0 (a constant function)." << std::endl;      
-      std::vector<double> a_const(1,1.);
-      const Polynomial<double> pol_const(a_const);
-      std::vector<double> exact_values(5,0.);
-      exact_values[0]=1.;
-      std::vector<double> computed_values(5);
-
-      pol_const.value(0.24, computed_values);
-      bool ok=true;
-      for (unsigned int i=0; i<exact_values.size(); ++i)
-	{
-	  if (std::fabs(computed_values[i]-exact_values[i])>1e-15)
-	    ok=false;
-	}
-
-      if (ok)
-	deallog << "ok";
-      else
-	deallog << "false";
-
-      deallog << std::endl;
-    }
-  
-  
-
-
-  deallog << std::endl << "Test of TensorProductPolynomials:" << std::endl;
-  deallog << "2D Example:" << std::endl;
-  unsigned int p=3,
-   n_tensor_pols=(p+1)*(p+1);
-  std::vector<Polynomial<double> > pols;
-  
-  for (unsigned int i=0; i<=p; ++i)
-    pols.push_back(LagrangeEquidistant(p, i));
-  
-  TensorProductPolynomials<2> tp_pol(pols);
-
-  double v_exact;
-  Tensor<1,2> grad_exact;
-  Tensor<2,2> grad_grad_exact;
-  
-  Point<2> point(0.35,0.62);
-				   // 4th shape function of Q3<2> is
-				   // equivalent to its 1st shape
-				   // function in lexicographical
-				   // order.
-  Q3_4th_shape_function_values_and_grads_dim2(point, v_exact, grad_exact, grad_grad_exact);
-  
-  unsigned int i=1;
-  double v=tp_pol.compute_value(i, point);
-  Tensor<1,2> grad=tp_pol.compute_grad(i, point);
-  Tensor<2,2> grad_grad=tp_pol.compute_grad_grad(i, point);
-
-  std::vector<double> vs(n_tensor_pols);
-  std::vector<Tensor<1,2> > grads(n_tensor_pols);
-  std::vector<Tensor<2,2> > grad_grads(n_tensor_pols);
-  tp_pol.compute(point, vs, grads, grad_grads);
-
-
-  deallog << "v=" << v << std::endl;
-  deallog << "vs[" << i << "]=" << vs[i] << std::endl;
-  deallog << "v_exact=" << v_exact << std::endl;
-  deallog << "grad=" << grad << std::endl;
-  deallog << "grads[" << i << "]=" << grads[i] << std::endl;
-  deallog << "grad_exact=" << grad_exact << std::endl;
-  for (unsigned int j=0; j<grad_grads[i].dimension; ++j)
-    for (unsigned int k=0; k<grad_grads[i].dimension; ++k)
-      {
-	deallog << "grad_grad[" << j << "][" << k << "]="
-		<< grad_grad[j][k] << std::endl;
-	deallog << "grad_grads[" << i<< "][" << j << "][" << k << "]="
-		<< grad_grads[i][j][k] << std::endl;
-	deallog << "grad_grad_exact[" << j << "][" << k << "]="
-		<< grad_grad_exact[j][k] << std::endl;
-      }
+  check_dimensions(p);
 }
-
-
-
-void Q3_4th_shape_function_values_and_grads_dim2(
-  const Point<2> &point, double &v_exact, Tensor<1,2> &grad_exact, Tensor<2,2> &grad2)
-{
-				   // the following functions
-				   // are taken from fe_lib.cubic.cc
-  const double xi=point(0),
-	      eta=point(1);
-  
-  v_exact=9.0*xi-45.0/2.0*xi*xi+27.0/2.0*xi*xi*xi+(
-    -99.0/2.0*xi+495.0/4.0*xi*xi-297.0/4.0*xi*xi*xi)*eta+(81.0*xi-405.0/2.0*xi*xi+243.0/2.0*xi*xi*xi)*
-		 eta*eta+(-81.0/2.0*xi+405.0/4.0*xi*xi-243.0/4.0*xi*xi*xi)*eta*eta*eta;
-  
-  grad_exact[0]=9.0-45.0*xi+81.0/2.0*xi*xi+(-99.0/2.0+495.0/2.0*xi-891.0/4.0*xi*xi)*eta+
-		(81.0-405.0*xi+729.0/2.0*xi*xi)*eta*eta+(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta*eta;
-  grad_exact[1]=-99.0/2.0*xi+495.0/4.0*xi*xi-297.0/4.0*xi*xi*xi+2.0*(
-    81.0*xi-405.0/2.0*xi*xi+243.0/2.0*xi*xi*xi)*eta+3.0*(
-      -81.0/2.0*xi+405.0/4.0*xi*xi-243.0/4.0*xi*xi*xi)*eta*eta;
-  
-  grad2[0][0] = -45.0+81.0*xi+(495.0/2.0-891.0/2.0*xi)*eta+(-405.0+729.0*xi)*eta*eta+
-		(405.0/2.0-729.0/2.0*xi)*eta*eta*eta;
-  grad2[0][1] = -99.0/2.0+495.0/2.0*xi-891.0/4.0*xi*xi+2.0*(81.0-405.0*xi+729.0/2.0*xi*xi)*eta+
-		3.0*(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta;
-  grad2[1][0] = -99.0/2.0+495.0/2.0*xi-891.0/4.0*xi*xi+2.0*(81.0-405.0*xi+729.0/2.0*xi*xi)*eta+
-		3.0*(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta;
-  grad2[1][1] = 162.0*xi-405.0*xi*xi+243.0*xi*xi*xi+6.0*(-81.0/2.0*xi+405.0/4.0*xi*xi-
-							 243.0/4.0*xi*xi*xi)*eta;
-}
-

@@ -23,7 +23,8 @@
 // a memory checked such as "purify". Maybe, this should be handled somehow
 // to avoid this confusion in future.
 
-
+//TODO:[GK] These polynomials are orthogonal on [-1,1], but the
+//integral over p^2 is not 1. Find out if this is ok.
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.

@@ -1,4 +1,5 @@
 
+DEAL::Legendre
 DEAL::P0 * P0 =2.00
 DEAL::P1 * P0 =0.00
 DEAL::P1 * P1 =0.667
@@ -119,3 +120,40 @@ DEAL::P14 * P11 =0.00
 DEAL::P14 * P12 =0.00
 DEAL::P14 * P13 =0.00
 DEAL::P14 * P14 =0.0690
+DEAL::LagrangeEquidistant
+DEAL::P0(x0) =2.00
+DEAL::P0(x1) =1.00
+DEAL::P0(x2) =1.00
+DEAL::P0(x3) =1.00
+DEAL::P0(x4) =1.00
+DEAL::P0(x5) =1.00
+DEAL::P1(x0) =1.00
+DEAL::P1(x1) =2.00
+DEAL::P1(x2) =1.00
+DEAL::P1(x3) =1.00
+DEAL::P1(x4) =1.00
+DEAL::P1(x5) =1.00
+DEAL::P2(x0) =1.00
+DEAL::P2(x1) =1.00
+DEAL::P2(x2) =2.00
+DEAL::P2(x3) =1.00
+DEAL::P2(x4) =1.00
+DEAL::P2(x5) =1.00
+DEAL::P3(x0) =1.00
+DEAL::P3(x1) =1.00
+DEAL::P3(x2) =1.00
+DEAL::P3(x3) =2.00
+DEAL::P3(x4) =1.00
+DEAL::P3(x5) =1.00
+DEAL::P4(x0) =1.00
+DEAL::P4(x1) =1.00
+DEAL::P4(x2) =1.00
+DEAL::P4(x3) =1.00
+DEAL::P4(x4) =2.00
+DEAL::P4(x5) =1.00
+DEAL::P5(x0) =1.00
+DEAL::P5(x1) =1.00
+DEAL::P5(x2) =1.00
+DEAL::P5(x3) =1.00
+DEAL::P5(x4) =1.00
+DEAL::P5(x5) =2.00
