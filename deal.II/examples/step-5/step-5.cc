@@ -817,7 +817,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // way as done above in deciding
 				   // which file to include, we here
 				   // decide which class name to use:
-#ifdef HAVE_STD_STRINSTREAM
+#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream filename;
 #else
   std::ostrstream filename;
