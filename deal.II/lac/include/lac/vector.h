@@ -203,9 +203,18 @@ class Vector
     Vector<Number> & operator= (const Vector<Number2>& V);
     
 				     /**
-				      * $U = U * V$: scalar product.
+				      * Return the scalar product of
+				      * two vectors.  The return type
+				      * is the underlying type of
+				      * @p{this} vector, so the return
+				      * type and the accuracy with
+				      * which it the result is
+				      * computed depend on the order
+				      * of the arguments of this
+				      * vector.
 				      */
-    Number operator* (const Vector<Number>& V) const;
+    template <typename Number2>
+    Number operator* (const Vector<Number2> &V) const;
 
 				     /**
 				      * Return square of the $l_2$-norm.

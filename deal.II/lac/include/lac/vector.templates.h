@@ -104,14 +104,15 @@ bool Vector<Number>::all_zero () const
 
 
 template <typename Number>
-Number Vector<Number>::operator * (const Vector<Number>& v) const
+template <typename Number2>
+Number Vector<Number>::operator * (const Vector<Number2>& v) const
 {
   Assert (dim!=0, ExcEmptyVector());
-
-  if (&v == this)
+  
+  if (this == reinterpret_cast<const Vector<Number>*>(&v))
     return norm_sqr();
   
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (dim == v.size(), ExcDimensionMismatch(dim, v.size()));
   
   Number sum0 = 0,
 	 sum1 = 0,
@@ -122,8 +123,8 @@ Number Vector<Number>::operator * (const Vector<Number>& v) const
 				   // allowing pipelined commands to be
 				   // executed in parallel
   const_iterator ptr  = begin(),
-		 vptr = v.begin(),
 		 eptr = ptr + (dim/4)*4;
+  typename Vector<Number2>::const_iterator vptr = v.begin();
   while (ptr!=eptr)
     {
       sum0 += (*ptr++ * *vptr++);
