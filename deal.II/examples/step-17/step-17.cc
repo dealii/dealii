@@ -877,7 +877,7 @@ unsigned int ElasticProblem<dim>::solve ()
                                  // time (or start their work for the next
                                  // iteration, or simply yield their CPUs to
                                  // other jobs that happen to run at the same
-                                 // time). The second thing is tath we not
+                                 // time). The second thing is that we not
                                  // only output the solution vector, but also
                                  // a vector that indicates which subdomain
                                  // each cell belongs to. This will make for
