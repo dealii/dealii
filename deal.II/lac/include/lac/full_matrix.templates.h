@@ -437,7 +437,7 @@ void FullMatrix<number>::backward (Vector<number2>& dst, const Vector<number2>& 
 {
   Assert(n() <= m(), ExcNotQuadratic());
   Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
-  Assert(src.size() == m(), ExcDimensionMismatch(src.size(), n()));
+  Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
 
   unsigned int j;
   unsigned int nu = (m()<n() ? m() : n());
