@@ -704,7 +704,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      */
     template <int,int,int> friend class DataOut_DoFData;
 
-#ifdef DEAL_II_CHECK_NESTED_CLASS_FRIEND_BUG
+#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
                                      /**
                                       * Make DataEntry a friend. This should
                                       * not be strictly necessary, since
@@ -714,8 +714,15 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * DataEntry can't derive from
                                       * DataEntryBase since the latter is a
                                       * private member of DataOut_DoFData.
+				      *
+				      * For whatever weird reason, it
+				      * is also not enough to make
+				      * just DataEntry a friend, but
+				      * we have to fully qualify it...
                                       */
-    template <typename> friend class DataEntry;
+    template <int N1, int N2, int N3>
+    template <typename>
+    friend class DataOut_DoFData<N1,N2,N3>::DataEntry;
 #endif
 };
 
