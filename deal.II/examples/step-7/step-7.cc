@@ -24,7 +24,7 @@
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
 #include <numerics/matrices.h>
 #include <numerics/error_estimator.h>
 #include <numerics/data_out.h>
@@ -1449,18 +1449,41 @@ void LaplaceProblem<dim>::run ()
 				   // simple here, since we only have
 				   // a pointer to the common base
 				   // class of all finite elements,
-				   // but we can use a rather new
-				   // feature of C++ to check whether
-				   // the actual type of the object
-				   // pointed to by ``fe'' is an
-				   // ``FEQ1'', ``FEQ2'', or something
-				   // different.
-  if (typeid(*fe)==typeid(const FEQ1<dim>))
-    filename += "-q1";
-  else
-    if (typeid(*fe)==typeid(const FEQ2<dim>))
-      filename += "-q2";
-    else
+				   // which does not know anything
+				   // about polynomial
+				   // degrees. However, we actually
+				   // know that we have generated a
+				   // finite element of class
+				   // ``FE_Q'', so we can use some C++
+				   // feature to actually get a
+				   // reference to the ``FE_Q''
+				   // element pointed to by the
+				   // reference and ask it for the
+				   // polynomial degree. Note that if
+				   // for whatever reason the object
+				   // referenced behind the pointer to
+				   // the base class should not be of
+				   // type ``FE_Q'', then the C++
+				   // language lets the
+				   // ``dynamic_cast'' operator
+				   // applied to a reference type
+				   // throw an exception (if it were a
+				   // pointer type, then a null
+				   // pointer would be returned, which
+				   // would then yield a segmentation
+				   // fault when dereferenced in the
+				   // subsequent call to
+				   // ``get_order'').
+  switch (dynamic_cast<const FE_Q<dim>&>(*fe).get_degree())
+    {
+      case 1:
+	    filename += "-q1";
+	    break;
+      case 2:
+	    filename += "-q2";
+	    break;
+
+      default:
 				       // The finite element is
 				       // neither Q1 nor Q2. This
 				       // should not have happened,
@@ -1471,7 +1494,9 @@ void LaplaceProblem<dim>::run ()
 				       // exception, since we don't
 				       // know how to name the
 				       // respective output file
-      Assert (false, ExcInternalError());
+	    Assert (false, ExcInternalError());
+    };
+  
     
   filename += ".gmv";
 	    
@@ -1531,26 +1556,15 @@ void LaplaceProblem<dim>::run ()
 				   // quadratic elements, two
 				   // sub-cells per space direction is
 				   // obviously the right choice, so
-				   // this is what we choose (note
-				   // that the variable is initialized
-				   // anyway to avoid an error message
-				   // about possible use without
-				   // initialization in optimized
-				   // mode, where the compiler does
-				   // not abort the program in the
-				   // second `else' clause; however,
-				   // the value in the initialization
-				   // is such that it should be
-				   // invalid):
-  unsigned int n_subcells = static_cast<unsigned int>(-1);
-  if (typeid(*fe) == typeid(const FEQ1<dim>))
-    n_subcells = 1;
-  else
-    if (typeid(*fe) == typeid(const FEQ2<dim>))
-      n_subcells = 2;
-    else
-      Assert (false, ExcInternalError());
-  
+				   // this is what we choose. In
+				   // general, for elements of
+				   // polynomial order ``q'', we use
+				   // ``q'' subdivisions, and the
+				   // order of the elements is
+				   // determined in the same way as
+				   // above in the ``run'' function:
+  const unsigned int
+    n_subcells = dynamic_cast<const FE_Q<dim>&>(*fe).get_degree();
   data_out.build_patches (n_subcells);
 
 				   // Finally write out the data in
@@ -1589,13 +1603,19 @@ void LaplaceProblem<dim>::run ()
 	  default:
 		Assert (false, ExcInternalError());
 	};
-      if (typeid(*fe)==typeid(const FEQ1<dim>))
-	filename += "-q1";
-      else
-	if (typeid(*fe)==typeid(const FEQ2<dim>))
-	  filename += "-q2";
-	else
-	  Assert (false, ExcInternalError());
+
+      switch (dynamic_cast<const FE_Q<dim>&>(*fe).get_degree())
+	{
+	  case 1:
+		filename += "-q1";
+		break;
+	  case 2:
+		filename += "-q2";
+		break;
+	  default:
+		Assert (false, ExcInternalError());
+	};
+  
       filename += ".tex";
       
       std::ofstream table_file(filename.c_str());
@@ -1685,13 +1705,17 @@ void LaplaceProblem<dim>::run ()
 	  default:
 		Assert (false, ExcInternalError());
 	};
-      if (typeid(*fe)==typeid(const FEQ1<dim>))
-	filename += "-q1";
-      else
-	if (typeid(*fe)==typeid(const FEQ2<dim>))
-	  filename += "-q2";
-	else
-	  Assert (false, ExcInternalError());
+      switch (dynamic_cast<const FE_Q<dim>&>(*fe).get_degree())
+	{
+	  case 1:
+		filename += "-q1";
+		break;
+	  case 2:
+		filename += "-q2";
+		break;
+	  default:
+		Assert (false, ExcInternalError());
+	};
       filename += ".tex";
 
       std::ofstream table_file(filename.c_str());
@@ -1729,7 +1753,7 @@ int main ()
 		  << "=============================================" << std::endl
 		  << std::endl;
 	
-	FEQ1<2> fe;
+	FE_Q<2> fe(1);
 	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::adaptive_refinement);
 	laplace_problem_2d.run ();
 
@@ -1741,7 +1765,7 @@ int main ()
 		  << "===========================================" << std::endl
 		  << std::endl;
 	
-	FEQ1<2> fe;
+	FE_Q<2> fe(1);
 	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
 	laplace_problem_2d.run ();
 
@@ -1753,7 +1777,7 @@ int main ()
 		  << "===========================================" << std::endl
 		  << std::endl;
 	
-	FEQ2<2> fe;
+	FE_Q<2> fe(2);
 	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
 	laplace_problem_2d.run ();
 
