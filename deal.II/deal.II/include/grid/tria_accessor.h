@@ -237,9 +237,6 @@ class TriaAccessor {
     template <int dim, typename Accessor> friend class TriaRawIterator<dim,Accessor>;
     template <int dim, typename Accessor> friend class TriaIterator<dim,Accessor>;
     template <int dim, typename Accessor> friend class TriaActiveIterator<dim,Accessor>;
-
-    friend class TriaRawIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
-    friend class TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
 };
 
 
