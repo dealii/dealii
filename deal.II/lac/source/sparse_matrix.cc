@@ -28,6 +28,22 @@ SparseMatrixStruct::SparseMatrixStruct () :
 
 
 
+SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &s) :
+		max_dim(0),
+		max_vec_len(0),
+		rowstart(0),
+		colnums(0)
+{
+  Assert (s.rowstart == 0, ExcInvalidConstructorCall());
+  Assert (s.colnums == 0, ExcInvalidConstructorCall());
+  Assert (s.rows == 0, ExcInvalidConstructorCall());
+  Assert (s.cols == 0, ExcInvalidConstructorCall());
+  
+  reinit (0,0,0);
+};
+
+
+
 SparseMatrixStruct::SparseMatrixStruct (const unsigned int m, const unsigned int n,
 					const unsigned int max_per_row) 
 		: max_dim(0),
@@ -62,7 +78,8 @@ SparseMatrixStruct::~SparseMatrixStruct ()
 
 
 void
-SparseMatrixStruct::reinit (const unsigned int m, const unsigned int n,
+SparseMatrixStruct::reinit (const unsigned int m,
+			    const unsigned int n,
 			    const unsigned int max_per_row)
 {
   Assert ((max_per_row>0) || ((m==0) && (n==0)), ExcInvalidNumber(max_per_row));

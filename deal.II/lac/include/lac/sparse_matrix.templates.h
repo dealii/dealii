@@ -21,7 +21,21 @@ template <typename number>
 SparseMatrix<number>::SparseMatrix () :
 		cols(0),
 		val(0),
-		max_len(0) {};
+		max_len(0)
+{};
+
+
+
+template <typename number>
+SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
+		cols(0),
+		val(0),
+		max_len(0)
+{
+  Assert (m.cols==0, ExcInvalidConstructorCall());
+  Assert (m.val==0, ExcInvalidConstructorCall());
+  Assert (m.max_len==0, ExcInvalidConstructorCall());
+};
 
 
 

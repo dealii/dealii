@@ -29,19 +29,6 @@ class ostream;
    */
 class SparseMatrixStruct
 {
-  private:
-				     /**
-				      * Copy constructor, made private in order to
-				      * prevent copying such an object which does
-				      * not make much sense because you can use
-				      * a structure like this for more than one
-				      * matrix.
-				      *
-				      * Because it is not needed, this function
-				      * is not implemented.
-				      */
-    SparseMatrixStruct (const SparseMatrixStruct &);
-    
   public:
 				     /**
 				      * Initialize the matrix empty, i.e. with
@@ -53,6 +40,33 @@ class SparseMatrixStruct
 				      */
     SparseMatrixStruct ();
     
+				     /**
+				      * Copy constructor. This constructor is
+				      * only allowed to be called if the matrix
+				      * structure to be copied is empty. This is
+				      * so in order to prevent involuntary
+				      * copies of objects for temporaries, which
+				      * can use large amounts of computing time.
+				      * However, copy constructors are needed
+				      * if yo want to use the STL data types
+				      * on classes like this, e.g. to write
+				      * such statements like
+				      * #v.push_back (SparseMatrixStruct());#,
+				      * with #v# a vector of #SparseMatrixStruct#
+				      * objects.
+				      *
+				      * Usually, it is sufficient to use the
+				      * explicit keyword to disallow unwanted
+				      * temporaries, but for the STL vectors,
+				      * this does not work. Since copying a
+				      * structure like this is not useful
+				      * anyway because multiple matrices can
+				      * use the same sparsity structure, copies
+				      * are only allowed for empty objects, as
+				      * described above.
+				      */
+    SparseMatrixStruct (const SparseMatrixStruct &);
+
 				     /**
 				      * Initialize a rectangular matrix with
 				      * #m# rows and #n# columns,
@@ -334,6 +348,10 @@ class SparseMatrixStruct
 				      * Exception
 				      */
     DeclException0 (ExcIO);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidConstructorCall);
 
   private:
     unsigned int max_dim;
@@ -382,6 +400,21 @@ class SparseMatrix
 				      * #reinit(SparseMatrixStruct)#.
 				      */
     SparseMatrix ();
+
+				     /**
+				      * Copy constructor. This constructor is
+				      * only allowed to be called if the matrix
+				      * to be copied is empty. This is for the
+				      * same reason as for the
+				      * #SparseMatrixStruct#, see there for the
+				      * details.
+				      *
+				      * If you really want to copy a whole
+				      * matrix, you can do so by using the
+				      * #copy_from# function.
+				      */
+    SparseMatrix (const SparseMatrix &);
+    
     
 				     /**
 				      * Constructor. Takes the given matrix
@@ -781,6 +814,10 @@ class SparseMatrix
 				      * Exception
 				      */
     DeclException0 (ExcIO);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidConstructorCall);
     
   private:
     const SparseMatrixStruct * cols;
