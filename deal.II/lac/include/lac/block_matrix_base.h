@@ -121,12 +121,6 @@ namespace internal
 	unsigned int row_block;
 	
 					 /**
-					  * The global number of the first row
-					  * of the block we are presently in.
-					  */
-	unsigned int row_start;	
-	
-					 /**
 					  * Number of block column where
 					  * column lies in.
 					  */
@@ -797,7 +791,6 @@ namespace internal
                     matrix(matrix),
                     base_iterator(matrix->block(0,0).begin()),
                     row_block(0),
-                    row_start(0),
                     col_block(0),
                     col_start(0),
                     a_index(0)
@@ -810,7 +803,6 @@ namespace internal
             = matrix->row_block_indices.global_to_local(r);
           row_block = indices.first;
           base_iterator = matrix->block(indices.first, 0).begin(indices.second);
-          row_start = matrix->row_block_indices.local_to_global(row_block, 0);
         }
       else
         {
@@ -825,7 +817,11 @@ namespace internal
     unsigned int
     Accessor<BlockMatrix>::row() const
     {
-      return row_start + base_iterator->row();
+      if (row_block < matrix->n_block_rows())
+        return (matrix->row_block_indices.local_to_global(row_block, 0) +
+                base_iterator->row());
+      else
+        return 0;
     }
 
 
@@ -936,12 +932,6 @@ namespace internal
                                                    // block row
                   local_row = 0;
                   ++accessor.row_block;
-                  if (accessor.row_block < accessor.matrix->n_block_rows())
-                    accessor.row_start =
-                      accessor.matrix->row_block_indices
-                      .local_to_global(accessor.row_block, 0);
-                  else
-                    accessor.row_start = 0;
                 }
             }
                                            // Finally, set base_iterator
