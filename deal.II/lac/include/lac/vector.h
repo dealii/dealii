@@ -52,14 +52,14 @@ class Vector
 				      * those in the @p{C++} standard libraries
 				      * @p{vector<...>} class.
 				      */
-    typedef Number value_type;
-    typedef value_type* pointer;
-    typedef const value_type* const_pointer;
-    typedef value_type* iterator;
-    typedef const value_type* const_iterator;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
-    typedef size_t size_type;
+    typedef Number            value_type;
+    typedef value_type       *pointer;
+    typedef const value_type *const_pointer;
+    typedef value_type       *iterator;
+    typedef const value_type *const_iterator;
+    typedef value_type       &reference;
+    typedef const value_type &const_reference;
+    typedef size_t            size_type;
 
 
 				     /**
@@ -101,6 +101,16 @@ class Vector
 				      * initialize all elements with zero.
 				      */
     Vector (const unsigned int n);
+
+				     /**
+				      * Initialize the vector with a
+				      * given range of values pointed
+				      * to by the iterators. This
+				      * function is there in analogy
+				      * to the @p{std::vector} class.
+				      */
+    template <typename InputIterator>
+    Vector (const InputIterator first, const InputIterator last);
     
 				     /**
 				      * Destructor, deallocates
@@ -521,6 +531,24 @@ Vector<Number>::Vector () :
 {}
 
 
+
+template <typename Number>
+template <typename InputIterator>
+Vector<Number>::Vector (const InputIterator first, const InputIterator last)
+		:
+		dim (0),
+		maxdim (0),
+		val (0)
+{
+				   // allocate memory. do not
+				   // initialize it, as we will copy
+				   // over to it in a second
+  reinit (std::distance (first, last), true);
+  std::copy (first, last, begin());
+};
+
+
+
 template <typename Number>
 inline
 Vector<Number>::Vector (const unsigned int n) :
@@ -546,7 +574,8 @@ Vector<Number>::~Vector ()
 
 template <typename Number>
 inline
-void Vector<Number>::reinit (const unsigned int n, const bool fast) {
+void Vector<Number>::reinit (const unsigned int n, const bool fast)
+{
   if (n==0) 
     {
       if (val) delete[] val;

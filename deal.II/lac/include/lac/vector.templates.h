@@ -500,7 +500,7 @@ Vector<Number>::operator = (const Vector<Number>& v)
 
 
 template <typename Number>
-template<typename Number2>
+template <typename Number2>
 Vector<Number>&
 Vector<Number>::operator = (const Vector<Number2>& v)
 {

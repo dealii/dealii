@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,6 +65,11 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
   
   d1 = 2.5;
   print (d1);
+
+				   // initialize with iterators
+  number1 array[] = { 0.0, 1.1, 2.2, 3.3 };
+  Vector<number1> d4 (&array[0], &array[4]);
+  print (d4);
   
   deallog << "Extract number" << std::endl;
 				   // Each line should contain two equal numbers
