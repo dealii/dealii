@@ -44,7 +44,7 @@ bool ParameterHandler::read_input (istream &input) {
 				       // chars is arbitrary but should
 				       // be enough
       char c[10000];
-      input.getline ((char *)&c, 10000);
+      input.getline (&c[0], 10000);
       line = c;
       if (!scan_line (line, lineno)) 
 	status = false;
@@ -114,9 +114,9 @@ void ParameterHandler::clear () {
   map<String, Section*, less<String> >::iterator p;
 
   for (p=defaults.subsections.begin(); p!=defaults.subsections.end(); ++p)
-    delete (*p).second;
+    delete p->second;
   for (p=changed_entries.subsections.begin(); p!=changed_entries.subsections.end(); ++p)
-    delete (*p).second;
+    delete p->second;
 
   defaults.subsections.erase (defaults.subsections.begin(), defaults.subsections.end());
   changed_entries.subsections.erase (changed_entries.subsections.begin(),
@@ -215,11 +215,11 @@ const String & ParameterHandler::get (const String &entry_string) const {
   map<String, pair<String,String>, less<String> >::const_iterator ptr;
   ptr = pc->entries.find (entry_string);
   if (ptr != pc->entries.end())
-    return (*ptr).second.first;
+    return ptr->second.first;
 
 				   // not changed
   ptr = pd->entries.find (entry_string);
-  return (*ptr).second.first;
+  return ptr->second.first;
 };
 
 
@@ -307,32 +307,32 @@ void ParameterHandler::print_parameters_section (ostream &out,
 				   // first find out the longest entry name
   unsigned int longest_entry = 0;
   for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
-    if ((*ptr).first.length() > longest_entry)
-      longest_entry = (*ptr).first.length();
+    if (ptr->first.length() > longest_entry)
+      longest_entry = ptr->first.length();
 
 				   // print entries one by one
   for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
     {
 				       // check whether this entry is listed
 				       // in the Changed tree
-      if (pc->entries.find((*ptr).first) != pc->entries.end()) 
+      if (pc->entries.find(ptr->first) != pc->entries.end()) 
 	switch (style) 
 	  {
 	    case Text:
 		  out << setw(indent_level*2) << ""
-		      << (*ptr).first
-		      << setw(longest_entry-(*ptr).first.length()+3) << " = "
-		      << pc->entries[(*ptr).first].first
+		      << ptr->first
+		      << setw(longest_entry-ptr->first.length()+3) << " = "
+		      << pc->entries[ptr->first].first
 		      << "  <"
-		      << pd->entries[(*ptr).first].first
+		      << pd->entries[ptr->first].first
 		      << ">"
 		      << endl;
 		  break;
 	    case LaTeX:
-		  out << "\\item {\\bf " << (*ptr).first << ":} "
-		      << pc->entries[(*ptr).first].first
+		  out << "\\item {\\bf " << ptr->first << ":} "
+		      << pc->entries[ptr->first].first
 		      << " ({\\it default:} "
-                      << pd->entries[(*ptr).first].first
+                      << pd->entries[ptr->first].first
 		      << ")"
 		      << endl;
 		  break;
@@ -345,13 +345,13 @@ void ParameterHandler::print_parameters_section (ostream &out,
 	  {
 	    case Text:
 		  out << setw(indent_level*2) << ""
-		      << (*ptr).first
-		      << setw(longest_entry-(*ptr).first.length()+2) << "= "
-		      << (*ptr).second.first << endl;
+		      << ptr->first
+		      << setw(longest_entry-ptr->first.length()+2) << "= "
+		      << ptr->second.first << endl;
 		  break;
 	    case LaTeX:
-		  out << "\\item {\\bf " << (*ptr).first << ":} "
-		      << (*ptr).second.first
+		  out << "\\item {\\bf " << ptr->first << ":} "
+		      << ptr->second.first
 		      << endl;
 		  break;
 	    default:
@@ -368,12 +368,12 @@ void ParameterHandler::print_parameters_section (ostream &out,
 	{
 	  case Text:
 		out << setw(indent_level*2) << ""
-		    << "subsection " << (*ptrss).first << endl;
+		    << "subsection " << ptrss->first << endl;
 		break;
 	  case LaTeX:
 		out << endl
 		    << "\\item {\\bf "
-		    << "Subsection " << (*ptrss).first
+		    << "Subsection " << ptrss->first
 		    << "}" << endl
 		    << "\\begin{itemize}"
 		    << endl;
@@ -381,7 +381,7 @@ void ParameterHandler::print_parameters_section (ostream &out,
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
-      enter_subsection ((*ptrss).first);
+      enter_subsection (ptrss->first);
       print_parameters_section (out, style, indent_level+1);
       leave_subsection ();
       switch (style) 
@@ -552,7 +552,7 @@ ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () 
 
 
 const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () const {
-  Section* sec = (Section*)&defaults; // not nice, but needs to be and
+  Section* sec = const_cast<Section*>(&defaults); // not nice, but needs to be and
 				   // after all: we do not change #sec#
   vector<String>::const_iterator SecName = subsection_path.begin();
     
@@ -583,7 +583,7 @@ ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () {
 
 
 const ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () const {
-  Section* sec = (Section*)&changed_entries; // same as in get_present_default_s...
+  Section* sec = const_cast<Section*>(&changed_entries); // same as in get_present_default_s...
   vector<String>::const_iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
@@ -603,7 +603,7 @@ ParameterHandler::Section::~Section () {
   map<String, Section*, less<String> >::iterator p;
 
   for (p=subsections.begin(); p!=subsections.end(); ++p)
-    delete (*p).second;
+    delete p->second;
 
 
   subsections.erase (subsections.begin(), subsections.end());
@@ -690,7 +690,7 @@ void MultipleParameterLoop::init_branches () {
   if (multiple_choices.size() > 0)
     for (vector<Entry>::iterator i=multiple_choices.end()-1;
 	 i >= multiple_choices.begin(); --i)
-      if ((*i).different_values.size() == 1)
+      if (i->different_values.size() == 1)
 	multiple_choices.erase (i);
 
 				   // finally calculate number of branches
@@ -728,18 +728,18 @@ void MultipleParameterLoop::init_branches_section (const ParameterHandler::Secti
 				   // whether it is a multiple entry
   map<String, pair<String,String>, less<String> >::const_iterator e;
   for (e = sec.entries.begin(); e != sec.entries.end(); ++e) 
-    if ((*e).second.first.contains('{')) 
+    if (e->second.first.contains('{')) 
       multiple_choices.push_back (Entry(subsection_path,
-					(*e).first,
-					(*e).second.first));
+					e->first,
+					e->second.first));
 	        
 
 				   // transverse subsections
   map<String, Section*, less<String> >::const_iterator s;
   for (s = sec.subsections.begin(); s != sec.subsections.end(); ++s) 
     {
-      enter_subsection ((*s).first);
-      init_branches_section (*(*s).second);
+      enter_subsection (s->first);
+      init_branches_section (*s->second);
       leave_subsection ();
     };
 };
@@ -755,53 +755,53 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no) {
     {
 				       // temporarily enter the subsection tree
 				       // of this multiple entry
-      subsection_path.swap ((*choice).subsection_path);
+      subsection_path.swap (choice->subsection_path);
 
 				       // set entry
       Section* pd = get_present_defaults_subsection ();
-      int selection = (run_no/possibilities) % (*choice).different_values.size();
+      int selection = (run_no/possibilities) % choice->different_values.size();
       String entry_value;
-      if ((*choice).type == variant)
-	entry_value = (*choice).different_values[selection];
+      if (choice->type == variant)
+	entry_value = choice->different_values[selection];
       else 
 	{
-	  if (run_no>=(*choice).different_values.size()) 
+	  if (run_no>=choice->different_values.size()) 
 	    {
 	      cerr << "The given array for entry "
-		<< pd->entries[(*choice).entry_name].first
+		<< pd->entries[choice->entry_name].first
 		<< " does not conatin enough elements! Taking empty string instead." << endl;
 	      entry_value = "";
 	    }
 	  else
-	    entry_value = (*choice).different_values[run_no];
+	    entry_value = choice->different_values[run_no];
 	};
       
 				       // check conformance with regex
-      if (!entry_value.matches (Regex(pd->entries[(*choice).entry_name].second)))
+      if (!entry_value.matches (Regex(pd->entries[choice->entry_name].second)))
 	{
 	  cerr << "In run no.  " << run_no+1 << ":" << endl
 	       << "    The entry value" << endl
 	       << "        " << entry_value << endl
 	       << "    for the entry named" << endl
-	       << "        " << (*choice).entry_name << endl
+	       << "        " << choice->entry_name << endl
 	       << "    does not match the given regular expression" << endl
-	       << "        " << pd->entries[(*choice).entry_name].second << endl
+	       << "        " << pd->entries[choice->entry_name].second << endl
 	       << "    Taking default value" << endl
-	       << "        " << pd->entries[(*choice).entry_name].first << endl;
+	       << "        " << pd->entries[choice->entry_name].first << endl;
 	  
 					   // select default instead
-	  entry_value = pd->entries[(*choice).entry_name].first;
+	  entry_value = pd->entries[choice->entry_name].first;
 	};
 
       Section* pc = get_present_changed_subsection ();
-      pc->entries[(*choice).entry_name] = make_pair(entry_value, String(""));
+      pc->entries[choice->entry_name] = make_pair(entry_value, String(""));
             
 				       // get out of subsection again
-      subsection_path.swap ((*choice).subsection_path);
+      subsection_path.swap (choice->subsection_path);
 
 				       // move ahead if it was a variant entry
-      if ((*choice).type == variant)
-	possibilities *= (*choice).different_values.size();
+      if (choice->type == variant)
+	possibilities *= choice->different_values.size();
     };
   
 };

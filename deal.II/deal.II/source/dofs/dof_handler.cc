@@ -6,6 +6,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
+#include <fe/fe.h>
 #include <lac/dsmatrix.h>
 #include <map>
 #include <algorithm>
@@ -631,19 +632,19 @@ const Triangulation<dim> & DoFHandler<dim>::get_tria () const {
 
 
 template <int dim>
-const FiniteElement<dim> & DoFHandler<dim>::get_selected_fe () const {
+const FiniteElementBase<dim> & DoFHandler<dim>::get_selected_fe () const {
   return *selected_fe;
 };
 
 
 
 template <int dim>
-void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe) {
+void DoFHandler<dim>::distribute_dofs (const FiniteElementBase<dim> &fe) {
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
   
-  reserve_space (fe);
   if (selected_fe != 0) delete selected_fe;
-  selected_fe = new FiniteElement<dim>(fe);
+  selected_fe = new FiniteElementBase<dim>(fe);
+  reserve_space ();
 
 				   // clear user flags because we will
 				   // need them
@@ -653,7 +654,7 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe) {
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   for (; cell != endc; ++cell) 
-    next_free_dof = distribute_dofs_on_cell (cell, fe, next_free_dof);
+    next_free_dof = distribute_dofs_on_cell (cell, next_free_dof);
   
   used_dofs = next_free_dof;
 };
@@ -661,7 +662,6 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe) {
 
 
 int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator   &cell,
-					    const FiniteElement<1> &fe,
 					    unsigned int            next_free_dof) {
 
 				   // distribute dofs of vertices
@@ -681,11 +681,13 @@ int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator   &cell,
 					   // copy dofs
 	    {
 	      if (v==0) 
-		for (unsigned int d=0; d<fe.dofs_per_vertex; ++d)
-		  cell->set_vertex_dof_index (0, d, neighbor->vertex_dof_index (1, d));
+		for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
+		  cell->set_vertex_dof_index (0, d,
+					      neighbor->vertex_dof_index (1, d));
 	      else
-		for (unsigned int d=0; d<fe.dofs_per_vertex; ++d)
-		  cell->set_vertex_dof_index (1, d, neighbor->vertex_dof_index (0, d));
+		for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
+		  cell->set_vertex_dof_index (1, d,
+					      neighbor->vertex_dof_index (0, d));
 
 					       // next neighbor
 	      continue;
@@ -693,12 +695,12 @@ int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator   &cell,
 	};
             
 				       // otherwise: create dofs newly
-      for (unsigned int d=0; d<fe.dofs_per_vertex; ++d)
+      for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
 	cell->set_vertex_dof_index (v, d, next_free_dof++);
     };
   
 				   // dofs of line
-  for (unsigned int d=0; d<fe.dofs_per_line; ++d)
+  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
     cell->set_dof_index (d, next_free_dof++);
 
 				   // note that this cell has been processed
@@ -711,16 +713,15 @@ int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator   &cell,
 
 
 int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator   &cell,
-					    const FiniteElement<2> &fe,
 					    unsigned int            next_free_dof) {
-  if (fe.dofs_per_vertex > 0)
+  if (selected_fe->dofs_per_vertex > 0)
 				     // number dofs on vertices
     for (unsigned int vertex=0; vertex<4; ++vertex)
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
       if (cell->vertex_dof_index(vertex, 0) == -1)
-	for (unsigned int d=0; d<fe.dofs_per_vertex; ++d)
+	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
 	  cell->set_vertex_dof_index (vertex, d, next_free_dof++);
     
   				   // for the four sides
@@ -729,12 +730,12 @@ int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator   &cell,
       line_iterator line = cell->line(side);
 
 				       // distribute dofs if necessary
-      if ((fe.dofs_per_line > 0) &&
+      if ((selected_fe->dofs_per_line > 0) &&
 					 // check whether line dof is already
 					 // numbered (check only first dof)
 	  (line->dof_index(0) == -1))
 					 // if not: distribute dofs
-	for (unsigned int d=0; d<fe.dofs_per_line; ++d)
+	for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
 	  line->set_dof_index (d, next_free_dof++);	    
 
 				       // note if line is subject to constraints
@@ -744,8 +745,8 @@ int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator   &cell,
   
 
       				       // dofs of quad
-  if (fe.dofs_per_quad > 0)
-    for (unsigned int d=0; d<fe.dofs_per_line; ++d)
+  if (selected_fe->dofs_per_quad > 0)
+    for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
       cell->set_dof_index (d, next_free_dof++);
 
   
@@ -903,7 +904,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 				       ////
       multimap<unsigned int, int, less<unsigned int> >::iterator i;
       for (i = dofs_by_coordination.begin(); i!=dofs_by_coordination.end(); ++i) 
-	new_number[(*i).second] = next_free_number++;
+	new_number[i->second] = next_free_number++;
 
 				       // after that: copy this round's
 				       // dofs for the next round
@@ -1512,7 +1513,8 @@ void DoFHandler<dim>::distribute_cell_to_dof_vector (const dVector &cell_data,
 
 
 
-void DoFHandler<1>::reserve_space (const FiniteElement<1> &fe) {
+void DoFHandler<1>::reserve_space () {
+  Assert (selected_fe != 0, ExcNoFESelected());
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
                                    // delete all levels and set them up
                                    // newly, since vectors are
@@ -1530,14 +1532,15 @@ void DoFHandler<1>::reserve_space (const FiniteElement<1> &fe) {
       levels.push_back (new DoFLevel<1>);
 
       levels.back()->line_dofs.resize (tria->levels[i]->lines.lines.size() *
-				       fe.dofs_per_line,
+				       selected_fe->dofs_per_line,
 				       -1);
     };
 };
 
 
 
-void DoFHandler<2>::reserve_space (const FiniteElement<2> &fe) {
+void DoFHandler<2>::reserve_space () {
+  Assert (selected_fe != 0, ExcNoFESelected());
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
   
                                    // delete all levels and set them up
@@ -1557,10 +1560,10 @@ void DoFHandler<2>::reserve_space (const FiniteElement<2> &fe) {
       levels.push_back (new DoFLevel<2>);
 
       levels.back()->line_dofs.resize (tria->levels[i]->lines.lines.size() *
-				       fe.dofs_per_line,
+				       selected_fe->dofs_per_line,
 				       -1);
       levels.back()->quad_dofs.resize (tria->levels[i]->quads.quads.size() *
-				       fe.dofs_per_quad,
+				       selected_fe->dofs_per_quad,
 				       -1);
     };
 };

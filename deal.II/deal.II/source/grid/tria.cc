@@ -116,7 +116,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
       if (lines_at_vertex[line->vertex_index(vertex)][0] == line->index())
 	if (lines_at_vertex[line->vertex_index(vertex)].size() == 2) 
 	  {
-	    const cell_iterator neighbor ((Triangulation<1>*)this,
+	    const cell_iterator neighbor (const_cast<Triangulation<1>*>(this),
 					  0,              // level
 					  lines_at_vertex[line->vertex_index(vertex)][1]);
 	    line->set_neighbor (vertex, neighbor);
@@ -129,7 +129,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 					 // present line is not first adjacent
 					 // one -> first adjacent one is neighbor
 	{
-	  const cell_iterator neighbor ((Triangulation<1>*)this,
+	  const cell_iterator neighbor (const_cast<Triangulation<1>*>(this),
 					0,              // level
 					lines_at_vertex[line->vertex_index(vertex)][0]);
 	  line->set_neighbor (vertex, neighbor);
@@ -266,8 +266,8 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
       for (i=needed_lines.begin(); i!=needed_lines.end(); i++) 
 	{
 					   // touch the vertices of this line
-	  ++vertex_touch_count[(*i).first.first];
-	  ++vertex_touch_count[(*i).first.second];
+	  ++vertex_touch_count[i->first.first];
+	  ++vertex_touch_count[i->first.second];
 	};
 
 				       // assert minimum touch count is at
@@ -290,9 +290,9 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
       map<pair<int,int>,line_iterator,less<pair<int,int> > >::iterator i;
       for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
 	{
-	  line->set (Line((*i).first.first, (*i).first.second));
+	  line->set (Line(i->first.first, i->first.second));
 	  line->set_used_flag ();
-	  (*i).second = line;
+	  i->second = line;
 	};
     };
 
@@ -367,8 +367,8 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
   for (; boundary_line!=end_boundary_line; ++boundary_line) 
     {
       line_iterator line;
-      pair<int,int> line_vertices(make_pair((*boundary_line).vertices[0],
-					    (*boundary_line).vertices[1]));
+      pair<int,int> line_vertices(make_pair(boundary_line->vertices[0],
+					    boundary_line->vertices[1]));
       if (needed_lines.find(line_vertices) != needed_lines.end())
 					 // line found in this direction
 	line = needed_lines[line_vertices];
@@ -393,7 +393,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
       Assert (line->boundary_indicator() == 0,
 	      ExcInteriorLineCantBeBoundary());
 
-      line->set_boundary_indicator ((*boundary_line).material_id);
+      line->set_boundary_indicator (boundary_line->material_id);
     };
 
 
@@ -580,7 +580,7 @@ void Triangulation<dim>::save_refine_flags (ostream &out) const {
 				   // 3. magic number 0xabcd
   out << mn_tria_refine_flags_begin << " " << N << endl;
   for (unsigned int i=0; i<N/8+1; ++i) 
-    out << (unsigned int)flags[i] << " ";
+    out << static_cast<unsigned int>(flags[i]) << " ";
   
   out << endl;
   out << mn_tria_refine_flags_end << endl;
@@ -685,7 +685,7 @@ void Triangulation<dim>::save_user_flags_line (ostream &out) const {
 				   // 3. magic number 0xabcf
   out << mn_tria_line_user_flags_begin << " " << N << endl;
   for (unsigned int i=0; i<N/8+1; ++i) 
-    out << (unsigned int)flags[i] << " ";
+    out << static_cast<unsigned int>(flags[i]) << " ";
   
   out << endl;
   out << mn_tria_line_user_flags_end << endl;
@@ -758,7 +758,7 @@ void Triangulation<dim>::save_user_flags_quad (ostream &out) const {
 				   // 3. magic number 0xabcf
   out << mn_tria_quad_user_flags_begin << " " << N << endl;
   for (unsigned int i=0; i<N/8+1; ++i) 
-    out << (unsigned int)flags[i] << " ";
+    out << static_cast<unsigned int>(flags[i]) << " ";
   
   out << endl;
   out << mn_tria_quad_user_flags_end << endl;
@@ -1119,7 +1119,7 @@ Triangulation<dim>::begin_raw_line (unsigned int level) const {
   if (levels[level]->lines.lines.size() == 0)
     return end_line ();
   
-  return raw_line_iterator ((Triangulation<dim>*)this,
+  return raw_line_iterator (const_cast<Triangulation<dim>*>(this),
 			    level,
 			    0);
 };
@@ -1144,7 +1144,7 @@ Triangulation<dim>::begin_raw_quad (unsigned int level) const {
   if (levels[level]->quads.quads.size() == 0)
     return end_quad();
   
-  return raw_quad_iterator ((Triangulation<dim>*)this,
+  return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
 			    level,
 			    0);
 };
@@ -1233,7 +1233,7 @@ Triangulation<dim>::begin_active_quad (unsigned int level) const {
 template <int dim>
 typename TriaDimensionInfo<dim>::raw_line_iterator
 Triangulation<dim>::end_line () const {
-  return raw_line_iterator ((Triangulation<dim>*)this,
+  return raw_line_iterator (const_cast<Triangulation<dim>*>(this),
 			    -1,
 			    -1);
 };
@@ -1252,7 +1252,7 @@ Triangulation<1>::end_quad () const {
 template <int dim>
 typename TriaDimensionInfo<dim>::raw_quad_iterator
 Triangulation<dim>::end_quad () const {
-  return raw_quad_iterator ((Triangulation<dim>*)this,
+  return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
 			    -1,
 			    -1);
 };
@@ -1266,7 +1266,7 @@ Triangulation<dim>::last_raw_line (const unsigned int level) const {
   Assert (levels[level]->lines.lines.size() != 0,
 	  ExcEmptyLevel (level));
   
-  return raw_line_iterator ((Triangulation<dim>*)this,
+  return raw_line_iterator (const_cast<Triangulation<dim>*>(this),
 			    level,
 			    levels[level]->lines.lines.size()-1);
 };
@@ -1291,7 +1291,7 @@ Triangulation<dim>::last_raw_quad (const unsigned int level) const {
   Assert (levels[level]->quads.quads.size() != 0,
 	  ExcEmptyLevel (level));
 
-  return raw_quad_iterator ((Triangulation<dim>*)this,
+  return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
 			    level,
 			    levels[level]->quads.quads.size()-1);
 };
@@ -1667,8 +1667,9 @@ unsigned int Triangulation<dim>::max_adjacent_cells () const {
     for (unsigned vertex=0; vertex<(1<<dim); ++vertex)
       ++usage_count[cell->vertex_index(vertex)];
 
-  return max ((unsigned int)1<<dim,
-	      (unsigned int)*(max_element (usage_count.begin(),usage_count.end())));
+  return max (static_cast<unsigned int>(1<<dim),
+	      static_cast<unsigned int>(*(max_element (usage_count.begin(),
+						       usage_count.end()))));
 };
 
 

@@ -6,6 +6,7 @@
 #include <grid/tria_iterator.h>
 #include <basic/data_io.h>
 #include <basic/function.h>
+#include <fe/fe.h>
 #include <fe/quadrature.h>
 
 #include "../../../mia/control.h"
@@ -76,7 +77,7 @@ template <int dim>
 void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				 const Quadrature<dim>    &quadrature,
 				 const FiniteElement<dim> &fe,
-				 const UpdateFields       &update_flags,
+				 const UpdateFlags        &update_flags,
 				 const DirichletBC        &dirichlet_bc,
 				 const Boundary<dim>      &boundary) {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
@@ -167,30 +168,21 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 
   difference.reinit (tria->n_active_cells());
   
-  UpdateFields update_flags = UpdateFields (update_q_points  |
-					    update_jacobians |
-					    update_JxW_values);
+  UpdateFlags update_flags = UpdateFlags (update_q_points  |
+					  update_jacobians |
+					  update_JxW_values);
   if ((norm==H1_seminorm) || (norm==H1_norm))
-    update_flags = UpdateFields (update_flags | update_gradients);
+    update_flags = UpdateFlags (update_flags | update_gradients);
   FEValues<dim> fe_values(fe, q, update_flags);
   
 				   // loop over all cells
-				   // (we need an iterator on the triangulation for
-				   // fe_values.reinit, but we also need an iterator
-				   // on the dofhandler; we could generate the first
-				   // out of the second or vice versa each time
-				   // we need them, but conversion seems to be slow.
-				   // therefore, we keep two iterators, hoping that
-				   // incrementing is faster than conversion...)
   DoFHandler<dim>::active_cell_iterator cell = dof_handler->begin_active(),
 					endc = dof_handler->end();
-  Triangulation<dim>::active_cell_iterator tria_cell = dof_handler->get_tria().begin_active();
-  
-  for (unsigned int index=0; cell != endc; ++cell, ++tria_cell, ++index)
+  for (unsigned int index=0; cell != endc; ++cell, ++index)
     {
       double diff=0;
 				       // initialize for this cell
-      fe_values.reinit (tria_cell, fe, boundary);
+      fe_values.reinit (cell, fe, boundary);
 
       switch (norm) 
 	{
@@ -394,7 +386,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
   make_boundary_value_list (dirichlet_bc, fe, boundary, boundary_values);
 
   map<int,double>::const_iterator dof, endd;
-  const unsigned int n_dofs   = (unsigned int)matrix.m();
+  const unsigned int n_dofs   = matrix.m();
   const dSMatrixStruct &sparsity = matrix.get_sparsity_pattern();
   const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
   const int          *sparsity_colnums  = sparsity.get_column_numbers();
@@ -405,9 +397,9 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 
 				       // set entries of this line
 				       // to zero
-      for (unsigned int j=sparsity_rowstart[(*dof).first];
-	   j<sparsity_rowstart[(*dof).first+1]; ++j)
-	if (sparsity_colnums[j] != (*dof).first)
+      for (unsigned int j=sparsity_rowstart[dof->first];
+	   j<sparsity_rowstart[dof->first+1]; ++j)
+	if (sparsity_colnums[j] != dof->first)
 					   // if not main diagonal entry
 	  matrix.global_entry(j) = 0.;
       
@@ -425,9 +417,9 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 				       // store the new rhs entry to make
 				       // the gauss step more efficient
       double new_rhs;
-      if (matrix.diag_element((*dof).first) != 0.0)
-	new_rhs = right_hand_side((*dof).first)
-		= (*dof).second * matrix.diag_element((*dof).first);
+      if (matrix.diag_element(dof->first) != 0.0)
+	new_rhs = right_hand_side(dof->first)
+		= dof->second * matrix.diag_element(dof->first);
       else
 	{
 	  double first_diagonal_entry = 1;
@@ -438,23 +430,23 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 		break;
 	      };
 	  
-	  matrix.set((*dof).first, (*dof).first,
+	  matrix.set(dof->first, dof->first,
 		     first_diagonal_entry);
-	  new_rhs = right_hand_side((*dof).first)
-		  = (*dof).second * first_diagonal_entry;
+	  new_rhs = right_hand_side(dof->first)
+		  = dof->second * first_diagonal_entry;
 	};
       
 				       // store the only nonzero entry
 				       // of this line for the Gauss
 				       // elimination step
-      const double diagonal_entry = matrix.diag_element((*dof).first);
+      const double diagonal_entry = matrix.diag_element(dof->first);
 
 				       // do the Gauss step
       for (unsigned int row=0; row<n_dofs; ++row) 
 	for (unsigned int j=sparsity_rowstart[row];
 	     j<sparsity_rowstart[row+1]; ++j)
-	  if ((sparsity_colnums[j] == (signed int)(*dof).first) &&
-	      ((signed int)row != (*dof).first))
+	  if ((sparsity_colnums[j] == (signed int)dof->first) &&
+	      ((signed int)row != dof->first))
 					     // this line has an entry
 					     // in the regarding column
 					     // but this is not the main
@@ -470,7 +462,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
       
       
 				       // preset solution vector
-      solution((*dof).first) = (*dof).second;
+      solution(dof->first) = dof->second;
     };
 };
 
@@ -503,7 +495,6 @@ ProblemBase<dim>::make_boundary_value_list (const DirichletBC        &dirichlet_
 				   // a Tria-iterator for the fe object
   DoFHandler<dim>::active_face_iterator face = dof_handler->begin_active_face(),
 					endf = dof_handler->end_face();
-  Triangulation<dim>::active_face_iterator tface = tria->begin_active_face();
   
   DirichletBC::const_iterator function_ptr;
 
@@ -515,7 +506,7 @@ ProblemBase<dim>::make_boundary_value_list (const DirichletBC        &dirichlet_
   vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
   vector<double>      dof_values;
 	
-  for (; face!=endf; ++face, ++tface)
+  for (; face!=endf; ++face)
     if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
 	dirichlet_bc.end()) 
 				       // face is subject to one of the
@@ -527,8 +518,8 @@ ProblemBase<dim>::make_boundary_value_list (const DirichletBC        &dirichlet_
 	face_dofs.erase (face_dofs.begin(), face_dofs.end());
 	dof_values.erase (dof_values.begin(), dof_values.end());
 	face->get_dof_indices (face_dofs);
-	fe.face_ansatz_points (tface, boundary, dof_locations);
-	(*function_ptr).second->value_list (dof_locations, dof_values);
+	fe.get_face_ansatz_points (face, boundary, dof_locations);
+	function_ptr->second->value_list (dof_locations, dof_values);
 
 					 // enter into list
 	for (unsigned int i=0; i<face_dofs.size(); ++i)

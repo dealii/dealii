@@ -3,6 +3,7 @@
 #include <numerics/assembler.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
+#include <fe/fe.h>
 #include <lac/dfmatrix.h>
 #include <lac/dvector.h>
 #include <lac/dsmatrix.h>
@@ -51,7 +52,7 @@ AssemblerData<dim>::AssemblerData (const DoFHandler<dim>    &dof,
 				   dVector                  &rhs_vector,
 				   const Quadrature<dim>    &quadrature,
 				   const FiniteElement<dim> &fe,
-				   const UpdateFields       &update_flags,
+				   const UpdateFlags        &update_flags,
 				   const Boundary<dim>      &boundary) :
 		dof(dof),
 		assemble_matrix(assemble_matrix),
@@ -98,9 +99,9 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 template <int dim>
 void Assembler<dim>::assemble (const Equation<dim> &equation) {
 				   // re-init fe values for this cell
-  fe_values.reinit (Triangulation<dim>::cell_iterator (tria,
-						       present_level,
-						       present_index),
+  fe_values.reinit (DoFHandler<dim>::cell_iterator (tria,
+						    present_level,
+						    present_index),
 		    fe,
 		    boundary);
   const unsigned int n_dofs = dof_handler->get_selected_fe().total_dofs;

@@ -49,12 +49,12 @@ void ConstraintMatrix::add_entry (const unsigned int line,
   else
     {
       for (line_ptr = &lines.back()-1; line_ptr>=lines.begin(); --line_ptr)
-	if ((*line_ptr).line == line)
+	if (line_ptr->line == line)
 	  break;
       Assert (false, ExcLineInexistant(line));
     };
 
-  (*line_ptr).entries.push_back (make_pair(column,value));
+  line_ptr->entries.push_back (make_pair(column,value));
 };
 
 
@@ -67,7 +67,7 @@ void ConstraintMatrix::close () {
   vector<ConstraintLine>::iterator line = lines.begin(),
 				   endl = lines.end();
   for (; line!=endl; ++line)
-    sort ((*line).entries.begin(), (*line).entries.end());
+    sort (line->entries.begin(), line->entries.end());
 
 				   // sort the lines
   sort (lines.begin(), lines.end());
@@ -110,7 +110,7 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
       new_line.push_back (row);
   else
     for (unsigned int row=0; row!=n_rows; ++row) 
-      if (row == (*next_constraint).line)
+      if (row == next_constraint->line)
 	{
 					   // this line is constrained
 	  new_line.push_back (-1);
@@ -152,11 +152,11 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 					     // let c point to the constraint
 					     // of this column
 	    vector<ConstraintLine>::const_iterator c = lines.begin();
-	    while ((*c).line != (unsigned int)uncondensed.get_column_numbers()[j])
+	    while (c->line != (unsigned int)uncondensed.get_column_numbers()[j])
 	      ++c;
 
-	    for (unsigned int q=0; q!=(*c).entries.size(); ++q) 
-	      condensed.add (new_line[row], new_line[(*c).entries[q].first]);
+	    for (unsigned int q=0; q!=c->entries.size(); ++q) 
+	      condensed.add (new_line[row], new_line[c->entries[q].first]);
 	  }
     else
 				       // line must be distributed
@@ -166,8 +166,8 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 					   // for each entry: distribute
 	  if (new_line[uncondensed.get_column_numbers()[j]] != -1)
 					     // column is not constrained
-	    for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q) 
-		condensed.add (new_line[(*next_constraint).entries[q].first],
+	    for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
+		condensed.add (new_line[next_constraint->entries[q].first],
 			       new_line[uncondensed.get_column_numbers()[j]]);
 	
 	  else
@@ -177,12 +177,12 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 					       // let c point to the constraint
 					       // of this column
 	      vector<ConstraintLine>::const_iterator c = lines.begin();
-	      while ((*c).line != (unsigned int)uncondensed.get_column_numbers()[j]) ++c;
+	      while (c->line != (unsigned int)uncondensed.get_column_numbers()[j]) ++c;
 	      
-	      for (unsigned int p=0; p!=(*c).entries.size(); ++p)
-		for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q)
-		    condensed.add (new_line[(*next_constraint).entries[q].first],
-				   new_line[(*c).entries[p].first]);
+	      for (unsigned int p=0; p!=c->entries.size(); ++p)
+		for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
+		    condensed.add (new_line[next_constraint->entries[q].first],
+				   new_line[c->entries[p].first]);
 	    };
 	
 	++next_constraint;
@@ -212,7 +212,7 @@ void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
   distribute.resize (sparsity.n_rows(), -1);
   
   for (unsigned int c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = (signed int)c;
+    distribute[lines[c].line] = static_cast<signed int>(c);
 
   int n_rows = sparsity.n_rows();
   for (int row=0; row<n_rows; ++row)
@@ -302,7 +302,7 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
       new_line.push_back (row);
   else
     for (unsigned int row=0; row!=n_rows; ++row)
-      if (row == (*next_constraint).line)
+      if (row == next_constraint->line)
 	{
 					   // this line is constrained
 	  new_line.push_back (-1);
@@ -345,13 +345,14 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
 					     // let c point to the constraint
 					     // of this column
 	    vector<ConstraintLine>::const_iterator c = lines.begin();
-	    while ((*c).line != (unsigned int)uncondensed_struct.get_column_numbers()[j]) ++c;
+	    while (c->line != (unsigned int)uncondensed_struct.get_column_numbers()[j])
+	      ++c;
 
-	    for (unsigned int q=0; q!=(*c).entries.size(); ++q)
+	    for (unsigned int q=0; q!=c->entries.size(); ++q)
 					       // distribute to rows with
 					       // appropriate weight
-	      condensed.add (new_line[row], new_line[(*c).entries[q].first],
-			     uncondensed.global_entry(j) * (*c).entries[q].second);
+	      condensed.add (new_line[row], new_line[c->entries[q].first],
+			     uncondensed.global_entry(j) * c->entries[q].second);
 	  }
     else
 				       // line must be distributed
@@ -361,11 +362,11 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
 					   // for each column: distribute
 	  if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
 					     // column is not constrained
-	    for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q) 
-		condensed.add (new_line[(*next_constraint).entries[q].first],
+	    for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
+		condensed.add (new_line[next_constraint->entries[q].first],
 			       new_line[uncondensed_struct.get_column_numbers()[j]],
 			       uncondensed.global_entry(j) *
-			       (*next_constraint).entries[q].second);
+			       next_constraint->entries[q].second);
 	
 	  else
 					     // not only this line but
@@ -374,15 +375,16 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
 					       // let c point to the constraint
 					       // of this column
 	      vector<ConstraintLine>::const_iterator c = lines.begin();
-	      while ((*c).line != (unsigned int)uncondensed_struct.get_column_numbers()[j]) ++c;
+	      while (c->line != (unsigned int)uncondensed_struct.get_column_numbers()[j])
+		++c;
 	      
-	      for (unsigned int p=0; p!=(*c).entries.size(); ++p)
-		for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q)
-		    condensed.add (new_line[(*next_constraint).entries[q].first],
-				   new_line[(*c).entries[p].first],
+	      for (unsigned int p=0; p!=c->entries.size(); ++p)
+		for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
+		    condensed.add (new_line[next_constraint->entries[q].first],
+				   new_line[c->entries[p].first],
 				   uncondensed.global_entry(j) *
-				   (*next_constraint).entries[q].second *
-				   (*c).entries[p].second);
+				   next_constraint->entries[q].second *
+				   c->entries[p].second);
 	    };
 	
 	++next_constraint;
@@ -412,7 +414,7 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
   distribute.resize (sparsity.n_rows(), -1);
   
   for (unsigned int c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = (signed int)c;
+    distribute[lines[c].line] = static_cast<signed int>(c);
 
   int n_rows = sparsity.n_rows();
   for (int row=0; row<n_rows; ++row) 
@@ -524,7 +526,7 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
       new_line.push_back (row);
   else
     for (unsigned int row=0; row!=n_rows; ++row)
-      if (row == (*next_constraint).line)
+      if (row == next_constraint->line)
 	{
 					   // this line is constrained
 	  new_line.push_back (-1);
@@ -560,10 +562,10 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
     else
 				       // line must be distributed
       {
-	for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q) 
-	  condensed(new_line[(*next_constraint).entries[q].first])
+	for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
+	  condensed(new_line[next_constraint->entries[q].first])
 	    +=
-	    uncondensed(row) * (*next_constraint).entries[q].second;
+	    uncondensed(row) * next_constraint->entries[q].second;
 
 	++next_constraint;
       };
@@ -580,13 +582,13 @@ void ConstraintMatrix::condense (dVector &vec) const {
   
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   for (unsigned int row=0; row<vec.n(); ++row)
-    if (row == (*next_constraint).line)
+    if (row == next_constraint->line)
 				       // line must be distributed
       {
-	for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q) 
-	  vec((*next_constraint).entries[q].first)
+	for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
+	  vec(next_constraint->entries[q].first)
 	    +=
-	    vec(row) * (*next_constraint).entries[q].second;
+	    vec(row) * next_constraint->entries[q].second;
 					 // set entry to zero
 	vec(row) = 0.;
 	
@@ -624,7 +626,7 @@ void ConstraintMatrix::distribute (const dVector &condensed,
       old_line.push_back (row);
   else
     for (unsigned int row=0; row!=n_rows; ++row)
-      if (row == (*next_constraint).line)
+      if (row == next_constraint->line)
 	{
 					   // this line is constrained
 	  old_line.push_back (-1);
@@ -661,9 +663,9 @@ void ConstraintMatrix::distribute (const dVector &condensed,
 					 // first set it to zero
 	uncondensed(line) = 0.;
 					 // then add the different contributions
-	for (unsigned int i=0; i<(*next_constraint).entries.size(); ++i)
-	  uncondensed(line) += (condensed(old_line[(*next_constraint).entries[i].first]) *
-				(*next_constraint).entries[i].second);
+	for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
+	  uncondensed(line) += (condensed(old_line[next_constraint->entries[i].first]) *
+				next_constraint->entries[i].second);
 	++next_constraint;
       };
 };
@@ -678,11 +680,11 @@ void ConstraintMatrix::distribute (dVector &vec) const {
     {
 				       // make entry in line next_constraint.line
 				       // first set it to zero
-      vec((*next_constraint).line) = 0.;
+      vec(next_constraint->line) = 0.;
 				       // then add the different contributions
-      for (unsigned int i=0; i<(*next_constraint).entries.size(); ++i)
-	vec((*next_constraint).line) += (vec((*next_constraint).entries[i].first) *
-					 (*next_constraint).entries[i].second);
+      for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
+	vec(next_constraint->line) += (vec(next_constraint->entries[i].first) *
+				       next_constraint->entries[i].second);
     };
 };
 
