@@ -466,8 +466,8 @@ SparseMatrix<number>::threaded_matrix_norm (const Vector<somenumber> &v,
 {
 #ifdef DEAL_II_USE_MT
   somenumber sum = 0.;
-  const number      *val_ptr    = &val[cols->rowstart[begin_row]];
-  const unsignedint *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
+  const number       *val_ptr    = &val[cols->rowstart[begin_row]];
+  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
   for (unsigned int row=begin_row; row<end_row; ++row)
     {
       somenumber s = 0.;
