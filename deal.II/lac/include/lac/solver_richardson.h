@@ -71,6 +71,11 @@ class SolverRichardson : private Solver<VECTOR>
 		      const AdditionalData &data=AdditionalData());
 
 				     /**
+				      * Virtual destructor.
+				      */
+    ~SolverRichardson ();
+    
+				     /**
 				      * Solve $Ax=b$ for $x$.
 				      */
     template<class MATRIX, class PRECONDITIONER>
@@ -151,7 +156,14 @@ SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
 					   VectorMemory<VECTOR> &mem,
 					   const AdditionalData &data):
 		Solver<VECTOR> (cn,mem),
-		additional_data(data)  {};
+		additional_data(data)
+{}
+
+
+
+template<class VECTOR>
+SolverRichardson<VECTOR>::~SolverRichardson()
+{}
 
 
 template<class VECTOR>
@@ -211,7 +223,7 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX &A,
   Vr  = memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
   Vd  = memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
 
-  deallog.push("Richardson");
+  deallog.push("RichardsonT");
 
 				   // Main loop
   for(int iter=0; conv==SolverControl::iterate; iter++)
