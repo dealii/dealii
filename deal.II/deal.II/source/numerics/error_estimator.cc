@@ -399,9 +399,6 @@ estimate_some (const Mapping<dim>                  &mapping,
                                            ((!neumann_bc.empty() ||
                                              (coefficients != 0))  ?
                                             update_q_points : 0) |
-#ifdef DEBUG
-                                           update_q_points |
-#endif
                                            update_normal_vectors));
   FEFaceValues<dim> fe_face_values_neighbor (mapping,
 					     dof_handler.get_fe(),
@@ -410,12 +407,7 @@ estimate_some (const Mapping<dim>                  &mapping,
   FESubfaceValues<dim> fe_subface_values (mapping,
 					  dof_handler.get_fe(),
 					  quadrature,
-					  UpdateFlags(
-                                            update_gradients
-#ifdef DEBUG
-                                            | update_q_points
-#endif
-                                            ));
+                                          update_gradients);
 
 
   active_cell_iterator cell = dof_handler.begin_active();
@@ -1035,25 +1027,6 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 				       // on the neighbor cell to the
 				       // common @p{subface}.
       fe_face_values.reinit (neighbor_child, neighbor_neighbor);
-
-                                       // make sure that quadrature
-                                       // points match. note that this
-                                       // won't hold in 3d if one of
-                                       // the lines of the cell is at
-                                       // the boundary and if this is
-                                       // a curved boundary, since
-                                       // then the four subfaces don't
-                                       // exactly make up the mother
-                                       // cell. so exclude this case
-      for (unsigned int q=0; q<n_q_points; ++q)
-        Assert ((fe_face_values.quadrature_point(q) -
-                 fe_subface_values.quadrature_point(q)).square()
-                <
-                1.e-15 * (fe_face_values.quadrature_point(q).square() + 
-                          fe_subface_values.quadrature_point(q).square())
-                ||
-                cell->has_boundary_lines(),
-                ExcInternalError());
 
                                        // store the gradient of the
 				       // solution in psi
