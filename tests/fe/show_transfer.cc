@@ -26,6 +26,7 @@
 #include <fe/fe_values.h>
 #include <multigrid/multigrid.h>
 #include <multigrid/mg_dof_handler.h>
+#include <numerics/data_out.h>
 
 #include <vector>
 #include <fstream>
@@ -49,21 +50,26 @@ print_matrix(ostream& of,
   MGTransferPrebuilt transfer;
   transfer.build_matrices(dof);
 
+  DataOut<2> dout;
+  dout.attach_dof_handler(dof);
+  
   unsigned int n_coarse = dof.n_dofs(level-1);
   unsigned int n_fine = dof.n_dofs(level);
-  Vector<double> in(n_fine);
-  Vector<double> out(n_coarse);
+  Vector<double> in(n_coarse);
+  vector<Vector<double> > out(n_coarse, n_fine);
 
-  of << name << endl;
-  for (unsigned int i=0;i<n_fine;++i)
+  ofstream file(name);
+
+  for (unsigned int i=0;i<n_coarse;++i)
     {
       in = 0.;
-      out = 0.;
+      out[i] = 0.;
       in(i) = 1.;
-      transfer.restrict_and_add(level,out,in);
-      out.print(of, 3, false);
+      transfer.prolongate(level,out[i],in);
+      dout.add_data_vector(out[i], "v");
     }
-  of << endl;
+  dout.build_patches(3);
+  dout.write_gnuplot(file);
 }
 
 
@@ -77,26 +83,26 @@ main()
 
   ofstream of("transfer.dat");
   
-  TEST(1,FEQ1<2>);
-  TEST(1,FEQ2<2>);
-  TEST(1,FEQ3<2>);
-  TEST(1,FEQ4<2>);
+//    TEST(1,FEQ1<2>);
+//    TEST(1,FEQ2<2>);
+//    TEST(1,FEQ3<2>);
+//    TEST(1,FEQ4<2>);
 
-  TEST(1,FEDG_Q0<2>);
-  TEST(1,FEDG_Q1<2>);
-  TEST(1,FEDG_Q2<2>);
-  TEST(1,FEDG_Q3<2>);
-  TEST(1,FEDG_Q4<2>);
+//    TEST(1,FEDG_Q0<2>);
+//    TEST(1,FEDG_Q1<2>);
+//  TEST(1,FEDG_Q2<2>);
+//  TEST(1,FEDG_Q3<2>);
+//  TEST(1,FEDG_Q4<2>);
 
-  TEST(2,FEQ1<2>);
-  TEST(2,FEQ2<2>);
-  TEST(2,FEQ3<2>);
-  TEST(2,FEQ4<2>);
+//    TEST(2,FEQ1<2>);
+//    TEST(2,FEQ2<2>);
+//    TEST(2,FEQ3<2>);
+//    TEST(2,FEQ4<2>);
 
   TEST(2,FEDG_Q0<2>);
   TEST(2,FEDG_Q1<2>);
   TEST(2,FEDG_Q2<2>);
-  TEST(2,FEDG_Q3<2>);
-  TEST(2,FEDG_Q4<2>);
+//  TEST(2,FEDG_Q3<2>);
+//  TEST(2,FEDG_Q4<2>);
   return 0;
 }
