@@ -36,7 +36,7 @@ const unsigned int DoFHandler<dim>::invalid_dof_index;
 template <int dim>
 DoFHandler<dim>::DoFHandler (const Triangulation<dim> &tria) :
 		tria(&tria, typeid(*this).name()),
-		selected_fe(0, typeid(*this).name())
+		selected_fe(0, typeid(*this).name()),
 		used_dofs (0)
 {}
 
