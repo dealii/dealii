@@ -15,12 +15,13 @@
 #include <multigrid/multigrid.h>
 
 #ifdef MG_DEBUG
-#include <fe/fe.h>
-#include <dofs/dof_accessor.h>
-#include <numerics/data_out.h>
-#include <multigrid/mg_dof_accessor.h>
-#include <multigrid/mg_dof_handler.h>
-#include <fstream>
+#  include <fe/fe.h>
+#  include <dofs/dof_accessor.h>
+#  include <numerics/data_out.h>
+#  include <multigrid/mg_dof_accessor.h>
+#  include <multigrid/mg_dof_handler.h>
+
+#  include <fstream>
 #endif
 
 

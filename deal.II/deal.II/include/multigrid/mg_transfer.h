@@ -110,9 +110,9 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      */
     template<int dim, class InVector>
     void
-    copy_to_mg (const MGDoFHandler<dim>& mg_dof,
+    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
 		MGLevelObject<Vector<number> > &dst,
-		const InVector &src) const;
+		const InVector                 &src) const;
 
 				     /**
 				      * Transfer from multi-level vector to
@@ -128,8 +128,8 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      */
     template<int dim, class OutVector>
     void
-    copy_from_mg (const MGDoFHandler<dim>& mg_dof,
-		  OutVector &dst,
+    copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
+		  OutVector                            &dst,
 		  const MGLevelObject<Vector<number> > &src) const;
 
 				     /**
@@ -142,8 +142,8 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      */
     template<int dim, class OutVector>
     void
-    copy_from_mg_add (const MGDoFHandler<dim>& mg_dof,
-		      OutVector &dst,
+    copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
+		      OutVector                            &dst,
 		      const MGLevelObject<Vector<number> > &src) const;
 
 				     /**
@@ -201,7 +201,8 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 
 
 /**
- * Implementation of matrix generation for @ref{MGTransferBlock} and @p{MGTransferSelected}.
+ * Implementation of matrix generation for @ref{MGTransferBlock} and
+ * @p{MGTransferSelected}.
  *
  * @author Guido Kanschat, 2001
  */
@@ -375,9 +376,9 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      */
     template<int dim, class InVector>
     void
-    copy_to_mg (const MGDoFHandler<dim>& mg_dof,
-		MGLevelObject<BlockVector<number> >& dst,
-		const InVector& src) const;
+    copy_to_mg (const MGDoFHandler<dim>             &mg_dof,
+		MGLevelObject<BlockVector<number> > &dst,
+		const InVector                      &src) const;
 
 				     /**
 				      * Transfer from multi-level vector to
@@ -393,9 +394,9 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      */
     template<int dim, class OutVector>
     void
-    copy_from_mg (const MGDoFHandler<dim>& mg_dof,
-		  OutVector& dst,
-		  const MGLevelObject<BlockVector<number> >& src) const;
+    copy_from_mg (const MGDoFHandler<dim>                   &mg_dof,
+		  OutVector                                 &dst,
+		  const MGLevelObject<BlockVector<number> > &src) const;
 
 				     /**
 				      * Add a multi-level vector to a
@@ -407,9 +408,9 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      */
     template<int dim, class OutVector>
     void
-    copy_from_mg_add (const MGDoFHandler<dim>& mg_dof,
-		      OutVector& dst,
-		      const MGLevelObject<BlockVector<number> >& src) const;
+    copy_from_mg_add (const MGDoFHandler<dim>                   &mg_dof,
+		      OutVector                                 &dst,
+		      const MGLevelObject<BlockVector<number> > &src) const;
 };
 
 
@@ -501,9 +502,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      */
     template<int dim, class InVector>
     void
-    copy_to_mg (const MGDoFHandler<dim>& mg_dof,
+    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
 		MGLevelObject<Vector<number> > &dst,
-		const InVector &src) const;
+		const InVector                 &src) const;
 
 				     /**
 				      * Transfer from multi-level vector to
@@ -519,8 +520,8 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      */
     template<int dim, class OutVector>
     void
-    copy_from_mg (const MGDoFHandler<dim>& mg_dof,
-		  OutVector &dst,
+    copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
+		  OutVector                            &dst,
 		  const MGLevelObject<Vector<number> > &src) const;
 
 				     /**
@@ -533,16 +534,15 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      */
     template<int dim, class OutVector>
     void
-    copy_from_mg_add (const MGDoFHandler<dim>& mg_dof,
-		      OutVector &dst,
+    copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
+		      OutVector                            &dst,
 		      const MGLevelObject<Vector<number> > &src) const;
 
   private:
-
-				   /**
-				    * Selected component.
-				    */
-  unsigned int selected;
+                                     /**
+                                      * Selected component.
+                                      */
+    unsigned int selected;
 };
 
 

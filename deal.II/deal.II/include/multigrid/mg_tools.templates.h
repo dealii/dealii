@@ -24,6 +24,10 @@
 #include <fstream>
 
 
+
+/* --------------------- MGTransferPrebuilt -------------- */
+
+
 //TODO[GK]: this file must really be changed: it contains #if's for deal_II_dimension, but we can't use this in headers, since application programs might not use this way to select the dimension. the only way in header files is to have proper template specializations
 
 
@@ -84,7 +88,7 @@ MGTransferPrebuilt<number>::copy_to_mg (
 				   // the respective vector on the
 				   // next finer level, which we then
 				   // already have built.
-  for (int level=maxlevel; level>=static_cast<int>(minlevel); --level)
+  for (int level=maxlevel; level>=static_cast<signed int>(minlevel); --level)
     {
       typename MGDoFHandler<dim>::active_cell_iterator
 	level_cell = mg_dof_handler.begin_active(level);
@@ -148,10 +152,10 @@ MGTransferPrebuilt<number>::copy_to_mg (
 template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferPrebuilt<number>::copy_from_mg(
-  const MGDoFHandler<dim>& mg_dof_handler,
-  OutVector &dst,
-  const MGLevelObject<Vector<number> > &src) const
+MGTransferPrebuilt<number>::
+copy_from_mg(const MGDoFHandler<dim>              &mg_dof_handler,
+             OutVector                            &dst,
+             const MGLevelObject<Vector<number> > &src) const
 {
   const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
 
@@ -167,8 +171,8 @@ MGTransferPrebuilt<number>::copy_from_mg(
 				   // data appropriately to the output
 				   // vector
 
-				   // Is the level monotonuosly increasing?
-
+				   // Note that the level is
+				   // monotonuosly increasing
   for (; level_cell != endc; ++level_cell)
     {
       DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
@@ -191,13 +195,15 @@ MGTransferPrebuilt<number>::copy_from_mg(
 //TODO:[GK]  constraints->set_zero(dst);
 }
 
+
+
 template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferPrebuilt<number>::copy_from_mg_add(
-  const MGDoFHandler<dim>& mg_dof_handler,
-  OutVector &dst,
-  const MGLevelObject<Vector<number> > &src) const
+MGTransferPrebuilt<number>::
+copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof_handler,
+                  OutVector                            &dst,
+                  const MGLevelObject<Vector<number> > &src) const
 {
   const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
 
@@ -213,8 +219,8 @@ MGTransferPrebuilt<number>::copy_from_mg_add(
 				   // data appropriately to the output
 				   // vector
 
-				   // Is the level monotonuosly increasing?
-
+				   // Note that the level is
+				   // monotonuosly increasing
   for (; level_cell != endc; ++level_cell)
     {
       DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
@@ -240,16 +246,20 @@ MGTransferPrebuilt<number>::copy_from_mg_add(
 }
 
 
+
+/* --------------------- MGTransferSelect -------------- */
+
+
 //TODO:[?] This function needs to be specially implemented, since in 2d mode we use faces
 #if deal_II_dimension == 1
 
 template <typename number>
 template <int dim, class InVector>
 void
-MGTransferSelect<number>::copy_to_mg (
-  const MGDoFHandler<dim>&,
-  MGLevelObject<Vector<number> >&,
-  const InVector&) const
+MGTransferSelect<number>::
+copy_to_mg (const MGDoFHandler<dim>        &,
+            MGLevelObject<Vector<number> > &,
+            const InVector                 &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -260,10 +270,10 @@ MGTransferSelect<number>::copy_to_mg (
 template <typename number>
 template <int dim, class InVector>
 void
-MGTransferSelect<number>::copy_to_mg (
-  const MGDoFHandler<dim>& mg_dof_handler,
-  MGLevelObject<Vector<number> >& dst,
-  const InVector& osrc) const
+MGTransferSelect<number>::
+copy_to_mg (const MGDoFHandler<dim>        &mg_dof_handler,
+            MGLevelObject<Vector<number> > &dst,
+            const InVector                 &osrc) const
 {
 				   // Make src a real finite element function
   InVector src = osrc;
@@ -303,7 +313,7 @@ MGTransferSelect<number>::copy_to_mg (
 				   // the respective vector on the
 				   // next finer level, which we then
 				   // already have built.
-  for (int level=maxlevel; level>=static_cast<int>(minlevel); --level)
+  for (int level=maxlevel; level>=static_cast<signed int>(minlevel); --level)
     {
 				       // Start of treated component
 				       // for this level
@@ -375,10 +385,10 @@ MGTransferSelect<number>::copy_to_mg (
 template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferSelect<number>::copy_from_mg(
-  const MGDoFHandler<dim>& mg_dof_handler,
-  OutVector &dst,
-  const MGLevelObject<Vector<number> > &src) const
+MGTransferSelect<number>::
+copy_from_mg (const MGDoFHandler<dim>              &mg_dof_handler,
+              OutVector                            &dst,
+              const MGLevelObject<Vector<number> > &src) const
 {
 
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
@@ -400,8 +410,8 @@ MGTransferSelect<number>::copy_from_mg(
 				   // data appropriately to the output
 				   // vector
 
-				   // Is the level monotonuosly increasing?
-
+				   // Note that the level is
+				   // monotonuosly increasing
   for (; level_cell != endc; ++level_cell)
     {
        DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
@@ -430,13 +440,15 @@ MGTransferSelect<number>::copy_from_mg(
 //TODO:[GK]  constraints->set_zero(dst);
 }
 
+
+
 template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferSelect<number>::copy_from_mg_add(
-  const MGDoFHandler<dim>& mg_dof_handler,
-  OutVector &dst,
-  const MGLevelObject<Vector<number> > &src) const
+MGTransferSelect<number>::
+copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof_handler,
+                  OutVector                            &dst,
+                  const MGLevelObject<Vector<number> > &src) const
 {
 
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
@@ -458,8 +470,8 @@ MGTransferSelect<number>::copy_from_mg_add(
 				   // data appropriately to the output
 				   // vector
 
-				   // Is the level monotonuosly increasing?
-
+				   // Note that the level is
+				   // monotonuosly increasing
   for (; level_cell != endc; ++level_cell)
     {
        DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
@@ -491,15 +503,19 @@ MGTransferSelect<number>::copy_from_mg_add(
 }
 
 
+
+/* --------------------- MGTransferBlock -------------- */
+
+
 #if deal_II_dimension == 1
 
 template <typename number>
 template <int dim, class InVector>
 void
-MGTransferBlock<number>::copy_to_mg (
-  const MGDoFHandler<dim>&,
-  MGLevelObject<BlockVector<number> >&,
-  const InVector&) const
+MGTransferBlock<number>::
+copy_to_mg (const MGDoFHandler<dim>             &,
+            MGLevelObject<BlockVector<number> > &,
+            const InVector                      &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -510,12 +526,13 @@ MGTransferBlock<number>::copy_to_mg (
 template <typename number>
 template <int dim, class InVector>
 void
-MGTransferBlock<number>::copy_to_mg (
-  const MGDoFHandler<dim>& mg_dof_handler,
-  MGLevelObject<BlockVector<number> >& dst,
-  const InVector& src) const
+MGTransferBlock<number>::
+copy_to_mg (const MGDoFHandler<dim>             &mg_dof_handler,
+            MGLevelObject<BlockVector<number> > &dst,
+            const InVector                      &src) const
 {
-				   // Make src a real finite element function
+				   // Make src a real finite element
+				   // function
 //  InVector src = osrc;
 //  constraints->distribute(src);
 
@@ -530,7 +547,7 @@ MGTransferBlock<number>::copy_to_mg (
   
   dst.clear();
 
-//TODO:[GK] Make sure dst is not too large ans sizes is filled  
+//TODO:[GK] Make sure dst is not too large and sizes is filled  
   for (unsigned int l=minlevel;l<=maxlevel;++l)
     dst[l].reinit(sizes[l]);
   
@@ -548,7 +565,7 @@ MGTransferBlock<number>::copy_to_mg (
 				   // the respective vector on the
 				   // next finer level, which we then
 				   // already have built.
-  for (int level=maxlevel; level>=static_cast<int>(minlevel); --level)
+  for (int level=maxlevel; level>=static_cast<signed int>(minlevel); --level)
     {
       typename MGDoFHandler<dim>::active_cell_iterator
 	level_cell = mg_dof_handler.begin_active(level);
@@ -596,10 +613,10 @@ MGTransferBlock<number>::copy_to_mg (
 template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferBlock<number>::copy_from_mg(
-  const MGDoFHandler<dim>& mg_dof_handler,
-  OutVector &dst,
-  const MGLevelObject<BlockVector<number> > &src) const
+MGTransferBlock<number>::
+copy_from_mg (const MGDoFHandler<dim>                   &mg_dof_handler,
+              OutVector                                 &dst,
+              const MGLevelObject<BlockVector<number> > &src) const
 {
 
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
@@ -616,8 +633,8 @@ MGTransferBlock<number>::copy_from_mg(
 				   // data appropriately to the output
 				   // vector
 
-				   // Is the level monotonuosly increasing?
-
+				   // Note that level is monotonuosly
+				   // increasing
   for (; level_cell != endc; ++level_cell)
     {
        DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
@@ -638,15 +655,16 @@ MGTransferBlock<number>::copy_from_mg(
     }
 }
 
+
+
 template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferBlock<number>::copy_from_mg_add(
-  const MGDoFHandler<dim>& mg_dof_handler,
-  OutVector &dst,
-  const MGLevelObject<BlockVector<number> > &src) const
+MGTransferBlock<number>::
+copy_from_mg_add (const MGDoFHandler<dim>                   &mg_dof_handler,
+                  OutVector                                 &dst,
+                  const MGLevelObject<BlockVector<number> > &src) const
 {
-
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -662,7 +680,8 @@ MGTransferBlock<number>::copy_from_mg_add(
 				   // data appropriately to the output
 				   // vector
 
-				   // Is the level monotonuosly increasing?
+				   // Note that the level monotonuosly
+				   // increasing
   for (; level_cell != endc; ++level_cell)
     {
        DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
