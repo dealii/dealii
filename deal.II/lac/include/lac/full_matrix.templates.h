@@ -1196,7 +1196,6 @@ void
 FullMatrix<number>::invert (const FullMatrix<number> &M)
 {
   Assert (dim_range == dim_image, ExcNotQuadratic());
-  Assert ((dim_range>=1) && (dim_range<=4), ExcNotImplemented(dim_range));
   Assert (dim_range == M.dim_range,
           ExcDimensionMismatch(dim_range,M.dim_range));
   Assert (dim_image == M.dim_image,
@@ -1338,7 +1337,12 @@ FullMatrix<number>::invert (const FullMatrix<number> &M)
 		    t54*M.el(1,2)-t123*M.el(1,1))*t65;
 	el(3,3) = (t14*M.el(2,2)-t129*M.el(2,1)-t29*M.el(2,2)+t133*M.el(2,1)+
 		   t43*M.el(1,2)-t119*M.el(1,1))*t65;
+
+	break;
       }
+
+      default:
+	    Assert (false, ExcNotImplemented(dim_range));
     };    
 };
   
