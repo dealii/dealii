@@ -255,6 +255,38 @@
  * Note that in this example, there is no need for the #thread_entry#
  * function and the structure encapsulating parameters.
  *
+ * \subsection{Using this class on global functions}
+ *
+ * The structures provided by this class are easier to use than the
+ * methods of the basic ThreadManager. It is also possible to call global
+ * functions (without a this pointer) as a thread. The struct used to
+ * package all data needed to call a global functions is called #Fun_Data#. 
+ *
+ * The following example shows how to call a global function
+ * \begin{verbatim}
+ *  void TestClass::spawn_thread () {
+ *                     // create ThreadManager object
+ *    ThreadManager thread_manager;
+ *                     // generate an object to pass
+ *                     // the two parameters
+ *    const ThreadManager::Fun_Data2<unsigned int,
+ *	                             unsigned int> 
+ *	    fun_data ( 1,        // first parameter
+ *                     2,        // second parameter
+ *                               // address of global function
+ *	               &threaded_function 
+ *                   );
+ *
+ *                     // spawn a thread
+ *     thread_manager.spawn (&fun_data);
+ *
+ *     ...             // do something more, start more threads, etc
+ *
+ *
+ *		       // ... and wait until they're finished:
+ *     thread_manager.wait ();
+ *  };
+ * \end{verbatim}
  * @author Wolfgang Bangerth, 1999
  */
 class ThreadManager : public ACE_Thread_Manager 
@@ -502,6 +534,621 @@ class ThreadManager : public ACE_Thread_Manager
 			mem_fun (mem_fun) {};
     };
     
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific heptary member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Class,
+              typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5, typename Arg6,
+              typename Arg7>
+      struct Mem_Fun_Data7
+      {
+	typedef void * (Class::*MemFun) (Arg1, Arg2, Arg3, Arg4, Arg5,
+					 Arg6, Arg7);
+	Class *object;
+	Arg1   arg1;
+	Arg2   arg2;
+	Arg3   arg3;
+	Arg4   arg4;
+	Arg5   arg5;
+	Arg6   arg6;
+	Arg7   arg7;
+	MemFun mem_fun;
+
+	Mem_Fun_Data7 (Class *object,
+		       Arg1   arg1,
+		       Arg2   arg2,
+		       Arg3   arg3,
+		       Arg4   arg4,
+		       Arg5   arg5,
+		       Arg6   arg6,
+		       Arg7   arg7,
+		       MemFun mem_fun) :
+			object (object),
+			arg1  (arg1),
+			arg2  (arg2),
+			arg3  (arg3),
+			arg4  (arg4),
+			arg5  (arg5),
+			arg6  (arg6),
+                        arg7  (arg7),
+			mem_fun (mem_fun) {};
+    };
+    
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific octary member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Class,
+              typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5, typename Arg6,
+              typename Arg7, typename Arg8>
+    struct Mem_Fun_Data8
+    {
+	typedef void * (Class::*MemFun) (Arg1, Arg2, Arg3, Arg4, Arg5,
+					 Arg6, Arg7, Arg8);
+	Class *object;
+	Arg1   arg1;
+	Arg2   arg2;
+	Arg3   arg3;
+	Arg4   arg4;
+	Arg5   arg5;
+	Arg6   arg6;
+	Arg7   arg7;
+	Arg8   arg8;
+	MemFun mem_fun;
+
+	Mem_Fun_Data8 (Class *object,
+		       Arg1   arg1,
+		       Arg2   arg2,
+		       Arg3   arg3,
+		       Arg4   arg4,
+		       Arg5   arg5,
+		       Arg6   arg6,
+		       Arg7   arg7,
+		       Arg8   arg8,
+		       MemFun mem_fun) :
+			object (object),
+			arg1  (arg1),
+			arg2  (arg2),
+			arg3  (arg3),
+			arg4  (arg4),
+			arg5  (arg5),
+			arg6  (arg6),
+                        arg7  (arg7),
+			arg8  (arg8),
+                        mem_fun (mem_fun) {};
+    };
+
+
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific nonary member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Class,
+              typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5, typename Arg6,
+              typename Arg7, typename Arg8,
+              typename Arg9>
+    struct Mem_Fun_Data9
+    {
+	typedef void * (Class::*MemFun) (Arg1, Arg2, Arg3, Arg4, Arg5,
+					 Arg6, Arg7, Arg8, Arg9);
+	Class *object;
+	Arg1   arg1;
+	Arg2   arg2;
+	Arg3   arg3;
+	Arg4   arg4;
+	Arg5   arg5;
+	Arg6   arg6;
+	Arg7   arg7;
+	Arg8   arg8;
+	Arg9   arg9;
+	MemFun mem_fun;
+
+	Mem_Fun_Data9 (Class *object,
+			Arg1   arg1,
+			Arg2   arg2,
+			Arg3   arg3,
+			Arg4   arg4,
+			Arg5   arg5,
+			Arg6   arg6,
+			Arg7   arg7,
+			Arg8   arg8,
+			Arg9   arg9,
+		       MemFun mem_fun) :
+			object (object),
+			arg1  (arg1),
+			arg2  (arg2),
+			arg3  (arg3),
+			arg4  (arg4),
+			arg5  (arg5),
+			arg6  (arg6),
+                        arg7  (arg7),
+			arg8  (arg8),
+			arg9  (arg9),
+			mem_fun (mem_fun) {};
+    };
+
+
+    				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific decary member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Class,
+              typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5, typename Arg6,
+              typename Arg7, typename Arg8,
+              typename Arg9, typename Arg10>
+    struct Mem_Fun_Data10
+    {
+	typedef void * (Class::*MemFun) (Arg1, Arg2, Arg3, Arg4, Arg5,
+					 Arg6, Arg7, Arg8, Arg9, Arg10);
+	Class *object;
+	Arg1   arg1;
+	Arg2   arg2;
+	Arg3   arg3;
+	Arg4   arg4;
+	Arg5   arg5;
+	Arg6   arg6;
+	Arg7   arg7;
+	Arg8   arg8;
+	Arg9   arg9;
+	Arg10  arg10;
+	MemFun mem_fun;
+
+	Mem_Fun_Data10 (Class *object,
+			Arg1   arg1,
+			Arg2   arg2,
+			Arg3   arg3,
+			Arg4   arg4,
+			Arg5   arg5,
+			Arg6   arg6,
+			Arg7   arg7,
+			Arg8   arg8,
+			Arg9   arg9,
+			Arg10  arg10,
+			MemFun mem_fun) :
+			object (object),
+			arg1  (arg1),
+			arg2  (arg2),
+			arg3  (arg3),
+			arg4  (arg4),
+			arg5  (arg5),
+			arg6  (arg6),
+                        arg7  (arg7),
+			arg8  (arg8),
+			arg9  (arg9),
+			arg10 (arg10),
+			mem_fun (mem_fun) {};
+    };
+    
+
+    
+    
+    				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * global function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1>
+      struct Fun_Data1
+      {
+ 	  typedef void * (*FunPtr) (Arg1);
+	  Arg1   arg1;
+	  FunPtr fun_ptr;
+	  
+	  Fun_Data1 (Arg1   arg1,
+		     FunPtr fun_ptr) :
+			  arg1  (arg1),
+			  fun_ptr (fun_ptr) {};
+      };
+
+
+    				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * global function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1, typename Arg2>
+      struct Fun_Data2
+      {
+ 	  typedef void * (*FunPtr) (Arg1 , Arg2);
+	  Arg1   arg1;
+	  Arg2   arg2;
+	  FunPtr fun_ptr;
+	  
+	  Fun_Data2 (Arg1   arg1,
+		     Arg2   arg2,
+		     FunPtr fun_ptr) :
+			  arg1  (arg1),
+			  arg2  (arg2),
+			  fun_ptr (fun_ptr) {};
+      };
+
+    				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * global function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1, typename Arg2,
+              typename Arg3>
+      struct Fun_Data3
+      {
+ 	  typedef void * (*FunPtr) (Arg1 , Arg2, Arg3);
+	  Arg1   arg1;
+	  Arg2   arg2;
+	  Arg3   arg3;
+	  FunPtr fun_ptr;
+	  
+	  Fun_Data3 (Arg1   arg1,
+		     Arg2   arg2,
+		     Arg3   arg3,
+		     FunPtr fun_ptr) :
+			  arg1  (arg1),
+			  arg2  (arg2),
+			  arg3  (arg3),
+			  fun_ptr (fun_ptr) {};
+      };
+    
+    				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * global function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4>
+      struct Fun_Data4
+      {
+ 	  typedef void * (*FunPtr) (Arg1 , Arg2, Arg3, Arg4);
+	  Arg1   arg1;
+	  Arg2   arg2;
+	  Arg3   arg3;
+	  Arg4   arg4;
+	  FunPtr fun_ptr;
+	  
+	  Fun_Data4 (Arg1   arg1,
+		     Arg2   arg2,
+		     Arg3   arg3,
+		     Arg4   arg4,
+		     FunPtr fun_ptr) :
+			  arg1  (arg1),
+			  arg2  (arg2),
+			  arg3  (arg3),
+			  arg4  (arg4),
+			  fun_ptr (fun_ptr) {};
+      };
+
+    				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * global function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5>
+    struct Fun_Data5
+    {
+	typedef void * (*FunPtr) (Arg1 , Arg2, Arg3, Arg4, Arg5);
+	Arg1   arg1;
+	Arg2   arg2;
+	Arg3   arg3;
+	Arg4   arg4;
+	Arg5   arg5;
+	FunPtr fun_ptr;
+	  
+	Fun_Data5 (Arg1   arg1,
+		   Arg2   arg2,
+		   Arg3   arg3,
+		   Arg4   arg4,
+		   Arg5   arg5,
+		   FunPtr fun_ptr) :
+			arg1  (arg1),
+			arg2  (arg2),
+			arg3  (arg3),
+			arg4  (arg4),
+			arg5  (arg5),
+			fun_ptr (fun_ptr) {};
+      };
+
+    				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * global function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5, typename Arg6>
+      struct Fun_Data6
+      {
+ 	  typedef void * (*FunPtr) (Arg1 , Arg2, Arg3, Arg4, Arg5,
+				    Arg6);
+	  Arg1   arg1;
+	  Arg2   arg2;
+	  Arg3   arg3;
+	  Arg4   arg4;
+	  Arg5   arg5;
+	  Arg6   arg6;
+	  FunPtr fun_ptr;
+	  
+	  Fun_Data6 (Arg1   arg1,
+		     Arg2   arg2,
+		     Arg3   arg3,
+		     Arg4   arg4,
+		     Arg5   arg5,
+		     Arg6   arg6,
+		     FunPtr fun_ptr) :
+			  arg1  (arg1),
+			  arg2  (arg2),
+			  arg3  (arg3),
+			  arg4  (arg4),
+			  arg5  (arg5),
+			  arg6  (arg6),
+			  fun_ptr (fun_ptr) {};
+      };
+
+    				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * global function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5, typename Arg6,
+              typename Arg7>
+    struct Fun_Data7
+    {
+	typedef void * (*FunPtr) (Arg1 , Arg2, Arg3, Arg4, Arg5,
+				  Arg6, Arg7);
+	Arg1   arg1;
+	Arg2   arg2;
+	Arg3   arg3;
+	Arg4   arg4;
+	Arg5   arg5;
+	Arg6   arg6;
+	Arg7   arg7;
+	FunPtr fun_ptr;
+	  
+	Fun_Data7 (Arg1   arg1,
+		   Arg2   arg2,
+		   Arg3   arg3,
+		   Arg4   arg4,
+		   Arg5   arg5,
+		   Arg6   arg6,
+		   Arg7   arg7,
+		   FunPtr fun_ptr) :
+			arg1  (arg1),
+			arg2  (arg2),
+			arg3  (arg3),
+			arg4  (arg4),
+			arg5  (arg5),
+			arg6  (arg6),
+			arg7  (arg7),
+			fun_ptr (fun_ptr) {};
+    };
+    
+    				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * global function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5, typename Arg6,
+              typename Arg7, typename Arg8>
+      struct Fun_Data8
+      {
+ 	  typedef void * (*FunPtr) (Arg1 , Arg2, Arg3, Arg4, Arg5,
+				    Arg6, Arg7, Arg8);
+	  Arg1   arg1;
+	  Arg2   arg2;
+	  Arg3   arg3;
+	  Arg4   arg4;
+	  Arg5   arg5;
+	  Arg6   arg6;
+	  Arg7   arg7;
+	  Arg8   arg8;
+	  FunPtr fun_ptr;
+	  
+	  Fun_Data8 (Arg1   arg1,
+		     Arg2   arg2,
+		     Arg3   arg3,
+		     Arg4   arg4,
+		     Arg5   arg5,
+		     Arg6   arg6,
+		     Arg7   arg7,
+		     Arg8   arg8,
+		     FunPtr fun_ptr) :
+			  arg1  (arg1),
+			  arg2  (arg2),
+			  arg3  (arg3),
+			  arg4  (arg4),
+			  arg5  (arg5),
+			  arg6  (arg6),
+			  arg7  (arg7),
+			  arg8  (arg8),
+			  fun_ptr (fun_ptr) {};
+      };
+    
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * global function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5, typename Arg6,
+              typename Arg7, typename Arg8,
+      typename Arg9>
+      struct Fun_Data9
+      {
+ 	  typedef void * (*FunPtr) (Arg1 , Arg2, Arg3, Arg4, Arg5,
+				    Arg6, Arg7, Arg8, Arg9);
+	  Arg1   arg1;
+	  Arg2   arg2;
+	  Arg3   arg3;
+	  Arg4   arg4;
+	  Arg5   arg5;
+	  Arg6   arg6;
+	  Arg7   arg7;
+	  Arg8   arg8;
+	  Arg9   arg9;
+	  FunPtr fun_ptr;
+	  
+	  Fun_Data9 (Arg1   arg1,
+		      Arg2   arg2,
+		      Arg3   arg3,
+		      Arg4   arg4,
+		      Arg5   arg5,
+		      Arg6   arg6,
+		      Arg7   arg7,
+		      Arg8   arg8,
+		      Arg9   arg9,
+		     FunPtr fun_ptr) :
+			  arg1  (arg1),
+	    arg2  (arg2),
+	    arg3  (arg3),
+	    arg4  (arg4),
+	    arg5  (arg5),
+	    arg6  (arg6),
+	    arg7  (arg7),
+	    arg8  (arg8),
+	    arg9  (arg9),
+	    fun_ptr (fun_ptr) {};
+      };
+    				     
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * function. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Arg1, typename Arg2,
+              typename Arg3, typename Arg4,
+              typename Arg5, typename Arg6,
+              typename Arg7, typename Arg8,
+      typename Arg9, typename Arg10>
+      struct Fun_Data10
+      {
+ 	  typedef void * (*FunPtr) (Arg1 , Arg2, Arg3, Arg4, Arg5,
+				    Arg6, Arg7, Arg8, Arg9, Arg10);
+	  Arg1   arg1;
+	  Arg2   arg2;
+	  Arg3   arg3;
+	  Arg4   arg4;
+	  Arg5   arg5;
+	  Arg6   arg6;
+	  Arg7   arg7;
+	  Arg8   arg8;
+	  Arg9   arg9;
+	  Arg10  arg10;
+	  FunPtr fun_ptr;
+	  
+	  Fun_Data10 (Arg1   arg1,
+		      Arg2   arg2,
+		      Arg3   arg3,
+		      Arg4   arg4,
+		      Arg5   arg5,
+		      Arg6   arg6,
+		      Arg7   arg7,
+		      Arg8   arg8,
+		      Arg9   arg9,
+		      Arg10  arg10,
+		      FunPtr fun_ptr) :
+			  arg1  (arg1),
+	    arg2  (arg2),
+	    arg3  (arg3),
+	    arg4  (arg4),
+	    arg5  (arg5),
+	    arg6  (arg6),
+	    arg7  (arg7),
+	    arg8  (arg8),
+	    arg9  (arg9),
+	    arg10 (arg10),
+	    fun_ptr (fun_ptr) {};
+      };
 
 
 				     /**
@@ -615,7 +1262,288 @@ class ThreadManager : public ACE_Thread_Manager
 	       int grp_id = -1,
 	       void *stack = 0,
 	       size_t stack_size = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for member functions as well,
+				      * rather than for global functions only.
+				      *
+				      * This version is for member functions
+				      * taking seven arguments
+				      */
+    template <typename ObjectClass, typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7>
+    int spawn (Mem_Fun_Data7<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+	                                 Arg6,Arg7> *mem_fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+				     /**
+				      * Wrapper function to allow spawning
+				      * threads for member functions as well,
+				      * rather than for global functions only.
+				      *
+				      * This version is for member functions
+				      * taking eight arguments
+				      */
+    template <typename ObjectClass, typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7, typename Arg8>
+      int spawn (Mem_Fun_Data8<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+	                                   Arg6,Arg7,Arg8> *mem_fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+				     /**
+				      * Wrapper function to allow spawning
+				      * threads for member functions as well,
+				      * rather than for global functions only.
+				      *
+				      * This version is for member functions
+				      * taking nine arguments
+				      */
+    template <typename ObjectClass, typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7, typename Arg8,
+                                    typename Arg9>
+    int spawn (Mem_Fun_Data9<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+	                                  Arg6,Arg7,Arg8,Arg9> *mem_fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+
     
+				     /**
+				      * Wrapper function to allow spawning
+				      * threads for member functions as well,
+				      * rather than for global functions only.
+				      *
+				      * This version is for member functions
+				      * taking ten arguments
+				      */
+    template <typename ObjectClass, typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7, typename Arg8,
+                                    typename Arg9, typename Arg10>
+    int spawn (Mem_Fun_Data10<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+	                                  Arg6,Arg7,Arg8,Arg9,Arg10> *mem_fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking one arguments
+				      */
+    template <typename Arg1>
+    int spawn (Fun_Data1<Arg1> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking two arguments
+				      */
+    template <typename Arg1, typename Arg2>
+    int spawn (Fun_Data2<Arg1,Arg2> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking three arguments
+				      */
+    template <typename Arg1, typename Arg2, typename Arg3>
+    int spawn (Fun_Data3<Arg1,Arg2,Arg3> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking four arguments
+				      */
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+    int spawn (Fun_Data4<Arg1,Arg2,Arg3,Arg4> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking five arguments
+				      */
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+      typename Arg5>
+    int spawn (Fun_Data5<Arg1,Arg2,Arg3,Arg4,Arg5> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking six arguments
+				      */
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6>
+    int spawn (Fun_Data6<Arg1,Arg2,Arg3,Arg4,Arg5,
+	       Arg6> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking seven arguments
+				      */
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6,
+      typename Arg7>
+    int spawn (Fun_Data7<Arg1,Arg2,Arg3,Arg4,Arg5,
+	       Arg6,Arg7> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking eigth arguments
+				      */
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6,
+      typename Arg7, typename Arg8>
+    int spawn (Fun_Data8<Arg1,Arg2,Arg3,Arg4,Arg5,
+	       Arg6,Arg7,Arg8> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking nine arguments
+				      */
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6,
+      typename Arg7, typename Arg8,
+      typename Arg9>
+    int spawn (Fun_Data9<Arg1,Arg2,Arg3,Arg4,Arg5,
+	       Arg6,Arg7,Arg8,Arg9> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+				     /**
+				      * Wrapper function to allow spawning
+				      * threads for funtions.
+				      *
+				      * This version is for member functions
+				      * taking ten arguments
+				      */
+    template <typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6,
+      typename Arg7, typename Arg8,
+      typename Arg9, typename Arg10>
+    int spawn (Fun_Data10<Arg1,Arg2,Arg3,Arg4,Arg5,
+	       Arg6,Arg7,Arg8,Arg9,Arg10> *fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
 				     /**
 				      * Wrapper function to allow spawning
 				      * multiple threads for member functions
@@ -740,6 +1668,331 @@ class ThreadManager : public ACE_Thread_Manager
 		 void *stack[] = 0,
 		 size_t stack_size[] = 0);
     
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking seven arguments
+				      */
+    template <typename ObjectClass, typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7>
+    int spawn_n (size_t n,
+		 Mem_Fun_Data7<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+		                            Arg6,Arg7> *mem_fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking eight arguments
+				      */
+    template <typename ObjectClass, typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7, typename Arg8>
+    int spawn_n (size_t n,
+		 Mem_Fun_Data8<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+		                           Arg6,Arg7,Arg8> *mem_fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking nine arguments
+				      */
+    template <typename ObjectClass, typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7, typename Arg8,
+                                    typename Arg9>
+    int spawn_n (size_t n,
+		 Mem_Fun_Data9<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+		                            Arg6,Arg7,Arg8,Arg9> *mem_fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+
+    				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking ten arguments
+				      */
+    template <typename ObjectClass, typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7, typename Arg8,
+                                    typename Arg9, typename Arg10>
+    int spawn_n (size_t n,
+		 Mem_Fun_Data10<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+		                            Arg6,Arg7,Arg8,Arg9,Arg10> *mem_fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking one arguments
+				      */
+    template < typename Arg1>
+    int spawn_n (size_t n,
+		 Fun_Data1<Arg1> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking two arguments
+				      */
+    template < typename Arg1, typename Arg2>
+    int spawn_n (size_t n,
+		 Fun_Data2<Arg1,Arg2> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking three arguments
+				      */
+    template < typename Arg1, typename Arg2,
+                                    typename Arg3>
+    int spawn_n (size_t n,
+		 Fun_Data3<Arg1,Arg2,Arg3> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking four arguments
+				      */
+    template < typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4>
+    int spawn_n (size_t n,
+		 Fun_Data4<Arg1,Arg2,Arg3,Arg4> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking five arguments
+				      */
+    template < typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5>
+    int spawn_n (size_t n,
+		 Fun_Data5<Arg1,Arg2,Arg3,Arg4,Arg5> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking six arguments
+				      */
+    template < typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6>
+    int spawn_n (size_t n,
+		 Fun_Data6<Arg1,Arg2,Arg3,Arg4,Arg5,
+		 Arg6> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking seven arguments
+				      */
+    template < typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7>
+    int spawn_n (size_t n,
+		 Fun_Data7<Arg1,Arg2,Arg3,Arg4,Arg5,
+		 Arg6,Arg7> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking eight arguments
+				      */
+    template < typename Arg1, typename Arg2,
+      typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6,
+      typename Arg7, typename Arg8>
+    int spawn_n (size_t n,
+		 Fun_Data8<Arg1,Arg2,Arg3,Arg4,Arg5,
+		 Arg6,Arg7,Arg8> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking nine arguments
+				      */
+    template < typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7, typename Arg8,
+                                    typename Arg9>
+    int spawn_n (size_t n,
+		 Fun_Data9<Arg1,Arg2,Arg3,Arg4,Arg5,
+		 Arg6,Arg7,Arg8,Arg9> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking ten arguments
+				      */
+    template < typename Arg1, typename Arg2,
+                                    typename Arg3, typename Arg4,
+                                    typename Arg5, typename Arg6,
+                                    typename Arg7, typename Arg8,
+                                    typename Arg9, typename Arg10>
+    int spawn_n (size_t n,
+		 Fun_Data10<Arg1,Arg2,Arg3,Arg4,Arg5,
+		 Arg6,Arg7,Arg8,Arg9,Arg10> *fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
+    
+
+    
   private:
 
 
@@ -806,6 +2059,182 @@ class ThreadManager : public ACE_Thread_Manager
                               typename Arg3, typename Arg4,
                               typename Arg5, typename Arg6>
     static void * thread_entry_point6 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with seven parameters.
+				      */
+    template <typename Class, typename Arg1, typename Arg2,
+                              typename Arg3, typename Arg4,
+                              typename Arg5, typename Arg6,
+                              typename Arg7>
+    static void * thread_entry_point7 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with eight parameters.
+				      */
+    template <typename Class, typename Arg1, typename Arg2,
+                              typename Arg3, typename Arg4,
+                              typename Arg5, typename Arg6,
+                              typename Arg7, typename Arg8>
+    static void * thread_entry_point8 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with nine parameters.
+				      */
+    template <typename Class, typename Arg1, typename Arg2,
+                              typename Arg3, typename Arg4,
+                              typename Arg5, typename Arg6,
+                              typename Arg7, typename Arg8,
+                              typename Arg9>
+    static void * thread_entry_point9 (void *_arg);
+
+				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with ten parameters.
+				      */
+    template <typename Class, typename Arg1, typename Arg2,
+                              typename Arg3, typename Arg4,
+                              typename Arg5, typename Arg6,
+                              typename Arg7, typename Arg8,
+                              typename Arg9, typename Arg10>
+    static void * thread_entry_point10 (void *_arg);
+
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with one parameters.
+				      */
+    template < typename Arg1>
+    static void * thread_entry_point_1 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with two parameters.
+				      */
+    template < typename Arg1, typename Arg2>
+    static void * thread_entry_point_2 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with three parameters.
+				      */
+    template < typename Arg1, typename Arg2,
+      typename Arg3>
+    static void * thread_entry_point_3 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with four parameters.
+				      */
+    template < typename Arg1, typename Arg2,
+      typename Arg3, typename Arg4>
+    static void * thread_entry_point_4 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with five parameters.
+				      */
+    template < typename Arg1, typename Arg2,
+      typename Arg3, typename Arg4,
+      typename Arg5>
+    static void * thread_entry_point_5 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with six parameters.
+				      */
+    template < typename Arg1, typename Arg2,
+      typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6>
+    static void * thread_entry_point_6 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with seven parameters.
+				      */
+    template < typename Arg1, typename Arg2,
+      typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6,
+      typename Arg7>
+    static void * thread_entry_point_7 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with eight parameters.
+				      */
+    template < typename Arg1, typename Arg2,
+      typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6,
+      typename Arg7, typename Arg8>
+    static void * thread_entry_point_8 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with nine parameters.
+				      */
+    template < typename Arg1, typename Arg2,
+      typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6,
+      typename Arg7, typename Arg8,
+      typename Arg9>
+    static void * thread_entry_point_9 (void *_arg);
+
+    				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
+				      * member function with ten parameters.
+				      */
+    template < typename Arg1, typename Arg2,
+      typename Arg3, typename Arg4,
+      typename Arg5, typename Arg6,
+      typename Arg7, typename Arg8,
+      typename Arg9, typename Arg10>
+    static void * thread_entry_point_10 (void *_arg);
+
 };
 
 
@@ -953,6 +2382,376 @@ int ThreadManager::spawn (Mem_Fun_Data6<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,Arg
 				    stack_size);
 };
 
+
+template <typename ObjectClass, typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7>
+int ThreadManager::spawn (Mem_Fun_Data7<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+			                            Arg6,Arg7> *mem_fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point7<ObjectClass,
+				    Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7>,
+				    (void*)mem_fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+
+template <typename ObjectClass, typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8>
+int ThreadManager::spawn (Mem_Fun_Data8<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+			                            Arg6,Arg7,Arg8> *mem_fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point8<ObjectClass,
+				    Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8>,
+				    (void*)mem_fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+
+template <typename ObjectClass, typename Arg1, typename Arg2,
+  typename Arg3, typename Arg4,
+  typename Arg5, typename Arg6,
+  typename Arg7, typename Arg8,
+  typename Arg9>
+int ThreadManager::spawn (Mem_Fun_Data9<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+			  Arg6,Arg7,Arg8,Arg9> *mem_fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point9<ObjectClass,
+				    Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9>,
+				    (void*)mem_fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+
+template <typename ObjectClass, typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8,
+                                typename Arg9, typename Arg10>
+int ThreadManager::spawn (Mem_Fun_Data10<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+			                            Arg6,Arg7,Arg8,Arg9,Arg10> *mem_fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point10<ObjectClass,
+				    Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10>,
+				    (void*)mem_fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+template <typename Arg1>
+int ThreadManager::spawn (Fun_Data1<Arg1> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_1<
+				    Arg1>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+template <typename Arg1, typename Arg2>
+int ThreadManager::spawn (Fun_Data2<Arg1,Arg2> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_2
+				    <Arg1,Arg2>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3>
+int ThreadManager::spawn (Fun_Data3<Arg1,Arg2,Arg3> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_3
+				    <Arg1,Arg2,Arg3>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4>
+int ThreadManager::spawn (Fun_Data4<Arg1,Arg2,Arg3,Arg4> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_4<
+				    Arg1,Arg2,Arg3,Arg4>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5>
+int ThreadManager::spawn (Fun_Data5<Arg1,Arg2,Arg3,Arg4,Arg5> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_5
+				    <Arg1,Arg2,Arg3,Arg4,Arg5>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6>
+int ThreadManager::spawn (Fun_Data6<Arg1,Arg2,Arg3,Arg4,Arg5,
+			  Arg6> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_6
+				    <Arg1,Arg2,Arg3,Arg4,Arg5,Arg6>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7>
+int ThreadManager::spawn (Fun_Data7<Arg1,Arg2,Arg3,Arg4,Arg5,
+			  Arg6,Arg7> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_7
+				    <Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8>
+int ThreadManager::spawn (Fun_Data8<Arg1,Arg2,Arg3,Arg4,Arg5,
+			  Arg6,Arg7,Arg8> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_8
+				    <Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8,
+                                typename Arg9>
+int ThreadManager::spawn (Fun_Data9<Arg1,Arg2,Arg3,Arg4,Arg5,
+			  Arg6,Arg7,Arg8,Arg9> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_9
+				    <Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
+
+
+
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8,
+                                typename Arg9, typename Arg10>
+int ThreadManager::spawn (Fun_Data10<Arg1,Arg2,Arg3,Arg4,Arg5,
+			  Arg6,Arg7,Arg8,Arg9,Arg10> *fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point_10
+				    <Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10>,
+				    (void*)fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
 
 
 template <typename ObjectClass, typename Arg>
@@ -1108,6 +2907,390 @@ int ThreadManager::spawn_n (size_t n,
 };
 
 
+template <typename ObjectClass, typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7>
+int ThreadManager::spawn_n (size_t n,
+			    Mem_Fun_Data7<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+			                               Arg6,Arg7> *mem_fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point7<ObjectClass,
+				      Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7>,
+				      (void*)mem_fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename ObjectClass, typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8>
+int ThreadManager::spawn_n (size_t n,
+			    Mem_Fun_Data8<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+			                               Arg6,Arg7,Arg8> *mem_fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point8<ObjectClass,
+				      Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8>,
+				      (void*)mem_fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename ObjectClass, typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8,
+                                typename Arg9>
+int ThreadManager::spawn_n (size_t n,
+			    Mem_Fun_Data9<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+			                              Arg6,Arg7,Arg8,Arg9> *mem_fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point9<ObjectClass,
+				      Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9>,
+				      (void*)mem_fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+
+template <typename ObjectClass, typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8,
+                                typename Arg9, typename Arg10>
+int ThreadManager::spawn_n (size_t n,
+			    Mem_Fun_Data10<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+			                               Arg6,Arg7,Arg8,Arg9,Arg10> *mem_fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point10<ObjectClass,
+				      Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10>,
+				      (void*)mem_fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+
+template <typename Arg1>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data1<Arg1> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_1<
+				      Arg1>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename Arg1, typename Arg2>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data2<Arg1,Arg2> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_2<
+				      Arg1,Arg2>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data3<Arg1,Arg2,Arg3> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_3<
+				      Arg1,Arg2,Arg3>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data4<Arg1,Arg2,Arg3,Arg4> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_4<
+				      Arg1,Arg2,Arg3,Arg4>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data5<Arg1,Arg2,Arg3,Arg4,Arg5> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_5<
+				      Arg1,Arg2,Arg3,Arg4,Arg5>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data6<Arg1,Arg2,Arg3,Arg4,Arg5,
+			    Arg6> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_6<
+				      Arg1,Arg2,Arg3,Arg4,Arg5,Arg6>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data7<Arg1,Arg2,Arg3,Arg4,Arg5,
+			    Arg6,Arg7> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_7<
+				      Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data8<Arg1,Arg2,Arg3,Arg4,Arg5,
+			    Arg6,Arg7,Arg8> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_8<
+				      Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8,
+                                typename Arg9>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data9<Arg1,Arg2,Arg3,Arg4,Arg5,
+			    Arg6,Arg7,Arg8,Arg9> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_9<
+				      Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
+
+
+
+template <typename Arg1, typename Arg2,
+                                typename Arg3, typename Arg4,
+                                typename Arg5, typename Arg6,
+                                typename Arg7, typename Arg8,
+                                typename Arg9, typename Arg10>
+int ThreadManager::spawn_n (size_t n,
+			    Fun_Data10<Arg1,Arg2,Arg3,Arg4,Arg5,
+			    Arg6,Arg7,Arg8,Arg9,Arg10> *fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point_10<
+				      Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10>,
+				      (void*)fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
 
 template <typename Class, typename Arg>
 void * ThreadManager::thread_entry_point1 (void *_arg)
@@ -1233,9 +3416,371 @@ void * ThreadManager::thread_entry_point6 (void *_arg)
 };
 
 
+
+template <typename Class, typename Arg1, typename Arg2,
+                          typename Arg3, typename Arg4,
+                          typename Arg5, typename Arg6,
+                          typename Arg7>
+void * ThreadManager::thread_entry_point7 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Mem_Fun_Data7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7> *arg
+    = reinterpret_cast<Mem_Fun_Data7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,
+                                            Arg6,Arg7> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->object->*(arg->mem_fun))(arg->arg1,
+					arg->arg2,
+					arg->arg3,
+					arg->arg4,
+					arg->arg5,
+					arg->arg6,
+					arg->arg7);
+};
+
+
+template <typename Class, typename Arg1, typename Arg2,
+                          typename Arg3, typename Arg4,
+                          typename Arg5, typename Arg6,
+                          typename Arg7, typename Arg8>
+void * ThreadManager::thread_entry_point8 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Mem_Fun_Data8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8> *arg
+    = reinterpret_cast<Mem_Fun_Data8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,
+                                            Arg6,Arg7,Arg8> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->object->*(arg->mem_fun))(arg->arg1,
+					arg->arg2,
+					arg->arg3,
+					arg->arg4,
+					arg->arg5,
+					arg->arg6,
+					arg->arg7,
+					arg->arg8);
+};
+
+
+template <typename Class, typename Arg1, typename Arg2,
+                          typename Arg3, typename Arg4,
+                          typename Arg5, typename Arg6,
+                          typename Arg7, typename Arg8,
+                          typename Arg9>
+void * ThreadManager::thread_entry_point9 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Mem_Fun_Data9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9> *arg
+    = reinterpret_cast<Mem_Fun_Data9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,
+                                            Arg6,Arg7,Arg8,Arg9> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->object->*(arg->mem_fun))(arg->arg1,
+					arg->arg2,
+					arg->arg3,
+					arg->arg4,
+					arg->arg5,
+					arg->arg6,
+					arg->arg7,
+					arg->arg8,
+					arg->arg9);
+};
+
+
+
+template <typename Class, typename Arg1, typename Arg2,
+                          typename Arg3, typename Arg4,
+                          typename Arg5, typename Arg6,
+                          typename Arg7, typename Arg8,
+                          typename Arg9, typename Arg10>
+void * ThreadManager::thread_entry_point10 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Mem_Fun_Data10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10> *arg
+    = reinterpret_cast<Mem_Fun_Data10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,
+                                            Arg6,Arg7,Arg8,Arg9,Arg10> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->object->*(arg->mem_fun))(arg->arg1,
+					arg->arg2,
+					arg->arg3,
+					arg->arg4,
+					arg->arg5,
+					arg->arg6,
+					arg->arg7,
+					arg->arg8,
+					arg->arg9,
+					arg->arg10);
+};
+
+
+template <typename Arg1>
+void * ThreadManager::thread_entry_point_1 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data1<Arg1> *arg
+    = reinterpret_cast<Fun_Data1<Arg1> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1);
+};
+
+
+template <typename Arg1, typename Arg2>
+void * ThreadManager::thread_entry_point_2 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data2<Arg1,Arg2> *arg
+    = reinterpret_cast<Fun_Data2<Arg1,Arg2> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1,
+			arg->arg2);
+};
+
+
+template <typename Arg1, typename Arg2,
+  typename Arg3>
+void * ThreadManager::thread_entry_point_3 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data3<Arg1,Arg2,Arg3> *arg
+    = reinterpret_cast<Fun_Data3<Arg1,Arg2,Arg3> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1,
+			arg->arg2,
+			arg->arg3);
+};
+
+
+template <typename Arg1, typename Arg2,
+  typename Arg3, typename Arg4>
+void * ThreadManager::thread_entry_point_4 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data4<Arg1,Arg2,Arg3,Arg4> *arg
+    = reinterpret_cast<Fun_Data4<Arg1,Arg2,Arg3,Arg4> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1,
+			arg->arg2,
+			arg->arg3,
+			arg->arg4);
+};
+
+
+template <typename Arg1, typename Arg2,
+                          typename Arg3, typename Arg4,
+                          typename Arg5>
+void * ThreadManager::thread_entry_point_5 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data5<Arg1,Arg2,Arg3,Arg4,Arg5> *arg
+    = reinterpret_cast<Fun_Data5<Arg1,Arg2,Arg3,Arg4,Arg5> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1,
+			arg->arg2,
+			arg->arg3,
+			arg->arg4,
+			arg->arg5);
+};
+
+
+template <typename Arg1, typename Arg2,
+                          typename Arg3, typename Arg4,
+                          typename Arg5, typename Arg6>
+void * ThreadManager::thread_entry_point_6 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6> *arg
+    = reinterpret_cast<Fun_Data6<Arg1,Arg2,Arg3,Arg4,Arg5,
+    Arg6> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1,
+			arg->arg2,
+			arg->arg3,
+			arg->arg4,
+			arg->arg5,
+			arg->arg6);
+};
+
+
+template <typename Arg1, typename Arg2,
+  typename Arg3, typename Arg4,
+  typename Arg5, typename Arg6,
+  typename Arg7>
+void * ThreadManager::thread_entry_point_7 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7> *arg
+    = reinterpret_cast<Fun_Data7<Arg1,Arg2,Arg3,Arg4,Arg5,
+    Arg6,Arg7> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1,
+			 arg->arg2,
+			 arg->arg3,
+			 arg->arg4,
+			 arg->arg5,
+			 arg->arg6,
+			arg->arg7);
+};
+
+
+template <typename Arg1, typename Arg2,
+                          typename Arg3, typename Arg4,
+                          typename Arg5, typename Arg6,
+                          typename Arg7, typename Arg8>
+void * ThreadManager::thread_entry_point_8 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8> *arg
+    = reinterpret_cast<Fun_Data8<Arg1,Arg2,Arg3,Arg4,Arg5,
+    Arg6,Arg7,Arg8> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1,
+			 arg->arg2,
+			 arg->arg3,
+			 arg->arg4,
+			 arg->arg5,
+			 arg->arg6,
+			 arg->arg7,
+			 arg->arg8);
+};
+
+
+template <typename Arg1, typename Arg2,
+                          typename Arg3, typename Arg4,
+                          typename Arg5, typename Arg6,
+                          typename Arg7, typename Arg8,
+                          typename Arg9>
+void * ThreadManager::thread_entry_point_9 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9> *arg
+    = reinterpret_cast<Fun_Data9<Arg1,Arg2,Arg3,Arg4,Arg5,
+    Arg6,Arg7,Arg8,Arg9> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1,
+			 arg->arg2,
+			 arg->arg3,
+			 arg->arg4,
+			 arg->arg5,
+			 arg->arg6,
+			 arg->arg7,
+			 arg->arg8,
+			 arg->arg9);
+};
+
+template <typename Arg1, typename Arg2,
+                          typename Arg3, typename Arg4,
+                          typename Arg5, typename Arg6,
+                          typename Arg7, typename Arg8,
+                          typename Arg9, typename Arg10>
+void * ThreadManager::thread_entry_point_10 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Fun_Data10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10> *arg
+    = reinterpret_cast<Fun_Data10<Arg1,Arg2,Arg3,Arg4,Arg5,
+    Arg6,Arg7,Arg8,Arg9,Arg10> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  return (arg->fun_ptr)(arg->arg1,
+			 arg->arg2,
+			 arg->arg3,
+			 arg->arg4,
+			 arg->arg5,
+			 arg->arg6,
+			 arg->arg7,
+			 arg->arg8,
+			 arg->arg9,
+			 arg->arg10);
+};
+
+
+
 #endif
 
 /*----------------------------   thread_manager.h     ---------------------------*/
 /* end of #ifndef __thread_manager_H */
 #endif
 /*----------------------------   thread_manager.h     ---------------------------*/
+
+
+
+
