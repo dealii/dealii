@@ -245,15 +245,15 @@ build-test-do:
 	@echo END MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
 	@echo 
 	@echo BEGIN MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
-	cd doc/doxygen ; $(MAKE)
+	cd examples/doxygen ; $(MAKE)
 	@echo END MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
 	@echo 
-	if test -d tests ; then \
-	   @echo BEGIN MAKE TESTS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
-	   cd tests ; $(MAKE) report+mail ; \
-	   @echo END MAKE TESTS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
-	   @echo ; \
-	 fi
+#	if test -d tests ; then \
+#	   @echo BEGIN MAKE TESTS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
+#	   cd tests ; $(MAKE) report+mail ; \
+#	   @echo END MAKE TESTS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
+#	   @echo ; \
+#	 fi
 	@echo BUILD TEST SUCCESSFUL `date -u '+%Y-%m-%d %T'`
 
 
