@@ -223,7 +223,7 @@ namespace PETScWrappers
 
                                      // then do the gather operation
     ierr = VecConvertMPIToSeqAll (static_cast<const Vec &>(v),
-                                            &vector);
+                                  &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     
     return *this;

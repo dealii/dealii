@@ -13,6 +13,8 @@
 
 
 #include <lac/petsc_vector_base.h>
+#include <lac/petsc_vector.h>
+#include <lac/petsc_parallel_vector.h>
 
 #include <cmath>
 
@@ -21,6 +23,74 @@
 
 namespace PETScWrappers
 {
+  namespace internal
+  {
+    VectorReference::operator PetscScalar () const
+    {
+      Assert (index < vector.size(),
+              ExcIndexRange (index, 0, vector.size()));
+              
+                                       // this is clumsy: there is no simple
+                                       // way in PETSc read an element from a
+                                       // vector, i.e. there is no function
+                                       // VecGetValue or so. The only way is
+                                       // to obtain a pointer to a contiguous
+                                       // representation of the vector and
+                                       // read from it. Subsequently, the
+                                       // vector representation has to be
+                                       // restored. In addition, we can only
+                                       // get access to the local part of the
+                                       // vector, so we have to guard against
+                                       // that
+      if (dynamic_cast<const PETScWrappers::Vector *>(&vector) != 0)
+        {
+          PetscScalar *ptr;
+          int ierr
+            = VecGetArray (static_cast<const Vec &>(vector), &ptr);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          
+          const PetscScalar value = *(ptr+index);
+          
+          ierr = VecRestoreArray (static_cast<const Vec &>(vector), &ptr);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          
+          return value;
+        }
+      else if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&vector) != 0)
+        {
+                                           // first verify that the requested
+                                           // element is actually locally
+                                           // available
+          int ierr;
+          int begin, end;
+          ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
+                                       &begin, &end);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+          AssertThrow ((index >= static_cast<unsigned int>(begin)) &&
+                       (index < static_cast<unsigned int>(end)),
+                       ExcAccessToNonlocalElement (index, begin, end-1));
+
+                                           // then access it
+          PetscScalar *ptr;
+          ierr = VecGetArray (static_cast<const Vec &>(vector), &ptr);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          
+          const PetscScalar value = *(ptr+index-begin);
+          
+          ierr = VecRestoreArray (static_cast<const Vec &>(vector), &ptr);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          
+          return value;
+        }
+      else
+                                         // what? what other kind of vector
+                                         // exists there?
+        Assert (false, ExcInternalError());
+      return -1e20;
+    }  
+  }
+  
   VectorBase::VectorBase ()
                   :
                   last_action (LastAction::none)

@@ -119,6 +119,16 @@ namespace PETScWrappers
                         int,
                         << "An error with error number " << arg1
                         << " occured while calling a PETSc function");
+                                         /**
+                                          * Exception
+                                          */
+        DeclException3 (ExcAccessToNonlocalElement,
+                        int, int, int,
+                        << "You tried to access element " << arg1
+                        << " of a distributed vector, but only elements "
+                        << arg2 << " through " << arg3
+                        << " are stored locally and can be accessed.");
+        
       private:
                                          /**
                                           * Point to the vector we are
@@ -762,38 +772,8 @@ namespace PETScWrappers
       
       return *this;
     }
-
-
-
-    inline
-    VectorReference::operator PetscScalar () const
-    {
-                                       // this is clumsy: there is no simple
-                                       // way in PETSc read an element from a
-                                       // vector, i.e. there is no function
-                                       // VecGetValue or so. The only way is
-                                       // to obtain a pointer to a contiguous
-                                       // representation of the vector and
-                                       // read from it. Subsequently, the
-                                       // vector representation has to be
-                                       // restored. If the vector has some
-                                       // kind of non-standard format, such as
-                                       // for parallel vectors, then this is a
-                                       // costly operation, just for a single
-                                       // read access..
-      PetscScalar *ptr;
-      int ierr
-        = VecGetArray (static_cast<const Vec &>(vector), &ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      const PetscScalar value = *(ptr+index);
-
-      ierr = VecRestoreArray (static_cast<const Vec &>(vector), &ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
-      return value;
-    }
   }
+  
 
 
   inline

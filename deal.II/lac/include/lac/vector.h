@@ -17,11 +17,21 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+#include <cstdio>
+
+
 #ifdef DEAL_II_USE_PETSC
-#  include <lac/petsc_vector_base.h>
+namespace PETScWrappers
+{
+  class Vector;
+  namespace MPI
+  {
+    class Vector;
+  }
+}
 #endif
 
-#include <cstdio>
+
 
 /*! @addtogroup Vectors
  *@{
@@ -114,12 +124,30 @@ class Vector
 #ifdef DEAL_II_USE_PETSC
                                      /**
                                       * Another copy constructor: copy the
-                                      * values from a PETSc wrapper vector
-                                      * class. This copy constructor is only
-                                      * available if PETSc was detected during
-                                      * configuration time.
+                                      * values from a sequential PETSc wrapper
+                                      * vector class. This copy constructor is
+                                      * only available if PETSc was detected
+                                      * during configuration time.
                                       */
-    Vector (const PETScWrappers::VectorBase &v);
+    Vector (const PETScWrappers::Vector &v);
+
+                                     /**
+                                      * Another copy constructor: copy the
+                                      * values from a parallel PETSc wrapper
+                                      * vector class. This copy constructor is
+                                      * only available if PETSc was detected
+                                      * during configuration time.
+                                      *
+                                      * Note that due to the communication
+                                      * model used in MPI, this operation can
+                                      * only succeed if all processes do it at
+                                      * the same time. I.e., it is not
+                                      * possible for only one process to
+                                      * obtain a copy of a parallel vector
+                                      * while the other jobs do something
+                                      * else.
+                                      */
+    Vector (const PETScWrappers::MPI::Vector &v);
 #endif
     
 				     /**
@@ -263,13 +291,44 @@ class Vector
 				      * present vector if necessary.
 				      */
     Vector<Number> & operator= (const Vector<Number> &c);
-
+    
 				     /**
 				      * Copy the given vector. Resize the
 				      * present vector if necessary.
 				      */
     template <typename Number2>
     Vector<Number> & operator= (const Vector<Number2> &v);
+
+#ifdef DEAL_II_USE_PETSC
+                                     /**
+                                      * Another copy operator: copy the values
+                                      * from a sequential PETSc wrapper vector
+                                      * class. This operator is only available
+                                      * if PETSc was detected during
+                                      * configuration time.
+                                      */
+    Vector<Number> &
+    operator = (const PETScWrappers::Vector &v);
+
+                                     /**
+                                      * Another copy operator: copy the values
+                                      * from a parallel PETSc wrapper vector
+                                      * class. This operator is only available
+                                      * if PETSc was detected during
+                                      * configuration time.
+                                      *
+                                      * Note that due to the communication
+                                      * model used in MPI, this operation can
+                                      * only succeed if all processes do it at
+                                      * the same time. I.e., it is not
+                                      * possible for only one process to
+                                      * obtain a copy of a parallel vector
+                                      * while the other jobs do something
+                                      * else.
+                                      */
+    Vector<Number> &
+    operator = (const PETScWrappers::MPI::Vector &v);
+#endif
 
                                      /**
                                       * Test for equality. This function

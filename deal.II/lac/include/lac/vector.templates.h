@@ -15,6 +15,12 @@
 
 
 #include <lac/vector.h>
+
+#ifdef DEAL_II_USE_PETSC
+#  include <lac/petsc_vector.h>
+#  include <lac/petsc_parallel_vector.h>
+#endif
+
 #include <cmath>
 #include <algorithm>
 #include <iostream>
@@ -75,7 +81,7 @@ Vector<Number>::Vector (const Vector<Number>& v)
 #ifdef DEAL_II_USE_PETSC
 
 template <typename Number>
-Vector<Number>::Vector (const PETScWrappers::VectorBase &v)
+Vector<Number>::Vector (const PETScWrappers::Vector &v)
                 :
 		dim(v.size()),
 		maxdim(v.size()),
@@ -97,7 +103,26 @@ Vector<Number>::Vector (const PETScWrappers::VectorBase &v)
                                        // restore the representation of the
                                        // vector
       ierr = VecRestoreArray (static_cast<const Vec&>(v), &start_ptr);
-      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));      
+      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));
+    }
+}
+
+
+
+template <typename Number>
+Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
+                :
+		dim(v.size()),
+		maxdim(v.size()),
+		val(0)
+{
+  if (dim)
+    {
+                                       // do this in a two-stage process:
+                                       // first convert to a sequential petsc
+                                       // vector, then copy that
+      PETScWrappers::Vector seq (v);
+      *this = seq;
     }
 }
 
@@ -603,6 +628,51 @@ Vector<Number>::operator = (const Vector<Number2>& v)
   return *this;
 }
 
+
+
+#ifdef DEAL_II_USE_PETSC
+
+template <typename Number>
+Vector<Number> &
+Vector<Number>::operator = (const PETScWrappers::Vector &v)
+{
+  if (v.size() != dim)
+    reinit (v.size(), true);
+  if (dim)
+    {
+                                       // get a representation of the vector
+                                       // and copy it
+      PetscScalar *start_ptr;
+      int ierr = VecGetArray (static_cast<const Vec&>(v), &start_ptr);
+      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));
+      
+      std::copy (start_ptr, start_ptr+dim, begin());
+
+                                       // restore the representation of the
+                                       // vector
+      ierr = VecRestoreArray (static_cast<const Vec&>(v), &start_ptr);
+      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));
+    }
+
+  return *this;
+}
+
+
+
+template <typename Number>
+Vector<Number> &
+Vector<Number>::operator = (const PETScWrappers::MPI::Vector &v)
+{
+                                   // do this in a two-stage process:
+                                   // first convert to a sequential petsc
+                                   // vector, then copy that
+  PETScWrappers::Vector seq (v);
+  *this = seq;
+
+  return *this;
+}
+
+#endif
 
 
 template <typename Number>
