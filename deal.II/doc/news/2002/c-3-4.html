@@ -115,15 +115,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> Fix: Bug in <code
-       class="member">Triangulation<3>::load_user_pointers(vector&lt;void
-       *&gt; &)</code> is now fixed.
+       class="member">Triangulation<3>::load_user_flags(vector&lt;bool&gt;
+       &)</code> is now fixed.
        <br>
        (RH 2002/06/14)
        </p>
 
   <li> <p> Fixed: <code
-       class="member">Triangulation::load_user_pointers(vector&lt;void
-       *&gt; &)</code> erroneously threw an assertion for
+       class="member">Triangulation::load_user_flags(vector&lt;bool&gt;
+       &)</code> erroneously threw an assertion for
        <code>dim==1</code>. This is now fixed.
        <br>
        (RH 2002/06/14)
@@ -133,7 +133,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">Triangulation<1>::n_quads</code> now returns 0,
        instead of throwing an assertion, as before. The same holds for
        similar functions like <code
-       class="member">Triangulation<dim>::n_hexs</code> that now
+       class="member">Triangulation&lt;dim&gt;::n_hexs</code> that now
        returns 0 for <code>dim<3</code>.
        <br>
        (RH 2002/06/14)
@@ -186,7 +186,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
   <li> <p> Changed: The constructor of <code
        class="class">DoFHandler</code> now takes a reference to a
-       <tt>const</tt> <code class="class">Triangulation</code>.
+       <code>const</code> <code class="class">Triangulation</code>.
        <br>
        (RH 2002/06/12)
        </p>
