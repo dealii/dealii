@@ -8,26 +8,25 @@
 
 
 
+TimeDependent::TimeDependent (const TimeSteppingData &data_primal):
+		sweep_no (static_cast<unsigned int>(-1)),
+		timestepping_data_primal (data_primal)
+{};
 
-template <int dim>
-TimeDependent<dim>::~TimeDependent ()
+
+
+
+TimeDependent::~TimeDependent ()
 {
-  for (typename vector<TimeStepBase<dim>*>::iterator i=timesteps.begin();
-       i!=timesteps.end(); ++i)
-    {
-      (*i)->unsubscribe();
-      delete (*i);
-    };
-  
-  timesteps.erase (timesteps.begin(), timesteps.end());
+  while (timesteps.size() != 0)
+    delete_timestep (0);
 };
 
 
 
-template <int dim>
 void
-TimeDependent<dim>::insert_timestep (TimeStepBase<dim> *new_timestep,
-				     const unsigned int position) 
+TimeDependent::insert_timestep (TimeStepBase      *new_timestep,
+				const unsigned int position) 
 {
   Assert (position<=timesteps.size(),
 	  ExcInvalidPosition(position, timesteps.size()));
@@ -61,18 +60,28 @@ TimeDependent<dim>::insert_timestep (TimeStepBase<dim> *new_timestep,
 
 
 
-template <int dim>
 void
-TimeDependent<dim>::add_timestep (TimeStepBase<dim> *new_timestep)
+TimeDependent::add_timestep (TimeStepBase *new_timestep)
 {
   insert_timestep (new_timestep, timesteps.size());
 };
 
 
 
-template <int dim>
+void TimeDependent::delete_timestep (const unsigned int position)
+{
+  Assert (position<=timesteps.size(),
+	  ExcInvalidPosition(position, timesteps.size()));
+
+  timesteps[position]->unsubscribe();
+  delete timesteps[position];
+  timesteps.erase (&timesteps[position]);
+};
+
+
+
 void
-TimeDependent<dim>::solve_primal_problem () 
+TimeDependent::solve_primal_problem () 
 {
   const unsigned int n_timesteps = timesteps.size();
 
@@ -80,42 +89,45 @@ TimeDependent<dim>::solve_primal_problem ()
 				   // a round of primal problems
   for (unsigned int step=0; step<n_timesteps; ++step)
     timesteps[step]->init_for_primal_problem();
+
+				   // wake up the first few time levels
+  for (int step=-timestepping_data_primal.look_ahead; step<0; ++step)
+    for (int look_ahead=1;
+	 look_ahead<=static_cast<int>(timestepping_data_primal.look_ahead); ++look_ahead)
+      if (step+look_ahead >= 0)
+	timesteps[step+look_ahead]->wake_up(look_ahead);
   
   for (unsigned int step=0; step<n_timesteps; ++step)
     {
-				       // first thing: wake up as many
+				       // first thing: wake up the
 				       // timesteps ahead as necessary
-      if (step==0)
-	{
-	  for (unsigned int i=0; i<timestepping_data_primal.look_ahead; ++i)
-	    if (i < n_timesteps)
-	      timesteps[i]->wake_up();
-	}
-      else
-	if (step+timestepping_data_primal.look_ahead < n_timesteps)
-	  timesteps[step+timestepping_data_primal.look_ahead]->wake_up();
-
+      for (unsigned int look_ahead=1;
+	   look_ahead<=timestepping_data_primal.look_ahead; ++look_ahead)
+	if (step+look_ahead < n_timesteps)
+	  timesteps[step+look_ahead]->wake_up(look_ahead);
+      
 				       // actually do the work
       timesteps[step]->solve_primal_problem ();
       
-				       // last thing: make those time levels
-				       // sleep that are no more needed
-      if (step=n_timesteps-1)
-	{
-	  for (unsigned int i=0; i<timestepping_data_primal.look_back; ++i)
-	    if (step >= i)
-	      timesteps[step-i]->sleep();
-	}
-      else
-	if (step >= timestepping_data_primal.look_back)
-	  timesteps[step-timestepping_data_primal.look_back]->sleep();
+				       // let the timesteps behind sleep
+      for (unsigned int look_back=1;
+	   look_back<=timestepping_data_primal.look_back; ++look_back)
+	if (step>=look_back)
+	  timesteps[step-look_back]->sleep(look_back);
     };
+
+				   // make the last few sweeps sleep
+  for (int step=n_timesteps;
+       step<static_cast<int>(n_timesteps+timestepping_data_primal.look_back); ++step)
+    for (int look_back=1;
+	 look_back<=static_cast<int>(timestepping_data_primal.look_back); ++look_back)
+      if ((step-look_back>=0) && (step-look_back<static_cast<int>(n_timesteps)))
+	timesteps[step-look_back]->sleep(look_back);
 };
 
 
 
-template <int dim>
-void TimeDependent<dim>::start_sweep (const unsigned int s) 
+void TimeDependent::start_sweep (const unsigned int s) 
 {
   sweep_no = s;
 
@@ -141,22 +153,144 @@ void TimeDependent<dim>::start_sweep (const unsigned int s)
 /* --------------------------------------------------------------------- */
 
 
-template <int dim>
-TimeStepBase<dim>::Flags::Flags (const unsigned int max_refinement_level,
-				 const bool delete_and_rebuild_tria):
-		max_refinement_level (max_refinement_level),
-		delete_and_rebuild_tria (delete_and_rebuild_tria)
+
+TimeStepBase::TimeStepBase (const double time) :
+		previous_timestep(0),
+		next_timestep (0),
+		sweep_no (static_cast<unsigned int>(-1)),
+		timestep_no (static_cast<unsigned int>(-1)),
+		time (time)
 {};
 
 
 
+TimeStepBase::~TimeStepBase () 
+{};
+
+
+
+void
+TimeStepBase::wake_up (const unsigned )
+{};
+
+
+
+void
+TimeStepBase::sleep (const unsigned)
+{};
+
+
+
+void
+TimeStepBase::init_for_sweep () 
+{};
+
+
+
+void
+TimeStepBase::init_for_primal_problem () 
+{
+  next_action = primal_problem;
+};
+
+
+
+void
+TimeStepBase::init_for_dual_problem () 
+{
+  next_action = dual_problem;
+};
+
+
+
+
+void
+TimeStepBase::solve_dual_problem () 
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
+
+
+
+void
+TimeStepBase::set_previous_timestep (const TimeStepBase *previous)
+{
+  previous_timestep = previous;
+};
+
+
+
+void
+TimeStepBase::set_next_timestep (const TimeStepBase *next)
+{
+  next_timestep     = next;
+};
+
+
+
+void
+TimeStepBase::set_timestep_no (const unsigned int step_no)
+{
+  timestep_no = step_no;
+};
+
+
+
+void
+TimeStepBase::set_sweep_no (const unsigned int sweep)
+{
+  sweep_no = sweep;
+};
+
+
+
+/* ------------------------------------------------------------------------- */
+
+
 template <int dim>
-TimeStepBase<dim>::TimeStepBase (const Triangulation<dim> &coarse_grid,
-				 const Flags              &flags) :
+TimeStepBase_Tria<dim>::Flags::Flags () {
+  Assert (false, ExcInternalError());
+};
+
+
+
+template <int dim>
+TimeStepBase_Tria<dim>::Flags::Flags (const unsigned int max_refinement_level,
+				      const bool delete_and_rebuild_tria,
+				      const unsigned int wakeup_level_to_build_grid,
+				      const unsigned int sleep_level_to_delete_grid):
+		max_refinement_level (max_refinement_level),
+		delete_and_rebuild_tria (delete_and_rebuild_tria),
+		wakeup_level_to_build_grid (wakeup_level_to_build_grid),
+		sleep_level_to_delete_grid (sleep_level_to_delete_grid)
+{
+  Assert (!delete_and_rebuild_tria || (wakeup_level_to_build_grid>=1),
+	  ExcInvalidParameter(wakeup_level_to_build_grid));
+  Assert (!delete_and_rebuild_tria || (sleep_level_to_delete_grid>=1),
+	  ExcInvalidParameter(sleep_level_to_delete_grid));
+};
+
+
+
+
+template <int dim>
+TimeStepBase_Tria<dim>::TimeStepBase_Tria() :
+		TimeStepBase (0),
+		tria (0),
+		coarse_grid (*reinterpret_cast<Triangulation<dim>*>(0))
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
+
+
+
+template <int dim>
+TimeStepBase_Tria<dim>::TimeStepBase_Tria (const double              time,
+					   const Triangulation<dim> &coarse_grid,
+					   const Flags              &flags) :
+		TimeStepBase (time),
 		tria(0),
 		coarse_grid (coarse_grid),
-		previous_timestep(0),
-		next_timestep (0),
 		flags (flags)
 {
   coarse_grid.subscribe();
@@ -165,7 +299,7 @@ TimeStepBase<dim>::TimeStepBase (const Triangulation<dim> &coarse_grid,
 
 
 template <int dim>
-TimeStepBase<dim>::~TimeStepBase () 
+TimeStepBase_Tria<dim>::~TimeStepBase_Tria () 
 {  
   Assert (tria!=0, ExcInternalError());
 
@@ -175,67 +309,40 @@ TimeStepBase<dim>::~TimeStepBase ()
 
 template <int dim>
 void
-TimeStepBase<dim>::wake_up () {
-  if (flags.delete_and_rebuild_tria)
-    restore_grid ();
+TimeStepBase_Tria<dim>::wake_up (const unsigned wakeup_level) {
+  TimeStepBase::wake_up (wakeup_level);
+  
+  if (wakeup_level == flags.wakeup_level_to_build_grid)
+    if (flags.delete_and_rebuild_tria)
+      restore_grid ();
 };
 
 
 
 template <int dim>
 void
-TimeStepBase<dim>::sleep ()
+TimeStepBase_Tria<dim>::sleep (const unsigned sleep_level)
 {
-  Assert (tria!=0, ExcInternalError());
-
-  if (flags.delete_and_rebuild_tria)
+  if (sleep_level == flags.sleep_level_to_delete_grid)
     {
-      tria->unsubscribe();
-      delete tria;
-      tria = 0;
+      Assert (tria!=0, ExcInternalError());
+      
+      if (flags.delete_and_rebuild_tria)
+	{
+	  tria->unsubscribe();
+	  delete tria;
+	  tria = 0;
+	};
     };
-};
 
-
-
-template <int dim>
-void
-TimeStepBase<dim>::init_for_sweep () 
-{};
-
-
-
-template <int dim>
-void
-TimeStepBase<dim>::init_for_primal_problem () 
-{
-  problem_type = primal_problem;
-};
-
-
-
-template <int dim>
-void
-TimeStepBase<dim>::init_for_dual_problem () 
-{
-  problem_type = dual_problem;
+  TimeStepBase::sleep (sleep_level);
 };
 
 
 
 
-
 template <int dim>
-void
-TimeStepBase<dim>::solve_dual_problem () 
-{
-  Assert (false, ExcPureVirtualFunctionCalled());
-};
-
-
-
-template <int dim>
-void TimeStepBase<dim>::save_refine_flags ()
+void TimeStepBase_Tria<dim>::save_refine_flags ()
 {
   				   // for any of the non-initial grids
 				   // store the refinement flags
@@ -248,7 +355,7 @@ void TimeStepBase<dim>::save_refine_flags ()
 
 
 template <int dim>
-void TimeStepBase<dim>::restore_grid () {
+void TimeStepBase_Tria<dim>::restore_grid () {
   Assert (tria == 0, ExcGridNotDeleted());
   Assert (refine_flags.size() == coarsen_flags.size(),
 	  ExcInternalError());
@@ -286,44 +393,7 @@ void TimeStepBase<dim>::restore_grid () {
 };
 
 
-
-template <int dim>
-void
-TimeStepBase<dim>::set_previous_timestep (const TimeStepBase *previous)
-{
-  previous_timestep = previous;
-};
-
-
-
-template <int dim>
-void
-TimeStepBase<dim>::set_next_timestep (const TimeStepBase *next)
-{
-  next_timestep     = next;
-};
-
-
-template <int dim>
-void
-TimeStepBase<dim>::set_timestep_no (const unsigned int step_no)
-{
-  timestep_no = step_no;
-};
-
-
-
-template <int dim>
-void
-TimeStepBase<dim>::set_sweep_no (const unsigned int sweep)
-{
-  sweep_no = sweep;
-};
-
-
-
 // explicit instantiations
-template class TimeDependent<deal_II_dimension>;
-template class TimeStepBase<deal_II_dimension>;
+template class TimeStepBase_Tria<deal_II_dimension>;
 
 

@@ -13,12 +13,79 @@
 
 
 
-template <int dim>
 class TimeDependent 
 {
   public:
+    struct TimeSteppingData
+    {
+					 /**
+					  * Constructor; see the different
+					  * fields for a description of the
+					  * meaning of the parameters.
+				      */
+	TimeSteppingData (const unsigned int look_ahead,
+			  const unsigned int look_back);
+
+					 /**
+				      * This denotes the number of timesteps
+				      * the timestepping algorithm needs to
+				      * look ahead. Usually, this number
+				      * will be zero, since algorithms
+				      * looking ahead can't act as
+				      * timestepping schemes since they
+				      * can't compute their data from knowledge
+				      * of the past only and are therefore
+				      * global in time.
+				      *
+				      * However, it may be necessary to look
+				      * ahead in other circumstances, when
+				      * not wanting to access the data of the
+				      * next time step(s), but for example
+				      * to know the next grid, the solution
+				      * of a dual problem on the next
+				      * time level, etc.
+				      *
+				      * Note that for a dual problem walking
+				      * back in time, "looking ahead" means
+				      * looking towards smaller time values.
+				      *
+				      * The value of this number determines,
+				      * how many time steps ahead the
+				      * time step manager start to call
+				      * the #wake_up# function for each
+				      * time step.
+				      */
+	const unsigned int look_ahead;
+
+					 /**
+				      * This is the opposite variable to the
+				      * above one. It denotes the number of
+				      * time steps behind the present one
+				      * for which we need to keep all data
+				      * in order to do the computations on
+				      * the present time level.
+				      *
+				      * For one step schemes (e.g. the
+				      * Euler schemes, or the Crank-Nicolson
+				      * scheme), this value will be one.
+				      *
+				      * The value of this number
+				      * determines, how many time
+				      * steps after having done
+				      * computations on a tim level
+				      * the time step manager will
+				      * call the #sleep# function for
+				      * each time step.
+				      */
+	const unsigned int look_back;
+    };
     
-    struct TimeSteppingData;
+
+				     /**
+				      * Constructor.
+				      */
+    TimeDependent (const TimeSteppingData &data_primal);
+    
     
 				     /**
 				      * Destructor. This will delete the
@@ -54,14 +121,27 @@ class TimeDependent
 				      * #add_timestep#, which inserts a
 				      * time step at the end of the list.
 				      */
-    void insert_timestep (TimeStepBase<dim> *new_timestep,
+    void insert_timestep (TimeStepBase      *new_timestep,
 			  const unsigned int position);
 
 				     /**
 				      * Just like #insert_timestep#, but
 				      * insert at the end.
 				      */
-    void add_timestep (TimeStepBase<dim> *new_timestep);
+    void add_timestep (TimeStepBase *new_timestep);
+
+				     /**
+				      * Delete a timestep. This is only
+				      * necessary to call, if you want to
+				      * delete it between two sweeps; at
+				      * the end of the lifetime of this object,
+				      * care is taken automatically of
+				      * deletion of the time step objects.
+				      * Deletion of the object by the
+				      * destructor is done through this
+				      * function also.
+				      */
+    void delete_timestep (const unsigned int position);
     
 
     void solve_primal_problem ();
@@ -108,7 +188,7 @@ class TimeDependent
 				      * objects pointed to by the pointers
 				      * in this collection.
 				      */
-    vector<TimeStepBase<dim>*> timesteps;
+    vector<TimeStepBase*> timesteps;
 
 				     /**
 				      * Number of the present sweep. This is
@@ -129,105 +209,79 @@ class TimeDependent
 
 
 
-template <int dim>
-struct TimeDependent<dim>::TimeSteppingData
-{
-				     /**
-				      * Constructor; see the different
-				      * fields for a description of the
-				      * meaning of the parameters.
-				      */
-    TimeSteppingData (const unsigned int look_ahead,
-		      const unsigned int look_back);
-
-				     /**
-				      * This denotes the number of timesteps
-				      * the timestepping algorithm needs to
-				      * look ahead. Usually, this number
-				      * will be zero, since algorithms
-				      * looking ahead can't act as
-				      * timestepping schemes since they
-				      * can't compute their data from knowledge
-				      * of the past only and are therefore
-				      * global in time.
-				      *
-				      * However, it may be necessary to look
-				      * ahead in other circumstances, when
-				      * not wanting to access the data of the
-				      * next time step(s), but for example
-				      * to know the next grid, the solution
-				      * of a dual problem on the next
-				      * time level, etc.
-				      *
-				      * Note that for a dual problem walking
-				      * back in time, "looking ahead" means
-				      * looking towards smaller time values.
-				      */
-    const unsigned int look_ahead;
-
-				     /**
-				      * This is the opposite variable to the
-				      * above one. It denotes the number of
-				      * time steps behind the present one
-				      * for which we need to keep all data
-				      * in order to do the computations on
-				      * the present time level.
-				      *
-				      * For one step schemes (e.g. the
-				      * Euler schemes, or the Crank-Nicolson
-				      * scheme), this value will be one.
-				      */
-    const unsigned int look_back;
-};
-    
 
 
 
-
-template <int dim>
 class TimeStepBase : public Subscriptor
 {
   public:
-				     // forward declaration
-    struct Flags;
-
 				     /**
 				      * Enum denoting the type of problem
 				      * which will have to be solved next.
 				      */
-    enum ProblemType {
+    enum NextAction {
 	  primal_problem,
 	  dual_problem
     };
     
 				     /**
-				      * Constructor. Takes a coarse
-				      * grid from which the grids on this
-				      * time level will be derived and
-				      * some flags steering the behaviour
-				      * of this object.
-				      *
-				      * The ownership of the coarse grid
-				      * stays with the creator of this
-				      * object. However, it is locked
-				      * from destruction to guarantee
-				      * the lifetime of the coarse grid
-				      * is longer than it is needed by
-				      * this object.
+				      * Constructor. Does nothing here apart
+				      * from setting the time.
 				      */
-    TimeStepBase (const Triangulation<dim> &coarse_grid,
-		  const Flags              &flags);
+    TimeStepBase (const double time);
 
 				     /**
 				      * Destructor. At present, this does
-				      * not more than releasing the lock on
-				      * the coarse grid triangulation given
-				      * to the constructor.
+				      * nothing.
 				      */
     virtual ~TimeStepBase ();
-    
-    virtual void wake_up ();
-    virtual void sleep ();
+
+				     /**
+				      * Reconstruct all the data that is
+				      * needed for this time level to work.
+				      * This function serves to reget all
+				      * the variables and data structures
+				      * to work again after they have been
+				      * send to sleep some time before, or
+				      * at the first time we visit this time
+				      * level. In particular, it is used
+				      * to reconstruct the triangulation,
+				      * degree of freedom handlers, to reload
+				      * data vectors in case they have been
+				      * stored to disk, etc.
+				      *
+				      * The actual implementation of
+				      * this function does nothing.
+				      *
+				      * Since this is an important task, you
+				      * should call this function from your
+				      * own function, should you choose to
+				      * overload it in your own class (which
+				      * likely is the case), preferably at
+				      * the beginning so that your function
+				      * can take effect of the triangulation
+				      * already existing.
+				      */
+    virtual void wake_up (const unsigned);
+
+				     /**
+				      * This is the opposite function
+				      * to #wake_up#. It is used to
+				      * delete data or save it to disk
+				      * after they are no more needed
+				      * for the present sweep. Typical
+				      * kinds of data for this are
+				      * data vectors, degree of
+				      * freedom handlers,
+				      * triangulation objects,
+				      * etc. which occupy large
+				      * amounts of memory and may
+				      * therefore be externalized.
+				      *
+				      * By default, this function does
+				      * nothing.
+				      */
+    virtual void sleep (const unsigned);
 
 				     /**
 				      * This function is called each time
@@ -238,6 +292,11 @@ class TimeStepBase : public Subscriptor
 				      * however, not to install large objects,
 				      * which should be deferred until the
 				      * #wake_up# function is called.
+				      *
+				      * A typical action of this function
+				      * would be sorting out names of
+				      * temporary files needed in the
+				      * process of solving, etc.
 				      *
 				      * At the time this function is called,
 				      * the values of #timestep_no#, #sweep_no#
@@ -256,7 +315,7 @@ class TimeStepBase : public Subscriptor
 				      * function is called (i.e. before the
 				      * solution takes place on the first
 				      * time level). By default, this function
-				      * sets the #problem_type# variable of
+				      * sets the #next_action# variable of
 				      * this class. You may overload this
 				      * function, but you should call this
 				      * function within your own one.
@@ -316,33 +375,6 @@ class TimeStepBase : public Subscriptor
     DeclException0 (ExcPureVirtualFunctionCalled);
     
   protected:
-
-				     /**
-				      * Triangulation used at this
-				      * time level. Since this is
-				      * something that every time
-				      * stepping scheme needs to have,
-				      * we can safely put it into the
-				      * base class. Note that the
-				      * triangulation is frequently
-				      * deleted and rebuilt by the
-				      * functions #sleep# and
-				      * #wake_up# to save memory, if
-				      * such a behaviour is specified
-				      * in the #flags# structure.
-				      */
-    Triangulation<dim>       *tria;
-
-				     /**
-				      * Pointer to a grid which is to
-				      * be used as the coarse grid for
-				      * this time level.  This pointer
-				      * is set through the
-				      * constructor; ownership remains
-				      * with the owner of this
-				      * management object.  */
-    const Triangulation<dim> &coarse_grid;
-
 				     /**				      
 				      * Pointer to the previous time step object
 				      * in the list.
@@ -379,33 +411,17 @@ class TimeStepBase : public Subscriptor
     const double time;
 
 				     /**
-				      * Variable storing whether the solution
-				      * of a primal or a dual problem is
-				      * actual. This variable is set by the
-				      * two functions
-				      * #init_for_{primal,dual}_problem#.
+				      * Variable storing whether
+				      *  the solution * of a primal or
+				      *  a dual problem is * actual,
+				      *  or any of the other actions
+				      *  specified in the enum. This
+				      *  variable is set by the
+				      *  #init_for_*# functions.
 				      */
-    ProblemType problem_type;
-    
-				     /**
-				      * Some flags about how this time level
-				      * shall behave. See the documentation
-				      * of this struct to find out more about
-				      * that.
-				      */
-    const Flags flags;
-    
+    NextAction next_action;
     
   private:
-				     /**
-				      * Vectors holding the refinement and
-				      * coarsening flags of the different
-				      * sweeps on this time level. The
-				      * vectors therefore hold the history
-				      * of the grid.
-				      */
-    vector<vector<bool> >   refine_flags, coarsen_flags;
-
 				     /**
 				      * Reset the pointer to the previous time
 				      * step; shall only be called by the
@@ -449,6 +465,177 @@ class TimeStepBase : public Subscriptor
 				      */
     void set_sweep_no (const unsigned int sweep_no);
     
+
+
+				     // make the manager object a friend
+    friend class TimeDependent;
+};
+
+	
+
+
+
+
+/**
+ * Specialization of #TimeStepBase# which addresses some aspects of grid handling.
+ * In particular, this class is though to make handling of grids available that
+ * are adaptively refined on each time step separately or with a loose coupling
+ * between time steps. It also takes care of deleting and rebuilding grids when
+ * memory resources are a point, through the #sleep# and #wake_up# functions
+ * declared in the base class.
+ *
+ * @author Wolfgang Bangerth, 1999
+ */
+template <int dim>
+class TimeStepBase_Tria :  public TimeStepBase
+{
+  public:
+				     // forward declaration
+    struct Flags;
+
+				     /**
+				      * Default constructor. Does nothing but
+				      * throws an exception. We need to have
+				      * such a constructor in order to satisfy
+				      * the needs of derived classes, which
+				      * take this class as a virtual base class
+				      * and don't need to call this constructor
+				      * of they are not terminal classes. The
+				      * compiler would like to know a
+				      * constructor to call anyway since it
+				      * can't know that the class is not
+				      * terminal.
+				      */
+    TimeStepBase_Tria ();
+    
+				     /**
+				      * Constructor. Takes a coarse
+				      * grid from which the grids on this
+				      * time level will be derived and
+				      * some flags steering the behaviour
+				      * of this object.
+				      *
+				      * The ownership of the coarse grid
+				      * stays with the creator of this
+				      * object. However, it is locked
+				      * from destruction to guarantee
+				      * the lifetime of the coarse grid
+				      * is longer than it is needed by
+				      * this object.
+				      */
+    TimeStepBase_Tria (const double              time,
+		       const Triangulation<dim> &coarse_grid,
+		       const Flags              &flags);
+
+				     /**
+				      * Destructor. At present, this does
+				      * not more than releasing the lock on
+				      * the coarse grid triangulation given
+				      * to the constructor.
+				      */
+    virtual ~TimeStepBase_Tria ();
+
+    				     /**
+				      * Reconstruct all the data that is
+				      * needed for this time level to work.
+				      * This function serves to reget all
+				      * the variables and data structures
+				      * to work again after they have been
+				      * send to sleep some time before, or
+				      * at the first time we visit this time
+				      * level. In particular, it is used
+				      * to reconstruct the triangulation,
+				      * degree of freedom handlers, to reload
+				      * data vectors in case they have been
+				      * stored to disk, etc. By default,
+				      * this function rebuilds the triangulation
+				      * if the respective flag has been set to
+				      * destroy it in the #sleep# function.
+				      *
+				      * Since this is an important task, you
+				      * should call this function from your
+				      * own function, should you choose to
+				      * overload it in your own class (which
+				      * likely is the case), preferably at
+				      * the beginning so that your function
+				      * can take effect of the triangulation
+				      * already existing.
+				      */
+    virtual void wake_up (const unsigned);
+
+				     /**
+				      * This is the opposite function
+				      * to #wake_up#. It is used to
+				      * delete data or save it to disk
+				      * after they are no more needed
+				      * for the present sweep. Typical
+				      * kinds of data for this are
+				      * data vectors, degree of
+				      * freedom handlers,
+				      * triangulation objects,
+				      * etc. which occupy large
+				      * amounts of memory and may
+				      * therefore be externalized.
+				      *
+				      * By default, if the user specified so
+				      * in the flags for this object, the
+				      * triangulation is deleted and the
+				      * refinement history saved such that
+				      * the respective #wake_up# function can
+				      * rebuild it. You should therefore call
+				      * this function from your overloaded
+				      * version, preferrably at the end so
+				      * that your function can use the
+				      * triangulation as long as ou need it.
+				      */
+    virtual void sleep (const unsigned);
+
+  protected:
+    
+				     /**
+				      * Triangulation used at this
+				      * time level. Since this is
+				      * something that every time
+				      * stepping scheme needs to have,
+				      * we can safely put it into the
+				      * base class. Note that the
+				      * triangulation is frequently
+				      * deleted and rebuilt by the
+				      * functions #sleep# and
+				      * #wake_up# to save memory, if
+				      * such a behaviour is specified
+				      * in the #flags# structure.
+				      */
+    Triangulation<dim>       *tria;
+
+				     /**
+				      * Pointer to a grid which is to
+				      * be used as the coarse grid for
+				      * this time level.  This pointer
+				      * is set through the
+				      * constructor; ownership remains
+				      * with the owner of this
+				      * management object.  */
+    const Triangulation<dim> &coarse_grid;
+    
+				     /**
+				      * Some flags about how this time level
+				      * shall behave. See the documentation
+				      * of this struct to find out more about
+				      * that.
+				      */
+    const Flags flags;
+
+  private:
+				     /**
+				      * Vectors holding the refinement and
+				      * coarsening flags of the different
+				      * sweeps on this time level. The
+				      * vectors therefore hold the history
+				      * of the grid.
+				      */
+    vector<vector<bool> >   refine_flags, coarsen_flags;
+
 				     /**
 				      * The refinement
 				      * flags of the triangulation are stored
@@ -465,24 +652,28 @@ class TimeStepBase : public Subscriptor
 				      * rebuilt using the saved flags.
 				      */
     void restore_grid ();
-
-
-				     // make the manager object a friend
-    template <> friend class TimeDependent<dim>;
 };
 
-	
+
 
 template <int dim>
-struct TimeStepBase<dim>::Flags
+struct TimeStepBase_Tria<dim>::Flags
 {
+				     /**
+				      * Default constructor; yields an exception,
+				      * so is not really usable.
+				      */
+    Flags ();
+    
 				     /**
 				      * Constructor; see the different
 				      * fields for a description of the
 				      * meaning of the parameters.
 				      */
     Flags (const unsigned int max_refinement_level,
-	   const bool delete_and_rebuild_tria);
+	   const bool delete_and_rebuild_tria,
+	   const unsigned int wakeup_level_to_build_grid,
+	   const unsigned int sleep_level_to_delete_grid);
     
 				     /**
 				      * Maximum level of a cell in the
@@ -517,8 +708,42 @@ struct TimeStepBase<dim>::Flags
 				      * uncommon, which makes this flag
 				      * understandable.
 				      */
-    const bool delete_and_rebuild_tria;    
+    const bool delete_and_rebuild_tria;
+
+				     /**
+				      * This number denotes the parameter to
+				      * the #wake_up# function at which it
+				      * shall rebuild the grid. Obviously,
+				      * it shall be less than or equal to the
+				      * #look_ahead# number passed to the
+				      * time step management object; if it
+				      * is equal, then the grid is rebuilt
+				      * the first time the #wake_up# function
+				      * is called. If #delete_and_rebuild_tria#
+				      * is #false#, this number has no meaning.
+				      */
+    const unsigned int wakeup_level_to_build_grid;
+
+				     /**
+				      * This is the opposite flag to the one
+				      * above: it determines at which call to
+				      * #sleep# the grid shall be deleted.
+				      */
+    const unsigned int sleep_level_to_delete_grid;
+
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidParameter,
+		    int,
+		    << "The parameter " << arg1 << " has an invalid value.");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
 };
+
+
 
 
 /*----------------------------   time-dependent.h     ---------------------------*/
