@@ -22,7 +22,7 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/vector.h>
-#include <vector>
+
 
 
 
