@@ -46,7 +46,7 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 				* dofs_per_quad),
 		first_face_line_index(GeometryInfo<dim-1>::vertices_per_cell
 				      * dofs_per_vertex),
-		first_face_quad_index(first_line_index+
+		first_face_quad_index(first_face_line_index+
 				      GeometryInfo<dim-1>::lines_per_cell
 				      * dofs_per_line),
 		total_dofs (first_hex_index+dofs_per_hex),
