@@ -73,7 +73,7 @@ show_shapes-o-files = $(show_shapes-cc-files:.cc=.o)
 endif
 
 show_shapes: $(show_shapes-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(flags) -o $@ $^
 
 ############################################################
 
@@ -86,7 +86,7 @@ show_transform-o-files = $(show_transform-cc-files:.cc=.o)
 endif
 
 show_transform: $(show_transform-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(flags) -o $@ $^
 
 ############################################################
 # Continue with other targets if needed
