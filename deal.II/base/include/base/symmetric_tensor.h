@@ -1651,5 +1651,155 @@ operator / (const SymmetricTensor<rank,dim> &t,
 }
 
 
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in a symmetric tensor of rank 2. This operation is the
+ * symmetric tensor analogon of a matrix-vector multiplication.
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+SymmetricTensor<2,1>
+operator * (const SymmetricTensor<4,1> &t,
+	    const SymmetricTensor<2,1> &s)
+{
+  const unsigned int dim = 1;
+  SymmetricTensor<2,dim> tmp;
+  tmp[0][0] = t[0][0][0][0] * s[0][0];
+  return tmp;
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in a symmetric tensor of rank 2. This operation is the
+ * symmetric tensor analogon of a matrix-vector multiplication.
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+SymmetricTensor<2,1>
+operator * (const SymmetricTensor<2,1> &s,
+	    const SymmetricTensor<4,1> &t)
+{
+  const unsigned int dim = 1;
+  SymmetricTensor<2,dim> tmp;
+  tmp[0][0] = t[0][0][0][0] * s[0][0];
+  return tmp;
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in a symmetric tensor of rank 2. This operation is the
+ * symmetric tensor analogon of a matrix-vector multiplication.
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+SymmetricTensor<2,2>
+operator * (const SymmetricTensor<4,2> &t,
+	    const SymmetricTensor<2,2> &s)
+{
+  const unsigned int dim = 2;
+  SymmetricTensor<2,dim> tmp;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i; j<dim; ++j)
+      tmp[i][j] = t[i][j][0][0] * s[0][0] +
+		  t[i][j][1][1] * s[1][1] +
+		  2 * t[i][j][0][1] * s[0][1];
+
+  return tmp;
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in a symmetric tensor of rank 2. This operation is the
+ * symmetric tensor analogon of a matrix-vector multiplication.
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+SymmetricTensor<2,2>
+operator * (const SymmetricTensor<2,2> &s,
+	    const SymmetricTensor<4,2> &t)
+{
+  const unsigned int dim = 2;
+  SymmetricTensor<2,dim> tmp;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i; j<dim; ++j)
+      tmp[i][j] = s[0][0] * t[0][0][i][j] * +
+		  s[1][1] * t[1][1][i][j] +
+		  2 * s[0][1] * t[0][1][i][j];
+
+  return tmp;
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in a symmetric tensor of rank 2. This operation is the
+ * symmetric tensor analogon of a matrix-vector multiplication.
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+SymmetricTensor<2,3>
+operator * (const SymmetricTensor<4,3> &t,
+	    const SymmetricTensor<2,3> &s)
+{
+  const unsigned int dim = 3;
+  SymmetricTensor<2,dim> tmp;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i; j<dim; ++j)
+      tmp[i][j] = t[i][j][0][0] * s[0][0] +
+		  t[i][j][1][1] * s[1][1] +
+		  t[i][j][2][2] * s[2][2] +
+		  2 * t[i][j][0][1] * s[0][1] +
+		  2 * t[i][j][0][2] * s[0][2] +
+		  2 * t[i][j][1][2] * s[1][2];
+
+  return tmp;
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in a symmetric tensor of rank 2. This operation is the
+ * symmetric tensor analogon of a matrix-vector multiplication.
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+SymmetricTensor<2,3>
+operator * (const SymmetricTensor<2,3> &s,
+	    const SymmetricTensor<4,3> &t)
+{
+  const unsigned int dim = 3;
+  SymmetricTensor<2,dim> tmp;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i; j<dim; ++j)
+      tmp[i][j] = s[0][0] * t[0][0][i][j] +
+		  s[1][1] * t[1][1][i][j] +
+		  s[2][2] * t[2][2][i][j] +
+		  2 * s[0][1] * t[0][1][i][j] +
+		  2 * s[0][2] * t[0][2][i][j] +
+		  2 * s[1][2] * t[1][2][i][j];
+
+  return tmp;
+}
+
+
+
 
 #endif
