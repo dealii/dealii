@@ -43,79 +43,6 @@
 #include <algorithm>
 
 
-template <int dim>
-double measure (const DoFHandler<dim> &dof_handler,
-		const Mapping<dim>    &mapping)
-{
-  QGauss4<dim> quadrature;
-  FEValues<dim> fe_values (mapping, dof_handler.get_fe(), quadrature,
-			   update_JxW_values);
-  
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-  double measure = 0;
-  for (; cell!=endc; ++cell)
-    {
-      fe_values.reinit (cell);
-      for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
-	measure += fe_values.JxW (i);
-    };
-  return measure;
-};
-
-
-template <int dim>
-double measure (const Triangulation<dim> &triangulation,
-		const Mapping<dim>       &mapping)
-{
-  FE_Q<dim> dummy_fe(1);
-  DoFHandler<dim> dof_handler (const_cast<Triangulation<dim>&>(triangulation));
-  dof_handler.distribute_dofs(dummy_fe);
-  return measure (dof_handler, mapping);
-};
-
-
-template <int dim>
-double surface (const DoFHandler<dim> &dof_handler,
-		const Mapping<dim>    &mapping)
-{
-  QGauss4<dim-1> quadrature;
-  FEFaceValues<dim> fe_values (mapping, dof_handler.get_fe(), quadrature,
-			       update_JxW_values);
-  
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-  double surface = 0;
-  for (; cell!=endc; ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      if (cell->face(face)->at_boundary())
-	{
-	  fe_values.reinit (cell, face);
-	  for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
-	    surface += fe_values.JxW (i);
-	};
-  return surface;
-};
-
-
-template <int dim>
-double surface (const Triangulation<dim> &triangulation,
-		const Mapping<dim>       &mapping)
-{
-  FE_Q<dim> dummy_fe(1);
-  DoFHandler<dim> dof_handler (const_cast<Triangulation<dim>&>(triangulation));
-  dof_handler.distribute_dofs(dummy_fe);
-  return surface (dof_handler, mapping);
-};
-
-
-template double surface (const Triangulation<2> &, const Mapping<2> &);
-template double measure (const Triangulation<2> &, const Mapping<2> &);
-
-
-
 
 				 // Then we declare a class which
 				 // represents the solution of a
@@ -123,9 +50,11 @@ template double measure (const Triangulation<2> &, const Mapping<2> &);
 				 // program is based on step-5, the
 				 // class looks rather the same, with
 				 // the sole structural difference
-				 // that we have merged the functions
-				 // ``assemble_system'' and ``solve'',
-				 // and the output function was
+				 // that the functions
+				 // ``assemble_system'' now calls
+				 // ``solve'' itself, and is thus
+				 // called ``assemble_and_solve'', and
+				 // that the output function was
 				 // dropped since the solution
 				 // function is so boring that it is
 				 // not worth being viewed.
@@ -270,49 +199,267 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 
+				 // The next function then assembles
+				 // the linear system of equations,
+				 // solves it, and evaluates the
+				 // solution. This then makes three
+				 // actions, and we will put them into
+				 // eight true statements (excluding
+				 // declaration of variables, and
+				 // handling of temporary
+				 // vectors). Thus, this function is
+				 // something for the very
+				 // lazy. Nevertheless, the functions
+				 // called are rather powerful, and
+				 // through them this function uses a
+				 // good deal of the whole
+				 // library. But let's look at each of
+				 // the steps.
 template <int dim>
 void LaplaceProblem<dim>::assemble_and_solve () 
-{  
-  QGauss2<dim>  cell_quadrature;
-  QGauss2<dim-1> face_quadrature;
+{
+
+				   // First, we have to assemble the
+				   // matrix and the right hand
+				   // side. In all previous examples,
+				   // we have investigated various
+				   // ways how to do this
+				   // manually. However, since the
+				   // Laplace matrix and simple right
+				   // hand sides appear so frequently
+				   // in applications, the library
+				   // provides functions for actually
+				   // doing this for you, i.e. they
+				   // perform the loop over all cells,
+				   // setting up the local matrices
+				   // and vectors, and putting them
+				   // together for the end result.
+				   //
+				   // The following are the two most
+				   // commonly used ones: creation of
+				   // the Laplace matrix and creation
+				   // of a right hand side vector from
+				   // body or boundary forces. They
+				   // take the mapping object, the
+				   // ``DoFHandler'' object
+				   // representing the degrees of
+				   // freedom and the finite element
+				   // in use, a quadrature formula to
+				   // be used, and the output
+				   // object. The function that
+				   // creates a right hand side vector
+				   // also has to take a function
+				   // object describing the
+				   // (continuous) right hand side
+				   // function.
+				   //
+				   // Let us look at the way the
+				   // matrix and body forces are
+				   // integrated:
+  const unsigned int gauss_degree
+    = std::max (static_cast<unsigned int>(ceil(1.*(mapping.get_degree()+1)/2)),
+		2U);
   MatrixTools::create_laplace_matrix (mapping, dof_handler,
-				      cell_quadrature,
+				      QGauss<dim>(gauss_degree),
 				      system_matrix);
   VectorTools::create_right_hand_side (mapping, dof_handler,
-				       cell_quadrature,
+				       QGauss<dim>(gauss_degree),
 				       ConstantFunction<dim>(-2),
 				       system_rhs);
-  
+				   // That's quite simple, right?
+				   //
+				   // Two remarks are in order,
+				   // though: First, these functions
+				   // are used in a lot of
+				   // contexts. Maybe you want to
+				   // create a Laplace or mass matrix
+				   // for a vector values finite
+				   // element; or you want to use the
+				   // default Q1 mapping; or you want
+				   // to assembled the matrix with a
+				   // coefficient in the Laplace
+				   // operator. For this reason, there
+				   // are quite a large number of
+				   // variants of these functions in
+				   // the ``MatrixCreator'' and
+				   // ``MatrixTools''
+				   // classes. Whenever you need a
+				   // slighly different version of
+				   // these functions than the ones
+				   // called above, it is certainly
+				   // worthwhile to take a look at the
+				   // documentation and to check
+				   // whether something fits your
+				   // needs.
+				   //
+				   // The second remark concerns the
+				   // quadrature formula we use: we
+				   // want to integrate over bilinear
+				   // shape functions, so we know that
+				   // we have to use at least a Gauss2
+				   // quadrature formula. On the other
+				   // hand, we want to have the
+				   // quadrature rule to have at least
+				   // the order of the boundary
+				   // approximation. Since the order
+				   // of Gauss-r is 2r, and the order
+				   // of the boundary approximation
+				   // using polynomials of degree p is
+				   // p+1, we know that 2r>=p+1. Since
+				   // r has to be an integer and (as
+				   // mentioned above) has to be at
+				   // least 2, this makes up for the
+				   // formula above computing
+				   // ``gauss_degree''.
+				   //
+				   // Note also, that we have used a
+				   // class called ``QGauss''. By now,
+				   // we have only used ``QGauss4'',
+				   // or the like, which implement a
+				   // Gauss quadrature rule of fixed
+				   // order. The ``QGauss'' class is
+				   // more general, taking a parameter
+				   // which indicates of which degree
+				   // it shall be; for small degrees,
+				   // the object then parallels
+				   // objects of type ``QGaussR'' with
+				   // fixed R, but it also provides
+				   // quadrature rules of higher
+				   // degree which are no longer
+				   // hardcoded in the library.
+
+				   // Since the generation of the body
+				   // force contributions to the right
+				   // hand side vector was so simple,
+				   // we do that all over again for
+				   // the boundary forces as well:
+				   // allocate a vector of the right
+				   // size and call the right
+				   // function. The boundary function
+				   // has constant values, so we can
+				   // generate an object from the
+				   // library on the fly, and we use
+				   // the same quadrature formula as
+				   // above, but this time of lower
+				   // dimension since we integrate
+				   // over faces now instead of cells:
   Vector<double> tmp (system_rhs.size());
   VectorTools::create_boundary_right_hand_side (mapping, dof_handler,
-						face_quadrature,
+						QGauss<dim-1>(gauss_degree),
 						ConstantFunction<dim>(1),
 						tmp);
+				   // Then add the contributions from
+				   // the boundary to those from the
+				   // interior of the domain:
   system_rhs += tmp;
+				   // For assembling the right hand
+				   // side, we had to use two
+				   // different vector objects, and
+				   // later add them together. The
+				   // reason we had to do so is that
+				   // the
+				   // ``VectorTools::create_right_hand_side''
+				   // and
+				   // ``VectorTools::create_boundary_right_hand_side''
+				   // functions first clear the output
+				   // vector, rather than adding up
+				   // their results to previous
+				   // contents. This can reasonably be
+				   // called a design flaw in the
+				   // library made in its infancy, but
+				   // unfortunately things are as they
+				   // are for some time now and it is
+				   // difficult to change such things
+				   // that silently break existing
+				   // code, so we have to live with
+				   // that.
 
+				   // Now, the linear system is set
+				   // up, so we can eliminate the one
+				   // degree of freedom which we
+				   // constrained to the other DoFs on
+				   // the boundary for the mean value
+				   // constraint from matrix and right
+				   // hand side vector, and solve the
+				   // system. After that, distribute
+				   // the constraints again, which in
+				   // this case means setting the
+				   // constrained degree of freedom to
+				   // its proper value
   mean_value_constraints.condense (system_matrix);
   mean_value_constraints.condense (system_rhs);  
 
   solve ();
   mean_value_constraints.distribute (solution);
-  
-  Vector<float> difference_per_cell (triangulation.n_active_cells());
+
+				   // Finally, evaluate what we got as
+				   // solution. As stated in the
+				   // introduction, we are interested
+				   // in the H1 seminorm of the
+				   // solution. Here, as well, we have
+				   // a function in the library that
+				   // does this, although in a
+				   // slightly non-obvious way: the
+				   // ``VectorTools::integrate_difference''
+				   // function integrates the norm of
+				   // the difference between a finite
+				   // element function and a
+				   // continuous function. If we
+				   // therefore want the norm of a
+				   // finite element field, we just
+				   // put the continuous function to
+				   // zero. Note that this function,
+				   // just as so many other ones in
+				   // the library as well, has at
+				   // least two versions, one which
+				   // takes a mapping as argument
+				   // (which we make us of here), and
+				   // the one which we have used in
+				   // previous examples which
+				   // implicitely uses ``MappingQ1''.
+				   // Also note that we take a
+				   // quadrature formula of one degree
+				   // higher, in order to avoid
+				   // superconvergence effects where
+				   // the solution happens to be
+				   // especially close to the exact
+				   // solution at certain points (we
+				   // don't know whether this might be
+				   // the case here, but there are
+				   // cases known of this, and we just
+				   // want to make sure):
+  Vector<float> norm_per_cell (triangulation.n_active_cells());
   VectorTools::integrate_difference (mapping, dof_handler,
 				     solution,
 				     ZeroFunction<dim>(),
-				     difference_per_cell,
-				     QGauss3<dim>(),
+				     norm_per_cell,
+				     QGauss<dim>(gauss_degree+1),
 				     H1_seminorm);
+				   // Then, the function just called
+				   // returns its results as a vector
+				   // of values each of which denotes
+				   // the norm on one cell. To get the
+				   // global norm, a simple
+				   // computation shows that we have
+				   // to take the l2 norm of the
+				   // vector:
+  const double norm = norm_per_cell.l2_norm();
+
+				   // Last task -- show output:
   std::cout << "  " << triangulation.n_active_cells() << " cells:  "
 	    << "  |u|_1="
-	    << difference_per_cell.l2_norm()
+	    << norm
 	    << ", error="
-	    << fabs(difference_per_cell.l2_norm()-sqrt(3.14159265358/2))
+	    << fabs(norm-sqrt(3.14159265358/2))
 	    << std::endl;
 };
 
 
 
+				 // The following function solving the
+				 // linear system of equations is
+				 // copied from step-5 and is
+				 // explained there in some detail:
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
@@ -329,6 +476,34 @@ void LaplaceProblem<dim>::solve ()
 
 
 
+				 // Finally the main function
+				 // controlling the different steps to
+				 // be performed. Its content is
+				 // rather straightforward, generating
+				 // a triangulation of a circle,
+				 // associating a boundary to it, and
+				 // then doing several cycles on
+				 // subsequently finer grids. Note
+				 // again that we have put mesh
+				 // refinement into the loop header;
+				 // this may be something for a test
+				 // program, but for real applications
+				 // you should consider that this
+				 // implies that the mesh is refined
+				 // after the loop is executed the
+				 // last time since the increment
+				 // clause (the last part of the
+				 // three-parted loop header) is
+				 // executed before the comparison
+				 // part (the second one), which may
+				 // be rather costly if the mesh is
+				 // already quite refined. In that
+				 // case, you should arrange code such
+				 // that the mesh is not further
+				 // refined after the last loop run
+				 // (or you should do it at the
+				 // beginning of each run except for
+				 // the first one).
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
