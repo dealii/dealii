@@ -49,6 +49,10 @@ plot (const Triangulation<dim> &tr)
   cm.close ();
   cm.distribute (values);
 
+                                   // now take these values, and print
+                                   // the values of this so defined
+                                   // function on each cell and on
+                                   // each quadrature point
   QTrapez<dim> quadrature;
   std::vector<Vector<double> > shape_values (quadrature.n_quadrature_points,
                                              Vector<double>(dim));
