@@ -206,7 +206,7 @@ void TimeDependent::end_sweep (const unsigned int n_threads)
     {
       const unsigned int stride = timesteps.size() / n_threads;
       Threads::ThreadManager thread_manager;
-      void (TimeDependent::*p) (unsigned int, unsigned int)
+      void (TimeDependent::*p) (const unsigned int, const unsigned int)
         = &TimeDependent::end_sweep;
       for (unsigned int i=0; i<n_threads; ++i)
         Threads::spawn (thread_manager,
