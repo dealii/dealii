@@ -304,9 +304,22 @@ namespace GridOutFlags
 					* @p{index}. If @p{true}, the
 					* first format is
 					* taken. Default is @p{true}.
+					*
+					* The flag has obviously no
+					* effect if
+					* @p{write_cell_numbers} is
+					* @p{false}.
 					*/
       bool write_cell_number_level;
-      
+
+				       /**
+					* Vertex numbers can be
+					* written onto the
+					* vertices. This is controled
+					* by the following
+					* flag. Default is @p{false}.
+					*/
+      bool write_vertex_numbers;
       
 				       /**
 					* Constructor.
@@ -317,7 +330,8 @@ namespace GridOutFlags
 	   const bool         color_lines_on_user_flag = false,
 	   const unsigned int n_boundary_face_points = 2,
 	   const bool         write_cell_numbers = false,
-	   const bool         write_cell_number_level = true);
+	   const bool         write_cell_number_level = true,
+	   const bool         write_vertex_numbers = false);
   };
   
 				   /**

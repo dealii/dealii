@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <list>
+#include <set>
 #include <ctime>
 #include <cmath>
 
@@ -1004,14 +1005,15 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	  << "/r {1 0 0 setrgbcolor} def" << std::endl;
 
 				       // in 2d, we can also plot cell
-				       // numbers, but this requires a
-				       // somewhat more lengthy
-				       // preamble. please don't ask
-				       // me what most of this means,
-				       // it is reverse engineered
-				       // from what GNUPLOT uses in
-				       // its output
-      if ((dim == 2) && (eps_flags_2.write_cell_numbers == true))
+				       // and vertex numbers, but this
+				       // requires a somewhat more
+				       // lengthy preamble. please
+				       // don't ask me what most of
+				       // this means, it is reverse
+				       // engineered from what GNUPLOT
+				       // uses in its output
+      if ((dim == 2) && (eps_flags_2.write_cell_numbers ||
+			 eps_flags_2.write_vertex_numbers))
 	{
 	  out << ("/R {rmoveto} bind def\n"
 		  "/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont\n"
@@ -1066,12 +1068,47 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	  else
 	    out << cell->index();
 
-	  out  << " )] "
-	       << "] -6 MCshow"
-	       << std::endl;
+	  out << " )] "
+	      << "] -6 MCshow"
+	      << std::endl;
 	};
     };
 
+				   // and the vertex numbers
+  if ((dim == 2) && (eps_flags_2.write_vertex_numbers == true))
+    {
+      out << "(Helvetica) findfont 140 scalefont setfont"
+	  << std::endl;
+
+				       // have a list of those
+				       // vertices which we have
+				       // already tracked, to avoid
+				       // doing this multiply
+      std::set<unsigned int> treated_vertices;
+      typename Triangulation<dim>::active_cell_iterator
+	cell = tria.begin_active (),
+	endc = tria.end ();
+      for (; cell!=endc; ++cell)
+	for (unsigned int vertex=0;
+	     vertex<GeometryInfo<dim>::vertices_per_cell;
+	     ++vertex)
+	  if (treated_vertices.find(cell->vertex_index(vertex))
+	      ==
+	      treated_vertices.end())
+	    {
+	      treated_vertices.insert (cell->vertex_index(vertex));
+	      
+	      out << (cell->vertex(vertex)(0)-offset(0))*scale << ' '
+		  << (cell->vertex(vertex)(1)-offset(1))*scale
+		  << " m" << std::endl
+		  << "[ [(Helvetica) 10.0 0.0 true true ("
+		  << cell->vertex_index(vertex)
+		  << " )] "
+		  << "] -6 MCshow"
+		  << std::endl;
+	    };
+    };
+  
   out << "showpage" << std::endl;
   
   AssertThrow (out, ExcIO());
