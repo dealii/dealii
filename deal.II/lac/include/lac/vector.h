@@ -710,14 +710,6 @@ class Vector
     unsigned int memory_consumption () const;
 				     //@}
 
-				     /** @addtogroup Exceptions
-				      * @{ */
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcEmptyVector);
-				     //@}
   protected:
 
 				     /**
@@ -850,7 +842,7 @@ inline
 Vector<Number> & Vector<Number>::operator = (const Number s)
 {
   if (s != 0.)
-    Assert (dim!=0, ExcEmptyVector());
+    Assert (dim!=0, ExcEmptyObject());
   if (dim!=0)
     std::fill (begin(), end(), s);
   return *this;
