@@ -141,8 +141,7 @@
  * the #params# structure exists long enough and that objects to which
  * elements of #params# point exist long enough. There are at least
  * two strategies for this problem:
- * \begin{verbatim}
- *
+ * \begin{enumerate}
  * \item Allocate the parameters object on the stack: one could modify
  *     the example as follows:
  *     \begin{verbatim}
@@ -220,7 +219,7 @@
  *     different parameter objects), as well as using the #spawn_n#
  *     function. Destruction of the parameter object remains with the
  *     calling function, as in the original example.
- * \end{verbatim}
+ * \end{enumerate}
  *
  *
  * \subsection{Example of use of this class}
