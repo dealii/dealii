@@ -24,14 +24,14 @@ plane { y, -10
 }
 
 
-text { ttf "timrom.ttf" "deal.II  3.1" .25, 0
+text { ttf "timrom.ttf" "deal.II  3.0" .25, 0
   pigment { BrightGold }
   finish { specular 1 }
   translate -3*x
   translate 0.02*y
 }
 
-text { ttf "timrom.ttf" "deal.II  3.1" .15, 0
+text { ttf "timrom.ttf" "deal.II  3.0" .15, 0
   pigment { BrightGold }
   finish { specular 1 }
   rotate 90*x
