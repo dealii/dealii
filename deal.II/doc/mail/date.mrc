@@ -87,7 +87,9 @@ deal.II Mailinglist
 <TSort>
 <TReverse>
 <SpamMode>
-
+<FromFields>
+reply-to:from:return-path:apparently-from:sender:resent-sender
+</FromFields>
 
 <!-- List styles -->
 
