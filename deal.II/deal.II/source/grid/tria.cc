@@ -2175,7 +2175,6 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const dVector &criteria,
 				   // up and compare with
 				   // #fraction_of_error*total_error#.
   dVector tmp(criteria);
-  transform (tmp.begin(), tmp.end(), tmp.begin(), sqr);
   const double total_error = tmp.l1_norm();
   
   dVector partial_sums(criteria.size());
@@ -2188,16 +2187,16 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const dVector &criteria,
   p = lower_bound (partial_sums.begin(), partial_sums.end(),
 		   top_fraction*total_error);
   if (p==partial_sums.begin())
-    top_threshold = sqrt(*p);
+    top_threshold = *p;
   else
-    top_threshold = sqrt(*p - *(p-1));
+    top_threshold = *p - *(p-1);
 
   p = upper_bound (partial_sums.begin(), partial_sums.end(),
 		   total_error*(1-bottom_fraction));
   if (p==partial_sums.end())
     bottom_threshold = 0;
   else
-    bottom_threshold = sqrt(*p - *(p-1));
+    bottom_threshold = *p - *(p-1);
 
 				   // in some rare cases it may happen that
 				   // both thresholds are the same (e.g. if
