@@ -382,6 +382,21 @@ class CompressedSparsityPattern : public Subscriptor
                                       * before, the @p flush_cache function is
                                       * marked const, and the data members are
                                       * marked @p mutable.
+                                      *
+                                      * A small testseries about the size of
+                                      * the cache showed that the run time of
+                                      * a small program just testing the
+                                      * compressed sparsity pattern element
+                                      * insertion routine ran for 3.6 seconds
+                                      * with a cache size of 8, and 4.2
+                                      * seconds with a cache size of 16. We
+                                      * deem even smaller cache sizes
+                                      * undesirable, since they lead to more
+                                      * memory allocations, while larger cache
+                                      * sizes lead to waste of memory. The
+                                      * original version of this class, with
+                                      * one std::set per row took 8.2 seconds
+                                      * on the same program.
                                       */
     struct Line
     {
