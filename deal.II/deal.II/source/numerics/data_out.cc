@@ -35,16 +35,22 @@ DataOut_DoFData<dim>::DataEntry::DataEntry (const Vector<double> *data,
 		names(names)
 {};
 
+
+
 template <int dim>
 DataOut_DoFData<dim>::DataOut_DoFData () :
 		dofs(0)
 {};
+
+
 
 template <int dim>
 DataOut_DoFData<dim>::~DataOut_DoFData ()
 {
   clear ();
 };
+
+
 
 template <int dim>
 void DataOut_DoFData<dim>::attach_dof_handler (const DoFHandler<dim> &d)
@@ -59,6 +65,8 @@ void DataOut_DoFData<dim>::attach_dof_handler (const DoFHandler<dim> &d)
   if (dofs != 0)
     dofs->subscribe ();
 };
+
+
 
 template <int dim>
 void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
@@ -97,21 +105,29 @@ template <int dim>
 void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 					    const string         &name)
 {
-  unsigned int n = dofs->get_fe().n_components ();
+  unsigned int n_components = dofs->get_fe().n_components ();
 
-  vector<string> names (1);
-  if (n > 1)
+  vector<string> names;
+				   // if only one component or vector
+				   // is cell vector: we only need one
+				   // name
+  if ((n_components == 1) ||
+      (vec.size() == dofs->get_tria().n_active_cells()))
     {
-      names.resize(dofs->get_fe().n_components ());
-      for (unsigned int i=0;i<n;++i)
+      names.resize (1, name);
+    }
+  else
+				     // otherwise append _i to the
+				     // given name
+    {
+      names.resize (n_components);
+      for (unsigned int i=0; i<n_components; ++i)
 	{
 	  ostrstream namebuf;
 	  namebuf << name << '_' << i << ends;
   	  names[i] = namebuf.str();
-  	}
-    } else {
-      names[0] = name;
-    }
+  	};
+    };
   
   add_data_vector (vec, names);
 }
