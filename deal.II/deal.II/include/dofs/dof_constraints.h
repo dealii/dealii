@@ -543,6 +543,16 @@ class ConstraintMatrix : public Subscriptor
 				      * If so, no new entries can be added.
 				      */
     bool sorted;
+
+				     /**
+				      * Return @p{true} if the weight
+				      * of an entry (the second
+				      * element of the pair) equals
+				      * zero. This function is used to
+				      * delete entries with zero
+				      * weight.
+				      */
+    static bool check_zero_weight (const std::pair<unsigned int, double> &p);
 };
 
 

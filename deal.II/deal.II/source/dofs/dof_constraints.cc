@@ -30,6 +30,15 @@
 
 inline
 bool
+ConstraintMatrix::check_zero_weight (const std::pair<unsigned int, double> &p)
+{
+  return (p.second == 0);
+};
+
+
+
+inline
+bool
 ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 {
   return line < a.line;
@@ -183,8 +192,7 @@ void ConstraintMatrix::close ()
 				       // 0*something can be omitted
       line->entries.erase (remove_if (line->entries.begin(),
 				      line->entries.end(),
-				      std::compose1 (std::bind2nd (std::equal_to<double>(), 0),
-						     std::select2nd<std::pair<unsigned int,double> >())),
+				      &check_zero_weight),
                            line->entries.end());
 
 				       // now sort the remainder
