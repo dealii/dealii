@@ -1427,7 +1427,7 @@ class ParameterHandler
 				      */
     DeclException1 (ExcEntryUndeclared,
 		    std::string,
-		    << "You cant ask for entry <" << arg1 << "> you have not yet declared");  
+		    << "You can't ask for entry <" << arg1 << "> you have not yet declared");  
     				     /**
 				      * Exception
 				      */
