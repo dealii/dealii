@@ -172,10 +172,16 @@ class Mapping : public Subscriptor
 	UpdateFlags  current_update_flags() const;
 
 					 /**
-					  * Determine if this is the first
-					  * cell visited. Then, we need to
-					  * use @p{update_once} to fill
-					  * cell-independent fields.
+					  * Determine if this is the
+					  * first cell visited. Then,
+					  * we need to use
+					  * @p{update_once} to fill
+					  * cell-independent
+					  * fields. Users of derived
+					  * classes will have to set
+					  * this field to @p{false};
+					  * it is initialized to
+					  * @p{true}.
 					  */
 	bool first_cell;
 
