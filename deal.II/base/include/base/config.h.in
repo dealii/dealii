@@ -1,4 +1,4 @@
-/* base/include/base/config.h.in.  Generated automatically from configure.in by autoheader.  */
+/* base/include/base/config.h.in.  Generated from configure.in by autoheader.  */
 //----------------------------  config.h  ---------------------------
 //    $Id$
 //    Version: $Name$
@@ -28,14 +28,10 @@
 // environment, contact the authors of the library.
 
 
-
 /* Backward compatibility support for functions and classes that do not take
    an explicit mapping variable, but rather use a default Q1 mapping instead
    */
 #undef DEAL_II_COMPAT_MAPPING
-
-/* Define if you have the rand_r function */
-#undef DEAL_II_DECLARE_LRAND48
 
 /* Flag indicating whether the library shall be compiled to use the Tecplot
    interface */
@@ -68,6 +64,12 @@
    */
 #undef DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND
 
+/* Define if we have to work around a bug in icc in which the compiler refuses
+   to consider a template when given a pointer to a constant member function.
+   See the aclocal.m4 file in the top-level directory for a description of
+   this bug. */
+#undef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
+
 /* Flag indicating whether the library shall be compiler for multithreaded
    applications */
 #undef DEAL_II_USE_MT
@@ -78,7 +80,7 @@
 /* Define if the compiler provides __builtin_expect */
 #undef HAVE_BUILTIN_EXPECT
 
-/* Define if you have the `gethostname' function. */
+/* Define to 1 if you have the `gethostname' function. */
 #undef HAVE_GETHOSTNAME
 
 /* Availability of the MA27 algorithm from HSL */
@@ -114,6 +116,21 @@
    that use this function. The question whether we have to do so is controlled
    by the preprocessor variable. */
 #undef NO_HAVE_GETRUSAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
 
 /* Define if we have to work around a bug in IBM's xlC compiler. See the
    aclocal.m4 file in the top-level directory for a description of this bug.
