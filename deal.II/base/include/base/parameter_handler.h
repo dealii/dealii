@@ -111,7 +111,18 @@ struct Patterns {
       private:
 	string sequence;
     };
-    
+
+				     /**
+				      * Test for the string being either
+				      * "true" or "false". This is mapped
+				      * to the #Sequence# class.
+				      */
+    class Bool : public Sequence {
+      public:
+	Bool ();
+	virtual PatternBase * clone () const;
+    };
+        
 				     /**
 				      * Always returns true when testing a
 				      * string.
@@ -302,8 +313,9 @@ struct Patterns {
  *   i.e. an input entry value which does not match the regular expression is not stored.
  *
  *   You can use #get# to retrieve the parameter in text form, #get_integer# to get an integer
- *   or #get_double# to get a double. It will cause an internal error if
- *   the string could not be converted to an integer or a double. This should, though, not
+ *   or #get_double# to get a double. You can also use #get_bool#.
+ *   It will cause an internal error if the string could not be 
+ *   converted to an integer, double or a bool. This should, though, not
  *   happen if you correctly specified the regular expression for this entry; you should not
  *   try to get out an integer or a double from an entry for which no according regular
  *   expression was set. The internal error is raised through the #Assert()# macro family
@@ -638,16 +650,21 @@ class ParameterHandler {
     
 				     /**
 				      * Return value of entry #entry_string# as
-				      * long integer.
+				      * #long int#.
 				      */
     long int       get_integer (const string &entry_string) const;
     
 				     /**
 				      * Return value of entry #entry_string# as
-				      * double.
+				      * #double#.
 				      */
     double         get_double (const string &entry_string) const;
 
+				     /**
+				      * Return value of entry #entry_string# as
+				      * #bool#.
+				      */
+    bool           get_bool (const string &entry_string) const;
 				     /**
 				      * Print all parameters with the given style
 				      * to #out#. Presently only Text and LaTeX

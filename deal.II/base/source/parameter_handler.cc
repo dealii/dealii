@@ -88,6 +88,18 @@ Patterns::Sequence::clone () const {
 
 
 
+Patterns::Bool::Bool () :
+		Sequence ("true|false")
+{};
+
+
+Patterns::PatternBase *
+Patterns::Bool::clone () const {
+  return new Patterns::Bool();
+};
+
+
+
 bool Patterns::Anything::match (const string &) const {
   return true;
 };
@@ -328,6 +340,17 @@ double ParameterHandler::get_double (const string &entry_string) const {
   return d;
 };
 
+
+
+bool ParameterHandler::get_bool (const string &entry_string) const {
+  string s = get(entry_string);
+
+  Assert ((s=="true") || (s=="false"), ExcConversionError(s));
+  if (s=="true")
+    return true;
+  else
+    return false;
+};
 
 
 
