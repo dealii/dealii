@@ -1376,6 +1376,10 @@ struct TimeStepBase_Tria<dim>::Flags
  *   scheme is adopted to allow for stricter corrections in later sweeps
  *   while the relaxations may be more generous in the first sweeps.
  *
+ *   There is a static variable #default_correction_relaxations# which you
+ *   can use as a default value. It is an empty list and thus defines no
+ *   relaxations.
+ *
  * \item #cell_number_correction_steps#: Usually, if you want the number of
  *   cells to be corrected, the target corridor for the cell number is computed
  *   and some additional cells are flagged or flags are removed. But since
@@ -1421,6 +1425,12 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 				      * class for more information.
 				      */
     typedef vector<vector<pair<unsigned int, double> > >   CorrectionRelaxations;
+
+				     /**
+				      * Default values for the relaxations:
+				      * no relaxations.
+				      */
+    static CorrectionRelaxations default_correction_relaxations;
 
 				     /**
 				      * Constructor. The default values are
@@ -1531,13 +1541,6 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
     DeclException1 (ExcInvalidValue,
 		    int,
 		    << "The following value does not fulfil the requirements: " << arg1);
-
-  private:
-				     /**
-				      * Default values for the relaxations:
-				      * no relaxations.
-				      */
-    static CorrectionRelaxations default_correction_relaxations;    
 };
 
 
