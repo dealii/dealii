@@ -105,8 +105,24 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * @p{base_element(0)} is
 				      * @p{this}.
 				      */
-    virtual const FiniteElement<dim> & base_element (const unsigned int index) const = 0;
+    virtual
+    const FiniteElement<dim> &
+    base_element (const unsigned int index) const = 0;
 
+                                     /**
+                                      * This index denotes how often
+                                      * the base element @p{index} is
+                                      * used in a composed element. If
+                                      * the element is scalar, then
+                                      * the result is always equal to
+                                      * one. See the documentation for
+                                      * the @p{n_base_elements}
+                                      * function for more details.
+                                      */
+    virtual
+    unsigned int
+    element_multiplicity (const unsigned int index) const = 0;
+    
 				     /**
 				      * Check for non-zero values on a face.
 				      *

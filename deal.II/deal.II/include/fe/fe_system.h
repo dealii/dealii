@@ -294,7 +294,7 @@ class FESystem : public FiniteElement<dim>
 				      * How often is a composing
 				      * element used.
 				      */
-    unsigned int element_multiplicity (const unsigned int index) const;
+    virtual unsigned int element_multiplicity (const unsigned int index) const;
 
 				     /**
 				      * Access to a composing
@@ -797,19 +797,6 @@ class FESystem : public FiniteElement<dim>
 
 
 template <> void FESystem<1>::initialize_unit_face_support_points ();
-
-
-/* ------------------------- inline functions ------------------------- */
-
-
-template<int dim>
-inline unsigned int
-FESystem<dim>::element_multiplicity (const unsigned int index) const
-{
-  Assert (index < base_elements.size(), 
-	  ExcIndexRange(index, 0, base_elements.size()));
-  return base_elements[index].second;
-};
 
 
 

@@ -252,7 +252,18 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * @p{this}, and all other
 				      * indices throw an error.
 				      */
-    virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
+    virtual const FiniteElement<dim> &
+    base_element (const unsigned int index) const;
+
+                                     /**
+                                      * Multiplicity of base element
+                                      * @p{index}. Since this is an
+                                      * atomic element,
+                                      * @p{element_multiplicity(0)}
+                                      * returns one, and all other
+                                      * indices will throw an error.
+                                      */
+    virtual unsigned int element_multiplicity (const unsigned int index);
     
 				     /**
 				      * This function returns

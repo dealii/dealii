@@ -168,7 +168,18 @@ class FE_DGP : public FiniteElement<dim>
 				      * @p{this}, and all other
 				      * indices throw an error.
 				      */
-    virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
+    virtual const FiniteElement<dim> &
+    base_element (const unsigned int index) const;
+
+                                     /**
+                                      * Multiplicity of base element
+                                      * @p{index}. Since this is a
+                                      * scalar element,
+                                      * @p{element_multiplicity(0)}
+                                      * returns one, and all other
+                                      * indices will throw an error.
+                                      */
+    virtual unsigned int element_multiplicity (const unsigned int index);
     
 				     /**
 				      * Check for non-zero values on a face.

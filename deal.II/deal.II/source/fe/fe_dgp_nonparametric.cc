@@ -396,6 +396,16 @@ FE_DGPNonparametric<dim>::base_element (const unsigned int index) const
 
 
 template <int dim>
+unsigned int
+FE_DGPNonparametric<dim>::element_multiplicity (const unsigned int index) const
+{
+  Assert (index==0, ExcIndexRange(index, 0, 1));
+  return 1;
+};
+
+
+
+template <int dim>
 bool
 FE_DGPNonparametric<dim>::has_support_on_face (const unsigned int,
 				  const unsigned int) const

@@ -1252,6 +1252,16 @@ FE_Nedelec<dim>::base_element (const unsigned int index) const
 
 
 template <int dim>
+unsigned int
+FE_Nedelec<dim>::element_multiplicity (const unsigned int index) const
+{
+  Assert (index==0, ExcIndexRange(index, 0, 1));
+  return 1;
+};
+
+
+
+template <int dim>
 bool
 FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const

@@ -2197,6 +2197,18 @@ FESystem<dim>::n_base_elements () const
 };
 
 
+
+template<int dim>
+unsigned int
+FESystem<dim>::element_multiplicity (const unsigned int index) const
+{
+  Assert (index < base_elements.size(), 
+	  ExcIndexRange(index, 0, base_elements.size()));
+  return base_elements[index].second;
+};
+
+
+
 template <int dim>
 bool
 FESystem<dim>::has_support_on_face (const unsigned int shape_index,
