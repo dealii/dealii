@@ -21,7 +21,7 @@ void dFMatrix::init(int mm, int nn)
   val = new double[val_size];
   dim_range = nn;
   dim_image = mm;
-  for (int i = nn*mm-1; i>=0 ; i--) val[i] = 0;
+  clear ();
 }
 
 dFMatrix::~dFMatrix()
@@ -863,8 +863,8 @@ dFMatrix::operator == (const dFMatrix &m) const
 
 
 double dFMatrix::determinant () const {
-  THROW2 (dim_range != dim_image, );
-  THROW2 ((dim_range<1) || (dim_range>3), IntError::Range(dim_range));
+//  THROW2 (dim_range != dim_image, );
+//  THROW2 ((dim_range<1) || (dim_range>3), IntError::Range(dim_range));
   
   switch (dim_range) 
     {
@@ -883,3 +883,54 @@ double dFMatrix::determinant () const {
             return 0;
     };
 };
+
+
+
+void dFMatrix::clear () {
+  for (unsigned int i=0; i<val_size; ++i)
+    val[i] = 0.;
+};
+
+
+
+void dFMatrix.invert (const dFMatrix &M) {
+//  THROW2 (dim_range != dim_image, ExcXXX());
+//  THROW2 ((dim_range<1) || (dim_range>3), IntError::Range(dim_range));
+//  THROW2 ((dim_range != M.dim_range) || (dim_image != M.dim_image),
+//          ExcXXX());
+  switch (dim_range) 
+    {
+      case 1:
+	    val[0] = 1.0/M.val[0];
+	    return;
+      case 2:
+					     // this is Maple output,
+					     // thus a bit unstructured
+	    const double t4 = 1.0/(M.el(0,0)*M.el(1,1)-M.el(0,1)*M.el(1,0));
+	    el(0,0) = M.el(1,1)*t4;
+	    el(0,1) = -M.el(0,1)*t4;
+	    el(1,0) = -M.el(1,0)*t4;
+	    el(1,1) = M.el(0,0)*t4;
+	    return;
+      case 3:
+	    const double t4 = M.el(0,0)*M.el(1,1),
+			 t6 = M.el(0,0)*M.el(1,2),
+			 t8 = M.el(0,1)*M.el(1,0),
+			t00 = M.el(0,2)*M.el(1,0),
+			t01 = M.el(0,1)*M.el(2,0),
+			t04 = M.el(0,2)*M.el(2,0),
+			t07 = 1.0/(t4*M.el(2,2)-t6*M.el(2,1)-t8*M.el(2,2)+
+				   t00*M.el(2,1)+t01*M.el(1,2)-t04*M.el(1,1));
+	    el(0,0) = (M.el(1,1)*M.el(2,2)-M.el(1,2)*M.el(2,1))*t07;
+	    el(0,1) = -(M.el(0,1)*M.el(2,2)-M.el(0,2)*M.el(2,1))*t07;
+	    el(0,2) = -(-M.el(0,1)*M.el(1,2)+M.el(0,2)*M.el(1,1))*t07;
+	    el(1,0) = -(M.el(1,0)*M.el(2,2)-M.el(1,2)*M.el(2,0))*t07;
+	    el(1,1) = (M.el(0,0)*M.el(2,2)-t04)*t07;
+	    el(1,2) = -(t6-t00)*t07;
+	    el(2,0) = -(-M.el(1,0)*M.el(2,1)+M.el(1,1)*M.el(2,0))*t07;
+	    el(2,1) = -(M.el(0,0)*M.el(2,1)-t01)*t07;
+	    el(2,2) = (t4-t8)*t07;
+	    return;
+    };    
+);
+  

@@ -164,5 +164,20 @@ class dFMatrix
                                       * for this function.
                                       */
     double determinant () const;
+
+				     /**
+				      * Assign the inverse of the given
+				      * matrix to #*this#. This function is
+				      * only implemented (hardcoded) for
+				      * square matrices of dimension one,
+				      * two and three.
+				      */
+    void invert (const dFMatrix &M);
+    
+				     /**
+				      * Set all entries in the matrix to
+				      * zero.
+				      */
+    void clear ();
 };
 #endif
