@@ -214,6 +214,7 @@ namespace CommunicationsLog
   
   struct Record 
   {
+      pid_t                 child_pid;
       Direction             direction;
       const std::type_info* type;
       unsigned int          count;
@@ -223,47 +224,48 @@ namespace CommunicationsLog
   };
 
   std::list<Record> communication_log;
+  Threads::ThreadMutex list_access_lock;
 
   
   template <typename T>
-  void record_communication (const Direction    direction,
+  void record_communication (const pid_t        child_pid,
+			     const Direction    direction,
                              const unsigned int count,
                              const unsigned int completed_bytes,
                              const std::string &descr)
   {
-    Record record = {direction, &typeid(T), count,
+    Record record = {child_pid, direction, &typeid(T), count,
                      sizeof(T)*count, completed_bytes, descr};
+    list_access_lock.acquire ();
     communication_log.push_back (record);
+    list_access_lock.release ();
   };
 
 
-  void list_communication () 
+  void list_communication (const pid_t child_pid) 
   {
-    sleep (random()%4);
-                                     // make sure only one thread is
-                                     // writing out at a time
-    static Threads::ThreadMutex write_lock;
-    write_lock.acquire ();
+    list_access_lock.acquire ();
     
     std::cerr << "++++++++++++++++++++++++++++++" << std::endl
-              << "Communiction log history:" << std::endl;
+              << "Communication log history:" << std::endl;
     
     for (std::list<Record>::const_iterator i=communication_log.begin();
          i!=communication_log.end(); ++i)
-      std::cerr << "++ "
-                << (i->direction == put ? "put" : "get")
-                << " "
-                << i->count << " objects of type "
-                << i->type->name()
-                << ", " << i->completed_bytes
-                << " of " << i->scheduled_bytes
-                << " bytes completed, description="
-                << i->description
-                << std::endl;
+      //      if (i->child_pid == child_pid)
+	std::cerr << "++ " << i->child_pid << ' '
+		  << (i->direction == put ? "put" : "get")
+		  << " "
+		  << i->count << " objects of type "
+		  << i->type->name()
+		  << ", " << i->completed_bytes
+		  << " of " << i->scheduled_bytes
+		  << " bytes completed, description="
+		  << i->description
+		  << std::endl;
     std::cerr << "++++++++++++++++++++++++++++++" << std::endl;
 
-    write_lock.release ();
-  };  
+    list_access_lock.release ();
+  };
 };
 
 
@@ -271,11 +273,11 @@ namespace CommunicationsLog
 /**
  * Output an error message and terminate the program.
  */
-void die (const std::string &text)
+void die (const std::string &text, const pid_t child)
 {
   std::cerr << "+++++ detached_ma27 driver: " << text
             << std::endl;
-  CommunicationsLog::list_communication ();
+  CommunicationsLog::list_communication (child);
   std::abort ();
 };
 
@@ -285,12 +287,12 @@ void die (const std::string &text)
  * codes.
  */
 template <typename T1, typename T2>
-void die (const std::string &text, const T1 t1, const T2 t2)
+void die (const std::string &text, const T1 t1, const T2 t2, const pid_t child)
 {
   std::cerr << "+++++ detached_ma27 driver: " << text
             << " code1=" << t1 << ", code2=" << t2
             << std::endl;
-  CommunicationsLog::list_communication ();
+  CommunicationsLog::list_communication (child);
   std::abort ();
 };
 
@@ -304,17 +306,24 @@ void die (const std::string &text, const T1 t1, const T2 t2)
  * check by calling "kill(PID,0)", where PID is the pid of the
  * child. if the return value is non-null, then kill couldn't find
  * out about the process, so it is apparently gone
+ *
+ * note that if the child dies, then it first becomes a zombie, until we 
+ * bury it by calling wait, waitpid, wait3, or wait4. before we do it, the
+ * process is dead but still exists, so kill will not report an error. so
+ * we have to make sure we call wait* before the kill, but then we also 
+ * do not want to use a blocking wait, so use it with WNOHANG
  */
 void monitor_child_liveness (const pid_t child_pid) 
 {
   while (true)
     {
+      waitpid (child_pid, 0, WNOHANG);
       int ret = kill (child_pid, 0);
       if (ret != 0)
         if ((ret == -1) && (errno == ESRCH))
-          die ("Child process seems to have died!");
+          die ("Child process seems to have died!", child_pid);
         else
-          die ("Unspecified error while checking for other process!", ret, errno);
+          die ("Unspecified error while checking for other process!", ret, errno, child_pid);
 
                                        // ok, master still running,
                                        // take a little rest and then
@@ -373,14 +382,14 @@ struct SparseDirectMA27::DetachedModeData
                            sizeof(T) * N - count);
             while ((ret<0) && (errno==EINTR));
             if (ret < 0)
-              die ("error on client side in 'put'", ret, errno);
+              die ("error on client side in 'put'", ret, errno, child_pid);
 
             count += ret;
           };
         
         std::fflush (NULL);
         CommunicationsLog::
-          record_communication<T> (CommunicationsLog::put, N, count, debug_info);
+          record_communication<T> (child_pid, CommunicationsLog::put, N, count, debug_info);
       };
 
     
@@ -398,13 +407,13 @@ struct SparseDirectMA27::DetachedModeData
             while ((ret<0) && (errno==EINTR));
             
             if (ret < 0)
-              die ("error on client side in 'get'", ret, errno);
+              die ("error on client side in 'get'", ret, errno, child_pid);
 
             count += ret;
           };
         
         CommunicationsLog::
-          record_communication<T> (CommunicationsLog::get, N, count, debug_info);
+          record_communication<T> (child_pid, CommunicationsLog::get, N, count, debug_info);
       };    
 };
 
@@ -642,8 +651,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
 				   // if we were not allowed to
 				   // allocate more memory, then throw
 				   // an exception
-  if (!call_succeeded)
-    throw ExcMA27AFailed(IFLAG);
+  AssertThrow (call_succeeded, ExcMA27AFailed(IFLAG));
 
 				   // catch returned values from the
 				   // COMMON block. we need these
@@ -786,7 +794,7 @@ SparseDirectMA27::factorize (const SparseMatrix<double> &matrix)
 					    // value, don't know
 					    // what to do here
 	  default:
-		throw ExcMA27BFailed(IFLAG);
+		AssertThrow (false, ExcMA27BFailed(IFLAG));
 	};
       continue;
 
@@ -795,8 +803,7 @@ SparseDirectMA27::factorize (const SparseMatrix<double> &matrix)
     }
   while (true);
 
-  if (!call_succeeded)
-    throw ExcMA27BFailed(IFLAG);
+  AssertThrow (call_succeeded, ExcMA27BFailed(IFLAG));
 
 				   // note that we have been here
 				   // already
@@ -1172,8 +1179,7 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
     }
   while (true);
 
-  if (!call_succeeded)
-    throw ExcMA47AFailed(INFO[0]);
+  AssertThrow (call_succeeded, ExcMA47AFailed(INFO[0]));
 
 				   // note that we have already been
 				   // in this function
@@ -1297,7 +1303,7 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
 					    // value, don't know
 					    // what to do here
 	  default:
-		throw ExcMA47BFailed(INFO[0]);
+		AssertThrow (false, ExcMA47BFailed(INFO[0]));
 	};
       continue;
 
@@ -1306,8 +1312,7 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
     }
   while (true);
 
-  if (!call_succeeded)
-    throw ExcMA47BFailed(INFO[0]);
+  AssertThrow (call_succeeded, ExcMA47BFailed(INFO[0]));
 
 				   // note that we have been here
 				   // already
