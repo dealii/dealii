@@ -758,11 +758,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <ol>
   <li> <p>
        New: The <code class="class">GeometryInfo</code> classes now
-       have a static member function <code
+       have new static member functions <code
        class="member">child_cell_from_point</code> that, given a point
-       in the unit cell, returns which child cell it is on.
+       in the unit cell, returns which child cell it is on; <code
+       class="member">cell_to_child_coordinates</code> that transforms
+       coordinates between the unit coordinate systems from the mother
+       to the child cell; and <code
+       class="member">is_inside_unit_cell</code> that tells whether a 
+       given point is inside the unit cell.
        <br>
-       (WB 2003/04/24)
+       (WB 2003/05/01)
        </p>
 
   <li> <p>
