@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -96,9 +96,10 @@ void ConstraintMatrix::add_line (const unsigned int line)
 
 
 
-void ConstraintMatrix::add_entry (const unsigned int line,
-				  const unsigned int column,
-				  const double       value)
+void
+ConstraintMatrix::add_entry (const unsigned int line,
+                             const unsigned int column,
+                             const double       value)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
 
@@ -125,7 +126,8 @@ void ConstraintMatrix::add_entry (const unsigned int line,
 				   // in any case: exit the function if an
 				   // entry for this column already exists,
 				   // since we don't want to enter it twice
-  for (std::vector<std::pair<unsigned int,double> >::const_iterator p=line_ptr->entries.begin();
+  for (std::vector<std::pair<unsigned int,double> >::const_iterator
+         p=line_ptr->entries.begin();
        p != line_ptr->entries.end(); ++p)
     if (p->first == column)
       {
@@ -139,8 +141,9 @@ void ConstraintMatrix::add_entry (const unsigned int line,
 
 
 
-void ConstraintMatrix::add_entries (const unsigned int                        line,
-				    const std::vector<std::pair<unsigned int,double> > &col_val_pairs)
+void
+ConstraintMatrix::add_entries (const unsigned int                        line,
+                               const std::vector<std::pair<unsigned int,double> > &col_val_pairs)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
 
@@ -214,7 +217,32 @@ void ConstraintMatrix::close ()
                            line->entries.end());
 
 				       // now sort the remainder
-      sort (line->entries.begin(), line->entries.end());
+      std::sort (line->entries.begin(), line->entries.end());
+
+                                       // finally do the following check: if
+                                       // the sum of weights for the
+                                       // constraints is close to one, but not
+                                       // exactly one, then rescale all the
+                                       // weights so that they sum up to
+                                       // 1. this adds a little numerical
+                                       // stability and avoids all sorts of
+                                       // problems where the actual value is
+                                       // close to, but not quite what we
+                                       // expected
+                                       //
+                                       // the case where the weights don't
+                                       // quite sum up happens when we compute
+                                       // the interpolation weights "on the
+                                       // fly", i.e. not from precomputed
+                                       // tables. in this case, the
+                                       // interpolation weights are also
+                                       // subject to round-off
+      double sum = 0;
+      for (unsigned int i=0; i<line->entries.size(); ++i)
+        sum += line->entries[i].second;
+      if ((sum != 1.0) && (std::fabs (sum-1.) < 1.e-13))
+        for (unsigned int i=0; i<line->entries.size(); ++i)
+          line->entries[i].second /= sum;
     };
   
 				   // sort the lines
