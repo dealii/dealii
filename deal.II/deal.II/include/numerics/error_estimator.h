@@ -14,6 +14,8 @@
 template <int dim> class DoFHandler;
 template <int dim> class Quadrature;
 template <int dim> class FiniteElement;
+template <int dim> class FEFaceValues;
+template <int dim> class FESubfaceValues;
 template <int dim> class Boundary;
 template <int dim> class Function;
 class dVector;
