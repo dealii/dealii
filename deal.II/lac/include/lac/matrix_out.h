@@ -342,7 +342,7 @@ template <class Matrix>
 void
 MatrixOut::build_patches (const Matrix      &matrix,
 			  const std::string &name,
-			  const Options     &options)
+			  const Options      options)
 {
   unsigned int
     gridpoints_x = (matrix.n() / options.block_size
