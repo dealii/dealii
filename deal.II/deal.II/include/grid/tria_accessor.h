@@ -427,7 +427,7 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      * you exactly know what you are doing,
 				      * since this value is reserved for
 				      * another purpose and algorithms may
-				      * not work if boundary cells have have
+				      * not work if boundary cells have
 				      * this boundary indicator or if interior
 				      * cells have boundary indicators other
 				      * than 255.
