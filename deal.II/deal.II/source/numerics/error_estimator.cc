@@ -987,14 +987,26 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
     {
 				       // get an iterator pointing to the
 				       // cell behind the present subface
+      const bool orientation_flag
+        = (dim != 3 ?
+           true :
+           cell->get_face_orientation(face_no) == true
+           &&
+           neighbor->get_face_orientation(neighbor_neighbor) == true);
+      static const unsigned int subface_translation[4]
+        = { 0, 3, 2, 1 };
+      const unsigned int neighbor_child_index
+        = (GeometryInfo<dim>::
+           child_cell_on_face(neighbor_neighbor,
+                              (orientation_flag ?
+                               subface_no :
+                               subface_translation[subface_no])));
       const active_cell_iterator neighbor_child
-	= neighbor->child(GeometryInfo<dim>::
-			  child_cell_on_face(neighbor_neighbor,subface_no));
+	= neighbor->child(neighbor_child_index);
       Assert (neighbor_child->face(neighbor_neighbor) ==
 	      cell->face(face_no)->child(subface_no),
 	      ExcInternalError());
-      Assert (!neighbor->child(GeometryInfo<dim>::
-			       child_cell_on_face(neighbor_neighbor,subface_no))->has_children(),
+      Assert (!neighbor->child(neighbor_child_index)->has_children(),
 	      ExcInternalError());
       
 				       // restrict the finite element on the
