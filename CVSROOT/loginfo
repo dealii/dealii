@@ -16,7 +16,7 @@
 # name and listing the modified file names.
 #
 #
-DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default.1999.html > /tmp/Tdefault; mv /tmp/Tdefault $CVSROOT/LOG/default.1999.html; chmod a+r $CVSROOT/LOG/default.1999.html
+DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default-2000.html > /tmp/Tdefault; mv /tmp/Tdefault $CVSROOT/LOG/default-2000.html; chmod a+r $CVSROOT/LOG/default-2000.html
 #
 # The various DEAL libraries
 #
