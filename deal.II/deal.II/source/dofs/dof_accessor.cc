@@ -94,7 +94,7 @@ template <int dim, typename BaseClass>
 void
 DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (dof_indices.size() == (2*dof_handler->get_selected_fe().dofs_per_vertex +
 				 dof_handler->get_selected_fe().dofs_per_line),
 	  ExcVectorDoesNotMatch());
@@ -133,7 +133,7 @@ void DoFLineAccessor<dim,BaseClass>::
 distribute_local_to_global (const dVector &local_source,
 			    dVector       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.size() == (2*dof_handler->get_selected_fe().dofs_per_vertex +
 				  dof_handler->get_selected_fe().dofs_per_line),
 	  ExcVectorDoesNotMatch());
@@ -158,7 +158,7 @@ void DoFLineAccessor<dim,BaseClass>::
 distribute_local_to_global (const dFMatrix &local_source,
 			    dSMatrix       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.m() == (2*dof_handler->get_selected_fe().dofs_per_vertex +
 			       dof_handler->get_selected_fe().dofs_per_line),
 	  ExcVectorDoesNotMatch());
@@ -264,7 +264,7 @@ template <int dim, typename BaseClass>
 void
 DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (dof_indices.size() == (4*dof_handler->get_selected_fe().dofs_per_vertex +
 				 4*dof_handler->get_selected_fe().dofs_per_line +
 				 dof_handler->get_selected_fe().dofs_per_quad),
@@ -324,7 +324,7 @@ void DoFQuadAccessor<dim,BaseClass>::
 distribute_local_to_global (const dVector &local_source,
 			    dVector       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.size() == (4*dof_handler->get_selected_fe().dofs_per_vertex +
 				  4*dof_handler->get_selected_fe().dofs_per_line +
 				  dof_handler->get_selected_fe().dofs_per_quad),
@@ -350,7 +350,7 @@ void DoFQuadAccessor<dim,BaseClass>::
 distribute_local_to_global (const dFMatrix &local_source,
 			    dSMatrix       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.m() == (4*dof_handler->get_selected_fe().dofs_per_vertex +
 			       4*dof_handler->get_selected_fe().dofs_per_line +
 			       dof_handler->get_selected_fe().dofs_per_quad),
