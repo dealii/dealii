@@ -635,6 +635,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: For each of the renumbering functions in the <code
+       class="class">DoFRenumbering</code> class there is now an
+       additional <code class="member">compute_*</code>
+       function. These new functions compute and return the
+       corresponding renumbering vectors but do not perform the actual
+       renumbering on the <code class="class">DoFHandler</code>
+       object. The behaviour of the old functions is not changed.
+       <br>
+       (RH 2003/02/03)
+       </p>
+
   <li> <p> 
        New: The <code class="class">ThreadMutex</code> classes now have a
        member class <code class="class">ScopedLock</code> that implements the

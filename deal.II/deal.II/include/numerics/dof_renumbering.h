@@ -217,6 +217,23 @@ class DoFRenumbering
 		   const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int>());
 
 				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * @p{Cuthill_McKee}
+				      * function. Does not perform the
+				      * renumbering on the
+				      * @p{DoFHandler} dofs but
+				      * returns the renumbering
+				      * vector.
+				      */    
+    template <int dim>
+    static std::vector<unsigned int>
+    compute_Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
+			   const bool                       reversed_numbering = false,
+			   const bool                       use_constraints    = false,
+			   const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int>());
+
+				     /**
 				      * Renumber the degrees of freedom
 				      * according to the Cuthill-McKee method,
 				      * eventually using the reverse numbering
@@ -294,9 +311,24 @@ class DoFRenumbering
 				      */
     template <int dim>
     static void
-    component_wise (DoFHandler<dim>            &dof_handler,
+    component_wise (DoFHandler<dim>                 &dof_handler,
 		    const std::vector<unsigned int> &component_order = std::vector<unsigned int>());
 
+				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * @p{component_wise}
+				      * function. Does not perform the
+				      * renumbering on the
+				      * @p{DoFHandler} dofs but
+				      * returns the renumbering
+				      * vector.
+				      */    
+    template <int dim>
+    static std::vector<unsigned int>
+    compute_component_wise (DoFHandler<dim>                 &dof_handler,
+			    const std::vector<unsigned int> &component_order = std::vector<unsigned int>());
+    
 				     /**
 				      * Sort the degrees of freedom by
 				      * component. It does the same
@@ -332,9 +364,23 @@ class DoFRenumbering
 				      */
     template <int dim>
     static void
-    cell_wise_dg (DoFHandler<dim>                     &dof_handler,
+    cell_wise_dg (DoFHandler<dim> &dof_handler,
 		  const std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
-    
+
+				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * @p{cell_wise_dg}
+				      * function. Does not perform the
+				      * renumbering on the
+				      * @p{DoFHandler} dofs but
+				      * returns the renumbering
+				      * vector.
+				      */
+    template <int dim>
+    static std::vector<unsigned int>
+    compute_cell_wise_dg (DoFHandler<dim> &dof_handler,
+			  const std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
 
 				     /**
 				      * Cell-wise renumbering on one
@@ -381,6 +427,21 @@ class DoFRenumbering
     downstream_dg (DoFHandler<dim>  &dof_handler,
 		   const Point<dim> &direction);
 
+    				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * @p{downstream_dg}
+				      * function. Does not perform the
+				      * renumbering on the
+				      * @p{DoFHandler} dofs but
+				      * returns the renumbering
+				      * vector.
+				      */
+    template <int dim>
+    static std::vector<unsigned int>
+    compute_downstream_dg (DoFHandler<dim>  &dof_handler,
+			   const Point<dim> &direction);
+
 				     /**
 				      * Cell-wise downstream numbering
 				      * with respect to a constant
@@ -412,6 +473,21 @@ class DoFRenumbering
     sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
 			     const std::vector<bool> &selected_dofs);
 
+    				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * @p{sort_selected_dofs_back}
+				      * function. Does not perform the
+				      * renumbering on the
+				      * @p{DoFHandler} dofs but
+				      * returns the renumbering
+				      * vector.
+				      */
+    template <int dim>
+    static std::vector<unsigned int>
+    compute_sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
+				     const std::vector<bool> &selected_dofs);
+
 				     /**
 				      * Renumber the degrees of
 				      * freedom in a random way.
@@ -419,7 +495,20 @@ class DoFRenumbering
     template <int dim>
     static void
     random (DoFHandler<dim> &dof_handler);
-    
+
+    				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * @p{random} function. Does not
+				      * perform the renumbering on the
+				      * @p{DoFHandler} dofs but
+				      * returns the renumbering
+				      * vector.
+				      */   
+    template <int dim>
+    static std::vector<unsigned int>
+    compute_random (DoFHandler<dim> &dof_handler);
+
 				     /**
 				      * Exception
 				      */

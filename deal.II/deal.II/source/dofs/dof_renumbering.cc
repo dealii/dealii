@@ -50,11 +50,32 @@ extern "C" long int lrand48 (void);
 #endif
 
 
+
 template <int dim>
-void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
-				    const bool                       reversed_numbering,
-				    const bool                       use_constraints,
-				    const std::vector<unsigned int> &starting_indices)
+void
+DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
+			       const bool                       reversed_numbering,
+			       const bool                       use_constraints,
+			       const std::vector<unsigned int> &starting_indices)
+{
+  std::vector<unsigned int> renumbering
+    =compute_Cuthill_McKee(dof_handler, reversed_numbering,
+			   use_constraints, starting_indices);
+
+				   // actually perform renumbering;
+				   // this is dimension specific and
+				   // thus needs an own function
+  dof_handler.renumber_dofs (renumbering);
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+DoFRenumbering::compute_Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
+				       const bool                       reversed_numbering,
+				       const bool                       use_constraints,
+				       const std::vector<unsigned int> &starting_indices)
 {
 				   // make the connection graph
   SparsityPattern sparsity (dof_handler.n_dofs(),
@@ -253,10 +274,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler
 	 i!=new_number.end(); ++i)
       *i = n_dofs-*i-1;
 
-				   // actually perform renumbering;
-				   // this is dimension specific and
-				   // thus needs an own function
-  dof_handler.renumber_dofs (new_number);
+  return new_number;
 }
 
 
@@ -433,13 +451,33 @@ void
 DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handler,
                                 const std::vector<unsigned int> &component_order_arg)
 {
+  std::vector<unsigned int> renumbering
+    =compute_component_wise(dof_handler, component_order_arg);
+
+  if (renumbering.size()!=0)
+    dof_handler.renumber_dofs (renumbering);
+}
+  
+
+
+template <int dim>
+std::vector<unsigned int>
+DoFRenumbering::compute_component_wise (DoFHandler<dim>                 &dof_handler,
+					const std::vector<unsigned int> &component_order_arg)
+{
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   const FiniteElement<dim> &fe     = dof_handler.get_fe();
+
+  std::vector<unsigned int> new_indices (dof_handler.n_dofs(),
+					 DoFHandler<dim>::invalid_dof_index);
 
 				   // do nothing if the FE has only
 				   // one component
   if (fe.n_components() == 1)
-    return;
+    {
+      new_indices.resize(0);
+      return new_indices;
+    }
   
   std::vector<unsigned int> component_order (component_order_arg);
   if (component_order.size() == 0)
@@ -556,8 +594,6 @@ DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handler,
                                    // components in the order the user
                                    // desired to see
   unsigned int next_free_index = 0;
-  std::vector<unsigned int> new_indices (dof_handler.n_dofs(),
-					 DoFHandler<dim>::invalid_dof_index);
   for (unsigned int c=0; c<fe.n_components(); ++c)
     {
       const unsigned int component = component_order[c];
@@ -575,7 +611,7 @@ DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handler,
   Assert (next_free_index == dof_handler.n_dofs(),
 	  ExcInternalError());
 
-  dof_handler.renumber_dofs (new_indices);
+  return new_indices;
 }
 
 
@@ -736,6 +772,19 @@ void
 DoFRenumbering::sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
 					 const std::vector<bool> &selected_dofs)
 {
+  std::vector<unsigned int> renumbering
+    =compute_sort_selected_dofs_back(dof_handler, selected_dofs);
+
+  dof_handler.renumber_dofs(renumbering);
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+DoFRenumbering::compute_sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
+						 const std::vector<bool> &selected_dofs)
+{
   const unsigned int n_dofs = dof_handler.n_dofs();
   Assert (selected_dofs.size() == n_dofs,
 	  ExcDimensionMismatch (selected_dofs.size(), n_dofs));
@@ -763,15 +812,30 @@ DoFRenumbering::sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
   Assert (next_unselected == n_selected_dofs, ExcInternalError());
   Assert (next_selected == n_dofs, ExcInternalError());
 
-				   // now perform the renumbering
-  dof_handler.renumber_dofs (new_dof_indices);
+  return new_dof_indices;
 }
+
 
 
 template <int dim>
 void
-DoFRenumbering::cell_wise_dg (DoFHandler<dim>& dof,
-			      const typename std::vector<typename DoFHandler<dim>::cell_iterator>& cells)
+DoFRenumbering::cell_wise_dg (
+  DoFHandler<dim>& dof,
+  const typename std::vector<typename DoFHandler<dim>::cell_iterator>& cells)
+{
+  std::vector<unsigned int> renumbering
+    =compute_cell_wise_dg(dof, cells);
+  
+  dof.renumber_dofs(renumbering);
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+DoFRenumbering::compute_cell_wise_dg (
+  DoFHandler<dim>& dof,
+  const typename std::vector<typename DoFHandler<dim>::cell_iterator>& cells)
 {
   Assert(cells.size() == dof.get_tria().n_active_cells(),
 	 ExcDimensionMismatch(cells.size(),
@@ -816,16 +880,15 @@ DoFRenumbering::cell_wise_dg (DoFHandler<dim>& dof,
   for (unsigned int i=0;i<new_order.size(); ++i)
     reverse[new_order[i]] = i;
 
-  dof.renumber_dofs(reverse);
+  return reverse;
 }
 
 
 #ifdef ENABLE_MULTIGRID
 template <int dim>
-void
-DoFRenumbering::cell_wise_dg (MGDoFHandler<dim>& dof,
-			      const unsigned int level,
-			      const typename std::vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
+void DoFRenumbering::cell_wise_dg (MGDoFHandler<dim>& dof,
+				   const unsigned int level,
+				   const typename std::vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
 {
   Assert(cells.size() == dof.get_tria().n_cells(level),
 	 ExcDimensionMismatch(cells.size(),
@@ -905,11 +968,24 @@ struct CompCells
       }
 };
 
-    
+
 template <int dim>
 void
 DoFRenumbering::downstream_dg (DoFHandler<dim>& dof,
 			       const Point<dim>& direction)
+{
+  std::vector<unsigned int> renumbering
+    =compute_downstream_dg(dof, direction);
+
+  dof.renumber_dofs(renumbering);
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+DoFRenumbering::compute_downstream_dg (DoFHandler<dim>& dof,
+				       const Point<dim>& direction)
 {
   std::vector<typename DoFHandler<dim>::cell_iterator>
     ordered_cells(dof.get_tria().n_active_cells());
@@ -921,16 +997,15 @@ DoFRenumbering::downstream_dg (DoFHandler<dim>& dof,
   copy (begin, end, ordered_cells.begin());
   sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
-  cell_wise_dg(dof, ordered_cells);
+  return compute_cell_wise_dg(dof, ordered_cells);
 }
 
 
 #ifdef ENABLE_MULTIGRID
 template <int dim>
-void
-DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
-			       const unsigned int level,
-			       const Point<dim>& direction)
+void DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
+				    const unsigned int level,
+				    const Point<dim>& direction)
 {
   std::vector<typename MGDoFHandler<dim>::cell_iterator>
     ordered_cells(dof.get_tria().n_cells(level));
@@ -947,9 +1022,21 @@ DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
 #endif
 
 
+
 template <int dim>
 void
 DoFRenumbering::random (DoFHandler<dim> &dof_handler)
+{
+  std::vector<unsigned int> renumbering
+    =compute_random(dof_handler);
+
+  dof_handler.renumber_dofs(renumbering);
+}
+
+
+template <int dim>
+std::vector<unsigned int>
+DoFRenumbering::compute_random (DoFHandler<dim> &dof_handler)
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   
@@ -958,7 +1045,7 @@ DoFRenumbering::random (DoFHandler<dim> &dof_handler)
     new_indices[i] = i;
   
   std::random_shuffle (new_indices.begin(), new_indices.end());
-  dof_handler.renumber_dofs(new_indices);  
+  return new_indices;
 }
 
 
@@ -973,7 +1060,21 @@ void DoFRenumbering::Cuthill_McKee<deal_II_dimension>
  const std::vector<unsigned int>&);
 
 template
+std::vector<unsigned int>
+DoFRenumbering::compute_Cuthill_McKee<deal_II_dimension>
+(DoFHandler<deal_II_dimension>&,
+ const bool,
+ const bool,
+ const std::vector<unsigned int>&);
+
+template
 void DoFRenumbering::component_wise<deal_II_dimension>
+(DoFHandler<deal_II_dimension>&,
+ const std::vector<unsigned int>&);
+
+template
+std::vector<unsigned int>
+DoFRenumbering::compute_component_wise<deal_II_dimension>
 (DoFHandler<deal_II_dimension>&,
  const std::vector<unsigned int>&);
 
@@ -985,12 +1086,26 @@ void DoFRenumbering::component_wise<deal_II_dimension>
 
 
 template
-void DoFRenumbering::cell_wise_dg<deal_II_dimension>
+void
+DoFRenumbering::cell_wise_dg<deal_II_dimension>
 (DoFHandler<deal_II_dimension>&,
  const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
-void DoFRenumbering::downstream_dg<deal_II_dimension>
+std::vector<unsigned int>
+DoFRenumbering::compute_cell_wise_dg<deal_II_dimension>
+(DoFHandler<deal_II_dimension>&,
+ const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
+
+template
+void
+DoFRenumbering::downstream_dg<deal_II_dimension>
+(DoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&);
+
+template
+std::vector<unsigned int>
+DoFRenumbering::compute_downstream_dg<deal_II_dimension>
 (DoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
@@ -1000,7 +1115,18 @@ void DoFRenumbering::sort_selected_dofs_back<deal_II_dimension>
  const std::vector<bool> &);
 
 template
+std::vector<unsigned int>
+DoFRenumbering::compute_sort_selected_dofs_back<deal_II_dimension>
+(DoFHandler<deal_II_dimension> &,
+ const std::vector<bool> &);
+
+template
 void DoFRenumbering::random<deal_II_dimension>
+(DoFHandler<deal_II_dimension> &);
+
+template
+std::vector<unsigned int>
+DoFRenumbering::compute_random<deal_II_dimension>
 (DoFHandler<deal_II_dimension> &);
 
 #ifdef ENABLE_MULTIGRID
@@ -1010,6 +1136,7 @@ void DoFRenumbering::Cuthill_McKee<deal_II_dimension>
  const unsigned int,
  const bool,
  const std::vector<unsigned int>&);
+
 template
 void DoFRenumbering::cell_wise_dg<deal_II_dimension>
 (MGDoFHandler<deal_II_dimension>&,
