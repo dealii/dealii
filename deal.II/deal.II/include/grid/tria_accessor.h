@@ -538,12 +538,18 @@ class QuadAccessor :  public TriaAccessor<dim> {
     bool used () const;
 
 				     /**
-				      *  Set the #used# flag.
+				      *  Set the #used# flag. You should know
+				      *  quite exactly what you are doing of you
+				      *  touch this function. It is exclusively
+				      *  for internal use in the library.
 				      */
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the #used# flag.
+				      *  Clear the #used# flag. You should know
+				      *  quite exactly what you are doing of you
+				      *  touch this function. It is exclusively
+				      *  for internal use in the library.
 				      */
     void clear_used_flag () const;
 
