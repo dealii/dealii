@@ -12,7 +12,7 @@
 ###########################################################################
 include ../../common/Make.global_options
 
-all: block_matrix_array.exe
+all: product_matrix.exe block_matrix_array.exe
 
 ######################################################################
 # Compilation of source code
@@ -30,7 +30,9 @@ block_matrix_array.exe: block_matrix_array.o $(lib-base.g) $(lib-lac.g)
 	@echo =====linking====$(MT)== $<
 	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^
 
-
+product_matrix.exe: product_matrix.o $(lib-base.g) $(lib-lac.g)
+	@echo =====linking====$(MT)== $<
+	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^
 
 ######################################################################
 # Pseudo target for cleaning directory
