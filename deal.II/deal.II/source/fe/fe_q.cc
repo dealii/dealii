@@ -48,14 +48,13 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
   poly = new TensorProductPolynomials<dim> (v);
 
 				   // do some internal book-keeping
-				   // for indices on the cell and on
-				   // the faces. in 1d, the function
-				   // for the latter is empty
   build_renumbering (*this, degree, renumber);
+//TODO:[WB] externalize this to a proper template function  
+#if deal_II_dimension > 1
   build_face_renumbering (FiniteElementData<dim-1>(FE_Q<dim-1>::get_dpo_vector(degree),1),
 			  degree,
 			  face_renumber);
-
+#endif
 
 				   // copy constraint matrices if they
 				   // are defined. otherwise set them
