@@ -290,6 +290,187 @@ class TriaDimensionInfo<3> {
 
 
 
+/*------------------------------------------------------------------------*/
+
+/**
+ * Cache class used to store the number of used and active elements
+ * (lines or quads etc) within the levels of a triangulation. This
+ * is only the declaration of the template, concrete instantiations
+ * are below.
+ *
+ * In the old days, whenever one wanted to access one of these
+ * numbers, one had to perform a loop over all lines, e.g., and count
+ * the elements until we hit the end iterator. This is time consuming
+ * and since access to the number of lines etc is a rather frequent
+ * operation, this was not an optimal solution.
+ *
+ * Note: these class should be made local to the triangulation class
+ * once the compiler supports that (gcc2.95 does not at present).
+ *
+ * @author Wolfgang Bangerth, 1999 */
+template <int dim>
+struct TriaNumberCache;
+
+/**
+ * Cache class used to store the number of used and active elements
+ * (lines or quads etc) within the levels of a triangulation. This
+ * specialization stores the numbers of lines.
+ *
+ * In the old days, whenever one wanted to access one of these
+ * numbers, one had to perform a loop over all lines, e.g., and count
+ * the elements until we hit the end iterator. This is time consuming
+ * and since access to the number of lines etc is a rather frequent
+ * operation, this was not an optimal solution.
+ *
+ * Note: these class should be made local to the triangulation class
+ * once the compiler supports that (gcc2.95 does not at present).
+ *
+ * @author Wolfgang Bangerth, 1999
+ */
+template <>
+struct TriaNumberCache<1> 
+{
+				     /**
+				      * Number of used lines in the whole
+				      * triangulation.
+				      */
+    unsigned int n_lines;
+
+				     /**
+				      * Array holding the number of used
+				      * lines on each level.
+				      */
+    vector<unsigned int> n_lines_level;
+    
+				     /**
+				      * Number of active lines in the
+				      * whole triangulation.
+				      */
+    unsigned int n_active_lines;
+
+				     /**
+				      * Array holding the number of active
+				      * lines on each level.
+				      */
+    vector<unsigned int> n_active_lines_level;
+
+				     /**
+				      * Constructor. Set values to zero
+				      * by default.
+				      */
+    TriaNumberCache ();
+};
+
+
+
+/**
+ * Cache class used to store the number of used and active elements
+ * (lines or quads etc) within the levels of a triangulation. This
+ * specialization stores the numbers of quads. Due to the inheritance
+ * from the base class #TriaNumberCache<1>#, the numbers of lines
+ * are also within this class.
+ *
+ * In the old days, whenever one wanted to access one of these
+ * numbers, one had to perform a loop over all lines, e.g., and count
+ * the elements until we hit the end iterator. This is time consuming
+ * and since access to the number of lines etc is a rather frequent
+ * operation, this was not an optimal solution.
+ *
+ * Note: these class should be made local to the triangulation class
+ * once the compiler supports that (gcc2.95 does not at present).
+ *
+ * @author Wolfgang Bangerth, 1999
+ */
+template <>
+struct TriaNumberCache<2> : public TriaNumberCache<1>
+{
+				     /**
+				      * Number of used quads in the whole
+				      * triangulation.
+				      */
+    unsigned int n_quads;
+
+				     /**
+				      * Array holding the number of used
+				      * quads on each level.
+				      */
+    vector<unsigned int> n_quads_level;
+    
+				     /**
+				      * Number of active quads in the
+				      * whole triangulation.
+				      */
+    unsigned int n_active_quads;
+
+				     /**
+				      * Array holding the number of active
+				      * quads on each level.
+				      */
+    vector<unsigned int> n_active_quads_level;
+
+				     /**
+				      * Constructor. Set values to zero
+				      * by default.
+				      */
+    TriaNumberCache ();
+};
+
+
+
+/**
+ * Cache class used to store the number of used and active elements
+ * (lines or quads etc) within the levels of a triangulation. This
+ * specialization stores the numbers of hexes. Due to the inheritance
+ * from the base class #TriaNumberCache<2>#, the numbers of lines
+ * and quads are also within this class.
+ *
+ * In the old days, whenever one wanted to access one of these
+ * numbers, one had to perform a loop over all lines, e.g., and count
+ * the elements until we hit the end iterator. This is time consuming
+ * and since access to the number of lines etc is a rather frequent
+ * operation, this was not an optimal solution.
+ *
+ * Note: these class should be made local to the triangulation class
+ * once the compiler supports that (gcc2.95 does not at present).
+ *
+ * @author Wolfgang Bangerth, 1999
+ */
+template <>
+struct TriaNumberCache<3> : public TriaNumberCache<2>
+{
+				     /**
+				      * Number of used hexes in the whole
+				      * triangulation.
+				      */
+    unsigned int n_hexes;
+
+				     /**
+				      * Array holding the number of used
+				      * hexes on each level.
+				      */
+    vector<unsigned int> n_hexes_level;
+    
+				     /**
+				      * Number of active hexes in the
+				      * whole triangulation.
+				      */
+    unsigned int n_active_hexes;
+
+				     /**
+				      * Array holding the number of active
+				      * hexes on each level.
+				      */
+    vector<unsigned int> n_active_hexes_level;
+
+				     /**
+				      * Constructor. Set values to zero
+				      * by default.
+				      */
+    TriaNumberCache ();
+};
+
+
+
 
 /*------------------------------------------------------------------------*/
 
@@ -2544,119 +2725,71 @@ class Triangulation
 				     /**
 				      *  Return total number of used lines,
 				      *  active or not.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_lines () const;
     
 				     /**
 				      *  Return total number of used lines,
 				      *  active or not on level #level#.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_lines (const unsigned int level) const;
     
 				     /**
 				      * Return total number of active lines.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_lines () const;
     
 				     /**
 				      *  Return total number of active lines,
 				      *  on level #level#.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_lines (const unsigned int level) const;
     
 				     /**
 				      *  Return total number of used quads,
 				      *  active or not.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_quads () const;
 
 				     /**
 				      *  Return total number of used quads,
 				      *  active or not on level #level#.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_quads (const unsigned int level) const;
     
 				     /**
 				      *  Return total number of active quads,
 				      *  active or not.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_quads () const;
     
 				     /**
 				      *  Return total number of active quads,
 				      *  active or not on level #level#.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_quads (const unsigned int level) const;
     
 				     /**
 				      *  Return total number of used hexahedra,
 				      *  active or not.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_hexs() const;
 
 				     /**
 				      *  Return total number of used hexahedra,
 				      *  active or not on level #level#.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_hexs(const unsigned int level) const;
     
 				     /**
 				      *  Return total number of active hexahedra,
 				      *  active or not.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_hexs() const;
     
 				     /**
 				      *  Return total number of active hexahedra,
 				      *  active or not on level #level#.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_hexs(const unsigned int level) const;
 
@@ -2665,18 +2798,6 @@ class Triangulation
 				      *  active or not.
 				      *  Maps to #n_lines()# in one space
 				      *  dimension and so on.
-				      *
-				      * Be a bit careful with this function,
-				      * since it needs quite some computational
-				      * ressources: the number of cells is
-				      * computed by looping over all cells,
-				      * rather than by returning a pre-stored
-				      * value. It is therefore often better
-				      * to rewrite lines like
-				      * #for (i=0; i<tria.n_cells() const; ++i) ...#
-				      * by
-				      * #const unsigned int n=tria.n_cells();#
-				      * #for (i=0; i<n; ++i) ...#.
 				      */
     unsigned int n_cells () const;
 
@@ -2685,10 +2806,6 @@ class Triangulation
 				      *  active or not, on level #level#.
 				      *  Maps to #n_lines(level)# in one space
 				      *  dimension and so on.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_cells (const unsigned int level) const;
 
@@ -2696,10 +2813,6 @@ class Triangulation
 				      *  Return total number of active cells.
 				      *  Maps to #n_active_lines()# in one space
 				      *  dimension and so on.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_cells () const;
 
@@ -2708,10 +2821,6 @@ class Triangulation
 				      * on level #level#.
 				      * Maps to #n_active_lines(level)# in one
 				      * space dimension and so on.
-				      *
-				      * Regarding the computational effort of
-				      * this function, the same applies as
-				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_cells (const unsigned int level) const;
 
@@ -2965,6 +3074,35 @@ class Triangulation
 				      * coarsening.
 				      */
     void fix_coarsen_flags ();
+
+				     /**
+				      * Re-compute the number of lines, quads,
+				      * etc. This function is called by
+				      * #execute_{coarsening,refinement}# and
+				      * by #create_triangulation# after the
+				      * grid was changed.
+				      *
+				      * This function simply delegates to the
+				      * functions below, which count
+				      * only a certain class of objects.
+				      */
+    void update_number_cache ();
+
+				     /**
+				      * Recompute the number of lines.
+				      */
+    void update_number_cache_lines ();
+
+    				     /**
+				      * Recompute the number of quads.
+				      */
+    void update_number_cache_quads ();
+
+    				     /**
+				      * Recompute the number of hexes.
+				      */
+    void update_number_cache_hexes ();
+
     
 				     /**
 				      *  Array of pointers pointing to the
@@ -3001,6 +3139,24 @@ class Triangulation
 				      */
     MeshSmoothing                    smooth_grid;
 
+				     /**
+				      * Cache to hold the numbers of lines,
+				      * quads, hexes, etc. These numbers
+				      * are set at the end of the refinement
+				      * and coarsening functions and enable
+				      * faster access later on. In the old
+				      * days, whenever one wanted to access
+				      * one of these numbers, one had to
+				      * perform a loop over all lines, e.g.,
+				      * and count the elements until we hit
+				      * the end iterator. This is time
+				      * consuming and since access to the
+				      * number of lines etc is a rather
+				      * frequent operation, this was not
+				      * an optimal solution.
+				      */
+    TriaNumberCache<dim>             number_cache;
+    
 				     // Friendship includes local classes.
     friend class TriaAccessor<dim>;
     friend class TriaObjectAccessor<1, dim>;

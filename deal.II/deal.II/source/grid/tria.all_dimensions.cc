@@ -670,3 +670,32 @@ void TriangulationLevel<3>::block_write (ostream &out) const
 };
 
 
+
+
+
+TriaNumberCache<1>::TriaNumberCache () :
+		n_lines (0),
+		n_active_lines (0) 
+						 // all other fields are
+						 // default constructed
+{};
+
+
+
+
+TriaNumberCache<2>::TriaNumberCache () :
+		n_quads (0),
+		n_active_quads (0) 
+						 // all other fields are
+						 // default constructed
+{};
+
+
+
+
+TriaNumberCache<3>::TriaNumberCache () :
+		n_hexes (0),
+		n_active_hexes (0) 
+						 // all other fields are
+						 // default constructed
+{};

@@ -36,8 +36,6 @@ Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
       boundary[i] = &straight_boundary;
       straight_boundary.subscribe();
     }
-  
-  levels.push_back (new TriangulationLevel<dim>);
 };
 
 
@@ -161,8 +159,7 @@ template <int dim>
 void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 {
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
-  Assert (n_cells () == 0, ExcTriangulationNotEmpty());
-  Assert (levels.size () == 1, ExcTriangulationNotEmpty());
+  Assert (levels.size () == 0, ExcTriangulationNotEmpty());
 
 				   // copy normal elements
   vertices      = old_tria.vertices;
@@ -175,14 +172,13 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
       boundary[i]      = old_tria.boundary[i];
       boundary[i]->subscribe ();
     }
-				   // delete only level previously existing,
-				   // reserve space for new and copy
-  delete levels[0];
-  levels.clear ();
+
   levels.reserve (old_tria.levels.size());
   for (unsigned int level=0; level<old_tria.levels.size(); ++level)
     levels.push_back (new TriangulationLevel<dim>(*old_tria.levels[level]));
 
+  number_cache = old_tria.number_cache;
+  
 				   // note that we need not copy the
 				   // subscriptor!
 };
@@ -225,7 +221,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
   const unsigned int dim=1;
   
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
-  Assert (n_lines() == 0, ExcTriangulationNotEmpty());
+  Assert (levels.size() == 0, ExcTriangulationNotEmpty());
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
@@ -238,6 +234,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
   vector<vector<int> > lines_at_vertex (v.size());
 
 				   // reserve enough space
+  levels.push_back (new TriangulationLevel<dim>);
   levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
   levels[0]->TriangulationLevel<1>::reserve_space (cells.size());
   
@@ -310,6 +307,10 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 					lines_at_vertex[line->vertex_index(vertex)][0]);
 	  line->set_neighbor (vertex, neighbor);
 	};
+
+
+				   // re-compute numbers of lines, etc
+  update_number_cache ();  
 };
 
 #endif
@@ -325,8 +326,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
   const unsigned int dim=2;
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
-  Assert (n_lines() == 0, ExcTriangulationNotEmpty());
-  Assert (n_quads() == 0, ExcTriangulationNotEmpty());
+  Assert (levels.size() == 0, ExcTriangulationNotEmpty());
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
@@ -460,6 +460,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
     };
 	
   				   // reserve enough space
+  levels.push_back (new TriangulationLevel<dim>);
   levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
   levels[0]->TriangulationLevel<1>::reserve_space (needed_lines.size());
   levels[0]->TriangulationLevel<2>::reserve_space (cells.size());
@@ -601,6 +602,10 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
       else
 	cell->set_neighbor (side,
 			    adjacent_cells[cell->line(side)->index()][0]);
+
+
+				   // re-compute numbers of lines, etc
+  update_number_cache ();  
 };
 
 #endif
@@ -647,9 +652,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
   const unsigned int dim=3;
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
-  Assert (n_lines() == 0, ExcTriangulationNotEmpty());
-  Assert (n_quads() == 0, ExcTriangulationNotEmpty());
-  Assert (n_hexs() == 0, ExcTriangulationNotEmpty());
+  Assert (levels.size() == 0, ExcTriangulationNotEmpty());
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
@@ -761,6 +764,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				   // actually set up data structures
 				   // for the lines
   				   // reserve enough space
+  levels.push_back (new TriangulationLevel<dim>);
   levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
   levels[0]->TriangulationLevel<1>::reserve_space (needed_lines.size());
 
@@ -1104,6 +1108,10 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
       else
 	cell->set_neighbor (face,
 			    adjacent_cells[cell->quad(face)->index()][0]);
+
+
+				   // re-compute numbers of lines, etc
+  update_number_cache ();  
 };
 
 #endif
@@ -3120,63 +3128,47 @@ unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const {
 
 template <int dim>
 unsigned int Triangulation<dim>::n_lines () const {
-  unsigned int n=0;
-  for (unsigned int l=0; l<levels.size(); ++l)
-    n += n_lines (l);
-  return n;
+  return number_cache.n_lines;
 };
 
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_lines (const unsigned int level) const {
-  if (levels[level]->lines.lines.size() == 0)
-    return 0;
-
-				   // only evaluate begin_/end_line if there
-				   // are lines.
-  line_iterator line = begin_line (level),
-		endc = (level == levels.size()-1 ?
-			line_iterator(end_line()) :
-			begin_line (level+1));
-  unsigned int n=0;
-  for (; line!=endc; ++line)
-    ++n;
-  return n;
+  Assert (level < number_cache.n_lines_level.size(),
+	  ExcIndexRange (level, 0, number_cache.n_lines_level.size()));
+  
+  return number_cache.n_lines_level[level];
 };
 
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_lines () const {
-  unsigned int n=0;
-  for (unsigned int l=0; l<levels.size(); ++l)
-    n += n_active_lines (l);
-  return n;
+  return number_cache.n_active_lines;
 };
 
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_lines (const unsigned int level) const {
-  if (levels[level]->lines.lines.size() == 0)
-    return 0;
-
-				   // only evaluate begin_/end_line if there
-				   // are lines.
-  active_line_iterator line = begin_active_line (level),
-		       endc = (level == levels.size()-1 ?
-			       active_line_iterator(end_line()) :
-			       begin_active_line (level+1));
-  unsigned int n=0;
-  for (; line!=endc; ++line)
-    ++n;
-  return n;
+  Assert (level < number_cache.n_lines_level.size(),
+	  ExcIndexRange (level, 0, number_cache.n_lines_level.size()));
+  
+  return number_cache.n_active_lines_level[level];
 };
 
 
 
 #if deal_II_dimension == 1
+
+template <>
+unsigned int Triangulation<1>::n_quads () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
 
 template <>
 unsigned int Triangulation<1>::n_quads (const unsigned int) const {
@@ -3193,63 +3185,46 @@ unsigned int Triangulation<1>::n_active_quads (const unsigned int) const {
 };
 
 
+template <>
+unsigned int Triangulation<1>::n_active_quads () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
 #endif
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_quads () const {
-  unsigned int n=0;
-  for (unsigned int l=0; l<levels.size(); ++l)
-    n += n_quads (l);
-  return n;
+  return number_cache.n_quads;
 };
 
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_quads (const unsigned int level) const {
-  if (levels[level]->quads.quads.size() == 0)
-    return 0;
-
-				   // only evaluate begin_/end_quad if there
-				   // are quads.
-  quad_iterator quad = begin_quad (level),
-		endc = (level == levels.size()-1 ?
-			quad_iterator(end_quad()) :
-			begin_quad (level+1));
-  unsigned int n=0;
-  for (; quad!=endc; ++quad)
-    ++n;
-  return n;
+  Assert (level < number_cache.n_quads_level.size(),
+	  ExcIndexRange (level, 0, number_cache.n_quads_level.size()));
+  
+  return number_cache.n_quads_level[level];
 };
 
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_quads () const {
-  unsigned int n=0;
-  for (unsigned int l=0; l<levels.size(); ++l)
-    n += n_active_quads (l);
-  return n;
+  return number_cache.n_active_quads;
 };
 
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const {
-  if (levels[level]->quads.quads.size() == 0)
-    return 0;
-
-				   // only evaluate begin_/end_quad if there
-				   // are quads.
-  active_quad_iterator quad = begin_active_quad (level),
-		       endc = (level == levels.size()-1 ?
-			       active_quad_iterator(end_quad()) :
-			       begin_active_quad (level+1));
-  unsigned int n=0;
-  for (; quad!=endc; ++quad)
-    ++n;
-  return n;
+  Assert (level < number_cache.n_quads_level.size(),
+	  ExcIndexRange (level, 0, number_cache.n_quads_level.size()));
+  
+  return number_cache.n_active_quads_level[level];
 };
 
 
@@ -3257,7 +3232,23 @@ unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const
 #if deal_II_dimension < 3
 
 template <>
+unsigned int Triangulation<1>::n_hexs () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
 unsigned int Triangulation<1>::n_hexs (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+unsigned int Triangulation<1>::n_active_hexs () const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -3273,7 +3264,23 @@ unsigned int Triangulation<1>::n_active_hexs (const unsigned int) const {
 
 
 template <>
+unsigned int Triangulation<2>::n_hexs () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
 unsigned int Triangulation<2>::n_hexs (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+unsigned int Triangulation<2>::n_active_hexs () const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -3289,62 +3296,36 @@ unsigned int Triangulation<2>::n_active_hexs (const unsigned int) const {
 #endif
 
 
-
-
 template <int dim>
 unsigned int Triangulation<dim>::n_hexs () const {
-  unsigned int n=0;
-  for (unsigned int l=0; l<levels.size(); ++l)
-    n += n_hexs (l);
-  return n;
+  return number_cache.n_hexes;
 };
 
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_hexs (const unsigned int level) const {
-  if (levels[level]->hexes.hexes.size() == 0)
-    return 0;
-
-				   // only evaluate begin_/end_hex if there
-				   // are hexs.
-  hex_iterator hex = begin_hex (level),
-	      endc = (level == levels.size()-1 ?
-		      hex_iterator(end_hex()) :
-		      begin_hex (level+1));
-  unsigned int n=0;
-  for (; hex!=endc; ++hex)
-    ++n;
-  return n;
+  Assert (level < number_cache.n_hexes_level.size(),
+	  ExcIndexRange (level, 0, number_cache.n_hexes_level.size()));
+  
+  return number_cache.n_hexes_level[level];
 };
 
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_hexs () const {
-  unsigned int n=0;
-  for (unsigned int l=0; l<levels.size(); ++l)
-    n += n_active_hexs (l);
-  return n;
+  return number_cache.n_active_hexes;
 };
 
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_hexs (const unsigned int level) const {
-  if (levels[level]->hexes.hexes.size() == 0)
-    return 0;
-
-				   // only evaluate begin_/end_hex if there
-				   // are hexs.
-  active_hex_iterator hex = begin_active_hex (level),
-		     endc = (level == levels.size()-1 ?
-			     active_hex_iterator(end_hex()) :
-			     begin_active_hex (level+1));
-  unsigned int n=0;
-  for (; hex!=endc; ++hex)
-    ++n;
-  return n;
+  Assert (level < number_cache.n_hexes_level.size(),
+	  ExcIndexRange (level, 0, number_cache.n_hexes_level.size()));
+  
+  return number_cache.n_active_hexes_level[level];
 };
 
 
@@ -3823,6 +3804,10 @@ void Triangulation<1>::execute_refinement () {
 	  };      
     };
 
+
+				   // re-compute number of lines
+  update_number_cache ();
+  
 #ifdef DEBUG
   for (unsigned int level=0; level<levels.size(); ++level) 
     levels[level]->monitor_memory (1);
@@ -4445,6 +4430,11 @@ void Triangulation<2>::execute_refinement () {
 	    subcells[3]->set_material_id (cell->material_id());
 	  };
     };
+
+				   // re-compute number of lines and quads
+  update_number_cache ();
+
+
 #ifdef DEBUG
   for (unsigned int level=0; level<levels.size(); ++level) 
     levels[level]->monitor_memory (2);
@@ -4744,6 +4734,7 @@ void Triangulation<3>::execute_refinement () {
 
 				   ///////////////////////////////////////
 				   // now refine marked quads
+				   ///////////////////////////////////////
   for (unsigned int level=0; level!=levels.size()-1; ++level)
     {
 				       // only active objects can be refined
@@ -4915,10 +4906,10 @@ void Triangulation<3>::execute_refinement () {
 	  };
     };
 
-
 				   ///////////////////////////////////
 				   // Now, finally, set up the new
 				   // cells
+				   ///////////////////////////////////
   for (unsigned int level=0; level!=levels.size()-1; ++level)
     {
 				       // only active objects can be refined
@@ -5665,6 +5656,9 @@ void Triangulation<3>::execute_refinement () {
 	  };
     };
 
+				   // re-compute number of lines and quads
+  update_number_cache ();
+
 
 #ifdef DEBUG
   for (unsigned int level=0; level<levels.size(); ++level) 
@@ -5754,6 +5748,10 @@ void Triangulation<dim>::execute_coarsening () {
 					 // use a separate function, since this
 					 // is dimension specific
 	delete_children (cell);
+
+  				   // re-compute number of lines and quads
+  update_number_cache ();
+
   				   // in principle no user flags should be
 				   // set any more at this point
 #if DEBUG
@@ -7063,6 +7061,212 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
 
 
 
+template <int dim>
+void Triangulation<dim>::update_number_cache_lines () 
+{
+				   ///////////////////////////////////
+				   // update the number of lines
+				   // on the different levels in
+				   // the cache
+  number_cache.n_lines_level.resize (levels.size());
+  number_cache.n_lines = 0;
+  for (unsigned int level=0; level<levels.size(); ++level)
+    {
+				       // count lines on this level
+      number_cache.n_lines_level[level] = 0;
+      if (levels[level]->lines.lines.size() != 0) 
+	{
+	  line_iterator line = begin_line (level),
+			endc = (level == levels.size()-1 ?
+				line_iterator(end_line()) :
+				begin_line (level+1));
+	  for (; line!=endc; ++line)
+	    ++number_cache.n_lines_level[level];
+	};
+      
+				       // update total number of lines
+      number_cache.n_lines += number_cache.n_lines_level[level];
+    };
+
+				   // do the update for the number
+				   // of active lines as well
+  number_cache.n_active_lines_level.resize (levels.size());
+  number_cache.n_active_lines = 0;
+  for (unsigned int level=0; level<levels.size(); ++level)
+    {
+				       // count lines on this level
+      number_cache.n_active_lines_level[level] = 0;
+      if (levels[level]->lines.lines.size() != 0) 
+	{
+	  active_line_iterator line = begin_active_line (level),
+			       endc = end_active_line (level);
+	  for (; line!=endc; ++line)
+	    ++number_cache.n_active_lines_level[level];
+	};
+      
+				       // update total number of lines
+      number_cache.n_active_lines += number_cache.n_active_lines_level[level];
+    };
+};
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+void Triangulation<1>::update_number_cache_quads () 
+{
+  Assert (false, ExcInternalError());
+};
+
+#endif
+
+#if deal_II_dimension >= 2
+
+template <int dim>
+void Triangulation<dim>::update_number_cache_quads () 
+{
+  				   ///////////////////////////////////
+				   // update the number of quads
+				   // on the different levels in
+				   // the cache
+  number_cache.n_quads_level.resize (levels.size());
+  number_cache.n_quads = 0;
+  for (unsigned int level=0; level<levels.size(); ++level)
+    {
+				       // count quads on this level
+      number_cache.n_quads_level[level] = 0;
+      if (levels[level]->quads.quads.size() != 0) 
+	{
+	  quad_iterator quad = begin_quad (level),
+			endc = (level == levels.size()-1 ?
+				quad_iterator(end_quad()) :
+				begin_quad (level+1));
+	  for (; quad!=endc; ++quad)
+	    ++number_cache.n_quads_level[level];
+	};
+      
+				       // update total number of quads
+      number_cache.n_quads += number_cache.n_quads_level[level];
+    };
+
+				   // do the update for the number
+				   // of active quads as well
+  number_cache.n_active_quads_level.resize (levels.size());
+  number_cache.n_active_quads = 0;
+  for (unsigned int level=0; level<levels.size(); ++level)
+    {
+				       // count quads on this level
+      number_cache.n_active_quads_level[level] = 0;
+      if (levels[level]->quads.quads.size() != 0) 
+	{
+	  active_quad_iterator quad = begin_active_quad (level),
+			       endc = end_active_quad (level);
+	  for (; quad!=endc; ++quad)
+	    ++number_cache.n_active_quads_level[level];
+	};
+      
+				       // update total number of quads
+      number_cache.n_active_quads += number_cache.n_active_quads_level[level];
+    };
+};
+
+#endif
+
+
+#if deal_II_dimension == 1
+
+template <>
+void Triangulation<1>::update_number_cache_hexes () 
+{
+  Assert (false, ExcInternalError());
+};
+
+#endif
+
+
+#if deal_II_dimension == 2
+
+template <>
+void Triangulation<2>::update_number_cache_hexes () 
+{
+  Assert (false, ExcInternalError());
+};
+
+#endif
+
+#if deal_II_dimension >= 3
+
+template <int dim>
+void Triangulation<dim>::update_number_cache_hexes () 
+{
+    				   ///////////////////////////////////
+				   // update the number of hexes
+				   // on the different levels in
+				   // the cache
+  number_cache.n_hexes_level.resize (levels.size());
+  number_cache.n_hexes = 0;
+  for (unsigned int level=0; level<levels.size(); ++level)
+    {
+				       // count hexes on this level
+      number_cache.n_hexes_level[level] = 0;
+      if (levels[level]->hexes.hexes.size() != 0) 
+	{
+	  hex_iterator hex = begin_hex (level),
+		      endc = (level == levels.size()-1 ?
+			      hex_iterator(end_hex()) :
+			      begin_hex (level+1));
+	  for (; hex!=endc; ++hex)
+	    ++number_cache.n_hexes_level[level];
+	};
+      
+				       // update total number of hexes
+      number_cache.n_hexes += number_cache.n_hexes_level[level];
+    };
+
+				   // do the update for the number
+				   // of active hexes as well
+  number_cache.n_active_hexes_level.resize (levels.size());
+  number_cache.n_active_hexes = 0;
+  for (unsigned int level=0; level<levels.size(); ++level)
+    {
+				       // count hexes on this level
+      number_cache.n_active_hexes_level[level] = 0;
+      if (levels[level]->hexes.hexes.size() != 0) 
+	{
+	  active_hex_iterator hex = begin_active_hex (level),
+			     endc = end_active_hex (level);
+	  for (; hex!=endc; ++hex)
+	    ++number_cache.n_active_hexes_level[level];
+	};
+      
+				       // update total number of hexes
+      number_cache.n_active_hexes += number_cache.n_active_hexes_level[level];
+    };
+};
+
+#endif
+
+
+template <int dim>
+void Triangulation<dim>::update_number_cache () 
+{
+				   // play a little bit with switch
+				   // statements without 'break's
+  switch (dim)
+    {
+      case 3:
+	    update_number_cache_hexes();
+      case 2:
+	    update_number_cache_quads();
+      case 1:
+	    update_number_cache_lines();
+	    break;
+	    
+      default:
+	    Assert (false, ExcInternalError());
+    };
+};
 
 
 

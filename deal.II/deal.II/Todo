@@ -212,8 +212,6 @@ Remove the hack in Make_forward_declarations when using gcc2.95. See
   the cvs diffs of 1.6 to 1.7 for the reason.
 
 
-Introduce a number cache, where functions like n_active_quads get
-  their data from. This is worth the work, as can be seen from
-  profiling data, since it prevents us from cycling through all
-  elements each time and above that allows to write
-     for (; i<n_active_cells(); ++i)
+Move the TriaNumberCache into the Triangulation class once the
+  compiler supports this (gcc2.95 does not allow this at present)
+  
