@@ -34,6 +34,22 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+
+       Changed: The Makefiles for the library are now truly
+       parallel. To this end, the automatic generation of the files
+       <tt>forward_declarations.h</tt> in the various directories had
+       to be changed. They will now be generated automatically at the
+       end of the targets <tt>all</tt>, <tt>debug</tt> and
+       <tt>optimized</tt>. They will not be generated while building a
+       single library. In this case, <tt>make forward</tt> can be used
+       to build them manually.
+       <br>
+       I introduced separate targets for the generation of the optimized versions only.
+       <br>
+       (GK 2002/04/17)
+       </p>
+
+  <li> <p> 
        New: The step-13 example program tells you something about
        software design things for finite element programs.
        <br>
