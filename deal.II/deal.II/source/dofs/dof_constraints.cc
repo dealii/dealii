@@ -1227,6 +1227,10 @@ vector_functions;
 vector_functions;
 #undef VectorType
 
+#define VectorType BlockVector<float>
+vector_functions;
+#undef VectorType
+
 
 
 template void ConstraintMatrix::condense<float>(const SparseMatrix<float> &uncondensed,
