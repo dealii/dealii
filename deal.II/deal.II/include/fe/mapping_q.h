@@ -22,18 +22,14 @@ template <int dim> class TensorProductPolynomials;
 
 
 
-
-//TODO:[RH] (later) doc: laplace_on_quad_vector, compute_laplace_on_quad, etc all
-//      see upcoming paper.
-
-
 /**
  * Mapping class that uses Qp-mappings on boundary cells. The mapping
  * shape functions make use of tensor product polynomials with
  * equidistant (on the unit cell) support points.
  *
- * For more details about Qp-mappings, see the small `mapping' report
- * in the `Reports' section of `Documentation'.
+ * For more details about Qp-mappings, see the `mapping' report at
+ * @p{deal.II/doc/reports/mapping_q/index.html} in the `Reports'
+ * section of `Documentation'.
  *
  * @author Ralf Hartmann, Guido Kanschat 2000, 2001
  */
@@ -229,8 +225,8 @@ class MappingQ : public MappingQ1<dim>
 				      * included.
 				      *
 				      * Needed by the
-				      * @p{compute_support_points_simple(laplace)}
-				      * functions. For @p{dim=1} this
+				      * @p{compute_support_points_laplace}
+				      * function . For @p{dim=1} this
 				      * function is empty.
 				      *
 				      * This function is made virtual
@@ -321,6 +317,11 @@ class MappingQ : public MappingQ1<dim>
 				      * the hardcoded data. For
 				      * @p{degree>=4} and MappingQ<2>
 				      * this vector is computed.
+				      *
+				      * For the definition of the
+				      * @p{laplace_on_quad_vector}
+				      * please refer to equation (8)
+				      * of the `mapping' report.
 				      */
     void
     set_laplace_on_quad_vector(Table<2,double> &loqvs) const;
@@ -335,16 +336,27 @@ class MappingQ : public MappingQ1<dim>
 				      * the hardcoded data. For
 				      * @p{degree>2} this vector is
 				      * computed.
+				      *
+				      * For the definition of the
+				      * @p{laplace_on_hex_vector}
+				      * please refer to equation (8)
+				      * of the `mapping' report.
 				      */
     void set_laplace_on_hex_vector(Table<2,double> &lohvs) const;
     
 				     /**
-				      * Computes the @p{laplace_on_quad(hex)_vector}.
+				      * Computes the
+				      * @p{laplace_on_quad(hex)_vector}.
 				      *
 				      * Called by the
-				      * @p{set_laplace_on_(quad)hex_vector}
+				      * @p{set_laplace_on_quad(hex)_vector}
 				      * functions if the data is not
 				      * yet hardcoded.
+				      *
+				      * For the definition of the
+				      * @p{laplace_on_quad(hex)_vector}
+				      * please refer to equation (8)
+				      * of the `mapping' report.
 				      */
     void compute_laplace_vector(Table<2,double> &lvs) const;
 
@@ -358,10 +370,13 @@ class MappingQ : public MappingQ1<dim>
 				      * points.
 				      *
 				      * The vector @p{a} initially
-				      * containts the locations of the
+				      * contains the locations of the
 				      * @p{n_outer} points, the
 				      * @p{n_inner} computed inner
 				      * points are appended.
+				      *
+				      * See equation (7) of the
+				      * `mapping' report.
 				      */
     void apply_laplace_vector(const Table<2,double>   &lvs,
 			      std::vector<Point<dim> > &a) const;
@@ -393,43 +408,6 @@ class MappingQ : public MappingQ1<dim>
       std::vector<Point<dim> > &a) const;
     
 				     /**
-				      * Simple version of the
-				      * @p{compute_support_points_laplace}
-				      * function. Does not use the
-				      * solution to Laplace
-				      * equation. Computes the inner
-				      * support points by simple
-				      * interpolations.
-				      *
-				      * This function isn't used in
-				      * the code as it was replaced in
-				      * @p{compute_mapping_support_points}
-				      * by the
-				      * @p{compute_support_points_laplace}
-				      * function.
-				      *
-				      * Nethertheless this function is
-				      * kept as someone might want to
-				      * do some comparative tests.
-				      */
-    void compute_support_points_simple(
-      const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;    
-    
-				     /**
-				      * For @p{dim=2} and 3. Simple
-				      * version of the
-				      * @p{add_face_support_points}
-				      * function.
-				      *
-				      * Needed by the
-				      * @p{compute_support_points_simple}
-				      */
-//TODO:[RH] (later) remove this function altogether?    
-    void fill_quad_support_points_simple (const typename Triangulation<dim>::cell_iterator &cell,
-					  std::vector<Point<dim> > &a) const;
-    
-				     /**
 				      * Needed by the
 				      * @p{laplace_on_quad} function
 				      * (for @p{dim==2}). Filled by the
@@ -444,6 +422,10 @@ class MappingQ : public MappingQ1<dim>
 				      *   unit_support_points, i.e.
 				      *   unit_support_points on the
 				      *   boundary of the quad
+				      *
+				      * For the definition of this
+				      * vector see equation (8) of the
+				      * `mapping' report.
 				      */
     Table<2,double> laplace_on_quad_vector;
     
@@ -452,6 +434,10 @@ class MappingQ : public MappingQ1<dim>
 				      * @p{laplace_on_hex} function
 				      * (for @p{dim==3}). Filled by the
 				      * constructor.
+				      *
+				      * For the definition of this
+				      * vector see equation (8) of the
+				      * `mapping' report.
 				      */
     Table<2,double> laplace_on_hex_vector;
 
@@ -544,9 +530,6 @@ template <> void MappingQ<1>::add_line_support_points (
 template<> void MappingQ<3>::add_quad_support_points(
   const Triangulation<3>::cell_iterator &cell,
   std::vector<Point<3> >                &a) const;
-template <> void MappingQ<3>::fill_quad_support_points_simple (
-  const Triangulation<3>::cell_iterator &cell,
-  std::vector<Point<3> > &a) const;
 
 
 
