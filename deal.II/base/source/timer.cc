@@ -17,8 +17,8 @@
 
 // these includes should probably be properly
 // ./configure'd using the AC_HEADER_TIME macro:
-#include <sys/resource.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 
 
 // on SunOS 4.x, getrusage is stated in the man pages and exists, but
