@@ -190,6 +190,7 @@ namespace FE_Q_2d
 
 // embedding matrices
 
+template <>
 const double * const 
 FE_Q<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell] =
 {
@@ -202,6 +203,7 @@ FE_Q<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell] =
 };
 
 
+template <>
 const unsigned int
 FE_Q<2>::Matrices::n_embedding_matrices
   = sizeof(FE_Q<2>::Matrices::embedding) /
@@ -245,6 +247,7 @@ namespace FE_Q_2d
 };
 
 
+template <>
 const double * const 
 FE_Q<2>::Matrices::constraint_matrices[] =
 {
@@ -255,6 +258,7 @@ FE_Q<2>::Matrices::constraint_matrices[] =
 };
 
 
+template <>
 const unsigned int 
 FE_Q<2>::Matrices::n_constraint_matrices
   = sizeof(FE_Q<2>::Matrices::constraint_matrices) /
