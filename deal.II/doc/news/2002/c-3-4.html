@@ -619,6 +619,21 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
 
+  <li> <p> New: <code class="class">PointerMatrix</code> now
+  has empty() function, which returns true if the pointer is null; otherwise
+  we call the pointer's empty() function.  This requires the class MATRIX
+  to have an empty() function.
+  <br>
+  (Brian Carnes 2003/05/22)
+  </p>
+
+  <li> <p> New: <code class="class">SparseLUDecomposition</code> now
+  has empty() function, which calls the inherited <code
+  class="class">SparseMatrix</code> empty() function.
+  <br>
+  (Brian Carnes 2003/05/22)
+  </p>
+
   <li> <p> New: <code class="class">PreconditionPSOR</code> implements
   interface to permuted SOR preconditioner function in <code
   class="class">SparseMatrix</code>.
