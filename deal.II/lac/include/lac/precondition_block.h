@@ -82,6 +82,11 @@ class PreconditionBlock : public virtual Subscriptor
 				      * Define number type of matrix.
 				      */
     typedef typename MATRIX::value_type number;
+
+				     /**
+				      * Value type for inverse matrices.
+				      */
+    typedef inverse_type value_type;
     
   public:
 				     /**
@@ -165,6 +170,15 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     bool empty () const;
 
+				     /**
+				      * Read-only access to entries.
+				      * This function is only possible
+				      * if the inverse diagonal blocks
+				      * are stored.
+				      */
+    value_type el(unsigned int i,
+		  unsigned int j) const;
+    
 				     /**
 				      * Use only the inverse of the
 				      * first diagonal block to save
@@ -372,6 +386,11 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				     /**
 				      * Make function of base class public again.
 				      */
+    PreconditionBlock<MATRIX, inverse_type>::el;
+
+				     /**
+				      * Make function of base class public again.
+				      */
     PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
 
 				     /**
@@ -474,6 +493,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * Make function of base class public again.
 				      */
     PreconditionBlock<MATRIX, inverse_type>::empty;
+    
+				     /**
+				      * Make function of base class public again.
+				      */
+    PreconditionBlock<MATRIX, inverse_type>::el;
 
 				     /**
 				      * Make function of base class public again.
@@ -633,6 +657,11 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				     /**
 				      * Make function of base class public again.
 				      */
+    PreconditionBlockSOR<MATRIX, inverse_type>::el;
+
+				     /**
+				      * Make function of base class public again.
+				      */
     PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
 
 				     /**
@@ -686,6 +715,29 @@ PreconditionBlock<MATRIX, inverse_type>::empty () const
   if (A == 0)
     return true;
   return A->empty();
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline inverse_type
+PreconditionBlock<MATRIX, inverse_type>::el (
+  unsigned int i,
+  unsigned int j) const
+{
+  const unsigned int bs = blocksize;
+  const unsigned int nb = i/bs;
+  
+  const FullMatrix<inverse_type>& B = inverse(nb);
+
+  const unsigned int ib = i % bs;
+  const unsigned int jb = j % bs;
+
+  if (jb +nb != j)
+    {
+      return 0.;
+    }
+  
+  return B(ib, jb);
 }
 
 #endif
