@@ -60,6 +60,7 @@ GridReordering<dim>::Cell::insert_faces (map<Face,FaceData> &/*global_faces*/)
 };
 
 
+#if deal_II_dimension == 2
 
 template <>
 void
@@ -172,6 +173,19 @@ GridReordering<2>::Cell::insert_faces (map<Face,FaceData> &global_faces)
     };
 };
 
+#endif
+#if deal_II_dimension == 3
+
+template <>
+void
+GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &/*global_faces*/)
+{
+  const unsigned int dim = 3;
+
+  Assert (false, ExcNotImplemented());
+};
+
+#endif
 
 
 template <int dim>
@@ -246,9 +260,6 @@ void GridReordering<dim>::Cell::find_backtracking_point ()
 				   // of course, not hold for cell 0,
 				   // from which we should never be
 				   // forced to track back
-//    if  (cell_no != 0)
-//      track_back_to_cell = cell_no-1;
-  
   if (cell_no == 0)
     track_back_to_cell = 0;
   else
@@ -260,23 +271,8 @@ void GridReordering<dim>::Cell::find_backtracking_point ()
 
 template <int dim>
 inline
-bool GridReordering<dim>::Cell::check_consistency (const unsigned int /*rot*/) const
+bool GridReordering<dim>::Cell::check_consistency (const unsigned int rot) const
 {
-				   // might be that we can use the
-				   // specialization for dim==2 after
-				   // some modification, but haven't
-				   // thought about that yet
-  Assert (false, ExcNotImplemented());
-  return false;
-};
-
-
-
-template <>
-inline
-bool GridReordering<2>::Cell::check_consistency (const unsigned int rot) const
-{
-  const unsigned int dim = 2;
 				   // make sure that for each face of
 				   // the cell the permuted faces are
 				   // not already in use, as that
@@ -298,43 +294,11 @@ bool GridReordering<2>::Cell::check_consistency (const unsigned int rot) const
 };
 
 
-template <int dim>
-inline
-void GridReordering<dim>::Cell::mark_faces_used (const unsigned int /*rot*/)
-{
-				   // might be that we can use the
-				   // specialization for dim==2 after
-				   // some modification, but haven't
-				   // thought about that yet. in
-				   // particular, I don't know whether
-				   // we have to treat edges in 3d
-				   // specially
-  Assert (false, ExcNotImplemented());
-};
-
-
 
 template <int dim>
 inline
-void GridReordering<dim>::Cell::mark_faces_unused (const unsigned int /*rot*/)
+void GridReordering<dim>::Cell::mark_faces_used (const unsigned int rot)
 {
-				   // might be that we can use the
-				   // specialization for dim==2 after
-				   // some modification, but haven't
-				   // thought about that yet. in
-				   // particular, I don't know whether
-				   // we have to treat edges in 3d
-				   // specially
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <>
-inline
-void GridReordering<2>::Cell::mark_faces_used (const unsigned int rot)
-{
-  const unsigned int dim=2;
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     {
       Assert (faces[rot][face]->second.use_count < 2,
@@ -345,11 +309,10 @@ void GridReordering<2>::Cell::mark_faces_used (const unsigned int rot)
 
 
 
-template <>
+template <int dim>
 inline
-void GridReordering<2>::Cell::mark_faces_unused (const unsigned int rot)
+void GridReordering<dim>::Cell::mark_faces_unused (const unsigned int rot)
 {
-  const unsigned int dim=2;
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     {
       Assert (faces[rot][face]->second.use_count > 0,
@@ -443,10 +406,12 @@ void GridReordering<dim>::track_back (vector<Cell>  &cells,
 				       // backtracking
       const typename vector<Cell>::iterator
 	try_cell = cells.begin() + rotation_states.size();
-//        cout << "Further backtracking from " << rotation_states.size()
-//  	   << " to " << try_cell->track_back_to_cell << endl;
-
+      
       track_back_to_cell = try_cell->track_back_to_cell;
+      
+//        cout << "Further backtracking from " << rotation_states.size()
+//  	   << " to " << track_back_to_cell << endl;
+
       Assert (track_back_to_cell > 0, ExcInternalError());
 
 				       // track further back. this
