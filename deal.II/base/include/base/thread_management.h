@@ -2830,7 +2830,7 @@ namespace Threads
     };
 
                                      // forward declare another class
-    template <typename> struct wrapper_base;
+    template <typename, typename> struct wrapper_base;
   }
 
 
@@ -2971,11 +2971,24 @@ namespace Threads
                                       * Base class for the classes
                                       * wrapping function pointers and
                                       * arguments for non-member and
-                                      * member functions.
+                                      * member functions. The first
+                                      * template class denotes the
+                                      * return type of the function
+                                      * being called. The second one
+                                      * is a class that provides a
+                                      * function @p{entry_point},
+                                      * which will be used as an entry
+                                      * point for the new thread. In
+                                      * the classes derived from this
+                                      * one, the second template
+                                      * argument is actually the
+                                      * derived class itself, using
+                                      * something like the
+                                      * Barton-Nackman trick.
                                       *
                                       * @author Wolfgang Bangerth, 2003
                                       */
-    template <typename RT>
+    template <typename RT, typename EntryPointClass>
     struct wrapper_base
     {
 
@@ -2991,20 +3004,14 @@ namespace Threads
             DescriptionPointer(new internal::thread_description<RT>());
 
           ThreadMutex::ScopedLock lock (mutex);        
-          thread_descriptor->create (entry_point, (void *)this);
+          thread_descriptor->create (&EntryPointClass::entry_point,
+				     (void *)this);
           condition.wait (mutex);
 
           return thread_descriptor;
         }
 
       protected:
-                                         /**
-                                          * Typedef for the type of a
-                                          * thread entry point, as
-                                          * required by POSIX.
-                                          */
-        typedef void * (*EntryPoint) (void *);
-
                                          /**
                                           * Typedef for shared
                                           * pointers to the objects
@@ -3014,14 +3021,6 @@ namespace Threads
         typedef
         boost::shared_ptr<internal::thread_description<RT> >
         DescriptionPointer;
-
-                                         /**
-                                          * Constructor. Take the
-                                          * address of a thread entry
-                                          * point and store it.
-                                          */
-        wrapper_base (const EntryPoint ep)
-                        : entry_point (ep) {};
 
                                          /**
                                           * Shared pointer to the
@@ -3038,16 +3037,6 @@ namespace Threads
                                           */
         mutable ThreadMutex     mutex;    
         mutable ThreadCondition condition;
-
-      private:
-                                         /**
-                                          * Address of the thread
-                                          * entry point. Is set in the
-                                          * constructor, and is the
-                                          * address of a function in
-                                          * derived classes.
-                                          */
-        const EntryPoint entry_point;
     };
   
 
@@ -3062,7 +3051,7 @@ namespace Threads
                                       * @author Wolfgang Bangerth, 2003
                                       */
     template <typename RT, typename ArgList>
-    struct fun_wrapper : public wrapper_base<RT>
+    struct fun_wrapper : public wrapper_base<RT, fun_wrapper<RT,ArgList> >
     {
                                          /**
                                           * Typedef for the type of
@@ -3097,8 +3086,7 @@ namespace Threads
                                           */
         fun_wrapper (FunPtr               fun_ptr,
                      const ArgReferences &args)
-                        : wrapper_base<RT> (&entry_point),
-                          fun_ptr (fun_ptr),
+                        : fun_ptr (fun_ptr),
                           args (args)  {};
       private:
                                          /**
@@ -3138,8 +3126,8 @@ namespace Threads
                                           */
         static void * entry_point (void *arg)
           {
-            const wrapper_base<RT> *w
-              = reinterpret_cast<const wrapper_base<RT>*> (arg);
+            const wrapper_base<RT, fun_wrapper> *w
+              = reinterpret_cast<const wrapper_base<RT, fun_wrapper>*> (arg);
             const fun_wrapper *wrapper
               = static_cast<const fun_wrapper*> (w);
 
@@ -3191,6 +3179,15 @@ namespace Threads
           
             return 0;
           };
+
+
+					 /**
+					  * Make the base class a
+					  * friend, so that it can
+					  * access the thread entry
+					  * point function.
+					  */
+	template <typename, typename> friend class wrapper_base;
     };
 
   
@@ -3205,7 +3202,7 @@ namespace Threads
                                       * @author Wolfgang Bangerth, 2003
                                       */
     template <typename RT, class C, typename ArgList>
-    struct mem_fun_wrapper : public wrapper_base<RT>
+    struct mem_fun_wrapper : public wrapper_base<RT, mem_fun_wrapper<RT,C,ArgList> >
     {
                                          /**
                                           * Typedef for the type of
@@ -3241,10 +3238,10 @@ namespace Threads
         mem_fun_wrapper (MemFunPtr            mem_fun_ptr,
                          C                   &c,
                          const ArgReferences &args)
-                        : wrapper_base<RT> (&entry_point),
-                          c (c),
-                          mem_fun_ptr (mem_fun_ptr),
-                          args (args)  {};
+                        :
+			c (c),
+			mem_fun_ptr (mem_fun_ptr),
+			args (args)  {};
       private:
                                          /**
                                           * Default constructor. Made
@@ -3285,8 +3282,8 @@ namespace Threads
                                           */
         static void * entry_point (void *arg)
           {
-            const wrapper_base<RT> *w
-              = reinterpret_cast<const wrapper_base<RT>*> (arg);
+            const wrapper_base<RT,mem_fun_wrapper> *w
+              = reinterpret_cast<const wrapper_base<RT,mem_fun_wrapper>*> (arg);
             const mem_fun_wrapper *wrapper
               = static_cast<const mem_fun_wrapper*> (w);
 
@@ -3339,6 +3336,14 @@ namespace Threads
           
             return 0;
           };
+
+					 /**
+					  * Make the base class a
+					  * friend, so that it can
+					  * access the thread entry
+					  * point function.
+					  */
+	template <typename, typename> friend class wrapper_base;
     };
   }
 
