@@ -448,11 +448,12 @@ class MatrixTools : public MatrixCreator<dim>
 				      * as described in the general
 				      * documentation.
 				      */
+    template <typename number>
     static void
     apply_boundary_values (const map<unsigned int,double> &boundary_values,
-			   SparseMatrix<double>  &matrix,
-			   Vector<double>        &solution,
-			   Vector<double>        &right_hand_side,
+			   SparseMatrix<number>  &matrix,
+			   Vector<number>        &solution,
+			   Vector<number>        &right_hand_side,
 			   const bool             eliminate_columns = true);
 
 				     /**

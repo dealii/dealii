@@ -517,11 +517,12 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 
 
 template <int dim>
+template <typename number>
 void
 MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
-					 SparseMatrix<double>  &matrix,
-					 Vector<double>   &solution,
-					 Vector<double>   &right_hand_side,
+					 SparseMatrix<number>  &matrix,
+					 Vector<number>   &solution,
+					 Vector<number>   &right_hand_side,
 					 const bool        preserve_symmetry)
 {
   Assert (matrix.n() == matrix.m(),
@@ -549,7 +550,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 				   // the first nonzero diagonal
 				   // element of the matrix, or 1 if
 				   // there is no such thing
-  double first_nonzero_diagonal_entry = 1;
+  number first_nonzero_diagonal_entry = 1;
   for (unsigned int i=0; i<n_dofs; ++i)
     if (matrix.diag_element(i) != 0)
       {
@@ -591,7 +592,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 				       //
 				       // store the new rhs entry to make
 				       // the gauss step more efficient
-      double new_rhs;
+      number new_rhs;
       if (matrix.diag_element(dof_number) != 0.0)
 	new_rhs = right_hand_side(dof_number)
 		= dof->second * matrix.diag_element(dof_number);
@@ -600,7 +601,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 					   // use the SparseMatrix::
 					   // to work around a bug in
 					   // egcs
-	  matrix.SparseMatrix<double>::set (dof_number, dof_number,
+	  matrix.SparseMatrix<number>::set (dof_number, dof_number,
 					    first_nonzero_diagonal_entry);
 	  new_rhs = right_hand_side(dof_number)
 		  = dof->second * first_nonzero_diagonal_entry;
@@ -619,7 +620,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 					   // store the only nonzero entry
 					   // of this line for the Gauss
 					   // elimination step
-	  const double diagonal_entry = matrix.diag_element(dof_number);
+	  const number diagonal_entry = matrix.diag_element(dof_number);
 	  
 					   // we have to loop over all
 					   // rows of the matrix which
@@ -1410,6 +1411,22 @@ template class MatrixTools<deal_II_dimension>;
 template class MassMatrix<deal_II_dimension>;
 template class LaplaceMatrix<deal_II_dimension>;
 
+
+template
+void
+MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
+					 SparseMatrix<double>  &matrix,
+					 Vector<double>   &solution,
+					 Vector<double>   &right_hand_side,
+					 const bool        preserve_symmetry);
+
+template
+void
+MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
+					 SparseMatrix<float>  &matrix,
+					 Vector<float>   &solution,
+					 Vector<float>   &right_hand_side,
+					 const bool       preserve_symmetry);
 
 template
 void
