@@ -41,7 +41,9 @@ enum NormType {
       mean,
       L1_norm,
       L2_norm,
-      Linfty_norm
+      Linfty_norm,
+      H1_seminorm,
+      H1_norm
 };
 
 
@@ -176,7 +178,8 @@ enum NormType {
   of freedom, which can then be attached to a #DataOut# object to be printed.
   
   Presently, there is the possibility to compute the following values from the
-  difference, on each cell: #mean#, #L1_norm#, #L2_norm#, #Linfty_norm#.
+  difference, on each cell: #mean#, #L1_norm#, #L2_norm#, #Linfty_norm#,
+  #H1_seminorm#.
   For the mean difference value, the reference function minus the numerical
   solution is computed, not the other way round.
 
@@ -198,6 +201,9 @@ enum NormType {
   intended as a rule of thumb, rather they are though to illustrate that the
   use of the wrong quadrature formula may show a significantly wrong result
   and care should be taken to chose the right formula.
+
+  The $H_1$ seminorm is the $L_2$ norm of the gradient of the difference. The
+  full $H_1$ norm is the sum of the seminorm and the $L_2$ norm.
   
   To get the {\it global} L_1 error, you have to sum up the entries in
   #difference#, e.g. using #dVector::l1_norm# function.
@@ -210,6 +216,9 @@ enum NormType {
   To get the global mean difference, simply sum up the elements as above.
   To get the L_\infty norm, take the maximum of the vector elements, e.g.
   using the #dVector::linfty_norm# function.
+
+  For the global $H_1$ norm and seminorm, the same rule applies as for the
+  $L_2$ norm: compute the $l_2$ norm of the cell error vector.
   */
 template <int dim>
 class ProblemBase {

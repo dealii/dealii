@@ -18,11 +18,15 @@
 
 
 
-inline double sqr (double x) {
+inline double sqr (const double x) {
   return x*x;
 };
 
 
+template <int dim>
+inline double sqr_point (const Point<dim> &p) {
+  return p.square();
+};
 
 
 
@@ -162,6 +166,8 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
   update_flags.q_points   = true;
   update_flags.jacobians  = true;
   update_flags.JxW_values = true;
+  if ((norm==H1_seminorm) || (norm==H1_norm))
+    update_flags.gradients = true;
   FEValues<dim> fe_values(fe, q, update_flags);
   
 				   // loop over all cells
@@ -188,6 +194,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 	  case L1_norm:
 	  case L2_norm:
 	  case Linfty_norm:
+	  case H1_norm:
 	  {
 					     // we need the finite element
 					     // function \psi at the different
@@ -240,9 +247,12 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 				 psi.begin(), ptr_fun(fabs));
 		      break;
 		case L2_norm:
+		case H1_norm:
 		      transform (psi.begin(), psi.end(),
 				 psi.begin(), ptr_fun(sqr));
 		      break;
+		default:
+		      Assert (false, ExcNotImplemented());
 	      };
 
 					     // ok, now we have the integrand,
@@ -259,6 +269,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 					    0.0);
 		      break;
 		case L2_norm:
+		case H1_norm:
 		      diff = sqrt(inner_product (psi.begin(), psi.end(),
 						 fe_values.get_JxW_values().begin(),
 						 0.0));
@@ -266,11 +277,63 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 		case Linfty_norm:
 		      diff = *max_element (psi.begin(), psi.end());
 		      break;
+		default:
+		      Assert (false, ExcNotImplemented());
 	      };
-	    
-	    break;
+
+					     // note: the H1_norm uses the result
+					     // of the L2_norm and control goes
+					     // over to the next case statement!
+	    if (norm != H1_norm)
+	      break;
 	  };
 
+	  case H1_seminorm:
+	  {
+					     // note: the computation of the
+					     // H1_norm starts at the previous
+					     // case statement, but continues
+					     // here!
+
+					     // for H1_norm: re-square L2_norm.
+	    diff = sqr(diff);
+
+					     // same procedure as above, but now
+					     // psi is a vector of gradients
+	    const unsigned int n_dofs = fe.total_dofs;
+	    const unsigned int n_q_points = q.n_quadrature_points;
+	    const vector<vector<Point<dim> > > & shape_grads = fe_values.get_shape_grads();
+	    vector<double>   dof_values;
+	    cell->get_dof_values (solution, dof_values);
+	    
+	    vector<Point<dim> >   psi;
+
+					     // in praxi: first compute
+					     // exact solution vector
+	    exact_solution.gradient_list (fe_values.get_quadrature_points(),
+					  psi);
+	    
+					     // then subtract finite element
+					     // solution
+	    for (unsigned int j=0; j<n_q_points; ++j) 
+	      for (unsigned int i=0; i<n_dofs; ++i)
+		psi[j] -= dof_values[i]*shape_grads[i][j];
+
+					     // take square of integrand
+	    vector<double> psi_square (psi.size(), 0.0);
+	    for (unsigned int i=0; i<n_q_points; ++i)
+	      psi_square[i] = sqr_point(psi[i]);
+
+					     // add seminorm to L_2 norm or
+					     // to zero
+	    diff += inner_product (psi_square.begin(), psi_square.end(),
+				   fe_values.get_JxW_values().begin(),
+				   0.0);
+	    diff = sqrt(diff);
+
+	    break;
+	  };
+					     
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
