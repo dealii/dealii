@@ -1144,27 +1144,43 @@ template <>
 unsigned int DoFHandler<1>::n_boundary_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
-
-
-
-template <>
-unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const
-{
-  Assert (selected_fe != 0, ExcNoFESelected());
   return 2*selected_fe->dofs_per_vertex;
 };
 
 
 
 template <>
-unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const
+unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (false, ExcNotImplemented());
-  return 0;
+
+				   // check that only boundary
+				   // indicators 0 and 1 are allowed
+				   // in 1d
+  for (FunctionMap::const_iterator i=boundary_indicators.begin();
+       i!=boundary_indicators.end(); ++i)
+    Assert ((i->first == 0) || (i->first == 1),
+	    ExcInvalidBoundaryIndicator());
+
+  return boundary_indicators.size()*selected_fe->dofs_per_vertex;
+};
+
+
+
+template <>
+unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &boundary_indicators) const
+{
+  Assert (selected_fe != 0, ExcNoFESelected());
+
+				   // check that only boundary
+				   // indicators 0 and 1 are allowed
+				   // in 1d
+  for (std::set<unsigned char>::const_iterator i=boundary_indicators.begin();
+       i!=boundary_indicators.end(); ++i)
+    Assert ((*i == 0) || (*i == 1),
+	    ExcInvalidBoundaryIndicator());
+
+  return boundary_indicators.size()*selected_fe->dofs_per_vertex;
 };
 
 #endif
