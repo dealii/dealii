@@ -680,7 +680,7 @@ sub writeClassDescription
 
 		$term = "<HR>\n";
 
-		$Description =~ s/\n\n+/\n<\/p><p>\n/g;
+		$Description =~ s/\n(\s*\n)+/\n<\/p><p>\n/g;
 
 		print CLASS "\n", makeReferencedText($Description) ,"\n</P>";
 	}
@@ -775,7 +775,7 @@ sub writeMemberDoc
 		print CLASS "<p><strong>For internal use only.</strong></p>\n" 
 			if $MethInternal;
 
-		$Description =~ s/\n\n+/\n<\/p><p>\n/g;
+		$Description =~ s/\n(\s*\n)+/\n<\/p><p>\n/g;
 
 		print CLASS "<p>",makeReferencedText($Description),"</p>\n";
 		
