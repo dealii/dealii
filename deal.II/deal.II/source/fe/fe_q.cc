@@ -1351,6 +1351,15 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
   else
 				     // more dimensions
     {
+                                       // first, special-case interior
+                                       // shape functions, since they
+                                       // have no support no-where on
+                                       // the boundary
+      if (((dim==2) && (shape_index>=first_quad_index))
+          ||
+          ((dim==3) && (shape_index>=first_hex_index)))
+        return false;
+                                       
                                        // let's see whether this is a
                                        // vertex
       if (shape_index < first_line_index) 
@@ -1431,12 +1440,14 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
                   ExcInternalError());
           
                                            // in 2d, cell bubble are
-                                           // zero on all faces
-          if (dim == 2)
-            return false;
+                                           // zero on all faces. but
+                                           // we have treated this
+                                           // case above already
+          Assert (dim != 2, ExcInternalError());
+
                                            // in 3d,
                                            // quad_index=face_index
-          else if (dim == 3)
+          if (dim == 3)
             return (quad_index == face_index);
           else
             Assert (false, ExcNotImplemented());
@@ -1444,13 +1455,18 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
       else
                                          // dof on hex
         {
-          Assert (dim == 3, ExcNotImplemented());
-                                           // in 3d, hex dofs are
-                                           // bubbles and are zero on
-                                           // the boundary
+                                           // can only happen in 3d,
+                                           // but this case has
+                                           // already been covered
+                                           // above
+          Assert (false, ExcNotImplemented());
           return false;
         };
     };
+
+                                   // we should not have gotten here
+  Assert (false, ExcInternalError());
+  return false;
 };
 
 
