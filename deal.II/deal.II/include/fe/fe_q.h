@@ -233,7 +233,7 @@
  * Note the reverse ordering of degrees of freedom on the left and upper
  * line.
  *
- * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001, Ralf Hartmann, 2001, 2004
+ * @author Wolfgang Bangerth, 1998; Guido Kanschat, 2001; Ralf Hartmann, 2001, 2004; Oliver Kayser-Herold, 2004
  */
 template <int dim>
 class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
