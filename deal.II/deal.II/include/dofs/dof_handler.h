@@ -832,7 +832,13 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * distribute it to the dofs in such a
 				      * way that a finite element field results,
 				      * which can then be further processed,
-				      * e.g. for output.
+				      * e.g. for output. You should note that
+				      * the resulting field will not be
+				      * continuous at hanging nodes. This can,
+				      * however, easily be arranged by calling
+				      * the appropraite #distribute# function
+				      * of a #ConstraintMatrix# object created
+				      * for this #DoFHandler# object.
 				      *
 				      * It is assumed that the number of
 				      * elements in #cell_data# equals the
