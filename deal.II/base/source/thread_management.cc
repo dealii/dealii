@@ -45,6 +45,49 @@ namespace Threads
   };
 
 
+
+  void handle_std_exception (const std::exception &exc) 
+  {
+    std::cerr << std::endl << std::endl
+              << "---------------------------------------------------------"
+              << std::endl
+              << "In one of the sub-threads of this program, an exception\n"
+              << "was thrown and not caught. Since exceptions do not\n"
+              << "propagate to the main thread, the library has caught it.\n"
+              << "The information carried by this exception is given below.\n"
+              << std::endl
+              << "---------------------------------------------------------"
+              << std::endl;
+    std::cerr << "Exception on processing: " << std::endl
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "---------------------------------------------------------"
+              << std::endl;
+    std::abort ();
+  };
+
+
+
+  void handle_unknown_exception ()
+  {
+    std::cerr << std::endl << std::endl
+              << "---------------------------------------------------------"
+              << std::endl
+              << "In one of the sub-threads of this program, an exception\n"
+              << "was thrown and not caught. Since exceptions do not\n"
+              << "propagate to the main thread, the library has caught it.\n"
+              << "The information carried by this exception is given below.\n"
+              << std::endl
+              << "---------------------------------------------------------"
+              << std::endl;
+    std::cerr << "Type of exception is unknown, but not std::exception.\n"
+              << "No additional information is available.\n"
+              << "---------------------------------------------------------"
+              << std::endl;
+    std::abort ();
+  };
+  
+
   
   unsigned int n_existing_threads () 
   {

@@ -4734,6 +4734,44 @@ namespace Threads
                                     * functions below.
                                     */
   void deregister_new_thread ();  
+
+                                   /**
+                                    * If in a sub-thread an exception
+                                    * is thrown, it is not propagated
+                                    * to the main thread. Therefore,
+                                    * the exception handler that is
+                                    * provided by the applications
+                                    * main function or some of its
+                                    * other parts will not be able to
+                                    * catch these
+                                    * exceptions. Therefore, we have
+                                    * to provide an exception handler
+                                    * in the top function of each
+                                    * sub-thread that at least catches
+                                    * the exception and prints some
+                                    * information, rather than letting
+                                    * the operating system to just
+                                    * kill the program without a
+                                    * message. In each of the
+                                    * functions we use as entry points
+                                    * to new threads, we therefore
+                                    * install a try-catch block, and
+                                    * if an exception of type
+                                    * @p{std::exception} is caught, it
+                                    * passes over control to this
+                                    * function, which will then
+                                    * provide some output.
+                                    */
+  void handle_std_exception (const std::exception &exc);
+
+                                   /**
+                                    * Same as above, but the type of
+                                    * the exception is not derived
+                                    * from @p{std::exception}, so
+                                    * there is little way to provide
+                                    * something more useful.
+                                    */
+  void handle_unknown_exception ();
   
 };   // end declarations of namespace Threads
 
@@ -4797,11 +4835,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)();
+    try 
+      {
+        (*fun_ptr)();
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -4879,11 +4936,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1);
+    try 
+      {
+        (*fun_ptr)(arg1);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -4965,11 +5041,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1, arg2);
+    try 
+      {
+        (*fun_ptr)(arg1, arg2);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -5057,11 +5152,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1, arg2, arg3);
+    try 
+      {
+        (*fun_ptr)(arg1, arg2, arg3);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
 
     return 0;
@@ -5154,11 +5268,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1, arg2, arg3, arg4);
+    try 
+      {
+        (*fun_ptr)(arg1, arg2, arg3, arg4);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -5256,11 +5389,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
+    try 
+      {
+        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -5364,11 +5516,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
+    try 
+      {
+        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -5478,11 +5649,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    try 
+      {
+        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -5599,11 +5789,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    try 
+      {
+        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -5724,11 +5933,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    try 
+      {
+        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -5857,11 +6085,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    try 
+      {
+        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -5954,11 +6201,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)();
+    try 
+      {
+        (object->*fun_ptr)();
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -6050,11 +6316,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1);
+    try 
+      {
+        (object->*fun_ptr)(arg1);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -6150,11 +6435,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1, arg2);
+    try 
+      {
+        (object->*fun_ptr)(arg1, arg2);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -6258,11 +6562,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1, arg2, arg3);
+    try 
+      {
+        (object->*fun_ptr)(arg1, arg2, arg3);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -6373,11 +6696,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1, arg2, arg3, arg4);
+    try 
+      {
+        (object->*fun_ptr)(arg1, arg2, arg3, arg4);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -6493,11 +6835,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
+    try 
+      {
+        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -6620,11 +6981,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
+    try 
+      {
+        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -6755,11 +7135,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    try 
+      {
+        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -6893,11 +7292,30 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    try 
+      {
+        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -7037,11 +7455,31 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    try 
+      {
+        (object->*fun_ptr)(arg1, arg2, arg3, arg4,
+                           arg5, arg6, arg7, arg8, arg9);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;
@@ -7187,11 +7625,31 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // register new thread, call the
+                                     // register new thread, call the
 				     // function, and upon its return,
-				     // de-register it again
+				     // de-register it again. since an
+				     // exception that is thrown from
+				     // one of the called functions
+				     // will not propagate to the main
+				     // thread, it will kill the
+				     // program if not treated here
+				     // before we return to the
+				     // operating system's thread
+				     // library
     register_new_thread ();
-    (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    try 
+      {
+        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5,
+                           arg6, arg7, arg8, arg9, arg10);
+      }
+    catch (const std::exception &exc)
+      {
+        handle_std_exception (exc);
+      }
+    catch (...)
+      {
+        handle_unknown_exception ();
+      };
     deregister_new_thread ();
   
     return 0;

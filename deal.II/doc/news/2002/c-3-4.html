@@ -160,6 +160,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> Changed: When an exception is thrown but not caught in a sub-thread,
+       this exception is not passed to the main thread by the operating
+       system. Rather, if the exception is not caught from the function that
+       was invoked by the spawning system function, the entire program is
+       terminated without an additional message. The wrapper functions which
+       are used to spawn new threads in the <code class="class">Threads</code>
+       namespace therefore now catch these exceptions and at least print the
+       message they carry, before aborting the program. This way, at least the
+       message gets displayed.
+       <br>
+       (WB 2002/10/13)
+       </p>
+
   <li> <p> Changed: The class <code
        class="member">Table&lt;2&gt;::fill</code> function, which is also
        inherited from the <code class="class">FullMatrix</code> class, used to
