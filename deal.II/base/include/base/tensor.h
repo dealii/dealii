@@ -179,12 +179,6 @@ class Tensor
 				      */
     static unsigned int memory_consumption ();
 
-// 				     /**
-// 				      * Exception
-// 				      */
-//     DeclException2(ExcWrongVectorSize, unsigned, int, << "Tensor has " << arg1
-// 		   << " entries, but vector has size " << arg2);
-    
   private:
 				     /**
 				      * Array of tensors holding the
