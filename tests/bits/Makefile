@@ -47,10 +47,11 @@ tests_x = anna_? \
 	  q_points \
           find_cell_* \
           sparse_matrix_* \
-	  full_matrix_vector_*
+	  full_matrix_vector_* \
+	  solver_selector
 
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  tests_x += petsc_*
+  tests_x += vector_* petsc_*
 endif
 
 # from above list of regular expressions, generate the real set of
