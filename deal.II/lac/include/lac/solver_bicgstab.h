@@ -7,6 +7,7 @@
 #include <base/logstream.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>
+#include <cmath>
 
 /**
  * Bicgstab algorithm by van der Vorst.
