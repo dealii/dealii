@@ -521,7 +521,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       QGauss3<dim>  q;
   
       cout << "    Calculating L2 error... ";
-      VectorTools<dim>::integrate_difference (*dof_handler,
+      VectorTools::integrate_difference (*dof_handler,
 					      solution, *solution_function,
 					      l2_error_per_cell, q,
 					      L2_norm);
@@ -529,7 +529,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       l2_error.push_back (l2_error_per_cell.l2_norm());
 
       cout << "    Calculating L-infinity error... ";
-      VectorTools<dim>::integrate_difference (*dof_handler,
+      VectorTools::integrate_difference (*dof_handler,
 					      solution, *solution_function,
 					      linfty_error_per_cell, q,
 					      Linfty_norm);
@@ -537,7 +537,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       linfty_error.push_back (linfty_error_per_cell.linfty_norm());
 
       cout << "    Calculating H1 error... ";
-      VectorTools<dim>::integrate_difference (*dof_handler,
+      VectorTools::integrate_difference (*dof_handler,
 					      solution, *solution_function,
 					      h1_error_per_cell, q, 
 					      H1_norm);

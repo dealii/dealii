@@ -251,24 +251,9 @@ enum NormType {
  *
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim>
 class VectorTools
 {
   public:
-				     /**
-				      *	Declare a data type which denotes a
-				      *	mapping between a boundary indicator
-				      *	and the function denoting the boundary
-				      *	values on this part of the boundary.
-				      *	Only one boundary function may be given
-				      *	for each boundary indicator, which is
-				      *	guaranteed by the #map# data type.
-				      *	
-				      *	See the general documentation of this
-				      *	class for more detail.
-				      */
-    typedef map<unsigned char,const Function<dim>*> FunctionMap;
-
 				     /**
 				      * Compute the interpolation of
 				      * #function# at the support
@@ -281,6 +266,7 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for further information.
 				      */
+    template <int dim>
     static void interpolate (const DoFHandler<dim>    &dof,
 			     const Function<dim>      &function,
 			     Vector<double>           &vec);
@@ -297,11 +283,12 @@ class VectorTools
 				      * #transfer#. Curved boundaries
 				      * are neglected so far.
 				      */
-    static void interpolate(const DoFHandler<dim>    &high_dof,
-			    const DoFHandler<dim>    &low_dof,
-			    const FullMatrix<double> &transfer,
-			    const Vector<double>     &high,
-			    Vector<double>           &low);
+    template <int dim>
+    static void interpolate (const DoFHandler<dim>    &high_dof,
+			     const DoFHandler<dim>    &low_dof,
+			     const FullMatrix<double> &transfer,
+			     const Vector<double>     &high,
+			     Vector<double>           &low);
 			  
 				     /**
 				      * Compute the projection of
@@ -335,6 +322,7 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for further information.
 				      */
+    template <int dim>
     static void project (const DoFHandler<dim>    &dof,
 			 const ConstraintMatrix   &constraints,
 			 const Quadrature<dim>    &quadrature,
@@ -350,6 +338,7 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for further information.
 				      */				      
+    template <int dim>
     static void create_right_hand_side (const DoFHandler<dim>    &dof,
 					const Quadrature<dim>    &q,
 					const Function<dim>      &rhs,
@@ -398,6 +387,7 @@ class VectorTools
 				      * See the general doc for more
 				      * information.
 				      */
+    template <int dim>
     static void interpolate_boundary_values (const DoFHandler<dim> &dof,
 					     const unsigned char    boundary_component,
 					     const Function<dim>   &boundary_function,
@@ -425,8 +415,9 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for further information.
 				      */
+    template <int dim>
     static void project_boundary_values (const DoFHandler<dim>  &dof,
-					 const FunctionMap      &boundary_function,
+					 const map<unsigned char,const Function<dim>*> &boundary_function,
 					 const Quadrature<dim-1>&q,
 					 map<int,double>        &boundary_values);
     
@@ -473,6 +464,7 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for more information.
 				      */
+    template <int dim>
     static void integrate_difference (const DoFHandler<dim>    &dof,
 				      const Vector<double>     &fe_function,
 				      const Function<dim>      &exact_solution,

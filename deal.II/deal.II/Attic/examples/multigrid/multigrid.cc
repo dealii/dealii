@@ -399,7 +399,7 @@ void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
 
   for (FunctionMap::const_iterator bc=dirichlet_bc.begin();
        bc != dirichlet_bc.end(); ++bc)
-    VectorTools<dim>::interpolate_boundary_values (*dof,
+    VectorTools::interpolate_boundary_values (*dof,
 						   bc->first,
 						   *bc->second,
 						   boundary_value_list);
@@ -511,7 +511,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   Vector<float>       h1_seminorm_error_per_cell, h1_error_per_cell;
   
   cout << "    Calculating L1 error... ";
-  VectorTools<dim>::integrate_difference (*dof,
+  VectorTools::integrate_difference (*dof,
 					  solution, sol,
 					  l1_error_per_cell,
 					  *quadrature, L1_norm);
@@ -519,7 +519,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   l1_error.push_back (l1_error_per_cell.l1_norm());
 
   cout << "    Calculating L2 error... ";
-  VectorTools<dim>::integrate_difference (*dof,
+  VectorTools::integrate_difference (*dof,
 					  solution, sol,
 					  l2_error_per_cell,
 					  *quadrature, L2_norm);
@@ -527,7 +527,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   l2_error.push_back (l2_error_per_cell.l2_norm());
 
   cout << "    Calculating L-infinity error... ";
-  VectorTools<dim>::integrate_difference (*dof,
+  VectorTools::integrate_difference (*dof,
 					  solution, sol,
 					  linfty_error_per_cell,
 					  *quadrature, Linfty_norm);
@@ -535,7 +535,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   linfty_error.push_back (linfty_error_per_cell.linfty_norm());
   
   cout << "    Calculating H1-seminorm error... ";
-  VectorTools<dim>::integrate_difference (*dof,
+  VectorTools::integrate_difference (*dof,
 					  solution, sol,
 					  h1_seminorm_error_per_cell,
 					  *quadrature, H1_seminorm);
@@ -543,7 +543,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   h1_seminorm_error.push_back (h1_seminorm_error_per_cell.l2_norm());
 
   cout << "    Calculating H1 error... ";
-  VectorTools<dim>::integrate_difference (*dof,
+  VectorTools::integrate_difference (*dof,
 					  solution, sol,
 					  h1_error_per_cell,
 					  *quadrature, H1_norm);
@@ -568,12 +568,12 @@ int PoissonProblem<dim>::run (const unsigned int level) {
 //       Vector<double> projected_solution;
 //       ConstraintMatrix constraints;
 //       constraints.close ();
-//       VectorTools<dim>::project (*dof, constraints, *fe,
+//       VectorTools::project (*dof, constraints, *fe,
 // 				 StraightBoundary<dim>(), *quadrature, 
 // 				 sol, projected_solution, false,
 // 				 *boundary_quadrature);
 //       cout << "    Calculating L2 error of projected solution... ";
-//       VectorTools<dim>::integrate_difference (*dof,
+//       VectorTools::integrate_difference (*dof,
 // 					      projected_solution, sol,
 // 					      l2_error_per_cell,
 // 					      *quadrature, *fe, L2_norm);

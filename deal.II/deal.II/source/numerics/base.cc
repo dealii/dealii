@@ -129,10 +129,10 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 
   for (FunctionMap::const_iterator dirichlet = dirichlet_bc.begin() ;
        dirichlet != dirichlet_bc.end() ; ++dirichlet)
-    VectorTools<dim>::interpolate_boundary_values (*dof_handler,
-						   dirichlet->first,
-						   *(dirichlet->second), 
-						   boundary_value_list);
+    VectorTools::interpolate_boundary_values (*dof_handler,
+					      dirichlet->first,
+					      *(dirichlet->second), 
+					      boundary_value_list);
   MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					   system_matrix, solution,
 					   right_hand_side);  

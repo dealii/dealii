@@ -5926,7 +5926,7 @@ void TimeStep_Dual<dim>::do_timestep ()
     {
       static const ZeroFunction<dim> boundary_values;
       
-      VectorTools<dim>::interpolate_boundary_values (*dof_handler, 0, boundary_values,
+      VectorTools::interpolate_boundary_values (*dof_handler, 0, boundary_values,
 						     boundary_value_list);
       MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					       system_matrix, v,
@@ -8161,13 +8161,13 @@ void TimeStep_Primal<dim>::do_initial_step ()
 
 				   // use L2-projection for u0 and v0
 #if 2 == 1
-  VectorTools<dim>::interpolate (*dof_handler, *parameters.initial_u, u);
-  VectorTools<dim>::interpolate (*dof_handler, *parameters.initial_v, v);
+  VectorTools::interpolate (*dof_handler, *parameters.initial_u, u);
+  VectorTools::interpolate (*dof_handler, *parameters.initial_v, v);
 #else
-  VectorTools<dim>::project (*dof_handler, constraints,
+  VectorTools::project (*dof_handler, constraints,
 			     quadrature, *parameters.initial_u, u,
 			     false, quadrature_face, (dim==2 ? true : false));
-  VectorTools<dim>::project (*dof_handler, constraints,
+  VectorTools::project (*dof_handler, constraints,
 			     quadrature, *parameters.initial_v, v,
 			     false, quadrature_face, (dim==2 ? true : false));
 #endif
@@ -8255,7 +8255,7 @@ void TimeStep_Primal<dim>::do_timestep ()
       parameters.boundary_values_v->set_time (time);
       
       map<int,double> boundary_value_list;
-      VectorTools<dim>::interpolate_boundary_values (*dof_handler, 0,
+      VectorTools::interpolate_boundary_values (*dof_handler, 0,
 						     *(parameters.boundary_values_u),
 						     boundary_value_list);
       MatrixTools<dim>::apply_boundary_values (boundary_value_list,
@@ -8281,7 +8281,7 @@ void TimeStep_Primal<dim>::do_timestep ()
   if (dim != 1)
     {
       map<int,double> boundary_value_list;
-      VectorTools<dim>::interpolate_boundary_values (*dof_handler, 0,
+      VectorTools::interpolate_boundary_values (*dof_handler, 0,
 						     *(parameters.boundary_values_v),
 						     boundary_value_list);
       MatrixTools<dim>::apply_boundary_values (boundary_value_list,
