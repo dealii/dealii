@@ -1,14 +1,14 @@
 This file is internal information only. It lists the steps to be done
 when a new release shall be issued:
 
-0/ cvs update -d
+0/ cvs update -d -P
 
 1/ if a x.y.0 release, create a branch:
 	call common/scripts/cvs-create-branch <x> <y>
 
-2/  cvs update -r Branch-<x>-<y>
+2/  cvs update -P -r Branch-<x>-<y>
 	or
-	cvs checkout -r Branch-<x>-<y> deal.II
+	cvs checkout -P -r Branch-<x>-<y> deal.II
 
 3/ change the content of the `Version' file on both HEAD and branch
 
@@ -29,7 +29,7 @@ when a new release shall be issued:
 
 10/ tell your friends to tag their programs
 
-11/ cvs export -r Version-x-y-z and form a tarball of that
+11/ cvs export -P -r Version-x-y-z and form a tarball of that
 
 12/ put it on the web server
 
