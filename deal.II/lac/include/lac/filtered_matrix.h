@@ -215,7 +215,7 @@ class FilteredMatrix : public Subscriptor
 				      * Default constructor. You will
 				      * have to set the matrix to be
 				      * used later using the
-				      * @{set_referenced_matrix}
+				      * @p{set_referenced_matrix}
 				      * function.
 				      */
     FilteredMatrix ();
@@ -269,7 +269,7 @@ class FilteredMatrix : public Subscriptor
 				      * enforced on the respective
 				      * solution vector's entry. Thus,
 				      * the data type might be, for
-				      * example, a @{std::list} or
+				      * example, a @p{std::list} or
 				      * @p{std::vector} of
 				      * @ref{IndexValuePair} objects,
 				      * but also a
@@ -411,7 +411,7 @@ class FilteredMatrix : public Subscriptor
 				      * returned.
 				      *
 				      * Note that it is assumed that
-				      * @{b} is a vector that has been
+				      * @p{b} is a vector that has been
 				      * treated by the
 				      * @ref{modify_rhs} function,
 				      * since we can then assume that

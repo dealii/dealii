@@ -321,7 +321,7 @@ class FullMatrix : public Table<2,number>
 				      * into the target. The two
 				      * permutation @p{p_r} and
 				      * @p{p_c} operate in a way, such
-				      * that @{result(i,j) =
+				      * that @p{result(i,j) =
 				      * src(p_r[i], p_c[j])}.
 				      *
 				      * The vectors may also be a
