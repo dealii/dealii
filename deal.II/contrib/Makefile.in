@@ -5,7 +5,7 @@ include ../common/Make.global_options
 
 
 # by default make sublibs
-default: hsl umfpack
+default: hsl
 
 ifeq ($(USE_CONTRIB_HSL),yes)
 hsl:
@@ -19,8 +19,12 @@ hsl-clean:
 endif
 
 
+ifeq ($(USE_CONTRIB_UMFPACK),yes)
 umfpack:
 	cd umfpack ; $(MAKE)
+else
+umfpack:
+endif
 
 # generic targets
 clean: hsl-clean

@@ -4302,6 +4302,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
   else
     UMFPACK_LIB='$(LIBDIR)/liblac_umfpack$(lib-suffix)'
     UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
+    USE_CONTRIB_UMFPACK='yes'
     AC_MSG_RESULT(using included version)
   fi
   AC_DEFINE(HAVE_UMFPACK,1,[UMFPACK is $1])
