@@ -217,9 +217,9 @@ void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
   prm.declare_entry ("Line widths in eps units", "0.5",
 		     Patterns::Double());
   prm.declare_entry ("Azimut angle", "60",
-		     Patterns::Double());
+		     Patterns::Double(0,180));
   prm.declare_entry ("Turn angle", "30",
-		     Patterns::Double());
+		     Patterns::Double(0,360));
   prm.declare_entry ("Scaling for z-axis", "1",
 		     Patterns::Double ());
   prm.declare_entry ("Draw mesh lines", "true",

@@ -22,238 +22,311 @@
 
 
 
-Patterns::PatternBase::~PatternBase ()
-{};
+namespace Patterns
+{  
+
+  PatternBase::~PatternBase ()
+  {};
 
 
 
-bool Patterns::Integer::match (const string &test_string) const
-{
-  istrstream str(test_string.c_str());
-  int i;
-  if (str >> i) return true;
-  return false;
-};
+  Integer::Integer (const int lower_bound,
+		    const int upper_bound) :
+		  lower_bound (lower_bound),
+		  upper_bound (upper_bound)
+  {};
 
 
 
-string Patterns::Integer::description () const
-{
-  return "[Integer]";
-};
-
-
-
-Patterns::PatternBase *
-Patterns::Integer::clone () const
-{
-  return new Patterns::Integer();
-};
-
-
-
-bool Patterns::Double::match (const string &test_string) const
-{
-  istrstream str(test_string.c_str());
-  double d;
-  if (str >> d) return true;
-  return false;
-};
-
-
-
-string Patterns::Double::description () const
-{
-  return "[Integer]";
-};
-
-
-Patterns::PatternBase *
-Patterns::Double::clone () const {
-  return new Patterns::Double();
-};
-
-
-
-Patterns::Selection::Selection (const string &seq)
-{
-  sequence = seq;
-
-  while (sequence.find(" |") != string::npos)
-    sequence.replace (sequence.find(" |"), 2, '|');
-  while (sequence.find("| ") != string::npos)
-    sequence.replace (sequence.find("| "), 2, '|');
-};
-
-
-
-bool Patterns::Selection::match (const string &test_string) const
-{
-  vector<string> choices;
-  string tmp(sequence);
-				   // check the different possibilities
-  while (tmp.find('|') != string::npos) 
-    {
-      if (test_string == string(tmp, 0, tmp.find('|')))
-	return true;
-      
-      tmp.erase (0, tmp.find('|')+1);
-    };
-				   // check last choice, not finished by |
-  if (test_string == tmp)
-    return true;
-
-				   // not found
-  return false;
-};
-
-
-
-string Patterns::Selection::description () const
-{
-  return sequence;
-};
-
-
-
-Patterns::PatternBase *
-Patterns::Selection::clone () const
-{
-  return new Patterns::Selection(sequence);
-};
-
-
-
-Patterns::MultipleSelection::MultipleSelection (const string &seq)
-{
-  Assert (seq.find (",") == string::npos, ExcCommasNotAllowed(seq.find(",")));
+  bool Integer::match (const string &test_string) const
+  {
+    istrstream str(test_string.c_str());
+    int i;
+    if (str >> i)
+      {
+					 // check whether valid bounds
+					 // were specified, and if so
+					 // enforce their values
+	if (lower_bound <= upper_bound)
+	  return ((lower_bound <= i) &&
+		  (upper_bound >= i));
+	else
+	  return true;
+      };
   
-  sequence = seq;
-  while (sequence.find(" |") != string::npos)
-    sequence.replace (sequence.find(" |"), 2, '|');
-  while (sequence.find("| ") != string::npos)
-    sequence.replace (sequence.find("| "), 2, '|');
-};
+    return false;
+  };
 
 
 
-bool Patterns::MultipleSelection::match (const string &test_string_list) const
-{
-  string tmp = test_string_list;
-  list<string> split_list;
+  string Integer::description () const
+  {
+				     // check whether valid bounds
+				     // were specified, and if so
+				     // output their values
+    if (lower_bound <= upper_bound)
+      {
+	ostrstream description;
+	description << "[Integer range "
+		    << lower_bound << "..." << upper_bound
+		    << " (inclusive)]"
+		    << ends;
+	return description.str();
+      }
+    else
+				       // if no bounds were given, then
+				       // return generic string
+      return "[Integer]";
+  };
 
-				   // first split the input list
-  while (tmp.length() != 0)
-    {
-      string name;
-      name = tmp;
+
+
+  PatternBase *
+  Integer::clone () const
+  {
+    return new Integer(lower_bound, upper_bound);
+  };
+
+
+
+  Double::Double (const int lower_bound,
+		  const int upper_bound) :
+		  lower_bound (lower_bound),
+		  upper_bound (upper_bound)
+  {};
+
+
+
+  bool Double::match (const string &test_string) const
+  {
+    istrstream str(test_string.c_str());
+    double d;
+    if (str >> d)
+      {
+					 // check whether valid bounds
+					 // were specified, and if so
+					 // enforce their values
+	if (lower_bound <= upper_bound)
+	  return ((lower_bound <= d) &&
+		  (upper_bound >= d));
+	else
+	  return true;
+      };
+    return false;
+  };
+
+
+
+  string Double::description () const
+  {
+				     // check whether valid bounds
+				     // were specified, and if so
+				     // output their values
+    if (lower_bound <= upper_bound)
+      {
+	ostrstream description;
+	description << "[Floating point range "
+		    << lower_bound << "..." << upper_bound
+		    << " (inclusive)]"
+		    << ends;
+	return description.str();
+      }
+    else
+				       // if no bounds were given, then
+				       // return generic string
+      return "[Double]";
+  };
+
+
+  PatternBase *
+  Double::clone () const
+  {
+    return new Double(lower_bound, upper_bound);
+  };
+
+
+
+  Selection::Selection (const string &seq)
+  {
+    sequence = seq;
+
+    while (sequence.find(" |") != string::npos)
+      sequence.replace (sequence.find(" |"), 2, '|');
+    while (sequence.find("| ") != string::npos)
+      sequence.replace (sequence.find("| "), 2, '|');
+  };
+
+
+
+  bool Selection::match (const string &test_string) const
+  {
+    vector<string> choices;
+    string tmp(sequence);
+				     // check the different possibilities
+    while (tmp.find('|') != string::npos) 
+      {
+	if (test_string == string(tmp, 0, tmp.find('|')))
+	  return true;
       
-      if (name.find(",") != string::npos)
-	{
-	  name.erase (name.find(","), string::npos);
-	  tmp.erase (0, test_string_list.find(",")+1);
-	}
-      else
-	tmp = "";
+	tmp.erase (0, tmp.find('|')+1);
+      };
+				     // check last choice, not finished by |
+    if (test_string == tmp)
+      return true;
+
+				     // not found
+    return false;
+  };
+
+
+
+  string Selection::description () const
+  {
+    return sequence;
+  };
+
+
+
+  PatternBase *
+  Selection::clone () const
+  {
+    return new Selection(sequence);
+  };
+
+
+
+  MultipleSelection::MultipleSelection (const string &seq)
+  {
+    Assert (seq.find (",") == string::npos, ExcCommasNotAllowed(seq.find(",")));
+  
+    sequence = seq;
+    while (sequence.find(" |") != string::npos)
+      sequence.replace (sequence.find(" |"), 2, '|');
+    while (sequence.find("| ") != string::npos)
+      sequence.replace (sequence.find("| "), 2, '|');
+  };
+
+
+
+  bool MultipleSelection::match (const string &test_string_list) const
+  {
+    string tmp = test_string_list;
+    list<string> split_list;
+
+				     // first split the input list
+    while (tmp.length() != 0)
+      {
+	string name;
+	name = tmp;
       
-      while ((name.length() != 0) &&
-	     (name[0] == ' '))
-	name.erase (0,1);
-      while (name[name.length()-1] == ' ')
-	name.erase (name.length()-1, 1);
-
-      split_list.push_back (name);
-    };
-
-
-				   // check the different possibilities
-  for (list<string>::const_iterator test_string = split_list.begin();
-       test_string != split_list.end(); ++test_string) 
-    {
-      bool string_found = false;
+	if (name.find(",") != string::npos)
+	  {
+	    name.erase (name.find(","), string::npos);
+	    tmp.erase (0, test_string_list.find(",")+1);
+	  }
+	else
+	  tmp = "";
       
-      tmp = sequence;
-      while (tmp.find('|') != string::npos) 
-	{
-	  if (*test_string == string(tmp, 0, tmp.find('|')))
-	    {
-						   // string found, quit
-						   // loop. don't change
-						   // tmp, since we don't
-						   // need it anymore.
-	      string_found = true;
-	      break;
-	    };
+	while ((name.length() != 0) &&
+	       (name[0] == ' '))
+	  name.erase (0,1);
+	while (name[name.length()-1] == ' ')
+	  name.erase (name.length()-1, 1);
+
+	split_list.push_back (name);
+      };
+
+
+				     // check the different possibilities
+    for (list<string>::const_iterator test_string = split_list.begin();
+	 test_string != split_list.end(); ++test_string) 
+      {
+	bool string_found = false;
+      
+	tmp = sequence;
+	while (tmp.find('|') != string::npos) 
+	  {
+	    if (*test_string == string(tmp, 0, tmp.find('|')))
+	      {
+						 // string found, quit
+						 // loop. don't change
+						 // tmp, since we don't
+						 // need it anymore.
+		string_found = true;
+		break;
+	      };
 	  
-	  tmp.erase (0, tmp.find('|')+1);
-	};
-				       // check last choice, not finished by |
-      if (!string_found)
-	if (*test_string == tmp)
-	  string_found = true;
+	    tmp.erase (0, tmp.find('|')+1);
+	  };
+					 // check last choice, not finished by |
+	if (!string_found)
+	  if (*test_string == tmp)
+	    string_found = true;
 
-      if (!string_found)
-	return false;
-    };
+	if (!string_found)
+	  return false;
+      };
 
-  return true;
-};
-
-
-
-string Patterns::MultipleSelection::description () const
-{
-  return sequence;
-};
+    return true;
+  };
 
 
 
-Patterns::PatternBase *
-Patterns::MultipleSelection::clone () const
-{
-  return new Patterns::MultipleSelection(sequence);
-};
+  string MultipleSelection::description () const
+  {
+    return sequence;
+  };
 
 
 
-Patterns::Bool::Bool () :
-		Selection ("true|false")
-{};
+  PatternBase *
+  MultipleSelection::clone () const
+  {
+    return new MultipleSelection(sequence);
+  };
 
 
 
-Patterns::PatternBase *
-Patterns::Bool::clone () const
-{
-  return new Patterns::Bool();
-};
+  Bool::Bool () :
+		  Selection ("true|false")
+  {};
 
 
 
-Patterns::Anything::Anything ()
-{};
+  PatternBase *
+  Bool::clone () const
+  {
+    return new Bool();
+  };
 
 
 
-bool Patterns::Anything::match (const string &) const
-{
-  return true;
-};
+  Anything::Anything ()
+  {};
 
 
 
-string Patterns::Anything::description () const
-{
-  return "[Anything]";
-};
+  bool Anything::match (const string &) const
+  {
+    return true;
+  };
 
 
 
-Patterns::PatternBase *
-Patterns::Anything::clone () const
-{
-  return new Patterns::Anything();
-};
+  string Anything::description () const
+  {
+    return "[Anything]";
+  };
+
+
+
+  PatternBase *
+  Anything::clone () const
+  {
+    return new Anything();
+  };
+ 
+}   // end namespace Patterns
 
 
 
@@ -380,7 +453,8 @@ bool ParameterHandler::declare_entry (const string &entry,
 	  ExcEntryAlreadyExists (entry));
 				   // Default must match Pattern
   Assert (pattern.match (default_value),
-	  ExcDefaultDoesNotMatchPattern(default_value, pattern.description()));
+	  ExcDefaultDoesNotMatchPattern(default_value,
+					pattern.description()));
   
 				   // does entry already exist?
   if (p->entries.find (entry) != p->entries.end())

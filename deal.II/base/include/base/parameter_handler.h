@@ -40,9 +40,8 @@ enum OutputStyle {
  * Declare some regexps which
  * may be used to define patterns.
  */ 
-struct Patterns
+namespace Patterns
 {
-  public:
 				     /**
 				      * Base class to declare common
 				      * interface.
@@ -69,102 +68,415 @@ struct Patterns
 	virtual string description () const = 0;
 	
 					 /**
-					  * Return a pointer to an exact
-					  * copy of the object. This is
-					  * necessary since we want to store
+					  * Return a pointer to an
+					  * exact copy of the
+					  * object. This is necessary
+					  * since we want to store
 					  * objects of this type in
-					  * containers.
+					  * containers, were we need
+					  * to copy objects without
+					  * knowledge of their actual
+					  * data type (we only have
+					  * pointers to the base
+					  * class).
+					  *
+					  * Ownership of the objects
+					  * returned by this function
+					  * is passed to the caller of
+					  * this function.
 					  */
 	virtual PatternBase * clone () const = 0;
     };
     
 				     /**
 				      * Test for the string being an
-				      * integer.
+				      * integer. If bounds are given
+				      * to the constructor, then the
+				      * integer given also needs to be
+				      * withing the interval specified
+				      * by these bounds. Note that
+				      * unlike common convention in
+				      * the C++ standard library, both
+				      * bounds of this interval are
+				      * inclusive; the reason is that
+				      * in practice in most cases, one
+				      * needs closed intervals, but
+				      * these can only be realized
+				      * with inclusive bounds for
+				      * non-integer values. We thus
+				      * stay consistent by always
+				      * using closed intervals.
+				      *
+				      * If the upper bound given to
+				      * the constructor is smaller
+				      * than the lower bound, then the
+				      * infinite interval is implied,
+				      * i.e. every integer is allowed.
+				      *
+				      * Giving bounds may be useful if
+				      * for example a value can only
+				      * be positive and less than a
+				      * reasonable upper bound (for
+				      * example the number of
+				      * refinement steps to be
+				      * performed), or in many other
+				      * cases.
 				      */
     class Integer : public PatternBase
     {
       public:
+					 /**
+					  * Constructor. Bounds can be
+					  * specified within which a
+					  * valid parameter has to
+					  * be. If the upper bound is
+					  * smaller than the lower
+					  * bound, then the infinite
+					  * interval is meant. The
+					  * default values are chosen
+					  * such that no bounds are
+					  * enforced on parameters.
+					  */
+	Integer (const int lower_bound = 1,
+		 const int upper_bound = 0);
+	
+					 /**
+					  * Return @p{true} if the
+					  * string is an integer and
+					  * its value is within the
+					  * specified range.
+					  */
 	virtual bool match (const string &test_string) const;
+
+					 /**
+					  * Return a description of
+					  * the pattern that valid
+					  * string are expected to
+					  * match. If bounds were
+					  * specified to the
+					  * constructor, then include
+					  * them into this
+					  * description.
+					  */
 	virtual string description () const;
+
+					 /**
+					  * Return a copy of the
+					  * present object, which is
+					  * newly allocated on the
+					  * heap. Ownership of that
+					  * object is transferred to
+					  * the caller of this
+					  * function.
+					  */
 	virtual PatternBase * clone () const;
+	
+      private:
+					 /**
+					  * Value of the lower
+					  * bound. A number that
+					  * satisfies the @p{match}
+					  * operation of this class
+					  * must be equal to this
+					  * value or larger, if the
+					  * bounds of the interval for
+					  * a valid range.
+					  */
+	const int lower_bound;
+
+					 /**
+					  * Value of the upper
+					  * bound. A number that
+					  * satisfies the @p{match}
+					  * operation of this class
+					  * must be equal to this
+					  * value or less, if the
+					  * bounds of the interval for
+					  * a valid range.
+					  */
+	const int upper_bound;
     };
     
 				     /**
-				      * Test for the string being a double.
+				      * Test for the string being a
+				      * @p{double}. If bounds are
+				      * given to the constructor, then
+				      * the integer given also needs
+				      * to be withing the interval
+				      * specified by these
+				      * bounds. Note that unlike
+				      * common convention in the C++
+				      * standard library, both bounds
+				      * of this interval are
+				      * inclusive; the reason is that
+				      * in practice in most cases, one
+				      * needs closed intervals, but
+				      * these can only be realized
+				      * with inclusive bounds for
+				      * non-integer values. We thus
+				      * stay consistent by always
+				      * using closed intervals.
+				      *
+				      * If the upper bound given to
+				      * the constructor is smaller
+				      * than the lower bound, then the
+				      * infinite interval is implied,
+				      * i.e. every integer is allowed.
+				      *
+				      * Giving bounds may be useful if
+				      * for example a value can only
+				      * be positive and less than a
+				      * reasonable upper bound (for
+				      * example damping parameters are
+				      * frequently only reasonable if
+				      * between zero and one), or in
+				      * many other cases.
 				      */
     class Double : public PatternBase
     {
       public:
+					 /**
+					  * Constructor. Bounds can be
+					  * specified within which a
+					  * valid parameter has to
+					  * be. If the upper bound is
+					  * smaller than the lower
+					  * bound, then the infinite
+					  * interval is meant. The
+					  * default values are chosen
+					  * such that no bounds are
+					  * enforced on parameters.
+					  */
+	Double (const int lower_bound = 1,
+		 const int upper_bound = 0);
+	
+					 /**
+					  * Return @p{true} if the
+					  * string is a number and its
+					  * value is within the
+					  * specified range.
+					  */
 	virtual bool match (const string &test_string) const;
+
+					 /**
+					  * Return a description of
+					  * the pattern that valid
+					  * string are expected to
+					  * match. If bounds were
+					  * specified to the
+					  * constructor, then include
+					  * them into this
+					  * description.
+					  */
 	virtual string description () const;
+
+					 /**
+					  * Return a copy of the
+					  * present object, which is
+					  * newly allocated on the
+					  * heap. Ownership of that
+					  * object is transferred to
+					  * the caller of this
+					  * function.
+					  */
 	virtual PatternBase * clone () const;
+	
+      private:
+					 /**
+					  * Value of the lower
+					  * bound. A number that
+					  * satisfies the @p{match}
+					  * operation of this class
+					  * must be equal to this
+					  * value or larger, if the
+					  * bounds of the interval for
+					  * a valid range.
+					  */
+	const int lower_bound;
+
+					 /**
+					  * Value of the upper
+					  * bound. A number that
+					  * satisfies the @p{match}
+					  * operation of this class
+					  * must be equal to this
+					  * value or less, if the
+					  * bounds of the interval for
+					  * a valid range.
+					  */
+	const int upper_bound;
     };
     
 				     /**
-				      * Test for the string being one of
-				      * a sequence of values given like a
-				      * regular expression. For example, if
-				      * the string given to the constructor
-				      * is "red|blue|black", then the @p{match}
-				      * function returns @p{true} exactly if
-				      * the string is either "red" or "blue"
-				      * or "black". Spaces around the pipe
-				      * signs do not matter and are
-				      * eliminated.
+				      * Test for the string being one
+				      * of a sequence of values given
+				      * like a regular expression. For
+				      * example, if the string given
+				      * to the constructor is
+				      * @p{"red|blue|black"}, then the
+				      * @p{match} function returns
+				      * @p{true} exactly if the string
+				      * is either "red" or "blue" or
+				      * "black". Spaces around the
+				      * pipe signs do not matter and
+				      * are eliminated.
 				      */
     class Selection : public PatternBase
     {
       public:
+					 /**
+					  * Constructor. Take the
+					  * given parameter as the
+					  * specification of valid
+					  * strings.
+					  */
 	Selection (const string &seq);
+
+					 /**
+					  * Return @p{true} if the
+					  * string is an element of
+					  * the description list
+					  * passed to the constructor.
+					  */
 	virtual bool match (const string &test_string) const;
+
+					 /**
+					  * Return a description of
+					  * the pattern that valid
+					  * string are expected to
+					  * match. Here, this is the
+					  * list of valid strings
+					  * passed to the constructor.
+					  */
 	virtual string description () const;
+
+					 /**
+					  * Return a copy of the
+					  * present object, which is
+					  * newly allocated on the
+					  * heap. Ownership of that
+					  * object is transferred to
+					  * the caller of this
+					  * function.
+					  */
 	virtual PatternBase * clone () const;
+
       private:
+					 /**
+					  * List of valid strings as
+					  * passed to the
+					  * constructor. We don't make
+					  * this string constant, as
+					  * we process it somewhat in
+					  * the constructor.
+					  */
 	string sequence;
     };
 
 
 				     /**
-				      * This class is much like the @p{Selection}
-				      * class, but it allows the input to be
-				      * a comma-separated list of values which
-				      * each have to be given in the constructor
-				      * argument. For example, if the string to
-				      * the constructor was @p{"ucd|gmv|eps"}, then
-				      * the following would be legal input:
-				      * @p{eps, gmv}. You may give an arbitrarily
-				      * long list of values, where there may be
-				      * as many spaces around commas as you like.
-				      * However, commas are not allowed inside
-				      * the values given to the constructor.
+				      * This class is much like the
+				      * @p{Selection} class, but it
+				      * allows the input to be a
+				      * comma-separated list of values
+				      * which each have to be given in
+				      * the constructor argument. For
+				      * example, if the string to the
+				      * constructor was
+				      * @p{"ucd|gmv|eps"}, then the
+				      * following would be legal
+				      * input: @p{eps, gmv}. You may
+				      * give an arbitrarily long list
+				      * of values, where there may be
+				      * as many spaces around commas
+				      * as you like.  However, commas
+				      * are not allowed inside the
+				      * values given to the
+				      * constructor.
 				      */
     class MultipleSelection : public PatternBase
     {
       public:
+					 /**
+					  * Constructor. Take the
+					  * given parameter as the
+					  * specification of valid
+					  * strings.
+					  */
 	MultipleSelection (const string &seq);
+
+					 /**
+					  * Return @p{true} if the
+					  * string is an element of
+					  * the description list
+					  * passed to the constructor.
+					  */
 	virtual bool match (const string &test_string) const;
+
+					 /**
+					  * Return a description of
+					  * the pattern that valid
+					  * string are expected to
+					  * match. Here, this is the
+					  * list of valid strings
+					  * passed to the constructor.
+					  */
 	virtual string description () const;
+
+					 /**
+					  * Return a copy of the
+					  * present object, which is
+					  * newly allocated on the
+					  * heap. Ownership of that
+					  * object is transferred to
+					  * the caller of this
+					  * function.
+					  */
 	virtual PatternBase * clone () const;
 
+					 /**
+					  * Exception.
+					  */
 	DeclException1 (ExcCommasNotAllowed,
 			int,
 			<< "A comma was found at position " << arg1
 			<< " of your input string, but commas are not allowed here.");
 	
       private:
+					 /**
+					  * List of valid strings as
+					  * passed to the
+					  * constructor. We don't make
+					  * this string constant, as
+					  * we process it somewhat in
+					  * the constructor.
+					  */
 	string sequence;
     };
 
 				     /**
-				      * Test for the string being either
-				      * "true" or "false". This is mapped
-				      * to the @p{Selection} class.
+				      * Test for the string being
+				      * either "true" or "false". This
+				      * is mapped to the @p{Selection}
+				      * class.
 				      */
     class Bool : public Selection
     {
       public:
+					 /**
+					  * Constrcuctor.
+					  */
 	Bool ();
+
+					 /**
+					  * Return a copy of the
+					  * present object, which is
+					  * newly allocated on the
+					  * heap. Ownership of that
+					  * object is transferred to
+					  * the caller of this
+					  * function.
+					  */
 	virtual PatternBase * clone () const;
     };
         
@@ -176,14 +488,39 @@ struct Patterns
     {
       public:
 					 /**
-					  * Allow for at least one non-virtual
+					  * Constructor. (Allow for at
+					  * least one non-virtual
 					  * function in this class, as
-					  * otherwise sometimes no virtual
-					  * table is emitted.
+					  * otherwise sometimes no
+					  * virtual table is emitted.)
 					  */
 	Anything ();
+
+					 /**
+					  * Return @p{true} if the
+					  * string matches its
+					  * constraints, i.e. always.
+					  */
 	virtual bool match (const string &test_string) const;
+
+					 /**
+					  * Return a description of
+					  * the pattern that valid
+					  * string are expected to
+					  * match. Here, this is the
+					  * string @p{"[Anything]"}.
+					  */
 	virtual string description () const;
+
+					 /**
+					  * Return a copy of the
+					  * present object, which is
+					  * newly allocated on the
+					  * heap. Ownership of that
+					  * object is transferred to
+					  * the caller of this
+					  * function.
+					  */
 	virtual PatternBase * clone () const;
     };
 };
