@@ -845,21 +845,15 @@ bool MultipleParameterLoop::read_input (istream &input) {
   AssertThrow (input, ExcIO());
 
   bool x = ParameterHandler::read_input (input);
-  if (x) init_branches ();
+  if (x)
+    init_branches ();
   return x;
 };
 
 
 
-bool MultipleParameterLoop::read_input (const string &filename) {
-				   // I don't know why it is necessary to
-				   // declare this function: simply not
-				   // overloading it in MultipleParameterLoop
-				   // should suffice, but then the compiler can't
-				   // find the inherited version and complains that
-				   // it can't find a function MultipleParameterLoop::
-				   // read_input (string, ostream) instead of trying the
-				   // base class (maybe wait for gcc2.8)
+bool MultipleParameterLoop::read_input (const string &filename)
+{
   return ParameterHandler::read_input (filename);
 				   // don't call init_branches, since this read_input
 				   // function calls
