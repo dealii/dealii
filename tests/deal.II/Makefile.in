@@ -67,7 +67,8 @@ endif
 
 all: grid_generator.check grid_test.check dof_test.check \
      fe_tables.check gradients.check \
-     constraints.check mg.check mglocal.check wave-test-3.check second_derivatives.check
+     constraints.check mg.check mglocal.check wave-test-3.check \
+     block_matrices.check second_derivatives.check
 
 exe: $(all:.check=.testcase) benchmark
 run: $(all:.check=.output)
@@ -246,6 +247,23 @@ mg-o-files = $(mg-cc-files:.cc=.o)
 endif
 
 mg.testcase: $(mg-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+
+############################################################
+
+
+block_matrices-cc-files = block_matrices.cc 
+
+ifeq ($(debug-mode),on)
+block_matrices-o-files = $(block_matrices-cc-files:.cc=.go)
+else
+block_matrices-o-files = $(block_matrices-cc-files:.cc=.o)
+endif
+
+block_matrices.testcase: $(block_matrices-o-files) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
