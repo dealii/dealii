@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.79 
+# From configure.in Revision: 1.80 
 
 
 
@@ -1987,7 +1987,7 @@ cross_compiling=$ac_cv_prog_cxx_cross
 void f()
 {
   std::vector<unsigned int> new_indices;
-  random_shuffle (new_indices.begin(), new_indices.end());
+  std::random_shuffle (new_indices.begin(), new_indices.end());
 };
     
 int main() {
