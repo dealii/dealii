@@ -32,6 +32,34 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Changed: Introduced the <code class="class">DoFHandler</code>
+       as template parameter in classes <code class="class">DataOutStack</code>,
+       <code class="class">DataOutFaces</code>, <code class="class">DataOut</code> and 
+       <code class="class">DataOut_DoFData</code>.
+       <code class="class">DoFHandler</code> is used as default
+       template argument to ensure backward compatibility. Added
+       an overloaded method <code class="member">reinit</code> for the
+       new <code class="class">hpDoFHandler</code> in class
+       <code class="class">FEValues</code>. Modified method
+       <code class="member">interpolate_boundary_values</code> in
+       class <code class="class">VectorTools</code> to take the
+       <code class="class">DoFHandler</code> as template
+       argument. Probably this method must be changed later, when the real
+       <code class="class">hpDoFHandler</code> is implemented. Added
+       the first implementation of the
+       <code class="class">hpDoFHandler</code> which is simply a copy
+       of the old one. But it should provide a good basis for the new
+       one. Finally the <code class="class">DoFAccessor</code> is now
+       instantiated for the new
+       <code class="class">hpDoFAccessor</code>. Overall these changes
+       now allow the compilation of some of the sample programs with
+       the new <code class="class">hpDoFAccessor</code> but obviously
+       not yet with new functionality.
+       <br>
+       (Oliver Kayser-Herold 2003/02/18)
+       </p>
+
+  <li> <p> 
        Changed: The <code class="member">DoFHandler::n_boundary_dofs</code>
        functions have been moved and renamed. They are now
        <code class="member">DoFTools::count_boundary_dofs</code>.
