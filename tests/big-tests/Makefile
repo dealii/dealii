@@ -1,11 +1,12 @@
 # $Id$
 
 CXX=c++
-CXXFLAGS.g= -DDEBUG -g -Wall -I../include
-CXXFLAGS  = -O3 -I../include
+INCPATH   = -I../include -I../../lac/include -I../../base/include
+CXXFLAGS.g= -DDEBUG -g -Wall $(INCPATH)
+CXXFLAGS  = -O3 $(INCPATH)
 
-LIBS.g    = -L../lib -lbasic.g -lgrid.g -lfe.g -lnumerics.g -ldeal.g
-LIBS      = -L../lib -lbasic -lgrid -lfe -lnumerics  -ldeal
+LIBS.g    = -L../lib -lbasic.g -lgrid.g -lfe.g -lnumerics.g -llac.g
+LIBS      = -L../lib -lbasic -lgrid -lfe -lnumerics 
 
 ifeq ($(shell uname),SunOS)
 CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
