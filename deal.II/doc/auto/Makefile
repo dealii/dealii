@@ -11,6 +11,7 @@ kdoc.base     = $(wildcard ../../base/include/base/*.h)
 kdoc.lac      = $(wildcard ../../lac/include/lac/*.h)
 kdoc.basic    = $(wildcard ../../deal.II/include/basic/*.h)
 kdoc.grid     = $(wildcard ../../deal.II/include/grid/tria*.h)\
+                $(wildcard ../../deal.II/include/grid/grid*.h)\
                 ../../deal.II/include/grid/geometry_info.h
 kdoc.dof      = $(wildcard ../../deal.II/include/grid/dof*.h) \
                 $(wildcard ../../deal.II/include/grid/mg_*.h) \
