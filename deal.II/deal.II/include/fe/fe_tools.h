@@ -351,12 +351,20 @@ class FETools
 				      * an additional
 				      * @p{ConstraintMatrix} argument,
 				      * see below.
+				      *
+				      * Since this function operates
+				      * on patches of cells, it is
+				      * required that the underlying
+				      * grid is refined at least once
+				      * for every coarse grid cell. If
+				      * this is not the case, an
+				      * exception will be raised.
 				      */
     template <int dim, class InVector, class OutVector>
-    static void extrapolate(const DoFHandler<dim>& dof1,
-			    const InVector&        z1,
-			    const DoFHandler<dim>& dof2,
-			    OutVector&             z2);    
+    static void extrapolate (const DoFHandler<dim>& dof1,
+			     const InVector&        z1,
+			     const DoFHandler<dim>& dof2,
+			     OutVector&             z2);    
 
 				     /**
 				      * Gives the patchwise
@@ -374,18 +382,16 @@ class FETools
 				      * elements on grids with hanging
 				      * nodes (locally refined grids).
 				      *
-				      * This function is interesting
-				      * for e.g. extrapolating
-				      * patchwise a piecewise linear
-				      * solution to a piecewise
-				      * quadratic solution.
+				      * Otherwise, the same holds as
+				      * for the other @p{extrapolate}
+				      * function.
 				      */
     template <int dim, class InVector, class OutVector>
-    static void extrapolate(const DoFHandler<dim>&  dof1,
-			    const InVector&         z1,
-			    const DoFHandler<dim>&  dof2,
-			    const ConstraintMatrix& constraints,
-			    OutVector&              z2);    
+    static void extrapolate (const DoFHandler<dim>&  dof1,
+			     const InVector&         z1,
+			     const DoFHandler<dim>&  dof2,
+			     const ConstraintMatrix& constraints,
+			     OutVector&              z2);    
 
 				     /**
 				      * The numbering of the degrees
@@ -461,7 +467,6 @@ class FETools
                                       * Exception
                                       */
     DeclException0 (ExcFEMustBePrimitive);
-    
 				     /**
 				      * Exception
 				      */
@@ -476,7 +481,10 @@ class FETools
 		    << "hanging nodes but without providing hanging node "
 		    << "constraints. Use the respective function with "
 		    << "additional ConstraintMatrix argument(s), instead.");
-  
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcGridNotRefinedAtLeastOnce);
 				     /**
 				      * Exception
 				      */

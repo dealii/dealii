@@ -14,7 +14,7 @@
 
 <p>
 This is the list of changes made after the release of 
-<acronym>deal.II</acronym> version ??.??. It is subdivided into changes
+<acronym>deal.II</acronym> version 4.0. It is subdivided into changes
 made to the three sub-libraries <a href="#base">base</a>, 
 <a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
 changes to the <a href="#general">general infrastructure,
@@ -67,12 +67,23 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> 
+       Fixed: The <code class="member">FETools::extrapolate</code>
+       function operates on patches of cells, but didn't check whether
+       the grid is at least refined once everywhere. If this was not
+       the case, it would generate wrong results. It now checks for
+       this, and if the grid has unrefined coarse grid cells, an
+       exception is generated.
+       <br>
+       (WB 2002/06/25)
+       </p>
+
   <li> <p>
-  Improved: <code class="class">FEFaceValuesBase</code> has a new
-  function <code class="member">orientation</code> accessing a unique
-  and consistent orientation for each face.
-  <br>
-  (GK 2003/06/23)
+       Improved: <code class="class">FEFaceValuesBase</code> has a new
+       function <code class="member">orientation</code> accessing a unique
+       and consistent orientation for each face.
+       <br> 
+       (GK 2003/06/23)
 
   <li> <p> 
        Changed: Embedding and restriction matrices for intergrid transfer are

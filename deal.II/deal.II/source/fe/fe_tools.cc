@@ -155,9 +155,9 @@ void FETools::get_back_interpolation_matrix(const FiniteElement<dim> &fe1,
 
 
 template <int dim, typename number>
-void FETools::get_interpolation_difference_matrix(const FiniteElement<dim> &fe1,
-						  const FiniteElement<dim> &fe2,
-						  FullMatrix<number> &difference_matrix)
+void FETools::get_interpolation_difference_matrix (const FiniteElement<dim> &fe1,
+						   const FiniteElement<dim> &fe2,
+						   FullMatrix<number> &difference_matrix)
 {
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
@@ -354,10 +354,10 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 
   
 template <int dim, class InVector, class OutVector>
-void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
-				       const InVector &u1,
-				       const FiniteElement<dim> &fe2,
-				       OutVector &u1_difference)
+void FETools::interpolation_difference (const DoFHandler<dim> &dof1,
+					const InVector &u1,
+					const FiniteElement<dim> &fe2,
+					OutVector &u1_difference)
 {
   Assert(dof1.get_fe().n_components() == fe2.n_components(),
 	 ExcDimensionMismatch(dof1.get_fe().n_components(), fe2.n_components()));
@@ -459,7 +459,20 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
   const unsigned int dofs_per_cell  = dof2.get_fe().dofs_per_cell;
   const Triangulation<dim> &tria=dof1.get_tria();
   Vector<typename OutVector::value_type> dof_values(dofs_per_cell);
-  
+
+				   // make sure that each cell on the
+				   // coarsest level is at least once
+				   // refined. otherwise, we can't
+				   // treat these cells and would
+				   // generate a bogus result
+  {
+    typename DoFHandler<dim>::cell_iterator cell = dof2.begin(0),
+					    endc = dof2.end(0);
+    for (; cell!=endc; ++cell)
+      Assert (cell->has_children(), ExcGridNotRefinedAtLeastOnce());
+  } 
+
+				   // then traverse grid bottom up
   for (unsigned int level=0; level<tria.n_levels()-1; ++level)
     {
       typename DoFHandler<dim>::cell_iterator cell=dof2.begin(level),
