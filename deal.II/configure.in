@@ -242,7 +242,7 @@ AC_MSG_RESULT()
 AC_MSG_RESULT(-------------- configuring shared/static libs ---------------)
 
 AC_ARG_ENABLE(shared,
-[  --enable-shared Set compiler flags to generate shared libraries],
+[  --enable-shared         set compiler flags to generate shared libraries],
     enableshared=$enableval,
     enableshared=yes)
 
@@ -298,7 +298,7 @@ dnl -------------------------------------------------------------
 dnl    Test if multigrid should be enabled
 dnl    default is yes if multigrid directory present
 AC_ARG_ENABLE(multigrid,
-[  --enable-multigrid Include multigrid code in library],
+[  --enable-multigrid      include multigrid code in library],
     enablemultigrid=$enableval,
     if test -r deal.II/include/multigrid/multigrid.h ; then
       enablemultigrid=yes ;
@@ -333,11 +333,14 @@ AC_SUBST(USE_CONTRIB_HSL)
 
 
 dnl -------------------------------------------------------------
-dnl                   Consistency of compiler flags
+dnl       Optimizations and consistency of compiler flags
 dnl -------------------------------------------------------------
 
 AC_MSG_RESULT()
 AC_MSG_RESULT(------------------ checking compiler flags ------------------)
+
+dnl Possible add some flags is optimizations are requested
+DEAL_II_CHECK_CPU_OPTIMIZATIONS
 
 dnl Last check: test whether CXXFLAGS and F77FLAGS are ok
 DEAL_II_CHECK_CXXFLAGS_CONSISTENCY

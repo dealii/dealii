@@ -815,6 +815,47 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 
 
 
+
+dnl -------------------------------------------------------------
+dnl Check whether user wants optimization for a certain type of
+dnl CPU. If so, then set some flags, dependent on what he
+dnl wants and the compiler. Not very many CPUS are listed here,
+dnl but this is simple to expand if desired.
+dnl
+dnl To use this feature, use --with-cpu=something
+dnl
+dnl Usage: DEAL_II_CHECK_CPU_OPTIMIZATIONS
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
+[
+  AC_ARG_WITH(cpu,
+  [  --with-cpu=cpu          Optimize specifically for the given CPU type,
+                          rather than just generating code for this
+		          processor family],
+      withcpu=$withval,
+      withcpu=)
+  AC_MSG_CHECKING(for CPU to optimize for)
+  case $withcpu in
+    PowerPC64)
+        AC_MSG_RESULT(PowerPC64)
+	case $GXX_VERSION in
+	  gcc*)
+	      CXXFLAGSG="$CXXFLAGSG -maix64"
+	      CXXFLAGSO="$CXXFLAGSO -maix64 -mpowerpc64 -mcpu=powerpc64 -mtune=powerpc64"
+	      AR="$AR -X 64"
+	      LDFLAGS="$LDFLAGS -maix64"
+              ;;
+        esac
+	;;
+
+    *)
+        AC_MSG_RESULT(none given or not recognized)
+  esac
+])
+
+
+
 dnl -------------------------------------------------------------
 dnl In some cases, -threads (or whatever else command line option)
 dnl switches on some preprocessor flags. If this is not the case,
@@ -900,8 +941,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 [
   AC_ARG_ENABLE(multithreading,
-  [  --enable-multithreading Set compiler flags to allow for
-                             multithreaded programs],
+  [  --enable-multithreading set compiler flags to allow for
+                          multithreaded programs],
     enablemultithreading=$enableval,
     enablemultithreading=no)
 ])
@@ -1034,7 +1075,7 @@ AC_DEFUN(DEAL_II_CHECK_USE_MT, dnl
 [
   AC_ARG_WITH(multithreading,
   [  --with-multithreading=name If name==posix, or no name given, then use
-                                POSIX threads],
+                          POSIX threads],
       withmultithreading=$withval,
       withmultithreading=no)
 
@@ -1177,8 +1218,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_COMPAT_BLOCKER, dnl
 [
   AC_ARG_ENABLE(compat-blocker,
-  [  --enable-compat-blocker=mapping Block functions that implicitely
-                                     assume a Q1 mapping],
+  [  --enable-compat-blocker=mapping block functions that implicitely
+                          assume a Q1 mapping],
       enable_compat_blocker=$enableval,
       enable_compat_blocker="")
 
@@ -3077,7 +3118,7 @@ AC_DEFUN(DEAL_II_CHECK_KDOC, dnl
   dnl    Find the kdoc directory for documentation. kdoc2 is in
   dnl    the contrib directory, but you might want another one
   AC_ARG_WITH(kdoc,
-  [  --with-kdoc=DIR use kdoc installed in DIR],
+  [  --with-kdoc=DIR         use kdoc installed in DIR],
       kdocdir=$withval,
       kdocdir=${DEAL2_DIR}/contrib/kdoc/bin)
   AC_MSG_CHECKING(for kdoc)
@@ -3113,7 +3154,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_DOCXX, dnl
 [
   AC_ARG_WITH(docxx,
-  [  --with-docxx=PATH use the doc++ executable pointed to by PATH],
+  [  --with-docxx=PATH       use the doc++ executable pointed to by PATH],
       docxx=$withval,
       docxx=to-be-determined)
   if test "$docxx" = to-be-determined ; then
