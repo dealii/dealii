@@ -104,7 +104,7 @@ void MGTransferPrebuilt<number>::prolongate (
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
 	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
 
-  prolongation_matrices[to_level-1].vmult (dst, src);
+  prolongation_matrices[to_level-1]->vmult (dst, src);
 }
 
 
@@ -117,7 +117,7 @@ void MGTransferPrebuilt<number>::restrict_and_add (
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
 
-  prolongation_matrices[from_level-1].Tvmult_add (dst, src);
+  prolongation_matrices[from_level-1]->Tvmult_add (dst, src);
 }
 
 
@@ -143,7 +143,7 @@ void MGTransferBlock<number>::prolongate (
     {
       if (!selected[k])
 	++k;
-      prolongation_matrices[to_level-1].block(k,k).vmult (dst.block(b), src.block(b));
+      prolongation_matrices[to_level-1]->block(k,k).vmult (dst.block(b), src.block(b));
       ++k;
     }
 }
@@ -163,7 +163,7 @@ void MGTransferBlock<number>::restrict_and_add (
     {
       if (!selected[k])
 	++k;
-      prolongation_matrices[from_level-1].block(k,k).Tvmult_add (dst.block(b), src.block(b));
+      prolongation_matrices[from_level-1]->block(k,k).Tvmult_add (dst.block(b), src.block(b));
       ++k;
     }
 }
@@ -185,7 +185,7 @@ void MGTransferSelect<number>::prolongate (
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
 	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
 
-      prolongation_matrices[to_level-1].block(selected, selected)
+      prolongation_matrices[to_level-1]->block(selected, selected)
 	.vmult (dst, src);
 }
 
@@ -199,7 +199,7 @@ void MGTransferSelect<number>::restrict_and_add (
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
 
-  prolongation_matrices[from_level-1].block(selected, selected)
+  prolongation_matrices[from_level-1]->block(selected, selected)
     .Tvmult_add (dst, src);
 }
 

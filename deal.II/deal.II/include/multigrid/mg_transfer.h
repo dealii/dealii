@@ -25,6 +25,9 @@
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
 
+#include <boost_local/shared_ptr.hpp>
+
+
 template <int dim> class MGDoFHandler;
 
 /*
@@ -179,13 +182,13 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      * while row indices belong to the
 				      * child cell, i.e. the fine level.
 				      */
-    std::vector<SparseMatrixEZ<double> > prolongation_matrices;
+    std::vector<boost::shared_ptr<SparseMatrixEZ<double> > > prolongation_matrices;
 #else
 				     /**
 				      * Sparsity patterns for transfer
 				      * matrices.
 				      */
-    std::vector<SparsityPattern>   prolongation_sparsities;
+    std::vector<boost::shared_ptr<SparsityPattern> >   prolongation_sparsities;
 
 				     /**
 				      * The actual prolongation matrix.
@@ -195,7 +198,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      * while row indices belong to the
 				      * child cell, i.e. the fine level.
 				      */
-    std::vector<SparseMatrix<double> > prolongation_matrices;
+    std::vector<boost::shared_ptr<SparseMatrix<double> > > prolongation_matrices;
 #endif
 };
 
@@ -261,10 +264,10 @@ class MGTransferBlockBase
 				      * while row indices belong to the
 				      * child cell, i.e. the fine level.
 				      */
-    std::vector<BlockSparseMatrixEZ<double> > prolongation_matrices;
+    std::vector<boost::shared_ptr<BlockSparseMatrixEZ<double> > > prolongation_matrices;
 #else
   private:
-    std::vector<BlockSparsityPattern>   prolongation_sparsities;
+    std::vector<boost::shared_ptr<BlockSparsityPattern> >   prolongation_sparsities;
 
   protected:
   
@@ -276,7 +279,7 @@ class MGTransferBlockBase
 				      * while row indices belong to the
 				      * child cell, i.e. the fine level.
 				      */
-    std::vector<BlockSparseMatrix<double> > prolongation_matrices;
+    std::vector<boost::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
 #endif
 };
 

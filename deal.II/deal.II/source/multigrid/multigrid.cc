@@ -41,21 +41,34 @@ void MGTransferPrebuilt<number>::build_matrices (
   for (unsigned int l=0;l<n_levels;++l)
     sizes[l] = mg_dof.n_dofs(l);
   
-				   // Reset the size of the array of
-				   // matrices. Call resize(0) first,
+				   // reset the size of the array of
+				   // matrices. call resize(0) first,
 				   // in order to delete all elements
-				   // as otherwise the copy
-				   // constructor of SparseMatrix and
-				   // SparsityPattern is called what
-				   // throws an error if existing
-				   // SparseMatrices/SparsityPatterns
-				   // have a size greater zero.
+				   // and clear their memory. then
+				   // repopulate these arrays
+				   //
+				   // note that on resize(0), the
+				   // shared_ptr class takes care of
+				   // deleting the object it points to
+				   // by itself
   prolongation_matrices.resize (0);
-  prolongation_matrices.resize (n_levels-1);
 #ifndef DEAL_PREFER_MATRIX_EZ
   prolongation_sparsities.resize (0);
-  prolongation_sparsities.resize (n_levels-1);
 #endif
+
+  for (unsigned int i=0; i<n_levels-1; ++i)
+    {
+#ifndef DEAL_PREFER_MATRIX_EZ
+      prolongation_sparsities
+	.push_back (boost::shared_ptr<SparsityPattern> (new SparsityPattern));
+      prolongation_matrices
+	.push_back (boost::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
+#else
+      prolongation_matrices
+	.push_back (boost::shared_ptr<SparseMatrix<double> > (new SparseMatrixEZ<double>));
+#endif
+    }
+  
 				   // two fields which will store the
 				   // indices of the multigrid dofs
 				   // for a cell and one of its children
@@ -77,16 +90,16 @@ void MGTransferPrebuilt<number>::build_matrices (
 				       // number of degrees of freedom per
 				       // cell
 #ifdef DEAL_PREFER_MATRIX_EZ      
-      prolongation_matrices[level].reinit (sizes[level+1],
-					   sizes[level],
-					   dofs_per_cell);
+      prolongation_matrices[level]->reinit (sizes[level+1],
+					    sizes[level],
+					    dofs_per_cell);
 #else
 				       // increment dofs_per_cell
 				       // since a useless diagonal
 				       // element will be stored
-      prolongation_sparsities[level].reinit (sizes[level+1],
-					     sizes[level],
-					     dofs_per_cell+1);
+      prolongation_sparsities[level]->reinit (sizes[level+1],
+					      sizes[level],
+					      dofs_per_cell+1);
       
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
@@ -114,15 +127,14 @@ void MGTransferPrebuilt<number>::build_matrices (
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    if (prolongation(i,j) != 0)
 		      {
-			prolongation_sparsities[level].add
-			  (dof_indices_child[i],
-			   dof_indices_parent[j]);
+			prolongation_sparsities[level]->add (dof_indices_child[i],
+							     dof_indices_parent[j]);
 		      };
 	      };
 	  };
-      prolongation_sparsities[level].compress ();
+      prolongation_sparsities[level]->compress ();
 
-      prolongation_matrices[level].reinit (prolongation_sparsities[level]);
+      prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 #endif
 
 				       // now actually build the matrices
@@ -148,12 +160,9 @@ void MGTransferPrebuilt<number>::build_matrices (
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    if (prolongation(i,j) != 0)
-		      {
-			prolongation_matrices[level].set
-			  (dof_indices_child[i],
-			   dof_indices_parent[j],
-			   prolongation(i,j));
-		      };
+		      prolongation_matrices[level]->set (dof_indices_child[i],
+							 dof_indices_parent[j],
+							 prolongation(i,j));
 	      };
 	  };
     };
@@ -182,13 +191,32 @@ void MGTransferBlockBase::build_matrices (
   MGTools::count_dofs_per_component(mg_dof, sizes);
   
 				   // reset the size of the array of
-				   // matrices
-  prolongation_matrices.clear();
+				   // matrices. call resize(0) first,
+				   // in order to delete all elements
+				   // and clear their memory. then
+				   // repopulate these arrays
+				   //
+				   // note that on resize(0), the
+				   // shared_ptr class takes care of
+				   // deleting the object it points to
+				   // by itself
+  prolongation_matrices.resize (0);
 #ifndef DEAL_PREFER_MATRIX_EZ
-  prolongation_sparsities.clear();
-  prolongation_sparsities.resize (n_levels-1);
+  prolongation_sparsities.resize (0);
 #endif
-  prolongation_matrices.resize (n_levels-1);
+
+  for (unsigned int i=0; i<n_levels-1; ++i)
+    {
+#ifndef DEAL_PREFER_MATRIX_EZ
+      prolongation_sparsities
+	.push_back (boost::shared_ptr<BlockSparsityPattern> (new BlockSparsityPattern));
+      prolongation_matrices
+	.push_back (boost::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrix<double>));
+#else
+      prolongation_matrices
+	.push_back (boost::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrixEZ<double>));
+#endif
+    }
 
 				   // two fields which will store the
 				   // indices of the multigrid dofs
@@ -220,35 +248,35 @@ void MGTransferBlockBase::build_matrices (
 // row-lengths, this should be used here to specify the length of
 // every single row.
 
-      prolongation_matrices[level].reinit (n_components, n_components);
+      prolongation_matrices[level]->reinit (n_components, n_components);
       for (unsigned int i=0;i<n_components;++i)
 	for (unsigned int j=0;j<n_components;++j)
 	  if (i==j)
-	    prolongation_matrices[level].block(i,j).reinit(
-	      sizes[level+1][i],
-	      sizes[level][j], dofs_per_cell, 0);
+	    prolongation_matrices[level]->block(i,j)
+	      .reinit(sizes[level+1][i],
+		      sizes[level][j], dofs_per_cell, 0);
 	  else
-	    prolongation_matrices[level].block(i,j).reinit(
-	      sizes[level+1][i],
-	      sizes[level][j], 0);
-      prolongation_matrices[level].collect_sizes();
+	    prolongation_matrices[level]->block(i,j)
+	      .reinit(sizes[level+1][i],
+		      sizes[level][j], 0);
+      prolongation_matrices[level]->collect_sizes();
 #else
-      prolongation_sparsities[level].reinit (n_components, n_components);
-      for (unsigned int i=0;i<n_components;++i)
-	for (unsigned int j=0;j<n_components;++j)
+      prolongation_sparsities[level]->reinit (n_components, n_components);
+      for (unsigned int i=0; i<n_components; ++i)
+	for (unsigned int j=0; j<n_components; ++j)
 	  if (i==j)
-	    prolongation_sparsities[level].block(i,j).reinit(
-	      sizes[level+1][i],
-	      sizes[level][j],
+	    prolongation_sparsities[level]->block(i,j)
+	      .reinit(sizes[level+1][i],
+		      sizes[level][j],
 //TODO:[GK] Split this by component to save memory
-	      dofs_per_cell+1);
+		      dofs_per_cell+1);
 	  else
-	    prolongation_sparsities[level].block(i,j).reinit(
-	      sizes[level+1][i],
-	      sizes[level][j],
-	      0);
+	    prolongation_sparsities[level]->block(i,j)
+	      .reinit(sizes[level+1][i],
+		      sizes[level][j],
+		      0);
 
-      prolongation_sparsities[level].collect_sizes();
+      prolongation_sparsities[level]->collect_sizes();
       
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
@@ -277,15 +305,14 @@ void MGTransferBlockBase::build_matrices (
 			const unsigned int icomp = fe.system_to_component_index(i).first;
 			const unsigned int jcomp = fe.system_to_component_index(j).first;
 			if ((icomp==jcomp) && selected[icomp])
-			  prolongation_sparsities[level].add
-			    (dof_indices_child[i],
-			     dof_indices_parent[j]);
+			  prolongation_sparsities[level]->add(dof_indices_child[i],
+							      dof_indices_parent[j]);
 		      };
 	      };
 	  };
-      prolongation_sparsities[level].compress ();
+      prolongation_sparsities[level]->compress ();
 
-      prolongation_matrices[level].reinit (prolongation_sparsities[level]);
+      prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 #endif
 				       // now actually build the matrices
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
@@ -314,10 +341,9 @@ void MGTransferBlockBase::build_matrices (
 			const unsigned int icomp = fe.system_to_component_index(i).first;
 			const unsigned int jcomp = fe.system_to_component_index(j).first;
 			if ((icomp==jcomp) && selected[icomp])
-			  prolongation_matrices[level].set
-			    (dof_indices_child[i],
-			     dof_indices_parent[j],
-			     prolongation(i,j));
+			  prolongation_matrices[level]->set(dof_indices_child[i],
+							    dof_indices_parent[j],
+							    prolongation(i,j));
 		      };
 	      };
 	  };
@@ -356,7 +382,7 @@ void MGTransferBlockBase::build_matrices (
 	  deallog << "level " << level
 		  << " block " << i << ' ' << j << std::endl;
 	  
-	  prolongation_matrices[level].block(i,j).print_statistics(deallog,true);
+	  prolongation_matrices[level]->block(i,j).print_statistics(deallog,true);
 	}
   deallog.pop();
 #endif  
