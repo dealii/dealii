@@ -142,7 +142,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   cout << "    Making grid..." << endl;
 
   string test = prm.get ("Test run");
-  unsigned int test_case;
+  unsigned int test_case = 1;
   if (test=="zoom in") test_case = 1;
   else
     if (test=="ball") test_case = 2;
