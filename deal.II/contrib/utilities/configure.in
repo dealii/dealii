@@ -3,8 +3,6 @@ dnl configure script to find the main deal library
 dnl in .. or ../deal.II or ../deal
 dnl
 
-define([AC_CACHE_LOAD], )dnl
-define([AC_CACHE_SAVE], )dnl
 AC_INIT(embedding.cc)
 
 dnl Supply deal-directory in command line or find it
