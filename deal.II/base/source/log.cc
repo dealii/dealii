@@ -17,7 +17,11 @@
 #include <base/memory_consumption.h>
 
 #include <sys/resource.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <iomanip>
+#include <fstream>
+#include <strstream>
 
 LogStream deallog;
 
@@ -131,6 +135,18 @@ LogStream::print_line_head()
 	  utime = diff;
 	}
     }
+
+  static const pid_t id = getpid();
+  std::ostrstream statname;
+  statname << "/proc/" << id << "/stat" << std::ends;
+  static long size;
+  static string dummy;
+  ifstream stat(statname.str());
+				   // ignore 22 values
+  stat >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
+    dummy >> dummy >> dummy >> dummy >> dummy >>
+    dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
+    dummy >> dummy >> dummy >> dummy >> dummy >> size;
   
   const std::string& head = get_prefix();
 
@@ -140,6 +156,9 @@ LogStream::print_line_head()
 	{
 	  int p = std_out->width(5);
 	  *std_out << utime << ':';
+	  std_out->width(16);
+	  *std_out << size << ':';
+	  
 	  std_out->width(p);
 	}
       *std_out <<  head << ':';
@@ -151,6 +170,8 @@ LogStream::print_line_head()
 	{
 	  int p = file->width(6);
 	  *file << utime << ':';
+	  file->width(16);
+	  *file << size << ':';
 	  file->width(p);
 	}  
       *file << head << ':';
