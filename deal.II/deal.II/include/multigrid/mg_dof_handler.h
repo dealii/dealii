@@ -181,7 +181,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * Constructor. Take @p{tria} as
 				      * the triangulation to work on.
 				      */
-    MGDoFHandler (Triangulation<dim> &tria);
+    MGDoFHandler (const Triangulation<dim> &tria);
 
 				     /**
 				      * Destructor
