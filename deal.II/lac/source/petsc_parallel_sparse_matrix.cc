@@ -255,7 +255,6 @@ namespace PETScWrappers
                const unsigned int               this_process,
                const bool                       preset_nonzero_locations)
     {
-//TODO[WB]: The next PETSc release should contain a function  MatMPI[B]AIJSetPreallocationCSR that we will want to use here. it may also be worthwhile to look at the functions MatPreallocateXXX in include/petscmat.h
       Assert (local_rows_per_process.size() == local_columns_per_process.size(),
               ExcDimensionMismatch (local_rows_per_process.size(),
                                local_columns_per_process.size()));
@@ -314,7 +313,7 @@ namespace PETScWrappers
                           0, &row_lengths_out_of_window[0],
                           &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
+
                                        // next preset the exact given matrix
                                        // entries with zeros, if the user
                                        // requested so. this doesn't avoid any
@@ -330,6 +329,18 @@ namespace PETScWrappers
                                        // class.
       if (preset_nonzero_locations == true)
         {
+                                       // starting with petsc 2.2.1, there is
+                                       // a function
+                                       // MatMPIAIJSetPreallocationCSR that
+                                       // can be used to allocate the sparsity
+                                       // pattern of a matrix if it is already
+                                       // available. if we don't have this, we
+                                       // have to somehow clumsily work around
+                                       // the whole thing:
+#if (PETSC_VERSION_MAJOR <= 2) && \
+    ((PETSC_VERSION_MINOR < 2) ||  \
+     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))      
+
           std::vector<int> row_entries;
           std::vector<PetscScalar> row_values;
           for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
@@ -344,6 +355,52 @@ namespace PETScWrappers
                             sparsity_pattern.row_length(i), &row_entries[0],
                             &row_values[0], INSERT_VALUES);
             }
+#else
+
+                                           // first set up the column number
+                                           // array for the rows to be stored
+                                           // on the local processor. have one
+                                           // dummy entry at the end to make
+                                           // sure petsc doesn't read past the
+                                           // end
+          std::vector<int> rowstart_in_window (local_row_end -
+                                               local_row_start + 1,
+                                               0);
+          std::vector<int> colnums_in_window;
+          {
+            unsigned int n_cols = 0;
+            for (unsigned int i=local_row_start; i<local_row_end; ++i)
+              {
+                const unsigned int row_length = sparsity_pattern.row_length(i);
+                rowstart_in_window[i+1-local_row_start]
+                  = rowstart_in_window[i-local_row_start] + row_length;
+                n_cols += row_length;
+              }
+            colnums_in_window.resize (n_cols+1, -1);
+          }
+          
+                                           // now copy over the information
+                                           // from the sparsity pattern.
+          {
+            unsigned int index=0;
+            for (unsigned int i=local_row_start; i<local_row_end; ++i)
+              for (unsigned int j=0; j<sparsity_pattern.row_length(i);
+                   ++j, ++index)
+              colnums_in_window[index] = sparsity_pattern.column_number(i,j);
+            Assert (index == colnums_in_window.size()-1, ExcInternalError());
+          }
+          
+                                           // then call the petsc function
+                                           // that summarily allocates these
+                                           // entries:
+          MatMPIAIJSetPreallocationCSR (matrix,
+                                        &rowstart_in_window[0],
+                                        &colnums_in_window[0],
+                                        0);
+      
+      
+#endif
+
           compress ();
 
 //TODO: We should use the appropriate option with MatSetOption here indicating that we do not intend to add any further matrix entries. Maybe this would accelerate some things as well
