@@ -22,6 +22,7 @@
 
 
 template <int dim, typename BaseClass>
+inline
 int DoFLineAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -56,6 +57,7 @@ void DoFLineAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 template <int dim, typename BaseClass>
+inline
 int DoFLineAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -195,6 +197,7 @@ void DoFLineAccessor<dim,BaseClass>::copy_from (const DoFLineAccessor<dim,BaseCl
 
 
 template <int dim, typename BaseClass>
+inline
 int DoFQuadAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -226,6 +229,7 @@ void DoFQuadAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 template <int dim, typename BaseClass>
+inline
 int DoFQuadAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
