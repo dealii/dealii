@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -111,10 +111,10 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 {
   return (quad->vertex(0) + quad->vertex(1) +
 	  quad->vertex(2) + quad->vertex(3) +
-	  quad->line(0)->child(0)->vertex(1) +
-	  quad->line(1)->child(0)->vertex(1) +
-  	  quad->line(2)->child(0)->vertex(1) +
-  	  quad->line(3)->child(0)->vertex(1)) / 8;
+	  quad->line(0)->center() +
+	  quad->line(1)->center() +
+  	  quad->line(2)->center() +
+  	  quad->line(3)->center()) / 8;
 }
 
 #endif
