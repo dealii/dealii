@@ -246,6 +246,22 @@ namespace Polynomials
       Monomial(const unsigned int n,
 	       const double coefficient = 1.);
 
+                                       /**
+                                        * Return a vector of Monomial
+                                        * objects of orders zero
+                                        * through @p{degree}, which
+                                        * then spans the full space of
+                                        * polynomials up to the given
+                                        * degree. This function may be
+                                        * used to initialize the
+                                        * @ref{TensorProductPolynomials}
+                                        * and @ref{PolynomialSpace}
+                                        * classes.
+                                        */
+      static
+      std::vector<Polynomial<number> >
+      generate_complete_basis (const unsigned int degree);
+    
     private:
 				       /**
 					* Needed by constructor.

@@ -324,6 +324,16 @@ namespace Polynomials
   {}
   
   
+  template <typename number>
+  std::vector<Polynomial<number> >
+  Monomial<number>::generate_complete_basis (const unsigned int degree)
+  {
+    std::vector<Polynomial<number> > v;
+    v.reserve(degree+1);
+    for (unsigned int i=0; i<=degree; ++i)
+      v.push_back (Monomial<number>(i));
+    return v;
+  }
 // ------------------ class LagrangeEquidistant --------------- //
 
   LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
