@@ -111,7 +111,7 @@ inline void quicksort(long r, T* a)
 }
 
 
-/*----------------- from sort.h -------------------------*/
+/*----------------- end: from sort.h -------------------------*/
 
 
 
@@ -286,9 +286,21 @@ dSMatrixStruct::bandwidth () const
 
 
 
+
+
+/*-------------------------------------------------------------------------*/
+
+
+dSMatrix::dSMatrix () :
+		cols(0),
+		val(0),
+		max_len(0) {};
+
+
 void
 dSMatrix::reinit()
 {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (cols->compressed, ExcNotCompressed());
   
   if(max_len<cols->vec_len)
@@ -315,8 +327,9 @@ dSMatrix::reinit (dSMatrixStruct &sparsity) {
 void
 dSMatrix::vmult(dVector& dst,const dVector& src)
 {
-  // Assert(m() = dst.n())
-  // Assert(n() = src.n())
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert(m() == dst.n(), ExcDimensionsDontMatch(m(),dst.n()));
+  Assert(n() == src.n(), ExcDimensionsDontMatch(n(),src.n()));
 
   for (int i=0;i<m();i++)
     {
@@ -333,8 +346,9 @@ dSMatrix::vmult(dVector& dst,const dVector& src)
 void
 dSMatrix::Tvmult(dVector& dst,const dVector& src) 
 {
-  // Assert(n() = dst.n())
-  // Assert(m() = src.n())
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert(n() == dst.n(), ExcDimensionsDontMatch(n(),dst.n()));
+  Assert(m() == src.n(), ExcDimensionsDontMatch(m(),src.n()));
 
   int i;
   
@@ -353,8 +367,10 @@ dSMatrix::Tvmult(dVector& dst,const dVector& src)
 double
 dSMatrix::residual(dVector& dst,const dVector& u,const dVector& b)
 {
-  // Assert(m() = dst.n())
-  // Assert(n() = src.n())
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert(m() == dst.n(), ExcDimensionsDontMatch(m(),dst.n()));
+  Assert(m() == b.n(), ExcDimensionsDontMatch(m(),b.n()));
+  Assert(n() == u.n(), ExcDimensionsDontMatch(n(),u.n()));
 
   double s,norm=0.;   
   
@@ -375,6 +391,8 @@ dSMatrix::residual(dVector& dst,const dVector& u,const dVector& b)
 void
 dSMatrix::Jacobi_precond(dVector& dst,const dVector& src,double om)
 {
+  Assert (cols != 0, ExcMatrixNotInitialized());
+
   int n = src.n();
 
   for (int i=0;i<n;++i)
@@ -386,6 +404,8 @@ dSMatrix::Jacobi_precond(dVector& dst,const dVector& src,double om)
 void
 dSMatrix::SSOR_precond(dVector& dst,const dVector& src,double om)
 {
+  Assert (cols != 0, ExcMatrixNotInitialized());
+
   int  p,n = src.n();
   int  i,j;
   
@@ -415,6 +435,7 @@ dSMatrix::SSOR_precond(dVector& dst,const dVector& src,double om)
 void
 dSMatrix::SOR_precond(dVector& dst,const dVector& src,double om)
 {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   dst = src;
   SOR(dst,om);
 }
@@ -422,8 +443,9 @@ dSMatrix::SOR_precond(dVector& dst,const dVector& src,double om)
 void
 dSMatrix::SOR(dVector& dst, double om)
 {
-  // Assert(m()==n())
-  // Assert(m()==dst.n())
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert(n() == m(), ExcDimensionsDontMatch(n(),m()));
+  Assert(m() == dst.n(), ExcDimensionsDontMatch(m(),dst.n()));
 
   for (int i=0;i<m();i++)
     {
@@ -441,6 +463,8 @@ dSMatrix::SOR(dVector& dst, double om)
 void
 dSMatrix::SSOR(dVector& dst, double om)
 {
+  Assert (cols != 0, ExcMatrixNotInitialized());
+
   int  p,n = dst.n();
   int  i,j;
   double s;
@@ -477,6 +501,8 @@ dSMatrix::SSOR(dVector& dst, double om)
 
 
 void dSMatrix::print (ostream &out) const {
+  Assert (cols != 0, ExcMatrixNotInitialized());
+
   for (int i=0; i<cols->rows; ++i)
     for (int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
       out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << endl;

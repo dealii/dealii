@@ -114,10 +114,18 @@ class dSMatrix
     double* val;
     int max_len;
   public:
-				     //
-    void reinit();
-				     //
-    void reinit (dSMatrixStruct &);
+
+				     /**
+				      * Constructor; initializes the matrix to be
+				      * empty, without any structure, i.e. the
+				      * matrix is not usable at all. This constructor
+				      * is therefore only useful for matrices which
+				      * are members of a class. You have to initialize
+				      * the matrix before usage with
+				      * #reinit(dSMatrixStruct)#.
+				      */
+    dSMatrix ();
+    
 				     //
     dSMatrix(dSMatrixStruct& c)
 		    : cols(&c), val(0), max_len(0)
@@ -129,6 +137,12 @@ class dSMatrix
       {
 	delete[] val;
       }
+
+
+				     //
+    void reinit();
+				     //
+    void reinit (dSMatrixStruct &);
 
 				     //
     int m() const { return cols->rows; }
@@ -166,5 +180,16 @@ class dSMatrix
 				      * Exception
 				      */
     DeclException0 (ExcNotCompressed);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcMatrixNotInitialized);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcDimensionsDontMatch,
+		    int, int,
+		    << "The dimensions " << arg1 << " and " << arg2
+		    << " do not match properly.");
 };
 #endif
