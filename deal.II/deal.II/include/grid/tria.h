@@ -1720,8 +1720,13 @@ class Triangulation
 				      *
 				      *  This triangulation must be empty
 				      *  beforehand.
+				      *
+				      *  The function is made #virtual# since
+				      *  some derived classes might want to
+				      *  disable the functionality of this
+				      *  function.
 				      */
-    void copy_triangulation (const Triangulation<dim> &old_tria);
+    virtual void copy_triangulation (const Triangulation<dim> &old_tria);
 
 				     /**
 				      * Write out a triangulation en bloc, i.e.
@@ -1735,15 +1740,23 @@ class Triangulation
 				      * only thought to support fast creation
 				      * of and restoration from temporary
 				      * files.
+				      *
+				      * The function is made #virtual# to
+				      * allow derived classes to write their
+				      * contents as well.
 				      */
-    void block_write (ostream &out) const;
+    virtual void block_write (ostream &out) const;
 
 				     /**
 				      * Restore a triangulation written by the
 				      * above function. The present content of
 				      * the triangulation is obviously lost.
+				      *
+				      * The function is made #virtual# to
+				      * allow derived classes to read their
+				      * contents as well.
 				      */
-    void block_read (istream &in);
+    virtual void block_read (istream &in);
     
 				     /**
 				      * Create a triangulation from a list
@@ -1763,10 +1776,14 @@ class Triangulation
 				      * #cells# array is subject to some
 				      * constraints; see the general class
 				      * documentation for this.
+				      *
+				      * This function is made #virtual# to allow
+				      * derived classes to set up some data
+				      * structures as well.
 				      */
-    void create_triangulation (const vector<Point<dim> >    &vertices,
-			       const vector<CellData<dim> > &cells,
-			       const SubCellData            &subcelldata);
+    virtual void create_triangulation (const vector<Point<dim> >    &vertices,
+				       const vector<CellData<dim> > &cells,
+				       const SubCellData            &subcelldata);
 
 				     /**
 				      * Distort the grid by randomly moving
