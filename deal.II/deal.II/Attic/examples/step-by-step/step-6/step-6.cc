@@ -811,6 +811,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 };
 
 
+
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
