@@ -384,11 +384,19 @@ QMidpoint<dim>::QMidpoint () :
 		Quadrature<dim> (QMidpoint<dim-1>(), QMidpoint<1>()){};
 
 template <int dim>
+QTrapez<dim>::QTrapez () :
+		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){};
+
+template <int dim>
 QSimpson<dim>::QSimpson () :
 		Quadrature<dim> (QSimpson<dim-1>(), QSimpson<1>()){};
 
 template <int dim>
-QTrapez<dim>::QTrapez () :
+QMilne<dim>::QMilne () :
+		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){};
+
+template <int dim>
+QWeddle<dim>::QWeddle () :
 		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){};
 
 
