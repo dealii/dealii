@@ -58,7 +58,7 @@ class SolverRichardson : public Solver<VECTOR>
 					  * to one.
 					  */
 	AdditionalData(double omega=1,
-		       bool use_preconditioned_residual = true):
+		       bool use_preconditioned_residual = false):
 			omega(omega),
 			use_preconditioned_residual(use_preconditioned_residual)
 	  {};
@@ -207,10 +207,7 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
       if (!additional_data.use_preconditioned_residual)
 	{
 	  res = r*r;
-//      cout << '[' << res << ' ';
 	  res=sqrt(res);
-//      cout << res << ' ' << r.l1_norm() << ']';
-//      r.print(cout);
 	  conv = control().check (iter, criterion());
 	  if (conv != SolverControl::iterate)
 	    break;
@@ -220,10 +217,7 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
       if (additional_data.use_preconditioned_residual)
 	{
 	  res = d*d;
-//      cout << '[' << res << ' ';
 	  res=sqrt(res);
-//      cout << res << ' ' << r.l1_norm() << ']';
-//      r.print(cout);
 	  conv = control().check (iter, criterion());
 	  if (conv != SolverControl::iterate)
 	    break;
