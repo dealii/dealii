@@ -1477,7 +1477,10 @@ typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::end (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
-  return const_iterator(this, r+1, 0);
+  const_iterator result(this, r+1, 0);
+  if (row_info[r+1].length == 0)
+    ++result;
+  return result;
 }
 
 template<typename number>
