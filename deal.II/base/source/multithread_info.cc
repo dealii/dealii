@@ -32,10 +32,22 @@
 
 #if DEAL_II_USE_MT == 1
 
+/* Detecting how many processors a given machine has is something that
+   varies greatly between operating systems. For a few operating
+   systems, we have figured out how to do that below, but some others
+   are still missing. If you find a way to do this on your favorite
+   system, please let us know.
+ */
+
+
 #  if defined(__linux__)
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
+				   // on linux, we simply count the
+				   // number of lines listing
+				   // individual processors when
+				   // reading from /proc/cpuinfo
   std::ifstream cpuinfo;
   std::string search;
   unsigned int nCPU = 0;
