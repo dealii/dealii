@@ -239,6 +239,14 @@ void test_compute_functions (const Mapping<dim> &mapping,
 			     const FiniteElement<dim> &fe,
 			     const char*)
 {
+                                   // generate a grid with only one
+                                   // cell, which furthermore has the
+                                   // shape of the unit cell. then the
+                                   // values/gradients/... we get from
+                                   // the FEValues object on this cell
+                                   // should really be equal to what
+                                   // we get from the finite element
+                                   // itself on the unit cell:
   Triangulation<dim> tr;
   DoFHandler<dim> dof(tr);
   GridGenerator::hyper_cube(tr, 0., 1.);
@@ -250,11 +258,16 @@ void test_compute_functions (const Mapping<dim> &mapping,
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   fe_values.reinit(cell);
 
+                                   // check values
   for (unsigned int x=0; x<q.n_quadrature_points; ++x)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
       {
-	Assert (fabs(fe_values.shape_value(i,x)-fe.shape_value(i,q.point(x))) < 1e-13,
-		ExcInternalError());
+        if (true)
+          {
+            const double val1 = fe_values.shape_value(i,x),
+                         val2 = fe.shape_value(i,q.point(x));
+            Assert (fabs(val1-val2) < 1e-13, ExcInternalError());
+          };
 
 	for (unsigned int c=0; c<fe.n_components(); ++c)
 	  Assert (((c == fe.system_to_component_index(i).first) &&
@@ -264,6 +277,8 @@ void test_compute_functions (const Mapping<dim> &mapping,
 		   (fe_values.shape_value_component(i,x,c) == 0)),
 		  ExcInternalError());
       };
+
+                                   // check gradients
   for (unsigned int x=0; x<q.n_quadrature_points; ++x)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
       {
@@ -280,6 +295,7 @@ void test_compute_functions (const Mapping<dim> &mapping,
 		  ExcInternalError());
       }
 
+                                   // check second derivatives
   double max_diff=0.;
   for (unsigned int x=0; x<q.n_quadrature_points; ++x)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
