@@ -30,6 +30,9 @@
  * has a default argument, so you may call it without the additional
  * parameter.
  *
+ * This version of CG is taken from Braess: "Finite Elements" and is analogous
+ * to the one in the SIAM Templates Book. It requires a symmetric preconditioner,
+ * i.e. SOR is not sufficient.
  *
  * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
  */
