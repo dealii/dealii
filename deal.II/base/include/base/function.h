@@ -129,6 +129,13 @@ class Function : public FunctionTime,
 				      * overhead in derived classes,
 				      * this is the best place to do
 				      * this.
+				      *
+				      * Nevertheless, since derived
+				      * classes want to call the
+				      * destructor of a base class,
+				      * the destructor is implemented
+				      * (despite it being pure
+				      * virtual).
 				      */
     virtual ~Function () = 0;
     
