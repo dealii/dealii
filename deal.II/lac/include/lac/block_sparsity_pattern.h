@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -315,6 +315,18 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * returned by the sub-objects.
 				      */
     unsigned int n_nonzero_elements () const;
+
+    				     /**
+				      * Print the sparsity of the
+				      * matrix. The output consists of
+				      * one line per row of the format
+				      * <tt>[i,j1,j2,j3,...]</tt>. <i>i</i>
+				      * is the row number and
+				      * <i>jn</n> are the allocated
+				      * columns in this row.
+				      */
+    void print (std::ostream &out) const;
+
 
 				     /**
 				      * Exception

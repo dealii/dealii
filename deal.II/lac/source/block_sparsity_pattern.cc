@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -233,6 +233,32 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_nonzero_elements () const
 
 
 
+template <class SparsityPatternBase>
+void
+BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream& out) const
+{
+  unsigned int k=0;
+  for (unsigned int ib=0;ib<n_block_rows();++ib)
+    {
+      for (unsigned int i=0;i<block(ib,ib).n_rows();++i)
+	{
+	  out << '[' << i+k;
+	  unsigned int l=0;
+	  for (unsigned int jb=0;jb<n_block_cols();++jb)
+	    {
+	      const SparsityPatternBase& b = block(ib,jb);
+	      for (unsigned int j=0;j<b.n_cols();++j)
+		if (b.exists(i,j))
+		  out << ',' << l+j;
+	      l += b.n_cols();
+	    }
+	  out << ']' << std::endl;
+	}
+      k += block(ib,ib).n_rows();
+    }
+}
+
+
 BlockSparsityPattern::BlockSparsityPattern ()
 {}
 
@@ -256,7 +282,6 @@ BlockSparsityPattern::is_compressed () const
 	return false;
   return true;
 }
-
 
 
 unsigned int
