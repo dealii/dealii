@@ -140,9 +140,45 @@ class Boundary : public Subscriptor
 				     vector<Point<dim> > &points) const;
     
 				     /**
+				      * Return intermediate points
+				      * on the boundary quad.
+				      *
+				      * The number of points requested
+				      * is given by the size of the
+				      * vector @p{points}. It is
+				      * required that this number is a
+				      * square of another integer,
+				      * i.e. @p{n=points.size()=m*m}. It
+				      * is the task of the derived
+				      * classes to arrange the points
+				      * such they split the quad into
+				      * @p{(m+1)(m+1)} approximately
+				      * equal-sized subquads.
+				      *
+				      * This function is needed by the
+				      * @p{MappingQ} class. As this
+				      * function is not needed for Q1
+				      * mappings, it is not made pure
+				      * virtual, to avoid the need to
+				      * overload it.  The default
+				      * implementation throws an error
+				      * in any case, however.
+				      */
+    virtual void
+    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
+				     vector<Point<dim> > &points) const;
+
+				     /**
 				      * Exception.
 				      */
     DeclException0 (ExcPureVirtualFunctionCalled);
+
+				     /**
+				      * Exception.
+				      */
+    DeclException1 (ExcFunctionNotUseful,
+		    int,
+		    << "The function called is not useful for dim=" << arg1 << ".");
 };
 
 
@@ -200,6 +236,21 @@ class StraightBoundary : public Boundary<dim> {
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				     vector<Point<dim> > &points) const;
+
+				     /**
+				      * Gives @p{n=points.size()=m*m}
+				      * points that splits the
+				      * p{StraightBoundary} quad into
+				      * @p{(m+1)(m+1)} subquads of equal
+				      * size.
+				      *
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
+				      */
+    virtual void
+    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
 				     vector<Point<dim> > &points) const;
 
 };
