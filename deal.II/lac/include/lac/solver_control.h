@@ -209,6 +209,11 @@ class SolverControl : public Subscriptor
 				      * steps.
 				      */
     void log_history (const bool);
+
+				     /**
+				      * Returns the log_history flag.
+				      */
+    bool log_history () const;
     
 				     /**
 				      * Set logging frequency.
@@ -436,6 +441,13 @@ inline void
 SolverControl::log_history (bool newval)
 {
   _log_history = newval;
+}
+
+
+inline bool
+SolverControl::log_history () const
+{
+  return _log_history;
 }
 
 
