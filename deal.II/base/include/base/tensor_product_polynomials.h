@@ -26,7 +26,11 @@
 /**
  * Tensor product of given polynomials.
  *
- * @author Ralf Hartmann, 2000
+ * Given a vector of @{n} one-dimensional polynomials @{P1} to @{Pn},
+ * this class generates @p{n} to the power of @p{dim} polynomials of
+ * the form @p{ Qijk(x,y,z) = Pi(x)Pj(y)Pk(z)}.
+ *
+ * @author Ralf Hartmann, 2000, documentation Guido Kanschat
  */
 template <int dim>
 class TensorProductPolynomials
@@ -34,17 +38,21 @@ class TensorProductPolynomials
   public:
 				     /**
 				      * Constructor. @p{pols} is a
-				      * vector of 1d polynomial
-				      * functions. For polynomials of
-				      * order @p{p} there should be
-				      * @p{p+1} polynomials.
+				      * vector of pointers to
+				      * one-dimensional polynomials.
 				      */
     TensorProductPolynomials(const vector<SmartPointer<Polynomial> > &pols);
 
 				     /**
-				      * Calculates the shape values
-				      * and shape grads at the
+				      * Calculates the polynomials
+				      * and their derivatives at
 				      * @p{unit_point}.
+				      *
+				      * The vectors must either have
+				      * length @p{0} or number of
+				      * polynomials. In the first
+				      * case, the function will not
+				      * compute these values.
 				      */
     void shape_values_and_grads(const Point<dim> &unit_point,
 				vector<double> &values,
