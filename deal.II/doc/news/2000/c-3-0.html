@@ -470,6 +470,19 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: The <code class="class"> FiniteElement</code> has got two
+       new functions <code class="member">transform_unit_to_real_cell
+       </code> and <code class="member">transform_real_to_unit_cell
+       </code>. They allow to transform points from reference (unit)
+       cell to real cell and visa versa. <code
+       class="member">transform_real_to_unit_cell</code> involves a
+       Newton iteration and works for all dimensions and all mappings
+       used to transform from unit to real cell.
+       <br>
+       (Ralf Hartmann 2000/10/12)
+       </p>
+
+  <li> <p>
        Extended: The <code class="class">Triangulation</code>
        class can handle boundary information in 3d as well
        (i.e. lines and quads in 3d with special material IDs).
