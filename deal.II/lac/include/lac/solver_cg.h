@@ -83,10 +83,10 @@ SolverPCG<Matrix,Vector>::solve (const Matrix &A,
   SolverControl::State conv=SolverControl::iterate;
   
 				   // Memory allocation
-  Vr  = memory.alloc(); Vector& g  = *Vr;
-  Vp  = memory.alloc(); Vector& h  = *Vp;
-  Vz  = memory.alloc(); Vector& d  = *Vz;
-  VAp = memory.alloc(); Vector& Ad = *VAp; 
+  Vr  = memory.alloc(); Vector& g  = *Vr; g.reinit(x);
+  Vp  = memory.alloc(); Vector& h  = *Vp; h.reinit(x);
+  Vz  = memory.alloc(); Vector& d  = *Vz; d.reinit(x);
+  VAp = memory.alloc(); Vector& Ad = *VAp; Ad.reinit(x);
 
 				   // Implementation taken from the DEAL
 				   // library
