@@ -1179,9 +1179,9 @@ class TriaDimensionInfo<2> {
  *   numbered as for the quadrilateral, for the back face they are just shifted.
  *   Finally, the four lines connecting front and back face are numbered:
  *   \begin{verbatim}
- *         *---6---*        *-------*
+ *         *---6---*        *---6---*
  *        /|       |       /       /|
- *      11 |       5      11     10 |
+ *      11 |       5      11     10 5
  *      /  7       |     /       /  |
  *     *   |       |    *---2---*   |
  *     |   *---4---*    |       |   *
@@ -1190,8 +1190,8 @@ class TriaDimensionInfo<2> {
  *     |/       /       |       |/
  *     *---0---*        *---0---*
  *   \end{verbatim}
- *   The direction of the front and back lines is as for the respective faces, while
- *   the connecting faces always point to the back:
+ *   The directions of the front and back lines is as for the respective faces, while
+ *   the connecting lines always point to the back:
  *   \begin{verbatim}
  *         *--->---*        *--->---*
  *        /|       |       /       /|
