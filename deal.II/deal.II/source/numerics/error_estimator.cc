@@ -33,13 +33,11 @@
 
 
 
-namespace
+static
+inline
+double sqr (const double x)
 {
-  inline
-  double sqr (const double x)
-  {
-    return x*x;
-  }
+  return x*x;
 }
 
 
