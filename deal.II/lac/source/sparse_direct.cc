@@ -311,7 +311,8 @@ namespace CommunicationsLog
     list_access_lock.acquire ();
     for (std::list<Record>::iterator i=communication_log.begin();
          i!=communication_log.end(); ++i)
-      communication_log.erase (i);
+      if (i->child_pid == child_pid)
+        communication_log.erase (i);
     list_access_lock.release ();
   };
 };
