@@ -13,7 +13,6 @@
 #ifndef __deal2__slice_vector_h
 #define __deal2__slice_vector_h
 
-
 #include <base/config.h>
 #include <base/exceptions.h>
 
@@ -58,6 +57,45 @@ class SliceVector
     unsigned int length;
 };
 
+
+/**
+ * Helper function for creating temporary objects without typing
+ * template arguments.
+ *
+ * @relates SliceVector
+ * @author Guido Kanschat, 2004
+ */
+template <class VECTOR>
+inline
+const SliceVector<VECTOR>
+make_slice (VECTOR& v)
+{
+  const SliceVector<VECTOR> r(v);
+  return r;
+}
+
+
+
+/**
+ * Helper function for creating temporary objects without typing
+ * template arguments.
+ *
+ * @relates SliceVector
+ * @author Guido Kanschat, 2004
+ */
+template <class VECTOR>
+inline
+const SliceVector<VECTOR>
+make_slice (VECTOR& v, unsigned int start, unsigned int length)
+{
+  const SliceVector<VECTOR> r(v, start, length);
+  return r;
+}
+
+
+
+
+//-------------- member functions --------------------//
 
 template <class VECTOR>
 inline
@@ -110,4 +148,3 @@ SliceVector<VECTOR>::operator[](unsigned int i) const
 
 
 #endif
-
