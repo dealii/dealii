@@ -83,7 +83,8 @@ class MultiGrid
 				    * Copies data from active portions
 				    * of an MGVector into the
 				    * respective positions of a
-				    * dVector.
+				    * dVector. All other entries of
+				    * #src# are zero.
 				    */
   void copy_from_mg(dVector& dst, const MGVector& src) const;
 
@@ -102,34 +103,76 @@ protected:
 				   /**
 				    * Number of pre-smoothing steps.
 				    */
-  unsigned n_presmooth;
+  unsigned n_pre_smooth;
   
 				   /**
 				    * Number of post-smoothing steps
 				    */
-  unsigned n_postsmooth;
+  unsigned n_post_smooth;
 				   /**
 				    * The (pre-)smoothing algorithm.
+				    * This function is required to
+				    * perform #steps# iterations to
+				    * smoothen the residual $Ax-b$.
 				    */
   virtual void smooth(unsigned level,
-		      dVector& dst,
-		      const dVector& src) const;
+		      dVector& x,
+		      const dVector& b,
+		      unsigned steps) const;
 
 				   /**
 				    * The post-smoothing algorithm.
 				    * Defaults to #smooth#.
 				    */
   virtual void post_smooth(unsigned level,
-		      dVector& dst,
-		      const dVector& src) const;
+			   dVector& dst,
+			   const dVector& src,
+			   unsigned steps) const;
 
+				   /**
+				    * Apply operator on all
+				    * cells of a level.
+				    *
+				    */
+  virtual void level_vmult(unsigned level,
+			   dVector& dst,
+			   const dVector& src) const;
 				   /**
 				    * Apply operator on non-refined
 				    * cells.
+				    *
+				    * The sum over all levels
+				    * of the results of this function
+				    * is the multiplication with the
+				    * normal fine-grid matrix.
 				    */
   virtual void level_active_vmult(unsigned level,
 				  dVector& dst,
 				  const dVector& src) const;
+
+				   /**
+				    * Restriction from #level#.
+				    *
+				    * This function <B>adds</B> the
+				    * restriction of #src# to #dst#,
+				    * where #src# is a vector on #level#
+				    * and #dst# is on #level#-1.
+				    */
+  virtual void restriction(unsigned level,
+			   dVector& dst,
+			   const dVector& src) const;
+			   
+
+				   /**
+				    * Prolongation to #level#.
+				    *
+				    * <B>Adds</B> the prolongation of
+				    * #src# to #dst#. Here, #dst# is on
+				    * #level# and #src# on #level#-1.
+				    */
+  virtual void prolongation(unsigned level,
+			    dVector& dst,
+			    const dVector& src) const;
 
 				   /**
 				    * Solve exactly on coarsest grid.

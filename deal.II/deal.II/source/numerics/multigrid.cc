@@ -27,6 +27,7 @@ MultiGrid::precondition(dVector& dst, const dVector& src) const
   level_mgstep(maxlevel);
 }
 
+
 void
 MultiGrid::level_mgstep(unsigned level) const
 {
@@ -36,9 +37,15 @@ MultiGrid::level_mgstep(unsigned level) const
     return;
   }
   
-  for (unsigned i=0; i< n_presmooth; ++i)
-  {
-    smooth(level, d[level], s[level]);
-  }
+  smooth(level, d[level], s[level], n_pre_smooth);
+
+  post_smooth(level, d[level], s[level], n_post_smooth);
 }
 
+
+void MultiGrid::post_smooth(unsigned level,
+			    dVector& dst, const dVector& src,
+			    unsigned steps) const
+{
+  smooth(level, dst, src, steps);
+}
