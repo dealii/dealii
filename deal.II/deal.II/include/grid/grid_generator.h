@@ -41,7 +41,7 @@ template <int dim> class Triangulation;
  *      $[-1,1]^2 - [0,1]^2$. To create a hyper-L in one dimension results in
  *      an error. The function is also implemented for three space dimensions.
  *
- *    @item Hyper balls:
+ *    @item Hyper ball:
  *      You get the circle or ball (or generalized: hyperball) around origin
  *      @p{p} and with radius @p{r} by calling
  *      @ref{GridGenerator}@p{::hyper_ball (tria, p, r)}. The circle is triangulated
@@ -75,7 +75,13 @@ template <int dim> class Triangulation;
  *      suitable boundary class is provided as @ref{HyperSphereBoundary}
  *      in the library.
  *
- * @item Slit domain: The slit domain is a variant of the hyper cube
+ *    @item Half shells: This is a variant of the preceeding domain,
+ *      where only one half of the shell is taken, defined by the first
+ *      coordinate having non-negative values. This class is useful in
+ *      computations with rotational symmetry, as then a 3d shell can be
+ *      modeled by a 2d half shell.
+ *
+ *    @item Slit domain: The slit domain is a variant of the hyper cube
  *      domain. In two spatial dimensions, it is a square into which a slit
  *      is sawed; if the initial square is though to be composed of four
  *      smaller squares, then two of them are not connected even though
@@ -221,6 +227,49 @@ class GridGenerator
 			     const double        outer_radius,
 			     const unsigned int  n_cells = 0);
 
+
+				     /**
+				      * Produce a half hyper-shell,
+				      * i.e. the space between two
+				      * circles in two space
+				      * dimensions and the region
+				      * between two spheres in 3d,
+				      * with given inner and outer
+				      * radius and a given number of
+				      * elements for this initial
+				      * triangulation.  However,
+				      * opposed to the previous
+				      * function, it does not produce
+				      * a whole shell, but only one
+				      * half of it, namely that part
+				      * for which the first component
+				      * is restricted to non-negative
+				      * values. The purpose of this
+				      * class is to enable
+				      * computations for solutions
+				      * which have rotational
+				      * symmetry, in which case the
+				      * half shell in 2d represents a
+				      * shell in 3d.
+				      *
+				      * If the number of
+				      * initial cells is zero (as is
+				      * the default), then it is
+				      * computed adaptively such that
+				      * the resulting elements have
+				      * the least aspect ratio.
+				      *
+				      * The triangulation needs to be
+				      * void upon calling this
+				      * function.
+				      */
+    template <int dim>
+    static void half_hyper_shell (Triangulation<dim> &tria,
+				  const Point<dim>   &center,
+				  const double        inner_radius,
+				  const double        outer_radius,
+				  const unsigned int  n_cells = 0);
+    
 				     /**
 				      * Exception
 				      */

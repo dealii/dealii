@@ -26,6 +26,7 @@ HyperBallBoundary<dim>::HyperBallBoundary (const Point<dim> p,
 {};
 
 
+
 template <int dim>
 Point<dim>
 HyperBallBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
@@ -41,6 +42,7 @@ HyperBallBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>
 };
 
 
+
 #if deal_II_dimension == 1
 
 template <>
@@ -53,6 +55,7 @@ get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
 };
 
 #endif
+
 
 
 template <int dim>
@@ -71,12 +74,14 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 };
 
 
+
 template <int dim>
 Point<dim>
 HyperBallBoundary<dim>::get_center () const 
 {
   return center;
 };
+
 
 
 template <int dim>
@@ -87,11 +92,15 @@ HyperBallBoundary<dim>::get_radius () const
 };
 
 
+/* ---------------------------------------------------------------------- */
+
+
 template <int dim>
 HalfHyperBallBoundary<dim>::HalfHyperBallBoundary (const Point<dim> center,
 						   const double     radius) :
 		HyperBallBoundary<dim> (center, radius)
 {};
+
 
 
 template <int dim>
@@ -105,6 +114,7 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
   else
     return HyperBallBoundary<dim>::get_new_point_on_line (line);
 };
+
 
 
 #if deal_II_dimension == 1
@@ -121,6 +131,7 @@ get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
 #endif
 
 
+
 template <int dim>
 Point<dim>
 HalfHyperBallBoundary<dim>::
@@ -134,10 +145,16 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 };
 
 
+
+/* ---------------------------------------------------------------------- */
+
+
+
 template <int dim>
 HyperShellBoundary<dim>::HyperShellBoundary (const Point<dim> &center) :
 		center (center) 
 {};
+
 
 
 template <int dim>
@@ -161,6 +178,7 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 };
 
 
+
 #if deal_II_dimension == 1
 
 template <>
@@ -173,6 +191,7 @@ get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
 };
 
 #endif
+
 
 
 template <int dim>
@@ -196,7 +215,80 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 };
 
 
+/* ---------------------------------------------------------------------- */
+
+
+
+
+template <int dim>
+HalfHyperShellBoundary<dim>::HalfHyperShellBoundary (const Point<dim> &center) :
+		HyperShellBoundary<dim> (center) 
+{};
+
+
+
+template <int dim>
+Point<dim>
+HalfHyperShellBoundary<dim>::
+get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
+{
+				   // first check whether the two end
+				   // points of the line are on the
+				   // axis of symmetry. if so, then
+				   // return the mid point
+  if ((line->vertex(0)(0) == center(0)) &&
+      (line->vertex(1)(0) == center(0)))
+    return (line->vertex(0) + line->vertex(1))/2;
+  
+
+				   // otherwise we are on the outer or
+				   // inner part of the shell. proceed
+				   // as in the base class
+  return HyperShellBoundary<dim>::get_new_point_on_line (line);
+};
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+Point<1>
+HalfHyperShellBoundary<1>::
+get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
+{
+  Assert (false, ExcInternalError());
+  return Point<1>();
+};
+
+#endif
+
+
+
+template <int dim>
+Point<dim>
+HalfHyperShellBoundary<dim>::
+get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+{
+				   // same thing as for the new point
+				   // on the line
+  if ((quad->vertex(0)(0) == center(0)) &&
+      (quad->vertex(1)(0) == center(0)) &&
+      (quad->vertex(2)(0) == center(0)) &&
+      (quad->vertex(3)(0) == center(0)))
+    return (quad->vertex(0) + quad->vertex(1) +
+	    quad->vertex(2) + quad->vertex(3)   )/4;
+  
+
+				   // otherwise we are on the outer or
+				   // inner part of the shell. proceed
+				   // as in the base class
+  return HyperShellBoundary<dim>::get_new_point_on_quad (quad);
+};
+
+
+
 // explicit instantiations
 template class HyperBallBoundary<deal_II_dimension>;
 template class HalfHyperBallBoundary<deal_II_dimension>;
 template class HyperShellBoundary<deal_II_dimension>;
+template class HalfHyperShellBoundary<deal_II_dimension>;

@@ -35,12 +35,14 @@ void GridGenerator::hyper_cube<> (Triangulation<1> &tria,
 };
 
 
+
 template <>
 void GridGenerator::hyper_cube_slit<> (Triangulation<1> &,
 				       const double,
 				       const double) {
   Assert (false, ExcInternalError());
 };
+
 
 
 template <>
@@ -51,12 +53,14 @@ void GridGenerator::hyper_L<> (Triangulation<1> &,
 };
 
 
+
 template <>
 void GridGenerator::hyper_ball<> (Triangulation<1> &,
 				  const Point<1> &,
 				  const double) {
   Assert (false, ExcInternalError());
 };
+
 
 
 template <>
@@ -69,6 +73,7 @@ void GridGenerator::hyper_shell<> (Triangulation<1> &,
 };
 
 #endif
+
 
 
 #if deal_II_dimension == 2
@@ -136,7 +141,9 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<2> &tria,
 			     cells,
 			     SubCellData());       // no boundary information
 }
-  
+
+
+
 template <>
 void GridGenerator::hyper_cube_slit<> (Triangulation<2> &tria,
 				       const double left,
@@ -169,6 +176,7 @@ void GridGenerator::hyper_cube_slit<> (Triangulation<2> &tria,
 };
 
 
+
 template <>
 void GridGenerator::hyper_L<> (Triangulation<2> &tria,
 			       const double a,
@@ -199,6 +207,7 @@ void GridGenerator::hyper_L<> (Triangulation<2> &tria,
 			     cells,
 			     SubCellData());       // no boundary information
 };
+
 
 
 template <>
@@ -236,6 +245,7 @@ void GridGenerator::hyper_ball<> (Triangulation<2> &tria,
 			     cells,
 			     SubCellData());       // no boundary information
 };
+
 
 
 template <>
@@ -297,6 +307,76 @@ void GridGenerator::hyper_shell<> (Triangulation<2>   &tria,
 };
 
 
+
+template <>
+void GridGenerator::half_hyper_shell<> (Triangulation<2>   &tria,
+					const Point<2>     &center,
+					const double        inner_radius,
+					const double        outer_radius,
+					const unsigned int  n_cells)
+{
+  Assert ((inner_radius > 0) && (inner_radius < outer_radius),
+	  ExcInvalidRadii ());
+  
+  const double pi     = 3.14159265359;
+				   // determine the number of cells
+				   // for the grid. if not provided by
+				   // the user determine it such that
+				   // the length of each cell on the
+				   // median (in the middle between
+				   // the two circles) is equal to its
+				   // radial extent (which is the
+				   // difference between the two
+				   // radii)
+  const unsigned int N = (n_cells == 0 ?
+			  static_cast<unsigned int>
+			  (ceil((pi* (outer_radius + inner_radius)/2) /
+				(outer_radius - inner_radius))) :
+			  n_cells);
+
+				   // set up N+1 vertices on the
+				   // outer and N+1 vertices on
+				   // the inner circle. the
+				   // first N+1 ones are on the
+				   // outer one, and all are
+				   // numbered counter-clockwise
+  vector<Point<2> > vertices(2*(N+1));
+  for (unsigned int i=0; i<=N; ++i)
+    {
+				   // enforce that the x-coordinates
+				   // of the first and last point of
+				   // each half-circle are exactly
+				   // zero (contrary to what we may
+				   // compute using the imprecise
+				   // value of pi)
+      vertices[i] =  Point<2>( ( (i==0) || (i==N) ?
+				 0 :
+				 cos(pi * i/N - pi/2) ),
+			       sin(pi * i/N - pi/2)) * outer_radius;
+      vertices[i+N+1] = vertices[i] * (inner_radius/outer_radius);
+
+      vertices[i]     += center;
+      vertices[i+N+1] += center;
+    };
+
+
+  vector<CellData<2> > cells (N, CellData<2>());
+	
+  for (unsigned int i=0; i<N; ++i) 
+    {
+      cells[i].vertices[0] = i;
+      cells[i].vertices[1] = (i+1)%(N+1);
+      cells[i].vertices[2] = N+1+((i+1)%(N+1));
+      cells[i].vertices[3] = N+1+i;
+	    
+      cells[i].material_id = 0;
+    };
+  
+  tria.create_triangulation (vertices, cells, SubCellData());
+};
+
+
+
 #endif
 
 
@@ -327,12 +407,14 @@ void GridGenerator::hyper_cube<> (Triangulation<3> &tria,
 };
 
 
+
 template <>
 void GridGenerator::hyper_cube_slit<> (Triangulation<3> &,
 				       const double,
 				       const double) {
   Assert (false, ExcNotImplemented());
 };
+
 
 
 template<>

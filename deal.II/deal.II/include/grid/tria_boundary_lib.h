@@ -33,7 +33,8 @@
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class HyperBallBoundary : public StraightBoundary<dim> {
+class HyperBallBoundary : public StraightBoundary<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -80,16 +81,20 @@ class HyperBallBoundary : public StraightBoundary<dim> {
 };
 
 
+
 /**
  * Variant of @p{HyperBallBoundary} which denotes a half hyper ball
  * where the first coordinate is restricted to the range $x>=0$ (or
  * $x>=center(0)$). In two dimensions, this equals the right half
- * circle, in three space dimensions it is a half ball.
+ * circle, in three space dimensions it is a half ball. This class
+ * might be useful for computations with rotational symmetry, where
+ * one dimension is the radius from the axis of rotation.
  *
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
-class HalfHyperBallBoundary : public HyperBallBoundary<dim> {
+class HalfHyperBallBoundary : public HyperBallBoundary<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -113,6 +118,7 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim> {
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 };
+
 
 
 /**
@@ -152,6 +158,49 @@ class HyperShellBoundary : public StraightBoundary<dim>
 				      */
     const Point<dim> center;
 };
+
+
+
+/**
+ * Variant of @p{HyperShellBoundary} which denotes a half hyper shell
+ * where the first coordinate is restricted to the range $x>=0$ (or
+ * $x>=center(0)$). In two dimensions, this equals the right half arc,
+ * in three space dimensions it is a half shell. This class might be
+ * useful for computations with rotational symmetry, where one
+ * dimension is the radius from the axis of rotation.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <int dim>
+class HalfHyperShellBoundary : public HyperShellBoundary<dim> 
+{
+  public:
+				     /**
+				      * Constructor. The center of the
+				      * spheres defaults to the
+				      * origin.
+				      */
+    HalfHyperShellBoundary (const Point<dim> &center = Point<dim>());
+    
+				     /**
+				      * Construct a new point on a line.
+				      */
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;  
+    
+				     /**
+				      * Construct a new point on a quad.
+				      */
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+    
+  private:
+				     /**
+				      * Store the center of the spheres.
+				      */
+    const Point<dim> center;
+};
+
 
 
 #endif
