@@ -22,12 +22,15 @@ dnl    Set the path to the deal.II libraries to `pwd`
 DEAL2_DIR=`pwd`
 AC_SUBST(DEAL2_DIR)
 
-dnl    Set major and minor version numbers of the deal.II library
+dnl    Set major and minor version numbers of the deal.II library,
+dnl    both as preprocessor variables and in Makefiles
 DEAL_2_MAJOR=`cat Version | perl -pi -e 's/^(\d+)\..*/$1/;'`
 DEAL_2_MINOR=`cat Version | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
 AC_DEFINE_UNQUOTED(DEAL_2_MAJOR, $DEAL_2_MAJOR)
 AC_DEFINE_UNQUOTED(DEAL_2_MINOR, $DEAL_2_MINOR)
 AC_MSG_RESULT(Configuring deal.II version `cat Version`)
+AC_SUBST(DEAL_2_MAJOR)
+AC_SUBST(DEAL_2_MINOR)
 
 
 dnl    Check for machine type operating system
