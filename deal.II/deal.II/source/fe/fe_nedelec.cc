@@ -272,130 +272,59 @@ FE_Nedelec<dim>::clone() const
 }
 
 
+#if deal_II_dimension == 1
 
-template <int dim>
+template <>
 double
-FE_Nedelec<dim>::shape_value_component (const unsigned int i,
-					const Point<dim>  &p,
-					const unsigned int component) const
+FE_Nedelec<1>::shape_value_component (const unsigned int ,
+				     const Point<1>    &,
+				     const unsigned int ) const
 {
+  Assert (false, ExcNotImplemented());
+}
+
+#endif
+
+#if deal_II_dimension == 2
+
+template <>
+double
+FE_Nedelec<2>::shape_value_component (const unsigned int i,
+				      const Point<2>    &p,
+				      const unsigned int component) const
+{
+  const unsigned int dim = 2;
+  
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
   
-  switch (dim)
+  switch (degree)
     {
-      case 2:    // 2D
+				       // first order Nedelec elements
+      case 1:
       {
-	switch (degree)
+	switch (i)
 	  {
-					     // first order Nedelec
-					     // elements
-	    case 1:
-	    {
-	      switch (i)
-		{
-						   // (1-y, 0)
-		  case 0: return (component == 0 ? 1-p(1) : 0);
-							 // (0,x)
-		  case 1: return (component == 0 ? 0 : p(0));
-							 // (y, 0)
-		  case 2: return (component == 0 ? p(1) : 0);
-							 // (0, 1-x)
-		  case 3: return (component == 0 ? 0 : 1-p(0));
+					     // (1-y, 0)
+	    case 0: return (component == 0 ? 1-p(1) : 0);
+						   // (0,x)
+	    case 1: return (component == 0 ? 0 : p(0));
+						   // (y, 0)
+	    case 2: return (component == 0 ? p(1) : 0);
+						   // (0, 1-x)
+	    case 3: return (component == 0 ? 0 : 1-p(0));
                         
-							 // there are
-							 // only four
-							 // shape
-							 // functions!?
-		  default:
-			Assert (false, ExcInternalError());
-			return 0;
-		};
-	    };
-
-					     // no other degrees
-					     // implemented
+						   // there are only
+						   // four shape
+						   // functions!?
 	    default:
-		  Assert (false, ExcNotImplemented());
+		  Assert (false, ExcInternalError());
+		  return 0;
 	  };
       };
 
-      case 3:    // 3D
-      {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements
-	    case 1:
-	    {
-					       // note that the
-					       // degrees of freedom
-					       // on opposite faces
-					       // have a common vector
-					       // direction, so simply
-					       // that a little. these
-					       // directions are:
-					       //
-					       // for lines 0, 2, 4, 6:
-					       //    (1,0,0)
-					       // for lines 1, 3, 5, 7:
-					       //    (0,0,1)
-					       // for lines 8, 9, 10, 11:
-					       //    (0,1,0)
-					       //
-					       // thus, sort out all
-					       // those cases where
-					       // the component is
-					       // zero anyway, and
-					       // only otherwise
-					       // compute the
-					       // spatially dependent
-					       // part which is then
-					       // also the return
-					       // value
-	      if (((i<8) && (((i%2==0) && (component!=0)) ||
-			     ((i%2==1) && (component!=2)))) ||
-		  ((i>=8) && (component != 1)))
-		return 0;
-
-					       // now we know that the
-					       // only non-zero
-					       // component is
-					       // requested:
-	      const double x = p(0),
-			   y = p(1),
-			   z = p(2);
-	      switch (i)
-		{
-		  case  0: return (1-y)*(1-z);
-		  case  2: return (1-y)*z;
-		  case  1: return x*(1-y);
-		  case  3: return (1-x)*(1-y);
-
-		  case  4: return y*(1-z);
-		  case  6: return y*z;
-		  case  5: return x*y;
-		  case  7: return (1-x)*y;
-			
-		  case  8: return (1-x)*(1-z);
-		  case  9: return x*(1-z);
-		  case 10: return x*z;
-		  case 11: return (1-x)*z;
-		  default:
-			Assert (false, ExcInternalError());
-			return 0;
-		};
-	    };
-
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
-      };
-      
-				       // presently no other space
-				       // dimension implemented
+					// no other degrees
+					// implemented
       default:
 	    Assert (false, ExcNotImplemented());
     };
@@ -403,132 +332,145 @@ FE_Nedelec<dim>::shape_value_component (const unsigned int i,
   return 0;
 }
 
+#endif
 
+#if deal_II_dimension == 3
 
-template <int dim>
-Tensor<1,dim>
-FE_Nedelec<dim>::shape_grad_component (const unsigned int i,
-				       const Point<dim> &p,
-				       const unsigned int component) const
+template <>
+double
+FE_Nedelec<3>::shape_value_component (const unsigned int i,
+				      const Point<3>    &p,
+				      const unsigned int component) const
 {
+  const unsigned int dim = 3;
+  
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  Assert (component < dim, ExcIndexRange (component, 0, dim));
+  
+  switch (degree)
+    {
+				       // first order Nedelec
+				       // elements
+      case 1:
+      {
+					 // note that the degrees of
+					 // freedom on opposite faces
+					 // have a common vector
+					 // direction, so simply that
+					 // a little. these directions
+					 // are:
+					 //
+					 // for lines 0, 2, 4, 6:
+					 //    (1,0,0)
+					 // for lines 1, 3, 5, 7:
+					 //    (0,0,1)
+					 // for lines 8, 9, 10, 11:
+					 //    (0,1,0)
+					 //
+					 // thus, sort out all those
+					 // cases where the component
+					 // is zero anyway, and only
+					 // otherwise compute the
+					 // spatially dependent part
+					 // which is then also the
+					 // return value
+	if (((i<8) && (((i%2==0) && (component!=0)) ||
+		       ((i%2==1) && (component!=2)))) ||
+	    ((i>=8) && (component != 1)))
+	  return 0;
+
+					       // now we know that the
+					       // only non-zero
+					       // component is
+					       // requested:
+	const double x = p(0),
+		     y = p(1),
+		     z = p(2);
+	switch (i)
+	  {
+	    case  0: return (1-y)*(1-z);
+	    case  2: return (1-y)*z;
+	    case  1: return x*(1-y);
+	    case  3: return (1-x)*(1-y);
+
+	    case  4: return y*(1-z);
+	    case  6: return y*z;
+	    case  5: return x*y;
+	    case  7: return (1-x)*y;
+			
+	    case  8: return (1-x)*(1-z);
+	    case  9: return x*(1-z);
+	    case 10: return x*z;
+	    case 11: return (1-x)*z;
+	    default:
+		  Assert (false, ExcInternalError());
+		  return 0;
+	  };
+      };
+
+					// no other degrees
+					// implemented
+      default:
+	    Assert (false, ExcNotImplemented());
+    };
+  
+  return 0;
+}
+
+#endif
+
+#if deal_II_dimension == 1
+
+template <>
+Tensor<1,1>
+FE_Nedelec<1>::shape_grad_component (const unsigned int ,
+				     const Point<1>    &,
+				     const unsigned int ) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#endif
+
+#if deal_II_dimension == 2
+
+template <>
+Tensor<1,2>
+FE_Nedelec<2>::shape_grad_component (const unsigned int i,
+				     const Point<2>    &p,
+				     const unsigned int component) const
+{
+  const unsigned int dim = 2;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
 
-  switch (dim)
+  switch (degree)
     {
-      case 2:    // 2D
+				       // first order Nedelec elements
+      case 1:
       {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements
-	    case 1:
-	    {
-					       // on the unit cell,
-					       // the gradients of
-					       // these shape
-					       // functions are
-					       // constant, so we pack
-					       // them into a table
-					       // for simpler lookup
-					       //
-					       // the format is: first
-					       // index=shape function
-					       // number; second
-					       // index=vector
-					       // component, thrid
-					       // index=component
-					       // within gradient
-	      static const double unit_gradients[4][2][2]
-		= { { {0.,-1.}, {0.,0.} },
-		    { {0.,0.},  {1.,0.} },
-		    { {0.,+1.}, {0.,0.} },
-		    { {0.,0.},  {-1.,0.} } };
-	      return Tensor<1,dim>(unit_gradients[i][component]);
-	    };
-
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
+					 // on the unit cell, the
+					 // gradients of these shape
+					 // functions are constant, so
+					 // we pack them into a table
+					 // for simpler lookup
+					 //
+					 // the format is: first
+					 // index=shape function
+					 // number; second
+					 // index=vector component,
+					 // thrid index=component
+					 // within gradient
+	static const double unit_gradients[4][2][2]
+	  = { { {0.,-1.}, {0.,0.} },
+	      { {0.,0.},  {1.,0.} },
+	      { {0.,+1.}, {0.,0.} },
+	      { {0.,0.},  {-1.,0.} } };
+	return Tensor<1,dim>(unit_gradients[i][component]);
       };
 
-      case 3:  // 3d
-      {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements
-	    case 1:
-	    {
-					       // on the unit cell,
-					       // the gradients of
-					       // these shape
-					       // functions are
-					       // linear. we pack them
-					       // into an array,
-					       // knowing that it may
-					       // be expensive to
-					       // recompute the whole
-					       // array each
-					       // time. maybe some
-					       // clever compiler can
-					       // optimize this out,
-					       // seeing that except
-					       // for one element all
-					       // the other ones are
-					       // dead stores...
-					       //
-					       // the format is: first
-					       // index=shape function
-					       // number; second
-					       // index=vector
-					       // component, thrid
-					       // index=component
-					       // within gradient
-	      const double x = p(0),
-			   y = p(1),
-			   z = p(2);
-	      const double unit_gradients[12][3][3]
-		= { { {0,-(1-z), -(1-y)}, {0,0,0}, {     0,      0, 0} },
-		    { {0,     0,      0}, {0,0,0}, { (1-y),     -x, 0} },
-                    { {0,    -z,  (1-y)}, {0,0,0}, {     0,      0, 0} },
-		    { {0,     0,      0}, {0,0,0}, {-(1-y), -(1-x), 0} },
-                    
-                    { {0, (1-z),     -y}, {0,0,0}, {     0,      0, 0} },
-		    { {0,     0,      0}, {0,0,0}, {     y,      x, 0} },
-                    { {0,     z,      y}, {0,0,0}, {     0,      0, 0} },
-		    { {0,     0,      0}, {0,0,0}, {    -y,  (1-x), 0} },
-                    
-                    { {0, 0, 0}, {-(1-z), 0, -(1-x)}, {0, 0, 0} },
-                    { {0, 0, 0}, { (1-z), 0,     -x}, {0, 0, 0} },
-                    { {0, 0, 0}, {     z, 0,      x}, {0, 0, 0} },
-                    { {0, 0, 0}, {    -z, 0,  (1-x)}, {0, 0, 0} } };
-                                               // note: simple check
-                                               // whether this can at
-                                               // all be: build the
-                                               // sum over all these
-                                               // tensors. since the
-                                               // sum of the shape
-                                               // functions is a
-                                               // constant, the
-                                               // gradient must
-                                               // necessarily be
-                                               // zero. this is in
-                                               // fact the case here,
-                                               // so test successfull
-	      return Tensor<1,dim>(unit_gradients[i][component]);
-	    };
-
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
-      };
-				       // presently no other space
-				       // dimension implemented
+					// no other degrees
+					// implemented
       default:
 	    Assert (false, ExcNotImplemented());
     };
@@ -536,63 +478,127 @@ FE_Nedelec<dim>::shape_grad_component (const unsigned int i,
   return Tensor<1,dim>();
 }
 
+#endif
 
+#if deal_II_dimension == 3
 
-template <int dim>
-Tensor<2,dim>
-FE_Nedelec<dim>::shape_grad_grad_component (const unsigned int i,
-					    const Point<dim> &/*p*/,
-					    const unsigned int component) const
+template <>
+Tensor<1,3>
+FE_Nedelec<3>::shape_grad_component (const unsigned int i,
+				     const Point<3>    &p,
+				     const unsigned int component) const
 {
+  const unsigned int dim = 3;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
 
-  switch (dim)
+  switch (degree)
     {
-      case 2:    // 2D
+				       // first order Nedelec elements
+      case 1:
       {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements. their second
-					     // derivatives on the
-					     // unit cell are zero
-	    case 1:
-	    {
-	      return Tensor<2,dim>();
-	    };
-
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
+					 // on the unit cell, the
+					 // gradients of these shape
+					 // functions are linear. we
+					 // pack them into an array,
+					 // knowing that it may be
+					 // expensive to recompute the
+					 // whole array each
+					 // time. maybe some clever
+					 // compiler can optimize this
+					 // out, seeing that except
+					 // for one element all the
+					 // other ones are dead
+					 // stores...
+					 //
+					 // the format is: first
+					 // index=shape function
+					 // number; second
+					 // index=vector component,
+					 // thrid index=component
+					 // within gradient
+	const double x = p(0),
+		     y = p(1),
+		     z = p(2);
+	const double unit_gradients[12][3][3]
+	  = { { {0,-(1-z), -(1-y)}, {0,0,0}, {     0,      0, 0} },
+	      { {0,     0,      0}, {0,0,0}, { (1-y),     -x, 0} },
+	      { {0,    -z,  (1-y)}, {0,0,0}, {     0,      0, 0} },
+	      { {0,     0,      0}, {0,0,0}, {-(1-y), -(1-x), 0} },
+                    
+	      { {0, (1-z),     -y}, {0,0,0}, {     0,      0, 0} },
+	      { {0,     0,      0}, {0,0,0}, {     y,      x, 0} },
+	      { {0,     z,      y}, {0,0,0}, {     0,      0, 0} },
+	      { {0,     0,      0}, {0,0,0}, {    -y,  (1-x), 0} },
+                    
+	      { {0, 0, 0}, {-(1-z), 0, -(1-x)}, {0, 0, 0} },
+	      { {0, 0, 0}, { (1-z), 0,     -x}, {0, 0, 0} },
+	      { {0, 0, 0}, {     z, 0,      x}, {0, 0, 0} },
+	      { {0, 0, 0}, {    -z, 0,  (1-x)}, {0, 0, 0} } };
+					 // note: simple check whether
+					 // this can at all be: build
+					 // the sum over all these
+					 // tensors. since the sum of
+					 // the shape functions is a
+					 // constant, the gradient
+					 // must necessarily be
+					 // zero. this is in fact the
+					 // case here, so test
+					 // successfull
+	return Tensor<1,dim>(unit_gradients[i][component]);
       };
 
-      case 3:    // 3D
-      {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements. their second
-					     // derivatives on the
-					     // unit cell are linear
-	    case 1:
-	    {
-//TODO: not true. this is what presently fails our "shapes" testcase              
-	      return Tensor<2,dim>();
-	    };
+					// no other degrees
+					// implemented
+      default:
+	    Assert (false, ExcNotImplemented());
+    };
+  
+  return Tensor<1,dim>();
+}
 
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
+#endif
+
+
+#if deal_II_dimension == 1
+
+template <>
+Tensor<2,1>
+FE_Nedelec<1>::shape_grad_grad_component (const unsigned int ,
+					  const Point<1>    &,
+					  const unsigned int ) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#endif
+
+
+#if deal_II_dimension == 2
+
+template <>
+Tensor<2,2>
+FE_Nedelec<2>::shape_grad_grad_component (const unsigned int i,
+					  const Point<2> &/*p*/,
+					  const unsigned int component) const
+{
+  const unsigned int dim = 2;
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  Assert (component < dim, ExcIndexRange (component, 0, dim));
+
+  switch (degree)
+    {
+				       // first order Nedelec
+				       // elements. their second
+				       // derivatives on the unit cell
+				       // are zero
+      case 1:
+      {
+	return Tensor<2,dim>();
       };
-	    
-      
-				       // presently no other space
-				       // dimension implemented
+
+					// no other degrees
+					// implemented
       default:
 	    Assert (false, ExcNotImplemented());
     };
@@ -600,6 +606,42 @@ FE_Nedelec<dim>::shape_grad_grad_component (const unsigned int i,
   return Tensor<2,dim>();
 }
 
+#endif
+
+#if deal_II_dimension == 3
+
+template <>
+Tensor<2,3>
+FE_Nedelec<3>::shape_grad_grad_component (const unsigned int i,
+					  const Point<3>    &/*p*/,
+					  const unsigned int component) const
+{
+  const unsigned int dim = 3;
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  Assert (component < dim, ExcIndexRange (component, 0, dim));
+
+  switch (degree)
+    {
+				       // first order Nedelec
+				       // elements. their second
+				       // derivatives on the unit cell
+				       // are linear
+      case 1:
+      {
+//TODO: not true. this is what presently fails our "shapes" testcase              
+	return Tensor<2,dim>();
+      };
+
+					// no other degrees
+					// implemented
+      default:
+	    Assert (false, ExcNotImplemented());
+    };
+
+  return Tensor<2,dim>();
+}
+
+#endif
 
 //----------------------------------------------------------------------
 // Auxiliary functions
