@@ -173,7 +173,7 @@ class TensorProductPolynomials
 				      * product polynomials. For $n$
 				      * 1d polynomials this is $n^dim$.
 				      */
-    unsigned int n() const;
+    unsigned int n () const;
 
 				     /**
 				      * Exception.
@@ -189,14 +189,14 @@ class TensorProductPolynomials
 				      * polynomials given to the
 				      * constructor.
 				      */
-    const std::vector<Polynomials::Polynomial<double> > polynomials;
+    std::vector<Polynomials::Polynomial<double> > polynomials;
 
 				     /**
 				      * Number of tensor product
 				      * polynomials. For $n$ 1d
 				      * polynomials this is $n^dim$.
 				      */
-    const unsigned int n_tensor_pols;
+    unsigned int n_tensor_pols;
 
                                      /**
                                       * Each tensor product polynomial
@@ -380,7 +380,7 @@ class AnisotropicPolynomials
 				      * polynomials in each coordinate
 				      * direction.
 				      */
-    unsigned int n() const;
+    unsigned int n () const;
 
 				     /**
 				      * Exception.
@@ -402,7 +402,7 @@ class AnisotropicPolynomials
 				      * polynomials given to the
 				      * constructor.
 				      */
-    const std::vector<std::vector<Polynomials::Polynomial<double> > > polynomials;
+    std::vector<std::vector<Polynomials::Polynomial<double> > > polynomials;
 
 				     /**
 				      * Number of tensor product
@@ -411,7 +411,7 @@ class AnisotropicPolynomials
 				      * dropped if the number of space
 				      * dimensions is less than 3.
 				      */
-    const unsigned int n_tensor_pols;
+    unsigned int n_tensor_pols;
 
                                      /**
                                       * Each tensor product polynomial
