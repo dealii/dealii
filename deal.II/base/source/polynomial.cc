@@ -336,6 +336,6 @@ LagrangeEquidistant::compute_coefficients (const unsigned int n,
   return a;
 }
 
-template Polynomial<float>;
-template Polynomial<double>;
-template Polynomial<long double>;
+template class Polynomial<float>;
+template class Polynomial<double>;
+template class Polynomial<long double>;
