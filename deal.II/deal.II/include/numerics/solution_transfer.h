@@ -32,10 +32,10 @@ template <int dim> class DoFHandler;
  * tria->refine_and_coarsen_fixed_fraction(error_indicator, 0.3, 0);
  * tria->execute_coarsening_and_refinement();
  * dof_handler->distribute_dofs (fe);
- * soltrans.refine_interpolate(solution);
+ * soltrans.refine_interpolate(solution, interpolated_solution);
  *                                     // if necessary interpolate some
  *                                     // more functions
- * soltrans.refine_interpolate(sol2);
+ * soltrans.refine_interpolate(sol2, interpolated_sol2);
  * ...
  * \end{verbatim}
  * \item If the grid will be coarsenend and refined
@@ -49,12 +49,14 @@ template <int dim> class DoFHandler;
  * soltrans.prepare_for_coarsening_and_refinement(solution);
  * tria->execute_coarsening_and_refinement ();
  * dof_handler->distribute_dofs (fe);
- * soltrans.interpolate(solution);
+ * soltrans.interpolate(solution, interpolated_solution);
  * \end{verbatim}
  
- * Multiple calling of the function #void interpolate (Vector<number> &out) const#
+ * Multiple calling of the function 
+ * #interpolate (const Vector<number> &in, Vector<number> &out)#
  * is NOT allowed. Interpolating several functions can be performed in one step
- * by using #void interpolate (vector<Vector<number> >&all_out) const#, and
+ * by using #void interpolate (const vector<Vector<number> >&all_in,
+ * vector<Vector<number> >&all_out) const#, and
  * using the respective #prepare_for_coarsening_and_refinement# function taking
  * several vectors as input before actually refining and coarsening the
  * triangulation (see there).
@@ -63,8 +65,8 @@ template <int dim> class DoFHandler;
  * For deleting all stored data in #SolutionTransfer# and reinitializing it
  * use the #clear()# function.
  *
- * Note that the #user_pointer# of some cells are used. Be sure that you don't need
- * them otherwise.
+ * Note that the #user_pointer# of some cells are used. 
+ * Be sure that you don't need them otherwise.
  *
  * The template argument #number# denotes the data type of the vectors you want
  * to transfer.
@@ -108,7 +110,7 @@ template <int dim> class DoFHandler;
  * Additionally the DoF indices of the cells
  * that will not be coarsened need to be stored according to the solution
  * transfer while pure refinement (cf there). All this is performed by
- * #prepare_coarsening_and_refinement(all_in)# where the 
+ * #prepare_for_coarsening_and_refinement(all_in)# where the 
  * #vector<Vector<number> >vector all_in# includes
  * all discrete functions to be interpolated onto the new grid.
  *
@@ -132,9 +134,10 @@ template <int dim> class DoFHandler;
  * #Pointerstruct# that is pointed to by the user_pointer of that cell.
  * It is clear that #interpolate(all_in, all_out)# only can be called with
  * the #vector<Vector<number> > all_in# that previously was the parameter
- * of the #prepare_coarsening_and_refinement(all_in)# function. Hence 
+ * of the #prepare_for_coarsening_and_refinement(all_in)# function. Hence 
  * #interpolate(all_in, all_out)# can (in contrast to 
  * #refine_interpolate(in, out)#) only be called once.
+ * \end{itemize}
  *
  * @author Ralf Hartmann, 1999
  */
