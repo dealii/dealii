@@ -3,11 +3,11 @@
 CXX       = c++
 INCLUDE   = -I../include -I../../base/include
 CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual -fno-rtti \
+            -Winline -Woverloaded-virtual \
             $(INCLUDE)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
-           -fno-rtti $(INCLUDE)
+           $(INCLUDE)
 
 cc-files = $(wildcard *.cc)
 o-files  = $(cc-files:.cc=.o)

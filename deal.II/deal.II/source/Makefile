@@ -30,11 +30,11 @@ CXX       = c++
 INCLUDE   = -I../include -I../../lac/include \
             -I../../base/include -I../../mia/include
 CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual -fno-rtti \
+            -Winline -Woverloaded-virtual \
             $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
-           -fno-rtti $(INCLUDE) \
+           $(INCLUDE) \
            -Ddeal_II_dimension=$(deal_II_dimension)
 
 %.go :

@@ -19,11 +19,11 @@ CXX       = c++
 INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
             -I$D/base/include
 CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual -fno-rtti  \
+            -Winline -Woverloaded-virtual \
             $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
-           -fno-rtti $(INCLUDE) \
+           $(INCLUDE) \
            -Ddeal_II_dimension=$(deal_II_dimension)
 
 %.go : %.cc Makefile
