@@ -15,6 +15,56 @@
 #include <base/subscriptor.h>
 #include <typeinfo>
 
+/*
+#include <set>
+
+template <class Class>
+class ActiveObjectMonitor
+{
+  public:
+    ~ActiveObjectMonitor ();
+    
+    void register_object (const Class *p);
+    void deregister_object (const Class *p);
+  private:
+    std::set<const Class*> registered_objects;
+};
+
+ActiveObjectMonitor<Subscriptor> active_object_monitor;
+
+
+ActiveObjectMonitor::~ActiveObjectMonitor ()
+{
+  if (registered_objects.size() > 0)
+    {
+      for (std::set<const Subscriptor*>::const_iterator i=registered_objects.begin();
+	   i!=registered_objects.end(); ++i)
+	std::cout << "Object still exists of type "
+		  << typeid(**i).name()
+		  << std::endl;
+      Assert (false, ExcInternalError());
+    };
+};
+
+
+void ActiveObjectMonitor::register_object (const Subscriptor *p)
+{
+  Assert (registered_objects.find(p) == registered_objects.end(),
+	  ExcInternalError());
+  registered_objects.insert (p);
+};
+
+
+void
+ActiveObjectMonitor::deregister_object (const Subscriptor *p)
+{
+  Assert (registered_objects.find(p) != registered_objects.end(),
+	  ExcInternalError());
+  registered_objects.erase (registered_objects.find(p));
+};
+*/
+
+
 
 
 Subscriptor::Subscriptor () :
