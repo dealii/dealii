@@ -267,7 +267,17 @@ namespace PETScWrappers
   class MatrixBase 
   {
     public:
+                                       /**
+                                        * Declare a typedef for the iterator
+                                        * class.
+                                        */
       typedef MatrixIterators::const_iterator const_iterator;
+
+                                       /**
+                                        * Declare a typedef in analogy to all
+                                        * the other container classes.
+                                        */
+      typedef PetscScalar value_type;
       
                                        /**
                                         * Default constructor.
@@ -282,7 +292,8 @@ namespace PETScWrappers
       
                                        /**
                                         * Set all matrix entries to zero, but
-                                        * retain the sparsity pattern.
+                                        * retain the sparsity pattern and all
+                                        * the other properties of the matrix.
                                         */
       void reinit ();
 
