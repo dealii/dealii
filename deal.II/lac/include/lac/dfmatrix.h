@@ -93,7 +93,7 @@ class dFMatrix
 				      * huge amount of computing time for large
 				      * matrices!!
 				      */
-    explicit dFMatrix (const dFMatrix&);
+    dFMatrix (const dFMatrix&);
 
 				     /**
 				      * Destructor. Release all memory.
