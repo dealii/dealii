@@ -484,7 +484,6 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 	{
 	  fe_values.reinit(cell);
 	  
-	  const FullMatrix<double>  &values    = fe_values.get_shape_values ();
 	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	  rhs_function.value_list (fe_values.get_quadrature_points(), rhs_values);
 	  
@@ -492,7 +491,7 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 	  for (unsigned int point=0; point<n_q_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      cell_vector(i) += rhs_values[point] *
-				values(i,point) *
+				fe_values.shape_value(i,point) *
 				weights[point];
 	
 	  cell->get_dof_indices (dofs);
@@ -510,7 +509,6 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 	{
 	  fe_values.reinit(cell);
 	  
-	  const FullMatrix<double>  &values    = fe_values.get_shape_values ();
 	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	  rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
 	  
@@ -522,7 +520,7 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 		  = fe.system_to_component_index(i).first;
 		
 		cell_vector(i) += rhs_values[point](component) *
-				  values(i,point) *
+				  fe_values.shape_value(i,point) *
 				  weights[point];
 	      }
 	  
@@ -595,7 +593,6 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 	    {
 	      fe_values.reinit(cell, face);
 	  
-	      const FullMatrix<double>  &values    = fe_values.get_shape_values ();
 	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	      rhs_function.value_list (fe_values.get_quadrature_points(), rhs_values);
 	      
@@ -603,7 +600,7 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		for (unsigned int i=0; i<dofs_per_cell; ++i) 
 		  cell_vector(i) += rhs_values[point] *
-				    values(i,point) *
+				    fe_values.shape_value(i,point) *
 				    weights[point];
 	
 	      cell->get_dof_indices (dofs);
@@ -625,7 +622,6 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 	    {
 	      fe_values.reinit(cell, face);
 	  
-	      const FullMatrix<double>  &values    = fe_values.get_shape_values ();
 	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	      rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
 	  
@@ -637,7 +633,7 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 		      = fe.system_to_component_index(i).first;
 		    
 		    cell_vector(i) += rhs_values[point](component) *
-				      values(i,point) *
+				      fe_values.shape_value(i,point) *
 				      weights[point];
 		  }
 	      

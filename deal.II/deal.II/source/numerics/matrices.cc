@@ -980,9 +980,6 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
       cell_matrix.clear ();
       cell->get_dof_indices (dof_indices);
       
-      const std::vector<std::vector<Tensor<1,dim> > >
-	&grads   = fe_values.get_shape_grads ();
-      
       if (coefficient != 0)
 	{
 	  if (coefficient->n_components==1)
@@ -994,14 +991,14 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
 		  const double weight = fe_values.JxW(point);
 		  for (unsigned int i=0; i<dofs_per_cell; ++i)
 		    {
+		      const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
 		      for (unsigned int j=0; j<dofs_per_cell; ++j)
 			{
+			  const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
 			  if ((n_components==1) ||
 			      (fe.system_to_component_index(i).first ==
 			       fe.system_to_component_index(j).first))
-			    cell_matrix(i,j) += (grads[i][point] *
-						 grads[j][point] *
-						 weight *
+			    cell_matrix(i,j) += (Du * Dv * weight *
 						 coefficient_values[point]);
 			}
 		    }
@@ -1016,15 +1013,15 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
 		  const double weight = fe_values.JxW(point);
 		  for (unsigned int i=0; i<dofs_per_cell; ++i)
 		    {
+		      const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
 		      const unsigned int component_i=
 			fe.system_to_component_index(i).first;
 		      for (unsigned int j=0; j<dofs_per_cell; ++j)
 			{
+			  const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
 			  if ((n_components==1) ||
 			      (fe.system_to_component_index(j).first == component_i))
-			    cell_matrix(i,j) += (grads[i][point] *
-						 grads[j][point] *
-						 weight *
+			    cell_matrix(i,j) += (Du * Dv * weight *
 						 coefficient_vector_values[point](component_i));
 			  
 			}
@@ -1038,14 +1035,14 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
 	    const double weight = fe_values.JxW(point);
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      {
+		const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
 		for (unsigned int j=0; j<dofs_per_cell; ++j)
 		  {
+		    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
 		    if ((n_components==1) ||
 			(fe.system_to_component_index(i).first ==
 			 fe.system_to_component_index(j).first))
-		      cell_matrix(i,j) += (grads[i][point] *
-					   grads[j][point] *
-					   weight);
+		      cell_matrix(i,j) += (Du * Dv * weight);
 		  }
 	      }
 	  }
@@ -1177,8 +1174,6 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
       local_rhs.clear ();
       cell->get_dof_indices (dof_indices);
       
-      const std::vector<std::vector<Tensor<1,dim> > >
-	&grads   = fe_values.get_shape_grads ();
       rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
       
       if (coefficient != 0)
@@ -1193,14 +1188,14 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 		    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 		      {
 			const double v = fe_values.shape_value(i,point);
+			const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
 			for (unsigned int j=0; j<dofs_per_cell; ++j)
 			  {
+			    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
 			    if ((n_components==1) ||
 				(fe.system_to_component_index(i).first ==
 				 fe.system_to_component_index(j).first))
-			      cell_matrix(i,j) += (grads[i][point] *
-						   grads[j][point] *
-						   weight *
+			      cell_matrix(i,j) += (Du * Dv * weight *
 						   coefficient_values[point]);
 			    local_rhs(i) += v * rhs_values[point] * weight;
 			  }
@@ -1217,15 +1212,15 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 		    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 		      {
 			const double v = fe_values.shape_value(i,point);
+			const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
 			const unsigned int component_i=
 			  fe.system_to_component_index(i).first;		    
 			for (unsigned int j=0; j<dofs_per_cell; ++j)
 			  {
+			    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
 			    if ((n_components==1) ||
 				(fe.system_to_component_index(j).first == component_i))
-			      cell_matrix(i,j) += (grads[i][point] *
-						   grads[j][point] *
-						   weight *
+			      cell_matrix(i,j) += (Du * Dv * weight *
 						   coefficient_vector_values[point](component_i));
 			    local_rhs(i) += v * rhs_values[point] * weight;
 			  }
@@ -1240,14 +1235,14 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      {
 		const double v = fe_values.shape_value(i,point);
+		const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
 		for (unsigned int j=0; j<dofs_per_cell; ++j)
 		  {
+		    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
 		    if ((n_components==1) ||
 			(fe.system_to_component_index(i).first ==
 			 fe.system_to_component_index(j).first))
-		      cell_matrix(i,j) += (grads[i][point] *
-					   grads[j][point] *
-					   weight);
+		      cell_matrix(i,j) += (Du * Dv * weight);
 		    local_rhs(i) += v * rhs_values[point] * weight;
 		  }
 	      }
