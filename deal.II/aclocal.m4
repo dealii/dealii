@@ -128,25 +128,34 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
                   GXX_VERSION=sun_forte
                 else
   
-  	          dnl KAI C++?
-  	          is_kai_cc="`($CXX --version 2>&1) | grep 'KAI C++'`"
-  	          if test "x$is_kai_cc" != "x" ; then
-  	            AC_MSG_RESULT(C++ compiler is KAI C++)
-  	            GXX_VERSION=kai_cc
+  	          dnl Portland Group C++?
+  	          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+  	          if test "x$is_pgcc" != "x" ; then
+  	            AC_MSG_RESULT(C++ compiler is Portland Group C++)
+  	            GXX_VERSION=portland_group
   	          else
   
-  	            dnl Portland Group C++?
-  	            is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-  	            if test "x$is_pgcc" != "x" ; then
-  	              AC_MSG_RESULT(C++ compiler is Portland Group C++)
-  	              GXX_VERSION=portland_group
+  	            dnl HP aCC?
+  	            is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
+  	            if test "x$is_aCC" != "x" ; then
+  	              AC_MSG_RESULT(C++ compiler is HP aCC)
+  	              GXX_VERSION=hp_aCC
   	            else
   
-  	              dnl HP aCC?
-  	              is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
-  	              if test "x$is_aCC" != "x" ; then
-  	                AC_MSG_RESULT(C++ compiler is HP aCC)
-  	                GXX_VERSION=hp_aCC
+  	              dnl KAI C++? It seems as if the documented options
+		      dnl -V and --version are not always supported, so give
+	              dnl the whole thing a second try by looking for /KCC/
+	 	      dnl somewhere in the paths that are output by -v. This
+	              dnl is risky business, since this combination of
+	              dnl characters might appear on other installations
+                      dnl of other compilers as well, so put this test to
+                      dnl the very end of the detection chain for the
+                      dnl various compilers
+  	              is_kai_cc="`($CXX --version 2>&1) | grep 'KAI C++'`"
+  	              is_kai_cc="$is_kai_cc`($CXX -v 2>&1) | grep /KCC/`"
+  	              if test "x$is_kai_cc" != "x" ; then
+  	                AC_MSG_RESULT(C++ compiler is KAI C++)
+  	                GXX_VERSION=kai_cc
   	              else
   
                         dnl  Aw, nothing suitable found...
