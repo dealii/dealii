@@ -245,8 +245,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 [
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
-    CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
-    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Winline -Woverloaded-virtual -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
+    CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-128"
+    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Winline -Woverloaded-virtual -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-128"
 
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
@@ -1601,7 +1601,7 @@ void __IssueError_Assert (const char *file,
   std::cerr << "--------------------------------------------------------"
 	    << std::endl;  
   std::abort ();
-};
+}
 
 template <class exc>
 void __IssueError_Throw (const char *file,
@@ -1613,7 +1613,7 @@ void __IssueError_Throw (const char *file,
 				   // Fill the fields of the exception object
   e.SetFields (file, line, function, cond, exc_name);
   throw e;
-};
+}
 
 #define AssertThrow(cond, exc)                                    \
   {                                                               \
@@ -1629,7 +1629,7 @@ class Exception0 :  public ExceptionBase {}
 namespace StandardExceptions 
 {
   DeclException0 (ExcInternalError);
-};
+}
 using namespace StandardExceptions;
     ],
     [
