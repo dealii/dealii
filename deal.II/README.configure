@@ -1,0 +1,87 @@
+######################################################################
+# $Id$
+######################################################################
+#
+# This file gives some hints on how to use autoconf and configure.in
+# to write configuration options for deal.II
+######################################################################
+
+
+
+######################################################################
+# Including optional libraries
+######################################################################
+
+For the library blob, after finding it, we fill with appropriate values:
+
+AC_DEFINE(HAVE_BLOB)           # goes into base/include/base/config.h
+AC_SUBST(BLOB_LIB)             # Additional libraries
+AC_SUBST(BLOB_INCLUDE_DIR)     # Starts with -I; include path for compiler
+
+The last two go int common/Make.global_options.
+
+######################################################################
+# I. Libraries without headers in ld's include path
+######################################################################
+
+In order to allow for configuring an optional library blob, add the
+following lines to configure.in:
+
+  AC_ARG_WITH(blob,
+    [  --with-blob=bloblib use the blob library],
+    DEAL_II_WITH_BLOB($withval))
+
+If the library should be included by default, use:
+
+  AC_ARG_WITH(blob,
+    [  --with-blob=bloblib use the blob library],
+    DEAL_II_WITH_BLOB($withval),
+    DEAL_II_WITH_BLOB(yes))
+
+
+Now, in aclocal.m4, define the macro DEAL_II_WITH_BLOB like:
+
+AC_DEFUN(DEAL_II_WITH_BLOB, dnl
+[
+  if test "x$1" != "xyes" ; then
+    AC_CHECK_LIB($1, my_function,
+      [
+        AC_SUBST(BLOB_LIB,"-l$1")
+      ],
+      AC_MSG_RESULT(not found),
+      $F77LIBS)
+  else
+    AC_CHECK_LIB(blob, daxpy_,
+      [
+        AC_SUBST(BLOB_LIB,"-lblob")
+      ],
+      AC_MSG_RESULT(not found),
+      $F77LIBS)
+  fi
+  AC_DEFINE(HAVE_BLOB)
+
+  AC_SUBST(NEEDS_F77LIBS, "yes")
+
+  if test "x$with_plip" = "x" ; then
+    with_plip = "yes;
+  fi
+])
+
+We have to distinguish the cases where --with-blob has an argument or
+not. If it has, it is the name of the library (like -lblas is
+-lperflib on Solaris). If it has no argument, the argument to this
+function is "yes" and must be replaced by "blob" in the second part.
+
+The additional variable F77LIBS occuring several times shos how to
+handle FORTRAN libraries. These usually require additional supporting
+libraries specified somewhere else by configure.
+
+Finally, if -lblob requires -lplip, we set the option --with-plip in
+the end in order to include this optional library, too. Make sure you
+check for plip after blob.
+
+######################################################################
+# II. Libraries with header files
+######################################################################
+
+to be continued
