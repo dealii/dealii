@@ -167,7 +167,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   Vector<double>     cell_vector(dofs_per_cell);
 
 
-UpdateFlags update_flags = UpdateFlags (update_values     |
+  UpdateFlags update_flags = UpdateFlags (update_values     |
 					  update_JxW_values |
 					  update_q_points);
   FEFaceValues<dim> fe_values (fe, q, update_flags);
@@ -292,7 +292,7 @@ UpdateFlags update_flags = UpdateFlags (update_values     |
 	    };
 
 
-// now transfer cell matrix and vector
+					   // now transfer cell matrix and vector
 					   // to the whole boundary matrix
 					   //
 					   // in the following: dof[i] holds the
@@ -517,7 +517,7 @@ void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &bo
     return;
 
 
-map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
+  map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
 					    endd = boundary_values.end();
   const unsigned int n_dofs             = matrix.m();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
@@ -544,7 +544,7 @@ map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
 	matrix.global_entry(j) = 0.;
 
 
-// set right hand side to
+				       // set right hand side to
 				       // wanted value: if main diagonal
 				       // entry nonzero, don't touch it
 				       // and scale rhs accordingly. If
@@ -632,7 +632,7 @@ map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
 	};
 
 
-// preset solution vector
+				       // preset solution vector
       solution(dof_number) = dof->second;
     };
 };
@@ -666,7 +666,7 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
   const vector<double>     &weights   = fe_values.get_JxW_values ();
 
 
-if (coefficient != 0)
+  if (coefficient != 0)
     {
       if (coefficient->n_components == 1)
 					 // scalar coefficient given
@@ -1007,7 +1007,7 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
 	  ExcDimensionMismatch(result.n(), high.dofs_per_cell));
 
 
-// Initialize FEValues at the support points
+				   // Initialize FEValues at the support points
 				   // of the low element.
   vector<double> phantom_weights(low.dofs_per_cell,1.);
   vector<Point<dim> > support_points(low.dofs_per_cell);
