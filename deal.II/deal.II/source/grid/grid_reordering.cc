@@ -1597,16 +1597,16 @@ namespace internal
 					   // process of rotating things
 	  CellData<2> q = mquads[qn].original_cell_data;
 	  
-					   //Are the sides oriented? 
-	  assert(is_fully_oriented_quad(qn));
+					   // Are the sides oriented? 
+	  Assert(is_fully_oriented_quad(qn), ExcInternalError());
 	  bool s[4]; //whether side 1 ,2, 3, 4 are in the default orientation
 	  for(int sn=0;sn<4;sn++)
 	    {
 	      s[sn]=is_side_default_oriented(qn,sn);
 	    }
 					   // Are they oriented in the "deal way"?
-	  assert(s[0]==s[2]);
-	  assert(s[1]==s[3]);
+	  Assert(s[0]==s[2], ExcInternalError());
+	  Assert(s[1]==s[3], ExcInternalError());
 					   // How much we rotate them by.
 	  int rotn = 2*(s[0]?1:0)+ ((s[0]^s[1])?1:0);
 
