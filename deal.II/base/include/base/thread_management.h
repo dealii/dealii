@@ -2713,6 +2713,165 @@ namespace Threads
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_));
   };
+
+
+
+/**
+ * Class to store the parameters of a function with 7 arguments. For
+ * more information on use and internals of this class see the report
+ * on this subject.
+ *
+ * @author Wolfgang Bangerth, Ralf Hartmann, 2001
+ */
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
+  class MemFunData7 : public FunDataBase
+  {
+    public:
+				       /**
+					* Typedef a pointer to a global
+					* function which we will call
+					* from this class.
+					*/
+      typedef RetType (Class::*FunPtr) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
+
+				       /**
+					* Constructor. Store pointer to
+					* the function and the values of
+					* the arguments.
+					*/
+      MemFunData7 (FunPtr fun_ptr,
+		   Class *object,
+		   Arg1   arg1,
+		   Arg2   arg2,
+		   Arg3   arg3,
+		   Arg4   arg4,
+		   Arg5   arg5,
+		   Arg6   arg6,
+		   Arg7   arg7);
+
+				       /**
+					* Copy constructor.
+					*/
+      MemFunData7 (const MemFunData7 &fun_data7);
+
+				       /**
+					* Virtual constructor.
+					*/
+      virtual FunDataBase * clone () const;
+
+    private:
+
+				       /**
+					* Pointer to the function to be
+					* called and values of the
+					* arguments to be passed.
+					*/
+      FunPtr fun_ptr;
+
+				       /**
+					* Pointer to the object which
+					* we shall work on.
+					*/
+      Class *object;
+ 
+				       /**
+					* Values of the arguments of the
+					* function to be called.
+					*/
+      Arg1   arg1;
+      Arg2   arg2;
+      Arg3   arg3;
+      Arg4   arg4;
+      Arg5   arg5;
+      Arg6   arg6;
+      Arg7   arg7;
+      
+				       /**
+					* Static function used as entry
+					* point for the new thread.
+					*/
+      static void * thread_entry_point (void *arg);
+
+				       /**
+					* Helper class, used to collect
+					* the values of the parameters
+					* which we will pass to the
+					* function, once we know its
+					* type.
+					*/
+      class ArgCollector
+      {
+	public:
+					   /**
+					    * Typedef the function
+					    * pointer type of the
+					    * underlying class to a
+					    * local type.
+					    */
+	  typedef typename MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::FunPtr FunPtr;
+	
+					   /**
+					    * Constructor. Take and store a
+					    * pointer to the function which
+					    * is to be called.
+					    */
+	  ArgCollector (FunPtr fun_ptr);
+    
+					   /**
+					    * Take the arguments with
+					    * which we want to call the
+					    * function and produce and
+					    * object of the desired type
+					    * from that.
+					    */
+	  FunEncapsulation collect_args (Class *object,
+					 Arg1 arg1,
+					 Arg2 arg2,
+					 Arg3 arg3,
+					 Arg4 arg4,
+					 Arg5 arg5,
+					 Arg6 arg6,
+					 Arg7 arg7);
+    
+					   /**
+					    * Same as above, but take
+					    * a reference instead of a
+					    * pointer. This allows us
+					    * to be a little
+					    * convenient, as we can
+					    * use @p{object} or
+					    * @p{this}, without taking
+					    * care that one is a
+					    * reference and the other
+					    * a pointer.
+					    */
+	  FunEncapsulation collect_args (Class &object,
+					 Arg1   arg1,
+					 Arg2   arg2,
+					 Arg3   arg3,
+					 Arg4   arg4,
+					 Arg5   arg5,
+					 Arg6   arg6,
+					 Arg7   arg7);
+	private:
+					   /**
+					    * Space to temporarily store
+					    * the function pointer.
+					    */
+	  FunPtr fun_ptr;
+      };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_>
+      friend 
+      typename MemFunData7<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
+					   Arg4_, Arg5_, Arg6_, Arg7_));
+  };
   
   
 				   /**
@@ -3006,6 +3165,22 @@ namespace Threads
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
   typename MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6));
+
+				   /**
+				    * Encapsulate a member function
+				    * pointer into an object with
+				    * which a new thread can later be
+				    * spawned.  For more information
+				    * on use and internals of this
+				    * class see the report on this
+				    * subject.
+				    *
+				    * This function exists once for
+				    * each number of parameters.
+				    */
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+  typename MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
+  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7));
 
   
 				   /**
@@ -4985,6 +5160,139 @@ namespace Threads
   {
     return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6);
   };
+
+
+
+  
+
+/* ---------------------- MemFunData7 implementation ------------------------ */
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
+  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::MemFunData7 (FunPtr  fun_ptr,
+									      Class  *object,
+									      Arg1    arg1,
+									      Arg2    arg2,
+									      Arg3    arg3,
+									      Arg4    arg4,
+									      Arg5    arg5,
+									      Arg6    arg6,
+									      Arg7    arg7) :
+		  FunDataBase (&MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::thread_entry_point),
+		  fun_ptr (fun_ptr),
+		  object (object),
+		  arg1 (arg1),
+		  arg2 (arg2),
+		  arg3 (arg3),
+		  arg4 (arg4),
+		  arg5 (arg5),
+		  arg6 (arg6),
+		  arg7 (arg7)
+  {};
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
+  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::MemFunData7 (const MemFunData7 &fun_data) :
+		  FunDataBase (fun_data),
+		  fun_ptr (fun_data.fun_ptr),
+		  object (fun_data.object),
+		  arg1 (fun_data.arg1),
+		  arg2 (fun_data.arg2),
+		  arg3 (fun_data.arg3),
+		  arg4 (fun_data.arg4),
+		  arg5 (fun_data.arg5),
+		  arg6 (fun_data.arg6),
+		  arg7 (fun_data.arg7)
+  {};
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
+  FunDataBase *
+  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::clone () const 
+  {
+    return new MemFunData7 (*this);
+  };
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
+  void *
+  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::thread_entry_point (void *arg) 
+  {
+				     // convenience typedef, since we
+				     // will need that class name
+				     // several times below
+    typedef MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType> ThisClass;
+  
+    FunEncapsulation *fun_encapsulation
+      = reinterpret_cast<FunEncapsulation*>(arg);
+    const ThisClass *fun_data
+      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
+
+				     // copy the parameters
+    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    Class            *object  = fun_data->object;
+    Arg1              arg1    = fun_data->arg1;
+    Arg2              arg2    = fun_data->arg2;
+    Arg3              arg3    = fun_data->arg3;
+    Arg4              arg4    = fun_data->arg4;
+    Arg5              arg5    = fun_data->arg5;
+    Arg6              arg6    = fun_data->arg6;
+    Arg7              arg7    = fun_data->arg7;
+
+
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
+    fun_data->lock.release ();
+
+				     // call the function
+    (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+  
+    return 0;
+  };
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
+  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
+		  fun_ptr (fun_ptr)
+  {};
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
+  FunEncapsulation
+  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::collect_args (Class *object,
+											     Arg1   arg1,
+											     Arg2   arg2,
+											     Arg3   arg3,
+											     Arg4   arg4,
+											     Arg5   arg5,
+											     Arg6   arg6,
+											     Arg7   arg7)
+  {
+    return new MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>(fun_ptr, object,
+									  arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+  };
+  
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
+  inline
+  FunEncapsulation
+  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::collect_args (Class &object,
+											     Arg1   arg1,
+											     Arg2   arg2,
+											     Arg3   arg3,
+											     Arg4   arg4,
+											     Arg5   arg5,
+											     Arg6   arg6,
+											     Arg7   arg7)
+  {
+    return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+  };
   
 
 /* ---------------------------------------------------------------- */
@@ -5153,6 +5461,15 @@ namespace Threads
 
 
   
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+  typename MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
+  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7))
+  {
+    return fun_ptr;
+  };
+
+
+  
   template <typename ForwardIterator>
   typename std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
@@ -5194,8 +5511,8 @@ namespace Threads
 					     // template type, which
 					     // here is unsigned if no
 					     // cast is performed)
-	    advance (return_values[i].second,
-		     static_cast<signed int>(n_elements_per_interval));
+	    std::advance (return_values[i].second,
+			  static_cast<signed int>(n_elements_per_interval));
 					     // distribute residual in
 					     // division equally among
 					     // the first few
