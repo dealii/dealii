@@ -179,7 +179,7 @@ void NonlinearProblem<dim>::run () {
   GridGenerator::hyper_cube (*tria);
   tria->refine_global (4);
 
-  for (unsigned int refinement_step=0; refinement_step<10; ++refinement_step)
+  for (unsigned int refinement_step=0; refinement_step<5; ++refinement_step)
     {
       cout << "Refinement step " << refinement_step << endl
 	   << "  Grid has " << tria->n_active_cells() << " active cells." << endl;
