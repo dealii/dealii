@@ -248,20 +248,21 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * Index of the #i#th degree
 				      * of freedom of this object.
 				      */
-    int dof_index (const unsigned int i) const;
+    unsigned int dof_index (const unsigned int i) const;
 
     				     /**
 				      * Set the index of the #i#th degree
 				      * of freedom of this object to #index#.
 				      */
-    void set_dof_index (const unsigned int i, const int index) const;
+    void set_dof_index (const unsigned int i,
+			const int index) const;
 
 				     /**
 				      * Index of the #i#th degree
 				      * on the #vertex#th vertex.
 				      */
-    int vertex_dof_index (const unsigned int vertex,
-			  const unsigned int i) const;
+    unsigned int vertex_dof_index (const unsigned int vertex,
+				   const unsigned int i) const;
 
 				     /**
 				      * Set the index of the #i#th degree
@@ -269,7 +270,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
-			       const int          index) const;
+			       const unsigned int index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -282,7 +283,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * right size before being passed
 				      * to this function.
 				      */
-    void get_dof_indices (vector<int> &dof_indices) const;
+    void get_dof_indices (vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the values of the given vector
