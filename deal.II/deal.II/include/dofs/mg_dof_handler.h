@@ -179,34 +179,6 @@ class MGDoFHandler : public DoFHandler<dim> {
     void make_sparsity_pattern (const unsigned int level,
 				dSMatrixStruct    &sparsity) const; 
 
-				     /**
-				      * Make up the constraint matrix which
-				      * is used to condensate the 
-				      * system matrices and to prolong
-				      * the solution vectors from the true
-				      * degrees of freedom also to the
-				      * constraint nodes. The constraints
-				      * apply only to the given level.
-				      *
-				      * Since this method does not make sense in
-				      * one dimension, the functions returns
-				      * immediately after clearing the
-				      * constraint matrix.
-				      * For more than one dimension, the matrix
-				      * is cleared before usage. The constraint
-				      * matrix is closed anyway, no matter of the
-				      * dimension.
-				      *
-				      * To condense a given sparsity pattern,
-				      * use #ConstraintMatrix::condense#.
-				      *
-				      * This function uses the user flags for
-				      * the faces. If you need the user flags,
-				      * store them beforehand.
-				      */
-    void make_constraint_matrix (const unsigned int level,
-				 ConstraintMatrix  &cm) const;
-
 				     /*--------------------------------------*/
     
 				     /**
