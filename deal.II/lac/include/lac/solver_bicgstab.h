@@ -147,7 +147,7 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 				      * The iteration loop itself.
 				      */
     template<class Preconditioner>
-    ReturnState iterate(const Preconditioner& precondition);
+    typename Solver<Matrix,Vector>::ReturnState iterate(const Preconditioner& precondition);
   
 };
 
@@ -231,7 +231,7 @@ SolverBicgstab<Matrix, Vector>::iterate(const Preconditioner& precondition)
 
 template<class Matrix, class Vector>
 template<class Preconditioner>
-Solver<Matrix,Vector>::ReturnState
+typename Solver<Matrix,Vector>::ReturnState
 SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
 				      Vector       &x,
 				      const Vector &b,
