@@ -18,6 +18,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <base/thread_management.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 
@@ -104,7 +105,20 @@
  * active. You have to synchronise your calls to the functions
  * provided by this class using mutexes (see the @ref{Threads}
  * namespace for such classes) to avoid multiple active calls at the
- * same time if you use multithreading.
+ * same time if you use multithreading. Since you may use this class
+ * in different parts of your program, and may not want to use a
+ * global variable for locking, this class has a lock as static member
+ * variable, which may be accessed using the
+ * @p{get_synchronisation_lock} function. Note however, that this
+ * class does not perform the synchronisation for you within its
+ * member functions. The reason is that you will usually want to
+ * synchronise over the calls to @p{initialize} and @p{factorize},
+ * since there should probably not be a call to one of these function
+ * with another matrix between the calls for one matrix. (The author
+ * does not really know whether this is true, but it is probably safe
+ * to assume that.) Since such cross-function synchronisation can only
+ * be performed from outside, it is left to the user of this class to
+ * do so.
  *
  * @author Wolfgang Bangerth, 2000, 2001
  */
@@ -211,6 +225,16 @@ class SparseDirectMA27 : public Subscriptor
 				      */
     unsigned int memory_consumption () const;
     
+				     /**
+				      * Get a reference to the
+				      * synchronisation lock which can
+				      * be used for this class. See
+				      * the general description of
+				      * this class for more
+				      * information.
+				      */
+    Threads::ThreadMutex & get_synchronisation_lock () const;
+
 				     /**
 				      * Exception.
 				      */
@@ -342,6 +366,12 @@ class SparseDirectMA27 : public Subscriptor
     int IFLAG;
 
 				     /**
+				      * Mutex for synchronising access
+				      * to this class.
+				      */
+    static Threads::ThreadMutex synchronisation_lock;
+    
+				     /**
 				      * Fill the @p{A} array from the
 				      * symmetric part of the given
 				      * matrix.
@@ -400,7 +430,20 @@ class SparseDirectMA27 : public Subscriptor
  * active. You have to synchronise your calls to the functions
  * provided by this class using mutexes (see the @ref{Threads}
  * namespace for such classes) to avoid multiple active calls at the
- * same time if you use multithreading.
+ * same time if you use multithreading. Since you may use this class
+ * in different parts of your program, and may not want to use a
+ * global variable for locking, this class has a lock as static member
+ * variable, which may be accessed using the
+ * @p{get_synchronisation_lock} function. Note however, that this
+ * class does not perform the synchronisation for you within its
+ * member functions. The reason is that you will usually want to
+ * synchronise over the calls to @p{initialize} and @p{factorize},
+ * since there should probably not be a call to one of these function
+ * with another matrix between the calls for one matrix. (The author
+ * does not really know whether this is true, but it is probably safe
+ * to assume that.) Since such cross-function synchronisation can only
+ * be performed from outside, it is left to the user of this class to
+ * do so.
  *
  * @author Wolfgang Bangerth, 2000, 2001
  */
@@ -517,6 +560,16 @@ class SparseDirectMA47 : public Subscriptor
 				      */
     unsigned int memory_consumption () const;
 
+				     /**
+				      * Get a reference to the
+				      * synchronisation lock which can
+				      * be used for this class. See
+				      * the general description of
+				      * this class for more
+				      * information.
+				      */
+    Threads::ThreadMutex & get_synchronisation_lock () const;
+    
 				     /**
 				      * Exception.
 				      */
@@ -640,6 +693,12 @@ class SparseDirectMA47 : public Subscriptor
     std::vector<unsigned int> KEEP;
     std::vector<unsigned int> IW1;
 
+				     /**
+				      * Mutex for synchronising access
+				      * to this class.
+				      */
+    static Threads::ThreadMutex synchronisation_lock;
+    
 				     /**
 				      * Fill the @p{A} array from the
 				      * symmetric part of the given

@@ -195,6 +195,9 @@ namespace HSL
 /* -------------------------- MA27 ---------------------------- */
 
 
+Threads::ThreadMutex SparseDirectMA27::synchronisation_lock;
+
+
 SparseDirectMA27::SparseDirectMA27 (const double LIW_factor_1,
 				    const double LIW_factor_2,
 				    const double LA_factor,
@@ -503,6 +506,14 @@ SparseDirectMA27::memory_consumption () const
 
 
 
+Threads::ThreadMutex &
+SparseDirectMA27::get_synchronisation_lock () const
+{
+  return synchronisation_lock;
+};
+
+
+
 void
 SparseDirectMA27::fill_A (const SparseMatrix<double> &matrix)
 {
@@ -535,7 +546,7 @@ SparseDirectMA27::fill_A (const SparseMatrix<double> &matrix)
 
 /* -------------------------- MA47 ---------------------------- */
 
-
+Threads::ThreadMutex SparseDirectMA47::synchronisation_lock;
 
 
 SparseDirectMA47::SparseDirectMA47 (const double LIW_factor_1,
@@ -828,6 +839,14 @@ SparseDirectMA47::memory_consumption () const
 	  MemoryConsumption::memory_consumption (IW) +
 	  MemoryConsumption::memory_consumption (KEEP) +
 	  MemoryConsumption::memory_consumption (IW1));
+};
+
+
+
+Threads::ThreadMutex &
+SparseDirectMA47::get_synchronisation_lock () const
+{
+  return synchronisation_lock;
 };
 
 
