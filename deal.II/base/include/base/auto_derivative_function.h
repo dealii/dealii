@@ -210,7 +210,7 @@ class AutoDerivativeFunction : public Function<dim>
 				      * over the different components
 				      * of the function.
 				      *
-				      * Imployes numerical difference
+				      * Imploys numerical difference
 				      * quotients using the preset
 				      * @p{DifferenceFormula}
 				      * @p{formula}.
