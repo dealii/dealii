@@ -262,7 +262,7 @@ enum NormType {
  * if access to an object describing the exact form of the boundary is needed, the
  * pointer stored within the triangulation object is accessed.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 2000
+ * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, 1998, 1999, 2000
  */
 class VectorTools
 {
