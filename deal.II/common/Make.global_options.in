@@ -147,7 +147,6 @@ include-path-contrib-boost = $D/contrib/boost/include
 include-path-tecplot       = $(TECIO_INCLUDE)
 include-path-petsc         = $(DEAL_II_PETSC_DIR)/include
 include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
-include-path-petsc-mpi     = $(DEAL_II_PETSC_DIR)/src/sys/src/mpiuni
 include-path-metis         = $(DEAL_II_METIS_DIR)/Lib
 
 INCLUDE           = $(addprefix -I, $(include-path-base) \
@@ -157,14 +156,20 @@ INCLUDE           = $(addprefix -I, $(include-path-base) \
 			            $(include-path-contrib-boost)\
 				    $(include-path-tecplot))
 
-# add PETSc and METIS include path if necessary
+# add PETSc and METIS include path if necessary. this rule
+# (and the one further down below to get correct flags) should eventually
+# be replaced by something where we do not blindly include PETSc make files
+# (and thus import all of its variables), but rather set up a scheme to
+# extract these values upon configuration
 ifeq ($(USE_CONTRIB_PETSC),yes)
+  include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
   INCLUDE += -I$(include-path-petsc) -I$(include-path-petsc-bmake)\
-             -I$(include-path-petsc-mpi)
+             $(MPI_INCLUDE)
 endif
 ifeq ($(USE_CONTRIB_METIS),yes)
   INCLUDE += -I$(include-path-metis)
 endif
+
 
 # compiler flags for debug and optimized mode
 CXXFLAGS.g   = @DEFS@ @CXXFLAGSG@  $(INCLUDE)
