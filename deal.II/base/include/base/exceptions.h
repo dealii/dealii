@@ -296,6 +296,19 @@ class ExceptionBase : public std::exception
 		   const char* c, const char *e);
 
 				     /**
+				      * Destructor. Empty, but needed
+				      * for the sake of exception
+				      * specification, since the base
+				      * class has this exception
+				      * specification and the
+				      * automatically generated
+				      * destructor would have a
+				      * different one due to member
+				      * objects.
+				      */
+    virtual ~ExceptionBase () throw();
+    
+				     /**
 				      *  Set the file name and line of where the
 				      *  exception appeared as well as the violated
 				      *  condition and the name of the exception as
@@ -505,6 +518,7 @@ class Exception0 :  public ExceptionBase {}
 class Exception1 : public ExceptionBase {                             \
   public:                                                             \
       Exception1 (const type1 a1) : arg1 (a1) {};                     \
+      virtual ~Exception1 () throw () {};                             \
       virtual void PrintInfo (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \
@@ -525,6 +539,7 @@ class Exception2 : public ExceptionBase {                             \
   public:                                                             \
       Exception2 (const type1 a1, const type2 a2) :                   \
 	      arg1 (a1), arg2(a2) {};                                 \
+      virtual ~Exception2 () throw () {};                             \
       virtual void PrintInfo (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \
@@ -546,6 +561,7 @@ class Exception3 : public ExceptionBase {                             \
   public:                                                             \
       Exception3 (const type1 a1, const type2 a2, const type3 a3) :   \
 	      arg1 (a1), arg2(a2), arg3(a3) {};                       \
+      virtual ~Exception3 () throw () {};                             \
       virtual void PrintInfo (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \
@@ -569,6 +585,7 @@ class Exception4 : public ExceptionBase {                             \
       Exception4 (const type1 a1, const type2 a2,                     \
 	    const type3 a3, const type4 a4) :                         \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {};             \
+      virtual ~Exception4 () throw () {};                             \
       virtual void PrintInfo (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \
@@ -593,6 +610,7 @@ class Exception5 : public ExceptionBase {                             \
       Exception5 (const type1 a1, const type2 a2, const type3 a3,     \
 	    const type4 a4, const type5 a5) :                         \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {};   \
+      virtual ~Exception5 () throw () {};                             \
       virtual void PrintInfo (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \

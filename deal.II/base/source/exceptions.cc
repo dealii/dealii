@@ -22,10 +22,17 @@ ExceptionBase::ExceptionBase () :
 {};
 
 
+
 ExceptionBase::ExceptionBase (const char* f, const int l, const char *func,
 			      const char* c, const char *e) :
 		file(f), line(l), function(func), cond(c), exc(e)
 {};
+
+
+
+ExceptionBase::~ExceptionBase () throw ()
+{};
+
 
 
 void ExceptionBase::SetFields (const char* f,
