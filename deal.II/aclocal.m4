@@ -1201,9 +1201,67 @@ AC_DEFUN(DEAL_II_CHECK_IBM_XLC_ERROR, dnl
     [
       AC_MSG_RESULT(yes. trying to work around)
       AC_DEFINE(XLC_WORK_AROUND_STD_BUG, 1, 
-                [Define if we have to work around a bug in IBM's xlC compiler])
+                [Define if we have to work around a bug in IBM's xlC compiler.
+See the aclocal.m4 file in the top-level directory for a description
+of this bug.])
     ])
 ])
+
+
+
+dnl -------------------------------------------------------------
+dnl Sun's Forte compiler (at least up to the Version 7 Early Access
+dnl release) have a problem with the following code, when compiling
+dnl with debug output:
+dnl 
+dnl /* ---------------------------------------------------------- */
+dnl /* Internal compiler error in abi2_mangler::entity_expression */
+dnl /* when compiled with -g.                                     */
+dnl template < int dim > struct T {
+dnl     typedef T<dim-1> SubT;
+dnl     T (SubT);
+dnl };
+dnl 
+dnl template <int dim> T<dim>::T (SubT) {};
+dnl 
+dnl template class T<3> ;
+dnl /* ---------------------------------------------------------- */
+dnl
+dnl The compiler gets an internal compiler error, so we work around
+dnl this problem by a really evil hack in the sources.
+dnl
+dnl Usage: DEAL_II_CHECK_LOCAL_TYPEDEF_COMP
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_LOCAL_TYPEDEF_COMP, dnl
+[
+  AC_MSG_CHECKING(for local computed template typedef bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG -g"
+  AC_TRY_COMPILE(
+    [
+	template < int dim > struct T {
+	    typedef T<dim-1> SubT;
+	    T (SubT);
+	};
+
+	template <int dim> T<dim>::T (SubT) {};
+
+	template class T<3> ;
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. trying to work around)
+      AC_DEFINE(DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND, 1, 
+                [Define if we have to work around a bug in Sun's Forte compiler.
+See the aclocal.m4 file in the top-level directory for a description
+of this bug.])
+    ])
+])
+
 
 
 

@@ -61,7 +61,13 @@ class TensorFunction : public FunctionTime,
 				      * @p{gradient} functions.
 				      */
     typedef Tensor<rank,dim> value_type;
-    typedef Tensor<rank+1,dim> gradient_type;
+
+    template <int dim2>
+    struct GradientTypeHelper
+    {
+	typedef Tensor<rank+1,dim> type;
+    };
+    typedef typename GradientTypeHelper<dim>::type gradient_type;
     
 				     /**
 				      * Constructor. May take an

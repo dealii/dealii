@@ -41,6 +41,11 @@
    interface */
 #undef DEAL_II_HAVE_TECPLOT
 
+/* Define if we have to work around a bug in Sun's Forte compiler. See the
+   aclocal.m4 file in the top-level directory for a description of this bug.
+   */
+#undef DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND
+
 /* Major version number of deal.II */
 #undef DEAL_II_MAJOR
 
@@ -87,7 +92,9 @@
    classes (early gcc versions did not) */
 #undef HAVE_STD_STRINGSTREAM
 
-/* Define if we have to work around a bug in IBM's xlC compiler */
+/* Define if we have to work around a bug in IBM's xlC compiler. See the
+   aclocal.m4 file in the top-level directory for a description of this bug.
+   */
 #undef XLC_WORK_AROUND_STD_BUG
 
 #endif
