@@ -22,10 +22,12 @@ clean  : $(clean)
 
 # define the action of the targets for the specific subdirectories
 $(compile) :
-	cd $(@:.compile=) ; $(MAKE)
+	cd $(@:.compile=) ; $(MAKE) D=$D
 
 $(run) :
 	cd $(@:.run=) ; $(MAKE) run
 
 $(clean) :
 	-cd $(@:.clean=) ; $(MAKE) clean
+
+

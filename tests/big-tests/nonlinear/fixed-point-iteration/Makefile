@@ -1,5 +1,11 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998
+# Copyright by the deal.II authors 1998, 1999, 2000
+
+############################################################
+# $D contains the root of the deal distribution and should
+# be supplied as a command line argument D=../../...
+############################################################
+
 
 # Template for makefiles for the examples subdirectory. In principle,
 # everything should be done automatically if you set the target file
@@ -36,10 +42,8 @@ delete-files = gnuplot* *.eps
 ###############################################################################
 # Internals
 
-#deal include base path
-D = ../../../..
 
-include ../../../Make.global_options
+include $D/Make.global_options
 
 
 

@@ -1,5 +1,10 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998, 1999, 2000
+# Copyright by the deal.II authors 1998, 1999, 2000
+
+############################################################
+# $D contains the root of the deal distribution and should
+# be supplied as a command line argument D=../../...
+############################################################
 
 
 # For the small projects Makefile, you basically need to fill in only
@@ -17,14 +22,6 @@ target   = grid_test
 # and to `off' when running production computations.
 debug-mode = on
 
-
-# As third field, we need to give the path to the top-level deal.II
-# directory. You need to adjust this to your needs. Since this path is
-# probably the most often needed one in the Makefile internals, it is
-# designated by a single-character variable, since that can be
-# reference using $D only, i.e. without the parentheses that are
-# required for most other parameters, as e.g. in $(target).
-D = ../../../deal.II/
 
 
 # The last field specifies the names of data and other files that

@@ -1,5 +1,10 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998
+# Copyright by the deal.II authors 1998, 1999, 2000
+
+############################################################
+# $D contains the root of the deal distribution and should
+# be supplied as a command line argument D=../../...
+############################################################
 
 # Template for makefiles for the examples subdirectory. In principle,
 # everything should be done automatically if you set the target file
@@ -36,9 +41,6 @@ delete-files = results/*gnuplot results/*.eps
 ###############################################################################
 # Internals
 
-#deal include base path
-D = ../../../deal.II/
-
 include $D/common/Make.global_options
 
 
@@ -48,7 +50,7 @@ cc-files    = $(filter-out *%, $(shell echo *.cc))
 o-files     = $(cc-files:.cc=.o)
 go-files    = $(cc-files:.cc=.go)
 h-files     = $(filter-out *%, $(shell echo *.h))
-lib-h-files = $(filter-out *%, $(shell echo ../../include/*/*.h))
+lib-h-files = $(filter-out *%, $(shell echo $D/include/*/*.h))
 
 # list of libraries needed to link with
 libs.g   = ./Obj.g.a         \
