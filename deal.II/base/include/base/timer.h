@@ -14,7 +14,7 @@
  * microsecond. 
  *
  *
- * \subsection{Usage}
+//TODO: * \subsection{Usage}
  *
  *
  * Note: the implementation of this class is system dependant.
