@@ -118,6 +118,12 @@ class InterGridMap
 					 // warning about non-default
 					 // constructor of GridClass
 	GridClass_dim ();
+
+					 /**
+					  * Declare iterator type, for
+					  * access from outside.
+					  */
+	typedef typename GridClass<dim>::cell_iterator cell_iterator;
     };
     
 				     /**
