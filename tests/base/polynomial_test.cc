@@ -19,6 +19,11 @@
 #include <base/tensor_product_polynomials.h>
 
 
+extern "C"
+void abort()
+{}
+
+
 
 bool equals_delta_ij(double value, unsigned int i, unsigned int j)
 {
@@ -36,7 +41,7 @@ void Q3_4th_shape_function_values_and_grads_dim2(
 
 
 
-int main(int, char)
+int main()
 {
   std::ofstream logfile("polynomial_test.output");
   logfile.precision(4);

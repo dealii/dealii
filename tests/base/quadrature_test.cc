@@ -71,18 +71,18 @@ check_cells (std::vector<Quadrature<dim>*>& quadratures)
 	      switch (dim)
 		{
 		case 3:
-		  f *= pow(points[x](2), i);
+		  f *= std::pow(static_cast<double>(points[x](2)), i*1.0);
 		case 2:
-		  f *= pow(points[x](1), i);
+		  f *= std::pow(static_cast<double>(points[x](1)), i*1.0);
 		case 1:
-		  f *= pow(points[x](0), i);
+		  f *= std::pow(static_cast<double>(points[x](0)), i*1.0);
 		}
 	      quadrature_int+=f*weights[x];
 	    }
 	  
 					   // the exact integral is 1/(i+1)
-	  exact_int=1./pow(i+1,dim);	  
-	  err = fabs(quadrature_int-exact_int);
+	  exact_int=1./std::pow(static_cast<double>(i+1),dim);	  
+	  err = std::fabs(quadrature_int-exact_int);
 	}
       while (err<1e-15);
 				       // Uncomment here for testing
@@ -144,11 +144,11 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 	      switch (dim)
 		{
 		case 3:
-		  f *= pow(points[x](2), i);
+		  f *= std::pow(points[x](2), i*1.0);
 		case 2:
-		  f *= pow(points[x](1), i);
+		  f *= std::pow(points[x](1), i*1.0);
 		case 1:
-		  f *= pow(points[x](0), i);
+		  f *= std::pow(points[x](0), i*1.0);
 		}
 	      quadrature_int+=f*weights[x];
 	    }
@@ -165,7 +165,7 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 	      break;
 	    }
       
-	  err = fabs(quadrature_int-exact_int);
+	  err = std::fabs(quadrature_int-exact_int);
 	}
       while (err<5e-15);
 				       // Uncomment here for testing
@@ -175,7 +175,7 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
   deallog.pop();
 }
 
-int main(int,char)
+int main()
 {
   std::ofstream logfile("quadrature_test.output");
   deallog.attach(logfile);
@@ -194,14 +194,14 @@ int main(int,char)
 
   deallog.push("2d");
   check_cells(q2);
-  check_faces(q1,false);
-  check_faces(q1,true);
+  check_faces<2>(q1,false);
+  check_faces<2>(q1,true);
   deallog.pop();
 
   deallog.push("3d");
   check_cells(q3);
-  check_faces(q2,false);
-  check_faces(q2,true);
+  check_faces<3>(q2,false);
+  check_faces<3>(q2,true);
   deallog.pop();
 
 				   // delete objects again to avoid

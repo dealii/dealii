@@ -55,7 +55,7 @@ template <int dim>
 double AutoSinExp<dim>::value (const Point<dim> &p,
 			       const unsigned int) const
 {
-  return sin(2*p(0))*exp(3*p(1));
+  return std::sin(2*p(0))*std::exp(3*p(1));
 }
 
 
@@ -92,8 +92,8 @@ Tensor<1,dim> ExactSinExp<dim>::gradient (const Point<dim> &p,
 					 const unsigned int) const
 {
   Tensor<1,dim> grad;
-  grad[0]=2*cos(2*p(0))*exp(3*p(1));
-  grad[1]=3*sin(2*p(0))*exp(3*p(1));
+  grad[0]=2*std::cos(2*p(0))*std::exp(3*p(1));
+  grad[1]=3*std::sin(2*p(0))*std::exp(3*p(1));
   return grad;
 }
 
@@ -109,7 +109,7 @@ void ExactSinExp<dim>::vector_gradient (const Point<dim>       &p,
 }
 
 
-int main(int, char)
+int main()
 {
   std::ofstream logfile("auto_derivative_function.output");
   logfile.precision(4);
@@ -145,7 +145,7 @@ int main(int, char)
 					   // Test of gradient function
 	  Tensor<1,dim> a_grad=auto_function.gradient(p);
 	  a_grad-=u_grad;
-	  double value=sqrt(a_grad*a_grad);
+	  double value=std::sqrt(a_grad*a_grad);
 	  history.add_value("grad", value);
 	  history.set_scientific("grad", true);
 	  history.set_precision("grad", 2);
@@ -155,7 +155,7 @@ int main(int, char)
 	  std::vector<Tensor<1,dim> > a_grads(1);
 	  auto_function.gradient_list(ps, a_grads);
 	  a_grads[0]-=u_grad;
-	  value=sqrt(a_grads[0]*a_grads[0]);
+	  value=std::sqrt(a_grads[0]*a_grads[0]);
 	  history.add_value("grads[0]", value);
 	  history.set_scientific("grads[0]", true);
 	  history.set_precision("grads[0]", 2);
@@ -165,7 +165,7 @@ int main(int, char)
 	  std::vector<Tensor<1,dim> > a_vgrad(2);
 	  auto_function.vector_gradient(p, a_vgrad);
 	  a_vgrad[1]-=u_grad;
-	  value=sqrt(a_vgrad[1]*a_vgrad[1]);
+	  value=std::sqrt(a_vgrad[1]*a_vgrad[1]);
 	  history.add_value("vgrad[1]", value);
 	  history.set_scientific("vgrad[1]", true);
 	  history.set_precision("vgrad[1]", 2);
@@ -177,7 +177,7 @@ int main(int, char)
 	    a_vgrads(1, std::vector<Tensor<1,dim> > (2));
 	  auto_function.vector_gradient_list(ps, a_vgrads);
 	  a_vgrads[0][1]-=u_grad;
-	  value=sqrt(a_vgrads[0][1]*a_vgrads[0][1]);
+	  value=std::sqrt(a_vgrads[0][1]*a_vgrads[0][1]);
 	  history.add_value("vgrads[1]", value);
 	  history.set_scientific("vgrads[1]", true);
 	  history.set_precision("vgrads[1]", 2);
