@@ -27,6 +27,9 @@ class Subscriptor
 				      * destruction it shall be zero again
 				      * (i.e. all objects which subscribed
 				      * should have unsubscribed again).
+				      *
+				      * The creator (and owner) of an object
+				      * is not counted.
 				      */
     mutable unsigned int counter;
   public:
@@ -127,7 +130,7 @@ class SmartReference
 				     /**
 				      * Conversion to normal reference
 				      */
-    operator T& ()
+    operator T& () const
       {
 	return t;
       }
@@ -137,7 +140,12 @@ class SmartReference
 
 
 /**
- * Smart pointers avoid destruction of an object in use.
+ * Smart pointers avoid destruction of an object in use. They can be used just
+ * like a pointer (i.e. using the #*# and #-># operators and through casting)
+ * but make sure that the object pointed to is not deleted in the course of
+ * use of the pointer by signalling the pointee its use. This is done using
+ * the #Subscriptor# class, which handles a use count and refuses destruction
+ * as long as a smart pointer or reference uses that object.
  */
 template<class T>
 class SmartPointer
