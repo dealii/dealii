@@ -858,9 +858,18 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   
 				   // We can get whatever we wrote to
 				   // the stream using the ``str()''
-				   // function. Use that as filename
+				   // function. If the new stringstream
+                                   // classes are used, then the result is
+                                   // a string which we have to convert to
+                                   // a char* using the ``c_str()''
+                                   // function, otherwise the result is a
+                                   // char* right away.  Use that as filename
 				   // for the output stream:
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ofstream output (filename.str().c_str());
+#else
   std::ofstream output (filename.str());
+#endif
 				   // And then write the data to the
 				   // file.
   data_out.write_eps (output);
