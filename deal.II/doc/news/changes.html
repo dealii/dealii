@@ -213,6 +213,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: There was a bug in the <code
+       class="class">KellyErrorEstimator</code> class that resulted in
+       assertions being thrown when run with multithreading
+       enabled. This is now fixed.
+       <br> 
+       (WB, 2005/03/10)
+       </p>
+
+  <li> <p>
        Changed: The <code class="class">Triangulation<2></code>::<code
        class="member">execute_refinement</code> function has been
        re-implemented to accommodate future developments. This change
