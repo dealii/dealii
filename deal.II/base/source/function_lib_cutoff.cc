@@ -80,7 +80,7 @@ namespace Functions
       for (unsigned int k=0;k<values.size();++k)
 	values[k] = (center.distance(points[k])<radius) ? 1. : 0.;
     else
-      fill (values.begin(), values.end(), 0.);
+      std::fill (values.begin(), values.end(), 0.);
   }
 
   
@@ -100,7 +100,7 @@ namespace Functions
 	  values[k] = val;
 	else
 	  {
-	    values[k] = 0.;
+	    values[k].clear ();
 	    values[k](selected) = val;
 	  }
       }
@@ -150,7 +150,7 @@ namespace Functions
 	  values[i] = ((d<radius) ? (radius-d) : 0.);
 	}
     else
-      fill (values.begin(), values.end(), 0.);
+      std::fill (values.begin(), values.end(), 0.);
   }
 
 
@@ -172,7 +172,7 @@ namespace Functions
 	  values[k] = val;
 	else
 	  {
-	    values[k] = 0.;
+	    values[k].clear ();
 	    values[k](selected) = val;
 	  }
       }
@@ -234,7 +234,7 @@ namespace Functions
 	    }
 	}
     else
-      fill (values.begin(), values.end(), 0.);
+      std::fill (values.begin(), values.end(), 0.);
   }
 
 
@@ -264,7 +264,7 @@ namespace Functions
 	  values[k] = val;
 	else
 	  {
-	    values[k] = 0.;
+	    values[k].clear ();
 	    values[k](selected) = val;
 	  }
       }
