@@ -15,11 +15,7 @@
 
 
 #include <lac/vector.h>
-
-#ifdef DEAL_II_USE_MT
-#  include <base/thread_management.h>
-#endif
-
+#include <base/thread_management.h>
 #include <string>
 
 
