@@ -29,7 +29,7 @@ int DoFLineAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
 				   // and enough room was reserved
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_line,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_line));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_line));
 
   return dof_handler->levels[present_level]
     ->line_dofs[present_index*dof_handler->selected_fe->dofs_per_line+i];
@@ -44,9 +44,9 @@ int DoFLineAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
-  Assert (vertex<2, ExcInvalidIndex (i,0,2));
+  Assert (vertex<2, ExcIndexRange (i,0,2));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
 
   const unsigned int dof_number = (vertex_index(vertex) *
 				   dof_handler->selected_fe->dofs_per_vertex +
@@ -117,7 +117,7 @@ int DoFQuadAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
 				   // and enough room was reserved
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_quad,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_quad));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_quad));
 
   return dof_handler->levels[present_level]
     ->quad_dofs[present_index*dof_handler->selected_fe->dofs_per_quad+i];
@@ -131,9 +131,9 @@ int DoFQuadAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
-  Assert (vertex<4, ExcInvalidIndex (i,0,4));
+  Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
 
   const unsigned int dof_number = (vertex_index(vertex) *
 				   dof_handler->selected_fe->dofs_per_vertex +
@@ -174,7 +174,7 @@ template <int dim, typename BaseClass>
 inline
 TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
 DoFQuadAccessor<dim,BaseClass>::line (const unsigned int i) const {
-  Assert (i<4, ExcInvalidIndex (i, 0, 4));
+  Assert (i<4, ExcIndexRange (i, 0, 4));
 
   return TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
     (
@@ -227,7 +227,7 @@ int DoFHexAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
 				   // and enough room was reserved
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_hex,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_hex));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_hex));
 
   return dof_handler->levels[present_level]
     ->hex_dofs[present_index*dof_handler->selected_fe->dofs_per_hex+i];
@@ -241,9 +241,9 @@ int DoFHexAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
-  Assert (vertex<8, ExcInvalidIndex (i,0,8));
+  Assert (vertex<8, ExcIndexRange (i,0,8));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
 
   const unsigned int dof_number = (vertex_index(vertex) *
 				   dof_handler->selected_fe->dofs_per_vertex +
@@ -305,7 +305,7 @@ template <int dim, typename BaseClass>
 inline
 TriaIterator<dim,DoFQuadAccessor<dim,QuadAccessor<dim> > >
 DoFHexAccessor<dim,BaseClass>::quad (const unsigned int i) const {
-  Assert (i<6, ExcInvalidIndex (i, 0, 6));
+  Assert (i<6, ExcIndexRange (i, 0, 6));
 
   return TriaIterator<dim,DoFQuadAccessor<dim,QuadAccessor<dim> > >
     (

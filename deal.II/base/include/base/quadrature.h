@@ -40,7 +40,9 @@
  * all functions are provided in the #quadrature.cc# file, but they will
  * throw exceptions if actually called. The only function which is allowed
  * to be called is the constructor taking one integer, which in this case
- * ignores its parameter, and of course the destructor.
+ * ignores its parameter, and of course the destructor. Besides this, it is
+ * necessary to provide a class #Point<0># to make the compiler happy. This
+ * class also does nothing.
  *
  * @author Wolfgang Bangerth, 1998
  */

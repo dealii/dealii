@@ -495,7 +495,7 @@ class MGDoFSubstructAccessor<1> :  public MGDoFLineAccessor<1,CellAccessor<1> > 
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef typename MGDoFLineAccessor<1,CellAccessor<1> >::AccessorData AccessorData;
+    typedef MGDoFLineAccessor<1,CellAccessor<1> >::AccessorData AccessorData;
 
     				     /**
 				      * Constructor

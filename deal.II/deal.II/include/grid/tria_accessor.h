@@ -237,9 +237,9 @@ class TriaAccessor {
 				      */
     Triangulation<dim> *tria;
 
-    template <int dim, typename Accessor> friend class TriaRawIterator<dim,Accessor>;
-    template <int dim, typename Accessor> friend class TriaIterator<dim,Accessor>;
-    template <int dim, typename Accessor> friend class TriaActiveIterator<dim,Accessor>;
+    template <int anydim, typename Accessor> friend class TriaRawIterator;
+    template <int anydim, typename Accessor> friend class TriaIterator;
+    template <int anydim, typename Accessor> friend class TriaActiveIterator;
 };
 
 
@@ -560,8 +560,7 @@ class LineAccessor :  public TriaAccessor<dim> {
 				     /**
 				      * Declare some friends.
 				      */
-    template <int dim> friend class TriaRawIterator<dim,LineAccessor<dim> >;
-    template <>        friend class TriaRawIterator<1,CellAccessor<1> >;
+    template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
 
 
@@ -917,8 +916,7 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				     /**
 				      * Declare some friends.
 				      */
-    template <int dim> friend class TriaRawIterator<dim,QuadAccessor<dim> >;
-    template <>        friend class TriaRawIterator<2,CellAccessor<2> >;
+    template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
 
 
@@ -1276,8 +1274,7 @@ class HexAccessor :  public TriaAccessor<dim> {
 				     /**
 				      * Declare some friends.
 				      */
-    template <int dim> friend class TriaRawIterator<dim,HexAccessor<dim> >;
-    template <>        friend class TriaRawIterator<3,CellAccessor<3> >;
+    template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
 
 
@@ -1323,7 +1320,7 @@ class TriaSubstructAccessor<1> :  public LineAccessor<1> {
 				      * Propagate the AccessorData type
 				      * into the present class.
 				      */
-    typedef typename LineAccessor<1>::AccessorData AccessorData;
+    typedef LineAccessor<1>::AccessorData AccessorData;
     				     /**
 				      * Constructor
 				      */
@@ -1356,7 +1353,7 @@ class TriaSubstructAccessor<2> : public QuadAccessor<2> {
 				      * Propagate the AccessorData type
 				      * into the present class.
 				      */
-    typedef typename QuadAccessor<2>::AccessorData AccessorData;
+    typedef QuadAccessor<2>::AccessorData AccessorData;
     				     /**
 				      * Constructor
 				      */
@@ -1390,7 +1387,7 @@ class TriaSubstructAccessor<3> : public HexAccessor<3> {
 				      * Propagate the AccessorData type
 				      * into the present class.
 				      */
-    typedef typename HexAccessor<3>::AccessorData AccessorData;
+    typedef HexAccessor<3>::AccessorData AccessorData;
     
     				     /**
 				      * Constructor

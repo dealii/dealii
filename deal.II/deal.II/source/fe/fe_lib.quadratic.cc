@@ -192,16 +192,16 @@ void FEQ2<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
 
 
 template <>
-void FEQ2<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
-					    vector<Point<1> >  &support_points) const {
+void FEQ2<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
+				  vector<Point<1> >  &support_points) const {
   FiniteElement<1>::get_support_points (cell, support_points);
 };
 
 
 
 template <>
-void FEQ2<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
-						 vector<Point<1> >  &) const {
+void FEQ2<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
+				       vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -1075,8 +1075,8 @@ void FEQ2<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   
 
 template <>
-void FEQ2<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
-					    vector<Point<2> >  &support_points) const {
+void FEQ2<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
+				  vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
   
@@ -1103,8 +1103,8 @@ void FEQ2<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &c
 
 
 template <>
-void FEQ2<2>::get_face_support_points (const typename DoFHandler<2>::face_iterator &face,
-						 vector<Point<2> >  &support_points) const {
+void FEQ2<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
+				       vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
 
@@ -2818,8 +2818,8 @@ void FEQ2<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
   
 
 template <>
-void FEQ2<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &cell,
-					    vector<Point<3> >  &support_points) const {
+void FEQ2<3>::get_support_points (const DoFHandler<3>::cell_iterator &cell,
+				  vector<Point<3> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
 
@@ -2918,8 +2918,8 @@ void FEQ2<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &c
 
 
 template <>
-void FEQ2<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &face,
-						 vector<Point<3> >  &support_points) const {
+void FEQ2<3>::get_face_support_points (const DoFHandler<3>::face_iterator &face,
+				       vector<Point<3> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
 

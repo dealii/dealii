@@ -1061,8 +1061,7 @@ class SparseMatrix : public Subscriptor
 
 				     // make all other sparse matrices
 				     // friends
-    template <typename somenumber> friend class SparseMatrix<somenumber>;
-
+    template <typename somenumber> friend class SparseMatrix;
 };
 
 

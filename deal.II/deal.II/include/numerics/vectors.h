@@ -444,10 +444,6 @@ class VectorTools //<dim>
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcNotImplemented);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInvalidFE);
 				     /**
 				      * Exception

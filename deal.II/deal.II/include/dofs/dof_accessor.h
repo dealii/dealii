@@ -87,16 +87,6 @@ class DoFAccessor {
 				      */
     DeclException0 (ExcInvalidObject);
 				     /**
-				      * Exception for child classes
-				      */
-    DeclException3 (ExcInvalidIndex,
-		    int,
-		    int,
-		    int,
-		    << "Invalid index " << arg1
-		    << ", index must be between " << arg2
-		    << " and " << arg3 << ".");
-				     /**
 				      * Exception
 				      */
     DeclException0 (ExcVectorNotEmpty);
@@ -600,7 +590,7 @@ class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef typename DoFLineAccessor<1,CellAccessor<1> >::AccessorData AccessorData;
+    typedef DoFLineAccessor<1,CellAccessor<1> >::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
@@ -634,7 +624,7 @@ class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef typename DoFQuadAccessor<2,CellAccessor<2> >::AccessorData AccessorData;
+    typedef DoFQuadAccessor<2,CellAccessor<2> >::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
@@ -669,7 +659,7 @@ class DoFSubstructAccessor<3> : public DoFHexAccessor<3,CellAccessor<3> > {
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef typename DoFQuadAccessor<3,CellAccessor<3> >::AccessorData AccessorData;
+    typedef DoFQuadAccessor<3,CellAccessor<3> >::AccessorData AccessorData;
     
     				     /**
 				      * Constructor

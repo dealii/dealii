@@ -148,17 +148,13 @@ Look at the hyper-L and hyper-ball code in 3d. I suspect the cubes are
   The hypercube is fixed, however.
 
 
-Let DoFHandler be derived from Subscriptor and let the DataOut object
-  subscribe to it. Same for FEValues and maybe some more classes.
-
-
 Change the vector<int> in 'void DoFQuadAccessor::get_dof_indices(
 	vector<int> &dof_indices) const' in a vector<unsigned int> and
 	catch the Error dof_index==-1 inside of this function
 
 
 Remove that pseudo-template clutter in the lower parts of
-        dof_accessor.cc marked by comments.
+        dof_accessor.[templates.]cc marked by comments.
 
 
 Remove the flag -fno-vtable-thunks if egcs's bug is removed someday.

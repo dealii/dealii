@@ -60,11 +60,23 @@ class Tensor<1,dim> {
     static const unsigned int rank      = 1;
 
 				     /**
+				      * Unnecessary variable, only used in
+				      * the declaration of #array_type#.
+				      * This variable should be omitted,
+				      * but egcs1.1.2 chokes on that so
+				      * we need it presently.
+				      */
+    static const unsigned int array_size = (dim>0 ? dim : 1);
+    
+				     /**
 				      * Declare an array type which can
 				      * be used to initialize statically
 				      * an object of this type.
+				      *
+				      * Use the same condition for #dim==0#
+				      * as in the #TensorBase<1,dim># class.
 				      */
-    typedef double array_type[dim];
+    typedef double array_type[array_size];
 
 				     /**
 				      * Constructor. Initialize all entries
@@ -173,22 +185,35 @@ class Tensor<1,dim> {
 				      * index marches fastest.
 				      */
     void unroll (Vector<double> &result) const;
-     
+
   protected:
 				     /**
-				      *  Store the values in a simple array.
+				      * Store the values in a simple array.
+				      * For #dim==0# store one element, because
+				      * otherways the compiler would choke.
+				      * We catch this case in the constructor
+				      * to disallow the creation of such
+				      * an object.
 				      */
-    double values[dim];
+    double values[dim>0 ? dim : 1];
 
 				     /**
 				      * Help function for unroll.
 				      */
-    void unroll_recursion (Vector<double> & result,
-			   unsigned int& start_index) const;
+    void unroll_recursion (Vector<double> &result,
+			   unsigned int   &start_index) const;
 
-    template<>
-    friend void Tensor<2,dim>::unroll_recursion(Vector<double> &,
-						unsigned&) const;
+				     // make the following classes
+				     // friends to this class. in principle,
+				     // it would suffice if otherrank==2,
+				     // but then the compiler complains
+				     // that this be an explicit specialization
+				     // which is not what we want
+				     //
+				     // also, it would be sufficient to make
+				     // the function unroll_loops a friend,
+				     // but that seems to be impossible as well.
+    template<int otherrank, int otherdim>  friend class Tensor;
 };
 
 				 /**

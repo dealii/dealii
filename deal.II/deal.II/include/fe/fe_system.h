@@ -526,7 +526,7 @@ FESystem<dim>::base_element(unsigned int index) const
 template <int dim>
 template <class FE>
 FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
-		FiniteElement (multiply_dof_numbers(fe, n_elements)),
+		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements)),
 		base_elements(1),
 		component_to_base_table(n_components)
 {
@@ -542,7 +542,7 @@ template <class FE1, class FE2>
 FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 			 const FE2 &fe2, const unsigned int n2)
 		:
-		FiniteElement (multiply_dof_numbers(fe1, n1, fe2, n2)),
+		FiniteElement<dim> (multiply_dof_numbers(fe1, n1, fe2, n2)),
 		base_elements(2),
 		component_to_base_table(n_components)
 {
@@ -564,9 +564,9 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 			 const FE2 &fe2, const unsigned int n2,
 			 const FE3 &fe3, const unsigned int n3)
 		:
-		FiniteElement (multiply_dof_numbers(fe1, n1,
-						    fe2, n2,
-						    fe3, n3)),
+		FiniteElement<dim> (multiply_dof_numbers(fe1, n1,
+							 fe2, n2,
+							 fe3, n3)),
 		base_elements(3),
 		component_to_base_table(n_components)
 {

@@ -65,7 +65,10 @@ sub parse_class_declarations {
 
 	    # we look for declarations, where after the name comes a colon
 	    # or an open-brace, maybe also a semicolon or just nothing
-	    if (($rest =~ /^\s*[:\{;]/) || ($rest =~ /^\s*$/)) {
+	    #
+	    # the colon might be of an inheritance list, but we do not
+	    # want it to come from a nested class declaration
+	    if (($rest =~ /^\s*([\{;]|:[^:])/) || ($rest =~ /^\s*$/)) {
 		$declaration = $basepart . " " . $name;
 		# strip double spaces etc.
 		$declaration =~ s/\s\s+/ /g;

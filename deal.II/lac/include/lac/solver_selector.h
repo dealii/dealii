@@ -104,10 +104,10 @@ class SolverSelector
 				      * 
 				      */
     template<class Preconditioner>
-    Solver<Matrix,Vector>::ReturnState solve(const Matrix &A,
-					     Vector &x,
-					     const Vector &b,
-					     const Preconditioner &precond) const;
+    typename Solver<Matrix,Vector>::ReturnState solve(const Matrix &A,
+						      Vector &x,
+						      const Vector &b,
+						      const Preconditioner &precond) const;
 
 				     /**
 				      * Set the additional data. For more
@@ -215,7 +215,7 @@ SolverSelector<Matrix, Vector>::~SolverSelector()
 
 template <class Matrix, class Vector>
 template<class Preconditioner>
-Solver<Matrix,Vector>::ReturnState 
+typename Solver<Matrix,Vector>::ReturnState 
 SolverSelector<Matrix, Vector>::solve(const Matrix &A,
 				      Vector &x,
 				      const Vector &b,

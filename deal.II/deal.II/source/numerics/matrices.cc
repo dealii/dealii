@@ -569,10 +569,11 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
 		     n_q_points = fe_values.n_quadrature_points;
 
   Assert (cell_matrix.n() == total_dofs,
-	  ExcWrongSize(cell_matrix.n(), total_dofs));
+	  Equation<dim>::ExcWrongSize(cell_matrix.n(), total_dofs));
   Assert (cell_matrix.m() == total_dofs,
-	  ExcWrongSize(cell_matrix.m(), total_dofs));
-  Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
+	  Equation<dim>::ExcWrongSize(cell_matrix.m(), total_dofs));
+  Assert (cell_matrix.all_zero(),
+	  Equation<dim>::ExcObjectNotEmpty());
   
   const FullMatrix<double> &values    = fe_values.get_shape_values ();
   const vector<double>     &weights   = fe_values.get_JxW_values ();
@@ -613,13 +614,15 @@ void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 		     n_q_points = fe_values.n_quadrature_points;
 
   Assert (cell_matrix.n() == total_dofs,
-	  ExcWrongSize(cell_matrix.n(), total_dofs));
+	  Equation<dim>::ExcWrongSize(cell_matrix.n(), total_dofs));
   Assert (cell_matrix.m() == total_dofs,
-	  ExcWrongSize(cell_matrix.m(), total_dofs));
+	  Equation<dim>::ExcWrongSize(cell_matrix.m(), total_dofs));
   Assert (rhs.size() == total_dofs,
-	  ExcWrongSize(rhs.size(), total_dofs));
-  Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
-  Assert (rhs.all_zero(), ExcObjectNotEmpty());
+	  Equation<dim>::ExcWrongSize(rhs.size(), total_dofs));
+  Assert (cell_matrix.all_zero(),
+	  Equation<dim>::ExcObjectNotEmpty());
+  Assert (rhs.all_zero(),
+	  Equation<dim>::ExcObjectNotEmpty());
 
   const FullMatrix<double> &values    = fe_values.get_shape_values ();
   const vector<double>     &weights   = fe_values.get_JxW_values ();
@@ -669,8 +672,10 @@ void MassMatrix<dim>::assemble (Vector<double>      &rhs,
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
-  Assert (rhs.size() == total_dofs, ExcWrongSize(rhs.size(), total_dofs));
-  Assert (rhs.all_zero(), ExcObjectNotEmpty());
+  Assert (rhs.size() == total_dofs,
+	  Equation<dim>::ExcWrongSize(rhs.size(), total_dofs));
+  Assert (rhs.all_zero(),
+	  Equation<dim>::ExcObjectNotEmpty());
 
   const FullMatrix<double> &values    = fe_values.get_shape_values ();
   const vector<double>     &weights   = fe_values.get_JxW_values ();
@@ -707,13 +712,15 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
 		     n_q_points = fe_values.n_quadrature_points;
 
   Assert (cell_matrix.n() == total_dofs,
-	  ExcWrongSize(cell_matrix.n(), total_dofs));
+	  Equation<dim>::ExcWrongSize(cell_matrix.n(), total_dofs));
   Assert (cell_matrix.m() == total_dofs,
-	  ExcWrongSize(cell_matrix.m(), total_dofs));
+	  Equation<dim>::ExcWrongSize(cell_matrix.m(), total_dofs));
   Assert (rhs.size() == total_dofs,
-	  ExcWrongSize(rhs.size(), total_dofs));
-  Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
-  Assert (rhs.all_zero(), ExcObjectNotEmpty());
+	  Equation<dim>::ExcWrongSize(rhs.size(), total_dofs));
+  Assert (cell_matrix.all_zero(),
+	  Equation<dim>::ExcObjectNotEmpty());
+  Assert (rhs.all_zero(),
+	  Equation<dim>::ExcObjectNotEmpty());
 
   const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
   const FullMatrix<double>             &values    = fe_values.get_shape_values ();
@@ -764,10 +771,11 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 		     n_q_points = fe_values.n_quadrature_points;
 
   Assert (cell_matrix.n() == total_dofs,
-	  ExcWrongSize(cell_matrix.n(), total_dofs));
+	  Equation<dim>::ExcWrongSize(cell_matrix.n(), total_dofs));
   Assert (cell_matrix.m() == total_dofs,
-	  ExcWrongSize(cell_matrix.m(), total_dofs));
-  Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
+	  Equation<dim>::ExcWrongSize(cell_matrix.m(), total_dofs));
+  Assert (cell_matrix.all_zero(),
+	  Equation<dim>::ExcObjectNotEmpty());
   
   const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
   const vector<double> &weights   = fe_values.get_JxW_values ();
@@ -805,8 +813,10 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
-  Assert (rhs.size() == total_dofs, ExcWrongSize(rhs.size(), total_dofs));
-  Assert (rhs.all_zero(), ExcObjectNotEmpty());
+  Assert (rhs.size() == total_dofs,
+	  Equation<dim>::ExcWrongSize(rhs.size(), total_dofs));
+  Assert (rhs.all_zero(),
+	  Equation<dim>::ExcObjectNotEmpty());
 
   const FullMatrix<double> &values    = fe_values.get_shape_values ();
   const vector<double>     &weights   = fe_values.get_JxW_values ();

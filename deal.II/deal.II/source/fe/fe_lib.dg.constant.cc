@@ -45,8 +45,8 @@ FEDG_Q0<1>::FEDG_Q0 () :
 
 template <>
 void
-FEDG_Q0<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
-					  vector<Point<1> >  &) const {
+FEDG_Q0<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
+				     vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -93,7 +93,7 @@ double
 FEDG_Q0<dim>::shape_value (const unsigned int i,
 				const Point<dim>&) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
   return 1.;
 };
 
@@ -105,7 +105,7 @@ Tensor<1,dim>
 FEDG_Q0<dim>::shape_grad (const unsigned int i,
 			       const Point<dim>&) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
   return Tensor<1,dim> ();
 };
 
@@ -117,7 +117,7 @@ Tensor<2,dim>
 FEDG_Q0<dim>::shape_grad_grad (const unsigned int i,
 				  const Point<dim> &) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
   return Tensor<2,dim>();
 };

@@ -307,16 +307,6 @@ class MatrixCreator
     static void create_interpolation_matrix(const FiniteElement<dim> &high,
 					    const FiniteElement<dim> &low,
 					    FullMatrix<double>& result);
-
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotImplemented);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInternalError);
 };
 
 

@@ -145,7 +145,7 @@ template <int dim>
 inline
 TriaIterator<dim,LineAccessor<dim> >
 LineAccessor<dim>::child (const unsigned int i) const {
-  Assert (i<2, ExcInvalidIndex(i,0,1));
+  Assert (i<2, ExcIndexRange(i,0,2));
   
   TriaIterator<dim,LineAccessor<dim> > q (tria, present_level+1, child_index (i));
   
@@ -162,7 +162,7 @@ template <int dim>
 inline
 int
 LineAccessor<dim>::child_index (unsigned int i) const {
-  Assert (i<2, ExcInvalidIndex(i,0,1));
+  Assert (i<2, ExcIndexRange(i,0,2));
   return tria->levels[present_level]->lines.children[present_index]+i;
 };
 
@@ -313,7 +313,7 @@ template <int dim>
 inline
 unsigned int
 QuadAccessor<dim>::line_index (unsigned int i) const {
-  Assert (i<4, ExcInvalidIndex(i,0,3));
+  Assert (i<4, ExcIndexRange(i,0,4));
 
   return tria->levels[present_level]->quads.quads[present_index].line(i);
 };
@@ -324,7 +324,7 @@ template <int dim>
 inline
 TriaIterator<dim,QuadAccessor<dim> >
 QuadAccessor<dim>::child (const unsigned int i) const {
-  Assert (i<4, ExcInvalidIndex(i,0,3));
+  Assert (i<4, ExcIndexRange(i,0,4));
   
   TriaIterator<dim,QuadAccessor<dim> > q (tria, present_level+1, child_index (i));
   
@@ -340,7 +340,7 @@ QuadAccessor<dim>::child (const unsigned int i) const {
 template <int dim>
 inline
 int QuadAccessor<dim>::child_index (unsigned int i) const {
-  Assert (i<4, ExcInvalidIndex(i,0,3));
+  Assert (i<4, ExcIndexRange(i,0,4));
   return tria->levels[present_level]->quads.children[present_index]+i;
 };
 
@@ -476,7 +476,7 @@ inline
 TriaIterator<dim,LineAccessor<dim> >
 HexAccessor<dim>::line (const unsigned int i) const {
   Assert (used(), ExcCellNotUsed());
-  Assert (i<12, ExcInvalidIndex (i,0,11));
+  Assert (i<12, ExcIndexRange (i,0,12));
   
   if (i<4)
     return quad(0)->line(i);
@@ -495,7 +495,7 @@ HexAccessor<dim>::line (const unsigned int i) const {
 	  case 11:
 		return quad(4)->line(3);
 	};
-  Assert (false, ExcInvalidIndex(i,0,11));
+  Assert (false, ExcIndexRange(i,0,12));
   return TriaIterator<dim,LineAccessor<dim> >(tria, -1, -1, 0);
 };
 
@@ -521,7 +521,7 @@ template <int dim>
 inline
 unsigned int
 HexAccessor<dim>::line_index (unsigned int i) const {
-  Assert (i<12, ExcInvalidIndex(i,0,11));
+  Assert (i<12, ExcIndexRange(i,0,12));
 
   if (i<4)
     return quad(0)->line_index(i);
@@ -540,7 +540,7 @@ HexAccessor<dim>::line_index (unsigned int i) const {
 	  case 11:
 		return quad(4)->line_index(3);
 	};
-  Assert (false, ExcInvalidIndex(i,0,11));
+  Assert (false, ExcIndexRange(i,0,12));
   return 0;
 };
 
@@ -550,7 +550,7 @@ template <int dim>
 inline
 unsigned int
 HexAccessor<dim>::quad_index (unsigned int i) const {
-  Assert (i<6, ExcInvalidIndex(i,0,5));
+  Assert (i<6, ExcIndexRange(i,0,6));
 
   return tria->levels[present_level]->hexes.hexes[present_index].quad(i);
 };
@@ -561,7 +561,7 @@ template <int dim>
 inline
 TriaIterator<dim,HexAccessor<dim> >
 HexAccessor<dim>::child (const unsigned int i) const {
-  Assert (i<6, ExcInvalidIndex(i,0,5));
+  Assert (i<6, ExcIndexRange(i,0,6));
   
   TriaIterator<dim,HexAccessor<dim> > q (tria, present_level+1, child_index (i));
   
@@ -577,7 +577,7 @@ HexAccessor<dim>::child (const unsigned int i) const {
 template <int dim>
 inline
 int HexAccessor<dim>::child_index (unsigned int i) const {
-  Assert (i<8, ExcInvalidIndex(i,0,7));
+  Assert (i<8, ExcIndexRange(i,0,8));
   return tria->levels[present_level]->hexes.children[present_index]+i;
 };
 

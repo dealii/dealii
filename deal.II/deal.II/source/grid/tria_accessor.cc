@@ -28,7 +28,7 @@ void LineAccessor<dim>::set (const Line &line) const {
 
 template <int dim>
 int LineAccessor<dim>::vertex_index (const unsigned int i) const {
-  Assert (i<2, ExcInvalidIndex(i,0,1));
+  Assert (i<2, ExcIndexRange(i,0,2));
   return tria->levels[present_level]->lines.lines[present_index].vertex (i);
 };
 
@@ -205,7 +205,7 @@ void QuadAccessor<dim>::set (const Quad &quad) const {
 
 template <int dim>
 int QuadAccessor<dim>::vertex_index (const unsigned int corner) const {
-  Assert (corner<4, ExcInvalidIndex(corner,0,3));
+  Assert (corner<4, ExcIndexRange(corner,0,4));
 
   const int corner_convention[4] = { 0,0,1,1 };
   return line(corner)->vertex_index(corner_convention[corner]);
@@ -578,7 +578,7 @@ void HexAccessor<dim>::set (const Hexahedron &hex) const {
 
 template <int dim>
 int HexAccessor<dim>::vertex_index (const unsigned int corner) const {
-  Assert (corner<8, ExcInvalidIndex(corner,0,7));
+  Assert (corner<8, ExcIndexRange(corner,0,8));
 
 				   // get the corner indices by asking
 				   // either the front or the back face
@@ -1489,8 +1489,7 @@ bool CellAccessor<1>::at_boundary () const {
 
 template <>
 unsigned char CellAccessor<1>::material_id () const {
-  Assert (used(),
-	  typename TriaSubstructAccessor<1>::ExcCellNotUsed());
+  Assert (used(), TriaSubstructAccessor<1>::ExcCellNotUsed());
   return tria->levels[present_level]->lines.material_id[present_index];
 };
 
@@ -1498,8 +1497,7 @@ unsigned char CellAccessor<1>::material_id () const {
 
 template <>
 void CellAccessor<1>::set_material_id (const unsigned char mat_id) const {
-  Assert (used(),
-	  typename TriaSubstructAccessor<1>::ExcCellNotUsed());
+  Assert (used(), TriaSubstructAccessor<1>::ExcCellNotUsed());
   tria->levels[present_level]->lines.material_id[present_index]
     = mat_id;						 
 };
@@ -1522,8 +1520,7 @@ bool CellAccessor<2>::at_boundary () const {
 
 template <>
 unsigned char CellAccessor<2>::material_id () const {
-  Assert (used(),
-	  typename TriaSubstructAccessor<2>::ExcCellNotUsed());
+  Assert (used(), TriaSubstructAccessor<2>::ExcCellNotUsed());
   return tria->levels[present_level]->quads.material_id[present_index];
 };
 
@@ -1531,8 +1528,7 @@ unsigned char CellAccessor<2>::material_id () const {
 
 template <>
 void CellAccessor<2>::set_material_id (const unsigned char mat_id) const {
-  Assert (used(),
-	  typename TriaSubstructAccessor<2>::ExcCellNotUsed());
+  Assert (used(), TriaSubstructAccessor<2>::ExcCellNotUsed());
   tria->levels[present_level]->quads.material_id[present_index]
     = mat_id;						 
 };
@@ -1557,8 +1553,7 @@ bool CellAccessor<3>::at_boundary () const {
 
 template <>
 unsigned char CellAccessor<3>::material_id () const {
-  Assert (used(),
-	  typename TriaSubstructAccessor<3>::ExcCellNotUsed());
+  Assert (used(), TriaSubstructAccessor<3>::ExcCellNotUsed());
   return tria->levels[present_level]->hexes.material_id[present_index];
 };
 
@@ -1566,8 +1561,7 @@ unsigned char CellAccessor<3>::material_id () const {
 
 template <>
 void CellAccessor<3>::set_material_id (const unsigned char mat_id) const {
-  Assert (used(),
-	  typename TriaSubstructAccessor<3>::ExcCellNotUsed());
+  Assert (used(), TriaSubstructAccessor<3>::ExcCellNotUsed());
   tria->levels[present_level]->hexes.material_id[present_index]
     = mat_id;						 
 };
@@ -1610,8 +1604,7 @@ template <int dim>
 bool CellAccessor<dim>::at_boundary (const unsigned int i) const {
   Assert (used(), typename TriaSubstructAccessor<dim>::ExcCellNotUsed());
   Assert (i<GeometryInfo<dim>::faces_per_cell,
-	  typename TriaSubstructAccessor<dim>::
-	  ExcInvalidIndex (i,0,GeometryInfo<dim>::faces_per_cell-1));
+	  ExcIndexRange (i,0,GeometryInfo<dim>::faces_per_cell));
   
   return (neighbor_index(i) == -1);
 };

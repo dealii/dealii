@@ -1407,10 +1407,6 @@ class FiniteElement : public FiniteElementBase<dim>
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcNotImplemented);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcBoundaryFaceUsed);
 				     /**
 				      * Exception

@@ -170,10 +170,20 @@ class Tensor //<rank_, dim>
 				     /**
 				      * Help function for unroll.
 				      */
-    void unroll_recursion(Vector<double> & result, unsigned int& start_index) const;
+    void unroll_recursion(Vector<double> &result,
+			  unsigned int   &start_index) const;
 
-    template<>
-    friend void Tensor<rank_+1,dim>::unroll_recursion(Vector<double> &, unsigned&) const;
+				     // make the following class a
+				     // friend to this class. in principle,
+				     // it would suffice if otherrank==rank+1,
+				     // but then the compiler complains
+				     // that this be an explicit specialization
+				     // which is not what we want
+				     //
+				     // also, it would be sufficient to make
+				     // the function unroll_loops a friend,
+				     // but that seems to be impossible as well.
+    template<int otherrank, int otherdim> friend class Tensor;
 };
 
 

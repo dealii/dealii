@@ -68,10 +68,10 @@ class SolverRichardson : public Solver<Matrix, Vector>
 				      * Solve $Ax=b$ for $x$.
 				      */
     template<class Preconditioner>
-    ReturnState solve (const Matrix &A,
-		       Vector       &x,
-		       const Vector &b,
-		       const Preconditioner& precondition);
+    typename Solver<Matrix,Vector>::ReturnState solve (const Matrix &A,
+						       Vector       &x,
+						       const Vector &b,
+						       const Preconditioner& precondition);
 
 				     /**
 				      * Set the damping-coefficient.
@@ -128,7 +128,7 @@ SolverRichardson<Matrix,Vector>::SolverRichardson(SolverControl &cn,
 
 template<class Matrix,class Vector>
 template<class Preconditioner>
-Solver<Matrix,Vector>::ReturnState 
+typename Solver<Matrix,Vector>::ReturnState 
 SolverRichardson<Matrix,Vector>::solve (const Matrix &A,
 					Vector       &x,
 					const Vector &b,

@@ -472,15 +472,17 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
 				      * friends of this class. This is
 				      * necessary for the implementation of
 				      * conversion constructors.
+				      *
+				      * In fact, we would not need them to
+				      * be friends if they were for different
+				      * dimensions, but the compiler dislikes
+				      * giving a fixed dimension and variable
+				      * accessor since then it says that would
+				      * be a artial specialization.
 				      */
-    template <typename SomeAccessor>
-    friend class TriaRawIterator<dim,SomeAccessor>;
-
-    template <typename SomeAccessor>
-    friend class TriaIterator<dim,SomeAccessor>;
-
-    template <typename SomeAccessor>
-    friend class TriaActiveIterator<dim,SomeAccessor>;
+    template <int anydim, typename SomeAccessor> friend class TriaRawIterator;
+    template <int anydim, typename SomeAccessor> friend class TriaIterator;
+    template <int anydim, typename SomeAccessor> friend class TriaActiveIterator;
 };
 
 

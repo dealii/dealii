@@ -181,16 +181,16 @@ void FEQ3<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
 
 
 template <>
-void FEQ3<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
-					vector<Point<1> >  &support_points) const {
+void FEQ3<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
+				  vector<Point<1> >  &support_points) const {
   FiniteElement<1>::get_support_points (cell, support_points);
 };
 
 
 
 template <>
-void FEQ3<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
-					     vector<Point<1> >  &) const {
+void FEQ3<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
+				       vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -198,7 +198,7 @@ void FEQ3<1>::get_face_support_points (const typename DoFHandler<1>::face_iterat
 
 template <>
 void FEQ3<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
-					   FullMatrix<double> &local_mass_matrix) const {
+				     FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,
@@ -1505,8 +1505,8 @@ void FEQ3<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
 
 
 template <>
-void FEQ3<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
-					vector<Point<2> >  &support_points) const {
+void FEQ3<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
+				  vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
 
@@ -1579,8 +1579,8 @@ void FEQ3<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &c
 
 
 template <>
-void FEQ3<2>::get_face_support_points (const typename DoFHandler<2>::face_iterator &face,
-					     vector<Point<2> >  &support_points) const {
+void FEQ3<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
+				       vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
 

@@ -93,11 +93,6 @@ class FEDG_Q0 : public FEQ1Mapping<dim> {
 				      * about.
 				      */
     const FullMatrix<double> & restrict (const unsigned int) const;
-  
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotImplemented);
 };
 
 

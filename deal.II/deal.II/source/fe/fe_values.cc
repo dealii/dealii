@@ -51,11 +51,11 @@ template <int dim>
 double FEValuesBase<dim>::shape_value (const unsigned int i,
 				       const unsigned int j) const {
   Assert (selected_dataset<shape_values.size(),
-	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   Assert (i<shape_values[selected_dataset].m(),
-	  ExcInvalidIndex (i, shape_values[selected_dataset].m()));
+	  ExcIndexRange (i, 0, shape_values[selected_dataset].m()));
   Assert (j<shape_values[selected_dataset].n(),
-	  ExcInvalidIndex (j, shape_values[selected_dataset].n()));
+	  ExcIndexRange (j, 0, shape_values[selected_dataset].n()));
 
   return shape_values[selected_dataset](i,j);
 };
@@ -454,7 +454,7 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 template <int dim>
 const Point<dim> &
 FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const {
-  Assert (i<normal_vectors.size(), ExcInvalidIndex(i, normal_vectors.size()));
+  Assert (i<normal_vectors.size(), ExcIndexRange(i, 0, normal_vectors.size()));
   Assert (update_flags & update_normal_vectors,
 	  ExcAccessToUninitializedField());
   

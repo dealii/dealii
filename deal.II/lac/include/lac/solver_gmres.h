@@ -98,10 +98,10 @@ class SolverGMRES : public Solver<Matrix, Vector>
 				      * Solver method.
 				      */
     template<class Preconditioner>
-    ReturnState solve (const Matrix &A,
-		       Vector       &x,
-		       const Vector &b,
-		       const Preconditioner& precondition);
+    typename Solver<Matrix,Vector>::ReturnState solve (const Matrix &A,
+						       Vector       &x,
+						       const Vector &b,
+						       const Preconditioner& precondition);
 
     DeclException1 (ExcTooFewTmpVectors,
 		    int,
@@ -183,7 +183,7 @@ SolverGMRES<Matrix,Vector>::givens_rotation (Vector &h,
 
 template<class Matrix, class Vector>
 template<class Preconditioner>
-Solver<Matrix,Vector>::ReturnState
+typename Solver<Matrix,Vector>::ReturnState
 SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 				   Vector      & x,
 				   const Vector& b,

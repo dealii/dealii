@@ -347,10 +347,8 @@ class DoFDimensionInfo<3> {
  *
  * @author Wolfgang Bangerth, 1998 */
 template <int dim>
-class DoFHandler
-  :
-  public Subscriptor,
-  public DoFDimensionInfo<dim>
+class DoFHandler  :  public Subscriptor,
+		     public DoFDimensionInfo<dim>
 {
   public:
     typedef typename DoFDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
@@ -1373,10 +1371,6 @@ class DoFHandler
 				      */
     const Triangulation<dim> & get_tria () const;
     
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotImplemented);
 				     /**
 				      * Exception
 				      */

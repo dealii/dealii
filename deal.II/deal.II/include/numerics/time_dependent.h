@@ -898,10 +898,6 @@ class TimeStepBase : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcInternalError);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcPureVirtualFunctionCalled);
 				     /**
 				      * Exception
@@ -1385,10 +1381,6 @@ struct TimeStepBase_Tria<dim>::Flags
     DeclException1 (ExcInvalidParameter,
 		    int,
 		    << "The parameter " << arg1 << " has an invalid value.");
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInternalError);
 };
 
 

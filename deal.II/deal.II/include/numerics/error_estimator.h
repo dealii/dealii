@@ -184,15 +184,6 @@ class KellyErrorEstimator {
 			  Vector<float>            &error,
 			  const Function<dim>      *coefficient = 0,
 			  const unsigned int        selected_component = 0);
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotImplemented);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInternalError);
 				     /**
 				      * Exception
 				      */

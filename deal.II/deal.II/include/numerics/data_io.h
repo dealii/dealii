@@ -142,10 +142,6 @@ class DataIn {
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcNotImplemented);
-				     /**
-				      * Exception
-				      */
     DeclException1 (ExcUnknownIdentifier,
 		    string,
 		    << "The identifier <" << arg1 << "> as name of a "
@@ -568,10 +564,6 @@ class DataOut {
 				      * Exception
 				      */
     DeclException0 (ExcIncorrectDofsPerVertex);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotImplemented);
 				     /**
 				      * Exception
 				      */

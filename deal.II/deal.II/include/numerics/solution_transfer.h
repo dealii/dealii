@@ -308,11 +308,6 @@ class SolutionTransfer
 		   int, int,
 		   << "The size of the vector is " << arg1
 		   << "although it should be " << arg2 << ".");
-    
-				     /**
-				      * Exception
-				      */
-    DeclException0(ExcInternalError);
 				  
   private:
 

@@ -192,19 +192,19 @@ class SolverDual : public Solver<Matrix, Vector>
 				      * Solve the original problem
 				      * $Ax=b$.
 				      */
-    ReturnState solve (const Matrix &A,
-			       Vector       &x,
-			       const Vector &b) = 0;
+    typename Solver<Matrix,Vector>::ReturnState solve (const Matrix &A,
+						       Vector       &x,
+						       const Vector &b) = 0;
 
 				     /**
 				      * Solve the two problems
 				      * $Ax=b1$ and $A^Tz=b2$ simultanously.
 				      */
-    ReturnState solve (const Matrix &A,
-			       Vector       &x,
-			       const Vector &b1,
-			       Vector       &z,
-			       const Vector &b2) = 0;
+    typename Solver<Matrix,Vector>::ReturnState solve (const Matrix &A,
+						       Vector       &x,
+						       const Vector &b1,
+						       Vector       &z,
+						       const Vector &b2) = 0;
 };
 
 

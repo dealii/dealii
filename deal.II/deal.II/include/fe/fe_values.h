@@ -528,10 +528,6 @@ class FEValuesBase
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcNotImplemented);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInvalidUpdateFlag);
     
   protected:

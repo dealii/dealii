@@ -33,7 +33,7 @@ void DoFLineAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_line,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_line));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_line));
 
   dof_handler->levels[present_level]
     ->line_dofs[present_index*dof_handler->selected_fe->dofs_per_line+i] = index;
@@ -48,9 +48,9 @@ void DoFLineAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ve
 							   const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
-  Assert (vertex<2, ExcInvalidIndex (i,0,2));
+  Assert (vertex<2, ExcIndexRange (i,0,2));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
 
   const unsigned int dof_number = (vertex_index(vertex) *
 				   dof_handler->selected_fe->dofs_per_vertex +
@@ -126,7 +126,7 @@ void DoFQuadAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_quad,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_quad));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_quad));
 
   dof_handler->levels[present_level]
     ->quad_dofs[present_index*dof_handler->selected_fe->dofs_per_quad+i] = index;
@@ -140,9 +140,9 @@ void DoFQuadAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ve
 							   const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
-  Assert (vertex<4, ExcInvalidIndex (i,0,4));
+  Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
 
   const unsigned int dof_number = (vertex_index(vertex) *
 				   dof_handler->selected_fe->dofs_per_vertex +
@@ -221,7 +221,7 @@ void DoFHexAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_hex,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_hex));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_hex));
 
   dof_handler->levels[present_level]
     ->hex_dofs[present_index*dof_handler->selected_fe->dofs_per_hex+i] = index;
@@ -235,9 +235,9 @@ void DoFHexAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ver
 							   const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
-  Assert (vertex<8, ExcInvalidIndex (i,0,8));
+  Assert (vertex<8, ExcIndexRange (i,0,8));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
 
   const unsigned int dof_number = (vertex_index(vertex) *
 				   dof_handler->selected_fe->dofs_per_vertex +

@@ -1212,7 +1212,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
    float cell_vector_min=cells.begin()->red; 
    float cell_vector_max=cell_vector_min;
 
-   for(typename multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();
+   for(multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();
        c!=cells.end(); ++c, ++cell_index)
      {
        for (unsigned int i=0; i<4; ++i)
@@ -1245,7 +1245,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
        double light_norm, normal_norm;
        float color;
 
-       for (typename multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();c!=cells.end();++c)
+       for (multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();c!=cells.end();++c)
 	 {
 	   EpsCellData cd(*c);
 
@@ -1301,7 +1301,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 
    const double scale = 300 / (xmax-xmin > ymax-ymin ? xmax-xmin : ymax-ymin);
    
-   for (typename multiset<DataOut<2>::EpsCellData>::iterator c=cells2.begin();
+   for (multiset<DataOut<2>::EpsCellData>::iterator c=cells2.begin();
 	c!=cells2.end(); ++c)
      {
        EpsCellData cd (*c);
@@ -1319,7 +1319,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 
 
 				    //  Now we are ready to output...
-   for (typename multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();
+   for (multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();
 	c!=cells.end(); ++c)
      {
        if (cell_data_p || cell_shade_p)

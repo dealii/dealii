@@ -519,7 +519,7 @@ double
 FESystem<dim>::shape_value (const unsigned int i,
 			    const Point<dim>  &p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
   pair<unsigned,unsigned> comp = system_to_component_index(i);
   
@@ -534,7 +534,7 @@ Tensor<1,dim>
 FESystem<dim>::shape_grad (const unsigned int  i,
 			   const Point<dim>   &p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
   pair<unsigned,unsigned> comp = system_to_component_index(i);
   
@@ -549,7 +549,7 @@ Tensor<2,dim>
 FESystem<dim>::shape_grad_grad (const unsigned int  i,
 				const Point<dim>   &p) const
  {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
 
   pair<unsigned,unsigned> comp = system_to_component_index(i);
