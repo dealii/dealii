@@ -108,8 +108,6 @@ void PreconditionBlock<number, inverse_type>::invert_diagblocks()
 //      }
 //      catch (ExcNotImplemented &)
     }
-				   // release the lock on A
-  A=0;
 }
 
 
