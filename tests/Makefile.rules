@@ -1,0 +1,60 @@
+######################################################################
+# $Id$
+#
+# Copyright (C) 201, the deal.II authors
+#
+# Common make rules for test files
+######################################################################
+
+
+normalize = $D/common/scripts/normalize.pl
+
+verbose = off
+
+############################################################
+# Postprocessing
+############################################################
+
+%.output:%.testcase
+	@echo =====Running======= $<
+	@./$<
+	@perl -pi $(normalize)  $@
+
+ifeq ($(verbose),on)
+%.check:%.output
+	@if diff $< $(patsubst %.output,%.checked, $<); then \
+		  echo '=====OK============' $< ; \
+		  touch $@ ; \
+		else \
+		  echo '+++++Error+++++++++' $< ; \
+		fi
+else
+%.check:%.output
+	@if diff $< $(patsubst %.output,%.checked, $<) > /dev/null ; then \
+		  echo '=====OK============' $< ; \
+		  touch $@ ; \
+		else \
+		  echo '+++++Error+++++++++' $< '   details with "make verbose=on"'; \
+		fi
+endif
+
+############################################################
+# Cleanup targets
+############################################################
+
+clean:
+	rm -f Makefile.depend *.o *.go *.output
+
+veryclean: clean
+	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
+
+############################################################
+# Automatic generation of dependencies
+############################################################
+
+all-cc-files = $(shell echo *.cc)
+
+Makefile.depend: $(all-cc-files)
+	@echo =====Dependencies== $@
+	@$(CXX) $(CXXFLAGS.g) $^ -M > $@
+	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@

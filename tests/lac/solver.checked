@@ -1,6 +1,6 @@
 
 DEAL::Size 4 Unknowns 9
-DEAL::SOR-diff:0.000
+DEAL::SOR-diff:0.00
 DEAL:no:cg::Starting 
 DEAL:no:cg::Convergence step 3 
 DEAL:no:Bicgstab::Starting 
@@ -30,7 +30,7 @@ DEAL:sor:GMRES::Convergence step 5
 DEAL:sor:QMRS::Starting 
 DEAL:sor:QMRS::Failure step 100 
 DEAL::Size 12 Unknowns 121
-DEAL::SOR-diff:0.000
+DEAL::SOR-diff:0.00
 DEAL:no:cg::Starting 
 DEAL:no:cg::Convergence step 15 
 DEAL:no:Bicgstab::Starting 
@@ -60,7 +60,7 @@ DEAL:sor:GMRES::Convergence step 20
 DEAL:sor:QMRS::Starting 
 DEAL:sor:QMRS::Failure step 100 
 DEAL::Size 36 Unknowns 1225
-DEAL::SOR-diff:0.000
+DEAL::SOR-diff:0.00
 DEAL:no:cg::Starting 
 DEAL:no:cg::Convergence step 49 
 DEAL:no:Bicgstab::Starting 

@@ -4,6 +4,7 @@
 // Show the shape functions implemented.
 
 #include <base/quadrature_lib.h>
+#include <base/logstream.h>
 #include <lac/vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -223,6 +224,12 @@ void plot_FE_DGQ_shape_functions()
 int
 main()
 {
+  ofstream logfile ("shapes.output");
+  logfile.precision (2);
+  logfile.setf(ios::fixed);  
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  
   plot_FE_Q_shape_functions<1>();
   plot_FE_Q_shape_functions<2>();
   plot_FE_DGQ_shape_functions<2>();

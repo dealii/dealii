@@ -478,10 +478,12 @@ void mapping_test()
 
 int main()
 {
-  ofstream logfile("mapping.dat");
-  logfile.precision(3);
+  ofstream logfile ("mapping.output");
+  logfile.precision (2);
+  logfile.setf(ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
+  
 				   // ----------------------- 
 				   // Tests for dim=1
 				   // -----------------------

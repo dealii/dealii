@@ -25,6 +25,10 @@ s/^\s+Time =.*//;
 s/^\s+Date =.*//;
 s/Time tag:.*//g;
 
+# Exceptions
+
+s/line <\d+> of\s?//;
+
 # Make small exponentials zero
 
 s/-?\d\.\d+e-1\d+/0.00/g;

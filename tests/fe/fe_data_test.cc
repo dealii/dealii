@@ -65,7 +65,7 @@ void test_fe_datas()
 
 int main(int,char)
 {
-  ofstream logfile("fe_data_test.dat");
+  ofstream logfile("fe_data_test.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

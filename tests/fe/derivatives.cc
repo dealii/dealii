@@ -132,10 +132,12 @@ void plot_FE_DGQ_shape_functions()
 int
 main()
 {
-  ofstream logfile ("derivatives.log");
-  deallog.attach (logfile);
-  logfile.precision(3);
-
+  ofstream logfile ("derivatives.output");
+  logfile.precision (2);
+  logfile.setf(ios::fixed);  
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  
   deallog.push ("1d");
   plot_FE_Q_shape_functions<1>();
   deallog.pop ();

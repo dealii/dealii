@@ -11,6 +11,7 @@ D = @DEAL2_DIR@
 
 include $D/common/Make.global_options
 
+normalize = $D/common/scripts/normalize.pl
 
 ############################################################
 # Set debug-mode as a default
@@ -88,7 +89,7 @@ else
 fe_data_test-o-files = $(fe_data_test-cc-files:.cc=.o)
 endif
 
-fe_data_test: $(fe_data_test-o-files) $(libraries)
+fe_data_test.testcase: $(fe_data_test-o-files) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
@@ -102,7 +103,7 @@ else
 shapes-o-files = $(shapes-cc-files:.cc=.o)
 endif
 
-shapes: $(shapes-o-files) $(libraries)
+shapes.testcase: $(shapes-o-files) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
@@ -116,7 +117,7 @@ else
 derivatives-o-files = $(derivatives-cc-files:.cc=.o)
 endif
 
-derivatives: $(derivatives-o-files) $(libraries)
+derivatives.testcase: $(derivatives-o-files) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
@@ -157,7 +158,7 @@ else
 mapping-o-files = $(mapping-cc-files:.cc=.o)
 endif
 
-mapping: $(mapping-o-files) $(libraries)
+mapping.testcase: $(mapping-o-files) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
@@ -193,17 +194,12 @@ performance: $(performance-o-files) $(libraries)
 # Continue with other targets if needed
 ############################################################
 
-check: fe_data_test mapping shapes
-	@echo Running programs
-	./fe_data_test
-	@perl -pi -e 's/JobId.*//;' fe_data_test.dat
-	./mapping
-	@perl -pi -e 's/JobId.*//;' mapping.dat
-	./shapes
+check: fe_data_test.check mapping.check derivatives.check shapes.check
 	@echo Checking results
 	$(MAKE) dodiff
 
 %.check: %.dat
+	@$(PERL) -pi $(normalize) $<
 	@diff $@ed $<
 	@touch $@
 
@@ -213,27 +209,7 @@ check = $(dat:.dat=.check)
 dodiff: $(check)
 	@echo OK
 
-############################################################
-# Cleanup targets
-############################################################
-
-clean:
-	rm -f *.o *.go *.inp *.gpl *.eps *.gnuplot *.dat
-
-veryclean: clean
-	rm -f fe_data_test mapping shapes
-
-############################################################
-# Automatic generation of dependencies
-############################################################
-
-all-cc-files = $(fe_data_test-cc-files) $(mapping-cc-files) $(shapes-cc-files)
-
-Makefile.depend: $(all-cc-files)
-	@echo =====Dependecies=== Makefile.depend
-	@$(CXX) $(flags) $^ -M > $@
-	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
-
+include ../Makefile.rules
 include Makefile.depend
 
 .PHONY: clean veryclean check

@@ -11,7 +11,6 @@ D = @DEAL2_DIR@
 
 include $D/common/Make.global_options
 
-
 ############################################################
 # Set debug-mode as a default
 ############################################################
@@ -351,52 +350,6 @@ target1: $(target1-o-files) $(libraries)
 
 
 ############################################################
-# Postprocessing
 ############################################################
-
-wave-test-3.output: wave-test-3.testcase
-	@echo =====Running======= $<
-	@./$<
-	@perl -pi -e 's/JobId.*//;          \
-                      s/value.*//;          \
-                      s/Creation Date.*//g; \
-                      s/Time tag:.*//g;     \
-                      s/(\.\d\d)\d*/\1/g;' $@
-
-%.output:%.testcase
-	@echo =====Running======= $<
-	@./$<
-	@perl -pi -e 's/JobId.*//;\
-		s/value.*//;\
-		s/-?\d\.\d+e-1[4-9]/0/g;\
-		s/%%Creation Date:.*//;\
-		s/# Time =.*//; \
-		s/# Date =.*//; \
-		s/^\s+Time =.*//;\
-		s/^\s+Date =.*//;'  $@
-
-%.check:%.output
-	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============' $<
-	@touch $@
-############################################################
-# Cleanup targets
-############################################################
-
-clean:
-	rm -f Make.depend *.o *.go *.output
-
-veryclean: clean
-	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
-
-############################################################
-# Automatic generation of dependencies
-############################################################
-
-all-cc-files = $(shell echo *.cc)
-
-Make.depend: $(all-cc-files)
-	@echo =====Dependencies== Make.depend
-	@$(CXX) $(CXXFLAGS.g) $^ -M > $@
-	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
-
-include Make.depend
+include ../Makefile.rules
+include Makefile.depend

@@ -186,42 +186,5 @@ target1: $(target1-o-files) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
 
-
-############################################################
-# Postprocessing
-############################################################
-
-%.output:%.testcase
-	@echo =====Running======= $<
-	@./$<
-	@perl -pi.bak -e 's/JobId.*//;s/value.*//;' $@
-	@rm $@.bak
-
-%.check:%.output
-	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
-	@touch $@
-############################################################
-# Cleanup targets
-############################################################
-
-clean:
-	rm -f Make.depend *.o *.go *.output
-
-veryclean: clean
-	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
-
-############################################################
-# Automatic generation of dependencies
-############################################################
-
-all-cc-files = $(shell echo *.cc)
-
-Make.depend: $(all-cc-files)
-	@echo =====Dependencies== Make.depend
-	@$(CXX) $(flags) $^ -M > $@
-	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
-
-include Make.depend
-
-
-
+include ../Makefile.rules
+include Makefile.depend
