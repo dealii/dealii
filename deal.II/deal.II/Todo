@@ -1,3 +1,7 @@
+=================================================================
+====== Things to be done for the deal.II library ================
+=================================================================
+
 Remove the comment signs in the monitor_* functions in tria.cc
   as early as possible. These were inserted, since at home the
   program did some strange things in the reserve_memory
@@ -21,13 +25,9 @@ Unify CellAccessor<1> and <2> by renaming
 
 
 Make AssemblerData a local class to Assembler again if gcc2.8 supports it.
-
-
-Let ParameterHandler and DataIn/Out throw exceptions. Make more tests
-  on the input. Same for output: check whether file could be created etc.
   
 
-Remove gcc2.8 workaround with DoFSubstructAccessor
+Remove gcc2.8 workaround with DoFSubstructAccessor for general <dim>
 
 
 Check usage of vector<>s: functions should assume that the objects have
@@ -65,7 +65,8 @@ Change <iostream> to <ostream> in grid/point.h and
   grid/tria_iterator.h when this becomes possible.
 
 
-Fill in docs for the timer class.
+Fill in docs for the timer class. Hopefully finally find a way to
+  let it measure times larger than half an hour.
 
 
 Use a correct strategy to output the reduction rate for adaptively
@@ -74,26 +75,16 @@ Use a correct strategy to output the reduction rate for adaptively
 
 In VectorTools::project_boundary_values, no condensation of sparsity
   structures, matrices and right hand sides or distribution of
-  solution vectors is performed, This is ok for dim<3 because then
+  solution vectors is performed. This is ok for dim<3 because then
   there are no constrained nodes on the boundary, but is not
   acceptable for higher dimensions. Fix this.
 
 
-Remove the this-> coding in tria_iterator.templates.h. These were
-  introduced in order to avoid an internal compiler error in an
-  egcs  snapshot.
+Re-enable printing of a preamble to ucd files in data_io.cc. This
+  was disabled because DEALVISION couldn't handle these.
 
 
-Re-enable printing of a preamble to ucd files in data_io.cc.
-
-
-Implement coarsening of grids and update docs for that. Note the
-  difference between refinement and coarsening: refinement
-  deliberately adds additional refinment flags to keep consistency
-  and thus refining all cells which were flagged for refinement.
-  Coarsening on the contrary never deletes additional cells.
-  Update algo section in tria docs for new smoothing strategies.
-
+Triangulation prepare_* functions:
   Document that multiple loops of preparation for refinement and
   coarsening do not interact, so smoothing may only be optimal if
   #prepare_*# are called intermittently until nothing more changed.
@@ -118,11 +109,6 @@ Fully implement the POVRAY format, i.e. use textures, a better angle
   of view, etc. The present implementation is only a rudimentary hack.
 
 
-Review the restriction matrices. I'm not really sure about their
-  meaning and how they are defined, so they may be wrong for linear
-  elements and they are not implemented at all for quadratic ones.
-
-
 Remove the workaround with the BoundaryHelper class which was
   introduced to work around a problem in the egcs-19980803 snapshot
   (previous ones worked flawless)
@@ -137,22 +123,12 @@ I suppose the [mg_]get_dof_values really belongs to the
   [MG]Line/QuadAccessor classes, but now it is in the
   [MG]CellAccessor. Correct this some time.
 
-Let all the reinit functions in /lac free their memory, if reinit
-  is called with the given dimension is zero. If so, check all deal.II files
-  for use of reinit. (At present, new dimension==0 is not allowed.)
-  [Done for dFMatrix and dVector; still to be done for the other
-  classes.]
-
-Use unsigned integers for the colnums array in dSMatrixStruct. This
-  would enhance safety since colnum=-1 would no longer point to a
-  valid address. How do you mark non-used columns? (gk)
-
-Let dSMatrixStruct::compress free the memory of colnums which is
-  no longer needed.
 
 FeValues: add flexibility for update flags
 
+
 Remove all fe& in vectors.h
+
 
 No support points for non-Lagrangian elements? Check for Langrange in
 interpolation?
@@ -172,14 +148,3 @@ Review DoFCellAccessor<dim>::get_interpolated_dof_values: it may be
   really be written but are not because the nodal value was zero.
 
 
-Move the exceptions in the Tensor package (tensor_base.h and tensor.h)
-  back into the Tensor class, if the compiler allows to do so. Also
-  rename them back (i.e. drop the initial Tensor* from the name).
-
-
-
-Think about the determinant function in the tensor package. Is it
-  useful, can it be generalized?
-
-
-Implement FELinearMapping::fill_fe_values->jacobians

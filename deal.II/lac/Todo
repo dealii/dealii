@@ -1,0 +1,19 @@
+=================================================================
+====== Things to be done for the lac library     ================
+=================================================================
+
+Let all the reinit functions in /lac free their memory, if reinit
+  is called with the given dimension is zero. If so, check all deal.II files
+  for use of reinit. (At present, new dimension==0 is not allowed.)
+  [Done for dFMatrix and dVector; still to be done for the other
+  classes.]
+
+Use unsigned integers for the colnums array in dSMatrixStruct. This
+  would enhance safety since colnum=-1 would no longer point to a
+  valid address. How do you mark non-used columns? (gk)
+
+
+Let dSMatrixStruct::compress free the memory of colnums which is
+  no longer needed.
+
+

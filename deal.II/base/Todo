@@ -1,0 +1,13 @@
+=================================================================
+====== Things to be done for the /base library   ================
+=================================================================
+
+Move the exceptions in the Tensor package (tensor_base.h and tensor.h)
+  back into the Tensor class, if the compiler allows to do so. Also
+  rename them back (i.e. drop the initial Tensor* from the name).
+
+
+
+Think about the determinant function in the tensor package. Is it
+  useful, can it be generalized?
+
