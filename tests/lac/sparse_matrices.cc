@@ -97,25 +97,64 @@ template <class MATRIX>
 void
 check_iterator (const MATRIX& A)
 {
+//  deallog.push("it");
+  
+  typename MATRIX::const_iterator E = A.end();
+
+  if (A.m() < 10)
+    for (unsigned int r=0;r<A.m();++r)
+      {
+	typename MATRIX::const_iterator b = A.begin(r);
+	if (b == E)
+	  deallog << "Final" << std::endl;
+	else
+	  deallog << r
+		  << '\t' << b->row()
+		  << '\t' << b->index()
+		  << '\t' << b->column()
+		  << '\t' << b->value()
+		  << std::endl;
+	typename MATRIX::const_iterator e = A.end(r);
+	if (e == E)
+	  deallog << "Final" << std::endl;
+	else
+	  deallog << '\t' << e->row()
+		  << '\t' << e->index()
+		  << std::endl;
+	deallog << "cols:";
+	
+	for (typename MATRIX::const_iterator i=b;i!=e;++i)
+	  deallog << '\t' << i->index() << ',' << i->column();
+	deallog << std::endl;
+      }
   for (typename MATRIX::const_iterator i = A.begin(); i!= A.end(); ++i)
     deallog << '\t' << i->row()
-	    << '\t' << i->column()
       	    << '\t' << i->index()
+	    << '\t' << i->column()
       	    << '\t' << i->value()
 	    << std::endl;
   deallog << "Repeat row 2" << std::endl;
   for (typename MATRIX::const_iterator i = A.begin(2); i!= A.end(2); ++i)
     deallog << '\t' << i->row()
-	    << '\t' << i->column()
       	    << '\t' << i->index()
+	    << '\t' << i->column()
       	    << '\t' << i->value()
 	    << std::endl;
+  
+//  deallog.pop();
 }
 
 
 void check_ez_iterator()
 {
   SparseMatrixEZ<float> m (6, 6, 0);
+
+  deallog << "Empty matrix" << std::endl;
+  
+  check_iterator(m);
+
+  deallog << "Irregular matrix" << std::endl;
+  
   m.set (0, 0, 1.);
   m.set (1, 0, 2.);
   m.set (2, 0, 3.);
