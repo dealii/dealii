@@ -76,7 +76,7 @@ namespace Functions
   CutOffFunctionLinfty<dim>::CutOffFunctionLinfty (const double r,
 						   const Point<dim> p,
 						   const unsigned int n_components,
-						   unsigned int select)
+						   const unsigned int select)
 		  :
 		  CutOffFunctionBase<dim> (r, p, n_components, select)
   {}
