@@ -427,7 +427,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 
 					 /**
 					  * Pointer which is not used by the
-					  * library but may be accessed an set
+					  * library but may be accessed and set
 					  * by the user to handle data local to
 					  * a line/quad/etc.
 					  */

@@ -137,14 +137,14 @@ Triangulation<dim>::get_boundary (const unsigned int number) const
 
 #if deal_II_dimension == 1
 template <>
-TriaDimensionInfo<1>::cell_iterator
+Triangulation<1>::cell_iterator
 Triangulation<1>::begin (const unsigned int level) const {
   return begin_line (level);
 }
 
 
 template <>
-TriaDimensionInfo<1>::raw_cell_iterator
+Triangulation<1>::raw_cell_iterator
 Triangulation<1>::end () const {
   return end_line ();
 }
@@ -155,14 +155,14 @@ Triangulation<1>::end () const {
 #if deal_II_dimension == 2
 
 template <>
-TriaDimensionInfo<2>::cell_iterator
+Triangulation<2>::cell_iterator
 Triangulation<2>::begin (const unsigned int level) const {
   return begin_quad (level);
 }
 
 
 template <>
-TriaDimensionInfo<2>::raw_cell_iterator
+Triangulation<2>::raw_cell_iterator
 Triangulation<2>::end () const {
   return end_quad ();
 }
@@ -173,14 +173,14 @@ Triangulation<2>::end () const {
 #if deal_II_dimension == 3
 
 template <>
-TriaDimensionInfo<3>::cell_iterator
+Triangulation<3>::cell_iterator
 Triangulation<3>::begin (const unsigned int level) const {
   return begin_hex (level);
 }
 
 
 template <>
-TriaDimensionInfo<3>::raw_cell_iterator
+Triangulation<3>::raw_cell_iterator
 Triangulation<3>::end () const {
   return end_hex ();
 }
@@ -2743,7 +2743,7 @@ void Triangulation<dim>::load_user_pointers_hex (const std::vector<void *> &v)
 #if deal_II_dimension == 1
 
 template <>
-TriaDimensionInfo<1>::raw_cell_iterator
+Triangulation<1>::raw_cell_iterator
 Triangulation<1>::begin_raw (const unsigned int level) const
 {
   return begin_raw_line (level);
@@ -2752,7 +2752,7 @@ Triangulation<1>::begin_raw (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<1>::active_cell_iterator
+Triangulation<1>::active_cell_iterator
 Triangulation<1>::begin_active (const unsigned int level) const
 {
   return begin_active_line (level);
@@ -2761,7 +2761,7 @@ Triangulation<1>::begin_active (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<1>::raw_cell_iterator
+Triangulation<1>::raw_cell_iterator
 Triangulation<1>::last_raw () const
 {
   return last_raw_line ();
@@ -2770,7 +2770,7 @@ Triangulation<1>::last_raw () const
 
 
 template <>
-TriaDimensionInfo<1>::raw_cell_iterator
+Triangulation<1>::raw_cell_iterator
 Triangulation<1>::last_raw (const unsigned int level) const
 {
   return last_raw_line (level);
@@ -2779,7 +2779,7 @@ Triangulation<1>::last_raw (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<1>::cell_iterator
+Triangulation<1>::cell_iterator
 Triangulation<1>::last () const
 {
   return last_line ();
@@ -2788,7 +2788,7 @@ Triangulation<1>::last () const
 
 
 template <>
-TriaDimensionInfo<1>::cell_iterator
+Triangulation<1>::cell_iterator
 Triangulation<1>::last (const unsigned int level) const
 {
   return last_line (level);
@@ -2797,7 +2797,7 @@ Triangulation<1>::last (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<1>::active_cell_iterator
+Triangulation<1>::active_cell_iterator
 Triangulation<1>::last_active () const
 {
   return last_active_line ();
@@ -2806,7 +2806,7 @@ Triangulation<1>::last_active () const
 
 
 template <>
-TriaDimensionInfo<1>::active_cell_iterator
+Triangulation<1>::active_cell_iterator
 Triangulation<1>::last_active (const unsigned int level) const
 {
   return last_active_line (level);
@@ -2815,7 +2815,7 @@ Triangulation<1>::last_active (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<1>::raw_face_iterator
+Triangulation<1>::raw_face_iterator
 Triangulation<1>::begin_raw_face (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2825,7 +2825,7 @@ Triangulation<1>::begin_raw_face (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::face_iterator
+Triangulation<1>::face_iterator
 Triangulation<1>::begin_face (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2835,7 +2835,7 @@ Triangulation<1>::begin_face (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::active_face_iterator
+Triangulation<1>::active_face_iterator
 Triangulation<1>::begin_active_face (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2845,7 +2845,7 @@ Triangulation<1>::begin_active_face (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::raw_face_iterator
+Triangulation<1>::raw_face_iterator
 Triangulation<1>::end_face () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2855,7 +2855,7 @@ Triangulation<1>::end_face () const
 
 
 template <>
-TriaDimensionInfo<1>::raw_face_iterator
+Triangulation<1>::raw_face_iterator
 Triangulation<1>::last_raw_face () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2865,7 +2865,7 @@ Triangulation<1>::last_raw_face () const
 
 
 template <>
-TriaDimensionInfo<1>::raw_face_iterator
+Triangulation<1>::raw_face_iterator
 Triangulation<1>::last_raw_face (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2875,7 +2875,7 @@ Triangulation<1>::last_raw_face (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::face_iterator
+Triangulation<1>::face_iterator
 Triangulation<1>::last_face () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2885,7 +2885,7 @@ Triangulation<1>::last_face () const
 
 
 template <>
-TriaDimensionInfo<1>::face_iterator
+Triangulation<1>::face_iterator
 Triangulation<1>::last_face (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2895,7 +2895,7 @@ Triangulation<1>::last_face (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::active_face_iterator
+Triangulation<1>::active_face_iterator
 Triangulation<1>::last_active_face () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2905,7 +2905,7 @@ Triangulation<1>::last_active_face () const
 
 
 template <>
-TriaDimensionInfo<1>::active_face_iterator
+Triangulation<1>::active_face_iterator
 Triangulation<1>::last_active_face (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2915,7 +2915,7 @@ Triangulation<1>::last_active_face (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::raw_quad_iterator
+Triangulation<1>::raw_quad_iterator
 Triangulation<1>::begin_raw_quad (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2925,7 +2925,7 @@ Triangulation<1>::begin_raw_quad (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::quad_iterator
+Triangulation<1>::quad_iterator
 Triangulation<1>::begin_quad (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2935,7 +2935,7 @@ Triangulation<1>::begin_quad (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::active_quad_iterator
+Triangulation<1>::active_quad_iterator
 Triangulation<1>::begin_active_quad (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2945,7 +2945,7 @@ Triangulation<1>::begin_active_quad (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::raw_quad_iterator
+Triangulation<1>::raw_quad_iterator
 Triangulation<1>::end_quad () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2955,7 +2955,7 @@ Triangulation<1>::end_quad () const
 
 
 template <>
-TriaDimensionInfo<1>::raw_quad_iterator
+Triangulation<1>::raw_quad_iterator
 Triangulation<1>::last_raw_quad (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2965,7 +2965,7 @@ Triangulation<1>::last_raw_quad (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::raw_quad_iterator
+Triangulation<1>::raw_quad_iterator
 Triangulation<1>::last_raw_quad () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2975,7 +2975,7 @@ Triangulation<1>::last_raw_quad () const
 
 
 template <>
-TriaDimensionInfo<1>::quad_iterator
+Triangulation<1>::quad_iterator
 Triangulation<1>::last_quad (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2985,7 +2985,7 @@ Triangulation<1>::last_quad (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::quad_iterator
+Triangulation<1>::quad_iterator
 Triangulation<1>::last_quad () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -2995,7 +2995,7 @@ Triangulation<1>::last_quad () const
 
 
 template <>
-TriaDimensionInfo<1>::active_quad_iterator
+Triangulation<1>::active_quad_iterator
 Triangulation<1>::last_active_quad (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3005,7 +3005,7 @@ Triangulation<1>::last_active_quad (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::active_quad_iterator
+Triangulation<1>::active_quad_iterator
 Triangulation<1>::last_active_quad () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3015,7 +3015,7 @@ Triangulation<1>::last_active_quad () const
 
 
 template <>
-TriaDimensionInfo<1>::raw_hex_iterator
+Triangulation<1>::raw_hex_iterator
 Triangulation<1>::begin_raw_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3025,7 +3025,7 @@ Triangulation<1>::begin_raw_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::hex_iterator
+Triangulation<1>::hex_iterator
 Triangulation<1>::begin_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3035,7 +3035,7 @@ Triangulation<1>::begin_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::active_hex_iterator
+Triangulation<1>::active_hex_iterator
 Triangulation<1>::begin_active_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3045,7 +3045,7 @@ Triangulation<1>::begin_active_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::raw_hex_iterator
+Triangulation<1>::raw_hex_iterator
 Triangulation<1>::end_hex () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3055,7 +3055,7 @@ Triangulation<1>::end_hex () const
 
 
 template <>
-TriaDimensionInfo<1>::raw_hex_iterator
+Triangulation<1>::raw_hex_iterator
 Triangulation<1>::last_raw_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3065,7 +3065,7 @@ Triangulation<1>::last_raw_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::raw_hex_iterator
+Triangulation<1>::raw_hex_iterator
 Triangulation<1>::last_raw_hex () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3075,7 +3075,7 @@ Triangulation<1>::last_raw_hex () const
 
 
 template <>
-TriaDimensionInfo<1>::hex_iterator
+Triangulation<1>::hex_iterator
 Triangulation<1>::last_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3085,7 +3085,7 @@ Triangulation<1>::last_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::hex_iterator
+Triangulation<1>::hex_iterator
 Triangulation<1>::last_hex () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3095,7 +3095,7 @@ Triangulation<1>::last_hex () const
 
 
 template <>
-TriaDimensionInfo<1>::active_hex_iterator
+Triangulation<1>::active_hex_iterator
 Triangulation<1>::last_active_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3105,7 +3105,7 @@ Triangulation<1>::last_active_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<1>::active_hex_iterator
+Triangulation<1>::active_hex_iterator
 Triangulation<1>::last_active_hex () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3118,7 +3118,7 @@ Triangulation<1>::last_active_hex () const
 #if deal_II_dimension == 2
 
 template <>
-TriaDimensionInfo<2>::raw_cell_iterator
+Triangulation<2>::raw_cell_iterator
 Triangulation<2>::begin_raw (const unsigned int level) const
 {
   return begin_raw_quad (level);
@@ -3127,7 +3127,7 @@ Triangulation<2>::begin_raw (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::active_cell_iterator
+Triangulation<2>::active_cell_iterator
 Triangulation<2>::begin_active (const unsigned int level) const
 {
   return begin_active_quad (level);
@@ -3136,7 +3136,7 @@ Triangulation<2>::begin_active (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::raw_cell_iterator
+Triangulation<2>::raw_cell_iterator
 Triangulation<2>::last_raw () const
 {
   return last_raw_quad ();
@@ -3145,7 +3145,7 @@ Triangulation<2>::last_raw () const
 
 
 template <>
-TriaDimensionInfo<2>::raw_cell_iterator
+Triangulation<2>::raw_cell_iterator
 Triangulation<2>::last_raw (const unsigned int level) const
 {
   return last_raw_quad (level);
@@ -3154,7 +3154,7 @@ Triangulation<2>::last_raw (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::cell_iterator
+Triangulation<2>::cell_iterator
 Triangulation<2>::last () const
 {
   return last_quad ();
@@ -3163,7 +3163,7 @@ Triangulation<2>::last () const
 
 
 template <>
-TriaDimensionInfo<2>::cell_iterator
+Triangulation<2>::cell_iterator
 Triangulation<2>::last (const unsigned int level) const
 {
   return last_quad (level);
@@ -3172,7 +3172,7 @@ Triangulation<2>::last (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::active_cell_iterator
+Triangulation<2>::active_cell_iterator
 Triangulation<2>::last_active () const
 {
   return last_active_quad ();
@@ -3181,7 +3181,7 @@ Triangulation<2>::last_active () const
 
 
 template <>
-TriaDimensionInfo<2>::active_cell_iterator
+Triangulation<2>::active_cell_iterator
 Triangulation<2>::last_active (const unsigned int level) const
 {
   return last_active_quad (level);
@@ -3190,7 +3190,7 @@ Triangulation<2>::last_active (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::raw_face_iterator
+Triangulation<2>::raw_face_iterator
 Triangulation<2>::begin_raw_face (const unsigned int level) const
 {
   return begin_raw_line (level);
@@ -3199,7 +3199,7 @@ Triangulation<2>::begin_raw_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::face_iterator
+Triangulation<2>::face_iterator
 Triangulation<2>::begin_face (const unsigned int level) const
 {
   return begin_line (level);
@@ -3208,7 +3208,7 @@ Triangulation<2>::begin_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::active_face_iterator
+Triangulation<2>::active_face_iterator
 Triangulation<2>::begin_active_face (const unsigned int level) const
 {
   return begin_active_line (level);
@@ -3217,7 +3217,7 @@ Triangulation<2>::begin_active_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::raw_face_iterator
+Triangulation<2>::raw_face_iterator
 Triangulation<2>::end_face () const
 {
   return end_line ();
@@ -3226,7 +3226,7 @@ Triangulation<2>::end_face () const
 
 
 template <>
-TriaDimensionInfo<2>::raw_face_iterator
+Triangulation<2>::raw_face_iterator
 Triangulation<2>::last_raw_face () const
 {
   return last_raw_line ();
@@ -3235,7 +3235,7 @@ Triangulation<2>::last_raw_face () const
 
 
 template <>
-TriaDimensionInfo<2>::raw_face_iterator
+Triangulation<2>::raw_face_iterator
 Triangulation<2>::last_raw_face (const unsigned int level) const
 {
   return last_raw_line (level);
@@ -3244,7 +3244,7 @@ Triangulation<2>::last_raw_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::face_iterator
+Triangulation<2>::face_iterator
 Triangulation<2>::last_face () const
 {
   return last_line ();
@@ -3253,7 +3253,7 @@ Triangulation<2>::last_face () const
 
 
 template <>
-TriaDimensionInfo<2>::face_iterator
+Triangulation<2>::face_iterator
 Triangulation<2>::last_face (const unsigned int level) const
 {
   return last_line (level);
@@ -3262,7 +3262,7 @@ Triangulation<2>::last_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::active_face_iterator
+Triangulation<2>::active_face_iterator
 Triangulation<2>::last_active_face () const
 {
   return last_active_line ();
@@ -3271,7 +3271,7 @@ Triangulation<2>::last_active_face () const
 
 
 template <>
-TriaDimensionInfo<2>::active_face_iterator
+Triangulation<2>::active_face_iterator
 Triangulation<2>::last_active_face (const unsigned int level) const
 {
   return last_active_line (level);
@@ -3280,7 +3280,7 @@ Triangulation<2>::last_active_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<2>::raw_hex_iterator
+Triangulation<2>::raw_hex_iterator
 Triangulation<2>::begin_raw_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3290,7 +3290,7 @@ Triangulation<2>::begin_raw_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<2>::hex_iterator
+Triangulation<2>::hex_iterator
 Triangulation<2>::begin_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3300,7 +3300,7 @@ Triangulation<2>::begin_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<2>::active_hex_iterator
+Triangulation<2>::active_hex_iterator
 Triangulation<2>::begin_active_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3310,7 +3310,7 @@ Triangulation<2>::begin_active_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<2>::raw_hex_iterator
+Triangulation<2>::raw_hex_iterator
 Triangulation<2>::end_hex () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3320,7 +3320,7 @@ Triangulation<2>::end_hex () const
 
 
 template <>
-TriaDimensionInfo<2>::raw_hex_iterator
+Triangulation<2>::raw_hex_iterator
 Triangulation<2>::last_raw_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3330,7 +3330,7 @@ Triangulation<2>::last_raw_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<2>::raw_hex_iterator
+Triangulation<2>::raw_hex_iterator
 Triangulation<2>::last_raw_hex () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3340,7 +3340,7 @@ Triangulation<2>::last_raw_hex () const
 
 
 template <>
-TriaDimensionInfo<2>::hex_iterator
+Triangulation<2>::hex_iterator
 Triangulation<2>::last_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3350,7 +3350,7 @@ Triangulation<2>::last_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<2>::hex_iterator
+Triangulation<2>::hex_iterator
 Triangulation<2>::last_hex () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3360,7 +3360,7 @@ Triangulation<2>::last_hex () const
 
 
 template <>
-TriaDimensionInfo<2>::active_hex_iterator
+Triangulation<2>::active_hex_iterator
 Triangulation<2>::last_active_hex (const unsigned int) const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3370,7 +3370,7 @@ Triangulation<2>::last_active_hex (const unsigned int) const
 
 
 template <>
-TriaDimensionInfo<2>::active_hex_iterator
+Triangulation<2>::active_hex_iterator
 Triangulation<2>::last_active_hex () const
 {
   Assert (false, ExcFunctionNotUseful());
@@ -3383,7 +3383,7 @@ Triangulation<2>::last_active_hex () const
 #if deal_II_dimension == 3
 
 template <>
-TriaDimensionInfo<3>::raw_cell_iterator
+Triangulation<3>::raw_cell_iterator
 Triangulation<3>::begin_raw (const unsigned int level) const
 {
   return begin_raw_hex (level);
@@ -3392,7 +3392,7 @@ Triangulation<3>::begin_raw (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::active_cell_iterator
+Triangulation<3>::active_cell_iterator
 Triangulation<3>::begin_active (const unsigned int level) const
 {
   return begin_active_hex (level);
@@ -3401,7 +3401,7 @@ Triangulation<3>::begin_active (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::raw_cell_iterator
+Triangulation<3>::raw_cell_iterator
 Triangulation<3>::last_raw () const
 {
   return last_raw_hex ();
@@ -3410,7 +3410,7 @@ Triangulation<3>::last_raw () const
 
 
 template <>
-TriaDimensionInfo<3>::raw_cell_iterator
+Triangulation<3>::raw_cell_iterator
 Triangulation<3>::last_raw (const unsigned int level) const
 {
   return last_raw_hex (level);
@@ -3419,7 +3419,7 @@ Triangulation<3>::last_raw (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::cell_iterator
+Triangulation<3>::cell_iterator
 Triangulation<3>::last () const
 {
   return last_hex ();
@@ -3428,7 +3428,7 @@ Triangulation<3>::last () const
 
 
 template <>
-TriaDimensionInfo<3>::cell_iterator
+Triangulation<3>::cell_iterator
 Triangulation<3>::last (const unsigned int level) const
 {
   return last_hex (level);
@@ -3437,7 +3437,7 @@ Triangulation<3>::last (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::active_cell_iterator
+Triangulation<3>::active_cell_iterator
 Triangulation<3>::last_active () const
 {
   return last_active_hex ();
@@ -3446,7 +3446,7 @@ Triangulation<3>::last_active () const
 
 
 template <>
-TriaDimensionInfo<3>::active_cell_iterator
+Triangulation<3>::active_cell_iterator
 Triangulation<3>::last_active (const unsigned int level) const
 {
   return last_active_hex (level);
@@ -3455,7 +3455,7 @@ Triangulation<3>::last_active (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::raw_face_iterator
+Triangulation<3>::raw_face_iterator
 Triangulation<3>::begin_raw_face (const unsigned int level) const
 {
   return begin_raw_quad (level);
@@ -3464,7 +3464,7 @@ Triangulation<3>::begin_raw_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::face_iterator
+Triangulation<3>::face_iterator
 Triangulation<3>::begin_face (const unsigned int level) const
 {
   return begin_quad (level);
@@ -3473,7 +3473,7 @@ Triangulation<3>::begin_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::active_face_iterator
+Triangulation<3>::active_face_iterator
 Triangulation<3>::begin_active_face (const unsigned int level) const
 {
   return begin_active_quad (level);
@@ -3482,7 +3482,7 @@ Triangulation<3>::begin_active_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::raw_face_iterator
+Triangulation<3>::raw_face_iterator
 Triangulation<3>::end_face () const
 {
   return end_quad ();
@@ -3491,7 +3491,7 @@ Triangulation<3>::end_face () const
 
 
 template <>
-TriaDimensionInfo<3>::raw_face_iterator
+Triangulation<3>::raw_face_iterator
 Triangulation<3>::last_raw_face () const
 {
   return last_raw_quad ();
@@ -3500,7 +3500,7 @@ Triangulation<3>::last_raw_face () const
 
 
 template <>
-TriaDimensionInfo<3>::raw_face_iterator
+Triangulation<3>::raw_face_iterator
 Triangulation<3>::last_raw_face (const unsigned int level) const
 {
   return last_raw_quad (level);
@@ -3509,7 +3509,7 @@ Triangulation<3>::last_raw_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::face_iterator
+Triangulation<3>::face_iterator
 Triangulation<3>::last_face () const
 {
   return last_quad ();
@@ -3518,7 +3518,7 @@ Triangulation<3>::last_face () const
 
 
 template <>
-TriaDimensionInfo<3>::face_iterator
+Triangulation<3>::face_iterator
 Triangulation<3>::last_face (const unsigned int level) const
 {
   return last_quad (level);
@@ -3527,7 +3527,7 @@ Triangulation<3>::last_face (const unsigned int level) const
 
 
 template <>
-TriaDimensionInfo<3>::active_face_iterator
+Triangulation<3>::active_face_iterator
 Triangulation<3>::last_active_face () const
 {
   return last_active_quad ();
@@ -3536,7 +3536,7 @@ Triangulation<3>::last_active_face () const
 
 
 template <>
-TriaDimensionInfo<3>::active_face_iterator
+Triangulation<3>::active_face_iterator
 Triangulation<3>::last_active_face (const unsigned int level) const
 {
   return last_active_quad (level);
@@ -3547,7 +3547,7 @@ Triangulation<3>::last_active_face (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_line_iterator
+typename Triangulation<dim>::raw_line_iterator
 Triangulation<dim>::begin_raw_line (const unsigned int level) const
 {
   Assert (level<levels.size(), ExcInvalidLevel(level));
@@ -3563,7 +3563,7 @@ Triangulation<dim>::begin_raw_line (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_quad_iterator
+typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::begin_raw_quad (const unsigned int level) const
 {
   Assert (level<levels.size(), ExcInvalidLevel(level));
@@ -3579,7 +3579,7 @@ Triangulation<dim>::begin_raw_quad (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_hex_iterator
+typename Triangulation<dim>::raw_hex_iterator
 Triangulation<dim>::begin_raw_hex (const unsigned int level) const
 {
   Assert (level<levels.size(), ExcInvalidLevel(level));
@@ -3595,7 +3595,7 @@ Triangulation<dim>::begin_raw_hex (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::line_iterator
+typename Triangulation<dim>::line_iterator
 Triangulation<dim>::begin_line (const unsigned int level) const
 {
   				   // level is checked in begin_raw
@@ -3611,7 +3611,7 @@ Triangulation<dim>::begin_line (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::quad_iterator
+typename Triangulation<dim>::quad_iterator
 Triangulation<dim>::begin_quad (const unsigned int level) const
 {
   				   // level is checked in begin_raw
@@ -3627,7 +3627,7 @@ Triangulation<dim>::begin_quad (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::hex_iterator
+typename Triangulation<dim>::hex_iterator
 Triangulation<dim>::begin_hex (const unsigned int level) const
 {
   				   // level is checked in begin_raw
@@ -3643,7 +3643,7 @@ Triangulation<dim>::begin_hex (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_line_iterator
+typename Triangulation<dim>::active_line_iterator
 Triangulation<dim>::begin_active_line (const unsigned int level) const
 {
   				   // level is checked in begin_raw
@@ -3659,7 +3659,7 @@ Triangulation<dim>::begin_active_line (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_quad_iterator
+typename Triangulation<dim>::active_quad_iterator
 Triangulation<dim>::begin_active_quad (const unsigned int level) const
 {
   				   // level is checked in begin_raw
@@ -3675,7 +3675,7 @@ Triangulation<dim>::begin_active_quad (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_hex_iterator
+typename Triangulation<dim>::active_hex_iterator
 Triangulation<dim>::begin_active_hex (const unsigned int level) const
 {
   				   // level is checked in begin_raw
@@ -3691,7 +3691,7 @@ Triangulation<dim>::begin_active_hex (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_line_iterator
+typename Triangulation<dim>::raw_line_iterator
 Triangulation<dim>::end_line () const
 {
   return raw_line_iterator (const_cast<Triangulation<dim>*>(this),
@@ -3702,7 +3702,7 @@ Triangulation<dim>::end_line () const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_quad_iterator
+typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::end_quad () const
 {
   return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
@@ -3713,7 +3713,7 @@ Triangulation<dim>::end_quad () const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_hex_iterator
+typename Triangulation<dim>::raw_hex_iterator
 Triangulation<dim>::end_hex () const
 {
   return raw_hex_iterator (const_cast<Triangulation<dim>*>(this),
@@ -3724,7 +3724,7 @@ Triangulation<dim>::end_hex () const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_line_iterator
+typename Triangulation<dim>::raw_line_iterator
 Triangulation<dim>::last_raw_line (const unsigned int level) const
 {
   Assert (level<levels.size(), ExcInvalidLevel(level));
@@ -3738,7 +3738,7 @@ Triangulation<dim>::last_raw_line (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_quad_iterator
+typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::last_raw_quad (const unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
@@ -3752,7 +3752,7 @@ Triangulation<dim>::last_raw_quad (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_hex_iterator
+typename Triangulation<dim>::raw_hex_iterator
 Triangulation<dim>::last_raw_hex (const unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
@@ -3766,28 +3766,28 @@ Triangulation<dim>::last_raw_hex (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_line_iterator
+typename Triangulation<dim>::raw_line_iterator
 Triangulation<dim>::last_raw_line () const {
   return last_raw_line (levels.size()-1);
 }
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_quad_iterator
+typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::last_raw_quad () const {
   return last_raw_quad (levels.size()-1);
 }
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_hex_iterator
+typename Triangulation<dim>::raw_hex_iterator
 Triangulation<dim>::last_raw_hex () const {
   return last_raw_hex (levels.size()-1);
 }
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::line_iterator
+typename Triangulation<dim>::line_iterator
 Triangulation<dim>::last_line (const unsigned int level) const {
   				   // level is checked in begin_raw
   raw_line_iterator ri = last_raw_line(level);
@@ -3801,7 +3801,7 @@ Triangulation<dim>::last_line (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::quad_iterator
+typename Triangulation<dim>::quad_iterator
 Triangulation<dim>::last_quad (const unsigned int level) const {
   				   // level is checked in begin_raw
   raw_quad_iterator ri = last_raw_quad(level);
@@ -3815,7 +3815,7 @@ Triangulation<dim>::last_quad (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::hex_iterator
+typename Triangulation<dim>::hex_iterator
 Triangulation<dim>::last_hex (const unsigned int level) const {
   				   // level is checked in begin_raw
   raw_hex_iterator ri = last_raw_hex(level);
@@ -3829,28 +3829,28 @@ Triangulation<dim>::last_hex (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::line_iterator
+typename Triangulation<dim>::line_iterator
 Triangulation<dim>::last_line () const {
   return last_line (levels.size()-1);
 }
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::quad_iterator
+typename Triangulation<dim>::quad_iterator
 Triangulation<dim>::last_quad () const {
   return last_quad (levels.size()-1);
 }
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::hex_iterator
+typename Triangulation<dim>::hex_iterator
 Triangulation<dim>::last_hex () const {
   return last_hex (levels.size()-1);
 }
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_line_iterator
+typename Triangulation<dim>::active_line_iterator
 Triangulation<dim>::last_active_line (const unsigned int level) const {
 				   // level is checked in begin_raw
   line_iterator i = last_line(level);
@@ -3864,7 +3864,7 @@ Triangulation<dim>::last_active_line (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_quad_iterator
+typename Triangulation<dim>::active_quad_iterator
 Triangulation<dim>::last_active_quad (const unsigned int level) const {
 				   // level is checked in begin_raw
   quad_iterator i = last_quad(level);
@@ -3878,7 +3878,7 @@ Triangulation<dim>::last_active_quad (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_hex_iterator
+typename Triangulation<dim>::active_hex_iterator
 Triangulation<dim>::last_active_hex (const unsigned int level) const {
 				   // level is checked in begin_raw
   hex_iterator i = last_hex(level);
@@ -3892,28 +3892,28 @@ Triangulation<dim>::last_active_hex (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_line_iterator
+typename Triangulation<dim>::active_line_iterator
 Triangulation<dim>::last_active_line () const {
   return last_active_line (levels.size()-1);
 }
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_quad_iterator
+typename Triangulation<dim>::active_quad_iterator
 Triangulation<dim>::last_active_quad () const {
   return last_active_quad (levels.size()-1);
 }
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_hex_iterator
+typename Triangulation<dim>::active_hex_iterator
 Triangulation<dim>::last_active_hex () const {
   return last_active_hex (levels.size()-1);
 }
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_cell_iterator
+typename Triangulation<dim>::raw_cell_iterator
 Triangulation<dim>::end_raw (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end() :
@@ -3922,7 +3922,7 @@ Triangulation<dim>::end_raw (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::cell_iterator
+typename Triangulation<dim>::cell_iterator
 Triangulation<dim>::end (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  cell_iterator(end()) :
@@ -3931,7 +3931,7 @@ Triangulation<dim>::end (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_cell_iterator
+typename Triangulation<dim>::active_cell_iterator
 Triangulation<dim>::end_active (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  active_cell_iterator(end()) :
@@ -3940,7 +3940,7 @@ Triangulation<dim>::end_active (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_face_iterator
+typename Triangulation<dim>::raw_face_iterator
 Triangulation<dim>::end_raw_face (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end_face() :
@@ -3949,7 +3949,7 @@ Triangulation<dim>::end_raw_face (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::face_iterator
+typename Triangulation<dim>::face_iterator
 Triangulation<dim>::end_face (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  face_iterator(end_face()) :
@@ -3958,7 +3958,7 @@ Triangulation<dim>::end_face (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_face_iterator
+typename Triangulation<dim>::active_face_iterator
 Triangulation<dim>::end_active_face (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  active_face_iterator(end_face()) :
@@ -3967,7 +3967,7 @@ Triangulation<dim>::end_active_face (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_line_iterator
+typename Triangulation<dim>::raw_line_iterator
 Triangulation<dim>::end_raw_line (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end_line() :
@@ -3976,7 +3976,7 @@ Triangulation<dim>::end_raw_line (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::line_iterator
+typename Triangulation<dim>::line_iterator
 Triangulation<dim>::end_line (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  line_iterator(end_line()) :
@@ -3985,7 +3985,7 @@ Triangulation<dim>::end_line (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_line_iterator
+typename Triangulation<dim>::active_line_iterator
 Triangulation<dim>::end_active_line (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  active_line_iterator(end_line()) :
@@ -3994,7 +3994,7 @@ Triangulation<dim>::end_active_line (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_quad_iterator
+typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::end_raw_quad (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end_quad() :
@@ -4003,7 +4003,7 @@ Triangulation<dim>::end_raw_quad (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::quad_iterator
+typename Triangulation<dim>::quad_iterator
 Triangulation<dim>::end_quad (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  quad_iterator(end_quad()) :
@@ -4012,7 +4012,7 @@ Triangulation<dim>::end_quad (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_quad_iterator
+typename Triangulation<dim>::active_quad_iterator
 Triangulation<dim>::end_active_quad (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  active_quad_iterator(end_quad()) :
@@ -4021,7 +4021,7 @@ Triangulation<dim>::end_active_quad (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::raw_hex_iterator
+typename Triangulation<dim>::raw_hex_iterator
 Triangulation<dim>::end_raw_hex (const unsigned int level) const {
   return (level == levels.size()-1 ?
 	  end_hex() :
@@ -4030,7 +4030,7 @@ Triangulation<dim>::end_raw_hex (const unsigned int level) const {
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::hex_iterator
+typename Triangulation<dim>::hex_iterator
 Triangulation<dim>::end_hex (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -4040,7 +4040,7 @@ Triangulation<dim>::end_hex (const unsigned int level) const
 
 
 template <int dim>
-typename TriaDimensionInfo<dim>::active_hex_iterator
+typename Triangulation<dim>::active_hex_iterator
 Triangulation<dim>::end_active_hex (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -4442,8 +4442,22 @@ Triangulation<dim>::execute_coarsening_and_refinement ()
 {
   prepare_coarsening_and_refinement ();
 
+				   // Inform RefinementListeners
+                                   // about beginning of refinement.
+  typename std::list<RefinementListener *>::iterator ref_listener =
+      refinement_listeners.begin (),
+      end_listener = refinement_listeners.end ();
+  for (; ref_listener != end_listener; ++ref_listener)
+      (*ref_listener)->pre_refinement_notification (*this);
+
   execute_coarsening();
   execute_refinement();
+
+				   // Inform RefinementListeners
+                                   // about end of refinement.
+  for (ref_listener = refinement_listeners.begin ();
+       ref_listener != end_listener; ++ref_listener)
+      (*ref_listener)->post_refinement_notification (*this);
 }
 
 
@@ -7301,7 +7315,6 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
   save_coarsen_flags (flags_before[0]);
   save_refine_flags (flags_before[1]);
 
-
 				   // do nothing in 1d, except setting
 				   // the coarsening flags correctly
   if (dim == 1)
@@ -8956,6 +8969,41 @@ void Triangulation<dim>::update_number_cache ()
       default:
 	    Assert (false, ExcInternalError());
     };
+}
+
+
+// Refinement listeners
+template<int dim>
+void Triangulation<dim>::
+RefinementListener::pre_refinement_notification (const Triangulation<dim> &)
+{}
+
+
+
+template<int dim>
+void Triangulation<dim>::
+RefinementListener::post_refinement_notification (const Triangulation<dim> &)
+{}
+
+
+
+template<int dim>
+void
+Triangulation<dim>::add_refinement_listener (RefinementListener &listener) const
+{
+    refinement_listeners.push_back (&listener);
+}
+
+
+
+template<int dim>
+void
+Triangulation<dim>::remove_refinement_listener (RefinementListener &listener) const
+{
+    typename std::list<RefinementListener *>::iterator p =
+	find (refinement_listeners.begin (), refinement_listeners.end (), &listener);
+    Assert (p != refinement_listeners.end (), ExcInternalError ());
+    refinement_listeners.erase (p);
 }
 
 
