@@ -5,6 +5,10 @@
 
 html: deal.tag
 
+private:
+	perl -pi -e 's/(EXTRACT_PRIVATE\s*=\s*)NO/$$1YES/' options.dox
+	$(MAKE) html
+
 %.tag: %.dox
 	doxygen $<
 
@@ -16,4 +20,4 @@ base:    base.tag
 lac:     lac.tag
 deal.II: deal.tag
 
-.PHONY: html base lac deal.II
+.PHONY: html private base lac deal.II
