@@ -53,6 +53,26 @@
     </p>
 
     <p>
+    Finally, the system's ``ar'' program seems to have a limit that
+    does not allow it to generate some of the libraries; in debug
+    mode, three sublibraries (one for 1d, 2d, and 3d, each) have a
+    size of more than 40 MB, and the system ``ar'' errored out with
+    the following message:
+    <pre>
+      ar: Warning: creating lib/libdeal_II_2d.g.a
+      /: write failed, file system is full
+      ar:  error writing archive member contents: Bad file number
+      gmake: *** [lib/libdeal_II_2d.g.a] Error 1
+    </pre>
+    However, it is not true that there is no left space on that
+    device. Furthermore, it is funny that ``ar'' warns about an action
+    that it is told to do. The solution is to install GNU ar from the
+    GNU binutils package, which is available for the OSF operating
+    system as well, even though the GNU assembler gas is not. With GNU
+    ar installed, linking object files together to libraries went fine.
+    </p>
+
+    <p>
     Another problem occured when gcc generated an internal compiler
     error when compiling the AssertThrow macro. (Note that we have
     also observed this effect on DEC Alpha stations running Linux
