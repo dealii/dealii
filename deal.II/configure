@@ -5186,11 +5186,11 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
   CXXFLAGS="$CXXFLAGSG"
   case "$GXX_VERSION" in
     gcc*)
-	CXXFLAGS="$CXXFLAGS -Werror"
+	CXXFLAGS="$CXXFLAGSG -Werror"
 	;;
 
     MIPSpro*)
-	CXXFLAGS="$CXXFLAGS -diag_error 1174"
+	CXXFLAGS="$CXXFLAGSG -diag_error 1174"
 	;;
   esac
 
