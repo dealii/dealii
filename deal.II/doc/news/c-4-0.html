@@ -32,17 +32,33 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3 style="color:red">Incompatibilities</h3>
 
 <ol>
+  <li> <p> Changed: All the vector and block vector classes had a member
+       function <code class="member">clear</code> which simply reset all
+       values of the vector to zero. It did not change the size of the vector,
+       though. This was confusing, since the standard C++ container classes
+       implement the semantics that the <code class="member">clear</code>
+       functions delete all entries of the containers, i.e. resize it to zero,
+       and we implemented similar semantics also for the <code
+       class="class">SparseMatrix</code><code class="class">DoFHandler</code>,
+       <code class="class">ConstraintMatrix</code> and various other
+       classes. To avoid this confusion in the future, the <code
+       class="member">clear</code> function has been dropped from the
+       interface of the vector classes. To set all elements of a vector to
+       zero without changing its size, the recommended way is to use the more
+       obvious notation <code class="member">v=0</code>.  <br> (WB 2004/05/10)
+       </p>
+
   <li> <p> Changed: the template parameter of <code
-  class="class">MGTransferPrebuilt</code> is now the complete vector
-  type, not just the value type of the vector. This allows to operate
-  on <code class="class">Vector</code> as well as on <code
-  class="class">BlockVector</code>. Unfortunately, the untested class
-  <code class="class">MGTransferBlock</code> underwent some more
-  changes without testing, such that it should be used with high
-  caution.
-  <br>
-  (GK 2004/04/01)
-  </p>
+       class="class">MGTransferPrebuilt</code> is now the complete vector
+       type, not just the value type of the vector. This allows to operate
+       on <code class="class">Vector</code> as well as on <code
+       class="class">BlockVector</code>. Unfortunately, the untested class
+       <code class="class">MGTransferBlock</code> underwent some more
+       changes without testing, such that it should be used with high
+       caution.
+       <br>
+       (GK 2004/04/01)
+       </p>
 
   <li> <p> Changed: The <code class="class">FiniteElement</code> classes had a
        function <code class="member">restrict</code> that returns the

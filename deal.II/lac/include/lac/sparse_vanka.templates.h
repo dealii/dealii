@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -195,7 +195,7 @@ SparseVanka<number>::vmult (Vector<number2>       &dst,
 			    const Vector<number2> &src) const
 {
 				   // first set output vector to zero
-  dst.clear ();
+  dst = 0;
 				   // then pass on to the function
 				   // that actually does the work
   apply_preconditioner (dst, src);
@@ -564,7 +564,7 @@ template <typename number2>
 void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
 				      const Vector<number2> &src) const
 {
-  dst.clear ();
+  dst = 0;
 
 				   // if no blocking is required, pass
 				   // down to the underlying class

@@ -971,7 +971,7 @@ namespace LaplaceSolver
       endc = this->dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-	cell_rhs.clear ();
+	cell_rhs = 0;
 
 	fe_values.reinit (cell);
 
@@ -987,7 +987,7 @@ namespace LaplaceSolver
 	cell->get_dof_indices (local_dof_indices);
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  rhs(local_dof_indices[i]) += cell_rhs(i);
-      };
+      }
   }
 
 

@@ -81,7 +81,7 @@ void test ()
        cell != dof_handler.end(); ++cell)
     {
       cell->get_dof_indices (local_dofs);
-      local_vector.clear ();
+      local_vector = 0;
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         local_vector(i) = (i+1.)*(local_dofs[i]+1.);
 

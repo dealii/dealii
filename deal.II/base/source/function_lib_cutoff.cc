@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -120,7 +120,7 @@ namespace Functions
 	  values[k] = val;
 	else
 	  {
-	    values[k].clear ();
+	    values[k] = 0;
 	    values[k](this->selected) = val;
 	  }
       }
@@ -194,7 +194,7 @@ namespace Functions
 	  values[k] = val;
 	else
 	  {
-	    values[k].clear ();
+	    values[k] = 0;
 	    values[k](this->selected) = val;
 	  }
       }
@@ -287,7 +287,7 @@ namespace Functions
 	  values[k] = val;
 	else
 	  {
-	    values[k].clear ();
+	    values[k] = 0;
 	    values[k](this->selected) = val;
 	  }
       }

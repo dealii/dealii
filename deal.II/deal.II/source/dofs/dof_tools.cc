@@ -2545,7 +2545,7 @@ DoFTools::compute_intergrid_weights_3 (const DoFHandler<dim>              &coars
 	    const unsigned int local_parameter_dof
 	      = coarse_fe.system_to_component_index(local_dof).second;
 	    
-	    global_parameter_representation.clear ();
+	    global_parameter_representation = 0;
 	    
 					     // distribute the representation of
 					     // @p{local_parameter_dof} on the

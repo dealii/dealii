@@ -138,16 +138,6 @@ void BlockVector<Number>::swap (BlockVector<Number> &v)
 
 
 template <typename Number>
-void BlockVector<Number>::clear ()
-{
-  for (unsigned int i=0;i<num_blocks;++i)
-    {
-      components[i].clear();
-    }
-}
-
-
-template <typename Number>
 bool
 BlockVector<Number>::all_zero () const
 {

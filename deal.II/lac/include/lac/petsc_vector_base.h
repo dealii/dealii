@@ -247,16 +247,6 @@ namespace PETScWrappers
       void compress ();
 
                                        /**
-                                        * Set all entries to zero. Equivalent
-                                        * to <tt>v = 0</tt>, but more obvious and
-                                        * faster.  Note that this function
-                                        * does not change the size of the
-                                        * vector, unlike the STL's
-                                        * <tt>vector<>::clear</tt> function.
-                                        */
-      void clear ();    
-      
-                                       /**
                                         * Set all components of the vector to
                                         * the given number @p s.
                                         */

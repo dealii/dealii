@@ -388,7 +388,7 @@ SparseMatrix<number>::Tvmult (OutVector& dst,
 
   Assert (&src != &dst, ExcSourceEqualsDestination());
 
-  dst.clear ();
+  dst = 0;
 
   for (unsigned int i=0;i<m();i++)
     {

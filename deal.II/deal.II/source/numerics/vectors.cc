@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -446,7 +446,7 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 	  ExcComponentMismatch());
   Assert (rhs_vector.size() == dof_handler.n_dofs(),
 	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-  rhs_vector.clear();
+  rhs_vector = 0;
   
   UpdateFlags update_flags = UpdateFlags(update_values   |
 					 update_q_points |
@@ -474,7 +474,7 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	  rhs_function.value_list (fe_values.get_quadrature_points(), rhs_values);
 	  
-	  cell_vector.clear();
+	  cell_vector = 0;
 	  for (unsigned int point=0; point<n_q_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      cell_vector(i) += rhs_values[point] *
@@ -499,7 +499,7 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	  rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
 	  
-	  cell_vector.clear();
+	  cell_vector = 0;
 	  for (unsigned int point=0; point<n_q_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      {
@@ -550,7 +550,8 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 	  ExcComponentMismatch());
   Assert (rhs_vector.size() == dof_handler.n_dofs(),
 	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-  rhs_vector.clear();
+  
+  rhs_vector = 0;
   
   UpdateFlags update_flags = UpdateFlags(update_values   |
 					 update_q_points |
@@ -583,7 +584,7 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	      rhs_function.value_list (fe_values.get_quadrature_points(), rhs_values);
 	      
-	      cell_vector.clear();
+	      cell_vector = 0;
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		for (unsigned int i=0; i<dofs_per_cell; ++i) 
 		  cell_vector(i) += rhs_values[point] *
@@ -612,7 +613,7 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	      rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
 	  
-	      cell_vector.clear();
+	      cell_vector = 0;
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  {

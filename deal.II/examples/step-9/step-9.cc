@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -1036,7 +1036,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				       // First clear old contents of
 				       // the cell contributions...
       cell_matrix.clear ();
-      cell_rhs.clear ();
+      cell_rhs = 0;
 
 				       // ... then initialize
 				       // the ``FEValues'' object...

@@ -126,7 +126,7 @@ void BoundaryFunction<dim>::vector_value (const Point<dim>   &,
   Assert (values.size() == dim+1, 
 	  ExcDimensionMismatch (values.size(), dim+1));
 				  
-  values.clear ();
+  values = 0;
   values(dim) = 1.;
 }
 

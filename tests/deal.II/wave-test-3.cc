@@ -5381,8 +5381,8 @@ TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_
     {
       const typename DoFHandler<dim>::cell_iterator old_child = old_cell->child(c);
 
-      child_rhs1.clear ();
-      child_rhs2.clear ();
+      child_rhs1 = 0;
+      child_rhs2 = 0;
       
       if (old_child->has_children())
 	{
@@ -7135,8 +7135,8 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
     {
       const typename DoFHandler<dim>::cell_iterator old_child = old_cell->child(c);
 
-      child_rhs1.clear ();
-      child_rhs2.clear ();
+      child_rhs1 = 0;
+      child_rhs2 = 0;
       
       if (old_child->has_children())
 	{

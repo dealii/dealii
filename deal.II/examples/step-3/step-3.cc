@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -482,7 +482,7 @@ void LaplaceProblem::assemble_system ()
 				       // right hand side to zero,
 				       // before we fill them.
       cell_matrix.clear ();
-      cell_rhs.clear ();
+      cell_rhs = 0;
 
 				       // Assemble the matrix: For the
 				       // Laplace problem, the matrix

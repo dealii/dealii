@@ -118,16 +118,6 @@ namespace PETScWrappers
 
 
 
-  void
-  VectorBase::clear ()
-  {
-    const PetscScalar zero = 0;
-    const int ierr = VecSet (&zero, vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-  }
-
-
-
   VectorBase &
   VectorBase::operator = (const PetscScalar s)
   {

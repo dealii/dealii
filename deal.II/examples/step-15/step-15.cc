@@ -464,7 +464,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                        // the local matrix and right hand side
                                        // contributions for this cell:
       cell_matrix.clear ();
-      cell_rhs.clear ();
+      cell_rhs = 0;
 
                                        // Then initialize the values and
                                        // gradients of the shape functions at

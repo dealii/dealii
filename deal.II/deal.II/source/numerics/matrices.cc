@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -326,7 +326,7 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
       fe_values.reinit (cell);
       
       cell_matrix.clear ();
-      local_rhs.clear ();
+      local_rhs = 0;
       cell->get_dof_indices (dof_indices);
       
       rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
@@ -584,7 +584,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	  boundary_functions.end())
 	{
 	  cell_matrix.clear ();
-	  cell_vector.clear ();
+	  cell_vector = 0;
 	  
 	  fe_values.reinit (cell, face);
 	  
@@ -1151,7 +1151,7 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
       fe_values.reinit (cell);
       
       cell_matrix.clear ();
-      local_rhs.clear ();
+      local_rhs = 0;
       cell->get_dof_indices (dof_indices);
       
       rhs.value_list (fe_values.get_quadrature_points(), rhs_values);

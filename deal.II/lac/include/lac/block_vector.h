@@ -815,16 +815,6 @@ class BlockVector
 		 const bool                 fast=false);
     
 				     /**
-				      * Set all entries to zero. Equivalent to
-				      * <tt>v=0</tt>, but more obvious and
-				      * faster.  Note that this function does
-				      * not change the size of the vector,
-				      * unlike the STL's
-				      * <tt>vector<>::clear</tt> function.
-				      */
-    void clear ();
-
-				     /**
 				      * Update internal structures
 				      * after resizing
 				      * vectors. Whenever you reinited

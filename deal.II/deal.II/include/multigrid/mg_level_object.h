@@ -169,7 +169,7 @@ MGLevelObject<Object>::clear ()
 {
   typename std::vector<boost::shared_ptr<Object> >::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
-    (*v)->clear();  
+    **v = 0;
 }
 
 

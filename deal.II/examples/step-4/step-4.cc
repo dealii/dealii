@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -407,7 +407,7 @@ void LaplaceProblem<dim>::assemble_system ()
     {
       fe_values.reinit (cell);
       cell_matrix.clear ();
-      cell_rhs.clear ();
+      cell_rhs = 0;
 
 				       // Now we have to assemble the
 				       // local matrix and right hand

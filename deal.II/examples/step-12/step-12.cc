@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -837,7 +837,7 @@ void DGMethod<dim>::assemble_system1 ()
 				       // ``cell_vector'' to zero,
 				       // before assembling the cell terms.
       u_v_matrix.clear ();
-      cell_vector.clear ();
+      cell_vector = 0;
       
 				       // Now we reinit the ``FEValues''
 				       // object for the current cell
@@ -1271,7 +1271,7 @@ void DGMethod<dim>::assemble_system2 ()
   for (;cell!=endc; ++cell) 
     {
       u_v_matrix.clear ();
-      cell_vector.clear ();
+      cell_vector = 0;
 
       fe_v.reinit (cell);
 
@@ -1625,7 +1625,7 @@ void DGMethod<dim>::run ()
 				       // right hand side vector and
 				       // the Timer object.
       system_matrix.reinit();
-      right_hand_side.clear();
+      right_hand_side = 0;
       assemble_timer.reset();
 
 				       // We start the Timer,

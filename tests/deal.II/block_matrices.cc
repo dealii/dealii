@@ -277,7 +277,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::assemble_system ()
       fe_values.reinit (cell);
 
       cell_matrix.clear ();
-      cell_rhs.clear ();
+      cell_rhs = 0;
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)

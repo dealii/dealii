@@ -475,7 +475,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
       Vector<number> tmp1(dofs_per_cell);
       Vector<number> tmp2(dofs_per_cell);
       
-      interpolated_values.clear ();
+      interpolated_values = 0;
 
                                        // later on we will have to
                                        // push the values interpolated

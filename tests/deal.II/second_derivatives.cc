@@ -76,7 +76,7 @@ int main ()
       
       for (unsigned int vertex=0; vertex<4; ++vertex)
 	{
-	  val.clear ();
+	  val = 0;
 	  val(vertex) = 1;
 	  
 	  std::vector<Tensor<2,2> > derivs(4);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -456,7 +456,7 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 
   std::vector<unsigned int> index_multiplicity(dof2.n_dofs(),0);
   std::vector<unsigned int> dofs (dofs_per_cell2);
-  u2.clear ();
+  u2 = 0;
 
   for (; cell1!=endc1, cell2!=endc2; ++cell1, ++cell2) 
     {

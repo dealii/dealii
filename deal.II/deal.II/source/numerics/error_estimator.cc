@@ -297,7 +297,7 @@ estimate (const Mapping<1>                    &mapping,
               else
                                                  // fill with zeroes.
                 for (unsigned int s=0; s<n_solution_vectors; ++s)
-                  grad_neighbor[s].clear ();
+                  grad_neighbor[s] = 0;
 
                                              // if there is a
                                              // coefficient, then

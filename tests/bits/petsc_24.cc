@@ -12,7 +12,9 @@
 //----------------------------  petsc_24.cc  ---------------------------
 
 
-// check PETScWrappers::Vector::clear()
+// this test used to check for PETScWrappers::Vector::clear(). However, this
+// function has since been removed, so we test for v=0 instead, although that
+// may be covered by one of the other tests
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    
@@ -32,7 +34,7 @@ void test (PETScWrappers::Vector &v)
                                    // then clear it again and make sure the
                                    // vector is really empty
   const unsigned int sz = v.size();
-  v.clear ();
+  v = 0;
   Assert (v.size() == sz, ExcInternalError());
   Assert (v.l2_norm() == 0, ExcInternalError());
 

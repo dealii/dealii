@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -1623,7 +1623,7 @@ namespace LaplaceSolver
       endc = this->dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-	cell_rhs.clear ();
+	cell_rhs = 0;
 	fe_values.reinit (cell);
 	rhs_function->value_list (fe_values.get_quadrature_points(),
 				  rhs_values);

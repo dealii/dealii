@@ -209,16 +209,6 @@ class Vector
                                       */
     void compress () const;
 
-    				     /**
-				      * Set all entries to zero. Equivalent to
-				      * <tt>v = 0</tt>, but more obvious and
-				      * faster.  Note that this function does
-				      * not change the size of the vector,
-				      * unlike the STL's <tt>vector<>::clear</tt>
-				      * function.
-				      */
-    void clear ();    
-
 				     /**
 				      * Change the dimension of the vector to
 				      * @p N. The reserved memory for this
@@ -818,17 +808,7 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast)
     };
   dim = n;
   if (fast == false)
-    clear ();
-}
-
-
-
-template <typename Number>
-inline
-void Vector<Number>::clear ()
-{
-  if (dim>0)
-    std::fill (begin(), end(), 0.);
+    *this = 0;
 }
 
 
