@@ -540,6 +540,8 @@ template <>
 void GridGenerator::hyper_ball<> (Triangulation<3> &tria,
 				  const Point<3> &p,
 				  const double radius) {
+  Assert(false, ExcNotImplemented());
+  
   const double a = 1./(1+sqrt(3)); // equilibrate cell sizes at transition
 				   // from the inner part to the radial
 				   // cells
@@ -578,7 +580,7 @@ void GridGenerator::hyper_ball<> (Triangulation<3> &tria,
 					 {8, 0, 3, 11, 12, 4, 7, 15},
 					 {11, 10,14, 15, 3, 2, 6, 7},
 					 {8, 9, 13, 12, 0, 1, 5, 4}};
-
+  
   std::vector<CellData<3> > cells (n_cells, CellData<3>());
   
   for (unsigned int i=0; i<n_cells; ++i) 
