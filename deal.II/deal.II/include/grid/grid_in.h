@@ -20,7 +20,11 @@
 #include <vector>
 #include <string>
 
+template <int dim> class Point;
 template <int dim> class Triangulation;
+template <int dim> class CellData;
+class SubCellData;
+
 
 /**
  * This class implements an input mechanism for grid data. It allows
