@@ -51,6 +51,8 @@
 // the function needs to be static because of another icc bug, though.
 // work around this by packing everything into a namespace of its own
 // and have the anonymous namespace inside
+//
+// this is now intel icc issue 216082
 namespace FE_Q_Helper
 {
   namespace
