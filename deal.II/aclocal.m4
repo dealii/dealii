@@ -435,7 +435,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl flags
 	  case "$target" in
 	    *86*)
-		CXXFLAGSO="$CXXFLAGSO -tpp6 -axiMK"
+		CXXFLAGSO="$CXXFLAGSO -tpp6"
 		;;
 	  esac
           ;;
