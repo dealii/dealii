@@ -297,12 +297,10 @@ class SparseMatrixEZ : public Subscriptor
     SparseMatrixEZ ();
 
 				     /**
-				      * Copy constructor. This constructor is
-				      * only allowed to be called if the matrix
-				      * to be copied is empty. This is for the
-				      * same reason as for the
-				      * @p{SparsityPattern}, see there for the
-				      * details.
+				      * Dummy copy constructor. This
+				      * is here for use in
+				      * containers. It may only be
+				      * called for empty objects.
 				      *
 				      * If you really want to copy a whole
 				      * matrix, you can do so by using the
@@ -333,7 +331,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * release the memory of the sparsity
 				      * structure.
 				      */
-    virtual ~SparseMatrixEZ ();
+    ~SparseMatrixEZ ();
 
 				     /** 
 				      * Pseudo operator only copying
@@ -355,10 +353,10 @@ class SparseMatrixEZ : public Subscriptor
 				      * efficient assembling of the
 				      * matrix.
 				      */
-    virtual void reinit (unsigned int n_rows,
-			 unsigned int n_columns = n_rows,
-			 unsigned int default_row_length = Entry::invalid,
-			 unsigned int default_increment = Entry::invalid);
+    void reinit (unsigned int n_rows,
+		 unsigned int n_columns = n_rows,
+		 unsigned int default_row_length = Entry::invalid,
+		 unsigned int default_increment = Entry::invalid);
 
 				     /**
 				      * Release all memory and return
@@ -368,7 +366,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * the sparsity pattern it was
 				      * previously tied to.
 				      */
-    virtual void clear ();
+    void clear ();
     
 				     /**
 				      * Return whether the object is
