@@ -73,8 +73,10 @@ class FullMatrix : public Subscriptor
 				      * conversion of integers and other types
 				      * to a matrix, this constructor is
 				      * declared #explicit#.
+				      *
+				      * By default, no memory is allocated.
 				      */
-    explicit FullMatrix (const unsigned int n = 1);
+    explicit FullMatrix (const unsigned int n = 0);
     
 				     /**
 				      * Constructor. Initialize the matrix as
@@ -166,6 +168,8 @@ class FullMatrix : public Subscriptor
 				      * Set dimension to $m(B)\times n(B)$ and
 				      * allocate memory if necessary. Forget
 				      * the previous content of the matrix.
+				      * However, this function does not copy
+				      * the contents of #B#.
 				      */
     template<typename number2>
     void reinit (const FullMatrix<number2> &B);
@@ -550,6 +554,10 @@ class FullMatrix : public Subscriptor
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcEmptyMatrix);
+				     /**
+				      * Exception
+				      */
     DeclException2 (ExcInvalidIndex,
 		    int, int,
 		    << "The given index " << arg1
@@ -623,14 +631,6 @@ class FullMatrix : public Subscriptor
 				      * #dim_range * dim_image#.
 				      */
     unsigned int val_size;
-    
-				     /**
-				      * Initialization. Initialize
-				      * memory for a #FullMatrix#
-				      * of #m# rows and #n#
-				      * columns to zero.
-				      */
-    void init (const unsigned int m, const unsigned int n);
     
 				     /**
 				      * Return a read-write reference to the
