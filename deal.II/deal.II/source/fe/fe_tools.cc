@@ -51,24 +51,10 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 				   // fe2 element.
   const typename std::vector<Point<dim> > &
     fe2_support_points = fe2.get_unit_support_points ();
-  Quadrature<dim> fe2_support_points_quadrature(fe2_support_points);
 
-				   // This is a bad workaround as we
-				   // can't ask the FEs for their
-				   // shape values any more.
-// TODO:[RH,GK] do this better. don't create a triangulation and dofhandler here!
-// maybe we can get it work by passing an end_iterator or something to the
-// FEValues::reinit function?
-// (if we have the second FEValues::reinit function, we at least no more need the DoFHandler object)  
-  Triangulation<dim> tria;
-  DoFHandler<dim> dof_handler(tria);
-  GridGenerator::hyper_cube(tria);
-  dof_handler.distribute_dofs(fe1);
-  MappingQ1<dim> mapping_q1;
-  FEValues<dim> fe_values(mapping_q1, fe1, fe2_support_points_quadrature,
-			  update_values);
-  fe_values.reinit(dof_handler.begin_active());
-  
+  Assert(fe2_support_points.size()==fe2.dofs_per_cell,
+	 typename FiniteElementBase<dim>::ExcFEHasNoSupportPoints());
+
   for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)	
     {
       const unsigned int i1 = fe2.system_to_component_index(i).first;
@@ -76,7 +62,7 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 	{
 	  const unsigned int j1 = fe1.system_to_component_index(j).first;
 	  if (i1==j1)
-	    interpolation_matrix(i,j) = fe_values.shape_value (j,i);
+	    interpolation_matrix(i,j) = fe1.shape_value (j,fe2_support_points[i]);
 	  else
 	    interpolation_matrix(i,j)=0.;
 	}  
