@@ -2245,10 +2245,10 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
 
 
 // explicit instantiations
-#if deal_II_dimension > 1
 template void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 				      SparsityPattern    &sparsity);
+#if deal_II_dimension > 1
 template void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 				      SparsityPattern    &,
