@@ -58,9 +58,10 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 				   // This is a bad workaround as we
 				   // can't ask the FEs for their
 				   // shape values any more.
-// TODO: do this better. don't create a triangulation and dofhandler here!
+// TODO:[RH,GK] do this better. don't create a triangulation and dofhandler here!
 // maybe we can get it work by passing an end_iterator or something to the
-// FEValues::reinit function?  
+// FEValues::reinit function?
+// (if we have the second FEValues::reinit function, we at least no more need the DoFHandler object)  
   Triangulation<dim> tria;
   DoFHandler<dim> dof_handler(tria);
   GridGenerator::hyper_cube(tria);

@@ -297,7 +297,7 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				   // update_boundary_forms is simply
 				   // ignored for the interior of a
 				   // cell.
-//TODO: Consider giving this function information on whether we are on
+//TODO:[RH,GK] Consider giving this function information on whether we are on
 //  a face.
   if (out & (update_JxW_values
 	    |update_normal_vectors))
@@ -575,8 +575,8 @@ MappingQ1<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
   const std::vector<double> &weights=q.get_weights();
 
 				   // Multiply quadrature weights
-                                  // by Jaconian determinants
- //TODO: compute Jacobi determinants directly, if co/contravariant is not needed
+                                  // by Jacobian determinants
+//TODO:[?] compute Jacobi determinants directly, if co/contravariant is not needed
   if (update_flags & update_JxW_values)
     {      
       Assert (JxW_values.size() == npts,

@@ -97,7 +97,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 				       // cell
       prolongation_sparsities.back().reinit (mg_dof.n_dofs(level+1),
 					     mg_dof.n_dofs(level),
-//TODO: evil hack, must be corrected!
+//TODO:[WB,GK] evil hack, must be corrected!
 					     dofs_per_cell+1);
       
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);

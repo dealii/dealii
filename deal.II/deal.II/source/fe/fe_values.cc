@@ -32,7 +32,7 @@ using namespace std;
 #endif
 
 
-// TODO: replace this by non-global object
+// TODO:[RH,GK] replace this by non-global object
 static const MappingQ1<deal_II_dimension> mapping_q1;
 
 template <int dim>
@@ -410,7 +410,7 @@ template <int dim>
 unsigned int
 FEValuesBase<dim>::memory_consumption () const
 {
-//TODO: check whether this is up to date  
+//TODO:[WB] check whether this is up to date  
   return (MemoryConsumption::memory_consumption (shape_values) +
 	  MemoryConsumption::memory_consumption (shape_gradients) +
 	  MemoryConsumption::memory_consumption (shape_2nd_derivatives) +
@@ -425,7 +425,7 @@ FEValuesBase<dim>::memory_consumption () const
 /*------------------------------- FEValues -------------------------------*/
 
 
-// TODO: unify the two constructor bodies by calling a single function that does all the work
+// TODO:[GK,WB] unify the two constructor bodies by calling a single function that does all the work
 template <int dim>
 FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 			 const FiniteElement<dim> &fe,
@@ -550,7 +550,7 @@ template <int dim>
 unsigned int
 FEValues<dim>::memory_consumption () const
 {
-//TODO: check whether this is up to date  
+//TODO:[WB] check whether this is up to date  
   return FEValuesBase<dim>::memory_consumption ();
 };
 
@@ -602,7 +602,7 @@ FEFaceValuesBase<dim>::get_boundary_forms () const
 /*------------------------------- FEFaceValues -------------------------------*/
 
 
-// TODO: unify the two constructor bodies by calling a single function that does all the work
+// TODO:[GK,WB] unify the two constructor bodies by calling a single function that does all the work
 template <int dim>
 FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 				 const FiniteElement<dim> &fe,
@@ -717,8 +717,8 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 /*------------------------------- FESubFaceValues -------------------------------*/
 
 
-// TODO: unify the two constructor bodies by calling a single function that does all the work
-// TODO: FESubfaceValues constructors are exactly the same as FEFaceValues constructors with exception of calling fe_sub_face_data instead of fe_face_data. Merge!
+// TODO:[GK,WB] unify the two constructor bodies by calling a single function that does all the work
+// TODO:[GK,WB] FESubfaceValues constructors are exactly the same as FEFaceValues constructors with exception of calling fe_sub_face_data instead of fe_face_data. Merge!
 template <int dim>
 FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 				       const FiniteElement<dim> &fe,
@@ -817,7 +817,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
   Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
 	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
 
-//TODO: Reinsert this assertion? It tests a necessary, not a sufficient condition
+//TODO:[GK] Reinsert this assertion? It tests a necessary, not a sufficient condition
   //  Assert (cell->face(face_no)->at_boundary() == false,
   //	  ExcReinitCalledWithBoundaryFace());
   

@@ -137,7 +137,7 @@ class MGDoFDimensionInfo<3>
  *
  * At present, multilevel algorithms are not fully functional, so this
  * documentation is still very brief.
-//TODO: Extend MGDoFHandler doc 
+//TODO:[WB] Extend MGDoFHandler doc 
  *
  * @author Wolfgang Bangerth, 1998, 1999
  */

@@ -23,7 +23,7 @@ template <int dim> class MappingQ;
 
 /**
  * Tensor product elements based on equidistant support points.
-//TODO: Document node numbering etc. copy from old documentation 
+//TODO:[RH,GK] Document node numbering etc. copy from old documentation 
  */
 template <int dim>
 class FE_Q : public FiniteElement<dim>
@@ -40,7 +40,7 @@ class FE_Q : public FiniteElement<dim>
 				      */
     ~FE_Q ();
 
-//TODO: make get_renumber private or move it some other place    
+//TODO:[RH] make get_renumber private or move it some other place    
 				     /**
 				      * Read-only access to the
 				      * renumber vector.

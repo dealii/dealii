@@ -23,7 +23,7 @@
 #include <lac/sparse_matrix.h>
 
 
-//TODO: This function needs to be specially implemented, since in 2d mode we use faces
+//TODO:[?] This function needs to be specially implemented, since in 2d mode we use faces
 #if deal_II_dimension == 1
 
 template <int dim>
@@ -84,7 +84,7 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
       const MGDoFHandler<dim>::active_cell_iterator
 	level_end  = mg_dof_handler->end_active(level);
 
-//TODO: Treat hanging nodes properly
+//TODO:[?] Treat hanging nodes properly
 // The single-level vector is not an FE-function, because the values at
 // hanging nodes are set to zero. This should be treated before the restriction.
 

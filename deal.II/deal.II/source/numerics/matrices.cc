@@ -40,12 +40,12 @@ using namespace std;
 
 
 
-//TODO: Comment?? Use proper mapping!
+//TODO:[RH,GK] Replace global by local object; better: have two functions, or by default arg
 static const MappingQ1<deal_II_dimension> mapping_q1;
 
 
 
-//TODO: re-create the create_mass_matrix function with 2 args
+//TODO:[RH,GK] maybe re-create the create_mass_matrix function with 2 args
 
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
@@ -577,7 +577,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 
 
 
-//TODO: recreate this function
+//TODO:[GK,RH] maybe recreate this function
 /*
 
 template <int dim>

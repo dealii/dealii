@@ -450,8 +450,8 @@ class VectorTools
 					     std::map<unsigned int,double> &boundary_values,
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
 
-//TODO: Update project_boundary_values for more components
-//TODO: Replace FunctionMap
+//TODO:[WB] Update project_boundary_values for more components
+//TODO:[WB] Replace FunctionMap
 				     /**
 				      * Project @p{function} to the boundary
 				      * of the domain, using the given quadrature
@@ -573,7 +573,7 @@ class VectorTools
 				      * be computed and later
 				      * subtracted.
 				      */
-// TODO: Implementation of subtract_mean_value is missing.    
+//TODO:[GK] Implementation of subtract_mean_value is missing.    
     static void subtract_mean_value(Vector<double>          &v,
 				    const std::vector<bool> &p_select);
     

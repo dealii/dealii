@@ -23,11 +23,11 @@ class LagrangeEquidistant;
 
 
 
-//TODO: (later) doc: laplace_on_quad_vector, compute_laplace_on_quad, etc all
+//TODO:[RH] (later) doc: laplace_on_quad_vector, compute_laplace_on_quad, etc all
 //      see upcoming paper.
 
 
-//TODO: more docs
+//TODO:[RH,GK] more docs
 /**
  * Mapping class that uses Qp-mappings on boundary cells. The mapping
  * shape functions make use of tensor product polynomials with
@@ -402,7 +402,7 @@ class MappingQ : public MappingQ1<dim>
 				      * Needed by the
 				      * @p{compute_support_points_simple}
 				      */
-//TODO: (later) remove this function altogether?    
+//TODO:[RH] (later) remove this function altogether?    
     void fill_quad_support_points_simple (const Triangulation<dim>::cell_iterator &cell,
 					  std::vector<Point<dim> > &a) const;
     

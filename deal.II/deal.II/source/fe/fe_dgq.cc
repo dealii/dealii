@@ -345,7 +345,7 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 		      }
 		break;
 	  default:
-//TODO: direction='y' is default, but is not implemented?!		
+//TODO:[GK] direction='y' is default, but is not implemented?!		
 		Assert (false, ExcNotImplemented ());
 	}
     }

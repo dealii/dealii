@@ -39,7 +39,7 @@ using namespace std;
 
 
 
-//TODO: Comment?? Proper Mapping
+//TODO:[RH,GK] Replace global by local object; better: have two functions, or by default arg
 static const MappingQ1<deal_II_dimension> mapping;
 
 

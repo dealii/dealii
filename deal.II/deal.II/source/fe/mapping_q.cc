@@ -700,7 +700,7 @@ MappingQ<dim>::compute_mapping_support_points(
   if (use_mapping_q_on_all_cells || cell->has_boundary_lines())
     compute_support_points_laplace(cell, a);
 //  compute_support_points_simple(cell, a);
-//TODO: (later) can we delete the previous line?  
+//TODO:[RH] (later) can we delete the previous line?  
 				   // keep last line for easy
 				   // switching between the two
 				   // possible cases of computing the
@@ -761,7 +761,7 @@ MappingQ<dim>::compute_support_points_laplace(const typename Triangulation<dim>:
 
 
 
-//TODO: (later) remove the following function altogether
+//TODO:[RH] (later) remove the following function altogether
 template <int dim>
 void
 MappingQ<dim>::compute_support_points_simple(const typename Triangulation<dim>::cell_iterator &cell,

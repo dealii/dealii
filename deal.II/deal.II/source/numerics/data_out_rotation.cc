@@ -23,7 +23,7 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 
-//TODO: Do this more clever
+//TODO:[RH,GK] Replace global by local object; better: have two functions, or by default arg
 static const MappingQ1<deal_II_dimension> mapping;
 
 #ifdef DEAL_II_USE_MT

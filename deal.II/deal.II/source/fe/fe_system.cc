@@ -27,7 +27,7 @@
 using namespace std;
 #endif
 
-//TODO: Remove obsolete data->compute_second_derivatives
+
 
 /* ----------------------- FESystem::InternalData ------------------- */
 
@@ -230,7 +230,6 @@ FESystem<dim>::clone() const
 }
 
 
-//TODO: remove update_second_derivatives from base elements
 
 template <int dim>
 UpdateFlags

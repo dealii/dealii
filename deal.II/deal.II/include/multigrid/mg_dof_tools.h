@@ -14,7 +14,7 @@
 #define __deal2__mg_dof_tools_h
 
 
-//TODO: Consider incorporating these functions in DoFTools
+//TODO:[?] Consider incorporating these functions in DoFTools (why?)
 
 /**
  * This is a collection of functions operating on, and manipulating

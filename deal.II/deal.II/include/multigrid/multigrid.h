@@ -62,7 +62,7 @@ class Multigrid : public MGBase
 				      * therefore create objects of
 				      * this type as late as possible.
 				      */
-//TODO: minlevel, maxlevel?
+//TODO:[GK] meaning of minlevel, maxlevel?
     Multigrid(const MGDoFHandler<dim>                       &mg_dof_handler,
 	      const ConstraintMatrix                        &constraints,
 	      const MGLevelObject<SparsityPattern>       &level_sparsities,
@@ -97,9 +97,9 @@ class Multigrid : public MGBase
 
 				     /**
 				      * Negative @p{vmult} on a level.
-//TODO: what does this function do?				      
-* @see MGBase.
-*/
+				      * @see MGBase.
+				      */
+//TODO:[GK] what does this function do?    
     virtual void level_vmult (const unsigned int    level,
 			      Vector<double>       &dest,
 			      const Vector<double> &src,

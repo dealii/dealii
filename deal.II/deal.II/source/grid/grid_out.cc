@@ -239,7 +239,6 @@ void GridOut::write_gnuplot (const Triangulation<1> &tria,
     {
       if (gnuplot_flags.write_cell_numbers)
 	out << "# cell " << cell << std::endl;
-//TODO: plot level and material according to switches      
 
       out << cell->vertex(0)
 	  << ' ' << cell->level()
@@ -290,7 +289,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
     {
       if (gnuplot_flags.write_cell_numbers)
 	out << "# cell " << cell << std::endl;
-//TODO: plot level and material according to switches      
+
       switch (dim)
 	{
 	  case 1:
@@ -396,7 +395,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 	   
 	  case 3:
 	  {
-//TODO: curved boundaries in 3d gnuplot not supported	    
+//TODO:[RH] curved boundaries in 3d gnuplot not supported	    
 	    Assert (mapping == 0, ExcNotImplemented());
 	    
 					     // front face
@@ -650,7 +649,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
       {
 					 // curved boundary output
 					 // presently not supported
-//TODO: curved boundaries in eps for 3d	
+//TODO:[RH] curved boundaries in eps for 3d	
 	Assert (mapping == 0, ExcNotImplemented());
 	
 	Triangulation<dim>::active_line_iterator line   =tria.begin_active_line ();

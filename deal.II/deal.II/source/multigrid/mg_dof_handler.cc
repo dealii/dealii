@@ -1564,7 +1564,7 @@ void MGDoFHandler<1>::reserve_space () {
 				   // now allocate the needed space
   for (unsigned int vertex=0; vertex<tria->vertices.size(); ++vertex)
     {
-//TODO: These conditions are violated on unused vertices
+//TODO:[WB,GK] These conditions are violated on unused vertices
       Assert (min_level[vertex] < tria->n_levels(),   ExcInternalError());
       Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
@@ -1655,7 +1655,7 @@ void MGDoFHandler<2>::reserve_space () {
 // now allocate the needed space
   for (unsigned int vertex=0; vertex<tria->vertices.size(); ++vertex)
     {
-//TODO: These conditions are violated on unused vertices
+//TODO:[WB,GK] These conditions are violated on unused vertices
       Assert (min_level[vertex] < tria->n_levels(),   ExcInternalError());
       Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
@@ -1749,7 +1749,7 @@ void MGDoFHandler<3>::reserve_space () {
 				   // now allocate the needed space
   for (unsigned int vertex=0; vertex<tria->vertices.size(); ++vertex)
     {
-//TODO: These conditions are violated on unused vertices
+//TODO:[WB,GK] These conditions are violated on unused vertices
       Assert (min_level[vertex] < tria->n_levels(),   ExcInternalError());
       Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 

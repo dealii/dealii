@@ -22,7 +22,7 @@ template <int dim> class MappingQ;
 
 /**
  * Discontinuous tensor product elements based on equidistant support points.
-//TODO: Document node numbering etc. copy from old documentation 
+//TODO:[GK,RH] Document node numbering etc. copy from old documentation 
  */
 template <int dim>
 class FE_DGQ : public FiniteElement<dim>
@@ -196,7 +196,7 @@ class FE_DGQ : public FiniteElement<dim>
 				     /**
 				      * Compute renumbering for rotation
 				      * of degrees of freedom.
-//TODO: meaning of direction=[zZxXyY]				      
+//TODO:[GK] meaning of direction=[zZxXyY]				      
 				      */
     void rotate_indices (std::vector<unsigned int> &indices,
 			 const char                 direction = 'y') const;
@@ -254,7 +254,7 @@ class FE_DGQ : public FiniteElement<dim>
 					  * entries in lower dimensions
 					  * are missing.
 					  */
-//TODO: what good is this, the base class already has it and it seems never to be used!?
+//TODO:[GK] what good is this, the base class already has it and it seems never to be used!?
 	std::vector<FEValues<dim>*> differences;
     };
     
