@@ -46,10 +46,18 @@ namespace PETScWrappers
 
                                        // get a representation of the present
                                        // row
-      int                ncols;
+      int ncols;
+
+#if (PETSC_VERSION_MAJOR <= 2) && \
+    ((PETSC_VERSION_MINOR < 2) ||  \
+     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+      int         *colnums;
+      PetscScalar *values;
+#else
       const int         *colnums;
       const PetscScalar *values;
-
+#endif
+      
       int ierr;
       ierr = MatGetRow(*matrix, this->a_row, &ncols, &colnums, &values);
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
