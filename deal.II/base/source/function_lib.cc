@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -117,6 +117,7 @@ namespace Functions
   Q1WedgeFunction<dim>::value (const Point<dim>   &p,
 			       const unsigned int) const
   {
+    Assert (dim>=2, ExcInternalError());
     return p(0)*p(1);
   }
   
@@ -128,6 +129,7 @@ namespace Functions
 				    std::vector<double>            &values,
 				    const unsigned int) const
   {
+    Assert (dim>=2, ExcInternalError());
     Assert (values.size() == points.size(),
 	    ExcDimensionMismatch(values.size(), points.size()));
     
@@ -144,6 +146,7 @@ namespace Functions
   Q1WedgeFunction<dim>::laplacian (const Point<dim>   &,
 				   const unsigned int) const
   {
+    Assert (dim>=2, ExcInternalError());
     return 0.;
   }
   
@@ -154,6 +157,7 @@ namespace Functions
 					std::vector<double>            &values,
 					const unsigned int) const
   {
+    Assert (dim>=2, ExcInternalError());
     Assert (values.size() == points.size(),
 	    ExcDimensionMismatch(values.size(), points.size()));
     
@@ -168,6 +172,7 @@ namespace Functions
   Q1WedgeFunction<dim>::gradient (const Point<dim>   &p,
 				  const unsigned int) const
   {
+    Assert (dim>=2, ExcInternalError());
     Tensor<1,dim> erg;
     erg[0] = p(1);
     erg[1] = p(0);
@@ -182,6 +187,7 @@ namespace Functions
 				       std::vector<Tensor<1,dim> >    &gradients,
 				       const unsigned int) const
   {
+    Assert (dim>=2, ExcInternalError());
     Assert (gradients.size() == points.size(),
 	    ExcDimensionMismatch(gradients.size(), points.size()));
     
