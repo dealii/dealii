@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -794,7 +794,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 [
   case "$F77_VERSION" in
-    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.[[01234]])
+    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.[[012345]])
         F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
         F77FLAGSO="$FFLAGS -O2"
   
