@@ -1426,7 +1426,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 
 					 // find the column where the
 					 // representant is mentioned
-	map<unsigned int,float>::const_iterator i = weights[parameter_dof].begin();
+	std::map<unsigned int,float>::const_iterator i = weights[parameter_dof].begin();
 	for (; i!=weights[parameter_dof].end(); ++i)
 	  if (i->second == 1)
 	    break;
