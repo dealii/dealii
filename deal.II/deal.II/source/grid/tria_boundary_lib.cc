@@ -478,11 +478,11 @@ get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &face
 				   // at x==0, since then it belongs
 				   // to the plane part of the
 				   // boundary
-  const Point<dim> quad_center = quad->center();
+  const Point<dim> quad_center = face->center();
   if (quad_center(0) == center(0))
     StraightBoundary<dim>::get_tangents_at_vertices (face, face_vertex_tangents);
   else
-    HyperBallBoundary<dim>::get_intermediate_points_on_quad (face, face_vertex_tangents);
+    HyperBallBoundary<dim>::get_tangents_at_vertices (face, face_vertex_tangents);
 };
 
 
