@@ -5,13 +5,23 @@
     <link href="../../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
     <link href="../../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
     <title>The deal.II news page</title>
-    <meta name="author" content="Guido Kanschat">
+    <meta name="author" content="Wolfgang Bangerth, Guido Kanschat, and others">
     <meta name="keywords" content="deal.II"></head>
 
 <body>
 <h2>Changes after Version 3.0</h2>
 <h3>General</h3>
 <ol>
+  <li> <p>
+       New: the <code class="program">configure</code> script now
+       checks whether the <code>getrusage</code> function is properly
+       declared (this function is used in the timer class). The
+       problem is that on SunOS 4.x, this function exists, but is not
+       declared in the right file (although it is listed in the man
+       pages). We then have to declare it ourselves.
+       <br>
+       (WB 2000/06/14)
+       </p>
 
   <li> <p>
        New: the <code class="program">configure</code> script now
@@ -19,7 +29,7 @@
        compiling in debug mode. This should force us to write more
        standard compliant code. (Since the ACE library is not
        standards conforming, the <code>-ansi</code> flag is not used
-       when multithreadinf is required.)
+       when multithreading is required.)
        <br>
        (WB 2000/06/14)
        </p>
