@@ -448,7 +448,8 @@ sub processClass
 	elsif ( /^[^\(]*$/ && /^(?:[\w_\:\s]+(?:<(?:(?:[-\w,_\s]|<(?:[-\w,+\s])+>)+)>)?(?:::)?)[\&\s*]+[\w_]+\s*(\[[^\]]*\])*\s*;\s*(\/\/.*)?$/ )
 	    #       1               2                                                            3      4           5                 6
 	    # 1: variable declarations have no ()
-	    # 2: data type, possibly several words as in 'unsigned int'
+	    # 2: data type, possibly several words as in 'unsigned int' and
+	    #    maybe containing templates <...> and ::
 	    # 3: reference pointer or at least a space before variable name
 	    # 4: variable name
 	    # 5: array declaration
