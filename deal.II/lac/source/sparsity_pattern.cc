@@ -534,7 +534,7 @@ SparsityPattern::print_gnuplot (ostream &out) const
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
       if (colnums[j] != invalid_entry)
-	out << i << " " << -colnums[j] << endl;
+	out << i << " " << -static_cast<unsigned int>(colnums[j]) << endl;
 
   AssertThrow (out, ExcIO());
 }
