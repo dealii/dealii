@@ -20,16 +20,18 @@
 #include <grid/tria.h>
 
 
+namespace internal
+{
 /**
  * Class declaring some dimension dependent numbers which are needed
  * for the grid reordering class.
  *
  * @author Wolfgang Bangerth, 2000
  */
-template <int dim>
-class GridReorderingInfo
-{
-};
+  template <int dim>
+  class GridReorderingInfo
+  {
+  };
 
 
 /**
@@ -39,29 +41,29 @@ class GridReorderingInfo
  *
  * @author Wolfgang Bangerth, 2000
  */
-template <>
-class GridReorderingInfo<2>
-{
-  public:
-				     /**
-				      * Number of possible valid
-				      * orientations of a cell. They
-				      * are the state in which it was
-				      * delivered and three possible
-				      * rotations in counter-clockwise
-				      * sense, thus a total of four.
-				      */
-    static const unsigned int rotational_states_of_cells = 4;
+  template <>
+  class GridReorderingInfo<2>
+  {
+    public:
+				       /**
+					* Number of possible valid
+					* orientations of a cell. They
+					* are the state in which it was
+					* delivered and three possible
+					* rotations in counter-clockwise
+					* sense, thus a total of four.
+					*/
+      static const unsigned int rotational_states_of_cells = 4;
 
-				     /**
-				      * Number of possible
-				      * orientations of a face in
-				      * 2d. It is the face and the
-				      * face with vertices exchanged,
-				      * thus two.
-				      */
-    static const unsigned int rotational_states_of_faces = 2;
-};
+				       /**
+					* Number of possible
+					* orientations of a face in
+					* 2d. It is the face and the
+					* face with vertices exchanged,
+					* thus two.
+					*/
+      static const unsigned int rotational_states_of_faces = 2;
+  };
 
 
 
@@ -72,39 +74,40 @@ class GridReorderingInfo<2>
  *
  * @author Wolfgang Bangerth, 2000
  */
-template <>
-class GridReorderingInfo<3>
-{
-  public:
-				     /**
-				      * Number of possible
-				      * orientations of a cell in 3d,
-				      * i.e. in how many ways can we
-				      * arrange the eight vertices of
-				      * a cube such that the numbering
-				      * conventions of deal.II are
-				      * satisfied. Since we can put
-				      * the cube on each of its six
-				      * faces and rotate it into four
-				      * ways on each of these faces,
-				      * the total number is 24.
-				      */
-    static const unsigned int rotational_states_of_cells = 24;
+  template <>
+  class GridReorderingInfo<3>
+  {
+    public:
+				       /**
+					* Number of possible
+					* orientations of a cell in 3d,
+					* i.e. in how many ways can we
+					* arrange the eight vertices of
+					* a cube such that the numbering
+					* conventions of deal.II are
+					* satisfied. Since we can put
+					* the cube on each of its six
+					* faces and rotate it into four
+					* ways on each of these faces,
+					* the total number is 24.
+					*/
+      static const unsigned int rotational_states_of_cells = 24;
 
-				     /**
-				      * Number of possible
-				      * orientations of a face in
-				      * 2d. It is the quadrilateral
-				      * rotated in all four
-				      * orientations, and also viewed
-				      * from the back, i.e. vertices
-				      * not numbered in
-				      * counter-clockwise sense but in
-				      * the other direction.
-				      */
-    static const unsigned int rotational_states_of_faces = 8;
-};
-
+				       /**
+					* Number of possible
+					* orientations of a face in
+					* 2d. It is the quadrilateral
+					* rotated in all four
+					* orientations, and also viewed
+					* from the back, i.e. vertices
+					* not numbered in
+					* counter-clockwise sense but in
+					* the other direction.
+					*/
+      static const unsigned int rotational_states_of_faces = 8;
+  };
+ 
+}
 
   
 
@@ -517,7 +520,7 @@ class GridReorderingInfo<3>
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim>
-class GridReordering : private GridReorderingInfo<dim>
+class GridReordering
 {
   public:
 				     /**
@@ -615,7 +618,7 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * cell.
 					  */
 	typename std::map<Face,FaceData>::iterator
-	faces[GridReorderingInfo<dim>::rotational_states_of_cells][GeometryInfo<dim>::faces_per_cell];
+	faces[internal::GridReorderingInfo<dim>::rotational_states_of_cells][GeometryInfo<dim>::faces_per_cell];
 
 					 /**
 					  * Cell indices of the
@@ -827,7 +830,7 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * algorithm.
 					  */
 	typename std::map<Face,FaceData >::const_iterator
-	reverse_faces[GridReorderingInfo<dim>::rotational_states_of_faces-1];
+	reverse_faces[internal::GridReorderingInfo<dim>::rotational_states_of_faces-1];
 
 					 /**
 					  * Indices of the one or two
