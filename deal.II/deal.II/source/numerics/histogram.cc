@@ -96,7 +96,12 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
 	    Assert (false, ExcInternalError());
     };
   
-  Assert (max_value > min_value, ExcInvalidData());
+  Assert (max_value >= min_value, ExcInvalidData());
+
+				   // move right bound arbitrarily if
+				   // necessary
+  if (max_value == min_value)
+    max_value = min_value+1;
   
 
 
