@@ -278,7 +278,8 @@ class KellyErrorEstimator
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
-			  unsigned int             n_threads = multithread_info.n_default_threads);
+			  const unsigned int       n_threads = multithread_info.n_default_threads);
+    
 				     /**
 				      * Same function as above, but
 				      * accepts more than one solution
@@ -314,7 +315,7 @@ class KellyErrorEstimator
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
-			  unsigned int                 n_threads = multithread_info.n_default_threads);
+			  const unsigned int           n_threads = multithread_info.n_default_threads);
 
 				     /**
 				      * Calls the @p{estimate}
@@ -328,7 +329,7 @@ class KellyErrorEstimator
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
-			  unsigned int                 n_threads = multithread_info.n_default_threads);
+			  const unsigned int           n_threads = multithread_info.n_default_threads);
 
     
 				     /**

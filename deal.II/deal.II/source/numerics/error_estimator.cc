@@ -65,6 +65,8 @@ KellyErrorEstimator<1>::Data::Data(const Mapping<1>                    &,
 		quadrature(* static_cast <const Quadrature<0> *> (0)),
 		neumann_bc(* static_cast <const FunctionMap<1>::type *> (0)),
 		solutions(* static_cast <const std::vector<const Vector<double>*> *> (0)),
+		n_threads (0),
+		n_solution_vectors (0),
 		face_integrals (* static_cast<FaceIntegrals*> (0))
 {
   Assert (false, ExcInternalError());
@@ -157,7 +159,7 @@ void KellyErrorEstimator<dim>::estimate (const Mapping<dim>      &mapping,
 					 Vector<float>           &error,
 					 const std::vector<bool> &component_mask,
 					 const Function<dim>     *coefficients,
-					 unsigned int             n_threads)
+					 const unsigned int       n_threads)
 {
 				   // just pass on to the other function
   const std::vector<const Vector<double>*> solutions (1, &solution);
@@ -175,7 +177,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
 					 Vector<float>           &error,
 					 const std::vector<bool> &component_mask,
 					 const Function<dim>     *coefficients,
-					 unsigned int             n_threads)
+					 const unsigned int       n_threads)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
@@ -679,7 +681,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
 					 std::vector<Vector<float>*>              &errors,
 					 const std::vector<bool>                  &component_mask,
 					 const Function<dim>                 *coefficients,
-					 unsigned int                         n_threads)
+					 const unsigned int                   n_threads)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));  
   static const MappingQ1<dim> mapping;
