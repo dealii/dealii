@@ -216,6 +216,7 @@ namespace PETScWrappers
       typedef PetscScalar               value_type;
       typedef size_t                    size_type;
       typedef internal::VectorReference reference;
+      typedef const internal::VectorReference const_reference;
 
                                        /**
                                         * Default constructor. It doesn't do

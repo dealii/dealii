@@ -671,7 +671,7 @@ class BlockVectorBase
     typedef internal::BlockVectorIterators::Iterator<BlockVectorBase,false> iterator;
     typedef internal::BlockVectorIterators::Iterator<BlockVectorBase,true>  const_iterator;
     typedef typename BlockType::reference       reference;
-    typedef const typename BlockType::reference const_reference;
+    typedef typename BlockType::const_reference const_reference;
 
     typedef std::size_t                     size_type;
 
