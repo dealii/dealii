@@ -72,7 +72,7 @@ template <typename number> class Vector;
  * corresponding ``.templates.h'' file and instantiate the respective
  * class yourself.
  *
- * @author Ralf Hartmann, 1999
+ * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<typename number, typename inverse_type = number>
 class PreconditionBlock
@@ -246,6 +246,8 @@ class PreconditionBlock
 
 /**
  * Block Jacobi preconditioning.
+ * See @ref{PreconditionBlock} for requirements on the matrix.
+ * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<typename number, typename inverse_type = number>
 class PreconditionBlockJacobi : public Subscriptor,
@@ -303,6 +305,9 @@ class PreconditionBlockJacobi : public Subscriptor,
  * The diagonal blocks and the elements 
  * (of arbitray structure) below the diagonal blocks are used
  * in the @p{operator ()} function of this class.
+ *
+ * See @ref{PreconditionBlock} for requirements on the matrix.
+ * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<typename number, typename inverse_type = number>
 class PreconditionBlockSOR : public  Subscriptor,
