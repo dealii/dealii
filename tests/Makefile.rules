@@ -96,7 +96,7 @@ flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
 ############################################################
 report:
 	@today=`date -u +"%Y-%m-%d %H:%M"` ; \
-	for test in $(tests) ; do \
+	for test in $(sort $(tests)) ; do \
 		if (($(MAKE) $$test.check stop_on_error=on 2>&1) > /dev/null); then \
 			echo $$today + $$test ; \
 		else \
