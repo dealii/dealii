@@ -25,9 +25,11 @@ class BoundaryValuesSine : public Function<dim> {
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<double>            &values) const {
+      Assert (values.size() == points.size(),
+	      ExcVectorHasWrongSize(values.size(), points.size()));
       for (unsigned int i=0; i<points.size(); ++i) 
-	values.push_back (cos(2*3.1415926536*points[i](0)) *
-			  cos(2*3.1415926536*points[i](1)));
+	values[i] = (cos(2*3.1415926536*points[i](0)) *
+		     cos(2*3.1415926536*points[i](1)));
     };
 };
 
@@ -209,16 +211,18 @@ template <int dim>
 void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
   if (dim>=2)
     prm.declare_entry ("Test run", "zoom in",
-		       "tensor\\|zoom in\\|ball\\|curved line\\|random\\|jump\\|L-region");
+		       Patterns::Sequence("tensor|zoom in|ball|curved line|"
+					  "random|jump|L-region"));
   else
-    prm.declare_entry ("Test run", "zoom in", "tensor\\|zoom in\\|random");
+    prm.declare_entry ("Test run", "zoom in",
+		       Patterns::Sequence("tensor|zoom in|random"));
 
   prm.declare_entry ("Global refinement", "0",
-		     ParameterHandler::RegularExpressions::Integer);
+		     Patterns::Integer());
   prm.declare_entry ("Right hand side", "zero",
-		     "zero\\|constant\\|trigpoly\\|poly");
+		     Patterns::Sequence("zero|constant|trigpoly|poly"));
   prm.declare_entry ("Boundary values", "zero",
-		     "zero\\|sine\\|jump");
+		     Patterns::Sequence("zero|sine|jump"));
   prm.declare_entry ("Output file", "gnuplot.1");
 };
 
@@ -227,7 +231,7 @@ void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
 
 template <int dim>
 bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
-  String test = prm.get ("Test run");
+  string test = prm.get ("Test run");
   unsigned int test_case;
   if (test=="zoom in") test_case = 1;
   else
@@ -375,7 +379,7 @@ void PoissonProblem<dim>::make_random_grid () {
 
 template <int dim>
 bool PoissonProblem<dim>::set_right_hand_side (ParameterHandler &prm) {
-  String rhs_name = prm.get ("Right hand side");
+  string rhs_name = prm.get ("Right hand side");
 
   if (rhs_name == "zero")
     rhs = new ZeroFunction<dim>();
@@ -401,8 +405,8 @@ bool PoissonProblem<dim>::set_right_hand_side (ParameterHandler &prm) {
 
 template <int dim>
 bool PoissonProblem<dim>::set_boundary_values (ParameterHandler &prm) {
-  String bv_name = prm.get ("Boundary values");
-
+  string bv_name = prm.get ("Boundary values");
+  
   if (bv_name == "zero")
     boundary_values = new ZeroFunction<dim> ();
   else
@@ -411,8 +415,11 @@ bool PoissonProblem<dim>::set_boundary_values (ParameterHandler &prm) {
     else
       if (bv_name == "jump")
 	boundary_values = new BoundaryValuesJump<dim> ();
-      else
-	return false;
+      else 
+	{
+	  cout << "Unknown boundary value function " << bv_name << endl;
+	  return false;
+	};
 
   if (boundary_values != 0)
     return true;
@@ -462,8 +469,8 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
        << endl;
 
   DataOut<dim> out;
-  String o_filename = prm.get ("Output file");
-  ofstream gnuplot(o_filename);
+  string o_filename = prm.get ("Output file");
+  ofstream gnuplot(o_filename.c_str());
   fill_data (out);
   out.write_gnuplot (gnuplot);
   gnuplot.close ();

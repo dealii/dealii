@@ -12,14 +12,9 @@
 #include <grid/dof_constraints.h>
 
 
-#include <fstream.h>
+#include <fstream>
 #include <cmath>
-extern "C" {
-#  include <stdlib.h>
-}
-
-extern TriaActiveIterator<1,CellAccessor<1> > x;
-extern TriaActiveIterator<2,CellAccessor<2> > y;
+#include <cstdlib>
 
 
 
@@ -116,9 +111,11 @@ void TestCases<dim>::create_new (const unsigned int) {
 template <int dim>
 void TestCases<dim>::declare_parameters (ParameterHandler &prm) {
   if (dim>=2)
-    prm.declare_entry ("Test run", "zoom in", "zoom in\\|ball\\|curved line\\|random");
+    prm.declare_entry ("Test run", "zoom in",
+		       Patterns::Sequence("zoom in|ball|curved line|random"));
   else
-    prm.declare_entry ("Test run", "zoom in", "zoom in\\|random");
+    prm.declare_entry ("Test run", "zoom in",
+		       Patterns::Sequence("zoom in|random"));
   prm.declare_entry ("Grid file", "grid.1");
   prm.declare_entry ("Sparsity file", "sparsity.1");
   prm.declare_entry ("Condensed sparsity file", "sparsity.c.1");
@@ -133,7 +130,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   
   cout << "    Making grid..." << endl;
 
-  String test = prm.get ("Test run");
+  string test = prm.get ("Test run");
   unsigned int test_case;
   if (test=="zoom in") test_case = 1;
   else
@@ -238,7 +235,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 
   				   // output the grid
   cout << "    Writing grid..." << endl;
-  ofstream out(prm.get("Grid file"));
+  ofstream out(prm.get("Grid file").c_str());
   tria->print_gnuplot (out);
 
 
@@ -259,7 +256,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   int unconstrained_bandwidth = sparsity.bandwidth();
 
   cout << "    Writing sparsity pattern... (This may take a while)" << endl;
-  ofstream sparsity_out (prm.get("Sparsity file"));
+  ofstream sparsity_out (prm.get("Sparsity file").c_str());
   sparsity.print_gnuplot (sparsity_out);
 
 
@@ -271,7 +268,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   constraints.condense (sparsity);
   
   cout << "    Writing condensed sparsity pattern... (This may take a while)" << endl;
-  ofstream c_sparsity_out (prm.get("Condensed sparsity file"));
+  ofstream c_sparsity_out (prm.get("Condensed sparsity file").c_str());
   sparsity.print_gnuplot (c_sparsity_out);
 
 

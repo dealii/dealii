@@ -32,7 +32,7 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 				   const Triangulation<2>::cell_iterator &) const {
   const vector<vector<Point<2> > >&gradients = fe_values.get_shape_grads ();
   const dFMatrix       &values    = fe_values.get_shape_values ();
-  vector<double>        rhs_values;
+  vector<double>        rhs_values (fe_values.n_quadrature_points);
   const vector<double> &weights   = fe_values.get_JxW_values ();
 
   right_hand_side.value_list (fe_values.get_quadrature_points(), rhs_values);

@@ -336,18 +336,18 @@ void PoissonProblem<dim>::create_new (const unsigned int) {
 template <int dim>
 void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
   prm.declare_entry ("Test case", "Gauss shape",
-		     "Gauss shape\\|Singular\\|Kink");
+		     Patterns::Sequence("Gauss shape|Singular|Kink"));
   prm.declare_entry ("Initial refinement", "2",
-		     ParameterHandler::RegularExpressions::Integer);
+		     Patterns::Integer());
   prm.declare_entry ("Refinement criterion", "estimated error",
-		     "global\\|true error\\|estimated error");
+		     Patterns::Sequence("global|true error|estimated error"));
   prm.declare_entry ("Refinement fraction", "0.3",
-		     ParameterHandler::RegularExpressions::Double);
+		     Patterns::Double());
   prm.declare_entry ("Maximum cells", "3000",
-		     ParameterHandler::RegularExpressions::Integer);
+		     Patterns::Integer());
   prm.declare_entry ("Output base filename", "");
-  prm.declare_entry ("Output format", "ucd"
-		     "ucd\\|gnuplot");
+  prm.declare_entry ("Output format", "ucd",
+		     Patterns::Sequence("ucd|gnuplot"));
 };
 
 
@@ -495,7 +495,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       out.add_data_vector (h1_error_per_dof, "H1-Error");
       out.add_data_vector (estimated_error_per_dof, "Estimated Error");
       out.add_data_vector (error_ratio, "Ratio True:Estimated Error");
-      String filename = prm.get ("Output base filename");
+      string filename = prm.get ("Output base filename");
       switch (refine_mode) 
 	{
 	  case global:
@@ -518,7 +518,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 	  filename += ".gnuplot";
       
       cout << "    Writing error plots to <" << filename << ">..." << endl;
-      ofstream outfile(filename);
+      ofstream outfile(filename.c_str());
       if (prm.get("Output format")=="ucd")      
 	out.write_ucd (outfile);
       else
@@ -548,7 +548,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       ++refine_step;
     };
 
-  String filename = prm.get ("Output base filename");
+  string filename = prm.get ("Output base filename");
   switch (refine_mode) 
     {
       case global:
@@ -566,7 +566,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   
   filename += "finest_mesh.gnuplot";
   cout << "    Wrinting finest grid to <" << filename << ">... " << endl;
-  ofstream finest_mesh (filename);
+  ofstream finest_mesh (filename.c_str());
   tria->print_gnuplot (finest_mesh);
   finest_mesh.close();
 
@@ -580,7 +580,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 template <int dim>
 void PoissonProblem<dim>::print_history (const ParameterHandler &prm,
 					 const RefineMode refine_mode) const {
-  String filename(prm.get("Output base filename"));
+  string filename(prm.get("Output base filename"));
   filename += "history.";
   switch (refine_mode) 
     {
@@ -598,7 +598,7 @@ void PoissonProblem<dim>::print_history (const ParameterHandler &prm,
   
   cout << endl << "Printing convergence history to <" << filename << ">..."
        << endl;
-  ofstream out(filename);
+  ofstream out(filename.c_str());
   out << "# n_dofs    l2_error linfty_error "
       << "h1_error estimated_error"
       << endl;
