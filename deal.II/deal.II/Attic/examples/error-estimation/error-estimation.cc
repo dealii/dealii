@@ -80,6 +80,8 @@ class PoissonProblem : public ProblemBase<dim> {
     vector<double> l2_error, linfty_error;
     vector<double> h1_error, estimated_error;
     vector<int>    n_dofs;
+
+    vector<double> laplacian;
 };
 
 
@@ -88,7 +90,7 @@ class PoissonProblem : public ProblemBase<dim> {
 
 /**
   Right hand side constructed such that the exact solution is
-  $x*y*exp(-(x**2+y**2)*10)$.
+  $x*y*exp(-(x**2+y**2)*40)$.
   */
 template <int dim>
 class RHSPoly : public Function<dim> {
@@ -121,19 +123,19 @@ class Solution : public Function<dim> {
 
 
 double RHSPoly<2>::operator () (const Point<2> &p) const {
-  return (120.-400.*p.square())*p(0)*p(1)*exp(-10.*p.square());
+  return (480.-6400.*p.square())*p(0)*p(1)*exp(-40.*p.square());
 };
 
 
 
 double Solution<2>::operator () (const Point<2> &p) const {
-  return p(0)*p(1)*exp(-10*p.square());
+  return p(0)*p(1)*exp(-40*p.square());
 };
 
 
 Point<2> Solution<2>::gradient (const Point<2> &p) const {
-  return Point<2> ((1-20.*p(0)*p(0))*p(1)*exp(-10*p.square()),
-		   (1-20.*p(1)*p(1))*p(0)*exp(-10*p.square()));
+  return Point<2> ((1-80.*p(0)*p(0))*p(1)*exp(-40*p.square()),
+		   (1-80.*p(1)*p(1))*p(0)*exp(-40*p.square()));
 };
 
   
@@ -279,10 +281,11 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
   QGauss3<dim>                    quadrature;
 
   unsigned int refine_step = 0;
-  while (tria->n_active_cells() < 6000)
+  while (tria->n_active_cells() < 2000)
     {
       cout << "Refinement step " << refine_step
-	   << ", using " << tria->n_active_cells() << " active cells."
+	   << ", using " << tria->n_active_cells() << " active cells on "
+	   << tria->n_levels() << " levels."
 	   << endl;
       cout << "    Distributing dofs... "; 
       dof->distribute_dofs (fe);
@@ -303,6 +306,7 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
       Solution<dim> sol;
       dVector       l2_error_per_cell, linfty_error_per_cell, h1_error_per_cell;
       dVector       estimated_error_per_cell;
+      dVector       laplacian_per_cell;
       QGauss3<dim>  q;
   
       cout << "    Calculating L2 error... ";
@@ -323,7 +327,6 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
       cout << "    Estimating H1 error... ";
       KellyErrorEstimator<dim> ee;
       QSimpson<dim-1> eq;
-//      
       ee.estimate_error (*dof, eq, fe, boundary,
 			 KellyErrorEstimator<dim>::FunctionMap(),
 			 solution,
@@ -331,15 +334,27 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
       cout << estimated_error_per_cell.l2_norm() << endl;
       estimated_error.push_back (estimated_error_per_cell.l2_norm());
 
+      laplacian_per_cell = estimated_error_per_cell;
+      DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
+					    endc = dof->end();
+      for (unsigned int i=0; cell!=endc; ++cell, ++i)
+	laplacian_per_cell(i) /= (cell->diameter() * cell->diameter() / 24);
+      cout << "    Computing second derivative maximum... "
+	   <<  laplacian_per_cell.linfty_norm()
+	   << endl;
+      laplacian.push_back (laplacian_per_cell.linfty_norm());
+      
       dVector l2_error_per_dof, linfty_error_per_dof;
       dVector h1_error_per_dof, estimated_error_per_dof;
+      dVector laplacian_per_dof;
       dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
       dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
 					  linfty_error_per_dof);
       dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
-//
       dof->distribute_cell_to_dof_vector (estimated_error_per_cell,
 					  estimated_error_per_dof);
+      dof->distribute_cell_to_dof_vector (laplacian_per_cell,
+					  laplacian_per_dof);
   
   
       DataOut<dim> out;
@@ -347,8 +362,8 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
       out.add_data_vector (l2_error_per_dof, "L2-Error");
       out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
       out.add_data_vector (h1_error_per_dof, "H1-Error");
-//
       out.add_data_vector (estimated_error_per_dof, "Estimated Error");
+      out.add_data_vector (laplacian_per_dof, "Second derivative pointwise");
 //      string filename = "gnuplot.";
       string filename = "ee.";
       switch (refine_mode) 
@@ -363,7 +378,8 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
 		filename += "estimated_error.";
 		break;
 	};
-      filename += ('0'+start_level+refine_step);
+      filename += ('0'+(start_level+refine_step)/10);
+      filename += ('0'+(start_level+refine_step)%10);
       filename += ".inp";                            //*
       cout << "    Writing error plots to <" << filename << ">..." << endl;
   
@@ -381,11 +397,11 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
 		tria->refine_global (1);
 		break;
 	  case true_error:
-		tria->refine_fixed_number (h1_error_per_cell, 0.3);
+		tria->refine_fixed_fraction (h1_error_per_cell, 0.5);
 		tria->execute_refinement ();
 		break;
 	  case error_estimator:
-		tria->refine_fixed_number (estimated_error_per_cell, 0.3);
+		tria->refine_fixed_number (estimated_error_per_cell, 0.2);
 		tria->execute_refinement ();
 		break;
 	};
@@ -415,11 +431,12 @@ void PoissonProblem<dim>::print_history (const RefineMode refine_mode) const {
     };
   filename += "gnuplot";
   
-  cout << endl << "Printing convergence history to" << filename << "..."
+  cout << endl << "Printing convergence history to <" << filename << ">..."
        << endl;
   ofstream out(filename.c_str());
   out << "# n_dofs    l2_error linfty_error "
-      << "h1_error estimated_error"
+      << "h1_error estimated_error "
+      << "laplacian"
       << endl;
   for (unsigned int i=0; i<n_dofs.size(); ++i)
     out << n_dofs[i]
@@ -427,7 +444,8 @@ void PoissonProblem<dim>::print_history (const RefineMode refine_mode) const {
 	<< l2_error[i] << "  "
 	<< linfty_error[i] << "  "
 	<< h1_error[i] << "  "
-	<< estimated_error[i]
+	<< estimated_error[i] << "  "
+	<< laplacian[i]
 	<< endl;
 
   double average_l2=0,
