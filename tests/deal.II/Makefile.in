@@ -22,22 +22,22 @@ default: run-tests
 
 ############################################################
 
-block_matrices.exe           : $(libraries)           $(lib-2d)           block_matrices.go
-constraints.exe              : $(libraries)           $(lib-2d) $(lib-3d) constraints.go
-data_out.exe                 : $(libraries)           $(lib-2d) $(lib-3d) data_out.go
-derivative_approximation.exe : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) derivative_approximation.go
-derivatives.exe              : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) derivatives.go
-dof_test.exe                 : $(libraries)           $(lib-2d) $(lib-3d) dof_test.go
-error_estimator.exe          : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) error_estimator.go
-gradients.exe                : $(libraries)           $(lib-2d)           gradients.go
-grid_test.exe                : $(libraries)           $(lib-2d) $(lib-3d) grid_test.go
-intergrid_constraints.exe    : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) intergrid_constraints.go
-intergrid_map.exe            : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) intergrid_map.go
-matrices.exe                 : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) matrices.go
-mg.exe                       : $(libraries)           $(lib-2d)           mg.go
-mglocal.exe                  : $(libraries)           $(lib-2d)           mglocal.go
-second_derivatives.exe       : $(libraries)           $(lib-2d)           second_derivatives.go
-wave-test-3.exe              : $(libraries)           $(lib-2d)           wave-test-3.go
+block_matrices.exe           : block_matrices.go                     $(lib-2d)           $(libraries)
+constraints.exe              : constraints.go                        $(lib-2d) $(lib-3d) $(libraries) 
+data_out.exe                 : data_out.go                           $(lib-2d) $(lib-3d) $(libraries)
+derivative_approximation.exe : derivative_approximation.go $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
+derivatives.exe              : derivatives.go              $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
+dof_test.exe                 : dof_test.go                           $(lib-2d) $(lib-3d) $(libraries)
+error_estimator.exe          : error_estimator.go          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
+gradients.exe                : gradients.go                          $(lib-2d)           $(libraries)
+grid_test.exe                : grid_test.go                          $(lib-2d) $(lib-3d) $(libraries)
+intergrid_constraints.exe    : intergrid_constraints.go    $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
+intergrid_map.exe            : intergrid_map.go            $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
+matrices.exe                 : matrices.go                 $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
+mg.exe                       : mg.go                                 $(lib-2d)           $(libraries)
+mglocal.exe                  : mglocal.go                            $(lib-2d)           $(libraries)
+second_derivatives.exe       : second_derivatives.go                 $(lib-2d)           $(libraries)
+wave-test-3.exe              : wave-test-3.go                        $(lib-2d)           $(libraries)
 
 
 

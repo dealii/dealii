@@ -19,14 +19,14 @@ default: run-tests
 
 ############################################################
 
-block_matrices.exe : $(libraries) block_matrices.go
-block_vector.exe   : $(libraries) block_vector.go abort.go
-full_matrix.exe    : $(libraries) full_matrix.go
-solver.exe         : $(libraries) solver.go testmatrix.go
-sparse_ilu.exe     : $(libraries) sparse_ilu.go testmatrix.go
-vector-vector.exe  : $(libraries) vector-vector.go
-#mgbase.exe         : $(libraries) mgbase.go
-#mg.exe             : $(libraries) mg.go testmatrix.go
+block_matrices.exe : block_matrices.go           $(libraries)
+block_vector.exe   : block_vector.go abort.go    $(libraries)
+full_matrix.exe    : full_matrix.go              $(libraries)
+solver.exe         : solver.go testmatrix.go     $(libraries)
+sparse_ilu.exe     : sparse_ilu.go testmatrix.go $(libraries)
+vector-vector.exe  : vector-vector.go            $(libraries)
+#mgbase.exe         : mgbase.go                   $(libraries)
+#mg.exe             : mg.go testmatrix.go         $(libraries)
 
 
 tests = block_matrices block_vector full_matrix solver sparse_ilu vector-vector

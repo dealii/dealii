@@ -19,12 +19,12 @@ default: run-tests
 
 ############################################################
 
-logtest.exe        : $(libraries) logtest.go
-polynomial_test.exe: $(libraries) polynomial_test.go
-quadrature_test.exe: $(libraries) quadrature_test.go
-reference.exe      : $(libraries) reference.go abort.go
-tensor.exe         : $(libraries) tensor.go
-timer.exe          : $(libraries) timer.go
+logtest.exe        : logtest.go            $(libraries)
+polynomial_test.exe: polynomial_test.go    $(libraries)
+quadrature_test.exe: quadrature_test.go    $(libraries)
+reference.exe      : reference.go abort.go $(libraries)
+tensor.exe         : tensor.go             $(libraries)
+timer.exe          : timer.go              $(libraries)
 
 
 tests = logtest quadrature_test reference tensor timer
