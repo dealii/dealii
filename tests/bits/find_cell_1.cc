@@ -1,8 +1,8 @@
 //----------------------------  find_cell_1.cc  ---------------------------
-//    find_cell_1.cc,v 1.2 2003/10/30 17:20:51 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

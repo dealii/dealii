@@ -1,5 +1,5 @@
 //----------------------------  volume_2.cc  ---------------------------
-//    volume_2.cc,v 1.1 2003/10/19 22:29:39 wolf Exp
+//    $Id$
 //    Version: 
 //
 //    Copyright (C) 2003, 2004 by the deal.II authors

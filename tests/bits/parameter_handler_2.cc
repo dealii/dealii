@@ -1,8 +1,8 @@
 //----------------------------  parameter_handler_2.cc  ---------------------------
-//    parameter_handler_2.cc,v 1.1 2003/05/06 16:06:33 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors and Brent Bayley
+//    Copyright (C) 2003, 2004 by the deal.II authors and Brent Bayley
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

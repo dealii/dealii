@@ -1,8 +1,8 @@
 //----------------------------  anna_6.cc  ---------------------------
-//    anna_6.cc,v 1.3 2003/04/21 20:32:21 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors and Anna Schneebeli
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors and Anna Schneebeli
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

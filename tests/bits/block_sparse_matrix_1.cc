@@ -1,8 +1,8 @@
 //----------------------------  block_sparse_matrix_1.cc  ---------------------------
-//    block_sparse_matrix_1.cc,v 1.1 2003/06/03 14:50:47 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors and Brian Carnes
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors and Brian Carnes
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

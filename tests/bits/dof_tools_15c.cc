@@ -1,8 +1,8 @@
 //----------------------------  dof_tools_1c.cc  ---------------------------
-//    dof_tools_15c.cc,v 1.1 2003/02/19 16:45:37 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

@@ -1,5 +1,5 @@
 //----------------------------  deal_solver_01.cc  ---------------------------
-//    deal_solver_01.cc,v 1.33 2003/05/30 19:19:16 guido Exp
+//    $Id$
 //    Version: 
 //
 //    Copyright (C) 2004 by the deal.II authors

@@ -1,8 +1,8 @@
 //----------------------------  data_out_stack_01.cc  ---------------------------
-//    data_out_stack_01.cc,v 1.1 2003/03/03 15:24:15 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

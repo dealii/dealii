@@ -1,8 +1,8 @@
 //----------------------------  anna_2.cc  ---------------------------
-//    anna_2.cc,v 1.4 2003/07/03 10:31:47 guido Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors and Anna Schneebeli
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors and Anna Schneebeli
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

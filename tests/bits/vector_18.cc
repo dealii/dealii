@@ -1,5 +1,5 @@
 //----------------------------  vector_18.cc  ---------------------------
-//    vector_11.cc,v 1.4 2003/07/03 10:31:46 guido Exp
+//    $Id$
 //    Version: 
 //
 //    Copyright (C) 2004 by the deal.II authors

@@ -1,8 +1,8 @@
 //----------------------------  fe_tools_09.cc  ---------------------------
-//    fe_tools_09.cc,v 1.1 2003/07/08 23:48:49 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

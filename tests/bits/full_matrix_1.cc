@@ -1,8 +1,8 @@
 //----------------------------  full_matrix_1.cc  ---------------------------
-//    full_matrix_1.cc,v 1.2 2003/09/24 15:24:58 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

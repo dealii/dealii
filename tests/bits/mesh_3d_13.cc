@@ -1,8 +1,8 @@
 //----------------------------  mesh_3d_13.cc  ---------------------------
-//    mesh_3d_13.cc,v 1.1 2003/10/16 14:16:40 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

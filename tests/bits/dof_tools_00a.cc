@@ -1,8 +1,8 @@
 //----------------------------  dof_tools_1c.cc  ---------------------------
-//    dof_tools_00a.cc,v 1.1 2003/07/08 10:58:43 guido Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

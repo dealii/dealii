@@ -1,8 +1,8 @@
 //----------------------------  unit_support_points.cc  ---------------------------
-//    unit_support_points.cc,v 1.4 2003/09/24 15:24:58 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

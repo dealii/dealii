@@ -1,5 +1,5 @@
 //----------------------------  mapping_q4_3d.cc  ---------------------------
-//    mapping_q4_3d.cc,v 1.2 2004/01/27 23:53:25 wolf Exp
+//    $Id$
 //    Version: 
 //
 //    Copyright (C) 2003, 2004 by the deal.II authors

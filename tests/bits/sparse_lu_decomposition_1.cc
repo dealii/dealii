@@ -1,8 +1,8 @@
 //----------------------------  sparse_lu_decomposition_1.cc  ---------------------------
-//    sparse_lu_decomposition_1.cc,v 1.1 2003/05/09 21:13:30 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
