@@ -588,7 +588,11 @@ class DealElemInfo : public ElementInfo
   {
     public:
 
-      Orienter(){};
+      Orienter()
+      {
+	for(int i=0;i<12;++i)
+	  edge_orient_array[i]=false;
+      }
 
       //The cube we're looking at now.
       unsigned int cur_posn; 
