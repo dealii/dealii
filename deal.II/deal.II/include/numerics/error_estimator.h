@@ -194,7 +194,7 @@ class KellyErrorEstimator
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
 
 
-/**
+				     /**
 				      * Implementation of the error
 				      * estimator described above. You
 				      * may give a coefficient, but
@@ -274,7 +274,7 @@ class KellyErrorEstimator
 private:
 
 
-/**
+				     /**
 				      * Declare a data type to represent the
 				      * mapping between faces and integrated
 				      * jumps of gradients. See the general
@@ -283,14 +283,14 @@ private:
     typedef map<typename DoFHandler<dim>::face_iterator,double> FaceIntegrals;
 
 
-/**
+				     /**
 				      * Redeclare an active cell iterator.
 				      * This is simply for convenience.
 				      */
     typedef DoFHandler<dim>::active_cell_iterator active_cell_iterator;
 
 
-/**
+				     /**
 				      * All data needed by the several functions
 				      * of the error estimator is gathered in
 				      * this struct. It is passed as a reference
