@@ -27,11 +27,16 @@ template<typename number> class FullMatrix;
 /**
  * Sparse matrix without sparsity pattern.
  *
- * Documentation follows.
+ * Instead of using a pre-assembled sparsity pattern, this matrix
+ * builds the pattern on the fly. Filling the matrix may consume more
+ * time as with @p{SparseMatrix}, since large memory movements may be
+ * involved. To help optimizing things, an expected row-length may be
+ * provided to the constructor, as well as a mininmum size increment
+ * for rows.
  *
  * The name of this matrix is in reverence to a publication of the
  * Internal Revenue Service of the United States of America. I hope
- * some otheraliens will appreciate it. By the way, the suffix makes
+ * some other aliens will appreciate it. By the way, the suffix makes
  * sense by pronouncing it the American way.
  *
  * @author Guido Kanschat, 2002
@@ -39,6 +44,51 @@ template<typename number> class FullMatrix;
 template <typename number>
 class SparseMatrixEZ : public Subscriptor
 {
+  private:
+				     /**
+				      * The class for storing the
+				      * column number of an entry
+				      * together with its value.
+				      */
+    struct Entry
+    {
+					 /**
+					  * Standard constructor. Sets
+					  * @p{column} to
+					  * @p{invalid_entry}.
+					  */
+	Entry();
+
+					 /**
+					  * Constructor. Fills column
+					  * and value.
+					  */
+	Entry(unsigned int column,
+	      const number& value);
+	
+					 /**
+					  * The column number.
+					  */
+	unsigned int column;
+					 /**
+					  * The value there.
+					  */
+	number value;
+					 /**
+					  * Comparison operator for finding.
+					  */
+	bool operator==(const Entry&) const;
+
+					 /**
+					  * Less than operator for sorting.
+					  */
+	bool operator < (const Entry&) const;
+					 /**
+					  * Non-existent column number.
+					  */
+	static const unsigned int invalid_entry = static_cast<unsigned int>(-1);
+    };
+
   public:
 				     /**
 				      * Type of matrix entries. In analogy to
@@ -70,10 +120,12 @@ class SparseMatrixEZ : public Subscriptor
 				     /**
 				      * Constructor. Generates a
 				      * matrix of the given size,
-				      * ready to be filled.
+				      * ready to be filled. The optional parameters 
 				      */
     explicit SparseMatrixEZ (unsigned int n_rows,
-			     unsigned int n_columns = n_rows);
+			     unsigned int n_columns = n_rows,
+			     unsigned int default_row_length = Entry::invalid_entry,
+			     unsigned int default_increment = Entry::invalid_entry);
     
 				     /**
 				      * Destructor. Free all memory, but do not
@@ -95,7 +147,9 @@ class SparseMatrixEZ : public Subscriptor
 				      * entries at this point.
 				      */
     virtual void reinit (unsigned int n_rows,
-			 unsigned int n_columns = n_rows);
+			 unsigned int n_columns = n_rows,
+			 unsigned int default_row_length = Entry::invalid_entry,
+			 unsigned int default_increment = Entry::invalid_entry);
 
 				     /**
 				      * Release all memory and return
@@ -319,26 +373,6 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     number operator () (const unsigned int i,
 			const unsigned int j) const;
-
-				     /**
-				      * This function is mostly like
-				      * @p{operator()} in that it
-				      * returns the value of the
-				      * matrix entry @p{(i,j)}. The only
-				      * difference is that if this
-				      * entry does not exist in the
-				      * sparsity pattern, then instead
-				      * of raising an exception, zero
-				      * is returned. While this may be
-				      * convenient in some cases, note
-				      * that it is simple to write
-				      * algorithms that are slow
-				      * compared to an optimal
-				      * solution, since the sparsity
-				      * of the matrix is not used.
-				      */
-    number el (const unsigned int i,
-	       const unsigned int j) const;
 
 				     /**
 				      * Return the main diagonal element in
@@ -650,113 +684,21 @@ class SparseMatrixEZ : public Subscriptor
 		    << "The iterators denote a range of " << arg1
 		    << " elements, but the given number of rows was " << arg2);
     
+
   private:
-				     /**
-				      * The class for storing the
-				      * column number of an entry
-				      * together with its value.
-				      */
-    struct Entry
-    {
-					 /**
-					  * Standard constructor. Sets
-					  * @p{column} to
-					  * @p{invalid_entry}.
-					  */
-	Entry();
-
-					 /**
-					  * Constructor. Fills column
-					  * and value.
-					  */
-	Entry(unsigned int column,
-	      const number& value);
-	
-					 /**
-					  * The column number.
-					  */
-	unsigned int column;
-					 /**
-					  * The value there.
-					  */
-	number value;
-					 /**
-					  * Comparison operator for finding.
-					  */
-	bool operator==(const Entry&) const;
-
-					 /**
-					  * Less than operator for sorting.
-					  */
-	bool operator < (const Entry&) const;
-					 /**
-					  * Non-existent column number.
-					  */
-	static const unsigned int invalid_entry = static_cast<unsigned int>(-1);
-    };
 
 				     /**
-				      * The class for storing each row.
+				      * Find an entry. Return a
+				      * zero-pointer if the entry does
+				      * not exist.
 				      */
-    class Row
-      {
-	public:
-					 /**
-					  * Set an entry to a value.
-					  */
-	void set(unsigned int column,
-		 const number& value);
-					 /**
-					  * Add value to an entry.
-					  */
-	void add(unsigned int column,
-		 const number& value);
-					 /*
-					  * Access to value.
-					  */
-	number& operator() (unsigned int column);
-
-					 /**
-					  * Read-only access to value.
-					  */
-	const number& operator() (unsigned int column) const;
-
-					 /**
-					  * Number of entries.
-					  */
-	unsigned int size() const;
-	
-					 /**
-					  * Start of entry list.
-					  */
-	typename std::vector<Entry>::iterator begin();
-	
-					 /**
-					  * Start of constant entry list.
-					  */
-	typename std::vector<Entry>::const_iterator begin() const;
-	
-					 /**
-					  * End of entry list.
-					  */
-	typename std::vector<Entry>::iterator end();
-	
-					 /**
-					  * End of constant entry list.
-					  */
-	typename std::vector<Entry>::const_iterator end() const;
-	
-	
-	private:
-					 /**
-					  * Actual data storage. This
-					  * vector contains the
-					  * entries of a row ordered
-					  * by column number.
-					  */
-	std::vector<Entry> values;
-      };
-    
+    const Entry* locate (unsigned int row,
+			 unsigned int col) const;
+				     /**
+				      * Find an entry or generate it.
+				      */
+    Entry* allocate (unsigned int row,
+		     unsigned int col);
     
 				     /**
 				      * Version of @p{vmult} which only
@@ -826,7 +768,6 @@ class SparseMatrixEZ : public Subscriptor
 			    const std::pair<unsigned int,unsigned int> interval,
 			    somenumber               *partial_norm) const;
 
-
 				     /**
 				      * Number of columns. This is
 				      * used to check vector
@@ -835,9 +776,20 @@ class SparseMatrixEZ : public Subscriptor
     unsigned int n_columns;
 
 				     /**
+				      * Start of indices rows. Points
+				      * into the data field.
+				      */
+    std::vector<unsigned int> row_start;
+    
+				     /**
 				      * Data storage.
 				      */
-    std::vector<Row> rows;
+    std::vector<Entry> data;
+
+				     /**
+				      * Increment when a row grows.
+				      */
+    unsigned int increment;
     
 				     // make all other sparse matrices
 				     // friends
@@ -886,81 +838,12 @@ SparseMatrixEZ<number>::Entry::operator<(const Entry& e) const
 
 
 
-template <typename number>
-inline
-const number&
-SparseMatrixEZ<number>::Row::operator()(unsigned int column) const
-{
-				   // find entry
-				   // return its value
-  Assert(false, ExcNotImplemented());
-  return values[0].value;
-}
-
-
-template <typename number>
-inline
-number&
-SparseMatrixEZ<number>::Row::operator()(unsigned int column)
-{
-				   // find entry
-				   // return its value
-  Assert(false, ExcNotImplemented());
-  return values[0].value;
-}
-
-
-template <typename number>
-inline
-typename std::vector<typename SparseMatrixEZ<number>::Entry>::iterator
-SparseMatrixEZ<number>::Row::begin()
-{
-  return values.begin();
-}
-
-
-template <typename number>
-inline
-unsigned int
-SparseMatrixEZ<number>::Row::size() const
-{
-  return values.size();
-}
-
-
-template <typename number>
-inline
-typename std::vector<typename SparseMatrixEZ<number>::Entry>::const_iterator
-SparseMatrixEZ<number>::Row::begin() const
-{
-  return values.begin();
-}
-
-
-template <typename number>
-inline
-typename std::vector<typename SparseMatrixEZ<number>::Entry>::iterator
-SparseMatrixEZ<number>::Row::end()
-{
-  return values.end();
-}
-
-
-template <typename number>
-inline
-typename std::vector<typename SparseMatrixEZ<number>::Entry>::const_iterator
-SparseMatrixEZ<number>::Row::end() const
-{
-  return values.end();
-}
-
-
 //----------------------------------------------------------------------//
 template <typename number>
 inline
 unsigned int SparseMatrixEZ<number>::m () const
 {
-  return rows.size();
+  return row_start.size() - 1;
 };
 
 
@@ -974,13 +857,107 @@ unsigned int SparseMatrixEZ<number>::n () const
 
 template <typename number>
 inline
+const SparseMatrixEZ<number>::Entry* SparseMatrixEZ<number>::locate (
+  const unsigned int row,
+  const unsigned int col) const
+{
+  Assert (row<m(), ExcIndexRange(row,0,m()));
+  Assert (col<n(), ExcIndexRange(col,0,n()));
+
+  const unsigned int end = row_start[row+1];
+  for (unsigned int i=row_start[row];i<end;++i)
+    {
+      const Entry * const entry = &data[i];
+      if (entry->column == col)
+	return entry;
+      if (entry->column == Entry::invalid_entry)
+	return 0;
+    }
+  return 0;
+}
+
+
+
+template <typename number>
+inline
+SparseMatrixEZ<number>::Entry* SparseMatrixEZ<number>::allocate (
+  const unsigned int row,
+  const unsigned int col)
+{
+  Assert (row<m(), ExcIndexRange(row,0,m()));
+  Assert (col<n(), ExcIndexRange(col,0,n()));
+
+  const unsigned int end = row_start[row+1];
+  for (unsigned int i=row_start[row];i<end;++i)
+    {
+      Entry* entry = &data[i];
+				       // entry found
+      if (entry->column == col)
+	return entry;
+				       // entry does not exist,
+				       // create it
+      if (entry->column > col)
+	{
+					   // Save original entry
+	  Entry temp = data[i];
+					   // Insert new entry here to
+					   // make sure all entries
+					   // are ordered by column
+					   // index
+	  entry->column = col;
+	  entry->value = 0;
+
+					   // Move all entries in this
+					   // row up by one
+	  for (unsigned int j = i+1;j<end;++j)
+	    {
+	      Entry temp2 = data[j];
+	      data[j] = temp;
+	      temp = temp2;
+	      if (temp.column == Entry::invalid_entry)
+		break;
+	    }
+					   // Extend row if there is
+					   // still a valid entry left
+	  if (temp.column != Entry::invalid_entry)
+	    {
+					       // Insert new entries
+	      data.insert(data.begin()+end, increment, Entry());
+					       // Update starts of
+					       // following rows
+	      for (unsigned int r=row+1;r<row_start.size();++r)
+		row_start[r] += increment;
+					       // Insert missing entry
+	      data[end] = temp;
+	    }
+	  return entry;
+	}
+    }
+				   // Row is full, but entry not
+				   // found. Therefore, we must
+				   // extend again
+  data.insert(data.begin()+end, increment, Entry());
+				   // Update starts of
+				   // following rows
+  for (unsigned int r=row+1;r<row_start.size();++r)
+    row_start[r] += increment;
+				   // Insert missing entry
+  data[end].column = col;
+  return &data[end];
+}
+
+
+
+template <typename number>
+inline
 void SparseMatrixEZ<number>::set (const unsigned int i,
-				const unsigned int j,
-				const number value)
+				  const unsigned int j,
+				  const number value)
 {
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
-  rows[i].set(j, value);
+  Entry* entry = allocate(i,j);
+  entry->value = value;
 };
 
 
@@ -988,38 +965,14 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
 template <typename number>
 inline
 void SparseMatrixEZ<number>::add (const unsigned int i,
-				const unsigned int j,
-				const number value)
+				  const unsigned int j,
+				  const number value)
 {
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
-  rows[i].add(j, value);
+  Entry* entry = allocate(i,j);
+  entry->value += value;
 };
-
-
-
-template <typename number>
-inline
-number SparseMatrixEZ<number>::diag_element (const unsigned int i) const
-{
-  Assert (i<m(), ExcIndexRange(i,0,m()));
-  Assert (i<n(), ExcIndexRange(i,0,n()));
-
-  return rows[i](i);
-};
-
-
-
-template <typename number>
-inline
-number & SparseMatrixEZ<number>::diag_element (const unsigned int i)
-{
-  Assert (i<m(), ExcIndexRange(i,0,m()));
-  Assert (i<n(), ExcIndexRange(i,0,n()));
-
-  return rows[i](i);
-};
-
 
 
 #endif

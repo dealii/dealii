@@ -178,7 +178,6 @@ FDMatrix::five_point(MATRIX& A) const
 	{
 					   // Number of the row to be entered
 	  unsigned int row = j+(nx-1)*i;
-	  
 	  A.set(row, row, 4.);
 	  if (j>0)
 	    {
