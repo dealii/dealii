@@ -13,8 +13,10 @@
 #ifndef __deal2__solver_h
 #define __deal2__solver_h
 
-template<typename number> class Vector;
-template<class VECTOR>  class VectorMemory;
+#include <base/subscriptor.h>
+
+template <typename number> class Vector;
+template <class VECTOR>    class VectorMemory;
 class SolverControl;
 
 
@@ -133,7 +135,7 @@ class SolverControl;
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001
  */
 template <class Vector = ::Vector<double> >
-class Solver
+class Solver : public Subscriptor
 {
   public:
 				     /**

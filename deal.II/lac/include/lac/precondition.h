@@ -95,7 +95,7 @@ class PreconditionIdentity : public Subscriptor
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
 template<class MATRIX = SparseMatrix<double>, class VECTOR = Vector<double> >
-class PreconditionUseMatrix
+class PreconditionUseMatrix : public Subscriptor
 {
   public:
 				     /**
@@ -148,7 +148,7 @@ class PreconditionUseMatrix
  * @author Guido Kanschat, 2000
  */
 template<class MATRIX = SparseMatrix<double> >
-class PreconditionRelaxation
+class PreconditionRelaxation : public Subscriptor
 {
   public:
 				     /**
@@ -419,7 +419,7 @@ class PreconditionLACSolver : public Subscriptor
 				     /**
 				      * The solver object to use.
 				      */
-    SOLVER* solver;
+    SmartPointer<SOLVER> solver;
 
 				     /**
 				      * The matrix in use.
@@ -429,11 +429,9 @@ class PreconditionLACSolver : public Subscriptor
 				     /**
 				      * The preconditioner to use.
 				      */
-    const PRECONDITION* precondition;
+    SmartPointer<const PRECONDITION> precondition;
 };
 
-//TODO:[?] Use SmartPointer for SOLVER and PRECONDITION above?
-// Another Subscriptor?
 
 
 /**

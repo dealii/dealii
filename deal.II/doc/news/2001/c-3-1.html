@@ -332,6 +332,20 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: Base class <code class="class">Solver</code> and all
+       <code class="class">Preconditioner</code> classes are now
+       derived from <code class="class">Subscriptor</code>.
+       Class <code class="class">PreconditionLACSolver</code> now uses
+       smartpointers to the given solver and preconditioner
+       objects. You will, therefore, have to derive your own
+       preconditioners and solvers from <code
+       class="class">Subscriptor</code> if you want to use it with
+       <code class="class">PreconditionLACSolver</code>.
+       <br>
+       (WB 2001/08/16)
+       </p>
+
+  <li> <p>
        New: Classes <code class="class">Vector</code> and
        <code class="class">BlockVector</code> now have member functions
        <code class="member">operator*=</code> which scale the vectors
