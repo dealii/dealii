@@ -80,7 +80,7 @@ void make_mesh (Triangulation<dim> &tria)
                                    // generate as many cells with
                                    // hanging nodes as possible
   tria.refine_global (4-dim);
-  const double steps[3] = { 9, 7, 3 };
+  const double steps[4] = { /*d=0*/ 0, 7, 3, 3 };
   for (unsigned int i=0; i<steps[dim]; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
