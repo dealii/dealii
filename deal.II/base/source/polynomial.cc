@@ -13,6 +13,7 @@
 
 
 #include <base/polynomial.h>
+#include <base/exceptions.h>
 
 template <typename number>
 Polynomial<number>::Polynomial (const typename std::vector<number> &a):
@@ -88,6 +89,108 @@ Polynomial<number>::value (const number         x,
 				   // fill higher derivatives by zero
   for (unsigned int j=min_valuessize_m; j<values_size; ++j)
     values[j] = 0;
+}
+
+
+template <typename number>
+void
+Polynomial<number>::scale(typename std::vector<number>& coefficients,
+			   const number factor)
+{
+  double f = 1.;
+  for (typename std::vector<number>::iterator c = coefficients.begin();
+       c != coefficients.end(); ++c)
+    {
+      *c *= f;
+      f *= factor;
+    }  
+}
+
+
+
+template <typename number>
+void
+Polynomial<number>::scale(const number factor)
+{
+  scale (coefficients, factor);
+}
+
+
+
+template <typename number>
+void
+Polynomial<number>::multiply(typename std::vector<number>& coefficients,
+			     const number factor)
+{
+  for (typename std::vector<number>::iterator c = coefficients.begin();
+       c != coefficients.end(); ++c)
+    *c *= factor;
+}
+
+
+
+template <typename number>
+template <typename number2>
+void
+Polynomial<number>::shift(typename std::vector<number>& coefficients,
+			  const number2 offset)
+{
+				   // Copy coefficients to a vector of
+				   // accuracy given by the argument
+  std::vector<number2> new_coefficients(coefficients.size());
+  new_coefficients.assign(coefficients.begin(), coefficients.end());
+  
+				   // Traverse all coefficients from
+				   // c_1. c_0 will be modified by
+				   // higher degrees, only.
+  for (unsigned int d=1; d<new_coefficients.size(); ++d)
+    {
+      const unsigned int n = d;
+				       // Binomial coefficients are
+				       // needed for the
+				       // computation. The rightmost
+				       // value is unity.
+      unsigned int binomial_coefficient = 1;
+
+				       // Powers of the offset will be
+				       // needed and computed
+				       // successively.
+      number2 offset_power = offset;
+      
+				       // Compute (x+offset)^d
+				       // and modify all values c_k
+				       // with k<d.
+				       // The coefficient in front of
+				       // x^d is not modified in this step.
+      for (unsigned int k=0;k<d;++k)
+	{
+					   // Recursion from Bronstein
+					   // Make sure no remainders
+					   // occur in integer
+					   // division.
+	  binomial_coefficient = (binomial_coefficient*(n-k))/(k+1);
+
+	  new_coefficients[d-k-1] += new_coefficients[d]
+				 * binomial_coefficient
+				 * offset_power;
+	  offset_power *= offset;
+	}
+				       // The binomial coefficient
+				       // should have gone through a
+				       // whole row of Pascal's
+				       // triangle.
+      Assert (binomial_coefficient == 1, ExcInternalError());
+    }
+  coefficients.assign(new_coefficients.begin(), new_coefficients.end());
+}
+
+
+template <typename number>
+template <typename number2>
+void
+Polynomial<number>::shift(const number2 offset)
+{
+  shift(coefficients, offset);
 }
 
 
@@ -348,3 +451,10 @@ generate_complete_basis (const unsigned int degree)
 template class Polynomial<float>;
 template class Polynomial<double>;
 template class Polynomial<long double>;
+
+template void Polynomial<float>::shift(const float offset);
+template void Polynomial<float>::shift(const double offset);
+template void Polynomial<float>::shift(const long double offset);
+template void Polynomial<double>::shift(const double offset);
+template void Polynomial<double>::shift(const long double offset);
+template void Polynomial<long double>::shift(const long double offset);

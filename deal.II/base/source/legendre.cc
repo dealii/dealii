@@ -30,8 +30,12 @@
 // for the start.
 template <typename number>
 typename std::vector<const typename std::vector<number> *>
-Legendre<number>::coefficients(20,
-			       static_cast<const typename std::vector<number>*>(0));
+Legendre<number>::recursive_coefficients(
+  20, static_cast<const typename std::vector<number>*>(0));
+template <typename number>
+typename std::vector<const typename std::vector<number> *>
+Legendre<number>::shifted_coefficients(
+  20, static_cast<const typename std::vector<number>*>(0));
 
 
 // have a lock that guarantees that at most one thread is changing and
@@ -60,13 +64,13 @@ Legendre<number>::compute_coefficients (const unsigned int k_)
     k=1;
 				   // check: does the information
 				   // already exist?
-  if ((coefficients.size() < k+1) ||
-      ((coefficients.size() >= k+1) &&
-       (coefficients[k] == 0)))
+  if ((recursive_coefficients.size() < k+1) ||
+      ((recursive_coefficients.size() >= k+1) &&
+       (recursive_coefficients[k] == 0)))
 				     // no, then generate the
 				     // respective coefficients
     {
-      coefficients.resize (k+1, 0);
+      recursive_coefficients.resize (k+1, 0);
       
       if (k<=1)
 	{
@@ -87,8 +91,20 @@ Legendre<number>::compute_coefficients (const unsigned int k_)
 
 					   // now make these arrays
 					   // const
-	  coefficients[0] = c0;
-	  coefficients[1] = c1;
+	  recursive_coefficients[0] = c0;
+	  recursive_coefficients[1] = c1;
+					   // Compute polynomials
+					   // orthogonal on [0,1]
+  	  c0 = new std::vector<number>(*c0);
+  	  c1 = new std::vector<number>(*c1);
+	  
+    	  Polynomial<number>::shift(*c0, (long double) -1.);
+    	  Polynomial<number>::scale(*c0, 2.);
+    	  Polynomial<number>::shift(*c1, (long double) -1.);
+    	  Polynomial<number>::scale(*c1, 2.);
+    	  Polynomial<number>::multiply(*c1, sqrt(3.));
+  	  shifted_coefficients[0]=c0;
+  	  shifted_coefficients[1]=c1;
 	}
       else
 	{
@@ -110,19 +126,26 @@ Legendre<number>::compute_coefficients (const unsigned int k_)
 	  const number b = a*(2*k-1);
 	  const number c = a*(k-1);
 	  
-	  (*ck)[k]   = b*(*coefficients[k-1])[k-1];
-	  (*ck)[k-1] = b*(*coefficients[k-1])[k-2];
+	  (*ck)[k]   = b*(*recursive_coefficients[k-1])[k-1];
+	  (*ck)[k-1] = b*(*recursive_coefficients[k-1])[k-2];
 	  for (unsigned int i=1 ; i<= k-2 ; ++i)
-	    (*ck)[i] = b*(*coefficients[k-1])[i-1]
-		       -c*(*coefficients[k-2])[i];
+	    (*ck)[i] = b*(*recursive_coefficients[k-1])[i-1]
+		       -c*(*recursive_coefficients[k-2])[i];
 
-	  (*ck)[0]   = -c*(*coefficients[k-2])[0];
+	  (*ck)[0]   = -c*(*recursive_coefficients[k-2])[0];
 
 					   // finally assign the newly
 					   // created vector to the
 					   // const pointer in the
 					   // coefficients array
-	  coefficients[k] = ck;
+	  recursive_coefficients[k] = ck;
+					   // and compute the
+					   // coefficients for [0,1]
+  	  ck = new std::vector<number>(*ck);
+    	  shift(*ck,(long double) -1.);
+    	  Polynomial<number>::scale(*ck, 2.);
+    	  Polynomial<number>::multiply(*ck, sqrt(2.*k+1.));
+  	  shifted_coefficients[k] = ck;
 	};
     };
 
@@ -145,7 +168,7 @@ Legendre<number>::get_coefficients (const unsigned int k)
 				   // of coefficients. do that in a MT
 				   // safe way
   coefficients_lock.acquire ();
-  const std::vector<number> *p = coefficients[k];
+  const std::vector<number> *p = shifted_coefficients[k];
   coefficients_lock.release ();
 
 				   // return the object pointed

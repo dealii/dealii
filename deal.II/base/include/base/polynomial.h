@@ -91,6 +91,50 @@ class Polynomial : public Subscriptor
 				      * separately.
 				      */
     unsigned int degree () const;
+
+				     /**
+				      * Scale the abscissa of the
+				      * polynomial.  Given the
+				      * polynomial $p(t)$ and the
+				      * scaling $t = ax$, then the
+				      * result of this operation is
+				      * the polynomial $q$, such that
+				      * $q(x) = p(t)$.
+				      *
+				      * The operation is performed in
+				      * place.
+				      */
+    void scale (const number factor);
+
+				     /**
+				      * Shift the abscissa oft the
+				      * polynomial.  Given the
+				      * polynomial $p(t)$ and the
+				      * shift $t = x + a$, then the
+				      * result of this operation is
+				      * the polynomial $q$, such that
+				      * $q(x) = p(t)$.
+				      *
+				      * The template parameter allows
+				      * to compute the new
+				      * coefficients with higher
+				      * accuracy, since all
+				      * computations are performed
+				      * with type @p{number2}. This
+				      * may be necessary, since this
+				      * operation involves a big
+				      * number of additions. On a Sun
+				      * Sparc Ultra with Solaris 2.8,
+				      * the difference between
+				      * @p{double} and @p{long double}
+				      * was not significant, though.
+				      *
+				      *
+				      * The operation is performed in
+				      * place.
+				      */
+    template <typename number2>
+    void shift (const number2 offset);
     
 				     /**
 				      * Exception
@@ -104,6 +148,25 @@ class Polynomial : public Subscriptor
     
   protected:
 
+				     /**
+				      * This function performs the actual scaling.
+				      */
+    static void scale (typename std::vector<number>& coefficients,
+		       const number factor);
+
+				     /**
+				      * This function performs the actual shift
+				      */
+    template <typename number2>
+    static void shift (typename std::vector<number>& coefficients,
+		       const number2 shift);
+
+				     /**
+				      * Multiply polynomial by a factor.
+				      */
+    static void multiply (typename std::vector<number>& coefficients,
+			  const number factor);
+    
 				     /**
 				      * Coefficients of the polynomial
 				      * $\sum_i a_i x^i$. This vector
@@ -192,12 +255,14 @@ class LagrangeEquidistant: public Polynomial<double>
 
 
 /**
- * Legendre polynomials of arbitrary order on @p{[-1,1]}.
+ * Legendre polynomials of arbitrary order on @p{[0,1]}.
  *
  * Constructing a Legendre polynomial of order @p{k}, the coefficients
  * will be computed by the three-term recursion formula.  The
  * coefficients are stored in a static data vector to be available
- * when needed next time.
+ * when needed next time. Since the recursion is performed for the
+ * interval $[-1,1]$, the polynomials are shifted to $[0,1]$ by the
+ * @p{scale} and @p{shift} functions of @p{Polynomial}, afterwards.
  *
  * @author Guido Kanschat, 2000
  */
@@ -229,6 +294,11 @@ class Legendre : public Polynomial<number>
     
   private:
 				     /**
+				      * Coefficients for the interval $[0,1]$.
+				      */
+    static typename std::vector<const typename std::vector<number> *> shifted_coefficients;
+    
+				     /**
 				      * Vector with already computed
 				      * coefficients. For each degree
 				      * of the polynomial, we keep one
@@ -238,7 +308,7 @@ class Legendre : public Polynomial<number>
 				      * vectors in order to simplify
 				      * programming multithread-safe.
 				      */
-    static typename std::vector<const typename std::vector<number> *> coefficients;
+    static typename std::vector<const typename std::vector<number> *> recursive_coefficients;
     
 				     /**
 				      * Compute coefficients recursively.

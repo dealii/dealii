@@ -630,18 +630,16 @@ class SparseMatrixEZ : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcMatrixNotInitialized);
-				     /**
-				      * Exception
-				      */
     DeclException2 (ExcInvalidIndex,
 		    int, int,
 		    << "The entry with index <" << arg1 << ',' << arg2
 		    << "> does not exist.");
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotSquare);
+
 				     /**
 				      * Exception
 				      */
