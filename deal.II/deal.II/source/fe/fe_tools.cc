@@ -38,7 +38,7 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 				    interpolation_matrix.n(),
 				    fe2.dofs_per_cell,
 				    fe1.dofs_per_cell));
-/*
+
 				   // Initialize FEValues for fe1 at
 				   // the unit support points of the
 				   // fe2 element.
@@ -67,7 +67,6 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 	    interpolation_matrix(i,j)=0.;
 	}  
     }
-*/
 }
 
 
