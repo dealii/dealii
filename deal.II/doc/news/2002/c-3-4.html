@@ -170,6 +170,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> Fixed: The <code class="member">write_text</code> and <code
+       class="member">write_tex</code> functions of the <code
+       class="class">TableHandler</code> class now check whether their
+       <code>ofstream</code> arguments are in a proper state before
+       using them for output.
+       <br>
+       (RH 2002/11/11)
+       </p>
+
   <li> <p> 
        New: Added Hierarchical Polynomial (similar to Legendre class). Will
        eventually be used in a hierarchical FiniteElement class similar to
