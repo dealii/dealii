@@ -356,6 +356,17 @@ struct GeometryInfo<1>
 					       const unsigned int child_index);
 
 				     /**
+				      * The reverse function to the
+				      * one above: take a point in the
+				      * coordinate system of the
+				      * child, and transform it to the
+				      * coordinate system of the
+				      * mother cell.
+				      */
+    static Point<1> child_to_cell_coordinates (const Point<1>    &p,
+					       const unsigned int child_index);
+
+				     /**
 				      * Return true if the given point
 				      * is inside the unit cell of the
 				      * present space dimension.
@@ -605,6 +616,17 @@ struct GeometryInfo<2>
 					       const unsigned int child_index);
 
 				     /**
+				      * The reverse function to the
+				      * one above: take a point in the
+				      * coordinate system of the
+				      * child, and transform it to the
+				      * coordinate system of the
+				      * mother cell.
+				      */
+    static Point<2> child_to_cell_coordinates (const Point<2>    &p,
+					       const unsigned int child_index);
+
+				     /**
 				      * Return true if the given point
 				      * is inside the unit cell of the
 				      * present space dimension.
@@ -849,6 +871,17 @@ struct GeometryInfo<3>
 				      * child.
 				      */
     static Point<3> cell_to_child_coordinates (const Point<3>    &p,
+					       const unsigned int child_index);
+
+				     /**
+				      * The reverse function to the
+				      * one above: take a point in the
+				      * coordinate system of the
+				      * child, and transform it to the
+				      * coordinate system of the
+				      * mother cell.
+				      */
+    static Point<3> child_to_cell_coordinates (const Point<3>    &p,
 					       const unsigned int child_index);
 
 				     /**
@@ -1146,6 +1179,55 @@ GeometryInfo<3>::cell_to_child_coordinates (const Point<3>    &p,
 			     (child_index == 6) || (child_index == 7)    ? 1. : 0.);
   const double z = p[2]*2 - ((child_index == 2) || (child_index == 3) ||
 			     (child_index == 6) || (child_index == 7)    ? 1. : 0.);
+    
+  return Point<dim>(x,y,z);
+}
+
+
+
+inline
+Point<1>
+GeometryInfo<1>::child_to_cell_coordinates (const Point<1>    &p,
+					    const unsigned int child_index)
+{
+  Assert (child_index < GeometryInfo<dim>::children_per_cell,
+	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::children_per_cell));
+  const double x = p[0]/2 + (child_index == 1 ? .5 : 0.);
+  return Point<dim>(x);
+}
+
+
+
+inline
+Point<2>
+GeometryInfo<2>::child_to_cell_coordinates (const Point<2>    &p,
+					    const unsigned int child_index)
+{
+  Assert (child_index < GeometryInfo<dim>::children_per_cell,
+	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::children_per_cell));
+
+  const double x = p[0]/2 + ((child_index == 1) || (child_index == 2) ? .5 : 0.);
+  const double y = p[1]/2 + ((child_index == 2) || (child_index == 3) ? .5 : 0.);
+    
+  return Point<dim>(x,y);
+}
+
+
+
+inline
+Point<3>
+GeometryInfo<3>::child_to_cell_coordinates (const Point<3>    &p,
+					    const unsigned int child_index)
+{
+  Assert (child_index < GeometryInfo<dim>::children_per_cell,
+	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::children_per_cell));
+
+  const double x = p[0]/2 + ((child_index == 1) || (child_index == 2) ||
+			     (child_index == 5) || (child_index == 6)    ? .5 : 0.);
+  const double y = p[1]/2 + ((child_index == 4) || (child_index == 5) ||
+			     (child_index == 6) || (child_index == 7)    ? .5 : 0.);
+  const double z = p[2]/2 + ((child_index == 2) || (child_index == 3) ||
+			     (child_index == 6) || (child_index == 7)    ? .5 : 0.);
     
   return Point<dim>(x,y,z);
 }
