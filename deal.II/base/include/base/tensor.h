@@ -724,6 +724,29 @@ void contract (Tensor<4,dim>       &dest,
 }
 
 
+/**
+ * Contract the last two indices of <tt>src1</tt> with the two indices
+ * <tt>src2</tt>, creating a rank-2 tensor. This is the matrix-vector
+ * product analog operation between tensors of rank 4 and rank 2.
+ *
+ * @relates Tensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline
+void double_contract (Tensor<2,dim>       &dest,
+		      const Tensor<4,dim> &src1,
+		      const Tensor<2,dim> &src2)
+{
+  dest.clear ();
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  dest[i][j] += src1[i][j][k][l] * src2[k][l];
+}
+
+
 
 /**
  * Contract three tensors, corresponding to the matrix vector product
