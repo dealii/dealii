@@ -22,6 +22,8 @@
 #include <fe/fe_q_hierarchical.h>
 #include <fe/fe_values.h>
 
+#include <cmath>
+
 
 
 template <int dim>
@@ -94,14 +96,14 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 	  if (c==0)
 	  {
 	    dofs_subcell[c](j,k) = ((k+j) % 2 == 0) ? 
-	      pow(.5,k)*factor: -pow(.5,k)*factor;
-	    dofs_cell[c](j,k) = pow(2.,j)*factor;
+	      std::pow(.5,k)*factor : -std::pow(.5,k)*factor;
+	    dofs_cell[c](j,k) = std::pow(2.,j)*factor;
 	  }
 	  else
 	  {
-	    dofs_subcell[c](j,k) = pow(.5,k)*factor;
+	    dofs_subcell[c](j,k) = std::pow(.5,k)*factor;
 	    dofs_cell[c](j,k) = ((k+j) % 2 == 0) ? 
-	      pow(2.,j)*factor : -pow(2.,j)*factor;
+	      std::pow(2.,j)*factor : -std::pow(2.,j)*factor;
 	  }
 	}
       }
