@@ -505,85 +505,46 @@ void FullMatrix<number>::diagadd (const number src)
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::mmult (FullMatrix<number2>& dst,
-				const FullMatrix<number2>& src) const
+void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
+				const FullMatrix<number2> &src) const
 {
   Assert (val != 0, ExcEmptyMatrix());
   Assert (n() == src.m(), ExcDimensionMismatch(n(), src.m()));
+  Assert (dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
+  Assert (dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
   
-  unsigned int i,j,k;
-  number2 s = 1.;
-  dst.reinit(m(), src.n());
-
-  for (i=0;i<m();i++)
-    for (j=0; j<src.n(); ++j)
+  for (unsigned int i=0; i<m(); i++)
+    for (unsigned int j=0; j<src.n(); j++)
       {
-	s = 0.;
-	for (k=0;k<n();k++) s+= el(i,k) * src.el(k,j);
+	number2 s = 0.;
+	for (unsigned k=0; k<n(); k++)
+	  s+= el(i,k) * src.el(k,j);
 	dst.el(i,j) = s;
       }
 }
 
-
-/*void FullMatrix<number>::mmult (FullMatrix& dst, const FullMatrix& src) const
-{
-  Assert (val != 0, ExcEmptyMatrix());  
-  Assert (m() == src.n(), ExcDimensionMismatch(m(), src.n()));
-
-  unsigned int i,j,k;
-  number2 s = 1.;
-
-  dst.reinit(n(), src.m());
-
-  for (i=0;i<n();i++)
-    for (j=0;j<src.m();j++)
-      {
-	s = 0.;
-	for (k=0;k<m();k++) s+= el(i,k) * src.el(k,j);
-	dst.el(i,j) = s;
-      }
-}*/
 
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::Tmmult (FullMatrix<number2>& dst, const FullMatrix<number2>& src) const
+void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
+				 const FullMatrix<number2> &src) const
 {
   Assert (val != 0, ExcEmptyMatrix());  
-  Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
+  Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
+  Assert (n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
+  Assert (src.n() == dst.n(), ExcDimensionMismatch(src.n(), dst.n()));
 
-  unsigned int i,j,k;
-  number2 s = 1.;
-  dst.reinit(m(), src.m());
-
-  for (i=0;i<m();i++)
-    for (j=0;j<src.m();j++)
+  for (unsigned int i=0; i<n(); i++)
+    for (unsigned int j=0; j<src.n(); j++)
       {
-	s = 0.;
-	for (k=0;k<n();k++) s+= el(k,i) * src.el(k,j);
+	number2 s = 0;
+	for (unsigned int k=0; k<m(); k++)
+	  s += el(k,i) * src.el(k,j);
 	dst.el(i,j) = s;
       }
 }
 
-
-/*void FullMatrix<number>::Tmmult(FullMatrix& dst, const FullMatrix& src) const
-{
-  Assert (val != 0, ExcEmptyMatrix());  
-  Assert (m() == src.n(), ExcDimensionMismatch(m(), src.n()));
-
-  unsigned int i,j,k;
-  number2 s = 1.;
-  
-  dst.reinit(n(), src.m());
-
-  for (i=0;i<n();i++)
-    for (j=0;j<src.m();j++)
-      {
-	s = 0.;
-	for (k=0;k<m();k++) s+= el(k,i) * src.el(k,j);
-	dst.el(i,j) = s;
-      }
-}*/
 
 
 template <typename number>
