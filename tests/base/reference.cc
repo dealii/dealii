@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,38 +65,38 @@ int main()
   streambuf *old_cerr_buf = std::cerr.rdbuf();
 #endif
   std::cerr.rdbuf(logfile.rdbuf());
-  
-  Test a("A");
-  const Test b("B");
-  SmartPointer<Test>       r=&a;
-  SmartPointer<const Test> s=&a;
+
+  if (true)
+    {
+      Test a("A");
+      const Test b("B");
+      SmartPointer<Test>       r(&a, "Test R");
+      SmartPointer<const Test> s(&a, "const Test S");
 //  SmartPointer<Test>       t=&b;    // this one should not work
-  SmartPointer<Test>       t=const_cast<Test*>(&b);
-  SmartPointer<const Test> u=&b;
-
-
-  deallog << "a ";
-  a.f();            // should print "mutable", since #a# is not const
-  deallog << "b ";
-  b.f();            // should print "const", since #b# is const
-  deallog << "r ";
-  r->f();           // should print "mutable", since it points to the non-const #a#
-  deallog << "s ";
-  s->f();           // should print "const", since it points to the const #b#
-				   // but we made it const
-  deallog << "t ";
-  t->f();           // should print "mutable", since #b# is const, but
-				   // we casted the constness away
-  deallog << "u ";
-  u->f();           // should print "const" since #b# is const
-				   // Now try if subscriptor works
-  {
-    Test c("C");
-    r = &c;
-    Test d("D");
-    r = &d;
-  }
-
+      SmartPointer<Test>       t(const_cast<Test*>(&b), "Test T");
+      SmartPointer<const Test> u(&b, "const Test");
+      
+      
+      deallog << "a ";
+      a.f();            // should print "mutable", since #a# is not const
+      deallog << "b ";
+      b.f();            // should print "const", since #b# is const
+      deallog << "r ";
+      r->f();           // should print "mutable", since it points to the non-const #a#
+      deallog << "s ";
+      s->f();           // should print "const", since it points to the const #b#
+				       // but we made it const
+      deallog << "t ";
+      t->f();           // should print "mutable", since #b# is const, but
+				       // we casted the constness away
+      deallog << "u ";
+      u->f();           // should print "const" since #b# is const
+				       // Now try if subscriptor works
+      Test c("C");
+      r = &c;
+      Test d("D");
+      r = &d;
+    }
   std::cerr.rdbuf(old_cerr_buf);
 }
 

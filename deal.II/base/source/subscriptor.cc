@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,7 +14,10 @@
 
 #include <base/thread_management.h>
 #include <base/subscriptor.h>
+
 #include <typeinfo>
+#include <string>
+#include <iostream>
 
 namespace 
 {
@@ -31,57 +34,7 @@ namespace
 }
 
 
-
-/*
-#include <set>
-
-template <class Class>
-class ActiveObjectMonitor
-{
-  public:
-    ~ActiveObjectMonitor ();
-    
-    void register_object (const Class *p);
-    void deregister_object (const Class *p);
-  private:
-    std::set<const Class*> registered_objects;
-};
-
-ActiveObjectMonitor<Subscriptor> active_object_monitor;
-
-
-ActiveObjectMonitor::~ActiveObjectMonitor ()
-{
-  if (registered_objects.size() > 0)
-    {
-      for (typename std::set<const Subscriptor*>::const_iterator i=registered_objects.begin();
-	   i!=registered_objects.end(); ++i)
-	std::cout << "Object still exists of type "
-		  << typeid(**i).name()
-		  << std::endl;
-      Assert (false, ExcInternalError());
-    };
-};
-
-
-void ActiveObjectMonitor::register_object (const Subscriptor *p)
-{
-  Assert (registered_objects.find(p) == registered_objects.end(),
-	  ExcInternalError());
-  registered_objects.insert (p);
-};
-
-
-void
-ActiveObjectMonitor::deregister_object (const Subscriptor *p)
-{
-  Assert (registered_objects.find(p) != registered_objects.end(),
-	  ExcInternalError());
-  registered_objects.erase (registered_objects.find(p));
-};
-*/
-
-
+static const char* unknown_subscriber = "unknown subscriber";
 
 
 Subscriptor::Subscriptor ()
@@ -111,7 +64,19 @@ Subscriptor::~Subscriptor ()
 				   // you can obtain the latter by
 				   // running the c++filt program over
 				   // the output.
-  Assert (counter == 0, ExcInUse(counter, object_info->name()));
+#ifdef DEBUG
+  std::string infostring;
+  for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
+    {
+      if (it->second > 0)
+	infostring += std::string("\n  from Subscriber ")
+		      + std::string(it->first);
+    }
+  
+  Assert (counter == 0, ExcInUse(counter,
+				 object_info->name(),
+				 infostring));
+#endif
 }
 
 
@@ -122,26 +87,47 @@ Subscriptor & Subscriptor::operator = (const Subscriptor &s)
   return *this;
 }
 
+// These are the implementations for debug mode. The optimized
+// versions are inlined in the header file.
 
-
-void Subscriptor::subscribe () const
-{
 #ifdef DEBUG
+void Subscriptor::subscribe (const char* id) const
+{
   if (object_info == 0)
     object_info = &typeid(*this);
-#endif
-
   Threads::ThreadMutex::ScopedLock lock (subscription_lock);
   ++counter;
+  
+#if DEAL_USE_MT == 0
+  const char* const name = (id != 0) ? id : unknown_subscriber;
+  
+  map_iterator it = counter_map.find(name);
+  if (it == counter_map.end())
+    counter_map.insert(map_value_type(name, 1U));
+  
+  else
+    it->second++;
+#endif
 }
 
 
-void Subscriptor::unsubscribe () const
+void Subscriptor::unsubscribe (const char* id) const
 {
   Assert (counter>0, ExcNotUsed());
   Threads::ThreadMutex::ScopedLock lock (subscription_lock);
   --counter;
+  
+#if DEAL_USE_MT == 0
+  const char* name = (id != 0) ? id : unknown_subscriber;
+
+  map_iterator it = counter_map.find(name);
+  Assert (it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
+  Assert (it->second > 0, ExcNoSubscriber(object_info->name(), name));
+  
+  it->second--;
+#endif
 }
+#endif
 
 
 unsigned int Subscriptor::n_subscriptions () const

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,86 +16,10 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+
 #include <typeinfo>
-
-
-namespace internal
-{
-				   /**
-				    * @internal
-				    * A namespace in which we
-				    * implement helper classes for the
-				    * subscriptor class.
-				    */
-  namespace Subscriptor
-  {
-                                     /**
-				      * @internal
-                                      * Template class that declares
-                                      * in inner typedef with the
-                                      * following semantics: if the
-                                      * first template parameter is
-                                      * <tt>true</tt>, then the inner
-                                      * typedef is <tt>volatile T</tt>,
-                                      * otherwise <tt>T</tt>. We achieve
-                                      * this behavior by partial
-                                      * specialization of the general
-                                      * template for both values of
-                                      * the boolean argument.
-                                      *
-                                      * This trick is used to declare
-                                      * the type of the counter
-                                      * variable to be eiter volatile
-                                      * or not, depending on whether
-                                      * we are in multithreaded mode
-                                      * or not. (If we are in MT mode,
-                                      * then we need the <tt>volatile</tt>
-                                      * specifier since more than one
-                                      * thread my modify the counter
-                                      * at the same time.
-                                      *
-                                      * Since we only partially
-                                      * specialize the case that the
-                                      * boolean template argument is
-                                      * <tt>false</tt>, this general
-                                      * template catches the case that
-                                      * it is <tt>true</tt>, i.e. in a
-                                      * sense it is also a
-                                      * specialization since a
-                                      * <tt>bool</tt> can only have two
-                                      * states.
-                                      *
-                                      * @author Wolfgang Bangerth, 2003
-                                      */
-    template <bool, typename T> struct PossiblyVolatile
-    {
-					 /**
-					  * @internal
-					  * @brief The actual typedef.
-					  */
-        typedef volatile T type;
-    };
-
-                                     /**
-				      * @internal
-                                      * Specialization of the template
-                                      * for the case that the first
-                                      * template argument is
-                                      * <tt>false</tt>, i.e. the
-                                      * non-volatile case.
-                                      */
-    template <typename T> struct PossiblyVolatile<false,T>
-    {
-					 /**
-					  * @internal
-					  * @brief The actual typedef.
-					  */
-        typedef T type;
-    };
-  }
-}
-
-
+#include <map>
+#include <string>
 
 /**
  * Handling of subscriptions.
@@ -105,9 +29,23 @@ namespace internal
  * constructor by reference, is stored. Then, the original object may
  * not be deleted before the dependent object is deleted. You can assert
  * this constraint by letting the object passed be derived from this class
- * and let the user <tt>subscribe</tt> to this object. The destructor the used
- * object inherits from the <tt>Subscriptor</tt> class then will lead to an error
+ * and let the user subscribe() to this object. The destructor the used
+ * object inherits from the Subscriptor class then will lead to an error
  * when destruction is attempted while there are still subscriptions.
+ *
+ * The utility of this class is even enhanced by providing identifying
+ * strings to the functions subscribe() and unsubscribe(). In case of
+ * a hanging subscription during destruction, this string will be
+ * listed in the exception's message. For reasons of efficiency, these
+ * strings are handled as <tt>const char*</tt>. Therefore, the
+ * pointers provided to subscribe() and to unsubscribe() must be the
+ * same. Strings with equal contents will not be recognized to be the
+ * same. The handling in SmartPointer will take care of this.
+ *
+ * @note Due to a problem with <tt>volatile</tt> declarations, this
+ * additional feature is switched of if multithreading is used.
+ *
+ * @author Guido Kanschat, 1998 - 2005
  */
 class Subscriptor
 {
@@ -144,14 +82,24 @@ class Subscriptor
     Subscriptor& operator = (const Subscriptor&);
         
 				     /**
-				      * Subscribes a user of the object.
+				      * Subscribes a user of the
+				      * object. The subscriber may be
+				      * identified by text supplied as
+				      * <tt>identifier</tt>.
 				      */
-    void subscribe () const;
+    void subscribe (const char* identifier = 0) const;
       
 				     /**
-				      * Unsubscribes a user from the object.
+				      * Unsubscribes a user from the
+				      * object.
+				      *
+				      * @note The <tt>identifier</tt>
+				      * must be the <b>same
+				      * pointer</b> as the one
+				      * supplied to subscribe(), not
+				      * just the same text.
 				      */
-    void unsubscribe () const;
+    void unsubscribe (const char* identifier = 0) const;
 
 				     /**
 				      * Return the present number of
@@ -172,19 +120,46 @@ class Subscriptor
 				      * Object may not be deleted, since
 				      * it is used.
 				      */
-    DeclException2(ExcInUse,
-		   int, char *,
+    DeclException3(ExcInUse,
+		   int, char*, std::string&,
 		   << "Object of class " << arg2
-		   << " is still used by " << arg1 << " other objects.");
+		   << " is still used by " << arg1 << " other objects."
+		   << arg3);
 
 				     /**
-				      * Exception: object should be used
-				      * when <tt>unsubscribe</tt> is called.
+				      * A subscriber with the
+				      * identification string given to
+				      * Subscriptor::unsubscribe() did
+				      * not subscribe to the object.
+				      */
+    DeclException2(ExcNoSubscriber, char*, char*,
+		   << "No subscriber with identifier \"" << arg2
+		   << "\" did subscribe to this object of class " << arg1);
+    
+				     /**
+				      * Exception: object should be
+				      * used when
+				      * Subscriptor::unsubscribe() is
+				      * called.
 				      */
     DeclException0(ExcNotUsed);
 				     //@}
 
   private:
+				     /**
+				      * The data type used in
+				      * #counter_map.
+				      */
+    typedef std::map<const char*, unsigned int>::value_type
+    map_value_type;
+    
+				     /**
+				      * The iterator type used in
+				      * #counter_map.
+				      */
+    typedef std::map<const char*, unsigned int>::iterator
+    map_iterator;
+    
     				     /**
 				      * Store the number of objects
 				      * which subscribed to this
@@ -196,7 +171,9 @@ class Subscriptor
 				      * unsubscribed again).
 				      *
 				      * The creator (and owner) of an
-				      * object is not counted.
+				      * object is counted in the map
+				      * below if HE manages to supply
+				      * identification.
 				      *
 				      * We use the <tt>mutable</tt> keyword
 				      * in order to allow subscription
@@ -209,12 +186,20 @@ class Subscriptor
 				      * <tt>volatile</tt>. However, this is
 				      * counter-productive in non-MT
 				      * mode since it may pessimize
-				      * code. So use the above
-				      * template class to selectively
+				      * code. So use the macro
+				      * defined above to selectively
 				      * add volatility.
 				      */
-    mutable internal::Subscriptor::PossiblyVolatile<DEAL_II_USE_MT,unsigned int>::type counter;
-
+    mutable DEAL_VOLATILE unsigned int counter;
+    
+				     /**
+				      * In this map, we count
+				      * subscriptions for each
+				      * different identification strig
+				      * supplied to subscribe().
+				      */
+    mutable std::map<const char*, unsigned int> counter_map;
+    
 				     /**
 				      * Pointer to the typeinfo object
 				      * of this object, from which we
@@ -229,5 +214,24 @@ class Subscriptor
     mutable const std::type_info * object_info;
 };
 
+//----------------------------------------------------------------------//
+
+// If we are in optimized mode, the subscription checking is turned
+// off. Therefore, we provide inline definitions of subscribe and
+// unsubscribe here. The definitions for debug mode are in
+// subscriptor.cc.
+
+#ifndef DEBUG
+
+inline void
+Subscriptor::subscribe(const char*) const
+{}
+
+
+inline void
+Subscriptor::unsubscribe(const char*) const
+{}
+
+#endif
 
 #endif

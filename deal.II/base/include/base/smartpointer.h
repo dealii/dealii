@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
+//    Copyright (C) 1998 - 2005 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,13 +31,13 @@
  * SmartPointer does NOT implement any memory handling! Especially,
  * deleting a SmartPointer does not delete the object. Writing
  * @code
- * SmartPointer<T> t = new T;
+ * SmartPointer<T> dont_do_this = new T;
  * @endcode
  * is a sure way to program a memory leak! The secure version is
  * @code
  * T* p = new T;
  * {
- *   SmartPointer<T> t = p;
+ *   SmartPointer<T> t(p, "mypointer");
  *   ...
  * }
  * delete p;
@@ -48,14 +48,19 @@
  * a constant object (disallowing write access when dereferenced), while
  * <tt>SmartPointer<ABC></tt> is a mutable pointer.
  *
- * @author Guido Kanschat, Wolfgang Bangerth, 1998, 1999, 2000
+ * @author Guido Kanschat, Wolfgang Bangerth, 1998 - 2005
  */
 template<typename T>
 class SmartPointer
 {
   public:
 				     /**
-				      * Standard constructor for null pointer.
+				      * Standard constructor for null
+				      * pointer.  @deprecated Since
+				      * this constructor will leave
+				      * #id empty, it should be
+				      * avoided wherever possible and
+				      * replaced by SmartPointer(0,id).
 				      */
     SmartPointer ();
 
@@ -65,6 +70,11 @@ class SmartPointer
 				      * copy the object subscribed to
 				      * from <tt>tt</tt>, but subscribe
 				      * ourselves to it again.
+				      *
+				      * The <tt>id</tt> is used in the
+				      * call to
+				      * Subscriptor::subscribe(). The #id of
+				      * the object copied is used here.
 				      */
     SmartPointer (const SmartPointer<T> &tt);
 
@@ -77,8 +87,14 @@ class SmartPointer
 				      * to lock it, i.e. to prevent
 				      * its destruction before the end
 				      * of its use.
+				      *
+				      * The <tt>id</tt> is used in the
+				      * call to
+				      * Subscriptor::subscribe() and
+				      * by ~SmartPointer() in the call
+				      * to Subscriptor::unsubscribe().
 				      */
-    SmartPointer (T *t);
+    SmartPointer (T *t, const char* id=0);
 
 
 				     /**
@@ -180,6 +196,11 @@ class SmartPointer
 				      * short name.
 				      */
     T * t;
+				     /**
+				      * The identification for the
+				      * subscriptor.
+				      */
+    const char* const id;
 };
 
 
@@ -189,18 +210,18 @@ class SmartPointer
 template <typename T>
 SmartPointer<T>::SmartPointer ()
                 :
-		t (0)
+		t (0), id(0)
 {}
 
 
 
 template <typename T>
-SmartPointer<T>::SmartPointer (T *t)
+SmartPointer<T>::SmartPointer (T *t, const char* id)
                 :
-		t (t)
+		t (t), id(id)
 {
   if (t != 0)
-    t->subscribe();
+    t->subscribe(id);
 }
 
 
@@ -208,7 +229,7 @@ SmartPointer<T>::SmartPointer (T *t)
 template <typename T>
 SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt)
                 :
-		t (tt.t)
+		t (tt.t), id(tt.id)
 {
   if (t != 0)
     t->subscribe();
@@ -220,7 +241,7 @@ template <typename T>
 SmartPointer<T>::~SmartPointer ()
 {
   if (t != 0)
-    t->unsubscribe();
+    t->unsubscribe(id);
 }
 
 
@@ -234,10 +255,10 @@ SmartPointer<T> & SmartPointer<T>::operator = (T *tt)
     return *this;
   
   if (t != 0)
-    t->unsubscribe();
+    t->unsubscribe(id);
   t = tt;
   if (tt != 0)
-    tt->subscribe();
+    tt->subscribe(id);
   return *this;
 }
 
@@ -254,10 +275,10 @@ SmartPointer<T>::operator = (const SmartPointer<T>& tt)
     return *this;
   
   if (t != 0)
-    t->unsubscribe();
+    t->unsubscribe(id);
   t = static_cast<T*>(tt);
   if (tt != 0)
-    tt->subscribe();
+    tt->subscribe(id);
   return *this;
 }
 
