@@ -301,3 +301,5 @@ AC_DEFUN(DEAL_II_CHECK_ASSERT_THROW, dnl
 	$3
     ])
 )
+
+
