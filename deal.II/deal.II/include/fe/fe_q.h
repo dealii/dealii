@@ -310,6 +310,22 @@ class FE_Q : public FiniteElement<dim>
     virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
     
 				     /**
+				      * Check for non-zero values on a face.
+				      *
+				      * This function returns
+				      * @p{true}, if the shape
+				      * function @p{shape_index} has
+				      * non-zero values on the face
+				      * @p{face_index}.
+				      *
+				      * Implementation of the
+				      * interface in
+				      * @ref{FiniteElement}
+				      */
+    virtual bool has_support_on_face (const unsigned int shape_index,
+				      const unsigned int face_index) const;
+
+				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.

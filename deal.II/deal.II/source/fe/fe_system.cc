@@ -1438,6 +1438,20 @@ FESystem<dim>::n_base_elements () const
 };
 
 
+template <int dim>
+bool
+FESystem<dim>::has_support_on_face (const unsigned int shape_index,
+				    const unsigned int face_index) const
+{
+  const pair<unsigned int, unsigned int> component
+    = system_to_component_index(shape_index);
+  const unsigned int base = component_to_base(component.first);
+  return base_element(base).has_support_on_face(component.second,
+						face_index);
+}
+
+
+
 
 template <int dim>
 unsigned int
