@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="../../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>The deal.II news page</title>
+    <meta name="author" content="Guido Kanschat">
+    <meta name="keywords" content="deal.II"></head>
+
+<body>
+
+
+<h2>Changes between versions 3.0 and 3.0.1</h2>
+
+<ol>
+  <li> <p>
+       Fix: getting the support points from system finite elements
+       (class <code class="class">FESystem</code>) resulted in an
+       exception. 
+       <br>
+       (WB 2000/05/10)
+       </p>
+
+  <li> <p>
+       Fix: the triangulation class over-estimated the necessary
+       amount of memory needed upon refinement and allocated too
+       much.
+       <br>
+       (WB 2000/04/19)
+       </p>
+
+
+  <li> <p>
+       Fix: <code class="member">FullMatrix::Tmmult</code> and
+       <code class="member">FullMatrix::Tvmult</code> were broken.
+       <br>
+       (WB 2000/05/08 and 2000/05/26)
+       </p>
+</ol>
+
+
+<hr>
+Last update $Date$
+
+</body>
+</html>
+
