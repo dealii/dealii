@@ -696,18 +696,14 @@ int TriaObjectAccessor<3, dim>::vertex_index (const unsigned int corner) const
       if (get_face_orientation(0) == true)
         return quad(0)->vertex_index(corner);
       else
-        {
-          return quad(0)->vertex_index(vertex_translation[corner]);
-        }
+        return quad(0)->vertex_index(vertex_translation[corner]);
     }
   else
     {
       if (get_face_orientation(1) == true)
         return quad(1)->vertex_index(corner-4);
       else
-        {
-          return quad(1)->vertex_index(vertex_translation[corner]);
-        }
+        return quad(1)->vertex_index(vertex_translation[corner-4]);
     }
 }
 
