@@ -171,7 +171,7 @@ template <class VECTOR>
 inline void
 ShiftedMatrix<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
-  A.vmult(dst, src);
+  A->vmult(dst, src);
   if (sigma != 0.)
     dst.add(sigma, src);
 }
@@ -184,7 +184,7 @@ ShiftedMatrix<MATRIX>::residual (VECTOR& dst,
 				 const VECTOR& src,
 				 const VECTOR& rhs) const
 {
-  A.vmult(dst, src);
+  A->vmult(dst, src);
   if (sigma != 0.)
     dst.add(sigma, src);
   dst.sadd(-1.,1.,rhs);
@@ -224,7 +224,7 @@ inline void
 ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>::vmult (VECTOR& dst,
 						     const VECTOR& src) const
 {
-  A.vmult(dst, src);
+  A->vmult(dst, src);
   if (sigma != 0.)
     {
       aux.reinit(dst);
@@ -240,7 +240,7 @@ ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>::residual (VECTOR& dst,
 							const VECTOR& src,
 							const VECTOR& rhs) const
 {
-  A.vmult(dst, src);
+  A->vmult(dst, src);
   if (sigma != 0.)
     {
       aux.reinit(dst);
