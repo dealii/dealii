@@ -866,6 +866,7 @@ LSingularityFunction::gradient (const Point<2>   &p,
       return Tensor<1,2>(infty);
     }
 
+//TODO:[GK] this is no reasonable return value  
 //  double phi = atan2(y,-x)+M_PI;
 //  double r2 = x*x+y*y;
 
