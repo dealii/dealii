@@ -353,18 +353,18 @@ class ConstraintMatrix : public Subscriptor
 	vector<pair<unsigned int,double> > entries;
 
 					 /**
-					  * This operator is a bit weird and
-					  * unintuitive: it compares the line
-					  * numbers of two lines. We need this
-					  * to sort the lines; in fact we could
-					  * do this using a comparison predicate.
-					  * However, gcc2.7 has problems with
-					  * type unification for the #ptr_fun#
-					  * function, so that the creation of a
-					  * predicate is a bit complicated. This
-					  * way, it is easier, albeit unintuitive
-					  * since two lines really have no
-					  * god-given order relation.
+					  * This operator is a bit
+					  * weird and unintuitive: it
+					  * compares the line numbers
+					  * of two lines. We need this
+					  * to sort the lines; in fact
+					  * we could do this using a
+					  * comparison predicate.
+					  * However, this way, it is
+					  * easier, albeit unintuitive
+					  * since two lines really
+					  * have no god-given order
+					  * relation.
 					  */
 	bool operator < (const ConstraintLine &) const;
     };
