@@ -495,7 +495,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 	    precondition.vmult(*r,v);
 	      
 	  double res = r->l2_norm();
-	  iteration_state = control().check (
+	  iteration_state = this->control().check (
 	    accumulated_iterations, res);
 
 	  if (iteration_state != SolverControl::iterate)
@@ -612,7 +612,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 		{
 		  const double res=r->l2_norm();
 		  
-		  iteration_state = control().check (
+		  iteration_state = this->control().check (
 		    accumulated_iterations, res);
 		}
 	      else
@@ -620,7 +620,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 		  precondition.vmult(*x_, *r);
 		  const double preconditioned_res=x_->l2_norm();
 		  
-		  iteration_state = control().check (
+		  iteration_state = this->control().check (
 		    accumulated_iterations, preconditioned_res);
 		}
   	    }
