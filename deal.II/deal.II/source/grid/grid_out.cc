@@ -859,4 +859,5 @@ template void GridOut::write_eps (const Triangulation<deal_II_dimension> &,
 #endif
 template void GridOut::write (const Triangulation<deal_II_dimension> &,
 			      std::ostream &,
-			      const OutputFormat);
+			      const OutputFormat,
+			      const Mapping<dim> *);
