@@ -723,13 +723,15 @@ SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>& dst,
-					   const Vector<somenumber>& src,
-					   const number om) const
+SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
+					   const Vector<somenumber> &src,
+					   const number              om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
+  Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
 
   const unsigned int n = src.size();
   somenumber              *dst_ptr = dst.begin();
@@ -749,9 +751,9 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>& dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
-					 const Vector<somenumber>& src,
-					 const number om) const
+SparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
+					 const Vector<somenumber> &src,
+					 const number              om) const
 {
 				   // to understand how this function works
 				   // you may want to take a look at the CVS
@@ -760,6 +762,8 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
+  Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
 
   const unsigned int  n            = src.size();
   const unsigned int *rowstart_ptr = &cols->rowstart[0];
