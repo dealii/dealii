@@ -34,6 +34,33 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Removed: The forward declarations files have gone. We have never
+       propagated their use in the example programs, but these files have been
+       there in the base, lac, and grid include directories, and forward
+       declared all classes that were present in the respective parts of the
+       library. This, the idea was, enables you to use just this include file
+       in your own header files, rather than including the full declarations of
+       these classes. However, maintaining these forward declaration files has
+       been a constant thorn in our side, be it that the timing of their
+       generation was difficult when using parallel builds, or that they were
+       difficult to generate at first. The latter is now the reason for their
+       abolition: we had a script for their generation, but it did not take
+       into account namespaces, so we got clashes when we found that we had
+       used the same class name in two different namespaces, since the script
+       put the forward declaration incorrectly into the global namespace where
+       they conflicted. Since we do not plan to extend the script by a
+       parser that can properly handle opening and closing braces of
+       namespaces, we simply drop these files.
+       <br>
+       What you should do if you have used these forward declaration files: you
+       have two possibilities - either include the respective header file in
+       which the class is fully declared, or write the forward declaration into
+       your headers yourself.
+       <br>
+       (WB 2002/09/05)
+       </p>
+
+  <li> <p> 
        New: There is now
        <a href="../../reports/assemble/index.html" target="body">a new report
        on assembling matrices</a> available from the 
