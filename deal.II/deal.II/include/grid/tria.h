@@ -683,18 +683,22 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        consists of a vector storing the indices of the vertices of this cell
  *        in the vertex list. To see how this works, you can take a look at the
  *        @ref{GridIn}@p{<dim>::read_*} functions. The appropriate function to be
- *        called is @p{Triangulation<dim>::create_triangulation (2)}.
+ *        called is @p{Triangulation<dim>::create_triangulation ()}.
  *
- *        Creating the hierarchical information needed for this library from
- *        cells storing only vertex information can be quite a complex task.
- *        For example in 2d, we have to create lines between vertices (but only
- *        once, though there are two cells which link these two vertices) and
- *        we have to create neighborship information. Grids being read in
- *        should therefore not be too large, reading refined grids would be
- *        inefficient. Apart from the performance aspect, refined grids do not
- *        lend too well to multigrid algorithms, since solving on the coarsest
- *        level is expensive. It is wiser in any case to read in a grid as coarse
- *        as possible and then do the needed refinement steps.
+ *        Creating the hierarchical information needed for this
+ *        library from cells storing only vertex information can be
+ *        quite a complex task.  For example in 2d, we have to create
+ *        lines between vertices (but only once, though there are two
+ *        cells which link these two vertices) and we have to create
+ *        neighborship information. Grids being read in should
+ *        therefore not be too large, reading refined grids would be
+ *        inefficient (although there is technically no problem in
+ *        reading grids with several 10.000 or 100.000 cells; the
+ *        library can handle this without much problems). Apart from
+ *        the performance aspect, refined grids do not lend too well
+ *        to multigrid algorithms, since solving on the coarsest level
+ *        is expensive. It is wiser in any case to read in a grid as
+ *        coarse as possible and then do the needed refinement steps.
  *
  *        It is your duty to guarantee that cells have the correct orientation.
  *        To guarantee this, in the input vector keeping the cell list, the
@@ -709,12 +713,16 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        quadrilaterals, i.e. two vertices interchanged; this results in
  *        a wrong area element).
  *
- *        There are more subtle conditions which must be imposed upon the
- *        vertex numbering within cells. See the documentation for the
- *        @ref{GridIn} class for more details on this. They do not only
- *        hold for the data read from an UCD or any other input file, but
- *        also for the data passed to the
- *        @p{Triangulation<dim>::create_triangulation (2)} function.
+ *        There are more subtle conditions which must be imposed upon
+ *        the vertex numbering within cells. They do not only hold for
+ *        the data read from an UCD or any other input file, but also
+ *        for the data passed to the
+ *        @p{Triangulation<dim>::create_triangulation ()}
+ *        function. See the documentation for the @ref{GridIn} class
+ *        for more details on this, and above all to the
+ *        @ref{GridReordering} class that explains many of the
+ *        problems and an algorithm to reorder cells such that they
+ *        satisfy the conditions outlined above.
  *
  *     @item Copying a triangulation: when computing on time dependant meshes
  *        of when using adaptive refinement, you will often want to create a
@@ -1767,6 +1775,13 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * @p{virtual} to allow derived
 				      * classes to set up some data
 				      * structures as well.
+				      *
+				      * For conditions when this
+				      * function can generate a valid
+				      * triangulation, see the
+				      * documentation of this class,
+				      * and the @ref{GridIn} and
+				      * @ref{GridReordering} class.
 				      */
     virtual void create_triangulation (const vector<Point<dim> >    &vertices,
 				       const vector<CellData<dim> > &cells,
@@ -3002,15 +3017,18 @@ class Triangulation : public TriaDimensionInfo<dim>,
     void fix_coarsen_flags ();
 
 				     /**
-				      * Re-compute the number of lines, quads,
-				      * etc. This function is called by
-				      * @p{execute_{coarsening,refinement}} and
-				      * by @p{create_triangulation} after the
-				      * grid was changed.
+				      * Re-compute the number of
+				      * lines, quads, etc. This
+				      * function is called by
+				      * @p{execute_coarsening_and_refinement}
+				      * and by
+				      * @p{create_triangulation} after
+				      * the grid was changed.
 				      *
-				      * This function simply delegates to the
-				      * functions below, which count
-				      * only a certain class of objects.
+				      * This function simply delegates
+				      * to the functions below, which
+				      * count only a certain class of
+				      * objects.
 				      */
     void update_number_cache ();
 
