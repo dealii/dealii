@@ -706,13 +706,12 @@ namespace LaplaceSolver
 };
 
 
-
-
-
 template <int dim>
 class Solution : public Function<dim>
 {
   public:
+    Solution () : Function<dim> () {};
+    
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const;
 };
@@ -736,6 +735,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
   public:
+    RightHandSide () {};
+    
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const;
 };
