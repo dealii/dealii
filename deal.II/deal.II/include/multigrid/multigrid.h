@@ -221,7 +221,7 @@ class MGTransferPrebuilt : public MGTransferBase
 					  * while row indices belong to the
 					  * child cell, i.e. the fine level.
 					  */
-    vector<SparseMatrix<float> > prolongation_matrices;
+    vector<SparseMatrix<double> > prolongation_matrices;
 };
 
 

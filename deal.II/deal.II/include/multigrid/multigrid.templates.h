@@ -38,15 +38,18 @@ Multigrid<dim>::copy_to_mg (const Vector<number>&)
 template <int dim>
 template <typename number>
 void
-Multigrid<dim>::copy_to_mg (const Vector<number>& src)
+Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
 {
+				   // Make src a real finite element function
+  Vector<number> src = osrc;
+//  constraints->distribute(src);
+
   const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
   const unsigned int dofs_per_face = mg_dof_handler->get_fe().dofs_per_face;
 
 				   // set the elements of the vectors
 				   // on all levels to zero
   defect.clear();
-//  constraints->condense(src);
   
   vector<unsigned int> global_dof_indices (dofs_per_cell);
   vector<unsigned int> level_dof_indices  (dofs_per_cell);
@@ -102,14 +105,16 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& src)
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    defect[level](level_dof_indices[i]) = src(global_dof_indices[i]);
 
-					   // Delete values on refinement edge,
-					   // since restriction will add them again.
 	  for (unsigned int face_n=0; face_n<GeometryInfo<dim>::faces_per_cell; ++face_n)
 	    {
 	      const MGDoFHandler<dim>::face_iterator face = level_cell->face(face_n);
 	      if (face->has_children())
 		{
 		  face->get_mg_dof_indices(level_face_indices);
+
+
+						   // Delete values on refinement edge,
+						   // since restriction will add them again.
 		  for (unsigned int i=0; i<dofs_per_face; ++i)
 		    defect[level](level_face_indices[i]) = 0.;
 		};

@@ -131,7 +131,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 	  };
       prolongation_sparsities[level].compress ();
 
-      prolongation_matrices.push_back (SparseMatrix<float>());
+      prolongation_matrices.push_back (SparseMatrix<double>());
       prolongation_matrices[level].reinit (prolongation_sparsities[level]);
 
 
