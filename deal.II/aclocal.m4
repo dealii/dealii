@@ -1801,8 +1801,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
   AC_CHECK_FILE($TEC90HOME/include/TECIO.h,
 	        TECPLOT_INCLUDE_PATH=$TEC90HOME/include)
 
-  if (test -r $TECPLOT_LIBRARY_PATH && \
-      test -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
+  if (test -r "$TECPLOT_LIBRARY_PATH" && \
+      test -r "$TECPLOT_INCLUDE_PATH/TECIO.h") ; then
     AC_DEFINE(DEAL_II_HAVE_TECPLOT, 1,
 	      [Flag indicating whether the library shall be compiled to use the Tecplot interface])
   fi
