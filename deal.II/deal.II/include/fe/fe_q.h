@@ -30,7 +30,8 @@ class FE_Q : public FiniteElement<dim>
 				      * Constructor for tensor product
 				      * polynomials of degree @p{k}.
 				      */
-    FE_Q (unsigned int k);
+    FE_Q (const unsigned int k);
+    
 				     /**
 				      * Destructor.
 				      */
@@ -49,18 +50,21 @@ class FE_Q : public FiniteElement<dim>
     virtual UpdateFlags update_each (UpdateFlags flags) const;
 
 				     /**
-				      * Return the support points of the
-				      * trial functions on the unit cell.
+				      * Return the support points of
+				      * the trial functions on the
+				      * unit cell.
 				      *
-				      * The order of points in
-				      * the array matches that returned by
-				      * the #cell->get_dof_indices# function, but:
+				      * The order of points in the
+				      * array matches that returned by
+				      * the @p{cell->get_dof_indices}
+				      * function, but:
 				      *
 				      * If the shape functions are not
-				      * Lagrangian interpolants at some
-				      * points, the size of the array
-				      * will be zero. This is the standard behavior,
-				      * if the function is not overloaded.
+				      * Lagrangian interpolants at
+				      * some points, the size of the
+				      * array will be zero. This is
+				      * the standard behavior, if the
+				      * function is not overloaded.
 				      */
     virtual void get_unit_support_points (std::vector<Point<dim> > &) const;    
     
@@ -69,15 +73,17 @@ class FE_Q : public FiniteElement<dim>
 				      * the trial functions on the
 				      * first face of the unit cell.
 				      *
-				      * The order of points in
-				      * the array matches that returned by
-				      * the #cell->get_dof_indices# function.
+				      * The order of points in the
+				      * array matches that returned by
+				      * the @p{cell->get_dof_indices}
+				      * function.
 				      *
 				      * If the shape functions are not
-				      * Lagrangian interpolants at some
-				      * points, the size of the array
-				      * will be zero. This is the standard behavior,
-				      * if the function is not overloaded.
+				      * Lagrangian interpolants at
+				      * some points, the size of the
+				      * array will be zero. This is
+				      * the standard behavior, if the
+				      * function is not overloaded.
 				      */
     virtual void get_unit_face_support_points (std::vector<Point<dim-1> > &) const;
 
@@ -85,8 +91,15 @@ class FE_Q : public FiniteElement<dim>
 				      * Read-only access to the
 				      * renumber vector.
 				      */
-    const std::vector<unsigned int> &get_renumber() const;
+    const std::vector<unsigned int> & get_renumber() const;
 
+				     /**
+				      * Return the polynomial degree
+				      * of this finite element,
+				      * i.e. the value passed to the
+				      * constructor.
+				      */
+    unsigned int get_degree () const;
     
 				     /**
 				      * Determine an estimate for the
@@ -110,7 +123,7 @@ class FE_Q : public FiniteElement<dim>
 				      * This function is needed by the
 				      * constructors of @p{FESystem}.
 				      */
-    virtual FiniteElement<dim> *clone() const;
+    virtual FiniteElement<dim> * clone() const;
   
 				     /**
 				      * Prepare internal data
@@ -175,7 +188,7 @@ class FE_Q : public FiniteElement<dim>
 				      * be passed to the constructor of
 				      * @p{FiniteElementData}.
 				      */
-    static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
+    static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
     
 				     /**
 				      * Map tensor product data to shape
@@ -212,8 +225,9 @@ class FE_Q : public FiniteElement<dim>
 				   std::vector<unsigned int>& numbering);
 
 				     /**
-				      * Map tensor product data to shape function
-				      * numbering on first face.
+				      * Map tensor product data to
+				      * shape function numbering on
+				      * first face.
 				      *
 				      * This function does the same as
 				      * @p{build_renumbering}, only on
@@ -237,16 +251,19 @@ class FE_Q : public FiniteElement<dim>
 				      * Degree of the polynomials.
 				      */  
     const unsigned int degree;
+
 				     /**
 				      * Mapping from lexicographic to
 				      * shape function numbering.
 				      */
     std::vector<unsigned int> renumber;
+    
 				     /**
 				      * Mapping from lexicographic to
 				      * shape function numbering on first face.
 				      */
     std::vector<unsigned int> face_renumber;
+    
 				     /**
 				      * Vector of one-dimensional
 				      * polynomials used.
@@ -272,6 +289,7 @@ class FE_Q : public FiniteElement<dim>
 					  * values for each quadrature point.
 					  */
 	std::vector<std::vector<double> > shape_values;
+
 					 /**
 					  * Array with shape function gradients
 					  * in quadrature points. There is one
@@ -288,13 +306,13 @@ class FE_Q : public FiniteElement<dim>
   
 				     /**
 				      * Allows @p{MappingQ} class to
-				      * access to build_renumbering
+				      * access to @p{build_renumbering}
 				      * function.
 				      */
     friend class MappingQ<dim>;
 };
 
-#endif
+
 
 
 template<int dim>
@@ -304,3 +322,8 @@ FE_Q<dim>::get_renumber() const
 {
   return renumber;
 }
+
+
+
+#endif
+
