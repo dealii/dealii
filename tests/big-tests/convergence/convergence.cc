@@ -292,28 +292,33 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   cout << h1_error_per_cell.l2_norm() << endl;
   h1_error.push_back (h1_error_per_cell.l2_norm());
 
-  dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
-  dVector h1_seminorm_error_per_dof, h1_error_per_dof;
-  dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
-  dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
-  dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
-  dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell, h1_seminorm_error_per_dof);
-  dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
+  if (level<=5) 
+    {
+      dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
+      dVector h1_seminorm_error_per_dof, h1_error_per_dof;
+      dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
+      dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
+      dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
+      dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell, h1_seminorm_error_per_dof);
+      dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
 
-  string filename = "gnuplot.";
-  filename += ('0'+level);
-  cout << "    Writing error plots to <" << filename << ">..." << endl;
-
-  DataOut<dim> out;
-  ofstream gnuplot(filename.c_str());
-  fill_data (out);
-  out.add_data_vector (l1_error_per_dof, "L1-Error");
-  out.add_data_vector (l2_error_per_dof, "L2-Error");
-  out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
-  out.add_data_vector (h1_seminorm_error_per_dof, "H1-seminorm-Error");
-  out.add_data_vector (h1_error_per_dof, "H1-Error");
-  out.write_gnuplot (gnuplot);
-  gnuplot.close ();
+      string filename = "gnuplot.";
+      filename += ('0'+level);
+      cout << "    Writing error plots to <" << filename << ">..." << endl;
+      
+      DataOut<dim> out;
+      ofstream gnuplot(filename.c_str());
+      fill_data (out);
+      out.add_data_vector (l1_error_per_dof, "L1-Error");
+      out.add_data_vector (l2_error_per_dof, "L2-Error");
+      out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
+      out.add_data_vector (h1_seminorm_error_per_dof, "H1-seminorm-Error");
+      out.add_data_vector (h1_error_per_dof, "H1-Error");
+      out.write_gnuplot (gnuplot);
+      gnuplot.close ();
+    }
+  else
+    cout << "    Not writing error as grid." << endl;
   
   cout << endl;
 };
@@ -367,7 +372,7 @@ void PoissonProblem<dim>::print_history () const {
 int main () {
   PoissonProblem<2> problem;
 
-  for (unsigned int level=1; level<8; ++level)
+  for (unsigned int level=1; level<10; ++level)
     problem.run (level);
 
   cout << endl << "Printing convergence history to <gnuplot.history>..." << endl;
