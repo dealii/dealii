@@ -241,6 +241,10 @@ class FullMatrix : public Subscriptor
 				      * Matrix-matrix-multiplication using
 				      * transpose of #this#.
 				      * $C=A^T*B$.
+				      *
+				      * Assumes that #A# and #B# have
+				      * compatible sizes and thet #C#
+				      * already has the right size.
 				      */
     template<typename number2>
     void Tmmult (FullMatrix<number2>       &C,
