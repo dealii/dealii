@@ -960,13 +960,22 @@ class ThreadManager : public ACE_Thread_Manager
       struct Fun_Data1
       {
  	  typedef void * (*FunPtr) (Arg1);
+	  typedef void   (*VoidFunPtr) (Arg1);
 	  Arg1   arg1;
 	  FunPtr fun_ptr;
+	  VoidFunPtr void_fun_ptr;
 	  
 	  Fun_Data1 (Arg1   arg1,
 		     FunPtr fun_ptr) :
 			  arg1  (arg1),
-			  fun_ptr (fun_ptr) {};
+			  fun_ptr (fun_ptr),
+			  void_fun_ptr (0) {};
+	  
+	  Fun_Data1 (Arg1   arg1,
+		     VoidFunPtr void_fun_ptr) :
+			  arg1  (arg1),
+			  fun_ptr (0),
+			  void_fun_ptr (void_fun_ptr) {};
       };
 
 
@@ -984,16 +993,27 @@ class ThreadManager : public ACE_Thread_Manager
       struct Fun_Data2
       {
  	  typedef void * (*FunPtr) (Arg1 , Arg2);
-	  Arg1   arg1;
-	  Arg2   arg2;
-	  FunPtr fun_ptr;
+ 	  typedef void   (*VoidFunPtr) (Arg1 , Arg2);
+	  Arg1       arg1;
+	  Arg2       arg2;
+	  FunPtr     fun_ptr;
+	  VoidFunPtr void_fun_ptr;
 	  
 	  Fun_Data2 (Arg1   arg1,
 		     Arg2   arg2,
 		     FunPtr fun_ptr) :
 			  arg1  (arg1),
 			  arg2  (arg2),
-			  fun_ptr (fun_ptr) {};
+			  fun_ptr (fun_ptr),
+			  void_fun_ptr (0) {};
+
+	  Fun_Data2 (Arg1       arg1,
+		     Arg2       arg2,
+		     VoidFunPtr void_fun_ptr) :
+			  arg1  (arg1),
+			  arg2  (arg2),
+			  fun_ptr (0),
+			  void_fun_ptr (void_fun_ptr) {};
       };
 
     				     /**
@@ -1011,10 +1031,12 @@ class ThreadManager : public ACE_Thread_Manager
       struct Fun_Data3
       {
  	  typedef void * (*FunPtr) (Arg1 , Arg2, Arg3);
+ 	  typedef void   (*VoidFunPtr) (Arg1 , Arg2, Arg3);
 	  Arg1   arg1;
 	  Arg2   arg2;
 	  Arg3   arg3;
 	  FunPtr fun_ptr;
+	  VoidFunPtr void_fun_ptr;
 	  
 	  Fun_Data3 (Arg1   arg1,
 		     Arg2   arg2,
@@ -1023,7 +1045,18 @@ class ThreadManager : public ACE_Thread_Manager
 			  arg1  (arg1),
 			  arg2  (arg2),
 			  arg3  (arg3),
-			  fun_ptr (fun_ptr) {};
+			  fun_ptr (fun_ptr),
+			  void_fun_ptr (0) {};
+
+	  Fun_Data3 (Arg1   arg1,
+		     Arg2   arg2,
+		     Arg3   arg3,
+		     VoidFunPtr void_fun_ptr) :
+			  arg1  (arg1),
+			  arg2  (arg2),
+			  arg3  (arg3),
+			  fun_ptr (0),
+			  void_fun_ptr (void_fun_ptr) {};
       };
     
     				     /**
@@ -3935,7 +3968,13 @@ void * ThreadManager::thread_entry_point_1 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->fun_ptr)(arg->arg1);
+  if (arg->fun_ptr != 0)
+    return (arg->fun_ptr)(arg->arg1);
+   else
+    {
+      (arg->void_fun_ptr)(arg->arg1);
+      return 0;
+    }; 
 };
 
 
@@ -3952,8 +3991,15 @@ void * ThreadManager::thread_entry_point_2 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->fun_ptr)(arg->arg1,
-			arg->arg2);
+  if (arg->fun_ptr != 0)
+    return (arg->fun_ptr)(arg->arg1,
+			  arg->arg2);
+  else
+    {
+      (arg->void_fun_ptr)(arg->arg1,
+			  arg->arg2);
+      return 0;
+    };
 };
 
 
@@ -3971,9 +4017,17 @@ void * ThreadManager::thread_entry_point_3 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->fun_ptr)(arg->arg1,
-			arg->arg2,
-			arg->arg3);
+  if (arg->fun_ptr != 0)
+    return (arg->fun_ptr)(arg->arg1,
+			  arg->arg2,
+			  arg->arg3);
+  else
+    {
+      (arg->void_fun_ptr)(arg->arg1,
+			  arg->arg2,
+			  arg->arg3);
+      return 0;
+    };
 };
 
 
