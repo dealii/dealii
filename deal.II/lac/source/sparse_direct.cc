@@ -43,13 +43,11 @@
 #endif
 
 
-// if configured for UMFPACK, include respective file. annoyingly the UMFPACK
-// files don't seem to have extern "C" wrapped around their headers...
-#ifdef DEAL_II_USE_UMFPACK
+// include UMFPACK file. annoyingly the UMFPACK files don't seem to have
+// extern "C" wrapped around their headers...
 extern "C" {
 #  include <umfpack.h>
 }
-#endif
 
 
 // if the HSL functions are not there, define them empty and throw an
