@@ -1624,7 +1624,7 @@ void DGMethod<dim>::run ()
 				       // reinit the system matrix, the
 				       // right hand side vector and
 				       // the Timer object.
-      system_matrix.reinit();
+      system_matrix.set_zero();
       right_hand_side = 0;
       assemble_timer.reset();
 

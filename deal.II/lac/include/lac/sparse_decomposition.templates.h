@@ -1,5 +1,5 @@
 //---------------------  sparse_decomposition.templates.h  ----------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -129,21 +129,6 @@ decompose (const SparseMatrix<somenumber> &matrix,
   prebuild_lower_bound ();
   copy_from (matrix);
   decomposed = true;
-}
-
-
-
-template <typename number>
-void
-SparseLUDecomposition<number>::reinit ()
-{
-  decomposed = false;
-  if (true)
-    {
-      std::vector<const unsigned int*> tmp;
-      tmp.swap (prebuilt_lower_bound);
-    };
-  SparseMatrix<number>::reinit ();
 }
 
 

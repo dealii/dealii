@@ -492,31 +492,10 @@ class SparseMatrix : public virtual Subscriptor
     SparseMatrix<number>& operator = (const SparseMatrix<number> &);
 
 				     /**
-				      * Reinitialize the object but
-				      * keep to the sparsity pattern
-				      * previously used.  This may be
-				      * necessary if the sparsity
-				      * structure has changed and you
-				      * want to update the size of the
-				      * matrix.
-				      *
-				      * Note that memory is only
-				      * reallocated if the new size
-				      * exceeds the old size. If that
-				      * is not the case, the allocated
-				      * memory is not reduced. However,
-				      * if the sparsity structure is
-				      * empty (i.e. the dimensions are
-				      * zero), then all memory is
-				      * freed.
-				      *
-				      * If the sparsity pattern has
-				      * not changed, then the effect
-				      * of this function is simply to
-				      * reset all matrix entries to
-				      * zero.
+				      * Set all elements to zero, but keep to
+				      * the sparsity pattern of the matrix.
 				      */
-    virtual void reinit ();
+    virtual void set_zero ();
 
 				     /**
 				      * Reinitialize the sparse matrix

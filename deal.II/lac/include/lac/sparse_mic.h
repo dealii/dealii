@@ -1,5 +1,5 @@
 //----------------------------  sparse_mic.h  ---------------------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -77,14 +77,6 @@ class SparseMIC : public SparseLUDecomposition<number>
     typedef
     typename SparseLUDecomposition<number>::AdditionalData
     AdditionalData;
-
-				     /**
-				      * This method is deprecated, and
-				      * left for backward
-				      * compability. It will be
-				      * removed in later versions.
-				      */
-    void reinit ();
 
 				     /**
 				      * This method is deprecated, and

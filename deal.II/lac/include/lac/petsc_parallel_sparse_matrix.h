@@ -129,7 +129,7 @@ namespace PETScWrappers
                                           * function simply calls the respective
                                           * function of the base class.
                                           */
-        void reinit ();
+        void set_zero ();
 
                                          /**
                                           * Throw away the present matrix and

@@ -32,7 +32,25 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3 style="color:red">Incompatibilities</h3>
 
 <ol>
-  <li> <p> Changed: All the vector and block vector classes had a member
+  <li> <p> Removed: All the matrix classes have functions <code
+       class="member">reinit</code> that are used to resize the
+       matrix. However, the sparse matrix classes had an equally named
+       function without arguments that basically left the size of the matrix
+       unchanged but set all elements of the matrix to zero. It could also be
+       abused to notify the matrix that the sparsity pattern on which it is
+       built has changed, an inherently risky procedure. The no-argument code
+       <class="member">reinit</code> function has therefore been removed to
+       avoid confusion with the <code class="member">reinit</code> functions
+       that take arguments. Instead, a <code class="member">set_zero</code>
+       function has been introduced that simply sets all elements of the
+       matrix to zero. If you want to notify a sparse matrix that its sparsity
+       pattern has changed, use the <code
+       class="member">reinit(SparsityPattern)</code> function.
+       <br> 
+       (WB 2004/05/10)
+       </p>
+
+  <li> <p> Removed: All the vector and block vector classes had a member
        function <code class="member">clear</code> which simply resets all
        values of the vector to zero. It did not change the size of the vector,
        though. This was confusing, since the standard C++ container classes
@@ -46,6 +64,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        interface of the vector classes. To set all elements of a vector to
        zero without changing its size, the recommended way is to use the more
        obvious notation <code class="member">v=0</code>.  
+       <br> 
+       (WB 2004/05/10)
+       </p>
+
+  <li> <p> Removed: The <code
+       class="member">SparseLUDecomposition::reinit</code> and <code
+       class="member">SparseMIC::reinit</code> functions without
+       argument had been deprecated before, and have now been removed.
        <br> 
        (WB 2004/05/10)
        </p>

@@ -339,24 +339,11 @@ class BlockSparseMatrix : public Subscriptor
     operator = (const BlockSparseMatrix<number> &);
 
 				     /**
-				      * Reinitialize the object but
-				      * keep to the sparsity pattern
-				      * previously used.  This may be
-				      * necessary if you reinitialized
-				      * the sparsity structure and
-				      * want to update the size of the
-				      * matrix. It only calls
-				      * SparseMatrix::reinit() on the
-				      * sub-matrices. The size of this
-				      * matrix is unchanged.
-				      *
-				      * If the sparsity pattern has
-				      * not changed, then the effect
-				      * of this function is simply to
-				      * reset all matrix entries to
-				      * zero.
+				      * Set all elements of the matrix to
+				      * zero, but keep the sparsity pattern
+				      * previously used.
 				      */
-    virtual void reinit ();
+    void set_zero ();
 
 				     /**
 				      * Reinitialize the sparse matrix

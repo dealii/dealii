@@ -289,14 +289,6 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				      * compability. It will be removed
 				      * in later versions.
 				      */
-    void reinit ();
-
-				     /**
-				      * This method is deprecated,
-				      * and left for backward
-				      * compability. It will be removed
-				      * in later versions.
-				      */
     void reinit (const SparsityPattern &sparsity);
 
 				     /**

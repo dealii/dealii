@@ -133,7 +133,7 @@ namespace PETScWrappers
 
 
   void
-  MatrixBase::reinit ()
+  MatrixBase::set_zero ()
   {
     const int ierr = MatZeroEntries (matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));    

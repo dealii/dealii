@@ -80,11 +80,11 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparsityPattern &c) :
-		cols(&c),
+		cols(0),
 		val(0),
 		max_len(0)
 {
-  reinit();
+  reinit (c);
 }
 
 
@@ -102,29 +102,13 @@ SparseMatrix<number>::~SparseMatrix ()
 
 template <typename number>
 void
-SparseMatrix<number>::reinit ()
+SparseMatrix<number>::set_zero ()
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (cols->compressed || cols->empty(), ExcNotCompressed());
 
-  if (cols->empty()) 
-    {
-      if (val) delete[] val;
-      val = 0;
-      max_len = 0;
-      return;
-    };
-
-  const unsigned int N = cols->n_nonzero_elements();
-  if (N > max_len || max_len == 0)
-    {
-      if (val) delete[] val;
-      val = new number[N];
-      max_len = N;
-    };
-
   if (val)
-    std::fill_n (&val[0], N, 0);
+    std::fill_n (&val[0], cols->n_nonzero_elements(), 0);
 }
 
 
@@ -134,7 +118,27 @@ void
 SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
 {
   cols = &sparsity;
-  reinit ();
+
+  if (cols->empty())
+    {
+      if (val != 0)
+        delete[] val;
+      val = 0;
+      max_len = 0;
+      return;
+    }
+
+  const unsigned int N = cols->n_nonzero_elements();
+  if (N > max_len || max_len == 0)
+    {
+      if (val != 0)
+        delete[] val;
+      val = new number[N];
+      max_len = N;
+    }
+
+  if (val != 0)
+    std::fill_n (&val[0], N, 0);
 }
 
 
@@ -246,7 +250,7 @@ void
 SparseMatrix<number>::copy_from (const FullMatrix<somenumber> &matrix)
 {
 				   // first delete previous content
-  reinit ();
+  set_zero ();
 
 				   // then copy old matrix
   for (unsigned int row=0; row<matrix.m(); ++row)

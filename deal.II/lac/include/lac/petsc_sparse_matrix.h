@@ -110,14 +110,6 @@ namespace PETScWrappers
                     const bool                       is_symmetric = false);
 
                                        /**
-                                        * Set all matrix entries to zero, but
-                                        * retain the sparsity pattern. This
-                                        * function simply calls the respective
-                                        * function of the base class.
-                                        */
-      void reinit ();
-
-                                       /**
                                         * Throw away the present matrix and
                                         * generate one that has the same
                                         * properties as if it were created by
@@ -165,18 +157,6 @@ namespace PETScWrappers
                       const std::vector<unsigned int> &row_lengths,
                       const bool                       is_symmetric = false);
   };
-
-
-/// @if NoDoc
-// -------- template and inline functions ----------
-
-  inline
-  void
-  SparseMatrix::reinit ()
-  {
-    MatrixBase::reinit ();
-  }
-///@endif  
 }
 
 #endif // DEAL_II_USE_PETSC

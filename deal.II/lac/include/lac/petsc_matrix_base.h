@@ -319,7 +319,7 @@ namespace PETScWrappers
                                         * retain the sparsity pattern and all
                                         * the other properties of the matrix.
                                         */
-      void reinit ();
+      void set_zero ();
 
                                        /**
                                         * Set the element (<i>i,j</i>)

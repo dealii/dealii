@@ -1,5 +1,5 @@
 //----------------------------  sparse_mic.templates.h  ---------------------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -76,31 +76,6 @@ void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
   SparseLUDecomposition<number>::initialize(matrix, data);
 
   decompose(matrix, data.strengthen_diagonal);
-}
-
-
-
-template <typename number>
-void
-SparseMIC<number>::reinit ()
-{
-  if (true)
-    {
-      std::vector<number> tmp;
-      tmp.swap (diag);
-    };
-  if (true)
-    {
-      std::vector<number> tmp;
-      tmp.swap (inv_diag);
-    };
-  if (true)
-    {
-      std::vector<number> tmp;
-      tmp.swap (inner_sums);
-    };
-
-  SparseLUDecomposition<number>::reinit ();
 }
 
 
