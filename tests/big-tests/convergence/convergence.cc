@@ -434,6 +434,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
       out.add_data_vector (linfty_error_per_dof, "Linfty_Error");
       out.add_data_vector (h1_seminorm_error_per_dof, "H1_seminorm_Error");
       out.add_data_vector (h1_error_per_dof, "H1_Error");
+      out.build_patches ();
       out.write_ucd (o);
       o.close ();
     }
