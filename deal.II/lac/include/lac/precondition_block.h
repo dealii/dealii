@@ -75,7 +75,7 @@ template <typename number> class Vector;
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<typename number, typename inverse_type = number>
-class PreconditionBlock
+class PreconditionBlock : public virtual Subscriptor
 {
   public:
 				     /**
@@ -293,7 +293,7 @@ class PreconditionBlock
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<typename number, typename inverse_type = number>
-class PreconditionBlockJacobi : public Subscriptor,
+class PreconditionBlockJacobi : public virtual Subscriptor,
 				private PreconditionBlock<number,inverse_type>
 {
   public:
@@ -354,7 +354,7 @@ class PreconditionBlockJacobi : public Subscriptor,
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<typename number, typename inverse_type = number>
-class PreconditionBlockSOR : public  Subscriptor,
+class PreconditionBlockSOR : public virtual Subscriptor,
 			     protected PreconditionBlock<number,inverse_type>
 {
   public:
@@ -417,7 +417,8 @@ class PreconditionBlockSOR : public  Subscriptor,
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<typename number, typename inverse_type = number>
-class PreconditionBlockSSOR : private PreconditionBlockSOR<number,inverse_type>
+class PreconditionBlockSSOR : public virtual Subscriptor,
+			      private PreconditionBlockSOR<number,inverse_type>
 {
   public:
 				     /**
