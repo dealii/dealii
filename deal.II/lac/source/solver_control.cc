@@ -1,6 +1,6 @@
 // $Id$
 
-
+#include <base/logstream.h>
 #include <lac/solver_control.h>
 
 
@@ -20,7 +20,10 @@ SolverControl::SolverControl (const unsigned int maxiter,
 
 SolverControl::State
 SolverControl::check (const unsigned int step,
-		      const double check_value) {
+		      const double check_value)
+{
+  deallog << "Check " << step << "\t" << check_value << endl;
+  
   lstep  = step;
   lvalue = check_value;
   if (step>=maxsteps) return failure;
