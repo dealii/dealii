@@ -316,6 +316,7 @@ dnl Check for specific machine types and other checks
 dnl -------------------------------------------------------------
 
 DEAL_II_CHECK_GETRUSAGE
+DEAL_II_CHECK_ISNAN
 
 case "$target" in
    dnl On Alpha, there was an internal compiler error in exceptions.h.
