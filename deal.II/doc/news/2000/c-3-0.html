@@ -37,6 +37,15 @@
 
 <ol>
 
+  <li> Change: the solver classes in LAC lost their first template
+  argument. Their names are now<code
+  class="class">Solver*&lt;VECTOR&gt;</code>. Furthermore, the
+  inheritance from <code class="class">Solver</code> was made private
+  to reflect the logical structure.
+
+  <li> New: <code class="class">EigenInverse</code> implements inverse
+  iteration by Wieland.
+
   <li> New: <code class="class">EigenPower</code> implements power
   method by von Mises
 
