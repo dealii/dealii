@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -341,7 +341,7 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 /**
  * Grant access to the multilevel degrees of freedom located on quads.
  *
- * @ref DoFLineAccessor
+ * DoFLineAccessor
  */
 template <int dim>
 class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
@@ -466,7 +466,7 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 /**
  * Grant access to the multilevel degrees of freedom located on hexhedra.
  *
- * @ref DoFLineAccessor
+ * DoFLineAccessor
  */
 template <int dim>
 class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,

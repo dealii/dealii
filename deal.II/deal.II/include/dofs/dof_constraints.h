@@ -76,8 +76,8 @@ class BlockIndices;
  *   two major drawbacks: keeping two matrices at the same time can be quite
  *   unacceptable in many cases, since these matrices may be several 10 or even
  *   100 MB large. Secondly, the condensation process is quite expensive, since
- *   @em{all} entries of the matrix have to be copied, not only those which are
- *   subject to constraints.
+ *   <em>all</em> entries of the matrix have to be copied, not only
+ *   those which are subject to constraints.
  *
  * @item Use only one sparsity pattern and one matrix: doing it this way, the
  *   condense functions add nonzero entries to the sparsity pattern of the
@@ -126,7 +126,7 @@ class BlockIndices;
  * in the already condensed form.
  * 
  * 
- * @section3{Condensing vectors}
+ * @sect3{Condensing vectors}
  * 
  * Condensing vectors works exactly as described above for matrices. Note that
  * condensation is an idempotent operation, i.e. doing it more than once on a
@@ -140,7 +140,7 @@ class BlockIndices;
  * techniques as mentioned above to avoid their use.
  * 
  *
- * @section3{Distributing constraints}
+ * @sect3{Distributing constraints}
  * 
  * After solving the condensed system of equations, the solution vector has to
  * be redistributed. This is done by the two @p{distribute} function, one

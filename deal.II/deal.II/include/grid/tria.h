@@ -714,7 +714,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  Usage of these iterators works mostly like with the STL iterators. Some
  *  examples taken from the @ref{Triangulation} source code follow.
  *  @begin{itemize}
- *  @item @em{Counting the number of cells on a specific level}
+ *  @item <em>Counting the number of cells on a specific level</em>
  *    @begin{verbatim}
  *     template <int dim>
  *     int Triangulation<dim>::n_cells (const int level) const {
@@ -740,7 +740,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *      };  
  *    @end{verbatim}
  *    
- *  @item @em{Refining all cells of a triangulation}
+ *  @item <em>Refining all cells of a triangulation</em>
  *    @begin{verbatim}
  *      template <int dim>
  *      void Triangulation<dim>::refine_global () {
@@ -1235,7 +1235,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   and read the flags of all used lines, quads, etc, not only of the
  *   active ones (well, activity is a concept which really only applies to
  *   cells, not for example to lines in 2D, so the abovementioned generalization
- *   to @em{all} lines, quads, etc seems plausible).
+ *   to <em>all</em> lines, quads, etc seems plausible).
  *
  *   If you want to store more specific user flags, you can use the functions
  *   @p{save_user_flags_line} and @p{load_user_flags_line} and the generalizations
@@ -1341,7 +1341,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   at the old grid and the refinement flags for each cell.
  *
  *   @begin{itemize}
- *   @item @em{Regularization:} The algorithm walks over all cells checking
+ *   @item <em>Regularization:</em> The algorithm walks over all cells checking
  *     whether the present cell is flagged for refinement and a neighbor of the
  *     present cell is refined once less than the present one. If so, flag the
  *     neighbor for refinement. Because of the induction above, there may be no
@@ -1355,7 +1355,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     on lower levels, but if these induce more refinement needed, this is
  *     performed later on when we visit them in out backward running loop.
  *
- *   @item @em{Smoothing:}
+ *   @item <em>Smoothing:</em>
  *     @begin{itemize}
  *     @item @p{limit_level_difference_at_vertices}:
  *       First a list is set up which stores for each vertex
@@ -1567,7 +1567,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     *-------*        *-------*
  *   @end{verbatim}
  *
- *   The @em{standard} direction of the faces is determined by the
+ *   The <em>standard</em> direction of the faces is determined by the
  *   numbers the lines have within a given face. This is like follows:
  *   @begin{itemize}
  *   @item Faces 0 and 1:
@@ -1650,17 +1650,17 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   all faces that are consistent with this convention.
  *
  *   For this reason, above convention is only what we call the
- *   @em{standard orientation}. deal.II actually allows faces in 3d to
- *   have either the standard direction, or its opposite, in which
- *   case the lines that make up a cell would have reverted orders,
- *   and the above line equivalences would not hold any more. You can
- *   ask a cell whether a given face has standard orientation by
- *   calling @p{cell->face_orientation(face_no)}: if the result is
- *   @p{true}, then the face has standard orientation, otherwise its
- *   normal vector is pointing the other direction. There are not very
- *   many places in application programs where you need this
- *   information actually, but a few places in the library make use of
- *   this.
+ *   <em>standard orientation</em>. deal.II actually allows faces in
+ *   3d to have either the standard direction, or its opposite, in
+ *   which case the lines that make up a cell would have reverted
+ *   orders, and the above line equivalences would not hold any
+ *   more. You can ask a cell whether a given face has standard
+ *   orientation by calling @p{cell->face_orientation(face_no)}: if
+ *   the result is @p{true}, then the face has standard orientation,
+ *   otherwise its normal vector is pointing the other
+ *   direction. There are not very many places in application programs
+ *   where you need this information actually, but a few places in the
+ *   library make use of this.
  *
  *   @sect4{Children}
  *

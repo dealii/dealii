@@ -1709,24 +1709,23 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
   private:
     				     /**
-				      *  Copy operator. This is
-				      *  normally used in a context
-				      *  like @p{iterator a,b;
-				      *  *a=*b;}. Since the meaning is
-				      *  to copy the object pointed to
-				      *  by @p{b} to the object
-				      *  pointed to by @p{a} and since
-				      *  accessors are not real but
-				      *  virtual objects, this
-				      *  operation is not useful for
-				      *  iterators on
-				      *  triangulations. We declare
-				      *  this function here private,
-				      *  thus it may not be used from
-				      *  outside.  Furthermore it is
-				      *  not implemented and will give
-				      *  a linker error if used
-				      *  anyway.
+				      * Copy operator. This is
+				      * normally used in a context
+				      * like <tt>iterator a,b;
+				      * *a=*b;</tt>. Since the meaning
+				      * is to copy the object pointed
+				      * to by @p{b} to the object
+				      * pointed to by @p{a} and since
+				      * accessors are not real but
+				      * virtual objects, this
+				      * operation is not useful for
+				      * iterators on
+				      * triangulations. We declare
+				      * this function here private,
+				      * thus it may not be used from
+				      * outside.  Furthermore it is
+				      * not implemented and will give
+				      * a linker error if used anyway.
 				      */
     void operator = (const TriaObjectAccessor<2, dim> &);
 
@@ -2290,9 +2289,9 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
  *
  * The following refers to any space dimension:
  * 
- * This class allows access to a @em{cell}, which is a line in 1D and
- * a quad in 2D. Cells have more functionality than lines or quads by
- * themselves, for example they can be flagged for refinement, they
+ * This class allows access to a <tt>cell</tt>, which is a line in 1D
+ * and a quad in 2D. Cells have more functionality than lines or quads
+ * by themselves, for example they can be flagged for refinement, they
  * have neighbors, they have the possibility to check whether they are
  * at the boundary etc. This class offers access to all this data.
  *
@@ -2613,8 +2612,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     				     /**
 				      *  Copy operator. This is
 				      *  normally used in a context
-				      *  like @p{iterator a,b;
-				      *  *a=*b;}. Since the meaning is
+				      *  like <tt>iterator a,b;
+				      *  *a=*b;</tt>. Since the meaning is
 				      *  to copy the object pointed to
 				      *  by @p{b} to the object
 				      *  pointed to by @p{a} and since

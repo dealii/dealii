@@ -500,8 +500,8 @@ class TriaRawIterator :
 
 
 /**
- *   This specialization of @ref{TriaRawIterator} provides access only to the
- *   @em{used} lines, quads, cells, etc.
+ *   This specialization of TriaRawIterator provides access only to
+ *   the <em>used</em> lines, quads, cells, etc.
  */
 template <int dim, typename Accessor>
 class TriaIterator : public TriaRawIterator<dim,Accessor> 
@@ -646,9 +646,10 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 
 
 /**
- *   This specialization of @ref{TriaIterator} provides access only to the
- *   @em{active} lines, quads, cells, etc. An active cell is a cell which is not
- *   refined and thus a cell on which calculations on the finest level are done.
+ *   This specialization of TriaIterator provides access only to the
+ *   <em>active</em> lines, quads, cells, etc. An active cell is a
+ *   cell which is not refined and thus a cell on which calculations
+ *   on the finest level are done.
  */
 template <int dim, typename Accessor>
 class TriaActiveIterator : public TriaIterator<dim,Accessor> 

@@ -403,16 +403,20 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
     TriaIterator<dim,DoFObjectAccessor<celldim, dim> > child (const unsigned int) const;
 
 				     /**
-				      * Distribute a local (cell based) vector
-				      * to a global one by mapping the local
-				      * numbering of the degrees of freedom to
-				      * the global one and entering the local
-				      * values into the global vector.
+				      * Distribute a local (cell
+				      * based) vector to a global one
+				      * by mapping the local numbering
+				      * of the degrees of freedom to
+				      * the global one and entering
+				      * the local values into the
+				      * global vector.
 				      *
-				      * The elements are @em{added} up to the
-				      * elements in the global vector, rather
-				      * than just set, since this is usually
-				      * what one wants.
+				      * The elements are
+				      * <em>added</em> up to the
+				      * elements in the global vector,
+				      * rather than just set, since
+				      * this is usually what one
+				      * wants.
 				      */
     template <typename number, typename OutputVector>
     void
@@ -648,10 +652,12 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * the global one and entering the local
 				      * values into the global vector.
 				      *
-				      * The elements are @em{added} up to the
-				      * elements in the global vector, rather
-				      * than just set, since this is usually
-				      * what one wants.
+				      * The elements are
+				      * <em>added</em> up to the
+				      * elements in the global vector,
+				      * rather than just set, since
+				      * this is usually what one
+				      * wants.
 				      */
     template <typename number, typename OutputVector>
     void
@@ -848,10 +854,12 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * the global one and entering the local
 				      * values into the global vector.
 				      *
-				      * The elements are @em{added} up to the
-				      * elements in the global vector, rather
-				      * than just set, since this is usually
-				      * what one wants.
+				      * The elements are
+				      * <em>added</em> up to the
+				      * elements in the global vector,
+				      * rather than just set, since
+				      * this is usually what one
+				      * wants.
 				      */
     template <typename number, typename OutputVector>
     void
@@ -1048,16 +1056,20 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
     TriaIterator<dim,DoFObjectAccessor<3, dim> > child (const unsigned int) const;
 
 				     /**
-				      * Distribute a local (cell based) vector
-				      * to a global one by mapping the local
-				      * numbering of the degrees of freedom to
-				      * the global one and entering the local
-				      * values into the global vector.
+				      * Distribute a local (cell
+				      * based) vector to a global one
+				      * by mapping the local numbering
+				      * of the degrees of freedom to
+				      * the global one and entering
+				      * the local values into the
+				      * global vector.
 				      *
-				      * The elements are @em{added} up to the
-				      * elements in the global vector, rather
-				      * than just set, since this is usually
-				      * what one wants.
+				      * The elements are
+				      * <em>added</em> up to the
+				      * elements in the global vector,
+				      * rather than just set, since
+				      * this is usually what one
+				      * wants.
 				      */
     template <typename number, typename OutputVector>
     void

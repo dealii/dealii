@@ -73,11 +73,11 @@ class MGLevelObject : public Subscriptor
 				      * for some @p{Object} classes,
 				      * most notably for vectors and
 				      * matrices. Note that if
-				      * @p{Object==Vector<T>}, @p{clear}
-				      * will set all entries to zero,
-				      * while if
-				      * @p{Object==vector<T>},
-				      * @p{clear} deletes the elements
+				      * <tt>Object==Vector@<T@></tt>,
+				      * clear() will set all entries
+				      * to zero, while if
+				      * <tt>Object==vector@<T@></tt>,
+				      * clear() deletes the elements
 				      * of the vectors. This class
 				      * might therefore not be useful
 				      * for STL vectors.

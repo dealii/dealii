@@ -174,9 +174,9 @@
  * degrees of freedom. This renumbering may only exchange whole blocks
  * and must not destroy the block structure.
  *
- * Given an ordered vector of cells, the function @p{cell_wise_dg}
+ * Given an ordered vector of cells, the function cell_wise_dg()
  * accomplishes this. Inside the cells, the previous ordering will be
- * preserved, so it may be useful to apply @component_wise} first.
+ * preserved, so it may be useful to apply component_wise() first.
  *
  *
  * @sect2{Random renumbering}

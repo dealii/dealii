@@ -273,7 +273,7 @@ class KellyErrorEstimator
 				     /**
 				      * Calls the @p{estimate}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */    
     template <typename InputVector>
     static void estimate (const DoFHandler<dim>   &dof,
@@ -326,7 +326,7 @@ class KellyErrorEstimator
 				     /**
 				      * Calls the @p{estimate}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <typename InputVector>
     static void estimate (const DoFHandler<dim>       &dof,

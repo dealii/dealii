@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -182,9 +182,9 @@ namespace IteratorFilters
 /**
  * This class provides a certain view on a range of triangulation or
  * DoFHandler iterators by only iterating over elements that satisfy a
- * given filter (called a @em{predicate}, following the notation of
- * the C++ standard library). Once initialized with a predicate and a
- * value for the iterator, a filtered iterator hops to the next or
+ * given filter (called a <em>predicate</em>, following the notation
+ * of the C++ standard library). Once initialized with a predicate and
+ * a value for the iterator, a filtered iterator hops to the next or
  * previous element that satisfies the predicate if operators ++ or --
  * are invoked. Intermediate iterator values that lie in between but
  * do not satisfy the predicate are skipped. It is thus very simple to
@@ -283,9 +283,9 @@ namespace IteratorFilters
  * iterators a nightmare, we rather give the predicate as an
  * unchangeable entity to the constructor. Note that one can assign a
  * filtered iterator with one predicate to another filtered iterator
- * with another type; yet, this does @em{not} change the predicate of
- * the assigned-to iterator, only the pointer indicating the iterator
- * is changed.
+ * with another type; yet, this does <em>not</em> change the predicate
+ * of the assigned-to iterator, only the pointer indicating the
+ * iterator is changed.
  *
  * If a filtered iterator is not assigned a value of the underlying
  * (unfiltered) iterator type, the default value is taken. If,

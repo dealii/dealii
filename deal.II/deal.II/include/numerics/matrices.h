@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,10 +49,10 @@ template <int dim> class FEValues;
  *
  * There exist two versions of each function. One with a @ref{Mapping}
  * argument and one without. If a code uses a mapping different from
- * @ref{MappingQ1} the functions @em{with} mapping argument should be
- * used. Code that uses only @ref{MappingQ1} may also use the
- * functions @em{without} @ref{Mapping} argument. Each of these latter
- * functions create a @ref{MappingQ1} object and just call the
+ * @ref{MappingQ1} the functions <em>with</em> mapping argument should
+ * be used. Code that uses only @ref{MappingQ1} may also use the
+ * functions <em>without</em> @ref{Mapping} argument. Each of these
+ * latter functions create a @ref{MappingQ1} object and just call the
  * respective functions with that object as mapping argument. The
  * functions without @ref{Mapping} argument still exist to ensure
  * backward compatibility. Nevertheless it is advised to change the
@@ -211,9 +211,9 @@ class MatrixCreator
 				    const Function<dim> * const a = 0);
 
 				     /**
-				      * Calls the @p{create_mass_matrix}
+				      * Calls the create_mass_matrix()
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, typename number>
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
@@ -244,9 +244,9 @@ class MatrixCreator
 				    const Function<dim> * const a = 0);
 
 				     /**
-				      * Calls the @p{create_mass_matrix}
+				      * Calls the create_mass_matrix()
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, typename number>
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
@@ -303,9 +303,9 @@ class MatrixCreator
 
 				     /**
 				      * Calls the
-				      * @p{create_boundary_mass_matrix}
+				      * create_boundary_mass_matrix()
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim>
     static
@@ -338,9 +338,10 @@ class MatrixCreator
 				       const Function<dim> * const a = 0);
     
 				     /**
-				      * Calls the @p{create_laplace_matrix}
+				      * Calls the
+				      * create_laplace_matrix()
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim>
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
@@ -372,9 +373,10 @@ class MatrixCreator
 				       const Function<dim> * const a = 0);
 
 				     /**
-				      * Calls the @p{create_laplace_matrix}
+				      * Calls the
+				      * create_laplace_matrix()
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim>
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,

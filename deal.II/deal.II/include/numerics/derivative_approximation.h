@@ -195,7 +195,7 @@ class DerivativeApproximation
     				     /**
 				      * Calls the @p{interpolate}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, class InputVector>
     static void
@@ -242,7 +242,7 @@ class DerivativeApproximation
     				     /**
 				      * Calls the @p{interpolate}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, class InputVector>
     static void

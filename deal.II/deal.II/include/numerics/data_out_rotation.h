@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -39,7 +39,7 @@ template <int dim> class DoFHandler;
  * intervals as well; the number of these intervals must be given to
  * the @p{build_patches} function. It is noted, however, that while
  * this function generates nice pictures of the whole domain, it often
- * produces @em{very} large output files.
+ * produces <em>very</em> large output files.
  *
  *
  * @sect3{Interface}

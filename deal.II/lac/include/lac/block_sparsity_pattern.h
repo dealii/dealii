@@ -322,7 +322,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * one line per row of the format
 				      * <tt>[i,j1,j2,j3,...]</tt>. <i>i</i>
 				      * is the row number and
-				      * <i>jn</n> are the allocated
+				      * <i>jn</i> are the allocated
 				      * columns in this row.
 				      */
     void print (std::ostream &out) const;

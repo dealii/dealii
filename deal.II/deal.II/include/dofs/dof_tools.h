@@ -627,12 +627,12 @@ class DoFTools
 				      * shape functions cannot be
 				      * associated with a single
 				      * vector component. In this
-				      * case, if @em{one} shape vector
-				      * component of this element is
-				      * flagged in
+				      * case, if <em>one</em> shape
+				      * vector component of this
+				      * element is flagged in
 				      * @p{component_select}, then
 				      * this is equivalent to
-				      * selecting @em{all} vector
+				      * selecting <em>all</em> vector
 				      * components corresponding to
 				      * this non-primitive base
 				      * element.

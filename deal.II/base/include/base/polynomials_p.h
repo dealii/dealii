@@ -82,9 +82,9 @@ class PolynomialsP: public PolynomialSpace<dim>
     void create_polynomial_ordering(std::vector<unsigned int> &index_map) const;
 
 				     /**
-				      * Degree <tt>p<tt> of the
+				      * Degree <tt>p</tt> of the
 				      * polynomial space $P_p$,
-				      * i.e. the number <tt>p<tt>
+				      * i.e. the number <tt>p</tt>
 				      * which was given to the
 				      * constructor.
 				      */

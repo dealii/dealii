@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -574,9 +574,9 @@ class TimeDependent
 				      * To see how this function work, note that
 				      * the function @p{solve_primal_problem} only
 				      * consists of a call to
-				      * @p{do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
+				      * <tt>do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
 				      *	   mem_fun(&TimeStepBase::solve_primal_problem),
-				      *	   timestepping_data_primal, forward);}.
+				      *	   timestepping_data_primal, forward);</tt>.
 				      *
 				      * Note also, that the given class from which
 				      * the two functions are taken needs not

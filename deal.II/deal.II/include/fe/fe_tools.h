@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -528,13 +528,13 @@ class FETools
 				      * @p{FE_Q<2>}, you can omit the
 				      * dimension argument altogether,
 				      * or replace it with the string
-				      * @p{<dim>}. The reason is that
-				      * the dimension argument may be
-				      * cumbersome if the name of a
-				      * finite element is given in an
-				      * input file that may be used to
-				      * control operation of the
-				      * program in different space
+				      * <tt>@<dim@></tt>. The reason
+				      * is that the dimension argument
+				      * may be cumbersome if the name
+				      * of a finite element is given
+				      * in an input file that may be
+				      * used to control operation of
+				      * the program in different space
 				      * dimensions. Running the
 				      * program in another space
 				      * dimension would then require

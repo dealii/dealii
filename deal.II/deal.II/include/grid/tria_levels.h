@@ -96,10 +96,11 @@ class TriangulationLevel<0>
 				      *  at the boundary), @p{level=index=-1}
 				      *  is set.
 				      *
-				      *  @em{Conventions:} The @p{i}th neighbor
-				      *  of a cell is the one which shares
-				      *  the @p{i}th face (@p{Line} in 2D, @p{Quad}
-				      *  in 3D) of this cell.
+				      *  <em>Conventions:</em> The
+				      *  @p{i}th neighbor of a cell is
+				      *  the one which shares the
+				      *  @p{i}th face (@p{Line} in 2D,
+				      *  @p{Quad} in 3D) of this cell.
 				      *
 				      *  The neighbor of a cell has at most the
 				      *  same level as this cell, i.e. it may
