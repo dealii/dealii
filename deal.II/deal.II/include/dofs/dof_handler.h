@@ -1334,14 +1334,14 @@ class DoFHandler  :  public Subscriptor,
 		    << "is invalid with respect to the number "
 		    << "of components in the finite element "
 		    << "(" << arg2 << ")");
-    
+
   protected:
     
 				     /**
 				      * Address of the triangulation to
 				      * work on.
 				      */
-    Triangulation<dim> * const tria;
+    SmartPointer<Triangulation<dim> > tria;
 
 				     /**
 				      * Store a pointer to the finite element

@@ -27,14 +27,13 @@ DoFHandler<dim>::DoFHandler (Triangulation<dim> *tria) :
 		tria(tria),
 		used_dofs (0)
 {
-  tria->subscribe ();
+  Assert (tria != 0, ExcInvalidTriangulation());
 };
 
 
 template <int dim>
-DoFHandler<dim>::~DoFHandler () {
-  tria->unsubscribe ();
-}
+DoFHandler<dim>::~DoFHandler ()
+{};
 
 
 
