@@ -27,6 +27,17 @@
  * the number of iterations before a restart occurs is less by three than
  * the total number of temporary vectors.
  *
+ * Note that restarts don't compensate temporary vectors very well, i.e.
+ * giving too few temporary vectors will increase the necessary iteration
+ * steps greatly; it is not uncommon that you will need more iterations
+ * than there are degrees of freedom in your solution vector, if the number
+ * of temporary vectors is lower than the size of the vector, even though
+ * GMRES is an exact solver if a sufficient number of temporary vectors is
+ * given. You should therefore always give as many temporary vectors as you
+ * can, unless you are limited by the available memory; only then should you
+ * start to trade computational speed against memory. One of the few other
+ * possibilities is to use a good preconditioner.
+ *
  * @author Original implementation by the DEAL authors; adapted, cleaned and documented by Wolfgang Bangerth
  */
 template<class Matrix, class Vector>
