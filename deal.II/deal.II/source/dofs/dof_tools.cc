@@ -711,6 +711,74 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 
 
 
+#if deal_II_dimension != 1
+
+template <int dim>
+void
+DoFTools::extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
+				 const vector<bool>    &component_select,
+				 vector<bool>          &selected_dofs)
+{
+  Assert (component_select.size() == dof_handler.get_fe().n_components(),
+	  ExcWrongSize (component_select.size(),
+			dof_handler.get_fe().n_components()));
+
+  selected_dofs.resize (dof_handler.n_dofs(), false);
+  vector<unsigned int> face_dof_indices (dof_handler.get_fe().dofs_per_face);
+  for (DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active();
+       cell!=dof_handler.end(); ++cell)
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      if (cell->at_boundary(face))
+	{
+	  cell->face(face)->get_dof_indices (face_dof_indices);
+	  for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
+	    if (component_select[dof_handler.get_fe().
+				face_system_to_component_index(i).first] == true)
+	      selected_dofs[face_dof_indices[i]] = true;
+	};
+};
+
+
+#else
+
+template <>
+void
+DoFTools::extract_boundary_dofs (const DoFHandler<1> &dof_handler,
+				 const vector<bool>  &component_select,
+				 vector<bool>        &selected_dofs)
+{
+  Assert (component_select.size() == dof_handler.get_fe().n_components(),
+	  ExcWrongSize (component_select.size(),
+			dof_handler.get_fe().n_components()));
+	  
+  selected_dofs.resize (dof_handler.n_dofs(), false);
+
+  Assert (dof_handler.get_fe().dofs_per_face == dof_handler.get_fe().dofs_per_vertex,
+	  ExcInternalError());
+  
+				   // loop over coarse grid cells
+  for (DoFHandler<1>::cell_iterator cell=dof_handler.begin(0);
+       cell!=dof_handler.end(0); ++cell)
+    {
+				       // check left-most vertex
+      if (cell->neighbor(0) == dof_handler.end())
+	for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
+	  if (component_select[dof_handler.get_fe().
+			      face_system_to_component_index(i).first] == true)
+	    selected_dofs[cell->vertex_dof_index(0,i)] = true;
+				       // check right-most vertex
+      if (cell->neighbor(1) == dof_handler.end())
+	for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
+	  if (component_select[dof_handler.get_fe().
+			      face_system_to_component_index(i).first] == true)
+	    selected_dofs[cell->vertex_dof_index(1,i)] = true;
+    };
+};
+
+
+#endif
+
+
 
 template <int dim>
 void
@@ -1195,6 +1263,13 @@ template void DoFTools::extract_level_dofs(unsigned int level,
 					   const vector<bool>& local_select,
 					   vector<bool>& selected_dofs);
 
+#if deal_II_dimension != 1
+template
+void
+DoFTools::extract_boundary_dofs (const DoFHandler<deal_II_dimension> &,
+				 const vector<bool>                  &,
+				 vector<bool>                        &);
+#endif 
 
 template
 void

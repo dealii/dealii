@@ -350,28 +350,53 @@ class DoFTools
 				      * are then flagged #true#, while all
 				      * others are set to #false#.
 				      *
-				      * The size of #select# shall equal
-				      * the number of components in the
-				      * finite element used by #dof#.
+				      * The size of #component_select#
+				      * shall equal the number of
+				      * components in the finite
+				      * element used by #dof#.
 				      */
     template <int dim>
     static void
-    extract_dofs(const DoFHandler<dim> &dof_handler,
-		 const vector<bool>    &select,
-		 vector<bool>          &selected_dofs);
+    extract_dofs (const DoFHandler<dim> &dof_handler,
+		  const vector<bool>    &component_select,
+		  vector<bool>          &selected_dofs);
 
 				     /**
-				      * Do the same thing as #extract_dofs#
-				      * for one level of a multi-grid DoF
-				      * numbering.
+				      * Do the same thing as
+				      * #extract_dofs# for one level
+				      * of a multi-grid DoF numbering.
 				      */
     template <int dim>
     static void
-    extract_level_dofs(const unsigned int       level,
-		       const MGDoFHandler<dim> &dof,
-		       const vector<bool>      &select,
-		       vector<bool>            &selected_dofs);
+    extract_level_dofs (const unsigned int       level,
+			const MGDoFHandler<dim> &dof,
+			const vector<bool>      &select,
+			vector<bool>            &selected_dofs);
 
+				     /**
+				      * Extract all degrees of freedom
+				      * which are at the boundary and
+				      * belong to specified components
+				      * of the solution. The function
+				      * returns its results in the
+				      * last parameter which contains
+				      * #true# is a degree of freedom
+				      * is at the boundary and belongs
+				      * to one of the selected
+				      * components, and #false#
+				      * otherwise.
+				      *
+				      * The size of #component_select#
+				      * shall equal the number of
+				      * components in the finite
+				      * element used by #dof#.
+				      */
+    template <int dim>
+    static void
+    extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
+			   const vector<bool>    &component_select,
+			   vector<bool>          &selected_dofs);
+    
 				     /**
 				      * This function can be used when
 				      * different variables shall be
