@@ -83,7 +83,8 @@ class PoissonProblem {
     typedef TriaActiveIterator<dim, Assembler<dim> > active_assemble_iterator;
 
     PoissonProblem (unsigned int order);
-
+    virtual ~PoissonProblem () {};
+    
     void clear ();
     void create_new ();
     void solve ();
@@ -111,6 +112,11 @@ class PoissonProblem {
     int run (unsigned int level);
     void print_history (string filename) const;
     
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNoTriaSelected);
+
   protected:
     Triangulation<dim> *tria;
     MGDoFHandler<dim>  *dof;
