@@ -2,17 +2,14 @@
 
 #include <fe/fe_lib.h>
 #include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-
+#include <grid/dof_accessor.h>
+#include <algorithm>
 
 
 
 FELinear<1>::FELinear () :
 		FiniteElement<1> (1, 0)
 {
-  restriction[0].reinit (2,2);
-  restriction[1].reinit (2,2);
-
 				   // for restriction and prolongation matrices:
 				   // note that we do not add up all the
 				   // contributions since then we would get
@@ -33,10 +30,6 @@ FELinear<1>::FELinear () :
   restriction[1](1,0) = 1./2.;
   restriction[1](1,1) = 1.0;
 
-
-  prolongation[0].reinit (2,2);
-  prolongation[1].reinit (2,2);
-  
   prolongation[0](0,0) = 1.0;
   prolongation[0](1,0) = 1./2.;
   prolongation[0](1,1) = 1./2.;
@@ -78,8 +71,8 @@ FELinear<1>::shape_grad(const unsigned int i,
 
 
 
-void FELinear<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
-				  const vector<Point<1> >               &unit_points,
+void FELinear<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
+				  const vector<Point<1> >            &unit_points,
 				  vector<dFMatrix>  &jacobians,
 				  const bool         compute_jacobians,
 				  vector<Point<1> > &ansatz_points,
@@ -96,31 +89,28 @@ void FELinear<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 
 
 
-void FELinear<1>::face_ansatz_points (const Triangulation<1>::face_iterator &,
-				      const Boundary<1> &,
-				      vector<Point<1> > &) const {
-  Assert (false, ExcPureFunctionCalled());
+void FELinear<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
+					  const Boundary<1>  &,
+					  vector<Point<1> >  &) const {
+  Assert (false, ExcInternalError());
 };
 
+
+
+void FELinear<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
+				      const Boundary<1>         &,
+				      const vector<Point<0> > &,
+				      vector<double>      &) const {
+  Assert (false, ExcInternalError());
+};
 
 
 
 FELinear<2>::FELinear () :
 		FiniteElement<2> (1, 0, 0)
 {
-  interface_constraints.reinit(1,2);
   interface_constraints(0,0) = 1./2.;
   interface_constraints(0,1) = 1./2.;
-
-  restriction[0].reinit(4,4);
-  restriction[1].reinit(4,4);
-  restriction[2].reinit(4,4);
-  restriction[3].reinit(4,4);
-
-  prolongation[0].reinit(4,4);
-  prolongation[1].reinit(4,4);
-  prolongation[2].reinit(4,4);
-  prolongation[3].reinit(4,4);
 
   restriction[0](0,0) = 1.0;
   restriction[0](0,1) = 1./2.;
@@ -239,17 +229,16 @@ FELinear<2>::shape_grad (const unsigned int i,
 
 
 
-// this function may be generalised to three or more dimensions with gcc2.8
-// you will have to change the number of vertices
-void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
-				  const vector<Point<2> >               &unit_points,
-				  vector<dFMatrix>  &jacobians,
-				  const bool         compute_jacobians,
-				  vector<Point<2> > &ansatz_points,
-				  const bool         compute_ansatz_points,
-				  vector<Point<2> > &q_points,
-				  const bool         compute_q_points,
-				  const Boundary<2> &) const {
+template <int dim>
+void FELinear<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+				    const vector<Point<dim> >            &unit_points,
+				    vector<dFMatrix>    &jacobians,
+				    const bool           compute_jacobians,
+				    vector<Point<dim> > &ansatz_points,
+				    const bool           compute_ansatz_points,
+				    vector<Point<dim> > &q_points,
+				    const bool           compute_q_points,
+				    const Boundary<dim> &) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -257,7 +246,6 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
   Assert (ansatz_points.size() == total_dofs,
 	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
   
-  const unsigned int dim=2;
   const unsigned int n_vertices=(1<<dim);
   unsigned int n_points=unit_points.size();
 
@@ -330,24 +318,42 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 				   // compute ansatz points, which are
 				   // the corners for linear elements
   if (compute_ansatz_points) 
-    for (unsigned int vertex=0; vertex<4; ++vertex)
+    for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
       ansatz_points[vertex] = vertices[vertex];
 };
 
 
 
+
 template <int dim>
-void FELinear<dim>::face_ansatz_points (const typename Triangulation<dim>::face_iterator &face,
-					const Boundary<dim>  &,
-					vector<Point<dim> >  &ansatz_points) const {
+void FELinear<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face_iterator &face,
+					    const Boundary<dim>  &,
+					    vector<Point<dim> >  &ansatz_points) const {
   Assert (ansatz_points.size() == (1<<(dim-1)),
-	  typename FiniteElementBase<dim>::ExcWrongFieldDimension (ansatz_points.size(),
-								   1<<(dim-1)));
-  
+	  ExcWrongFieldDimension (ansatz_points.size(), 1<<(dim-1)));
+
   for (unsigned int vertex=0; vertex<(1<<(dim-1)); ++vertex)
     ansatz_points[vertex] = face->vertex(vertex);
 };
 
+
+
+void FELinear<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
+				      const Boundary<2>         &,
+				      const vector<Point<1> > &unit_points,
+				      vector<double>      &face_jacobians) const {
+  Assert (unit_points.size() == face_jacobians.size(),
+	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
+
+				   // a linear mapping for a single line
+				   // produces particularly simple
+				   // expressions for the jacobi
+				   // determinant :-)
+  const double h = sqrt((face->vertex(1) - face->vertex(0)).square());
+  fill_n (face_jacobians.begin(),
+	  unit_points.size(),
+	  h);  
+};
 
 
 
@@ -359,8 +365,8 @@ FEQuadratic<1>::FEQuadratic () :
 
 
 
-void FEQuadratic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
-				     const vector<Point<1> >               &unit_points,
+void FEQuadratic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
+				     const vector<Point<1> >            &unit_points,
 				     vector<dFMatrix>  &jacobians,
 				     const bool         compute_jacobians,
 				     vector<Point<1> > &ansatz_points,
@@ -377,10 +383,26 @@ void FEQuadratic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell
 
 
 
+void FEQuadratic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
+					     const Boundary<1>  &,
+					     vector<Point<1> >  &) const {
+  Assert (false, ExcInternalError());
+};
+
+
+
+void FEQuadratic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
+					 const Boundary<1>         &,
+					 const vector<Point<0> > &,
+					 vector<double>      &) const {
+  Assert (false, ExcInternalError());
+};
+
+
+
 FEQuadratic<2>::FEQuadratic () :
 		FiniteElement<2> (1, 1, 1)
 {
-  interface_constraints.reinit(3,3);
   interface_constraints(0,2) = 1.0;
   interface_constraints(1,0) = 3./8.;
   interface_constraints(1,1) = -1./8.;
@@ -388,6 +410,10 @@ FEQuadratic<2>::FEQuadratic () :
   interface_constraints(2,0) = -1./8.;
   interface_constraints(2,1) = 3./8.;
   interface_constraints(2,2) = 3./4.;
+
+				   // still implement restriction
+				   // and prolongation
+  Assert (false, ExcNotImplemented());
 };
 
 
@@ -398,7 +424,7 @@ FEQuadratic<dim>::shape_value (const unsigned int i,
 			       const Point<dim> &) const
 {
   Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
-  Assert (false, typename FiniteElementBase<dim>::ExcNotImplemented());
+  Assert (false, ExcNotImplemented());
   return 0.;
 };
 
@@ -410,21 +436,22 @@ FEQuadratic<dim>::shape_grad (const unsigned int i,
 			      const Point<dim> &) const
 {
   Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
-  Assert (false, typename FiniteElementBase<dim>::ExcNotImplemented());
+  Assert (false, ExcNotImplemented());
   return Point<dim> ();
 };
 
 
 
-void FEQuadratic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
-				     const vector<Point<2> >               &unit_points,
-				     vector<dFMatrix>  &jacobians,
-				     const bool,
-				     vector<Point<2> > &ansatz_points,
-				     const bool,
-				     vector<Point<2> > &q_points,
-				     const bool,
-				     const Boundary<2> &) const {
+template <int dim>
+void FEQuadratic<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
+				       const vector<Point<dim> >            &unit_points,
+				       vector<dFMatrix>  &jacobians,
+				       const bool,
+				       vector<Point<dim> > &ansatz_points,
+				       const bool,
+				       vector<Point<dim> > &q_points,
+				       const bool,
+				       const Boundary<dim> &) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -432,7 +459,26 @@ void FEQuadratic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
   Assert (ansatz_points.size() == total_dofs,
 	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
 
-  Assert (false, typename FiniteElementBase<2>::ExcNotImplemented());
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void FEQuadratic<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face_iterator &,
+					       const Boundary<dim>  &,
+					       vector<Point<dim> >  &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void FEQuadratic<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &,
+				      const Boundary<dim>         &,
+				      const vector<Point<dim-1> > &,
+				      vector<double>      &) const {
+  Assert (false, ExcNotImplemented());
 };
 
 
@@ -445,8 +491,8 @@ FECubic<1>::FECubic () :
 
 
 
-void FECubic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
-				 const vector<Point<1> >               &unit_points,
+void FECubic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
+				 const vector<Point<1> >            &unit_points,
 				 vector<dFMatrix>  &jacobians,
 				 const bool         compute_jacobians,
 				 vector<Point<1> > &ansatz_points,
@@ -459,6 +505,23 @@ void FECubic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				    jacobians, compute_jacobians,
 				    ansatz_points, compute_ansatz_points,
 				    q_points, compute_q_points, boundary);
+};
+
+
+
+void FECubic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
+					 const Boundary<1>  &,
+					 vector<Point<1> >  &) const {
+  Assert (false, ExcInternalError());
+};
+
+
+
+void FECubic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
+				     const Boundary<1>         &,
+				     const vector<Point<0> > &,
+				     vector<double>      &) const {
+  Assert (false, ExcInternalError());
 };
 
 
@@ -476,7 +539,7 @@ FECubic<dim>::shape_value (const unsigned int i,
 			   const Point<dim> &) const
 {
   Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
-  Assert (false, typename FiniteElementBase<dim>::ExcNotImplemented());
+  Assert (false, ExcNotImplemented());
   return 0.;
 };
 
@@ -488,21 +551,22 @@ FECubic<dim>::shape_grad (const unsigned int i,
 			  const Point<dim> &) const
 {
   Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
-  Assert (false, typename FiniteElementBase<dim>::ExcNotImplemented());
+  Assert (false, ExcNotImplemented());
   return Point<dim> ();
 };
 
 
 
-void FECubic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
-				 const vector<Point<2> >               &unit_points,
-				 vector<dFMatrix>  &jacobians,
-				 const bool,
-				 vector<Point<2> > &ansatz_points,
-				 const bool,
-				 vector<Point<2> > &q_points,
-				 const bool,
-				 const Boundary<2> &) const {
+template <int dim>
+void FECubic<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
+				   const vector<Point<dim> >            &unit_points,
+				   vector<dFMatrix>  &jacobians,
+				   const bool,
+				   vector<Point<dim> > &ansatz_points,
+				   const bool,
+				   vector<Point<dim> > &q_points,
+				   const bool,
+				   const Boundary<dim> &) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -510,15 +574,32 @@ void FECubic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
   Assert (ansatz_points.size() == total_dofs,
 	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
 
-  Assert (false, typename FiniteElementBase<2>::ExcNotImplemented());
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void FECubic<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face_iterator &,
+					   const Boundary<dim>  &,
+					   vector<Point<dim> >  &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void FECubic<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &,
+				       const Boundary<dim>         &,
+				       const vector<Point<dim-1> > &,
+				       vector<double>      &) const {
+  Assert (false, ExcNotImplemented());
 };
 
 
 
 
-
-
-// explicite instantiations
+// explicit instantiations
 
 template class FELinear<1>;
 template class FELinear<2>;

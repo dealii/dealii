@@ -5,20 +5,43 @@
 /*----------------------------   fe.h     ---------------------------*/
 
 #include <base/exceptions.h>
-#include <grid/tria.h>
+#include <grid/point.h>
+#include <grid/dof.h>
 #include <lac/dfmatrix.h>
 
 
 
+template <int dim> class Boundary;
+template <int dim> struct FiniteElementData;
 
 
 
 /**
-  Base class for finite elements in arbitrary dimensions.
+  Dimension dependent data for finite elements. See the #FiniteElementBase#
+  class for more information.
   */
-template <int dim>
-class FiniteElementBase {
-  public:
+struct FiniteElementData<1> {
+				     /**
+				      * Number of degrees of freedom on
+				      * a vertex.
+				      */
+    const unsigned int dofs_per_vertex;
+
+				     /** Number of degrees of freedom
+				      *  on a line.
+				      */
+    const unsigned int dofs_per_line;
+
+				     /**
+				      * Number of degrees of freedom on a
+				      * face. This information is
+				      * redundant to some fields in the
+				      * derived classes but makes
+				      * writing dimension independant
+				      * programs easier.
+				      */
+    const unsigned int dofs_per_face;
+    
 				     /**
 				      * Total number of degrees of freedom
 				      * on a cell. This information is
@@ -35,58 +58,149 @@ class FiniteElementBase {
 				      * #total_dofs# is therefore a good way to
 				      * check if something went wrong.
 				      */
-    FiniteElementBase () :
+    FiniteElementData () :
+		    dofs_per_vertex(0),
+		    dofs_per_line(0),
+		    dofs_per_face(0),
 		    total_dofs(0) {};
+
+				     /**
+				      * A more useful version to construct
+				      * an object of this type.
+				      */
+    FiniteElementData (const unsigned int dofs_per_vertex,
+		       const unsigned int dofs_per_line) :
+		    dofs_per_vertex(dofs_per_vertex),
+		    dofs_per_line(dofs_per_line),
+		    dofs_per_face(dofs_per_vertex),
+		    total_dofs (2*dofs_per_vertex+dofs_per_line) {};
+
+				     /**
+				      * Comparison operator. It is not clear to
+				      * me why we have to declare and implement
+				      * this one explicitely.
+				      */
+    bool operator == (const FiniteElementData<1> &) const;
+};
+
+
+
+
+/**
+  Dimension dependent data for finite elements. See the #FiniteElementBase#
+  class for more information.
+  */
+struct FiniteElementData<2> {
+				     /**
+				      * Number of degrees of freedom on
+				      * a vertex.
+				      */
+    const unsigned int dofs_per_vertex;
+
+				     /** Number of degrees of freedom
+				      *  on a line.
+				      */
+    const unsigned int dofs_per_line;
+
+				     /** Number of degrees of freedom
+				      *  on a quad.
+				      */
+    const unsigned int dofs_per_quad;
+
+				     /**
+				      * Number of degrees of freedom on a
+				      * face. This information is
+				      * redundant to some fields in the
+				      * derived classes but makes
+				      * writing dimension independant
+				      * programs easier.
+				      */
+    const unsigned int dofs_per_face;
     
 				     /**
-				      * Constructor. You have to set the
+				      * Total number of degrees of freedom
+				      * on a cell. This information is
+				      * redundant to some fields in the
+				      * derived classes but makes
+				      * writing dimension independant
+				      * programs easier.
+				      */
+    const unsigned int total_dofs;
+
+    				     /**
+				      * Default constructor. Constructs an element
+				      * which is not so useful. Checking
+				      * #total_dofs# is therefore a good way to
+				      * check if something went wrong.
+				      */
+    FiniteElementData () :
+		    dofs_per_vertex(0),
+		    dofs_per_line(0),
+		    dofs_per_quad(0),
+		    dofs_per_face(0),
+		    total_dofs(0) {};
+
+				     /**
+				      * A more useful version to construct
+				      * an object of this type.
+				      */
+    FiniteElementData (const unsigned int dofs_per_vertex,
+		       const unsigned int dofs_per_line,
+		       const unsigned int dofs_per_quad) :
+		    dofs_per_vertex(dofs_per_vertex),
+		    dofs_per_line(dofs_per_line),
+		    dofs_per_quad(dofs_per_quad),
+		    dofs_per_face(2*dofs_per_vertex+
+				  dofs_per_line),
+		    total_dofs (4*dofs_per_vertex+
+				4*dofs_per_quad+
+				dofs_per_line) {};
+
+				     /**
+				      * Comparison operator. It is not clear to
+				      * me why we have to declare and implement
+				      * this one explicitely.
+				      */
+    bool operator == (const FiniteElementData<2> &) const;
+};
+
+    
+
+
+
+/**
+  Base class for finite elements in arbitrary dimensions. This class provides
+  several fields which describe a specific finite element and which are filled
+  by derived classes. It more or less only offers the fields and access
+  functions which makes it possible to copy finite elements without knowledge
+  of the actual type (linear, quadratic, etc).
+
+  The implementation of this base class is split into two parts: those fields
+  which are not common to all dimensions (#dofs_per_quad# for example are only
+  useful for #dim>=2#) are put into the #FiniteElementData<dim># class which
+  is explicitely specialized for all used dimensions, while those fields which
+  may be formulated in a dimension-independent way are put into the present
+  class.
+
+  The different matrices are initialized with the correct size, such that in
+  the derived (concrete) finite element classes, their entries must only be
+  filled in; no resizing is needed.
+  */
+template <int dim>
+struct FiniteElementBase : public FiniteElementData<dim> {
+  public:
+				     /**
+				      * Construct an object of this type.
+				      * You have to set the
 				      * matrices explicitely after calling
-				      * this base class' constructor.
+				      * this base class' constructor. For
+				      * #dim==1#, #dofs_per_quad# must be
+				      * zero.
 				      */
-    FiniteElementBase (const unsigned int total_dofs) :
-		    total_dofs(total_dofs) {};
-
-				     /**
-				      * Copy constructor.
-				      */
-    FiniteElementBase (const FiniteElementBase &f);
-
-				     /**
-				      * Destructor. Only declared to have a
-				      * virtual destructor which the compiler
-				      * wants to have.
-				      */
-    virtual ~FiniteElementBase () {};
+    FiniteElementBase (const unsigned int dofs_per_vertex,
+		       const unsigned int dofs_per_line,
+		       const unsigned int dofs_per_quad=0);
     
-
-				     /**
-				      * Return the value of the #i#th shape
-				      * function at the point #p#. This function
-				      * should really be pure, but then we could
-				      * not make copies of a finite element
-				      * object even if we did not intend to use
-				      * this function. Therefore, we omit the
-				      * #=0# signature and implement this function
-				      * by throwing an exception.
-				      * #p# is a point on the reference element.
-				      */
-    virtual double shape_value (const unsigned int i,
-			        const Point<dim>& p) const;
-
-				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at the point #p#. This function
-				      * should really be pure, but then we could
-				      * not make copies of a finite element
-				      * object even if we did not intend to use
-				      * this function. Therefore, we omit the
-				      * #=0# signature and implement this function
-				      * by throwing an exception.
-				      * #p# is a point on the reference element,
-				      */
-    virtual Point<dim> shape_grad (const unsigned int i,
-				   const Point<dim>& p) const;
-
 				     /**
 				      * Return a readonly reference to the
 				      * matrix which describes the transfer of a
@@ -104,7 +218,7 @@ class FiniteElementBase {
     const dFMatrix & prolongate (const unsigned int child) const;
 
 				     /**
-				      * Return a readinly reference to the
+				      * Return a readonly reference to the
 				      * matrix which describes the constraints
 				      * at the interface between a refined and
 				      * an unrefined cell.
@@ -114,68 +228,6 @@ class FiniteElementBase {
 				      * constraints then.
 				      */
     const dFMatrix & constraints () const;
-    
-				     /**
-				      * Compute the Jacobian matrix and the
-				      * quadrature points as well as the ansatz
-				      * function locations on the real cell in
-				      * real space from the given cell
-				      * and the given quadrature points on the
-				      * unit cell. The Jacobian matrix is to
-				      * be computed at every quadrature point.
-				      * This function has to be in the finite
-				      * element class, since different finite
-				      * elements need different transformations
-				      * of the unit cell to a real cell.
-				      *
-				      * The computation of the three fields may
-				      * share some common code, which is why we
-				      * put it in one function. However, it may
-				      * not always be necessary to really
-				      * compute all fields, so there are
-				      * bool flags which tell the function which
-				      * of the fields to actually compute.
-				      *
-				      * Refer to the documentation of the
-				      * \Ref{FEValues} class for a definition
-				      * of the Jacobi matrix.
-				      *
-				      * It is provided for the finite element
-				      * class in one space dimension, but for
-				      * higher dimensions, it depends on the
-				      * present fe and needs reimplementation
-				      * by the user.
-				      *
-				      * The function assumes that the fields
-				      * already have the right number of
-				      * elements.
-				      */
-    virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
-				 const vector<Point<dim> >               &unit_points,
-				 vector<dFMatrix>    &jacobians,
-				 const bool           compute_jacobians,
-				 vector<Point<dim> > &ansatz_points,
-				 const bool           compute_ansatz_points,
-				 vector<Point<dim> > &q_points,
-				 const bool           compute_q_points,
-				 const Boundary<dim> &boundary) const;
-
-				     /**
-				      * Return the ansatz points this FE has
-				      * on a face if a cell would have the
-				      * given face as a side. This function is
-				      * needed for higher order elements, if
-				      * we want to use curved boundary
-				      * approximations. For that reason, a
-				      * boundary object has to be passed.
-				      *
-				      * The function assumes that the fields
-				      * already have the right number of
-				      * elements.
-				      */
-    virtual void face_ansatz_points (const Triangulation<dim>::face_iterator &face,
-				     const Boundary<dim>  &boundary,
-				     vector<Point<dim> >  &ansatz_points) const;
     
 				     /**
 				      * Comparison operator. We also check for
@@ -202,18 +254,20 @@ class FiniteElementBase {
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcPureFunctionCalled);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotImplemented);
-				     /**
-				      * Exception
-				      */
     DeclException2 (ExcWrongFieldDimension,
 		    int, int,
 		    << "The field has not the assumed dimension " << arg2
 		    << ", but has " << arg1 << " elements.");
+    DeclException2 (ExcWrongInterfaceMatrixSize,
+		    int, int,
+		    << "The interface matrix has a size of " << arg1
+		    << "x" << arg2
+		    << ", which is not reasonable in the present dimension.");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
+    
   protected:
 				     /**
 				      * Have #N=2^dim# matrices keeping the
@@ -277,153 +331,36 @@ class FiniteElementBase {
 
 
 
-/**
-  Define a finite element class.
-  */
-template <int dim>
-class FiniteElement;
-
-
 
 /**
-  Finite Element in one dimension.
-
-  {\bf Note on extending the finite element class}
-
-  If you want to extend this class (not by derivation, but by adding new
-  elements), you should be aware that it may be copied at places where you
-  don't expect that (e.g. the #DoFHandler# class keeps a copy). You must
-  thus make sure that the copy operator works correctly, in special if
-  pointers are involved, copying by the default copy constructor supplied
-  by the compiler will result in double deletion and maybe access to data
-  elements which are no more valid.
-
-  Consequence: make sure the copy constructor is correct.
-
-  This class should really be a pure one, with functions having the #=0#
-  signature. However, some instances of this class need to be floating around
-  anyhow (e.g. the #DoFHandler# class keeps a copy, only to have the values
-  of #dof_per*# available), so we do not make it pure but rather implement
-  those functions which should in fact be pure to throw an error.
-  */
-class FiniteElement<1> : public FiniteElementBase<1> {
-  public:
-				     /**
-				      * Number of degrees of freedom on
-				      * a vertex.
-				      */
-    const unsigned int dofs_per_vertex;
-
-				     /** Number of degrees of freedom
-				      *  on a line.
-				      */
-    const unsigned int dofs_per_line;
+  Finite Element in any dimension. This class declares the functionality
+  to fill the fields of the #FiniteElementBase# class. Since this is
+  something that depends on the actual finite element, the functions are
+  declared virtual if it is not possible to provide a reasonable standard
+  implementation.
 
 
-				     /**
-				      * Default constructor. The base class
-				      * produces an invalid element.
-				      */
-    FiniteElement () :
-		    dofs_per_vertex(0),
-		    dofs_per_line(0) {};
-    
-				     /**
-				      * Constructor
-				      */
-    FiniteElement (const unsigned int dofs_per_vertex,
-		   const unsigned int dofs_per_line) :
-		    FiniteElementBase<1> (2*dofs_per_vertex +
-					  dofs_per_line),
-  		    dofs_per_vertex(dofs_per_vertex),
-		    dofs_per_line  (dofs_per_line) {};
+  {\bf Finite Elements in one dimension}
 
-				     /**
-				      * Copy constructor
-				      */
-    FiniteElement (const FiniteElement<1> &fe) :
-		    FiniteElementBase<1> (fe),
-  		    dofs_per_vertex(fe.dofs_per_vertex),
-		    dofs_per_line  (fe.dofs_per_line) {};
-
-				     /**
-				      * Same pseudo-comparison operator
-				      * as for the base class.
-				      */
-    bool operator == (const FiniteElement<1> &f) const;
-
-				     /**
-				      * Compute the Jacobian matrix and the
-				      * quadrature points as well as the ansatz
-				      * function locations on the real cell in
-				      * real space from the given cell
-				      * and the given quadrature points on the
-				      * unit cell. The Jacobian matrix is to
-				      * be computed at every quadrature point.
-				      *
-				      * Refer to the documentation of the
-				      * \Ref{FEValues} class for a definition
-				      * of the Jacobi matrix.
-				      *
-				      * For one dimensional finite elements,
-				      * these transformations are usually the
-				      * same, linear ones, so we provide
-				      * them in the FE<1> base class. You may,
-				      * however override this implementation
-				      * if you would like to use finite elements
-				      * of higher than first order with
-				      * non-equidistant integration points, e.g.
-				      * with an exponential dependence from the
-				      * distance to the origin. The standard
-				      * implementation distributes the dofs on
-				      * the line equidistantly.
-				      *
-				      * The function assumes that the fields
-				      * already have the right number of
-				      * elements.
-				      */
-    virtual void fill_fe_values (const Triangulation<1>::cell_iterator &cell,
-				 const vector<Point<1> >               &unit_points,
-				 vector<dFMatrix>  &jacobians,
-				 const bool         compute_jacobians,
-				 vector<Point<1> > &ansatz_points,
-				 const bool         compute_ansatz_points,
-				 vector<Point<1> > &q_points,
-				 const bool         compute_q_points,
-				 const Boundary<1> &boundary) const;
-
-				     /**
-				      * Return the ansatz points this FE has
-				      * on a face if a cell would have the
-				      * given face as a side. This function is
-				      * needed for higher order elements, if
-				      * we want to use curved boundary
-				      * approximations.
-				      *
-				      * Question: is this function useful in 1D?
-				      * At present it is not implemented.
-				      */
-    virtual void face_ansatz_points (const Triangulation<1>::face_iterator &face,
-				     const Boundary<1>  &boundary,
-				     vector<Point<1> >  &ansatz_points) const;
-};
-
-
-
-
-
-/**
-  Finite Element in two dimensions.
-
+  Finite elements in one dimension need only set the #restriction# and
+  #prolongation# matrices in #FiniteElementBase<1>#. The constructor of
+  this class in one dimension presets the #interface_constraints# matrix
+  by the unit matrix with dimension one. Changing this behaviour in
+  derived classes is generally not a reasonable idea and you risk getting
+  in terrible trouble.
+  
+  
+  {\bf Finite elements in two dimensions}
+  
   In addition to the fields already present in 1D, a constraint matrix
   is needed in case two quads meet at a common line of which one is refined
   once more than the other one. Then there are constraints referring to the
   hanging nodes on that side of the line which is refined. These constraints
   are represented by a $n\times m$-matrix #line_constraints#, where $n$ is the
-  number of degrees of freedom on the refined side (those dofs on the three
-  vertices plus those on the two lines), and $m$ is that of the unrefined side
+  number of degrees of freedom on the refined side (those dofs on the middle
+  vertex plus those on the two lines), and $m$ is that of the unrefined side
   (those dofs on the two vertices plus those on the line). The matrix is thus
-  a rectangular one, being higher than wide.
+  a rectangular one.
 
   The mapping of the dofs onto the indices of the matrix is as follows:
   let $d_v$ be the number of dofs on a vertex, $d_l$ that on a line, then
@@ -443,70 +380,42 @@ class FiniteElement<1> : public FiniteElementBase<1> {
   degree of freedom to other degrees of freedom which are themselves
   constrained. Only one level of indirection is allowed. It is not known
   at the time of this writing whether this is a constraint itself.
-
-  If you want to extend this class (not by derivation, but by adding new
-  elements), see \Ref{FiniteElement<1>}
-
-  This class should really be a pure one, with functions having the #=0#
-  signature. However, some instances of this class need to be floating around
-  anyhow (e.g. the #DoFHandler# class keeps a copy, only to have the values
-  of #dof_per*# available), so we do not make it pure but rather implement
-  those functions which should in fact be pure to throw an error.
   */
-class FiniteElement<2> : public FiniteElementBase<2> {
+template <int dim>
+class FiniteElement : public FiniteElementBase<dim> {
   public:
-				     /**
-				      * Number of degrees of freedom on
-				      * a vertex.
-				      */
-    const unsigned int dofs_per_vertex;
-
-				     /** Number of degrees of freedom
-				      *  on a line.
-				      */
-    const unsigned int dofs_per_line;
-
-				     /** Number of degrees of freedom
-				      *  on a quad.
-				      */
-    const unsigned int dofs_per_quad;
-
-				     /**
-				      * Default constructor. The base class
-				      * produces an invalid element.
-				      */
-    FiniteElement () :
-		    dofs_per_vertex(0),
-		    dofs_per_line(0),
-		    dofs_per_quad(0) {};
-
 				     /**
 				      * Constructor
 				      */
     FiniteElement (const unsigned int dofs_per_vertex,
 		   const unsigned int dofs_per_line,
-		   const unsigned int dofs_per_quad) :
-		    FiniteElementBase<2> (4*dofs_per_vertex +
-					  4*dofs_per_line +
-					  dofs_per_quad),
-		    dofs_per_vertex(dofs_per_vertex),
-		    dofs_per_line  (dofs_per_line),
-		    dofs_per_quad  (dofs_per_quad)  {};
+		   const unsigned int dofs_per_quad=0) :
+		    FiniteElementBase<dim> (dofs_per_vertex,
+					    dofs_per_line,
+					    dofs_per_quad) {};
 
 				     /**
-				      * Copy constructor
+				      * Destructor. Only declared to have a
+				      * virtual destructor which the compiler
+				      * wants to have.
 				      */
-    FiniteElement (const FiniteElement<2> &fe) :
-		    FiniteElementBase<2> (fe),
-  		    dofs_per_vertex(fe.dofs_per_vertex),
-		    dofs_per_line  (fe.dofs_per_line),
-		    dofs_per_quad  (fe.dofs_per_quad) {};
+    virtual ~FiniteElement () {};
+    
+				     /**
+				      * Return the value of the #i#th shape
+				      * function at the point #p#.
+				      * #p# is a point on the reference element.
+				      */
+    virtual double shape_value (const unsigned int i,
+			        const Point<dim>& p) const = 0;
 
 				     /**
-				      * Same pseudo-comparison operator
-				      * as for the base class.
+				      * Return the gradient of the #i#th shape
+				      * function at the point #p#.
+				      * #p# is a point on the reference element,
 				      */
-    bool operator == (const FiniteElement<2> &f) const;
+    virtual Point<dim> shape_grad (const unsigned int i,
+				   const Point<dim>& p) const = 0;
 
 				     /**
 				      * Compute the Jacobian matrix and the
@@ -516,49 +425,234 @@ class FiniteElement<2> : public FiniteElementBase<2> {
 				      * and the given quadrature points on the
 				      * unit cell. The Jacobian matrix is to
 				      * be computed at every quadrature point.
+				      * This function has to be in the finite
+				      * element class, since different finite
+				      * elements need different transformations
+				      * of the unit cell to a real cell.
+				      *
+				      * The computation of the three fields may
+				      * share some common code, which is why we
+				      * put it in one function. However, it may
+				      * not always be necessary to really
+				      * compute all fields, so there are
+				      * bool flags which tell the function which
+				      * of the fields to actually compute.
 				      *
 				      * Refer to the documentation of the
 				      * \Ref{FEValues} class for a definition
-				      * of the Jacobi matrix.
+				      * of the Jacobi matrix and of the various
+				      * structures to be filled.
 				      *
-				      * For two dimensional finite elements,
-				      * these transformations are usually
-				      * dependent on the actual finite element,
-				      * which is expressed by the names
-				      * sub- and isoparametric elements. This
-				      * function is therefore not implemented
-				      * by the FE<2> base class, but is made
-				      * pure virtual.
+				      * It is provided for the finite element
+				      * class in one space dimension, but for
+				      * higher dimensions, it depends on the
+				      * present fe and needs reimplementation
+				      * by the user. This is due to the fact
+				      * that the user may want to use
+				      * iso- or subparametric mappings of the
+				      * unit cell to the real cell, which
+				      * makes things much more complicated.
 				      *
 				      * The function assumes that the fields
 				      * already have the right number of
 				      * elements.
+				      *
+				      * This function is more or less an
+				      * interface to the #FEValues# class and
+				      * should not be used by users unless
+				      * absolutely needed.
 				      */
-    virtual void fill_fe_values (const Triangulation<2>::cell_iterator &cell,
-				 const vector<Point<2> >               &unit_points,
-				 vector<dFMatrix>  &jacobians,
-				 const bool         compute_jacobians,
-				 vector<Point<2> > &ansatz_points,
-				 const bool         compute_ansatz_points,
-				 vector<Point<2> > &q_points,
-				 const bool         compute_q_points,
-				 const Boundary<2> &boundary) const;
+    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+				 const vector<Point<dim> >            &unit_points,
+				 vector<dFMatrix>    &jacobians,
+				 const bool           compute_jacobians,
+				 vector<Point<dim> > &ansatz_points,
+				 const bool           compute_ansatz_points,
+				 vector<Point<dim> > &q_points,
+				 const bool           compute_q_points,
+				 const Boundary<dim> &boundary) const;
 
 				     /**
-				      * Return the ansatz points this FE has
-				      * on a face if a cell would have the
-				      * given face as a side. This function is
-				      * needed for higher order elements, if
-				      * we want to use curved boundary
-				      * approximations.
+				      * Do the same thing that the other
+				      * #fill_fe_values# function does,
+				      * exception that a face rather than
+				      * a cell is considered. The #face_no#
+				      * parameter denotes the number of the
+				      * face to the given cell to be
+				      * considered.
+				      *
+				      * The unit points for the quadrature
+				      * formula are given on the unit face
+				      * which is a mannifold of dimension
+				      * one less than the dimension of the
+				      * cell. The #global_unit_points# 
+				      * denote the position of the unit points
+				      * on the selected face on the unit cell.
+				      * This additional information is passed
+				      * since the #FEFaceValues# class can
+				      * compute them once and for all,
+				      * eliminating the need to recompute it
+				      * each time #FEFaceValues::reinit# is
+				      * called.
+				      *
+				      * The jacobian matrix is evaluated at
+				      * each of the quadrature points on the
+				      * given face. The matrix is the
+				      * transformation matrix of the unit cell
+				      * to the real cell, not from the unit
+				      * face to the real face. This is the
+				      * necessary matrix to compute the real
+				      * gradients.
+				      *
+				      * Conversely, the Jacobi determinants
+				      * are the determinants of the
+				      * transformation from the unit face to
+				      * the real face. This information is
+				      * needed to actually perform integrations
+				      * along faces. Note that we here return
+				      * the inverse of the determinant of the
+				      * jacobi matrices as explained in the
+				      * documentation of the #FEValues# class.
+				      * 
+				      * The ansatz points are the
+				      * off-points of those ansatz functions
+				      * located on the given face; this
+				      * information is taken over from the
+				      * #get_face_ansatz_points# function.
+				      *
+				      * The order of ansatz functions is the
+				      * same as if it were a cell of dimension
+				      * one less than the present. E.g. in
+				      * two dimensions, the order is first
+				      * the vertex functions (using the
+				      * direction of the face induced by the
+				      * given cell) then the interior functions.
+				      * The same applies for the quadrature
+				      * points which also use the standard
+				      * direction of faces as laid down by
+				      * the #Triangulation# class.
+				      *
+				      * There is a standard implementation for
+				      * dimensions greater than one. It
+				      * uses the #fill_fe_values()#
+				      * function to retrieve the wanted
+				      * information. Since this operation acts
+				      * only on unit faces and cells it does
+				      * not depend on a specific finite element
+				      * transformation and is thus applicable
+				      * for all finite elements and uses tha
+				      * same mapping from the unit to the real
+				      * cell as used for the other operations
+				      * performed by the specific finite element
+				      * class.
+				      *
+				      * Two fields remain to be finite element
+				      * specific in this standard implementation:
+				      * The jacobi determinants of the
+				      * transformation from the unit face to the
+				      * real face and the ansatz points. For
+				      * these two fields, there exist pure
+				      * virtual functions, #get_face_jacobians#
+				      * and the #get_face_ansatz_points#
+				      * function.
+				      *
+				      * Though there is a standard
+				      * implementation, there
+				      * may be room for optimizations which is
+				      * why this function is made virtual.
+				      *
+				      * Since any implementation for one
+				      * dimension would be senseless, all
+				      * derived classes should throw an error
+				      * when called with #dim==1#.
 				      *
 				      * The function assumes that the fields
 				      * already have the right number of
 				      * elements.
+				      *
+				      * This function is more or less an
+				      * interface to the #FEValues# class and
+				      * should not be used by users unless
+				      * absolutely needed.
 				      */
-    virtual void face_ansatz_points (const Triangulation<2>::face_iterator &face,
-				     const Boundary<2>  &boundary,
-				     vector<Point<2> >  &ansatz_points) const;
+    virtual void fill_fe_face_values (const DoFHandler<dim>::cell_iterator &cell,
+				      const unsigned int           face_no,
+				      const vector<Point<dim-1> > &unit_points,
+				      const vector<Point<dim> >   &global_unit_points,
+				      vector<dFMatrix>    &jacobians,
+				      const bool           compute_jacobians,
+				      vector<Point<dim> > &ansatz_points,
+				      const bool           compute_ansatz_points,
+				      vector<Point<dim> > &q_points,
+				      const bool           compute_q_points,
+				      vector<double>      &face_jacobi_determinants,
+				      const bool           compute_face_jacobians,
+				      const Boundary<dim> &boundary) const;
+    
+				     /**
+				      * This function produces a subset of
+				      * the information provided by the
+				      * #fill_fe_face_values()# function,
+				      * namely the ansatz function off-points
+				      * of those ansatz functions located on
+				      * the face. However, you should not try
+				      * to implement this function using the
+				      * abovementioned function, since usually
+				      * that function uses this function to
+				      * compute information.
+				      *
+				      * This function is excluded from the
+				      * abovementioned one, since no information
+				      * about the neighboring cell is needed,
+				      * such that loops over faces alone are
+				      * possible when using this function.
+				      * This is useful for example if we want
+				      * to interpolate boundary values to the
+				      * finite element functions. If integration
+				      * along faces is needed, we still need
+				      * the #fill_fe_values# function.
+				      *
+				      * The function assumes that the
+				      * #ansatz_points# array already has the
+				      * right size. The order of points in
+				      * the array matches that returned by
+				      * the #face->get_dof_indices# function.
+				      *
+				      * Since any implementation for one
+				      * dimension would be senseless, all
+				      * derived classes should throw an error
+				      * when called with #dim==1#.
+				      */
+    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+					 const Boundary<dim> &boundary,
+					 vector<Point<dim> > &ansatz_points) const =0;
+
+				     /**
+				      * This is the second separated function
+				      * described in the documentation of the
+				      * #fill_fe_face_values# function. It
+				      * returns the determinants of the
+				      * transformation from the unit face to the
+				      * real face at the
+				      *
+				      * Since any implementation for one
+				      * dimension would be senseless, all
+				      * derived classes should throw an error
+				      * when called with #dim==1#.
+				      */
+    virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
+				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<double>      &face_jacobi_determinants) const =0;
+    
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcPureFunctionCalled);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotImplemented);
 };
 
 

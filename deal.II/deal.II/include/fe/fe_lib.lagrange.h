@@ -45,36 +45,20 @@ class FELinear : public FiniteElement<dim> {
 				  const Point<dim>& p) const;
 
 				     /**
-				      * Compute the Jacobian matrix and the
-				      * quadrature points as well as the ansatz
-				      * function locations on the real cell in
-				      * real space from the given cell
-				      * and the given quadrature points on the
-				      * unit cell. The Jacobian matrix is to
-				      * be computed at every quadrature point.
-				      *
-				      * Refer to the documentation of the
-				      * \Ref{FEValues} class for a definition
-				      * of the Jacobi matrix.
+				      * Refer to the base class for detailed
+				      * information on this function.
 				      *
 				      * For one dimensional elements, this
 				      * function simply passes through to
 				      * the one implemented in the base class.
-				      * For two dimensional finite elements,
-				      * these transformations are usually
-				      * dependent on the actual finite element,
-				      * which is expressed by the names
-				      * sub- and isoparametric elements. This
-				      * function is therefore not implemented
-				      * by the FE<2> base class, but is made
-				      * pure virtual.
-				      *
-				      * The function assumes that the fields
-				      * already have the right number of
-				      * elements.
+				      * For higher dimensional finite elements
+				      * we use linear mappings and therefore
+				      * the boundary object is ignored since
+				      * the boundary is approximated using
+				      * piecewise straight boundary segments.
 				      */
-    virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
-				 const vector<Point<dim> >               &unit_points,
+    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+				 const vector<Point<dim> >            &unit_points,
 				 vector<dFMatrix>    &jacobians,
 				 const bool           compute_jacobians,
 				 vector<Point<dim> > &ansatz_points,
@@ -84,20 +68,21 @@ class FELinear : public FiniteElement<dim> {
 				 const Boundary<dim> &boundary) const;
 
 				     /**
-				      * Return the ansatz points this FE has
-				      * on a face if a cell would have the
-				      * given face as a side. Since we have no
-				      * degrees of freedom on the faces for
-				      * the linear ansatz, the ansatz points are
-				      * simply the vertices of the face.
-				      *
-				      * The function assumes that the fields
-				      * already have the right number of
-				      * elements.
+				      * Refer to the base class for detailed
+				      * information on this function.
 				      */
-    virtual void face_ansatz_points (const Triangulation<dim>::face_iterator &face,
-				     const Boundary<dim>  &boundary,
-				     vector<Point<dim> >  &ansatz_points) const;
+    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+					 const Boundary<dim> &boundary,
+					 vector<Point<dim> > &ansatz_points) const;
+
+    				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
+				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<double>      &face_jacobi_determinants) const;
 };
 
 
@@ -131,36 +116,15 @@ class FEQuadratic : public FiniteElement<dim> {
 				  const Point<dim>& p) const;
 
 				     /**
-				      * Compute the Jacobian matrix and the
-				      * quadrature points as well as the ansatz
-				      * function locations on the real cell in
-				      * real space from the given cell
-				      * and the given quadrature points on the
-				      * unit cell. The Jacobian matrix is to
-				      * be computed at every quadrature point.
-				      *
-				      * Refer to the documentation of the
-				      * \Ref{FEValues} class for a definition
-				      * of the Jacobi matrix.
+				      * Refer to the base class for detailed
+				      * information on this function.
 				      *
 				      * For one dimensional elements, this
 				      * function simply passes through to
 				      * the one implemented in the base class.
-				      * For two dimensional finite elements,
-				      * these transformations are usually
-				      * dependent on the actual finite element,
-				      * which is expressed by the names
-				      * sub- and isoparametric elements. This
-				      * function is therefore not implemented
-				      * by the FE<2> base class, but is made
-				      * pure virtual.
-				      *
-				      * The function assumes that the fields
-				      * already have the right number of
-				      * elements.
 				      */
-    virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
-				 const vector<Point<dim> >               &unit_points,
+    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+				 const vector<Point<dim> >            &unit_points,
 				 vector<dFMatrix>    &jacobians,
 				 const bool           compute_jacobians,
 				 vector<Point<dim> > &ansatz_points,
@@ -168,6 +132,23 @@ class FEQuadratic : public FiniteElement<dim> {
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const Boundary<dim> &boundary) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+					 const Boundary<dim> &boundary,
+					 vector<Point<dim> > &ansatz_points) const;
+
+    				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
+				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<double>      &face_jacobi_determinants) const;
 };
 
 
@@ -201,36 +182,15 @@ class FECubic : public FiniteElement<dim> {
 				  const Point<dim>& p) const;
 
 				     /**
-				      * Compute the Jacobian matrix and the
-				      * quadrature points as well as the ansatz
-				      * function locations on the real cell in
-				      * real space from the given cell
-				      * and the given quadrature points on the
-				      * unit cell. The Jacobian matrix is to
-				      * be computed at every quadrature point.
-				      *
-				      * Refer to the documentation of the
-				      * \Ref{FEValues} class for a definition
-				      * of the Jacobi matrix.
+				      * Refer to the base class for detailed
+				      * information on this function.
 				      *
 				      * For one dimensional elements, this
 				      * function simply passes through to
 				      * the one implemented in the base class.
-				      * For two dimensional finite elements,
-				      * these transformations are usually
-				      * dependent on the actual finite element,
-				      * which is expressed by the names
-				      * sub- and isoparametric elements. This
-				      * function is therefore not implemented
-				      * by the FE<2> base class, but is made
-				      * pure virtual.
-				      *
-				      * The function assumes that the fields
-				      * already have the right number of
-				      * elements.
 				      */
-    virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
-				 const vector<Point<dim> >               &unit_points,
+    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+				 const vector<Point<dim> >            &unit_points,
 				 vector<dFMatrix>    &jacobians,
 				 const bool           compute_jacobians,
 				 vector<Point<dim> > &ansatz_points,
@@ -238,6 +198,23 @@ class FECubic : public FiniteElement<dim> {
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const Boundary<dim> &boundary) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+					 const Boundary<dim> &boundary,
+					 vector<Point<dim> > &ansatz_points) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
+				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<double>      &face_jacobi_determinants) const;
 };
 
 
@@ -246,3 +223,5 @@ class FECubic : public FiniteElement<dim> {
 /* end of #ifndef __fe_lib_H */
 #endif
 /*----------------------------   fe_lib.h     ---------------------------*/
+
+
