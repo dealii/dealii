@@ -168,4 +168,4 @@ clean:
 	-rm class_index.html
 
 
-.PHONY: default all autogen-doc autogen-doc-all tutorial clean development validate-xrefs glossary
+.PHONY: default doxygen all autogen-doc autogen-doc-all tutorial clean development validate-xrefs glossary
