@@ -117,8 +117,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
-  dof_handler (triangulation),
-  fe(1)
+  fe (1), dof_handler (triangulation)
 {};
 
 
