@@ -943,24 +943,39 @@ FESystem<dim>::build_cell_tables()
 				   // components to linear
 				   // index. Fortunately, this is the
 				   // inverse of what we just did.
-  std::vector<unsigned int> dofs_per_component (this->n_components(), 0);
-  for (unsigned int sys=0; sys<this->dofs_per_cell; ++sys)
-    ++dofs_per_component[this->system_to_component_index(sys).first];
-  for (unsigned int component=0; component<this->n_components(); ++component)
-    this->component_to_system_table[component].resize(dofs_per_component[component]);
-
-				   // then go the reverse way to fill the array
-  for (unsigned int sys=0; sys<this->dofs_per_cell; ++sys)
+                                   //
+                                   // note that we can only do this if
+                                   // all sub-elements are primiive,
+                                   // otherwise fill the table with
+                                   // invalid values
+  if (this->is_primitive())
     {
-      const unsigned int
-	comp          = this->system_to_component_index(sys).first,
-	index_in_comp = this->system_to_component_index(sys).second;
+      std::vector<unsigned int> dofs_per_component (this->n_components(), 0);
+      for (unsigned int sys=0; sys<this->dofs_per_cell; ++sys)
+        ++dofs_per_component[this->system_to_component_index(sys).first];
+      for (unsigned int component=0; component<this->n_components(); ++component)
+        this->component_to_system_table[component].resize(dofs_per_component[component]);
       
-      Assert (comp < this->component_to_system_table.size(),
-	      ExcInternalError());
-      Assert (index_in_comp < this->component_to_system_table[comp].size(),
-	      ExcInternalError());
-      this->component_to_system_table[comp][index_in_comp] = sys;
+                                       // then go the reverse way to fill the array
+      for (unsigned int sys=0; sys<this->dofs_per_cell; ++sys)
+        {
+          const unsigned int
+            comp          = this->system_to_component_index(sys).first,
+            index_in_comp = this->system_to_component_index(sys).second;
+          
+          Assert (comp < this->component_to_system_table.size(),
+                  ExcInternalError());
+          Assert (index_in_comp < this->component_to_system_table[comp].size(),
+                  ExcInternalError());
+          this->component_to_system_table[comp][index_in_comp] = sys;
+        };
+    }
+  else
+                                     // element is not primitive, so
+                                     // fill elements with nonsense
+    {
+      std::vector< std::vector<unsigned int> > tmp;
+      this->component_to_system_table.swap (tmp);
     };
 };
 
@@ -1145,26 +1160,38 @@ FESystem<dim>::build_face_tables()
   Assert (total_index == this->face_system_to_base_table.size(),
 	  ExcInternalError());
 
-				   // finally, initialize reverse mapping
-  std::vector<unsigned int> dofs_per_component (this->n_components(), 0);
-  for (unsigned int sys=0; sys<this->dofs_per_face; ++sys)
-    ++dofs_per_component[this->face_system_to_component_index(sys).first];
-  for (unsigned int component=0; component<this->n_components(); ++component)
-    this->face_component_to_system_table[component].resize(dofs_per_component[component]);
+				   // finally, initialize reverse
+				   // mapping. same applies
+				   // w.r.t. primitivity as above:
+  if (this->is_primitive())
+    {
+      std::vector<unsigned int> dofs_per_component (this->n_components(), 0);
+      for (unsigned int sys=0; sys<this->dofs_per_face; ++sys)
+        ++dofs_per_component[this->face_system_to_component_index(sys).first];
+      for (unsigned int component=0; component<this->n_components(); ++component)
+        this->face_component_to_system_table[component].resize(dofs_per_component[component]);
 
 				   // then go the reverse way to fill
 				   // the array
-  for (unsigned int sys=0; sys<this->dofs_per_face; ++sys)
+      for (unsigned int sys=0; sys<this->dofs_per_face; ++sys)
+        {
+          const unsigned int
+            comp          = this->face_system_to_component_index(sys).first,
+            index_in_comp = this->face_system_to_component_index(sys).second;
+          
+          Assert (comp < this->face_component_to_system_table.size(),
+                  ExcInternalError());
+          Assert (index_in_comp < this->face_component_to_system_table[comp].size(),
+                  ExcInternalError());
+          this->face_component_to_system_table[comp][index_in_comp] = sys;
+        };
+    }
+  else
+                                     // element is not primitive, so
+                                     // fill elements with nonsense
     {
-      const unsigned int
-	comp          = this->face_system_to_component_index(sys).first,
-	index_in_comp = this->face_system_to_component_index(sys).second;
-      
-      Assert (comp < this->face_component_to_system_table.size(),
-	      ExcInternalError());
-      Assert (index_in_comp < this->face_component_to_system_table[comp].size(),
-	      ExcInternalError());
-      this->face_component_to_system_table[comp][index_in_comp] = sys;
+      std::vector< std::vector<unsigned int> > tmp;
+      this->face_component_to_system_table.swap (tmp);
     };
 };
 
