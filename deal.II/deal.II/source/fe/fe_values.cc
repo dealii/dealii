@@ -621,36 +621,6 @@ FEValues<dim>::memory_consumption () const
 /*------------------------------- FEFaceValuesBase --------------------------*/
 
 
-#if deal_II_dimension == 1
-template <>
-const bool
-FEFaceValuesBase<1>::orientation_table[GeometryInfo<1>::faces_per_cell] =
-{
-      false, true
-};
-#endif
-
-
-#if deal_II_dimension == 2
-template <>
-const bool
-FEFaceValuesBase<2>::orientation_table[GeometryInfo<2>::faces_per_cell] =
-{
-      true, true, false, false
-};
-#endif
-
-
-#if deal_II_dimension == 3
-template <>
-const bool
-FEFaceValuesBase<3>::orientation_table[GeometryInfo<3>::faces_per_cell] =
-{
-      true, false, true, false, true, false
-};
-#endif
-
-
 template <int dim>
 FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 					 const unsigned int dofs_per_cell,
@@ -769,7 +739,6 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
   this->present_cell = cell;
-  this->my_orientation = this->orientation_table[face_no];
   
   this->get_mapping().fill_fe_face_values(cell, face_no,
 					  this->quadrature,
@@ -871,7 +840,6 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
                       "instead in these cases."));
   
   this->present_cell  = cell;
-  this->my_orientation = this->orientation_table[face_no];
 
   this->get_mapping().fill_fe_subface_values(cell, face_no, subface_no,
 					     this->quadrature,

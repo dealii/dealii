@@ -985,25 +985,6 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * @p{n.ds}.
 				      */
     const Tensor<1,dim> & boundary_form (const unsigned int i) const;
-
-				     /**
-				      * Get the natural orientation of
-				      * the face.
-				      *
-				      * If this is true, then the
-				      * natural normal vector of the
-				      * face points outwards (faces
-				      * 0,1 in two dimensions, faces
-				      * 0,2,4 in three). On the other
-				      * faces, the natural normal
-				      * vector points inwards.
-				      *
-				      * With this function, you have
-				      * access to a consistent and
-				      * unique orientation of all
-				      * faces.
-				      */
-    bool orientation () const;
     
 				     /**
 				      * Return the list of outward normal
@@ -1038,21 +1019,6 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * formula here.
 				      */
     const Quadrature<dim-1> quadrature;
-
-				     /**
-				      * Value for orientation function.
-				      */
-    bool my_orientation;
-
-    				     /**
-				      * Data table for orientation
-				      * values. Since the faces are
-				      * numbered in a creative
-				      * fashion, we stores these
-				      * values instead of computing
-				      * them.
-				      */
-    static const bool orientation_table[GeometryInfo<dim>::faces_per_cell];
 };
 
 
@@ -1519,7 +1485,6 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 }
 
 
-
 template <int dim>
 inline
 const Tensor<1,dim> &
@@ -1533,15 +1498,6 @@ FEFaceValuesBase<dim>::boundary_form (const unsigned int i) const
   return this->boundary_forms[i];
 }
 
-
-
-template <int dim>
-inline
-bool
-FEFaceValuesBase<dim>::orientation () const
-{
-  return my_orientation;
-}
 
 
 template <int dim>
