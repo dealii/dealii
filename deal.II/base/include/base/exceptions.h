@@ -14,7 +14,7 @@
 #define __deal2__exceptions_h
 
 
-#include <iosfwd>
+#include <exception>
 #include <iostream>
 #include <cstdlib>
 
