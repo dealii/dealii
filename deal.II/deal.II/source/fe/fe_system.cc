@@ -1173,8 +1173,6 @@ FESystem<dim>::build_face_tables()
 template <int dim>
 void FESystem<dim>::build_interface_constraints () 
 {
-//TODO: Review for base elements with more than one component. do it in the same way as for building the cell restriction and interpolation tables, i.e. top-down
-  
 				   // the layout of the constraints
 				   // matrix is described in the
 				   // FiniteElement class. you may
@@ -1356,7 +1354,7 @@ void FESystem<dim>::build_interface_constraints ()
 					      4*base_element(m_index.first.first).dofs_per_vertex;
 		    Assert (tmp2 < base_element(m_index.first.first).dofs_per_line,
 			    ExcInternalError());
-		    m_index.second = base_element(m_index.first.first).dofs_per_vertex +
+		    m_index.second = 5*base_element(m_index.first.first).dofs_per_vertex +
 				     base_element(m_index.first.first).dofs_per_line*sub_line +
 				     tmp2;
 		  }
@@ -1385,7 +1383,7 @@ void FESystem<dim>::build_interface_constraints ()
 					      4*base_element(m_index.first.first).dofs_per_line;
 		    Assert (tmp2 < base_element(m_index.first.first).dofs_per_quad,
 			    ExcInternalError());
-		    m_index.second = base_element(m_index.first.first).dofs_per_vertex +
+		    m_index.second = 5*base_element(m_index.first.first).dofs_per_vertex +
 				     12*base_element(m_index.first.first).dofs_per_line +
 				     base_element(m_index.first.first).dofs_per_quad*sub_quad +
 				     tmp2;
