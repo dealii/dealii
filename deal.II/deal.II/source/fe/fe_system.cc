@@ -591,15 +591,20 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
     {
       if (fe_data.first_cell)
 	{
-					   // Initialize the FEValuesDatas
-					   // for the base elements.
-					   // Originally this is the task
-					   // of FEValues::FEValues() but
-					   // the latter initializes
-					   // the FEValuesDatas only of the
-					   // FESystem but not the
-					   // FEValuesDatas needed by the
+					   // Initialize the
+					   // FEValuesDatas for the
 					   // base elements.
+					   // Originally this was the
+					   // task of
+					   // FEValues::FEValues() but
+					   // the latter initializes
+					   // the FEValuesDatas only
+					   // of the FESystem, not of
+					   // the FEValuesDatas needed
+					   // by the base elements
+					   // (and: how should it know
+					   // of their existence,
+					   // after all).
 	  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
 	    {
 					       // Pointer needed to get
