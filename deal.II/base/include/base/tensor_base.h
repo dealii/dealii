@@ -24,6 +24,8 @@
 #include <base/exceptions.h>
 #include <vector>
 
+#include <cmath>
+
 // we only need output streams, but older compilers did not provide
 // them in a separate include file
 #ifdef HAVE_STD_OSTREAM_HEADER
