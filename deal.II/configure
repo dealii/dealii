@@ -1183,7 +1183,7 @@ if test $GXX = yes ; then
 	echo "$ac_t""Compiler is egcs-1.1" 1>&6
 	GXX_VERSION=egcs1.1
 	;;
-    *2.95*)
+    *2.95* | *2.96* | *2.97* )
 	echo "$ac_t""Compiler is gcc-2.95" 1>&6
 	GXX_VERSION=gcc2.95
 	;;

@@ -107,6 +107,10 @@ AC_PATH_PROG(CC,$CC)
 
 dnl    Find the right C++ compiler. This modifies the following
 dnl    variables: CXX, GXX, CXXFLAGS
+dnl
+dnl    Note that we subsume gcc snapshots 2.96 and 2.97 under
+dnl    gcc version 2.95 as well, as they should support the same
+dnl    compiler flags
 AC_PROG_CXX
 AC_PATH_PROG(CXX,$CXX)
 if test $GXX = yes ; then
@@ -117,7 +121,7 @@ if test $GXX = yes ; then
 	AC_MSG_RESULT(Compiler is egcs-1.1)
 	GXX_VERSION=egcs1.1
 	;;
-    *2.95*)
+    *2.95* | *2.96* | *2.97* )
 	AC_MSG_RESULT(Compiler is gcc-2.95)
 	GXX_VERSION=gcc2.95
 	;;
