@@ -51,6 +51,7 @@ dVector::dVector (const dVector& v) :
 void dVector::reinit (const unsigned int n, const bool fast)
 {
   Assert (n>0, ExcInvalidNumber(n));
+
   if (n>maxdim)
   {
     if (val) delete[] val;
@@ -254,7 +255,8 @@ double dVector::linfty_norm () const {
 
 dVector& dVector::operator += (const dVector& v)
 {
-  if (v.dim != dim) reinit(v,1);
+  if (v.dim != dim)
+    reinit (v, true);
 
   for (unsigned int i=0; i<dim; ++i)
     val[i] += v.val[i];
@@ -265,7 +267,8 @@ dVector& dVector::operator += (const dVector& v)
 
 dVector& dVector::operator -= (const dVector& v)
 {
-  if (v.dim != dim) reinit(v,1);
+  if (v.dim != dim)
+    reinit (v, true);
 
   for (unsigned int i=0; i<dim; ++i)
     val[i] -= v.val[i];
@@ -351,6 +354,14 @@ void dVector::sadd (const double x, const double a,
 
 
 
+void dVector::scale (const double factor)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    val[i] *= factor;
+}
+
+
+
 void dVector::equ (const double a, const dVector& u,
 		   const double b, const dVector& v)
 {
@@ -361,20 +372,24 @@ void dVector::equ (const double a, const dVector& u,
 
 
 
-void dVector::scale (const double factor)
-{
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] *= factor;
-}
-
-
-
 void dVector::equ (const double a, const dVector& u)
 {
   Assert (dim == u.dim, ExcDimensionsDontMatch(dim, u.dim));
   for (unsigned int i=0; i<dim; ++i)
     val[i] = a*u.val[i];
 }
+
+
+
+void dVector::ratio (const dVector &a, const dVector &b) {
+  Assert (a.dim == b.dim, ExcDimensionsDontMatch (a.dim, b.dim));
+
+				   // no need to reinit with zeros, since
+				   // we overwrite them anyway
+  reinit (a.size(), true);
+  for (unsigned int i=0; i<dim; ++i)
+    val[i] = a.val[i] / b.val[i];
+};
 
 
 
@@ -389,7 +404,8 @@ dVector& dVector::operator = (const double s)
 
 dVector& dVector::operator = (const dVector& v)
 {
-  if (v.dim != dim) reinit(v,1);
+  if (v.dim != dim)
+    reinit (v, true);
 
   for (unsigned int i=0; i<dim; ++i)
     val[i] = v.val[i];
