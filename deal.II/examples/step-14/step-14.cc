@@ -2724,28 +2724,24 @@ namespace LaplaceSolver
 				   // dual solution to the (smaller)
 				   // primal space. For the
 				   // interpolation, there is a
-				   // library function, the rest is
-				   // standard. Further down in the
-				   // ``estimate_error'' function we
-				   // explain that the result of the
-				   // interpolation is not a
-				   // conforming finite element field,
-				   // i.e. the interpolated dual
-				   // solution is no more
-				   // continuous. We could fix this
-				   // (and do so in the
-				   // ``estimate_error'' function),
-				   // but since this is only for
-				   // graphical output, we don't care
-				   // here.
+				   // library function, that takes a
+				   // ``ConstraintMatrix'' object
+				   // including the hanging node
+				   // constraints. The rest is
+				   // standard.
   template <int dim>
   void
   WeightedResidual<dim>::output_solution () const
   {
+    ConstraintMatrix primal_hanging_node_constraints;
+    DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
+					     primal_hanging_node_constraints);
+    primal_hanging_node_constraints.close();
     Vector<double> dual_solution (PrimalSolver<dim>::dof_handler.n_dofs());
     FETools::interpolate (DualSolver<dim>::dof_handler,
 			  DualSolver<dim>::solution,
 			  PrimalSolver<dim>::dof_handler,
+			  primal_hanging_node_constraints,
 			  dual_solution);    
 
     DataOut<dim> data_out;
@@ -2825,51 +2821,53 @@ namespace LaplaceSolver
 				     // cell-wise interpolated into
 				     // the finite element space in
 				     // which we have solved the dual
-				     // problem:
+				     // problem: But, again as in the
+				     // ``WeightedResidual::output_solution''
+				     // function we first need to
+				     // create a ConstraintMatrix
+				     // including the hanging node
+				     // constraints, but this time of
+				     // the dual finite element space.
+    ConstraintMatrix dual_hanging_node_constraints;
+    DoFTools::make_hanging_node_constraints (DualSolver<dim>::dof_handler,
+					     dual_hanging_node_constraints);
+    dual_hanging_node_constraints.close();
     Vector<double> primal_solution (DualSolver<dim>::dof_handler.n_dofs());
     FETools::interpolate (PrimalSolver<dim>::dof_handler,
 			  PrimalSolver<dim>::solution,
 			  DualSolver<dim>::dof_handler,
+			  dual_hanging_node_constraints,
 			  primal_solution);
     
-				     // Then for the interpolation of
-				     // the numerically approximated
-				     // dual solution z into the
-				     // finite element space of the
-				     // primal solution: interpolate
-				     // into this smaller finite
-				     // element space...
+				     // Then for computing the
+				     // interpolation of the
+				     // numerically approximated dual
+				     // solution z into the finite
+				     // element space of the primal
+				     // solution and subtracting it
+				     // from z: use the
+				     // ``interpolate_difference''
+				     // function, that gives (z-I_hz)
+				     // in the element space of the
+				     // dual solution.
+    ConstraintMatrix primal_hanging_node_constraints;
+    DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
+					     primal_hanging_node_constraints);
+    primal_hanging_node_constraints.close();
     Vector<double> tmp (PrimalSolver<dim>::dof_handler.n_dofs());
     FETools::interpolate (DualSolver<dim>::dof_handler,
 			  DualSolver<dim>::solution,
 			  PrimalSolver<dim>::dof_handler,
+			  primal_hanging_node_constraints,
 			  tmp);
-				     // ...but then remark that at
-				     // present the function that did
-				     // this does not respect hanging
-				     // node constraints. Doh. The
-				     // result is that the ``tmp''
-				     // vector is cell-wise of the
-				     // polynomial degree of the
-				     // primal finite element, but may
-				     // be discontinuous at hanging
-				     // nodes. Fix ``fix'' this by
-				     // building up the hanging node
-				     // constraints for this finite
-				     // element space, and apply them
-				     // to the computed interpolation:
-    ConstraintMatrix primal_hanging_node_constraints;
-    DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
-					     primal_hanging_node_constraints);
-    primal_hanging_node_constraints.close ();
-    primal_hanging_node_constraints.distribute (tmp);
 				     // Note that this could probably
 				     // have been more efficient since
 				     // those constraints have been
 				     // used previously when
 				     // assembling matrix and right
 				     // hand side for the primal
-				     // problem. We leave the
+				     // problem and writing out the
+				     // dual solution. We leave the
 				     // optimization of the program in
 				     // this respect as an exercise.
 
@@ -2897,6 +2895,7 @@ namespace LaplaceSolver
     FETools::interpolate (PrimalSolver<dim>::dof_handler,
 			  tmp,
 			  DualSolver<dim>::dof_handler,
+			  dual_hanging_node_constraints,
 			  i_h_dual_solution);
 
 				     // With all this in place,
