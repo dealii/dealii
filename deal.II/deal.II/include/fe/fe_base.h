@@ -366,38 +366,39 @@ class FiniteElementBase : public Subscriptor,
 				    */
   class InternalDataBase : public Mapping<dim>::InternalDataBase
     {
-      public:
-				       /**
-					* Initialize some pointers
-					* used in the computation of
-					* second derivatives by finite
-					* differencing of gradients.
-					*/
-      void initialize_2nd (const FiniteElement<dim> *element,
-			   const Mapping<dim>       &mapping,
-			   const Quadrature<dim>    &quadrature);
-      
-      				       /**
-					* Destructor. Needed to avoid
-					* memory leaks with difference
-					* quotients.
-					*/
-      ~InternalDataBase ();
+      public:      
+					 /**
+					  * Destructor. Needed to
+					  * avoid memory leaks with
+					  * difference quotients.
+					  */
+	virtual ~InternalDataBase ();
 
-				       /**
-					* Storage for @p{FEValues}
-					* objects needed to
-					* approximate second
-					* derivatives.
-					*
-					* The ordering is @p{p+hx},
-					* @p{p+hy}, @p{p+hz},
-					* @p{p-hx}, @p{p-hy},
-					* @p{p-hz}, where unused
-					* entries in lower dimensions
-					* are missing.
-					*/
-      typename std::vector<FEValues<dim>*> differences;
+					 /**
+					  * Initialize some pointers
+					  * used in the computation of
+					  * second derivatives by
+					  * finite differencing of
+					  * gradients.
+					  */
+	void initialize_2nd (const FiniteElement<dim> *element,
+			     const Mapping<dim>       &mapping,
+			     const Quadrature<dim>    &quadrature);
+	
+					 /**
+					  * Storage for @p{FEValues}
+					  * objects needed to
+					  * approximate second
+					  * derivatives.
+					  *
+					  * The ordering is @p{p+hx},
+					  * @p{p+hy}, @p{p+hz},
+					  * @p{p-hx}, @p{p-hy},
+					  * @p{p-hz}, where unused
+					  * entries in lower dimensions
+					  * are missing.
+					  */
+	typename std::vector<FEValues<dim>*> differences;
     };
   
 				     /**
