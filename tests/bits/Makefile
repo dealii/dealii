@@ -37,7 +37,8 @@ tests_x = anna_? \
           denis_1 \
 	  unit_support_points \
 	  parameter_handler_* \
-	  sparse_lu_decomposition_1 block_sparse_matrix_1 \
+	  sparse_lu_decomposition_1 \
+	  block_sparse_matrix_1 \
 	  hyper_ball_3d cylinder coarsening_3d \
 	  mesh_3d_* \
 	  normals_* \
