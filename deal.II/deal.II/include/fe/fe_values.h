@@ -345,7 +345,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * to get the derivative in one
 				      * of the coordinate directions,
 				      * use the appropriate function
-				      * of the @pref{Tensor} class to
+				      * of the @ref{Tensor} class to
 				      * extract one component. Since
 				      * only a reference to the
 				      * gradient's value is returned,
