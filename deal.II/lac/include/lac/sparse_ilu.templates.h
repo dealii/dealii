@@ -49,7 +49,6 @@ void SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
 
 template <typename number>
 template <typename somenumber>
-inline
 void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				   const double strengthen_diagonal)
 {
