@@ -468,6 +468,7 @@ compute_2nd (const Mapping<dim>                   &mapping,
 	     InternalDataBase                     &fe_internal,
 	     FEValuesData<dim>                    &data) const
 {
+//TODO[GK]: This function presently has a flaw: it ignores the offset parameter. This means that if it is called for faces or subfaces, it computes the data for _all_ faces or subfaces, even though we only need to have this for one of them. given that computing second derivatives is expensive, this is significant. What should be done is to honor the offset parameter and of course only compute what we actually need
   Assert ((fe_internal.update_each | fe_internal.update_once)
 	  & update_second_derivatives,
 	  ExcInternalError());
