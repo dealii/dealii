@@ -5,9 +5,9 @@
 /*----------------------------   subscriptor.h     ---------------------------*/
 
 
-
+#ifndef __exceptions_H
 #include <base/exceptions.h>
-
+#endif
 
 
 /**
@@ -102,7 +102,10 @@ class Subscriptor
 
 
 /**
- * Smart references avoid destruction of a referenced object.
+ * Smart references avoid destruction of a referenced object.  This
+ * class has not been fully developed, since the compiler could not
+ * resolve the dot operator in a convenient manner. The use of
+ * #SmartPointer# is recommended, instead.
  */
 template<class T>
 class SmartReference
@@ -138,73 +141,6 @@ class SmartReference
 
 
 
-
-/**
- * Smart pointers avoid destruction of an object in use. They can be used just
- * like a pointer (i.e. using the #*# and #-># operators and through casting)
- * but make sure that the object pointed to is not deleted in the course of
- * use of the pointer by signalling the pointee its use. This is done using
- * the #Subscriptor# class, which handles a use count and refuses destruction
- * as long as a smart pointer or reference uses that object.
- */
-template<class T>
-class SmartPointer
-{
-    T* t;
-
-  public:
-				     /**
-				      * Constructor taking a normal pointer.
-				      */
-    SmartPointer(T* tt)
-		    : t(tt) 
-      {
-	t->subscribe();
-      }
-
-				     /**
-				      * Destructor, removing the subscription.
-				      */
-    ~SmartPointer()
-      {
-	t->unsubscribe();
-      }
-				   /**
-				    * Assignment operator. Change of
-				    * subscription is necessary.
-				    */
-  SmartPointer<T>& operator=(T* tt)
-      {
-	t->unsubscribe();
-	t = tt;
-	tt->subscribe();
-      }
-  
-
-				     /**
-				      * Conversion to normal pointer.
-				      */
-    operator T* () const
-      {
-	return t;
-      }
-
-				     /**
-				      * Dereferencing operator.
-				      */
-    T& operator* () const
-      {
-	return *t;
-      }
-
-				     /**
-				      * Dereferencing operator.
-				      */
-    T* operator -> () const
-      {
-	return t;
-      }
-};
 
 
 
