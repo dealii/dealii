@@ -195,7 +195,13 @@ class TensorProductPolynomials
 				      */
     std::vector<unsigned int> n_pols_to;
     
-    
+				     /**
+				      * Computes @p{x} to the power of
+				      * @p{y} for unsigned int @p{x}
+				      * and @p{y}. It is a private
+				      * function as it is only used in
+				      * this class.
+				      */
     static unsigned int power(const unsigned int x, const unsigned int y);
 };
 
