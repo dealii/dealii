@@ -25,9 +25,7 @@
 
 
 //TODO:[GK] Cleanup
-//  Move MGSmoother to mg_base.h
 //  move definitions of virtual destructors to mg_base.templates.h
-//  move MGCoarseGridLACIteration to mg_coarse.h
 //
 
 /**
@@ -123,15 +121,6 @@ class Multigrid : public Subscriptor
 				      * @p{level_mgstep}.
 				      */
     void vcycle();
-
-				     /**
-				      * Print a level vector using
-				      * @ref{DoFHandler}.
-				      */
-/*      virtual void print_vector (const unsigned int level, */
-/*  			       const VECTOR& v, */
-/*  			       const char* name) const; */
-    
 
   private:
     

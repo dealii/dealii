@@ -189,59 +189,6 @@ class MGCoarseGrid : public Subscriptor
 
 
 /**
- * Coarse grid solver using LAC iterative methods.
- * This is a little wrapper, transforming a triplet of iterative
- * solver, matrix and preconditioner into a coarse grid solver.
- *
- * The type of the matrix (i.e. the template parameter @p{MATRIX})
- * should be derived from @p{Subscriptor} to allow for the use of a
- * smart pointer to it.
- *
- * @author Guido Kanschat, 1999
- */
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR = Vector<double> >
-class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
-{
-  public:
-				     /**
-				      * Constructor.
-				      * Store solver, matrix and
-				      * preconditioning method for later
-				      * use.
-				      */
-    MGCoarseGridLACIteration (SOLVER        &,
-			      const MATRIX  &,
-			      const PRECOND &);
-    
-				     /**
-				      * Implementation of the abstract
-				      * function.
-				      * Calls the solver method with
-				      * matrix, vectors and
-				      * preconditioner.
-				      */
-    void operator() (const unsigned int   level,
-		     VECTOR       &dst,
-		     const VECTOR &src) const;
-  private:
-				     /**
-				      * Reference to the solver.
-				      */
-    SOLVER& solver;
-    
-				     /**
-				      * Reference to the matrix.
-				      */
-    const SmartPointer<const MATRIX> matrix;
-    
-				     /**
-				      * Reference to the preconditioner.
-				      */
-    const PRECOND& precondition;
-};
-
-
-/**
  * Base class used to declare the operations needed by a concrete class
  * implementing prolongation and restriction of vectors in the multigrid
  * context. This class is an abstract one and has no implementations of
@@ -306,6 +253,32 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
  				   const VECTOR&      src) const = 0;
  };
 
+
+
+/**
+ * Base class for multigrid smoothers. Does nothing but defining the
+ * interface used by multigrid methods.
+ *
+ * @author Guido Kanschat, 2002
+ */
+template <class VECTOR>
+class MGSmoother : public Subscriptor
+{
+  public:
+				   /**
+				    * Virtual destructor.
+				    */
+  virtual ~MGSmoother();
+
+				   /**
+				    * Smoothing function. This is the
+				    * function used in multigrid
+				    * methods.
+				    */
+  virtual void smooth (const unsigned int level,
+		       VECTOR&            u,
+		       const VECTOR&      rhs) const = 0;  
+};
 
 
 /* ------------------------------------------------------------------- */
@@ -397,32 +370,6 @@ MGMatrix<MATRIX, VECTOR>::vmult (unsigned int level,
 {
   const MGLevelObject<MATRIX>& m = **this;
   m[level].vmult(dst, src);
-}
-
-
-/* ------------------ Functions for MGCoarseGridLACIteration ------------ */
-
-
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
-MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
-::MGCoarseGridLACIteration(SOLVER& s,
-			   const MATRIX  &m,
-			   const PRECOND &p)
-		:
-		solver(s),
-		matrix(&m),
-		precondition(p)
-{};
-
-
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
-void
-MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
-::operator() (const unsigned int    /* level */,
-	      VECTOR       &dst,
-	      const VECTOR &src) const
-{
-  solver.solve(*matrix, dst, src, precondition);
 }
 
 

@@ -23,32 +23,6 @@ template <int dim> class MGDoFHandler;
 
 
 /**
- * Base class for multigrid smoothers. Does nothing but defining the
- * interface used by multigrid methods.
- *
- * @author Guido KAnschat, 2002
- */
-template <class VECTOR>
-class MGSmoother : public Subscriptor
-{
-  public:
-				   /**
-				    * Virtual destructor.
-				    */
-  virtual ~MGSmoother();
-
-				   /**
-				    * Smoothing function. This is the
-				    * function used in multigrid
-				    * methods.
-				    */
-  virtual void smooth (const unsigned int level,
-		       VECTOR&            u,
-		       const VECTOR&      rhs) const = 0;  
-};
-
-
-/**
  * Smoother doing nothing. This class is not useful for many applications other
  * than for testing some multigrid procedures. Also some applications might
  * get convergence without smoothing and then this class brings you the
