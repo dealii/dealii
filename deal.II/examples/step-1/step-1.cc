@@ -95,14 +95,16 @@ void second_grid ()
                                    // point (1,0), and inner and outer
                                    // radius shall be 0.5 and 1. The
                                    // number of circumferentical cells
-                                   // will be adjusted automatically
-                                   // by this function (in this case,
-                                   // there will be 10)
+                                   // could be adjusted automatically
+                                   // by this function, but we choose
+                                   // to set it explicitely as the
+                                   // last argument
   const Point<2> center (1,0);
   const double inner_radius = 0.5,
                outer_radius = 1.0;
   GridGenerator::hyper_shell (triangulation,
-                              center, inner_radius, outer_radius);
+                              center, inner_radius, outer_radius,
+			      10);
                                    // By default, the triangulation
                                    // assumes that all boundaries are
                                    // straight and given by the cells
