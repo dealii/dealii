@@ -193,8 +193,8 @@ check ()
 				  << std::endl;
     };
 
-//    if (dim > 1)
-//      check_boundary (dof, mapping);
+  if (dim > 1)
+    check_boundary (dof, mapping);
 };
 
 
@@ -208,10 +208,10 @@ int main ()
   deallog.depth_console (0);
 
   deallog.push ("1d");
-//  check<1> ();
+  check<1> ();
   deallog.pop ();
   deallog.push ("2d");
-//  check<2> ();
+  check<2> ();
   deallog.pop ();
   deallog.push ("3d");
   check<3> ();
