@@ -31,10 +31,10 @@ class iVector
 protected:
 
 				     /// Dimension. Actual number of components
-    int dim;
+    unsigned int dim;
 
 				     /// Dimension. Determines amount of reserved memory , evtl. >DIM !
-    int maxdim;
+    unsigned int maxdim;
     
 				     /// Component-array.
     int *val;
@@ -46,50 +46,50 @@ protected:
 				     /**
 				      *  Dummy-Constructor. Dimension=1
 				      */
-    iVector();
+    iVector ();
     
 				     /**
 				      *   Copy-Constructor. Dimension set to that of V , <p>
 				      *                     all components are copied from V
 				      */
-    iVector(const iVector& V);
+    iVector (const iVector& V);
     
 				     /**
 				      *        Constructor. Dimension = N (>0)
 				      */
-    iVector(int N);
+    iVector (const unsigned int N);
     
 				     /**
 				      *         Destructor. Clears memory
 				      */
-    ~iVector();
+    ~iVector ();
     
 				     /**
 				      *  U(0-N) = s       . Fill all components
 				      */
-    iVector& operator=(int s);
+    iVector& operator = (const int s);
     
 				     /**
 				      *  U = V            . Copy all components
 				      */
-    iVector& operator=(const iVector& V);
+    iVector& operator = (const iVector& V);
     
 				     /**
 				      * Change  Dimension. <p>
 				      * Set dimension to N <p>
 				      * ! reserved memory for This remains unchanged ! <p>
-				      * on fast=0 vector is filled by 0.
+				      * on fast==false vector is filled by 0.
 				      */
-    void reinit(int N, int fast = 0);
+    void reinit (const unsigned int N, const bool fast=false);
     
 				     /**
 				      * Adjust  Dimension. <p>
 				      * Set dimension to n(V) <p>
 				      * ! reserved memory for This remains unchanged ! <p>
 				      * ! components of V are not copied in any case ! <p>
-				      * on fast=0 vector is filled by 0.
+				      * on fast==false vector is filled by 0.
 				      */
-    void reinit(const iVector& V, int fast = 0);
+    void reinit (const iVector& V, const bool fast=false);
 
 				     /**
 				      * Set all elements to zero.
@@ -100,7 +100,7 @@ protected:
 				      *  Inquire Dimension. returns Dimension ,
 				      *             INLINE
 				      */
-    int n() const;
+    unsigned int n () const;
 				     //@}
     
     
@@ -111,13 +111,13 @@ protected:
 				      *  Access Components. returns U(i) ,
 				      *             INLINE
 				      */
-    int operator()(int i) const;
+    int operator() (const unsigned int i) const;
     
 				     /**
 				      *  Access Components. returns U(i) ,
 				      *             INLINE
 				      */
-    int& operator()(int i);
+    int& operator() (const unsigned int i);
 				     //@}
     
     
@@ -127,17 +127,17 @@ protected:
 				     /**
 				      *  U+=V             . Simple addition
 				      */
-    void add(const iVector& V);
+    void add (const iVector& V);
     
 				     /**
 				      *  U+=a*V           . Simple addition
 				      */
-    void add(int a, const iVector& V);
+    void add (const unsigned int a, const iVector& V);
     
 				     /**
 				      *  U=a*V            . Replacing
 				      */
-    void equ(int a, const iVector& V);
+    void equ (const unsigned int a, const iVector& V);
 				     //@}
 
 				     /**
@@ -168,24 +168,24 @@ protected:
 
 
 
-inline int iVector::n() const
+inline unsigned int iVector::n() const
 {
   return dim;
 }
 
 
 
-inline int iVector::operator() (int i) const
+inline int iVector::operator() (unsigned int i) const
 {
-  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
+  Assert (i<dim, ExcInvalidIndex(i,dim));
   return val[i];
 }
 
 
 
-inline int& iVector::operator() (int i)
+inline int& iVector::operator() (unsigned int i)
 {
-  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
+  Assert (i<dim, ExcInvalidIndex(i,dim));
   return val[i];
 }
 

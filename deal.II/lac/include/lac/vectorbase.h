@@ -36,39 +36,51 @@ class VectorBase
 				     /**
 				      *  U(i)=0             . ONE Component only
 				      */
-    virtual void czero(int i) = 0;
+    virtual void czero (const unsigned int i) = 0;
     
 				     /**
 				      *  U(i)=a*V(j)        . Replacing
 				      */
-    virtual void cequ(int i, const VectorBase& V, double a, int j) = 0;
+    virtual void cequ (const unsigned int i, const VectorBase& V,
+		       const double a, const unsigned int j) = 0;
     
 				     /**
 				      *  U(i)=a*V(j)+b*V(k) . Replacing by sum
 				      */
-    virtual void cequ(int i, const VectorBase& V, double a, int j, double b, int k) = 0;
+    virtual void cequ (const unsigned int i, const VectorBase& V,
+		       const double a, const unsigned int j,
+		       const double b, const unsigned int k) = 0;
     
 				     /**
 				      *  U(i)=a*V(j)+b*V(k)+c*V(l)+d*V(m) . Replacing by sum
 				      */
-    virtual void cequ(int i, const VectorBase& V, double a, int j, double b,
-		      int k, double c, int l, double d, int m) = 0;
+    virtual void cequ (const unsigned int i, const VectorBase& V,
+		       const double a, const unsigned int j,
+		       const double b, const unsigned int k,
+		       const double c, const unsigned int l,
+		       const double d, const unsigned int m) = 0;
     
 				     /**
 				      *  U(i)+=a*V(j)       . Simple addition
 				      */
-    virtual void cadd(int i, const VectorBase& V, double a, int j) = 0;
+    virtual void cadd (const unsigned int i, const VectorBase& V,
+		       const double a, const unsigned int j) = 0;
     
 				     /**
 				      *  U(i)+=a*V(j)+b*V(k). Multiple addition
 				      */
-    virtual void cadd(int i, const VectorBase& V, double a, int j, double b, int k) = 0;
+    virtual void cadd (const unsigned int i, const VectorBase& V,
+		       const double a, const unsigned int j,
+		       const double b, const unsigned int k) = 0;
     
 				     /**
 				      *  U(i)+=a*V(j)+b*V(k)+c*V(l)+d*V(m) . Multiple addition
 				      */
-    virtual void cadd(int i, const VectorBase& V, double a, int j, double b,
-		      int k, double c, int l, double d, int m) = 0;
+    virtual void cadd (const unsigned int i, const VectorBase& V,
+		       const double a, const unsigned int j,
+		       const double b, const unsigned int k,
+		       const double c, const unsigned int l,
+		       const double d, const unsigned int m) = 0;
 				     //@}
     
     

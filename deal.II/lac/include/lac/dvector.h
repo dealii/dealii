@@ -39,10 +39,10 @@ class dVector : public VectorBase
   protected:
 
 				     /// Dimension. Actual number of components
-    int dim;
+    unsigned int dim;
 
 				     /// Dimension. Determines amount of reserved memory , evtl. >DIM !
-    int maxdim;
+    unsigned int maxdim;
 
 				     /// Component-array. 
     double *val;
@@ -56,23 +56,23 @@ class dVector : public VectorBase
 				     /**
 				      *  Dummy-Constructor. Dimension=0
 				      */
-    dVector();
+    dVector ();
     
 				     /**
 				      *   Copy-Constructor. Dimension set to that of V , <p>
 				      *                     all components are copied from V
 				      */
-    dVector(const dVector& V);
+    dVector (const dVector& V);
     
 				     /**
 				      *        Constructor. Dimension = N (>0)
 				      */
-    dVector(int N);
+    dVector (const unsigned int N);
     
 				     /**
 				      *         Destructor. Clears memory
 				      */
-    ~dVector();
+    ~dVector ();
 
 				     /**
 				      * Set all entries to zero. Equivalent to
@@ -82,17 +82,17 @@ class dVector : public VectorBase
 				     /**
 				      *  U(0-N) = s       . Fill all components
 				      */
-    dVector& operator=(double s);
+    dVector& operator= (const double s);
     
 				     /**
 				      *  U = V            . Copy all components
 				      */
-    dVector& operator=(const dVector& V);
+    dVector& operator= (const dVector& V);
     
 				     /**
 				      *  U = U * V        . Scalar Produkt
 				      */
-    double operator*(const dVector& V) const;
+    double operator* (const dVector& V) const;
 
 				     /**
 				      * Return square of the norm.
@@ -103,24 +103,24 @@ class dVector : public VectorBase
 				      * Change  Dimension. <p>
 				      * Set dimension to N <p>
 				      * ! reserved memory for This remains unchanged ! <p>
-				      * on fast=0 vector is filled by 0.
+				      * on fast==false vector is filled by 0.
 				      */ 
-    void reinit(int N, int fast = 0);
+    void reinit (const unsigned int N, const bool fast=false);
     
 				     /**
 				      * Adjust  Dimension. <p>
 				      * Set dimension to n(V) <p>
 				      * ! reserved memory for This remains unchanged ! <p>
 				      * ! components of V are not copied in any case ! <p>
-				      * on fast=0 vector is filled by 0.
+				      * on fast==false vector is filled by 0.
 				      */
-    void reinit(const dVector& V, int fast = 0);
+    void reinit (const dVector& V, const bool fast=false);
     
 				     /**
 				      *  Inquire Dimension. returns Dimension , 
 				      *             INLINE
 				      */
-    int n() const;
+    unsigned int n () const;
 				     //@}
     
     
@@ -132,13 +132,13 @@ class dVector : public VectorBase
 				      *  Access Components. returns U(i) , 
 				      *             INLINE
 				      */
-    double operator()(int i) const;
+    double operator() (const unsigned int i) const;
     
 				     /**
 				      *  Access Components. returns U(i) , 
 				      *             INLINE
 				      */
-    double& operator()(int i);
+    double& operator() (const unsigned int i);
 				     //@}
     
     
@@ -149,58 +149,62 @@ class dVector : public VectorBase
 				     /**
 				      *  U(0-DIM)+=s      . Addition of S to all components
 				      */
-    void add(const double s);
+    void add (const double s);
     
 				     /**
 				      *  U+=V             . Simple addition
 				      */
-    void add(const dVector& V);
+    void add (const dVector& V);
     
 				     /**
 				      *  U+=a*V           . Simple addition
 				      */
-    void add(double a, const dVector& V);
+    void add (const double a, const dVector& V);
     
 				     /**
 				      *  U+=a*V+b*W       . Multiple addition
 				      */
-    void add(double a, const dVector& V, double b, const dVector& W);
+    void add (const double a, const dVector& V,
+	      const double b, const dVector& W);
     
 				     /**
 				      *  U=s*U+V          . Scaling + simple addition
 				      */
-    void sadd(double s, const dVector& V);
+    void sadd (const double s, const dVector& V);
     
 				     /**
 				      *  U=s*U+a*V        . Scaling + simple addition
 				      */
-    void sadd(double s, double a, const dVector& V);
+    void sadd (const double s, const double a, const dVector& V);
     
 				     /**
 				      *  U=s*U+a*V+b*W    . Scaling + multiple addition
 				      */
-    void sadd(double s, double a, const dVector& V, double b, const dVector& W);
+    void sadd (const double s, const double a,
+	       const dVector& V, const double b, const dVector& W);
     
 				     /**
 				      *  U=s*U+a*V+b*W+c*X. Scaling + multiple addition
 				      */
-    void sadd(double s, double a, const dVector& V, double b, const dVector& W, 
-	      double c, const dVector& X);
+    void sadd (const double s, const double a,
+	       const dVector& V, const double b, const dVector& W, 
+	       const double c, const dVector& X);
     
 				     /**
 				      *  U=s*U            . Scaling
 				      */
-    void equ(double s);
+    void equ (const double s);
     
 				     /**
 				      *  U=a*V            . Replacing
 				      */
-    void equ(double a, const dVector& V);
+    void equ (const double a, const dVector& V);
     
 				     /**
 				      *  U=a*V+b*W        . Replacing by sum
 				      */
-    void equ(double a, const dVector& V, double b, const dVector& W);
+    void equ (const double a, const dVector& V,
+	      const double b, const dVector& W);
 				     //@}
     
     
@@ -211,39 +215,51 @@ class dVector : public VectorBase
 				     /**
 				      *  U(i)=0             . ONE Component only
 				      */
-    void czero(int i);
+    void czero (const unsigned int i);
     
 				     /**
 				      *  U(i)=a*V(j)        . Replacing
 				      */
-    void cequ(int i, const VectorBase& V, double a, int j);
+    void cequ(unsigned int i, const VectorBase& V,
+	      double a, unsigned int j);
     
 				     /**
 				      *  U(i)=a*V(j)+b*V(k) . Replacing by sum
 				      */
-    void cequ(int i, const VectorBase& V, double a, int j, double b, int k);
+    void cequ (const unsigned int i, const VectorBase& V,
+	       const double a, const unsigned int j,
+	       const double b, const unsigned int k);
     
 				     /**
 				      *  U(i)=a*V(j)+b*V(k)+c*V(l)+d*V(m) . Replacing by sum
 				      */
-    void cequ(int i, const VectorBase& V, double a, int j, double b,
-	      int k, double c, int l, double d, int m);
+    void cequ (const unsigned int i, const VectorBase& V,
+	       const double a, const unsigned int j,
+	       const double b, const unsigned int k,
+	       const double c, const unsigned int l,
+	       const double d, const unsigned int m);
     
 				     /**
 				      *  U(i)+=a*V(j)       . Simple addition
 				      */
-    void cadd(int i, const VectorBase& V, double a, int j);
+    void cadd (const unsigned int i, const VectorBase& V,
+	       const double a, const unsigned int j);
     
 				     /**
 				      *  U(i)+=a*V(j)+b*V(k). Multiple addition
 				      */ 
-    void cadd(int i, const VectorBase& V, double a, int j, double b, int k);
+    void cadd (const unsigned int i, const VectorBase& V,
+	       const double a, const unsigned int j,
+	       const double b, const unsigned int k);
     
 				     /**
 				      *  U(i)+=a*V(j)+b*V(k)+c*V(l)+d*V(m) . Multiple addition
 				      */
-    void cadd(int i, const VectorBase& V, double a, int j, double b,
-	      int k, double c, int l, double d, int m);
+    void cadd (const unsigned int i, const VectorBase& V,
+	       const double a, const unsigned int j,
+	       const double b, const unsigned int k,
+	       const double c, const unsigned int l,
+	       const double d, const unsigned int m);
 				     //@}
     
     
@@ -252,17 +268,17 @@ class dVector : public VectorBase
 				      */
 				     //@{
 				     ///
-    virtual const char* name() const;
+    virtual const char* name () const;
     
 				     /**
 				      *  Output of vector in user-defined format.
 				      */
-    void print(FILE* fp, const char* format = 0) const;
+    void print (FILE* fp, const char* format = 0) const;
     
 				     /**
 				      *  Output of vector in user-defined format.
 				      */
-    void print(const char* format = 0) const;
+    void print (const char* format = 0) const;
 
 				     /**
 				      * Print to given stream, one element per line.
@@ -300,20 +316,20 @@ class dVector : public VectorBase
 
 
 
-inline int dVector::n() const
+inline unsigned int dVector::n () const
 {
   return dim;
 }
 
-inline double dVector::operator() (int i) const
+inline double dVector::operator() (const unsigned int i) const
 {
-  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
+  Assert (i<dim, ExcInvalidIndex(i,dim));
   return val[i];
 }
 
-inline double& dVector::operator() (int i)
+inline double& dVector::operator() (const unsigned int i)
 {
-  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
+  Assert (i<dim, ExcInvalidIndex(i,dim));
   return val[i];
 }
 

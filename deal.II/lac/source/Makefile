@@ -2,19 +2,24 @@
 
 CXX       = c++
 INCLUDE   = -I../include -I../../base/include
-CXXFLAGS.g= -DDEBUG -g -Wall -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual $(INCLUDE)
+CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
+            -Winline -Woverloaded-virtual -fno-rtti -fno-exceptions \
+            $(INCLUDE)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
-           -funroll-loops -felide-constructors -fnonnull-objects $(INCLUDE)
+           -funroll-loops -felide-constructors -fnonnull-objects \
+           -fno-rtti -fno-exceptions $(INCLUDE)
+
+ifeq ($(shell uname),Linux)
+CXX       = /home/wolf/bin/gcc-2.8.1/bin/c++
+endif
 
 ifeq ($(shell uname),SunOS)
-#CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
-#CXXFLAGS.g:= -V2.7.2.3 $(CXXFLAGS.g)
-INCLUDE2.8  =  -I/usr/local/source/libstdc++-2.8.0/libstdc++ \
-               -I/usr/local/source/libstdc++-2.8.0/libio
-CXXFLAGS  := $(CXXFLAGS) -fno-rtti -fno-exceptions $(INCLUDE2.8)
-CXXFLAGS.g:= $(CXXFLAGS.g) -W -fno-rtti -fno-exceptions $(INCLUDE2.8)
+INCLUDE2.8=  -I/usr/local/source/libstdc++-2.8.0/libstdc++ \
+             -I/usr/local/source/libstdc++-2.8.0/libio
+CXXFLAGS  := $(CXXFLAGS) $(INCLUDE2.8)
+CXXFLAGS.g:= $(CXXFLAGS.g) $(INCLUDE2.8)
 endif
+
 
 
 cc-files = $(wildcard *.cc)
@@ -41,7 +46,7 @@ lib.a: ../lib/liblac.a($(o-files))
 lib.g.a: ../lib/liblac.g.a($(go-files))
 
 clean:
-	rm -f *.o *.go *~ Makefile.dep
+	rm -f *.o *.go *~ Makefile.dep ../lib/lib*
 
 
 

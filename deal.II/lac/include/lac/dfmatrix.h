@@ -38,31 +38,35 @@ class dFMatrix
 				     /** 
 				      * Dimension. Actual number of Columns
 				      */
-    int dim_range;
+    unsigned int dim_range;
 				     /**
 				      * Dimension. Actual number of Rows
 				      */
-    int dim_image;
+    unsigned int dim_image;
 				     /**
 				      * Dimension. Determines amount of reserved memory
 				      */
-    int val_size;
+    unsigned int val_size;
 
 				     /**
 				      * Initialization   . initialize memory for Matrix <p>
 				      * ( m rows , n columns )
 				      */
-    void init(int m, int n);
+    void init (const unsigned int m, const unsigned int n);
     
 				     /**
 				      *   Access Elements. returns A(i,j)
 				      */
-    double& el(int i, int j)  { return val[i*dim_range+j]; }
+    double& el (const unsigned int i, const unsigned int j)  {
+      return val[i*dim_range+j];
+    };
     
 				     /**
 				      *   Access Elements. returns A(i,j)
 				      */
-    double el(int i, int j) const { return val[i*dim_range+j]; }
+    double el (const unsigned int i, const unsigned int j) const {
+      return val[i*dim_range+j];
+    };
     
     
   public:
@@ -72,13 +76,13 @@ class dFMatrix
 				      *       Constructor. Dimension = (n,n) <p>
 				      *       ->   quadratic matrix (n rows , n columns)
 				      */
-    dFMatrix(int n = 1) { init(n,n); }
+    dFMatrix (const unsigned int n = 1) { init(n,n); }
     
 				     /**
 				      *       Constructor. Dimension = (m,n) <p>
 				      *       -> rectangular matrix (m rows , n columns)
 				      */
-    dFMatrix(int m,int n) { init(m,n); }
+    dFMatrix (const unsigned int m,unsigned int n) { init(m,n); }
     
 				     /** 
 				      * Copy constructor. Be very careful with
@@ -86,7 +90,7 @@ class dFMatrix
 				      * huge amount of computing time for large
 				      * matrices!!
 				      */
-    dFMatrix(const dFMatrix&);
+    dFMatrix (const dFMatrix&);
 
 				     /**
 				      *        Destructor. Clears memory
@@ -109,38 +113,39 @@ class dFMatrix
 				     /**
 				      *  U(0-m,0-n) = s  . Fill all elements
 				      */
-    void fill(const dFMatrix& src, int i = 0, int j = 0);
+    void fill (const dFMatrix& src,
+	       const unsigned int i=0, const unsigned int j=0);
     
 				     /**
 				      * Change  Dimension.
 				      * Set dimension to (m,n) <p>
 				      * ( reinit rectangular matrix )
 				      */
-    void reinit(int m, int n);
+    void reinit (const unsigned int m, const unsigned int n);
     
 				     /**
 				      * Change  Dimension.
 				      * Set dimension to (n,n) <p>
 				      * ( reinit quadratic matrix )
 				      */
-    void reinit(int n) { reinit(n,n); }
+    void reinit (const unsigned int n) { reinit(n,n); }
     
 				     /**
 				      * Adjust  Dimension.
 				      * Set dimension to ( m(B),n(B) ) <p>
 				      * ( adjust to dimensions of another matrix B )
 				      */
-    void reinit(const dFMatrix& B) { reinit(B.m(), B.n()); }
+    void reinit (const dFMatrix& B) { reinit(B.m(), B.n()); }
     
 				     /**
 				      *  Inquire Dimension (Row) . returns Number of Rows
 				      */
-    int m() const { return dim_image; }
+    unsigned int m() const { return dim_image; }
     
 				     /**
 				      *  Inquire Dimension (Col) . returns Number of Columns
 				      */
-    int n() const { return dim_range; }
+    unsigned int n () const { return dim_range; }
 				     //@}
     
     
@@ -151,25 +156,25 @@ class dFMatrix
 				      *   Access Elements. returns element at relative 'address' i <p>
 				      *   ( -> access to A(i/n , i mod n) )
 				      */
-    double el(int i) const { return val[i]; }
+    double el (const unsigned int i) const { return val[i]; }
     
 				     /**
 				      *   Access Elements. returns A(i,j)
 				      */
-    double operator() (int i, int j) const
+    double operator() (const unsigned int i, const unsigned int j) const
       {
-	Assert ((i>=0) && (i<dim_image), ExcInvalidIndex (i, dim_image));
-	Assert ((j>=0) && (j<dim_range), ExcInvalidIndex (i, dim_range));
+	Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
+	Assert (j<dim_range, ExcInvalidIndex (i, dim_range));
 	return el(i,j);
       }
 
 				     /**
 				      *   Access Elements. returns A(i,j)
 				      */
-    double& operator() (int i, int j)
+    double& operator() (const unsigned int i, const unsigned int j)
       {
-	Assert ((i>=0) && (i<dim_image), ExcInvalidIndex (i, dim_image));
-	Assert ((j>=0) && (j<dim_range), ExcInvalidIndex (i, dim_range));
+	Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
+	Assert (j<dim_range, ExcInvalidIndex (i, dim_range));
 	return el(i,j);
       }
 
@@ -187,26 +192,26 @@ class dFMatrix
 				     /**
 				      *  A+=B            . Simple addition
 				      */
-    void add(double s, const dFMatrix& B);
+    void add (const double s, const dFMatrix& B);
 
 				     /**
 				      * A+=Transp(B).
 				      * Simple addition of the transpose of B to this
 				      */
-    void Tadd(double s, const dFMatrix& B);
+    void Tadd (const double s, const dFMatrix& B);
     
 				     /**
 				      * C=A*B.
 				      * Matrix-matrix-multiplication 
 				      */
-    void mmult(dFMatrix& C, const dFMatrix& B) const;
+    void mmult (dFMatrix& C, const dFMatrix& B) const;
     
 				     /**
 				      * C=Transp(A)*B.
 				      * Matrix-matrix-multiplication using
 				      * transpose of this
 				      */
-    void Tmmult(dFMatrix& C, const dFMatrix& B) const;
+    void Tmmult (dFMatrix& C, const dFMatrix& B) const;
     
 				     /**
 				      *  w (+)= A*v.
@@ -214,21 +219,21 @@ class dFMatrix
 				      *  ( application of this to a vector v )
 				      *  flag adding=true : w=+A*v
 				      */
-    void vmult(dVector& w, const dVector& v,const int adding = 0) const;
-
+    void vmult (dVector& w, const dVector& v, const bool adding=false) const;
+    
 				     /**
 				      *  w (+)= Transp(A)*v.
 				      *  Matrix-vector-multiplication ; <p>
 				      *  (application of transpose of this to a vector v)
 				      *  flag adding=true : w=+A*v
 				      */
-    void Tvmult(dVector& w,const dVector& v,const int adding=0) const;
+    void Tvmult (dVector& w, const dVector& v, const bool adding=false) const;
 
 				     /**
 				      * A=Inverse(A). Inversion of this by
 				      * Gauss-Jordan-algorithm
 				      */
-    void gauss_jordan();
+    void gauss_jordan ();
 
 				     /**
                                       * Computes the determinant of a matrix.
@@ -258,37 +263,41 @@ class dFMatrix
 				      *  A(i,1-n)+=s*A(j,1-n).
 				      * Simple addition of rows of this
 				      */
-    void add_row(int i, double s, int j);
+    void add_row (const unsigned int i, const double s, const unsigned int j);
 
 				     /**
 				      *  A(i,1-n)+=s*A(j,1-n)+t*A(k,1-n).
 				      *  Multiple addition of rows of this
 				      */
-    void add_row(int i, double s, int j, double t, int k);
+    void add_row (const unsigned int i,
+		  const double s, const unsigned int j,
+		  const double t, const unsigned int k);
 
 				     /**
 				      *  A(1-n,i)+=s*A(1-n,j).
 				      *  Simple addition of columns of this
 				      */
-    void add_col(int i, double s, int j);
+    void add_col (const unsigned int i, const double s, const unsigned int j);
 
 				     /**
 				      *  A(1-n,i)+=s*A(1-n,j)+t*A(1-n,k).
 				      *  Multiple addition of columns of this
 				      */
-    void add_col(int i, double s, int j, double t, int k);
+    void add_col (const unsigned int i,
+		  const double s, const unsigned int j,
+		  const double t, const unsigned int k);
 
 				     /**
 				      * Swap  A(i,1-n) <-> A(j,1-n).
 				      * Swap rows i and j of this
 				      */
-    void swap_row(int i, int j);
+    void swap_row (const unsigned int i, const unsigned int j);
 
 				     /**
 				      *  Swap  A(1-n,i) <-> A(1-n,j).
 				      *  Swap columns i and j of this
 				      */
-    void swap_col(int i, int j);
+    void swap_col (const unsigned int i, const unsigned int j);
 				     //@}
 
 
@@ -300,17 +309,17 @@ class dFMatrix
 				      *  w=b-A*v.
 				      *  Residual calculation , returns |w|
 				      */
-    double residual(dVector& w, const dVector& v, const dVector& b) const;
+    double residual (dVector& w, const dVector& v, const dVector& b) const;
 
 				     /**
 				      *  Inversion of lower triangle .
 				      */
-    void forward(dVector& dst, const dVector& src) const;
+    void forward (dVector& dst, const dVector& src) const;
 
 				     /**
 				      *  Inversion of upper triangle .
 				      */
-    void backward(dVector& dst, const dVector& src) const;
+    void backward (dVector& dst, const dVector& src) const;
 
 				     /**
 				      * QR - factorization of a matrix.
@@ -320,38 +329,38 @@ class dFMatrix
 				      *  triangle contains the resulting matrix R, <p>
 				      * the lower the incomplete factorization matrices.
 				      */
-    void householder(dVector& y);
+    void householder (dVector& y);
 
 				     /**
 				      * Least - Squares - Approximation by QR-factorization.
 				      */
-    double least_squares(dVector& dst, dVector& src);
+    double least_squares (dVector& dst, dVector& src);
 
 				     /**
 				      *  A(i,i)+=B(i,1-n). Addition of complete
 				      *  rows of B to diagonal-elements of this ; <p>
 				      *  ( i = 1 ... m )
 				      */
-    void add_diag(double s, const dFMatrix& B);
+    void add_diag (const double s, const dFMatrix& B);
 
 				     /**
 				      *  A(i,i)+=s  i=1-m.
 				      * Add constant to diagonal elements of this
 				      */
-    void diagadd(const double& src);
+    void diagadd (const double& src);
 
 				     /**
 				      *  w+=part(A)*v. Conditional partial
 				      *  Matrix-vector-multiplication <p>
 				      *  (used elements of v determined by x)
 				      */
-    void gsmult(dVector& w, const dVector& v,const iVector& x) const;
+    void gsmult (dVector& w, const dVector& v, const iVector& x) const;
 
 
 				     /**
 				      * Output of the matrix in user-defined format.
 				      */
-    void print(FILE* fp, const char* format = 0) const;
+    void print (FILE* fp, const char* format = 0) const;
 				     //@}
 
 				     /**

@@ -12,11 +12,11 @@
 dFMatrix::dFMatrix (const dFMatrix &m) 
 {
   init (m.dim_image, m.dim_range);
-  for (int i=0; i!=dim_image*dim_range; ++i)
+  for (unsigned int i=0; i!=dim_image*dim_range; ++i)
     val[i] = m.val[i];
 };
 
-void dFMatrix::init(int mm, int nn)
+void dFMatrix::init (const unsigned int mm, const unsigned int nn)
 {
   val_size = nn*mm;
   val = new double[val_size];
@@ -25,12 +25,12 @@ void dFMatrix::init(int mm, int nn)
   clear ();
 }
 
-dFMatrix::~dFMatrix()
+dFMatrix::~dFMatrix ()
 {
   delete[] val;
 }
 
-void dFMatrix::reinit(int mm, int nn)
+void dFMatrix::reinit (const unsigned int mm, const unsigned int nn)
 {
   if (val_size<nn*mm)
     {
@@ -42,11 +42,12 @@ void dFMatrix::reinit(int mm, int nn)
       dim_range = nn;
       dim_image = mm;
 //      memset(val, 0, sizeof(double)*nn*mm);
-      for (int i = nn*mm-1; i>=0 ; i--) val[i] = 0;
+      for (unsigned int i=0; i<nn*mm; ++i) val[i] = 0;
     }
 }
 
-void dFMatrix::vmult(dVector& dst, const dVector& src,const int adding) const
+void dFMatrix::vmult (dVector& dst, const dVector& src,
+		      const bool adding) const
 {
   Assert(dst.n() == m(), ExcDimensionMismatch(dst.n(), m()));
   Assert(src.n() == n(), ExcDimensionMismatch(src.n(), n()));
@@ -156,17 +157,20 @@ void dFMatrix::vmult(dVector& dst, const dVector& src,const int adding) const
   else
   {    
     double* e = val;
-    for (int i=0;i<m();i++)
+    const unsigned int size_m = m(),
+		       size_n = n();
+    for (unsigned int i=0; i<size_m; ++i)
     {
       s = 0.;
-      for (int j=0;j<n();j++) s += src(j) * *(e++);
+      for (unsigned int j=0; j<size_n; ++j)
+	s += src(j) * *(e++);
       if (!adding) dst(i) = s;
       else dst(i) += s;
     }
   }
 }
 
-void dFMatrix::gsmult(dVector& dst, const dVector& src,const iVector& gl) const
+void dFMatrix::gsmult (dVector& dst, const dVector& src, const iVector& gl) const
 {
   Assert(n() == m(), ExcNotQuadratic());
   Assert(dst.n() == n(), ExcDimensionMismatch(dst.n(), n()));
@@ -285,80 +289,89 @@ void dFMatrix::gsmult(dVector& dst, const dVector& src,const iVector& gl) const
   else
   {    
     double* e = val;
-    for (int i=0;i<m();i++)
+    const unsigned int size_m = m(),
+		       size_n = n();
+    for (unsigned int i=0; i<size_m; ++i)
     {
       s = 0.;
-      for (int j=0;j<n();j++) if(gl(i)<gl(j)) s += src(j) * *(e++);
+      for (unsigned int j=0; j<size_n; ++j)
+	if(gl(i)<gl(j)) s += src(j) * *(e++);
       dst(i) += s;
     }
   }
 }
 
-void dFMatrix::Tvmult(dVector& dst, const dVector& src, const int adding) const
+void dFMatrix::Tvmult (dVector& dst, const dVector& src, const bool adding) const
 {
   Assert(dst.n() == n(), ExcDimensionMismatch(dst.n(), n()));
   Assert(src.n() == m(), ExcDimensionMismatch(src.n(), m()));
 
-  int i,j;
+  unsigned int i,j;
   double s;
-  for (i=0;i<m();i++)
+  const unsigned int size_m = m(),
+		     size_n = n();
+  for (i=0; i<size_m; ++i)
   {
     s = 0.;
-    for (j=0;j<n();j++) s += src(j) * el(j,i);
+    for (j=0; j<size_n; ++j)
+      s += src(j) * el(j,i);
     if(!adding) dst(i) = s;
     else dst(i) += s;
   }
 }
 
-double dFMatrix::residual(dVector& dst, const dVector& src,
+double dFMatrix::residual (dVector& dst, const dVector& src,
 			  const dVector& right) const
 {
   Assert(dst.n() == m(), ExcDimensionMismatch(dst.n(), m()));
   Assert(src.n() == n(), ExcDimensionMismatch(src.n(), n()));
   Assert(right.n() == m(), ExcDimensionMismatch(right.n(), m()));
 
-  int i,j;
+  unsigned int i,j;
   double s, res = 0.;
-  for (i=0;i<n();i++)
+  const unsigned int size_m = m(),
+		     size_n = n();
+  for (i=0; i<size_n; ++i)
     {
       s = right(i);
-      for (j=0;j<m();j++) s -= src(j) * el(i,j);
+      for (j=0; j<size_m; ++j)
+	s -= src(j) * el(i,j);
       dst(i) = s;
       res += s*s;
     }
   return sqrt(res);
 }
 
-void dFMatrix::forward(dVector& dst, const dVector& src) const
+void dFMatrix::forward (dVector& dst, const dVector& src) const
 {
   Assert(n() == m(), ExcNotQuadratic());
   Assert(dst.n() == n(), ExcDimensionMismatch(dst.n(), n()));
   Assert(src.n() == n(), ExcDimensionMismatch(src.n(), n()));
 
-  int i,j;
-  int nu = MIN(m(),n());
+  unsigned int i,j;
+  unsigned int nu = MIN(m(),n());
   double s;
-  for (i=0;i<nu;i++)
+  for (i=0; i<nu; ++i)
     {
       s = src(i);
-      for (j=0;j<i;j++) s -= dst(j) * el(i,j);
+      for (j=0; j<i; ++j) s -= dst(j) * el(i,j);
       dst(i) = s/el(i,i);
     }
 }
 
-void dFMatrix::backward(dVector& dst, const dVector& src) const
+void dFMatrix::backward (dVector& dst, const dVector& src) const
 {
   Assert(n() == m(), ExcNotQuadratic());
   Assert(dst.n() == n(), ExcDimensionMismatch(dst.n(), n()));
   Assert(src.n() == n(), ExcDimensionMismatch(src.n(), n()));
 
-  int i,j;
-  int nu = MIN(m(),n());
+  unsigned int j;
+  unsigned int nu = MIN(m(),n());
   double s;
-  for (i=nu-1;i>=0;i--)
+  for (int i=nu-1; i>=0; --i)
     {
       s = src(i);
-      for (j=i+1;j<nu;j++) s -= dst(j) * el(i,j);
+      for (j=i+1; j<nu; ++j) s -= dst(j) * el(i,j);
       dst(i) = s/el(i,i);
     }
 }
@@ -366,81 +379,88 @@ void dFMatrix::backward(dVector& dst, const dVector& src) const
 dFMatrix& dFMatrix::operator = (const dFMatrix& M)
 {
   reinit(M);
-  int nn = n()*m();
-  for (int i=0;i<nn;i++) val[i] = M.val[i];
+  unsigned int nn = n()*m();
+  for (unsigned int i=0; i<nn; ++i)
+    val[i] = M.val[i];
   return *this;
 }
 
-void dFMatrix::fill(const dFMatrix& src, int i, int j)
+void dFMatrix::fill (const dFMatrix& src,
+		     const unsigned int i, const unsigned int j)
 {
   Assert (n() >= src.n() + j, ExcInvalidDestination(n(), src.n(), j));
   Assert (m() >= src.m() + i, ExcInvalidDestination(m(), src.m(), i));
 
-  for (int ii=0; ii<src.m() ; ii++)
-    for (int jj=0; jj<src.n() ; jj++)
+  for (unsigned int ii=0; ii<src.m() ; ++ii)
+    for (unsigned int jj=0; jj<src.n() ; ++jj)
       el(ii+i,jj+j) = src.el(ii,jj);
 }
 
-void dFMatrix::add_row(int i, double s, int j)
+void dFMatrix::add_row (const unsigned int i,
+			const double s, const unsigned int j)
 {
-  int k;
-  for (k=0;k<m();k++) el(i,k) += s*el(j,k);
+  for (unsigned int k=0; k<m(); ++k)
+    el(i,k) += s*el(j,k);
 }
 
-void dFMatrix::add_row(int i, double s, int j, double t, int k)
+void dFMatrix::add_row (const unsigned int i, const double s,
+		        const unsigned int j, const double t,
+			const unsigned int k)
 {
-  int l;
-  for (l=0;l<m();l++) el(i,l) += s*el(j,l) + t*el(k,l);
+  const unsigned int size_m = m();
+  for (unsigned l=0; l<size_m; ++l)
+    el(i,l) += s*el(j,l) + t*el(k,l);
 }
 
-void dFMatrix::add_col(int i, double s, int j)
+void dFMatrix::add_col (const unsigned int i, const double s,
+			const unsigned int j)
 {
-  int k;
-  for (k=0;k<n();k++) el(k,i) += s*el(k,j);
+  for (unsigned int k=0; k<n(); ++k)
+    el(k,i) += s*el(k,j);
 }
 
-void dFMatrix::add_col(int i, double s, int j, double t, int k)
+void dFMatrix::add_col (const unsigned int i, const double s,
+		        const unsigned int j, const double t,
+			const unsigned int k)
 {
-  int l;
-  for (l=0;l<n();l++) el(l,i) += s*el(l,j) + t*el(l,k);
+  for (unsigned int l=0; l<n(); ++l)
+    el(l,i) += s*el(l,j) + t*el(l,k);
 }
 
-void dFMatrix::swap_row(int i, int j)
+void dFMatrix::swap_row (const unsigned int i, const unsigned int j)
 {
-  int k;
   double s;
-  for (k=0;k<m();k++)
+  for (unsigned int k=0; k<m(); ++k)
   {
     s = el(i,k); el(i,k) = el(j,k); el(j,k) = s;
   }
 }
 
-void dFMatrix::swap_col(int i, int j)
+void dFMatrix::swap_col (const unsigned int i, const unsigned int j)
 {
-  int k;
   double s;
-  for (k=0;k<n();k++)
+  for (unsigned int k=0; k<n(); ++k)
   {
     s = el(k,i); el(k,i) = el(k,j); el(k,j) = s;
   }
 }
 
-void dFMatrix::diagadd(const double& src)
+void dFMatrix::diagadd (const double& src)
 {
   Assert (m() == n(), ExcDimensionMismatch(m(),n()));
-  for (int i=0;i<n();i++)
+  for (unsigned int i=0; i<n(); ++i)
     el(i,i) += src;
 }
 
-void dFMatrix::mmult(dFMatrix& dst, const dFMatrix& src) const
+void dFMatrix::mmult (dFMatrix& dst, const dFMatrix& src) const
 {
   Assert (n() == src.m(), ExcDimensionMismatch(n(), src.m()));
-  int i,j,k;
+  unsigned int i,j,k;
   double s = 1.;
   dst.reinit(m(), src.n());
 
   for (i=0;i<m();i++)
-    for (j=0;j<src.n();j++)
+    for (j=0; j<src.n(); ++j)
       {
 	s = 0.;
 	for (k=0;k<n();k++) s+= el(i,k) * src.el(k,j);
@@ -448,11 +468,11 @@ void dFMatrix::mmult(dFMatrix& dst, const dFMatrix& src) const
       }
 }
 
-/*void dFMatrix::mmult(dFMatrix& dst, const dFMatrix& src) const
+/*void dFMatrix::mmult (dFMatrix& dst, const dFMatrix& src) const
 {
   Assert (m() == src.n(), ExcDimensionMismatch(m(), src.n()));
 
-  int i,j,k;
+  unsigned int i,j,k;
   double s = 1.;
 
   dst.reinit(n(), src.m());
@@ -466,11 +486,11 @@ void dFMatrix::mmult(dFMatrix& dst, const dFMatrix& src) const
       }
 }*/
 
-void dFMatrix::Tmmult(dFMatrix& dst, const dFMatrix& src) const
+void dFMatrix::Tmmult (dFMatrix& dst, const dFMatrix& src) const
 {
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
 
-  int i,j,k;
+  unsigned int i,j,k;
   double s = 1.;
   dst.reinit(m(), src.m());
 
@@ -487,7 +507,7 @@ void dFMatrix::Tmmult(dFMatrix& dst, const dFMatrix& src) const
 {
   Assert (m() == src.n(), ExcDimensionMismatch(m(), src.n()));
 
-  int i,j,k;
+  unsigned int i,j,k;
   double s = 1.;
   
   dst.reinit(n(), src.m());
@@ -501,10 +521,10 @@ void dFMatrix::Tmmult(dFMatrix& dst, const dFMatrix& src) const
       }
 }*/
 
-void dFMatrix::print(FILE* f, const char* format) const
+void dFMatrix::print (FILE* f, const char* format) const
 {
   if (!format) format = " %5.2f";
-  int i,j;
+  unsigned int i,j;
   for (i=0;i<m();i++)
     {
       for (j=0;j<n();j++) fprintf(f, format, el(i,j));
@@ -512,7 +532,7 @@ void dFMatrix::print(FILE* f, const char* format) const
     }
 }
 
-void dFMatrix::add(double s,const dFMatrix& src)
+void dFMatrix::add (const double s,const dFMatrix& src)
 {
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
@@ -621,13 +641,15 @@ void dFMatrix::add(double s,const dFMatrix& src)
   }
   else
   {
-    for (int i = n()*m()-1; i>=0 ; i--) val[i] += s * src.el(i);
+    const unsigned int size = n()*m();
+    for (unsigned int i=0; i<size; i++)
+      val[i] += s * src.el(i);
   }
 }
 
 
 
-void dFMatrix::add_diag(double s,const dFMatrix& src)
+void dFMatrix::add_diag (const double s, const dFMatrix& src)
 {
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
@@ -737,11 +759,13 @@ void dFMatrix::add_diag(double s,const dFMatrix& src)
   }
   else
   {
-    for (int i = n()*m()-1; i>=0 ; i--) val[i] += s * src.el(i);
+    const unsigned int size = n()*m();
+    for (unsigned int i=0; i<size; i++)
+      val[i] += s * src.el(i);
   }
 }
 
-void dFMatrix::Tadd(double s,const dFMatrix& src)
+void dFMatrix::Tadd (const double s, const dFMatrix& src)
 {
   Assert (m() == n(),     ExcNotQuadratic());
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
@@ -868,8 +892,8 @@ dFMatrix::operator == (const dFMatrix &m) const
   bool q = (dim_range==m.dim_range) && (dim_image==m.dim_image);
   if (!q) return false;
 
-  for (int i=0; i<dim_image; ++i)
-    for (int j=0; j<dim_range; ++j)
+  for (unsigned int i=0; i<dim_image; ++i)
+    for (unsigned int j=0; j<dim_range; ++j)
       if (el(i,j) != m.el(i,j)) return false;
   return true;
 };
@@ -901,7 +925,7 @@ double dFMatrix::determinant () const {
 
 
 void dFMatrix::clear () {
-  for (int i=0; i<val_size; ++i)
+  for (unsigned int i=0; i<val_size; ++i)
     val[i] = 0.;
 };
 

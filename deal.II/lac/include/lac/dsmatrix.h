@@ -32,43 +32,46 @@ CLASS
 class dSMatrixStruct
 {
   friend class dSMatrix;
-  int max_dim;
-  int rows, cols;
-  int vec_len, max_vec_len;
-  int max_row_len;
-  int* rowstart;
+  unsigned int max_dim;
+  unsigned int rows, cols;
+  unsigned int vec_len, max_vec_len;
+  unsigned int max_row_len;
+  unsigned int* rowstart;
   int* colnums;
-  int compressed;
+  bool compressed;
 
 public:
   //////////
-  void reinit(int m, int n, int max_per_row);
+  void reinit (const unsigned int m, const unsigned int n,
+	       const unsigned int max_per_row);
 				     //////////
-  dSMatrixStruct(int m, int n, int max_per_row);
+  dSMatrixStruct (const unsigned int m, const unsigned int n,
+		  const unsigned int max_per_row);
     
 				     //////////
-  dSMatrixStruct(int n, int max_per_row);
+  dSMatrixStruct (const unsigned int n, const unsigned int max_per_row);
 				     //////////
-  ~dSMatrixStruct();
+  ~dSMatrixStruct ();
   //////////
-  void compress();
+  void compress ();
   //////////
-  int operator () (int i, int j);
+  int operator() (const unsigned int i, const unsigned int j);
   //////////
-  void add(int i, int j);
+  void add (const unsigned int i, const unsigned int j);
   //////////
-  void add_matrix(int n, int* rowcols);
+  void add_matrix (const unsigned int n, const int* rowcols);
   //////////
-  void add_matrix(int m, int n, int* rows, int* cols);
+  void add_matrix (const unsigned int m, const unsigned int n,
+		   const int* rows, const int* cols);
   //////////
-  void add_matrix(const iVector& rowcols);
+  void add_matrix (const iVector& rowcols);
   //////////
-  void add_matrix(const iVector& rows, const iVector& cols);
+  void add_matrix (const iVector& rows, const iVector& cols);
 
     void print_gnuplot (ostream &) const;
-    int n_rows () const;
-    int n_cols () const;
-    int bandwidth () const;
+    unsigned int n_rows () const;
+    unsigned int n_cols () const;
+    unsigned int bandwidth () const;
 
 				     /**
 				      * Return whether the structure is
@@ -91,7 +94,7 @@ public:
 				      * avoid programs relying on outdated
 				      * information!
 				      */
-    const int * get_rowstart_indices () const;
+    const unsigned int * get_rowstart_indices () const;
 
 				     /**
 				      * This is kind of an expert mode: get
@@ -146,7 +149,7 @@ class dSMatrix
 {
     dSMatrixStruct * cols;
     double* val;
-    int max_len;
+    unsigned int max_len;
   public:
 
 				     /**
@@ -161,14 +164,14 @@ class dSMatrix
     dSMatrix ();
     
 				     //
-    dSMatrix(dSMatrixStruct& c);
+    dSMatrix (dSMatrixStruct& c);
     
 				     //
-    ~dSMatrix();
+    ~dSMatrix ();
     
 
 				     //
-    void reinit();
+    void reinit ();
 				     //
     void reinit (dSMatrixStruct &);
 
@@ -180,14 +183,16 @@ class dSMatrix
     void clear ();
     
 				     //
-    int m() const;
+    unsigned int m () const;
 				     //
-    int n() const;
+    unsigned int n () const;
 
 				     //
-    void set (int i, int j, double value);
+    void set (const unsigned int i, const unsigned int j,
+	      const double value);
 				     //
-    void add (int i, int j, double value);
+    void add (const unsigned int i, const unsigned int j,
+	      const double value);
 
 				     /**
 				      * Return the value of the entry (i,j).
@@ -198,7 +203,7 @@ class dSMatrix
 				      * throws an exception if the wanted
 				      * element does not exist in the matrix.
 				      */
-    double operator () (const int i, const int j) const;
+    double operator () (const unsigned int i, const unsigned int j) const;
 
 				     /**
 				      * Return the main diagonal element in
@@ -213,7 +218,7 @@ class dSMatrix
 				      * involve searching for the right column
 				      * number.
 				      */
-    double diag_element (const int i) const;
+    double diag_element (const unsigned int i) const;
 
     				     /**
 				      * This is kind of an expert mode: get
@@ -232,33 +237,36 @@ class dSMatrix
 				      * avoid programs relying on outdated
 				      * information!
 				      */
-    double global_entry (const int i) const;
+    double global_entry (const unsigned int i) const;
 
 				     /**
 				      * Same as above, but with write access.
 				      * You certainly know what you do?
 				      */
-    double & global_entry (const int i);
+    double & global_entry (const unsigned int i);
 
 				     //
     void vmult (dVector& dst,const dVector& src) const;
 				     //
-    void Tvmult(dVector& dst,const dVector& src) const;
+    void Tvmult (dVector& dst,const dVector& src) const;
   
 				     //
-    double residual (dVector& dst,const dVector& x,const dVector& b);
+    double residual (dVector& dst, const dVector& x, const dVector& b);
 				     //
-    void Jacobi_precond(dVector& dst,const dVector& src,double om = 1.);
+    void Jacobi_precond (dVector& dst, const dVector& src,
+			 const double om = 1.);
 				     //
-    void SSOR_precond(dVector& dst,const dVector& src,double om = 1.);
+    void SSOR_precond (dVector& dst, const dVector& src,
+		       const double om = 1.);
 				     //
-    void SOR_precond(dVector& dst,const dVector& src,double om = 1.);
+    void SOR_precond (dVector& dst, const dVector& src,
+		      const double om = 1.);
 				     //
-    void SSOR(dVector& dst,double om = 1.);
+    void SSOR (dVector& dst, const double om = 1.);
 				     //
-    void SOR(dVector& dst,double om = 1.);
+    void SOR (dVector& dst, const double om = 1.);
 				     //
-    void precondition(dVector& dst,const dVector& src) { dst=src; }
+    void precondition (dVector& dst, const dVector& src) { dst=src; }
 
     const dSMatrixStruct & get_sparsity_pattern () const;
     
@@ -305,14 +313,14 @@ class dSMatrix
 /*---------------------- Inline functions -----------------------------------*/
 
 inline
-int dSMatrixStruct::n_rows () const {
+unsigned int dSMatrixStruct::n_rows () const {
   return rows;
 };
 
 
 
 inline
-int dSMatrixStruct::n_cols () const {
+unsigned int dSMatrixStruct::n_cols () const {
   return cols;
 };
 
@@ -326,7 +334,7 @@ bool dSMatrixStruct::is_compressed () const {
 
 
 inline
-const int * dSMatrixStruct::get_rowstart_indices () const {
+const unsigned int * dSMatrixStruct::get_rowstart_indices () const {
   return rowstart;
 };
 
@@ -342,7 +350,7 @@ const int * dSMatrixStruct::get_column_numbers () const {
 
 
 inline
-int dSMatrix::m () const
+unsigned int dSMatrix::m () const
 {
   return cols->rows;
 };
@@ -350,7 +358,7 @@ int dSMatrix::m () const
 
 
 inline
-int dSMatrix::n () const
+unsigned int dSMatrix::n () const
 {
   return cols->cols;
 };
@@ -358,7 +366,8 @@ int dSMatrix::n () const
 
 
 inline
-void dSMatrix::set (int i, int j, double value) {
+void dSMatrix::set (const unsigned int i, const unsigned int j,
+		    const double value) {
   Assert (cols->operator()(i,j) != -1,
 	  ExcInvalidIndex(i,j));
   val[cols->operator()(i,j)] = value;
@@ -367,7 +376,8 @@ void dSMatrix::set (int i, int j, double value) {
 
 
 inline
-void dSMatrix::add (int i, int j, double value) {
+void dSMatrix::add (const unsigned int i, const unsigned int j,
+		    const double value) {
   Assert (cols->operator()(i,j) != -1,
 	  ExcInvalidIndex(i,j));
   val[cols->operator()(i,j)] += value;
@@ -378,7 +388,7 @@ void dSMatrix::add (int i, int j, double value) {
 
 
 inline
-double dSMatrix::operator () (const int i, const int j) const {
+double dSMatrix::operator () (const unsigned int i, const unsigned int j) const {
   Assert (cols->operator()(i,j) != -1,
 	  ExcInvalidIndex(i,j));
   return val[cols->operator()(i,j)];
@@ -387,9 +397,9 @@ double dSMatrix::operator () (const int i, const int j) const {
 
 
 inline
-double dSMatrix::diag_element (const int i) const {
+double dSMatrix::diag_element (const unsigned int i) const {
   Assert (m() == n(), ExcMatrixNotSquare());
-  Assert ((0<=i) && (i<max_len), ExcInvalidIndex1(i));
+  Assert (i<max_len, ExcInvalidIndex1(i));
   
 				   // Use that the first element in each
 				   // row of a square matrix is the main
@@ -400,14 +410,14 @@ double dSMatrix::diag_element (const int i) const {
 
 
 inline
-double dSMatrix::global_entry (const int j) const {
+double dSMatrix::global_entry (const unsigned int j) const {
   return val[j];
 };
 
 
 
 inline
-double & dSMatrix::global_entry (const int j) {
+double & dSMatrix::global_entry (const unsigned int j) {
   return val[j];
 };
 
