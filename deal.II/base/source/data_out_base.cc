@@ -469,7 +469,7 @@ void DataOutBase::write_ucd (const typename std::vector<Patch<dim,spacedim> > &p
 template <int dim, int spacedim>
 void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &patches,
 			    const std::vector<std::string>          &data_names,
-			    const DXFlags                           &flags,
+			    const DXFlags                           &/*flags*/,
 			    std::ostream                            &out) 
 {
   AssertThrow (out, ExcIO());
