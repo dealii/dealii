@@ -23,7 +23,6 @@
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
-#include <grid/grid_out.h>
 #include <multigrid/mg_dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
@@ -74,7 +73,7 @@ int main()
   logfile.precision (3);
   deallog.attach(logfile);
 //  deallog.log_execution_time(true);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
 
   Helmholtz equation;
   RHSFunction<2> rhs;
@@ -84,9 +83,9 @@ int main()
   FEQ2<2> fe2;
   FEQ3<2> fe3;
   FEQ4<2> fe4;
-  for (unsigned int degree=1;degree<=1;degree++)
+  for (unsigned int degree=1;degree<=3;degree++)
     {
-      Triangulation<2> tr(Triangulation<2>::maximum_smoothing);
+      Triangulation<2> tr;
       MGDoFHandler<2> mgdof(tr);
       DoFHandler<2>& dof(mgdof);
   
@@ -102,38 +101,11 @@ int main()
 	}
 
       tr.refine_global(1);
-
-      Triangulation<2>::active_cell_iterator cell, endc;
-      for (int i=0; i<8; ++i) 
-	{
-	  int n_levels = tr.n_levels();
-	  cell = tr.begin_active();
-	  endc = tr.end();
-	  
-	  for (; cell!=endc; ++cell) 
-	    {
-	      double r      = rand()*1.0/RAND_MAX,
-		     weight = 1.*
-			      (cell->level()*cell->level()) /
-			      (n_levels*n_levels);
-	      
-	      if (r <= 0.5*weight)
-		cell->set_refine_flag ();
-	    };
-	  
-	  tr.execute_coarsening_and_refinement ();
-	};
-//        Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-//        cell->set_refine_flag();
+      Triangulation<2>::active_cell_iterator cell = tr.begin_active();
+      cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
 
-//      tr.refine_global(4);
-      if (true)
-	{
-	  ofstream x ("T");
-	  GridOut().write_eps (tr, x);
-	};
-      
+      tr.refine_global(1);
       dof.distribute_dofs(*fe);
       const unsigned int size = dof.n_dofs();
       deallog << "DoFs " << size << endl;
@@ -194,7 +166,7 @@ int main()
 	  SolverCG<> cgsolver(cgcontrol, cgmem);
 	  PreconditionIdentity cgprec;
 	  MGCoarseGridLACIteration<SolverCG<>, SparseMatrix<double>, PreconditionIdentity>
-	    coarse(cgsolver, mgA[0], cgprec);
+	    coarse(cgsolver, mgA[tr.n_levels()-2], cgprec);
 	  
 	  MGSmootherRelaxation<double>
 	    smoother(mgdof, mgA, &SparseMatrix<double>::template precondition_SSOR<double>,
@@ -205,7 +177,7 @@ int main()
 	  transfer.build_matrices(mgdof);
 
 
-Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer, 0);
+Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer, tr.n_levels()-2);
 	  PreconditionMG<Multigrid<2> >
 	    mgprecondition(multigrid, smoother, smoother, coarse);
 
