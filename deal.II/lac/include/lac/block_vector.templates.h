@@ -73,13 +73,16 @@ template <int n_blocks, typename Number>
 void BlockVector<n_blocks, Number>::reinit (const vector<unsigned int>& n,
 					    const bool fast)
 {
+  Assert (n.size() == n_blocks,
+	  ExcDimensionsDontMatch(n.size(), n_blocks));
+  
   unsigned int j=0;
   start[0] = j;
-  for (unsigned int i=0;i<n_blocks;)
+  for (unsigned int i=0; i<n_blocks; ++i)
     {
       components[i].reinit(n[i], fast);
       j += n[i];
-      start[++i] = j;
+      start[i+1] = j;
     }
 }
 
