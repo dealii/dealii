@@ -103,11 +103,6 @@ namespace PETScWrappers
     
     preconditioner.set_preconditioner_type (pc);
   
-                                     // in the deal.II solvers, we always
-                                     // honor the initial guess in the
-                                     // solution vector. do so here as well:
-    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
-  
                                      // then a convergence monitor
                                      // function. that function simply checks
                                      // with the solver_control object we have
@@ -161,12 +156,6 @@ namespace PETScWrappers
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         preconditioner.set_preconditioner_type (solver_data->pc);
-
-                                         // in the deal.II solvers, we always
-                                         // honor the initial guess in the
-                                         // solution vector. do so here as
-                                         // well:
-        KSPSetInitialGuessNonzero (solver_data->ksp, PETSC_TRUE);
 
                                          // then a convergence monitor
                                          // function. that function simply
@@ -285,6 +274,11 @@ namespace PETScWrappers
                                      // set the damping factor from the data
     ierr = KSPRichardsonSetScale (ksp, additional_data.omega);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
   
 
@@ -309,6 +303,11 @@ namespace PETScWrappers
     int ierr;
     ierr = KSPSetType (ksp, const_cast<char *>(KSPCHEBYCHEV));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
   
@@ -333,6 +332,11 @@ namespace PETScWrappers
     int ierr;
     ierr = KSPSetType (ksp, const_cast<char *>(KSPCG));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
   
 
@@ -357,6 +361,11 @@ namespace PETScWrappers
     int ierr;
     ierr = KSPSetType (ksp, const_cast<char *>(KSPBICG));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
   
@@ -428,6 +437,11 @@ namespace PETScWrappers
 	ierr = KSPSetPreconditionerSide(ksp, PC_RIGHT);
 	AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
   
 
@@ -452,6 +466,11 @@ namespace PETScWrappers
     int ierr;
     ierr = KSPSetType (ksp, const_cast<char *>(KSPBCGS));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
   
@@ -476,6 +495,11 @@ namespace PETScWrappers
     int ierr;
     ierr = KSPSetType (ksp, const_cast<char *>(KSPCGS));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
   
 
@@ -500,6 +524,11 @@ namespace PETScWrappers
     int ierr;
     ierr = KSPSetType (ksp, const_cast<char *>(KSPTFQMR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
   
@@ -524,6 +553,11 @@ namespace PETScWrappers
     int ierr;
     ierr = KSPSetType (ksp, const_cast<char *>(KSPTCQMR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
   
@@ -548,6 +582,11 @@ namespace PETScWrappers
     int ierr;
     ierr = KSPSetType (ksp, const_cast<char *>(KSPCR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
   
@@ -572,9 +611,52 @@ namespace PETScWrappers
     int ierr;
     ierr = KSPSetType (ksp, const_cast<char *>(KSPLSQR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
+  }
+ 
+
+/* ---------------------- SolverPreOnly ------------------------ */
+
+  SolverPreOnly::SolverPreOnly (SolverControl        &cn,
+				const MPI_Comm       &mpi_communicator,
+				const AdditionalData &data)
+                  :
+                  SolverBase (cn, mpi_communicator),
+                  additional_data (data)
+  {}
+
+
+  void
+  SolverPreOnly::set_solver_type (KSP &ksp) const
+  {
+                                     // set the type of solver. work around a
+                                     // problem in PETSc 2.1.6, where it asks
+                                     // for a char*, even though KSPXXXX is of
+                                     // type const char*
+    int ierr;
+    ierr = KSPSetType (ksp, const_cast<char *>(KSPPREONLY));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // The KSPPREONLY solver of
+                                     // PETSc never calls the convergence
+                                     // monitor, which leads to failure 
+                                     // even when everything was ok.
+                                     // Therefore the SolverControl status 
+                                     // is set to some nice values, which
+                                     // guarantee a nice result at the end 
+                                     // of the solution process.
+    solver_control.check (1, 0.0);
+
+                                     // Using the PREONLY solver with
+                                     // a nonzero initial guess leads
+                                     // PETSc to produce some error messages.
+    KSPSetInitialGuessNonzero (ksp, PETSC_FALSE);
   }
 
-  
 }
 
 #else

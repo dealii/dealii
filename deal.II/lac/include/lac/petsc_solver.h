@@ -1018,6 +1018,77 @@ namespace PETScWrappers
       virtual void set_solver_type (KSP &ksp) const;
   };
   
+
+/**
+ * An implementation of the solver interface using the PETSc PREONLY
+ * solver. Actually this is NOT a real solution algorithm. Its only
+ * purpose is to provide a solver object, when the preconditioner
+ * should be used as real solver. It is very useful in conjunction with
+ * the complete LU decomposition preconditioner <tt> PreconditionLU </tt>, 
+ * which in conjunction with this solver class becomes a direct solver.
+ *
+ * @ingroup PETScWrappers
+ * @author Wolfgang Bangerth, 2004, Oliver Kayser-Herold, 2004
+ */
+  class SolverPreOnly : public SolverBase
+  {
+    public:
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional data to the
+                                        * solver.
+                                        */
+      struct AdditionalData
+      {};
+	
+                                       /**
+                                        * Constructor. In contrast to
+                                        * deal.II's own solvers, there is no
+                                        * need to give a vector memory
+                                        * object. However, PETSc solvers want
+                                        * to have an MPI communicator context
+                                        * over which computations are
+                                        * parallelized. By default,
+                                        * @p PETSC_COMM_SELF is used here,
+                                        * but you can change this. Note that
+                                        * for single processor (non-MPI)
+                                        * versions, this parameter does not
+                                        * have any effect.
+                                        *
+                                        * The last argument takes a structure
+                                        * with additional, solver dependent
+                                        * flags for tuning.
+                                        *
+                                        * Note that the communicator used here
+                                        * must match the communicator used in
+                                        * the system matrix, solution, and
+                                        * right hand side object of the solve
+                                        * to be done with this
+                                        * solver. Otherwise, PETSc will
+                                        * generate hard to track down errors,
+                                        * see the documentation of the
+                                        * SolverBase class.
+                                        */
+      SolverPreOnly (SolverControl        &cn,
+		     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+		     const AdditionalData &data = AdditionalData());
+      
+    protected:
+                                       /**
+                                        * Store a copy of the flags for this
+                                        * particular solver.
+                                        */
+      const AdditionalData additional_data;
+
+                                       /**
+                                        * Function that takes a Krylov
+                                        * Subspace Solver context object, and
+                                        * sets the type of solver that is
+                                        * appropriate for this class.
+                                        */
+      virtual void set_solver_type (KSP &ksp) const;
+  };
+
 }
 
 #endif // DEAL_II_USE_PETSC
