@@ -165,6 +165,18 @@ namespace PETScWrappers
                       const std::vector<unsigned int> &row_lengths,
                       const bool                       is_symmetric = false);
   };
+
+
+
+// -------- template and inline functions ----------
+
+  inline
+  void
+  SparseMatrix::reinit ()
+  {
+    MatrixBase::reinit ();
+  }
+  
 }
 
 /*@}*/
