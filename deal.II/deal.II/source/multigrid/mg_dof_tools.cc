@@ -653,95 +653,25 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
 
 
 // explicit instantiations
-template void
-MGTools::make_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				  SparsityPattern &,
-				  const unsigned int);
 
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				       SparsityPattern &,
-				       const unsigned int);
+// Functions for building sparsity patterns are in a driver file. We
+// call it for all different patterns known.
+#define PATTERN SparsityPattern
+#include "mg_tools.pattern.in.h"
+#undef PATTERN
 
-template void
-MGTools::make_flux_sparsity_pattern_edge<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-					    SparsityPattern &,
-					    const unsigned int);
+#define PATTERN CompressedSparsityPattern
+#include "mg_tools.pattern.in.h"
+#undef PATTERN
 
-template void
-MGTools::make_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				  CompressedSparsityPattern &,
-				  const unsigned int);
+#define PATTERN BlockSparsityPattern
+#include "mg_tools.pattern.in.h"
+#undef PATTERN
 
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				       CompressedSparsityPattern &,
-				       const unsigned int);
+#define PATTERN CompressedBlockSparsityPattern
+#include "mg_tools.pattern.in.h"
+#undef PATTERN
 
-template void
-MGTools::make_flux_sparsity_pattern_edge<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-					    CompressedSparsityPattern &,
-					    const unsigned int);
-
-template void
-MGTools::make_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				  BlockSparsityPattern &,
-				  const unsigned int);
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				       BlockSparsityPattern &,
-				       const unsigned int);
-
-template void
-MGTools::make_flux_sparsity_pattern_edge<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-					    BlockSparsityPattern &,
-					    const unsigned int);
-
-template void
-MGTools::make_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				  CompressedBlockSparsityPattern &,
-				  const unsigned int);
-
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				       CompressedBlockSparsityPattern &,
-				       const unsigned int);
-
-template void
-MGTools::make_flux_sparsity_pattern_edge<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-					    CompressedBlockSparsityPattern &,
-					    const unsigned int);
-
-#if deal_II_dimension > 1
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				       SparsityPattern &,
-				       const unsigned int,
-				       const Table<2,DoFTools::Coupling>&,
-				       const Table<2,DoFTools::Coupling>&);
-
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				       CompressedSparsityPattern &,
-				       const unsigned int,
-				       const Table<2,DoFTools::Coupling>&,
-				       const Table<2,DoFTools::Coupling>&);
-
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				       BlockSparsityPattern &,
-				       const unsigned int,
-				       const Table<2,DoFTools::Coupling>&,
-				       const Table<2,DoFTools::Coupling>&);
-
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
-				       CompressedBlockSparsityPattern &,
-				       const unsigned int,
-				       const Table<2,DoFTools::Coupling>&,
-				       const Table<2,DoFTools::Coupling>&);
-
-#endif
 
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
