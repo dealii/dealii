@@ -24,7 +24,7 @@ int main()
   PathSearch::add_class("CC");
 
 				   // Open with full debugging
-  PathSearch cc("CC", 2);
+  PathSearch cc("CC", 3);
   cc.add_path(DEAL_II_PATH "/lac/source/");
   cc.add_path(DEAL_II_PATH "/lac/include/lac/", PathSearch::front);
   cc.add_suffix(".c");
@@ -37,7 +37,7 @@ int main()
 
   cc.show(deallog);
   
-  PathSearch mesh("MESH", 2);
+  PathSearch mesh("MESH", 3);
   mesh.show(deallog);
   std::istream& in = mesh.open("backstep");
   std::string line;
