@@ -487,16 +487,7 @@ class TriaRawIterator :
 				     /**
 				      *  Exception
 				      */
-    DeclException1 (ExcDereferenceInvalidObject,
-		    TriaRawIterator,
-		    << "You tried to dereference an iterator for which this "
-		    << "is not possible. More information on this iterator: "
-		    << "level=" << arg1.accessor.level()
-		    << ", index=" << arg1.accessor.index()
-		    << ", state="
-		    << (arg1.state() == IteratorState::valid ? "valid" :
-			(arg1.state() == IteratorState::past_the_end ?
-			 "past_the_end" : "invalid")));
+    DeclException0 (ExcDereferenceInvalidObject);
 				     /**
 				      *  Exception
 				      */
@@ -871,8 +862,7 @@ inline
 const Accessor &
 TriaRawIterator<dim,Accessor>::operator * () const
 {
-  Assert (state() == IteratorState::valid,
-	  ExcDereferenceInvalidObject(*this));
+  Assert (state() == IteratorState::valid, ExcDereferenceInvalidObject());
   return accessor;
 };
 
@@ -883,8 +873,7 @@ inline
 Accessor &
 TriaRawIterator<dim,Accessor>::operator * ()
 {
-  Assert (state() == IteratorState::valid,
-	  ExcDereferenceInvalidObject(*this));
+  Assert (state() == IteratorState::valid, ExcDereferenceInvalidObject());
   return accessor;
 };
 
@@ -925,10 +914,8 @@ inline
 bool
 TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const
 {
-  Assert (state() != IteratorState::invalid,
-	  ExcDereferenceInvalidObject(*this));
-  Assert (i.state() != IteratorState::invalid,
-	  ExcDereferenceInvalidObject(i));
+  Assert (state() != IteratorState::invalid, ExcDereferenceInvalidObject());
+  Assert (i.state() != IteratorState::invalid, ExcDereferenceInvalidObject());
   Assert (&accessor.get_triangulation() == &i.accessor.get_triangulation(),
 	  ExcInvalidComparison());
   
