@@ -1212,6 +1212,12 @@ namespace internal
                                       */
     struct Edge 
     {
+        Edge (const unsigned int v0,
+              const unsigned int v1)
+                        :
+                        v0(v0), v1(v1)
+          {}
+        
         const unsigned int v0, v1;
         bool operator < (const Edge &e) const
           {
@@ -1230,10 +1236,10 @@ namespace internal
         {
                                            // construct the four edges
 	                                   // in reverse order
-          const Edge reverse_edges[4] = { { c->vertices[1], c->vertices[0] },
-                                          { c->vertices[2], c->vertices[1] },
-                                          { c->vertices[2], c->vertices[3] },
-                                          { c->vertices[3], c->vertices[0] } };
+          const Edge reverse_edges[4] = { Edge (c->vertices[1], c->vertices[0]),
+                                          Edge (c->vertices[2], c->vertices[1]),
+                                          Edge (c->vertices[2], c->vertices[3]),
+                                          Edge (c->vertices[3], c->vertices[0]) };
                                            // for each of them, check
                                            // whether they are already
                                            // in the set
@@ -1255,7 +1261,7 @@ namespace internal
                                            // duplicated by itself)
           for (unsigned int i=0; i<4; ++i)
 	    {
-	      const Edge e = { reverse_edges[i].v1, reverse_edges[i].v0 };  
+	      const Edge e(reverse_edges[i].v1, reverse_edges[i].v0);
 	      edges.insert (e);
 	    }
                                            // then go on with next
