@@ -79,7 +79,7 @@ class dFMatrix
 				      * Constructor. Initialize the matrix as
 				      * a square matrix with dimension #n#.
 				      */
-    dFMatrix (const unsigned int n = 1);
+    explicit dFMatrix (const unsigned int n = 1);
     
 				     /**
 				      * Constructor. Initialize the matrix as
@@ -93,7 +93,7 @@ class dFMatrix
 				      * huge amount of computing time for large
 				      * matrices!!
 				      */
-    dFMatrix (const dFMatrix&);
+    explicit dFMatrix (const dFMatrix&);
 
 				     /**
 				      * Destructor. Release all memory.
