@@ -141,9 +141,20 @@ class TableIndices<2> : public TableIndicesBase<2>
                                      /**
                                       * Constructor. Set indices to
                                       * the given values.
+				      *
+				      * The default values for the
+				      * second and subsequent
+				      * arguments are necessary for
+				      * some neat template tricks in
+				      * SymmetricTensor where we only
+				      * want to set the first index
+				      * and construct the subsequent
+				      * ones later on, i.e. for the
+				      * moment we don't care about the
+				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2);
+                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int);
 };
 
 
@@ -172,10 +183,21 @@ class TableIndices<3> : public TableIndicesBase<3>
                                      /**
                                       * Constructor. Set indices to
                                       * the given values.
+				      *
+				      * The default values for the
+				      * second and subsequent
+				      * arguments are necessary for
+				      * some neat template tricks in
+				      * SymmetricTensor where we only
+				      * want to set the first index
+				      * and construct the subsequent
+				      * ones later on, i.e. for the
+				      * moment we don't care about the
+				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2,
-                  const unsigned int index3);
+                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int);
 };
 
 
@@ -203,11 +225,22 @@ class TableIndices<4> : public TableIndicesBase<4>
                                      /**
                                       * Constructor. Set indices to
                                       * the given values.
+				      *
+				      * The default values for the
+				      * second and subsequent
+				      * arguments are necessary for
+				      * some neat template tricks in
+				      * SymmetricTensor where we only
+				      * want to set the first index
+				      * and construct the subsequent
+				      * ones later on, i.e. for the
+				      * moment we don't care about the
+				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2,
-                  const unsigned int index3,
-                  const unsigned int index4);
+                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index4 = deal_II_numbers::invalid_unsigned_int);
 };
 
 
@@ -235,12 +268,23 @@ class TableIndices<5> : public TableIndicesBase<5>
                                      /**
                                       * Constructor. Set indices to
                                       * the given values.
+				      *
+				      * The default values for the
+				      * second and subsequent
+				      * arguments are necessary for
+				      * some neat template tricks in
+				      * SymmetricTensor where we only
+				      * want to set the first index
+				      * and construct the subsequent
+				      * ones later on, i.e. for the
+				      * moment we don't care about the
+				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2,
-                  const unsigned int index3,
-                  const unsigned int index4,
-                  const unsigned int index5);
+                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index4 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index5 = deal_II_numbers::invalid_unsigned_int);
 };
 
 
@@ -268,13 +312,24 @@ class TableIndices<6> : public TableIndicesBase<6>
                                      /**
                                       * Constructor. Set indices to
                                       * the given values.
+				      *
+				      * The default values for the
+				      * second and subsequent
+				      * arguments are necessary for
+				      * some neat template tricks in
+				      * SymmetricTensor where we only
+				      * want to set the first index
+				      * and construct the subsequent
+				      * ones later on, i.e. for the
+				      * moment we don't care about the
+				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2,
-                  const unsigned int index3,
-                  const unsigned int index4,
-                  const unsigned int index5,
-                  const unsigned int index6);
+                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index4 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index5 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index6 = deal_II_numbers::invalid_unsigned_int);
 };
 
 
@@ -302,14 +357,25 @@ class TableIndices<7> : public TableIndicesBase<7>
                                      /**
                                       * Constructor. Set indices to
                                       * the given values.
+				      *
+				      * The default values for the
+				      * second and subsequent
+				      * arguments are necessary for
+				      * some neat template tricks in
+				      * SymmetricTensor where we only
+				      * want to set the first index
+				      * and construct the subsequent
+				      * ones later on, i.e. for the
+				      * moment we don't care about the
+				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2,
-                  const unsigned int index3,
-                  const unsigned int index4,
-                  const unsigned int index5,
-                  const unsigned int index6,
-                  const unsigned int index7);
+                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index4 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index5 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index6 = deal_II_numbers::invalid_unsigned_int,
+                  const unsigned int index7 = deal_II_numbers::invalid_unsigned_int);
 };
 
 
