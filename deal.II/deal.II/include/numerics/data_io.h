@@ -150,6 +150,14 @@ class DataIn {
 				     /**
 				      * Exception
 				      */
+    DeclException1 (ExcUnknownIdentifier,
+		    string,
+		    << "The identifier <" << arg1 << "> as name of a "
+		    << "part in an UCD input file is unknown or the "
+		    << "respective input routine is not implemented.");
+				     /**
+				      * Exception
+				      */
     DeclException0 (ExcNoTriangulationSelected);
 				     /**
 				      * Exception

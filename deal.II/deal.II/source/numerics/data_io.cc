@@ -158,7 +158,7 @@ void DataIn<dim>::read_ucd (istream &in) {
 	  }
 	else
 					   // cannot read this
-	  Assert (false, ExcNotImplemented());
+	  Assert (false, ExcUnknownIdentifier(cell_type));
     };
 
 				   // check that no forbidden arrays are used
