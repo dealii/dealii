@@ -184,24 +184,23 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
   Vector<number> tmp(criteria);
   const double total_error = tmp.l1_norm();
 
-  Vector<number> partial_sums(criteria.size());
-  
 				   // sort the largest criteria to the
 				   // beginning of the vector
   std::sort (tmp.begin(), tmp.end(), std::greater<double>());
-  std::partial_sum (tmp.begin(), tmp.end(), partial_sums.begin());
 
 				   // compute thresholds
-  const typename Vector<number>::const_iterator
-    q = std::lower_bound (partial_sums.begin(), partial_sums.end(),
-			  static_cast<number>(top_fraction*total_error)),
-    p = std::upper_bound (partial_sums.begin(), partial_sums.end(),
-			  static_cast<number>(total_error*(1-bottom_fraction)));
-  
-  double bottom_threshold = tmp(p != partial_sums.end() ?
-				p-partial_sums.begin() :
-				criteria.size()-1),
-	 top_threshold    = tmp(q-partial_sums.begin());
+  typename Vector<number>::const_iterator pp=tmp.begin();
+  for (double sum=0; (sum<top_fraction*total_error) && (pp!=(tmp.end()-1)); ++pp)
+    sum += *pp;
+  double top_threshold = ( pp != tmp.begin () ?
+			   (*pp+*(pp-1))/2 :
+			   *pp );
+  typename Vector<number>::const_iterator qq=(tmp.end()-1);
+  for (double sum=0; (sum<bottom_fraction*total_error) && (qq!=tmp.begin()); --qq)
+    sum += *qq;
+  double bottom_threshold = ( qq != (tmp.end()-1) ?
+			      (*qq + *(qq+1))/2 :
+			      0);
 
 				   // in some rare cases it may happen that
 				   // both thresholds are the same (e.g. if
@@ -244,6 +243,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
 				   // actually flag cells
   if (top_threshold < *std::max_element(criteria.begin(), criteria.end()))
     refine (tria, criteria, top_threshold);
+  
   if (bottom_threshold > *std::min_element(criteria.begin(), criteria.end()))
     coarsen (tria, criteria, bottom_threshold);
 };
