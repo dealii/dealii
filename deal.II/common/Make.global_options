@@ -28,7 +28,13 @@ CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
 # DEAL_II_USE_MT=true
 
 ifeq ($(DEAL_II_USE_MT),true)
-  INCLUDE    += -I $(ACE_ROOT)
+		# at least on SUN, ACE includes the wrong files
+		# sometimes and we get warnings about undefined 
+		# functions. we suppress them by telling gcc
+		# (by -i instead of -I) that the ACE files are 
+		# 'system' headers and shall thus not be examined
+		# too closely
+  INCLUDE    += -i$(ACE_ROOT)
   CXXFLAGS.g += -DDEAL_II_USE_MT
   CXXFLAGS.o += -DDEAL_II_USE_MT
 
