@@ -10,12 +10,15 @@ include $D/common/Make.global_options
 
 
 # generic targets
-default: autogen-doc tutorial development glossary class_index.html validate-xrefs
+default: doxygen tutorial development glossary class_index.html validate-xrefs
 
 all: default autogen-doc-all
 
 
 # specific targets
+doxygen:
+	cd doxygen ; rm -f *.tag ; $(MAKE)
+
 autogen-doc:
 	cd auto ; $(MAKE)
 
