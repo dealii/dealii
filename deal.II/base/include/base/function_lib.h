@@ -19,6 +19,61 @@
 
 
 /**
+ * The distance to the origin squared.
+ *
+ * This function returns the square norm of the radius vector of a point.
+ *
+ * Together with the function, its derivatives and Laplacian are defined.
+ *
+ * @author: Guido Kanschat, 1999
+ */
+template<int dim>
+class SquareFunction : public Function<dim>
+{
+  public:
+				     /**
+				      * @reimplemented
+				      */
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+
+				     /**
+				      * @reimplemented
+				      */
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<double>            &values,
+			     const unsigned int         component = 0) const;
+
+				     /**
+				      * @reimplemented
+				      */
+    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				    const unsigned int  component = 0) const;
+
+				     /**
+				      * @reimplemented
+				      */
+    virtual void gradient_list (const vector<Point<dim> > &points,
+				vector<Tensor<1,dim> >    &gradients,
+				const unsigned int         component = 0) const;
+
+				     /**
+				      * @reimplemented
+				      */
+    double laplacian (const Point<dim>   &p,
+		      const unsigned int  component = 0) const;
+
+				     /**
+				      * @reimplemented
+				      */
+    void laplacian_list (const vector<Point<dim> > &points,
+			 vector<double>            &values,
+			 const unsigned int         component = 0) const;
+};
+
+
+
+/**
  * d-quadratic pillow on the unit hypercube.
  *
  * This is a function for testing the implementation. It has zero Dirichlet
