@@ -44,6 +44,16 @@ Boundary<dim>::get_intermediate_points_on_line (
 
 
 template <int dim>
+void
+Boundary<dim>::get_intermediate_points_on_quad (
+  const typename Triangulation<dim>::quad_iterator &,
+  vector<Point<dim> > &) const
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
+
+
+template <int dim>
 Point<dim>
 StraightBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
 {
@@ -57,7 +67,7 @@ template <int dim>
 Point<dim>
 StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const 
 {
-  Assert (false, typename Boundary<dim>::ExcPureVirtualFunctionCalled());
+  Assert (false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
   return Point<dim>();
 };
 
@@ -80,6 +90,20 @@ StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>:
 #endif
 
 
+#if deal_II_dimension < 2
+
+template <int dim>
+void
+StraightBoundary<dim>::get_intermediate_points_on_line (
+  const typename Triangulation<dim>::line_iterator &,
+  vector<Point<dim> > &) const
+{
+  Assert(false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
+}
+
+
+#else
+
 template <int dim>
 void
 StraightBoundary<dim>::get_intermediate_points_on_line (
@@ -88,11 +112,51 @@ StraightBoundary<dim>::get_intermediate_points_on_line (
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
-  const double part=1./(n+1);
-  double position=part;
-  for (unsigned int i=0; i<n; ++i, position+=part)
-    points[i]=(1-position)*line->vertex(0) + position*line->vertex(1);
+  const double dx=1./(n+1);
+  double x=dx;
+  for (unsigned int i=0; i<n; ++i, x+=dx)
+    points[i]=(1-x)*line->vertex(0) + x*line->vertex(1);
 };
+
+#endif
+
+
+
+#if deal_II_dimension < 3
+
+template <int dim>
+void
+StraightBoundary<dim>::get_intermediate_points_on_quad (
+  const typename Triangulation<dim>::quad_iterator &,
+  vector<Point<dim> > &) const
+{
+  Assert(false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
+}
+
+#else
+
+template <int dim>
+void
+StraightBoundary<dim>::get_intermediate_points_on_quad (
+  const typename Triangulation<dim>::quad_iterator &quad,
+  vector<Point<dim> > &points) const
+{
+  const unsigned int n=points.size(),
+		     m=static_cast<unsigned int>(sqrt(n));
+				   // is n a square number
+  Assert(m*m==n, ExcInternalError());
+  const double ds=1./(m+1);
+  double y=ds;
+  for (unsigned int i=0; i<n; ++i, y+=ds)
+    {
+      double x=ds;
+      for (unsigned int j=0; j<n; ++j, x+=ds)
+	points[i*m+j]=((1-x)*quad->vertex(0) + x*quad->vertex(1))*(1-y)+
+		      ((1-x)*quad->vertex(3) + x*quad->vertex(2))*y;
+    }
+}
+
+#endif
 
 
 // explicit instantiations
