@@ -165,7 +165,7 @@
  * degrees of freedom. This renumbering may only exchange whole blocks
  * and must not destroy the block structure.
  *
- * Given an ordered vector of cells, the function @p{cell_wise}
+ * Given an ordered vector of cells, the function @p{cell_wise_dg}
  * accomplishes this. Inside the cells, the previous ordering will be
  * preserved, so it may be useful to apply @component_wise} first.
  *
@@ -278,11 +278,43 @@ class DoFRenumbering
 				      * freedom have to be associated
 				      * with the interior of the cell.
 				      */
-    template< int dim>
+    template <int dim>
     static void
-    cell_wise (DoFHandler<dim>                     &dof_handler,
-	       const vector<DoFCellAccessor<dim> > &cell_order);
+    cell_wise_dg (DoFHandler<dim>                     &dof_handler,
+		  const vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
     
+
+				     /**
+				      * Cell-wise downstream numbering
+				      * with respect to a constant
+				      * flow direction.
+				      *
+				      * The cells are sorted such that
+				      * the centers of higher numbers
+				      * are further downstream with
+				      * respect to the constant vector
+				      * @p{direction} than the centers
+				      * of lower numbers. Even if this
+				      * yields a downstream numbering
+				      * with respect to the flux on
+				      * the edges for fairly general
+				      * grids, this might not be
+				      * guaranteed for all meshes.
+				      *
+				      * This function produces a
+				      * downstream ordering of the
+				      * mesh cells and calls
+				      * @ref{cell_wise_dg}.
+				      * Therefore, it only works with
+				      * Discontinuous Galerkin Finite
+				      * Elements, i.e. all degrees of
+				      * freedom have to be associated
+				      * with the interior of the cell.
+				      */
+    template <int dim>
+    static void
+    downstream_dg (DoFHandler<dim>  &dof_handler,
+		   const Point<dim> &direction);
 
 				     /**
 				      * Sort those degrees of freedom
@@ -299,8 +331,8 @@ class DoFRenumbering
 				      */
     template <int dim>
     static void
-    sort_selected_dofs_back (const vector<bool> &selected_dofs,
-			     DoFHandler<dim>    &dof_handler);
+    sort_selected_dofs_back (DoFHandler<dim>    &dof_handler,
+			     const vector<bool> &selected_dofs);
 
 				     /**
 				      * Exception

@@ -501,8 +501,8 @@ void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 
 template <int dim>
 void
-DoFRenumbering::sort_selected_dofs_back (const vector<bool> &selected_dofs,
-					 DoFHandler<dim>    &dof_handler)
+DoFRenumbering::sort_selected_dofs_back (DoFHandler<dim>    &dof_handler,
+					 const vector<bool> &selected_dofs)
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   Assert (selected_dofs.size() == n_dofs,
@@ -538,8 +538,8 @@ DoFRenumbering::sort_selected_dofs_back (const vector<bool> &selected_dofs,
 
 template <int dim>
 void
-DoFRenumbering::cell_wise (DoFHandler<dim>& dof,
-			   const vector<DoFCellAccessor<dim> >& cells)
+DoFRenumbering::cell_wise_dg (DoFHandler<dim>& dof,
+			   const vector<typename DoFHandler<dim>::cell_iterator>& cells)
 {
   Assert(cells.size() == dof.get_tria().n_active_cells(),
 	 ExcDimensionMismatch(cells.size(),
@@ -565,18 +565,74 @@ DoFRenumbering::cell_wise (DoFHandler<dim>& dof,
 
   unsigned int global_index = 0;
   
-  typename vector<DoFCellAccessor<dim> >::const_iterator cell;
+  typename vector<typename DoFHandler<dim>::cell_iterator>::const_iterator cell;
 
   for(cell = cells.begin(); cell != cells.end(); ++cell)
     {
-      cell->get_dof_indices(cell_dofs);
+      (*cell)->get_dof_indices(cell_dofs);
       sort(cell_dofs.begin(), cell_dofs.end());
-      
+
       for (unsigned int i=0;i<n_cell_dofs;++i)
-	new_order[global_index++] = cell_dofs[i];
+	{
+	  new_order[global_index++] = cell_dofs[i];
+	}
     }
   Assert(global_index == n_global_dofs, ExcRenumberingIncomplete());
-  dof.renumber_dofs(new_order);
+
+  vector<unsigned int> reverse(new_order.size());
+
+  for (unsigned int i=0;i<new_order.size(); ++i)
+    reverse[new_order[i]] = i;
+
+  dof.renumber_dofs(reverse);
+}
+
+/**
+ * Provide comparator for DoFCellAccessors
+ */
+
+template <int dim>
+struct CompCells
+{
+				     /**
+				      * Flow direction.
+				      */
+    const Point<dim>& dir;
+				     /**
+				      * Constructor.
+				      */
+    CompCells (const Point<dim>& dir) :
+		    dir(dir) 
+      {}
+				     /**
+				      * Return true if c1 < c2.
+				      */    
+    bool operator () (const typename DoFHandler<dim>::cell_iterator& c1,
+		      const typename DoFHandler<dim>::cell_iterator&c2) const
+      {
+	Point<dim> diff = c2->center() - c1->center();
+	double s = diff*dir;
+	return (s>0);
+      }
+};
+
+    
+template <int dim>
+void
+DoFRenumbering::downstream_dg (DoFHandler<dim>& dof,
+			       const Point<dim>& direction)
+{
+  vector<typename DoFHandler<dim>::cell_iterator>
+    ordered_cells(dof.get_tria().n_active_cells());
+  CompCells<dim> comparator(direction);
+  
+  typename DoFHandler<dim>::active_cell_iterator begin = dof.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator end = dof.end();
+  
+  copy (begin, end, ordered_cells.begin());
+  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+
+  cell_wise_dg(dof, ordered_cells);
 }
 
 
@@ -600,11 +656,13 @@ void DoFRenumbering::component_wise (DoFHandler<deal_II_dimension>&,
 
 
 template
-void DoFRenumbering::cell_wise (DoFHandler<deal_II_dimension>&,
-				const vector<DoFCellAccessor<deal_II_dimension> >&);
-
-
+void DoFRenumbering::cell_wise_dg (DoFHandler<deal_II_dimension>&,
+				   const vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
-void DoFRenumbering::sort_selected_dofs_back (const vector<bool> &,
-					      DoFHandler<deal_II_dimension> &);
+void DoFRenumbering::downstream_dg (DoFHandler<deal_II_dimension>&,
+				    const Point<deal_II_dimension>&);
+
+template
+void DoFRenumbering::sort_selected_dofs_back (DoFHandler<deal_II_dimension> &,
+					      const vector<bool> &);
