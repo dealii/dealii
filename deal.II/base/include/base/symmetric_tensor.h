@@ -604,9 +604,20 @@ class SymmetricTensor
                                      /**
                                       * Constructor. Generate a symmetric
                                       * tensor from a general one. Assumes
-                                      * that @p t is already symmetric, but
-                                      * this is not checked: we simply copy
-                                      * only a subset of elements.
+                                      * that @p t is already symmetric, and in
+                                      * debug mode this is in fact
+                                      * checked. Note that no provision is
+                                      * made to assure that the tensor is
+                                      * symmetric only up to round-off error:
+                                      * if the incoming tensor is not exactly
+                                      * symmetric, then an exception is
+                                      * thrown. If you know that incoming
+                                      * tensor is symmetric only up to
+                                      * round-off, then you may want to call
+                                      * the <tt>symmetrize</tt> function
+                                      * first. If you aren't sure, it is good
+                                      * practice to check before calling
+                                      * <tt>symmetrize</tt>.
                                       */
     SymmetricTensor (const Tensor<2,dim> &t);
 
