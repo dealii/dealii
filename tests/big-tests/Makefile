@@ -25,9 +25,9 @@ $(compile) :
 	cd $(@:.compile=) ; $(MAKE) D=$D
 
 $(run) :
-	cd $(@:.run=) ; $(MAKE) run
+	cd $(@:.run=) ; $(MAKE) run D=$D
 
 $(clean) :
-	-cd $(@:.clean=) ; $(MAKE) clean
+	-cd $(@:.clean=) ; $(MAKE) clean D=$D
 
 
