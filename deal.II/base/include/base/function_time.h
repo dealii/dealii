@@ -59,10 +59,10 @@ class FunctionTime {
 				      */
     FunctionTime (const double initial_time = 0.0);
 
-				   /**
-				    * Virtual destructor.
-				    */
-  virtual ~FunctionTime();
+				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~FunctionTime();
   
 				     /**
 				      * Return the value of the time variable/
@@ -81,12 +81,14 @@ class FunctionTime {
 				      */
     virtual void advance_time (const double delta_t);
 
-private:
+  private:
 				     /**
 				      * Store the present time.
 				      */
     double time;
 };
+
+
 
 inline double
 FunctionTime::get_time () const

@@ -40,8 +40,7 @@
  *  @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
-class Function :
-  public FunctionTime
+class Function : public FunctionTime
 {
   public:
 				     /**
@@ -101,12 +100,6 @@ class Function :
 		    int, int,
 		    << "The vector has size " << arg1 << " but should have "
 		    << arg2 << " elements.");
-    
-  protected:
-				     /**
-				      * Store the present time.
-				      */
-    double time;
 };
 
 
