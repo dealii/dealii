@@ -80,13 +80,14 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 template <>
 void
 HyperBallBoundary<1>::get_intermediate_points_on_line (
-  const Triangulation<1>::line_iterator &line,
-  std::vector<Point<1> > &points) const
+  const Triangulation<1>::line_iterator &,
+  std::vector<Point<1> > &) const
 {
   Assert(false, ExcInternalError());
 }
 
 #else
+
 
 template <int dim>
 void
@@ -94,71 +95,81 @@ HyperBallBoundary<dim>::get_intermediate_points_on_line (
   const typename Triangulation<dim>::line_iterator &line,
   typename std::vector<Point<dim> > &points) const
 {
-  const unsigned int n=points.size();
-  Assert(n>0, ExcInternalError());
-  if (n==1)
+  if (points.size()==1)
     points[0]=get_new_point_on_line(line);
   else
+    get_intermediate_points_between_points(line->vertex(0), line->vertex(1), points);
+}
+
+  
+template <int dim>
+void
+HyperBallBoundary<dim>::get_intermediate_points_between_points (
+  const Point<dim> &p0, const Point<dim> &p1,
+  typename std::vector<Point<dim> > &points) const
+{
+  const unsigned int n=points.size();
+  Assert(n>0, ExcInternalError());
+
+  const Point<dim> v0=p0-center,
+		   v1=p1-center;
+  const double length=sqrt((v1-v0).square());
+  
+  double eps=1e-14;
+  Assert(fabs(v0.square()-radius*radius)<eps, ExcInternalError());
+  Assert(fabs(v1.square()-radius*radius)<eps, ExcInternalError());
+  
+  const double alpha=acos((v0*v1)/sqrt(v0.square()*v1.square()));
+  const double d_alpha=alpha/(n+1);
+  const Point<dim> pm=0.5*(v0+v1);
+  
+  const double h=sqrt(pm.square());
+  
+  double beta=0;
+  unsigned int left_index=0, right_index=0;
+  if ((n+1)%2==0)
     {
-      Point<dim> v0=line->vertex(0)-center,
-		 v1=line->vertex(1)-center;
-      const double length=sqrt((v1-v0).square());
-
-      double eps=1e-14;
-      Assert(fabs(v0.square()-radius*radius)<eps, ExcInternalError());
-      Assert(fabs(v1.square()-radius*radius)<eps, ExcInternalError());
+				       // if the number of
+				       // parts is even insert
+				       // the midpoint
+      left_index=(n-1)/2;
+      right_index=left_index;
+      points[left_index]=pm;
+      --left_index;
+      ++right_index;
+      beta=d_alpha;
+    }
+  else
+    {
+      beta=(n/2+1)*d_alpha-alpha/2.;
+      right_index=n/2;
+      left_index=n/2-1;
+    }
       
-      const double alpha=acos((v0*v1)/sqrt(v0.square()*v1.square()));
-      const double d_alpha=alpha/(n+1);
-      const Point<dim> pm=StraightBoundary<dim>::get_new_point_on_line (line)-center;
-
-      const double h=sqrt(pm.square());
-
-      double beta=0;
-      unsigned int left_index=0, right_index=0;
-      if ((n+1)%2==0)
-	{
-					   // if the number of
-					   // parts is even insert
-					   // the midpoint
-	  left_index=(n-1)/2;
-	  right_index=left_index;
-	  points[left_index]=pm;
-	  --left_index;
-	  ++right_index;
-	  beta=d_alpha;
-	}
-      else
-	{
-	  beta=(n/2+1)*d_alpha-alpha/2.;
-	  right_index=n/2;
-	  left_index=n/2-1;
-	}
-      
-				       // n even:  m=n/2,
-				       // n odd:   m=(n-1)/2
-      const unsigned int m=n/2;
-      for (unsigned int i=0; i<m ; ++i, ++right_index, --left_index, beta+=d_alpha)
-	{
-	  Assert(right_index<n, ExcInternalError());
-	  Assert(left_index+1>=1, ExcInternalError());
+				   // n even:  m=n/2,
+				   // n odd:   m=(n-1)/2
+  const unsigned int m=n/2;
+  for (unsigned int i=0; i<m ; ++i, ++right_index, --left_index, beta+=d_alpha)
+    {
+      Assert(right_index<n, ExcInternalError());
+      Assert(left_index+1>=1, ExcInternalError());
 	  
-	  double d=h*tan(beta);
-  	  points[right_index]=pm+d/length*(v1-v0);
-  	  points[left_index]=pm-d/length*(v1-v0);
-	}
+      double d=h*tan(beta);
+      points[right_index]=pm+d/length*(v1-v0);
+      points[left_index]=pm-d/length*(v1-v0);
+    }
       
 
-				       // project the points from the
-				       // straight line to the
-				       // HyperBallBoundary
-      for (unsigned int i=0; i<n; ++i)
-	{
-	  points[i] *= radius / sqrt(points[i].square());
-	  points[i] += center;
-	}
+				   // project the points from the
+				   // straight line to the
+				   // HyperBallBoundary
+  for (unsigned int i=0; i<n; ++i)
+    {
+      points[i] *= radius / sqrt(points[i].square());
+      points[i] += center;
     }
 }
+
 
 #endif
 
@@ -170,15 +181,23 @@ HyperBallBoundary<3>::get_intermediate_points_on_quad (
   const Triangulation<3>::quad_iterator &quad,
   std::vector<Point<3> > &points) const
 {
-  Assert(points.size()==1, ExcNotImplemented());
-  StraightBoundary<3>::get_intermediate_points_on_quad (quad, points);
-  Point<3> &middle=points[0];
+  unsigned int m=static_cast<unsigned int> (sqrt(points.size()));
+  Assert(points.size()==m*m, ExcInternalError());
+
+  vector<Point<3> > lp3(m);
+  vector<Point<3> > lp1(m);
   
-  middle -= center;
-				   // project to boundary
-  middle *= radius / sqrt(middle.square());
+  get_intermediate_points_on_line(quad->line(3), lp3);
+  get_intermediate_points_on_line(quad->line(1), lp1);
   
-  middle += center;
+  vector<Point<3> > lps(m);
+  for (unsigned int i=0; i<m; ++i)
+    {
+      get_intermediate_points_between_points(lp3[i], lp1[i], lps);
+      
+      for (unsigned int j=0; j<m; ++j)
+	points[i*m+j]=lps[j];
+    }
 }
 
 #endif

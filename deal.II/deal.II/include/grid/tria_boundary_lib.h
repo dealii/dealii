@@ -63,7 +63,8 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * this class and the documentation of the
 				      * base class.
 				      *
-				      * Only implemented for @p{dim=2}.
+				      * Calls
+				      * @p{get_intermediate_points_between_points}.
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
@@ -92,6 +93,23 @@ class HyperBallBoundary : public StraightBoundary<dim>
     double get_radius () const;
     
   protected:
+
+				     /**
+				      * Called by
+				      * @p{get_intermediate_points_on_line}
+				      * and by
+				      * @p{get_intermediate_points_on_quad}.
+				      *
+				      * Refer to the general
+				      * documentation of
+				      * @p{get_intermediate_points_on_line}
+				      * in the documentation of the
+				      * base class.
+				      */
+    void get_intermediate_points_between_points (const Point<dim> &p0, const Point<dim> &p1,
+						 typename std::vector<Point<dim> > &points) const;
+    
+    
 				     /**
 				      * Center point of the hyperball.
 				      */
