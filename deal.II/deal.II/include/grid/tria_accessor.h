@@ -28,12 +28,10 @@ class Quad;
 class Hexahedron;
 
 
-//TODO:[WB] comment outdated. include templates right into this file
-// note: in non-debug mode, i.e. with optimizations, the file
-// tria_accessor.templates.h is included at the end of this file.
-// this includes a lot of templates and thus makes compilation
-// slower, but at the same time allows for more aggressive
-// inlining and thus faster code.
+// note: the file tria_accessor.templates.h is included at the end of
+// this file.  this includes a lot of templates. originally, this was
+// only done in debug mode, but led to cyclic reduction problems and
+// so is now on by default.
 
 
 /**
@@ -2016,7 +2014,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				     /**
 				      *  Exception
 				      */
-    DeclException0 (ExcCellFlaggedForCoarsening);    
+    DeclException0 (ExcCellFlaggedForCoarsening);
+    
   private:
     				     /**
 				      *  Copy operator. This is normally
