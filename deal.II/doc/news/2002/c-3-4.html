@@ -105,6 +105,20 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: The existing <code
+       class="member">FETools::extrapolate</code> functions does not
+       take into account hanging node constraints. Therefore, it works
+       for continuous elements on globally refined grids and on
+       discontinuous elements, only. Now, there is a new <code
+       class="member">FETools::extrapolate</code> function with an
+       additional <code class="class">ConstraintMatrix</code> argument
+       for the hanging node constraints. This new function works for
+       continuous as well as for discontinuous elements. But, the old
+       function is still supported.
+       <br>
+       (RH 2002/06/17)
+       </p>
+
   <li> <p> New: There are now <code
        class="member">Triangulation::save/load_user_pointers(vector&lt;void
        *&gt; &)</code> functions similar to the respective <code

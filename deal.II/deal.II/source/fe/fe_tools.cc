@@ -376,6 +376,20 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 			  const DoFHandler<dim> &dof2,
 			  Vector<number> &u2)
 {
+  ConstraintMatrix dummy;
+  dummy.close();
+  extrapolate(dof1, u1, dof2, dummy, u2);
+}
+
+
+
+template <int dim, typename number>
+void FETools::extrapolate(const DoFHandler<dim> &dof1,
+			  const Vector<number> &u1,
+			  const DoFHandler<dim> &dof2,
+			  const ConstraintMatrix &constraints,
+			  Vector<number> &u2)
+{
   Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
 	 ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
   Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
@@ -383,7 +397,7 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
   Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
   Vector<number> u3(dof2.n_dofs());
-  interpolate(dof1, u1, dof2, u3);
+  interpolate(dof1, u1, dof2, constraints, u3);
 
   const unsigned int dofs_per_cell  = dof2.get_fe().dofs_per_cell;
   const Triangulation<dim> &tria=dof1.get_tria();
@@ -423,6 +437,9 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 	      }
 	  }
     }
+
+				   // Apply hanging node constraints.
+  constraints.distribute(u2);
 }
 
 

@@ -341,18 +341,49 @@ class FETools
 				      * Note that the resulting field
 				      * does not satisfy continuity
 				      * requirements of the given
-				      * finite elements. You have to
-				      * apply
-				      * @ref{ConstraintMatrix}@p{::distribute}
-				      * with the hanging node
-				      * constraints of the second DoF
-				      * handler object to make the
-				      * output continuous again.
+				      * finite elements.
+				      * 
+				      * When you use continuous
+				      * elements on grids with hanging
+				      * nodes, please use the
+				      * @p{extrapolate} function with
+				      * an additional
+				      * @p{ConstraintMatrix} argument,
+				      * see below.
 				      */
     template <int dim, typename number>
     static void extrapolate(const DoFHandler<dim> &dof1,
 			    const Vector<number>  &z1,
 			    const DoFHandler<dim> &dof2,
+			    Vector<number>        &z2);    
+
+				     /**
+				      * Gives the patchwise
+				      * extrapolation of a @p{dof1}
+				      * function @p{z1} to a @p{dof2}
+				      * function @p{z2}.  @p{dof1} and
+				      * @p{dof2} need to be @ref{DoFHandler}
+				      * based on the same triangulation.
+				      * @p{constraints} is a hanging
+				      * node constraints object
+				      * corresponding to
+				      * @p{dof2}. This object is
+				      * particular important when
+				      * interpolating onto continuous
+				      * elements on grids with hanging
+				      * nodes (locally refined grids).
+				      *
+				      * This function is interesting
+				      * for e.g. extrapolating
+				      * patchwise a piecewise linear
+				      * solution to a piecewise
+				      * quadratic solution.
+				      */
+    template <int dim, typename number>
+    static void extrapolate(const DoFHandler<dim> &dof1,
+			    const Vector<number>  &z1,
+			    const DoFHandler<dim> &dof2,
+			    const ConstraintMatrix &constraints,
 			    Vector<number>        &z2);    
 
 				     /**
