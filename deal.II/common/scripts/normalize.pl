@@ -44,3 +44,4 @@ s/-0\.00/0.00/g;
 # Residual values
 
 s/value.*//;
+s/with residual.*//;
