@@ -126,31 +126,52 @@ class FETools
 				      * Therefore the meanvalue is taken
 				      * at the DoF values on the
 				      * discontinuities.
+				      *
+				      * Note that the resulting output
+				      * vector does not necessarily
+				      * respect continuity
+				      * requirements at hanging nodes:
+				      * if, for example, you are
+				      * interpolating a Q2 field to a
+				      * Q1 field, then at hanging
+				      * nodes the output field will
+				      * have the function value of the
+				      * input field, which however is
+				      * not usually the mean value of
+				      * the two adjacent nodes. It is
+				      * thus not part of the Q1
+				      * function space on the whole
+				      * triangulation, although it is
+				      * of course Q1 on each cell.
 				      */
     template <int dim, typename number>
-    static void interpolate(const DoFHandler<dim> &dof1,
-			    const Vector<number> &u1,
-			    const DoFHandler<dim> &dof2,
-			    Vector<number> &u2);
+    static void interpolate (const DoFHandler<dim> &dof1,
+			     const Vector<number>  &u1,
+			     const DoFHandler<dim> &dof2,
+			     Vector<number>        &u2);
     
 				     /**
-				      * Gives the interpolation of the @p{fe1}-
-				      * function @p{u1} to a @p{fe2}-function, and
+				      * Gives the interpolation of the
+				      * @p{fe1}-function @p{u1} to a
+				      * @p{fe2}-function, and
 				      * interpolates this to a second
-				      * @p{fe1}-function named @p{u1_interpolated}.
+				      * @p{fe1}-function named
+				      * @p{u1_interpolated}.
 				      *
 				      * Note, that this function only
-				      * makes sense if the finite element
-				      * space due to @p{fe1} is not a subset of
-				      * the finite element space due to
-				      * @p{fe2}, as if it were a subset then
-				      * @p{u1_interpolated} would be equal to @p{u1}.
+				      * makes sense if the finite
+				      * element space due to @p{fe1}
+				      * is not a subset of the finite
+				      * element space due to @p{fe2},
+				      * as if it were a subset then
+				      * @p{u1_interpolated} would be
+				      * equal to @p{u1}.
 				      */
     template <int dim, typename number>
-    static void back_interpolate(const DoFHandler<dim> &dof1,
-				 const Vector<number> &u1,
-				 const FiniteElement<dim> &fe2,
-				 Vector<number> &u1_interpolated);
+    static void back_interpolate (const DoFHandler<dim>    &dof1,
+				  const Vector<number>     &u1,
+				  const FiniteElement<dim> &fe2,
+				  Vector<number>           &u1_interpolated);
 
 				     /**
 				      * Gives $(Id-I_h)z2$ for a given
