@@ -16,7 +16,7 @@
 
 #include <lac/solver.h>
 #include <lac/solver_control.h>
-
+#include <base/subscriptor.h>
 
 /**
  * Implementation of the richardson iteration method. The stopping criterion
@@ -38,7 +38,7 @@
  * @author Ralf Hartmann
  */
 template <class VECTOR = Vector<double> >
-class SolverRichardson : private Solver<VECTOR>
+class SolverRichardson : public Subscriptor, private Solver<VECTOR>
 {
   public:
 				     /**

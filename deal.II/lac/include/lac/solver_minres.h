@@ -18,7 +18,7 @@
 #include <lac/solver_control.h>
 #include <base/logstream.h>
 #include <cmath>
-
+#include <base/subscriptor.h>
 
 
 /**
@@ -48,7 +48,7 @@
  * @author Thomas Richter, 2000
  */
 template <class VECTOR = Vector<double> >
-class SolverMinRes : private Solver<VECTOR>
+class SolverMinRes : public Subscriptor, private Solver<VECTOR>
 {
   public:
     				     /**

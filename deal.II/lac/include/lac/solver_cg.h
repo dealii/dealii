@@ -17,6 +17,7 @@
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <base/logstream.h>
+#include <base/subscriptor.h>
 #include <cmath>
 
 
@@ -44,7 +45,7 @@
  * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
  */
 template <class VECTOR = Vector<double> >
-class SolverCG : private Solver<VECTOR>
+class SolverCG : public Subscriptor, private Solver<VECTOR>
 {
   public:
     				     /**

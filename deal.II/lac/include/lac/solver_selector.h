@@ -85,7 +85,7 @@
  * @author Ralf Hartmann, 1999
  */
 template <class Vector = Vector<double> >
-class SolverSelector
+class SolverSelector : public Subscriptor
 {
   public:
 

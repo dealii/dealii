@@ -80,7 +80,7 @@
  */
 template <class Matrix = SparseMatrix<double>,
           class Vector = Vector<double> >
-class PreconditionSelector
+class PreconditionSelector : public Subscriptor
 {
   public:
     

@@ -30,7 +30,7 @@ template <typename number> class SparseMatrix;
  *
  * @author Guido Kanschat, 1999
  */
-class PreconditionIdentity
+class PreconditionIdentity : public Subscriptor
 {
   public:
 				     /**
@@ -204,7 +204,7 @@ class PreconditionRelaxation
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX = SparseMatrix<double> >
-class PreconditionJacobi : private PreconditionRelaxation<MATRIX>
+class PreconditionJacobi : public Subscriptor, private PreconditionRelaxation<MATRIX>
 {
   public:
 				     /**
@@ -259,7 +259,7 @@ class PreconditionJacobi : private PreconditionRelaxation<MATRIX>
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX = SparseMatrix<double> >
-class PreconditionSOR : private PreconditionRelaxation<MATRIX>
+class PreconditionSOR : public Subscriptor, private PreconditionRelaxation<MATRIX>
 {
   public:
 				     /**
@@ -312,7 +312,7 @@ class PreconditionSOR : private PreconditionRelaxation<MATRIX>
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX = SparseMatrix<double> >
-class PreconditionSSOR : private PreconditionRelaxation<MATRIX>
+class PreconditionSSOR : public Subscriptor, private PreconditionRelaxation<MATRIX>
 {
   public:
 				     /**
@@ -390,7 +390,7 @@ class PreconditionSSOR : private PreconditionRelaxation<MATRIX>
  * @author Guido Kanschat, 1999
  */
 template<class SOLVER, class MATRIX = SparseMatrix<double>, class PRECONDITION = PreconditionIdentity>
-class PreconditionLACSolver
+class PreconditionLACSolver : public Subscriptor
 {
   public:
 				     /**
@@ -448,7 +448,7 @@ class PreconditionLACSolver
  * @author Guido Kanschat, 2000
  */
 template<class MATRIX, class PRECOND, class VECTOR>
-class PreconditionedMatrix
+class PreconditionedMatrix : public Subscriptor
 {
   public:
 				     /**

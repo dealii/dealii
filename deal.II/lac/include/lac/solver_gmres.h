@@ -16,7 +16,7 @@
 
 /*----------------------------   solver_pgmres.h     ---------------------------*/
 
-
+#include <base/subscriptor.h>
 #include <base/logstream.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>
@@ -72,7 +72,7 @@
  * @author Wolfgang Bangerth
  */
 template <class VECTOR = Vector<double> >
-class SolverGMRES : private Solver<VECTOR>
+class SolverGMRES : public Subscriptor, private Solver<VECTOR>
 {
   public:
     				     /**

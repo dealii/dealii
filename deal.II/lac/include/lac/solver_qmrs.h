@@ -17,7 +17,7 @@
 #include <lac/solver_control.h>
 #include <base/logstream.h>
 #include <cmath>
-
+#include <base/subscriptor.h>
 
 /**
  * QMRS method.
@@ -49,7 +49,7 @@
  * @author Guido Kanschat, 1999
  */
 template <class VECTOR = Vector<double> >
-class SolverQMRS : private Solver<VECTOR>
+class SolverQMRS : public Subscriptor, private Solver<VECTOR>
 {
   public:
     				     /**

@@ -18,7 +18,7 @@
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <cmath>
-
+#include <base/subscriptor.h>
 /**
  * Bicgstab algorithm by van der Vorst.
  *
@@ -43,7 +43,7 @@
  * work for you, try to change this value.
  */
 template <class VECTOR = Vector<double> >
-class SolverBicgstab : private Solver<VECTOR>
+class SolverBicgstab : public Subscriptor, private Solver<VECTOR>
 {
   public:
     				     /**
