@@ -234,6 +234,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p> New: class <code class="class">BlockVector</code> has a
+  function <code class="member">collect_sizes()</code>, very much as
+  <code class="class">BlockSparsityPattern</code>. This allows
+  updating internal structures after blocks have been resized.
+  <br>
+  (GK 2002/09/17)
+  </p>
+
   <li> <p> New: class <code class="class">SparseMatrix</code> has an
   STL-conforming <code class="class">const_iterator</code> and
   functions <code class="member">begin()</code> and <code

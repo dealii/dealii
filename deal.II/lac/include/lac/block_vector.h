@@ -845,6 +845,19 @@ class BlockVector
 				      * STL's @p{vector<>::clear} function.
 				      */
     void clear ();
+
+				     /**
+				      * Update internal structures
+				      * after resizing
+				      * vectors. Whenever you reinited
+				      * a block of a block vector, the
+				      * internal data structures are
+				      * corrupted. Therefore, you
+				      * should call this function
+				      * after al blocks got their new
+				      * size.
+				      */
+    void collect_sizes ();
     
 				     /**
 				      * Swap the contents of this

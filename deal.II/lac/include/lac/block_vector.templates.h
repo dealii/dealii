@@ -110,6 +110,18 @@ void BlockVector<Number>::reinit (const BlockVector<Number2>& v,
 }
 
 
+template <typename Number>
+void
+BlockVector<Number>::collect_sizes ()
+{
+  std::vector<unsigned int> sizes (num_blocks);
+
+  for (unsigned int i=0; i<num_blocks; ++i)
+    sizes[i] = block(i).size();
+
+  block_indices.reinit(sizes);
+}
+
 
 template <typename Number>
 BlockVector<Number>::~BlockVector ()

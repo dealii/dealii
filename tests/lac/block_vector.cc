@@ -30,6 +30,8 @@ void test ()
   ivector[1] = 0;
   ivector[2] = 1;
   ivector[3] = 2;
+
+  const std::vector<unsigned int> vector_indices(ivector);
   
   BlockIndices i1(ivector);
   BlockIndices i2 = i1;
@@ -46,26 +48,6 @@ void test ()
   deallog.pop();
 
 
-				   // initialization by an iterator
-				   // range
-  deallog.push ("Initialization from iterators");
-  double array[] = { 0, 1, 2, 3, 4, 5 };
-  BlockVector<double> v1(ivector, &array[0], &array[6]);
-  for (unsigned int i=0; i<v1.size(); ++i)
-    deallog << v1(i) << ' ';
-  deallog << std::endl;
-
-				   // same test, but do not initialize
-				   // from double*'s, but from
-				   // std::list iterators.
-  std::list<double> l(&array[0], &array[6]);
-  BlockVector<double> v2(ivector, l.begin(), l.end());
-  for (unsigned int i=0; i<v2.size(); ++i)
-    deallog << v2(i) << ' ';
-  deallog << std::endl;
-  deallog.pop ();
-
-  
   i3.reinit(ivector);
 
   deallog.push("global->local");
@@ -129,6 +111,37 @@ void test ()
   unsigned int i = i1.global_to_local(3).first;
   i = i1.local_to_global(1,2);
   i = i1.local_to_global(2,0);
+
+  deallog.pop ();
+  deallog.push("BlockVector");
+				   // initialization by an iterator
+				   // range
+  deallog.push ("Constructor with iterators");
+  double array[] = { 0, 1, 2, 3, 4, 5 };
+  BlockVector<double> v1(vector_indices, &array[0], &array[6]);
+  for (unsigned int i=0; i<v1.size(); ++i)
+    deallog << v1(i) << ' ';
+  deallog << std::endl;
+
+				   // same test, but do not initialize
+				   // from double*'s, but from
+				   // std::list iterators.
+  std::list<double> l(&array[0], &array[6]);
+  BlockVector<double> v2(vector_indices, l.begin(), l.end());
+  for (unsigned int i=0; i<v2.n_blocks(); ++i)
+    for (unsigned int j=0;j<v2.block(i).size();++j)
+      deallog << i << '\t' << j << '\t' <<v2.block(i)(j) << std::endl;
+
+  deallog.pop();
+  deallog.push("reinit block");
+  v2.block(1).reinit(5);
+  v2.collect_sizes();
+  for (unsigned int i=0; i<v2.size(); ++i)
+    deallog << v2(i) << ' ';
+  deallog << std::endl;
+  
+  deallog.pop ();
+  deallog.pop ();
 }
 
 
