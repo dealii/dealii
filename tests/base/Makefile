@@ -59,7 +59,7 @@ endif
 	@$(CXX) $(flags) -c $< -o $@
 
 
-all: logtest.check reference.check tensor.check quadrature_test.check
+all: logtest.check reference.check tensor.check quadrature_test.check timer.check
 exe: $(all:.check=.testcase)
 output: $(all:.check=.output)
 ############################################################
@@ -137,10 +137,18 @@ quadrature_test.testcase: $(quadrature_test-o-files) $(libraries)
 	@$(CXX) $(flags) -o $@ $^
 
 
-############################################################
-# Continue with other targets if needed
-############################################################
 
+timer-cc-files = timer.cc
+
+ifeq ($(debug-mode),on)
+timer-o-files = $(timer-cc-files:.cc=.go)
+else
+timer-o-files = $(timer-cc-files:.cc=.o)
+endif
+
+timer.testcase: $(timer-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
 
 ############################################################
 # Continue with other targets if needed
