@@ -8,7 +8,7 @@
 #include <lac/dvector.h>
 #include <iostream>
 #include <algorithm>
-
+#include <numeric>
 
 
 
@@ -84,11 +84,22 @@ void ConstraintMatrix::close () {
   Assert (sorted==false, ExcMatrixIsClosed());
 
 				   // sort the entries in the different lines
+				   // and strip zero entries
   vector<ConstraintLine>::iterator line = lines.begin(),
 				   endl = lines.end();
   for (; line!=endl; ++line)
-    sort (line->entries.begin(), line->entries.end());
+    {
+				       // first remove zero entries
+      line->entries.erase (remove_if (line->entries.begin(),
+				      line->entries.end(),
+				      compose1 (bind2nd (equal_to<double>(), 0),
+						select2nd<pair<unsigned int,double> >())),
+                           line->entries.end());
 
+				       // now sort the remainder
+      sort (line->entries.begin(), line->entries.end());
+    };
+  
 				   // sort the lines
   sort (lines.begin(), lines.end());
   
