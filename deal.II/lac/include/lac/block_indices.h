@@ -103,7 +103,7 @@ class BlockIndices
 				      * Return the size of the @p{i}th
 				      * block.
 				      */
-    unsigned int block_size (const unsigned int i) const
+    unsigned int block_size (const unsigned int i) const;
       
 				     /**
 				      * Copy operator.
