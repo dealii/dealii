@@ -17,6 +17,7 @@
 
 #include <base/exceptions.h>
 #include <string>
+#include <cstdlib>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
@@ -24,8 +25,6 @@
 #  include <strstream>
 #endif
 
-
-unsigned int ExceptionBase::n_treated_exceptions;
 
 
 ExceptionBase::ExceptionBase () :
@@ -119,4 +118,86 @@ const char * ExceptionBase::what () const throw ()
   description = converter.str();
 
   return description.c_str();
+};
+
+
+
+namespace deal_II_exception_internals
+{
+
+				   /**
+				    * Number of exceptions dealt
+				    * with so far. Zero at program
+				    * start. Messages are only
+				    * displayed if the value is
+				    * zero.
+				    */
+  static unsigned int n_treated_exceptions;
+  
+
+  void issue_error_assert (const char *file,
+			   int         line,
+			   const char *function,
+			   const char *cond,
+			   const char *exc_name,
+			   ExceptionBase &         e)
+  {
+				     // fill the fields of the exception object
+    e.SetFields (file, line, function, cond, exc_name);
+    
+				     // if no other exception has been
+				     // displayed before, show this one
+    if (n_treated_exceptions == 0)
+      {
+	std::cerr << "--------------------------------------------------------"
+		  << std::endl;
+					 // print out general data
+	e.PrintExcData (std::cerr);
+					 // print out exception specific data
+	e.PrintInfo (std::cerr);
+	std::cerr << "--------------------------------------------------------"
+		  << std::endl;
+      }
+    else
+      {
+					 // if this is the first
+					 // follow-up message, display a
+					 // message that further
+					 // exceptions are suppressed
+	if (n_treated_exceptions == 1)
+	  std::cerr << "******** More assertions fail but messages are suppressed! ********"
+		    << std::endl;
+      };
+    
+				     // increase number of treated
+				     // exceptions by one
+    n_treated_exceptions++;
+    
+    
+				     // abort the program now since
+				     // something has gone horribly
+				     // wrong. however, there is one
+				     // case where we do not want to do
+				     // that, namely when another
+				     // exception, possibly thrown by
+				     // AssertThrow is active, since in
+				     // that case we will not come to
+				     // see the original exception. in
+				     // that case indicate that the
+				     // program is not aborted due to
+				     // this reason.
+    if (std::uncaught_exception() == true)
+      std::cerr << "******** Program is not aborted since another exception is active! ********"
+		<< std::endl;
+    else
+      std::abort ();
+  };
+
+
+
+  void abort ()
+  {
+    std::abort ();
+  };
+  
 };

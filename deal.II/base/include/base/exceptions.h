@@ -18,7 +18,7 @@
 
 #include <exception>
 #include <iostream>
-#include <cstdlib>
+
 
 #ifndef __GNUC__
 #  define __PRETTY_FUNCTION__ "(unknown)"
@@ -111,8 +111,10 @@
  *  @p{Assert (i>m, ExcSomewhat());}
  *
  *  @sect3{How it works internally}
- *  If the @p{DEBUG} preprocessor directive is set, the call @p{Assert (cond, exc);}
- *  is converted by the preprocessor into the sequence
+ *  If the @p{DEBUG} preprocessor directive is set, the call @p{Assert
+ *  (cond, exc);} is basically converted by the preprocessor into the
+ *  sequence (note that function names and exact calling sequences may
+ *  change over time, but the general principle remains the same)
  *  @begin{verbatim}
  *    if (!(cond))
  *      __IssueError_Assert (__FILE__,
@@ -400,29 +402,41 @@ class ExceptionBase : public std::exception
 				      * Name of the exception and call sequence.
 				      */
     const char  *exc;
-
-				     /**
-				      * Number of exceptions dealt
-				      * with so far. Zero at program
-				      * start. Messages are only
-				      * displayed if the value is
-				      * zero.
-				      */
-    static unsigned int n_treated_exceptions;
-
-				     /**
-				      * Make this function a friend
-				      * since it needs access to the
-				      * @p{n_treated_exceptions}
-				      * variable.
-				      */
-    template <class exc> friend void __IssueError_Assert (const char *file,
-							  int         line,
-							  const char *function,
-							  const char *cond,
-							  const char *exc_name,
-							  exc         e);
 };
+
+
+
+
+/**
+ * In this namespace functions in connection with the Assert and
+ * AssertThrow mechanism are declared. They are solely for internal
+ * purposes and are not for use outside the exception handling and
+ * throwing mechanism.
+ */
+namespace deal_II_exception_internals
+{
+
+/**
+ *  Relay exceptions from the @p{Assert} macro to the
+ *  @p{__IssueError_Assert} function. Used to convert the last
+ *  argument from arbitrary type to @ref{ExceptionBase} which is not
+ *  possible inside the @p{Assert} macro due to syntactical
+ *  difficulties in connection with the way we use the macro and the
+ *  declaration of the exception classes.
+ *
+ *  @see ExceptionBase
+ */
+  template <class exc>
+  inline
+  void issue_error_assert_1 (const char *file,
+			     int         line,
+			     const char *function,
+			     const char *cond,
+			     const char *exc_name,
+			     exc         e)
+  {
+    issue_error_assert (file,line,function,cond,exc_name,e);
+  };
 
 
 
@@ -433,66 +447,13 @@ class ExceptionBase : public std::exception
  *
  *  @see ExceptionBase
  */
-template <class exc>
-void __IssueError_Assert (const char *file,
-			  int         line,
-			  const char *function,
-			  const char *cond,
-			  const char *exc_name,
-			  exc         e)
-{
-				   // fill the fields of the exception object
-  e.SetFields (file, line, function, cond, exc_name);
-
-				   // if no other exception has been
-				   // displayed before, show this one
-  if (ExceptionBase::n_treated_exceptions == 0)
-    {
-      std::cerr << "--------------------------------------------------------"
-		<< std::endl;
-				       // print out general data
-      e.PrintExcData (std::cerr);
-				       // print out exception specific data
-      e.PrintInfo (std::cerr);
-      std::cerr << "--------------------------------------------------------"
-		<< std::endl;
-    }
-  else
-    {
-				       // if this is the first
-				       // follow-up message, display a
-				       // message that further
-				       // exceptions are suppressed
-      if (ExceptionBase::n_treated_exceptions == 1)
-	std::cerr << "******** More assertions fail but messages are suppressed! ********"
-		  << std::endl;
-    };
-
-				   // increase number of treated
-				   // exceptions by one
-  ExceptionBase::n_treated_exceptions++;
-      
-
-				   // abort the program now since
-				   // something has gone horribly
-				   // wrong. however, there is one
-				   // case where we do not want to do
-				   // that, namely when another
-				   // exception, possibly thrown by
-				   // AssertThrow is active, since in
-				   // that case we will not come to
-				   // see the original exception. in
-				   // that case indicate that the
-				   // program is not aborted due to
-				   // this reason.
-  if (std::uncaught_exception() == true)
-    std::cerr << "******** Program is not aborted since another exception is active! ********"
-	      << std::endl;
-  else
-    std::abort ();
-};
-
-
+  void issue_error_assert (const char *file,
+			   int         line,
+			   const char *function,
+			   const char *cond,
+			   const char *exc_name,
+			   ExceptionBase &         e);
+  
 
 /**
  *  This routine does the main work for the
@@ -501,18 +462,29 @@ void __IssueError_Assert (const char *file,
  *
  *  @see ExceptionBase
  */
-template <class exc>
-void __IssueError_Throw (const char *file,
-			 int         line,
-			 const char *function,
-			 const char *cond,
-			 const char *exc_name,
-			 exc         e) {
-				   // Fill the fields of the exception object
-  e.SetFields (file, line, function, cond, exc_name);
-  throw e;
-};
+  template <class exc>
+  void issue_error_throw (const char *file,
+			  int         line,
+			  const char *function,
+			  const char *cond,
+			  const char *exc_name,
+			  exc         e)
+  {
+				     // Fill the fields of the
+				     // exception object
+    e.SetFields (file, line, function, cond, exc_name);
+    throw e;
+  };
 
+
+/**
+ * Abort the program. This function is used so that we need not
+ * include <cstdlib> into this file since it is included into all
+ * other files of the library and we would like to keep its include
+ * list as short as possible.
+ */
+  void abort ();
+};
 
 
 #ifdef DEBUG  ////////////////////////////////////////
@@ -527,12 +499,13 @@ void __IssueError_Throw (const char *file,
  * @see ExceptionBase
  * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
-#define Assert(cond, exc)                                         \
-  {                                                               \
-    if (!(cond))                                                  \
-      __IssueError_Assert (__FILE__,                              \
-			   __LINE__,                              \
-			   __PRETTY_FUNCTION__, #cond, #exc, exc);\
+#define Assert(cond, exc)                                           \
+  {                                                                 \
+    if (!(cond))                                                    \
+      deal_II_exception_internals::                                 \
+      issue_error_assert_1 (__FILE__,                               \
+			     __LINE__,                              \
+			     __PRETTY_FUNCTION__, #cond, #exc, exc);\
   }
 
 
@@ -565,18 +538,19 @@ void __IssueError_Throw (const char *file,
  * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
 #ifndef DISABLE_ASSERT_THROW
-#define AssertThrow(cond, exc)                                    \
-  {                                                               \
-    if (!(cond))                                                  \
-      __IssueError_Throw (__FILE__,                               \
-			  __LINE__,                               \
-			  __PRETTY_FUNCTION__, #cond, #exc, exc); \
+#define AssertThrow(cond, exc)                                   \
+  {                                                              \
+    if (!(cond))                                                 \
+      deal_II_exception_internals::                              \
+      issue_error_throw (__FILE__,                               \
+			 __LINE__,                               \
+			 __PRETTY_FUNCTION__, #cond, #exc, exc); \
   }
 #else
 #define AssertThrow(cond, exc)                                    \
   {                                                               \
     if (!(cond))                                                  \
-      std::abort ();                                              \
+      deal_II_exception_internals::abort ();                      \
   }
 #endif
 
@@ -789,7 +763,7 @@ namespace StandardExceptions
 				    * not.
 				    *
 				    * We usually leave in these
-				    * exceptions even after we are
+				    * assertions even after we are
 				    * confident that the
 				    * implementation is correct, since
 				    * if someone later changes or
