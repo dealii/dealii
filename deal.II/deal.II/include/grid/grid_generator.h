@@ -436,9 +436,17 @@ class GridGenerator
                                      /**
 				      * Initialize the given
 				      * Triangulation with a hypercube
-				      * with a slit. The slit goes
-				      * from <tt>(x=0,y=-1)</tt> to
-				      * <tt>(0,0)</tt> in 2d.
+				      * with a slit. In each
+				      * coordinate direction, the
+				      * hypercube extends from @p left
+				      * to @p right.
+				      *
+				      * In 2d, the split goes in
+				      * vertical direction from
+				      * <tt>x=(left+right)/2,
+				      * y=left</tt> to the center of
+				      * the square at
+				      * <tt>x=y=(left+right)/2</tt>.
 				      *
 				      * The triangulation needs to be
 				      * void upon calling this
@@ -448,7 +456,7 @@ class GridGenerator
 				      * exist for triangulations of
 				      * all space dimensions, but
 				      * throws an error if called in
-				      * 1d. It is also not presently
+				      * 1d. It is also presently not
 				      * implemented in 3d.
 				      */
     static void hyper_cube_slit (Triangulation<1> &tria,
