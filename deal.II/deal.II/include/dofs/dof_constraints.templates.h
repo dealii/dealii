@@ -184,7 +184,8 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 					     // happen, since we only
 					     // operate on compressed
 					     // matrices!
-	    Assert (sparsity.get_column_numbers()[j] != SparsityPattern::invalid_entry,
+	    Assert (sparsity.get_column_numbers()[j] !=
+                    SparsityPattern::invalid_entry,
 		    ExcMatrixNotClosed());
 	    
 	    if (distribute[sparsity.get_column_numbers()[j]] != -1)
@@ -336,10 +337,14 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 		last  = block_sparsity.get_rowstart_indices()[block_index.second+1];
 	      for (unsigned int j=first; j<last; ++j)
 						 // end of row reached?
-		if (block_sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+		if (block_sparsity.get_column_numbers()[j] ==
+                    SparsityPattern::invalid_entry)
 		  {
-						     // this should not happen, since
-						     // we only operate on compressed
+						     // this should
+						     // not happen,
+						     // since we only
+						     // operate on
+						     // compressed
 						     // matrices!
 		    Assert (false, ExcMatrixNotClosed());
 		    break;
@@ -351,10 +356,16 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 						      block_sparsity.get_column_numbers()[j]);
 		    
 		    if (distribute[global_col] != -1)
-						       // distribute entry at regular
-						       // row @p{row} and irregular column
+						       // distribute
+						       // entry at
+						       // regular row
+						       // @p{row} and
+						       // irregular
+						       // column
 						       // global_col;
-						       // set old entry to zero
+						       // set old
+						       // entry to
+						       // zero
 		      {
 			const double old_value =
 			  uncondensed.block(block_row,block_col).global_entry(j);
@@ -391,10 +402,14 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
       
 	      for (unsigned int j=first; j<last; ++j)
 						 // end of row reached?
-		if (block_sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+		if (block_sparsity.get_column_numbers()[j] ==
+                    SparsityPattern::invalid_entry)
 		  {
-						     // this should not happen, since
-						     // we only operate on compressed
+						     // this should
+						     // not happen,
+						     // since we only
+						     // operate on
+						     // compressed
 						     // matrices!
 		    Assert (false, ExcMatrixNotClosed());
 		    break;
@@ -406,10 +421,15 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 						       block_sparsity.get_column_numbers()[j]);
 		    
 		    if (distribute[global_col] == -1)
-						       // distribute entry at irregular
-						       // row @p{row} and regular column
-						       // global_col. set old
-						       // entry to zero
+						       // distribute
+						       // entry at
+						       // irregular
+						       // row @p{row}
+						       // and regular
+						       // column
+						       // global_col. set
+						       // old entry to
+						       // zero
 		      {
 			const double old_value
 			  = uncondensed.block(block_row,block_col).global_entry(j);
@@ -424,11 +444,20 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 			uncondensed.block(block_row,block_col).global_entry(j) = 0.;
 		      }
 		    else
-						       // distribute entry at irregular
-						       // row @p{row} and irregular column
+						       // distribute
+						       // entry at
+						       // irregular
+						       // row @p{row}
+						       // and
+						       // irregular
+						       // column
 						       // @p{global_col}
-						       // set old entry to one if on main
-						       // diagonal, zero otherwise
+						       // set old
+						       // entry to one
+						       // if on main
+						       // diagonal,
+						       // zero
+						       // otherwise
 		      {
 			const double old_value
 			  = uncondensed.block(block_row,block_col).global_entry(j);
@@ -461,10 +490,10 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
   Assert (condensed.size()+n_constraints() == uncondensed.size(),
 	  ExcWrongDimension());
   
-				   // store for each line of the vector
-				   // its new line number
-				   // after compression. If the shift is
-				   // -1, this line will be condensed away
+				   // store for each line of the
+				   // vector its new line number after
+				   // compression. If the shift is -1,
+				   // this line will be condensed away
   std::vector<int> new_line;
 
   new_line.reserve (uncondensed.size());
@@ -643,10 +672,12 @@ ConstraintMatrix::distribute (const VectorType &condensed,
       uncondensed(line) = condensed(old_line[line]);
     else
       {
-					 // line was condensed away, create it newly
-					 // first set it to zero
+					 // line was condensed away,
+					 // create it newly first set
+					 // it to zero
 	uncondensed(line) = 0.;
-					 // then add the different contributions
+					 // then add the different
+					 // contributions
 	for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
 	  uncondensed(line) += (condensed(old_line[next_constraint->entries[i].first]) *
 				next_constraint->entries[i].second);
@@ -665,10 +696,12 @@ ConstraintMatrix::distribute (VectorType &vec) const
   std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   for (; next_constraint != lines.end(); ++next_constraint) 
     {
-				       // make entry in line next_constraint.line
-				       // first set it to zero
+				       // make entry in line
+				       // next_constraint.line first
+				       // set it to zero
       vec(next_constraint->line) = 0.;
-				       // then add the different contributions
+				       // then add the different
+				       // contributions
       for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
 	vec(next_constraint->line) += (vec(next_constraint->entries[i].first) *
 				       next_constraint->entries[i].second);
