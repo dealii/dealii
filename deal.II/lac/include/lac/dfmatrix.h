@@ -233,7 +233,7 @@ class dFMatrix
 				      *  w (+)= Transp(A)*v.
 				      *  Matrix-vector-multiplication ; <p>
 				      *  (application of transpose of this to a vector v)
-				      *  flag adding=true : w=+A*v
+				      *  flag adding=true : w+=A*v
 				      */
     void Tvmult (dVector& w, const dVector& v, const bool adding=false) const;
 
