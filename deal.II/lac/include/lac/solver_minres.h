@@ -250,7 +250,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 				   // Preconditioner positive
   Assert (delta[1]>=0, ExcPreconditionerNotDefinite());
   
-  r0 = sqrt(delta[1]);
+  r0 = std::sqrt(delta[1]);
   r_l2 = r0;
   
   
@@ -265,15 +265,15 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   while (conv==SolverControl::iterate)
     {      
       if (delta[1]!=0)
-	v *= 1./sqrt(delta[1]);
+	v *= 1./std::sqrt(delta[1]);
       else
 	v.reinit(VS);
 
       A.vmult(*u[2],v);
-      u[2]->add (-sqrt(delta[1]/delta[0]), *u[0]);
+      u[2]->add (-std::sqrt(delta[1]/delta[0]), *u[0]);
 
       gamma = *u[2] * v;
-      u[2]->add (-gamma / sqrt(delta[1]), *u[1]);
+      u[2]->add (-gamma / std::sqrt(delta[1]), *u[1]);
       *m[0] = v;
       
 				       // precondition: solve M v = u[2]
@@ -288,23 +288,23 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
       if (j==1)
 	{
 	  d_ = gamma;
-	  e[1] = sqrt(delta[2]);
+	  e[1] = std::sqrt(delta[2]);
 	}
       if (j>1)
 	{
 	  d_ = s * e[0] - c * gamma;
 	  e[0] = c * e[0] + s * gamma;
-	  f[1] = s * sqrt(delta[2]);
-	  e[1] = -c * sqrt(delta[2]);
+	  f[1] = s * std::sqrt(delta[2]);
+	  e[1] = -c * std::sqrt(delta[2]);
 	}
 
-      d = sqrt (d_*d_ + delta[2]);
+      d = std::sqrt (d_*d_ + delta[2]);
       
       if (j>1) tau *= s / c;
       c = d_ / d;
       tau *= c;
       
-      s = sqrt(delta[2]) / d;
+      s = std::sqrt(delta[2]) / d;
 
       if (j==1)
 	tau = r0 * c;
@@ -314,7 +314,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 	m[0]->add (-f[0], *m[2]);
       *m[0] *= 1./d;
       x.add (tau, *m[0]);
-      r_l2 *= fabs(s);
+      r_l2 *= std::fabs(s);
 
       conv = this->control().check(j,r_l2);
       
