@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <numeric>
 #include <utility>
+#include <cmath>
 
 template <typename number>
 bool operator == (const BlockVector<number> &v1,
@@ -134,7 +135,11 @@ void test ()
 
 				       // check backwards
       for (unsigned int i=0; i<v1.size(); ++i, --p1)
-	Assert (*p1 == v1.size()-i-1, ExcInternalError());
+	{
+	  const double val = *p1;
+	  const double ref = v1.size()-i-1;
+	  Assert (val==ref, ExcInternalError());
+	};
 
 				       // if we came thus far,
 				       // everything is alright
