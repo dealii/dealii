@@ -433,6 +433,36 @@ class FullMatrix : public Table<2,number>
 	       const FullMatrix<number2> &B);
     
 				     /**
+				      * Add transose of a rectangular block.
+				      *
+				      * A rectangular block of the
+				      * matrix <tt>src</tt> is
+				      * transposed and addedadded to
+				      * <tt>this</tt>. The upper left
+				      * corner of the block being
+				      * copied is
+				      * <tt>(src_offset_i,src_offset_j)</tt>
+				      * in the coordinates of the
+				      * <b>non</b>-transposed matrix.
+				      * The upper left corner of the
+				      * copied block is
+				      * <tt>(dst_offset_i,dst_offset_j)</tt>.
+				      * The size of the rectangular
+				      * block being copied is the
+				      * maximum size possible,
+				      * determined either by the size
+				      * of <tt>this</tt> or
+				      * <tt>src</tt>.
+				      */
+    template<typename number2>
+    void Tadd (const FullMatrix<number2> &src,
+	      const double factor,
+	      const unsigned int dst_offset_i = 0,
+	      const unsigned int dst_offset_j = 0,
+	      const unsigned int src_offset_i = 0,
+	      const unsigned int src_offset_j = 0);
+    
+				     /**
 				      * Matrix-matrix-multiplication.
 				      *
 				      * The optional parameter

@@ -892,6 +892,31 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
 
 template <typename number>
 template <typename number2>
+void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
+			      const double factor,
+			      const unsigned int dst_offset_i,
+			      const unsigned int dst_offset_j,
+			      const unsigned int src_offset_i,
+			      const unsigned int src_offset_j)
+{
+				   // Compute maximal size of copied block
+  const unsigned int rows = (m() - dst_offset_i >= src.n() - src_offset_i)
+			    ? src.n()
+			    : m();
+  const unsigned int cols = (n() - dst_offset_j >= src.m() - src_offset_j)
+			    ? src.m()
+			    : n();
+  
+  for (unsigned int i=0; i<rows ; ++i)
+    for (unsigned int j=0; j<cols ; ++j)
+      this->el(dst_offset_i+i,dst_offset_j+j)
+	+= factor * src.el(src_offset_i+j,src_offset_j+i);
+}
+
+
+
+template <typename number>
+template <typename number2>
 void
 FullMatrix<number>::add_diag (const number s, const FullMatrix<number2>& src)
 {
