@@ -73,7 +73,7 @@ AutoDerivativeFunction<dim>::gradient (const Point<dim>   &p,
     {
       case UpwindEuler:
       {
-	Tensor<1,dim> q1;
+	Point<dim> q1;
 	for (unsigned int i=0; i<dim; ++i)
 	  {
 	    q1=p-ht[i];
@@ -83,7 +83,7 @@ AutoDerivativeFunction<dim>::gradient (const Point<dim>   &p,
       }
       case Euler:
       {
-	Tensor<1,dim> q1, q2;
+	Point<dim> q1, q2;
 	for (unsigned int i=0; i<dim; ++i)
 	  {
 	    q1=p+ht[i];
@@ -94,7 +94,7 @@ AutoDerivativeFunction<dim>::gradient (const Point<dim>   &p,
       }
       case FourthOrder:
       {
-	Tensor<1,dim> q1, q2, q3, q4;
+	Point<dim> q1, q2, q3, q4;
 	for (unsigned int i=0; i<dim; ++i)
 	  {
 	    q2=p+ht[i];
@@ -126,7 +126,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
     {
       case UpwindEuler:
       {
-	Tensor<1,dim> q1;
+	Point<dim> q1;
 	Vector<double> v(n_components), v1(n_components);
 	const double h_inv=1./h;
 	for (unsigned int i=0; i<dim; ++i)
@@ -142,7 +142,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
       }
       case Euler:
       {
-	Tensor<1,dim> q1, q2;
+	Point<dim> q1, q2;
 	Vector<double> v1(n_components), v2(n_components);
 	const double h_inv_2=1./(2*h);
 	for (unsigned int i=0; i<dim; ++i)
@@ -159,7 +159,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
       }
       case FourthOrder:
       {
-	Tensor<1,dim> q1, q2, q3, q4;
+	Point<dim> q1, q2, q3, q4;
 	Vector<double> v1(n_components), v2(n_components), v3(n_components), v4(n_components);
 	const double h_inv_12=1./(12*h);
 	for (unsigned int i=0; i<dim; ++i)
@@ -196,7 +196,7 @@ void AutoDerivativeFunction<dim>::gradient_list (const typename std::vector<Poin
     {
       case UpwindEuler:
       {
-	Tensor<1,dim> q1;
+	Point<dim> q1;
 	for (unsigned p=0; p<points.size(); ++p)
 	  for (unsigned int i=0; i<dim; ++i)
 	    {
@@ -207,7 +207,7 @@ void AutoDerivativeFunction<dim>::gradient_list (const typename std::vector<Poin
       }
       case Euler:
       {
-	Tensor<1,dim> q1, q2;
+	Point<dim> q1, q2;
 	for (unsigned p=0; p<points.size(); ++p)
 	  for (unsigned int i=0; i<dim; ++i)
 	    {
@@ -219,7 +219,7 @@ void AutoDerivativeFunction<dim>::gradient_list (const typename std::vector<Poin
       }
       case FourthOrder:
       {
-	Tensor<1,dim> q1, q2, q3, q4;
+	Point<dim> q1, q2, q3, q4;
 	for (unsigned p=0; p<points.size(); ++p)
 	  for (unsigned int i=0; i<dim; ++i)
 	    {
@@ -257,7 +257,7 @@ vector_gradient_list (const typename std::vector<Point<dim> >            &points
     {
       case UpwindEuler:
       {
-	Tensor<1,dim> q1;
+	Point<dim> q1;
 	for (unsigned p=0; p<points.size(); ++p)
 	  for (unsigned int i=0; i<dim; ++i)
 	    {
@@ -269,7 +269,7 @@ vector_gradient_list (const typename std::vector<Point<dim> >            &points
       }
       case Euler:
       {
-	Tensor<1,dim> q1, q2;
+	Point<dim> q1, q2;
 	for (unsigned p=0; p<points.size(); ++p)
 	  for (unsigned int i=0; i<dim; ++i)
 	    {
@@ -282,7 +282,7 @@ vector_gradient_list (const typename std::vector<Point<dim> >            &points
       }
       case FourthOrder:
       {
-	Tensor<1,dim> q1, q2, q3, q4;
+	Point<dim> q1, q2, q3, q4;
 	for (unsigned p=0; p<points.size(); ++p)
 	  for (unsigned int i=0; i<dim; ++i)
 	    {
