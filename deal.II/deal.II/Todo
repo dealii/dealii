@@ -29,23 +29,12 @@ Unify CellAccessor<1> and <2> by renaming
   Do the same with DoFLineAccessor and DoFQuadAccessor
 
 
-Unify FEValues<dim> and FEFaceValues<dim> to FEValues<dim,subdim>
-  and use partial specialization.
-
-
-Add support for fast assemblage of mass matrices.
-
-
 Make AssemblerData a local class to Assembler again if gcc2.8 supports it.
 
 
 Let ParameterHandler and DataIn/Out throw exceptions. Make more tests
   on the input. Same for output: check whether file could be created etc.
   
-
-Replace function objects by mem_fun, fun_ptr, ... when member function
-  templates are supported.
-
 
 Remove gcc2.8 workaround with DoFSubstructAccessor
 
@@ -68,7 +57,9 @@ Update DoFHandler::distribute_cell_to_dof_vector for higher order
 Remove FiniteElementData<>::operator == and let it be generated
   implicitely.
 
-Look at the fill_fe_values functions for possible optimizations.
+
+Look at the fill_fe_values functions for possible optimizations
+  since this is one of the most often called functions.
 
 
 Try to find out what happens if DoFAccessor::get_dof_values is
@@ -81,7 +72,7 @@ Change <iostream> to <ostream> in grid/point.h and
   grid/tria_iterator.h when this becomes possible.
 
 
-Find and fix the bug in Tria::refine_fixed_fraction
+Fix all those workarounds in Tria::refine_fixed_fraction
 
 
 Fill in docs for the timer class.
@@ -106,7 +97,16 @@ Remove the this-> coding in tria_iterator.templates.h. These were
 Re-enable printing of a preamble to ucd files in data_io.cc.
 
 
-Implement coarsening of grids and update docs for that.
+Implement coarsening of grids and update docs for that. Note the
+  difference between refinement and coarsening: refinement
+  deliberately adds additional refinment flags to keep consistency
+  and thus refining all cells which were flagged for refinement.
+  Coarsening on the contrary never deletes additional cells.
+  Update algo section in tria docs for new smoothing strategies.
+
+  What happens if cells on the coarest level are flagged??
+
+
 
 Check all places where condensation of matrices/vectors and
   application of boundary values takes place. I am not sure about
@@ -117,11 +117,12 @@ Check all places where condensation of matrices/vectors and
   of the 3D library.
 
 
+Delete exception Triangulation<>::ExcUnusedMemoryAtEnd
+
+
 
 
 DEAL:
-Let an empty dfmatrix assume it has dimensions zero rather than one!
-
 Is dvector::operator= (double) really useful or does it make more
   confusion than it helps?
 
@@ -133,6 +134,8 @@ Let all the reinit functions in /lac free their memory, if reinit
   is called with less requirements. Maybe give free all memory
   if the given dimension is zero. If so, check all deal.II files
   for use of reinit. (At present, new dimension==0 is not allowed.)
+  [Done for dFMatrix and dVector; still to be done for the other
+  classes.]
 
 Why are there all these unsafe casts from VectorBase to dVector
   in dvector.cc?
