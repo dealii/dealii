@@ -17,3 +17,16 @@ include $D/common/Make.global_options
 %.o : %.cc Makefile
 	@echo =====optimized===== $<
 	@$(CXX) $(flags) -c $< -o $@
+
+############################################################
+# Automatic generation of dependencies
+############################################################
+
+all-cc-files = $(shell echo *.cc)
+
+Makefile.depend: $(all-cc-files)
+	@echo =====Dependencies== Make.depend
+	@$(CXX) $(flags) $^ -M > $@
+	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.g.o:/;' $@
+
+include Makefile.depend
