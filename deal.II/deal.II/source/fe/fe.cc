@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <numeric>
 
 
 // if necessary try to work around a bug in the IBM xlC compiler
@@ -409,7 +410,13 @@ compute_2nd (const Mapping<dim>                   &mapping,
   Assert ((fe_internal.update_each | fe_internal.update_once)
 	  & update_second_derivatives,
 	  ExcInternalError());
-  Assert (data.shape_2nd_derivatives.n_rows() == this->dofs_per_cell,
+
+  const unsigned int total_nonzero_components
+    = std::accumulate (n_nonzero_components_table.begin(),
+                       n_nonzero_components_table.end(),
+                       0U);
+  
+  Assert (data.shape_2nd_derivatives.n_rows() == total_nonzero_components,
 	  ExcInternalError());
 				   // Number of quadrature points
   const unsigned int n_q_points = data.shape_2nd_derivatives.n_cols();
@@ -430,51 +437,84 @@ compute_2nd (const Mapping<dim>                   &mapping,
   Table<2,Tensor<1,dim> >    diff_quot (dim, n_q_points);
   std::vector<Tensor<1,dim> > diff_quot2 (n_q_points);
 
-				   // for all shape functions at all
+				   // for all nonzero components of
+				   // all shape functions at all
 				   // quadrature points and difference
 				   // quotients in all directions:
-  for (unsigned int shape=0; shape<this->dofs_per_cell; ++shape)
-    {
-      for (unsigned int d1=0; d1<dim; ++d1)
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-					     // get gradient at points
-					     // shifted slightly to
-					     // the right and to the
-					     // left in the present
-					     // coordinate direction
-	    const Tensor<1,dim>& right
-	      = fe_internal.differences[d1]->shape_grad(shape, q);
-	    const Tensor<1,dim>& left
-	      = fe_internal.differences[d1+dim]->shape_grad(shape, q);
+  unsigned int total_index = 0;
+  for (unsigned int shape_index=0; shape_index<this->dofs_per_cell; ++shape_index)
+    for (unsigned int n=0; n<n_nonzero_components(shape_index); ++n, ++total_index)
+      {
+        for (unsigned int d1=0; d1<dim; ++d1)
+          for (unsigned int q=0; q<n_q_points; ++q)
+            {
+                                               // get gradient at points
+                                               // shifted slightly to
+                                               // the right and to the
+                                               // left in the present
+                                               // coordinate direction
+                                               //
+                                               // note that things
+                                               // might be more
+                                               // difficult if the
+                                               // shape function has
+                                               // more than one
+                                               // non-zero component,
+                                               // so find out about
+                                               // the actual component
+                                               // if necessary
+              Tensor<1,dim> right, left;
+              if (is_primitive(shape_index))
+                {
+                  right = fe_internal.differences[d1]->shape_grad(shape_index, q);
+                  left  = fe_internal.differences[d1+dim]->shape_grad(shape_index, q);
+                }
+              else
+                {
+                                                   // get the
+                                                   // component index
+                                                   // of the n-th
+                                                   // nonzero
+                                                   // compoment
+                  unsigned int component=0;
+                  for (unsigned int k=0; k<=n; ++k)
+                    while (nonzero_components[shape_index][component] == false)
+                      ++component;
+                  Assert (component < n_components(), ExcInternalError());
 
-					     // compute the second
-					     // derivative from a
-					     // symmetric difference
-					     // approximation
-	    for (unsigned int d=0; d<dim; ++d)
-	      diff_quot[d][q][d1] = 1./(2*fd_step_length) * (right[d]-left[d]);
-	  }
-
-				       // up to now we still have
-				       // difference quotients on the
-				       // unit cell, so transform it
-				       // to something on the real
-				       // cell
-      for (unsigned int d=0; d<dim; ++d)
-	{
-	  Assert (diff_quot2.size() <=
-		  diff_quot[d].size(),
-		  ExcInternalError());
-	  mapping.transform_covariant (&*diff_quot2.begin(), &*diff_quot2.end(),
-				       diff_quot[d].begin(),
-				       mapping_internal);
-
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    for (unsigned int d1=0; d1<dim; ++d1)
-	      data.shape_2nd_derivatives[shape][q][d][d1] = diff_quot2[q][d1];
-	}
-    }
+                  right = fe_internal.differences[d1]
+                          ->shape_grad_component(shape_index, q, component);
+                  left  = fe_internal.differences[d1+dim]
+                          ->shape_grad_component(shape_index, q, component);
+                };
+              
+                                               // compute the second
+                                               // derivative from a
+                                               // symmetric difference
+                                               // approximation
+              for (unsigned int d=0; d<dim; ++d)
+                diff_quot[d][q][d1] = 1./(2*fd_step_length) * (right[d]-left[d]);
+            }
+        
+                                         // up to now we still have
+                                         // difference quotients on the
+                                         // unit cell, so transform it
+                                         // to something on the real
+                                         // cell
+        for (unsigned int d=0; d<dim; ++d)
+          {
+            Assert (diff_quot2.size() <=
+                    diff_quot[d].size(),
+                    ExcInternalError());
+            mapping.transform_covariant (&*diff_quot2.begin(), &*diff_quot2.end(),
+                                         diff_quot[d].begin(),
+                                         mapping_internal);
+            
+            for (unsigned int q=0; q<n_q_points; ++q)
+              for (unsigned int d1=0; d1<dim; ++d1)
+                data.shape_2nd_derivatives[total_index][q][d][d1] = diff_quot2[q][d1];
+          }
+      }
 }
 
 
