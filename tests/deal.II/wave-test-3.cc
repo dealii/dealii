@@ -3136,7 +3136,7 @@ if (parameters.compare_indicators_globally)
 	   << std::endl;
       deallog << "    Now refining...";
       do_loop (mem_fun (&TimeStepBase_Tria<dim>::init_for_refinement),
-	       bind2nd (mem_fun1 (&TimeStepBase_Wave<dim>::refine_grid),
+	       bind2nd (mem_fun (&TimeStepBase_Wave<dim>::refine_grid),
 			TimeStepBase_Tria<dim>::RefinementData (top_threshold,
 								bottom_threshold)),
 	       TimeDependent::TimeSteppingData (0,1),
