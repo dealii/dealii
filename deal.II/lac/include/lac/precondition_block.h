@@ -570,6 +570,11 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
     PreconditionBlock<MATRIX, inverse_type>::block_size;
     
 				     /**
+				      * Make function public.
+				      */
+    PreconditionBlock<MATRIX, inverse_type>::n_blocks;
+    
+				     /**
 				      * Execute block Jacobi
 				      * preconditioning.
 				      *
