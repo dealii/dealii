@@ -24,7 +24,7 @@ define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_REVISION($Revision$)
 AC_PREREQ(2.50)
-AC_INIT(base)
+AC_INIT(deal.II, 3.5, dealii@dealii.org)
 
 dnl Where the output config file is located
 AC_CONFIG_HEADER(base/include/base/config.h)
