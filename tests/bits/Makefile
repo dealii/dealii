@@ -31,11 +31,12 @@ gerold_1.exe            : gerold_1.g.$(OBJEXT)            $(libraries)
 roy_1.exe               : roy_1.g.$(OBJEXT)               $(libraries)
 denis_1.exe             : denis_1.g.$(OBJEXT)             $(libraries)
 unit_support_points.exe : unit_support_points.g.$(OBJEXT) $(libraries)
+parameter_handler_1.exe : parameter_handler_1.g.$(OBJEXT) $(libraries)
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 \
 	roy_1 \
         denis_1 \
-	unit_support_points
+	unit_support_points parameter_handler_1
 
 ############################################################
 
