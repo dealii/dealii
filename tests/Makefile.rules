@@ -10,8 +10,9 @@
 
 normalize = $D/common/scripts/normalize.pl
 
-verbose = off
+WORKDIR = $(notdir $(shell pwd))
 
+verbose = off
 
 ############################################################
 # First how to create executables, including all necessary
@@ -79,9 +80,9 @@ endif
 	@echo '=====Checking======' $<
 	@perl -pi $(normalize)  $<
 	@if test "x$(verbose)" = "xon" ; then \
-		cmd="diff -w $< $(patsubst %.output,%.checked, $<)" ; \
+		cmd="diff -w $< ../compare/$(WORKDIR)/$<" ; \
 	 else \
-		cmd="diff -w $< $(patsubst %.output,%.checked, $<) > /dev/null" ; \
+		cmd="diff -w $< ../compare/$(WORKDIR)/$< > /dev/null" ; \
 	 fi ; \
 	 if eval $$cmd ; then \
 		echo '=====OK============' $@ ; \
@@ -119,12 +120,11 @@ report:
 ############################################################
 # After all these general rules, here is the target to be
 # executed by make: for each entry in the list $(tests)
-# perform a check. Do it in alphabetical order for better
-# overview
+# perform a check.
 ############################################################
 run-tests: $(tests:%=%.OK)
 
-
+output: $(tests:%=%.output)
 
 
 ############################################################

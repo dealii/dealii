@@ -2,24 +2,24 @@
 # Makefile,v 1.14 2002/09/19 13:53:47 wolf Exp
 # Common Makefile for all test directories
 
-all: base lac fe deal.II bits
+all: compare base lac fe deal.II bits
 
-base:
+base: compare
 	cd base ; $(MAKE)
 
-lac:
+lac: compare
 	cd lac ; $(MAKE)
 
-fe:
+fe: compare
 	cd fe ; $(MAKE)
 
-bits:
+bits: compare
 	cd bits ; $(MAKE)
 
-deal.II:
+deal.II: compare
 	cd deal.II ; $(MAKE)
 
-report:
+report: compare
 	@for i in base lac fe deal.II bits ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
@@ -62,6 +62,11 @@ all-headers:
 	 done
 	@rm -rf tmp-all-headers
 
+# Generate a link to system specific test program output
+
+compare:
+	cd results; $(MAKE)
+	ln -s results/$(TARGET)+$(GXX-VERSION) compare
 
 clean: clean-base clean-lac clean-deal.II clean-fe clean-bits
 veryclean: veryclean-base veryclean-lac veryclean-deal.II veryclean-fe veryclean-bits

@@ -30,7 +30,6 @@ sparse_matrices.exe       : sparse_matrices.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $
 sparse_matrices.opt.exe   : sparse_matrices.$(OBJEXT) testmatrix.$(OBJEXT) $(libraries_o)
 sparsity_pattern.exe      : sparsity_pattern.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
 sparse_ilu.exe            : sparse_ilu.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
-sparse_matrix_ez_iterator.exe : sparse_matrix_ez_iterator.g.$(OBJEXT)   $(libraries)
 vector-vector.exe         : vector-vector.g.$(OBJEXT)                   $(libraries)
 #mgbase.exe               : mgbase.g.$(OBJEXT)                          $(libraries)
 #mg.exe                   : mg.g.$(OBJEXT) testmatrix.g.$(OBJEXT)       $(libraries)
@@ -40,7 +39,7 @@ tests = $(sort \
           sparse_matrices block_matrices block_vector block_vector_iterator \
           full_matrix \
           matrix_out solver sparsity_pattern sparse_ilu \
-          sparse_matrix_ez_iterator vector-vector)
+          vector-vector)
 
 ############################################################
 

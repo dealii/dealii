@@ -197,18 +197,12 @@ void
 test ()
 {
   Triangulation<dim> triangulation;
-  if (dim != 2)
-    GridGenerator::hyper_cube (triangulation);
-  else
-    GridGenerator::hyper_cube_slit (triangulation);    
+  
+  GridGenerator::hyper_cube (triangulation);
+
   triangulation.refine_global (1);
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
-  triangulation.last_active()->set_refine_flag ();
-  triangulation.execute_coarsening_and_refinement();
-
-  if (dim < 3)
-    triangulation.refine_global (1);
 
   deallog << "dim=" << dim
 	  << ", n_cells=" << triangulation.n_active_cells()

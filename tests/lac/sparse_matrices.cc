@@ -113,10 +113,26 @@ check_iterator (const MATRIX& A)
 }
 
 
+void check_ez_iterator()
+{
+  SparseMatrixEZ<float> m (6, 6, 0);
+  m.set (0, 0, 1.);
+  m.set (1, 0, 2.);
+  m.set (2, 0, 3.);
+  m.set (2, 2, 0.);  // should be ignored
+  m.set (0, 1, 1.);
+  m.set (0, 2, 2.);
+  m.set (0, 3, 3.);
+  m.set (4, 3, 17.);
+
+  check_iterator(m);
+}
+
+
 int main()
 {
   std::ofstream logfile("sparse_matrices.output");
-  logfile.setf(std::ios::fixed);
+//  logfile.setf(std::ios::fixed);
   logfile.precision(2);
   deallog.attach(logfile);
 
@@ -133,6 +149,8 @@ int main()
   const unsigned int size = 50;
   const unsigned int row_length = 9;
 #endif
+  
+  check_ez_iterator();
   
   FDMatrix testproblem (size, size);
   unsigned int dim = (size-1)*(size-1);
@@ -187,7 +205,6 @@ int main()
     if (std::fabs(A_res[i] - E_res[i]) > 1.e-14)
       deallog << "SparseMatrix and SparseMatrixEZ differ!!!"
 	      << std::endl;
-
                                    // dump A into a file, and re-read
                                    // it, then delete tmp file and
                                    // check equality
@@ -204,7 +221,8 @@ int main()
   remove ("sparse_matrices.tmp");
 
   for (unsigned int i=0; i<A.n_nonzero_elements(); ++i)
-    Assert (std::fabs(A.global_entry(i) - A_tmp.global_entry(i)) <=
-            std::fabs(1e-14*A.global_entry(i)),
-            ExcInternalError());
+    if (std::fabs(A.global_entry(i) - A_tmp.global_entry(i)) <=
+            std::fabs(1e-14*A.global_entry(i)))
+      deallog << "write/read-error at global position "
+	      << i << std::endl;
 }
