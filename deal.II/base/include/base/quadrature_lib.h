@@ -10,7 +10,7 @@
 
 
 /**
- *  2-Point-Gauss quadrature formula.
+ *  2-Point-Gauss quadrature formula, exact for polynomials of degree 3.
  *
  *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
  */
@@ -24,7 +24,7 @@ class QGauss2 : public Quadrature<dim>
 
 
 /**
- *  3-Point-Gauss quadrature formula.
+ *  3-Point-Gauss quadrature formula, exact for polynomials of degree 5.
  *
  *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
  */
@@ -38,7 +38,7 @@ class QGauss3 : public Quadrature<dim>
 
 
 /**
- * 4-Point-Gauss quadrature formula.
+ * 4-Point-Gauss quadrature formula, exact for polynomials of degree 7.
  *
  *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
  */
@@ -53,7 +53,7 @@ class QGauss4 : public Quadrature<dim>
 
 
 /**
- *  5-Point-Gauss quadrature formula.
+ *  5-Point-Gauss quadrature formula, exact for polynomials of degree 9.
  *
  *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
  */
@@ -67,7 +67,8 @@ class QGauss5 : public Quadrature<dim>
 
 
 /**
- *  6-Point-Gauss quadrature formula. I have not found explicite
+ *  6-Point-Gauss quadrature formula, exact for polynomials of degree 11.
+ *  I have not found explicite
  *  representations of the zeros of the Legendre functions of sixth
  *  and higher degree. If anyone finds them, please replace the existing
  *  numbers by these expressions.
@@ -85,7 +86,8 @@ class QGauss6 : public Quadrature<dim>
 
 
 /**
- *  7-Point-Gauss quadrature formula. I have not found explicite
+ *  7-Point-Gauss quadrature formula, exact for polynomials of degree 13.
+ *  I have not found explicite
  *  representations of the zeros of the Legendre functions of sixth
  *  and higher degree. If anyone finds them, please replace the existing
  *  numbers by these expressions.
@@ -103,7 +105,8 @@ class QGauss7 : public Quadrature<dim>
 
 
 /**
- *  8-Point-Gauss quadrature formula. I have not found explicite
+ *  8-Point-Gauss quadrature formula, exact for polynomials of degree 15.
+ *  I have not found explicite
  *  representations of the zeros of the Legendre functions of sixth
  *  and higher degree. If anyone finds them, please replace the existing
  *  numbers by these expressions.
@@ -123,7 +126,7 @@ class QGauss8 : public Quadrature<dim>
 
 
 /**
- * First order midpoint quadrature rule.
+ * Midpoint quadrature rule, exact for linear polynomials.
  * For compatibility, this rule may be accessed as #QGauss1#, too.
  */
 template <int dim>
@@ -136,7 +139,7 @@ class QMidpoint : public Quadrature<dim>
 #define QGauss1 QMidpoint
 
 /**
- * Simpson quadrature rule.
+ * Simpson quadrature rule, exact for polynomials of degree 3. 
  */
 template <int dim>
 class QSimpson : public Quadrature<dim>
@@ -148,7 +151,7 @@ class QSimpson : public Quadrature<dim>
 
 
 /**
- * Trapezoidal quadrature rule.
+ * Trapezoidal quadrature rule, exact for linear polynomials.
  */
 template <int dim>
 class QTrapez : public Quadrature<dim>

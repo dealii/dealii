@@ -20,18 +20,36 @@
  *
  * There are a number of derived classes, denoting concrete integration
  * formulae. These are named by a prefixed #Q#, the name of the formula
- * (e.g. #Gauss#) and finally the order of integration. For example,
- * #QGauss2<dim># denotes a second order Gauss integration formula in
- * any dimension. Second order means that it integrates polynomials of
- * third order exact. In general, a formula of order #n# exactly
- * integrates polynomials of order #2n-1#.
+ * (e.g. #Midpoint# or #Gauss#) and finally (only for Gauss integration 
+ * formulae) the number of quadrature points.
+ *
+ * For each quadrature formula
+ * there exists a number #m#, that denotes the maximal degree of polynomials
+ * the formula of integration is exact for. This number is given 
+ * in the documentation of each formula. The order of integration is then
+ * given by #m+1#, that means that the error representation of the quadrature 
+ * formula includes the $(m+1).$ derivative of the function to be integrated.
+ * As the $(m+1).$ derivate of polynomials of degree #m# is 0, the order of
+ * integration is always one larger than the degree of polynomials the
+ * quadrature formula is exact for. For example, the #Midpoint# quadrature
+ * formula is exact for polynomials of degree 1 (linear polynomials) and its order
+ * of integration is 2, i.e. `The midpoint-formula is of order 2'.
+ * 
+ * Note the special case of Gauss integration formulae: The number #n# in the
+ * n-Point-Gauss Quadrature formula #QGaussn# denotes the number of quadrature
+ * points of the formula in one dimension. This formula is exact for polynomials
+ * of degree #2n-1# and its order of integration is #2n#. For example,
+ * #QGauss2<1># denotes the 2-Point-Gauss quadrature formula in 1 dimension.
+ * It is exact for polynomials of degree 3 and its order of integration is 4.
  *
  * Most integration formulae in more than one space dimension are tensor
  * products of quadrature formulae in one space dimension, or more
  * generally the tensor product of a formula in #(dim-1)# dimensions and
  * one in one dimension. There is a special constructor to generate a
  * quadrature formula from two others.
- *
+ * For example, the #QGauss2<dim># formulae includes $2^dim$ quadrature points
+ * in #dim# dimensions but is still exact for polynomials of degree 3 and its
+ * order of integration is 4.
  *
  * For some programs it is necessary to have a quadrature object for faces.
  * These programs fail to link if compiled for only one space dimension,
@@ -44,7 +62,7 @@
  * necessary to provide a class #Point<0># to make the compiler happy. This
  * class also does nothing.
  *
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, documentation: Ralf Hartmann, 1999
  */
 template <int dim>
 class Quadrature {
