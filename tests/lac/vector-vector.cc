@@ -20,7 +20,7 @@
 
 
 
-const unsigned int N=50;
+const unsigned int N=10;
 unsigned int check_point = 0;
 
 
@@ -29,11 +29,11 @@ unsigned int check_point = 0;
 template <typename number>
 void print (const Vector<number> &v) 
 {
-  deallog << "Check point " << check_point << endl;
-  check_point++;
+//  deallog << "Check point " << check_point << endl;
+//  check_point++;
   
   for (unsigned int i=0; i<v.size(); ++i)
-    deallog << v(i) << ' ';
+    deallog << v(i) << '\t';
   deallog << endl;
 };
 
@@ -42,14 +42,20 @@ void print (const Vector<number> &v)
 template <typename number1, typename number2>
 void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
 {
+  deallog << "Fill & Swap" << endl;
+  Vector<number1> d3(d1.size());
+  print (d3);
+  
   for (unsigned int i=0; i<N; ++i)
     {
-      d1(i) = 1. * i / 3;
-      d2(i) = d1(i)*d1(i) / 2;
+      d1(i) = 2. * i;
+      d2(i) = .5 * d1(i)*d1(i);
+      d3(i) = 2. - .5 * i;
     };
 
   print (d1);
   print (d2);
+  print (d3);
 
   swap (d1, d2);
   print (d1);
@@ -57,44 +63,79 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
   d1 = d2;
   print (d1);
   
-  d1 = 2.871;
+  d1 = 2.5;
   print (d1);
   
-  deallog << d1 * d2 << ' ' << d2.norm_sqr() << endl;
-  deallog << d1.mean_value() << ' ' << d2.l1_norm() << endl;
-  deallog << d1.l2_norm() << ' ' << d1.linfty_norm() << endl;
+  deallog << "Extract number" << endl;
+				   // Each line should contain two equal numbers
+  double sum = 0.;
+  for (unsigned int i=0;i<N;++i)
+    sum += 4.*i-i*i;
+  deallog << d3 * d2 << '\t' << sum << endl;
 
+  sum = 0.;
+  for (unsigned int i=0;i<N;++i)
+    sum += 4.*i*i;
+  deallog << d2.norm_sqr() << '\t' << sum << endl;
+
+  sum = sqrt(sum);
+  deallog << d2.l2_norm() << '\t' << sum << endl;
+
+  sum = 0.;
+  for (unsigned int i=0;i<N;++i)
+    sum += (2.-.5*i)/N;
+  deallog << d3.mean_value() << '\t' << sum << endl;
+
+  sum = 0.;
+  for (unsigned int i=0;i<N;++i)
+    sum += fabs(2.-.5*i);
+  deallog << d3.l1_norm() << '\t' << sum << endl;
+
+  sum = 0.;
+  for (unsigned int i=0;i<N;++i)
+    {
+      double t = fabs(2.-.5*i);
+      if (t>sum) sum = t;
+    }
+  deallog << d3.linfty_norm() << '\t' << sum << endl;
+
+  deallog << "add & sub" << endl;
+  
   d1 += d2;
   print (d1);
   
   d2 -= d1;
   print (d2);
   
-  d1.add (2.54);
+  d1.add (1.5);
   print (d1);
   
-  d1.add (6.7, d2);
+  d1.add (2, d3);
   print (d1);
   
-  d1.add (2.3, d2, 3.4, d2);
+  d1.add (2., d2, .5, d3);
   print (d1);
   
-  d2.sadd (1.1, d1);
+  deallog << "sadd & scale" << endl;
+  
+  d2.sadd (2., d1);
   print (d2);
   
-  d2.sadd (1.3, 1.7, d1);
+  d2.sadd (2., .5, d1);
   print (d2);
   
-  d1.sadd (12, 17, d2, 14, d2);
+  d1.sadd (2, 2, d2, 2, d3);
   print (d1);
   
-  d1.scale (3.14154);
+  d1.scale (4.);
   print (d1);
   
-  d2.equ (1.569, d1);
+  deallog << "equ" << endl;
+  
+  d2.equ (.25, d1);
   print (d2);
   
-  d2.equ (1.876, d1, 1867, d1);
+  d2.equ (.25, d1, 2, d3);
   print (d2);
   
   d1.ratio (d1, d2);
@@ -106,7 +147,7 @@ int main()
 {
   ofstream logfile("vector-vector.output");
   logfile.setf(ios::fixed);
-  logfile.precision(5);
+  logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
   
