@@ -18,7 +18,7 @@ ConditionalOStream pout;
 
 
 ConditionalOStream::ConditionalOStream():
-		std_out(&cout),
+		std_out(&std::cout),
 		active_flag(true)
 {}
 
