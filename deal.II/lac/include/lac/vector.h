@@ -717,6 +717,18 @@ Vector<Number> & Vector<Number>::operator *= (const Number factor)
 
 
 
+
+template <typename Number>
+inline
+Vector<Number> & Vector<Number>::operator = (const Number s)
+{
+  Assert (dim!=0, ExcEmptyVector());
+  std::fill (begin(), end(), s);
+  return *this;
+}
+
+
+
 /**
  * Global function @p{swap} which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The

@@ -488,16 +488,6 @@ void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b)
 
 
 template <typename Number>
-Vector<Number>& Vector<Number>::operator = (const Number s)
-{
-  Assert (dim!=0, ExcEmptyVector());
-  std::fill (begin(), end(), s);
-  return *this;
-}
-
-
-
-template <typename Number>
 Vector<Number>&
 Vector<Number>::operator = (const Vector<Number>& v)
 {
