@@ -83,7 +83,8 @@ Polynomial<number>::value (const number         x,
 				   // differentiate the polynomial
 				   // more often than the highest
 				   // power is
-  for (unsigned int j=0; j<std::min(values_size, m); ++j)
+  const unsigned int min_valuessize_m=std::min(values_size, m);
+  for (unsigned int j=0; j<min_valuessize_m; ++j)
     {
       for (int k=m-2; k>=static_cast<int>(j); --k)
 	a[k]+=x*a[k+1];
@@ -93,7 +94,7 @@ Polynomial<number>::value (const number         x,
     }
 
 				   // fill higher derivatives by zero
-  for (unsigned int j=std::min(values_size,m); j<values_size; ++j)
+  for (unsigned int j=min_valuessize_m; j<values_size; ++j)
     values[j] = 0;
 }
 
