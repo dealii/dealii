@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 2003, 2004, 2005 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -51,7 +51,7 @@
 #include <multigrid/mg_transfer.h>
                                  // And a file in which equivalents to the
                                  // DoFTools class are declared:
-#include <multigrid/mg_dof_tools.h>
+#include <multigrid/mg_tools.h>
 
 #include <multigrid/mg_coarse.h>
 #include <multigrid/mg_smoother.h>

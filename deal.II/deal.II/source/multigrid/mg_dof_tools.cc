@@ -24,7 +24,7 @@
 #include <grid/tria_iterator.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
-#include <multigrid/mg_dof_tools.h>
+#include <multigrid/mg_tools.h>
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
 #include <dofs/dof_tools.h>

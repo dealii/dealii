@@ -10,8 +10,10 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__mg_dof_tools_h
-#define __deal2__mg_dof_tools_h
+#ifndef __deal2__mg_tools_h
+#define __deal2__mg_tools_h
+
+// This file moved here from mg_dof_tools.h Revision 1.36
 
 #include <base/config.h>
 #include <dofs/dof_tools.h>

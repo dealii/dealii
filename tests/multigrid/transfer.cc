@@ -25,7 +25,7 @@
 #include <fe/fe_system.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_transfer.h>
-#include <multigrid/mg_dof_tools.h>
+#include <multigrid/mg_tools.h>
 #include <multigrid/mg_level_object.h>
 
 #include <fstream>
