@@ -1,12 +1,11 @@
 // $Id$
 
 #include <numerics/multigrid.h>
+#include <algorithm>
 #include <fstream>
 
-inline int minimum(int a, int b)
-{
-  return ((a<b) ? a : b);
-}
+
+
 
 template <int dim>
 MG<dim>::MG(const MGDoFHandler<dim>& dofs,
@@ -16,17 +15,19 @@ MG<dim>::MG(const MGDoFHandler<dim>& dofs,
 	    unsigned int minl, unsigned int maxl)
 		:
 		MGBase(transfer, minl,
-		       minimum(dofs.get_tria().n_levels()-1, maxl)),
+		       min(dofs.get_tria().n_levels()-1, maxl)),
 		dofs(&dofs),
 		matrices(&matrices),
 		hanging_nodes(hanging_nodes)
 {
   for (unsigned int level = minlevel; level<=maxlevel ; ++level)
     {
-      s[level].reinit(matrices[level].m());
-      d[level].reinit(matrices[level].m());
-    }
-}
+      solution[level].reinit(matrices[level].m());
+      defect[level].reinit(matrices[level].m());
+    };
+};
+
+
 
 template <int dim>
 template <typename number>
@@ -38,7 +39,7 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 
 				   // set the elements of the vectors
 				   // on all levels to zero
-  d.clear();
+  defect.clear();
 //  hanging_nodes.condense(src);
   
   vector<int> index(fe_dofs);
@@ -65,7 +66,7 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 	  dc->get_dof_indices(index);
 	  c->get_mg_dof_indices(mgindex);
 	  for (unsigned int i=0;i<fe_dofs;++i)
-	    d[c->level()](mgindex[i]) = src(index[i]);
+	    defect[c->level()](mgindex[i]) = src(index[i]);
 
 					   // Delete values on refinement edge
 	  for (unsigned int face_n = 0; face_n< GeometryInfo<dim>::faces_per_cell; ++face_n)
@@ -75,14 +76,14 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 		{
 		  face->get_mg_dof_indices(mgfaceindex);
 		  for (unsigned int i=0;i<face_dofs;++i)
-		    d[c->level()](mgfaceindex[i]) = 0.;
+		    defect[c->level()](mgfaceindex[i]) = 0.;
 		}
 	    }
 	}
 //      if (level > (int) minlevel)
 //        transfer->restrict(level, d[level-1], d[level]);
       if (level < (int) maxlevel)
-	transfer->restrict(level+1, d[level], d[level+1]);
+	transfer->restrict(level+1, defect[level], defect[level+1]);
     }
   
 //   for (unsigned int i=minlevel; i<= maxlevel; ++i)
@@ -94,7 +95,8 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 //     }
 }
 
-template <int dim> template <typename number>
+template <int dim>
+template <typename number>
 void
 MG<dim>::copy_from_mg(Vector<number>& dst) const
 {
@@ -112,13 +114,13 @@ MG<dim>::copy_from_mg(Vector<number>& dst) const
 //     }
 
   DoFHandler<dim>::active_cell_iterator dc = dofs->DoFHandler<dim>::begin_active();
-  for (MGDoFHandler<dim>::active_cell_iterator c = dofs->begin_active()
-					    ; c != dofs->end() ; ++c, ++dc)
+  for (MGDoFHandler<dim>::active_cell_iterator c = dofs->begin_active();
+       c != dofs->end(); ++c, ++dc)
     {
       dc->get_dof_indices(index);
       c->get_mg_dof_indices(mgindex);
       for (unsigned int i=0;i<fe_dofs;++i)
-	dst(index[i]) = s[c->level()](mgindex[i]);
+	dst(index[i]) = solution[c->level()](mgindex[i]);
     } 
   hanging_nodes.set_zero(dst);
 //   {
@@ -129,6 +131,8 @@ MG<dim>::copy_from_mg(Vector<number>& dst) const
 //     out.write_gnuplot(of,1);
 //   }
 }
+
+
 
 template <int dim>
 void
