@@ -16,10 +16,10 @@
 # name and listing the modified file names.
 #
 # For example:
-DEFAULT		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/LOG/default
-^deal.*		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/LOG/deal
-^mia.*		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/LOG/mia
-^lac.*		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/LOG/lac
+DEFAULT		(echo ""; echo $USER %s; date; cat) >> $CVSROOT/LOG/default
+^deal.*		(echo ""; echo $USER %s; date; cat) >> $CVSROOT/LOG/deal
+^mia.*		(echo ""; echo $USER %s; date; cat) >> $CVSROOT/LOG/mia
+^lac.*		(echo ""; echo $USER %s; date; cat) >> $CVSROOT/LOG/lac
 
 
 
