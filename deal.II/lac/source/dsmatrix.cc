@@ -578,7 +578,7 @@ dSMatrix::precondition_Jacobi (dVector& dst, const dVector& src,
 				     // the diagonal entry is the first
 				     // in each row, i.e. at index
 				     // rowstart[i]
-    dst(i) = om * src(i) * val[cols->rowstart[i]];
+    dst(i) = om * src(i) / val[cols->rowstart[i]];
 };
 
 
