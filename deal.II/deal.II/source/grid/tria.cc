@@ -18,17 +18,25 @@
 
 
 
+template <int dim>
+const StraightBoundary<dim>& Triangulation<dim>::straight_boundary
+= StraightBoundary<dim>();
+
+
 
 
 
 template <int dim>
 Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 		Subscriptor (),
-		boundary (0),
 		smooth_grid(smooth_grid)
 {
-				   // set default boundary
-  set_boundary (0);
+				   // set default boundary for all possible components
+  for (unsigned int i=0;i<255;++i)
+    {
+      boundary[i] = &straight_boundary;
+      straight_boundary.subscribe();
+    }
   
   levels.push_back (new TriangulationLevel<dim>);
 };
@@ -36,7 +44,8 @@ Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 
 
 template <int dim>
-Triangulation<dim>::Triangulation (const Triangulation<dim> &) :
+Triangulation<dim>::Triangulation (const Triangulation<dim> &) 
+		:
 		Subscriptor ()      // do not set any subscriptors; anyway,
 			       // calling this constructor is an error!
 {
@@ -46,38 +55,38 @@ Triangulation<dim>::Triangulation (const Triangulation<dim> &) :
 
 
 template <int dim>
-Triangulation<dim>::~Triangulation () {
+Triangulation<dim>::~Triangulation ()
+{
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
 
-  boundary->unsubscribe ();
+  for (unsigned int i=0;i<255;++i)
+    boundary[i]->unsubscribe ();
   levels.clear ();
 };
 
 
-
 template <int dim>
-void Triangulation<dim>::set_boundary (const Boundary<dim> *boundary_object) {
-  static StraightBoundary<dim> default_boundary;
-
-  if (boundary != 0)
-    boundary->unsubscribe ();
-
-  if (boundary_object != 0)
-    boundary = boundary_object;
-  else
-    boundary = &default_boundary;
-
-  boundary->subscribe ();
+void
+Triangulation<dim>::set_boundary (unsigned int number,
+				  const Boundary<dim>& boundary_object)
+{
+  Assert(number<255, ExcIndexRange(number,0,255));
+  
+  boundary[number]->unsubscribe ();
+  boundary[number] = &boundary_object;
+  boundary_object.subscribe();
 };
 
 
 
 template <int dim>
 const Boundary<dim> &
-Triangulation<dim>::get_boundary () const 
+Triangulation<dim>::get_boundary (unsigned int number) const 
 {
-  return *boundary;
+  Assert(number<255, ExcIndexRange(number,0,255));
+  
+  return *(boundary[number]);
 };
 
 
@@ -150,7 +159,8 @@ Triangulation<3>::end () const {
 
 
 template <int dim>
-void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria) {
+void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
+{
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (n_cells () == 0, ExcTriangulationNotEmpty());
   Assert (levels.size () == 1, ExcTriangulationNotEmpty());
@@ -160,11 +170,12 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
   vertices_used = old_tria.vertices_used;
   smooth_grid   = old_tria.smooth_grid;
 
-  if (boundary)
-    boundary->unsubscribe ();
-  boundary      = old_tria.boundary;
-  boundary->subscribe ();
-
+  for (unsigned i=0;i<255;++i)
+    {
+      boundary[i]->unsubscribe ();
+      boundary[i]      = old_tria.boundary[i];
+      boundary[i]->subscribe ();
+    }
 				   // delete only level previously existing,
 				   // reserve space for new and copy
   delete levels[0];
@@ -4302,10 +4313,15 @@ void Triangulation<2>::execute_refinement () {
 						     // where shall we put the new
 						     // vertex?
 		    Point<2> new_point;
-		    if (cell->at_boundary(nb)) 
+		    
+		    face_iterator face=cell->line(nb);
+		    
+		    if ( face->boundary_indicator() != 255 )
+		      {
 						       // boundary vertex
-		      new_point = boundary->get_new_point_on_line (cell->line(nb));
-		    else {
+		      new_point = boundary[face->boundary_indicator()]->
+				  get_new_point_on_line (face);
+		      } else {
 							 // vertex between two
 							 // normal cells
 			new_point = vertices[new_vertices[2*nb]];
@@ -4773,7 +4789,7 @@ void Triangulation<3>::execute_refinement () {
 
 	    if (line->at_boundary())
 	      vertices[next_unused_vertex]
-		= boundary->get_new_point_on_line (line);
+		= boundary[line->boundary_indicator()]->get_new_point_on_line (line);
 	    else
 	      vertices[next_unused_vertex]
 		= (line->vertex(0) + line->vertex(1)) / 2;
@@ -4855,7 +4871,7 @@ void Triangulation<3>::execute_refinement () {
 	    
 	    if (quad->at_boundary()) 
 	      vertices[next_unused_vertex]
-		= boundary->get_new_point_on_quad (quad);
+		= boundary[quad->boundary_indicator()]->get_new_point_on_quad (quad);
 	    else
 	      vertices[next_unused_vertex]
 		= (quad->vertex(0) + quad->vertex(1) +

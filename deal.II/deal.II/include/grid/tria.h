@@ -11,9 +11,8 @@
 #include <base/forward-declarations.h>
 #include <base/point.h>
 #include <grid/geometry_info.h>
+//#include <grid/tria_boundary.h>
 #include <base/subscriptor.h>
-
-
 
 
 /**
@@ -992,6 +991,8 @@ class TriaDimensionInfo<3> {
  *
  *   \subsection{Boundary approximation}
  *
+ *   To be updated!
+ *
  *   You can specify a boundary function: if a new vertex is created on a
  *   side or face at the boundary, this function is used to compute where
  *   it will be placed. See \Ref{Boundary} for the details. Usage with
@@ -1393,7 +1394,17 @@ class TriaDimensionInfo<3> {
  *   @see TriaRawIterator
  *   @author Wolfgang Bangerth, 1998 */
 template <int dim>
-class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
+class Triangulation
+  : public TriaDimensionInfo<dim>,
+    public Subscriptor
+{
+  private:
+				     /**
+				      * Default boundary object. This declaration is used
+				      * for the default argument in #set_boundary#.
+				      */
+    static const StraightBoundary<dim>& straight_boundary;
+
   public:
     typedef typename TriaDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
     typedef typename TriaDimensionInfo<dim>::line_iterator line_iterator;
@@ -1446,68 +1457,41 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
     
 				     /**
 				      *  Assign a boundary object to the
-				      *  triangulation, which is used to find
-				      *  the point where to place new vertices
-				      *  on the boundary. Ownership of the
-				      *  object remains with the caller of this
-				      *  function, i.e. you have to make sure
-				      *  that it is not destroyed before
-				      *  #Triangulation<>::execute_refinement_and_refinement()#
-				      *  is called the last time. Checking this
-				      *  is mostly done by the library by
-				      *  using a #Subscriptor# object as base
-				      *  class for boundary objects.
+				      *  triangulation. If a face with boundary number #number#
+				      *  is refined, this object is used to find
+				      *  the location of new vertices
+				      *  on the boundary. This will also be true for non-linear
+				      *  transformations of cells to the unit cell in shape
+				      *  function calculations. Multiple calls to this function are
+				      *  allowed to store different boundary curves or surfaces.
 				      *
-				      *  If you copy this triangulation to
-				      *  another one using the
-				      *  #copy_triangulation# function, you must
-				      *  make sure that the lifetime of boundary
-				      *  object extends to the lifetime of the
-				      *  new triangulation as well.
+				      * Numbers of boundary object correspond to material numbers of
+				      * faces at the boundary, for instance the material id in a UCD
+				      * input file. They are not necessarily consecutive but must be
+				      * in the range 0-254.
 				      *
-				      *  Because of the use of the #Subscriptor#
-				      *  base class, you must wait for the
-				      *  #Triangulation# object to release the
-				      *  lock to the boundary object before
-				      *  destroying that. This usually happens
-				      *  when the destructor of the
-				      *  triangulation is executed, but you may
-				      *  manually do so by calling
-				      *  #set_boundary(0)#, passing a Null
-				      *  pointer as new boundary object. This
-				      *  is the interpreted as "take the
-				      *  default boundary object", which
-				      *  actually is a #StraightBoundary#
-				      *  object.
+				      * The #boundary_object# is not copied and MUST persist
+				      * until the triangulation is destroyed. Otherwise,
+				      * the #Subscriptor# class will issue #ExcObjectInUse#.
+				      * This is also true for triangulations generated from this
+				      * one by #copy_triangulation#.
 				      *
-				      *  You are allowed to remove or replace
+				      *  It is possible to remove or replace
 				      *  the boundary object during the lifetime
-				      *  of a non-empty triangulation, but
-				      *  you should be sure about what you do.
+				      *  of a non-empty triangulation. Usually, this is done
+				      *  before the first refinement and is dangerous afterwards.
+				      *  Removal of a boundary object is done by
+				      *  #set_boundary(number)#.
 				      */
-    void set_boundary (const Boundary<dim> *boundary_object);
+    void set_boundary (unsigned int number,
+		       const Boundary<dim>& boundary_object = straight_boundary);
 
 				     /**
-				      * Return a constant reference to the boundary
-				      * object used for this triangulation. This
-				      * is necessary for a host of applications
-				      * that need to use the exact shape of the
-				      * boundary. Since the boundary used by all
-				      * these applications, it is useful to ask
-				      * the triangulation rather than asking
-				      * for another parameter for each of these
-				      * functions.
-				      *
-				      * If you need to store a pointer to the
-				      * boundary somewhere, for example
-				      * in the constructor of an object, for
-				      * later use in the member functions,
-				      * you should consider calling #subscribe#
-				      * on the boundary to guarantee that the
-				      * boundary object is still alive during
-				      * the lifetime of your object.
+				      * Return a constant reference to a boundary
+				      * object used for this triangulation.
+				      * Number is the same as in #set_boundary#
 				      */
-    const Boundary<dim> & get_boundary () const;
+    const Boundary<dim> & get_boundary (unsigned int number) const;
     
 				     /**
 				      *  Copy a triangulation. This operation is
@@ -2992,9 +2976,9 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
     vector<bool>                     vertices_used;
 
 				     /**
-				      *  Pointer to a boundary object.
+				      *  Collection of boundary objects.
 				      */
-    const Boundary<dim>             *boundary;
+    const Boundary<dim>* boundary[255];
 
 				     /**
 				      *  Do some smoothing in the process
