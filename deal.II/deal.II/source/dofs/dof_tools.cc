@@ -1050,8 +1050,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 		     n_fine_dofs   = fine_grid.n_dofs();
 
 				   // local numbers of dofs
-  const unsigned int coarse_dofs_per_cell = coarse_fe.dofs_per_cell,
-		     fine_dofs_per_cell   = fine_fe.dofs_per_cell;
+  const unsigned int fine_dofs_per_cell   = fine_fe.dofs_per_cell;
 
 				   // alias the number of dofs per
 				   // cell belonging to the
@@ -1203,13 +1202,6 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // set up this mapping
   if (true)
     {
-				       // list of local dof numbers
-				       // belonging to the parameter
-				       // part of the FE on the fine grid
-      vector<unsigned int> parameter_dofs;
-      for (unsigned int i=0; i<coarse_dofs_per_cell; ++i)
-	parameter_dofs.push_back(fine_fe.component_to_system_index(coarse_component,i));
-
       vector<unsigned int> local_dof_indices(fine_fe.dofs_per_cell);
       unsigned int next_free_index=0;
       for (typename DoFHandler<dim>::active_cell_iterator cell=fine_grid.begin_active();
