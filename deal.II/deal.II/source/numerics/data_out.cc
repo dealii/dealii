@@ -307,6 +307,9 @@ template <int dim>
 void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				  const unsigned int n_threads_) 
 {
+  Assert (n_subdivisions >= 1,
+	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
+  
   Assert (dofs != 0, typename DataOut_DoFData<dim>::ExcNoDoFHandlerSelected());
 
 #ifdef DEAL_II_USE_MT

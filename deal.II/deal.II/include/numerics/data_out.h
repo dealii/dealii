@@ -499,6 +499,14 @@ class DataOut : public DataOut_DoFData<dim>
     virtual typename DoFHandler<dim>::cell_iterator
     next_cell (const typename DoFHandler<dim>::cell_iterator &cell);
 
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidNumberOfSubdivisions,
+		    int,
+		    << "The number of subdivisions per patch, " << arg1
+		    << ", is not valid.");
+    
   private:
 				     /**
 				      * All data needed in one thread

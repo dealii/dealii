@@ -323,6 +323,13 @@ class DataOutStack : public DataOutInterface<dim+1>
 		    string,
 		    << "You tried to declare a component of a data vector with "
 		    << "the name <" << arg1 << ">, but that name is already used.");
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidNumberOfSubdivisions,
+		    int,
+		    << "The number of subdivisions per patch, " << arg1
+		    << ", is not valid.");
     
   private:
 				     /**

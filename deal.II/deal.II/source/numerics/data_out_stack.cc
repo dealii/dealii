@@ -175,7 +175,8 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 {
 				   // this is mostly copied from the
 				   // DataOut class
-  
+  Assert (n_subdivisions >= 1,
+	  ExcInvalidNumberOfSubdivisions(n_subdivisions));  
   Assert (dof_handler != 0, ExcNoDoFHandlerSelected());
   
   const unsigned int n_components   = dof_handler->get_fe().n_components();
