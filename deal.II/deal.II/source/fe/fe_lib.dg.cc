@@ -36,30 +36,12 @@ FEDG_Q1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 
 
 template <int dim>
-const FullMatrix<double> & 
-FEDG_Q1<dim>::restrict (const unsigned int child) const {
-  Assert (false, ExcNotImplemented());
-  return restriction[child];
-};
-
-
-
-template <int dim>
 void
 FEDG_Q2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
 						vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
 };
-
-
-template <int dim>
-const FullMatrix<double> & 
-FEDG_Q2<dim>::restrict (const unsigned int child) const {
-  Assert (false, ExcNotImplemented());
-  return restriction[child];
-};
-
 
 
 template <int dim>
@@ -72,29 +54,11 @@ FEDG_Q3<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 
 
 template <int dim>
-const FullMatrix<double> & 
-FEDG_Q3<dim>::restrict (const unsigned int child) const {
-  Assert (false, ExcNotImplemented());
-  return restriction[child];
-};
-
-
-
-
-template <int dim>
 void
 FEDG_Q4<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
 					      vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
-};
-
-
-template <int dim>
-const FullMatrix<double> & 
-FEDG_Q4<dim>::restrict (const unsigned int child) const {
-  Assert (false, ExcNotImplemented());
-  return restriction[child];
 };
 
 

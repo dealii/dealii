@@ -79,20 +79,6 @@ class FEDG_Q0 : public FEQ1Mapping<dim> {
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					FullMatrix<double> &local_mass_matrix) const;
-  
-				     /**
-				      * Return a readonly reference to the
-				      * matrix which describes the transfer of a
-				      * child with the given number to the
-				      * mother cell. See the #restriction# array
-				      * for more information.
-				      *
-				      * This function returns an error since the
-				      * correct use of the restriction
-				      * matrices is not yet finally decided
-				      * about.
-				      */
-    const FullMatrix<double> & restrict (const unsigned int) const;
 };
 
 
@@ -131,15 +117,6 @@ class FEDG_Q1 : public FEQ1<dim>{
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					  vector<Point<dim> > &support_points) const;
-
-
-				     /**
-				      * This function returns an error since the
-				      * correct use of the restriction
-				      * matrices is not yet finally decided
-				      * about.
-				      */
-    const FullMatrix<double> & restrict (const unsigned int) const;
 };
 
 
@@ -177,14 +154,6 @@ class FEDG_Q2 : public FEQ2<dim>{
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					  vector<Point<dim> > &support_points) const;
-
-				     /**
-				      * This function returns an error since the
-				      * correct use of the restriction
-				      * matrices is not yet finally decided
-				      * about.
-				      */
-    const FullMatrix<double> & restrict (const unsigned int) const;
 };
 
 
@@ -223,14 +192,6 @@ class FEDG_Q3 : public FEQ3<dim>{
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					  vector<Point<dim> > &support_points) const;
-
-				     /**
-				      * This function returns an error since the
-				      * correct use of the restriction
-				      * matrices is not yet finally decided
-				      * about.
-				      */
-    const FullMatrix<double> & restrict (const unsigned int) const;
 };
 
 
@@ -268,14 +229,6 @@ class FEDG_Q4 : public FEQ4<dim>{
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					  vector<Point<dim> > &support_points) const;
-				     
-				     /**
-				      * This function returns an error since the
-				      * correct use of the restriction
-				      * matrices is not yet finally decided
-				      * about.
-				      */
-    const FullMatrix<double> & restrict (const unsigned int) const;
 };
 
 

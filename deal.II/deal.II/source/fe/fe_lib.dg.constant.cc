@@ -123,15 +123,6 @@ FEDG_Q0<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 
 
 
-template <int dim>
-const FullMatrix<double> & 
-FEDG_Q0<dim>::restrict (const unsigned int child) const {
-  Assert (false, ExcNotImplemented());
-  return restriction[child];
-};
-
-
-
 // explicit instantiations
 
 template class FEDG_Q0<deal_II_dimension>;
