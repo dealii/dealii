@@ -1154,8 +1154,7 @@ template <>
 unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (false, ExcNotImplemented());
-  return 0;
+  return 2*selected_fe->dofs_per_vertex;
 };
 
 
@@ -1659,8 +1658,7 @@ template <>
 unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (false, ExcInternalError());
-  return 0;
+  return selected_fe->dofs_per_vertex;
 };
 
 #endif

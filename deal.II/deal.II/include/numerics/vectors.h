@@ -542,7 +542,6 @@ class VectorTools
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
 
     
-//TODO:[WB] Update project_boundary_values for more components
 				     /**
 				      * Project @p{function} to the boundary
 				      * of the domain, using the given quadrature

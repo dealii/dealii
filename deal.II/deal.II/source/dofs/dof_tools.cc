@@ -118,23 +118,65 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>                 &dof,
 #if deal_II_dimension == 1
 
 template <>
-void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
-					       const std::vector<unsigned int>  &,
-					       SparsityPattern    &)
+void
+DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
+					  const DoFHandler<1>::FunctionMap  &function_map,
+					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+					  SparsityPattern    &sparsity)
 {
-  Assert (false, ExcInternalError());
+  const unsigned int dofs_per_vertex = dof_handler.get_fe().dofs_per_vertex;
+  std::vector<unsigned int> boundary_dof_boundary_indices (dofs_per_vertex);
+  
+				   // first check left, the right
+				   // boundary point
+  for (unsigned int direction=0; direction<2; ++direction)
+    {
+				       // if this boundary is not
+				       // requested, then go on with next one
+      if (function_map.find(direction) ==
+	  function_map.end())
+	continue;
+
+				       // find active cell at that
+				       // boundary: first go to
+				       // left/right, then to children
+      DoFHandler<1>::cell_iterator cell = dof_handler.begin(0);
+      while (!cell->at_boundary(direction))
+	cell = cell->neighbor(direction);
+      while (!cell->active())
+	cell = cell->child(direction);
+
+				       // next get boundary mapped dof
+				       // indices of boundary dofs
+      for (unsigned int i=0; i<dofs_per_vertex; ++i)
+	boundary_dof_boundary_indices[i]
+	  = dof_to_boundary_mapping[cell->vertex_dof_index(direction,i)];
+
+      for (unsigned int i=0; i<dofs_per_vertex; ++i)
+	for (unsigned int j=0; j<dofs_per_vertex; ++j)
+	  sparsity.add (boundary_dof_boundary_indices[i],
+			boundary_dof_boundary_indices[j]);
+    };
 };
 
 
+
 template <>
-void
-DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
-					  const DoFHandler<1>::FunctionMap  &,
-					  const std::vector<unsigned int>  &,
-					  SparsityPattern    &)
+void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
+					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
+					       SparsityPattern    &sparsity)
 {
-  Assert (false, ExcInternalError());
-}
+				   // there are only 2 boundary
+				   // indicators in 1d, so it is no
+				   // performance problem to call the
+				   // other function
+  DoFHandler<1>::FunctionMap boundary_indicators;
+  boundary_indicators[0] = 0;
+  boundary_indicators[1] = 0;
+  make_boundary_sparsity_pattern (dof_handler, boundary_indicators,
+				  dof_to_boundary_mapping, sparsity);
+};
+
 
 #endif
 
@@ -222,8 +264,8 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
   const unsigned int dofs_per_face = dof.get_fe().dofs_per_face;
   std::vector<unsigned int> dofs_on_this_face(dofs_per_face);
-  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-					endf = dof.end_face();
+  typename DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
+						 endf = dof.end_face();
   for (; face!=endf; ++face)
     if (boundary_indicators.find(face->boundary_indicator()) !=
 	boundary_indicators.end())
@@ -1757,23 +1799,60 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 
 template <>
 void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
-					    std::vector<unsigned int> &)
+					    const std::set<unsigned char> &boundary_indicators,
+					    std::vector<unsigned int> &mapping)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-  Assert (false, ExcNotImplemented());
+
+  mapping.clear ();
+  mapping.insert (mapping.end(), dof_handler.n_dofs(),
+		  DoFHandler<1>::invalid_dof_index);
+
+  unsigned int next_free_index = 0;
+  
+				   // first check left, the right
+				   // boundary point
+  for (unsigned int direction=0; direction<2; ++direction)
+    {
+				       // if this boundary is not
+				       // requested, then go on with next one
+      if (boundary_indicators.find(direction) ==
+	  boundary_indicators.end())
+	continue;
+
+				       // find active cell at that
+				       // boundary: first go to
+				       // left/right, then to children
+      DoFHandler<1>::cell_iterator cell = dof_handler.begin(0);
+      while (!cell->at_boundary(direction))
+	cell = cell->neighbor(direction);
+      while (!cell->active())
+	cell = cell->child(direction);
+
+				       // next enumerate these degrees
+				       // of freedom
+      for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_vertex; ++i)
+	mapping[cell->vertex_dof_index(direction,i)] = next_free_index++;
+    };
 };
 
 
 
 template <>
 void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
-					    const std::set<unsigned char> &,
-					    std::vector<unsigned int> &)
+					    std::vector<unsigned int> &mapping)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-  Assert (false, ExcNotImplemented());
-};
 
+				   // in 1d, there are only 2 boundary
+				   // indicators, so enumerate them
+				   // and pass on to the other
+				   // function
+  std::set<unsigned char> boundary_indicators;
+  boundary_indicators.insert (0U);
+  boundary_indicators.insert (1U);
+  map_dof_to_boundary_indices (dof_handler, boundary_indicators, mapping);
+};
 
 #else
 

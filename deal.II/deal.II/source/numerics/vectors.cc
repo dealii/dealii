@@ -804,6 +804,24 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
 }
 
 
+#if deal_II_dimension == 1
+
+template <>
+void
+VectorTools::project_boundary_values (const Mapping<1>       &mapping,
+				      const DoFHandler<1>    &dof,
+				      const FunctionMap<1>::type &boundary_functions,
+				      const Quadrature<0>  &,
+				      std::map<unsigned int,double> &boundary_values)
+{
+				   // projection in 1d is equivalent
+				   // to interpolation
+  interpolate_boundary_values (mapping, dof, boundary_functions,
+			       boundary_values, std::vector<bool>());
+};
+
+#endif
+
 
 template <int dim>
 void
@@ -1371,12 +1389,15 @@ void VectorTools::integrate_difference (const DoFHandler<deal_II_dimension> &,
 					const Quadrature<deal_II_dimension> &,
 					const NormType                      &,
 					const Function<deal_II_dimension>   *);
+#if deal_II_dimension != 1
 template
 void VectorTools::project_boundary_values (const Mapping<deal_II_dimension>     &,
 					   const DoFHandler<deal_II_dimension>  &,
 					   const FunctionMap<deal_II_dimension>::FunctionMap &,
 					   const Quadrature<deal_II_dimension-1>&,
 					   std::map<unsigned int,double>        &);
+#endif
+
 template
 void VectorTools::project_boundary_values (const DoFHandler<deal_II_dimension>  &,
 					   const FunctionMap<deal_II_dimension>::FunctionMap &,

@@ -88,7 +88,7 @@ template <int dim> class Mapping;
  * should not rely on it since it may be changed sometimes: we loop
  * over all faces, check whether it is on the boundary, if so get the
  * global numbers of the degrees of freedom on that face, and for each
- * of these we give a subsequent boundary number if none has already
+ * of these we give a sequential boundary number if none has already
  * been given to this dof. But it should be emphasized again that you
  * should not try to use this internal knowledge about the used
  * algorithm, you are better off if you just accept the mapping `as
@@ -119,7 +119,7 @@ template <int dim> class Mapping;
  * easy.  It should really be a degree of freedom of which the
  * respective basis function has nonzero values on the boundary. At
  * least for Lagrange elements this definition is equal to the
- * statement that the off-point of the trial function, i.e. the point
+ * statement that the off-point of the shape function, i.e. the point
  * where the function assumes its nominal value (for Lagrange elements
  * this is the point where it has the function value @p{1}), is
  * located on the boundary. We do not check this directly, the
@@ -821,7 +821,7 @@ class DoFTools
 				      * index of that degree of
 				      * freedom on the boundary. After
 				      * this operation, @p{mapping[dof]}
-				      * gives the index of the the
+				      * gives the index of the
 				      * degree of freedom with global
 				      * number @p{dof} in the list of
 				      * degrees of freedom on the
@@ -841,13 +841,6 @@ class DoFTools
 				      *
 				      * Prior content of @p{mapping}
 				      * is deleted.
-				      *
-				      * This function is not
-				      * implemented for one
-				      * dimension. See the general doc
-				      * of this class for more
-				      * information on boundary
-				      * treatment.
 				      */
     template <int dim>
     static void
