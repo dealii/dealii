@@ -1577,11 +1577,11 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   @memo Implementation of a multilevel triangulation of a domain
  *   @see TriaRawIterator
- *   @author Wolfgang Bangerth, 1998 */
+ *   @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
-class Triangulation
-  : public TriaDimensionInfo<dim>,
-    public Subscriptor
+class Triangulation : public TriaDimensionInfo<dim>,
+		      public Subscriptor
 {
   private:
 				     /**
@@ -2287,7 +2287,7 @@ class Triangulation
 				      *  in 1D and #last_active_quad# in 2D.
 				      */
     active_cell_iterator last_active (const unsigned int level) const;
-				     //@}
+				     /*@}*/
 
     				     /*---------------------------------------*/
     				     /*---------------------------------------*/
@@ -2413,7 +2413,7 @@ class Triangulation
 				      *  in 2D and #last_active_quad# in 3D.
 				      */
     active_face_iterator last_active_face (const unsigned int level) const;
-				     //@}
+				     /*@}*/
 
     
 				     /*---------------------------------------*/
@@ -2899,7 +2899,7 @@ class Triangulation
 				     /**
 				      *  @name Exceptions
 				      */
-				     //@{
+				     /*@{*/
 				     /**
 				      *  Exception
 				      */
@@ -3003,7 +3003,7 @@ class Triangulation
 				      * Exception
 				      */
     DeclException0 (ExcIO);
-				     //@}
+				     /*@}*/
   protected:
 
 				     /**
