@@ -240,8 +240,10 @@ documentation, etc</a>.
 <ol>
   <li> <p> Changed: Solver functions <code class="member">solve</code>
        are void now. If the solver has not converged within the
-       maximum number of iterations, it throws an exception of type
-       <code class="class">ExcNoConvergence</code>.
+       maximum number of iterations or encounters a breakdown, it
+       throws an exception of type <code
+       class="class">SolverControl::NoConvergence</code> instead of
+       returning a special value.
        <br>
        (GK 2001/03/29)
        </p>
