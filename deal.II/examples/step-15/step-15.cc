@@ -610,7 +610,8 @@ int main ()
     {
       deallog.depth_console (0);
 
-      for (unsigned int realization=0; realization<100; ++realization)
+      const unsigned int n_realizations = 10;
+      for (unsigned int realization=0; realization<n_realizations; ++realization)
         {
           std::cout << "Realization " << realization << ":" << std::endl;
   
