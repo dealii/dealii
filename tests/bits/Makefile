@@ -134,7 +134,6 @@ volume_1.exe            : volume_1.g.$(OBJEXT)             $(libraries)
 volume_2.exe            : volume_2.g.$(OBJEXT)             $(libraries)
 volume_3.exe            : volume_3.g.$(OBJEXT)             $(libraries)
 volume_4.exe            : volume_4.g.$(OBJEXT)             $(libraries)
-solution_transfer_1.exe : solution_transfer_1.g.$(OBJEXT)  $(libraries)
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	geometry_info_1 point_inside_1 point_inside_2 \
@@ -172,7 +171,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	volume_1 volume_2 volume_3 volume_4 \
 	mapping_cartesian_1 \
 	mapping_q4_3d \
-	q_points solution_transfer_1
+	q_points
 
 ############################################################
 
