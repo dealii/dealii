@@ -1,4 +1,4 @@
-//----------------------------  vector_memory.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  vector_memory.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__vector_memory_h
 #define __deal2__vector_memory_h
 

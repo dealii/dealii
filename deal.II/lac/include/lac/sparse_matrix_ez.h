@@ -1,4 +1,4 @@
-//----------------------------  sparse_matrix_ez.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_matrix_ez.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__sparse_matrix_ez_h
 #define __deal2__sparse_matrix_ez_h
 
@@ -1141,7 +1141,7 @@ SparseMatrixEZ<number>::RowInfo::RowInfo(unsigned int start)
 {}
 
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 template <typename number>
 inline
 SparseMatrixEZ<number>::const_iterator::Accessor::
@@ -1306,7 +1306,7 @@ operator < (const const_iterator& other) const
 }
 
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 template <typename number>
 inline
 unsigned int SparseMatrixEZ<number>::m () const

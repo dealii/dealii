@@ -1,4 +1,4 @@
-//----------------------------  petsc_precondition.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  petsc_precondition.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__petsc_precondition_h
 #define __deal2__petsc_precondition_h
 

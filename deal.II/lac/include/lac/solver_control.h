@@ -1,4 +1,4 @@
-//----------------------------  solver_control.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  solver_control.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__solver_control_h
 #define __deal2__solver_control_h
 
@@ -451,7 +451,7 @@ class ReductionControl : public SolverControl
 };
 
 /*@}*/
-//------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 
 inline unsigned int

@@ -1,15 +1,15 @@
-//----------------------------  precondition.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998 - 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  precondition.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__precondition_h
 #define __deal2__precondition_h
 
@@ -740,7 +740,7 @@ PreconditionIdentity::Tvmult_add (VECTOR &dst, const VECTOR &src) const
   dst.add(src);
 }
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 inline
 PreconditionRichardson::AdditionalData::AdditionalData (
@@ -813,7 +813,7 @@ PreconditionRichardson::Tvmult_add (VECTOR &dst, const VECTOR &src) const
   dst.add(relaxation,src);
 }
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template <class MATRIX>
 inline void
@@ -824,7 +824,7 @@ PreconditionRelaxation<MATRIX>::initialize (const MATRIX &rA,
   relaxation = parameters.relaxation;
 }
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template <class MATRIX>
 template<class VECTOR>
@@ -847,7 +847,7 @@ PreconditionJacobi<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 }
 
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template <class MATRIX>
 template<class VECTOR>
@@ -870,7 +870,7 @@ PreconditionSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 }
 
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template <class MATRIX>
 template<class VECTOR>
@@ -893,7 +893,7 @@ PreconditionSSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 }
 
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template <class MATRIX>
 inline void
@@ -932,7 +932,7 @@ PreconditionPSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 }
 
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 
 template<class MATRIX, class VECTOR>
@@ -952,7 +952,7 @@ PreconditionUseMatrix<MATRIX,VECTOR>::vmult (VECTOR &dst,
   (matrix.*precondition)(dst, src);
 }
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template<class MATRIX>
 inline

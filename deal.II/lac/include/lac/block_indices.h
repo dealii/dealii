@@ -1,4 +1,4 @@
-//----------------------------  block_indices.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  block_indices.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__block_indices_h
 #define __deal2__block_indices_h
 

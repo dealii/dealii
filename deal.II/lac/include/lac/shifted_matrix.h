@@ -1,4 +1,4 @@
-//----------------------------  eigen.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  eigen.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__shifted_matrix_h
 #define __deal2__shifted_matrix_h
 
@@ -144,7 +144,7 @@ class ShiftedMatrixGeneralized
     
 
 /*@}*/
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template <class MATRIX>
 inline
@@ -198,7 +198,7 @@ ShiftedMatrix<MATRIX>::residual (VECTOR& dst,
 }
 
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 template <class MATRIX, class MASSMATRIX, class VECTOR>
 inline
 ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>

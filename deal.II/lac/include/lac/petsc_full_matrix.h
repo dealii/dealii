@@ -1,4 +1,4 @@
-//----------------------------  petsc_full_matrix.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  petsc_full_matrix.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__petsc_full_matrix_h
 #define __deal2__petsc_full_matrix_h
 

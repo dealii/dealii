@@ -1,4 +1,4 @@
-//----------------------------  sparse_matrix_ez.templates.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_matrix_ez.templates.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__sparse_matrix_ez_templates_h
 #define __deal2__sparse_matrix_ez_templates_h
 
@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <cmath>
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template <typename number>
 SparseMatrixEZ<number>::SparseMatrixEZ()

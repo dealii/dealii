@@ -5,7 +5,7 @@
 //    This file was automatically generated from blas.h.in
 //    See blastemplates in the deal.II contrib directory
 //
-//    Copyright (C) 2005 by the deal authors
+//    Copyright (C) 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

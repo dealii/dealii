@@ -1,5 +1,5 @@
-//----------------------------  sparse_ilu.templates.h  ---------------------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004
+//---------------------------------------------------------------------------
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -7,7 +7,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_ilu.templates.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__sparse_ilu_templates_h
 #define __deal2__sparse_ilu_templates_h
 
