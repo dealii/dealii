@@ -52,7 +52,7 @@ inconvenience this causes.
        <class="member">reinit</code> function has therefore been removed to
        avoid confusion with the <code class="member">reinit</code> functions
        that take arguments. Instead, you should now use <code
-       class="member">matrix=0</code> to simply sets all elements of the
+       class="member">matrix=0</code> to simply set all elements of the
        matrix to zero. If you want to notify a sparse matrix that its sparsity
        pattern has changed, use the <code
        class="member">reinit(SparsityPattern)</code> function.
@@ -79,7 +79,7 @@ inconvenience this causes.
        class="member">clear</code> functions have been dropped from
        the interface of the vector and full matrix classes, and the
        remaining instances where deal.II classes have a function of
-       that name really mean that the object is reset to its virginial
+       that name really mean that the object is reset to its virginal
        state. To set all
        elements of a matrix or vector to zero without changing its size, the
        recommended way is to use the more obvious notation <code
