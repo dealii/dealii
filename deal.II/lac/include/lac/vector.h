@@ -377,9 +377,18 @@ class Vector
 				      * Scale each element of the
 				      * vector by the given factor.
 				      */
-//TODO:[?] Why not have an operator *= instead of/in addition to `scale'?    
     void scale (const Number factor);
 
+				     /**
+				      * Scale each element of the
+				      * vector by a constant
+				      * value. This operator is an
+				      * alias to the @ref{scale}
+				      * function, except that it
+				      * returns a reference to itself.
+				      */
+    Vector<Number> & operator *= (const Number factor);
+    
 				     /**
 				      * Scale each element of this
 				      * vector by the corresponding
@@ -560,6 +569,7 @@ Vector<Number>::Vector (const unsigned int n) :
 }
 
 
+
 template <typename Number>
 inline
 Vector<Number>::~Vector ()
@@ -570,6 +580,7 @@ Vector<Number>::~Vector ()
       val=0;
     }
 }
+
 
 
 template <typename Number>
@@ -597,6 +608,7 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast)
 }
 
 
+
 template <typename Number>
 inline
 void Vector<Number>::clear ()
@@ -606,12 +618,14 @@ void Vector<Number>::clear ()
 }
 
 
+
 template <typename Number>
 inline
 unsigned int Vector<Number>::size () const
 {
   return dim;
 }
+
 
 
 template <typename Number>
@@ -623,6 +637,7 @@ Vector<Number>::begin ()
 };
 
 
+
 template <typename Number>
 inline
 typename Vector<Number>::const_iterator 
@@ -630,6 +645,7 @@ Vector<Number>::begin () const
 {
   return &val[0];
 };
+
 
 
 template <typename Number>
@@ -641,6 +657,7 @@ Vector<Number>::end ()
 };
 
 
+
 template <typename Number>
 inline
 typename Vector<Number>::const_iterator
@@ -648,6 +665,7 @@ Vector<Number>::end () const
 {
   return &val[dim];
 };
+
 
 
 template <typename Number>
@@ -659,6 +677,7 @@ Number Vector<Number>::operator() (const unsigned int i) const
 }
 
 
+
 template <typename Number>
 inline
 Number& Vector<Number>::operator() (const unsigned int i)
@@ -666,6 +685,16 @@ Number& Vector<Number>::operator() (const unsigned int i)
   Assert (i<dim, ExcIndexRange(i,0,dim));
   return val[i];
 }
+
+
+
+template <typename Number>
+inline
+Vector<Number> & Vector<Number>::operator *= (const Number factor) 
+{
+  scale (factor);
+  return *this;
+};
 
 
 

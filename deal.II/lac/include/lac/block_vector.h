@@ -442,6 +442,16 @@ class BlockVector
     void scale (const Number factor);
     
 				     /**
+				      * Scale each element of the
+				      * vector by a constant
+				      * value. This operator is an
+				      * alias to the @ref{scale}
+				      * function, except that it
+				      * returns a reference to itself.
+				      */
+    BlockVector<Number> & operator *= (const Number factor);
+
+				     /**
 				      *  U=a*V. Replacing.
 				      */
     void equ (const Number a, const BlockVector<Number>& V);
@@ -602,6 +612,16 @@ Number& BlockVector<Number>::operator() (const unsigned int i)
     = block_indices.global_to_local (i);
   return components[local_index.first](local_index.second);
 }
+
+
+
+template <typename Number>
+inline
+BlockVector<Number> & BlockVector<Number>::operator *= (const Number factor) 
+{
+  scale (factor);
+  return *this;
+};
 
 
 
