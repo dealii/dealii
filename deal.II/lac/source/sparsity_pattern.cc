@@ -92,6 +92,7 @@ SparsityPattern::SparsityPattern (const unsigned int          m,
 };
 
 
+
 SparsityPattern::SparsityPattern (const SparsityPattern &original,
 				  const unsigned int        max_per_row,
 				  const unsigned int        extra_off_diagonals)
@@ -126,28 +127,24 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
 				       // the rest from that element onwards
 				       // which is not a side-diagonal any
 				       // more.
-      const int * const
+      const unsigned int * const
 	original_row_start = &original.colnums[original.rowstart[row]] + 1;
-				       // thw following requires that
+				       // the following requires that
 				       // #original# be compressed since
-				       // otherwise there might be -1's
-      const int * const
+				       // otherwise there might be invalid_entry's
+      const unsigned int * const
 	original_row_end   = &original.colnums[original.rowstart[row+1]];
 
-      const int * const
+      const unsigned int * const
 	original_last_before_side_diagonals = lower_bound (original_row_start,
 							   original_row_end,
-							   static_cast<int>
-							   (row
-							    -extra_off_diagonals));
-      const int * const
+							   row-extra_off_diagonals);
+      const unsigned int * const
 	original_first_after_side_diagonals = upper_bound (original_row_start,
 							   original_row_end,
-							   static_cast<int>
-							   (row
-							    +extra_off_diagonals));
+							   row+extra_off_diagonals);
 
-      int * next_free_slot = &colnums[rowstart[row]] + 1;
+      unsigned int * next_free_slot = &colnums[rowstart[row]] + 1;
 
 				       // copy elements before side-diagonals
       next_free_slot = copy (original_row_start,
@@ -274,7 +271,7 @@ SparsityPattern::reinit (const unsigned int m,
     {
       if (colnums) delete[] colnums;
       max_vec_len = vec_len;
-      colnums = new int[max_vec_len];
+      colnums = new unsigned int[max_vec_len];
     };
 
 				   // set the rowstart array 
@@ -286,7 +283,7 @@ SparsityPattern::reinit (const unsigned int m,
 				   // preset the column numbers by a
 				   // value indicating it is not in
 				   // use
-  fill_n (&colnums[0], vec_len, -1);
+  fill_n (&colnums[0], vec_len, invalid_entry);
 
 				   // if the matrix is square: let the
 				   // first entry in each row be the
@@ -303,11 +300,14 @@ void
 SparsityPattern::compress ()
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+
+				   // do nothing if already compressed
+  if (compressed)
+    return;
   
-  if (compressed) return;
   unsigned int next_free_entry = 0,
-		next_row_start = 0,
-		    row_length = 0;
+	       next_row_start  = 0,
+	       row_length      = 0;
 
 				   // first find out how many non-zero
 				   // elements there are, in order to
@@ -316,14 +316,14 @@ SparsityPattern::compress ()
   const unsigned int
     nonzero_elements = count_if (&colnums[rowstart[0]],
 				 &colnums[rowstart[rows]],
-				 bind2nd(not_equal_to<int>(), -1));
+				 bind2nd(not_equal_to<unsigned int>(), invalid_entry));
 				   // now allocate the respective memory
-  int *new_colnums = new int[nonzero_elements];
+  unsigned int *new_colnums = new unsigned int[nonzero_elements];
 
   
 				   // reserve temporary storage to
 				   // store the entries of one row
-  vector<int> tmp_entries (max_row_length);
+  vector<unsigned int> tmp_entries (max_row_length);
   
 				   // Traverse all rows
   for (unsigned int line=0; line<rows; ++line)
@@ -332,7 +332,7 @@ SparsityPattern::compress ()
 				       // first unused entry is reached
       row_length = 0;
       for (unsigned int j=rowstart[line]; j<rowstart[line+1]; ++j,++row_length)
-	if (colnums[j] != -1)
+	if (colnums[j] != invalid_entry)
 	  tmp_entries[row_length] = colnums[j];
 	else
 	  break;
@@ -361,7 +361,7 @@ SparsityPattern::compress ()
 
 				       // some internal checks
       Assert ((rows!=cols) ||
-	      (new_colnums[rowstart[line]] == static_cast<signed int>(line)),
+	      (new_colnums[rowstart[line]] == line),
 	      ExcInternalError());
 				       // assert that the first entry
 				       // does not show up in
@@ -452,8 +452,9 @@ SparsityPattern::max_entries_per_row () const
 
 
 
-int
-SparsityPattern::operator () (const unsigned int i, const unsigned int j) const
+unsigned int
+SparsityPattern::operator () (const unsigned int i,
+			      const unsigned int j) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (i<rows, ExcInvalidIndex(i,rows));
@@ -466,13 +467,13 @@ SparsityPattern::operator () (const unsigned int i, const unsigned int j) const
 				   // if a first entry exists)
   if (rowstart[i] != rowstart[i+1]) 
     {
-      if (static_cast<signed int>(j) == colnums[rowstart[i]])
+      if (j == colnums[rowstart[i]])
 	return rowstart[i];
     }
   else
 				     // no first entry exists for this
 				     // line
-    return -1;
+    return invalid_entry;
 
 				   // all other entries are sorted, so
 				   // we can use a binary seach algorithm
@@ -484,19 +485,21 @@ SparsityPattern::operator () (const unsigned int i, const unsigned int j) const
 				   // at the top of this function, so it
 				   // may not be called for noncompressed
 				   // structures.
-  const int * const p = lower_bound (&colnums[rowstart[i]+1],
-				     &colnums[rowstart[i+1]],
-				     static_cast<signed int>(j));
-  if ((*p == static_cast<signed int>(j)) &&
+  const unsigned int * const p = lower_bound (&colnums[rowstart[i]+1],
+					      &colnums[rowstart[i+1]],
+					      j);
+  if ((*p == j) &&
       (p != &colnums[rowstart[i+1]]))
     return (p - &colnums[0]);
   else
-    return -1;
+    return invalid_entry;
 }
 
 
+
 void
-SparsityPattern::add (const unsigned int i, const unsigned int j)
+SparsityPattern::add (const unsigned int i,
+		      const unsigned int j)
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (i<rows, ExcInvalidIndex(i,rows));
@@ -506,10 +509,10 @@ SparsityPattern::add (const unsigned int i, const unsigned int j)
   for (unsigned int k=rowstart[i]; k<rowstart[i+1]; k++)
     {
 				       // entry already exists
-      if (colnums[k] == (signed int)j) return;
+      if (colnums[k] == j) return;
 				       // empty entry found, put new
 				       // entry here
-      if (colnums[k] == -1)
+      if (colnums[k] == invalid_entry)
 	{
 	  colnums[k] = j;
 	  return;
@@ -525,35 +528,12 @@ SparsityPattern::add (const unsigned int i, const unsigned int j)
 
 
 void
-SparsityPattern::add_matrix (const unsigned int n, const int* rowcols)
-{
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
-  for (unsigned int i=0; i<n; ++i)
-    for (unsigned int j=0; j<n; ++j)
-      add(rowcols[i], rowcols[j]);
-}
-
-
-
-void
-SparsityPattern::add_matrix (const unsigned int m, const unsigned int n,
-			     const int* rows, const int* cols)
-{
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
-  for (unsigned i=0; i<m; ++i)
-    for (unsigned j=0; j<n; ++j)
-      add(rows[i], cols[j]);
-}
-
-
-
-void
 SparsityPattern::print_gnuplot (ostream &out) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
-      if (colnums[j]>=0)
+      if (colnums[j] != invalid_entry)
 	out << i << " " << -colnums[j] << endl;
 
   AssertThrow (out, ExcIO());
@@ -568,7 +548,7 @@ SparsityPattern::bandwidth () const
   unsigned int b=0;
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
-      if (colnums[j]>=0) 
+      if (colnums[j] != invalid_entry)
 	{
 	  if (static_cast<unsigned int>(abs(static_cast<int>(i-colnums[j]))) > b)
 	    b = abs(static_cast<int>(i-colnums[j]));

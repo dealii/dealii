@@ -135,7 +135,7 @@ PreconditionBlockSOR<number,inverse_type>::~PreconditionBlockSOR(){}
 
 template <typename number, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2> &dst,
+void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2>       &dst,
 							    const Vector<number2> &src) const
 {
   Assert(A!=0, ExcNoMatrixGivenToUse());
@@ -149,7 +149,7 @@ void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2> &dst
 
   const SparsityPattern &spars    = M.get_sparsity_pattern();
   const unsigned int    *rowstart = spars.get_rowstart_indices();
-  const int             *columns  = spars.get_column_numbers();
+  const unsigned int    *columns  = spars.get_column_numbers();
 
   Vector<number2> b_cell(blocksize), x_cell(blocksize);
 
@@ -172,8 +172,7 @@ void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2> &dst
 	    {
 	      b_cell_row=src(row);
 	      for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
-		if ((column=static_cast<unsigned int>(columns[j]))
-		    < begin_diag_block)
+		if ((column=columns[j]) < begin_diag_block)
 		    b_cell_row -= M.global_entry(j) * dst(column);
 	      b_cell(row_cell)=b_cell_row;
 	      for (unsigned int column_cell=0, column=cell*blocksize;
@@ -196,7 +195,7 @@ void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2> &dst
 	  {
 	    b_cell_row=src(row);
 	    for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
-	      if ((column=static_cast<unsigned int>(columns[j])) < begin_diag_block)
+	      if ((column=columns[j]) < begin_diag_block)
 		{
 		  b_cell_row -= M.global_entry(j) * dst(column);
 		}

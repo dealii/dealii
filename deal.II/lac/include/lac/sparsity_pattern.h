@@ -89,11 +89,37 @@
  * needed. Then #a_{24}=val[number of the found element] = 3#.
  *
  *
- * @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth; some documentation by Rasched Zamni
+ * @author Wolfgang Bangerth and others
  */
 class SparsityPattern : public Subscriptor
 {
   public:
+				     /**
+				      * Define a value which is used
+				      * to indicate that a certain
+				      * value in the #colnums# array
+				      * is unused, i.e. does not
+				      * represent a certain column
+				      * number index.
+				      *
+				      * Indices with this invalid
+				      * value are used to insert new
+				      * entries to the sparsity
+				      * pattern using the #add# member
+				      * function, and are removed when
+				      * calling #compress#.
+				      *
+				      * You should not assume that the
+				      * variable declared here has a
+				      * certain value. The
+				      * initialization is given here
+				      * only to enable the compiler to
+				      * perform some optimizations,
+				      * but the actual value of the
+				      * variable may change over time.
+				      */
+    static const unsigned int invalid_entry = static_cast<unsigned int>(-1);
+    
 				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
@@ -305,7 +331,7 @@ class SparsityPattern : public Subscriptor
 				      * element with row number #i# and
 				      * column number #j#. If the matrix
 				      * element is not a nonzero one,
-				      * return -1.
+				      * return #SparsityPattern::invalid_entry#.
 				      *
 				      * This function is usually called
 				      * by the #operator()# of the
@@ -318,7 +344,7 @@ class SparsityPattern : public Subscriptor
 				      * because the column numbers are
 				      * sorted.
 				      */
-    int operator() (const unsigned int i, const unsigned int j) const;
+    unsigned int operator() (const unsigned int i, const unsigned int j) const;
 
 				     /**
 				      * Add a nonzero entry to the matrix.
@@ -330,25 +356,6 @@ class SparsityPattern : public Subscriptor
 				      */
     void add (const unsigned int i, const unsigned int j);
     
-				     /**
-				      * This matrix adds a whole connectivity
-				      * list to the sparsity structure
-				      * respresented by this object. It assumes
-				      * the #rowcols# array to be a list of
-				      * indices which are all linked together,
-				      * i.e. all entries
-				      * #(rowcols[i], rowcols[j])# for all
-				      * #i,j=0...n# for this sparsity pattern
-				      * are created. #n# is assumed to be the
-				      * number of elements pointed to by
-				      * #rowcols#.
-				      */
-    void add_matrix (const unsigned int n, const int* rowcols);
-
-				     //////////
-    void add_matrix (const unsigned int m, const unsigned int n,
-		     const int* rows, const int* cols);
-
 				     /**
 				      * Print the sparsity of the matrix
 				      * in a format that #gnuplot# understands
@@ -483,7 +490,7 @@ class SparsityPattern : public Subscriptor
 				      * avoid programs relying on outdated
 				      * information!
 				      */
-    const int * get_column_numbers () const;
+    const unsigned int * get_column_numbers () const;
     
     
 				     /**
@@ -655,7 +662,7 @@ class SparsityPattern : public Subscriptor
 				      * element, i.e.
 				      * #colnums[rowstart[r]]==r#.
 				      */
-    int *colnums;
+    unsigned int *colnums;
 
 				     /**
 				      * Store whether the #compress# function
@@ -711,11 +718,12 @@ SparsityPattern::get_rowstart_indices () const
 
 
 inline
-const int *
+const unsigned int *
 SparsityPattern::get_column_numbers () const
 {
   return colnums;
 };
+
 
 
 inline
@@ -726,16 +734,19 @@ SparsityPattern::row_length (const unsigned int row) const
   return rowstart[row+1]-rowstart[row];
 }
 
+
+
 inline
 unsigned int
 SparsityPattern::column_number (const unsigned int row,
-				   const unsigned int index) const
+				const unsigned int index) const
 {
   Assert(row<rows, ExcIndexRange(row,0,rows));
   Assert(index<row_length(row), ExcIndexRange(index,0,row_length(row)));
 
   return colnums[rowstart[row]+index];
 }
+
 
 
 inline

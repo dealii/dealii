@@ -73,11 +73,11 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				       // pattern of the old matrix!
       const unsigned int * const rowstart_indices
 	= matrix.get_sparsity_pattern().get_rowstart_indices();
-      const int * const          column_numbers
+      const unsigned int * const column_numbers
 	= matrix.get_sparsity_pattern().get_column_numbers();
       
       for (unsigned int row=0; row<m(); ++row)
-	for (const int * col = &column_numbers[rowstart_indices[row]];
+	for (const unsigned int * col = &column_numbers[rowstart_indices[row]];
 	     col != &column_numbers[rowstart_indices[row+1]]; ++col)
 	  set (row, *col, matrix.global_entry(col-column_numbers));
     };
@@ -110,7 +110,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				   // matrix
   const SparsityPattern             &sparsity = get_sparsity_pattern();
   const unsigned int * const rowstart_indices = sparsity.get_rowstart_indices();
-  const int * const          column_numbers   = sparsity.get_column_numbers();
+  const unsigned int * const column_numbers   = sparsity.get_column_numbers();
   
 /*
   PSEUDO-ALGORITHM
@@ -148,15 +148,15 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				       // let k run over all lower-left
 				       // elements of row i; skip
 				       // diagonal element at start
-      const int * first_of_row
+      const unsigned int * first_of_row
 	= &column_numbers[rowstart_indices[row]+1];
-      const int * first_after_diagonal
+      const unsigned int * first_after_diagonal
 	= lower_bound (&column_numbers[rowstart_indices[row]+1],
 		       &column_numbers[rowstart_indices[row+1]],
-		       static_cast<int>(row));
+		       row);
 
 				       // k := *col_ptr
-      for (const int * col_ptr = first_of_row; col_ptr!=first_after_diagonal; ++col_ptr)
+      for (const unsigned int * col_ptr = first_of_row; col_ptr!=first_after_diagonal; ++col_ptr)
 	{
 	  const unsigned int global_index_ik = col_ptr-column_numbers;
 	  global_entry(global_index_ik) *= diag_element(*col_ptr);
@@ -169,7 +169,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 					   // row correctly, but excluding
 					   // the main diagonal entry
 	  bool left_of_diagonal = true;
-	  for (const int * j = col_ptr+1;
+	  for (const unsigned int * j = col_ptr+1;
 	       j<&column_numbers[rowstart_indices[row+1]];
 	       ++j)
 	    {
@@ -189,9 +189,9 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 					       //
 					       // note that j should never point
 					       // to the diagonal itself!
-	      if (left_of_diagonal && (*j > static_cast<int>(row)))
+	      if (left_of_diagonal && (*j > row))
 		{
-		  Assert (*j != static_cast<int>(row), ExcInternalError());
+		  Assert (*j != row, ExcInternalError());
 		  
 		  left_of_diagonal = false;
 						   // a[i,i] -= a[i,k]*a[k,i]
@@ -271,10 +271,8 @@ void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
   Assert (dst.size() == m(), ExcSizeMismatch(dst.size(), m()));
   
   const unsigned int N=dst.size();
-  const unsigned int * const rowstart_indices
-    = get_sparsity_pattern().get_rowstart_indices();
-  const int * const          column_numbers
-    = get_sparsity_pattern().get_column_numbers();
+  const unsigned int * const rowstart_indices = get_sparsity_pattern().get_rowstart_indices();
+  const unsigned int * const column_numbers   = get_sparsity_pattern().get_column_numbers();
 				   // solve LUx=b in two steps:
 				   // first Ly = b, then
 				   //       Ux = y
@@ -292,15 +290,15 @@ void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
     {
 				       // get start of this row. skip the
 				       // diagonal element
-      const int * const rowstart = &column_numbers[rowstart_indices[row]+1];
+      const unsigned int * const rowstart = &column_numbers[rowstart_indices[row]+1];
 				       // find the position where the part
 				       // right of the diagonal starts
-      const int * const first_after_diagonal
+      const unsigned int * const first_after_diagonal
 	= lower_bound (rowstart,
 		       &column_numbers[rowstart_indices[row+1]],
-		       static_cast<int>(row));
+		       row);
       
-      for (const int * col=rowstart; col!=first_after_diagonal; ++col)
+      for (const unsigned int * col=rowstart; col!=first_after_diagonal; ++col)
 	dst(row) -= global_entry (col-column_numbers) * dst(*col);
     };
 
@@ -315,15 +313,15 @@ void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
   for (int row=N-1; row>=0; --row)
     {
 				       // get end of this row
-      const int * const rowend = &column_numbers[rowstart_indices[row+1]];
+      const unsigned int * const rowend = &column_numbers[rowstart_indices[row+1]];
 				       // find the position where the part
 				       // right of the diagonal starts
-      const int * const first_after_diagonal
+      const unsigned int * const first_after_diagonal
 	= lower_bound (&column_numbers[rowstart_indices[row]+1],
 		       &column_numbers[rowstart_indices[row+1]],
-		       row);
+		       static_cast<unsigned int>(row));
       
-      for (const int * col=first_after_diagonal; col!=rowend; ++col)
+      for (const unsigned int * col=first_after_diagonal; col!=rowend; ++col)
 	dst(row) -= global_entry (col-column_numbers) * dst(*col);
 
 				       // scale by the diagonal element.

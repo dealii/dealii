@@ -512,11 +512,13 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
   const unsigned int n_dofs             = matrix.m();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
   const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
-  const int          *sparsity_colnums  = sparsity.get_column_numbers();
+  const unsigned int *sparsity_colnums  = sparsity.get_column_numbers();
 
   for (; dof != endd; ++dof)
     {
-      const int dof_number = dof->first;
+      Assert (dof->first >= 0, ExcInternalError());
+      
+      const unsigned int dof_number = static_cast<unsigned int>(dof->first);
 				       // for each boundary dof:
       
 				       // set entries of this line
@@ -577,7 +579,7 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 	{
 					   // we need not handle the
 					   // row we have already cleared
-	  if ((signed int)row == dof_number)
+	  if (row == dof_number)
 	    continue;
 
 					   // check whether the line has
@@ -592,9 +594,9 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 					   //
 					   // if this row contains an element
 					   // for this dof, *p==dof_number
-	  const int * p = lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
-				      &sparsity_colnums[sparsity_rowstart[row+1]],
-				      dof_number);
+	  const unsigned int * p = lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
+					       &sparsity_colnums[sparsity_rowstart[row+1]],
+					       dof_number);
 					   // check whether this line has
 					   // an entry in the regarding column
 					   // (check for ==dof_number and

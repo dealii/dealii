@@ -680,16 +680,17 @@ unsigned int SparseMatrix<number>::n () const
 
 template <typename number>
 inline
-void SparseMatrix<number>::set (const unsigned int i, const unsigned int j,
-				const number value) {
+void SparseMatrix<number>::set (const unsigned int i,
+				const unsigned int j,
+				const number value)
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert ((cols->operator()(i,j) != -1) || (value == 0.),
+  Assert ((cols->operator()(i,j) != SparsityPattern::invalid_entry) ||
+	  (value == 0.),
 	  ExcInvalidIndex(i,j));
 
-  const int index = cols->operator()(i,j);
-
-  if (index >= 0)
-    val[index] = value;
+  if (value != 0.)
+    val[cols->operator()(i,j)] = value;
 };
 
 
@@ -699,13 +700,12 @@ inline
 void SparseMatrix<number>::add (const unsigned int i, const unsigned int j,
 				const number value) {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert ((cols->operator()(i,j) != -1) || (value == 0.),
+  Assert ((cols->operator()(i,j) != SparsityPattern::invalid_entry) ||
+	  (value == 0.),
 	  ExcInvalidIndex(i,j));
 
-  const int index = cols->operator()(i,j);
-  
-  if (index >= 0)
-    val[index] += value;
+  if (value != 0.)
+    val[cols->operator()(i,j)] += value;
 };
 
 
@@ -714,9 +714,11 @@ void SparseMatrix<number>::add (const unsigned int i, const unsigned int j,
 
 template <typename number>
 inline
-number SparseMatrix<number>::operator () (const unsigned int i, const unsigned int j) const {
+number SparseMatrix<number>::operator () (const unsigned int i,
+					  const unsigned int j) const
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (cols->operator()(i,j) != -1,
+  Assert (cols->operator()(i,j) != SparsityPattern::invalid_entry,
 	  ExcInvalidIndex(i,j));
   return val[cols->operator()(i,j)];
 };
@@ -725,7 +727,8 @@ number SparseMatrix<number>::operator () (const unsigned int i, const unsigned i
 
 template <typename number>
 inline
-number SparseMatrix<number>::diag_element (const unsigned int i) const {
+number SparseMatrix<number>::diag_element (const unsigned int i) const
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
   Assert (i<max_len, ExcInvalidIndex1(i));
@@ -757,7 +760,8 @@ number & SparseMatrix<number>::diag_element (const unsigned int i)
 template <typename number>
 inline
 number
-SparseMatrix<number>::raw_entry(unsigned int row, unsigned int index) const
+SparseMatrix<number>::raw_entry (const unsigned int row,
+				 const unsigned int index) const
 {
   Assert(row<cols->rows, ExcIndexRange(row,0,cols->rows));
   Assert(index<cols->row_length(row), ExcIndexRange(index,0,cols->row_length(row)));
@@ -769,7 +773,8 @@ SparseMatrix<number>::raw_entry(unsigned int row, unsigned int index) const
 
 template <typename number>
 inline
-number SparseMatrix<number>::global_entry (const unsigned int j) const {
+number SparseMatrix<number>::global_entry (const unsigned int j) const
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   return val[j];
 };
@@ -778,7 +783,8 @@ number SparseMatrix<number>::global_entry (const unsigned int j) const {
 
 template <typename number>
 inline
-number & SparseMatrix<number>::global_entry (const unsigned int j) {
+number & SparseMatrix<number>::global_entry (const unsigned int j)
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   return val[j];
 };

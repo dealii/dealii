@@ -87,7 +87,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 					     // let c point to the constraint
 					     // of this column
 	    vector<ConstraintLine>::const_iterator c = lines.begin();
-	    while (c->line != (unsigned int)uncondensed_struct.get_column_numbers()[j])
+	    while (c->line != uncondensed_struct.get_column_numbers()[j])
 	      ++c;
 
 	    for (unsigned int q=0; q!=c->entries.size(); ++q)
@@ -117,7 +117,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 					       // let c point to the constraint
 					       // of this column
 	      vector<ConstraintLine>::const_iterator c = lines.begin();
-	      while (c->line != (unsigned int)uncondensed_struct.get_column_numbers()[j])
+	      while (c->line != uncondensed_struct.get_column_numbers()[j])
 		++c;
 	      
 	      for (unsigned int p=0; p!=c->entries.size(); ++p)
@@ -157,15 +157,15 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
 
-  int n_rows = sparsity.n_rows();
-  for (int row=0; row<n_rows; ++row)
+  const unsigned int n_rows = sparsity.n_rows();
+  for (unsigned int row=0; row<n_rows; ++row)
     {
       if (distribute[row] == -1)
 					 // regular line. loop over cols
 	for (unsigned int j=sparsity.get_rowstart_indices()[row];
 	     j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					   // end of row reached?
-	  if (sparsity.get_column_numbers()[j] == -1)
+	  if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
 	    {
 					       // this should not happen, since
 					       // we only operate on compressed
@@ -199,7 +199,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 	for (unsigned int j=sparsity.get_rowstart_indices()[row];
 	     j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					   // end of row reached?
-	  if (sparsity.get_column_numbers()[j] == -1)
+	  if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
 	    {
 					       // this should not happen, since
 					       // we only operate on compressed

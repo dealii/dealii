@@ -2,13 +2,6 @@
 ====== Things to be done for the lac library     ================
 =================================================================
 
-Use unsigned integers for the colnums array in dSMatrixStruct. This
-  would enhance safety since colnum=-1 would no longer point to a
-  valid address. Mark unused values by numeric_limits<uint>::max
-  (or some such constant) instead, which probably has the same
-  bit representation as (uint)-1, but is an unsigned, therefore
-  eliminating the need for conversions.
-
 
 Make ILU decomposition faster by following the comment in the
   innermost loop (about the better use of the index j).

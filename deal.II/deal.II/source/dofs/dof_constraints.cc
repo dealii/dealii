@@ -190,7 +190,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 					     // let c point to the constraint
 					     // of this column
 	    vector<ConstraintLine>::const_iterator c = lines.begin();
-	    while (c->line != (unsigned int)uncondensed.get_column_numbers()[j])
+	    while (c->line != uncondensed.get_column_numbers()[j])
 	      ++c;
 
 	    for (unsigned int q=0; q!=c->entries.size(); ++q) 
@@ -215,7 +215,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 					       // let c point to the constraint
 					       // of this column
 	      vector<ConstraintLine>::const_iterator c = lines.begin();
-	      while (c->line != (unsigned int)uncondensed.get_column_numbers()[j]) ++c;
+	      while (c->line != uncondensed.get_column_numbers()[j]) ++c;
 	      
 	      for (unsigned int p=0; p!=c->entries.size(); ++p)
 		for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
@@ -256,10 +256,10 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const {
 	for (unsigned int j=sparsity.get_rowstart_indices()[row];
 	     j<sparsity.get_rowstart_indices()[row+1]; ++j)
 	  {
-	    const int column = sparsity.get_column_numbers()[j];
+	    const unsigned int column = sparsity.get_column_numbers()[j];
 	    
 					     // end of row reached?
-	    if (column == -1)
+	    if (column == SparsityPattern::invalid_entry)
 	      break;
 	    else
 	      if (distribute[column] != -1)
@@ -279,7 +279,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const {
 	for (unsigned int j=sparsity.get_rowstart_indices()[row];
 	     j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					   // end of row reached?
-	  if (sparsity.get_column_numbers()[j] == -1)
+	  if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
 	    break;
 	  else
 	    {

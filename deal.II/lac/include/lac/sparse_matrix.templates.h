@@ -260,9 +260,9 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
 
 				   // if not in MT mode or size<2000
 				   // do it in an oldfashioned way
-  const number *val_ptr = &val[cols->rowstart[0]];
-  const int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-  somenumber   *dst_ptr = &dst(0);
+  const number       *val_ptr    = &val[cols->rowstart[0]];
+  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
+  somenumber         *dst_ptr    = &dst(0);
   for (unsigned int row=0; row<n_rows; ++row)
     {
       somenumber s = 0.;
@@ -284,9 +284,9 @@ SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 				      const unsigned int        end_row) const
 {
 #ifdef DEAL_II_USE_MT
-  const number *val_ptr = &val[cols->rowstart[begin_row]];
-  const int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
-  somenumber   *dst_ptr = &dst(begin_row);
+  const number       *val_ptr    = &val[cols->rowstart[begin_row]];
+  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
+  somenumber         *dst_ptr    = &dst(begin_row);
   for (unsigned int row=begin_row; row<end_row; ++row)
     {
       somenumber s = 0.;
@@ -322,7 +322,7 @@ SparseMatrix<number>::Tvmult (Vector<somenumber>& dst, const Vector<somenumber>&
     {
       for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  int p = cols->colnums[j];
+	  const unsigned int p = cols->colnums[j];
 	  dst(p) += val[j] * src(i);
 	}
     }
@@ -340,10 +340,10 @@ SparseMatrix<number>::vmult_add (Vector<somenumber>& dst, const Vector<somenumbe
   Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionsDontMatch(n(),src.size()));
 
-  const unsigned int n_rows = m();
-  const number *val_ptr = &val[cols->rowstart[0]];
-  const int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-  somenumber   *dst_ptr = &dst(0);
+  const unsigned int  n_rows     = m();
+  const number       *val_ptr    = &val[cols->rowstart[0]];
+  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
+  somenumber         *dst_ptr    = &dst(0);
   for (unsigned int row=0; row<n_rows; ++row)
     {
       somenumber s = 0.;
@@ -369,7 +369,7 @@ SparseMatrix<number>::Tvmult_add (Vector<somenumber>& dst, const Vector<somenumb
     {
       for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  int p = cols->colnums[j];
+	  const unsigned int p = cols->colnums[j];
 	  dst(p) += val[j] * src(i);
 	}
     }
@@ -438,9 +438,9 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
 #endif
 				   // if not in MT mode or the matrix is
 				   // too small: do it one-by-one
-  somenumber sum = 0.;
-  const number *val_ptr = &val[cols->rowstart[0]];
-  const int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
+  somenumber          sum        = 0.;
+  const number       *val_ptr    = &val[cols->rowstart[0]];
+  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
   for (unsigned int row=0; row<n_rows; ++row)
     {
       somenumber s = 0.;
@@ -466,8 +466,8 @@ SparseMatrix<number>::threaded_matrix_norm (const Vector<somenumber> &v,
 {
 #ifdef DEAL_II_USE_MT
   somenumber sum = 0.;
-  const number *val_ptr = &val[cols->rowstart[begin_row]];
-  const int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
+  const number      *val_ptr    = &val[cols->rowstart[begin_row]];
+  const unsignedint *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
   for (unsigned int row=begin_row; row<end_row; ++row)
     {
       somenumber s = 0.;
@@ -600,7 +600,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
       somenumber s = b(i);
       for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  int p = cols->colnums[j];
+	  const unsigned int p = cols->colnums[j];
 	  s -= val[j] * u(p);
 	}
       dst(i) = s;
@@ -628,7 +628,7 @@ SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
       somenumber s = b(i);
       for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  int p = cols->colnums[j];
+	  const unsigned int p = cols->colnums[j];
 	  s -= val[j] * u(p);
 	}
       dst(i) = s;
@@ -704,7 +704,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
       const unsigned int first_right_of_diagonal_index
 	= (lower_bound (&cols->colnums[*rowstart_ptr+1],
 			&cols->colnums[*(rowstart_ptr+1)],
-			static_cast<signed int>(row)) -
+			row) -
 	   &cols->colnums[0]);
 				       
       for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
@@ -727,10 +727,10 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
       const unsigned int first_right_of_diagonal_index
 	= (lower_bound (&cols->colnums[*rowstart_ptr+1],
 			&cols->colnums[*(rowstart_ptr+1)],
-			static_cast<signed int>(row)) -
+			static_cast<unsigned int>(row)) -
 	   &cols->colnums[0]);
       for (unsigned int j=first_right_of_diagonal_index; j<*(rowstart_ptr+1); ++j)
-	if (cols->colnums[j] > row)
+	if (cols->colnums[j] > static_cast<unsigned int>(row))
 	  *dst_ptr -= om* val[j] * dst(cols->colnums[j]);
       
       *dst_ptr /= val[*rowstart_ptr];
@@ -769,7 +769,7 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst, const number om) const
     {
       somenumber s = dst(row);
       for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
-	if (static_cast<unsigned int>(cols->colnums[j]) < row)
+	if (cols->colnums[j] < row)
 	  s -= val[j] * dst(cols->colnums[j]);
 
       dst(row) = s * om / val[cols->rowstart[row]];
@@ -847,7 +847,6 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
   Assert (m() == n(), ExcMatrixNotSquare());
   Assert (m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
 
-  int p;
   const unsigned int  n = dst.size();
   unsigned int  j;
   somenumber s;
@@ -857,8 +856,8 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
       s = 0.;
       for (j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  p = cols->colnums[j];
-	  if (p>=0)
+	  const unsigned int p = cols->colnums[j];
+	  if (p != SparsityPattern::invalid_entry)
 	    {
 	      if (i>j) s += val[j] * dst(p);
 	    }
@@ -872,8 +871,8 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
       s = 0.;
       for (j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  p = cols->colnums[j];
-	  if (p>=0)
+	  const unsigned int p = cols->colnums[j];
+	  if (p != SparsityPattern::invalid_entry)
 	    {
 	      if (static_cast<unsigned int>(i)<j) s += val[j] * dst(p);
 	    }
@@ -933,7 +932,7 @@ void SparseMatrix<number>::print_formatted (ostream &out,
   for (unsigned int i=0; i<m(); ++i)
     {
       for (unsigned int j=0; j<n(); ++j)
-	if ((*cols)(i,j) != -1)
+	if ((*cols)(i,j) != SparsityPattern::invalid_entry)
 	  out << setw(width)
 	      << val[cols->operator()(i,j)] << ' ';
 	else

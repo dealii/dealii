@@ -69,7 +69,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
 					   // of this row's entries
 	  for (j=sparsity.get_rowstart_indices()[row];
 	       j<sparsity.get_rowstart_indices()[row+1]; ++j)
-	    if (sparsity.get_column_numbers()[j] == -1)
+	    if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
 	      break;
 					   // post-condition after loop:
 					   // coordination, i.e. the number
@@ -123,7 +123,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
       for (unsigned int i=0; i<last_round_dofs.size(); ++i)
 	for (unsigned int j=sparsity.get_rowstart_indices()[last_round_dofs[i]];
 	     j<sparsity.get_rowstart_indices()[last_round_dofs[i]+1]; ++j)
-	  if (sparsity.get_column_numbers()[j] == -1)
+	  if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
 	    break;
 	  else
 	    next_round_dofs.push_back (sparsity.get_column_numbers()[j]);
@@ -163,7 +163,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
 	  unsigned int coordination = 0;
 	  for (unsigned int j=sparsity.get_rowstart_indices()[*s];
 	       j<sparsity.get_rowstart_indices()[*s+1]; ++j)
-	    if (sparsity.get_column_numbers()[j] == -1)
+	    if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
 	      break;
 	    else
 	      ++coordination;
@@ -248,7 +248,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
 	  unsigned int j;
 	  for (j=sparsity.get_rowstart_indices()[row];
 	       j<sparsity.get_rowstart_indices()[row+1]; ++j)
-	    if (sparsity.get_column_numbers()[j] == -1)
+	    if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
 	      break;
 					   // post-condition after loop:
 					   // coordination is now
@@ -287,7 +287,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
       for (unsigned int i=0; i<last_round_dofs.size(); ++i)
 	for (unsigned int j=sparsity.get_rowstart_indices()[last_round_dofs[i]];
 	     j<sparsity.get_rowstart_indices()[last_round_dofs[i]+1]; ++j)
-	  if (sparsity.get_column_numbers()[j] == -1)
+	  if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
 	    break;
 	  else
 	    next_round_dofs.push_back (sparsity.get_column_numbers()[j]);
@@ -327,7 +327,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
 	  unsigned int coordination = 0;
 	  for (unsigned int j=sparsity.get_rowstart_indices()[*s];
 	       j<sparsity.get_rowstart_indices()[*s+1]; ++j)
-	    if (sparsity.get_column_numbers()[j] == -1)
+	    if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
 	      break;
 	    else
 	      ++coordination;
