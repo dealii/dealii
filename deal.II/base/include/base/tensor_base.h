@@ -43,11 +43,21 @@ template <int dim> class Tensor<1,dim>;
 
 /**
  * This class is a specialized version of the <tt>Tensor<rank,dim></tt> class.
- * It handles tensors with one index, i.e. vectors, of fixed dimension
- * and offers the functionality needed for tensors of higher rank.
+ * It handles tensors with one index, i.e. vectors, of fixed dimension and
+ * provides the basis for the functionality needed for tensors of higher rank.
  *
- * In many cases, you will want to use the more specialized <tt>Point</tt> class
- * which acts as a tensor of rank one but has more functionality.
+ * Within deal.II, the distinction between this class and its derived class
+ * <tt>Point</tt> is that we use the <tt>Point</tt> class mainly to denote the
+ * points that make up geometric objects. As such, they have a small number of
+ * additional operations over general tensors of rank 1 for which we use the
+ * <tt>Tensor<1,dim></tt> class. In particular, there is a distance() function
+ * to compute the Euclidian distance between two points in space.
+ *
+ * However, the <tt>Point</tt> class is really only used where the coordinates
+ * of an object can be thought to possess the dimension of a length. For all
+ * other uses, such as the gradient of a scalar function (which is a tensor of
+ * rank 1, or vector, with as many elements as a point object, but with
+ * different physical units), we use the <tt>Tensor<1,dim></tt> class.
  */
 template <int dim>
 class Tensor<1,dim>
