@@ -14,8 +14,7 @@ CXX       = /home/wolf/bin/gcc/bin/c++
 endif
 
 ifeq ($(shell uname),SunOS)
-//CXX       = /usr/local/gcc/egcs-19980803/bin/c++
-CXX       = g++
+CXX       = c++
 endif
 
 
