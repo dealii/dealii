@@ -59,20 +59,25 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 				   // to a face, for the present cell and its
 				   // neighbor.
   FEFaceValues<dim> fe_face_values_cell (fe, quadrature,
-					 UpdateFlags(update_gradients | update_JxW_values |
-						     update_jacobians | update_q_points |
+					 UpdateFlags(update_gradients  |
+						     update_JxW_values |
+						     update_jacobians  |
+						     update_q_points   |
 						     update_normal_vectors)); 
   FEFaceValues<dim> fe_face_values_neighbor (fe, quadrature,
-					     UpdateFlags(update_gradients)); 
+					     UpdateFlags(update_gradients |
+							 update_jacobians));
+
+				   // loop variables
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
-  
 				   // loop over all cells
   for (unsigned int present_cell=0; cell!=endc; ++cell, ++present_cell)
 				     // loop over all faces of this cell
     for (unsigned int face_no=0; face_no<2*dim; ++face_no)
       {
-	const unsigned char boundary_indicator = cell->face(face_no)->boundary_indicator();
+	const unsigned char boundary_indicator
+	  = cell->face(face_no)->boundary_indicator();
 	if ((boundary_indicator != 255) &&
 	    neumann_bc.find(boundary_indicator)==neumann_bc.end())
 					   // this face is part of the boundary
@@ -97,13 +102,14 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					 // get a list of the values of
 					 // the solution for the ansatz
 					 // functions on this cell
-	vector<double>   dof_values;
+	vector<double>   dof_values(fe.total_dofs, 0);
 	cell->get_dof_values (solution, dof_values);
 
 					 // get a list of the gradients of
 					 // the ansatz functions on this
 					 // cell at the quadrature points
-	const vector<vector<Point<dim> > > &shape_grads(fe_face_values_cell.get_shape_grads());
+	const vector<vector<Point<dim> > > &shape_grads(fe_face_values_cell.
+							get_shape_grads());
 
 					 // compute the gradients of the solution
 					 // at the quadrature points by summing
@@ -123,7 +129,8 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 	    Assert (cell->neighbor(face_no).state() == valid,
 		    ExcInternalError());
 	    unsigned int neighbor_neighbor;
-	    DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(face_no);
+	    DoFHandler<dim>::active_cell_iterator neighbor
+	      = cell->neighbor(face_no);
 
 					     // find which number the current
 					     // face has relative to the neighboring
@@ -137,7 +144,8 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					     // get restriction of finite element
 					     // function of #neighbor# to the
 					     // common face.
-	    fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor, fe, boundary);
+	    fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor,
+					    fe, boundary);
 
 					     // get a list of the values of
 					     // the solution for the ansatz
@@ -178,7 +186,8 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					 //
 					 // let phi be the name of the integrand
 	vector<double> phi(n_q_points,0);
-	const vector<Point<dim> > &normal_vectors(fe_face_values_cell.get_normal_vectors());
+	const vector<Point<dim> > &normal_vectors(fe_face_values_cell.
+						  get_normal_vectors());
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  phi[point] = psi[point]*normal_vectors[point];
 	
@@ -222,7 +231,7 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 	error(present_cell)
 	  += sqrt(inner_product (phi.begin(), phi.end(),
 				 fe_face_values_cell.get_JxW_values().begin(),
-				 0.0));
+				 0.0)) * cell->diameter();
       };
 };
 

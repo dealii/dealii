@@ -214,7 +214,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 	    const unsigned int n_dofs = fe.total_dofs;
 	    const unsigned int n_q_points = q.n_quadrature_points;
 	    const dFMatrix & shape_values = fe_values.get_shape_values();
-	    vector<double>   dof_values;
+	    vector<double>   dof_values(fe.total_dofs, 0);
 	    cell->get_dof_values (solution, dof_values);
 	    
 	    vector<double>   psi;
@@ -299,7 +299,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 	    const unsigned int n_dofs = fe.total_dofs;
 	    const unsigned int n_q_points = q.n_quadrature_points;
 	    const vector<vector<Point<dim> > > & shape_grads = fe_values.get_shape_grads();
-	    vector<double>   dof_values;
+	    vector<double>   dof_values(fe.total_dofs, 0);
 	    cell->get_dof_values (solution, dof_values);
 	    
 	    vector<Point<dim> >   psi;
@@ -359,7 +359,7 @@ void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
 
 template <int dim>
 pair<char*,char*> ProblemBase<dim>::get_solution_name () const {
-  return pair<char*,char*>("solution", "");
+  return pair<char*,char*>("solution", "<dimensionless>");
 };
 
 
