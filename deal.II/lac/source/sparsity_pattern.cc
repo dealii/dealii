@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,9 +67,9 @@ SparsityPattern::SparsityPattern (const unsigned int m,
 
 
 
-SparsityPattern::SparsityPattern (const unsigned int          m,
-				  const unsigned int          n,
-				  const vector<unsigned int> &row_lengths) 
+SparsityPattern::SparsityPattern (const unsigned int               m,
+				  const unsigned int               n,
+				  const std::vector<unsigned int> &row_lengths) 
 		: max_dim(0),
 		  max_vec_len(0),
 		  rowstart(0),
@@ -92,8 +92,8 @@ SparsityPattern::SparsityPattern (const unsigned int n,
 
 
 
-SparsityPattern::SparsityPattern (const unsigned int          m,
-				  const vector<unsigned int> &row_lengths) 
+SparsityPattern::SparsityPattern (const unsigned int               m,
+				  const std::vector<unsigned int> &row_lengths) 
 		: max_dim(0),
 		  max_vec_len(0),
 		  rowstart(0),
@@ -156,17 +156,17 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
       const unsigned int * const
 	original_last_before_side_diagonals
 	= (row > extra_off_diagonals ?
-	   lower_bound (original_row_start,
-			original_row_end,
-			row-extra_off_diagonals) :
+	   std::lower_bound (original_row_start,
+			     original_row_end,
+			     row-extra_off_diagonals) :
 	   original_row_start);
       
       const unsigned int * const
 	original_first_after_side_diagonals
 	= (row < rows-extra_off_diagonals-1 ?
-	   upper_bound (original_row_start,
-			original_row_end,
-			row+extra_off_diagonals) :
+	   std::upper_bound (original_row_start,
+			     original_row_end,
+			     row+extra_off_diagonals) :
 	   original_row_end);
 
 				       // find first free slot. the
@@ -175,22 +175,22 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
       unsigned int * next_free_slot = &colnums[rowstart[row]] + 1;
 
 				       // copy elements before side-diagonals
-      next_free_slot = copy (original_row_start,
-			     original_last_before_side_diagonals,
-			     next_free_slot);
+      next_free_slot = std::copy (original_row_start,
+				  original_last_before_side_diagonals,
+				  next_free_slot);
 
 				       // insert left and right side-diagonals
-      for (unsigned int i=1; i<=min(row,extra_off_diagonals);
+      for (unsigned int i=1; i<=std::min(row,extra_off_diagonals);
 	   ++i, ++next_free_slot)
 	*next_free_slot = row-i;
-      for (unsigned int i=1; i<=min(extra_off_diagonals, rows-row-1);
+      for (unsigned int i=1; i<=std::min(extra_off_diagonals, rows-row-1);
 	   ++i, ++next_free_slot)
 	*next_free_slot = row+i;
 
 				       // copy rest
-      next_free_slot = copy (original_first_after_side_diagonals,
-			     original_row_end,
-			     next_free_slot);
+      next_free_slot = std::copy (original_first_after_side_diagonals,
+				  original_row_end,
+				  next_free_slot);
 
 				       // this error may happen if the
 				       // sum of previous elements per row
@@ -238,16 +238,16 @@ SparsityPattern::reinit (const unsigned int m,
 {
 				   // simply map this function to the
 				   // other @p{reinit} function
-  const vector<unsigned int> row_lengths (m, max_per_row);
+  const std::vector<unsigned int> row_lengths (m, max_per_row);
   reinit (m, n, row_lengths);
 };
 
 
 
 void
-SparsityPattern::reinit (const unsigned int m,
-			 const unsigned int n,
-			 const vector<unsigned int> &row_lengths)
+SparsityPattern::reinit (const unsigned int               m,
+			 const unsigned int               n,
+			 const std::vector<unsigned int> &row_lengths)
 {
   Assert (((m==0) && (n==0)) || (*max_element(row_lengths.begin(), row_lengths.end()) > 0),
 	  ExcInvalidNumber(*max_element(row_lengths.begin(), row_lengths.end())));
@@ -282,12 +282,12 @@ SparsityPattern::reinit (const unsigned int m,
 				   // columns
   unsigned int vec_len = 0;
   for (unsigned int i=0; i<m; ++i)
-    vec_len += min(row_lengths[i], n);
+    vec_len += std::min(row_lengths[i], n);
 
   max_row_length = (row_lengths.size() == 0 ?
 		    0 :
-		    min (*max_element(row_lengths.begin(), row_lengths.end()),
-			 n));
+		    std::min (*std::max_element(row_lengths.begin(), row_lengths.end()),
+			      n));
 
 
 				   // allocate memory for the rowstart
@@ -311,13 +311,13 @@ SparsityPattern::reinit (const unsigned int m,
 				   // set the rowstart array 
   rowstart[0] = 0;
   for (unsigned int i=1; i<=rows; ++i)
-    rowstart[i] = rowstart[i-1]+min(row_lengths[i-1],n);
+    rowstart[i] = rowstart[i-1]+std::min(row_lengths[i-1],n);
   Assert (rowstart[rows]==vec_len, ExcInternalError());
 
 				   // preset the column numbers by a
 				   // value indicating it is not in
 				   // use
-  fill_n (&colnums[0], vec_len, invalid_entry);
+  std::fill_n (&colnums[0], vec_len, invalid_entry);
 
 				   // if the matrix is square: let the
 				   // first entry in each row be the
@@ -348,17 +348,17 @@ SparsityPattern::compress ()
 				   // elements there are, in order to
 				   // allocate the right amount of
 				   // memory
-  const unsigned int
-    nonzero_elements = count_if (&colnums[rowstart[0]],
-				 &colnums[rowstart[rows]],
-				 bind2nd(not_equal_to<unsigned int>(), invalid_entry));
+  const unsigned int nonzero_elements
+    = std::count_if (&colnums[rowstart[0]],
+		     &colnums[rowstart[rows]],
+		     std::bind2nd(std::not_equal_to<unsigned int>(), invalid_entry));
 				   // now allocate the respective memory
   unsigned int *new_colnums = new unsigned int[nonzero_elements];
 
 
 				   // reserve temporary storage to
 				   // store the entries of one row
-  vector<unsigned int> tmp_entries (max_row_length);
+  std::vector<unsigned int> tmp_entries (max_row_length);
   
 				   // Traverse all rows
   for (unsigned int line=0; line<rows; ++line)
@@ -381,8 +381,8 @@ SparsityPattern::compress ()
 				       // this case only sort the
 				       // remaining entries, otherwise
 				       // sort all
-      sort ((rows==cols) ? &tmp_entries[1] : &tmp_entries[0],
-	    &tmp_entries[row_length]);
+      std::sort ((rows==cols) ? &tmp_entries[1] : &tmp_entries[0],
+		 &tmp_entries[row_length]);
 
 				       // insert column numbers
 				       // into the new field
@@ -411,15 +411,15 @@ SparsityPattern::compress ()
 				       // entries at all
       Assert ((rowstart[line] == next_row_start)
 	      ||
-	      (find (&new_colnums[rowstart[line]+1],
-		     &new_colnums[next_row_start],
-		     new_colnums[rowstart[line]]) ==
+	      (std::find (&new_colnums[rowstart[line]+1],
+			  &new_colnums[next_row_start],
+			  new_colnums[rowstart[line]]) ==
 	       &new_colnums[next_row_start]),
 	      ExcInternalError());
       Assert ((rowstart[line] == next_row_start)
 	      ||
-	      (adjacent_find(&new_colnums[rowstart[line]+1],
-			     &new_colnums[next_row_start]) ==
+	      (std::adjacent_find(&new_colnums[rowstart[line]+1],
+				  &new_colnums[next_row_start]) ==
 	       &new_colnums[next_row_start]),
 	      ExcInternalError());
     };
@@ -489,7 +489,7 @@ SparsityPattern::max_entries_per_row () const
 				   // gives us a sharp bound
   unsigned int m = 0;
   for (unsigned int i=1; i<rows; ++i)
-    m = max (m, rowstart[i]-rowstart[i-1]);
+    m = std::max (m, rowstart[i]-rowstart[i-1]);
 
   return m;
 };
@@ -529,9 +529,9 @@ SparsityPattern::operator () (const unsigned int i,
 				   // at the top of this function, so it
 				   // may not be called for noncompressed
 				   // structures.
-  const unsigned int * const p = lower_bound (&colnums[rowstart[i]+1],
-					      &colnums[rowstart[i+1]],
-					      j);
+  const unsigned int * const p = std::lower_bound (&colnums[rowstart[i]+1],
+						   &colnums[rowstart[i+1]],
+						   j);
   if ((*p == j) &&
       (p != &colnums[rowstart[i+1]]))
     return (p - &colnums[0]);
@@ -607,7 +607,7 @@ SparsityPattern::symmetrize ()
 
 
 void
-SparsityPattern::print_gnuplot (ostream &out) const
+SparsityPattern::print_gnuplot (std::ostream &out) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   for (unsigned int i=0; i<rows; ++i)
@@ -620,7 +620,7 @@ SparsityPattern::print_gnuplot (ostream &out) const
 					 // is x-y, that is we have to
 					 // exchange the order of
 					 // output
-	out << colnums[j] << " " << -static_cast<signed int>(i) << endl;
+	out << colnums[j] << " " << -static_cast<signed int>(i) << std::endl;
 
   AssertThrow (out, ExcIO());
 }

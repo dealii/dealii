@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -693,7 +693,7 @@ class TimeDependent
 				      * objects pointed to by the pointers
 				      * in this collection.
 				      */
-    vector<TimeStepBase*> timesteps;
+    std::vector<TimeStepBase*> timesteps;
 
 				     /**
 				      * Number of the present sweep. This is
@@ -1404,12 +1404,12 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * vectors therefore hold the history
 				      * of the grid.
 				      */
-    vector<vector<bool> >   refine_flags;
+    std::vector<std::vector<bool> >   refine_flags;
 
 				     /**
 				      * @see refine_flags
 				      */
-    vector<vector<bool> >   coarsen_flags;
+    std::vector<std::vector<bool> >   coarsen_flags;
 
     				     /**
 				      * Restore the grid according to the saved
@@ -1627,7 +1627,7 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 				      * See the general description of this
 				      * class for more information.
 				      */
-    typedef vector<vector<pair<unsigned int, double> > >   CorrectionRelaxations;
+    typedef std::vector<std::vector<std::pair<unsigned int, double> > >   CorrectionRelaxations;
 
 				     /**
 				      * Default values for the relaxations:
@@ -1699,7 +1699,7 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 				      * List of relaxations to the correction
 				      * step.
 				      */
-    const vector<vector<pair<unsigned int,double> > > correction_relaxations;
+    const std::vector<std::vector<std::pair<unsigned int,double> > > correction_relaxations;
     
 				     /**
 				      * Number of iterations to be performed

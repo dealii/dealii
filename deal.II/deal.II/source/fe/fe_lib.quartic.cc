@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,7 @@ template <> void FEQ4<deal_II_dimension>::initialize_matrices ();
 template <>
 FEQ4<1>::FEQ4 () :
 		FEQ1Mapping<1> (1, 3, 0, 0, 1,
-				vector<bool> (1, false))
+				std::vector<bool> (1, false))
 {
   initialize_matrices ();
 };
@@ -37,7 +37,7 @@ FEQ4<1>::FEQ4 () :
 template <>
 FEQ4<1>::FEQ4 (const int) :
 		FEQ1Mapping<1> (0, 5, 0, 0, 1,
-				vector<bool> (1, true))
+				std::vector<bool> (1, true))
 {
   initialize_matrices ();
 };
@@ -85,7 +85,7 @@ void FEQ4<1>::initialize_matrices ()
 template <>
 double
 FEQ4<1>::shape_value(const unsigned int i,
-			     const Point<1>     &p) const
+		     const Point<1>     &p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   const double xi = p(0);
@@ -104,7 +104,7 @@ FEQ4<1>::shape_value(const unsigned int i,
 template <>
 Tensor<1,1>
 FEQ4<1>::shape_grad(const unsigned int i,
-			    const Point<1>    &p) const
+		    const Point<1>    &p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   const double xi = p(0);
@@ -128,7 +128,7 @@ FEQ4<1>::shape_grad(const unsigned int i,
 template <>
 Tensor<2,1>
 FEQ4<1>::shape_grad_grad (const unsigned int i,
-				  const Point<1>    &p) const
+			  const Point<1>    &p) const
 {
   Assert (i<dofs_per_cell, ExcIndexRange(i, 0, dofs_per_cell));
 
@@ -148,28 +148,28 @@ FEQ4<1>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FEQ4<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
+void FEQ4<1>::get_unit_support_points (std::vector<Point<1> > &unit_points) const {
   FiniteElement<1>::get_unit_support_points (unit_points);
 };
 
 
 template <>
 void FEQ4<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
-				  vector<Point<1> >  &support_points) const {
+				  std::vector<Point<1> >  &support_points) const {
   FiniteElement<1>::get_support_points (cell, support_points);
 };
 
 
 template <>
 void FEQ4<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
-				       vector<Point<1> >  &) const {
+				       std::vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
 
 
 template <>
 void FEQ4<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
-					     FullMatrix<double> &local_mass_matrix) const {
+				     FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == dofs_per_cell,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
   Assert (local_mass_matrix.m() == dofs_per_cell,
@@ -221,7 +221,7 @@ void FEQ4<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 template <>
 FEQ4<2>::FEQ4 () :
 		FEQ1Mapping<2> (1, 3, 9, 0, 1,
-				vector<bool> (1, false))
+				std::vector<bool> (1, false))
 {
   interface_constraints(0,3) = 1.0;
   interface_constraints(1,0) = 35.0/128.0;
@@ -254,7 +254,7 @@ FEQ4<2>::FEQ4 () :
 template <>
 FEQ4<2>::FEQ4 (const int) :
 		FEQ1Mapping<2> (0, 0, 25, 0, 1,
-				vector<bool> (1, true))
+				std::vector<bool> (1, true))
 {
   initialize_matrices ();
 };
@@ -982,7 +982,7 @@ void FEQ4<2>::initialize_matrices ()
 template <>
 double
 FEQ4<2>::shape_value (const unsigned int i,
-			      const Point<2>    &p) const
+		      const Point<2>    &p) const
 {
   Assert (i<dofs_per_cell, ExcIndexRange(i, 0, dofs_per_cell));
 
@@ -1129,7 +1129,7 @@ FEQ4<2>::shape_value (const unsigned int i,
 template <>
 Tensor<1,2>
 FEQ4<2>::shape_grad (const unsigned int i,
-			     const Point<2>    &p) const
+		     const Point<2>    &p) const
 {
   Assert (i<dofs_per_cell, ExcIndexRange(i, 0, dofs_per_cell));
 
@@ -1200,7 +1200,7 @@ FEQ4<2>::shape_grad (const unsigned int i,
 template <>
 Tensor<2,2>
 FEQ4<2>::shape_grad_grad (const unsigned int i,
-				  const Point<2>    &p) const
+			  const Point<2>    &p) const
 {
   Assert (i<dofs_per_cell, ExcIndexRange(i, 0, dofs_per_cell));
 
@@ -1337,7 +1337,7 @@ FEQ4<2>::shape_grad_grad (const unsigned int i,
 
 template <>
 void FEQ4<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
-					     FullMatrix<double> &local_mass_matrix) const {
+				     FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == dofs_per_cell,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
   Assert (local_mass_matrix.m() == dofs_per_cell,
@@ -2601,7 +2601,7 @@ void FEQ4<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 
 
 template <>
-void FEQ4<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
+void FEQ4<2>::get_unit_support_points (std::vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
 
@@ -2635,7 +2635,7 @@ void FEQ4<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
 
 template <>
 void FEQ4<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
-				  vector<Point<2> >  &support_points) const {
+				  std::vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
 
@@ -2743,7 +2743,7 @@ void FEQ4<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
 
 template <>
 void FEQ4<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
-				       vector<Point<2> >  &support_points) const {
+				       std::vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
 
@@ -2767,7 +2767,7 @@ void FEQ4<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 template <>
 FEQ4<3>::FEQ4 () :
 		FEQ1Mapping<3> (1, 3, 9, 27, 1,
-				vector<bool> (1, false))
+				std::vector<bool> (1, false))
 {
   Assert (false, ExcNotImplemented());
 };
@@ -2776,7 +2776,7 @@ FEQ4<3>::FEQ4 () :
 template <>
 FEQ4<3>::FEQ4 (const int) :
 		FEQ1Mapping<3> (0, 0, 0, 64, 1,
-				vector<bool> (1, true))
+				std::vector<bool> (1, true))
 {
   Assert (false, ExcNotImplemented());
 };
@@ -2829,7 +2829,7 @@ FEQ4<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 
 
 template <>
-void FEQ4<3>::get_unit_support_points (vector<Point<3> > &) const
+void FEQ4<3>::get_unit_support_points (std::vector<Point<3> > &) const
 {
   Assert (false, ExcNotImplemented());
 };
@@ -2837,7 +2837,7 @@ void FEQ4<3>::get_unit_support_points (vector<Point<3> > &) const
 
 template <>
 void FEQ4<3>::get_support_points (const DoFHandler<3>::cell_iterator &,
-				  vector<Point<3> >  &) const
+				  std::vector<Point<3> >  &) const
 {
   Assert (false, ExcNotImplemented());
 };
@@ -2845,7 +2845,7 @@ void FEQ4<3>::get_support_points (const DoFHandler<3>::cell_iterator &,
 
 template <>
 void FEQ4<3>::get_face_support_points (const DoFHandler<3>::face_iterator &,
-				       vector<Point<3> >  &) const
+				       std::vector<Point<3> >  &) const
 {
   Assert (false, ExcNotImplemented());
 };

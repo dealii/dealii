@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -123,7 +123,7 @@ class BlockVector
 				      * initialize each block with
 				      * @p{n[i]} zero elements.
 				      */
-    BlockVector (const vector<unsigned int> &n);
+    BlockVector (const std::vector<unsigned int> &n);
 
                                      /**
 				      * Destructor. Clears memory
@@ -163,8 +163,8 @@ class BlockVector
 				      * If @p{fast==false}, the vector
 				      * is filled with zeros.
 				      */ 
-    void reinit (const vector<unsigned int> &N,
-		 const bool                  fast=false);
+    void reinit (const std::vector<unsigned int> &N,
+		 const bool                       fast=false);
     
 				     /**
 				      * Change the dimension to that of the
@@ -176,7 +176,7 @@ class BlockVector
 				      * @p{reinit (V.size(), fast)}.
 				      */
     void reinit (const BlockVector<Number> &V,
-		 const bool                          fast=false);
+		 const bool                 fast=false);
     
 				     /**
 				      * Set all entries to zero. Equivalent to
@@ -449,11 +449,11 @@ class BlockVector
 
 				     /**
 				      * Print to a stream.
-				      * 
 				      */
-    void print (ostream &, unsigned int precision = 3,
-		bool scientific = true,
-		bool across = true) const;
+    void print (std::ostream       &out,
+		const unsigned int  precision = 3,
+		const bool          scientific = true,
+		const bool          across = true) const;
 
 				     /**
 				      * Write the vector en bloc to a file. This
@@ -463,7 +463,7 @@ class BlockVector
 				      * a different operating system of number
 				      * format.
 				      */
-    void block_write (ostream &out) const;
+    void block_write (std::ostream &out) const;
 
 				     /**
 				      * Read a vector en block from a file. This
@@ -480,7 +480,7 @@ class BlockVector
 				      * data as a vector stored bitwise to a
 				      * file, but not more.
 				      */
-    void block_read (istream &in);
+    void block_read (std::istream &in);
 
 				     /**
 				      * Determine an estimate for the
@@ -495,7 +495,7 @@ class BlockVector
 				     /**
 				      * Pointer to the array of components.
 				      */
-    vector<Vector<Number> > components;
+    std::vector<Vector<Number> > components;
 
 				     /**
 				      * Object managing the
@@ -540,7 +540,7 @@ template <typename Number>
 inline
 Number BlockVector<Number>::operator() (const unsigned int i) const
 {
-  const pair<unsigned int,unsigned int> local_index
+  const std::pair<unsigned int,unsigned int> local_index
     = block_indices.global_to_local (i);
   return components[local_index.first](local_index.second);
 }
@@ -551,7 +551,7 @@ template <typename Number>
 inline
 Number& BlockVector<Number>::operator() (const unsigned int i)
 {
-  const pair<unsigned int,unsigned int> local_index
+  const std::pair<unsigned int,unsigned int> local_index
     = block_indices.global_to_local (i);
   return components[local_index.first](local_index.second);
 }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,8 +40,8 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 		dofs_per_cell (dofs_per_cell),
 		n_transform_functions (n_transform_functions),
 		shape_values (n_values_arrays, FullMatrix<double>(dofs_per_cell, n_q_points)),
-		shape_gradients (dofs_per_cell, vector<Tensor<1,dim> >(n_q_points)),
-		shape_2nd_derivatives (dofs_per_cell, vector<Tensor<2,dim> >(n_q_points)),
+		shape_gradients (dofs_per_cell, std::vector<Tensor<1,dim> >(n_q_points)),
+		shape_2nd_derivatives (dofs_per_cell, std::vector<Tensor<2,dim> >(n_q_points)),
 		weights (n_q_points, 0),
 		JxW_values (n_q_points, 0),
 		quadrature_points (n_q_points, Point<dim>()),
@@ -78,7 +78,7 @@ double FEValuesBase<dim>::shape_value (const unsigned int i,
 template <int dim>
 template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
-					     vector<number>    &values) const
+					     std::vector<number>    &values) const
 {
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
@@ -112,7 +112,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
 template <int dim>
 template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (const InputVector       &fe_function,
-					     vector<Vector<number> > &values) const
+					     std::vector<Vector<number> > &values) const
 {
   Assert (n_quadrature_points == values.size(),
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
@@ -133,7 +133,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector       &fe_functio
   
 				   // initialize with zero
   for (unsigned i=0;i<values.size();++i)
-    fill_n (values[i].begin(), values[i].size(), 0);
+    std::fill_n (values[i].begin(), values[i].size(), 0);
 
 				   // add up contributions of trial
 				   // functions
@@ -164,7 +164,7 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
-					    vector<Tensor<1,dim> > &gradients) const
+					    std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
@@ -199,7 +199,7 @@ void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
 template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_function,
-					    vector<vector<Tensor<1,dim> > > &gradients) const
+					    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (n_quadrature_points == gradients.size(),
 	  ExcWrongNoOfComponents());
@@ -255,7 +255,7 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe_function,
-						      vector<Tensor<2,dim> > &second_derivatives) const
+						      std::vector<Tensor<2,dim> > &second_derivatives) const
 {
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
@@ -292,7 +292,7 @@ template <class InputVector>
 void
 FEValuesBase<dim>::
 get_function_2nd_derivatives (const InputVector               &fe_function,
-			      vector<vector<Tensor<2,dim> > > &second_derivs) const
+			      std::vector<std::vector<Tensor<2,dim> > > &second_derivs) const
 {
   Assert (n_quadrature_points == second_derivs.size(),
 	  ExcWrongNoOfComponents());
@@ -400,13 +400,13 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 				   1,
 				   update_flags,
 				   fe),
-		unit_shape_gradients(fe.dofs_per_cell,
-				     vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
-		unit_shape_2nd_derivatives(fe.dofs_per_cell,
-					   vector<Tensor<2,dim> >(quadrature.n_quadrature_points)),
-		unit_shape_gradients_transform(fe.n_transform_functions(),
-					       vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
-		unit_quadrature_points(quadrature.get_points())
+  unit_shape_gradients(fe.dofs_per_cell,
+		       std::vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
+			 unit_shape_2nd_derivatives(fe.dofs_per_cell,
+						    std::vector<Tensor<2,dim> >(quadrature.n_quadrature_points)),
+						      unit_shape_gradients_transform(fe.n_transform_functions(),
+										     std::vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
+										       unit_quadrature_points(quadrature.get_points())
 {
   Assert ((update_flags & update_normal_vectors) == false,
 	  typename FEValuesBase<dim>::ExcInvalidUpdateFlag());
@@ -496,7 +496,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
     for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
 	{
-	  					   // tmp1 := (d_k d_l phi) J_lj
+					   // tmp1 := (d_k d_l phi) J_lj
 	  contract (tmp1, unit_shape_2nd_derivatives[i][j], jacobi_matrices[j]);
 					   // tmp2 := tmp1_kj J_ki
 	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
@@ -558,20 +558,20 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 				   n_faces_or_subfaces,
 				   update_flags,
 				   fe),
-		unit_shape_gradients (n_faces_or_subfaces,
-				      vector<vector<Tensor<1,dim> > >(dofs_per_cell,
-								   vector<Tensor<1,dim> >(n_q_points))),
-		unit_shape_2nd_derivatives(n_faces_or_subfaces,
-					   vector<vector<Tensor<2,dim> > >(dofs_per_cell,
-									   vector<Tensor<2,dim> >(n_q_points))),
-		unit_shape_gradients_transform (n_faces_or_subfaces,
-						vector<vector<Tensor<1,dim> > >(n_transform_functions,
-										vector<Tensor<1,dim> >(n_q_points))),
-		unit_face_quadrature_points (n_q_points, Point<dim-1>()),
-		unit_quadrature_points (n_faces_or_subfaces,
-					vector<Point<dim> >(n_q_points, Point<dim>())),
-		face_jacobi_determinants (n_q_points, 0),
-		normal_vectors (n_q_points)
+  unit_shape_gradients (n_faces_or_subfaces,
+			std::vector<std::vector<Tensor<1,dim> > >(dofs_per_cell,
+								  std::vector<Tensor<1,dim> >(n_q_points))),
+								    unit_shape_2nd_derivatives(n_faces_or_subfaces,
+											       std::vector<std::vector<Tensor<2,dim> > >(dofs_per_cell,
+																	 std::vector<Tensor<2,dim> >(n_q_points))),
+																	   unit_shape_gradients_transform (n_faces_or_subfaces,
+																					   std::vector<std::vector<Tensor<1,dim> > >(n_transform_functions,
+																										     std::vector<Tensor<1,dim> >(n_q_points))),
+																										       unit_face_quadrature_points (n_q_points, Point<dim-1>()),
+																														      unit_quadrature_points (n_faces_or_subfaces,
+																																	      std::vector<Point<dim> >(n_q_points, Point<dim>())),
+																																					 face_jacobi_determinants (n_q_points, 0),
+																																					 normal_vectors (n_q_points)
 {};
 
 
@@ -815,8 +815,8 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 	    if (update_flags & update_second_derivatives)
 	      unit_shape_2nd_derivatives[face*GeometryInfo<dim>::subfaces_per_face+subface][i][j]
 		= fe.shape_grad_grad(i, unit_quadrature_points[face *
-							    GeometryInfo<dim>::
-							    subfaces_per_face+subface][j]);
+							      GeometryInfo<dim>::
+							      subfaces_per_face+subface][j]);
 	  };
   for (unsigned int i=0; i<n_transform_functions; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j)
@@ -971,69 +971,69 @@ template class FESubfaceValues<deal_II_dimension>;
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<double> &,
-					     vector<double>       &) const;
+							   std::vector<double>       &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<float> &,
-					     vector<float>      &) const;
+							   std::vector<float>      &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<double> &,
-					     vector<double>      &) const;
+							   std::vector<double>      &) const;
 
 //-----------------------------------------------------------------------------
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<double> &,
-					     vector<Vector<double> > &) const;
+							   std::vector<Vector<double> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<float> &,
-					     vector<Vector<float> > &) const;
+							   std::vector<Vector<float> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<double> &,
-					     vector<Vector<double> >     &) const;
+							   std::vector<Vector<double> >     &) const;
 
 //-----------------------------------------------------------------------------
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads (const Vector<double> &,
-					    vector<Tensor<1,deal_II_dimension> > &) const;
+							  std::vector<Tensor<1,deal_II_dimension> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads (const Vector<float> &,
-					     vector<Tensor<1,deal_II_dimension> > &) const;
+							  std::vector<Tensor<1,deal_II_dimension> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads (const BlockVector<double> &,
-					     vector<Tensor<1,deal_II_dimension> > &) const;
+							  std::vector<Tensor<1,deal_II_dimension> > &) const;
 
 //-----------------------------------------------------------------------------
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads (const Vector<double> &,
-					     vector<vector<Tensor<1,deal_II_dimension> > > &) const;
+							  std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads (const Vector<float> &,
-					     vector<vector<Tensor<1,deal_II_dimension> > > &) const;
+							  std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads (const BlockVector<double> &,
-					     vector<vector<Tensor<1,deal_II_dimension> > > &) const;
+							  std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
 
 //-----------------------------------------------------------------------------
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const Vector<double> &,
-					    vector<Tensor<2,deal_II_dimension> > &) const;
+								    std::vector<Tensor<2,deal_II_dimension> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const Vector<float> &,
-					     vector<Tensor<2,deal_II_dimension> > &) const;
+								    std::vector<Tensor<2,deal_II_dimension> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const BlockVector<double> &,
-					     vector<Tensor<2,deal_II_dimension> > &) const;
+								    std::vector<Tensor<2,deal_II_dimension> > &) const;
 //-----------------------------------------------------------------------------
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const Vector<double> &,
-					    vector<vector<Tensor<2,deal_II_dimension> > > &) const;
+								    std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const Vector<float> &,
-					     vector<vector<Tensor<2,deal_II_dimension> > > &) const;
+								    std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const BlockVector<double> &,
-					     vector<vector<Tensor<2,deal_II_dimension> > > &) const;
+								    std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;

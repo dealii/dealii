@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -427,7 +427,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{map} type with a
+					  * STL @p{std::map} type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -499,7 +499,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{map} type with a
+					  * STL @p{std::map} type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -555,7 +555,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{map} type with a
+					  * STL @p{std::map} type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -634,7 +634,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{map} type with a
+					  * STL @p{std::map} type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -929,7 +929,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{map} type with a
+					  * STL @p{std::map} type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -985,7 +985,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{map} type with a
+					  * STL @p{std::map} type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -1003,10 +1003,10 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_ucd (const vector<Patch<dim,spacedim> > &patches,
-			   const vector<string>               &data_names,
-			   const UcdFlags                     &flags,
-			   ostream                            &out);
+    static void write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
+			   const std::vector<std::string>          &data_names,
+			   const UcdFlags                          &flags,
+			   std::ostream                            &out);
 
     				     /**
 				      * Write the given list of patches
@@ -1016,10 +1016,10 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_gnuplot (const vector<Patch<dim,spacedim> > &patches,
-			       const vector<string>               &data_names,
-			       const GnuplotFlags                 &flags,
-			       ostream                            &out);
+    static void write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
+			       const std::vector<std::string>          &data_names,
+			       const GnuplotFlags                      &flags,
+			       std::ostream                            &out);
 
     				     /**
 				      * Write the given list of patches
@@ -1029,10 +1029,10 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_povray (const vector<Patch<dim,spacedim> > &patches,
-			      const vector<string>               &data_names,
-			      const PovrayFlags                  &flags,
-			      ostream                            &out);
+    static void write_povray (const std::vector<Patch<dim,spacedim> > &patches,
+			      const std::vector<std::string>          &data_names,
+			      const PovrayFlags                       &flags,
+			      std::ostream                            &out);
 
     				     /**
 				      * Write the given list of patches
@@ -1042,10 +1042,10 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_eps (const vector<Patch<dim,spacedim> > &patches,
-			   const vector<string>               &data_names,
-			   const EpsFlags                     &flags,
-			   ostream                            &out);
+    static void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
+			   const std::vector<std::string>          &data_names,
+			   const EpsFlags                          &flags,
+			   std::ostream                            &out);
 
     				     /**
 				      * Write the given list of patches
@@ -1055,10 +1055,10 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_gmv (const vector<Patch<dim,spacedim> > &patches,
-			   const vector<string>               &data_names,
-			   const GmvFlags                     &flags,
-			   ostream                            &out);
+    static void write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
+			   const std::vector<std::string>          &data_names,
+			   const GmvFlags                          &flags,
+			   std::ostream                            &out);
 
 				     /**
 				      * Determine an estimate for
@@ -1069,7 +1069,7 @@ class DataOutBase
 				      * not be determined exactly
 				      * (for example: what is the
 				      * memory consumption of an
-				      * STL @p{map} type with a
+				      * STL @p{std::map} type with a
 				      * certain number of
 				      * elements?), this is only
 				      * an estimate. however often
@@ -1175,8 +1175,8 @@ class DataOutBase
 				      */
     template <int dim, int spacedim>
     static void
-    write_gmv_reorder_data_vectors (const vector<Patch<dim,spacedim> > &patches,
-				    vector<vector<double> >            &data_vectors);
+    write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
+				    std::vector<std::vector<double> >       &data_vectors);
 };
 
 
@@ -1309,35 +1309,35 @@ class DataOutInterface : private DataOutBase
 				      * function and write it to @p{out} in
 				      * UCD format.
 				      */
-    void write_ucd (ostream &out) const;
+    void write_ucd (std::ostream &out) const;
 
 				     /**
 				      * Obtain data through the @p{get_patches}
 				      * function and write it to @p{out} in
 				      * GNUPLOT format.
 				      */
-    void write_gnuplot (ostream &out) const;
+    void write_gnuplot (std::ostream &out) const;
 
     				     /**
 				      * Obtain data through the @p{get_patches}
 				      * function and write it to @p{out} in
 				      * POVRAY format.
 				      */
-    void write_povray (ostream &out) const;
+    void write_povray (std::ostream &out) const;
 
 				     /**
 				      * Obtain data through the @p{get_patches}
 				      * function and write it to @p{out} in
 				      * EPS format.
 				      */
-    void write_eps (ostream &out) const;
+    void write_eps (std::ostream &out) const;
 
     				     /**
 				      * Obtain data through the @p{get_patches}
 				      * function and write it to @p{out} in
 				      * GMV format.
 				      */
-    void write_gmv (ostream &out) const;
+    void write_gmv (std::ostream &out) const;
 
 				     /**
 				      * Write data and grid to @p{out} according
@@ -1349,7 +1349,8 @@ class DataOutInterface : private DataOutBase
 				      * An error occurs if no format is provided and
 				      * the default format is @p{default_format}.
 				      */
-    void write (ostream &out, const OutputFormat output_format = default_format) const;
+    void write (std::ostream       &out,
+		const OutputFormat  output_format = default_format) const;
 
 				     /**
 				      * Set the default format. The value set here
@@ -1407,7 +1408,7 @@ class DataOutInterface : private DataOutBase
 				      * suffix for the
 				      * @p{default_format} is returned.
 				      */
-    string default_suffix (const OutputFormat output_format = default_format) const;
+    std::string default_suffix (const OutputFormat output_format = default_format) const;
 
 				     /**
 				      * Return the @p{OutputFormat} value
@@ -1429,7 +1430,7 @@ class DataOutInterface : private DataOutBase
 				      * @p{ParameterHandler} class, use the
 				      * function @p{get_output_format_names ()}.
 				      */
-    static OutputFormat parse_output_format (const string &format_name);
+    static OutputFormat parse_output_format (const std::string &format_name);
 
 				     /**
 				      * Return a list of implemented output
@@ -1438,7 +1439,7 @@ class DataOutInterface : private DataOutBase
 				      * as used by the @p{ParameterHandler}
 				      * classes.
 				      */
-    static string get_output_format_names ();
+    static std::string get_output_format_names ();
 
 				     /**
 				      * Declare parameters for all output
@@ -1487,7 +1488,7 @@ class DataOutInterface : private DataOutBase
 				      * not be determined exactly
 				      * (for example: what is the
 				      * memory consumption of an
-				      * STL @p{map} type with a
+				      * STL @p{std::map} type with a
 				      * certain number of
 				      * elements?), this is only
 				      * an estimate. however often
@@ -1513,7 +1514,7 @@ class DataOutInterface : private DataOutBase
 				      * allow the output functions to
 				      * know what they shall print.
 				      */
-    virtual const vector<DataOutBase::Patch<dim,spacedim> > &
+    virtual const std::vector<DataOutBase::Patch<dim,spacedim> > &
     get_patches () const = 0;
 
 				     /**
@@ -1522,7 +1523,7 @@ class DataOutInterface : private DataOutBase
 				      * obtained by the output functions
 				      * of the base class.
 				      */
-    virtual vector<string> get_dataset_names () const = 0;
+    virtual std::vector<std::string> get_dataset_names () const = 0;
 
   private:
 				     /**

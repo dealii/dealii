@@ -43,24 +43,24 @@ void ExceptionBase::SetFields (const char* f,
 
 
 
-void ExceptionBase::PrintExcData (ostream &out) const
+void ExceptionBase::PrintExcData (std::ostream &out) const
 {
   out << "An error occurred in line <" << line
       << "> of file <" << file
-      << "> in function" << endl
-      << "    " << function << endl
-      << "The violated condition was: "<< endl
-      << "    " << cond << endl
-      << "The name and call sequence of the exception was:" << endl
-      << "    " << exc  << endl
-      << "Additional Information: " << endl;
+      << "> in function" << std::endl
+      << "    " << function << std::endl
+      << "The violated condition was: "<< std::endl
+      << "    " << cond << std::endl
+      << "The name and call sequence of the exception was:" << std::endl
+      << "    " << exc  << std::endl
+      << "Additional Information: " << std::endl;
 };
 
 
 
-void ExceptionBase::PrintInfo (ostream &out) const
+void ExceptionBase::PrintInfo (std::ostream &out) const
 {
-  out << "(none)" << endl;
+  out << "(none)" << std::endl;
 };
 
 
@@ -78,21 +78,21 @@ const char * ExceptionBase::what () const throw ()
 				   // and therefore need a liftime which is
 				   // longer than the execution time of this
 				   // function
-  static string description;
+  static std::string description;
 				   // convert the messages printed by the
-				   // exceptions into a string
-  ostrstream converter;
+				   // exceptions into a std::string
+  std::ostrstream converter;
 
   converter << "--------------------------------------------------------"
-	    << endl;
-				   // put general info into the string
+	    << std::endl;
+				   // put general info into the std::string
   PrintExcData (converter);
 				   // put in exception specific data
   PrintInfo (converter);
   
   converter << "--------------------------------------------------------"
-	    << endl
-	    << ends;
+	    << std::endl
+	    << std::ends;
 
   description = converter.str();
 

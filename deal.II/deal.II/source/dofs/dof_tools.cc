@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,7 +45,7 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
 	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
 
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+  std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
   for (; cell!=endc; ++cell) 
@@ -62,9 +62,9 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
 
 template <int dim, class SparsityPattern>
 void
-DoFTools::make_sparsity_pattern (const DoFHandler<dim>       &dof,
-				 const vector<vector<bool> > &mask,
-				 SparsityPattern             &sparsity)
+DoFTools::make_sparsity_pattern (const DoFHandler<dim>                 &dof,
+				 const std::vector<std::vector<bool> > &mask,
+				 SparsityPattern                       &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -82,8 +82,8 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>       &dof,
 				   // first build a mask for each dof,
 				   // not like the one given which represents
 				   // components
-  vector<vector<bool> > dof_mask(dofs_per_cell,
-				 vector<bool>(dofs_per_cell, false));
+  std::vector<std::vector<bool> > dof_mask(dofs_per_cell,
+					   std::vector<bool>(dofs_per_cell, false));
   for (unsigned int i=0; i<dofs_per_cell; ++i)
     for (unsigned int j=0; j<dofs_per_cell; ++j)
       dof_mask[i][j] = mask
@@ -91,9 +91,9 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>       &dof,
 		       [dof.get_fe().system_to_component_index(j).first];
 
 
-  vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+  std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-		       endc = dof.end();
+					endc = dof.end();
   for (; cell!=endc; ++cell) 
     {
       cell->get_dof_indices (dofs_on_this_cell);
@@ -111,10 +111,10 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>       &dof,
 
 template <>
 void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
-					       const vector<unsigned int>  &,
+					       const std::vector<unsigned int>  &,
 					       SparsityPattern    &)
 {
-    Assert (false, ExcInternalError());
+  Assert (false, ExcInternalError());
 };
 
 
@@ -122,7 +122,7 @@ template <>
 void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
 					  const DoFHandler<1>::FunctionMap  &,
-					  const vector<unsigned int>  &,
+					  const std::vector<unsigned int>  &,
 					  SparsityPattern    &)
 {
   Assert (false, ExcInternalError());
@@ -134,7 +134,7 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
 template <int dim>
 void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
-					  const vector<unsigned int>  &dof_to_boundary_mapping,
+					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
 					  SparsityPattern    &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
@@ -149,9 +149,9 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 	  ExcInternalError());
 
   const unsigned int dofs_per_face = dof.get_fe().dofs_per_face;
-  vector<unsigned int> dofs_on_this_face(dofs_per_face);
+  std::vector<unsigned int> dofs_on_this_face(dofs_per_face);
   DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-		       endf = dof.end_face();
+					endf = dof.end_face();
   for (; face!=endf; ++face)
     if (face->at_boundary())
       {
@@ -175,7 +175,7 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 template <int dim>
 void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 					       const DoFHandler<dim>::FunctionMap  &boundary_indicators,
-					       const vector<unsigned int>  &dof_to_boundary_mapping,
+					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
 					       SparsityPattern    &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
@@ -191,7 +191,7 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
   if (true)
     {
       unsigned int max_element = 0;
-      for (vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
+      for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
 	   i!=dof_to_boundary_mapping.end(); ++i)
 	if ((*i != DoFHandler<dim>::invalid_dof_index) &&
 	    (*i > max_element))
@@ -202,9 +202,9 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 #endif
 
   const unsigned int dofs_per_face = dof.get_fe().dofs_per_face;
-  vector<unsigned int> dofs_on_this_face(dofs_per_face);
+  std::vector<unsigned int> dofs_on_this_face(dofs_per_face);
   DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-		       endf = dof.end_face();
+					endf = dof.end_face();
   for (; face!=endf; ++face)
     if (boundary_indicators.find(face->boundary_indicator()) !=
 	boundary_indicators.end())
@@ -238,8 +238,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
 
   const unsigned int total_dofs = dof.get_fe().dofs_per_cell;
-  vector<unsigned int> dofs_on_this_cell(total_dofs);
-  vector<unsigned int> dofs_on_other_cell(total_dofs);
+  std::vector<unsigned int> dofs_on_this_cell(total_dofs);
+  std::vector<unsigned int> dofs_on_other_cell(total_dofs);
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
 
@@ -341,16 +341,16 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	  ExcDimensionMismatch (flux_mask.n(), n_comp));
   
   const unsigned int total_dofs = dof.get_fe().dofs_per_cell;
-  vector<unsigned int> dofs_on_this_cell(total_dofs);
-  vector<unsigned int> dofs_on_other_cell(total_dofs);
+  std::vector<unsigned int> dofs_on_this_cell(total_dofs);
+  std::vector<unsigned int> dofs_on_other_cell(total_dofs);
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
 
 
-  vector<vector<bool> > int_dof_mask(total_dofs,
-				 vector<bool>(total_dofs, false));
-  vector<vector<bool> > flux_dof_mask(total_dofs,
-				 vector<bool>(total_dofs, false));
+  std::vector<std::vector<bool> > int_dof_mask(total_dofs,
+					       std::vector<bool>(total_dofs, false));
+  std::vector<std::vector<bool> > flux_dof_mask(total_dofs,
+						std::vector<bool>(total_dofs, false));
   for (unsigned int i=0; i<total_dofs; ++i)
     for (unsigned int j=0; j<total_dofs; ++j)
       {
@@ -471,8 +471,8 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
   const unsigned int n_dofs_on_mother   = 2*fe.dofs_per_vertex + fe.dofs_per_line,
 		     n_dofs_on_children = fe.dofs_per_vertex + 2*fe.dofs_per_line;
 
-  vector<unsigned int> dofs_on_mother(n_dofs_on_mother);
-  vector<unsigned int> dofs_on_children(n_dofs_on_children);
+  std::vector<unsigned int> dofs_on_mother(n_dofs_on_mother);
+  std::vector<unsigned int> dofs_on_children(n_dofs_on_children);
 
   Assert(n_dofs_on_mother == fe.constraints().n(),
 	 ExcDimensionMismatch(n_dofs_on_mother,
@@ -564,8 +564,8 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 			  12*fe.dofs_per_line+
 			  4*fe.dofs_per_quad);
 
-  vector<unsigned int> dofs_on_mother(n_dofs_on_mother);
-  vector<unsigned int> dofs_on_children(n_dofs_on_children);
+  std::vector<unsigned int> dofs_on_mother(n_dofs_on_mother);
+  std::vector<unsigned int> dofs_on_children(n_dofs_on_children);
 
   Assert(n_dofs_on_mother == fe.constraints().n(),
 	 ExcDimensionMismatch(n_dofs_on_mother,
@@ -707,13 +707,13 @@ void DoFTools::distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler
   
 				   // count how often we have added a value
 				   // in the sum for each dof
-  vector<unsigned char> touch_count (dof_handler.n_dofs(), 0);
+  std::vector<unsigned char> touch_count (dof_handler.n_dofs(), 0);
 
   DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 					endc = dof_handler.end();
   unsigned int present_cell = 0;
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  vector<unsigned int> dof_indices (dofs_per_cell);
+  std::vector<unsigned int> dof_indices (dofs_per_cell);
 
   for (; cell!=endc; ++cell, ++present_cell) 
     {
@@ -754,9 +754,9 @@ void DoFTools::distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler
 
 template<int dim>
 void
-DoFTools::extract_dofs (const DoFHandler<dim> &dof,
-			const vector<bool>    &component_select,
-			vector<bool>          &selected_dofs)
+DoFTools::extract_dofs (const DoFHandler<dim>      &dof,
+			const std::vector<bool>    &component_select,
+			std::vector<bool>          &selected_dofs)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   Assert(component_select.size() == fe.n_components(),
@@ -767,7 +767,7 @@ DoFTools::extract_dofs (const DoFHandler<dim> &dof,
 				   // preset all values by false
   fill_n (selected_dofs.begin(), dof.n_dofs(), false);
   
-  vector<unsigned int> indices(fe.dofs_per_cell);
+  std::vector<unsigned int> indices(fe.dofs_per_cell);
   
   DoFHandler<dim>::active_cell_iterator c;
   for (c = dof.begin_active() ; c != dof.end() ; ++ c)
@@ -788,8 +788,8 @@ template<int dim>
 void
 DoFTools::extract_level_dofs(const unsigned int       level,
 			     const MGDoFHandler<dim> &dof,
-			     const vector<bool>      &component_select,
-			     vector<bool>            &selected_dofs)
+			     const std::vector<bool> &component_select,
+			     std::vector<bool>       &selected_dofs)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
   Assert(component_select.size() == fe.n_components(),
@@ -800,7 +800,7 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 				   // preset all values by false
   fill_n (selected_dofs.begin(), dof.n_dofs(level), false);
 
-  vector<unsigned int> indices(fe.dofs_per_cell);
+  std::vector<unsigned int> indices(fe.dofs_per_cell);
   
   MGDoFHandler<dim>::cell_iterator c;
   for (c = dof.begin(level) ; c != dof.end(level) ; ++ c)
@@ -821,10 +821,10 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 
 template <int dim>
 void
-DoFTools::extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
-				 const vector<bool>    &component_select,
-				 vector<bool>          &selected_dofs,
-				 const set<unsigned char> &boundary_indicators)
+DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
+				 const std::vector<bool>       &component_select,
+				 std::vector<bool>             &selected_dofs,
+				 const std::set<unsigned char> &boundary_indicators)
 {
   Assert (component_select.size() == dof_handler.get_fe().n_components(),
 	  ExcWrongSize (component_select.size(),
@@ -842,7 +842,7 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
 				   // values
   selected_dofs.clear ();
   selected_dofs.resize (dof_handler.n_dofs(), false);
-  vector<unsigned int> face_dof_indices (dof_handler.get_fe().dofs_per_face);
+  std::vector<unsigned int> face_dof_indices (dof_handler.get_fe().dofs_per_face);
   for (DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -850,13 +850,13 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
 	if (! check_boundary_indicator ||
 	    (boundary_indicators.find (cell->face(face)->boundary_indicator())
 	     != boundary_indicators.end()))
-	{
-	  cell->face(face)->get_dof_indices (face_dof_indices);
-	  for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
-	    if (component_select[dof_handler.get_fe().
-				face_system_to_component_index(i).first] == true)
-	      selected_dofs[face_dof_indices[i]] = true;
-	};
+	  {
+	    cell->face(face)->get_dof_indices (face_dof_indices);
+	    for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
+	      if (component_select[dof_handler.get_fe().
+				  face_system_to_component_index(i).first] == true)
+		selected_dofs[face_dof_indices[i]] = true;
+	  };
 };
 
 
@@ -864,9 +864,9 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
 
 template <>
 void
-DoFTools::extract_boundary_dofs (const DoFHandler<1> &dof_handler,
-				 const vector<bool>  &component_select,
-				 vector<bool>        &selected_dofs)
+DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
+				 const std::vector<bool>  &component_select,
+				 std::vector<bool>        &selected_dofs)
 {
   Assert (component_select.size() == dof_handler.get_fe().n_components(),
 	  ExcWrongSize (component_select.size(),
@@ -909,7 +909,7 @@ DoFTools::extract_boundary_dofs (const DoFHandler<1> &dof_handler,
 template <>
 void
 DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
-				     vector<bool>        &selected_dofs)
+				     std::vector<bool>   &selected_dofs)
 {
   Assert(selected_dofs.size() == dof_handler.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
@@ -928,7 +928,7 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
 template <>
 void
 DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
-				     vector<bool>        &selected_dofs)
+				     std::vector<bool>   &selected_dofs)
 {
   const unsigned int dim = 2;
   
@@ -968,7 +968,7 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
 template <>
 void
 DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
-				     vector<bool>        &selected_dofs)
+				     std::vector<bool>   &selected_dofs)
 {
   const unsigned int dim = 3;
 
@@ -1126,8 +1126,8 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // degree of freedom of the
 				   // coarse-grid variable in the
 				   // fine-grid element
-  vector<Vector<double> > parameter_dofs (coarse_dofs_per_cell_component,
-					  Vector<double>(fine_dofs_per_cell));
+  std::vector<Vector<double> > parameter_dofs (coarse_dofs_per_cell_component,
+					       Vector<double>(fine_dofs_per_cell));
 				   // for each coarse dof: find its
 				   // position within the fine element
 				   // and set this value to one in the
@@ -1151,8 +1151,8 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				       // to true if this is an
 				       // interesting dof. finally count
 				       // how many true's there
-      vector<bool> dof_is_interesting (fine_grid.n_dofs(), false);
-      vector<unsigned int>  local_dof_indices (fine_fe.dofs_per_cell);
+      std::vector<bool> dof_is_interesting (fine_grid.n_dofs(), false);
+      std::vector<unsigned int>  local_dof_indices (fine_fe.dofs_per_cell);
       
       for (DoFHandler<dim>::active_cell_iterator cell=fine_grid.begin_active();
 	   cell!=fine_grid.end(); ++cell)
@@ -1171,11 +1171,11 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // get an array in which we store
 				   // which dof on the coarse grid is
 				   // a parameter and which is not
-  vector<bool> coarse_dof_is_parameter (coarse_grid.n_dofs());
+  std::vector<bool> coarse_dof_is_parameter (coarse_grid.n_dofs());
   if (true)
     {
-      vector<bool> mask (coarse_grid.get_fe().n_components(),
-			 false);
+      std::vector<bool> mask (coarse_grid.get_fe().n_components(),
+			      false);
       mask[coarse_component] = true;
       extract_dofs (coarse_grid, mask, coarse_dof_is_parameter);
     };
@@ -1210,12 +1210,12 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // that parameter dof, if it is any
 				   // other dof, then its value is -1,
 				   // indicating an error
-  vector<int> weight_mapping (n_fine_dofs, -1);
+  std::vector<int> weight_mapping (n_fine_dofs, -1);
 
 				   // set up this mapping
   if (true)
     {
-      vector<unsigned int> local_dof_indices(fine_fe.dofs_per_cell);
+      std::vector<unsigned int> local_dof_indices(fine_fe.dofs_per_cell);
       unsigned int next_free_index=0;
       for (typename DoFHandler<dim>::active_cell_iterator cell=fine_grid.begin_active();
 	   cell != fine_grid.end(); ++cell)
@@ -1307,7 +1307,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // while all others will be
 				   // constrained to this dof (and
 				   // possibly others)
-  vector<int> representants(weights.m(), -1);
+  std::vector<int> representants(weights.m(), -1);
   for (unsigned int parameter_dof=0; parameter_dof<weights.m(); ++parameter_dof)
     if (coarse_dof_is_parameter[parameter_dof] == true)
       {
@@ -1355,7 +1355,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // which takes the bulk of the
 				   // time, but it is not known to the
 				   // author how to make it faster...
-  vector<pair<unsigned int,double> > constraint_line;
+  std::vector<std::pair<unsigned int,double> > constraint_line;
   for (unsigned int global_dof=0; global_dof<n_fine_dofs; ++global_dof)
     if (weight_mapping[global_dof] != -1)
 				       // this global dof is a parameter
@@ -1393,8 +1393,8 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 	constraint_line.clear ();
 	for (unsigned int row=first_used_row; row<weights.m(); ++row)
 	  if (weights(row,weight_mapping[global_dof]) != 0)
-	    constraint_line.push_back (make_pair(representants[row],
-						 weights(row,weight_mapping[global_dof])));
+	    constraint_line.push_back (std::make_pair(representants[row],
+						      weights(row,weight_mapping[global_dof])));
 
 	constraints.add_entries (global_dof, constraint_line);
       };
@@ -1407,14 +1407,14 @@ void
 DoFTools::compute_intergrid_weights (const DoFHandler<dim>              &coarse_grid,
 				     const unsigned int                  coarse_component,
 				     const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-				     const vector<Vector<double> >      &parameter_dofs,
-				     const vector<int>                  &weight_mapping,
+				     const std::vector<Vector<double> > &parameter_dofs,
+				     const std::vector<int>             &weight_mapping,
 				     FullMatrix<float>                  &weights)
 {
 				   // simply distribute the range of
 				   // cells to different threads
   typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
-  vector<pair<active_cell_iterator,active_cell_iterator> >
+  std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
     cell_intervals = Threads::split_range<active_cell_iterator> (coarse_grid.begin_active(),
 								 coarse_grid.end(),
 								 multithread_info.n_default_threads);
@@ -1440,8 +1440,8 @@ void
 DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coarse_grid,
 				       const unsigned int                  coarse_component,
 				       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-				       const vector<Vector<double> >      &parameter_dofs,
-				       const vector<int>                  &weight_mapping,
+				       const std::vector<Vector<double> > &parameter_dofs,
+				       const std::vector<int>             &weight_mapping,
 				       FullMatrix<float>                  &weights,
 				       const typename DoFHandler<dim>::active_cell_iterator &begin,
 				       const typename DoFHandler<dim>::active_cell_iterator &end)
@@ -1523,7 +1523,7 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
   Vector<double> global_parameter_representation (n_fine_dofs);
   
   typename DoFHandler<dim>::active_cell_iterator cell;
-  vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
+  std::vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
   
   for (cell=begin; cell!=end; ++cell)
     {
@@ -1612,7 +1612,7 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 
 template <>
 void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
-					    vector<unsigned int> &)
+					    std::vector<unsigned int> &)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());
@@ -1623,7 +1623,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
 template <>
 void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
 					    const set<unsigned char> &,
-					    vector<unsigned int> &)
+					    std::vector<unsigned int> &)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());
@@ -1634,8 +1634,8 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
 
 
 template <int dim>
-void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
-					    vector<unsigned int>  &mapping)
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>     &dof_handler,
+					    std::vector<unsigned int> &mapping)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
 
@@ -1644,7 +1644,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
 		  DoFHandler<dim>::invalid_dof_index);
   
   const unsigned int dofs_per_face = dof_handler.get_fe().dofs_per_face;
-  vector<unsigned int> dofs_on_face(dofs_per_face);
+  std::vector<unsigned int> dofs_on_face(dofs_per_face);
   unsigned int next_boundary_index = 0;
   
   typename DoFHandler<dim>::active_face_iterator face = dof_handler.begin_active_face(),
@@ -1665,9 +1665,9 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
 
 
 template <int dim>
-void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>    &dof_handler,
-					    const set<unsigned char> &boundary_indicators,
-					    vector<unsigned int>     &mapping)
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>         &dof_handler,
+					    const std::set<unsigned char> &boundary_indicators,
+					    std::vector<unsigned int>     &mapping)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
   Assert (boundary_indicators.find (255) == boundary_indicators.end(),
@@ -1682,7 +1682,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>    &dof_handle
     return;
   
   const unsigned int dofs_per_face = dof_handler.get_fe().dofs_per_face;
-  vector<unsigned int> dofs_on_face(dofs_per_face);
+  std::vector<unsigned int> dofs_on_face(dofs_per_face);
   unsigned int next_boundary_index = 0;
   
   typename DoFHandler<dim>::active_face_iterator face = dof_handler.begin_active_face(),
@@ -1717,12 +1717,12 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 				      const FullMatrix<double>&);
 template void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
-					  const vector<unsigned int>  &,
+					  const std::vector<unsigned int>  &,
 					  SparsityPattern    &);
 template void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 					  const DoFHandler<deal_II_dimension>::FunctionMap  &boundary_indicators,
-					  const vector<unsigned int>  &dof_to_boundary_mapping,
+					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
 					  SparsityPattern    &sparsity);
 #endif
 
@@ -1736,12 +1736,12 @@ DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
 
 template void 
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
-				 const vector<vector<bool> > &mask,
+				 const std::vector<std::vector<bool> > &mask,
 				 SparsityPattern             &sparsity);
 
 template void 
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
-				 const vector<vector<bool> > &mask,
+				 const std::vector<std::vector<bool> > &mask,
 				 BlockSparsityPattern        &sparsity);
 
 template
@@ -1758,20 +1758,20 @@ DoFTools::distribute_cell_to_dof_vector (const DoFHandler<deal_II_dimension> &do
 
 
 template void DoFTools::extract_dofs(const DoFHandler<deal_II_dimension>& dof,
-				     const vector<bool>& component_select,
-				     vector<bool>& selected_dofs);
+				     const std::vector<bool>& component_select,
+				     std::vector<bool>& selected_dofs);
 template void DoFTools::extract_level_dofs(unsigned int level,
 					   const MGDoFHandler<deal_II_dimension>& dof,
-					   const vector<bool>& component_select,
-					   vector<bool>& selected_dofs);
+					   const std::vector<bool>& component_select,
+					   std::vector<bool>& selected_dofs);
 
 
 #if deal_II_dimension != 1
 template
 void
 DoFTools::extract_boundary_dofs (const DoFHandler<deal_II_dimension> &,
-				 const vector<bool>                  &,
-				 vector<bool>                        &);
+				 const std::vector<bool>                  &,
+				 std::vector<bool>                        &);
 #endif 
 
 template
@@ -1790,12 +1790,12 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<deal_II_dimension> &,
 template
 void
 DoFTools::map_dof_to_boundary_indices (const DoFHandler<deal_II_dimension> &,
-				       vector<unsigned int> &);
+				       std::vector<unsigned int> &);
 
 template
 void
 DoFTools::map_dof_to_boundary_indices (const DoFHandler<deal_II_dimension> &,
-				       const set<unsigned char> &,
-				       vector<unsigned int> &);
+				       const std::set<unsigned char> &,
+				       std::vector<unsigned int> &);
 
 #endif 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -226,7 +226,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX& A,
 				   // This is really bad since vectors
 				   // should only be allocated if
 				   // really needed. (GK)
-  vector<VECTOR*> tmp_vectors (n_tmp_vectors, 0);
+  std::vector<VECTOR*> tmp_vectors (n_tmp_vectors, 0);
   for (unsigned int tmp=0; tmp<n_tmp_vectors; ++tmp)
     {
       tmp_vectors[tmp] = memory.alloc();

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,9 +49,9 @@ void Function<dim>::vector_value (const Point<dim> &,
 
 
 template <int dim>
-void Function<dim>::value_list (const vector<Point<dim> > &points,
-				vector<double>            &values,
-				const unsigned int         component) const
+void Function<dim>::value_list (const std::vector<Point<dim> > &points,
+				std::vector<double>            &values,
+				const unsigned int              component) const
 {
 				   // check whether component is in
 				   // the valid range is up to the
@@ -65,8 +65,8 @@ void Function<dim>::value_list (const vector<Point<dim> > &points,
 
 
 template <int dim>
-void Function<dim>::vector_value_list (const vector<Point<dim> > &points,
-				       vector<Vector<double> >   &values) const
+void Function<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+				       std::vector<Vector<double> >   &values) const
 {
 				   // check whether component is in
 				   // the valid range is up to the
@@ -90,16 +90,16 @@ Tensor<1,dim> Function<dim>::gradient (const Point<dim> &,
 
 template <int dim>
 void Function<dim>::vector_gradient (const Point<dim>       &,
-				     vector<Tensor<1,dim> > &) const
+				     std::vector<Tensor<1,dim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 };
 
 
 template <int dim>
-void Function<dim>::gradient_list (const vector<Point<dim> > &points,
-				   vector<Tensor<1,dim> >    &gradients,
-				   const unsigned int         component) const
+void Function<dim>::gradient_list (const std::vector<Point<dim> > &points,
+				   std::vector<Tensor<1,dim> >    &gradients,
+				   const unsigned int              component) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -110,8 +110,8 @@ void Function<dim>::gradient_list (const vector<Point<dim> > &points,
 
 
 template <int dim>
-void Function<dim>::vector_gradient_list (const vector<Point<dim> >       &points,
-					  vector<vector<Tensor<1,dim> > > &gradients) const
+void Function<dim>::vector_gradient_list (const std::vector<Point<dim> >            &points,
+					  std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -129,7 +129,7 @@ void Function<dim>::vector_gradient_list (const vector<Point<dim> >       &point
 
 template <int dim>
 double Function<dim>::laplacian (const Point<dim> &,
-			     const unsigned int) const
+				 const unsigned int) const
 {
   Assert (false, ExcPureFunctionCalled());
   return 0;
@@ -138,7 +138,7 @@ double Function<dim>::laplacian (const Point<dim> &,
 
 template <int dim>
 void Function<dim>::vector_laplacian (const Point<dim> &,
-				  Vector<double>   &) const
+				      Vector<double>   &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
@@ -146,9 +146,9 @@ void Function<dim>::vector_laplacian (const Point<dim> &,
 
 
 template <int dim>
-void Function<dim>::laplacian_list (const vector<Point<dim> > &points,
-				vector<double>            &laplacians,
-				const unsigned int         component) const
+void Function<dim>::laplacian_list (const std::vector<Point<dim> > &points,
+				    std::vector<double>            &laplacians,
+				    const unsigned int              component) const
 {
 				   // check whether component is in
 				   // the valid range is up to the
@@ -162,8 +162,8 @@ void Function<dim>::laplacian_list (const vector<Point<dim> > &points,
 
 
 template <int dim>
-void Function<dim>::vector_laplacian_list (const vector<Point<dim> > &points,
-				       vector<Vector<double> >   &laplacians) const
+void Function<dim>::vector_laplacian_list (const std::vector<Point<dim> > &points,
+					   std::vector<Vector<double> >   &laplacians) const
 {
 				   // check whether component is in
 				   // the valid range is up to the
@@ -202,7 +202,7 @@ ZeroFunction<dim>::~ZeroFunction ()
 
 template <int dim>
 double ZeroFunction<dim>::value (const Point<dim> &,
-				       const unsigned int) const
+				 const unsigned int) const
 {
   return 0.;
 };
@@ -215,13 +215,13 @@ void ZeroFunction<dim>::vector_value (const Point<dim> &,
   Assert (return_value.size() == n_components,
 	  ExcDimensionMismatch (return_value.size(), n_components));
 
-  fill_n (return_value.begin(), n_components, 0.0);
+  std::fill_n (return_value.begin(), n_components, 0.0);
 };
 
 
 template <int dim>
-void ZeroFunction<dim>::value_list (const vector<Point<dim> > &points,
-				    vector<double>            &values,
+void ZeroFunction<dim>::value_list (const std::vector<Point<dim> > &points,
+				    std::vector<double>            &values,
 				    const unsigned int         /*component*/) const {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -231,8 +231,8 @@ void ZeroFunction<dim>::value_list (const vector<Point<dim> > &points,
 
 
 template <int dim>
-void ZeroFunction<dim>::vector_value_list (const vector<Point<dim> > &points,
-					   vector<Vector<double> >   &values) const
+void ZeroFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+					   std::vector<Vector<double> >   &values) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -241,7 +241,7 @@ void ZeroFunction<dim>::vector_value_list (const vector<Point<dim> > &points,
     {
       Assert (values[i].size() == n_components,
 	      ExcDimensionMismatch(values[i].size(), n_components));
-      fill_n (values[i].begin(), n_components, 0.);
+      std::fill_n (values[i].begin(), n_components, 0.);
     };
 };
 
@@ -256,7 +256,7 @@ Tensor<1,dim> ZeroFunction<dim>::gradient (const Point<dim> &,
 
 template <int dim>
 void ZeroFunction<dim>::vector_gradient (const Point<dim>       &,
-					 vector<Tensor<1,dim> > &gradients) const
+					 std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (gradients.size() == n_components,
 	  ExcDimensionMismatch(gradients.size(), n_components));
@@ -267,9 +267,9 @@ void ZeroFunction<dim>::vector_gradient (const Point<dim>       &,
 
 
 template <int dim>
-void ZeroFunction<dim>::gradient_list (const vector<Point<dim> > &points,
-				       vector<Tensor<1,dim> >    &gradients,
-				       const unsigned int         /*component*/) const
+void ZeroFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
+				       std::vector<Tensor<1,dim> >    &gradients,
+				       const unsigned int              /*component*/) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -280,8 +280,8 @@ void ZeroFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 
 
 template <int dim>
-void ZeroFunction<dim>::vector_gradient_list (const vector<Point<dim> >       &points,
-					      vector<vector<Tensor<1,dim> > > &gradients) const
+void ZeroFunction<dim>::vector_gradient_list (const std::vector<Point<dim> >            &points,
+					      std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -301,7 +301,7 @@ template <int dim>
 ConstantFunction<dim>::ConstantFunction (const double value,
 					 const unsigned int n_components) :
 		ZeroFunction<dim> (n_components),
-		function_value    (value) {};
+  function_value    (value) {};
 
 
 template <int dim>
@@ -310,7 +310,7 @@ ConstantFunction<dim>::~ConstantFunction () {};
 
 template <int dim>
 double ConstantFunction<dim>::value (const Point<dim> &,
-					   const unsigned int) const
+				     const unsigned int) const
 {
   return function_value;
 };
@@ -323,14 +323,15 @@ void ConstantFunction<dim>::vector_value (const Point<dim> &,
   Assert (return_value.size() == n_components,
 	  ExcDimensionMismatch (return_value.size(), n_components));
 
-  fill_n (return_value.begin(), n_components, function_value);
+  std::fill_n (return_value.begin(), n_components, function_value);
 };
 
 
 template <int dim>
-void ConstantFunction<dim>::value_list (const vector<Point<dim> > &points,
-					vector<double>            &values,
-					const unsigned int         /*component*/) const {
+void ConstantFunction<dim>::value_list (const std::vector<Point<dim> > &points,
+					std::vector<double>            &values,
+					const unsigned int              /*component*/) const
+{
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
 
@@ -339,8 +340,8 @@ void ConstantFunction<dim>::value_list (const vector<Point<dim> > &points,
 
 
 template <int dim>
-void ConstantFunction<dim>::vector_value_list (const vector<Point<dim> > &points,
-					       vector<Vector<double> >   &values) const
+void ConstantFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+					       std::vector<Vector<double> >   &values) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -349,7 +350,7 @@ void ConstantFunction<dim>::vector_value_list (const vector<Point<dim> > &points
     {
       Assert (values[i].size() == n_components,
 	      ExcDimensionMismatch(values[i].size(), n_components));
-      fill_n (values[i].begin(), n_components, function_value);
+      std::fill_n (values[i].begin(), n_components, function_value);
     };
 };
 
@@ -372,7 +373,7 @@ ComponentSelectFunction<dim>::ComponentSelectFunction (const unsigned int select
 						       const unsigned int n_components)
 		:
 		ConstantFunction<dim> (value, n_components),
-		selected(selected)
+  selected(selected)
 {}
 
 
@@ -383,15 +384,15 @@ void ComponentSelectFunction<dim>::vector_value (const Point<dim> &,
   Assert (return_value.size() == n_components,
 	  ExcDimensionMismatch (return_value.size(), n_components));
 
-  fill_n (return_value.begin(), n_components, 0.);
+  std::fill_n (return_value.begin(), n_components, 0.);
   return_value(selected) = function_value;
 }
 
 
 
 template <int dim>
-void ComponentSelectFunction<dim>::vector_value_list (const vector<Point<dim> > &points,
-					       vector<Vector<double> >   &values) const
+void ComponentSelectFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+						      std::vector<Vector<double> >   &values) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -400,7 +401,7 @@ void ComponentSelectFunction<dim>::vector_value_list (const vector<Point<dim> > 
     {
       Assert (values[i].size() == n_components,
 	      ExcDimensionMismatch(values[i].size(), n_components));
-      fill_n (values[i].begin(), n_components, 0.);
+      std::fill_n (values[i].begin(), n_components, 0.);
       values[i](selected) = function_value;
     }
 }

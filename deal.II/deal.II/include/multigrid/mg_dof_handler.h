@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -210,8 +210,8 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * indices after renumbering in the
 				      * order of the old indices.
 				      */
-    void renumber_dofs (const unsigned int level,
-			const vector<unsigned int> &new_numbers);
+    void renumber_dofs (const unsigned int               level,
+			const std::vector<unsigned int> &new_numbers);
 
 				     /*--------------------------------------*/
     
@@ -524,9 +524,9 @@ class MGDoFHandler : public DoFHandler<dim>
 
 
 /**
-				      *  Return an iterator pointing to the
-				      *  last line, used or not.
-				      */
+ *  Return an iterator pointing to the
+ *  last line, used or not.
+ */
     raw_line_iterator    last_raw_line () const;
 
 				     /**
@@ -621,9 +621,9 @@ class MGDoFHandler : public DoFHandler<dim>
 
 
 /**
-				      *  Return an iterator pointing to the
-				      *  last quad, used or not.
-				      */
+ *  Return an iterator pointing to the
+ *  last quad, used or not.
+ */
     raw_quad_iterator    last_raw_quad () const;
 
 				     /**
@@ -718,9 +718,9 @@ class MGDoFHandler : public DoFHandler<dim>
 
 
 /**
-				      *  Return an iterator pointing to the
-				      *  last hex, used or not.
-				      */
+ *  Return an iterator pointing to the
+ *  last hex, used or not.
+ */
     raw_hex_iterator    last_raw_hex () const;
 
 				     /**
@@ -910,23 +910,23 @@ class MGDoFHandler : public DoFHandler<dim>
 
 
 /**
-				      * Distribute dofs on the given cell,
-				      * with new dofs starting with index
-				      * @p{next_free_dof}. Return the next
-				      * unused index number. The finite
-				      * element used is the one given to
-				      * @p{distribute_dofs}, which is copied
-				      * to @p{selected_fe}.
-				      *
-				      * This function is excluded from the
-				      * @p{distribute_dofs} function since
-				      * it can not be implemented dimension
-				      * independent.
-				      *
-				      * Note that unlike for the usual dofs,
-				      * here all cells and not only active
-				      * ones are allowed.
-				      */
+ * Distribute dofs on the given cell,
+ * with new dofs starting with index
+ * @p{next_free_dof}. Return the next
+ * unused index number. The finite
+ * element used is the one given to
+ * @p{distribute_dofs}, which is copied
+ * to @p{selected_fe}.
+ *
+ * This function is excluded from the
+ * @p{distribute_dofs} function since
+ * it can not be implemented dimension
+ * independent.
+ *
+ * Note that unlike for the usual dofs,
+ * here all cells and not only active
+ * ones are allowed.
+ */
     unsigned int distribute_dofs_on_cell (cell_iterator &cell,
 					  unsigned int   next_free_dof);
     
@@ -944,7 +944,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * numbers which start from zero on each
 				      * level.
 				      */
-    vector<DoFLevel<dim>*>    mg_levels;
+    std::vector<DoFLevel<dim>*>    mg_levels;
 
 				     /**
 				      * For each vertex there is a list of
@@ -952,13 +952,13 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * on the different levels it lives on and
 				      * which are these levels.
 				      */
-    vector<MGVertexDoFs>      mg_vertex_dofs;
+    std::vector<MGVertexDoFs>      mg_vertex_dofs;
     
 				     /**
 				      * Vectors storing the number of degrees of
 				      * freedom on each level.
 				      */
-    vector<unsigned int>      mg_used_dofs;
+    std::vector<unsigned int>      mg_used_dofs;
 
 #if (__GNUC__==2) && (__GNUC_MINOR__ < 95)  
 				     // this seems to be disallowed

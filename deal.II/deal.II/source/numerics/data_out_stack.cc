@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,11 +51,11 @@ void DataOutStack<dim>::new_parameter_value (const double p,
 				   //
 				   // this is to prevent serious waste of
 				   // memory
-  for (typename vector<DataVector>::const_iterator i=dof_data.begin();
+  for (typename std::vector<DataVector>::const_iterator i=dof_data.begin();
        i!=dof_data.end(); ++i)
     Assert (i->data.size() == 0,
 	    ExcDataNotCleared ());
-  for (typename vector<DataVector>::const_iterator i=cell_data.begin();
+  for (typename std::vector<DataVector>::const_iterator i=cell_data.begin();
        i!=cell_data.end(); ++i)
     Assert (i->data.size() == 0,
 	    ExcDataNotCleared ());
@@ -71,17 +71,17 @@ void DataOutStack<dim>::attach_dof_handler (const DoFHandler<dim> &dof)
 
 
 template <int dim>
-void DataOutStack<dim>::declare_data_vector (const string     &name,
+void DataOutStack<dim>::declare_data_vector (const std::string     &name,
 					     const VectorType  vector_type)
 {
-  vector<string> names;
+  std::vector<std::string> names;
   names.push_back (name);
   declare_data_vector (names, vector_type);
 };
 
 
 template <int dim>
-void DataOutStack<dim>::declare_data_vector (const vector<string> &names,
+void DataOutStack<dim>::declare_data_vector (const std::vector<std::string> &names,
 					     const VectorType      vector_type)
 {
 				   // make sure this function is
@@ -92,14 +92,14 @@ void DataOutStack<dim>::declare_data_vector (const vector<string> &names,
 
 				   // also make sure that no name is
 				   // used twice
-  for (vector<string>::const_iterator name=names.begin(); name!=names.end(); ++name)
+  for (std::vector<std::string>::const_iterator name=names.begin(); name!=names.end(); ++name)
     {
-      for (typename vector<DataVector>::const_iterator data_set=dof_data.begin();
+      for (typename std::vector<DataVector>::const_iterator data_set=dof_data.begin();
 	   data_set!=dof_data.end(); ++data_set)
 	for (unsigned int i=0; i<data_set->names.size(); ++i)
 	  Assert (*name != data_set->names[i], ExcNameAlreadyUsed(*name));
 
-      for (typename vector<DataVector>::const_iterator data_set=cell_data.begin();
+      for (typename std::vector<DataVector>::const_iterator data_set=cell_data.begin();
 	   data_set!=cell_data.end(); ++data_set)
 	for (unsigned int i=0; i<data_set->names.size(); ++i)
 	  Assert (*name != data_set->names[i], ExcNameAlreadyUsed(*name));
@@ -123,9 +123,9 @@ void DataOutStack<dim>::declare_data_vector (const vector<string> &names,
 template <int dim>
 template <typename number>
 void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
-					 const string         &name)
+					 const std::string         &name)
 {
-  vector<string> names;
+  std::vector<std::string> names;
   names.push_back (name);
   add_data_vector (vec, names);
 };
@@ -134,7 +134,7 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 template <int dim>
 template <typename number>
 void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
-					 const vector<string> &names)
+					 const std::vector<std::string> &names)
 {
   Assert (dof_handler != 0, ExcNoDoFHandlerSelected ());
 				   // either cell data and one name,
@@ -148,17 +148,17 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				       "0123456789_<>()") == string::npos,
+				       "0123456789_<>()") == std::string::npos,
 	    ExcInvalidCharacter (names[i]));
   
   if (vec.size() == dof_handler->n_dofs())
     {
-      typename vector<DataVector>::iterator data_vector=dof_data.begin();
+      typename std::vector<DataVector>::iterator data_vector=dof_data.begin();
       for (; data_vector!=dof_data.end(); ++data_vector)
 	if (data_vector->names == names)
 	  {
 	    data_vector->data.reinit (vec.size());
-	    copy (vec.begin(), vec.end(),
+	    std::copy (vec.begin(), vec.end(),
 		  data_vector->data.begin());
 	    break;
 	  };
@@ -167,13 +167,13 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
     }
   else
     {
-      typename vector<DataVector>::iterator data_vector=cell_data.begin();
+      typename std::vector<DataVector>::iterator data_vector=cell_data.begin();
       for (; data_vector!=cell_data.end(); ++data_vector)
 	if (data_vector->names == names)
 	  {
 	    data_vector->data.reinit (vec.size());
-	    copy (vec.begin(), vec.end(),
-		  data_vector->data.begin());
+	    std::copy (vec.begin(), vec.end(),
+		       data_vector->data.begin());
 	    break;
 	  };
       Assert (data_vector != cell_data.end(),
@@ -216,8 +216,8 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 				  patch_points,
 				  update_values);
   const unsigned int n_q_points = patch_points.n_quadrature_points;
-  vector<double>          patch_values (n_q_points);
-  vector<Vector<double> > patch_values_system (n_q_points,
+  std::vector<double>          patch_values (n_q_points);
+  std::vector<Vector<double> > patch_values_system (n_q_points,
 					       Vector<double>(n_components));
 
 				   // add the required number of patches
@@ -228,8 +228,9 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 
 				   // now loop over all cells and
 				   // actually create the patches
-  typename vector<DataOutBase::Patch<dim+1> >::iterator patch = &patches[patches.size()-n_patches];
-  unsigned int                                    cell_number = 0;
+  typename std::vector<DataOutBase::Patch<dim+1> >::iterator
+    patch = patches.begin() + (patches.size()-n_patches);
+  unsigned int cell_number = 0;
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell, ++patch, ++cell_number)
     {
@@ -308,11 +309,11 @@ void DataOutStack<dim>::finish_parameter_value ()
 {
 				   // release lock on dof handler
   dof_handler = 0;
-  for (typename vector<DataVector>::iterator i=dof_data.begin();
+  for (typename std::vector<DataVector>::iterator i=dof_data.begin();
        i!=dof_data.end(); ++i)
     i->data.reinit (0);
   
-  for (typename vector<DataVector>::iterator i=cell_data.begin();
+  for (typename std::vector<DataVector>::iterator i=cell_data.begin();
        i!=cell_data.end(); ++i)
     i->data.reinit (0);
 };
@@ -335,7 +336,7 @@ DataOutStack<dim>::memory_consumption () const
 
 
 template <int dim>
-const vector<DataOutBase::Patch<dim+1> > &
+const std::vector<DataOutBase::Patch<dim+1> > &
 DataOutStack<dim>::get_patches () const
 {
   return patches;
@@ -344,13 +345,13 @@ DataOutStack<dim>::get_patches () const
 
 
 template <int dim>
-vector<string> DataOutStack<dim>::get_dataset_names () const
+std::vector<std::string> DataOutStack<dim>::get_dataset_names () const
 {
-  vector<string> names;
-  for (typename vector<DataVector>::const_iterator dataset=dof_data.begin();
+  std::vector<std::string> names;
+  for (typename std::vector<DataVector>::const_iterator dataset=dof_data.begin();
        dataset!=dof_data.end(); ++dataset)
     names.insert (names.end(), dataset->names.begin(), dataset->names.end());
-  for (typename vector<DataVector>::const_iterator dataset=cell_data.begin();
+  for (typename std::vector<DataVector>::const_iterator dataset=cell_data.begin();
        dataset!=cell_data.end(); ++dataset)
     names.insert (names.end(), dataset->names.begin(), dataset->names.end());
   
@@ -361,7 +362,7 @@ vector<string> DataOutStack<dim>::get_dataset_names () const
 // explicit instantiations
 template class DataOutStack<deal_II_dimension>;
 template void DataOutStack<deal_II_dimension>::add_data_vector (const Vector<double> &vec,
-								const string         &name);
+								const std::string         &name);
 template void DataOutStack<deal_II_dimension>::add_data_vector (const Vector<float>  &vec,
-								const string         &name);
+								const std::string         &name);
 

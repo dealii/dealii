@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,7 +45,7 @@ class FEQ1Mapping : public FiniteElement<dim>
 		 const unsigned int  dofs_per_quad,
 		 const unsigned int  dofs_per_hex,
 		 const unsigned int  n_components,
-		 const vector<bool> &restriction_is_additive_flags);
+		 const std::vector<bool> &restriction_is_additive_flags);
 
 				     /**
 				      * Transforms the point @p{p} on
@@ -95,8 +95,8 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      * simply returns the length of the face.
 				      */
     virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<double>      &face_jacobi_determinants) const;
+				     const std::vector<Point<dim-1> > &unit_points,
+				     std::vector<double>      &face_jacobi_determinants) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -108,8 +108,8 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      */
     virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
 					const unsigned int           subface_no,
-					const vector<Point<dim-1> > &unit_points,
-					vector<double>      &face_jacobi_determinants) const;
+					const std::vector<Point<dim-1> > &unit_points,
+					std::vector<double>      &face_jacobi_determinants) const;
 
 				     /**
 				      * Return the normal vectors to the
@@ -127,8 +127,8 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int           face_no,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<Point<dim> >         &normal_vectors) const;
+				     const std::vector<Point<dim-1> > &unit_points,
+				     std::vector<Point<dim> >         &normal_vectors) const;
 
 				     /**
 				      * Return the normal vectors to the
@@ -148,8 +148,8 @@ class FEQ1Mapping : public FiniteElement<dim>
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int           face_no,
 				     const unsigned int           subface_no,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<Point<dim> >         &normal_vectors) const;    
+				     const std::vector<Point<dim-1> > &unit_points,
+				     std::vector<Point<dim> >         &normal_vectors) const;    
 
 				     /**
 				      * Refer to the base class for detailed
@@ -162,17 +162,17 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      * we use multilinear mappings.
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				 const vector<Point<dim> >            &unit_points,
-				 vector<Tensor<2,dim> >               &jacobians,
+				 const std::vector<Point<dim> >            &unit_points,
+				 std::vector<Tensor<2,dim> >               &jacobians,
 				 const bool              compute_jacobians,
-				 vector<Tensor<3,dim> > &jacobians_grad,
+				 std::vector<Tensor<3,dim> > &jacobians_grad,
 				 const bool              compute_jacobians_grad,
-				 vector<Point<dim> >    &support_points,
+				 std::vector<Point<dim> >    &support_points,
 				 const bool              compute_support_points,
-				 vector<Point<dim> >    &q_points,
+				 std::vector<Point<dim> >    &q_points,
 				 const bool              compute_q_points,
 				 const FullMatrix<double>         &shape_values_transform,
-				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const;
+				 const std::vector<std::vector<Tensor<1,dim> > > &shape_grad_transform) const;
 
     				     /**
 				      * Compute the gradients of the jacobian
@@ -181,8 +181,8 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      * points on the unit cell.
 				      */
     static void compute_jacobian_gradients (const DoFHandler<dim>::cell_iterator &cell,
-					    const vector<Point<dim> >            &unit_points,
-					    vector<Tensor<3,dim> >               &jacobians);
+					    const std::vector<Point<dim> >            &unit_points,
+					    std::vector<Tensor<3,dim> >               &jacobians);
 
 
 				     /**

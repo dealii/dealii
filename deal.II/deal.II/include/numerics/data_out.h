@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -222,8 +222,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * class to see which characters
 				      * are valid and which are not.
 				      */
-    void add_data_vector (const Vector<double> &data,
-			  const vector<string> &names);
+    void add_data_vector (const Vector<double>           &data,
+			  const std::vector<std::string> &names);
 
 				     /**
 				      * This function is an
@@ -250,7 +250,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * each component to @p{name}
 				      */
     void add_data_vector (const Vector<double> &data,
-			  const string         &name);
+			  const std::string    &name);
 
 				     /**
 				      * Release the pointers to the
@@ -327,9 +327,9 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * Exception
 				      */
     DeclException1 (ExcInvalidCharacter,
-		    string,
-		    << "Please use only the characters [a-zA-Z0-9_<>()] for" << endl
-		    << "description strings since AVS will only accept these." << endl
+		    std::string,
+		    << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
+		    << "description strings since AVS will only accept these." << std::endl
 		    << "The string you gave was <" << arg1 << ">.");
 				     /**
 				      * Exception
@@ -357,8 +357,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * with no explicit arguments for
 					  * STL classes).
 					  */
-	DataEntry (const Vector<double> *data = 0,
-		   const vector<string> &names = vector<string>());
+	DataEntry (const Vector<double>           *data = 0,
+		   const std::vector<std::string> &names = std::vector<std::string>());
 
 					 /**
 					  * Determine an estimate for the
@@ -380,13 +380,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * Names of the components of this
 					  * data vector.
 					  */
-	vector<string> names;
+	std::vector<std::string> names;
 	
 					 /**
 					  * Physical unit name of this
 					  * component.
 					  */
-	string   units;
+	std::string   units;
     };
 
 				     /**
@@ -398,13 +398,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * List of data elements with vectors of
 				      * values for each degree of freedom.
 				      */
-    vector<DataEntry>  dof_data;
+    std::vector<DataEntry>  dof_data;
 
 				     /**
 				      * List of data elements with vectors of
 				      * values for each cell.
 				      */
-    vector<DataEntry>  cell_data;
+    std::vector<DataEntry>  cell_data;
 
 				     /**
 				      * This is a list of patches that is
@@ -413,7 +413,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * in the output routines of the base
 				      * classes.
 				      */
-    vector<DataOutBase::Patch<patch_dim,patch_space_dim> > patches;
+    std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > patches;
 
 				     /**
 				      * Function by which the base
@@ -421,7 +421,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * what patches they shall write
 				      * to a file.
 				      */
-    virtual const vector<DataOutBase::Patch<patch_dim,patch_space_dim> > &
+    virtual const std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > &
     get_patches () const;
 
 				     /**
@@ -430,7 +430,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * obtained by the output functions
 				      * of the base class.
 				      */
-    virtual vector<string> get_dataset_names () const;
+    virtual std::vector<std::string> get_dataset_names () const;
 };
 
 
@@ -577,8 +577,8 @@ class DataOut : public DataOut_DoFData<dim,dim>
 	unsigned int n_components;
 	unsigned int n_datasets;
 	unsigned int n_subdivisions;
-	vector<double>          patch_values;
-	vector<Vector<double> > patch_values_system;
+	std::vector<double>          patch_values;
+	std::vector<Vector<double> > patch_values_system;
 	Data ()
 	  {}
     };

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -525,7 +525,7 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * general documentation of this
 				      * class.
 				      */
-    static void reorder_cells (vector<CellData<dim> > &original_cells);
+    static void reorder_cells (std::vector<CellData<dim> > &original_cells);
     
   private:
 
@@ -549,7 +549,7 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * the @p{stack} adaptor from
 				      * STL.
 				      */
-    typedef vector<unsigned int> RotationStack;
+    typedef std::vector<unsigned int> RotationStack;
     
 				     /**
 				      * Class that describes the
@@ -613,7 +613,7 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * each orientation of the
 					  * cell.
 					  */
-	typename map<Face,FaceData>::iterator
+	typename std::map<Face,FaceData>::iterator
 	faces[GridReorderingInfo<dim>::rotational_states_of_cells][GeometryInfo<dim>::faces_per_cell];
 
 					 /**
@@ -681,7 +681,7 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * @p{adjacent_cells} field
 					  * of the inserted faces.
 					  */
-	void insert_faces (map<Face,FaceData > &global_faces);
+	void insert_faces (std::map<Face,FaceData > &global_faces);
 
 					 /**
 					  * Find out the neighbors of the
@@ -816,7 +816,7 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * important for the
 					  * algorithm.
 					  */
-	typename map<Face,FaceData >::const_iterator
+	typename std::map<Face,FaceData >::const_iterator
 	reverse_faces[GridReorderingInfo<dim>::rotational_states_of_faces-1];
 
 					 /**
@@ -868,12 +868,12 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * as recursive calls but rather
 				      * as eliminated tail-recursion.
 				      */
-    static void track_back (vector<Cell>  &cells,
-			    RotationStack &rotation_states,
-			    unsigned int   track_back_to_cell);
+    static void track_back (std::vector<Cell>  &cells,
+			    RotationStack      &rotation_states,
+			    const unsigned int  track_back_to_cell);
 
-    static bool try_rotate_single_neighbors (vector<Cell>  &cells,
-					     RotationStack &rotation_states);
+    static bool try_rotate_single_neighbors (std::vector<Cell>  &cells,
+					     RotationStack      &rotation_states);
     
 				     /**
 				      * This is the main function that
@@ -892,9 +892,9 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * between original cells and
 				      * presorted cells.
 				      */
-    static void find_reordering (vector<Cell>               &cells,
-				 vector<CellData<dim> >     &original_cells,
-				 const vector<unsigned int> &new_cell_numbers);
+    static void find_reordering (std::vector<Cell>               &cells,
+				 std::vector<CellData<dim> >     &original_cells,
+				 const std::vector<unsigned int> &new_cell_numbers);
 
 				     /**
 				      * Preorder the incoming cells by
@@ -908,9 +908,9 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * stored.
 				      */
     static
-    vector<unsigned int>
-    presort_cells (vector<Cell>       &cells,
-		   map<Face,FaceData> &faces);
+    std::vector<unsigned int>
+    presort_cells (std::vector<Cell>       &cells,
+		   std::map<Face,FaceData> &faces);
 };
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,11 +21,11 @@
 // to mirror from the .h file. rather, we omit it here
 
 #if ! ((__GNUC__==2) && (__GNUC_MINOR__ < 95))
-  const unsigned int GeometryInfo<deal_II_dimension>::vertices_per_cell;
-  const unsigned int GeometryInfo<deal_II_dimension>::lines_per_cell;
-  const unsigned int GeometryInfo<deal_II_dimension>::quads_per_cell;
-  const unsigned int GeometryInfo<deal_II_dimension>::hexes_per_cell;
-  const unsigned int GeometryInfo<deal_II_dimension>::children_per_cell;
+const unsigned int GeometryInfo<deal_II_dimension>::vertices_per_cell;
+const unsigned int GeometryInfo<deal_II_dimension>::lines_per_cell;
+const unsigned int GeometryInfo<deal_II_dimension>::quads_per_cell;
+const unsigned int GeometryInfo<deal_II_dimension>::hexes_per_cell;
+const unsigned int GeometryInfo<deal_II_dimension>::children_per_cell;
 #endif
 
 

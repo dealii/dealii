@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,7 +51,7 @@ template <int dim>
 Triangulation<dim>::Triangulation (const Triangulation<dim> &) 
 		:
 		Subscriptor ()      // do not set any subscriptors; anyway,
-			       // calling this constructor is an error!
+				   // calling this constructor is an error!
 {
   Assert (false, ExcInternalError());
 };
@@ -211,8 +211,8 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
-					     const vector<CellData<1> > &cells,
+void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
+					     const std::vector<CellData<1> > &cells,
 					     const SubCellData &subcelldata)
 {
 				   // note: since no boundary information
@@ -230,11 +230,11 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 
 				   // copy vertices
   vertices = v;
-  vertices_used = vector<bool> (v.size(), true);
+  vertices_used = std::vector<bool> (v.size(), true);
     
 				   // store the indices of the lines which
 				   // are adjacent to a given vertex
-  vector<vector<int> > lines_at_vertex (v.size());
+  std::vector<std::vector<int> > lines_at_vertex (v.size());
 
 				   // reserve enough space
   levels.push_back (new TriangulationLevel<dim>);
@@ -366,9 +366,9 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
-					     const vector<CellData<2> > &c,
-					     const SubCellData          &subcelldata)
+void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
+					     const std::vector<CellData<2> > &c,
+					     const SubCellData               &subcelldata)
 {
   const unsigned int dim=2;
 
@@ -379,11 +379,11 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 
 				   // copy vertices
   vertices = v;
-  vertices_used = vector<bool> (v.size(), true);
+  vertices_used = std::vector<bool> (v.size(), true);
 
 				   // copy cells. This is needed since we
 				   // may need to change entries
-  vector<CellData<2> > cells(c);
+  std::vector<CellData<2> > cells(c);
 
 
 				   // make up a list of the needed lines
@@ -396,7 +396,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 				   // object itself. In the first run, these
 				   // iterators are all invalid ones, but they
 				   // are filled afterwards
-  map<pair<int,int>,line_iterator> needed_lines;
+  std::map<std::pair<int,int>,line_iterator> needed_lines;
   for (unsigned int cell=0; cell<cells.size(); ++cell)
     {
       for (unsigned int vertex=0; vertex<4; ++vertex)
@@ -425,11 +425,11 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	  };
       
       
-      pair<int,int> line_vertices[4] = {   // note the order of the vertices
-	    make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
-	    make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
-	    make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
-	    make_pair (cells[cell].vertices[0], cells[cell].vertices[3])};
+      std::pair<int,int> line_vertices[4] = {   // note the order of the vertices
+	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
+	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
+	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
+	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[3])  };
 
 				       // note the following: if the sense
 				       // of the vertices of a cell is correct,
@@ -493,8 +493,8 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 					   // direction 1->4, while in
 					   // the second it would be 4->1.
 					   // This will cause the exception.
-	  if (! (needed_lines.find(make_pair(line_vertices[line].second,
-					     line_vertices[line].first))
+	  if (! (needed_lines.find(std::make_pair(line_vertices[line].second,
+						  line_vertices[line].first))
 		 ==
 		 needed_lines.end()))
 	    {
@@ -531,8 +531,8 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 				   // at least two adjacent lines
   if (true) 
     {
-      vector<unsigned short int> vertex_touch_count (v.size(), 0);
-      map<pair<int,int>,line_iterator>::iterator i;
+      std::vector<unsigned short int> vertex_touch_count (v.size(), 0);
+      std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i=needed_lines.begin(); i!=needed_lines.end(); i++) 
 	{
 					   // touch the vertices of this line
@@ -578,7 +578,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
   if (true) 
     {
       raw_line_iterator line = begin_raw_line();
-      map<pair<int,int>,line_iterator>::iterator i;
+      std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
 	{
 	  line->set (Line(i->first.first, i->first.second));
@@ -592,7 +592,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 
 				   // store for each line index
 				   // the adjacent cells
-  map<int,vector<cell_iterator> > adjacent_cells;
+  std::map<int,std::vector<cell_iterator> > adjacent_cells;
 
 				   // finally make up cells
   if (true) 
@@ -602,10 +602,10 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	{
 					   // list of iterators of lines
 	  const line_iterator lines[4] = {
-		needed_lines[make_pair(cells[c].vertices[0], cells[c].vertices[1])],
-		needed_lines[make_pair(cells[c].vertices[1], cells[c].vertices[2])],
-		needed_lines[make_pair(cells[c].vertices[3], cells[c].vertices[2])],
-		needed_lines[make_pair(cells[c].vertices[0], cells[c].vertices[3])]};
+		needed_lines[std::make_pair(cells[c].vertices[0], cells[c].vertices[1])],
+		needed_lines[std::make_pair(cells[c].vertices[1], cells[c].vertices[2])],
+		needed_lines[std::make_pair(cells[c].vertices[3], cells[c].vertices[2])],
+		needed_lines[std::make_pair(cells[c].vertices[0], cells[c].vertices[3])]};
 	  
 	  cell->set (Quad(lines[0]->index(),
 			  lines[1]->index(),
@@ -673,15 +673,15 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
     };
 
 				   // set boundary indicators where given
-  vector<CellData<1> >::const_iterator boundary_line
+  std::vector<CellData<1> >::const_iterator boundary_line
     = subcelldata.boundary_lines.begin();
-  vector<CellData<1> >::const_iterator end_boundary_line
+  std::vector<CellData<1> >::const_iterator end_boundary_line
     = subcelldata.boundary_lines.end();
   for (; boundary_line!=end_boundary_line; ++boundary_line) 
     {
       line_iterator line;
-      pair<int,int> line_vertices(make_pair(boundary_line->vertices[0],
-					    boundary_line->vertices[1]));
+      std::pair<int,int> line_vertices(std::make_pair(boundary_line->vertices[0],
+						      boundary_line->vertices[1]));
       if (needed_lines.find(line_vertices) != needed_lines.end())
 					 // line found in this direction
 	line = needed_lines[line_vertices];
@@ -689,7 +689,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	{
 					   // look whether it exists in
 					   // reverse direction
-	  swap (line_vertices.first, line_vertices.second);
+	  std::swap (line_vertices.first, line_vertices.second);
 	  if (needed_lines.find(line_vertices) != needed_lines.end())
 	    line = needed_lines[line_vertices];
 	  else 
@@ -806,9 +806,10 @@ struct QuadComparator {
 
 
 template <>
-void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
-					     const vector<CellData<3> > &c,
-					     const SubCellData          &subcelldata) {
+void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
+					     const std::vector<CellData<3> > &c,
+					     const SubCellData               &subcelldata)
+{
   const unsigned int dim=3;
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
@@ -818,11 +819,11 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 
 				   // copy vertices
   vertices = v;
-  vertices_used = vector<bool> (v.size(), true);
+  vertices_used = std::vector<bool> (v.size(), true);
 
 				   // copy cells. This is needed since we
 				   // may need to change entries
-  vector<CellData<3> > cells(c);
+  std::vector<CellData<3> > cells(c);
 
 				   ///////////////////////////////////////
 				   // first set up some collections of data
@@ -839,7 +840,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				   // iterators are all invalid ones, but they
 				   // are filled afterwards
 				   // same applies for the quads
-  map<pair<int,int>,line_iterator> needed_lines;
+  std::map<std::pair<int,int>,line_iterator> needed_lines;
   for (unsigned int cell=0; cell<cells.size(); ++cell)
     {
 
@@ -872,23 +873,23 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 	  };
       
       
-      pair<int,int> line_vertices[12] = {   // note the order of the vertices
-					     // front face
-	    make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
-	    make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
-	    make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
-	    make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
-					     // back face
-	    make_pair (cells[cell].vertices[4], cells[cell].vertices[5]),
-	    make_pair (cells[cell].vertices[5], cells[cell].vertices[6]),
-	    make_pair (cells[cell].vertices[7], cells[cell].vertices[6]),
-	    make_pair (cells[cell].vertices[4], cells[cell].vertices[7]),
-					     // connects of front and back face
-	    make_pair (cells[cell].vertices[0], cells[cell].vertices[4]),
-	    make_pair (cells[cell].vertices[1], cells[cell].vertices[5]),
-	    make_pair (cells[cell].vertices[2], cells[cell].vertices[6]),
-	    make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
-      };
+      std::pair<int,int> line_vertices[12] = {   // note the order of the vertices
+					 // front face
+	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
+	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
+	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
+	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
+					   // back face
+	  std::make_pair (cells[cell].vertices[4], cells[cell].vertices[5]),
+	  std::make_pair (cells[cell].vertices[5], cells[cell].vertices[6]),
+	  std::make_pair (cells[cell].vertices[7], cells[cell].vertices[6]),
+	  std::make_pair (cells[cell].vertices[4], cells[cell].vertices[7]),
+					   // connects of front and back face
+	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[4]),
+	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[5]),
+	  std::make_pair (cells[cell].vertices[2], cells[cell].vertices[6]),
+	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
+	  };
 
 				       // in the 2d code, some tests were performed
 				       // which may heal a problem with quads that
@@ -904,8 +905,8 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 					   // assert that the line was not
 					   // already inserted in reverse
 					   // order.
-	  if (! (needed_lines.find(make_pair(line_vertices[line].second,
-					     line_vertices[line].first))
+	  if (! (needed_lines.find(std::make_pair(line_vertices[line].second,
+						  line_vertices[line].first))
 		 ==
 		 needed_lines.end()))
 	    {
@@ -944,8 +945,8 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				   // at least two adjacent lines
   if (true) 
     {
-      vector<unsigned short int> vertex_touch_count (v.size(), 0);
-      map<pair<int,int>,line_iterator>::iterator i;
+      std::vector<unsigned short int> vertex_touch_count (v.size(), 0);
+      std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i=needed_lines.begin(); i!=needed_lines.end(); i++) 
 	{
 					   // touch the vertices of this line
@@ -992,7 +993,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
   if (true) 
     {
       raw_line_iterator line = begin_raw_line();
-      map<pair<int,int>,line_iterator>::iterator i;
+      std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
 	{
 	  line->set (Line(i->first.first, i->first.second));
@@ -1016,7 +1017,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 
 				   // note that QuadComparator is a class
 				   // declared and defined in this file
-  map<Quad,quad_iterator,QuadComparator> needed_quads;
+  std::map<Quad,quad_iterator,QuadComparator> needed_quads;
   for (unsigned int cell=0; cell<cells.size(); ++cell) 
     {
 				       // the faces are quads which consist
@@ -1037,23 +1038,23 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				       // vertex indices) in place, but before
 				       // they are really needed. This is just
 				       // copied from above.
-      pair<int,int> line_list[12] = {   // note the order of the vertices
-					     // front face
-	    make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
-	    make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
-	    make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
-	    make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
-					     // back face
-	    make_pair (cells[cell].vertices[4], cells[cell].vertices[5]),
-	    make_pair (cells[cell].vertices[5], cells[cell].vertices[6]),
-	    make_pair (cells[cell].vertices[7], cells[cell].vertices[6]),
-	    make_pair (cells[cell].vertices[4], cells[cell].vertices[7]),
-					     // connects of front and back face
-	    make_pair (cells[cell].vertices[0], cells[cell].vertices[4]),
-	    make_pair (cells[cell].vertices[1], cells[cell].vertices[5]),
-	    make_pair (cells[cell].vertices[2], cells[cell].vertices[6]),
-	    make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
-      };
+      std::pair<int,int> line_list[12] = {   // note the order of the vertices
+					 // front face
+	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
+	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
+	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
+	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
+					   // back face
+	  std::make_pair (cells[cell].vertices[4], cells[cell].vertices[5]),
+	  std::make_pair (cells[cell].vertices[5], cells[cell].vertices[6]),
+	  std::make_pair (cells[cell].vertices[7], cells[cell].vertices[6]),
+	  std::make_pair (cells[cell].vertices[4], cells[cell].vertices[7]),
+					   // connects of front and back face
+	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[4]),
+	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[5]),
+	  std::make_pair (cells[cell].vertices[2], cells[cell].vertices[6]),
+	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
+	  };
 
       Quad faces[6]
 	= {
@@ -1098,7 +1099,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 					 // insert quad, with invalid iterator
 					 // if quad already exists, then
 					 // nothing bad happens here
-	  needed_quads[faces[quad]] = end_quad();
+	needed_quads[faces[quad]] = end_quad();
     };
 
 
@@ -1111,7 +1112,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
   if (true) 
     {
       raw_quad_iterator quad = begin_raw_quad();
-      map<Quad,quad_iterator>::iterator q;
+      std::map<Quad,quad_iterator,QuadComparator>::iterator q;
       for (q = needed_quads.begin(); quad!=end_quad(); ++quad, ++q)
 	{
 	  quad->set (q->first);
@@ -1131,7 +1132,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 
 				   // store for each quad index
 				   // the adjacent cells
-  map<int,vector<cell_iterator> > adjacent_cells;
+  std::map<int,std::vector<cell_iterator> > adjacent_cells;
 
 				   // finally make up cells
   if (true) 
@@ -1148,23 +1149,23 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 					   // the quads that are bounded by
 					   // these lines; these are then
 					   // the faces of the present cell
-	  pair<int,int> line_list[12] = {   // note the order of the vertices
-						 // front face
-		make_pair (cells[c].vertices[0], cells[c].vertices[1]),
-		make_pair (cells[c].vertices[1], cells[c].vertices[2]),
-		make_pair (cells[c].vertices[3], cells[c].vertices[2]),
-		make_pair (cells[c].vertices[0], cells[c].vertices[3]),
-						 // back face
-		make_pair (cells[c].vertices[4], cells[c].vertices[5]),
-		make_pair (cells[c].vertices[5], cells[c].vertices[6]),
-		make_pair (cells[c].vertices[7], cells[c].vertices[6]),
-		make_pair (cells[c].vertices[4], cells[c].vertices[7]),
-						 // connects of front and back face
-		make_pair (cells[c].vertices[0], cells[c].vertices[4]),
-		make_pair (cells[c].vertices[1], cells[c].vertices[5]),
-		make_pair (cells[c].vertices[2], cells[c].vertices[6]),
-		make_pair (cells[c].vertices[3], cells[c].vertices[7])
-	  };
+	  std::pair<int,int> line_list[12] = {   // note the order of the vertices
+					     // front face
+	      std::make_pair (cells[c].vertices[0], cells[c].vertices[1]),
+	      std::make_pair (cells[c].vertices[1], cells[c].vertices[2]),
+	      std::make_pair (cells[c].vertices[3], cells[c].vertices[2]),
+	      std::make_pair (cells[c].vertices[0], cells[c].vertices[3]),
+					       // back face
+	      std::make_pair (cells[c].vertices[4], cells[c].vertices[5]),
+	      std::make_pair (cells[c].vertices[5], cells[c].vertices[6]),
+	      std::make_pair (cells[c].vertices[7], cells[c].vertices[6]),
+	      std::make_pair (cells[c].vertices[4], cells[c].vertices[7]),
+					       // connects of front and back face
+	      std::make_pair (cells[c].vertices[0], cells[c].vertices[4]),
+	      std::make_pair (cells[c].vertices[1], cells[c].vertices[5]),
+	      std::make_pair (cells[c].vertices[2], cells[c].vertices[6]),
+	      std::make_pair (cells[c].vertices[3], cells[c].vertices[7])
+	      };
 
 	  Quad faces[6]
 	    = {
@@ -1324,15 +1325,15 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				   // where given
 				   //
 				   // first do so for lines
-  vector<CellData<1> >::const_iterator boundary_line
+  std::vector<CellData<1> >::const_iterator boundary_line
     = subcelldata.boundary_lines.begin();
-  vector<CellData<1> >::const_iterator end_boundary_line
+  std::vector<CellData<1> >::const_iterator end_boundary_line
     = subcelldata.boundary_lines.end();
   for (; boundary_line!=end_boundary_line; ++boundary_line)
     {
       line_iterator line;
-      pair <int, int> line_vertices(make_pair(boundary_line->vertices[0],
-					      boundary_line->vertices[1]));
+      std::pair <int, int> line_vertices(std::make_pair(boundary_line->vertices[0],
+							boundary_line->vertices[1]));
       if (needed_lines.find(line_vertices) != needed_lines.end())
 					 // line found in this
 					 // direction
@@ -1342,7 +1343,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 	{
 					   // look wether it exists in
 					   // reverse direction
-	  swap (line_vertices.first, line_vertices.second);
+	  std::swap (line_vertices.first, line_vertices.second);
 	  if (needed_lines.find(line_vertices) != needed_lines.end())
 	    line = needed_lines[line_vertices];
 	  else
@@ -1364,15 +1365,15 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 
 
 				   // now go on with boundary faces
-  vector<CellData<2> >::const_iterator boundary_quad
+  std::vector<CellData<2> >::const_iterator boundary_quad
     = subcelldata.boundary_quads.begin();
-  vector<CellData<2> >::const_iterator end_boundary_quad
+  std::vector<CellData<2> >::const_iterator end_boundary_quad
     = subcelldata.boundary_quads.end();
   for (; boundary_quad!=end_boundary_quad; ++boundary_quad)
     {
       quad_iterator quad;
       line_iterator line[4];
-      vector <int> quad_vertices(4);
+      std::vector <int> quad_vertices(4);
  
 				       // first find the lines that
 				       // are made up of the given
@@ -1381,11 +1382,11 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				       // finally use the find
 				       // function of the map template
 				       // to find the quad
-      pair <int, int> line_vertices[4]
-	= { make_pair (boundary_quad->vertices[0], boundary_quad->vertices[1]),
-	    make_pair (boundary_quad->vertices[1], boundary_quad->vertices[2]),
-	    make_pair (boundary_quad->vertices[3], boundary_quad->vertices[2]),
-	    make_pair (boundary_quad->vertices[0], boundary_quad->vertices[3]) };
+      std::pair <int, int> line_vertices[4]
+	= {   std::make_pair (boundary_quad->vertices[0], boundary_quad->vertices[1]),
+	      std::make_pair (boundary_quad->vertices[1], boundary_quad->vertices[2]),
+	      std::make_pair (boundary_quad->vertices[3], boundary_quad->vertices[2]),
+	      std::make_pair (boundary_quad->vertices[0], boundary_quad->vertices[3]) };
        
       for (unsigned int i=0; i<4; ++i)
 	{
@@ -1396,18 +1397,18 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 	  else
 					     // look wether it exists
 					     // in reverse direction
-	  {
-	    swap (line_vertices[i].first, line_vertices[i].second);
- 	    if (needed_lines.find(line_vertices[i]) != needed_lines.end())
- 	      line[i] = needed_lines[line_vertices[i]];
- 	    else
- 	      {
-						 // line does not exist
- 		AssertThrow (false, ExcLineInexistant(line_vertices[i].first,
- 		                                      line_vertices[i].second));
-		line[i] = end_line();
- 	      };
- 	  };
+	    {
+	      std::swap (line_vertices[i].first, line_vertices[i].second);
+	      if (needed_lines.find(line_vertices[i]) != needed_lines.end())
+		line[i] = needed_lines[line_vertices[i]];
+	      else
+		{
+						   // line does not exist
+		  AssertThrow (false, ExcLineInexistant(line_vertices[i].first,
+							line_vertices[i].second));
+		  line[i] = end_line();
+		};
+	    };
 	};  
       
  
@@ -1532,11 +1533,11 @@ void Triangulation<1>::distort_random (const double factor,
   for (cell_iterator cell=begin(0); cell!=end(0); ++cell)
     almost_infinite_length += cell->diameter();
   
-  vector<double>             minimal_length (vertices.size(),
-					     almost_infinite_length);
+  std::vector<double>             minimal_length (vertices.size(),
+						  almost_infinite_length);
 				   // also note if a vertex is at
 				   // the boundary
-  vector<bool>               at_boundary (vertices.size(), false);
+  std::vector<bool>               at_boundary (vertices.size(), false);
   
   for (active_line_iterator line=begin_active_line();
        line != end_line(); ++line)
@@ -1548,9 +1549,11 @@ void Triangulation<1>::distort_random (const double factor,
 	};
       
       minimal_length[line->vertex_index(0)]
-	= min(line->diameter(), minimal_length[line->vertex_index(0)]);
+	= std::min(line->diameter(),
+		   minimal_length[line->vertex_index(0)]);
       minimal_length[line->vertex_index(1)]
-	= min(line->diameter(), minimal_length[line->vertex_index(1)]);
+	= std::min(line->diameter(),
+		   minimal_length[line->vertex_index(1)]);
     };
 
 
@@ -1604,12 +1607,12 @@ void Triangulation<dim>::distort_random (const double factor,
   for (cell_iterator cell=begin(0); cell!=end(0); ++cell)
     almost_infinite_length += cell->diameter();
   
-  vector<double>             minimal_length (vertices.size(),
-					     almost_infinite_length);
+  std::vector<double>             minimal_length (vertices.size(),
+						  almost_infinite_length);
 
 				   // also note if a vertex is at
 				   // the boundary
-  vector<bool>               at_boundary (vertices.size(), false);
+  std::vector<bool>               at_boundary (vertices.size(), false);
   
   for (active_line_iterator line=begin_active_line();
        line != end_line(); ++line)
@@ -1621,9 +1624,11 @@ void Triangulation<dim>::distort_random (const double factor,
 	};
       
       minimal_length[line->vertex_index(0)]
-	= min(line->diameter(), minimal_length[line->vertex_index(0)]);
+	= std::min(line->diameter(),
+		   minimal_length[line->vertex_index(0)]);
       minimal_length[line->vertex_index(1)]
-	= min(line->diameter(), minimal_length[line->vertex_index(1)]);
+	= std::min(line->diameter(),
+		   minimal_length[line->vertex_index(1)]);
     };
 
 
@@ -1702,9 +1707,9 @@ void Triangulation<dim>::refine_global (const unsigned int times) {
 
 
 template <int dim>
-void Triangulation<dim>::save_refine_flags (vector<bool> &v) const {
+void Triangulation<dim>::save_refine_flags (std::vector<bool> &v) const {
   v.resize (n_active_cells(), false);
-  vector<bool>::iterator  i = v.begin();
+  std::vector<bool>::iterator  i = v.begin();
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   for (; cell!=endc; ++cell, ++i)
@@ -1713,8 +1718,8 @@ void Triangulation<dim>::save_refine_flags (vector<bool> &v) const {
 
 
 template <int dim>
-void Triangulation<dim>::save_refine_flags (ostream &out) const {
-  vector<bool> v;
+void Triangulation<dim>::save_refine_flags (std::ostream &out) const {
+  std::vector<bool> v;
   save_refine_flags (v);
   write_bool_vector (mn_tria_refine_flags_begin, v, mn_tria_refine_flags_end,
 		     out);
@@ -1722,8 +1727,8 @@ void Triangulation<dim>::save_refine_flags (ostream &out) const {
 
 
 template <int dim>
-void Triangulation<dim>::load_refine_flags (istream &in) {
-  vector<bool> v;
+void Triangulation<dim>::load_refine_flags (std::istream &in) {
+  std::vector<bool> v;
   read_bool_vector (mn_tria_refine_flags_begin, v, mn_tria_refine_flags_end,
 		    in);
   load_refine_flags (v);
@@ -1731,12 +1736,12 @@ void Triangulation<dim>::load_refine_flags (istream &in) {
 
 
 template <int dim>
-void Triangulation<dim>::load_refine_flags (const vector<bool> &v) {
+void Triangulation<dim>::load_refine_flags (const std::vector<bool> &v) {
   Assert (v.size() == n_active_cells(), ExcGridReadError());
   
   active_cell_iterator cell = begin_active(),
 		       endc = end();
-  vector<bool>::const_iterator i = v.begin();
+  std::vector<bool>::const_iterator i = v.begin();
   for (; cell!=endc; ++cell, ++i)
     if (*i == true)
       cell->set_refine_flag();
@@ -1746,9 +1751,9 @@ void Triangulation<dim>::load_refine_flags (const vector<bool> &v) {
 
 
 template <int dim>
-void Triangulation<dim>::save_coarsen_flags (vector<bool> &v) const {
+void Triangulation<dim>::save_coarsen_flags (std::vector<bool> &v) const {
   v.resize (n_active_cells(), false);
-  vector<bool>::iterator  i = v.begin();
+  std::vector<bool>::iterator  i = v.begin();
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   for (; cell!=endc; ++cell, ++i)
@@ -1757,8 +1762,8 @@ void Triangulation<dim>::save_coarsen_flags (vector<bool> &v) const {
 
 
 template <int dim>
-void Triangulation<dim>::save_coarsen_flags (ostream &out) const {
-  vector<bool> v;
+void Triangulation<dim>::save_coarsen_flags (std::ostream &out) const {
+  std::vector<bool> v;
   save_coarsen_flags (v);
   write_bool_vector (mn_tria_coarsen_flags_begin, v, mn_tria_coarsen_flags_end,
 		     out);
@@ -1766,8 +1771,8 @@ void Triangulation<dim>::save_coarsen_flags (ostream &out) const {
 
 
 template <int dim>
-void Triangulation<dim>::load_coarsen_flags (istream &in) {
-  vector<bool> v;
+void Triangulation<dim>::load_coarsen_flags (std::istream &in) {
+  std::vector<bool> v;
   read_bool_vector (mn_tria_coarsen_flags_begin, v, mn_tria_coarsen_flags_end,
 		    in);
   load_coarsen_flags (v);
@@ -1775,12 +1780,12 @@ void Triangulation<dim>::load_coarsen_flags (istream &in) {
 
 
 template <int dim>
-void Triangulation<dim>::load_coarsen_flags (const vector<bool> &v) {
+void Triangulation<dim>::load_coarsen_flags (const std::vector<bool> &v) {
   Assert (v.size() == n_active_cells(), ExcGridReadError());
   
   active_cell_iterator cell = begin_active(),
 		       endc = end();
-  vector<bool>::const_iterator i = v.begin();
+  std::vector<bool>::const_iterator i = v.begin();
   for (; cell!=endc; ++cell, ++i)
     if (*i == true)
       cell->set_coarsen_flag();
@@ -1888,7 +1893,7 @@ void Triangulation<3>::clear_user_flags () {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags (ostream &out) const {
+void Triangulation<dim>::save_user_flags (std::ostream &out) const {
   save_user_flags_line (out);
   
   if (dim>=2)
@@ -1903,12 +1908,12 @@ void Triangulation<dim>::save_user_flags (ostream &out) const {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags (vector<bool> &v) const {
+void Triangulation<dim>::save_user_flags (std::vector<bool> &v) const {
 				   // clear vector and append
 				   // all the stuff later on
   v.clear ();
 
-  vector<bool> tmp;
+  std::vector<bool> tmp;
 
   save_user_flags_line (tmp);
   v.insert (v.end(), tmp.begin(), tmp.end());
@@ -1931,7 +1936,7 @@ void Triangulation<dim>::save_user_flags (vector<bool> &v) const {
 
 
 template <int dim>
-void Triangulation<dim>::load_user_flags (istream &in)
+void Triangulation<dim>::load_user_flags (std::istream &in)
 {
   load_user_flags_line (in);
   
@@ -1947,10 +1952,10 @@ void Triangulation<dim>::load_user_flags (istream &in)
 
 
 template <int dim>
-void Triangulation<dim>::load_user_flags (const vector<bool> &v)
+void Triangulation<dim>::load_user_flags (const std::vector<bool> &v)
 {
   Assert (v.size() == n_lines()+n_quads()+n_hexs(), ExcInternalError());
-  vector<bool> tmp;
+  std::vector<bool> tmp;
 
 				   // first extract the flags belonging
 				   // to lines
@@ -1982,9 +1987,9 @@ void Triangulation<dim>::load_user_flags (const vector<bool> &v)
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_line (vector<bool> &v) const {
+void Triangulation<dim>::save_user_flags_line (std::vector<bool> &v) const {
   v.resize (n_lines(), false);
-  vector<bool>::iterator  i = v.begin();
+  std::vector<bool>::iterator  i = v.begin();
   line_iterator line = begin_line(),
 		endl = end_line();
   for (; line!=endl; ++line, ++i)
@@ -1993,8 +1998,8 @@ void Triangulation<dim>::save_user_flags_line (vector<bool> &v) const {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_line (ostream &out) const {
-  vector<bool> v;
+void Triangulation<dim>::save_user_flags_line (std::ostream &out) const {
+  std::vector<bool> v;
   save_user_flags_line (v);
   write_bool_vector (mn_tria_line_user_flags_begin, v, mn_tria_line_user_flags_end,
 		     out);
@@ -2002,8 +2007,8 @@ void Triangulation<dim>::save_user_flags_line (ostream &out) const {
 
 
 template <int dim>
-void Triangulation<dim>::load_user_flags_line (istream &in) {
-  vector<bool> v;
+void Triangulation<dim>::load_user_flags_line (std::istream &in) {
+  std::vector<bool> v;
   read_bool_vector (mn_tria_line_user_flags_begin, v, mn_tria_line_user_flags_end,
 		    in);
   load_user_flags_line (v);
@@ -2011,12 +2016,12 @@ void Triangulation<dim>::load_user_flags_line (istream &in) {
 
 
 template <int dim>
-void Triangulation<dim>::load_user_flags_line (const vector<bool> &v) {
+void Triangulation<dim>::load_user_flags_line (const std::vector<bool> &v) {
   Assert (v.size() == n_lines(), ExcGridReadError());
   
   line_iterator line = begin_line(),
 		endl = end_line();
-  vector<bool>::const_iterator i = v.begin();
+  std::vector<bool>::const_iterator i = v.begin();
   for (; line!=endl; ++line, ++i)
     if (*i == true)
       line->set_user_flag();
@@ -2028,49 +2033,49 @@ void Triangulation<dim>::load_user_flags_line (const vector<bool> &v) {
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::save_user_flags_quad (ostream &) const {
+void Triangulation<1>::save_user_flags_quad (std::ostream &) const {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<1>::save_user_flags_quad (vector<bool> &) const {
+void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<1>::load_user_flags_quad (istream &) {
+void Triangulation<1>::load_user_flags_quad (std::istream &) {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<1>::load_user_flags_quad (const vector<bool> &) {
+void Triangulation<1>::load_user_flags_quad (const std::vector<bool> &) {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<1>::save_user_flags_hex (ostream &) const {
+void Triangulation<1>::save_user_flags_hex (std::ostream &) const {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<1>::save_user_flags_hex (vector<bool> &) const {
+void Triangulation<1>::save_user_flags_hex (std::vector<bool> &) const {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<1>::load_user_flags_hex (istream &) {
+void Triangulation<1>::load_user_flags_hex (std::istream &) {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<1>::load_user_flags_hex (const vector<bool> &) {
+void Triangulation<1>::load_user_flags_hex (const std::vector<bool> &) {
   Assert (false, ExcFunctionNotUseful());
 };
 
@@ -2078,9 +2083,9 @@ void Triangulation<1>::load_user_flags_hex (const vector<bool> &) {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_quad (vector<bool> &v) const {
+void Triangulation<dim>::save_user_flags_quad (std::vector<bool> &v) const {
   v.resize (n_quads(), false);
-  vector<bool>::iterator  i = v.begin();
+  std::vector<bool>::iterator  i = v.begin();
   quad_iterator quad = begin_quad(),
 		endq = end_quad();
   for (; quad!=endq; ++quad, ++i)
@@ -2089,8 +2094,8 @@ void Triangulation<dim>::save_user_flags_quad (vector<bool> &v) const {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_quad (ostream &out) const {
-  vector<bool> v;
+void Triangulation<dim>::save_user_flags_quad (std::ostream &out) const {
+  std::vector<bool> v;
   save_user_flags_quad (v);
   write_bool_vector (mn_tria_quad_user_flags_begin, v, mn_tria_quad_user_flags_end,
 		     out);
@@ -2098,8 +2103,8 @@ void Triangulation<dim>::save_user_flags_quad (ostream &out) const {
 
 
 template <int dim>
-void Triangulation<dim>::load_user_flags_quad (istream &in) {
-  vector<bool> v;
+void Triangulation<dim>::load_user_flags_quad (std::istream &in) {
+  std::vector<bool> v;
   read_bool_vector (mn_tria_quad_user_flags_begin, v, mn_tria_quad_user_flags_end,
 		    in);
   load_user_flags_quad (v);
@@ -2107,12 +2112,12 @@ void Triangulation<dim>::load_user_flags_quad (istream &in) {
 
 
 template <int dim>
-void Triangulation<dim>::load_user_flags_quad (const vector<bool> &v) {
+void Triangulation<dim>::load_user_flags_quad (const std::vector<bool> &v) {
   Assert (v.size() == n_quads(), ExcGridReadError());
   
   quad_iterator quad = begin_quad(),
 		endq = end_quad();
-  vector<bool>::const_iterator i = v.begin();
+  std::vector<bool>::const_iterator i = v.begin();
   for (; quad!=endq; ++quad, ++i)
     if (*i == true)
       quad->set_user_flag();
@@ -2124,25 +2129,25 @@ void Triangulation<dim>::load_user_flags_quad (const vector<bool> &v) {
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::save_user_flags_hex (ostream &) const {
+void Triangulation<2>::save_user_flags_hex (std::ostream &) const {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<2>::save_user_flags_hex (vector<bool> &) const {
+void Triangulation<2>::save_user_flags_hex (std::vector<bool> &) const {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<2>::load_user_flags_hex (istream &) {
+void Triangulation<2>::load_user_flags_hex (std::istream &) {
   Assert (false, ExcFunctionNotUseful());
 };
 
 
 template <>
-void Triangulation<2>::load_user_flags_hex (const vector<bool> &) {
+void Triangulation<2>::load_user_flags_hex (const std::vector<bool> &) {
   Assert (false, ExcFunctionNotUseful());
 };
 
@@ -2151,9 +2156,9 @@ void Triangulation<2>::load_user_flags_hex (const vector<bool> &) {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_hex (vector<bool> &v) const {
+void Triangulation<dim>::save_user_flags_hex (std::vector<bool> &v) const {
   v.resize (n_hexs(), false);
-  vector<bool>::iterator  i = v.begin();
+  std::vector<bool>::iterator  i = v.begin();
   hex_iterator hex = begin_hex(),
 	      endh = end_hex();
   for (; hex!=endh; ++hex, ++i)
@@ -2162,8 +2167,8 @@ void Triangulation<dim>::save_user_flags_hex (vector<bool> &v) const {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_hex (ostream &out) const {
-  vector<bool> v;
+void Triangulation<dim>::save_user_flags_hex (std::ostream &out) const {
+  std::vector<bool> v;
   save_user_flags_hex (v);
   write_bool_vector (mn_tria_hex_user_flags_begin, v, mn_tria_hex_user_flags_end,
 		     out);
@@ -2171,8 +2176,8 @@ void Triangulation<dim>::save_user_flags_hex (ostream &out) const {
 
 
 template <int dim>
-void Triangulation<dim>::load_user_flags_hex (istream &in) {
-  vector<bool> v;
+void Triangulation<dim>::load_user_flags_hex (std::istream &in) {
+  std::vector<bool> v;
   read_bool_vector (mn_tria_hex_user_flags_begin, v, mn_tria_hex_user_flags_end,
 		    in);
   load_user_flags_hex (v);
@@ -2180,12 +2185,12 @@ void Triangulation<dim>::load_user_flags_hex (istream &in) {
 
 
 template <int dim>
-void Triangulation<dim>::load_user_flags_hex (const vector<bool> &v) {
+void Triangulation<dim>::load_user_flags_hex (const std::vector<bool> &v) {
   Assert (v.size() == n_hexs(), ExcGridReadError());
   
   hex_iterator hex = begin_hex(),
 	      endh = end_hex();
-  vector<bool>::const_iterator i = v.begin();
+  std::vector<bool>::const_iterator i = v.begin();
   for (; hex!=endh; ++hex, ++i)
     if (*i == true)
       hex->set_user_flag();
@@ -3592,8 +3597,8 @@ template <int dim>
 unsigned int
 Triangulation<dim>::n_used_vertices () const 
 {
-  return count_if (vertices_used.begin(), vertices_used.end(),
-		   bind2nd (equal_to<bool>(), true));
+  return std::count_if (vertices_used.begin(), vertices_used.end(),
+			std::bind2nd (std::equal_to<bool>(), true));
 };
 
 
@@ -3622,16 +3627,16 @@ unsigned int Triangulation<dim>::max_adjacent_cells () const {
 				   // store the number of times a cell touches
 				   // a vertex. An unsigned int should suffice,
 				   // even for larger dimensions
-  vector<unsigned short int> usage_count (max_vertex_index+1, 0);
+  std::vector<unsigned short int> usage_count (max_vertex_index+1, 0);
 				   // touch a vertex's usage count everytime
 				   // we find an adjacent element
   for (cell=begin(); cell!=endc; ++cell)
     for (unsigned vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       ++usage_count[cell->vertex_index(vertex)];
 
-  return max (GeometryInfo<dim>::vertices_per_cell,
-	      static_cast<unsigned int>(*(max_element (usage_count.begin(),
-						       usage_count.end()))));
+  return std::max (GeometryInfo<dim>::vertices_per_cell,
+		   static_cast<unsigned int>(*std::max_element (usage_count.begin(),
+								usage_count.end())));
 };
 
 
@@ -3693,9 +3698,9 @@ void Triangulation<1>::execute_refinement () {
 				       // count number of used cells on
 				       // the next higher level
       const unsigned int used_cells
-	=  count_if (levels[level+1]->lines.used.begin(),
-		     levels[level+1]->lines.used.end(),
-		     bind2nd (equal_to<bool>(), true));
+	=  std::count_if (levels[level+1]->lines.used.begin(),
+			  levels[level+1]->lines.used.end(),
+			  std::bind2nd (std::equal_to<bool>(), true));
 
 				       // reserve space for the used_cells
 				       // cells already existing on the next
@@ -3717,8 +3722,8 @@ void Triangulation<1>::execute_refinement () {
 
 				   // add to needed vertices how
 				   // many vertices are already in use
-  needed_vertices += count_if (vertices_used.begin(), vertices_used.end(),
-			       bind2nd (equal_to<bool>(), true));
+  needed_vertices += std::count_if (vertices_used.begin(), vertices_used.end(),
+				    std::bind2nd (std::equal_to<bool>(), true));
 				   // if we need more vertices: create them,
 				   // if not: leave the array as is, since
 				   // shrinking is not really possible because
@@ -3967,13 +3972,13 @@ void Triangulation<2>::execute_refinement () {
 						     // case 1
 		    if (((neighbor->refine_flag_set() == true) &&
 			 (acell->index() < neighbor->index()))
-							  // case 1a
-							  // we need one more vertex
-							  // and two more lines, but
-							  // we must only count them
-							  // once. Convention: count
-							  // them for the cell with
-							  // the lower index
+							 // case 1a
+							 // we need one more vertex
+							 // and two more lines, but
+							 // we must only count them
+							 // once. Convention: count
+							 // them for the cell with
+							 // the lower index
 			||
 			(neighbor->refine_flag_set() == false))
 						       // case 1b
@@ -4006,10 +4011,10 @@ void Triangulation<2>::execute_refinement () {
       				       // count number of used cells on
 				       // the next higher level
       const unsigned int used_cells
-	= count_if (levels[level+1]->quads.used.begin(),
-		levels[level+1]->quads.used.end(),
-		bind2nd (equal_to<bool>(), true));
-
+	= std::count_if (levels[level+1]->quads.used.begin(),
+			 levels[level+1]->quads.used.end(),
+			 std::bind2nd (std::equal_to<bool>(), true));
+      
 
 				       // reserve space for the used_cells
 				       // cells already existing on the next
@@ -4031,8 +4036,8 @@ void Triangulation<2>::execute_refinement () {
 
 				   // add to needed vertices how
 				   // many vertices are already in use
-  needed_vertices += count_if (vertices_used.begin(), vertices_used.end(),
-			       bind2nd (equal_to<bool>(), true));
+  needed_vertices += std::count_if (vertices_used.begin(), vertices_used.end(),
+				    std::bind2nd (std::equal_to<bool>(), true));
 				   // if we need more vertices: create them,
 				   // if not: leave the array as is, since
 				   // shrinking is not really possible because
@@ -4086,23 +4091,23 @@ void Triangulation<2>::execute_refinement () {
    
    First:
    Set up an array of the 3x3 vertices, which are distributed on the cell
-   (the array consists of indices into the @p{vertices} vector
+   (the array consists of indices into the @p{vertices} std::vector
    
-     6--5--4
-     |  |  |
-     7--8--3
-     |  |  |
-     0--1--2
+   6--5--4
+   |  |  |
+   7--8--3
+   |  |  |
+   0--1--2
 	
    Second:  
    Set up an array of the new lines (the array consists of iterator pointers
    into the lines arrays)
    
-     .-5-.-4-.         The directions are:  .->-.->-.
-     6   9   3                              ^   ^   ^
-     .-10.11- .                             .->-.->-.
-     7   8   2                              ^   ^   ^
-     .-0-.-1-.                              .->-.->-.
+   .-5-.-4-.         The directions are:  .->-.->-.
+   6   9   3                              ^   ^   ^
+   .-10.11- .                             .->-.->-.
+   7   8   2                              ^   ^   ^
+   .-0-.-1-.                              .->-.->-.
 
    Please note that since the children of line are created in the direction of
    that line, the lines 4,5 and 6,7 are created in the wrong time order. This
@@ -4114,13 +4119,13 @@ void Triangulation<2>::execute_refinement () {
    Third:
    Set up an array of neighbors:
    
-       5   4
-      .--.--.
-     6|  |  |3
-      .--.--.
-     7|  |  |2
-      .--.--.
-       0   1
+   5   4
+   .--.--.
+   6|  |  |3
+   .--.--.
+   7|  |  |2
+   .--.--.
+   0   1
 
    We need this array for two reasons: first to get the lines which will
    bound the four subcells (if the neighboring cell is refined, these
@@ -4146,12 +4151,12 @@ void Triangulation<2>::execute_refinement () {
    Convention:
    The created children are numbered like this:
 
-     .--.--.
-     |3 . 2|
-     .--.--.
-     |0 | 1|
-     .--.--.
-   */
+   .--.--.
+   |3 . 2|
+   .--.--.
+   |0 | 1|
+   .--.--.
+*/
 
 	    int               new_vertices[9] = {cell->vertex_index(0), -1,
 						 cell->vertex_index(1), -1,
@@ -4177,11 +4182,11 @@ void Triangulation<2>::execute_refinement () {
 		bool neighbor_refined=false;
 		if (cell->neighbor(nb).state() == valid)
 		  if (cell->neighbor(nb)->active() == false)
-						   // (ask in two if-statements,
-						   // since otherwise both
-						   // conditions would be executed,
-						   // but the second will throw an
-						   // error if the first fails!)
+						     // (ask in two if-statements,
+						     // since otherwise both
+						     // conditions would be executed,
+						     // but the second will throw an
+						     // error if the first fails!)
 		    neighbor_refined=true;
 		
 		if (neighbor_refined)
@@ -4192,8 +4197,8 @@ void Triangulation<2>::execute_refinement () {
 						     // two children which
 						     // we can use.
 		    cell_iterator neighbor = cell->neighbor(nb);
-							 // this cell is the nb_nb-th
-							 // neighbor or neighbor(nb)
+						     // this cell is the nb_nb-th
+						     // neighbor or neighbor(nb)
 		    const unsigned int nb_nb = cell->neighbor_of_neighbor (nb);
 
 		    neighbors_neighbor[2*nb] = neighbors_neighbor[2*nb+1] = nb_nb;
@@ -4249,9 +4254,9 @@ void Triangulation<2>::execute_refinement () {
 		    
 		    if ( face->boundary_indicator() != 255 )
 		      {
-						       // boundary vertex
-		      new_point = boundary[face->boundary_indicator()]->
-				  get_new_point_on_line (face);
+							 // boundary vertex
+			new_point = boundary[face->boundary_indicator()]->
+				    get_new_point_on_line (face);
 		      } else {
 							 // vertex between two
 							 // normal cells
@@ -4299,7 +4304,7 @@ void Triangulation<2>::execute_refinement () {
 			new_lines[nb*2] = next_unused_line;
 
 			new_lines[nb*2]->set(Line(new_vertices[2*nb+1],
-						    new_vertices[2*nb]));
+						  new_vertices[2*nb]));
 			new_lines[nb*2]->set_used_flag ();
 			new_lines[nb*2]->clear_children ();
 			new_lines[nb*2]->clear_user_pointer ();
@@ -4618,9 +4623,9 @@ void Triangulation<3>::execute_refinement () {
 				       // count number of used cells on
 				       // the next higher level
       const unsigned int used_cells
-	= count_if (levels[level+1]->quads.used.begin(),
-		    levels[level+1]->quads.used.end(),
-		    bind2nd (equal_to<bool>(), true));
+	= std::count_if (levels[level+1]->quads.used.begin(),
+			 levels[level+1]->quads.used.end(),
+			 std::bind2nd (std::equal_to<bool>(), true));
 
 
 				       // reserve space for the used_cells
@@ -4647,8 +4652,8 @@ void Triangulation<3>::execute_refinement () {
 
 				   // add to needed vertices how
 				   // many vertices are already in use
-  needed_vertices += count_if (vertices_used.begin(), vertices_used.end(),
-			       bind2nd (equal_to<bool>(), true));
+  needed_vertices += std::count_if (vertices_used.begin(), vertices_used.end(),
+				    std::bind2nd (std::equal_to<bool>(), true));
 				   // if we need more vertices: create them,
 				   // if not: leave the array as is, since
 				   // shrinking is not really possible because
@@ -5279,13 +5284,13 @@ void Triangulation<3>::execute_refinement () {
 				    line_indices[25],
 				    line_indices[12]));
 	    new_quads[10]->set (Quad(line_indices[25],
-				    line_indices[18],
-				    line_indices[23],
-				    line_indices[14]));
+				     line_indices[18],
+				     line_indices[23],
+				     line_indices[14]));
 	    new_quads[11]->set (Quad(line_indices[24],
-				    line_indices[14],
-				    line_indices[22],
-				    line_indices[2]));
+				     line_indices[14],
+				     line_indices[22],
+				     line_indices[2]));
 	    for (unsigned int i=0; i<12; ++i)
 	      {
 		new_quads[i]->set_used_flag();
@@ -5895,22 +5900,22 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 		  };
 	      };
 
-						 // there is another thing here:
-						 // if any of the lines if refined,
-						 // we may not coarsen this cell.
-						 // this also holds true if the
-						 // line is not yet refined, but
-						 // will be
-						 //
-						 // this is not totally true,
-						 // since the neighbors' children
-						 // may also be all coarsened,
-						 // but we do not catch these
-						 // aspects here; in effect, we
-						 // disallow to coarsen sharp
-						 // edges where the refinement
-						 // level decreases from each cell
-						 // to the next
+					     // there is another thing here:
+					     // if any of the lines if refined,
+					     // we may not coarsen this cell.
+					     // this also holds true if the
+					     // line is not yet refined, but
+					     // will be
+					     //
+					     // this is not totally true,
+					     // since the neighbors' children
+					     // may also be all coarsened,
+					     // but we do not catch these
+					     // aspects here; in effect, we
+					     // disallow to coarsen sharp
+					     // edges where the refinement
+					     // level decreases from each cell
+					     // to the next
 	    if (cell->line(line)->has_children() ||
 		cell->line(line)->user_flag_set())
 	      if (cell->coarsen_flag_set())
@@ -6033,7 +6038,7 @@ void Triangulation<dim>::fix_coarsen_flags () {
 	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
 	      Assert (cell->child(c)->refine_flag_set()==false,
-		    ExcInternalError());
+		      ExcInternalError());
 	      
 	      cell->child(c)->set_coarsen_flag();
 	    };
@@ -6047,7 +6052,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				   // save the flags to determine whether
 				   // something was changed in the course
 				   // of this function
-  vector<bool> flags_before[2];
+  std::vector<bool> flags_before[2];
   save_coarsen_flags (flags_before[0]);
   save_refine_flags (flags_before[1]);
 
@@ -6058,7 +6063,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
     {
       fix_coarsen_flags ();
 
-      vector<bool> flags_after[2];
+      std::vector<bool> flags_after[2];
       save_coarsen_flags (flags_after[0]);
       save_refine_flags (flags_after[1]);
 
@@ -6099,8 +6104,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				   //    is enough. Unfortunately, each
 				   //    loop is rather expensive, so
 				   //    we chose the way presented here
-  vector<bool> flags_before_loop[2] = {flags_before[0],
-				       flags_before[1]};
+  std::vector<bool> flags_before_loop[2] = {flags_before[0],
+					      flags_before[1]};
 
 				   // now for what is done in each loop: we
 				   // have to fulfill several tasks at the
@@ -6416,7 +6421,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 	{
 					   // store highest level one of the cells
 					   // adjacent to a vertex belongs to
-	  vector<int> vertex_level (vertices.size(), 0);
+	  std::vector<int> vertex_level (vertices.size(), 0);
 	  active_cell_iterator cell = begin_active(),
 			       endc = end();
 	  for (; cell!=endc; ++cell)
@@ -6424,12 +6429,12 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		 ++vertex)
 	      if (cell->refine_flag_set())
 		vertex_level[cell->vertex_index(vertex)]
-		  = max (vertex_level[cell->vertex_index(vertex)],
-			 cell->level()+1);
+		  = std::max (vertex_level[cell->vertex_index(vertex)],
+			      cell->level()+1);
 	      else
 		vertex_level[cell->vertex_index(vertex)]
-		  = max (vertex_level[cell->vertex_index(vertex)],
-			 cell->level());
+		  = std::max (vertex_level[cell->vertex_index(vertex)],
+			      cell->level());
 
 					   // loop over all cells in reverse
 					   // order. do so because we can then
@@ -6451,8 +6456,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
 			 ++v)
 		      vertex_level[cell->vertex_index(v)]
-			= max (vertex_level[cell->vertex_index(v)],
-			       cell->level()+1);
+			= std::max (vertex_level[cell->vertex_index(v)],
+				    cell->level()+1);
 
 						     // now that we fixed this cell,
 						     // we can safely leave this
@@ -6737,7 +6742,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 
 				       // get the refinement and coarsening
 				       // flags
-      vector<bool> flags_after_loop[2];
+      std::vector<bool> flags_after_loop[2];
       save_coarsen_flags (flags_after_loop[0]);
       save_refine_flags (flags_after_loop[1]);
 
@@ -7190,19 +7195,19 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 				   // used, is more severe and causes a memory
 				   // leak which is probably impossible to
 				   // find.
-  const pair<line_iterator,bool> line_is_needed_pairs[12]
-    = { make_pair(cell->line(0), false),
-	make_pair(cell->line(1), false),
-	make_pair(cell->line(2), false),
-	make_pair(cell->line(3), false),
-	make_pair(cell->line(4), false),
-	make_pair(cell->line(5), false),
-	make_pair(cell->line(6), false),
-	make_pair(cell->line(7), false),
-	make_pair(cell->line(8), false),
-	make_pair(cell->line(9), false),
-	make_pair(cell->line(10), false),
-	make_pair(cell->line(11), false)  };
+  const std::pair<line_iterator,bool> line_is_needed_pairs[12]
+    = {   std::make_pair(cell->line(0), false),
+	  std::make_pair(cell->line(1), false),
+	  std::make_pair(cell->line(2), false),
+	  std::make_pair(cell->line(3), false),
+	  std::make_pair(cell->line(4), false),
+	  std::make_pair(cell->line(5), false),
+	  std::make_pair(cell->line(6), false),
+	  std::make_pair(cell->line(7), false),
+	  std::make_pair(cell->line(8), false),
+	  std::make_pair(cell->line(9), false),
+	  std::make_pair(cell->line(10), false),
+	  std::make_pair(cell->line(11), false)  };
 				   // if in debug mode: make sure that
 				   // none of the lines of this cell is
 				   // twice refined; else, deleting this
@@ -7216,14 +7221,14 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 				   // next make a map out of this for simpler
 				   // access to the flag associated with a
 				   // line
-  map<line_iterator,bool> line_is_needed (&line_is_needed_pairs[0],
-					  &line_is_needed_pairs[12]);
+  std::map<line_iterator,bool> line_is_needed (&line_is_needed_pairs[0],
+					       &line_is_needed_pairs[12]);
   
 				   // then ask each neighbor and their neighbors
   for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb) 
     {
       const cell_iterator neighbor = cell->neighbor(nb);
-					 // do nothing if at boundary
+				       // do nothing if at boundary
       if (neighbor.state() != valid)
 	continue;
 
@@ -7297,7 +7302,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 				   // now, if the lines are not marked as
 				   // needed, we may delete their children
 				   // and the midpoint
-  map<line_iterator,bool>::iterator line_and_flag;
+  std::map<line_iterator,bool>::iterator line_and_flag;
   for (line_and_flag=line_is_needed.begin();
        line_and_flag!=line_is_needed.end(); ++line_and_flag)
     if  (line_and_flag->second == false)
@@ -7322,9 +7327,9 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 
 template <int dim>
 void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
-					    const vector<bool> &v,
+					    const std::vector<bool> &v,
 					    const unsigned int  magic_number2,
-					    ostream            &out) {
+					    std::ostream            &out) {
   const unsigned int N = v.size();
   unsigned char *flags = new unsigned char[N/8+1];
   for (unsigned int i=0; i<N/8+1; ++i) flags[i]=0;
@@ -7339,11 +7344,11 @@ void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
 				   // 1. number of flags
 				   // 2. the flags
 				   // 3. magic number
-  out << magic_number1 << ' ' << N << endl;
+  out << magic_number1 << ' ' << N << std::endl;
   for (unsigned int i=0; i<N/8+1; ++i) 
     out << static_cast<unsigned int>(flags[i]) << ' ';
   
-  out << endl << magic_number2 << endl;
+  out << std::endl << magic_number2 << std::endl;
   
   delete[] flags;
 
@@ -7353,9 +7358,9 @@ void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
 
 template <int dim>
 void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
-					   vector<bool>       &v,
+					   std::vector<bool>       &v,
 					   const unsigned int  magic_number2,
-					   istream            &in) {
+					   std::istream            &in) {
   AssertThrow (in, ExcIO());
 
   unsigned int magic_number;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -180,7 +180,7 @@ TriaObjectAccessor<1,dim>::max_refinement_depth () const
 
   const unsigned int depths[2] = { child(0)->max_refinement_depth() + 1,
 				   child(1)->max_refinement_depth() + 1  };
-  return max (depths[0], depths[1]);
+  return std::max (depths[0], depths[1]);
 };
 
 
@@ -343,8 +343,8 @@ TriaObjectAccessor<2,dim>::max_refinement_depth () const
 				   child(1)->max_refinement_depth() + 1,
 				   child(2)->max_refinement_depth() + 1,
 				   child(3)->max_refinement_depth() + 1 };
-  return max (max (depths[0], depths[1]),
-	      max (depths[2], depths[3]));
+  return std::max (std::max (depths[0], depths[1]),
+		   std::max (depths[2], depths[3]));
 };
 
 
@@ -575,10 +575,10 @@ TriaObjectAccessor<3,dim>::max_refinement_depth () const
 				   child(5)->max_refinement_depth() + 1,
 				   child(6)->max_refinement_depth() + 1,
 				   child(7)->max_refinement_depth() + 1  };
-  return max (max (max (depths[0], depths[1]),
-		   max (depths[2], depths[3])),
-	      max (max (depths[4], depths[5]),
-		   max (depths[6], depths[7])));
+  return std::max (std::max (std::max (depths[0], depths[1]),
+			     std::max (depths[2], depths[3])),
+		   std::max (std::max (depths[4], depths[5]),
+			     std::max (depths[6], depths[7])));
 };
 
 
@@ -697,7 +697,7 @@ TriaObjectAccessor<celldim,dim>::line (const unsigned int i) const
 	      return quad(0)->line(i);
 	    else
 	      if (i<8)
-      return quad(1)->line(i-4);
+		return quad(1)->line(i-4);
 	      else
 		switch (i) 
 		  {

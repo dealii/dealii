@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,8 +46,8 @@ TensorFunction<rank, dim>::value (const Point<dim> &) const
 
 template <int rank, int dim>
 void
-TensorFunction<rank, dim>::value_list (const vector<Point<dim> > &points,
-				       vector<Tensor<rank,dim> > &values) const
+TensorFunction<rank, dim>::value_list (const std::vector<Point<dim> > &points,
+				       std::vector<Tensor<rank,dim> > &values) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -68,8 +68,8 @@ TensorFunction<rank, dim>::gradient (const Point<dim> &) const
 
 template <int rank, int dim>
 void
-TensorFunction<rank, dim>::gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<rank+1,dim> > &gradients) const
+TensorFunction<rank, dim>::gradient_list (const std::vector<Point<dim> > &points,
+				    std::vector<Tensor<rank+1,dim> >     &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));

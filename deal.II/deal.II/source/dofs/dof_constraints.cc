@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -74,12 +74,12 @@ void ConstraintMatrix::add_entry (const unsigned int line,
 {
   Assert (sorted==false, ExcMatrixIsClosed());
 
-  vector<ConstraintLine>::iterator line_ptr;
-  const vector<ConstraintLine>::const_iterator start=lines.begin();
+  std::vector<ConstraintLine>::iterator line_ptr;
+  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
 				   // the usual case is that the line where
 				   // a value is entered is the one we
 				   // added last, so we search backward
-  for (line_ptr=&lines.back(); line_ptr!=start; --line_ptr)
+  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
     if (line_ptr->line == line)
       break;
 
@@ -97,7 +97,7 @@ void ConstraintMatrix::add_entry (const unsigned int line,
 				   // in any case: exit the function if an
 				   // entry for this column already exists,
 				   // since we don't want to enter it twice
-  for (vector<pair<unsigned int,double> >::const_iterator p=line_ptr->entries.begin();
+  for (std::vector<std::pair<unsigned int,double> >::const_iterator p=line_ptr->entries.begin();
        p != line_ptr->entries.end(); ++p)
     if (p->first == column)
       {
@@ -106,22 +106,22 @@ void ConstraintMatrix::add_entry (const unsigned int line,
 	return;
       };
   
-  line_ptr->entries.push_back (make_pair(column,value));
+  line_ptr->entries.push_back (std::make_pair(column,value));
 };
 
 
 
 void ConstraintMatrix::add_entries (const unsigned int                        line,
-				    const vector<pair<unsigned int,double> > &col_val_pairs)
+				    const std::vector<std::pair<unsigned int,double> > &col_val_pairs)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
 
-  vector<ConstraintLine>::iterator line_ptr;
-  const vector<ConstraintLine>::const_iterator start=lines.begin();
+  std::vector<ConstraintLine>::iterator line_ptr;
+  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
 				   // the usual case is that the line where
 				   // a value is entered is the one we
 				   // added last, so we search backward
-  for (line_ptr=&lines.back(); line_ptr!=start; --line_ptr)
+  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
     if (line_ptr->line == line)
       break;
 
@@ -140,10 +140,10 @@ void ConstraintMatrix::add_entries (const unsigned int                        li
 				   // an entry for this column already
 				   // exists, since we don't want to
 				   // enter it twice
-  for (vector<pair<unsigned int,double> >::const_iterator col_val_pair = col_val_pairs.begin();
+  for (std::vector<std::pair<unsigned int,double> >::const_iterator col_val_pair = col_val_pairs.begin();
        col_val_pair!=col_val_pairs.end(); ++col_val_pair)
     {
-      for (vector<pair<unsigned int,double> >::const_iterator p=line_ptr->entries.begin();
+      for (std::vector<std::pair<unsigned int,double> >::const_iterator p=line_ptr->entries.begin();
 	   p != line_ptr->entries.end(); ++p)
 	if (p->first == col_val_pair->first)
 	  {
@@ -167,8 +167,8 @@ void ConstraintMatrix::close ()
 
 				   // sort the entries in the different lines
 				   // and strip zero entries
-  vector<ConstraintLine>::iterator line = lines.begin(),
-				   endl = lines.end();
+  std::vector<ConstraintLine>::iterator line = lines.begin(),
+					endl = lines.end();
   for (; line!=endl; ++line)
     {
 				       // first remove zero
@@ -181,8 +181,8 @@ void ConstraintMatrix::close ()
 				       // 0*something can be omitted
       line->entries.erase (remove_if (line->entries.begin(),
 				      line->entries.end(),
-				      compose1 (bind2nd (equal_to<double>(), 0),
-						select2nd<pair<unsigned int,double> >())),
+				      std::compose1 (std::bind2nd (std::equal_to<double>(), 0),
+						     std::select2nd<std::pair<unsigned int,double> >())),
                            line->entries.end());
 
 				       // now sort the remainder
@@ -196,9 +196,9 @@ void ConstraintMatrix::close ()
 				   // if in debug mode: check that no
 				   // dof is constraint to another dof
 				   // that is also constrained
-  for (vector<ConstraintLine>::const_iterator line=lines.begin();
+  for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
        line!=lines.end(); ++line)
-    for (vector<pair<unsigned int,double> >::const_iterator entry=line->entries.begin();
+    for (std::vector<std::pair<unsigned int,double> >::const_iterator entry=line->entries.begin();
 	 entry!=line->entries.end(); ++entry)
       {
 					 // make sure that
@@ -206,7 +206,7 @@ void ConstraintMatrix::close ()
 					 // index of a line itself
 	ConstraintLine test_line;
 	test_line.line = entry->first;
-	const vector<ConstraintLine>::const_iterator
+	const std::vector<ConstraintLine>::const_iterator
 	  test_line_position = lower_bound (lines.begin(),
 					    lines.end(),
 					    test_line);
@@ -224,7 +224,7 @@ void ConstraintMatrix::close ()
 
 void ConstraintMatrix::clear ()
 {
-  lines = vector<ConstraintLine>();
+  lines = std::vector<ConstraintLine>();
   sorted = false;
 };
 
@@ -243,12 +243,12 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 				   // its new line number
 				   // after compression. If the shift is
 				   // -1, this line will be condensed away
-  vector<int> new_line;
+  std::vector<int> new_line;
 
   new_line.reserve (uncondensed.n_rows());
 
-  vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  unsigned int                           shift           = 0;
+  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+  unsigned int                                shift           = 0;
   unsigned int n_rows = uncondensed.n_rows();
 
   if (next_constraint == lines.end()) 
@@ -298,7 +298,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 	  {
 					     // let c point to the constraint
 					     // of this column
-	    vector<ConstraintLine>::const_iterator c = lines.begin();
+	    std::vector<ConstraintLine>::const_iterator c = lines.begin();
 	    while (c->line != uncondensed.get_column_numbers()[j])
 	      ++c;
 
@@ -314,8 +314,8 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 	  if (new_line[uncondensed.get_column_numbers()[j]] != -1)
 					     // column is not constrained
 	    for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
-		condensed.add (new_line[next_constraint->entries[q].first],
-			       new_line[uncondensed.get_column_numbers()[j]]);
+	      condensed.add (new_line[next_constraint->entries[q].first],
+			     new_line[uncondensed.get_column_numbers()[j]]);
 	
 	  else
 					     // not only this line but
@@ -323,13 +323,13 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 	    {
 					       // let c point to the constraint
 					       // of this column
-	      vector<ConstraintLine>::const_iterator c = lines.begin();
+	      std::vector<ConstraintLine>::const_iterator c = lines.begin();
 	      while (c->line != uncondensed.get_column_numbers()[j]) ++c;
 	      
 	      for (unsigned int p=0; p!=c->entries.size(); ++p)
 		for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
-		    condensed.add (new_line[next_constraint->entries[q].first],
-				   new_line[c->entries[p].first]);
+		  condensed.add (new_line[next_constraint->entries[q].first],
+				 new_line[c->entries[p].first]);
 	    };
 	
 	++next_constraint;
@@ -353,7 +353,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 				   // otherwise, the number states which
 				   // line in the constraint matrix handles
 				   // this index
-  vector<int> distribute(sparsity.n_rows(), -1);
+  std::vector<int> distribute(sparsity.n_rows(), -1);
   
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -442,7 +442,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 				   // otherwise, the number states which
 				   // line in the constraint matrix handles
 				   // this index
-  vector<int> distribute (sparsity.n_rows(), -1);
+  std::vector<int> distribute (sparsity.n_rows(), -1);
   
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -452,7 +452,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
     {
 				       // get index of this row
 				       // within the blocks
-      const pair<unsigned int,unsigned int>
+      const std::pair<unsigned int,unsigned int>
 	block_index = index_mapping.global_to_local(row);
       const unsigned int block_row = block_index.first;
       
@@ -584,7 +584,7 @@ bool ConstraintMatrix::is_constrained (const unsigned int index) const
     }
   else
     {
-      for (vector<ConstraintLine>::const_iterator i=lines.begin();
+      for (std::vector<ConstraintLine>::const_iterator i=lines.begin();
 	   i!=lines.end(); ++i)
 	if (i->line == index)
 	  return true;
@@ -598,26 +598,26 @@ bool ConstraintMatrix::is_constrained (const unsigned int index) const
 unsigned int ConstraintMatrix::max_constraint_indirections () const 
 {
   unsigned int return_value = 0;
-  for (vector<ConstraintLine>::const_iterator i=lines.begin();
+  for (std::vector<ConstraintLine>::const_iterator i=lines.begin();
        i!=lines.end(); ++i)
 				     // use static cast, since
 				     // typeof(size)==size_t, which is
 				     // != unsigned int on AIX
-    return_value = max(return_value,
-		       static_cast<unsigned int>(i->entries.size()));
+    return_value = std::max(return_value,
+			    static_cast<unsigned int>(i->entries.size()));
 
   return return_value;
 };
 
     
 
-void ConstraintMatrix::print (ostream &out) const
+void ConstraintMatrix::print (std::ostream &out) const
 {
   for (unsigned int i=0; i!=lines.size(); ++i)
     for (unsigned int j=0; j!=lines[i].entries.size(); ++j)
       out << "    " << lines[i].line
 	  << " " << lines[i].entries[j].first
-	  << ":  " << lines[i].entries[j].second << endl;
+	  << ":  " << lines[i].entries[j].second << std::endl;
 
   AssertThrow (out, ExcIO());
 };

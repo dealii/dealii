@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,14 +69,14 @@ class TriangulationLevel<0>
 				      *  @p{lines} vector, in two dimensions
 				      *  that of the @p{quads} vector, etc.
 				      */
-    vector<bool> refine_flags;
+    std::vector<bool> refine_flags;
 
 				     /**
 				      * Same meaning as the one above, but
 				      * specifies whether a cell must be
 				      * coarsened.
 				      */
-    vector<bool> coarsen_flags;
+    std::vector<bool> coarsen_flags;
     
 				     /**
 				      *  Levels and indices of the neighbors
@@ -126,7 +126,7 @@ class TriangulationLevel<0>
 				      *  which case its neighbor pointer points
 				      *  to the mother cell of this cell).
 				      */
-    vector<pair<int,int> > neighbors;
+    std::vector<std::pair<int,int> > neighbors;
     
 				     /**
 				      *  Reserve enough space to accomodate
@@ -212,7 +212,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  index of a line is stored in the
 					  *  line itself.
 					  */
-	vector<Line> lines;
+	std::vector<Line> lines;
 					 /**
 					  *  Index of the first child of a line
 					  *  in the list on the next level.
@@ -231,7 +231,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  @ref{TriaIterator}@p{::active()}
 					  *  tests for this.
 					  */
-	vector<int>  children;
+	std::vector<int>  children;
 	
 					 /**
 					  *  Vector storing whether a line is
@@ -245,7 +245,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  rather the according @p{used} flag
 					  *  is set to @p{false}.
 					  */
-	vector<bool> used;
+	std::vector<bool> used;
 
 					 /**
 					  *  Make available a field for user data,
@@ -258,7 +258,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  You can clear all used flags using
 					  *  @ref{Triangulation}@p{::clear_user_flags()}.
 					  */
-	vector<bool> user_flags;
+	std::vector<bool> user_flags;
 
 					 /**
 					  * Store boundary and material data. In
@@ -281,7 +281,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  * is not possible if you don't know
 					  * which cell it belongs to.
 					  */
-	vector<unsigned char> material_id;
+	std::vector<unsigned char> material_id;
 
 					 /**
 					  * Pointer which is not used by the
@@ -289,7 +289,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  * by the user to handle data local to
 					  * a line/quad/etc.
 					  */
-	vector<void*> user_pointers;
+	std::vector<void*> user_pointers;
     };
     
   public:
@@ -365,7 +365,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 					 /**
 					  *  Same as for the @p{lines} array.
 					  */
-	vector<Quad> quads;
+	std::vector<Quad> quads;
 					 /**
 					  *  Same as for the
 					  *  @ref{TriangulationLevel<1>::LinesData}@p{::chilren}
@@ -376,19 +376,19 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 					  *  following immediately
 					  *  afterwards.
 					  */
-	vector<int>  children;
+	std::vector<int>  children;
 
 					 /**
 					  *  Same as for
 					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
 					  */
-	vector<bool> used;
+	std::vector<bool> used;
 
 					 /**
 					  *  Same as for
 					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
 					  */
-	vector<bool> user_flags;
+	std::vector<bool> user_flags;
 
 					 /**
 					  * Store boundary and material data. In
@@ -411,7 +411,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 					  * is not possible if you don't know
 					  * which cell it belongs to.
 					  */
-	vector<unsigned char> material_id;
+	std::vector<unsigned char> material_id;
 
 
 					 /**
@@ -420,7 +420,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 					  * by the user to handle data local to
 					  * a line/quad/etc.
 					  */
-	vector<void*> user_pointers;
+	std::vector<void*> user_pointers;
     };
     
   public:
@@ -485,7 +485,7 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 					 /**
 					  *  Same as for the @p{lines} array.
 					  */
-	vector<Hexahedron> hexes;
+	std::vector<Hexahedron> hexes;
 					 /**
 					  *  Same as for the
 					  *  @ref{TriangulationLevel<1>::LinesData}@p{::chilren}
@@ -496,19 +496,19 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 					  *  following immediately
 					  *  afterwards.
 					  */
-	vector<int>  children;
+	std::vector<int>  children;
 
 					 /**
 					  *  Same as for
 					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
 					  */
-	vector<bool> used;
+	std::vector<bool> used;
 
 					 /**
 					  *  Same as for
 					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
 					  */
-	vector<bool> user_flags;
+	std::vector<bool> user_flags;
 
 					 /**
 					  * Store boundary and material data. In
@@ -531,7 +531,7 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 					  * is not possible if you don't know
 					  * which cell it belongs to.
 					  */
-	vector<unsigned char> material_id;
+	std::vector<unsigned char> material_id;
 
 
 					 /**
@@ -540,7 +540,7 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 					  * by the user to handle data local to
 					  * a line/quad/etc.
 					  */
-	vector<void*> user_pointers;
+	std::vector<void*> user_pointers;
     };
     
   public:

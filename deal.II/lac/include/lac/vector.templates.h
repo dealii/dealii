@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,8 @@
 
 
 template <typename Number>
-static inline Number sqr (const Number x) {
+static inline Number sqr (const Number x)
+{
   return x*x;
 };
 
@@ -54,7 +55,7 @@ Vector<Number>::Vector (const Vector<Number>& v) :
     {
       val = new Number[maxdim];
       Assert (val != 0, ExcOutOfMemory());
-      copy (v.begin(), v.end(), begin());
+      std::copy (v.begin(), v.end(), begin());
     }
 }
 
@@ -119,7 +120,7 @@ template <typename Number>
 void Vector<Number>::clear ()
 {
   if (dim>0)
-    fill (begin(), end(), 0.);
+    std::fill (begin(), end(), 0.);
 }
 
 
@@ -302,8 +303,8 @@ Number Vector<Number>::linfty_norm () const {
     if (max0<fabs(val[i]))
       max0 = fabs(val[i]);
 
-  return max (max(max0, max1),
-	      max(max2, max3));
+  return std::max (std::max(max0, max1),
+		   std::max(max2, max3));
 };
 
 
@@ -516,7 +517,7 @@ template <typename Number>
 Vector<Number>& Vector<Number>::operator = (const Number s)
 {
   Assert (dim!=0, ExcEmptyVector());
-  fill (begin(), end(), s);
+  std::fill (begin(), end(), s);
   return *this;
 }
 
@@ -529,7 +530,7 @@ Vector<Number>::operator = (const Vector<Number>& v)
   if (v.dim != dim)
     reinit (v.dim, true);
   if (dim!=0)
-    copy (v.begin(), v.end(), begin());
+    std::copy (v.begin(), v.end(), begin());
   
   return *this;
 }
@@ -544,7 +545,7 @@ Vector<Number>::operator = (const Vector<Number2>& v)
   if (v.size() != dim)
     reinit (v.size(), true);
   if (dim!=0)
-    copy (v.begin(), v.end(), begin());
+    std::copy (v.begin(), v.end(), begin());
   
   return *this;
 }
@@ -576,19 +577,19 @@ void Vector<Number>::print (const char* format) const
 
 
 template <typename Number>
-void Vector<Number>::print (ostream &out,
-			    unsigned int precision,
-			    bool scientific,
-			    bool across) const
+void Vector<Number>::print (std::ostream      &out,
+			    const unsigned int precision,
+			    const bool         scientific,
+			    const bool         across) const
 {
   Assert (dim!=0, ExcEmptyVector());
 
   out.precision (precision);
   if (scientific)
     {
-      out.setf (ios::scientific, ios::floatfield);
+      out.setf (std::ios::scientific, std::ios::floatfield);
     } else {
-      out.setf (ios::fixed, ios::floatfield);
+      out.setf (std::ios::fixed, std::ios::floatfield);
     }
 
   if (across)
@@ -596,8 +597,8 @@ void Vector<Number>::print (ostream &out,
       out << val[i] << ' ';
   else
     for (unsigned int i=0; i<size(); ++i)
-      out << val[i] << endl;
-  out << endl;
+      out << val[i] << std::endl;
+  out << std::endl;
   
   AssertThrow (out, ExcIO());
 };
@@ -605,12 +606,12 @@ void Vector<Number>::print (ostream &out,
 
 
 template <typename Number>
-void Vector<Number>::block_write (ostream &out) const
+void Vector<Number>::block_write (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
 
 				   // other version of the following
-				   //  out << size() << endl << '[';
+				   //  out << size() << std::endl << '[';
 				   // reason: operator<< seems to use
 				   // some resources that lead to
 				   // problems in a multithreaded
@@ -636,7 +637,7 @@ void Vector<Number>::block_write (ostream &out) const
 
 
 template <typename Number>
-void Vector<Number>::block_read (istream &in)
+void Vector<Number>::block_read (std::istream &in)
 {
   AssertThrow (in, ExcIO());
 
@@ -657,7 +658,7 @@ void Vector<Number>::block_read (istream &in)
   in.read (&c, 1);
   AssertThrow (c=='[', ExcIO());
   
-  in.read (reinterpret_cast<void*>(begin()),
+  in.read (reinterpret_cast<char*>(begin()),
 	   reinterpret_cast<const char*>(end())
 	   - reinterpret_cast<const char*>(begin()));
   

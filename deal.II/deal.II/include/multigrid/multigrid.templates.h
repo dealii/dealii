@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,9 +52,9 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
 				   // on all levels to zero
   defect.clear();
   
-  vector<unsigned int> global_dof_indices (dofs_per_cell);
-  vector<unsigned int> level_dof_indices  (dofs_per_cell);
-  vector<unsigned int> level_face_indices (dofs_per_face);
+  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
+  std::vector<unsigned int> level_face_indices (dofs_per_face);
 
 				   // initialize the objects with
 				   // their correct size
@@ -144,8 +144,8 @@ Multigrid<dim>::copy_from_mg(Vector<number> &dst) const
 {
   const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
 
-  vector<unsigned int> global_dof_indices (dofs_per_cell);
-  vector<unsigned int> level_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
   MGDoFHandler<dim>::active_cell_iterator
     level_cell = mg_dof_handler->begin_active();
@@ -199,8 +199,8 @@ Multigrid<dim>::print_vector (const unsigned int level,
   
   const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
 
-  vector<unsigned int> global_dof_indices (dofs_per_cell);
-  vector<unsigned int> level_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
   DoFHandler<dim>::active_cell_iterator
     global_cell = dof->begin_active(level);
@@ -224,7 +224,7 @@ Multigrid<dim>::print_vector (const unsigned int level,
 	  = v(level_dof_indices[i]);
     }
 
-  ofstream out_file(name);
+  std::ofstream out_file(name);
   DataOut<dim> out;
   out.attach_dof_handler(*dof);
   out.add_data_vector(out_vector, "v");

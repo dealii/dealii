@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,9 +73,9 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   if (true)
     {
 				       // preset the elements
-      fill_n (&global_entry(0),
-	      n_nonzero_elements(),
-	      0);
+      std::fill_n (&global_entry(0),
+		   n_nonzero_elements(),
+		   0);
 
 				       // note: pointers to the sparsity
 				       // pattern of the old matrix!
@@ -159,9 +159,9 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
       const unsigned int * first_of_row
 	= &column_numbers[rowstart_indices[row]+1];
       const unsigned int * first_after_diagonal
-	= lower_bound (&column_numbers[rowstart_indices[row]+1],
-		       &column_numbers[rowstart_indices[row+1]],
-		       row);
+	= std::lower_bound (&column_numbers[rowstart_indices[row]+1],
+			    &column_numbers[rowstart_indices[row+1]],
+			    row);
 
 				       // k := *col_ptr
       for (const unsigned int * col_ptr = first_of_row; col_ptr!=first_after_diagonal; ++col_ptr)
@@ -301,9 +301,9 @@ void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
 				       // find the position where the part
 				       // right of the diagonal starts
       const unsigned int * const first_after_diagonal
-	= lower_bound (rowstart,
-		       &column_numbers[rowstart_indices[row+1]],
-		       row);
+	= std::lower_bound (rowstart,
+			    &column_numbers[rowstart_indices[row+1]],
+			    row);
       
       for (const unsigned int * col=rowstart; col!=first_after_diagonal; ++col)
 	dst(row) -= global_entry (col-column_numbers) * dst(*col);
@@ -324,9 +324,9 @@ void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
 				       // find the position where the part
 				       // right of the diagonal starts
       const unsigned int * const first_after_diagonal
-	= lower_bound (&column_numbers[rowstart_indices[row]+1],
-		       &column_numbers[rowstart_indices[row+1]],
-		       static_cast<unsigned int>(row));
+	= std::lower_bound (&column_numbers[rowstart_indices[row]+1],
+			    &column_numbers[rowstart_indices[row+1]],
+			    static_cast<unsigned int>(row));
       
       for (const unsigned int * col=first_after_diagonal; col!=rowend; ++col)
 	dst(row) -= global_entry (col-column_numbers) * dst(*col);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,7 @@
 
 template<typename number>
 SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
-				 const vector<bool>         &selected,
+				 const std::vector<bool>    &selected,
 				 const bool                  conserve_mem,
 				 const unsigned int          n_threads)
 		:
@@ -51,7 +51,7 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 template<typename number>
 SparseVanka<number>::~SparseVanka()
 {
-  vector<SmartPointer<FullMatrix<float> > >::iterator i;
+  std::vector<SmartPointer<FullMatrix<float> > >::iterator i;
   for(i=inverses.begin(); i!=inverses.end(); ++i)
     {
       FullMatrix<float> *p = *i;
@@ -87,7 +87,7 @@ SparseVanka<number>::compute_inverses ()
 				   // consecutive, with other
 				   // consecutive regions where we do
 				   // not have to do something
-  vector<pair<unsigned int, unsigned int> > blocking (n_threads);
+  std::vector<std::pair<unsigned int, unsigned int> > blocking (n_threads);
 
   unsigned int c       = 0;
   unsigned int thread  = 0;
@@ -134,7 +134,7 @@ SparseVanka<number>::compute_inverses (const unsigned int begin,
 				   // set-up the vector that will be used
 				   // by the functions which we call
 				   // below.
-  vector<unsigned int> local_indices;
+  std::vector<unsigned int> local_indices;
 
 				   // traverse all rows of the matrix
 				   // which are selected
@@ -147,8 +147,8 @@ SparseVanka<number>::compute_inverses (const unsigned int begin,
 
 template <typename number>
 void
-SparseVanka<number>::compute_inverse (const unsigned int    row,
-				      vector<unsigned int> &local_indices) 
+SparseVanka<number>::compute_inverse (const unsigned int         row,
+				      std::vector<unsigned int> &local_indices) 
 {
 				   // first define an alias to the sparsity
 				   // pattern of the matrix, since this
@@ -207,9 +207,9 @@ SparseVanka<number>::vmult (Vector<number2>       &dst,
 template<typename number>
 template<typename number2>
 void
-SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
-					   const Vector<number2> &src,
-					   const vector<bool>    *const dof_mask) const
+SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
+					   const Vector<number2>   &src,
+					   const std::vector<bool> *const dof_mask) const
 {
   Assert (dst.size() == src.size(),
 	  ExcInvalidVectorSize(dst.size(), src.size()));
@@ -241,7 +241,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
   Vector<float> b (structure.max_entries_per_row());
   Vector<float> x (structure.max_entries_per_row());
   
-  map<unsigned int, unsigned int> local_index;
+  std::map<unsigned int, unsigned int> local_index;
 
 				   // traverse all rows of the matrix
 				   // which are selected
@@ -280,11 +280,11 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 					 // couple with @p{row}.
 	local_index.clear ();
 	for (unsigned int i=0; i<row_length; ++i)
-	  local_index.insert(pair<unsigned int, unsigned int>
+	  local_index.insert(std::pair<unsigned int, unsigned int>
 			     (structure.column_number(row, i), i));
 	
 					 // Build local matrix and rhs
-	for (map<unsigned int, unsigned int>::const_iterator is=local_index.begin();
+	for (std::map<unsigned int, unsigned int>::const_iterator is=local_index.begin();
 	     is!=local_index.end(); ++is)
 	  {
 					     // irow loops over all DoFs that
@@ -313,7 +313,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 						 // which itself couples with
 						 // @p{row}) also couples with
 						 // @p{row}.
-		const map<unsigned int, unsigned int>::const_iterator js
+		const std::map<unsigned int, unsigned int>::const_iterator js
 		  = local_index.find(col);
 						 // if not, then still use
 						 // this dof to modify the rhs
@@ -342,7 +342,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 	inverses[row]->vmult(x,b);
 	
 					 // Distribute new values
-	for (map<unsigned int, unsigned int>::const_iterator is=local_index.begin();
+	for (std::map<unsigned int, unsigned int>::const_iterator is=local_index.begin();
 	     is!=local_index.end(); ++is)
 	  {
 	    const unsigned int irow = is->first;
@@ -382,7 +382,7 @@ SparseVanka<number>::memory_consumption () const
 
 template <typename number>
 SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
-					    const vector<bool>         &selected,
+					    const std::vector<bool>    &selected,
 					    const unsigned int          n_blocks,
 					    const BlockingStrategy      blocking_strategy,
 					    const bool                  conserve_memory,
@@ -391,7 +391,7 @@ SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
 		SparseVanka<number> (M, selected, conserve_memory, n_threads),
                 n_blocks (n_blocks),
                 dof_masks (n_blocks,
-		           vector<bool>(M.m(), false))
+		           std::vector<bool>(M.m(), false))
 {
   compute_dof_masks (M, selected, blocking_strategy);
 };
@@ -400,7 +400,7 @@ SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
 template <typename number>
 void
 SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
-					     const vector<bool>         &selected,
+					     const std::vector<bool>    &selected,
 					     const BlockingStrategy      blocking_strategy) 
 {
   Assert (n_blocks > 0, ExcInternalError());
@@ -409,11 +409,10 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
 					 selected.end(),
 					 true);
   
-  const unsigned int n_inverses_per_block = max(n_inverses / n_blocks,
-						1U);
+  const unsigned int n_inverses_per_block = std::max(n_inverses / n_blocks, 1U);
   
 				   // precompute the splitting points
-  vector<pair<unsigned int, unsigned int> > intervals (n_blocks);
+  std::vector<std::pair<unsigned int, unsigned int> > intervals (n_blocks);
     
 				   // set up start and end index for
 				   // each of the blocks. note that
@@ -483,14 +482,14 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
 					 // Lagrange dofs of each
 					 // block access the different
 					 // dofs
-	vector<vector<unsigned int> > access_count (n_blocks,
-						    vector<unsigned int>(M.m(), 0));
+	std::vector<std::vector<unsigned int> >
+	  access_count (n_blocks, std::vector<unsigned int>(M.m(), 0));
 	
 					 // set-up the map that will
 					 // be used to store the
 					 // indices each Lagrange dof
 					 // accesses
-	map<unsigned int, unsigned int> local_index;
+	std::map<unsigned int, unsigned int> local_index;
 	const SparsityPattern &structure = M.get_sparsity_pattern();
 
 	for (unsigned int row=0; row<M.m(); ++row)

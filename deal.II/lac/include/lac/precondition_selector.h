@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -89,7 +89,7 @@ class PreconditionSelector : public Subscriptor
 				      * the damping parameter of
 				      * the preconditioning.
 				      */
-    PreconditionSelector(const string preconditioning,
+    PreconditionSelector(const std::string                 &preconditioning,
 			 const typename Vector::value_type &omega=1.);
     
 				     /**
@@ -116,7 +116,7 @@ class PreconditionSelector : public Subscriptor
 				      * Get the names of all implemented
 				      * preconditionings.
 				      */
-    static string get_precondition_names();
+    static std::string get_precondition_names();
 
 				     /**
 				      * Exception.
@@ -130,7 +130,7 @@ class PreconditionSelector : public Subscriptor
 				      * Stores the name of the
 				      * preconditioning.
 				      */
-    string preconditioning;
+    std::string preconditioning;
 
   private:
 				     /**
@@ -153,7 +153,7 @@ class PreconditionSelector : public Subscriptor
 
 template <class Matrix, class Vector>
 PreconditionSelector<Matrix,Vector>
-::PreconditionSelector(string preconditioning,
+::PreconditionSelector(std::string                       &preconditioning,
 		       const typename Vector::value_type &omega) :
 		preconditioning(preconditioning),
 		omega(omega)  {}
@@ -204,7 +204,7 @@ void PreconditionSelector<Matrix,Vector>::vmult (Vector &dst,
 
 
 template <class Matrix, class Vector>
-string PreconditionSelector<Matrix,Vector>::get_precondition_names()
+std::string PreconditionSelector<Matrix,Vector>::get_precondition_names()
 {
   return "none|jacobi|sor|ssor";
 }

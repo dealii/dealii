@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -109,7 +109,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   const unsigned int n_dofs = local_source.size();
   
 				   // get indices of dofs
-  vector<unsigned int> dofs (n_dofs);
+  std::vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell vector
@@ -152,7 +152,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   const unsigned int n_dofs = local_source.m();
 
 				   // get indices of dofs
-  vector<unsigned int> dofs (n_dofs);
+  std::vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell matrix
@@ -181,7 +181,7 @@ DoFObjectAccessor<1,dim>::get_dof_values (const InputVector &values,
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  typename vector<number>::iterator next_local_value=local_values.begin();
+  typename Vector<number>::iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_local_value++ = values(vertex_dof_index(vertex,d));
@@ -212,10 +212,10 @@ DoFObjectAccessor<1,dim>::set_dof_values (const Vector<number> &local_values,
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  typename vector<number>::const_iterator next_local_value=local_values.begin();
+  typename Vector<number>::const_iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-       values(vertex_dof_index(vertex,d)) = *next_local_value++;
+      values(vertex_dof_index(vertex,d)) = *next_local_value++;
   for (unsigned int d=0; d<dofs_per_line; ++d)
     values(dof_index(d)) = *next_local_value++;
 
@@ -286,7 +286,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   const unsigned int n_dofs = local_source.size();
 
 				   // get indices of dofs
-  vector<unsigned int> dofs (n_dofs);
+  std::vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell vector
@@ -318,7 +318,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   const unsigned int n_dofs = local_source.m();
 
 				   // get indices of dofs
-  vector<unsigned int> dofs (n_dofs);
+  std::vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell matrix
@@ -351,7 +351,7 @@ DoFObjectAccessor<2,dim>::get_dof_values (const InputVector &values,
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  typename vector<number>::iterator next_local_value=local_values.begin();
+  typename Vector<number>::iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_local_value++ = values(vertex_dof_index(vertex,d));
@@ -389,7 +389,7 @@ DoFObjectAccessor<2,dim>::set_dof_values (const Vector<number> &local_values,
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  typename vector<number>::const_iterator next_local_value=local_values.begin();
+  typename Vector<number>::const_iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       values(vertex_dof_index(vertex,d)) = *next_local_value++;
@@ -451,7 +451,8 @@ void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 template <int dim>
 void DoFObjectAccessor<3, dim>::
 distribute_local_to_global (const Vector<double> &local_source,
-			    Vector<double>       &global_destination) const {
+			    Vector<double>       &global_destination) const
+{
   Assert (dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0,
@@ -467,7 +468,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   const unsigned int n_dofs = local_source.size();
 
 				   // get indices of dofs
-  vector<unsigned int> dofs (n_dofs);
+  std::vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell vector
@@ -501,7 +502,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   const unsigned int n_dofs = local_source.m();
 
 				   // get indices of dofs
-  vector<unsigned int> dofs (n_dofs);
+  std::vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell matrix
@@ -533,7 +534,7 @@ DoFObjectAccessor<3,dim>::get_dof_values (const InputVector &values,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
-  typename vector<number>::iterator next_local_value = local_values.begin();
+  typename Vector<number>::iterator next_local_value = local_values.begin();
   for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_local_value++ = values(vertex_dof_index(vertex,d));
@@ -575,7 +576,7 @@ DoFObjectAccessor<3,dim>::set_dof_values (const Vector<number> &local_values,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
-  typename vector<number>::const_iterator next_local_value=local_values.begin();
+  typename Vector<number>::const_iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       values(vertex_dof_index(vertex,d)) = *next_local_value++;

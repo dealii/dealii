@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -672,7 +672,7 @@ class SparseMatrix : public Subscriptor
 				      * nonzero entry of the matrix
 				      * per line.
 				      */
-    void print (ostream &out) const;
+    void print (std::ostream &out) const;
 
 				     /**
 				      * Print the matrix in the usual
@@ -713,7 +713,7 @@ class SparseMatrix : public Subscriptor
 				      * may produce @em{large} amounts of
 				      * output if applied to a large matrix!
 				      */
-    void print_formatted (ostream            &out,
+    void print_formatted (std::ostream       &out,
 			  const unsigned int  precision   = 3,
 			  const bool          scientific  = true,
 			  const unsigned int  width       = 0,
@@ -872,7 +872,7 @@ class SparseMatrix : public Subscriptor
     void threaded_residual (Vector<somenumber>       &dst,
 			    const Vector<somenumber> &u,
 			    const Vector<somenumber> &b,
-			    const pair<unsigned int,unsigned int> interval,
+			    const std::pair<unsigned int,unsigned int> interval,
 			    somenumber               *partial_norm) const;
 
 

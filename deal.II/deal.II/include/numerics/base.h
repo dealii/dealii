@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -108,7 +108,7 @@ class ProblemBase
 				      *	See the general documentation of this
 				      *	class for more detail.
 				      */
-    typedef map<unsigned char,const Function<dim>*> FunctionMap;
+    typedef std::map<unsigned char,const Function<dim>*> FunctionMap;
 				     /**
 				      * Typdedef an iterator which assembles
 				      * matrices and vectors.
@@ -199,7 +199,7 @@ class ProblemBase
 				      * Overload this function, if you
 				      * want anything else.
 				      */
-    virtual string get_solution_name () const;
+    virtual std::string get_solution_name () const;
 
 				     /**
 				      * Exception

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -94,8 +94,8 @@ class Quadrature : public Subscriptor
 				     /**
 				      * Constructor from given vectors.
 				      */
-    Quadrature (const vector<Point<dim> > & points,
-		const vector<double> & weights);
+    Quadrature (const std::vector<Point<dim> > &points,
+		const std::vector<double>      &weights);
     
 				     /**
 				      * Virtual destructor.
@@ -111,7 +111,7 @@ class Quadrature : public Subscriptor
 				      * Return a reference to the whole array of
 				      * quadrature points.
 				      */
-    const vector<Point<dim> > & get_points () const;
+    const std::vector<Point<dim> > & get_points () const;
     
 				     /**
 				      * Return the weight of the @p{i}th
@@ -123,7 +123,7 @@ class Quadrature : public Subscriptor
 				      * Return a reference to the whole array
 				      * of weights.
 				      */
-    const vector<double> & get_weights () const;
+    const std::vector<double> & get_weights () const;
 
     				     /**
 				      * Determine an estimate for
@@ -138,14 +138,14 @@ class Quadrature : public Subscriptor
 				      * List of quadrature points. To be filled
 				      * by the constructors of derived classes.
 				      */
-    vector<Point<dim> > quadrature_points;
+    std::vector<Point<dim> > quadrature_points;
 
 				     /**
 				      * List of weights of the quadrature points.
 				      * To be filled by the constructors of
 				      * derived classes.
 				      */
-    vector<double>      weights;
+    std::vector<double>      weights;
 };
 
 
@@ -273,17 +273,17 @@ class QProjector : public Quadrature<dim>
 				      * details, see the general doc for
 				      * this class.
 				      */
-    static void project_to_face (const Quadrature<dim-1> &quadrature,
-				 const unsigned int       face_no,
-				 vector<Point<dim> >     &q_points);
+    static void project_to_face (const Quadrature<dim-1>  &quadrature,
+				 const unsigned int        face_no,
+				 std::vector<Point<dim> > &q_points);
 
 				     /**
 				      * Projection to all faces.
 				      * Generate a formula that integrates
 				      * over all faces at the same time.
 				      */
-    static void project_to_faces (const Quadrature<dim-1> &quadrature,
-				  vector<Point<dim> >     &q_points);
+    static void project_to_faces (const Quadrature<dim-1>  &quadrature,
+				  std::vector<Point<dim> > &q_points);
     
     				     /**
 				      * Compute the quadrature points on the
@@ -293,10 +293,10 @@ class QProjector : public Quadrature<dim>
 				      * details, see the general doc for
 				      * this class.
 				      */
-    static void project_to_subface (const Quadrature<dim-1> &quadrature,
-				    const unsigned int       face_no,
-				    const unsigned int       subface_no,
-				    vector<Point<dim> >     &q_points);
+    static void project_to_subface (const Quadrature<dim-1>  &quadrature,
+				    const unsigned int        face_no,
+				    const unsigned int        subface_no,
+				    std::vector<Point<dim> > &q_points);
 
 				     /**
 				      * Projection to all child faces.
@@ -305,8 +305,8 @@ class QProjector : public Quadrature<dim>
 				      * ordering is first by face,
 				      * then by subface
 				      */
-    static void project_to_subfaces (const Quadrature<dim-1> &quadrature,
-				     vector<Point<dim> >     &q_points);
+    static void project_to_subfaces (const Quadrature<dim-1>  &quadrature,
+				     std::vector<Point<dim> > &q_points);
 };
 
 

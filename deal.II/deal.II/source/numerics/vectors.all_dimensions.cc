@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,7 @@
 
 void
 VectorTools::subtract_mean_value(Vector<double>     &v,
-				 const vector<bool> &p_select)
+				 const std::vector<bool> &p_select)
 {
   unsigned int n = v.size();
   Assert(n == p_select.size(), ExcDimensionMismatch(n, p_select.size()));

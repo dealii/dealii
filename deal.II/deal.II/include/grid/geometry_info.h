@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,8 @@ template <int _dim>
 struct GeometryInfo
 {
 				     /**
-				      * Present dimension. Does not look useful, but might be.
+				      * Present dimension. Does not
+				      * look useful, but might be.
 				      */
     static const unsigned int dim               = _dim;
 

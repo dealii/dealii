@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -4428,7 +4428,7 @@ FEDG_Q4<3>::FEDG_Q4():
 template <int dim>
 void
 FEDG_Q1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-				       vector<Point<dim> >  &support_points) const
+				       std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
@@ -4439,7 +4439,7 @@ FEDG_Q1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 template <int dim>
 void
 FEDG_Q2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-						vector<Point<dim> >  &support_points) const
+				       std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
@@ -4450,7 +4450,7 @@ FEDG_Q2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 template <int dim>
 void
 FEDG_Q3<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-				       vector<Point<dim> >  &support_points) const
+				       std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
@@ -4461,7 +4461,7 @@ FEDG_Q3<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 template <int dim>
 void
 FEDG_Q4<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-				       vector<Point<dim> >  &support_points) const
+				       std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));

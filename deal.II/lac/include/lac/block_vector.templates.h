@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,7 @@ BlockVector<Number>::BlockVector (unsigned int n_blocks,
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector (const vector<unsigned int> &n)
+BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n)
 {
   reinit (n, false);
 }
@@ -70,14 +70,14 @@ void BlockVector<Number>::reinit (const unsigned int n_bl,
 				  const unsigned int bl_sz,
 				  const bool                  fast)
 {
-  vector<unsigned int> n(n_bl, bl_sz);
+  std::vector<unsigned int> n(n_bl, bl_sz);
   reinit(n, fast);
 }
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const vector<unsigned int> &n,
-				  const bool                  fast)
+void BlockVector<Number>::reinit (const std::vector<unsigned int> &n,
+				  const bool                       fast)
 {
   block_indices.reinit (n);
   num_blocks = n.size();
@@ -451,17 +451,17 @@ BlockVector<Number>::operator = (const BlockVector< Number2>& v)
 
 
 template <typename Number>
-void BlockVector<Number>::print (ostream &out,
-				 unsigned int precision,
-				 bool scientific,
-				 bool across) const
+void BlockVector<Number>::print (std::ostream       &out,
+				 const unsigned int  precision,
+				 const bool          scientific,
+				 const bool          across) const
 {
   for (unsigned int i=0;i<num_blocks;++i)
     {
       if (across)
 	out << 'C' << i << ':';
       else
-	out << "Component " << i << endl;
+	out << "Component " << i << std::endl;
       components[i].print(out, precision, scientific, across);
     }
 }
@@ -469,7 +469,7 @@ void BlockVector<Number>::print (ostream &out,
 
 
 template <typename Number>
-void BlockVector<Number>::block_write (ostream &out) const
+void BlockVector<Number>::block_write (std::ostream &out) const
 {
   for (unsigned int i=0;i<num_blocks;++i)
     {
@@ -480,7 +480,7 @@ void BlockVector<Number>::block_write (ostream &out) const
 
 
 template <typename Number>
-void BlockVector<Number>::block_read (istream &in)
+void BlockVector<Number>::block_read (std::istream &in)
 {
   for (unsigned int i=0;i<num_blocks;++i)
     {

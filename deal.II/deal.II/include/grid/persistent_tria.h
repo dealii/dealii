@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -180,15 +180,15 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * is not useful in the context of this
 				      * class.
 				      */
-    virtual void create_triangulation (const vector<Point<dim> >    &vertices,
-				       const vector<CellData<dim> > &cells,
-				       const SubCellData            &subcelldata);
+    virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
+				       const std::vector<CellData<dim> > &cells,
+				       const SubCellData                 &subcelldata);
 
 				     /**
 				      * Writes all refine and coarsen
 				      * flags to the ostream @p{out}.
 				      */
-    virtual void write_flags(ostream &out) const;
+    virtual void write_flags(std::ostream &out) const;
 
 				     /**
 				      * Reads all refine and coarsen flags
@@ -198,7 +198,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * after the end or breakdown of a program
 				      * and its restart.
 				      */
-    virtual void read_flags(istream &in);
+    virtual void read_flags(std::istream &in);
 
 				     /**
 				      * Determine an estimate for the
@@ -230,12 +230,12 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * vectors therefore hold the history
 				      * of the grid.
 				      */
-    vector<vector<bool> >   refine_flags;
+    std::vector<std::vector<bool> >   refine_flags;
 
 				     /**
 				      * @see refine_flags
 				      */
-    vector<vector<bool> >   coarsen_flags;
+    std::vector<std::vector<bool> >   coarsen_flags;
 };
 
 

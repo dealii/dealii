@@ -105,9 +105,9 @@ class Coefficient : public Function<dim>
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
     
-    virtual void value_list (const vector<Point<dim> > &points,
-			     vector<double>            &values,
-			     const unsigned int         component = 0) const;
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<double>            &values,
+			     const unsigned int              component = 0) const;
 };
 
 
@@ -136,9 +136,9 @@ double Coefficient<dim>::value (const Point<dim> &p,
 				 // values are the same as if we would
 				 // ask the ``value'' function.
 template <int dim>
-void Coefficient<dim>::value_list (const vector<Point<dim> > &points,
-				   vector<double>            &values,
-				   const unsigned int component) const 
+void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+				   std::vector<double>            &values,
+				   const unsigned int              component) const 
 {
 				   // Use n_q_points as an
 				   // abbreviation for the number of
@@ -272,9 +272,9 @@ void LaplaceProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
-  cout << "   Number of degrees of freedom: "
-       << dof_handler.n_dofs()
-       << endl;
+  std::cout << "   Number of degrees of freedom: "
+	    << dof_handler.n_dofs()
+	    << std::endl;
 
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
@@ -341,7 +341,7 @@ void LaplaceProblem<dim>::assemble_system ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // Below, we will ask the
 				   // Coefficient class to compute the
@@ -351,7 +351,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // space to store the values in,
 				   // which we use the following
 				   // variable for:
-  vector<double>     coefficient_values (n_q_points);
+  std::vector<double>     coefficient_values (n_q_points);
 
   DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 					endc = dof_handler.end();
@@ -409,7 +409,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // in the FEValues class. The
 				       // gradient are accessed as
 				       // follows:
-      const vector<vector<Tensor<1,dim> > >
+      const std::vector<std::vector<Tensor<1,dim> > >
 	& shape_grads  = fe_values.get_shape_grads();
 				       // The data type looks a bit
 				       // unwieldy, since each entry
@@ -426,9 +426,9 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // respective quadrature points
 				       // are stored, can be obtained
 				       // like this:
-      const vector<double>
+      const std::vector<double>
 	& JxW_values   = fe_values.get_JxW_values();
-      const vector<Point<dim> >
+      const std::vector<Point<dim> >
 	& q_points     = fe_values.get_quadrature_points();
 				       // Admittedly, the declarations
 				       // above are not easily
@@ -558,7 +558,7 @@ void LaplaceProblem<dim>::assemble_system ()
     };
 
 				   // Again use zero boundary values:
-  map<unsigned int,double> boundary_values;
+  std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(),
@@ -625,9 +625,9 @@ void LaplaceProblem<dim>::solve ()
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
 
-  cout << "   " << solver_control.last_step()
-       << " CG iterations needed to obtain convergence."
-       << endl;
+  std::cout << "   " << solver_control.last_step()
+	    << " CG iterations needed to obtain convergence."
+	    << std::endl;
 };
 
 
@@ -741,20 +741,20 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // could as well give stream
 				   // modifiers such as ``setf'',
 				   // ``setprecision'', and so on.
-  ostrstream filename;
+  std::ostrstream filename;
   filename << "solution-"
 	   << cycle
 	   << ".eps";
 				   // In order to append the final
 				   // '\0', we have to put an ``ends''
 				   // to the end of the string:
-  filename << ends;
+  filename << std::ends;
   
 				   // We can get whatever we wrote to
 				   // the stream using the ``str()''
 				   // function. Use that as filename
 				   // for the output stream:
-  ofstream output (filename.str());
+  std::ofstream output (filename.str());
 				   // And then write the data to the
 				   // file.
   data_out.write_eps (output);
@@ -767,7 +767,7 @@ void LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
-      cout << "Cycle " << cycle << ':' << endl;
+      std::cout << "Cycle " << cycle << ':' << std::endl;
 
 				       // If this is the first round,
 				       // then we have no grid yet,
@@ -799,7 +799,7 @@ void LaplaceProblem<dim>::run ()
 	{
 	  GridIn<dim> grid_in;
 	  grid_in.attach_triangulation (triangulation);
-	  ifstream input_file("circle-grid.inp");
+	  std::ifstream input_file("circle-grid.inp");
 					   // We would now like to
 					   // read the file. However,
 					   // the input file is only
@@ -902,12 +902,12 @@ void LaplaceProblem<dim>::run ()
 				       // the things that we have
 				       // already seen in the previous
 				       // examples.
-      cout << "   Number of active cells: "
-	   << triangulation.n_active_cells()
-	   << endl
-	   << "   Total number of cells: "
-	   << triangulation.n_cells()
-	   << endl;
+      std::cout << "   Number of active cells: "
+		<< triangulation.n_active_cells()
+		<< std::endl
+		<< "   Total number of cells: "
+		<< triangulation.n_cells()
+		<< std::endl;
 
       setup_system ();
       assemble_system ();
@@ -948,8 +948,8 @@ int main ()
 				   // lines.
 /*  
   Coefficient<2>    coefficient;
-  vector<Point<2> > points (2);
-  vector<double>    coefficient_values (1);
+  std::vector<Point<2> > points (2);
+  std::vector<double>    coefficient_values (1);
   coefficient.value_list (points, coefficient_values);
 */
   

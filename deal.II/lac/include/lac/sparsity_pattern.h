@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -184,9 +184,9 @@ class SparsityPattern : public Subscriptor
 				      * row is given by the
 				      * @p{row_lengths} array.
 				      */
-    SparsityPattern (const unsigned int          m,
-		     const unsigned int          n,
-		     const vector<unsigned int> &row_lengths);
+    SparsityPattern (const unsigned int               m,
+		     const unsigned int               n,
+		     const std::vector<unsigned int> &row_lengths);
     
 				     /**
 				      * Initialize a square matrix of dimension
@@ -204,8 +204,8 @@ class SparsityPattern : public Subscriptor
 				      * row is given by the
 				      * @p{row_lengths} array.
 				      */
-    SparsityPattern (const unsigned int          m,
-		     const vector<unsigned int> &row_lengths);
+    SparsityPattern (const unsigned int               m,
+		     const std::vector<unsigned int> &row_lengths);
 
 				     /**
 				      * Copy operator. For this the same holds
@@ -290,9 +290,9 @@ class SparsityPattern : public Subscriptor
 				      * to save time and to avoid fragmentation
 				      * of the heap.
 				      */
-    void reinit (const unsigned int          m,
-		 const unsigned int          n,
-		 const vector<unsigned int> &row_lengths);
+    void reinit (const unsigned int               m,
+		 const unsigned int               n,
+		 const std::vector<unsigned int> &row_lengths);
     
 				     /**
 				      * This function compresses the sparsity
@@ -402,7 +402,7 @@ class SparsityPattern : public Subscriptor
 				      * to dots or points and use the
 				      * @p{plot} command.
 				      */
-    void print_gnuplot (ostream &out) const;
+    void print_gnuplot (std::ostream &out) const;
 
 				     /**
 				      * Return number of rows of this
@@ -540,7 +540,7 @@ class SparsityPattern : public Subscriptor
     DeclException2 (ExcNotEnoughSpace,
 		    int, int,
 		    << "Upon entering a new entry to row " << arg1
-		    << ": there was no free entry any more. " << endl
+		    << ": there was no free entry any more. " << std::endl
 		    << "(Maximum number of entries for this row: "
 		    << arg2 << "; maybe the matrix is already compressed?)");
 				     /**

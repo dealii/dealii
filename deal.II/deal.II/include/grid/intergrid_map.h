@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -200,7 +200,7 @@ class InterGridMap
 				      * The actual data. Hold one iterator
 				      * for each cell on each level.
 				      */
-    vector<vector<cell_iterator> > mapping;
+    std::vector<std::vector<cell_iterator> > mapping;
 
 				     /**
 				      * Store a pointer to the source grid.

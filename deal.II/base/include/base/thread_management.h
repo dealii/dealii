@@ -1238,7 +1238,7 @@ namespace Threads
       friend
       typename FunData7<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,void>::ArgCollector
       encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
-						       Arg4_, Arg5_, Arg6_, Arg7_));
+				   Arg4_, Arg5_, Arg6_, Arg7_));
   };
   
   
@@ -1371,8 +1371,8 @@ namespace Threads
       friend
       typename FunData8<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,void>::ArgCollector
       encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
-						       Arg4_, Arg5_, Arg6_,
-						       Arg7_, Arg8_));
+				   Arg4_, Arg5_, Arg6_,
+				   Arg7_, Arg8_));
   };
   
   
@@ -1631,7 +1631,7 @@ namespace Threads
 					*/
       template <class Class_, typename Arg1_>
       friend
-      typename MemFunData1<Class,Arg1_,void>::ArgCollector
+      typename MemFunData1<Class_,Arg1_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_));
   };
 
@@ -1770,7 +1770,7 @@ namespace Threads
 					*/
       template <class Class_, typename Arg1_, typename Arg2_>
       friend
-      typename MemFunData2<Class,Arg1_,Arg2_,void>::ArgCollector
+      typename MemFunData2<Class_,Arg1_,Arg2_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_));
   };
 
@@ -1912,7 +1912,7 @@ namespace Threads
 					*/
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_>
       friend 
-      typename MemFunData3<Class,Arg1_,Arg2_,Arg3_,void>::ArgCollector
+      typename MemFunData3<Class_,Arg1_,Arg2_,Arg3_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_,Arg2_,Arg3_));
   };
 
@@ -2058,7 +2058,7 @@ namespace Threads
 					*/
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_>
       friend
-      typename MemFunData4<Class,Arg1_,Arg2_,Arg3_,Arg4_,void>::ArgCollector
+      typename MemFunData4<Class_,Arg1_,Arg2_,Arg3_,Arg4_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_));
   };
 
@@ -2208,7 +2208,7 @@ namespace Threads
 					*/
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_>
       friend 
-      typename MemFunData5<Class,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,void>::ArgCollector
+      typename MemFunData5<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_));
   };
@@ -2363,7 +2363,7 @@ namespace Threads
 					*/
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_>
       friend 
-      typename MemFunData6<Class,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,void>::ArgCollector
+      typename MemFunData6<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_));
   };
@@ -2673,7 +2673,7 @@ namespace Threads
 				    * @p{[begin[i],end[i])}.
 				    */
   template <typename ForwardIterator>
-  vector<pair<ForwardIterator,ForwardIterator> >
+  std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
 	       const ForwardIterator &end,
 	       const unsigned int n_intervals);
@@ -2687,7 +2687,7 @@ namespace Threads
 				    * iterators, now values are taken
 				    * that define the whole interval.
 				    */
-  vector<pair<unsigned int,unsigned int> >
+  std::vector<std::pair<unsigned int,unsigned int> >
   split_interval (const unsigned int begin,
 		  const unsigned int end,
 		  const unsigned int n_intervals);
@@ -2799,13 +2799,13 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2876,14 +2876,14 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2957,15 +2957,15 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3044,16 +3044,16 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
     Arg3              arg3    = fun_data->arg3;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3136,7 +3136,7 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -3144,9 +3144,9 @@ namespace Threads
     Arg4              arg4    = fun_data->arg4;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3233,7 +3233,7 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -3242,9 +3242,9 @@ namespace Threads
     Arg5              arg5    = fun_data->arg5;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3300,15 +3300,15 @@ namespace Threads
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-    FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunData6 (const FunData6 &fun_data) :
-    FunDataBase (fun_data),
-    fun_ptr (fun_data.fun_ptr),
-    arg1 (fun_data.arg1),
-    arg2 (fun_data.arg2),
-    arg3 (fun_data.arg3),
-    arg4 (fun_data.arg4),
-    arg5 (fun_data.arg5),
-    arg6 (fun_data.arg6)
+  FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunData6 (const FunData6 &fun_data) :
+		  FunDataBase (fun_data),
+		  fun_ptr (fun_data.fun_ptr),
+		  arg1 (fun_data.arg1),
+		  arg2 (fun_data.arg2),
+		  arg3 (fun_data.arg3),
+		  arg4 (fun_data.arg4),
+		  arg5 (fun_data.arg5),
+		  arg6 (fun_data.arg6)
   {};
 
 
@@ -3336,7 +3336,7 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -3346,9 +3346,9 @@ namespace Threads
     Arg6              arg6    = fun_data->arg6;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3408,16 +3408,16 @@ namespace Threads
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-    FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::FunData7 (const FunData7 &fun_data) :
-    FunDataBase (fun_data),
-    fun_ptr (fun_data.fun_ptr),
-    arg1 (fun_data.arg1),
-    arg2 (fun_data.arg2),
-    arg3 (fun_data.arg3),
-    arg4 (fun_data.arg4),
-    arg5 (fun_data.arg5),
-    arg6 (fun_data.arg6),
-    arg7 (fun_data.arg7)
+  FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::FunData7 (const FunData7 &fun_data) :
+		  FunDataBase (fun_data),
+		  fun_ptr (fun_data.fun_ptr),
+		  arg1 (fun_data.arg1),
+		  arg2 (fun_data.arg2),
+		  arg3 (fun_data.arg3),
+		  arg4 (fun_data.arg4),
+		  arg5 (fun_data.arg5),
+		  arg6 (fun_data.arg6),
+		  arg7 (fun_data.arg7)
   {};
 
 
@@ -3445,7 +3445,7 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -3456,9 +3456,9 @@ namespace Threads
     Arg7              arg7    = fun_data->arg7;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3498,14 +3498,14 @@ namespace Threads
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
   FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::FunData8 (FunPtr fun_ptr,
-								  Arg1   arg1,
-								  Arg2   arg2,
-								  Arg3   arg3,
-								  Arg4   arg4,
-								  Arg5   arg5,
-								  Arg6   arg6,
-								  Arg7   arg7,
-								  Arg8   arg8) :
+								       Arg1   arg1,
+								       Arg2   arg2,
+								       Arg3   arg3,
+								       Arg4   arg4,
+								       Arg5   arg5,
+								       Arg6   arg6,
+								       Arg7   arg7,
+								       Arg8   arg8) :
 		  FunDataBase (&FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::thread_entry_point),
 		  fun_ptr (fun_ptr),
 		  arg1 (arg1),
@@ -3521,17 +3521,17 @@ namespace Threads
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-    FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::FunData8 (const FunData8 &fun_data) :
-    FunDataBase (fun_data),
-    fun_ptr (fun_data.fun_ptr),
-    arg1 (fun_data.arg1),
-    arg2 (fun_data.arg2),
-    arg3 (fun_data.arg3),
-    arg4 (fun_data.arg4),
-    arg5 (fun_data.arg5),
-    arg6 (fun_data.arg6),
-    arg7 (fun_data.arg7),
-    arg8 (fun_data.arg8)
+  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::FunData8 (const FunData8 &fun_data) :
+		  FunDataBase (fun_data),
+		  fun_ptr (fun_data.fun_ptr),
+		  arg1 (fun_data.arg1),
+		  arg2 (fun_data.arg2),
+		  arg3 (fun_data.arg3),
+		  arg4 (fun_data.arg4),
+		  arg5 (fun_data.arg5),
+		  arg6 (fun_data.arg6),
+		  arg7 (fun_data.arg7),
+		  arg8 (fun_data.arg8)
   {};
 
 
@@ -3559,7 +3559,7 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
@@ -3571,9 +3571,9 @@ namespace Threads
     Arg8              arg8    = fun_data->arg8;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3655,13 +3655,13 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3745,15 +3745,15 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3840,16 +3840,16 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
     Arg2              arg2    = fun_data->arg2;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3943,7 +3943,7 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
@@ -3951,9 +3951,9 @@ namespace Threads
     Arg3              arg3    = fun_data->arg3;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -4053,7 +4053,7 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
@@ -4062,9 +4062,9 @@ namespace Threads
     Arg4              arg4    = fun_data->arg4;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -4168,7 +4168,7 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
@@ -4178,9 +4178,9 @@ namespace Threads
     Arg5              arg5    = fun_data->arg5;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -4239,15 +4239,15 @@ namespace Threads
 									 Arg4    arg4,
 									 Arg5    arg5,
 									 Arg6    arg6) :
-    FunDataBase (&MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::thread_entry_point),
-    fun_ptr (fun_ptr),
-    object (object),
-    arg1 (arg1),
-    arg2 (arg2),
-    arg3 (arg3),
-    arg4 (arg4),
-    arg5 (arg5),
-    arg6 (arg6)
+		  FunDataBase (&MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::thread_entry_point),
+		  fun_ptr (fun_ptr),
+		  object (object),
+		  arg1 (arg1),
+		  arg2 (arg2),
+		  arg3 (arg3),
+		  arg4 (arg4),
+		  arg5 (arg5),
+		  arg6 (arg6)
   {};
 
 
@@ -4290,7 +4290,7 @@ namespace Threads
     const ThisClass *fun_data
       = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
 
-				   // copy the parameters
+				     // copy the parameters
     ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
     Class            *object  = fun_data->object;
     Arg1              arg1    = fun_data->arg1;
@@ -4301,9 +4301,9 @@ namespace Threads
     Arg6              arg6    = fun_data->arg6;
 
 
-				   // copying of parameters is done,
-				   // now we can release the lock on
-				   // @p{fun_data}
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -4347,9 +4347,9 @@ namespace Threads
 											Arg4   arg4,
 											Arg5   arg5,
 											Arg6   arg6)
-    {
-      return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6);
-    };
+  {
+    return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6);
+  };
   
 
 /* ---------------------------------------------------------------- */
@@ -4499,7 +4499,7 @@ namespace Threads
 
   
   template <typename ForwardIterator>
-  vector<pair<ForwardIterator,ForwardIterator> >
+  std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin, const ForwardIterator &end,
 	       const unsigned int n_intervals)
   {
@@ -4507,7 +4507,7 @@ namespace Threads
     const unsigned int n_elements_per_interval = n_elements / n_intervals;
     const unsigned int residual                = n_elements % n_intervals;
     
-    vector<pair<ForwardIterator,ForwardIterator> >
+    std::vector<std::pair<ForwardIterator,ForwardIterator> >
       return_values (n_intervals);
 
     return_values[0].first = begin;

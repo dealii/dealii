@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -276,9 +276,9 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * accessor is constructed.
 				      */
     TriaObjectAccessor (Triangulation<dim> *parent     = 0,
-		 const int           level      = -1,
-		 const int           index      = -1,
-		 const AccessorData *local_data = 0) :
+			const int           level      = -1,
+			const int           index      = -1,
+			const AccessorData *local_data = 0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -1026,9 +1026,9 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  Constructor.
 				      */
     TriaObjectAccessor (Triangulation<dim> *parent     = 0,
-		  const int           level      = -1,
-		  const int           index      = -1,
-		  const AccessorData *local_data = 0) :
+			const int           level      = -1,
+			const int           index      = -1,
+			const AccessorData *local_data = 0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -1399,9 +1399,9 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  Constructor.
 				      */
     TriaObjectAccessor (Triangulation<dim> *parent     = 0,
-		 const int           level      = -1,
-		 const int           index      = -1,
-		 const AccessorData *local_data = 0) :
+			const int           level      = -1,
+			const int           index      = -1,
+			const AccessorData *local_data = 0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**

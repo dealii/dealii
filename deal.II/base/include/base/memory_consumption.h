@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,7 @@
  * This namespace provides functions helping to determine the amount
  * of memory used by objects. The goal is not necessarily to give the
  * amount of memory used up to the last bit (what is the memory used
- * by an STL @p{map<>} object?), but rather to aid in the search for
+ * by an STL @p{std::map<>} object?), but rather to aid in the search for
  * memory bottlenecks.
  *
  * The functions in this namespace work basically by reducing each
@@ -37,19 +37,19 @@
  * operator to it. If this is not the case, then try to reduce it to
  * more basic types.
  *
- * For example, if it is a C-style array or a standard C++ @p{vector},
+ * For example, if it is a C-style array or a standard C++ @p{std::vector},
  * then sum up the sizes of the array elements by calling
  * @p{memory_consumption} on each of them. This way, we can also
- * reduce objects of type @p{vector<vector<double> >} to its atomic
+ * reduce objects of type @p{std::vector<std::vector<double> >} to its atomic
  * types, and can thus determine the memory used even if the sizes of
  * the elements of the outermost vector differ (e.g. the first
  * sub-vector has 3 and the second sub-vector has 10 elements).
  *
  * There are two exceptions to simply adding up the sizes of the
- * subobjects: for C++ @p{vector} objects, we also have to add the
+ * subobjects: for C++ @p{std::vector} objects, we also have to add the
  * size of the vector object, i.e. @p{sizeof(vector<T>)}, to the sizes
  * of the elements. Secondly, for the most common used vectors, such
- * as @p{vector<double>} and @p{vector<unsigned int>} we determine the
+ * as @p{std::vector<double>} and @p{std::vector<unsigned int>} we determine the
  * size without a loop but rather directly, since we know that the
  * sizes of the elements are constant.
  *
@@ -141,15 +141,15 @@ namespace MemoryConsumption
 				   /**
 				    * Determine an estimate of the
 				    * amount of memory in bytes
-				    * consumed by a @p{string}
+				    * consumed by a @p{std::string}
 				    * variable.
 				    */
-  unsigned int memory_consumption (const string &s);
+  unsigned int memory_consumption (const std::string &s);
 
 				   /**
 				    * Determine an estimate of the
 				    * amount of memory in bytes
-				    * consumed by a @p{vector} of
+				    * consumed by a @p{std::vector} of
 				    * certain elements. It does so by
 				    * looping over all elements of the
 				    * vector and determining their
@@ -194,7 +194,7 @@ namespace MemoryConsumption
 				    * vectors of bools.
 				    */
   template <typename T>
-  unsigned int memory_consumption (const vector<T> &v);
+  unsigned int memory_consumption (const std::vector<T> &v);
 
 				   /**
 				    * Estimate the amount of memory
@@ -204,10 +204,10 @@ namespace MemoryConsumption
 				    * store simple data elements
 				    * like @p{double}s in such
 				    * arrays (but rather use STL
-				    * @p{vector}s or deal.II
+				    * @p{std::vector}s or deal.II
 				    * @p{Vector} objects), we do not
 				    * provide specializations like
-				    * for the @p{vector} arrays, but
+				    * for the @p{std::vector} arrays, but
 				    * always use the loop over all
 				    * elements.
 				    */
@@ -225,7 +225,7 @@ namespace MemoryConsumption
 				    * one-by-one, but as a bit
 				    * field.
 				    */
-  unsigned int memory_consumption (const vector<bool> &v);
+  unsigned int memory_consumption (const std::vector<bool> &v);
     
 				   /**
 				    * Specialization of the
@@ -233,7 +233,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{int}s.
 				    */
-  unsigned int memory_consumption (const vector<int> &v);
+  unsigned int memory_consumption (const std::vector<int> &v);
     
 				   /**
 				    * Specialization of the
@@ -241,7 +241,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{double}s.
 				    */
-  unsigned int memory_consumption (const vector<double> &v);
+  unsigned int memory_consumption (const std::vector<double> &v);
     
 				   /**
 				    * Specialization of the
@@ -249,7 +249,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{float}s.
 				    */
-  unsigned int memory_consumption (const vector<float> &v);
+  unsigned int memory_consumption (const std::vector<float> &v);
     
 				   /**
 				    * Specialization of the
@@ -257,7 +257,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{char}s.
 				    */
-  unsigned int memory_consumption (const vector<char> &v);
+  unsigned int memory_consumption (const std::vector<char> &v);
     
 				   /**
 				    * Specialization of the
@@ -265,7 +265,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{unsigned char}s.
 				    */
-  unsigned int memory_consumption (const vector<unsigned char> &v);
+  unsigned int memory_consumption (const std::vector<unsigned char> &v);
     
 				   /**
 				    * Specialization of the
@@ -274,7 +274,7 @@ namespace MemoryConsumption
 				    * for a vector of pointers.
 				    */
   template <typename T>
-  unsigned int memory_consumption (const vector<T *> &v);
+  unsigned int memory_consumption (const std::vector<T *> &v);
 
 				   /**
 				    * Determine an estimate of the
@@ -282,7 +282,7 @@ namespace MemoryConsumption
 				    * consumed by a pair of values.
 				    */
   template <typename A, typename B>
-  unsigned int memory_consumption (const pair<A,B> &p);
+  unsigned int memory_consumption (const std::pair<A,B> &p);
     
 				   /**
 				    * Return the amount of memory
@@ -414,9 +414,9 @@ namespace MemoryConsumption
 
 
   template <typename T>
-  unsigned int memory_consumption (const vector<T> &v)
+  unsigned int memory_consumption (const std::vector<T> &v)
   {
-    unsigned int mem = sizeof(vector<T>);
+    unsigned int mem = sizeof(std::vector<T>);
     const unsigned int n = v.size();
     for (unsigned int i=0; i<n; ++i)
       mem += memory_consumption(v[i]);
@@ -438,7 +438,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const vector<bool> &v)
+  unsigned int memory_consumption (const std::vector<bool> &v)
   {
     return v.capacity() / 8 + sizeof(v);
   };
@@ -446,7 +446,7 @@ namespace MemoryConsumption
 
   
   inline
-  unsigned int memory_consumption (const vector<int> &v)
+  unsigned int memory_consumption (const std::vector<int> &v)
   {
     return (v.capacity() * sizeof(int) +
 	    sizeof(v));
@@ -455,7 +455,7 @@ namespace MemoryConsumption
     
 
   inline
-  unsigned int memory_consumption (const vector<double> &v)
+  unsigned int memory_consumption (const std::vector<double> &v)
   {
     return (v.capacity() * sizeof(double) +
 	    sizeof(v));
@@ -464,7 +464,7 @@ namespace MemoryConsumption
     
 
   inline
-  unsigned int memory_consumption (const vector<float> &v)
+  unsigned int memory_consumption (const std::vector<float> &v)
   {
     return (v.capacity() * sizeof(float) +
 	    sizeof(v));
@@ -473,7 +473,7 @@ namespace MemoryConsumption
     
 	
   inline
-  unsigned int memory_consumption (const vector<char> &v)
+  unsigned int memory_consumption (const std::vector<char> &v)
   {
     return (v.capacity() * sizeof(char) +
 	    sizeof(v));
@@ -482,7 +482,7 @@ namespace MemoryConsumption
 
     
   inline
-  unsigned int memory_consumption (const vector<unsigned char> &v)
+  unsigned int memory_consumption (const std::vector<unsigned char> &v)
   {
     return (v.capacity() * sizeof(unsigned char) +
 	    sizeof(v));
@@ -492,7 +492,7 @@ namespace MemoryConsumption
     
   template <typename T>
   inline
-  unsigned int memory_consumption (const vector<T *> &v)
+  unsigned int memory_consumption (const std::vector<T *> &v)
   {
     return (v.capacity() * sizeof(T *) +
 	    sizeof(v));
@@ -502,7 +502,7 @@ namespace MemoryConsumption
 				    
   template <typename A, typename B>
   inline
-  unsigned int memory_consumption (const pair<A,B> &p)
+  unsigned int memory_consumption (const std::pair<A,B> &p)
   {
     return (memory_consumption(p.first) +
 	    memory_consumption(p.second));

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -140,9 +140,9 @@ class Tensor
 				      */
     Tensor<rank_,dim>   operator - (const Tensor<rank_,dim> &) const;
 
-				       /**
-					* Invert all entries of a tensor.
-					*/
+				     /**
+				      * Invert all entries of a tensor.
+				      */
     Tensor<rank_,dim>   operator - () const;
     
 				     /**
@@ -674,7 +674,7 @@ void outer_product (Tensor<3,dim>       &dst,
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-      dst[i][j][k] = src1[i] * src2[j][k];
+	dst[i][j][k] = src1[i] * src2[j][k];
 };
 
 
@@ -693,7 +693,7 @@ void outer_product (Tensor<3,dim>       &dst,
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-      dst[i][j][k] = src1[i][j] * src2[k];
+	dst[i][j][k] = src1[i][j] * src2[k];
 };
 
 
@@ -878,7 +878,7 @@ invert (const Tensor<2,dim> &t)
        
       default:
 	    AssertThrow (false, ExcNotImplemented());
-   };    
+    };    
   return return_tensor;
 };
 

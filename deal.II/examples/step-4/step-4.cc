@@ -250,18 +250,18 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (4);
   
-  cout << "   Number of active cells: "
-       << triangulation.n_active_cells()
-       << endl
-       << "   Total number of cells: "
-       << triangulation.n_cells()
-       << endl;
+  std::cout << "   Number of active cells: "
+	    << triangulation.n_active_cells()
+	    << std::endl
+	    << "   Total number of cells: "
+	    << triangulation.n_cells()
+	    << std::endl;
 
   dof_handler.distribute_dofs (fe);
 
-  cout << "   Number of degrees of freedom: "
-       << dof_handler.n_dofs()
-       << endl;
+  std::cout << "   Number of degrees of freedom: "
+	    << dof_handler.n_dofs()
+	    << std::endl;
 
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
@@ -358,7 +358,7 @@ void LaplaceProblem<dim>::assemble_system ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // Note here, that a cell is a
 				   // quadrilateral in two space
@@ -446,7 +446,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // would like to use (i.e. the
 				   // BoundaryValues class declared
 				   // above):
-  map<unsigned int,double> boundary_values;
+  std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    BoundaryValues<dim>(),
@@ -479,9 +479,9 @@ void LaplaceProblem<dim>::solve ()
 				   // from the linear solvers, we have
 				   // to print the number of
 				   // iterations by hand.
-  cout << "   " << solver_control.last_step()
-       << " CG iterations needed to obtain convergence."
-       << endl;
+  std::cout << "   " << solver_control.last_step()
+	    << " CG iterations needed to obtain convergence."
+	    << std::endl;
 };
 
 
@@ -511,9 +511,9 @@ void LaplaceProblem<dim>::output_results () const
 				   // other values than 2 or 3, but we
 				   // neglect this here for the sake
 				   // of brevity).
-  ofstream output (dim == 2 ?
-		   "solution-2d.gmv" :
-		   "solution-3d.gmv");
+  std::ofstream output (dim == 2 ?
+			"solution-2d.gmv" :
+			"solution-3d.gmv");
   data_out.write_gmv (output);
 };
 
@@ -527,7 +527,7 @@ void LaplaceProblem<dim>::output_results () const
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  cout << "Solving problem in " << dim << " space dimensions." << endl;
+  std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
   
   make_grid_and_dofs();
   assemble_system ();

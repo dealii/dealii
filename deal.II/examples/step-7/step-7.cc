@@ -792,12 +792,12 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // of the degrees of freedom on a
 				   // cell.
   RightHandSide<dim>   right_hand_side;
-  vector<double>       rhs_values (n_q_points);
+  std::vector<double>       rhs_values (n_q_points);
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // Then we define an object
 				   // denoting the exact solution
@@ -831,11 +831,11 @@ void LaplaceProblem<dim>::assemble_system ()
       fe_values.reinit (cell);
       const FullMatrix<double> 
 	& shape_values = fe_values.get_shape_values();
-      const vector<vector<Tensor<1,dim> > >
+      const std::vector<std::vector<Tensor<1,dim> > >
 	& shape_grads  = fe_values.get_shape_grads();
-      const vector<double>
+      const std::vector<double>
 	& JxW_values   = fe_values.get_JxW_values();
-      const vector<Point<dim> >
+      const std::vector<Point<dim> >
 	& q_points     = fe_values.get_quadrature_points();
 
       right_hand_side.value_list (q_points, rhs_values);
@@ -924,11 +924,11 @@ void LaplaceProblem<dim>::assemble_system ()
 					     // local variables:
 	    const FullMatrix<double> 
 	      & face_shape_values   = fe_face_values.get_shape_values();
-	    const vector<double>
+	    const std::vector<double>
 	      & face_JxW_values     = fe_face_values.get_JxW_values();
-	    const vector<Point<dim> >
+	    const std::vector<Point<dim> >
 	      & face_q_points       = fe_face_values.get_quadrature_points();
-	    const vector<Point<dim> >
+	    const std::vector<Point<dim> >
 	      & face_normal_vectors = fe_face_values.get_normal_vectors ();
 
 					     // And we can then
@@ -1007,7 +1007,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // belong to Gamma1 are therefore
 				   // excluded from the interpolation
 				   // of boundary values.
-  map<unsigned int,double> boundary_values;
+  std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    Solution<dim>(),
@@ -1215,14 +1215,14 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
   const unsigned int n_active_cells=triangulation.n_active_cells();
   const unsigned int n_dofs=dof_handler.n_dofs();
   
-  cout << "Cycle " << cycle << ':' 
-       << endl
-       << "   Number of active cells:       "
-       << n_active_cells
-       << endl
-       << "   Number of degrees of freedom: "
-       << n_dofs
-       << endl;
+  std::cout << "Cycle " << cycle << ':' 
+	    << std::endl
+	    << "   Number of active cells:       "
+	    << n_active_cells
+	    << std::endl
+	    << "   Number of degrees of freedom: "
+	    << n_dofs
+	    << std::endl;
 
 				   // Add the important data to the
 				   // ``TableHandler'' by giving the key
@@ -1427,7 +1427,7 @@ void LaplaceProblem<dim>::run ()
 				   // statements which you have
 				   // already seen in previous
 				   // examples:
-  string filename;
+  std::string filename;
   switch (refinement_mode)
     {
       case global_refinement:
@@ -1475,7 +1475,7 @@ void LaplaceProblem<dim>::run ()
     
   filename += ".gmv";
 	    
-  ofstream output (filename.c_str());
+  std::ofstream output (filename.c_str());
 
 
   DataOut<dim> data_out;
@@ -1560,12 +1560,12 @@ void LaplaceProblem<dim>::run ()
 				   // In each cycle values were added
 				   // to the TableHandler. Now write
 				   // the table to the standard output
-				   // stream cout. Note, that the
+				   // stream `std::cout'. Note, that the
 				   // output in text format is a quite
 				   // simple one and the captions may
 				   // not be printed directly above
 				   // the specific columns.
-  convergence_table.write_text(cout);
+  convergence_table.write_text(std::cout);
 				   // The table can also be written
 				   // into a Tex file.  The (nicely)
 				   // formatted table can be viewed at
@@ -1577,7 +1577,7 @@ void LaplaceProblem<dim>::run ()
 				   // refinement mode, as above
   if (true)
     {
-      string filename = "error";
+      std::string filename = "error";
       switch (refinement_mode)
 	{
 	  case global_refinement:
@@ -1598,7 +1598,7 @@ void LaplaceProblem<dim>::run ()
 	  Assert (false, ExcInternalError());
       filename += ".tex";
       
-      ofstream table_file(filename.c_str());
+      std::ofstream table_file(filename.c_str());
       convergence_table.write_tex(table_file);
       table_file.close();
     }
@@ -1618,7 +1618,7 @@ void LaplaceProblem<dim>::run ()
 				   // by adding the columns or the
 				   // supercolumns to a new string
 				   // vector.
-  vector<string> new_order;
+  std::vector<std::string> new_order;
   new_order.push_back("n cells");
   new_order.push_back("H1");
   new_order.push_back("L2");
@@ -1669,11 +1669,11 @@ void LaplaceProblem<dim>::run ()
 				   // Finally, the convergence chart
 				   // is written. The filename is
 				   // again constructed as above.
-  convergence_table.write_text(cout);
+  convergence_table.write_text(std::cout);
 
   if (true)
     {
-      string filename = "convergence";
+      std::string filename = "convergence";
       switch (refinement_mode)
 	{
 	  case global_refinement:
@@ -1694,7 +1694,7 @@ void LaplaceProblem<dim>::run ()
 	  Assert (false, ExcInternalError());
       filename += ".tex";
 
-      ofstream table_file(filename.c_str());
+      std::ofstream table_file(filename.c_str());
       convergence_table.write_tex(table_file);
       table_file.close();
     }
@@ -1725,63 +1725,63 @@ int main ()
 				       // before we go to the next
 				       // run.
       {
-	cout << "Solving with Q1 elements, adaptive refinement" << endl
-	     << "=============================================" << endl
-	     << endl;
+	std::cout << "Solving with Q1 elements, adaptive refinement" << std::endl
+		  << "=============================================" << std::endl
+		  << std::endl;
 	
 	FEQ1<2> fe;
 	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::adaptive_refinement);
 	laplace_problem_2d.run ();
 
-	cout << endl;
+	std::cout << std::endl;
       };
 	
       {
-	cout << "Solving with Q1 elements, global refinement" << endl
-	     << "===========================================" << endl
-	     << endl;
+	std::cout << "Solving with Q1 elements, global refinement" << std::endl
+		  << "===========================================" << std::endl
+		  << std::endl;
 	
 	FEQ1<2> fe;
 	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
 	laplace_problem_2d.run ();
 
-	cout << endl;
+	std::cout << std::endl;
       };
        
       {
-	cout << "Solving with Q2 elements, global refinement" << endl
-	     << "===========================================" << endl
-	     << endl;
+	std::cout << "Solving with Q2 elements, global refinement" << std::endl
+		  << "===========================================" << std::endl
+		  << std::endl;
 	
 	FEQ2<2> fe;
 	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
 	laplace_problem_2d.run ();
 
-	cout << endl;
+	std::cout << std::endl;
       };
        
     }
-  catch (exception &exc)
+  catch (std::exception &exc)
     {
-      cerr << endl << endl
-	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Exception on processing: " << endl
-	   << exc.what() << endl
-	   << "Aborting!" << endl
-	   << "----------------------------------------------------"
-	   << endl;
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
       return 1;
     }
   catch (...) 
     {
-      cerr << endl << endl
-	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Unknown exception!" << endl
-	   << "Aborting!" << endl
-	   << "----------------------------------------------------"
-	   << endl;
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
       return 1;
     };
 

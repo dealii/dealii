@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -117,7 +117,7 @@ class SwappableVector : public Vector<number>
 				      * has previously been called,
 				      * then that is deleted first.
 				      */
-    void swap_out (const string &filename);
+    void swap_out (const std::string &filename);
 
 				     /**
 				      * Reload the data of this vector
@@ -219,7 +219,7 @@ class SwappableVector : public Vector<number>
 				      * the filename is an empty
 				      * string.
 				      */
-    const string & get_filename () const;
+    const std::string & get_filename () const;
    
 				     /**
 				      * Determine an estimate for the
@@ -240,7 +240,7 @@ class SwappableVector : public Vector<number>
 				      * Exception.
 				      */ 
     DeclException1 (ExcInvalidFilename,
-		    string,
+		    std::string,
 		    << "The filename <" << arg1
 		    << "> is not a valid one here.");
 				     /**
@@ -259,7 +259,7 @@ class SwappableVector : public Vector<number>
 				      * empty, indicating no ownership
 				      * of files.
 				      */
-    string filename;
+    std::string filename;
 
 				     /**
 				      * If in multithread mode, then

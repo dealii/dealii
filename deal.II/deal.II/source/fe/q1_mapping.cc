@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,7 +33,7 @@ FEQ1Mapping<1>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 			     const unsigned int dofs_per_quad,
 			     const unsigned int dofs_per_hex,
 			     const unsigned int n_components,
-			     const vector<bool> &restriction_is_additive_flags) :
+			     const std::vector<bool> &restriction_is_additive_flags) :
 		FiniteElement<1> (FiniteElementData<1> (dofs_per_vertex,
 							dofs_per_line,
 							GeometryInfo<1>::vertices_per_cell,
@@ -78,8 +78,8 @@ FEQ1Mapping<1>::shape_grad_transform(const unsigned int i,
 
 template <>
 void FEQ1Mapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
-					 const vector<Point<0> > &,
-					 vector<double>      &) const {
+					 const std::vector<Point<0> > &,
+					 std::vector<double>      &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -87,8 +87,8 @@ void FEQ1Mapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 template <>
 void FEQ1Mapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
 					    const unsigned int           ,
-					    const vector<Point<0> > &,
-					    vector<double>      &) const {
+					    const std::vector<Point<0> > &,
+					    std::vector<double>      &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -96,8 +96,8 @@ void FEQ1Mapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &
 template <>
 void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					 const unsigned int,
-					 const vector<Point<0> > &,
-					 vector<Point<1> > &) const {
+					 const std::vector<Point<0> > &,
+					 std::vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -106,25 +106,25 @@ template <>
 void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					 const unsigned int,
 					 const unsigned int,
-					 const vector<Point<0> > &,
-					 vector<Point<1> > &) const {
+					 const std::vector<Point<0> > &,
+					 std::vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
 
 
 template <>
 void FEQ1Mapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
-				     const vector<Point<1> > &unit_points,
-				     vector<Tensor<2,1> >    &jacobians,
+				     const std::vector<Point<1> > &unit_points,
+				     std::vector<Tensor<2,1> >    &jacobians,
 				     const bool            compute_jacobians,
-				     vector<Tensor<3,1> > &jacobians_grad,
+				     std::vector<Tensor<3,1> > &jacobians_grad,
 				     const bool            compute_jacobians_grad,
-				     vector<Point<1> >    &support_points,
+				     std::vector<Point<1> >    &support_points,
 				     const bool            compute_support_points,
-				     vector<Point<1> >    &q_points,
+				     std::vector<Point<1> >    &q_points,
 				     const bool            compute_q_points,
 				     const FullMatrix<double>       &shape_values_transform,
-				     const vector<vector<Tensor<1,1> > > &shape_gradients_transform) const {
+				     const std::vector<std::vector<Tensor<1,1> > > &shape_gradients_transform) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
@@ -146,7 +146,7 @@ FEQ1Mapping<2>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 			     const unsigned int dofs_per_quad,
 			     const unsigned int dofs_per_hex,
 			     const unsigned int n_components,
-			     const vector<bool> &restriction_is_additive_flags) :
+			     const std::vector<bool> &restriction_is_additive_flags) :
 		FiniteElement<2> (FiniteElementData<2> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,
@@ -194,8 +194,8 @@ FEQ1Mapping<2>::shape_grad_transform (const unsigned int i,
 
 template <>
 void FEQ1Mapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
-					 const vector<Point<1> > &unit_points,
-					 vector<double> &face_jacobians) const {
+					 const std::vector<Point<1> > &unit_points,
+					 std::vector<double> &face_jacobians) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == face_jacobians.size(),
@@ -215,8 +215,8 @@ void FEQ1Mapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &fac
 template <>
 void FEQ1Mapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &face,
 					    const unsigned int           ,
-					    const vector<Point<1> > &unit_points,
-					    vector<double> &face_jacobians) const {
+					    const std::vector<Point<1> > &unit_points,
+					    std::vector<double> &face_jacobians) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == face_jacobians.size(),
@@ -238,8 +238,8 @@ void FEQ1Mapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &
 template <>
 void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 					 const unsigned int       face_no,
-					 const vector<Point<1> > &unit_points,
-					 vector<Point<2> > &normal_vectors) const {
+					 const std::vector<Point<1> > &unit_points,
+					 std::vector<Point<2> > &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == normal_vectors.size(),
@@ -269,8 +269,8 @@ template <>
 void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 					 const unsigned int       face_no,
 					 const unsigned int,
-					 const vector<Point<1> > &unit_points,
-					 vector<Point<2> > &normal_vectors) const {
+					 const std::vector<Point<1> > &unit_points,
+					 std::vector<Point<2> > &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
 				   // note, that in 2D the normal vectors to the
@@ -311,7 +311,7 @@ FEQ1Mapping<3>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 			     const unsigned int dofs_per_quad,
 			     const unsigned int dofs_per_hex,
 			     const unsigned int n_components,
-			     const vector<bool> &restriction_is_additive_flags) :
+			     const std::vector<bool> &restriction_is_additive_flags) :
 		FiniteElement<3> (FiniteElementData<3> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,
@@ -382,8 +382,8 @@ FEQ1Mapping<3>::shape_grad_transform (const unsigned int i,
 
 template <>
 void FEQ1Mapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &face,
-					 const vector<Point<2> > &unit_points,
-					 vector<double> &face_jacobians) const {
+					 const std::vector<Point<2> > &unit_points,
+					 std::vector<double> &face_jacobians) const {
   Assert (unit_points.size() == face_jacobians.size(),
 	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
 
@@ -454,8 +454,8 @@ void FEQ1Mapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &fac
 template <>
 void FEQ1Mapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &/*face*/,
 					    const unsigned int           ,
-					    const vector<Point<2> > &unit_points,
-					    vector<double> &face_jacobians) const {
+					    const std::vector<Point<2> > &unit_points,
+					    std::vector<double> &face_jacobians) const {
   Assert (false,
 	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
 };
@@ -464,8 +464,8 @@ void FEQ1Mapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &
 template <>
 void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cell,
 					 const unsigned int       face_no,
-					 const vector<Point<2> > &unit_points,
-					 vector<Point<3> > &normal_vectors) const {
+					 const std::vector<Point<2> > &unit_points,
+					 std::vector<Point<3> > &normal_vectors) const {
   Assert (unit_points.size() == normal_vectors.size(),
 	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
   
@@ -519,8 +519,8 @@ template <>
 void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*cell*/,
 					 const unsigned int       /*face_no*/,
 					 const unsigned int,
-					 const vector<Point<2> > &unit_points,
-					 vector<Point<3> > &normal_vectors) const {
+					 const std::vector<Point<2> > &unit_points,
+					 std::vector<Point<3> > &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
 				   // note, that in 2D the normal vectors to the
@@ -589,7 +589,7 @@ Point<dim> FEQ1Mapping<dim>::transform_real_to_unit_cell (
       contract (d, df_1, f);
       
       p_unit -= d;
-				   // f(x)
+				       // f(x)
       p_real=transform_unit_to_real_cell(cell, p_unit);
       f = p_real-p;
     }
@@ -600,17 +600,17 @@ Point<dim> FEQ1Mapping<dim>::transform_real_to_unit_cell (
   
 template <int dim>
 void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				       const vector<Point<dim> >            &unit_points,
-				       vector<Tensor<2,dim> >               &jacobians,
+				       const std::vector<Point<dim> >            &unit_points,
+				       std::vector<Tensor<2,dim> >               &jacobians,
 				       const bool              compute_jacobians,
-				       vector<Tensor<3,dim> > &jacobians_grad,
+				       std::vector<Tensor<3,dim> > &jacobians_grad,
 				       const bool              compute_jacobians_grad,
-				       vector<Point<dim> > &support_points,
+				       std::vector<Point<dim> > &support_points,
 				       const bool           compute_support_points,
-				       vector<Point<dim> > &q_points,
+				       std::vector<Point<dim> > &q_points,
 				       const bool           compute_q_points,
 				       const FullMatrix<double>      &shape_values_transform,
-				       const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const
+				       const std::vector<std::vector<Tensor<1,dim> > > &shape_grad_transform) const
 {
   Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
 	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
@@ -659,85 +659,85 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
 
 /* jacobi matrices: compute d(x)/d(xi) and invert this
    Let M(l) be the inverse of J at the quadrature point l, then
-     M_{ij}(l) = sum_s p_i(s) d(N_s(l))/d(xi_j)
-   where p_i(s) is the i-th coordinate of the s-th vertex vector,
+   M_{ij}(l) = sum_s p_i(s) d(N_s(l))/d(xi_j)
+   where p_i(s) is the i-th coordinate of the s-th vertex std::vector,
    N_s(l) is the value of the s-th vertex shape function at the
    quadrature point l.
 
    We could therefore write:
    l=0..n_points-1
-     i=0..dim-1
-       j=0..dim-1
-         M_{ij}(l) = 0
-	 s=0..n_vertices
-	   M_{ij}(l) += p_i(s) d(N_s(l))/d(xi_j)
+   i=0..dim-1
+   j=0..dim-1
+   M_{ij}(l) = 0
+   s=0..n_vertices
+   M_{ij}(l) += p_i(s) d(N_s(l))/d(xi_j)
 
-  However, we rewrite the loops to only compute the gradient once for
-  each integration point and basis function.
+   However, we rewrite the loops to only compute the gradient once for
+   each integration point and basis function.
 
-  One last note regarding whether we have to invert M or M transposed: it is
-  easy to try out, by computing the gradients of a function on a distorted
-  cell (just move one vertex) where the nodal values for linear elements
-  are one for the moved vertex and zero otherwise. Please also note that
-  when computing the gradients on the real cell, the jacobian matrix
-  is multiplied to the unit cell gradient *from the right*! be very careful
-  with these things.
+   One last note regarding whether we have to invert M or M transposed: it is
+   easy to try out, by computing the gradients of a function on a distorted
+   cell (just move one vertex) where the nodal values for linear elements
+   are one for the moved vertex and zero otherwise. Please also note that
+   when computing the gradients on the real cell, the jacobian matrix
+   is multiplied to the unit cell gradient *from the right*! be very careful
+   with these things.
 
-  The following little program tests the correct behaviour. The program can
-  also be found in the <tests> directory.
+   The following little program tests the correct behaviour. The program can
+   also be found in the <tests> directory.
 
-  -------------------------------------------
-  #include <grid/tria.h>
-  #include <grid/tria_boundary.h>
-  #include <dofs/dof_handler.h>
-  #include <fe/fe_values.h>
-  #include <fe/fe_lib.lagrange.h>
-  #include <base/quadrature_lib.h>
-  #include <grid/tria_iterator.h>
-  #include <dofs/dof_accessor.h>
-  #include <lac/vector.h>
+   -------------------------------------------
+   #include <grid/tria.h>
+   #include <grid/tria_boundary.h>
+   #include <dofs/dof_handler.h>
+   #include <fe/fe_values.h>
+   #include <fe/fe_lib.lagrange.h>
+   #include <base/quadrature_lib.h>
+   #include <grid/tria_iterator.h>
+   #include <dofs/dof_accessor.h>
+   #include <lac/vector.h>
 
-  int main () {
-    Triangulation<2> tria;
-    tria.create_hypercube (0,1);
-    tria.begin_active()->vertex(2)(0) = 2;
+   int main () {
+   Triangulation<2> tria;
+   tria.create_hypercube (0,1);
+   tria.begin_active()->vertex(2)(0) = 2;
 
-    DoFHandler<2> dof(&tria);
-    FELinear<2> fe;
-    dof.distribute_dofs(fe);
+   DoFHandler<2> dof(&tria);
+   FELinear<2> fe;
+   dof.distribute_dofs(fe);
 
-    StraightBoundary<2> b;
-    QTrapez<2> q;
-    FEValues<2> fevalues(fe,q,update_gradients);
-    fevalues.reinit (dof.begin_active(),b);
+   StraightBoundary<2> b;
+   QTrapez<2> q;
+   FEValues<2> fevalues(fe,q,update_gradients);
+   fevalues.reinit (dof.begin_active(),b);
 
 
-    Vector<double> val(4);
-    val(2) = 1;
+   Vector<double> val(4);
+   val(2) = 1;
 
-    vector<Point<2> > grads(4);
-    fevalues.get_function_grads (val, grads);
+   std::vector<Point<2> > grads(4);
+   fevalues.get_function_grads (val, grads);
 
-    for (unsigned int i=0; i<4; ++i)
-      cout << "Vertex " << i
-	   << "   grad=" << grads[i] << endl;
-  };
-  ---------------------------------------------
+   for (unsigned int i=0; i<4; ++i)
+   std::cout << "Vertex " << i
+   << "   grad=" << grads[i] << std::endl;
+   };
+   ---------------------------------------------
   
-  The correct output should be
-  --------------------------------
-  Vertex 0   grad=0 0
-  Vertex 1   grad=0.5 0
-  Vertex 2   grad=0 1
-  Vertex 3   grad=0.5 0.5
-  --------------------------------
-  and the wrong would be
-  --------------------------------
-  Vertex 0   grad=0 0
-  Vertex 1   grad=0.5 0
-  Vertex 2   grad=-1 1
-  Vertex 3   grad=0 1
-  --------------------------------  
+   The correct output should be
+   --------------------------------
+   Vertex 0   grad=0 0
+   Vertex 1   grad=0.5 0
+   Vertex 2   grad=0 1
+   Vertex 3   grad=0.5 0.5
+   --------------------------------
+   and the wrong would be
+   --------------------------------
+   Vertex 0   grad=0 0
+   Vertex 1   grad=0.5 0
+   Vertex 2   grad=-1 1
+   Vertex 3   grad=0 1
+   --------------------------------  
 */
 
   if (compute_jacobians)

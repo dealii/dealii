@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -257,7 +257,7 @@ class DoFHandler  :  public Subscriptor,
 				      *	for each boundary indicator, which is
 				      *	guaranteed by the @p{map} data type.
 				      */
-    typedef map<unsigned char,const Function<dim>*> FunctionMap;
+    typedef std::map<unsigned char,const Function<dim>*> FunctionMap;
 
 				     /**
 				      * When the arrays holding the
@@ -354,7 +354,7 @@ class DoFHandler  :  public Subscriptor,
 				      * wants to implement an ordering scheme
 				      * herself, for example downwind numbering.
 				      */
-    void renumber_dofs (const vector<unsigned int> &new_numbers);
+    void renumber_dofs (const std::vector<unsigned int> &new_numbers);
 
 				     /**
 				      * Return the maximum number of
@@ -984,7 +984,7 @@ class DoFHandler  :  public Subscriptor,
 				      * consideration.
 				      */
     unsigned int
-    n_boundary_dofs (const set<unsigned char> &boundary_indicators) const;
+    n_boundary_dofs (const std::set<unsigned char> &boundary_indicators) const;
 
 				     /**
 				      * Return a constant reference to the
@@ -1137,7 +1137,7 @@ class DoFHandler  :  public Subscriptor,
 				      * @p{levels[]} tree of the @ref{Triangulation}
 				      * objects.
 				      */
-    vector<DoFLevel<dim>*>    levels;
+    std::vector<DoFLevel<dim>*>    levels;
 
 				     /**
 				      * Store the number of dofs created last
@@ -1149,7 +1149,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Array to store the indices for degrees
 				      * of freedom located at vertices.
 				      */
-    vector<unsigned int>      vertex_dofs;
+    std::vector<unsigned int>      vertex_dofs;
 
 
 #if (__GNUC__==2) && (__GNUC_MINOR__ < 95)

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,7 @@ class BlockIndices
 				      * number of blocks will be the
 				      * size of the vector
 				      */
-    BlockIndices (const vector<unsigned int> &n);
+    BlockIndices (const std::vector<unsigned int> &n);
 
 				     /**
 				      * Reinitialize the number of
@@ -65,7 +65,7 @@ class BlockIndices
 				      * of block @p{i} is set to
 				      * @p{n[i]}.
 				      */
-    void reinit (const vector<unsigned int> &n);
+    void reinit (const std::vector<unsigned int> &n);
     
 				     /**
 				      * Return the block and the
@@ -75,7 +75,7 @@ class BlockIndices
 				      * the block, the second the
 				      * index within it.
 				      */
-    pair<unsigned int,unsigned int>
+    std::pair<unsigned int,unsigned int>
     global_to_local (const unsigned int i) const;
 
 				     /**
@@ -139,7 +139,7 @@ class BlockIndices
 				      * value is the total number of
 				      * entries.
 				      */
-    vector<unsigned int> start_indices;
+    std::vector<unsigned int> start_indices;
 };
 
 
@@ -158,7 +158,7 @@ BlockIndices::BlockIndices (unsigned int n_blocks)
 
 
 inline
-BlockIndices::BlockIndices (const vector<unsigned int> &n)
+BlockIndices::BlockIndices (const std::vector<unsigned int> &n)
   : n_blocks(n.size()),
     start_indices(n.size()+1)
 {
@@ -172,7 +172,7 @@ void
 BlockIndices::reinit (const unsigned int n_blocks,
 		      const unsigned int n_elements_per_block)
 {
-  const vector<unsigned int> v(n_blocks, n_elements_per_block);
+  const std::vector<unsigned int> v(n_blocks, n_elements_per_block);
   reinit (v);
 };
 
@@ -180,7 +180,7 @@ BlockIndices::reinit (const unsigned int n_blocks,
 
 inline
 void
-BlockIndices::reinit (const vector<unsigned int> &n)
+BlockIndices::reinit (const std::vector<unsigned int> &n)
 {
   if (start_indices.size() != n.size()+1)
     {
@@ -195,7 +195,7 @@ BlockIndices::reinit (const vector<unsigned int> &n)
 
 
 inline
-pair<unsigned int,unsigned int>
+std::pair<unsigned int,unsigned int>
 BlockIndices::global_to_local (const unsigned int i) const
 {
   Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
@@ -204,7 +204,7 @@ BlockIndices::global_to_local (const unsigned int i) const
   while (i < start_indices[block])
     --block;
 
-  return make_pair<unsigned int>(block, i-start_indices[block]);
+  return std::make_pair<unsigned int>(block, i-start_indices[block]);
 };
 
 

@@ -235,7 +235,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
   sparsity_pattern.compress ();
 
 				   // Now write the results to a file
-  ofstream out ("sparsity_pattern.1");
+  std::ofstream out ("sparsity_pattern.1");
   sparsity_pattern.print_gnuplot (out);
 				   // The result is in GNUPLOT format,
 				   // where in each line of the output
@@ -315,7 +315,7 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress ();
 				   // ...and output the result:
-  ofstream out ("sparsity_pattern.2");
+  std::ofstream out ("sparsity_pattern.2");
   sparsity_pattern.print_gnuplot (out);
 				   // Again, the output is shown
 				   // below. Note that the nonzero

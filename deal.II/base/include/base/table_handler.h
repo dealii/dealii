@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,12 +45,12 @@ class TableEntryBase
 				     /**
 				      * Write the table entry as text.
 				      */
-    virtual void write_text (ostream &) const =0;
+    virtual void write_text (std::ostream &) const =0;
 
 				     /**
 				      * Write the table entry in tex format.
 				      */
-    virtual void write_tex (ostream &) const =0;
+    virtual void write_tex (std::ostream &) const =0;
 };
 
 
@@ -88,12 +88,12 @@ class TableEntry : public TableEntryBase
 				     /**
 				      * Write the table entry as text.
 				      */
-    virtual void write_text (ostream &out) const;
+    virtual void write_text (std::ostream &out) const;
 
 				     /**
 				      * Write the table entry in tex format.
 				      */
-    virtual void write_tex (ostream &out) const;
+    virtual void write_tex (std::ostream &out) const;
 
   private:
 				     /**
@@ -111,12 +111,12 @@ class TableEntry : public TableEntryBase
  * @sect3{Usage}
  *
  * The most important function is the templatized function 
- * @p{add_value(const string &key, const value_type value)}, that adds a column
+ * @p{add_value(const std::string &key, const value_type value)}, that adds a column
  * with the name @p{key} to the table if this column does not yet exist and adds the 
- * value of @p{value_type} (e.g. @p{unsigned int}, @p{double}, @p{string}, ...) to this column.
+ * value of @p{value_type} (e.g. @p{unsigned int}, @p{double}, @p{std::string}, ...) to this column.
  * After the table is complete there are different possibilities of output, e.g.
- * into a tex file with @p{write_tex(ofstream &file)} or as text with 
- * @p{write_text (ostream &out)}. 
+ * into a tex file with @p{write_tex(std::ofstream &file)} or as text with 
+ * @p{write_text (std::ostream &out)}. 
  *
  * Two (or more) columns may be merged into a "supercolumn" by twice
  * (or multiple) calling @p{add_column_to_supercolumn(...)}, see
@@ -151,7 +151,7 @@ class TableEntry : public TableEntryBase
  * table.set_precision("square roots", 6);
  *
  *                                  // output
- * ofstream out_file("number_table.tex");
+ * std::ofstream out_file("number_table.tex");
  * table.write_tex(out_file);
  * out_file.close();
  * @end{verbatim}
@@ -174,8 +174,8 @@ class TableHandler
 				      * to the column.
 				      */
     template <typename value_type>
-    void add_value (const string     &key,
-		    const value_type  value);
+    void add_value (const std::string &key,
+		    const value_type   value);
     
 				     /**
 				      * Creates a sypercolumn (if not yet
@@ -194,8 +194,8 @@ class TableHandler
 				      * the order of output follows the order
 				      * the columns are added to the supercolumn.
 				      */
-    void add_column_to_supercolumn (const string &key,
-				    const string &superkey);
+    void add_column_to_supercolumn (const std::string &key,
+				    const std::string &superkey);
 
 				     /**
 				      * Change the order of columns and
@@ -220,7 +220,7 @@ class TableHandler
 				      * next e.g. five columns and again @p{write_*},
 				      * and so on.
 				      */
-    void set_column_order (const vector<string> &new_order);
+    void set_column_order (const std::vector<std::string> &new_order);
     
 				     /**
 				      * Sets the @p{precision} e.g. double or float
@@ -228,7 +228,7 @@ class TableHandler
 				      * the same as in calling
 				      * @p{out << setprecision(precision)}.
 				      */
-    void set_precision (const string &key,
+    void set_precision (const std::string &key,
 			const unsigned int precision);
 
 				     /**
@@ -236,8 +236,8 @@ class TableHandler
 				      * scientific, false means fixed point
 				      * notation.
 				      */
-    void set_scientific (const string &key,
-			 bool scientific);
+    void set_scientific (const std::string &key,
+			 const bool         scientific);
 
 				     /**
 				      * Sets the caption of the column @p{key}
@@ -245,8 +245,8 @@ class TableHandler
 				      * this different from @p{key}, if it 
 				      * contains formulas or similar constructs.
 				      */
-    void set_tex_caption (const string &key,
-			  const string &tex_caption);
+    void set_tex_caption (const std::string &key,
+			  const std::string &tex_caption);
 
 				     /**
 				      * Sets the caption the the supercolumn
@@ -255,8 +255,8 @@ class TableHandler
 				      * if it contains formulas or similar
 				      * constructs.
 				      */
-    void set_tex_supercaption (const string &superkey,
-			       const string &tex_supercaption);
+    void set_tex_supercaption (const std::string &superkey,
+			       const std::string &tex_supercaption);
 
 				     /**
 				      * Sets the tex output format of a column.
@@ -265,46 +265,46 @@ class TableHandler
 				      * is not called for a column, the default
 				      * is preset to be @p{c}.
 				      */
-    void set_tex_format (const string &key,
-			 const string &format="c");
+    void set_tex_format (const std::string &key,
+			 const std::string &format="c");
 
 				     /**
 				      * Write table as formatted text, e.g.
 				      * to the standard output.
 				      */
-    void write_text (ostream &out) const;
+    void write_text (std::ostream &out) const;
 
 				     /**
 				      * Write table as a tex file.
 				      */
-    void write_tex (ofstream &file) const;
+    void write_tex (std::ofstream &file) const;
    
     				     /**
 				      * Exception
 				      */
     DeclException1 (ExcColumnNotExistent,
-		    string,
+		    std::string,
 		    << "Column <" << arg1 << "> does not exist.");
 
     				     /**
 				      * Exception
 				      */
     DeclException1 (ExcSuperColumnNotExistent,
-		    string,
+		    std::string,
 		    << "Supercolumn <" << arg1 << "> does not exist.");
 
     				     /**
 				      * Exception
 				      */
     DeclException1 (ExcColumnOrSuperColumnNotExistent,
-		    string,
+		    std::string,
 		    << "Column or supercolumn <" << arg1 << "> does not exist.");
     
     				     /**
 				      * Exception
 				      */
     DeclException4 (ExcWrongNumberOfDataEntries,
-		    string, int, string, int,
+		    std::string, int, std::string, int,
 		    << "Column <" << arg1 << "> has got " << arg2
 		    << " rows, but Column <" << arg3 << "> has got " << arg4 << ".");
 
@@ -312,7 +312,7 @@ class TableHandler
 				      * Exception
 				      */
     DeclException1 (ExcUndefinedTexFormat,
-		    string,
+		    std::string,
 		    << "<" << arg1 << "> is not a tex column format. Use l,c,r.");
 
   protected:
@@ -332,7 +332,7 @@ class TableHandler
 					 /**
 					  * Constructor.
 					  */
-	Column(const string &tex_caption);
+	Column(const std::string &tex_caption);
 	
 					 /**
 					  * Destructor.
@@ -348,7 +348,7 @@ class TableHandler
 					  * a wrapper for @p{T}, but is derived
 					  * from @p{TableEntryBase}.
 					  */
-	vector<TableEntryBase *> entries;
+	std::vector<TableEntryBase *> entries;
 	
 					 /**
 					  * The caption of the column in tex output.
@@ -358,7 +358,7 @@ class TableHandler
 					  * be changed by calling
 					  * @p{TableHandler::set_tex_caption(...)}.
 					  */
-	string tex_caption;
+	std::string tex_caption;
 
 					 /**
 					  * The column format in tex output.
@@ -370,7 +370,7 @@ class TableHandler
 					  * right or left.
 					  */
 	
-	string tex_format;
+	std::string tex_format;
 
 					 /**
 					  * Double or float entries are written with
@@ -402,7 +402,7 @@ class TableHandler
 				      * consistency of the data. The result is
 				      * returned in @p{sel_columns}.
 				      */
-    void get_selected_columns (vector<string> &sel_columns) const;
+    void get_selected_columns (std::vector<std::string> &sel_columns) const;
     
 				     /**
 				      * Builtin function, that gives the 
@@ -422,13 +422,13 @@ class TableHandler
 				      * adding the columns. This order may be
 				      * changed by @p{set_column_order(...)}.
 				      */
-    vector<string> column_order;
+    std::vector<std::string> column_order;
 
 				     /**
 				      * Maps the column keys to the columns
 				      * (not supercolumns).
 				      */
-    map<string,Column> columns;
+    std::map<std::string,Column> columns;
 
 				     /**
 				      * Maps each supercolumn key to the
@@ -441,7 +441,7 @@ class TableHandler
 				      * keys for each supercolumn key is
 				      * relevant.
 				      */
-    map<string, vector<string> > supercolumns;
+    std::map<std::string, std::vector<std::string> > supercolumns;
 
 				     /**
 				      * Maps the supercolumn keys to the
@@ -452,7 +452,7 @@ class TableHandler
 				      * supercolumn keys but they may be changed
 				      * by @p{set_tex_supercaptions(...)}.
 				      */
-    map<string, string> tex_supercaptions;
+    std::map<std::string, std::string> tex_supercaptions;
 };
 
 

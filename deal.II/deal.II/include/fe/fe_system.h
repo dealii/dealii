@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -185,7 +185,7 @@ class FESystem : public FiniteElement<dim>
 				      * For the ordering of shape functions
 				      * refer to the @p{shape_value} function.
 				      */
-    virtual void get_unit_support_points (vector<Point<dim> > &support_points) const;
+    virtual void get_unit_support_points (std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -195,14 +195,14 @@ class FESystem : public FiniteElement<dim>
 				      * refer to the @p{shape_value} function.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     vector<Point<dim> > &support_points) const;
+				     std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  vector<Point<dim> > &support_points) const;
+					  std::vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Fill the local mass matrix. The elements
@@ -317,8 +317,8 @@ class FESystem : public FiniteElement<dim>
 				      * underlying object.
 				      */
     virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<double>      &face_jacobi_determinants) const;
+				     const std::vector<Point<dim-1> > &unit_points,
+				     std::vector<double>      &face_jacobi_determinants) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -333,8 +333,8 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
 					const unsigned int           subface_no,
-					const vector<Point<dim-1> > &unit_points,
-					vector<double>      &face_jacobi_determinants) const;
+					const std::vector<Point<dim-1> > &unit_points,
+					std::vector<double>      &face_jacobi_determinants) const;
 
 				     /**
 				      * Return the normal vectors to the
@@ -352,8 +352,8 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<Point<dim> >         &normal_vectors) const;
+				     const std::vector<Point<dim-1> > &unit_points,
+				     std::vector<Point<dim> >         &normal_vectors) const;
 
 				     /**
 				      * Return the normal vectors to the
@@ -373,8 +373,8 @@ class FESystem : public FiniteElement<dim>
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int           face_no,
 				     const unsigned int           subface_no,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<Point<dim> >         &normal_vectors) const;
+				     const std::vector<Point<dim-1> > &unit_points,
+				     std::vector<Point<dim> >         &normal_vectors) const;
 
 				     /**
 				      * Implementation of the
@@ -382,17 +382,17 @@ class FESystem : public FiniteElement<dim>
 				      * @p{FiniteElement}.
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				 const vector<Point<dim> >            &unit_points,
-				 vector<Tensor<2,dim> >               &jacobians,
+				 const std::vector<Point<dim> >            &unit_points,
+				 std::vector<Tensor<2,dim> >               &jacobians,
 				 const bool              compute_jacobians,
-				 vector<Tensor<3,dim> > &jacobians_grad,
+				 std::vector<Tensor<3,dim> > &jacobians_grad,
 				 const bool              compute_jacobians_grad,
-				 vector<Point<dim> > &support_points,
+				 std::vector<Point<dim> > &support_points,
 				 const bool           compute_support_points,
-				 vector<Point<dim> > &q_points,
+				 std::vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const FullMatrix<double>  &shape_values_transform,
-				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const;
+				 const std::vector<std::vector<Tensor<1,dim> > > &shape_grad_transform) const;
     
 				     /** 
 				      * Number of different base
@@ -449,7 +449,7 @@ class FESystem : public FiniteElement<dim>
 				      * Pairs of multiplicity and
 				      * element type.
 				      */
-    typedef pair<const FiniteElement<dim> *, unsigned int> ElementPair;
+    typedef std::pair<const FiniteElement<dim> *, unsigned int> ElementPair;
     
 				     /**
 				      * Pointer to underlying finite
@@ -462,7 +462,7 @@ class FESystem : public FiniteElement<dim>
 				      * created by the constructor and
 				      * constant afterwards.
 				      */
-    vector<ElementPair> base_elements;
+    std::vector<ElementPair> base_elements;
 
 
 				     /**
@@ -511,7 +511,7 @@ class FESystem : public FiniteElement<dim>
 				      * the mixed element consisting of @p{N}
 				      * elements of the sub-element @p{fe}.
 				      */
-    static vector<bool>
+    static std::vector<bool>
     compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
 					   const unsigned int        N);
     
@@ -519,7 +519,7 @@ class FESystem : public FiniteElement<dim>
 				      * Same as above for mixed elements
 				      * with two different sub-elements.
 				      */
-    static vector<bool>
+    static std::vector<bool>
     compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
 					   const unsigned int        N1,
 					   const FiniteElement<dim> &fe2,
@@ -529,7 +529,7 @@ class FESystem : public FiniteElement<dim>
 				      * Same as above for mixed elements
 				      * with three different sub-elements.
 				      */
-    static vector<bool>
+    static std::vector<bool>
     compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
 					   const unsigned int        N1,
 					   const FiniteElement<dim> &fe2,
@@ -589,7 +589,7 @@ template <class FE>
 FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
 		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements),
 				    compute_restriction_is_additive_flags (fe, n_elements)),
-		base_elements(1)
+  base_elements(1)
 {
   base_elements[0] = ElementPair(new FE, n_elements);
   base_elements[0].first -> subscribe ();
@@ -605,7 +605,7 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 		FiniteElement<dim> (multiply_dof_numbers(fe1, n1, fe2, n2),
 				    compute_restriction_is_additive_flags (fe1, n1,
 									   fe2, n2)),
-		base_elements(2)
+  base_elements(2)
 {
   Assert(fe1.n_transform_functions() == fe2.n_transform_functions(),
 	 ExcElementTransformNotEqual());
@@ -630,7 +630,7 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 				    compute_restriction_is_additive_flags (fe1, n1,
 									   fe2, n2,
 									   fe3, n3)),
-		base_elements(3)
+  base_elements(3)
 {
   Assert(fe1.n_transform_functions() == fe2.n_transform_functions(),
 	 ExcElementTransformNotEqual());

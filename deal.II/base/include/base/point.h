@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -112,9 +112,9 @@ class Point : public Tensor<1,dim>
 				      */
     Point<dim>   operator - (const Point<dim> &) const;
 
-				       /**
-					* The opposite vector.
-					*/
+				     /**
+				      * The opposite vector.
+				      */
     Point<dim>   operator - () const;
     
 				     /**
@@ -271,7 +271,7 @@ Point<4>::Point (const double, const double, const double)
 template <int dim>
 inline
 double Point<dim>::operator () (const unsigned int index) const
- {
+{
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
@@ -312,7 +312,7 @@ Point<dim> Point<dim>::operator - () const
 {
   Point<dim> result;
   for (unsigned int i=0; i<dim; ++i)
-      result.values[i] = -values[i];
+    result.values[i] = -values[i];
   return result;
 };
 

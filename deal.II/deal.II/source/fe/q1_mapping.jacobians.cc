@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,8 +33,8 @@
 
 template <>
 void FEQ1Mapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_iterator &,
-						     const vector<Point<1> > &unit_points,
-						     vector<Tensor<3,1> >    &jacobians_grad) 
+						     const std::vector<Point<1> > &unit_points,
+						     std::vector<Tensor<3,1> >    &jacobians_grad) 
 {
   Assert (unit_points.size() == jacobians_grad.size(),
 	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
@@ -54,8 +54,8 @@ void FEQ1Mapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_itera
 
 template <>
 void FEQ1Mapping<2>::compute_jacobian_gradients (const DoFHandler<2>::cell_iterator &cell,
-						     const vector<Point<2> > &unit_points,
-						     vector<Tensor<3,2> >    &jacobians_grad) 
+						     const std::vector<Point<2> > &unit_points,
+						     std::vector<Tensor<3,2> >    &jacobians_grad) 
 {
   Assert (unit_points.size() == jacobians_grad.size(),
 	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
@@ -137,8 +137,8 @@ void FEQ1Mapping<2>::compute_jacobian_gradients (const DoFHandler<2>::cell_itera
 
 template <>
 void FEQ1Mapping<3>::compute_jacobian_gradients (const DoFHandler<3>::cell_iterator &cell,
-						     const vector<Point<3> > &unit_points,
-						     vector<Tensor<3,3> >    &jacobians_grad) 
+						     const std::vector<Point<3> > &unit_points,
+						     std::vector<Tensor<3,3> >    &jacobians_grad) 
 {
   Assert (unit_points.size() == jacobians_grad.size(),
 	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,8 +14,8 @@
 #define __deal2__grid_refinement_h
 
 
-#include<lac/vector.h>
-#include<vector>
+#include <lac/vector.h>
+#include <vector>
 
 // forward declarations
 template <int dim> class Triangulation;
@@ -315,10 +315,10 @@ class GridRefinement
 				      * @p{refine_and_coarsen_optimize}
 				      */
     template<typename number>
-    static void qsort_index(const Vector<number>  &a,
-			    vector<unsigned int>  &ind,
-			    int                   l,
-			    int                   r);
+    static void qsort_index(const Vector<number>       &a,
+			    std::vector<unsigned int>  &ind,
+			    int                         l,
+			    int                         r);
 };
 
 

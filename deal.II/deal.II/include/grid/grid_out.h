@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -363,7 +363,7 @@ class GridOut
 				      */
     template <int dim>
     void write_gnuplot (const Triangulation<dim> &tria,
-			ostream                  &out);
+			std::ostream             &out);
 
 				     /**
 				      * Write the triangulation in the
@@ -402,7 +402,7 @@ class GridOut
 				      */
     template <int dim>
     void write_ucd (const Triangulation<dim> &tria,
-		    ostream                  &out);
+		    std::ostream             &out);
 
 				     /**
 				      * Write the triangulation in the
@@ -456,7 +456,7 @@ class GridOut
 				      */
     template <int dim>
     void write_eps (const Triangulation<dim> &tria,
-		    ostream                  &out);
+		    std::ostream             &out);
     
 				     /**
 				      * Write data and grid to @p{out} according
@@ -466,7 +466,7 @@ class GridOut
 				      */
     template <int dim>
     void write (const Triangulation<dim> &tria,
-		ostream                  &out,
+		std::ostream             &out,
 		const OutputFormat        output_format);
 
 				     /**
@@ -515,7 +515,7 @@ class GridOut
 				      * thus be called without creating an
 				      * object of this class.
 				      */
-    static string default_suffix (const OutputFormat output_format);
+    static std::string default_suffix (const OutputFormat output_format);
 
 				     /**
 				      * Return the @p{OutputFormat} value
@@ -537,7 +537,7 @@ class GridOut
 				      * @ref{ParameterHandler} class, use the
 				      * function @p{get_output_format_names ()}.
 				      */
-    static OutputFormat parse_output_format (const string &format_name);
+    static OutputFormat parse_output_format (const std::string &format_name);
 
 				     /**
 				      * Return a list of implemented output
@@ -546,7 +546,7 @@ class GridOut
 				      * as used by the @ref{ParameterHandler}
 				      * classes.
 				      */
-    static string get_output_format_names ();
+    static std::string get_output_format_names ();
 
 				     /**
 				      * Determine an estimate for the
@@ -628,7 +628,7 @@ class GridOut
     template <int dim>
     void write_ucd_faces (const Triangulation<dim> &tria,
 			  const unsigned int        starting_index,
-			  ostream                  &out) const;
+			  std::ostream             &out) const;
 
 				     /**
 				      * Return the number of faces in the

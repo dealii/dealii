@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -60,7 +60,7 @@ BlockSparsityPattern::reinit (const unsigned int r,
 				   // set new sizes
   rows = r;
   columns = c;
-  sub_objects.resize (rows, vector<SmartPointer<SparsityPattern> > (columns));
+  sub_objects.resize (rows, std::vector<SmartPointer<SparsityPattern> > (columns));
 
 				   // allocate new objects
   for (unsigned int i=0; i<rows; ++i)
@@ -91,8 +91,8 @@ BlockSparsityPattern::operator = (const BlockSparsityPattern &bsp)
 void
 BlockSparsityPattern::collect_sizes ()
 {
-  vector<unsigned int> row_sizes (rows);
-  vector<unsigned int> col_sizes (columns);
+  std::vector<unsigned int> row_sizes (rows);
+  std::vector<unsigned int> col_sizes (columns);
 
 				   // first find out the row sizes
 				   // from the first block column

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -94,9 +94,9 @@ class SolverSelector : public Subscriptor
 				      * the @p{SolverControl} and the 
 				      * @p{VectorMemory} as argument.
 				      */
-    SolverSelector(const string solvername,
-		   SolverControl &control,
-		   VectorMemory<Vector> &vectorm);
+    SolverSelector (const std::string    &solvername,
+		    SolverControl        &control,
+		    VectorMemory<Vector> &vectorm);
   
 				     /**
 				      * Destructor
@@ -148,20 +148,20 @@ class SolverSelector : public Subscriptor
 				      * Get the names of all implemented
 				      * solvers.
 				      */
-    static string get_solver_names ();
+    static std::string get_solver_names ();
 
 				     /**
 				      * Exception.
 				      */
     DeclException1 (ExcSolverDoesNotExist,
-		    string, << "Solver " << arg1 << " does not exist. Use one of "
-		    << endl << get_solver_names());
+		    std::string, << "Solver " << arg1 << " does not exist. Use one of "
+		    << std::endl << get_solver_names());
 
   protected:
 				     /**
 				      * Stores the Name of the solver.
 				      */
-    string solver_name;
+    std::string solver_name;
     
 				     /**
 				      * Stores the @p{SolverControl} that
@@ -204,8 +204,8 @@ class SolverSelector : public Subscriptor
 
 
 template <class Vector>
-SolverSelector<Vector>::SolverSelector(string solver_name,
-				       SolverControl &control,
+SolverSelector<Vector>::SolverSelector(const std::string    &solver_name,
+				       SolverControl        &control,
 				       VectorMemory<Vector> &vector_memory) :
 		solver_name(solver_name),
 		control(&control),
@@ -258,7 +258,7 @@ SolverSelector<Vector>::solve(const Matrix &A,
 
 
 template <class Vector>
-string SolverSelector<Vector>::get_solver_names()
+std::string SolverSelector<Vector>::get_solver_names()
 {
   return "richardson|cg|bicgstab|gmres";
 };

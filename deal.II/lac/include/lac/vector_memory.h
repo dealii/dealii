@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -151,12 +151,12 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * vector is used, second the
 				      * vector itself.
 				      */
-    typedef pair<bool, Vector* > entry_type;
+    typedef std::pair<bool, Vector* > entry_type;
 
 				     /**
 				      * Array of allocated vectors.
 				      */
-    vector<entry_type> pool;
+    std::vector<entry_type> pool;
     
 				     /**
 				      * Overall number of allocations.
@@ -172,7 +172,7 @@ template<typename Vector>
 GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size)
 		: pool(initial_size)
 {
-  for (typename vector<entry_type>::iterator i=pool.begin();
+  for (typename std::vector<entry_type>::iterator i=pool.begin();
        i != pool.end();
        ++i)
     {
@@ -188,7 +188,7 @@ template<typename Vector>
 GrowingVectorMemory<Vector>::~GrowingVectorMemory()
 {
   unsigned int n = 0;
-  for (typename vector<entry_type>::iterator i=pool.begin();
+  for (typename std::vector<entry_type>::iterator i=pool.begin();
        i != pool.end();
        ++i)
     {
@@ -197,12 +197,12 @@ GrowingVectorMemory<Vector>::~GrowingVectorMemory()
       delete i->second;
     }
   deallog << "GrowingVectorMemory:Overall allocated vectors: "
-	  << n_alloc << endl;
+	  << n_alloc << std::endl;
   deallog << "GrowingVectorMemory:Maximum allocated vectors: "
-	  << pool.size() << endl;
+	  << pool.size() << std::endl;
   if (n!=0)
     deallog << "GrowingVectorMemory:Vectors not deallocated: "
-	    << n << " Memory leak!" << endl;
+	    << n << " Memory leak!" << std::endl;
 }
 
 
@@ -212,7 +212,7 @@ Vector*
 GrowingVectorMemory<Vector>::alloc()
 {
   ++n_alloc;
-  for (typename vector<entry_type>::iterator i=pool.begin();
+  for (typename std::vector<entry_type>::iterator i=pool.begin();
        i != pool.end();
        ++i)
     {
@@ -235,7 +235,7 @@ template<typename Vector>
 void
 GrowingVectorMemory<Vector>::free(const Vector* const v)
 {
-  for (typename vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
+  for (typename std::vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
     {
       if (v == (i->second))
 	{

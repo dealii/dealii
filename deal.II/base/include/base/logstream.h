@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,12 +33,12 @@
  * The usual usage of this class is through the pregenerated object
  * @p{deallog}. Typical steps are
  * @begin{itemize}
- * @item @p{deallog.attach(ostream)}: write logging information into a file.
+ * @item @p{deallog.attach(std::ostream)}: write logging information into a file.
  * @item @p{deallog.depth_console(n)}: restrict output on screen to outer loops.
  * @item Before entering a new phase of your program, e.g. a new loop,
  *       @p{deallog.push("loopname")}.
- * @item @p{deallog << anything << endl;} to write logging information
- *       (Usage of @p{endl} is mandatory!).
+ * @item @p{deallog << anything << std::endl;} to write logging information
+ *       (Usage of @p{std::endl} is mandatory!).
  * @item @p{deallog.pop()} when leaving that stage entered with @p{push}.
  * @end{itemize}
  *
@@ -54,15 +54,15 @@ class LogStream
 				      * allow identification where the
 				      * output was generated.
 				      */
-    stack<string> prefixes;
+    std::stack<std::string> prefixes;
 
 				     /**
 				      * Default stream, where the output
 				      * is to go to. This stream defaults
-				      * to @p{cerr}, but can be set to another
+				      * to @p{std::cerr}, but can be set to another
 				      * stream through the constructor.
 				      */
-    ostream  *std_out;
+    std::ostream  *std_out;
 
 				     /**
 				      * Pointer to a stream, where a copy of
@@ -72,7 +72,7 @@ class LogStream
 				      * You can set and reset this stream
 				      * by the @p{attach} function.
 				      */
-    ostream  *file;
+    std::ostream  *file;
 
 				     /**
 				      * Flag which stores whether the
@@ -113,7 +113,7 @@ class LogStream
 				      * Standard constructor, since we
 				      * intend to provide an object
 				      * @p{deallog} in the library. Set the
-				      * standard output stream to @p{cerr}.
+				      * standard output stream to @p{std::cerr}.
 				      */
     LogStream();
     
@@ -121,7 +121,7 @@ class LogStream
 				      * Enable output to a second
 				      * stream @p{o}.
 				      */
-    void attach(ostream& o);
+    void attach(std::ostream& o);
     
 				     /**
 				      * Disable output to the second
@@ -134,12 +134,12 @@ class LogStream
 				     /**
 				      * Gives the default stream (@p{std_out}).
 				      */
-    ostream& get_console();
+    std::ostream& get_console();
 
 				     /**
 				      * Gives the file stream.
 				      */
-    ostream& get_file_stream();
+    std::ostream& get_file_stream();
     
 				     /**
 				      * Push another prefix on the
@@ -148,7 +148,7 @@ class LogStream
 				      * colon and there is a double
 				      * colon after the last prefix.
 				      */
-    void push (const string& text);
+    void push (const std::string& text);
         
 				     /**
 				      * Remove the last prefix.
@@ -200,14 +200,14 @@ class LogStream
 				      * function on the present object. It
 				      * works the same way as it is possible
 				      * to output the stream manipulators
-				      * (like @p{endl}, etc) work on standard
-				      * streams: @p{stream << endl;}. We need
+				      * (like @p{std::endl}, etc) work on standard
+				      * streams: @p{stream << std::endl;}. We need
 				      * to overload this function in order
 				      * to know when we have to print the
 				      * prefixes, since a user may use several
 				      * calls to @p{operator <<} before the
 				      * line is complete. The overloaded
-				      * function @p{void endl(LogStream &)}
+				      * function @p{void std::endl(LogStream &)}
 				      * tells the @p{LogStream} that the end of
 				      * the line is reached.
 				      */
@@ -223,7 +223,7 @@ class LogStream
 				      * not be determined exactly
 				      * (for example: what is the
 				      * memory consumption of an
-				      * STL @p{map} type with a
+				      * STL @p{std::map} type with a
 				      * certain number of
 				      * elements?), this is only
 				      * an estimate. however often
@@ -261,7 +261,7 @@ LogStream &
 LogStream::operator<< (const T& t)
 {
 				   // if the previous command was an
-				   // @p{endl}, print the topmost prefix
+				   // @p{std::endl}, print the topmost prefix
 				   // and a colon
   if (was_endl)
     {
@@ -281,10 +281,10 @@ LogStream::operator<< (const T& t)
 
 
 /**
- * Replacement of @p{endl} for @p{LogStream}.
+ * Replacement of @p{std::endl} for @p{LogStream}.
  *
- * Overloaded version of the stream manipulator function @p{endl} which
- * results in calling the original version of @p{endl} for each of the
+ * Overloaded version of the stream manipulator function @p{std::endl} which
+ * results in calling the original version of @p{std::endl} for each of the
  * two streams, if the present prefix number does not exceed the
  * specified maximal number.
  *
@@ -293,10 +293,10 @@ LogStream::operator<< (const T& t)
 inline void endl(LogStream& s)
 {
   if (s.prefixes.size() <= s.std_depth)
-    *s.std_out << endl;
+    *s.std_out << std::endl;
 
   if (s.file && (s.prefixes.size() <= s.file_depth))
-    *s.file << endl;
+    *s.file << std::endl;
 
   s.was_endl = true;
 };
@@ -311,4 +311,6 @@ extern LogStream deallog;
 
 
 #endif
+
+
 

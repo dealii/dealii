@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,7 +90,7 @@ class DoFLevel<1>
 				      * of freedom. See @ref{DoFLevel} for
 				      * detailed information.
 				      */
-    vector<unsigned int> line_dofs;
+    std::vector<unsigned int> line_dofs;
 
 				     /**
 				      * Determine an estimate for the
@@ -117,7 +117,7 @@ class DoFLevel<2> : public DoFLevel<1>
 				      * of freedom. See @ref{DoFLevel} for
 				      * detailed information.
 				      */
-    vector<unsigned int> quad_dofs;
+    std::vector<unsigned int> quad_dofs;
 
 				     /**
 				      * Determine an estimate for the
@@ -144,7 +144,7 @@ class DoFLevel<3> : public DoFLevel<2>
 				      * of freedom. See @ref{DoFLevel} for
 				      * detailed information.
 				      */
-    vector<unsigned int> hex_dofs;
+    std::vector<unsigned int> hex_dofs;
 
 				     /**
 				      * Determine an estimate for the

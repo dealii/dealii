@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -86,9 +86,9 @@ class FunctionDerivative : public Function<dim>
 				     /**
 				      * Function values at multiple points.
 				      */
-    virtual void value_list (const vector<Point<dim> > &points,
-			     vector<double>            &values,
-			     const unsigned int         component = 0) const;    
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<double>            &values,
+			     const unsigned int              component = 0) const;    
 
 				     /**
 				      * Determine an estimate for
@@ -99,7 +99,7 @@ class FunctionDerivative : public Function<dim>
 				      * not be determined exactly
 				      * (for example: what is the
 				      * memory consumption of an
-				      * STL @p{map} type with a
+				      * STL @p{std::map} type with a
 				      * certain number of
 				      * elements?), this is only
 				      * an estimate. however often

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,11 +72,11 @@ MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps)
 				   // to much memory by later copying the
 				   // content of this vector to its final
 				   // destination
-  vector<unsigned int> boundary_dofs;
+  std::vector<unsigned int> boundary_dofs;
 
 				   // temporary to hold the dof indices
 				   // on a face between to levels
-  vector<unsigned int> dofs_on_face (mg_dof.get_fe().dofs_per_face);
+  std::vector<unsigned int> dofs_on_face (mg_dof.get_fe().dofs_per_face);
 
   for (unsigned int level=1; level<n_levels; ++level)
     {
@@ -127,7 +127,7 @@ MGSmoother::set_zero_interior_boundary (const unsigned int  level,
   if (level==0)
     return;
   else
-    for (vector<unsigned int>::const_iterator p=interior_boundary_dofs[level-1].begin();
+    for (std::vector<unsigned int>::const_iterator p=interior_boundary_dofs[level-1].begin();
 	 p!=interior_boundary_dofs[level-1].end(); ++p)
       u(*p) = 0;
 };

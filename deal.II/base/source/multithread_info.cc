@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,8 +32,8 @@
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
-  ifstream cpuinfo;
-  string search;
+  std::ifstream cpuinfo;
+  std::string search;
   unsigned int nCPU = 0;
   
   cpuinfo.open("/proc/cpuinfo");
@@ -43,7 +43,7 @@ unsigned int MultithreadInfo::get_n_cpus()
   while(cpuinfo)
     {
       cpuinfo >> search;
-      if (search.find("processor")!=string::npos)
+      if (search.find("processor")!=std::string::npos)
 	nCPU++;	  
     }
   cpuinfo.close();

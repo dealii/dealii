@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,13 +47,13 @@ get_projected_derivative (const FEValues<dim>  &fe_values,
 {
   if (fe_values.get_fe().n_components() == 1)
     {
-      vector<ProjectedDerivative> values (1);
+      std::vector<ProjectedDerivative> values (1);
       fe_values.get_function_values (solution, values);
       return values[0];
     }
   else
     {
-      vector<Vector<double> > values
+      std::vector<Vector<double> > values
 	(1, Vector<double>(fe_values.get_fe().n_components()));
       fe_values.get_function_values (solution, values);
       return values[0](component);
@@ -95,14 +95,14 @@ get_projected_derivative (const FEValues<dim>  &fe_values,
 {
   if (fe_values.get_fe().n_components() == 1)
     {
-      vector<ProjectedDerivative> values (1);
+      std::vector<ProjectedDerivative> values (1);
       fe_values.get_function_grads (solution, values);
       return values[0];
     }
   else
     {
-      vector<vector<ProjectedDerivative> > values
-	(1, vector<ProjectedDerivative>(fe_values.get_fe().n_components()));
+      std::vector<std::vector<ProjectedDerivative> > values
+	(1, std::vector<ProjectedDerivative>(fe_values.get_fe().n_components()));
       fe_values.get_function_grads (solution, values);
       return values[0][component];
     };
@@ -140,8 +140,8 @@ derivative_norm (const Derivative &d)
     = { 0.5*(d[0][0] + d[1][1] + sqrt(radicand)),
 	0.5*(d[0][0] + d[1][1] - sqrt(radicand))  };
   
-  return max (fabs (eigenvalues[0]),
-	      fabs (eigenvalues[1]));
+  return std::max (std::fabs (eigenvalues[0]),
+	      std::fabs (eigenvalues[1]));
 };
 
 
@@ -231,7 +231,7 @@ approximate_derivative (const DoFHandler<dim> &dof_handler,
 				  dof_handler.get_tria().n_active_cells()));
 
   const unsigned int n_threads = multithread_info.n_default_threads;
-  vector<IndexInterval> index_intervals
+  std::vector<IndexInterval> index_intervals
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
 			       n_threads);
   Threads::ThreadManager thread_manager;
@@ -283,7 +283,7 @@ DerivativeApproximation::approximate (const DoFHandler<dim> &dof_handler,
 				   // active neighbors of a cell
 				   // reserve the maximal number of
 				   // active neighbors
-  vector<typename DoFHandler<dim>::active_cell_iterator> active_neighbors;
+  std::vector<typename DoFHandler<dim>::active_cell_iterator> active_neighbors;
   active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
 			    GeometryInfo<dim>::subfaces_per_face);
 
@@ -376,7 +376,7 @@ DerivativeApproximation::approximate (const DoFHandler<dim> &dof_handler,
 				       // now loop over all active
 				       // neighbors and collect the
 				       // data we need
-      typename vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
+      typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
 	neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
 	{

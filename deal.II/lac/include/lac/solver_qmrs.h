@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -249,7 +249,7 @@ SolverQMRS<VECTOR>::solve (const MATRIX &A,
   do 
     {
       if (step)
-	deallog << "Restart step " << step << endl;
+	deallog << "Restart step " << step << std::endl;
       state = iterate(A, precondition);
     }
   while (state == breakdown);
@@ -316,9 +316,9 @@ SolverQMRS<VECTOR>::iterate(const MATRIX& A,
   precondition.vmult(q,p);
  
   tau = v.norm_sqr();
-  //deallog << "tau:" << tau << endl;
+  //deallog << "tau:" << tau << std::endl;
   rho = q*v;
-  //deallog << "rho:" << rho << endl;
+  //deallog << "rho:" << rho << std::endl;
 
 
 while (state == SolverControl::iterate)
@@ -335,7 +335,7 @@ while (state == SolverControl::iterate)
 	return breakdown;
 				       // Step 3
       alpha = rho/sigma;
-      //deallog << "alpha:" << alpha << endl;
+      //deallog << "alpha:" << alpha << std::endl;
 
       v.add(-alpha,t);
 				       // Step 4
@@ -344,9 +344,9 @@ while (state == SolverControl::iterate)
       psi = 1./(1.+theta);
       tau *= theta*psi;
 
-      //deallog << "psi:" << psi << endl;
-      //deallog << "theta:" << theta << endl;
-      //deallog << "tau:" << tau << endl;
+      //deallog << "psi:" << psi << std::endl;
+      //deallog << "theta:" << theta << std::endl;
+      //deallog << "tau:" << tau << std::endl;
 
       d.sadd(psi*theta_old, psi*alpha, p);
       x.add(d);

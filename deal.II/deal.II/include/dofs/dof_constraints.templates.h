@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,12 +40,12 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 				   // its new line number
 				   // after compression. If the shift is
 				   // -1, this line will be condensed away
-  vector<int> new_line;
+  std::vector<int> new_line;
 
   new_line.reserve (uncondensed_struct.n_rows());
 
-  vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  unsigned int                           shift           = 0;
+  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+  unsigned int                                shift           = 0;
   const unsigned int n_rows = uncondensed_struct.n_rows();
 
   if (next_constraint == lines.end()) 
@@ -96,7 +96,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	  {
 					     // let c point to the constraint
 					     // of this column
-	    vector<ConstraintLine>::const_iterator c = lines.begin();
+	    std::vector<ConstraintLine>::const_iterator c = lines.begin();
 	    while (c->line != uncondensed_struct.get_column_numbers()[j])
 	      ++c;
 
@@ -115,10 +115,10 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	  if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
 					     // column is not constrained
 	    for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
-		condensed.add (new_line[next_constraint->entries[q].first],
-			       new_line[uncondensed_struct.get_column_numbers()[j]],
-			       uncondensed.global_entry(j) *
-			       next_constraint->entries[q].second);
+	      condensed.add (new_line[next_constraint->entries[q].first],
+			     new_line[uncondensed_struct.get_column_numbers()[j]],
+			     uncondensed.global_entry(j) *
+			     next_constraint->entries[q].second);
 	
 	  else
 					     // not only this line but
@@ -126,17 +126,17 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	    {
 					       // let c point to the constraint
 					       // of this column
-	      vector<ConstraintLine>::const_iterator c = lines.begin();
+	      std::vector<ConstraintLine>::const_iterator c = lines.begin();
 	      while (c->line != uncondensed_struct.get_column_numbers()[j])
 		++c;
 	      
 	      for (unsigned int p=0; p!=c->entries.size(); ++p)
 		for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
-		    condensed.add (new_line[next_constraint->entries[q].first],
-				   new_line[c->entries[p].first],
-				   uncondensed.global_entry(j) *
-				   next_constraint->entries[q].second *
-				   c->entries[p].second);
+		  condensed.add (new_line[next_constraint->entries[q].first],
+				 new_line[c->entries[p].first],
+				 uncondensed.global_entry(j) *
+				 next_constraint->entries[q].second *
+				 c->entries[p].second);
 	    };
 	
 	++next_constraint;
@@ -162,7 +162,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 				   // otherwise, the number states which
 				   // line in the constraint matrix handles
 				   // this index
-  vector<int> distribute (sparsity.n_rows(), -1);
+  std::vector<int> distribute (sparsity.n_rows(), -1);
   
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -291,7 +291,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 				   // otherwise, the number states which
 				   // line in the constraint matrix handles
 				   // this index
-  vector<int> distribute (sparsity.n_rows(), -1);
+  std::vector<int> distribute (sparsity.n_rows(), -1);
   
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -301,7 +301,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
     {
 				       // get index of this row
 				       // within the blocks
-      const pair<unsigned int,unsigned int>
+      const std::pair<unsigned int,unsigned int>
 	block_index = index_mapping.global_to_local(row);
       const unsigned int block_row = block_index.first;
       
@@ -457,12 +457,12 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
 				   // its new line number
 				   // after compression. If the shift is
 				   // -1, this line will be condensed away
-  vector<int> new_line;
+  std::vector<int> new_line;
 
   new_line.reserve (uncondensed.size());
 
-  vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  unsigned int                           shift           = 0;
+  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+  unsigned int                                shift           = 0;
   unsigned int n_rows = uncondensed.size();
 
   if (next_constraint == lines.end()) 
@@ -528,7 +528,7 @@ ConstraintMatrix::condense (VectorType &vec) const
 				     // nothing to do
     return;
   
-  vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   for (unsigned int row=0; row<vec.size(); ++row)
     if (row == next_constraint->line)
 				       // line must be distributed
@@ -559,7 +559,7 @@ ConstraintMatrix::set_zero (VectorType &vec) const
 				     // nothing to do
     return;
   
-  vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   for (unsigned int row=0; row<vec.size(); ++row)
     if (row == next_constraint->line)
       {
@@ -588,12 +588,12 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 				   // its old line number before
 				   // distribution. If the shift is
 				   // -1, this line was condensed away
-  vector<int> old_line;
+  std::vector<int> old_line;
 
   old_line.reserve (uncondensed.size());
 
-  vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  unsigned int                           shift           = 0;
+  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+  unsigned int                                shift           = 0;
   unsigned int n_rows = uncondensed.size();
 
   if (next_constraint == lines.end()) 
@@ -654,7 +654,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
-  vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   for (; next_constraint != lines.end(); ++next_constraint) 
     {
 				       // make entry in line next_constraint.line

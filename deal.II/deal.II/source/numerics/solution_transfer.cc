@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,8 +65,8 @@ void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
   const unsigned int dofs_per_cell  = dof_handler->get_fe().dofs_per_cell;
   n_dofs_old=dof_handler->n_dofs();
 
-  indices_on_cell=vector<vector<unsigned int> > (n_active_cells,
-						 vector<unsigned int> (dofs_per_cell));
+  indices_on_cell=std::vector<std::vector<unsigned int> > (n_active_cells,
+						 std::vector<unsigned int> (dofs_per_cell));
 
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();
@@ -110,7 +110,7 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();
 
-  vector<unsigned int> *indexptr;  
+  std::vector<unsigned int> *indexptr;  
 
   for (; cell!=endc; ++cell) 
     {
@@ -122,7 +122,7 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
 					 // which is both done by one
 					 // function
 	{
-	  indexptr=static_cast<vector<unsigned int> *>(cell->user_pointer());
+	  indexptr=static_cast<std::vector<unsigned int> *>(cell->user_pointer());
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    local_values(i)=in(indexptr->operator[](i));
 	  cell->set_dof_values_by_interpolation(local_values, out);
@@ -146,7 +146,7 @@ void SolutionTransfer<dim, number>::refine_interpolate (Vector<number> &vec) con
 template<int dim, typename number>
 void
 SolutionTransfer<dim, number>::
-prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
+prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in)
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
   Assert(!prepared_for!=coarsening_and_refinement, 
@@ -192,14 +192,14 @@ prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
 					 GeometryInfo<dim>::children_per_cell;
 
 				   // allocate the needed memory
-  indices_on_cell    = vector<vector<unsigned int> > (n_cells_to_stay_or_refine,
-						      vector<unsigned int> (dofs_per_cell));
+  indices_on_cell    = std::vector<std::vector<unsigned int> > (n_cells_to_stay_or_refine,
+						      std::vector<unsigned int> (dofs_per_cell));
   dof_values_on_cell
-    = vector<vector<Vector<number> > > (n_coarsen_fathers,
-					vector<Vector<number> > (in_size,
+    = std::vector<std::vector<Vector<number> > > (n_coarsen_fathers,
+					std::vector<Vector<number> > (in_size,
 								 Vector<number> (dofs_per_cell)));
 
-  all_pointerstructs = vector<Pointerstruct> (n_cells_to_stay_or_refine +
+  all_pointerstructs = std::vector<Pointerstruct> (n_cells_to_stay_or_refine +
 					      n_coarsen_fathers);
 
 
@@ -264,15 +264,15 @@ template<int dim, typename number>
 void
 SolutionTransfer<dim, number>::prepare_for_coarsening_and_refinement(const Vector<number> &in)
 {
-  vector<Vector<number> > all_in=vector<Vector<number> >(1, in);
+  std::vector<Vector<number> > all_in=std::vector<Vector<number> >(1, in);
   prepare_for_coarsening_and_refinement(all_in);
 }
 
 
 template<int dim, typename number>
 void SolutionTransfer<dim, number>::
-interpolate (const vector<Vector<number> > &all_in,
-	     vector<Vector<number> >       &all_out) const
+interpolate (const std::vector<Vector<number> > &all_in,
+	     std::vector<Vector<number> >       &all_out) const
 {
   Assert(prepared_for==coarsening_and_refinement, ExcNotPrepared());
   for (unsigned int i=0; i<all_in.size(); ++i)
@@ -283,7 +283,7 @@ interpolate (const vector<Vector<number> > &all_in,
 
 				   // resize the output vector
   if (all_out.size() != all_in.size())
-    all_out = vector<Vector<number> >(all_in.size(),
+    all_out = std::vector<Vector<number> >(all_in.size(),
 				      Vector<number>(dof_handler->n_dofs()));
   else
     {
@@ -296,10 +296,10 @@ interpolate (const vector<Vector<number> > &all_in,
   const unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
   Vector<number> local_values(dofs_per_cell);
 
-  vector<unsigned int>    *indexptr;
+  std::vector<unsigned int>    *indexptr;
   Pointerstruct           *structptr;
-  vector<Vector<number> > *valuesptr;
-  vector<unsigned int>     dofs(dofs_per_cell);
+  std::vector<Vector<number> > *valuesptr;
+  std::vector<unsigned int>     dofs(dofs_per_cell);
 
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();
@@ -358,9 +358,9 @@ template<int dim, typename number>
 void SolutionTransfer<dim, number>::interpolate(const Vector<number> &in,
 						Vector<number>       &out) const
 {
-  vector<Vector<number> > all_in(1);
+  std::vector<Vector<number> > all_in(1);
   all_in[0] = in;
-  vector<Vector<number> > all_out(1);
+  std::vector<Vector<number> > all_out(1);
   all_out[0] = out;
   interpolate(all_in,
 	      all_out);

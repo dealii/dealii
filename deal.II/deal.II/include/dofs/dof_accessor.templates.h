@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -138,7 +138,7 @@ DoFObjectAccessor<1,dim>::vertex_dof_index (const unsigned int vertex,
 template <int dim>
 inline
 void
-DoFObjectAccessor<1,dim>::get_dof_indices (vector<unsigned int> &dof_indices) const
+DoFObjectAccessor<1,dim>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
 				   // since the exception classes are
 				   // from a template dependent base
@@ -159,7 +159,7 @@ DoFObjectAccessor<1,dim>::get_dof_indices (vector<unsigned int> &dof_indices) co
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  vector<unsigned int>::iterator next = dof_indices.begin();
+  std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = vertex_dof_index(vertex,d);
@@ -174,9 +174,9 @@ TriaIterator<dim,DoFObjectAccessor<1,dim> >
 DoFObjectAccessor<1,dim>::child (const unsigned int i) const
 {
   TriaIterator<dim,DoFObjectAccessor<1,dim> > q (tria,
-						       present_level+1,
-						       child_index (i),
-						       dof_handler);
+						 present_level+1,
+						 child_index (i),
+						 dof_handler);
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
@@ -240,7 +240,7 @@ DoFObjectAccessor<2,dim>::vertex_dof_index (const unsigned int vertex,
 template <int dim>
 inline
 void
-DoFObjectAccessor<2,dim>::get_dof_indices (vector<unsigned int> &dof_indices) const
+DoFObjectAccessor<2,dim>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   Assert (dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
@@ -254,7 +254,7 @@ DoFObjectAccessor<2,dim>::get_dof_indices (vector<unsigned int> &dof_indices) co
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  vector<unsigned int>::iterator next = dof_indices.begin();
+  std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = vertex_dof_index(vertex,d);
@@ -289,9 +289,9 @@ TriaIterator<dim,DoFObjectAccessor<2,dim> >
 DoFObjectAccessor<2,dim>::child (const unsigned int i) const
 {
   TriaIterator<dim,DoFObjectAccessor<2,dim> > q (tria,
-						  present_level+1,
-						  child_index (i),
-						  dof_handler);
+						 present_level+1,
+						 child_index (i),
+						 dof_handler);
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
@@ -357,7 +357,7 @@ DoFObjectAccessor<3,dim>::vertex_dof_index (const unsigned int vertex,
 template <int dim>
 inline
 void
-DoFObjectAccessor<3,dim>::get_dof_indices (vector<unsigned int> &dof_indices) const
+DoFObjectAccessor<3,dim>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   Assert (dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
@@ -373,7 +373,7 @@ DoFObjectAccessor<3,dim>::get_dof_indices (vector<unsigned int> &dof_indices) co
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
-  vector<unsigned int>::iterator next = dof_indices.begin();
+  std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = vertex_dof_index(vertex,d);
@@ -427,9 +427,9 @@ TriaIterator<dim,DoFObjectAccessor<3,dim> >
 DoFObjectAccessor<3,dim>::child (const unsigned int i) const
 {
   TriaIterator<dim,DoFObjectAccessor<3,dim> > q (tria,
-						  present_level+1,
-						  child_index (i),
-						  dof_handler);
+						 present_level+1,
+						 child_index (i),
+						 dof_handler);
   
 #ifdef DEBUG
   if (q.state() != past_the_end)

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,7 +26,7 @@
 
   n_functions      := 5:
 
-  # note: support_points[i] is a vector which is indexed from
+  # note: support_points[i] is a std::vector which is indexed from
   # one and not from zero!
   support_points[0] := [0,0]:
   support_points[1] := [1,0]:
@@ -313,9 +313,9 @@
 
 template <>
 FECrissCross<1>::FECrissCross () :
-				   // set more or less invalid data
+						 // set more or less invalid data
 		FiniteElement<1> (FiniteElementData<1> (0,0,0,0),
-				  vector<bool>())
+				  std::vector<bool>())
 {
   Assert (false, ExcNotUseful());
 };
@@ -343,21 +343,21 @@ Tensor<2,1> FECrissCross<1>::shape_grad_grad (const unsigned int, const Point<1>
 
 
 template <>
-void FECrissCross<1>::get_unit_support_points (vector<Point<1> >&) const {
+void FECrissCross<1>::get_unit_support_points (std::vector<Point<1> >&) const {
   Assert (false, ExcNotUseful());
 };
 
 
 template <>
 void FECrissCross<1>::get_support_points (const DoFHandler<1>::cell_iterator &,
-					  vector<Point<1> > &) const {
+					  std::vector<Point<1> > &) const {
   Assert (false, ExcNotUseful());
 };
 
 
 template <>
 void FECrissCross<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
-					       vector<Point<1> > &) const {
+					       std::vector<Point<1> > &) const {
   Assert (false, ExcNotUseful());
 };
 
@@ -387,8 +387,8 @@ Tensor<1,1> FECrissCross<1>::shape_grad_transform (const unsigned int,
 
 template <>
 void FECrissCross<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
-					  const vector<Point<0> > &,
-					  vector<double>      &) const {
+					  const std::vector<Point<0> > &,
+					  std::vector<double>      &) const {
   Assert (false, ExcNotUseful());
 };
 
@@ -396,8 +396,8 @@ void FECrissCross<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 template <>
 void FECrissCross<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
 					     const unsigned int,
-					     const vector<Point<0> > &,
-					     vector<double>      &) const {
+					     const std::vector<Point<0> > &,
+					     std::vector<double>      &) const {
   Assert (false, ExcNotUseful());
 };
 
@@ -405,8 +405,8 @@ void FECrissCross<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator 
 template <>
 void FECrissCross<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					  const unsigned int,
-					  const vector<Point<0> > &,
-					  vector<Point<1> >       &) const {
+					  const std::vector<Point<0> > &,
+					  std::vector<Point<1> >       &) const {
   Assert (false, ExcNotUseful());
 };
 
@@ -415,25 +415,25 @@ template <>
 void FECrissCross<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					  const unsigned int,
 					  const unsigned int,
-					  const vector<Point<0> > &,
-					  vector<Point<1> >       &) const {
+					  const std::vector<Point<0> > &,
+					  std::vector<Point<1> >       &) const {
   Assert (false, ExcNotUseful());
 };
 
 
 template <>
 void FECrissCross<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &,
-				       const vector<Point<1> > &,
-				       vector<Tensor<2,1> >    &,
-				       const bool            ,
-				       vector<Tensor<3,1> > &,
-				       const bool            ,
-				       vector<Point<1> >    &,
-				       const bool            ,
-				       vector<Point<1> >    &,
-				       const bool            ,
-				       const FullMatrix<double>       &,
-				       const vector<vector<Tensor<1,1> > > &) const {
+				      const std::vector<Point<1> > &,
+				      std::vector<Tensor<2,1> >    &,
+				      const bool            ,
+				      std::vector<Tensor<3,1> > &,
+				      const bool            ,
+				      std::vector<Point<1> >    &,
+				      const bool            ,
+				      std::vector<Point<1> >    &,
+				      const bool            ,
+				      const FullMatrix<double>       &,
+				      const std::vector<std::vector<Tensor<1,1> > > &) const {
   Assert (false, ExcNotUseful());
 };
 
@@ -446,7 +446,7 @@ void FECrissCross<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &,
 template <>
 FECrissCross<2>::FECrissCross () :
 		FiniteElement<2> (FiniteElementData<2> (1,0,1,5,1),
-				  vector<bool> (1, false))
+				  std::vector<bool> (1, false))
 {
   interface_constraints(0,0) = 1./2.;
   interface_constraints(0,1) = 1./2.;
@@ -566,9 +566,9 @@ FECrissCross<2>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FECrissCross<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
+void FECrissCross<2>::get_unit_support_points (std::vector<Point<2> > &unit_points) const {
   Assert(unit_points.size()==dofs_per_cell,
-	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
+	 ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
 
   unit_points[0] = Point<2> (0,0);
   unit_points[1] = Point<2> (1,0);
@@ -580,7 +580,7 @@ void FECrissCross<2>::get_unit_support_points (vector<Point<2> > &unit_points) c
 
 template <>
 void FECrissCross<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
-					  vector<Point<2> > &support_points) const {
+					  std::vector<Point<2> > &support_points) const {
   const unsigned int dim = 2;
   
   Assert (support_points.size() == dofs_per_cell,
@@ -616,7 +616,7 @@ void FECrissCross<2>::get_support_points (const DoFHandler<2>::cell_iterator &ce
 
 template <>
 void FECrissCross<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
-					       vector<Point<2> > &support_points) const {
+					       std::vector<Point<2> > &support_points) const {
   const unsigned int dim = 2;
   
   Assert ((support_points.size() == dofs_per_face) &&
@@ -789,8 +789,8 @@ Tensor<1,2> FECrissCross<2>::shape_grad_transform (const unsigned int i,
 
 template <>
 void FECrissCross<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
-					  const vector<Point<1> > &unit_points,
-					  vector<double> &face_jacobians) const {
+					  const std::vector<Point<1> > &unit_points,
+					  std::vector<double> &face_jacobians) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == face_jacobians.size(),
@@ -810,8 +810,8 @@ void FECrissCross<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &fa
 template <>
 void FECrissCross<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &face,
 					     const unsigned int,
-					     const vector<Point<1> > &unit_points,
-					     vector<double> &face_jacobians) const {
+					     const std::vector<Point<1> > &unit_points,
+					     std::vector<double> &face_jacobians) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == face_jacobians.size(),
@@ -833,8 +833,8 @@ void FECrissCross<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator 
 template <>
 void FECrissCross<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 					  const unsigned int       face_no,
-					  const vector<Point<1> > &unit_points,
-					  vector<Point<2> > &normal_vectors) const {
+					  const std::vector<Point<1> > &unit_points,
+					  std::vector<Point<2> > &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == normal_vectors.size(),
@@ -864,8 +864,8 @@ template <>
 void FECrissCross<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 					  const unsigned int       face_no,
 					  const unsigned int,
-					  const vector<Point<1> > &unit_points,
-					  vector<Point<2> >       &normal_vectors) const {
+					  const std::vector<Point<1> > &unit_points,
+					  std::vector<Point<2> >       &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
 				   // note, that in 2D the normal vectors to the
@@ -898,17 +898,17 @@ void FECrissCross<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &ce
 
 template <int dim>
 void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-					const vector<Point<dim> >            &unit_points,
-					vector<Tensor<2,dim> >               &jacobians,
+					const std::vector<Point<dim> >            &unit_points,
+					std::vector<Tensor<2,dim> >               &jacobians,
 					const bool              compute_jacobians,
-					vector<Tensor<3,dim> > &jacobians_grad,
+					std::vector<Tensor<3,dim> > &jacobians_grad,
 					const bool              compute_jacobians_grad,
-					vector<Point<dim> >    &support_points,
+					std::vector<Point<dim> >    &support_points,
 					const bool compute_support_points,
-					vector<Point<dim> >    &q_points,
+					std::vector<Point<dim> >    &q_points,
 					const bool              compute_q_points,
 					const FullMatrix<double>         &shape_values_transform,
-					const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/) const {
+					const std::vector<std::vector<Tensor<1,dim> > > &/*shape_grad_transform*/) const {
   Assert (jacobians.size() == unit_points.size(),
 	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
 								  unit_points.size()));
@@ -950,7 +950,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 /* jacobi matrices: compute d(x)/d(xi) and invert this
    Let M(l) be the inverse of J at the quadrature point l, then
      M_{ij}(l) = sum_s p_i(s) d(N_s(l))/d(xi_j)
-   where p_i(s) is the i-th coordinate of the s-th vertex vector,
+   where p_i(s) is the i-th coordinate of the s-th vertex std::vector,
    N_s(l) is the value of the s-th shape function at the
    quadrature point l.
 
@@ -1127,9 +1127,9 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 
 template <>
 FECrissCross<3>::FECrissCross () :
-				   // set more or less invalid data
+						 // set more or less invalid data
 		FiniteElement<3> (FiniteElementData<3> (0,0,0,0,0,0),
-				  vector<bool>())
+				  std::vector<bool>())
 {
   Assert (false, ExcNotImplemented());
 };
@@ -1138,7 +1138,7 @@ FECrissCross<3>::FECrissCross () :
 template <>
 double
 FECrissCross<3>::shape_value (const unsigned int,
-		      const Point<3>    &) const
+			      const Point<3>    &) const
 {
   Assert (false, ExcNotImplemented());
   return 0;
@@ -1148,7 +1148,7 @@ FECrissCross<3>::shape_value (const unsigned int,
 template <>
 Tensor<1,3>
 FECrissCross<3>::shape_grad (const unsigned int,
-		     const Point<3>    &) const
+			     const Point<3>    &) const
 {
   Assert (false, ExcNotImplemented());
   return Tensor<1,3>();
@@ -1158,7 +1158,7 @@ FECrissCross<3>::shape_grad (const unsigned int,
 template <>
 Tensor<2,3>
 FECrissCross<3>::shape_grad_grad (const unsigned int,
-			  const Point<3>    &) const
+				  const Point<3>    &) const
 {
   Assert (false, ExcNotImplemented());
   return Tensor<2,3>();
@@ -1168,14 +1168,14 @@ FECrissCross<3>::shape_grad_grad (const unsigned int,
 template <>
 void
 FECrissCross<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
-				FullMatrix<double> &) const
+					FullMatrix<double> &) const
 {
   Assert (false, ExcNotImplemented());
 };
 
 
 template <>
-void FECrissCross<3>::get_unit_support_points (vector<Point<3> > &) const
+void FECrissCross<3>::get_unit_support_points (std::vector<Point<3> > &) const
 {
   Assert (false, ExcNotImplemented());
 };
@@ -1183,7 +1183,7 @@ void FECrissCross<3>::get_unit_support_points (vector<Point<3> > &) const
 
 template <>
 void FECrissCross<3>::get_support_points (const DoFHandler<3>::cell_iterator &,
-				  vector<Point<3> >  &) const
+					  std::vector<Point<3> >  &) const
 {
   Assert (false, ExcNotImplemented());
 };
@@ -1191,7 +1191,7 @@ void FECrissCross<3>::get_support_points (const DoFHandler<3>::cell_iterator &,
 
 template <>
 void FECrissCross<3>::get_face_support_points (const DoFHandler<3>::face_iterator &,
-				       vector<Point<3> >  &) const
+					       std::vector<Point<3> >  &) const
 {
   Assert (false, ExcNotImplemented());
 };
@@ -1199,8 +1199,8 @@ void FECrissCross<3>::get_face_support_points (const DoFHandler<3>::face_iterato
 
 template <>
 void FECrissCross<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &,
-					  const vector<Point<2> > &,
-					  vector<double>      &) const {
+					  const std::vector<Point<2> > &,
+					  std::vector<double>      &) const {
   Assert (false, ExcNotImplemented());
 };
 
@@ -1208,8 +1208,8 @@ void FECrissCross<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &,
 template <>
 void FECrissCross<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &,
 					     const unsigned int,
-					     const vector<Point<2> > &,
-					     vector<double>      &) const {
+					     const std::vector<Point<2> > &,
+					     std::vector<double>      &) const {
   Assert (false, ExcNotImplemented());
 };
 
@@ -1217,8 +1217,8 @@ void FECrissCross<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator 
 template <>
 void FECrissCross<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &,
 					  const unsigned int,
-					  const vector<Point<2> > &,
-					  vector<Point<3> >       &) const {
+					  const std::vector<Point<2> > &,
+					  std::vector<Point<3> >       &) const {
   Assert (false, ExcNotImplemented());
 };
 
@@ -1227,25 +1227,25 @@ template <>
 void FECrissCross<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &,
 					  const unsigned int,
 					  const unsigned int,
-					  const vector<Point<2> > &,
-					  vector<Point<3> >       &) const {
+					  const std::vector<Point<2> > &,
+					  std::vector<Point<3> >       &) const {
   Assert (false, ExcNotImplemented());
 };
 
 
 template <>
 void FECrissCross<3>::fill_fe_values (const DoFHandler<3>::cell_iterator &,
-				      const vector<Point<3> > &,
-				      vector<Tensor<2,3> >    &,
+				      const std::vector<Point<3> > &,
+				      std::vector<Tensor<2,3> >    &,
 				      const bool            ,
-				      vector<Tensor<3,3> > &,
+				      std::vector<Tensor<3,3> > &,
 				      const bool            ,
-				      vector<Point<3> >    &,
+				      std::vector<Point<3> >    &,
 				      const bool            ,
-				      vector<Point<3> >    &,
+				      std::vector<Point<3> >    &,
 				      const bool            ,
 				      const FullMatrix<double>       &,
-				      const vector<vector<Tensor<1,3> > > &) const {
+				      const std::vector<std::vector<Tensor<1,3> > > &) const {
   Assert (false, ExcNotImplemented());
 };
 

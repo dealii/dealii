@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -60,9 +60,9 @@ FESystem<dim>::build_cell_table()
 		   ++local_index)
 		{
 		  system_to_component_table[total_index++]
-		    = make_pair (comp_start+m,
-				 vertex_number*base_element(base).dofs_per_vertex
-				 +local_index);
+		    = std::make_pair (comp_start+m,
+				      vertex_number*base_element(base).dofs_per_vertex
+				      +local_index);
 		}
 	    }
 	  comp_start += element_multiplicity(base);
@@ -71,7 +71,7 @@ FESystem<dim>::build_cell_table()
   
 				   // 2. Lines
   for (unsigned int line_number= 0 ; ((line_number != GeometryInfo<dim>::lines_per_cell) &&
-				  (GeometryInfo<dim>::lines_per_cell > 0));
+				      (GeometryInfo<dim>::lines_per_cell > 0));
        ++line_number)
     {
       unsigned comp_start = 0;
@@ -85,7 +85,7 @@ FESystem<dim>::build_cell_table()
 		   ++local_index)
 		{
 		  system_to_component_table[total_index++]
-		    = pair<unsigned,unsigned>
+		    = std::pair<unsigned,unsigned>
 		    (comp_start+m,
 		     line_number*base_element(base).dofs_per_line
 		     +local_index+base_element(base).first_line_index);
@@ -112,9 +112,9 @@ FESystem<dim>::build_cell_table()
 		   ++local_index)
 		{
 		  system_to_component_table[total_index++]
-		    = make_pair (comp_start+m,
-				 quad_number*base_element(base).dofs_per_quad
-				 +local_index+base_element(base).first_quad_index);
+		    = std::make_pair (comp_start+m,
+				      quad_number*base_element(base).dofs_per_quad
+				      +local_index+base_element(base).first_quad_index);
 		}
 	    }
 	  comp_start += element_multiplicity(base);
@@ -138,9 +138,9 @@ FESystem<dim>::build_cell_table()
 		   ++local_index)
 		{
 		  system_to_component_table[total_index++]
-		    = make_pair (comp_start+m,
-				 hex_number*base_element(base).dofs_per_hex
-				 +local_index+base_element(base).first_hex_index);
+		    = std::make_pair (comp_start+m,
+				      hex_number*base_element(base).dofs_per_hex
+				      +local_index+base_element(base).first_hex_index);
 		}
 	    }
 	  comp_start += element_multiplicity(base);
@@ -191,7 +191,7 @@ FESystem<dim>::build_face_table()
 		   ++local_index)
 		{
 		  face_system_to_component_table[total_index++]
-		    = pair<unsigned,unsigned>
+		    = std::pair<unsigned,unsigned>
 		    (comp_start+m,
 		     vertex_number*base_element(base).dofs_per_vertex+local_index);
 		}
@@ -218,7 +218,7 @@ FESystem<dim>::build_face_table()
 		   ++local_index)
 		{
 		  face_system_to_component_table[total_index++]
-		    = pair<unsigned,unsigned>
+		    = std::pair<unsigned,unsigned>
 		    (comp_start+m,
 		     line_number*base_element(base).dofs_per_line
 		     +local_index+base_element(base).first_face_line_index);
@@ -246,7 +246,7 @@ FESystem<dim>::build_face_table()
 		   ++local_index)
 		{
 		  face_system_to_component_table[total_index++]
-		    = pair<unsigned,unsigned>
+		    = std::pair<unsigned,unsigned>
 		    (comp_start+m,
 		     quad_number*base_element(base).dofs_per_quad
 		     +local_index+base_element(base).first_face_quad_index);
@@ -298,10 +298,10 @@ void FESystem<dim>::build_interface_constraints ()
 					 //
 					 // first value in pair is component,
 					 // second is index
-	const pair<unsigned int, unsigned int> n_index
+	const std::pair<unsigned int, unsigned int> n_index
 	  = face_system_to_component_index (n);
 
-	pair<unsigned int, unsigned int> m_index;
+	std::pair<unsigned int, unsigned int> m_index;
 	switch (dim)
 	  {
 	    case 1:
@@ -350,12 +350,12 @@ void FESystem<dim>::build_interface_constraints ()
 				    (GeometryInfo<2>::vertices_per_cell * dofs_per_vertex
 				     + index_in_line).second
 				    - base_element (component_to_base_table[m_index.first]).first_line_index)
-						   // then add the number of dofs
-						   // per vertex to get the index
-						   // on the first line
+								    // then add the number of dofs
+								    // per vertex to get the index
+								    // on the first line
 				   + base_element(component_to_base_table[m_index.first]).dofs_per_vertex
-						   // if on the second line: add
-						   // some more
+								    // if on the second line: add
+								    // some more
 				   + base_element(component_to_base_table[m_index.first]).dofs_per_line * sub_line;
 		};
 	      break;
@@ -670,11 +670,11 @@ FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe1,
 
 
 template <int dim>
-vector<bool>
+std::vector<bool>
 FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
 						      const unsigned int n_elements) 
 {
-  vector<bool> tmp;
+  std::vector<bool> tmp;
   for (unsigned int i=0; i<n_elements; ++i)
     for (unsigned int component=0; component<fe.n_components(); ++component)
       tmp.push_back (fe.restriction_is_additive (component));
@@ -683,13 +683,13 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 
 
 template <int dim>
-vector<bool>
+std::vector<bool>
 FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
 						      const unsigned int        N1,
 						      const FiniteElement<dim> &fe2,
 						      const unsigned int        N2) 
 {
-  vector<bool> tmp;
+  std::vector<bool> tmp;
   for (unsigned int i=0; i<N1; ++i)
     for (unsigned int component=0; component<fe1.n_components(); ++component)
       tmp.push_back (fe1.restriction_is_additive (component));
@@ -701,7 +701,7 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 
 
 template <int dim>
-vector<bool>
+std::vector<bool>
 FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
 						      const unsigned int        N1,
 						      const FiniteElement<dim> &fe2,
@@ -709,7 +709,7 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 						      const FiniteElement<dim> &fe3,
 						      const unsigned int        N3) 
 {
-  vector<bool> tmp;
+  std::vector<bool> tmp;
   for (unsigned int i=0; i<N1; ++i)
     for (unsigned int component=0; component<fe1.n_components(); ++component)
       tmp.push_back (fe1.restriction_is_additive (component));
@@ -730,7 +730,7 @@ FESystem<dim>::shape_value (const unsigned int i,
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
-  pair<unsigned,unsigned> comp = system_to_component_index(i);
+  std::pair<unsigned,unsigned> comp = system_to_component_index(i);
   
   return base_element(component_to_base_table[comp.first])
     .shape_value(comp.second, p);
@@ -744,7 +744,7 @@ FESystem<dim>::shape_grad (const unsigned int  i,
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
-  pair<unsigned,unsigned> comp = system_to_component_index(i);
+  std::pair<unsigned,unsigned> comp = system_to_component_index(i);
   
   return base_element(component_to_base_table[comp.first])
     .shape_grad(comp.second, p);
@@ -755,11 +755,11 @@ template <int dim>
 Tensor<2,dim>
 FESystem<dim>::shape_grad_grad (const unsigned int  i,
 				const Point<dim>   &p) const
- {
+{
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
 
-  pair<unsigned,unsigned> comp = system_to_component_index(i);
+  std::pair<unsigned,unsigned> comp = system_to_component_index(i);
   
   return base_element(component_to_base_table[comp.first])
     .shape_grad_grad(comp.second, p);
@@ -768,14 +768,14 @@ FESystem<dim>::shape_grad_grad (const unsigned int  i,
 
 template <int dim>
 void FESystem<dim>::get_unit_support_points (
-  vector<Point<dim> > &unit_support_points) const
+  std::vector<Point<dim> > &unit_support_points) const
 {
   Assert(unit_support_points.size() == dofs_per_cell,
 	 typename FiniteElementBase<dim>::
 	 ExcWrongFieldDimension (unit_support_points.size(),
 				 dofs_per_cell));
 
-  vector<Point<dim> > base_unit_support_points (base_element(0).dofs_per_cell);
+  std::vector<Point<dim> > base_unit_support_points (base_element(0).dofs_per_cell);
   unsigned int component = 0;
   for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
     {
@@ -821,14 +821,14 @@ void FESystem<dim>::get_unit_support_points (
 
 template <int dim>
 void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-					vector<Point<dim> > &support_points) const
+					std::vector<Point<dim> > &support_points) const
 {
   Assert(support_points.size() == dofs_per_cell,
 	 typename FiniteElementBase<dim>::
 	 ExcWrongFieldDimension (support_points.size(),
 				 dofs_per_cell));
 
-  vector<Point<dim> > base_support_points (base_element(0).dofs_per_cell);
+  std::vector<Point<dim> > base_support_points (base_element(0).dofs_per_cell);
   unsigned int component = 0;
   for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
     {
@@ -852,14 +852,14 @@ void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &ce
 
 template <int dim>
 void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterator & face,
-					     vector<Point<dim> > & support_points) const
+					     std::vector<Point<dim> > & support_points) const
 {
   Assert (support_points.size() == dofs_per_face,
 	  typename FiniteElementBase<dim>::
 	  ExcWrongFieldDimension (support_points.size(),
 				  dofs_per_face));
 
-  vector<Point<dim> > base_support_points (base_element(0).dofs_per_face);
+  std::vector<Point<dim> > base_support_points (base_element(0).dofs_per_face);
   unsigned int comp = 0;
   for (unsigned int base=0 ; base<n_base_elements(); ++base)
     {
@@ -873,7 +873,7 @@ void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterato
 		= base_support_points[i];
 	    }
 	  
-	      ++comp;
+	  ++comp;
 	}
     }
 }
@@ -914,7 +914,7 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 	{
 	  for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<base_element_dofs_per_cell; ++j)
-					     // only fill diagonals of the blocks
+					       // only fill diagonals of the blocks
 	      local_mass_matrix (component_to_system_index(component,i),
 				 component_to_system_index(component,j))
 		= base_mass_matrix (i,j);
@@ -961,8 +961,8 @@ Tensor<1,dim> FESystem<dim>::shape_grad_transform (const unsigned int i,
 
 template <int dim>
 void FESystem<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-					const vector<Point<dim-1> > &unit_points,
-					vector<double>      &face_jacobi_determinants) const
+					const std::vector<Point<dim-1> > &unit_points,
+					std::vector<double>      &face_jacobi_determinants) const
 {
   base_elements[0].first->get_face_jacobians (face, unit_points,
 					      face_jacobi_determinants);
@@ -972,22 +972,22 @@ void FESystem<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &fa
 template <int dim>
 void FESystem<dim>::get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
 					   const unsigned int           subface_no,
-					   const vector<Point<dim-1> > &unit_points,
-					   vector<double>      &face_jacobi_determinants) const
+					   const std::vector<Point<dim-1> > &unit_points,
+					   std::vector<double>      &face_jacobi_determinants) const
 {
   base_elements[0].first->get_subface_jacobians (face, subface_no, unit_points,
-					   face_jacobi_determinants);
+						 face_jacobi_determinants);
 };
 
 
 template <int dim>
 void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 					const unsigned int          face_no,
-					const vector<Point<dim-1> > &unit_points,
-					vector<Point<dim> >         &normal_vectors) const
+					const std::vector<Point<dim-1> > &unit_points,
+					std::vector<Point<dim> >         &normal_vectors) const
 {
   base_elements[0].first->get_normal_vectors (cell, face_no, unit_points,
-					normal_vectors);
+					      normal_vectors);
 };
 
 
@@ -995,37 +995,37 @@ template <int dim>
 void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 					const unsigned int          face_no,
 					const unsigned int          subface_no,
-					const vector<Point<dim-1> > &unit_points,
-					vector<Point<dim> >         &normal_vectors) const
+					const std::vector<Point<dim-1> > &unit_points,
+					std::vector<Point<dim> >         &normal_vectors) const
 {
   base_elements[0].first->get_normal_vectors (cell, face_no, subface_no, unit_points,
-				    normal_vectors);
+					      normal_vectors);
 };
 
 
 template <int dim>
 void
 FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-			       const vector<Point<dim> >            &unit_points,
-			       vector<Tensor<2,dim> >               &jacobians,
+			       const std::vector<Point<dim> >            &unit_points,
+			       std::vector<Tensor<2,dim> >               &jacobians,
 			       const bool              compute_jacobians,
-			       vector<Tensor<3,dim> > &jacobians_grad,
+			       std::vector<Tensor<3,dim> > &jacobians_grad,
 			       const bool              compute_jacobians_grad,
-			       vector<Point<dim> > &support_points,
+			       std::vector<Point<dim> > &support_points,
 			       const bool           compute_support_points,
-			       vector<Point<dim> > &q_points,
+			       std::vector<Point<dim> > &q_points,
 			       const bool           compute_q_points,
 			       const FullMatrix<double>  &shape_values_transform,
-			       const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const
+			       const std::vector<std::vector<Tensor<1,dim> > > &shape_grad_transform) const
 {
 				   // if we are to compute the support
 				   // points, then we need to get them
 				   // from each base element. the
 				   // following variable is used as
 				   // temporary
-  vector<Point<dim> > supp(compute_support_points ?
-			   base_elements[0].first->dofs_per_cell :
-			   0);
+  std::vector<Point<dim> > supp(compute_support_points ?
+				base_elements[0].first->dofs_per_cell :
+				0);
 
   base_elements[0].first->fill_fe_values (cell, unit_points, jacobians, compute_jacobians,
 					  jacobians_grad, compute_jacobians_grad,

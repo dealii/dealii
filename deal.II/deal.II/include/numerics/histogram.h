@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -109,10 +109,10 @@ class Histogram
 				      * on this.
 				      */
     template <typename number>
-    void evaluate (const vector<Vector<number> > &values,
-		   const vector<double>          &y_values,
-		   const unsigned int             n_intervals,
-		   const IntervalSpacing          interval_spacing = linear);
+    void evaluate (const std::vector<Vector<number> > &values,
+		   const std::vector<double>          &y_values,
+		   const unsigned int                  n_intervals,
+		   const IntervalSpacing               interval_spacing = linear);
 
 				     /**
 				      * This function is only a wrapper
@@ -131,14 +131,14 @@ class Histogram
 				      * the GNUPLOT program. The function
 				      * generates 2d or 3d histograms.
 				      */
-    void write_gnuplot (ostream &out) const;
+    void write_gnuplot (std::ostream &out) const;
 
 				     /**
 				      * Return allowed names for the interval
 				      * spacing as string. At present this
 				      * is "linear|logarithmic".
 				      */
-    static string get_interval_spacing_names ();
+    static std::string get_interval_spacing_names ();
 
 				     /**
 				      * Get a string containing one of the
@@ -147,7 +147,7 @@ class Histogram
 				      * @p{IntervalSpacing}. Throw an error
 				      * if the string is no valid one.
 				      */
-    static IntervalSpacing parse_interval_spacing (const string &name);
+    static IntervalSpacing parse_interval_spacing (const std::string &name);
     
     				     /**
 				      * Determine an estimate for the
@@ -179,7 +179,7 @@ class Histogram
 				      * Exception.
 				      */
     DeclException1 (ExcInvalidName,
-		    string,
+		    std::string,
 		    << "The given name <" << arg1
 		    << "> does not match any of the known formats.");
     
@@ -248,14 +248,14 @@ class Histogram
 				      * for each data set given to the
 				      * @p{evaluate} function.
 				      */
-    vector<vector<Interval> > intervals;
+    std::vector<std::vector<Interval> > intervals;
 
 				     /**
 				      * Values for the depth axis of 3d
 				      * histograms. Stored in the @p{evaluate}
 				      * function.
 				      */
-    vector<double>            y_values;
+    std::vector<double>            y_values;
 };
 
 

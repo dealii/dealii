@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -414,8 +414,8 @@ class VectorTools
     static void interpolate_boundary_values (const DoFHandler<dim>    &dof,
 					     const unsigned char       boundary_component,
 					     const Function<dim>      &boundary_function,
-					     map<unsigned int,double> &boundary_values,
-					     const vector<bool>       &component_mask = vector<bool>());
+					     std::map<unsigned int,double> &boundary_values,
+					     const std::vector<bool>       &component_mask = std::vector<bool>());
 
 //TODO: Update project_boundary_values for more components
 //TODO: Replace FunctionMap
@@ -440,9 +440,9 @@ class VectorTools
 				      */
     template <int dim>
     static void project_boundary_values (const DoFHandler<dim>    &dof,
-					 const map<unsigned char,const Function<dim>*> &boundary_function,
+					 const std::map<unsigned char,const Function<dim>*> &boundary_function,
 					 const Quadrature<dim-1>  &q,
-					 map<unsigned int,double> &boundary_values);
+					 std::map<unsigned int,double> &boundary_values);
     
     				     /**
 				      * Compute the error of the finite element solution.
@@ -525,8 +525,8 @@ class VectorTools
 				      * be computed and later
 				      * subtracted.
 				      */
-    static void subtract_mean_value(Vector<double>     &v,
-				    const vector<bool> &p_select);
+    static void subtract_mean_value(Vector<double>          &v,
+				    const std::vector<bool> &p_select);
     
 				     /**
 				      * Compute the mean value of one

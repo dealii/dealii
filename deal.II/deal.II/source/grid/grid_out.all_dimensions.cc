@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -79,7 +79,7 @@ void GridOut::set_flags (const EpsFlags<3> &flags)
 };
 
 
-string GridOut::default_suffix (const OutputFormat output_format) 
+std::string GridOut::default_suffix (const OutputFormat output_format) 
 {
   switch (output_format) 
     {
@@ -100,7 +100,7 @@ string GridOut::default_suffix (const OutputFormat output_format)
 
 
 GridOut::OutputFormat
-GridOut::parse_output_format (const string &format_name)
+GridOut::parse_output_format (const std::string &format_name)
 {
   if (format_name == "ucd")
     return ucd;
@@ -117,7 +117,7 @@ GridOut::parse_output_format (const string &format_name)
 };
 
 
-string GridOut::get_output_format_names () 
+std::string GridOut::get_output_format_names () 
 {
   return "gnuplot|eps";
 };

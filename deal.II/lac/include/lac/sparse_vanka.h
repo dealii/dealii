@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,7 +14,6 @@
 #define __deal2__sparse_vanka_h
 
 
-/* Copyright Guido Kanschat, Wolfgang Bangerth 1999, 2000 */
 
 
 #include <base/smartpointer.h>
@@ -186,7 +185,7 @@ class SparseVanka
 				      * @p{multithread_info.n_default_threads}.
 				      */
     SparseVanka(const SparseMatrix<number> &M,
-		const vector<bool>         &selected,
+		const std::vector<bool>    &selected,
 		const bool                  conserve_memory = false,
 		const unsigned int          n_threads       = multithread_info.n_default_threads);
     
@@ -261,9 +260,9 @@ class SparseVanka
 				      * with a null pointer
 				      */
     template<typename number2>
-    void apply_preconditioner (Vector<number2>       &dst,
-			       const Vector<number2> &src,
-			       const vector<bool>    *dof_mask = 0) const;    
+    void apply_preconditioner (Vector<number2>         &dst,
+			       const Vector<number2>   &src,
+			       const std::vector<bool> *dof_mask = 0) const;    
 
 				     /**
 				      * Determine an estimate for the
@@ -287,7 +286,7 @@ class SparseVanka
 				      * Indices of those degrees of
 				      * freedom that we shall work on.
 				      */
-    const vector<bool> &selected;
+    const std::vector<bool> &selected;
 
 				     /**
 				      * Number of threads to be used
@@ -303,7 +302,7 @@ class SparseVanka
 				      * Only those elements will be used
 				      * that are tagged in @p{selected}.
 				      */
-    mutable vector<SmartPointer<FullMatrix<float> > > inverses;
+    mutable std::vector<SmartPointer<FullMatrix<float> > > inverses;
 
 				     /**
 				      * Compute the inverses of all
@@ -339,8 +338,8 @@ class SparseVanka
 				      * the case where this function
 				      * re-creates it each time.
 				      */
-    void compute_inverse (const unsigned int    row,
-			  vector<unsigned int> &local_indices);
+    void compute_inverse (const unsigned int         row,
+			  std::vector<unsigned int> &local_indices);
 
 };
 
@@ -513,7 +512,7 @@ class SparseBlockVanka : public SparseVanka<number>
 				      * @p{n_blocks} to the base class.
 				      */
     SparseBlockVanka (const SparseMatrix<number> &M,
-		      const vector<bool>         &selected,
+		      const std::vector<bool>    &selected,
 		      const unsigned int          n_blocks,
 		      const BlockingStrategy      blocking_strategy,
 		      const bool                  conserve_memory = false,
@@ -553,7 +552,7 @@ class SparseBlockVanka : public SparseVanka<number>
 				      * recomputing each time the
 				      * preconditioner is called.
 				      */
-    vector<vector<bool> > dof_masks;
+    std::vector<std::vector<bool> > dof_masks;
 
 				     /**
 				      * Compute the contents of the
@@ -562,7 +561,7 @@ class SparseBlockVanka : public SparseVanka<number>
 				      * constructor.
 				      */
     void compute_dof_masks (const SparseMatrix<number> &M,
-			    const vector<bool>         &selected,
+			    const std::vector<bool>    &selected,
 			    const BlockingStrategy      blocking_strategy);
 };
 

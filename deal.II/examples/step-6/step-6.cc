@@ -145,9 +145,9 @@ class Coefficient : public Function<dim>
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
     
-    virtual void value_list (const vector<Point<dim> > &points,
-			     vector<double>            &values,
-			     const unsigned int         component = 0) const;
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<double>            &values,
+			     const unsigned int              component = 0) const;
 };
 
 
@@ -165,9 +165,9 @@ double Coefficient<dim>::value (const Point<dim> &p,
 
 
 template <int dim>
-void Coefficient<dim>::value_list (const vector<Point<dim> > &points,
-				   vector<double>            &values,
-				   const unsigned int component) const 
+void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+				   std::vector<double>            &values,
+				   const unsigned int              component) const 
 {
   const unsigned int n_points = points.size();
 
@@ -465,9 +465,9 @@ void LaplaceProblem<dim>::assemble_system ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  vector<double>       coefficient_values (n_q_points);
+  std::vector<double>       coefficient_values (n_q_points);
 
 				   // We can now go on with assembling
 				   // the matrix and right hand
@@ -493,11 +493,11 @@ void LaplaceProblem<dim>::assemble_system ()
       fe_values.reinit (cell);
       const FullMatrix<double> 
 	& shape_values = fe_values.get_shape_values();
-      const vector<vector<Tensor<1,dim> > >
+      const std::vector<std::vector<Tensor<1,dim> > >
 	& shape_grads  = fe_values.get_shape_grads();
-      const vector<double>
+      const std::vector<double>
 	& JxW_values   = fe_values.get_JxW_values();
-      const vector<Point<dim> >
+      const std::vector<Point<dim> >
 	& q_points     = fe_values.get_quadrature_points();
 
       coefficient.value_list (q_points, coefficient_values);
@@ -564,7 +564,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // from the system of equations
 				   // happens *after* the elimination
 				   // of hanging nodes.
-  map<unsigned int,double> boundary_values;
+  std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(),
@@ -817,12 +817,12 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // this will only work if the cycle
 				   // number is less than ten, which
 				   // we check by an assertion.
-  string filename = "grid-";
+  std::string filename = "grid-";
   filename += ('0' + cycle);
   Assert (cycle < 10, ExcInternalError());
   
   filename += ".eps";
-  ofstream output (filename.c_str());
+  std::ofstream output (filename.c_str());
 
 				   // Using this filename, we write
 				   // each grid as a postscript file.
@@ -837,7 +837,7 @@ void LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<8; ++cycle)
     {
-      cout << "Cycle " << cycle << ':' << endl;
+      std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	{
@@ -889,15 +889,15 @@ void LaplaceProblem<dim>::run ()
 	};
       
 
-      cout << "   Number of active cells:       "
-	   << triangulation.n_active_cells()
-	   << endl;
+      std::cout << "   Number of active cells:       "
+		<< triangulation.n_active_cells()
+		<< std::endl;
 
       setup_system ();
 
-      cout << "   Number of degrees of freedom: "
-	   << dof_handler.n_dofs()
-	   << endl;
+      std::cout << "   Number of degrees of freedom: "
+		<< dof_handler.n_dofs()
+		<< std::endl;
       
       assemble_system ();
       solve ();
@@ -922,7 +922,7 @@ void LaplaceProblem<dim>::run ()
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
   
-  ofstream output ("final-solution.eps");
+  std::ofstream output ("final-solution.eps");
   data_out.write_eps (output);
 };
 
@@ -1007,16 +1007,16 @@ int main ()
 				   // other information. This is also
 				   // what would be printed in the
 				   // following.
-  catch (exception &exc)
+  catch (std::exception &exc)
     {
-      cerr << endl << endl
-	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Exception on processing: " << endl
-	   << exc.what() << endl
-	   << "Aborting!" << endl
-	   << "----------------------------------------------------"
-	   << endl;
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
 				       // We can't do much more than
 				       // printing as much information
 				       // as we can get to, so abort
@@ -1032,13 +1032,13 @@ int main ()
 				   // message and exit.
   catch (...) 
     {
-      cerr << endl << endl
-	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Unknown exception!" << endl
-	   << "Aborting!" << endl
-	   << "----------------------------------------------------"
-	   << endl;
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
       return 1;
     };
 

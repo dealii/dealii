@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,8 @@
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>
-class Vector {
+class Vector
+{
   public:
 				     /**
 				      * Declare standard types used in all
@@ -418,9 +419,10 @@ class Vector {
 				      * Print to a stream.
 				      * 
 				      */
-    void print (ostream &, unsigned int precision = 3,
-		bool scientific = true,
-		bool across = true) const;
+    void print (std::ostream       &out,
+		const unsigned int  precision = 3,
+		const bool          scientific = true,
+		const bool          across = true) const;
 
 				     /**
 				      * Write the vector en bloc to a file. This
@@ -430,7 +432,7 @@ class Vector {
 				      * a different operating system of number
 				      * format.
 				      */
-    void block_write (ostream &out) const;
+    void block_write (std::ostream &out) const;
 
 				     /**
 				      * Read a vector en block from a file. This
@@ -447,7 +449,7 @@ class Vector {
 				      * data as a vector stored bitwise to a
 				      * file, but not more.
 				      */
-    void block_read (istream &in);
+    void block_read (std::istream &in);
 
 				     /**
 				      * Determine an estimate for the

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -246,11 +246,11 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
-		    const int           level,
-		    const int           index,
-		    const AccessorData *local_data) :
+		       const int           level,
+		       const int           index,
+		       const AccessorData *local_data) :
 		    DoFAccessor<dim> (local_data),
-		    DoFObjectAccessor_Inheritance<celldim,dim>::BaseClass (tria,level,index) {};
+      DoFObjectAccessor_Inheritance<celldim,dim>::BaseClass (tria,level,index) {};
     
 				     /**
 				      * Index of the @p{i}th degree
@@ -291,7 +291,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * right size before being passed
 				      * to this function.
 				      */
-    void get_dof_indices (vector<unsigned int> &dof_indices) const;
+    void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the values of the given vector
@@ -504,7 +504,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 		       const int           index,
 		       const AccessorData *local_data) :
 		    DoFAccessor<dim> (local_data),
-		    DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,level,index) {};
+      DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,level,index) {};
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -543,7 +543,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
 				      */
-    void get_dof_indices (vector<unsigned int> &dof_indices) const;
+    void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the values of the given vector
@@ -688,11 +688,11 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
-		     const int           level,
-		     const int           index,
-		     const AccessorData *local_data) :
+		       const int           level,
+		       const int           index,
+		       const AccessorData *local_data) :
 		    DoFAccessor<dim> (local_data),
-		    DoFObjectAccessor_Inheritance<2,dim>::BaseClass (tria,level,index) {};
+      DoFObjectAccessor_Inheritance<2,dim>::BaseClass (tria,level,index) {};
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -732,7 +732,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
 				      */
-    void get_dof_indices (vector<unsigned int> &dof_indices) const;
+    void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the values of the given vector
@@ -885,11 +885,11 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
-		    const int           level,
-		    const int           index,
-		    const AccessorData *local_data) :
+		       const int           level,
+		       const int           index,
+		       const AccessorData *local_data) :
 		    DoFAccessor<dim> (local_data),
-		    DoFObjectAccessor_Inheritance<3,dim>::BaseClass (tria,level,index) {};
+      DoFObjectAccessor_Inheritance<3,dim>::BaseClass (tria,level,index) {};
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -929,7 +929,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
 				      */
-    void get_dof_indices (vector<unsigned int> &dof_indices) const;
+    void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the values of the given vector
@@ -1090,7 +1090,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 		     const int           level,
 		     const int           index,
 		     const AccessorData *local_data) :
-		     DoFObjectAccessor<dim, dim> (tria,level,index,local_data) {};
+		    DoFObjectAccessor<dim, dim> (tria,level,index,local_data) {};
 
 				     /**
 				      * Return the @p{i}th neighbor as a DoF cell

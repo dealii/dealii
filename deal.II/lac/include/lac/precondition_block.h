@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -267,7 +267,7 @@ class PreconditionBlock
 				      * memory in comparison with
 				      * @p{inverse_type=double}.
 				      */
-    vector<FullMatrix<inverse_type> > var_inverse;
+    std::vector<FullMatrix<inverse_type> > var_inverse;
 
 				     /**
 				      * Storage of the original diagonal blocks.
@@ -276,7 +276,7 @@ class PreconditionBlock
 				      *
 				      * Used by the blocked SSOR method.
 				      */
-    vector<FullMatrix<inverse_type> > var_diagonal;
+    std::vector<FullMatrix<inverse_type> > var_diagonal;
 				      
 				     /**
 				      * Flag for diagonal compression.

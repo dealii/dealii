@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -139,8 +139,8 @@ class ConstraintMatrix : public Subscriptor
 				      * preceeding function more
 				      * several times, but is faster.
 				      */
-    void add_entries (const unsigned int                        line,
-		      const vector<pair<unsigned int,double> > &col_val_pairs);
+    void add_entries (const unsigned int                                  line,
+		      const std::vector<std::pair<unsigned int,double> > &col_val_pairs);
 
 				     /**
 				      * Close the filling of entries. Since the
@@ -384,7 +384,7 @@ class ConstraintMatrix : public Subscriptor
 				      * not stored in this object and are not
 				      * printed.
 				      */
-    void print (ostream &) const;
+    void print (std::ostream &) const;
 
 				     /**
 				      * Determine an estimate for the
@@ -459,7 +459,7 @@ class ConstraintMatrix : public Subscriptor
 					  * thereof, the same applies as what is
 					  * said for @ref{ConstraintMatrix}@p{::lines}.
 					  */
-	vector<pair<unsigned int,double> > entries;
+	std::vector<std::pair<unsigned int,double> > entries;
 
 					 /**
 					  * This operator is a bit
@@ -503,7 +503,7 @@ class ConstraintMatrix : public Subscriptor
 				      * additionally make usage of this matrix
 				      * much slower.
 				      */
-    vector<ConstraintLine> lines;
+    std::vector<ConstraintLine> lines;
 	
 				     /**
 				      * Store whether the arrays are sorted.

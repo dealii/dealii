@@ -182,9 +182,9 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // of terminal cells. By terminal
 				   // we mean the cells on the finest
 				   // grid.
-  cout << "Number of active cells: "
-       << triangulation.n_active_cells()
-       << endl;
+  std::cout << "Number of active cells: "
+	    << triangulation.n_active_cells()
+	    << std::endl;
 				   // We stress the adjective
 				   // `terminal' or `active', since
 				   // there are more cells, namely the
@@ -198,9 +198,9 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // i.e. 256, then 64, 16, 4, and
 				   // 1. We can get the total number
 				   // of cells like this:
-  cout << "Total number of cells: "
-       << triangulation.n_cells()
-       << endl;
+  std::cout << "Total number of cells: "
+	    << triangulation.n_cells()
+	    << std::endl;
 				   // Note the distinction between
 				   // n_active_cells() and n_cells().
   
@@ -218,9 +218,9 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // Now that we have the degrees of
 				   // freedom, we can take a look at
 				   // how many there are:
-  cout << "Number of degrees of freedom: "
-       << dof_handler.n_dofs()
-       << endl;
+  std::cout << "Number of degrees of freedom: "
+	    << dof_handler.n_dofs()
+	    << std::endl;
 				   // There should be one DoF for each
 				   // vertex. Since we have a 32 times
 				   // 32 grid, the number of DoFs
@@ -431,7 +431,7 @@ void LaplaceProblem::assemble_system ()
 				   // them, we need a scratch
 				   // (temporary) array for these
 				   // numbers:
-  vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // Now for the loop over all
 				   // cells. You have seen before how
@@ -649,7 +649,7 @@ void LaplaceProblem::assemble_system ()
 				   // mapping of DoF numbers to
 				   // boundary values is done by the
 				   // `map' class.
-  map<unsigned int,double> boundary_values;
+  std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<2>(),
@@ -799,7 +799,7 @@ void LaplaceProblem::output_results () const
 				   // are other functions which write
 				   // their data in postscript, AVS,
 				   // GMV, or some other format):
-  ofstream output ("solution.gpl");
+  std::ofstream output ("solution.gpl");
   data_out.write_gnuplot (output);
 };
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,7 +58,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 				   // initial direction at the end
 				   // again
   const double pi = 3.14159265358979323846;
-  vector<Point<dim+1> > angle_directions (n_patches_per_circle+1);
+  std::vector<Point<dim+1> > angle_directions (n_patches_per_circle+1);
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
       angle_directions[i][0] = cos(2*pi*i/n_patches_per_circle);
@@ -67,7 +67,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
   
   
   unsigned int cell_number = 0;
-  typename vector<DataOutBase::Patch<dim+1> >::iterator patch = patches.begin();
+  typename std::vector<DataOutBase::Patch<dim+1> >::iterator patch = patches.begin();
   typename DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
@@ -328,7 +328,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 				   // clear the patches array
   if (true)
     {
-      vector<DataOutBase::Patch<dim+1> > dummy;
+      std::vector<DataOutBase::Patch<dim+1> > dummy;
       patches.swap (dummy);
     };
   
@@ -347,7 +347,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 				   // rotation
   n_patches *= n_patches_per_circle;
 
-  vector<Data> thread_data(n_threads);
+  std::vector<Data> thread_data(n_threads);
 
 				   // init data for the threads
   for (unsigned int i=0;i<n_threads;++i)

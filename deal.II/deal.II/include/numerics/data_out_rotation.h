@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -177,8 +177,8 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 	unsigned int n_datasets;
 	unsigned int n_patches_per_circle;
 	unsigned int n_subdivisions;
-	vector<double>          patch_values;
-	vector<Vector<double> > patch_values_system;
+	std::vector<double>          patch_values;
+	std::vector<Vector<double> > patch_values_system;
 	Data ()
 	  {}
     };

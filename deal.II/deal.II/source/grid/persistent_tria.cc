@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,9 +32,9 @@ PersistentTriangulation (const PersistentTriangulation<dim> &old_tria) :
 						 // tria, i.e. it will be
 						 // empty on first use
 		Triangulation<dim> (),
-		coarse_grid (old_tria.coarse_grid),
-		refine_flags (old_tria.refine_flags),
-		coarsen_flags (old_tria.coarsen_flags)
+  coarse_grid (old_tria.coarse_grid),
+  refine_flags (old_tria.refine_flags),
+  coarsen_flags (old_tria.coarsen_flags)
 {
   Assert (old_tria.n_levels() == 0, ExcTriaNotEmpty ());
 };
@@ -50,8 +50,8 @@ void
 PersistentTriangulation<dim>::execute_coarsening_and_refinement () 
 {
 				   // first save flags
-  refine_flags.push_back (vector<bool>());
-  coarsen_flags.push_back (vector<bool>());
+  refine_flags.push_back (std::vector<bool>());
+  coarsen_flags.push_back (std::vector<bool>());
   save_refine_flags (refine_flags.back());
   save_coarsen_flags (coarsen_flags.back());
 
@@ -95,9 +95,9 @@ PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_
 
 template <int dim>
 void
-PersistentTriangulation<dim>::create_triangulation (const vector<Point<dim> >    &,
-						    const vector<CellData<dim> > &,
-						    const SubCellData            &)
+PersistentTriangulation<dim>::create_triangulation (const std::vector<Point<dim> >    &,
+						    const std::vector<CellData<dim> > &,
+						    const SubCellData                 &)
 {
   Assert (false, ExcFunctionNotUseful());
 };
@@ -105,13 +105,13 @@ PersistentTriangulation<dim>::create_triangulation (const vector<Point<dim> >   
 
 template <int dim>
 void
-PersistentTriangulation<dim>::write_flags(ostream &out) const
+PersistentTriangulation<dim>::write_flags(std::ostream &out) const
 {
   const unsigned int n_flag_levels=refine_flags.size();
   
   AssertThrow (out, ExcIO());
 
-  out << mn_persistent_tria_flags_begin << ' ' << n_flag_levels << endl;
+  out << mn_persistent_tria_flags_begin << ' ' << n_flag_levels << std::endl;
 
   for (unsigned int i=0; i<n_flag_levels; ++i)
     {
@@ -121,7 +121,7 @@ PersistentTriangulation<dim>::write_flags(ostream &out) const
 			 mn_tria_coarsen_flags_end, out);
     }
   
-  out << mn_persistent_tria_flags_end << endl;
+  out << mn_persistent_tria_flags_end << std::endl;
 
   AssertThrow (out, ExcIO());
 }
@@ -129,7 +129,7 @@ PersistentTriangulation<dim>::write_flags(ostream &out) const
 
 template <int dim>
 void
-PersistentTriangulation<dim>::read_flags(istream &in)
+PersistentTriangulation<dim>::read_flags(std::istream &in)
 {
   Assert(refine_flags.size()==0 && coarsen_flags.size()==0,
 	 ExcTriaNotEmpty());
@@ -145,8 +145,8 @@ PersistentTriangulation<dim>::read_flags(istream &in)
   in >> n_flag_levels;
   for (unsigned int i=0; i<n_flag_levels; ++i)
     {
-      refine_flags.push_back (vector<bool>());
-      coarsen_flags.push_back (vector<bool>());
+      refine_flags.push_back (std::vector<bool>());
+      coarsen_flags.push_back (std::vector<bool>());
       read_bool_vector (mn_tria_refine_flags_begin, refine_flags.back(),
 			mn_tria_refine_flags_end, in);
       read_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags.back(),

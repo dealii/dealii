@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,7 @@ void DataOutFaces<dim>::build_some_patches (Data data)
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   unsigned int face_number = 0;
-  typename vector<DataOutBase::Patch<dim-1,dim> >::iterator patch = patches.begin();
+  typename std::vector<DataOutBase::Patch<dim-1,dim> >::iterator patch = patches.begin();
   FaceDescriptor face=first_face();
 
 				   // get first face in this thread
@@ -149,7 +149,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
 				   // clear the patches array
   if (true)
     {
-      vector<DataOutBase::Patch<dim-1,dim> > dummy;
+      std::vector<DataOutBase::Patch<dim-1,dim> > dummy;
       patches.swap (dummy);
     };
   
@@ -162,7 +162,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
        face = next_face(face))
     ++n_patches;
 
-  vector<Data> thread_data(n_threads);
+  std::vector<Data> thread_data(n_threads);
 
 				   // init data for the threads
   for (unsigned int i=0;i<n_threads;++i)

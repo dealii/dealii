@@ -69,7 +69,7 @@
  *  This declares an exception class named @p{ExcDomain}, which
  *  has two variables as additional information (named
  *  @p{arg1} and @p{arg2} by default) and which outputs the
- *  given sequence (which is appended to an @p{ostream}
+ *  given sequence (which is appended to an @p{std::ostream}
  *  variable's name, thus the weird syntax). There are
  *  other @p{DeclExceptionN} macros for exception classes
  *  with more or no parameters. It is proposed to let start
@@ -136,7 +136,7 @@
  *  In @p{__IssueError} the given data
  *  is transferred into the @p{exc} object by calling the
  *  @p{SetFields} function; after that, the general error info
- *  is printed onto @p{cerr} using the @p{PrintError} function of
+ *  is printed onto @p{std::cerr} using the @p{PrintError} function of
  *  @p{exc} and finally the exception specific data is printed
  *  using the user defined function @p{PrintError} (which is
  *  normally created using the @p{DeclException (...)} macro
@@ -175,9 +175,9 @@
  *      do_something ();
  *    }
  *    catch (exception &e) {
- *      cerr << "Exception occured:" << endl
+ *      std::cerr << "Exception occured:" << std::endl
  *           << e.what ()
- *           << endl;
+ *           << std::endl;
  *      do_something_to_reciver ();
  *    };
  *  @end{verbatim}
@@ -243,8 +243,8 @@
  *    public:
  *      name (const type1 a1, const type2 a2) :
  *                     arg1 (a1), arg2(a2) {};
- *      virtual void PrintInfo (ostream &out) const {
- *        out outsequence << endl;
+ *      virtual void PrintInfo (std::ostream &out) const {
+ *        out outsequence << std::endl;
  *      };
  *    private:
  *      type1 arg1;
@@ -278,7 +278,7 @@
  *
  *  @author Wolfgang Bangerth, November 1997, extensions 1998
  */
-class ExceptionBase : public exception
+class ExceptionBase : public std::exception
 {
   public:
 				     /**
@@ -311,14 +311,14 @@ class ExceptionBase : public exception
 				      *  Print out the general part of the error
 				      *  information.
 				      */
-    void PrintExcData (ostream &out) const;
+    void PrintExcData (std::ostream &out) const;
 
 				     /**
 				      *  Print more specific information about the
 				      *  exception which occured. Overload this
 				      *  function in your own exception classes.
 				      */
-    virtual void PrintInfo (ostream &out) const;
+    virtual void PrintInfo (std::ostream &out) const;
 
 
 				     /**
@@ -381,14 +381,14 @@ void __IssueError_Assert (const char *file,
 {
 				   // Fill the fields of the exception object
   e.SetFields (file, line, function, cond, exc_name);
-  cerr << "--------------------------------------------------------"
-       << endl;
+  std::cerr << "--------------------------------------------------------"
+	    << std::endl;
 				   // print out general data
-  e.PrintExcData (cerr);
+  e.PrintExcData (std::cerr);
 				   // print out exception specific data
-  e.PrintInfo (cerr);
-  cerr << "--------------------------------------------------------"
-       << endl;
+  e.PrintInfo (std::cerr);
+  std::cerr << "--------------------------------------------------------"
+	    << std::endl;
   
   abort ();
 };
@@ -505,8 +505,8 @@ class Exception0 :  public ExceptionBase {}
 class Exception1 : public ExceptionBase {                             \
   public:                                                             \
       Exception1 (const type1 a1) : arg1 (a1) {};                     \
-      virtual void PrintInfo (ostream &out) const {                   \
-        out outsequence << endl;                                      \
+      virtual void PrintInfo (std::ostream &out) const {              \
+        out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \
       const type1 arg1;                                               \
@@ -525,8 +525,8 @@ class Exception2 : public ExceptionBase {                             \
   public:                                                             \
       Exception2 (const type1 a1, const type2 a2) :                   \
 	      arg1 (a1), arg2(a2) {};                                 \
-      virtual void PrintInfo (ostream &out) const {                   \
-        out outsequence << endl;                                      \
+      virtual void PrintInfo (std::ostream &out) const {              \
+        out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \
       const type1 arg1;                                               \
@@ -546,8 +546,8 @@ class Exception3 : public ExceptionBase {                             \
   public:                                                             \
       Exception3 (const type1 a1, const type2 a2, const type3 a3) :   \
 	      arg1 (a1), arg2(a2), arg3(a3) {};                       \
-      virtual void PrintInfo (ostream &out) const {                   \
-        out outsequence << endl;                                      \
+      virtual void PrintInfo (std::ostream &out) const {              \
+        out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \
       const type1 arg1;                                               \
@@ -569,8 +569,8 @@ class Exception4 : public ExceptionBase {                             \
       Exception4 (const type1 a1, const type2 a2,                     \
 	    const type3 a3, const type4 a4) :                         \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {};             \
-      virtual void PrintInfo (ostream &out) const {                   \
-        out outsequence << endl;                                      \
+      virtual void PrintInfo (std::ostream &out) const {              \
+        out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \
       const type1 arg1;                                               \
@@ -593,8 +593,8 @@ class Exception5 : public ExceptionBase {                             \
       Exception5 (const type1 a1, const type2 a2, const type3 a3,     \
 	    const type4 a4, const type5 a5) :                         \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {};   \
-      virtual void PrintInfo (ostream &out) const {                   \
-        out outsequence << endl;                                      \
+      virtual void PrintInfo (std::ostream &out) const {              \
+        out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \
       const type1 arg1;                                               \

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,7 +34,7 @@ void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<dim> &dof,
 	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
 
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+  std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 				   endc = dof.end(level);
   for (; cell!=endc; ++cell) 
@@ -64,8 +64,8 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
 
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
-  vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
+  std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+  std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
   MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 				   endc = dof.end(level);
   for (; cell!=endc; ++cell)
@@ -125,8 +125,8 @@ MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
 	  ExcDimensionMismatch (sparsity.n_cols(), fine_dofs));
 
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
-  vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
+  std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+  std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
   MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 				   endc = dof.end(level);
   for (; cell!=endc; ++cell)
@@ -187,16 +187,16 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 	  ExcDimensionMismatch (flux_mask.n(), n_comp));
   
   const unsigned int total_dofs = dof.get_fe().dofs_per_cell;
-  vector<unsigned int> dofs_on_this_cell(total_dofs);
-  vector<unsigned int> dofs_on_other_cell(total_dofs);
+  std::vector<unsigned int> dofs_on_this_cell(total_dofs);
+  std::vector<unsigned int> dofs_on_other_cell(total_dofs);
   MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 				   endc = dof.end(level);
 
 
-  vector<vector<bool> > int_dof_mask(total_dofs,
-				 vector<bool>(total_dofs, false));
-  vector<vector<bool> > flux_dof_mask(total_dofs,
-				 vector<bool>(total_dofs, false));
+  std::vector<std::vector<bool> > int_dof_mask(total_dofs,
+				 std::vector<bool>(total_dofs, false));
+  std::vector<std::vector<bool> > flux_dof_mask(total_dofs,
+				 std::vector<bool>(total_dofs, false));
   for (unsigned int i=0; i<total_dofs; ++i)
     for (unsigned int j=0; j<total_dofs; ++j)
       {

@@ -231,8 +231,8 @@ class AdvectionField : public TensorFunction<1,dim>
   public:
     virtual Tensor<1,dim> value (const Point<dim> &p) const;
     
-    virtual void value_list (const vector<Point<dim> > &points,
-			     vector<Tensor<1,dim> >    &values) const;
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<Tensor<1,dim> >    &values) const;
 
 				     // In previous examples, we have
 				     // used assertions that throw
@@ -243,7 +243,7 @@ class AdvectionField : public TensorFunction<1,dim>
 				     // follows:
     DeclException2 (ExcDimensionMismatch,
 		    unsigned int, unsigned int,
-		    << "The vector has size " << arg1 << " but should have "
+		    << "The std::vector has size " << arg1 << " but should have "
 		    << arg2 << " elements.");
 				     // The syntax may look a little
 				     // strange, but is
@@ -266,7 +266,7 @@ class AdvectionField : public TensorFunction<1,dim>
 				     // types of the parameters. The
 				     // last argument is a sequence of
 				     // output directives that will be
-				     // piped into the ``cerr''
+				     // piped into the ``std::cerr''
 				     // object, thus the strange
 				     // format with the leading ``<<''
 				     // operator and the like. Note
@@ -332,8 +332,8 @@ AdvectionField<dim>::value (const Point<dim> &p) const
 
 template <int dim>
 void
-AdvectionField<dim>::value_list (const vector<Point<dim> > &points,
-				 vector<Tensor<1,dim> >    &values) const 
+AdvectionField<dim>::value_list (const std::vector<Point<dim> > &points,
+				 std::vector<Tensor<1,dim> >    &values) const 
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch (values.size(), points.size()));
@@ -372,9 +372,9 @@ class RightHandSide : public Function<dim>
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
     
-    virtual void value_list (const vector<Point<dim> > &points,
-			     vector<double>            &values,
-			     const unsigned int         component = 0) const;
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<double>            &values,
+			     const unsigned int              component = 0) const;
     
   private:
     static const Point<dim> center_point;
@@ -428,9 +428,9 @@ RightHandSide<dim>::value (const Point<dim>   &p,
 
 template <int dim>
 void
-RightHandSide<dim>::value_list (const vector<Point<dim> > &points,
-				vector<double>            &values,
-				const unsigned int         component) const 
+RightHandSide<dim>::value_list (const std::vector<Point<dim> > &points,
+				std::vector<double>            &values,
+				const unsigned int              component) const 
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch (values.size(), points.size()));
@@ -452,9 +452,9 @@ class BoundaryValues : public Function<dim>
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
     
-    virtual void value_list (const vector<Point<dim> > &points,
-			     vector<double>            &values,
-			     const unsigned int         component = 0) const;
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<double>            &values,
+			     const unsigned int              component = 0) const;
 };
 
 
@@ -475,9 +475,9 @@ BoundaryValues<dim>::value (const Point<dim>   &p,
 
 template <int dim>
 void
-BoundaryValues<dim>::value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values,
-				 const unsigned int         component) const 
+BoundaryValues<dim>::value_list (const std::vector<Point<dim> > &points,
+				 std::vector<double>            &values,
+				 const unsigned int              component) const 
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch (values.size(), points.size()));
@@ -603,7 +603,7 @@ class GradientEstimation
     DeclException0 (ExcInsufficientDirections);
 
   private:
-    typedef pair<unsigned int,unsigned int> IndexInterval;
+    typedef std::pair<unsigned int,unsigned int> IndexInterval;
 
     template <int dim>
     static void estimate_interval (const DoFHandler<dim> &dof,
@@ -768,7 +768,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // only for a range of cell
 				   // iterators, but for iterators in
 				   // general, so you could use for
-				   // ``vector<T>::iterator'' or usual
+				   // ``std::vector<T>::iterator'' or usual
 				   // pointers as well.
 				   //
 				   // The function returns a vector of
@@ -800,7 +800,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // first typedef this data type to
 				   // an alias.
   typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
-  vector<pair<active_cell_iterator,active_cell_iterator> >
+  std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
     thread_ranges 
     = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
 						  dof_handler.end (),
@@ -964,7 +964,7 @@ assemble_system_interval (const DoFHandler<dim>::active_cell_iterator &begin,
 				   // indices of the degrees of
 				   // freedom of the cell on which we
 				   // are presently working...
-  vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // ... and array in which the
 				   // values of right hand side,
@@ -972,10 +972,10 @@ assemble_system_interval (const DoFHandler<dim>::active_cell_iterator &begin,
 				   // boundary values will be stored,
 				   // for cell and face integrals
 				   // respectively:
-  vector<double>         rhs_values (n_q_points);
-  vector<Tensor<1,dim> > advection_directions (n_q_points);
-  vector<double>         face_boundary_values (n_face_q_points);
-  vector<Tensor<1,dim> > face_advection_directions (n_face_q_points);
+  std::vector<double>         rhs_values (n_q_points);
+  std::vector<Tensor<1,dim> > advection_directions (n_q_points);
+  std::vector<double>         face_boundary_values (n_face_q_points);
+  std::vector<Tensor<1,dim> > face_advection_directions (n_face_q_points);
 
 				   // Then we start the main loop over
 				   // the cells:
@@ -994,11 +994,11 @@ assemble_system_interval (const DoFHandler<dim>::active_cell_iterator &begin,
       fe_values.reinit (cell);
       const FullMatrix<double> 
 	& shape_values = fe_values.get_shape_values();
-      const vector<vector<Tensor<1,dim> > >
+      const std::vector<std::vector<Tensor<1,dim> > >
 	& shape_grads  = fe_values.get_shape_grads();
-      const vector<double>
+      const std::vector<double>
 	& JxW_values   = fe_values.get_JxW_values();
-      const vector<Point<dim> >
+      const std::vector<Point<dim> >
 	& q_points     = fe_values.get_quadrature_points();
 
 				       // ... obtain the values of
@@ -1092,11 +1092,11 @@ assemble_system_interval (const DoFHandler<dim>::active_cell_iterator &begin,
 	    
 	    const FullMatrix<double> 
 	      & face_shape_values = fe_face_values.get_shape_values();
-	    const vector<double>
+	    const std::vector<double>
 	      & face_JxW_values   = fe_face_values.get_JxW_values();
-	    const vector<Point<dim> >
+	    const std::vector<Point<dim> >
 	      & face_q_points     = fe_face_values.get_quadrature_points();
-	    const vector<Point<dim> >
+	    const std::vector<Point<dim> >
 	      & normal_vectors    = fe_face_values.get_normal_vectors();
 	    
 					     // For the quadrature
@@ -1345,12 +1345,12 @@ void AdvectionProblem<dim>::refine_grid ()
 template <int dim>
 void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
 {
-  string filename = "grid-";
+  std::string filename = "grid-";
   filename += ('0' + cycle);
   Assert (cycle < 10, ExcInternalError());
   
   filename += ".eps";
-  ofstream output (filename.c_str());
+  std::ofstream output (filename.c_str());
 
   GridOut grid_out;
   grid_out.write_eps (triangulation, output);
@@ -1364,7 +1364,7 @@ void AdvectionProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
-      cout << "Cycle " << cycle << ':' << endl;
+      std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	{
@@ -1377,15 +1377,15 @@ void AdvectionProblem<dim>::run ()
 	};
       
 
-      cout << "   Number of active cells:       "
-	   << triangulation.n_active_cells()
-	   << endl;
+      std::cout << "   Number of active cells:       "
+		<< triangulation.n_active_cells()
+		<< std::endl;
 
       setup_system ();
 
-      cout << "   Number of degrees of freedom: "
-	   << dof_handler.n_dofs()
-	   << endl;
+      std::cout << "   Number of degrees of freedom: "
+		<< dof_handler.n_dofs()
+		<< std::endl;
       
       assemble_system ();
       solve ();
@@ -1397,7 +1397,7 @@ void AdvectionProblem<dim>::run ()
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
   
-  ofstream output ("final-solution.gmv");
+  std::ofstream output ("final-solution.gmv");
   data_out.write_gmv (output);
 };
 
@@ -1445,7 +1445,7 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 				   // larger interval. This is used
 				   // here:
   const unsigned int n_threads = multithread_info.n_default_threads;
-  vector<IndexInterval> index_intervals
+  std::vector<IndexInterval> index_intervals
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
 			       n_threads);
 
@@ -1598,7 +1598,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				   // later reallocations. Note how
 				   // this maximal number of active
 				   // neighbors is computed here.
-  vector<typename DoFHandler<dim>::active_cell_iterator> active_neighbors;
+  std::vector<typename DoFHandler<dim>::active_cell_iterator> active_neighbors;
   active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
 			    GeometryInfo<dim>::subfaces_per_face);
 
@@ -1863,14 +1863,14 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       // in real space.
       const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
 
-      vector<double> this_midpoint_value(1);
+      std::vector<double> this_midpoint_value(1);
       fe_midpoint_value.get_function_values (solution, this_midpoint_value);
 		
 
 				       // Now loop over all active
 				       // neighbors and collect the
 				       // data we need.
-      typename vector<DoFHandler<dim>::active_cell_iterator>::const_iterator
+      typename std::vector<DoFHandler<dim>::active_cell_iterator>::const_iterator
 	neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
 	{
@@ -1893,7 +1893,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 	  fe_midpoint_value.reinit (neighbor);
 	  const Point<dim> neighbor_center = fe_midpoint_value.quadrature_point(0);
 
-	  vector<double> neighbor_midpoint_value(1);
+	  std::vector<double> neighbor_midpoint_value(1);
 	  fe_midpoint_value.get_function_values (solution, this_midpoint_value);
 
 					   // Compute the vector ``y''
@@ -2014,27 +2014,27 @@ int main ()
       AdvectionProblem<2> advection_problem_2d;
       advection_problem_2d.run ();
     }
-  catch (exception &exc)
+  catch (std::exception &exc)
     {
-      cerr << endl << endl
-	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Exception on processing: " << endl
-	   << exc.what() << endl
-	   << "Aborting!" << endl
-	   << "----------------------------------------------------"
-	   << endl;
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
       return 1;
     }
   catch (...) 
     {
-      cerr << endl << endl
-	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Unknown exception!" << endl
-	   << "Aborting!" << endl
-	   << "----------------------------------------------------"
-	   << endl;
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
       return 1;
     };
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -120,14 +120,14 @@ struct SubCellData
 				      * a line on the boundary and its boundary
 				      * indicator.
 				      */
-    vector<CellData<1> > boundary_lines;
+    std::vector<CellData<1> > boundary_lines;
 
 				     /**
 				      * Each record of this vector describes
 				      * a quad on the boundary and its boundary
 				      * indicator.
 				      */
-    vector<CellData<2> > boundary_quads;
+    std::vector<CellData<2> > boundary_quads;
 
 				     /**
 				      * This function checks whether the vectors
@@ -379,7 +379,7 @@ struct TriaNumberCache<1>
 				      * Array holding the number of used
 				      * lines on each level.
 				      */
-    vector<unsigned int> n_lines_level;
+    std::vector<unsigned int> n_lines_level;
     
 				     /**
 				      * Number of active lines in the
@@ -391,7 +391,7 @@ struct TriaNumberCache<1>
 				      * Array holding the number of active
 				      * lines on each level.
 				      */
-    vector<unsigned int> n_active_lines_level;
+    std::vector<unsigned int> n_active_lines_level;
 
 				     /**
 				      * Constructor. Set values to zero
@@ -439,7 +439,7 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
 				      * Array holding the number of used
 				      * quads on each level.
 				      */
-    vector<unsigned int> n_quads_level;
+    std::vector<unsigned int> n_quads_level;
     
 				     /**
 				      * Number of active quads in the
@@ -451,7 +451,7 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
 				      * Array holding the number of active
 				      * quads on each level.
 				      */
-    vector<unsigned int> n_active_quads_level;
+    std::vector<unsigned int> n_active_quads_level;
 
 				     /**
 				      * Constructor. Set values to zero
@@ -499,7 +499,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
 				      * Array holding the number of used
 				      * hexes on each level.
 				      */
-    vector<unsigned int> n_hexes_level;
+    std::vector<unsigned int> n_hexes_level;
     
 				     /**
 				      * Number of active hexes in the
@@ -511,7 +511,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
 				      * Array holding the number of active
 				      * hexes on each level.
 				      */
-    vector<unsigned int> n_active_hexes_level;
+    std::vector<unsigned int> n_active_hexes_level;
 
 				     /**
 				      * Constructor. Set values to zero
@@ -1818,9 +1818,9 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * and the @ref{GridIn} and
 				      * @ref{GridReordering} class.
 				      */
-    virtual void create_triangulation (const vector<Point<dim> >    &vertices,
-				       const vector<CellData<dim> > &cells,
-				       const SubCellData            &subcelldata);
+    virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
+				       const std::vector<CellData<dim> > &cells,
+				       const SubCellData                 &subcelldata);
 
 				     /**
 				      * Distort the grid by randomly
@@ -1974,46 +1974,46 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  usage, read the general
 				      *  documentation for this class.
 				      */
-    void save_refine_flags (ostream &out) const;
+    void save_refine_flags (std::ostream &out) const;
 
 				     /**
 				      * Same as above, but store the flags to
 				      * a bitvector rather than to a file.
 				      */
-    void save_refine_flags (vector<bool> &v) const;
+    void save_refine_flags (std::vector<bool> &v) const;
 
 				     /**
 				      *  Read the information stored by
 				      *  @p{save_refine_flags}.
 				      */
-    void load_refine_flags (istream &in);
+    void load_refine_flags (std::istream &in);
 
     				     /**
 				      *  Read the information stored by
 				      *  @p{save_refine_flags}.
 				      */
-    void load_refine_flags (const vector<bool> &v);
+    void load_refine_flags (const std::vector<bool> &v);
 
 				     /**
 				      * Analogue to @p{save_refine_flags}.
 				      */
-    void save_coarsen_flags (ostream &out) const;
+    void save_coarsen_flags (std::ostream &out) const;
 
 				     /**
 				      * Same as above, but store the flags to
 				      * a bitvector rather than to a file.
 				      */
-    void save_coarsen_flags (vector<bool> &v) const;
+    void save_coarsen_flags (std::vector<bool> &v) const;
 
     				     /**
 				      * Analogue to @p{load_refine_flags}.
 				      */
-    void load_coarsen_flags (istream &out);
+    void load_coarsen_flags (std::istream &out);
 
 				     /**
 				      * Analogue to @p{load_refine_flags}.
 				      */
-    void load_coarsen_flags (const vector<bool> &v);
+    void load_coarsen_flags (const std::vector<bool> &v);
 
     				     /*@}*/
 
@@ -2039,7 +2039,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  @p{save_refine_flags} for more
 				      *  details.
 				      */
-    void save_user_flags (ostream &out) const;
+    void save_user_flags (std::ostream &out) const;
 
 				     /**
 				      * Same as above, but store the flags to
@@ -2047,24 +2047,24 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * The output vector is resized if
 				      * necessary.
 				      */
-    void save_user_flags (vector<bool> &v) const;
+    void save_user_flags (std::vector<bool> &v) const;
 
 				     /**
 				      *  Read the information stored by
 				      *  @p{save_user_flags}.
 				      */
-    void load_user_flags (istream &in);
+    void load_user_flags (std::istream &in);
 
     				     /**
 				      *  Read the information stored by
 				      *  @p{save_user_flags}.
 				      */
-    void load_user_flags (const vector<bool> &v);
+    void load_user_flags (const std::vector<bool> &v);
 
 				     /**
 				      * Save the user flags on lines.
 				      */
-    void save_user_flags_line (ostream &out) const;
+    void save_user_flags_line (std::ostream &out) const;
 
 				     /**
 				      * Same as above, but store the flags to
@@ -2072,22 +2072,22 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * The output vector is resized if
 				      * necessary.
 				      */
-    void save_user_flags_line (vector<bool> &v) const;
+    void save_user_flags_line (std::vector<bool> &v) const;
 
 				     /**
 				      * Load the user flags located on lines.
 				      */
-    void load_user_flags_line (istream &in);
+    void load_user_flags_line (std::istream &in);
 
     				     /**
 				      * Load the user flags located on lines.
 				      */
-    void load_user_flags_line (const vector<bool> &v);
+    void load_user_flags_line (const std::vector<bool> &v);
 
     				     /**
 				      * Save the user flags on quads.
 				      */
-    void save_user_flags_quad (ostream &out) const;
+    void save_user_flags_quad (std::ostream &out) const;
 
 				     /**
 				      * Same as above, but store the flags to
@@ -2095,22 +2095,22 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * The output vector is resized if
 				      * necessary.
 				      */
-    void save_user_flags_quad (vector<bool> &v) const;
+    void save_user_flags_quad (std::vector<bool> &v) const;
 
 				     /**
 				      * Load the user flags located on quads.
 				      */
-    void load_user_flags_quad (istream &in);
+    void load_user_flags_quad (std::istream &in);
 
 				     /**
 				      * Load the user flags located on quads.
 				      */
-    void load_user_flags_quad (const vector<bool> &v);
+    void load_user_flags_quad (const std::vector<bool> &v);
 
 				     /**
 				      * Save the user flags on hexs.
 				      */
-    void save_user_flags_hex (ostream &out) const;
+    void save_user_flags_hex (std::ostream &out) const;
 
 				     /**
 				      * Same as above, but store the flags to
@@ -2118,17 +2118,17 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * The output vector is resized if
 				      * necessary.
 				      */
-    void save_user_flags_hex (vector<bool> &v) const;
+    void save_user_flags_hex (std::vector<bool> &v) const;
 
 				     /**
 				      * Load the user flags located on hexs.
 				      */
-    void load_user_flags_hex (istream &in);
+    void load_user_flags_hex (std::istream &in);
 
 				     /**
 				      * Load the user flags located on hexs.
 				      */
-    void load_user_flags_hex (const vector<bool> &v);
+    void load_user_flags_hex (const std::vector<bool> &v);
 				     /*@}*/
 
 				     /* ------------------------------------ */
@@ -3002,20 +3002,20 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  as well. The format should therefore be
 				      *  interplatform compatible.
 				      */
-    static void write_bool_vector (const unsigned int  magic_number1,
-				   const vector<bool> &v,
-				   const unsigned int  magic_number2,
-				   ostream            &out);
+    static void write_bool_vector (const unsigned int       magic_number1,
+				   const std::vector<bool> &v,
+				   const unsigned int       magic_number2,
+				   std::ostream            &out);
 
 				     /**
 				      * Re-read a vector of bools previously
 				      * written by @p{write_bool_vector} and
 				      * compare with the magic numbers.
 				      */
-    static void read_bool_vector (const unsigned int  magic_number1,
-				  vector<bool>       &v,
-				  const unsigned int  magic_number2,
-				  istream            &in);
+    static void read_bool_vector (const unsigned int       magic_number1,
+				  std::vector<bool>       &v,
+				  const unsigned int       magic_number2,
+				  std::istream            &in);
 
   private:
 				     /**
@@ -3109,19 +3109,19 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *
 				      *  Usage is like @p{levels[3]->quads}.
 				      */
-    vector<TriangulationLevel<dim>*> levels;
+    std::vector<TriangulationLevel<dim>*> levels;
 
 				     /**
 				      *  Array of the vertices of this
 				      *  triangulation.
 				      */
-    vector<Point<dim> >              vertices;
+    std::vector<Point<dim> >              vertices;
 
 				     /**
 				      *  Array storing a bit-pattern which
 				      *  vertices are used.
 				      */
-    vector<bool>                     vertices_used;
+    std::vector<bool>                     vertices_used;
 
 				     /**
 				      *  Collection of boundary

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -361,7 +361,7 @@ class BlockSparsityPattern : public Subscriptor
 				     /**
 				      * Array of sparsity patterns.
 				      */
-    vector<vector<SmartPointer<SparsityPattern> > > sub_objects;
+    std::vector<std::vector<SmartPointer<SparsityPattern> > > sub_objects;
 
 				     /**
 				      * Object storing and managing
@@ -441,7 +441,7 @@ BlockSparsityPattern::add (const unsigned int i,
 				   // if you get an error here, are
 				   // you sure you called
 				   // @p{collect_sizes()} before?
-  const pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
     col_index = column_indices.global_to_local (j);
   sub_objects[row_index.first][col_index.first]->add (row_index.second,

@@ -140,8 +140,8 @@ class RightHandSide :  public Function<dim>
 				     // returns the values of the
 				     // vector-valued function at
 				     // several points at once:
-    virtual void vector_value_list (const vector<Point<dim> > &points,
-				    vector<Vector<double> >   &value_list) const;
+    virtual void vector_value_list (const std::vector<Point<dim> > &points,
+				    std::vector<Vector<double> >   &value_list) const;
 };
 
 
@@ -236,8 +236,8 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
 				 // the values at several points at
 				 // once.
 template <int dim>
-void RightHandSide<dim>::vector_value_list (const vector<Point<dim> > &points,
-					    vector<Vector<double> >   &value_list) const 
+void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+					    std::vector<Vector<double> >   &value_list) const 
 {
 				   // First we define an abbreviation
 				   // for the number of points which
@@ -460,7 +460,7 @@ void ElasticProblem<dim>::assemble_system ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // As was shown in previous
 				   // examples as well, we need a
@@ -469,8 +469,8 @@ void ElasticProblem<dim>::assemble_system ()
 				   // quadrature points on a cell. In
 				   // the present situation, we have
 				   // two coefficients, lambda and mu.
-  vector<double>     lambda_values (n_q_points);
-  vector<double>     mu_values (n_q_points);
+  std::vector<double>     lambda_values (n_q_points);
+  std::vector<double>     mu_values (n_q_points);
 
 				   // Well, we could as well have
 				   // omitted the above two arrays
@@ -499,8 +499,8 @@ void ElasticProblem<dim>::assemble_system ()
 				   // which is a ``Vector<double>''
 				   // with ``dim'' elements.
   RightHandSide<dim>      right_hand_side;
-  vector<Vector<double> > rhs_values (n_q_points,
-				      Vector<double>(dim));
+  std::vector<Vector<double> > rhs_values (n_q_points,
+					   Vector<double>(dim));
 
 
 				   // Now we can begin with the loop
@@ -521,11 +521,11 @@ void ElasticProblem<dim>::assemble_system ()
 				       // offers:
       const FullMatrix<double> 
 	& shape_values = fe_values.get_shape_values();
-      const vector<vector<Tensor<1,dim> > >
+      const std::vector<std::vector<Tensor<1,dim> > >
 	& shape_grads  = fe_values.get_shape_grads();
-      const vector<double>
+      const std::vector<double>
 	& JxW_values   = fe_values.get_JxW_values();
-      const vector<Point<dim> >
+      const std::vector<Point<dim> >
 	& q_points     = fe_values.get_quadrature_points();
       
 				       // Next we get the values of
@@ -562,7 +562,7 @@ void ElasticProblem<dim>::assemble_system ()
 					   // that there is more in
 					   // it. In fact, the
 					   // function returns a
-					   // ``pair<unsigned int,
+					   // ``std::pair<unsigned int,
 					   // unsigned int>'', of
 					   // which the first element
 					   // is ``comp(i)'' and the
@@ -730,7 +730,7 @@ void ElasticProblem<dim>::assemble_system ()
 				   // we need to pass ``dim'' as
 				   // number of components to the zero
 				   // function as well.
-  map<unsigned int,double> boundary_values;
+  std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(dim),
@@ -813,20 +813,20 @@ void ElasticProblem<dim>::refine_grid ()
 				 // been shown in previous examples
 				 // already. The only difference is
 				 // not that the solution function is
-				 // vector values. The ``DataOut''
+				 // std::vector values. The ``DataOut''
 				 // class takes care of this
 				 // automatically, but we have to give
 				 // each component of the solution
-				 // vector a different name.
+				 // std::vector a different name.
 template <int dim>
 void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 {
-  string filename = "solution-";
+  std::string filename = "solution-";
   filename += ('0' + cycle);
   Assert (cycle < 10, ExcInternalError());
   
   filename += ".gmv";
-  ofstream output (filename.c_str());
+  std::ofstream output (filename.c_str());
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
@@ -859,7 +859,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 				   // library will throw an exception
 				   // otherwise, at least if in debug
 				   // mode.
-  vector<string> solution_names;
+  std::vector<std::string> solution_names;
   switch (dim)
     {
       case 1:
@@ -925,7 +925,7 @@ void ElasticProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<8; ++cycle)
     {
-      cout << "Cycle " << cycle << ':' << endl;
+      std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	{
@@ -1039,15 +1039,15 @@ void ElasticProblem<dim>::run ()
       else
 	refine_grid ();
 
-      cout << "   Number of active cells:       "
-	   << triangulation.n_active_cells()
-	   << endl;
+      std::cout << "   Number of active cells:       "
+		<< triangulation.n_active_cells()
+		<< std::endl;
 
       setup_system ();
 
-      cout << "   Number of degrees of freedom: "
-	   << dof_handler.n_dofs()
-	   << endl;
+      std::cout << "   Number of degrees of freedom: "
+		<< dof_handler.n_dofs()
+		<< std::endl;
       
       assemble_system ();
       solve ();
@@ -1068,28 +1068,28 @@ int main ()
       ElasticProblem<2> elastic_problem_2d;
       elastic_problem_2d.run ();
     }
-  catch (exception &exc)
+  catch (std::exception &exc)
     {
-      cerr << endl << endl
-	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Exception on processing: " << endl
-	   << exc.what() << endl
-	   << "Aborting!" << endl
-	   << "----------------------------------------------------"
-	   << endl;
-
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      
       return 1;
     }
   catch (...) 
     {
-      cerr << endl << endl
-	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Unknown exception!" << endl
-	   << "Aborting!" << endl
-	   << "----------------------------------------------------"
-	   << endl;
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
       return 1;
     };
 

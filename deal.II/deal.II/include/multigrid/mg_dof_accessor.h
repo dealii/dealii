@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -288,7 +288,7 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 				      * indices refer to the local numbering
 				      * for the level this line lives on.
 				      */
-    void get_mg_dof_indices (vector<unsigned int> &dof_indices) const;
+    void get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the value of the given vector
@@ -357,9 +357,9 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     MGDoFObjectAccessor (Triangulation<dim> *tria,
-		       const int           level,
-		       const int           index,
-		       const AccessorData *local_data);
+			 const int           level,
+			 const int           index,
+			 const AccessorData *local_data);
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -405,7 +405,7 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				      * indices refer to the local numbering
 				      * for the level this quad lives on.
 				      */
-    void get_mg_dof_indices (vector<unsigned int> &dof_indices) const;
+    void get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const;
  
     				     /**
 				      * Return the value of the given vector
@@ -482,9 +482,9 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     MGDoFObjectAccessor (Triangulation<dim> *tria,
-		      const int           level,
-		      const int           index,
-		      const AccessorData *local_data);
+			 const int           level,
+			 const int           index,
+			 const AccessorData *local_data);
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -530,7 +530,7 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 				      * indices refer to the local numbering
 				      * for the level this hex lives on.
 				      */
-    void get_mg_dof_indices (vector<unsigned int> &dof_indices) const;
+    void get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the value of the given vector

@@ -179,7 +179,7 @@ namespace Threads
 
 
 
-  vector<pair<unsigned int,unsigned int> >
+  std::vector<std::pair<unsigned int,unsigned int> >
   split_interval (const unsigned int begin,
 		  const unsigned int end,
 		  const unsigned int n_intervals)
@@ -190,7 +190,7 @@ namespace Threads
     const unsigned int n_elements_per_interval = n_elements / n_intervals;
     const unsigned int residual                = n_elements % n_intervals;
     
-    vector<pair<unsigned int,unsigned int> > return_values (n_intervals);
+    std::vector<std::pair<unsigned int,unsigned int> > return_values (n_intervals);
 
     return_values[0].first = begin;
     for (unsigned int i=0; i<n_intervals; ++i)

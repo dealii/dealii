@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,7 @@ void GridIn<dim>::attach_triangulation (Triangulation<dim> &t)
 
 
 template <int dim>
-void GridIn<dim>::read_ucd (istream &in)
+void GridIn<dim>::read_ucd (std::istream &in)
 {
   Assert (tria != 0, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
@@ -55,11 +55,11 @@ void GridIn<dim>::read_ucd (istream &in)
      >> dummy;        // model data
 
 				   // set up array of vertices
-  vector<Point<dim> >     vertices (n_vertices);
+  std::vector<Point<dim> >     vertices (n_vertices);
 				   // set up mapping between numbering
 				   // in ucd-file (key) and in the
 				   // vertices vector
-  map<int,int> vertex_indices;
+  std::map<int,int> vertex_indices;
   
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
     {
@@ -80,12 +80,12 @@ void GridIn<dim>::read_ucd (istream &in)
     };
 
 				   // set up array of cells
-  vector<CellData<dim> > cells;
-  SubCellData            subcelldata;
+  std::vector<CellData<dim> > cells;
+  SubCellData                 subcelldata;
 
   for (unsigned int cell=0; cell<n_cells; ++cell) 
     {
-      string cell_type;
+      std::string cell_type;
       int material_id;
       
       in >> dummy          // cell number
@@ -193,7 +193,7 @@ void GridIn<dim>::read_ucd (istream &in)
 
 
 template <int dim>
-void GridIn<dim>::read_dbmesh (istream &in)
+void GridIn<dim>::read_dbmesh (std::istream &in)
 {
   Assert (tria != 0, ExcNoTriangulationSelected());
   Assert (dim==2, ExcNotImplemented());
@@ -205,7 +205,7 @@ void GridIn<dim>::read_dbmesh (istream &in)
 
 
 				   // first read in identifier string
-  string line;
+  std::string line;
   getline (in, line);
 
   AssertThrow (line=="MeshVersionFormatted 0",
@@ -232,7 +232,7 @@ void GridIn<dim>::read_dbmesh (istream &in)
 				   // knowledge to parse and interpret
 				   // the other fields in between as
 				   // well...
-  while (getline(in,line), line.find("# END")==string::npos);
+  while (getline(in,line), line.find("# END")==std::string::npos);
   skip_empty_lines (in);
 
 
@@ -244,7 +244,7 @@ void GridIn<dim>::read_dbmesh (istream &in)
   double dummy;
   
   in >> n_vertices;
-  vector<Point<dim> >     vertices (n_vertices);
+  std::vector<Point<dim> >     vertices (n_vertices);
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
     {
 				       // read vertex coordinates
@@ -303,7 +303,7 @@ void GridIn<dim>::read_dbmesh (istream &in)
   getline (in, line);
   AssertThrow (line=="Quadrilaterals", ExcInvalidDBMESHInput(line));
 
-  vector<CellData<dim> > cells;
+  std::vector<CellData<dim> > cells;
   SubCellData            subcelldata;
   unsigned int n_cells;
   in >> n_cells;
@@ -337,7 +337,7 @@ void GridIn<dim>::read_dbmesh (istream &in)
 				   // clue what they mean. skip them
 				   // all and leave the interpretation
 				   // to other implementors...
-  while (getline(in,line), ((line.find("End")==string::npos) && (in)));
+  while (getline(in,line), ((line.find("End")==std::string::npos) && (in)));
 				   // ok, so we are not at the end of
 				   // the file, that's it, mostly
 
@@ -357,9 +357,9 @@ void GridIn<dim>::read_dbmesh (istream &in)
 
 
 template <int dim>
-void GridIn<dim>::skip_empty_lines (istream &in)
+void GridIn<dim>::skip_empty_lines (std::istream &in)
 {    
-  string line;
+  std::string line;
   while (in) 
     {
 				       // get line
@@ -385,8 +385,8 @@ void GridIn<dim>::skip_empty_lines (istream &in)
 
 
 template <int dim>
-void GridIn<dim>::skip_comment_lines (istream    &in,
-				      const char  comment_start)
+void GridIn<dim>::skip_comment_lines (std::istream &in,
+				      const char    comment_start)
 {    
   char c;
   while (in.get(c), c==comment_start) 
@@ -405,13 +405,13 @@ void GridIn<dim>::skip_comment_lines (istream    &in,
 
 template <int dim>
 void
-GridIn<dim>::delete_unused_vertices (vector<Point<dim> >    &vertices,
-				     vector<CellData<dim> > &cells,
-				     SubCellData            &subcelldata)
+GridIn<dim>::delete_unused_vertices (std::vector<Point<dim> >    &vertices,
+				     std::vector<CellData<dim> > &cells,
+				     SubCellData                 &subcelldata)
 {
 				   // first check which vertices are
 				   // actually used
-  vector<bool> vertex_used (vertices.size(), false);
+  std::vector<bool> vertex_used (vertices.size(), false);
   for (unsigned int c=0; c<cells.size(); ++c)
     for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       vertex_used[cells[c].vertices[v]] = true;
@@ -420,7 +420,7 @@ GridIn<dim>::delete_unused_vertices (vector<Point<dim> >    &vertices,
 				   // are actually used in the same
 				   // order as they were beforehand
   const unsigned int invalid_vertex = static_cast<unsigned int>(-1);
-  vector<unsigned int> new_vertex_numbers (vertices.size(), invalid_vertex);
+  std::vector<unsigned int> new_vertex_numbers (vertices.size(), invalid_vertex);
   unsigned int next_free_number = 0;
   for (unsigned int i=0; i<vertices.size(); ++i)
     if (vertex_used[i] == true)
@@ -449,7 +449,7 @@ GridIn<dim>::delete_unused_vertices (vector<Point<dim> >    &vertices,
 				   // which we really need to a new
 				   // array and replace the old one by
 				   // the new one
-  vector<Point<dim> > tmp;
+  std::vector<Point<dim> > tmp;
   tmp.reserve (count(vertex_used.begin(), vertex_used.end(), true));
   for (unsigned int v=0; v<vertices.size(); ++v)
     if (vertex_used[v] == true)
@@ -460,9 +460,9 @@ GridIn<dim>::delete_unused_vertices (vector<Point<dim> >    &vertices,
 
 
 template <int dim>
-void GridIn<dim>::debug_output_grid (const vector<CellData<dim> > &/*cells*/,
-				     const vector<Point<dim> >    &/*vertices*/,
-				     ostream                      &/*out*/)
+void GridIn<dim>::debug_output_grid (const std::vector<CellData<dim> > &/*cells*/,
+				     const std::vector<Point<dim> >    &/*vertices*/,
+				     std::ostream                      &/*out*/)
 {
   Assert (false, ExcNotImplemented());
 };
@@ -472,9 +472,9 @@ void GridIn<dim>::debug_output_grid (const vector<CellData<dim> > &/*cells*/,
 
 template <>
 void
-GridIn<2>::debug_output_grid (const vector<CellData<2> > &cells,
-			      const vector<Point<2> >    &vertices,
-			      ostream                    &out)
+GridIn<2>::debug_output_grid (const std::vector<CellData<2> > &cells,
+			      const std::vector<Point<2> >    &vertices,
+			      std::ostream                    &out)
 {
   double min_x = vertices[cells[0].vertices[0]](0),
 	 max_x = vertices[cells[0].vertices[0]](0),
@@ -497,7 +497,7 @@ GridIn<2>::debug_output_grid (const vector<CellData<2> > &cells,
 	    max_y = p(1);
 	};
 
-      out << "# cell " << i << endl;
+      out << "# cell " << i << std::endl;
       Point<2> center;
       for (unsigned int f=0; f<4; ++f)
 	center += vertices[cells[i].vertices[f]];
@@ -506,7 +506,7 @@ GridIn<2>::debug_output_grid (const vector<CellData<2> > &cells,
       out << "set label \"" << i << "\" at "
 	  << center(0) << ',' << center(1)
 	  << " center"
-	  << endl;
+	  << std::endl;
 
 				       // first two line right direction
       for (unsigned int f=0; f<2; ++f)
@@ -516,7 +516,7 @@ GridIn<2>::debug_output_grid (const vector<CellData<2> > &cells,
 	    << " to "
 	    << vertices[cells[i].vertices[(f+1)%4]](0) << ',' 
 	    << vertices[cells[i].vertices[(f+1)%4]](1)
-	    << endl;
+	    << std::endl;
 				       // other two lines reverse direction
       for (unsigned int f=2; f<4; ++f)
 	out << "set arrow from "
@@ -525,17 +525,17 @@ GridIn<2>::debug_output_grid (const vector<CellData<2> > &cells,
 	    << " to "
 	    << vertices[cells[i].vertices[f]](0) << ',' 
 	    << vertices[cells[i].vertices[f]](1)
-	    << endl;
-      out << endl;
+	    << std::endl;
+      out << std::endl;
     };
   
 
-  out << endl
-      << "set nokey" << endl
+  out << std::endl
+      << "set nokey" << std::endl
       << "pl [" << min_x << ':' << max_x << "]["
       << min_y << ':' << max_y <<  "] "
-      << min_y << endl
-      << "pause -1" << endl;
+      << min_y << std::endl
+      << "pause -1" << std::endl;
 };
 
 #endif
@@ -545,72 +545,72 @@ GridIn<2>::debug_output_grid (const vector<CellData<2> > &cells,
 
 template <>
 void
-GridIn<3>::debug_output_grid (const vector<CellData<3> > &cells,
-			      const vector<Point<3> >    &vertices,
-			      ostream                    &out)
+GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
+			      const std::vector<Point<3> >    &vertices,
+			      std::ostream                    &out)
 {
   for (unsigned int cell=0; cell<cells.size(); ++cell)
     {
 				       // line 0
       out << vertices[cells[cell].vertices[0]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[1]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 1
       out << vertices[cells[cell].vertices[1]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[2]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 2
       out << vertices[cells[cell].vertices[3]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[2]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 3
       out << vertices[cells[cell].vertices[0]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[3]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 4
       out << vertices[cells[cell].vertices[4]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[5]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 5
       out << vertices[cells[cell].vertices[5]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[6]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 6
       out << vertices[cells[cell].vertices[7]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[6]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 7
       out << vertices[cells[cell].vertices[4]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[7]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 8
       out << vertices[cells[cell].vertices[0]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[4]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 9
       out << vertices[cells[cell].vertices[1]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[5]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 10
       out << vertices[cells[cell].vertices[2]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[6]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
 				       // line 11
       out << vertices[cells[cell].vertices[3]]
-	  << endl
+	  << std::endl
 	  << vertices[cells[cell].vertices[7]]
-	  << endl << endl << endl;
+	  << std::endl << std::endl << std::endl;
     };
 };
 

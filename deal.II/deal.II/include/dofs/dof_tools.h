@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -265,7 +265,7 @@ class DoFTools
 				      */
     template<int dim, class SparsityPattern>
     static void make_sparsity_pattern (const DoFHandler<dim>       &dof,
-				       const vector<vector<bool> > &mask,
+				       const std::vector<std::vector<bool> > &mask,
 				       SparsityPattern             &sparsity_pattern);
 
     				     /**
@@ -296,9 +296,9 @@ class DoFTools
 				      */
     template<int dim>
     static void
-    make_boundary_sparsity_pattern (const DoFHandler<dim>      &dof,
-				    const vector<unsigned int> &dof_to_boundary_mapping,
-				    SparsityPattern            &sparsity_pattern); 
+    make_boundary_sparsity_pattern (const DoFHandler<dim>           &dof,
+				    const std::vector<unsigned int> &dof_to_boundary_mapping,
+				    SparsityPattern                 &sparsity_pattern); 
 
 				     /**
 				      * Write the sparsity structure of the
@@ -333,9 +333,9 @@ class DoFTools
 				      */
     template<int dim>
     static void
-    make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
+    make_boundary_sparsity_pattern (const DoFHandler<dim> &dof,
 				    const typename DoFHandler<dim>::FunctionMap &boundary_indicators,
-				    const vector<unsigned int>  &dof_to_boundary_mapping,
+				    const std::vector<unsigned int>  &dof_to_boundary_mapping,
 				    SparsityPattern    &sparsity); 
 
 				     /**
@@ -492,9 +492,9 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    extract_dofs (const DoFHandler<dim> &dof_handler,
-		  const vector<bool>    &component_select,
-		  vector<bool>          &selected_dofs);
+    extract_dofs (const DoFHandler<dim>      &dof_handler,
+		  const std::vector<bool>    &component_select,
+		  std::vector<bool>          &selected_dofs);
 
 				     /**
 				      * Do the same thing as
@@ -505,8 +505,8 @@ class DoFTools
     static void
     extract_level_dofs (const unsigned int       level,
 			const MGDoFHandler<dim> &dof,
-			const vector<bool>      &select,
-			vector<bool>            &selected_dofs);
+			const std::vector<bool> &select,
+			std::vector<bool>       &selected_dofs);
 
 				     /**
 				      * Extract all degrees of freedom
@@ -545,10 +545,10 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
-			   const vector<bool>    &component_select,
-			   vector<bool>          &selected_dofs,
-			   const set<unsigned char> &boundary_indicators = set<unsigned char>());
+    extract_boundary_dofs (const DoFHandler<dim>      &dof_handler,
+			   const std::vector<bool>    &component_select,
+			   std::vector<bool>          &selected_dofs,
+			   const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
 
 				     /**
 				      * Select all dofs that will be
@@ -565,7 +565,7 @@ class DoFTools
     template <int dim>
     static void
     extract_hanging_node_dofs (const DoFHandler<dim> &dof_handler,
-			       vector<bool>          &selected_dofs);
+			       std::vector<bool>     &selected_dofs);
     
 				     /**
 				      * This function can be used when
@@ -826,8 +826,8 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
-				 vector<unsigned int>  &mapping);
+    map_dof_to_boundary_indices (const DoFHandler<dim>      &dof_handler,
+				 std::vector<unsigned int>  &mapping);
 
 				     /**
 				      * Same as the previous function,
@@ -842,9 +842,9 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    map_dof_to_boundary_indices (const DoFHandler<dim>    &dof_handler,
-				 const set<unsigned char> &boundary_indicators,
-				 vector<unsigned int>     &mapping);
+    map_dof_to_boundary_indices (const DoFHandler<dim>         &dof_handler,
+				 const std::set<unsigned char> &boundary_indicators,
+				 std::vector<unsigned int>     &mapping);
     
 				   
 				     /**
@@ -897,8 +897,8 @@ class DoFTools
     compute_intergrid_weights (const DoFHandler<dim>              &coarse_grid,
 			       const unsigned int                  coarse_component,
 			       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-			       const vector<Vector<double> >      &parameter_dofs,
-			       const vector<int>                  &weight_mapping,
+			       const std::vector<Vector<double> > &parameter_dofs,
+			       const std::vector<int>             &weight_mapping,
 			       FullMatrix<float>                  &weights);
 
 				     /**
@@ -916,8 +916,8 @@ class DoFTools
     compute_intergrid_weights_1 (const DoFHandler<dim>              &coarse_grid,
 				 const unsigned int                  coarse_component,
 				 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-				 const vector<Vector<double> >      &parameter_dofs,
-				 const vector<int>                  &weight_mapping,
+				 const std::vector<Vector<double> > &parameter_dofs,
+				 const std::vector<int>             &weight_mapping,
 				 FullMatrix<float>                  &weights,
 				 const typename DoFHandler<dim>::active_cell_iterator &begin,
 				 const typename DoFHandler<dim>::active_cell_iterator &end);

@@ -4,10 +4,10 @@
 template<typename number>
 template<int dim>
 MGSmootherRelaxation<number>::MGSmootherRelaxation (const MGDoFHandler<dim>                       &mg_dof,
-		      const MGLevelObject<SparseMatrix<number> > &matrix,
-		      const function_ptr                             relaxation,
-		      const unsigned int                             steps,
-		      const double                                   omega)
+						    const MGLevelObject<SparseMatrix<number> > &matrix,
+						    const function_ptr                             relaxation,
+						    const unsigned int                             steps,
+						    const double                                   omega)
 		:
 		MGSmoother(mg_dof, steps),
 		matrix(&matrix),

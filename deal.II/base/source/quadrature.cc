@@ -34,8 +34,8 @@ Quadrature<dim>::Quadrature (const unsigned int n_q) :
 
 
 template <int dim>
-Quadrature<dim>::Quadrature (const vector<Point<dim> > & points,
-			     const vector<double> & weights)
+Quadrature<dim>::Quadrature (const std::vector<Point<dim> >  &points,
+			     const std::vector<double>       &weights)
 		: n_quadrature_points(points.size()),
 		  quadrature_points(points),
 		  weights(weights)
@@ -130,7 +130,7 @@ const Point<dim> & Quadrature<dim>::point (const unsigned int i) const
 
 
 template <>
-const vector<Point<0> > & Quadrature<0>::get_points () const
+const std::vector<Point<0> > & Quadrature<0>::get_points () const
 {
   Assert (false, ExcInternalError());
   return quadrature_points;
@@ -139,7 +139,7 @@ const vector<Point<0> > & Quadrature<0>::get_points () const
 
 
 template <int dim>
-const vector<Point<dim> > & Quadrature<dim>::get_points () const
+const std::vector<Point<dim> > & Quadrature<dim>::get_points () const
 {
   return quadrature_points;
 };
@@ -165,7 +165,7 @@ double Quadrature<dim>::weight (const unsigned int i) const
 
 
 template <int dim>
-const vector<double> & Quadrature<dim>::get_weights () const
+const std::vector<double> & Quadrature<dim>::get_weights () const
 {
   return weights;
 };
@@ -173,7 +173,7 @@ const vector<double> & Quadrature<dim>::get_weights () const
 
 
 template <>
-const vector<double> & Quadrature<0>::get_weights () const
+const std::vector<double> & Quadrature<0>::get_weights () const
 {
   Assert (false, ExcInternalError());
   return weights;
@@ -223,16 +223,16 @@ QProjector<dim>::QProjector (const Quadrature<dim-1> &quadrature,
 template <>
 void QProjector<1>::project_to_face (const Quadrature<0> &,
 				     const unsigned int,
-				     vector<Point<1> > &)
+				     std::vector<Point<1> > &)
 {
   Assert(false, ExcNotImplemented());
 }
 
 
 template <>
-void QProjector<2>::project_to_face (const Quadrature<1> &quadrature,
-				     const unsigned int   face_no,
-				     vector<Point<2> >   &q_points)
+void QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
+				     const unsigned int        face_no,
+				     std::vector<Point<2> >   &q_points)
 {
   const unsigned int dim=2;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
@@ -260,9 +260,9 @@ void QProjector<2>::project_to_face (const Quadrature<1> &quadrature,
 
 
 template <>
-void QProjector<3>::project_to_face (const Quadrature<2> &quadrature,
-				     const unsigned int   face_no,
-				     vector<Point<3> >   &q_points)
+void QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
+				     const unsigned int      face_no,
+				     std::vector<Point<3> > &q_points)
 {
   const unsigned int dim=3;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
@@ -320,10 +320,10 @@ void QProjector<1>::project_to_subface (const Quadrature<0> &,
 
   
 template <>
-void QProjector<2>::project_to_subface (const Quadrature<1> &quadrature,
-					const unsigned int   face_no,
-					const unsigned int   subface_no,
-					vector<Point<2> >   &q_points)
+void QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
+					const unsigned int      face_no,
+					const unsigned int      subface_no,
+					std::vector<Point<2> > &q_points)
 {
   const unsigned int dim=2;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
@@ -394,10 +394,10 @@ void QProjector<2>::project_to_subface (const Quadrature<1> &quadrature,
 
 
 template <>
-void QProjector<3>::project_to_subface (const Quadrature<2> &quadrature,
-					const unsigned int   face_no,
-					const unsigned int   subface_no,
-					vector<Point<3> >   &q_points)
+void QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
+					const unsigned int      face_no,
+					const unsigned int      subface_no,
+					std::vector<Point<3> > &q_points)
 {
   const unsigned int dim=3;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
@@ -552,14 +552,14 @@ void QProjector<3>::project_to_subface (const Quadrature<2> &quadrature,
 
 template <int dim>
 void
-QProjector<dim>::project_to_faces (const Quadrature<dim-1> &quadrature,
-				   vector<Point<dim> >     &q_points)
+QProjector<dim>::project_to_faces (const Quadrature<dim-1>  &quadrature,
+				   std::vector<Point<dim> > &q_points)
 {
   unsigned int npt = quadrature.n_quadrature_points;
   unsigned int nf = GeometryInfo<dim>::faces_per_cell;
   
   q_points.resize (npt*nf);
-  vector <Point<dim> > help(npt);
+  std::vector <Point<dim> > help(npt);
   
   unsigned k=0;
   for (unsigned int i=0;i<nf;++i)
@@ -575,15 +575,15 @@ QProjector<dim>::project_to_faces (const Quadrature<dim-1> &quadrature,
 
 template <int dim>
 void
-QProjector<dim>::project_to_subfaces (const Quadrature<dim-1> &quadrature,
-				      vector<Point<dim> >     &q_points)
+QProjector<dim>::project_to_subfaces (const Quadrature<dim-1>  &quadrature,
+				      std::vector<Point<dim> > &q_points)
 {
   unsigned int npt = quadrature.n_quadrature_points;
   unsigned int nf = GeometryInfo<dim>::faces_per_cell;
   unsigned int nc = GeometryInfo<dim>::subfaces_per_face;
   
   q_points.resize (npt*nf*nc);
-  vector <Point<dim> > help(npt);
+  std::vector <Point<dim> > help(npt);
   
   unsigned k=0;
   for (unsigned int i=0;i<nf;++i)

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -542,12 +542,15 @@ class FullMatrix : public Subscriptor
     void diagadd (const number s);
 
 				     /**
-				      * Output of the matrix in user-defined format.
+				      * Output of the matrix in
+				      * user-defined format.
 				      */
-    void print (ostream& s, int width=5, int precision=2) const;
+    void print (std::ostream       &s,
+		const unsigned int  width=5,
+		const unsigned int  precision=2) const;
 
 				     /**
-			      * Print the matrix in the usual
+				      * Print the matrix in the usual
 				      * format, i.e. as a matrix and
 				      * not as a list of nonzero
 				      * elements. For better
@@ -585,8 +588,8 @@ class FullMatrix : public Subscriptor
 				      * may produce @em{large} amounts of
 				      * output if applied to a large matrix!
 				      */
-    void print_formatted (ostream &out,
-			  const unsigned int presicion=3,
+    void print_formatted (std::ostream       &out,
+			  const unsigned int  presicion=3,
 			  const bool          scientific  = true,
 			  const unsigned int  width       = 0,
 			  const char         *zero_string = " ",

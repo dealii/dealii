@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -88,7 +88,7 @@ SolverControl::check (const unsigned int step,
     {
       if (_log_result)
 	deallog << "Convergence step " << step
-		<< " value " << check_value << endl;      
+		<< " value " << check_value << endl;
       return success;
     }
   

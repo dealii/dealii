@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -196,7 +196,7 @@ class MatrixCreator
 				      *	See the general documentation of this
 				      *	class for more detail.
 				      */
-    typedef map<unsigned char,const Function<dim>*> FunctionMap;
+    typedef std::map<unsigned char,const Function<dim>*> FunctionMap;
 
 				     /**
 				      * Assemble the mass matrix. If no 
@@ -285,7 +285,7 @@ class MatrixCreator
 					     SparseMatrix<double>     &matrix,
 					     const FunctionMap        &rhs,
 					     Vector<double>           &rhs_vector,
-					     vector<unsigned int>     &vec_to_dof_mapping,
+					     std::vector<unsigned int>&vec_to_dof_mapping,
 					     const Function<dim>      *a = 0);
 
 				     /**
@@ -442,7 +442,7 @@ class MatrixTools : public MatrixCreator<dim>
 				      */
     template <typename number>
     static void
-    apply_boundary_values (const map<unsigned int,double> &boundary_values,
+    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 			   SparseMatrix<number>  &matrix,
 			   Vector<number>        &solution,
 			   Vector<number>        &right_hand_side,
@@ -458,7 +458,7 @@ class MatrixTools : public MatrixCreator<dim>
 				      * matrices and block vectors
 				      */
     static void
-    apply_boundary_values (const map<unsigned int,double> &boundary_values,
+    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 			   BlockSparseMatrix<double> &matrix,
 			   BlockVector<double> &solution,
 			   BlockVector<double> &right_hand_side,

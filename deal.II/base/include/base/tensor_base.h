@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,7 +42,7 @@ template <int rank, int dim> class Tensor;
 template <int dim>
 class Tensor<1,dim>
 {
-      public:
+  public:
 				     /**
 				      * Provide a way to get the
 				      * dimension of an object without
@@ -192,9 +192,9 @@ class Tensor<1,dim>
 				      */
     Tensor<1,dim>   operator - (const Tensor<1,dim> &) const;
 
-				       /**
-					* Tensor with inverted entries.
-					*/
+				     /**
+				      * Tensor with inverted entries.
+				      */
     Tensor<1,dim>   operator - () const;
     
 				     /**
@@ -251,11 +251,11 @@ class Tensor<1,dim>
 				      */
     double values[(dim!=0) ? (dim) : 1];
 
-				       /**
-					* Point is allowed access to
-					* the coordinates. This is
-					* supposed to improve speed.
-					*/
+				     /**
+				      * Point is allowed access to
+				      * the coordinates. This is
+				      * supposed to improve speed.
+				      */
     friend class Point<dim>;
 };
 
@@ -274,7 +274,7 @@ DeclException1 (ExcDimTooSmall,
 				  *  form @p{x1 x2 x3 etc}.
 				  */
 template <int dim>
-ostream & operator << (ostream &out, const Tensor<1,dim> &p);
+std::ostream & operator << (std::ostream &out, const Tensor<1,dim> &p);
 
 
 /*------------------------------- Inline functions: Tensor ---------------------------*/
@@ -313,6 +313,24 @@ Tensor<1,dim>::Tensor (const Tensor<1,dim> &p)
 
 
 
+template <>
+inline
+Tensor<1,0>::Tensor (const Tensor<1,0> &)
+{
+				   // at some places in the library,
+				   // we have Point<0> for formal
+				   // reasons (e.g., we sometimes have
+				   // Quadrature<dim-1> for faces, so
+				   // we have Quadrature<0> for dim=1,
+				   // and then we have Point<0>). To
+				   // avoid warnings in the above
+				   // function that the loop end check
+				   // always fails, we implement this
+				   // function here
+};
+
+
+
 template <int dim>
 inline
 double Tensor<1,dim>::operator [] (const unsigned int index) const
@@ -339,6 +357,25 @@ Tensor<1,dim> & Tensor<1,dim>::operator = (const Tensor<1,dim> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
+  return *this;
+};
+
+
+
+template <>
+inline
+Tensor<1,0> & Tensor<1,0>::operator = (const Tensor<1,0> &)
+{
+				   // at some places in the library,
+				   // we have Point<0> for formal
+				   // reasons (e.g., we sometimes have
+				   // Quadrature<dim-1> for faces, so
+				   // we have Quadrature<0> for dim=1,
+				   // and then we have Point<0>). To
+				   // avoid warnings in the above
+				   // function that the loop end check
+				   // always fails, we implement this
+				   // function here
   return *this;
 };
 
@@ -444,7 +481,7 @@ Tensor<1,dim> Tensor<1,dim>::operator - () const
 {
   Tensor<1,dim> result;
   for (unsigned int i=0; i<dim; ++i)
-      result.values[i] = -values[i];
+    result.values[i] = -values[i];
   return result;
 };
 
@@ -476,7 +513,7 @@ Tensor<1,dim>::memory_consumption ()
  */
 template <int dim>
 inline
-ostream & operator << (ostream &out, const Tensor<1,dim> &p)
+std::ostream & operator << (std::ostream &out, const Tensor<1,dim> &p)
 {
   for (unsigned int i=0; i<dim-1; ++i)
     out << p[i] << ' ';
@@ -493,7 +530,7 @@ ostream & operator << (ostream &out, const Tensor<1,dim> &p)
  * a compiler warning that the loop is empty.
  */
 inline
-ostream & operator << (ostream &out, const Tensor<1,1> &p)
+std::ostream & operator << (std::ostream &out, const Tensor<1,1> &p)
 {
   out << p[0];
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -106,8 +106,8 @@ reinit (const BlockSparsityPattern &sparsity)
   sparsity_pattern = &sparsity;
   rows = sparsity.n_block_rows();
   columns = sparsity.n_block_cols();
-  sub_objects = vector<vector<SmartPointer<SparseMatrix<number> > > >
-		(rows, vector<SmartPointer<SparseMatrix<number> > > (columns, 0));
+  sub_objects = std::vector<std::vector<SmartPointer<SparseMatrix<number> > > >
+		(rows, std::vector<SmartPointer<SparseMatrix<number> > > (columns, 0));
 
 				   // and reinitialize the blocks
   for (unsigned int r=0; r<rows; ++r)

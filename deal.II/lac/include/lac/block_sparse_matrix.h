@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -511,7 +511,7 @@ class BlockSparseMatrix : public Subscriptor
 				     /**
 				      * Array of sub-matrices.
 				      */
-    vector<vector<SmartPointer<SparseMatrix<number> > > > sub_objects;
+    std::vector<std::vector<SmartPointer<SparseMatrix<number> > > > sub_objects;
 };
 
 
@@ -575,7 +575,7 @@ BlockSparseMatrix<number>::set (const unsigned int i,
 				const unsigned int j,
 				const number value)
 {
-  const pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,unsigned int>
     row_index = sparsity_pattern->row_indices.global_to_local (i),
     col_index = sparsity_pattern->column_indices.global_to_local (j);
   block(row_index.first,col_index.first).set (row_index.second,
@@ -592,7 +592,7 @@ BlockSparseMatrix<number>::add (const unsigned int i,
 				const unsigned int j,
 				const number value)
 {
-  const pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,unsigned int>
     row_index = sparsity_pattern->row_indices.global_to_local (i),
     col_index = sparsity_pattern->column_indices.global_to_local (j);
   block(row_index.first,col_index.first).add (row_index.second,
@@ -608,7 +608,7 @@ number
 BlockSparseMatrix<number>::operator () (const unsigned int i,
 					const unsigned int j) const
 {
-  const pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,unsigned int>
     row_index = sparsity_pattern->row_indices.global_to_local (i),
     col_index = sparsity_pattern->column_indices.global_to_local (j);
   return block(row_index.first,col_index.first) (row_index.second,

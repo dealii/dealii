@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -172,14 +172,20 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 				       // avoids copying
       if (store_diagonals)
 	{
-	  vector<FullMatrix<inverse_type> > tmp(n_cells,
-						FullMatrix<inverse_type>(blocksize));
+	  std::vector<FullMatrix<inverse_type> >
+	    tmp(n_cells, FullMatrix<inverse_type>(blocksize));
 	  var_diagonal.swap (tmp);
 	}
-      
-      vector<FullMatrix<inverse_type> > tmp(n_cells,
-					    FullMatrix<inverse_type>(blocksize));
-      var_inverse.swap (tmp);
+
+      if (true)
+	{
+	  std::vector<FullMatrix<inverse_type> >
+	    tmp(n_cells, FullMatrix<inverse_type>(blocksize));
+	  var_inverse.swap (tmp);
+					   // make sure the tmp object
+					   // goes out of scope as
+					   // soon as possible
+	};
 
       M_cell.clear ();
       

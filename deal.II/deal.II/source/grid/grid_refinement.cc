@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,10 +24,10 @@
 #include <fstream>
 
 template<typename number>
-void GridRefinement::qsort_index(const Vector<number>  &a,
-				 vector<unsigned int> &ind,
-				 int                  l,
-				 int                  r)
+void GridRefinement::qsort_index(const Vector<number>      &a,
+				 std::vector<unsigned int> &ind,
+				 int                        l,
+				 int                        r)
 {
   int i,j,t;
   number v;
@@ -79,7 +79,7 @@ void GridRefinement::refine (Triangulation<dim>   &tria,
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
-  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+  Assert (*std::min_element(criteria.begin(), criteria.end()) >= 0,
 	  ExcInvalidParameterValue());  
 
 				   // nothing to do; especially we
@@ -107,7 +107,7 @@ void GridRefinement::coarsen (Triangulation<dim>   &tria,
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
-  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+  Assert (*std::min_element(criteria.begin(), criteria.end()) >= 0,
 	  ExcInvalidParameterValue());
 
   Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
@@ -132,7 +132,7 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim>   &tria,
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
-  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+  Assert (*std::min_element(criteria.begin(), criteria.end()) >= 0,
 	  ExcInvalidParameterValue());
 
   const int refine_cells=static_cast<int>(top_fraction*criteria.size());
@@ -143,17 +143,17 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim>   &tria,
       Vector<number> tmp(criteria);
       if (refine_cells)
 	{
-	  nth_element (tmp.begin(), tmp.begin()+refine_cells,
-		       tmp.end(),
-		       greater<double>());
+	  std::nth_element (tmp.begin(), tmp.begin()+refine_cells,
+			    tmp.end(),
+			    std::greater<double>());
 	  refine (tria, criteria, *(tmp.begin() + refine_cells));
 	};
 
       if (coarsen_cells)
 	{
-	  nth_element (tmp.begin(), tmp.begin()+tmp.size()-coarsen_cells,
-		       tmp.end(),
-		       greater<double>());
+	  std::nth_element (tmp.begin(), tmp.begin()+tmp.size()-coarsen_cells,
+			    tmp.end(),
+			    std::greater<double>());
 	  coarsen (tria, criteria, *(tmp.begin() + tmp.size() - coarsen_cells));
 	};
     };
@@ -173,7 +173,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
-  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+  Assert (*std::min_element(criteria.begin(), criteria.end()) >= 0,
 	  ExcInvalidParameterValue());
 
 				   // let tmp be the cellwise square of the
@@ -187,15 +187,15 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
   
 				   // sort the largest criteria to the
 				   // beginning of the vector
-  sort (tmp.begin(), tmp.end(), greater<double>());
-  partial_sum (tmp.begin(), tmp.end(), partial_sums.begin());
+  std::sort (tmp.begin(), tmp.end(), std::greater<double>());
+  std::partial_sum (tmp.begin(), tmp.end(), partial_sums.begin());
 
 				   // compute thresholds
   const typename Vector<number>::const_iterator
-    q = lower_bound (partial_sums.begin(), partial_sums.end(),
-		     top_fraction*total_error),
-    p = upper_bound (partial_sums.begin(), partial_sums.end(),
-		     total_error*(1-bottom_fraction));
+    q = std::lower_bound (partial_sums.begin(), partial_sums.end(),
+			  static_cast<number>(top_fraction*total_error)),
+    p = std::upper_bound (partial_sums.begin(), partial_sums.end(),
+			  static_cast<number>(total_error*(1-bottom_fraction)));
   
   double bottom_threshold = tmp(p != partial_sums.end() ?
 				p-partial_sums.begin() :
@@ -233,7 +233,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
 				   // threshold if it equals the
 				   // largest indicator and the
 				   // top_fraction!=1
-  if ((top_threshold == *max_element(criteria.begin(), criteria.end())) &&
+  if ((top_threshold == *std::max_element(criteria.begin(), criteria.end())) &&
       (top_fraction != 1))
     top_threshold *= 0.999;
   
@@ -241,9 +241,9 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
     bottom_threshold = 0.999*top_threshold;
   
 				   // actually flag cells
-  if (top_threshold < *max_element(criteria.begin(), criteria.end()))
+  if (top_threshold < *std::max_element(criteria.begin(), criteria.end()))
     refine (tria, criteria, top_threshold);
-  if (bottom_threshold > *min_element(criteria.begin(), criteria.end()))
+  if (bottom_threshold > *std::min_element(criteria.begin(), criteria.end()))
     coarsen (tria, criteria, bottom_threshold);
 };
 
@@ -258,12 +258,12 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim>   &tria,
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
-  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+  Assert (*std::min_element(criteria.begin(), criteria.end()) >= 0,
 	  ExcInvalidParameterValue());
   
 				   // get an increasing order on
 				   // the error indicator
-  vector<unsigned int> tmp(criteria.size());
+  std::vector<unsigned int> tmp(criteria.size());
   for (unsigned int i=0;i<criteria.size();++i)
     tmp[i] = i;
   

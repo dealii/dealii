@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -150,7 +150,7 @@ void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
       neighbors.reserve (total_cells*(2*dimension));
       neighbors.insert (neighbors.end(),
 			total_cells*(2*dimension) - neighbors.size(),
-			make_pair(-1,-1));
+			std::make_pair(-1,-1));
     };
 };
 
@@ -191,9 +191,9 @@ TriangulationLevel<0>::memory_consumption () const
 void TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
 {
   const unsigned int new_size = new_lines +
-				count_if (lines.used.begin(),
-					  lines.used.end(),
-					  bind2nd (equal_to<bool>(), true));
+				std::count_if (lines.used.begin(),
+					       lines.used.end(),
+					       std::bind2nd (std::equal_to<bool>(), true));
 
 				   // same as in @p{reserve_space<0>}: only
 				   // allocate space if necessary
@@ -284,9 +284,9 @@ TriangulationLevel<1>::memory_consumption () const
 void TriangulationLevel<2>::reserve_space (const unsigned int new_quads)
 {
   const unsigned int new_size = new_quads +
-				count_if (quads.used.begin(),
-					  quads.used.end(),
-					  bind2nd (equal_to<bool>(), true));
+				std::count_if (quads.used.begin(),
+					       quads.used.end(),
+					       std::bind2nd (std::equal_to<bool>(), true));
 
 				   // see above...
   if (new_size>quads.quads.size())
@@ -369,9 +369,9 @@ TriangulationLevel<2>::memory_consumption () const
 void TriangulationLevel<3>::reserve_space (const unsigned int new_hexes)
 {
   const unsigned int new_size = new_hexes +
-				count_if (hexes.used.begin(),
-					  hexes.used.end(),
-					  bind2nd (equal_to<bool>(), true));
+				std::count_if (hexes.used.begin(),
+					       hexes.used.end(),
+					       std::bind2nd (std::equal_to<bool>(), true));
 
 				   // see above...
   if (new_size>hexes.hexes.size())
@@ -454,8 +454,8 @@ TriangulationLevel<3>::memory_consumption () const
 TriaNumberCache<1>::TriaNumberCache () :
 		n_lines (0),
 		n_active_lines (0) 
-						 // all other fields are
-						 // default constructed
+				   // all other fields are
+				   // default constructed
 {};
 
 
@@ -473,8 +473,8 @@ TriaNumberCache<1>::memory_consumption () const
 TriaNumberCache<2>::TriaNumberCache () :
 		n_quads (0),
 		n_active_quads (0) 
-						 // all other fields are
-						 // default constructed
+				   // all other fields are
+				   // default constructed
 {};
 
 
@@ -494,8 +494,8 @@ TriaNumberCache<2>::memory_consumption () const
 TriaNumberCache<3>::TriaNumberCache () :
 		n_hexes (0),
 		n_active_hexes (0) 
-						 // all other fields are
-						 // default constructed
+				   // all other fields are
+				   // default constructed
 {};
 
 

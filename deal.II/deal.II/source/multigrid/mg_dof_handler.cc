@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1381,7 +1381,7 @@ unsigned int MGDoFHandler<dim>::n_dofs (const unsigned int level) const {
 
 template <>
 void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
-				     const vector<unsigned int> &new_numbers) {
+				     const std::vector<unsigned int> &new_numbers) {
   Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
   
 				   // note that we can not use cell iterators
@@ -1390,7 +1390,7 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 				   // two cells more than once. Anyway, this
 				   // ways it's not only more correct but also
 				   // faster
-  for (vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
+  for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
        i!=mg_vertex_dofs.end(); ++i)
 				     // if the present vertex lives on
 				     // the present level
@@ -1401,7 +1401,7 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 		      new_numbers[i->get_index (level, d,
 						selected_fe->dofs_per_vertex)]);
 
-  for (vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i) 
     {
       Assert (*i != DoFHandler<1>::invalid_dof_index, ExcInternalError());
@@ -1416,10 +1416,10 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 
 template <>
 void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
-				     const vector<unsigned int>  &new_numbers) {
+				     const std::vector<unsigned int>  &new_numbers) {
   Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
   
-  for (vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
+  for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
        i!=mg_vertex_dofs.end(); ++i)
 				     // if the present vertex lives on
 				     // the present level
@@ -1430,14 +1430,14 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 		      new_numbers[i->get_index (level, d,
 						selected_fe->dofs_per_vertex)]);
   
-  for (vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i)
     {
       Assert (*i != DoFHandler<2>::invalid_dof_index, ExcInternalError());
       *i = new_numbers[*i];
     };
 
-  for (vector<unsigned int>::iterator i=mg_levels[level]->quad_dofs.begin();
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->quad_dofs.begin();
        i!=mg_levels[level]->quad_dofs.end(); ++i)
     {
       Assert (*i != DoFHandler<2>::invalid_dof_index, ExcInternalError());
@@ -1452,10 +1452,10 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 
 template <>
 void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
-				     const vector<unsigned int>  &new_numbers) {
+				     const std::vector<unsigned int>  &new_numbers) {
   Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
   
-  for (vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
+  for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
        i!=mg_vertex_dofs.end(); ++i)
 				     // if the present vertex lives on
 				     // the present level
@@ -1466,21 +1466,21 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 		      new_numbers[i->get_index (level, d,
 						selected_fe->dofs_per_vertex)]);
   
-  for (vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i)
     {
       Assert (*i != DoFHandler<3>::invalid_dof_index, ExcInternalError());
       *i = new_numbers[*i];
     };
 
-  for (vector<unsigned int>::iterator i=mg_levels[level]->quad_dofs.begin();
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->quad_dofs.begin();
        i!=mg_levels[level]->quad_dofs.end(); ++i)
     {
       Assert (*i != DoFHandler<3>::invalid_dof_index, ExcInternalError());
       *i = new_numbers[*i];
     };
 
-  for (vector<unsigned int>::iterator i=mg_levels[level]->hex_dofs.begin();
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->hex_dofs.begin();
        i!=mg_levels[level]->hex_dofs.end(); ++i)
     {
       Assert (*i != DoFHandler<3>::invalid_dof_index, ExcInternalError());
@@ -1525,7 +1525,7 @@ void MGDoFHandler<1>::reserve_space () {
     {
       mg_levels.push_back (new DoFLevel<1>);
 
-      mg_levels.back()->line_dofs = vector<unsigned int>(tria->levels[i]->lines.lines.size() *
+      mg_levels.back()->line_dofs = std::vector<unsigned int>(tria->levels[i]->lines.lines.size() *
 							 selected_fe->dofs_per_line,
 							 DoFHandler<1>::invalid_dof_index);
     };
@@ -1544,8 +1544,8 @@ void MGDoFHandler<1>::reserve_space () {
 				   // vertex we pass by  belongs to
   mg_vertex_dofs.resize (tria->vertices.size());
 
-  vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
-  vector<unsigned int> max_level (tria->vertices.size(), 0);
+  std::vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
+  std::vector<unsigned int> max_level (tria->vertices.size(), 0);
 
   Triangulation<dim>::cell_iterator cell = tria->begin(),
 				    endc = tria->end();
@@ -1611,10 +1611,10 @@ void MGDoFHandler<2>::reserve_space () {
     {
       mg_levels.push_back (new DoFLevel<2>);
 
-      mg_levels.back()->line_dofs = vector<unsigned int> (tria->levels[i]->lines.lines.size() *
+      mg_levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
 							  selected_fe->dofs_per_line,
 							  DoFHandler<2>::invalid_dof_index);
-      mg_levels.back()->quad_dofs = vector<unsigned int> (tria->levels[i]->quads.quads.size() *
+      mg_levels.back()->quad_dofs = std::vector<unsigned int> (tria->levels[i]->quads.quads.size() *
 							  selected_fe->dofs_per_quad,
 							  DoFHandler<2>::invalid_dof_index);
     };
@@ -1634,8 +1634,8 @@ void MGDoFHandler<2>::reserve_space () {
 				   // vertex we pass by  belongs to
   mg_vertex_dofs.resize (tria->vertices.size());
 
-  vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
-  vector<unsigned int> max_level (tria->vertices.size(), 0);
+  std::vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
+  std::vector<unsigned int> max_level (tria->vertices.size(), 0);
 
   Triangulation<dim>::cell_iterator cell = tria->begin(),
 				    endc = tria->end();
@@ -1702,13 +1702,13 @@ void MGDoFHandler<3>::reserve_space () {
     {
       mg_levels.push_back (new DoFLevel<3>);
 
-      mg_levels.back()->line_dofs = vector<unsigned int> (tria->levels[i]->lines.lines.size() *
+      mg_levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
 							  selected_fe->dofs_per_line,
 							  DoFHandler<3>::invalid_dof_index);
-      mg_levels.back()->quad_dofs = vector<unsigned int> (tria->levels[i]->quads.quads.size() *
+      mg_levels.back()->quad_dofs = std::vector<unsigned int> (tria->levels[i]->quads.quads.size() *
 							  selected_fe->dofs_per_quad,
 							  DoFHandler<3>::invalid_dof_index);
-      mg_levels.back()->hex_dofs = vector<unsigned int> (tria->levels[i]->hexes.hexes.size() *
+      mg_levels.back()->hex_dofs = std::vector<unsigned int> (tria->levels[i]->hexes.hexes.size() *
 							 selected_fe->dofs_per_hex,
 							 DoFHandler<3>::invalid_dof_index);
     };
@@ -1728,8 +1728,8 @@ void MGDoFHandler<3>::reserve_space () {
 				   // vertex we pass by  belongs to
   mg_vertex_dofs.resize (tria->vertices.size());
 
-  vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
-  vector<unsigned int> max_level (tria->vertices.size(), 0);
+  std::vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
+  std::vector<unsigned int> max_level (tria->vertices.size(), 0);
 
   Triangulation<dim>::cell_iterator cell = tria->begin(),
 				    endc = tria->end();

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1169,10 +1169,10 @@ unsigned int DoFHandler<dim>::n_boundary_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   
-  set<int> boundary_dofs;
+  std::set<int> boundary_dofs;
 
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
-  vector<unsigned int> dofs_on_face(dofs_per_face);
+  std::vector<unsigned int> dofs_on_face(dofs_per_face);
   active_face_iterator face = begin_active_face (),
 		       endf = end_face();
   for (; face!=endf; ++face)
@@ -1195,10 +1195,10 @@ DoFHandler<dim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
   Assert (boundary_indicators.find(255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
   
-  set<int> boundary_dofs;
+  std::set<int> boundary_dofs;
 
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
-  vector<unsigned int> dofs_on_face(dofs_per_face);
+  std::vector<unsigned int> dofs_on_face(dofs_per_face);
   active_face_iterator face = begin_active_face (),
 		       endf = end_face();
   for (; face!=endf; ++face)
@@ -1216,16 +1216,16 @@ DoFHandler<dim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
 
 template <int dim>
 unsigned int
-DoFHandler<dim>::n_boundary_dofs (const set<unsigned char> &boundary_indicators) const
+DoFHandler<dim>::n_boundary_dofs (const std::set<unsigned char> &boundary_indicators) const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
   
-  set<int> boundary_dofs;
+  std::set<int> boundary_dofs;
 
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
-  vector<unsigned int> dofs_on_face(dofs_per_face);
+  std::vector<unsigned int> dofs_on_face(dofs_per_face);
   active_face_iterator face = begin_active_face (),
 		       endf = end_face();
   for (; face!=endf; ++face)
@@ -1317,14 +1317,14 @@ unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
 
       if (neighbor.state() == valid)
 	{
-					 // find true neighbor; may be its
-					 // a child of @p{neighbor}
+					   // find true neighbor; may be its
+					   // a child of @p{neighbor}
 	  while (neighbor->has_children())
 	    neighbor = neighbor->child(v==0 ? 1 : 0);
 
 					   // has neighbor already been processed?
 	  if (neighbor->user_flag_set())
-					   // copy dofs
+					     // copy dofs
 	    {
 	      if (v==0) 
 		for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
@@ -1468,16 +1468,17 @@ unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
 #if deal_II_dimension == 1
 
 template <>
-void DoFHandler<1>::renumber_dofs (const vector<unsigned int> &new_numbers) {
+void DoFHandler<1>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
+{
   Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 #ifdef DEBUG
 				   // assert that the new indices are
 				   // consecutively numbered
   if (true)
     {
-      vector<unsigned int> tmp(new_numbers);
+      std::vector<unsigned int> tmp(new_numbers);
       sort (tmp.begin(), tmp.end());
-      vector<unsigned int>::const_iterator p = tmp.begin();
+      std::vector<unsigned int>::const_iterator p = tmp.begin();
       unsigned int                         i = 0;
       for (; p!=tmp.end(); ++p, ++i)
 	Assert (*p == i, ExcNewNumbersNotConsecutive(i));
@@ -1492,7 +1493,7 @@ void DoFHandler<1>::renumber_dofs (const vector<unsigned int> &new_numbers) {
 				   // faster; note, however, that dof numbers
 				   // may be invalid_dof_index, namely when the appropriate
 				   // vertex/line/etc is unused
-  for (vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
+  for (std::vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
     if (*i != invalid_dof_index)
       *i = new_numbers[*i];
     else
@@ -1503,7 +1504,7 @@ void DoFHandler<1>::renumber_dofs (const vector<unsigned int> &new_numbers) {
 	      ExcInternalError ());
   
   for (unsigned int level=0; level<levels.size(); ++level) 
-    for (vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
+    for (std::vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
 	 i!=levels[level]->line_dofs.end(); ++i)
       if (*i != invalid_dof_index)
 	*i = new_numbers[*i];
@@ -1515,16 +1516,17 @@ void DoFHandler<1>::renumber_dofs (const vector<unsigned int> &new_numbers) {
 #if deal_II_dimension == 2
 
 template <>
-void DoFHandler<2>::renumber_dofs (const vector<unsigned int> &new_numbers) {
+void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
+{
   Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 #ifdef DEBUG
 				   // assert that the new indices are
 				   // consecutively numbered
   if (true)
     {
-      vector<unsigned int> tmp(new_numbers);
+      std::vector<unsigned int> tmp(new_numbers);
       sort (tmp.begin(), tmp.end());
-      vector<unsigned int>::const_iterator p = tmp.begin();
+      std::vector<unsigned int>::const_iterator p = tmp.begin();
       unsigned int                         i = 0;
       for (; p!=tmp.end(); ++p, ++i)
 	Assert (*p == i, ExcNewNumbersNotConsecutive(i));
@@ -1539,7 +1541,7 @@ void DoFHandler<2>::renumber_dofs (const vector<unsigned int> &new_numbers) {
 				   // faster; note, however, that dof numbers
 				   // may be invalid_dof_index, namely when the appropriate
 				   // vertex/line/etc is unused
-  for (vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
+  for (std::vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
     if (*i != invalid_dof_index)
       *i = new_numbers[*i];
     else
@@ -1551,11 +1553,11 @@ void DoFHandler<2>::renumber_dofs (const vector<unsigned int> &new_numbers) {
   
   for (unsigned int level=0; level<levels.size(); ++level) 
     {
-      for (vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
+      for (std::vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
 	   i!=levels[level]->line_dofs.end(); ++i)
 	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
-      for (vector<unsigned int>::iterator i=levels[level]->quad_dofs.begin();
+      for (std::vector<unsigned int>::iterator i=levels[level]->quad_dofs.begin();
 	   i!=levels[level]->quad_dofs.end(); ++i)
 	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
@@ -1568,17 +1570,18 @@ void DoFHandler<2>::renumber_dofs (const vector<unsigned int> &new_numbers) {
 #if deal_II_dimension == 3
 
 template <>
-void DoFHandler<3>::renumber_dofs (const vector<unsigned int> &new_numbers) {
+void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
+{
   Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 #ifdef DEBUG
 				   // assert that the new indices are
 				   // consecutively numbered
   if (true)
     {
-      vector<unsigned int> tmp(new_numbers);
+      std::vector<unsigned int> tmp(new_numbers);
       sort (tmp.begin(), tmp.end());
-      vector<unsigned int>::const_iterator p = tmp.begin();
-      unsigned int                         i = 0;
+      std::vector<unsigned int>::const_iterator p = tmp.begin();
+      unsigned int                              i = 0;
       for (; p!=tmp.end(); ++p, ++i)
 	Assert (*p == i, ExcNewNumbersNotConsecutive(i));
     };
@@ -1592,7 +1595,7 @@ void DoFHandler<3>::renumber_dofs (const vector<unsigned int> &new_numbers) {
 				   // faster; note, however, that dof numbers
 				   // may be invalid_dof_index, namely when the appropriate
 				   // vertex/line/etc is unused
-  for (vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
+  for (std::vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
     if (*i != invalid_dof_index)
       *i = new_numbers[*i];
     else
@@ -1604,15 +1607,15 @@ void DoFHandler<3>::renumber_dofs (const vector<unsigned int> &new_numbers) {
   
   for (unsigned int level=0; level<levels.size(); ++level) 
     {
-      for (vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
+      for (std::vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
 	   i!=levels[level]->line_dofs.end(); ++i)
 	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
-      for (vector<unsigned int>::iterator i=levels[level]->quad_dofs.begin();
+      for (std::vector<unsigned int>::iterator i=levels[level]->quad_dofs.begin();
 	   i!=levels[level]->quad_dofs.end(); ++i)
 	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
-      for (vector<unsigned int>::iterator i=levels[level]->hex_dofs.begin();
+      for (std::vector<unsigned int>::iterator i=levels[level]->hex_dofs.begin();
 	   i!=levels[level]->hex_dofs.end(); ++i)
 	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
@@ -1627,7 +1630,8 @@ void DoFHandler<3>::renumber_dofs (const vector<unsigned int> &new_numbers) {
 template <>
 unsigned int DoFHandler<1>::max_couplings_between_dofs () const {
   Assert (selected_fe != 0, ExcNoFESelected());
-  return min(3*selected_fe->dofs_per_vertex + 2*selected_fe->dofs_per_line, n_dofs());
+  return std::min(3*selected_fe->dofs_per_vertex +
+		  2*selected_fe->dofs_per_line, n_dofs());
 };
 
 
@@ -1700,7 +1704,7 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
 	    Assert (false, ExcNotImplemented());
 	    max_couplings=0;
     };
-  return(min(max_couplings,n_dofs()));
+  return std::min(max_couplings,n_dofs());
 };
 
 
@@ -1742,7 +1746,7 @@ unsigned int DoFHandler<3>::max_couplings_between_dofs () const {
       max_couplings=0;
     }
   
-  return min(max_couplings,n_dofs());
+  return std::min(max_couplings,n_dofs());
 };
 
 
@@ -1784,17 +1788,17 @@ void DoFHandler<1>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs = vector<unsigned int>(tria->vertices.size()*
-				     selected_fe->dofs_per_vertex,
-				     invalid_dof_index);
+  vertex_dofs = std::vector<unsigned int>(tria->vertices.size()*
+					  selected_fe->dofs_per_vertex,
+					  invalid_dof_index);
     
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<1>);
 
-      levels.back()->line_dofs = vector<unsigned int>(tria->levels[i]->lines.lines.size() *
-						      selected_fe->dofs_per_line,
-						      invalid_dof_index);
+      levels.back()->line_dofs = std::vector<unsigned int>(tria->levels[i]->lines.lines.size() *
+							   selected_fe->dofs_per_line,
+							   invalid_dof_index);
     };
 };
 
@@ -1815,19 +1819,19 @@ void DoFHandler<2>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs = vector<unsigned int>(tria->vertices.size()*
-				     selected_fe->dofs_per_vertex,
-				     invalid_dof_index);
+  vertex_dofs = std::vector<unsigned int>(tria->vertices.size()*
+					  selected_fe->dofs_per_vertex,
+					  invalid_dof_index);
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<2>);
 
-      levels.back()->line_dofs = vector<unsigned int> (tria->levels[i]->lines.lines.size() *
-						       selected_fe->dofs_per_line,
-						       invalid_dof_index);
-      levels.back()->quad_dofs = vector<unsigned int> (tria->levels[i]->quads.quads.size() *
-						       selected_fe->dofs_per_quad,
-						       invalid_dof_index);
+      levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
+							    selected_fe->dofs_per_line,
+							    invalid_dof_index);
+      levels.back()->quad_dofs = std::vector<unsigned int> (tria->levels[i]->quads.quads.size() *
+							    selected_fe->dofs_per_quad,
+							    invalid_dof_index);
     };
 };
 
@@ -1847,22 +1851,22 @@ void DoFHandler<3>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs = vector<unsigned int>(tria->vertices.size()*
-				     selected_fe->dofs_per_vertex,
-				     invalid_dof_index);
+  vertex_dofs = std::vector<unsigned int>(tria->vertices.size()*
+					  selected_fe->dofs_per_vertex,
+					  invalid_dof_index);
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<3>);
 
-      levels.back()->line_dofs = vector<unsigned int> (tria->levels[i]->lines.lines.size() *
-						       selected_fe->dofs_per_line,
-						       invalid_dof_index);
-      levels.back()->quad_dofs = vector<unsigned int> (tria->levels[i]->quads.quads.size() *
-						       selected_fe->dofs_per_quad,
-						       invalid_dof_index);
-      levels.back()->hex_dofs = vector<unsigned int> (tria->levels[i]->hexes.hexes.size() *
-						      selected_fe->dofs_per_hex,
-						      invalid_dof_index);
+      levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
+							    selected_fe->dofs_per_line,
+							    invalid_dof_index);
+      levels.back()->quad_dofs = std::vector<unsigned int> (tria->levels[i]->quads.quads.size() *
+							    selected_fe->dofs_per_quad,
+							    invalid_dof_index);
+      levels.back()->hex_dofs = std::vector<unsigned int> (tria->levels[i]->hexes.hexes.size() *
+							   selected_fe->dofs_per_hex,
+							   invalid_dof_index);
     };
 };
 

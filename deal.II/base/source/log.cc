@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,20 +23,20 @@ LogStream deallog;
 
 
 LogStream::LogStream()
-		: std_out(&cerr), file(0), was_endl(true),
+		: std_out(&std::cerr), file(0), was_endl(true),
 		  std_depth(10000), file_depth(10000),
 		  print_utime(false)
 {
   prefixes.push("DEAL:");
-  std_out->setf(ios::showpoint | ios::left);
+  std_out->setf(std::ios::showpoint | std::ios::left);
 }
 
 
 void
-LogStream::attach(ostream& o)
+LogStream::attach(std::ostream& o)
 {
   file = &o;
-  o.setf(ios::showpoint | ios::left);
+  o.setf(std::ios::showpoint | std::ios::left);
   o << dealjobid();
 }
 
@@ -47,14 +47,14 @@ void LogStream::detach ()
 };
 
 
-ostream&
+std::ostream&
 LogStream::get_console()
 {
   return *std_out;
 }
 
 
-ostream&
+std::ostream&
 LogStream::get_file_stream()
 {
   Assert(file, ExcNoFileStreamGiven());
@@ -63,11 +63,11 @@ LogStream::get_file_stream()
 
 
 void
-LogStream::push (const string& text)
+LogStream::push (const std::string& text)
 {
-  string pre=prefixes.top();
+  std::string pre=prefixes.top();
   pre += text;
-  pre += string(":");
+  pre += std::string(":");
   prefixes.push(pre);
 };
 
@@ -118,7 +118,7 @@ LogStream::print_line_head()
 	  *std_out << utime << ':';
 	  std_out->width(p);
 	}
-    *std_out << prefixes.top() << ':';
+      *std_out << prefixes.top() << ':';
     }
   
   if (file && (prefixes.size() <= file_depth))
@@ -129,7 +129,7 @@ LogStream::print_line_head()
 	  *file << utime << ':';
 	  file->width(p);
 	}  
-    *file << prefixes.top() << ':';
+      *file << prefixes.top() << ':';
     }
 }
 
@@ -151,7 +151,7 @@ LogStream::memory_consumption () const
 				   // elements, we have to copy the
 				   // stack since we can't access
 				   // elements from further below
-  stack<string> tmp;
+  std::stack<std::string> tmp;
   while (tmp.size() > 0)
     {
       mem += MemoryConsumption::memory_consumption (tmp.top());

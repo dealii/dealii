@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,7 +61,7 @@ class DoFPrintSolverStep : public SOLVER
     DoFPrintSolverStep (SolverControl& control,
 			VectorMemory<VECTOR>& mem,
 			DataOut<dim>& data_out,
-			const string& basename);
+			const std::string& basename);
 
 				     /**
 				      * Call-back function for the
@@ -80,7 +80,7 @@ class DoFPrintSolverStep : public SOLVER
 				     /**
 				      * Base of filenames.
 				      */
-    const string basename;
+    const std::string basename;
 };
 
 
@@ -90,7 +90,7 @@ template<int dim, class SOLVER, class VECTOR>
 DoFPrintSolverStep<dim, SOLVER, VECTOR>::DoFPrintSolverStep (SolverControl& control,
 							     VectorMemory<VECTOR>& mem,
 							     DataOut<dim>& data_out,
-							     const string& basename)
+							     const std::string& basename)
 		: SOLVER (control, mem),
 		  out (data_out),
 		  basename (basename)
@@ -114,12 +114,12 @@ DoFPrintSolverStep<dim, SOLVER, VECTOR>::print_vectors (const unsigned int step,
 	   << setw(3) << setfill('0') << step
 	   << out.default_suffix() << ends;
 
-  const string fname = filename.str();
+  const std::string fname = filename.str();
 
-  deallog << "Writing file:" << fname << endl;
+  deallog << "Writing file:" << fname << std::endl;
 
   out.build_patches();
-  ofstream of (fname.c_str());
+  std::ofstream of (fname.c_str());
   out.write (of);
 }
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -153,8 +153,8 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * and therefore only one name needs to
 				      * be given.
 				      */
-    void declare_data_vector (const string     &name,
-			      const VectorType  vector_type);
+    void declare_data_vector (const std::string &name,
+			      const VectorType   vector_type);
 
 				     /**
 				      * Declare a data vector. The @p{vector_type}
@@ -173,8 +173,8 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * element if the finite element has
 				      * only one component.
 				      */
-    void declare_data_vector (const vector<string> &name,
-			      const VectorType      vector_type);
+    void declare_data_vector (const std::vector<std::string> &name,
+			      const VectorType                vector_type);
 
 
 				     /**
@@ -203,7 +203,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      */
     template <typename number>
     void add_data_vector (const Vector<number> &vec,
-			  const string         &name);
+			  const std::string    &name);
 
 				     /**
 				      * Add a data vector for the presently
@@ -234,8 +234,8 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * are already done.
 				      */
     template <typename number>
-    void add_data_vector (const Vector<number> &vec,
-			  const vector<string> &names);
+    void add_data_vector (const Vector<number>           &vec,
+			  const std::vector<std::string> &names);
 
 				     /**
 				      * Actually build the patches for output
@@ -296,9 +296,9 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * Exception
 				      */
     DeclException1 (ExcInvalidCharacter,
-		    string,
-		    << "Please use only the characters [a-zA-Z0-9_<>()] for" << endl
-		    << "description strings since AVS will only accept these." << endl
+		    std::string,
+		    << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
+		    << "description strings since AVS will only accept these." << std::endl
 		    << "The string you gave was <" << arg1 << ">.");
 				     /**
 				      * Exception
@@ -312,7 +312,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * Exception
 				      */
     DeclException1 (ExcVectorNotDeclared,
-		    string,
+		    std::string,
 		    << "The data vector for which the first component has the name "
 		    << arg1 << " has not been declared before.");
 				     /**
@@ -327,7 +327,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * Exception
 				      */
     DeclException1 (ExcNameAlreadyUsed,
-		    string,
+		    std::string,
 		    << "You tried to declare a component of a data vector with "
 		    << "the name <" << arg1 << ">, but that name is already used.");
 				     /**
@@ -362,7 +362,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * List of patches of all past and
 				      * present parameter value data sets.
 				      */
-    vector<DataOutBase::Patch<dim+1> >   patches;
+    std::vector<DataOutBase::Patch<dim+1> >   patches;
 
 				     /**
 				      * Structure holding data vectors
@@ -380,7 +380,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 					  * Names of the different components
 					  * within each such data set.
 					  */
-	vector<string> names;
+	std::vector<std::string> names;
 
 					 /**
 					  * Determine an estimate for
@@ -393,12 +393,12 @@ class DataOutStack : public DataOutInterface<dim+1>
 				     /**
 				      * List of DoF data vectors.
 				      */
-    vector<DataVector> dof_data;
+    std::vector<DataVector> dof_data;
 
 				     /**
 				      * List of cell data vectors.
 				      */
-    vector<DataVector> cell_data;
+    std::vector<DataVector> cell_data;
     
 				     /**
 				      * This is the function through
@@ -408,7 +408,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * the base class @ref{DataOutBase}) to
 				      * the actual output function.
 				      */
-    virtual const vector<DataOutBase::Patch<dim+1> > & get_patches () const;
+    virtual const std::vector<DataOutBase::Patch<dim+1> > & get_patches () const;
 
 
 				     /**
@@ -417,7 +417,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * obtained by the output functions
 				      * of the base class.
 				      */
-    virtual vector<string> get_dataset_names () const;
+    virtual std::vector<std::string> get_dataset_names () const;
 };
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -216,7 +216,7 @@ class KellyErrorEstimator
 				      *	for each boundary indicator, which is
 				      *	guaranteed by the @p{map} data type.
 				      */    
-    typedef map<unsigned char,const Function<dim>*> FunctionMap;
+    typedef std::map<unsigned char,const Function<dim>*> FunctionMap;
 
 
 				     /**
@@ -274,7 +274,7 @@ class KellyErrorEstimator
 			  const FunctionMap       &neumann_bc,
 			  const Vector<double>    &solution,
 			  Vector<float>           &error,
-			  const vector<bool>      &component_mask = vector<bool>(),
+			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  unsigned int             n_threads = multithread_info.n_default_threads);
 
@@ -308,9 +308,9 @@ class KellyErrorEstimator
     static void estimate (const DoFHandler<dim>               &dof,
 			  const Quadrature<dim-1>             &quadrature,
 			  const FunctionMap                   &neumann_bc,
-			  const vector<const Vector<double>*> &solutions,
-			  vector<Vector<float>*>              &errors,
-			  const vector<bool>                  &component_mask = vector<bool>(),
+			  const std::vector<const Vector<double>*> &solutions,
+			  std::vector<Vector<float>*>              &errors,
+			  const std::vector<bool>                  &component_mask = std::vector<bool>(),
 			  const Function<dim>                 *coefficients   = 0,
 			  unsigned int                         n_threads = multithread_info.n_default_threads);
 
@@ -359,7 +359,7 @@ class KellyErrorEstimator
 				      * general documentation of this
 				      * class for more information.
 				      */
-    typedef map<typename DoFHandler<dim>::face_iterator,vector<double> > FaceIntegrals;
+    typedef std::map<typename DoFHandler<dim>::face_iterator,std::vector<double> > FaceIntegrals;
 
 
 				     /**
@@ -418,8 +418,8 @@ class KellyErrorEstimator
 	const DoFHandler<dim>               &dof_handler;
 	const Quadrature<dim-1>             &quadrature;
 	const FunctionMap                   &neumann_bc;
-	const vector<const Vector<double>*> &solutions;
-	const vector<bool>                   component_mask;
+	const std::vector<const Vector<double>*> &solutions;
+	const std::vector<bool>                   component_mask;
 	const Function<dim>                 *coefficients;
 	const unsigned int                   n_threads;
 	const unsigned int                   n_solution_vectors;
@@ -447,7 +447,7 @@ class KellyErrorEstimator
 					  * synchronisation makes
 					  * things even slower.
 					  */ 
-	vector<vector<vector<double> > >         phi;
+	std::vector<std::vector<std::vector<double> > >         phi;
 
 					 /**
 					  * A vector for the gradients of
@@ -465,18 +465,18 @@ class KellyErrorEstimator
 					  * index of the solution
 					  * vector.
 					  */
-	vector<vector<vector<Tensor<1,dim> > > > psi;
+	std::vector<std::vector<std::vector<Tensor<1,dim> > > > psi;
 
 					 /**
 					  * The same vector for a neighbor cell
 					  */
-	vector<vector<vector<Tensor<1,dim> > > > neighbor_psi;
+	std::vector<std::vector<std::vector<Tensor<1,dim> > > > neighbor_psi;
 
 					 /**
 					  * The normal vectors of the finite
 					  * element function on one face
 					  */
-	vector<Tensor<1,dim> > normal_vectors;
+	vector<std::Tensor<1,dim> > normal_vectors;
 
 					 /**
 					  * Two arrays needed for the
@@ -484,8 +484,8 @@ class KellyErrorEstimator
 					  * the jumps, if they are
 					  * given.
 					  */
-	vector<double>          coefficient_values1;
-	vector<Vector<double> > coefficient_values;
+	std::vector<double>          coefficient_values1;
+	std::vector<Vector<double> > coefficient_values;
 
 					 /**
 					  * Array for the products of
@@ -493,7 +493,7 @@ class KellyErrorEstimator
 					  * weights of quadraturs
 					  * points.
 					  */
-	vector<double>          JxW_values;
+	std::vector<double>          JxW_values;
 
 					 /**
 					  * A constructor of the
@@ -503,8 +503,8 @@ class KellyErrorEstimator
 	Data(const DoFHandler<dim>               &dof,
 	     const Quadrature<dim-1>             &quadrature,
 	     const FunctionMap                   &neumann_bc,
-	     const vector<const Vector<double>*> &solutions,
-	     const vector<bool>                  &component_mask,
+	     const std::vector<const Vector<double>*> &solutions,
+	     const std::vector<bool>                  &component_mask,
 	     const Function<dim>                 *coefficients,
 	     const unsigned int                   n_threads,
 	     FaceIntegrals                       &face_integrals);

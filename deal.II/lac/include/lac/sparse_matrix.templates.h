@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -114,7 +114,7 @@ SparseMatrix<number>::reinit ()
     };
 
   if (val)
-    fill_n (&val[0], N, 0);
+    std::fill_n (&val[0], N, 0);
 }
 
 
@@ -168,8 +168,8 @@ unsigned int
 SparseMatrix<number>::n_actually_nonzero_elements () const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  return count_if(&val[0], &val[n_nonzero_elements ()],
-		  bind2nd(not_equal_to<double>(), 0));
+  return std::count_if(&val[0], &val[n_nonzero_elements ()],
+		       std::bind2nd(std::not_equal_to<double>(), 0));
 };
 
 
@@ -220,8 +220,8 @@ SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  copy (&matrix.val[0], &matrix.val[cols->n_nonzero_elements()],
-	&val[0]);
+  std::copy (&matrix.val[0], &matrix.val[cols->n_nonzero_elements()],
+	     &val[0]);
   
   return *this;
 };
@@ -414,7 +414,7 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 
 				       // space for the norms of
 				       // the different parts
-      vector<somenumber> partial_sums (n_threads, 0);
+      std::vector<somenumber> partial_sums (n_threads, 0);
       Threads::ThreadManager thread_manager;
 				       // spawn some jobs...
       for (unsigned int i=0; i<n_threads; ++i)
@@ -507,7 +507,7 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 
 				       // space for the norms of
 				       // the different parts
-      vector<somenumber> partial_sums (n_threads, 0);
+      std::vector<somenumber> partial_sums (n_threads, 0);
       Threads::ThreadManager thread_manager;
 				       // spawn some jobs...
       for (unsigned int i=0; i<n_threads; ++i)
@@ -644,7 +644,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
  
 				       // space for the square norms of
 				       // the different parts
-      vector<somenumber> partial_norms (n_threads, 0);
+      std::vector<somenumber> partial_norms (n_threads, 0);
       Threads::ThreadManager thread_manager;
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
@@ -688,7 +688,7 @@ void
 SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 					 const Vector<somenumber> &u,
 					 const Vector<somenumber> &b,
-					 const pair<unsigned int, unsigned int> interval,
+					 const std::pair<unsigned int, unsigned int> interval,
 					 somenumber               *partial_norm) const
 {
   const unsigned int begin_row = interval.first,
@@ -774,9 +774,10 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
 				       // line denotes the diagonal element,
 				       // which we need not check.
       const unsigned int first_right_of_diagonal_index
-	= (lower_bound (&cols->colnums[*rowstart_ptr+1],
-			&cols->colnums[*(rowstart_ptr+1)],
-			row) -
+	= (std::lower_bound (&cols->colnums[*rowstart_ptr+1],
+			     &cols->colnums[*(rowstart_ptr+1)],
+			     row)
+	   -
 	   &cols->colnums[0]);
 				       
       for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
@@ -797,9 +798,9 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
   for (int row=n-1; row>=0; --row, --rowstart_ptr, --dst_ptr)
     {
       const unsigned int first_right_of_diagonal_index
-	= (lower_bound (&cols->colnums[*rowstart_ptr+1],
-			&cols->colnums[*(rowstart_ptr+1)],
-			static_cast<unsigned int>(row)) -
+	= (std::lower_bound (&cols->colnums[*rowstart_ptr+1],
+			     &cols->colnums[*(rowstart_ptr+1)],
+			     static_cast<unsigned int>(row)) -
 	   &cols->colnums[0]);
       for (unsigned int j=first_right_of_diagonal_index; j<*(rowstart_ptr+1); ++j)
 	if (cols->colnums[j] > static_cast<unsigned int>(row))
@@ -990,6 +991,7 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
 }
 
 
+
 template <typename number>
 const SparsityPattern &
 SparseMatrix<number>::get_sparsity_pattern () const
@@ -999,21 +1001,23 @@ SparseMatrix<number>::get_sparsity_pattern () const
 };
 
 
+
 template <typename number>
-void SparseMatrix<number>::print (ostream &out) const {
+void SparseMatrix<number>::print (std::ostream &out) const
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
 
   for (unsigned int i=0; i<cols->rows; ++i)
     for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
-      out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << endl;
+      out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
 
   AssertThrow (out, ExcIO());
 };
 
 
 template <typename number>
-void SparseMatrix<number>::print_formatted (ostream &out,
+void SparseMatrix<number>::print_formatted (std::ostream &out,
 					    const unsigned int precision,
 					    bool scientific,
 					    unsigned int width,
@@ -1026,11 +1030,11 @@ void SparseMatrix<number>::print_formatted (ostream &out,
   out.precision (precision);
   if (scientific)
     {
-      out.setf (ios::scientific, ios::floatfield);
+      out.setf (std::ios::scientific, std::ios::floatfield);
       if (!width)
 	width = precision+7;
     } else {
-      out.setf (ios::fixed, ios::floatfield);
+      out.setf (std::ios::fixed, std::ios::floatfield);
       if (!width)
 	width = precision+2;
     }
@@ -1039,17 +1043,17 @@ void SparseMatrix<number>::print_formatted (ostream &out,
     {
       for (unsigned int j=0; j<n(); ++j)
 	if ((*cols)(i,j) != SparsityPattern::invalid_entry)
-	  out << setw(width)
+	  out << std::setw(width)
 	      << val[cols->operator()(i,j)] * denominator << ' ';
 	else
-	  out << setw(width) << zero_string << ' ';
-      out << endl;
+	  out << std::setw(width) << zero_string << ' ';
+      out << std::endl;
     };
   AssertThrow (out, ExcIO());
 
 // see above
 
-//  out.setf (0, ios::floatfield);                 // reset output format
+//  out.setf (0, std::ios::floatfield);                 // reset output format
 };
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -104,7 +104,7 @@ void MGDoFObjectAccessor<1, dim>::set_mg_vertex_dof_index (const unsigned int ve
 
 template <int dim>
 void
-MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indices) const
+MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -115,7 +115,7 @@ MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indic
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  vector<unsigned int>::iterator next = dof_indices.begin();
+  std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = mg_vertex_dof_index(vertex,d);
@@ -143,7 +143,7 @@ MGDoFObjectAccessor<1,dim>::get_mg_dof_values (const Vector<number> &values,
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  typename vector<number>::iterator next_dof_value=dof_values.begin();
+  typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_dof_value++ = values(mg_vertex_dof_index(vertex,d));
@@ -263,7 +263,7 @@ void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int ve
 
 template <int dim>
 void
-MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indices) const
+MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -276,7 +276,7 @@ MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indic
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  vector<unsigned int>::iterator next = dof_indices.begin();
+  std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = mg_vertex_dof_index(vertex,d);
@@ -308,7 +308,7 @@ MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  typename vector<number>::iterator next_dof_value=dof_values.begin();
+  typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_dof_value++ = values(mg_vertex_dof_index(vertex,d));
@@ -447,7 +447,7 @@ void MGDoFObjectAccessor<3, dim>::set_mg_vertex_dof_index (const unsigned int ve
 
 template <int dim>
 void
-MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indices) const
+MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -462,7 +462,7 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indic
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
-  vector<unsigned int>::iterator next = dof_indices.begin();
+  std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = mg_vertex_dof_index(vertex,d);
@@ -498,7 +498,7 @@ MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const Vector<number> &values,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
-  typename vector<number>::iterator next_dof_value=dof_values.begin();
+  typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_dof_value++ = values(mg_vertex_dof_index(vertex,d));

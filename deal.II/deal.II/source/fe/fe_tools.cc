@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,8 +42,8 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 				   // Initialize FEValues for fe1 at
 				   // the unit support points of the
 				   // fe2 element.
-  vector<double> phantom_weights(fe2.dofs_per_cell,1.);
-  vector<Point<dim> > fe2_support_points (fe2.dofs_per_cell);
+  std::vector<double> phantom_weights(fe2.dofs_per_cell,1.);
+  std::vector<Point<dim> > fe2_support_points (fe2.dofs_per_cell);
   fe2.get_unit_support_points (fe2_support_points);
   Quadrature<dim> fe2_support_points_quadrature(fe2_support_points,
 						phantom_weights);
@@ -117,7 +117,7 @@ void FETools::get_interpolation_difference_matrix(const FiniteElement<dim> &fe1,
   for (unsigned int i=0; i<fe1.dofs_per_cell; ++i)
     difference_matrix(i,i) = 1.;
   
-				     // compute difference
+				   // compute difference
   difference_matrix.add (-1, interpolation_matrix);
 }
 
@@ -151,8 +151,8 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 					cell2 = dof2.begin_active(),
 					endc2 = dof2.end();
 
-  vector<unsigned int> index_multiplicity(dof2.n_dofs(),0);
-  vector<unsigned int> dofs (dofs_per_cell2);
+  std::vector<unsigned int> index_multiplicity(dof2.n_dofs(),0);
+  std::vector<unsigned int> dofs (dofs_per_cell2);
   u2.clear ();
   
   for (; cell1!=endc1, cell2!=endc2; ++cell1, ++cell2) 

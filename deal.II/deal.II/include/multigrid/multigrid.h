@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -98,8 +98,8 @@ class Multigrid : public MGBase
 				     /**
 				      * Negative @p{vmult} on a level.
 //TODO: what does this function do?				      
-				      * @see MGBase.
-				      */
+* @see MGBase.
+*/
     virtual void level_vmult (const unsigned int    level,
 			      Vector<double>       &dest,
 			      const Vector<double> &src,
@@ -126,8 +126,8 @@ class Multigrid : public MGBase
 
 
 /**
-				      * Sparsity patterns for each level.
-				      */
+ * Sparsity patterns for each level.
+ */
     SmartPointer<const MGLevelObject<SparsityPattern> > level_sparsities;
     
 				     /**
@@ -219,17 +219,17 @@ class MGTransferPrebuilt : public MGTransferBase
 
   private:
 
-    vector<SparsityPattern>   prolongation_sparsities;
+    std::vector<SparsityPattern>   prolongation_sparsities;
 
-					 /**
-					  * The actual prolongation matrix.
-					  * column indices belong to the
-					  * dof indices of the mother cell,
-					  * i.e. the coarse level.
-					  * while row indices belong to the
-					  * child cell, i.e. the fine level.
-					  */
-    vector<SparseMatrix<double> > prolongation_matrices;
+				     /**
+				      * The actual prolongation matrix.
+				      * column indices belong to the
+				      * dof indices of the mother cell,
+				      * i.e. the coarse level.
+				      * while row indices belong to the
+				      * child cell, i.e. the fine level.
+				      */
+    std::vector<SparseMatrix<double> > prolongation_matrices;
 };
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,7 +77,7 @@ unsigned int GridReordering<dim>::Cell::count_neighbors () const
 
 template <int dim>
 void
-GridReordering<dim>::Cell::insert_faces (map<Face,FaceData> &/*global_faces*/)
+GridReordering<dim>::Cell::insert_faces (std::map<Face,FaceData> &/*global_faces*/)
 {
   Assert (false, ExcNotImplemented());
 };
@@ -87,7 +87,7 @@ GridReordering<dim>::Cell::insert_faces (map<Face,FaceData> &/*global_faces*/)
 
 template <>
 void
-GridReordering<2>::Cell::insert_faces (map<Face,FaceData> &global_faces)
+GridReordering<2>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 {
   const unsigned int dim = 2;
 
@@ -107,8 +107,8 @@ GridReordering<2>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 				   // already exists, then the stored
 				   // data is not touched.
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    faces[0][face] = global_faces.insert (make_pair(new_faces[face],
-						    FaceData())).first;
+    faces[0][face] = global_faces.insert (std::make_pair(new_faces[face],
+							 FaceData())).first;
 
 
 				   // then for each of the faces also
@@ -119,10 +119,10 @@ GridReordering<2>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 				   // `2'
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     {
-      swap (new_faces[face].vertices[0],
-	    new_faces[face].vertices[1]);
-      faces[2][face] = global_faces.insert (make_pair(new_faces[face],
-						      FaceData())).first;
+      std::swap (new_faces[face].vertices[0],
+		 new_faces[face].vertices[1]);
+      faces[2][face] = global_faces.insert (std::make_pair(new_faces[face],
+							   FaceData())).first;
     };
 
 				   // then finally fill in rotational
@@ -202,7 +202,7 @@ GridReordering<2>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 
 template <>
 void
-GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
+GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 {
   const unsigned int dim = 3;
 
@@ -229,17 +229,17 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 	{ { vertices[0], vertices[4], vertices[7], vertices[3] } } };
   Face new_faces[GeometryInfo<dim>::faces_per_cell][rotational_states_of_faces]
     = { { new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[1], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+	    new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+      { new_faces_tmp[1], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
 	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
 	{ new_faces_tmp[2], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[3], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[4], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[5], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] }};
+	    new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	  { new_faces_tmp[3], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+	      new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	    { new_faces_tmp[4], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+		new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	      { new_faces_tmp[5], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+		  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] }};
 
 				   // first do the faces in their
 				   // usual direction
@@ -258,8 +258,8 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
 	  new_faces[face][rot].vertices[v]
 	    = new_faces[face][rot-rotational_states_of_faces/2].vertices[v];
-	swap (new_faces[face][rot].vertices[1],
-	      new_faces[face][rot].vertices[3]);
+	std::swap (new_faces[face][rot].vertices[1],
+		   new_faces[face][rot].vertices[3]);
       };
   
 	
@@ -274,12 +274,12 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 				   // newighbor has already inserted
 				   // it or not. we don't care about
 				   // that here, though
-  map<Face,FaceData>::iterator
+  std::map<Face,FaceData>::iterator
     new_faces_ptr[rotational_states_of_faces][GeometryInfo<dim>::faces_per_cell];
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
       new_faces_ptr[rot][face]
-	= global_faces.insert (make_pair(new_faces[face][rot], FaceData())).first;
+	= global_faces.insert (std::make_pair(new_faces[face][rot], FaceData())).first;
   
 				   // and crosslink them to each other
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -310,40 +310,40 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 //  	cout << new_faces_ptr[0][face]->first.vertices[i] << ' ';
 //        cout << '>';
       
-    if (new_faces_ptr[0][face]->second.adjacent_cells[0] ==
-	FaceData::invalid_adjacent_cell)
-      {
+      if (new_faces_ptr[0][face]->second.adjacent_cells[0] ==
+	  FaceData::invalid_adjacent_cell)
+	{
 //	cout << " as neighbor 0" << endl;
-					 // no, faces had not been
-					 // used before, so we are the
-					 // first adjacent cell
-	for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
-	  {
-	    Assert (new_faces_ptr[rot][face]->second.adjacent_cells[0]
-		    == FaceData::invalid_adjacent_cell,
-		    ExcInternalError());
-	    new_faces_ptr[rot][face]->second.adjacent_cells[0] = cell_no;
-	  };
-      }
-    else
-      {	
-					 // otherwise: cell had been
-					 // entered before, so we are
-					 // the second neighbor
-	const unsigned int
-	  previous_neighbor = new_faces_ptr[0][face]->second.adjacent_cells[0];
+					   // no, faces had not been
+					   // used before, so we are the
+					   // first adjacent cell
+	  for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
+	    {
+	      Assert (new_faces_ptr[rot][face]->second.adjacent_cells[0]
+		      == FaceData::invalid_adjacent_cell,
+		      ExcInternalError());
+	      new_faces_ptr[rot][face]->second.adjacent_cells[0] = cell_no;
+	    };
+	}
+      else
+	{	
+					   // otherwise: cell had been
+					   // entered before, so we are
+					   // the second neighbor
+	  const unsigned int
+	    previous_neighbor = new_faces_ptr[0][face]->second.adjacent_cells[0];
 //	cout << " as neighbor 1 (previous: " << previous_neighbor << ")" << endl;
-	for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
-	  {
-	    Assert (new_faces_ptr[rot][face]->second.adjacent_cells[0] ==
-		    previous_neighbor,
-		    ExcInternalError());
-	    Assert (new_faces_ptr[rot][face]->second.adjacent_cells[1] ==
-		    FaceData::invalid_adjacent_cell,
-		    ExcInternalError());
-	    new_faces_ptr[rot][face]->second.adjacent_cells[1] = cell_no;
-	  };
-      };
+	  for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
+	    {
+	      Assert (new_faces_ptr[rot][face]->second.adjacent_cells[0] ==
+		      previous_neighbor,
+		      ExcInternalError());
+	      Assert (new_faces_ptr[rot][face]->second.adjacent_cells[1] ==
+		      FaceData::invalid_adjacent_cell,
+		      ExcInternalError());
+	      new_faces_ptr[rot][face]->second.adjacent_cells[1] = cell_no;
+	    };
+	};
     };
   
   
@@ -401,7 +401,7 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 				   // each of the six faces build the
 				   // cell (store which face and which
 				   // orientation):
-  static pair<unsigned int, unsigned int>
+  static std::pair<unsigned int, unsigned int>
     cell_orientation_faces[rotational_states_of_cells][GeometryInfo<dim>::faces_per_cell];
 
   if (already_initialized == false)
@@ -448,7 +448,7 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 		for (unsigned int r=0; r<rotational_states_of_faces; ++r)
 		  if (standard_faces[face] == new_faces[f][r])
 		    {
-		      cell_orientation_faces[rot][face] = make_pair(f,r);
+		      cell_orientation_faces[rot][face] = std::make_pair(f,r);
 		      face_found = true;
 		      break;
 		    };
@@ -476,7 +476,7 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 					   // often, don't make
 					   // differences between
 					   // debug and optimized mode
-	  vector<bool> face_used(GeometryInfo<dim>::faces_per_cell, false);
+	  std::vector<bool> face_used(GeometryInfo<dim>::faces_per_cell, false);
 	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	    {
 					       // ups, face already
@@ -692,9 +692,9 @@ GridReordering<dim>::FaceData::FaceData () :
 
 template <int dim>
 inline
-void GridReordering<dim>::track_back (vector<Cell>  &cells,
-				      RotationStack &rotation_states,
-				      unsigned int   track_back_to_cell)
+void GridReordering<dim>::track_back (std::vector<Cell> &cells,
+				      RotationStack     &rotation_states,
+				      unsigned int       track_back_to_cell)
 {
   top_of_function:
   
@@ -735,7 +735,7 @@ void GridReordering<dim>::track_back (vector<Cell>  &cells,
 				       // last cell can't be rotated
 				       // further. go on with
 				       // backtracking
-      const typename vector<Cell>::iterator
+      const typename std::vector<Cell>::iterator
 	try_cell = cells.begin() + rotation_states.size();
       
       track_back_to_cell = try_cell->track_back_to_cell;
@@ -766,8 +766,8 @@ void GridReordering<dim>::track_back (vector<Cell>  &cells,
 
 
 template <int dim>
-bool GridReordering<dim>::try_rotate_single_neighbors (vector<Cell>  &cells,
-						       RotationStack &rotation_states)
+bool GridReordering<dim>::try_rotate_single_neighbors (std::vector<Cell> &cells,
+						       RotationStack     &rotation_states)
 {
 				   // the rotation state of the cell
 				   // which we try to add by rotating
@@ -882,9 +882,9 @@ bool GridReordering<dim>::try_rotate_single_neighbors (vector<Cell>  &cells,
 
 
 template <int dim>
-void GridReordering<dim>::find_reordering (vector<Cell<dim> >         &cells,
-					   vector<CellData<dim> >     &original_cells,
-					   const vector<unsigned int> &new_cell_numbers)
+void GridReordering<dim>::find_reordering (std::vector<Cell>               &cells,
+					   std::vector<CellData<dim> >     &original_cells,
+					   const std::vector<unsigned int> &new_cell_numbers)
 {
 //  cout << "Starting..." << flush;
   
@@ -931,7 +931,7 @@ void GridReordering<dim>::find_reordering (vector<Cell<dim> >         &cells,
 //  	    cout << "New max size " << rotation_states.size() << endl;
 	};
       
-      const typename vector<Cell>::iterator
+      const typename std::vector<Cell>::iterator
 	try_cell = cells.begin() + rotation_states.size()-1;
       if (try_cell->check_consistency (rotation_states.back()))
 	{
@@ -1076,9 +1076,9 @@ void GridReordering<dim>::find_reordering (vector<Cell<dim> >         &cells,
 
 
 template <int dim>
-vector<unsigned int>
-GridReordering<dim>::presort_cells (vector<Cell<dim> > &cells,
-				    map<Face,FaceData> &faces)
+std::vector<unsigned int>
+GridReordering<dim>::presort_cells (std::vector<Cell>       &cells,
+				    std::map<Face,FaceData> &faces)
 {
 				   // first find the cell with the
 				   // least neighbors
@@ -1098,11 +1098,11 @@ GridReordering<dim>::presort_cells (vector<Cell<dim> > &cells,
 				   // insert the new cells numbers of
 				   // each cell
   const unsigned int invalid_cell_number = static_cast<unsigned int>(-1);
-  vector<unsigned int> new_cell_numbers (cells.size(), invalid_cell_number);
+  std::vector<unsigned int> new_cell_numbers (cells.size(), invalid_cell_number);
 
 				   // and have an array of the next
 				   // cells to be numbered (old numbers)
-  vector<unsigned int> next_round_cells (1, cell_with_min_neighbors);
+  std::vector<unsigned int> next_round_cells (1, cell_with_min_neighbors);
 
   unsigned int next_free_new_number = 0;
   
@@ -1123,10 +1123,10 @@ GridReordering<dim>::presort_cells (vector<Cell<dim> > &cells,
 				       // neighbors of the cells of
 				       // this round which have not
 				       // yet been renumbered
-      vector<unsigned int> new_next_round_cells;
+      std::vector<unsigned int> new_next_round_cells;
       for (unsigned int i=0; i<next_round_cells.size(); ++i)
 	for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	  if (cells[next_round_cells[i]].neighbors[n] != Cell<dim>::invalid_neighbor)
+	  if (cells[next_round_cells[i]].neighbors[n] != Cell::invalid_neighbor)
 	    if (new_cell_numbers[cells[next_round_cells[i]].neighbors[n]]
 		== invalid_cell_number)
 	      new_next_round_cells.push_back (cells[next_round_cells[i]].neighbors[n]);
@@ -1168,7 +1168,7 @@ GridReordering<dim>::presort_cells (vector<Cell<dim> > &cells,
 
 				   // now that we know in which order
 				   // to sort the cells, do so:
-  vector<Cell<dim> > new_cells (cells.size());
+  std::vector<Cell> new_cells (cells.size());
   for (unsigned int i=0; i<cells.size(); ++i)
     new_cells[new_cell_numbers[i]] = cells[i];
 				   // then switch old and new array
@@ -1186,7 +1186,7 @@ GridReordering<dim>::presort_cells (vector<Cell<dim> > &cells,
 	cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
     };
 
-  for (typename map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
+  for (typename std::map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
     for (unsigned int k=0; k<2; ++k)
       if (i->second.adjacent_cells[k] != FaceData::invalid_adjacent_cell)
 	i->second.adjacent_cells[k] = new_cell_numbers[i->second.adjacent_cells[k]];
@@ -1197,7 +1197,7 @@ GridReordering<dim>::presort_cells (vector<Cell<dim> > &cells,
 		      
 
 template <int dim>
-void GridReordering<dim>::reorder_cells (vector<CellData<dim> > &original_cells)
+void GridReordering<dim>::reorder_cells (std::vector<CellData<dim> > &original_cells)
 {
 				   // we need more information than
 				   // provided by the input parameter,
@@ -1207,15 +1207,15 @@ void GridReordering<dim>::reorder_cells (vector<CellData<dim> > &original_cells)
 				   // old cells to another class that
 				   // provides space to these
 				   // informations
-  vector<Cell<dim> > cells;
+  std::vector<Cell> cells;
   cells.reserve (original_cells.size());
   for (unsigned int i=0; i<original_cells.size(); ++i)
-    cells.push_back (Cell<dim>(original_cells[i], i));
+    cells.push_back (Cell(original_cells[i], i));
   
 				   // first generate all the faces
 				   // possible, i.e. in each possible
 				   // direction and rotational state
-  map<Face,FaceData> faces;
+  std::map<Face,FaceData> faces;
   for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
     cells[cell_no].insert_faces (faces);
 
@@ -1234,7 +1234,7 @@ void GridReordering<dim>::reorder_cells (vector<CellData<dim> > &original_cells)
 				   // do a preordering step in order
 				   // to make further backtracking
 				   // more local
-  const vector<unsigned int>
+  const std::vector<unsigned int>
     new_cell_numbers = presort_cells (cells, faces);
 
 				   // finally do some preliminary work
@@ -1255,7 +1255,7 @@ void GridReordering<dim>::reorder_cells (vector<CellData<dim> > &original_cells)
 				   // find_reordering function has
 				   // cleared all used marks it knows
 				   // of
-  for (typename map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
+  for (typename std::map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
     Assert (i->second.use_count == 0, ExcInternalError());
 };
 
@@ -1264,7 +1264,7 @@ void GridReordering<dim>::reorder_cells (vector<CellData<dim> > &original_cells)
 #if deal_II_dimension == 1
 
 template <>
-void GridReordering<1>::reorder_cells (vector<CellData<1> > &)
+void GridReordering<1>::reorder_cells (std::vector<CellData<1> > &)
 {
 				   // there should not be much to do
 				   // in 1d...
@@ -1281,7 +1281,7 @@ void GridReordering<1>::reorder_cells (vector<CellData<1> > &)
 template
 void
 GridReordering<deal_II_dimension>::
-reorder_cells (vector<CellData<deal_II_dimension> > &);
+reorder_cells (std::vector<CellData<deal_II_dimension> > &);
 #endif
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,8 +73,8 @@ FullMatrix<number>::FullMatrix (const FullMatrix &m) :
 {
   reinit (m.dim_image, m.dim_range);
   if (dim_range*dim_image != 0)
-    copy (&m.val[0], &m.val[dim_image*dim_range],
-	  &val[0]);
+    std::copy (&m.val[0], &m.val[dim_image*dim_range],
+	       &val[0]);
 };
 
 
@@ -421,8 +421,8 @@ FullMatrix<number>::operator = (const FullMatrix<number>& m)
 {
   reinit (m);
   if (dim_range*dim_image != 0)
-    copy (&m.val[0], &m.val[dim_image*dim_range],
-	  &val[0]);
+    std::copy (&m.val[0], &m.val[dim_image*dim_range],
+	       &val[0]);
   
   return *this;
 }
@@ -690,15 +690,17 @@ number FullMatrix<number>::linfty_norm () const
 
 template <typename number>
 void
-FullMatrix<number>::print (ostream& s, int w, int p) const
+FullMatrix<number>::print (std::ostream       &s,
+			   const unsigned int  w,
+			   const unsigned int  p) const
 {
   Assert (val != 0, ExcEmptyMatrix());
   
-  unsigned int i,j;
-  for (i=0;i<m();i++)
+  for (unsigned int i=0; i<m(); ++i)
     {
-      for (j=0;j<n();j++) s << setw(w) << setprecision(p) << el(i,j);
-      s << endl;
+      for (unsigned int j=0; j<n(); ++j)
+	s << std::setw(w) << std::setprecision(p) << el(i,j);
+      s << std::endl;
     }
 }
 
@@ -1084,8 +1086,8 @@ FullMatrix<number>::operator == (const FullMatrix<number> &m) const
   return ( ((val==0) && (m.val==0)) ||
 	   ((dim_range==m.dim_range) &&
 	    (dim_image==m.dim_image) &&
-	    equal (&val[0], &val[dim_range*dim_image],
-		   &m.val[0])));
+	    std::equal (&val[0], &val[dim_range*dim_image],
+			&m.val[0])));
 };
 
 
@@ -1155,7 +1157,7 @@ template <typename number>
 void FullMatrix<number>::clear ()
 {
   if (val != 0)
-    fill_n (&val[0], n()*m(), 0);
+    std::fill_n (&val[0], n()*m(), 0);
 };
 
 
@@ -1320,16 +1322,18 @@ FullMatrix<number>::invert (const FullMatrix<number> &M)
 
 template <typename number>
 void
-FullMatrix<number>::print_formatted (ostream &out,
-				     const unsigned int precision,
-				     bool scientific,
-				     unsigned int width,
-				     const char* zero_string,
-				     const double denominator) const
+FullMatrix<number>::print_formatted (std::ostream       &out,
+				     const unsigned int  precision,
+				     const bool          scientific,
+				     const unsigned int  width,
+				     const char         *zero_string,
+				     const double        denominator) const
 {
   Assert (val != 0, ExcEmptyMatrix());
   
-  unsigned int old_precision = out.precision (precision);
+				   // set output format, but store old
+				   // state
+  std::ios::fmtflags old_flags = out.flags();
   if (scientific)
     {
       out.setf (ios::scientific, ios::floatfield);
@@ -1345,22 +1349,19 @@ FullMatrix<number>::print_formatted (ostream &out,
     {
       for (unsigned int j=0; j<n(); ++j)
 	if (el(i,j) != 0)
-	  out << setw(width)
+	  out << std::setw(width)
 	      << el(i,j) * denominator << ' ';
 	else
-	  out << setw(width) << zero_string << ' ';
-      out << endl;
+	  out << std::setw(width) << zero_string << ' ';
+      out << std::endl;
     };
 
   AssertThrow (out, ExcIO());
-
-  out.precision(old_precision);
-  out.setf (0, ios::floatfield);                 // reset output format
+				   // reset output format
+  out.flags (old_flags);
 };
 
 
-// Gauss-Jordan-Algorithmus
-// cf. Stoer I (4th Edition) p. 153
 
 template <typename number>
 void
@@ -1369,7 +1370,9 @@ FullMatrix<number>::gauss_jordan()
   Assert (val != 0, ExcEmptyMatrix());  
   Assert (dim_range == dim_image, ExcNotQuadratic());
   
-  vector<unsigned int> p(n());
+				   // Gauss-Jordan-Algorithmus
+				   // cf. Stoer I (4th Edition) p. 153
+  std::vector<unsigned int> p(n());
 
   for (unsigned int i=0; i<n(); ++i)
     p[i] = i;
@@ -1392,9 +1395,9 @@ FullMatrix<number>::gauss_jordan()
       if (r>j)
 	{
 	  for (unsigned int k=0; k<n(); ++k)
-	    swap (el(j,k), el(r,k));
+	    std::swap (el(j,k), el(r,k));
 
-	  swap (p[j], p[r]);
+	  std::swap (p[j], p[r]);
 	}
 
 				       // transformation
@@ -1417,7 +1420,7 @@ FullMatrix<number>::gauss_jordan()
       el(j,j) = hr;
     }
 				   // columninterchange
-  vector<number> hv(n());
+  std::vector<number> hv(n());
   for (unsigned int i=0; i<n(); ++i)
     {
       for (unsigned int k=0; k<n(); ++k)

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -208,7 +208,7 @@ class DoFRenumbering
     Cuthill_McKee (DoFHandler<dim>            &dof_handler,
 		   const bool                  reversed_numbering = false,
 		   const bool                  use_constraints    = false,
-		   const vector<unsigned int> &starting_indices   = vector<unsigned int>());
+		   const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int>());
 
 				     /**
 				      * Renumber the degrees of freedom
@@ -234,7 +234,7 @@ class DoFRenumbering
     Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
 		   const unsigned int          level,
 		   const bool                  reversed_numbering = false,
-		   const vector<unsigned int> &starting_indices   = vector<unsigned int> ());
+		   const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int> ());
 
 				     /**
 				      * Sort the degrees of freedom by
@@ -272,7 +272,7 @@ class DoFRenumbering
     template <int dim>
     static void
     component_wise (DoFHandler<dim>            &dof_handler,
-		    const vector<unsigned int> &component_order = vector<unsigned int>());
+		    const std::vector<unsigned int> &component_order = std::vector<unsigned int>());
 
 				     /**
 				      * Cell-wise renumbering for DG
@@ -296,7 +296,7 @@ class DoFRenumbering
     template <int dim>
     static void
     cell_wise_dg (DoFHandler<dim>                     &dof_handler,
-		  const vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
+		  const std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
     
 
 				     /**
@@ -309,7 +309,7 @@ class DoFRenumbering
     static void
     cell_wise_dg (MGDoFHandler<dim>                                       &dof_handler,
 		  const unsigned int                                       level,
-		  const vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
+		  const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
     
 
 				     /**
@@ -372,8 +372,8 @@ class DoFRenumbering
 				      */
     template <int dim>
     static void
-    sort_selected_dofs_back (DoFHandler<dim>    &dof_handler,
-			     const vector<bool> &selected_dofs);
+    sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
+			     const std::vector<bool> &selected_dofs);
 
 				     /**
 				      * Renumber the degrees of

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -100,7 +100,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   
   FullMatrix<double>   local_mass_matrix (dofs_per_cell, dofs_per_cell);
-  vector<unsigned int> dofs_on_this_cell (dofs_per_cell);
+  std::vector<unsigned int> dofs_on_this_cell (dofs_per_cell);
   
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
@@ -125,7 +125,7 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 						    SparseMatrix<double>   &,
 						    const FunctionMap      &,
 						    Vector<double>         &,
-						    vector<unsigned int>   &,
+						    std::vector<unsigned int>   &,
 						    const Function<1>      *)
 {
   Assert (false, ExcNotImplemented());
@@ -140,7 +140,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 						      SparseMatrix<double>     &matrix,
 						      const FunctionMap        &rhs,
 						      Vector<double>           &rhs_vector,
-						      vector<unsigned int>     &dof_to_boundary_mapping,
+						      std::vector<unsigned int>     &dof_to_boundary_mapping,
 						      const Function<dim>      *a)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
@@ -160,7 +160,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   if (true)
     {
       unsigned int max_element = 0;
-      for (vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
+      for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
 	   i!=dof_to_boundary_mapping.end(); ++i)
 	if ((*i != DoFHandler<dim>::invalid_dof_index) &&
 	    (*i > max_element))
@@ -184,17 +184,17 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 				   // two variables for the coefficient,
 				   // one for the two cases indicated in
 				   // the name
-  vector<double>          coefficient_values_scalar (fe_values.n_quadrature_points);
-  vector<Vector<double> > coefficient_values_system (fe_values.n_quadrature_points,
+  std::vector<double>          coefficient_values_scalar (fe_values.n_quadrature_points);
+  std::vector<Vector<double> > coefficient_values_system (fe_values.n_quadrature_points,
 						     Vector<double>(n_components));
 
-  vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
-  vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
+  std::vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
+  std::vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
 					     Vector<double>(n_components));
 
-  vector<unsigned int> dofs (dofs_per_cell);
-  vector<unsigned int> dofs_on_face_vector (dofs_per_face);
-  set<int> dofs_on_face;
+  std::vector<unsigned int> dofs (dofs_per_cell);
+  std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
+  std::set<int> dofs_on_face;
 
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active (),
 					endc = dof.end ();
@@ -210,7 +210,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 	  fe_values.reinit (cell, face);
 
 	  const FullMatrix<double> &values    = fe_values.get_shape_values ();
-	  const vector<double>     &weights   = fe_values.get_JxW_values ();
+	  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
 
 	  if (fe_is_system)
 					     // FE has several components
@@ -519,7 +519,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 template <int dim>
 template <typename number>
 void
-MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
+MatrixTools<dim>::apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 					 SparseMatrix<number>  &matrix,
 					 Vector<number>   &solution,
 					 Vector<number>   &right_hand_side,
@@ -537,7 +537,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
     return;
 
 
-  map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
+  std::map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
 					    endd = boundary_values.end();
   const unsigned int n_dofs             = matrix.m();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
@@ -646,7 +646,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 					       // element
 					       // (row,dof_number)
 	      const unsigned int *
-		p = lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
+		p = std::lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
 				&sparsity_colnums[sparsity_rowstart[row+1]],
 				dof_number);
 
@@ -686,7 +686,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 
 template <int dim>
 void
-MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
+MatrixTools<dim>::apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 					 BlockSparseMatrix<double>  &matrix,
 					 BlockVector<double>   &solution,
 					 BlockVector<double>   &right_hand_side,
@@ -719,7 +719,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
     return;
 
 
-  map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
+  std::map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
 					    endd = boundary_values.end();
   const unsigned int n_dofs = matrix.m();
   const BlockSparsityPattern &
@@ -770,7 +770,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 				       // in the block in which this
 				       // dof is located
       const unsigned int dof_number = dof->first;
-      const pair<unsigned int,unsigned int>
+      const std::pair<unsigned int,unsigned int>
 	block_index = index_mapping.global_to_local (dof_number);
 
 				       // for each boundary dof:
@@ -943,14 +943,14 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 			p = &this_sparsity.get_column_numbers()
 			    [this_sparsity.get_rowstart_indices()[row]];
 		      else
-			p = lower_bound(&this_sparsity.get_column_numbers()
+			p = std::lower_bound(&this_sparsity.get_column_numbers()
 					[this_sparsity.get_rowstart_indices()[row]+1],
 					&this_sparsity.get_column_numbers()
 					[this_sparsity.get_rowstart_indices()[row+1]],
 					block_index.second);
 		    }
 		  else
-		    p = lower_bound(&this_sparsity.get_column_numbers()
+		    p = std::lower_bound(&this_sparsity.get_column_numbers()
 				    [this_sparsity.get_rowstart_indices()[row]],
 				    &this_sparsity.get_column_numbers()
 				    [this_sparsity.get_rowstart_indices()[row+1]],
@@ -1030,7 +1030,7 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
 	  Equation<dim>::ExcObjectNotEmpty());
   
   const FullMatrix<double> &values    = fe_values.get_shape_values ();
-  const vector<double>     &weights   = fe_values.get_JxW_values ();
+  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
 
 
   if (coefficient != 0)
@@ -1038,7 +1038,7 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
       if (coefficient->n_components == 1)
 					 // scalar coefficient given
 	{
-	  vector<double> coefficient_values (fe_values.n_quadrature_points);
+	  std::vector<double> coefficient_values (fe_values.n_quadrature_points);
 	  coefficient->value_list (fe_values.get_quadrature_points(),
 				   coefficient_values);
 	  for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -1059,7 +1059,7 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
 					 // vectorial coefficient
 					 // given
 	{
-	  vector<Vector<double> > coefficient_values (fe_values.n_quadrature_points,
+	  std::vector<Vector<double> > coefficient_values (fe_values.n_quadrature_points,
 						      Vector<double>(n_components));
 	  coefficient->vector_value_list (fe_values.get_quadrature_points(),
 					  coefficient_values);
@@ -1127,13 +1127,13 @@ void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 	  Equation<dim>::ExcObjectNotEmpty());
 
   const FullMatrix<double> &values    = fe_values.get_shape_values ();
-  const vector<double>     &weights   = fe_values.get_JxW_values ();
-  vector<double>            rhs_values (fe_values.n_quadrature_points);
+  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
+  std::vector<double>            rhs_values (fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
   if (coefficient != 0)
     {
-      vector<double> coefficient_values (n_q_points);
+      std::vector<double> coefficient_values (n_q_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<n_q_points; ++point)
@@ -1187,8 +1187,8 @@ void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 	  Equation<dim>::ExcObjectNotEmpty());
 
   const FullMatrix<double> &values    = fe_values.get_shape_values ();
-  const vector<double>     &weights   = fe_values.get_JxW_values ();
-  vector<double>            rhs_values(fe_values.n_quadrature_points);
+  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
+  std::vector<double>            rhs_values(fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
   for (unsigned int point=0; point<n_q_points; ++point)
@@ -1238,15 +1238,15 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
   Assert (rhs.all_zero(),
 	  Equation<dim>::ExcObjectNotEmpty());
 
-  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
   const FullMatrix<double>             &values    = fe_values.get_shape_values ();
-  vector<double>        rhs_values(fe_values.n_quadrature_points);
-  const vector<double> &weights   = fe_values.get_JxW_values ();
+  std::vector<double>        rhs_values(fe_values.n_quadrature_points);
+  const std::vector<double> &weights   = fe_values.get_JxW_values ();
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
   if (coefficient != 0)
     {
-      vector<double> coefficient_values(n_q_points);
+      std::vector<double> coefficient_values(n_q_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<n_q_points; ++point)
@@ -1302,12 +1302,12 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
   Assert (cell_matrix.all_zero(),
 	  Equation<dim>::ExcObjectNotEmpty());
   
-  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-  const vector<double> &weights   = fe_values.get_JxW_values ();
+  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+  const std::vector<double> &weights   = fe_values.get_JxW_values ();
    
   if (coefficient != 0)
     {
-      vector<double> coefficient_values(n_q_points);
+      std::vector<double> coefficient_values(n_q_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<n_q_points; ++point)
@@ -1358,8 +1358,8 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 	  Equation<dim>::ExcObjectNotEmpty());
 
   const FullMatrix<double> &values    = fe_values.get_shape_values ();
-  const vector<double>     &weights   = fe_values.get_JxW_values ();
-  vector<double>        rhs_values(fe_values.n_quadrature_points);
+  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
+  std::vector<double>        rhs_values(fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
    
   for (unsigned int point=0; point<n_q_points; ++point)
@@ -1382,7 +1382,7 @@ template class LaplaceMatrix<deal_II_dimension>;
 template
 void
 MatrixTools<deal_II_dimension>::
-apply_boundary_values (const map<unsigned int,double> &boundary_values,
+apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 		       SparseMatrix<double>  &matrix,
 		       Vector<double>   &solution,
 		       Vector<double>   &right_hand_side,
@@ -1391,7 +1391,7 @@ apply_boundary_values (const map<unsigned int,double> &boundary_values,
 template
 void
 MatrixTools<deal_II_dimension>::
-apply_boundary_values (const map<unsigned int,double> &boundary_values,
+apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 		       SparseMatrix<float>  &matrix,
 		       Vector<float>   &solution,
 		       Vector<float>   &right_hand_side,
@@ -1400,7 +1400,7 @@ apply_boundary_values (const map<unsigned int,double> &boundary_values,
 template
 void
 MatrixTools<deal_II_dimension>::
-apply_boundary_values (const map<unsigned int,double> &,
+apply_boundary_values (const std::map<unsigned int,double> &,
 		       BlockSparseMatrix<double>      &,
 		       BlockVector<double>            &,
 		       BlockVector<double>            &,

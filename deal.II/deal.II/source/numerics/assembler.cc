@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -91,7 +91,7 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 
 
 // get indices of dofs
-  vector<unsigned int> dofs (n_dofs);
+  std::vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
 
 				   // one could use the

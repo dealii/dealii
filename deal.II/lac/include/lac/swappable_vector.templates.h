@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -93,7 +93,7 @@ SwappableVector<number>::operator= (const SwappableVector<number> &v)
 
 
 template <typename number>
-void SwappableVector<number>::swap_out (const string &name)
+void SwappableVector<number>::swap_out (const std::string &name)
 {
 				   // if the vector was stored in
 				   // another file previously, and
@@ -118,7 +118,7 @@ void SwappableVector<number>::swap_out (const string &name)
 				   //  @p{reload} function
   Assert (data_is_preloaded == false, ExcInternalError());
   
-  ofstream tmp_out(filename.c_str());
+  std::ofstream tmp_out(filename.c_str());
   block_write (tmp_out);
   tmp_out.close ();
 	
@@ -203,7 +203,7 @@ void SwappableVector<number>::reload_vector (const bool set_flag)
   Assert (filename != "", ExcInvalidFilename (filename));
   Assert (size() == 0, ExcSizeNonzero());
   
-  ifstream tmp_in(filename.c_str());
+  std::ifstream tmp_in(filename.c_str());
   block_read (tmp_in);
   tmp_in.close ();
 
@@ -255,7 +255,7 @@ void SwappableVector<number>::kill_file ()
 
 
 template <typename number>
-const string &
+const std::string &
 SwappableVector<number>::get_filename () const 
 {
   return filename;

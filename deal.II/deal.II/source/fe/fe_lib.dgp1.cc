@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,7 @@ template <> void FEDG_P1<deal_II_dimension>::initialize_matrices ();
 template <>
 FEDG_P1<1>::FEDG_P1 () :
 		FEQ1Mapping<1> (0, 2, 0, 0, 1,
-				vector<bool> (1, true))
+				std::vector<bool> (1, true))
 {
 //  initialize_matrices ();
 };
@@ -65,13 +65,13 @@ void FEDG_P1<1>::initialize_matrices ()
 template <>
 double
 FEDG_P1<1>::shape_value(const unsigned int i,
-			 const Point<1>     &p) const
+			const Point<1>     &p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   switch (i)
     {
-    case 0: return 1.-p(0);
-    case 1: return p(0);
+      case 0: return 1.-p(0);
+      case 1: return p(0);
     }
   return 0.;
 }
@@ -81,7 +81,7 @@ template <>
 inline
 Tensor<1,1>
 FEDG_P1<1>::shape_grad(const unsigned int i,
-			const Point<1>&) const
+		       const Point<1>&) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // originally, the return type of the
@@ -91,8 +91,8 @@ FEDG_P1<1>::shape_grad(const unsigned int i,
 				   // however
   switch (i)
     {
-    case 0: return Point<1>(-1.);
-    case 1: return Point<1>(1.);
+      case 0: return Point<1>(-1.);
+      case 1: return Point<1>(1.);
     }
   return Point<1>();
 };
@@ -112,7 +112,7 @@ FEDG_P1<1>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FEDG_P1<1>::get_unit_support_points (vector<Point<1> >  &support_points) const
+void FEDG_P1<1>::get_unit_support_points (std::vector<Point<1> >  &support_points) const
 {
   FiniteElement<1>::get_unit_support_points (support_points);
 };
@@ -120,7 +120,7 @@ void FEDG_P1<1>::get_unit_support_points (vector<Point<1> >  &support_points) co
 
 template <>
 void FEDG_P1<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
-				     vector<Point<1> >  &support_points) const
+				     std::vector<Point<1> >  &support_points) const
 {
   FiniteElement<1>::get_support_points (cell, support_points);
 };
@@ -128,7 +128,7 @@ void FEDG_P1<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
 
 template <>
 void FEDG_P1<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
-					  vector<Point<1> >  &) const
+					  std::vector<Point<1> >  &) const
 {
   Assert (false, ExcInternalError());
 };
@@ -136,7 +136,7 @@ void FEDG_P1<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 
 template <>
 void FEDG_P1<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
-					 FullMatrix<double> &local_mass_matrix) const
+					FullMatrix<double> &local_mass_matrix) const
 {
   Assert (local_mass_matrix.n() == dofs_per_cell,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
@@ -158,7 +158,7 @@ void FEDG_P1<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell
 template <>
 FEDG_P1<2>::FEDG_P1 () :
 		FEQ1Mapping<2> (0, 0, 3, 0, 1,
-				vector<bool> (1, true))
+				std::vector<bool> (1, true))
 {
 //  initialize_matrices ();
 };
@@ -175,7 +175,7 @@ template <>
 inline
 double
 FEDG_P1<2>::shape_value (const unsigned int i,
-			  const Point<2>& p) const
+			 const Point<2>& p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   switch (i)
@@ -192,7 +192,7 @@ template <>
 inline
 Tensor<1,2>
 FEDG_P1<2>::shape_grad (const unsigned int i,
-			 const Point<2>&) const
+			const Point<2>&) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // originally, the return type of the
@@ -214,7 +214,7 @@ template <>
 inline
 Tensor<2,2>
 FEDG_P1<2>::shape_grad_grad (const unsigned int i,
-			      const Point<2> &) const
+			     const Point<2> &) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   return Tensor<2,2>();
@@ -223,7 +223,7 @@ FEDG_P1<2>::shape_grad_grad (const unsigned int i,
 
 template <>
 void FEDG_P1<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &,
-					 FullMatrix<double> &local_mass_matrix) const
+					FullMatrix<double> &local_mass_matrix) const
 {
   Assert(false, ExcNotImplemented ());
   Assert (local_mass_matrix.n() == dofs_per_cell,
@@ -234,7 +234,7 @@ void FEDG_P1<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &,
 
 
 template <>
-void FEDG_P1<2>::get_unit_support_points (vector<Point<2> > &unit_points) const
+void FEDG_P1<2>::get_unit_support_points (std::vector<Point<2> > &unit_points) const
 {
   Assert (unit_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
@@ -253,7 +253,7 @@ void FEDG_P1<2>::get_unit_support_points (vector<Point<2> > &unit_points) const
 template <>
 FEDG_P1<3>::FEDG_P1 () :
 		FEQ1Mapping<3> (0, 0, 0, 4, 1,
-				vector<bool> (1, true))
+				std::vector<bool> (1, true))
 {
 //  initialize_matrices ();
 };
@@ -288,7 +288,7 @@ template <>
 inline
 Tensor<1,3>
 FEDG_P1<3>::shape_grad (const unsigned int i,
-			 const Point<3>&) const
+			const Point<3>&) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // originally, the return type of the
@@ -311,7 +311,7 @@ template <>
 inline
 Tensor<2,3>
 FEDG_P1<3>::shape_grad_grad (const unsigned int i,
-			      const Point<3> &) const
+			     const Point<3> &) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
@@ -322,7 +322,7 @@ FEDG_P1<3>::shape_grad_grad (const unsigned int i,
 
 template <>
 void FEDG_P1<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
-					 FullMatrix<double> &local_mass_matrix) const
+					FullMatrix<double> &local_mass_matrix) const
 {
   Assert (local_mass_matrix.n() == dofs_per_cell,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
@@ -334,7 +334,7 @@ void FEDG_P1<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 
 
 template <>
-void FEDG_P1<3>::get_unit_support_points (vector<Point<3> > &unit_points) const
+void FEDG_P1<3>::get_unit_support_points (std::vector<Point<3> > &unit_points) const
 {
   Assert (unit_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
@@ -352,7 +352,7 @@ void FEDG_P1<3>::get_unit_support_points (vector<Point<3> > &unit_points) const
 template <int dim>
 void
 FEDG_P1<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-				   vector<Point<dim> >  &support_points) const
+				  std::vector<Point<dim> >  &support_points) const
 {
   Assert (support_points.size() == dofs_per_cell,
 	  typename FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),
@@ -366,7 +366,7 @@ FEDG_P1<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator 
 template <int dim>
 void
 FEDG_P1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
-				       vector<Point<dim> >  &support_points) const
+				       std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == dofs_per_face) &&
 	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,7 +26,7 @@ FEDG_Q0<dim>::FEDG_Q0 () :
 				  (dim==2 ? 1 : 0),
 				  (dim==3 ? 1 : 0),
 				  1,
-				  vector<bool> (1, true))
+				  std::vector<bool> (1, true))
 {
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     { 
@@ -42,7 +42,7 @@ FEDG_Q0<dim>::FEDG_Q0 () :
 template <>
 void
 FEDG_Q0<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
-				     vector<Point<1> >  &) const
+				     std::vector<Point<1> >  &) const
 {
   Assert (false, ExcInternalError());
 };
@@ -55,7 +55,7 @@ template <int dim>
 inline
 double
 FEDG_Q0<dim>::shape_value (const unsigned int i,
-				const Point<dim>&) const
+			   const Point<dim>&) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   return 1.;
@@ -106,7 +106,7 @@ void FEDG_Q0<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &
 
 template <int dim>
 void
-FEDG_Q0<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) const
+FEDG_Q0<dim>::get_unit_support_points (std::vector<Point<dim> > &unit_points) const
 {
   Assert (unit_points.size() == dofs_per_cell,
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
@@ -119,7 +119,7 @@ FEDG_Q0<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) const
 template <int dim>
 void
 FEDG_Q0<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-				  vector<Point<dim> >  &support_points) const
+				  std::vector<Point<dim> >  &support_points) const
 {
   Assert (support_points.size() == dofs_per_cell,
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
@@ -132,7 +132,7 @@ FEDG_Q0<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator 
 template <int dim>
 void
 FEDG_Q0<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-				       vector<Point<dim> >  &support_points) const
+				       std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,7 +49,7 @@ class MGLevelObject : public Subscriptor
 				      * is created empty.
 				      */
     MGLevelObject (const unsigned int minlevel = 0,
-		      const unsigned int maxlevel = 0);
+		   const unsigned int maxlevel = 0);
     
 				     /**
 				      * Access object on level @p{level}.
@@ -82,7 +82,7 @@ class MGLevelObject : public Subscriptor
 				      * @p{Object==Vector<T>}, @p{clear}
 				      * will set all entries to zero,
 				      * while if
-				      * @p{Object==std::vector<T>},
+				      * @p{Object==vector<T>},
 				      * @p{clear} deletes the elements
 				      * of the vectors. This class
 				      * might therefore not be useful
@@ -103,7 +103,7 @@ class MGLevelObject : public Subscriptor
 				     /**
 				      * Array of the objects to be held.
 				      */
-    vector<Object> objects;
+    std::vector<Object> objects;
 };
 
 
@@ -551,7 +551,7 @@ template<class Object>
 void
 MGLevelObject<Object>::clear ()
 {
-  typename vector<Object>::iterator v;
+  typename std::vector<Object>::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
     v->clear();  
 };
@@ -578,8 +578,8 @@ MGLevelObject<Object>::get_maxlevel () const
 
 template<class SOLVER, class MATRIX, class PRECOND>
 MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::MGCoarseGridLACIteration(SOLVER        &s,
-			 const MATRIX  &m,
-			 const PRECOND &p)
+									  const MATRIX  &m,
+									  const PRECOND &p)
 		:
 		solver(s),
 		matrix(&m),
@@ -590,8 +590,8 @@ MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::MGCoarseGridLACIteration(SOLVER
 template<class SOLVER, class MATRIX, class PRECOND>
 void
 MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::operator() (const unsigned int    /* level */,
-	    Vector<double>       &dst,
-	    const Vector<double> &src) const
+							     Vector<double>       &dst,
+							     const Vector<double> &src) const
 {
   solver.solve(*matrix, dst, src, precondition);
 }

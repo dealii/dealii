@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -248,7 +248,7 @@ class FiniteElementBase : public Subscriptor,
 				      * this base class' constructor.
 				      */
     FiniteElementBase (const FiniteElementData<dim> &fe_data,
-		       const vector<bool> &restriction_is_additive_flags);
+		       const std::vector<bool>      &restriction_is_additive_flags);
     
 				     /**
 				      * Return a readonly reference to the
@@ -309,7 +309,8 @@ class FiniteElementBase : public Subscriptor,
 				      * component and second index in
 				      * component.
 				      */
-    pair<unsigned int,unsigned int> system_to_component_index (unsigned int index) const; 
+    std::pair<unsigned int,unsigned int>
+    system_to_component_index (unsigned int index) const; 
     
 				     /**
 				      * Compute system index from components on a face.
@@ -325,7 +326,8 @@ class FiniteElementBase : public Subscriptor,
 				      * component and second index in
 				      * component.
 				      */
-    pair<unsigned int,unsigned int> face_system_to_component_index (unsigned int index) const;
+    std::pair<unsigned int,unsigned int>
+    face_system_to_component_index (unsigned int index) const;
     
  				     /**
 				      * The base element establishing a
@@ -552,25 +554,25 @@ class FiniteElementBase : public Subscriptor,
 				      * Map between linear dofs and
 				      * component dofs.
 				      */
-    vector< pair<unsigned int, unsigned int> > system_to_component_table;
+    std::vector< std::pair<unsigned int, unsigned int> > system_to_component_table;
 
 				     /**
 				      * Map between linear dofs and
 				      * component dofs on face.
 				      */
-    vector< pair<unsigned int, unsigned int> > face_system_to_component_table;
+    std::vector< std::pair<unsigned int, unsigned int> > face_system_to_component_table;
 
 				     /**
 				      * Map between component and
 				      * linear dofs.
 				      */
-    vector< vector<unsigned int> > component_to_system_table;
+    std::vector< std::vector<unsigned int> > component_to_system_table;
 
 				     /**
 				      * Map between component and
 				      * linear dofs on a face.
 				      */
-    vector< vector<unsigned int> > face_component_to_system_table;
+    std::vector< std::vector<unsigned int> > face_component_to_system_table;
     
 				     /**
 				      * The base element establishing
@@ -585,7 +587,7 @@ class FiniteElementBase : public Subscriptor,
 				      * shape functions of the base
 				      * element.
 				      */
-    vector<unsigned int> component_to_base_table;
+    std::vector<unsigned int> component_to_base_table;
 
 				     /**
 				      * This flag determines how the
@@ -740,7 +742,7 @@ class FiniteElementBase : public Subscriptor,
 				      * There is one flag per
 				      * component.
 				      */
-    const vector<bool> restriction_is_additive_flags;    
+    const std::vector<bool> restriction_is_additive_flags;    
 };
 
 
@@ -1046,7 +1048,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Constructor
 				      */
     FiniteElement (const FiniteElementData<dim> &fe_data,
-		   const vector<bool> &restriction_is_additive_flags);
+		   const std::vector<bool>      &restriction_is_additive_flags);
 
 				     /**
 				      * Destructor. Only declared to
@@ -1213,17 +1215,17 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * absolutely needed.
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				 const vector<Point<dim> > &unit_points,
-				 vector<Tensor<2,dim> >    &jacobians,
-				 const bool                 compute_jacobians,
-				 vector<Tensor<3,dim> >    &jacobians_grad,
-				 const bool                 compute_jacobians_grad,
-				 vector<Point<dim> >       &support_points,
-				 const bool                 compute_support_points,
-				 vector<Point<dim> >       &q_points,
-				 const bool                 compute_q_points,
-				 const FullMatrix<double>            &shape_values_transform,
-				 const vector<vector<Tensor<1,dim> > > &shape_grads_transform) const;
+				 const std::vector<Point<dim> > &unit_points,
+				 std::vector<Tensor<2,dim> >    &jacobians,
+				 const bool                      compute_jacobians,
+				 std::vector<Tensor<3,dim> >    &jacobians_grad,
+				 const bool                      compute_jacobians_grad,
+				 std::vector<Point<dim> >       &support_points,
+				 const bool                      compute_support_points,
+				 std::vector<Point<dim> >       &q_points,
+				 const bool                      compute_q_points,
+				 const FullMatrix<double>       &shape_values_transform,
+				 const std::vector<std::vector<Tensor<1,dim> > > &shape_grads_transform) const;
 
 				     /**
 				      * Do the same thing that the
@@ -1357,22 +1359,22 @@ class FiniteElement : public FiniteElementBase<dim>
 				      */
     virtual void fill_fe_face_values (const DoFHandler<dim>::cell_iterator &cell,
 				      const unsigned int           face_no,
-				      const vector<Point<dim-1> > &unit_points,
-				      const vector<Point<dim> >   &global_unit_points,
-				      vector<Tensor<2,dim> >      &jacobians,
-				      const bool                   compute_jacobians,
-				      vector<Tensor<3,dim> >      &jacobians_grad,
-				      const bool                   compute_jacobians_grad,
-				      vector<Point<dim> > &support_points,
-				      const bool           compute_support_points,
-				      vector<Point<dim> > &q_points,
-				      const bool           compute_q_points,
-				      vector<double>      &face_jacobi_determinants,
-				      const bool           compute_face_jacobians,
-				      vector<Point<dim> > &normal_vectors,
-				      const bool           compute_normal_vectors,
-				      const FullMatrix<double>      &shape_values_transform,
-				      const vector<vector<Tensor<1,dim> > > &shape_grads_transform) const;
+				      const std::vector<Point<dim-1> > &unit_points,
+				      const std::vector<Point<dim> >   &global_unit_points,
+				      std::vector<Tensor<2,dim> >      &jacobians,
+				      const bool                        compute_jacobians,
+				      std::vector<Tensor<3,dim> >      &jacobians_grad,
+				      const bool                        compute_jacobians_grad,
+				      std::vector<Point<dim> > &support_points,
+				      const bool                compute_support_points,
+				      std::vector<Point<dim> > &q_points,
+				      const bool                compute_q_points,
+				      std::vector<double>      &face_jacobi_determinants,
+				      const bool                compute_face_jacobians,
+				      std::vector<Point<dim> > &normal_vectors,
+				      const bool                compute_normal_vectors,
+				      const FullMatrix<double> &shape_values_transform,
+				      const std::vector<std::vector<Tensor<1,dim> > > &shape_grads_transform) const;
 
 				     /**
 				      * This function does almost the
@@ -1416,20 +1418,20 @@ class FiniteElement : public FiniteElementBase<dim>
     virtual void fill_fe_subface_values (const DoFHandler<dim>::cell_iterator &cell,
 					 const unsigned int           face_no,
 					 const unsigned int           subface_no,
-					 const vector<Point<dim-1> > &unit_points,
-					 const vector<Point<dim> >   &global_unit_points,
-					 vector<Tensor<2,dim> >      &jacobians,
-					 const bool                   compute_jacobians,
-					 vector<Tensor<3,dim> >      &jacobians_grad,
-					 const bool           compute_jacobians_grad,
-					 vector<Point<dim> > &q_points,
-					 const bool           compute_q_points,
-					 vector<double>      &face_jacobi_determinants,
-					 const bool           compute_face_jacobians,
-					 vector<Point<dim> > &normal_vectors,
-					 const bool           compute_normal_vectors,
-					 const FullMatrix<double>      &shape_values_transform,
-					 const vector<vector<Tensor<1,dim> > > &shape_grads_transform) const;
+					 const std::vector<Point<dim-1> > &unit_points,
+					 const std::vector<Point<dim> >   &global_unit_points,
+					 std::vector<Tensor<2,dim> >      &jacobians,
+					 const bool                        compute_jacobians,
+					 std::vector<Tensor<3,dim> >      &jacobians_grad,
+					 const bool                compute_jacobians_grad,
+					 std::vector<Point<dim> > &q_points,
+					 const bool                compute_q_points,
+					 std::vector<double>      &face_jacobi_determinants,
+					 const bool                compute_face_jacobians,
+					 std::vector<Point<dim> > &normal_vectors,
+					 const bool                compute_normal_vectors,
+					 const FullMatrix<double> &shape_values_transform,
+					 const std::vector<std::vector<Tensor<1,dim> > > &shape_grads_transform) const;
 
 				     /**
 				      * Return the support points of
@@ -1452,7 +1454,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * dimensions, an overwritten
 				      * function has to be provided.
 				      */
-    virtual void get_unit_support_points (vector<Point<dim> > &unit_points) const;
+    virtual void get_unit_support_points (std::vector<Point<dim> > &unit_points) const;
     
 				     /**
 				      * Compute the off-points of the
@@ -1504,7 +1506,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * stored by the triangulation.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     vector<Point<dim> > &support_points) const;
+				     std::vector<Point<dim> > &support_points) const;
     
 				     /**
 				      * Compute the off-points of the
@@ -1570,7 +1572,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  vector<Point<dim> > &support_points) const =0;
+					  std::vector<Point<dim> > &support_points) const =0;
 
 				     /**
 				      * This is the second separated function
@@ -1593,8 +1595,8 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * function.
 				      */
     virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<double>      &face_jacobi_determinants) const =0;
+				     const std::vector<Point<dim-1> > &unit_points,
+				     std::vector<double>      &face_jacobi_determinants) const =0;
 
 				     /**
 				      * Does the same as the above
@@ -1614,8 +1616,8 @@ class FiniteElement : public FiniteElementBase<dim>
 				      */
     virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
 					const unsigned int           subface_no,
-					const vector<Point<dim-1> > &unit_points,
-					vector<double>      &face_jacobi_determinants) const =0;
+					const std::vector<Point<dim-1> > &unit_points,
+					std::vector<double>      &face_jacobi_determinants) const =0;
 
 				     /**
 				      * Compute the normal vectors to
@@ -1643,9 +1645,9 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * function.
 				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int          face_no,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<Point<dim> >         &normal_vectors) const =0;
+				     const unsigned int                face_no,
+				     const std::vector<Point<dim-1> > &unit_points,
+				     std::vector<Point<dim> >         &normal_vectors) const =0;
 
 				     /**
 				      * Does the same as the above function,
@@ -1660,8 +1662,8 @@ class FiniteElement : public FiniteElementBase<dim>
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int           face_no,
 				     const unsigned int           subface_no,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<Point<dim> >         &normal_vectors) const =0;
+				     const std::vector<Point<dim-1> > &unit_points,
+				     std::vector<Point<dim> >         &normal_vectors) const =0;
 
 				     /**
 				      * Fill in the given matrix with
@@ -1944,7 +1946,7 @@ FiniteElementBase<dim>::component_to_system_index (unsigned int component,
 
 template <int dim>  
 inline
-pair<unsigned int,unsigned int>
+std::pair<unsigned int,unsigned int>
 FiniteElementBase<dim>::system_to_component_index (unsigned int index) const
 {
   Assert(index < system_to_component_table.size(),
@@ -1972,7 +1974,7 @@ FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
 
 template <int dim>  
 inline
-pair<unsigned int,unsigned int>
+std::pair<unsigned int,unsigned int>
 FiniteElementBase<dim>::face_system_to_component_index (unsigned int index) const
 {
   Assert(index < face_system_to_component_table.size(),

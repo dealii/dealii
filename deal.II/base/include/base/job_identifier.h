@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,18 +26,40 @@
 class JobIdentifier
 {
   public:
+				     /**
+				      * Constructor. Set program
+				      * identifier to value of
+				      * @p{program_id} concatenated
+				      * with the present time.
+				      */
     JobIdentifier();
-    ~JobIdentifier();
-    
+
+				     /**
+				      * ???
+				      */
     static const char* program_id();
-    const string operator () ()const;
+
+				     /**
+				      * Return the value of @p{id}.
+				      */
+    const std::string operator () ()const;
+    
   private:
-    string id;
+				     /**
+				      * String holding the identifier
+				      * of the presently running
+				      * program.
+				      */
+    std::string id;
 };
 
 
 /*------------------------------ Inline functions ------------------------------*/
 
+
+/**
+ * Global object to identify the presently running program.
+ */
 extern JobIdentifier dealjobid;
 
 #endif

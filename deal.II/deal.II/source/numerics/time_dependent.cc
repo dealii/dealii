@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -96,7 +96,7 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
     else
       {
 					 // inner time step
-	vector<TimeStepBase*>::iterator insert_position
+	std::vector<TimeStepBase*>::iterator insert_position
 	  = find(timesteps.begin(), timesteps.end(), position);
 	
 	(*(insert_position-1))->set_next_timestep (new_timestep);
@@ -128,7 +128,7 @@ void TimeDependent::delete_timestep (const unsigned int position)
 
   timesteps[position]->unsubscribe();
   delete timesteps[position];
-  timesteps.erase (&timesteps[position]);
+  timesteps.erase (timesteps.begin() + position);
 
 				   // reset "next" pointer of previous
 				   // time step if possible
@@ -152,8 +152,8 @@ void TimeDependent::delete_timestep (const unsigned int position)
 void
 TimeDependent::solve_primal_problem () 
 {
-  do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
-	   mem_fun(&TimeStepBase::solve_primal_problem),
+  do_loop (std::mem_fun(&TimeStepBase::init_for_primal_problem),
+	   std::mem_fun(&TimeStepBase::solve_primal_problem),
 	   timestepping_data_primal,
 	   forward);
 };
@@ -162,8 +162,8 @@ TimeDependent::solve_primal_problem ()
 void
 TimeDependent::solve_dual_problem () 
 {
-  do_loop (mem_fun(&TimeStepBase::init_for_dual_problem),
-	   mem_fun(&TimeStepBase::solve_dual_problem),
+  do_loop (std::mem_fun(&TimeStepBase::init_for_dual_problem),
+	   std::mem_fun(&TimeStepBase::solve_dual_problem),
 	   timestepping_data_dual,
 	   backward);
 };
@@ -172,8 +172,8 @@ TimeDependent::solve_dual_problem ()
 void
 TimeDependent::postprocess () 
 {
-  do_loop (mem_fun(&TimeStepBase::init_for_postprocessing),
-	   mem_fun(&TimeStepBase::postprocess_timestep),
+  do_loop (std::mem_fun(&TimeStepBase::init_for_postprocessing),
+	   std::mem_fun(&TimeStepBase::postprocess_timestep),
 	   timestepping_data_postprocess,
 	   forward);
 };
@@ -491,8 +491,8 @@ void TimeStepBase_Tria<dim>::save_refine_flags ()
 {
   				   // for any of the non-initial grids
 				   // store the refinement flags
-  refine_flags.push_back (vector<bool>());
-  coarsen_flags.push_back (vector<bool>());
+  refine_flags.push_back (std::vector<bool>());
+  coarsen_flags.push_back (std::vector<bool>());
   tria->save_refine_flags (refine_flags.back());
   tria->save_coarsen_flags (coarsen_flags.back());
 };
@@ -758,14 +758,14 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
       (refinement_flags.cell_number_correction_steps > 0))
     {
       sorted_criteria = criteria;
-      sort (sorted_criteria.begin(),
+      std::sort (sorted_criteria.begin(),
 	    sorted_criteria.end());
-      p_refinement_threshold = lower_bound (sorted_criteria.begin(),
-					    sorted_criteria.end(),
-					    refinement_threshold);
-      p_coarsening_threshold = upper_bound (sorted_criteria.begin(),
-					    sorted_criteria.end(),
-					    coarsening_threshold);
+      p_refinement_threshold = std::lower_bound (sorted_criteria.begin(),
+						 sorted_criteria.end(),
+						 static_cast<float>(refinement_threshold));
+      p_coarsening_threshold = std::upper_bound (sorted_criteria.begin(),
+						 sorted_criteria.end(),
+						 static_cast<float>(coarsening_threshold));
     };
 
 
@@ -897,7 +897,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 	double delta_up = refinement_flags.cell_number_corridor_top,
 	     delta_down = refinement_flags.cell_number_corridor_bottom;
 
-	const vector<pair<unsigned int,double> > &relaxations
+	const std::vector<std::pair<unsigned int,double> > &relaxations
 	  = (sweep_no >= refinement_flags.correction_relaxations.size() ?
 	     refinement_flags.correction_relaxations.back() :
 	     refinement_flags.correction_relaxations[sweep_no]);
@@ -1158,10 +1158,10 @@ template <int dim>
 TimeStepBase_Tria<dim>::RefinementFlags::CorrectionRelaxations
 TimeStepBase_Tria<dim>::RefinementFlags::default_correction_relaxations 
   (1,    // one element, denoting the first and all subsequent sweeps
-   vector<pair<unsigned int,double> >(1,    // one element, denoting the upper bound
-								       // for the following
-								       // relaxation
-				      make_pair (0, 0.)));
+   std::vector<std::pair<unsigned int,double> >(1,    // one element, denoting the upper bound
+										 // for the following
+										 // relaxation
+						std::make_pair (0, 0.)));
 
 
 template <int dim>

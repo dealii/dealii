@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -149,20 +149,20 @@ class GridIn
 				      * Read grid data from an ucd file.
 				      * Numerical data is ignored.
 				      */
-    void read_ucd (istream &);
+    void read_ucd (std::istream &);
 
 				     /**
 				      * Read grid data from a file
 				      * containing data in the DB mesh
 				      * format.
 				      */
-    void read_dbmesh (istream &);
+    void read_dbmesh (std::istream &);
     
 				     /**
 				      * Exception
 				      */
     DeclException1 (ExcUnknownIdentifier,
-		    string,
+		    std::string,
 		    << "The identifier <" << arg1 << "> as name of a "
 		    << "part in an UCD input file is unknown or the "
 		    << "respective input routine is not implemented.");
@@ -185,7 +185,7 @@ class GridIn
 				      * Exception
 				      */
     DeclException1 (ExcInvalidDBMESHInput,
-		    string,
+		    std::string,
 		    << "The string <" << arg1 << "> is not recognized at the present"
 		    << " position of a DB Mesh file.");
     
@@ -210,7 +210,7 @@ class GridIn
 				      * contain either nothing or only
 				      * whitespace.
 				      */
-    static void skip_empty_lines (istream &in);
+    static void skip_empty_lines (std::istream &in);
     
 				     /**
 				      * Skip lines of comment that
@@ -226,7 +226,7 @@ class GridIn
 				      * there were no lines of
 				      * comments.
 				      */
-    static void skip_comment_lines (istream    &in,
+    static void skip_comment_lines (std::istream    &in,
 				    const char  comment_start);
 
 				     /**
@@ -256,9 +256,9 @@ class GridIn
 				      * have to eliminate unused
 				      * vertices beforehand.
 				      */
-    static void delete_unused_vertices (vector<Point<dim> >    &vertices,
-					vector<CellData<dim> > &cells,
-					SubCellData            &subcelldata);
+    static void delete_unused_vertices (std::vector<Point<dim> >    &vertices,
+					std::vector<CellData<dim> > &cells,
+					SubCellData                 &subcelldata);
 
 				     /**
 				      * This function can write the
@@ -305,9 +305,9 @@ class GridIn
 				      * without further ado by the
 				      * user.
 				      */
-    static void debug_output_grid (const vector<CellData<dim> > &cells,
-				   const vector<Point<dim> >    &vertices,
-				   ostream                      &out);
+    static void debug_output_grid (const std::vector<CellData<dim> > &cells,
+				   const std::vector<Point<dim> >    &vertices,
+				   std::ostream                      &out);
 };
 
 

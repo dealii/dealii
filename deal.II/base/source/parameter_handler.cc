@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,19 +32,19 @@ namespace Patterns
 
 
   unsigned int
-    PatternBase::memory_consumption () const
-    {
-      if (dynamic_cast<const Integer*>(this) != 0)
-	return sizeof(Integer);
-      else if (dynamic_cast<const Double*>(this) != 0)
-	return sizeof(Double);
-      else if (dynamic_cast<const Bool*>(this) != 0)
-	return sizeof(Bool);
-      else if (dynamic_cast<const Anything*>(this) != 0)
-	return sizeof(Anything);
-      else
-	return sizeof(*this) + 32;
-    };
+  PatternBase::memory_consumption () const
+  {
+    if (dynamic_cast<const Integer*>(this) != 0)
+      return sizeof(Integer);
+    else if (dynamic_cast<const Double*>(this) != 0)
+      return sizeof(Double);
+    else if (dynamic_cast<const Bool*>(this) != 0)
+      return sizeof(Bool);
+    else if (dynamic_cast<const Anything*>(this) != 0)
+      return sizeof(Anything);
+    else
+      return sizeof(*this) + 32;
+  };
   
 
 
@@ -57,9 +57,9 @@ namespace Patterns
 
 
 
-  bool Integer::match (const string &test_string) const
+  bool Integer::match (const std::string &test_string) const
   {
-    istrstream str(test_string.c_str());
+    std::istrstream str(test_string.c_str());
     int i;
     if (str >> i)
       {
@@ -78,18 +78,18 @@ namespace Patterns
 
 
 
-  string Integer::description () const
+  std::string Integer::description () const
   {
 				     // check whether valid bounds
 				     // were specified, and if so
 				     // output their values
     if (lower_bound <= upper_bound)
       {
-	ostrstream description;
+	std::ostrstream description;
 	description << "[Integer range "
 		    << lower_bound << "..." << upper_bound
 		    << " (inclusive)]"
-		    << ends;
+		    << std::ends;
 	return description.str();
       }
     else
@@ -116,9 +116,9 @@ namespace Patterns
 
 
 
-  bool Double::match (const string &test_string) const
+  bool Double::match (const std::string &test_string) const
   {
-    istrstream str(test_string.c_str());
+    std::istrstream str(test_string.c_str());
     double d;
     if (str >> d)
       {
@@ -136,18 +136,18 @@ namespace Patterns
 
 
 
-  string Double::description () const
+  std::string Double::description () const
   {
 				     // check whether valid bounds
 				     // were specified, and if so
 				     // output their values
     if (lower_bound <= upper_bound)
       {
-	ostrstream description;
+	std::ostrstream description;
 	description << "[Floating point range "
 		    << lower_bound << "..." << upper_bound
 		    << " (inclusive)]"
-		    << ends;
+		    << std::ends;
 	return description.str();
       }
     else
@@ -165,26 +165,26 @@ namespace Patterns
 
 
 
-  Selection::Selection (const string &seq)
+  Selection::Selection (const std::string &seq)
   {
     sequence = seq;
 
-    while (sequence.find(" |") != string::npos)
+    while (sequence.find(" |") != std::string::npos)
       sequence.replace (sequence.find(" |"), 2, "|");
-    while (sequence.find("| ") != string::npos)
+    while (sequence.find("| ") != std::string::npos)
       sequence.replace (sequence.find("| "), 2, "|");
   };
 
 
 
-  bool Selection::match (const string &test_string) const
+  bool Selection::match (const std::string &test_string) const
   {
-    vector<string> choices;
-    string tmp(sequence);
+    std::vector<std::string> choices;
+    std::string tmp(sequence);
 				     // check the different possibilities
-    while (tmp.find('|') != string::npos) 
+    while (tmp.find('|') != std::string::npos) 
       {
-	if (test_string == string(tmp, 0, tmp.find('|')))
+	if (test_string == std::string(tmp, 0, tmp.find('|')))
 	  return true;
       
 	tmp.erase (0, tmp.find('|')+1);
@@ -199,7 +199,7 @@ namespace Patterns
 
 
 
-  string Selection::description () const
+  std::string Selection::description () const
   {
     return sequence;
   };
@@ -214,40 +214,40 @@ namespace Patterns
 
 
   unsigned int
-    Selection::memory_consumption () const
-    {
-      return (sizeof(PatternBase) +
-	      MemoryConsumption::memory_consumption(sequence));
-    };
+  Selection::memory_consumption () const
+  {
+    return (sizeof(PatternBase) +
+	    MemoryConsumption::memory_consumption(sequence));
+  };
   
 
-  MultipleSelection::MultipleSelection (const string &seq)
+  MultipleSelection::MultipleSelection (const std::string &seq)
   {
-    Assert (seq.find (",") == string::npos, ExcCommasNotAllowed(seq.find(",")));
+    Assert (seq.find (",") == std::string::npos, ExcCommasNotAllowed(seq.find(",")));
   
     sequence = seq;
-    while (sequence.find(" |") != string::npos)
+    while (sequence.find(" |") != std::string::npos)
       sequence.replace (sequence.find(" |"), 2, "|");
-    while (sequence.find("| ") != string::npos)
+    while (sequence.find("| ") != std::string::npos)
       sequence.replace (sequence.find("| "), 2, "|");
   };
 
 
 
-  bool MultipleSelection::match (const string &test_string_list) const
+  bool MultipleSelection::match (const std::string &test_string_list) const
   {
-    string tmp = test_string_list;
-    list<string> split_list;
+    std::string tmp = test_string_list;
+    std::list<std::string> split_list;
 
 				     // first split the input list
     while (tmp.length() != 0)
       {
-	string name;
+	std::string name;
 	name = tmp;
       
-	if (name.find(",") != string::npos)
+	if (name.find(",") != std::string::npos)
 	  {
-	    name.erase (name.find(","), string::npos);
+	    name.erase (name.find(","), std::string::npos);
 	    tmp.erase (0, test_string_list.find(",")+1);
 	  }
 	else
@@ -264,15 +264,15 @@ namespace Patterns
 
 
 				     // check the different possibilities
-    for (list<string>::const_iterator test_string = split_list.begin();
+    for (std::list<std::string>::const_iterator test_string = split_list.begin();
 	 test_string != split_list.end(); ++test_string) 
       {
 	bool string_found = false;
       
 	tmp = sequence;
-	while (tmp.find('|') != string::npos) 
+	while (tmp.find('|') != std::string::npos) 
 	  {
-	    if (*test_string == string(tmp, 0, tmp.find('|')))
+	    if (*test_string == std::string(tmp, 0, tmp.find('|')))
 	      {
 						 // string found, quit
 						 // loop. don't change
@@ -298,7 +298,7 @@ namespace Patterns
 
 
 
-  string MultipleSelection::description () const
+  std::string MultipleSelection::description () const
   {
     return sequence;
   };
@@ -313,11 +313,11 @@ namespace Patterns
 
 
   unsigned int
-    MultipleSelection::memory_consumption () const
-    {
-      return (sizeof(PatternBase) +
-	      MemoryConsumption::memory_consumption(sequence));
-    };
+  MultipleSelection::memory_consumption () const
+  {
+    return (sizeof(PatternBase) +
+	    MemoryConsumption::memory_consumption(sequence));
+  };
 
 
 
@@ -340,14 +340,14 @@ namespace Patterns
 
 
 
-  bool Anything::match (const string &) const
+  bool Anything::match (const std::string &) const
   {
     return true;
   };
 
 
 
-  string Anything::description () const
+  std::string Anything::description () const
   {
     return "[Anything]";
   };
@@ -374,11 +374,11 @@ ParameterHandler::~ParameterHandler ()
 
 
 
-bool ParameterHandler::read_input (istream &input)
+bool ParameterHandler::read_input (std::istream &input)
 {
   AssertThrow (input, ExcIO());
 
-  string line;
+  std::string line;
   int lineno=0;
   while (input) 
     {
@@ -393,17 +393,17 @@ bool ParameterHandler::read_input (istream &input)
 
 
 
-bool ParameterHandler::read_input (const string &filename)
+bool ParameterHandler::read_input (const std::string &filename)
 {
-  ifstream input (filename.c_str());
+  std::ifstream input (filename.c_str());
   if (!input) 
     {
-      cerr << "ParameterHandler::read_input: could not open file <"
-	   << filename << "> for reading." << endl
-	   << "Trying to make file <"
-	   << filename << "> with default values for you." << endl;
+      std::cerr << "ParameterHandler::read_input: could not open file <"
+		<< filename << "> for reading." << std::endl
+		<< "Trying to make file <"
+		<< filename << "> with default values for you." << std::endl;
 
-      ofstream output (filename.c_str());
+      std::ofstream output (filename.c_str());
       if (output)
 	{
 	  print_parameters (output, Text);
@@ -419,12 +419,12 @@ bool ParameterHandler::read_input (const string &filename)
 
 bool ParameterHandler::read_input_from_string (const char *s)
 {
-				   // if empty string then exit
+				   // if empty std::string then exit
 				   // with success
   if ((s == 0) || ((*s) == 0)) return true;
   
-  string line;
-  string input (s);
+  std::string line;
+  std::string input (s);
   int    lineno=0;
 
 				   // if necessary append a newline char
@@ -458,7 +458,7 @@ void ParameterHandler::clear ()
   defaults.entries.clear ();
   changed_entries.entries.clear ();
 
-  map<string, Section*>::iterator p;
+  std::map<std::string, Section*>::iterator p;
 
   for (p=defaults.subsections.begin(); p!=defaults.subsections.end(); ++p)
     delete p->second;
@@ -475,8 +475,8 @@ void ParameterHandler::clear ()
 
 
 
-bool ParameterHandler::declare_entry (const string &entry,
-				      const string &default_value,
+bool ParameterHandler::declare_entry (const std::string           &entry,
+				      const std::string           &default_value,
 				      const Patterns::PatternBase &pattern)
 {
   Section* p = get_present_defaults_subsection ();
@@ -506,16 +506,16 @@ bool ParameterHandler::declare_entry (const string &entry,
 
 
 
-void ParameterHandler::enter_subsection (const string &subsection)
+void ParameterHandler::enter_subsection (const std::string &subsection)
 {
   Section* pd = get_present_defaults_subsection ();
 
 				   // does subsection already exist?
   if (pd->subsections.find (subsection) == pd->subsections.end()) 
     {
-      				   // subsection does not yet exist:
-				   // create entry in Defaults and
-				   // changed_entries trees
+				       // subsection does not yet exist:
+				       // create entry in Defaults and
+				       // changed_entries trees
       pd->subsections[subsection] = new Section();
 
       Section* pc = get_present_changed_subsection ();
@@ -547,7 +547,7 @@ bool ParameterHandler::leave_subsection ()
 
 
 
-const string & ParameterHandler::get (const string &entry_string) const
+const std::string & ParameterHandler::get (const std::string &entry_string) const
 {
   const Section* pd = get_present_defaults_subsection ();
   const Section* pc = get_present_changed_subsection ();
@@ -559,7 +559,7 @@ const string & ParameterHandler::get (const string &entry_string) const
   
   if (pd->entries.find (entry_string) == pd->entries.end()) 
     {
-      static const string empty_string;
+      static const std::string empty_string;
       return empty_string;
     };
 
@@ -578,9 +578,9 @@ const string & ParameterHandler::get (const string &entry_string) const
 
 
 
-long int ParameterHandler::get_integer (const string &entry_string) const
+long int ParameterHandler::get_integer (const std::string &entry_string) const
 {
-  string s = get (entry_string);
+  std::string s = get (entry_string);
   char *endptr;
   long int i = strtol (s.c_str(), &endptr, 10);
 				   // assert there was no error
@@ -592,9 +592,9 @@ long int ParameterHandler::get_integer (const string &entry_string) const
 
 
 
-double ParameterHandler::get_double (const string &entry_string) const
+double ParameterHandler::get_double (const std::string &entry_string) const
 {
-  string s = get (entry_string);
+  std::string s = get (entry_string);
   char *endptr;
   double d = strtod (s.c_str(), &endptr);
 				   // assert there was no error
@@ -606,9 +606,9 @@ double ParameterHandler::get_double (const string &entry_string) const
 
 
 
-bool ParameterHandler::get_bool (const string &entry_string) const
+bool ParameterHandler::get_bool (const std::string &entry_string) const
 {
-  string s = get(entry_string);
+  std::string s = get(entry_string);
 
   AssertThrow ((s=="true") || (s=="false"), ExcConversionError(s));
   if (s=="true")
@@ -619,7 +619,7 @@ bool ParameterHandler::get_bool (const string &entry_string) const
 
 
 
-ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style)
+std::ostream & ParameterHandler::print_parameters (std::ostream &out, OutputStyle style)
 {
 				   // assert that only known formats are
 				   // given as "style"
@@ -630,14 +630,14 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style)
   switch (style) 
     {
       case Text:
-	    out << "#Listing of Parameters" << endl
-		<< "#---------------------" << endl;
+	    out << "#Listing of Parameters" << std::endl
+		<< "#---------------------" << std::endl;
 	    break;
       case LaTeX:
 	    out << "\\subsubsection*{Listing of parameters}";
-	    out << endl << endl;
+	    out << std::endl << std::endl;
 	    out << "\\begin{itemize}"
-	        << endl;
+	        << std::endl;
 	    break;
       default:
 	    Assert (false, ExcNotImplemented());
@@ -651,7 +651,7 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style)
       case Text:
 	    break;
       case LaTeX:
-	    out << "\\end{itemize}" << endl;
+	    out << "\\end{itemize}" << std::endl;
 	    break;
       default:
 	    Assert (false, ExcNotImplemented());
@@ -673,7 +673,7 @@ ParameterHandler::log_parameters (LogStream &out)
 
 
 
-void ParameterHandler::print_parameters_section (ostream           &out,
+void ParameterHandler::print_parameters_section (std::ostream      &out,
 						 const OutputStyle  style,
 						 const unsigned int indent_level)
 {
@@ -706,14 +706,14 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 	switch (style) 
 	  {
 	    case Text:
-		  out << setw(indent_level*2) << ""
+		  out << std::setw(indent_level*2) << ""
 		      << "set "
 		      << ptr->first
-		      << setw(longest_entry-ptr->first.length()+3) << " = "
+		      << std::setw(longest_entry-ptr->first.length()+3) << " = "
 		      << pc->entries[ptr->first].first
 		      << "  #"
 		      << pd->entries[ptr->first].first
-		      << endl;
+		      << std::endl;
 		  break;
 	    case LaTeX:
 		  out << "\\item {\\bf " << ptr->first << ":} "
@@ -721,7 +721,7 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 		      << " ({\\it default:} "
                       << pd->entries[ptr->first].first
 		      << ")"
-		      << endl;
+		      << std::endl;
 		  break;
 	    default:
 		  Assert (false, ExcNotImplemented());
@@ -731,16 +731,16 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 	switch (style) 
 	  {
 	    case Text:
-		  out << setw(indent_level*2) << ""
+		  out << std::setw(indent_level*2) << ""
 		      << "set "
 		      << ptr->first
-		      << setw(longest_entry-ptr->first.length()+3) << "= "
-		      << ptr->second.first << endl;
+		      << std::setw(longest_entry-ptr->first.length()+3) << "= "
+		      << ptr->second.first << std::endl;
 		  break;
 	    case LaTeX:
 		  out << "\\item {\\bf " << ptr->first << ":} "
 		      << ptr->second.first
-		      << endl;
+		      << std::endl;
 		  break;
 	    default:
 		  Assert (false, ExcNotImplemented());
@@ -749,22 +749,22 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 
 
 				   // now transverse subsections tree
-  map<string, Section*>::const_iterator ptrss;
+  std::map<std::string, Section*>::const_iterator ptrss;
   for (ptrss = pd->subsections.begin(); ptrss != pd->subsections.end(); ++ptrss)
     {
       switch (style) 
 	{
 	  case Text:
-		out << setw(indent_level*2) << ""
-		    << "subsection " << ptrss->first << endl;
+		out << std::setw(indent_level*2) << ""
+		    << "subsection " << ptrss->first << std::endl;
 		break;
 	  case LaTeX:
-		out << endl
+		out << std::endl
 		    << "\\item {\\bf "
 		    << "Subsection " << ptrss->first
-		    << "}" << endl
+		    << "}" << std::endl
 		    << "\\begin{itemize}"
-		    << endl;
+		    << std::endl;
 		break;
 	  default:
 		Assert (false, ExcNotImplemented());
@@ -777,20 +777,20 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 	  case Text:
 						 // write end of subsection. one
 						 // blank line after each subsection
-		out << setw(indent_level*2) << ""
-		    << "end" << endl
-		    << endl;
+		out << std::setw(indent_level*2) << ""
+		    << "end" << std::endl
+		    << std::endl;
 
 						 // if this is a toplevel
 						 // subsection, then have two
 						 // newlines
 		if (indent_level == 0)
-		  out << endl;
+		  out << std::endl;
 		
 		break;
 	  case LaTeX:
 		out << "\\end{itemize}"
-		    << endl;
+		    << std::endl;
 		break;
 	  default:
 		Assert (false, ExcNotImplemented());
@@ -813,19 +813,19 @@ void ParameterHandler::log_parameters_section (LogStream &out)
     {
       if ((pc->entries.find(ptr->first) != pc->entries.end()) &&
 	  (pc->entries[ptr->first].first != pd->entries[ptr->first].first))
-				       // check whether this entry is listed
-				       // in the Changed tree and actually
-				       // differs from the default value
-	  out << ptr->first << ": "
-	      << pc->entries[ptr->first].first << endl;
+					 // check whether this entry is listed
+					 // in the Changed tree and actually
+					 // differs from the default value
+	out << ptr->first << ": "
+	    << pc->entries[ptr->first].first << endl;
       else
-	  out << ptr->first << ": "
-	      << ptr->second.first << endl;
+	out << ptr->first << ": "
+	    << ptr->second.first << endl;
     };
 
 
 				   // now transverse subsections tree
-  map<string, Section*>::const_iterator ptrss;
+  std::map<std::string, Section*>::const_iterator ptrss;
   for (ptrss = pd->subsections.begin(); ptrss != pd->subsections.end(); ++ptrss)
     {
       out.push(ptrss->first);
@@ -838,17 +838,17 @@ void ParameterHandler::log_parameters_section (LogStream &out)
 
 
 
-bool ParameterHandler::scan_line (string line,
+bool ParameterHandler::scan_line (std::string        line,
 				  const unsigned int lineno)
 {
 				   // if there is a comment, delete it
-  if (line.find('#') != string::npos)
-    line.erase (line.find("#"), string::npos);
+  if (line.find('#') != std::string::npos)
+    line.erase (line.find("#"), std::string::npos);
 				   // replace every whitespace sequence
 				   // by " "
-  while (line.find('\t') != string::npos)
+  while (line.find('\t') != std::string::npos)
     line.replace (line.find('\t'), 1, " ");
-  while (line.find("  ") != string::npos)
+  while (line.find("  ") != std::string::npos)
     line.erase (line.find("  "), 1);
   				   // now every existing whitespace
 				   // should be exactly one ' ';
@@ -865,19 +865,19 @@ bool ParameterHandler::scan_line (string line,
       (line.find ("subsection ") == 0))
     {
 				       // delete this prefix
-      line.erase (0, string("subsection").length()+1);
+      line.erase (0, std::string("subsection").length()+1);
 
-      string SecName = line;
+      std::string SecName = line;
       Section* pc = get_present_changed_subsection ();
 				       // check whether subsection exists
       if (pc->subsections.find(SecName) == pc->subsections.end()) 
 	{
-	  cerr << "Line " << lineno << ": There is no such subsection to be entered:" << endl;
+	  std::cerr << "Line " << lineno << ": There is no such subsection to be entered:" << std::endl;
 	  for (unsigned int i=0; i<subsection_path.size(); ++i)
-	    cerr << setw(i*2+4) << " "
-		 << "subsection " << subsection_path[i] << endl;
-	  cerr << setw(subsection_path.size()*2+4) << " "
-	       << "subsection " << SecName << endl;
+	    std::cerr << std::setw(i*2+4) << " "
+		      << "subsection " << subsection_path[i] << std::endl;
+	  std::cerr << std::setw(subsection_path.size()*2+4) << " "
+		    << "subsection " << SecName << std::endl;
 	  return false;
 	};
 
@@ -891,8 +891,8 @@ bool ParameterHandler::scan_line (string line,
       (line.find ("end") == 0))
     if (subsection_path.size() == 0) 
       {
-	cerr << "Line " << lineno
-	     << ": There is no subsection to leave here!" << endl;
+	std::cerr << "Line " << lineno
+		  << ": There is no subsection to leave here!" << std::endl;
 	return false;
       }
     else
@@ -905,28 +905,28 @@ bool ParameterHandler::scan_line (string line,
 				       // erase "set" statement and eliminate
 				       // spaces around the '='
       line.erase (0, 4);
-      if (line.find(" =") != string::npos)
+      if (line.find(" =") != std::string::npos)
 	line.replace (line.find(" ="), 2, "=");
-      if (line.find("= ") != string::npos)
+      if (line.find("= ") != std::string::npos)
 	line.replace (line.find("= "), 2, "=");
 
 				       // extract entry name and value
-      string entry_name  (line, 0, line.find('='));
-      string entry_value (line, line.find('=')+1, string::npos);
+      std::string entry_name  (line, 0, line.find('='));
+      std::string entry_value (line, line.find('=')+1, std::string::npos);
 
       Section* pd = get_present_defaults_subsection ();
 
 				       // check whether entry was declared
       if (pd->entries.find(entry_name) == pd->entries.end()) 
 	{
-	  cerr << "Line " << lineno
-	       << ": No such entry was declared:" << endl
-	       << "    " << entry_name << endl
-	       << "    <Present subsection:" << endl;
+	  std::cerr << "Line " << lineno
+		    << ": No such entry was declared:" << std::endl
+		    << "    " << entry_name << std::endl
+		    << "    <Present subsection:" << std::endl;
 	  for (unsigned int i=0; i<subsection_path.size(); ++i)
-	    cerr << setw(i*2+8) << " "
-		 << "subsection " << subsection_path[i] << endl;
-	  cerr << "    >" << endl;
+	    std::cerr << std::setw(i*2+8) << " "
+		      << "subsection " << subsection_path[i] << std::endl;
+	  std::cerr << "    >" << std::endl;
 
 	  return false;
 	};
@@ -937,16 +937,16 @@ bool ParameterHandler::scan_line (string line,
 				       // exception: if it contains characters
 				       // which specify it as a multiple loop
 				       // entry, then ignore content
-      if (entry_value.find ('{') == string::npos)
+      if (entry_value.find ('{') == std::string::npos)
 	if (!pd->entries[entry_name].second->match(entry_value))
 	  {
-	    cerr << "Line " << lineno << ":" << endl
-		 << "    The entry value" << endl
-		 << "        " << entry_value << endl
-		 << "    for the entry named" << endl
-		 << "        " << entry_name << endl
-		 << "    does not match the given pattern" << endl
-		 << "        " << pd->entries[entry_name].second->description() << endl;
+	    std::cerr << "Line " << lineno << ":" << std::endl
+		      << "    The entry value" << std::endl
+		      << "        " << entry_value << std::endl
+		      << "    for the entry named" << std::endl
+		      << "        " << entry_name << std::endl
+		      << "    does not match the given pattern" << std::endl
+		      << "        " << pd->entries[entry_name].second->description() << std::endl;
 	    return false;
 	  };
       
@@ -964,8 +964,8 @@ bool ParameterHandler::scan_line (string line,
     };
 
 				   // this line matched nothing known
-  cerr << "Line " << lineno << ": This line matched nothing known:" << endl
-       << "    " << line << endl;
+  std::cerr << "Line " << lineno << ": This line matched nothing known:" << std::endl
+	    << "    " << line << std::endl;
   return false;
 };
 
@@ -974,7 +974,7 @@ bool ParameterHandler::scan_line (string line,
 ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection ()
 {
   Section* sec = &defaults;
-  vector<string>::const_iterator SecName = subsection_path.begin();
+  std::vector<std::string>::const_iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -991,7 +991,7 @@ const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsecti
 {
   Section* sec = const_cast<Section*>(&defaults); // not nice, but needs to be and
 				   // after all: we do not change @p{sec}
-  vector<string>::const_iterator SecName = subsection_path.begin();
+  std::vector<std::string>::const_iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -1007,7 +1007,7 @@ const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsecti
 ParameterHandler::Section* ParameterHandler::get_present_changed_subsection ()
 {
   Section* sec = &changed_entries;
-  vector<string>::iterator SecName = subsection_path.begin();
+  std::vector<std::string>::iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -1023,7 +1023,7 @@ ParameterHandler::Section* ParameterHandler::get_present_changed_subsection ()
 const ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () const
 {
   Section* sec = const_cast<Section*>(&changed_entries); // same as in get_present_default_s...
-  vector<string>::const_iterator SecName = subsection_path.begin();
+  std::vector<std::string>::const_iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -1051,7 +1051,7 @@ ParameterHandler::Section::~Section ()
 {
   entries.clear ();
 
-  map<string, Section*>::iterator p;
+  std::map<std::string, Section*>::iterator p;
 
   for (p=subsections.begin(); p!=subsections.end(); ++p)
     delete p->second;
@@ -1069,7 +1069,7 @@ ParameterHandler::Section::memory_consumption () const
     mem += (MemoryConsumption::memory_consumption (i->first) +
 	    MemoryConsumption::memory_consumption (i->second.first) +
 	    MemoryConsumption::memory_consumption (*i->second.second));
-  for (map<string, Section*>::const_iterator i=subsections.begin(); i!=subsections.end(); ++i)
+  for (std::map<std::string, Section*>::const_iterator i=subsections.begin(); i!=subsections.end(); ++i)
     mem += (MemoryConsumption::memory_consumption (i->first) +
 	    MemoryConsumption::memory_consumption (*(i->second)));
   return mem;
@@ -1089,7 +1089,7 @@ MultipleParameterLoop::~MultipleParameterLoop ()
 
 
 
-bool MultipleParameterLoop::read_input (istream &input)
+bool MultipleParameterLoop::read_input (std::istream &input)
 {
   AssertThrow (input, ExcIO());
 
@@ -1101,12 +1101,12 @@ bool MultipleParameterLoop::read_input (istream &input)
 
 
 
-bool MultipleParameterLoop::read_input (const string &filename)
+bool MultipleParameterLoop::read_input (const std::string &filename)
 {
   return ParameterHandler::read_input (filename);
 				   // don't call init_branches, since this read_input
 				   // function calls
-				   // MultipleParameterLoop::Readinput(istream &, ostream &)
+				   // MultipleParameterLoop::Readinput(std::istream &, std::ostream &)
 				   // which itself calls init_branches.
 };
 
@@ -1123,7 +1123,7 @@ bool MultipleParameterLoop::read_input_from_string (const char *s)
 
 void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc)
 {
-  for (int run_no=0; run_no<n_branches; ++run_no) 
+  for (unsigned int run_no=0; run_no<n_branches; ++run_no) 
     {
 				       // give create_new one-based numbers
       uc.create_new (run_no+1);
@@ -1157,7 +1157,7 @@ void MultipleParameterLoop::init_branches ()
 				   // has only one single value after reading the
 				   // input
   if (multiple_choices.size() > 0)
-    for (vector<Entry>::iterator i=multiple_choices.end()-1;
+    for (std::vector<Entry>::iterator i=multiple_choices.end()-1;
 	 i >= multiple_choices.begin(); --i)
       if (i->different_values.size() == 1)
 	multiple_choices.erase (i);
@@ -1172,20 +1172,20 @@ void MultipleParameterLoop::init_branches ()
 				   // number of entries
   for (unsigned int i=0; i<multiple_choices.size(); ++i)
     if (multiple_choices[i].type == array)
-      if (multiple_choices[i].different_values.size() != (unsigned int)n_branches)
-	cerr << "    The entry value" << endl
-	     << "        " << multiple_choices[i].entry_value << endl
-	     << "    for the entry named" << endl
-	     << "        " << multiple_choices[i].entry_name << endl
-	     << "    does not have the right number of entries for the " << endl
-	     << "        " << n_branches << " variant runs that will be performed." << endl;
+      if (multiple_choices[i].different_values.size() != n_branches)
+	std::cerr << "    The entry value" << std::endl
+		  << "        " << multiple_choices[i].entry_value << std::endl
+		  << "    for the entry named" << std::endl
+		  << "        " << multiple_choices[i].entry_name << std::endl
+		  << "    does not have the right number of entries for the " << std::endl
+		  << "        " << n_branches << " variant runs that will be performed." << std::endl;
 
 
 				   // do a first run on filling the values to
 				   // check for the conformance with the regexp
 				   // (afterwards, this will be lost in the whole
 				   // other output)
-  for (int i=0; i<n_branches; ++i) 
+  for (unsigned int i=0; i<n_branches; ++i) 
     fill_entry_values (i);
 };
 
@@ -1197,14 +1197,14 @@ void MultipleParameterLoop::init_branches_section (const ParameterHandler::Secti
 				   // whether it is a multiple entry
   Section::EntryType::const_iterator e;
   for (e = sec.entries.begin(); e != sec.entries.end(); ++e) 
-    if (e->second.first.find('{') != string::npos) 
+    if (e->second.first.find('{') != std::string::npos) 
       multiple_choices.push_back (Entry(subsection_path,
 					e->first,
 					e->second.first));
 
 
 				   // transverse subsections
-  map<string, Section*>::const_iterator s;
+  std::map<std::string, Section*>::const_iterator s;
   for (s = sec.subsections.begin(); s != sec.subsections.end(); ++s) 
     {
       enter_subsection (s->first);
@@ -1219,7 +1219,7 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 {
   int possibilities = 1;
   
-  vector<Entry>::iterator choice;
+  std::vector<Entry>::iterator choice;
   for (choice = multiple_choices.begin();
        choice != multiple_choices.end();
        ++choice) 
@@ -1231,16 +1231,16 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 				       // set entry
       Section* pd = get_present_defaults_subsection ();
       int selection = (run_no/possibilities) % choice->different_values.size();
-      string entry_value;
+      std::string entry_value;
       if (choice->type == variant)
 	entry_value = choice->different_values[selection];
       else 
 	{
 	  if (run_no>=choice->different_values.size()) 
 	    {
-	      cerr << "The given array for entry "
-		<< pd->entries[choice->entry_name].first
-		<< " does not conatin enough elements! Taking empty string instead." << endl;
+	      std::cerr << "The given array for entry "
+			<< pd->entries[choice->entry_name].first
+			<< " does not conatin enough elements! Taking empty string instead." << std::endl;
 	      entry_value = "";
 	    }
 	  else
@@ -1250,15 +1250,15 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 				       // check conformance with regex
       if (!pd->entries[choice->entry_name].second->match(entry_value))
 	{
-	  cerr << "In run no.  " << run_no+1 << ":" << endl
-	       << "    The entry value" << endl
-	       << "        " << entry_value << endl
-	       << "    for the entry named" << endl
-	       << "        " << choice->entry_name << endl
-	       << "    does not match the given pattern" << endl
-	       << "        " << pd->entries[choice->entry_name].second->description() << endl
-	       << "    Taking default value" << endl
-	       << "        " << pd->entries[choice->entry_name].first << endl;
+	  std::cerr << "In run no.  " << run_no+1 << ":" << std::endl
+		    << "    The entry value" << std::endl
+		    << "        " << entry_value << std::endl
+		    << "    for the entry named" << std::endl
+		    << "        " << choice->entry_name << std::endl
+		    << "    does not match the given pattern" << std::endl
+		    << "        " << pd->entries[choice->entry_name].second->description() << std::endl
+		    << "    Taking default value" << std::endl
+		    << "        " << pd->entries[choice->entry_name].first << std::endl;
 	  
 					   // select default instead
 	  entry_value = pd->entries[choice->entry_name].first;
@@ -1299,10 +1299,10 @@ MultipleParameterLoop::memory_consumption () const
 
 
 
-MultipleParameterLoop::Entry::Entry (const vector<string> &ssp,
-				     const string& Name,
-				     const string& Value) :
-    subsection_path (ssp), entry_name(Name), entry_value(Value)
+MultipleParameterLoop::Entry::Entry (const std::vector<std::string> &ssp,
+				     const std::string              &Name,
+				     const std::string              &Value) :
+		subsection_path (ssp), entry_name(Name), entry_value(Value)
 {};
 
 
@@ -1313,10 +1313,10 @@ void MultipleParameterLoop::Entry::split_different_values ()
 				   // part before the opening "{",
 				   // the selection itself, final
 				   // part after "}"
-  string prefix  (entry_value, 0, entry_value.find('{'));
-  string multiple(entry_value, entry_value.find('{')+1,
-		  entry_value.rfind('}')-entry_value.find('{')-1);
-  string postfix (entry_value, entry_value.rfind('}')+1, string::npos);
+  std::string prefix  (entry_value, 0, entry_value.find('{'));
+  std::string multiple(entry_value, entry_value.find('{')+1,
+		       entry_value.rfind('}')-entry_value.find('{')-1);
+  std::string postfix (entry_value, entry_value.rfind('}')+1, std::string::npos);
 				   // if array entry {{..}}: delete inner
 				   // pair of braces
   if (multiple[0]=='{')
@@ -1329,25 +1329,25 @@ void MultipleParameterLoop::Entry::split_different_values ()
   while (multiple[multiple.size()-1] == ' ') multiple.erase (multiple.size()-1,1);
   
 				   // delete spaces around '|'
-  while (multiple.find(" |") != string::npos)
+  while (multiple.find(" |") != std::string::npos)
     multiple.replace (multiple.find(" |"), 2, "|");
-  while (multiple.find("| ") != string::npos)
+  while (multiple.find("| ") != std::string::npos)
     multiple.replace (multiple.find("| "), 2, "|");
 
-  while (multiple.find('|') != string::npos) 
+  while (multiple.find('|') != std::string::npos) 
     {
       different_values.push_back (prefix +
-				  string(multiple, 0, multiple.find('|'))+
+				  std::string(multiple, 0, multiple.find('|'))+
 				  postfix);
       multiple.erase (0, multiple.find('|')+1);
     };
 				   // make up the last selection ("while" broke
 				   // because there was no '|' any more
   different_values.push_back (prefix+multiple+postfix);
-				 // finally check whether this was a variant
-				 // entry ({...}) or an array ({{...}})
-  if ((entry_value.find("{{") != string::npos) &&
-      (entry_value.find("}}") != string::npos))
+				   // finally check whether this was a variant
+				   // entry ({...}) or an array ({{...}})
+  if ((entry_value.find("{{") != std::string::npos) &&
+      (entry_value.find("}}") != std::string::npos))
     type = array;
   else
     type = variant;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -222,7 +222,7 @@ template <int dim> class Triangulation;
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim, typename Accessor>
-class TriaRawIterator : public bidirectional_iterator<Accessor,int>
+class TriaRawIterator : public std::bidirectional_iterator<Accessor,int>
 {
   public:
 				     /**
@@ -457,7 +457,7 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>
 				      * Print the iterator to @p{out}. The
 				      * format is like @p{level.index}.
 				      */
-    void print (ostream &out) const;
+    void print (std::ostream &out) const;
 
 
 				     /**
@@ -943,7 +943,7 @@ TriaRawIterator<dim,Accessor>::operator -- ()
 template <int dim, typename Accessor>
 inline
 void
-TriaRawIterator<dim,Accessor>::print (ostream &out) const
+TriaRawIterator<dim,Accessor>::print (std::ostream &out) const
 {
   out << accessor.level() << "." << accessor.index();
 };
@@ -1030,7 +1030,8 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
  */
 template <int dim, typename Accessor>
 inline
-ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i)
+std::ostream & operator << (std::ostream                        &out,
+			    const TriaRawIterator<dim,Accessor> &i)
 {
   i.print(out);
   return out;
@@ -1048,7 +1049,8 @@ ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i)
  */
 template <int dim, typename Accessor>
 inline
-ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i)
+std::ostream & operator << (std::ostream                     &out,
+			    const TriaIterator<dim,Accessor> &i)
 {
   i.print(out);
   return out;
@@ -1066,7 +1068,8 @@ ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i)
  */
 template <int dim, typename Accessor>
 inline
-ostream & operator << (ostream &out, const TriaActiveIterator<dim,Accessor> &i)
+std::ostream & operator << (std::ostream                           &out,
+			    const TriaActiveIterator<dim,Accessor> &i)
 {
   i.print(out);
   return out;

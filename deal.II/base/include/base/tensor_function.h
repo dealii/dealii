@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -85,8 +85,8 @@ class TensorFunction : public FunctionTime,
 				      * the right size, i.e.  the same
 				      * size as the @p{points} array.  
 				      */
-    virtual void value_list (const vector<Point<dim> > &points,
-			     vector<Tensor<rank,dim> > &values) const;
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<Tensor<rank,dim> > &values) const;
 
 				     /**
 				      * Return the gradient of the
@@ -102,8 +102,8 @@ class TensorFunction : public FunctionTime,
 				      * the right size, i.e.  the same
 				      * size as the @p{points} array.  
 				      */
-    virtual void gradient_list (const vector<Point<dim> > &points,
-				vector<Tensor<rank+1,dim> > &gradients) const;
+    virtual void gradient_list (const std::vector<Point<dim> >   &points,
+				std::vector<Tensor<rank+1,dim> > &gradients) const;
 
 				     /**
 				      * Exception

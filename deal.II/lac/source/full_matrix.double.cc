@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -125,9 +125,9 @@ FullMatrix<double>::invert (const FullMatrix<double> &M)
 //  double condition = s[0]/s[dim_range-1];
   
   if (info!=0)
-    deallog << "inverting error " << info << ' ' << erg << endl;
+    deallog << "inverting error " << info << ' ' << erg << std::endl;
   if (rank<(int)dim_range)
-    deallog << "rank deficiency " << rank << endl;
+    deallog << "rank deficiency " << rank << std::endl;
   delete[] work;
   delete[] s;
   delete[] matrix;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,7 @@ Multigrid<dim>::Multigrid (const MGDoFHandler<dim>                       &mg_dof
 			   const unsigned int                             maxlevel)
 		:
 		MGBase(transfer, minlevel,
-		       min(mg_dof_handler.get_tria().n_levels()-1,
+		       std::min(mg_dof_handler.get_tria().n_levels()-1,
 			   maxlevel)),
 		mg_dof_handler(&mg_dof_handler),
 		level_sparsities(&level_sparsities),
@@ -76,8 +76,8 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 // two fields which will store the
 				   // indices of the multigrid dofs
 				   // for a cell and one of its children
-  vector<unsigned int> dof_indices_mother (dofs_per_cell);
-  vector<unsigned int> dof_indices_child (dofs_per_cell);
+  std::vector<unsigned int> dof_indices_mother (dofs_per_cell);
+  std::vector<unsigned int> dof_indices_child (dofs_per_cell);
   
 				   // for each level: first build the sparsity
 				   // pattern of the matrices and then build the

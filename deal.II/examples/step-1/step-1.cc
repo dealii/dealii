@@ -72,7 +72,7 @@ void first_grid ()
                                    // Now we want to write it to some
                                    // output, here in postscript
                                    // format
-  ofstream out ("grid-1.eps");
+  std::ofstream out ("grid-1.eps");
   GridOut grid_out;
   grid_out.write_eps (triangulation, out);
 };
@@ -194,7 +194,7 @@ void second_grid ()
                                    // Now we want to write it to some
                                    // output, here in postscript
                                    // format
-  ofstream out ("grid-2.eps");
+  std::ofstream out ("grid-2.eps");
   GridOut grid_out;
   grid_out.write_eps (triangulation, out);
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,7 +33,7 @@
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataEntry::
 DataEntry (const Vector<double> *data,
-	   const vector<string> &names) :
+	   const std::vector<std::string> &names) :
 		data(data),
 		names(names)
 {};
@@ -90,7 +90,7 @@ attach_dof_handler (const DoFHandler<dof_handler_dim> &d)
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (const Vector<double> &vec,
-							     const vector<string> &names)
+							     const std::vector<std::string> &names)
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
 
@@ -111,7 +111,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (con
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				       "0123456789_<>()") == string::npos,
+				       "0123456789_<>()") == std::string::npos,
 	    ExcInvalidCharacter (names[i]));
   
   DataEntry new_entry (&vec, names);
@@ -131,11 +131,11 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (con
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (const Vector<double> &vec,
-							     const string         &name)
+							     const std::string         &name)
 {
   unsigned int n_components = dofs->get_fe().n_components ();
 
-  vector<string> names;
+  std::vector<std::string> names;
 				   // if only one component or vector
 				   // is cell vector: we only need one
 				   // name
@@ -151,8 +151,8 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (con
       names.resize (n_components);
       for (unsigned int i=0; i<n_components; ++i)
 	{
-	  ostrstream namebuf;
-	  namebuf << name << '_' << i << ends;
+	  std::ostrstream namebuf;
+	  namebuf << name << '_' << i << std::ends;
   	  names[i] = namebuf.str();
   	};
     };
@@ -169,7 +169,7 @@ void DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_data_vect
   cell_data.erase (cell_data.begin(), cell_data.end());
 
 				   // delete patches
-  vector<DataOutBase::Patch<patch_dim,patch_space_dim> > dummy;
+  std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > dummy;
   patches.swap (dummy);
 }
 
@@ -208,23 +208,23 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear ()
     };
 
 				   // delete patches
-  vector<DataOutBase::Patch<patch_dim,patch_space_dim> > dummy;
+  std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > dummy;
   patches.swap (dummy);
 }
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-vector<string>
+std::vector<std::string>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_dataset_names () const 
 {
-  vector<string> names;
+  std::vector<std::string> names;
 				   // collect the names of dof
 				   // and cell data
-  for (typename vector<DataEntry>::const_iterator d=dof_data.begin();
+  for (typename std::vector<DataEntry>::const_iterator d=dof_data.begin();
        d!=dof_data.end(); ++d)
     for (unsigned int i=0; i<d->names.size(); ++i)
       names.push_back (d->names[i]);
-  for (typename vector<DataEntry>::const_iterator d=cell_data.begin();
+  for (typename std::vector<DataEntry>::const_iterator d=cell_data.begin();
        d!=cell_data.end(); ++d)
     {
       Assert (d->names.size() == 1, ExcInternalError());
@@ -237,7 +237,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_dataset_names ()
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-const vector<typename DataOutBase::Patch<patch_dim, patch_space_dim> > &
+const std::vector<typename DataOutBase::Patch<patch_dim, patch_space_dim> > &
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;
@@ -275,7 +275,7 @@ void DataOut<dim>::build_some_patches (Data data)
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   unsigned int cell_number = 0;
-  typename vector<DataOutBase::Patch<dim> >::iterator patch = patches.begin();
+  typename std::vector<DataOutBase::Patch<dim> >::iterator patch = patches.begin();
   DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
@@ -379,7 +379,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // clear the patches array
   if (true)
     {
-      vector<DataOutBase::Patch<dim> > dummy;
+      std::vector<DataOutBase::Patch<dim> > dummy;
       patches.swap (dummy);
     };
   
@@ -392,7 +392,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
        cell = next_cell(cell))
     ++n_patches;
 
-  vector<Data> thread_data(n_threads);
+  std::vector<Data> thread_data(n_threads);
 
 				   // init data for the threads
   for (unsigned int i=0;i<n_threads;++i)
