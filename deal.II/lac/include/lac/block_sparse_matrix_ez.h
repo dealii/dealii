@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -79,6 +79,25 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      * blocks only.
 				      */
     BlockSparseMatrixEZ & operator = (const BlockSparseMatrixEZ<Number>&);
+
+				     /**
+                                      * This operator assigns a scalar to
+                                      * a matrix. Since this does usually
+                                      * not make much sense (should we set
+                                      * all matrix entries to this value?
+                                      * Only the nonzero entries of the
+                                      * sparsity pattern?), this operation
+                                      * is only allowed if the actual
+                                      * value to be assigned is zero. This
+                                      * operator only exists to allow for
+                                      * the obvious notation
+                                      * <tt>matrix=0</tt>, which sets all
+                                      * elements of the matrix to zero,
+                                      * but keep the sparsity pattern
+                                      * previously used.
+                                      */
+    BlockSparseMatrixEZ & operator = (const double d);
+
 
 				     /**
 				      * Set matrix to zero dimensions

@@ -657,10 +657,6 @@ namespace PETScWrappers
                                         * Exception
                                         */
       DeclException0 (ExcMatrixNotSquare);
-                                       /**
-                                        * Exception
-                                        */
-      DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
       
     protected:
                                        /**

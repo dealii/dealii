@@ -251,17 +251,11 @@ class FullMatrix : public Table<2,number>
     operator = (const FullMatrix<number2>&);
 
 				     /**
-				      * This operator assigns a scalar to a
-				      * matrix. Since this does usually not
-				      * make much sense (should we set all
-				      * matrix entries to this value? Only the
-				      * nonzero entries of the sparsity
-				      * pattern?), this operation is only
-				      * allowed if the actual value to be
-				      * assigned is zero. This operator only
-				      * exists to allow for the obvious
-				      * notation <tt>matrix=0</tt>, which sets
-				      * all elements of the matrix to zero.
+				      * This operator assigns a scalar
+				      * to a matrix. To avoid
+				      * confusion with constructors,
+				      * zero is the only value allowed
+				      * for <tt>d</tt>
 				      */
     FullMatrix<number> &
     operator = (const double d);
@@ -981,10 +975,6 @@ class FullMatrix : public Table<2,number>
 		    << "Target region not in matrix: size in this direction="
 		    << arg1 << ", size of new matrix=" << arg2
 		    << ", offset=" << arg3);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
 				     /**
 				      * Exception
 				      */

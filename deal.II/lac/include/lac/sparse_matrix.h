@@ -1504,10 +1504,6 @@ class SparseMatrix : public virtual Subscriptor
                                       * Exception
                                       */
     DeclException0 (ExcSourceEqualsDestination);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
     
   private:
 				     /**

@@ -896,10 +896,6 @@ class BlockSparseMatrix : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotInitialized);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
     
   private:
 				     /**

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,6 +61,25 @@ SparseMatrixEZ<number>::operator= (const SparseMatrixEZ<number>& m)
   Assert (m.empty(), ExcInvalidConstructorCall());
   return *this;
 }
+
+
+template <typename number>
+SparseMatrixEZ<number> &
+SparseMatrixEZ<number>::operator = (const double d)
+{
+  Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+
+  typename std::vector<Entry>::iterator e = data.begin();
+  const typename std::vector<Entry>::iterator end = data.end();
+  
+  while (e != end)
+    {
+      (e++)->value = 0.;
+    }
+  
+  return *this;
+}
+
 
 
 template <typename number>

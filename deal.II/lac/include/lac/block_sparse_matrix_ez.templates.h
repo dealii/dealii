@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -76,6 +76,21 @@ operator = (const BlockSparseMatrixEZ<number> &m)
 }
 
  
+
+template <typename number>
+BlockSparseMatrixEZ<number> &
+BlockSparseMatrixEZ<number>::operator = (const double d)
+{
+  Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+  
+  for (unsigned int r=0; r<n_block_rows(); ++r)
+    for (unsigned int c=0; c<n_block_cols(); ++c)
+      block(r,c) = 0;
+
+  return *this;
+}
+
+
 
 template <typename number>
 BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ (
