@@ -54,14 +54,14 @@ class MappingCartesian : public Mapping<dim>
 		      const Quadrature<dim-1>& quadrature) const;
 
     virtual void
-    fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
 		    const Quadrature<dim>& quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
 		    std::vector<Point<dim> >        &quadrature_points,
 		    std::vector<double>             &JxW_values) const ;
 
     virtual void
-    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,
 			 const unsigned int face_no,
 			 const Quadrature<dim-1>& quadrature,
 			 typename Mapping<dim>::InternalDataBase &mapping_data,
@@ -70,7 +70,7 @@ class MappingCartesian : public Mapping<dim>
 			 std::vector<Tensor<1,dim> >        &boundary_form,
 			 std::vector<Point<dim> >        &normal_vectors) const ;
     virtual void
-    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
 			    const unsigned int face_no,
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,
@@ -193,7 +193,7 @@ class MappingCartesian : public Mapping<dim>
 				      * Do the computation for the
 				      * <tt>fill_*</tt> functions.
 				      */
-    void compute_fill (const typename DoFHandler<dim>::cell_iterator &cell,
+    void compute_fill (const typename Triangulation<dim>::cell_iterator &cell,
 		       const unsigned int face_no,
 		       const unsigned int sub_no,
 		       InternalData& data,
@@ -216,7 +216,7 @@ class MappingCartesian : public Mapping<dim>
 /// @if NoDoc
 
 template <> void MappingCartesian<1>::fill_fe_face_values (
-  const DoFHandler<1>::cell_iterator &,
+  const Triangulation<1>::cell_iterator &,
   const unsigned,
   const Quadrature<0>&,
   Mapping<1>::InternalDataBase&,
@@ -226,7 +226,7 @@ template <> void MappingCartesian<1>::fill_fe_face_values (
   std::vector<Point<1> >&) const;
 
 template <> void MappingCartesian<1>::fill_fe_subface_values (
-  const DoFHandler<1>::cell_iterator &,
+  const Triangulation<1>::cell_iterator &,
   const unsigned,
   const unsigned,
   const Quadrature<0>&,

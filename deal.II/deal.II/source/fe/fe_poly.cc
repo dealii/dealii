@@ -235,11 +235,11 @@ FE_Poly<POLY,dim>::get_data (const UpdateFlags      update_flags,
 template <class POLY, int dim>
 void
 FE_Poly<POLY,dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-                                   const typename DoFHandler<dim>::cell_iterator &cell,
-                                   const Quadrature<dim>                &quadrature,
-                                   typename Mapping<dim>::InternalDataBase &mapping_data,
-                                   typename Mapping<dim>::InternalDataBase &fedata,
-                                   FEValuesData<dim>                    &data) const
+				   const typename Triangulation<dim>::cell_iterator &cell,
+				   const Quadrature<dim>                &quadrature,
+				   typename Mapping<dim>::InternalDataBase &mapping_data,
+				   typename Mapping<dim>::InternalDataBase &fedata,
+				   FEValuesData<dim>                    &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -277,7 +277,7 @@ FE_Poly<POLY,dim>::fill_fe_values (const Mapping<dim>                   &mapping
 template <class POLY, int dim>
 void
 FE_Poly<POLY,dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
-				const typename DoFHandler<dim>::cell_iterator &cell,
+				const typename Triangulation<dim>::cell_iterator &cell,
 				const unsigned int                    face,
 				const Quadrature<dim-1>              &quadrature,
 				typename Mapping<dim>::InternalDataBase       &mapping_data,
@@ -327,7 +327,7 @@ FE_Poly<POLY,dim>::fill_fe_face_values (const Mapping<dim>                   &ma
 template <class POLY, int dim>
 void
 FE_Poly<POLY,dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
-				   const typename DoFHandler<dim>::cell_iterator &cell,
+				   const typename Triangulation<dim>::cell_iterator &cell,
 				   const unsigned int                    face,
 				   const unsigned int                    subface,
 				   const Quadrature<dim-1>              &quadrature,

@@ -537,7 +537,6 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
 // Fill data of FEValues
 //----------------------------------------------------------------------
 
-
 template <int dim>
 bool
 FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,

@@ -1493,7 +1493,7 @@ FE_RaviartThomas<dim>::get_data (const UpdateFlags      update_flags,
 template <int dim>
 void
 FE_RaviartThomas<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-                                       const typename DoFHandler<dim>::cell_iterator &cell,
+                                       const typename Triangulation<dim>::cell_iterator &cell,
                                        const Quadrature<dim>                &quadrature,
                                        typename Mapping<dim>::InternalDataBase &mapping_data,
                                        typename Mapping<dim>::InternalDataBase &fedata,
@@ -1618,7 +1618,7 @@ FE_RaviartThomas<dim>::fill_fe_values (const Mapping<dim>                   &map
 template <int dim>
 void
 FE_RaviartThomas<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
-                                            const typename DoFHandler<dim>::cell_iterator &cell,
+                                            const typename Triangulation<dim>::cell_iterator &cell,
                                             const unsigned int                    face,
                                             const Quadrature<dim-1>              &quadrature,
                                             typename Mapping<dim>::InternalDataBase       &mapping_data,
@@ -1755,7 +1755,7 @@ FE_RaviartThomas<dim>::fill_fe_face_values (const Mapping<dim>                  
 template <int dim>
 void
 FE_RaviartThomas<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
-                                               const typename DoFHandler<dim>::cell_iterator &cell,
+                                               const typename Triangulation<dim>::cell_iterator &cell,
                                                const unsigned int                    face,
                                                const unsigned int                    subface,
                                                const Quadrature<dim-1>              &quadrature,

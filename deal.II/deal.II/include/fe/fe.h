@@ -23,6 +23,7 @@ template <int dim> class FEValues;
 template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
 template <int dim> class FESystem;
+template <int dim> class FECollection;
 
 /*!@addtogroup febase */
 /*@{*/
@@ -242,7 +243,8 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * a copy constructor.
 				      *
 				      * This function is needed by the
-				      * constructors of @p FESystem.
+				      * constructors of FESystem as well
+				      * as by the FECollection class.
 				      */
     virtual FiniteElement<dim> *clone() const = 0;
     
@@ -309,7 +311,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      */				      
     virtual void
     fill_fe_values (const Mapping<dim>                   &mapping,
-		    const typename DoFHandler<dim>::cell_iterator &cell,
+		    const typename Triangulation<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
 		    typename Mapping<dim>::InternalDataBase       &mapping_internal,
 		    typename Mapping<dim>::InternalDataBase       &fe_internal,
@@ -328,7 +330,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      */				      
     virtual void
     fill_fe_face_values (const Mapping<dim>                   &mapping,
-			 const typename DoFHandler<dim>::cell_iterator &cell,
+			 const typename Triangulation<dim>::cell_iterator &cell,
 			 const unsigned int                    face_no,
 			 const Quadrature<dim-1>              &quadrature,
 			 typename Mapping<dim>::InternalDataBase       &mapping_internal,
@@ -348,7 +350,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      */				      
     virtual void
     fill_fe_subface_values (const Mapping<dim>                   &mapping,
-			    const typename DoFHandler<dim>::cell_iterator &cell,
+			    const typename Triangulation<dim>::cell_iterator &cell,
 			    const unsigned int                    face_no,
 			    const unsigned int                    sub_no,
 			    const Quadrature<dim-1>              &quadrature,
@@ -365,6 +367,7 @@ class FiniteElement : public FiniteElementBase<dim>
     friend class FEFaceValues<dim>;
     friend class FESubfaceValues<dim>;
     friend class FESystem<dim>;
+    friend class FECollection<dim>;
 };
 
 /*@}*/

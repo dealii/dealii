@@ -12,9 +12,8 @@
 //----------------------------------------------------------------
 
 
-#include <fe/fe.h>
 #include <grid/geometry_info.h>
-
+#include <fe/fe.h>
 
 
 template <int dim>

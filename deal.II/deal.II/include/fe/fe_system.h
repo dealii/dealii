@@ -448,7 +448,7 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual void
     fill_fe_values (const Mapping<dim>                      &mapping,
-		    const typename DoFHandler<dim>::cell_iterator &cell,
+		    const typename Triangulation<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                   &quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
 		    typename Mapping<dim>::InternalDataBase &fe_data,
@@ -466,7 +466,7 @@ class FESystem : public FiniteElement<dim>
 				      */    
     virtual void
     fill_fe_face_values (const Mapping<dim>                   &mapping,
-			 const typename DoFHandler<dim>::cell_iterator &cell,
+			 const typename Triangulation<dim>::cell_iterator &cell,
 			 const unsigned int                    face_no,
 			 const Quadrature<dim-1>              &quadrature,
 			 typename Mapping<dim>::InternalDataBase      &mapping_data,
@@ -485,7 +485,7 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim>                   &mapping,
-			    const typename DoFHandler<dim>::cell_iterator &cell,
+			    const typename Triangulation<dim>::cell_iterator &cell,
 			    const unsigned int                    face_no,
 			    const unsigned int                    sub_no,
 			    const Quadrature<dim-1>              &quadrature,
@@ -518,7 +518,7 @@ class FESystem : public FiniteElement<dim>
 				      */
     template <int dim_1>
     void compute_fill (const Mapping<dim>                   &mapping,
-		       const typename DoFHandler<dim>::cell_iterator &cell,
+		       const typename Triangulation<dim>::cell_iterator &cell,
 		       const unsigned int                    face_no,
 		       const unsigned int                    sub_no,
 		       const Quadrature<dim_1>              &quadrature,

@@ -184,7 +184,7 @@ class MappingQ : public MappingQ1<dim>
 				      * Mapping.
 				      */
     virtual void
-    fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
 		    typename std::vector<Point<dim> >             &quadrature_points,
@@ -195,7 +195,7 @@ class MappingQ : public MappingQ1<dim>
 				      * Mapping.
 				      */
     virtual void
-    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,
 			 const unsigned int face_no,
 			 const Quadrature<dim-1>& quadrature,
 			 typename Mapping<dim>::InternalDataBase &mapping_data,
@@ -209,7 +209,7 @@ class MappingQ : public MappingQ1<dim>
 				      * Mapping.
 				      */
     virtual void
-    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
 			    const unsigned int face_no,
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,

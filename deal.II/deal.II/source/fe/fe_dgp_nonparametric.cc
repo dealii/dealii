@@ -286,7 +286,7 @@ template <int dim>
 void
 FE_DGPNonparametric<dim>::fill_fe_values (
   const Mapping<dim>&,
-  const typename DoFHandler<dim>::cell_iterator&,
+  const typename Triangulation<dim>::cell_iterator&,
   const Quadrature<dim>&,
   typename Mapping<dim>::InternalDataBase&,
   typename Mapping<dim>::InternalDataBase& fedata,
@@ -326,7 +326,7 @@ template <int dim>
 void
 FE_DGPNonparametric<dim>::fill_fe_face_values (
   const Mapping<dim>&,
-  const typename DoFHandler<dim>::cell_iterator&,
+  const typename Triangulation<dim>::cell_iterator&,
   const unsigned int,
   const Quadrature<dim-1>&,
   typename Mapping<dim>::InternalDataBase&,
@@ -367,7 +367,7 @@ template <int dim>
 void
 FE_DGPNonparametric<dim>::fill_fe_subface_values (
   const Mapping<dim>&,
-  const typename DoFHandler<dim>::cell_iterator&,
+  const typename Triangulation<dim>::cell_iterator&,
   const unsigned int,
   const unsigned int,
   const Quadrature<dim-1>&,

@@ -439,7 +439,7 @@ MappingQ1<dim>::get_subface_data (const UpdateFlags update_flags,
 
 template <int dim>
 void
-MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cell,
+MappingQ1<dim>::compute_fill (const typename Triangulation<dim>::cell_iterator &cell,
 			      const unsigned int       n_q_points,
 			      const DataSetDescriptor  data_set,
 			      InternalData            &data,
@@ -542,7 +542,7 @@ MappingQ1<dim>::compute_mapping_support_points(
 
 template <int dim>
 void
-MappingQ1<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+MappingQ1<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
 				const Quadrature<dim>                &q,
 				typename Mapping<dim>::InternalDataBase      &mapping_data,
 				std::vector<Point<dim> >                  &quadrature_points,
@@ -577,7 +577,7 @@ MappingQ1<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &c
 
 template <int dim>
 void
-MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator &cell,
+MappingQ1<dim>::compute_fill_face (const typename Triangulation<dim>::cell_iterator &cell,
 				   const unsigned int      face_no,
 				   const bool              is_subface,
 				   const unsigned int      n_q_points,
@@ -668,7 +668,7 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 
 template <int dim>
 void
-MappingQ1<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
+MappingQ1<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,
 				     const unsigned int       face_no,
 				     const Quadrature<dim-1> &q,
 				     typename Mapping<dim>::InternalDataBase &mapping_data,
@@ -699,7 +699,7 @@ MappingQ1<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterat
 
 template <int dim>
 void
-MappingQ1<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
+MappingQ1<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
 					const unsigned int       face_no,
 					const unsigned int       sub_no,
 					const Quadrature<dim-1> &q,
@@ -733,7 +733,7 @@ MappingQ1<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_ite
 
 template <>
 void
-MappingQ1<1>::compute_fill_face (const DoFHandler<1>::cell_iterator &,
+MappingQ1<1>::compute_fill_face (const Triangulation<1>::cell_iterator &,
 				 const unsigned int,
 				 const bool,
 				 const unsigned int,
@@ -751,7 +751,7 @@ MappingQ1<1>::compute_fill_face (const DoFHandler<1>::cell_iterator &,
 
 template <>
 void
-MappingQ1<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &,
+MappingQ1<1>::fill_fe_face_values (const Triangulation<1>::cell_iterator &,
 				   const unsigned,
 				   const Quadrature<0>&,
 				   Mapping<1>::InternalDataBase&,
@@ -766,7 +766,7 @@ MappingQ1<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &,
 
 template <>
 void
-MappingQ1<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
+MappingQ1<1>::fill_fe_subface_values (const Triangulation<1>::cell_iterator &,
 				      const unsigned,
 				      const unsigned,
 				      const Quadrature<0>&,

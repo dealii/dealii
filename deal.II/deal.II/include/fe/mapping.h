@@ -15,12 +15,11 @@
 
 
 #include <base/config.h>
-#include <cmath>
-#include <base/point.h>
-#include <base/subscriptor.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <fe/fe_update_flags.h>
+
+#include <cmath>
 
 template <int dim> class Quadrature;
 template <int dim> class FEValuesData;
@@ -445,7 +444,7 @@ class Mapping : public Subscriptor
 				      *
 				      */
     virtual void
-    fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                         &quadrature,
 		    InternalDataBase                              &internal,
 		    std::vector<Point<dim> >                      &quadrature_points,
@@ -473,7 +472,7 @@ class Mapping : public Subscriptor
 				      * transformed quadrature weight.
 				      */
     virtual void
-    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,
 			 const unsigned int                        face_no,
 			 const Quadrature<dim-1>                  &quadrature,
 			 InternalDataBase                         &internal,
@@ -486,7 +485,7 @@ class Mapping : public Subscriptor
 				      * See above.
 				      */
     virtual void
-    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
 			    const unsigned int                        face_no,
 			    const unsigned int                        sub_no,
 			    const Quadrature<dim-1>                  &quadrature,

@@ -31,7 +31,6 @@ template<int dim> class FESystem;
 /*!@addtogroup febase */
 /*@{*/
 
-
 /**
  * Dimension independent data for finite elements. See the derived
  * class FiniteElementBase class for information on its use. All
@@ -904,7 +903,7 @@ class FiniteElementBase : public Subscriptor,
 				      * @p system_to_base_index
 				      * function.
 				      */
-    std::pair<unsigned int,unsigned int>
+    std::pair<unsigned int, unsigned int>
     system_to_component_index (const unsigned int index) const;    
   
 				     /**
@@ -912,7 +911,7 @@ class FiniteElementBase : public Subscriptor,
 				      * shape functions and their
 				      * indices on a face.
 				      */
-    std::pair<unsigned int,unsigned int>
+    std::pair<unsigned int, unsigned int>
     face_system_to_component_index (const unsigned int index) const;
 
                                      /**
@@ -1661,7 +1660,7 @@ class FiniteElementBase : public Subscriptor,
 				      * gradients.
 				      */
     void compute_2nd (const Mapping<dim>                      &mapping,
-		      const typename DoFHandler<dim>::cell_iterator    &cell,
+		      const typename Triangulation<dim>::cell_iterator    &cell,
 		      const unsigned int                       offset,
 		      typename Mapping<dim>::InternalDataBase &mapping_internal,
 		      InternalDataBase                        &fe_internal,

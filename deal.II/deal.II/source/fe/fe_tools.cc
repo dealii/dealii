@@ -34,6 +34,8 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 
+#include <boost/shared_ptr.hpp>
+
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
 #else
@@ -44,6 +46,30 @@
 
 namespace 
 {
+  template <int dim>
+  unsigned int
+  max_dofs_per_cell (const DoFHandler<dim> &dh) 
+  {
+    return dh.get_fe().dofs_per_cell;
+  }
+
+
+  template <int dim>
+  unsigned int
+  max_dofs_per_face (const DoFHandler<dim> &dh) 
+  {
+    return dh.get_fe().dofs_per_face;
+  }
+
+
+  template <int dim>
+  unsigned int
+  n_components (const DoFHandler<dim> &dh) 
+  {
+    return dh.get_fe().n_components();
+  }
+
+
                                    // forwarder function for
                                    // FE::get_interpolation_matrix. we
                                    // will want to call that function
@@ -75,8 +101,6 @@ namespace
     fe2.get_interpolation_matrix (fe1, tmp);
     interpolation_matrix = tmp;
   }
-
-
 
 				   // return true if the given pattern
 				   // string matches the given name at
@@ -352,6 +376,7 @@ void FETools::get_interpolation_difference_matrix (const FiniteElement<dim> &fe1
 }
 
 
+
 template <int dim, typename number>
 void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 				     const FiniteElement<dim> &fe2,
@@ -444,11 +469,16 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 }
 
 
-template <int dim, class InVector, class OutVector>
-void FETools::interpolate(const DoFHandler<dim> &dof1,
-			  const InVector &u1,
-			  const DoFHandler<dim> &dof2,
-			  OutVector &u2)
+
+template <int dim,
+          template <int> class DH1,
+          template <int> class DH2,
+          class InVector, class OutVector>
+void
+FETools::interpolate(const DH1<dim> &dof1,
+                     const InVector &u1,
+                     const DH2<dim> &dof2,
+                     OutVector      &u2)
 {
   ConstraintMatrix dummy;
   dummy.close();
@@ -457,17 +487,21 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 
   
 template <int dim, class InVector, class OutVector>
-void FETools::interpolate(const DoFHandler<dim> &dof1,
-			  const InVector &u1,
-			  const DoFHandler<dim> &dof2,
-			  const ConstraintMatrix &constraints,
-			  OutVector &u2)
+void
+FETools::interpolate(const DoFHandler<dim>  &dof1,
+                     const InVector         &u1,
+                     const DoFHandler<dim>  &dof2,
+                     const ConstraintMatrix &constraints,
+                     OutVector              &u2)
 {
-  Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+  Assert(&dof1.get_tria() == &dof2.get_tria(), ExcTriangulationMismatch());
   Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
-	 ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
-  Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
-  Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
+	 ExcDimensionMismatch(dof1.get_fe().n_components(),
+                              dof2.get_fe().n_components()));
+  Assert(u1.size()==dof1.n_dofs(),
+         ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
+  Assert(u2.size()==dof2.n_dofs(),
+         ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
 				   // for continuous elements on grids
 				   // with hanging nodes we need
@@ -475,9 +509,9 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 				   // constraints. Consequentely, if
 				   // there are no constraints then
 				   // hanging nodes are not allowed.
-  const bool hanging_nodes_not_allowed=
-    (dof2.get_fe().dofs_per_vertex != 0)
-    && (constraints.n_constraints()==0);
+  const bool hanging_nodes_not_allowed
+    = ((dof2.get_fe().dofs_per_vertex != 0) &&
+       (constraints.n_constraints() == 0));
   
   const unsigned int dofs_per_cell1=dof1.get_fe().dofs_per_cell;
   const unsigned int dofs_per_cell2=dof2.get_fe().dofs_per_cell;
@@ -495,11 +529,11 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 						 cell2 = dof2.begin_active(),
 						 endc2 = dof2.end();
 
-  std::vector<unsigned int> index_multiplicity(dof2.n_dofs(),0);
+  std::vector<unsigned int> touch_count(dof2.n_dofs(),0);
   std::vector<unsigned int> dofs (dofs_per_cell2);
   u2 = 0;
 
-  for (; cell1!=endc1, cell2!=endc2; ++cell1, ++cell2) 
+  for (; cell1!=endc1; ++cell1, ++cell2) 
     {
       if (hanging_nodes_not_allowed)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -513,17 +547,20 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
       for (unsigned int i=0; i<dofs_per_cell2; ++i)
 	{
 	  u2(dofs[i])+=u2_local(i);
-	  ++index_multiplicity[dofs[i]];
+	  ++touch_count[dofs[i]];
 	}
     }
-
+                                   // cell1 is at the end, so should
+                                   // be cell2
+  Assert (cell2 == endc2, ExcInternalError());
+  
 				   // when a discontinuous element is
 				   // interpolated to a continuous
 				   // one, we take the mean values.
   for (unsigned int i=0; i<dof2.n_dofs(); ++i)
     {
-      Assert(index_multiplicity[i]!=0, ExcInternalError());
-      u2(i) /= index_multiplicity[i];
+      Assert(touch_count[i]!=0, ExcInternalError());
+      u2(i) /= touch_count[i];
     }
 
 				   // Apply hanging node constraints.
@@ -531,11 +568,135 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 }
 
 
+
+template <int dim,
+          template <int> class DH1,
+          template <int> class DH2,              
+          class InVector, class OutVector>
+void
+FETools::interpolate (const DH1<dim>         &dof1,
+                      const InVector         &u1,
+                      const DH2<dim>         &dof2,
+                      const ConstraintMatrix &constraints,
+                      OutVector              &u2)
+{
+  Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+
+  Assert(u1.size()==dof1.n_dofs(),
+         ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
+  Assert(u2.size()==dof2.n_dofs(),
+         ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
+
+                                   // allocate vectors at maximal
+                                   // size. will be reinited in inner
+                                   // cell, but Vector makes sure that
+                                   // this does not lead to
+                                   // reallocation of memory
+  Vector<typename OutVector::value_type> u1_local(max_dofs_per_cell(dof1));
+  Vector<typename OutVector::value_type> u2_local(max_dofs_per_cell(dof2));
+
+                                   // have a map for interpolation
+                                   // matrices. shared_ptr make sure
+                                   // that memory is released again
+  std::map<const FiniteElement<dim> *,
+           std::map<const FiniteElement<dim> *,
+                    boost::shared_ptr<FullMatrix<double> > > >
+    interpolation_matrices;
+  
+  typename DH1<dim>::active_cell_iterator cell1 = dof1.begin_active(),
+                                          endc1 = dof1.end();
+  typename DH2<dim>::active_cell_iterator cell2 = dof2.begin_active(),
+                                          endc2 = dof2.end();
+
+  std::vector<unsigned int> touch_count(dof2.n_dofs(),0);
+  std::vector<unsigned int> dofs;
+  dofs.reserve (max_dofs_per_cell (dof2));
+  u2.clear ();
+
+  for (; cell1!=endc1; ++cell1, ++cell2) 
+    {
+      Assert(cell1->get_fe().n_components() == cell2->get_fe().n_components(),
+             ExcDimensionMismatch (cell1->get_fe().n_components(),
+                                   cell2->get_fe().n_components()));
+
+                                       // for continuous elements on
+                                       // grids with hanging nodes we
+                                       // need hanging node
+                                       // constraints. Consequentely,
+                                       // if there are no constraints
+                                       // then hanging nodes are not
+                                       // allowed.
+      const bool hanging_nodes_not_allowed
+        = ((cell2->get_fe().dofs_per_vertex != 0) &&
+           (constraints.n_constraints() == 0));
+  
+      if (hanging_nodes_not_allowed)
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  Assert (cell1->at_boundary(face) ||
+		  cell1->neighbor(face)->level() == cell1->level(),
+		  ExcHangingNodesNotAllowed(0));
+      
+      
+      const unsigned int dofs_per_cell1 = cell1->get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell2 = cell2->get_fe().dofs_per_cell;
+      u1_local.reinit (dofs_per_cell1);
+      u2_local.reinit (dofs_per_cell2);
+
+                                       // check if interpolation
+                                       // matrix for this particular
+                                       // pair of elements is already
+                                       // there
+      if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()] == 0)
+        {
+          boost::shared_ptr<FullMatrix<double> >
+            interpolation_matrix (new FullMatrix<double> (dofs_per_cell2,
+                                                          dofs_per_cell1));
+          interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
+            = interpolation_matrix;
+            
+          FETools::get_interpolation_matrix(cell1->get_fe(),
+                                            cell2->get_fe(),
+                                            *interpolation_matrix);
+        }
+      
+      cell1->get_dof_values(u1, u1_local);
+      interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
+        ->vmult(u2_local, u1_local);
+
+      dofs.resize (dofs_per_cell2);
+      cell2->get_dof_indices(dofs);
+
+      for (unsigned int i=0; i<dofs_per_cell2; ++i)
+	{
+	  u2(dofs[i])+=u2_local(i);
+	  ++touch_count[dofs[i]];
+	}
+    }
+                                   // cell1 is at the end, so should
+                                   // be cell2
+  Assert (cell2 == endc2, ExcInternalError());
+
+				   // when a discontinuous element is
+				   // interpolated to a continuous
+				   // one, we take the mean values.
+  for (unsigned int i=0; i<dof2.n_dofs(); ++i)
+    {
+      Assert(touch_count[i]!=0, ExcInternalError());
+      u2(i) /= touch_count[i];
+    }
+
+				   // Apply hanging node constraints.
+  constraints.distribute(u2);
+}
+
+
+
 template <int dim, class InVector, class OutVector>
-void FETools::back_interpolate(const DoFHandler<dim> &dof1,
-			       const InVector &u1,
-			       const FiniteElement<dim> &fe2,
-			       OutVector &u1_interpolated)
+void
+FETools::back_interpolate(const DoFHandler<dim>    &dof1,
+                          const InVector           &u1,
+                          const FiniteElement<dim> &fe2,
+                          OutVector                &u1_interpolated)
 {
   Assert(dof1.get_fe().n_components() == fe2.n_components(),
 	 ExcDimensionMismatch(dof1.get_fe().n_components(), fe2.n_components()));
@@ -545,7 +706,7 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
   
 				   // For continuous elements on grids
 				   // with hanging nodes we need
-				   // hnaging node
+				   // hanging node
 				   // constraints. Consequently, when
 				   // the elements are continuous no
 				   // hanging node constraints are
@@ -574,6 +735,78 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 
       cell->get_dof_values(u1, u1_local);
       interpolation_matrix.vmult(u1_int_local, u1_local);
+      cell->set_dof_values(u1_int_local, u1_interpolated);
+    }
+}
+
+
+  
+template <int dim,
+          template <int> class DH,
+          class InVector, class OutVector>
+void
+FETools::back_interpolate(const DH<dim>            &dof1,
+                          const InVector           &u1,
+                          const FiniteElement<dim> &fe2,
+                          OutVector                &u1_interpolated)
+{
+  Assert(u1.size() == dof1.n_dofs(),
+         ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
+  Assert(u1_interpolated.size() == dof1.n_dofs(),
+	 ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
+  
+  Vector<typename OutVector::value_type> u1_local(max_dofs_per_cell(dof1));
+  Vector<typename OutVector::value_type> u1_int_local(max_dofs_per_cell(dof1));
+  
+  typename DH<dim>::active_cell_iterator cell = dof1.begin_active(),
+                                         endc = dof1.end();
+
+                                   // map from possible fe objects in
+                                   // dof1 to the back_interpolation
+                                   // matrices
+  std::map<const FiniteElement<dim> *,
+           boost::shared_ptr<FullMatrix<double> > > interpolation_matrices;
+  
+  for (; cell!=endc; ++cell) 
+    {
+      Assert(cell->get_fe().n_components() == fe2.n_components(),
+             ExcDimensionMismatch(cell->get_fe().n_components(),
+                                  fe2.n_components()));
+      
+                                       // For continuous elements on
+                                       // grids with hanging nodes we
+                                       // need hanging node
+                                       // constraints. Consequently,
+                                       // when the elements are
+                                       // continuous no hanging node
+                                       // constraints are allowed.
+      const bool hanging_nodes_not_allowed=
+        (cell->get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
+      
+      if (hanging_nodes_not_allowed)
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  Assert (cell->at_boundary(face) ||
+		  cell->neighbor(face)->level() == cell->level(),
+		  ExcHangingNodesNotAllowed(0));
+
+      const unsigned int dofs_per_cell1 = cell->get_fe().dofs_per_cell;
+      
+                                       // make sure back_interpolation
+                                       // matrix is available
+      if (interpolation_matrices[&cell->get_fe()] != 0)
+        {
+          interpolation_matrices[&cell->get_fe()] =
+            boost::shared_ptr<FullMatrix<double> >
+            (new FullMatrix<double>(dofs_per_cell1, dofs_per_cell1));
+          get_back_interpolation_matrix(dof1.get_fe(), fe2,
+                                        *interpolation_matrices[&cell->get_fe()]);
+        }      
+      
+      u1_local.reinit (dofs_per_cell1);
+      u1_int_local.reinit (dofs_per_cell1);
+      
+      cell->get_dof_values(u1, u1_local);
+      interpolation_matrices[&cell->get_fe()]->vmult(u1_int_local, u1_local);
       cell->set_dof_values(u1_int_local, u1_interpolated);
     }
 }

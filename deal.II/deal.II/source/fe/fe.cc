@@ -12,9 +12,9 @@
 //----------------------------  fe.cc  ---------------------------
 
 
-#include <fe/fe.h>
 #include <base/memory_consumption.h>
 #include <fe/mapping.h>
+#include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <base/quadrature.h>
 #include <grid/tria.h>
@@ -462,7 +462,7 @@ template <int dim>
 void
 FiniteElementBase<dim>::
 compute_2nd (const Mapping<dim>                   &mapping,
-	     const typename DoFHandler<dim>::cell_iterator &cell,
+	     const typename Triangulation<dim>::cell_iterator &cell,
 	     const unsigned int,
 	     typename Mapping<dim>::InternalDataBase &mapping_internal,
 	     InternalDataBase                     &fe_internal,

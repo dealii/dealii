@@ -21,6 +21,10 @@
 #include <base/tensor.h>
 #include <base/quadrature.h>
 #include <base/table.h>
+#include <lac/vector.h>
+#include <lac/block_vector.h>
+#include <lac/petsc_vector.h>
+#include <lac/petsc_block_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
@@ -28,10 +32,14 @@
 #include <fe/fe.h>
 #include <fe/fe_update_flags.h>
 #include <fe/mapping.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 
 #include <algorithm>
+#include <memory>
 
 template <int dim> class Quadrature;
+
 
 /*!@addtogroup febase */
 /*@{*/
@@ -307,7 +315,7 @@ class FEValuesData
  * updating. Still, it is recommended to give ALL needed update flags
  * to @p FEValues.
  *
- * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001
+ * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */
 template <int dim>
 class FEValuesBase : protected FEValuesData<dim>
@@ -824,10 +832,10 @@ class FEValuesBase : protected FEValuesData<dim>
     const FiniteElement<dim> & get_fe () const;
 
 				     /**
-				      * Constant reference to the
-				      * current cell
+				      * Return a triangulation
+				      * iterator to the current cell.
 				      */
-    typename Triangulation<dim>::cell_iterator get_cell () const;
+    const typename Triangulation<dim>::cell_iterator get_cell () const;
 
 				     /**
 				      * Determine an estimate for the
@@ -880,6 +888,469 @@ class FEValuesBase : protected FEValuesData<dim>
     DeclException0 (ExcFENotPrimitive);
     
   protected:
+                                     /**
+                                      * Objects of the @p FEValues
+                                      * class need to store a pointer
+                                      * (i.e. an iterator) to the
+                                      * present cell in order to be
+                                      * able to extract the values of
+                                      * the degrees of freedom on this
+                                      * cell in the
+                                      * @p get_function_values and
+                                      * assorted functions. On the
+                                      * other hand, this class should
+                                      * also work for different
+                                      * iterators, as long as they
+                                      * have the same interface to
+                                      * extract the DoF values (i.e.,
+                                      * for example, they need to have
+                                      * a @p get_interpolated_dof_values
+                                      * function).
+                                      *
+                                      * This calls for a common base
+                                      * class of iterator classes, and
+                                      * making the functions we need
+                                      * here @p virtual. On the other
+                                      * hand, this is the only place
+                                      * in the library where we need
+                                      * this, and introducing a base
+                                      * class of iterators and making
+                                      * a function virtual penalizes
+                                      * @em{all} users of the
+                                      * iterators, which are basically
+                                      * intended as very fast accessor
+                                      * functions. So we do not want
+                                      * to do this. Rather, what we do
+                                      * here is making the functions
+                                      * we need virtual only for use
+                                      * with @em{this class}. The idea
+                                      * is the following: have a
+                                      * common base class which
+                                      * declares some pure virtual
+                                      * functions, and for each
+                                      * possible iterator type, we
+                                      * have a derived class which
+                                      * stores the iterator to the
+                                      * cell and implements these
+                                      * functions. Since the iterator
+                                      * classes have the same
+                                      * interface, we can make the
+                                      * derived classes a template,
+                                      * templatized on the iterator
+                                      * type.
+                                      *
+                                      * This way, the use of virtual
+                                      * functions is restricted to
+                                      * only this class, and other
+                                      * users of iterators do not have
+                                      * to bear the negative effects.
+                                      *
+                                      * @author Wolfgang Bangerth, 2003
+                                      */
+    class CellIteratorBase 
+    {
+      public:
+                                         /**
+                                          * Destructor. Made virtual
+                                          * since we store only
+                                          * pointers to the base
+                                          * class.
+                                          */
+        virtual ~CellIteratorBase ();
+        
+                                         /**
+                                          * Conversion operator to an
+                                          * iterator for
+                                          * triangulations. This
+                                          * conversion is implicit for
+                                          * the original iterators,
+                                          * since they are derived
+                                          * classes. However, since
+                                          * here we have kind of a
+                                          * parallel class hierarchy,
+                                          * we have to have a
+                                          * conversion operator.
+                                          */
+        virtual
+        operator const typename Triangulation<dim>::cell_iterator () const = 0;
+
+                                         /**
+                                          * Return the number of
+                                          * degrees of freedom the DoF
+                                          * handler object has to
+                                          * which the iterator belongs
+                                          * to.
+                                          */
+        virtual
+        unsigned int
+        n_dofs_for_dof_handler () const = 0;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const Vector<double> &in,
+                                     Vector<double>       &out) const = 0;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const Vector<float> &in,
+                                     Vector<float>       &out) const = 0;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const BlockVector<double> &in,
+                                     Vector<double>       &out) const = 0;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const BlockVector<float> &in,
+                                     Vector<float>       &out) const = 0;
+
+#ifdef DEAL_II_USE_PETSC
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const PETScWrappers::Vector &in,
+                                     Vector<PetscScalar>         &out) const = 0;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
+                                     Vector<PetscScalar>              &out) const = 0;
+#endif
+    };
+
+
+                                     /**
+                                      * Implementation of derived
+                                      * classes of the
+                                      * CellIteratorBase
+                                      * interface. See there for a
+                                      * description of the use of
+                                      * these classes.
+                                      * 
+                                      * @author Wolfgang Bangerth, 2003
+                                      */
+    template <typename CI>
+    class CellIterator : public CellIteratorBase
+    {
+      public:
+                                         /**
+                                          * Constructor. Take an
+                                          * iterator and store it in
+                                          * this class.
+                                          */
+        CellIterator (const CI &cell);
+        
+                                         /**
+                                          * Conversion operator to an
+                                          * iterator for
+                                          * triangulations. This
+                                          * conversion is implicit for
+                                          * the original iterators,
+                                          * since they are derived
+                                          * classes. However, since
+                                          * here we have kind of a
+                                          * parallel class hierarchy,
+                                          * we have to have a
+                                          * conversion operator.
+                                          */
+        virtual
+        operator const typename Triangulation<dim>::cell_iterator () const;
+        
+                                         /**
+                                          * Return the number of
+                                          * degrees of freedom the DoF
+                                          * handler object has to
+                                          * which the iterator belongs
+                                          * to.
+                                          */
+        virtual
+        unsigned int
+        n_dofs_for_dof_handler () const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const Vector<double> &in,
+                                     Vector<double>       &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const Vector<float> &in,
+                                     Vector<float>       &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const BlockVector<double> &in,
+                                     Vector<double>       &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const BlockVector<float> &in,
+                                     Vector<float>       &out) const;
+
+#ifdef DEAL_II_USE_PETSC
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const PETScWrappers::Vector &in,
+                                     Vector<PetscScalar>         &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
+                                     Vector<PetscScalar>              &out) const;
+#endif
+      private:
+                                         /**
+                                          * Copy of the iterator which
+                                          * we use in this object.
+                                          */
+        const CI cell;
+    };
+
+
+                                     /**
+                                      * Implementation of a derived
+                                      * class of the
+                                      * CellIteratorBase
+                                      * interface. See there for a
+                                      * description of the use of
+                                      * these classes.
+                                      *
+                                      * This class is basically a
+                                      * specialization of the general
+                                      * template for iterators into
+                                      * @p Triangulation objects (but
+                                      * since C++ does not allow
+                                      * something like this for nested
+                                      * classes, it runs under a
+                                      * separate name). Since these do
+                                      * not implement the interface
+                                      * that we would like to call,
+                                      * the functions of this class
+                                      * cannot be implemented
+                                      * meaningfully. However, most
+                                      * functions of the @p FEValues
+                                      * class do not make any use of
+                                      * degrees of freedom at all, so
+                                      * it should be possible to call
+                                      * @p FEValues::reinit with a tria
+                                      * iterator only; this class
+                                      * makes this possible, but
+                                      * whenever one of the functions
+                                      * of @p FEValues tries to call
+                                      * any of the functions of this
+                                      * class, an exception will be
+                                      * raised reminding the user that
+                                      * if she wants to use these
+                                      * features, then the
+                                      * @p FEValues object has to be
+                                      * reinitialized with a cell
+                                      * iterator that allows to
+                                      * extract degree of freedom
+                                      * information.
+                                      * 
+                                      * @author Wolfgang Bangerth, 2003
+                                      */
+    class TriaCellIterator : public CellIteratorBase
+    {
+      public:
+                                         /**
+                                          * Constructor. Take an
+                                          * iterator and store it in
+                                          * this class.
+                                          */
+        TriaCellIterator (const typename Triangulation<dim>::cell_iterator &cell);
+        
+                                         /**
+                                          * Conversion operator to an
+                                          * iterator for
+                                          * triangulations. This
+                                          * conversion is implicit for
+                                          * the original iterators,
+                                          * since they are derived
+                                          * classes. However, since
+                                          * here we have kind of a
+                                          * parallel class hierarchy,
+                                          * we have to have a
+                                          * conversion operator. Here,
+                                          * the conversion is trivial,
+                                          * from and to the same time.
+                                          */
+        virtual
+        operator const typename Triangulation<dim>::cell_iterator () const;
+
+                                         /**
+                                          * Implement the respective
+                                          * function of the base
+                                          * class. Since this is not
+                                          * possible, we just raise an
+                                          * error.
+                                          */
+        virtual
+        unsigned int
+        n_dofs_for_dof_handler () const;
+
+                                         /**
+                                          * Implement the respective
+                                          * function of the base
+                                          * class. Since this is not
+                                          * possible, we just raise an
+                                          * error.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const Vector<double> &in,
+                                     Vector<double>       &out) const;
+
+                                         /**
+                                          * Implement the respective
+                                          * function of the base
+                                          * class. Since this is not
+                                          * possible, we just raise an
+                                          * error.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const Vector<float> &in,
+                                     Vector<float>       &out) const;
+
+                                         /**
+                                          * Implement the respective
+                                          * function of the base
+                                          * class. Since this is not
+                                          * possible, we just raise an
+                                          * error.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const BlockVector<double> &in,
+                                     Vector<double>       &out) const;
+
+                                         /**
+                                          * Implement the respective
+                                          * function of the base
+                                          * class. Since this is not
+                                          * possible, we just raise an
+                                          * error.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const BlockVector<float> &in,
+                                     Vector<float>       &out) const;
+
+#ifdef DEAL_II_USE_PETSC
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const PETScWrappers::Vector &in,
+                                     Vector<PetscScalar>         &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
+                                     Vector<PetscScalar>              &out) const;
+#endif
+      private:
+                                         /**
+                                          * Copy of the iterator which
+                                          * we use in this object.
+                                          */
+        const typename Triangulation<dim>::cell_iterator cell;
+
+                                         /**
+                                          * String to be displayed
+                                          * whenever one of the
+                                          * functions of this class is
+                                          * called. Make it a static
+                                          * member variable, since we
+                                          * show the same message for
+                                          * all member functions.
+                                          */
+        static const char * const message_string;
+    };
+    
 				     /**
 				      * Store the cell selected last time
 				      * the @p reinit function was called
@@ -887,8 +1358,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * to the <tt>get_function_*</tt> functions
 				      * safer.
 				      */
-    typename DoFHandler<dim>::cell_iterator present_cell;
-
+    std::auto_ptr<const CellIteratorBase> present_cell;
+    
 				     /**
 				      * Storage for the mapping object.
 				      */
@@ -937,6 +1408,23 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * @p MappingQ1 implicitly.
 				      */
     static const Mapping<dim> &get_default_mapping();
+
+  private:
+                                     /**
+                                      * Copy constructor. Since
+                                      * objects of this class are not
+                                      * copyable, we make it private,
+                                      * and also do not implement it.
+                                      */
+    FEValuesBase (const FEValuesBase &);
+    
+                                     /**
+                                      * Copy operator. Since
+                                      * objects of this class are not
+                                      * copyable, we make it private,
+                                      * and also do not implement it.
+                                      */
+    FEValuesBase & operator= (const FEValuesBase &);    
 };
 
 
@@ -975,11 +1463,62 @@ class FEValues : public FEValuesBase<dim>
 	      const UpdateFlags         update_flags);
     
 				     /**
-				      * Reinitialize the gradients, Jacobi
-				      * determinants, etc for the given cell
-				      * and the given finite element.
+				      * Reinitialize the gradients,
+				      * Jacobi determinants, etc for
+				      * the given cell of type
+				      * "iterator into a DoFHandler
+				      * object", and the finite
+				      * element associated with this
+				      * object. It is assumed that the
+				      * finite element used by the
+				      * given cell is also the one
+				      * used by this @p FEValues
+				      * object.
 				      */
-    void reinit (const typename DoFHandler<dim>::cell_iterator &);
+    void reinit (const typename DoFHandler<dim>::cell_iterator &cell);
+
+				     /**
+				      * Reinitialize the gradients,
+				      * Jacobi determinants, etc for
+				      * the given cell of type
+				      * "iterator into a MGDoFHandler
+				      * object", and the finite
+				      * element associated with this
+				      * object. It is assumed that the
+				      * finite element used by the
+				      * given cell is also the one
+				      * used by this @p FEValues
+				      * object.
+				      */
+    void reinit (const typename MGDoFHandler<dim>::cell_iterator &cell);
+
+				     /**
+				      * Reinitialize the gradients,
+				      * Jacobi determinants, etc for
+				      * the given cell of type
+				      * "iterator into a Triangulation
+				      * object", and the given finite
+				      * element. Since iterators into
+				      * triangulation alone only
+				      * convey information about the
+				      * geometry of a cell, but not
+				      * about degrees of freedom
+				      * possibly associated with this
+				      * cell, you will not be able to
+				      * call some functions of this
+				      * class if they need information
+				      * about degrees of
+				      * freedom. These functions are,
+				      * above all, the
+				      * <tt>get_function_value/grads/2nd_derivatives</tt>
+				      * functions. If you want to call
+				      * these functions, you have to
+				      * call the @p reinit variants
+				      * that take iterators into
+				      * @p DoFHandler or other DoF
+				      * handler type objects.
+				      */
+    void reinit (const typename Triangulation<dim>::cell_iterator &cell);
 
 				     /**
 				      * Return a reference to the copy
@@ -995,6 +1534,13 @@ class FEValues : public FEValuesBase<dim>
 				      */
     unsigned int memory_consumption () const;
 
+                                     /**
+                                      * Return a reference to this
+                                      * very object.
+                                      */
+//TODO: explain reason    
+    const FEValues<dim> & get_present_fe_values () const;
+    
   private:
 				     /**
 				      * Store a copy of the quadrature
@@ -1007,6 +1553,20 @@ class FEValues : public FEValuesBase<dim>
 				      * constructors.
 				      */
     void initialize (const UpdateFlags update_flags);
+
+                                     /**
+                                      * The reinit() functions do
+                                      * only that part of the work
+                                      * that requires knowledge of the
+                                      * type of iterator. After
+                                      * setting present_cell(),
+                                      * they pass on to this function,
+                                      * which does the real work, and
+                                      * which is independent of the
+                                      * actual type of the cell
+                                      * iterator.
+                                      */
+    void do_reinit ();
 };
 
 
@@ -1139,18 +1699,18 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * matching the quadrature rule
 				      * and update flags.
 				      */
-    FEFaceValues (const Mapping<dim>& mapping,
-		  const FiniteElement<dim>& fe,
-		  const Quadrature<dim-1>& quadrature,
-		  const UpdateFlags update_flags);
+    FEFaceValues (const Mapping<dim>       &mapping,
+		  const FiniteElement<dim> &fe,
+		  const Quadrature<dim-1>  &quadrature,
+		  const UpdateFlags         update_flags);
 
                                      /**
 				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
-    FEFaceValues (const FiniteElement<dim>& fe,
-		  const Quadrature<dim-1>& quadrature,
-		  const UpdateFlags update_flags);
+    FEFaceValues (const FiniteElement<dim> &fe,
+		  const Quadrature<dim-1>  &quadrature,
+		  const UpdateFlags         update_flags);
 
 				     /**
 				      * Reinitialize the gradients, Jacobi
@@ -1158,9 +1718,44 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * number @p face_no of @p cell
 				      * and the given finite element.
 				      */
-    void reinit (const typename DoFHandler<dim>::cell_iterator& cell,
-		 const unsigned int face_no);
+    void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
+		 const unsigned int                            face_no);
 
+				     /**
+				      * Reinitialize the gradients,
+				      * Jacobi determinants, etc for
+				      * the given face on given cell
+				      * of type "iterator into a
+				      * Triangulation object", and the
+				      * given finite element. Since
+				      * iterators into triangulation
+				      * alone only convey information
+				      * about the geometry of a cell,
+				      * but not about degrees of
+				      * freedom possibly associated
+				      * with this cell, you will not
+				      * be able to call some functions
+				      * of this class if they need
+				      * information about degrees of
+				      * freedom. These functions are,
+				      * above all, the
+				      * <tt>get_function_value/grads/2nd_derivatives</tt>
+				      * functions. If you want to call
+				      * these functions, you have to
+				      * call the @p reinit variants
+				      * that take iterators into
+				      * @p DoFHandler or other DoF
+				      * handler type objects.
+				      */
+    void reinit (const typename Triangulation<dim>::cell_iterator &cell,
+		 const unsigned int                    face_no);
+    
+                                     /**
+                                      * Return a reference to this
+                                      * very object.
+                                      */
+//TODO: explain reason    
+    const FEFaceValues<dim> & get_present_fe_values () const;
   private:
 
 				     /**
@@ -1168,6 +1763,20 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * constructors.
 				      */
     void initialize (const UpdateFlags update_flags);    
+
+                                     /**
+                                      * The reinit() functions do
+                                      * only that part of the work
+                                      * that requires knowledge of the
+                                      * type of iterator. After
+                                      * setting present_cell(),
+                                      * they pass on to this function,
+                                      * which does the real work, and
+                                      * which is independent of the
+                                      * actual type of the cell
+                                      * iterator.
+                                      */
+    void do_reinit (const unsigned int face_no);
 };
 
 
@@ -1199,30 +1808,74 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * matching the quadrature rule
 				      * and update flags.
 				      */
-    FESubfaceValues (const Mapping<dim>& mapping,
-		     const FiniteElement<dim>& fe,
-		     const Quadrature<dim-1>& face_quadrature,
-		     const UpdateFlags update_flags);
+    FESubfaceValues (const Mapping<dim>       &mapping,
+		     const FiniteElement<dim> &fe,
+		     const Quadrature<dim-1>  &face_quadrature,
+		     const UpdateFlags         update_flags);
 
                                      /**
 				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
-    FESubfaceValues (const FiniteElement<dim>& fe,
-		     const Quadrature<dim-1>& face_quadrature,
-		     const UpdateFlags update_flags);
+    FESubfaceValues (const FiniteElement<dim> &fe,
+		     const Quadrature<dim-1>  &face_quadrature,
+		     const UpdateFlags         update_flags);
 
 				     /**
-				      * Reinitialize the gradients, Jacobi
-				      * determinants, etc for the face with
-				      * number @p face_no of @p cell
-				      * and the given finite element.
+				      * Reinitialize the gradients,
+				      * Jacobi determinants, etc for
+				      * the given cell of type
+				      * "iterator into a DoFHandler
+				      * object", and the finite
+				      * element associated with this
+				      * object. It is assumed that the
+				      * finite element used by the
+				      * given cell is also the one
+				      * used by this
+				      * @p FESubfaceValues object.
 				      */
-    void reinit (const typename DoFHandler<dim>::cell_iterator& cell,
-		 const unsigned int face_no,
-		 const unsigned int subface_no);
+    void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
+		 const unsigned int                    face_no,
+		 const unsigned int                    subface_no);
 
 				     /**
+				      * Reinitialize the gradients,
+				      * Jacobi determinants, etc for
+				      * the given subface on given
+				      * cell of type "iterator into a
+				      * Triangulation object", and the
+				      * given finite element. Since
+				      * iterators into triangulation
+				      * alone only convey information
+				      * about the geometry of a cell,
+				      * but not about degrees of
+				      * freedom possibly associated
+				      * with this cell, you will not
+				      * be able to call some functions
+				      * of this class if they need
+				      * information about degrees of
+				      * freedom. These functions are,
+				      * above all, the
+				      * <tt>get_function_value/grads/2nd_derivatives</tt>
+				      * functions. If you want to call
+				      * these functions, you have to
+				      * call the @p reinit variants
+				      * that take iterators into
+				      * @p DoFHandler or other DoF
+				      * handler type objects.
+				      */
+    void reinit (const typename Triangulation<dim>::cell_iterator &cell,
+		 const unsigned int                    face_no,
+		 const unsigned int                    subface_no);
+    
+                                     /**
+                                      * Return a reference to this
+                                      * very object.
+                                      */
+//TODO: explain reason    
+    const FESubfaceValues<dim> & get_present_fe_values () const;
+
+                                     /**
 				      * Exception
 				      */
     DeclException0 (ExcReinitCalledWithBoundaryFace);
@@ -1239,6 +1892,21 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * constructors.
 				      */
     void initialize (const UpdateFlags update_flags);
+
+                                     /**
+                                      * The reinit() functions do
+                                      * only that part of the work
+                                      * that requires knowledge of the
+                                      * type of iterator. After
+                                      * setting present_cell(),
+                                      * they pass on to this function,
+                                      * which does the real work, and
+                                      * which is independent of the
+                                      * actual type of the cell
+                                      * iterator.
+                                      */
+    void do_reinit (const unsigned int face_no,
+                    const unsigned int subface_no);
 };
 
 /*@}*/
@@ -1551,10 +2219,10 @@ FEValuesBase<dim>::get_mapping () const
 
 template <int dim>
 inline
-typename Triangulation<dim>::cell_iterator
+const typename Triangulation<dim>::cell_iterator
 FEValuesBase<dim>::get_cell () const
 {
-  return present_cell;
+  return *present_cell;
 }
 
 /*------------------------ Inline functions: FEValues ----------------------------*/
@@ -1566,6 +2234,16 @@ const Quadrature<dim> &
 FEValues<dim>::get_quadrature () const 
 {
   return quadrature;
+}
+
+
+
+template <int dim>
+inline
+const FEValues<dim> &
+FEValues<dim>::get_present_fe_values () const 
+{
+  return *this;
 }
 
 
@@ -1586,6 +2264,39 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 }
 
 
+
+/*------------------------ Inline functions: FE*FaceValues --------------------*/
+
+template <int dim>
+inline
+const Quadrature<dim-1> &
+FEFaceValuesBase<dim>::get_quadrature () const 
+{
+  return quadrature;
+}
+
+
+
+template <int dim>
+inline
+const FEFaceValues<dim> &
+FEFaceValues<dim>::get_present_fe_values () const 
+{
+  return *this;
+}
+
+
+
+template <int dim>
+inline
+const FESubfaceValues<dim> &
+FESubfaceValues<dim>::get_present_fe_values () const 
+{
+  return *this;
+}
+
+
+
 template <int dim>
 inline
 const Tensor<1,dim> &
@@ -1599,15 +2310,6 @@ FEFaceValuesBase<dim>::boundary_form (const unsigned int i) const
   return this->boundary_forms[i];
 }
 
-
-
-template <int dim>
-inline
-const Quadrature<dim-1> &
-FEFaceValuesBase<dim>::get_quadrature () const 
-{
-  return quadrature;
-}
 
 
 

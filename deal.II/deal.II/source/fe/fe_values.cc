@@ -12,9 +12,6 @@
 //----------------------------  fe_values.cc  ---------------------------
 
 
-#include <fe/fe.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_values.h>
 #include <base/memory_consumption.h>
 #include <base/quadrature.h>
 #include <lac/vector.h>
@@ -25,8 +22,239 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_boundary.h>
 #include <dofs/dof_accessor.h>
+#include <fe/mapping_q1.h>
+#include <fe/fe_values.h>
+#include <fe/fe.h>
 
 #include <iomanip>
+
+
+/* ---------------- FEValuesBase<dim>::CellIteratorBase --------- */
+
+template <int dim>
+inline
+FEValuesBase<dim>::CellIteratorBase::~CellIteratorBase ()
+{}
+
+
+
+/* ---------------- FEValuesBase<dim>::CellIterator<CI> --------- */
+
+
+template <int dim>
+template <typename CI>
+inline
+FEValuesBase<dim>::CellIterator<CI>::CellIterator (const CI &cell)
+                :
+                cell(cell)
+{}
+
+
+
+template <int dim>
+template <typename CI>
+FEValuesBase<dim>::CellIterator<CI>::
+operator const typename Triangulation<dim>::cell_iterator () const
+{
+  return cell;
+}
+
+
+
+template <int dim>
+template <typename CI>
+unsigned int
+FEValuesBase<dim>::CellIterator<CI>::n_dofs_for_dof_handler () const
+{
+  return cell->get_dof_handler().n_dofs();
+}
+
+
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const Vector<double> &in,
+                             Vector<double>       &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const Vector<float> &in,
+                             Vector<float>       &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const BlockVector<double> &in,
+                             Vector<double>            &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const BlockVector<float> &in,
+                             Vector<float>            &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+
+#ifdef DEAL_II_USE_PETSC
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const PETScWrappers::Vector &in,
+                             Vector<PetscScalar>         &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
+                             Vector<PetscScalar>              &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+#endif
+
+
+/* ---------------- FEValuesBase<dim>::TriaCellIterator --------- */
+
+template <int dim>
+const char * const
+FEValuesBase<dim>::TriaCellIterator::message_string
+= ("You have previously called the FEValues::reinit function with a\n"
+   "cell iterator of type Triangulation<dim>::cell_iterator. However,\n"
+   "when you do this, you cannot call some functions in the FEValues\n"
+   "class, such as the get_function_values/grads/2nd_derivatives\n"
+   "functions. If you need these functions, then you need to call\n"
+   "FEValues::reinit with an iterator type that allows to extract\n"
+   "degrees of freedom, such as DoFHandler<dim>::cell_iterator.");
+
+
+template <int dim>
+inline
+FEValuesBase<dim>::TriaCellIterator::
+TriaCellIterator (const typename Triangulation<dim>::cell_iterator &cell)
+                :
+                cell(cell)
+{}
+
+
+
+template <int dim>
+FEValuesBase<dim>::TriaCellIterator::
+operator const typename Triangulation<dim>::cell_iterator () const
+{
+  return cell;
+}
+
+
+
+template <int dim>
+unsigned int
+FEValuesBase<dim>::TriaCellIterator::n_dofs_for_dof_handler () const
+{
+  Assert (false, ExcMessage (message_string));
+  return 0;
+}
+
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const Vector<double> &,
+                             Vector<double>       &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const Vector<float> &,
+                             Vector<float>       &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const BlockVector<double> &,
+                             Vector<double>            &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const BlockVector<float> &,
+                             Vector<float>            &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+
+#ifdef DEAL_II_USE_PETSC
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const PETScWrappers::Vector &,
+                             Vector<PetscScalar>         &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const PETScWrappers::BlockVector &,
+                             Vector<PetscScalar>              &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+#endif
+
+
+
+
+/* --------------------- FEValuesData ----------------- */
 
 
 template <int dim>
@@ -144,16 +372,13 @@ void FEValuesBase<dim>::get_function_values (const InputVector            &fe_fu
 	  ExcWrongNoOfComponents());
   Assert (values.size() == n_quadrature_points,
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
-  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
+  Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
   Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
-  if (present_cell->active())
-    present_cell->get_dof_values (fe_function, dof_values);
-  else
-    present_cell->get_interpolated_dof_values(fe_function, dof_values);
+  present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
   std::fill_n (values.begin(), n_quadrature_points, 0);
@@ -185,16 +410,13 @@ void FEValuesBase<dim>::get_function_values (const InputVector                  
     Assert (values[i].size() == n_components, ExcWrongNoOfComponents());
 
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
-  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
+  Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
     
 				   // get function values of dofs
 				   // on this cell
   Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
-  if (present_cell->active())
-    present_cell->get_dof_values (fe_function, dof_values);
-  else
-    present_cell->get_interpolated_dof_values(fe_function, dof_values);
+  present_cell->get_interpolated_dof_values(fe_function, dof_values);
   
 				   // initialize with zero
   for (unsigned i=0;i<values.size();++i)
@@ -252,16 +474,13 @@ get_function_grads (const InputVector           &fe_function,
 	  ExcWrongNoOfComponents());
   Assert (gradients.size() == n_quadrature_points,
 	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
-  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
+  Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
   Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
-  if (present_cell->active())
-    present_cell->get_dof_values (fe_function, dof_values);
-  else
-    present_cell->get_interpolated_dof_values(fe_function, dof_values);
+  present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
   std::fill_n (gradients.begin(), n_quadrature_points, Tensor<1,dim>());
@@ -298,16 +517,13 @@ get_function_grads (const InputVector                         &fe_function,
     Assert (gradients[i].size() == n_components, ExcWrongNoOfComponents());
 
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
-  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
+  Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
   Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
-  if (present_cell->active())
-    present_cell->get_dof_values (fe_function, dof_values);
-  else
-    present_cell->get_interpolated_dof_values(fe_function, dof_values);
+  present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
   for (unsigned i=0;i<gradients.size();++i)
@@ -351,16 +567,13 @@ get_function_2nd_derivatives (const InputVector           &fe_function,
   Assert (second_derivatives.size() == n_quadrature_points,
 	  ExcWrongVectorSize(second_derivatives.size(), n_quadrature_points));
   Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
-  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
+  Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
   Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
-  if (present_cell->active())
-    present_cell->get_dof_values (fe_function, dof_values);
-  else
-    present_cell->get_interpolated_dof_values(fe_function, dof_values);
+  present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
   std::fill_n (second_derivatives.begin(), n_quadrature_points, Tensor<2,dim>());
@@ -397,16 +610,13 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
     Assert (second_derivs[i].size() == n_components, ExcWrongNoOfComponents());
 
   Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
-  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
+  Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
   Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
-  if (present_cell->active())
-    present_cell->get_dof_values (fe_function, dof_values);
-  else
-    present_cell->get_interpolated_dof_values(fe_function, dof_values);
+  present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
   for (unsigned i=0;i<second_derivs.size();++i)
@@ -470,7 +680,6 @@ FEValuesBase<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (this->normal_vectors) +
 	  MemoryConsumption::memory_consumption (this->boundary_forms) +
 	  sizeof(this->update_flags) +
-	  MemoryConsumption::memory_consumption (present_cell) +
 	  MemoryConsumption::memory_consumption (n_quadrature_points) +
 	  MemoryConsumption::memory_consumption (dofs_per_cell) +
 	  MemoryConsumption::memory_consumption (mapping) +
@@ -580,26 +789,101 @@ FEValues<dim>::initialize (const UpdateFlags update_flags)
 
 
 template <int dim>
-void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
+void
+FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 {
 				   // assert that the finite elements
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
+	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
-  this->present_cell = cell;
+                                   // set new cell. auto_ptr will take
+                                   // care that old object gets
+                                   // destroyed and also that this
+                                   // object gets destroyed in the
+                                   // destruction of this class
+  this->present_cell.reset 
+    (new typename FEValuesBase<dim>::template
+     CellIterator<typename DoFHandler<dim>::cell_iterator> (cell));
 
-  this->get_mapping().fill_fe_values(cell,
+                                   // this was the part of the work
+                                   // that is dependent on the actual
+                                   // data type of the iterator. now
+                                   // pass on to the function doing
+                                   // the real work.
+  do_reinit ();
+}
+
+
+
+template <int dim>
+void
+FEValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator &cell)
+{
+				   // assert that the finite elements
+				   // passed to the constructor and
+				   // used by the DoFHandler used by
+				   // this cell, are the same
+  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
+	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
+	  typename FEValuesBase<dim>::ExcFEDontMatch());
+
+                                   // set new cell. auto_ptr will take
+                                   // care that old object gets
+                                   // destroyed and also that this
+                                   // object gets destroyed in the
+                                   // destruction of this class
+  this->present_cell.reset 
+    (new typename FEValuesBase<dim>::template
+     CellIterator<typename MGDoFHandler<dim>::cell_iterator> (cell));
+
+                                   // this was the part of the work
+                                   // that is dependent on the actual
+                                   // data type of the iterator. now
+                                   // pass on to the function doing
+                                   // the real work.
+  do_reinit ();
+}
+
+
+
+template <int dim>
+void FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell)
+{
+                                   // no FE in this cell, so no check
+                                   // necessary here
+
+                                   // set new cell. auto_ptr will take
+                                   // care that old object gets
+                                   // destroyed and also that this
+                                   // object gets destroyed in the
+                                   // destruction of this class
+  this->present_cell.reset 
+    (new typename FEValuesBase<dim>::TriaCellIterator (cell));
+                                   // this was the part of the work
+                                   // that is dependent on the actual
+                                   // data type of the iterator. now
+                                   // pass on to the function doing
+                                   // the real work.
+  do_reinit ();
+}
+
+
+
+template <int dim>
+void FEValues<dim>::do_reinit ()
+{
+  this->get_mapping().fill_fe_values(*this->present_cell,
 				     quadrature,
 				     *this->mapping_data,
 				     this->quadrature_points,
 				     this->JxW_values);
   
   this->get_fe().fill_fe_values(this->get_mapping(),
-				cell,
+				*this->present_cell,
 				quadrature,
 				*this->mapping_data,
 				*this->fe_data,
@@ -740,9 +1024,57 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
-  this->present_cell = cell;
+  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
   
-  this->get_mapping().fill_fe_face_values(cell, face_no,
+                                   // set new cell. auto_ptr will take
+                                   // care that old object gets
+                                   // destroyed and also that this
+                                   // object gets destroyed in the
+                                   // destruction of this class
+  this->present_cell.reset 
+    (new typename FEValuesBase<dim>::template
+     CellIterator<typename DoFHandler<dim>::cell_iterator> (cell));
+
+                                   // this was the part of the work
+                                   // that is dependent on the actual
+                                   // data type of the iterator. now
+                                   // pass on to the function doing
+                                   // the real work.
+  do_reinit (face_no);
+}
+
+
+
+template <int dim>
+void FEFaceValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
+				const unsigned int              face_no)
+{
+  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
+
+                                   // set new cell. auto_ptr will take
+                                   // care that old object gets
+                                   // destroyed and also that this
+                                   // object gets destroyed in the
+                                   // destruction of this class
+  this->present_cell.reset 
+    (new typename FEValuesBase<dim>::TriaCellIterator (cell));
+
+                                   // this was the part of the work
+                                   // that is dependent on the actual
+                                   // data type of the iterator. now
+                                   // pass on to the function doing
+                                   // the real work.
+  do_reinit (face_no);
+}
+
+
+
+template <int dim>
+void FEFaceValues<dim>::do_reinit (const unsigned int face_no)
+{
+  this->get_mapping().fill_fe_face_values(*this->present_cell, face_no,
 					  this->quadrature,
 					  *this->mapping_data,
 					  this->quadrature_points,
@@ -751,7 +1083,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 					  this->normal_vectors);
   
   this->get_fe().fill_fe_face_values(this->get_mapping(),
-				     cell, face_no,
+				     *this->present_cell, face_no,
 				     this->quadrature,
 				     *this->mapping_data,
 				     *this->fe_data,
@@ -841,9 +1173,59 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
                       "already refined. Iterate over their children "
                       "instead in these cases."));
   
-  this->present_cell  = cell;
+                                   // set new cell. auto_ptr will take
+                                   // care that old object gets
+                                   // destroyed and also that this
+                                   // object gets destroyed in the
+                                   // destruction of this class
+  this->present_cell.reset 
+    (new typename FEValuesBase<dim>::template
+     CellIterator<typename DoFHandler<dim>::cell_iterator> (cell));
 
-  this->get_mapping().fill_fe_subface_values(cell, face_no, subface_no,
+                                   // this was the part of the work
+                                   // that is dependent on the actual
+                                   // data type of the iterator. now
+                                   // pass on to the function doing
+                                   // the real work.
+  do_reinit (face_no, subface_no);
+}
+
+
+
+template <int dim>
+void FESubfaceValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
+				   const unsigned int         face_no,
+				   const unsigned int         subface_no)
+{
+  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
+	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
+  
+                                   // set new cell. auto_ptr will take
+                                   // care that old object gets
+                                   // destroyed and also that this
+                                   // object gets destroyed in the
+                                   // destruction of this class
+  this->present_cell.reset 
+    (new typename FEValuesBase<dim>::TriaCellIterator (cell));
+
+                                   // this was the part of the work
+                                   // that is dependent on the actual
+                                   // data type of the iterator. now
+                                   // pass on to the function doing
+                                   // the real work.
+  do_reinit (face_no, subface_no);
+}
+
+
+
+template <int dim>
+void FESubfaceValues<dim>::do_reinit (const unsigned int face_no,
+                                      const unsigned int subface_no)
+{
+  this->get_mapping().fill_fe_subface_values(*this->present_cell,
+                                             face_no, subface_no,
 					     this->quadrature,
 					     *this->mapping_data,
 					     this->quadrature_points,
@@ -852,7 +1234,8 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 					     this->normal_vectors);
   
   this->get_fe().fill_fe_subface_values(this->get_mapping(),
-					cell, face_no, subface_no,
+					*this->present_cell,
+                                        face_no, subface_no,
 					this->quadrature,
 					*this->mapping_data,
 					*this->fe_data,

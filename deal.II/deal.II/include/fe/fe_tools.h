@@ -15,10 +15,16 @@
 
 
 
+#include <base/config.h>
+#include <base/exceptions.h>
+
+#include <vector>
+
 template <typename number> class FullMatrix;
+template <typename number> class Vector;
 template <int dim> class FiniteElement;
 template <int dim> class DoFHandler;
-template <typename number> class Vector;
+template <int dim> class hpDoFHandler;
 template <int dim> class FE_Q;
 class ConstraintMatrix;
 
@@ -31,6 +37,7 @@ class ConstraintMatrix;
 /*!@addtogroup febase */
 /*@{*/
 
+
 /**
  * This class performs interpolations and extrapolations of discrete
  * functions of one @p FiniteElement @p fe1 to another @p FiniteElement
@@ -41,7 +48,7 @@ class ConstraintMatrix;
  * $id-I_h$ that is needed for evaluating $(id-I_h)z$ for e.g. the
  * dual solution $z$.
  *
- * @author Ralf Hartmann, Guido Kanschat, 2000, 2004
+ * @author Ralf Hartmann, 2000; Wolfgang Bangerth, 2003, Guido Kanschat, 2000, 2004
  */
 class FETools
 {
@@ -88,9 +95,11 @@ class FETools
 				      * is an embedding matrix.
 				      */
     template <int dim, typename number>
-    static void get_interpolation_matrix(const FiniteElement<dim> &fe1,
-					 const FiniteElement<dim> &fe2,
-					 FullMatrix<number> &interpolation_matrix);
+    static
+    void
+    get_interpolation_matrix(const FiniteElement<dim> &fe1,
+                             const FiniteElement<dim> &fe2,
+                             FullMatrix<number> &interpolation_matrix);
     
 				     /**
 				      * Gives the interpolation matrix
@@ -111,9 +120,11 @@ class FETools
 				      * only the unit matrix.
 				      */
     template <int dim, typename number>
-    static void get_back_interpolation_matrix(const FiniteElement<dim> &fe1,
-					      const FiniteElement<dim> &fe2,
-					      FullMatrix<number> &interpolation_matrix);
+    static
+    void
+    get_back_interpolation_matrix(const FiniteElement<dim> &fe1,
+                                  const FiniteElement<dim> &fe2,
+                                  FullMatrix<number> &interpolation_matrix);
 
 				     /**
 				      * Gives the unit matrix minus the
@@ -136,8 +147,8 @@ class FETools
     static
     void
     get_interpolation_difference_matrix(const FiniteElement<dim> &fe1,
-					const FiniteElement<dim> &fe2,
-					FullMatrix<number> &difference_matrix);
+                                        const FiniteElement<dim> &fe2,
+                                        FullMatrix<number> &difference_matrix);
 
 				     /**
 				      * Compute the local
@@ -207,11 +218,16 @@ class FETools
 				      * your hanging node constraints
 				      * object.
 				      */
-    template <int dim, class InVector, class OutVector>
-    static void interpolate (const DoFHandler<dim>& dof1,
-			     const InVector&        u1,
-			     const DoFHandler<dim>& dof2,
-			     OutVector&             u2);
+    template <int dim,
+              template <int> class DH1,
+              template <int> class DH2,
+              class InVector, class OutVector>
+    static
+    void
+    interpolate (const DH1<dim> &dof1,
+                 const InVector &u1,
+                 const DH2<dim> &dof2,
+                 OutVector      &u2);
     
 				     /**
 				      * Gives the interpolation of a
@@ -252,6 +268,23 @@ class FETools
 			     const DoFHandler<dim>&  dof2,
 			     const ConstraintMatrix& constraints,
 			     OutVector&              u2);
+
+
+                                     /**
+                                      * Same as last function, except
+                                      * that one or both of the dof
+                                      * handler objects might be of
+                                      * type @p hpDoFHandler.
+                                      */
+    template <int dim,
+              template <int> class DH1,
+              template <int> class DH2,              
+              class InVector, class OutVector>
+    static void interpolate (const DH1<dim>         &dof1,
+			     const InVector         &u1,
+			     const DH2<dim>         &dof2,
+			     const ConstraintMatrix &constraints,
+			     OutVector&              u2);
     
 
 				     /**
@@ -281,12 +314,26 @@ class FETools
 				      * mapping.
 				      */
     template <int dim, class InVector, class OutVector>
-    static void back_interpolate (const DoFHandler<dim>&    dof1,
-				  const InVector&           u1,
-				  const FiniteElement<dim>& fe2,
-				  OutVector&                u1_interpolated);
+    static void back_interpolate (const DoFHandler<dim>    &dof1,
+				  const InVector           &u1,
+				  const FiniteElement<dim> &fe2,
+				  OutVector                &u1_interpolated);
 
-				     /**
+                                     /**
+                                      * Same as last function, except
+                                      * that the dof handler objects
+                                      * might be of type
+                                      * @p hpDoFHandler.
+                                      */
+    template <int dim,
+              template <int> class DH,
+              class InVector, class OutVector>
+    static void back_interpolate (const DH<dim>            &dof1,
+				  const InVector           &u1,
+				  const FiniteElement<dim> &fe2,
+				  OutVector                &u1_interpolated);
+
+                                     /**
 				      * Gives the interpolation of the
 				      * @p dof1-function @p u1 to a
 				      * @p dof2-function, and

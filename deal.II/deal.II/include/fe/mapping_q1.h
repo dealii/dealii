@@ -324,7 +324,7 @@ class MappingQ1 : public Mapping<dim>
 					  * @p mapping_support_points are
 					  * stored.
 					  */
-	typename DoFHandler<dim>::cell_iterator cell_of_current_support_points;
+	typename Triangulation<dim>::cell_iterator cell_of_current_support_points;
 	
 					 /**
 					  * Default value of this flag
@@ -374,7 +374,7 @@ class MappingQ1 : public Mapping<dim>
 				      * Mapping.
 				      */
     virtual void
-    fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
 		    const Quadrature<dim>& quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
 		    typename std::vector<Point<dim> >       &quadrature_points,
@@ -385,7 +385,7 @@ class MappingQ1 : public Mapping<dim>
 				      * Mapping.
 				      */
     virtual void
-    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,
 			 const unsigned int face_no,
 			 const Quadrature<dim-1>& quadrature,
 			 typename Mapping<dim>::InternalDataBase &mapping_data,
@@ -399,7 +399,7 @@ class MappingQ1 : public Mapping<dim>
 				      * Mapping.
 				      */
     virtual void
-    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
 			    const unsigned int face_no,
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,
@@ -458,7 +458,7 @@ class MappingQ1 : public Mapping<dim>
 				      * Do the computation for the
 				      * <tt>fill_*</tt> functions.
 				      */
-    void compute_fill (const typename DoFHandler<dim>::cell_iterator &cell,
+    void compute_fill (const typename Triangulation<dim>::cell_iterator &cell,
 		       const unsigned int      npts,
 		       const DataSetDescriptor data_set,
 		       InternalData           &data,
@@ -468,7 +468,7 @@ class MappingQ1 : public Mapping<dim>
 				      * Do the computation for the
 				      * <tt>fill_*</tt> functions.
 				      */
-    void compute_fill_face (const typename DoFHandler<dim>::cell_iterator &cell,
+    void compute_fill_face (const typename Triangulation<dim>::cell_iterator &cell,
 			    const unsigned int      face_no,
 			    const bool              is_subface,
 			    const unsigned int      npts,
@@ -697,7 +697,7 @@ MappingQ1<1>::compute_face_data (const UpdateFlags,
                                  InternalData &) const;
 
 template <> void MappingQ1<1>::compute_fill_face (
-  const DoFHandler<1>::cell_iterator &,
+  const Triangulation<1>::cell_iterator &,
   const unsigned int,
   const bool,
   const unsigned int,
@@ -710,7 +710,7 @@ template <> void MappingQ1<1>::compute_fill_face (
   std::vector<Point<1> > &) const;
 
 template <> void MappingQ1<1>::fill_fe_face_values (
-  const DoFHandler<1>::cell_iterator &,
+  const Triangulation<1>::cell_iterator &,
   const unsigned,
   const Quadrature<0>&,
   Mapping<1>::InternalDataBase&,
@@ -720,7 +720,7 @@ template <> void MappingQ1<1>::fill_fe_face_values (
   std::vector<Point<1> >&) const;
 
 template <> void MappingQ1<1>::fill_fe_subface_values (
-  const DoFHandler<1>::cell_iterator &,
+  const Triangulation<1>::cell_iterator &,
   const unsigned,
   const unsigned,
   const Quadrature<0>&,

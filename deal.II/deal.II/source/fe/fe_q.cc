@@ -930,7 +930,6 @@ FE_Q<1>::initialize_constraints ()
 
 #endif
 
-
 #if deal_II_dimension == 2
 
 template <>
