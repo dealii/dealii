@@ -63,6 +63,15 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 #else
 
+// if you get to see this warning, then this can have two reasons: either
+// because you fell through all of the above #if clauses and on your system
+// the detection of processors is really not implemented, or you are using
+// a compiler that does not understand the #warning directive, in which case
+// you will see a report on the screen even if the detection of processors
+// is implemented for your system. In the latter case, you need not worry
+// about the warning (although it is acknowledged that it is annoying),
+// otherwise you might want to consider implementing the missing feature
+// and submitting it back to the authors of the library.
 #warning Detection of Processors not supported on this OS
 
 unsigned int MultithreadInfo::get_n_cpus()
