@@ -324,9 +324,9 @@ class TableHandler
                                       * Write table as a tex file. If
                                       * with_header is set to false
                                       * (it is true by default), then
-                                      * no \documentclass{...},
-                                      * \begin{document} and 
-                                      * \end{document} are used. In
+                                      * no "\documentclass{...}",
+                                      * "\begin{document}" and 
+                                      * "\end{document}" are used. In
                                       * this way the file can be
                                       * included into an existing tex
                                       * file using a command like
