@@ -78,8 +78,14 @@ sub parse_class_declarations {
 	    $rest     = $7;
 
 	    # test whether it is a forward declaration or something else.
-	    # $rest contains the name of the class and what comes after that
-	    #
+	    # if it is a forward declaration, then skip it, as it must 
+	    # be declared somewhere else properly
+	    # (note that $rest contains the name of the class and what 
+	    # comes after that)
+	    if ( $rest =~ /;\s*$/ ) {
+		next;
+	    }
+
 	    # first extract the name of the class
 	    $rest =~ /([\w_]+(\s*<(([-\w,_\s]|<([-\w,\s])+>)+)>)?)(.*)/;
 
