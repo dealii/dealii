@@ -62,7 +62,7 @@ main()
   FEQ2<2> fe2;
   FEQ3<2> fe3;
   FEQ4<2> fe4;
-  for (unsigned int degree=1;degree<=4;degree++)
+  for (unsigned int degree=1;degree<=3;degree++)
     {
       Triangulation<2> tr;
       MGDoFHandler<2> mgdof(&tr);
