@@ -4910,10 +4910,6 @@ Triangulation<2>::execute_refinement ()
 		   child_no<GeometryInfo<dim>::subfaces_per_face; ++child_no, ++l)
 		new_lines[l]=cell->line(face_no)->child(child_no);
 	    Assert(l==8, ExcInternalError());
-					     // TODO: check whether
-					     // lines 4&5 and 6&7 will
-					     // be used in the right
-					     // ordering
 		
 	    for (; l<12; ++l)
 	      {
@@ -5002,7 +4998,7 @@ Triangulation<2>::execute_refinement ()
 					     //
 					     // to do so, first
 					     // collect the iterators
-					     // pointing to the 6x4
+					     // pointing to the 4x2
 					     // neighbors of this
 					     // cell.
 					     //
