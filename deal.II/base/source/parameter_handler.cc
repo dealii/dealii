@@ -457,8 +457,8 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style) {
   switch (style) 
     {
       case Text:
-	    out << "Listing of Parameters" << endl
-		<< "---------------------" << endl;
+	    out << "#Listing of Parameters" << endl
+		<< "#---------------------" << endl;
 	    break;
       case LaTeX:
 	    out << "\\subsubsection*{Listing of parameters}";
