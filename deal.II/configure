@@ -4073,9 +4073,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 	    T (SubT);
 	};
 
-	template <int dim> T<dim>::T (SubT) {};
+	template <int dim> T<dim>::T (SubT) {}
 
-	template class T<3> ;
+	template class T<3>;
 
 int
 main ()
@@ -4135,19 +4135,20 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-	template <int N, int M> class T      {    void bar ();  };
+	template <int N, int M> struct T      {    int bar ();  };
 
-	template <int M>        class T<1,M> {
+	template <int M>        struct T<1,M> {
+            T ();
 	  private:
 	    static int i;
 	    template <int N1, int N2> friend class T;
 	};
 
-	template <int N,int M> void T<N,M>::bar () {
-	  T<N-1,M>::i;
-	};
+	template <int N,int M> int T<N,M>::bar () {
+	  return T<N-1,M>::i;
+	}
 
-	template class T<2,1> ;
+	template class T<2,1>;
 
 int
 main ()
@@ -4210,7 +4211,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 	struct X
 	{
 	    template <typename T2>
-	    X operator = (T2 &){};
+	    X operator = (T2 &) { return X(); }
 	};
 
 	template X X::operator=<float> (float &);
@@ -4280,9 +4281,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 	      C(const C<T>&);
 	      template <typename N> friend class C;
 	  };
-	};
+	}
 
-	namespace NS2 {  template <typename number> class C;  };
+	namespace NS2 {  template <typename number> class C;  }
 
 	template <typename T> class X {
 	    template <typename N> friend class NS2::C;
@@ -4294,9 +4295,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 	namespace NS {
   	  template<typename T>
 	  inline C<T>::C(const C<T>&)
-          {};
-	};
-
+          {}
+	}
 
 int
 main ()
@@ -4438,7 +4438,7 @@ template <typename P> class Y {
 };
 
 template <typename T> class X<1,T> {
-    X () { Y<T>::i; };     // access private field
+    int f () { return Y<T>::i; };     // access private field
 };
 
 template class X<1,int>;
@@ -4510,7 +4510,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 
 	template <int dim>
 	Function<dim>::~Function ()
-	{};
+	{}
 
 	template class Function<1>;
 	template Function<1>::~Function();
@@ -4581,7 +4581,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 	};
 
 	template <template <int> class T>
-	void X<T>::foo (type t) {};
+	void X<T>::foo (type) {}
 
 	template struct X<TT>;
 
@@ -4649,12 +4649,13 @@ cat >>conftest.$ac_ext <<_ACEOF
       void f(T<dim>);
 
       template <int dim, template <int> class T>
-      void g()
+      void* g()
       {
         void (*p) (T<dim>) = &f<dim,T>;
+        return (void*)p;
       }
 
-      template void g<2,X> ();
+      template void* g<2,X> ();
 
 int
 main ()
@@ -4928,8 +4929,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 
 	void f()
 	{
-	  long double *p1, *p2;
-	  double *p3;
+	  long double *p1=0, *p2=0;
+	  double *p3=0;
 	  copy (p1, p2, p3);
 	  p3 = copy (p1, p2, p3);
 	};
@@ -5406,7 +5407,7 @@ int
 main ()
 {
 
-	unsigned int i = std::numeric_limits<unsigned int>::min();
+	return std::numeric_limits<unsigned int>::min();
 
   ;
   return 0;
@@ -6216,7 +6217,7 @@ int
 main ()
 {
 
-unsigned int seed = 0;
+int seed = 0;
 int i=rand_r(&i);
 
   ;

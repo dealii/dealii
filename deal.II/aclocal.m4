@@ -1716,9 +1716,9 @@ AC_DEFUN(DEAL_II_CHECK_LOCAL_TYPEDEF_COMP, dnl
 	    T (SubT);
 	};
 
-	template <int dim> T<dim>::T (SubT) {};
+	template <int dim> T<dim>::T (SubT) {}
 
-	template class T<3> ;
+	template class T<3>;
     ],
     [],
     [
@@ -1782,9 +1782,9 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS, dnl
 
 	template <int N,int M> int T<N,M>::bar () { 
 	  return T<N-1,M>::i; 
-	};
+	}
 
-	template class T<2,1> ; 
+	template class T<2,1>;
     ],
     [],
     [
@@ -1836,7 +1836,7 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST, dnl
 	struct X
 	{
 	    template <typename T2>
-	    X operator = (T2 &) { return X(); };
+	    X operator = (T2 &) { return X(); }
 	};
 
 	template X X::operator=<float> (float &);
@@ -1904,9 +1904,9 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
 	      C(const C<T>&);
 	      template <typename N> friend class C;
 	  };
-	};
+	}
 
-	namespace NS2 {  template <typename number> class C;  };
+	namespace NS2 {  template <typename number> class C;  }
 
 	template <typename T> class X {
 	    template <typename N> friend class NS2::C;
@@ -1918,9 +1918,8 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
 	namespace NS {
   	  template<typename T>
 	  inline C<T>::C(const C<T>&)
-          {};
-	};
-
+          {}
+	}
     ],
     [],
     [
@@ -2097,7 +2096,7 @@ AC_DEFUN(DEAL_II_CHECK_IMPLEMENTED_PURE_FUNCTION_BUG, dnl
 
 	template <int dim>
 	Function<dim>::~Function ()
-	{};
+	{}
 
 	template class Function<1>;
 	template Function<1>::~Function();
@@ -2152,7 +2151,7 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_TEMPLATE_TYPEDEF_BUG, dnl
 	};
 
 	template <template <int> class T>
-	void X<T>::foo (type) {};
+	void X<T>::foo (type) {}
 
 	template struct X<TT>;
     ],
