@@ -177,6 +177,21 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: The <code
+       class="member">MatrixTools::local_apply_boundary_values</code> function
+       used to set the diagonal entries of boundary nodes to one. This is a
+       really bad choice, and the algorithm we use now is much better. There
+       are still a few problems when using this function for matrices that
+       will be solved as a Schur complement; there is nothing we can do in
+       that function in these cases, since we are lacking fundamental pieces
+       of information, but the cases where this applies and the strategies to
+       work with this problem anyway are now well documented in the
+       documentation of the <code class="class">MatrixTools</code> class.
+       <br> 
+       (WB 2004/06/07)
+       </p>
+
+  <li> <p>
        Fixed: The <code class="member">GridGenerator::cylinder_shell</code>
        function generated cells that were all inside-out, i.e. had negative
        Jacobians. In usual finite element computations this simply leads to
