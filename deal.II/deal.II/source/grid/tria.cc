@@ -4387,7 +4387,7 @@ void Triangulation<3>::execute_refinement () {
 
 				       // now count the quads and lines which
 				       // were flagged for refinement
-      for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+      for (quad_iterator quad=begin_quad(level); quad!=end_quad(level); ++quad)
 	if (quad->user_flag_set())
 	  {
 	    Assert (quad->has_children() == false, ExcInternalError());
@@ -4396,7 +4396,7 @@ void Triangulation<3>::execute_refinement () {
 	    needed_vertices += 1;
 	  };
 
-      for (line_iterator line=begin_line(); line!=end_line(); ++line)
+      for (line_iterator line=begin_line(level); line!=end_line(level); ++line)
 	if (line->user_flag_set())
 	  {
 	    Assert (line->has_children() == false, ExcInternalError());
@@ -4409,8 +4409,8 @@ void Triangulation<3>::execute_refinement () {
 				       // the next higher level
       const unsigned int used_cells
 	= count_if (levels[level+1]->quads.used.begin(),
-		levels[level+1]->quads.used.end(),
-		bind2nd (equal_to<bool>(), true));
+		    levels[level+1]->quads.used.end(),
+		    bind2nd (equal_to<bool>(), true));
 
 
 				       // reserve space for the used_cells
