@@ -11,7 +11,7 @@ while(<>)
 	$entry = pop @n;
 	while ($#n>=0)
 	{
-	    $entry .= " in " . pop @n;
+	    $entry .= "+" . pop @n;
 	}
 	$entry .= '=' . $2 . '=' . $library;
 	push @entries, $entry;
@@ -28,19 +28,20 @@ print << 'EOT'
 Remark: Lowercase is sorted behind uppercase and destructors are isolated at
 the end.
 <hr>
-<UL>
+<TABLE CELLPADDING=9 CELLSPACING=0 RULES=ROWS BORDER=6>
+<TR><TH><B>function/class</B><TD ALIGN=CENTER><B>in class</B></TR>
 EOT
     ;
 foreach $entry (sort @entries)
 {
     @l = split "=", $entry;
-    
+    @c = split '\+', @l[0];
     @f = split "#", @l[1];
 
-    print "<LI> <A HREF = \"$l[2]/@f[0]\">@l[0]</A>\n";
+    print "<TR><TH ALIGN=left><A HREF = \"$l[2]/@f[0]\">@c[0]</A><TD>@c[1]</TR>\n";
 }
 print << 'EOT'
-</UL>
+</TABLE>
 </BODY>
 </HTML>
 EOT
