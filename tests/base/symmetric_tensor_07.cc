@@ -28,8 +28,8 @@
 template <int dim>
 void test ()
 {
-  const double lambda = 5,
-	       mu     = 7;
+  const double lambda = 7,
+	       mu     = 5;
   SymmetricTensor<4,dim> ts;
   Tensor<4,dim>          ta;
   for (unsigned int i=0; i<dim; ++i)
@@ -56,7 +56,7 @@ void test ()
 	Assert (as[i][j] == aa[i][j], ExcInternalError());
 	Assert (bs[i][j] == ba[i][j], ExcInternalError());
 
-	deallog << as[i][j] << ' ' << bs[i][i] << std::endl;
+	deallog << as[i][j] << ' ' << bs[i][j] << std::endl;
       }
 
 				   // test distributivity of
