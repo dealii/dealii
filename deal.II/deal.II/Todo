@@ -162,3 +162,6 @@ Use unsigned integers for the colnums array in dSMatrixStruct. This
 Let dSMatrixStruct::compress free the memory of colnums which is
   no longer needed.
 
+FeValues: Replace 'ansatz', add flexibility for update flags and put
+the element into the constructor
+
