@@ -344,6 +344,19 @@ FiniteElementBase<dim>::has_support_points () const
 
 
 template <int dim>
+Point<dim>
+FiniteElementBase<dim>::unit_support_point (const unsigned index) const
+{
+  Assert (index < this->dofs_per_cell,
+          ExcIndexRange (index, 0, this->dofs_per_cell));
+  Assert (unit_support_points.size() == this->dofs_per_cell,
+          ExcFEHasNoSupportPoints ());
+  return unit_support_points[index];
+};
+
+
+
+template <int dim>
 const std::vector<Point<dim-1> > &
 FiniteElementBase<dim>::get_unit_face_support_points () const
 {
@@ -364,6 +377,19 @@ bool
 FiniteElementBase<dim>::has_face_support_points () const
 {
   return (unit_face_support_points.size() != 0);
+};
+
+
+
+template <int dim>
+Point<dim-1>
+FiniteElementBase<dim>::unit_face_support_point (const unsigned index) const
+{
+  Assert (index < this->dofs_per_face,
+          ExcIndexRange (index, 0, this->dofs_per_face));
+  Assert (unit_face_support_points.size() == this->dofs_per_face,
+          ExcFEHasNoSupportPoints ());
+  return unit_face_support_points[index];
 };
 
 

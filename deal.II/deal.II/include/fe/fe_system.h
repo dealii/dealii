@@ -312,7 +312,8 @@ class FESystem : public FiniteElement<dim>
     base_element (const unsigned int index) const;
     
 				     /**
-				      * Check for non-zero values on a face.
+				      * Check for non-zero values on a
+				      * face.
 				      *
 				      * This function returns
 				      * @p{true}, if the shape
@@ -327,6 +328,24 @@ class FESystem : public FiniteElement<dim>
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
 
+                                     /**
+                                      * Implementation of the
+                                      * respective function in the
+                                      * base class.
+                                      */
+    virtual
+    Point<dim>
+    unit_support_point (const unsigned int index) const;
+    
+                                     /**
+                                      * Implementation of the
+                                      * respective function in the
+                                      * base class.
+                                      */
+    virtual
+    Point<dim-1>
+    unit_face_support_point (const unsigned int index) const;
+    
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)

@@ -900,8 +900,57 @@ class FiniteElementBase : public Subscriptor,
 				      * then a call to the
 				      * @p{get_unit_support_points}
 				      * yields a non-empty array.
+				      *
+				      * The result may be false if an
+				      * element is not defined by
+				      * interpolating shape functions,
+				      * for example by P-elements on
+				      * quadrilaterals. It will
+				      * usually only be true if the
+				      * element constructs its shape
+				      * functions by the requirement
+				      * that they be one at a certain
+				      * point and zero at all the
+				      * points associated with the
+				      * other shape functions.
+				      *
+				      * In composed elements (i.e. for
+				      * the @ref{FESystem} class, the
+				      * result will be true if all all
+				      * the base elements have defined
+				      * support points.
 				      */
     bool has_support_points () const;
+
+                                     /**
+                                      * Return the position of the
+                                      * support point of the
+                                      * @p{index}th shape function. If
+                                      * it does not exist, raise an
+                                      * exception.
+                                      *
+                                      * The default implementation
+                                      * simply returns the respective
+                                      * element from the array you get
+                                      * from
+                                      * @ref{get_unit_support_points},
+                                      * but derived elements may
+                                      * overload this function. In
+                                      * particular, note that the
+                                      * @ref{FESystem} class overloads
+                                      * it so that it can return the
+                                      * support points of individual
+                                      * base elements, of not all the
+                                      * base elements define support
+                                      * points. In this way, you can
+                                      * still ask for certain support
+                                      * points, even if
+                                      * @p{get_unit_support_points}
+                                      * only returns an empty array.
+                                      */
+    virtual
+    Point<dim>
+    unit_support_point (const unsigned int index) const;
     
 				     /**
 				      * Return the support points of
@@ -969,9 +1018,24 @@ class FiniteElementBase : public Subscriptor,
 				      * is true, then a call to the
 				      * @p{get_unit_support_points}
 				      * yields a non-empty array.
+				      *
+				      * For more information, see the
+				      * documentation for the
+				      * @ref{has_support_points}
+				      * function.
 				      */
     bool has_face_support_points () const;
 
+                                     /**
+                                      * The function corresponding to
+                                      * the @p{unit_support_point}
+                                      * function, but for faces. See
+                                      * there for more information.
+                                      */
+    virtual
+    Point<dim-1>
+    unit_face_support_point (const unsigned int index) const;
+    
 				     /**
 				      * Return in which of the vector
 				      * components of this finite

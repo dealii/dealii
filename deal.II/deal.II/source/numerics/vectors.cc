@@ -764,11 +764,12 @@ VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping
 
 template <int dim>
 void
-VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping,
-					  const DoFHandler<dim>         &dof,
-					  const typename FunctionMap<dim>::type &function_map,
-					  std::map<unsigned int,double> &boundary_values,
-					  const std::vector<bool>       &component_mask_)
+VectorTools::
+interpolate_boundary_values (const Mapping<dim>            &mapping,
+                             const DoFHandler<dim>         &dof,
+                             const typename FunctionMap<dim>::type &function_map,
+                             std::map<unsigned int,double> &boundary_values,
+                             const std::vector<bool>       &component_mask_)
 {
 				   // if for whatever reason we were
 				   // passed an empty map, return
@@ -816,14 +817,36 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 				   // support points. this wil be used
 				   // to obtain the quadrature points
 				   // on the real cell's face
-  const std::vector<Point<dim-1> >
-    & unit_support_points = fe.get_unit_face_support_points();
+  std::vector<Point<dim-1> >
+    unit_support_points = fe.get_unit_face_support_points();
   
 				   // check whether there are support
-				   // points on the face, if not, then
-				   // this FE does not allow to be
-				   // used in this function
-  Assert (unit_support_points.size() != 0, ExcNonInterpolatingFE());
+				   // points on the face. if not, then
+				   // we should try a more clever
+				   // way. the idea is that a finite
+				   // element may not offer support
+				   // points for all its shape
+				   // functions, but maybe only
+				   // some. if it offers support
+				   // points for the components we are
+				   // interested in in this function,
+				   // then that's fine. if not, the
+				   // function we call in the finite
+				   // element will raise an
+				   // exception. the support points
+				   // for the other shape functions
+				   // are left uninitialized (well,
+				   // initialized by the default
+				   // constructor), since we don't
+				   // need them anyway.
+  if (unit_support_points.size() == 0)
+    {
+      unit_support_points.resize (fe.dofs_per_face);
+      for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+        if (component_mask[fe.face_system_to_component_index(i).first]
+            == true)
+          unit_support_points[i] = fe.unit_face_support_point(i);
+    };
 
   Quadrature<dim-1> aux_quad (unit_support_points);
   FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);

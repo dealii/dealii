@@ -468,6 +468,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: For finite element classes, the functions
+       <code class="member">unit_support_point</code> and
+       <code class="member">unit_face_support_point</code> return the position
+       of an individual support point. This is necessary when you want to get
+       information about the support points of certain components in a composed
+       finite element, where not all components provide support points, and the
+       composed element thus does not fill the array the 
+       <code class="member">get_unit_support_points</code> function returns.
+       <br>
+       (WB 2002/11/23)
+       </p>
+
+  <li> <p> 
        Fixed: Vectors could not be given as input and output vectors to the
        <code class="class">SolutionTransfer</code> class at the same time, but
        this was not checked. An assertion has now been added to ensure this

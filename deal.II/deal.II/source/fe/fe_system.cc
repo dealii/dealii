@@ -2229,6 +2229,54 @@ FESystem<dim>::has_support_on_face (const unsigned int shape_index,
 
 
 
+template <int dim>
+Point<dim>
+FESystem<dim>::unit_support_point (const unsigned index) const
+{
+  Assert (index < this->dofs_per_cell,
+          ExcIndexRange (index, 0, this->dofs_per_cell));
+  Assert ((unit_support_points.size() == this->dofs_per_cell) ||
+          (unit_support_points.size() == 0),
+          typename FiniteElementBase<dim>::ExcFEHasNoSupportPoints ());
+
+                                   // let's see whether we have the
+                                   // information pre-computed
+  if (this->unit_support_points.size() != 0)
+    return this->unit_support_points[index];
+  else
+                                     // no. ask the base element
+                                     // whether it would like to
+                                     // provide this information
+    return (base_element(system_to_base_index(index).first.first)
+            .unit_support_point(system_to_base_index(index).second));
+};
+
+
+
+template <int dim>
+Point<dim-1>
+FESystem<dim>::unit_face_support_point (const unsigned index) const
+{
+  Assert (index < this->dofs_per_face,
+          ExcIndexRange (index, 0, this->dofs_per_face));
+  Assert ((unit_face_support_points.size() == this->dofs_per_face) ||
+          (unit_face_support_points.size() == 0),
+          typename FiniteElementBase<dim>::ExcFEHasNoSupportPoints ());
+
+                                   // let's see whether we have the
+                                   // information pre-computed
+  if (this->unit_face_support_points.size() != 0)
+    return this->unit_face_support_points[index];
+  else
+                                     // no. ask the base element
+                                     // whether it would like to
+                                     // provide this information
+    return (base_element(face_system_to_base_index(index).first.first)
+            .unit_face_support_point(face_system_to_base_index(index).second));
+};
+
+
+
 
 template <int dim>
 unsigned int
