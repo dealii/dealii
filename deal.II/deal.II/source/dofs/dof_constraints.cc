@@ -144,8 +144,8 @@ void ConstraintMatrix::close ()
 					 // make sure that
 					 // entry->first is not the
 					 // index of a line itself
-	const ConstraintLine test_line = { entry->first,
-					   vector<pair<unsigned int,double> >() };
+	ConstraintLine test_line;
+	test_line.line = entry->first;
 	const vector<ConstraintLine>::const_iterator
 	  test_line_position = lower_bound (lines.begin(),
 					    lines.end(),
