@@ -19,6 +19,7 @@ struct GeometryInfo<0>
     static const unsigned int lines_per_cell = 0;
     static const unsigned int quads_per_cell = 0;
     static const unsigned int hexes_per_cell = 0;
+    static const unsigned int children_per_cell = 0;
 };
 
 
@@ -59,7 +60,7 @@ struct GeometryInfo
 				      * Number of children each face has
 				      * when the adjacent cell is refined.
 				      */
-    static const unsigned int subfaces_per_face = ((_dim>1) ? GeometryInfo<_dim-1>::children_per_cell : 0);
+    static const unsigned int subfaces_per_face = GeometryInfo<_dim-1>::children_per_cell;
 
 				     /**
 				      * Number of vertices a cell has.
@@ -75,19 +76,17 @@ struct GeometryInfo
 				      * #for (i=0; i<vertices_per_face; ++i)#,
 				      * at least if #i# is an #unsigned int#.
 				      */
-    static const unsigned int vertices_per_face = ((_dim>1) ? GeometryInfo<_dim-1>::vertices_per_cell : 0);
+    static const unsigned int vertices_per_face = GeometryInfo<_dim-1>::vertices_per_cell;
 
 				     /**
 				      * Number of lines each face has.
-				      * Since this is not useful in one
-				      * dimension, we provide a useless
-				      * number (in the hope that a compiler
-				      * may warn when it sees constructs like
-				      * #for (i=0; i<lines_per_face; ++i)#,
-				      * at least if #i# is an #unsigned int#.
 				      */
-    static const unsigned int lines_per_face = ((_dim>1) ? GeometryInfo<_dim-1>::lines_per_cell : 0);
+    static const unsigned int lines_per_face = GeometryInfo<_dim-1>::lines_per_cell;
     
+				     /**
+				      * Number of quads on each face.
+				      */
+    static const unsigned int quads_per_face = GeometryInfo<_dim-1>::quads_per_cell;
 
 				     /**
 				      * Number of lines of a cell.
