@@ -80,6 +80,14 @@
 /* Minor version number of deal.II */
 #undef DEAL_II_MINOR
 
+/* Set to the minimal number of elements a std::vector<bool> can always hold,
+   i.e. its minimal capacity. */
+#undef DEAL_II_MIN_BOOL_VECTOR_CAPACITY
+
+/* Set to the minimal number of elements a std::vector<T> can always hold,
+   i.e. its minimal capacity. */
+#undef DEAL_II_MIN_VECTOR_CAPACITY
+
 /* Define if we have to work around a bug in gcc with marking all instances of
    a template class as friends to this class if the class is inside a
    namespace. See the aclocal.m4 file in the top-level directory for a

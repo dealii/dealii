@@ -5727,6 +5727,141 @@ fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
 
 
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+  CXXFLAGS="$CXXFLAGSG -Werror"
+
+  echo "$as_me:$LINENO: checking for minimal std::vector<T> capacity" >&5
+echo $ECHO_N "checking for minimal std::vector<T> capacity... $ECHO_C" >&6
+  if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <vector>
+int main () {
+    std::vector<int> v(1);
+    v.reserve (1);
+    v.resize (1);
+    return v.capacity();
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+
+	  	  { { echo "$as_me:$LINENO: error: impossible result -- aborting" >&5
+echo "$as_me: error: impossible result -- aborting" >&2;}
+   { (exit 1); exit 1; }; }
+
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+
+	  result="$?"
+	  echo "$as_me:$LINENO: result: $result" >&5
+echo "${ECHO_T}$result" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define DEAL_II_MIN_VECTOR_CAPACITY $result
+_ACEOF
+
+
+
+fi
+rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+
+    echo "$as_me:$LINENO: checking for minimal std::vector<bool> capacity" >&5
+echo $ECHO_N "checking for minimal std::vector<bool> capacity... $ECHO_C" >&6
+  if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <vector>
+int main () {
+    std::vector<bool> v(1);
+    v.reserve (1);
+    v.resize (1);
+    return v.capacity();
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+
+	  	  { { echo "$as_me:$LINENO: error: impossible result -- aborting" >&5
+echo "$as_me: error: impossible result -- aborting" >&2;}
+   { (exit 1); exit 1; }; }
+
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+
+	  result="$?"
+	  echo "$as_me:$LINENO: result: $result" >&5
+echo "${ECHO_T}$result" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define DEAL_II_MIN_BOOL_VECTOR_CAPACITY $result
+_ACEOF
+
+
+
+fi
+rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+
+
   echo "$as_me:$LINENO: checking whether getrusage is properly declared" >&5
 echo $ECHO_N "checking whether getrusage is properly declared... $ECHO_C" >&6
   ac_ext=cc

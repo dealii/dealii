@@ -179,19 +179,19 @@ TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) const
 				   // as many elements as an integer
 				   // has bits
   Assert (refine_flags.size() <= refine_flags.capacity() + sizeof(int)*8 ||
-	  refine_flags.size()<256,
+	  refine_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("refine_flags",
 			   refine_flags.size(), refine_flags.capacity()));
   Assert (coarsen_flags.size() <= coarsen_flags.capacity() + sizeof(int)*8 ||
-	  coarsen_flags.size()<256,
+	  coarsen_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("coarsen_flags",
 			   coarsen_flags.size(), coarsen_flags.capacity()));
   Assert (neighbors.size() ==  neighbors.capacity() ||
-	  neighbors.size()<256,
+	  neighbors.size()<DEAL_II_MIN_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("neighbors",
 			   neighbors.size(), neighbors.capacity()));
   Assert (subdomain_ids.size() ==  subdomain_ids.capacity() ||
-	  subdomain_ids.size()<256,
+	  subdomain_ids.size()<DEAL_II_MIN_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("subdomain_ids",
 			   subdomain_ids.size(), subdomain_ids.capacity()));
   Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
@@ -262,19 +262,19 @@ TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) const
 				   // as many elements as an integer
 				   // has bits
   Assert (lines.lines.size() == lines.lines.capacity() ||
-	  lines.lines.size()<256,
+	  lines.lines.size()<DEAL_II_MIN_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("lines",
 			   lines.lines.size(), lines.lines.capacity()));
   Assert (lines.children.size() == lines.children.capacity() ||
-	  lines.children.size()<256,
+	  lines.children.size()<DEAL_II_MIN_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("children",
 			   lines.children.size(), lines.children.capacity()));
   Assert (lines.used.size() <= lines.used.capacity() + sizeof(int)*8 ||
-	  lines.used.size()<256,
+	  lines.used.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("used",
 			   lines.used.size(), lines.used.capacity()));
   Assert (lines.user_flags.size() <= lines.user_flags.capacity() + sizeof(int)*8 ||
-	  lines.user_flags.size()<256,
+	  lines.user_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("user_flags",
 			   lines.user_flags.size(), lines.user_flags.capacity()));
   Assert (lines.lines.size() == lines.used.size(),
@@ -356,19 +356,19 @@ TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) const
 				   // as many elements as an integer
 				   // has bits
   Assert (quads.quads.size() == quads.quads.capacity() ||
-	  quads.quads.size()<256,
+	  quads.quads.size()<DEAL_II_MIN_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("quads",
 			   quads.quads.size(), quads.quads.capacity()));
   Assert (quads.children.size() == quads.children.capacity() ||
-	  quads.children.size()<256,
+	  quads.children.size()<DEAL_II_MIN_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("children",
 			   quads.children.size(), quads.children.capacity()));
   Assert (quads.used.size() <= quads.used.capacity() + sizeof(int)*8 ||
-	  quads.used.size()<256,
+	  quads.used.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("used",
 			   quads.used.size(), quads.used.capacity()));
   Assert (quads.user_flags.size() <= quads.user_flags.capacity() + sizeof(int)*8 ||
-	  quads.user_flags.size()<256,
+	  quads.user_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("user_flags",
 			   quads.user_flags.size(), quads.user_flags.capacity()));
   Assert (quads.quads.size() == quads.used.size(),
@@ -434,6 +434,12 @@ TriangulationLevel<3>::reserve_space (const unsigned int new_hexes)
       hexes.user_pointers.reserve (new_size);
       hexes.user_pointers.insert (hexes.user_pointers.end(),
 				  new_size-hexes.user_pointers.size(), 0);
+
+      hexes.face_orientations.reserve (new_size * GeometryInfo<3>::faces_per_cell);
+      hexes.face_orientations.insert (hexes.face_orientations.end(),
+                                      new_size * GeometryInfo<3>::faces_per_cell
+                                      - hexes.face_orientations.size(),
+                                      true);
     };
 }
 
@@ -450,19 +456,19 @@ TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) const
 				   // as many elements as an integer
 				   // has bits
   Assert (hexes.hexes.size() == hexes.hexes.capacity() ||
-	  hexes.hexes.size()<256,
+	  hexes.hexes.size()<DEAL_II_MIN_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("hexes",
 			   hexes.hexes.size(), hexes.hexes.capacity()));
   Assert (hexes.children.size() == hexes.children.capacity() ||
-	  hexes.children.size()<256,
+	  hexes.children.size()<DEAL_II_MIN_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("children",
 			   hexes.children.size(), hexes.children.capacity()));
   Assert (hexes.used.size() <= hexes.used.capacity() + sizeof(int)*8 ||
-	  hexes.used.size()<256,
+	  hexes.used.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("used",
 			   hexes.used.size(), hexes.used.capacity()));
   Assert (hexes.user_flags.size() <= hexes.user_flags.capacity() + sizeof(int)*8 ||
-	  hexes.user_flags.size()<256,
+	  hexes.user_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
 	  ExcMemoryWasted ("user_flags",
 			   hexes.user_flags.size(), hexes.user_flags.capacity()));
   Assert (hexes.hexes.size() == hexes.used.size(),
@@ -475,6 +481,10 @@ TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) const
 	  ExcMemoryInexact (hexes.hexes.size(), hexes.material_id.size()));
   Assert (hexes.hexes.size() == hexes.user_pointers.size(),
 	  ExcMemoryInexact (hexes.hexes.size(), hexes.user_pointers.size()));
+  Assert (hexes.hexes.size() * GeometryInfo<3>::faces_per_cell
+          == hexes.face_orientations.size(),
+	  ExcMemoryInexact (hexes.hexes.size() * GeometryInfo<3>::faces_per_cell,
+                            hexes.face_orientations.size()));
 
   TriangulationLevel<2>::monitor_memory (true_dimension);
 }
@@ -490,7 +500,8 @@ TriangulationLevel<3>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (hexes.used) +
 	  MemoryConsumption::memory_consumption (hexes.user_flags) +
 	  MemoryConsumption::memory_consumption (hexes.material_id) +
-	  MemoryConsumption::memory_consumption (hexes.user_pointers));
+	  MemoryConsumption::memory_consumption (hexes.user_pointers) +
+	  MemoryConsumption::memory_consumption (hexes.face_orientations));
 }
 
 

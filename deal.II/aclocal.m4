@@ -2824,6 +2824,9 @@ static preload_terminate_dummy dummy;
 
 
 
+
+
+
 dnl -------------------------------------------------------------
 dnl gcc versions up to 2.95.3 had a problem with the std::advance function,
 dnl when the number of steps forward was given by an unsigned number, since
@@ -2860,6 +2863,67 @@ AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
 	[
 	  AC_MSG_RESULT(yes)
           DEAL_II_ADVANCE_WARNING=yes
+	]
+  )
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl
+dnl Usage: DEAL_II_CHECK_MIN_VECTOR_CAPACITY
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_MIN_VECTOR_CAPACITY, dnl
+[
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG -Werror"
+
+  AC_MSG_CHECKING(for minimal std::vector<T> capacity)
+  AC_TRY_RUN(
+	[
+#include <vector>
+int main () {
+    std::vector<int> v(1);
+    v.reserve (1);
+    v.resize (1);
+    return v.capacity();
+}
+	],
+	[
+	  dnl That's impossible: the return value can't be zero!
+	  AC_MSG_ERROR(impossible result -- aborting)
+	],
+	[
+	  result="$?"
+	  AC_MSG_RESULT($result)
+          AC_DEFINE_UNQUOTED(DEAL_II_MIN_VECTOR_CAPACITY, $result, 
+                   [Set to the minimal number of elements a std::vector<T> can
+	            always hold, i.e. its minimal capacity.])
+	]
+  )
+
+  dnl Do same thing with std::vector<bool>
+  AC_MSG_CHECKING(for minimal std::vector<bool> capacity)
+  AC_TRY_RUN(
+	[
+#include <vector>
+int main () {
+    std::vector<bool> v(1);
+    v.reserve (1);
+    v.resize (1);
+    return v.capacity();
+}
+	],
+	[
+	  dnl That's impossible: the return value can't be zero!
+	  AC_MSG_ERROR(impossible result -- aborting)
+	],
+	[
+	  result="$?"
+	  AC_MSG_RESULT($result)
+          AC_DEFINE_UNQUOTED(DEAL_II_MIN_BOOL_VECTOR_CAPACITY, $result, 
+                   [Set to the minimal number of elements a std::vector<bool> can
+	            always hold, i.e. its minimal capacity.])
 	]
   )
 ])
