@@ -721,7 +721,7 @@ class FiniteElementBase : public Subscriptor,
 				      * @p ExcEmbeddingVoid. You can
 				      * check whether this is the case
 				      * by calling the
-				      * @ref{prolongation_is_implemented()}.
+				      * prolongation_is_implemented().
 				      */
     const FullMatrix<double> &
     get_prolongation_matrix (const unsigned int child) const;

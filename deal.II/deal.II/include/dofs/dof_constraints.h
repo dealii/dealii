@@ -50,7 +50,7 @@ class BlockIndices;
  * lines using the add_line() function, and then populating it using the
  * add_entry() function to a given line, or add_entries() to add more
  * than one entry at a time. After all constraints have been added, you need
- * to call @ref{close()}, which compresses the storage format and sorts the
+ * to call close(), which compresses the storage format and sorts the
  * entries.
  *
  * Constraint matrices are used to handle hanging nodes and other constrained
