@@ -27,23 +27,6 @@ static inline Number sqr (const Number x)
 };
 
 
-template <typename Number>
-Vector<Number>::Vector () :
-		dim(0),
-		maxdim(0),
-		val(0)
-{}
-
-
-template <typename Number>
-Vector<Number>::Vector (const unsigned int n) :
-		dim(0),
-		maxdim(0),
-		val(0)
-{
-  reinit (n, false);
-}
-
 
 template <typename Number>
 Vector<Number>::Vector (const Vector<Number>& v) :
@@ -79,49 +62,10 @@ Vector<Number>::Vector (const Vector<Number>& v) :
 
 
 template <typename Number>
-Vector<Number>::~Vector ()
-{
-  if (val) delete[] val;
-}
-
-
-
-template <typename Number>
-void Vector<Number>::reinit (const unsigned int n, const bool fast) {
-  if (n==0) 
-    {
-      if (val) delete[] val;
-      val = 0;
-      maxdim = dim = 0;
-      return;
-    };
-  
-  if (n>maxdim)
-    {
-      if (val) delete[] val;
-      val = new Number[n];
-      Assert (val != 0, ExcOutOfMemory());
-      maxdim = n;
-    };
-  dim = n;
-  if (fast == false)
-    clear ();
-}
-
-
-template <typename Number>
 void Vector<Number>::reinit (const Vector<Number>& v, const bool fast)
 {
   reinit (v.size(), fast);
 };
-
-
-template <typename Number>
-void Vector<Number>::clear ()
-{
-  if (dim>0)
-    std::fill (begin(), end(), 0.);
-}
 
 
 

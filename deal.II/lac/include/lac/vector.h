@@ -516,6 +516,72 @@ class Vector
 /*----------------------- Inline functions ----------------------------------*/
 
 
+
+template <typename Number>
+inline
+Vector<Number>::Vector () :
+		dim(0),
+		maxdim(0),
+		val(0)
+{}
+
+
+template <typename Number>
+inline
+Vector<Number>::Vector (const unsigned int n) :
+		dim(0),
+		maxdim(0),
+		val(0)
+{
+  reinit (n, false);
+}
+
+
+template <typename Number>
+inline
+Vector<Number>::~Vector ()
+{
+  if (val)
+    {
+      delete[] val;
+      val=0;
+    }
+}
+
+
+template <typename Number>
+inline
+void Vector<Number>::reinit (const unsigned int n, const bool fast) {
+  if (n==0) 
+    {
+      if (val) delete[] val;
+      val = 0;
+      maxdim = dim = 0;
+      return;
+    };
+  
+  if (n>maxdim)
+    {
+      if (val) delete[] val;
+      val = new Number[n];
+      Assert (val != 0, ExcOutOfMemory());
+      maxdim = n;
+    };
+  dim = n;
+  if (fast == false)
+    clear ();
+}
+
+
+template <typename Number>
+inline
+void Vector<Number>::clear ()
+{
+  if (dim>0)
+    std::fill (begin(), end(), 0.);
+}
+
+
 template <typename Number>
 inline
 unsigned int Vector<Number>::size () const
