@@ -77,30 +77,30 @@ class FEValues {
 					  * Compute quadrature points in real
 					  * space (not on unit cell).
 					  */
-	bool update_q_points;
+	bool q_points;
 					 /**
 					  * Transform gradients on unit cell to
 					  * gradients on real cell.
 					  */
-	bool update_gradients;
+	bool gradients;
 					 /**
 					  * Compute jacobian matrices of the
 					  * transform between unit and real cell
 					  * in the evaluation points.
 					  */
-	bool update_jacobians;
+	bool jacobians;
 					 /**
 					  * Compute the JxW values (Jacobian
 					  * determinant at the quadrature point
 					  * times the weight of this point).
 					  */
-	bool update_JxW_values;
+	bool JxW_values;
 					 /**
 					  * Compute the points on the real cell
 					  * on which the ansatz functions are
 					  * located.
 					  */
-	bool update_ansatz_points;
+	bool ansatz_points;
     };
 
     
@@ -828,7 +828,7 @@ template <int dim>
 inline
 const vector<vector<Point<dim> > > &
 FEValues<dim>::get_shape_grads () const {
-  Assert (update_flags.update_gradients, ExcAccessToUninitializedField());
+  Assert (update_flags.gradients, ExcAccessToUninitializedField());
   return shape_gradients;
 };
 
@@ -838,7 +838,7 @@ template <int dim>
 inline
 const vector<Point<dim> > &
 FEValues<dim>::get_quadrature_points () const {
-  Assert (update_flags.update_q_points, ExcAccessToUninitializedField());
+  Assert (update_flags.q_points, ExcAccessToUninitializedField());
   return quadrature_points;
 };
 
@@ -848,7 +848,7 @@ template <int dim>
 inline
 const vector<Point<dim> > &
 FEValues<dim>::get_ansatz_points () const {
-  Assert (update_flags.update_ansatz_points, ExcAccessToUninitializedField());
+  Assert (update_flags.ansatz_points, ExcAccessToUninitializedField());
   return ansatz_points;
 };
 
@@ -858,7 +858,7 @@ template <int dim>
 inline
 const vector<double> &
 FEValues<dim>::get_JxW_values () const {
-  Assert (update_flags.update_JxW_values, ExcAccessToUninitializedField());
+  Assert (update_flags.JxW_values, ExcAccessToUninitializedField());
   return JxW_values;
 };
 

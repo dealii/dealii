@@ -130,8 +130,8 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
   difference.reserve (tria->n_cells());
 
   FEValues<dim>::UpdateStruct update_flags;
-  update_flags.update_q_points   = true;
-  update_flags.update_JxW_values = true;
+  update_flags.q_points   = true;
+  update_flags.JxW_values = true;
   FEValues<dim> fe_values(fe, q, update_flags);
   
 				   // loop over all cells

@@ -123,27 +123,26 @@ int main () {
   QGauss4<2>         quadrature;
 
 				   
-//  HyperBallBoundary<2> boundary(Point<2>(2,3), 4);
-
   cout << "Making grid..." << endl;
   
   tria.create_hypercube ();
+//  HyperBallBoundary<2> boundary(Point<2>(2,3), 4);
 //  tria.create_hyper_ball(Point<2>(2,3),4);
 //  tria.set_boundary (&boundary);
   
-  tria.refine_global (1);
-  (--tria.last_active())->set_refine_flag();
-  tria.execute_refinement ();
+//  tria.refine_global (1);
+//  (--tria.last_active())->set_refine_flag();
+//  tria.execute_refinement ();
 //  tria.begin_active(2)->set_refine_flag();
 //  tria.execute_refinement ();
-  tria.refine_global (2);
+  tria.refine_global (3);
 
 /*
   const unsigned int dim=2;
   tria.refine_global (1);
 	
   Triangulation<dim>::active_cell_iterator cell, endc;
-  for (int i=0; i<12; ++i) 
+  for (int i=0; i<8; ++i) 
     {
       int n_levels = tria.n_levels();
       cell = tria.begin_active();
@@ -171,12 +170,12 @@ int main () {
 
   cout << "Assembling matrices..." << endl;
   FEValues<2>::UpdateStruct update_flags;
-  update_flags.update_q_points = true;
-  update_flags.update_gradients = true;
-  update_flags.update_jacobians = true;
-  update_flags.update_JxW_values = true;
-  ProblemBase<2>::DirichletBC d;
-  problem.assemble (equation, quadrature, fe, update_flags, d);
+  update_flags.q_points = true;
+  update_flags.gradients = true;
+  update_flags.jacobians = true;
+  update_flags.JxW_values = true;
+  ProblemBase<2>::DirichletBC dirichlet_bc;
+  problem.assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
 
   cout << "Solving..." << endl;
   problem.solve ();

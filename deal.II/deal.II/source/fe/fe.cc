@@ -9,11 +9,11 @@
 
 template <int dim>
 FEValues<dim>::UpdateStruct::UpdateStruct () :
-		update_q_points(false),
-		update_gradients(false),
-		update_jacobians(false),
-		update_JxW_values(false),
-		update_ansatz_points(false) {};
+		q_points(false),
+		gradients(false),
+		jacobians(false),
+		JxW_values(false),
+		ansatz_points(false) {};
 		
 
 
@@ -75,7 +75,7 @@ FEValues<dim>::shape_grad (const unsigned int i,
 			   const unsigned int j) const {
   Assert (i<(unsigned int)shape_values.m(), ExcInvalidIndex (i, shape_values.m()));
   Assert (j<(unsigned int)shape_values.n(), ExcInvalidIndex (j, shape_values.n()));
-  Assert (update_flags.update_gradients, ExcAccessToUninitializedField());
+  Assert (update_flags.gradients, ExcAccessToUninitializedField());
 
   return shape_gradients[i][j];
 };
@@ -85,7 +85,7 @@ FEValues<dim>::shape_grad (const unsigned int i,
 template <int dim>
 const Point<dim> & FEValues<dim>::quadrature_point (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
-  Assert (update_flags.update_q_points, ExcAccessToUninitializedField());
+  Assert (update_flags.q_points, ExcAccessToUninitializedField());
   
   return quadrature_points[i];
 };
@@ -95,7 +95,7 @@ const Point<dim> & FEValues<dim>::quadrature_point (const unsigned int i) const 
 template <int dim>
 const Point<dim> & FEValues<dim>::ansatz_point (const unsigned int i) const {
   Assert (i<ansatz_points.size(), ExcInvalidIndex(i, ansatz_points.size()));
-  Assert (update_flags.update_ansatz_points, ExcAccessToUninitializedField());
+  Assert (update_flags.ansatz_points, ExcAccessToUninitializedField());
   
   return ansatz_points[i];
 };
@@ -105,7 +105,7 @@ const Point<dim> & FEValues<dim>::ansatz_point (const unsigned int i) const {
 template <int dim>
 double FEValues<dim>::JxW (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
-  Assert (update_flags.update_JxW_values, ExcAccessToUninitializedField());
+  Assert (update_flags.JxW_values, ExcAccessToUninitializedField());
   
   return JxW_values[i];
 };
@@ -117,21 +117,21 @@ void FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &ce
 			    const FiniteElement<dim>                         &fe) {
 				   // fill jacobi matrices and real
 				   // quadrature points
-  if (update_flags.update_jacobians || update_flags.update_q_points)
+  if (update_flags.jacobians || update_flags.q_points)
     fe.fill_fe_values (cell,
 		       unit_quadrature_points,
 		       jacobi_matrices,
-		       update_flags.update_jacobians,
+		       update_flags.jacobians,
 		       ansatz_points,
-		       update_flags.update_ansatz_points,
+		       update_flags.ansatz_points,
 		       quadrature_points,
-		       update_flags.update_q_points);
+		       update_flags.q_points);
 
 				   // compute gradients on real element if
 				   // requested
-  if (update_flags.update_gradients) 
+  if (update_flags.gradients) 
     {
-      Assert (update_flags.update_jacobians, ExcCannotInitializeField());
+      Assert (update_flags.jacobians, ExcCannotInitializeField());
       
       for (unsigned int i=0; i<fe.total_dofs; ++i)
 	for (unsigned int j=0; j<n_quadrature_points; ++j)
@@ -155,9 +155,9 @@ void FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &ce
 				   // refer to the general doc for
 				   // why we take the inverse of the
 				   // determinant
-  if (update_flags.update_JxW_values) 
+  if (update_flags.JxW_values) 
     {
-      Assert (update_flags.update_jacobians,
+      Assert (update_flags.jacobians,
 	      ExcCannotInitializeField());
       for (unsigned int i=0; i<n_quadrature_points; ++i)
 	JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
