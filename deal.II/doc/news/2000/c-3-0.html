@@ -100,7 +100,14 @@
        later on. It also has a function to preload the data before its
        use in a separate thread if the library is configured for
        multi-threading.
-       </p>  
+       </p>
+
+  <li> <p>
+       Fix: the ``copy-like'' constructor of 
+       <code class="class">SparsityPattern</code> that copies another
+       object and adds some off-diagonals had a bug that caused an
+       exception in some cases. This is now fixed.
+       </p>
 </ol>
 
 
