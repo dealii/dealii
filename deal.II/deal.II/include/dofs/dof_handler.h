@@ -1531,13 +1531,16 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     Triangulation<dim> * const tria;
 
 				     /**
-				      * Store a copy of the finite element given
-				      * latest for the distribution of dofs. In
-				      * fact, since the FE base class itself has
-				      * not much functionality, this object only
-				      * stores numbers such as the number of
-				      * dofs per line, but also restriction
-				      * and prolongation matrices, etc.
+				      * Store a pointer to the finite element
+				      * given latest for the distribution of
+				      * dofs. In order to avoid destruction of
+				      * the object before the lifetime of
+				      * the DoF handler, we subscribe to
+				      * the finite element object. To unlock
+				      * the FE before the end of the lifetime
+				      * of this DoF handler, use the #clear()#
+				      * function (this clears all data of
+				      * this object as well, though).
 				      */
     SmartPointer<const FiniteElement<dim> > selected_fe;
 
