@@ -160,7 +160,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	              else
   
                         dnl  Aw, nothing suitable found...
-                        AC_MSG_ERROR(Unrecognized compiler, sorry)
+                        AC_MSG_ERROR([Unrecognized compiler -- sorry])
                         exit 1
                       fi
                     fi
