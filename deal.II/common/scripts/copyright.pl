@@ -39,18 +39,21 @@ my $copyreg = "Copyright \\(C\\) $copystring by the deal.II authors";
 $copystring = "Copyright (C) $copystring by the deal.II authors";
 
 my $found = 0;
+my $qpl = 0;
 my $ok = 0;
 
 while(<>)
 {
-    next unless (m/(Copyright.*)/);
+    next unless (m/(Copyright.*authors)/);
     my $copyfile = $1;
     $found = 1;
     if (m/$copyreg/)
     {
 	$ok = 1;
-    } else { 
-	print "perl -pi~ -e 's/$copyfile/$copystring/;' $file\n";
+    } else {
+	$copyfile =~ s/\(/\\(/;
+	$copyfile =~ s/\)/\\)/;
+	print "perl -pi~ -e 's{$copyfile}{$copystring};' $file\n";
     }
 }
 
