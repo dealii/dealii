@@ -39,480 +39,487 @@ template<typename T>
 class vector2d : public Subscriptor
 {
   public:
-				     /**
-				      * Object representing one row of
-				      * a @ref{vector2d} object. It
-				      * allows to access the elements
-				      * through the
-				      * @p{operator[]}. Since objects
-				      * of this type are also
-				      * generated through the
-				      * @p{vector2d::operator[]}, this
-				      * allows accessing the elements
-				      * of @p{vector2d} objects just
-				      * as those of two-dimensional
-				      * C-style arrays.
-				      *
-				      * This class is used for
-				      * constant @p{vector2d}
-				      * objects. It only allows
-				      * read-only access to the
-				      * elements.
-				      */
+                                     /**
+                                      * Object representing one row of
+                                      * a @ref{vector2d} object. It
+                                      * allows to access the elements
+                                      * through the
+                                      * @p{operator[]}. Since objects
+                                      * of this type are also
+                                      * generated through the
+                                      * @p{vector2d::operator[]}, this
+                                      * allows accessing the elements
+                                      * of @p{vector2d} objects just
+                                      * as those of two-dimensional
+                                      * C-style arrays.
+                                      *
+                                      * This class is used for
+                                      * constant @p{vector2d}
+                                      * objects. It only allows
+                                      * read-only access to the
+                                      * elements.
+                                      */
     class ConstRowAccessor
     {
       public:
-					 /**
-					  * Typedef iterator and other
-					  * types to the elements of
-					  * this row. Since this class
-					  * represents rows of
-					  * constant objects,
-					  * @p{iterator} and
-					  * @p{const_iterator} have
-					  * the same type.
-					  */
-	typedef const T value_type;
-	typedef value_type* pointer;
-	typedef const value_type* const_pointer;
-	typedef value_type* iterator;
-	typedef const value_type* const_iterator;
-	typedef value_type& reference;
-	typedef const value_type& const_reference;
-	typedef size_t size_type;
-	typedef ptrdiff_t difference_type;
+                                         /**
+                                          * Typedef iterator and other
+                                          * types to the elements of
+                                          * this row. Since this class
+                                          * represents rows of
+                                          * constant objects,
+                                          * @p{iterator} and
+                                          * @p{const_iterator} have
+                                          * the same type.
+                                          */
+        typedef const T value_type;
+        typedef value_type* pointer;
+        typedef const value_type* const_pointer;
+        typedef value_type* iterator;
+        typedef const value_type* const_iterator;
+        typedef value_type& reference;
+        typedef const value_type& const_reference;
+        typedef size_t size_type;
+        typedef ptrdiff_t difference_type;
 	
-					 /**
-					  * Constructor.
-					  */
-	ConstRowAccessor (const vector2d<T>  &parent,
-			  const unsigned int  row);
+                                         /**
+                                          * Constructor.
+                                          */
+        ConstRowAccessor (const vector2d<T>  &parent,
+                          const unsigned int  row);
 
-					 /**
-					  * Access operator.
-					  */
-	const_reference operator [] (const unsigned int column) const;
+                                         /**
+                                          * Access operator.
+                                          */
+        const_reference operator [] (const unsigned int column) const;
 
-					 /**
-					  * Return an iterator to the
-					  * first element of this row.
-					  */
-	const_iterator begin () const;
+                                         /**
+                                          * Return an iterator to the
+                                          * first element of this row.
+                                          */
+        const_iterator begin () const;
 
-					 /**
-					  * Return an interator to the
-					  * element past the end of
-					  * this row.
-					  */
-	const_iterator end () const;
+                                         /**
+                                          * Return an interator to the
+                                          * element past the end of
+                                          * this row.
+                                          */
+        const_iterator end () const;
 
-					 /**
-					  * Return the number of
-					  * elements between @p{begin}
-					  * and @p{end}, i.e. the
-					  * number of columns of the
-					  * matrix.
-					  */
-	unsigned int size () const;
+                                         /**
+                                          * Return the number of
+                                          * elements between @p{begin}
+                                          * and @p{end}, i.e. the
+                                          * number of columns of the
+                                          * matrix.
+                                          */
+        unsigned int size () const;
 	
       protected:
-					 /**
-					  * Pointer to the parent
-					  * object. Used only to check
-					  * access indices for
-					  * validity.
-					  */
-	const vector2d<T>  &parent;
+                                         /**
+                                          * Pointer to the parent
+                                          * object. Used only to check
+                                          * access indices for
+                                          * validity.
+                                          */
+        const vector2d<T>  &parent;
 
-					 /**
-					  * Pointer to the start of
-					  * the row pointed to by this
-					  * object.
-					  */
-	const T * const     row_start;
+                                         /**
+                                          * Pointer to the start of
+                                          * the row pointed to by this
+                                          * object.
+                                          */
+        const T * const     row_start;
     };    
 
 
-				     /**
-				      * Object representing one row of
-				      * a @ref{vector2d} object. It
-				      * allows to access the elements
-				      * through the
-				      * @p{operator[]}. Since objects
-				      * of this type are also
-				      * generated through the
-				      * @p{vector2d::operator[]}, this
-				      * allows accessing the elements
-				      * of @p{vector2d} objects just
-				      * as those of two-dimensional
-				      * C-style arrays.
-				      *
-				      * This class is used for
-				      * non-constant @p{vector2d}
-				      * objects. It allows read and
-				      * write access to the elements.
-				      */
+                                     /**
+                                      * Object representing one row of
+                                      * a @ref{vector2d} object. It
+                                      * allows to access the elements
+                                      * through the
+                                      * @p{operator[]}. Since objects
+                                      * of this type are also
+                                      * generated through the
+                                      * @p{vector2d::operator[]}, this
+                                      * allows accessing the elements
+                                      * of @p{vector2d} objects just
+                                      * as those of two-dimensional
+                                      * C-style arrays.
+                                      *
+                                      * This class is used for
+                                      * non-constant @p{vector2d}
+                                      * objects. It allows read and
+                                      * write access to the elements.
+                                      */
     class NonConstRowAccessor
     {
       public:
-					 /**
-					  * Typedef constant and
-					  * non-constant iterator
-					  * types to the elements of
-					  * this row, as well as all
-					  * the other types usually
-					  * required for the standard
-					  * library algorithms.
-					  */
-	typedef T value_type;
-	typedef value_type* pointer;
-	typedef const value_type* const_pointer;
-	typedef value_type* iterator;
-	typedef const value_type* const_iterator;
-	typedef value_type& reference;
-	typedef const value_type& const_reference;
-	typedef size_t size_type;
-	typedef ptrdiff_t difference_type;
+                                         /**
+                                          * Typedef constant and
+                                          * non-constant iterator
+                                          * types to the elements of
+                                          * this row, as well as all
+                                          * the other types usually
+                                          * required for the standard
+                                          * library algorithms.
+                                          */
+        typedef T value_type;
+        typedef value_type* pointer;
+        typedef const value_type* const_pointer;
+        typedef value_type* iterator;
+        typedef const value_type* const_iterator;
+        typedef value_type& reference;
+        typedef const value_type& const_reference;
+        typedef size_t size_type;
+        typedef ptrdiff_t difference_type;
 
 	
-					 /**
-					  * Constructor.
-					  */
-	NonConstRowAccessor (vector2d<T>        &parent,
-			     const unsigned int  row);
+                                         /**
+                                          * Constructor.
+                                          */
+        NonConstRowAccessor (vector2d<T>        &parent,
+                             const unsigned int  row);
 
 
-					 /**
-					  * Access operator.
-					  */
-	reference operator [] (const unsigned int column) const;
+                                         /**
+                                          * Access operator.
+                                          */
+        reference operator [] (const unsigned int column) const;
 
-					 /**
-					  * Return an iterator to the
-					  * first element of this
-					  * row. Constant version.
-					  */
-	const_iterator begin () const;
+                                         /**
+                                          * Return an iterator to the
+                                          * first element of this
+                                          * row. Constant version.
+                                          */
+        const_iterator begin () const;
 
-					 /**
-					  * Return an iterator to the
-					  * first element of this
-					  * row. Non-constant version.
-					  */
-	iterator begin ();
+                                         /**
+                                          * Return an iterator to the
+                                          * first element of this
+                                          * row. Non-constant version.
+                                          */
+        iterator begin ();
 	
-					 /**
-					  * Return an interator to the
-					  * element past the end of
-					  * this row. Constant version.
-					  */
-	const_iterator end () const;
+                                         /**
+                                          * Return an interator to the
+                                          * element past the end of
+                                          * this row. Constant version.
+                                          */
+        const_iterator end () const;
 	
-					 /**
-					  * Return an interator to the
-					  * element past the end of
-					  * this row. Non-constant
-					  * version.
-					  */
-	iterator end ();
+                                         /**
+                                          * Return an interator to the
+                                          * element past the end of
+                                          * this row. Non-constant
+                                          * version.
+                                          */
+        iterator end ();
 
-					 /**
-					  * Return the number of
-					  * elements between @p{begin}
-					  * and @p{end}, i.e. the
-					  * number of columns of the
-					  * matrix.
-					  */
-	unsigned int size () const;
+                                         /**
+                                          * Return the number of
+                                          * elements between @p{begin}
+                                          * and @p{end}, i.e. the
+                                          * number of columns of the
+                                          * matrix.
+                                          */
+        unsigned int size () const;
 	
       private:
-					 /**
-					  * Pointer to the parent
-					  * object. Used only to check
-					  * access indices for
-					  * validity.
-					  */
-	const vector2d<T>  &parent;
+                                         /**
+                                          * Pointer to the parent
+                                          * object. Used only to check
+                                          * access indices for
+                                          * validity.
+                                          */
+        const vector2d<T>  &parent;
 
-					 /**
-					  * Pointer to the start of
-					  * the row pointed to by this
-					  * object.
-					  */
-	T * const           row_start;
+                                         /**
+                                          * Pointer to the start of
+                                          * the row pointed to by this
+                                          * object.
+                                          */
+        T * const           row_start;
     };    
-				     /**
-				      * Constructor for a quadratic
-				      * @p{rows} by @p{rows} array. The
-				      * standard constructor creates an
-				      * empty object.
-				      */
-    vector2d (const unsigned int rows = 0);
+
+                                     /**
+                                      * Default
+                                      * constructor. Initialize this
+                                      * as an empty array, i.e. all
+                                      * dimensions are zero.
+                                      */
+    vector2d ();
     
-				     /**
-				      * Constructor for a @p{rows} by
-				      * @p{cols} array.
-				      */
+                                     /**
+                                      * Constructor for a @p{rows} by
+                                      * @p{cols} array.
+                                      */
     vector2d (const unsigned int rows,
-	      const unsigned int cols);
+              const unsigned int cols);
+
+
+                                     /**
+                                      * Constructor just as the one
+                                      * above, but use the give
+                                      * pointer to initialize the
+                                      * elements of this table. For
+                                      * the requirements on the format
+                                      * of the initializers, see the
+                                      * @p{fill} function of this
+                                      * class.
+                                      */
+    vector2d (const unsigned int rows,
+              const unsigned int cols,
+              const T           *initializers);
     
-				     /**
-				      * Copy-constructor for deep copy.
-				      */
+                                     /**
+                                      * Copy-constructor for deep copy.
+                                      */
     vector2d (const vector2d&);
- 				     /**
-				      * Constructor initializing from
-				      * an array of data elements. The array
-				      * is arranged line by line. No
-				      * range checking is performed.
-				      */
-    vector2d (const unsigned int rows,
-	      const unsigned int cols,
-	      const T* entries);
     
-				     /**
-				      * Assignment operator.
-				      * Copy all elements of @p{src}
-				      * into the matrix. The size is
-				      * adjusted if needed.
-				      *
-				      * We can't use the other, templatized
-				      * version since if we don't declare
-				      * this one, the compiler will happily
-				      * generate a predefined copy
-				      * operator which is not what we want.
-				      */
+                                     /**
+                                      * Assignment operator.
+                                      * Copy all elements of @p{src}
+                                      * into the matrix. The size is
+                                      * adjusted if needed.
+                                      *
+                                      * We can't use the other, templatized
+                                      * version since if we don't declare
+                                      * this one, the compiler will happily
+                                      * generate a predefined copy
+                                      * operator which is not what we want.
+                                      */
     vector2d<T>& operator = (const vector2d<T>& src);
     
-				     /**
-				      * Copy operator.
-				      * Copy all elements of @p{src}
-				      * into the array. The size is
-				      * adjusted if needed.
-				      *
-				      * This function requires that the
-				      * type @p{T2} is convertible to
-				      * @p{T}.
-				      */
+                                     /**
+                                      * Copy operator.
+                                      * Copy all elements of @p{src}
+                                      * into the array. The size is
+                                      * adjusted if needed.
+                                      *
+                                      * This function requires that the
+                                      * type @p{T2} is convertible to
+                                      * @p{T}.
+                                      */
     template<typename T2>
     vector2d<T>& operator = (const vector2d<T2> &src);
 				      
-				     /**
-				      * Destructor. Free allocated memory.
-				      */
+                                     /**
+                                      * Destructor. Free allocated memory.
+                                      */
     ~vector2d ();
     
-				     /**
-				      * Set dimension to $m\times n$
-				      * and allocate memory if
-				      * necessary. Forget the previous
-				      * content of the array.
-				      */
+                                     /**
+                                      * Set dimension to $m\times n$
+                                      * and allocate memory if
+                                      * necessary. Forget the previous
+                                      * content of the array.
+                                      */
     void reinit (const unsigned int m,
-		 const unsigned int n);
+                 const unsigned int n);
     
-				     /**
-				      * Set dimension to $n\times n$
-				      * and allocate memory if
-				      * necessary. Forget the previous
-				      * content of the array.
-				      */
+                                     /**
+                                      * Set dimension to $n\times n$
+                                      * and allocate memory if
+                                      * necessary. Forget the previous
+                                      * content of the array.
+                                      */
     void reinit (const unsigned int n);
 
-				     /**
-				      * Set the dimensions to the same
-				      * as another array. The other
-				      * array will not be copied,
-				      * though. The entries of this
-				      * array will be zero.
-				      */
+                                     /**
+                                      * Set the dimensions to the same
+                                      * as another array. The other
+                                      * array will not be copied,
+                                      * though. The entries of this
+                                      * array will be zero.
+                                      */
     template <class T2>
     void reinit (const vector2d<T2> &shape);
     
-				     /**
-				      * Number of rows.
-				      */
+                                     /**
+                                      * Number of rows.
+                                      */
     unsigned int n_rows () const;
     
-				     /**
-				      * Number of columns.
-				      */
+                                     /**
+                                      * Number of columns.
+                                      */
     unsigned int n_cols () const;
     
-				     /**
-				      * Return the value of the
-				      * element at position @p{(i,j)}
-				      * as a constant reference.
-				      *
-				      * We return the requested value
-				      * as a constant reference rather
-				      * than by value since this
-				      * object may hold data types
-				      * that may be large, and we
-				      * don't know here whether
-				      * copying is expensive or not.
-				      */
+                                     /**
+                                      * Return the value of the
+                                      * element at position @p{(i,j)}
+                                      * as a constant reference.
+                                      *
+                                      * We return the requested value
+                                      * as a constant reference rather
+                                      * than by value since this
+                                      * object may hold data types
+                                      * that may be large, and we
+                                      * don't know here whether
+                                      * copying is expensive or not.
+                                      */
     const T & operator() (const unsigned int i,
-			  const unsigned int j) const;
+                          const unsigned int j) const;
     
-				     /**
-				      * Return a read-write reference to
-				      * the element at position @p{(i,j)}.
-				      */
+                                     /**
+                                      * Return a read-write reference to
+                                      * the element at position @p{(i,j)}.
+                                      */
     T & operator() (const unsigned int i,
-		    const unsigned int j);
+                    const unsigned int j);
 
-				     /**
-				      * Return an object representing
-				      * a certain row of this
-				      * array. This object in turn has
-				      * an @p{operator[]}, so that the
-				      * elements of this array can be
-				      * accessed through @p{x[i][j]}
-				      * as well as through @p{x(i,j)}.
-				      *
-				      * This function is for constant
-				      * objects. The returned row
-				      * representing object only
-				      * allows read access to the
-				      * elements of the row pointed
-				      * to.
-				      */
+                                     /**
+                                      * Return an object representing
+                                      * a certain row of this
+                                      * array. This object in turn has
+                                      * an @p{operator[]}, so that the
+                                      * elements of this array can be
+                                      * accessed through @p{x[i][j]}
+                                      * as well as through @p{x(i,j)}.
+                                      *
+                                      * This function is for constant
+                                      * objects. The returned row
+                                      * representing object only
+                                      * allows read access to the
+                                      * elements of the row pointed
+                                      * to.
+                                      */
     ConstRowAccessor    operator [] (const unsigned int row) const;
 
-				     /**
-				      * Return an object representing
-				      * a certain row of this
-				      * array. This object in turn has
-				      * an @p{operator[]}, so that the
-				      * elements of this array can be
-				      * accessed through @p{x[i][j]}
-				      * as well as through @p{x(i,j)}.
-				      *
-				      * This function is for
-				      * non-constant objects. The
-				      * returned row representing
-				      * object allows read and write
-				      * access to the elements of the
-				      * row pointed to.
-				      */
+                                     /**
+                                      * Return an object representing
+                                      * a certain row of this
+                                      * array. This object in turn has
+                                      * an @p{operator[]}, so that the
+                                      * elements of this array can be
+                                      * accessed through @p{x[i][j]}
+                                      * as well as through @p{x(i,j)}.
+                                      *
+                                      * This function is for
+                                      * non-constant objects. The
+                                      * returned row representing
+                                      * object allows read and write
+                                      * access to the elements of the
+                                      * row pointed to.
+                                      */
     NonConstRowAccessor operator [] (const unsigned int row);
     
 
-				     /**
-				      * Set all entries to their
-				      * default value (zero).
-				      */
+                                     /**
+                                      * Set all entries to their
+                                      * default value (zero).
+                                      */
     void clear ();
     
                                      /**
-				      * Fill array with an array of
-				      * elements.  The array is
-				      * arranged line by line. No
-				      * range checking is performed,
-				      * i.e., it is assumed that the
-				      * input array @p{entries}
-				      * contains @p{n_rows()*n_cols()}
-				      * elements, and that the layout
-				      * refers to the desired shape of
-				      * this table.
-				      */
+                                      * Fill array with an array of
+                                      * elements.  The array is
+                                      * arranged line by line. No
+                                      * range checking is performed,
+                                      * i.e., it is assumed that the
+                                      * input array @p{entries}
+                                      * contains @p{n_rows()*n_cols()}
+                                      * elements, and that the layout
+                                      * refers to the desired shape of
+                                      * this table.
+                                      */
     template<typename T2>
     void fill (const T2 *entries);
     
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      */
     unsigned int memory_consumption () const;
 
   protected:
-				     /**
-				      * Return a read-write reference
-				      * to the element @p{(i,j)}.
-				      *
-				      * This function does no bounds
-				      * checking and is only to be
-				      * used internally and in
-				      * functions already checked.
-				      */
+                                     /**
+                                      * Return a read-write reference
+                                      * to the element @p{(i,j)}.
+                                      *
+                                      * This function does no bounds
+                                      * checking and is only to be
+                                      * used internally and in
+                                      * functions already checked.
+                                      */
     T & el (const unsigned int i, const unsigned int j);
   
-				     /**
-				      * Return the value of the
-				      * element @p{(i,j)} as a
-				      * read-only reference.
-				      *
-				      * This function does no bounds
-				      * checking and is only to be
-				      * used internally and in
-				      * functions already checked.
-				      *
-				      * We return the requested value
-				      * as a constant reference rather
-				      * than by value since this
-				      * object may hold data types
-				      * that may be large, and we
-				      * don't know here whether
-				      * copying is expensive or not.
-				      */
+                                     /**
+                                      * Return the value of the
+                                      * element @p{(i,j)} as a
+                                      * read-only reference.
+                                      *
+                                      * This function does no bounds
+                                      * checking and is only to be
+                                      * used internally and in
+                                      * functions already checked.
+                                      *
+                                      * We return the requested value
+                                      * as a constant reference rather
+                                      * than by value since this
+                                      * object may hold data types
+                                      * that may be large, and we
+                                      * don't know here whether
+                                      * copying is expensive or not.
+                                      */
     const T & el (const unsigned int i, const unsigned int j) const;    
   
-				     /**
-				      * Direct read-only access to
-				      * data field. Used by
-				      * @ref{FullMatrix} (there even
-				      * with a cast from const),
-				      * otherwise, keep away!
-				      */
+                                     /**
+                                      * Direct read-only access to
+                                      * data field. Used by
+                                      * @ref{FullMatrix} (there even
+                                      * with a cast from const),
+                                      * otherwise, keep away!
+                                      */
     const T* data () const;
     
   private:
-				     /**
-				      * Component-array.
-				      */
+                                     /**
+                                      * Component-array.
+                                      */
     T* val;
     
-				     /**
-				      * Size of array. This may be
-				      * larger than the number of
-				      * actually used elements, since
-				      * we don't shrink the array upon
-				      * calls to @p{reinit} unless the
-				      * new size is zero.
-				      */
+                                     /**
+                                      * Size of array. This may be
+                                      * larger than the number of
+                                      * actually used elements, since
+                                      * we don't shrink the array upon
+                                      * calls to @p{reinit} unless the
+                                      * new size is zero.
+                                      */
     unsigned int val_size;    
     
-				     /**
-				      * Number of Rows
-				      */
+                                     /**
+                                      * Number of Rows
+                                      */
     unsigned int num_rows;
     
-				     /** 
-				      * Number of Columns
-				      */
+                                     /** 
+                                      * Number of Columns
+                                      */
     unsigned int num_cols;
 
-				     /**
-				      * Friend declaration needed for
-				      * inter-type copy operator.
-				      */
+                                     /**
+                                      * Friend declaration needed for
+                                      * inter-type copy operator.
+                                      */
     template <typename T2> friend class vector2d;
     
-				     /**
-				      * This is unfortunately needed.
-				      */
+                                     /**
+                                      * This is unfortunately needed.
+                                      */
     template <typename T2> friend class FullMatrix;
 
-				     /**
-				      * Make the following classes
-				      * friends; this is not strictly
-				      * necessary according to a
-				      * defect report to the C++
-				      * standard, but older compilers
-				      * still require this behavior.
-				      */
+                                     /**
+                                      * Make the following classes
+                                      * friends; this is not strictly
+                                      * necessary according to a
+                                      * defect report to the C++
+                                      * standard, but older compilers
+                                      * still require this behavior.
+                                      */
     friend class ConstRowAccessor;
     friend class NonConstRowAccessor;
 };
@@ -524,10 +531,10 @@ template <typename T>
 inline
 vector2d<T>::ConstRowAccessor::
 ConstRowAccessor (const vector2d<T>  &parent,
-		  const unsigned int  row)
-			:
-		parent (parent),
-		row_start(&parent.val[row*parent.n_cols()])
+                  const unsigned int  row)
+                :
+                parent (parent),
+                row_start(&parent.val[row*parent.n_cols()])
 {
   Assert (row < parent.n_rows(), ExcInternalError());
 };
@@ -579,10 +586,10 @@ template <typename T>
 inline
 vector2d<T>::NonConstRowAccessor::
 NonConstRowAccessor (vector2d<T>        &parent,
-		     const unsigned int  row)
-			:
-		parent (parent),
-		row_start(&parent.val[row*parent.n_cols()])
+                     const unsigned int  row)
+                :
+                parent (parent),
+                row_start(&parent.val[row*parent.n_cols()])
 {
   Assert (row < parent.n_rows(), ExcInternalError());
 };
@@ -677,44 +684,44 @@ vector2d<T>::fill (const T2* entries)
 template <typename T>
 void
 vector2d<T>::reinit (const unsigned int mm,
-		     const unsigned int nn)
+                     const unsigned int nn)
 {
   num_cols = nn;
   num_rows = mm;
 
-				   // if zero size was given: free all
-				   // memory
+                                   // if zero size was given: free all
+                                   // memory
   if ((num_cols==0) || (num_rows == 0))
     {
       if (val != 0)
-	delete[] val;
+        delete[] val;
 
       val      = 0;
       val_size = 0;
 
-				       // set both sizes to zero, even
-				       // if one was previously
-				       // nonzero. This simplifies
-				       // some Assertions.
+                                       // set both sizes to zero, even
+                                       // if one was previously
+                                       // nonzero. This simplifies
+                                       // some Assertions.
       num_cols = num_rows = 0;
 
       return;
     };
   
-				   // if new size is nonzero:
-				   // if necessary: allocate
-				   // additional memory
+                                   // if new size is nonzero:
+                                   // if necessary: allocate
+                                   // additional memory
   if (val_size<nn*mm)
     {
       if (val != 0)
-	delete[] val;
+        delete[] val;
 
       val_size = num_cols * num_rows;
       val      = new T[val_size];
     };
 
-				   // Clear contents of old or new
-				   // memory.
+                                   // Clear contents of old or new
+                                   // memory.
   clear ();
 };
 
@@ -740,62 +747,61 @@ vector2d<T>::reinit (const vector2d<T2> &B)
 
 
 template <typename T>
+vector2d<T>::vector2d ()
+                :
+                val (0),
+                val_size (0),
+                num_rows (0),
+                num_cols (0)
+{
+  reinit (0,0);
+};
+
+
+
+template <typename T>
 vector2d<T>::vector2d (const unsigned int m,
-		       const unsigned int n)
-		:
-		val (0),
+                       const unsigned int n)
+                :
+                val (0),
                 val_size (0),
                 num_rows (0),
                 num_cols (0)
 {
   reinit (m,n);
-};
-
-
-
-template <typename T>
-vector2d<T>::vector2d (const unsigned int m)
-		:
-		val (0),
-                val_size (0),
-                num_rows (0),
-                num_cols (0)
-{
-  reinit (m,m);
-};
-
-
-
-template <typename T>
-vector2d<T>::vector2d (const unsigned int  m,
-		       const unsigned int  n,
-		       const T            *entries)
-		:
-		val (0),
-                val_size (0),
-		num_rows (0),
-		num_cols (0)
-{
-  reinit (m,n);
-
-  if (num_cols*num_rows != 0)
-    std::copy (entries, entries+num_rows*num_cols, val);
 };
 
 
 
 template <typename T>
 vector2d<T>::vector2d (const vector2d &m)
-		:
-		Subscriptor (),
-		val (0),
-		val_size (0),
-		num_rows (0),
-		num_cols (0)
+                :
+                Subscriptor (),
+                val (0),
+                val_size (0),
+                num_rows (0),
+                num_cols (0)
 {
   reinit (m.num_rows, m.num_cols);
   if (num_cols*num_rows != 0)
     std::copy (&m.val[0], &m.val[num_rows*num_cols], &val[0]);
+};
+
+
+template <typename T>
+vector2d<T>::vector2d (const unsigned int  m,
+                       const unsigned int  n,
+                       const T            *entries)
+                :
+                val (0),
+                val_size (0),
+                num_rows (0),
+                num_cols (0)
+{
+  reinit (m,n);
+
+  if (num_cols*num_rows != 0)
+    std::copy (entries, entries+num_rows*num_cols, val);
 };
 
 
@@ -807,7 +813,7 @@ vector2d<T>::operator = (const vector2d<T>& m)
   reinit (m);
   if (num_cols*num_rows != 0)
     std::copy (&m.val[0], &m.val[num_rows*num_cols],
-	       &val[0]);
+               &val[0]);
   
   return *this;
 }
@@ -822,7 +828,7 @@ vector2d<T>::operator = (const vector2d<T2>& m)
   reinit(m);
   if (num_cols*num_rows != 0)
     copy (&m.val[0], &m.val[num_rows*num_cols],
-	  &val[0]);
+          &val[0]);
 
   return *this;
 }
@@ -897,10 +903,10 @@ inline
 typename vector2d<T>::ConstRowAccessor 
 vector2d<T>::operator [] (const unsigned int row) const 
 {
-				   // Note: check for validity of row
-				   // number is done in the
-				   // constructor of the created
-				   // object
+                                   // Note: check for validity of row
+                                   // number is done in the
+                                   // constructor of the created
+                                   // object
   return ConstRowAccessor(*this, row);
 };
 
@@ -911,10 +917,10 @@ inline
 typename vector2d<T>::NonConstRowAccessor 
 vector2d<T>::operator [] (const unsigned int row)
 {
-				   // Note: check for validity of row
-				   // number is done in the
-				   // constructor of the created
-				   // object
+                                   // Note: check for validity of row
+                                   // number is done in the
+                                   // constructor of the created
+                                   // object
   return NonConstRowAccessor(*this, row);
 };
 
