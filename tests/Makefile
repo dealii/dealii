@@ -50,8 +50,9 @@ all-headers:
 		cd tmp-all-headers ; \
 		cp ../base/Makefile . ; \
 		for j in $$headers ; do \
-			echo "#include <$$j>" > tmp.cc ; \
+			echo ; echo ; \
 			echo "********** Checking for $$j ************" ; \
+			echo "#include <$$j>" > tmp.cc ; \
 			if $(MAKE) tmp.go ; then : ; else exit 1 ; fi ; \
 			rm -f tmp.* ; \
 		done ; \
