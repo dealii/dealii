@@ -26,6 +26,8 @@
 
 
 /**
+ * The use of this class is now deprecated!
+ *
  * Base class for user problems. This class stores the system matrix and right
  * hand side vectors as well as a solution vector. It initiates the assemblage
  * process of matrix and vectors and so on.
