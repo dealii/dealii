@@ -173,65 +173,67 @@ SolverPGMRES<Matrix,Vector>::solve (const Matrix& A,
 
   v.scale (1./rho);
 
-  unsigned int k;
-  for (k=0 ; k<kmax-1 && (reached==SolverControl::iterate) ; k++)
-  {
-    Vector& vv = *tmp_vectors[k+1];
-    
-    if (left_precondition)
-      {
-	A.vmult(p, *tmp_vectors[k]);
-	A.precondition(vv,p);
-      } else {
-	A.precondition(p,*tmp_vectors[k]);
-	A.vmult(vv,p);
-      };
+				   // inner iteration doing at most as
+				   // many steps as there are temporary
+				   // vectors. the number of steps actually
+				   // been done is propagated outside
+				   // through the #dim# variable
+  for (unsigned int inner_iteration=0;
+       inner_iteration<kmax-1 && (reached==SolverControl::iterate);
+       inner_iteration++)
+    {
+				       // yet another alias
+      Vector& vv = *tmp_vectors[inner_iteration+1];
+      
+      if (left_precondition)
+	{
+	  A.vmult(p, *tmp_vectors[inner_iteration]);
+	  A.precondition(vv,p);
+	} else {
+	  A.precondition(p,*tmp_vectors[inner_iteration]);
+	  A.vmult(vv,p);
+	};
+      
+      dim = inner_iteration+1;
 
-    dim = k+1;
+				       /* Orthogonalization */
+      for (unsigned int i=0 ; i<dim ; ++i)
+	{
+	  h(i) = vv * *tmp_vectors[i];
+	  vv.add(-h(i),*tmp_vectors[i]);
+	};
+      
+      double s = vv.l2_norm();
+      h(inner_iteration+1) = s;
+    
+				       /* Re-orthogonalization */
+      for (unsigned i=0; i<dim; ++i)
+	{
+	  double htmp = vv * *tmp_vectors[i];
+	  h(i) += htmp;
+	  vv.add(-htmp,*tmp_vectors[i]);
+	};
+    
+      s = vv.l2_norm();
+      h(inner_iteration+1) = s;
+    
+      vv.scale(1./s);
+    
+				       /*  Transformation into
+					   triagonal structure  */
+      givens_rotation(h,gamma,ci,si,inner_iteration);
 
-    /* Orthogonalization */
-    
-    for (unsigned int i=0 ; i<dim ; ++i)
-      {
-	h(i) = vv * *tmp_vectors[i];
-	vv.add(-h(i),*tmp_vectors[i]);
-      };
-    
-    double s = vv.l2_norm();
-    h(k+1) = s;
-    
-    /* Re-orthogonalization */
-    
-    for (unsigned i=0; i<dim; ++i)
-      {
-	double htmp = vv * *tmp_vectors[i];
-	h(i) += htmp;
-	vv.add(-htmp,*tmp_vectors[i]);
-      };
-    
-    s = vv.l2_norm();
-    h(k+1) = s;
-    
-    vv.scale(1./s);
-    
-    /*  Transformation into triagonal structure  */
-    
-    givens_rotation(h,gamma,ci,si,k);
+				       /*  append vector on matrix  */
+      for (unsigned int i=0; i<dim; ++i)
+	H(i,inner_iteration) = h(i);
 
-    /*  append vector on matrix  */
-
-    for (unsigned int i=0; i<dim; ++i)
-      H(i,k) = h(i);
-
-    /*  residual  */
-
-    rho = fabs(gamma(dim));
+				       /*  residual  */
+      rho = fabs(gamma(dim));
     
-    reached = control().check (k0+k, rho);
-  }
+      reached = control().check (k0+inner_iteration, rho);
+    };
   
-  /*  Calculate solution  */  
-
+				   /*  Calculate solution  */
   h.reinit(dim);
   FullMatrix<double> H1(dim+1,dim);
 
@@ -258,8 +260,6 @@ SolverPGMRES<Matrix,Vector>::solve (const Matrix& A,
   for (unsigned int tmp=0; tmp<n_tmp_vectors; ++tmp)
     memory.free (tmp_vectors[tmp]);
 
-// WB  
-//  return reached;
   if (reached)
     return success;
   else
