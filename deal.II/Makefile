@@ -173,7 +173,7 @@ clean-examples:
 	cd $D/examples ; $(MAKE) clean
 
 clean-lib:
-	cd $(LIBDIR) ; $(MAKE) clean
+	-rm $(LIBDIR/lib*
 
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
