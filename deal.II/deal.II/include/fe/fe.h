@@ -48,6 +48,7 @@ template <int dim> class MatrixCreator;
 template <int dim>
 class FiniteElement : public FiniteElementBase<dim>
 {
+  private:
 				     /**
 				      * Copy constructor prohibited.
 				      */
@@ -66,21 +67,6 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * are deleted properly.
 				      */
     virtual ~FiniteElement ();
-
-				     /**
-				      * Compute flags for initial
-				      * update only.
-				      * @see{FEValuesBase}
-				      */
-    virtual UpdateFlags update_once (UpdateFlags flags) const = 0;
-  
-				     /**
-				      * Compute flags for update on
-				      * each cell.
-				      * @see{FEValuesBase}
-				      */
-    virtual UpdateFlags update_each (UpdateFlags flags) const = 0;
-  
 
 				     /**
 				      * Return the support points of the
@@ -116,16 +102,73 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * will be zero. This is the standard behavior,
 				      * if the function is not overloaded.
 				      */
-    virtual void get_unit_face_support_points (std::vector<Point<dim-1> > &) const;    
+    virtual void get_unit_face_support_points (std::vector<Point<dim-1> > &points) const;    
     
-    friend class FEValues<dim>;
-    friend class FEFaceValues<dim>;
-    friend class FESubfaceValues<dim>;
-    friend class FESystem<dim>;
-    friend class MatrixCreator<dim>;
-    friend class VectorTools;
+				     /**
+				      * Number of base elements in a mixed
+				      * discretization. This function returns
+				      * 1 for primitive elements.
+				      */
+    virtual unsigned int n_base_elements () const;
     
+				     /**
+				      * Access to base element
+				      * objects.  By default,
+				      * #base_element(0)# is #this#.
+				      * This function is overloaded by
+				      * system elements to allow
+				      * access to the different
+				      * components of mixed
+				      * discretizations.
+				      */
+    virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
+    
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      *
+				      * This function is made virtual,
+				      * since finite element objects
+				      * are usually accessed through
+				      * pointers to their base class,
+				      * rather than the class itself.
+				      */
+    virtual unsigned int memory_consumption () const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcBoundaryFaceUsed);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcJacobiDeterminantHasWrongSign);
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcComputationNotUseful,
+		    int,
+		    << "The computation you required from this function is not "
+		    << "feasible or not probable in the present dimension ("
+		    << arg1 << ") because it would be prohibitively expensive.");
+
   protected:
+
+				     /**
+				      * Compute flags for initial
+				      * update only.
+				      * @see{FEValuesBase}
+				      */
+    virtual UpdateFlags update_once (UpdateFlags flags) const = 0;
+  
+				     /**
+				      * Compute flags for update on
+				      * each cell.
+				      * @see{FEValuesBase}
+				      */
+    virtual UpdateFlags update_each (UpdateFlags flags) const = 0;
+  
 				     /**
 				      * @p{clone} function instead of
 				      * a copy constructor.
@@ -228,58 +271,14 @@ class FiniteElement : public FiniteElementBase<dim>
 			    typename Mapping<dim>::InternalDataBase      &fe_internal,
 			    FEValuesData<dim> &data) const = 0;
 
-
-  public:
-
 				     /**
-				      * Number of base elements in a mixed
-				      * discretization. This function returns
-				      * 1 for simple elements.
+				      * Declare some other classes as
+				      * friends of this class.
 				      */
-    virtual unsigned int n_base_elements () const;
-    
-				     /**
-				      * Access to base element
-				      * objects.  By default,
-				      * #base_element(0)# is #this#.
-				      * This function is overloaded by
-				      * system elements to allow
-				      * access to the different
-				      * components of mixed
-				      * discretizations.
-				      */
-    virtual const FiniteElement<dim>& base_element (const unsigned int index) const;
-    
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      *
-				      * This function is made virtual,
-				      * since finite element objects
-				      * are usually accessed through
-				      * pointers to their base class,
-				      * rather than the class itself.
-				      */
-    virtual unsigned int memory_consumption () const;
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcBoundaryFaceUsed);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcJacobiDeterminantHasWrongSign);
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcComputationNotUseful,
-		    int,
-		    << "The computation you required from this function is not "
-		    << "feasible or not probable in the present dimension ("
-		    << arg1 << ") because it would be prohibitively expensive.");
-
+    friend class FEValues<dim>;
+    friend class FEFaceValues<dim>;
+    friend class FESubfaceValues<dim>;
+    friend class FESystem<dim>;
 };
 
 

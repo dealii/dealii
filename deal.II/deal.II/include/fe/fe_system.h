@@ -466,10 +466,11 @@ class FESystem : public FiniteElement<dim>
 	~InternalData();
 
 					 /**
-					  * Flag for computation of
-					  * second derivatives.
+					  * Flag indicating whether
+					  * second derivatives shall
+					  * be computed.
 					  */
-	bool second_flag;
+	bool compute_second_derivatives;
 	
 					 /**
 					  * Gives write-access to the

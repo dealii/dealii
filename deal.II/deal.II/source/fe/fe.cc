@@ -34,35 +34,51 @@ using namespace std;
 template <int dim>
 void
 FiniteElementBase<dim>::
-InternalDataBase::initialize (const FiniteElement<dim>* element,
-			      const Mapping<dim>& mapping,
-			      const Quadrature<dim>& quadrature)
+InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
+				  const Mapping<dim>       &mapping,
+				  const Quadrature<dim>    &quadrature)
 {
-				   // We compute difference
-				   // quotients of gradients
-  UpdateFlags diff_flags = update_gradients;
-  
-				   // We will need shifted
-				   // quadrature formulae
+				   // if we shall compute second
+				   // derivatives, then we do so by
+				   // finite differencing the
+				   // gradients. that we do by
+				   // evaluating the gradients of
+				   // shape values at points shifted
+				   // star-like a little in each
+				   // coordinate direction around each
+				   // quadrature point.
+				   //
+				   // therefore generate 2*dim (the
+				   // number of evaluation points)
+				   // FEValues objects with slightly
+				   // shifted positions
   std::vector<Point<dim> > diff_points (quadrature.n_quadrature_points);
-  std::vector<double> diff_weights (quadrature.n_quadrature_points, 0);
+  std::vector<double>      diff_weights (quadrature.n_quadrature_points, 0);
   
-				   // The star has 2dim points
   differences.resize(2*dim);
-  for (unsigned int d=0;d<dim;++d)
+  for (unsigned int d=0; d<dim; ++d)
     {
       Point<dim> shift;
+//TODO: unify the places where the finite differencing step length is used      
       shift (d) = 1.e-6;
-      for (unsigned int i=0;i<diff_points.size();++i)
+
+				       // generate points and FEValues
+				       // objects shifted in
+				       // plus-direction. note that
+				       // they only need to compute
+				       // gradients, not more
+      for (unsigned int i=0; i<diff_points.size(); ++i)
 	diff_points[i] = quadrature.point(i) + shift;
-      Quadrature<dim> plus_quad (diff_points, diff_weights);
-      differences[d] =
-	new FEValues<dim> (mapping, *element, plus_quad, diff_flags);
-      for (unsigned int i=0;i<diff_points.size();++i)
+      const Quadrature<dim> plus_quad (diff_points, diff_weights);
+      differences[d] = new FEValues<dim> (mapping, *element,
+					  plus_quad, update_gradients);
+
+				       // now same in minus-direction
+      for (unsigned int i=0; i<diff_points.size(); ++i)
 	diff_points[i] = quadrature.point(i) - shift;
-      Quadrature<dim> minus_quad (diff_points, diff_weights);
-      differences[d+dim] =
-	new FEValues<dim> (mapping, *element, minus_quad, diff_flags);	  
+      const Quadrature<dim> minus_quad (diff_points, diff_weights);
+      differences[d+dim] = new FEValues<dim> (mapping, *element,
+					      minus_quad, update_gradients); 
     }
 }
 
@@ -72,9 +88,15 @@ InternalDataBase::initialize (const FiniteElement<dim>* element,
 template <int dim>
 FiniteElementBase<dim>::InternalDataBase::~InternalDataBase ()
 {
-  for (unsigned int i=0;i<differences.size ();++i)
+  for (unsigned int i=0; i<differences.size (); ++i)
     if (differences[i] != 0)
-      delete differences[i];
+      {
+					 // delete pointer and set it
+					 // to zero to avoid
+					 // inadvertant use
+	delete differences[i];
+	differences[i] = 0;
+      };
 }
 
 
@@ -82,14 +104,15 @@ FiniteElementBase<dim>::InternalDataBase::~InternalDataBase ()
 
 template <int dim>
 FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data,
-					   const std::vector<bool> &restriction_is_additive_flags) :
-  FiniteElementData<dim> (fe_data),
-  system_to_component_table(dofs_per_cell),
-  face_system_to_component_table(dofs_per_face),
-  component_to_system_table(components, std::vector<unsigned>(dofs_per_cell)),
-			      face_component_to_system_table(components, std::vector<unsigned>(dofs_per_face)),
-							       component_to_base_table(components),
-							       restriction_is_additive_flags(restriction_is_additive_flags)
+					   const std::vector<bool> &restriction_is_additive_flags)
+		:
+		FiniteElementData<dim> (fe_data),
+                system_to_component_table(dofs_per_cell),
+                face_system_to_component_table(dofs_per_face),
+                component_to_system_table(components, std::vector<unsigned>(dofs_per_cell)),
+		face_component_to_system_table(components, std::vector<unsigned>(dofs_per_face)),
+		component_to_base_table(components),
+		restriction_is_additive_flags(restriction_is_additive_flags)
 {
   Assert(restriction_is_additive_flags.size()==fe_data.components,
 	 ExcDimensionMismatch(restriction_is_additive_flags.size(),fe_data.components));
@@ -100,13 +123,16 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
       prolongation[i].reinit (dofs_per_cell, dofs_per_cell);
     };
 
+				   // first set sizes of some
+				   // matrices. they will be filled by
+				   // derived classes, or re-set to
+				   // zero size of not defined
   switch (dim)
     {
       case 1:
 	    Assert ((interface_constraints.m() == 0) &&
 		    (interface_constraints.n() == 0),
 		    ExcInternalError());
-	    
 	    break;
 	    
       case 2:
@@ -142,6 +168,7 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 };
 
 
+
 template <int dim>
 const FullMatrix<double> &
 FiniteElementBase<dim>::restrict (const unsigned int child) const
@@ -153,6 +180,7 @@ FiniteElementBase<dim>::restrict (const unsigned int child) const
 };
 
 
+
 template <int dim>
 const FullMatrix<double> &
 FiniteElementBase<dim>::prolongate (const unsigned int child) const
@@ -162,6 +190,7 @@ FiniteElementBase<dim>::prolongate (const unsigned int child) const
   Assert (prolongation[child].n() != 0, ExcEmbeddingVoid());
   return prolongation[child];
 };
+
 
 
 template <int dim>
@@ -178,6 +207,7 @@ FiniteElementBase<dim>::constraints () const
   
   return interface_constraints;
 };
+
 
 
 template <int dim>
@@ -211,52 +241,76 @@ FiniteElementBase<dim>::memory_consumption () const
 };
 
 
+
 template <int dim>
 void
 FiniteElementBase<dim>::
-compute_2nd (const Mapping<dim> &mapping,
+compute_2nd (const Mapping<dim>                   &mapping,
 	     const DoFHandler<dim>::cell_iterator &cell,
-	     const unsigned int offset,
-	     Mapping<dim>::InternalDataBase &mapping_internal,
-	     InternalDataBase& fe_internal,
-	     FEValuesData<dim>& data) const
+	     const unsigned int                    offset,
+	     Mapping<dim>::InternalDataBase       &mapping_internal,
+	     InternalDataBase                     &fe_internal,
+	     FEValuesData<dim>                    &data) const
 {
 				   // Number of quadrature points
-  const unsigned int n = data.shape_2nd_derivatives[0].size();
-  
-  for (unsigned int d=0;d<dim;++d)
+  const unsigned int n_q_points = data.shape_2nd_derivatives[0].size();
+
+				   // first reinit the fe_values
+				   // objects used for the finite
+				   // differencing stuff
+  for (unsigned int d=0; d<dim; ++d)
     {
       fe_internal.differences[d]->reinit(cell);
       fe_internal.differences[d+dim]->reinit(cell);
     }
 
-  std::vector<std::vector<Tensor<1,dim> > > diff_quot (dim, std::vector<Tensor<1,dim> >(n));
-  std::vector<Tensor<1,dim> > diff_quot2 (n);
-				   // Loop over shape functions
+				   // collection of difference
+				   // quotients of gradients in each
+				   // direction (first index) and at
+				   // all q-points (second index)
+  std::vector<std::vector<Tensor<1,dim> > > diff_quot (dim, std::vector<Tensor<1,dim> >(n_q_points));
+  std::vector<Tensor<1,dim> >               diff_quot2 (n_q_points);
+
+				   // for all shape functions at all
+				   // quadrature points and difference
+				   // quotients in all directions:
   for (unsigned int shape=0; shape<dofs_per_cell; ++shape)
     {
-      
-				       // Fill difference quotients
-      for (unsigned int d1=0;d1<dim;++d1)
-					 // Loop over quadrature points
-	for (unsigned int k=0;k<n;++k)
+      for (unsigned int d1=0; d1<dim; ++d1)
+	for (unsigned int q=0; q<n_q_points; ++q)
 	  {
+					     // get gradient at points
+					     // shifted slightly to
+					     // the right and to the
+					     // left in the present
+					     // coordinate direction
 	    const Tensor<1,dim>& right
-	      = fe_internal.differences[d1]->shape_grad(shape, k);
+	      = fe_internal.differences[d1]->shape_grad(shape, q);
 	    const Tensor<1,dim>& left
-	      = fe_internal.differences[d1+dim]->shape_grad(shape, k);
-	    for (unsigned int d=0;d<dim;++d)
-	      diff_quot[d][k][d1] = (.5/1.e-6) * (right[d]-left[d]);
+	      = fe_internal.differences[d1+dim]->shape_grad(shape, q);
+
+//TODO: unify the places where the finite differencing step length is used      
+					     // compute the second
+					     // derivative from a
+					     // symmetric difference
+					     // approximation
+	    for (unsigned int d=0; d<dim; ++d)
+	      diff_quot[d][q][d1] = 1./(2*1.e-6) * (right[d]-left[d]);
 	  }
-      
-      for (unsigned int d=0;d<dim;++d)
+
+				       // up to now we still have
+				       // difference quotients on the
+				       // unit cell, so transform it
+				       // to something on the real
+				       // cell
+      for (unsigned int d=0; d<dim; ++d)
 	{
 	  mapping.transform_covariant (diff_quot2, diff_quot[d],
 				       mapping_internal, offset);
 
-	  for (unsigned int k=0;k<n;++k)
-	    for (unsigned int d1=0;d1<dim;++d1)
-	      data.shape_2nd_derivatives[shape][k][d][d1] = diff_quot2[k][d1];
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    for (unsigned int d1=0; d1<dim; ++d1)
+	      data.shape_2nd_derivatives[shape][q][d][d1] = diff_quot2[q][d1];
 	}
     }
 }
@@ -283,14 +337,17 @@ template <int dim>
 void
 FiniteElement<dim>::get_unit_support_points (std::vector<Point<dim> > &points) const
 {
+				   // default implementation
   points.resize(0);
 }
+
 
     
 template <int dim>
 void
 FiniteElement<dim>::get_unit_face_support_points (std::vector<Point<dim-1> > &points) const
 {
+				   // default implementation
   points.resize(0);
 }
 
@@ -298,8 +355,8 @@ FiniteElement<dim>::get_unit_face_support_points (std::vector<Point<dim-1> > &po
 
 template <int dim>
 Mapping<dim>::InternalDataBase*
-FiniteElement<dim>::get_face_data (const UpdateFlags flags,
-				   const Mapping<dim>& mapping,
+FiniteElement<dim>::get_face_data (const UpdateFlags       flags,
+				   const Mapping<dim>      &mapping,
 				   const Quadrature<dim-1> &quadrature) const
 {
   QProjector<dim> q(quadrature, false);
@@ -307,24 +364,29 @@ FiniteElement<dim>::get_face_data (const UpdateFlags flags,
 }
 
 
+
 template <int dim>
 Mapping<dim>::InternalDataBase*
-FiniteElement<dim>::get_subface_data (const UpdateFlags flags,
-				      const Mapping<dim>& mapping,
+FiniteElement<dim>::get_subface_data (const UpdateFlags        flags,
+				      const Mapping<dim>      &mapping,
 				      const Quadrature<dim-1> &quadrature) const
 {
   QProjector<dim> q(quadrature, true);
   return get_data (flags, mapping, q);
-  
 }
+
 
 
 template <int dim>
 unsigned int
 FiniteElement<dim>::n_base_elements() const
 {
+				   // default implementation
   return 1;
 }
+
+
+
 
 template <int dim>
 unsigned int

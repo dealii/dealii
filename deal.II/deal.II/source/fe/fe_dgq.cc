@@ -394,10 +394,12 @@ FE_DGQ<dim>::get_data (const UpdateFlags update_flags,
 				   std::vector<Tensor<1,dim> >(quadrature.n_quadrature_points));
     }
 
+				   // if second derivatives through
+				   // finite differencing is required,
+				   // then initialize some objects for
+				   // that
   if (flags & update_second_derivatives)
-    {
-      data->initialize (this, mapping, quadrature);
-    }
+    data->initialize_2nd (this, mapping, quadrature);
   
   
   if (flags & (update_values | update_gradients))

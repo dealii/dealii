@@ -156,20 +156,24 @@ FESystem<dim>::update_each (UpdateFlags flags) const
 
 template <int dim>
 Mapping<dim>::InternalDataBase*
-FESystem<dim>::get_data (UpdateFlags flags,
-			 const Mapping<dim>& mapping,
-			 const Quadrature<dim>& quadrature) const
+FESystem<dim>::get_data ( UpdateFlags           flags,
+			 const Mapping<dim>    &mapping,
+			 const Quadrature<dim> &quadrature) const
 {
   InternalData* data = new InternalData(n_base_elements());
 
-  data->second_flag = flags & update_second_derivatives;
-
-				   // Make sure that this object
-				   // computes 2nd derivatives itself
-  if (data->second_flag)
+				   // if second derivatives through
+				   // finite differencing is required,
+				   // then initialize some objects for
+				   // that
+  data->compute_second_derivatives = flags & update_second_derivatives;
+  if (data->compute_second_derivatives)
     {
+				       // delete
+				       // update_second_derivatives
+				       // from flags list
       flags = UpdateFlags (flags ^ update_second_derivatives);
-      data->initialize (this, mapping, quadrature);
+      data->initialize_2nd (this, mapping, quadrature);
     }
   
   
@@ -177,13 +181,17 @@ FESystem<dim>::get_data (UpdateFlags flags,
     {
       typename Mapping<dim>::InternalDataBase *base_fe_data_base =
 	base_element(base_no).get_data(flags, mapping, quadrature);
+
       FiniteElementBase<dim>::InternalDataBase *base_fe_data =
 	dynamic_cast<typename FiniteElementBase<dim>::InternalDataBase *>
 	(base_fe_data_base);
       
       data->set_fe_data(base_no, base_fe_data);
-      data->update_once|=base_fe_data->update_once;
-      data->update_each|=base_fe_data->update_each;
+
+				       // collect requirements of base
+				       // elements
+      data->update_once |= base_fe_data->update_once;
+      data->update_each |= base_fe_data->update_each;
       
 				       // The FEValuesData @p{data}
 				       // given to the
@@ -210,7 +218,7 @@ FESystem<dim>::get_data (UpdateFlags flags,
 				       // @p{data}, similar to the
 				       // storing of the
 				       // @p{base_fe_data}s.
-      FEValuesData<dim> *base_data=new FEValuesData<dim>();
+      FEValuesData<dim> *base_data = new FEValuesData<dim>();
       data->set_fe_values_data(base_no, base_data);
     }
   data->update_flags=data->update_once | data->update_each;
@@ -451,7 +459,7 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 	    }
 	}
     }
-  if (fe_data.second_flag)
+  if (fe_data.compute_second_derivatives)
     {
       unsigned int offset = 0;
       if (face_no != static_cast<unsigned int> (-1))
@@ -1116,14 +1124,22 @@ FESystem<dim>::InternalData::InternalData(const unsigned int n_base_elements):
 template <int dim>
 FESystem<dim>::InternalData::~InternalData()
 {
+				   // delete pointers and set them to
+				   // zero to avoid inadvertant use
   for (unsigned int i=0; i<base_fe_datas.size(); ++i)
     if (base_fe_datas[i])
-      delete base_fe_datas[i];
+      {
+	delete base_fe_datas[i];
+	base_fe_datas[i] = 0;
+      };
   
   for (unsigned int i=0; i<base_fe_values_datas.size(); ++i)
     if (base_fe_values_datas[i])
-      delete base_fe_values_datas[i];
-}
+      {
+	delete base_fe_values_datas[i];
+	base_fe_values_datas[i] = 0;
+      };
+};
 
 
 

@@ -335,12 +335,14 @@ class FiniteElementBase : public Subscriptor,
     {
       public:
 				       /**
-					* Initialize @ref{FEValues}
-					* pointers for given element.
+					* Initialize some pointers
+					* used in the computation of
+					* second derivatives by finite
+					* differencing of gradients.
 					*/
-      void initialize (const FiniteElement<dim>* element,
-		       const Mapping<dim>& mapping,
-		       const Quadrature<dim>& quadrature);
+      void initialize_2nd (const FiniteElement<dim> *element,
+			   const Mapping<dim>       &mapping,
+			   const Quadrature<dim>    &quadrature);
       
       				       /**
 					* Destructor. Needed to avoid
@@ -377,14 +379,16 @@ class FiniteElementBase : public Subscriptor,
 		       const std::vector<bool> &restriction_is_additive_flags);
     
                                      /**
-				      * Compute second differences.
+				      * Compute second derivatives by
+				      * finite differences of
+				      * gradients.
 				      */
-    void compute_2nd (const Mapping<dim> &mapping,
-		      const DoFHandler<dim>::cell_iterator &cell,
-		      const unsigned int offset,
+    void compute_2nd (const Mapping<dim>                      &mapping,
+		      const DoFHandler<dim>::cell_iterator    &cell,
+		      const unsigned int                       offset,
 		      typename Mapping<dim>::InternalDataBase &mapping_internal,
-		      InternalDataBase& fe_internal,
-		      FEValuesData<dim>& data) const;
+		      InternalDataBase                        &fe_internal,
+		      FEValuesData<dim>                       &data) const;
 
 				     /**
 				      * Projection from a fine grid

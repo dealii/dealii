@@ -989,8 +989,12 @@ FE_Q<dim>::get_data (const UpdateFlags      update_flags,
 				   std::vector<Tensor<1,dim> >(n_q_points));
     }
 
+				   // if second derivatives through
+				   // finite differencing is required,
+				   // then initialize some objects for
+				   // that
   if (flags & update_second_derivatives)
-    data->initialize (this, mapping, quadrature);
+    data->initialize_2nd (this, mapping, quadrature);
   
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
