@@ -435,9 +435,9 @@ template <typename number>
 template <typename number2>
 void FullMatrix<number>::backward (Vector<number2>& dst, const Vector<number2>& src) const
 {
-  Assert(n() == m(), ExcNotQuadratic());
+  Assert(n() <= m(), ExcNotQuadratic());
   Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  Assert(src.size() == m(), ExcDimensionMismatch(src.size(), n()));
 
   unsigned int j;
   unsigned int nu = (m()<n() ? m() : n());
@@ -1400,7 +1400,7 @@ FullMatrix<number>::householder(Vector<number2>& src)
 {
   // m > n, src.n() = m
   Assert (dim_range <= dim_image, ExcDimensionMismatch(dim_range, dim_image));
-  Assert (src.size() == dim_range, ExcDimensionMismatch(src.size(), dim_range));
+  Assert (src.size() == dim_image, ExcDimensionMismatch(src.size(), dim_image));
 
   for (unsigned int j=0 ; j<n() ; ++j)
   {
