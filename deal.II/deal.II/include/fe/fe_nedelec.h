@@ -14,12 +14,9 @@
 #define __deal2__fe_nedelec_h
 
 #include <base/config.h>
-#include <base/polynomial.h>
-#include <base/tensor_product_polynomials.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
 
-template <int dim> class TensorProductPolynomials;
 template <int dim> class MappingQ;
 
 
@@ -579,7 +576,64 @@ class FE_Nedelec : public FiniteElement<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> void FE_Nedelec<1>::initialize_unit_face_support_points ();
+template <>
+void FE_Nedelec<1>::initialize_unit_face_support_points ();
+
+template <>
+double
+FE_Nedelec<1>::shape_value_component (const unsigned int ,
+                                      const Point<1>    &,
+                                      const unsigned int ) const;
+
+template <>
+double
+FE_Nedelec<2>::shape_value_component (const unsigned int ,
+                                      const Point<2>    &,
+                                      const unsigned int ) const;
+
+template <>
+double
+FE_Nedelec<3>::shape_value_component (const unsigned int ,
+                                      const Point<3>    &,
+                                      const unsigned int ) const;
+
+template <>
+Tensor<1,1>
+FE_Nedelec<1>::shape_grad_component (const unsigned int ,
+                                     const Point<1>    &,
+                                     const unsigned int ) const;
+
+template <>
+Tensor<1,2>
+FE_Nedelec<2>::shape_grad_component (const unsigned int ,
+                                     const Point<2>    &,
+                                     const unsigned int ) const;
+
+template <>
+Tensor<1,3>
+FE_Nedelec<3>::shape_grad_component (const unsigned int ,
+                                     const Point<3>    &,
+                                     const unsigned int ) const;
+
+template <>
+Tensor<2,1>
+FE_Nedelec<1>::shape_grad_grad_component (const unsigned int ,
+                                          const Point<1>    &,
+                                          const unsigned int ) const;
+
+template <>
+Tensor<2,2>
+FE_Nedelec<2>::shape_grad_grad_component (const unsigned int ,
+                                          const Point<2>    &,
+                                          const unsigned int ) const;
+
+template <>
+Tensor<2,3>
+FE_Nedelec<3>::shape_grad_grad_component (const unsigned int ,
+                                          const Point<3>    &,
+                                          const unsigned int ) const;
+
+
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
