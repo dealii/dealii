@@ -152,7 +152,9 @@
  * your program: you can still acquire and release the lock as before,
  * it will only have no effect now, since different objects of this
  * class no longer share the lock, i.e. you will get it always without
- * waiting.
+ * waiting. On the other hand, it will prevent that you call functions
+ * of this object multiply in parallel at the same time, which is what
+ * you probably wanted.
  * 
  * @author Wolfgang Bangerth, 2000, 2001, 2002
  */
@@ -327,7 +329,15 @@ class SparseDirectMA27 : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcDifferentSparsityPatterns);
-
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcReadError,
+                    int, int,
+                    << "Error while reading in detached mode. Return value "
+                    << "for 'read' was " << arg1
+                    << ", errno has value " << arg2);
+    
   private:
                                      /**
                                       * Declare a local type which
