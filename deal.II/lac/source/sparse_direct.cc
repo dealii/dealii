@@ -775,9 +775,9 @@ void SparseDirectMA27::call_ma27ad (const unsigned int *N,
                                        // all other fields are kept at
                                        // the client. array should not
                                        // be in used on this side
-      Assert (IW == 0, ExcInternalError());
+      Assert (*LIW == 0, ExcInternalError());
       Assert (IKEEP == 0, ExcInternalError());
-      Assert (IW == 0, ExcInternalError());
+      Assert (IW1 == 0, ExcInternalError());
       
                                        // next get back what we need
                                        // to know
