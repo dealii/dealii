@@ -22,14 +22,14 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 				 const unsigned int          n_threads)
 		:
 		matrix (&M),
-		selected (selected),
 		conserve_mem (conserve_mem),
+		selected (selected),
 		n_threads (n_threads),
 		inverses (M.m(), 0)
 {
-  Assert (M.m() == M.n(),
-	  ExcMatrixNotSquare ());
-
+  Assert (M.m() == M.n(), ExcMatrixNotSquare ());
+  Assert (M.m() == selected.size(), ExcInvalidVectorSize(M.m(), selected.size()));
+  
   if (conserve_mem == false)
     compute_inverses ();
 }
@@ -222,6 +222,7 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 
 
 
+
 template<typename number>
 template<typename number2>
 void
@@ -230,7 +231,11 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 					   const unsigned int     begin,
 					   const unsigned int     end) const
 {
-  Assert (begin < end, ExcInternalError());
+  Assert (begin < end, ExcInvalidRange(begin, end));
+  Assert (dst.size() == src.size(),
+	  ExcInvalidVectorSize(dst.size(), src.size()));
+  Assert (dst.size() == matrix->m(),
+	  ExcInvalidVectorSize(dst.size(), src.size()));
   
 				   // first define an alias to the sparsity
 				   // pattern of the matrix, since this
@@ -244,8 +249,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 				   // blocks. this variable is used to
 				   // optimize access to vectors a
 				   // little bit.
-  const bool range_is_restricted = (begin != 0) && (end != matrix->m());
-  
+  const bool range_is_restricted = ((begin != 0) || (end != matrix->m()));
   
 				   // space to be used for local
 				   // systems. allocate as much memory
@@ -262,7 +266,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 
 				   // traverse all rows of the matrix
 				   // which are selected
-  for (unsigned int row=0; row< matrix->m() ; ++row)
+  for (unsigned int row=begin; row<end; ++row)
     if (selected[row] == true)
       {
 	const unsigned int row_length = structure.row_length(row);
@@ -280,7 +284,6 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 	
 	b.reinit (row_length);
 	x.reinit (row_length);
-	
 					 // mapping between:
 					 // 1 column number of all
 					 //   entries in this row, and
@@ -315,11 +318,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 	    const unsigned int irow_length = structure.row_length(irow);
 	    
 					     // copy rhs
-	    if (!range_is_restricted ||
-		((begin <= irow) && (irow < end)))
-	      b(i) = src(irow);
-	    else
-	      b(i) = 0;
+	    b(i) = src(irow);
 	    
 					     // for all the DoFs that irow
 					     // couples with
@@ -383,3 +382,108 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
       };
 };
 
+
+
+
+template <typename number>
+SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
+					    const vector<bool>         &selected,
+					    const bool                  conserve_memory,
+					    const unsigned int          n_threads,
+					    const unsigned int          n_blocks)
+		:
+		SparseVanka<number> (M, selected, conserve_memory, n_threads),
+                n_blocks (n_blocks)
+{
+  Assert (n_blocks > 0, ExcInternalError());
+
+				   // precompute the splitting points
+  intervals.resize (n_blocks);
+  
+  const unsigned int n_inverses = count (selected.begin(),
+					 selected.end(),
+					 true);
+  
+  const unsigned int n_inverses_per_block = max(n_inverses / n_blocks,
+						1U);
+  
+				   // set up start and end index for
+				   // each of the blocks. note that
+				   // we have to work somewhat to get
+				   // this appropriate, since the
+				   // indices for which inverses have
+				   // to be computed may not be evenly
+				   // distributed in the vector. as an
+				   // extreme example consider
+				   // numbering of DoFs by component,
+				   // then all indices for which we
+				   // have to do work will be
+				   // consecutive, with other
+				   // consecutive regions where we do
+				   // not have to do something
+  unsigned int c       = 0;
+  unsigned int block   = 0;
+  intervals[0].first   = 0;
+  
+  for (unsigned int i=0; (i<M.m()) && (block+1<n_blocks); ++i)
+    {
+      if (selected[i] == true)
+	++c;
+      if (c == n_inverses_per_block)
+	{
+	  intervals[block].second  = i;
+	  intervals[block+1].first = i;
+	  ++block;
+	  
+	  c = 0;
+	};
+    };
+  intervals[n_blocks-1].second = M.m();
+};
+
+
+
+
+template <typename number>
+template <typename number2>
+void SparseBlockVanka<number>::operator() (Vector<number2>       &dst,
+					   const Vector<number2> &src) const
+{
+  dst.clear ();
+
+				   // if no blocking is required, pass
+				   // down to the underlying class
+  if (n_blocks == 1)
+    apply_preconditioner (dst, src, 0, dst.size());
+  else
+				     // otherwise: blocking requested
+    {
+#ifdef DEAL_II_USE_MT
+      typedef ThreadManager::Mem_Fun_Data4
+	<const SparseVanka<number>, Vector<number2>&,
+	const Vector<number2> &, unsigned int, unsigned int> MemFunData;
+      vector<MemFunData> mem_fun_data
+	(n_blocks,
+	 MemFunData (this,
+		     dst, src, 0, 0,
+		     &SparseVanka<number>::template apply_preconditioner<number2>));
+
+      ThreadManager thread_manager;
+      for (unsigned int block=0; block<n_blocks; ++block)
+	{
+	  mem_fun_data[block].arg3 = intervals[block].first;
+	  mem_fun_data[block].arg4 = intervals[block].second;
+
+	  thread_manager.spawn (&mem_fun_data[block],
+				THR_SCOPE_SYSTEM | THR_DETACHED);
+	};
+
+      thread_manager.wait ();
+#else
+      for (unsigned int block=0; block<n_blocks; ++block)
+	apply_preconditioner (dst, src,
+			      intervals[block].first,
+			      intervals[block].second);
+#endif
+    };
+};

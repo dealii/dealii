@@ -99,7 +99,7 @@
  * whether this might pose some problems in the inversion of the local matrices.
  * Maybe someone would like to check this.
  *
- * @author Guido Kanschat, documentation and extensions by Wolfgang Bangerth; 1999, 2000
+ * @author Guido Kanschat, Wolfgang Bangerth; 1999, 2000
  */
 template<typename number>
 class SparseVanka
@@ -182,6 +182,62 @@ class SparseVanka
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotSquare);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidRange,
+		    unsigned int, unsigned int,
+		    << "The bounds [" << arg1 << ',' << arg2
+		    << ") do not form a valid range.");
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidVectorSize,
+		    unsigned int, unsigned int,
+		    << "The dimensions of vectors and matrices, "
+		    << arg1 << " and " << arg2 << " do not match.");
+
+  protected:
+				     /**
+				      * Apply the inverses in the
+				      * range #[begin,end)# to the
+				      * #src# vector and move the
+				      * result into #dst#. Actually,
+				      * only values of #src# from
+				      * within the range are taken
+				      * (all others are set to zero),
+				      * and only values inside the
+				      * range are written to #dst#, so
+				      * the application of this
+				      * function only does what is
+				      * announced in the general
+				      * documentation if the given
+				      * range is the whole interval.
+				      *
+				      * The reason for providing the
+				      * interval anyway is that in
+				      * derived classes we may want to
+				      * apply the preconditioner to
+				      * blocks of the matrix only, in
+				      * order to parallelize the
+				      * application. Then, it is
+				      * important to only write to
+				      * some slices of #dst# and only
+				      * takes values from similar
+				      * slices of #src#, in order to
+				      * eliminate the dependencies of
+				      * threads of each other.
+				      *
+				      * The #operator()# of this class
+				      * of course calls this function
+				      * with the whole interval
+				      * #[begin,end)=[0,matrix.m())#.
+				      */
+    template<typename number2>
+    void apply_preconditioner (Vector<number2>       &dst,
+			       const Vector<number2> &src,
+			       const unsigned int     begin,
+			       const unsigned int     end) const;    
     
   private:
 				     /**
@@ -190,15 +246,15 @@ class SparseVanka
     SmartPointer<const SparseMatrix<number> > matrix;
     
 				     /**
-				      * Indices of Lagrange
-				      * multipliers.
-				      */
-    const vector<bool> &selected;
-    
-				     /**
 				      * Conserve memory flag.
 				      */
     const bool conserve_mem;
+
+				     /**
+				      * Indices of those degrees of
+				      * freedom that we shall work on.
+				      */
+    const vector<bool> &selected;
 
 				     /**
 				      * Number of threads to be used
@@ -253,49 +309,116 @@ class SparseVanka
     void compute_inverse (const unsigned int               row,
 			  map<unsigned int, unsigned int> &local_index);
 
-				     /**
-				      * Apply the inverses in the
-				      * range #[begin,end)# to the
-				      * #src# vector and move the
-				      * result into #dst#. Actually,
-				      * only values of #src# from
-				      * within the range are taken
-				      * (all others are set to zero),
-				      * and only values inside the
-				      * range are written to #dst#, so
-				      * the application of this
-				      * function only does what is
-				      * announced in the general
-				      * documentation if the given
-				      * range is the whole interval.
-				      *
-				      * The reason for providing the
-				      * interval anyway is that in
-				      * derived classes we may want to
-				      * apply the preconditioner to
-				      * blocks of the matrix only, in
-				      * order to parallelize the
-				      * application. Then, it is
-				      * important to only write to
-				      * some slices of #dst# and only
-				      * takes values from similar
-				      * slices of #src#, in order to
-				      * eliminate the dependencies of
-				      * threads of each other.
-				      *
-				      * The #operator()# of this class
-				      * of course calls this function
-				      * with the whole interval
-				      * #[begin,end)=[0,matrix.m())#.
-				      */
-    template<typename number2>
-    void apply_preconditioner (Vector<number2>       &dst,
-			       const Vector<number2> &src,
-			       const unsigned int     begin,
-			       const unsigned int     end) const;
 };
 
 
+
+/**
+ * Block version of the sparse Vanka preconditioner. This class
+ * divides the matrix into blocks and works on the diagonal blocks
+ * only, which of course reduces the efficiency as preconditioner, but
+ * is perfectly parallelizable. The constructor takes a parameter into
+ * how many diagonal blocks the matrix shall be subdivided and then
+ * lets the underlying class do the work.
+ *
+ * Division of the matrix is done in a way such that the blocks are
+ * not necessarily of equal size, but such that the number of selected
+ * degrees of freedom for which a local system is to be solved is
+ * equal between blocks. The reason for this strategy to subdivision
+ * is load-balancing for multithreading, but it is necessary to note
+ * that this almost renders the capability as precondition useless if
+ * the degrees of freedom are numbered by component, i.e. all Lagrange
+ * multipliers en bloc.
+ *
+ * This class is probably useless if you don't have a multiprocessor
+ * system, since then the amount of work per preconditioning step is
+ * the same as for the #SparseVanka# class, but preconditioning
+ * properties are worse. On the other hand, if you have a
+ * multiprocessor system, the worse preconditioning quality (leading
+ * to more iterations of the linear solver) usually is well balanced
+ * by the increased speed of application due to the parallelization,
+ * leading to an overall decrease in elapsed wall-time for solving
+ * your linear system. It should be noted that the quality as
+ * preconditioner reduces with growing number of blocks, so there may
+ * be an optimal value (in terms of wall-time per linear solve) for
+ * the number of blocks.
+ *
+ * To facilitate writing portable code, if the number of blocks into
+ * which the matrix is to be subdivided, is set to one, then this
+ * class acts just like the #SparseVanka# class. You may therefore
+ * want to set the number of blocks equal to the number of processors
+ * you have.
+ *
+ * Note that the parallelization is done if #deal.II# was configured
+ * for multithread use and that the number of threads which is spawned
+ * equals the number of blocks. This is reasonable since you will not
+ * want to set the number of blocks unnecessarily large, since, as
+ * mentioned, this reduces the preconditioning properties.
+ *
+ *
+ * \subsection{Typical results}
+ *
+ * As a prototypical test case, we use a nonlinear problem from
+ * optimization, which leads to a series of saddle point problems,
+ * each of which is solved using GMRES with Vanka as
+ * preconditioner. The equation had approx. 850 degrees of
+ * freedom. With the non-blocked version #SparseVanka# (or
+ * #SparseBlockVanka# with #n_blocks==1#), the following numbers of
+ * iterations is needed to solver the linear system in each nonlinear
+ * step: \begin{verbatim} 101 68 64 53 35 21 \end{verbatim} With four
+ * blocks, we need the following numbers of iterations
+ * \begin{verbatim} 124 88 83 66 44 28 \end{verbatim} As can be seen,
+ * more iterations are needed. However, in terms of computing time,
+ * the first version needs 72 seconds wall time (and 79 seconds CPU
+ * time, which is more than wall time since some other parts of the
+ * program were parallelized as well), while the second version needed
+ * 53 second wall time (and 110 seconds CPU time) on a four processor
+ * machine. The total time is in both cases dominated by the linear
+ * solvers. In this case, it is therefore worth while using the
+ * blocked version of the preconditioner if wall time is more
+ * important than CPU time.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template<typename number>
+class SparseBlockVanka : public SparseVanka<number>
+{
+  public:
+				     /**
+				      * Constructor. Pass all
+				      * arguments except for
+				      * #n_blocks# to the base class.
+				      */
+    SparseBlockVanka (const SparseMatrix<number> &M,
+		      const vector<bool>         &selected,
+		      const bool                  conserve_memory = false,
+		      const unsigned int          n_threads       = 1,
+		      const unsigned int          n_blocks        = 1);
+
+				     /**
+				      * Apply the preconditioner.
+				      */
+    template<typename number2>
+    void operator() (Vector<number2>       &dst,
+		     const Vector<number2> &src) const;
+    
+  private:
+				     /**
+				      * Store the number of blocks.
+				      */
+    const unsigned int n_blocks;
+
+				     /**
+				      * In this field, we precompute
+				      * the first and the one after
+				      * the last index of each
+				      * block. This computation is
+				      * done in the constructor, to
+				      * avoid recomputing each time
+				      * the preconditioner is called.
+				      */
+    vector<pair<unsigned int, unsigned int> > intervals;
+};
 
 
 
