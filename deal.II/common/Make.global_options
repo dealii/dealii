@@ -19,8 +19,10 @@ CXXFLAGS.g= -DDEBUG -ggdb -Wall -W -Wconversion \
             $(INCLUDE)
 CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
             -felide-constructors -fnonnull-objects \
-	    -fno-vtable-thunks -ftemplate-depth-32 -pg\
+	    -fno-vtable-thunks -ftemplate-depth-32 \
             $(INCLUDE)
+
+# DEAL_II_USE_MT=true
 
 ifeq ($(DEAL_II_USE_MT),true)
   INCLUDE    += -I $(shell echo $$ACE_ROOT)
