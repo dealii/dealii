@@ -1453,7 +1453,7 @@ dnl construct at various places, we check for it and if the compiler
 dnl dies, we use a workaround that is non-ISO C++ but works for these
 dnl compilers.
 dnl
-dnl Usage: DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+dnl Usage: DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG
 dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
@@ -1492,6 +1492,63 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
 		      to this class if the class is inside a namespace.
                       See the aclocal.m4 file in the top-level directory
                       for a description of this bug.])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Intel's ICC 5.0.1 compiler has the following problem: it won't
+dnl compile this code:
+dnl ---------------------------------
+dnl template <class Class> void encapsulate (void (Class::*fun_ptr)());
+dnl struct X {
+dnl  void bar () const;
+dnl };
+dnl void foo () {
+dnl   encapsulate(&X::bar);
+dnl };
+dnl ---------------------------------
+dnl It complains about not finding an instance for the encapsulate function.
+dnl The problem is due to the fact that the function we take the address of
+dnl is constant, i.e. it should match the template with Class="const X",
+dnl but apparently doesn't. Unfortunately, we rely on such code in the
+dnl Threads mechanisms. So detect this bug and if present work around it
+dnl by providing a second set of encapsulate functions for constant 
+dnl functions.
+dnl
+dnl Usage: DEAL_II_CHECK_TEMPL_CONST_MEM_PTR_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TEMPL_CONST_MEM_PTR_BUG, dnl
+[
+  AC_MSG_CHECKING(for templates and pointers to const member functions bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	template <class Class> void encapsulate (void (Class::*fun_ptr)());
+
+	struct X {
+	  void bar () const;
+	};
+
+	void foo () {
+	  encapsulate(&X::bar);
+	};
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_TEMPL_CONST_MEM_PTR_BUG, 1, 
+                     [Define if we have to work around a bug in icc in which
+                      the compiler refuses to consider a template when given
+                      a pointer to a constant member function.
+                      See the aclocal.m4 file in the top-level directory
+                      for a description of this bug.])
+    ])
 ])
 
 
