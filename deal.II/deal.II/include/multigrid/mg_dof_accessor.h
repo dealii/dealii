@@ -114,6 +114,7 @@ class MGDoFAccessor {
 template <int celldim, int dim>
 class MGDoFObjectAccessor_Inheritance 
 {
+  public:
 				     /**
 				      * Declaration of the @p{typedef}.
 				      * See the full documentation for
@@ -139,6 +140,7 @@ class MGDoFObjectAccessor_Inheritance
 template <int dim>
 class MGDoFObjectAccessor_Inheritance<dim,dim>
 {
+  public:
 				     /**
 				      * Declaration of the @p{typedef}.
 				      * See the full documentation for
