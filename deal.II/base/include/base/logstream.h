@@ -39,15 +39,15 @@
  * @end{itemize}
  *
  * The usual usage of this class is through the pregenerated object
- * @p{deallog}. Typical steps are
+ * <tt>deallog</tt>. Typical steps are
  * @begin{itemize}
- * @item @p{deallog.attach(std::ostream)}: write logging information into a file.
- * @item @p{deallog.depth_console(n)}: restrict output on screen to outer loops.
+ * @item <tt>deallog.attach(std::ostream)</tt>: write logging information into a file.
+ * @item <tt>deallog.depth_console(n)</tt>: restrict output on screen to outer loops.
  * @item Before entering a new phase of your program, e.g. a new loop,
- *       @p{deallog.push("loopname")}.
- * @item @p{deallog << anything << std::endl;} to write logging information
- *       (Usage of @p{std::endl} is mandatory!).
- * @item @p{deallog.pop()} when leaving that stage entered with @p{push}.
+ *       <tt>deallog.push("loopname")</tt>.
+ * @item <tt>deallog << anything << std::endl;</tt> to write logging information
+ *       (Usage of <tt>std::endl</tt> is mandatory!).
+ * @item <tt>deallog.pop()</tt> when leaving that stage entered with <tt>push</tt>.
  * @end{itemize}
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003
@@ -58,27 +58,27 @@ class LogStream
 				     /**
 				      * Standard constructor, since we
 				      * intend to provide an object
-				      * @p{deallog} in the library. Set the
-				      * standard output stream to @p{std::cerr}.
+				      * <tt>deallog</tt> in the library. Set the
+				      * standard output stream to <tt>std::cerr</tt>.
 				      */
     LogStream ();
     
 				     /**
 				      * Enable output to a second
-				      * stream @p{o}.
+				      * stream <tt>o</tt>.
 				      */
     void attach (std::ostream& o);
     
 				     /**
 				      * Disable output to the second
 				      * stream. You may want to call
-				      * @p{close} on the stream that was
+				      * <tt>close</tt> on the stream that was
 				      * previously attached to this object.
 				      */
     void detach ();
 
 				     /**
-				      * Gives the default stream (@p{std_out}).
+				      * Gives the default stream (<tt>std_out</tt>).
 				      */
     std::ostream& get_console ();
 
@@ -117,9 +117,9 @@ class LogStream
 				      * function allows to restrict
 				      * console output to the upmost
 				      * levels of iterations. Only
-				      * output with less than @p{n}
+				      * output with less than <tt>n</tt>
 				      * prefixes is printed. By calling
-				      * this function with @p{n=0}, no
+				      * this function with <tt>n=0</tt>, no
 				      * console output will be written.
 				      *
 				      * The previous value of this
@@ -131,7 +131,7 @@ class LogStream
 				      * Maximum number of levels to be
 				      * written to the log file. The
 				      * functionality is the same as
-				      * @p{depth_console}, nevertheless,
+				      * <tt>depth_console</tt>, nevertheless,
 				      * this function should be used
 				      * with care, since it may spoile
 				      * the value of a log file.
@@ -156,11 +156,11 @@ class LogStream
 				      * Output time differences
 				      * between consecutive logs. If
 				      * this function is invoked with
-				      * @p{true}, the time difference
+				      * <tt>true</tt>, the time difference
 				      * between the previous log line
 				      * and the recent one is
 				      * printed. If it is invoked with
-				      * @p{false}, the accumulated
+				      * <tt>false</tt>, the accumulated
 				      * time since start of the
 				      * program is printed (default
 				      * behavior).
@@ -186,10 +186,10 @@ class LogStream
 				      * manipulators. This passes on
 				      * the whole thing to the
 				      * template function with the
-				      * exception of the @p{std::endl}
+				      * exception of the <tt>std::endl</tt>
 				      * manipulator, for which special
 				      * action is performed: set the
-				      * @p{was_endl} variable that
+				      * <tt>was_endl</tt> variable that
 				      * forces this object to generate
 				      * a line head the next time
 				      * something is written by this
@@ -206,7 +206,7 @@ class LogStream
 				      * not be determined exactly
 				      * (for example: what is the
 				      * memory consumption of an
-				      * STL @p{std::map} type with a
+				      * STL <tt>std::map</tt> type with a
 				      * certain number of
 				      * elements?), this is only
 				      * an estimate. however often
@@ -233,7 +233,7 @@ class LogStream
 				     /**
 				      * Default stream, where the output
 				      * is to go to. This stream defaults
-				      * to @p{std::cerr}, but can be set to another
+				      * to <tt>std::cerr</tt>, but can be set to another
 				      * stream through the constructor.
 				      */
     std::ostream  *std_out;
@@ -244,7 +244,7 @@ class LogStream
 				      * will be a file stream.
 				      *
 				      * You can set and reset this stream
-				      * by the @p{attach} function.
+				      * by the <tt>attach</tt> function.
 				      */
     std::ostream  *file;
 
@@ -304,7 +304,7 @@ class LogStream
 				      * writing output. This function
 				      * unifies the work that is
 				      * common to the two
-				      * @p{operator<<} functions.
+				      * <tt>operator<<</tt> functions.
 				      */
     template <typename T>
     void print (const T &t);
@@ -336,7 +336,7 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream&))
   print (p);
 
 				   // next check whether this is the
-				   // @p{endl} manipulator, and if so
+				   // <tt>endl</tt> manipulator, and if so
 				   // set a flag
   std::ostream & (* const p_endl) (std::ostream&) = &std::endl;
   if (p == p_endl)
@@ -353,7 +353,7 @@ void
 LogStream::print (const T &t)
 {
 				   // if the previous command was an
-				   // @p{std::endl}, print the topmost
+				   // <tt>std::endl</tt>, print the topmost
 				   // prefix and a colon
   if (was_endl)
     {

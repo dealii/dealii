@@ -74,9 +74,9 @@ class PolynomialsBDM
 				      * product polynomials then use
 				      * this function, rather than
 				      * using any of the
-				      * @p{compute_value},
-				      * @p{compute_grad} or
-				      * @p{compute_grad_grad}
+				      * <tt>compute_value</tt>,
+				      * <tt>compute_grad</tt> or
+				      * <tt>compute_grad_grad</tt>
 				      * functions, see below, in a
 				      * loop over all tensor product
 				      * polynomials.
@@ -88,9 +88,9 @@ class PolynomialsBDM
     
 				     /**
 				      * Computes the value of the
-				      * @p{i}th BDM
+				      * <tt>i</tt>th BDM
 				      * polynomial at
-				      * @p{unit_point}.
+				      * <tt>unit_point</tt>.
 				      *
 				      * Note, that using this function
 				      * within a loop over all tensor
@@ -100,9 +100,9 @@ class PolynomialsBDM
 				      * (one-dimensional) polynomials
 				      * is (unnecessarily) computed
 				      * several times.  Instead use
-				      * the @p{compute} function, see
+				      * the <tt>compute</tt> function, see
 				      * above, with
-				      * @p{values.size()==n_tensor_pols}
+				      * <tt>values.size()==n_tensor_pols</tt>
 				      * to get the point values of all
 				      * tensor polynomials all at once
 				      * and in a much more efficient
@@ -113,9 +113,9 @@ class PolynomialsBDM
 
 				     /**
 				      * Computes the grad of the
-				      * @p{i}th tensor product
+				      * <tt>i</tt>th tensor product
 				      * polynomial at
-				      * @p{unit_point}. Here @p{i} is
+				      * <tt>unit_point</tt>. Here <tt>i</tt> is
 				      * given in tensor product
 				      * numbering.
 				      *
@@ -127,9 +127,9 @@ class PolynomialsBDM
 				      * underlying (one-dimensional)
 				      * polynomials is (unnecessarily)
 				      * computed several times.
-				      * Instead use the @p{compute}
+				      * Instead use the <tt>compute</tt>
 				      * function, see above, with
-				      * @p{grads.size()==n_tensor_pols}
+				      * <tt>grads.size()==n_tensor_pols</tt>
 				      * to get the point value of all
 				      * tensor polynomials all at once
 				      * and in a much more efficient
@@ -141,9 +141,9 @@ class PolynomialsBDM
 				     /**
 				      * Computes the second
 				      * derivative (grad_grad) of the
-				      * @p{i}th tensor product
+				      * <tt>i</tt>th tensor product
 				      * polynomial at
-				      * @p{unit_point}. Here @p{i} is
+				      * <tt>unit_point</tt>. Here <tt>i</tt> is
 				      * given in tensor product
 				      * numbering.
 				      *
@@ -155,9 +155,9 @@ class PolynomialsBDM
 				      * underlying (one-dimensional)
 				      * polynomials is (unnecessarily)
 				      * computed several times.
-				      * Instead use the @p{compute}
+				      * Instead use the <tt>compute</tt>
 				      * function, see above, with
-				      * @p{grad_grads.size()==n_tensor_pols}
+				      * <tt>grad_grads.size()==n_tensor_pols</tt>
 				      * to get the point value of all
 				      * tensor polynomials all at once
 				      * and in a much more efficient

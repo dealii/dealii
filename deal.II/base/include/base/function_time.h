@@ -26,33 +26,33 @@
  *  normally does not create thousands of function objects, the gain in
  *  generality weighs out the fact that we need not store the time value
  *  for not time dependent problems. The second advantage is that the derived
- *  standard classes like @p{ZeroFunction}, @p{ConstantFunction} etc also work
+ *  standard classes like <tt>ZeroFunction</tt>, <tt>ConstantFunction</tt> etc also work
  *  for time dependent problems.
  *
  *  Access to the time goes through the following functions:
  *  @begin{verbatim}
- *  @item @p{get_time}: return the present value of the time variable.
- *  @item @p{set_time}: set the time value to a specific value.
- *  @item @p{advance_time}: increase the time by a certain time step.
+ *  @item <tt>get_time</tt>: return the present value of the time variable.
+ *  @item <tt>set_time</tt>: set the time value to a specific value.
+ *  @item <tt>advance_time</tt>: increase the time by a certain time step.
  *  @end{verbatim}
  *  The latter two functions are virtual, so that derived classes can
  *  perform computations which need only be done once for every new time.
- *  For example, if a time dependent function had a factor @p{sin(t)}, then
+ *  For example, if a time dependent function had a factor <tt>sin(t)</tt>, then
  *  it may be a reasonable choice to calculate this factor in a derived
- *  version of @p{set_time}, store it in a member variable and use that one
- *  rather than computing it every time @p{operator()}, @p{value_list} or one
+ *  version of <tt>set_time</tt>, store it in a member variable and use that one
+ *  rather than computing it every time <tt>operator()</tt>, <tt>value_list</tt> or one
  *  of the other functions is called.
  *
- *  By default, the @p{advance_time} function calls the @p{set_time} function
+ *  By default, the <tt>advance_time</tt> function calls the <tt>set_time</tt> function
  *  with the new time, so it is sufficient in most cases to overload only
- *  @p{set_time} for computations as sketched out above.
+ *  <tt>set_time</tt> for computations as sketched out above.
  *
  *  The constructor of this class takes an initial value for the time
  *  variable, which defaults to zero. Because a default value is given,
  *  none of the derived classes needs to take an initial value for the
  *  time variable if not needed.
  *
- *  Once again the warning: do not use the @p{time} variable for any other
+ *  Once again the warning: do not use the <tt>time</tt> variable for any other
  *  purpose than the intended one! This will inevitably lead to confusion.
  *
  *
@@ -79,14 +79,14 @@ class FunctionTime
     double get_time () const;
 
 				     /**
-				      * Set the time to @p{new_time}, overwriting
+				      * Set the time to <tt>new_time</tt>, overwriting
 				      * the old value.
 				      */
     virtual void set_time (const double new_time);
 
 				     /**
 				      * Advance the time by the given
-				      * time step @p{delta_t}.
+				      * time step <tt>delta_t</tt>.
 				      */
     virtual void advance_time (const double delta_t);
 

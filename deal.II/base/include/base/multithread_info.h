@@ -24,9 +24,9 @@
  * use in multithreaded programs.  At the moment this is just the
  * number of cpus. If deal.II is compiled with multithreading support,
  * some functions will use multiple threads for their action, and will
- * use the member variable @p{n_default_threads} of this class as the
+ * use the member variable <tt>n_default_threads</tt> of this class as the
  * default number of threads to start.  This variable
- * @p{n_default_threads} is set to the number of CPUs by default, but
+ * <tt>n_default_threads</tt> is set to the number of CPUs by default, but
  * can be adjusted by the user to fit the requirements.
  *
  * @author Thomas Richter, 2000
@@ -60,7 +60,7 @@ class MultithreadInfo
 				      * The number of threads to use as
 				      * a default value for all functions
 				      * that support multithreading.
-				      * At start time this is @p{n_cpus} or
+				      * At start time this is <tt>n_cpus</tt> or
 				      * one, if detection of the number
 				      * of CPUs is not possible.
 				      */
@@ -75,7 +75,7 @@ class MultithreadInfo
 				      * not be determined exactly
 				      * (for example: what is the
 				      * memory consumption of an
-				      * STL @p{std::map} type with a
+				      * STL <tt>std::map</tt> type with a
 				      * certain number of
 				      * elements?), this is only
 				      * an estimate. however often
@@ -107,7 +107,7 @@ class MultithreadInfo
 
 
 /**
- * Global variable of type @p{MultithreadInfo} which you may ask for the
+ * Global variable of type <tt>MultithreadInfo</tt> which you may ask for the
  * number of CPUs in you system, as well as for the default number of
  * threads that multithreaded functions shall use.
  */

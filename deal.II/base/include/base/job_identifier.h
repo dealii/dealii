@@ -18,9 +18,9 @@
 #include <string>
 
 /**
- * Identification of a program run. @p{JobIdentifier} determines the
+ * Identification of a program run. <tt>JobIdentifier</tt> determines the
  * start time of a program run and stores it as a program
- * identifier. There exists a library object @p{dealjobid} of this
+ * identifier. There exists a library object <tt>dealjobid</tt> of this
  * class. This object can be accessed by all output functions to
  * provide an id for the current job.
  */
@@ -30,7 +30,7 @@ class JobIdentifier
 				     /**
 				      * Constructor. Set program
 				      * identifier to value of
-				      * @p{program_id} concatenated
+				      * <tt>program_id</tt> concatenated
 				      * with the present time.
 				      */
     JobIdentifier();
@@ -53,7 +53,7 @@ class JobIdentifier
     static const char* program_id();
 
 				     /**
-				      * Return the value of @p{id}.
+				      * Return the value of <tt>id</tt>.
 				      */
     const std::string operator () () const;
     

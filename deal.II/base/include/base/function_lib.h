@@ -86,7 +86,7 @@ namespace Functions
   
   
 /**
- * The function @p{xy}. This function serves as an example for
+ * The function <tt>xy</tt>. This function serves as an example for
  * a vanishing Laplacian.
  *
  * @author: Guido Kanschat, 2000
@@ -475,7 +475,7 @@ namespace Functions
  * A jump in x-direction transported into some direction.
  *
  * If the advection is parallel to the y-axis, the function is
- * @p{-atan(sx)}, where @p{s} is the steepness parameter provided in
+ * <tt>-atan(sx)</tt>, where <tt>s</tt> is the steepness parameter provided in
  * the constructor.
  *
  * For different advection directions, this function will be turned in
@@ -546,7 +546,7 @@ namespace Functions
 					* not be determined exactly
 					* (for example: what is the
 					* memory consumption of an
-					* STL @p{std::map} type with a
+					* STL <tt>std::map</tt> type with a
 					* certain number of
 					* elements?), this is only
 					* an estimate. however often
@@ -573,12 +573,12 @@ namespace Functions
       double angle;
       
 				       /**
-					* Sine of @p{angle}.
+					* Sine of <tt>angle</tt>.
 					*/
       double sine;
       
 				       /**
-					* Cosine of @p{angle}.
+					* Cosine of <tt>angle</tt>.
 					*/
       double cosine;
   };
@@ -631,7 +631,7 @@ namespace Functions
       
 				       /**
 					* Compute the Laplacian of a
-					* given component at point @p{p}.
+					* given component at point <tt>p</tt>.
 					*/
       virtual double laplacian (const Point<dim>   &p,
 				const unsigned int  component = 0) const;
@@ -690,7 +690,7 @@ namespace Functions
       
 				       /**
 					* Compute the Laplacian of a
-					* given component at point @p{p}.
+					* given component at point <tt>p</tt>.
 					*/
       virtual double laplacian (const Point<dim>   &p,
 				const unsigned int  component = 0) const;
@@ -747,7 +747,7 @@ namespace Functions
       
 				       /**
 					* Compute the Laplacian of a
-					* given component at point @p{p}.
+					* given component at point <tt>p</tt>.
 					*/
       virtual double laplacian (const Point<dim>   &p,
 				const unsigned int  component = 0) const;
@@ -813,7 +813,7 @@ namespace Functions
       
 				       /**
 					* Compute the Laplacian of a
-					* given component at point @p{p}.
+					* given component at point <tt>p</tt>.
 					*/
       virtual double laplacian (const Point<dim>   &p,
 				const unsigned int  component = 0) const;
@@ -859,7 +859,7 @@ namespace Functions
 					* center of the ball and its
 					* radius.
 					*
-					* If an argument @p{select} is
+					* If an argument <tt>select</tt> is
 					* given and not -1, the
 					* cut-off function will be
 					* non-zero for this component
@@ -872,12 +872,12 @@ namespace Functions
       
 				       /**
 					* Move the center of the ball
-					* to new point @p{p}.
+					* to new point <tt>p</tt>.
 					*/
       void new_center (const Point<dim>& p);
       
 				       /**
-					* Set the radius of the ball to @p{r}.
+					* Set the radius of the ball to <tt>r</tt>.
 					*/
       void new_radius (const double r);
 
@@ -894,7 +894,7 @@ namespace Functions
 
 				       /**
 					* Component selected. If
-					* @p{no_component}, the function is
+					* <tt>no_component</tt>, the function is
 					* the same in all components.
 					*/
       const unsigned int selected;
@@ -904,8 +904,8 @@ namespace Functions
   
 /**
  * Cut-off function in L-infinity for an arbitrary ball.  This
- * function is the characteristic function of a ball around @p{center}
- * with a specified @p{radius}, that is,
+ * function is the characteristic function of a ball around <tt>center</tt>
+ * with a specified <tt>radius</tt>, that is,
  * \f[
  * f = \chi(B_r(c)).
  * \f]
@@ -923,7 +923,7 @@ namespace Functions
 					* center of the ball and its
 					* radius.
 					*
-					* If an argument @p{select} is
+					* If an argument <tt>select</tt> is
 					* given and not -1, the
 					* cut-off function will be
 					* non-zero for this component
@@ -957,7 +957,7 @@ namespace Functions
   
 /**
  * Cut-off function for an arbitrary ball. This function is a cone
- * with support in a ball of certain @p{radius} around @p{center}. The
+ * with support in a ball of certain <tt>radius</tt> around <tt>center</tt>. The
  * maximum value is 1. If vector valued, it can be restricted
  * to a single component.
  *
@@ -973,7 +973,7 @@ namespace Functions
 					* radius.
 					* radius.
 					*
-					* If an argument @p{select} is
+					* If an argument <tt>select</tt> is
 					* given, the cut-off function
 					* will be non-zero for this
 					* component only.
@@ -1006,8 +1006,8 @@ namespace Functions
   
 /**
  * Cut-off function for an arbitrary ball. This is the traditional
- * cut-off function in C-infinity for a ball of certain @p{radius}
- * around @p{center}, $f(r)=exp(1-1/(1-r**2/s**2))$, where $r$ is the
+ * cut-off function in C-infinity for a ball of certain <tt>radius</tt>
+ * around <tt>center</tt>, $f(r)=exp(1-1/(1-r**2/s**2))$, where $r$ is the
  * distance to the center, and $s$ is the radius of the sphere. If
  * vector valued, it can be restricted to a single component.
  *
@@ -1023,7 +1023,7 @@ namespace Functions
 					* radius.
 					* radius.
 					*
-					* If an argument @p{select} is
+					* If an argument <tt>select</tt> is
 					* given, the cut-off function
 					* will be non-zero for this
 					* component only.

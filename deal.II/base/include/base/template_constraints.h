@@ -22,7 +22,7 @@ template <bool, typename> struct constraint_and_return_value;
 
 /**
  * This specialization of the general template for the case of a
- * @p{true} first template argument declares a local typedef @p{type}
+ * <tt>true</tt> first template argument declares a local typedef <tt>type</tt>
  * to the second template argument. It is used in order to construct
  * constraints on template arguments in template (and member template)
  * functions. The negative specialization is missing.

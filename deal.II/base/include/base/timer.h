@@ -44,7 +44,7 @@
  * @end{verbatim}
  *
  * Alternatively, you can also restart the timer instead of resetting
- * it. The times between successive calls to @p{start/stop} will then be
+ * it. The times between successive calls to <tt>start/stop</tt> will then be
  * accumulated.
  *
  * Note: the implementation of this class is system dependent.
@@ -92,31 +92,31 @@ class Timer
   private:
 
 				     /**
-				      * Value of the user time when @p{start}
+				      * Value of the user time when <tt>start</tt>
 				      * was called the last time or when the
-				      * object was created and no @p{stop} was
+				      * object was created and no <tt>stop</tt> was
 				      * issued in between.
 				      */
     double              start_time;
 
 
 				     /**
-				      * Similar to @p{start_time}, but
+				      * Similar to <tt>start_time</tt>, but
 				      * needed for children threads
 				      * in multithread mode. Value of
-				      * the user time when @p{start}
+				      * the user time when <tt>start</tt>
 				      * was called the last time or
 				      * when the object was created
-				      * and no @p{stop} was issued in
+				      * and no <tt>stop</tt> was issued in
 				      * between.
 				      *
 				      * For some reason (error in
 				      * operating system?) the
 				      * function call
-				      * @p{getrusage(RUSAGE_CHILDREN,.)}
+				      * <tt>getrusage(RUSAGE_CHILDREN,.)</tt>
 				      * gives always 0 (at least
 				      * on Solaris7). Hence the
-				      * @p{Timer} class still does not
+				      * <tt>Timer</tt> class still does not
 				      * yet work for multithreading
 				      * mode.
 				      */
@@ -124,7 +124,7 @@ class Timer
 
 				     /**
 				      * Accumulated time for all previous
-				      * @p{start}/@p{stop} cycles. The time for
+				      * <tt>start</tt>/<tt>stop</tt> cycles. The time for
 				      * the present cycle is not included.
 				      */
     double              cumulative_time;

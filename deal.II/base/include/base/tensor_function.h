@@ -32,8 +32,8 @@
  *  functions with several components, but that the return type is
  *  always tensor-valued. The returned values of the evaluation of
  *  objects of this type are always whole tensors, while for the
- *  @p{Function} class, one can ask for a specific component only, or
- *  use the @p{vector_value} function, which however does not return
+ *  <tt>Function</tt> class, one can ask for a specific component only, or
+ *  use the <tt>vector_value</tt> function, which however does not return
  *  the value, but rather writes it into the address provided by its
  *  second argument. The reason for the different behaviour of the
  *  classes is that in the case if tensor valued functions, the size
@@ -43,7 +43,7 @@
  *  the size is not known to the compiler, so memory has to be
  *  allocated on the heap, resulting in relatively expensive copy
  *  operations. One can therefore consider this class a specialization
- *  of the @p{Function} class for which the size is known. An
+ *  of the <tt>Function</tt> class for which the size is known. An
  *  additional benefit is that tensors of arbitrary rank can be
  *  returned, not only vectors, as for them the size can be determined
  *  similarly simply.
@@ -57,7 +57,7 @@ class TensorFunction : public FunctionTime,
   public:
 				     /**
 				      * Define typedefs for the return
-				      * types of the @p{value}
+				      * types of the <tt>value</tt>
 				      * functions.
 				      */
     typedef Tensor<rank,dim> value_type;
@@ -130,12 +130,12 @@ class TensorFunction : public FunctionTime,
     virtual value_type value (const Point<dim> &p) const;
 
 				     /**
-				      * Set @p{values} to the point
+				      * Set <tt>values</tt> to the point
 				      * values of the function at the
-				      * @p{points}.  It is assumed
-				      * that @p{values} already has
+				      * <tt>points</tt>.  It is assumed
+				      * that <tt>values</tt> already has
 				      * the right size, i.e.  the same
-				      * size as the @p{points} array.  
+				      * size as the <tt>points</tt> array.  
 				      */
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<value_type> &values) const;
@@ -147,12 +147,12 @@ class TensorFunction : public FunctionTime,
     virtual gradient_type gradient (const Point<dim> &p) const;
 
 				     /**
-				      * Set @p{gradients} to the
+				      * Set <tt>gradients</tt> to the
 				      * gradients of the function at
-				      * the @p{points}.  It is assumed
-				      * that @p{values} already has
+				      * the <tt>points</tt>.  It is assumed
+				      * that <tt>values</tt> already has
 				      * the right size, i.e.  the same
-				      * size as the @p{points} array.  
+				      * size as the <tt>points</tt> array.  
 				      */
     virtual void gradient_list (const std::vector<Point<dim> >   &points,
 				std::vector<gradient_type> &gradients) const;

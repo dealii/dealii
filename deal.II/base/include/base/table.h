@@ -47,7 +47,7 @@ template <typename T> class Table<6,T>;
     public:
                                        /**
                                         * Access the value of the
-                                        * @p{i}th index.
+                                        * <tt>i</tt>th index.
                                         */
       unsigned int operator[] (const unsigned int i) const;
     
@@ -65,8 +65,8 @@ template <typename T> class Table<6,T>;
  *
  * This is the general template, and has no implementation. There are
  * a number of specializations that are actually implemented (one for
- * each used value of @p{N}), which only differ in the way they
- * implement their constructors (they take @p{N} arguments, something
+ * each used value of <tt>N</tt>), which only differ in the way they
+ * implement their constructors (they take <tt>N</tt> arguments, something
  * that cannot be represented by a general template). Actual storage
  * of and access to data is done by the @ref{TableIndicesBase} base
  * class of a specializations.
@@ -278,7 +278,7 @@ namespace internal
 /**
  * @internal
  * Have a namespace in which we declare some classes that are used to
- * access the elements of tables using the @p{operator[]}. These are
+ * access the elements of tables using the <tt>operator[]</tt>. These are
  * quite technical, since they have to do their work recursively (due
  * to the fact that the number of indices is not known, we have to
  * return an iterator into the next lower dimension object if we
@@ -288,7 +288,7 @@ namespace internal
  * classes at all, except possibly for educational reasons.  None of
  * the classes herein has a interface that you should use explicitly
  * in your programs (except, of course, through access to the elements
- * of tables with @p{operator[]}, which generates temporary objects of
+ * of tables with <tt>operator[]</tt>, which generates temporary objects of
  * the types of this namespace).
  *
  * @author Wolfgang Bangerth, 2002
@@ -335,31 +335,31 @@ namespace internal
 /**
  * @internal
  * Class that acts as accessor to subobjects of tables of type
- * @p{Table<N,T>}. The template parameter @p{C} may be either true or
+ * <tt>Table<N,T></tt>. The template parameter <tt>C</tt> may be either true or
  * false, and indicates whether the objects worked on are constant or
  * not (i.e. write access is only allowed if the value is false).
  *
- * Since with @p{N} indices, the effect of applying @p{operator[]} is
- * getting access to something we @p{N-1} indices, we have to
+ * Since with <tt>N</tt> indices, the effect of applying <tt>operator[]</tt> is
+ * getting access to something we <tt>N-1</tt> indices, we have to
  * implement these accessor classes recursively, with stopping when we
  * have only one index left. For the latter case, a specialization of
- * this class is declared below, where calling @p{operator[]} gives
+ * this class is declared below, where calling <tt>operator[]</tt> gives
  * you access to the objects actually stored by the table. In the
  * value given to the index operator needs to be checked whether it is
  * inside its bounds, for which we need to know which index of the
  * table we are actually accessing presently. This is done through the
- * template parameter @p{P}: it indicates, how many remaining indices
- * there are. For a vector, @p{P} may only be one (and then the
+ * template parameter <tt>P</tt>: it indicates, how many remaining indices
+ * there are. For a vector, <tt>P</tt> may only be one (and then the
  * specialization below is used). For a table this value may be two,
- * and when using @p{operator[]}, an object with @p{P=1} emerges.
+ * and when using <tt>operator[]</tt>, an object with <tt>P=1</tt> emerges.
  *
- * The value of @p{P} is also used to determine the stride: this
+ * The value of <tt>P</tt> is also used to determine the stride: this
  * object stores a pointer indicating the beginning of the range of
- * objects that it may access. When we apply @p{operator[]} on this
+ * objects that it may access. When we apply <tt>operator[]</tt> on this
  * object, the resulting new accessor may only access a subset of
  * these elements, and to know which subset we need to know the
  * dimensions of the table and the present index, which is indicated
- * by @p{P}.
+ * by <tt>P</tt>.
  *
  * As stated for the entire namespace, you will not usually have to do
  * with these classes directly, and should not try to use their
@@ -396,7 +396,7 @@ namespace internal
                                           * you having such objects
                                           * around. The only way to
                                           * create such objects is via
-                                          * the @p{Table} class, which
+                                          * the <tt>Table</tt> class, which
                                           * only generates them as
                                           * temporary objects. This
                                           * guarantees that the accessor
@@ -529,7 +529,7 @@ namespace internal
                                           * you having such objects
                                           * around. The only way to
                                           * create such objects is via
-                                          * the @p{Table} class, which
+                                          * the <tt>Table</tt> class, which
                                           * only generates them as
                                           * temporary objects. This
                                           * guarantees that the accessor
@@ -640,7 +640,7 @@ namespace internal
  * it is two then it is a matrix, and so on.
  *
  * Previously, this data type was emulated in this library by
- * constructs like @p{std::vector<std::vector<T>>}, or even higher
+ * constructs like <tt>std::vector<std::vector<T>></tt>, or even higher
  * nested constructs.  However, this has the disadvantage that it is
  * hard to initialize, and most importantly that it is very
  * inefficient if all rows have the same size (which is the usual
@@ -656,20 +656,20 @@ namespace internal
  * class. Second, how to access the individual elements. The basic
  * problem here is that we would like to make the number of arguments
  * to be passed to the constructor as well as the access functions
- * dependent on the template parameter @p{N} indicating the number of
+ * dependent on the template parameter <tt>N</tt> indicating the number of
  * dimensions. Of course, this is not possible.
  *
  * The way out of the first problem (and partly the second one as
- * well) is to have derived class for each value of @p{N} that have a
+ * well) is to have derived class for each value of <tt>N</tt> that have a
  * constructor with the right number of arguments, one for each
  * dimension. These then transform their arguments into the data type
  * this class wants to see, both for construction as well as access
- * through the @p{operator()} function.
+ * through the <tt>operator()</tt> function.
  *
  * The second problem is that we would like to allow access through a
- * sequence of @p{operator[]} calls. This mostly because, as said,
+ * sequence of <tt>operator[]</tt> calls. This mostly because, as said,
  * this class is a replacement for previous use of nested
- * @p{std::vector} objects, where we had to use the @p{operator[]}
+ * <tt>std::vector</tt> objects, where we had to use the <tt>operator[]</tt>
  * access function recursively until we were at the innermost
  * object. Emulating this behavior without losing the ability to do
  * index checks, and in particular without losing performance is
@@ -682,7 +682,7 @@ namespace internal
  * In some way, this class is similar to the @ref{Tensor} class, in
  * that it templatizes on the number of dimensions. However, there are
  * two major differences. The first is that the @ref{Tensor} class
- * stores only numeric values (as @p{double}s), while the @p{Table}
+ * stores only numeric values (as <tt>double</tt>s), while the <tt>Table</tt>
  * class stores arbitrary objects. The second is that the @ref{Tensor}
  * class has fixed dimensions, also give as a template argument, while
  * this class can handle arbitrary dimensions, which may also be
@@ -744,7 +744,7 @@ class TableBase : public Subscriptor
     
                                      /**
                                       * Assignment operator.
-                                      * Copy all elements of @p{src}
+                                      * Copy all elements of <tt>src</tt>
                                       * into the matrix. The size is
                                       * adjusted if needed.
                                       *
@@ -758,13 +758,13 @@ class TableBase : public Subscriptor
     
                                      /**
                                       * Copy operator.
-                                      * Copy all elements of @p{src}
+                                      * Copy all elements of <tt>src</tt>
                                       * into the array. The size is
                                       * adjusted if needed.
                                       *
                                       * This function requires that the
-                                      * type @p{T2} is convertible to
-                                      * @p{T}.
+                                      * type <tt>T2</tt> is convertible to
+                                      * <tt>T</tt>.
                                       */
     template<typename T2>
     TableBase<N,T>& operator = (const TableBase<N,T2> &src);
@@ -806,7 +806,7 @@ class TableBase : public Subscriptor
                                       * empty, i.e. one of the
                                       * directions is zero. This is
                                       * equivalent to
-                                      * @p{n_elements()==0}.
+                                      * <tt>n_elements()==0</tt>.
                                       */
     bool empty () const;
     
@@ -820,8 +820,8 @@ class TableBase : public Subscriptor
                                       * means line by line. No range
                                       * checking is performed, i.e.,
                                       * it is assumed that the input
-                                      * array @p{entries} contains
-                                      * @p{n_rows()*n_cols()}
+                                      * array <tt>entries</tt> contains
+                                      * <tt>n_rows()*n_cols()</tt>
                                       * elements, and that the layout
                                       * refers to the desired shape of
                                       * this table. The only check we
@@ -830,7 +830,7 @@ class TableBase : public Subscriptor
                                       *
                                       * Note also that the type of the
                                       * objects of the input array,
-                                      * @p{T2}, must be convertible to
+                                      * <tt>T2</tt>, must be convertible to
                                       * the type of the objects of
                                       * this array.
                                       */
@@ -926,7 +926,7 @@ class TableBase : public Subscriptor
                                       * larger than the number of
                                       * actually used elements, since
                                       * we don't shrink the array upon
-                                      * calls to @p{reinit} unless the
+                                      * calls to <tt>reinit</tt> unless the
                                       * new size is zero.
                                       */
     unsigned int val_size;    
@@ -1043,7 +1043,7 @@ class Table<1,T> : public TableBase<1,T>
  * For the rationale of this class, and a description of the
  * interface, see the base class. Since this serves as the base class
  * of the full matrix classes in this library, and to keep a minimal
- * compatibility with a predecessor class (@p{vector2d}), some
+ * compatibility with a predecessor class (<tt>vector2d</tt>), some
  * additional functions are provided.
  * 
  * @author Wolfgang Bangerth, 2002
@@ -1070,7 +1070,7 @@ class Table<2,T> : public TableBase<2,T>
                                       * Reinitialize the object. This
                                       * function is mostly here for
                                       * compatibility with the earlier
-                                      * @p{vector2d} class. Passes
+                                      * <tt>vector2d</tt> class. Passes
                                       * down to the base class by
                                       * converting the arguments to
                                       * the data type requested by the
@@ -1150,7 +1150,7 @@ class Table<2,T> : public TableBase<2,T>
   protected:
                                      /**
                                       * Return a read-write reference
-                                      * to the element @p{(i,j)}.
+                                      * to the element <tt>(i,j)</tt>.
                                       *
                                       * This function does no bounds
                                       * checking and is only to be
@@ -1161,14 +1161,14 @@ class Table<2,T> : public TableBase<2,T>
                                       * here for compatibility with a
                                       * former implementation of these
                                       * table classes for 2d arrays,
-                                      * then called @p{vector2d}.
+                                      * then called <tt>vector2d</tt>.
                                       */
     T & el (const unsigned int i,
             const unsigned int j);
   
                                      /**
                                       * Return the value of the
-                                      * element @p{(i,j)} as a
+                                      * element <tt>(i,j)</tt> as a
                                       * read-only reference.
                                       *
                                       * This function does no bounds
@@ -1188,7 +1188,7 @@ class Table<2,T> : public TableBase<2,T>
                                       * here for compatibility with a
                                       * former implementation of these
                                       * table classes for 2d arrays,
-                                      * then called @p{vector2d}.
+                                      * then called <tt>vector2d</tt>.
                                       */
     const T & el (const unsigned int i,
                   const unsigned int j) const;

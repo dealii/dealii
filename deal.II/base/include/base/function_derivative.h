@@ -21,14 +21,14 @@
 /**
  * Derivative of a function object.  The value access functions of
  * this class return the directional derivative of a function with
- * respect to a direction provided on construction. If @p{b} is the
- * vector, the derivative @p{b . grad f} is computed. This derivative
- * is evaluated directly, not by computing the gradient of @p{f} and
- * its scalar product with @p{b}.
+ * respect to a direction provided on construction. If <tt>b</tt> is the
+ * vector, the derivative <tt>b . grad f</tt> is computed. This derivative
+ * is evaluated directly, not by computing the gradient of <tt>f</tt> and
+ * its scalar product with <tt>b</tt>.
  *
  * The derivative is computed numerically, using one of the provided
- * difference formulas (see @p{set_formula} for available
- * schemes). Experimenting with @p{h} and the difference scheme may be
+ * difference formulas (see <tt>set_formula</tt> for available
+ * schemes). Experimenting with <tt>h</tt> and the difference scheme may be
  * necessary to obtain sufficient results.
  *
  * @author Guido Kanschat, 2000
@@ -53,7 +53,7 @@ class FunctionDerivative : public Function<dim>
 				      * functions to compute
 				      * derivatives of, the direction
 				      * vector of the differentiation
-				      * and the step size @p{h} of the
+				      * and the step size <tt>h</tt> of the
 				      * difference formula.
 				      */
     FunctionDerivative (const Function<dim> &f,
@@ -72,7 +72,7 @@ class FunctionDerivative : public Function<dim>
 				      * This is the constructor for a
 				      * variable velocity field. Most
 				      * probably, a new object of
-				      * @p{FunctionDerivative} has to
+				      * <tt>FunctionDerivative</tt> has to
 				      * be constructed for each set of
 				      * quadrature points.
 				      *
@@ -91,11 +91,11 @@ class FunctionDerivative : public Function<dim>
 				      *
 				      * Formulas implemented right now
 				      * are first order backward Euler
-				      * (@p{UpwindEuler}), second
+				      * (<tt>UpwindEuler</tt>), second
 				      * order symmetric Euler
-				      * (@p{Euler}) and a symmetric
+				      * (<tt>Euler</tt>) and a symmetric
 				      * fourth order formula
-				      * (@p{FourthOrder}).
+				      * (<tt>FourthOrder</tt>).
 				      */
     void set_formula (DifferenceFormula formula = Euler);
     
@@ -122,7 +122,7 @@ class FunctionDerivative : public Function<dim>
 				      * not be determined exactly
 				      * (for example: what is the
 				      * memory consumption of an
-				      * STL @p{std::map} type with a
+				      * STL <tt>std::map</tt> type with a
 				      * certain number of
 				      * elements?), this is only
 				      * an estimate. however often

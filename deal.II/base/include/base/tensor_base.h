@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,11 +42,11 @@ template <int dim> class Tensor<1,dim>;
 
 
 /**
- * This class is a specialized version of the @p{Tensor<rank,dim>} class.
+ * This class is a specialized version of the <tt>Tensor<rank,dim></tt> class.
  * It handles tensors with one index, i.e. vectors, of fixed dimension
  * and offers the functionality needed for tensors of higher rank.
  *
- * In many cases, you will want to use the more specialized @p{Point} class
+ * In many cases, you will want to use the more specialized <tt>Point</tt> class
  * which acts as a tensor of rank one but has more functionality.
  */
 template <int dim>
@@ -59,7 +59,7 @@ class Tensor<1,dim>
 				      * explicit knowledge of it's
 				      * data type. Implementation is
 				      * this way instead of providing
-				      * a function @p{dimension()}
+				      * a function <tt>dimension()</tt>
 				      * because now it is possible to
 				      * get the dimension at compile
 				      * time without the expansion and
@@ -91,7 +91,7 @@ class Tensor<1,dim>
 				      * an object of this type.
 				      *
 				      * Avoid warning about zero-sized
-				      * array for @p{dim==0} by
+				      * array for <tt>dim==0</tt> by
 				      * choosing lunatic value that is
 				      * likely to overflow memory
 				      * limits.
@@ -100,7 +100,7 @@ class Tensor<1,dim>
     
 				     /**
 				      * Constructor. Initialize all entries
-				      * to zero if @p{initialize==true}; this
+				      * to zero if <tt>initialize==true</tt>; this
 				      * is the default behaviour.
 				      */
     explicit Tensor (const bool initialize = true);
@@ -118,12 +118,12 @@ class Tensor<1,dim>
     Tensor (const Tensor<1,dim> &);
 
 				     /**
-				      * Read access to the @p{index}th
+				      * Read access to the <tt>index</tt>th
 				      * coordinate.
 				      *
 				      * Note that the derived
-				      * @p{Point} class also provides
-				      * access through the @p{()}
+				      * <tt>Point</tt> class also provides
+				      * access through the <tt>()</tt>
 				      * operator for
 				      * backcompatibility.
 				      */
@@ -131,11 +131,11 @@ class Tensor<1,dim>
 
     				     /**
 				      * Read and write access to the
-				      * @p{index}th coordinate.
+				      * <tt>index</tt>th coordinate.
 				      *
 				      * Note that the derived
-				      * @p{Point} class also provides
-				      * access through the @p{()}
+				      * <tt>Point</tt> class also provides
+				      * access through the <tt>()</tt>
 				      * operator for
 				      * backcompatibility.
 				      */
@@ -172,13 +172,13 @@ class Tensor<1,dim>
 
 				     /**
 				      * Scale the vector by
-				      * @p{factor}, i.e. multiply all
-				      * coordinates by @p{factor}.
+				      * <tt>factor</tt>, i.e. multiply all
+				      * coordinates by <tt>factor</tt>.
 				      */
     Tensor<1,dim> & operator *= (const double &factor);
 
 				     /**
-				      * Scale the vector by @p{1/factor}.
+				      * Scale the vector by <tt>1/factor</tt>.
 				      */
     Tensor<1,dim> & operator /= (const double &factor);
 
@@ -190,7 +190,7 @@ class Tensor<1,dim>
 
 				     /**
 				      * Add two tensors. If possible,
-				      * use @p{operator +=} instead
+				      * use <tt>operator +=</tt> instead
 				      * since this does not need to
 				      * copy a point at least once.
 				      */
@@ -198,7 +198,7 @@ class Tensor<1,dim>
 
 				     /**
 				      * Subtract two tensors. If
-				      * possible, use @p{operator +=}
+				      * possible, use <tt>operator +=</tt>
 				      * instead since this does not
 				      * need to copy a point at least
 				      * once.
@@ -244,7 +244,7 @@ class Tensor<1,dim>
   private:
 				     /**
 				      * Store the values in a simple
-				      * array.  For @p{dim==0} store
+				      * array.  For <tt>dim==0</tt> store
 				      * one element, because otherways
 				      * the compiler would choke.  We
 				      * catch this case in the
@@ -297,11 +297,12 @@ class Tensor<1,dim>
 
 				 /**
 				  *  Prints the values of this point in the
-				  *  form @p{x1 x2 x3 etc}.
+				  *  form <tt>x1 x2 x3 etc</tt>.
 				  */
 template <int dim>
 std::ostream & operator << (std::ostream &out, const Tensor<1,dim> &p);
 
+/// @if NoDoc
 
 /*------------------------------- Inline functions: Tensor ---------------------------*/
 
@@ -614,7 +615,7 @@ operator / (const Tensor<1,dim> &t,
   return tt;
 }
 
-
+/// @endif
 
 #endif
 

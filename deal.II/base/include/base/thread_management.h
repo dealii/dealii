@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,7 +44,7 @@ namespace Threads
  * multithreading. It allows to write programs such that they start
  * new threads and/or lock objects in multithreading mode, and use
  * dummy thread management and synchronisation classes instead when
- * running in single-thread mode. Specifically, the @p{spawn} functions
+ * running in single-thread mode. Specifically, the <tt>spawn</tt> functions
  * only call the function but wait for it to return instead of running
  * in on another thread, and the mutices do nothing really. The only
  * reason to provide such a function is that the program can be
@@ -86,7 +86,7 @@ namespace Threads
                                         * automatically be the case
                                         * when you lock and unlock the
                                         * mutex "by hand", i.e. using
-                                        * @p{acquire} and @p{release}.
+                                        * <tt>acquire</tt> and <tt>release</tt>.
                                         */
       class ScopedLock
       {
@@ -135,7 +135,7 @@ namespace Threads
  * programs such that they start new threads and/or lock objects in
  * multithreading mode, and use dummy thread management and
  * synchronisation classes instead when running in single-thread
- * mode. Specifically, the @p{spawn} functions only call the function
+ * mode. Specifically, the <tt>spawn</tt> functions only call the function
  * but wait for it to return instead of running in on another thread,
  * and the mutices do nothing really. The only reason to provide such
  * a function is that the program can be compiled both in MT and
@@ -179,7 +179,7 @@ namespace Threads
 					* mutex which needs to be
 					* given to this function as an
 					* argument, see the man page
-					* of @p{posix_cond_wait} for a
+					* of <tt>posix_cond_wait</tt> for a
 					* description of the
 					* mechanisms. Since in single
 					* threaded mode, this function
@@ -201,7 +201,7 @@ namespace Threads
  * (otherwise, the barrier could not be left, since the one thread is
  * waiting for some other part of the program to reach a certain point
  * of execution), the constructor of this class throws an exception if
- * the @p{count} argument denoting the number of threads that need to
+ * the <tt>count</tt> argument denoting the number of threads that need to
  * be synchronised is not equal to one.
  *
  * @author Wolfgang Bangerth, 2001
@@ -216,7 +216,7 @@ namespace Threads
 					* number of threads to be
 					* synchronised is one, this
 					* constructor raises an
-					* exception if the @p{count}
+					* exception if the <tt>count</tt>
 					* argument is one.
 					*/
       DummyBarrier (const unsigned int  count,
@@ -292,7 +292,7 @@ namespace Threads
                                         * automatically be the case
                                         * when you lock and unlock the
                                         * mutex "by hand", i.e. using
-                                        * @p{acquire} and @p{release}.
+                                        * <tt>acquire</tt> and <tt>release</tt>.
                                         */
       class ScopedLock
       {
@@ -355,7 +355,7 @@ namespace Threads
                                         * condition variables a
                                         * friend, since it needs
                                         * access to the
-                                        * @p{pthread_mutex_t}
+                                        * <tt>pthread_mutex_t</tt>
                                         * structure.
                                         */
       friend class PosixThreadCondition;
@@ -411,7 +411,7 @@ namespace Threads
 					* mutex which needs to be
 					* given to this function as an
 					* argument, see the man page
-					* of @p{posix_cond_wait} for a
+					* of <tt>posix_cond_wait</tt> for a
 					* description of the
 					* mechanisms.
 					*/
@@ -575,12 +575,12 @@ namespace Threads
                                     * threads are created by directly
                                     * calling the respective functions
                                     * of the operating system
-                                    * (e.g. @p{pthread_create} for the
+                                    * (e.g. <tt>pthread_create</tt> for the
                                     * POSIX thread interface), or if
                                     * they are killed (e.g. either
-                                    * through @p{pthread_exit} from
+                                    * through <tt>pthread_exit</tt> from
                                     * the spawned thread, or
-                                    * @p{pthread_kill} from another
+                                    * <tt>pthread_kill</tt> from another
                                     * thread), then these events are
                                     * not registered and counted for
                                     * the result of this function.
@@ -588,17 +588,17 @@ namespace Threads
   unsigned int n_existing_threads ();
 
 				   /**
-				    * Split the range @p{[begin,end)}
-				    * into @p{n_intervals} subintervals
+				    * Split the range <tt>[begin,end)</tt>
+				    * into <tt>n_intervals</tt> subintervals
 				    * of equal size. The last interval
 				    * will be a little bit larger, if
 				    * the number of elements in the
 				    * whole range is not exactly
-				    * divisible by @p{n_intervals}. The
+				    * divisible by <tt>n_intervals</tt>. The
 				    * type of the iterators has to
 				    * fulfill the requirements of a
 				    * forward iterator,
-				    * i.e. @p{operator++} must be
+				    * i.e. <tt>operator++</tt> must be
 				    * available, and of course it must
 				    * be assignable.
 				    *
@@ -606,7 +606,7 @@ namespace Threads
 				    * returned as a vector of pairs of
 				    * iterators, where each pair
 				    * denotes the range
-				    * @p{[begin[i],end[i])}.
+				    * <tt>[begin[i],end[i])</tt>.
 				    */
   template <typename ForwardIterator>
   std::vector<std::pair<ForwardIterator,ForwardIterator> >
@@ -615,7 +615,7 @@ namespace Threads
 	       const unsigned int n_intervals);
 
 				   /**
-				    * Split the interval @p{[begin,end)}
+				    * Split the interval <tt>[begin,end)</tt>
 				    * into subintervals of (almost)
 				    * equal size. This function works
 				    * mostly as the one before, with
@@ -671,7 +671,7 @@ namespace Threads
                                       * points to new threads, we
                                       * therefore install a try-catch
                                       * block, and if an exception of
-                                      * type @p{std::exception} is
+                                      * type <tt>std::exception</tt> is
                                       * caught, it passes over control
                                       * to this function, which will
                                       * then provide some output.
@@ -682,7 +682,7 @@ namespace Threads
 				      * @internal
                                       * Same as above, but the type of
                                       * the exception is not derived
-                                      * from @p{std::exception}, so
+                                      * from <tt>std::exception</tt>, so
                                       * there is little way to provide
                                       * something more useful.
                                       */
@@ -715,7 +715,7 @@ namespace Threads
   
 }   // end declarations of namespace Threads
 
-
+/// @if NoDoc
 /* ----------- implementation of functions in namespace Threads ---------- */
 namespace Threads 
 {  
@@ -2807,9 +2807,9 @@ namespace Threads
 
                                          /**
                                           * Store whether the
-                                          * @p{join()} member function
+                                          * <tt>join()</tt> member function
                                           * as already been called. If
-                                          * @p{true}, then @p{join}
+                                          * <tt>true</tt>, then <tt>join</tt>
                                           * will return immediately,
                                           * otherwise it needs to go
                                           * through a call to the
@@ -2823,7 +2823,7 @@ namespace Threads
                                           * class. Access to it is
                                           * performed through counted
                                           * pointers, both from
-                                          * @p{Thread<>} objects as
+                                          * <tt>Thread<></tt> objects as
                                           * well as from the thread
                                           * entry point function on
                                           * the new thread. It is only
@@ -2836,7 +2836,7 @@ namespace Threads
 
                                          /**
                                           * Mutex used to synchronise
-                                          * calls to the @p{join()}
+                                          * calls to the <tt>join()</tt>
                                           * function.
                                           */
         mutable ThreadMutex   join_mutex;
@@ -2859,7 +2859,7 @@ namespace Threads
                                           * point and arguments. Store
                                           * the result of the
                                           * operation in the
-                                          * @p{thread} member variable
+                                          * <tt>thread</tt> member variable
                                           * for further use.
                                           */
         void create (void * (*p) (void *), void *d);
@@ -2913,7 +2913,7 @@ namespace Threads
                                     * around in user space.
                                     *
                                     * The default value of the
-                                    * template argument is @p{void},
+                                    * template argument is <tt>void</tt>,
                                     * so if the function you are
                                     * calling on a new thread has no
                                     * return value, you can omit the
@@ -2929,13 +2929,13 @@ namespace Threads
                                         * with a pointer to an
                                         * internal thread object. This
                                         * is the constructor used to
-                                        * the @p{spawn} family of
+                                        * the <tt>spawn</tt> family of
                                         * functions.
                                         *
                                         * We would like to make this
                                         * constructor private and only
                                         * grant the
-                                        * @p{wrapper_base::fire_up}
+                                        * <tt>wrapper_base::fire_up</tt>
                                         * function friendship, but
                                         * granting friendship to
                                         * functions in other
@@ -2959,7 +2959,7 @@ namespace Threads
                                         * except for assigning it a
                                         * thread object that holds
                                         * data created by the
-                                        * @p{spawn} functions.
+                                        * <tt>spawn</tt> functions.
                                         */
       Thread () {};
 
@@ -2984,7 +2984,7 @@ namespace Threads
                                         * thread. Since this is only
                                         * available once the thread
                                         * finishes, this implicitely
-                                        * also calls @p{join()}.
+                                        * also calls <tt>join()</tt>.
                                         */
       RT return_value () {
         join ();
@@ -3044,7 +3044,7 @@ namespace Threads
                                       * return type of the function
                                       * being called. The second one
                                       * is a class that provides a
-                                      * function @p{entry_point},
+                                      * function <tt>entry_point</tt>,
                                       * which will be used as an entry
                                       * point for the new thread. In
                                       * the classes derived from this
@@ -4965,7 +4965,7 @@ namespace Threads
                                         * not supported, there can
                                         * only be exactly one thread,
                                         * and the result is
-                                        * @p{true}. This function
+                                        * <tt>true</tt>. This function
                                         * doesn't make much sense,
                                         * though, when threads are not
                                         * supported.
@@ -5073,7 +5073,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with no arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5089,7 +5089,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * no arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5141,7 +5141,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions with
                                     * 1 argument. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5157,7 +5157,7 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * const member functions with 1
                                     * argument. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5212,7 +5212,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 2 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5228,7 +5228,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 2 arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -5283,7 +5283,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 3 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5300,7 +5300,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 3 arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -5358,7 +5358,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 4 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5375,7 +5375,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 4 arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -5435,7 +5435,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 5 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5454,7 +5454,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 5 arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -5515,7 +5515,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 6 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5534,7 +5534,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 6 arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -5598,7 +5598,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 7 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5620,7 +5620,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 7 arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -5688,7 +5688,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 8 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5712,7 +5712,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 8 arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -5784,7 +5784,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 9 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5808,7 +5808,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 9 arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -5881,7 +5881,7 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 10 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5907,7 +5907,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 10 arguments. This is the
-                                    * version of the @p{spawn}
+                                    * version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -5969,7 +5969,7 @@ namespace Threads
                                     * for non-member or static member
                                     * functions with no
                                     * arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -6019,7 +6019,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 1 argument. This
-                                    * is the version of the @p{spawn}
+                                    * is the version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -6071,7 +6071,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 2 arguments. This
-                                    * is the version of the @p{spawn}
+                                    * is the version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -6124,7 +6124,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 3 arguments. This
-                                    * is the version of the @p{spawn}
+                                    * is the version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -6180,7 +6180,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 4 arguments. This
-                                    * is the version of the @p{spawn}
+                                    * is the version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -6238,7 +6238,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 5 arguments. This
-                                    * is the version of the @p{spawn}
+                                    * is the version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -6297,7 +6297,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 6 arguments. This
-                                    * is the version of the @p{spawn}
+                                    * is the version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -6358,7 +6358,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 7 arguments. This
-                                    * is the version of the @p{spawn}
+                                    * is the version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -6423,7 +6423,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 8 arguments. This
-                                    * is the version of the @p{spawn}
+                                    * is the version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -6492,7 +6492,7 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 9 arguments. This
-                                    * is the version of the @p{spawn}
+                                    * is the version of the <tt>spawn</tt>
                                     * function for the case that
                                     * threading is not enabled.
                                     */
@@ -6563,7 +6563,7 @@ namespace Threads
                                     * for non-member or static member
                                     * functions with 10
                                     * arguments. This is the version
-                                    * of the @p{spawn} function for
+                                    * of the <tt>spawn</tt> function for
                                     * the case that threading is not
                                     * enabled.
                                     */
@@ -6642,7 +6642,7 @@ namespace Threads
   
 }   // end of implementation of namespace Threads
 
-
+/// @endif
 
 
 //----------------------------   thread_management.h     ---------------------------

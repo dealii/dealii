@@ -35,9 +35,9 @@ namespace internal
                                       * in inner typedef with the
                                       * following semantics: if the
                                       * first template parameter is
-                                      * @p{true}, then the inner
-                                      * typedef is @p{volatile T},
-                                      * otherwise @p{T}. We achieve
+                                      * <tt>true</tt>, then the inner
+                                      * typedef is <tt>volatile T</tt>,
+                                      * otherwise <tt>T</tt>. We achieve
                                       * this behavior by partial
                                       * specialization of the general
                                       * template for both values of
@@ -49,7 +49,7 @@ namespace internal
                                       * or not, depending on whether
                                       * we are in multithreaded mode
                                       * or not. (If we are in MT mode,
-                                      * then we need the @p{volatile}
+                                      * then we need the <tt>volatile</tt>
                                       * specifier since more than one
                                       * thread my modify the counter
                                       * at the same time.
@@ -57,12 +57,12 @@ namespace internal
                                       * Since we only partially
                                       * specialize the case that the
                                       * boolean template argument is
-                                      * @p{false}, this general
+                                      * <tt>false</tt>, this general
                                       * template catches the case that
-                                      * it is @p{true}, i.e. in a
+                                      * it is <tt>true</tt>, i.e. in a
                                       * sense it is also a
                                       * specialization since a
-                                      * @p{bool} can only have two
+                                      * <tt>bool</tt> can only have two
                                       * states.
                                       *
                                       * @author Wolfgang Bangerth, 2003
@@ -77,7 +77,7 @@ namespace internal
                                       * Specialization of the template
                                       * for the case that the first
                                       * template argument is
-                                      * @p{false}, i.e. the
+                                      * <tt>false</tt>, i.e. the
                                       * non-volatile case.
                                       */
     template <typename T> struct PossiblyVolatile<false,T>
@@ -97,8 +97,8 @@ namespace internal
  * constructor by reference, is stored. Then, the original object may
  * not be deleted before the dependent object is deleted. You can assert
  * this constraint by letting the object passed be derived from this class
- * and let the user @p{subscribe} to this object. The destructor the used
- * object inherits from the @p{Subscriptor} class then will lead to an error
+ * and let the user <tt>subscribe</tt> to this object. The destructor the used
+ * object inherits from the <tt>Subscriptor</tt> class then will lead to an error
  * when destruction is attempted while there are still subscriptions.
  */
 class Subscriptor
@@ -131,7 +131,7 @@ class Subscriptor
 				      * care, too, because the counter
 				      * has to remain the same. It therefore
 				      * does nothing more than returning
-				      * @p{*this}.
+				      * <tt>*this</tt>.
 				      */
     Subscriptor& operator = (const Subscriptor&);
         
@@ -168,7 +168,7 @@ class Subscriptor
 
 				     /**
 				      * Exception: object should be used
-				      * when @p{unsubscribe} is called.
+				      * when <tt>unsubscribe</tt> is called.
 				      */
     DeclException0(ExcNotUsed);
 
@@ -187,7 +187,7 @@ class Subscriptor
 				      * The creator (and owner) of an
 				      * object is not counted.
 				      *
-				      * We use the @p{mutable} keyword
+				      * We use the <tt>mutable</tt> keyword
 				      * in order to allow subscription
 				      * to constant objects also.
 				      *
@@ -195,7 +195,7 @@ class Subscriptor
 				      * counter may be modified by
 				      * different threads. We thus
 				      * have to mark it
-				      * @p{volatile}. However, this is
+				      * <tt>volatile</tt>. However, this is
 				      * counter-productive in non-MT
 				      * mode since it may pessimize
 				      * code. So use the above

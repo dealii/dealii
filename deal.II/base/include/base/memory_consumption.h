@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,52 +25,52 @@
  * This namespace provides functions helping to determine the amount
  * of memory used by objects. The goal is not necessarily to give the
  * amount of memory used up to the last bit (what is the memory used
- * by an STL @p{std::map<>} object?), but rather to aid in the search for
+ * by an STL <tt>std::map<></tt> object?), but rather to aid in the search for
  * memory bottlenecks.
  *
  * The functions in this namespace work basically by reducing each
  * object to its basics as far as they are known from this place. They
  * do not attempt to know what goes on in each object, if they are not
- * basic types (such as @p{int} or @p{double}) or STL containers (such
- * as @p{vectors}). The method goes as follows: if the object with
- * which a @p{memory_consumption} function from this namespace is an
- * atomic type, the return its size by applying the @p{sizeof}
+ * basic types (such as <tt>int</tt> or <tt>double</tt>) or STL containers (such
+ * as <tt>vectors</tt>). The method goes as follows: if the object with
+ * which a <tt>memory_consumption</tt> function from this namespace is an
+ * atomic type, the return its size by applying the <tt>sizeof</tt>
  * operator to it. If this is not the case, then try to reduce it to
  * more basic types.
  *
- * For example, if it is a C-style array or a standard C++ @p{std::vector},
+ * For example, if it is a C-style array or a standard C++ <tt>std::vector</tt>,
  * then sum up the sizes of the array elements by calling
- * @p{memory_consumption} on each of them. This way, we can also
- * reduce objects of type @p{std::vector<std::vector<double> >} to its atomic
+ * <tt>memory_consumption</tt> on each of them. This way, we can also
+ * reduce objects of type <tt>std::vector<std::vector<double> ></tt> to its atomic
  * types, and can thus determine the memory used even if the sizes of
  * the elements of the outermost vector differ (e.g. the first
  * sub-vector has 3 and the second sub-vector has 10 elements).
  *
  * There are two exceptions to simply adding up the sizes of the
- * subobjects: for C++ @p{std::vector} objects, we also have to add the
- * size of the vector object, i.e. @p{sizeof(vector<T>)}, to the sizes
+ * subobjects: for C++ <tt>std::vector</tt> objects, we also have to add the
+ * size of the vector object, i.e. <tt>sizeof(vector<T>)</tt>, to the sizes
  * of the elements. Secondly, for the most common used vectors, such
- * as @p{std::vector<double>} and @p{std::vector<unsigned int>} we determine the
+ * as <tt>std::vector<double></tt> and <tt>std::vector<unsigned int></tt> we determine the
  * size without a loop but rather directly, since we know that the
  * sizes of the elements are constant.
  *
- * Finally, if we cannot reduce a type @p{T} further, because it is
+ * Finally, if we cannot reduce a type <tt>T</tt> further, because it is
  * neither atomic nor a known C++ data type, we call a member function
- * @p{T::memory_consumption} on it, which we assume to exist. Almost
+ * <tt>T::memory_consumption</tt> on it, which we assume to exist. Almost
  * all classes in the deal.II library have such a function. This way,
- * if we call @p{memory_consumption(v)} on a vector @p{v} of type
- * @p{FullMatrix<double>}, we first reduce this to a loop in which we
- * call @p{memory_consumption(v[i])}, and because there is no such
+ * if we call <tt>memory_consumption(v)</tt> on a vector <tt>v</tt> of type
+ * <tt>FullMatrix<double></tt>, we first reduce this to a loop in which we
+ * call <tt>memory_consumption(v[i])</tt>, and because there is no such
  * function handling this explicitly, we try to call
- * @p{v[i].memory_consumption()}.
+ * <tt>v[i].memory_consumption()</tt>.
  *
  *
  * @sect3{Extending this namespace}
  *
  * The functions in this namespace and the functionality provided by
  * it live on the assumption that there is either a function
- * @p{memory_consumption(T)} in this namespace determining the amount
- * of memory use by objects of type @p{T}, or that the class @p{T} has
+ * <tt>memory_consumption(T)</tt> in this namespace determining the amount
+ * of memory use by objects of type <tt>T</tt>, or that the class <tt>T</tt> has
  * a function of that name as member function. While the latter is
  * true for almost all class in deal.II, we have only implemented the
  * first kind of functions for the most common data types, such as
@@ -85,7 +85,7 @@ namespace MemoryConsumption
 {
 				   /**
 				    * Determine the amount of memory
-				    * in bytes consumed by a @p{bool}
+				    * in bytes consumed by a <tt>bool</tt>
 				    * variable.
 				    */
   inline
@@ -93,7 +93,7 @@ namespace MemoryConsumption
 
 				   /**
 				    * Determine the amount of memory
-				    * in bytes consumed by a @p{char}
+				    * in bytes consumed by a <tt>char</tt>
 				    * variable.
 				    */
   inline
@@ -102,7 +102,7 @@ namespace MemoryConsumption
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a
-				    * @p{short int} variable.
+				    * <tt>short int</tt> variable.
 				    */
   inline
   unsigned int memory_consumption (const short int);
@@ -110,14 +110,14 @@ namespace MemoryConsumption
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a
-				    * @p{short unsigned int} variable.
+				    * <tt>short unsigned int</tt> variable.
 				    */
   inline
   unsigned int memory_consumption (const short unsigned int);
 
 				   /**
 				    * Determine the amount of memory
-				    * in bytes consumed by a @p{int}
+				    * in bytes consumed by a <tt>int</tt>
 				    * variable.
 				    */
   inline
@@ -125,7 +125,7 @@ namespace MemoryConsumption
 
 				   /**
 				    * Determine the amount of memory
-				    * in bytes consumed by a @p{unsigned int}
+				    * in bytes consumed by a <tt>unsigned int</tt>
 				    * variable.
 				    */
   inline
@@ -133,7 +133,7 @@ namespace MemoryConsumption
 
 				   /**
 				    * Determine the amount of memory
-				    * in bytes consumed by a @p{float}
+				    * in bytes consumed by a <tt>float</tt>
 				    * variable.
 				    */
   inline
@@ -141,7 +141,7 @@ namespace MemoryConsumption
 
 				   /**
 				    * Determine the amount of memory
-				    * in bytes consumed by a @p{double}
+				    * in bytes consumed by a <tt>double</tt>
 				    * variable.
 				    */
   inline
@@ -150,7 +150,7 @@ namespace MemoryConsumption
 				   /**
 				    * Determine an estimate of the
 				    * amount of memory in bytes
-				    * consumed by a @p{std::string}
+				    * consumed by a <tt>std::string</tt>
 				    * variable.
 				    */
   inline
@@ -159,16 +159,16 @@ namespace MemoryConsumption
 				   /**
 				    * Determine an estimate of the
 				    * amount of memory in bytes
-				    * consumed by a @p{std::vector} of
+				    * consumed by a <tt>std::vector</tt> of
 				    * certain elements. It does so by
 				    * looping over all elements of the
 				    * vector and determining their
 				    * sizes using the
-				    * @p{memory_consumption}
+				    * <tt>memory_consumption</tt>
 				    * functions. If the elements are
 				    * of constant size, there might be
 				    * another global function
-				    * @p{memory_consumption} for this
+				    * <tt>memory_consumption</tt> for this
 				    * data type or if there is a
 				    * member function of that class of
 				    * that names that returns a
@@ -213,12 +213,12 @@ namespace MemoryConsumption
 				    * C-style array. Since in this
 				    * library we do not usually
 				    * store simple data elements
-				    * like @p{double}s in such
+				    * like <tt>double</tt>s in such
 				    * arrays (but rather use STL
-				    * @p{std::vector}s or deal.II
-				    * @p{Vector} objects), we do not
+				    * <tt>std::vector</tt>s or deal.II
+				    * <tt>Vector</tt> objects), we do not
 				    * provide specializations like
-				    * for the @p{std::vector} arrays, but
+				    * for the <tt>std::vector</tt> arrays, but
 				    * always use the loop over all
 				    * elements.
 				    */
@@ -230,7 +230,7 @@ namespace MemoryConsumption
 				    * Specialization of the
 				    * determination of the memory
 				    * consumption of a vector, here
-				    * for a vector of @p{bool}s.
+				    * for a vector of <tt>bool</tt>s.
 				    *
 				    * This is a special case, as the
 				    * bools are not stored
@@ -244,7 +244,7 @@ namespace MemoryConsumption
 				    * Specialization of the
 				    * determination of the memory
 				    * consumption of a vector, here
-				    * for a vector of @p{int}s.
+				    * for a vector of <tt>int</tt>s.
 				    */
   inline
   unsigned int memory_consumption (const std::vector<int> &v);
@@ -253,7 +253,7 @@ namespace MemoryConsumption
 				    * Specialization of the
 				    * determination of the memory
 				    * consumption of a vector, here
-				    * for a vector of @p{double}s.
+				    * for a vector of <tt>double</tt>s.
 				    */
   inline
   unsigned int memory_consumption (const std::vector<double> &v);
@@ -262,7 +262,7 @@ namespace MemoryConsumption
 				    * Specialization of the
 				    * determination of the memory
 				    * consumption of a vector, here
-				    * for a vector of @p{float}s.
+				    * for a vector of <tt>float</tt>s.
 				    */
   inline
   unsigned int memory_consumption (const std::vector<float> &v);
@@ -271,7 +271,7 @@ namespace MemoryConsumption
 				    * Specialization of the
 				    * determination of the memory
 				    * consumption of a vector, here
-				    * for a vector of @p{char}s.
+				    * for a vector of <tt>char</tt>s.
 				    */
   inline
   unsigned int memory_consumption (const std::vector<char> &v);
@@ -280,7 +280,7 @@ namespace MemoryConsumption
 				    * Specialization of the
 				    * determination of the memory
 				    * consumption of a vector, here
-				    * for a vector of @p{unsigned char}s.
+				    * for a vector of <tt>unsigned char</tt>s.
 				    */
   inline
   unsigned int memory_consumption (const std::vector<unsigned char> &v);
@@ -357,10 +357,10 @@ namespace MemoryConsumption
 				    * by the object pointed to.
 				    *
 				    * Note that we needed this
-				    * function since @p{void} is no
-				    * type and a @p{void*} is thus
+				    * function since <tt>void</tt> is no
+				    * type and a <tt>void*</tt> is thus
 				    * not caught by the general
-				    * @p{T*} template function
+				    * <tt>T*</tt> template function
 				    * above.
 				    */
   inline
@@ -372,7 +372,7 @@ namespace MemoryConsumption
 				    * not explicitly listed: try if
 				    * there is a member function
 				    * called
-				    * @p{memory_consumption}. If
+				    * <tt>memory_consumption</tt>. If
 				    * this is not the case, then the
 				    * compiler will in any case
 				    * complain that this last exit
@@ -386,6 +386,8 @@ namespace MemoryConsumption
 
 
 // now comes the implementation of these functions
+
+/// @if NoDoc
 
 namespace MemoryConsumption
 {
@@ -596,6 +598,6 @@ namespace MemoryConsumption
   }
 }
 
-
+/// @endif
 
 #endif

@@ -25,7 +25,7 @@ template <int dim> class Tensor<1,dim>;
  * an arbitrary number of indices. The Tensor class provides an
  * indexing operator and a bit of infrastructure, but most
  * functionality is recursively handed down to tensors of rank 1 or
- * put into external templated functions, e.g. the @p{contract} family.
+ * put into external templated functions, e.g. the <tt>contract</tt> family.
  *
  * Using this tensor class for objects of rank 2 has advantages over
  * matrices in many cases since the dimension is known to the compiler
@@ -43,7 +43,7 @@ class Tensor
 				      * explicit knowledge of it's
 				      * data type. Implementation is
 				      * this way instead of providing
-				      * a function @p{dimension()}
+				      * a function <tt>dimension()</tt>
 				      * because now it is possible to
 				      * get the dimension at compile
 				      * time without the expansion and
@@ -125,26 +125,26 @@ class Tensor
     Tensor<rank_,dim> & operator -= (const Tensor<rank_,dim> &);
 
 				     /**
-				      *  Scale the tensor by @p{factor}, i.e. multiply
-				      *  all coordinates by @p{factor}.
+				      *  Scale the tensor by <tt>factor</tt>, i.e. multiply
+				      *  all coordinates by <tt>factor</tt>.
 				      */
     Tensor<rank_,dim> & operator *= (const double &factor);
 
 				     /**
-				      *  Scale the vector by @p{1/factor}.
+				      *  Scale the vector by <tt>1/factor</tt>.
 				      */
     Tensor<rank_,dim> & operator /= (const double &factor);
 
 				     /**
 				      *  Add two tensors. If possible, use
-				      *  @p{operator +=} instead since this does not
+				      *  <tt>operator +=</tt> instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Tensor<rank_,dim>   operator + (const Tensor<rank_,dim> &) const;
 
 				     /**
 				      *  Subtract two tensors. If possible, use
-				      *  @p{operator +=} instead since this does not
+				      *  <tt>operator +=</tt> instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Tensor<rank_,dim>   operator - (const Tensor<rank_,dim> &) const;
@@ -431,7 +431,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<rank_,1> &p)
 
 /**
  * Contract a tensor of rank 1 with a tensor of rank 1. The result is
- * @p{sum_j src1[j] src2[j]}.
+ * <tt>sum_j src1[j] src2[j]</tt>.
  *
  * @author Guido Kanschat, 2000
  */
@@ -450,7 +450,7 @@ double contract (const Tensor<1,dim> &src1,
 
 /**
  * Contract a tensor of rank 2 with a tensor of rank 1. The result is
- * @p{dest[i] = sum_j src1[i][j] src2[j]}.
+ * <tt>dest[i] = sum_j src1[i][j] src2[j]</tt>.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -470,7 +470,7 @@ void contract (Tensor<1,dim>       &dest,
 
 /**
  * Contract a tensor of rank 1 with a tensor of rank 2. The result is
- * @p{dest[i] = sum_j src1[j] src2[j][i]}.
+ * <tt>dest[i] = sum_j src1[j] src2[j][i]</tt>.
  *
  * @author Guido Kanschat, 2001
  */
@@ -490,7 +490,7 @@ void contract (Tensor<1,dim>       &dest,
 
 /**
  * Contract a tensor of rank 2 with a tensor of rank 2. The result is
- * @p{dest[i][k] = sum_j src1[i][j] src2[j][k]}.
+ * <tt>dest[i][k] = sum_j src1[i][j] src2[j][k]</tt>.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -511,11 +511,11 @@ void contract (Tensor<2,dim>       &dest,
 
 /**
  * Contract a tensor of rank 2 with a tensor of rank 2. The
- * contraction is performed over index @p{index1} of the first tensor,
- * and @p{index2} of the second tensor. Thus, if @p{index1==2},
- * @p{index2==1}, the result is the usual contraction, but if for
- * example @p{index1==1}, @p{index2==2}, then the result is
- * @p{dest[i][k] = sum_j src1[j][i] src2[k][j]}.
+ * contraction is performed over index <tt>index1</tt> of the first tensor,
+ * and <tt>index2</tt> of the second tensor. Thus, if <tt>index1==2</tt>,
+ * <tt>index2==1</tt>, the result is the usual contraction, but if for
+ * example <tt>index1==1</tt>, <tt>index2==2</tt>, then the result is
+ * <tt>dest[i][k] = sum_j src1[j][i] src2[k][j]</tt>.
  *
  * Note that the number of the index is counted from 1 on, not from
  * zero as usual.
@@ -584,7 +584,7 @@ void contract (Tensor<2,dim>       &dest,
 
 /**
  * Contract a tensor of rank 3 with a tensor of rank 1. The
- * contraction is performed over index @p{index1} of the first
+ * contraction is performed over index <tt>index1</tt> of the first
  * tensor.
  *
  * Note that the number of the index is counted from 1 on, not from
@@ -633,7 +633,7 @@ void contract (Tensor<2,dim>       &dest,
 
 /**
  * Contract a tensor of rank 3 with a tensor of rank 2. The result is
- * @p{dest[i][j][l] = sum_k src1[i][j][k] src2[k][l]}.
+ * <tt>dest[i][j][l] = sum_k src1[i][j][k] src2[k][l]</tt>.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -655,7 +655,7 @@ void contract (Tensor<3,dim>       &dest,
 
 /**
  * Contract a tensor of rank 2 with a tensor of rank 3. The result is
- * @p{dest[i][j][l] = sum_k src1[i][k] src2[k][j][l]}.
+ * <tt>dest[i][j][l] = sum_k src1[i][k] src2[k][j][l]</tt>.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -676,7 +676,7 @@ void contract (Tensor<3,dim>       &dest,
 
 /**
  * Contract a tensor of rank 3 with a tensor of rank 3. The result is
- * @p{dest[i][j][k][l] = sum_m src1[i][j][m] src2[m][k][l]}.
+ * <tt>dest[i][j][k][l] = sum_m src1[i][j][m] src2[m][k][l]</tt>.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -699,7 +699,7 @@ void contract (Tensor<4,dim>       &dest,
 
 /**
  * Form the outer product of two tensors of rank 1 and 1, i.e.
- * @p{dst[i][j] = src1[i] * src2[j]}.
+ * <tt>dst[i][j] = src1[i] * src2[j]</tt>.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -717,7 +717,7 @@ void outer_product (Tensor<2,dim>       &dst,
 
 /**
  * Form the outer product of two tensors of rank 1 and 2, i.e.
- * @p{dst[i][j][k] = src1[i] * src2[j][k]}.
+ * <tt>dst[i][j][k] = src1[i] * src2[j][k]</tt>.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -736,7 +736,7 @@ void outer_product (Tensor<3,dim>       &dst,
 
 /**
  * Form the outer product of two tensors of rank 2 and 1, i.e.
- * @p{dst[i][j][k] = src1[i][j] * src2[k]}.
+ * <tt>dst[i][j][k] = src1[i][j] * src2[k]</tt>.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -755,8 +755,8 @@ void outer_product (Tensor<3,dim>       &dst,
 
 /**
  * Form the outer product of two tensors of rank 0 and 1, i.e.
- * @p{dst[i] = src1 * src2[i]}. Of course, this is only a scaling of
- * @p{src2}, but we consider this an outer product for completeness of
+ * <tt>dst[i] = src1 * src2[i]</tt>. Of course, this is only a scaling of
+ * <tt>src2</tt>, but we consider this an outer product for completeness of
  * these functions and since this is sometimes needed when writing
  * templates that depend on the rank of a tensor, which may sometimes
  * be zero (i.e. a scalar).
@@ -776,8 +776,8 @@ void outer_product (Tensor<1,dim>       &dst,
 
 /**
  * Form the outer product of two tensors of rank 1 and 0, i.e.
- * @p{dst[i] = src1[i] * src2}. Of course, this is only a scaling of
- * @p{src1}, but we consider this an outer product for completeness of
+ * <tt>dst[i] = src1[i] * src2</tt>. Of course, this is only a scaling of
+ * <tt>src1</tt>, but we consider this an outer product for completeness of
  * these functions and since this is sometimes needed when writing
  * templates that depend on the rank of a tensor, which may sometimes
  * be zero (i.e. a scalar).
@@ -801,7 +801,7 @@ void outer_product (Tensor<1,dim>       &dst,
  * vector. This function is defined for all space dimensions to allow
  * for dimension independent programming (e.g. within switches over
  * the space dimenion), but may only be called if the actual dimension
- * of the arguments is two (e.g. from the @p{dim==2} case in the
+ * of the arguments is two (e.g. from the <tt>dim==2</tt> case in the
  * switch).
  *
  * @author Guido Kanschat, 2001
@@ -825,7 +825,7 @@ cross_product (Tensor<1,dim>       &dst,
  * space dimensions to allow for dimension independent programming
  * (e.g. within switches over the space dimenion), but may only be
  * called if the actual dimension of the arguments is three (e.g. from
- * the @p{dim==3} case in the switch).
+ * the <tt>dim==3</tt> case in the switch).
  *
  * @author Guido Kanschat, 2001
  */
@@ -861,7 +861,7 @@ double determinant (const Tensor<rank,1> &t)
 				   // can be computed by recursion. we
 				   // need therefore not try to access
 				   // the number itself, which is
-				   // difficult since it needs @p{rank}
+				   // difficult since it needs <tt>rank</tt>
 				   // indirections, which is not
 				   // computable in the general
 				   // template
@@ -886,7 +886,7 @@ double determinant (const Tensor<1,1> &t)
 
 
 /**
- * Compute the determinant of a tensor or rank 2, here for @p{dim==2}.
+ * Compute the determinant of a tensor or rank 2, here for <tt>dim==2</tt>.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -901,7 +901,7 @@ double determinant (const Tensor<2,2> &t)
 
 
 /**
- * Compute the determinant of a tensor or rank 2, here for @p{dim==3}.
+ * Compute the determinant of a tensor or rank 2, here for <tt>dim==3</tt>.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -1011,7 +1011,7 @@ invert (const Tensor<2,dim> &t)
  * perform the return value optimization, and since the size of the
  * return object is known, it is acceptable to return the result by
  * value, rather than by reference as a parameter. Note that there are
- * specializations of this function for @p{dim==1,2,3}.
+ * specializations of this function for <tt>dim==1,2,3</tt>.
  *
  * @author Wolfgang Bangerth, 2002
  */
@@ -1035,7 +1035,7 @@ transpose (const Tensor<2,dim> &t)
 
 /**
  * Return the transpose of the given tensor. This is the
- * specialization of the general template for @p{dim==1}.
+ * specialization of the general template for <tt>dim==1</tt>.
  *
  * @author Wolfgang Bangerth, 2002
  */
@@ -1051,7 +1051,7 @@ transpose (const Tensor<2,1> &t)
 
 /**
  * Return the transpose of the given tensor. This is the
- * specialization of the general template for @p{dim==2}.
+ * specialization of the general template for <tt>dim==2</tt>.
  *
  * @author Wolfgang Bangerth, 2002
  */
@@ -1068,7 +1068,7 @@ transpose (const Tensor<2,2> &t)
 
 /**
  * Return the transpose of the given tensor. This is the
- * specialization of the general template for @p{dim==3}.
+ * specialization of the general template for <tt>dim==3</tt>.
  *
  * @author Wolfgang Bangerth, 2002
  */

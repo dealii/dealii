@@ -51,7 +51,7 @@ class QuadratureSelector : public Quadrature<dim>
 				     /**
 				      * This function returns all
 				      * possible names for quadratures
-				      * as a list separated by @p{|},
+				      * as a list separated by <tt>|</tt>,
 				      * so that you can use it for the
 				      * definition of parameter files
 				      * (see @ref{ParameterHandler} for

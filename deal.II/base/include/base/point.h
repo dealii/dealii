@@ -21,23 +21,23 @@
 
 
 /**
- * The @p{Point} class provides for a point or vector in a space with arbitrary
- * dimension @p{dim}.
+ * The <tt>Point</tt> class provides for a point or vector in a space with arbitrary
+ * dimension <tt>dim</tt>.
  *
  * It is the preferred object to be passed to functions which
  * operate on points in spaces of a priori unknown dimension: rather than
- * using functions like @p{double f(double x)} and @p{double f(double x, double y)},
- * you use double @p{f(Point<dim> &p)}.
+ * using functions like <tt>double f(double x)</tt> and <tt>double f(double x, double y)</tt>,
+ * you use double <tt>f(Point<dim> &p)</tt>.
  *
- * @p{Point} also serves as a starting point for the implementation of the
- * geometrical primitives like @p{Polyhedron}, @p{Triangle}, etc.
+ * <tt>Point</tt> also serves as a starting point for the implementation of the
+ * geometrical primitives like <tt>Polyhedron</tt>, <tt>Triangle</tt>, etc.
  *
- * @p{Point}s can also be thought of as vectors, i.e. points in a vector space
+ * <tt>Point</tt>s can also be thought of as vectors, i.e. points in a vector space
  * without an obvious meaning. For instance, it may be suitable to let the
- * gradient of a function be a @p{point} vector:
- * @p{Point<dim> gradient_of_f (const Point<dim> &x)}. @p{Point}s have all
+ * gradient of a function be a <tt>point</tt> vector:
+ * <tt>Point<dim> gradient_of_f (const Point<dim> &x)</tt>. <tt>Point</tt>s have all
  * functionality for this, e.g. scalar products, addition etc. However, you
- * should also consider using the simpler @p{Tensor<1,dim>} class, which seems
+ * should also consider using the simpler <tt>Tensor<1,dim></tt> class, which seems
  * more suited to gradients.
  *
  * @author Wolfgang Bangerth, 1997
@@ -55,7 +55,7 @@ class Point : public Tensor<1,dim>
 				     /**
 				      * Constructor. Initialize all
 				      * entries to zero if
-				      * @p{initialize==true}.
+				      * <tt>initialize==true</tt>.
 				      */
     explicit Point (const bool initialize);
 
@@ -68,35 +68,35 @@ class Point : public Tensor<1,dim>
     
 				     /**
 				      *  Constructor for one dimensional points. This
-				      *  function is only implemented for @p{dim==1}
+				      *  function is only implemented for <tt>dim==1</tt>
 				      *  since the usage is considered unsafe
-				      *  for points with @p{dim!=1}.
+				      *  for points with <tt>dim!=1</tt>.
 				      */
     explicit Point (const double x);
 
 				     /**
 				      *  Constructor for two dimensional points. This
-				      *  function is only implemented for @p{dim==2}
+				      *  function is only implemented for <tt>dim==2</tt>
 				      *  since the usage is considered unsafe
-				      *  for points with @p{dim!=2}.
+				      *  for points with <tt>dim!=2</tt>.
 				      */
     Point (const double x, const double y);
     
 				     /**
 				      *  Constructor for three dimensional points. This
-				      *  function is only implemented for @p{dim==3}
+				      *  function is only implemented for <tt>dim==3</tt>
 				      *  since the usage is considered unsafe
-				      *  for points with @p{dim!=3}.
+				      *  for points with <tt>dim!=3</tt>.
 				      */
     Point (const double x, const double y, const double z);
 
 				     /**
-				      *  Read access to the @p{index}th coordinate.
+				      *  Read access to the <tt>index</tt>th coordinate.
 				      */
     double   operator () (const unsigned int index) const;
 
     				     /**
-				      *  Read and write access to the @p{index}th
+				      *  Read and write access to the <tt>index</tt>th
 				      *  coordinate.
 				      */
     double & operator () (const unsigned int index);
@@ -108,14 +108,14 @@ class Point : public Tensor<1,dim>
 					 
 				     /**
 				      *  Add two point vectors. If possible, use
-				      *  @p{operator +=} instead since this does not
+				      *  <tt>operator +=</tt> instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Point<dim>   operator + (const Tensor<1,dim>&) const;
 
 				     /**
 				      *  Subtract two point vectors. If possible, use
-				      *  @p{operator +=} instead since this does not
+				      *  <tt>operator +=</tt> instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Point<dim>   operator - (const Tensor<1,dim>&) const;
@@ -127,7 +127,7 @@ class Point : public Tensor<1,dim>
     
 				     /**
 				      *  Multiply by a factor. If possible, use
-				      *  @p{operator *=} instead since this does not
+				      *  <tt>operator *=</tt> instead since this does not
 				      *  need to copy a point at least once.
 				      *
 				      * There is a commutative complement to this
@@ -142,7 +142,7 @@ class Point : public Tensor<1,dim>
 
 				     /**
 				      *  Divide by a factor. If possible, use
-				      *  @p{operator /=} instead since this does not
+				      *  <tt>operator /=</tt> instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Point<dim>   operator / (const double) const;
@@ -155,8 +155,8 @@ class Point : public Tensor<1,dim>
     double              square () const;
     
 				     /**
-				      * Returns the distance of @p{this} 
-				      * point to the point @p{p}.
+				      * Returns the distance of <tt>this</tt> 
+				      * point to the point <tt>p</tt>.
 				      */
     double distance (const Point<dim> &p) const;
 
