@@ -124,7 +124,7 @@ TODO:
 
 TAGS:
 	@cd $D/common ; etags $D/base/source/*.cc \
-	$D/lac/source/*.cc $D/deal.II/source/*/*.cc \
+	$D/lac/source/*.cc $D/deal.II/source/*/*.cc $D/deal.II/source/*/*.h \
 	$D/tests/*/*.cc $D/examples/*/*.cc \
 	--language=c++ \
 	$D/base/include/*/*.h $D/lac/include/*/*.h \
