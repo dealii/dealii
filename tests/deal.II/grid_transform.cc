@@ -70,7 +70,7 @@ int main ()
 		   vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
 		{
 		  const Point<dim> &v=face->vertex(vertex_no);
-		  if (fabs(sqrt(v.square())-outer_radius)<1e-12)
+		  if (std::fabs(std::sqrt(v.square())-outer_radius)<1e-12)
 		    {
 						       // leave the
 						       // point, where
@@ -78,7 +78,7 @@ int main ()
 		      new_points.insert(std::pair<unsigned int, Point<dim> > (
 			face->vertex_index(vertex_no), v));
 		    }
-		  else if (fabs(sqrt(v.square())-inner_radius)<1e-12)
+		  else if (std::fabs(std::sqrt(v.square())-inner_radius)<1e-12)
 		    {
 						       // move the
 						       // center of
