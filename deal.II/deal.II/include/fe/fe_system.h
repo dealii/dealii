@@ -232,15 +232,15 @@ class FESystem : public FiniteElement<dim>
     
 
 				     /**
-				      * Calles (among other things)
+				      * Calls (among other things)
 				      * @p{fill_fe_([sub]face)_values}
-				      * of the base elements. Calles
+				      * of the base elements. Calls
 				      * @p{fill_fe_values} if
 				      * @p{face_no==-1} and
-				      * @p{sub_no==-1}; calles
+				      * @p{sub_no==-1}; calls
 				      * @p{fill_fe_face_values} if
 				      * @p{face_no==-1} and
-				      * @p{sub_no!=-1}; and calles
+				      * @p{sub_no!=-1}; and calls
 				      * @p{fill_fe_subface_values} if 
 				      * @p{face_no!=-1} and
 				      * @p{sub_no!=-1}.
