@@ -64,7 +64,8 @@ run: $(target)
 
 
 clean:
-	-rm -f *.o *.go *~ Makefile.dep $(target) *gmv *gnuplot *gpl *eps
+	-rm -f *.o *.go *~ Makefile.dep $(target) *gmv *gnuplot *gpl *eps \
+               sparsity_pattern.*
 
 
 
