@@ -179,7 +179,8 @@ class FE_Q : public FiniteElement<dim>
 				      * in the files @p{mat_q.[123]}
 				      * in the source directory.
 				      */
-    struct Matrices {
+    struct Matrices
+    {
 					 /**
 					  * Embedding matrices. For
 					  * each element type (the
