@@ -24,10 +24,10 @@ void FEValuesBase<deal_II_dimension>::get_function_values<IN>
 (const IN&, std::vector<float>&) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values<IN>
-(const IN&, const SliceVector<const std::vector<unsigned int> >&, std::vector<double>&) const;
+(const IN&, const VectorSlice<const std::vector<unsigned int> >&, std::vector<double>&) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values<IN>
-(const IN&, const SliceVector<const std::vector<unsigned int> >&, std::vector<float>&) const;
+(const IN&, const VectorSlice<const std::vector<unsigned int> >&, std::vector<float>&) const;
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_values<IN>
@@ -38,11 +38,11 @@ void FEValuesBase<deal_II_dimension>::get_function_values<IN>
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_values<IN>
-(const IN&, const SliceVector<const std::vector<unsigned int> >&,
+(const IN&, const VectorSlice<const std::vector<unsigned int> >&,
  std::vector<Vector<double> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values<IN>
-(const IN&, const SliceVector<const std::vector<unsigned int> >&,
+(const IN&, const VectorSlice<const std::vector<unsigned int> >&,
  std::vector<Vector<float> > &) const;
 
 template
@@ -50,7 +50,7 @@ void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
 (const IN&, std::vector<Tensor<1,deal_II_dimension> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
-(const IN&, const SliceVector<const std::vector<unsigned int> >&,
+(const IN&, const VectorSlice<const std::vector<unsigned int> >&,
  std::vector<Tensor<1,deal_II_dimension> > &) const;
 
 template
@@ -58,7 +58,7 @@ void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
 (const IN&, std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
-(const IN&, const SliceVector<const std::vector<unsigned int> >&,
+(const IN&, const VectorSlice<const std::vector<unsigned int> >&,
  std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
 
 template
