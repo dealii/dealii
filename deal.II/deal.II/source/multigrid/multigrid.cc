@@ -2,37 +2,43 @@
 // Copyright Guido Kanschat, Universitaet Heidelberg, 1999
 
 #include <numerics/multigrid.h>
+#include <lac/dvector.h>
 
 void
-MGMatrix::vmult(dVector& dst, const dVector& src) const
+MultiGrid::vmult(dVector& dst, const dVector& src) const
 {
   dst = 0.;
   
   copy_to_mg(s,src);
   
-  for (int l=0;l<maxlevel;++l)
+  for (unsigned l=0;l<maxlevel;++l)
   {
-    level_active_vmult(l,d,s);
+    level_active_vmult(l,d[l],s[l]);
   }
   copy_from_mg(dst,d);
 }
 
 
 void
-MGMatrix::precondition(dVector& dst, const dVector& src) const
+MultiGrid::precondition(dVector& dst, const dVector& src) const
 {
   copy_to_mg(s,src);
-  d = 0.;
-  
-    
+  copy_to_mg(d,dst);
+  level_mgstep(maxlevel);
 }
 
 void
-MGMatrix::level_mgstep(int level)
+MultiGrid::level_mgstep(unsigned level) const
 {
-  for (int i=0; i< n_presmooth; ++i)
+  if (level == minlevel)
   {
-    smooth(level, d, s);
+    coarse_grid_solution(level, d[level], s[level]);
+    return;
+  }
+  
+  for (unsigned i=0; i< n_presmooth; ++i)
+  {
+    smooth(level, d[level], s[level]);
   }
 }
 
