@@ -323,15 +323,22 @@ void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapp
 					       // the gradients field which
 					       // will be used later on.
 	      {
-//TODO: [WB] Only ask once, then copy		
 		if (n_components==1)
-		  for (unsigned int s=0; s<n_solution_vectors; ++s)
-		    neumann_bc.find(n)->second->value(cell->vertex(0),
-						      grad_neighbor[s](0));
+		  {
+		    double v;
+		    neumann_bc.find(n)->second->value(cell->vertex(0), v);
+		    
+		    for (unsigned int s=0; s<n_solution_vectors; ++s)
+		      grad_neighbor[s](0) = v;
+		  }
 		else
+		  {
+		    Vector<double> v(n_components);
+		    neumann_bc.find(n)->second->vector_value(cell->vertex(0), v);
+		    
 		  for (unsigned int s=0; s<n_solution_vectors; ++s)
-		    neumann_bc.find(n)->second->vector_value(cell->vertex(0),
-							     grad_neighbor[s]);
+		    grad_neighbor[s] = v;
+		  };
 	      }
 	    else
 					       // fill with zeroes.
