@@ -489,8 +489,14 @@ namespace deal_II_numbers {
 #endif
 ])
 
-dnl Write output to the global options file
-AC_OUTPUT(common/Make.global_options common/Makefile.template doc/Makefile doc/auto/Makefile doc/auto/kdoc/Makefile)
+dnl Write output to the global options file and modify other files as well
+dnl that need some information
+AC_OUTPUT([common/Make.global_options 
+           common/Makefile.template 
+           common/scripts/make_dependencies.pl
+           doc/Makefile 
+           doc/auto/Makefile 
+           doc/auto/kdoc/Makefile])
 
 
 echo
