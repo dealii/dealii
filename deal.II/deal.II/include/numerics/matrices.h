@@ -51,8 +51,9 @@ class dSMatrix;
  * At present there are functions to create the following matrices:
  * \begin{itemize}
  * \item #create_mass_matrix#: create the matrix with entries
- *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$. Uses the
- *   #MassMatrix# class. 
+ *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$. Here, the $\phi_i$
+ *   are the basis functions of the finite element space given.
+ *   This function uses the #MassMatrix# class. 
  *
  * \item #create_laplace_matrix#: there are two versions of this; the
  *   one which takes the #Function<dim># object creates
@@ -63,26 +64,67 @@ class dSMatrix;
  *   argument, which is a pointer to a function and defaults to zero.
  *   This function uses the #LaplaceMatrix# class.
  * \end{itemize}
+ *
+ *
+ * \subsection{Right hand sides}
+ *
+ * In many cases, you will not only want to build the matrix, but also
+ * a right hand side, which will give a vector with
+ * $f_i = \int_\Omega f(x) \phi_i(x) dx$. For this purpose, each function
+ * exists in two versions, one only building the matrix and one also
+ * building the right hand side vector.
+ *
+ * Creation of the right hand side
+ * is the same for all operators and therefore for all of the functions
+ * below. It would be most orthogonal to write one single function which
+ * builds up the right hand side and not provide many functions doing
+ * the same thing. However, this may result in a heavy performance
+ * penalty, since then many values of a certain finite element have to
+ * be computed twice, so it is more economical to  implement it more than
+ * once. If you only want to create a right hand side as above, there is
+ * a function in the #VectorCreator# class. The use of the latter may be
+ * useful if you want to create many right hand side vectors.
  */
 template <int dim>
 class MatrixCreator {
   public:
 				     /**
-				      * Assemble the mass matrix. See
-				      * the general doc of this class
+				      * Assemble the mass matrix. If no 
+				      * coefficient is given, it is assumed
+				      * to be constant one.
+				      * 
+				      * See the general doc of this class
 				      * for more information.
 				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const FiniteElement<dim> &fe,
 				    const Quadrature<dim>    &q,
 				    const Boundary<dim>      &boundary,
-				    dSMatrix &matrix);
+				    dSMatrix                 &matrix,
+				    const Function<dim>      *a = 0);
+
+    				     /**
+				      * Assemble the mass matrix and a right
+				      * hand side vector. If no 
+				      * coefficient is given, it is assumed
+				      * to be constant one.
+				      * 
+				      * See the general doc of this class
+				      * for more information.
+				      */
+    static void create_mass_matrix (const DoFHandler<dim>    &dof,
+				    const FiniteElement<dim> &fe,
+				    const Quadrature<dim>    &q,
+				    const Boundary<dim>      &boundary,
+				    dSMatrix                 &matrix,
+				    const Function<dim>      &rhs,
+				    dVector                  &rhs_vector,
+				    const Function<dim>      *a = 0);
 
 				     /**
-				      * Assemble the laplace matrix with a
-				      * variable weight function. If no 
+				      * Assemble the Laplace matrix. If no 
 				      * coefficient is given, it is assumed
-				      * to be zero.
+				      * to be constant one.
 				      * 
 				      * See the general doc of this class
 				      * for more information.
@@ -92,6 +134,24 @@ class MatrixCreator {
 				       const Quadrature<dim>    &q,
 				       const Boundary<dim>      &boundary,
 				       dSMatrix &matrix,
+				       const Function<dim>      *a = 0);
+
+				     /**
+				      * Assemble the Laplace matrix and a right
+				      * hand side vector. If no 
+				      * coefficient is given, it is assumed
+				      * to be constant one.
+				      * 
+				      * See the general doc of this class
+				      * for more information.
+				      */
+    static void create_laplace_matrix (const DoFHandler<dim>    &dof,
+				       const FiniteElement<dim> &fe,
+				       const Quadrature<dim>    &q,
+				       const Boundary<dim>      &boundary,
+				       dSMatrix &matrix,
+				       const Function<dim>      &rhs,
+				       dVector                  &rhs_vector,
 				       const Function<dim>      *a = 0);
 };
 
@@ -152,7 +212,7 @@ class MassMatrix :  public Equation<dim> {
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &cell) const;
+			   const typename Triangulation<dim>::cell_iterator &) const;
 
 				     /**
 				      * Construct the cell matrix for this cell.
@@ -161,7 +221,7 @@ class MassMatrix :  public Equation<dim> {
 				      */
     virtual void assemble (dFMatrix            &cell_matrix,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &cell) const;
+			   const typename Triangulation<dim>::cell_iterator &) const;
 
 				     /**
 				      * Only construct the right hand side
@@ -172,7 +232,7 @@ class MassMatrix :  public Equation<dim> {
 				      */
     virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &cell) const;
+			   const typename Triangulation<dim>::cell_iterator &) const;
     
 				     /**
 				      * Exception
@@ -255,7 +315,7 @@ class LaplaceMatrix :  public Equation<dim> {
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &cell) const;
+			   const typename Triangulation<dim>::cell_iterator &) const;
 
 				     /**
 				      * Construct the cell matrix for this cell.
@@ -264,7 +324,7 @@ class LaplaceMatrix :  public Equation<dim> {
 				      */
     virtual void assemble (dFMatrix            &cell_matrix,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &cell) const;
+			   const typename Triangulation<dim>::cell_iterator &) const;
 
 				     /**
 				      * Only construct the right hand side
@@ -275,7 +335,7 @@ class LaplaceMatrix :  public Equation<dim> {
 				      */
     virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &cell) const;
+			   const typename Triangulation<dim>::cell_iterator &) const;
 
 				     /**
 				      * Exception

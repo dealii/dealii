@@ -17,21 +17,55 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const FiniteElement<dim> &fe,
 					     const Quadrature<dim>    &q,
 					     const Boundary<dim>      &boundary,
-					     dSMatrix &matrix) {
+					     dSMatrix                 &matrix,
+					     const Function<dim> * const a) {
   dVector dummy;    // no entries, should give an error if accessed
+  UpdateFlags update_flags = UpdateFlags(update_jacobians |
+					 update_JxW_values);
+  if (a != 0)
+    update_flags = UpdateFlags (update_flags | update_q_points);
   const AssemblerData<dim> data (dof,
 				 true, false,  // assemble matrix but not rhs
 				 matrix, dummy,
-				 q, fe,
-				 UpdateFlags(update_jacobians |
-					     update_JxW_values),
-				 boundary);
+				 q, fe, update_flags, boundary);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
 	       dof.get_tria().begin_active()->index(),
 	       &data);
-  MassMatrix<dim> equation;
+  MassMatrix<dim> equation(0,a);
+  do 
+    {
+      assembler->assemble (equation);
+    }
+  while ((++assembler).state() == valid);
+};
+
+
+
+
+template <int dim>
+void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
+					     const FiniteElement<dim> &fe,
+					     const Quadrature<dim>    &q,
+					     const Boundary<dim>      &boundary,
+					     dSMatrix                 &matrix,
+					     const Function<dim>      &rhs,
+					     dVector                  &rhs_vector,
+					     const Function<dim> * const a) {
+  UpdateFlags update_flags = UpdateFlags(update_q_points |
+					 update_jacobians |
+					 update_JxW_values);
+  const AssemblerData<dim> data (dof,
+				 true, true,
+				 matrix, rhs_vector,
+				 q, fe,	 update_flags, boundary);
+  TriaActiveIterator<dim, Assembler<dim> >
+    assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
+	       dof.get_tria().begin_active()->level(),
+	       dof.get_tria().begin_active()->index(),
+	       &data);
+  MassMatrix<dim> equation(&rhs,a);
   do 
     {
       assembler->assemble (equation);
@@ -47,17 +81,18 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const FiniteElement<dim> &fe,
 						const Quadrature<dim>    &q,
 						const Boundary<dim>      &boundary,
-						dSMatrix &matrix,
+						dSMatrix                 &matrix,
 						const Function<dim> * const a) {
   dVector dummy;   // no entries, should give an error if accessed
+  UpdateFlags update_flags = UpdateFlags(update_gradients |
+					 update_jacobians |
+					 update_JxW_values);
+  if (a != 0)
+    update_flags = UpdateFlags(update_flags | update_q_points);
   const AssemblerData<dim> data (dof,
 				 true, false,  // assemble matrix but not rhs
 				 matrix, dummy,
-				 q, fe,
-				 UpdateFlags(update_gradients |
-					     update_jacobians |
-					     update_JxW_values),
-				 boundary);
+				 q, fe,	 update_flags, boundary);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
@@ -72,6 +107,38 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 };
 
 
+
+template <int dim>
+void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
+						const FiniteElement<dim> &fe,
+						const Quadrature<dim>    &q,
+						const Boundary<dim>      &boundary,
+						dSMatrix                 &matrix,
+						const Function<dim>      &rhs,
+						dVector                  &rhs_vector,
+						const Function<dim> * const a) {
+  UpdateFlags update_flags = UpdateFlags(update_q_points  |
+					 update_gradients |
+					 update_jacobians |
+					 update_JxW_values);
+  const AssemblerData<dim> data (dof,
+				 true, true,
+				 matrix, rhs_vector,
+				 q, fe,
+				 update_flags,
+				 boundary);
+  TriaActiveIterator<dim, Assembler<dim> >
+    assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
+	       dof.get_tria().begin_active()->level(),
+	       dof.get_tria().begin_active()->index(),
+	       &data);
+  LaplaceMatrix<dim> equation (&rhs, a);
+  do 
+    {
+      assembler->assemble (equation);
+    }
+  while ((++assembler).state() == valid);
+};
 
 
 
