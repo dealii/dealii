@@ -176,3 +176,6 @@ Change the vector<int> in 'void DoFQuadAccessor::get_dof_indices(
 	vector<int> &dof_indices) const' in a vector<unsigned int> and
 	catch the Error dof_index==-1 inside of this function
 
+
+Remove that pseudo-template clutter in the lower parts of
+        dof_accessor.cc marked by comments.
