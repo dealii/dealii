@@ -18,12 +18,11 @@ template <int dim> class DoFHandler;
 template <int dim> class FiniteElement;
 template <int dim> class Quadrature;
 template <int dim> class DataOut;
-template <int dim> class Function;
 template <int dim> class Equation;
 template <int dim> class Assembler;
 template <int dim> class Boundary;
 template <int dim> class StraightBoundary;
-
+template <int dim> class Function;
 
 
 /**
@@ -238,19 +237,18 @@ template <int dim>
 class ProblemBase {
   public:
 				     /**
-				      * Declare a data type which denotes a
-				      * mapping between a boundary indicator
-				      * and the function denoting the boundary
-				      * values on this part of the boundary.
-				      * Only one boundary function may be given
-				      * for each boundary indicator, which is
-				      * guaranteed by the #map# data type.
-				      *
-				      * See the general documentation of this
-				      * class for more detail.
+				      *	Declare a data type which denotes a
+				      *	mapping between a boundary indicator
+				      *	and the function denoting the boundary
+				      *	values on this part of the boundary.
+				      *	Only one boundary function may be given
+				      *	for each boundary indicator, which is
+				      *	guaranteed by the #map# data type.
+				      *	
+				      *	See the general documentation of this
+				      *	class for more detail.
 				      */
-    typedef map<unsigned char,Function<dim>* > DirichletBC;
-
+    typedef map<unsigned char,Function<dim>*> FunctionMap;
 				     /**
 				      * Typdedef an iterator which assembles
 				      * matrices and vectors.
@@ -309,7 +307,7 @@ class ProblemBase {
 			   const Quadrature<dim>    &q,
 			   const FiniteElement<dim> &fe,
 			   const UpdateFlags         update_flags,
-			   const DirichletBC        &dirichlet_bc = DirichletBC(),
+			   const FunctionMap        &dirichlet_bc = FunctionMap(),
 			   const Boundary<dim>      &boundary = StraightBoundary<dim>());
     
 				     /**
@@ -373,7 +371,7 @@ class ProblemBase {
 				      * See the general doc for more
 				      * information.
 				      */
-    virtual void make_boundary_value_list (const DirichletBC        &dirichlet_bc,
+    virtual void make_boundary_value_list (const FunctionMap        &dirichlet_bc,
 					   const FiniteElement<dim> &fe,
 					   const Boundary<dim>      &boundary,
 					   map<int,double>          &boundary_values) const;
@@ -450,7 +448,7 @@ class ProblemBase {
     void apply_dirichlet_bc (dSMatrix          &matrix,
 			     dVector           &solution,
 			     dVector           &right_hand_side,
-			     const DirichletBC &dirichlet_bc,
+			     const FunctionMap &dirichlet_bc,
 			     const FiniteElement<dim> &fe,
 			     const Boundary<dim>      &boundary);
     

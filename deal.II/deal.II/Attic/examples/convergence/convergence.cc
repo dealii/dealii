@@ -254,7 +254,7 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   UpdateFlags update_flags = UpdateFlags(update_q_points  | update_gradients |
 					 update_jacobians | update_JxW_values);
   
-  ProblemBase<dim>::DirichletBC dirichlet_bc;
+  ProblemBase<dim>::FunctionMap dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
   assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
 

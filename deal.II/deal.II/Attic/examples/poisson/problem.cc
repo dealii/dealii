@@ -448,7 +448,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << dof->n_dofs() << " degrees of freedom." << endl;
 
   cout << "    Assembling matrices..." << endl;
-  ProblemBase<dim>::DirichletBC dirichlet_bc;
+  ProblemBase<dim>::FunctionMap dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
   assemble (equation, quadrature, fe,
 	    UpdateFlags(update_gradients | update_JxW_values |
