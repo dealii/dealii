@@ -425,7 +425,7 @@ class DoFTools
 				      * This function uses the user
 				      * flags of the triangulation.
 				      */
-    template<int dim>
+    template<int dim, class SparsityPattern>
     static void
     make_flux_sparsity_pattern (const DoFHandler<dim> &dof_handler,
 				SparsityPattern       &sparsity_pattern);
@@ -433,6 +433,7 @@ class DoFTools
 				     /**
 				      * Same function, but for 1d.
 				      */
+    template<class SparsityPattern>
     static void
     make_flux_sparsity_pattern (const DoFHandler<1> &dof_handler,
 				SparsityPattern     &sparsity_pattern);
@@ -454,7 +455,7 @@ class DoFTools
 				      * for the couplings occuring in
 				      * fluxes.
 				      */
-    template <int dim>
+    template <int dim, class SparsityPattern>
     static void
     make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				SparsityPattern       &sparsity,

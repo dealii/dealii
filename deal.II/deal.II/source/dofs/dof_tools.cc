@@ -290,7 +290,7 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 
 
-template<int dim>
+template<int dim, class SparsityPattern>
 void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				      SparsityPattern       &sparsity)
@@ -385,6 +385,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 
 #if deal_II_dimension == 1
 
+template <class SparsityPattern>
 void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<1> &dof,
 				      SparsityPattern     &sparsity)
@@ -432,7 +433,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<1> &dof,
 #endif
 
 
-template<int dim>
+template<int dim, class SparsityPattern>
 void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				      SparsityPattern       &sparsity,
@@ -2215,6 +2216,30 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 template void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 				      SparsityPattern    &,
+				      const FullMatrix<double>&,
+				      const FullMatrix<double>&);
+template void
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+				      CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+				      CompressedSparsityPattern    &,
+				      const FullMatrix<double>&,
+				      const FullMatrix<double>&);
+template void
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+				      BlockSparsityPattern    &sparsity);
+template void
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+				      BlockSparsityPattern    &,
+				      const FullMatrix<double>&,
+				      const FullMatrix<double>&);
+template void
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+				      CompressedBlockSparsityPattern    &sparsity);
+template void
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+				      CompressedBlockSparsityPattern    &,
 				      const FullMatrix<double>&,
 				      const FullMatrix<double>&);
 #endif
