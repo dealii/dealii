@@ -48,15 +48,34 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
+  <li> <p> The script that builds the dependency lists for Makefiles
+       has been rewritten in C++, since the previous perl script
+       became just too slow after the addition of parts of
+       BOOST. Using the old perl script should still work, although it
+       simply forwards to the new program. In order to use the new
+       one, simply replace the line
+       <code><pre>
+         $(PERL) $D/common/scripts/make_dependencies.pl ...
+       </pre></code>
+       by
+       <code><pre>
+         $D/common/scripts/make_dependencies ...
+       </pre></code>
+       i.e. call the program directly without the perl interpreter and
+       without the file extension for a perl program.
+       <br>
+       (WB 2003/08/19)
+       </p>
+
   <li> <p> First steps to a migration of the documentation from
-  <tt>kdoc</tt> to <a href="http://www.doxygen.org">Doxygen</a> have
-  been done. It can be generated after installing <a
-  href="http://www.doxygen.org">Doxygen</a> by calling <tt>make</tt>
-  in <tt>doc/doxygen</tt> and using the preliminary link page <a
-  href="../doxygen/index.html">index.html</a> in that directory.
-  <br>
-  (GK 2003/08/02)
-  </p>
+       <tt>kdoc</tt> to <a href="http://www.doxygen.org">Doxygen</a> have
+       been done. It can be generated after installing <a
+       href="http://www.doxygen.org">Doxygen</a> by calling <tt>make</tt>
+       in <tt>doc/doxygen</tt> and using the preliminary link page <a
+       href="../doxygen/index.html">index.html</a> in that directory.
+       <br>
+       (GK 2003/08/02)
+       </p>
 </ol>
 
 
