@@ -65,7 +65,7 @@ Triangulation<dim>::~Triangulation ()
 
 template <int dim>
 void
-Triangulation<dim>::set_boundary (unsigned int number,
+Triangulation<dim>::set_boundary (const unsigned int number,
 				  const Boundary<dim>& boundary_object)
 {
   Assert(number<255, ExcIndexRange(number,0,255));
@@ -79,7 +79,7 @@ Triangulation<dim>::set_boundary (unsigned int number,
 
 template <int dim>
 const Boundary<dim> &
-Triangulation<dim>::get_boundary (unsigned int number) const 
+Triangulation<dim>::get_boundary (const unsigned int number) const 
 {
   Assert(number<255, ExcIndexRange(number,0,255));
   
