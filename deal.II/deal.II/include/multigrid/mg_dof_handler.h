@@ -44,7 +44,8 @@ class MGDoFDimensionInfo
 /**
  * Define some types for the DoF handling in one dimension.
  *
- * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in
+ * @ref{TriaDimensionInfo<2>}.
  */
 template <>
 class MGDoFDimensionInfo<1>
@@ -76,7 +77,8 @@ class MGDoFDimensionInfo<1>
 /**
  * Define some types for the DoF handling in two dimensions.
  *
- * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in
+ * @ref{TriaDimensionInfo<2>}.
  */
 template <>
 class MGDoFDimensionInfo<2>
@@ -108,7 +110,8 @@ class MGDoFDimensionInfo<2>
 /**
  * Define some types for the DoF handling in two dimensions.
  *
- * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in
+ * @ref{TriaDimensionInfo<2>}.
  */
 template <>
 class MGDoFDimensionInfo<3>
@@ -139,10 +142,10 @@ class MGDoFDimensionInfo<3>
 
 /**
  * This class manages degrees of freedom for a multilevel hierarchy of
- * grids. It does mostly the same as does the @p{DoDHandler} class, but
- * it uses a separate enumeration of the degrees of freedom on each
- * level. For example, a vertex has several DoF numbers, one for each
- * level of the triangulation on which it exists.
+ * grids. It does mostly the same as does the @p{DoDHandler} class,
+ * but it uses a separate enumeration of the degrees of freedom on
+ * each level. For example, a vertex has several DoF numbers, one for
+ * each level of the triangulation on which it exists.
  *
  * At present, multilevel algorithms are not fully functional, so this
  * documentation is still very brief.
@@ -175,8 +178,8 @@ class MGDoFHandler : public DoFHandler<dim>
     typedef typename MGDoFDimensionInfo<dim>::active_face_iterator active_face_iterator;
 
 				     /**
-				      * Constructor. Take @p{tria} as the
-				      * triangulation to work on.
+				      * Constructor. Take @p{tria} as
+				      * the triangulation to work on.
 				      */
     MGDoFHandler (Triangulation<dim> &tria);
 
@@ -210,15 +213,17 @@ class MGDoFHandler : public DoFHandler<dim>
     virtual void clear ();
 
 				     /**
-				      * Actually do the renumbering based on
-				      * a list of new dof numbers for all the
-				      * dofs. 
+				      * Actually do the renumbering
+				      * based on a list of new dof
+				      * numbers for all the dofs.
 				      *
-				      * @p{new_numbers} is an array of integers
-				      * with size equal to the number of dofs
-				      * on the present level. It stores the new
-				      * indices after renumbering in the
-				      * order of the old indices.
+				      * @p{new_numbers} is an array of
+				      * integers with size equal to
+				      * the number of dofs on the
+				      * present level. It stores the
+				      * new indices after renumbering
+				      * in the order of the old
+				      * indices.
 				      */
     void renumber_dofs (const unsigned int               level,
 			const std::vector<unsigned int> &new_numbers);
@@ -230,120 +235,139 @@ class MGDoFHandler : public DoFHandler<dim>
 				      */
 				     /*@{*/
 				     /**
-				      *  Iterator to the first cell, used
-				      *  or not, on level @p{level}. If a level
-				      *  has no cells, a past-the-end iterator
-				      *  is returned.
+				      * Iterator to the first cell,
+				      * used or not, on level
+				      * @p{level}. If a level has no
+				      * cells, a past-the-end iterator
+				      * is returned.
 				      *
-				      *  This function calls @p{begin_raw_line}
-				      *  in 1D and @p{begin_raw_quad} in 2D.
+				      * This function calls
+				      * @p{begin_raw_line} in 1D and
+				      * @p{begin_raw_quad} in 2D.
 				      */
     raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first used cell
-				      *  on level @p{level}.
+				      * Iterator to the first used
+				      * cell on level @p{level}.
 				      *
-				      *  This function calls @p{begin_line}
-				      *  in 1D and @p{begin_quad} in 2D.
+				      * This function calls
+				      * @p{begin_line} in 1D and
+				      * @p{begin_quad} in 2D.
 				      */
     cell_iterator        begin       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first active
-				      *  cell on level @p{level}.
+				      * Iterator to the first active
+				      * cell on level @p{level}.
 				      *
-				      *  This function calls @p{begin_active_line}
-				      *  in 1D and @p{begin_active_quad} in 2D.
+				      * This function calls
+				      * @p{begin_active_line} in 1D
+				      * and @p{begin_active_quad} in
+				      * 2D.
 				      */
     active_cell_iterator begin_active(const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator past the end; this
-				      *  iterator serves for comparisons of
-				      *  iterators with past-the-end or
-				      *  before-the-beginning states.
+				      * Iterator past the end; this
+				      * iterator serves for
+				      * comparisons of iterators with
+				      * past-the-end or
+				      * before-the-beginning states.
 				      *
-				      *  This function calls @p{end_line}
-				      *  in 1D and @p{end_quad} in 2D.
+				      * This function calls
+				      * @p{end_line} in 1D and
+				      * @p{end_quad} in 2D.
 				      */
     raw_cell_iterator    end () const;
 
 				     /**
-				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return an iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     cell_iterator        end (const unsigned int level) const;
     
 				     /**
-				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return a raw iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     raw_cell_iterator    end_raw (const unsigned int level) const;
 
     				     /**
-				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
-				      * is the last level, then this returns
-				      * @p{end()}.
+				      * Return an active iterator
+				      * which is the first iterator
+				      * not on level. If @p{level} is
+				      * the last level, then this
+				      * returns @p{end()}.
 				      */
     active_cell_iterator end_active (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the
-				      *  last cell, used or not.
+				      * Return an iterator pointing to
+				      * the last cell, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 1D and @p{last_raw_quad} in 2D.
+				      * This function calls
+				      * @p{last_raw_line} in 1D and
+				      * @p{last_raw_quad} in 2D.
 				      */
     raw_cell_iterator    last_raw () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  cell of the level @p{level}, used or not.
+				      * Return an iterator pointing to
+				      * the last cell of the level
+				      * @p{level}, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 1D and @p{last_raw_quad} in 2D.
+				      * This function calls
+				      * @p{last_raw_line} in 1D and
+				      * @p{last_raw_quad} in 2D.
 				      */
     raw_cell_iterator    last_raw (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used cell.
+				      * Return an iterator pointing to
+				      * the last used cell.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 1D and @p{last_quad} in 2D.
+				      * This function calls
+				      * @p{last_line} in 1D and
+				      * @p{last_quad} in 2D.
 				      */
     cell_iterator        last () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used cell on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last used cell on level
+				      * @p{level}.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 1D and @p{last_quad} in 2D.
+				      * This function calls
+				      * @p{last_line} in 1D and
+				      * @p{last_quad} in 2D.
 				      */
     cell_iterator        last (const unsigned int level) const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active cell.
+				      * Return an iterator pointing to
+				      * the last active cell.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 1D and @p{last_active_quad} in 2D.
+				      * This function calls
+				      * @p{last_active_line} in 1D and
+				      * @p{last_active_quad} in 2D.
 				      */
     active_cell_iterator last_active () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  active cell on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last active cell on level
+				      * @p{level}.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 1D and @p{last_active_quad} in 2D.
+				      * This function calls
+				      * @p{last_active_line} in 1D and
+				      * @p{last_active_quad} in 2D.
 				      */
     active_cell_iterator last_active (const unsigned int level) const;
 				     //@}
@@ -355,120 +379,139 @@ class MGDoFHandler : public DoFHandler<dim>
 				      */
 				     /*@{*/
 				     /**
-				      *  Iterator to the first face, used
-				      *  or not, on level @p{level}. If a level
-				      *  has no faces, a past-the-end iterator
-				      *  is returned.
+				      * Iterator to the first face,
+				      * used or not, on level
+				      * @p{level}. If a level has no
+				      * faces, a past-the-end iterator
+				      * is returned.
 				      *
-				      *  This function calls @p{begin_raw_line}
-				      *  in 2D and @p{begin_raw_quad} in 3D.
+				      * This function calls
+				      * @p{begin_raw_line} in 2D and
+				      * @p{begin_raw_quad} in 3D.
 				      */
     raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first used face
-				      *  on level @p{level}.
+				      * Iterator to the first used
+				      * face on level @p{level}.
 				      *
-				      *  This function calls @p{begin_line}
-				      *  in 2D and @p{begin_quad} in 3D.
+				      * This function calls
+				      * @p{begin_line} in 2D and
+				      * @p{begin_quad} in 3D.
 				      */
     face_iterator        begin_face       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first active
-				      *  face on level @p{level}.
+				      * Iterator to the first active
+				      * face on level @p{level}.
 				      *
-				      *  This function calls @p{begin_active_line}
-				      *  in 2D and @p{begin_active_quad} in 3D.
+				      * This function calls
+				      * @p{begin_active_line} in 2D
+				      * and @p{begin_active_quad} in
+				      * 3D.
 				      */
     active_face_iterator begin_active_face(const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator past the end; this
-				      *  iterator serves for comparisons of
-				      *  iterators with past-the-end or
-				      *  before-the-beginning states.
+				      * Iterator past the end; this
+				      * iterator serves for
+				      * comparisons of iterators with
+				      * past-the-end or
+				      * before-the-beginning states.
 				      *
-				      *  This function calls @p{end_line}
-				      *  in 2D and @p{end_quad} in 3D.
+				      * This function calls
+				      * @p{end_line} in 2D and
+				      * @p{end_quad} in 3D.
 				      */
     raw_face_iterator    end_face () const;
 
 				     /**
-				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return an iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     face_iterator        end_face (const unsigned int level) const;
     
 				     /**
-				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return a raw iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     raw_face_iterator    end_raw_face (const unsigned int level) const;
 
     				     /**
-				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
-				      * is the last level, then this returns
-				      * @p{end()}.
+				      * Return an active iterator
+				      * which is the first iterator
+				      * not on level. If @p{level} is
+				      * the last level, then this
+				      * returns @p{end()}.
 				      */
     active_face_iterator end_active_face (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the
-				      *  last face, used or not.
+				      * Return an iterator pointing to
+				      * the last face, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 2D and @p{last_raw_quad} in 3D.
+				      * This function calls
+				      * @p{last_raw_line} in 2D and
+				      * @p{last_raw_quad} in 3D.
 				      */
     raw_face_iterator    last_raw_face () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  face of the level @p{level}, used or not.
+				      * Return an iterator pointing to
+				      * the last face of the level
+				      * @p{level}, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 2D and @p{last_raw_quad} in 3D.
+				      * This function calls
+				      * @p{last_raw_line} in 2D and
+				      * @p{last_raw_quad} in 3D.
 				      */
     raw_face_iterator    last_raw_face (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used face.
+				      * Return an iterator pointing to
+				      * the last used face.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 2D and @p{last_quad} in 3D.
+				      * This function calls
+				      * @p{last_line} in 2D and
+				      * @p{last_quad} in 3D.
 				      */
     face_iterator        last_face () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used face on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last used face on level
+				      * @p{level}.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 2D and @p{last_quad} in 3D.
+				      * This function calls
+				      * @p{last_line} in 2D and
+				      * @p{last_quad} in 3D.
 				      */
     face_iterator        last_face (const unsigned int level) const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active face.
+				      * Return an iterator pointing to
+				      * the last active face.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 2D and @p{last_active_quad} in 3D.
+				      * This function calls
+				      * @p{last_active_line} in 2D and
+				      * @p{last_active_quad} in 3D.
 				      */
     active_face_iterator last_active_face () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  active face on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last active face on level
+				      * @p{level}.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 2D and @p{last_active_quad} in 3D.
+				      * This function calls
+				      * @p{last_active_line} in 2D and
+				      * @p{last_active_quad} in 3D.
 				      */
     active_face_iterator last_active_face (const unsigned int level) const;
 				     //@}
@@ -477,96 +520,103 @@ class MGDoFHandler : public DoFHandler<dim>
 /*---------------------------------------*/
 
 				     /**
-				      *  @name Line iterator functions
+				      * @name Line iterator functions
 				      */
 				     /*@{*/
 				     /**
-				      *  Iterator to the first line, used
-				      *  or not, on level @p{level}. If a level
-				      *  has no lines, a past-the-end iterator
-				      *  is returned.
+				      * Iterator to the first line,
+				      * used or not, on level
+				      * @p{level}. If a level has no
+				      * lines, a past-the-end iterator
+				      * is returned.
 				      */
     raw_line_iterator begin_raw_line (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first used line
-				      *  on level @p{level}.
+				      * Iterator to the first used
+				      * line on level @p{level}.
 				      */
     line_iterator     begin_line (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first active
-				      *  line on level @p{level}.
+				      * Iterator to the first active
+				      * line on level @p{level}.
 				      */
     active_line_iterator begin_active_line(const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator past the end; this
-				      *  iterator serves for comparisons of
-				      *  iterators with past-the-end or
-				      *  before-the-beginning states.
+				      * Iterator past the end; this
+				      * iterator serves for
+				      * comparisons of iterators with
+				      * past-the-end or
+				      * before-the-beginning states.
 				      */
     raw_line_iterator end_line () const;
 
 				     /**
-				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return an iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     line_iterator        end_line (const unsigned int level) const;
     
 				     /**
-				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return a raw iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     raw_line_iterator    end_raw_line (const unsigned int level) const;
 
     				     /**
-				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
-				      * is the last level, then this returns
-				      * @p{end()}.
+				      * Return an active iterator
+				      * which is the first iterator
+				      * not on level. If @p{level} is
+				      * the last level, then this
+				      * returns @p{end()}.
 				      */
     active_line_iterator end_active_line (const unsigned int level) const;
 
 
-/**
- *  Return an iterator pointing to the
- *  last line, used or not.
- */
+				     /**
+				      * Return an iterator pointing to
+				      * the last line, used or not.
+				      */
     raw_line_iterator    last_raw_line () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  line of the level @p{level}, used or not.
-
+				      * Return an iterator pointing to
+				      * the last line of the level
+				      * @p{level}, used or not.
 				      */
     raw_line_iterator    last_raw_line (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used line.
+				      * Return an iterator pointing to
+				      * the last used line.
 				      */
     line_iterator        last_line () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used line on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last used line on level
+				      * @p{level}.
 				      */
     line_iterator        last_line (const unsigned int level) const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active line.
+				      * Return an iterator pointing to
+				      * the last active line.
 				      */
     active_line_iterator last_active_line () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  active line on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last active line on level
+				      * @p{level}.
 				      */
     active_line_iterator last_active_line (const unsigned int level) const;
 				     /*@}*/	  
@@ -578,92 +628,99 @@ class MGDoFHandler : public DoFHandler<dim>
     				     /*@{
 				      */
     				     /**
-				      *  Iterator to the first quad, used
-				      *  or not, on level @p{level}. If a level
-				      *  has no quads, a past-the-end iterator
-				      *  is returned.
+				      * Iterator to the first quad,
+				      * used or not, on level
+				      * @p{level}. If a level has no
+				      * quads, a past-the-end iterator
+				      * is returned.
 				      */
     raw_quad_iterator    begin_raw_quad   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first used quad
-				      *  on level @p{level}.
+				      * Iterator to the first used
+				      * quad on level @p{level}.
 				      */
     quad_iterator        begin_quad       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first active
-				      *  quad on level @p{level}.
+				      * Iterator to the first active
+				      * quad on level @p{level}.
 				      */
     active_quad_iterator begin_active_quad(const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator past the end; this
-				      *  iterator serves for comparisons of
-				      *  iterators with past-the-end or
-				      *  before-the-beginning states.
+				      * Iterator past the end; this
+				      * iterator serves for
+				      * comparisons of iterators with
+				      * past-the-end or
+				      * before-the-beginning states.
 				      */
     raw_quad_iterator    end_quad () const;
 
 				     /**
-				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return an iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     quad_iterator        end_quad (const unsigned int level) const;
     
 				     /**
-				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return a raw iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     raw_quad_iterator    end_raw_quad (const unsigned int level) const;
 
     				     /**
-				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
-				      * is the last level, then this returns
-				      * @p{end()}.
+				      * Return an active iterator
+				      * which is the first iterator
+				      * not on level. If @p{level} is
+				      * the last level, then this
+				      * returns @p{end()}.
 				      */
     active_quad_iterator end_active_quad (const unsigned int level) const;
 
 
-/**
- *  Return an iterator pointing to the
- *  last quad, used or not.
- */
+				     /**
+				      * Return an iterator pointing to
+				      * the last quad, used or not.
+				      */
     raw_quad_iterator    last_raw_quad () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  quad of the level @p{level}, used or not.
-
+				      * Return an iterator pointing to
+				      * the last quad of the level
+				      * @p{level}, used or not.
 				      */
     raw_quad_iterator    last_raw_quad (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used quad.
+				      * Return an iterator pointing to
+				      * the last used quad.
 				      */
     quad_iterator        last_quad () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used quad on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last used quad on level
+				      * @p{level}.
 				      */
     quad_iterator        last_quad (const unsigned int level) const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active quad.
+				      * Return an iterator pointing to
+				      * the last active quad.
 				      */
     active_quad_iterator last_active_quad () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  active quad on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last active quad on level
+				      * @p{level}.
 				      */
     active_quad_iterator last_active_quad (const unsigned int level) const;
 				     /*@}*/
@@ -675,92 +732,99 @@ class MGDoFHandler : public DoFHandler<dim>
     				     /*@{
 				      */
     				     /**
-				      *  Iterator to the first hex, used
-				      *  or not, on level @p{level}. If a level
-				      *  has no hexs, a past-the-end iterator
-				      *  is returned.
+				      * Iterator to the first hex,
+				      * used or not, on level
+				      * @p{level}. If a level has no
+				      * hexs, a past-the-end iterator
+				      * is returned.
 				      */
     raw_hex_iterator    begin_raw_hex   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first used hex
-				      *  on level @p{level}.
+				      * Iterator to the first used hex
+				      * on level @p{level}.
 				      */
     hex_iterator        begin_hex       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator to the first active
-				      *  hex on level @p{level}.
+				      * Iterator to the first active
+				      * hex on level @p{level}.
 				      */
     active_hex_iterator begin_active_hex(const unsigned int level = 0) const;
 
 				     /**
-				      *  Iterator past the end; this
-				      *  iterator serves for comparisons of
-				      *  iterators with past-the-end or
-				      *  before-the-beginning states.
+				      * Iterator past the end; this
+				      * iterator serves for
+				      * comparisons of iterators with
+				      * past-the-end or
+				      * before-the-beginning states.
 				      */
     raw_hex_iterator    end_hex () const;
 
 				     /**
-				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return an iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     hex_iterator        end_hex (const unsigned int level) const;
     
 				     /**
-				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
-				      * the last level, then this returns
+				      * Return a raw iterator which is
+				      * the first iterator not on
+				      * level. If @p{level} is the
+				      * last level, then this returns
 				      * @p{end()}.
 				      */
     raw_hex_iterator    end_raw_hex (const unsigned int level) const;
 
     				     /**
-				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
-				      * is the last level, then this returns
-				      * @p{end()}.
+				      * Return an active iterator
+				      * which is the first iterator
+				      * not on level. If @p{level} is
+				      * the last level, then this
+				      * returns @p{end()}.
 				      */
     active_hex_iterator end_active_hex (const unsigned int level) const;
 
 
-/**
- *  Return an iterator pointing to the
- *  last hex, used or not.
- */
+				     /**
+				      * Return an iterator pointing to
+				      * the last hex, used or not.
+				      */
     raw_hex_iterator    last_raw_hex () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  hex of the level @p{level}, used or not.
-
+				      * Return an iterator pointing to
+				      * the last hex of the level
+				      * @p{level}, used or not.
 				      */
     raw_hex_iterator    last_raw_hex (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used hex.
+				      * Return an iterator pointing to
+				      * the last used hex.
 				      */
     hex_iterator        last_hex () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used hex on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last used hex on level
+				      * @p{level}.
 				      */
     hex_iterator        last_hex (const unsigned int level) const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active hex.
+				      * Return an iterator pointing to
+				      * the last active hex.
 				      */
     active_hex_iterator last_active_hex () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  active hex on level @p{level}.
+				      * Return an iterator pointing to
+				      * the last active hex on level
+				      * @p{level}.
 				      */
     active_hex_iterator last_active_hex (const unsigned int level) const;
 				     /*@}*/
@@ -768,11 +832,12 @@ class MGDoFHandler : public DoFHandler<dim>
 				     /*---------------------------------------*/
 
     				     /**
-				      * Return the number of degrees of freedom
-				      * on the specified level.
-				      * Included in this number are those
-				      * DoFs which are constrained by
-				      * hanging nodes.
+				      * Return the number of degrees
+				      * of freedom on the specified
+				      * level.  Included in this
+				      * number are those DoFs which
+				      * are constrained by hanging
+				      * nodes.
 				      */
     unsigned int n_dofs (const unsigned int level) const;
 
@@ -785,41 +850,50 @@ class MGDoFHandler : public DoFHandler<dim>
     
   private:
 
-				     /** We need for each vertex a list of the
-				      * degree of freedom indices on each of the
-				      * levels this vertex lives on. Since most
-				      * vertices live only on a few levels, it
-				      * is not economical to reserve indices for
-				      * all the levels there are; rather, we
-				      * create an object which holds the indices
-				      * on those levels only where the vertex
-				      * lives. To construct such an array, it
-				      * is necessary to know beforehand which
-				      * is the coarsest level the vertex lives
-				      * on, how many levels it lives on and
-				      * how many dofs there are on each vertex.
-				      * If we have this information, we can
-				      * allocate exactly the amount of memory
-				      * which is needed and need not handle
+				     /**
+				      * We need for each vertex a list
+				      * of the degree of freedom
+				      * indices on each of the levels
+				      * this vertex lives on. Since
+				      * most vertices live only on a
+				      * few levels, it is not
+				      * economical to reserve indices
+				      * for all the levels there are;
+				      * rather, we create an object
+				      * which holds the indices on
+				      * those levels only where the
+				      * vertex lives. To construct
+				      * such an array, it is necessary
+				      * to know beforehand which is
+				      * the coarsest level the vertex
+				      * lives on, how many levels it
+				      * lives on and how many dofs
+				      * there are on each vertex.  If
+				      * we have this information, we
+				      * can allocate exactly the
+				      * amount of memory which is
+				      * needed and need not handle
 				      * growing arrays and the like.
 				      */
     class MGVertexDoFs {
       public:
 	
 					 /**
-					  * Constructor. This one is empty
-					  * because it is difficult to make it
-					  * efficient to use vector<>'s and
-					  * still construct the object using
-					  * the constructor. Use the @p{init}
-					  * function to really allocate
-					  * memory.
+					  * Constructor. This one is
+					  * empty because it is
+					  * difficult to make it
+					  * efficient to use
+					  * vector<>'s and still
+					  * construct the object using
+					  * the constructor. Use the
+					  * @p{init} function to
+					  * really allocate memory.
 					  */
 	MGVertexDoFs ();
 
 					 /**
-					  * Allocate memory and
-					  * set all indices to @p{-1}.
+					  * Allocate memory and set
+					  * all indices to @p{-1}.
 					  */
 	void init (const unsigned int coarsest_level,
 		   const unsigned int finest_level,
@@ -832,17 +906,20 @@ class MGDoFHandler : public DoFHandler<dim>
 
 					 /**
 					  * Set the index with number
-					  * @p{dof_number} of this vertex on
-					  * @p{level} to the given index. To
-					  * compute the position in the array,
-					  * one has to specify how many
-					  * dofs per vertex there are. It is
-					  * not checked that the level number
-					  * is below the number of the finest
-					  * level this vertex lives on.
+					  * @p{dof_number} of this
+					  * vertex on @p{level} to the
+					  * given index. To compute
+					  * the position in the array,
+					  * one has to specify how
+					  * many dofs per vertex there
+					  * are. It is not checked
+					  * that the level number is
+					  * below the number of the
+					  * finest level this vertex
+					  * lives on.
 					  *
-					  * The function is inline, so should
-					  * be reasonably fast.
+					  * The function is inline, so
+					  * should be reasonably fast.
 					  */
 	void set_index (const unsigned int level,
 			const unsigned int dof_number,
@@ -850,32 +927,37 @@ class MGDoFHandler : public DoFHandler<dim>
 			const unsigned int index);
 	
 					 /**
-					  * Return the index with number
-					  * @p{dof_number} of this vertex on
-					  * @p{level}. To
-					  * compute the position in the array,
-					  * one has to specify how many
-					  * dofs per vertex there are. It is
-					  * not checked that the level number
-					  * is below the number of the finest
-					  * level this vertex lives on.
+					  * Return the index with
+					  * number @p{dof_number} of
+					  * this vertex on
+					  * @p{level}. To compute the
+					  * position in the array, one
+					  * has to specify how many
+					  * dofs per vertex there
+					  * are. It is not checked
+					  * that the level number is
+					  * below the number of the
+					  * finest level this vertex
+					  * lives on.
 					  *
-					  * The function is inline, so should
-					  * be reasonably fast.
+					  * The function is inline, so
+					  * should be reasonably fast.
 					  */
 	unsigned int get_index (const unsigned int level,
 				const unsigned int dof_number,
 				const unsigned int dofs_per_vertex) const;
 
 					 /**
-					  * Return the index of the coarsest
-					  * level this vertex lives on.
+					  * Return the index of the
+					  * coarsest level this vertex
+					  * lives on.
 					  */
 	unsigned int get_coarsest_level () const;
 
 					 /**
-					  * Return the index of the finest
-					  * level this vertex lives on.
+					  * Return the index of the
+					  * finest level this vertex
+					  * lives on.
 					  */
 	unsigned int get_finest_level () const;
 	
@@ -897,18 +979,21 @@ class MGDoFHandler : public DoFHandler<dim>
 	
       private:
 					 /**
-					  * Store the coarsest level this
-					  * vertex lives on. This is used
-					  * as an offset when accessing the
-					  * dofs of a specific level.
+					  * Store the coarsest level
+					  * this vertex lives on. This
+					  * is used as an offset when
+					  * accessing the dofs of a
+					  * specific level.
 					  */
 	unsigned int coarsest_level;
 
 					 /**
-					  * Finest level this level lives on.
-					  * This is mostly used for error
-					  * checking but can also be accessed
-					  * by the function @p{get_finest_level}.
+					  * Finest level this level
+					  * lives on.  This is mostly
+					  * used for error checking
+					  * but can also be accessed
+					  * by the function
+					  * @p{get_finest_level}.
 					  */
 	unsigned int finest_level;
 
@@ -944,8 +1029,9 @@ class MGDoFHandler : public DoFHandler<dim>
 					  unsigned int   next_free_dof);
     
 				     /**
-				      * Reserve enough space for the MG dof
-				      * indices for a given triangulation.
+				      * Reserve enough space for the
+				      * MG dof indices for a given
+				      * triangulation.
 				      */
     void reserve_space ();
 
@@ -955,26 +1041,30 @@ class MGDoFHandler : public DoFHandler<dim>
     void clear_space ();
     
     				     /**
-				      * Space to store the DoF numbers for the
-				      * different levels. Unlike the @p{levels}
-				      * object in the @ref{DoFHandler}, these are
-				      * not global numbers but rather are
-				      * numbers which start from zero on each
-				      * level.
+				      * Space to store the DoF numbers
+				      * for the different
+				      * levels. Unlike the @p{levels}
+				      * object in the
+				      * @ref{DoFHandler}, these are
+				      * not global numbers but rather
+				      * are numbers which start from
+				      * zero on each level.
 				      */
     typename std::vector<DoFLevel<dim>*>    mg_levels;
 
 				     /**
-				      * For each vertex there is a list of
-				      * indices of the degrees of freedom indices
-				      * on the different levels it lives on and
-				      * which are these levels.
+				      * For each vertex there is a
+				      * list of indices of the degrees
+				      * of freedom indices on the
+				      * different levels it lives on
+				      * and which are these levels.
 				      */
     typename std::vector<MGVertexDoFs>      mg_vertex_dofs;
     
 				     /**
-				      * Vectors storing the number of degrees of
-				      * freedom on each level.
+				      * Vectors storing the number of
+				      * degrees of freedom on each
+				      * level.
 				      */
     std::vector<unsigned int>      mg_used_dofs;
 
