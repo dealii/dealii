@@ -421,6 +421,25 @@ void FE_Q_Hierarchical<dim>::initialize_unit_support_points ()
                                    // support point. There is
                                    // only one support point per
                                    // vertex, line, quad, hex, etc.
+                                   //
+                                   // note, however, that the support
+                                   // points thus associated with
+                                   // shape functions are not unique:
+                                   // the linear shape functions are
+                                   // associated with the vertices,
+                                   // but all others are associated
+                                   // with either line, quad, or hex
+                                   // midpoints, and there may be
+                                   // multiple shape functions
+                                   // associated with them. there
+                                   // really is no other useful
+                                   // numbering, since the
+                                   // hierarchical shape functions do
+                                   // not vanish at all-but-one
+                                   // interpolation points (like the
+                                   // Lagrange functions used in
+                                   // FE_Q), so there's not much we
+                                   // can do here.
   unsigned int k=0;
   for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
     for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
