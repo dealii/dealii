@@ -398,6 +398,37 @@ DeclException1 (ExcInvalidTensorIndex,
 
 
 /**
+ * Output operator for tensors. Print the elements consecutively, with
+ * a space in between, two spaces between rank 1 subtensors, three
+ * between rank 2 and so on.
+ */
+template <int rank_, int dim>
+inline
+std::ostream & operator << (std::ostream &out, const Tensor<rank_,dim> &p)
+{
+  for (unsigned int i=0; i<dim-1; ++i)
+    out << p[i] << ' ';
+  out << p[dim-1];
+
+  return out;
+};
+
+
+/**
+ * Specialization for 1D.
+ */
+template <int rank_>
+inline
+std::ostream & operator << (std::ostream &out, const Tensor<rank_,1> &p)
+{
+  out << p[0];
+
+  return out;
+};
+
+
+
+/**
  * Contract a tensor of rank 1 with a tensor of rank 1. The result is
  * @p{sum_j src1[j] src2[j]}.
  *
