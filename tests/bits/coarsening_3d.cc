@@ -79,7 +79,6 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
           cell.vertices[j]   = connectivity[i][j];
           cell.vertices[j+4] = connectivity[i][j]+n_vertices_per_surface;
         }
-      cell.material_id = 0;
       cells.push_back (cell);
     }
 
