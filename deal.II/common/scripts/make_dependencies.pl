@@ -8,7 +8,7 @@
 # This program makes for each of the given files a makefile dependency
 # list, also considering nested includes. It only considers included
 # files which are located in the given include pathes (you can give any
-# number of pathes). The output looks like this:
+# number of paths). The output looks like this:
 #
 #   $basepath/.o-file: file included_files
 #   $basepath/.g.o-file: file included_files
@@ -47,7 +47,7 @@ $_ = shift;
 $basepath = $1;
 
 
-#fill list of files to be processed
+# fill list of files to be processed
 while ($ARGV[0]) {
     @input_files = (@input_files, shift);
 }
