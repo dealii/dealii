@@ -195,7 +195,7 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
 				   // Implementation taken from the DEAL
 				   // library
   int  it=0;
-  long double res,gh,alpha,beta;
+  double res,gh,alpha,beta;
  
   res = A.residual(g,x,b);
   conv = control().check(0,res);

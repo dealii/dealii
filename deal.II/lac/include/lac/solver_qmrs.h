@@ -163,7 +163,7 @@ class SolverQMRS : public Solver<Matrix,Vector>
 				      * norm of the residual vector and thus
 				      * the square root of the #res2# value.
 				      */
-    long double res2;
+    double res2;
 				     /**
 				      * Breakdown threshold.
 				      */
