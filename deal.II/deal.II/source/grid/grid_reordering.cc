@@ -174,14 +174,113 @@ GridReordering<2>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 };
 
 #endif
+
 #if deal_II_dimension == 3
 
 template <>
 void
-GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &/*global_faces*/)
+GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 {
   const unsigned int dim = 3;
 
+				   // first generate for each of the 6
+				   // faces of a cell in 3d the four
+				   // possible orientations and
+				   // cross-link them among each other
+				   //
+				   // do this generation step by first
+				   // only inserting each face in
+				   // standard orientation and then
+				   // fill in the other ones by
+				   // rotation of these faces
+				   //
+				   // note that we have the indices
+				   // reversed here compared to the
+				   // Cell class, for simplicity
+  const Face new_faces_tmp[GeometryInfo<dim>::faces_per_cell]
+    = { { { vertices[0], vertices[1], vertices[2], vertices[3] } },
+	{ { vertices[4], vertices[5], vertices[6], vertices[7] } },
+	{ { vertices[0], vertices[1], vertices[5], vertices[4] } },
+	{ { vertices[1], vertices[5], vertices[6], vertices[2] } },
+	{ { vertices[3], vertices[2], vertices[6], vertices[7] } },
+	{ { vertices[0], vertices[4], vertices[7], vertices[3] } } };
+  Face new_faces[GeometryInfo<dim>::faces_per_cell][rotational_states_of_faces]
+    = { { new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[1], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[2], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[3], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[4], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[5], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] } };
+    
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int rot=1; rot<rotational_states_of_faces; ++rot)
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+	new_faces[face][rot].vertices[v]
+	  = new_faces[face][0].vertices[(v+rot) % GeometryInfo<dim>::vertices_per_face];
+
+				   // now insert all the faces, by now
+				   // without specific order with
+				   // respect to the orientational
+				   // states of the cell. note that we
+				   // get the indices correct
+				   // here. also remark that the face
+				   // might already have been in the
+				   // map, depending on whether a
+				   // newighbor has already inserted
+				   // it or not. we don't care about
+				   // that here, though
+  map<Face,FaceData>::iterator
+    new_faces_ptr[rotational_states_of_faces][GeometryInfo<dim>::faces_per_cell];
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
+      new_faces_ptr[rot][face]
+	= global_faces.insert (make_pair(new_faces[face][rot], FaceData())).first;
+  
+				   // and crosslink them to each other
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
+      for (unsigned int other_rot=0; other_rot<rotational_states_of_faces; ++other_rot)
+	{
+	  if (other_rot < rot)
+	    new_faces_ptr[rot][face]->second.reverse_faces[other_rot]
+	      = new_faces_ptr[other_rot][face];
+	  else
+	    if (other_rot > rot)
+	      new_faces_ptr[rot][face]->second.reverse_faces[other_rot-1]
+		= new_faces_ptr[other_rot][face];
+					   // if rot==other_rot, then
+					   // we need not link this
+					   // cell to itself
+	};
+  
+
+				   // for each of the faces (whether
+				   // already inserted or not) note
+				   // that the present cell is one of
+				   // the neighbors
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
+      if (new_faces_ptr[rot][face]->second.adjacent_cells[0] ==
+	  FaceData::invalid_adjacent_cell)
+					 // no, faces had not been
+					 // used before, so we are the
+					 // first adjacent cell
+	new_faces_ptr[rot][face]->second.adjacent_cells[0] = cell_no;
+      else
+					 // otherwise: cell had been
+					 // entered before, so we are
+					 // the second neighbor
+	{
+	  Assert (new_faces_ptr[rot][face]->second.adjacent_cells[1] ==
+		  FaceData::invalid_adjacent_cell,
+		  ExcInternalError());
+	  new_faces_ptr[rot][face]->second.adjacent_cells[1] = cell_no;
+	};
+
+				   // still have to link cell in
+				   // different orientations to the
+				   // faces
+  
   Assert (false, ExcNotImplemented());
 };
 
