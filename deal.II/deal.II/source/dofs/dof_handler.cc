@@ -1315,9 +1315,17 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &ff,
   
   reserve_space ();
 
-				   // clear user flags because we will
-				   // need them
-  tria->clear_user_flags ();
+				   // Clear user flags because we will
+				   // need them. But first we save
+				   // them and make sure that we
+				   // restore them later such that at
+				   // the end of this function the
+				   // Triangulation will be in the
+				   // same state as it was at the
+				   // beginning of this function.
+  std::vector<bool> user_flags;
+  tria->save_user_flags(user_flags);
+  const_cast<Triangulation<dim> &>(*tria).clear_user_flags ();
   
   unsigned int next_free_dof = offset;   
   active_cell_iterator cell = begin_active(),
@@ -1325,8 +1333,11 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &ff,
 
   for (; cell != endc; ++cell) 
     next_free_dof = distribute_dofs_on_cell (cell, next_free_dof);
-  
+
   used_dofs = next_free_dof;
+
+				   // finally restore the user flags
+  const_cast<Triangulation<dim> &>(*tria).load_user_flags(user_flags);
 };
 
 
