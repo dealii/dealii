@@ -674,6 +674,41 @@ double FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u, cons
 };
 
 
+template <typename number>
+number FullMatrix<number>::l1_norm () const
+{
+  number sum=0, max=0;
+  const unsigned int n_rows = m(), n_cols = n();
+  
+  for (unsigned int col=0; col<n_cols; ++col)
+    {
+      sum=0;
+      for (unsigned int row=0; row<n_rows; ++row)
+	sum += fabs(el(row,col));
+      if (sum > max)
+	max = sum;
+    }
+  return max;
+};
+
+
+template <typename number>
+number FullMatrix<number>::linfty_norm () const
+{
+  number sum=0, max=0;
+  const unsigned int n_rows = m(), n_cols = n();
+
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+      sum=0;
+      for (unsigned int col=0; col<n_cols; ++col)
+	sum += fabs(el(row,col));
+      if (sum > max)
+	max = sum;
+    }
+  return max;
+};
+
 
 template <typename number>
 void

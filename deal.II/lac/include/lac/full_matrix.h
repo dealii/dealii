@@ -333,6 +333,33 @@ class FullMatrix
 				      */
     template<typename number2>
     double matrix_scalar_product (const Vector<number2> &u, const Vector<number2> &v) const;
+
+    				     /**
+				      * Return the l1-norm of the matrix, i.e.
+				      * $|M|_1=max_{all columns j}\sum_{all 
+				      * rows i} |M_ij|$,
+				      * (max. sum of columns).
+				      * This is the
+				      * natural matrix norm that is compatible
+				      * to the l1-norm for vectors, i.e.
+				      * $|Mv|_1\leq |M|_1 |v|_1$.
+				      * (cf. Rannacher Numerik0)
+				      */
+    number l1_norm () const;
+
+    				     /**
+				      * Return the linfty-norm of the
+				      * matrix, i.e.
+				      * $|M|_infty=max_{all rows i}\sum_{all 
+				      * columns j} |M_ij|$,
+				      * (max. sum of rows).
+				      * This is the
+				      * natural matrix norm that is compatible
+				      * to the linfty-norm of vectors, i.e.
+				      * $|Mv|_infty \leq |M|_infty |v|_infty$.
+				      * (cf. Rannacher Numerik0)
+				      */
+    number linfty_norm () const;
     
 				     /**
 				      * A=Inverse(A). Inversion of this by

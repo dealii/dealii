@@ -215,6 +215,44 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
 };
 
 
+template <typename number>
+number SparseMatrix<number>::l1_norm () const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
+
+  Vector<number> column_sums(n());
+  const unsigned int n_rows = m();
+  for (unsigned int row=0; row<n_rows; ++row)
+    for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1] ; ++j)
+      column_sums(cols->colnums[j])+=fabs(val[j]);
+
+  return column_sums.linfty_norm();
+};
+
+
+template <typename number>
+number SparseMatrix<number>::linfty_norm () const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
+
+  const number *val_ptr = &val[cols->rowstart[0]];
+
+  number sum, max=0;
+  const unsigned int n_rows = m();
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+      sum=0;
+      const number *const val_end_of_row = &val[cols->rowstart[row+1]];
+      while (val_ptr != val_end_of_row)
+	sum += fabs(*val_ptr++);
+      if (sum > max)
+	max = sum;
+    }
+  return max;
+};
+
 
 template <typename number>
 template <typename somenumber>
