@@ -195,7 +195,7 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
 
 				     /**
 				      * Constructor. Should never be called
-				      * ans thus throws an error.
+				      * and thus throws an error.
 				      */
     DoFObjectAccessor (Triangulation<dim> *,
 		       const int,
