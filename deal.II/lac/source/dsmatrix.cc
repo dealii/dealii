@@ -7,112 +7,7 @@
 #include <lac/dsmatrix.h>
 #include <iostream>
 #include <iomanip>
-
-/*----------------- from sort.h -------------------------*/
-
-
-//////////
-template<class T>
-inline void swap (T* a, T* b)
-{
-  T x = *a;
-  *a = *b;
-  *b = x;
-}
-
-//////////
-template<class T>
-inline void simple_sort (const long n, T* field)
-{
-  long i,j;
-  for (i=1;i<n;i++)
-  {
-    for (j=i+1;j<=n;j++)
-    {
-      if (field[j] < field[i])
-      {
-	swap(field+i,field+j);
-      }
-    }
-  }
-}
-
-template<class T>
-inline void heapsort_sift (T* a, const long l, const long r)
-{
-  long i = l;
-  long j = 2*i;
-  T    x = a[i];
-
-  while (j<=r)
-  {
-    if (j<r) 
-    {
-      if (a[j] < a[j+1]) j++;
-    }
-    if (!(x < a[j])) break;
-    a[i] = a[j];
-    i = j;
-    j = 2*i;
-  }
-  a[i] = x;
-}
-
-
-//////////
-template<class T>
-inline void heapsort (const int n, T* field)
-{
-  field--;
-
-  long l =(n/2)+1;
-  long r = n;
-
-  while (l>1)
-  {
-    l--;
-    heapsort_sift(field,l,r);
-  }
-  while (r>1)
-  {
-    swap(field+l,field+r);
-    r--;
-    heapsort_sift(field,l,r);
-  }
-}
-
-//////////
-template<class T>
-inline void _quicksort (const long r, T* a, const long l)
-{
-  long i = l;
-  long j = r;
-  T*   x = &a[(l+r)/2];
-  do
-  {
-    while (a[i] < *x) i++;
-    while (*x < a[j]) j--;
-    if (i<=j)
-    {
-      swap(a+i,a+j);
-      i++;
-      j--;
-    }
-  }
-  while (i<=j);
-  if (l<j) _quicksort(j,a,l);
-  if (i<r) _quicksort(r,a,i);
-}
-
-template<class T>
-inline void quicksort (const long r, T* a)
-{
-  _quicksort(r,a,1);
-}
-
-
-/*----------------- end: from sort.h -------------------------*/
-
+#include <algorithm>
 
 
 
@@ -179,14 +74,13 @@ dSMatrixStruct::reinit (const unsigned int m, const unsigned int n,
 
   for (unsigned int i=0; i<=rows; i++)
     rowstart[i] = i * max_per_row;
-  for (int i = vec_len-1; i>=0; i--)
-    colnums[i] = -1;
+  fill_n (&colnums[0], vec_len, -1);
 
   if (rows == cols)
     for (unsigned int i=0;i<rows;i++)
       colnums[rowstart[i]] = i;
 
-  compressed = 0;
+  compressed = false;
 }
 
 
@@ -194,41 +88,76 @@ void
 dSMatrixStruct::compress ()
 {
   if (compressed) return;
-  unsigned int i,j,k,l,s;
-  int* entries;
+  unsigned int next_free_entry = 0,
+		next_row_start = 0,
+		    row_length = 0;
 
-  entries = new int[max_row_len];
+				   // reserve temporary storage to
+				   // store the entries of one wor
+  int *tmp_entries = new int[max_row_len];
 
-  // Traverse all rows
-
-  for (i=0,k=0,s=0 ; i<rows ; ++i)
+				   // Traverse all rows
+  for (unsigned int line=0; line<rows; ++line)
     {
+				       // copy used entries, break if
+				       // first unused entry is reached
+      row_length = 0;
+      for (unsigned int j=rowstart[line]; j<rowstart[line+1]; ++j,++row_length)
+	if (colnums[j] != -1)
+	  tmp_entries[row_length] = colnums[j];
+	else
+	  break;
+				       // now #rowstart# is
+				       // the number of entries in
+				       // this line
 
-      // Sort entries in ascending order
+				       // for square matrices, the
+				       // first entry in each row
+				       // is the diagonal one. In
+				       // this case only sort the
+				       // remaining entries, otherwise
+				       // sort all
+      sort ((rows==cols) ? &tmp_entries[1] : &tmp_entries[0],
+	    &tmp_entries[row_length]);
 
-      for (j=rowstart[i],l=0; j<rowstart[i+1]; ++j,++l)
-	entries[l] = colnums[j];
-      heapsort(max_row_len, entries);
+				       // Re-insert column numbers
+				       // into the field
+      for (unsigned int j=0; j<row_length; ++j)
+	colnums[next_free_entry++] = tmp_entries[j];
 
-      // Re-insert column numbers into the field
+				       // note new start of this and
+				       // the next row
+      rowstart[line] = next_row_start;
+      next_row_start = next_free_entry;
 
-      // Ensure diagonal entry first in quadratic matrix
-
-      if (cols == rows) colnums[k++] = i;
-
-      for (l=0; l < max_row_len ; ++l)
-	if (entries[l]>=0)
-	  if (((signed int)i!=entries[l]) || (rows!=cols))
-	    colnums[k++] = entries[l];
-
-      rowstart[i] = s;
-      s = k;
-    }
-  vec_len = rowstart[i] = s;
+				       // some internal checks
+      Assert ((rows!=cols) ||
+	      (colnums[rowstart[line]] == static_cast<signed int>(line)),
+	      ExcInternalError());
+				       // assert that the first entry
+				       // does not show up in
+				       // the remaining ones and that
+				       // the remaining ones are unique
+				       // among themselves (this handles
+				       // both cases, quadratic and
+				       // rectangular matrices)
+      Assert (find (&colnums[rowstart[line]+1],
+		    &colnums[next_row_start],
+		    colnums[rowstart[line]]) ==
+	      &colnums[next_row_start],
+	      ExcInternalError());
+      Assert (adjacent_find(&colnums[rowstart[line]+1],
+			    &colnums[next_row_start]) ==
+	      &colnums[next_row_start],
+	      ExcInternalError());
+    };
+  
+  vec_len = rowstart[rows] = next_row_start;
   compressed = true;
 
-  delete[] entries;
-}
+  delete[] tmp_entries;
+};
+
 
 
 int
@@ -236,10 +165,31 @@ dSMatrixStruct::operator () (const unsigned int i, const unsigned int j) const
 {
   Assert (i<rows, ExcInvalidIndex(i,rows));
   Assert (j<cols, ExcInvalidIndex(j,cols));
+  Assert (compressed, ExcNotCompressed());
 
-  for (unsigned int k=rowstart[i] ; k<rowstart[i+1] ; k++)
-    if (colnums[k] == (signed int)j) return k;
-  return -1;
+				   // check first entry separately, since
+				   // for square matrices this is
+				   // the diagonal entry (check only
+				   // if a first entry exists)
+  if (rowstart[i] != rowstart[i+1]) 
+    {
+      if (static_cast<signed int>(j) == colnums[rowstart[i]])
+	return rowstart[i];
+    }
+  else
+				     // no first entry exists for this
+				     // line
+    return -1;
+
+				   // all other entries are sorted, so
+				   // we can use a binary seach algorithm
+  const int* p = lower_bound (&colnums[rowstart[i]+1],
+			      &colnums[rowstart[i+1]],
+			      static_cast<signed int>(j));
+  if (*p == static_cast<signed int>(j))
+    return (p - &colnums[0]);
+  else
+    return -1;
 }
 
 
@@ -248,6 +198,7 @@ dSMatrixStruct::add (const unsigned int i, const unsigned int j)
 {
   Assert (i<rows, ExcInvalidIndex(i,rows));
   Assert (j<cols, ExcInvalidIndex(j,cols));
+  Assert (compressed==false, ExcMatrixIsCompressed());
 
   for (unsigned int k=rowstart[i]; k<rowstart[i+1]; k++)
     {
@@ -273,9 +224,8 @@ dSMatrixStruct::add (const unsigned int i, const unsigned int j)
 void
 dSMatrixStruct::add_matrix (const unsigned int n, const int* rowcols)
 {
-  unsigned int i,j;
-  for (i=0;i<n;i++)
-    for (j=0;j<n;j++)
+  for (unsigned int i=0; i<n; ++i)
+    for (unsigned int j=0; j<n; ++j)
       add(rowcols[i], rowcols[j]);
 }
 
@@ -285,9 +235,8 @@ void
 dSMatrixStruct::add_matrix (const unsigned int m, const unsigned int n,
 			    const int* rows, const int* cols)
 {
-  unsigned int i,j;
-  for (i=0;i<m;i++)
-    for (j=0;j<n;j++)
+  for (unsigned i=0; i<m; ++i)
+    for (unsigned j=0; j<n; ++j)
       add(rows[i], cols[j]);
 }
 
@@ -636,6 +585,7 @@ dSMatrix::SSOR (dVector& dst, const double om)
 
 
 const dSMatrixStruct & dSMatrix::get_sparsity_pattern () const {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   return *cols;
 };
 
@@ -652,6 +602,7 @@ void dSMatrix::print (ostream &out) const {
 
 
 void dSMatrix::print_formatted (ostream &out, const unsigned int precision) const {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   out.precision (precision);
   out.setf (ios::scientific, ios::floatfield);   // set output format
   
