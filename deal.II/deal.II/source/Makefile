@@ -23,8 +23,8 @@ h-files  = $(wildcard ../include/*/*.h)
 # would be the same for both debug and non-debug versions, if we
 # don't care about different directories
 tmp1     = $(notdir $(cc-files))
-o-files  = $(addprefix ../lib/$(deal_II_dimension)d/o/,  $(tmp1:.cc=.o) )
-go-files = $(addprefix ../lib/$(deal_II_dimension)d/go/, $(tmp1:.cc=.go))
+o-files  = $(addprefix ../lib/$(deal_II_dimension)d/o/,  $(tmp1:.cc=_$(deal_II_dimension)d.o) )
+go-files = $(addprefix ../lib/$(deal_II_dimension)d/go/, $(tmp1:.cc=_$(deal_II_dimension)d.go))
 
 
 CXX       = c++
@@ -89,11 +89,19 @@ clean:
 #we don't change the script but rather pipe its
 #result through another perl script to get what we
 #want.
+#
+#Next addition: replace .g?o by _2d.g?o or whatever
+#the dimension is, because we want to have unique
+#object file names in the libraries in order to write
+#programs which use the 2d *and* the 3d library;
+#if the files within these libraries had the same names,
+#we may get into trouble.
 ../lib/Makefile.dep: $(cc-files) $(h-files) Makefile ../Make.global_options
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/libgrid $(INCLUDE) $(cc-files) \
 		| perl -p -e 's!^.*\(.*/(.*)\):!../lib/$(deal_II_dimension)d/$$1:!g;' \
 		| perl -pe 's!(/[^/]+\.(o|go)):!/$$2$$1:!g;' \
+		| perl -pe 's!(\.g?o)!_$(deal_II_dimension)d$$1!g;' \
 		> ../lib/Makefile.dep
 
 
