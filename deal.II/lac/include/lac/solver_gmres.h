@@ -225,6 +225,19 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 	};
  
       double rho = v.l2_norm();
+
+				       // check the residual here as
+				       // well since it may be that
+				       // we got the exact (or an almost
+				       // exact) solution vector at
+				       // the outset. if we wouldn't
+				       // check here, the next scaling
+				       // operation would produce
+				       // garbage
+      iteration_state = control().check (accumulated_iterations, rho);
+      if (iteration_state != SolverControl::iterate)
+	break;
+      
       gamma(0) = rho;
       
       v.scale (1./rho);
