@@ -48,7 +48,7 @@ namespace
   }
 
 
-  
+#ifdef DEAL_II_USE_PETSC  
   PetscScalar
   max_element (const PETScWrappers::VectorBase &criteria)
   {
@@ -62,7 +62,6 @@ namespace
   }
 
 
-
   PetscScalar
   min_element (const PETScWrappers::VectorBase &criteria)
   {
@@ -74,6 +73,7 @@ namespace
       m = std::min (m, criteria(i));
     return m;
   }
+#endif
 }
 
 
