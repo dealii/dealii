@@ -31,7 +31,7 @@ HyperBallBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>
 template <>
 Point<1>
 HyperBallBoundary<1>::
-get_new_point_on_quad (const typename Triangulation<1>::quad_iterator &) const
+get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
 {
   Assert (false, ExcInternalError());
   return Point<1>();
@@ -93,7 +93,7 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 template <>
 Point<1>
 HyperShellBoundary<1>::
-get_new_point_on_quad (const typename Triangulation<1>::quad_iterator &) const
+get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
 {
   Assert (false, ExcInternalError());
   return Point<1>();
