@@ -22,8 +22,8 @@ void TriaAccessor<dim>::copy_from (const TriaAccessor<dim> &a) {
 
 template <int dim>
 bool TriaAccessor<dim>::operator == (const TriaAccessor<dim> &a) const {
-  return ((present_level == a.present_level) &&
-	  (present_index == a.present_index) &&
+  return ((present_index == a.present_index) &&
+	  (present_level == a.present_level) &&
 	  (tria == a.tria));
 };
 
@@ -31,8 +31,8 @@ bool TriaAccessor<dim>::operator == (const TriaAccessor<dim> &a) const {
 
 template <int dim>
 bool TriaAccessor<dim>::operator != (const TriaAccessor<dim> &a) const {
-  return ((present_level != a.present_level) ||
-	  (present_index != a.present_index) ||
+  return ((present_index != a.present_index) ||
+	  (present_level != a.present_level) ||
 	  (tria != a.tria));
 };
 
