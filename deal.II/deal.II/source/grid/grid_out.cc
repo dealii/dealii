@@ -1161,9 +1161,9 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					 // lower left corner
 	  << "0 0 "
 					 // upper right corner
-	  << lrint( (x_max-x_min) * scale )+1
+	  << static_cast<unsigned int>(std::floor(( (x_max-x_min) * scale )+1))
 	  << ' '
-	  << lrint( (y_max-y_min) * scale )+1
+          << static_cast<unsigned int>(std::floor(( (y_max-y_min) * scale )+1))
 	  << std::endl;
 
 				       // define some abbreviations to keep
