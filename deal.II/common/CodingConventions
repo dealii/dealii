@@ -1,0 +1,72 @@
+Here are some conventions for source code of the deal.II library:
+=================================================================
+
+1./ Functions which return the number of something (number of cells,
+  degrees of freedom, etc) should start with n_*
+
+2./ Function which set a bit or flag should start with set_*;
+  functions which clear bits of flags should be named clear_*
+
+3./ After each function, at least three empty lines are expected to
+  enable better readability. One empty line occurs in functions to
+  group blocks of code, two empty lines are not enough to distinguish
+  visibly enough.
+
+4./ Whenever an integer variable can only assume nonnegative values,
+  it has to be marked as unsigned.
+
+5./ Whenever an argument will not be changed, it should be marked
+  const, even if it passed by value. This makes programs more readable
+  and lets the compiler issue warnings if such a parameter variable is
+  changed, which is often either involuntarily or poor style.
+
+6./ Whenever a function does not change any of the member variable of
+  the embedding class/object, it should be marked as const.
+
+7./ Function and variable names may not consist of only one or two
+  letters, unless the variable is a pure counting index.
+
+8./ Use the geometry information in GeometryInfo<dim> to get the
+  number of faces per cell, the number of children per cell, the
+  child indices of the child cells adjacent to face 3, etc, rather
+  than writing them into the directly as 2*dim, (1<<dim) and
+  {0,3}. This reduces the possibilities for errors and enhances
+  readability of code. Unfortunately, the GeometryInfo mechanism
+  was not invented right at the start of the program, so there are
+  quite a lot of places where this rule is violated. Of you find
+  such a place, fix it. We have set an amount of 1 cent per fixed
+  place, payable by cheque when the deal.II project is considered
+  finished by the author(s).
+
+9./ The layout of class declarations is the following: first the
+  block of public functions, beginning with the constructors, then
+  the destructors. If there are public member variables, these have
+  to occur before the constructor. Public variables shall only be
+  used if constant or unavoidable.
+
+  After the public members, the protected and finally the private
+  members are to be listed. The order is as above: first variables
+  then functions.
+
+  Exceptions shall be declared at the end of the public section
+  before the non-public sections start.
+
+10./ If a function has both input and output parameters, usually the
+  input parameters shall precede the output parameters, unless there
+  are good reasons to change this order.
+
+11./ Exceptions are used for internal parameter checking and for
+  consistency checks through the Assert macro. Exception handling
+  like done by the C++ language (try/throw/catch) are used to
+  handle run time errors (like I/O failures) which must be on
+  in any case, not only in debug mode.
+
+12./ Classes generally are named using uppercase letters to denote
+  word beginnings (e.g. TriaIterator) while functions and variables
+  use lowercase letters and underscores to denote different words.
+  The only exception are the iterator typedefs in Triangulation
+  and DoFHandler (named cell_iterator, active_line_iterator, etc)
+  to make the connection to the STL classes clear.
+
+13./ Each class has to have at least 200 pages of documentation ;-)
+
