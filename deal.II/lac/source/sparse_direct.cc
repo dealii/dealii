@@ -400,7 +400,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                        // process was somehow
                                        // terminated without sending
                                        // him this information
-      const pid_t parent_pid = std::getpid();
+      const pid_t parent_pid = getpid();
       detached_mode_data->put (&parent_pid, 1, "parent_pid");
     };
   
