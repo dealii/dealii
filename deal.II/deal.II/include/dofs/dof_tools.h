@@ -422,9 +422,6 @@ class DoFTools
 				      * the normal couplings and these
 				      * extra matrix entries are
 				      * considered.
-				      *
-				      * This function uses the user
-				      * flags of the triangulation.
 				      */
     template<int dim, class SparsityPattern>
     static void
