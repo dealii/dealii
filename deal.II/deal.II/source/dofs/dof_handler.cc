@@ -1315,13 +1315,13 @@ unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
       };
 
 
-// dofs of quad
+				   // dofs of quad
   if (selected_fe->dofs_per_quad > 0)
     for (unsigned int d=0; d<selected_fe->dofs_per_quad; ++d)
       cell->set_dof_index (d, next_free_dof++);
 
 
-// note that this cell has been processed
+				   // note that this cell has been processed
   cell->set_user_flag ();
   
   return next_free_dof;
@@ -1376,13 +1376,13 @@ unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
       };
 
 
-// dofs of hex
+				   // dofs of hex
   if (selected_fe->dofs_per_hex > 0)
     for (unsigned int d=0; d<selected_fe->dofs_per_hex; ++d)
       cell->set_dof_index (d, next_free_dof++);
 
 
-// note that this cell has been processed
+				   // note that this cell has been processed
   cell->set_user_flag ();
   
   return next_free_dof;
@@ -1656,7 +1656,7 @@ unsigned int DoFHandler<3>::max_couplings_between_dofs () const {
 	    27*selected_fe->dofs_per_hex);
 
 
-Assert (false, ExcNotImplemented());
+  Assert (false, ExcNotImplemented());
   return 0;
 };
 

@@ -202,7 +202,7 @@ prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
 					      n_coarsen_fathers);
 
 
-// we need counters for
+				   // we need counters for
 				   // the 'to_stay_or_refine' cells 'n_sr',
 				   // the 'coarsen_fathers' cells 'n_cf',
 				   // and all the cells where a
@@ -292,7 +292,7 @@ interpolate (const vector<Vector<number> > &all_in,
     };
 
 
-const unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
+  const unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
   Vector<number> local_values(dofs_per_cell);
 
   vector<unsigned int>    *indexptr;

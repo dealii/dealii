@@ -96,7 +96,7 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
 	    );
 
 
-for (unsigned int i=1; i<values.size(); ++i)
+	    for (unsigned int i=1; i<values.size(); ++i)
 	      {
 		min_value = min (min_value,
 				 *min_element(values[i].begin(),
@@ -148,7 +148,7 @@ for (unsigned int i=1; i<values.size(); ++i)
     max_value = min_value+1;
 
 
-// now set up the intervals based on
+				   // now set up the intervals based on
 				   // the min and max values
   intervals.clear ();
 				   // set up one list of intervals
@@ -191,7 +191,7 @@ for (unsigned int i=1; i<values.size(); ++i)
     intervals.push_back (intervals[0]);
 
 
-// finally fill the intervals
+				   // finally fill the intervals
   for (unsigned int i=0; i<values.size(); ++i)
     for (Vector<number>::const_iterator p=values[i].begin();
 	 p < values[i].end(); ++p)

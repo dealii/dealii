@@ -87,7 +87,7 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>       &dof,
 		       [dof.get_fe().system_to_component_index(j).first];
 
 
-vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+  vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 		       endc = dof.end();
   for (; cell!=endc; ++cell) 
@@ -358,7 +358,7 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
 	cell->face(face)->set_user_flag();
 
 
-// loop over all lines; only on lines
+				   // loop over all lines; only on lines
 				   // there can be constraints.
   for (line = dof_handler.begin_line(); line != endl; ++line)
 				     // if dofs on this line are subject
@@ -449,7 +449,7 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 	cell->face(face)->set_user_flag();
 
 
-// loop over all faces; only on faces
+				   // loop over all faces; only on faces
 				   // there can be constraints.
   for (face=dof_handler.begin_face(); face != endf; ++face)
 				     // if dofs on this line are subject

@@ -489,7 +489,7 @@ void FESystem<dim>::initialize ()
 	  };
 
 
-// now set up the interface constraints.
+				   // now set up the interface constraints.
 				   // this is kind'o hairy, so don't try
 				   // to do it dimension independent
   build_interface_constraints ();
@@ -755,7 +755,7 @@ FESystem<dim>::shape_grad_grad (const unsigned int  i,
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
 
-pair<unsigned,unsigned> comp = system_to_component_index(i);
+  pair<unsigned,unsigned> comp = system_to_component_index(i);
   
   return base_element(component_to_base_table[comp.first])
     .shape_grad_grad(comp.second, p);

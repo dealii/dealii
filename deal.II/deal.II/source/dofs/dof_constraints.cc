@@ -162,7 +162,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 	  ExcMatrixNotSquare());
 
 
-// store for each line of the matrix
+				   // store for each line of the matrix
 				   // its new line number
 				   // after compression. If the shift is
 				   // -1, this line will be condensed away
@@ -200,7 +200,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 	new_line.push_back (row-shift);
 
 
-next_constraint = lines.begin();
+  next_constraint = lines.begin();
 				   // note: in this loop we need not check
 				   // whether #next_constraint# is a valid
 				   // iterator, since #next_constraint# is

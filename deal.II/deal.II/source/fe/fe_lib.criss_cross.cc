@@ -116,7 +116,7 @@
   od:
 
 
-# these are the basis functions differentiated with respect to
+  # these are the basis functions differentiated with respect to
   # xi and eta. we need them for the computation of the jacobi
   # matrix, since we can't just differentiate a function.
   phi_xi[0] := proc(x,y) if(y<1-x) then -1;  else 0; fi; end:
@@ -168,7 +168,7 @@
           end:
 
 
-# Now for the mass matrix: we divide the entire cell into four
+  # Now for the mass matrix: we divide the entire cell into four
   # sectors:
   #
   # *-------*
@@ -917,7 +917,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 
 
-unsigned int n_points=unit_points.size();
+  unsigned int n_points=unit_points.size();
 
 				   // we need the support points in any
 				   // way, wanted or not by the user
@@ -1027,7 +1027,7 @@ unsigned int n_points=unit_points.size();
       };
 
 
-if (compute_jacobians_grad)
+  if (compute_jacobians_grad)
     switch (dim) 
       {
 	case 1:

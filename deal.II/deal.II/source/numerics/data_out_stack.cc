@@ -189,7 +189,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
     ++n_patches;
 
 
-// before we start the loop:
+				   // before we start the loop:
 				   // create a quadrature rule that
 				   // actually has the points on this
 				   // patch, and an object that
@@ -239,7 +239,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 	};
 
 
-// now fill in the the data values.
+				       // now fill in the the data values.
 				       // note that the required order is
 				       // with highest coordinate running
 				       // fastest, we need to enter each

@@ -121,7 +121,7 @@ void DataOut_Old<dim>::write_ucd (ostream &out) const {
     };
 
 
-// write preamble
+				   // write preamble
   if (true)
     {
 /*      
@@ -432,7 +432,7 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
     };
 
 
-DoFHandler<dim>::active_cell_iterator cell;
+  DoFHandler<dim>::active_cell_iterator cell;
   DoFHandler<dim>::active_cell_iterator endc = dofs->end();
 
   QTrapez<1>     q_trapez;
@@ -543,7 +543,7 @@ DoFHandler<dim>::active_cell_iterator cell;
 		  };
 
 
-break;
+		break;
 
 	  default:
 		Assert (false, ExcNotImplemented());
@@ -610,7 +610,7 @@ void DataOut_Old<dim>::write_gnuplot_draft (ostream &out) const
     };
 
 
-DoFHandler<dim>::active_cell_iterator cell;
+  DoFHandler<dim>::active_cell_iterator cell;
   DoFHandler<dim>::active_cell_iterator endc = dofs->end();
 
   unsigned int cell_index=0;
@@ -748,7 +748,7 @@ DoFHandler<dim>::active_cell_iterator cell;
 		out << endl << endl;
 
 
-break;
+		break;
 		
 	  default:
 		Assert (false, ExcNotImplemented());
@@ -815,7 +815,7 @@ void DataOut_Old<2>::write_povray_mesh (ostream &out) const {
       << endl;
 
 
-// write frame object
+				   // write frame object
   out << "mesh {" << endl;
   
   DoFHandler<2>::active_cell_iterator cell;
@@ -902,7 +902,7 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
   };  
 
 
-// Make output values local by
+				    // Make output values local by
 				    // copying them to a multiset.
 				    // Perform the necessary turn.
    const DoFHandler<2>::active_cell_iterator endc = dofs->end();
@@ -1008,7 +1008,7 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
    cells2.clear();
 
 
-// If we want shaded output we can
+				    // If we want shaded output we can
 				    // do the shading now.
    if (cell_shade_p)
      {
@@ -1016,7 +1016,8 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
        double light_norm, normal_norm;
        float color;
 
-       for (multiset<DataOut_Old<2>::EpsCellData>::iterator c=cells.begin();c!=cells.end();++c)
+       for (multiset<DataOut_Old<2>::EpsCellData>::iterator c=cells.begin();
+	    c!=cells.end(); ++c)
 	 {
 	   EpsCellData cd(*c);
 
@@ -1061,7 +1062,7 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
      cells2.swap (cells);
 
 
-// Next we have to shift and scale
+				    // Next we have to shift and scale
 				    // a bit so that everything still
 				    // arrives in our bounding box of
 				    // 310x310.
@@ -1088,7 +1089,7 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
      };
 
 
-//  Now we are ready to output...
+				    //  Now we are ready to output...
    for (multiset<DataOut_Old<2>::EpsCellData>::iterator c=cells.begin();
 	c!=cells.end(); ++c)
      {
@@ -1158,7 +1159,7 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
       << endl;
 
 
-///////////////////////////////
+				   ///////////////////////////////
 				   // first make up a list of used
 				   // vertices along with their
 				   // coordinates. since dofs have
@@ -1250,7 +1251,7 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
     };
 
 
-/////////////////////////////////////
+				   /////////////////////////////////////
 				   // now for the cells. this is simpler
 				   // than the above task
   if (true)
@@ -1275,7 +1276,7 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
     };
 
 
-///////////////////////////////////////
+				   ///////////////////////////////////////
 				   // data output.
   out << "variable" << endl;
 
@@ -1333,7 +1334,7 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
     };
 
 
-// Cell data is the simplest since the order
+				   // Cell data is the simplest since the order
 				   // already is correct
   if (true)
     {

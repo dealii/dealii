@@ -285,7 +285,7 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 
 
-// local mesh width
+				   // local mesh width
   const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
 
   for (unsigned int i=0; i<q_points.size(); ++i) 
@@ -311,6 +311,7 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
   if (compute_support_points)
     get_support_points (cell, support_points);
 };
+
 
 
 template <>

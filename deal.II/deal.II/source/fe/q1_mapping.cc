@@ -561,14 +561,14 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
 	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 
 
-unsigned int n_points=unit_points.size();
+  unsigned int n_points=unit_points.size();
 
   Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
   for (unsigned int l=0; l<GeometryInfo<dim>::vertices_per_cell; ++l)
     vertices[l] = cell->vertex(l);
 
 
-if (compute_q_points) 
+  if (compute_q_points) 
     {
 				       // initialize points to zero
       for (unsigned int i=0; i<n_points; ++i)
@@ -636,7 +636,7 @@ if (compute_q_points)
     };
 
 
-One last note regarding whether we have to invert M or M transposed: it is
+  One last note regarding whether we have to invert M or M transposed: it is
   easy to try out, by computing the gradients of a function on a distorted
   cell (just move one vertex) where the nodal values for linear elements
   are one for the moved vertex and zero otherwise. Please also note that
@@ -673,7 +673,7 @@ One last note regarding whether we have to invert M or M transposed: it is
     fevalues.reinit (dof.begin_active(),b);
 
 
-Vector<double> val(4);
+    Vector<double> val(4);
     val(2) = 1;
 
     vector<Point<2> > grads(4);

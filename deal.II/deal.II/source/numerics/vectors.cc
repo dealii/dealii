@@ -956,7 +956,7 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
  	};
 
 
-// append result of this cell
+				       // append result of this cell
  				       // to the end of the vector
       difference(index) = diff;
     };

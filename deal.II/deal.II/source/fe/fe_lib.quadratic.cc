@@ -65,7 +65,7 @@ void FEQ2<1>::initialize_matrices () {
   od;
 
 
-# to get the restriction (interpolation) matrices, evaluate
+  # to get the restriction (interpolation) matrices, evaluate
   # the basis functions on the child cells at the global
   # interpolation points
 

@@ -9868,7 +9868,7 @@ void FEQ3<3>::initialize_matrices ()
       prolongation[7](63,62) = 225.0/256.0;
 
 
-restriction[0](0,0) = 1.0;
+      restriction[0](0,0) = 1.0;
       restriction[0](8,9) = 1.0;
       restriction[0](14,15) = 1.0;
       restriction[0](24,25) = 1.0;

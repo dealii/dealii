@@ -113,7 +113,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>            &dof_handler,
     };
 
 
-// store next free dof index
+				   // store next free dof index
   unsigned int next_free_number = 0;
 
 				   // enumerate the first round dofs
@@ -295,7 +295,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
     };
 
 
-// store next free dof index
+				   // store next free dof index
   unsigned int next_free_number = 0;
 
 				   // enumerate the first round dofs
@@ -345,7 +345,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
 	continue;
 
 
-// store for each coordination
+				       // store for each coordination
 				       // number the dofs with these
 				       // coordination number
       multimap<unsigned int, int> dofs_by_coordination;

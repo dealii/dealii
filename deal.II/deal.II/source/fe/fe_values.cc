@@ -398,7 +398,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
 
 
-// second part:
+					   // second part:
 					   // tmp1 := (d_k J_lj) (d_l phi)
 	  contract (tmp1, jacobi_matrices_grad[j], 2, unit_shape_gradients[i][j]);
 					   // tmp1_kj J_ki
@@ -411,7 +411,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 	};
 
 
-// compute Jacobi determinants in
+				   // compute Jacobi determinants in
 				   // quadrature points.
 				   // refer to the general doc for
 				   // why we take the inverse of the
@@ -577,7 +577,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       };
 
 
-Tensor<2,dim> tmp1, tmp2;
+  Tensor<2,dim> tmp1, tmp2;
   if (update_flags & update_second_derivatives)
     for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
@@ -588,7 +588,7 @@ Tensor<2,dim> tmp1, tmp2;
 	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
 
 
-// second part:
+					   // second part:
 					   // tmp1 := (d_k J_lj) (d_l phi)
 	  contract (tmp1,
 		    jacobi_matrices_grad[j], 2,
@@ -603,7 +603,7 @@ Tensor<2,dim> tmp1, tmp2;
 	};
 
 
-// compute Jacobi determinants in
+				   // compute Jacobi determinants in
 				   // quadrature points.
 				   // refer to the general doc for
 				   // why we take the inverse of the
@@ -758,7 +758,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
 
 
-// second part:
+					   // second part:
 					   // tmp1 := (d_k J_lj) (d_l phi)
 	  contract (tmp1,
 		    jacobi_matrices_grad[j], 2,
@@ -773,7 +773,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 	};
 
 
-// compute Jacobi determinants in
+				   // compute Jacobi determinants in
 				   // quadrature points.
 				   // refer to the general doc for
 				   // why we take the inverse of the
