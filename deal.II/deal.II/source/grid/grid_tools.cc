@@ -123,7 +123,7 @@ void
 GridTools::shift (const Point<dim>   &shift_vector,
 		  Triangulation<dim> &triangulation)
 {
-  transform (std::bind2nd(ptr_fun(&shift_point<dim>),
+  transform (std::bind2nd(std::ptr_fun(&shift_point<dim>),
 			  shift_vector),
 	     triangulation);
 };
