@@ -1531,14 +1531,6 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 		       Vector<float>   &right_hand_side,
 		       const bool       preserve_symmetry);
 
-template
-void
-MatrixTools<deal_II_dimension>::
-apply_boundary_values (const std::map<unsigned int,double> &,
-		       BlockSparseMatrix<double>      &,
-		       BlockVector<double>            &,
-		       BlockVector<double>            &,
-		       const bool);
 
 
 
