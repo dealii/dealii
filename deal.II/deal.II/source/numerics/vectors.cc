@@ -1229,10 +1229,12 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
     {
       case H1_seminorm:
       case W1p_seminorm:
+      case W1infty_seminorm:
 	update_flags |= UpdateFlags (update_gradients);
 	break;
       case H1_norm:
       case W1p_norm:
+      case W1infty_norm:
 	update_flags |= UpdateFlags (update_gradients);
 					 // no break!
       default:
@@ -1402,6 +1404,7 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 	      diff=std::sqrt(diff);
 	    break;
 	  case Linfty_norm:
+	  case W1infty_norm:
 	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
 	    for (unsigned int k=0; k<n_components; ++k)
 	      for (unsigned int q=0; q<n_q_points; ++q)
@@ -1453,6 +1456,24 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 					fe_values.get_JxW_values().begin(),
 					0.0);
 	    diff = std::sqrt(diff);
+	    break;
+	  case W1infty_seminorm:
+	  case W1infty_norm:
+	    Assert(false, ExcNotImplemented());
+	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+	    for (unsigned int k=0; k<n_components; ++k)
+	      for (unsigned int q=0; q<n_q_points; ++q)
+		{
+		  double t = 0.;
+		  for (unsigned int d=0;d<dim;++d)
+		    t = std::max(t,std::fabs(psi_grads[q][k][d])
+				 * weight_vectors[q](k));
+		  
+		  psi_scalar[q] = std::max(psi_scalar[q],t);
+		}
+
+	    for (unsigned int i=0;i<psi_scalar.size();++i)
+	      diff = std::max (diff, psi_scalar[i]);
 	    break;
 	  default:
 	    break;

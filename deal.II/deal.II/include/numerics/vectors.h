@@ -326,6 +326,17 @@ class VectorTools
 					    */
 	  L2_norm,
 					   /**
+					    * The absolute value to
+					    * the <i>p</i>th power is
+					    * integrated and the pth
+					    * root is computed on each
+					    * cell. The exponent
+					    * <i>p</i> is the last
+					    * parameter of the
+					    * function.
+					    */
+	  Lp_norm,
+					   /**
 					    * The maximum absolute
 					    * value of the function.
 					    */
@@ -342,17 +353,6 @@ class VectorTools
 					    */
 	  H1_norm,
 					   /**
-					    * The absolute value to
-					    * the <i>p</i>th power is
-					    * integrated and the pth
-					    * root is computed on each
-					    * cell. The exponent
-					    * <i>p</i> is the last
-					    * parameter of the
-					    * function.
-					    */
-	  Lp_norm,
-					   /**
 					    * #Lp_norm of the gradient.
 					    */
 	  W1p_seminorm,
@@ -360,7 +360,17 @@ class VectorTools
 					    * same as #H1_norm for
 					    * <i>L<sup>p</sup></i>.
 					    */
-	  W1p_norm
+	  W1p_norm,
+					   /**
+					    * #Linfty_norm of the gradient.
+					    */
+	  W1infty_seminorm,
+					   /**
+					    * same as #H1_norm for
+					    * <i>L<sup>infty</sup></i>.
+					    */
+	  W1infty_norm
+	  
     };
     
 				     /**
