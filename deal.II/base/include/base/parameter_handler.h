@@ -368,7 +368,7 @@ struct Patterns {
  *
  *   This is the code:
  *   \begin{verbatim}
- *     #include <iostream.h>
+ *     #include <iostream>
  *     #include "../include/parameter_handler.h"
  *     
  *     

@@ -5,7 +5,7 @@
 /*----------------------------   exceptions.h     ---------------------------*/
 
 
-#include <iostream.h>
+#include <iostream>
 #include <exception>
 #include <cstdlib>
 
