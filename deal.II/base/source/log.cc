@@ -3,7 +3,10 @@
 #include <base/logstream.h>
 #include <base/jobidentifier.h>
 
+
+
 LogStream deallog;
+
 
 
 LogStream::LogStream()

@@ -66,14 +66,36 @@ class Tensor {
     Tensor & operator = (const Tensor<rank_,dim> &);
 
 				     /**
-				      *  Test for equality of two points.
+				      *  Test for equality of two tensors.
 				      */
     bool operator == (const Tensor<rank_,dim> &) const;
 
     				     /**
-				      *  Test for inequality of two points.
+				      *  Test for inequality of two tensors.
 				      */
     bool operator != (const Tensor<rank_,dim> &) const;
+
+				     /**
+				      *  Add another vector, i.e. move this tensor by
+				      *  the given offset.
+				      */
+    Tensor<rank_,dim> & operator += (const Tensor<rank_,dim> &);
+    
+				     /**
+				      *  Subtract another vector.
+				      */
+    Tensor<rank_,dim> & operator -= (const Tensor<rank_,dim> &);
+
+				     /**
+				      *  Scale the vector by #factor#, i.e. multiply
+				      *  all coordinates by #factor#.
+				      */
+    Tensor<rank_,dim> & operator *= (const double &factor);
+
+				     /**
+				      *  Scale the vector by #1/factor#.
+				      */
+    Tensor<rank_,dim> & operator /= (const double &factor);
 
 				     /**
 				      * Reset all values to zero.
@@ -126,7 +148,7 @@ template <int rank_, int dim>
 inline
 Tensor<rank_,dim> & Tensor<rank_,dim>::operator = (const Tensor<rank_,dim> &t) {
   for (unsigned int i=0; i<dim; ++i)
-    values[i] = t.values[i];
+    subtensor[i] = t.subtensor[i];
   return *this;
 };
 
@@ -136,7 +158,7 @@ template <int rank_, int dim>
 inline
 bool Tensor<rank_,dim>::operator == (const Tensor<rank_,dim> &p) const {
   for (unsigned int i=0; i<dim; ++i)
-    if (values[i] != p.values[i]) return false;
+    if (subtensor[i] != p.subtensor[i]) return false;
   return true;
 };
 
@@ -146,6 +168,46 @@ template <int rank_, int dim>
 inline
 bool Tensor<rank_,dim>::operator != (const Tensor<rank_,dim> &p) const {
   return !((*this) == p);
+};
+
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim> & Tensor<rank_,dim>::operator += (const Tensor<rank_,dim> &p) {
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i] += p.subtensor[i];
+  return *this;
+};
+
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim> & Tensor<rank_,dim>::operator -= (const Tensor<rank_,dim> &p) {
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i] -= p.subtensor[i];
+  return *this;
+};
+
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim> & Tensor<rank_,dim>::operator *= (const double &s) {
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i] *= s;
+  return *this;
+};
+
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim> & Tensor<rank_,dim>::operator /= (const double &s) {
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i] /= s;
+  return *this;
 };
 
 
@@ -165,6 +227,29 @@ void Tensor<rank_,dim>::clear () {
 
 
 
+/*  Exception class. This is certainly not the best possible place for its
+    declaration, but at present, local classes to any of Tensor<> can't
+    be properly accessed (haven't investigated why). If anyone has a better
+    idea, realize it!
+*/
+DeclException1 (ExcInvalidTensorIndex,
+		int,
+		<< "Invalid tensor index " << arg1);
+
+
+
+template <int dim>
+inline
+void contract (Tensor<1,dim>       &dest,
+	       const Tensor<2,dim> &src1,
+	       const Tensor<1,dim> &src2) {
+  dest.clear ();
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      dest[i] += src1[i][j] * src2[j];
+};
+
+
 
 template <int dim>
 inline
@@ -176,6 +261,100 @@ void contract (Tensor<2,dim>       &dest,
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
 	dest[i][j] += src1[i][k] * src2[k][j];
+};
+
+
+
+template <int dim>
+inline
+void contract (Tensor<2,dim>       &dest,
+	       const Tensor<2,dim> &src1,   const unsigned int index1,
+	       const Tensor<2,dim> &src2,   const unsigned int index2) {
+  dest.clear ();
+
+  switch (index1)
+    {
+      case 1:
+	    switch (index2)
+	      {
+		case 1:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    dest[i][j] += src1[k][i] * src2[k][j];
+		      break;
+		case 2:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    dest[i][j] += src1[k][i] * src2[j][k];
+		      break;
+
+		default:
+		      Assert (false, ExcInvalidTensorIndex (index2));
+	      };
+	    break;
+      case 2:
+	    switch (index2)
+	      {
+		case 1:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    dest[i][j] += src1[i][k] * src2[k][j];
+		      break;
+		case 2:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    dest[i][j] += src1[i][k] * src2[j][k];
+		      break;
+
+		default:
+		      Assert (false, ExcInvalidTensorIndex (index2));
+	      };
+	    break;
+
+      default:
+	    Assert (false, ExcInvalidTensorIndex (index1));
+    };
+};
+
+
+
+template <int dim>
+inline
+void contract (Tensor<2,dim>       &dest,
+	       const Tensor<3,dim> &src1,   const unsigned int index1,
+	       const Tensor<1,dim> &src2) {
+  dest.clear ();
+
+  switch (index1)
+    {
+      case 1:
+	    for (unsigned int i=0; i<dim; ++i)
+	      for (unsigned int j=0; j<dim; ++j)
+		for (unsigned int k=0; k<dim; ++k)
+		  dest[i][j] += src1[k][i][j] * src2[k];
+	    break;
+
+      case 2:
+	    for (unsigned int i=0; i<dim; ++i)
+	      for (unsigned int j=0; j<dim; ++j)
+		for (unsigned int k=0; k<dim; ++k)
+		  dest[i][j] += src1[i][k][j] * src2[k];
+	    break;
+
+      case 3:
+	    for (unsigned int i=0; i<dim; ++i)
+	      for (unsigned int j=0; j<dim; ++j)
+		for (unsigned int k=0; k<dim; ++k)
+		  dest[i][j] += src1[i][j][k] * src2[k];
+	    break;
+
+      default:
+	    Assert (false, ExcInvalidTensorIndex (index1));
+    };
 };
 
 
@@ -224,7 +403,14 @@ void contract (Tensor<4,dim>       &dest,
 	    dest[i][j][k][l] += src1[i][j][m] * src2[m][k][l];
 };
 
-    
+
+
+inline
+double determinant (const Tensor<2,2> &t) {
+  return ((t[0][0] * t[1][1]) -
+	  (t[1][0] * t[0][1]));
+};
+
     
     
     

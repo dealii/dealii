@@ -43,6 +43,13 @@ class Point : public Tensor<1,dim> {
 				      * to zero.
 				      */
     explicit Point ();
+
+				     /**
+				      * Convert a tensor to a point. Since no
+				      * additional data is inside a point,
+				      * this is ok.
+				      */
+    Point (const Tensor<1,dim> &);
     
 				     /**
 				      *  Constructor for one dimensional points. This
@@ -104,37 +111,16 @@ class Point : public Tensor<1,dim> {
     Point<dim>   operator * (const double) const;
 
 				     /**
+				      *  Returns the scalar product of two vectors.
+				      */
+    double       operator * (const Point<dim> &) const;
+
+				     /**
 				      *  Divide by a factor. If possible, use
 				      *  #operator /=# instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Point<dim>   operator / (const double) const;
-
-				     /**
-				      *  Add another vector, i.e. move this point by
-				      *  the given offset.
-				      */
-    Point<dim> & operator += (const Point<dim> &);
-				     /**
-				      *  Subtract another vector.
-				      */
-    Point<dim> & operator -= (const Point<dim> &);
-
-				     /**
-				      *  Scale the vector by #factor#, i.e. multiply
-				      *  all coordinates by #factor#.
-				      */
-    Point<dim> & operator *= (const double &factor);
-
-				     /**
-				      *  Scale the vector by #1/factor#.
-				      */
-    Point<dim> & operator /= (const double &factor);
-
-				     /**
-				      *  Returns the scalar product of two vectors.
-				      */
-    double              operator * (const Point<dim> &) const;
 
 				     /**
 				      *  Returns the scalar product of this point
@@ -172,6 +158,12 @@ template <int dim>
 inline
 Point<dim>::Point () :
 		Tensor<1,dim>() {};
+
+
+template <int dim>
+inline
+Point<dim>::Point (const Tensor<1,dim> &t) :
+		Tensor<1,dim>(t) {};
 
 
 
@@ -246,6 +238,15 @@ Point<dim> Point<dim>::operator * (const double factor) const {
 
 template <int dim>
 inline
+double Point<dim>::operator * (const Point<dim> &p) const {
+				   // simply pass down
+  return Tensor<1,dim>::operator * (p);
+};
+
+
+
+template <int dim>
+inline
 Point<dim> operator * (const double factor, const Point<dim> &p) {
   return p*factor;
 };
@@ -260,57 +261,6 @@ Point<dim> Point<dim>::operator / (const double factor) const {
 
 
   
-template <int dim>
-inline
-Point<dim> & Point<dim>::operator += (const Point<dim> &p) {
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] += p.values[i];
-  return *this;
-};
-
-
-
-template <int dim>
-inline
-Point<dim> & Point<dim>::operator -= (const Point<dim> &p) {
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] -= p.values[i];
-  return *this;
-};
-
-
-
-template <int dim>
-inline
-Point<dim> & Point<dim>::operator *= (const double &s) {
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] *= s;
-  return *this;
-};
-
-
-
-template <int dim>
-inline
-Point<dim> & Point<dim>::operator /= (const double &s) {
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] /= s;
-  return *this;
-};
-
-
-
-template <int dim>
-inline
-double Point<dim>::operator * (const Point<dim> &p) const {
-  double q=0;
-  for (unsigned int i=0; i<dim; ++i)
-    q += values[i] * p.values[i];
-  return q;
-};
-
-
-
 template <int dim>
 inline
 double Point<dim>::square () const {

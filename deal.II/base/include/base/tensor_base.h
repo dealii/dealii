@@ -103,6 +103,32 @@ class Tensor<1,dim> {
     bool operator != (const Tensor<1,dim> &) const;
 
 				     /**
+				      *  Add another vector, i.e. move this point by
+				      *  the given offset.
+				      */
+    Tensor<1,dim> & operator += (const Tensor<1,dim> &);
+				     /**
+				      *  Subtract another vector.
+				      */
+    Tensor<1,dim> & operator -= (const Tensor<1,dim> &);
+
+				     /**
+				      *  Scale the vector by #factor#, i.e. multiply
+				      *  all coordinates by #factor#.
+				      */
+    Tensor<1,dim> & operator *= (const double &factor);
+
+				     /**
+				      *  Scale the vector by #1/factor#.
+				      */
+    Tensor<1,dim> & operator /= (const double &factor);
+
+				     /**
+				      *  Returns the scalar product of two vectors.
+				      */
+    double              operator * (const Tensor<1,dim> &) const;
+
+				     /**
 				      * Reset all values to zero.
 				      */
     void clear ();
@@ -204,6 +230,57 @@ template <int dim>
 inline
 bool Tensor<1,dim>::operator != (const Tensor<1,dim> &p) const {
   return !((*this) == p);
+};
+
+
+
+template <int dim>
+inline
+Tensor<1,dim> & Tensor<1,dim>::operator += (const Tensor<1,dim> &p) {
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] += p.values[i];
+  return *this;
+};
+
+
+
+template <int dim>
+inline
+Tensor<1,dim> & Tensor<1,dim>::operator -= (const Tensor<1,dim> &p) {
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] -= p.values[i];
+  return *this;
+};
+
+
+
+template <int dim>
+inline
+Tensor<1,dim> & Tensor<1,dim>::operator *= (const double &s) {
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] *= s;
+  return *this;
+};
+
+
+
+template <int dim>
+inline
+Tensor<1,dim> & Tensor<1,dim>::operator /= (const double &s) {
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] /= s;
+  return *this;
+};
+
+
+
+template <int dim>
+inline
+double Tensor<1,dim>::operator * (const Tensor<1,dim> &p) const {
+  double q=0;
+  for (unsigned int i=0; i<dim; ++i)
+    q += values[i] * p.values[i];
+  return q;
 };
 
 
