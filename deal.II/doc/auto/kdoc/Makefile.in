@@ -46,18 +46,11 @@ endif
 kdoc: kdoc-installed $(kdoc.library-files)
 
 
-# check whether kdoc is already installed. if not, then try to do so
+# check whether kdoc is already installed. if not, then try to do
+# so. also install afresh if not up-to-date with the sources
 kdoc-installed:
-	@if test ! -d $(kdocdir) ; then  \
-	    echo "========================================" ; \
-	    echo "Trying to install kdoc first" ;  \
-	    echo "========================================" ; \
-	    cd $(kdocdir:kdoc/bin=kdoc) ;    \
-	    $(MAKE) install ;  \
-	    echo "========================================" ; \
-	    echo "Done" ;  \
-	    echo "========================================" ; \
-        fi
+	cd $(kdocdir:kdoc/bin=kdoc) ; $(MAKE)
+
 
 
 # now for the generation of the documentation of the sublibraries.
