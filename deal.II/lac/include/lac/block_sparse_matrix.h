@@ -145,7 +145,6 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
     BlockSparseMatrix<number> &
     operator = (const double d);
 
-
     				     /**
 				      * Release all memory and return
 				      * to a state just like after
@@ -159,6 +158,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      * object to have no blocks at all.
 				      */
     void clear ();
+    
 				     /**
 				      * Reinitialize the sparse matrix
 				      * with the given sparsity
