@@ -2,14 +2,29 @@
 body {
 	background-image: none;
 	background-color: white; 
+    color: Black;
+    margin: 0;
+    padding: 0;
 }
+
+body {
+    font: normal sans-serif;
+    color: Black;
+    margin: 0;
+    padding: 0;
+}
+
 
 body.title {
 	background-image: url(pictures/title-background.jpg);
+    margin: 0;
+    padding: 2px;
 }
 
 body.navbar {
 	background-image: url(pictures/deal.II-text.jpg);
+    margin: 2px;
+    padding: 2px;
 }
 
 frameset { background-color: white;
@@ -18,10 +33,27 @@ frameset { background-color: white;
 	   frameborder: 0;
          }
 
-h1 {
-	text-align:center;
-	color:#0000A0;
+a:hover { text-decoration: underline; }
+
+
+img {
+    border: none;
+    vertical-align: middle;
 }
+
+p {
+    margin: 0.4em 0em 0.5em 0em;
+    line-height: 1.5em;
+}
+
+hr {
+    height: 1px;
+    color: #aaaaaa;
+    background-color: #aaaaaa;
+    border: 0;
+    margin: 0.2em 0 0.2em 0;
+}
+
 
 h1.head {
 	text-align:center;
@@ -29,8 +61,32 @@ h1.head {
 	color:black;
 }
 
-h2 { color:#a00000;
-   }
+h1, h2, h3, h4, h5, h6 {
+    color: Black;
+    background: none;
+    font-weight: normal;
+    margin: 0;
+    padding-top: 0.5em;
+    padding-bottom: 0.17em;
+    border-bottom: 1px solid #aaaaaa;
+}
+h1 { font-size: 175%; }
+h2 { font-size: 140%; }
+h3 { font-size: 125%;
+     padding-bottom: 0.17em;
+     border-bottom: 1px dashed #aaaaaa; }
+h4 { font-size: 110%; 
+     border-bottom: none;
+     font-weight: bold;
+}
+h5 { font-size: 100%; 
+     border-bottom: none;
+     font-weight: bold;
+}
+h6 { font-size: 80%;  
+     border-bottom: none;
+     font-weight: bold;
+}
 
 div.right {
   text-align: right;
@@ -38,7 +94,44 @@ div.right {
 
 td { vertical-align: top; }
 
-dt { font-weight: bold; }
+
+ul {
+    line-height: 1.5em;
+    list-style-type: square;
+    margin: 0.3em 0 0 1.5em;
+    padding:0;
+}
+ol {
+    line-height: 1.5em;
+    margin: 0.3em 0 0 3.2em;
+    padding:0;
+    list-style-image: none;
+}
+li { margin-bottom: 0.1em; }
+dt {
+    font-weight: bold;
+    margin-bottom: 0.1em;
+}
+dl{
+    margin-top: 0.2em;
+    margin-bottom: 0.5em;
+}
+dd {
+    line-height: 1.5em;
+    margin-left: 2em;
+    margin-bottom: 0.1em;
+}
+
+abbr, acronym, .explain {
+    color: Black;
+    background: none;
+    cursor: help;
+}
+
+q {
+    font-family: Times, "Times New Roman", serif;
+    font-style: italic;
+}
 
 .figure     { font-weight: bold;
 	      font-size: larger;
