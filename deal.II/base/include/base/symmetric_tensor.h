@@ -163,7 +163,7 @@ namespace internal
                                         * @author Wolfgang Bangerth, 2005
                                         */
       template <int dim, bool constness>
-      class RowAccessor 
+      class Accessor 
       {
         public:
                                            /**
@@ -187,7 +187,7 @@ namespace internal
                                             * access as well as the row we
                                             * point to as arguments.
                                             */
-          RowAccessor (base_tensor_type  &tensor,
+          Accessor (base_tensor_type  &tensor,
                        const unsigned int  row);
 
                                            /**
@@ -360,7 +360,7 @@ class SymmetricTensor<2,dim>
                                       * symmetric tensor. This function is
                                       * called for constant tensors.
                                       */
-    internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,true>
+    internal::SymmetricTensor::Rank2Accessors::Accessor<dim,true>
     operator [] (const unsigned int row) const;
 
                                      /**
@@ -368,7 +368,7 @@ class SymmetricTensor<2,dim>
                                       * symmetric tensor. This function is
                                       * called for non-constant tensors.
                                       */
-    internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,false>
+    internal::SymmetricTensor::Rank2Accessors::Accessor<dim,false>
     operator [] (const unsigned int row);
     
                                      /**
@@ -427,8 +427,8 @@ namespace internal
     namespace Rank2Accessors
     {
       template <int dim, bool constness>
-      RowAccessor<dim,constness>::
-      RowAccessor (base_tensor_type  &base_tensor,
+      Accessor<dim,constness>::
+      Accessor (base_tensor_type  &base_tensor,
                    const unsigned int row)
                       :
                       base_tensor (base_tensor),
@@ -440,8 +440,8 @@ namespace internal
 
 
       template <int dim, bool constness>
-      typename RowAccessor<dim,constness>::reference
-      RowAccessor<dim,constness>::
+      typename Accessor<dim,constness>::reference
+      Accessor<dim,constness>::
       operator[] (const unsigned int column)
       {
         Assert (column < dim, ExcIndexRange (column, 0, dim));
@@ -675,21 +675,21 @@ SymmetricTensor<2,dim>::operator * (const SymmetricTensor &s) const
 
 
 template <int dim>
-internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,true>
+internal::SymmetricTensor::Rank2Accessors::Accessor<dim,true>
 SymmetricTensor<2,dim>::operator [] (const unsigned int row) const
 {
   return
-    internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,true> (data, row);
+    internal::SymmetricTensor::Rank2Accessors::Accessor<dim,true> (data, row);
 }
 
 
 
 template <int dim>
-internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,false>
+internal::SymmetricTensor::Rank2Accessors::Accessor<dim,false>
 SymmetricTensor<2,dim>::operator [] (const unsigned int row)
 {
   return
-    internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,false> (data, row);
+    internal::SymmetricTensor::Rank2Accessors::Accessor<dim,false> (data, row);
 }
 
 
