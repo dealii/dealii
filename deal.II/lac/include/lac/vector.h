@@ -92,6 +92,24 @@ class Vector {
 				      *                     all components are copied from V
 				      */
     Vector (const Vector<Number>& V);
+
+
+// note: I disabled this function for the time being, since egcs1.1.2
+// does not respect the "explicit" keyword for template constructors.
+// this leads to unwanted conversions and in some places to automatically
+// generated temporaries, where this is not a good idea    
+// 				     /**
+// 				      * Copy constructor taking a vector of
+// 				      * another data type. This will fail if
+// 				      * there is no conversion path from
+// 				      * #OtherNumber# to #Number#. Note that
+// 				      * you may lose accuracy when copying
+// 				      * to a vector with data elements with
+// 				      * less accuracy.
+// 				      */
+//     template <typename OtherNumber>
+//     explicit
+//     Vector (const Vector<OtherNumber> &v);
     
 				     /**
 				      * Constructor. Set dimension to #n# and

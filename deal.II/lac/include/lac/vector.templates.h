@@ -53,6 +53,25 @@ Vector<Number>::Vector (const Vector<Number>& v) :
 
 
 
+// see the .h file for why this function was disabled
+//
+// template <typename Number>
+// template <typename OtherNumber>
+// Vector<Number>::Vector (const Vector<OtherNumber>& v) :
+// 		dim(v.size()),
+// 		maxdim(v.size()),
+// 		val(0)
+// {
+//   if (dim)
+//     {
+//       val = new Number[maxdim];
+//       Assert (val != 0, ExcOutOfMemory());
+//       copy (v.begin(), v.end(), begin());
+//     }
+// }
+
+
+
 template <typename Number>
 void Vector<Number>::reinit (const unsigned int n, const bool fast) {
   if (n==0) 
