@@ -155,6 +155,24 @@ class ConstraintMatrix : public Subscriptor
     unsigned int n_constraints () const;
 
 				     /**
+				      * Return whether the degree of
+				      * freedom with number #index# is
+				      * a constrained one.
+				      *
+				      * Note that if #close# was
+				      * called before, then this
+				      * function is significantly
+				      * faster, since then the
+				      * constrained degrees of freedom
+				      * are sorted and we can do a
+				      * binary search, while before
+				      * #close# was called, we have to
+				      * perform a linear search
+				      * through all entries.
+				      */
+    bool is_constrained (const unsigned int index) const;
+    
+				     /**
 				      * Condense a given sparsity pattern. This
 				      * function assumes the uncondensed
 				      * matrix struct to be compressed and the

@@ -12,7 +12,9 @@
 
 
 
-bool ConstraintMatrix::ConstraintLine::operator < (const ConstraintMatrix::ConstraintLine &a) const
+inline
+bool
+ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 {
   return line < a.line;
 };
@@ -308,8 +310,34 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const {
 
 
 
-unsigned int ConstraintMatrix::n_constraints () const {
+unsigned int ConstraintMatrix::n_constraints () const
+{
   return lines.size();
+};
+
+
+
+bool ConstraintMatrix::is_constrained (const unsigned int index) const 
+{
+  if (sorted == true)
+    {
+      
+      ConstraintLine index_comparison;
+      index_comparison.line = index;
+      
+      return binary_search (lines.begin (),
+			    lines.end (),
+			    index_comparison);
+    }
+  else
+    {
+      for (vector<ConstraintLine>::const_iterator i=lines.begin();
+	   i!=lines.end(); ++i)
+	if (i->line == index)
+	  return true;
+
+      return false;
+    };
 };
 
 
