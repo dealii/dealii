@@ -13,42 +13,55 @@
 
 
 #include <base/subscriptor.h>
+#include <typeinfo>
+
 
 
 Subscriptor::Subscriptor () :
-		counter (0)
+		counter (0),
+		object_info (0)
 {};
 
 
 Subscriptor::Subscriptor (const Subscriptor &) :
-		counter (0)
+		counter (0),
+		object_info (0)
 {};
 
 
 Subscriptor::~Subscriptor ()
 {
-#ifndef QUIET_SUBSCRIPTOR
-  Assert (counter == 0, ExcInUse(counter, classname ));
-#else
-  Assert (counter == 0, ExcInUse(counter));
-#endif
+				   // check whether there are still
+				   // subscriptions to this object. if
+				   // so, output the actual name of
+				   // the class to which this object
+				   // belongs, i.e. the most derived
+				   // class. note that the name may be
+				   // mangled, so it need not be the
+				   // clear-text class name. however,
+				   // you can obtain the latter by
+				   // running the c++filt program over
+				   // the output.
+  Assert (counter == 0, ExcInUse(counter, object_info->name()));
 }
 
 
-Subscriptor & Subscriptor::operator = (const Subscriptor &)
+
+Subscriptor & Subscriptor::operator = (const Subscriptor &s)
 {
+  object_info = s.object_info;
   return *this;
 };
+
 
 
 void Subscriptor::subscribe () const
 {
 #ifdef DEBUG
-#ifndef QUIET_SUBSCRIPTOR
-  if(classname.size() == 0)
-    classname = string(typeid(*this).name());
+  if (object_info == 0)
+    object_info = &typeid(*this);
 #endif
-#endif
+
   ++counter;
 };
 
