@@ -19,6 +19,21 @@
 
 #include <fe/fe_nedelec.h>
 
+// Transfer matrices for finite elements: have one matrix for each of
+// the four child cells which tells us how the degrees of freedom on
+// the child cell are obtained from the degrees of freedom on the
+// mother cell
+//
+// TODO: [Anna] check whether the following paragraph is correct. if so, then please multiply the values in the eight following matrices by two
+
+// note the following: since the shape functions themselves and not
+// only the gradients are transformed using the mapping object from
+// the unit cell to the real cell, the actual values of the function
+// on the real cell is degree of freedom times value of the shape
+// function on the unit cell times Jacobian. Thus, what has the DoF
+// value 1 on the mother cell must have the DoF value 2 on the child
+// cell since the latter is smaller by a (linear scaling) factor of
+// two.
 namespace FE_Nedelec_3d
 {
   static const double q1_into_q1_refined_0[] =
@@ -176,8 +191,16 @@ sizeof(FE_Nedelec<3>::Matrices::embedding[0]);
 
 
 
-// Constraint matrices
+// Constraint matrices: how do the new value on child faces depend on
+// the values on the mother face if that face has a hanging node
+//
+// TODO: [Anna] check whether the following paragraph is correct. if so, then please multiply the values in the following matrix by two
 
+// Here, the same applies as for the embedding matrices: since the DoF
+// values are not only multiplied by the values of the shape function
+// on the unit cell, but also by the transformation, we have to
+// multiply the value on the large face by two to get the same value
+// back on the small face
 namespace FE_Nedelec_3d 
 {
   static const double constraint_q1[] =
