@@ -201,5 +201,5 @@ endif
 ifeq ($(USE_CONTRIB_PETSC),yes)
   include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
   CXXFLAGS.g += $(GCXX_PETSCFLAGS)
-  CXXFLAGS.g += $(OCXX_PETSCFLAGS)
+  CXXFLAGS.o += $(OCXX_PETSCFLAGS)
 endif
