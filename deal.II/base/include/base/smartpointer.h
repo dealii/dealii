@@ -144,7 +144,8 @@ SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt) :
 
 
 template <typename T>
-SmartPointer<T>::~SmartPointer () {
+SmartPointer<T>::~SmartPointer ()
+{
   if (t)
     t->unsubscribe();
 };
@@ -168,6 +169,7 @@ SmartPointer<T> & SmartPointer<T>::operator = (T *tt)
 };
 
 
+
 template <typename T>
 SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt)
 {
@@ -186,9 +188,11 @@ SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt)
 };
 
 
+
 template <typename T>
 inline
-SmartPointer<T>::operator T* () const {
+SmartPointer<T>::operator T* () const
+{
   return t;
 };
 
@@ -196,7 +200,8 @@ SmartPointer<T>::operator T* () const {
 
 template <typename T>
 inline
-T & SmartPointer<T>::operator * () const {
+T & SmartPointer<T>::operator * () const
+{
   return *t;
 };
 
@@ -204,7 +209,8 @@ T & SmartPointer<T>::operator * () const {
 
 template <typename T>
 inline
-T * SmartPointer<T>::operator -> () const {
+T * SmartPointer<T>::operator -> () const
+{
   return t;
 };
 
