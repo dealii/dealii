@@ -80,7 +80,7 @@ SparseMatrix<double>, /*PreconditionRelaxation<SparseMatrix<double> ,*/
 Coarse;
 
 
-main()
+int main()
 {
   ofstream logfile("mg.output");
   deallog.attach(logfile);

@@ -41,15 +41,6 @@ libraries = $(libs)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
-
-%.go : %.cc Makefile
-	@echo =====debug========= $<
-	@$(CXX) $(flags) -c $< -o $@
-%.o : %.cc Makefile
-	@echo =====optimized===== $<
-	@$(CXX) $(flags) -c $< -o $@
-
-
 all: solver.check mgbase.check mg.check
 exe: $(all:.check=.testcase) benchmark
 run: $(all:.check=.output)
@@ -75,7 +66,8 @@ solver-o-files = $(solver-cc-files:.cc=.o)
 endif
 
 solver.testcase: $(solver-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
 
 
 ############################################################
@@ -90,7 +82,8 @@ mgbase-o-files = $(mgbase-cc-files:.cc=.o)
 endif
 
 mgbase.testcase: $(mgbase-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
 
 
 
@@ -106,7 +99,8 @@ mg-o-files = $(mg-cc-files:.cc=.o)
 endif
 
 mg.testcase: $(mg-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
 
 
 
@@ -172,7 +166,7 @@ veryclean: clean
 all-cc-files = $(shell echo *.cc)
 
 Make.depend: $(all-cc-files)
-	@echo =====Dependencies=== Make.depend
+	@echo =====Dependencies== Make.depend
 	@$(CXX) $(flags) $^ -M > $@
 	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
 

@@ -1,3 +1,5 @@
+// $Id$
+// (c) Guido Kanschat, 1999
 
 #include <fstream>
 #include <base/subscriptor.h>
@@ -29,7 +31,7 @@ public:
 
 
 
-main()
+int main()
 {
   ofstream logfile("reference.output");
   deallog.attach(logfile);

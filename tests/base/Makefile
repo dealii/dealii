@@ -74,6 +74,7 @@ logtest-o-files = $(logtest-cc-files:.cc=.o)
 endif
 
 logtest.testcase: $(logtest-o-files) $(libraries)
+	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
 
@@ -89,6 +90,7 @@ tensor-o-files = $(tensor-cc-files:.cc=.o)
 endif
 
 tensor.testcase: $(tensor-o-files) $(libraries)
+	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
 
@@ -105,6 +107,7 @@ reference-o-files = $(reference-cc-files:.cc=.o)
 endif
 
 reference.testcase: $(reference-o-files) $(libraries)
+	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
 
@@ -128,6 +131,7 @@ target1-o-files = $(target1-cc-files:.cc=.o)
 endif
 
 target1: $(target1-o-files) $(libraries)
+	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
 
@@ -160,7 +164,7 @@ veryclean: clean
 all-cc-files = $(shell echo *.cc)
 
 Make.depend: $(all-cc-files)
-	@echo =====Dependecies=== Make.depend
+	@echo =====Dependencies== Make.depend
 	@$(CXX) $(flags) $^ -M > $@
 	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
 

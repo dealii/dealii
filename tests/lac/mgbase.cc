@@ -73,7 +73,7 @@ class MGTest
       }
 };
 
-main()
+int main()
 {
   ofstream logfile("mgbase.output");
   deallog.attach(logfile);

@@ -1,7 +1,10 @@
+// $Id$
+// (c) Guido Kanschat, 1999
+
 #include <base/logstream.h>
 #include <fstream>
 
-main()
+int main()
 {
   ofstream logfile("logtest.output");
   deallog.attach(logfile);

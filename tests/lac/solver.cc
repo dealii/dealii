@@ -79,32 +79,32 @@ main()
       deallog << "SOR-diff:" << res*res << endl;
       
       deallog.push("no");
-      {
-	check_method(cg,A,u,f,prec_no);
-	check_method(bicgstab,A,u,f,prec_no);
-	check_method(gmres,A,u,f,prec_no);
-	check_method(qmrs,A,u,f,prec_no);
-      };
+
+      check_method(cg,A,u,f,prec_no);
+      check_method(bicgstab,A,u,f,prec_no);
+      check_method(gmres,A,u,f,prec_no);
+      check_method(qmrs,A,u,f,prec_no);
+
       deallog.pop();
       
-      deallog.push("ssor");      
-      {
-	check_method(rich,A,u,f,prec_ssor);
-	check_method(cg,A,u,f,prec_ssor);
-	check_method(bicgstab,A,u,f,prec_ssor);
-	check_method(gmres,A,u,f,prec_ssor);
-	check_method(qmrs,A,u,f,prec_ssor);
-      };
+      deallog.push("ssor");
+
+      check_method(rich,A,u,f,prec_ssor);
+      check_method(cg,A,u,f,prec_ssor);
+      check_method(bicgstab,A,u,f,prec_ssor);
+      check_method(gmres,A,u,f,prec_ssor);
+      check_method(qmrs,A,u,f,prec_ssor);
+
       deallog.pop();
 
-      deallog.push("sor");      
-      {
-	check_method(rich,A,u,f,prec_sor);
-	check_method(cg,A,u,f,prec_sor);
-	check_method(bicgstab,A,u,f,prec_sor);
-	check_method(gmres,A,u,f,prec_sor);
-	check_method(qmrs,A,u,f,prec_sor);
-      };
+      deallog.push("sor");
+
+      check_method(rich,A,u,f,prec_sor);
+      check_method(cg,A,u,f,prec_sor);
+      check_method(bicgstab,A,u,f,prec_sor);
+      check_method(gmres,A,u,f,prec_sor);
+      check_method(qmrs,A,u,f,prec_sor);
+
       deallog.pop();
     };
 };
