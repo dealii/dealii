@@ -36,7 +36,8 @@ tests_x =  logtest \
 	   auto_derivative_function \
 	   anisotropic_* \
            hierarchical \
-	   data_out_base
+	   data_out_base \
+	   function_parser
 
 # from above list of regular expressions, generate the real set of
 # tests
