@@ -635,7 +635,7 @@ namespace internal
 					     // numbers on edge
 					     // edge_num
 	    Cell & cur_cell = cell_list[cur_cell_id];
-// m.DumpCell(cur_cell);
+
 	    for(unsigned short int edge_num=0; 
 		edge_num<12; 
 		++edge_num)
@@ -870,14 +870,9 @@ namespace internal
       int ge2 = c.edges[e2];
 
 
-//  std::cout<<"Coming Into Node "<<node_num<< " are the local edges : "
-//    <<e0<<" "<<e1<<" "<<e2<<std::endl;
-
       int or0 = info.edge_to_node_orient[local_node_num][0]*c.local_orientation_flags[e0];
       int or1 = info.edge_to_node_orient[local_node_num][1]*c.local_orientation_flags[e1];
       int or2 = info.edge_to_node_orient[local_node_num][2]*c.local_orientation_flags[e2];
-
-//  std::cout<<"They have orientations : "<<or0<<" "<<or1<<" "<<or2<<std::endl;
 
 				       // What each edge thinks the
 				       // current node should be.
@@ -886,115 +881,20 @@ namespace internal
       int curglobalnodenum1 = edge_list[ge1].nodes[or1==1 ? 0 : 1];
       int curglobalnodenum2 = edge_list[ge2].nodes[or2==1 ? 0 : 1];
 
-//  std::cout<<"This means the current node is "
-//    <<curglobalnodenum0 <<" "
-//    <<curglobalnodenum1 <<" "
-//    <<curglobalnodenum2 <<std::endl; 
+      const bool retval = ((curglobalnodenum0 == curglobalnodenum1)&&
+			   (curglobalnodenum1 == curglobalnodenum2) );
 
-      bool retval = ((curglobalnodenum0 == curglobalnodenum1)&&
-		     (curglobalnodenum1 == curglobalnodenum2) );
-
-
-      if (!retval)
-	{
-	  std::cout << "FAILED SANITY TEST";
-	  dump_cell(c);
-	}
       Assert (retval == true, ExcInternalError());
   
       return retval;
-    }
-
-
-    
-    void Mesh::dump_cell(const Cell &c) const
-    {
-      std::cout<<std::endl
-	       <<"===CELL NODES==="<<std::endl;
-      for(int i=0;i<8;++i)
-	std::cout<<"\t"<<c.nodes[i];
-      std::cout<<std::endl;
-      std::cout<<"===CELL EDGES==="<<std::endl;
-      for(int i=0;i<12;++i)
-	{
-	  std::cout<<"\t"<<c.edges[i]<<" "<<c.local_orientation_flags[i];
-	  if(c.edges[i]>=0)
-	    {
-	      std::cout<<":"<<edge_list[c.edges[i]].nodes[0]<<" ";
-	      std::cout<<":"<<edge_list[c.edges[i]].nodes[1]<<" ";
-	      std::cout<<":"<<edge_list[c.edges[i]].orientation_flag;
-	    }
-	  std::cout<<std::endl;
-	}
-    }
-
-
-    void Mesh::dump() const
-    {
-      std::cout<<std::endl
-	       <<"===NODES==="<<std::endl;
-      const int nnodes=node_list.size();
-      for(int i=0;i<nnodes;++i)
-	{
-	  std::cout<<i<<"\t"<<node_list[i](0)<<"\t"<<node_list[i](1)<<"\t"<<node_list[i](2)<<std::endl;
-	}
-
-      std::cout<<"===EDGES==="<<std::endl;
-      const unsigned int nedges=edge_list.size();
-      for(unsigned int i=0;i<nedges;++i)
-	{
-	  const Edge &e = edge_list[i];
-	  std::cout<<i<<"\t"<<e.orientation_flag<<"\t"<<e.nodes[0]<<"\t"<<e.nodes[1]<<std::endl;
-	}
-  
-      std::cout<<"===CELLS==="<<std::endl;
-      const int ncells=cell_list.size();
-      for(int i=0;i<ncells;++i)
-	{
-	  const Cell & c = cell_list[i];
-	  std::cout<<"cell "<<i<<std::endl<<"  nodes:\t";
-	  std::cout<<c.nodes[0]<<"\t"<<c.nodes[1]<<"\t"<<c.nodes[2]<<"\t"<<c.nodes[3]<<std::endl;
-	  std::cout<<"\t\t"<<c.nodes[4]<<"\t"<<c.nodes[5]<<"\t"<<c.nodes[6]<<"\t"<<c.nodes[7]<<std::endl;
-	  std::cout<<"  edges:"<<std::endl;
-	  for(int j=0;j<12;++j)
-	    std::cout<<"\t\t"<<c.edges[j]<<" "<<c.local_orientation_flags[j]<<std::endl;
-	}
-    }
-
-
-    
-    void Mesh::dump_edges(char const * const fname) const
-    {
-      const int nedges = edge_list.size();
-      const int npoints = node_list.size();
- 
-				       // Only do this if we've have
-				       // the extra information
-      if (npoints==0) 
-	return;
-  
-      std::ofstream outfile(fname);
-
-      outfile<<npoints<<" "<<nedges<<std::endl;
-      for(int i=0;i<npoints;++i)
-	{
-	  const Point<3> & n = node_list[i];
-	  outfile<<n(0)<<" "<<n(1)<<" "<<n(2)<<std::endl;
-	} 
-      for(int i=0;i<nedges;++i)
-	{
-	  const Edge & e = edge_list[i];
-	  outfile<<e.nodes[0]<<" "
-		 <<e.nodes[1]<<" "
-		 <<e.orientation_flag<<" "
-		 <<e.group<<std::endl;
-	} 
-    }
+    }    
 
 
 				     /**
-				      * This assignes an orientation to each edge so that 
-				      * every cube is a rotated Deal.II cube.
+				      * This assignes an orientation
+				      * to each edge so that every
+				      * cube is a rotated Deal.II
+				      * cube.
 				      */
     bool Orienter::orient_edges(Mesh &m)
     {
@@ -1036,11 +936,8 @@ namespace internal
 						   // Cube doesn't
 						   // have a
 						   // contradiction
-		  if(!Consistant(m,cur_posn))
-		    {
-		      m.dump_edges("edgelist.dat");
-		    }
-		  AssertThrow(Consistant(m,cur_posn),GridOrientError("Mesh is Unorientable"));
+		  AssertThrow(Consistent(m,cur_posn),
+			      GridOrientError("Mesh is Unorientable"));
 						   // If we needed to
 						   // orient any edges
 						   // in the current
@@ -1082,19 +979,19 @@ namespace internal
       return true;
     }
 
-    bool Orienter::Consistant(Mesh &m, int cell_num)
+    bool Orienter::Consistent(Mesh &m, int cell_num)
     {
 
       const Cell& c = m.cell_list[cell_num];
   
 				       // Checks that all oriented
 				       // edges in the group are
-				       // oriented consistantly.
+				       // oriented consistently.
       for(int group=0; group<3; ++group)
 	{
 					   // When a nonzero
 					   // orientation is first
-					   // encoutered in the group
+					   // encountered in the group
 					   // it is stored in this
 	  int value=0;
 					   // Loop over all parallel
@@ -1223,11 +1120,10 @@ namespace internal
 	return false;
 
 				       // If so orient all edges
-				       // consistantly.
+				       // consistently.
       cur_flag = 1;
       for (int i=4*n; i<4*(n+1); ++i)
 	{
-// std::cout<<i<<" ORIENTING\n";
 	  if ((edge_flags&cur_flag)!=0)
 	    {
 	      m.edge_list[c.edges[i]].orientation_flag 
@@ -1284,34 +1180,6 @@ namespace internal
 	}
       return false;
     }
-
-
-    
-    bool Orienter::CheckCellEdgeGroupConsistancy(const Mesh &m, const Cell & c, int egrp) const
-    {
-      int grp=0;
-      for(int i=4*egrp;i<4*egrp+4;++i)
-	{
-	  int cgrp = m.edge_list[c.edges[i]].group;
-	  if (cgrp!=0)
-	    {
-	      if(grp==0)
-		grp=cgrp;
-	      else if (grp!=cgrp)
-		return false;
-	    }
-	}
-      return true;
-    }
-      
-    
-    bool Orienter::CheckCellEdgeGroupConsistancy(const Mesh &m, const Cell &c) const
-    {
-      return (CheckCellEdgeGroupConsistancy(m,c,0) &&
-	      CheckCellEdgeGroupConsistancy(m,c,1) &&
-	      CheckCellEdgeGroupConsistancy(m,c,2));
-    }
-
 
     
     void Orienter::orient_cubes(Mesh & the_mesh)
@@ -1399,8 +1267,6 @@ namespace internal
 	      int Total  = ((local_edge_orientation[iedg0]*isign0==1)?1:0)
 			   + ((local_edge_orientation[iedg1]*isign1==1)?1:0)
 			   + ((local_edge_orientation[iedg2]*isign2==1)?1:0);
-      
-//      std::cout<<"TOTAL : "<<Total<<std::endl;
       
 	      if (Total==3) 
 		{

@@ -669,24 +669,6 @@ namespace internal
                                           */
         Mesh(const ElementInfo & INFO): info(INFO) { }
 
-                                         /**
-                                          * Prints all information
-                                          * about the mesh
-                                          */
-        void dump() const;
-        
-                                         /**
-                                          * Prints all information
-                                          * about the cell
-                                          */
-        void dump_cell(const Cell &c) const;
-
-                                         /**
-                                          * Writes edge information to
-                                          * a file.
-                                          */
-        void dump_edges(char const * const fname) const;
-
       private:
                                          /**
                                           * Unimplemented private copy
@@ -743,20 +725,12 @@ namespace internal
         bool OrientEdgeSetInCurrentCube (Mesh &m,
                                          int edge_set);
         bool OrientNextUnorientedEdge (Mesh &m);
-        bool Consistant (Mesh &m,
+        bool Consistent (Mesh &m,
                          int cell_num);
 
 
         void GetAdjacentCubes (Mesh &m);
         bool GetNextActiveCube (Mesh &m);
-
-        bool CheckCellEdgeGroupConsistancy (const Mesh &m,
-                                            const Cell &c) const;
-        
-        bool CheckCellEdgeGroupConsistancy (const Mesh &m,
-                                            const Cell & c,
-                                            int egrp) const;
-
     };
 
 
