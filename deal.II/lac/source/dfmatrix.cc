@@ -8,13 +8,30 @@
 
 
 
+dFMatrix::dFMatrix (const unsigned int n) {
+  init (n,n);
+};
+
+
+
+dFMatrix::dFMatrix (const unsigned int m, const unsigned int n) {
+  init (m,n);
+};
+
+
 
 dFMatrix::dFMatrix (const dFMatrix &m) 
 {
   init (m.dim_image, m.dim_range);
-  for (unsigned int i=0; i!=dim_image*dim_range; ++i)
-    val[i] = m.val[i];
+  double       *       p = &val[0];
+  const double *      vp = &m.val[0];
+  const double * const e = &val[dim_image*dim_range];
+
+  while (p!=e)
+    *p++ = *vp++;
 };
+
+
 
 void dFMatrix::init (const unsigned int mm, const unsigned int nn)
 {
@@ -23,12 +40,14 @@ void dFMatrix::init (const unsigned int mm, const unsigned int nn)
   dim_range = nn;
   dim_image = mm;
   clear ();
-}
+};
 
-dFMatrix::~dFMatrix ()
-{
+
+
+dFMatrix::~dFMatrix () {
   delete[] val;
-}
+};
+
 
 
 bool dFMatrix::all_zero () const {
@@ -58,6 +77,20 @@ void dFMatrix::reinit (const unsigned int mm, const unsigned int nn)
       clear ();
     }
 }
+
+
+
+void dFMatrix::reinit (const unsigned int n) {
+  reinit (n, n);
+};
+
+
+
+void dFMatrix::reinit (const dFMatrix &B) {
+  reinit (B.m(), B.n());
+};
+
+
 
 void dFMatrix::vmult (dVector& dst, const dVector& src,
 		      const bool adding) const
@@ -389,12 +422,16 @@ void dFMatrix::backward (dVector& dst, const dVector& src) const
     }
 }
 
-dFMatrix& dFMatrix::operator = (const dFMatrix& M)
-{
-  reinit(M);
-  unsigned int nn = n()*m();
-  for (unsigned int i=0; i<nn; ++i)
-    val[i] = M.val[i];
+dFMatrix& dFMatrix::operator = (const dFMatrix& m) {
+  reinit(m);
+
+  double *             p = &val[0];
+  const double *      vp = &m.val[0];
+  const double * const e = &val[dim_image*dim_range];
+
+  while (p!=e)
+    *p++ = *vp++;
+
   return *this;
 }
 

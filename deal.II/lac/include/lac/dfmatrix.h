@@ -50,34 +50,35 @@ class dFMatrix
     void init (const unsigned int m, const unsigned int n);
     
 				     /**
-				      *   Access Elements. returns A(i,j)
+				      * Return a read-write reference to the
+				      * element #(i,j)#.
+				      *
+				      * This function does no bounds checking.
 				      */
-    double& el (const unsigned int i, const unsigned int j)  {
-      return val[i*dim_range+j];
-    };
+    double& el (const unsigned int i, const unsigned int j);
     
 				     /**
-				      *   Access Elements. returns A(i,j)
+				      * Return the value of the element #(i,j)#.
+				      *
+				      * This function does no bounds checking.
 				      */
-    double el (const unsigned int i, const unsigned int j) const {
-      return val[i*dim_range+j];
-    };
+    double el (const unsigned int i, const unsigned int j) const;
     
     
   public:
 				     /**@name 1: Basic Object-handling */
 				     //@{
 				     /**
-				      *       Constructor. Dimension = (n,n) <p>
-				      *       ->   quadratic matrix (n rows , n columns)
+				      * Constructor. Initialize the matrix as
+				      * a square matrix with dimension #n#.
 				      */
-    dFMatrix (const unsigned int n = 1) { init(n,n); }
+    dFMatrix (const unsigned int n = 1);
     
 				     /**
-				      *       Constructor. Dimension = (m,n) <p>
-				      *       -> rectangular matrix (m rows , n columns)
+				      * Constructor. Initialize the matrix as
+				      * a rectangular #m# times #n# matrix.
 				      */
-    dFMatrix (const unsigned int m,unsigned int n) { init(m,n); }
+    dFMatrix (const unsigned int m, const unsigned int n);
     
 				     /** 
 				      * Copy constructor. Be very careful with
@@ -88,14 +89,16 @@ class dFMatrix
     dFMatrix (const dFMatrix&);
 
 				     /**
-				      *        Destructor. Clears memory
+				      * Destructor. Release all memory.
 				      */
     ~dFMatrix();
     
-				      /**
+				     /**
 				      * Comparison operator. Be careful with
 				      * this thing, it may eat up huge amounts
-				      * of computing time!
+				      * of computing time! It is most commonly
+				      * used for internal consistency checks
+				      * of programs.
 				      */
     bool operator == (const dFMatrix &) const;
 
@@ -123,24 +126,28 @@ class dFMatrix
 				      * Set dimension to (n,n) <p>
 				      * ( reinit quadratic matrix )
 				      */
-    void reinit (const unsigned int n) { reinit(n,n); }
+    void reinit (const unsigned int n);
     
 				     /**
 				      * Adjust  Dimension.
 				      * Set dimension to ( m(B),n(B) ) <p>
 				      * ( adjust to dimensions of another matrix B )
 				      */
-    void reinit (const dFMatrix& B) { reinit(B.m(), B.n()); }
+    void reinit (const dFMatrix &B);
     
 				     /**
-				      *  Inquire Dimension (Row) . returns Number of Rows
+				      * Return number of rows of this matrix.
+				      * To remember: this matrix is an
+				      * $m \times n$-matrix.
 				      */
-    unsigned int m() const { return dim_image; }
+    unsigned int m () const;
     
 				     /**
-				      *  Inquire Dimension (Col) . returns Number of Columns
+				      * Return number of columns of this matrix.
+				      * To remember: this matrix is an
+				      * $m \times n$-matrix.
 				      */
-    unsigned int n () const { return dim_range; }
+    unsigned int n () const;
 
     				     /**
 				      * Return whether the matrix contains only
@@ -162,28 +169,23 @@ class dFMatrix
 				      *   Access Elements. returns element at relative 'address' i <p>
 				      *   ( -> access to A(i/n , i mod n) )
 				      */
-    double el (const unsigned int i) const { return val[i]; }
+    double el (const unsigned int i) const;
     
 				     /**
-				      *   Access Elements. returns A(i,j)
+				      * Return the value of the element #(i,j)#.
+				      * Does the same as the #el(i,j)# function
+				      * but does bounds checking.
 				      */
-    double operator() (const unsigned int i, const unsigned int j) const
-      {
-	Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
-	Assert (j<dim_range, ExcInvalidIndex (i, dim_range));
-	return el(i,j);
-      }
-
+    double operator() (const unsigned int i, const unsigned int j) const;
+    
 				     /**
-				      *   Access Elements. returns A(i,j)
+				      * Return a read-write reference to
+				      * the element #(i,j)#.
+				      * Does the same as the #el(i,j)# function
+				      * but does bounds checking.
 				      */
-    double& operator() (const unsigned int i, const unsigned int j)
-      {
-	Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
-	Assert (j<dim_range, ExcInvalidIndex (i, dim_range));
-	return el(i,j);
-      }
-
+    double& operator() (const unsigned int i, const unsigned int j);
+    
 				     /**
 				      * Set all entries in the matrix to
 				      * zero.
@@ -223,7 +225,7 @@ class dFMatrix
 				      *  w (+)= A*v.
 				      *  Matrix-vector-multiplication ; <p>
 				      *  ( application of this to a vector v )
-				      *  flag adding=true : w=+A*v
+				      *  flag adding=true : w+=A*v
 				      */
     void vmult (dVector& w, const dVector& v, const bool adding=false) const;
     
@@ -433,6 +435,64 @@ class dFMatrix
 		    << "This function is not implemented for the given"
 		    << " matrix dimension " << arg1);
 };
+
+
+
+
+
+/*-------------------------Inline functions -------------------------------*/
+
+
+inline
+double & dFMatrix::el (const unsigned int i, const unsigned int j)  {
+  return val[i*dim_range+j];
+};
+
+
+
+inline
+double dFMatrix::el (const unsigned int i, const unsigned int j) const {
+  return val[i*dim_range+j];
+};
+
+
+
+inline
+unsigned int dFMatrix::m() const {
+  return dim_image;
+};
+
+
+
+inline
+unsigned int dFMatrix::n() const {
+  return dim_range;
+};
+
+
+
+inline
+double dFMatrix::el (const unsigned int i) const {
+  return val[i];
+};
+
+
+
+inline
+double dFMatrix::operator() (const unsigned int i, const unsigned int j) const {  
+  Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
+  Assert (j<dim_range, ExcInvalidIndex (i, dim_range));
+  return el(i,j);
+};
+
+
+
+inline
+double & dFMatrix::operator() (const unsigned int i, const unsigned int j) {
+  Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
+  Assert (j<dim_range, ExcInvalidIndex (i, dim_range));
+  return el(i,j);
+}
 
 
 
