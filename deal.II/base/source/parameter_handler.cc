@@ -509,8 +509,10 @@ void ParameterHandler::print_parameters_section (ostream           &out,
   for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
     {
 				       // check whether this entry is listed
-				       // in the Changed tree
-      if (pc->entries.find(ptr->first) != pc->entries.end()) 
+				       // in the Changed tree and actually
+				       // differs from the default value
+      if ((pc->entries.find(ptr->first) != pc->entries.end()) &&
+	  (pc->entries[ptr->first].first != pd->entries[ptr->first].first))
 	switch (style) 
 	  {
 	    case Text:
