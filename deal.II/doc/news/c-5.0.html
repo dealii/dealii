@@ -28,12 +28,40 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 </p>
 
 
+<a name="incompatible"></a>
+<h3 style="color:red">Incompatibilities</h3>
+
+<p style="color:red">
+Following are a few modifications to the library that unfortunately
+are incompatible with previous versions of the library, but which we
+deem necessary for the future maintainability of the
+library. Unfortunately, some of these changes will require
+modifications to application programs. We apologize for the
+inconvenience this causes.
+</p>
+
+
+<ol>
+  <li> <p>
+       Changed: Previously, parallel PETSc matrices only took the sizes of the
+       matrix and the number of rows to be stored locally as arguments. They
+       chose the partitioning of columns to be the same as that for the
+       rows. However, this does not work for non-quadratic parallel matrices,
+       and leads to very hard to find errors. Therefore, all constructors and
+       reinit functions of the parallel sparse matrix classes now take an
+       additional argument indicating the partitioning of columns of the matrix.
+       <br> 
+       (WB 2004/06/02)
+       </p>
+</ol>
+
+
+
 <a name="general"></a>
 <h3>General</h3>
 
 <ol>
 </ol>
-
 
 
 <a name="base"></a>
@@ -43,10 +71,10 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
   <li> <p>
        New: An object of the new <code
        class="class">ConditionalOStream</code> class allows to print
-       to standard output depending on its condition, which is active
+       to an output stream depending on a condition, which is active
        or not. This is particular useful for parallel computations
-       when only one process should print to standard output. An
-       object <tt>pout</tt> of this class is pregenerated.
+       when only one process should print to standard output, while in all
+       other processes we simply want output suppressed.
        <br> 
        (RH 2004/05/26)
        </p>
@@ -58,6 +86,66 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       New: Block matrices and vectors have been factored into abstract base
+       classes and concrete implementation classes. While the previous classes
+       still exist in all their functionality, this allowed us to now also
+       have block matrices and vectors for PETSc sequential and parallel
+       objects.
+       <br> 
+       (WB 2004/06/02)
+       </p>
+
+  <li> <p>
+       New: Vector and block vector classes had a commented out template
+       constructor constructing such a vector from a vector object with a
+       different template argument, for example constructing a <code
+       class="class">Vector&lt;double&gt;</code> from a <code
+       class="class">Vector&lt;float&gt;</code>. This constructor has been
+       commented out a long time ago due to a compiler bug in which the
+       <code>explicit</code> keyword on template constructors was ignored, a
+       fact that is dangerous since it may lead the compiler to generate
+       temporaries without our ado. This bug is not detected during
+       configuration time of the library, and these constructors are available
+       whenever the compiler does not contain this bug.
+       <br> 
+       (WB 2004/06/02)
+       </p>
+
+  <li> <p>
+       New: In analogy to the PETSc vector classes, the PETSc matrix classes
+       now also have member functions <code class="member">local_range</code>,
+       <code class="member">in_local_range</code>, and <code
+       class="member">local_size</code>.
+       <br> 
+       (WB 2004/06/02)
+       </p>
+
+  <li> <p>
+       New: Parallel PETSc matrix and vector classes now have member functions
+       <code class="member">get_mpi_communicator</code> that returns the MPI
+       communicator object these objects operate on.
+       <br> 
+       (WB 2004/06/02)
+       </p>
+
+  <li> <p>
+       Changed: The PETSc linear solver classes now take a constant, rather
+       than a nonconstant reference to the MPI communicator to be used. This
+       prevents some unnecessary compiler problems in conjunction with the new
+       <code class="member">get_mpi_communicator</code> function.
+       <br> 
+       (WB 2004/06/02)
+       </p>
+
+  <li> <p>
+       New: Parallel and sequential PETSc sparse matrix classes can now be
+       initialized (via either constructor or reinit functions) with a
+       compressed sparsity pattern object, allowing for more efficient
+       preallocation of nonzero entries.
+       <br> 
+       (WB 2004/06/02)
+       </p>
 </ol>
 
 
