@@ -587,6 +587,105 @@ void contract (Tensor<4,dim>       &dest,
 };
 
 
+
+/**
+ * Form the outer product of two tensors of rank 1 and 1, i.e.
+ * @p{dst[i][j] = src1[i] * src2[j]}.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <int dim>
+void outer_product (Tensor<2,dim>       &dst,
+		    const Tensor<1,dim> &src1,
+		    const Tensor<1,dim> &src2) 
+{
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      dst[i][j] = src1[i] * src2[j];
+};
+
+
+
+/**
+ * Form the outer product of two tensors of rank 1 and 2, i.e.
+ * @p{dst[i][j][k] = src1[i] * src2[j][k]}.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <int dim>
+void outer_product (Tensor<3,dim>       &dst,
+		    const Tensor<1,dim> &src1,
+		    const Tensor<2,dim> &src2) 
+{
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+      dst[i][j][k] = src1[i] * src2[j][k];
+};
+
+
+
+/**
+ * Form the outer product of two tensors of rank 2 and 1, i.e.
+ * @p{dst[i][j][k] = src1[i][j] * src2[k]}.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <int dim>
+void outer_product (Tensor<3,dim>       &dst,
+		    const Tensor<2,dim> &src1,
+		    const Tensor<1,dim> &src2) 
+{
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+      dst[i][j][k] = src1[i][j] * src2[k];
+};
+
+
+
+/**
+ * Form the outer product of two tensors of rank 0 and 1, i.e.
+ * @p{dst[i] = src1 * src2[i]}. Of course, this is only a scaling of
+ * @p{src2}, but we consider this an outer product for completeness of
+ * these functions and since this is sometimes needed when writing
+ * templates that depend on the rank of a tensor, which may sometimes
+ * be zero (i.e. a scalar).
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <int dim>
+void outer_product (Tensor<1,dim>       &dst,
+		    const double         src1,
+		    const Tensor<1,dim> &src2) 
+{
+  for (unsigned int i=0; i<dim; ++i)
+    dst[i] = src1 * src2[i];
+};
+
+
+
+/**
+ * Form the outer product of two tensors of rank 1 and 0, i.e.
+ * @p{dst[i] = src1[i] * src2}. Of course, this is only a scaling of
+ * @p{src1}, but we consider this an outer product for completeness of
+ * these functions and since this is sometimes needed when writing
+ * templates that depend on the rank of a tensor, which may sometimes
+ * be zero (i.e. a scalar).
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <int dim>
+void outer_product (Tensor<1,dim>       &dst,
+		    const Tensor<1,dim>  src1,
+		    const double         src2) 
+{
+  for (unsigned int i=0; i<dim; ++i)
+    dst[i] = src1[i] * src2;
+};
+
+
+      
 /**
  * Compute the determinant of a tensor of arbitrary rank and dimension
  * one. Since this is a number, the return value is, of course, the
