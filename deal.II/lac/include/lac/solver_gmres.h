@@ -151,6 +151,12 @@ class SolverGMRES : public Subscriptor, private Solver<VECTOR>
 				    * Auxiliary matrix for inverting @p{H}
 				    */
   FullMatrix<double> H1;
+
+  private:
+				   /**
+				    * No copy constructor.
+				    */
+  SolverGMRES (const SolverGMRES<VECTOR>&);
 };
 
 

@@ -141,10 +141,34 @@ class SchurMatrix :
 		    const BlockVector<double>& src,
 		    const BlockVector<double>& rhs) const;
   private:
+				   /**
+				    * No copy constructor.
+				    */
+  SchurMatrix (const SchurMatrix<MA_inverse, MB, MDt, MC>&);
+				   /**
+				    * No assignment.
+				    */
+  SchurMatrix& operator = (const SchurMatrix<MA_inverse, MB, MDt, MC>&);
+
+				   /**
+				    * Pointer to inverse of upper left block.
+				    */
   const SmartPointer<const MA_inverse> Ainv;
+				   /**
+				    * Pointer to lower left block.
+				    */
   const SmartPointer<const MB> B;
+				   /**
+				    * Pointer to transpose of upper right block.
+				    */
   const SmartPointer<const MDt> Dt;
+				   /**
+				    * Pointer to lower right block.
+				    */
   const SmartPointer<const MC> C;
+				   /**
+				    * Auxiliary memory for vectors.
+				    */
   VectorMemory<BlockVector<double> >& mem;
 };
 
@@ -156,7 +180,8 @@ SchurMatrix<MA_inverse, MB, MDt, MC>
 	      const MC& C,
 	      VectorMemory<BlockVector<double> >& mem)
   : Ainv(&Ainv), B(&B), Dt(&Dt), C(&C), mem(mem)
-{}
+{
+}
 
 
 template <class MA_inverse, class MB, class MDt, class MC>
