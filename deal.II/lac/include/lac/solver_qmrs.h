@@ -55,8 +55,7 @@ class SolverQMRS : private Solver<VECTOR>
     				     /**
 				      * Standardized data struct to
 				      * pipe additional data to the
-				      * solver. This solver does not
-				      * need additional data.
+				      * solver.
 				      *
 				      * There are two possibilities to compute
 				      * the residual: one is an estimate using
@@ -64,9 +63,14 @@ class SolverQMRS : private Solver<VECTOR>
 				      * is exact computation using another matrix
 				      * vector multiplication.
 				      *
-				      * QMRS, is susceptible to breakdowns, so
-				      * we need a parameter telling us, which
-				      * numbers are considered zero.
+				      * QMRS, is susceptible to
+				      * breakdowns, so we need a
+				      * parameter telling us, which
+				      * numbers are considered
+				      * zero. The proper breakdown
+				      * criterion is very unclear, so
+				      * experiments may be necessary
+				      * here.
 				      */
     struct AdditionalData
     {
@@ -161,7 +165,7 @@ class SolverQMRS : private Solver<VECTOR>
 				      */
     double res2;
 				     /**
-				      * Breakdown threshold.
+				      * Additional parameters..
 				      */
     AdditionalData additional_data;
   private:
