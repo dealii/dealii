@@ -42,6 +42,7 @@ validate-xrefs:
 	cd glossary ; $(MAKE) validate-xrefs
 	cd publications ; $(MAKE) validate-xrefs
 	cd news ; $(MAKE) validate-xrefs
+	cd reports ; $(MAKE) validate-xrefs
 
 
 # generate a class index from each of the various include directories
