@@ -49,7 +49,8 @@ Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 		Subscriptor (),
 		smooth_grid(smooth_grid)
 {
-				   // set default boundary for all possible components
+				   // set default boundary for all
+				   // possible components
   for (unsigned int i=0;i<255;++i)
     {
       boundary[i] = straight_boundary;
@@ -61,8 +62,10 @@ Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 template <int dim>
 Triangulation<dim>::Triangulation (const Triangulation<dim> &) 
 		:
-		Subscriptor ()      // do not set any subscriptors; anyway,
-				   // calling this constructor is an error!
+		Subscriptor ()
+				   // do not set any subscriptors;
+				   // anyway, calling this constructor
+				   // is an error!
 {
   Assert (false, ExcInternalError());
 };
@@ -83,8 +86,9 @@ Triangulation<dim>::~Triangulation ()
 template <int dim>
 void Triangulation<dim>::clear () 
 {
-				   // only allow this operation if there
-				   // are no subscribers any more
+				   // only allow this operation if
+				   // there are no subscribers any
+				   // more
   Assert (n_subscriptions() == 0, ExcInternalError());
   
   for (unsigned int i=0; i<levels.size(); ++i)
@@ -226,25 +230,28 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 					     const std::vector<CellData<1> > &cells,
 					     const SubCellData &subcelldata)
 {
-				   // note: since no boundary information
-				   // can be given in one dimension, the
-				   // @p{subcelldata} field is ignored. (only
-				   // used for error checking, which is a
-				   // good idea in any case)
+				   // note: since no boundary
+				   // information can be given in one
+				   // dimension, the @p{subcelldata}
+				   // field is ignored. (only used for
+				   // error checking, which is a good
+				   // idea in any case)
   
   const unsigned int dim=1;
   
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (levels.size() == 0, ExcTriangulationNotEmpty());
-				   // check that no forbidden arrays are used
+				   // check that no forbidden arrays
+				   // are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
 				   // copy vertices
   vertices = v;
   vertices_used = std::vector<bool> (v.size(), true);
     
-				   // store the indices of the lines which
-				   // are adjacent to a given vertex
+				   // store the indices of the lines
+				   // which are adjacent to a given
+				   // vertex
   std::vector<std::vector<int> > lines_at_vertex (v.size());
 
 				   // reserve enough space
@@ -265,8 +272,8 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
       next_free_line->clear_user_pointer ();
       next_free_line->set_subdomain_id (0);
       
-				       // note that this cell
-				       // is adjacent to these vertices
+				       // note that this cell is
+				       // adjacent to these vertices
       lines_at_vertex[cells[cell].vertices[0]].push_back (cell);
       lines_at_vertex[cells[cell].vertices[1]].push_back (cell);
     };
@@ -289,16 +296,20 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 					       // or two adjacent
 					       // lines
 
-					       // clear will only work if
-					       // there are no
-					       // subscriptions. however, this
-					       // is bogus here, as the
-					       // subscriptions were for the
-					       // initially empty grid, and we
-					       // want to clear it again now,
-					       // so temporarily disable
-					       // subscriptions, clear, and
-					       // then set them again
+					       // clear will only work
+					       // if there are no
+					       // subscriptions. however,
+					       // this is bogus here,
+					       // as the subscriptions
+					       // were for the
+					       // initially empty
+					       // grid, and we want to
+					       // clear it again now,
+					       // so temporarily
+					       // disable
+					       // subscriptions,
+					       // clear, and then set
+					       // them again
 	      const unsigned int n=n_subscriptions();
 	      for (unsigned int i=0; i<n; ++i)
 		unsubscribe();
@@ -309,8 +320,8 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 	      AssertThrow (false, ExcInternalError());
       };
 
-				   // assert there are no more than two boundary
-				   // nodes
+				   // assert there are no more than
+				   // two boundary nodes
   if (boundary_nodes != 2)
     {
 				       // clear will only work if
@@ -341,10 +352,11 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
   for (; line!=end(); ++line)
 				     // for each of the two vertices
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-				       // if first cell adjacent to this
-				       // vertex is the present one, then
-				       // the neighbor is the second adjacent
-				       // cell and vice versa
+				       // if first cell adjacent to
+				       // this vertex is the present
+				       // one, then the neighbor is
+				       // the second adjacent cell and
+				       // vice versa
       if (lines_at_vertex[line->vertex_index(vertex)][0] == line->index())
 	if (lines_at_vertex[line->vertex_index(vertex)].size() == 2) 
 	  {
@@ -354,12 +366,14 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 	    line->set_neighbor (vertex, neighbor);
 	  }
 	else
-					   // no second adjacent cell entered
-					   // -> cell at boundary
+					   // no second adjacent cell
+					   // entered -> cell at
+					   // boundary
 	  line->set_neighbor (vertex, end());
       else
-					 // present line is not first adjacent
-					 // one -> first adjacent one is neighbor
+					 // present line is not first
+					 // adjacent one -> first
+					 // adjacent one is neighbor
 	{
 	  const cell_iterator neighbor (const_cast<Triangulation<1>*>(this),
 					0,              // level
@@ -386,28 +400,32 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (levels.size() == 0, ExcTriangulationNotEmpty());
-				   // check that no forbidden arrays are used
+				   // check that no forbidden arrays
+				   // are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
 				   // copy vertices
   vertices = v;
   vertices_used = std::vector<bool> (v.size(), true);
 
-				   // copy cells. This is needed since we
-				   // may need to change entries
+				   // copy cells. This is needed since
+				   // we may need to change entries
   std::vector<CellData<2> > cells(c);
 
 
-				   // make up a list of the needed lines
-				   // each line is a pair of vertices. The list
-				   // is kept sorted and it is guaranteed
-				   // that each line is inserted only once.
-				   // While the key of such an entry is the
-				   // pair of vertices, the thing it points
-				   // to is an iterator pointing to the line
-				   // object itself. In the first run, these
-				   // iterators are all invalid ones, but they
-				   // are filled afterwards
+				   // make up a list of the needed
+				   // lines each line is a pair of
+				   // vertices. The list is kept
+				   // sorted and it is guaranteed that
+				   // each line is inserted only once.
+				   // While the key of such an entry
+				   // is the pair of vertices, the
+				   // thing it points to is an
+				   // iterator pointing to the line
+				   // object itself. In the first run,
+				   // these iterators are all invalid
+				   // ones, but they are filled
+				   // afterwards
   std::map<std::pair<int,int>,line_iterator> needed_lines;
   for (unsigned int cell=0; cell<cells.size(); ++cell)
     {
@@ -415,16 +433,18 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	if ( ! ((0<=cells[cell].vertices[vertex]) &&
 		(cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size()))))
 	  {
-					     // clear will only work if
-					     // there are no
-					     // subscriptions. however, this
-					     // is bogus here, as the
-					     // subscriptions were for the
-					     // initially empty grid, and we
-					     // want to clear it again now,
-					     // so temporarily disable
-					     // subscriptions, clear, and
-					     // then set them again
+					     // clear will only work
+					     // if there are no
+					     // subscriptions. however,
+					     // this is bogus here, as
+					     // the subscriptions were
+					     // for the initially
+					     // empty grid, and we
+					     // want to clear it again
+					     // now, so temporarily
+					     // disable subscriptions,
+					     // clear, and then set
+					     // them again
 	    const unsigned int n=n_subscriptions();
 	    for (unsigned int i=0; i<n; ++i)
 	      unsubscribe();
@@ -443,21 +463,26 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
 	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[3])  };
 
-				       // note the following: if the sense
-				       // of the vertices of a cell is correct,
-				       // but the vertices are given in an
-				       // order which makes the sense of one line
-				       // ambiguous when viewed from the two
-				       // adjacent cells, we can heal this by
-				       // shifting the vertex indices of one
-				       // cell by two (diagonally exchanging
-				       // the two vertices from which the
-				       // four lines originate and to which
-				       // they converge).
-				       // If two lines are wrong, we could heal
-				       // this by rotating by one or three
-				       // vertices, but deciding this is
-				       // difficult and not implemented.
+				       // note the following: if the
+				       // sense of the vertices of a
+				       // cell is correct, but the
+				       // vertices are given in an
+				       // order which makes the sense
+				       // of one line ambiguous when
+				       // viewed from the two adjacent
+				       // cells, we can heal this by
+				       // shifting the vertex indices
+				       // of one cell by two
+				       // (diagonally exchanging the
+				       // two vertices from which the
+				       // four lines originate and to
+				       // which they converge).  If
+				       // two lines are wrong, we
+				       // could heal this by rotating
+				       // by one or three vertices,
+				       // but deciding this is
+				       // difficult and not
+				       // implemented.
 //        for (unsigned int line=0; line<4; ++line)
 //  	if (needed_lines.find(std::make_pair(line_vertices[line].second,
 //  				  	     line_vertices[line].first))
@@ -484,42 +509,51 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 
       for (unsigned int line=0; line<4; ++line)
 	{
-					   // assert that the line was not
-					   // already inserted in reverse
-					   // order. This happens in spite of
-					   // the vertex rotation above, if the
-					   // sense of the cell was incorrect.
+					   // assert that the line was
+					   // not already inserted in
+					   // reverse order. This
+					   // happens in spite of the
+					   // vertex rotation above,
+					   // if the sense of the cell
+					   // was incorrect.
 					   //
-					   // Here is what usually happened when
-					   // this exception is thrown:
+					   // Here is what usually
+					   // happened when this
+					   // exception is thrown:
 					   // consider these two cells
 					   // and the vertices
 					   //  3---4---5
 					   //  |   |   |
 					   //  0---1---2
-					   // If in the input vector the
-					   // two cells are given with
-					   // vertices <0 1 4 3> and
-					   // <4 1 2 5>, in the first cell
-					   // the middle line would have
+					   // If in the input vector
+					   // the two cells are given
+					   // with vertices <0 1 4 3>
+					   // and <4 1 2 5>, in the
+					   // first cell the middle
+					   // line would have
 					   // direction 1->4, while in
-					   // the second it would be 4->1.
-					   // This will cause the exception.
+					   // the second it would be
+					   // 4->1.  This will cause
+					   // the exception.
 	  if (! (needed_lines.find(std::make_pair(line_vertices[line].second,
 						  line_vertices[line].first))
 		 ==
 		 needed_lines.end()))
 	    {
-					       // clear will only work if
-					       // there are no
-					       // subscriptions. however, this
-					       // is bogus here, as the
-					       // subscriptions were for the
-					       // initially empty grid, and we
-					       // want to clear it again now,
-					       // so temporarily disable
-					       // subscriptions, clear, and
-					       // then set them again
+					       // clear will only work
+					       // if there are no
+					       // subscriptions. however,
+					       // this is bogus here,
+					       // as the subscriptions
+					       // were for the
+					       // initially empty
+					       // grid, and we want to
+					       // clear it again now,
+					       // so temporarily
+					       // disable
+					       // subscriptions,
+					       // clear, and then set
+					       // them again
 	      const unsigned int n=n_subscriptions();
 	      for (unsigned int i=0; i<n; ++i)
 		unsubscribe();
@@ -531,23 +565,25 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 			   ExcGridHasInvalidCell(cell));
 	    };
 		  
-					   // insert line, with invalid iterator
-					   // if line already exists, then
+					   // insert line, with
+					   // invalid iterator if line
+					   // already exists, then
 					   // nothing bad happens here
 	  needed_lines[line_vertices[line]] = end_line();
 	};
     };
 
 
-				   // check that every vertex has
-				   // at least two adjacent lines
+				   // check that every vertex has at
+				   // least two adjacent lines
   if (true) 
     {
       std::vector<unsigned short int> vertex_touch_count (v.size(), 0);
       std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i=needed_lines.begin(); i!=needed_lines.end(); i++) 
 	{
-					   // touch the vertices of this line
+					   // touch the vertices of
+					   // this line
 	  ++vertex_touch_count[i->first.first];
 	  ++vertex_touch_count[i->first.second];
 	};
@@ -561,14 +597,15 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	{
 					   // clear will only work if
 					   // there are no
-					   // subscriptions. however, this
-					   // is bogus here, as the
-					   // subscriptions were for the
-					   // initially empty grid, and we
-					   // want to clear it again now,
-					   // so temporarily disable
-					   // subscriptions, clear, and
-					   // then set them again
+					   // subscriptions. however,
+					   // this is bogus here, as
+					   // the subscriptions were
+					   // for the initially empty
+					   // grid, and we want to
+					   // clear it again now, so
+					   // temporarily disable
+					   // subscriptions, clear,
+					   // and then set them again
 	  const unsigned int n=n_subscriptions();
 	  for (unsigned int i=0; i<n; ++i)
 	    unsubscribe();
@@ -612,7 +649,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
       raw_cell_iterator cell = begin_raw_quad();
       for (unsigned int c=0; c<cells.size(); ++c, ++cell)
 	{
-					   // list of iterators of lines
+					   // list of iterators of
+					   // lines
 	  const line_iterator lines[4] = {
 		needed_lines[std::make_pair(cells[c].vertices[0], cells[c].vertices[1])],
 		needed_lines[std::make_pair(cells[c].vertices[1], cells[c].vertices[2])],
@@ -629,13 +667,15 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  cell->clear_user_pointer ();
 	  cell->set_subdomain_id (0);
 	  
-					   // note that this cell is adjacent
-					   // to the four lines
+					   // note that this cell is
+					   // adjacent to the four
+					   // lines
 	  for (unsigned int line=0; line<4; ++line)
 	    adjacent_cells[lines[line]->index()].push_back (cell);
 	  
-					   // make some checks on the vertices
-					   // and their ordering
+					   // make some checks on the
+					   // vertices and their
+					   // ordering
 	  Assert (lines[0]->vertex_index(0) == lines[3]->vertex_index(0),
 		  ExcInternalErrorOnCell(c));
 	  Assert (lines[0]->vertex_index(1) == lines[1]->vertex_index(0),
@@ -651,21 +691,22 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
   for (line_iterator line=begin_line(); line!=end_line(); ++line) 
     {
       const unsigned int n_adj_cells = adjacent_cells[line->index()].size();
-				       // assert that every line has one or
-				       // two adjacent cells
+				       // assert that every line has
+				       // one or two adjacent cells
       if (! ((n_adj_cells >= 1) &&
 	     (n_adj_cells <= 2)))
 	{
 					   // clear will only work if
 					   // there are no
-					   // subscriptions. however, this
-					   // is bogus here, as the
-					   // subscriptions were for the
-					   // initially empty grid, and we
-					   // want to clear it again now,
-					   // so temporarily disable
-					   // subscriptions, clear, and
-					   // then set them again
+					   // subscriptions. however,
+					   // this is bogus here, as
+					   // the subscriptions were
+					   // for the initially empty
+					   // grid, and we want to
+					   // clear it again now, so
+					   // temporarily disable
+					   // subscriptions, clear,
+					   // and then set them again
 	  const unsigned int n=n_subscriptions();
 	  for (unsigned int i=0; i<n; ++i)
 	    unsubscribe();
@@ -677,8 +718,9 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	};
 
 				       // if only one cell: line is at
-				       // boundary -> give it the boundary
-				       // indicator zero by default
+				       // boundary -> give it the
+				       // boundary indicator zero by
+				       // default
       if (n_adj_cells == 1)
 	line->set_boundary_indicator (0);
       else
@@ -686,7 +728,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
       	line->set_boundary_indicator (255);
     };
 
-				   // set boundary indicators where given
+				   // set boundary indicators where
+				   // given
   std::vector<CellData<1> >::const_iterator boundary_line
     = subcelldata.boundary_lines.begin();
   std::vector<CellData<1> >::const_iterator end_boundary_line
@@ -697,12 +740,13 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
       std::pair<int,int> line_vertices(std::make_pair(boundary_line->vertices[0],
 						      boundary_line->vertices[1]));
       if (needed_lines.find(line_vertices) != needed_lines.end())
-					 // line found in this direction
+					 // line found in this
+					 // direction
 	line = needed_lines[line_vertices];
       else 
 	{
-					   // look whether it exists in
-					   // reverse direction
+					   // look whether it exists
+					   // in reverse direction
 	  std::swap (line_vertices.first, line_vertices.second);
 	  if (needed_lines.find(line_vertices) != needed_lines.end())
 	    line = needed_lines[line_vertices];
@@ -710,16 +754,20 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	    {
 					       // line does not exist
 	      
-					       // clear will only work if
-					       // there are no
-					       // subscriptions. however, this
-					       // is bogus here, as the
-					       // subscriptions were for the
-					       // initially empty grid, and we
-					       // want to clear it again now,
-					       // so temporarily disable
-					       // subscriptions, clear, and
-					       // then set them again
+					       // clear will only work
+					       // if there are no
+					       // subscriptions. however,
+					       // this is bogus here,
+					       // as the subscriptions
+					       // were for the
+					       // initially empty
+					       // grid, and we want to
+					       // clear it again now,
+					       // so temporarily
+					       // disable
+					       // subscriptions,
+					       // clear, and then set
+					       // them again
 	      const unsigned int n=n_subscriptions();
 	      for (unsigned int i=0; i<n; ++i)
 		unsubscribe();
@@ -739,14 +787,15 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	{
 					   // clear will only work if
 					   // there are no
-					   // subscriptions. however, this
-					   // is bogus here, as the
-					   // subscriptions were for the
-					   // initially empty grid, and we
-					   // want to clear it again now,
-					   // so temporarily disable
-					   // subscriptions, clear, and
-					   // then set them again
+					   // subscriptions. however,
+					   // this is bogus here, as
+					   // the subscriptions were
+					   // for the initially empty
+					   // grid, and we want to
+					   // clear it again now, so
+					   // temporarily disable
+					   // subscriptions, clear,
+					   // and then set them again
 	  const unsigned int n=n_subscriptions();
 	  for (unsigned int i=0; i<n; ++i)
 	    unsubscribe();
@@ -781,16 +830,18 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
   for (cell_iterator cell=begin(); cell!=end(); ++cell)
     for (unsigned int side=0; side<4; ++side)
       if (adjacent_cells[cell->line(side)->index()][0] == cell)
-					 // first adjacent cell is this one
+					 // first adjacent cell is
+					 // this one
 	{
 	  if (adjacent_cells[cell->line(side)->index()].size() == 2)
-					     // there is another adjacent cell
+					     // there is another
+					     // adjacent cell
 	    cell->set_neighbor (side,
 				adjacent_cells[cell->line(side)->index()][1]);
 	}
-				   // first adjacent cell is not this one,
-				   // -> it must be the neighbor we are
-				   // looking for
+				   // first adjacent cell is not this
+				   // one, -> it must be the neighbor
+				   // we are looking for
       else
 	cell->set_neighbor (side,
 			    adjacent_cells[cell->line(side)->index()][0]);
@@ -807,20 +858,20 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 
 /**
  * Invent an object which compares two Quads against each other. This
- * comparison is needed in order to establish a map of Quads to iterators
- * in the Triangulation<3>::create_triangulation function.
+ * comparison is needed in order to establish a map of Quads to
+ * iterators in the Triangulation<3>::create_triangulation function.
  *
- * Since this comparison is not canonical, we do not include it into the
- * general Quad class.
+ * Since this comparison is not canonical, we do not include it into
+ * the general Quad class.
  */
 struct QuadComparator
 {
     inline bool operator () (const Quad &q1, const Quad &q2) const
       {
-					 // here is room to optimize the
-					 // repeated equality test of
-					 // the previous lines, but I don't
-					 // care at present
+					 // here is room to optimize
+					 // the repeated equality test
+					 // of the previous lines, but
+					 // I don't care at present
 	if ((q1.line(0) < q2.line(0))          ||
 	    ((q1.line(0) == q2.line(0)) &&
 	     (q1.line(1) <  q2.line(1)))       ||
@@ -851,52 +902,59 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (levels.size() == 0, ExcTriangulationNotEmpty());
-				   // check that no forbidden arrays are used
+				   // check that no forbidden arrays
+				   // are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
 				   // copy vertices
   vertices = v;
   vertices_used = std::vector<bool> (v.size(), true);
 
-				   // copy cells. This is needed since we
-				   // may need to change entries
+				   // copy cells. This is needed since
+				   // we may need to change entries
   std::vector<CellData<3> > cells(c);
 
 				   ///////////////////////////////////////
 				   // first set up some collections of data
 				   //
-				   // make up a list of the needed lines
+				   // make up a list of the needed
+				   // lines
 				   //
-				   // each line is a pair of vertices. The list
-				   // is kept sorted and it is guaranteed
-				   // that each line is inserted only once.
-				   // While the key of such an entry is the
-				   // pair of vertices, the thing it points
-				   // to is an iterator pointing to the line
-				   // object itself. In the first run, these
-				   // iterators are all invalid ones, but they
-				   // are filled afterwards
-				   // same applies for the quads
+				   // each line is a pair of
+				   // vertices. The list is kept
+				   // sorted and it is guaranteed that
+				   // each line is inserted only once.
+				   // While the key of such an entry
+				   // is the pair of vertices, the
+				   // thing it points to is an
+				   // iterator pointing to the line
+				   // object itself. In the first run,
+				   // these iterators are all invalid
+				   // ones, but they are filled
+				   // afterwards same applies for the
+				   // quads
   std::map<std::pair<int,int>,line_iterator> needed_lines;
   for (unsigned int cell=0; cell<cells.size(); ++cell)
     {
 
-				       // check whether vertex
-				       // indices are valid ones
+				       // check whether vertex indices
+				       // are valid ones
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
 	if (! ((0<=cells[cell].vertices[vertex]) &&
 	       (cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size()))))
 	  {
-					     // clear will only work if
-					     // there are no
-					     // subscriptions. however, this
-					     // is bogus here, as the
-					     // subscriptions were for the
-					     // initially empty grid, and we
-					     // want to clear it again now,
-					     // so temporarily disable
-					     // subscriptions, clear, and
-					     // then set them again
+					     // clear will only work
+					     // if there are no
+					     // subscriptions. however,
+					     // this is bogus here, as
+					     // the subscriptions were
+					     // for the initially
+					     // empty grid, and we
+					     // want to clear it again
+					     // now, so temporarily
+					     // disable subscriptions,
+					     // clear, and then set
+					     // them again
 	    const unsigned int n=n_subscriptions();
 	    for (unsigned int i=0; i<n; ++i)
 	      unsubscribe();
@@ -921,42 +979,51 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  std::make_pair (cells[cell].vertices[5], cells[cell].vertices[6]),
 	  std::make_pair (cells[cell].vertices[7], cells[cell].vertices[6]),
 	  std::make_pair (cells[cell].vertices[4], cells[cell].vertices[7]),
-					   // connects of front and back face
+					   // connects of front and
+					   // back face
 	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[4]),
 	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[5]),
 	  std::make_pair (cells[cell].vertices[2], cells[cell].vertices[6]),
 	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
 	  };
 
-				       // in the 2d code, some tests were performed
-				       // which may heal a problem with quads that
-				       // are rotated such that the lines don't
-				       // fit snuggly any more. I don't know how
-				       // to do this in 3d also, so I leve it for
-				       // future student generations.
+				       // in the 2d code, some tests
+				       // were performed which may
+				       // heal a problem with quads
+				       // that are rotated such that
+				       // the lines don't fit snuggly
+				       // any more. I don't know how
+				       // to do this in 3d also, so I
+				       // leve it for future student
+				       // generations.
 				       //
-				       // however, check that the line does not
-				       // exist in the other direction
+				       // however, check that the line
+				       // does not exist in the other
+				       // direction
       for (unsigned int line=0; line<12; ++line)
 	{
-					   // assert that the line was not
-					   // already inserted in reverse
-					   // order.
+					   // assert that the line was
+					   // not already inserted in
+					   // reverse order.
 	  if (! (needed_lines.find(std::make_pair(line_vertices[line].second,
 						  line_vertices[line].first))
 		 ==
 		 needed_lines.end()))
 	    {
-					       // clear will only work if
-					       // there are no
-					       // subscriptions. however, this
-					       // is bogus here, as the
-					       // subscriptions were for the
-					       // initially empty grid, and we
-					       // want to clear it again now,
-					       // so temporarily disable
-					       // subscriptions, clear, and
-					       // then set them again
+					       // clear will only work
+					       // if there are no
+					       // subscriptions. however,
+					       // this is bogus here,
+					       // as the subscriptions
+					       // were for the
+					       // initially empty
+					       // grid, and we want to
+					       // clear it again now,
+					       // so temporarily
+					       // disable
+					       // subscriptions,
+					       // clear, and then set
+					       // them again
 	      const unsigned int n=n_subscriptions();
 	      for (unsigned int i=0; i<n; ++i)
 		unsubscribe();
@@ -967,8 +1034,9 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	      AssertThrow (false, ExcGridHasInvalidCell(cell));
 	    };
 		  
-					   // insert line, with invalid iterator
-					   // if line already exists, then
+					   // insert line, with
+					   // invalid iterator if line
+					   // already exists, then
 					   // nothing bad happens here
 	  needed_lines[line_vertices[line]] = end_line();
 	};
@@ -978,34 +1046,36 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   /////////////////////////////////
 				   // now for some sanity-checks:
 				   //
-				   // check the every vertex has
-				   // at least two adjacent lines
+				   // check the every vertex has at
+				   // least two adjacent lines
   if (true) 
     {
       std::vector<unsigned short int> vertex_touch_count (v.size(), 0);
       std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i=needed_lines.begin(); i!=needed_lines.end(); i++) 
 	{
-					   // touch the vertices of this line
+					   // touch the vertices of
+					   // this line
 	  ++vertex_touch_count[i->first.first];
 	  ++vertex_touch_count[i->first.second];
 	};
 
-				       // assert minimum touch count is at
-				       // least two
+				       // assert minimum touch count
+				       // is at least two
       if (! (* (std::min_element(vertex_touch_count.begin(),
 				 vertex_touch_count.end())) >= 2))
 	{
 					   // clear will only work if
 					   // there are no
-					   // subscriptions. however, this
-					   // is bogus here, as the
-					   // subscriptions were for the
-					   // initially empty grid, and we
-					   // want to clear it again now,
-					   // so temporarily disable
-					   // subscriptions, clear, and
-					   // then set them again
+					   // subscriptions. however,
+					   // this is bogus here, as
+					   // the subscriptions were
+					   // for the initially empty
+					   // grid, and we want to
+					   // clear it again now, so
+					   // temporarily disable
+					   // subscriptions, clear,
+					   // and then set them again
 	  const unsigned int n=n_subscriptions();
 	  for (unsigned int i=0; i<n; ++i)
 	    unsubscribe();
@@ -1038,8 +1108,8 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  line->clear_user_flag ();
 	  line->clear_user_pointer ();
 
-					   // now set the iterator for this
-					   // line
+					   // now set the iterator for
+					   // this line
 	  i->second = line;
 	};
     };
@@ -1048,33 +1118,41 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   ///////////////////////////////////////////
 				   // make up the quads of this triangulation
 				   //
-				   // same thing: the iterators are set
-				   // to the invalid value at first, we only
-				   // collect the data now
+				   // same thing: the iterators are
+				   // set to the invalid value at
+				   // first, we only collect the data
+				   // now
 
-				   // note that QuadComparator is a class
-				   // declared and defined in this file
+				   // note that QuadComparator is a
+				   // class declared and defined in
+				   // this file
   std::map<Quad,quad_iterator,QuadComparator> needed_quads;
   for (unsigned int cell=0; cell<cells.size(); ++cell) 
     {
-				       // the faces are quads which consist
-				       // of four numbers denoting the index
-				       // of the four lines bounding th
-				       // quad. we can get this index by
-				       // asking @p{needed_lines} for an
-				       // iterator to this line, dereferencing
-				       // it and thus return an iterator into
+				       // the faces are quads which
+				       // consist of four numbers
+				       // denoting the index of the
+				       // four lines bounding th
+				       // quad. we can get this index
+				       // by asking @p{needed_lines}
+				       // for an iterator to this
+				       // line, dereferencing it and
+				       // thus return an iterator into
 				       // the @p{lines} array of the
-				       // triangulation, which is already set
-				       // up. we can then ask this iterator
-				       // for its index within the present
-				       // level (the level is zero, of course)
+				       // triangulation, which is
+				       // already set up. we can then
+				       // ask this iterator for its
+				       // index within the present
+				       // level (the level is zero, of
+				       // course)
 				       //
-				       // to make things easier, we don't
-				       // creare the lines (pairs of their
-				       // vertex indices) in place, but before
-				       // they are really needed. This is just
-				       // copied from above.
+				       // to make things easier, we
+				       // don't creare the lines
+				       // (pairs of their vertex
+				       // indices) in place, but
+				       // before they are really
+				       // needed. This is just copied
+				       // from above.
       std::pair<int,int> line_list[12] = {   // note the order of the vertices
 					 // front face
 	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
@@ -1126,16 +1204,20 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 		    needed_lines[line_list[11]]->index(),
 		    needed_lines[line_list[3]]->index())    };
 
-				       // in the 2d code, some tests were performed
-				       // which may heal a problem with hexes that
-				       // are rotated such that the quads don't
-				       // fit snuggly any more. I don't know how
-				       // to do this in here, so I leve it for
-				       // future student generations.
+				       // in the 2d code, some tests
+				       // were performed which may
+				       // heal a problem with hexes
+				       // that are rotated such that
+				       // the quads don't fit snuggly
+				       // any more. I don't know how
+				       // to do this in here, so I
+				       // leve it for future student
+				       // generations.
       for (unsigned int quad=0; quad<6; ++quad)
-					 // insert quad, with invalid iterator
-					 // if quad already exists, then
-					 // nothing bad happens here
+					 // insert quad, with invalid
+					 // iterator if quad already
+					 // exists, then nothing bad
+					 // happens here
 	needed_quads[faces[quad]] = end_quad();
     };
 
@@ -1157,8 +1239,8 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  quad->clear_user_flag ();
 	  quad->clear_user_pointer ();
 
-					   // now set the iterator for this
-					   // quad
+					   // now set the iterator for
+					   // this quad
 	  q->second = quad;
 	};
     };
@@ -1167,8 +1249,8 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // finally create the cells
   levels[0]->TriangulationLevel<3>::reserve_space (cells.size());  
 
-				   // store for each quad index
-				   // the adjacent cells
+				   // store for each quad index the
+				   // adjacent cells
   std::map<int,std::vector<cell_iterator> > adjacent_cells;
 
 				   // finally make up cells
@@ -1177,15 +1259,17 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
       raw_cell_iterator cell = begin_raw_hex();
       for (unsigned int c=0; c<cells.size(); ++c, ++cell)
 	{
-					   // first find for each of the
-					   // cells the quad iterator of
-					   // the respective faces.
+					   // first find for each of
+					   // the cells the quad
+					   // iterator of the
+					   // respective faces.
 					   //
 					   // to this end, set up the
-					   // lines of this cell and find
-					   // the quads that are bounded by
-					   // these lines; these are then
-					   // the faces of the present cell
+					   // lines of this cell and
+					   // find the quads that are
+					   // bounded by these lines;
+					   // these are then the faces
+					   // of the present cell
 	  std::pair<int,int> line_list[12] = {   // note the order of the vertices
 					     // front face
 	      std::make_pair (cells[c].vertices[0], cells[c].vertices[1]),
@@ -1237,8 +1321,9 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 			needed_lines[line_list[11]]->index(),
 			needed_lines[line_list[3]]->index())    };
 
-					   // get the iterators corresponding
-					   // to the faces
+					   // get the iterators
+					   // corresponding to the
+					   // faces
 	  const quad_iterator face_iterator[6] = {
 		needed_quads[faces[0]],
 		needed_quads[faces[1]],
@@ -1247,8 +1332,8 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 		needed_quads[faces[4]],
 		needed_quads[faces[5]]};
 
-					   // make the cell out of these
-					   // iterators
+					   // make the cell out of
+					   // these iterators
 	  cell->set (Hexahedron(face_iterator[0]->index(),
 				face_iterator[1]->index(),
 				face_iterator[2]->index(),
@@ -1262,14 +1347,16 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  cell->clear_user_pointer ();
 	  cell->set_subdomain_id (0);
 	  
-					   // note that this cell is adjacent
-					   // to the four lines
+					   // note that this cell is
+					   // adjacent to the four
+					   // lines
 	  for (unsigned int quad=0; quad<6; ++quad)
 	    adjacent_cells[face_iterator[quad]->index()].push_back (cell);
 	  
-					   // make some checks on the lines
-					   // and their ordering; if the
-					   // lines are right, so are the
+					   // make some checks on the
+					   // lines and their
+					   // ordering; if the lines
+					   // are right, so are the
 					   // vertices
 	  Assert (face_iterator[0]->line(0) == face_iterator[2]->line(0),
 		  ExcInternalErrorOnCell(c));
@@ -1307,21 +1394,22 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
   for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
     {
       const unsigned int n_adj_cells = adjacent_cells[quad->index()].size();
-				       // assert that every quad has one or
-				       // two adjacent cells
+				       // assert that every quad has
+				       // one or two adjacent cells
       if (! ((n_adj_cells >= 1) &&
 	     (n_adj_cells <= 2)))
 	{
 					   // clear will only work if
 					   // there are no
-					   // subscriptions. however, this
-					   // is bogus here, as the
-					   // subscriptions were for the
-					   // initially empty grid, and we
-					   // want to clear it again now,
-					   // so temporarily disable
-					   // subscriptions, clear, and
-					   // then set them again
+					   // subscriptions. however,
+					   // this is bogus here, as
+					   // the subscriptions were
+					   // for the initially empty
+					   // grid, and we want to
+					   // clear it again now, so
+					   // temporarily disable
+					   // subscriptions, clear,
+					   // and then set them again
 	  const unsigned int n=n_subscriptions();
 	  for (unsigned int i=0; i<n; ++i)
 	    unsubscribe();
@@ -1333,8 +1421,9 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	};
 
 				       // if only one cell: quad is at
-				       // boundary -> give it the boundary
-				       // indicator zero by default
+				       // boundary -> give it the
+				       // boundary indicator zero by
+				       // default
       if (n_adj_cells == 1)
 	quad->set_boundary_indicator (0);
       else
@@ -1347,8 +1436,8 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // the boundary and mark all others as
 				   // interior ones
 				   //
-				   // for this: first mark all lines as
-				   // interior
+				   // for this: first mark all lines
+				   // as interior
   for (line_iterator line=begin_line(); line!=end_line(); ++line)
     line->set_boundary_indicator (255);
 				   // next reset all lines bounding
@@ -1458,7 +1547,8 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 		line[i] = needed_lines[line_vertices[i]];
 	      else
 		{
-						   // line does not exist
+						   // line does not
+						   // exist
 		  AssertThrow (false, ExcLineInexistant(line_vertices[i].first,
 							line_vertices[i].second));
 		  line[i] = end_line();
@@ -1537,16 +1627,18 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
   for (cell_iterator cell=begin(); cell!=end(); ++cell)
     for (unsigned int face=0; face<6; ++face)
       if (adjacent_cells[cell->quad(face)->index()][0] == cell)
-					 // first adjacent cell is this one
+					 // first adjacent cell is
+					 // this one
 	{
 	  if (adjacent_cells[cell->quad(face)->index()].size() == 2)
-					     // there is another adjacent cell
+					     // there is another
+					     // adjacent cell
 	    cell->set_neighbor (face,
 				adjacent_cells[cell->quad(face)->index()][1]);
 	}
-				   // first adjacent cell is not this one,
-				   // -> it must be the neighbor we are
-				   // looking for
+				   // first adjacent cell is not this
+				   // one, -> it must be the neighbor
+				   // we are looking for
       else
 	cell->set_neighbor (face,
 			    adjacent_cells[cell->quad(face)->index()][0]);
@@ -1565,14 +1657,16 @@ template <>
 void Triangulation<1>::distort_random (const double factor,
 				       const bool   keep_boundary)
 {
-				   // this function is mostly equivalent to
-				   // that for the general dimensional case
-				   // the only difference being the correction
-				   // for split faces which is not necessary
-				   // in 1D
+				   // this function is mostly
+				   // equivalent to that for the
+				   // general dimensional case the
+				   // only difference being the
+				   // correction for split faces which
+				   // is not necessary in 1D
 				   //
-				   // if you change something here, don't
-				   // forget to do so there as well
+				   // if you change something here,
+				   // don't forget to do so there as
+				   // well
 
   const unsigned int dim = 1;
   
@@ -1617,13 +1711,15 @@ void Triangulation<1>::distort_random (const double factor,
   
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
     {
-				       // ignore this vertex if we whall keep
-				       // the boundary and this vertex *is* at
-				       // the boundary
+				       // ignore this vertex if we
+				       // whall keep the boundary and
+				       // this vertex *is* at the
+				       // boundary
       if (keep_boundary && at_boundary[vertex])
 	continue;
       
-				       // first compute a random shift vector
+				       // first compute a random shift
+				       // vector
       for (unsigned int d=0; d<dim; ++d)
 	shift_vector(d) = std::rand()*1.0/RAND_MAX;
 
@@ -1655,17 +1751,19 @@ void Triangulation<dim>::distort_random (const double factor,
 				   // correction for split faces which
 				   // is not necessary in 1D
 				   //
-				   // if you change something here, don't
-				   // forget to do so there as well
+				   // if you change something here,
+				   // don't forget to do so there as
+				   // well
   
 				   // find the smallest length of the
 				   // lines adjacent to the
 				   // vertex. take the initial value
 				   // to be larger than anything that
 				   // might be found: the diameter of
-				   // the triangulation, here estimated
-				   // by adding up the diameters of
-				   // the coarse grid cells.
+				   // the triangulation, here
+				   // estimated by adding up the
+				   // diameters of the coarse grid
+				   // cells.
   double almost_infinite_length = 0;
   for (cell_iterator cell=begin(0); cell!=end(0); ++cell)
     almost_infinite_length += cell->diameter();
@@ -1673,8 +1771,8 @@ void Triangulation<dim>::distort_random (const double factor,
   std::vector<double> minimal_length (vertices.size(),
 				      almost_infinite_length);
 
-				   // also note if a vertex is at
-				   // the boundary
+				   // also note if a vertex is at the
+				   // boundary
   std::vector<bool>   at_boundary (vertices.size(), false);
   
   for (active_line_iterator line=begin_active_line();
@@ -1700,13 +1798,15 @@ void Triangulation<dim>::distort_random (const double factor,
   
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
     {
-				       // ignore this vertex if we whall keep
-				       // the boundary and this vertex *is* at
-				       // the boundary
+				       // ignore this vertex if we
+				       // whall keep the boundary and
+				       // this vertex *is* at the
+				       // boundary
       if (keep_boundary && at_boundary[vertex])
 	continue;
       
-				       // first compute a random shift vector
+				       // first compute a random shift
+				       // vector
       for (unsigned int d=0; d<dim; ++d)
 	shift_vector(d) = std::rand()*1.0/RAND_MAX;
 
@@ -1731,14 +1831,15 @@ void Triangulation<dim>::distort_random (const double factor,
 					 // thus there are restricted
 					 // nodes
 	{
-					   // not implemented at present
-					   // for dim=3 or higher
+					   // not implemented at
+					   // present for dim=3 or
+					   // higher
 	  Assert (dim<=2, ExcInternalError());
 
 					   // compute where the common
-					   // point of the two child lines
-					   // will lie and
-					   // reset it to the correct value
+					   // point of the two child
+					   // lines will lie and reset
+					   // it to the correct value
 	  vertices[cell->face(face)->child(0)->vertex_index(1)]
 	    = (cell->face(face)->vertex(0) +
 	       cell->face(face)->vertex(1)) / 2;
@@ -2060,8 +2161,8 @@ void Triangulation<dim>::load_user_flags (const std::vector<bool> &v)
   Assert (v.size() == n_lines()+n_quads()+n_hexs(), ExcInternalError());
   std::vector<bool> tmp;
 
-				   // first extract the flags belonging
-				   // to lines
+				   // first extract the flags
+				   // belonging to lines
   tmp.insert (tmp.end(),
 	      v.begin(), v.begin()+n_lines());
 				   // and set the lines
@@ -2349,8 +2450,8 @@ void Triangulation<dim>::load_user_flags_hex (const std::vector<bool> &v)
 template <int dim>
 void Triangulation<dim>::save_user_pointers (std::vector<void *> &v) const
 {
-				   // clear vector and append
-				   // all the stuff later on
+				   // clear vector and append all the
+				   // stuff later on
   v.clear ();
 
   std::vector<void *> tmp;
@@ -2382,8 +2483,8 @@ void Triangulation<dim>::load_user_pointers (const std::vector<void *> &v)
   Assert (v.size() == n_lines()+n_quads()+n_hexs(), ExcInternalError());
   std::vector<void *> tmp;
 
-				   // first extract the pointers belonging
-				   // to lines
+				   // first extract the pointers
+				   // belonging to lines
   tmp.insert (tmp.end(),
 	      v.begin(), v.begin()+n_lines());
 				   // and set the lines
@@ -4098,11 +4199,10 @@ unsigned int Triangulation<dim>::n_levels () const
 {
   if (levels.size() == 0)
     return 0;
-				   // check whether there are
-				   // cells on the highest levels
-				   // (there need not be, since they
-				   // might all have been coarsened
-				   // away)
+				   // check whether there are cells on
+				   // the highest levels (there need
+				   // not be, since they might all
+				   // have been coarsened away)
   raw_cell_iterator cell = last_raw (levels.size()-1),
 		    endc = end();
   for (; cell!=endc; --cell)
@@ -4171,20 +4271,22 @@ template <int dim>
 unsigned int Triangulation<dim>::max_adjacent_cells () const {
   cell_iterator cell = begin(0),
 		endc = (levels.size() > 1 ? begin(1) : cell_iterator(end()));
-				   // store the largest index of the vertices
-				   // used on level 0
+				   // store the largest index of the
+				   // vertices used on level 0
   unsigned int max_vertex_index = 0;
   for (; cell!=endc; ++cell)
     for (unsigned vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       if (cell->vertex_index(vertex) > (signed int)max_vertex_index)
 	max_vertex_index = cell->vertex_index(vertex);
 
-				   // store the number of times a cell touches
-				   // a vertex. An unsigned int should suffice,
-				   // even for larger dimensions
+				   // store the number of times a cell
+				   // touches a vertex. An unsigned
+				   // int should suffice, even for
+				   // larger dimensions
   std::vector<unsigned short int> usage_count (max_vertex_index+1, 0);
-				   // touch a vertex's usage count everytime
-				   // we find an adjacent element
+				   // touch a vertex's usage count
+				   // everytime we find an adjacent
+				   // element
   for (cell=begin(); cell!=endc; ++cell)
     for (unsigned vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       ++usage_count[cell->vertex_index(vertex)];
@@ -4211,11 +4313,12 @@ template <>
 void Triangulation<1>::execute_refinement () {
   const unsigned int dim = 1;
   
-				   // check whether a new level is needed
-				   // we have to check for this on the
-				   // highest level only (on this, all
-				   // used cells are also active, so we
-				   // only have to check for this)
+				   // check whether a new level is
+				   // needed we have to check for this
+				   // on the highest level only (on
+				   // this, all used cells are also
+				   // active, so we only have to check
+				   // for this)
   if (true)
     {
       raw_cell_iterator cell = begin_active (levels.size()-1),
@@ -4231,18 +4334,18 @@ void Triangulation<1>::execute_refinement () {
 
 
 				   // check how much space is needed
-				   // on every level
-				   // we need not check the highest
-				   // level since either
-				   // - on the highest level no cells
-				   //   are flagged for refinement
-				   // - there are, but prepare_refinement
-				   //   added another empty level
+				   // on every level we need not check
+				   // the highest level since either -
+				   // on the highest level no cells
+				   // are flagged for refinement -
+				   // there are, but
+				   // prepare_refinement added another
+				   // empty level
   unsigned int needed_vertices = 0;
   for (int level=levels.size()-2; level>=0; --level)
     {
-				       // count number of flagged cells on
-				       // this level
+				       // count number of flagged
+				       // cells on this level
       unsigned int flagged_cells = 0;
       active_cell_iterator acell = begin_active(level),
 			   aendc = begin_active(level+1);
@@ -4250,39 +4353,41 @@ void Triangulation<1>::execute_refinement () {
 	if (acell->refine_flag_set())
 	  ++flagged_cells;
 
-				       // count number of used cells on
-				       // the next higher level
+				       // count number of used cells
+				       // on the next higher level
       const unsigned int used_cells
 	=  std::count_if (levels[level+1]->lines.used.begin(),
 			  levels[level+1]->lines.used.end(),
 			  std::bind2nd (std::equal_to<bool>(), true));
 
-				       // reserve space for the used_cells
-				       // cells already existing on the next
-				       // higher level as well as for the
-				       // 2*flagged_cells that will be created
-				       // on that level
+				       // reserve space for the
+				       // used_cells cells already
+				       // existing on the next higher
+				       // level as well as for the
+				       // 2*flagged_cells that will be
+				       // created on that level
       levels[level+1]->
 	TriangulationLevel<0>::reserve_space (used_cells+
 					      GeometryInfo<1>::children_per_cell *
 					      flagged_cells, 1);
-				       // reserve space for 2*flagged_cells
-				       // new lines on the next higher
-				       // level
+				       // reserve space for
+				       // 2*flagged_cells new lines on
+				       // the next higher level
       levels[level+1]->
 	TriangulationLevel<1>::reserve_space (GeometryInfo<1>::children_per_cell*flagged_cells);
       
       needed_vertices += flagged_cells;
     };
 
-				   // add to needed vertices how
-				   // many vertices are already in use
+				   // add to needed vertices how many
+				   // vertices are already in use
   needed_vertices += std::count_if (vertices_used.begin(), vertices_used.end(),
 				    std::bind2nd (std::equal_to<bool>(), true));
-				   // if we need more vertices: create them,
-				   // if not: leave the array as is, since
-				   // shrinking is not really possible because
-				   // some of the vertices at the end may be
+				   // if we need more vertices: create
+				   // them, if not: leave the array as
+				   // is, since shrinking is not
+				   // really possible because some of
+				   // the vertices at the end may be
 				   // in use
   if (needed_vertices > vertices.size())
     {
@@ -4292,8 +4397,8 @@ void Triangulation<1>::execute_refinement () {
 
 
 				   // Do REFINEMENT
-				   // on every level; exclude highest level as
-				   // above
+				   // on every level; exclude highest
+				   // level as above
 
 				   // index of next unused vertex
   unsigned int next_unused_vertex = 0;
@@ -4312,7 +4417,8 @@ void Triangulation<1>::execute_refinement () {
 					     // clear refinement flag
 	    cell->clear_refine_flag ();
 
-					     // search for next unused vertex      
+					     // search for next unused
+					     // vertex
 	    while (vertices_used[next_unused_vertex] == true)
 	      ++next_unused_vertex;
 	    Assert (next_unused_vertex < vertices.size(),
@@ -4326,9 +4432,10 @@ void Triangulation<1>::execute_refinement () {
 	    vertices[next_unused_vertex] = new_point;
 	    vertices_used[next_unused_vertex] = true;
 
-					     // search for next two unused cell
-					     // (++ takes care of the end of
-					     // the vector)
+					     // search for next two
+					     // unused cell (++ takes
+					     // care of the end of the
+					     // vector)
 	    raw_cell_iterator first_child, second_child;
 	    while (next_unused_cell->used() == true)
 	      ++next_unused_cell;
@@ -4349,8 +4456,9 @@ void Triangulation<1>::execute_refinement () {
 	    first_child->set_material_id (cell->material_id());
 	    first_child->set_subdomain_id (cell->subdomain_id());	    
 	    
-					     // reset neighborship info
-					     // (refer to \Ref{TriangulationLevel<0>}
+					     // reset neighborship
+					     // info (refer to
+					     // \Ref{TriangulationLevel<0>}
 					     // for details)
 	    first_child->set_neighbor (1, second_child);
 	    if (cell->neighbor(0).state() != IteratorState::valid)
@@ -4358,26 +4466,35 @@ void Triangulation<1>::execute_refinement () {
 	    else
 	      if (cell->neighbor(0)->active())
 		{
-						   // since the neighbors level is
-						   // always <=level, if the
-						   // cell is active, then there
-						   // are no cells to the left which
-						   // may want to know about this
-						   // new child cell.
+						   // since the
+						   // neighbors level
+						   // is always
+						   // <=level, if the
+						   // cell is active,
+						   // then there are
+						   // no cells to the
+						   // left which may
+						   // want to know
+						   // about this new
+						   // child cell.
 		  Assert (cell->neighbor(0)->level() <= cell->level(),
 			  ExcInternalError());
 		  first_child->set_neighbor (0, cell->neighbor(0));
 		}
 	      else
-						 // left neighbor is refined
+						 // left neighbor is
+						 // refined
 		{
-						   // set neighbor to cell on
-						   // same level
+						   // set neighbor to
+						   // cell on same
+						   // level
 		  first_child->set_neighbor (0, cell->neighbor(0)->child(1));
 
-						   // reset neighbor info of
-						   // all right descendant of the
-						   // left neighbor of cell
+						   // reset neighbor
+						   // info of all
+						   // right descendant
+						   // of the left
+						   // neighbor of cell
 		  cell_iterator left_neighbor = cell->neighbor(0);
 		  while (left_neighbor->has_children())
 		    {
@@ -4402,8 +4519,9 @@ void Triangulation<1>::execute_refinement () {
 		  second_child->set_neighbor (1, cell->neighbor(1));
 		}
 	      else
-						 // right neighbor is refined
-						 // same as above
+						 // right neighbor is
+						 // refined same as
+						 // above
 		{
 		  second_child->set_neighbor (1, cell->neighbor(1)->child(0));
 		  
@@ -4425,12 +4543,15 @@ void Triangulation<1>::execute_refinement () {
   for (unsigned int level=0; level<levels.size(); ++level) 
     levels[level]->monitor_memory (1);
 
-				   // check whether really all refinement flags
-				   // are reset (also of previously non-active
-				   // cells which we may not have touched. If
-				   // the refinement flag of a non-active cell
-				   // is set, something went wrong since the
-				   // cell-accessors should have caught this)
+				   // check whether really all
+				   // refinement flags are reset (also
+				   // of previously non-active cells
+				   // which we may not have
+				   // touched. If the refinement flag
+				   // of a non-active cell is set,
+				   // something went wrong since the
+				   // cell-accessors should have
+				   // caught this)
   cell_iterator cell = begin(),
 		endc = end();
   while (cell != endc)
@@ -4447,11 +4568,12 @@ template <>
 void Triangulation<2>::execute_refinement () {
   const unsigned int dim = 2;
   
-				   // check whether a new level is needed
-				   // we have to check for this on the
-				   // highest level only (on this, all
-				   // used cells are also active, so we
-				   // only have to check for this)
+				   // check whether a new level is
+				   // needed we have to check for this
+				   // on the highest level only (on
+				   // this, all used cells are also
+				   // active, so we only have to check
+				   // for this)
   if (true)
     {
       raw_cell_iterator cell = begin_active (levels.size()-1),
@@ -4467,9 +4589,8 @@ void Triangulation<2>::execute_refinement () {
 
 
 				   // check how much space is needed
-				   // on every level
-				   // we need not check the highest
-				   // level since either
+				   // on every level we need not check
+				   // the highest level since either
 				   // - on the highest level no cells
 				   //   are flagged for refinement
 				   // - there are, but prepare_refinement
@@ -4477,10 +4598,11 @@ void Triangulation<2>::execute_refinement () {
   unsigned int needed_vertices = 0;
   for (int level=levels.size()-2; level>=0; --level)
     {
-      				       // count number of flagged cells on
-				       // this level and compute how many
-				       // new vertices and new lines will
-				       // be needed
+      				       // count number of flagged
+      				       // cells on this level and
+      				       // compute how many new
+      				       // vertices and new lines will
+      				       // be needed
       unsigned int flagged_cells = 0;
       unsigned int needed_lines  = 0;
       active_cell_iterator acell = begin_active(level),
@@ -4490,10 +4612,12 @@ void Triangulation<2>::execute_refinement () {
 	  {
 	    ++flagged_cells;
 
-					     // new vertex at center of cell
-					     // is needed in any case
+					     // new vertex at center
+					     // of cell is needed in
+					     // any case
 	    ++needed_vertices;
-					     //	also the four inner lines
+					     //	also the four inner
+					     //	lines
 	    needed_lines += 4;
 	    
 					     // for all neighbors of
@@ -4501,13 +4625,16 @@ void Triangulation<2>::execute_refinement () {
 	    for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb) 
 	      {
 		const cell_iterator neighbor = acell->neighbor(nb);
-						 // if cell is at boundary
+						 // if cell is at
+						 // boundary
 		if (neighbor.state() != IteratorState::valid) 
 		  {
-						     // new midpoint vertex
+						     // new midpoint
+						     // vertex
 						     // necessary
 		    ++needed_vertices;
-						     // also two new lines
+						     // also two new
+						     // lines
 		    needed_lines += 2;
 		    
 		    continue;
@@ -4530,6 +4657,7 @@ void Triangulation<2>::execute_refinement () {
 		    if (((neighbor->refine_flag_set() == true) &&
 			 (acell->index() < neighbor->index()))
 							 // case 1a
+
 							 // we need one more vertex
 							 // and two more lines, but
 							 // we must only count them
@@ -4565,40 +4693,43 @@ void Triangulation<2>::execute_refinement () {
 	      };
 	  };
       
-      				       // count number of used cells on
-				       // the next higher level
+      				       // count number of used cells
+      				       // on the next higher level
       const unsigned int used_cells
 	= std::count_if (levels[level+1]->quads.used.begin(),
 			 levels[level+1]->quads.used.end(),
 			 std::bind2nd (std::equal_to<bool>(), true));
       
 
-				       // reserve space for the used_cells
-				       // cells already existing on the next
-				       // higher level as well as for the
-				       // 4*flagged_cells that will be created
-				       // on that level
+				       // reserve space for the
+				       // used_cells cells already
+				       // existing on the next higher
+				       // level as well as for the
+				       // 4*flagged_cells that will be
+				       // created on that level
       levels[level+1]->
 	TriangulationLevel<0>::reserve_space (used_cells+4*flagged_cells, 2);
-				       // reserve space for needed_lines
-				       // new lines
+				       // reserve space for
+				       // needed_lines new lines
       levels[level+1]->
 	TriangulationLevel<1>::reserve_space (needed_lines);
-      				       // reserve space for 4*flagged_cells
+      				       // reserve space for
+      				       // 4*flagged_cells
 				       // new quads on the next higher
 				       // level
       levels[level+1]->
 	TriangulationLevel<2>::reserve_space (4*flagged_cells);
     };
 
-				   // add to needed vertices how
-				   // many vertices are already in use
+				   // add to needed vertices how many
+				   // vertices are already in use
   needed_vertices += std::count_if (vertices_used.begin(), vertices_used.end(),
 				    std::bind2nd (std::equal_to<bool>(), true));
-				   // if we need more vertices: create them,
-				   // if not: leave the array as is, since
-				   // shrinking is not really possible because
-				   // some of the vertices at the end may be
+				   // if we need more vertices: create
+				   // them, if not: leave the array as
+				   // is, since shrinking is not
+				   // really possible because some of
+				   // the vertices at the end may be
 				   // in use
   if (needed_vertices > vertices.size())
     {
@@ -4607,9 +4738,9 @@ void Triangulation<2>::execute_refinement () {
     };
 
 
-				   // Do REFINEMENT
-				   // on every level; exclude highest level as
-				   // above
+				   // Do REFINEMENT  
+				   // on every level; exclude highest
+				   // level as above
 
 				   //  index of next unused vertex
   unsigned int next_unused_vertex = 0;
@@ -4629,7 +4760,8 @@ void Triangulation<2>::execute_refinement () {
 					     // clear refinement flag
 	    cell->clear_refine_flag ();
 
-					     // do some additional checks.
+					     // do some additional
+					     // checks.
 #ifdef DEBUG
 	    for (unsigned int neighbor=0;
 		 neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
@@ -4731,37 +4863,49 @@ void Triangulation<2>::execute_refinement () {
 					      cell->neighbor(3)};
 	    int               neighbors_neighbor[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
 
-					     // remember: the @p{i}th line
-					     // is the common line to the
-					     // @p{i}th neighbor
+					     // remember: the @p{i}th
+					     // line is the common
+					     // line to the @p{i}th
+					     // neighbor
 	    for (unsigned int nb=0; nb<4; ++nb)
 	      {
 		bool neighbor_refined=false;
 		if (cell->neighbor(nb).state() == IteratorState::valid)
 		  if (cell->neighbor(nb)->active() == false)
-						     // (ask in two if-statements,
-						     // since otherwise both
-						     // conditions would be executed,
-						     // but the second will throw an
-						     // error if the first fails!)
+						     // (ask in two
+						     // if-statements,
+						     // since
+						     // otherwise both
+						     // conditions
+						     // would be
+						     // executed, but
+						     // the second
+						     // will throw an
+						     // error if the
+						     // first fails!)
 		    neighbor_refined=true;
 		
 		if (neighbor_refined)
 		  {
-						     // neighbor exists and is
-						     // refined
-						     // ->the common line has
-						     // two children which
+						     // neighbor
+						     // exists and is
+						     // refined ->the
+						     // common line
+						     // has two
+						     // children which
 						     // we can use.
 		    cell_iterator neighbor = cell->neighbor(nb);
-						     // this cell is the nb_nb-th
-						     // neighbor or neighbor(nb)
+						     // this cell is
+						     // the nb_nb-th
+						     // neighbor or
+						     // neighbor(nb)
 		    const unsigned int nb_nb = cell->neighbor_of_neighbor (nb);
 
 		    neighbors_neighbor[2*nb] = neighbors_neighbor[2*nb+1] = nb_nb;
-						     // vertex 1 of child 0
-						     // is always the interior
-						     // one
+						     // vertex 1 of
+						     // child 0 is
+						     // always the
+						     // interior one
 		    new_vertices[2*nb+1] = neighbor->line(nb_nb)
 					   ->child(0)->vertex_index(1);
 
@@ -4770,16 +4914,22 @@ void Triangulation<2>::execute_refinement () {
 			new_lines[2*nb]  = neighbor->line(nb_nb)->child(0);
 			new_lines[2*nb+1]= neighbor->line(nb_nb)->child(1);
 		      } else {
-							 // lines 2 and 3 have
-							 // opposite sense
+							 // lines 2
+							 // and 3 have
+							 // opposite
+							 // sense
 			new_lines[2*nb]  = neighbor->line(nb_nb)->child(1);
 			new_lines[2*nb+1]= neighbor->line(nb_nb)->child(0);
 		      };
 		    
-						     // finally find out which
-						     // are the two neighbor
-						     // subcells, adjacent to
-						     // the two sublines
+						     // finally find
+						     // out which are
+						     // the two
+						     // neighbor
+						     // subcells,
+						     // adjacent to
+						     // the two
+						     // sublines
 		    static const unsigned int child_mapping[4][2] = {{0,1},{1,2},{3,2},{0,3}};     
 		    if (nb < 2) 
 		      {
@@ -4792,18 +4942,24 @@ void Triangulation<2>::execute_refinement () {
 		  }
 		else 
 	    
-						   // neighboring cell either
-						   // does not exist or is
-						   // not refined -> we need a
-						   // new vertex and two new lines
+						   // neighboring cell
+						   // either does not
+						   // exist or is not
+						   // refined -> we
+						   // need a new
+						   // vertex and two
+						   // new lines
 		  {
-						     // search for next unused vertex
+						     // search for
+						     // next unused
+						     // vertex
 		    while (vertices_used[next_unused_vertex] == true)
 		      ++next_unused_vertex;
 		    Assert (next_unused_vertex < vertices.size(),
 			    ExcTooFewVerticesAllocated());
 
-						     // where shall we put the new
+						     // where shall we
+						     // put the new
 						     // vertex?
 		    Point<2> new_point;
 		    
@@ -4811,12 +4967,15 @@ void Triangulation<2>::execute_refinement () {
 		    
 		    if ( face->boundary_indicator() != 255 )
 		      {
-							 // boundary vertex
+							 // boundary
+							 // vertex
 			new_point = boundary[face->boundary_indicator()]->
 				    get_new_point_on_line (face);
 		      } else {
-							 // vertex between two
-							 // normal cells
+							 // vertex
+							 // between
+							 // two normal
+							 // cells
 			new_point = vertices[new_vertices[2*nb]];
 			new_point += vertices[new_vertices[(2*nb+2)%8]];
 			new_point /= 2.0;
@@ -4826,9 +4985,12 @@ void Triangulation<2>::execute_refinement () {
 		    vertices[new_vertices[nb*2+1]] = new_point;
 		    vertices_used[new_vertices[nb*2+1]] = true;
 
-						     // search for next unused line
-						     // (++ takes care of the end of
-						     // the vector)
+						     // search for
+						     // next unused
+						     // line (++ takes
+						     // care of the
+						     // end of the
+						     // vector)
 		    while (next_unused_line->used() == true)
 		      ++next_unused_line;
 
@@ -4875,17 +5037,18 @@ void Triangulation<2>::execute_refinement () {
 		  };
 	      };
 	    
-					     // add new vertex in the middle
-					     // search for next unused
-					     // vertex
+					     // add new vertex in the
+					     // middle search for next
+					     // unused vertex
 	    while (vertices_used[next_unused_vertex] == true)
 	      ++next_unused_vertex;
 	    Assert (next_unused_vertex < vertices.size(),
 		    ExcTooFewVerticesAllocated());
 
-					     // new vertex is placed at the
-					     // arithmetic mean of all 8
-					     // neighboring points.
+					     // new vertex is placed
+					     // at the arithmetic mean
+					     // of all 8 neighboring
+					     // points.
 	    Point<2> new_point(0,0);
 	    for (unsigned int i=0; i<8; ++i)
 	      new_point +=  vertices[new_vertices[i]];
@@ -4897,7 +5060,8 @@ void Triangulation<2>::execute_refinement () {
 	    
 					     // add the 4 inner lines
 	    
-					     // search for next unused line
+					     // search for next unused
+					     // line
 	    while (next_unused_line->used() == true)
 	      ++next_unused_line;
 	    new_lines[8] = next_unused_line;
@@ -4933,8 +5097,9 @@ void Triangulation<2>::execute_refinement () {
 	    new_lines[11]->set_used_flag ();
 	    new_lines[11]->clear_children ();
 	    new_lines[11]->clear_user_pointer ();
-					     // set the boundary indicators of
-					     // the outer cells.
+					     // set the boundary
+					     // indicators of the
+					     // outer cells.
 	    new_lines[0]->set_boundary_indicator (cell->line(0)->boundary_indicator());
 	    new_lines[1]->set_boundary_indicator (cell->line(0)->boundary_indicator());
 	    new_lines[2]->set_boundary_indicator (cell->line(1)->boundary_indicator());
@@ -4943,19 +5108,22 @@ void Triangulation<2>::execute_refinement () {
 	    new_lines[5]->set_boundary_indicator (cell->line(2)->boundary_indicator());
 	    new_lines[6]->set_boundary_indicator (cell->line(3)->boundary_indicator());
 	    new_lines[7]->set_boundary_indicator (cell->line(3)->boundary_indicator());
-					     // inner cells have boundary
-					     // indicator 255
+					     // inner cells have
+					     // boundary indicator 255
 	    new_lines[8]->set_boundary_indicator (255);
 	    new_lines[9]->set_boundary_indicator (255);
 	    new_lines[10]->set_boundary_indicator (255);
 	    new_lines[11]->set_boundary_indicator (255);
 
 
-					     // finally add the four new cells!
+					     // finally add the four
+					     // new cells!
 	    
-					     // search for next unused cell
-					     // the four children have to be put
-					     // into the array consecutively
+					     // search for next unused
+					     // cell the four children
+					     // have to be put into
+					     // the array
+					     // consecutively
 	    while (next_unused_cell->used() == true)
 	      ++next_unused_cell;
 
@@ -4997,21 +5165,26 @@ void Triangulation<2>::execute_refinement () {
 	    subcells[3]->clear_children();
 	    subcells[3]->clear_user_pointer ();
 	    
-					     // finally set neighborship info of
+					     // finally set
+					     // neighborship info of
 					     // external cells
-					     // (neighbor_mapping is the mapping
-					     // between the 8 neighbors and the
-					     // adjacent new cells in the interior)
+					     // (neighbor_mapping is
+					     // the mapping between
+					     // the 8 neighbors and
+					     // the adjacent new cells
+					     // in the interior)
 	    const int neighbor_mapping[8] = {0,1, 1,2, 2,3, 3,0};
 	    
 	    for (unsigned int nb=0; nb<8; ++nb)
 	      if (neighbors[nb].state() == IteratorState::valid)
 		if (neighbors[nb]->level() == level+1)
-						   // neighbor is refined cell
+						   // neighbor is
+						   // refined cell
 		  neighbors[nb]->set_neighbor(neighbors_neighbor[nb],
 					      subcells[neighbor_mapping[nb]]);
 
-					     // and neighbarship of new cells
+					     // and neighbarship of
+					     // new cells
 	    subcells[0]->set_neighbor (0, neighbors[0]);
 	    subcells[0]->set_neighbor (1, subcells[1]);
 	    subcells[0]->set_neighbor (2, subcells[3]);
@@ -5044,7 +5217,8 @@ void Triangulation<2>::execute_refinement () {
 	  };
     };
 
-				   // re-compute number of lines and quads
+				   // re-compute number of lines and
+				   // quads
   update_number_cache ();
 
 
@@ -5052,12 +5226,15 @@ void Triangulation<2>::execute_refinement () {
   for (unsigned int level=0; level<levels.size(); ++level) 
     levels[level]->monitor_memory (2);
 
-				   // check whether really all refinement flags
-				   // are reset (also of previously non-active
-				   // cells which we may not have touched. If
-				   // the refinement flag of a non-active cell
-				   // is set, something went wrong since the
-				   // cell-accessors should have caught this)
+				   // check whether really all
+				   // refinement flags are reset (also
+				   // of previously non-active cells
+				   // which we may not have
+				   // touched. If the refinement flag
+				   // of a non-active cell is set,
+				   // something went wrong since the
+				   // cell-accessors should have
+				   // caught this)
   cell_iterator cell = begin(),
 		endc = end();
   while (cell != endc)
@@ -5075,11 +5252,12 @@ void Triangulation<3>::execute_refinement ()
 {
   const unsigned int dim = 3;
 
-				   // check whether a new level is needed
-				   // we have to check for this on the
-				   // highest level only (on this, all
-				   // used cells are also active, so we
-				   // only have to check for this)
+				   // check whether a new level is
+				   // needed we have to check for this
+				   // on the highest level only (on
+				   // this, all used cells are also
+				   // active, so we only have to check
+				   // for this)
   if (true)
     {
       raw_cell_iterator cell = begin_active (levels.size()-1),
@@ -5094,10 +5272,10 @@ void Triangulation<3>::execute_refinement ()
     };
 
 
-				   // first clear user flags for
-				   // quads and lines; we're gonna
-				   // use them to flag which lines
-				   // and quads need refinement
+				   // first clear user flags for quads
+				   // and lines; we're gonna use them
+				   // to flag which lines and quads
+				   // need refinement
   for (line_iterator line=begin_line(); line!=end_line(); ++line)
     line->clear_user_flag();
   for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
@@ -5116,10 +5294,11 @@ void Triangulation<3>::execute_refinement ()
   unsigned int needed_vertices = 0;
   for (int level=levels.size()-2; level>=0; --level)
     {
-      				       // count number of flagged cells on
-				       // this level and compute how many
-				       // new vertices and new lines will
-				       // be needed
+      				       // count number of flagged
+      				       // cells on this level and
+      				       // compute how many new
+      				       // vertices and new lines will
+      				       // be needed
       unsigned int flagged_cells = 0;
       unsigned int needed_lines  = 0;
       unsigned int needed_quads  = 0;
@@ -5131,22 +5310,27 @@ void Triangulation<3>::execute_refinement ()
 	  {
 	    ++flagged_cells;
 
-					     // new vertex at center of cell
-					     // is needed in any case
+					     // new vertex at center
+					     // of cell is needed in
+					     // any case
 	    ++needed_vertices;
-					     //	also the six inner lines
+					     //	also the six inner
+					     //	lines
 	    needed_lines += 6;
 					     // and the 12 inner quads
 	    needed_quads += 12;
 	    
-					     // mark all faces and lines for
-					     // refinement; checking locally
-					     // whether the neighbor would
-					     // also like to refine them is
-					     // rather difficult for lines
-					     // so we only flag them and after
-					     // visiting all cells, we decide
-					     // which lines need refinement;
+					     // mark all faces and
+					     // lines for refinement;
+					     // checking locally
+					     // whether the neighbor
+					     // would also like to
+					     // refine them is rather
+					     // difficult for lines so
+					     // we only flag them and
+					     // after visiting all
+					     // cells, we decide which
+					     // lines need refinement;
 					     // same for the quads
 	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
 		 ++face)
@@ -5163,8 +5347,9 @@ void Triangulation<3>::execute_refinement ()
 	      };
 	  };
 
-				       // now count the quads and lines which
-				       // were flagged for refinement
+				       // now count the quads and
+				       // lines which were flagged for
+				       // refinement
       for (quad_iterator quad=begin_quad(level); quad!=end_quad(level); ++quad)
 	if (quad->user_flag_set())
 	  {
@@ -5191,36 +5376,39 @@ void Triangulation<3>::execute_refinement ()
 			 std::bind2nd (std::equal_to<bool>(), true));
 
 
-				       // reserve space for the used_cells
-				       // cells already existing on the next
-				       // higher level as well as for the
-				       // 8*flagged_cells that will be created
-				       // on that level
+				       // reserve space for the
+				       // used_cells cells already
+				       // existing on the next higher
+				       // level as well as for the
+				       // 8*flagged_cells that will be
+				       // created on that level
       levels[level+1]->
 	TriangulationLevel<0>::reserve_space (used_cells+8*flagged_cells, 3);
-				       // reserve space for needed_lines
-				       // new lines
+				       // reserve space for
+				       // needed_lines new lines
       levels[level+1]->
 	TriangulationLevel<1>::reserve_space (needed_lines);
-				       // reserve space for needed_quads
-				       // new quads
+				       // reserve space for
+				       // needed_quads new quads
       levels[level+1]->
 	TriangulationLevel<2>::reserve_space (needed_quads);
-      				       // reserve space for 8*flagged_cells
+      				       // reserve space for
+      				       // 8*flagged_cells
 				       // new hexes on the next higher
 				       // level
       levels[level+1]->
 	TriangulationLevel<3>::reserve_space (8*flagged_cells);
     };
 
-				   // add to needed vertices how
-				   // many vertices are already in use
+				   // add to needed vertices how many
+				   // vertices are already in use
   needed_vertices += std::count_if (vertices_used.begin(), vertices_used.end(),
 				    std::bind2nd (std::equal_to<bool>(), true));
-				   // if we need more vertices: create them,
-				   // if not: leave the array as is, since
-				   // shrinking is not really possible because
-				   // some of the vertices at the end may be
+				   // if we need more vertices: create
+				   // them, if not: leave the array as
+				   // is, since shrinking is not
+				   // really possible because some of
+				   // the vertices at the end may be
 				   // in use
   if (needed_vertices > vertices.size())
     {
@@ -5231,18 +5419,21 @@ void Triangulation<3>::execute_refinement ()
 
 				   ///////////////////////////////////////////
 				   // Before we start with the actual
-				   // refinement, we do some sanity checks if
-				   // in debug mode. especially, we try to
+				   // refinement, we do some sanity
+				   // checks if in debug
+				   // mode. especially, we try to
 				   // catch the notorious problem with
-				   // lines being twice refined, i.e. there
-				   // are cells adjacent at one line ("around
-				   // the edge", but not at a face), with
-				   // two cells differing by more than one
+				   // lines being twice refined,
+				   // i.e. there are cells adjacent at
+				   // one line ("around the edge", but
+				   // not at a face), with two cells
+				   // differing by more than one
 				   // refinement level
 				   //
-				   // this check is very simple to implement
-				   // here, since we have all lines flagged if
-				   // they shall be refined
+				   // this check is very simple to
+				   // implement here, since we have
+				   // all lines flagged if they shall
+				   // be refined
 #ifdef DEBUG
   for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
     if (!cell->refine_flag_set())
@@ -5256,20 +5447,22 @@ void Triangulation<3>::execute_refinement ()
 				   ///////////////////////////////////////////
 				   // Do refinement on every level
 				   //
-				   // To make life a bit easier, we first
-				   // refine those lines and quads that were
-				   // flagged for refinement and then compose
-				   // the newly to be created cells.
+				   // To make life a bit easier, we
+				   // first refine those lines and
+				   // quads that were flagged for
+				   // refinement and then compose the
+				   // newly to be created cells.
 				   //
-				   //  index of next unused vertex
+				   // index of next unused vertex
   unsigned int next_unused_vertex = 0;
 
 				   // first for lines
   for (unsigned int level=0; level!=levels.size()-1; ++level)
     {
-				       // only active objects can be refined
-				       // further; remember that we won't
-				       // operate on the finest level, so
+				       // only active objects can be
+				       // refined further; remember
+				       // that we won't operate on the
+				       // finest level, so
 				       // begin_*(level+1) is allowed
       active_line_iterator line = begin_active_line(level),
 			   endl = begin_active_line(level+1);
@@ -5278,10 +5471,12 @@ void Triangulation<3>::execute_refinement ()
       for (; line!=endl; ++line)
 	if (line->user_flag_set())
 	  {
-					     // this line needs to be refined
+					     // this line needs to be
+					     // refined
 
-					     // find the next unused vertex
-					     // and set it appropriately
+					     // find the next unused
+					     // vertex and set it
+					     // appropriately
 	    while (vertices_used[next_unused_vertex] == true)
 	      ++next_unused_vertex;
 	    Assert (next_unused_vertex < vertices.size(),
@@ -5295,27 +5490,30 @@ void Triangulation<3>::execute_refinement ()
 	      vertices[next_unused_vertex]
 		= (line->vertex(0) + line->vertex(1)) / 2;
 	  
-					     // now that we created the right
-					     // point, make up the two child
-					     // lines
-					     // (++ takes care of the end of
-					     // the vector)
+					     // now that we created
+					     // the right point, make
+					     // up the two child lines
+					     // (++ takes care of the
+					     // end of the vector)
 	    while (next_unused_line->used() == true)
 	      ++next_unused_line;
-					     // there should always be two
-					     // consecutive unused lines, such
-					     // that the children of a line
+					     // there should always be
+					     // two consecutive unused
+					     // lines, such that the
+					     // children of a line
 					     // will be consecutive.
-					     // then set the child pointer of
-					     // the present line
+					     // then set the child
+					     // pointer of the present
+					     // line
 	    line->set_children (next_unused_line->index());
 	  
 					     // set the two new lines
 	    raw_line_iterator children[2] = { next_unused_line,
 					      ++next_unused_line };
-					     // some tests; if any of the
-					     // iterators should be invalid,
-					     // then already dereferencing
+					     // some tests; if any of
+					     // the iterators should
+					     // be invalid, then
+					     // already dereferencing
 					     // will fail
 	    Assert (children[0]->used() == false, ExcCellShouldBeUnused());
 	    Assert (children[1]->used() == false, ExcCellShouldBeUnused());
@@ -5337,8 +5535,9 @@ void Triangulation<3>::execute_refinement ()
 	    children[0]->set_boundary_indicator (line->boundary_indicator());
 	    children[1]->set_boundary_indicator (line->boundary_indicator());
 	    
-					     // finally clear flag indicating
-					     // the need for refinement
+					     // finally clear flag
+					     // indicating the need
+					     // for refinement
 	    line->clear_user_flag ();
 	  };
     };
@@ -5349,9 +5548,10 @@ void Triangulation<3>::execute_refinement ()
 				   ///////////////////////////////////////
   for (unsigned int level=0; level!=levels.size()-1; ++level)
     {
-				       // only active objects can be refined
-				       // further; remember that we won't
-				       // operate on the finest level, so
+				       // only active objects can be
+				       // refined further; remember
+				       // that we won't operate on the
+				       // finest level, so
 				       // begin_*(level+1) is allowed
       active_quad_iterator quad = begin_active_quad(level),
 			   endq = begin_active_quad(level+1);
@@ -5361,10 +5561,12 @@ void Triangulation<3>::execute_refinement ()
       for (; quad!=endq; ++quad)
 	if (quad->user_flag_set())
 	  {
-					     // this quad needs to be refined
+					     // this quad needs to be
+					     // refined
 
-					     // find the next unused vertex
-					     // and set it appropriately
+					     // find the next unused
+					     // vertex and set it
+					     // appropriately
 	    while (vertices_used[next_unused_vertex] == true)
 	      ++next_unused_vertex;
 	    Assert (next_unused_vertex < vertices.size(),
@@ -5428,11 +5630,12 @@ void Triangulation<3>::execute_refinement ()
 		      quad->line(2)->child(0)->vertex(1) +
 		      quad->line(3)->child(0)->vertex(1))   ) / 16;
 	  
-					     // now that we created the right
-					     // point, make up the four
-					     // lines interior to the quad
-					     // (++ takes care of the end of
-					     // the vector)
+					     // now that we created
+					     // the right point, make
+					     // up the four lines
+					     // interior to the quad
+					     // (++ takes care of the
+					     // end of the vector)
 	    raw_line_iterator new_lines[4];
 
 	    for (unsigned int i=0; i<4; ++i)
@@ -5445,15 +5648,18 @@ void Triangulation<3>::execute_refinement ()
 		Assert (new_lines[i]->used() == false, ExcCellShouldBeUnused());
 	      };
 
-					     // set the data of the four lines.
-					     // first collect the indices of
-					     // the five vertices:
+					     // set the data of the
+					     // four lines.
+					     // first collect the
+					     // indices of the five
+					     // vertices:
 					     // *--2--*
 					     // |  |  |
 					     // 3--4--1
 					     // |  |  |
 					     // *--0--*
-					     // the lines are numbered as follows:
+					     // the lines are numbered
+					     // as follows:
 					     // *--*--*
 					     // |  2  |
 					     // *3-*-1*
@@ -5482,10 +5688,12 @@ void Triangulation<3>::execute_refinement ()
 	      };
 
 
-					     // now for the quads. again, first
-					     // collect some data about the
-					     // indices of the lines, with
-					     // the following numbering:
+					     // now for the
+					     // quads. again, first
+					     // collect some data
+					     // about the indices of
+					     // the lines, with the
+					     // following numbering:
 					     // *5-*-4*
 					     // 6  10 3
 					     // *11*-9*
@@ -5506,11 +5714,13 @@ void Triangulation<3>::execute_refinement ()
 		  new_lines[3]->index() 
 	      };
 	    
-					     // find some space for the four
-					     // newly to be created quads.
-					     // note that there should
-					     // always be four consecutive
-					     // free slots for them
+					     // find some space for
+					     // the four newly to be
+					     // created quads.  note
+					     // that there should
+					     // always be four
+					     // consecutive free slots
+					     // for them
 	    raw_quad_iterator new_quads[4];
 
 	    while (next_unused_quad->used() == true)
@@ -5531,8 +5741,9 @@ void Triangulation<3>::execute_refinement ()
 	    new_quads[3] = next_unused_quad;
 	    Assert (new_quads[3]->used() == false, ExcCellShouldBeUnused());
 
-					     // note these quads as children
-					     // to the present one
+					     // note these quads as
+					     // children to the
+					     // present one
 	    quad->set_children (new_quads[0]->index());
 
 	    new_quads[0]->set (Quad(line_indices[0],
@@ -5560,8 +5771,9 @@ void Triangulation<3>::execute_refinement ()
 		new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
 	      };  
 	    
-					     // finally clear flag indicating
-					     // the need for refinement
+					     // finally clear flag
+					     // indicating the need
+					     // for refinement
 	    quad->clear_user_flag ();
 	  };
     };
@@ -5572,9 +5784,10 @@ void Triangulation<3>::execute_refinement ()
 				   ///////////////////////////////////
   for (unsigned int level=0; level!=levels.size()-1; ++level)
     {
-				       // only active objects can be refined
-				       // further; remember that we won't
-				       // operate on the finest level, so
+				       // only active objects can be
+				       // refined further; remember
+				       // that we won't operate on the
+				       // finest level, so
 				       // begin_*(level+1) is allowed
       active_hex_iterator hex  = begin_active_hex(level),
 			  endh = begin_active_hex(level+1);
@@ -5585,7 +5798,8 @@ void Triangulation<3>::execute_refinement ()
       for (; hex!=endh; ++hex)
 	if (hex->refine_flag_set())
 	  {
-					     // do some additional checks.
+					     // do some additional
+					     // checks.
 #ifdef DEBUG
 	    for (unsigned int neighbor=0;
 		 neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
@@ -5596,17 +5810,21 @@ void Triangulation<3>::execute_refinement ()
 			 (hex->neighbor(neighbor)->refine_flag_set() == true)),
 			ExcInternalError());
 #endif
-					     // this hex needs to be refined
+					     // this hex needs to be
+					     // refined
 	    
 					     // clear flag indicating
-					     // the need for refinement. do it
-					     // here already, since we can't
-					     // do it anymore once the cell
-					     // has children
+					     // the need for
+					     // refinement. do it here
+					     // already, since we
+					     // can't do it anymore
+					     // once the cell has
+					     // children
 	    hex->clear_refine_flag ();
 
-					     // find the next unused vertex
-					     // and set it appropriately
+					     // find the next unused
+					     // vertex and set it
+					     // appropriately
 	    while (vertices_used[next_unused_vertex] == true)
 	      ++next_unused_vertex;
 	    Assert (next_unused_vertex < vertices.size(),
@@ -5639,17 +5857,19 @@ void Triangulation<3>::execute_refinement ()
 		 line<GeometryInfo<dim>::lines_per_cell; ++line)
 	      vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1) *
 					      7./192.;
-					     // finally add centers of faces
+					     // finally add centers of
+					     // faces
 	    for (unsigned int face=0;
 		 face<GeometryInfo<dim>::faces_per_cell; ++face)
 	      vertices[next_unused_vertex] += hex->face(face)->child(0)->vertex(2) *
 					      1./12.;
 
-					     // now that we created the right
-					     // point, make up the six
-					     // lines interior to the quad
-					     // (++ takes care of the end of
-					     // the vector)
+					     // now that we created
+					     // the right point, make
+					     // up the six lines
+					     // interior to the quad
+					     // (++ takes care of the
+					     // end of the vector)
 	    raw_line_iterator new_lines[6];
 
 	    for (unsigned int i=0; i<6; ++i)
@@ -5662,19 +5882,23 @@ void Triangulation<3>::execute_refinement ()
 		Assert (new_lines[i]->used() == false, ExcCellShouldBeUnused());
 	      };
 
-					     // set the data of the six lines.
-					     // first collect the indices of
-					     // the seven vertices (consider
-					     // the two planes to be crossed
-					     // to form the planes cutting
-					     // the hex in two vertically
-					     // and horizontally)
+					     // set the data of the
+					     // six lines.  first
+					     // collect the indices of
+					     // the seven vertices
+					     // (consider the two
+					     // planes to be crossed
+					     // to form the planes
+					     // cutting the hex in two
+					     // vertically and
+					     // horizontally)
 					     //     *--2--*   *--5--*
 					     //    /  /  /    |  |  |
 					     //   3--6--1     3--6--1
 					     //  /  /  /      |  |  |
 					     // *--0--*       *--4--*
-					     // the lines are numbered as follows:
+					     // the lines are numbered
+					     // as follows:
 					     //     *--*--*   *--*--*
 					     //    /  2  /    |  5  |
 					     //   *3-*-1*     *3-*-1*
@@ -5708,10 +5932,12 @@ void Triangulation<3>::execute_refinement ()
 	      };
 
 
-					     // now for the quads. again, first
-					     // collect some data about the
-					     // indices of the lines, with
-					     // the following numbering:
+					     // now for the
+					     // quads. again, first
+					     // collect some data
+					     // about the indices of
+					     // the lines, with the
+					     // following numbering:	    
 					     // front plane    *---*---*
 					     //                |   2   |
 					     //                *3--*--1*
@@ -5730,12 +5956,14 @@ void Triangulation<3>::execute_refinement ()
 					     //                |   16  | 
 					     //                *---*---*
 					     //
-					     // left plane (the left-to-right
-					     // planes are displayed twice each,
-					     // for better readability of the
-					     // indices; the left part is
-					     // already determined by the
-					     // pictures above)
+					     // left plane (the
+					     // left-to-right planes
+					     // are displayed twice
+					     // each, for better
+					     // readability of the
+					     // indices; the left part
+					     // is already determined
+					     // by the pictures above)
 					     //                  *            *
 					     //                 /|           /| 
 					     //                * |          * |
@@ -5816,8 +6044,9 @@ void Triangulation<3>::execute_refinement ()
 		    hex->face(3)->child(1)->line_index(2)    //29
 	      };
 	    
-					     // find some space for the 12
-					     // newly to be created quads.
+					     // find some space for
+					     // the 12 newly to be
+					     // created quads.
 	    raw_quad_iterator new_quads[12];
 
 	    for (unsigned int i=0; i<12; ++i)
@@ -5830,9 +6059,11 @@ void Triangulation<3>::execute_refinement ()
 		Assert (new_quads[i]->used() == false, ExcCellShouldBeUnused());
 	      };
 
-					     // set up the 12 quads, numbered
-					     // as follows (shown are the three
-					     // planes cutting the hex in two):
+					     // set up the 12 quads,
+					     // numbered as follows
+					     // (shown are the three
+					     // planes cutting the hex
+					     // in two):
 					     //
 					     //  *-----*-----*
 					     //  |  3  |  2  |
@@ -5926,13 +6157,15 @@ void Triangulation<3>::execute_refinement ()
 					     /////////////////////////////////
 					     // create the eight new hexes
 					     //
-					     // again first collect some data.
-					     // here, we need the indices of a
-					     // whole lotta quads. they are
+					     // again first collect
+					     // some data.  here, we
+					     // need the indices of a
+					     // whole lotta
+					     // quads. they are
 					     // numbered as follows:
 					     //
-					     // planes in the interior of
-					     // the old hex:
+					     // planes in the interior
+					     // of the old hex:
 					     //  *-----*-----*
 					     //  |  3  |  2  |
 					     //  |     |     |
@@ -5964,8 +6197,8 @@ void Triangulation<3>::execute_refinement ()
 					     //       |/
 					     //       *
 					     //
-					     // children of the faces of the
-					     // old hex
+					     // children of the faces
+					     // of the old hex
 					     //      *-------*        *-------*
 					     //     /|19   18|       /31   30/|
 					     //    34|       |      /       /26
@@ -6023,11 +6256,13 @@ void Triangulation<3>::execute_refinement ()
 	      };
 
 
-					     // find some space for the eight
-					     // newly to be created hexes.
-					     // note that there should
-					     // always be eight consecutive
-					     // free slots for them
+					     // find some space for
+					     // the eight newly to be
+					     // created hexes.  note
+					     // that there should
+					     // always be eight
+					     // consecutive free slots
+					     // for them
 	    raw_hex_iterator new_hexes[8];
 
 	    while (next_unused_hex->used() == true)
@@ -6040,8 +6275,9 @@ void Triangulation<3>::execute_refinement ()
 		++next_unused_hex;
 	      };
 
-					     // note these hexes as children
-					     // to the present cell
+					     // note these hexes as
+					     // children to the
+					     // present cell
 	    hex->set_children (new_hexes[0]->index());
 
 					     // front children
@@ -6103,29 +6339,35 @@ void Triangulation<3>::execute_refinement ()
 		new_hexes[i]->clear_user_flag();
 		new_hexes[i]->clear_user_pointer();
 		new_hexes[i]->clear_children();
-						 // inherit material properties
+						 // inherit material
+						 // properties
 		new_hexes[i]->set_material_id (hex->material_id());
 		new_hexes[i]->set_subdomain_id (hex->subdomain_id());		
 	      };
 
 
 					     /////////////////////////////////
-					     // now the only thing still to be
-					     // done is setting neighborship
+					     // now the only thing still
+					     // to be done is setting
+					     // neighborship
 					     // information.
 					     //
-					     // to do so, first collect the
-					     // iterators pointing to
-					     // the 6x4 neighbors of this
+					     // to do so, first
+					     // collect the iterators
+					     // pointing to the 6x4
+					     // neighbors of this
 					     // cell.
 					     //
 					     // note that in case the
-					     // neighboring cell is not refined,
-					     // the neighbor iterators point
-					     // to the common moter cell. the
-					     // same applies if there is no
-					     // neighbor: the iterators are
-					     // past the end
+					     // neighboring cell is
+					     // not refined, the
+					     // neighbor iterators
+					     // point to the common
+					     // moter cell. the same
+					     // applies if there is no
+					     // neighbor: the
+					     // iterators are past the
+					     // end
 	    cell_iterator neighbor_cells[6][4];
 	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
 		 ++face)
@@ -6142,24 +6384,34 @@ void Triangulation<3>::execute_refinement ()
 		else
 						   // neighbor exists
 		  {
-						     // neighbor's level must
-						     // not be higher (else
-						     // something went wrong
-						     // when constructing
-						     // either of the two
-						     // cells) and not
-						     // lower since then
-						     // this cell should not
-						     // have been refined.
+						     // neighbor's
+						     // level must not
+						     // be higher
+						     // (else
+						     // something went
+						     // wrong when
+						     // constructing
+						     // either of the
+						     // two cells) and
+						     // not lower
+						     // since then
+						     // this cell
+						     // should not
+						     // have been
+						     // refined.
 		    Assert (neighbor->level() == hex->level(),
 			    ExcInternalError());
 
-						     // now there are two
-						     // possibilities: either
-						     // the nieghbor has no
-						     // children or it has
+						     // now there are
+						     // two
+						     // possibilities:
+						     // either the
+						     // nieghbor has
+						     // no children or
+						     // it has
 						     // children. these
-						     // must be terminal then.
+						     // must be
+						     // terminal then.
 		    if (!neighbor->has_children())
 		      for (unsigned int child_face=0;
 			   child_face<GeometryInfo<dim>::subfaces_per_face;
@@ -6167,23 +6419,37 @@ void Triangulation<3>::execute_refinement ()
 			neighbor_cells[face][child_face] = neighbor;
 		    else
 						       // neighbor has
-						       // children; now it's
-						       // getting complicated
+						       // children;
+						       // now it's
+						       // getting
+						       // complicated
 		      {
-							 // first find the face
-							 // of the neighbor
-							 // adjacent to which
-							 // the present cell is
+							 // first find
+							 // the face
+							 // of the
+							 // neighbor
+							 // adjacent
+							 // to which
+							 // the
+							 // present
+							 // cell is
 			const unsigned int nb_nb = hex->neighbor_of_neighbor(face);
 			Assert (nb_nb<GeometryInfo<dim>::faces_per_cell,
 				ExcInternalError());
 
-							 // now the four child
-							 // cells of neighbor
-							 // adjacent to the
-							 // present cell can
-							 // be obtained by a
-							 // function of
+							 // now the
+							 // four child
+							 // cells of
+							 // neighbor
+							 // adjacent
+							 // to the
+							 // present
+							 // cell can
+							 // be
+							 // obtained
+							 // by a
+							 // function
+							 // of
 							 // GeometryInfo
 			for (unsigned int c=0;
 			     c<GeometryInfo<dim>::subfaces_per_face; ++c)
@@ -6201,8 +6467,9 @@ void Triangulation<3>::execute_refinement ()
 		  };
 	      };
 
-					     // now we've got all neighbors, so set
-					     // them in the new cells
+					     // now we've got all
+					     // neighbors, so set them
+					     // in the new cells
 	    new_hexes[0]->set_neighbor (0, neighbor_cells[0][0]);
 	    new_hexes[0]->set_neighbor (1, new_hexes[4]);
 	    new_hexes[0]->set_neighbor (2, neighbor_cells[2][0]);
@@ -6260,12 +6527,14 @@ void Triangulation<3>::execute_refinement ()
 	    new_hexes[7]->set_neighbor (5, neighbor_cells[5][2]);
 
 
-					     // now we need to set the neighbors
-					     // neighborship information; this
-					     // is only necessary if the
-					     // neighboring cell is refined,
-					     // i.e. is on the same level as
-					     // the new children of the
+					     // now we need to set the
+					     // neighbors neighborship
+					     // information; this is
+					     // only necessary if the
+					     // neighboring cell is
+					     // refined, i.e. is on
+					     // the same level as the
+					     // new children of the
 					     // present cell
 	    for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb)
 	      for (unsigned int subface=0;
@@ -6275,18 +6544,23 @@ void Triangulation<3>::execute_refinement ()
 		    (neighbor_cells[nb][subface]->level() ==
 		     hex->level()+1))
 		  {
-						     // ok, the neighbor is
-						     // a refined one and we
-						     // need to set one of
-						     // the new children as
-						     // its neighbor
+						     // ok, the
+						     // neighbor is a
+						     // refined one
+						     // and we need to
+						     // set one of the
+						     // new children
+						     // as its
+						     // neighbor
 		    cell_iterator neighbor = neighbor_cells[nb][subface];
 
-						     // find which neighbor
-						     // pointer is to be reset;
-						     // this pointer still
-						     // points to the present
-						     // cell
+						     // find which
+						     // neighbor
+						     // pointer is to
+						     // be reset; this
+						     // pointer still
+						     // points to the
+						     // present cell
 		    unsigned int face;
 		    for (face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 		      if (neighbor->neighbor(face) == hex)
@@ -6295,13 +6569,19 @@ void Triangulation<3>::execute_refinement ()
 		    Assert (face<GeometryInfo<dim>::faces_per_cell,
 			    ExcInternalError());
 
-						     // now neighbor->neighbor(face)
-						     // needs to be reset. do a
-						     // large switch statement to
-						     // find out which of the
-						     // eight children is next
-						     // to the face/subface we
-						     // are presently at
+						     // now
+						     // neighbor->neighbor(face)
+						     // needs to be
+						     // reset. do a
+						     // large switch
+						     // statement to
+						     // find out which
+						     // of the eight
+						     // children is
+						     // next to the
+						     // face/subface
+						     // we are
+						     // presently at
 		    static const unsigned int child_on_face_and_subface[6][4]
 		      = {  
 			    {0, 1, 2, 3},
@@ -6316,13 +6596,15 @@ void Triangulation<3>::execute_refinement ()
 		  };
 
 
-					     // note that the refinement
-					     // flag was already cleared at
-					     // the beginning of this loop
+					     // note that the
+					     // refinement flag was
+					     // already cleared at the
+					     // beginning of this loop
 	  };
     };
 
-				   // re-compute number of lines and quads
+				   // re-compute number of lines and
+				   // quads
   update_number_cache ();
 
 
@@ -6330,12 +6612,15 @@ void Triangulation<3>::execute_refinement ()
   for (unsigned int level=0; level<levels.size(); ++level) 
     levels[level]->monitor_memory (3);
 
-				   // check whether really all refinement flags
-				   // are reset (also of previously non-active
-				   // cells which we may not have touched. If
-				   // the refinement flag of a non-active cell
-				   // is set, something went wrong since the
-				   // cell-accessors should have caught this)
+				   // check whether really all
+				   // refinement flags are reset (also
+				   // of previously non-active cells
+				   // which we may not have
+				   // touched. If the refinement flag
+				   // of a non-active cell is set,
+				   // something went wrong since the
+				   // cell-accessors should have
+				   // caught this)
   line_iterator line = begin_line(),
 		endl = end_line();
   while (line != endl)
@@ -6358,9 +6643,11 @@ void Triangulation<3>::execute_refinement ()
 
 
 template <int dim>
-void Triangulation<dim>::execute_coarsening () {
-  				   // loop over all cells. Flag all cells of
-				   // which all children are flagged for
+void Triangulation<dim>::execute_coarsening ()
+{
+  				   // loop over all cells. Flag all
+  				   // cells of which all children are
+  				   // flagged for
 				   // coarsening and delete the childrens'
 				   // flags. In effect, only those
 				   // cells are flagged of which originally
@@ -6393,29 +6680,35 @@ void Triangulation<dim>::execute_coarsening () {
 	};
 
 
-				   // now do the actual coarsening step. Since
-				   // the loop goes over used cells only we need
-				   // not worry about deleting some cells since
-				   // the ++operator will then just hop over
-				   // them if we should hit one. Do the loop
-				   // in the reverse way since we may only
-				   // delete some cells if their neighbors
-				   // have already been deleted (if the latter
-				   // are on a higher level for example)
+				   // now do the actual coarsening
+				   // step. Since the loop goes over
+				   // used cells only we need not
+				   // worry about deleting some cells
+				   // since the ++operator will then
+				   // just hop over them if we should
+				   // hit one. Do the loop in the
+				   // reverse way since we may only
+				   // delete some cells if their
+				   // neighbors have already been
+				   // deleted (if the latter are on a
+				   // higher level for example)
 				   //
-				   // if there is only one level, there can not
-				   // be anything to do
+				   // if there is only one level,
+				   // there can not be anything to do
   if (levels.size() >= 2)
     for (cell = last(levels.size()-2); cell!=endc; --cell)
       if (cell->user_flag_set())
-					 // use a separate function, since this
-					 // is dimension specific
+					 // use a separate function,
+					 // since this is dimension
+					 // specific
 	delete_children (cell);
 
-  				   // re-compute number of lines and quads
+  				   // re-compute number of lines and
+  				   // quads
   update_number_cache ();
 
-  				   // in principle no user flags should be
+  				   // in principle no user flags
+  				   // should be
 				   // set any more at this point
 #if DEBUG
   for (cell=begin(); cell!=endc; ++cell)
@@ -6436,52 +6729,62 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 {
   const unsigned int dim = 3;
   
-				   // first clear flags on lines, since
-				   // we need them to determine which
-				   // lines will be refined
+				   // first clear flags on lines,
+				   // since we need them to determine
+				   // which lines will be refined
   for (line_iterator line=begin_line(); line!=end_line(); ++line)
     line->clear_user_flag();
 
-				   // variables to store whether the mesh was
-				   // changed in the present loop and in the
-				   // whole process
+				   // variables to store whether the
+				   // mesh was changed in the present
+				   // loop and in the whole process
   bool mesh_changed      = false;
 
   do
     {
       mesh_changed = false;
 
-				       // flag those lines that will be refined
+				       // flag those lines that will
+				       // be refined
       for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
 	if (cell->refine_flag_set())
 	  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
-					     // if the line is not yet refined,
-					     // it will be in the process
+					     // if the line is not yet
+					     // refined, it will be in
+					     // the process
 	    if (!cell->line(line)->has_children())
 	      cell->line(line)->set_user_flag();
 
 
-				       // now check whether there are cells with
-				       // lines that are more than once refined
-				       // or that will be more than once
-				       // refined. The first thing should never
-				       // be the case, in the second case we
-				       // flag the cell for refinement
+				       // now check whether there are
+				       // cells with lines that are
+				       // more than once refined or
+				       // that will be more than once
+				       // refined. The first thing
+				       // should never be the case, in
+				       // the second case we flag the
+				       // cell for refinement
       for (active_cell_iterator cell=last_active(); cell!=end(); --cell)
 	for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
 	  {
 	    if (cell->line(line)->has_children())
 	      {
-						 // if this line is refined, its
-						 // children should not have
-						 // further children
+						 // if this line is
+						 // refined, its
+						 // children should
+						 // not have further
+						 // children
 						 //
-						 // however, if any of the
-						 // children is flagged for
-						 // further refinement, we need
-						 // to refine this cell also
-						 // (at least, if the cell is
-						 // not already flagged)
+						 // however, if any of
+						 // the children is
+						 // flagged for
+						 // further
+						 // refinement, we
+						 // need to refine
+						 // this cell also (at
+						 // least, if the cell
+						 // is not already
+						 // flagged)
 		bool offending_line_found = false;
 		
 		for (unsigned int c=0; c<2; ++c)
@@ -6492,13 +6795,16 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 		    if (cell->line(line)->child(c)->user_flag_set () &&
 			!cell->refine_flag_set())
 		      {
-							 // tag this cell for
+							 // tag this
+							 // cell for
 							 // refinement
 			cell->clear_coarsen_flag ();
 			cell->set_refine_flag();
 			
-							 // note that we have
-							 // changed the grid
+							 // note that
+							 // we have
+							 // changed
+							 // the grid
 			offending_line_found = true;
 			
 							 // it may save us several
@@ -6524,22 +6830,27 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 		  };
 	      };
 
-					     // there is another thing here:
-					     // if any of the lines if refined,
-					     // we may not coarsen this cell.
-					     // this also holds true if the
-					     // line is not yet refined, but
+					     // there is another thing
+					     // here: if any of the
+					     // lines if refined, we
+					     // may not coarsen this
+					     // cell.  this also holds
+					     // true if the line is
+					     // not yet refined, but
 					     // will be
 					     //
-					     // this is not totally true,
-					     // since the neighbors' children
-					     // may also be all coarsened,
-					     // but we do not catch these
-					     // aspects here; in effect, we
-					     // disallow to coarsen sharp
-					     // edges where the refinement
-					     // level decreases from each cell
-					     // to the next
+					     // this is not totally
+					     // true, since the
+					     // neighbors' children
+					     // may also be all
+					     // coarsened, but we do
+					     // not catch these
+					     // aspects here; in
+					     // effect, we disallow to
+					     // coarsen sharp edges
+					     // where the refinement
+					     // level decreases from
+					     // each cell to the next
 	    if (cell->line(line)->has_children() ||
 		cell->line(line)->user_flag_set())
 	      if (cell->coarsen_flag_set())
@@ -6559,39 +6870,46 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 
 template <int dim>
 void Triangulation<dim>::fix_coarsen_flags () {
-				   // loop over all cells. Flag all cells of
-				   // which all children are flagged for
-				   // coarsening and delete the childrens'
-				   // flags. Also delete all flags of cells
-				   // for which not all children of a cell
-				   // are flagged. In effect, only those
-				   // cells are flagged of which originally
-				   // all children were flagged and for which
-				   // all children are on the same refinement
-				   // level. For flagging, the user flags are
-				   // used, to avoid confusion and because
-				   // non-active cells can't be flagged for
-				   // coarsening
+				   // loop over all cells. Flag all
+				   // cells of which all children are
+				   // flagged for coarsening and
+				   // delete the childrens'
+				   // flags. Also delete all flags of
+				   // cells for which not all children
+				   // of a cell are flagged. In
+				   // effect, only those cells are
+				   // flagged of which originally all
+				   // children were flagged and for
+				   // which all children are on the
+				   // same refinement level. For
+				   // flagging, the user flags are
+				   // used, to avoid confusion and
+				   // because non-active cells can't
+				   // be flagged for coarsening
 				   //
-				   // In effect, all coarsen flags are turned
-				   // into user flags of the mother cell if
-				   // coarsening is possible or deleted
-				   // otherwise. Coarsen flags of cells with
-				   // no mother cell, i.e. on the
-				   // coarsest level are deleted explicitly.
+				   // In effect, all coarsen flags are
+				   // turned into user flags of the
+				   // mother cell if coarsening is
+				   // possible or deleted
+				   // otherwise. Coarsen flags of
+				   // cells with no mother cell,
+				   // i.e. on the coarsest level are
+				   // deleted explicitly.
   clear_user_flags ();
-				   // number of active children of @p{cell}.
-				   // number of children of @p{cell} which are
-				   // flagged for coarsening
+				   // number of active children of
+				   // @p{cell}.  number of children of
+				   // @p{cell} which are flagged for
+				   // coarsening
   unsigned int flagged_children;
       
   cell_iterator cell = begin(),
 		endc = end();
   for (; cell!=endc; ++cell) 
     {
-				       // nothing to do if we are already on
-				       // the finest level; if we are on the
-				       // coarsest level, delete coarsen flag
+				       // nothing to do if we are
+				       // already on the finest level;
+				       // if we are on the coarsest
+				       // level, delete coarsen flag
 				       // since no coarsening possible
       if (cell->active()) 
 	{
@@ -6606,34 +6924,37 @@ void Triangulation<dim>::fix_coarsen_flags () {
 	    cell->child(child)->coarsen_flag_set()) 
 	  {
 	    ++flagged_children;
-					     // clear flag since we don't need
-					     // it anymore
+					     // clear flag since we
+					     // don't need it anymore
 	    cell->child(child)->clear_coarsen_flag();
 	  };
 	  
-				       // flag this cell for coarsening if all
-				       // children were flagged
+				       // flag this cell for
+				       // coarsening if all children
+				       // were flagged
       if (flagged_children == GeometryInfo<dim>::children_per_cell)
 	cell->set_user_flag();
     };
       
-				   // in principle no coarsen flags should be
-				   // set any more at this point
+				   // in principle no coarsen flags
+				   // should be set any more at this
+				   // point
 #if DEBUG
   for (cell=begin(); cell!=endc; ++cell)
     Assert (cell->coarsen_flag_set() == false, ExcInternalError());
 #endif
 
-				   // revert change of flags: use coarsen
-				   // flags again and delete user flags
+				   // revert change of flags: use
+				   // coarsen flags again and delete
+				   // user flags
   for (cell=last(); cell!=endc; --cell)
     if (cell->user_flag_set())
       {
 	cell->clear_user_flag();
 
-					 // find out whether the children
-					 // of this cell may be flagged
-					 // for refinement
+					 // find out whether the
+					 // children of this cell may
+					 // be flagged for refinement
 	bool coarsening_allowed = true;
 	for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	  for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
@@ -6656,8 +6977,8 @@ void Triangulation<dim>::fix_coarsen_flags () {
 		  coarsening_allowed = false;
 	    };
 	
-					 // if allowed: tag the children
-					 // for coarsening
+					 // if allowed: tag the
+					 // children for coarsening
 	if (coarsening_allowed)
 	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
@@ -6673,16 +6994,16 @@ void Triangulation<dim>::fix_coarsen_flags () {
 template <int dim>
 bool Triangulation<dim>::prepare_coarsening_and_refinement () {
       
-				   // save the flags to determine whether
-				   // something was changed in the course
-				   // of this function
+				   // save the flags to determine
+				   // whether something was changed in
+				   // the course of this function
   std::vector<bool> flags_before[2];
   save_coarsen_flags (flags_before[0]);
   save_refine_flags (flags_before[1]);
 
 
-				   // do nothing in 1d, except setting the
-				   // coarsening flags correctly
+				   // do nothing in 1d, except setting
+				   // the coarsening flags correctly
   if (dim == 1)
     {
       fix_coarsen_flags ();
@@ -6701,20 +7022,21 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				   // each loop. we do so in order to
 				   // find out whether something was
 				   // changed in the present loop, in
-				   // which case we would have to re-run
-				   // the loop. the other possibility to
-				   // find this out would be to set a
-				   // flag @p{something_changed} to true
+				   // which case we would have to
+				   // re-run the loop. the other
+				   // possibility to find this out
+				   // would be to set a flag
+				   // @p{something_changed} to true
 				   // each time we change something.
 				   // however, sometimes one change in
 				   // one of the parts of the loop is
-				   // undone by another one, so we might
-				   // end up in an endless loop. we
-				   // could be tempted to break this loop
-				   // at an arbitrary number of runs,
-				   // but that would not be a clean
-				   // solution, since we would either have
-				   // to
+				   // undone by another one, so we
+				   // might end up in an endless
+				   // loop. we could be tempted to
+				   // break this loop at an arbitrary
+				   // number of runs, but that would
+				   // not be a clean solution, since
+				   // we would either have to  
 				   // 1/ break the loop too early, in which
 				   //    case the promise that a second
 				   //    call to this function immediately
@@ -6731,28 +7053,34 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
   std::vector<bool> flags_before_loop[2] = {flags_before[0],
 					      flags_before[1]};
 
-				   // now for what is done in each loop: we
-				   // have to fulfill several tasks at the
-				   // same time, namely several mesh smoothing
-				   // algorithms and mesh regularisation, by
-				   // which we mean that the next mesh fulfills
-				   // several requirements such as no double
-				   // refinement at each face or line, etc.
+				   // now for what is done in each
+				   // loop: we have to fulfill several
+				   // tasks at the same time, namely
+				   // several mesh smoothing
+				   // algorithms and mesh
+				   // regularisation, by which we mean
+				   // that the next mesh fulfills
+				   // several requirements such as no
+				   // double refinement at each face
+				   // or line, etc.
 				   //
-				   // since doing these things at once seems
-				   // almost impossible (in the first year of
-				   // this library, they were done in two
-				   // functions, one for refinement and
-				   // one for coarsening, and most things
-				   // within these were done at once, so the
-				   // code was rather impossible to join into
-				   // this, only, function), we do them one
-				   // after each other. the order in which
-				   // we do them is such that the important
-				   // tasks, namely regularisation, are done
-				   // last and the least important things
-				   // are done the first. the following
-				   // order is chosen:
+				   // since doing these things at once
+				   // seems almost impossible (in the
+				   // first year of this library, they
+				   // were done in two functions, one
+				   // for refinement and one for
+				   // coarsening, and most things
+				   // within these were done at once,
+				   // so the code was rather
+				   // impossible to join into this,
+				   // only, function), we do them one
+				   // after each other. the order in
+				   // which we do them is such that
+				   // the important tasks, namely
+				   // regularisation, are done last
+				   // and the least important things
+				   // are done the first. the
+				   // following order is chosen:
 				   //
 				   // 0/ do not coarsen a cell if
 				   //    'most of the neighbors' will be
@@ -6797,27 +7125,34 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				   //    cell are either flagged for coarsening
 				   //    or none of the children is
 				   //
-				   // For some of these steps, it is known that
-				   // they interact. Namely, it is not possible
-				   // to guarantee that after step 6 another
-				   // step 5 would have no effect; the same
-				   // holds for the opposite order and also
-				   // when taking into account step 7. however,
-				   // it is important to guarantee that step
-				   // five or six do not undo something that
-				   // step 5 did, and step 7 not something of
-				   // step 6, otherwise the requirements will
-				   // not be satisfied even if the loop
-				   // terminates. this is accomplished by
-				   // the fact that steps 5 and 6 only *add*
-				   // refinement flags and delete coarsening
-				   // flags (therefore, step 6
-				   // can't undo something that step 4 already
-				   // did), and step 7 only deletes coarsening
-				   // flags, never adds some. step 7 needs also
-				   // take care that it won't tag cells for
-				   // refinement for which some neighbors
-				   // are more refined or will be refined.
+				   // For some of these steps, it is
+				   // known that they
+				   // interact. Namely, it is not
+				   // possible to guarantee that after
+				   // step 6 another step 5 would have
+				   // no effect; the same holds for
+				   // the opposite order and also when
+				   // taking into account step
+				   // 7. however, it is important to
+				   // guarantee that step five or six
+				   // do not undo something that step
+				   // 5 did, and step 7 not something
+				   // of step 6, otherwise the
+				   // requirements will not be
+				   // satisfied even if the loop
+				   // terminates. this is accomplished
+				   // by the fact that steps 5 and 6
+				   // only *add* refinement flags and
+				   // delete coarsening flags
+				   // (therefore, step 6 can't undo
+				   // something that step 4 already
+				   // did), and step 7 only deletes
+				   // coarsening flags, never adds
+				   // some. step 7 needs also take
+				   // care that it won't tag cells for
+				   // refinement for which some
+				   // neighbors are more refined or
+				   // will be refined.
   bool mesh_changed_in_this_loop = false;
   do
     {
@@ -6935,13 +7270,20 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 	  for (cell=begin(); cell!=endc; ++cell)
 	    if (!cell->active() || (cell->active() && cell->refine_flag_set()))
 	      {
-						 // check whether all children are
-						 // active, i.e. not refined
-						 // themselves. This is a precondition
-						 // that the children may be coarsened
-						 // away. If the cell is only flagged
-						 // for refinement, then all future
-						 // children will be active
+						 // check whether all
+						 // children are
+						 // active, i.e. not
+						 // refined
+						 // themselves. This
+						 // is a precondition
+						 // that the children
+						 // may be coarsened
+						 // away. If the cell
+						 // is only flagged
+						 // for refinement,
+						 // then all future
+						 // children will be
+						 // active
 		bool all_children_active = true;
 		if (!cell->active())
 		  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
@@ -6953,13 +7295,22 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 
 		if (all_children_active) 
 		  {
-						     // count number of refined and
-						     // unrefined neighbors of cell.
-						     // neighbors on lower levels
-						     // are counted as unrefined since
-						     // they can only get to the same
-						     // level as this cell by the
-						     // next refinement cycle
+						     // count number
+						     // of refined and
+						     // unrefined
+						     // neighbors of
+						     // cell.
+						     // neighbors on
+						     // lower levels
+						     // are counted as
+						     // unrefined
+						     // since they can
+						     // only get to
+						     // the same level
+						     // as this cell
+						     // by the next
+						     // refinement
+						     // cycle
 		    unsigned int unrefined_neighbors = 0,
 				     total_neighbors = 0;
 
@@ -6992,14 +7343,22 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 			      };
 		      };
 		
-						     // if all neighbors unrefined:
-						     // mark this
-						     // cell for coarsening or don't
-						     // refine if marked for that
+						     // if all
+						     // neighbors
+						     // unrefined:
+						     // mark this cell
+						     // for coarsening
+						     // or don't
+						     // refine if
+						     // marked for
+						     // that
 						     //
-						     // also do the distinction
-						     // between the two versions of
-						     // the eliminate_refined_*_islands
+						     // also do the
+						     // distinction
+						     // between the
+						     // two versions
+						     // of the
+						     // eliminate_refined_*_islands
 						     // flag
 						     //
 						     // the last check
@@ -7043,8 +7402,9 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				       //    neighboring cells at each vertex.
       if (smooth_grid & limit_level_difference_at_vertices) 
 	{
-					   // store highest level one of the cells
-					   // adjacent to a vertex belongs to
+					   // store highest level one
+					   // of the cells adjacent to
+					   // a vertex belongs to
 	  std::vector<int> vertex_level (vertices.size(), 0);
 	  active_cell_iterator cell = begin_active(),
 			       endc = end();
@@ -7060,11 +7420,13 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		  = std::max (vertex_level[cell->vertex_index(vertex)],
 			      cell->level());
 
-					   // loop over all cells in reverse
-					   // order. do so because we can then
-					   // update the vertex levels on the
-					   // and maybe already flag additional
-					   // cells in this loop
+					   // loop over all cells in
+					   // reverse order. do so
+					   // because we can then
+					   // update the vertex levels
+					   // on the and maybe already
+					   // flag additional cells in
+					   // this loop
 	  for (cell=last_active(); cell != endc; --cell)
 	    if (cell->refine_flag_set() == false) 
 	      for (unsigned int vertex=0;
@@ -7072,8 +7434,9 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		if (vertex_level[cell->vertex_index(vertex)] >
 		    cell->level()+1)
 		  {
-						     // refine cell and
-						     // update vertex levels
+						     // refine cell
+						     // and update
+						     // vertex levels
 		    cell->clear_coarsen_flag();
 		    cell->set_refine_flag();
 
@@ -7083,30 +7446,36 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 			= std::max (vertex_level[cell->vertex_index(v)],
 				    cell->level()+1);
 
-						     // now that we fixed this cell,
-						     // we can safely leave this
-						     // inner loop.
+						     // now that we
+						     // fixed this
+						     // cell, we can
+						     // safely leave
+						     // this inner
+						     // loop.
 		    break;
 		  };	  
 	};
 
 				       /////////////////////////////////////
-				       // STEP 3:
-				       //    eliminate unrefined islands. this
-				       //    has higher priority since this
-				       //    diminishes the approximation
-				       //    properties not only of the unrefined
-				       //    island, but also of the surrounding
-				       //    patch.
+				       // STEP 3:      
+				       //    eliminate unrefined
+				       //    islands. this has higher
+				       //    priority since this
+				       //    diminishes the
+				       //    approximation properties
+				       //    not only of the unrefined
+				       //    island, but also of the
+				       //    surrounding patch.
       if (smooth_grid & eliminate_unrefined_islands)
 	{
 	  active_cell_iterator cell = begin_active(),
 			       endc = end();
 	  for (; cell!=endc; ++cell) 
 	    {
-					       // if cell is already flagged
-					       // for refinement: nothing to
-					       // do anymore
+					       // if cell is already
+					       // flagged for
+					       // refinement: nothing
+					       // to do anymore
 	      if (cell->refine_flag_set())
 		continue;
 		  
@@ -7115,10 +7484,14 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 	      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 		if (!cell->at_boundary(face))
 		  {
-						     // neighbor may only be on
-						     // the same level or one
-						     // level below because of
-						     // the regularisation above
+						     // neighbor may
+						     // only be on the
+						     // same level or
+						     // one level
+						     // below because
+						     // of the
+						     // regularisation
+						     // above
 		    Assert ((cell->neighbor_level(face)==cell->level()) ||
 			    (cell->neighbor_level(face)==cell->level()-1),
 			    ExcInternalError());
@@ -7200,9 +7573,12 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		for (unsigned int i=0; i<n_children; ++i)
 		  {
 		    cell_iterator child=cell->child(i);
-						     // check consistency:
-						     // cell is really a patch,
-						     // i.e. no child is refined.
+						     // check
+						     // consistency:
+						     // cell is really
+						     // a patch,
+						     // i.e. no child
+						     // is refined.
 		    Assert(child->active(), ExcInternalError());
 		    
 		    if (child->refine_flag_set())
@@ -7284,7 +7660,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		
 		if (n_coarsen_flags!=n_children*n_children)
 		  {
-						     // clear all grandchildren's
+						     // clear all
+						     // grandchildren's
 						     // coarsen_flags
 		    for (unsigned int c=0; c<n_children; ++c)
 		      {
@@ -7399,13 +7776,14 @@ template <>
 void Triangulation<1>::delete_children (cell_iterator &cell) {
   const unsigned int dim=1;
 				   // first we need to reset the
-				   // neighbor pointers of the neighbors
-				   // of this cell's children to this
-				   // cell. This is different for one
-				   // dimension, since there neighbors
-				   // can have a refinement level
-				   // differing from that of this cell's
-				   // children by more than one level.
+				   // neighbor pointers of the
+				   // neighbors of this cell's
+				   // children to this cell. This is
+				   // different for one dimension,
+				   // since there neighbors can have a
+				   // refinement level differing from
+				   // that of this cell's children by
+				   // more than one level.
 
   Assert (!cell->child(0)->has_children() && !cell->child(1)->has_children(),
 	  ExcInternalError());
@@ -7426,8 +7804,9 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
 		    ExcInternalError());
 	    neighbor->set_neighbor (1, cell);
 	    
-					     // move on to further children
-					     // on the boundary between this
+					     // move on to further
+					     // children on the
+					     // boundary between this
 					     // cell and its neighbor
 	    if (neighbor->has_children())
 	      neighbor = neighbor->child(1);
@@ -7452,8 +7831,9 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
 		    ExcInternalError());
 	    neighbor->set_neighbor (0, cell);
 	    
-					     // move on to further children
-					     // on the boundary between this
+					     // move on to further
+					     // children on the
+					     // boundary between this
 					     // cell and its neighbor
 	    if (neighbor->has_children())
 	      neighbor = neighbor->child(0);
@@ -7463,16 +7843,16 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
       };
 
 
-				   // delete the vertex which will not be
-				   // needed anymore. This vertex is the
-				   // second of the second line of the
-				   // first child
+				   // delete the vertex which will not
+				   // be needed anymore. This vertex
+				   // is the second of the second line
+				   // of the first child
   vertices_used[cell->child(0)->vertex_index(1)] = false;
 
-				   // invalidate children.
-				   // clear user pointers, to avoid that
-				   // they may appear at unwanted places
-				   // later on...
+				   // invalidate children.  clear user
+				   // pointers, to avoid that they may
+				   // appear at unwanted places later
+				   // on...
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     {
       cell->child(child)->clear_user_pointer();
@@ -7495,16 +7875,17 @@ template <>
 void Triangulation<2>::delete_children (cell_iterator &cell) {
   const unsigned int dim=2;
 				   // first we need to reset the
-				   // neighbor pointers of the neighbors
-				   // of this cell's children to this
-				   // cell. This is different for one
-				   // dimension, since there neighbors
-				   // can have a refinement level
-				   // differing from that of this cell's
-				   // children by more than one level.
-				   // For two or more dimensions, the
-				   // neighbors of the children may only
-				   // be on the same level or on the level
+				   // neighbor pointers of the
+				   // neighbors of this cell's
+				   // children to this cell. This is
+				   // different for one dimension,
+				   // since there neighbors can have a
+				   // refinement level differing from
+				   // that of this cell's children by
+				   // more than one level.  For two or
+				   // more dimensions, the neighbors
+				   // of the children may only be on
+				   // the same level or on the level
 				   // of this cell (the case that the
 				   // neighbors are more refined than
 				   // the children was eliminated in
@@ -7522,25 +7903,28 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
 		(neighbor->level()==cell->level()+1),
 		ExcInternalError());
 	
-					 // if the neighbor's level is the
-					 // same as that of @p{cell}, then
-					 // it's neighbor pointers points
-					 // to this cell rather than to
-					 // this cell's child. In that
-					 // case we need not do anything.
-					 // If the neighbor is refined
-					 // as often as are the children,
-					 // we need to reset those neigbor
+					 // if the neighbor's level is
+					 // the same as that of
+					 // @p{cell}, then it's
+					 // neighbor pointers points
+					 // to this cell rather than
+					 // to this cell's child. In
+					 // that case we need not do
+					 // anything.  If the neighbor
+					 // is refined as often as are
+					 // the children, we need to
+					 // reset those neigbor
 					 // pointers that point to the
 					 // child of this cell; when
 					 // resetting the neighbor
-					 // pointers of neighbors of one
-					 // of the children, we will also
-					 // reset the neighbor pointers
-					 // other children to the present
-					 // cell, but this does no harm
-					 // since we delete the children
-					 // afterwards anyway
+					 // pointers of neighbors of
+					 // one of the children, we
+					 // will also reset the
+					 // neighbor pointers other
+					 // children to the present
+					 // cell, but this does no
+					 // harm since we delete the
+					 // children afterwards anyway
 	if (neighbor->level() == cell->level()+1)
 	  for (unsigned int neighbor_neighbor=0;
 	       neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
@@ -7549,15 +7933,15 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
 	      neighbor->set_neighbor(neighbor_neighbor, cell);
       };
 
-				   // delete the vertex which will not be
-				   // needed anymore. This vertex is the
-				   // second of the second line of the
-				   // first child
+				   // delete the vertex which will not
+				   // be needed anymore. This vertex
+				   // is the second of the second line
+				   // of the first child
   vertices_used[cell->child(0)->line(1)->vertex_index(1)] = false;
 
-				   // clear user pointers, to avoid that
-				   // they may appear at unwanted places
-				   // later on...
+				   // clear user pointers, to avoid
+				   // that they may appear at unwanted
+				   // places later on...
   cell->child(0)->line(1)->clear_user_pointer();
   cell->child(0)->line(2)->clear_user_pointer();
   cell->child(2)->line(0)->clear_user_pointer();
@@ -7575,12 +7959,12 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
   cell->child(2)->line(0)->clear_used_flag();
   cell->child(2)->line(3)->clear_used_flag();
 
-				   // for the four faces: if the neighbor
-				   // does not itself need the subfaces,
-				   // delete them. note that since dim>1
-				   // the level of a neighbor is either
-				   // one less or the same as that of
-				   // cell
+				   // for the four faces: if the
+				   // neighbor does not itself need
+				   // the subfaces, delete them. note
+				   // that since dim>1 the level of a
+				   // neighbor is either one less or
+				   // the same as that of cell
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face) 
     if ((cell->neighbor(face).state() != IteratorState::valid) ||
 	(cell->neighbor(face)->level() == cell->level()-1) ||
@@ -7625,16 +8009,17 @@ template <>
 void Triangulation<3>::delete_children (cell_iterator &cell) {
   const unsigned int dim=3;
 				   // first we need to reset the
-				   // neighbor pointers of the neighbors
-				   // of this cell's children to this
-				   // cell. This is different for one
-				   // dimension, since there neighbors
-				   // can have a refinement level
-				   // differing from that of this cell's
-				   // children by more than one level.
-				   // For two or more dimensions, the
-				   // neighbors of the children may only
-				   // be on the same level or on the level
+				   // neighbor pointers of the
+				   // neighbors of this cell's
+				   // children to this cell. This is
+				   // different for one dimension,
+				   // since there neighbors can have a
+				   // refinement level differing from
+				   // that of this cell's children by
+				   // more than one level.  For two or
+				   // more dimensions, the neighbors
+				   // of the children may only be on
+				   // the same level or on the level
 				   // of this cell (the case that the
 				   // neighbors are more refined than
 				   // the children was eliminated in
@@ -7651,25 +8036,28 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 		(neighbor->level()==cell->level()+1),
 		ExcInternalError());
 	
-					 // if the neighbor's level is the
-					 // same as that of @p{cell}, then
-					 // it's neighbor pointers points
-					 // to this cell rather than to
-					 // this cell's child. In that
-					 // case we need not do anything.
-					 // If the neighbor is refined
-					 // as often as are the children,
-					 // we need to reset those neigbor
+					 // if the neighbor's level is
+					 // the same as that of
+					 // @p{cell}, then it's
+					 // neighbor pointers points
+					 // to this cell rather than
+					 // to this cell's child. In
+					 // that case we need not do
+					 // anything.  If the neighbor
+					 // is refined as often as are
+					 // the children, we need to
+					 // reset those neigbor
 					 // pointers that point to the
 					 // child of this cell; when
 					 // resetting the neighbor
-					 // pointers of neighbors of one
-					 // of the children, we will also
-					 // reset the neighbor pointers
-					 // other children to the present
-					 // cell, but this does no harm
-					 // since we delete the children
-					 // afterwards anyway
+					 // pointers of neighbors of
+					 // one of the children, we
+					 // will also reset the
+					 // neighbor pointers other
+					 // children to the present
+					 // cell, but this does no
+					 // harm since we delete the
+					 // children afterwards anyway
 	if (neighbor->level() == cell->level()+1)
 	  for (unsigned int neighbor_neighbor=0;
 	       neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
@@ -7678,11 +8066,11 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	      neighbor->set_neighbor(neighbor_neighbor, cell);
       };
 
-				   // delete the vertex which will not be
-				   // needed anymore. This vertex is the
-				   // vertex at the heart of this cell,
-				   // which is the sixth of the 
-				   // first child
+				   // delete the vertex which will not
+				   // be needed anymore. This vertex
+				   // is the vertex at the heart of
+				   // this cell, which is the sixth of
+				   // the first child
   vertices_used[cell->child(0)->vertex_index(6)] = false;
 
 				   ///////////////////////////////////////
@@ -7737,12 +8125,12 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
       interior_lines[l]->clear_used_flag();
     };
 
-				   // for the six faces: if the neighbor
-				   // does not itself need the subfaces,
-				   // delete them. note that since dim>1
-				   // the level of a neighbor is either
-				   // one less or the same as that of
-				   // cell
+				   // for the six faces: if the
+				   // neighbor does not itself need
+				   // the subfaces, delete them. note
+				   // that since dim>1 the level of a
+				   // neighbor is either one less or
+				   // the same as that of cell
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face) 
     if ((cell->neighbor(face).state() != IteratorState::valid) ||
 	(cell->neighbor(face)->level() == cell->level()-1) ||
@@ -7794,31 +8182,36 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
   cell->clear_children ();
   cell->clear_user_flag();
 
-				   // now there still are the 12 lines of
-				   // this hex which are refined and which
-				   // may need coarsening. however, it is not
-				   // so easy to decide whether they are still
-				   // needed, since it does not suffice to
-				   // ask the neighbors. we also need to ask
-				   // those cells, which are "around the
-				   // corner".
+				   // now there still are the 12 lines
+				   // of this hex which are refined
+				   // and which may need
+				   // coarsening. however, it is not
+				   // so easy to decide whether they
+				   // are still needed, since it does
+				   // not suffice to ask the
+				   // neighbors. we also need to ask
+				   // those cells, which are "around
+				   // the corner".
 				   //
-				   // to do so: first set up a list of 12 pairs
-				   // of line_iterators and flags which denote
-				   // whether the line's children are still
-				   // needed
+				   // to do so: first set up a list of
+				   // 12 pairs of line_iterators and
+				   // flags which denote whether the
+				   // line's children are still needed
 				   //
-				   // we default to: "is not needed" because in
-				   // this case, if we make an error in the code
-				   // below, some lines will be deleted that in
-				   // fact are needed. this will eventually be
-				   // caught somewhen, because there are many
-				   // checks whether an iterator points to
-				   // something used. the opposite case, that
-				   // we do not delete lines that are no more
-				   // used, is more severe and causes a memory
-				   // leak which is probably impossible to
-				   // find.
+				   // we default to: "is not needed"
+				   // because in this case, if we make
+				   // an error in the code below, some
+				   // lines will be deleted that in
+				   // fact are needed. this will
+				   // eventually be caught somewhen,
+				   // because there are many checks
+				   // whether an iterator points to
+				   // something used. the opposite
+				   // case, that we do not delete
+				   // lines that are no more used, is
+				   // more severe and causes a memory
+				   // leak which is probably
+				   // impossible to find.
   const std::pair<line_iterator,bool> line_is_needed_pairs[12]
     = {   std::make_pair(cell->line(0), false),
 	  std::make_pair(cell->line(1), false),
@@ -7833,22 +8226,23 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	  std::make_pair(cell->line(10), false),
 	  std::make_pair(cell->line(11), false)  };
 				   // if in debug mode: make sure that
-				   // none of the lines of this cell is
-				   // twice refined; else, deleting this
-				   // cell's children will result
+				   // none of the lines of this cell
+				   // is twice refined; else, deleting
+				   // this cell's children will result
 				   // in an invalid state
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int c=0; c<2; ++c)
       Assert (!cell->line(line)->child(c)->has_children(),
 	      ExcInternalError());
 
-				   // next make a map out of this for simpler
-				   // access to the flag associated with a
-				   // line
+				   // next make a map out of this for
+				   // simpler access to the flag
+				   // associated with a line
   std::map<line_iterator,bool> line_is_needed (&line_is_needed_pairs[0],
 					       &line_is_needed_pairs[12]);
   
-				   // then ask each neighbor and their neighbors
+				   // then ask each neighbor and their
+				   // neighbors
   for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb) 
     {
       const cell_iterator neighbor = cell->neighbor(nb);
@@ -7860,9 +8254,9 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	      ExcInternalError());
 
 				       // if the neighbor itself has
-				       // children, then the four lines
-				       // of the common face are definitely
-				       // needed
+				       // children, then the four
+				       // lines of the common face are
+				       // definitely needed
       if (neighbor->has_children())
 	{
 	  for (unsigned int i=0; i<4; ++i)
@@ -7877,17 +8271,20 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	  continue;
 	};
 
-				       // if the neighbor is not refined,
-				       // then it may still be that one of
-				       // his neighbors may need one of our
-				       // lines. the present cell is also
-				       // one of his neighbors, but this one
-				       // is not any more refined
+				       // if the neighbor is not
+				       // refined, then it may still
+				       // be that one of his neighbors
+				       // may need one of our
+				       // lines. the present cell is
+				       // also one of his neighbors,
+				       // but this one is not any more
+				       // refined
       for (unsigned int nb_nb=0; nb_nb<GeometryInfo<dim>::faces_per_cell;
 	   ++nb_nb)
 	{
 	  const cell_iterator neighbor_neighbor = neighbor->neighbor(nb_nb);
-					   // do nothing if at boundary
+					   // do nothing if at
+					   // boundary
 	  if (neighbor_neighbor.state() != IteratorState::valid)
 	    continue;
 
@@ -7895,8 +8292,9 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 		  (neighbor_neighbor->level() == cell->level()-1),
 		  ExcInternalError());
 	  
-					   // also do nothing if the neighbor
-					   // is at a lower level (but then it
+					   // also do nothing if the
+					   // neighbor is at a lower
+					   // level (but then it
 					   // should not be refined)
 	  if (neighbor_neighbor->level() == cell->level()-1)
 	    {
@@ -7905,13 +8303,15 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	      continue;
 	    };
 
-					   // neighbor's neighbor is on
-					   // same level. if it has children,
-					   // then look closer
+					   // neighbor's neighbor is
+					   // on same level. if it has
+					   // children, then look
+					   // closer
 	  if (neighbor_neighbor->has_children())
-					     // if any of those cell's lines
-					     // is one of those that we are
-					     // interested in, then flag it
+					     // if any of those cell's
+					     // lines is one of those
+					     // that we are interested
+					     // in, then flag it
 	    for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
 	      {
 		line_iterator line = neighbor_neighbor->line(l);
@@ -7923,9 +8323,9 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
     };
 
 
-				   // now, if the lines are not marked as
-				   // needed, we may delete their children
-				   // and the midpoint
+				   // now, if the lines are not marked
+				   // as needed, we may delete their
+				   // children and the midpoint
   std::map<line_iterator,bool>::iterator line_and_flag;
   for (line_and_flag=line_is_needed.begin();
        line_and_flag!=line_is_needed.end(); ++line_and_flag)
@@ -8063,8 +8463,8 @@ void Triangulation<dim>::update_number_cache_lines ()
       number_cache.n_lines += number_cache.n_lines_level[level];
     };
 
-				   // do the update for the number
-				   // of active lines as well
+				   // do the update for the number of
+				   // active lines as well
   number_cache.n_active_lines_level.resize (levels.size());
   number_cache.n_active_lines = 0;
   for (unsigned int level=0; level<levels.size(); ++level)
