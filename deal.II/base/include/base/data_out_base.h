@@ -533,6 +533,15 @@ class DataOutBase
 	Patch ();
 
 					 /**
+					  * Compare the present patch
+					  * for equality with another
+					  * one. This is used in a few
+					  * of the automated tests in
+					  * our testsuite.
+					  */
+	bool operator == (const Patch &patch) const;
+	
+					 /**
 					  * Determine an estimate for
 					  * the memory consumption (in
 					  * bytes) of this
@@ -2228,6 +2237,59 @@ class DataOutInterface : private DataOutBase
 
 
 
+template <int dim, int spacedim=dim>
+class DataOutReader : public DataOutInterface<dim,spacedim>
+{
+  public:
+				     /**
+				      * Read a sequence of patches as
+				      * written previously by
+				      * <tt>DataOutBase::write_deal_II_intermediate</tt>
+				      * and store them in the present
+				      * object. This overwrites any
+				      * previous content.
+				      */
+    void read (std::istream &in);
+
+  protected:
+				     /**
+				      * This is the function
+				      * through which this class
+				      * propagates preprocessed data in
+				      * the form of Patch
+				      * structures (declared in the
+				      * base class DataOutBase) to
+				      * the actual output
+				      * function.
+				      *
+				      * It returns the patches as read
+				      * the last time a stream was
+				      * given to the read() function.
+				      */
+    virtual const std::vector<typename DataOutBase::Patch<dim,spacedim> > &
+    get_patches () const;
+
+				     /**
+				      * Abstract virtual function
+				      * through which the names of
+				      * data sets are obtained by the
+				      * output functions of the base
+				      * class.
+				      *
+				      * Return the names of the
+				      * variables as read the last
+				      * time we read a file.
+				      */
+    virtual std::vector<std::string> get_dataset_names () const;
+    
+  private:
+    std::vector<typename DataOutBase::Patch<dim,spacedim> > patches;
+    std::vector<std::string> dataset_names;
+};
+
+
+
+
 /* -------------------- inline functions ------------------- */
 
 inline
@@ -2253,6 +2315,21 @@ template <int dim, int spacedim>
 std::ostream &
 operator << (std::ostream                           &out,
 	     const DataOutBase::Patch<dim,spacedim> &patch);
+
+
+
+/**
+ * Input operator for an object of type
+ * <tt>DataOutBase::Patch</tt>. This operator reads the intermediate
+ * graphics format represented by the patch data structure, using the
+ * format in which it was written using the operator<<.
+ *
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim, int spacedim>
+std::istream &
+operator >> (std::istream                     &in,
+	     DataOutBase::Patch<dim,spacedim> &patch);
 
 
 

@@ -23,6 +23,21 @@
 #include <cmath>
 #include <set>
 
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
+
+
+DeclException2(ExcUnexpectedInput,
+	       std::string, std::string,
+	       << "Unexpected input: expected line\n  <"
+	       << arg1
+	       << ">\nbut got\n  <"
+	       << arg2 << ">");
+
+
 
 template <int dim, int spacedim>
 const unsigned int DataOutBase::Patch<dim,spacedim>::no_neighbor;
@@ -43,6 +58,40 @@ DataOutBase::Patch<dim,spacedim>::Patch ()
   
   Assert (dim<=spacedim, ExcIndexRange(dim,0,spacedim));
   Assert (spacedim<=3, ExcNotImplemented());
+}
+
+
+
+template <int dim, int spacedim>
+bool
+DataOutBase::Patch<dim,spacedim>::operator == (const Patch &patch) const
+{
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    if (vertices[i] != patch.vertices[i])
+      return false;
+
+  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+    if (neighbors[i] != patch.neighbors[i])
+      return false;
+
+  if (patch_index != patch.patch_index)
+    return false;
+
+  if (n_subdivisions != patch.n_subdivisions)
+    return false;
+
+  if (data.n_rows() != patch.data.n_rows())
+    return false;
+
+  if (data.n_cols() != patch.data.n_cols())
+    return false;
+
+  for (unsigned int i=0; i<data.n_rows(); ++i)
+    for (unsigned int j=0; j<data.n_cols(); ++j)
+      if (data[i][j] != patch.data[i][j])
+	return false;
+  
+  return true;
 }
 
 
@@ -4468,6 +4517,103 @@ DataOutInterface<dim,spacedim>::memory_consumption () const
 
 
 
+
+template <int dim, int spacedim>
+void
+DataOutReader<dim,spacedim>::read (std::istream &in) 
+{
+  Assert (in, ExcIO());
+
+				   // first empty previous content
+  {
+    std::vector<typename DataOutBase::Patch<dim,spacedim> >
+      tmp;
+    tmp.swap (patches);
+  }
+  {
+    std::vector<std::string> tmp;
+    tmp.swap (dataset_names);
+  }
+
+				   // then check that we have the
+				   // correct header of this
+				   // file. both the first and second
+				   // lines have to match
+  {
+    std::string header;
+    getline (in, header);
+
+#ifdef HAVE_STD_STRINGSTREAM
+    std::ostringstream s;
+#else
+    std::ostrstream s;
+#endif
+
+    s << "[deal.II intermediate format graphics data]";
+
+#ifndef HAVE_STD_STRINGSTREAM
+    s << std::ends;
+#endif
+    
+    Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
+  }
+  {
+    std::string header;
+    getline (in, header);
+
+#ifdef HAVE_STD_STRINGSTREAM
+    std::ostringstream s;
+#else
+    std::ostrstream s;
+#endif
+
+    s << "[written by deal.II version "
+      << DEAL_II_MAJOR << '.' << DEAL_II_MINOR << "]";
+
+#ifndef HAVE_STD_STRINGSTREAM
+    s << std::ends;
+#endif
+    
+    Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
+  }  
+  
+				   // then read the rest of the data
+  unsigned int n_datasets;
+  in >> n_datasets;
+  dataset_names.resize (n_datasets);
+  for (unsigned int i=0; i<n_datasets; ++i)
+    in >> dataset_names[i];
+
+  unsigned int n_patches;
+  in >> n_patches;
+  patches.resize (n_patches);
+  for (unsigned int i=0; i<n_patches; ++i)
+    in >> patches[i];
+  
+  Assert (in, ExcIO());  
+}
+
+
+
+template <int dim, int spacedim>
+const std::vector<typename DataOutBase::Patch<dim,spacedim> > &
+DataOutReader<dim,spacedim>::get_patches () const
+{
+  return patches;
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<std::string>
+DataOutReader<dim,spacedim>::get_dataset_names () const
+{
+  return dataset_names;
+}
+
+
+
+
 template <int dim, int spacedim>
 std::ostream &
 operator << (std::ostream                           &out,
@@ -4502,58 +4648,89 @@ operator << (std::ostream                           &out,
 
 
 
+template <int dim, int spacedim>
+std::istream &
+operator >> (std::istream                     &in,
+	     DataOutBase::Patch<dim,spacedim> &patch)
+{
+  Assert (in, ExcIO());
+
+				   // read a header line and compare
+				   // it to what we usually
+				   // write. skip all lines that
+				   // contain only blanks at the start
+  {
+    std::string header;
+    do
+      {
+	getline (in, header);
+	while ((header.size() != 0) &&
+	       (header[header.size()-1] == ' '))
+	  header.erase(header.size()-1);
+      }
+    while ((header == "") && in);
+
+#ifdef HAVE_STD_STRINGSTREAM
+    std::ostringstream s;
+#else
+    std::ostrstream s;
+#endif
+
+    s << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]";
+
+#ifndef HAVE_STD_STRINGSTREAM
+    s << std::ends;
+#endif
+    
+    Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
+  }
+  
+
+				   // then read all the data that is
+				   // in this patch
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    in >> patch.vertices[i];
+
+  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+    in >> patch.neighbors[i];
+
+  in >> patch.patch_index >> patch.n_subdivisions;
+
+  unsigned int n_rows, n_cols;
+  in >> n_rows >> n_cols;
+  patch.data.reinit (n_rows, n_cols);
+  for (unsigned int i=0; i<patch.data.n_rows(); ++i)
+    for (unsigned int j=0; j<patch.data.n_cols(); ++j)
+      in >> patch.data[i][j];
+
+  Assert (in, ExcIO());
+  
+  return in;
+}
+
+
+
 
 // explicit instantiations
-template class DataOutInterface<1,1>;
-template class DataOutBase::Patch<1,1>;
+#define INSTANTIATE(dim,spacedim) \
+  template class DataOutInterface<dim,spacedim>;                \
+  template class DataOutReader<dim,spacedim>;                   \
+  template class DataOutBase::Patch<dim,spacedim>;              \
+  template                                                      \
+  std::ostream &                                                \
+  operator << (std::ostream                           &out,     \
+	       const DataOutBase::Patch<dim,spacedim> &patch);  \
+  template                                                      \
+  std::istream &                                                \
+  operator >> (std::istream                     &in,            \
+	       DataOutBase::Patch<dim,spacedim> &patch)
 
-template class DataOutInterface<2,2>;
-template class DataOutBase::Patch<2,2>;
-
-template class DataOutInterface<3,3>;
-template class DataOutBase::Patch<3,3>;
-
-template class DataOutInterface<4,4>;
-template class DataOutBase::Patch<4,4>;
-
-// plotting surfaces
-template class DataOutInterface<1,2>;
-template class DataOutBase::Patch<1,2>;
-
-template class DataOutInterface<2,3>;
-template class DataOutBase::Patch<2,3>;
-
-template class DataOutInterface<3,4>;
-template class DataOutBase::Patch<3,4>;
-
-// output operators
-template
-std::ostream &
-operator << (std::ostream                  &out,
-	     const DataOutBase::Patch<1,1> &patch);
-template
-std::ostream &
-operator << (std::ostream                  &out,
-	     const DataOutBase::Patch<2,2> &patch);
-template
-std::ostream &
-operator << (std::ostream                  &out,
-	     const DataOutBase::Patch<3,3> &patch);
-template
-std::ostream &
-operator << (std::ostream                  &out,
-	     const DataOutBase::Patch<4,4> &patch);
-template
-std::ostream &
-operator << (std::ostream                  &out,
-	     const DataOutBase::Patch<1,2> &patch);
-template
-std::ostream &
-operator << (std::ostream                  &out,
-	     const DataOutBase::Patch<2,3> &patch);
-template
-std::ostream &
-operator << (std::ostream                  &out,
-	     const DataOutBase::Patch<3,4> &patch);
+INSTANTIATE(1,1);
+INSTANTIATE(2,2);
+INSTANTIATE(3,3);
+INSTANTIATE(4,4);
+INSTANTIATE(1,2);
+INSTANTIATE(2,3);
+INSTANTIATE(3,4);
 
 
