@@ -491,22 +491,38 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 
 
 template <int dim>
-void FiniteElement<dim>::get_unit_support_points (vector<Point<dim> > &) const {
+void
+FiniteElement<dim>::get_unit_support_points (vector<Point<dim> > &) const
+{
   Assert (false, ExcPureFunctionCalled());
 };
 
 
 
 template <int dim>
-void FiniteElement<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &,
+void
+FiniteElement<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &,
 					    const Boundary<dim> &,
-					    vector<Point<dim> > &) const {
+					    vector<Point<dim> > &) const
+{
   Assert (false, ExcPureFunctionCalled());
 };
 
 
+template <int dim>
+unsigned int
+FiniteElement<dim>::n_base_elements() const
+{
+  return 1;
+}
 
-
+template <int dim>
+const FiniteElement<dim>&
+FiniteElement<dim>::base_element(unsigned index) const
+{
+  Assert (index==0, ExcIndexRange(index,0,1));
+  return *this;
+}
 
 /*------------------------------- Explicit Instantiations -------------*/
 

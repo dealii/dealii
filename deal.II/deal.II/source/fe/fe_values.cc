@@ -92,12 +92,12 @@ template <int dim>
 void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_function,
 					     vector< Vector<double> > &values) const
 {
-  Assert (fe->n_components == values.size(),
+  Assert (n_quadrature_points == values.size(),
 	  ExcWrongNoOfComponents());
   Assert (selected_dataset<shape_values.size(),
 	  ExcInvalidIndex (selected_dataset, shape_values.size()));
   for (unsigned i=0;i<values.size();++i)
-    Assert (values[i].size() == n_quadrature_points,
+    Assert (values[i].size() == fe->n_components,
 	    ExcWrongVectorSize(values.size(), n_quadrature_points));
 
 				   // get function values of dofs
