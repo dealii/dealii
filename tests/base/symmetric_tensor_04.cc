@@ -48,7 +48,13 @@ int main ()
 
                                    // make sure norm is induced by scalar
                                    // product
-  Assert (std::fabs (t.norm()*t.norm() - t*t) < 1e-14,
+  double norm_sqr = 0;
+  for (unsigned int i=0; i<2; ++i)
+    for (unsigned int j=0; j<2; ++j)
+      for (unsigned int k=0; k<2; ++k)
+	for (unsigned int l=0; l<2; ++l)
+	  norm_sqr += t[i][j][k][l] * t[i][j][k][l];
+  Assert (std::fabs (t.norm()*t.norm() - norm_sqr) < 1e-14,
           ExcInternalError());
 
   deallog << "OK" << std::endl;
