@@ -420,8 +420,13 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 	thread_data[i].patch_values_system[k].reinit(n_components);
     }
 
-				   // create the patches with
-				   // default values
+				   // create the patches with default
+				   // values. allocate as many patches
+				   // as are needed, as this reduces
+				   // expensive copying when push_back
+				   // or similar operations are used
+				   // which would regularly overflow
+				   // the allocated amount of memory
   DataOutBase::Patch<dim>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
