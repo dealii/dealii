@@ -196,14 +196,14 @@ class TimeDependent
 				      * To see how this function work, note that
 				      * the function #solve_primal_problem# only
 				      * consists of a call to
-				      * #  do_loop (&TimeStepBase::init_for_primal_problem,
-				      *	   &TimeStepBase::solve_primal_problem,
+				      * #  do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
+				      *	   mem_fun(&TimeStepBase::solve_primal_problem),
 				      *	   timestepping_data_primal);#.
 				      *
 				      * Note also, that the given class from which
 				      * the two functions are taken needs not
-				      * necessarily be a #TimeStepBase#, but it
-				      * should be a derived class, that is
+				      * necessarily be #TimeStepBase#, but it
+				      * could also be a derived class, that is
 				      * #static_cast#able from a #TimeStepBase#.
 				      * The function may be a virtual function
 				      * (even a pure one) of that class, which
@@ -212,10 +212,21 @@ class TimeDependent
 				      * through virtual base classes and thus
 				      * unreachable by #static_cast# from the
 				      * #TimeStepBase# class.
+				      *
+				      * Instead of using the above form, you can
+				      * equally well use
+				      * #bind2nd(mem_fun1(&X::unary_function),
+				      *          arg)# which lets the #do_loop#
+				      * function call teh given function with
+				      * the specified parameter. Note that you
+				      * need to bind the second parameter since
+				      * the first one implicitely contains
+				      * the object which the function is to
+				      * be called for.
 				      */
-    template <class TimeStepClass>
-    void do_loop (void (TimeStepClass::*init_function) (),
-		  void (TimeStepClass::*loop_function) (),
+    template <typename InitFunctionObject, typename LoopFunctionObject>
+    void do_loop (InitFunctionObject init_function,
+		  LoopFunctionObject loop_function,
 		  const TimeSteppingData &timestepping_data);
     
 		  
@@ -276,7 +287,7 @@ class TimeDependent
 				      * do. See the documentation of this struct
 				      * for more information.
 				      */
-    TimeSteppingData timestepping_data_primal;
+    const TimeSteppingData timestepping_data_primal;
 
 				     /**
 				      * Some flags telling the
@@ -284,7 +295,7 @@ class TimeDependent
 				      * do. See the documentation of this struct
 				      * for more information.
 				      */
-    TimeSteppingData timestepping_data_dual;
+    const TimeSteppingData timestepping_data_dual;
 
 				     /**
 				      * Some flags telling the
@@ -292,16 +303,16 @@ class TimeDependent
 				      * do. See the documentation of this struct
 				      * for more information.
 				      */
-    TimeSteppingData timestepping_data_postprocess;  
+    const TimeSteppingData timestepping_data_postprocess;  
     
 };
 
 
 
 
-template <class TimeStepClass>
-void TimeDependent::do_loop (void (TimeStepClass::*init_function) (),
-			     void (TimeStepClass::*loop_function) (),
+template <typename InitFunctionObject, typename LoopFunctionObject>
+void TimeDependent::do_loop (InitFunctionObject init_function,
+			     LoopFunctionObject loop_function,
 			     const TimeSteppingData &timestepping_data)
 {
   const unsigned int n_timesteps = timesteps.size();
@@ -309,7 +320,7 @@ void TimeDependent::do_loop (void (TimeStepClass::*init_function) (),
 				   // initialize the time steps for
 				   // a round of primal problems
   for (unsigned int step=0; step<n_timesteps; ++step)
-    (static_cast<TimeStepClass*>(timesteps[step])->*init_function) ();
+    init_function (static_cast<typename InitFunctionObject::argument_type>(timesteps[step]));
 
 				   // wake up the first few time levels
   for (int step=-timestepping_data.look_ahead; step<0; ++step)
@@ -328,7 +339,7 @@ void TimeDependent::do_loop (void (TimeStepClass::*init_function) (),
 	  timesteps[step+look_ahead]->wake_up(look_ahead);
       
 				       // actually do the work
-      (static_cast<TimeStepClass*>(timesteps[step])->*loop_function) ();
+      loop_function (static_cast<typename LoopFunctionObject::argument_type>(timesteps[step]));
       
 				       // let the timesteps behind sleep
       for (unsigned int look_back=0;
