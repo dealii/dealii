@@ -19,6 +19,128 @@
 
 
 /**
+ * Boundary object for the hull of a cylinder.  In three dimensions,
+ * points are projected on a circular tube along the @p{x}-axis. The
+ * radius of the tube can be set. Similar to @ref{HyperBallBoundary},
+ * new points are projected by dividing the straight line between the
+ * old two points and adjusting the radius in the @p{yz}-plane.
+ *
+ * This class was developed to be used in conjunction with the
+ * @p{cylinder} function of @ref{GridGenerator}. It should be used for
+ * the hull of the cylinder only (boundary indicator 0).
+ *
+ *   This class is derived from @ref{StraightBoundary} rather than from
+ *   @ref{Boundary}, which would seem natural, since this way we can use the
+ *   @ref{StraightBoundary}@p{<dim>::in_between(neighbors)} function.
+ *
+ *   @author Guido Kanschat, 2001
+ */
+template <int dim>
+class CylinderBoundary : public StraightBoundary<dim>
+{
+  public:
+				     /**
+				      * Constructor
+				      */
+    CylinderBoundary (const double     radius = 1.0);
+
+				     /**
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
+				      */
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+
+				     /**
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
+				      */
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+
+				     /**
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      *
+				      * Calls
+				      * @p{get_intermediate_points_between_points}.
+				      */
+    virtual void
+    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				     typename std::vector<Point<dim> > &points) const;
+
+				     /**
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      *
+				      * Only implemented for @p{dim=3}
+				      * and for @p{points.size()==1}.
+				      */
+    virtual void
+    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
+				     typename std::vector<Point<dim> > &points) const;
+
+				     /**
+				      * Compute the normals to the
+				      * boundary at the vertices of
+				      * the given face.
+				      *
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      */
+    virtual void
+    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+
+				     /**
+				      * Return the radius of the cylinder.
+				      */
+    double get_radius () const;
+
+				     /**
+				      * Exception. Thrown by the
+				      * @p{get_radius} if the
+				      * @p{compute_radius_automatically},
+				      * see below, flag is set true.
+				      */
+    DeclException0 (ExcRadiusNotSet);
+    
+    
+  protected:
+				     /**
+				      * Radius of the cylinder.
+				      */
+    const double radius;
+
+  private:
+
+				     /**
+				      * Called by
+				      * @p{get_intermediate_points_on_line}
+				      * and by
+				      * @p{get_intermediate_points_on_quad}.
+				      *
+				      * Refer to the general
+				      * documentation of
+				      * @p{get_intermediate_points_on_line}
+				      * in the documentation of the
+				      * base class.
+				      */
+    void get_intermediate_points_between_points (const Point<dim> &p0, const Point<dim> &p1,
+						 typename std::vector<Point<dim> > &points) const;    
+};
+
+
+
+/**
  *   Specialisation of @ref{Boundary}<dim>, which places the new point on
  *   the boundary of a ball in arbitrary dimension. It works by projecting
  *   the point in the middle of the old points onto the ball. The middle is

@@ -21,6 +21,161 @@
 
 
 template <int dim>
+CylinderBoundary<dim>::CylinderBoundary (const double radius) :
+		radius(radius)
+{};
+
+
+
+template <int dim>
+Point<dim>
+CylinderBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+{
+  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
+    
+				   // project to boundary
+  if (dim>=3)
+    middle *= radius / std::sqrt(middle.square()-middle(0)*middle(0));
+  return middle;
+};
+
+
+template <int dim>
+Point<dim>
+CylinderBoundary<dim>::
+get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+{
+  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
+  
+				   // project to boundary
+  if (dim>=3)
+    middle *= radius / std::sqrt(middle.square()-middle(0)*middle(0));
+  return middle;
+};
+
+
+template <int dim>
+void
+CylinderBoundary<dim>::get_intermediate_points_on_line (
+  const typename Triangulation<dim>::line_iterator &line,
+  typename std::vector<Point<dim> > &points) const
+{
+  if (points.size()==1)
+    points[0]=get_new_point_on_line(line);
+  else
+    get_intermediate_points_between_points(line->vertex(0), line->vertex(1), points);
+}
+
+  
+template <int dim>
+void
+CylinderBoundary<dim>::get_intermediate_points_between_points (
+  const Point<dim> &v0, const Point<dim> &v1,
+  typename std::vector<Point<dim> > &points) const
+{
+  const unsigned int n=points.size();
+  Assert(n>0, ExcInternalError());
+				   // Do a simple linear interpolation
+				   // followed by projection. If this
+				   // is not sufficient, try to
+				   // understand the sophisticated
+				   // code in HyperBall later.
+  Point<dim> ds = v1-v0;
+  ds /= n+1;
+  
+  for (unsigned int i=0; i<n; ++i)
+    {
+      if (i==0)
+	points[i] = v0+ds;
+      else
+	points[i] = points[i-1]+ds;
+      
+      points[i] *= radius / std::sqrt(points[i].square()-points[i](0)*points[i](0));
+    }
+}
+
+
+#if deal_II_dimension == 3
+
+template <>
+void
+CylinderBoundary<3>::get_intermediate_points_on_quad (
+  const Triangulation<3>::quad_iterator &quad,
+  std::vector<Point<3> > &points) const
+{
+  unsigned int m=static_cast<unsigned int> (std::sqrt(static_cast<double>(points.size())));
+  Assert(points.size()==m*m, ExcInternalError());
+
+  std::vector<Point<3> > lp3(m);
+  std::vector<Point<3> > lp1(m);
+  
+  get_intermediate_points_on_line(quad->line(3), lp3);
+  get_intermediate_points_on_line(quad->line(1), lp1);
+  
+  std::vector<Point<3> > lps(m);
+  for (unsigned int i=0; i<m; ++i)
+    {
+      get_intermediate_points_between_points(lp3[i], lp1[i], lps);
+      
+      for (unsigned int j=0; j<m; ++j)
+	points[i*m+j]=lps[j];
+    }
+}
+
+#endif
+
+
+template <int dim>
+void
+CylinderBoundary<dim>::get_intermediate_points_on_quad (
+  const typename Triangulation<dim>::quad_iterator &,
+  typename std::vector<Point<dim> > &) const
+{
+  Assert(false, Boundary<dim>::ExcFunctionNotUseful(dim));
+}
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+void
+CylinderBoundary<1>::
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 Boundary<1>::FaceVertexNormals &) const
+{
+  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+};
+
+#endif
+
+
+template <int dim>
+void
+CylinderBoundary<dim>::
+get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
+{
+  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
+    {
+      face_vertex_normals[vertex] = face->vertex(vertex);
+      face_vertex_normals[vertex][0] = 0.;
+    }
+};
+
+
+
+template <int dim>
+double
+CylinderBoundary<dim>::get_radius () const 
+{
+  return radius;
+};
+
+
+//======================================================================//
+
+template <int dim>
 HyperBallBoundary<dim>::HyperBallBoundary (const Point<dim> p,
 					   const double     radius) :
 		center(p), radius(radius), compute_radius_automatically(false)
@@ -597,6 +752,7 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 
 // explicit instantiations
 template class HyperBallBoundary<deal_II_dimension>;
+template class CylinderBoundary<deal_II_dimension>;
 template class HalfHyperBallBoundary<deal_II_dimension>;
 template class HyperShellBoundary<deal_II_dimension>;
 template class HalfHyperShellBoundary<deal_II_dimension>;

@@ -133,6 +133,7 @@ GridGenerator::colorize_hyper_rectangle (Triangulation<dim> &tria)
 	    cell->face(3)->set_boundary_indicator (1);
 	    cell->face(4)->set_boundary_indicator (5);
 	    cell->face(5)->set_boundary_indicator (0);
+	    break;
       default:
 	    Assert(false, ExcNotImplemented());
     };
@@ -180,6 +181,25 @@ void GridGenerator::hyper_L (Triangulation<1> &,
 void GridGenerator::hyper_ball (Triangulation<1> &,
 				const Point<1> &,
 				const double)
+{
+  Assert (false, ExcInternalError());
+};
+
+
+
+void
+GridGenerator::cylinder (Triangulation<2> &,
+			 const double,
+			 const double)
+{
+  Assert (false, ExcInternalError());  
+}
+
+
+
+void GridGenerator::cylinder (Triangulation<1> &,
+			      const double,
+			      const double)
 {
   Assert (false, ExcInternalError());
 };
@@ -410,6 +430,38 @@ void GridGenerator::hyper_shell (Triangulation<2>   &tria,
   
   tria.create_triangulation (vertices, cells, SubCellData());
 };
+
+
+
+void
+GridGenerator::cylinder (Triangulation<2> &tria,
+			 const double radius,
+			 const double half_length)
+{
+  Point<2> p1 (-half_length, -radius);
+  Point<2> p2 (half_length, radius);
+
+  hyper_rectangle(tria, p1, p2, true);
+
+  Triangulation<2>::face_iterator f = tria.begin_face();
+  Triangulation<2>::face_iterator end = tria.end_face();
+  while (f != end)
+    {
+      switch (f->boundary_indicator())
+	{
+	  case 0:
+	    f->set_boundary_indicator(1);
+	    break;
+	  case 1:
+	    f->set_boundary_indicator(2);
+	    break;
+	  default:
+	    f->set_boundary_indicator(0);
+	    break;	    
+	}
+      ++f;
+    }
+}
 
 
 
@@ -693,6 +745,81 @@ GridGenerator::hyper_ball (Triangulation<3> &tria,
   tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[n_vertices]),
 			     cells,
 			     SubCellData());       // no boundary information
+};
+
+
+
+void
+GridGenerator::cylinder (Triangulation<3> &tria,
+			 const double radius,
+			 const double half_length)
+{
+				   // Copy the base from hyper_ball<2>
+				   // and transform it to yz
+  const double d = radius/std::sqrt(2.0);
+  const double a = d/(1+std::sqrt(2.0));
+  const Point<3> vertices[24] = {
+    Point<3>(-half_length, -d,-d),
+      Point<3>(-half_length,  d,-d),
+      Point<3>(-half_length, -a,-a),
+      Point<3>(-half_length,  a,-a),
+      Point<3>(-half_length, -a, a),
+      Point<3>(-half_length,  a, a),
+      Point<3>(-half_length, -d, d),
+      Point<3>(-half_length,  d, d),
+    Point<3>(0, -d,-d),
+      Point<3>(0,  d,-d),
+      Point<3>(0, -a,-a),
+      Point<3>(0,  a,-a),
+      Point<3>(0, -a, a),
+      Point<3>(0,  a, a),
+      Point<3>(0, -d, d),
+      Point<3>(0,  d, d),
+    Point<3>(half_length, -d,-d),
+      Point<3>(half_length,  d,-d),
+      Point<3>(half_length, -a,-a),
+      Point<3>(half_length,  a,-a),
+      Point<3>(half_length, -a, a),
+      Point<3>(half_length,  a, a),
+      Point<3>(half_length, -d, d),
+      Point<3>(half_length,  d, d),
+      };
+  
+  int cell_vertices[10][8] = {
+	{0,1,3,2,8,9,11,10},
+	{0,2,4,6,8,10,12,14},
+	{2,3,5,4,10,11,13,12},
+	{1,7,5,3,9,15,13,11},
+	{6,4,5,7,14,12,13,15}
+  };
+  for (unsigned int i=0;i<5;++i)
+    for (unsigned int j=0;j<8;++j)
+      cell_vertices[i+5][j] = cell_vertices[i][j]+8;
+  
+  std::vector<CellData<3> > cells (10, CellData<3>());
+  
+  for (unsigned int i=0; i<10; ++i) 
+    {
+      for (unsigned int j=0; j<8; ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
+    };
+  
+  tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[24]),
+			     cells,
+			     SubCellData());       // no boundary information
+
+  Triangulation<3>::cell_iterator cell = tria.begin();
+  Triangulation<3>::cell_iterator end = tria.end();
+  
+  while (cell != end)
+    {
+      if (cell->face(0)->boundary_indicator() != 255)
+	cell->face(0)->set_boundary_indicator(1);
+      if (cell->face(1)->boundary_indicator() != 255)
+	cell->face(1)->set_boundary_indicator(2);
+      ++cell;
+    }
 };
 
 

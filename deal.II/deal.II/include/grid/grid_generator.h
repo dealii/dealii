@@ -252,6 +252,47 @@ class GridGenerator
 			    const double      radius = 1.);
 
 				     /**
+				      * Create a cylinder around the
+				      * x-axis.  The cylinder extends
+				      * from @p{x=-half_length} to
+				      * @p{x=+half_length} and its
+				      * projection into the
+				      * @p{yz}-plane is a circle of
+				      * radius @p{radius}.
+				      *
+				      * The boundaries are colored
+				      * according to the following
+				      * scheme: 0 for the hull of the
+				      * cylinder, 1 for the left hand
+				      * face and 2 for the right hand
+				      * face.
+				      */
+    static void cylinder (Triangulation<3> &tria,
+			  const double      radius = 1.,
+			  const double      half_length = 1.);
+
+				     /**
+				      * Projection of the
+				      * three-dimensional cylinder
+				      * into the @p{xy}-plane.
+				      * Therefore, this is simply a square.
+				      *
+				      * Coloring is like in 3D.
+				      */
+    static void cylinder (Triangulation<2> &tria,
+			  const double      radius = 1.,
+			  const double      half_length = 1.);
+
+				     /**
+				      * Non-implemented dummy for compilation purposes.
+				      */
+    static void cylinder (Triangulation<1> &tria,
+			  const double      radius,
+			  const double      half_length);
+
+
+
+				     /**
 				      * Initialize the given
 				      * triangulation with a hyper-L
 				      * consisting of exactly
