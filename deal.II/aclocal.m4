@@ -49,7 +49,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	GXX_VERSION=gcc2.95
   	;;
       *2.96*)
-  	AC_MSG_RESULT(C++ compiler is gcc-2.96)
+  	AC_MSG_ERROR(C++ compiler reports faulty gcc 2.96. Please install a new compiler)
   	GXX_VERSION=gcc2.96
   	;;
       *2.97*)
