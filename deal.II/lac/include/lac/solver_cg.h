@@ -188,10 +188,10 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
 				   // resize the vectors, but do not set
 				   // the values since they'd be overwritten
 				   // soon anyway.
-  g.reinit(x.size(), true);
-  h.reinit(x.size(), true);
-  d.reinit(x.size(), true);
-  Ad.reinit(x.size(), true);
+  g.reinit(x, true);
+  h.reinit(x, true);
+  d.reinit(x, true);
+  Ad.reinit(x, true);
 				   // Implementation taken from the DEAL
 				   // library
   int  it=0;
