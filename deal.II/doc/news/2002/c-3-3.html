@@ -13,13 +13,20 @@
 
 <h2>Changes after Version 3.3</h2>
 
+<p>
 This is the list of changes made after the release of 
 <acronym>deal.II</acronym> version 3.3. It is subdivided into changes
 made to the three sub-libraries <a href="#base">base</a>, 
 <a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
 changes to the <a href="#general">general infrastructure,
 documentation, etc</a>.
+</p>
 
+<p>
+All entries are signed with the names of the author. Regular
+contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
+(Guido Kanschat), RH (Ralf Hartmann), BK (Benjamin Shelton Kirk).
+</p>
 
 
 <a name="general"></a>
@@ -28,7 +35,7 @@ documentation, etc</a>.
 <ol>
   <li> <p> 
        Changed: The build system was entirely revised. Object
-       files in debug more now have the suffix <code>.g.o</code>
+       files in debug mode now have the suffix <code>.g.o</code>
        instead of <code>.go</code>. All object files from the
        subdirectories are now placed into the <code>/lib</code>
        top-level directory, rather than in library directories in the
@@ -42,6 +49,8 @@ documentation, etc</a>.
 
 <a name="base"></a>
 <h3>base</h3>
+
+<ol>
   <li> <p> 
        Changed: The quite logorrhoeic function name <code
        class="class">TensorProductPolynomials</code>::<code
@@ -77,7 +86,6 @@ documentation, etc</a>.
        <br>
        (BK 2002/02/11)
        </p>
-<ol>
 </ol>
 
 
@@ -109,13 +117,14 @@ documentation, etc</a>.
 
 <a name="deal.II"></a>
 <h3>deal.II</h3>
+
+<ol>
   <li> <p> 
        New: Finite element family with complete polynomial spaces
        for discontinuous Galerkin: <code class="class">FE_DGP</code>
        <br> 
        (GK 2002/02/11)
        </p>
-<ol>
 </ol>
 
 <hr>
