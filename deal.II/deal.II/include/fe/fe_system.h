@@ -618,6 +618,11 @@ class FESystem : public FiniteElement<dim>
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+
+template <> void FESystem<1>::initialize_unit_face_support_points ();
+
 
 /* ------------------------- inline functions ------------------------- */
 

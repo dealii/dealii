@@ -608,6 +608,49 @@ class KellyErrorEstimator
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+
+template <> KellyErrorEstimator<1>::Data::Data(
+  const Mapping<1>                    &,
+  const DoFHandler<1>                 &,
+  const Quadrature<0>                 &,
+  const FunctionMap<1>::type          &,
+  const std::vector<const Vector<double>*> &,
+  const std::vector<bool>                  &,
+  const Function<1>                   *,
+  const unsigned int                   ,
+  FaceIntegrals                       &);
+
+template <> void KellyErrorEstimator<1>::estimate_some (
+  Data &, const unsigned int);
+
+template <> void KellyErrorEstimator<1>::estimate (
+  const Mapping<1>                    &mapping,
+  const DoFHandler<1>                 &dof_handler,
+  const Quadrature<0>                 &,
+  const FunctionMap<1>::type          &neumann_bc,
+  const std::vector<const Vector<double>*> &solutions,
+  std::vector<Vector<float>*>              &errors,
+  const std::vector<bool>                  &component_mask_,
+  const Function<1>                   *coefficient,
+  const unsigned int);
+
+template <> void KellyErrorEstimator<1>::integrate_over_regular_face (
+  Data &,
+  const active_cell_iterator &,
+  const unsigned int      ,
+  FEFaceValues<1>        &,
+  FEFaceValues<1>        &);
+
+template <> void KellyErrorEstimator<1>::integrate_over_irregular_face (
+  Data &,
+  const active_cell_iterator &,
+  const unsigned int          ,
+  FEFaceValues<1>            &,
+  FESubfaceValues<1>         &);
+
+
 #endif
 
 

@@ -506,4 +506,29 @@ class MappingQ : public MappingQ1<dim>
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+
+template<> MappingQ<1>::MappingQ (const unsigned int);
+template<> MappingQ<1>::~MappingQ ();
+template<> void MappingQ<1>::compute_shapes_virtual (
+  const std::vector<Point<1> > &unit_points,
+  MappingQ1<1>::InternalData   &data) const;
+template <> void MappingQ<1>::set_laplace_on_quad_vector(
+  std::vector<std::vector<double> > &) const;
+template <> void MappingQ<3>::set_laplace_on_hex_vector(
+  std::vector<std::vector<double> > &lohvs) const;
+template <> void MappingQ<1>::compute_laplace_vector(
+  std::vector<std::vector<double> > &) const;
+template <> void MappingQ<1>::add_line_support_points (
+  const Triangulation<1>::cell_iterator &,
+  std::vector<Point<1> > &) const;
+template<> void MappingQ<3>::add_quad_support_points(
+  const Triangulation<3>::cell_iterator &cell,
+  std::vector<Point<3> >                &a) const;
+template <> void MappingQ<3>::fill_quad_support_points_simple (
+  const Triangulation<3>::cell_iterator &cell,
+  std::vector<Point<3> > &a) const;
+
+
 #endif

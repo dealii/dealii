@@ -194,4 +194,9 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+template <> void DataOutRotation<3>::build_some_patches (Data);
+
+
 #endif

@@ -493,6 +493,31 @@ class MatrixCreator
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+
+template <> void MatrixCreator<1>::create_boundary_mass_matrix (
+  const Mapping<1>          &,
+  const DoFHandler<1>       &,
+  const Quadrature<0>       &,
+  SparseMatrix<double>      &,
+  const FunctionMap<1>::type&,
+  Vector<double>            &,
+  std::vector<unsigned int> &,
+  const Function<1>         * const);
+
+template <> void MatrixCreator<1>::create_boundary_mass_matrix_1 (
+  const Mapping<1>          &,
+  const DoFHandler<1>       &,
+  const Quadrature<0>       &,
+  SparseMatrix<double>      &,
+  const FunctionMap<1>::type&,
+  Vector<double>            &,
+  std::vector<unsigned int> &,
+  const Function<1> * const ,
+  const IteratorRange       &,
+  Threads::ThreadMutex      &);
+
 
 /**
  * Provide a collection of functions operating on matrices. These include

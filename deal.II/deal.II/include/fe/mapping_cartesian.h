@@ -265,4 +265,31 @@ class MappingCartesian : public Mapping<dim>
 };
 
 
+
+/* -------------- declaration of explicit specializations ------------- */
+
+
+template <> void MappingCartesian<1>::fill_fe_face_values (
+  const DoFHandler<1>::cell_iterator &,
+  const unsigned,
+  const Quadrature<0>&,
+  Mapping<1>::InternalDataBase&,
+  std::vector<Point<1> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,1> >&,
+  std::vector<Point<1> >&) const;
+
+template <> void MappingCartesian<1>::fill_fe_subface_values (
+  const DoFHandler<1>::cell_iterator &,
+  const unsigned,
+  const unsigned,
+  const Quadrature<0>&,
+  Mapping<1>::InternalDataBase&,
+  std::vector<Point<1> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,1> >&,
+  std::vector<Point<1> >&) const;
+
+  
+
 #endif

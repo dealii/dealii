@@ -361,6 +361,15 @@ class Mapping : public Subscriptor
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+
+template<> const unsigned int Mapping<1>::normal_directions[2];
+template<> const unsigned int Mapping<2>::normal_directions[4];
+template<> const unsigned int Mapping<3>::normal_directions[6];
+
+
+/* ------------------------- inline functions ------------------------- */
 
 
 template <int dim>

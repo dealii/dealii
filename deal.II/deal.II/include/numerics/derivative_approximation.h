@@ -477,6 +477,16 @@ class DerivativeApproximation
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+template <> double DerivativeApproximation::SecondDerivative<1>::derivative_norm (
+  const Derivative &d);
+template <> double DerivativeApproximation::SecondDerivative<2>::derivative_norm (
+  const Derivative &d);
+template <> double DerivativeApproximation::SecondDerivative<3>::derivative_norm (
+  const Derivative &d);
+
+
 #endif
 
 

@@ -615,7 +615,14 @@ class FE_Q : public FiniteElement<dim>
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
 
+template <> void FE_Q<1>::initialize_unit_face_support_points ();
+template <> void FE_Q<1>::build_face_renumbering (const unsigned int,
+						  std::vector<unsigned int>&);
+
+
+/* ---------------------------- inline functions --------------------- */
 
 template<int dim>
 inline

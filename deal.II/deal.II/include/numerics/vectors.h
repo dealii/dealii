@@ -11,6 +11,7 @@
 
 
 #include <base/exceptions.h>
+#include <dofs/function_map.h>
 #include <map>
 #include <vector>
 
@@ -744,6 +745,42 @@ class VectorTools
 				      */
   DeclException0 (ExcNonInterpolatingFE);
 };
+
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <> void VectorTools::project (
+  const Mapping<1>       &,
+  const DoFHandler<1>    &,
+  const ConstraintMatrix &,
+  const Quadrature<1>    &,
+  const Function<1>      &,
+  Vector<double>         &,
+  const bool              ,
+  const Quadrature<0>    &,
+  const bool              );
+
+template <> void VectorTools::interpolate_boundary_values (
+  const Mapping<1>         &,
+  const DoFHandler<1>      &dof,
+  const unsigned char       boundary_component,
+  const Function<1>        &boundary_function,
+  std::map<unsigned int,double> &boundary_values,
+  const std::vector<bool>       &component_mask_);
+
+template <> void VectorTools::interpolate_boundary_values (
+  const Mapping<1>              &mapping,
+  const DoFHandler<1>           &dof,
+  const FunctionMap<1>::type    &function_map,
+  std::map<unsigned int,double> &boundary_values,
+  const std::vector<bool>       &component_mask);
+
+template <> void VectorTools::project_boundary_values (
+  const Mapping<1>       &mapping,
+  const DoFHandler<1>    &dof,
+  const FunctionMap<1>::type &boundary_functions,
+  const Quadrature<0>  &,
+  std::map<unsigned int,double> &boundary_values);
 
 
 #endif
