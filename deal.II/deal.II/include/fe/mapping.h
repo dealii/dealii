@@ -42,8 +42,11 @@ template <int dim> class FESubfaceValues;
  * result of @p{update_once}. Finally, on each cell, use
  * @p{fill_fe_*_values} with the result of @p{update_each} to compute
  * values for a special cell.
- * 
- * @author Guido Kanschat, Ralf Hartmann 2000
+ *
+ * A hint to implementators: no function except the two functions @p{update_once}
+ * and @p{update_each} may add any flags.
+ *
+ * @author Guido Kanschat, Ralf Hartmann 2000, 2001
  */
 template <int dim>
 class Mapping : public Subscriptor
