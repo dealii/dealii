@@ -1658,7 +1658,7 @@ FE_RaviartThomas<dim>::fill_fe_face_values (const Mapping<dim>                  
 				   // number of conversions
   if (flags & update_values)
     {
-      Assert (fe_data.shape_values.size() == dofs_per_cell,
+      Assert (fe_data.shape_values.size() == this->dofs_per_cell,
               ExcInternalError());
       Assert (fe_data.shape_values[0].size() ==
               GeometryInfo<dim>::faces_per_cell * n_q_points *
@@ -1690,7 +1690,7 @@ FE_RaviartThomas<dim>::fill_fe_face_values (const Mapping<dim>                  
       
   if (flags & update_gradients)
     {
-      Assert (fe_data.shape_values.size() == dofs_per_cell,
+      Assert (fe_data.shape_values.size() == this->dofs_per_cell,
               ExcInternalError());
       Assert (fe_data.shape_gradients[0].size() ==
               GeometryInfo<dim>::faces_per_cell * n_q_points *
