@@ -18,6 +18,7 @@
 #include <base/table.h>
 #include <base/smartpointer.h>
 #include <lac/block_indices.h>
+#include <lac/vector.h>
 
 #include <cmath>
 
@@ -514,10 +515,9 @@ class BlockMatrixBase : public Subscriptor
 				      * applicable if the matrix has
 				      * only one block.
 				      */
-    template <class BlockVectorType,
-              class VectorType>
-    void vmult (VectorType       &dst,
-		const VectorType &src) const;
+    template <typename number>
+    void vmult (Vector<number>       &dst,
+		const Vector<number> &src) const;
     
 				     /**
 				      * Matrix-vector multiplication:
@@ -562,10 +562,9 @@ class BlockMatrixBase : public Subscriptor
 				      * applicable if the matrix has
 				      * only one block.
 				      */
-    template <class BlockVectorType,
-              class VectorType>
-    void Tvmult (VectorType       &dst,
-		 const VectorType &src) const;
+    template <typename number>
+    void Tvmult (Vector<number>       &dst,
+		 const Vector<number> &src) const;
     
 				     /**
 				      * Adding Matrix-vector
@@ -1351,11 +1350,10 @@ BlockMatrixBase<MatrixType>::vmult (BlockVectorType  &dst,
 
 
 template <class MatrixType>
-template <class BlockVectorType,
-          class VectorType>
+template <typename number>
 void
-BlockMatrixBase<MatrixType>::vmult (VectorType       &dst,
-                                    const VectorType &src) const
+BlockMatrixBase<MatrixType>::vmult (Vector<number>       &dst,
+                                    const Vector<number> &src) const
 {
   Assert (1 == n_block_rows(),
 	  ExcDimensionMismatch(1, n_block_rows()));
@@ -1455,11 +1453,10 @@ BlockMatrixBase<MatrixType>::Tvmult (VectorType    &dst,
 
 
 template <class MatrixType>
-template <class BlockVectorType,
-          class VectorType>
+template <typename number>
 void
-BlockMatrixBase<MatrixType>::Tvmult (VectorType       &dst,
-                                     const VectorType &src) const
+BlockMatrixBase<MatrixType>::Tvmult (Vector<number>       &dst,
+                                     const Vector<number> &src) const
 {
   Assert (1 == n_block_cols(),
 	  ExcDimensionMismatch(1, n_block_cols()));
