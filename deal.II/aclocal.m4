@@ -25,7 +25,7 @@ dnl
 AC_DEFUN(DEAL_II_THREAD_CPPFLAGS, dnl
 [
   AC_MSG_CHECKING(for platform specific multi-threading defines)
-  AC_REQUIRE([AC_LANG_CPLUSPLUS])
+  AC_LANG_CPLUSPLUS
   AC_TRY_COMPILE(
    [
 #if !defined (_REENTRANT) && !defined (_THREAD_SAFE)
@@ -129,7 +129,7 @@ dnl Usage: DEAL_II_CHECK_GETRUSAGE
 dnl
 AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
   AC_MSG_CHECKING(whether getrusage is properly declared)
-  AC_REQUIRE([AC_LANG_CPLUSPLUS])
+  AC_LANG_CPLUSPLUS
   AC_TRY_COMPILE(
     [
 #include <sys/resource.h>
@@ -179,7 +179,7 @@ dnl                                 action when flag is found)
 dnl
 AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
   AC_MSG_CHECKING(whether isnan is declared with $1 flags)
-  AC_REQUIRE([AC_LANG_CPLUSPLUS])
+  AC_LANG_CPLUSPLUS
   CXXFLAGS=$2
   deal_II_isnan_flag=""
   AC_TRY_COMPILE(
@@ -284,7 +284,7 @@ dnl                                   action if compiler crashes)
 dnl
 AC_DEFUN(DEAL_II_CHECK_ASSERT_THROW, dnl
   AC_MSG_CHECKING(whether AssertThrow works with $1 flags)
-  AC_REQUIRE([AC_LANG_CPLUSPLUS])
+  AC_LANG_CPLUSPLUS
   CXXFLAGS=$2
   AC_TRY_COMPILE(
     [
