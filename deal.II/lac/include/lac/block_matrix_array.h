@@ -430,17 +430,8 @@ class BlockTrianglePrecondition
 				      * size and clear all blocks.
 				      */
     void reinit(const unsigned int n_block_rows);
-    
-				     /**
-				      * Add a new block. Calls BlockMatrixArray::enter().
-				      */
-    template <class MATRIX>
-    void enter (const MATRIX      &matrix,
-		const unsigned int row,
-		const unsigned int col,
-		const double       prefix = 1.,
-		const bool         transpose = false);
-				     /**
+
+                                     /**
 				      * Preconditioning.
 				      */
     void vmult (BlockVector<number>& dst,
@@ -633,21 +624,6 @@ BlockMatrixArray<number>::print_latex (STREAM& out) const
 	  out << " &";
       }
   out << "\\end{array}" << std::endl;
-}
-
-
-template <typename number>
-template <class MATRIX>
-inline
-void
-BlockTrianglePrecondition<number>::enter (
-  const MATRIX      &matrix,
-  const unsigned int row,
-  const unsigned int col,
-  const double       prefix,
-  const bool         transpose)
-{
-  BlockMatrixArray<number>::enter(matrix, row, col, prefix, transpose);
 }
 
 
