@@ -125,6 +125,29 @@ class BlockVector
 				      */
     BlockVector (const std::vector<unsigned int> &n);
 
+				     /**
+				      * Constructor. Set the number of
+				      * blocks to
+				      * @p{n.size()}. Initialize the
+				      * vector with the elements
+				      * pointed to by the range of
+				      * iterators given as second and
+				      * third argument. Apart from the
+				      * first argument, this
+				      * constructor is in complete
+				      * analogy to the respective
+				      * constructor of the
+				      * @p{std::vector} class, but the
+				      * first argument is needed in
+				      * order to know how to subdivide
+				      * the block vector into
+				      * different blocks.
+				      */
+    template <typename InputIterator>
+    BlockVector (const std::vector<unsigned int> &n,
+		 const InputIterator              first,
+		 const InputIterator              end);
+    
                                      /**
 				      * Destructor. Clears memory
 				      */
@@ -486,6 +509,11 @@ class BlockVector
 
 				     //@}
 
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcIteratorRangeDoesNotMatchVectorSize);
+
   protected:
 				     /**
 				      * Pointer to the array of components.
@@ -512,6 +540,30 @@ class BlockVector
 
 
 /*----------------------- Inline functions ----------------------------------*/
+
+
+template <typename Number>
+template <typename InputIterator>
+BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n,
+				  const InputIterator              first,
+				  const InputIterator              end)
+{
+				   // first set sizes of blocks, but
+				   // don't initialize them as we will
+				   // copy elements soon
+  reinit (n, true);
+  InputIterator start = first;
+  for (unsigned int b=0; b<n.size(); ++b)
+    {
+      InputIterator end = start;
+      std::advance (end, static_cast<signed int>(n[b]));
+      std::copy (start, end, block(b).begin());
+      start = end;
+    };
+  Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
+};
+
+
 
 
 template <typename Number>

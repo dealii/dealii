@@ -18,6 +18,7 @@
 #include <lac/block_vector.h>
 #include <fstream>
 #include <vector>
+#include <list>
 
 void test ()
 {
@@ -43,6 +44,27 @@ void test ()
 	    << std::endl;
   deallog.pop();
 
+
+				   // initialization by an iterator
+				   // range
+  deallog.push ("Initialization from iterators");
+  double array[] = { 0, 1, 2, 3, 4, 5 };
+  BlockVector<double> v1(ivector, &array[0], &array[6]);
+  for (unsigned int i=0; i<v1.size(); ++i)
+    deallog << v1(i) << ' ';
+  deallog << std::endl;
+
+				   // same test, but do not initialize
+				   // from double*'s, but from
+				   // std::list iterators.
+  std::list<double> l(&array[0], &array[6]);
+  BlockVector<double> v2(ivector, l.begin(), l.end());
+  for (unsigned int i=0; i<v2.size(); ++i)
+    deallog << v2(i) << ' ';
+  deallog << std::endl;
+  deallog.pop ();
+
+  
   i3.reinit(ivector);
 
   deallog.push("global->local");

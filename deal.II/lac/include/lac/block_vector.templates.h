@@ -73,7 +73,7 @@ BlockVector<Number>::BlockVector (const BlockVector<Number>& v)
 template <typename Number>
 void BlockVector<Number>::reinit (const unsigned int n_bl,
 				  const unsigned int bl_sz,
-				  const bool                  fast)
+				  const bool         fast)
 {
   std::vector<unsigned int> n(n_bl, bl_sz);
   reinit(n, fast);

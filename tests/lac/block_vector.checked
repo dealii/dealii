@@ -1,4 +1,6 @@
 
+DEAL:BlockIndices:Initialization from iterators::0.000 1.000 2.000 3.000 4.000 5.000 
+DEAL:BlockIndices:Initialization from iterators::0.000 1.000 2.000 3.000 4.000 5.000 
 DEAL:BlockIndices:global->local::0	0	0	0	0	0	0
 DEAL:BlockIndices:global->local::1	0	1	0	1	0	1
 DEAL:BlockIndices:global->local::2	0	2	0	2	0	2
