@@ -25,10 +25,15 @@ using namespace std;
 
 
 // static variables
+#if deal_II_dimension == 2
 const unsigned int GridReorderingInfo<2>::rotational_states_of_cells;
 const unsigned int GridReorderingInfo<2>::rotational_states_of_faces;
+#endif
+
+#if deal_II_dimension == 3
 const unsigned int GridReorderingInfo<3>::rotational_states_of_cells;
 const unsigned int GridReorderingInfo<3>::rotational_states_of_faces;
+#endif
 
 template <int dim>
 const unsigned int GridReordering<dim>::Cell::invalid_neighbor;
