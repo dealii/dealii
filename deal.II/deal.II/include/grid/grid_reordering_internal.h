@@ -497,14 +497,24 @@ namespace internal
     struct Cell
     {
                                          /**
+                                          * Default Constructor
+                                          */
+        Cell ();
+
+                                         /**
+                                          * Copy Constructor
+                                          */
+        Cell (const Cell &c);
+
+                                         /**
                                           * The IDs for each of the edges.
                                           */
-        int edges[GeometryInfo<3>::lines_per_cell];
+        unsigned int edges[GeometryInfo<3>::lines_per_cell];
         
                                          /**
                                           * The IDs for each of the nodes.
                                           */        
-        int nodes[GeometryInfo<3>::vertices_per_cell];  
+        unsigned int nodes[GeometryInfo<3>::vertices_per_cell];  
 
                                          /**
                                           * Which way do the edges
@@ -523,17 +533,7 @@ namespace internal
                                           * to be oriented in the
                                           * current sheet.
                                           */
-        bool waiting_to_be_processed;  
-
-                                         /**
-                                          * Copy Constructor
-                                          */
-        Cell (const Cell &c);
-
-                                         /**
-                                          * Default Constructor
-                                          */
-        Cell();
+        bool waiting_to_be_processed;
     };
 
 
@@ -555,13 +555,10 @@ namespace internal
         Mesh ();
 
                                          /**
-                                          * The list of nodes
-                                          */
-        std::vector<Point<3> > node_list;
-                                         /**
                                           * The list of edges 
                                           */
         std::vector<Edge> edge_list;
+	
                                          /**
                                           * The list of cells
                                           */
@@ -578,7 +575,7 @@ namespace internal
                                           * Unimplemented private copy
                                           * constructor to disable it.
                                           */
-        Mesh(const Mesh&);
+        Mesh (const Mesh&);
 	
                                          /**
                                           * Unimplemented private

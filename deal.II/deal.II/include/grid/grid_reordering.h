@@ -648,8 +648,7 @@ class GridReordering<3>
 				      *  the general documentation of
 				      *  this class.
 				      */
-    static void reorder_cells (std::vector<CellData<3> > &original_cells,
-			       std::vector<Point<3> > * node_vec_ptr=NULL);
+    static void reorder_cells (std::vector<CellData<3> > &original_cells);
 };
 
 

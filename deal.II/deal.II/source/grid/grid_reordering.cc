@@ -578,7 +578,7 @@ namespace internal
 {
   namespace GridReordering3d
   {
-    DeclException1 (GridOrientError,
+    DeclException1 (ExcGridOrientError,
 		    char *,
 		    <<  "Grid Orientation Error: " << arg1);
 
@@ -857,14 +857,14 @@ namespace internal
     
     Cell::Cell () 
     {
-      for (unsigned int i = 0; i<GeometryInfo<3>::lines_per_cell; ++i)
+      for (unsigned int i=0; i<GeometryInfo<3>::lines_per_cell; ++i)
 	{
-	  edges[i] = -1;
+	  edges[i] = static_cast<unsigned int>(-1);
 	  local_orientation_flags[i] = 1;
 	}
       
-      for (unsigned int i = 0; i<GeometryInfo<3>::vertices_per_cell; ++i)
-	nodes[i] = -1;
+      for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+	nodes[i] = static_cast<unsigned int>(-1);
       
       waiting_to_be_processed = false;
     }
@@ -904,12 +904,12 @@ namespace internal
       const unsigned int ge1 = c.edges[e1];
       const unsigned int ge2 = c.edges[e2];
 
-      int or0 = ElementInfo::edge_to_node_orient[local_node_num][0] *
-		c.local_orientation_flags[e0];
-      int or1 = ElementInfo::edge_to_node_orient[local_node_num][1] *
-		c.local_orientation_flags[e1];
-      int or2 = ElementInfo::edge_to_node_orient[local_node_num][2] *
-		c.local_orientation_flags[e2];
+      const int or0 = ElementInfo::edge_to_node_orient[local_node_num][0] *
+		      c.local_orientation_flags[e0];
+      const int or1 = ElementInfo::edge_to_node_orient[local_node_num][1] *
+		      c.local_orientation_flags[e1];
+      const int or2 = ElementInfo::edge_to_node_orient[local_node_num][2] *
+		      c.local_orientation_flags[e2];
 
 				       // Make sure that edges agree
 				       // what the current node should
@@ -978,7 +978,7 @@ namespace internal
 						   // have a
 						   // contradiction
 		  AssertThrow(consistent(m,cur_posn),
-			      GridOrientError("Mesh is Unorientable"));
+			      ExcGridOrientError("Mesh is Unorientable"));
 						   // If we needed to
 						   // orient any edges
 						   // in the current
@@ -1106,7 +1106,7 @@ namespace internal
 				       // should be un-oriented
       for (int j = egrp*4; j<egrp*4+4; ++j)
 	Assert (m.edge_list[c.edges[j]].orientation_flag == 0,
-		GridOrientError("Tried to orient edge when other edges "
+		ExcGridOrientError("Tried to orient edge when other edges "
 				"in group already oriented!"));
 
 				       // Make the edge alignment
@@ -1134,21 +1134,22 @@ namespace internal
 
 
     
-    bool Orienter::orient_edge_set_in_current_cube(Mesh &m,
-						   const unsigned int n)
+    bool
+    Orienter::orient_edge_set_in_current_cube (Mesh &m,
+					       const unsigned int n)
     {
       const Cell& c = m.cell_list[cur_posn];
   
 				       // Check if any edge is
 				       // oriented
-      int num_oriented = 0;
+      unsigned int num_oriented = 0;
       int glorient = 0;
       unsigned int edge_flags = 0;
       unsigned int cur_flag = 1;
-      for (unsigned int i = 4*n; i<4*(n+1); ++i)
+      for (unsigned int i = 4*n; i<4*(n+1); ++i, cur_flag<<=1)
 	{
-	  int orient = m.edge_list[c.edges[i]].orientation_flag *
-		       c.local_orientation_flags[i];
+	  const int orient = m.edge_list[c.edges[i]].orientation_flag *
+			     c.local_orientation_flags[i];
 	  if (orient != 0)
 	    {
 	      num_oriented++;
@@ -1156,11 +1157,10 @@ namespace internal
 		glorient = orient;
 	      else
 		AssertThrow(orient == glorient,
-			    GridOrientError("Attempted to Orient Misaligned cube"));
+			    ExcGridOrientError("Attempted to Orient Misaligned cube"));
 	    }
 	  else
 	    edge_flags |= cur_flag;
-	  cur_flag *= 2;
 	}
 
 				       // were any of the sides
@@ -1172,17 +1172,15 @@ namespace internal
 				       // If so orient all edges
 				       // consistently.
       cur_flag = 1;
-      for (unsigned int i=4*n; i<4*(n+1); ++i)
-	{
-	  if ((edge_flags&cur_flag) != 0)
-	    {
-	      m.edge_list[c.edges[i]].orientation_flag 
-		= c.local_orientation_flags[i]*glorient;
-	      m.edge_list[c.edges[i]].group = cur_edge_group;
-	      edge_orient_array[i] = true;
-	    }
-	  cur_flag *= 2;
-	} 
+      for (unsigned int i=4*n; i<4*(n+1); ++i, cur_flag<<=1)
+	if ((edge_flags & cur_flag) != 0)
+	  {
+	    m.edge_list[c.edges[i]].orientation_flag 
+	      = c.local_orientation_flags[i]*glorient;
+	    m.edge_list[c.edges[i]].group = cur_edge_group;
+	    edge_orient_array[i] = true;
+	  }
+	
       return true;
     }
 
@@ -1282,58 +1280,61 @@ namespace internal
 					       // All edges should be
 					       // oriented at this
 					       // stage..
-	      Assert (the_edge.orientation_flag != 0,GridOrientError("Unoriented edge encountered"));
+	      Assert (the_edge.orientation_flag != 0,
+		      ExcGridOrientError ("Unoriented edge encountered"));
 					       // calculate whether it
 					       // points the right way
 					       // (1) or not (-1)
-	      local_edge_orientation[j] = (the_cell.local_orientation_flags[j]*the_edge.orientation_flag);
+	      local_edge_orientation[j] = (the_cell.local_orientation_flags[j] *
+					   the_edge.orientation_flag);
 	    }
 
 					   // Here the number of
 					   // incoming edges is
 					   // tallied for each node.
 	  int perm_num = -1;
-	  for (int node_num = 0;node_num<8;++node_num)
+	  for (unsigned int node_num=0; node_num<8; ++node_num)
 	    {
 					       // The local edge
 					       // numbers coming into
 					       // the node
-	      int iedg0 = ElementInfo::edge_to_node[node_num][0];
-	      int iedg1 = ElementInfo::edge_to_node[node_num][1];
-	      int iedg2 = ElementInfo::edge_to_node[node_num][2];
+	      const unsigned int e0 = ElementInfo::edge_to_node[node_num][0];
+	      const unsigned int e1 = ElementInfo::edge_to_node[node_num][1];
+	      const unsigned int e2 = ElementInfo::edge_to_node[node_num][2];
 
 					       // The local
 					       // orientation of the
 					       // edge coming into the
 					       // node.
-	      int isign0 = ElementInfo::edge_to_node_orient[node_num][0];
-	      int isign1 = ElementInfo::edge_to_node_orient[node_num][1];
-	      int isign2 = ElementInfo::edge_to_node_orient[node_num][2];
+	      const int sign0 = ElementInfo::edge_to_node_orient[node_num][0];
+	      const int sign1 = ElementInfo::edge_to_node_orient[node_num][1];
+	      const int sign2 = ElementInfo::edge_to_node_orient[node_num][2];
 
 					       // Add one to the total
 					       // for each edge
 					       // pointing in
-	      int Total  = ((local_edge_orientation[iedg0]*isign0 == 1)?1:0)
-			   + ((local_edge_orientation[iedg1]*isign1 == 1)?1:0)
-			   + ((local_edge_orientation[iedg2]*isign2 == 1)?1:0);
+	      const unsigned int
+		total  = (((local_edge_orientation[e0]*sign0 == 1) ? 1 : 0)
+			  +((local_edge_orientation[e1]*sign1 == 1) ? 1 : 0)
+			  +((local_edge_orientation[e2]*sign2 == 1) ? 1 : 0));
       
-	      if (Total == 3) 
+	      if (total == 3) 
 		{
 		  Assert (perm_num == -1,
-			  GridOrientError("More than one node with 3 incoming "
-					  "edges found in curent hex.")); 
+			  ExcGridOrientError("More than one node with 3 incoming "
+					     "edges found in curent hex.")); 
 		  perm_num = node_num;
 		}
 	    }
 					   // We should now have a
 					   // valid permutation number
 	  Assert (perm_num != -1,
-		  GridOrientError("No node having 3 incoming edges found in curent hex.")); 
+		  ExcGridOrientError("No node having 3 incoming edges found in curent hex.")); 
 
 					   // So use the apropriate
 					   // rotation to get the new
 					   // cube
-	  int temp[8];
+	  unsigned int temp[8];
 	  for (unsigned int i=0; i<8; ++i)
 	    temp[i] = the_cell.nodes[CubePermutations[perm_num][i]];
 	  for (unsigned int i=0; i<8; ++i)
@@ -1345,8 +1346,7 @@ namespace internal
 
 
 
-void GridReordering<3>::reorder_cells(std::vector<CellData<3> > &incubes,
-				      std::vector<Point<3> >    *node_vec_ptr)
+void GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
 {
 
   Assert (incubes.size() != 0,
@@ -1360,9 +1360,6 @@ void GridReordering<3>::reorder_cells(std::vector<CellData<3> > &incubes,
 				   // information it starts prety much
 				   // empty.
   internal::GridReordering3d::Mesh the_mesh;
-
-  if (node_vec_ptr != NULL)
-    the_mesh.node_list = *node_vec_ptr;
   
 				   // Copy the cells into our own
 				   // internal data format.
