@@ -399,6 +399,16 @@ ostream & operator << (ostream &out, const Point<dim> &p) {
 };
 
 
+template <>
+inline
+ostream & operator << (ostream &out, const Point<1> &p) {
+  out << p(0);
+  return out;
+};
+  
+
+
+
 
 /*----------------------------   point.h     ---------------------------*/
 /* end of #ifndef __point_H */
