@@ -10,8 +10,6 @@
 #include <grid/tria_boundary.h>
 
 
-#define UNDEF 0
-
 
 /*------------------------------- FiniteElementData ----------------------*/
 
