@@ -24,11 +24,14 @@ enum MeshSmoothing {
 
       eliminate_refined_inner_islands    = 0x100,
       eliminate_refined_boundary_islands = 0x200,
+      do_not_produce_unrefined_islands   = 0x400,
       
       smoothing_on_refinement            = (limit_level_difference_at_vertices |
 					    eliminate_unrefined_islands),
       smoothing_on_coarsening            = (eliminate_refined_inner_islands |
-					    eliminate_refined_boundary_islands),
+					    eliminate_refined_boundary_islands |
+					    do_not_produce_unrefined_islands),
+      
       maximum_smoothing                  = 0xffff
 };
 
@@ -1015,6 +1018,11 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     while those at the boundary may well be wanted, for example if one
  *     refines the mesh according to a criterion associated with a boundary
  *     integral or if one has rough boundary data.
+ *
+ *   \item #do_not_produce_unrefined_islands#:
+ *     This flag prevents the occurence of unrefined islands. In more detail:
+ *     It prohibits the coarsening of a cell if 'most of the neighbors' will
+ *     be refined after the step.
  *
  *   \item #smoothing_on_refinement#:
  *     This flag sums up all smoothing algorithms which may be performed upon
