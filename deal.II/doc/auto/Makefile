@@ -117,7 +117,7 @@ kdoc/names.html: $(kdoc.libray-files)
 # but it is hard to compute them from the '%'-sign used in the rule
 %.tex: %.doc++
 	$(DOCPP) -p -t -u -o $@ -ep a4wide $<
-#	rm $^
+	rm $^
 
 
 # generate temporary files from the doc++-latex-output which have
@@ -128,7 +128,7 @@ kdoc/names.html: $(kdoc.libray-files)
 	 perl scripts/process-tex        | \
 	 perl -pi -e 's/cxx\./$(basename $(notdir $@)).cxx./g;' > $@
 
-latex/abc.tex: latex/base.tex1 latex/lac.tex1 latex/dealII.tex1
+latex/deal_II_technical_reference.tex: latex/base.tex1 latex/lac.tex1 latex/dealII.tex1
 	@cat latex/header.tex                              > $@
 	@echo "\\\\chapter{Base library}"                 >> $@
 	@echo "\\\\def\\\\presentlib{base}"               >> $@
@@ -140,7 +140,7 @@ latex/abc.tex: latex/base.tex1 latex/lac.tex1 latex/dealII.tex1
 	@echo "\\\\def\\\\presentlib{dealII}"             >> $@
 	@cat latex/dealII.tex1                            >> $@
 	@cat latex/footer.tex                             >> $@
-#	rm $^
+	rm $^
 
 
 
@@ -151,9 +151,15 @@ latex/abc.tex: latex/base.tex1 latex/lac.tex1 latex/dealII.tex1
 	-rm $(subst .tex,.log,$<)
 	-rm $(subst .tex,.aux,$<)
 
+
+# generate postscript files from a latex output file
+%.ps: %.dvi
+	dvips $< -o $@
+
+
 clean:
 	-rm -f kdoc/names.html kdoc/*.kdoc kdoc/*/*.html cvs-backlog/*.html \
-		latex/base.* latex/lac.* latex/dealII.*
+		latex/base.* latex/lac.* latex/dealII.* latex/deal_II_technical_reference.*
 
 
 .PHONY: default all kdoc $(kdoc.library-files) $(kdoc.library-files.rerun) clean
