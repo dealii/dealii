@@ -177,7 +177,7 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     class const_iterator
     {
-      private:
+      public:
                                          /**
                                           * Accessor class for iterators
                                           */
