@@ -287,7 +287,18 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				      | update_normal_vectors));
 
   //  cerr << "Mapping-each " << hex << in << ' ' << out;
-  
+
+				   // The following is a little incorrect:
+				   // If not applied on a face,
+				   // update_boundary_forms does not
+				   // make sense. On the other hand,
+				   // it is necessary on a
+				   // face. Currently,
+				   // update_boundary_forms is simply
+				   // ignored for the interior of a
+				   // cell.
+//TODO: Consider giving this function information on whether we are on
+//  a face.
   if (out & (update_JxW_values
 	    |update_normal_vectors))
     out |= update_boundary_forms;
@@ -353,10 +364,7 @@ MappingQ1<dim>::compute_face_data (UpdateFlags update_flags,
 				   const unsigned int n_original_q_points,
 				   InternalData& data) const
 {
-  if (update_flags & update_JxW_values)
-    update_flags |= update_boundary_forms;
-  
-   compute_data (update_flags, q, n_original_q_points, data);
+  compute_data (update_flags, q, n_original_q_points, data);
 
 #if (deal_II_dimension>1)
   if (data.update_flags & update_boundary_forms)
