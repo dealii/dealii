@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000 by the deal.II authors
+# Copyright (C) 2000, 2001 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -99,6 +99,19 @@ endif
 
 show_transform: $(show_transform-o-files) $(libraries)
 	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
+
+############################################################
+
+performance-cc-files = performance.cc
+
+ifeq ($(debug-mode),on)
+performance-o-files = $(performance-cc-files:.cc=.go)
+else
+performance-o-files = $(performance-cc-files:.cc=.o)
+endif
+
+performance: $(performance-o-files) $(libraries)
+	@$(CXX) $(flags) -o $@ $^
 
 ############################################################
 
