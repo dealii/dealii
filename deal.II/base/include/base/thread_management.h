@@ -15,12 +15,11 @@
 
 
 #ifdef DEAL_II_USE_MT
+#  include <base/exceptions.h>
+#  include <ace/Thread_Manager.h>
+#  include <ace/Synch.h>
+#endif
 
-#include <base/exceptions.h>
-#include <ace/Thread_Manager.h>
-#include <ace/Synch.h>
-
-#include <string>
 #include <utility>
 #include <vector>
 #include <iterator>
@@ -33,6 +32,114 @@ namespace Threads
 				   // forward declarations
   class FunDataBase;
 
+/**
+ * This class is used instead of a true lock class when not using
+ * multithreading. It allows to write programs such that they start
+ * new threads and/or lock objects in multithreading mode, and use
+ * dummy thread management and synchronisation classes instead when
+ * running in single-thread mode. Specifically, the #spawn# functions
+ * only call the function but wait for it to return instead of running
+ * in on another thread, and the mutices do nothing really. The only
+ * reason to provide such a function is that the program can be
+ * compiled both in MT and non-MT mode without difference.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+  class DummyThreadMutex
+  {
+    public:
+				       /**
+					* Simulate acquisition of the
+					* mutex. As this class does
+					* nothing really, this
+					* function does nothing as
+					* well.
+					*/
+      inline void acquire () const {};
+
+				       /**
+					* Simulate release of the
+					* mutex. As this class does
+					* nothing really, this
+					* function does nothing as
+					* well.
+					*/
+      inline void release () const {};
+  };
+
+
+/**
+ * This class is used instead of a true thread manager class when not
+ * using multithreading. It allows to write programs such that they
+ * start new threads and/or lock objects in multithreading mode, and
+ * use dummy thread management and synchronisation classes instead
+ * when running in single-thread mode. Specifically, the #spawn#
+ * functions only call the function but wait for it to return instead
+ * of running in on another thread, and the mutices do nothing
+ * really. The only reason to provide such a function is that the
+ * program can be compiled both in MT and non-MT mode without
+ * difference.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+  class DummyThreadManager 
+  {
+    public:
+				       /**
+					* Typedef for a global
+					* function that might be
+					* called on a new thread.
+					*/
+      typedef void * (*FunPtr) (void *);
+
+				       /**
+					* Emulate spawning a new
+					* thread and calling the
+					* passed function
+					* thereon. Actually only call
+					* that function with the given
+					* parameters, and wait for it
+					* to return.
+					*/
+      void spawn (const FunPtr fun_ptr,
+		  void *       fun_data,
+		  int          flags) const;
+
+				       /**
+					* Emulate that we wait for
+					* other threads to
+					* return. Since no other
+					* threads have been started,
+					* the right thing, of course,
+					* is to return immediately.
+					*/
+      inline void wait () const {};
+  };
+
+  
+#ifdef DEAL_II_USE_MT
+				   /**
+				    * In multithread mode, we alias
+				    * the mutex and thread management
+				    * classes to the respective
+				    * classes of the ACE library.
+				    */
+  typedef ACE_Thread_Mutex   ThreadMutex;
+  typedef ACE_Thread_Manager ThreadManager;
+#else
+				   /**
+				    * In non-multithread mode, the
+				    * mutex and thread management
+				    * classes are aliased to dummy
+				    * classes that actually do
+				    * nothing, in particular not lock
+				    * objects or start new threads.
+				    */
+  typedef DummyThreadMutex   ThreadMutex;
+  typedef ThreadManager      ThreadManager;
+#endif
+
+  
 
 /**
  * Class used to store a pointer temporarily and delete the object
@@ -151,7 +258,7 @@ namespace Threads
 					* no data is deleted when it is
 					* still in use.
 					*/
-      mutable ACE_Thread_Mutex lock;
+      mutable ThreadMutex lock;
     
     private:
 				       /**
@@ -169,8 +276,8 @@ namespace Threads
 					* needs to have access to the
 					* #thread_entry_point# variable.
 					*/
-      friend void spawn (ACE_Thread_Manager       &thread_manager,
-			 const FunEncapsulation   &fun_data);
+      friend void spawn (ThreadManager          &thread_manager,
+			 const FunEncapsulation &fun_data);
   };
 
 
@@ -1973,7 +2080,7 @@ namespace Threads
 				    * using the given thread manager
 				    * object.
 				    */
-  void spawn (ACE_Thread_Manager     &thread_manager,
+  void spawn (ThreadManager          &thread_manager,
 	      const FunEncapsulation &fun_data);
 
 
@@ -1982,7 +2089,7 @@ namespace Threads
 				    * using the same parameters and
 				    * calling the same function.
 				    */
-  void spawn_n (ACE_Thread_Manager     &thread_manager,
+  void spawn_n (ThreadManager          &thread_manager,
 		const FunEncapsulation &fun_encapsulation,
 		const unsigned int      n_threads);
 
@@ -2076,7 +2183,7 @@ namespace Threads
 					* Exception
 					*/
       DeclException2 (ExcObjectsExist,
-		      string, int,
+		      char*, int,
 		      << "There are still " << arg2 << " objects of type "
 		      << arg1 << " alive. You probably have a memory "
 		      << "leak somewhere.");
@@ -3554,7 +3661,6 @@ namespace Threads
 };   // end of implementation of namespace Threads
 
 
-#endif // DEAL_II_USE_MT
 
 
 //----------------------------   thread_management.h     ---------------------------

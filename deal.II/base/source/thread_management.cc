@@ -20,6 +20,15 @@
 
 namespace Threads 
 {
+  void DummyThreadManager::spawn (const FunPtr fun_ptr,
+				  void *       fun_data,
+				  int          /*flags*/) const
+  {
+    (*fun_ptr) (fun_data);
+  };
+  
+
+  
   FunDataCounter::FunDataCounter () :
 		  n_fun_encapsulation_objects (0),
 		  n_fun_data_base_objects (0)
@@ -135,7 +144,7 @@ namespace Threads
 
 
     
-  void spawn (ACE_Thread_Manager     &thread_manager,
+  void spawn (ThreadManager          &thread_manager,
 	      const FunEncapsulation &fun_data)
   {
 				     // lock the #fun_data_base# object
@@ -152,7 +161,7 @@ namespace Threads
 
 
   
-  void spawn_n (ACE_Thread_Manager     &thread_manager,
+  void spawn_n (ThreadManager          &thread_manager,
 		const FunEncapsulation &fun_data,
 		const unsigned int      n_threads)
   {
