@@ -83,8 +83,6 @@ documentation, etc</a>.
        functionality constitutes a significant improvement of
        <acronym>deal.II</acronym>. Results produced by the new code
        match those of the old design up to machine precision.
-       </p>
-       
        <br>
        (RH & GK 2001/03/13)
        </p>
@@ -221,7 +219,6 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-
        Removed: The explicite instantiations of <code
        class="class">SparseMatrix&lt;long double&gt;</code> are
        removed as a prerelease of gcc3.0 fails to compile it. A user
@@ -234,7 +231,8 @@ documentation, etc</a>.
        (RH 2001/03/14)
        </p>
   
-  <li> <p> New: class <code
+  <li> <p> 
+       New: class <code
        class="class">BlockMatrixArray&lt;MATRIX&gt;</code> implements
        a block matrix based on an array of matrix pointers. Since this
        array may be incomplete, no direct access to entries is
@@ -266,6 +264,28 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+
+       New: The new function <code
+       class="class">PersistentTriangulation&lt;dim&gt;</code>::<code
+       class="member">restore(unsigned int)</code> allows to restore
+       the triangulation step by step.
+       <br>
+       New: Now there exists a function <code
+       class="class">PersistentTriangulation&lt;dim&gt;</code>::<code
+       class="member">clear_flags</code> to allow to re-<code
+       class="member">read_flags</code> without the need of clearing
+       the triangulation in advance.
+       <br>
+       New: The new function <code
+       class="class">PersistentTriangulation&lt;dim&gt;</code>::<code
+       class="member">n_refinement_steps</code> returns the number of
+       refinement steps stored in <code
+       class="member">refine_flags</code>.
+       <br>
+       (RH 2001/03/20)
+       </p>
+
   <li> <p>
        New: <code class="class">GridGenerator</code>::<code
        class="member">hyper_rectangle</code> creates
