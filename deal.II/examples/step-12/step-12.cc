@@ -1531,7 +1531,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   Assert (cycle < 10, ExcInternalError());
   
   filename += ".eps";
-  cout << "Writing grid to <" << filename << ">..." << endl;
+  std::cout << "Writing grid to <" << filename << ">..." << std::endl;
   std::ofstream eps_output (filename.c_str());
 
   GridOut grid_out;
@@ -1544,7 +1544,8 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   Assert (cycle < 10, ExcInternalError());
   
   filename += ".gnuplot";
-  cout << "Writing solution to <" << filename << ">..." << endl << endl;
+  std::cout << "Writing solution to <" << filename << ">..."
+	    << std::endl << std::endl;
   std::ofstream gnuplot_output (filename.c_str());
   
   DataOut<dim> data_out;
@@ -1607,7 +1608,9 @@ void DGMethod<dim>::run ()
 				       // current time without
 				       // disturbing the time
 				       // measurement.
-      cout << "Time of assemble_system1: " << assemble_timer() << endl;
+      std::cout << "Time of assemble_system1: "
+		<< assemble_timer()
+		<< std::endl;
       solve (solution1);
 
 				       // As preparation for the
@@ -1624,7 +1627,9 @@ void DGMethod<dim>::run ()
 				       // call the second assembling routine
       assemble_system2 ();
 				       // and access the current time.
-      cout << "Time of assemble_system2: " << assemble_timer() << endl;
+      std::cout << "Time of assemble_system2: "
+		<< assemble_timer()
+		<< std::endl;
       solve (solution2);
 
 				       // To make sure that both
@@ -1636,7 +1641,7 @@ void DGMethod<dim>::run ()
       solution1-=solution2;
       const double difference=solution1.linfty_norm();
       if (difference>1e-13)
-	cout << "solution1 and solution2 differ!!" << endl;
+	std::cout << "solution1 and solution2 differ!!" << std::endl;
 
 				       // Finally we perform the
 				       // output.
