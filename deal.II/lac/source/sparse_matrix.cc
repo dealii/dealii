@@ -7,7 +7,6 @@
 
 
 #include <lac/sparsematrix.h>
-//#include <lac/sparsematrix.templates.h>
 #include <lac/ivector.h>
 
 #include <iostream>
