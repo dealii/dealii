@@ -817,7 +817,7 @@ residual (BlockVector<somenumber>          &dst,
   somenumber res = 0;
   for (unsigned int row=0; row<rows; ++row)
     res += dst.block(row).norm_sqr ();
-  return sqrt(res);
+  return std::sqrt(res);
 };
 
 
