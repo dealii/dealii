@@ -32,7 +32,28 @@ void first_grid ()
 {
 				   // Define an object for a
 				   // triangulation of a
-				   // two-dimensional domain
+				   // two-dimensional domain. Here and
+				   // in many following cases, the
+				   // string "<2>" after a class name
+				   // indicates that this is an object
+				   // that shall work in two space
+				   // dimensions. Likewise, there are
+				   // version working in one ("<1>")
+				   // and three ("<3>") space
+				   // dimension, or for all
+				   // dimensions. We will see such
+				   // constructs in later examples,
+				   // where we show how to program
+				   // dimension independently.
+				   // (At present, only one through
+				   // three space dimensions are
+				   // supported, but that is not a
+				   // restriction. In case someone
+				   // would like to implement four
+				   // dimensional finite elements, for
+				   // example for general relativity,
+				   // this would be a straightforward
+				   // thing.)
   Triangulation<2> triangulation;
   
 				   // Fill it with a square
