@@ -53,28 +53,34 @@ struct FiniteElementData<1> {
 				      */
     const unsigned int total_dofs;
 
+				     /**
+				      * Number of basis functions used for the
+				      * transformation from unit cell to real
+				      * cell. For a linear mapping, this number
+				      * equals the number of vertices.
+				      */
+    const unsigned int n_transform_functions;
+    
     				     /**
 				      * Default constructor. Constructs an element
 				      * which is not so useful. Checking
 				      * #total_dofs# is therefore a good way to
 				      * check if something went wrong.
 				      */
-    FiniteElementData () :
-		    dofs_per_vertex(0),
-		    dofs_per_line(0),
-		    dofs_per_face(0),
-		    total_dofs(0) {};
+    FiniteElementData ();
 
 				     /**
 				      * A more useful version to construct
 				      * an object of this type.
 				      */
     FiniteElementData (const unsigned int dofs_per_vertex,
-		       const unsigned int dofs_per_line) :
+		       const unsigned int dofs_per_line,
+		       const unsigned int n_transform_functions) :
 		    dofs_per_vertex(dofs_per_vertex),
 		    dofs_per_line(dofs_per_line),
 		    dofs_per_face(dofs_per_vertex),
-		    total_dofs (2*dofs_per_vertex+dofs_per_line) {};
+		    total_dofs (2*dofs_per_vertex+dofs_per_line),
+		    n_transform_functions(n_transform_functions) {};
 
 				     /**
 				      * Comparison operator. It is not clear to
@@ -82,6 +88,11 @@ struct FiniteElementData<1> {
 				      * this one explicitely.
 				      */
     bool operator == (const FiniteElementData<1> &) const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
 };
 
 
@@ -128,18 +139,21 @@ struct FiniteElementData<2> {
 				      */
     const unsigned int total_dofs;
 
+				     /**
+				      * Number of basis functions used for the
+				      * transformation from unit cell to real
+				      * cell. For a linear mapping, this number
+				      * equals the number of vertices.
+				      */
+    const unsigned int n_transform_functions;
+
     				     /**
 				      * Default constructor. Constructs an element
 				      * which is not so useful. Checking
 				      * #total_dofs# is therefore a good way to
 				      * check if something went wrong.
 				      */
-    FiniteElementData () :
-		    dofs_per_vertex(0),
-		    dofs_per_line(0),
-		    dofs_per_quad(0),
-		    dofs_per_face(0),
-		    total_dofs(0) {};
+    FiniteElementData ();
 
 				     /**
 				      * A more useful version to construct
@@ -147,7 +161,8 @@ struct FiniteElementData<2> {
 				      */
     FiniteElementData (const unsigned int dofs_per_vertex,
 		       const unsigned int dofs_per_line,
-		       const unsigned int dofs_per_quad) :
+		       const unsigned int dofs_per_quad,
+		       const unsigned int n_transform_functions) :
 		    dofs_per_vertex(dofs_per_vertex),
 		    dofs_per_line(dofs_per_line),
 		    dofs_per_quad(dofs_per_quad),
@@ -155,7 +170,8 @@ struct FiniteElementData<2> {
 				  dofs_per_line),
 		    total_dofs (4*dofs_per_vertex+
 				4*dofs_per_line+
-				dofs_per_quad) {};
+				dofs_per_quad),
+		    n_transform_functions (n_transform_functions) {};
 
 				     /**
 				      * Comparison operator. It is not clear to
@@ -163,6 +179,11 @@ struct FiniteElementData<2> {
 				      * this one explicitely.
 				      */
     bool operator == (const FiniteElementData<2> &) const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
 };
 
     
@@ -202,7 +223,8 @@ struct FiniteElementBase : public FiniteElementData<dim> {
 				      */
     FiniteElementBase (const unsigned int dofs_per_vertex,
 		       const unsigned int dofs_per_line,
-		       const unsigned int dofs_per_quad=0);
+		       const unsigned int dofs_per_quad,
+		       const unsigned int n_transform_functions);
     
 				     /**
 				      * Return a readonly reference to the
@@ -266,10 +288,6 @@ struct FiniteElementBase : public FiniteElementData<dim> {
 		    << "The interface matrix has a size of " << arg1
 		    << "x" << arg2
 		    << ", which is not reasonable in the present dimension.");
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInternalError);
     
   protected:
 				     /**
@@ -474,10 +492,12 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      */
     FiniteElement (const unsigned int dofs_per_vertex,
 		   const unsigned int dofs_per_line,
-		   const unsigned int dofs_per_quad=0) :
+		   const unsigned int dofs_per_quad,
+		   const unsigned int n_transform_functions) :
 		    FiniteElementBase<dim> (dofs_per_vertex,
 					    dofs_per_line,
-					    dofs_per_quad) {};
+					    dofs_per_quad,
+					    n_transform_functions) {};
 
 				     /**
 				      * Destructor. Only declared to have a
@@ -492,7 +512,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * #p# is a point on the reference element.
 				      */
     virtual double shape_value (const unsigned int i,
-			        const Point<dim>& p) const = 0;
+			        const Point<dim> &p) const = 0;
 
 				     /**
 				      * Return the gradient of the #i#th shape
@@ -500,8 +520,28 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * #p# is a point on the reference element,
 				      */
     virtual Point<dim> shape_grad (const unsigned int i,
-				   const Point<dim>& p) const = 0;
+				   const Point<dim> &p) const = 0;
 
+				     /**
+				      * Return the value of the #i#th shape
+				      * function of the transformation mapping
+				      * from unit cell to real cell. For
+				      * isoparametric elements, this function
+				      * is the same as the ansatz functions,
+				      * but for sublinear or other mappings,
+				      * they differ.
+				      */
+    virtual double shape_value_transform (const unsigned int i,
+					  const Point<dim> &p) const = 0;
+
+				     /**
+				      * Same as above: return gradient of the
+				      * #i#th shape function for the mapping
+				      * from unit to real cell.
+				      */
+    virtual Point<dim> shape_grad_transform (const unsigned int i,
+					     const Point<dim> &p) const = 0;    
+    
 				     /**
 				      * Compute the Jacobian matrix and the
 				      * quadrature points as well as the ansatz
@@ -538,6 +578,17 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * unit cell to the real cell, which
 				      * makes things much more complicated.
 				      *
+				      * The #shape_values/grads_transform#
+				      * arrays store the values and gradients
+				      * of the transformation basis functions.
+				      * While this information is not necessary
+				      * for the computation of the other fields,
+				      * it allows for significant speedups, since
+				      * the values and gradients of the transform
+				      * functions at the quadrature points
+				      * need not be recomputed each time this
+				      * function is called.
+				      *
 				      * The function assumes that the fields
 				      * already have the right number of
 				      * elements.
@@ -555,6 +606,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				 const bool           compute_ansatz_points,
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
+				 const dFMatrix      &shape_values_transform,
+				 const vector<vector<Point<dim> > > &shape_grads_transform,
 				 const Boundary<dim> &boundary) const;
 
 				     /**
@@ -675,6 +728,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      const bool           compute_face_jacobians,
 				      vector<Point<dim> > &normal_vectors,
 				      const bool           compute_normal_vectors,
+				      const dFMatrix      &shape_values_transform,
+				      const vector<vector<Point<dim> > > &shape_grads_transform,
 				      const Boundary<dim> &boundary) const;
 
 				     /**
@@ -718,6 +773,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 					 const bool           compute_face_jacobians,
 					 vector<Point<dim> > &normal_vectors,
 					 const bool           compute_normal_vectors,
+					 const dFMatrix      &shape_values_transform,
+					 const vector<vector<Point<dim> > > &shape_grads_transform,
 					 const Boundary<dim> &boundary) const;
 
 				     /**
@@ -984,7 +1041,30 @@ class FELinearMapping : public FiniteElement<dim> {
 		     const unsigned int dofs_per_quad=0) :
 		    FiniteElement<dim> (dofs_per_vertex,
 					dofs_per_line,
-					dofs_per_quad) {};
+					dofs_per_quad,
+					GeometryInfo<dim>::vertices_per_cell) {};
+
+    				     /**
+				      * Return the value of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      * Here, the (bi-)linear basis functions
+				      * are meant, which are used for the
+				      * computation of the transformation from
+				      * unit cell to real space cell.
+				      */
+    virtual double shape_value_transform (const unsigned int i,
+					  const Point<dim> &p) const;
+
+				     /**
+				      * Return the gradient of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      * Here, the (bi-)linear basis functions
+				      * are meant, which are used for the
+				      * computation of the transformation from
+				      * unit cell to real space cell.
+				      */
+    virtual Point<dim> shape_grad_transform (const unsigned int i,
+					     const Point<dim> &p) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -1073,30 +1153,9 @@ class FELinearMapping : public FiniteElement<dim> {
 				 const bool           compute_ansatz_points,
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
+				 const dFMatrix      &shape_values_transform,
+				 const vector<vector<Point<dim> > > &shape_grad_transform,
 				 const Boundary<dim> &boundary) const;
-
-  protected:
-    				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
-				      * Here, the (bi-)linear basis functions
-				      * are meant, which are used for the
-				      * computation of the transformation from
-				      * unit cell to real space cell.
-				      */
-    double linear_shape_value(const unsigned int i,
-			      const Point<dim>& p) const;
-
-				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
-				      * Here, the (bi-)linear basis functions
-				      * are meant, which are used for the
-				      * computation of the transformation from
-				      * unit cell to real space cell.
-				      */
-    Point<dim> linear_shape_grad(const unsigned int i,
-				 const Point<dim>& p) const;
 };
 
 

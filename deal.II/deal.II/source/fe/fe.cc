@@ -14,6 +14,17 @@
 
 #if deal_II_dimension == 1
 
+FiniteElementData<1>::FiniteElementData () :
+		dofs_per_vertex(0),
+		dofs_per_line(0),
+		dofs_per_face(0),
+		total_dofs(0),
+		n_transform_functions(0) {
+  Assert (false, ExcInternalError());
+};
+
+
+
 bool FiniteElementData<1>::operator== (const FiniteElementData<1> &f) const {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
 	  (dofs_per_line == f.dofs_per_line) &&
@@ -25,6 +36,19 @@ bool FiniteElementData<1>::operator== (const FiniteElementData<1> &f) const {
 
 
 #if deal_II_dimension == 2
+
+
+FiniteElementData<2>::FiniteElementData () :
+		dofs_per_vertex(0),
+		dofs_per_line(0),
+		dofs_per_quad(0),
+		dofs_per_face(0),
+		total_dofs(0),
+		n_transform_functions(0) {
+  Assert (false, ExcInternalError());
+};
+
+
 
 bool FiniteElementData<2>::operator== (const FiniteElementData<2> &f) const {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
@@ -45,9 +69,11 @@ bool FiniteElementData<2>::operator== (const FiniteElementData<2> &f) const {
 template <>
 FiniteElementBase<1>::FiniteElementBase (const unsigned int dofs_per_vertex,
 					 const unsigned int dofs_per_line,
-					 const unsigned int dofs_per_quad) :
+					 const unsigned int dofs_per_quad,
+					 const unsigned int n_transform_funcs) :
 		FiniteElementData<1> (dofs_per_vertex,
-				      dofs_per_line)
+				      dofs_per_line,
+				      n_transform_functs)
 {
   Assert (dofs_per_quad==0, ExcInternalError());
 
@@ -69,10 +95,12 @@ FiniteElementBase<1>::FiniteElementBase (const unsigned int dofs_per_vertex,
 template <>
 FiniteElementBase<2>::FiniteElementBase (const unsigned int dofs_per_vertex,
 					 const unsigned int dofs_per_line,
-					 const unsigned int dofs_per_quad) :
+					 const unsigned int dofs_per_quad,
+					 const unsigned int n_transform_funcs) :
 		FiniteElementData<2> (dofs_per_vertex,
 				      dofs_per_line,
-				      dofs_per_quad)
+				      dofs_per_quad,
+				      n_transform_funcs)
 {
   const unsigned int dim=2;
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
@@ -153,6 +181,8 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				       const bool         compute_ansatz_points,
 				       vector<Point<1> > &q_points,
 				       const bool         compute_q_points,
+				       const dFMatrix      &shape_values_transform,
+				       const vector<vector<Point<dim> > > &shape_grad_transform,
 				       const Boundary<1> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -198,6 +228,8 @@ void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &
 					    const bool              ,
 					    vector<Point<1> >       &,
 					    const bool,
+					    const dFMatrix          &,
+					    const vector<vector<Point<1> > > &,
 					    const Boundary<1>       &) const {
   Assert (false, ExcNotImplemented());
 };
@@ -217,6 +249,8 @@ void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterato
 					       const bool               ,
 					       vector<Point<1> >       &,
 					       const bool,
+					       const dFMatrix          &,
+					       const vector<vector<Point<1> > > &,
 					       const Boundary<1>       &) const {
   Assert (false, ExcNotImplemented());
 };
@@ -260,6 +294,8 @@ void FiniteElement<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
 					 const bool,
 					 vector<Point<dim> > &,
 					 const bool,
+					 const dFMatrix      &,
+					 const vector<vector<Point<dim> > > &,
 					 const Boundary<dim> &) const {
   Assert (false, ExcPureFunctionCalled());
 };
@@ -281,6 +317,8 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 					      const bool           compute_face_jacobians,
 					      vector<Point<dim> > &normal_vectors,
 					      const bool           compute_normal_vectors,
+					      const dFMatrix      &shape_values_transform,
+					      const vector<vector<Point<dim> > > &shape_gradients_transform,
 					      const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -296,6 +334,7 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 		  jacobians, compute_jacobians,
 		  dummy, false,
 		  q_points, compute_q_points,
+		  shape_values_transform, shape_gradients_transform,
 		  boundary);
   
   if (compute_ansatz_points)
@@ -327,6 +366,8 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 						 const bool           compute_face_jacobians,
 						 vector<Point<dim> > &normal_vectors,
 						 const bool           compute_normal_vectors,
+						 const dFMatrix      &shape_values_transform,
+						 const vector<vector<Point<dim> > > &shape_gradients_transform,
 						 const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -340,6 +381,7 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 		  jacobians, compute_jacobians,
 		  dummy, false,
 		  q_points, compute_q_points,
+		  shape_values_transform, shape_gradients_transform,
 		  boundary);
   
   if (compute_face_jacobians)
@@ -362,13 +404,16 @@ void FiniteElement<dim>::get_ansatz_points (const DoFHandler<dim>::cell_iterator
 
 
 
+
+/*---------------------------- FELinearMapping ----------------------------------*/
+
 #if deal_II_dimension == 1
 
 template <>
 inline
 double
-FELinearMapping<1>::linear_shape_value(const unsigned int i,
-				       const Point<1>     &p) const
+FELinearMapping<1>::shape_value_transform (const unsigned int i,
+					   const Point<1>     &p) const
 {
   Assert((i<2), ExcInvalidIndex(i));
   const double xi = p(0);
@@ -385,8 +430,8 @@ FELinearMapping<1>::linear_shape_value(const unsigned int i,
 template <>
 inline
 Point<1>
-FELinearMapping<1>::linear_shape_grad(const unsigned int i,
-				     const Point<1>&) const
+FELinearMapping<1>::shape_grad_transform(const unsigned int i,
+					 const Point<1>&) const
 {
   Assert((i<2), ExcInvalidIndex(i));
   switch (i)
@@ -400,7 +445,7 @@ FELinearMapping<1>::linear_shape_grad(const unsigned int i,
 
 
 template <>
-void FEQuadraticSub<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
+void FELinearMapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 					    const Boundary<1>         &,
 					    const vector<Point<0> > &,
 					    vector<double>      &) const {
@@ -410,7 +455,7 @@ void FEQuadraticSub<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &
 
 
 template <>
-void FEQuadraticSub<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
+void FELinearMapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
 					       const unsigned int           ,
 					       const vector<Point<0> > &,
 					       vector<double>      &) const {
@@ -420,7 +465,7 @@ void FEQuadraticSub<1>::get_subface_jacobians (const DoFHandler<1>::face_iterato
 
 
 template <>
-void FEQuadraticSub<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
+void FELinearMapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					    const unsigned int,
 					    const Boundary<1> &,
 					    const vector<Point<0> > &,
@@ -431,7 +476,7 @@ void FEQuadraticSub<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &
 
 
 template <>
-void FEQuadraticSub<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
+void FELinearMapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					    const unsigned int,
 					    const unsigned int,
 					    const vector<Point<0> > &,
@@ -449,12 +494,16 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 					 const bool         compute_ansatz_points,
 					 vector<Point<1> > &q_points,
 					 const bool         compute_q_points,
+					 const dFMatrix      &shape_values_transform,
+					 const vector<vector<Point<dim> > > &shape_gradients_transform,
 					 const Boundary<1> &boundary) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
 				    ansatz_points, compute_ansatz_points,
-				    q_points, compute_q_points, boundary);
+				    q_points, compute_q_points,
+				    shape_values_transform, shape_gradients_transform,
+				    boundary);
 };
 
 
@@ -468,8 +517,8 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 template <>
 inline
 double
-FELinearMapping<2>::linear_shape_value (const unsigned int i,
-				       const Point<2>& p) const
+FELinearMapping<2>::shape_value_transform (const unsigned int i,
+					   const Point<2>& p) const
 {
   Assert((i<4), ExcInvalidIndex(i));
   switch (i)
@@ -487,8 +536,8 @@ FELinearMapping<2>::linear_shape_value (const unsigned int i,
 template <>
 inline
 Point<2>
-FELinearMapping<2>::linear_shape_grad (const unsigned int i,
-				      const Point<2>& p) const
+FELinearMapping<2>::shape_grad_transform (const unsigned int i,
+					  const Point<2>& p) const
 {
   Assert((i<4), ExcInvalidIndex(i));
   switch (i)
@@ -629,6 +678,8 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 					   const bool           compute_ansatz_points,
 					   vector<Point<dim> > &q_points,
 					   const bool           compute_q_points,
+					   const dFMatrix      &shape_values_transform,
+					   const vector<vector<Point<dim> > > &shape_grad_transform,
 					   const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -665,7 +716,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 				       // use a subparametric mapping
       for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j) 
 	for (unsigned int l=0; l<n_points; ++l) 
-	  q_points[l] += vertices[j] * linear_shape_value(j, unit_points[l]);
+	  q_points[l] += vertices[j] * shape_values_transform(j, l);
     };
   
 
@@ -697,7 +748,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 	    {
 					       // we want the linear transform,
 					       // so use that function
-	      const Point<dim> gradient = linear_shape_grad (s, unit_points[l]);
+	      const Point<dim> gradient = shape_grad_transform[s][l];
 	      for (unsigned int i=0; i<dim; ++i)
 		for (unsigned int j=0; j<dim; ++j)
 		  M(i,j) += vertices[s](i) * gradient(j);
@@ -714,7 +765,6 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 
 /*------------------------------- Explicit Instantiations -------------*/
 
-template class FiniteElementData<deal_II_dimension>;
 template class FiniteElementBase<deal_II_dimension>;
 template class FiniteElement<deal_II_dimension>;
 template class FELinearMapping<deal_II_dimension>;

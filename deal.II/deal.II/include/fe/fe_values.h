@@ -57,6 +57,32 @@ template <int dim> class Quadrature;
  *  the derived classes and the #get_values# function for the exact usage of
  *  this variable.
  *
+ *  For many of the actual computations done by the #fill_fe_*# functions of
+ *  the #FiniteElement# class and its decendants, the values and gradients of
+ *  the transformation functions are needed. For example, for the computation
+ *  of the real location of a quadrature point from the location on the unit
+ *  cell, the values are needed, while for the computation of the Jacobian
+ *  matrix the gradient is needed. While for linear elements the transformation
+ *  functions coincide with the ansatz functions, this does not hold for higher
+ *  order elements with subparametric mappings and for other types of elements
+ *  such as non-conforming ones, etc, such that the precomputed values and
+ *  gradients of the ansatz functions (#unit_shape_values# and
+ *  #unit_shape_grads#) cannot be used for the present purpose.
+ *  In principle, these values could be computed each time the #fill_fe_*#
+ *  function is called; however, this computation is highly redundant, since
+ *  only the values on the unit cell and only at the quadrature points are
+ *  needed, i.e. they are the same for each cell that #fill_fe_*# is called.
+ *  Therefore, two additional arrays, #unit_shape_values_transform# and
+ *  #unit_shape_grads_transform# are provided, which are filled upon construction
+ *  of an object of this type, which the actual finite element may or may not
+ *  use. Later on, the #fill_fe_*# functions are passed pointers to these
+ *  arrays, which they may use to extract the values and gradients of the
+ *  transform functions. If a concrete finite element choses not to use this
+ *  field, it shall set its field #n_transform_functions# to zero.
+ *
+ *  The #unit_shape_grads_transform# array is provided by the derived classes
+ *  to allow for the inclusion of multiple faces, etc.
+ *
  *
  *  \subsection{Definitions}
  *
@@ -141,7 +167,6 @@ template <int dim> class Quadrature;
  * not assume that someone who wants to get the #JxW_values# must set the
  * #update_jacobians# flag besides the #update_JxW_values# flag.
  *
- *
  * It is also forbidden that the constructor of a class set the
  * #update_jacobians# flag if the user specifies #update_JxW_values#. This is
  * since derived classes may be able to compute the #JxW_values# field without
@@ -170,6 +195,14 @@ class FEValuesBase {
     const unsigned int total_dofs;
 
 				     /**
+				      * Number of basis functions for the
+				      * transformation from the unit cell
+				      * to the real cell. See the docs for
+				      * more information on this field.
+				      */
+    const unsigned int n_transform_functions;
+    
+				     /**
 				      * Constructor. Set up the array sizes
 				      * with #n_q_points# quadrature points,
 				      * #n_ansatz_points# ansatz points (on
@@ -186,6 +219,7 @@ class FEValuesBase {
     FEValuesBase (const unsigned int n_q_points,
 		  const unsigned int n_ansatz_points,
 		  const unsigned int n_dofs,
+		  const unsigned int n_transform_functions,
 		  const unsigned int n_values_array,
 		  const UpdateFlags update_flags);
     
@@ -471,6 +505,27 @@ class FEValuesBase {
     vector<dFMatrix>     jacobi_matrices;
 
 				     /**
+				      * Store the values of the basis functions
+				      * of the transformation from unit cell
+				      * to real cell at the quadrature points.
+				      *
+				      * This field stores some data which is not
+				      * really needed for the assemblage of
+				      * matrices and vectors but makes that
+				      * operation much faster. Each time the
+				      * #FEValues::reinit# function calls
+				      * the #FiniteElemenet::fill_fe_values#
+				      * function, this and the next array are
+				      * passed. The #fill_fe_values# function
+				      * may or may not use this field.
+				      *
+				      * The element #(i,j)# denotes the value
+				      * of the #i#th transfer basis function
+				      * at the #j#th quadrature point.
+				      */
+    vector<dFMatrix>     shape_values_transform;
+
+				     /**
 				      * Store which of the data sets in the
 				      * #shape_values# array is presently
 				      * active. This variable is set by the
@@ -484,7 +539,7 @@ class FEValuesBase {
 				      * Store which fields are to be updated by
 				      * the reinit function.
 				      */
-    UpdateFlags         update_flags;
+    UpdateFlags          update_flags;
 
 				     /**
 				      * Store the cell selected last time
@@ -575,7 +630,14 @@ class FEValues : public FEValuesBase<dim> {
 				      */
     vector<vector<Point<dim> > >   unit_shape_gradients;
     
-
+				     /**
+				      * Gradients of the basis
+				      * functions of the transformation.
+				      * Analogous to the #shape_values_transform#
+				      * array of the base class.
+				      */
+    vector<vector<Point<dim> > >   unit_shape_gradients_transform;
+    
 				     /**
 				      * Array of quadrature points in the unit
 				      * cell. This array is set up upon
@@ -680,6 +742,7 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
     FEFaceValuesBase (const unsigned int n_q_points,
 		      const unsigned int n_ansatz_points,
 		      const unsigned int n_dofs,
+		      const unsigned int n_transform_functions,
 		      const unsigned int n_faces_or_subfaces,
 		      const UpdateFlags update_flags);
 
@@ -712,6 +775,14 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
 				      * #unit_shape_gradients[face][dof][q_point]#
 				      */
     vector<vector<vector<Point<dim> > > > unit_shape_gradients;
+    
+				     /**
+				      * Gradients of the basis
+				      * functions of the transformation.
+				      * Analogous to the #shape_values_transform#
+				      * array of the base class.
+				      */
+    vector<vector<vector<Point<dim> > > > unit_shape_gradients_transform;
 
     				     /**
 				      * Array of quadrature points on the
