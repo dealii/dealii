@@ -117,6 +117,8 @@ MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
   const unsigned int fine_dofs = dof.n_dofs(level);
   const unsigned int coarse_dofs = dof.n_dofs(level-1);
   
+  // Matrix maps from fine level to coarse level
+
   Assert (sparsity.n_rows() == coarse_dofs,
 	  ExcDimensionMismatch (sparsity.n_rows(), coarse_dofs));
   Assert (sparsity.n_cols() == fine_dofs,
@@ -135,6 +137,8 @@ MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
 	   face < GeometryInfo<dim>::faces_per_cell;
 	   ++face)
 	{
+	  // Neighbor is coarser
+
 	  if ( (! cell->at_boundary(face)) &&
 	       (static_cast<unsigned int>(cell->neighbor_level(face)) != level) )
 	    {
@@ -145,10 +149,10 @@ MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
 		{
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    {
-		      sparsity.add (dofs_on_this_cell[i],
-				    dofs_on_other_cell[j]);
-		      sparsity.add (dofs_on_this_cell[j],
-				    dofs_on_other_cell[i]);
+		      sparsity.add (dofs_on_other_cell[i],
+				    dofs_on_this_cell[j]);
+		      sparsity.add (dofs_on_other_cell[j],
+				    dofs_on_this_cell[i]);
 		    }
 		}
 	    }
