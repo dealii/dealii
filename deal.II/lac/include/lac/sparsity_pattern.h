@@ -1218,7 +1218,7 @@ inline
 bool
 SparsityPattern::optimize_diagonal () const
 {
-  return (rows == cols);
+  return diagonal_optimized;
 }
 
 
