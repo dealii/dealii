@@ -1,4 +1,4 @@
-//----------------------------  solver.cc  ---------------------------
+//----------------------------  block_matrices.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  solver.cc  ---------------------------
+//----------------------------  block_matrices.cc  ---------------------------
 
 
 #include <base/logstream.h>
@@ -30,7 +30,7 @@ void test ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  BlockSparsityPattern<3,2> bsp;
+  BlockSparsityPattern bsp(3,2);
 				   // set sizes
   bsp.block(0,0).reinit ( 2, 10, 7);
   bsp.block(0,1).reinit ( 2, 19, 8);
