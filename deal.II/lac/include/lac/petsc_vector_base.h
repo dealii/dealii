@@ -75,6 +75,28 @@ namespace PETScWrappers
         
       public:
                                          /**
+                                          * This looks like a copy operator,
+                                          * but does something different than
+                                          * usual. In particular, it does not
+                                          * copy the member variables of this
+                                          * reference. Rather, it handles the
+                                          * situation where we have two
+                                          * vectors @p v and @p w, and assign
+                                          * elements like in
+                                          * <tt>v(i)=w(i)</tt>. Here, both
+                                          * left and right hand side of the
+                                          * assignment have data type
+                                          * VectorReference, but what we
+                                          * really mean is to assign the
+                                          * vector elements represented by the
+                                          * two references. This operator
+                                          * implements this operation. Note
+                                          * also that this allows us to make
+                                          * the assignment operator const.
+                                          */
+        const VectorReference & operator = (const VectorReference &r) const;
+        
+                                         /**
                                           * Set the referenced element of the
                                           * vector to <tt>s</tt>.
                                           */
@@ -87,8 +109,8 @@ namespace PETScWrappers
         const VectorReference & operator += (const PetscScalar &s) const;
 
                                          /**
-                                          * Subtract <tt>s</tt> from the referenced
-                                          * element of the vector.
+                                          * Subtract <tt>s</tt> from the
+                                          * referenced element of the vector.
                                           */
         const VectorReference & operator -= (const PetscScalar &s) const;
 
@@ -255,7 +277,8 @@ namespace PETScWrappers
       bool operator != (const VectorBase &v) const;
 
                                        /**
-                                        * Return the global dimension of the vector.
+                                        * Return the global dimension of the
+                                        * vector.
                                         */
       unsigned int size () const;
 
@@ -631,6 +654,21 @@ namespace PETScWrappers
     {}
 
 
+    inline
+    const VectorReference &
+    VectorReference::operator = (const VectorReference &r) const
+    {
+                                       // as explained in the class
+                                       // documentation, this is not the copy
+                                       // operator. so simply pass on to the
+                                       // "correct" assignment operator
+      *this = static_cast<PetscScalar> (r);
+
+      return *this;
+    }
+
+
+    
     inline
     const VectorReference &
     VectorReference::operator = (const PetscScalar &value) const
