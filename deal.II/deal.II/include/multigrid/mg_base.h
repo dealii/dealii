@@ -38,8 +38,9 @@ class MGCoarseGridSolver : public Subscriptor
 				      * about the matrix is removed to
 				      * that class.
 				      */
-    virtual void operator() (unsigned int level, Vector<double>& dst,
-			     const Vector<double>& src) const = 0;
+    virtual void operator() (const unsigned int    level,
+			     Vector<double>       &dst,
+			     const Vector<double> &src) const = 0;
 };
 
 
@@ -70,7 +71,7 @@ class MGSmootherBase :  public Subscriptor
 				      * or another function doing similar
 				      * things.
 				      */
-    virtual void smooth (const unsigned int   level,
+    virtual void smooth (const unsigned int    level,
 			 Vector<double>       &u,
 			 const Vector<double> &rhs) const = 0;
 

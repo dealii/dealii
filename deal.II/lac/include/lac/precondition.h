@@ -24,6 +24,8 @@ class PreconditionIdentity
 };
 
 
+
+
 /**
  * Preconditioner using a matrix-builtin function.
  * This class forms a preconditioner suitable for the LAC solver
@@ -35,9 +37,28 @@ class PreconditionIdentity
  *
  * It seems that all builtin preconditioners have a relaxation
  * parameter, so please use #PreconditionRelaxation# for these.
- * @author Guido Kanschat, 1999
- */ 
-
+ *
+ * \subsection{Use}
+ * You will usually not want to create a named object of this type,
+ * although possible. The most common use is like this:
+ * \begin{verbatim}
+ *    SolverGMRES<SparseMatrix<double>,
+ *                Vector<double> >      gmres(control,memory,500);
+ *
+ *    gmres.solve (matrix, solution, right_hand_side,
+ *		   PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
+ *		   (matrix,&SparseMatrix<double>::template precondition_Jacobi));
+ * \end{verbatim}
+ * This creates an unnamed object to be passed as the fourth parameter to
+ * the solver function of the #SolverGMRES# class. It assumes that the
+ * #SparseMatrix# class has a function #precondition_Jacobi# taking two
+ * vectors (source and destination) as parameters. (Actually, there is no
+ * function like that, the existing function takes a third parameter,
+ * denoting the relaxation parameter; this example is therefore only meant to
+ * illustrate the general idea.)
+ *
+ * @author Guido Kanschat, Wolfgang Bangerth, 1999
+ */
 template<class MATRIX, class VECTOR>
 class PreconditionUseMatrix
 {
@@ -57,18 +78,24 @@ class PreconditionUseMatrix
 				      * must be a member function of
 				      * that matrix.
 				      */
-    PreconditionUseMatrix(const MATRIX & M, function_ptr method);
+    PreconditionUseMatrix(const MATRIX      &M,
+			  const function_ptr method);
     
 				     /**
-				      * Execute preconditioning.
+				      * Execute preconditioning. Calls the
+				      * function passed to the constructor
+				      * of this object with the two
+				      * arguments given here.
 				      */
-    void operator() (VECTOR&, const VECTOR&) const;
+    void operator() (VECTOR       &dst,
+		     const VECTOR &src) const;
 
   private:
 				     /**
 				      * Pointer to the matrix in use.
 				      */
     const MATRIX& matrix;
+    
 				     /**
 				      * Pointer to the preconditioning
 				      * function.
@@ -76,14 +103,33 @@ class PreconditionUseMatrix
     const function_ptr precondition;
 };
 
+
+
 /**
  * Preconditioner for builtin relaxation methods.
- * Application of this preconditioner involves
+ * Application of this preconditioner includes
  * use of the #precondition_...# methods of #SparseMatrix#.
  *
- * Construction of objects of this class is quite strange, so read the
- * documentation of the constructor for an example.
- * @author Guido Kanschat, 1999
+ * \subsection{Use}
+ * You will usually not want to create a named object of this type,
+ * although possible. The most common use is like this:
+ * \begin{verbatim}
+ *    SolverGMRES<SparseMatrix<double>,
+ *                Vector<double> >      gmres(control,memory,500);
+ *
+ *    gmres.solve (matrix, solution, right_hand_side,
+ *		   PreconditionRelaxation<SparseMatrix<double>,Vector<double> >
+ *		   (matrix,&SparseMatrix<double>::template precondition_Jacobi,
+ *                   0.5));
+ * \end{verbatim}
+ * This creates an unnamed object to be passed as the fourth parameter to
+ * the solver function of the #SolverGMRES# class. It assumes that the
+ * #SparseMatrix# class has a function #precondition_Jacobi# taking two
+ * vectors (source and destination) and a relaxation value as parameters. (Unlike
+ * for the #PreconditionUseMatrix# class, this time it should work, with
+ * relaxation parameter $0.5$.)
+ *
+ * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
 template<class MATRIX, class VECTOR>
 class PreconditionRelaxation
@@ -103,21 +149,19 @@ class PreconditionRelaxation
 				      * for later use and selects a
 				      * preconditioning method, which
 				      * must be a member function of
-				      * that matrix. An example of a
-				      * typical usage is this:
-	* \begin{verbatim}
-	* SparseMatrix<float> A;
-	* Vector<double> u;
-	* PreconditioningRelaxation<SparseMatrix<float>,Vector<double> >
-	*    precondition_ssor(A, &SparseMatrix<float>::template
-	*       precondition_SSOR<double>, 1.2);
-	* \end{verbatim}
-	*/
-    PreconditionRelaxation(const MATRIX & M, function_ptr method,
-			   double omega = 1.);
+				      * that matrix.
+				      */
+    PreconditionRelaxation(const MATRIX      &M,
+			   const function_ptr method,
+			   const double       omega = 1.);
     
 				     /**
-				      * Execute preconditioning.
+				      * Execute preconditioning. Calls the
+				      * function passed to the constructor
+				      * of this object with the two
+				      * arguments given here, and the
+				      * relaxation parameter passed to the
+				      * constructor.
 				      */
     void operator() (VECTOR&, const VECTOR&) const;
 
@@ -126,17 +170,23 @@ class PreconditionRelaxation
 				      * Pointer to the matrix in use.
 				      */
     const MATRIX& matrix;
+    
 				     /**
 				      * Pointer to the preconditioning
 				      * function.
 				      */
     const function_ptr precondition;
+    
 				     /**
 				      * Relaxation parameter.
 				      */
     double omega;
 };
 
+
+
+
+/* ---------------------------------- Inline functions ------------------- */
 
 template<class VECTOR>
 void
