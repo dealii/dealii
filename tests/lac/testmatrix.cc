@@ -14,6 +14,7 @@
 
 #include "testmatrix.h"
 #include <lac/sparse_matrix.h>
+#include <lac/block_sparse_matrix.h>
 #include <lac/sparse_matrix_ez.h>
 #include <lac/vector.h>
 
@@ -249,6 +250,8 @@ FDMatrix::gnuplot_print(std::ostream& s, const Vector<number>& V) const
 
 template void FDMatrix::five_point(SparseMatrix<long double>&, bool) const;
 template void FDMatrix::five_point(SparseMatrix<double>&, bool) const;
+template void FDMatrix::five_point(BlockSparseMatrix<long double>&, bool) const;
+template void FDMatrix::five_point(BlockSparseMatrix<double>&, bool) const;
 template void FDMatrix::five_point(SparseMatrixEZ<double>&, bool) const;
 template void FDMatrix::five_point(SparseMatrix<float>&, bool) const;
 template void FDMatrix::nine_point(SparseMatrix<long double>&, bool) const;

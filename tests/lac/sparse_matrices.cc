@@ -17,6 +17,7 @@
 #include "testmatrix.h"
 #include <base/logstream.h>
 #include <lac/sparse_matrix.h>
+#include <lac/block_sparse_matrix.h>
 #include <lac/sparse_matrix_ez.h>
 #include <lac/vector.h>
 #include <lac/solver_richardson.h>
@@ -89,6 +90,49 @@ check_vmult_quadratic(std::vector<double>& residuals,
   PREC_CHECK(prich, Tsolve, block_jacobi);
   PREC_CHECK(prich, Tsolve, block_ssor);
   PREC_CHECK(prich, Tsolve, block_sor);
+  deallog.pop();
+}
+
+
+
+void
+check_vmult_quadratic(std::vector<double>& residuals,
+		      const BlockSparseMatrix<double> & A,
+		      const char* prefix)
+{
+  deallog.push(prefix);
+  
+  Vector<double> u(A.n());
+  Vector<double> f(A.m());
+  GrowingVectorMemory<> mem;
+
+  SolverControl control(10, 1.e-13, false);
+  SolverRichardson<> rich(control, mem, .01);
+  SolverRichardson<> prich(control, mem, 1.);
+  PreconditionIdentity identity;
+  PreconditionJacobi<BlockSparseMatrix<double> > jacobi;
+  jacobi.initialize(A, .5);
+
+  PreconditionBlock<BlockSparseMatrix<double>, float>::AdditionalData
+    data((unsigned int) std::sqrt(A.n()+.3), 1.2);
+  
+  PreconditionBlockJacobi<BlockSparseMatrix<double>, float> block_jacobi;
+  block_jacobi.initialize(A, data);
+  
+  u = 0.;
+  f = 1.;
+
+  PREC_CHECK(rich, solve, identity);
+  PREC_CHECK(prich, solve, jacobi);
+  u = 0.;
+  PREC_CHECK(prich, solve, block_jacobi);
+  
+  u = 0.;
+  deallog << "Transpose" << std::endl;
+  PREC_CHECK(rich, Tsolve, identity);
+  PREC_CHECK(prich, Tsolve, jacobi);
+  u = 0.;
+  PREC_CHECK(prich, Tsolve, block_jacobi);
   deallog.pop();
 }
 
@@ -238,43 +282,71 @@ int main()
 
   std::vector<double> A_res;
   std::vector<double> E_res;
-  
-  deallog << "Structure" << std::endl;
+
+				   // usual sparse matrix
   SparsityPattern structure(dim, dim, 5);
-  testproblem.five_point_structure(structure);
-  structure.compress();
-  SparseMatrix<double>  A(structure);
-  deallog << "Assemble" << std::endl;
-  testproblem.five_point(A, true);
-  check_vmult_quadratic(A_res, A, "5-SparseMatrix<double>");
+  SparseMatrix<double>  A;
+  {
+    deallog << "Structure" << std::endl;
+    testproblem.five_point_structure(structure);
+    structure.compress();
+    A.reinit (structure);
+    deallog << "Assemble" << std::endl;
+    testproblem.five_point(A, true);
+    check_vmult_quadratic(A_res, A, "5-SparseMatrix<double>");
 #ifdef DEBUG
-  check_iterator(A);
+    check_iterator(A);
 #endif
+  }
 
+				   // block sparse matrix with only
+				   // one block
+  {
+    deallog << "Structure" << std::endl;
+    BlockSparsityPattern block_structure(1,1);
+    block_structure.block(0,0).reinit (dim, dim, 5);
+    block_structure.collect_sizes ();
+    testproblem.five_point_structure(block_structure.block(0,0));
+    block_structure.compress();
+    BlockSparseMatrix<double>  block_A(block_structure);
+    deallog << "Assemble" << std::endl;
+    testproblem.five_point(block_A, true);
+    std::vector<double> block_A_res;
+    check_vmult_quadratic(block_A_res, block_A, "5-BlockSparseMatrix<double>");
+#ifdef DEBUG
+    check_iterator(block_A);
+#endif
+  }
+
+				   // ez sparse matrix
   SparseMatrixEZ<double> E(dim,dim,row_length,2);
-  deallog << "Assemble" << std::endl;
-  testproblem.five_point(E, true);
-  check_vmult_quadratic(E_res, E, "5-SparseMatrixEZ<double>");
+  {
+    deallog << "Assemble" << std::endl;
+    testproblem.five_point(E, true);
+    check_vmult_quadratic(E_res, E, "5-SparseMatrixEZ<double>");
 #ifdef DEBUG
-  check_iterator(E);
+    check_iterator(E);
 #endif
-  E.print_statistics(deallog, true);
-  E.add_scaled(-1., A);
-  if (E.l2_norm() < 1.e-14)
-    deallog << "Matrices are equal" << std::endl;
-  else
-    deallog << "Matrices differ!!" << std::endl;
+    E.print_statistics(deallog, true);
+    E.add_scaled(-1., A);
+    if (E.l2_norm() < 1.e-14)
+      deallog << "Matrices are equal" << std::endl;
+    else
+      deallog << "Matrices differ!!" << std::endl;
+  }
   
-  A.clear();
-  deallog << "Structure" << std::endl;
-  structure.reinit(dim, dim, 9);
-  testproblem.nine_point_structure(structure);
-  structure.compress();
-  A.reinit(structure);
-  deallog << "Assemble" << std::endl;
-  testproblem.nine_point(A);
-  check_vmult_quadratic(A_res, A, "9-SparseMatrix<double>");
-
+  {
+    structure.reinit(dim, dim, 5);
+    deallog << "Structure" << std::endl;
+    structure.reinit(dim, dim, 9);
+    testproblem.nine_point_structure(structure);
+    structure.compress();
+    A.reinit (structure);
+    deallog << "Assemble" << std::endl;
+    testproblem.nine_point(A);
+    check_vmult_quadratic(A_res, A, "9-SparseMatrix<double>");
+  }
+  
   E.clear();
   E.reinit(dim,dim,row_length,2);
   deallog << "Assemble" << std::endl;
