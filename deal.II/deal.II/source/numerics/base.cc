@@ -10,10 +10,8 @@
 #include <basic/function.h>
 #include <fe/fe.h>
 #include <fe/quadrature.h>
-
-#include "../../../mia/control.h"
-#include "../../../mia/vectormemory.h"
-#include "../../../mia/cg.h"
+#include <lac/solver_cg.h>
+#include <lac/vector_memory.h>
 
 #include <map>
 #include <numeric>
@@ -134,15 +132,12 @@ template <int dim>
 void ProblemBase<dim>::solve () {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
-  int    max_iter  = 4000;
-  double tolerance = 1.e-16;
-  
-  Control                          control1(max_iter,tolerance);
+  SolverControl                    control(4000, 1e-16);
   PrimitiveVectorMemory<dVector>   memory(right_hand_side.size());
-  CG<dSMatrix,dVector>             cg(control1,memory);
+  SolverCG<dSMatrix,dVector>       cg(control,memory);
 
 				   // solve
-  cg (system_matrix, solution, right_hand_side);
+  cg.solve (system_matrix, solution, right_hand_side);
 				   // distribute solution
   constraints.distribute (solution);
 };

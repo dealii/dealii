@@ -14,10 +14,8 @@
 #include <numerics/matrices.h>
 #include <lac/dvector.h>
 #include <lac/dsmatrix.h>
-
-#include "../../../mia/control.h"
-#include "../../../mia/vectormemory.h"
-#include "../../../mia/cg.h"
+#include <lac/solver_cg.h>
+#include <lac/vector_memory.h>
 
 #include <numeric>
 #include <algorithm>
@@ -167,14 +165,12 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   MatrixTools<dim>::apply_boundary_values (boundary_values,
 					   mass_matrix, vec, tmp);
 
-  int    max_iter  = 1000;
-  double tolerance = 1.e-16;
-  Control                          control1(max_iter,tolerance);
+  SolverControl                    control(1000,1e-16);
   PrimitiveVectorMemory<dVector>   memory(tmp.size());
-  CG<dSMatrix,dVector>             cg(control1,memory);
+  SolverCG<dSMatrix,dVector>       cg(control,memory);
 
 				   // solve
-  cg (mass_matrix, vec, tmp);
+  cg.solve (mass_matrix, vec, tmp);
   
 				   // distribute solution
   constraints.distribute (vec);
@@ -323,14 +319,12 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   
   dVector boundary_projection (rhs.size());
 
-  int    max_iter  = 1000;
-  double tolerance = 1.e-16;
-  Control                          control1(max_iter,tolerance);
+  SolverControl                    control(1000, 1e-16);
   PrimitiveVectorMemory<dVector>   memory(rhs.size());
-  CG<dSMatrix,dVector>             cg(control1,memory);
+  SolverCG<dSMatrix,dVector>       cg(control,memory);
 
 				   // solve
-  cg (mass_matrix, boundary_projection, rhs);
+  cg.solve (mass_matrix, boundary_projection, rhs);
 
 				   // fill in boundary values
   for (unsigned int i=0; i<dof_to_boundary_mapping.size(); ++i)
