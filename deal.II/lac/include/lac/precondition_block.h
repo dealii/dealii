@@ -1125,7 +1125,7 @@ typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
 PreconditionBlockJacobi<MATRIX, inverse_type>::begin (
   const unsigned int r) const
 {
-  Assert (r<A->m(), ExcIndexRange(r,0,A->m()));
+  Assert (r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r);
 }
 
@@ -1137,7 +1137,7 @@ typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
 PreconditionBlockJacobi<MATRIX, inverse_type>::end (
   const unsigned int r) const
 {
-  Assert (r<A->m(), ExcIndexRange(r,0,A->m()));
+  Assert (r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r+1);
 }
 
