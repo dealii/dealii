@@ -19,21 +19,16 @@
 
 #include <fe/q1_mapping.h>
 
+
 /**
- * Isoparametric Q1 finite element in #dim# space dimensions.
+ * Discontinuous P1-element on hypercubes.
  *
- * The linear, isoparametric mapping from a point $\vec \xi$ on the unit cell
- * to a point $\vec x$ on the real cell is defined as
- * $$ \vec x(\vec \xi)  = \sum_j {\vec p_j} N_j(\xi) $$
- * where $\vec p_j$ is the vector to the $j$th corner point of the cell in
- * real space and $N_j(\vec \xi)$ is the value of the basis function associated
- * with the $j$th corner point, on the unit cell at point $\vec \xi$. The sum
- * over $j$ runs over all corner points.
+ * This is the implementation of a linear (sic) polynomial space on a
+ * d-dimensional hypercube. The shape functions are the first @p{d+1}
+ * of @p{1,x,y,z}. Later on, these should be exchanged for mutually
+ * orthogonal, preferably by changing the unit cell to $[-1,1]^d$.
  *
- * The number of degrees of freedom equal the number of the respective vertex
- * of the cell
- *
- * @author Wolfgang Bangerth, 1998, 1999
+ * @author Guido Kanschat, 2000
  */
 template <int dim>
 class FEDG_P1 : public FEQ1Mapping<dim>
@@ -119,86 +114,15 @@ class FEDG_P1 : public FEQ1Mapping<dim>
 
 
 /**
- * Subparametric Q2 finite element in #dim# space dimensions.
- * A Q1 mapping from the unit cell
- * to the real cell is implemented.
+ * Discontinuous P2-element on hypercubes.
  *
- * The numbering of the degrees of freedom is as follows:
- * \begin{itemize}
- * \item 1D case:
- *   \begin{verbatim}
- *      0---2---1
- *   \end{verbatim}
+ * This is the implementation of a linear (sic) polynomial space on a
+ * d-dimensional hypercube. The shape functions are those of
+ * @p{1,x,y,z, x*x, x*y, x*z, y*y, y*z, z*z} applying to the space
+ * dimension. Later on, these should be exchanged for mutually
+ * orthogonal, preferably by changing the unit cell to $[-1,1]^d$.
  *
- * \item 2D case:
- *   \begin{verbatim}
- *      3---6---2
- *      |       |
- *      7   8   5
- *      |       |
- *      0---4---1
- *   \end{verbatim}
- *
- * \item 3D case:
- *   \begin{verbatim}
- *         7--14---6        7--14---6
- *        /|       |       /       /|
- *      19 |       13     19      1813
- *      /  15      |     /       /  |
- *     3   |       |    3---10--2   |
- *     |   4--12---5    |       |   5
- *     |  /       /     |       9  /
- *    11 16      17     11      | 17
- *     |/       /       |       |/
- *     0---8---1        0---8---1
- *
- *         *-------*        *-------*
- *        /|       |       /       /|
- *       / |  21   |      /  24   / |
- *      /  |       |     /       /  |
- *     *   |       |    *-------*   |
- *     |25 *-------*    |       |23 *
- *     |  /       /     |   20  |  /
- *     | /  22   /      |       | /
- *     |/       /       |       |/
- *     *-------*        *-------* 
- *   \end{verbatim}
- *   The center vertex has number 26.
- *
- *   The respective coordinate values of the support points of the degrees
- *   of freedom are as follows:
- *   \begin{itemize}
- *   \item Index 0: #[0, 0, 0]#;
- *   \item Index 1: #[1, 0, 0]#;
- *   \item Index 2: #[1, 0, 1]#;
- *   \item Index 3: #[0, 0, 1]#;
- *   \item Index 4: #[0, 1, 0]#;
- *   \item Index 5: #[1, 1, 0]#;
- *   \item Index 6: #[1, 1, 1]#;
- *   \item Index 7: #[0, 1, 1]#;
- *   \item Index 8: #[1/2, 0, 0]#;
- *   \item Index 9: #[1, 0, 1/2]#;
- *   \item Index 10: # [1/2, 0, 1]#;
- *   \item Index 11: # [0, 0, 1/2]#;
- *   \item Index 12: # [1/2, 1, 0]#;
- *   \item Index 13: # [1, 1, 1/2]#;
- *   \item Index 14: # [1/2, 1, 1]#;
- *   \item Index 15: # [0, 1, 1/2]#;
- *   \item Index 16: # [0, 1/2, 0]#;
- *   \item Index 17: # [1, 1/2, 0]#;
- *   \item Index 18: # [1, 1/2, 1]#;
- *   \item Index 19: # [0, 1/2, 1]#;
- *   \item Index 20: # [1/2, 0, 1/2]#;
- *   \item Index 21: # [1/2, 1, 1/2]#;
- *   \item Index 22: # [1/2, 1/2, 0]#;
- *   \item Index 23: # [1, 1/2, 1/2]#;
- *   \item Index 24: # [1/2, 1/2, 1]#;
- *   \item Index 25: # [0, 1/2, 1/2]#;
- *   \item Index 26: # [1/2, 1/2, 1/2]#; 
- *   \end{itemize}
- * \end{itemize}
- *
- * @author Wolfgang Bangerth, 1998, 1999
+ * @author Guido Kanschat, 2000
  */
 template <int dim>
 class FEDG_P2 : public FEQ1Mapping<dim>
@@ -282,30 +206,15 @@ class FEDG_P2 : public FEQ1Mapping<dim>
 
 
 /**
- * Subparametric Q3 finite element in #dim# space dimensions.
- * A Q1 mapping from the unit cell
- * to the real cell is implemented.
+ * Discontinuous P3-element on hypercubes.
  *
- * The numbering of degrees of freedom in one spatial dimension is as follows:
- * \begin{verbatim}
- *   0--2--3--1
- * \end{verbatim}
+ * This is the implementation of a linear (sic) polynomial space on a
+ * d-dimensional hypercube. The shape functions are the basis
+ * polynomials spanning the space of cubic polynomials. Later on,
+ * they should be exchanged for mutually orthogonal, preferably by
+ * changing the unit cell to $[-1,1]^d$.
  *
- * The numbering of degrees of freedom in two spatial dimension is as follows:
- * \begin{verbatim}
- *   3--8--9--2
- *   |        |
- *   11 15 14 7
- *   |        |
- *   10 12 13 6
- *   |        |
- *   0--4--5--1
- * \end{verbatim}
- * Note the reverse ordering of degrees of freedom on the left and upper
- * line and the counterclockwise numbering of the interior degrees of
- * freedom.
- *
- * @author Wolfgang Bangerth, 1998
+ * @author Guido Kanschat, 2000
  */
 template <int dim>
 class FEDG_P3 : public FEQ1Mapping<dim>
@@ -390,32 +299,15 @@ class FEDG_P3 : public FEQ1Mapping<dim>
 
 
 /**
- * Subparametric Q4 finite element in #dim# space dimensions.
- * A linear (subparametric) mapping from the unit cell
- * to the real cell is implemented.
+ * Discontinuous P3-element on hypercubes.
  *
- * The numbering of degrees of freedom in one spatial dimension is as follows:
- * \begin{verbatim}
- *   0--2--3--4--1
- * \end{verbatim}
+ * This is the implementation of a linear (sic) polynomial space on a
+ * d-dimensional hypercube. The shape functions are the basis
+ * polynomials spanning the space of cubic polynomials. Later on,
+ * they should be exchanged for mutually orthogonal, preferably by
+ * changing the unit cell to $[-1,1]^d$.
  *
- * The numbering of degrees of freedom in two spatial dimension is as follows:
- * \begin{verbatim}
- *   3--10-11-12-2
- *   |           |
- *   15 19 22 18 9
- *   |           |
- *   14 23 24 21 8
- *   |           |
- *   13 16 20 17 7
- *   |           |
- *   0--4--5--6--1
- * \end{verbatim}
- * Note the reverse ordering of degrees of freedom on the left and upper
- * line and the numbering of the interior degrees of
- * freedom.
- *
- * @author Wolfgang Bangerth, 1998
+ * @author Guido Kanschat, 2000
  */
 template <int dim>
 class FEDG_P4 : public FEQ1Mapping<dim>

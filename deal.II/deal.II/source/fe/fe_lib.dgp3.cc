@@ -20,14 +20,14 @@
 
 
 // declare explicit specializations before use:
-template <> void FEDG_P2<deal_II_dimension>::initialize_matrices ();
+template <> void FEDG_P3<deal_II_dimension>::initialize_matrices ();
 
 
 #if deal_II_dimension == 1
 
 template <>
-FEDG_P2<1>::FEDG_P2 () :
-		FEQ1Mapping<1> (0, 3, 0, 0, 1,
+FEDG_P3<1>::FEDG_P3 () :
+		FEQ1Mapping<1> (0, 4, 0, 0, 1,
 				vector<bool> (1, true))
 {
 //  initialize_matrices ();
@@ -35,7 +35,7 @@ FEDG_P2<1>::FEDG_P2 () :
 
 
 template <>
-void FEDG_P2<1>::initialize_matrices ()
+void FEDG_P3<1>::initialize_matrices ()
 {
   Assert(false, ExcNotImplemented());
 };
@@ -43,7 +43,7 @@ void FEDG_P2<1>::initialize_matrices ()
 
 template <>
 double
-FEDG_P2<1>::shape_value(const unsigned int i,
+FEDG_P3<1>::shape_value(const unsigned int i,
 			 const Point<1>     &p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
@@ -52,6 +52,7 @@ FEDG_P2<1>::shape_value(const unsigned int i,
       case 0: return 1.;
       case 1: return p(0);
       case 2: return p(0)*p(0);
+      case 2: return p(0)*p(0)*p(0);
     }
   return 0.;
 }
@@ -60,7 +61,7 @@ FEDG_P2<1>::shape_value(const unsigned int i,
 template <>
 inline
 Tensor<1,1>
-FEDG_P2<1>::shape_grad(const unsigned int i,
+FEDG_P3<1>::shape_grad(const unsigned int i,
 			const Point<1>&p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
@@ -74,6 +75,7 @@ FEDG_P2<1>::shape_grad(const unsigned int i,
       case 0: return Point<1>(-1.);
       case 1: return Point<1>(1.);
       case 2: return Point<1>(2.*p(0));
+      case 2: return Point<1>(3.*p(0)*p(0));
 	    
     }
   return Point<1>();
@@ -83,7 +85,7 @@ FEDG_P2<1>::shape_grad(const unsigned int i,
 template <>
 inline
 Tensor<2,1>
-FEDG_P2<1>::shape_grad_grad (const unsigned int i,
+FEDG_P3<1>::shape_grad_grad (const unsigned int i,
 			     const Point<1> &) const
 {
   Assert(false, ExcNotImplemented());
@@ -93,14 +95,14 @@ FEDG_P2<1>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FEDG_P2<1>::get_unit_support_points (vector<Point<1> >  &support_points) const
+void FEDG_P3<1>::get_unit_support_points (vector<Point<1> >  &support_points) const
 {
   FiniteElement<1>::get_unit_support_points (support_points);
 };
 
 
 template <>
-void FEDG_P2<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
+void FEDG_P3<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
 				     vector<Point<1> >  &support_points) const
 {
   FiniteElement<1>::get_support_points (cell, support_points);
@@ -108,7 +110,7 @@ void FEDG_P2<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
 
 
 template <>
-void FEDG_P2<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
+void FEDG_P3<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 					  vector<Point<1> >  &) const
 {
   Assert (false, ExcInternalError());
@@ -116,7 +118,7 @@ void FEDG_P2<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 
 
 template <>
-void FEDG_P2<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
+void FEDG_P3<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 					 FullMatrix<double> &local_mass_matrix) const
 {
   Assert(false, ExcNotImplemented());
@@ -132,8 +134,8 @@ void FEDG_P2<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell
 #if deal_II_dimension == 2
 
 template <>
-FEDG_P2<2>::FEDG_P2 () :
-		FEQ1Mapping<2> (0, 0, 6, 0, 1,
+FEDG_P3<2>::FEDG_P3 () :
+		FEQ1Mapping<2> (0, 0, 10, 0, 1,
 				vector<bool> (1, true))
 {
 //  initialize_matrices ();
@@ -141,7 +143,7 @@ FEDG_P2<2>::FEDG_P2 () :
 
 
 template <>
-void FEDG_P2<2>::initialize_matrices ()
+void FEDG_P3<2>::initialize_matrices ()
 {
   Assert(false, ExcNotImplemented());
 };
@@ -150,7 +152,7 @@ void FEDG_P2<2>::initialize_matrices ()
 template <>
 inline
 double
-FEDG_P2<2>::shape_value (const unsigned int i,
+FEDG_P3<2>::shape_value (const unsigned int i,
 			  const Point<2>& p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
@@ -162,6 +164,10 @@ FEDG_P2<2>::shape_value (const unsigned int i,
       case 3: return p(0)*p(0);
       case 4: return p(0)*p(1);
       case 5: return p(1)*p(1);
+      case 6: return p(0)*p(0)*p(0);
+      case 7: return p(0)*p(0)*p(1);
+      case 8: return p(0)*p(1)*p(1);
+      case 9: return p(1)*p(1)*p(1);
     }
   return 0.;
 };
@@ -170,7 +176,7 @@ FEDG_P2<2>::shape_value (const unsigned int i,
 template <>
 inline
 Tensor<1,2>
-FEDG_P2<2>::shape_grad (const unsigned int i,
+FEDG_P3<2>::shape_grad (const unsigned int i,
 			 const Point<2>& p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
@@ -187,6 +193,10 @@ FEDG_P2<2>::shape_grad (const unsigned int i,
       case 3: return Point<2> (2*p(0),0);
       case 4: return Point<2> (p(1),p(0));
       case 5: return Point<2> (0,2*p(1));
+      case 6: return Point<2> (3*p(0)*p(0), 0);
+      case 7: return Point<2> (2*p(0)*p(1), p(0)*p(0));
+      case 8: return Point<2> (p(1)*p(1),   2*p(0)*p(1));
+      case 9: return Point<2> (0,           3*p(1)*p(1));
     }
   return Point<2> ();
 };
@@ -195,7 +205,7 @@ FEDG_P2<2>::shape_grad (const unsigned int i,
 template <>
 inline
 Tensor<2,2>
-FEDG_P2<2>::shape_grad_grad (const unsigned int i,
+FEDG_P3<2>::shape_grad_grad (const unsigned int i,
 			      const Point<2> &) const
 {
   Assert(false, ExcNotImplemented());
@@ -205,7 +215,7 @@ FEDG_P2<2>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FEDG_P2<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &,
+void FEDG_P3<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &,
 					 FullMatrix<double> &) const
 {
   Assert(false, ExcNotImplemented ());
@@ -213,8 +223,9 @@ void FEDG_P2<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &,
 
 
 template <>
-void FEDG_P2<2>::get_unit_support_points (vector<Point<2> > &unit_points) const
+void FEDG_P3<2>::get_unit_support_points (vector<Point<2> > &unit_points) const
 {
+  Assert(false, ExcNotImplemented ());
   Assert (unit_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
 
@@ -233,7 +244,7 @@ void FEDG_P2<2>::get_unit_support_points (vector<Point<2> > &unit_points) const
 #if deal_II_dimension == 3
 
 template <>
-FEDG_P2<3>::FEDG_P2 () :
+FEDG_P3<3>::FEDG_P3 () :
 		FEQ1Mapping<3> (0, 0, 0, 4, 1,
 				vector<bool> (1, true))
 {
@@ -243,7 +254,7 @@ FEDG_P2<3>::FEDG_P2 () :
 
 
 template <>
-void FEDG_P2<3>::initialize_matrices ()
+void FEDG_P3<3>::initialize_matrices ()
 {
   Assert(false, ExcNotImplemented());
 };
@@ -252,7 +263,7 @@ void FEDG_P2<3>::initialize_matrices ()
 template <>
 inline
 double
-FEDG_P2<3>::shape_value (const unsigned int i,
+FEDG_P3<3>::shape_value (const unsigned int i,
 			 const Point<3>& p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
@@ -270,7 +281,7 @@ FEDG_P2<3>::shape_value (const unsigned int i,
 template <>
 inline
 Tensor<1,3>
-FEDG_P2<3>::shape_grad (const unsigned int i,
+FEDG_P3<3>::shape_grad (const unsigned int i,
 			 const Point<3>& p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
@@ -293,7 +304,7 @@ FEDG_P2<3>::shape_grad (const unsigned int i,
 template <>
 inline
 Tensor<2,3>
-FEDG_P2<3>::shape_grad_grad (const unsigned int i,
+FEDG_P3<3>::shape_grad_grad (const unsigned int i,
 			      const Point<3> &p) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
@@ -304,7 +315,7 @@ FEDG_P2<3>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FEDG_P2<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
+void FEDG_P3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 					 FullMatrix<double> &local_mass_matrix) const
 {
   Assert (local_mass_matrix.n() == dofs_per_cell,
@@ -317,7 +328,7 @@ void FEDG_P2<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 
 
 template <>
-void FEDG_P2<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
+void FEDG_P3<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
   Assert (unit_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
 
@@ -333,7 +344,7 @@ void FEDG_P2<3>::get_unit_support_points (vector<Point<3> > &unit_points) const 
 
 template <int dim>
 void
-FEDG_P2<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+FEDG_P3<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
 				   vector<Point<dim> >  &support_points) const
 {
   Assert (support_points.size() == dofs_per_cell,
@@ -346,7 +357,7 @@ FEDG_P2<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator 
 
 template <int dim>
 void
-FEDG_P2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+FEDG_P3<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
 				       vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == dofs_per_face) &&
@@ -361,4 +372,4 @@ FEDG_P2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 
 // explicit instantiations
 
-template class FEDG_P2<deal_II_dimension>;
+template class FEDG_P3<deal_II_dimension>;
