@@ -452,6 +452,14 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 };
 
 
+template <int dim>
+void
+HalfHyperBallBoundary<dim>::
+get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &,
+			  typename Boundary<dim>::FaceVertexTangents &) const
+{
+  Assert(false, ExcNotImplemented());
+}
 
 #if deal_II_dimension == 1
 
