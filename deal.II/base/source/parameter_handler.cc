@@ -18,6 +18,7 @@
 #include <base/logstream.h>
 #include <base/memory_consumption.h>
 #include <fstream>
+#include <iostream>
 #include <iomanip>
 #include <cstdlib>
 #include <algorithm>

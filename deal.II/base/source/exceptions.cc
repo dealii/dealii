@@ -18,6 +18,7 @@
 #include <base/exceptions.h>
 #include <string>
 #include <cstdlib>
+#include <iostream>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
