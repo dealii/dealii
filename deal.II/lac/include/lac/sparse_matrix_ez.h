@@ -19,6 +19,8 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 
+#include <vector>
+
 template<typename number> class Vector;
 template<typename number> class FullMatrix;
 
@@ -63,7 +65,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * matrix, you can do so by using the
 				      * @p{copy_from} function.
 				      */
-    SparseMatrixEZ (const SparseMatrix &);
+    SparseMatrixEZ (const SparseMatrixEZ &);
 
 				     /**
 				      * Constructor. Generates a
@@ -712,7 +714,7 @@ class SparseMatrixEZ : public Subscriptor
 					 /*
 					  * Access to value.
 					  */
-//	number& operator() (unsigned int column);
+	number& operator() (unsigned int column);
 
 					 /**
 					  * Read-only access to value.
@@ -727,22 +729,22 @@ class SparseMatrixEZ : public Subscriptor
 					 /**
 					  * Start of entry list.
 					  */
-	std::vector<Entry>::iterator begin();
+	typename std::vector<Entry>::iterator begin();
 	
 					 /**
 					  * Start of constant entry list.
 					  */
-	std::vector<Entry>::const_iterator begin() const;
+	typename std::vector<Entry>::const_iterator begin() const;
 	
 					 /**
 					  * End of entry list.
 					  */
-	std::vector<Entry>::iterator end();
+	typename std::vector<Entry>::iterator end();
 	
 					 /**
 					  * End of constant entry list.
 					  */
-	std::vector<Entry>::const_iterator end() const;
+	typename std::vector<Entry>::const_iterator end() const;
 	
 	
 	private:
@@ -752,7 +754,7 @@ class SparseMatrixEZ : public Subscriptor
 					  * entries of a row ordered
 					  * by column number.
 					  */
-	std::vector<Entry> values;
+	typename std::vector<Entry> values;
       };
     
     
@@ -910,7 +912,7 @@ SparseMatrixEZ<number>::Row::operator()(unsigned int column)
 
 template <typename number>
 inline
-std::vector<Entry>::iterator
+typename std::vector<typename SparseMatrixEZ<number>::Entry>::iterator
 SparseMatrixEZ<number>::Row::begin()
 {
   return values.begin();
@@ -928,7 +930,7 @@ SparseMatrixEZ<number>::Row::size() const
 
 template <typename number>
 inline
-std::vector<Entry>::const_iterator
+typename std::vector<typename SparseMatrixEZ<number>::Entry>::const_iterator
 SparseMatrixEZ<number>::Row::begin() const
 {
   return values.begin();
@@ -937,7 +939,7 @@ SparseMatrixEZ<number>::Row::begin() const
 
 template <typename number>
 inline
-std::vector<Entry>::iterator
+typename std::vector<typename SparseMatrixEZ<number>::Entry>::iterator
 SparseMatrixEZ<number>::Row::end()
 {
   return values.end();
@@ -946,7 +948,7 @@ SparseMatrixEZ<number>::Row::end()
 
 template <typename number>
 inline
-std::vector<Entry>::const_iterator
+typename std::vector<typename SparseMatrixEZ<number>::Entry>::const_iterator
 SparseMatrixEZ<number>::Row::end() const
 {
   return values.end();
