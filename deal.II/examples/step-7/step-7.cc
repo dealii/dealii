@@ -856,16 +856,8 @@ void LaplaceProblem<dim>::assemble_system ()
       cell_rhs.clear ();
 
       fe_values.reinit (cell);
-      const FullMatrix<double> 
-	& shape_values = fe_values.get_shape_values();
-      const std::vector<std::vector<Tensor<1,dim> > >
-	& shape_grads  = fe_values.get_shape_grads();
-      const std::vector<double>
-	& JxW_values   = fe_values.get_JxW_values();
-      const std::vector<Point<dim> >
-	& q_points     = fe_values.get_quadrature_points();
 
-      right_hand_side.value_list (q_points, rhs_values);
+      right_hand_side.value_list (fe_values.get_quadrature_points(), rhs_values);
       
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -884,17 +876,17 @@ void LaplaceProblem<dim>::assemble_system ()
 					       // their gradients,
 					       // which is the second
 					       // term below:
-	      cell_matrix(i,j) += ((shape_grads[i][q_point] *
-				    shape_grads[j][q_point] *
-				    JxW_values[q_point])
+	      cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point) *
+				    fe_values.shape_grad(j,q_point) *
+				    fe_values.JxW(q_point))
 				   +
-				   (shape_values[i][q_point] *
-				    shape_values[j][q_point] *
-				    JxW_values[q_point]));
+				   (fe_values.shape_value(i,q_point) *
+				    fe_values.shape_value(j,q_point) *
+				    fe_values.JxW(q_point)));
 
-	    cell_rhs(i) += (shape_values (i,q_point) *
+	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    rhs_values [q_point] *
-			    JxW_values[q_point]);
+			    fe_values.JxW(q_point));
 	  };
 
 				       // Then there is that second
@@ -945,19 +937,6 @@ void LaplaceProblem<dim>::assemble_system ()
 					     // class:
 	    fe_face_values.reinit (cell, face);
 
-					     // Then, for simpler
-					     // access, we alias the
-					     // various quantities to
-					     // local variables:
-	    const FullMatrix<double> 
-	      & face_shape_values   = fe_face_values.get_shape_values();
-	    const std::vector<double>
-	      & face_JxW_values     = fe_face_values.get_JxW_values();
-	    const std::vector<Point<dim> >
-	      & face_q_points       = fe_face_values.get_quadrature_points();
-	    const std::vector<Point<dim> >
-	      & face_normal_vectors = fe_face_values.get_normal_vectors ();
-
 					     // And we can then
 					     // perform the
 					     // integration by using a
@@ -978,8 +957,8 @@ void LaplaceProblem<dim>::assemble_system ()
 						 // present quadrature
 						 // point:
 		const double neumann_value
-		  = (exact_solution.gradient (face_q_points[q_point]) *
-		     face_normal_vectors[q_point]);
+		  = (exact_solution.gradient (fe_face_values.quadrature_point(q_point)) *
+		     fe_face_values.normal_vector(q_point));
 
 						 // Using this, we can
 						 // compute the
@@ -988,8 +967,8 @@ void LaplaceProblem<dim>::assemble_system ()
 						 // shape function:
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  cell_rhs(i) += (neumann_value *
-				  face_shape_values[i][q_point] *
-				  face_JxW_values[q_point]);
+				  fe_face_values.shape_value(i,q_point) *
+				  fe_face_values.JxW(q_point));
 	      };
 	  };
 

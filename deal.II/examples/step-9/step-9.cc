@@ -1009,25 +1009,17 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
       cell_rhs.clear ();
 
 				       // ... then initialize
-				       // ``FEValues'' object and
-				       // define aliases to the data
-				       // it provides...
+				       // the ``FEValues'' object...
       fe_values.reinit (cell);
-      const FullMatrix<double> 
-	& shape_values = fe_values.get_shape_values();
-      const std::vector<std::vector<Tensor<1,dim> > >
-	& shape_grads  = fe_values.get_shape_grads();
-      const std::vector<double>
-	& JxW_values   = fe_values.get_JxW_values();
-      const std::vector<Point<dim> >
-	& q_points     = fe_values.get_quadrature_points();
 
 				       // ... obtain the values of
 				       // right hand side and
 				       // advection directions at the
 				       // quadrature points...
-      advection_field.value_list (q_points, advection_directions);
-      right_hand_side.value_list (q_points, rhs_values);
+      advection_field.value_list (fe_values.get_quadrature_points(),
+				  advection_directions);
+      right_hand_side.value_list (fe_values.get_quadrature_points(),
+				  rhs_values);
 
 				       // ... set the value of the
 				       // streamline diffusion
@@ -1044,17 +1036,17 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      cell_matrix(i,j) += ((advection_directions[q_point] *
-				    shape_grads[j][q_point]    *
-				    (shape_values[i][q_point] +
+				    fe_values.shape_grad(j,q_point)   *
+				    (fe_values.shape_value(i,q_point) +
 				     delta *
 				     (advection_directions[q_point] *
-				      shape_grads[i][q_point]))) *
-				   JxW_values[q_point]);
+				      fe_values.shape_grad(i,q_point)))) *
+				   fe_values.JxW(q_point));
 
-	    cell_rhs(i) += ((shape_values[i][q_point] +
+	    cell_rhs(i) += ((fe_values.shape_value(i,q_point) +
 			     delta *
 			     (advection_directions[q_point] *
-			      shape_grads[i][q_point])        ) *
+			      fe_values.shape_grad(i,q_point))        ) *
 			    rhs_values[i] *
 			    fe_values.JxW (q_point));
 	  };
@@ -1102,23 +1094,8 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 					     // above, we have to
 					     // reinitialize the
 					     // FEFaceValues object
-					     // for the present face,
-					     // and we also define the
-					     // usual aliases to the
-					     // fields holding values
-					     // of shape functions,
-					     // normal vectors, or
-					     // quadrature points.
+					     // for the present face:
 	    fe_face_values.reinit (cell, face);
-	    
-	    const FullMatrix<double> 
-	      & face_shape_values = fe_face_values.get_shape_values();
-	    const std::vector<double>
-	      & face_JxW_values   = fe_face_values.get_JxW_values();
-	    const std::vector<Point<dim> >
-	      & face_q_points     = fe_face_values.get_quadrature_points();
-	    const std::vector<Point<dim> >
-	      & normal_vectors    = fe_face_values.get_normal_vectors();
 	    
 					     // For the quadrature
 					     // points at hand, we ask
@@ -1126,8 +1103,10 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 					     // inflow function and
 					     // for the direction of
 					     // flow:
-	    boundary_values.value_list (face_q_points, face_boundary_values);
-	    advection_field.value_list (face_q_points, face_advection_directions);
+	    boundary_values.value_list (fe_face_values.get_quadrature_points(),
+					face_boundary_values);
+	    advection_field.value_list (fe_face_values.get_quadrature_points(),
+					face_advection_directions);
 	    
 					     // Now loop over all
 					     // quadrature points and
@@ -1154,7 +1133,9 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 					     // normal vector must be
 					     // negative):
 	    for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
-	      if (normal_vectors[q_point] * face_advection_directions[q_point] < 0)
+	      if (fe_face_values.normal_vector(q_point) *
+		  face_advection_directions[q_point]
+		  < 0)
 						 // If the is part of
 						 // the inflow
 						 // boundary, then
@@ -1174,16 +1155,16 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 		  {
 		    for (unsigned int j=0; j<dofs_per_cell; ++j)
 		      cell_matrix(i,j) -= (face_advection_directions[q_point] *
-					   normal_vectors[q_point] *
-					   face_shape_values[i][q_point] *
-					   face_shape_values[j][q_point] *
-					   face_JxW_values[q_point]);
+					   fe_face_values.normal_vector(q_point) *
+					   fe_face_values.shape_value(i,q_point) *
+					   fe_face_values.shape_value(j,q_point) *
+					   fe_face_values.JxW(q_point));
 		    
 		    cell_rhs(i) -= (face_advection_directions[q_point] *
-				    normal_vectors[q_point] *
-				    face_boundary_values[q_point] *
-				    face_shape_values[i][q_point] *
-				    face_JxW_values[q_point]);
+				    fe_face_values.normal_vector(q_point) *
+				    face_boundary_values[q_point]         *
+				    fe_face_values.shape_value(i,q_point) *
+				    fe_face_values.JxW(q_point));
 		  };
 	  };
       
