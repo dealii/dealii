@@ -26,7 +26,8 @@
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
 #include <dofs/dof_tools.h>
 
@@ -36,6 +37,8 @@
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_smoother.h>
 #include <multigrid/multigrid.h>
+
+MappingQ1<2> mapping;
 
 #include "helmholtz.h"
 
@@ -74,10 +77,10 @@ int main()
   RHSFunction<2> rhs;
   QGauss5<2> quadrature;
   
-  FEQ1<2> fe1;
-  FEQ2<2> fe2;
-  FEQ3<2> fe3;
-  FEQ4<2> fe4;
+  FE_Q<2> fe1(1);
+  FE_Q<2> fe2(2);
+  FE_Q<2> fe3(3);
+  FE_Q<2> fe4(4);
   for (unsigned int degree=1;degree<=3;degree++)
     {
       Triangulation<2> tr;

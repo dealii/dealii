@@ -7602,7 +7602,8 @@ void UserMatrix::precondition (Vector<double> &dst,
 /* $Id$ */
 
 
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
+#include <fe/mapping_q1.h>
 #include <base/quadrature_lib.h>
 
 

@@ -1,25 +1,26 @@
 
-DEAL:Q1::DoFs 41
-DEAL:Q1::Levels: 4
-DEAL:Q1::smoothing-steps1
-DEAL:Q1:cg::Starting 
-DEAL:Q1:cg::Convergence step 8 
-DEAL:Q1::smoothing-steps2
-DEAL:Q1:cg::Starting 
-DEAL:Q1:cg::Convergence step 7 
-DEAL:Q2::DoFs 141
-DEAL:Q2::Levels: 4
-DEAL:Q2::smoothing-steps1
-DEAL:Q2:cg::Starting 
-DEAL:Q2:cg::Failure step 20 
-DEAL:Q2::smoothing-steps2
-DEAL:Q2:cg::Starting 
-DEAL:Q2:cg::Failure step 20 
-DEAL:Q3::DoFs 297
-DEAL:Q3::Levels: 4
-DEAL:Q3::smoothing-steps1
-DEAL:Q3:cg::Starting 
-DEAL:Q3:cg::Failure step 20 
-DEAL:Q3::smoothing-steps2
-DEAL:Q3:cg::Starting 
-DEAL:Q3:cg::Failure step 20 
+DEAL::Test
+DEAL::DoFs 41
+DEAL::Levels: 4
+DEAL::smoothing-steps1
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 8 
+DEAL::smoothing-steps2
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 7 
+DEAL::DoFs 141
+DEAL::Levels: 4
+DEAL::smoothing-steps1
+DEAL:cg::Starting 
+DEAL:cg::Failure step 20 
+DEAL::smoothing-steps2
+DEAL:cg::Starting 
+DEAL:cg::Failure step 20 
+DEAL::DoFs 297
+DEAL::Levels: 4
+DEAL::smoothing-steps1
+DEAL:cg::Starting 
+DEAL:cg::Failure step 20 
+DEAL::smoothing-steps2
+DEAL:cg::Starting 
+DEAL:cg::Failure step 20 

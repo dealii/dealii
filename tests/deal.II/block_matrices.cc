@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,7 +25,8 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
+#include <fe/mapping_q1.h>
 
 #include <dofs/dof_tools.h>
 
@@ -69,7 +70,7 @@ class LaplaceProblem
     const unsigned int n_blocks;
 
     Triangulation<2>     triangulation;
-    FEQ1<2>              fe;
+    FE_Q<2>              fe;
     DoFHandler<2>        dof_handler;
 
     Sparsity      sparsity_pattern;
@@ -82,6 +83,7 @@ class LaplaceProblem
 template <class Vector, class Matrix, class Sparsity>
 LaplaceProblem<Vector,Matrix,Sparsity>::LaplaceProblem (const unsigned int n_blocks) :
 		n_blocks (n_blocks),
+		fe(1),
 		dof_handler (triangulation)
 {
   sparsity_pattern.reinit (n_blocks, n_blocks);
@@ -92,6 +94,7 @@ LaplaceProblem<Vector,Matrix,Sparsity>::LaplaceProblem (const unsigned int n_blo
 template <>
 LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::LaplaceProblem (const unsigned int n_blocks) :
 		n_blocks (n_blocks),
+		fe(1),
 		dof_handler (triangulation)
 {};
 
@@ -100,6 +103,7 @@ LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::LaplaceProb
 template <>
 LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::LaplaceProblem (const unsigned int n_blocks) :
 		n_blocks (n_blocks),
+		fe(1),
 		dof_handler (triangulation)
 {};
 

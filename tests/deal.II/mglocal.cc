@@ -29,7 +29,8 @@
 #include <multigrid/mg_dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <numerics/data_out.h>
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
 #include <multigrid/multigrid.h>
 #include <multigrid/mg_smoother.h>
@@ -69,44 +70,36 @@ extern void write_gnuplot (const MGDoFHandler<2>& dofs,
 int main()
 {
   ofstream logfile("mglocal.output");
-  logfile.setf(ios::fixed);
-  logfile.precision (3);
+  //  logfile.setf(ios::fixed);
+  //  logfile.precision (3);
   deallog.attach(logfile);
 //  deallog.log_execution_time(true);
   deallog.depth_console(0);
 
+  deallog << "Test" << endl;
+  
   Helmholtz equation;
   RHSFunction<2> rhs;
   QGauss5<2> quadrature;
   
-  FEQ1<2> fe1;
-  FEQ2<2> fe2;
-  FEQ3<2> fe3;
-  FEQ4<2> fe4;
   for (unsigned int degree=1;degree<=3;degree++)
     {
       Triangulation<2> tr;
-      MGDoFHandler<2> mgdof(tr);
-      DoFHandler<2>& dof(mgdof);
-  
       GridGenerator::hyper_cube(tr,-M_PI_2,M_PI_2);
   
-      FiniteElement<2>* fe;
-      switch(degree)
-	{
-	  case 1: fe = &fe1; deallog.push("Q1"); break;
-	  case 2: fe = &fe2; deallog.push("Q2"); break;
-	  case 3: fe = &fe3; deallog.push("Q3"); break;
-	  case 4: fe = &fe4; deallog.push("Q4"); break;
-	}
-
       tr.refine_global(1);
       Triangulation<2>::active_cell_iterator cell = tr.begin_active();
       cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
 
       tr.refine_global(1);
-      dof.distribute_dofs(*fe);
+
+      FE_Q<2> fe(degree);
+
+      MGDoFHandler<2> mgdof(tr);
+      DoFHandler<2>& dof(mgdof);
+  
+      dof.distribute_dofs(fe);
       const unsigned int size = dof.n_dofs();
       deallog << "DoFs " << size << endl;
       deallog << "Levels: " << tr.n_levels() << endl;

@@ -13,7 +13,8 @@
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_handler.h>
 #include <grid/intergrid_map.h>
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
+#include <fe/mapping_q1.h>
 
 #include <fstream>
 
@@ -31,8 +32,8 @@ void check ()
   tria_1.refine_global (5-dim);
   tria_2.copy_triangulation (tria_1);
 
-  FEQ1<dim> fe_1;
-  FEQ2<dim> fe_2;
+  FE_Q<dim> fe_1(1);
+  FE_Q<dim> fe_2(2);
   
 				   // make several loops to refine the
 				   // two grids

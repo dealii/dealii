@@ -17,7 +17,8 @@
 #include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_values.h>
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
+#include <fe/mapping_q1.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
@@ -39,12 +40,13 @@ int main ()
   GridGenerator::hyper_cube (tria,0,1);
   tria.begin_active()->vertex(2)(0) = 2;
 
-  FEQ1<2> fe;
+  FE_Q<2> fe(1);
   DoFHandler<2> dof(tria);
   dof.distribute_dofs(fe);
 
   QTrapez<2> q;
-  FEValues<2> fevalues(fe,q,update_gradients);
+  MappingQ1<2> mapping;
+  FEValues<2> fevalues(mapping,fe,q,update_gradients);
   fevalues.reinit (dof.begin_active());
 
 

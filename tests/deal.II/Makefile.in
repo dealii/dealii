@@ -66,10 +66,10 @@ endif
 
 
 all: grid_test.check dof_test.check data_out.check \
-     fe_tables.check gradients.check \
-     constraints.check mg.check mglocal.check wave-test-3.check \
+     derivatives.check gradients.check \
+     constraints.check mg.check mglocal.check \
      block_matrices.check second_derivatives.check \
-     intergrid_constraints.check intergrid_map.check
+     intergrid_constraints.check intergrid_map.check wave-test-3.check
 
 exe: $(all:.check=.testcase) benchmark
 run: $(all:.check=.output)
@@ -142,20 +142,20 @@ endif
 
 data_out.testcase: $(data_out-o-files) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
+	@$(CXX) $(flags) -o $@ $^
 
 
 ############################################################
 
-fe_tables-cc-files = fe_tables.cc 
+derivatives-cc-files = derivatives.cc 
 
 ifeq ($(debug-mode),on)
-fe_tables-o-files = $(fe_tables-cc-files:.cc=.go)
+derivatives-o-files = $(derivatives-cc-files:.cc=.go)
 else
-fe_tables-o-files = $(fe_tables-cc-files:.cc=.o)
+derivatives-o-files = $(derivatives-cc-files:.cc=.o)
 endif
 
-fe_tables.testcase: $(fe_tables-o-files) $(libraries)
+derivatives.testcase: $(derivatives-o-files) $(libdeal1d) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
@@ -368,6 +368,7 @@ wave-test-3.output: wave-test-3.testcase
 	@./$<
 	@perl -pi -e 's/JobId.*//;\
 		s/value.*//;\
+		s/-?\d\.\d+e-1[4-9]/0/g;\
 		s/%%Creation Date:.*//;\
 		s/# Time =.*//; \
 		s/# Date =.*//; \

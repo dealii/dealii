@@ -9,14 +9,16 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
+#include <numerics/dof_renumbering.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_handler.h>
 #include <grid/intergrid_map.h>
-#include <fe/fe_lib.lagrange.h>
-#include <fe/fe_lib.dg.h>
+#include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe_system.h>
 
 #include <fstream>
@@ -49,15 +51,15 @@ void check ()
 				   // note that presently dq2 elements
 				   // are not implemented in 3d, so
 				   // take special measures
-  const FEDG_Q0<dim> fe_constant;
-  const FEQ2<dim>    fe_quadratic;
-  const FEDG_Q1<dim> fe_dq_linear;
-  const FEDG_Q2<dim> *fe_dq_quadratic = (dim != 3
+  const FE_DGQ<dim> fe_constant(0);
+  const FE_Q<dim>    fe_quadratic(2);
+  const FE_DGQ<dim> fe_dq_linear(1);
+  const FE_DGQ<dim> *fe_dq_quadratic = (dim != 3
 					 ?
-					 new FEDG_Q2<dim>()
+					 new FE_DGQ<dim>(2)
 					 :
 					 0);
-  
+
   const FESystem<dim>
     *fe_1 = (dim != 3
 	     ?
@@ -69,6 +71,7 @@ void check ()
 			       fe_dq_linear,     2,
 			       fe_constant,      12)
 	     );
+
   const FESystem<dim>
     *fe_2 = (dim != 3
 	     ?
@@ -92,6 +95,8 @@ void check ()
 
       dof_1.distribute_dofs (*fe_1);
       dof_2.distribute_dofs (*fe_2);
+      DoFRenumbering::Cuthill_McKee (dof_1);
+      DoFRenumbering::Cuthill_McKee (dof_2);
 
       deallog << "  Grid 1: " << tria_1.n_active_cells() << " cells, "
 	      << dof_1.n_dofs() << " dofs" << endl;
