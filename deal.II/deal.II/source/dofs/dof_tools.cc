@@ -1880,10 +1880,17 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
 
 				   // now loop over all cells and
 				   // enquire the support points on
-				   // each of these
-  QMidpoint<dim> q_dummy;
+				   // each of these. use a dummy
+				   // quadrature formula where the
+				   // quadrature points are located at
+				   // the unit support points to
+				   // enquire the location of the
+				   // support points in real space
+  Quadrature<dim> q_dummy(dof_handler.get_fe().get_unit_support_points(),
+			  std::vector<double> (dofs_per_cell,
+					       1./dofs_per_cell));
   FEValues<dim> fe_values (mapping, dof_handler.get_fe(),
-			   q_dummy, update_support_points);
+			   q_dummy, update_q_points);
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -1893,12 +1900,10 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
     {
       fe_values.reinit (cell);
       cell->get_dof_indices (local_dof_indices);
-//TODO:[WB] Uncomment code once FEValues::get_support_points is available. Add a ChangeLog entry then.
-      Assert (false, ExcNotImplemented());
-//        const std::vector<Point<dim> > & support_points
-//  	= fe_values.get_support_points ();
-//        for (unsigned int i=0; i<dofs_per_cell; ++i)
-//  	support_points[local_dof_indices[i]] = support_points[i];
+      const std::vector<Point<dim> > & points
+  	= fe_values.get_quadrature_points ();
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	support_points[local_dof_indices[i]] = points[i];
     };
 };
 
