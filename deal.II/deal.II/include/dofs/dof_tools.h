@@ -14,14 +14,12 @@
 #define __deal2__dof_tools_h
 
 
-// Copyright Wolfgang Bangerth, Guido Kanschat, and others 1999, 2000
-
-
 #include <base/exceptions.h>
 #include <vector>
 
 class SparsityPattern;
 template <typename number> class Vector;
+template <typename number> class FullMatrix;
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 class ConstraintMatrix;
