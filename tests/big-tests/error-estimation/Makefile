@@ -23,12 +23,12 @@ run-parameters  =
 
 # To execute additional action apart from running the program, fill
 # in this list:
-additional-run-action = gnuplot make_ps
+additional-run-action = gnuplot make_ps ; ./strip_comments
 
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the
 # following list
-delete-files = gnuplot* *inp *.ps *.eps
+delete-files = gnuplot* *inp *.ps *.eps history.*
 
 
 

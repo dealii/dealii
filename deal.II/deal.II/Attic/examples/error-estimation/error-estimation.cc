@@ -385,8 +385,8 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
 		tria->execute_refinement ();
 		break;
 	  case error_estimator:
-		tria->execute_refinement ();
 		tria->refine_fixed_number (estimated_error_per_cell, 0.3);
+		tria->execute_refinement ();
 		break;
 	};
       cout << endl << endl;

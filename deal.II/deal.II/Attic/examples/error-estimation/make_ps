@@ -21,3 +21,6 @@ set output "history.estimated_error.eps"
 
 plot "history.estimated_error.gnuplot" using 1:2 title "L2 error","history.estimated_error.gnuplot" using 1:3 title "Linfty error","history.estimated_error.gnuplot" using 1:4 title "H1 error","history.estimated_error.gnuplot" using 1:5 title "Estimated H1 error"
 
+
+set output "history.compare.eps"
+plot "history.global.gnuplot" using 1:2 title "global refinement -- L2 error", "history.true_error.gnuplot" using 1:2 title "ref. by true error -- L2 error", "history.estimated_error.gnuplot" using 1:2 title "ref. by estimated error -- L2 error", "history.global.gnuplot" using 1:4 title "global refinement -- H1 error", "history.true_error.gnuplot" using 1:4 title "ref. by true error -- H1 error", "history.estimated_error.gnuplot" using 1:4 title "ref. by estimated error -- H1 error"
