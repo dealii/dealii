@@ -892,7 +892,8 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
 	      ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
 
 
-      Point<spacedim> ver[16];			    // value for all points in this patch
+      vector<Point<spacedim> > ver((n_subdivisions+1)*
+				   (n_subdivisions+1));
       
       for (unsigned int i=0; i<n_subdivisions+1; ++i)
 	{
@@ -919,7 +920,10 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
 		  const int dl = i*(n_subdivisions+1)+j;
 		  if (flags.smooth)               // only if smooth triangles are used
 		    {
-		      Point<3> nrml[16];     // aproximate normal vectors in patch
+						       // aproximate normal
+						       // vectors in patch
+		      vector<Point<3> > nrml((n_subdivisions+1)*
+					     (n_subdivisions+1));
 		      Point<3> h1,h2;
 		      for (unsigned int i=0; i<n_subdivisions+1;++i)
 			{
@@ -1005,34 +1009,46 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
 			  << ver[dl](0) << ","   
 			  << patch->data(0,dl) << ","
 			  << ver[dl](1) << ">, <"
-			  << nrml[dl] << ">," << std::endl;
+			  << nrml[dl](0) << ", " << nrml[dl](1) << ", " << nrml[dl](2)
+			  << ">," << std::endl;
 		      out << " \t<" 
 			  << ver[dl+n_subdivisions+1](0) << "," 
 			  << patch->data(0,dl+n_subdivisions+1)  << ","
 			  << ver[dl+n_subdivisions+1](1) << ">, <"
-			  << nrml[dl+n_subdivisions+1] << ">," << std::endl;
+			  << nrml[dl+n_subdivisions+1](0) << ", "
+			  << nrml[dl+n_subdivisions+1](1) << ", "
+			  << nrml[dl+n_subdivisions+1](2)
+			  << ">," << std::endl;
 		      out << "\t<" 
 			  << ver[dl+n_subdivisions+2](0) << "," 
 			  << patch->data(0,dl+n_subdivisions+2)  << ","
 			  << ver[dl+n_subdivisions+2](1) << ">, <"
-			  << nrml[dl+n_subdivisions+2] << ">}" << std::endl; 
+			  << nrml[dl+n_subdivisions+2](0) << ", "
+			  << nrml[dl+n_subdivisions+2](1) << ", "
+			  << nrml[dl+n_subdivisions+2](2) 
+			  << ">}" << std::endl; 
 		      
 						       // upper/left triangle
 		      out << "smooth_triangle {" << std::endl << "\t<" 
 			  << ver[dl](0) << "," 
 			  << patch->data(0,dl) << ","
 			  << ver[dl](1) << ">, <"
-			  << nrml[dl] << ">," << std::endl;
+			  << nrml[dl](0) << ", " << nrml[dl](1) << ", " << nrml[dl](2) 
+			  << ">," << std::endl;
 		      out << "\t<" 
 			  << ver[dl+n_subdivisions+2](0) << "," 
 			  << patch->data(0,dl+n_subdivisions+2)  << ","
 			  << ver[dl+n_subdivisions+2](1) << ">, <"
-			  << nrml[dl+n_subdivisions+2] << ">," << std::endl;
+			  << nrml[dl+n_subdivisions+2](0) << ", "
+			  << nrml[dl+n_subdivisions+2](1) << ", "
+			  << nrml[dl+n_subdivisions+2](2)
+			  << ">," << std::endl;
 		      out << "\t<" 
 			  << ver[dl+1](0) << "," 
 			  << patch->data(0,dl+1)  << ","
 			  << ver[dl+1](1) << ">, <"
-			  << nrml[dl+1] << ">}" << std::endl;
+			  << nrml[dl+1](0) << ", " << nrml[dl+1](1) << ", " << nrml[dl+1](2)
+			  << ">}" << std::endl;
 		    }
 		  else
 		    {		
@@ -1063,8 +1079,8 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
 		      out << "\t<" 
 			  << ver[dl+1](0) << ","
 			  << patch->data(0,dl+1)  << ","
-			  << ver[dl+1](1) << ">}" << std::endl;
-		    };
+			   << ver[dl+1](1) << ">}" << std::endl;
+		        };
 		};
 	    };
 	}
