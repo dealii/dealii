@@ -80,6 +80,9 @@ class SquareFunction : public Function<dim>
  * boundary values on the domain $(-1,1)^d$. In the inside, it is the
  * product of $x_i^2-1$.
  *
+ * Providing a non-zero argument to the constructor, the whole function
+ * can be offset by a constant.
+ *
  * Together with the function, its derivatives and Laplacian are defined.
  *
  * @author: Guido Kanschat, 1999
@@ -88,6 +91,13 @@ template<int dim>
 class PillowFunction : public Function<dim>
 {
   public:
+				     /**
+				      * Constructor. Provide a
+				      * constant that will be added to
+				      * each function value.
+				      */
+    PillowFunction (const double offset=0.);
+
 				     /**
 				      * The value at a single point.
 				      */
@@ -126,6 +136,8 @@ class PillowFunction : public Function<dim>
     virtual void laplacian_list (const vector<Point<dim> > &points,
 				 vector<double>            &values,
 				 const unsigned int         component = 0) const;
+  private:
+    const double offset;
 };
 
 

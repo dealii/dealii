@@ -109,6 +109,13 @@ SquareFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 
 
 template<int dim>
+PillowFunction<dim>::PillowFunction (const double offset)
+		:
+		offset(offset)
+{}
+
+
+template<int dim>
 double
 PillowFunction<dim>::value (const Point<dim>   &p,
 			    const unsigned int) const
@@ -116,11 +123,11 @@ PillowFunction<dim>::value (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    return 1.-p(0)*p(0);
+	    return 1.-p(0)*p(0)+offset;
       case 2:
-	    return (1.-p(0)*p(0))*(1.-p(1)*p(1));
+	    return (1.-p(0)*p(0))*(1.-p(1)*p(1))+offset;
       case 3:
-	    return (1.-p(0)*p(0))*(1.-p(1)*p(1))*(1.-p(2)*p(2));
+	    return (1.-p(0)*p(0))*(1.-p(1)*p(1))*(1.-p(2)*p(2))+offset;
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -142,13 +149,13 @@ PillowFunction<dim>::value_list (const vector<Point<dim> > &points,
       switch(dim)
 	{
 	  case 1:
-		values[i] = 1.-p(0)*p(0);
+		values[i] = 1.-p(0)*p(0)+offset;
 		break;
 	  case 2:
-		values[i] = (1.-p(0)*p(0))*(1.-p(1)*p(1));
+		values[i] = (1.-p(0)*p(0))*(1.-p(1)*p(1))+offset;
 		break;
 	  case 3:
-		values[i] = (1.-p(0)*p(0))*(1.-p(1)*p(1))*(1.-p(2)*p(2));
+		values[i] = (1.-p(0)*p(0))*(1.-p(1)*p(1))*(1.-p(2)*p(2))+offset;
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
