@@ -5,7 +5,7 @@
 /*----------------------------   problem_base.h     ---------------------------*/
 
 
-#include "../deal/dsmatrix.h"
+#include <lac/dsmatrix.h>
 
 
 // forward declaration

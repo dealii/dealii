@@ -8,7 +8,7 @@
 #include <grid/tria_line.h>
 #include <grid/tria_quad.h>
 #include <grid/point.h>
-#include "tria_boundary.h"
+#include <grid/tria_boundary.h>
 
 
 //#ifdef __GNUC__

@@ -4,7 +4,7 @@
 #define __fe_H
 /*----------------------------   fe.h     ---------------------------*/
 
-#include "../deal/dfmatrix.h"
+#include <lac/dfmatrix.h>
 #include <grid/point.h>
 #include <basic/exceptions.h>
 #include <grid/tria.h>
