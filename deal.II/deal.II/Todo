@@ -179,3 +179,6 @@ Change the vector<int> in 'void DoFQuadAccessor::get_dof_indices(
 
 Remove that pseudo-template clutter in the lower parts of
         dof_accessor.cc marked by comments.
+
+
+Remove the flag -fno-vtable-thunks if egcs's bug is removed someday.
