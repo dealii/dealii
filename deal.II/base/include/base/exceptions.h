@@ -563,7 +563,9 @@ class Exception5 : public ExceptionBase {                             \
 }
 
 
-DeclException0(ExcNotImplemented);
+DeclException0 (ExcNotImplemented);
+DeclException0 (ExcInternalError);
+
 
 
 /*----------------------------   exceptions.h     ---------------------------*/
