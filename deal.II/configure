@@ -2695,10 +2695,18 @@ echo "${ECHO_T}C++ compiler is Portland Group C++" >&6
   	          GXX_VERSION=portland_group
   	        else
 
-                                        { { echo "$as_me:$LINENO: error: Unrecognized compiler" >&5
+  	            	          is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
+  	          if test "x$is_aCC" != "x" ; then
+  	            echo "$as_me:$LINENO: result: C++ compiler is HP aCC" >&5
+echo "${ECHO_T}C++ compiler is HP aCC" >&6
+  	            GXX_VERSION=hp_aCC
+  	          else
+
+                                            { { echo "$as_me:$LINENO: error: Unrecognized compiler" >&5
 echo "$as_me: error: Unrecognized compiler" >&2;}
    { (exit sorry); exit sorry; }; }
-                    exit 1
+                      exit 1
+                    fi
                   fi
                 fi
               fi
@@ -2868,6 +2876,13 @@ rm -f conftest.$ac_objext conftest.$ac_ext
 	  CXXFLAGSG="$CXXFLAGS -A -Xa -DDEBUG"
           CXXFLAGSO="$CXXFLAGS -A -Xa"
           CXXFLAGSPIC="-Kpic"
+          ;;
+
+      hp_aCC)
+          CXXFLAGSG="$CXXFLAGS -g1 +p +w -z -Aa -AA"
+          CXXFLAGSO="$CXXFLAGS -A -Xa -z +O2 -Aa -AA"
+          CXXFLAGSPIC="+Z"
+	  # for linking shared libs, -b is also necessary...
           ;;
 
       *)
