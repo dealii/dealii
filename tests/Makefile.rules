@@ -45,7 +45,7 @@ verbose = off
 
 %.check : %.output
 	@echo '=====Checking======' $< ;
-	@if test "x$verbose" = "xon" then \
+	@if test "x$verbose" = "xon" ; then \
 		cmd="diff $< $(patsubst %.output,%.checked, $<)" ; \
 	 else \
 		cmd="diff $< $(patsubst %.output,%.checked, $<) > /dev/null" ; \
