@@ -83,12 +83,14 @@ class Subscriptor
 				      * Object may not be deleted, since
 				      * it is used.
 				      */
-    DeclException0(InUse);
+    DeclException1(ExcInUse,
+		   int,
+		   << "This object is still used by " << arg1 << " other objects.");
 				     /**
 				      * Exception: object should be used
 				      * when #unsubscribe# is called.
 				      */
-    DeclException0(NotUsed);
+    DeclException0(ExcNotUsed);
   
 
   private:

@@ -17,7 +17,7 @@ Subscriptor::Subscriptor (const Subscriptor &) :
 
 
 Subscriptor::~Subscriptor () {
-  Assert (counter == 0, InUse());
+  Assert (counter == 0, ExcInUse(counter));
 };
 
 
@@ -35,7 +35,7 @@ void Subscriptor::subscribe () const {
 
 
 void Subscriptor::unsubscribe () const {
-  Assert (counter>0, NotUsed());
+  Assert (counter>0, ExcNotUsed());
   --counter;
 };
 
