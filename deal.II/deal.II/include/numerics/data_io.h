@@ -253,7 +253,7 @@ class DataIn {
  * plot of the (#x-2#)th data set. For example, using #x=4# would mean to
  * plot the second data set.
  *
- * This format is somewhat restricted to coninuous data and to finite elements
+ * This format is somewhat restricted to continuous data and to finite elements
  * of first order only. The reason for the first restriction is that it takes
  * nodal values and can therefore only work if a finite element has degrees of
  * freedom in the vertices of each cell. This is not the case for discontinuous
