@@ -256,10 +256,12 @@ class SparsityPattern : public Subscriptor
     ~SparsityPattern ();
 
 				     /**
-				      * Copy operator. For this the same holds
-				      * as for the copy constructor: it is
-				      * declared, defined and fine to be called,
-				      * but the latter only for empty objects.
+				      * Copy operator. For this the
+				      * same holds as for the copy
+				      * constructor: it is declared,
+				      * defined and fine to be called,
+				      * but the latter only for empty
+				      * objects.
 				      */
     SparsityPattern & operator = (const SparsityPattern &);
     
@@ -510,10 +512,11 @@ class SparsityPattern : public Subscriptor
 
 				     /**
 				      * Return the index of the matrix
-				      * element with row number @p{i} and
-				      * column number @p{j}. If the matrix
-				      * element is not a nonzero one,
-				      * return @p{SparsityPattern::invalid_entry}.
+				      * element with row number @p{i}
+				      * and column number @p{j}. If
+				      * the matrix element is not a
+				      * nonzero one, return
+				      * @p{SparsityPattern::invalid_entry}.
 				      *
 				      * This function is usually called
 				      * by the @p{operator()} of the
@@ -525,10 +528,39 @@ class SparsityPattern : public Subscriptor
 				      * with a binary sort algorithm
 				      * because the column numbers are
 				      * sorted.
+				      *
+				      * If @p{m} is the number of
+				      * entries in @p{row}, then the
+				      * complexity of this function is
+				      * @p{log(m)} if the sparsity
+				      * pattern is compressed.
 				      */
     unsigned int operator() (const unsigned int i, 
 			     const unsigned int j) const;
 
+				     /**
+				      * This is the inverse operation
+				      * to @p{operator()}: given a
+				      * global index, find out row and
+				      * column of the matrix entry to
+				      * which it belongs. The returned
+				      * value is the pair composed of
+				      * row and column index.
+				      *
+				      * This function may only be
+				      * called if the sparsity pattern
+				      * is closed. The global index
+				      * must then be between zero and
+				      * @p{n_nonzero_elements}.
+				      *
+				      * If @p{N} is the number of
+				      * rows of this matrix, then the
+				      * complexity of this function is
+				      * @p{log(N)}.
+				      */
+    std::pair<unsigned int, unsigned int>
+    matrix_position (const unsigned int global_index) const;
+    
 				     /**
 				      * Add a nonzero entry to the matrix.
 				      * This function may only be called

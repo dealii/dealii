@@ -661,6 +661,38 @@ SparsityPattern::exists (const unsigned int i,
 }
 
 
+
+std::pair<unsigned int, unsigned int>
+SparsityPattern::matrix_position (const unsigned int global_index) const
+{
+  Assert (compressed == true, ExcNotCompressed());
+  Assert (global_index < n_nonzero_elements(),
+	  ExcIndexRange (global_index, 0, n_nonzero_elements()));
+
+				   // first find the row in which the
+				   // entry is located. for this note
+				   // that the rowstart array indexes
+				   // the global indices at which each
+				   // row starts. since it is sorted,
+				   // and since there is an element
+				   // for the one-past-last row, we
+				   // can simply use a bisection
+				   // search on it
+  const unsigned int row
+    = (std::upper_bound (&rowstart[0], &rowstart[rows], global_index)
+       - &rowstart[0] - 1);
+
+				   // now, the column index is simple
+				   // since that is what the colnums
+				   // array stores:
+  const unsigned int col = colnums[global_index];
+
+				   // so return the respective pair
+  return std::make_pair (row,col);
+};
+
+
+
 void
 SparsityPattern::symmetrize () 
 {

@@ -96,6 +96,31 @@ main ()
       for (; sp3_p != sp3.get_column_numbers()+sp3.get_rowstart_indices()[row+1]; ++sp3_p, ++sp4_p)
 	Assert (*sp3_p == *sp4_p, ExcInternalError());
     };
+
+
+				   // check the matrix_position
+				   // function with sparsity patterns
+				   // sp1 through sp4. the checked
+				   // function should be the inverse
+				   // of operator()
+				   //
+				   // check inverseness property first
+				   // forward, then backward
+  for (unsigned int loop=1; loop<=4; ++loop)
+    {
+      const SparsityPattern &
+	sp = (loop==1 ? sp1 : (loop==2 ? sp2 : (loop==3 ? sp3 : sp4)));
+      for (unsigned int i=0; i<sp.n_nonzero_elements(); ++i)
+	Assert (sp(sp.matrix_position(i).first,
+		    sp.matrix_position(i).second) == i,
+		ExcInternalError());
+      for (unsigned int row=0; row<sp.n_rows(); ++row)
+	for (unsigned int col=0; col<sp.n_cols(); ++col)
+	  if (sp(row,col) != SparsityPattern::invalid_entry)
+	    Assert (sp.matrix_position(sp(row,col)) ==
+		    std::make_pair(row,col),
+		    ExcInternalError());
+    };
 };
 
   
