@@ -36,13 +36,16 @@ namespace
 
 template <typename number>
 void
-Legendre<number>::compute_coefficients (const unsigned int k)
+Legendre<number>::compute_coefficients (unsigned int k)
 {
 				   // first make sure that no other
 				   // thread intercepts the operation
 				   // of this function
   coefficients_lock.acquire ();
 
+				   // The first 2 coefficients are hard-coded
+  if (k==0)
+    k=1;
 				   // check: does the information
 				   // already exist?
   if ((coefficients.size() < k+1) ||
