@@ -199,7 +199,7 @@ sizeof(FE_Nedelec<3>::Matrices::embedding[0]);
 // Here, the same applies as for the embedding matrices: since the DoF
 // values are not only multiplied by the values of the shape function
 // on the unit cell, but also by the transformation, we have to
-// multiply the value on the large face by two to get the same value
+// multiply the value on the large face by 1/2 to get the same value
 // back on the small face
 namespace FE_Nedelec_3d 
 {
