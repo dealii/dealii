@@ -111,16 +111,21 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
       mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
       if test "x$mips_pro" != "x" ; then
         case "$mips_pro" in
-          *"7.0"* | *"7.1"* | *"7.2"* | *"7.3"*)
+          *7.0* | *7.1* | *7.2* | *7.3*)
             dnl MIPSpro 7.3 does not support standard C++, therefore it is not
             dnl able to compile deal.II. Previous compiler versions neither.
             AC_MSG_RESULT(C++ compiler is $mips_pro)
             AC_MSG_ERROR(This compiler is not supported)
             GXX_VERSION=MIPSpro7.3
             ;;
-          *"7.4"*)
+          *7.4)
             AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.4)
+            AC_MSG_ERROR(This compiler is not supported. Use MIPSPro compiler 7.4x)
             GXX_VERSION=MIPSpro7.4
+            ;;
+          *7.41* | *7.42* | *7.43* | *7.44*)
+            AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.4x)
+            GXX_VERSION=MIPSpro7.4x
             ;;
           *"7.5"*)
             AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.5)
@@ -412,14 +417,14 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl The indicated enumeration value is out of "int" range.
           dnl cc-1485 CC: WARNING File = /usr/include/CC/iomanip, Line = 122
           dnl This form for taking the address of a member function is nonstandard.
-          CXXFLAGSG="$CXXFLAGS -DDEBUG -no_auto_include -ansiW -woff 1429,1066,1485"
+          CXXFLAGSG="$CXXFLAGS -DDEBUG -D__sgi__ -no_auto_include -ansiW -woff 1429,1066,1485"
           dnl Disable some compiler warnings, that warn about variables
           dnl which are used in Assert templates but not in optimized mode
           dnl cc-1174 CC: full_matrix.templates.h, Line = 1461
           dnl The variable "typical_diagonal_element" was declared but never referenced.
           dnl cc-1552 CC: WARNING File = source/data_out_base.cc, Line = 3493
           dnl The variable "ierr" is set but never used.
-          CXXFLAGSO="$CXXFLAGS -O2 -no_auto_include -woff 1174,1552"
+          CXXFLAGSO="$CXXFLAGS -D__sgi__ -O2 -no_auto_include -woff 1174,1552"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC"
           dnl Avoid output of prelinker
