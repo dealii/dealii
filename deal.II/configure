@@ -2672,6 +2672,13 @@ fi
 
 
 
+            if test "$GXX" = "yes" ; then
+    GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
+    if test "x$GXX_VERSION_STRING" = "x" ; then
+      GXX=no
+    fi
+  fi
+
   if test "$GXX" = yes ; then
         GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
@@ -2762,6 +2769,7 @@ echo "${ECHO_T}C++ compiler is MIPSpro C++ compiler" >&6
 	  version5="`echo $is_intel_icc | grep 'Version 5'`"
 	  version6="`echo $is_intel_icc | grep 'Version 6'`"
 	  version7="`echo $is_intel_icc | grep 'Version 7'`"
+	  version8="`echo $is_intel_icc | grep 'Version 8'`"
           if test "x$version5" != "x" ; then
             echo "$as_me:$LINENO: result: C++ compiler is Intel ICC 5" >&5
 echo "${ECHO_T}C++ compiler is Intel ICC 5" >&6
@@ -2774,11 +2782,15 @@ echo "${ECHO_T}C++ compiler is Intel ICC 6" >&6
             echo "$as_me:$LINENO: result: C++ compiler is Intel ICC 7" >&5
 echo "${ECHO_T}C++ compiler is Intel ICC 7" >&6
             GXX_VERSION=intel_icc7
+          else if test "x$version8" != "x" ; then
+            echo "$as_me:$LINENO: result: C++ compiler is Intel ICC 8" >&5
+echo "${ECHO_T}C++ compiler is Intel ICC 8" >&6
+            GXX_VERSION=intel_icc8
           else
             echo "$as_me:$LINENO: result: C++ compiler is Intel ICC" >&5
 echo "${ECHO_T}C++ compiler is Intel ICC" >&6
             GXX_VERSION=intel_icc
-          fi fi fi
+          fi fi fi fi
         else
 
                     is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
@@ -3097,8 +3109,8 @@ rm -f conftest.$ac_objext conftest.$ac_ext
           ;;
 
       portland_group)
-	            	   	  	                                                     	  	  	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175"
-          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175"
+	            	   	  	                                                     	  	   	  	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175 --diag_suppress 284"
+          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175 --diag_suppress 284"
           CXXFLAGSPIC="-Kpic"
           ;;
 
