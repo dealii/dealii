@@ -33,7 +33,7 @@
  * of the form @p{ Pijk(x,y,z) = Pi(x)Pj(y)Pk(z)}, where the sum of
  * @p{i}, @p{j} and @p{k} is less than or equal @p{n}.
  *
- * @author Guido Kanschat, 2002
+ * @author Guido Kanschat, 2002, Wolfgang Bangerth, 2003
  */
 template <int dim>
 class PolynomialSpace
@@ -55,7 +55,7 @@ class PolynomialSpace
 				      * @p{Polynomial<double>}.
 				      */
     template <class Pol>
-    PolynomialSpace(const std::vector<Pol> &pols);
+    PolynomialSpace (const std::vector<Pol> &pols);
 
 				     /**
 				      * Computes the value and the
@@ -65,9 +65,12 @@ class PolynomialSpace
 				      *
 				      * The size of the vectors must
 				      * either be equal @p{0} or equal
-				      * @p{n()}.  In the
-				      * first case, the function will
-				      * not compute these values.
+				      * @p{n()}.  In the first case,
+				      * the function will not compute
+				      * these values, i.e. you
+				      * indicate what you want to have
+				      * computed by resizing those
+				      * vectors which you want filled.
 				      *
 				      * If you need values or
 				      * derivatives of all polynomials
@@ -79,8 +82,8 @@ class PolynomialSpace
 				      * functions, see below, in a
 				      * loop over all polynomials.
 				      */
-    void compute (const Point<dim>                     &unit_point,
-		  std::vector<double>                  &values,
+    void compute (const Point<dim>            &unit_point,
+		  std::vector<double>         &values,
 		  std::vector<Tensor<1,dim> > &grads,
 		  std::vector<Tensor<2,dim> > &grad_grads) const;
     
@@ -112,8 +115,8 @@ class PolynomialSpace
 				      *
 				      * Consider using @p{compute} instead.
 				      */
-    Tensor<2,dim> compute_grad_grad(const unsigned int i,
-				    const Point<dim> &p) const;
+    Tensor<2,dim> compute_grad_grad (const unsigned int i,
+                                     const Point<dim> &p) const;
 
 				     /**
 				      * Return the number of
@@ -127,7 +130,7 @@ class PolynomialSpace
 				      * 2d, and @p{N(N+1)(N+2)/6 in
 				      * 3d.
 				      */
-    unsigned int n() const;
+    unsigned int n () const;
 
 				     /**
 				      * Exception.
@@ -161,10 +164,8 @@ class PolynomialSpace
 				      * @p{p_n(x,y,z) =
 				      * p_i(x)p_j(y)p_k(z)}.
 				      */
-    void compute_index(unsigned int n,
-		       unsigned int& nx,
-		       unsigned int& ny,
-		       unsigned int& nz) const;
+    void compute_index (const unsigned int n,
+                        unsigned int      (&index)[dim]) const;
     
 				     /**
 				      * Static function used in the
@@ -175,6 +176,21 @@ class PolynomialSpace
 };
 
 
+/* -------------- declaration of explicit specializations --- */
+
+template <>
+void PolynomialSpace<1>::compute_index(const unsigned int n,
+                                       unsigned int      (&index)[1]) const;
+template <>
+void PolynomialSpace<2>::compute_index(const unsigned int n,
+                                       unsigned int      (&index)[2]) const;
+template <>
+void PolynomialSpace<3>::compute_index(const unsigned int n,
+                                       unsigned int      (&index)[3]) const;
+
+
+
+/* -------------- inline and template functions ------------- */
 
 template <int dim>
 template <class Pol>

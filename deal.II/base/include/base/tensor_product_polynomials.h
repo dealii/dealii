@@ -19,7 +19,6 @@
 #include <base/tensor.h>
 #include <base/point.h>
 #include <base/polynomial.h>
-#include <base/smartpointer.h>
 
 #include <vector>
 
@@ -34,7 +33,13 @@
  * $[0,d], then the tensor product polynomials are orthogonal on
  * $[-1,1]^d$ or $[0,1]^d$, respectively.
  *
- * @author Ralf Hartmann, 2000, documentation Guido Kanschat
+ * Indexing is as following: the order of dim-dimensional polynomials
+ * is x-coordinates running fastest, then y-coordinate, etc. The first
+ * few polynomials are thus @p{P1(x)P1(y)}, @p{P2(x)P1(y)},
+ * @p{P3(x)P1(y)}, ..., @p{P1(x)P2(y)}, @p{P2(x)P2(y)},
+ * @p{P3(x)P2(y)}, ..., and likewise in 3d.
+ * 
+ * @author Ralf Hartmann, Guido Kanschat, 2000, Wolfgang Bangerth 2003
  */
 template <int dim>
 class TensorProductPolynomials
@@ -42,13 +47,15 @@ class TensorProductPolynomials
   public:
 				     /**
 				      * Constructor. @p{pols} is a
-				      * vector of pointers to
-				      * one-dimensional polynomials
-				      * and will be copied into the
-				      * member variable @p{polynomials}.
+				      * vector of objects that should
+				      * be derived or otherwise
+				      * convertible to one-dimensional
+				      * polynomial objects and will be
+				      * copied into the member
+				      * variable @p{polynomials}.
 				      */
     template <class Pol>
-    TensorProductPolynomials(const std::vector<Pol> &pols);
+    TensorProductPolynomials (const std::vector<Pol> &pols);
 
 				     /**
 				      * Computes the value and the
@@ -74,10 +81,10 @@ class TensorProductPolynomials
 				      * loop over all tensor product
 				      * polynomials.
 				      */
-    void compute(const Point<dim>                     &unit_point,
-		 std::vector<double>                  &values,
-		 std::vector<Tensor<1,dim> > &grads,
-		 std::vector<Tensor<2,dim> > &grad_grads) const;
+    void compute (const Point<dim>            &unit_point,
+                  std::vector<double>         &values,
+                  std::vector<Tensor<1,dim> > &grads,
+                  std::vector<Tensor<2,dim> > &grad_grads) const;
     
 				     /**
 				      * Computes the value of the
@@ -158,8 +165,8 @@ class TensorProductPolynomials
 				      * and in a much more efficient
 				      * way.
 				      */
-    Tensor<2,dim> compute_grad_grad(const unsigned int i,
-				    const Point<dim> &p) const;
+    Tensor<2,dim> compute_grad_grad (const unsigned int i,
+                                     const Point<dim> &p) const;
 
 				     /**
 				      * Returns the number of tensor
@@ -191,23 +198,59 @@ class TensorProductPolynomials
 				      */
     const unsigned int n_tensor_pols;
 
-				     /**
-				      * @p{n_pols_to[n]=polynomials.size()^n}
-				      * Filled by the constructor.
-				      *
-				      * For internal use only. 
-				      */
-    std::vector<unsigned int> n_pols_to;
+                                     /**
+                                      * Each tensor product polynomial
+                                      * @þ{i} is a product of
+                                      * one-dimensional polynomials in
+                                      * each space direction. Compute
+                                      * the indices of these
+                                      * one-dimensional polynomials
+                                      * for each space direction,
+                                      * given the index @p{i}.
+                                      */
+    void compute_index (const unsigned int i,
+                        unsigned int       (&indices)[dim]) const;
     
 				     /**
 				      * Computes @p{x} to the power of
-				      * @p{y} for unsigned int @p{x}
-				      * and @p{y}. It is a private
-				      * function as it is only used in
-				      * this class.
+				      * @p{dim} for unsigned int @p{x}.
+				      * Used in the constructor.
 				      */
-    static unsigned int power(const unsigned int x, const unsigned int y);
+    static
+    unsigned int x_to_the_dim (const unsigned int x);
 };
+
+
+
+/* -------------- declaration of explicit specializations --- */
+
+template <>
+void
+TensorProductPolynomials<1>::compute_index(const unsigned int n,
+                                           unsigned int      (&index)[1]) const;
+template <>
+void
+TensorProductPolynomials<2>::compute_index(const unsigned int n,
+                                           unsigned int      (&index)[2]) const;
+template <>
+void
+TensorProductPolynomials<3>::compute_index(const unsigned int n,
+                                           unsigned int      (&index)[3]) const;
+
+
+/* ---------------- template and inline functions ---------- */
+
+template <int dim>
+inline
+unsigned int
+TensorProductPolynomials<dim>::
+x_to_the_dim (const unsigned int x)
+{
+  unsigned int y = 1;
+  for (unsigned int d=0; d<dim; ++d)
+    y *= x;
+  return y;
+}
 
 
 
@@ -217,16 +260,8 @@ TensorProductPolynomials<dim>::
 TensorProductPolynomials(const std::vector<Pol> &pols)
 		:
 		polynomials (pols.begin(), pols.end()),
-		n_tensor_pols(power(pols.size(), dim)),
-		n_pols_to(dim+1)
-{
-  const unsigned int n_pols=polynomials.size();
-
-  n_pols_to[0]=1;
-  for (unsigned int i=0; i<dim; ++i)
-    n_pols_to[i+1]=n_pols_to[i]*n_pols;
-  Assert(n_pols_to[dim]==n_tensor_pols, ExcInternalError());
-}
+		n_tensor_pols(x_to_the_dim(pols.size()))
+{}
 
 
 
