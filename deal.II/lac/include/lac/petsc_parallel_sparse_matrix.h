@@ -76,6 +76,36 @@ namespace PETScWrappers
     {
       public:
                                          /**
+                                          * A structure that describes some of
+                                          * the traits of this class in terms
+                                          * of its run-time behavior. Some
+                                          * other classes (such as the block
+                                          * matrix classes) that take one or
+                                          * other of the matrix classes as its
+                                          * template parameters can tune their
+                                          * behavior based on the variables in
+                                          * this class.
+                                          */
+        struct Traits
+        {
+                                             /**
+                                              * It is not safe to elide
+                                              * additions of zeros to
+                                              * individual elements of this
+                                              * matrix. The reason is that
+                                              * additions to the matrix may
+                                              * trigger collective operations
+                                              * synchronising buffers on
+                                              * multiple processes. If an
+                                              * addition is elided on one
+                                              * process, this may lead to
+                                              * other processes hanging in an
+                                              * infinite waiting loop.
+                                              */
+            static const bool zero_addition_can_be_elided = false;
+        };
+
+                                         /**
                                           * Default constructor. Create an
                                           * empty matrix.
                                           */

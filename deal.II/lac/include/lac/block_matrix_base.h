@@ -1180,8 +1180,12 @@ BlockMatrixBase<MatrixType>::add (const unsigned int i,
                                   const unsigned int j,
                                   const value_type value)
 {
-                                   // save some cycles for zero additions
-  if (value == 0)
+                                   // save some cycles for zero additions, but
+                                   // only if it is safe for the matrix we are
+                                   // working with
+  if ((MatrixType::Traits::zero_addition_can_be_elided == true)
+      &&
+      (value == 0))
     return;
   
   const std::pair<unsigned int,unsigned int>

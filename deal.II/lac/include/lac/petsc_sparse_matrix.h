@@ -42,6 +42,27 @@ namespace PETScWrappers
   {
     public:
                                        /**
+                                        * A structure that describes some of
+                                        * the traits of this class in terms of
+                                        * its run-time behavior. Some other
+                                        * classes (such as the block matrix
+                                        * classes) that take one or other of
+                                        * the matrix classes as its template
+                                        * parameters can tune their behavior
+                                        * based on the variables in this
+                                        * class.
+                                        */
+      struct Traits
+      {
+                                           /**
+                                            * It is safe to elide additions of
+                                            * zeros to individual elements of
+                                            * this matrix.
+                                            */
+          static const bool zero_addition_can_be_elided = true;
+      };
+
+                                       /**
                                         * Default constructor. Create an empty
                                         * matrix.
                                         */
