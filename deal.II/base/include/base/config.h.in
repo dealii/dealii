@@ -5,7 +5,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -123,9 +123,6 @@
    applications. If so, then it is set to one, otherwise to zero. */
 #undef DEAL_II_USE_MT
 
-/* Defined if multi-threading is to be achieved by using the ACE library */
-#undef DEAL_II_USE_MT_ACE
-
 /* Defined if multi-threading is to be achieved by using the POSIX functions
    */
 #undef DEAL_II_USE_MT_POSIX
@@ -195,11 +192,6 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
-
-/* Define if we have to work around a bug in IBM's xlC compiler. See the
-   aclocal.m4 file in the top-level directory for a description of this bug.
-   */
-#undef XLC_WORK_AROUND_STD_BUG
 
 /* If already available, do not define at all. Otherwise, define to __func__
    if that is available. In all other cases, indicate that no information

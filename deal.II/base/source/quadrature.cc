@@ -40,12 +40,6 @@ Quadrature<dim>::Quadrature (const unsigned int n_q) :
 
 
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
-
 template <int dim>
 Quadrature<dim>::Quadrature (const std::vector<Point<dim> > &points,
 			     const std::vector<double>               &weights)

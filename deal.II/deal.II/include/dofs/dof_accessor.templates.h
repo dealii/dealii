@@ -261,11 +261,6 @@ DoFObjectAccessor<2,dim>::vertex_dof_index (const unsigned int vertex,
 }
 
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
 
 template <int dim>
 inline

@@ -260,12 +260,6 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
 
 
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
-
 template <int dim, typename number>
 void
 GridRefinement::refine_and_coarsen_optimize (Triangulation<dim>   &tria,

@@ -48,11 +48,6 @@ void Function<dim>::vector_value (const Point<dim> &,
 }
 
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
 template <int dim>
 void Function<dim>::value_list (const std::vector<Point<dim> > &points,
 				std::vector<double>                     &values,

@@ -1536,50 +1536,6 @@ AC_DEFUN(DEAL_II_HAVE_PRETTY_FUNCTION, dnl
 
 
 dnl -------------------------------------------------------------
-dnl IBM xlC 5.0 from the VisualAge C++ pack has a bug with the following 
-dnl code. We can work around it if we insert code like "using namespace std;"
-dnl in the right place, but we'd like to do so only if absolutely necessary.
-dnl Check whether the compiler which we are using has this bug.
-dnl
-dnl Usage: DEAL_II_CHECK_IBM_XLC_ERROR
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_IBM_XLC_ERROR, dnl
-[
-  AC_MSG_CHECKING(for std::vector bug)
-  AC_LANG(C++)
-  CXXFLAGS="$CXXFLAGSG"
-  AC_TRY_COMPILE(
-    [
-      namespace std {
-        template <class _Ty>                             class allocator {};
-        template<class _Ty, class _Ax = allocator<_Ty> > class vector{};
-      }
-
-      struct X {};
-      template <int dim> void g (const std::vector<X> &x);
-
-      void f ()  {
-        std::vector<X> x;
-        g<1> (x);
-      };
-    ],
-    [],
-    [
-      AC_MSG_RESULT(no)
-    ],
-    [
-      AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(XLC_WORK_AROUND_STD_BUG, 1, 
-                [Define if we have to work around a bug in IBM's xlC compiler.
-                 See the aclocal.m4 file in the top-level directory for a
-                 description of this bug.])
-    ])
-])
-
-
-
-dnl -------------------------------------------------------------
 dnl Sun's Forte compiler (at least up to the Version 7 Early Access
 dnl release) has a problem with the following code, when compiling
 dnl with debug output:

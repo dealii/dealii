@@ -20,14 +20,6 @@
 #include <algorithm>
 
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
-
-
-
 
 template <int dim>
 GridIn<dim>::GridIn () :

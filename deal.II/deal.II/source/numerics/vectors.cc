@@ -38,12 +38,6 @@
 
 //TODO:[GK] Move templates containing vector arguments to vectors.templates.h
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
-
 
 
 template <int dim>

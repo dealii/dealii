@@ -29,10 +29,6 @@
 
 //TODO[GK]: It is relatively confusing with all these update_each, update_once, and in particular update_current flags. there also does not seem to be much documentation at a higher level, except for the documentation of some member variables on this. It would be nice, if we could at least get rid of update_current, to make things a little bit more clear
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
 
 /*------------------------------- FiniteElementBase ----------------------*/
 

@@ -1875,12 +1875,6 @@ void Triangulation<dim>::refine_global (const unsigned int times)
 
 
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
-
 template <int dim>
 void Triangulation<dim>::save_refine_flags (std::vector<bool> &v) const
 {

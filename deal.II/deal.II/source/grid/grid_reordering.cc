@@ -17,12 +17,6 @@
 #include <grid/grid_reordering.h>
 
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
-
 
 // static variables
 #if deal_II_dimension == 2

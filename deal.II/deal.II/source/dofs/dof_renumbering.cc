@@ -39,12 +39,6 @@
 #include <algorithm>
 
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
-
 // for whatever reason, the random_shuffle function used below needs
 // lrand48 to be declared when using -ansi as compiler flag (rather
 // than do so itself). however, inclusion of <cstdlib> or <stdlib.h>
