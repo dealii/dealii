@@ -343,6 +343,10 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 					      dSMatrix  &matrix,
 					      dVector   &solution,
 					      dVector   &right_hand_side) {
+  Assert (matrix.n() == matrix.m(),
+	  ExcDimensionsDontMatch(matrix.n(), matrix.m()));
+  Assert (matrix.n() == right_hand_side.size(),
+	  ExcDimensionsDontMatch(matrix.n(), right_hand_side.size()));
 				   // if no boundary values are to be applied
 				   // simply return
   if (boundary_values.size() == 0)
@@ -362,12 +366,17 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 				       // for each boundary dof:
       
 				       // set entries of this line
-				       // to zero
+				       // to zero except for the diagonal
+				       // entry. Note that the diagonal
+				       // entry is always the first one
+				       // for square matrices, i.e.
+				       // we shall not set
+				       // matrix.global_entry(
+				       //     sparsity_rowstart[dof.first])
       const unsigned int last = sparsity_rowstart[dof_number+1];
-      for (unsigned int j=sparsity_rowstart[dof->first]; j<last; ++j)
-	if (sparsity_colnums[j] != dof_number)
-					   // if not main diagonal entry
-	  matrix.global_entry(j) = 0.;
+      for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
+	matrix.global_entry(j) = 0.;
+
       
 				       // set right hand side to
 				       // wanted value: if main diagonal
@@ -409,22 +418,51 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 
 				       // do the Gauss step
       for (unsigned int row=0; row<n_dofs; ++row) 
-	for (unsigned int j=sparsity_rowstart[row];
-	     j<sparsity_rowstart[row+1]; ++j)
-	  if ((sparsity_colnums[j] == dof_number) &&
-	      ((signed int)row != dof_number))
+	{
+					   // we need not handle the
+					   // row we have already cleared
+	  if ((signed int)row == dof_number)
+	    continue;
+
+					   // check whether the line has
+					   // an entry in the row corresponding
+					   // to the dof presently worked with.
+					   // note again: the first entry is
+					   // the diagonal entry which we
+					   // cannot be interested in; following
+					   // are the other entries in sorted
+					   // order, so we can use a binary
+					   // search
+					   //
+					   // if this row contains an element
+					   // for this dof, *p==dof_number
+	  const int * p = lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
+				      &sparsity_colnums[sparsity_rowstart[row+1]],
+				      dof_number);
+					   // check whether this line has
+					   // an entry in the regarding column
+					   // (check for ==dof_number and
+					   // != next_row, since if
+					   // row==dof_number-1, *p is a
+					   // past-the-end pointer but points
+					   // to dof_number anyway...)
+	  if ((*p == dof_number) &&
+	      (p != &sparsity_colnums[sparsity_rowstart[row+1]]))
 					     // this line has an entry
 					     // in the regarding column
-					     // but this is not the main
-					     // diagonal entry
 	    {
+	      const unsigned int global_entry
+		= (p - &sparsity_colnums[sparsity_rowstart[0]]);
+	      
 					       // correct right hand side
-	      right_hand_side(row) -= matrix.global_entry(j)/diagonal_entry *
-				      new_rhs;
+	      right_hand_side(row) -= matrix.global_entry(global_entry) /
+				      diagonal_entry * new_rhs;
 	      
 					       // set matrix entry to zero
-	      matrix.global_entry(j) = 0.;
+	      matrix.global_entry(global_entry) = 0.;
 	    };
+	};
+      
       
       
 				       // preset solution vector
