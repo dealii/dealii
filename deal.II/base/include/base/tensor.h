@@ -468,6 +468,18 @@ double contract (const Tensor<1,dim> &src1,
 }
 
 
+
+template <int dim>
+inline
+double
+operator * (const Tensor<1,dim> &src1,
+            const Tensor<1,dim> &src2)
+{
+  return contract(src1, src2);
+}
+
+
+
 /**
  * Contract a tensor of rank 2 with a tensor of rank 1. The result is
  * <tt>dest[i] = sum_j src1[i][j] src2[j]</tt>.
@@ -485,6 +497,20 @@ void contract (Tensor<1,dim>       &dest,
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       dest[i] += src1[i][j] * src2[j];
+}
+
+
+
+template <int dim>
+Tensor<1,dim>
+operator * (const Tensor<2,dim> &src1,
+            const Tensor<1,dim> &src2)
+{
+  Tensor<1,dim> dest;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      dest[i] += src1[i][j] * src2[j];
+  return dest;
 }
 
 
@@ -510,6 +536,21 @@ void contract (Tensor<1,dim>       &dest,
 
 
 
+template <int dim>
+inline
+Tensor<1,dim>
+operator * (const Tensor<1,dim> &src1,
+            const Tensor<2,dim> &src2)
+{
+  Tensor<1,dim> dest;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      dest[i] += src1[j] * src2[j][i];
+  return dest;
+}
+
+
+
 /**
  * Contract a tensor of rank 2 with a tensor of rank 2. The result is
  * <tt>dest[i][k] = sum_j src1[i][j] src2[j][k]</tt>.
@@ -528,6 +569,22 @@ void contract (Tensor<2,dim>       &dest,
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
 	dest[i][j] += src1[i][k] * src2[k][j];
+}
+
+
+
+template <int dim>
+inline
+Tensor<2,dim>
+operator * (const Tensor<2,dim> &src1,
+            const Tensor<2,dim> &src2)
+{
+  Tensor<2,dim> dest;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	dest[i][j] += src1[i][k] * src2[k][j];
+  return dest;
 }
 
 
@@ -679,6 +736,23 @@ void contract (Tensor<3,dim>       &dest,
 
 
 
+template <int dim>
+inline
+Tensor<3,dim>
+operator * (const Tensor<3,dim> &src1,
+            const Tensor<2,dim> &src2)
+{
+  Tensor<3,dim> dest;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  dest[i][j][k] += src1[i][j][l] * src2[l][k];
+  return dest;
+}
+
+
+
 /**
  * Contract a tensor of rank 2 with a tensor of rank 3. The result is
  * <tt>dest[i][j][l] = sum_k src1[i][k] src2[k][j][l]</tt>.
@@ -701,6 +775,23 @@ void contract (Tensor<3,dim>       &dest,
 }
 
 
+
+template <int dim>
+inline
+Tensor<3,dim>
+operator * (const Tensor<2,dim> &src1,
+            const Tensor<3,dim> &src2)
+{
+  Tensor<3,dim> dest;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  dest[i][j][k] += src1[i][l] * src2[l][j][k];
+  return dest;
+}
+
+
 /**
  * Contract a tensor of rank 3 with a tensor of rank 3. The result is
  * <tt>dest[i][j][k][l] = sum_m src1[i][j][m] src2[m][k][l]</tt>.
@@ -710,17 +801,18 @@ void contract (Tensor<3,dim>       &dest,
  */
 template <int dim>
 inline
-void contract (Tensor<4,dim>       &dest,
-	       const Tensor<3,dim> &src1,
-	       const Tensor<3,dim> &src2)
+Tensor<4,dim>
+operator * (const Tensor<3,dim> &src1,
+            const Tensor<3,dim> &src2)
 {
-  dest.clear ();
+  Tensor<4,dim> dest;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
 	for (unsigned int l=0; l<dim; ++l)
 	  for (unsigned int m=0; m<dim; ++m)
 	    dest[i][j][k][l] += src1[i][j][m] * src2[m][k][l];
+  return dest;
 }
 
 
