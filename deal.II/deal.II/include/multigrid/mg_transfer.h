@@ -43,7 +43,7 @@ template <int dim> class MGDoFHandler;
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002
  */
-template<typename number>
+template <typename number>
 class MGTransferPrebuilt : public MGTransferBase<Vector<number> > 
 {
   public:
@@ -111,7 +111,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      * on each of the levels
 				      * separately, i.a. an @p{MGVector}.
 				      */
-    template<int dim, class InVector>
+    template <int dim, class InVector>
     void
     copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
 		MGLevelObject<Vector<number> > &dst,
@@ -129,7 +129,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      * constrained degrees of freedom
 				      * are set to zero.
 				      */
-    template<int dim, class OutVector>
+    template <int dim, class OutVector>
     void
     copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
 		  OutVector                            &dst,
@@ -143,7 +143,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      * function, but probably not for
 				      * continuous elements.
 				      */
-    template<int dim, class OutVector>
+    template <int dim, class OutVector>
     void
     copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
 		      OutVector                            &dst,
@@ -200,6 +200,54 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      */
     std::vector<boost::shared_ptr<SparseMatrix<double> > > prolongation_matrices;
 #endif
+
+				     /**
+				      * Structure that is used to
+				      * disambiguate calls to
+				      * @p{copy_to_mg} for 1d and
+				      * non-1d. We provide two
+				      * functions of @p{copy_to_mg},
+				      * where the 1d function takes an
+				      * argument of type
+				      * @p{is_1d<true>} and the other
+				      * one of type @p{is_1d<false>}.
+				      */
+    template <bool> struct is_1d;
+    
+				     /**
+				      * Implementation of the
+				      * @p{copy_to_mg} function for
+				      * 1d. We have to resort to some
+				      * template trickery because we
+				      * can't specialize template
+				      * functions on the (outer)
+				      * template of the class, without
+				      * also fully specializing the
+				      * inner (member function)
+				      * template parameters. However,
+				      * it can be done by adding the
+				      * additional argument that
+				      * converts template
+				      * specialization into function
+				      * overloading.
+				      */
+    template <int dim, class InVector>
+    void
+    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+		MGLevelObject<Vector<number> > &dst,
+		const InVector                 &src,
+		const is_1d<true>              &) const;
+
+				     /**
+				      * Same for all other space
+				      * dimensions.
+				      */
+    template <int dim, class InVector>
+    void
+    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+		MGLevelObject<Vector<number> > &dst,
+		const InVector                 &src,
+		const is_1d<false>             &) const;
 };
 
 
@@ -377,7 +425,7 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * on each of the levels
 				      * separately, i.a. an @p{MGVector}.
 				      */
-    template<int dim, class InVector>
+    template <int dim, class InVector>
     void
     copy_to_mg (const MGDoFHandler<dim>             &mg_dof,
 		MGLevelObject<BlockVector<number> > &dst,
@@ -395,7 +443,7 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * constrained degrees of freedom
 				      * are set to zero.
 				      */
-    template<int dim, class OutVector>
+    template <int dim, class OutVector>
     void
     copy_from_mg (const MGDoFHandler<dim>                   &mg_dof,
 		  OutVector                                 &dst,
@@ -409,11 +457,60 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * function, but probably not for
 				      * continuous elements.
 				      */
-    template<int dim, class OutVector>
+    template <int dim, class OutVector>
     void
     copy_from_mg_add (const MGDoFHandler<dim>                   &mg_dof,
 		      OutVector                                 &dst,
 		      const MGLevelObject<BlockVector<number> > &src) const;
+
+  private:
+				     /**
+				      * Structure that is used to
+				      * disambiguate calls to
+				      * @p{copy_to_mg} for 1d and
+				      * non-1d. We provide two
+				      * functions of @p{copy_to_mg},
+				      * where the 1d function takes an
+				      * argument of type
+				      * @p{is_1d<true>} and the other
+				      * one of type @p{is_1d<false>}.
+				      */
+    template <bool> struct is_1d;
+
+				     /**
+				      * Implementation of the
+				      * @p{copy_to_mg} function for
+				      * 1d. We have to resort to some
+				      * template trickery because we
+				      * can't specialize template
+				      * functions on the (outer)
+				      * template of the class, without
+				      * also fully specializing the
+				      * inner (member function)
+				      * template parameters. However,
+				      * it can be done by adding the
+				      * additional argument that
+				      * converts template
+				      * specialization into function
+				      * overloading.
+				      */
+    template <int dim, class InVector>
+    void
+    copy_to_mg (const MGDoFHandler<dim>             &mg_dof,
+		MGLevelObject<BlockVector<number> > &dst,
+		const InVector                      &src,
+		const is_1d<true>                   &) const;
+
+				     /**
+				      * Same for all other space
+				      * dimensions.
+				      */
+    template <int dim, class InVector>
+    void
+    copy_to_mg (const MGDoFHandler<dim>             &mg_dof,
+		MGLevelObject<BlockVector<number> > &dst,
+		const InVector                      &src,
+		const is_1d<false>                  &) const;    
 };
 
 
@@ -497,13 +594,26 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				   Vector<number>       &dst,
 				   const Vector<number> &src) const;
 
+				     /**
+				      * Structure that is used to
+				      * disambiguate calls to
+				      * @p{copy_to_mg} for 1d and
+				      * non-1d. We provide two
+				      * functions of @p{copy_to_mg},
+				      * where the 1d function takes an
+				      * argument of type
+				      * @p{is_1d<true>} and the other
+				      * one of type @p{is_1d<false>}.
+				      */
+    template <bool> struct is_1d;
+    
     				     /**
 				      * Transfer from a vector on the
 				      * global grid to vectors defined
 				      * on each of the levels
 				      * separately, i.a. an @p{MGVector}.
 				      */
-    template<int dim, class InVector>
+    template <int dim, class InVector>
     void
     copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
 		MGLevelObject<Vector<number> > &dst,
@@ -521,7 +631,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * constrained degrees of freedom
 				      * are set to zero.
 				      */
-    template<int dim, class OutVector>
+    template <int dim, class OutVector>
     void
     copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
 		  OutVector                            &dst,
@@ -535,7 +645,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * function, but probably not for
 				      * continuous elements.
 				      */
-    template<int dim, class OutVector>
+    template <int dim, class OutVector>
     void
     copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
 		      OutVector                            &dst,
@@ -546,6 +656,42 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
                                       * Selected component.
                                       */
     unsigned int selected;
+
+
+				     /**
+				      * Implementation of the
+				      * @p{copy_to_mg} function for
+				      * 1d. We have to resort to some
+				      * template trickery because we
+				      * can't specialize template
+				      * functions on the (outer)
+				      * template of the class, without
+				      * also fully specializing the
+				      * inner (member function)
+				      * template parameters. However,
+				      * it can be done by adding the
+				      * additional argument that
+				      * converts template
+				      * specialization into function
+				      * overloading.
+				      */
+    template <int dim, class InVector>
+    void
+    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+		MGLevelObject<Vector<number> > &dst,
+		const InVector                 &src,
+		const is_1d<true>              &) const;
+
+				     /**
+				      * Same for all other space
+				      * dimensions.
+				      */
+    template <int dim, class InVector>
+    void
+    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+		MGLevelObject<Vector<number> > &dst,
+		const InVector                 &src,
+		const is_1d<false>             &) const;
 };
 
 

@@ -11,8 +11,8 @@
 //
 //----------------------------------------------------------------------------
 
-#ifndef __deal2__mg_tools_templates_h
-#define __deal2__mg_tools_templates_h
+#ifndef __deal2__mg_transfer_templates_h
+#define __deal2__mg_transfer_templates_h
 
 #include <lac/sparse_matrix.h>
 #include <dofs/dof_constraints.h>
@@ -28,33 +28,39 @@
 /* --------------------- MGTransferPrebuilt -------------- */
 
 
-//TODO[GK]: this file must really be changed: it contains #if's for deal_II_dimension, but we can't use this in headers, since application programs might not use this way to select the dimension. the only way in header files is to have proper template specializations
-
-
-//TODO:[?] This function needs to be specially implemented, since in 2d mode we use faces
-#if deal_II_dimension == 1
 
 template <typename number>
 template <int dim, class InVector>
 void
-MGTransferPrebuilt<number>::copy_to_mg (
-  const MGDoFHandler<dim>&,
-  MGLevelObject<Vector<number> >&,
-  const InVector&) const
+MGTransferPrebuilt<number>::copy_to_mg (const MGDoFHandler<dim>        &mg_dof_handler,
+					MGLevelObject<Vector<number> > &dst,
+					const InVector                 &src) const
+{
+				   // forward to the correct
+				   // specialization
+  copy_to_mg (mg_dof_handler, dst, src, is_1d<dim==1>());
+}
+
+
+template <typename number>
+template <int dim, class InVector>
+void
+MGTransferPrebuilt<number>::copy_to_mg (const MGDoFHandler<dim>        &,
+					MGLevelObject<Vector<number> > &,
+					const InVector                 &,
+					const is_1d<true>              &) const
 {
   Assert(false, ExcNotImplemented());
 }
 
-#else
-
 
 template <typename number>
 template <int dim, class InVector>
 void
-MGTransferPrebuilt<number>::copy_to_mg (
-  const MGDoFHandler<dim>& mg_dof_handler,
-  MGLevelObject<Vector<number> >& dst,
-  const InVector& src) const
+MGTransferPrebuilt<number>::copy_to_mg (const MGDoFHandler<dim>        &mg_dof_handler,
+					MGLevelObject<Vector<number> > &dst,
+					const InVector                 &src,
+					const is_1d<false>             &) const
 {
 				   // Make src a real finite element function
 //  InVector src = osrc;
@@ -146,7 +152,6 @@ MGTransferPrebuilt<number>::copy_to_mg (
     };
 }
 
-#endif
 
 
 template <typename number>
@@ -250,8 +255,21 @@ copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof_handler,
 /* --------------------- MGTransferSelect -------------- */
 
 
-//TODO:[?] This function needs to be specially implemented, since in 2d mode we use faces
-#if deal_II_dimension == 1
+
+template <typename number>
+template <int dim, class InVector>
+void
+MGTransferSelect<number>::
+copy_to_mg (const MGDoFHandler<dim>        &mg_dof_handler,
+            MGLevelObject<Vector<number> > &dst,
+            const InVector                 &src) const
+{
+				   // forward to the correct
+				   // specialization
+  copy_to_mg (mg_dof_handler, dst, src, is_1d<dim==1>());
+}
+
+
 
 template <typename number>
 template <int dim, class InVector>
@@ -259,12 +277,12 @@ void
 MGTransferSelect<number>::
 copy_to_mg (const MGDoFHandler<dim>        &,
             MGLevelObject<Vector<number> > &,
-            const InVector                 &) const
+            const InVector                 &,
+	    const is_1d<true>              &) const
 {
   Assert(false, ExcNotImplemented());
 }
 
-#else
 
 
 template <typename number>
@@ -273,7 +291,8 @@ void
 MGTransferSelect<number>::
 copy_to_mg (const MGDoFHandler<dim>        &mg_dof_handler,
             MGLevelObject<Vector<number> > &dst,
-            const InVector                 &osrc) const
+            const InVector                 &osrc,
+	    const is_1d<false>             &) const
 {
 				   // Make src a real finite element function
   InVector src = osrc;
@@ -379,7 +398,6 @@ copy_to_mg (const MGDoFHandler<dim>        &mg_dof_handler,
     };
 }
 
-#endif
 
 
 template <typename number>
@@ -507,21 +525,6 @@ copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof_handler,
 /* --------------------- MGTransferBlock -------------- */
 
 
-#if deal_II_dimension == 1
-
-template <typename number>
-template <int dim, class InVector>
-void
-MGTransferBlock<number>::
-copy_to_mg (const MGDoFHandler<dim>             &,
-            MGLevelObject<BlockVector<number> > &,
-            const InVector                      &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-#else
-
 
 template <typename number>
 template <int dim, class InVector>
@@ -530,6 +533,36 @@ MGTransferBlock<number>::
 copy_to_mg (const MGDoFHandler<dim>             &mg_dof_handler,
             MGLevelObject<BlockVector<number> > &dst,
             const InVector                      &src) const
+{
+				   // forward to the correct
+				   // specialization
+  copy_to_mg (mg_dof_handler, dst, src, is_1d<dim==1>());
+}
+
+
+
+template <typename number>
+template <int dim, class InVector>
+void
+MGTransferBlock<number>::
+copy_to_mg (const MGDoFHandler<dim>             &,
+            MGLevelObject<BlockVector<number> > &,
+            const InVector                      &,
+	    const is_1d<true>                   &) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <typename number>
+template <int dim, class InVector>
+void
+MGTransferBlock<number>::
+copy_to_mg (const MGDoFHandler<dim>             &mg_dof_handler,
+            MGLevelObject<BlockVector<number> > &dst,
+            const InVector                      &src,
+	    const is_1d<false>                  &) const
 {
 				   // Make src a real finite element
 				   // function
@@ -607,7 +640,7 @@ copy_to_mg (const MGDoFHandler<dim>             &mg_dof_handler,
     };
 }
 
-#endif
+
 
 
 template <typename number>
