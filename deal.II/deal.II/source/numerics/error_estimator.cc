@@ -12,7 +12,6 @@
 //----------------------------  error_estimator.cc  ---------------------------
 
 
-#include <base/timer.h>
 #include <base/thread_management.h>
 #include <base/quadrature.h>
 #include <base/quadrature_lib.h>
