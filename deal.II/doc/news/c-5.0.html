@@ -74,6 +74,13 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: Examples do not use obsolete classes
+       <code>QGaussN</code> anymore.
+       <br>
+       (GK 2004/12/18)
+       </p>
+
+  <li> <p>
        Fixed: Configuration scripts were changed to allow any file suffix for
        shared and static libraries to allow in the future the creation of dlls
        under cygwin.
@@ -408,27 +415,38 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
-       Fixed: In rare cases of 3d meshes with a certain topology, we triggered
-       an assertion in
-       <code>TriaAccessor::neighbor_child_on_subface</code>. It turns out that
-       the code actually computes the correct answer, but the assertion had a
-       condition that doesn't always have to be satisfied. This bogus
-       assertion is now fixed.
+       Improved: <code class="class">GeometryInfo</code> has two new
+       fields <code class="member">unit_normal_direction</code> and
+       <code class="member">unit_normal_orientation</code>,
+       indicating the direction of the unit normal vector for each
+       face of the reference cell.
+       <br>
+       (GK 2004/12/18)
+       </p>
+
+  <li> <p>
+       Fixed: In rare cases of 3d meshes with a certain topology,
+       we triggered an assertion in <code
+       class="class">TriaAccessor</code>::<code
+       class="member">neighbor_child_on_subface</code>. It turns out
+       that the code actually computes the correct answer, but the
+       assertion had a condition that doesn't always have to be
+       satisfied. This bogus assertion is now fixed.
        <br>
        (WB 2004/11/12)
        </p>
 
-  <li> <p>
-       Fixed: The <code>GridGenerator::cylinder</code> function in 3d
-       assigned the wrong boundary value to the top and bottom part of
-       the cylinder if the half length of the cylinder was not equal
-       to 1. This is now fixed.
+  <li> <p> Fixed: The <code class="class">GridGenerator</code>::<code
+       class="member">cylinder</code> function in 3d assigned the
+       wrong boundary value to the top and bottom part of the cylinder
+       if the half length of the cylinder was not equal to 1. This is
+       now fixed.
        <br>
        (Ralf Schulz 2004/10/27)
        </p>
 
   <li> <p>
-       Improved: Now the <code>FE_Q</code> class supports hanging node
+       Improved: Now the <code class="class">FE_Q</code> class supports hanging node
        constraints for elements of arbitrary polynomial degree also in
        3D.
        <br>
@@ -437,7 +455,8 @@ inconvenience this causes.
 
   <li> <p>
        Fixed: The <code
-       class="member">StraightBoundary<3>::get_new_point_on_quad</code>
+       class="class">StraightBoundary&lt;3&gt;</code>::<code
+       class="member">get_new_point_on_quad</code>
        did not work on general grids. This is now fixed.
        <br>
        (RH 2004/10/15)
@@ -466,8 +485,9 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: The <code class="member">GridOut::write_gnuplot</code>
-       function now supports curved boundaries also for <code>dim==3</code>.
+       New: The <code class="class">GridOut</code>::<code
+       class="member">write_gnuplot</code> function now supports
+       curved boundaries also for <code>dim==3</code>.
        <br>
        (RH 2004/09/20)
        </p>
