@@ -365,6 +365,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
       intel_icc*)
           dnl Disable some compiler warnings, as they often are wrong on
           dnl our code:
+	  dnl  #11: ` unrecognized preprocessing directive" (we use
+	  dnl       #warning at one place)
           dnl #175: `subscript out of range' (doesn't take into account that
           dnl       some code is only reachable for some dimensions)
           dnl #327: `NULL reference is not allowed' (this happens when we
@@ -374,8 +376,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl #525: `type "DataOutBase::DataOutBase" is an inaccessible type
           dnl       (allowed for compatibility)' (I don't understand what the
           dnl       compiler means)
-          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -ip -unroll -w0 -wd424"
+          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -DDEBUG -inline_debug_info"
+          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -ip -unroll -w0 -wd424 -wd11"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC -shared"
 

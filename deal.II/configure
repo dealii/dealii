@@ -3039,8 +3039,8 @@ rm -f conftest.$ac_objext conftest.$ac_ext
           ;;
 
       intel_icc*)
-                                                                                                                        CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -ip -unroll -w0 -wd424"
+                    	  	                                                                                                      CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -DDEBUG -inline_debug_info"
+          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -ip -unroll -w0 -wd424 -wd11"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC -shared"
 
