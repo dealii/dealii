@@ -256,8 +256,9 @@ class GridTools
                                       */
     template <int dim>
     static
-    void partition_triangulation (Triangulation<dim> &triangulation,
-                                  const unsigned int  n_partitions);
+    void partition_triangulation (const unsigned int  n_partitions,
+                                  Triangulation<dim> &triangulation);
+    
                                      /**
                                       * Exception
                                       */

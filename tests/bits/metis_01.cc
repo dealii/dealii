@@ -33,7 +33,7 @@ void test ()
 
                                    // subdivide into 5 subdomains
   deallog << "RECURSIVE" << std::endl;
-  GridTools::partition_triangulation (triangulation, 5);
+  GridTools::partition_triangulation (5, triangulation);
   for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)

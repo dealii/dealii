@@ -245,8 +245,8 @@ GridTools::find_active_cell_around_point (const Container  &container,
 template <int dim>
 void
 GridTools::
-partition_triangulation (Triangulation<dim> &triangulation,
-                         const unsigned int  n_partitions)
+partition_triangulation (const unsigned int  n_partitions,
+                         Triangulation<dim> &triangulation)
 {
   Assert (n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
 
@@ -353,5 +353,5 @@ GridTools::find_active_cell_around_point (const MGDoFHandler<deal_II_dimension> 
 
 template
 void
-GridTools::partition_triangulation (Triangulation<deal_II_dimension> &,
-                                    const unsigned int);
+GridTools::partition_triangulation (const unsigned int,
+                                    Triangulation<deal_II_dimension> &);
