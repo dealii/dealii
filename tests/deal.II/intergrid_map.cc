@@ -95,7 +95,7 @@ void check ()
       tria_1.execute_coarsening_and_refinement ();
       tria_2.execute_coarsening_and_refinement ();
     };
-};
+}
 
 
 
@@ -110,5 +110,5 @@ int main ()
   check<1> ();
   check<2> ();
   check<3> ();
-};
+}
 

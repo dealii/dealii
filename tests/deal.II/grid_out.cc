@@ -51,7 +51,7 @@ void test ()
   grid_out.write_ucd (tria, logfile);
   if (dim != 1)
     grid_out.write_dx (tria, logfile);
-};
+}
 
 
 int main ()
@@ -63,5 +63,5 @@ int main ()
   test<1> ();
   test<2> ();
   test<3> ();
-};
+}
 

@@ -116,4 +116,4 @@ int main ()
   tria.clear();
   
   return 0;
-};
+}

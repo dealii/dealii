@@ -1,5 +1,5 @@
 // $Id$
-// Copyright (C) 2001, 2002 Ralf Hartmann
+// Copyright (C) 2001, 2002, 2003 Ralf Hartmann
 //
 // Shows the shape functions implemented and computes the area of cells.
 
@@ -172,7 +172,7 @@ plot_faces(Mapping<1>&,
 	   FiniteElement<1>&,
 	   DoFHandler<1>::cell_iterator&,
 	   const std::string&)
-{};
+{}
 
 
 
@@ -182,7 +182,7 @@ plot_subfaces(Mapping<1>&,
 	      FiniteElement<1>&,
 	      DoFHandler<1>::cell_iterator&,
 	      const std::string&)
-{};
+{}
 
 
 

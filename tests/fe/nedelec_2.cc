@@ -81,7 +81,7 @@ plot (const Triangulation<dim> &tr)
                 
       deallog << std::endl;
     }
-};
+}
 
 
 
@@ -101,7 +101,7 @@ check ()
   tr.begin_active()->set_refine_flag ();
   tr.execute_coarsening_and_refinement ();
   plot (tr);
-};
+}
 
 
 int

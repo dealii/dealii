@@ -168,7 +168,7 @@ void test ()
 	}
       deallog << "Check 4 (dim=" << dim << ") ok" << std::endl;      
     };
-};
+}
 
 
 int main ()
@@ -182,4 +182,4 @@ int main ()
   test<3> ();
   
   return 0;
-};
+}

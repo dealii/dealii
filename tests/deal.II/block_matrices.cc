@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -87,7 +87,7 @@ LaplaceProblem<Vector,Matrix,Sparsity>::LaplaceProblem (const unsigned int n_blo
 		dof_handler (triangulation)
 {
   sparsity_pattern.reinit (n_blocks, n_blocks);
-};
+}
 
 
 
@@ -96,7 +96,7 @@ LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::LaplaceProb
 		n_blocks (n_blocks),
 		fe(1),
 		dof_handler (triangulation)
-{};
+{}
 
 
 
@@ -105,7 +105,7 @@ LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::LaplaceProble
 		n_blocks (n_blocks),
 		fe(1),
 		dof_handler (triangulation)
-{};
+{}
 
 
 
@@ -133,7 +133,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::make_grid_and_dofs ()
 
   system_matrix.reinit (sparsity_pattern);
   reinit_vectors ();
-};
+}
 
 
 template <>
@@ -142,7 +142,7 @@ void LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::reinit
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
 			   dof_handler.max_couplings_between_dofs());
-};
+}
 
 
 
@@ -151,7 +151,7 @@ void LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::reinit
 {
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 
@@ -161,7 +161,7 @@ void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_s
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
 			   dof_handler.max_couplings_between_dofs());
-};
+}
 
 
 
@@ -170,7 +170,7 @@ void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_v
 {
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 
@@ -210,7 +210,7 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
       default:
 	    AssertThrow (false, ExcNotImplemented());
     }; 
-};
+}
 
 
 
@@ -248,7 +248,7 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
       default:
 	    AssertThrow (false, ExcNotImplemented());
     };
-};
+}
 
 
 
@@ -313,7 +313,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::assemble_system ()
 				      system_matrix,
 				      solution,
 				      system_rhs);
-};
+}
 
 
 template <class Vector, class Matrix, class Sparsity>
@@ -328,7 +328,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::solve ()
   
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
-};
+}
 
 
 template <class Vector, class Matrix, class Sparsity>
@@ -345,7 +345,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::run ()
 				       //<< typeid(Matrix).name ()
 				       //<< '-'
 	    << i << ' ' << solution(i) << std::endl;
-};
+}
 
     
 
@@ -440,4 +440,4 @@ int main ()
   
     
   return 0;
-};
+}

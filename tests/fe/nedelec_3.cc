@@ -95,7 +95,7 @@ check ()
                 
       deallog << std::endl;
     }
-};
+}
 
 
 int

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,7 @@ int main ()
   QTrapez<2> q;
 
 
-Vector<double> val(4);
+  Vector<double> val(4);
 
   deallog << "Testing transformation of 2nd derivatives of shape function:" << std::endl;
   
@@ -89,4 +89,4 @@ Vector<double> val(4);
 	  deallog << std::endl;
 	};
     };
-};
+}

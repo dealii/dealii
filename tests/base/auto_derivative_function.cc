@@ -66,7 +66,8 @@ template <int dim>
 void AutoSinExp<dim>::vector_value (const Point<dim> &p,
 				    Vector<double>     &values) const
 {
-  Assert(values.size()==n_components, ExcDimensionMismatch(values.size(), n_components));
+  Assert(values.size()==this->n_components,
+         ExcDimensionMismatch(values.size(), this->n_components));
   values(0)=0;
   values(1)=value(p);
 }
@@ -105,7 +106,8 @@ template <int dim>
 void ExactSinExp<dim>::vector_gradient (const Point<dim>       &p,
 				       typename std::vector<Tensor<1,dim> > &gradients) const
 {
-  Assert(gradients.size()==n_components, ExcDimensionMismatch(gradients.size(), n_components));
+  Assert(gradients.size()==this->n_components,
+         ExcDimensionMismatch(gradients.size(), this->n_components));
   
   gradients[0].clear();
   gradients[1]=gradient(p);

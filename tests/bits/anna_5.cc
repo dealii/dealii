@@ -21,4 +21,4 @@ int main ()
 {
   std::ofstream o("anna_5.output");
   BlockSparsityPattern      sparsity_pattern;
-};
+}

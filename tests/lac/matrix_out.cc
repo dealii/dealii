@@ -73,4 +73,4 @@ int main ()
 				MatrixOut::Options (false, 4));
       matrix_out.write_gmv (logfile);
     };
-};
+}

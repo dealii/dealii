@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,7 +53,7 @@ bool operator == (const SparsityPattern &sp1,
       return false;
   
   return true;
-};
+}
 
 
 
@@ -72,7 +72,7 @@ bool operator == (const BlockSparsityPattern &sp1,
 	return false;
   
   return true;
-};
+}
 
 
 
@@ -108,7 +108,7 @@ check_boundary (const DoFHandler<dim> &dof)
 	  << " -- "
 	  << (sparsity_1 == sparsity_2 ? "ok" : "failed")
 	  << std::endl;
-};
+}
 
 
 
@@ -218,7 +218,7 @@ check ()
 
 				   // check boundary matrices
   check_boundary (dof);
-};
+}
 
 
 

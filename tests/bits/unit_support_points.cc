@@ -33,7 +33,7 @@ void check_cell1 (const FiniteElement<dim> &fe)
             fe.unit_support_point(i),
             ExcInternalError());
   deallog << "dim=" << dim << ", cell=ok" << std::endl;
-};
+}
 
 
 template <int dim>
@@ -44,11 +44,11 @@ void check_face1 (const FiniteElement<dim> &fe)
             fe.unit_face_support_point(i),
             ExcInternalError());
   deallog << "dim=" << dim << ", face=ok" << std::endl;
-};
+}
 
 
 void check_face1 (const FiniteElement<1> &) 
-{};
+{}
 
 
 
@@ -57,7 +57,7 @@ void check1 (const FiniteElement<dim> &fe)
 {
   check_cell1 (fe);
   check_face1 (fe);
-};
+}
 
 
 template <int dim>
@@ -69,7 +69,7 @@ void check_cell2 (const FiniteElement<dim> &fe,
       deallog << i << " " << fe.unit_support_point(i)
               << std::endl;
   deallog << "dim=" << dim << ", cell=ok" << std::endl;
-};
+}
 
 
 template <int dim>
@@ -81,12 +81,12 @@ void check_face2 (const FiniteElement<dim> &fe,
           deallog << i << " " << fe.unit_face_support_point(i)
                   << std::endl;
       deallog << "dim=" << dim << ", face=ok" << std::endl;
-};
+}
 
 
 void check_face2 (const FiniteElement<1> &,
                   const unsigned int) 
-{};
+{}
 
 
 
@@ -96,7 +96,7 @@ void check2 (const FiniteElement<dim> &fe,
 {
   check_cell2 (fe, comp);
   check_face2 (fe, comp);
-};
+}
 
 
 
@@ -117,7 +117,7 @@ void check ()
   check2 (FESystem<dim> (FE_Q<dim> (2), 1,
                          FE_DGP<dim> (2), 1),
           0);
-};
+}
 
     
 
@@ -131,4 +131,4 @@ int main ()
   check<2> ();
   check<3> ();
   return 0;
-};
+}

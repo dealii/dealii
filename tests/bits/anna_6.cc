@@ -112,13 +112,13 @@ class BoundaryFunction : public Function<dim>
 
 template <int dim>
 BoundaryFunction<dim>::BoundaryFunction () : 
-                Function<dim> (dim+1) {};
+                Function<dim> (dim+1) {}
 
 
 
 template <int dim>
 inline
-void BoundaryFunction<dim>::vector_value (const Point<dim>   &p,
+void BoundaryFunction<dim>::vector_value (const Point<dim>   &,
                                           Vector<double> &values) const
 {
 	
@@ -127,7 +127,7 @@ void BoundaryFunction<dim>::vector_value (const Point<dim>   &p,
 				  
   values.clear ();
   values(dim) = 1.;
-};
+}
 
 
 
@@ -138,10 +138,8 @@ void BoundaryFunction<dim>::vector_value (const Point<dim>   &p,
 template <int dim>
 ImposeBC<dim>::ImposeBC() :
                 fe (FE_Nedelec<dim>(1), 1, FE_Q<dim>(1), 1),
-                dof_handler (triangulation)
-			
-				 
-{};
+                dof_handler (triangulation)			 
+{}
 
 
 
@@ -149,7 +147,7 @@ template <int dim>
 ImposeBC<dim>::~ImposeBC() 
 {
   dof_handler.clear ();
-};
+}
 
 
 template <int dim>
@@ -195,9 +193,7 @@ void ImposeBC<dim>::test_extract_boundary_DoFs ()
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     if (ned_boundary_dofs[i] == true)
       boundary_values[i] = 0.;
-	  
-
-};
+}
 
 
 				
@@ -250,7 +246,7 @@ void ImposeBC<dim>::test_interpolate_BC ()
       deallog << boundary_values[i] << ' ';
     }
   deallog << std::endl;
-};
+}
 
 
 
@@ -280,9 +276,8 @@ void ImposeBC<dim>::run ()
           << std::endl;
 
   test_extract_boundary_DoFs ();
-  test_interpolate_BC ();
-	  
-};
+  test_interpolate_BC ();  
+}
 
 
 int main () 
@@ -323,4 +318,4 @@ int main ()
     };
 
   return 0;
-};
+}

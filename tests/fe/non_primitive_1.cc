@@ -106,7 +106,7 @@ create_stokes_matrix_1 (const DoFHandler<dim> &dof_handler,
 		 local_dof_indices[j],
 		 local_matrix(i,j));
     };
-};
+}
 
 
 
@@ -180,7 +180,7 @@ create_stokes_matrix_2 (const DoFHandler<dim> &dof_handler,
 		 local_dof_indices[j],
 		 local_matrix(i,j));
     };
-};
+}
 
 
 
@@ -258,7 +258,7 @@ create_stokes_matrix_3 (const DoFHandler<dim> &dof_handler,
 		 local_dof_indices[j],
 		 local_matrix(i,j));
     };
-};
+}
 
 
 
@@ -326,7 +326,7 @@ test ()
       Assert (A1.global_entry(i) == A3.global_entry(i),
 	      ExcInternalError());
     };
-};
+}
 
 
 
@@ -339,7 +339,7 @@ int main ()
   test<1> ();
   test<2> ();
   test<3> ();
-};
+}
 
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,14 +57,14 @@ get_q_face (Function<dim>&)
 {
   static QGauss4<dim-1> q;
   return q;
-};
+}
 
 
 Quadrature<0> &
 get_q_face (Function<1>&)
 {
   return *static_cast<Quadrature<0>*>(0);
-};
+}
 
 
 

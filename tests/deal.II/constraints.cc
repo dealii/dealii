@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -230,7 +230,7 @@ void make_tria (Triangulation<3> &tria, int step)
 	break;
       };
     };
-};
+}
 
 
 
@@ -281,7 +281,7 @@ void merge_check ()
       c1.merge (c2);
       c1.print (logfile);
     };
-};
+}
 
 
 int main ()
@@ -331,5 +331,5 @@ int main ()
     };
 
   merge_check ();
-};
+}
 

@@ -63,7 +63,7 @@ SystemTest<dim>::SystemTest () :
                 fe (FE_Nedelec<dim>(1), 2,
                     FE_Q<dim>(1), 1),
 		dof_handler (triangulation)
-{};
+{}
 
 
 template <int dim>
@@ -81,7 +81,7 @@ void SystemTest<dim>::make_grid_and_dofs ()
   deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
 				  
-};
+}
 
 template <int dim>
 void SystemTest<dim>::shape_to_components () 
@@ -94,15 +94,16 @@ void SystemTest<dim>::shape_to_components ()
   for(unsigned int i = 0; i<fe.dofs_per_cell; i++)
     deallog <<"  shapefunction "<< i << " is Nedelec:  "
             << (fe.is_primitive(i) ? "false" : "true") << std::endl;
-};
+}
 
 
 
 template <int dim>
 void SystemTest<dim>::check_numbering () 
 {
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-                                      endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
   std::vector<unsigned int>	local_dof_indices(fe.dofs_per_cell);
 	
   for (; cell!=endc; ++cell)
@@ -136,8 +137,7 @@ void SystemTest<dim>::check_numbering ()
                 << std::endl;
       deallog << std::endl;
     };
-	
-};
+}
 
 
 template <int dim>
@@ -146,7 +146,7 @@ void SystemTest<dim>::run ()
   make_grid_and_dofs ();
   shape_to_components ();
   check_numbering();
-};
+}
 
     
 
@@ -159,4 +159,4 @@ int main ()
   SystemTest<2>().run();
   SystemTest<3>().run();  
   return 0;
-};
+}

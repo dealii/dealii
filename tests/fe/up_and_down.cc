@@ -49,7 +49,7 @@ Point<dim> transform (const Point<dim> p)
             Assert (false, ExcNotImplemented());
             return Point<dim>();
     };
-};
+}
 
 
 template <int dim>
@@ -116,7 +116,7 @@ void check_element (const Triangulation<dim> &tr,
           << std::endl;
   
   Assert (relative_residual < threshold*x.l2_norm(), ExcInternalError());
-};
+}
 
 
 template <int dim>
@@ -130,7 +130,8 @@ void test ()
                                    // difficult. then refine it twice
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
-  GridTools::transform (&transform<dim>, tr);
+  Point<dim> (*p) (Point<dim>) = &transform<dim>;
+  GridTools::transform (p, tr);
   tr.refine_global (2);
 
                                    // now for a list of finite
@@ -226,8 +227,8 @@ void test ()
       {
         deallog << dim << "d, uniform grid, fe #" << i;
         check_element (tr, *fe_list[i]);
-      };
-};
+      }
+}
 
 
 

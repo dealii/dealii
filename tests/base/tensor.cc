@@ -98,4 +98,4 @@ int main ()
       deallog << "Result WRONG!" << std::endl;
     };
 
-};
+}

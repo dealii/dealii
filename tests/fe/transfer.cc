@@ -45,7 +45,7 @@ print_matrix(std::ostream& of,
 	     Triangulation<dim>& tr,
 	     unsigned int level,
 	     const FiniteElement<dim>& finel,
-	     const char* name)
+	     const char* /*name*/)
 {
   MGDoFHandler<dim> dof(tr);
   dof.distribute_dofs(finel);

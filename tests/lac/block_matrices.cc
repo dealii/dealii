@@ -200,7 +200,7 @@ void test ()
   const double msp2 = bsm.matrix_scalar_product (dst, src);
   Assert (msp1 == msp2, ExcInternalError());
   deallog << "matrix_scalar_product " << msp1 << ' ' << msp2 << std::endl;
-};
+}
 
 
 
@@ -238,4 +238,4 @@ int main ()
   
   
   return 0;
-};
+}

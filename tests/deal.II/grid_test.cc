@@ -51,7 +51,7 @@ class Ball :
     };
 
 
-virtual Point<dim>
+    virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const {
       Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad(quad);
       
@@ -125,7 +125,7 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
       middle(1) = 1+0.04*sin(6*3.141592*middle(0));
   
   return middle;
-};
+}
 
 
 template <int dim>
@@ -159,7 +159,7 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
       middle(1) = 1+0.04*sin(6*3.141592*middle(0));
   
   return middle;
-};
+}
 
 
 template <int dim>
@@ -262,7 +262,7 @@ void test (const int test_case)
 	  << "     Total number of active cells = " << tria.n_active_cells() << std::endl;
 
   deallog.pop();
-};
+}
 
 
 int main ()
@@ -277,4 +277,4 @@ int main ()
     test<3> (i);
   
   return 0;
-};
+}

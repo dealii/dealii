@@ -364,7 +364,7 @@ void test_compute_functions (const Mapping<dim> &mapping,
       fe_values.reinit(dof.begin_active());
       check_values_and_derivatives (fe, fe_values, q);
     };
-};
+}
 
 
 
@@ -530,7 +530,7 @@ void plot_FE_Nedelec_shape_functions()
 //   plot_shape_functions(m, p1, "Nedelec1");
 //   plot_face_shape_functions(m, p1, "Nedelec1");
   test_compute_functions(m, p1, "Nedelec1");
-};
+}
 
 
 
@@ -584,7 +584,7 @@ void plot_FE_System_shape_functions()
           test_compute_functions(m, p4, "System_Nedelec_2");
         };
     };
-};
+}
 
 
 int

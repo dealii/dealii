@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,7 +50,7 @@ int main ()
   fevalues.reinit (dof.begin_active());
 
 
-Vector<double> val(4);
+  Vector<double> val(4);
 
   deallog << "Testing transformation of gradients of shape function:" << std::endl;
   
@@ -66,7 +66,7 @@ Vector<double> val(4);
       fevalues.get_function_grads (val, grads);
 
 
-bool ok;
+      bool ok;
       switch (vertex) 
 	{
 	  case 0:
@@ -108,4 +108,4 @@ bool ok;
     return 0;
   else
     return 1;
-};
+}

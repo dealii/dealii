@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,7 +47,7 @@ bool PointComp<1>::operator () (const Point<1> &p1,
 				const Point<1> &p2) const
 {
   return p1(0) < p2(0);
-};
+}
 
 
 // have somewhat weird orderings in 2d and 3d
@@ -58,7 +58,7 @@ bool PointComp<2>::operator () (const Point<2> &p1,
   return ((p1(0)+p1(1) < p2(0)+p2(1)) ||
 	  ((p1(0)+p1(1) == p2(0)+p2(1)) &&
 	   (p1(0)-p1(1) < p2(0)-p2(1))));
-};
+}
 
 
 
@@ -71,7 +71,7 @@ bool PointComp<3>::operator () (const Point<3> &p1,
 	  ((p1(0)+p1(1) < p2(0)+p2(1)) ||
 	   ((p1(0)+p1(1) == p2(0)+p2(1)) &&
 	    (p1(0)-p1(1) < p2(0)-p2(1)))));
-};
+}
 
 
 

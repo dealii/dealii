@@ -69,7 +69,7 @@ void VectorBoundaryValues<dim>::vector_value (const Point<dim> &p,
 
   for (unsigned int i=0; i<2; ++i)
     values(i) = p(i)*p(i);
-};
+}
 
 
 
@@ -87,7 +87,7 @@ class FindBug
     FESystem<dim>              fe;
     DoFHandler<dim>        dof_handler;
     Vector<double>          solution;
-};
+}
 
 
                                  // Construct FESystem with
@@ -98,7 +98,7 @@ FindBug<dim>::FindBug () :
                 fe (FE_Q<dim>(1), 1,
                     FE_DGP<dim>(0), 1),
                 dof_handler (triangulation)
-{};
+{}
 
 
 template <int dim>
@@ -125,8 +125,7 @@ void FindBug<dim>::make_grid_and_dofs ()
           << std::endl;
 
   solution.reinit(dof_handler.n_dofs());
-
-};
+}
 
 
 template <int dim>
@@ -227,7 +226,7 @@ void FindBug<dim>::dirichlet_conditions ()
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     if (fixed_dofs[i] == true)
       deallog << i << " " << dirichlet_dofs[i] << std::endl;
-};
+}
 
 
 
@@ -236,7 +235,7 @@ void FindBug<dim>::run ()
 {
   make_grid_and_dofs ();
   dirichlet_conditions ();
-};
+}
 
 
 
@@ -250,5 +249,5 @@ int main ()
   FindBug<3>().run ();
   
   return 0;
-};
+}
 

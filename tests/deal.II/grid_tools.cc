@@ -64,7 +64,7 @@ void test1 ()
 		  << std::endl;
 	};
     };
-};
+}
 
 
 // GridTools::transform
@@ -84,7 +84,7 @@ void test2 ()
   logfile << "Rotated grid:" << std::endl;
   GridTools::rotate (3.14159265258/4, tria);
   GridOut().write_gnuplot (tria, logfile);
-};
+}
 
 
 int main ()
@@ -100,5 +100,5 @@ int main ()
   test2 ();
   
   return 0;
-};
+}
 

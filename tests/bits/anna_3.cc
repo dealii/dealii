@@ -61,13 +61,12 @@ SystemTest<dim>::SystemTest () :
                 fe (FE_Nedelec<dim>(1), 2,
                     FE_Q<dim>(1), 1),
 		dof_handler (triangulation)
-{};
+{}
 
 
 template <int dim>
 void SystemTest<dim>::make_grid_and_dofs ()
-{
-				  
+{			  
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (0);
   deallog << "Number of active cells: " << triangulation.n_active_cells()
@@ -79,7 +78,7 @@ void SystemTest<dim>::make_grid_and_dofs ()
   deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
 				  
-};
+}
 
 
 template <int dim>
@@ -104,7 +103,7 @@ void SystemTest<dim>::check ()
   for (unsigned int i=0; i<fe.n_components(); ++i)
     deallog << dofs_per_component[i] << ' ';
   deallog << std::endl;
-};
+}
 
 
 template <int dim>
@@ -119,7 +118,7 @@ void SystemTest<dim>::run ()
   deallog << std::endl << "*** Renumbering ***" << std::endl;
   DoFRenumbering::component_wise (dof_handler);
   check ();
-};
+}
 
     
 
@@ -132,4 +131,4 @@ int main ()
   SystemTest<2>().run();
   SystemTest<3>().run();  
   return 0;
-};
+}

@@ -102,7 +102,7 @@ double RightHandSide<dim>::value (const Point<dim> &p,
     return_value += 4*pow(p(i), 4);
 
   return return_value;
-};
+}
 
 
 template <int dim>
@@ -110,7 +110,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 				   const unsigned int) const 
 {
   return p.square();
-};
+}
 
 
 
@@ -118,7 +118,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
   fe (1), dof_handler (triangulation)
-{};
+{}
 
 
 
@@ -157,7 +157,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-};
+}
 
 
 
@@ -169,7 +169,7 @@ void LaplaceProblem<dim>::solve ()
 				   // arbitrary values
   for (unsigned int i=0; i<solution.size(); ++i)
     solution(i) = i;
-};
+}
 
 
 
@@ -205,7 +205,7 @@ void LaplaceProblem<2>::output_results () const
       data_out.write_gnuplot (logfile);
       data_out.write_ucd (logfile);
     };
-};
+}
 
 
 
@@ -241,7 +241,7 @@ void LaplaceProblem<3>::output_results () const
       data_out.write_gnuplot (logfile);
       data_out.write_ucd (logfile);
     };
-};
+}
 
 
 
@@ -251,7 +251,7 @@ void LaplaceProblem<dim>::run ()
   make_grid_and_dofs();
   solve ();
   output_results ();
-};
+}
 
     
 
@@ -267,4 +267,4 @@ int main ()
   laplace_problem_3d.run ();
   
   return 0;
-};
+}

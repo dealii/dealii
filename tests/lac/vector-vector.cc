@@ -36,7 +36,7 @@ void print (const Vector<number> &v)
   for (unsigned int i=0; i<v.size(); ++i)
     deallog << v(i) << '\t';
   deallog << std::endl;
-};
+}
 
 
 
@@ -146,7 +146,7 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
   
   d1.ratio (d1, d2);
   print (d1);
-};
+}
 
 
 int main()
@@ -170,6 +170,6 @@ int main()
   check_vectors (d1, d2);
   check_vectors (f1, f2);
   check_vectors (l1, l2);
-};
+}
 
   

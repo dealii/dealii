@@ -50,8 +50,8 @@ print_fe_statistics(const FiniteElement<dim>& fe)
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
   StraightBoundary<dim> boundary;
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+  typename DoFHandler<dim>::active_face_iterator face = dof.begin_active_face();
 
   const std::vector<Point<dim> > unit_points = fe.get_unit_support_points();
   const std::vector<Point<dim> > support_points = fe.get_support_points();

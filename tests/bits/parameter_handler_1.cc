@@ -28,7 +28,7 @@ void check (const char *p)
   prm.read_input (in);
 
   deallog << "test_1=" << prm.get ("test_1") << std::endl;
-};
+}
 
 
 int main () 
@@ -40,4 +40,4 @@ int main ()
   check ("parameter_handler_1.prm1");
   
   return 0;
-};
+}

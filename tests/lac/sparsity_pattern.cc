@@ -155,7 +155,7 @@ main ()
            ++sp3_p, ++sp4_p)
 	Assert (*sp3_p == *sp4_p, ExcInternalError());
     };
-};
+}
 
   
   

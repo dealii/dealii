@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -48,7 +48,7 @@ class MySquareFunction : public Function<dim>
     
     virtual void   vector_value (const Point<dim>   &p,
 				 Vector<double>     &values) const
-      { for (unsigned int d=0; d<n_components; ++d) values(d) = value(p,d); };
+      { for (unsigned int d=0; d<this->n_components; ++d) values(d) = value(p,d); };
 };
 
 
@@ -58,14 +58,14 @@ boundary_q (const DoFHandler<dim> &)
 {
   static const QGauss4<dim-1> q;
   return q;
-};
+}
 
 
 const Quadrature<0> &
 boundary_q (const DoFHandler<1> &)
 {
   return *static_cast<const Quadrature<0>*>(0);
-};
+}
 
 
 void write_map (const std::map<unsigned int,double> &bv)
@@ -73,7 +73,7 @@ void write_map (const std::map<unsigned int,double> &bv)
   for (std::map<unsigned int,double>::const_iterator
 	 i=bv.begin(); i!=bv.end(); ++i)
     deallog << i->first << ' ' << i->second <<std::endl;
-};
+}
 
       
 

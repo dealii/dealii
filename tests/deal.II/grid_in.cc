@@ -40,7 +40,7 @@ void test1 ()
   
   GridOut grid_out;
   grid_out.write_ucd (tria, logfile);
-};
+}
 
 
 template <int dim>
@@ -66,7 +66,7 @@ void test2 ()
     for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells()+1);
   deallog << hash << std::endl;
-};
+}
 
 
 int main ()
@@ -77,5 +77,5 @@ int main ()
 
   test1<2> ();
   test2<2> ();
-};
+}
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -101,14 +101,14 @@ check_boundary (const DoFHandler<dim> &dof,
   
 				   // finally write out matrix
   matrix.print (deallog.get_file_stream());
-};
+}
 
 
 
 void
 check_boundary (const DoFHandler<1> &,
 		const Mapping<1>    &)
-{};
+{}
 
 
 
@@ -195,7 +195,7 @@ check ()
 
   if (dim > 1)
     check_boundary (dof, mapping);
-};
+}
 
 
 

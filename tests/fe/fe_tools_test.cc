@@ -82,7 +82,7 @@ void make_grid (Triangulation<2> &triangulation)
 
       triangulation.execute_coarsening_and_refinement ();
     };
-};
+}
 
 
 template<int dim>
@@ -178,7 +178,7 @@ void test(const Triangulation<dim> &tria,
 //  file2.setf(std::ios::showpoint | std::ios::left);
 //  data_out.write_gnuplot(file2);
 //  file2.close();
-};
+}
 
 
 

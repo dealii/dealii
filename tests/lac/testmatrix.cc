@@ -226,14 +226,14 @@ FDMatrix::gnuplot_print(std::ostream& s, const Vector<number>& V) const
 
 
 
-template void FDMatrix::five_point(SparseMatrix<long double>&) const;
-template void FDMatrix::five_point(SparseMatrix<double>&) const;
-template void FDMatrix::five_point(SparseMatrixEZ<double>&) const;
-template void FDMatrix::five_point(SparseMatrix<float>&) const;
-template void FDMatrix::nine_point(SparseMatrix<long double>&) const;
-template void FDMatrix::nine_point(SparseMatrix<double>&) const;
-template void FDMatrix::nine_point(SparseMatrixEZ<double>&) const;
-template void FDMatrix::nine_point(SparseMatrix<float>&) const;
+template void FDMatrix::five_point(SparseMatrix<long double>&, bool) const;
+template void FDMatrix::five_point(SparseMatrix<double>&, bool) const;
+template void FDMatrix::five_point(SparseMatrixEZ<double>&, bool) const;
+template void FDMatrix::five_point(SparseMatrix<float>&, bool) const;
+template void FDMatrix::nine_point(SparseMatrix<long double>&, bool) const;
+template void FDMatrix::nine_point(SparseMatrix<double>&, bool) const;
+template void FDMatrix::nine_point(SparseMatrixEZ<double>&, bool) const;
+template void FDMatrix::nine_point(SparseMatrix<float>&, bool) const;
 template void FDMatrix::gnuplot_print(std::ostream& s, const Vector<long double>& V) const;
 template void FDMatrix::gnuplot_print(std::ostream& s, const Vector<double>& V) const;
 template void FDMatrix::gnuplot_print(std::ostream& s, const Vector<float>& V) const;

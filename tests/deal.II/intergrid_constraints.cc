@@ -217,7 +217,7 @@ void check ()
   delete fe_2;
   if (fe_dq_quadratic != 0)
     delete fe_dq_quadratic;
-};
+}
 
 
 
@@ -231,5 +231,5 @@ int main ()
   check<1> ();
   check<2> ();
   check<3> ();
-};
+}
 

@@ -68,7 +68,7 @@ solve_filtered (std::map<unsigned int,double> &bv,
        i!=bv.end(); ++i)
     Assert (std::fabs(u(i->first) - i->second) < 1e-8,
 	    ExcInternalError());
-};
+}
 
 
 
@@ -88,7 +88,7 @@ solve_eliminated (std::map<unsigned int,double> &bv,
   prec.initialize (A, 1.2);
   
   solver.solve (A, u, f, prec);
-};
+}
 
 
 

@@ -32,7 +32,7 @@ bool operator == (const BlockVector<number> &v1,
     if (v1(i) != v2(i))
       return false;
   return true;
-};
+}
 
 
 void test ()
@@ -309,7 +309,7 @@ void test ()
 				       // everything is alright
       deallog << "Check 19: true" << std::endl;      
     };
-};
+}
 
 
 
@@ -354,5 +354,5 @@ int main ()
   
   
   return 0;
-};
+}
 

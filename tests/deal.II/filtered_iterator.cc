@@ -43,7 +43,7 @@ template <typename Iterator>
 bool level_equal_to_3 (const Iterator c)
 {
   return (static_cast<unsigned int>(c->level()) == 3);
-};
+}
 
 
 
@@ -52,7 +52,7 @@ bool level_equal_to (const Iterator     c,
 		     const unsigned int level)
 {
   return (static_cast<unsigned int>(c->level()) == level);
-};
+}
 
 
 void test ()
@@ -206,7 +206,7 @@ void test ()
       
       logfile << "Check 5: OK" << std::endl;
     };
-};
+}
 
 
 int main ()
@@ -218,5 +218,5 @@ int main ()
   test ();
   
   return 0;
-};
+}
 

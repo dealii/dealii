@@ -42,7 +42,7 @@ void print_formatted (const FullMatrix<number> &A,
 	};
       deallog << std::endl;
     };
-};
+}
 
 
 template <int dim>

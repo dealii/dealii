@@ -63,7 +63,7 @@ void check (const FiniteElement<dim> &fe)
 	};
       deallog << std::endl;
     };
-};
+}
 
 
 
@@ -110,7 +110,7 @@ void check ()
 	      << std::endl;
       check (FESystem<dim> (FESystem<dim> (FE_Q<dim>(p),2), 2));
     };
-};
+}
 
   
 
@@ -124,5 +124,5 @@ int main ()
   check<1> ();
   check<2> ();
   check<3> ();
-};
+}
 

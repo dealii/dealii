@@ -1,5 +1,5 @@
 // $Id$
-// Copyright (C) 2001 Wolfgang Bangerth
+// Copyright (C) 2001, 2003 Wolfgang Bangerth
 //
 // Test the continuity of normal vectors at vertices, and thus the
 // C1-ness of the C1-mapping
@@ -115,4 +115,4 @@ int main ()
 		      ExcInternalError());
 	    };
 	};  
-};
+}

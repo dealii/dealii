@@ -135,7 +135,7 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
       middle(1) = 1+0.04*sin(6*3.141592*middle(0));
   
   return middle;
-};
+}
 
 
 
@@ -170,7 +170,7 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
       middle(1) = 1+0.04*sin(6*3.141592*middle(0));
   
   return middle;
-};
+}
 
 
 
@@ -195,7 +195,7 @@ class TestCases
 
 template <int dim>
 TestCases<dim>::TestCases () :
-		tria(0), dof(0) {};
+		tria(0), dof(0) {}
 
 
 
@@ -204,7 +204,7 @@ TestCases<dim>::~TestCases ()
 {
   if (dof)  delete dof;
   if (tria) delete tria;
-};
+}
 
 
 
@@ -218,7 +218,7 @@ void TestCases<dim>::create_new ()
   GridGenerator::hyper_cube(*tria);
 
   dof = new DoFHandler<dim> (*tria);
-};
+}
 
 
 
@@ -336,7 +336,7 @@ void TestCases<dim>::run (const unsigned int test_case)
 				   // release the lock that dof has to the
 				   // finite element object
   dof->clear ();
-};
+}
 
 
 
@@ -360,5 +360,5 @@ int main ()
     };
   
   return 0;
-};
+}
 
