@@ -202,19 +202,6 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 
 
-#if deal_II_dimension == 1
-
-//TODO: Implement make_flux_sparsity_pattern in 1D ?
-template <>
-void
-DoFTools::make_flux_sparsity_pattern (const DoFHandler<1>&,
-				      SparseMatrixStruct &)
-{
-  Assert(false, ExcNotImplemented());
-}
-
-#else
-
 //TODO: Check this function for potential of optimization. (G)
 
 template<int dim>
@@ -268,7 +255,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim>& dof,
     }
 }
 
-#endif
+
 
 template<int dim>
 void
