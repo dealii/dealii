@@ -27,34 +27,35 @@ const unsigned int Tensor<rank,dim>::dimension;
 
 template <int dim>
 void
-Tensor<1,dim>::unroll( Vector<double>& result) const
+Tensor<1,dim>::unroll (Vector<double> &result) const
 {
-  Assert(result.size()==dim,
-	 ExcWrongVectorSize(dim, result.size()));
+  Assert (result.size()==dim,
+          ExcDimensionMismatch(dim, result.size()));
 
   unsigned index = 0;
-  unroll_recursion(result,index);
+  unroll_recursion (result,index);
 }
 
 
 
 template <int rank_, int dim>
 void
-Tensor<rank_, dim>::unroll( Vector<double>& result) const
+Tensor<rank_, dim>::unroll (Vector<double> &result) const
 {
   Assert(result.size()==std::pow(static_cast<double>(dim),rank_),
 	 ExcWrongVectorSize(static_cast<unsigned int>(std::pow(static_cast<double>(dim),rank_)),
 			    result.size()));
 
   unsigned index = 0;
-  unroll_recursion(result,index);
+  unroll_recursion (result, index);
 }
 
 
 
 template <int rank_, int dim>
 void
-Tensor<rank_, dim>::unroll_recursion( Vector<double>& result, unsigned& index) const
+Tensor<rank_, dim>::unroll_recursion (Vector<double>     &result,
+                                      const unsigned int &index) const
 {
   for (unsigned i=0; i<dim; ++i)
     {
@@ -66,7 +67,8 @@ Tensor<rank_, dim>::unroll_recursion( Vector<double>& result, unsigned& index) c
 
 template<int dim>
 void
-Tensor<1,dim>::unroll_recursion( Vector<double>& result, unsigned& index) const
+Tensor<1,dim>::unroll_recursion (Vector<double>     &result,
+                                 const unsigned int &index) const
 {
   for (unsigned i=0; i<dim; ++i)
     result(index++) = operator[](i);  

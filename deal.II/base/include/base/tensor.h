@@ -196,8 +196,8 @@ class Tensor
 				     /**
 				      * Help function for unroll.
 				      */
-    void unroll_recursion(Vector<double> &result,
-			  unsigned int   &start_index) const;
+    void unroll_recursion(Vector<double>     &result,
+			  const unsigned int &start_index) const;
 
 				     // make the following class a
 				     // friend to this class. in principle,
