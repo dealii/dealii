@@ -17,6 +17,10 @@ kdoc.dof  = $(wildcard ../../deal.II/include/grid/dof*.h) \
             $(wildcard ../../deal.II/include/fe/*.h)
 kdoc.num  = $(wildcard ../../deal.II/include/numerics/*.h)
 
+# for latex-output, we join the different libraries of the
+# deal.II library into just one file
+kdoc.deal_II = $(kdoc.basic) $(kdoc.grid) $(kdoc.dof) $(kdoc.num)
+
 # user projects. the projects should be independant of each other, so
 # we need not take care of cross-dependencies each time 
 kdoc.transport     = $(wildcard ../../projects/transport/trans_dg/*.h)
@@ -42,6 +46,11 @@ kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
 
 
 KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
+ifeq ($(shell uname),SunOS)
+DOCPP = /home/people/kanschat/bin/doc++
+else
+DOCPP = doc++
+endif
 
 
 # by default: make docu libraries and generate an index of all names
@@ -91,8 +100,54 @@ kdoc/names.html: $(kdoc.libray-files)
 	@cd kdoc ; perl ../scripts/index.pl *.kdoc > names.html
 
 
+# generate the input file for doc++
+%.doc++: Makefile
+	@echo $(kdoc.$(subst .doc++,,$(subst latex/,,$@)))  | \
+	 perl -pi -e 's# #\n#g;  s#\.\./\.\./#//\@Include: ../../../#g;' > \
+	 $@
+
+
+# generate one of the latex-output files; this needs the respective
+# include file for DOC++
+#
+# delete the .doc++ files immediately again, since they are no more 
+# used and since this forces make to re-make the .tex-file each time
+# we ask for it; the right way to do so would be to use dependencies,
+# but it is hard to compute them from the '%'-sign used in the rule
+%.tex: %.doc++
+	$(DOCPP) -p -t -u -o $@ -ep a4wide $<
+	rm $^
+
+
+# generate temporary files from the doc++-latex-output which have
+# headers and footers stripped and label names replaced by something
+# file dependent
+%.tex1: %.tex
+	cat $<                           | \
+	 perl scripts/process-tex        | \
+	 perl -pi -e 's/cxx\./$(basename $(notdir $@)).cxx./g;' > $@
+
+latex/abc.tex: latex/base.tex1 latex/lac.tex1 latex/deal_II.tex1
+	@cat latex/header.tex                              > $@
+	@echo "\\\\chapter{Base library}"                 >> $@
+	@cat latex/base.tex1                              >> $@
+	@echo "\\\\chapter{Linear algebra library}"       >> $@
+	@cat latex/lac.tex1                               >> $@
+	@echo "\\\\chapter{deal.II library}"              >> $@
+	@cat latex/deal_II.tex1                           >> $@
+	@cat latex/footer.tex                             >> $@
+	rm $^
+
+
+
+# generate the latex-processed files from these
+%.dvi: %.tex
+	cd latex ; latex $(notdir $<)
+	cd latex ; latex $(notdir $<)
+	-rm $(subst .tex,.toc,$<)
+
 clean:
-	-rm -f kdoc/names.html kdoc/*.kdoc kdoc/*/*.html cvs-backlog/*.html
+	-rm -f kdoc/names.html kdoc/*.kdoc kdoc/*/*.html cvs-backlog/*.html latex/*
 
 
 .PHONY: default all kdoc $(kdoc.library-files) $(kdoc.library-files.rerun) clean
