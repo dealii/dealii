@@ -40,8 +40,6 @@ void FESystem<dim>::initialize ()
 		   local_index < base_element(comp).dofs_per_vertex ;
 		   ++local_index)
 		{
-		  cerr << "V(sys, comp, m, loc) = ("
-		       << total_index << "," << comp << "," << m << "," << local_index << ")" << endl;
 		  system_to_component_table[total_index++]
 		    = pair<unsigned,unsigned>
 		    (comp_start+m,
@@ -66,8 +64,6 @@ void FESystem<dim>::initialize ()
 		   local_index < base_element(comp).dofs_per_line ;
 		   ++local_index)
 		{
-		  cerr << "L(sys, comp, m, loc) = ("
-		       << total_index << "," << comp << "," << m << "," << local_index << ")" << endl;
 		  system_to_component_table[total_index++]
 		    = pair<unsigned,unsigned>
 		    (comp_start+m,
@@ -93,8 +89,6 @@ void FESystem<dim>::initialize ()
 		   local_index < base_element(comp).dofs_per_quad ;
 		   ++local_index)
 		{
-		  cerr << "Q(sys, comp, m, loc) = ("
-		       << total_index << "," << comp << "," << m << "," << local_index << ")" << endl;
 		  system_to_component_table[total_index++]
 		    = pair<unsigned,unsigned>
 		    (comp_start+m,
@@ -120,8 +114,6 @@ void FESystem<dim>::initialize ()
 		   local_index < base_element(comp).dofs_per_hex ;
 		   ++local_index)
 		{
-		  cerr << "Q(sys, comp, m, loc) = ("
-		       << total_index << "," << comp << "," << m << "," << local_index << ")" << endl;
 		  system_to_component_table[total_index++]
 		    = pair<unsigned,unsigned>
 		    (comp_start+m,
