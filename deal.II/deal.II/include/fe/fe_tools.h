@@ -619,6 +619,13 @@ class FETools
 				      * responsibility to destroy the
 				      * object pointed to at an
 				      * appropriate time.
+				      *
+				      * Since the value of the template
+				      * argument can't be deduced from the
+				      * (string) argument given to this
+				      * function, you have to explicitly
+				      * specify it when you call this
+				      * function.
 				      */
     template <int dim>
     static
