@@ -232,7 +232,7 @@ target1: $(target1-o-files) $(libraries)
 %.output:%.testcase
 	@echo =====Running======= $<
 	@./$<
-	@perl -pi -e 's/JobId.*//;s/value.*//;' $@
+	@perl -pi -e 's/JobId.*//;s/value.*//;s/error occur.*//;' $@
 
 %.check:%.output
 	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
