@@ -589,12 +589,11 @@ BlockTrianglePrecondition<MATRIX>::do_row (
   BlockVector<number>& dst,
   unsigned int row_num) const
 {
-  const typename BlockMatrixArray<MATRIX>::Entry* diagonal = 0;
-  
   typename std::vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
     m = entries.begin();
   typename std::vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
     end = entries.end();
+  typename std::vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator diagonal = end;  
   
   static Vector<number> aux;
   aux.reinit(dst.block(row_num), true);
@@ -609,7 +608,7 @@ BlockTrianglePrecondition<MATRIX>::do_row (
 	continue;
       if (j == i)
 	{
-	  Assert (diagonal == 0, ExcMultipleDiagonal(j));
+	  Assert (diagonal == end, ExcMultipleDiagonal(j));
 	  diagonal = m;
 	} else {
 	  if (m->transpose)
