@@ -65,10 +65,29 @@ int main () {
 		    for (unsigned int point=0; point<4; ++point)
 		      {
 							 // on the unit cell,
-							 // the second derivative
-							 // of a linear element
-							 // should be zero
-			if (derivs[point] != Tensor<2,2>())
+			bool ok=true;
+
+			if ((derivs[point][0][0] != 0) ||
+			    (derivs[point][1][1] != 0))
+			  ok = false;
+
+			switch (vertex)
+			  {
+			    case 0:
+			    case 2:
+				  if ((derivs[point][0][1] != 1) ||
+				      (derivs[point][1][0] != 1))
+				    ok = false;
+				  break;
+			    case 1:
+			    case 3:
+				  if ((derivs[point][0][1] != -1) ||
+				      (derivs[point][1][0] != -1))
+				    ok = false;
+				  break;
+			  };  
+			
+			if (!ok)
 			  {
 			    testcase_succeeded = false;
 			    cout << "WRONG! ";
