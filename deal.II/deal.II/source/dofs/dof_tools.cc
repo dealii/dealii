@@ -311,8 +311,17 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 						 endc = dof.end();
 
-				   // clear user flags for further use
-  const_cast<Triangulation<dim>&>(dof.get_tria()).clear_user_flags();
+				   // Clear user flags because we will
+				   // need them. But first we save
+				   // them and make sure that we
+				   // restore them later such that at
+				   // the end of this function the
+				   // Triangulation will be in the
+				   // same state as it was at the
+				   // beginning of this function.
+  std::vector<bool> user_flags;
+  dof.get_tria().save_user_flags(user_flags);
+  const_cast<Triangulation<dim> &>(dof.get_tria()).clear_user_flags ();
   
   for (; cell!=endc; ++cell)
     {
@@ -383,6 +392,9 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	    } 
 	}
     }
+
+				   // finally restore the user flags
+  const_cast<Triangulation<dim> &>(dof.get_tria()).load_user_flags(user_flags);
 }
 
 
@@ -490,7 +502,17 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	support_on_face(i,f) = fe.has_support_on_face(i,f);
     }
   
-  (const_cast<Triangulation<dim>& > (dof.get_tria())).clear_user_flags();
+				   // Clear user flags because we will
+				   // need them. But first we save
+				   // them and make sure that we
+				   // restore them later such that at
+				   // the end of this function the
+				   // Triangulation will be in the
+				   // same state as it was at the
+				   // beginning of this function.
+  std::vector<bool> user_flags;
+  dof.get_tria().save_user_flags(user_flags);
+  const_cast<Triangulation<dim> &>(dof.get_tria()).clear_user_flags ();
   
   for (; cell!=endc; ++cell)
     {
@@ -651,6 +673,9 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	    } 
 	}
     }
+
+  				   // finally restore the user flags
+  const_cast<Triangulation<dim> &>(dof.get_tria()).load_user_flags(user_flags);
 }
 
 
