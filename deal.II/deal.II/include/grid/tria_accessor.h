@@ -207,6 +207,10 @@ class TriaAccessor
 				      * Exception
 				      */
     DeclException0 (ExcCantCompareIterators);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNeighborIsCoarser);
 				     /*@}*/
 	
   protected:
@@ -1711,10 +1715,11 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
  * the possibility to check whether they are at the boundary etc. This class
  * offers access to all this data.
  *
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, 1999, 2000
  */
 template <int dim>
-class CellAccessor :  public TriaObjectAccessor<dim,dim> {
+class CellAccessor :  public TriaObjectAccessor<dim,dim>
+{
   public:
 				     /**
 				      * Propagate the AccessorData type
@@ -1761,6 +1766,33 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim> {
     void set_neighbor (const unsigned int i,
 		       const TriaIterator<dim,CellAccessor<dim> > &pointer) const;
 
+				     /**
+				      * Return the how-many'th
+				      * neighbor this cell is of
+				      * #cell->neighbor(neighbor)#,
+				      * i.e. return the number #n#
+				      * such that
+				      * #cell->neighbor(neighbor)->neighbor(n)==cell#. This
+				      * function is the right one if
+				      * you want to know how to get
+				      * back from a neighbor to the
+				      * present cell.
+				      *
+				      * Note that this operation is
+				      * only useful if the neighbor is
+				      * not on a coarser level than
+				      * the present cell
+				      * (i.e. #cell->neighbor(neighbor)->level()#
+				      * needs to be equal to
+				      * #cell->level()#, since
+				      * otherwise the neighbors of the
+				      * neighbor cell are on a coarser
+				      * level than the present one and
+				      * you can't get back from there
+				      * to this cell.
+				      */
+    unsigned int neighbor_of_neighbor (const unsigned int neighbor) const;
+    
 				     /**
 				      *  Return whether the #i#th vertex or
 				      *  face (depending on the dimension) is

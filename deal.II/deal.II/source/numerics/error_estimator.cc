@@ -578,18 +578,14 @@ integrate_over_regular_face (Data &data,
 				     // of gradient across this face
     {
       Assert (cell->neighbor(face_no).state() == valid,
-	      ExcInternalError());
-      unsigned int neighbor_neighbor;
-      DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(face_no);
+	      ExcInternalError());      
+      
+      const DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(face_no);
       
 				       // find which number the current
 				       // face has relative to the neighboring
 				       // cell
-      for (neighbor_neighbor=0; neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
-	   ++neighbor_neighbor)
-	if (neighbor->neighbor(neighbor_neighbor) == cell)
-	  break;
-      
+      const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
       Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell, ExcInternalError());
       
 				       // get restriction of finite element
@@ -720,6 +716,7 @@ integrate_over_irregular_face (Data &data,
 			       FESubfaceValues<dim>       &fe_subface_values)
 {
   const DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
+
   Assert (neighbor.state() == valid, ExcInternalError());
   Assert (neighbor->has_children(), ExcInternalError());
 				   // set up a vector of the gradients
@@ -736,11 +733,7 @@ integrate_over_irregular_face (Data &data,
   
 				   // store which number #cell# has in the
 				   // list of neighbors of #neighbor#
-  unsigned int neighbor_neighbor;
-  for (neighbor_neighbor=0; neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
-       ++neighbor_neighbor)
-    if (neighbor->neighbor(neighbor_neighbor) == cell)
-      break;
+  const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
   Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell, ExcInternalError());
   
 				   // loop over all subfaces

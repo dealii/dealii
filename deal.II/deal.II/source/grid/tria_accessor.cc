@@ -1600,6 +1600,58 @@ void CellAccessor<dim>::set_neighbor (const unsigned int i,
 
 
 template <int dim>
+unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbor) const
+{
+				   // make sure that the neighbor is
+				   // not on a coarser level
+  Assert (neighbor_level(neighbor) == present_level,
+	  ExcNeighborIsCoarser());
+  Assert (neighbor < GeometryInfo<dim>::faces_per_cell,
+	  ExcInvalidNeighbor(neighbor));
+
+  const TriaIterator<dim,CellAccessor<dim> > neighbor_cell = this->neighbor(neighbor);
+  
+				   // usually, on regular patches of
+				   // the grid, this cell is just on
+				   // the opposite side of the
+				   // neighbor that the neighbor is of
+				   // this cell. for example in 2d, if
+				   // we want to know the
+				   // neighbor_of_neighbor if
+				   // neighbor==1 (the right
+				   // neighbor), then we will get 3
+				   // (the left neighbor) in most
+				   // cases. look up this relationship
+				   // in the table provided by
+				   // GeometryInfo and try it
+  const unsigned int neighbor_guess
+    = GeometryInfo<dim>::opposite_face[neighbor];
+  
+  if ((neighbor_cell->neighbor_index (neighbor_guess) == present_index) &&
+      (neighbor_cell->neighbor_level (neighbor_guess) == present_level))
+    return neighbor_guess;
+  else
+				     // if the guess was false, then
+				     // we need to loop over all
+				     // neighbors and find the number
+				     // the hard way
+    {
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	if ((neighbor_cell->neighbor_index (face) == present_index) &&
+	    (neighbor_cell->neighbor_level (face) == present_level))
+	  return face;
+
+				       // we should never get here,
+				       // since then we did not find
+				       // our way back...
+      Assert (false, ExcInternalError());
+      return static_cast<unsigned int>(-1);
+    };
+};
+
+
+
+template <int dim>
 bool CellAccessor<dim>::at_boundary (const unsigned int i) const {
   Assert (used(), ExcCellNotUsed());
   Assert (i<GeometryInfo<dim>::faces_per_cell,

@@ -128,6 +128,15 @@ struct GeometryInfo
 						+ GeometryInfo<dim-1>::quads_per_cell);
 
 				     /**
+				      * List of numbers which is
+				      * denote which face is opposite
+				      * to a given face. In 1d, this
+				      * list is #{1,0}#, in 2d #{2, 3, 0, 1}#,
+				      * in 3d #{1, 0, 4, 5, 2, 3}#.
+				      */
+    static const unsigned int opposite_face[faces_per_cell];
+    
+				     /**
 				      * This field store which child cells
 				      * are adjacent to a certain face of
 				      * the mother cell.

@@ -4242,43 +4242,41 @@ void Triangulation<2>::execute_refinement () {
 						     // two children which
 						     // we can use.
 		    cell_iterator neighbor = cell->neighbor(nb);
-		    for (unsigned int nb_nb=0; nb_nb<4; ++nb_nb)
-		      if (neighbor->neighbor(nb_nb)==cell)
 							 // this cell is the nb_nb-th
 							 // neighbor or neighbor(nb)
-			{
-			  neighbors_neighbor[2*nb] = neighbors_neighbor[2*nb+1] = nb_nb;
-							   // vertex 1 of child 0
-							   // is always the interior
-							   // one
-			  new_vertices[2*nb+1] = neighbor->line(nb_nb)
-						 ->child(0)->vertex_index(1);
+		    const unsigned int nb_nb = cell->neighbor_of_neighbor (nb);
 
-			  if (nb < 2) 
-			    {
-			      new_lines[2*nb]  = neighbor->line(nb_nb)->child(0);
-			      new_lines[2*nb+1]= neighbor->line(nb_nb)->child(1);
-			    } else {
-							       // lines 2 and 3 have
-							       // opposite sense
-			      new_lines[2*nb]  = neighbor->line(nb_nb)->child(1);
-			      new_lines[2*nb+1]= neighbor->line(nb_nb)->child(0);
-			    };
+		    neighbors_neighbor[2*nb] = neighbors_neighbor[2*nb+1] = nb_nb;
+						     // vertex 1 of child 0
+						     // is always the interior
+						     // one
+		    new_vertices[2*nb+1] = neighbor->line(nb_nb)
+					   ->child(0)->vertex_index(1);
 
-							   // finally find out which
-							   // are the two neighbor
-							   // subcells, adjacent to
-							   // the two sublines
-			  const int child_mapping[4][2] = {{0,1},{1,2},{3,2},{0,3}};     
-			  if (nb < 2) 
-			    {
-			      neighbors[2*nb]  = neighbor->child(child_mapping[nb_nb][0]);
-			      neighbors[2*nb+1]= neighbor->child(child_mapping[nb_nb][1]);
-			    } else {
-			      neighbors[2*nb]  = neighbor->child(child_mapping[nb_nb][1]);
-			      neighbors[2*nb+1]= neighbor->child(child_mapping[nb_nb][0]);
-			    };
-			};
+		    if (nb < 2) 
+		      {
+			new_lines[2*nb]  = neighbor->line(nb_nb)->child(0);
+			new_lines[2*nb+1]= neighbor->line(nb_nb)->child(1);
+		      } else {
+							 // lines 2 and 3 have
+							 // opposite sense
+			new_lines[2*nb]  = neighbor->line(nb_nb)->child(1);
+			new_lines[2*nb+1]= neighbor->line(nb_nb)->child(0);
+		      };
+		    
+						     // finally find out which
+						     // are the two neighbor
+						     // subcells, adjacent to
+						     // the two sublines
+		    static const unsigned int child_mapping[4][2] = {{0,1},{1,2},{3,2},{0,3}};     
+		    if (nb < 2) 
+		      {
+			neighbors[2*nb]  = neighbor->child(child_mapping[nb_nb][0]);
+			neighbors[2*nb+1]= neighbor->child(child_mapping[nb_nb][1]);
+		      } else {
+			neighbors[2*nb]  = neighbor->child(child_mapping[nb_nb][1]);
+			neighbors[2*nb+1]= neighbor->child(child_mapping[nb_nb][0]);
+		      };
 		  }
 		else 
 	    
@@ -5560,7 +5558,7 @@ void Triangulation<3>::execute_refinement () {
 	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
 		 ++face)
 	      {
-		cell_iterator neighbor = hex->neighbor(face);
+		const cell_iterator neighbor = hex->neighbor(face);
 
 						 // if no neighbor
 		if (neighbor.state() != valid)
@@ -5604,11 +5602,7 @@ void Triangulation<3>::execute_refinement () {
 							 // of the neighbor
 							 // adjacent to which
 							 // the present cell is
-			unsigned int nb_nb;
-			for (nb_nb=0; nb_nb<GeometryInfo<dim>::faces_per_cell;
-			     ++nb_nb)
-			  if (neighbor->neighbor(nb_nb) == hex)
-			    break;
+			const unsigned int nb_nb = hex->neighbor_of_neighbor(face);
 			Assert (nb_nb<GeometryInfo<dim>::faces_per_cell,
 				ExcInternalError());
 
