@@ -30,12 +30,21 @@ class BlockIndices;
 
 
 /**
- * This class represents the matrix denoting the distribution of the degrees
- * of freedom of hanging nodes.
+ * This class implements linear homogeneous constraints on degrees of
+ * freedom. In particular, it handles constraints of the form
+ * $x_{i1} = \sum_{j=2}^M a_{i_j} x_{i_j}$. Each "line" in objects of this
+ * class corresponds to one such constraint, with the number of the
+ * line being $i1$, and the entries in this line being pairs
+ * $(i_j,a_{i_j})$. Note that the constraints are linear in the $x_i$,
+ * and that there is not constant (non-homogeneous) term in the
+ * constraint. However, this is exactly the form we need for hanging
+ * node and certain other constraints, where we need to constrain one
+ * degree of freedom in terms of others. The name of the class stems
+ * from the fact that these constraints can be represented in matrix
+ * form as $X x = 0$, and this object then describes the matrix $X$.
  *
  * The matrix is organized in lines (rows), but only those lines are stored
- * where constraints are present. Lines where only one entry (identity) is
- * present are not stored if not explicitly inserted.
+ * where constraints are present.
  *
  * Constraint matrices are used to handle hanging nodes and other constrained
  * degrees of freedom. When building the global system matrix and the right
