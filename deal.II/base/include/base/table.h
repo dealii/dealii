@@ -284,6 +284,41 @@ template <typename T> class Table<6,T>;
   };
 
 
+/**
+ * Array of indices of fixed size used for the TableBase
+ * class.
+ *
+ * This is the specialization for a seven-dimensional table. This
+ * class only differs in the non-default constructors from the other
+ * specializations. Actual storage of and access to data is done by
+ * the TableIndicesBase base class of a specializations.
+ *
+ * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
+ */
+  template <>
+  class TableIndices<7> : public TableIndicesBase<7>
+  {
+    public:
+                                       /**
+                                        * Default constructor. Set all
+                                        * indices to zero.
+                                        */
+      TableIndices ();
+
+                                       /**
+                                        * Constructor. Set indices to
+                                        * the given values.
+                                        */
+      TableIndices (const unsigned int index1,
+                    const unsigned int index2,
+                    const unsigned int index3,
+                    const unsigned int index4,
+                    const unsigned int index5,
+                    const unsigned int index6,
+                    const unsigned int index7);
+  };
+
+
 namespace internal
 {
 
@@ -1338,9 +1373,9 @@ class Table<4,T> : public TableBase<4,T>
                                      /**
                                       * Access operator. Generate an
                                       * object that accesses the
-                                      * requested two-dimensional
+                                      * requested three-dimensional
                                       * subobject of this
-                                      * three-dimensional table. Range
+                                      * four-dimensional table. Range
                                       * checks are performed.
                                       *
                                       * This version of the function
@@ -1352,9 +1387,9 @@ class Table<4,T> : public TableBase<4,T>
                                      /**
                                       * Access operator. Generate an
                                       * object that accesses the
-                                      * requested two-dimensional
+                                      * requested three-dimensional
                                       * subobject of this
-                                      * three-dimensional table. Range
+                                      * four-dimensional table. Range
                                       * checks are performed.
                                       *
                                       * This version of the function
@@ -1428,9 +1463,9 @@ class Table<5,T> : public TableBase<5,T>
                                      /**
                                       * Access operator. Generate an
                                       * object that accesses the
-                                      * requested two-dimensional
+                                      * requested four-dimensional
                                       * subobject of this
-                                      * three-dimensional table. Range
+                                      * five-dimensional table. Range
                                       * checks are performed.
                                       *
                                       * This version of the function
@@ -1442,9 +1477,9 @@ class Table<5,T> : public TableBase<5,T>
                                      /**
                                       * Access operator. Generate an
                                       * object that accesses the
-                                      * requested two-dimensional
+                                      * requested four-dimensional
                                       * subobject of this
-                                      * three-dimensional table. Range
+                                      * five-dimensional table. Range
                                       * checks are performed.
                                       *
                                       * This version of the function
@@ -1521,9 +1556,9 @@ class Table<6,T> : public TableBase<6,T>
                                      /**
                                       * Access operator. Generate an
                                       * object that accesses the
-                                      * requested two-dimensional
+                                      * requested five-dimensional
                                       * subobject of this
-                                      * three-dimensional table. Range
+                                      * six-dimensional table. Range
                                       * checks are performed.
                                       *
                                       * This version of the function
@@ -1535,9 +1570,9 @@ class Table<6,T> : public TableBase<6,T>
                                      /**
                                       * Access operator. Generate an
                                       * object that accesses the
-                                      * requested two-dimensional
+                                      * requested five-dimensional
                                       * subobject of this
-                                      * three-dimensional table. Range
+                                      * six-dimensional table. Range
                                       * checks are performed.
                                       *
                                       * This version of the function
@@ -1581,6 +1616,101 @@ class Table<6,T> : public TableBase<6,T>
 };
 
 
+/**
+ * A class representing a seven-dimensional table of objects (not
+ * necessarily only numbers).
+ *
+ * For the rationale of this class, and a description of the
+ * interface, see the base class.
+ * 
+ * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
+ */
+template <typename T>
+class Table<7,T> : public TableBase<7,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    Table ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    Table (const unsigned int size1,
+           const unsigned int size2,
+           const unsigned int size3,
+	   const unsigned int size4,
+	   const unsigned int size5,
+	   const unsigned int size6,
+	   const unsigned int size7);
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested six-dimensional
+                                      * subobject of this
+                                      * seven-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    internal::TableBaseAccessors::Accessor<7,T,true,6>
+    operator [] (const unsigned int i) const;
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested six-dimensional
+                                      * subobject of this
+                                      * seven-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    internal::TableBaseAccessors::Accessor<7,T,false,6>
+    operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+			   const unsigned int l,
+			   const unsigned int m,
+			   const unsigned int n,
+			   const unsigned int o) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j,
+                     const unsigned int k,
+		     const unsigned int l,
+		     const unsigned int m,
+		     const unsigned int n,
+		     const unsigned int o);
+};
 
 
 
@@ -1727,7 +1857,8 @@ inline
 TableIndices<6>::TableIndices ()
 {
   this->indices[0] = this->indices[1] = this->indices[2]
-		   = this->indices[3] = this->indices[4] = 0;
+		   = this->indices[3] = this->indices[4]
+		   = this->indices[5] = 0;
 }
 
 
@@ -1746,6 +1877,36 @@ TableIndices<6>::TableIndices (const unsigned int index1,
   this->indices[3] = index4;
   this->indices[4] = index5;
   this->indices[5] = index6;
+}
+
+
+
+inline
+TableIndices<7>::TableIndices ()
+{
+  this->indices[0] = this->indices[1] = this->indices[2]
+		   = this->indices[3] = this->indices[4]
+		   = this->indices[5] = this->indices[6] = 0;
+}
+
+
+
+inline
+TableIndices<7>::TableIndices (const unsigned int index1,
+                               const unsigned int index2,
+                               const unsigned int index3,
+			       const unsigned int index4,
+			       const unsigned int index5,
+			       const unsigned int index6,
+			       const unsigned int index7)
+{
+  this->indices[0] = index1;
+  this->indices[1] = index2;
+  this->indices[2] = index3;
+  this->indices[3] = index4;
+  this->indices[4] = index5;
+  this->indices[5] = index6;
+  this->indices[6] = index7;
 }
 
 
@@ -2802,6 +2963,136 @@ Table<6,T>::operator () (const unsigned int i,
 		     *this->table_size[3] + l)
 		    *this->table_size[4] + m)
                    *this->table_size[5] + n];
+}
+
+
+
+template <typename T>
+Table<7,T>::Table ()
+{}
+
+
+
+template <typename T>
+Table<7,T>::Table (const unsigned int size1,
+                   const unsigned int size2,
+                   const unsigned int size3,
+		   const unsigned int size4,
+		   const unsigned int size5,
+		   const unsigned int size6,
+		   const unsigned int size7)
+                :
+                TableBase<7,T> (TableIndices<7> (size1, size2, size3, size4, size5, size6, size7))
+{}
+
+
+
+template <typename T>
+inline
+internal::TableBaseAccessors::Accessor<7,T,true,6>
+Table<7,T>::operator [] (const unsigned int i) const
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  const unsigned int subobject_size = this->table_size[1] *
+                                      this->table_size[2] *
+				      this->table_size[3] *
+				      this->table_size[4] *
+				      this->table_size[5] *
+				      this->table_size[6];
+  return (internal::TableBaseAccessors::Accessor<7,T,true,6>
+          (*this,
+           this->val+i*subobject_size));
+}
+
+
+
+template <typename T>
+inline
+internal::TableBaseAccessors::Accessor<7,T,false,6>
+Table<7,T>::operator [] (const unsigned int i)
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  const unsigned int subobject_size = this->table_size[1] *
+                                      this->table_size[2] *
+				      this->table_size[3] *
+				      this->table_size[4] *
+				      this->table_size[5] *
+				      this->table_size[6];
+  return (internal::TableBaseAccessors::Accessor<7,T,false,6>
+          (*this,
+           this->val+i*subobject_size));
+}
+
+
+
+template <typename T>
+inline
+const T &
+Table<7,T>::operator () (const unsigned int i,
+                         const unsigned int j,
+                         const unsigned int k,
+			 const unsigned int l,
+			 const unsigned int m,
+			 const unsigned int n,
+			 const unsigned int o) const
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  Assert (j < this->table_size[1],
+          ExcIndexRange (j, 0, this->table_size[1]));
+  Assert (k < this->table_size[2],
+          ExcIndexRange (k, 0, this->table_size[2]));
+  Assert (l < this->table_size[3],
+          ExcIndexRange (l, 0, this->table_size[3]));
+  Assert (m < this->table_size[4],
+          ExcIndexRange (m, 0, this->table_size[4]));
+  Assert (n < this->table_size[5],
+          ExcIndexRange (n, 0, this->table_size[5]));
+  Assert (o < this->table_size[6],
+          ExcIndexRange (o, 0, this->table_size[6]));
+  return this->val[(((((i*this->table_size[1]+j)
+		       *this->table_size[2] + k)
+		      *this->table_size[3] + l)
+		     *this->table_size[4] + m)
+		    *this->table_size[5] + n)
+		   *this->table_size[6] + o];
+}
+
+
+
+template <typename T>
+inline
+T &
+Table<7,T>::operator () (const unsigned int i,
+                         const unsigned int j,
+                         const unsigned int k,
+			 const unsigned int l,
+			 const unsigned int m,
+			 const unsigned int n,
+			 const unsigned int o)
+{
+  Assert (i < this->table_size[0],
+          ExcIndexRange (i, 0, this->table_size[0]));
+  Assert (j < this->table_size[1],
+          ExcIndexRange (j, 0, this->table_size[1]));
+  Assert (k < this->table_size[2],
+          ExcIndexRange (k, 0, this->table_size[2]));
+  Assert (l < this->table_size[3],
+          ExcIndexRange (l, 0, this->table_size[3]));
+  Assert (m < this->table_size[4],
+          ExcIndexRange (m, 0, this->table_size[4]));
+  Assert (n < this->table_size[5],
+          ExcIndexRange (n, 0, this->table_size[5]));
+  Assert (o < this->table_size[5],
+          ExcIndexRange (o, 0, this->table_size[6]));
+  return this->val[(((((i*this->table_size[1]+j)
+		       *this->table_size[2] + k)
+		      *this->table_size[3] + l)
+		     *this->table_size[4] + m)
+		    *this->table_size[5] + n)
+		   *this->table_size[6] + o];
 }
 
 
