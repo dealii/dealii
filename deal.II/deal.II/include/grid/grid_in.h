@@ -34,6 +34,20 @@ class SubCellData;
  * format for grid data. Any numerical data after the block of
  * topological information is ignored.
  *
+ * Since the coarse mesh fed into a @p{Triangulation} object cannot
+ * have hanging nodes, strange things will happen if the input file
+ * has them. This is due to the fact that most mesh description
+ * formats do not store neighborship information between cells, so the
+ * grid reading functions have to regenerate it. They do so by
+ * checking whether two cells have a common face. If there are hanging
+ * nodes in a triangulation, adjacent cells have no common face, so
+ * the grid reader concludes that the adjacent cells have no neighbors
+ * along these faces and must therefore be at the boundary. In effect,
+ * an internal crack of the domain is introduced this way. Since such
+ * cases are very hard to detect, the library does not make any
+ * attempt to abort on such situations, and you will get a
+ * triangulation that probably does not do what you want.
+ *
  * Note: if you experience unexpected problems with the use of this
  * class, be sure to read the documentation right until the end, and
  * also read the documentation of the @ref{GridReordering} class.
