@@ -125,6 +125,21 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
                                    // situation by using existing edge
                                    // midpoints if available, or center() if
                                    // not
+                                   //
+                                   // note that this situation can not happen
+                                   // during mesh refinement, as there the
+                                   // edges are refined first and only then
+                                   // the face. thus, the check whether a line
+                                   // has children does not lead to the
+                                   // situation where the new face midpoints
+                                   // have different positions depending on
+                                   // which of the two cells is refined first.
+                                   //
+                                   // the situation where the edges aren't
+                                   // refined happens when the a higher order
+                                   // MappingQ requests the midpoint of a
+                                   // face, though, and it is for these cases
+                                   // that we need to have the check available
   return (quad->vertex(0) + quad->vertex(1) +
 	  quad->vertex(2) + quad->vertex(3) +
 	  (quad->line(0)->has_children() ?
