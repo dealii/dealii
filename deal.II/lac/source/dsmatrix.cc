@@ -258,7 +258,7 @@ dSMatrixStruct::add (int i, int j)
 				   // if we came thus far, something went
 				   // wrong: there was not enough space
 				   // in this line
-  Assert (false, ExcNotEnoughSpace(i));
+  Assert (false, ExcNotEnoughSpace(i, rowstart[i+1]-rowstart[i]));
 }
 
 

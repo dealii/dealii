@@ -127,10 +127,12 @@ public:
 				     /**
 				      * Exception
 				      */
-    DeclException1 (ExcNotEnoughSpace,
-		    int,
+    DeclException2 (ExcNotEnoughSpace,
+		    int, int,
 		    << "Upon entering a new entry to row " << arg1
-		    << ": there was no free entry any more.");
+		    << ": there was no free entry any more. " << endl
+		    << "(Maximum number of entries for this row: "
+		    << arg2 << "; maybe the matrix is already compressed?)");
 };
 
 
