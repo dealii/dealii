@@ -15,6 +15,15 @@
 #include <base/polynomial.h>
 #include <base/thread_management.h>
 
+//TODO:[?] This class leaks memory, but only at the very end of a program.
+// Since it expands the Legendre<number>::coefficients array, the elements
+// of this static variable are not destroyed at the end of the program
+// run. While this is not a problem (since the returned memory could
+// not be used anyway then), it is a little confusing when looking at
+// a memory checked such as "purify". Maybe, this should be handled somehow
+// to avoid this confusion in future.
+
+
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
