@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -117,7 +117,7 @@ void check ()
 
 int main ()
 {
-  std::ofstream logfile("fe_traits.output");
+  std::ofstream logfile("traits.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
