@@ -18,7 +18,7 @@
 //   DoFTools::
 //   make_boundary_sparsity_pattern (const DoFHandler<dim> &,
 //                                   const std::vector<unsigned int> &
-//	                    CompressedBlockSparsityPattern  &);
+//	                             CompressedBlockSparsityPattern  &);
 
 std::string output_file_name = "dof_tools_15d.output";
 
