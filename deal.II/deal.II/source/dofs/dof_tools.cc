@@ -24,12 +24,13 @@
 #include <fe/fe_system.h>
 #include <dofs/dof_tools.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/block_sparsity_pattern.h>
 #include <lac/vector.h>
 
 #include <algorithm>
 
 
-template <int dim>
+template <int dim, class SparsityPattern>
 void
 DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
 				 SparsityPattern       &sparsity)
@@ -57,7 +58,7 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
 }
 
 
-template <int dim>
+template <int dim, class SparsityPattern>
 void
 DoFTools::make_sparsity_pattern (const DoFHandler<dim>       &dof,
 				 const vector<vector<bool> > &mask,
@@ -1414,12 +1415,29 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& d
 
 template void
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
-					       SparsityPattern    &sparsity);
+				 SparsityPattern    &sparsity);
+
+template void
+DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
+				 BlockSparsityPattern<2,2>    &sparsity);
+template void
+DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
+				 BlockSparsityPattern<3,3>    &sparsity);
 
 template void 
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 				 const vector<vector<bool> > &mask,
 				 SparsityPattern             &sparsity);
+
+template void 
+DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+				 const vector<vector<bool> > &mask,
+				 BlockSparsityPattern<2,2>   &sparsity);
+
+template void 
+DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+				 const vector<vector<bool> > &mask,
+				 BlockSparsityPattern<3,3>   &sparsity);
 
 template
 void

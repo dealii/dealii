@@ -199,6 +199,14 @@
        New: <code class="member">DoFRenumbering::sort_selected_dofs_back ()</code>
        sorts selected degrees of freedom to the end of the index range.
        </p>
+
+  <li> <p> 
+       Extended: <code class="member">DoFTools::make_sparsity_pattern ()</code>
+       now accepts a template parameter as sparsity pattern. This
+       allows to use this function for the usual 
+       <code class="class">SparsityPattern</code>, or for 
+       <code class="class">BlockSparsityPattern</code> arguments.
+       </p>
 </ol>
 
 <hr>

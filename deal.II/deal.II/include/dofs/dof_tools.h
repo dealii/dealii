@@ -98,8 +98,15 @@ class DoFTools
 				      * Remember using
 				      * #SparsityPattern::compress()#
 				      * after generating the pattern.
+				      *
+				      * The actual type of the
+				      * sparsity pattern may be
+				      * #SparsityPattern#,
+				      * #BlockSparsityPattern#, or any
+				      * other class that satisfies
+				      * similar requirements.
 				      */
-    template<int dim>
+    template <int dim, class SparsityPattern>
     static void make_sparsity_pattern (const DoFHandler<dim> &dof,
 				       SparsityPattern       &sparsity_pattern);
 
@@ -157,8 +164,15 @@ class DoFTools
 				      * the matrix structure just like the
 				      * previous function, but does not create
 				      * elements if not specified by the mask.
+				      *
+				      * The actual type of the
+				      * sparsity pattern may be
+				      * #SparsityPattern#,
+				      * #BlockSparsityPattern#, or any
+				      * other class that satisfies
+				      * similar requirements.
 				      */
-    template<int dim>
+    template<int dim, class SparsityPattern>
     static void make_sparsity_pattern (const DoFHandler<dim>       &dof,
 				       const vector<vector<bool> > &mask,
 				       SparsityPattern             &sparsity_pattern);
