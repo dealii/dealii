@@ -200,7 +200,7 @@ inline
 Point<dim>::Point (const double x)
 {
   Assert (dim==1, ExcInvalidConstructorCalled());
-  values[0] = x;
+  this->values[0] = x;
 };
 
 
@@ -210,8 +210,8 @@ inline
 Point<dim>::Point (const double x, const double y)
 {
   Assert (dim==2, ExcInvalidConstructorCalled());
-  values[0] = x;
-  values[1] = y;
+  this->values[0] = x;
+  this->values[1] = y;
 };
 
 
@@ -221,9 +221,9 @@ inline
 Point<dim>::Point (const double x, const double y, const double z)
 {
   Assert (dim==3, ExcInvalidConstructorCalled());
-  values[0] = x;
-  values[1] = y;
-  values[2] = z;
+  this->values[0] = x;
+  this->values[1] = y;
+  this->values[2] = z;
 };
 
 
@@ -233,7 +233,7 @@ inline
 double Point<dim>::operator () (const unsigned int index) const
 {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
-  return values[index];
+  return this->values[index];
 };
 
 
@@ -243,7 +243,7 @@ inline
 double & Point<dim>::operator () (const unsigned int index) 
 {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
-  return values[index];
+  return this->values[index];
 };
 
 
@@ -272,7 +272,7 @@ Point<dim> Point<dim>::operator - () const
 {
   Point<dim> result;
   for (unsigned int i=0; i<dim; ++i)
-    result.values[i] = -values[i];
+    result.this->values[i] = -this->values[i];
   return result;
 };
 
@@ -302,7 +302,7 @@ double Point<dim>::square () const
 {
   double q=0;
   for (unsigned int i=0; i<dim; ++i)
-    q += values[i] * values[i];
+    q += this->values[i] * this->values[i];
   return q;
 };
 
@@ -314,7 +314,7 @@ double Point<dim>::distance (const Point<dim> &p) const
   double sum=0;
   for (unsigned int i=0; i<dim; ++i)
     {
-      const double diff=values[i]-p(i);
+      const double diff=this->values[i]-p(i);
       sum += diff*diff;
     }
   

@@ -735,7 +735,7 @@ template <typename number>
 inline unsigned int
 FullMatrix<number>::m() const
 {
-  return n_rows();
+  return this->n_rows();
 };
 
 
@@ -744,7 +744,7 @@ template <typename number>
 inline unsigned int
 FullMatrix<number>::n() const
 {
-  return n_cols();
+  return this->n_cols();
 };
 
 
