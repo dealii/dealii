@@ -115,6 +115,16 @@ namespace
     return Point<2> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
 		     std::sin(angle)*p(0) + std::cos(angle) * p(1));
   };
+
+
+
+  template <int dim>
+  inline
+  Point<dim> scale_point (const Point<dim> p,
+			  const double factor)
+  {
+    return p*factor;
+  };
 };
 
 
@@ -143,6 +153,19 @@ GridTools::rotate (const double      angle,
 #endif
 
 
+template <int dim>
+void
+GridTools::scale (const double        scaling_factor,
+		  Triangulation<dim> &triangulation)
+{
+  Assert (scaling_factor>0, ExcScalingFactorNotPositive (scaling_factor));
+  
+  transform (std::bind2nd(std::ptr_fun(&scale_point<dim>),
+			  scaling_factor),
+	     triangulation);
+};
+
+
 
 #if deal_II_dimension != 1
 template
@@ -152,4 +175,8 @@ GridTools::diameter<deal_II_dimension> (const Triangulation<deal_II_dimension> &
 
 template
 void GridTools::shift<deal_II_dimension> (const Point<deal_II_dimension> &,
+					  Triangulation<deal_II_dimension> &);
+
+template
+void GridTools::scale<deal_II_dimension> (const double,
 					  Triangulation<deal_II_dimension> &);

@@ -123,11 +123,37 @@ class GridTools
     static
     void rotate (const double      angle,
 		 Triangulation<2> &triangulation);
+
+				     /**
+				      * Scale the entire triangulation
+				      * by the given factor. To
+				      * preserve the orientation of
+				      * the triangulation, the factor
+				      * must be positive.
+				      *
+				      * This function uses the
+				      * @ref{transform} function
+				      * above, so the requirements on
+				      * the triangulation stated there
+				      * hold for this function as
+				      * well.
+				      */
+    template <int dim>
+    static
+    void scale (const double        scaling_factor,
+		Triangulation<dim> &triangulation);
     
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcTriangulationHasBeenRefined);
+
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcScalingFactorNotPositive,
+		    double,
+		    << "The scaling factor must be positive, but is " << arg1);
 };
 
 
