@@ -994,7 +994,7 @@ BlockSparseMatrix<number>::const_iterator::operator++ ()
 {
   Assert (this->row_block<this->matrix->n_block_rows(), ExcIteratorPastEnd());
 
-				   // Remeber current row inside block
+				   // Remember current row inside block
   unsigned int local_row = this->base_iterator->row();
 				   // Advance inside block
   ++this->base_iterator;
