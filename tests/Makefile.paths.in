@@ -1,0 +1,4 @@
+# File only holding those definitions in the Makefiles of the subdirs
+# which are changed by the ./configure file.
+
+D = @DEAL2_DIR@

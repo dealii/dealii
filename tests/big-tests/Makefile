@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
 # Copyright (C) 2000 by the deal.II authors
@@ -7,7 +8,7 @@
 # Include general settings for including DEAL libraries
 ############################################################
 
-D = @DEAL2_DIR@
+D = /home/atlas2/wolf/program/testdeal/deal.II/tests/..
 
 include $D/common/Make.global_options
 

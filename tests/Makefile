@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 # $Id$
 # Common Makefile for all test directories
 

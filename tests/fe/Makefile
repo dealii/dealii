@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
 # Copyright (C) 2000, 2001 by the deal.II authors
@@ -7,7 +8,7 @@
 # Include general settings for including DEAL libraries
 ############################################################
 
-D = @DEAL2_DIR@
+include ../Makefile.paths
 include $D/common/Make.global_options
 debug-mode = on
 

@@ -23,4 +23,4 @@ AC_ARG_WITH(deal,
     fi)
 AC_SUBST(DEAL2_DIR)
 
-AC_OUTPUT(Makefile base/Makefile lac/Makefile fe/Makefile deal.II/Makefile big-tests/Makefile)
+AC_OUTPUT(Makefile.paths)
