@@ -171,9 +171,21 @@ class Multigrid : public Subscriptor
 				      * Triangulation; therefore, this
 				      * function will only accept
 				      * arguments smaller than the
-				      * current #maxlevel.
+				      * current #maxlevel and not
+				      * smaller than the current
+				      * #minlevel.
 				      */
     void set_maxlevel(unsigned int);
+
+				     /**
+				      * Set the coarse level for which
+				      * the multilevel method is
+				      * performed. By default, this is
+				      * zero. Accepted are
+				      * non-negative values smaller
+				      * than the current #maxlevel.
+				      */
+    void set_minlevel(unsigned int);
 
 				     /**
 				      * Chance #cycle_type used in cycle().

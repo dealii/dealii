@@ -77,6 +77,15 @@ Multigrid<VECTOR>::set_maxlevel(unsigned int l)
 
 template <class VECTOR>
 void
+Multigrid<VECTOR>::set_minlevel(unsigned int l)
+{
+  Assert (l <= maxlevel, ExcIndexRange(l,minlevel,maxlevel+1));
+  minlevel = l;
+}
+
+
+template <class VECTOR>
+void
 Multigrid<VECTOR>::set_cycle(Multigrid<VECTOR>::Cycle c)
 {
   cycle_type = c;
