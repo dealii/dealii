@@ -316,6 +316,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: Missing <code>ucd</code> is now added to the list of
+       supported output formats returned by <code
+       class="class">GridOut</code>::<code
+       class="member">get_output_format_names</code>.
+       <br>
+       (RH 2001/04/03)
+       </p>
+
+  <li> <p>
        New/fixed: In some obscure corner cases, the detection logic in <code
        class="member">DataOut_DoFData::add_data_vector</code> would
        not have been able to detect whether something is a DoF data
@@ -331,8 +340,8 @@ documentation, etc</a>.
   <li> <p>
        Removed: the <code class="class">ProblemBase</code> class,
        which has been deprecated since before the release of 
-       <acronym>deal.II</acronym> 3.0 has finally been removed. The
-       same applied for the classes
+       <acronym>deal.II</acronym> 3.0, has finally been removed. The
+       same applies for the classes
        <code class="class">Assembler</code>,
        <code class="class">Equation</code>,
        <code class="class">MassMatrix</code>, and
@@ -369,6 +378,7 @@ documentation, etc</a>.
        class="class">MappingQ1</code>.
        <br>
        (RH 2001/03/27)
+       </p>
 
   <li> <p>
        New: <code class="class">Boundary</code> and derived classes
