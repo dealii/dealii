@@ -1231,7 +1231,8 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
 						   // the height field, I don't know
 						   // it.
 		  EpsCell2d eps_cell;
-		  const double pi = 3.1415926536;
+//TODO:[?] Unify the various places where PI is defined to a central instance  
+		  const double pi = 3.141592653589793238462;
 		  const double cx = -cos(pi-flags.azimut_angle * 2*pi / 360.),
 			       cz = -cos(flags.turn_angle * 2*pi / 360.),
 			       sx = sin(pi-flags.azimut_angle * 2*pi / 360.),

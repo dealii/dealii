@@ -67,7 +67,8 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 				   // place. for simplicity add the
 				   // initial direction at the end
 				   // again
-  const double pi = 3.14159265358979323846;
+//TODO:[?] Unify the various places where PI is defined to a central instance  
+  const double pi = 3.141592653589793238462;
   std::vector<Point<dim+1> > angle_directions (n_patches_per_circle+1);
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {

@@ -275,7 +275,8 @@ C DEFINE A TEST MATRIX
   
 */
 
-  const double pi = 3.141592653587932384;
+//TODO:[?] Unify the various places where PI is defined to a central instance  
+  const double pi = 3.141592653589793238462;
   const double am = trace(d) / 3.;
 
 				   // s := d - trace(d) I

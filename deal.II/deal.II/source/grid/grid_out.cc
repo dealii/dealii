@@ -679,9 +679,10 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					 // is in direction of the viewer, but
 					 // I am too tired at present to fix
 					 // this
+//TODO:[?] Unify the various places where PI is defined to a central instance  
+	const double pi = 3.141592653589793238462;
 	const double z_angle    = eps_flags_3.azimut_angle;
 	const double turn_angle = eps_flags_3.turn_angle;
-	const double pi = 3.1415926536;
 	const Point<dim> view_direction(-sin(z_angle * 2.*pi / 360.) * sin(turn_angle * 2.*pi / 360.),
 					+sin(z_angle * 2.*pi / 360.) * cos(turn_angle * 2.*pi / 360.),
 					-cos(z_angle * 2.*pi / 360.));
