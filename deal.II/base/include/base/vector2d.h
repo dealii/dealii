@@ -16,6 +16,7 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 
+#include <cstddef>
 
 template <typename T> class vector2d;
 template <typename T> class FullMatrix;
