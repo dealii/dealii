@@ -1214,7 +1214,7 @@ void FECrissCross<3>::get_unit_support_points (vector<Point<3> > &) const
 
 
 template <>
-void FECrissCross<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &,
+void FECrissCross<3>::get_support_points (const DoFHandler<3>::cell_iterator &,
 				  vector<Point<3> >  &) const
 {
   Assert (false, ExcNotImplemented());
@@ -1223,7 +1223,7 @@ void FECrissCross<3>::get_support_points (const typename DoFHandler<3>::cell_ite
 
 
 template <>
-void FECrissCross<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &,
+void FECrissCross<3>::get_face_support_points (const DoFHandler<3>::face_iterator &,
 				       vector<Point<3> >  &) const
 {
   Assert (false, ExcNotImplemented());
