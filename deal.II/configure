@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.62 
+# From configure.in Revision: 1.63 
 
 
 
@@ -2271,7 +2271,7 @@ if test "x$F77" != "x" ; then
       F77FLAGSO="$F77FLAGSO -fPIC"
     fi
 
-                F77LDFLAGS="-lg2c"
+                LIBS="$LIBS -lg2c"
 
   else
 
@@ -2281,7 +2281,7 @@ if test "x$F77" != "x" ; then
       echo "$ac_t""compiler is AIX Fortran77" 1>&6
       F77FLAGSG="$FFLAGS -g"
       F77FLAGSO="$FFLAGS -O3 -w"
-      F77LDFLAGS="-lxlf90"  
+      LIBS="$LIBS -lxlf90"  
 
                   
     else
@@ -2293,7 +2293,7 @@ if test "x$F77" != "x" ; then
 	F77_VERSION="SunF77"
 	F77FLAGSG="$FFLAGS -silent -g"
 	F77FLAGSO="$FFLAGS -silent -O3 -w"
-	F77LDFLAGS="-lF77 -lsunmath -lM77"
+	LIBSS="$LIBS -lF77 -lsunmath -lM77"
 
 		if test $enableshared = yes ; then
 	  F77FLAGSG="$F77FLAGSG -PIC"
@@ -2308,7 +2308,7 @@ if test "x$F77" != "x" ; then
 	  F77_VERSION="MIPSproF77"
 	  F77FLAGSG="$FFLAGS -ansi -g"
 	  F77FLAGSO="$FFLAGS -O3 -woffall"
-	  F77LDFLAGS="-lftn"
+	  LIBSS="$LIBS -lftn"
 
 	  	  if test $enableshared = yes ; then
 	    F77FLAGSG="$F77FLAGSG -shared -KPIC"
@@ -2333,10 +2333,11 @@ fi
 
 
 
+
 # Extract the first word of "perl", so it can be a program name with args.
 set dummy perl; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2340: checking for $ac_word" >&5
+echo "configure:2341: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_PERL'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2374,7 +2375,7 @@ fi
 
 
 echo $ac_n "checking for HSL subroutines""... $ac_c" 1>&6
-echo "configure:2378: checking for HSL subroutines" >&5
+echo "configure:2379: checking for HSL subroutines" >&5
 hsl_subroutines=""
 if test -r contrib/hsl/source/ma27.f ; then
   hsl_subroutines="$hsl_subroutines MA27"
@@ -2409,7 +2410,7 @@ if test "${with_blas+set}" = set; then
   withval="$with_blas"
   if test "$withval" != no ; then
     echo $ac_n "checking for BLAS""... $ac_c" 1>&6
-echo "configure:2413: checking for BLAS" >&5
+echo "configure:2414: checking for BLAS" >&5
     if test -r "$withval" ; then
       echo "$ac_t""found" 1>&6
     else
@@ -2425,7 +2426,7 @@ EOF
   
 else
   echo $ac_n "checking for daxpy_ in -lblas""... $ac_c" 1>&6
-echo "configure:2429: checking for daxpy_ in -lblas" >&5
+echo "configure:2430: checking for daxpy_ in -lblas" >&5
 ac_lib_var=`echo blas'_'daxpy_ | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2433,7 +2434,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lblas -lg2c $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2437 "configure"
+#line 2438 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 #ifdef __cplusplus
@@ -2447,7 +2448,7 @@ int main() {
 daxpy_()
 ; return 0; }
 EOF
-if { (eval echo configure:2451: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2452: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2479,7 +2480,7 @@ if test "${with_lapack+set}" = set; then
   withval="$with_lapack"
   if test "$withval" != no ; then
     echo $ac_n "checking for LAPACK""... $ac_c" 1>&6
-echo "configure:2483: checking for LAPACK" >&5
+echo "configure:2484: checking for LAPACK" >&5
     if test -r "$withval" ; then
       echo "$ac_t""found" 1>&6
     else
@@ -2495,7 +2496,7 @@ EOF
   
 else
   echo $ac_n "checking for dgels_ in -llapack""... $ac_c" 1>&6
-echo "configure:2499: checking for dgels_ in -llapack" >&5
+echo "configure:2500: checking for dgels_ in -llapack" >&5
 ac_lib_var=`echo lapack'_'dgels_ | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2503,7 +2504,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-llapack  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2507 "configure"
+#line 2508 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 #ifdef __cplusplus
@@ -2517,7 +2518,7 @@ int main() {
 dgels_()
 ; return 0; }
 EOF
-if { (eval echo configure:2521: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2522: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2584,7 +2585,7 @@ else
 fi
 
 echo $ac_n "checking for kdoc""... $ac_c" 1>&6
-echo "configure:2588: checking for kdoc" >&5
+echo "configure:2589: checking for kdoc" >&5
 if test "$kdocdir" != ${DEAL2_DIR}/contrib/kdoc/bin ; then
   if test -r $kdocdir/kdoc ; then
     echo "$ac_t""found" 1>&6
@@ -2620,7 +2621,7 @@ if test "$docxx" = to-be-determined ; then
   # Extract the first word of ""doc++"", so it can be a program name with args.
 set dummy "doc++"; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2624: checking for $ac_word" >&5
+echo "configure:2625: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_docxx'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2654,7 +2655,7 @@ fi
 
 else
   echo $ac_n "checking for doc++""... $ac_c" 1>&6
-echo "configure:2658: checking for doc++" >&5
+echo "configure:2659: checking for doc++" >&5
   if test -x "$docxx" ; then
     echo "$ac_t""yes" 1>&6
   else
@@ -2677,16 +2678,16 @@ cross_compiling=$ac_cv_prog_cxx_cross
 
 CXXFLAGS="$CXXFLAGSG"
 echo $ac_n "checking for consistency of CXXFLAGSG flags""... $ac_c" 1>&6
-echo "configure:2681: checking for consistency of CXXFLAGSG flags" >&5
+echo "configure:2682: checking for consistency of CXXFLAGSG flags" >&5
 cat > conftest.$ac_ext <<EOF
-#line 2683 "configure"
+#line 2684 "configure"
 #include "confdefs.h"
 
 int main() {
 ;
 ; return 0; }
 EOF
-if { (eval echo configure:2690: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2691: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
     echo "$ac_t""yes" 1>&6
@@ -2704,16 +2705,16 @@ rm -f conftest*
 
 CXXFLAGS="$CXXFLAGSO"
 echo $ac_n "checking for consistency of CXXFLAGSO flags""... $ac_c" 1>&6
-echo "configure:2708: checking for consistency of CXXFLAGSO flags" >&5
+echo "configure:2709: checking for consistency of CXXFLAGSO flags" >&5
 cat > conftest.$ac_ext <<EOF
-#line 2710 "configure"
+#line 2711 "configure"
 #include "confdefs.h"
 
 int main() {
 ;
 ; return 0; }
 EOF
-if { (eval echo configure:2717: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2718: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
     echo "$ac_t""yes" 1>&6

@@ -553,7 +553,7 @@ if test "x$F77" != "x" ; then
     dnl Then we have to set the set of libraries we have to link with
     dnl when linking C++ and Fortran code with the C++ compiler. For
     dnl g77, this is only libg2c
-    F77LDFLAGS="-lg2c"
+    LIBS="$LIBS -lg2c"
 
   else
 
@@ -565,7 +565,7 @@ if test "x$F77" != "x" ; then
       AC_MSG_RESULT(compiler is AIX Fortran77)
       F77FLAGSG="$FFLAGS -g"
       F77FLAGSO="$FFLAGS -O3 -w"
-      F77LDFLAGS="-lxlf90"  
+      LIBS="$LIBS -lxlf90"  
 
       dnl Note: presently, we don't support shared libs on AIX, so we don't need
       dnl to set -PIC or the like for this compiler (nonetheless, I couldn't find
@@ -583,7 +583,7 @@ if test "x$F77" != "x" ; then
 	F77_VERSION="SunF77"
 	F77FLAGSG="$FFLAGS -silent -g"
 	F77FLAGSO="$FFLAGS -silent -O3 -w"
-	F77LDFLAGS="-lF77 -lsunmath -lM77"
+	LIBSS="$LIBS -lF77 -lsunmath -lM77"
 
 	dnl If necessary, add shared lib flags
 	if test $enableshared = yes ; then
@@ -601,7 +601,7 @@ if test "x$F77" != "x" ; then
 	  F77_VERSION="MIPSproF77"
 	  F77FLAGSG="$FFLAGS -ansi -g"
 	  F77FLAGSO="$FFLAGS -O3 -woffall"
-	  F77LDFLAGS="-lftn"
+	  LIBSS="$LIBS -lftn"
 
 	  dnl If necessary, add shared lib flags
 	  if test $enableshared = yes ; then
@@ -626,6 +626,7 @@ AC_SUBST(F77_VERSION)
 AC_SUBST(F77FLAGSO)
 AC_SUBST(F77FLAGSG)
 AC_SUBST(F77LDFLAGS)
+AC_SUBST(LIBS)
 
 
 dnl    Find path to perl
