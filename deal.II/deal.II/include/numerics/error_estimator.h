@@ -155,13 +155,13 @@ class KellyErrorEstimator {
 				      */
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
     
-    void estimate_error (const DoFHandler<dim>    &dof,
-			 const Quadrature<dim-1>  &quadrature,
-			 const FiniteElement<dim> &fe,
-			 const Boundary<dim>      &boundary,
-			 const FunctionMap        &neumann_bc,
-			 const dVector            &solution,
-			 dVector                  &error) const;
+    static void estimate_error (const DoFHandler<dim>    &dof,
+				const Quadrature<dim-1>  &quadrature,
+				const FiniteElement<dim> &fe,
+				const Boundary<dim>      &boundary,
+				const FunctionMap        &neumann_bc,
+				const dVector            &solution,
+				dVector                  &error);
 
 				     /**
 				      * Exception

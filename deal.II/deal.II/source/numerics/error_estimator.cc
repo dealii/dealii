@@ -30,7 +30,7 @@ void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
 					     const Boundary<1> &,
 					     const FunctionMap &,
 					     const dVector &,
-					     dVector &) const {
+					     dVector &) {
   Assert(false, ExcNotImplemented());
 };
 
@@ -43,7 +43,7 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					       const Boundary<dim>      &boundary,
 					       const FunctionMap        &neumann_bc,
 					       const dVector            &solution,
-					       dVector                  &error) const {
+					       dVector                  &error) {
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
 
