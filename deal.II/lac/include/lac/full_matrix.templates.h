@@ -115,10 +115,10 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
-  double s;
+  number2 s;
   if ((n()==3) && (m()==3))
   {
-    double s0,s1,s2;
+    number2 s0,s1,s2;
     s   = src(0);
     s0  = s*val[0]; s1  = s*val[3]; s2  = s*val[6]; 
     s   = src(1);
@@ -141,7 +141,7 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
   }
   else if ((n()==4) && (m()==4))
   {
-    double s0,s1,s2,s3;
+    number2 s0,s1,s2,s3;
     s = src(0);
     s0  = s*val[0]; s1  = s*val[4]; s2  = s*val[8];  s3  = s*val[12];
     s = src(1);
@@ -168,7 +168,7 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
   }
   else if ((n()==8) && (m()==8))
   {
-    double s0,s1,s2,s3,s4,s5,s6,s7;
+    number2 s0,s1,s2,s3,s4,s5,s6,s7;
     s = src(0);
     s0 = s*val[0]; s1 = s*val[8]; s2 = s*val[16]; s3 = s*val[24];
     s4 = s*val[32]; s5 = s*val[40]; s6 = s*val[48]; s7 = s*val[56];
@@ -244,10 +244,10 @@ void FullMatrix<number>::gsmult (Vector<number2>& dst, const Vector<number2>& sr
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
   Assert(gl.n() == n(), ExcDimensionMismatch(gl.n(), n()));
 
-  double s;
+  number2 s;
   if ((n()==3) && (m()==3))
   {
-    double s0=0.,s1=0.,s2=0.;
+    number2 s0=0.,s1=0.,s2=0.;
     s   = src(0);
     if(gl(1)<gl(0)) s1  = s*val[3]; if(gl(2)<gl(0))  s2  = s*val[6]; 
     s   = src(1);
@@ -261,7 +261,7 @@ void FullMatrix<number>::gsmult (Vector<number2>& dst, const Vector<number2>& sr
   }
   else if ((n()==4) && (m()==4))
   {
-    double s0=0.,s1=0.,s2=0.,s3=0.;
+    number2 s0=0.,s1=0.,s2=0.,s3=0.;
     s = src(0);
     if(gl(1)<gl(0)) s1 = s*val[4];  if(gl(2)<gl(0)) s2 = s*val[8]; if(gl(3)<gl(0)) s3 = s*val[12];
     s = src(1);
@@ -278,7 +278,7 @@ void FullMatrix<number>::gsmult (Vector<number2>& dst, const Vector<number2>& sr
   }
   else if ((n()==8) && (m()==8))
   {
-    double s0=0.,s1=0.,s2=0.,s3=0.,s4=0.,s5=0.,s6=0.,s7=0.;
+    number2 s0=0.,s1=0.,s2=0.,s3=0.,s4=0.,s5=0.,s6=0.,s7=0.;
     s = src(0);
     if(gl(1)<gl(0)) s1 = s*val[8]; 
     if(gl(2)<gl(0)) s2 = s*val[16]; 
@@ -380,7 +380,7 @@ void FullMatrix<number>::Tvmult (Vector<number2>& dst,
   Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
 
   unsigned int i,j;
-  double s;
+  number2 s;
   const unsigned int size_m = m(),
 		     size_n = n();
   for (i=0; i<size_m; ++i)
@@ -406,7 +406,7 @@ double FullMatrix<number>::residual (Vector<number2>& dst,
   Assert(right.size() == m(), ExcDimensionMismatch(right.size(), m()));
 
   unsigned int i,j;
-  double s, res = 0.;
+  number2 s, res = 0.;
   const unsigned int size_m = m(),
 		     size_n = n();
   for (i=0; i<size_n; ++i)
@@ -432,7 +432,7 @@ void FullMatrix<number>::forward (Vector<number2>& dst,
 
   unsigned int i,j;
   unsigned int nu = ( (m()<n()) ? m() : n());
-  double s;
+  number2 s;
   for (i=0; i<nu; ++i)
     {
       s = src(i);
@@ -450,7 +450,7 @@ void FullMatrix<number>::backward (Vector<number2>& dst,
 {
   unsigned int j;
   unsigned int nu = (m()<n() ? m() : n());
-  double s;
+  number2 s;
   for (int i=nu-1; i>=0; --i)
     {
       s = src(i);
@@ -593,7 +593,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>& dst,
 {
   Assert (n() == src.m(), ExcDimensionMismatch(n(), src.m()));
   unsigned int i,j,k;
-  double s = 1.;
+  number2 s = 1.;
   dst.reinit(m(), src.n());
 
   for (i=0;i<m();i++)
@@ -612,7 +612,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>& dst,
   Assert (m() == src.n(), ExcDimensionMismatch(m(), src.n()));
 
   unsigned int i,j,k;
-  double s = 1.;
+  number2 s = 1.;
 
   dst.reinit(n(), src.m());
 
@@ -634,7 +634,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>& dst, const FullMatrix<numb
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
 
   unsigned int i,j,k;
-  double s = 1.;
+  number2 s = 1.;
   dst.reinit(m(), src.m());
 
   for (i=0;i<m();i++)
@@ -653,7 +653,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>& dst, const FullMatrix<numb
   Assert (m() == src.n(), ExcDimensionMismatch(m(), src.n()));
 
   unsigned int i,j,k;
-  double s = 1.;
+  number2 s = 1.;
   
   dst.reinit(n(), src.m());
 
@@ -675,14 +675,14 @@ double FullMatrix<number>::matrix_norm (const Vector<number2> &v) const
   Assert(m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
-  double sum = 0.;
+  number2 sum = 0.;
   const unsigned int n_rows = m();
   const number *val_ptr = &val[0];
   const number2 *v_ptr;
   
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      double s = 0.;
+      number2 s = 0.;
       const number * const val_end_of_row = val_ptr+n_rows;
       v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
@@ -703,7 +703,7 @@ double FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u, cons
   Assert(m() == u.size(), ExcDimensionMismatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
-  double sum = 0.;
+  number2 sum = 0.;
   const unsigned int n_rows = m();
   const unsigned int n_cols = n();
   const number *val_ptr = &val[0];
@@ -711,7 +711,7 @@ double FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u, cons
   
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      double s = 0.;
+      number2 s = 0.;
       const number * const val_end_of_row = val_ptr+n_cols;
       v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
@@ -1188,7 +1188,7 @@ template <typename number>
 double
 FullMatrix<number>::norm2 () const
 {
-  double s = 0.;
+  number s = 0.;
   for (unsigned int i=0;i<dim_image*dim_range;++i)
     s += val[i]*val[i];
   return s;
@@ -1223,7 +1223,7 @@ FullMatrix<number>::invert (const FullMatrix<number> &M)
 					     // this is Maple output,
 					     // thus a bit unstructured
       {
-	    const double t4 = 1.0/(M.el(0,0)*M.el(1,1)-M.el(0,1)*M.el(1,0));
+	    const number t4 = 1.0/(M.el(0,0)*M.el(1,1)-M.el(0,1)*M.el(1,0));
 	    el(0,0) = M.el(1,1)*t4;
 	    el(0,1) = -M.el(0,1)*t4;
 	    el(1,0) = -M.el(1,0)*t4;
@@ -1233,7 +1233,7 @@ FullMatrix<number>::invert (const FullMatrix<number> &M)
       
       case 3:
       {
-	    const double t4 = M.el(0,0)*M.el(1,1),
+	    const number t4 = M.el(0,0)*M.el(1,1),
 			 t6 = M.el(0,0)*M.el(1,2),
 			 t8 = M.el(0,1)*M.el(1,0),
 			t00 = M.el(0,2)*M.el(1,0),
@@ -1262,61 +1262,61 @@ FullMatrix<number>::invert (const FullMatrix<number> &M)
 					 // readlib(C);
 					 // C(ai,optimized,filename=x4);
 
-	const double t14 = M.el(0,0)*M.el(1,1);
-	const double t15 = M.el(2,2)*M.el(3,3);
-	const double t17 = M.el(2,3)*M.el(3,2);
-	const double t19 = M.el(0,0)*M.el(2,1);
-	const double t20 = M.el(1,2)*M.el(3,3);
-	const double t22 = M.el(1,3)*M.el(3,2);
-	const double t24 = M.el(0,0)*M.el(3,1);
-	const double t25 = M.el(1,2)*M.el(2,3);
-	const double t27 = M.el(1,3)*M.el(2,2);
-	const double t29 = M.el(1,0)*M.el(0,1);
-	const double t32 = M.el(1,0)*M.el(2,1);
-	const double t33 = M.el(0,2)*M.el(3,3);
-	const double t35 = M.el(0,3)*M.el(3,2);
-	const double t37 = M.el(1,0)*M.el(3,1);
-	const double t38 = M.el(0,2)*M.el(2,3);
-	const double t40 = M.el(0,3)*M.el(2,2);
-	const double t42 = t14*t15-t14*t17-t19*t20+t19*t22+
+	const number t14 = M.el(0,0)*M.el(1,1);
+	const number t15 = M.el(2,2)*M.el(3,3);
+	const number t17 = M.el(2,3)*M.el(3,2);
+	const number t19 = M.el(0,0)*M.el(2,1);
+	const number t20 = M.el(1,2)*M.el(3,3);
+	const number t22 = M.el(1,3)*M.el(3,2);
+	const number t24 = M.el(0,0)*M.el(3,1);
+	const number t25 = M.el(1,2)*M.el(2,3);
+	const number t27 = M.el(1,3)*M.el(2,2);
+	const number t29 = M.el(1,0)*M.el(0,1);
+	const number t32 = M.el(1,0)*M.el(2,1);
+	const number t33 = M.el(0,2)*M.el(3,3);
+	const number t35 = M.el(0,3)*M.el(3,2);
+	const number t37 = M.el(1,0)*M.el(3,1);
+	const number t38 = M.el(0,2)*M.el(2,3);
+	const number t40 = M.el(0,3)*M.el(2,2);
+	const number t42 = t14*t15-t14*t17-t19*t20+t19*t22+
 			   t24*t25-t24*t27-t29*t15+t29*t17+
 			   t32*t33-t32*t35-t37*t38+t37*t40;
-	const double t43 = M.el(2,0)*M.el(0,1);
-	const double t46 = M.el(2,0)*M.el(1,1);
-	const double t49 = M.el(2,0)*M.el(3,1);
-	const double t50 = M.el(0,2)*M.el(1,3);
-	const double t52 = M.el(0,3)*M.el(1,2);
-	const double t54 = M.el(3,0)*M.el(0,1);
-	const double t57 = M.el(3,0)*M.el(1,1);
-	const double t60 = M.el(3,0)*M.el(2,1);
-	const double t63 = t43*t20-t43*t22-t46*t33+t46*t35+
+	const number t43 = M.el(2,0)*M.el(0,1);
+	const number t46 = M.el(2,0)*M.el(1,1);
+	const number t49 = M.el(2,0)*M.el(3,1);
+	const number t50 = M.el(0,2)*M.el(1,3);
+	const number t52 = M.el(0,3)*M.el(1,2);
+	const number t54 = M.el(3,0)*M.el(0,1);
+	const number t57 = M.el(3,0)*M.el(1,1);
+	const number t60 = M.el(3,0)*M.el(2,1);
+	const number t63 = t43*t20-t43*t22-t46*t33+t46*t35+
 			   t49*t50-t49*t52-t54*t25+t54*t27+
 			   t57*t38-t57*t40-t60*t50+t60*t52;
-	const double t65 = 1/(t42+t63);
-	const double t71 = M.el(0,2)*M.el(2,1);
-	const double t73 = M.el(0,3)*M.el(2,1);
-	const double t75 = M.el(0,2)*M.el(3,1);
-	const double t77 = M.el(0,3)*M.el(3,1);
-	const double t81 = M.el(0,1)*M.el(1,2);
-	const double t83 = M.el(0,1)*M.el(1,3);
-	const double t85 = M.el(0,2)*M.el(1,1);
-	const double t87 = M.el(0,3)*M.el(1,1);
-	const double t101 = M.el(1,0)*M.el(2,2);
-	const double t103 = M.el(1,0)*M.el(2,3);
-	const double t105 = M.el(2,0)*M.el(1,2);
-	const double t107 = M.el(2,0)*M.el(1,3);
-	const double t109 = M.el(3,0)*M.el(1,2);
-	const double t111 = M.el(3,0)*M.el(1,3);
-	const double t115 = M.el(0,0)*M.el(2,2);
-	const double t117 = M.el(0,0)*M.el(2,3);
-	const double t119 = M.el(2,0)*M.el(0,2);
-	const double t121 = M.el(2,0)*M.el(0,3);
-	const double t123 = M.el(3,0)*M.el(0,2);
-	const double t125 = M.el(3,0)*M.el(0,3);
-	const double t129 = M.el(0,0)*M.el(1,2);
-	const double t131 = M.el(0,0)*M.el(1,3);
-	const double t133 = M.el(1,0)*M.el(0,2);
-	const double t135 = M.el(1,0)*M.el(0,3);
+	const number t65 = 1/(t42+t63);
+	const number t71 = M.el(0,2)*M.el(2,1);
+	const number t73 = M.el(0,3)*M.el(2,1);
+	const number t75 = M.el(0,2)*M.el(3,1);
+	const number t77 = M.el(0,3)*M.el(3,1);
+	const number t81 = M.el(0,1)*M.el(1,2);
+	const number t83 = M.el(0,1)*M.el(1,3);
+	const number t85 = M.el(0,2)*M.el(1,1);
+	const number t87 = M.el(0,3)*M.el(1,1);
+	const number t101 = M.el(1,0)*M.el(2,2);
+	const number t103 = M.el(1,0)*M.el(2,3);
+	const number t105 = M.el(2,0)*M.el(1,2);
+	const number t107 = M.el(2,0)*M.el(1,3);
+	const number t109 = M.el(3,0)*M.el(1,2);
+	const number t111 = M.el(3,0)*M.el(1,3);
+	const number t115 = M.el(0,0)*M.el(2,2);
+	const number t117 = M.el(0,0)*M.el(2,3);
+	const number t119 = M.el(2,0)*M.el(0,2);
+	const number t121 = M.el(2,0)*M.el(0,3);
+	const number t123 = M.el(3,0)*M.el(0,2);
+	const number t125 = M.el(3,0)*M.el(0,3);
+	const number t129 = M.el(0,0)*M.el(1,2);
+	const number t131 = M.el(0,0)*M.el(1,3);
+	const number t133 = M.el(1,0)*M.el(0,2);
+	const number t135 = M.el(1,0)*M.el(0,3);
 	el(0,0) = (M.el(1,1)*M.el(2,2)*M.el(3,3)-M.el(1,1)*M.el(2,3)*M.el(3,2)-
 		   M.el(2,1)*M.el(1,2)*M.el(3,3)+M.el(2,1)*M.el(1,3)*M.el(3,2)+
 		   M.el(3,1)*M.el(1,2)*M.el(2,3)-M.el(3,1)*M.el(1,3)*M.el(2,2))*t65;
@@ -1396,7 +1396,7 @@ FullMatrix<number>::gauss_jordan()
   iVector p(n());
 
   unsigned int i,j,k,r;
-  double max, hr;
+  number max, hr;
 
   for (i=0; i<n(); ++i) p(i) = i;
 
@@ -1465,27 +1465,27 @@ FullMatrix<number>::householder(Vector<number2>& src)
 
   for (unsigned int j=0 ; j<n() ; ++j)
   {
-    double sigma = 0;
+    number2 sigma = 0;
     unsigned int i;
     for (i=j ; i<m() ; ++i) sigma += el(i,j)*el(i,j);
     if (fabs(sigma) < 1.e-15) return;
-    double s = el(j,j);
+    number2 s = el(j,j);
     s = (s<0) ? sqrt(sigma) : -sqrt(sigma);
-    double dj = s;
+    number2 dj = s;
 
-    double beta = 1./(s*el(j,j)-sigma);
+    number2 beta = 1./(s*el(j,j)-sigma);
     el(j,j) -= s;
 
     for (unsigned int k=j+1 ; k<n() ; ++k)
     {
-      double sum = 0.;
+      number2 sum = 0.;
       for (i=j ; i<m() ; ++i) sum += el(i,j)*el(i,k);
       sum *= beta;
 
       for (i=j ; i<m() ; ++i) el(i,k) += sum*el(i,j);
     }
 
-    double sum = 0.;
+    number2 sum = 0.;
     for (i=j ; i<m() ; ++i) sum += el(i,j)*src(i);
     sum *= beta;
 
@@ -1506,7 +1506,7 @@ FullMatrix<number>::least_squares(Vector<number2>& dst, Vector<number2>& src)
   householder(src);
   backward(dst, src);
 
-  double sum = 0.;
+  number2 sum = 0.;
   for (unsigned int i=n() ; i<m() ; ++i) sum += src(i) * src(i);
   return sqrt(sum);
 }

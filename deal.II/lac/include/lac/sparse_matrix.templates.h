@@ -190,7 +190,7 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
   somenumber   *dst_ptr = &dst(0);
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      double s = 0.;
+      somenumber s = 0.;
       const number *const val_end_of_row = &val[cols->rowstart[row+1]];
       while (val_ptr != val_end_of_row)
 	s += *val_ptr++ * src(*colnum_ptr++);
@@ -233,13 +233,13 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
   Assert(m() == v.size(), ExcDimensionsDontMatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionsDontMatch(n(),v.size()));
 
-  double sum = 0.;
+  somenumber sum = 0.;
   const unsigned int n_rows = m();
   const number *val_ptr = &val[cols->rowstart[0]];
   const int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      double s = 0.;
+      somenumber s = 0.;
       const number *val_end_of_row = &val[cols->rowstart[row+1]];
       while (val_ptr != val_end_of_row)
 	s += *val_ptr++ * v(*colnum_ptr++);
@@ -303,7 +303,7 @@ SparseMatrix<number>::residual (Vector<somenumber>& dst,
   Assert(m() == b.size(), ExcDimensionsDontMatch(m(),b.size()));
   Assert(n() == u.size(), ExcDimensionsDontMatch(n(),u.size()));
 
-  double s,norm=0.;   
+  somenumber s,norm=0.;   
   
   for (unsigned int i=0;i<m();i++)
     {
@@ -461,7 +461,7 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
   int p;
   const unsigned int  n = dst.size();
   unsigned int  j;
-  double s;
+  somenumber s;
   
   for (unsigned int i=0; i<n; i++)
     {

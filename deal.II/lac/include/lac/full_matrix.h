@@ -36,6 +36,9 @@ class iVector;
  * data types, the implementation of non-inline functions is in
  * "fullmatrix.templates.h". Driver files are in the source tree.
  *
+ * Internal calculations are usually done with the accuracy of the vector argument to
+ * functions. If there is no argument with a number type, the matrix number type is used.
+ *
  * <TABLE BORDER=1>
  * <TR><TH ALIGN=CENTER><B>this</B><TH ALIGN=CENTER><B>other
  * matrix</B><TH ALIGN=CENTER><B>vector</B><TH ALIGN=CENTER><B>rhs in
