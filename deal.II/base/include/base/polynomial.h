@@ -58,7 +58,12 @@ namespace Polynomials
                                         * minus one.
                                         */
       Polynomial (const std::vector<number> &coefficients);
-    
+
+				       /**
+					* Default constructor creating an illegal object.
+					*/
+      Polynomial ();
+      
                                        /**
                                         * Return the value of this
                                         * polynomial at the given point.
@@ -144,6 +149,27 @@ namespace Polynomials
       template <typename number2>
       void shift (const number2 offset);
 
+				       /**
+					* Compute the derivative of
+					* the polynomial.
+					*/
+      Polynomial<number> derivative () const;
+
+				       /**
+					* Multiply with a scalar.
+					*/
+      Polynomial<number>& operator *= (const double s);
+
+				       /**
+					* Add a second polynomial.
+					*/
+      Polynomial<number>& operator += (const Polynomial<number>& p);
+      
+				       /**
+					* Subtract a second polynomial.
+					*/
+      Polynomial<number>& operator -= (const Polynomial<number>& p);
+      
                                        /**
                                         * Print coefficients.
                                         */
@@ -198,6 +224,36 @@ namespace Polynomials
   };
 
 
+/**
+ * @brief Monomial of degree n.
+ *
+ * Class generates Polynomial objects representing a monomial of
+ * degree n, that is, the function $x^n$.
+ *
+ * @author Guido Kanschat, 2004
+ */
+  template <typename number>
+  class Monomial :
+       public Polynomial<number>
+  {
+    public:
+				       /**
+					* Constructor, taking the
+					* degree of the monomial and
+					* an optional coefficient as
+					* arguments.
+					*/
+      Monomial(const unsigned int n,
+	       const double coefficient = 1.);
+
+    private:
+				       /**
+					* Needed by constructor.
+					*/
+      static std::vector<number> make_vector(unsigned int n,
+					     const double coefficient);
+  };
+  
 
 /**
  * Lagrange polynomials with equidistant interpolation points in
@@ -441,6 +497,11 @@ namespace Polynomials
 
 namespace Polynomials 
 {
+  template <typename number>
+  inline
+  Polynomial<number>::Polynomial () 
+  {}
+  
   template <typename number>
   inline
   unsigned int

@@ -157,6 +157,46 @@ namespace Polynomials
 
 
   template <typename number>
+  Polynomial<number>&
+  Polynomial<number>::operator *= (const double s)
+  {
+    for (typename std::vector<number>::iterator c = coefficients.begin();
+         c != coefficients.end(); ++c)
+      *c *= s;
+    return *this;
+  }
+
+  
+  template <typename number>
+  Polynomial<number>&
+  Polynomial<number>::operator += (const Polynomial<number>& p)
+  {
+//TODO:[GK] Is resize correct?    
+    if (p.degree() > degree())
+      coefficients.resize(p.coefficients.size());
+    typename std::vector<number>::const_iterator d = p.coefficients.begin();
+    for (typename std::vector<number>::iterator c = coefficients.begin();
+         c != coefficients.end(); ++c, ++d)
+      *c += *d;
+    return *this;
+  }
+
+  
+  template <typename number>
+  Polynomial<number>&
+  Polynomial<number>::operator -= (const Polynomial<number>& p)
+  {
+    if (p.degree() > degree())
+      coefficients.resize(p.coefficients.size());
+    typename std::vector<number>::const_iterator d = p.coefficients.begin();
+    for (typename std::vector<number>::iterator c = coefficients.begin();
+         c != coefficients.end(); ++c, ++d)
+      *c -= *d;
+    return *this;
+  }
+
+  
+  template <typename number>
   template <typename number2>
   void
   Polynomial<number>::shift(std::vector<number>& coefficients,
@@ -236,6 +276,22 @@ namespace Polynomials
   }
 
 
+  
+  template <typename number>
+  Polynomial<number>
+  Polynomial<number>::derivative () const
+  {
+    if (degree() == 0)
+      return Monomial<number>(0, 0.);
+
+    std::vector<number> newcoefficients (coefficients.size()-1);
+    for (unsigned int i=1 ; i<coefficients.size() ; ++i)
+      newcoefficients[i-1] = i * coefficients[i];
+
+    return Polynomial<number> (newcoefficients);
+  }
+  
+
   template <typename number>
   void
   Polynomial<number>::print (std::ostream& out) const
@@ -248,7 +304,26 @@ namespace Polynomials
   }
 
 
+// ------------------ class Monomial -------------------------- //
 
+  template <typename number>
+  std::vector<number>
+  Monomial<number>::make_vector(unsigned int n,
+				double coefficient)
+  {
+    std::vector<number> result(n+1, 0.);
+    result[n] = coefficient;
+    return result;
+  }
+  
+  
+  template <typename number>
+  Monomial<number>::Monomial (unsigned int n,
+			      double coefficient)
+		  : Polynomial<number>(make_vector(n, coefficient))
+  {}
+  
+  
 // ------------------ class LagrangeEquidistant --------------- //
 
   LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
@@ -871,4 +946,8 @@ namespace Polynomials
   template void Polynomial<long double>::shift(const long double offset);
   template void Polynomial<float>::shift(const long double offset);
   template void Polynomial<double>::shift(const long double offset);
+
+  template class Monomial<float>;
+  template class Monomial<double>;
+  template class Monomial<long double>;
 }
