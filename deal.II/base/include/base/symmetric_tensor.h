@@ -700,6 +700,12 @@ class SymmetricTensor
     typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim>::type
     operator * (const SymmetricTensor<2,dim> &s) const;
 
+				     /**
+				      * Contraction over two indices
+				      * of the present object with the
+				      * rank-4 symmetric tensor given
+				      * as argument.
+				      */
     typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim>::type
     operator * (const SymmetricTensor<4,dim> &s) const;
     
