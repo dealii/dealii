@@ -97,7 +97,7 @@ int main () {
   PoissonEquation<2> equation;
   QGauss4<2>         quadrature;
   
-  tria.create_unit_hypercube();
+  tria.create_hypercube();
   tria.refine_global (1);
   dof.distribute_dofs (fe);
   problem.assemble (equation, quadrature, fe);
