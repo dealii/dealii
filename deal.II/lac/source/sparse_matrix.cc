@@ -165,7 +165,7 @@ SparseMatrixStruct::~SparseMatrixStruct ()
 
 
 SparseMatrixStruct &
-SparseMatrixStruct::opertor = (const SparseMatrixStruct &s)
+SparseMatrixStruct::operator = (const SparseMatrixStruct &s)
 {
   Assert (s.rowstart == 0, ExcInvalidConstructorCall());
   Assert (s.colnums == 0, ExcInvalidConstructorCall());
