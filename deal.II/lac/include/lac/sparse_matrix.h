@@ -127,7 +127,7 @@ class SparseMatrix : public virtual Subscriptor
                                          /**
                                           * Postfix increment.
                                           */
-	const_iterator& operator++ (int);
+	const_iterator operator++ (int);
 
                                          /**
                                           * Dereferencing operator.
