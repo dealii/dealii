@@ -16,7 +16,10 @@
 
 #include <base/config.h>
 #include <dofs/dof_constraints.h>
-
+#include <lac/sparsity_pattern.h>
+#include <lac/sparse_matrix.h>
+#include <lac/block_sparsity_pattern.h>
+#include <lac/block_sparse_matrix.h>
 
 
 
