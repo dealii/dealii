@@ -177,14 +177,14 @@ MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
 
 
 
-//TODO: Replace FullMatrix by Table<2,bool>
+//TODO[GK]: Replace FullMatrix by Table<2,bool>
 template<int dim, class SparsityPattern>
 void
 MGTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
-					SparsityPattern       &sparsity,
-					const unsigned int level,
-					const FullMatrix<double>& int_mask,
-					const FullMatrix<double>& flux_mask)
+                                     SparsityPattern       &sparsity,
+                                     const unsigned int level,
+                                     const FullMatrix<double>& int_mask,
+                                     const FullMatrix<double>& flux_mask)
 {
   const unsigned int n_dofs = dof.n_dofs(level);
   const unsigned int n_comp = dof.get_fe().n_components();

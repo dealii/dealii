@@ -23,7 +23,7 @@
 #include <numerics/solution_transfer.h>
 
 
-//TODO: the storage of data in the indices_on_cell array is rather inefficient, both in terms of memory as well as in terms of computing time, since we allocate a large array of small vectors. It would be more efficient to use a Table<2> for that, but since we let user pointers point into this data, this is not exactly a 5-minuter to change. should be done, however, sometimes.
+//TODO[?]: the storage of data in the indices_on_cell array is rather inefficient, both in terms of memory as well as in terms of computing time, since we allocate a large array of small vectors. It would be more efficient to use a Table<2> for that, but since we let user pointers point into this data, this is not exactly a 5-minuter to change. should be done, however, sometimes.
 
 
 
