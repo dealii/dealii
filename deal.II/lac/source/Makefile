@@ -1,13 +1,6 @@
 # $Id$
 
-CXX       = c++
-INCLUDE   = -I../include -I../../base/include
-CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual \
-            $(INCLUDE)
-CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
-           -felide-constructors -fnonnull-objects \
-           $(INCLUDE)
+D=../..
 
 cc-files = $(wildcard *.cc)
 o-files  = $(cc-files:.cc=.o)
@@ -16,7 +9,7 @@ h-files  = $(wildcard ../include/*/*.h)
 
 forward-declarations = $D/lac/include/lac/forward-declarations.h
 
-D=../..
+include $D/deal.II/Make.global_options
 
 
 %.go : %.cc Makefile
