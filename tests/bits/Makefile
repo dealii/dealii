@@ -61,6 +61,9 @@ tests_x = anna_? \
 	  cylinder_shell_* \
 	  grid_in_*
 
+# tests for the hp branch:
+#	  fe_collection_*
+
 ifeq ($(USE_CONTRIB_PETSC),yes)
   tests_x += petsc_*
 endif
