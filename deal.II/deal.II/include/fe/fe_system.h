@@ -410,7 +410,6 @@ class FESystem //<dim>
 				      * the result allows access to
 				      * shape functions of the base
 				      * element.
-				      *
 				      */
     vector<unsigned> component_to_base_table;
     
@@ -423,7 +422,8 @@ class FESystem //<dim>
 				      * multiplied by #n#. Don't touch the
 				      * number of functions for the
 				      * transformation from unit to real
-				      * cell.  */
+				      * cell.
+				      */
     static FiniteElementData<dim>
     multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
 			  const unsigned int            N);
