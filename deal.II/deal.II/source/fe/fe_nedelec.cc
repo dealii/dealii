@@ -357,7 +357,7 @@ FE_Nedelec<3>::shape_value_component (const unsigned int i,
 					 // note that the degrees of
 					 // freedom on opposite faces
 					 // have a common vector
-					 // direction, so simply that
+					 // direction, so simplify that
 					 // a little. these directions
 					 // are:
 					 //
@@ -461,7 +461,7 @@ FE_Nedelec<2>::shape_grad_component (const unsigned int i,
 					 // index=shape function
 					 // number; second
 					 // index=vector component,
-					 // thrid index=component
+					 // third index=component
 					 // within gradient
 	static const double unit_gradients[4][2][2]
 	  = { { {0.,-1.}, {0.,0.} },
@@ -517,7 +517,7 @@ FE_Nedelec<3>::shape_grad_component (const unsigned int i,
 					 // index=shape function
 					 // number; second
 					 // index=vector component,
-					 // thrid index=component
+					 // third index=component
 					 // within gradient
 	const double x = p(0),
 		     y = p(1),
