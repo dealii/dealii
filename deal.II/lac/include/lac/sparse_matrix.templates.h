@@ -195,7 +195,9 @@ SparseMatrix<number>::symmetrize ()
   for (unsigned int row=0; row<n_rows; ++row)
     {
 				       // first skip diagonal entry
-      number             *val_ptr = &val[cols->rowstart[row]+1];
+      number             *val_ptr = &val[cols->rowstart[row]];
+      if (cols->optimize_diagonal())
+	  ++val_ptr;
       const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[row]+1];      
       const number       *const val_end_of_row = &val[cols->rowstart[row+1]];
 
