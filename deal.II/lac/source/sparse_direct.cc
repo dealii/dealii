@@ -20,7 +20,7 @@
 // if we know that at least one of the HSL functions are there,
 // include the respective include file. Otherwise save some CPU cycles
 // in the compiler
-#if HAVE_HSL_MA27 || HAVE_HSL_MA47
+#if defined(HAVE_HSL_MA27) || defined(HAVE_HSL_MA47)
 #  include <hsl/hsl.h>
 #endif
 
