@@ -483,7 +483,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 			 solution,
 			 estimated_error_per_cell,
 			 ((prm.get("Test case")=="Kink") ?
-			  kink_coefficient : 0 ));
+			  &kink_coefficient : 0 ));
       cout << estimated_error_per_cell.l2_norm() << endl;
       estimated_error.push_back (estimated_error_per_cell.l2_norm());
 
