@@ -48,9 +48,11 @@ AC_ARG_ENABLE(shared,
     enableshared=yes)
 
 dnl On AIX and alpha, shared libs don't work for us at present, so 
-dnl disable them (we should probably use libtool there)
+dnl disable them (we should probably use libtool there). Likewise on
+dnl CygWin Windows systems, where we don't know how to create shared
+dnl libs at all (at least at present)
 case "$target" in
-   *-aix* | alpha*-linux* ) 
+   *-aix* | alpha*-linux* | *cygwin )
 	   AC_MSG_WARN(Shared libraries not supported on $target. Using static libs instead)
 	   enableshared=no 
 	   ;;

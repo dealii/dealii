@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.30 
+# From configure.in Revision: 1.31 
 
 
 
@@ -694,7 +694,7 @@ fi
 
 
 case "$target" in
-   *-aix* | alpha*-linux* ) 
+   *-aix* | alpha*-linux* | *cygwin )
 	   echo "configure: warning: Shared libraries not supported on $target. Using static libs instead" 1>&2
 	   enableshared=no 
 	   ;;
@@ -1730,7 +1730,7 @@ EOF
 if { (eval echo configure:1731: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
-		deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
+	  					deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
 		break;
 	    
 else
@@ -1738,7 +1738,7 @@ else
   cat conftest.$ac_ext >&5
   rm -rf conftest*
   
-	
+                	    
 fi
 rm -f conftest*
 	done
@@ -1802,7 +1802,7 @@ EOF
 if { (eval echo configure:1803: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
-		deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
+	  					deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
 		break;
 	    
 else
@@ -1810,7 +1810,7 @@ else
   cat conftest.$ac_ext >&5
   rm -rf conftest*
   
-	
+                	    
 fi
 rm -f conftest*
 	done
