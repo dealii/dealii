@@ -85,7 +85,23 @@ class BlockMatrixArray : public Subscriptor
 		      const unsigned int n_block_cols);
 
 				     /**
-				      * Add a block matrix entry.
+				      * Add a block matrix entry. The
+				      * <tt>matrix</tt> is entered
+				      * into a list of blocks for
+				      * multiplication, together with
+				      * its coordinates <tt>row</tt>
+				      * and <tt>col</tt> as well as
+				      * optional multiplication factor
+				      * <tt>prefix</tt> and transpose
+				      * flag <tt>transpose</tt>.
+				      *
+				      * @note No check for consistency
+				      * of block sizes is
+				      * made. Therefore, entering a
+				      * block of wrong dimension here
+				      * will only lead to a
+				      * ExcDimensionMismatch in one of
+				      * the multiplication functions.
 				      */
     void enter (const MATRIX      &matrix,
 		const unsigned int row,
@@ -168,7 +184,7 @@ class BlockMatrixArray : public Subscriptor
 				      * Internal data structure.
 				      *
 				      * For each entry of a
-				      * @p BlockMatrixArray, its
+				      * BlockMatrixArray, its
 				      * position, matrix, prefix and
 				      * optional transposition must be
 				      * stored. This structure
@@ -250,18 +266,19 @@ class BlockMatrixArray : public Subscriptor
  * matrix. Then, forward or backward insertion is performed
  * block-wise. The diagonal blocks are NOT inverted for this purpose!
  *
- * While block indices may be duplicated (see BlockMatrixArray)
- * to add blocks, this is not allowed on the diagonal. A short
- * computation reveals why.
- *
  * Like for all preconditioners, the preconditioning operation is
- * performed by the @p vmult member function.
+ * performed by the vmult() member function.
+ *
+ * @note While block indices may be duplicated (see BlockMatrixArray)
+ * to add blocks, this is not allowed for diagonal blocks, since
+ * summing up the inverse of two blocks does not yield the inverse of
+ * the sum.
  *
  * The implementation may be a little clumsy, but it should be
  * sufficient as long as the block sizes are much larger than the
  * number of blocks.
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001, 2005
  */
 template <class MATRIX>
 class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
@@ -286,7 +303,7 @@ class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
   
 				     /**
 				      * Preconditioning
-				      * adding to @p dst.
+				      * adding to <tt>dst</tt>.
 				      */
     template <class number>
     void vmult_add (BlockVector<number>& dst,
@@ -301,7 +318,7 @@ class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
   
 				     /**
 				      * Transposed preconditioning
-				      * adding to @p dst.
+				      * adding to <tt>dst</tt>.
 				      */
     template <class number>
     void Tvmult_add (BlockVector<number>& dst,
