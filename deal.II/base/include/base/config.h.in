@@ -5,7 +5,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,6 +35,12 @@
    an explicit mapping variable, but rather use a default Q1 mapping instead
    */
 #undef DEAL_II_COMPAT_MAPPING
+
+/* Define if we have to work around another bug in Intel's icc compiler in
+   which the compiler refuses to store the const attribute at a member
+   function pointer with a constant class. See the aclocal.m4 file in the
+   top-level directory for a description of this bug. */
+#undef DEAL_II_CONST_MEM_FUN_PTR_BUG
 
 /* Flag indicating whether the library shall be compiled to use the Tecplot
    interface */
@@ -93,6 +99,12 @@
    class template parameter. For the exact failure mode, look at aclocal.m4 in
    the top-level directory. */
 #undef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
+
+/* Define if we have to work around a bug in Intel's icc compiler in which the
+   compiler refuses to consider a template when given a pointer to a constant
+   member function. See the aclocal.m4 file in the top-level directory for a
+   description of this bug. */
+#undef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
 
 /* Define if we have to work around a bug with some compilers that will not
    allow us to specify a fully specialized class of a template as a friend.

@@ -1909,6 +1909,124 @@ template class X<1,int>;
 
 
 dnl -------------------------------------------------------------
+dnl Intel's ICC 5.0.1 compiler has the following problem: it won't
+dnl compile this code:
+dnl ---------------------------------
+dnl template <class Class> void encapsulate (void (Class::*fun_ptr)());
+dnl struct X {
+dnl  void bar () const;
+dnl };
+dnl void foo () {
+dnl   encapsulate(&X::bar);
+dnl };
+dnl ---------------------------------
+dnl It complains about not finding an instance for the encapsulate function.
+dnl The problem is due to the fact that the function we take the address of
+dnl is constant, i.e. it should match the template with Class="const X",
+dnl but apparently doesn't. Unfortunately, we rely on such code in the
+dnl Threads mechanisms. So detect this bug and if present work around it
+dnl by providing a second set of encapsulate functions for constant 
+dnl functions.
+dnl
+dnl Usage: DEAL_II_CHECK_TEMPL_CONST_MEM_PTR_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TEMPL_CONST_MEM_PTR_BUG, dnl
+[
+  AC_MSG_CHECKING(for templates and pointers to const member functions bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	template <class Class> void encapsulate (void (Class::*fun_ptr)());
+
+	struct X {
+	  void bar () const;
+	};
+
+	void foo () {
+	  encapsulate(&X::bar);
+	};
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_TEMPL_CONST_MEM_PTR_BUG, 1, 
+                     [Define if we have to work around a bug in Intel's icc
+                      compiler in which the compiler refuses to consider a
+                      template when given a pointer to a constant member function.
+                      See the aclocal.m4 file in the top-level directory
+                      for a description of this bug.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl More Intel ICC 5.0.1 compiler lossage with pointers to constant
+dnl member functions
+dnl ---------------------------------
+dnl template <class Class> struct Y {
+dnl   typedef void (Class::*FunPtr) ();
+dnl   FunPtr fun_ptr;
+dnl   Class *object;
+dnl   void foo () {
+dnl     (object->*fun_ptr)();
+dnl   };
+dnl };
+dnl
+dnl struct X {};
+dnl
+dnl template class Y<const X>;
+dnl ---------------------------------
+dnl Again, it does not store the information that the member function pointer
+dnl refers to a constant object, so complains that the object is constant,
+dnl but the member function is not.
+dnl
+dnl Usage: DEAL_II_CHECK_CONST_MEM_FUN_PTR_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_CONST_MEM_FUN_PTR_BUG, dnl
+[
+  AC_MSG_CHECKING(for const member function pointers bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	template <class Class> struct Y {
+	  typedef void (Class::*FunPtr) ();
+	  FunPtr fun_ptr;
+	  Class *object;
+	  void foo () {
+	    (object->*fun_ptr)();
+	  };
+	};
+
+	struct X {};
+
+	template class Y<const X>;
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_CONST_MEM_FUN_PTR_BUG, 1, 
+                     [Define if we have to work around another bug in Intel's icc
+                      compiler in which the compiler refuses to store the const
+                      attribute at a member function pointer with a constant class.
+                      See the aclocal.m4 file in the top-level directory
+                      for a description of this bug.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl DEC/Compaq's cxx compiler does not want us to implement
 dnl virtual functions that were declared abstract before. We do
 dnl this with the destructor of the Function class, since we want
