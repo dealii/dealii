@@ -1302,8 +1302,10 @@ namespace internal
 		  const unsigned int initv1)
 		    :
 		    v0(initv0), v1(initv1),
-		    Q0(static_cast<unsigned int>(-1)),Q1(static_cast<unsigned int>(-1)),
-		    lsn0(static_cast<unsigned int>(-1)),lsn1(static_cast<unsigned int>(-1)),
+		    Q0(static_cast<unsigned int>(-1)),
+                    Q1(static_cast<unsigned int>(-1)),
+		    lsn0(static_cast<unsigned int>(-1)),
+                    lsn1(static_cast<unsigned int>(-1)),
 		    Oriented(false)
     {};
 
