@@ -743,3 +743,16 @@ approximate_second_derivative<deal_II_dimension>
  const Vector<double>  &solution,
  Vector<float>         &derivative_norm,
  const unsigned int     component);
+
+// static variables
+// 
+// on AIX, the linker is unhappy about some missing symbols. they
+// should really be there, but explicitly instantiation them will also
+// not hurt
+template
+const UpdateFlags
+DerivativeApproximation::Gradient<deal_II_dimension>::update_flags;
+
+template
+const UpdateFlags
+DerivativeApproximation::SecondDerivative<deal_II_dimension>::update_flags;
