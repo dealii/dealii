@@ -16,6 +16,7 @@
 #include <base/parameter_handler.h>
 #include <lac/solver_control.h>
 
+#include <cmath>
 
 /*----------------------- SolverControl ---------------------------------*/
 
@@ -29,6 +30,9 @@ SolverControl::SolverControl (const unsigned int maxiter,
 		tol(tolerance),
 		lvalue(1.e300),
 		lstep(0),
+		check_failure(false),
+		relative_failure_residual(0),
+		failure_residual(0),
 		_log_history(_log_history),
 		_log_frequency(1),
 		_log_result(_log_result)
@@ -51,10 +55,19 @@ SolverControl::check (const unsigned int step,
   lstep  = step;
   lvalue = check_value;
 
-  if ((step==0) && _log_result)
-    deallog << "Starting value " << check_value << endl;
+  if (step==0)
+    {
+      if (check_failure)
+	failure_residual=relative_failure_residual*check_value;
+      
+      if (_log_result)
+	deallog << "Starting value " << check_value << endl;
+    }
 
-  if (step >= maxsteps)
+  
+  if ((step >= maxsteps) ||
+      (check_failure && ((check_value > failure_residual) ||
+			 isnan(check_value))))
     {
       if (_log_result)
 	deallog << "Failure step " << step
@@ -69,6 +82,7 @@ SolverControl::check (const unsigned int step,
 		<< " value " << check_value << endl;      
       return success;
     }
+  
   return iterate;
 }
 

@@ -156,6 +156,24 @@ class SolverControl : public Subscriptor
 				      * Change maximum number of steps.
 				      */
     unsigned int set_max_steps (const unsigned int);
+
+				     /**
+				      * Enables the failure
+				      * check. Solving is stopped with
+				      * @p{ReturnState} @p{failure} if
+				      * @p{residual>failure_residual} with
+				      * @p{failure_residual:=rel_failure_residual*first_residual}.
+				      */
+    void set_failure_criterion (const double rel_failure_residual);
+
+				     /**
+				      * Disables failure check and
+				      * resets
+				      * @p{relative_failure_residual}
+				      * and @p{failure_residual} to
+				      * zero.
+				      */
+    void clear_failure_criterion ();
     
 				     /**
 				      * Tolerance.
@@ -194,7 +212,7 @@ class SolverControl : public Subscriptor
 				      * Prescribed tolerance to be achieved.
 				      */
     double       tol;
-    
+
 				     /**
 				      * Last value of the convergence criterion.
 				      */
@@ -205,6 +223,33 @@ class SolverControl : public Subscriptor
 				      */
     unsigned int       lstep;
 
+				     /**
+				      * Is set to @p{true} by
+				      * @p{set_failure_criterion} and
+				      * enables failure checking.
+				      */
+    bool check_failure;
+
+				     /*
+				      * Stores the
+				      * @p{rel_failure_residual} set by
+				      * @p{set_failure_criterion}
+				      */
+    double       relative_failure_residual;
+
+    
+				     /**
+				      * @p{failure_residual} equals the
+				      * first residual multiplied by
+				      * @p{relative_crit} set by
+				      * @p{set_failure_criterion} (see there).
+				      *
+				      * Until the first residual is
+				      * known it is 0.
+				      */
+    double       failure_residual;
+
+    
 				     /**
 				      * Log convergence history to @p{deallog}.
 				      */
@@ -333,6 +378,23 @@ SolverControl::set_max_steps (unsigned int newval)
   unsigned int old = maxsteps;
   maxsteps = newval;
   return old;
+}
+
+
+inline void
+SolverControl::set_failure_criterion (const double rel_failure_residual)
+{
+  relative_failure_residual=rel_failure_residual;
+  check_failure=true;
+}
+
+
+inline void
+SolverControl::clear_failure_criterion ()
+{
+  relative_failure_residual=0;
+  failure_residual=0;
+  check_failure=false;
 }
 
 
