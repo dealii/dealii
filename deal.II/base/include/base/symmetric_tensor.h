@@ -695,7 +695,8 @@ class SymmetricTensor
 				      * of rank 2. For example, if the
 				      * present object is also a
 				      * rank-2 tensor, then this is
-				      * the scalar-product contraction
+				      * the scalar-product double
+				      * contraction
 				      * <tt>a<sub>ij</sub>b<sub>ij</sub></tt>
 				      * over all indices
 				      * <tt>i,j</tt>. In this case,
@@ -715,6 +716,20 @@ class SymmetricTensor
 				      * present object and the indices
 				      * of the argument, and the
 				      * result is a tensor of rank 2.
+				      *
+				      * Note that the multiplication
+				      * operator for symmetrict
+				      * tensors is defined to be a
+				      * double contraction over two
+				      * indices, while it is defined
+				      * as a single contraction over
+				      * only one index for regular
+				      * <tt>Tensor</tt> objects. For
+				      * symmetric tensors it therefore
+				      * acts in a way that is commonly
+				      * denoted by a "colon
+				      * multiplication" in the
+				      * mathematica literature.
                                       */
     typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim>::type
     operator * (const SymmetricTensor<2,dim> &s) const;
