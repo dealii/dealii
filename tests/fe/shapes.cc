@@ -234,6 +234,96 @@ void plot_face_shape_functions (Mapping<1>&,
 {}
 
 
+
+// given an FEValues object for a cell that is equal to the unit cell,
+// check that the values and gradients that the FEValues object
+// generated are equivalent to the values the finite element returns
+// for the unit cell
+template <int dim>
+void
+check_values_and_derivatives (const FiniteElement<dim> &fe,
+                              const FEValuesBase<dim>  &fe_values,
+                              const Quadrature<dim>    &q)
+{
+                                   // check values
+  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      {
+        for (unsigned int c=0; c<fe.n_components(); ++c)
+          {
+            const double val1 = fe_values.shape_value_component(i,x,c),
+                         val2 = fe.shape_value_component(i,q.point(x),c);
+            Assert (fabs(val1-val2) < 1e-13, ExcInternalError());
+          };
+
+                                         // test something about the
+                                         // correctness of indices
+                                         // etc, except for the more
+                                         // complicated case of
+                                         // non-primitive elements
+        if (fe.is_primitive(i))
+          for (unsigned int c=0; c<fe.n_components(); ++c)
+            Assert (((c == fe.system_to_component_index(i).first) &&
+                     (fe_values.shape_value(i,x) == fe_values.shape_value_component(i,x,c)))
+                    ||
+                    ((c != fe.system_to_component_index(i).first) &&
+                     (fe_values.shape_value_component(i,x,c) == 0)),
+                    ExcInternalError());
+      };
+        
+                                   // check gradients
+  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      {
+        for (unsigned int c=0; c<fe.n_components(); ++c)
+          {
+            Tensor<1,dim> tmp=fe_values.shape_grad_component(i,x,c);
+            tmp -= fe.shape_grad_component (i,q.point(x), c);
+            Assert (sqrt(tmp*tmp)<1e-14, ExcInternalError());
+          };
+
+        if (fe.is_primitive(i))
+          for (unsigned int c=0; c<fe.n_components(); ++c)
+            Assert (((c == fe.system_to_component_index(i).first) &&
+                     (fe_values.shape_grad(i,x) == fe_values.shape_grad_component(i,x,c)))
+                    ||
+                    ((c != fe.system_to_component_index(i).first) &&
+                     (fe_values.shape_grad_component(i,x,c) == Tensor<1,dim>())),
+                    ExcInternalError());
+      }
+
+                                   // check second derivatives
+  double max_diff=0.;
+  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      {
+        for (unsigned int c=0; c<fe.n_components(); ++c)
+          {
+            Tensor<2,dim> tmp=fe_values.shape_2nd_derivative_component(i,x,c);
+            tmp -= fe.shape_grad_grad_component(i,q.point(x),c);
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                {
+                  const double diff=fabs(tmp[j][k]);
+                  if (diff>max_diff) max_diff=diff;
+                  Assert (fabs(tmp[j][k]) < 1e-6, ExcInternalError());
+                }
+          };
+
+        if (fe.is_primitive(i))
+          for (unsigned int c=0; c<fe.n_components(); ++c)
+            Assert (((c == fe.system_to_component_index(i).first) &&
+                     (fe_values.shape_2nd_derivative(i,x) ==
+                      fe_values.shape_2nd_derivative_component(i,x,c)))
+                    ||
+                    ((c != fe.system_to_component_index(i).first) &&
+                     (fe_values.shape_2nd_derivative_component(i,x,c) == Tensor<2,dim>())),
+                    ExcInternalError());
+      }
+}
+
+
+
 template<int dim>
 void test_compute_functions (const Mapping<dim> &mapping,
 			     const FiniteElement<dim> &fe,
@@ -251,75 +341,22 @@ void test_compute_functions (const Mapping<dim> &mapping,
   DoFHandler<dim> dof(tr);
   GridGenerator::hyper_cube(tr, 0., 1.);
   dof.distribute_dofs(fe);
-  const QGauss6<dim> q;
-  FEValues<dim> fe_values(mapping, fe, q, UpdateFlags(update_values|
-						      update_gradients|
-						      update_second_derivatives));
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  fe_values.reinit(cell);
 
-                                   // check values
-  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
-    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-      {
-        if (true)
-          {
-            const double val1 = fe_values.shape_value(i,x),
-                         val2 = fe.shape_value(i,q.point(x));
-            Assert (fabs(val1-val2) < 1e-13, ExcInternalError());
-          };
+  const UpdateFlags update_all = (update_values | update_gradients |
+                                  update_second_derivatives);
+  
+                                   // first check this for FEValues
+                                   // objects
+  if (true)
+    {
+      const QGauss6<dim> q;
+      FEValues<dim> fe_values(mapping, fe, q, update_all);
+      fe_values.reinit(dof.begin_active());
+      check_values_and_derivatives (fe, fe_values, q);
+    };
+};
 
-	for (unsigned int c=0; c<fe.n_components(); ++c)
-	  Assert (((c == fe.system_to_component_index(i).first) &&
-		   (fe_values.shape_value(i,x) == fe_values.shape_value_component(i,x,c)))
-		  ||
-		  ((c != fe.system_to_component_index(i).first) &&
-		   (fe_values.shape_value_component(i,x,c) == 0)),
-		  ExcInternalError());
-      };
 
-                                   // check gradients
-  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
-    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-      {
-	Tensor<1,dim> tmp=fe_values.shape_grad(i,x);
-	tmp-=fe.shape_grad(i,q.point(x));
-	Assert (sqrt(tmp*tmp)<1e-14, ExcInternalError());
-
-	for (unsigned int c=0; c<fe.n_components(); ++c)
-	  Assert (((c == fe.system_to_component_index(i).first) &&
-		   (fe_values.shape_grad(i,x) == fe_values.shape_grad_component(i,x,c)))
-		  ||
-		  ((c != fe.system_to_component_index(i).first) &&
-		   (fe_values.shape_grad_component(i,x,c) == Tensor<1,dim>())),
-		  ExcInternalError());
-      }
-
-                                   // check second derivatives
-  double max_diff=0.;
-  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
-    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-      {
-	Tensor<2,dim> tmp=fe_values.shape_2nd_derivative(i,x);
-	tmp-=fe.shape_grad_grad(i,q.point(x));
-	for (unsigned int j=0; j<dim; ++j)
-	  for (unsigned int k=0; k<dim; ++k)
-	    {
-	      const double diff=fabs(tmp[j][k]);
-	      if (diff>max_diff) max_diff=diff;
-	      Assert (fabs(tmp[j][k]) < 1e-6, ExcInternalError());
-	    }	
-
-	for (unsigned int c=0; c<fe.n_components(); ++c)
-	  Assert (((c == fe.system_to_component_index(i).first) &&
-		   (fe_values.shape_2nd_derivative(i,x) ==
-		    fe_values.shape_2nd_derivative_component(i,x,c)))
-		  ||
-		  ((c != fe.system_to_component_index(i).first) &&
-		   (fe_values.shape_2nd_derivative_component(i,x,c) == Tensor<2,dim>())),
-		  ExcInternalError());
-      }
-}
 
 
 
@@ -453,9 +490,63 @@ void plot_FE_Nedelec_shape_functions()
 {
   MappingQ1<dim> m;
   FE_Nedelec<dim> p1(1);
-  plot_shape_functions(m, p1, "Nedelec1");
-  plot_face_shape_functions(m, p1, "Nedelec1");
+//   plot_shape_functions(m, p1, "Nedelec1");
+//   plot_face_shape_functions(m, p1, "Nedelec1");
   test_compute_functions(m, p1, "Nedelec1");
+};
+
+
+
+template<int dim>
+void plot_FE_System_shape_functions()
+{
+  MappingQ1<dim> m;
+
+//   FESystem<dim> p1(FE_Q<dim>(2), 1,
+//                    FE_Q<dim>(dim<3 ? 3 : 2), 2);
+//   plot_shape_functions(m, p1, "System1");
+//   plot_face_shape_functions(m, p1, "System1");
+//   test_compute_functions(m, p1, "System1");
+
+//   FESystem<dim> p2(FE_Q<dim>(2), 1,
+//                    FESystem<dim> (FE_Q<dim>(1),1,
+//                                   FE_DGP<dim>(3),3,
+//                                   FE_DGQ<dim>(0),2), 2,
+//                    FE_DGQ<dim>(0), 2);
+//   plot_shape_functions(m, p2, "System2");
+//   plot_face_shape_functions(m, p2, "System2");
+//   test_compute_functions(m, p2, "System2");
+
+                                   // some tests with the Nedelec
+                                   // element. don't try to make sense
+                                   // out of the composed elements,
+                                   // they are simply constructed as
+                                   // complicated as possible to
+                                   // trigger as many assertions as
+                                   // possible (and they _have_, in
+                                   // the past, literally dozens of
+                                   // assertions)
+  if (dim != 1) 
+    {
+      FESystem<dim> p3(FE_Nedelec<dim>(1), 1,
+                       FESystem<dim> (FE_Q<dim>(1),1,
+                                      FE_DGP<dim>(3),3,
+                                      FE_Nedelec<dim>(1),2), 2,
+                       FE_DGQ<dim>(0), 2);
+      test_compute_functions(m, p3, "System_Nedelec_1");
+
+                                       // the following is simply too
+                                       // expensive in 3d...
+      if (dim != 3)
+        {
+          FESystem<dim> p4(p3, 1,
+                           FESystem<dim> (FE_Q<dim>(1),1,
+                                          p3,3,
+                                          FE_Nedelec<dim>(1),2), 1,
+                           p3, 1);
+          test_compute_functions(m, p4, "System_Nedelec_2");
+        };
+    };
 };
 
 
@@ -464,7 +555,7 @@ main()
 {
   std::ofstream logfile ("shapes.output");
   logfile.precision (PRECISION);
-  logfile.setf(std::ios::fixed);  
+  logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
   deallog.depth_console(0);
   
@@ -474,13 +565,14 @@ main()
 
   plot_FE_DGP_shape_functions<1>();
   plot_FE_DGP_shape_functions<2>();
+  plot_FE_DGP_shape_functions<3>();
 
-				   // FESystem test.
-  MappingQ1<2> m;
-  FESystem<2> q2_q3(FE_Q<2>(2), 1,
-		    FE_Q<2>(3), 1);
-  test_compute_functions(m, q2_q3, "Q2_Q3");
-//  plot_shape_functions(m, q2_q3, "Q2_Q3");
+  plot_FE_Nedelec_shape_functions<2>();
+  plot_FE_Nedelec_shape_functions<3>();
+
+  plot_FE_System_shape_functions<1>();
+  plot_FE_System_shape_functions<2>();
+  plot_FE_System_shape_functions<3>();
   
   return 0;
 }
