@@ -102,7 +102,7 @@
  *  which by macro expansion does the following:
  *  @begin{verbatim}
  *    #ifdef DEBUG
- *        if (!cond)
+ *        if (!(cond))
  *              issue error of class ExcDomain(n,dim)
  *    #else
  *        do nothing
@@ -202,7 +202,7 @@
  *  want to keep to this, but want to extend it a bit. In general, the
  *  structure is the same, i.e. you normally raise and exception by
  *  @begin{verbatim}
- *    if (!cond)
+ *    if (!(cond))
  *      throw ExcSomething();
  *  @end{verbatim}
  *  and catch it using the statement
@@ -231,7 +231,7 @@
  *  which is the same as explained above for the @p{Assert} expansion, requires
  *  some work if one would want to write it down each time:
  *  @begin{verbatim}
- *    if (!cond)
+ *    if (!(cond))
  *      {
  *        ExcSomething e(additional information);
  *        e.SetFields (__FILE__, __LINE__, __PRETTY_FUNCTION__,
@@ -602,7 +602,7 @@ namespace deal_II_exceptions
 #  else // HAVE_BUILTIN_EXPECT
 #    define AssertThrow(cond, exc)                                   \
       {                                                              \
-        if (__builtin_expect(!cond, false))                          \
+        if (__builtin_expect(!(cond), false))                        \
           deal_II_exceptions::internals::                            \
           issue_error_throw (__FILE__,                               \
 		  	     __LINE__,                               \
