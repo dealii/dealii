@@ -246,6 +246,9 @@ ReductionControl::check (const unsigned int step,
       if (m_log_result)
 	deallog << "Convergence step " << step
 		<< " value " << check_value << std::endl;
+      lstep  = step;
+      lvalue = check_value;
+      
       lcheck = success;
       return success;
     }
