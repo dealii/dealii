@@ -43,7 +43,8 @@ namespace BlockVectorIterators
 				    */
   template <typename number, bool constness>
   struct Types
-  {};
+  {
+  };
 
 
   
