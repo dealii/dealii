@@ -3,12 +3,15 @@ s/\\p\{([^}]+)\}/$1/g;
 s/\@p\{([^}]+)\}/$1/g;
 s/\\ref\{([^}]+)\}/$1/g;
 s/\@ref\{([^}]+)\}/$1/g;
-s/\@item/<li>/g;
-#s/\@sect3\{([^}]+)\}/\@subsubsection $1/g;
+s/\$/\@f\$/g;
+
+s/\@sect(\d)\{([^}]+)\}/<h$1>$2<\/h$1>/g;
 s/\\begin\{verbatim\}/\@verbatim/g;
 s/\\end\{verbatim\}/\@endverbatim/g;
 s/\@begin\{verbatim\}/\@verbatim/g;
 s/\@end\{verbatim\}/\@endverbatim/g;
+
+s/\@item/<li>/g;
 
 s/\\begin\{itemize\}/<UL>/g;
 s/\\end\{itemize\}/<\/UL>/g;

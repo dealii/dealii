@@ -58,8 +58,8 @@ EXAMPLE_PATH           =
 EXAMPLE_PATTERNS       = 
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = 
-INPUT_FILTER           = 
-FILTER_SOURCE_FILES    = NO
+INPUT_FILTER           = ./filter
+FILTER_SOURCE_FILES    = YES
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
 #---------------------------------------------------------------------------
@@ -78,7 +78,7 @@ IGNORE_PREFIX          =
 #---------------------------------------------------------------------------
 GENERATE_HTML          = YES
 HTML_HEADER            = 
-HTML_FOOTER            = 
+HTML_FOOTER            = footer.html
 HTML_STYLESHEET        = 
 HTML_ALIGN_MEMBERS     = NO
 GENERATE_HTMLHELP      = NO
