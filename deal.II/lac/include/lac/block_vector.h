@@ -183,7 +183,17 @@ class BlockVector
 				     /**
 				      * Read-only access to a single block.
 				      */
-    const Vector<Number>& block (const unsigned int i) const;
+    const Vector<Number> &
+    block (const unsigned int i) const;
+
+				     /**
+				      * Return a reference on the
+				      * object that describes the
+				      * mapping between block and
+				      * global indices.
+				      */
+    const BlockIndices<n_blocks> &
+    get_block_indices () const;
     
 				     /**
 				      * $U(0-N) = s$: fill all components.
@@ -512,6 +522,8 @@ BlockVector<n_blocks,Number>::block(unsigned int i)
   return components[i];
 }
 
+
+
 template <int n_blocks, typename Number>
 inline
 const Vector<Number>&
@@ -520,6 +532,16 @@ BlockVector<n_blocks,Number>::block(unsigned int i) const
   Assert(i<n_blocks, ExcIndexRange(i,0,n_blocks));
 
   return components[i];
+}
+
+
+
+template <int n_blocks, typename Number>
+inline
+const BlockIndices<n_blocks>&
+BlockVector<n_blocks,Number>::get_block_indices () const
+{
+  return block_indices;
 }
 
 
