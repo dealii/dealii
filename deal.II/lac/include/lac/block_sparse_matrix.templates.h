@@ -1,4 +1,4 @@
-//----------------------------  block_sparse_matrix.templates.h  ---------------------------
+//-------------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  block_sparse_matrix.templates.h  ---------------------------
+//-------------------------------------------------------------------------------
 #ifndef __deal2__block_sparse_matrix_templates_h
 #define __deal2__block_sparse_matrix_templates_h
 
@@ -61,8 +61,8 @@ BlockSparseMatrix<number> &
 BlockSparseMatrix<number>::
 operator = (const BlockSparseMatrix<number> &m) 
 {
-  Assert (rows == m.rows, ExcIncompatibleObjects());
-  Assert (columns == m.columns, ExcIncompatibleObjects());
+  Assert (rows == m.rows, ExcDimensionMismatch(rows, m.rows));
+  Assert (columns == m.columns, ExcDimensionMismatch(columns, m.columns));
 				   // this operator does not do
 				   // anything except than checking
 				   // whether the base objects want to

@@ -668,10 +668,6 @@ class BlockSparseMatrix : public Subscriptor
 				      */
     DeclException0 (ExcMatrixNotBlockSquare);
 
-				     /**
-				      * Exception.
-				      */
-    DeclException0 (ExcIncompatibleObjects);
     
   private:
 				     /**
