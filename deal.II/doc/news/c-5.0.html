@@ -113,6 +113,36 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: <code class="member">VectorTools::point_difference</code>
+       used to use an algorithm to find the cell the given point is in that
+       was linear in the total number of active cells. It has been rewritten
+       to use
+       <code class="member">GridTools::find_active_cell_around_point</code>
+       which is only logarithmic in its complexity.
+       <br> 
+       (WB 2004/07/07)
+       </p>
+
+  <li> <p>
+       Fixed: Block matrix iterators could get into all kind of interesting
+       (and invalid) states when some of the blocks had empty rows. In this
+       common case, we would frequently skip elements when looping over the
+       elements of a block matrix. These cases should now be fixed.
+       <br> 
+       (WB 2004/07/07)
+       </p>
+
+  <li> <p>
+       Removed: Block matrix iterators used to have a function
+       <code class="member">it-&gt;index()</code> that returned something like
+       the position within a row. However, this was fragile, and has been
+       removed. If you want an ordering of elements within a row, use the
+       <code class="member">operator &lt;</code> to compare iterators.
+       <br> 
+       (WB 2004/07/07)
+       </p>
+
+  <li> <p>
        Improved: The <code
        class="class">PETScWrappers::SolverGMRES::AdditionalData</code>
        class now takes an additional flag indicating the use of left
