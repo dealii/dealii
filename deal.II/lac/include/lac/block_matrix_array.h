@@ -32,7 +32,7 @@ template <typename> class BlockVector;
  * location @p{(i,j)} several times will add the corresponding
  * matrices in matrix-vector multiplications.
  *
- * @subsection{Requirements}
+ * @sect3{Requirements}
  *
  * The template argument @p{MATRIX} is a class providing the the
  * matrix-vector multiplication functions @p{vmult} etc. defined in
