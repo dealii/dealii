@@ -54,7 +54,11 @@ enum MeshSmoothing {
  */
 template <int dim>
 struct CellData {
+#if !((__GNUC__==2) && (__GNUC_MINOR__==95))
     int           vertices[GeometryInfo<dim>::vertices_per_cell];
+#else
+    int           vertices[1 << dim];
+#endif
     unsigned char material_id;
 };
 
@@ -3202,11 +3206,24 @@ class Triangulation
     TriaNumberCache<dim>             number_cache;
     
 				     // Friendship includes local classes.
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+				     // this seems to be disallowed
+				     // by the standard, so gcc2.95
+				     // does not accept it
     friend class TriaAccessor<dim>;
     friend class TriaObjectAccessor<1, dim>;
     friend class TriaObjectAccessor<2, dim>;
     friend class TriaObjectAccessor<3, dim>;
+#else
+				     // this, however, may grant
+				     // access to too many classes,
+				     // but ...
+    template <int dim1> friend class TriaAccessor;
 
+    template <int dim1, int dim2>
+    friend class TriaObjectAccessor;
+#endif
+    
     friend class CellAccessor<dim>;
     
     friend class TriaRawIterator<1,TriaObjectAccessor<1, 1> >;

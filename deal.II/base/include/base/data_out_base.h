@@ -250,7 +250,11 @@ class DataOutBase
 					  * is the same as for cells
 					  * in the triangulation.
 					  */
+#if ! ((__GNUC__==2) && (__GNUC_MINOR__==95))  
 	Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
+#else
+	Point<dim> vertices[1<<dim];
+#endif
 	
 					 /**
 					  * Number of subdivisions with

@@ -11,7 +11,6 @@
 
 
 
-
 // helper function to aquire the number of levels within a grid
 template <class GridClass>
 unsigned int

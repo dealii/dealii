@@ -316,12 +316,14 @@ class GridOut
     struct EpsFlags : public EpsFlagsBase 
     {};
 
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+
 				     /**
 				      * Flags specific to the output of
 				      * grids in three space dimensions.
 				      */
     template <>
-    struct EpsFlags<3> : public EpsFlagsBase 
+    struct EpsFlags<3> : public EpsFlagsBase
     {
 					 /**
 					  * Angle of the line origin-viewer
@@ -355,6 +357,9 @@ class GridOut
 			azimut_angle (azimut_angle),
 			turn_angle (turn_angle)      {};
     };
+#else
+#   warning Not implemented for gcc2.95
+#endif
     
 	
     

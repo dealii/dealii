@@ -958,9 +958,19 @@ class MGDoFHandler
 				      */
     vector<unsigned int>      mg_used_dofs;
 
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)  
+				     // this seems to be disallowed
+				     // by the standard, so gcc2.95
+				     // does not accept it
     friend class MGDoFObjectAccessor<1, dim>;
     friend class MGDoFObjectAccessor<2, dim>;
     friend class MGDoFObjectAccessor<3, dim>;
+#else
+				     // this, however, may grant
+				     // access to too many classes,
+				     // but ...
+    template <int dim1, int dim2> friend class MGDoFObjectAccessor;
+#endif
 };
 
     

@@ -99,12 +99,32 @@ template <template <int> class GridClass, int dim>
 class InterGridMap 
 {
   public:
+
+#if (__GNUC__==2) && (__GNUC_MINOR__==95)
+				     // helper class
+    struct GridClass_dim : public GridClass<dim> {
+					 // constructor. will
+					 // not be implemented,
+					 // but suppresses compiler
+					 // warning about non-default
+					 // constructor of GridClass
+	GridClass_dim ();
+    };
+    
+				     /**
+				      * Typedef to the iterator type of
+				      * the grid class under consideration.
+				      */
+    typedef typename GridClass_dim::cell_iterator cell_iterator;
+
+#else
+
 				     /**
 				      * Typedef to the iterator type of
 				      * the grid class under consideration.
 				      */
     typedef typename GridClass<dim>::cell_iterator cell_iterator;
-
+#endif
 				     /**
 				      * Create the mapping between the two
 				      * grids.

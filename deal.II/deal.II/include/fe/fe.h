@@ -420,7 +420,11 @@ class FiniteElementBase : public Subscriptor,
 				      * matrix are discarded and will not fill
 				      * up the transfer matrix.
 				      */
+#if !((__GNUC__==2) && (__GNUC_MINOR__==95))
     FullMatrix<double> restriction[GeometryInfo<dim>::children_per_cell];
+#else
+    FullMatrix<double> restriction[1 << dim];
+#endif
 
     				     /**
 				      * Have #N=2^dim# matrices keeping the
@@ -458,7 +462,11 @@ class FiniteElementBase : public Subscriptor,
 				      * matrix are discarded and will not fill
 				      * up the transfer matrix.
 				      */
+#if ! ((__GNUC__==2) && (__GNUC_MINOR__==95))
     FullMatrix<double> prolongation[GeometryInfo<dim>::children_per_cell];
+#else
+    FullMatrix<double> prolongation[1 << dim];
+#endif
 
     				     /**
 				      * Specify the constraints which the

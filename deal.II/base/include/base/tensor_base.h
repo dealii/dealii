@@ -59,6 +59,7 @@ class Tensor<1,dim> {
 				      */
     static const unsigned int rank      = 1;
 
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)  
 				     /**
 				      * Unnecessary variable, only used in
 				      * the declaration of #array_type#.
@@ -67,7 +68,7 @@ class Tensor<1,dim> {
 				      * we need it presently.
 				      */
     static const unsigned int array_size = ((dim!=0) ? (dim) : 1);
-    
+
 				     /**
 				      * Declare an array type which can
 				      * be used to initialize statically
@@ -77,7 +78,19 @@ class Tensor<1,dim> {
 				      * as in the #TensorBase<1,dim># class.
 				      */
     typedef double array_type[array_size];
+#else
 
+				     /**
+				      * Declare an array type which can
+				      * be used to initialize statically
+				      * an object of this type.
+				      *
+				      * Use the same condition for #dim==0#
+				      * as in the #TensorBase<1,dim># class.
+				      */
+    typedef double array_type[(dim!=0) ? dim : 1];
+#endif
+    
 				     /**
 				      * Constructor. Initialize all entries
 				      * to zero if #initialize==true#; this

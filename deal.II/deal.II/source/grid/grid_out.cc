@@ -366,8 +366,14 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					 // is in direction of the viewer, but
 					 // I am too tired at present to fix
 					 // this
+#if !((__GNUC__==2) && (__GNUC_MINOR__==95))
 	const double z_angle    = eps_flags_3.azimut_angle;
 	const double turn_angle = eps_flags_3.turn_angle;
+#else
+#   warning Not implemented for gcc2.95
+	const double z_angle    = 60;
+	const double turn_angle = 30;
+#endif
 	const double pi = 3.1415926536;
 	const Point<dim> view_direction(-sin(z_angle * 2.*pi / 360.) * sin(turn_angle * 2.*pi / 360.),
 					+sin(z_angle * 2.*pi / 360.) * cos(turn_angle * 2.*pi / 360.),

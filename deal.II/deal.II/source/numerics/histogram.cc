@@ -72,41 +72,58 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
       case logarithmic:
 	    min_value = *min_element(values[0].begin(),
 				     values[0].end(),
-								      // for gcc2.95
-//				     &Histogram::template logarithmic_less<number>);
-								      // for egcs1.1.2
-				     &logarithmic_less<number>);
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+				     &logarithmic_less<number>
+#else
+				     &Histogram::template logarithmic_less<number>
+#endif
+	    );
+	    
 	    max_value = *max_element(values[0].begin(),
 				     values[0].end(),
-								      // for gcc2.95
-//				     &Histogram::template logarithmic_less<number>);
-								      // for egcs1.1.2
-				     &logarithmic_less<number>);
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+				     &logarithmic_less<number>
+#else
+				     &Histogram::template logarithmic_less<number>
+#endif
+	    );
+	    
 
 	    for (unsigned int i=1; i<values.size(); ++i)
 	      {
 		min_value = min (min_value,
 				 *min_element(values[i].begin(),
 					      values[i].end(),
-								      // for gcc2.95
-//				              &Histogram::template logarithmic_less<number>);
-								      // for egcs1.1.2
-					      &logarithmic_less<number>),
-								      // for gcc2.95
-//				     &Histogram::template logarithmic_less<number>);
-								      // for egcs1.1.2
-				 &logarithmic_less<number>);
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+					      &logarithmic_less<number>
+#else
+					      &Histogram::template logarithmic_less<number>
+#endif
+				 ),
+
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+				 &logarithmic_less<number>
+#else
+				 &Histogram::template logarithmic_less<number>
+#endif
+		);
+
 		max_value = max (max_value,
 				 *max_element(values[i].begin(),
 					      values[i].end(),
-								      // for gcc2.95
-//				              &Histogram::template logarithmic_less<number>);
-								      // for egcs1.1.2
-					      &logarithmic_less<number>),
-								      // for gcc2.95
-//				 &Histogram::template logarithmic_less<number>);
-								      // for egcs1.1.2
-				 &logarithmic_less<number>);
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+					      &logarithmic_less<number>
+#else
+					      &Histogram::template logarithmic_less<number>
+#endif
+				 ),
+
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+				 &logarithmic_less<number>
+#else
+				 &Histogram::template logarithmic_less<number>
+#endif
+		);
 	      };
 	    
 	    break;
