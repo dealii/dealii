@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 #include <base/polynomial_space.h>
 #include <base/exceptions.h>
 #include <base/table.h>
+
 
 
 template <int dim>
@@ -34,9 +35,12 @@ PolynomialSpace<dim>::compute_n_pols (const unsigned int n)
 template <>
 void
 PolynomialSpace<1>::
-compute_index (const unsigned int n,
+compute_index (const unsigned int i,
                unsigned int      (&index)[1]) const
 {
+  Assert(i<index_map.size(),
+	 ExcIndexRange(i,0,index_map.size()));
+  const unsigned int n=index_map[i];
   index[0] = n;
 }
 
@@ -45,9 +49,12 @@ compute_index (const unsigned int n,
 template <>
 void
 PolynomialSpace<2>::
-compute_index (const unsigned int n,
+compute_index (const unsigned int i,
                unsigned int      (&index)[2]) const
 {
+  Assert(i<index_map.size(),
+	 ExcIndexRange(i,0,index_map.size()));
+  const unsigned int n=index_map[i];
                                    // there should be a better way to
                                    // write this function (not
                                    // linear in n_1d), someone
@@ -70,9 +77,12 @@ compute_index (const unsigned int n,
 template <>
 void
 PolynomialSpace<3>::
-compute_index (const unsigned int n,
+compute_index (const unsigned int i,
                unsigned int      (&index)[3]) const
 {
+  Assert(i<index_map.size(),
+	 ExcIndexRange(i,0,index_map.size()));
+  const unsigned int n=index_map[i];
                                    // there should be a better way to
                                    // write this function (not
                                    // quadratic in n_1d), someone
@@ -96,6 +106,37 @@ compute_index (const unsigned int n,
 }
 
 
+template <int dim>
+void
+PolynomialSpace<dim>::output_indices(std::ostream &out) const
+{
+  unsigned int ix[dim];
+  for (unsigned int i=0; i<n_pols; ++i)
+    {
+      compute_index(i,ix);
+      out << i << "\t";
+      for (unsigned int d=0; d<dim; ++d)
+	out << ix[d] << " ";
+      out << endl;
+    }
+}
+
+
+
+template <int dim>
+void
+PolynomialSpace<dim>::set_polynomial_ordering(
+  const vector<unsigned int> &imap)
+{
+  Assert(imap.size()==index_map.size(),
+	 ExcDimensionMismatch(imap.size(), index_map.size()));
+
+  index_map=imap;
+  for (unsigned int i=0; i<index_map.size(); ++i)
+    reverse_index_map[index_map[i]]=i;
+}
+
+
 
 template <int dim>
 double
@@ -104,7 +145,6 @@ PolynomialSpace<dim>::compute_value (const unsigned int i,
 {
   unsigned int ix[dim];
   compute_index(i,ix);
-
                                    // take the product of the
                                    // polynomials in the various space
                                    // directions
@@ -235,9 +275,10 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
       for (unsigned int iz=0;iz<((dim>2) ? n_1d : 1);++iz)
 	for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
 	  for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
-	    values[k++] = v[0][ix][0]
-			  * ((dim>1) ? v[1][iy][0] : 1.)
-			  * ((dim>2) ? v[2][iz][0] : 1.);
+	    values[reverse_index_map[k++]] =
+	      v[0][ix][0]
+	      * ((dim>1) ? v[1][iy][0] : 1.)
+	      * ((dim>2) ? v[2][iz][0] : 1.);
     }
   
   if (update_grads)
@@ -248,11 +289,11 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
 	for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
 	  for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
 	    {
+	      const unsigned int k2=reverse_index_map[k++];
 	      for (unsigned int d=0;d<dim;++d)
-		grads[k][d] = v[0][ix][(d==0) ? 1 : 0]
-                              * ((dim>1) ? v[1][iy][(d==1) ? 1 : 0] : 1.)
-                              * ((dim>2) ? v[2][iz][(d==2) ? 1 : 0] : 1.);
-	      ++k;
+		grads[k2][d] = v[0][ix][(d==0) ? 1 : 0]
+                  * ((dim>1) ? v[1][iy][(d==1) ? 1 : 0] : 1.)
+                  * ((dim>2) ? v[2][iz][(d==2) ? 1 : 0] : 1.);
 	    }
     }
 
@@ -264,6 +305,7 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
 	for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
 	  for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
 	    {
+	      const unsigned int k2=reverse_index_map[k++];
 	      for (unsigned int d1=0; d1<dim; ++d1)
 		for (unsigned int d2=0; d2<dim; ++d2)
 		  {
@@ -277,11 +319,11 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
 		    const unsigned int
 		      j2 = ((d1==2) ? 1 : 0) + ((d2==2) ? 1 : 0);
 		    
-		    grad_grads[k][d1][d2] = v[0][ix][j0]
-					    * ((dim>1) ? v[1][iy][j1] : 1.)
-					    * ((dim>2) ? v[2][iz][j2] : 1.);
+		    grad_grads[k2][d1][d2] =
+		      v[0][ix][j0]
+		      * ((dim>1) ? v[1][iy][j1] : 1.)
+		      * ((dim>2) ? v[2][iz][j2] : 1.);
 		  }
-	      ++k;
 	    }
     }
 }

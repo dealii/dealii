@@ -31,11 +31,19 @@
  * Given a vector of <i>n</i> one-dimensional polynomials
  * <i>P<sub>0</sub></i> to <i>P<sub>n</sub></i>, where
  * <i>P<sub>i</sub></i> has degree <i>i</i>, this class generates all
- * polynomials of the form <i> P<sub>ijk</sub>(x,y,z) =
+ * multi-dimensional polynomials of the form <i>
+ * P<sub>ijk</sub>(x,y,z) =
  * P<sub>i</sub>(x)P<sub>j</sub>(y)P<sub>k</sub>(z)</i>, where the sum
  * of <i>i</i>, <i>j</i> and <i>k</i> is less than or equal <i>n</i>.
  *
- * @author Guido Kanschat, 2002, Wolfgang Bangerth, 2003
+ * The @ref{output_indices} function prints the ordering of the
+ * polynomials, i.e. for each multi-dimensional polynomial in the
+ * polynomial space it gives the indices i,j,k of the one-dimensional
+ * polynomials in x,y and z direction. The ordering of the
+ * multi-dimensional polynomials can be changed by using the
+ * @p{set_polynomial_ordering} function.
+ *
+ * @author Guido Kanschat, 2002, Wolfgang Bangerth, 2003, Ralf Hartmann 2004
  */
 template <int dim>
 class PolynomialSpace
@@ -58,6 +66,20 @@ class PolynomialSpace
     template <class Pol>
     PolynomialSpace (const std::vector<Pol> &pols);
 
+				     /**
+				      * Prints the list of the indices
+				      * to <tt>out</tt>.
+				      */
+    void output_indices(std::ostream &out) const;
+
+				     /**
+				      * Sets the ordering of the
+				      * polynomials. Requires
+				      * <tt>index_map.size()==n()</tt>. Stores
+				      * a copy of <tt>index_map</tt>.
+				      */
+    void set_polynomial_ordering(const vector<unsigned int> &index_map);
+    
 				     /**
 				      * Computes the value and the
 				      * first and second derivatives
@@ -152,7 +174,20 @@ class PolynomialSpace
 		    int, int, int,
 		    << "Dimension " << arg1 << " not equal to " << arg2 << " nor to " << arg3);
 
-	    
+  protected:
+    
+				     /**
+				      * Compute numbers in x, y and z
+				      * direction. Given an index
+				      * <tt>n</tt> in the d-dimensional
+				      * polynomial space, compute the
+				      * indices i,j,k such that
+				      * <i>p<sub>n</sub>(x,y,z) =
+				      * p<sub>i</sub>(x)p<sub>j</sub>(y)p<sub>k</sub>(z)</i>.
+				      */
+    void compute_index (const unsigned int n,
+                        unsigned int      (&index)[dim]) const;
+
   private:
 				     /**
 				      * Copy of the vector <tt>pols</tt> of
@@ -169,16 +204,16 @@ class PolynomialSpace
     const unsigned int n_pols;
 
 				     /**
-				      * Compute numbers in x, y and z
-				      * direction. Given an index
-				      * <tt>n</tt> in the d-dimensional
-				      * polynomial space, compute the
-				      * indices i,j,k such that
-				      * <i>p<sub>n</sub>(x,y,z) =
-				      * p<sub>i</sub>(x)p<sub>j</sub>(y)p<sub>k</sub>(z)</i>.
+				      * Index map for reordering the
+				      * polynomials.
 				      */
-    void compute_index (const unsigned int n,
-                        unsigned int      (&index)[dim]) const;
+    std::vector<unsigned int> index_map;
+
+				     /**
+				      * Index map for reordering the
+				      * polynomials.
+				      */
+    std::vector<unsigned int> reverse_index_map;
     
 				     /**
 				      * Static function used in the
@@ -208,12 +243,23 @@ void PolynomialSpace<3>::compute_index(const unsigned int n,
 
 template <int dim>
 template <class Pol>
-PolynomialSpace<dim>::
-PolynomialSpace (const std::vector<Pol> &pols)
+PolynomialSpace<dim>::PolynomialSpace (const std::vector<Pol> &pols)
 		:
 		polynomials (pols.begin(), pols.end()),
-		n_pols (compute_n_pols(polynomials.size()))
-{}
+		n_pols (compute_n_pols(polynomials.size())),
+		index_map(n_pols),
+		reverse_index_map(n_pols)
+{
+				   // per default set this index map
+				   // to identity. This map can be
+				   // changed by the user through the
+				   // set_polynomial_ordering function
+  for (unsigned int i=0; i<n_pols; ++i)
+    {
+      index_map[i]=i;
+      reverse_index_map[i]=i;
+    }
+}
 
 
 template<int dim>
