@@ -1171,8 +1171,14 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // weight_mapping is used to map the
 				   // global (fine grid) parameter dof
 				   // indices to the columns
-  FullMatrix<double> weights (n_coarse_dofs,
-			      n_parameters_on_fine_grid);
+				   //
+				   // note that the `weights' array
+				   // can take up huge amounts of
+				   // memory, and in particular is
+				   // roughly quadratic in the memory
+				   // consumption!
+  FullMatrix<float> weights (n_coarse_dofs,
+			     n_parameters_on_fine_grid);
 				   // this is this mapping. there is one
 				   // entry for each dof on the fine grid;
 				   // if it is a parameter dof, then its
@@ -1370,7 +1376,7 @@ DoFTools::compute_intergrid_weights (const DoFHandler<dim>              &coarse_
 				     const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 				     const vector<Vector<double> >      &parameter_dofs,
 				     const vector<int>                  &weight_mapping,
-				     FullMatrix<double>                 &weights)
+				     FullMatrix<float>                  &weights)
 {
 				   // simply distribute the range of
 				   // cells to different threads
@@ -1403,7 +1409,7 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 				       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 				       const vector<Vector<double> >      &parameter_dofs,
 				       const vector<int>                  &weight_mapping,
-				       FullMatrix<double>                 &weights,
+				       FullMatrix<float>                  &weights,
 				       const typename DoFHandler<dim>::active_cell_iterator &begin,
 				       const typename DoFHandler<dim>::active_cell_iterator &end)
 {

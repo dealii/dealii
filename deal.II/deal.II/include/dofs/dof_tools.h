@@ -886,7 +886,7 @@ class DoFTools
 			       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 			       const vector<Vector<double> >      &parameter_dofs,
 			       const vector<int>                  &weight_mapping,
-			       FullMatrix<double>                 &weights);
+			       FullMatrix<float>                  &weights);
 
 				     /**
 				      * This is a function that is
@@ -905,7 +905,7 @@ class DoFTools
 				 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 				 const vector<Vector<double> >      &parameter_dofs,
 				 const vector<int>                  &weight_mapping,
-				 FullMatrix<double>                 &weights,
+				 FullMatrix<float>                  &weights,
 				 const typename DoFHandler<dim>::active_cell_iterator &begin,
 				 const typename DoFHandler<dim>::active_cell_iterator &end);
 };
