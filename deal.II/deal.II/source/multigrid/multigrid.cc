@@ -82,7 +82,6 @@ MGTransferBase::~MGTransferBase ()
 /* ----------------------------- MGTransferPrebuilt ------------------------ */
 
 
-<<<<<<< multigrid.cc
 /*
 MGTransferPrebuilt::~MGTransferPrebuilt () 
 {};
