@@ -773,9 +773,10 @@ class TableBase : public Subscriptor
                                       * Set all entries to their
                                       * default value (i.e. copy them
                                       * over with default constructed
-                                      * objects).
+                                      * objects). Do not change the
+                                      * size of the table, though.
                                       */
-    void clear ();
+    void reset_values ();
     
                                      /**
                                       * Set the dimensions of this
@@ -1960,7 +1961,7 @@ TableBase<N,T>::operator = (const TableBase<N,T2>& m)
 template <int N, typename T>
 inline
 void
-TableBase<N,T>::clear ()
+TableBase<N,T>::reset_values ()
 {
   if (n_elements() != 0)
     std::fill_n (val, n_elements(), T());
@@ -1993,7 +1994,7 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes)
       table_size = TableIndices<N>();
 
       return;
-    };
+    }
   
                                    // if new size is nonzero:
                                    // if necessary allocate
@@ -2005,11 +2006,23 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes)
 
       val_size = new_size;
       val      = new T[val_size];
-    };
+    }
 
                                    // reinitialize contents of old or
-                                   // new memory.
-  clear ();
+                                   // new memory. note that we
+                                   // actually need to do this here,
+                                   // even in the case that we
+                                   // reallocated memory, since per
+                                   // C++ standard, clause 5.3.4/15
+                                   // the newly allocated objects are
+                                   // only default initialized by
+                                   // operator new[] if they are
+                                   // non-POD type. In other words, if
+                                   // we have a table of doubles, then
+                                   // their values after calling 'new
+                                   // double[val_size]' is
+                                   // indetermined.
+  reset_values ();
 }
 
 

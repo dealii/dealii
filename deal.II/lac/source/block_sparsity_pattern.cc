@@ -68,7 +68,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::
 reinit (const unsigned int n_block_rows,
         const unsigned int n_block_columns)
 {
-				   // delete previous content
+				   // delete previous content and
+				   // clean the sub_objects array
+				   // completely
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)
       {
@@ -76,9 +78,9 @@ reinit (const unsigned int n_block_rows,
 	sub_objects[i][j] = 0;
 	delete sp;
       };
-  sub_objects.clear ();
+  sub_objects.reinit (0,0);
 
-				   // set new sizes
+				   // then set new sizes
   rows = n_block_rows;
   columns = n_block_columns;
   sub_objects.reinit (rows, columns);

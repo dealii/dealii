@@ -95,7 +95,8 @@ BlockSparseMatrix<number>::
 reinit (const BlockSparsityPattern &sparsity)
 {
 				   // first delete previous content of
-				   // the subobjects array
+				   // the subobjects array and delete
+				   // the table completely
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       {
@@ -103,8 +104,7 @@ reinit (const BlockSparsityPattern &sparsity)
 	sub_objects[r][c] = 0;
 	delete p;
       }
-  
-  sub_objects.clear ();
+  sub_objects.reinit (0,0);
 
 				   // then associate new sparsity
 				   // pattern and resize

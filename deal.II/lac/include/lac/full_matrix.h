@@ -983,9 +983,6 @@ class FullMatrix : public Table<2,number>
     DeclException0 (ExcSourceEqualsDestination);
 
     friend class Accessor;
-
-  private:
-    void clear ();
 };
 
 /*@}*/
