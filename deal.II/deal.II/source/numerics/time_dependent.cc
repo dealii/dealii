@@ -536,9 +536,12 @@ void TimeStepBase_Tria<dim>::restore_grid ()
 
 
 
-template <int dim>
-static void
-mirror_refinement_flags (const typename Triangulation<dim>::cell_iterator &new_cell,
+// have a few helper functions
+namespace 
+{
+  template <int dim>
+  void
+  mirror_refinement_flags (const typename Triangulation<dim>::cell_iterator &new_cell,
 			 const typename Triangulation<dim>::cell_iterator &old_cell)
 {
 				   // mirror the refinement
@@ -584,7 +587,7 @@ mirror_refinement_flags (const typename Triangulation<dim>::cell_iterator &new_c
 
 
 template <int dim>
-static bool
+bool
 adapt_grid_cells (const typename Triangulation<dim>::cell_iterator &cell1,
                   const typename Triangulation<dim>::cell_iterator &cell2)
 {
@@ -689,7 +692,7 @@ adapt_grid_cells (const typename Triangulation<dim>::cell_iterator &cell1,
 
 
 template <int dim>
-static bool
+bool
 adapt_grids (Triangulation<dim> &tria1,
 	     Triangulation<dim> &tria2)
 {
@@ -706,7 +709,7 @@ adapt_grids (Triangulation<dim> &tria1,
 
   return grids_changed;
 }
-
+}
 
 
 template <int dim>
@@ -1162,7 +1165,7 @@ TimeStepBase_Tria_Flags::RefinementFlags<dim>::default_correction_relaxations
    std::vector<std::pair<unsigned int,double> >(1,    // one element, denoting the upper bound
 										 // for the following
 										 // relaxation
-						std::make_pair (0, 0.)));
+						std::make_pair (0U, 0.)));
 
 
 template <int dim>
