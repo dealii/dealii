@@ -1,7 +1,7 @@
 // $Id$
 // Copyright (C) 2001 Ralf Hartmann
 //
-// Show the shape functions implemented and computes the area of cells.
+// Shows the shape functions implemented and computes the area of cells.
 
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
@@ -43,9 +43,8 @@ plot_transformation(Mapping<dim> &mapping,
 				      | update_JxW_values));
 
   fe_values.reinit(cell);
-  
-  std::ofstream gnuplot(name);
-  gnuplot.precision(PRECISION);
+
+  deallog.push(name);
   
   unsigned int k=0;
   for (unsigned int nz=0; nz<=((dim>2) ? div : 0); ++nz)
@@ -54,15 +53,16 @@ plot_transformation(Mapping<dim> &mapping,
 	{
 	  for (unsigned int nx=0; nx<=div; ++nx)
 	    {
-	      gnuplot << fe_values.quadrature_point(k);
+	      deallog << fe_values.quadrature_point(k);
 	      double J = fe_values.JxW(k) / q.weight(k);
-	      gnuplot << ' ' << J << std::endl;
+	      deallog << ' ' << J << std::endl;
 	      ++k;
 	    }
-	  gnuplot << std::endl;
+	  deallog << std::endl;
 	}
-      gnuplot << std::endl;  
+      deallog << std::endl;  
     }
+  deallog.pop();
 }
 
 
@@ -74,8 +74,7 @@ plot_faces(Mapping<dim> &mapping,
 	   DoFHandler<dim>::cell_iterator &cell,
 	   const char* name)
 {
-  std::ofstream gnuplot(name);
-  gnuplot.precision(PRECISION);
+  deallog.push(name);
 
   QGauss4<dim-1> q;
   const unsigned int nq = (unsigned int) (.01 + pow(q.n_quadrature_points, 1./(dim-1)));
@@ -100,13 +99,14 @@ plot_faces(Mapping<dim> &mapping,
 	    {
 	      Point<dim> x = fe_values.quadrature_point(k);
 	      Tensor<1,dim> n = normals[k];
-	      gnuplot << x << '\t' << n << std::endl;
+	      deallog << x << '\t' << n << std::endl;
 	      ++k;
 	    }
-	  gnuplot << std::endl;
+	  deallog << std::endl;
 	}
-      gnuplot << std::endl;      
+      deallog << std::endl;      
     }
+  deallog.pop();
 }
 
 
@@ -118,8 +118,7 @@ plot_subfaces(Mapping<dim> &mapping,
 	      DoFHandler<dim>::cell_iterator &cell,
 	      const char* name)
 {
-  std::ofstream gnuplot(name);
-  gnuplot.precision(PRECISION);
+  deallog.push(name);
 
   QGauss4<dim-1> q;
   const unsigned int nq = (unsigned int) (.01 + pow(q.n_quadrature_points, 1./(dim-1)));
@@ -146,13 +145,14 @@ plot_subfaces(Mapping<dim> &mapping,
 	      {
 		Point<dim> x = fe_values.quadrature_point(k);
 		Tensor<1,dim> n = normals[k];
-		gnuplot << x << '\t' << n << std::endl;
+		deallog << x << '\t' << n << std::endl;
 		++k;
 	      }
-	    gnuplot << std::endl;
+	    deallog << std::endl;
 	  }
-	gnuplot << std::endl;
+	deallog << std::endl;
       }
+  deallog.pop();
 }
 
 
@@ -480,7 +480,7 @@ void mapping_test()
 	      {
 		std::ostrstream ost(st2, 99);
 		ost << "Mapping" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << ".output" << std::ends;
+		    << mapping_strings[j] << std::ends;
 		deallog << st2 << std::endl;
 		plot_transformation(*mapping_ptr[j], fe_q4, cell, st2);
 		compute_area(*mapping_ptr[j], fe_q4, cell);
@@ -490,7 +490,7 @@ void mapping_test()
 	      {
 		std::ostrstream ost(st2, 99);
 		ost << "MappingFace" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << ".output" << std::ends;
+		    << mapping_strings[j] << std::ends;
 		deallog << st2 << std::endl;	    
 		plot_faces(*mapping_ptr[j], fe_q4, cell, st2);
 	      }
@@ -499,7 +499,7 @@ void mapping_test()
 	      {
 		std::ostrstream ost(st2, 99);
 		ost << "MappingSubface" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << ".output" << std::ends;
+		    << mapping_strings[j] << std::ends;
 		deallog << st2 << std::endl;	    
 		plot_subfaces(*mapping_ptr[j], fe_q4, cell, st2);
 	      }
@@ -539,7 +539,6 @@ int main()
 {
   std::ofstream logfile ("mapping.output");
   logfile.precision (PRECISION);
-  logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
   
