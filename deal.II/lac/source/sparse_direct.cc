@@ -301,7 +301,7 @@ void die (const std::string &text, const T1 t1, const T2 t2)
  * latter is the case, then also exit this process
  *
  * check by calling "kill(PID,0)", where PID is the pid of the
- * parent. if the return value is non-null, then kill couldn't find
+ * child. if the return value is non-null, then kill couldn't find
  * out about the process, so it is apparently gone
  */
 extern "C"
