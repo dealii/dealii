@@ -171,6 +171,213 @@ namespace Evaluation
   };
 
 
+				   // @sect4{The PointXDerivativeEvaluation class}
+
+				   // Besides the class implementing
+				   // the evaluation of the solution
+				   // at one point, we here provide
+				   // one which evaluates the gradient
+				   // at a grid point. Since in
+				   // general the gradient of a finite
+				   // element function is not
+				   // continuous at a vertex, we have
+				   // to be a little bit more careful
+				   // here. What we do is to loop over
+				   // all cells, even if we have found
+				   // the point already on once cell,
+				   // and use the mean value of the
+				   // gradient at the vertex taken
+				   // from all adjacent cells.
+				   //
+				   // Given the interface of the
+				   // ``PointValueEvaluation'' class,
+				   // the declaration of this class
+				   // provides little surprise, and
+				   // neither does the constructor:
+  template <int dim>
+  class PointXDerivativeEvaluation : public EvaluationBase<dim>
+  {
+    public:
+      PointXDerivativeEvaluation (const Point<dim>   &evaluation_point,
+				  TableHandler       &results_table);
+      
+      virtual void operator () (const DoFHandler<dim> &dof_handler,
+				const Vector<double>  &solution) const;
+      
+      DeclException1 (ExcEvaluationPointNotFound,
+		      Point<dim>,
+		      << "The evaluation point " << arg1
+		      << " was not found among the vertices of the present grid.");
+    private:
+      const Point<dim>  evaluation_point;
+      TableHandler     &results_table;
+  };
+
+
+  template <int dim>
+  PointXDerivativeEvaluation<dim>::
+  PointXDerivativeEvaluation (const Point<dim>   &evaluation_point,
+			      TableHandler       &results_table)
+		  :
+		  evaluation_point (evaluation_point),
+		  results_table (results_table)
+  {};
+  
+
+				   // The more interesting things
+				   // happen inside the function doing
+				   // the actual evaluation:
+  template <int dim>
+  void
+  PointXDerivativeEvaluation<dim>::
+  operator () (const DoFHandler<dim> &dof_handler,
+	       const Vector<double>  &solution) const 
+  {
+				     // This time initialize the
+				     // return value with something
+				     // useful, since we will have to
+				     // add up a number of
+				     // contributions and take the
+				     // mean value afterwards...
+    double point_derivative = 0;
+
+				     // ...then have some objects of
+				     // which the meaning wil become
+				     // clear below...
+    QTrapez<dim>  vertex_quadrature;
+    FEValues<dim> fe_values (dof_handler.get_fe(),
+			     vertex_quadrature,
+			     update_gradients | update_q_points);
+    std::vector<Tensor<1,dim> >
+      solution_gradients (vertex_quadrature.n_quadrature_points);
+    
+				     // ...and next loop over all cells
+				     // and their vertices, and count
+				     // how often the vertex has been
+				     // found:
+    typename DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    unsigned int evaluation_point_hits = 0;
+    for (; cell!=endc; ++cell)
+      for (unsigned int vertex=0;
+	   vertex<GeometryInfo<dim>::vertices_per_cell;
+	   ++vertex)
+	if (cell->vertex(vertex) == evaluation_point)
+	  {
+					     // Things are now no more
+					     // as simple, since we
+					     // can't get the gradient
+					     // of the finite element
+					     // field as before, where
+					     // we simply had to pick
+					     // one degree of freedom
+					     // at a vertex.
+					     //
+					     // Rather, we have to
+					     // evaluate the finite
+					     // element field on this
+					     // cell, and at a certain
+					     // point. As you know,
+					     // evaluating finite
+					     // element fields at
+					     // certain points is done
+					     // through the
+					     // ``FEValues'' class, so
+					     // we use that. The
+					     // question is: the
+					     // ``FEValues'' object
+					     // needs to be a given a
+					     // quadrature formula and
+					     // can then compute the
+					     // values of finite
+					     // element quantities at
+					     // the quadrature
+					     // points. Here, we don't
+					     // want to do quadrature,
+					     // we simply want to
+					     // specify some points!
+					     //
+					     // Nevertheless, the same
+					     // way is chosen: use a
+					     // special quadrature
+					     // rule with points at
+					     // the vertices, since
+					     // these are what we are
+					     // interested in. The
+					     // appropriate rule is
+					     // the trapezoidal rule,
+					     // so that is the reason
+					     // why we used that one
+					     // above.
+					     //
+					     // Thus: initialize the
+					     // ``FEValues'' object on
+					     // this cell,
+	    fe_values.reinit (cell);
+					     // and extract the
+					     // gradients of the
+					     // solution vector at the
+					     // vertices:
+	    fe_values.get_function_grads (solution,
+					  solution_gradients);
+
+					     // Now we have the
+					     // gradients at all
+					     // vertices, so pick out
+					     // that one which belongs
+					     // to the evaluation
+					     // point (note that the
+					     // order of vertices is
+					     // not necessarily the
+					     // same as that of the
+					     // quadrature points):
+	    unsigned int q_point = 0;
+	    for (; q_point<solution_gradients.size(); ++q_point)
+	      if (fe_values.quadrature_point(q_point) ==
+		  evaluation_point)
+		break;
+
+					     // Check that the
+					     // evaluation point was
+					     // indeed found,
+	    Assert (q_point < solution_gradients.size(),
+		    ExcInternalError());
+					     // and if so take the
+					     // x-derivative of the
+					     // gradient there as the
+					     // value which we are
+					     // interested in, and
+					     // increase the counter
+					     // indicating how often
+					     // we have added to that
+					     // variable:
+	    point_derivative += solution_gradients[q_point][0];
+	    ++evaluation_point_hits;
+	  };
+
+				     // Now we have looped over all
+				     // cells and vertices, so check
+				     // whether the point was found:
+    AssertThrow (evaluation_point_hits > 0,
+		 ExcEvaluationPointNotFound(evaluation_point));
+
+				     // We have simply summed up the
+				     // contributions of all adjacent
+				     // cells, so we still have to
+				     // compute the mean value. Once
+				     // this is done, enter the result
+				     // into the provided table:
+    point_derivative /= evaluation_point_hits;
+    results_table.add_value ("DoFs", dof_handler.n_dofs());
+    results_table.add_value ("d_x u(x_0)", point_derivative);
+
+    std::cout << "   Point x-derivative=" << point_derivative  //TODO
+	      << std::endl;
+  };
+
+
+  
 				   // @sect4{The GridOutput class}
 
 				   // Since this program has a more
@@ -560,7 +767,7 @@ namespace LaplaceSolver
   void
   Solver<dim>::LinearSystem::solve (Vector<double> &solution) const
   {
-    SolverControl           solver_control (1000, 1e-16);
+    SolverControl           solver_control (10000, 1e-12); //TODO!
     PrimitiveVectorMemory<> vector_memory;
     SolverCG<>              cg (solver_control, vector_memory);
 
@@ -2728,8 +2935,8 @@ template <int dim>
 void solve_problem ()
 {
   Triangulation<dim> triangulation (Triangulation<dim>::smoothing_on_refinement);
-  const FE_Q<dim>          primal_fe(3);
-  const FE_Q<dim>          dual_fe(4);
+  const FE_Q<dim>          primal_fe(1);
+  const FE_Q<dim>          dual_fe(2);
   const QGauss4<dim>       quadrature;
   const QGauss4<dim-1>     face_quadrature;
 
@@ -2755,12 +2962,15 @@ void solve_problem ()
   TableHandler results_table;
   Evaluation::PointValueEvaluation<dim>
     postprocessor1 (Point<dim>(0.75,0.75), results_table);
+  Evaluation::PointXDerivativeEvaluation<dim>
+    postprocessor2 (Point<dim>(0.75,0.75), results_table);
   Evaluation::GridOutput<dim>
-    postprocessor2 ("grid");
+    postprocessor3 ("grid");
 
   std::list<Evaluation::EvaluationBase<dim> *> postprocessor_list;
   postprocessor_list.push_back (&postprocessor1);
-  postprocessor_list.push_back (&postprocessor2);  
+  postprocessor_list.push_back (&postprocessor2);
+  postprocessor_list.push_back (&postprocessor3);
 
   run_simulation (*solver, postprocessor_list);
 
