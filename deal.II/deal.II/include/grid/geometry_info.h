@@ -122,7 +122,8 @@ struct GeometryInfo
 				      * Computation is analogous to
 				      * #lines_per_cell#. Very
 				      * important for more than three
-				      * dimensions!  */
+				      * dimensions!
+				      */
     static const unsigned int hexes_per_cell = (2*GeometryInfo<dim-1>::hexes_per_cell
 						+ GeometryInfo<dim-1>::quads_per_cell);
 
