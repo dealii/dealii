@@ -311,6 +311,14 @@ class DataOut {
 				      * degrees of freedom in the dof handler.
 				      * Therefore, no block vectors are allowed
 				      * at present.
+				      *
+				      * The name and unit of a data vector shall
+				      * only contain characters which are
+				      * letters, underscore and a few other
+				      * ones. Refer to the #ExcInvalidCharacter#
+				      * exception declared in this class to
+				      * see which characters are valid and which
+				      * are not.
 				      */
     void add_data_vector (const dVector &data,
 			  const string  &name,
