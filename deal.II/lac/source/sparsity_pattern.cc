@@ -381,8 +381,8 @@ SparsityPattern::compress ()
 				       // this case only sort the
 				       // remaining entries, otherwise
 				       // sort all
-      std::sort ((rows==cols) ? &tmp_entries[1] : &tmp_entries[0],
-		 &tmp_entries[row_length]);
+      std::sort ((rows==cols) ? tmp_entries.begin()+1 : tmp_entries.begin(),
+		 tmp_entries.begin()+row_length);
 
 				       // insert column numbers
 				       // into the new field
