@@ -141,6 +141,10 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   
   const unsigned int dofs_per_cell = fe.total_dofs,
 		     dofs_per_face = fe.dofs_per_face;
+  
+  const unsigned int n_components  = fe.n_components;
+  Assert (n_components == 1, ExcNotImplemented());
+  
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_vector(dofs_per_cell);
   
@@ -318,6 +322,9 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
 						SparseMatrix<double>     &matrix,
 						const Function<dim> * const a) {
+  const unsigned int n_components  = dof.get_fe().n_components;
+  Assert ((n_components==1) || (a==0), ExcNotImplemented());
+
   Vector<double> dummy;   // no entries, should give an error if accessed
   UpdateFlags update_flags = UpdateFlags(update_gradients |
 					 update_JxW_values);
@@ -382,6 +389,9 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						Vector<double>           &rhs_vector,
 						const Function<dim> * const a)
 {
+  const unsigned int n_components  = dof.get_fe().n_components;
+  Assert ((n_components==1) || (a==0), ExcNotImplemented());
+
   UpdateFlags update_flags = UpdateFlags(update_q_points  |
 					 update_gradients |
 					 update_JxW_values);
@@ -567,6 +577,8 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
 				const typename DoFHandler<dim>::cell_iterator &) const {
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
+  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const unsigned int n_components  = fe.n_components;
 
   Assert (cell_matrix.n() == total_dofs,
 	  Equation<dim>::ExcWrongSize(cell_matrix.n(), total_dofs));
@@ -586,19 +598,31 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
 			       coefficient_values);
       for (unsigned int i=0; i<total_dofs; ++i) 
 	for (unsigned int j=0; j<total_dofs; ++j)
-	  for (unsigned int point=0; point<n_q_points; ++point)
-	    cell_matrix(i,j) += (values(i,point) *
-				 values(j,point) *
-				 weights[point] *
-				 coefficient_values[point]);
+	  if ((n_components == 1)
+	      ||
+	      (fe.system_to_component_index(i).first ==
+	       fe.system_to_component_index(j).first))
+	    {
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		cell_matrix(i,j) += (values(i,point) *
+				     values(j,point) *
+				     weights[point] *
+				     coefficient_values[point]);
+	    };
     }
   else
     for (unsigned int i=0; i<total_dofs; ++i) 
       for (unsigned int j=0; j<total_dofs; ++j)
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  cell_matrix(i,j) += (values(i,point) *
-			       values(j,point) *
-			       weights[point]);
+	if ((n_components == 1)
+	    ||
+	    (fe.system_to_component_index(i).first ==
+	     fe.system_to_component_index(j).first))
+	  {
+	    for (unsigned int point=0; point<n_q_points; ++point)
+	      cell_matrix(i,j) += (values(i,point) *
+				   values(j,point) *
+				   weights[point]);
+	  };
 };
 
 
@@ -612,7 +636,13 @@ void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
+  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const unsigned int n_components  = fe.n_components;
 
+				   // for system elements: need
+				   // VectorFunction for rhs
+  Assert (n_components==1, ExcNotImplemented());
+  
   Assert (cell_matrix.n() == total_dofs,
 	  Equation<dim>::ExcWrongSize(cell_matrix.n(), total_dofs));
   Assert (cell_matrix.m() == total_dofs,
@@ -671,6 +701,12 @@ void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
+  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const unsigned int n_components  = fe.n_components;
+
+				   // for system elements: need
+				   // VectorFunction for rhs
+  Assert (n_components==1, ExcNotImplemented());
 
   Assert (rhs.size() == total_dofs,
 	  Equation<dim>::ExcWrongSize(rhs.size(), total_dofs));
@@ -710,6 +746,12 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
   
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
+  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const unsigned int n_components  = fe.n_components;
+
+				   // for system elements: need
+				   // VectorFunction for rhs
+  Assert (n_components==1, ExcNotImplemented());
 
   Assert (cell_matrix.n() == total_dofs,
 	  Equation<dim>::ExcWrongSize(cell_matrix.n(), total_dofs));
@@ -770,6 +812,13 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
+  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const unsigned int n_components  = fe.n_components;
+
+				   // for system elements: need
+				   // VectorFunction for coefficient
+  Assert ((n_components==1) || (coefficient==0), ExcNotImplemented());
+
   Assert (cell_matrix.n() == total_dofs,
 	  Equation<dim>::ExcWrongSize(cell_matrix.n(), total_dofs));
   Assert (cell_matrix.m() == total_dofs,
@@ -794,12 +843,18 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 				coefficient_values[point];
     }
   else
-    for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<total_dofs; ++i) 
-	for (unsigned int j=0; j<total_dofs; ++j)
-	  cell_matrix(i,j) += (gradients[i][point] *
-			       gradients[j][point]) *
-			      weights[point];
+    for (unsigned int i=0; i<total_dofs; ++i) 
+      for (unsigned int j=0; j<total_dofs; ++j)
+	if ((n_components==1)
+	    ||
+	    (fe.system_to_component_index(i).first ==
+	     fe.system_to_component_index(j).first))
+	  {
+	    for (unsigned int point=0; point<n_q_points; ++point)
+	      cell_matrix(i,j) += (gradients[i][point] *
+				   gradients[j][point]) *
+				  weights[point];
+	  };
 };
 
 
@@ -812,6 +867,12 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
+  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const unsigned int n_components  = fe.n_components;
+
+				   // for system elements: need
+				   // VectorFunction for rhs
+  Assert (n_components==1, ExcNotImplemented());
 
   Assert (rhs.size() == total_dofs,
 	  Equation<dim>::ExcWrongSize(rhs.size(), total_dofs));
@@ -828,13 +889,18 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
       rhs(i) += values(i,point) *
 		rhs_values[point] *
 		weights[point];
-}
+};
+
+
 
 template<int dim> void
 MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
 						const FiniteElement<dim> &low,
 						FullMatrix<double>& result)
 {
+  Assert (high.n_components == low.n_components,
+	  ExcInvalidFE());
+  
   result.reinit (low.total_dofs, high.total_dofs);
 
   vector<Point<dim> > unit_support_points (high.total_dofs);
@@ -842,7 +908,11 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
   
   for (unsigned int i=0; i<low.total_dofs; ++i)
     for (unsigned int j=0; j<high.total_dofs; ++j)
-      result(i,j) = high.shape_value (j, unit_support_points[i]);
+				       // shape functions need to belong
+				       // to the same component
+      if (low.system_to_component_index(i).first ==
+	  high.system_to_component_index(j).first)
+	result(i,j) = high.shape_value (j, unit_support_points[i]);
 }
 
 

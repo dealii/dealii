@@ -66,6 +66,14 @@
  *   way using quadrature sets up the full matrix, i.e. with the
  *   cross coupling of shape functions belonging to different subelements.
  *
+ *   If the finite element for which the mass matrix is to be built
+ *   has more than one component, the resulting matrix will not
+ *   couple the different components. It will furthermore accept
+ *   a single coefficient through the #Function# parameter for all
+ *   components. If you want different coefficients for the different
+ *   parameters, you need to call the respective function accepting
+ *   a #VectorFunction# argument.
+ *
  * \item #create_laplace_matrix#: there are two versions of this; the
  *   one which takes the #Function<dim># object creates
  *   $a_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \nabla\phi_j(x) dx$,
@@ -307,6 +315,11 @@ class MatrixCreator
     static void create_interpolation_matrix(const FiniteElement<dim> &high,
 					    const FiniteElement<dim> &low,
 					    FullMatrix<double>& result);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidFE);
 };
 
 
