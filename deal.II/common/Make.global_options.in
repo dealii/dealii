@@ -93,5 +93,7 @@ ifneq ($(with-multithreading),no)
   LIBPATH    += -L$(ACE_ROOT)/ace
   CXXFLAGS.g += -DDEAL_II_USE_MT
   CXXFLAGS.o += -DDEAL_II_USE_MT
+
+  vpath %.a $(ACE_ROOT)
 endif
 
