@@ -28,8 +28,8 @@ class iVector;
  * data type of the entries is provided in the template argument #number#.
  * The interface is quite fat and in fact has grown every time a new
  * feature was needed. So, a lot of functions are provided.
- * 
- * The since the instantiation of this template is quite an effort,
+ *
+ * Since the instantiation of this template is quite an effort,
  * standard versions are precompiled into the library. These include all
  * combinations of 'float' and 'double' for matrices and vectors. If you need more
  * data types, the implementation of non-inline functions is in
