@@ -176,7 +176,7 @@ class FE_Q : public FiniteElement<dim>
 				      * constraint and embedding
 				      * matrices. The definition of
 				      * the various static fields are
-				      * in the files @p{mat_q.[123]}
+				      * in the files @p{fe_q_[123]d.cc}
 				      * in the source directory.
 				      */
     struct Matrices
