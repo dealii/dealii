@@ -1,12 +1,13 @@
 ############################################################
-# $D contains the root of the deal distribution and should
-# be supplied as a command line argument D=../../...
+# $Id$
+# Copyright (C) 2000 by the deal.II authors
 ############################################################
-
 
 ############################################################
 # Include general settings for including DEAL libraries
 ############################################################
+
+D = @DEAL2_DIR@
 
 include $D/common/Make.global_options
 
@@ -22,12 +23,12 @@ debug-mode = on
 # Define library names
 ############################################################
 
-libs.g   = $(lib-deal2-2d.g) \
-           $(lib-lac.g)      \
-           $(lib-base.g)
-libs     = $(lib-deal2-2d.o) \
-           $(lib-lac.o)      \
-           $(lib-base.o)
+libs.g   = $(lib-lac.g)      \
+           $(lib-base.g)     \
+	   $(lib-deal2-2d.g)
+libs     = $(lib-lac.o)      \
+           $(lib-base.o)     \
+	   $(lib-deal2-2d.o)
 
 
 ############################################################
@@ -59,8 +60,11 @@ endif
 	@echo =====optimized===== $<
 	@$(CXX) $(flags) -c $< -o $@
 
+all: solver.check mgbase.check mg.check
+exe: $(all:.check=.testcase) benchmark
+run: $(all:.check=.output)
 
-all: check
+
 
 ############################################################
 # Typical block for building a running program
@@ -75,71 +79,104 @@ all: check
 #
 ############################################################
 
-show_shapes-cc-files = show_shapes.cc
+solver-cc-files = solver.cc testmatrix.cc
 
 ifeq ($(debug-mode),on)
-show_shapes-o-files = $(show_shapes-cc-files:.cc=.go)
+solver-o-files = $(solver-cc-files:.cc=.go)
 else
-show_shapes-o-files = $(show_shapes-cc-files:.cc=.o)
+solver-o-files = $(solver-cc-files:.cc=.o)
 endif
 
-show_shapes: $(show_shapes-o-files) $(libraries)
+solver.testcase: $(solver-o-files) $(libraries)
+	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
+
 
 ############################################################
 
-show_transform-cc-files = show_transform.cc
+
+mgbase-cc-files = mgbase.cc
 
 ifeq ($(debug-mode),on)
-show_transform-o-files = $(show_transform-cc-files:.cc=.go)
+mgbase-o-files = $(mgbase-cc-files:.cc=.go)
 else
-show_transform-o-files = $(show_transform-cc-files:.cc=.o)
+mgbase-o-files = $(mgbase-cc-files:.cc=.o)
 endif
 
-show_transform: $(show_transform-o-files) $(libraries)
+mgbase.testcase: $(mgbase-o-files) $(libraries)
+	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
+
+
+
+############################################################
+
+
+mg-cc-files = mg.cc testmatrix.cc
+
+ifeq ($(debug-mode),on)
+mg-o-files = $(mg-cc-files:.cc=.go)
+else
+mg-o-files = $(mg-cc-files:.cc=.o)
+endif
+
+mg.testcase: $(mg-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
 
 ############################################################
 # Continue with other targets if needed
 ############################################################
 
-check: show_transform show_shapes
-	@echo Running programs
-	@./show_transform
-	@./show_shapes
-	@echo Checking results
-	$(MAKE) dodiff
 
-%.check: %.dat
-	diff $@ $<
+benchmark-cc-files = benchmark.cc
 
-dat = $(wildcard *.dat)
-check = $(dat:.dat=.check)
+ifeq ($(debug-mode),on)
+benchmark-o-files = $(benchmark-cc-files:.cc=.go)
+else
+benchmark-o-files = $(benchmark-cc-files:.cc=.o)
+endif
 
-dodiff: $(check)
-	@echo OK
+benchmark.testcase: $(benchmark-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
 
+############################################################
+# Continue with other targets if needed
+############################################################
+
+
+target1-cc-files = t1.cc t2.cc t3.cc
+
+ifeq ($(debug-mode),on)
+target1-o-files = $(target1-cc-files:.cc=.go)
+else
+target1-o-files = $(target1-cc-files:.cc=.o)
+endif
+
+target1: $(target1-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+# Postprocessing
+############################################################
+
+%.output:%.testcase
+	@echo =====Running======= $<
+	@./$<
+	@perl -pi -e 's/JobId.*//;s/value.*//;' $@
+
+%.check:%.output
+	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
 ############################################################
 # Cleanup targets
 ############################################################
 
 clean:
-	rm -f *.o *.go
+	rm -f Make.depend *.o *.go *.output T
 
 veryclean: clean
-	rm -f show_shapes show_transform *.inp *.gpl *.eps *.gnuplot *.dat
+	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
 
-############################################################
-# Automatic generation of dependencies
-############################################################
-
-all-cc-files = $(show_shapes-cc-files) $(show_transform-cc-files)
-
-Make.depend: $(all-cc-files)
-	@echo =====Dependecies=== Make.depend
-	@$(CXX) $(flags) $^ -M > $@
-	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
-
-include Make.depend
-
-.PHONY: clean veryclean check

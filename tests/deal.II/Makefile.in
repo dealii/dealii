@@ -1,12 +1,13 @@
 ############################################################
-# $D contains the root of the deal distribution and should
-# be supplied as a command line argument D=../../...
+# $Id$
+# Copyright (C) 2000 by the deal.II authors
 ############################################################
-
 
 ############################################################
 # Include general settings for including DEAL libraries
 ############################################################
+
+D = @DEAL2_DIR@
 
 include $D/common/Make.global_options
 

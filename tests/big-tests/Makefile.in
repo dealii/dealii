@@ -1,5 +1,15 @@
+############################################################
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998
+# Copyright (C) 2000 by the deal.II authors
+############################################################
+
+############################################################
+# Include general settings for including DEAL libraries
+############################################################
+
+D = @DEAL2_DIR@
+
+include $D/common/Make.global_options
 
 
 # list the directories we want to visit

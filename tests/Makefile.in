@@ -4,36 +4,36 @@
 all: base lac fe deal.II big-tests
 
 base:
-	cd base ; $(MAKE) D=@DEAL2_DIR@
+	cd base ; $(MAKE)
 
 lac:
-	cd lac ; $(MAKE) D=@DEAL2_DIR@
+	cd lac ; $(MAKE)
 
 fe:
-	cd fe ; $(MAKE) D=@DEAL2_DIR@
+	cd fe ; $(MAKE)
 
 deal.II:
-	cd deal.II ; $(MAKE) D=@DEAL2_DIR@
+	cd deal.II ; $(MAKE)
 
 big-tests:
-	cd big-tests ; $(MAKE) D=@DEAL2_DIR@
+	cd big-tests ; $(MAKE)
 
 
 clean: clean-base clean-lac clean-deal.II clean-fe
 
 clean-base:
-	cd base ; $(MAKE) clean D=@DEAL2_DIR@
+	cd base ; $(MAKE) clean
 
 clean-lac:
-	cd lac ; $(MAKE) clean D=@DEAL2_DIR@
+	cd lac ; $(MAKE) clean
 
 clean-fe:
-	cd fe ; $(MAKE) clean D=@DEAL2_DIR@
+	cd fe ; $(MAKE) clean
 
 clean-deal.II:
-	cd deal.II ; $(MAKE) clean D=@DEAL2_DIR@
+	cd deal.II ; $(MAKE) clean
 
 clean-big:
-	cd big-tests ; $(MAKE) clean D=@DEAL2_DIR@
+	cd big-tests ; $(MAKE) clean
 
 .PHONY : all base lac fe deal.II big-tests clean clean-base clean-lac clean-fe clean-deal.II clean-big
