@@ -2,61 +2,121 @@ set size 0.721,1
 set data style lines
 set noxtics
 set noytics
+set noztics
 set noxzeroaxis
 set noyzeroaxis
 set nokey
 set term postscript eps
 
-!echo "  Making <grid.zoom_in.eps>"
-set output "grid.zoom_in.eps"
-plot "grid.zoom_in"
+!echo "  Making <2d.zoom_in.grid.eps>"
+set output "results/2d.zoom_in.grid.eps"
+plot "results/2d.zoom_in.grid"
 
-!echo "  Making <grid.ball.eps>"
-set output "grid.ball.eps"
-plot "grid.ball"
+!echo "  Making <2d.ball.grid.eps>"
+set output "results/2d.ball.grid.eps"
+plot "results/2d.ball.grid"
 
-!echo "  Making <grid.curved_line.eps>"
-set output "grid.curved_line.eps"
-plot "grid.curved_line"
+!echo "  Making <2d.curved_line.grid.eps>"
+set output "results/2d.curved_line.grid.eps"
+plot "results/2d.curved_line.grid"
 
-!echo "  Making <grid.random.eps>"
-set output "grid.random.eps"
-plot "grid.random"
+!echo "  Making <2d.random.grid.eps>"
+set output "results/2d.random.grid.eps"
+plot "results/2d.random.grid"
+
+
+
+
+!echo "  Making <3d.zoom_in.grid.eps>"
+set output "results/3d.zoom_in.grid.eps"
+splot "results/3d.zoom_in.grid"
+
+!echo "  Making <3d.ball.grid.eps>"
+set output "results/3d.ball.grid.eps"
+splot "results/3d.ball.grid"
+
+!echo "  Making <3d.curved_line.grid.eps>"
+set output "results/3d.curved_line.grid.eps"
+splot "results/3d.curved_line.grid"
+
+!echo "  Making <3d.random.grid.eps>"
+set output "results/3d.random.grid.eps"
+splot "results/3d.random.grid"
+
 
 
 
 set data style dots
 
-!echo "  Making <sparsity.zoom_in.eps>"
-set output "sparsity.zoom_in.eps"
-plot "sparsity.zoom_in"
+!echo "  Making <2d.zoom_in.sparsity.eps>"
+set output "results/2d.zoom_in.sparsity.eps"
+plot "results/2d.zoom_in.sparsity"
 
-!echo "  Making <sparsity.ball.eps>"
-set output "sparsity.ball.eps"
-plot "sparsity.ball"
-
-!echo "  Making <sparsity.curved_line.eps>"
-set output "sparsity.curved_line.eps"
-plot "sparsity.curved_line"
-
-!echo "  Making <sparsity.random.eps>"
-set output "sparsity.random.eps"
-plot "sparsity.random"
+!echo "  Making <2d.zoom_in.sparsity.c.eps>"
+set output "results/2d.zoom_in.sparsity.c.eps"
+plot "results/2d.zoom_in.sparsity.c"
 
 
+!echo "  Making <2d.ball.sparsity.eps>"
+set output "results/2d.ball.sparsity.eps"
+plot "results/2d.ball.sparsity"
 
-!echo "  Making <sparsity.c.zoom_in.eps>"
-set output "sparsity.c.zoom_in.eps"
-plot "sparsity.c.zoom_in"
+!echo "  Making <2d.ball.sparsity.c.eps>"
+set output "results/2d.ball.sparsity.c.eps"
+plot "results/2d.ball.sparsity.c"
 
-!echo "  Making <sparsity.c.ball.eps>"
-set output "sparsity.c.ball.eps"
-plot "sparsity.c.ball"
 
-!echo "  Making <sparsity.c.curved_line.eps>"
-set output "sparsity.c.curved_line.eps"
-plot "sparsity.c.curved_line"
+!echo "  Making <2d.curved_line.sparsity.eps>"
+set output "results/2d.curved_line.sparsity.eps"
+plot "results/2d.curved_line.sparsity"
 
-!echo "  Making <sparsity.c.random.eps>"
-set output "sparsity.c.random.eps"
-plot "sparsity.c.random"
+!echo "  Making <2d.curved_line.sparsity.c.eps>"
+set output "results/2d.curved_line.sparsity.c.eps"
+plot "results/2d.curved_line.sparsity.c"
+
+
+!echo "  Making <2d.random.sparsity.eps>"
+set output "results/2d.random.sparsity.eps"
+plot "results/2d.random.sparsity"
+
+!echo "  Making <2d.random.sparsity.c.eps>"
+set output "results/2d.random.sparsity.c.eps"
+plot "results/2d.random.sparsity.c"
+
+
+
+!echo "  Making <3d.zoom_in.sparsity.eps>"
+set output "results/3d.zoom_in.sparsity.eps"
+plot "results/3d.zoom_in.sparsity"
+
+!echo "  Making <3d.zoom_in.sparsity.c.eps>"
+set output "results/3d.zoom_in.sparsity.c.eps"
+plot "results/3d.zoom_in.sparsity.c"
+
+
+!echo "  Making <3d.ball.sparsity.eps>"
+set output "results/3d.ball.sparsity.eps"
+plot "results/3d.ball.sparsity"
+
+!echo "  Making <3d.ball.sparsity.c.eps>"
+set output "results/3d.ball.sparsity.c.eps"
+plot "results/3d.ball.sparsity.c"
+
+
+!echo "  Making <3d.curved_line.sparsity.eps>"
+set output "results/3d.curved_line.sparsity.eps"
+plot "results/3d.curved_line.sparsity"
+
+!echo "  Making <3d.curved_line.sparsity.c.eps>"
+set output "results/3d.curved_line.sparsity.c.eps"
+plot "results/3d.curved_line.sparsity.c"
+
+
+!echo "  Making <3d.random.sparsity.eps>"
+set output "results/3d.random.sparsity.eps"
+plot "results/3d.random.sparsity"
+
+!echo "  Making <3d.random.sparsity.c.eps>"
+set output "results/3d.random.sparsity.c.eps"
+plot "results/3d.random.sparsity.c"
+

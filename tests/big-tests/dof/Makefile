@@ -28,7 +28,7 @@ additional-run-action = gnuplot make_ps
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the
 # following list
-delete-files = grid* sparsity* *.eps
+delete-files = results/?d.*
 
 
 

@@ -245,8 +245,12 @@ void TestCases<dim>::run (ParameterHandler &prm) {
     };
 
   				   // output the grid
+  string file_prefix ("results/");
+  file_prefix += ('0'+dim);
+  file_prefix += "d.";
+  
   cout << "    Writing grid..." << endl;
-  ofstream out(prm.get("Grid file").c_str());
+  ofstream out((file_prefix + prm.get("Grid file")).c_str());
   tria->print_gnuplot (out);
 
 
@@ -267,7 +271,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   int unconstrained_bandwidth = sparsity.bandwidth();
 
   cout << "    Writing sparsity pattern..." << endl;
-  ofstream sparsity_out (prm.get("Sparsity file").c_str());
+  ofstream sparsity_out ((file_prefix + prm.get("Sparsity file")).c_str());
   sparsity.print_gnuplot (sparsity_out);
 
 
@@ -278,8 +282,9 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   dof->make_constraint_matrix (constraints);
   constraints.condense (sparsity);
   
-  cout << "    Writing condensed sparsity pattern... (This may take a while)" << endl;
-  ofstream c_sparsity_out (prm.get("Condensed sparsity file").c_str());
+  cout << "    Writing condensed sparsity pattern..." << endl;
+  ofstream c_sparsity_out ((file_prefix +
+			    prm.get("Condensed sparsity file")).c_str());
   sparsity.print_gnuplot (c_sparsity_out);
 
 
