@@ -1,13 +1,12 @@
 
-DEAL::Quadrature no.2 is exact for polynomials of degree 3
-DEAL::Quadrature no.3 is exact for polynomials of degree 5
-DEAL::Quadrature no.4 is exact for polynomials of degree 7
-DEAL::Quadrature no.5 is exact for polynomials of degree 9
-DEAL::Quadrature no.6 is exact for polynomials of degree 11
-DEAL::Quadrature no.7 is exact for polynomials of degree 13
-DEAL::Quadrature no.8 is exact for polynomials of degree 0
-DEAL::Quadrature no.9 is exact for polynomials of degree 1
-DEAL::Quadrature no.10 is exact for polynomials of degree 1
-DEAL::Quadrature no.11 is exact for polynomials of degree 3
-DEAL::Quadrature no.12 is exact for polynomials of degree 5
-DEAL::Quadrature no.13 is exact for polynomials of degree 7
+DEAL::Quadrature no.0 (t7QGauss21i2) is exact for polynomials of degree 3
+DEAL::Quadrature no.1 (t7QGauss31i2) is exact for polynomials of degree 5
+DEAL::Quadrature no.2 (t7QGauss41i2) is exact for polynomials of degree 7
+DEAL::Quadrature no.3 (t7QGauss51i2) is exact for polynomials of degree 9
+DEAL::Quadrature no.4 (t7QGauss61i2) is exact for polynomials of degree 11
+DEAL::Quadrature no.5 (t7QGauss71i2) is exact for polynomials of degree 13
+DEAL::Quadrature no.6 (t9QMidpoint1i2) is exact for polynomials of degree 1
+DEAL::Quadrature no.7 (t7QTrapez1i2) is exact for polynomials of degree 1
+DEAL::Quadrature no.8 (t8QSimpson1i2) is exact for polynomials of degree 3
+DEAL::Quadrature no.9 (t6QMilne1i2) is exact for polynomials of degree 5
+DEAL::Quadrature no.10 (t7QWeddle1i2) is exact for polynomials of degree 7
