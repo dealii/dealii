@@ -75,9 +75,9 @@ double FEValuesBase<dim>::shape_value (const unsigned int i,
 
 
 template <int dim>
-template <class InputVector>
+template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
-					     vector<double>    &values) const
+					     vector<number>    &values) const
 {
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
@@ -88,7 +88,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -108,9 +108,9 @@ void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
 
 
 template <int dim>
-template <class InputVector>
-void FEValuesBase<dim>::get_function_values (const InputVector        &fe_function,
-					     vector< Vector<double> > &values) const
+template <class InputVector, typename number>
+void FEValuesBase<dim>::get_function_values (const InputVector       &fe_function,
+					     vector<Vector<number> > &values) const
 {
   Assert (n_quadrature_points == values.size(),
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
@@ -122,7 +122,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector        &fe_functi
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -170,7 +170,7 @@ void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -207,7 +207,7 @@ void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -259,7 +259,7 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -829,7 +829,7 @@ void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<double> 
 					     vector<double>       &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<float> &,
-					     vector<double>      &) const;
+					     vector<float>      &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<2,double> &,
 					     vector<double>      &) const;
@@ -844,7 +844,7 @@ void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<double> 
 					     vector<Vector<double> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<float> &,
-					     vector<Vector<double> > &) const;
+					     vector<Vector<float> > &) const;
 template
 void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<2,double> &,
 					     vector<Vector<double> >     &) const;

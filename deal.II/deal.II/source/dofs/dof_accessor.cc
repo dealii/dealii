@@ -680,7 +680,7 @@ DoFObjectAccessor<1,deal_II_dimension>::set_dof_values (const Vector<float> &,
 template
 void
 DoFObjectAccessor<1,deal_II_dimension>::get_dof_values (const BlockVector<2,double> &,
-							Vector<float>       &) const;
+							Vector<double>       &) const;
 
 template
 void
@@ -692,7 +692,7 @@ DoFObjectAccessor<1,deal_II_dimension>::set_dof_values (const Vector<double>  &,
 template
 void
 DoFObjectAccessor<1,deal_II_dimension>::get_dof_values (const BlockVector<3,double> &,
-							Vector<float>       &) const;
+							Vector<double>       &) const;
 
 template
 void
@@ -731,7 +731,7 @@ DoFObjectAccessor<2,deal_II_dimension>::set_dof_values (const Vector<float> &,
 template
 void
 DoFObjectAccessor<2,deal_II_dimension>::get_dof_values (const BlockVector<2,double> &,
-							Vector<float>       &) const;
+							Vector<double>       &) const;
 
 template
 void
@@ -743,7 +743,7 @@ DoFObjectAccessor<2,deal_II_dimension>::set_dof_values (const Vector<double>  &,
 template
 void
 DoFObjectAccessor<2,deal_II_dimension>::get_dof_values (const BlockVector<3,double> &,
-							Vector<float>       &) const;
+							Vector<double>       &) const;
 
 template
 void
@@ -783,7 +783,7 @@ DoFObjectAccessor<3,deal_II_dimension>::set_dof_values (const Vector<float> &,
 template
 void
 DoFObjectAccessor<3,deal_II_dimension>::get_dof_values (const BlockVector<2,double> &,
-							Vector<float>       &) const;
+							Vector<double>       &) const;
 template
 void
 DoFObjectAccessor<3,deal_II_dimension>::set_dof_values (const Vector<double>  &,
@@ -794,7 +794,7 @@ DoFObjectAccessor<3,deal_II_dimension>::set_dof_values (const Vector<double>  &,
 template
 void
 DoFObjectAccessor<3,deal_II_dimension>::get_dof_values (const BlockVector<3,double> &,
-							Vector<float>       &) const;
+							Vector<double>       &) const;
 template
 void
 DoFObjectAccessor<3,deal_II_dimension>::set_dof_values (const Vector<double>  &,
