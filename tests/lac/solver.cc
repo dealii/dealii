@@ -31,6 +31,8 @@ check_method( SOLVER& solver, const MATRIX& A,
 int main()
 {
   ofstream logfile("solver.output");
+  logfile.setf(ios::fixed);
+  logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   
