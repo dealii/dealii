@@ -500,13 +500,17 @@ template class TableEntry<std::string>;
 
 
 template
-void TableHandler::add_value(const std::string &, const double);
+void TableHandler::add_value<> (const std::string &,
+				const double);
 
 template
-void TableHandler::add_value(const std::string &, const int);
+void TableHandler::add_value<> (const std::string &,
+				const int);
 
 template
-void TableHandler::add_value(const std::string &, const unsigned int);
+void TableHandler::add_value<> (const std::string &,
+				const unsigned int);
 
 template
-void TableHandler::add_value(const std::string &, const std::string);
+void TableHandler::add_value<> (const std::string &,
+				const std::string);
