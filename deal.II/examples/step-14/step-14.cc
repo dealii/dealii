@@ -354,7 +354,6 @@ namespace LaplaceSolver
 					      *boundary_values,
 					      boundary_value_map);
     
-    
     thread_manager.wait ();
     linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
@@ -680,74 +679,261 @@ namespace LaplaceSolver
 };
 
 
-template <int dim>
-class Solution : public Function<dim>
+				 // @sect3{Equation data}
+				 //
+				 // In this example program, we work
+				 // with the same data sets as in the
+				 // previous one, but as it may so
+				 // happen that someone wants to run
+				 // the program with a different
+				 // solution and right hand side
+				 // function, we show a simple
+				 // technique to do exactly that. For
+				 // more clarity, we furthermore pack
+				 // everything that has to do with
+				 // equation data into a namespace of
+				 // its own.
+				 //
+				 // Basically, the idea is as follows:
+				 // let us have a structure for each
+				 // set of data, in which we have two
+				 // subclasses, one called
+				 // ``Solution'' for the exact
+				 // solution (and also used as right
+				 // hand side), and one called
+				 // ``RightHandSide''. Since the
+				 // solution of the previous example
+				 // program looked like curved ridges,
+				 // we use this name here for the
+				 // enclosing class. Note that the
+				 // names of the two inner class have
+				 // to be the same for all enclosing
+				 // classes, and also that we have
+				 // attached the dimension template
+				 // argument to the enclosing class
+				 // rather than to the inner ones, to
+				 // make further processing simpler.
+				 // (From a language viewpoint, a
+				 // namespace would be better to
+				 // encapsulate these inner classes,
+				 // rather than a structure. However,
+				 // namespaces cannot be given as
+				 // template arguments, so we use a
+				 // structure to allow a second object
+				 // to select from within its given
+				 // argument. The enclosing structure,
+				 // of course, has no members apart
+				 // from the classes it declares, and
+				 // will never be instantiated.)
+				 //
+				 // The idea is then the following: we
+				 // can generate objects for
+				 // solution/boundary values and right
+				 // hand side by simply giving the
+				 // name of the outer class as a
+				 // template argument to a class which
+				 // we call here ``Data::SetUp'', and
+				 // it then creates objects for the
+				 // inner classes. In this case, to
+				 // get all that characterizes the
+				 // curved ridge solution, we would
+				 // simply generate an instance of
+				 // ``Data::SetUp<Data::CurvedRidge>'',
+				 // and everything we need to know
+				 // about the solution would be static
+				 // member variables of that object.
+				 //
+				 // This approach might seem like
+				 // overkill in this case, but will
+				 // become very handy once a certain
+				 // set up is not only characterized
+				 // by a solution (or Dirichlet
+				 // boundary values) and a right hand
+				 // side function, but in addition by
+				 // material properties, Neumann
+				 // values, different boundary
+				 // descriptors, etc. In that case,
+				 // the ``SetUp'' class might consist
+				 // of a dozen or more objects, and
+				 // each descriptor class (like the
+				 // ``CurvedRidges'' class below)
+				 // would have to provide them. Then,
+				 // you will be happy to be able to
+				 // change from one set of data to
+				 // another by only changing the
+				 // template argument to the ``SetUp''
+				 // class at one place, rather than at
+				 // many.
+				 //
+				 // With this framework for different
+				 // test cases, we are almost
+				 // finished, but one thing remains:
+				 // by now we can select statically,
+				 // by changing one template argument,
+				 // which data set to choose. In order
+				 // to be able to do that dynamically,
+				 // i.e. at run time, we need a base
+				 // class. This we provide in the
+				 // obvious way, see below, with
+				 // virtual abstract functions. It
+				 // forces us to introduce a second
+				 // template parameter ``dim'' which
+				 // we need for the base class (which
+				 // could be avoided using some
+				 // template magic, but we omit that),
+				 // but that's all.
+				 //
+				 // Adding new testcases is now
+				 // simple, you don't have to touch
+				 // the framework classes, only a
+				 // structure like the
+				 // ``CurvedRidges'' one is needed.
+namespace Data
 {
-  public:
-    Solution () : Function<dim> () {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component) const;
-};
-
-
-template <int dim>
-double
-Solution<dim>::value (const Point<dim>   &p,
-		      const unsigned int  /*component*/) const
-{
-//    double q = p(0);
-//    for (unsigned int i=1; i<dim; ++i)
-//      q += sin(10*p(i)+5*p(0)*p(0));
-//    const double exponential = exp(q);
-//    return exponential;
-  double s = 1;
-  for (unsigned int i=0; i<dim; ++i)
-    s *= sin(3.1415926536*p(i));
-  return s;
-};
-
-
-
-template <int dim>
-class RightHandSide : public Function<dim>
-{
-  public:
-    RightHandSide () {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component) const;
-};
-
-
-template <int dim>
-double
-RightHandSide<dim>::value (const Point<dim>   &p,
-			   const unsigned int  /*component*/) const
-{
-  double q = p(0);
-  for (unsigned int i=1; i<dim; ++i)
-    q += sin(10*p(i)+5*p(0)*p(0));
-  const double u = exp(q);
-  double t1 = 1,
-	 t2 = 0,
-	 t3 = 0;
-  for (unsigned int i=1; i<dim; ++i)
-    {
-      t1 += cos(10*p(i)+5*p(0)*p(0)) * 10 * p(0);
-      t2 += 10*cos(10*p(i)+5*p(0)*p(0)) -
-	    100*sin(10*p(i)+5*p(0)*p(0)) * p(0)*p(0);
-      t3 += 100*cos(10*p(i)+5*p(0)*p(0))*cos(10*p(i)+5*p(0)*p(0)) -
-	    100*sin(10*p(i)+5*p(0)*p(0));
-    };
-  t1 = t1*t1;
+				   // @sect4{The SetUpBase and SetUp classes}
   
-  return -u*(t1+t2+t3);
-//    double s = 1;
-//    for (unsigned int i=0; i<dim; ++i)
-//      s *= sin(3.1415926536*p(i));
-//    return dim*3.1415926536*3.1415926536*s;  
+				   // Based on the above description,
+				   // the ``SetUpBase'' class then looks
+				   // like this:
+  template <int dim>
+  struct SetUpBase
+  {
+      virtual
+      const Function<dim> &  get_solution () const = 0;
+
+      virtual
+      const Function<dim> &  get_right_hand_side () const = 0;
+  };
+
+
+				   // And now for the derived class
+				   // that takes the template argument
+				   // as explained above. For some
+				   // reason, C++ requires us to
+				   // define a constructor (which
+				   // maybe empty), as otherwise a
+				   // warning is generated that some
+				   // data is not initialized.
+				   //
+				   // Here we pack the data elements
+				   // into private variables, and
+				   // allow access to them through the
+				   // methods of the base class.
+  template <class Traits, int dim>
+  struct SetUp : public SetUpBase<dim>
+  {
+      SetUp () {};
+
+      virtual
+      const Function<dim> &  get_solution () const;
+
+      virtual
+      const Function<dim> &  get_right_hand_side () const;
+      
+    private:
+      static const typename Traits::Solution      solution;
+      static const typename Traits::RightHandSide right_hand_side;
+  };
+
+				   // We have to provide definitions
+				   // for the static member variables
+				   // of the above class:
+  template <class Traits, int dim>
+  const typename Traits::Solution      SetUp<Traits,dim>::solution;
+  template <class Traits, int dim>
+  const typename Traits::RightHandSide SetUp<Traits,dim>::right_hand_side;
+
+				   // And definitions of the member
+				   // functions:
+  template <class Traits, int dim>
+  const Function<dim> &
+  SetUp<Traits,dim>::get_solution () const 
+  {
+    return solution;
+  };
+
+
+  template <class Traits, int dim>
+  const Function<dim> &
+  SetUp<Traits,dim>::get_right_hand_side () const 
+  {
+    return right_hand_side;
+  };
+  
+
+				   // @sect4{The CurvedRidges class}
+
+				   // The class that is used to
+				   // describe the solution and right
+				   // hand side of the ``curved
+				   // ridge'' problem is like so:
+  template <int dim>
+  struct CurvedRidges
+  {
+      class Solution : public Function<dim>
+      {
+	public:
+	  Solution () : Function<dim> () {};
+	  
+	  virtual double value (const Point<dim>   &p,
+				const unsigned int  component) const;
+      };
+
+
+      class RightHandSide : public Function<dim>
+      {
+	public:
+	  RightHandSide () : Function<dim> () {};
+	  
+	  virtual double value (const Point<dim>   &p,
+				const unsigned int  component) const;
+      };
+  };
+  
+    
+  template <int dim>
+  double
+  CurvedRidges<dim>::Solution::value (const Point<dim>   &p,
+				      const unsigned int  /*component*/) const
+  {
+    double q = p(0);
+    for (unsigned int i=1; i<dim; ++i)
+      q += sin(10*p(i)+5*p(0)*p(0));
+    const double exponential = exp(q);
+    return exponential;
+  };
+
+
+
+  template <int dim>
+  double
+  CurvedRidges<dim>::RightHandSide::value (const Point<dim>   &p,
+					   const unsigned int  /*component*/) const
+  {
+    double q = p(0);
+    for (unsigned int i=1; i<dim; ++i)
+      q += sin(10*p(i)+5*p(0)*p(0));
+    const double u = exp(q);
+    double t1 = 1,
+	   t2 = 0,
+	   t3 = 0;
+    for (unsigned int i=1; i<dim; ++i)
+      {
+	t1 += cos(10*p(i)+5*p(0)*p(0)) * 10 * p(0);
+	t2 += 10*cos(10*p(i)+5*p(0)*p(0)) -
+	      100*sin(10*p(i)+5*p(0)*p(0)) * p(0)*p(0);
+	t3 += 100*cos(10*p(i)+5*p(0)*p(0))*cos(10*p(i)+5*p(0)*p(0)) -
+	      100*sin(10*p(i)+5*p(0)*p(0));
+      };
+    t1 = t1*t1;
+    
+    return -u*(t1+t2+t3);
+  };
+
+
+//XXX  
 };
+
 
 
 
@@ -1232,7 +1418,7 @@ namespace LaplaceSolver
     data_out.attach_dof_handler (DualSolver<dim>::dof_handler);
     data_out.add_data_vector (xe, "e");
     data_out.build_patches ();
-    data_out.write_gmv (x);
+    data_out.write_gnuplot (x);
     
     std::transform (error_indicators.begin(),
 		    error_indicators.end(),
@@ -2065,16 +2251,17 @@ void solve_problem (const std::string &solver_name)
   std::cout << header << std::endl
 	    << std::string (header.size(), '-') << std::endl;
 
-  Triangulation<dim> triangulation;
+  Triangulation<dim> triangulation (Triangulation<dim>::maximum_smoothing);
 //  create_triangulation (triangulation);
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (5);
   const FE_Q<dim>          primal_fe(1);
   const FE_Q<dim>          dual_fe(2);
   const QGauss4<dim>       quadrature;
-  const QGauss4<dim-1>     face_quadrature;  
-  const RightHandSide<dim> rhs_function;
-  const Solution<dim>      boundary_values;
+  const QGauss4<dim-1>     face_quadrature;
+
+  const Data::SetUpBase<dim> *data =
+    new Data::SetUp<Data::CurvedRidges<dim>,dim> ();
 
   const Point<dim> evaluation_point(0.5,0.5);
   const DualFunctional::PointValueEvaluation<dim>
@@ -2086,8 +2273,8 @@ void solve_problem (const std::string &solver_name)
 						     dual_fe,
 						     quadrature,
 						     face_quadrature,
-						     rhs_function,
-						     boundary_values,
+						     data->get_right_hand_side(),
+						     data->get_solution(),
 						     dual_functional);
 
   TableHandler results_table;
