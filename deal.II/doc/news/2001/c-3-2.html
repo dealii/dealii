@@ -116,6 +116,14 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: For Mac OS X, the file <code>base/source/log.cc</code>
+       needed to include <code>sys/time.h</code> in addition to
+       <code>sys/resource.h</code>.
+       <br>
+       (Alexis Herault, WB 2002/01/28)
+       </p>
+
+  <li> <p>
        Improved: The cut-off functions <code
        class="class">Functios::CutOffFunctionLinfty</code>, <code
        class="class">Functios::CutOffFunctionW1</code>, and <code
