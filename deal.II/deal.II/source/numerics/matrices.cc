@@ -1368,42 +1368,6 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 
 
 
-template<int dim>
-void
-MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
-						const FiniteElement<dim> &low,
-						FullMatrix<double>& result)
-{
-  Assert (high.n_components() == low.n_components(),
-	  ExcInvalidFE());
-  
-  Assert (result.m() == low.dofs_per_cell,
-	  ExcDimensionMismatch(result.m(), low.dofs_per_cell));
-  Assert (result.n() == high.dofs_per_cell,
-	  ExcDimensionMismatch(result.n(), high.dofs_per_cell));
-
-
-				   // Initialize FEValues at the support points
-				   // of the low element.
-  vector<double> phantom_weights(low.dofs_per_cell,1.);
-  vector<Point<dim> > support_points(low.dofs_per_cell);
-  low.get_unit_support_points(support_points);
-  Quadrature<dim> low_points(support_points,
-			     phantom_weights);
-
-  FEValues<dim> fe(high, low_points, update_values);
-  
-  for (unsigned int i=0; i<low.dofs_per_cell; ++i)
-    for (unsigned int j=0; j<high.dofs_per_cell; ++j)
-				       // shape functions need to belong
-				       // to the same component
-      if (low.system_to_component_index(i).first ==
-	  high.system_to_component_index(j).first)
-	result(i,j) = fe.shape_value(j,i);
-}
-
-
-
 // explicit instantiations
 
 template class MatrixCreator<deal_II_dimension>;

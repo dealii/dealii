@@ -330,27 +330,6 @@ class MatrixCreator
 				       const Function<dim>      *a = 0);
 
 				     /**
-				      * Lagrange interpolation
-				      * matrix for different
-				      * elements.
-				      *
-				      * This function builds a matrix
-				      * $A$ such that a function
-				      * $u_{high}$ is interpolated to
-				      * a function of lower order
-				      * $u_{low}$ by cell-wise
-				      * multiplication
-				      * $u_{low} = A u_{high}$.
-				      */
-    static void create_interpolation_matrix(const FiniteElement<dim> &high,
-					    const FiniteElement<dim> &low,
-					    FullMatrix<double>& result);
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidFE);
-				     /**
 				      * Exception
 				      */
     DeclException0 (ExcComponentMismatch);
