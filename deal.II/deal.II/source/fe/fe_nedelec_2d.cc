@@ -34,11 +34,10 @@ namespace FE_Nedelec_2d
 
   static const double q1_into_q1_refined_1[] =
   {
-//[Anna]:done	
   	1., 0., 0., 0.,
   	0., 1., 0., 0.,
   	0.5, 0., 0.5, 0.,
-  	 0., 0.5, 0., 0.5,
+	0., 0.5, 0., 0.5,
   };
 
   static const double q1_into_q1_refined_2[] =
@@ -65,16 +64,16 @@ template <>
 const double * const 
 FE_Nedelec<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell] =
 {
-  { FE_Nedelec_2d::q1_into_q1_refined_0, FE_Nedelec_2d::q1_into_q1_refined_1,
-      FE_Nedelec_2d::q1_into_q1_refined_2, FE_Nedelec_2d::q1_into_q1_refined_3 }
+      { FE_Nedelec_2d::q1_into_q1_refined_0, FE_Nedelec_2d::q1_into_q1_refined_1,
+	FE_Nedelec_2d::q1_into_q1_refined_2, FE_Nedelec_2d::q1_into_q1_refined_3 }
 };
 
 
 template <>
 const unsigned int
 FE_Nedelec<2>::Matrices::n_embedding_matrices
-  = sizeof(FE_Nedelec<2>::Matrices::embedding) /
-    sizeof(FE_Nedelec<2>::Matrices::embedding[0]);
+= sizeof(FE_Nedelec<2>::Matrices::embedding) /
+sizeof(FE_Nedelec<2>::Matrices::embedding[0]);
 
 
 // Constraint matrices: how do the new value on child faces depend on
@@ -99,15 +98,15 @@ template <>
 const double * const 
 FE_Nedelec<2>::Matrices::constraint_matrices[] =
 {
-  FE_Nedelec_2d::constraint_q1
+      FE_Nedelec_2d::constraint_q1
 };
 
 
 template <>
 const unsigned int 
 FE_Nedelec<2>::Matrices::n_constraint_matrices
-  = sizeof(FE_Nedelec<2>::Matrices::constraint_matrices) /
-    sizeof(FE_Nedelec<2>::Matrices::constraint_matrices[0]);
+= sizeof(FE_Nedelec<2>::Matrices::constraint_matrices) /
+sizeof(FE_Nedelec<2>::Matrices::constraint_matrices[0]);
 
 
 
