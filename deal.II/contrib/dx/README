@@ -1,0 +1,12 @@
+==================================================
+= Networks for IBM Data Explorer
+==================================================
+
+Structure:
+
+single: visualization for files with all components in a
+  single data vector
+
+single/scalar.net:
+  extract one scalar from the data vector and visualize by
+  shading and isolines
