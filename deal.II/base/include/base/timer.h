@@ -37,7 +37,7 @@
  * it. The times between successive calls to #start/stop# will then be
  * accumulated.
  *
- * Note: the implementation of this class is system dependant.
+ * Note: the implementation of this class is system dependent.
  *
  * @author G. Kanschat, W. Bangerth
  */
@@ -75,13 +75,6 @@ class Timer
 				      * measurement. The elapsed time
 				      * is returned in units of
 				      * seconds.
-				      *
-				      * A regular call to this
-				      * function serves to avoid time
-				      * overflow (which is now nearly
-				      * every 30 minutes on UNIX
-				      * machines) in long-time
-				      * measurements.
 				      */
     double operator() () const;
 
