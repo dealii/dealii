@@ -177,9 +177,10 @@ distclean-bits:
 abort.o: abort.cc
 	 @$(CXX) $(CXXFLAGS.g) -o $@ -c $<
 
-.PHONY : all base lac fe deal.II bits \
-	clean clean-base clean-lac clean-fe clean-deal.II clean-bits \
-	distclean distclean-base distclean-lac distclean-fe distclean-deal.II distclean-bits
+.PHONY : all base lac fe deal.II multigrid bits \
+	clean clean-base clean-lac clean-fe clean-deal.II clean-multigrid clean-bits \
+	distclean distclean-base distclean-lac distclean-fe \
+	distclean-deal.II distclean-multigrid distclean-bits
 
 include Makefile.paths
 include $D/common/Make.global_options
