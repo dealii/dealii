@@ -21,7 +21,8 @@ default: run-tests
 ############################################################
 
 tests_x = vector-vector \
-	full_matrix sparsity_pattern sparse_matrices \
+	full_matrix tridiagonal_matrix \
+	sparsity_pattern sparse_matrices \
 	block_vector block_vector_iterator block_matrices \
 	matrix_lib matrix_out \
 	solver eigen \
