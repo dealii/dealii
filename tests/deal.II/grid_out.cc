@@ -44,8 +44,13 @@ void test ()
   GridOutFlags::Eps<2> eps2(GridOutFlags::EpsFlagsBase::width,
 			    300, .5, false, 5, true);
   grid_out.set_flags (eps2);
-  std::ofstream x("x.eps");
-  grid_out.write_eps (tria, x);
+
+  if (dim != 1)
+    grid_out.write_eps (tria, logfile);
+  grid_out.write_gnuplot (tria, logfile);
+  grid_out.write_ucd (tria, logfile);
+  if (dim != 1)
+    grid_out.write_dx (tria, logfile);
 };
 
 
@@ -55,6 +60,8 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
+  test<1> ();
   test<2> ();
+  test<3> ();
 };
 
