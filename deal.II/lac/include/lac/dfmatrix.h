@@ -85,7 +85,8 @@ int val_size;
 				     /**
  *  A = B           . Copy all elements
  */
-    dFMatrix& operator = (const dFMatrix& B)
+    dFMatrix& operator = (const dFMatrix& B);
+    
 
 				 /**
  *  U(0-m,0-n) = s  . Fill all elements
