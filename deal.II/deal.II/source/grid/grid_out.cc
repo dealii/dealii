@@ -295,11 +295,11 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				   // distinctions between
 				   // eps_flags_1, eps_flags_2, ...
   const EpsFlagsBase &eps_flags_base = (dim==1 ?
-					eps_flags_1 :
+					(EpsFlagsBase&)eps_flags_1 :
 					(dim==2 ?
-					 eps_flags_2 :
+					 (EpsFlagsBase&)eps_flags_2 :
 					 (dim==3 ?
-					  eps_flags_3 :
+					  (EpsFlagsBase&)eps_flags_3 :
 					  *(EpsFlagsBase*)0)));
   
   AssertThrow (out, ExcIO());
