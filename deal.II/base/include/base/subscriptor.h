@@ -1,8 +1,17 @@
-/*----------------------------   subscriptor.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __subscriptor_H
-#define __subscriptor_H
-/*----------------------------   subscriptor.h     ---------------------------*/
+//----------------------------  subscriptor.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  subscriptor.h  ---------------------------
+#ifndef __deal2__subscriptor_h
+#define __deal2__subscriptor_h
 
 
 #ifndef __exceptions_H
@@ -91,9 +100,9 @@ class Subscriptor
 				      * when #unsubscribe# is called.
 				      */
     DeclException0(ExcNotUsed);
-  
 
-  private:
+
+private:
     				     /**
 				      * Store the number of objects which
 				      * subscribed to this object. Initialally,
@@ -113,10 +122,4 @@ class Subscriptor
 };
 
 
-
-
-
-/*----------------------------   subscriptor.h     ---------------------------*/
-/* end of #ifndef __subscriptor_H */
 #endif
-/*----------------------------   subscriptor.h     ---------------------------*/

@@ -1,9 +1,17 @@
-/**********************   parameter-handler.h     ****************************/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __parameter_handler_H
-#define __parameter_handler_H
-/**********************   parameter-handler.h     ****************************/
+//----------------------------  parameter_handler.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  parameter_handler.h  ---------------------------
+#ifndef __deal2__parameter_handler_h
+#define __deal2__parameter_handler_h
 
 
 // public classes; to be declared below
@@ -20,14 +28,12 @@ class istream;
 class ostream;
 
 
-
 /**
  * List of possible output formats.
  */
 enum OutputStyle {
       Text, LaTeX, HTML
 };
-
 
 
 /**
@@ -114,7 +120,7 @@ struct Patterns {
     };
 
 
-				     /**
+/**
 				      * This class is much like the #Selection#
 				      * class, but it allows the input to be
 				      * a comma-separated list of values which
@@ -174,9 +180,6 @@ struct Patterns {
     };
 };
 
-
-
-      
 
 /**
  *   The #ParameterHandler# class provides a standard interface to an input file
@@ -671,7 +674,7 @@ class ParameterHandler
     void clear ();
 
 
-				     /**
+/**
 				      * Declare a new entry with name #entry#,
 				      * default and for which
 				      * any input has to match the #pattern#
@@ -753,10 +756,9 @@ class ParameterHandler
     void print_parameters_section (ostream &out,
 				   const OutputStyle Style,
 				   const unsigned int indent_level);
-    
-				   
 
-				     /**
+
+/**
 				      * Exception
 				      */
     DeclException1 (ExcEntryAlreadyExists,
@@ -881,9 +883,6 @@ class ParameterHandler
 
     friend class MultipleParameterLoop;
 };
-
-	
-
 
 
 /**
@@ -1279,7 +1278,6 @@ ParameterHandler::ok() const
   return status;
 }
 
-/**********************   parameter-handler.h     ****************************/
-/* end of #ifndef __parameter_handler_H */
+
 #endif
-/**********************   parameter-handler.h     ****************************/
+

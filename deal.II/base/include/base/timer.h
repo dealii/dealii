@@ -1,9 +1,17 @@
-/*----------------------------   timer.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __timer_H
-#define __timer_H
-/*----------------------------   timer.h     ---------------------------*/
+//----------------------------  timer.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  timer.h  ---------------------------
+#ifndef __deal2__timer_h
+#define __deal2__timer_h
 
 
 /**
@@ -96,7 +104,7 @@ class Timer
     double              cumulative_time;
 
 
-				     /**
+/**
 				      * Store whether the timer is presently
 				      * running.
 				      */
@@ -113,10 +121,4 @@ class Timer
 };
 
 
-
-
-
-/*----------------------------   timer.h     ---------------------------*/
-/* end of #ifndef __timer_H */
 #endif
-/*----------------------------   timer.h     ---------------------------*/

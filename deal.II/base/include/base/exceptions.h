@@ -1,8 +1,17 @@
-/*----------------------------   exceptions.h     ---------------------------*/
-/*      $Id$  */
-#ifndef __exceptions_H
-#define __exceptions_H
-/*----------------------------   exceptions.h     ---------------------------*/
+//----------------------------  exceptions.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  exceptions.h  ---------------------------
+#ifndef __deal2__exceptions_h
+#define __deal2__exceptions_h
 
 
 #include <iostream>
@@ -310,8 +319,8 @@ class ExceptionBase : public exception {
 				      */
     virtual void PrintInfo (ostream &out) const;
 
-    
-				     /**
+
+/**
 				      *  Function derived from the base class
 				      *  which allows to pass information like
 				      *  the line and name of the file where the
@@ -353,7 +362,6 @@ class ExceptionBase : public exception {
 };
 
 
-
 /**
  *  This routine does the main work for the
  *  exception generation mechanism used in the
@@ -383,7 +391,6 @@ void __IssueError_Assert (const char *file,
 };
 
 
-
 /**
  *  This routine does the main work for the
  *  exception generation mechanism used in the
@@ -404,8 +411,6 @@ void __IssueError_Throw (const char *file,
 };
 
 
-
-    
 #ifdef DEBUG  ////////////////////////////////////////
 
 /**
@@ -434,7 +439,6 @@ void __IssueError_Throw (const char *file,
 #endif      ////////////////////////////////////////
 
 
-
 /**
  *  This is the main routine in the exception mechanism for run-time mode
  *  error checking. See the
@@ -452,8 +456,6 @@ void __IssueError_Throw (const char *file,
 			  __LINE__,                              \
 			  __PRETTY_FUNCTION__, #cond, #exc, exc);\
   }
-
-  
 
 
 /**
@@ -586,8 +588,4 @@ namespace StandardExceptions
 using namespace StandardExceptions;
 
 
-
-/*----------------------------   exceptions.h     ---------------------------*/
-/* end of #ifndef __exceptions_H */
 #endif
-/*----------------------------   exceptions.h     ---------------------------*/

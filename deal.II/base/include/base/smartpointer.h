@@ -1,8 +1,18 @@
-/*----------------------------   smartpointer.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __smartpointer_H
-#define __smartpointer_H
-/*----------------------------   smartpointer.h     ---------------------------*/
+//----------------------------  smartpointer.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  smartpointer.h  ---------------------------
+#ifndef __deal2__smartpointer_h
+#define __deal2__smartpointer_h
+
 
 #ifndef __subscriptor_H
 #include <base/subscriptor.h>
@@ -65,9 +75,8 @@ class SmartPointer
 				      */
     SmartPointer (T *t);
 
-    
 
-				     /**
+/**
 				      * Destructor, removing the subscription.
 				      */
     ~SmartPointer();
@@ -110,9 +119,6 @@ class SmartPointer
 };
 
 
-
-
-
 /* --------------------------- inline Template functions ------------------------------*/
 
 
@@ -120,7 +126,6 @@ template <typename T>
 SmartPointer<T>::SmartPointer () :
 		t (0)
 {};
-
 
 
 template <typename T>
@@ -132,7 +137,6 @@ SmartPointer<T>::SmartPointer (T *t) :
 };
 
 
-
 template <typename T>
 SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt) :
 		t (tt.t)
@@ -142,14 +146,12 @@ SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt) :
 };
 
 
-
 template <typename T>
 SmartPointer<T>::~SmartPointer ()
 {
   if (t)
     t->unsubscribe();
 };
-
 
 
 template <typename T>
@@ -167,7 +169,6 @@ SmartPointer<T> & SmartPointer<T>::operator = (T *tt)
     tt->subscribe();
   return *this;
 };
-
 
 
 template <typename T>
@@ -188,14 +189,12 @@ SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt)
 };
 
 
-
 template <typename T>
 inline
 SmartPointer<T>::operator T* () const
 {
   return t;
 };
-
 
 
 template <typename T>
@@ -206,7 +205,6 @@ T & SmartPointer<T>::operator * () const
 };
 
 
-
 template <typename T>
 inline
 T * SmartPointer<T>::operator -> () const
@@ -215,10 +213,4 @@ T * SmartPointer<T>::operator -> () const
 };
 
 
-
-
-
-/*----------------------------   smartpointer.h     ---------------------------*/
-/* end of #ifndef __smartpointer_H */
 #endif
-/*----------------------------   smartpointer.h     ---------------------------*/

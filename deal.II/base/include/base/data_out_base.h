@@ -1,8 +1,17 @@
-/*----------------------------   data_out_base.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __data_out_base_H
-#define __data_out_base_H
-/*----------------------------   data_out_base.h     ---------------------------*/
+//----------------------------  data_out_base.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  data_out_base.h  ---------------------------
+#ifndef __deal2__data_out_base_h
+#define __deal2__data_out_base_h
 
 
 #include <base/forward_declarations.h>
@@ -12,10 +21,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
-
-
-
 
 
 /**
@@ -403,7 +408,7 @@ class DataOutBase
     };
 
 
-				     /**
+/**
 				      * Flags describing the details of
 				      * output in UCD format.
 				      */
@@ -546,8 +551,8 @@ class DataOutBase
 	void parse_parameters (ParameterHandler &prm);
     };
 
-    
-    				     /**
+
+/**
 				      * Flags describing the details of
 				      * output in encapsulated postscript
 				      * format.
@@ -755,7 +760,7 @@ class DataOutBase
 	ColorFunction color_function;
 
 
-					 /**
+/**
 					  * Default colorization function. This
 					  * one does what one usually wants:
 					  * It shifts colors from black (lowest
@@ -926,8 +931,8 @@ class DataOutBase
 			   const GmvFlags            &flags,
 			   ostream                   &out);
 
-    
-				     /**
+
+/**
 				      * Exception
 				      */
     DeclException2 (ExcUnexpectedNumberOfDatasets,
@@ -1008,10 +1013,6 @@ class DataOutBase
     };
 
 };
-
-	
-
-
 
 
 /**
@@ -1220,8 +1221,8 @@ class DataOutInterface : private DataOutBase
 				      */
     void set_flags (const GmvFlags &gmv_flags);
 
-    
-				     /**
+
+/**
 				      * Provide a function which tells us which
 				      * suffix with a given output format
 				      * usually has. At present the following
@@ -1385,9 +1386,4 @@ class DataOutInterface : private DataOutBase
 };
 
 
-
-
-/*----------------------------   data_out_base.h     ---------------------------*/
-/* end of #ifndef __data_out_base_H */
 #endif
-/*----------------------------   data_out_base.h     ---------------------------*/

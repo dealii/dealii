@@ -1,9 +1,17 @@
-/*----------------------------   table_handler.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __table_handler_H
-#define __table_handler_H
-/*----------------------------   table_handler.h     ---------------------------*/
-
+//----------------------------  table_handler.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  table_handler.h  ---------------------------
+#ifndef __deal2__table_handler_h
+#define __deal2__table_handler_h
 
 
 #include <base/exceptions.h>
@@ -14,7 +22,6 @@
 #include <iostream>
 
 #include <fstream>
-
 
 
 /**
@@ -94,8 +101,6 @@ class TableEntry : public TableEntryBase
 				      */
     const value_type val;
 };
-
-
 
 
 /**
@@ -451,10 +456,4 @@ class TableHandler
 };
 
 
-
-
-
-/*----------------------------   table_handler.h     ---------------------------*/
-/* end of #ifndef __table_handler_H */
 #endif
-/*----------------------------   table_handler.h     ---------------------------*/

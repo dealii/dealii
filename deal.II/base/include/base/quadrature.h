@@ -1,14 +1,21 @@
-/*----------------------------   quadrature.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __quadrature_H
-#define __quadrature_H
-/*----------------------------   quadrature.h     ---------------------------*/
+//----------------------------  quadrature.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  quadrature.h  ---------------------------
+#ifndef __deal2__quadrature_h
+#define __deal2__quadrature_h
 
 
 #include <base/point.h>
 #include <vector>
-
 
 
 /**
@@ -142,7 +149,6 @@ class Quadrature
 };
 
 
-
 /**
  * Quadrature formula constructed by iteration of another quadrature formula in
  * each direction. In more than one space dimension, the resulting quadrature
@@ -198,8 +204,6 @@ class QIterated : public Quadrature<dim>
 				      */
     static bool uses_both_endpoints (const Quadrature<1> &base_quadrature);
 };
-
-
 
 
 /**
@@ -266,10 +270,4 @@ class QProjector {
 };
 
 
-
-
-
-/*----------------------------   quadrature.h     ---------------------------*/
-/* end of #ifndef __quadrature_H */
 #endif
-/*----------------------------   quadrature.h     ---------------------------*/

@@ -1,10 +1,17 @@
-/*---------------------------- functiontime.h ---------------------------*/
-/*      $Id$ */
-/*      Copyright W. Bangerth, Guido Kanschat
- * University of Heidelberg, 1998, 1999 */
-#ifndef __functiontime_H
-#define __functiontime_H
-/*---------------------------- functiontime.h ---------------------------*/
+//----------------------------  function_time.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  function_time.h  ---------------------------
+#ifndef __deal2__function_time_h
+#define __deal2__function_time_h
 
 
 #include <base/exceptions.h>
@@ -96,7 +103,5 @@ FunctionTime::get_time () const
   return time;
 };
 
-/*---------------------------- functiontime.h ---------------------------*/
-/* end of #ifndef __functiontime_H */
 #endif
-/*---------------------------- functiontime.h ---------------------------*/
+

@@ -1,9 +1,17 @@
-/*----------------------------   tensorfunction.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright G. Kanschat, University of Heidelberg, 1999 */
-#ifndef __tensorfunction_H
-#define __tensorfunction_H
-/*----------------------------   tensorfunction.h     ---------------------------*/
+//----------------------------  tensor_function.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tensor_function.h  ---------------------------
+#ifndef __deal2__tensor_function_h
+#define __deal2__tensor_function_h
 
 
 #include <base/exceptions.h>
@@ -14,8 +22,6 @@
 #include <base/point.h>
 #include <base/function_time.h>
 #include <base/forward_declarations.h>
-
-
 
 
 /**
@@ -104,11 +110,5 @@ class TensorFunction : public FunctionTime,
 };
 
 
-
-
-
-
-/*---------------------------- tensorfunction.h ---------------------------*/
-/* end of #ifndef __tensorfunction_H */
 #endif
-/*---------------------------- tensorfunction.h ---------------------------*/
+

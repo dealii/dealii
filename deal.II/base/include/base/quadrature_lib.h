@@ -1,9 +1,17 @@
-/*----------------------------   quadrature_lib.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __quadrature_lib_H
-#define __quadrature_lib_H
-/*----------------------------   quadrature_lib.h     ---------------------------*/
+//----------------------------  quadrature_lib.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  quadrature_lib.h  ---------------------------
+#ifndef __deal2__quadrature_lib_h
+#define __deal2__quadrature_lib_h
 
 
 #include <base/quadrature.h>
@@ -24,7 +32,6 @@ class QGauss2 : public Quadrature<dim>
 };
 
 
-
 /**
  *  3-Point-Gauss quadrature formula, exact for polynomials of degree 5.
  *
@@ -38,7 +45,6 @@ class QGauss3 : public Quadrature<dim>
   public:
     QGauss3 ();
 };
-
 
 
 /**
@@ -56,8 +62,6 @@ class QGauss4 : public Quadrature<dim>
 };
 
 
-
-
 /**
  *  5-Point-Gauss quadrature formula, exact for polynomials of degree 9.
  *
@@ -71,7 +75,6 @@ class QGauss5 : public Quadrature<dim>
   public:
     QGauss5 ();
 };
-
 
 
 /**
@@ -94,7 +97,6 @@ class QGauss6 : public Quadrature<dim>
 };
 
 
-
 /**
  *  7-Point-Gauss quadrature formula, exact for polynomials of degree 13.
  *  I have not found explicite
@@ -113,7 +115,6 @@ class QGauss7 : public Quadrature<dim>
   public:
     QGauss7 ();
 };
-
 
 
 /**
@@ -136,9 +137,6 @@ class QGauss8 : public Quadrature<dim>
 };
 
 
-
-
-
 /**
  * Midpoint quadrature rule, exact for linear polynomials.
  */
@@ -148,7 +146,6 @@ class QMidpoint : public Quadrature<dim>
   public:
     QMidpoint ();
 };
-
 
 
 /**
@@ -162,7 +159,6 @@ class QSimpson : public Quadrature<dim>
 };
 
 
-
 /**
  * Trapezoidal quadrature rule, exact for linear polynomials.
  */
@@ -174,8 +170,4 @@ class QTrapez : public Quadrature<dim>
 };
 
 
-
-/*----------------------------   quadrature_lib.h     ---------------------------*/
-/* end of #ifndef __quadrature_lib_H */
 #endif
-/*----------------------------   quadrature_lib.h     ---------------------------*/

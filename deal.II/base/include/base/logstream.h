@@ -1,8 +1,17 @@
-/*----------------------------   logstream.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __logstream_H
-#define __logstream_H
-/*----------------------------   logstream.h     ---------------------------*/
+//----------------------------  logstream.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  logstream.h  ---------------------------
+#ifndef __deal2__logstream_h
+#define __deal2__logstream_h
 
 
 #include <base/exceptions.h>
@@ -10,8 +19,6 @@
 #include <string>
 #include <stack>
 #include <iostream>
-
-
 
 
 /**
@@ -225,8 +232,6 @@ private:
 };
 
 
-
-
 /* ----------------------------- Inline functions and templates ---------------- */
 
 
@@ -256,8 +261,6 @@ LogStream::operator<< (const T& t)
 
   return *this;
 }
-
-
 
 
 /**
@@ -290,10 +293,5 @@ inline void endl(LogStream& s)
 extern LogStream deallog;
 
 
-
-
-/*----------------------------   logstream.h     ---------------------------*/
-/* end of #ifndef __logstream_H */
 #endif
-/*----------------------------   logstream.h     ---------------------------*/
 

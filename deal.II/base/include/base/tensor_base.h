@@ -1,8 +1,17 @@
-/*----------------------------   tensor_base.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __tensor_base_H
-#define __tensor_base_H
-/*----------------------------   tensor_base.h     ---------------------------*/
+//----------------------------  tensor_base.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tensor_base.h  ---------------------------
+#ifndef __deal2__tensor_base_h
+#define __deal2__tensor_base_h
 
 
 // single this file out from tensor.h, since we want to derive Point<dim>
@@ -15,7 +24,6 @@
 #include <vector>
 
 template <typename number> class Vector;
-
 
 
 // general template; specialized for rank==1; the general template is in
@@ -239,7 +247,7 @@ DeclException1 (ExcDimTooSmall,
 		<< "Given dimensions must be >= 1, but was " << arg1);
 
 
-				 /**
+/**
 				  *  Prints the values of this point in the
 				  *  form #x1 x2 x3 etc#.
 				  */
@@ -247,15 +255,10 @@ template <int dim>
 ostream & operator << (ostream &out, const Tensor<1,dim> &p);
 
 
-
-
-
-
 /*------------------------------- Inline functions: Tensor ---------------------------*/
 // in the following, declarations of operators look rather weird because they are
 // split over several lines. this is necessary, however, because otherwise doc++
 // gets really confused about this all... :-(
-
 
 
 template <int dim>
@@ -270,7 +273,6 @@ Tensor<1,dim>::Tensor (const bool initialize)
 };
 
 
-
 template <int dim>
 inline
 Tensor<1,dim>::Tensor (const array_type &initializer)
@@ -278,7 +280,6 @@ Tensor<1,dim>::Tensor (const array_type &initializer)
   for (unsigned int i=0; i<dim; ++i)
     values[i] = initializer[i];
 };
-
 
 
 template <int dim>
@@ -290,7 +291,6 @@ Tensor<1,dim>::Tensor (const Tensor<1,dim> &p)
 };
 
 
-
 template <int dim>
 inline
 double Tensor<1,dim>::operator [] (const unsigned int index) const
@@ -300,7 +300,6 @@ double Tensor<1,dim>::operator [] (const unsigned int index) const
 };
 
 
-
 template <int dim>
 inline
 double & Tensor<1,dim>::operator [] (const unsigned int index)
@@ -308,7 +307,6 @@ double & Tensor<1,dim>::operator [] (const unsigned int index)
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
-
 
 
 template <int dim>
@@ -321,7 +319,6 @@ Tensor<1,dim> & Tensor<1,dim>::operator = (const Tensor<1,dim> &p)
 };
 
 
-
 template <int dim>
 inline
 bool Tensor<1,dim>::operator == (const Tensor<1,dim> &p) const
@@ -332,14 +329,12 @@ bool Tensor<1,dim>::operator == (const Tensor<1,dim> &p) const
 };
 
 
-
 template <int dim>
 inline
 bool Tensor<1,dim>::operator != (const Tensor<1,dim> &p) const
 {
   return !((*this) == p);
 };
-
 
 
 template <int dim>
@@ -352,7 +347,6 @@ Tensor<1,dim> & Tensor<1,dim>::operator += (const Tensor<1,dim> &p)
 };
 
 
-
 template <int dim>
 inline
 Tensor<1,dim> & Tensor<1,dim>::operator -= (const Tensor<1,dim> &p)
@@ -361,7 +355,6 @@ Tensor<1,dim> & Tensor<1,dim>::operator -= (const Tensor<1,dim> &p)
     values[i] -= p.values[i];
   return *this;
 };
-
 
 
 template <int dim>
@@ -374,7 +367,6 @@ Tensor<1,dim> & Tensor<1,dim>::operator *= (const double &s)
 };
 
 
-
 template <int dim>
 inline
 Tensor<1,dim> & Tensor<1,dim>::operator /= (const double &s)
@@ -383,7 +375,6 @@ Tensor<1,dim> & Tensor<1,dim>::operator /= (const double &s)
     values[i] /= s;
   return *this;
 };
-
 
 
 template <int dim>
@@ -397,14 +388,12 @@ double Tensor<1,dim>::operator * (const Tensor<1,dim> &p) const
 };
 
 
-
 template <int dim>
 inline
 Tensor<1,dim> Tensor<1,dim>::operator + (const Tensor<1,dim> &p) const
 {
   return (Tensor<1,dim>(*this) += p);
 };
-
 
 
 template <int dim>
@@ -415,7 +404,6 @@ Tensor<1,dim> Tensor<1,dim>::operator - (const Tensor<1,dim> &p) const
 };
 
 
-
 template <int dim>
 inline
 void Tensor<1,dim>::clear ()
@@ -423,10 +411,6 @@ void Tensor<1,dim>::clear ()
   for (unsigned int i=0; i<dim; ++i)
     values[i] = 0;
 };
-
-
-
-
 
 
 template <int dim>
@@ -449,13 +433,6 @@ ostream & operator << (ostream &out, const Tensor<1,1> &p)
 
   return out;
 };
-  
 
 
-
-
-
-/*----------------------------   tensor_base.h     ---------------------------*/
-/* end of #ifndef __tensor_base_H */
 #endif
-/*----------------------------   tensor_base.h     ---------------------------*/

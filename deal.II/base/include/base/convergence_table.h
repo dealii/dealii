@@ -1,8 +1,17 @@
-/*----------------------------   convergence_table.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __convergence_table_H
-#define __convergence_table_H
-/*----------------------------   convergence_table.h     ---------------------------*/
+//----------------------------  convergence_table.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  convergence_table.h  ---------------------------
+#ifndef __deal2__convergence_table_h
+#define __deal2__convergence_table_h
 
 
 #include <base/table_handler.h>
@@ -98,8 +107,8 @@ class ConvergenceTable: public TableHandler
 				     const string &reference_column_key,
 				     const RateMode rate_mode);
 
-   
-				     /**
+
+/**
 				      * Evaluates the convergence rates of the
 				      * data column #data_column_key# 
 				      * due to the #RateMode#.
@@ -200,11 +209,5 @@ class ConvergenceTable: public TableHandler
 		    << "Rate column <" << arg1 << "> does already exist.");
 };
 
-    
 
-
-
-/*----------------------------   convergence_table.h     ---------------------------*/
-/* end of #ifndef __convergence_table_H */
 #endif
-/*----------------------------   convergence_table.h     ---------------------------*/

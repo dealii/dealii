@@ -1,9 +1,17 @@
-/*----------------------------   function.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __function_H
-#define __function_H
-/*----------------------------   function.h     ---------------------------*/
+//----------------------------  function.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  function.h  ---------------------------
+#ifndef __deal2__function_h
+#define __deal2__function_h
 
 
 #include <base/forward_declarations.h>
@@ -11,7 +19,6 @@
 #include <base/function_time.h>
 #include <base/subscriptor.h>
 #include <vector>
-
 
 
 /**
@@ -264,8 +271,6 @@ class Function : public FunctionTime,
 };
 
 
-
-
 /**
  * Provide a function which always returns zero. Obviously, also the
  * derivates of this function are zero. Also, it returns zero on all
@@ -382,9 +387,6 @@ class ZeroFunction : public Function<dim> {
 };
 
 
-
-
-
 /**
  * Provide a function which always returns a constant value, which is
  * delivered upon construction. Obviously, the derivates of this
@@ -472,9 +474,4 @@ class ConstantFunction : public ZeroFunction<dim> {
 };
 
 
-
-
-/*----------------------------   function.h     ---------------------------*/
-/* end of #ifndef __function_H */
 #endif
-/*----------------------------   function.h     ---------------------------*/

@@ -1,8 +1,17 @@
-/*----------------------------   tensor.h     ---------------------------*/
-/*      $Id$ */
-#ifndef __tensor_H
-#define __tensor_H
-/*----------------------------   tensor.h     ---------------------------*/
+//----------------------------  tensor.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tensor.h  ---------------------------
+#ifndef __deal2__tensor_h
+#define __deal2__tensor_h
 
 
 #include <base/tensor_base.h>
@@ -141,9 +150,9 @@ class Tensor
 				      * index of the tensor marches fastest.
 				      */
     void unroll(Vector<double> & result) const;
-    
 
-				     /**
+
+/**
 				      * Reset all values to zero.
 				      */
     void clear ();
@@ -181,8 +190,6 @@ class Tensor
 };
 
 
-
-
 /*--------------------------- Inline functions -----------------------------*/
 // in the following, declarations of operators look rather weird because they are
 // split over several lines. this is necessary, however, because otherwise doc++
@@ -199,7 +206,6 @@ Tensor<rank_,dim>::Tensor ()
 };
 
 
-
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim>::Tensor (const array_type &initializer)
@@ -207,8 +213,6 @@ Tensor<rank_,dim>::Tensor (const array_type &initializer)
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] =  Tensor<rank_-1,dim>(initializer[i]);
 };
-
-      
 
 
 template <int rank_, int dim>
@@ -222,7 +226,6 @@ Tensor<rank_,dim>::operator[] (const unsigned int i)
 };
 
 
-
 template <int rank_, int dim>
 inline
 const Tensor<rank_-1,dim> &
@@ -232,7 +235,6 @@ Tensor<rank_,dim>::operator[] (const unsigned int i) const
   
   return subtensor[i];
 };
-
 
 
 template <int rank_, int dim>
@@ -246,7 +248,6 @@ Tensor<rank_,dim>::operator = (const Tensor<rank_,dim> &t)
 };
 
 
-
 template <int rank_, int dim>
 inline
 bool
@@ -258,7 +259,6 @@ Tensor<rank_,dim>::operator == (const Tensor<rank_,dim> &p) const
 };
 
 
-
 template <int rank_, int dim>
 inline
 bool
@@ -266,7 +266,6 @@ Tensor<rank_,dim>::operator != (const Tensor<rank_,dim> &p) const
 {
   return !((*this) == p);
 };
-
 
 
 template <int rank_, int dim>
@@ -280,7 +279,6 @@ Tensor<rank_,dim>::operator += (const Tensor<rank_,dim> &p)
 };
 
 
-
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
@@ -290,7 +288,6 @@ Tensor<rank_,dim>::operator -= (const Tensor<rank_,dim> &p)
     subtensor[i] -= p.subtensor[i];
   return *this;
 };
-
 
 
 template <int rank_, int dim>
@@ -304,7 +301,6 @@ Tensor<rank_,dim>::operator *= (const double &s)
 };
 
 
-
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
@@ -314,7 +310,6 @@ Tensor<rank_,dim>::operator /= (const double &s)
     subtensor[i] /= s;
   return *this;
 };
-
 
 
 template <int rank_, int dim>
@@ -331,7 +326,6 @@ Tensor<rank_,dim>::operator + (const Tensor<rank_,dim> &t) const
 };
 
 
-
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim>
@@ -346,7 +340,6 @@ Tensor<rank_,dim>::operator - (const Tensor<rank_,dim> &t) const
 };
 
 
-
 template <int rank_, int dim>
 inline
 void Tensor<rank_,dim>::clear ()
@@ -356,11 +349,7 @@ void Tensor<rank_,dim>::clear ()
 };
 
 
-
-
-
 /* ----------------- Non-member functions operating on tensors. ------------ */
-
 
 
 /*  Exception class. This is certainly not the best possible place for its
@@ -371,7 +360,6 @@ void Tensor<rank_,dim>::clear ()
 DeclException1 (ExcInvalidTensorIndex,
 		int,
 		<< "Invalid tensor index " << arg1);
-
 
 
 template <int dim>
@@ -386,7 +374,6 @@ void contract (Tensor<1,dim>       &dest,
 };
 
 
-
 template <int dim>
 inline
 void contract (Tensor<2,dim>       &dest,
@@ -398,7 +385,6 @@ void contract (Tensor<2,dim>       &dest,
       for (unsigned int k=0; k<dim; ++k)
 	dest[i][j] += src1[i][k] * src2[k][j];
 };
-
 
 
 template <int dim>
@@ -457,7 +443,6 @@ void contract (Tensor<2,dim>       &dest,
 };
 
 
-
 template <int dim>
 inline
 void contract (Tensor<2,dim>       &dest,
@@ -494,7 +479,6 @@ void contract (Tensor<2,dim>       &dest,
 };
 
 
-
 template <int dim>
 inline
 void contract (Tensor<3,dim>       &dest,
@@ -507,7 +491,6 @@ void contract (Tensor<3,dim>       &dest,
 	for (unsigned int l=0; l<dim; ++l)
 	  dest[i][j][k] += src1[i][j][l] * src2[l][k];
 };
-
 
 
 template <int dim>
@@ -524,7 +507,6 @@ void contract (Tensor<3,dim>       &dest,
 };
 
 
-
 template <int dim>
 inline
 void contract (Tensor<4,dim>       &dest,
@@ -538,7 +520,6 @@ void contract (Tensor<4,dim>       &dest,
 	  for (unsigned int m=0; m<dim; ++m)
 	    dest[i][j][k][l] += src1[i][j][m] * src2[m][k][l];
 };
-
 
 
 template <int rank>
@@ -557,14 +538,11 @@ double determinant (const Tensor<1,1> &t) {
 };
 
 
-
-
 inline
 double determinant (const Tensor<2,2> &t) {
   return ((t[0][0] * t[1][1]) -
 	  (t[1][0] * t[0][1]));
 };
-
 
 
 inline
@@ -583,12 +561,5 @@ double determinant (const Tensor<2,3> &t) {
 	   -t[2][0]*t[0][2]*t[1][1] );
 };
 
-    
-    
 
-
-
-/*----------------------------   tensor.h     ---------------------------*/
-/* end of #ifndef __tensor_H */
 #endif
-/*----------------------------   tensor.h     ---------------------------*/

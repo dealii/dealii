@@ -1,9 +1,17 @@
-/*----------------------------   point.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __point_H
-#define __point_H
-/*----------------------------   point.h     ---------------------------*/
+//----------------------------  point.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  point.h  ---------------------------
+#ifndef __deal2__point_h
+#define __deal2__point_h
 
 
 #include <base/exceptions.h>
@@ -128,7 +136,7 @@ class Point : public Tensor<1,dim> {
     double              square () const;
 
 
-				     /**
+/**
 				      *  Exception
 				      */
     DeclException1 (ExcDimTooSmall,
@@ -141,13 +149,7 @@ class Point : public Tensor<1,dim> {
 };
 
 
-
-
-
-
-
 /*------------------------------- Inline functions: Point ---------------------------*/
-
 
 
 template <int dim>
@@ -162,13 +164,11 @@ Point<dim>::Point (const Tensor<1,dim> &t) :
 		Tensor<1,dim>(t) {};
 
 
-
 template <>
 inline
 Point<1>::Point (const double x) {
   values[0] = x;
 };
-
 
 
 template <>
@@ -178,13 +178,11 @@ Point<1>::Point (const double, const double) {
 };
 
 
-
 template <>
 inline
 Point<1>::Point (const double, const double, const double) {
   Assert (false, ExcInvalidConstructorCalled());
 };
-
 
 
 template <>
@@ -195,7 +193,6 @@ Point<2>::Point (const double x, const double y) {
 };
 
 
-
 template <>
 inline
 Point<2>::Point (const double, const double, const double) {
@@ -203,13 +200,11 @@ Point<2>::Point (const double, const double, const double) {
 };
 
 
-
 template <>
 inline
 Point<3>::Point (const double, const double) {
   Assert (false, ExcInvalidConstructorCalled());
 };
-
 
 
 template <>
@@ -221,7 +216,6 @@ Point<3>::Point (const double x, const double y, const double z) {
 };
 
 
-
 template <>
 inline
 Point<4>::Point (const double, const double) {
@@ -229,13 +223,11 @@ Point<4>::Point (const double, const double) {
 };
 
 
-
 template <>
 inline
 Point<4>::Point (const double, const double, const double) {
   Assert (false, ExcInvalidConstructorCalled());
 };
-
 
 
 template <int dim>
@@ -246,14 +238,12 @@ double Point<dim>::operator () (const unsigned int index) const {
 };
 
 
-
 template <int dim>
 inline
 double & Point<dim>::operator () (const unsigned int index) {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
-
 
 
 template <int dim>
@@ -263,7 +253,6 @@ Point<dim> Point<dim>::operator + (const Point<dim> &p) const {
 };
 
 
-
 template <int dim>
 inline
 Point<dim> Point<dim>::operator - (const Point<dim> &p) const {
@@ -271,13 +260,11 @@ Point<dim> Point<dim>::operator - (const Point<dim> &p) const {
 };
 
 
-
 template <int dim>
 inline
 Point<dim> Point<dim>::operator * (const double factor) const {
   return (Point<dim>(*this) *= factor);
 };
-
 
 
 template <int dim>
@@ -288,13 +275,11 @@ double Point<dim>::operator * (const Point<dim> &p) const {
 };
 
 
-
 template <int dim>
 inline
 Point<dim> operator * (const double factor, const Point<dim> &p) {
   return p*factor;
 };
-
 
 
 template <int dim>
@@ -304,7 +289,6 @@ Point<dim> Point<dim>::operator / (const double factor) const {
 };
 
 
-  
 template <int dim>
 inline
 double Point<dim>::square () const {
@@ -315,10 +299,4 @@ double Point<dim>::square () const {
 };
 
 
-
-
-
-/*----------------------------   point.h     ---------------------------*/
-/* end of #ifndef __point_H */
 #endif
-/*----------------------------   point.h     ---------------------------*/

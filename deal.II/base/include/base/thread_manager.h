@@ -1,8 +1,17 @@
-/*----------------------------   thread_manager.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __thread_manager_H
-#define __thread_manager_H
-/*----------------------------   thread_manager.h     ---------------------------*/
+//----------------------------  thread_manager.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  thread_manager.h  ---------------------------
+#ifndef __deal2__thread_manager_h
+#define __deal2__thread_manager_h
 
 
 #ifdef DEAL_II_USE_MT
@@ -341,8 +350,8 @@ class ThreadManager : public ACE_Thread_Manager
 			void_mem_fun (void_mem_fun) {};
     };
 
-    
-				     /**
+
+/**
 				      * This class is used to package all
 				      * data needed to call a specific unary
 				      * member function of an object. It is
@@ -486,7 +495,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-				     /**
+/**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific ternary member
@@ -534,9 +543,9 @@ class ThreadManager : public ACE_Thread_Manager
 			mem_fun (0),
 			void_mem_fun (void_mem_fun) {};
     };
-    
 
-				     /**
+
+/**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific quaternary member
@@ -653,8 +662,8 @@ class ThreadManager : public ACE_Thread_Manager
 			void_mem_fun (void_mem_fun) {};
     };
 
-    
-				     /**
+
+/**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific hexary member
@@ -825,7 +834,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-				     /**
+/**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific nonary member
@@ -883,7 +892,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-    				     /**
+/**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific decary member
@@ -942,11 +951,9 @@ class ThreadManager : public ACE_Thread_Manager
 			arg10 (arg10),
 			mem_fun (mem_fun) {};
     };
-    
 
-    
-    
-    				     /**
+
+/**
 				      * This class is used to package
 				      * all data needed to call a
 				      * global function. See the
@@ -979,7 +986,7 @@ class ThreadManager : public ACE_Thread_Manager
       };
 
 
-    				     /**
+/**
 				      * This class is used to package
 				      * all data needed to call a
 				      * global function. See the
@@ -1403,7 +1410,7 @@ class ThreadManager : public ACE_Thread_Manager
       };
 
 
-				     /**
+/**
 				      * Wrapper function to allow spawning
 				      * threads for member functions as well,
 				      * rather than for global functions only.
@@ -1601,8 +1608,7 @@ class ThreadManager : public ACE_Thread_Manager
 	       size_t stack_size = 0);
 
 
-    
-				     /**
+/**
 				      * Wrapper function to allow spawning
 				      * threads for member functions as well,
 				      * rather than for global functions only.
@@ -1626,8 +1632,7 @@ class ThreadManager : public ACE_Thread_Manager
 	       size_t stack_size = 0);
 
 
-
-    				     /**
+/**
 				      * Wrapper function to allow spawning
 				      * threads for funtions.
 				      *
@@ -2280,13 +2285,12 @@ class ThreadManager : public ACE_Thread_Manager
 		 ACE_hthread_t thread_handles[] = 0,
 		 void *stack[] = 0,
 		 size_t stack_size[] = 0);
-    
-
-    
-  private:
 
 
-				     /**
+private:
+
+
+/**
 				      * This is a function satisfying the
 				      * requirements for thread entry points.
 				      * It takes as argument all the
@@ -2415,7 +2419,7 @@ class ThreadManager : public ACE_Thread_Manager
     static void * thread_entry_point10 (void *_arg);
 
 
-    				     /**
+/**
 				      * This is a function satisfying the
 				      * requirements for thread entry points.
 				      * It takes as argument all the
@@ -2538,7 +2542,6 @@ class ThreadManager : public ACE_Thread_Manager
 };
 
 
-
 /* ------------------------------ Template functions -------------------------------- */
 
 
@@ -2564,7 +2567,6 @@ int ThreadManager::spawn (Mem_Fun_Data0<ObjectClass> *mem_fun_data,
 };
 
 
-
 template <typename ObjectClass, typename Arg>
 int ThreadManager::spawn (Mem_Fun_Data1<ObjectClass,Arg> *mem_fun_data,
 			  long flags,
@@ -2585,7 +2587,6 @@ int ThreadManager::spawn (Mem_Fun_Data1<ObjectClass,Arg> *mem_fun_data,
 				    stack,
 				    stack_size);
 };
-
 
 
 template <typename ObjectClass, typename Arg1, typename Arg2>
@@ -2610,7 +2611,6 @@ int ThreadManager::spawn (Mem_Fun_Data2<ObjectClass,Arg1,Arg2> *mem_fun_data,
 };
 
 
-
 template <typename ObjectClass, typename Arg1, typename Arg2, typename Arg3>
 int ThreadManager::spawn (Mem_Fun_Data3<ObjectClass,Arg1,Arg2,Arg3> *mem_fun_data,
 			  long flags,
@@ -2631,7 +2631,6 @@ int ThreadManager::spawn (Mem_Fun_Data3<ObjectClass,Arg1,Arg2,Arg3> *mem_fun_dat
 				    stack,
 				    stack_size);
 };
-
 
 
 template <typename ObjectClass, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -2656,7 +2655,6 @@ int ThreadManager::spawn (Mem_Fun_Data4<ObjectClass,Arg1,Arg2,Arg3,Arg4> *mem_fu
 };
 
 
-
 template <typename ObjectClass, typename Arg1, typename Arg2,
                                 typename Arg3, typename Arg4,
                                 typename Arg5>
@@ -2679,7 +2677,6 @@ int ThreadManager::spawn (Mem_Fun_Data5<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5> *m
 				    stack,
 				    stack_size);
 };
-
 
 
 template <typename ObjectClass, typename Arg1, typename Arg2,
@@ -2733,7 +2730,6 @@ int ThreadManager::spawn (Mem_Fun_Data7<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
 };
 
 
-
 template <typename ObjectClass, typename Arg1, typename Arg2,
                                 typename Arg3, typename Arg4,
                                 typename Arg5, typename Arg6,
@@ -2759,7 +2755,6 @@ int ThreadManager::spawn (Mem_Fun_Data8<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
 				    stack,
 				    stack_size);
 };
-
 
 
 template <typename ObjectClass, typename Arg1, typename Arg2,
@@ -2788,7 +2783,6 @@ int ThreadManager::spawn (Mem_Fun_Data9<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
 				    stack,
 				    stack_size);
 };
-
 
 
 template <typename ObjectClass, typename Arg1, typename Arg2,
@@ -3046,9 +3040,6 @@ int ThreadManager::spawn (Fun_Data9<Arg1,Arg2,Arg3,Arg4,Arg5,
 };
 
 
-
-
-
 template <typename Arg1, typename Arg2,
                                 typename Arg3, typename Arg4,
                                 typename Arg5, typename Arg6,
@@ -3101,7 +3092,6 @@ int ThreadManager::spawn_n (size_t n,
 };
 
 
-
 template <typename ObjectClass, typename Arg>
 int ThreadManager::spawn_n (size_t n,
 			    Mem_Fun_Data1<ObjectClass,Arg> *mem_fun_data,
@@ -3124,7 +3114,6 @@ int ThreadManager::spawn_n (size_t n,
 				      stack,
 				      stack_size);
 };
-
 
 
 template <typename ObjectClass, typename Arg1, typename Arg2>
@@ -3151,7 +3140,6 @@ int ThreadManager::spawn_n (size_t n,
 };
 
 
-
 template <typename ObjectClass, typename Arg1, typename Arg2, typename Arg3>
 int ThreadManager::spawn_n (size_t n,
 			    Mem_Fun_Data3<ObjectClass,Arg1,Arg2,Arg3> *mem_fun_data,
@@ -3174,7 +3162,6 @@ int ThreadManager::spawn_n (size_t n,
 				      stack,
 				      stack_size);
 };
-
 
 
 template <typename ObjectClass, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -3201,7 +3188,6 @@ int ThreadManager::spawn_n (size_t n,
 };
 
 
-
 template <typename ObjectClass, typename Arg1, typename Arg2,
                                 typename Arg3, typename Arg4,
                                 typename Arg5>
@@ -3226,7 +3212,6 @@ int ThreadManager::spawn_n (size_t n,
 				      stack,
 				      stack_size);
 };
-
 
 
 template <typename ObjectClass, typename Arg1, typename Arg2,
@@ -3608,8 +3593,6 @@ int ThreadManager::spawn_n (size_t n,
 };
 
 
-
-
 template <typename Arg1, typename Arg2,
                                 typename Arg3, typename Arg4,
                                 typename Arg5, typename Arg6,
@@ -3662,7 +3645,6 @@ void * ThreadManager::thread_entry_point0 (void *_arg)
 };
 
 
-
 template <typename Class, typename Arg>
 void * ThreadManager::thread_entry_point1 (void *_arg)
 {
@@ -3683,7 +3665,6 @@ void * ThreadManager::thread_entry_point1 (void *_arg)
       return 0;
     };
 };
-
 
 
 template <typename Class, typename Arg1, typename Arg2>
@@ -3707,7 +3688,6 @@ void * ThreadManager::thread_entry_point2 (void *_arg)
       return 0;
     };
 };
-
 
 
 template <typename Class, typename Arg1, typename Arg2, typename Arg3>
@@ -3737,7 +3717,6 @@ void * ThreadManager::thread_entry_point3 (void *_arg)
 };
 
 
-
 template <typename Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 void * ThreadManager::thread_entry_point4 (void *_arg)
 {
@@ -3765,7 +3744,6 @@ void * ThreadManager::thread_entry_point4 (void *_arg)
       return 0;
     };
 };
-
 
 
 template <typename Class, typename Arg1, typename Arg2,
@@ -3801,7 +3779,6 @@ void * ThreadManager::thread_entry_point5 (void *_arg)
 };
 
 
-
 template <typename Class, typename Arg1, typename Arg2,
                           typename Arg3, typename Arg4,
                           typename Arg5, typename Arg6>
@@ -3835,7 +3812,6 @@ void * ThreadManager::thread_entry_point6 (void *_arg)
       return 0;
     };
 };
-
 
 
 template <typename Class, typename Arg1, typename Arg2,
@@ -3921,7 +3897,6 @@ void * ThreadManager::thread_entry_point9 (void *_arg)
 					arg->arg8,
 					arg->arg9);
 };
-
 
 
 template <typename Class, typename Arg1, typename Arg2,
@@ -4094,7 +4069,6 @@ void * ThreadManager::thread_entry_point_5 (void *_arg)
 };
 
 
-
 template <typename Arg1, typename Arg2,
                           typename Arg3, typename Arg4,
                           typename Arg5, typename Arg6>
@@ -4235,14 +4209,7 @@ void * ThreadManager::thread_entry_point_10 (void *_arg)
 };
 
 
-
 #endif
 
-/*----------------------------   thread_manager.h     ---------------------------*/
-/* end of #ifndef __thread_manager_H */
+
 #endif
-/*----------------------------   thread_manager.h     ---------------------------*/
-
-
-
-
