@@ -2038,7 +2038,7 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
 	    for (unsigned int point=0; point<n_q_points; ++point)
 	      local_integral[shape_func] += fe_face_values.shape_value(shape_func,point) *
 					    (EvaluateSeismicSignal<dim>
-					     ::weight(q_points[point], time)) *
+					     ::weight(q_points[point], this->time)) *
 					    fe_face_values.JxW(point);
 
 	  cell->get_dof_indices (cell_dof_indices);
@@ -2116,7 +2116,7 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
   j1.reinit (this->dof->n_dofs());
   j2.reinit (this->dof->n_dofs());
 
-  if ((time<=1.6) || (time>1.8))
+  if ((this->time<=1.6) || (this->time>1.8))
     return;
   
   typename DoFHandler<dim>::active_cell_iterator cell, endc;
@@ -2264,7 +2264,7 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
   j1.reinit (this->dof->n_dofs());
   j2.reinit (this->dof->n_dofs());
   
-  if ((this->time<=2.4-this->time_step) || (time>2.4))
+  if ((this->time<=2.4-this->time_step) || (this->time>2.4))
     return;
 
   typename DoFHandler<dim>::active_cell_iterator cell, endc;
@@ -2623,11 +2623,11 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 	  double local_integral = 0;
 	  for (unsigned int point=0; point<n_q_points; ++point)
 	    local_integral += face_u[point] *
-			      weight (q_points[point], time) *
+			      weight (q_points[point], this->time) *
 			      face_values.JxW(point);
 	  u_integrated += local_integral;
 
-	  out << time
+	  out << this->time
 	      << ' '
 	      << cell->face(face)->vertex(0)(0)
 	      << "  "
@@ -2688,7 +2688,7 @@ double EvaluateSplitSignal<1>::evaluate ()
 
 template <int dim>
 double EvaluateSplitSignal<dim>::evaluate () {
-  if ((time<=1.6) || (time>1.8))
+  if ((this->time<=1.6) || (this->time>1.8))
     return 0;
 
   const unsigned int n_q_points = this->quadrature_face->n_quadrature_points;
@@ -2926,10 +2926,10 @@ double EvaluateHuyghensWave<dim>::evaluate ()
 
   AssertThrow (point_found, ExcInternalError());
 
-  if ((time > 0.5) && (time < 0.69)) 
+  if ((this->time > 0.5) && (this->time < 0.69)) 
     {
       integrated_value += value_at_origin * this->time_step;
-      weighted_value += value_at_origin * this->time_step * time;
+      weighted_value += value_at_origin * this->time_step * this->time;
     };
   
   return value_at_origin;
@@ -3031,7 +3031,7 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
   if (sweep_no != parameters.number_of_sweeps-1)
     refine_grids ();
 
-  write_statistics (this->sweep_info);
+  write_statistics (sweep_info);
 
   end_sweep ();
   
@@ -3244,7 +3244,7 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
     {
       deallog << "    Writing summary.";
       
-      this->sweep_info.write_summary (parameters.eval_list,
+      sweep_info.write_summary (parameters.eval_list,
 				logfile);
       AssertThrow (logfile, ExcIO());
 
@@ -5205,7 +5205,7 @@ TimeStep_Dual<dim>::TimeStep_Dual (const std::string &dual_fe)
 template <int dim>
 void TimeStep_Dual<dim>::do_initial_step () {
   deallog << "  Dual problem: time="
-       << time
+       << this->time
        << ", step=" << this->timestep_no
        << ", sweep=" << this->sweep_no
        << ". "
@@ -5249,7 +5249,7 @@ template <int dim>
 void TimeStep_Dual<dim>::do_timestep ()
 {
   deallog << "  Dual problem: time="
-       << time
+       << this->time
        << ", step=" << this->timestep_no
        << ", sweep=" << this->sweep_no
        << ". "
@@ -6722,7 +6722,7 @@ template <int dim>
 void TimeStep_Postprocess<dim>::postprocess_timestep () 
 {
   deallog << "  Postprocessing: time="
-       << time
+       << this->time
        << ", step=" << timestep_no
        << ", sweep=" << sweep_no
        << ". ";
@@ -6754,10 +6754,6 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       typename DataOut<dim>::OutputFormat output_format
 	= DataOut<dim>::parse_output_format (parameters.output_format);
       
-      std::string data_filename	= (parameters.output_directory +
-				   "sweep" + int_to_string(sweep_no,2) +
-				   "/" + int_to_string(timestep_no,4) +
-				   out.default_suffix (output_format));
       out.attach_dof_handler (*get_timestep_primal().dof_handler);
       out.add_data_vector (get_timestep_primal().u, "u");
       out.add_data_vector (get_timestep_primal().v, "v");
@@ -6966,7 +6962,7 @@ template <int dim>
 void TimeStep_Primal<dim>::do_initial_step ()
 {
   deallog << "  Primal problem: time="
-       << time
+       << this->time
        << ", step=" << timestep_no
        << ", sweep=" << sweep_no
        << ". "
@@ -7002,7 +6998,7 @@ template <int dim>
 void TimeStep_Primal<dim>::do_timestep ()
 {
   deallog << "  Primal problem: time="
-       << time
+       << this->time
        << ", step=" << timestep_no
        << ", sweep=" << sweep_no
        << ". "
@@ -7415,7 +7411,7 @@ TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::ce
 					      Vector<double>        &right_hand_side2) {
   unsigned int level_difference = 1;  
   
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
   const double time_step = get_backward_timestep();
 
   FullMatrix<double>    cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -7437,9 +7433,9 @@ TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::ce
     {
       const typename DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
 
-      fe.prolongate(c).vmult (local_old_dof_values_u,
+      this->fe.prolongate(c).vmult (local_old_dof_values_u,
 			      old_dof_values_u);
-      fe.prolongate(c).vmult (local_old_dof_values_v,
+      this->fe.prolongate(c).vmult (local_old_dof_values_v,
 			      old_dof_values_v);
 
       if (new_child->has_children())
@@ -7456,7 +7452,7 @@ TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::ce
 	  fe_values.reinit (new_child);
 	  cell_matrix.clear ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
-	  parameters.density->value_list (fe_values.get_quadrature_points(),
+	  this->parameters.density->value_list (fe_values.get_quadrature_points(),
 					      density_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -7471,7 +7467,7 @@ TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::ce
 
 	  cell_matrix.clear ();
 	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
-	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
+	  this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 						stiffness_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -7485,11 +7481,11 @@ TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::ce
 	  rhs1 = local_M_u;
 	  rhs1.add (time_step, local_M_v);
 	  rhs1.add ((-time_step*time_step*
-		     parameters.theta*
-		     (1-parameters.theta)),
+		     this->parameters.theta*
+		     (1-this->parameters.theta)),
 		    local_A_u);
 	  rhs2 = local_M_v;
-	  rhs2.add (-(1-parameters.theta)*
+	  rhs2.add (-(1-this->parameters.theta)*
 		    time_step,
 		    local_A_u);
 	  
@@ -7536,27 +7532,27 @@ void UserMatrix::precondition (Vector<double> &dst,
 
 
 
-const FE_Q<2>   FEHelper<2>::fe_linear(1);
-const FE_Q<2>   FEHelper<2>::fe_quadratic_sub(2);
+template <> const FE_Q<2>   FEHelper<2>::fe_linear(1);
+template <> const FE_Q<2>   FEHelper<2>::fe_quadratic_sub(2);
 #if 2 < 3
-const FE_Q<2>   FEHelper<2>::fe_cubic_sub(3);
-const FE_Q<2>   FEHelper<2>::fe_quartic_sub(4);
+template <> const FE_Q<2>   FEHelper<2>::fe_cubic_sub(3);
+template <> const FE_Q<2>   FEHelper<2>::fe_quartic_sub(4);
 #endif
     
-const QGauss2<2> FEHelper<2>::q_gauss_2;
-const QGauss3<2> FEHelper<2>::q_gauss_3;
-const QGauss4<2> FEHelper<2>::q_gauss_4;
-const QGauss5<2> FEHelper<2>::q_gauss_5;
-const QGauss6<2> FEHelper<2>::q_gauss_6;
-const QGauss7<2> FEHelper<2>::q_gauss_7;
+template <> const QGauss2<2> FEHelper<2>::q_gauss_2;
+template <> const QGauss3<2> FEHelper<2>::q_gauss_3;
+template <> const QGauss4<2> FEHelper<2>::q_gauss_4;
+template <> const QGauss5<2> FEHelper<2>::q_gauss_5;
+template <> const QGauss6<2> FEHelper<2>::q_gauss_6;
+template <> const QGauss7<2> FEHelper<2>::q_gauss_7;
 
 #if 2 > 1
-const QGauss2<2-1> FEHelper<2>::q_gauss_2_face;
-const QGauss3<2-1> FEHelper<2>::q_gauss_3_face;
-const QGauss4<2-1> FEHelper<2>::q_gauss_4_face;
-const QGauss5<2-1> FEHelper<2>::q_gauss_5_face;
-const QGauss6<2-1> FEHelper<2>::q_gauss_6_face;
-const QGauss7<2-1> FEHelper<2>::q_gauss_7_face;
+template <> const QGauss2<2-1> FEHelper<2>::q_gauss_2_face;
+template <> const QGauss3<2-1> FEHelper<2>::q_gauss_3_face;
+template <> const QGauss4<2-1> FEHelper<2>::q_gauss_4_face;
+template <> const QGauss5<2-1> FEHelper<2>::q_gauss_5_face;
+template <> const QGauss6<2-1> FEHelper<2>::q_gauss_6_face;
+template <> const QGauss7<2-1> FEHelper<2>::q_gauss_7_face;
 #endif
 
 
