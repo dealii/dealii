@@ -182,7 +182,7 @@ template <typename T>
 SmartPointer<T>::SmartPointer (T *t) :
 		t (t)
 {
-  if (t)
+  if (t != 0)
     t->subscribe();
 };
 
@@ -192,7 +192,7 @@ template <typename T>
 SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt) :
 		t (tt.t)
 {
-  if (t)
+  if (t != 0)
     t->subscribe();
 };
 
@@ -201,7 +201,7 @@ SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt) :
 template <typename T>
 SmartPointer<T>::~SmartPointer ()
 {
-  if (t)
+  if (t != 0)
     t->unsubscribe();
 };
 
@@ -215,10 +215,10 @@ SmartPointer<T> & SmartPointer<T>::operator = (T *tt)
   if (t == tt)
     return *this;
   
-  if (t)
+  if (t != 0)
     t->unsubscribe();
   t = tt;
-  if (tt)
+  if (tt != 0)
     tt->subscribe();
   return *this;
 };
@@ -234,10 +234,10 @@ SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt)
   if (&tt == this)
     return *this;
   
-  if (t)
+  if (t != 0)
     t->unsubscribe();
   t = static_cast<T*>(tt);
-  if (tt)
+  if (tt != 0)
     tt->subscribe();
   return *this;
 };
@@ -284,9 +284,13 @@ template <typename T>
 inline
 void SmartPointer<T>::swap (T *&tt)
 {
-  t->unsubscribe ();
+  if (t != 0)
+    t->unsubscribe ();
+  
   std::swap (t, tt);
-  t->subscribe ();
+
+  if (t != 0)
+    t->subscribe ();
 };
 
 
