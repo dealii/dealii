@@ -161,9 +161,9 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
-  number2 s;
   if ((n()==3) && (m()==3))
   {
+    number2 s;
     number2 s0,s1,s2;
     s   = src(0);
     s0  = s*val[0]; s1  = s*val[3]; s2  = s*val[6]; 
@@ -187,6 +187,7 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
   }
   else if ((n()==4) && (m()==4))
   {
+    number2 s;
     number2 s0,s1,s2,s3;
     s = src(0);
     s0  = s*val[0]; s1  = s*val[4]; s2  = s*val[8];  s3  = s*val[12];
@@ -214,6 +215,7 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
   }
   else if ((n()==8) && (m()==8))
   {
+    number2 s;
     number2 s0,s1,s2,s3,s4,s5,s6,s7;
     s = src(0);
     s0 = s*val[0]; s1 = s*val[8]; s2 = s*val[16]; s3 = s*val[24];
@@ -268,16 +270,29 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
     number* e = val;
     const unsigned int size_m = m(),
 		       size_n = n();
-    for (unsigned int i=0; i<size_m; ++i)
-    {
-      s = 0.;
-      for (unsigned int j=0; j<size_n; ++j)
-	s += src(j) * *(e++);
-      if (!adding) dst(i) = s;
-      else dst(i) += s;
-    }
-  }
-}
+    if (!adding)
+      {
+	for (unsigned int i=0; i<size_m; ++i)
+	  {
+	    number2 s = 0.;
+	    for (unsigned int j=0; j<size_n; ++j)
+	      s += src(j) * *(e++);
+	    dst(i) = s;
+	  };
+      }
+    else
+      {
+	for (unsigned int i=0; i<size_m; ++i)
+	  {
+	    number2 s = 0.;
+	    for (unsigned int j=0; j<size_n; ++j)
+	      s += src(j) * *(e++);
+	    dst(i) += s;
+	  };
+      };
+  };
+};
+
 
 
 template <typename number>
@@ -291,18 +306,29 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
   Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
   Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
 
-  unsigned int i,j;
-  number2 s;
   const unsigned int size_m = m(),
 		     size_n = n();
-  for (i=0; i<size_n; ++i)
-  {
-    s = 0.;
-    for (j=0; j<size_m; ++j)
-      s += src(j) * el(j,i);
-    if(!adding) dst(i) = s;
-    else dst(i) += s;
-  }
+
+  if (!adding)
+    {
+      for (unsigned int i=0; i<size_n; ++i)
+	{
+	  number2 s = 0.;
+	  for (unsigned int j=0; j<size_m; ++j)
+	    s += src(j) * el(j,i);
+	  dst(i) = s;
+	};
+    }
+  else
+    {
+      for (unsigned int i=0; i<size_n; ++i)
+	{
+	  number2 s = 0.;
+	  for (unsigned int j=0; j<size_m; ++j)
+	    s += src(j) * el(j,i);
+	  dst(i) += s;
+	};
+    };
 }
 
 
