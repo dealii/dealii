@@ -639,7 +639,7 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast)
   if (n>maxdim)
     {
       if (val) delete[] val;
-      val = new Number[n];
+      val = new value_type[n];
       Assert (val != 0, ExcOutOfMemory());
       maxdim = n;
     };
