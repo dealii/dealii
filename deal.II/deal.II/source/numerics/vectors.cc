@@ -242,7 +242,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
       cell->get_dof_indices (dofs_on_cell);
 
 
-if (fe_is_system)
+      if (fe_is_system)
 	{
 					   // get function values at
 					   // these points. Here: get
@@ -408,7 +408,7 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
       };
 
 
-// set up mass matrix and right hand side
+				   // set up mass matrix and right hand side
   vec.reinit (dof.n_dofs());
   SparsityPattern sparsity(dof.n_dofs(),
 			   dof.n_dofs(),
@@ -502,8 +502,6 @@ VectorTools::interpolate_boundary_values (const DoFHandler<1>      &dof,
   const FiniteElement<1> &fe = dof.get_fe();
   Assert (fe.n_components() == boundary_function.n_components,
 	  ExcComponentMismatch());
-  Assert (fe.dofs_per_vertex == fe.n_components(),
-	  ExcComponentMismatch());
 
 				   // set the component mask to either
 				   // the original value or a vector
@@ -514,56 +512,51 @@ VectorTools::interpolate_boundary_values (const DoFHandler<1>      &dof,
   Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
   
-				   // check whether boundary values at the
-				   // left boundary of the line are requested
-  if (boundary_component == 0)
-    {
-				       // first find the leftmost active
-				       // cell by first traversing the coarse
-				       // grid to its left end and then going
-				       // to the children
-      DoFHandler<1>::cell_iterator leftmost_cell = dof.begin(0);
-      while (leftmost_cell->neighbor(0).state() == valid)
-	leftmost_cell = leftmost_cell->neighbor(0);
-
-      while (leftmost_cell->has_children())
-	leftmost_cell = leftmost_cell->child(0);
-
-				       // now set the value of the
-				       // leftmost degree of
-				       // freedom. setting also
-				       // created the entry in the map
-				       // if it did not exist
-				       // beforehand
-      for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-	if (component_mask[fe.face_system_to_component_index(i).first])
-	  boundary_values[leftmost_cell->vertex_dof_index(0,i)]
-	    = boundary_function.value(leftmost_cell->vertex(0), i);
-    };
-
-				   // same for the right boundary of
-				   // the line are requested
-  if (boundary_component == 1)
-    {
-				       // first find the leftmost active
-				       // cell by first traversing the coarse
-				       // grid to its left end and then going
-				       // to the children
-      DoFHandler<1>::cell_iterator rightmost_cell = dof.last(0);
-      while (rightmost_cell->neighbor(1).state() == valid)
-	rightmost_cell = rightmost_cell->neighbor(1);
-
-      while (rightmost_cell->has_children())
-	rightmost_cell = rightmost_cell->child(1);
-
-				       // now set the value of the rightmost
-				       // degree of freedom
-      for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-	if (component_mask[fe.face_system_to_component_index(i).first])
-	  boundary_values[rightmost_cell->vertex_dof_index(1,i)]
-	    = boundary_function.value(rightmost_cell->vertex(1), i);
-    };
+				   // check whether boundary values at
+				   // the left or right boundary of
+				   // the line are
+				   // requested. #direction# denotes
+				   // the neighboring direction in
+				   // which we seek the boundary,
+				   // i.e. 0 is left boundary and 1 is
+				   // right.
+  const unsigned int direction = boundary_component;
+  Assert (direction < 2, ExcInvalidBoundaryIndicator());
   
+				   // first find the outermost active
+				   // cell by first traversing the coarse
+				   // grid to its end and then going
+				   // to the children
+  DoFHandler<1>::cell_iterator outermost_cell = dof.begin(0);
+  while (outermost_cell->neighbor(direction).state() == valid)
+    outermost_cell = outermost_cell->neighbor(direction);
+  
+  while (outermost_cell->has_children())
+    outermost_cell = outermost_cell->child(direction);
+
+				   // now set the value of the
+				   // outermost degree of
+				   // freedom. setting also
+				   // creates the entry in the map
+				   // if it did not exist
+				   // beforehand
+				   //
+				   // save some time by requesting
+				   // values only once for each point,
+				   // irrespective of the number of
+				   // components of the function
+  Vector<double> function_values (fe.n_components());
+  if (fe.n_components() == 1)
+    function_values(0)
+      = boundary_function.value (outermost_cell->vertex(direction));
+  else
+    boundary_function.vector_value (outermost_cell->vertex(direction),
+				    function_values);
+  
+  for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
+    if (component_mask[fe.face_system_to_component_index(i).first])
+      boundary_values[outermost_cell->vertex_dof_index(direction,i)]
+	= function_values(fe.face_system_to_component_index(i).first);
 };
 
 
@@ -640,8 +633,8 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 					     // get only the one component that
 					     // this function has
 	    boundary_function.value_list (dof_locations,
-					      dof_values_scalar,
-					      0);
+					  dof_values_scalar,
+					  0);
 	    
 					     // enter into list
 	    
@@ -693,12 +686,12 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
     Assert (false, ExcNotImplemented());
 
 
-// make mass matrix and right hand side
+				   // make mass matrix and right hand side
   SparseMatrix<double> mass_matrix(sparsity);
   Vector<double>       rhs(sparsity.n_rows());
 
 
-MatrixTools<dim>::create_boundary_mass_matrix (dof, q, 
+  MatrixTools<dim>::create_boundary_mass_matrix (dof, q, 
 						 mass_matrix, boundary_functions,
 						 rhs, dof_to_boundary_mapping);
 
@@ -707,7 +700,7 @@ MatrixTools<dim>::create_boundary_mass_matrix (dof, q,
   Assert (dim<3, ExcNotImplemented());
 
 
-Vector<double> boundary_projection (rhs.size());
+  Vector<double> boundary_projection (rhs.size());
 
   SolverControl           control(1000, 1e-16);
   PrimitiveVectorMemory<> memory;
