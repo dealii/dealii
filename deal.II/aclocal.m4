@@ -1420,10 +1420,23 @@ dnl   template <typename T>  class C  {
 dnl       template <typename N> friend class C;
 dnl   };
 dnl };
-dnl /* ---------------------------------------------------------- */
+dnl /* ----------------------------------------------- */
 dnl
-dnl The compiler gets an internal error here. Since we need this
-dnl construct at verious places, we check for it and if the compiler
+dnl This is fixed with gcc at least in snapshots before version 3.1,
+dnl but the following bug remains:
+dnl
+dnl /* ----------------------------------------------- */
+dnl namespace NS {  template <typename number> class C;  };
+dnl
+dnl template <typename T> class X {
+dnl   template <typename N> friend class NS::C;
+dnl };
+dnl
+dnl template class X<int>;
+dnl /* ----------------------------------------------- */
+dnl
+dnl The compiler gets an internal error for these cases. Since we need this
+dnl construct at various places, we check for it and if the compiler
 dnl dies, we use a workaround that is non-ISO C++ but works for these
 dnl compilers.
 dnl
@@ -1442,6 +1455,14 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
 	      template <typename N> friend class C;
 	  };
 	};
+
+	namespace NS2 {  template <typename number> class C;  };
+
+	template <typename T> class X {
+	    template <typename N> friend class NS2::C;
+	};
+
+	template class X<int>;
     ],
     [],
     [
