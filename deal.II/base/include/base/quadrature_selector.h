@@ -18,6 +18,8 @@
 #include <base/quadrature.h>
 #include <base/exceptions.h>
 
+#include <string>
+
 
 /**
  * This class implements the quadrature rule passed to its constructor
@@ -31,7 +33,6 @@
  * 
  * @author Ralf Schulz, 2003
  */
-
 template<int dim>
 class QuadratureSelector : public Quadrature<dim>
 {
