@@ -519,10 +519,10 @@ class FEValuesBase
 				     /**
 				      * Exception
 				      */
-  DeclException0 (ExcWrongNoOfComponents);
-				   /**
-				    * Exception.
-				    */
+    DeclException0 (ExcWrongNoOfComponents);
+				     /**
+				      * Exception.
+				      */
     DeclException2 (ExcWrongVectorSize,
 		    int, int,
 		    << "Vector has wrong size " << arg1
