@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2002 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,14 +56,17 @@ check_vmult_quadratic(std::vector<double>& residuals,
   sor.initialize(A, 1.2);
   PreconditionSSOR<MATRIX> ssor;
   ssor.initialize(A, 1.2);
+
+  PreconditionBlock<MATRIX, float>::AdditionalData data(sqrt(A.n()+.3), 1.2);
+  
   PreconditionBlockJacobi<MATRIX, float> block_jacobi;
-  block_jacobi.initialize(A, (unsigned int) (sqrt(A.n()+.3)), 1.2);
+  block_jacobi.initialize(A, data);
   block_jacobi.invert_diagblocks();
   PreconditionBlockSSOR<MATRIX, float> block_ssor;
-  block_ssor.initialize(A, (unsigned int) (sqrt(A.n()+.3)), 1.2);
+  block_ssor.initialize(A, data);
   block_ssor.invert_diagblocks();
   PreconditionBlockSOR<MATRIX, float> block_sor;
-  block_sor.initialize(A, (unsigned int) (sqrt(A.n()+.3)), 1.2);
+  block_sor.initialize(A, data);
   block_sor.invert_diagblocks();
   
   u = 0.;
