@@ -3697,7 +3697,7 @@ class Coefficients {
 				 vector<double>            &values,
 				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
-		  ExcVectorHasWrongSize(values.size(), points.size()));
+		  ExcDimensionMismatch(values.size(), points.size()));
 	  for (unsigned int i=0; i<points.size(); ++i)
 	    values[i]  = this->Kink::value(points[i], 0);
 	};
@@ -3730,7 +3730,7 @@ class Gradient : public Function<dim> {
 				 vector<double>            &values,
 				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
-		  ExcVectorHasWrongSize(values.size(), points.size()));
+		  ExcDimensionMismatch(values.size(), points.size()));
 	  for (unsigned int i=0; i<points.size(); ++i)
 	    values[i]  = this->Gradient::value(points[i], 0);
 	};
@@ -3765,7 +3765,7 @@ class PreliminaryEarthModel : public Function<dim> {
 				 vector<double>            &values,
 				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
-		  ExcVectorHasWrongSize(values.size(), points.size()));
+		  ExcDimensionMismatch(values.size(), points.size()));
 	  for (unsigned int i=0; i<points.size(); ++i)
 	    values[i]  = this->PreliminaryEarthModel::value(points[i], 0);
 	};
@@ -3806,7 +3806,7 @@ class Distorted : public Function<dim> {
 				 vector<double>            &values,
 				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
-		  ExcVectorHasWrongSize(values.size(), points.size()));
+		  ExcDimensionMismatch(values.size(), points.size()));
 	  for (unsigned int i=0; i<points.size(); ++i)
 	    values[i]  = this->Distorted::value(points[i], 0);
 	};

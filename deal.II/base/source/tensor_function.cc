@@ -50,7 +50,7 @@ TensorFunction<rank, dim>::value_list (const vector<Point<dim> > &points,
 				       vector<Tensor<rank,dim> > &values) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     values[i]  = this->value (points[i]);
@@ -72,7 +72,7 @@ TensorFunction<rank, dim>::gradient_list (const vector<Point<dim> > &points,
 				    vector<Tensor<rank+1,dim> > &gradients) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+	  ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i] = gradient(points[i]);

@@ -57,7 +57,7 @@ void Function<dim>::value_list (const vector<Point<dim> > &points,
 				   // the valid range is up to the
 				   // derived class
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     values[i]  = this->value (points[i], component);
@@ -72,7 +72,7 @@ void Function<dim>::vector_value_list (const vector<Point<dim> > &points,
 				   // the valid range is up to the
 				   // derived class
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     this->vector_value (points[i], values[i]);
@@ -102,7 +102,7 @@ void Function<dim>::gradient_list (const vector<Point<dim> > &points,
 				   const unsigned int         component) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+	  ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i] = gradient(points[i], component);
@@ -114,12 +114,12 @@ void Function<dim>::vector_gradient_list (const vector<Point<dim> >       &point
 					  vector<vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+	  ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     {
       Assert (gradients[i].size() == n_components,
-	      ExcVectorHasWrongSize(gradients[i].size(), n_components));
+	      ExcDimensionMismatch(gradients[i].size(), n_components));
       for (unsigned int component=0; component<n_components; ++component)
 	gradients[i][component] = gradient(points[i], component);
     };
@@ -149,7 +149,7 @@ void ZeroFunction<dim>::vector_value (const Point<dim> &,
 				      Vector<double>   &return_value) const
 {
   Assert (return_value.size() == n_components,
-	  ExcVectorHasWrongSize (return_value.size(), n_components));
+	  ExcDimensionMismatch (return_value.size(), n_components));
 
   fill_n (return_value.begin(), n_components, 0.0);
 };
@@ -160,7 +160,7 @@ void ZeroFunction<dim>::value_list (const vector<Point<dim> > &points,
 				    vector<double>            &values,
 				    const unsigned int         /*component*/) const {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   fill_n (values.begin(), points.size(), 0.);
 };
@@ -171,12 +171,12 @@ void ZeroFunction<dim>::vector_value_list (const vector<Point<dim> > &points,
 					   vector<Vector<double> >   &values) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     {
       Assert (values[i].size() == n_components,
-	      ExcVectorHasWrongSize(values[i].size(), n_components));
+	      ExcDimensionMismatch(values[i].size(), n_components));
       fill_n (values[i].begin(), n_components, 0.);
     };
 };
@@ -195,7 +195,7 @@ void ZeroFunction<dim>::vector_gradient (const Point<dim>       &,
 					 vector<Tensor<1,dim> > &gradients) const
 {
   Assert (gradients.size() == n_components,
-	  ExcVectorHasWrongSize(gradients.size(), n_components));
+	  ExcDimensionMismatch(gradients.size(), n_components));
 
   for (unsigned int c=0; c<n_components; ++c)
     gradients[c].clear ();
@@ -208,7 +208,7 @@ void ZeroFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 				       const unsigned int         /*component*/) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+	  ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i].clear ();
@@ -220,11 +220,11 @@ void ZeroFunction<dim>::vector_gradient_list (const vector<Point<dim> >       &p
 					      vector<vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+	  ExcDimensionMismatch(gradients.size(), points.size()));
   for (unsigned int i=0; i<points.size(); ++i)
     {
       Assert (gradients[i].size() == n_components,
-	      ExcVectorHasWrongSize(gradients[i].size(), n_components));
+	      ExcDimensionMismatch(gradients[i].size(), n_components));
       for (unsigned int c=0; c<n_components; ++c)
 	gradients[i][c].clear ();
     };
@@ -255,7 +255,7 @@ void ConstantFunction<dim>::vector_value (const Point<dim> &,
 					  Vector<double>   &return_value) const
 {
   Assert (return_value.size() == n_components,
-	  ExcVectorHasWrongSize (return_value.size(), n_components));
+	  ExcDimensionMismatch (return_value.size(), n_components));
 
   fill_n (return_value.begin(), n_components, function_value);
 };
@@ -266,7 +266,7 @@ void ConstantFunction<dim>::value_list (const vector<Point<dim> > &points,
 					vector<double>            &values,
 					const unsigned int         /*component*/) const {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   fill_n (values.begin(), points.size(), function_value);
 };
@@ -277,12 +277,12 @@ void ConstantFunction<dim>::vector_value_list (const vector<Point<dim> > &points
 					       vector<Vector<double> >   &values) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     {
       Assert (values[i].size() == n_components,
-	      ExcVectorHasWrongSize(values[i].size(), n_components));
+	      ExcDimensionMismatch(values[i].size(), n_components));
       fill_n (values[i].begin(), n_components, function_value);
     };
 };
@@ -314,7 +314,7 @@ void Function<dim>::laplacian_list (const vector<Point<dim> > &points,
 				   // the valid range is up to the
 				   // derived class
   Assert (laplacians.size() == points.size(),
-	  ExcVectorHasWrongSize(laplacians.size(), points.size()));
+	  ExcDimensionMismatch(laplacians.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     laplacians[i]  = this->laplacian (points[i], component);
@@ -329,7 +329,7 @@ void Function<dim>::vector_laplacian_list (const vector<Point<dim> > &points,
 				   // the valid range is up to the
 				   // derived class
   Assert (laplacians.size() == points.size(),
-	  ExcVectorHasWrongSize(laplacians.size(), points.size()));
+	  ExcDimensionMismatch(laplacians.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     this->vector_laplacian (points[i], laplacians[i]);

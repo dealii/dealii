@@ -136,6 +136,7 @@ AC_ARG_ENABLE(multigrid,
     fi)
 if test $enablemultigrid = yes ; then
    AC_MSG_RESULT(Configuring multigrid)
+   AC_DEFINE(ENABLE_MULTIGRID)
 fi
 AC_SUBST(enablemultigrid)
 

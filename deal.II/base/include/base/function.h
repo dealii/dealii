@@ -255,25 +255,6 @@ class Function : public FunctionTime,
 				      */
     virtual void vector_laplacian_list (const vector<Point<dim> > &points,
 					vector<Vector<double> >   &values) const;
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcPureFunctionCalled);
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcVectorHasWrongSize,
-		    int, int,
-		    << "The vector has size " << arg1 << " but should have "
-		    << arg2 << " elements.");
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcWrongComponent,
-		    int, int,
-		    << "Component " << arg1 << " does not exist, as the values "
-		    << "of this function have only " << arg2 << " components.");
 };
 
 

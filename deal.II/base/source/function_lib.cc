@@ -43,7 +43,7 @@ PillowFunction<dim>::value_list (const vector<Point<dim> > &points,
 				 const unsigned int) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     {
@@ -93,7 +93,7 @@ PillowFunction<dim>::laplacian_list (const vector<Point<dim> > &points,
 				     const unsigned int) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     {
@@ -150,7 +150,7 @@ PillowFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 				    const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+	  ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     {
@@ -203,7 +203,7 @@ CosineFunction<dim>::value_list (const vector<Point<dim> > &points,
 				 const unsigned int) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     {
@@ -251,7 +251,7 @@ CosineFunction<dim>::laplacian_list (const vector<Point<dim> > &points,
 				     const unsigned int) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     {
@@ -306,7 +306,7 @@ CosineFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 				    const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+	  ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     {
@@ -357,7 +357,7 @@ LSingularityFunction::value_list (const vector<Point<2> > &points,
 				 const unsigned int) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     {
@@ -391,7 +391,7 @@ LSingularityFunction::laplacian_list (const vector<Point<2> > &points,
 				     const unsigned int) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     values[i] = 0.;
@@ -428,7 +428,7 @@ LSingularityFunction::gradient_list (const vector<Point<2> > &points,
 				    const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+	  ExcDimensionMismatch(gradients.size(), points.size()));
   Assert(false, ExcNotImplemented());
 }
 
@@ -455,7 +455,7 @@ SlitSingularityFunction::value_list (const vector<Point<2> > &points,
 				 const unsigned int) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     {
@@ -484,7 +484,7 @@ SlitSingularityFunction::laplacian_list (const vector<Point<2> > &points,
 				     const unsigned int) const
 {
   Assert (values.size() == points.size(),
-	  ExcVectorHasWrongSize(values.size(), points.size()));
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0;i<points.size();++i)
     values[i] = 0.;
@@ -508,7 +508,7 @@ SlitSingularityFunction::gradient_list (const vector<Point<2> > &points,
 				    const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
-	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+	  ExcDimensionMismatch(gradients.size(), points.size()));
   Assert(false, ExcNotImplemented());
 }
 

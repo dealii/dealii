@@ -34,7 +34,7 @@ class BoundaryValuesSine : public Function<dim> {
 				      */
     virtual void value (const Point<dim> &p,
 			Vector<double>   &values) const {
-      Assert (values.size()==1, ExcVectorHasWrongSize (values.size(), 1));
+      Assert (values.size()==1, ExcDimensionMismatch (values.size(), 1));
 
       double x = 1;
       
@@ -55,7 +55,7 @@ class BoundaryValuesSine : public Function<dim> {
 			     vector<double>            &values,
 			     const unsigned int         component) const {
       Assert (values.size() == points.size(),
-	      ExcVectorHasWrongSize(values.size(), points.size()));
+	      ExcDimensionMismatch(values.size(), points.size()));
       for (unsigned int i=0; i<points.size(); ++i) 
 	values[i] = BoundaryValuesSine<dim>::value (points[i], component);
     };
