@@ -1408,12 +1408,12 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 
 
 
-template <int dim>
+template <int dim, class InVector>
 double
 VectorTools::compute_mean_value (const Mapping<dim>    &mapping,
 				 const DoFHandler<dim> &dof,
 				 const Quadrature<dim> &quadrature,
-				 Vector<double>        &v,
+				 InVector              &v,
 				 const unsigned int     component)
 {
   Assert (component < dof.get_fe().n_components(),
@@ -1445,11 +1445,11 @@ VectorTools::compute_mean_value (const Mapping<dim>    &mapping,
 };
 
 
-template <int dim>
+template <int dim, class InVector>
 double
 VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
 				 const Quadrature<dim> &quadrature,
-				 Vector<double>        &v,
+				 InVector              &v,
 				 const unsigned int     component)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1704,17 +1704,55 @@ void VectorTools::project_boundary_values (const DoFHandler<deal_II_dimension>  
 					   const FunctionMap<deal_II_dimension>::type &,
 					   const Quadrature<deal_II_dimension-1>&,
 					   std::map<unsigned int,double>        &);
+
 template
-double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>    &,
-					const DoFHandler<deal_II_dimension> &,
-					const Quadrature<deal_II_dimension> &,
-					Vector<double>                      &,
+double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>&,
+					const DoFHandler<deal_II_dimension>&,
+					const Quadrature<deal_II_dimension>&,
+					Vector<double>&,
 					const unsigned int);
 template
-double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension> &,
-					const Quadrature<deal_II_dimension> &,
-					Vector<double>                      &,
+double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension>&,
+					const Quadrature<deal_II_dimension>&,
+					Vector<double>&,
 					const unsigned int);
+
+template
+double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>&,
+					const DoFHandler<deal_II_dimension>&,
+					const Quadrature<deal_II_dimension>&,
+					BlockVector<double>&,
+					const unsigned int);
+template
+double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension>&,
+					const Quadrature<deal_II_dimension>&,
+					BlockVector<double>&,
+					const unsigned int);
+
+template
+double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>&,
+					const DoFHandler<deal_II_dimension>&,
+					const Quadrature<deal_II_dimension>&,
+					Vector<float>&,
+					const unsigned int);
+template
+double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension>&,
+					const Quadrature<deal_II_dimension>&,
+					Vector<float>&,
+					const unsigned int);
+
+template
+double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>&,
+					const DoFHandler<deal_II_dimension>&,
+					const Quadrature<deal_II_dimension>&,
+					BlockVector<float>&,
+					const unsigned int);
+template
+double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension>&,
+					const Quadrature<deal_II_dimension>&,
+					BlockVector<float>&,
+					const unsigned int);
+
 
 
 // the following two functions are not derived from a template in 1d

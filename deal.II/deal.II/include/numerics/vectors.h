@@ -844,22 +844,22 @@ class VectorTools
 				      * Stokes with complete Dirichlet
 				      * boundaries for the velocities.
 				      */
-    template <int dim>
+    template <int dim, class InVector>
     static double compute_mean_value (const Mapping<dim>    &mapping,
 				      const DoFHandler<dim> &dof,
 				      const Quadrature<dim> &quadrature,
-				      Vector<double>        &v,
+				      InVector              &v,
 				      const unsigned int     component);
     
 				     /**
-				      * Calls the @p{integrate_difference}
+				      * Calls the @p{compute_mean_value}
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
-    template <int dim>
+    template <int dim, class InVector>
     static double compute_mean_value (const DoFHandler<dim> &dof,
 				      const Quadrature<dim> &quadrature,
-				      Vector<double>        &v,
+				      InVector              &v,
 				      const unsigned int     component);
 
 				     /**
