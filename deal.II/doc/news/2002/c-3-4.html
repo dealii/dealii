@@ -321,6 +321,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
+       New: The <code class="class">ThreadMutex</code> classes now have a
+       member class <code class="class">ScopedLock</code> that implements the
+       scoped thread-safe locking pattern of Doug Schmidt. It is also used in
+       various places of the code now.
+       <br>
+       (WB 2003/01/28)
+       </p>
+
+  <li> <p> 
        Fixed: The <code class="class">PosixThreadManager</code> called
        its <code class="member">wait</code> function in the
        destructor. If this had been called before already, then the
@@ -709,6 +718,26 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The <code
+       class="member">ConstraintMatrix::is_identity_constrained</code> function
+       would previously generate a segmentation fault if called on a constraint
+       matrix object that did not contain any constraints at all. This is now
+       fixed.
+       <br>
+       (WB 2003/02/15)
+       </p>
+
+  <li> <p>
+       Fixed: Objects of type <code class="class">FESystem</code> 
+       could not be constructed if one of the elements it is to be composed of
+       did not implement interface constraints for hanging nodes. This is now
+       fixed: you can construct such a composed element, but it does not
+       implement hanging node constraints either.
+       <br>
+       (WB 2003/02/15)
+       </p>
+
+  <li> <p>
        New: For each of the renumbering functions in the <code
        class="class">DoFRenumbering</code> class there is now an
        additional <code class="member">compute_*</code>
@@ -718,15 +747,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        object. The behaviour of the old functions is not changed.
        <br>
        (RH 2003/02/03)
-       </p>
-
-  <li> <p> 
-       New: The <code class="class">ThreadMutex</code> classes now have a
-       member class <code class="class">ScopedLock</code> that implements the
-       scoped thread-safe locking pattern of Doug Schmidt. It is also used in
-       various places of the code now.
-       <br>
-       (WB 2003/01/28)
        </p>
 
   <li> <p> 
