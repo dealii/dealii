@@ -26,6 +26,12 @@ documentation, etc</a>.
 <h3>General</h3>
 
 <ol>
+  <li> <p> New: example program step-12. Discontinuous Galerkin
+       discretization.
+       <br>
+       (RH 2001/11/21)
+       </p>
+
   <li> <p>
        New: <acronym>deal.II</acronym> now uses a file
        <code>config.h</code> for most global preprocessor defines,
@@ -164,6 +170,14 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: The new <code
+       class="member">CellAccessor<dim>::neighbor_of_coarser_neighbor</code>
+       function returns where to find the present cell from a coarser
+       neighbor.
+       <br>
+       (RH 2001/11/21)
+       </p>
+
   <li> <p>
        Fixed: The <code>GridRefinement::refine_fixed_fraction</code>
        function sometimes had problems when indicators vary over

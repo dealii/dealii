@@ -14,6 +14,20 @@
 <h2>Changes between versions 3.2.0 and 3.2.1</h2>
 
 <ol>
+  <li> <p> New: example program step-12. Discontinuous Galerkin
+       discretization.
+       <br>
+       (RH 2001/11/21)
+       </p>
+
+  <li> <p> New: The new <code
+       class="member">CellAccessor<dim>::neighbor_of_coarser_neighbor</code>
+       function returns where to find the present cell from a coarser
+       neighbor.
+       <br>
+       (RH 2001/11/21)
+       </p>
+
   <li> <p>
        Fixed: when checking for convergence in linear solvers in
        <code class="member">SolverControl::check</code>, we first
