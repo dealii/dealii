@@ -22,6 +22,7 @@
 template <int dim> class Boundary;
 template <int dim> class StraightBoundary;
 template <int dim> class CellAccessor;
+template <int dim> class TriaAccessor;
 template<int celldim, int dim> class TriaObjectAccessor;
 template <int dim, typename Accessor> class TriaRawIterator;
 template <int dim, typename Accessor> class TriaIterator;
