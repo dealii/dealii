@@ -997,6 +997,14 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 
 
 
+/**
+ * Print the address to which this iterator points to @p{out}. The
+ * address is given by the pair @p{(level,index)}, where @p{index} is
+ * an index relative to the level in which the object is that is
+ * pointed to.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim, typename Accessor>
 inline
 ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i)
@@ -1007,6 +1015,14 @@ ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i)
 
 
 
+/**
+ * Print the address to which this iterator points to @p{out}. The
+ * address is given by the pair @p{(level,index)}, where @p{index} is
+ * an index relative to the level in which the object is that is
+ * pointed to.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim, typename Accessor>
 inline
 ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i)
@@ -1017,6 +1033,14 @@ ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i)
 
 
 
+/**
+ * Print the address to which this iterator points to @p{out}. The
+ * address is given by the pair @p{(level,index)}, where @p{index} is
+ * an index relative to the level in which the object is that is
+ * pointed to.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim, typename Accessor>
 inline
 ostream & operator << (ostream &out, const TriaActiveIterator<dim,Accessor> &i)
