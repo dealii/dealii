@@ -12,12 +12,16 @@
 #include <fe/fe.h>
 #include <lac/dsmatrix.h>
 
+#include <algorithm>
+
+
 
 /* ------------------------ MGVertexDoFs ----------------------------------- */
 
 template <int dim>
 MGDoFHandler<dim>::MGVertexDoFs::MGVertexDoFs () :
 		coarsest_level (1<<30),
+		finest_level (0),
 		indices (0)
 {};
 
@@ -25,11 +29,14 @@ MGDoFHandler<dim>::MGVertexDoFs::MGVertexDoFs () :
 
 template <int dim>
 void MGDoFHandler<dim>::MGVertexDoFs::init (const unsigned int cl,
-					    const unsigned int n_levels,
+					    const unsigned int fl,
 					    const unsigned int dofs_per_vertex) {
   Assert (indices == 0, ExcInternalError());
 
   coarsest_level = cl;
+  finest_level   = fl;
+
+  const unsigned int n_levels = finest_level-coarsest_level + 1;
   
   indices = new int[n_levels * dofs_per_vertex];
   Assert (indices != 0, ExcNoMemory ());
@@ -47,6 +54,21 @@ MGDoFHandler<dim>::MGVertexDoFs::~MGVertexDoFs () {
   delete[] indices;
 };
 
+
+
+template <int dim>
+inline
+unsigned int MGDoFHandler<dim>::MGVertexDoFs::get_coarsest_level () const {
+  return coarsest_level;
+};
+
+
+
+template <int dim>
+inline
+unsigned int MGDoFHandler<dim>::MGVertexDoFs::get_finest_level () const {
+  return finest_level;
+};
 
 
 
@@ -997,6 +1019,261 @@ void MGDoFHandler<dim>::make_sparsity_pattern (const unsigned int  level,
 
 
 
+template <int dim>
+void MGDoFHandler<dim>::renumber_dofs (const unsigned int      level,
+				       const RenumberingMethod method,
+				       const bool              use_constraints,
+				       const vector<int>      &starting_points) {
+				   // make the connection graph
+  dSMatrixStruct sparsity (n_dofs(level), max_couplings_between_dofs());
+  make_sparsity_pattern (level, sparsity);
+
+  if (use_constraints) 
+    {
+      ConstraintMatrix constraints;
+      make_constraint_matrix (level, constraints);
+      constraints.condense (sparsity);
+    };
+    
+  int n_dofs = sparsity.n_rows();
+				   // store the new dof numbers; -1 means
+				   // that no new number was chosen yet
+				   //
+				   // the commented line is what would be the
+				   // correct way to do, but gcc2.8 chokes
+				   // over that. The other lines are a
+				   // workaround
+//  vector<int> new_number(n_dofs, -1);
+  vector<int> new_number;
+  new_number.resize (n_dofs, -1);
+  
+				   // store the indices of the dofs renumbered
+				   // in the last round. Default to starting
+				   // points
+  vector<int> last_round_dofs (starting_points);
+  
+				   // delete disallowed elements
+  for (unsigned int i=0; i<last_round_dofs.size(); ++i)
+    if ((last_round_dofs[i]<0) || (last_round_dofs[i]>=n_dofs))
+      last_round_dofs[i] = -1;
+  
+  remove_if (last_round_dofs.begin(), last_round_dofs.end(),
+	     bind2nd(equal_to<int>(), -1));
+  
+				   // now if no valid points remain:
+				   // find dof with lowest coordination
+				   // number
+  
+  if (last_round_dofs.size() == 0)
+    {
+      int          starting_point   = -1;
+      unsigned int min_coordination = n_dofs;
+      for (int row=0; row<n_dofs; ++row) 
+	{
+	  unsigned int j;
+	  for (j=sparsity.get_rowstart_indices()[row];
+	       j<sparsity.get_rowstart_indices()[row+1]; ++j)
+	    if (sparsity.get_column_numbers()[j] == -1)
+	      break;
+					   // post-condition after loop:
+					   // coordination is now
+					   // j-rowstart[row]
+	  if (j-sparsity.get_rowstart_indices()[row] <  min_coordination)
+	    {
+	      min_coordination = j-sparsity.get_rowstart_indices()[row];
+	      starting_point   = row;
+	    };
+	};
+				       // initialize the first dof
+      last_round_dofs.push_back (starting_point);
+    };
+  
+
+				   // store next free dof index
+  int         next_free_number = 0;
+
+				   // enumerate the first round dofs
+  for (unsigned int i=0; i!=last_round_dofs.size(); ++i)
+    new_number[last_round_dofs[i]] = next_free_number++;
+
+  bool all_dofs_renumbered = false;
+
+				   // now do as many steps as needed to
+				   // renumber all dofs
+  while (!all_dofs_renumbered) 
+    {
+				       // store the indices of the dofs to be
+				       // renumbered in the next round
+      vector<int> next_round_dofs;
+
+				       // find all neighbors of the
+				       // dofs numbered in the last
+				       // round
+      for (unsigned int i=0; i<last_round_dofs.size(); ++i)
+	for (unsigned int j=sparsity.get_rowstart_indices()[last_round_dofs[i]];
+	     j<sparsity.get_rowstart_indices()[last_round_dofs[i]+1]; ++j)
+	  if (sparsity.get_column_numbers()[j] == -1)
+	    break;
+	  else
+	    next_round_dofs.push_back (sparsity.get_column_numbers()[j]);
+      
+				       // sort dof numbers
+      sort (next_round_dofs.begin(), next_round_dofs.end());
+
+				       // delete multiple entries
+      vector<int>::iterator end_sorted;
+      end_sorted = unique (next_round_dofs.begin(), next_round_dofs.end());
+      next_round_dofs.erase (end_sorted, next_round_dofs.end());
+
+				       // eliminate dofs which are
+				       // already numbered
+      for (int s=next_round_dofs.size()-1; s>=0; --s)
+	if (new_number[next_round_dofs[s]] != -1)
+	  next_round_dofs.erase (&next_round_dofs[s]);
+
+				       // check whether there are any new
+				       // dofs
+      all_dofs_renumbered = (next_round_dofs.size() == 0);
+      if (all_dofs_renumbered)
+					 // end loop if possible
+	continue;
+      
+
+				       // store for each coordination
+				       // number the dofs with these
+				       // coordination number
+      multimap<unsigned int, int> dofs_by_coordination;
+      
+				       // find coordination number for
+				       // each of these dofs
+      for (vector<int>::iterator s=next_round_dofs.begin();
+	   s!=next_round_dofs.end(); ++s) 
+	{
+	  unsigned int coordination = 0;
+	  for (unsigned int j=sparsity.get_rowstart_indices()[*s];
+	       j<sparsity.get_rowstart_indices()[*s+1]; ++j)
+	    if (sparsity.get_column_numbers()[j] == -1)
+	      break;
+	    else
+	      ++coordination;
+
+					   // insert this dof at its
+					   // coordination number
+	  const pair<const unsigned int, int> new_entry (coordination, *s);
+	  dofs_by_coordination.insert (new_entry);
+	};
+      
+				       ////
+      multimap<unsigned int, int>::iterator i;
+      for (i = dofs_by_coordination.begin(); i!=dofs_by_coordination.end(); ++i) 
+	new_number[i->second] = next_free_number++;
+
+				       // after that: copy this round's
+				       // dofs for the next round
+      last_round_dofs = next_round_dofs;
+    };
+
+#ifdef DEBUG
+				   //  test for all indices numbered
+  if (find (new_number.begin(), new_number.end(), -1) != new_number.end())
+    Assert (false, ExcRenumberingIncomplete());
+  Assert (next_free_number == n_dofs,
+	  ExcRenumberingIncomplete());
+#endif
+
+  switch (method) 
+    {
+      case Cuthill_McKee:
+	    break;
+      case reverse_Cuthill_McKee:
+      {
+	for (vector<int>::iterator i=new_number.begin(); i!=new_number.end(); ++i)
+	  *i = n_dofs-*i;
+	break;
+      };
+      default:
+	    Assert (false, ExcNotImplemented());
+    };
+
+				   // actually perform renumbering;
+				   // this is dimension specific and
+				   // thus needs an own function
+  do_renumbering (level, new_number);
+};
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+void MGDoFHandler<1>::do_renumbering (const unsigned int level,
+				      const vector<int> &new_numbers) {
+  Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
+  
+				   // note that we can not use cell iterators
+				   // in this function since then we would
+				   // renumber the dofs on the interface of
+				   // two cells more than once. Anyway, this
+				   // ways it's not only more correct but also
+				   // faster
+  for (vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
+       i!=mg_vertex_dofs.end(); ++i)
+				     // if the present vertex lives on
+				     // the present level
+    if ((i->get_coarsest_level() <= level) &&
+	(i->get_finest_level() >= level))
+      for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
+	i->set_index (level, d, selected_fe->dofs_per_vertex,
+		      new_numbers[i->get_index (level, d,
+						selected_fe->dofs_per_vertex)]);
+
+  for (vector<int>::iterator i=mg_levels[level]->line_dofs.begin();
+       i!=mg_levels[level]->line_dofs.end(); ++i) 
+    {
+      Assert (*i != -1, ExcInternalError());
+      *i = new_numbers[*i];
+    };
+};
+
+#endif
+
+
+#if deal_II_dimension == 2
+
+template <>
+void MGDoFHandler<2>::do_renumbering (const unsigned int  level,
+				      const vector<int>  &new_numbers) {
+  Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
+  
+  for (vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
+       i!=mg_vertex_dofs.end(); ++i)
+				     // if the present vertex lives on
+				     // the present level
+    if ((i->get_coarsest_level() <= level) &&
+	(i->get_finest_level() >= level))
+      for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
+	i->set_index (level, d, selected_fe->dofs_per_vertex,
+		      new_numbers[i->get_index (level, d,
+						selected_fe->dofs_per_vertex)]);
+  
+  for (vector<int>::iterator i=mg_levels[level]->line_dofs.begin();
+       i!=mg_levels[level]->line_dofs.end(); ++i)
+    {
+      Assert (*i != -1, ExcInternalError());
+      *i = new_numbers[*i];
+    };
+  for (vector<int>::iterator i=mg_levels[level]->quad_dofs.begin();
+       i!=mg_levels[level]->quad_dofs.end(); ++i)
+    {
+      Assert (*i != -1, ExcInternalError());
+      *i = new_numbers[*i];
+    };
+};
+
+#endif
+
+
+
 
 #if deal_II_dimension == 1
 
@@ -1074,7 +1351,7 @@ void MGDoFHandler<1>::reserve_space () {
       Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
       mg_vertex_dofs[vertex].init (min_level[vertex],
-				   max_level[vertex]-min_level[vertex]+1,
+				   max_level[vertex],
 				   selected_fe->dofs_per_vertex);
     };
 };
@@ -1162,7 +1439,7 @@ void MGDoFHandler<2>::reserve_space () {
       Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
       mg_vertex_dofs[vertex].init (min_level[vertex],
-				   max_level[vertex]-min_level[vertex]+1,
+				   max_level[vertex],
 				   selected_fe->dofs_per_vertex);
     };
 };

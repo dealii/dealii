@@ -178,6 +178,34 @@ class MGDoFHandler : public DoFHandler<dim> {
     void make_sparsity_pattern (const unsigned int level,
 				dSMatrixStruct    &sparsity) const; 
 
+				     /**
+				      * Make up the constraint matrix which
+				      * is used to condensate the 
+				      * system matrices and to prolong
+				      * the solution vectors from the true
+				      * degrees of freedom also to the
+				      * constraint nodes. The constraints
+				      * apply only to the given level.
+				      *
+				      * Since this method does not make sense in
+				      * one dimension, the functions returns
+				      * immediately after clearing the
+				      * constraint matrix.
+				      * For more than one dimension, the matrix
+				      * is cleared before usage. The constraint
+				      * matrix is closed anyway, no matter of the
+				      * dimension.
+				      *
+				      * To condense a given sparsity pattern,
+				      * use #ConstraintMatrix::condense#.
+				      *
+				      * This function uses the user flags for
+				      * the faces. If you need the user flags,
+				      * store them beforehand.
+				      */
+    void make_constraint_matrix (const unsigned int level,
+				 ConstraintMatrix  &cm) const;
+
 				     /*--------------------------------------*/
     
 				     /**
@@ -680,7 +708,7 @@ class MGDoFHandler : public DoFHandler<dim> {
 					  * set all indices to #-1#.
 					  */
 	void init (const unsigned int coarsest_level,
-		   const unsigned int n_levels,
+		   const unsigned int finest_level,
 		   const unsigned int dofs_per_vertex);
 
 					 /**
@@ -724,6 +752,18 @@ class MGDoFHandler : public DoFHandler<dim> {
 	int get_index (const unsigned int level,
 		       const unsigned int dof_number,
 		       const unsigned int dofs_per_vertex) const;
+
+					 /**
+					  * Return the index of the coarsest
+					  * level this vertex lives on.
+					  */
+	unsigned int get_coarsest_level () const;
+
+					 /**
+					  * Return the index of the finest
+					  * level this vertex lives on.
+					  */
+	unsigned int get_finest_level () const;
 	
 					 /**
 					  * Exception.
@@ -739,8 +779,8 @@ class MGDoFHandler : public DoFHandler<dim> {
 					  */
 	DeclException1 (ExcInvalidLevel,
 			int,
-			<< "The given level number " << arg1 << " is below the "
-			<< "coarsest level this vertex lives on.");
+			<< "The given level number " << arg1 << " is outside "
+			<< "the range of levels this vertex lives on.");
 					 /**
 					  * Exception.
 					  */
@@ -756,17 +796,19 @@ class MGDoFHandler : public DoFHandler<dim> {
 	unsigned int coarsest_level;
 
 					 /**
+					  * Finest level this level lives on.
+					  * This is mostly used for error
+					  * checking but can also be accessed
+					  * by the function #get_finest_level#.
+					  */
+	unsigned int finest_level;
+
+					 /**
 					  * Array holding the indices.
 					  */
 	int         *indices;
     };
 
-    
-				     /**
-				      * Reserve enough space for the MG dof
-				      * indices for a given triangulation.
-				      */
-    void reserve_space ();
 
 				     /**
 				      * Distribute dofs on the given cell,
@@ -784,6 +826,28 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      */
     unsigned int distribute_dofs_on_cell (active_cell_iterator &cell,
 					  unsigned int next_free_dof);
+    
+				     /**
+				      * Actually do the renumbering prepared
+				      * by the #renumber_dofs# function on
+				      * the given #level#. Since
+				      * this is dimension specific, we
+				      * need to have another function.
+				      *
+				      * #new_numbers# is an array of integers
+				      * with size equal to the number of dofs
+				      * on the present level. It stores the new
+				      * indices after renumbering in the
+				      * order of the old indices.
+				      */
+    void do_renumbering (const unsigned int level,
+			 const vector<int> &new_numbers);
+
+				     /**
+				      * Reserve enough space for the MG dof
+				      * indices for a given triangulation.
+				      */
+    void reserve_space ();
 
     				     /**
 				      * Space to store the DoF numbers for the
@@ -830,7 +894,8 @@ void MGDoFHandler<dim>::MGVertexDoFs::set_index  (const unsigned int level,
 						  const unsigned int dof_number,
 						  const unsigned int dofs_per_vertex,
 						  const unsigned int index) {
-  Assert (level >= coarsest_level, ExcInvalidLevel(level));
+  Assert ((level >= coarsest_level) && (level <= finest_level),
+	  ExcInvalidLevel(level));
   Assert (dof_number < dofs_per_vertex, ExcInvalidIndex ());
   
   indices[(level-coarsest_level)*dofs_per_vertex + dof_number] = index;
@@ -844,7 +909,8 @@ inline
 int MGDoFHandler<dim>::MGVertexDoFs::get_index  (const unsigned int level,
 						 const unsigned int dof_number,
 						 const unsigned int dofs_per_vertex) const {
-  Assert (level >= coarsest_level, ExcInvalidLevel(level));
+  Assert ((level >= coarsest_level) && (level <= finest_level),
+	  ExcInvalidLevel(level));
   Assert (dof_number < dofs_per_vertex, ExcInvalidIndex ());
   
   return indices[(level-coarsest_level)*dofs_per_vertex + dof_number];
