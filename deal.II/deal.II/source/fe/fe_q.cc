@@ -1383,7 +1383,7 @@ FE_Q<3>::initialize_constraints ()
   for (unsigned int i=0;i<=this->degree;++i)
     v.push_back(Polynomials::LagrangeEquidistant(this->degree,i));
 
-  const TensorProductPolynomials<dim-1> face_polynomial(v);
+  const TensorProductPolynomials<dim-1> face_polynomials(v);
 
   this->interface_constraints
     .TableBase<2,double>::reinit (this->interface_constraints_size());
@@ -1475,7 +1475,7 @@ FE_Q<3>::initialize_constraints ()
             new_index = indices[1] * (this->degree + 1) + indices[0];
 
           this->interface_constraints(j,i) = 
-            face_polynomial.compute_value (new_index, constraint_point);
+            face_polynomials.compute_value (new_index, constraint_point);
 	    
                                            // if the value is small up
                                            // to round-off, then
