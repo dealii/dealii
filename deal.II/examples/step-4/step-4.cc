@@ -447,9 +447,10 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // BoundaryValues class declared
 				   // above):
   std::map<unsigned int,double> boundary_values;
+  BoundaryValues<dim> bv;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
-					    BoundaryValues<dim>(),
+					    bv,
 					    boundary_values);
   MatrixTools<dim>::apply_boundary_values (boundary_values,
 					   system_matrix,
