@@ -28,8 +28,32 @@ namespace internal
                                     * internal to how the SymmetricTensor
                                     * class works.
                                     */
-  namespace SymmetricTensor
+  namespace SymmetricTensorAccessors
   {
+				     /**
+				      * Create a TableIndices<2>
+				      * object where the first entries
+				      * up to <tt>position-1</tt> are
+				      * taken from previous_indices,
+				      * and new_index is put at
+				      * position
+				      * <tt>position</tt>. The
+				      * remaining indices remain in
+				      * invalid state.
+				      */
+    TableIndices<2> merge (const TableIndices<2> &previous_indices,
+			   const unsigned int     new_index,
+			   const unsigned int     position)
+    {
+      Assert (position < 2, ExcIndexRange (position, 0, 2));
+      
+      if (position == 0)
+	return TableIndices<2>(new_index);
+      else
+	return TableIndices<2>(previous_indices[0], new_index);
+    }
+    
+    
                                      /**
                                       * Declaration of typedefs for the type
                                       * of data structures which are used to
@@ -127,7 +151,7 @@ namespace internal
     template <int rank, int dim>
     struct AccessorTypes<rank, dim,true>
     {
-        typedef const ::SymmetricTensor<rank,dim> tensor_type;
+        typedef const SymmetricTensor<rank,dim> tensor_type;
 
         typedef double reference;
     };
@@ -144,95 +168,267 @@ namespace internal
     template <int rank, int dim>
     struct AccessorTypes<rank,dim,false>
     {
-        typedef ::SymmetricTensor<rank,dim> tensor_type;
+        typedef SymmetricTensor<rank,dim> tensor_type;
 
         typedef double &reference;
     };
 
 
-    template <int rank, int dim, bool constness>
-    class Accessor;
-    
-                                     /**
-                                      * Accessor class to access the elements
-                                      * of individual rows in a symmetric
-                                      * tensor of rank 2. Since the elements
-                                      * of symmetric tensors are not stored as
-                                      * in a table, the accessors are a little
-                                      * more involved. However, for tensors of
-                                      * rank 2 they are still relatively
-                                      * simple in that an accessor is created
-                                      * by the SymmetricTensor class with the
-                                      * first access to <tt>operator[]</tt>;
-                                      * the accessor thereby points to a row
-                                      * of the tensor. Calling
-                                      * <tt>operator[]</tt> on the accessor
-                                      * then selects an entry of this
-                                      * row. Note that if this entry is not
-                                      * actually stored, then the transpose
-                                      * entry is chosen as that is guaranteed
-                                      * to be stored.
-                                      *
-                                      * @author Wolfgang Bangerth, 2005
-                                      */
-    template <int dim, bool constness>
-    class Accessor<2,dim,constness> 
+/**
+ * @internal
+ *
+ * Class that acts as accessor to elements of type
+ * SymmetricTensor. The template parameter <tt>C</tt> may be either
+ * true or false, and indicates whether the objects worked on are
+ * constant or not (i.e. write access is only allowed if the value is
+ * false).
+ *
+ * Since with <tt>N</tt> indices, the effect of applying
+ * <tt>operator[]</tt> is getting access to something we <tt>N-1</tt>
+ * indices, we have to implement these accessor classes recursively,
+ * with stopping when we have only one index left. For the latter
+ * case, a specialization of this class is declared below, where
+ * calling <tt>operator[]</tt> gives you access to the objects
+ * actually stored by the tensor; the tensor class also makes sure
+ * that only those elements are actually accessed which we actually
+ * store, i.e. it reorders indices if necessary. The template
+ * parameter <tt>P</tt> indicates how many remaining indices there
+ * are. For a rank-2 tensor, <tt>P</tt> may be two, and when using
+ * <tt>operator[]</tt>, an object with <tt>P=1</tt> emerges.
+ *
+ * As stated for the entire namespace, you will not usually have to do
+ * with these classes directly, and should not try to use their
+ * interface directly as it may change without notice. In fact, since
+ * the constructors are made private, you will not even be able to
+ * generate objects of this class, as they are only thought as
+ * temporaries for access to elements of the table class, not for
+ * passing them around as arguments of functions, etc.
+ *
+ * This class is an adaptation of a similar class used for the Table
+ * class.
+ *
+ * @author Wolfgang Bangerth, 2002, 2005
+ */
+    template <int rank, int dim, bool constness, unsigned int P>
+    class Accessor
     {
       public:
                                          /**
-                                          * Import which tensor we work on.
+                                          * Import two typedefs from the
+                                          * switch class above.
                                           */
-        typedef
-        typename AccessorTypes<2,dim,constness>::tensor_type
-        tensor_type;
+        typedef typename AccessorTypes<rank,dim,constness>::reference reference;
+        typedef typename AccessorTypes<rank,dim,constness>::tensor_type tensor_type;
 
-                                         /**
-                                          * The type of a reference to an
-                                          * individual element of the
-                                          * symmetric tensor. If the tensor
-                                          * is constant, we can only return
-                                          * a value instead of a reference.
-                                          */
-        typedef typename AccessorTypes<2,dim,constness>::reference reference;
-
-                                         /**
-                                          * Constructor. Take the tensor to
-                                          * access as well as the row we
-                                          * point to as arguments.
-                                          */
-        Accessor (tensor_type        &tensor,
-                  const unsigned int  row);
-
-                                         /**
-                                          * Return a reference to an element
-                                          * of this row (if we point to a
-                                          * non-const tensor), or the value
-                                          * of the element (in case this is
-                                          * a constant tensor).
-                                          */
-        reference operator[] (const unsigned int column);
-          
       private:
                                          /**
-                                          * Reference to the tensor we
+                                          * Constructor. Take a
+                                          * reference to the tensor
+                                          * object which we will
                                           * access.
+                                          *
+					  * The second argument
+					  * denotes the values of
+					  * previous indices into the
+					  * tensor. For example, for a
+					  * rank-4 tensor, if P=2,
+					  * then we will already have
+					  * had two successive element
+					  * selections (e.g. through
+					  * <tt>tensor[1][2]</tt>),
+					  * and the two index values
+					  * have to be stored
+					  * somewhere. This class
+					  * therefore only makes use
+					  * of the first rank-P
+					  * elements of this array,
+					  * but passes it on to the
+					  * next level with P-1 which
+					  * fills the next entry, and
+					  * so on.
+					  *
+                                          * The constructor is made
+                                          * private in order to prevent
+                                          * you having such objects
+                                          * around. The only way to
+                                          * create such objects is via
+                                          * the <tt>Table</tt> class, which
+                                          * only generates them as
+                                          * temporary objects. This
+                                          * guarantees that the accessor
+                                          * objects go out of scope
+                                          * earlier than the mother
+                                          * object, avoid problems with
+                                          * data consistency.
                                           */
-        tensor_type &tensor;
+        Accessor (tensor_type              &tensor,
+                  const TableIndices<rank> &previous_indices);
 
                                          /**
-                                          * Index of the row we access.
+                                          * Default constructor. Not
+                                          * needed, and invisible, so
+                                          * private.
                                           */
-        const unsigned int row;
-
+        Accessor ();
+        
                                          /**
-                                          * Make the symmetric tensor
-                                          * classes a friend, since they are
-                                          * the only ones who can create
-                                          * objects like this.
+                                          * Copy constructor. Not
+                                          * needed, and invisible, so
+                                          * private.
                                           */
-        template <int,int> class ::SymmetricTensor;
+        Accessor (const Accessor &a);
+
+      public:
+      
+                                         /**
+                                          * Index operator.
+                                          */
+        Accessor<rank,dim,constness,P-1> operator [] (const unsigned int i);
+
+      private:
+                                         /**
+                                          * Store the data given to the
+                                          * constructor.
+                                          */
+        tensor_type             &tensor;
+        const TableIndices<rank> previous_indices;
+
+                                         // declare some other classes
+                                         // as friends. make sure to
+                                         // work around bugs in some
+                                         // compilers
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+        template <int,int> friend class SymmetricTensor;
+        template <int,int,bool,int>
+        friend class Accessor;
+#  ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
+        friend class SymmetricTensor<rank,dim>;
+        friend class Accessor<rank,dim,constness,P+1>;
+#  endif
+#else
+        friend class SymmetricTensor<rank,dim>;
+        friend class Accessor<rank,dim,constness,P+1>;
+#endif
     };
 
+
+  
+/**
+ * @internal
+ * Accessor class for SymmetricTensor. This is the specialization for the last
+ * index, which actually allows access to the elements of the table,
+ * rather than recursively returning access objects for further
+ * subsets. The same holds for this specialization as for the general
+ * template; see there for more information.
+ *
+ * @author Wolfgang Bangerth, 2002, 2005
+ */
+    template <int rank, int dim, bool constness>
+    class Accessor<rank,dim,constness,1>
+    {
+      public:
+                                         /**
+                                          * Import two typedefs from the
+                                          * switch class above.
+                                          */
+        typedef typename AccessorTypes<rank,dim,constness>::reference reference;
+        typedef typename AccessorTypes<rank,dim,constness>::tensor_type tensor_type;
+
+      private:
+                                         /**
+                                          * Constructor. Take a
+                                          * reference to the tensor
+                                          * object which we will
+                                          * access.
+                                          *
+					  * The second argument
+					  * denotes the values of
+					  * previous indices into the
+					  * tensor. For example, for a
+					  * rank-4 tensor, if P=2,
+					  * then we will already have
+					  * had two successive element
+					  * selections (e.g. through
+					  * <tt>tensor[1][2]</tt>),
+					  * and the two index values
+					  * have to be stored
+					  * somewhere. This class
+					  * therefore only makes use
+					  * of the first rank-P
+					  * elements of this array,
+					  * but passes it on to the
+					  * next level with P-1 which
+					  * fills the next entry, and
+					  * so on.
+					  *
+					  * For this particular
+					  * specialization, i.e. for
+					  * P==1, all but the last
+					  * index are already filled.
+					  *
+                                          * The constructor is made
+                                          * private in order to prevent
+                                          * you having such objects
+                                          * around. The only way to
+                                          * create such objects is via
+                                          * the <tt>Table</tt> class, which
+                                          * only generates them as
+                                          * temporary objects. This
+                                          * guarantees that the accessor
+                                          * objects go out of scope
+                                          * earlier than the mother
+                                          * object, avoid problems with
+                                          * data consistency.
+                                          */
+        Accessor (tensor_type              &tensor,
+                  const TableIndices<rank> &previous_indices);      
+
+                                         /**
+                                          * Default constructor. Not
+                                          * needed, and invisible, so
+                                          * private.
+                                          */
+        Accessor ();
+
+                                         /**
+                                          * Copy constructor. Not
+                                          * needed, and invisible, so
+                                          * private.
+                                          */
+        Accessor (const Accessor &a);
+
+      public:
+      
+                                         /**
+                                          * Index operator.
+                                          */
+        reference operator [] (const unsigned int);
+      
+      private:
+                                         /**
+                                          * Store the data given to the
+                                          * constructor.
+                                          */
+        tensor_type             &tensor;
+        const TableIndices<rank> previous_indices;
+
+                                         // declare some other classes
+                                         // as friends. make sure to
+                                         // work around bugs in some
+                                         // compilers
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+        template <int,int> friend class SymmetricTensor;
+        template <int,int,bool,int>
+        friend class Accessor;
+#  ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
+        friend class SymmetricTensor<rank,dim>;
+        friend class Accessor<rank,dim,constness,2>;
+#  endif
+#else
+        friend class SymmetricTensor<rank,dim>;
+        friend class Accessor<rank,dim,constness,2>;
+#endif
+    };
   }
 }
 
@@ -410,7 +606,7 @@ class SymmetricTensor
                                       * symmetric tensor. This function is
                                       * called for constant tensors.
                                       */
-    internal::SymmetricTensor::Accessor<rank,dim,true>
+    internal::SymmetricTensorAccessors::Accessor<rank,dim,true,rank-1>
     operator [] (const unsigned int row) const;
 
                                      /**
@@ -418,7 +614,7 @@ class SymmetricTensor
                                       * symmetric tensor. This function is
                                       * called for non-constant tensors.
                                       */
-    internal::SymmetricTensor::Accessor<rank,dim,false>
+    internal::SymmetricTensorAccessors::Accessor<rank,dim,false,rank-1>
     operator [] (const unsigned int row);
     
                                      /**
@@ -463,7 +659,7 @@ class SymmetricTensor
                                      /**
                                       * Data storage for a symmetric tensor.
                                       */
-    typename internal::SymmetricTensor::StorageType<2,dim>::base_tensor_type data;
+    typename internal::SymmetricTensorAccessors::StorageType<2,dim>::base_tensor_type data;
 };
 
 
@@ -472,26 +668,48 @@ class SymmetricTensor
 
 namespace internal
 {
-  namespace SymmetricTensor
+  namespace SymmetricTensorAccessors
   {
-    template <int dim, bool constness>
-    Accessor<2,dim,constness>::
-    Accessor (tensor_type       &tensor,
-              const unsigned int  row)
-                    :
-                    tensor (tensor),
-                    row (row)
+//     template <int rank, int dim, bool constness, int P>
+//     Accessor<rank,dim,constness,P>::
+//     Accessor (const tensor_type        &tensor,
+// 	      const TableIndices<rank> &previous_indices)
+// 		    :
+// 		    tensor (tensor),
+// 		    previous_indices (previous_indices)
+//     {}
+
+
+
+//     template <int rank, int dim, bool constness, int P>
+//     Accessor<rank,dim,constness,P-1>
+//     Accessor<rank,dim,constness,P>::operator[] (const unsigned int i)
+//     {
+//       return Accessor<dim,rank,constness,P-1> (tensor,
+// 					       merge (previous_indices, i, rank-P));
+//     }
+
+
+
+    template <int rank, int dim, bool constness>
+    Accessor<rank,dim,constness,1>::
+    Accessor (tensor_type              &tensor,
+	      const TableIndices<rank> &previous_indices)
+		    :
+		    tensor (tensor),
+		    previous_indices (previous_indices)
     {}
 
 
 
-    template <int dim, bool constness>
-    typename Accessor<2,dim,constness>::reference
-    Accessor<2,dim,constness>::
-    operator[] (const unsigned int column)
+    template <int rank, int dim, bool constness>
+    typename Accessor<rank,dim,constness,1>::reference
+    Accessor<rank,dim,constness,1>::operator[] (const unsigned int i)
     {
-      return tensor(TableIndices<2> (row, column));
+      return tensor(merge (previous_indices, i, rank-1));
     }
+    
+    
   }
 }
 
@@ -661,7 +879,7 @@ unsigned int
 SymmetricTensor<rank,dim>::memory_consumption ()
 {
   return
-    internal::SymmetricTensor::StorageType<rank,dim>::memory_consumption ();
+    internal::SymmetricTensorAccessors::StorageType<rank,dim>::memory_consumption ();
 }
 
 
@@ -853,21 +1071,23 @@ SymmetricTensor<2,3>::operator () (const TableIndices<2> &indices) const
 
 
 template <int rank, int dim>
-internal::SymmetricTensor::Accessor<rank,dim,true>
+internal::SymmetricTensorAccessors::Accessor<rank,dim,true,rank-1>
 SymmetricTensor<rank,dim>::operator [] (const unsigned int row) const
 {
   return
-    internal::SymmetricTensor::Accessor<rank,dim,true> (*this, row);
+    internal::SymmetricTensorAccessors::
+    Accessor<rank,dim,true,rank-1> (*this, TableIndices<rank> (row));
 }
 
 
 
 template <int rank, int dim>
-internal::SymmetricTensor::Accessor<rank,dim,false>
+internal::SymmetricTensorAccessors::Accessor<rank,dim,false,rank-1>
 SymmetricTensor<rank,dim>::operator [] (const unsigned int row)
 {
   return
-    internal::SymmetricTensor::Accessor<rank,dim,false> (*this, row);
+    internal::SymmetricTensorAccessors::
+    Accessor<rank,dim,false,rank-1> (*this, TableIndices<rank> (row));
 }
 
 
