@@ -15,6 +15,7 @@
 
 
 
+#include <base/config.h>
 #include <lac/vector.h>
 #include <lac/sparse_ilu.h>
 

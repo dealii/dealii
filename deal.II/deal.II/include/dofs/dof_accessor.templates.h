@@ -11,6 +11,7 @@
 #define __deal2__dof_accessor_templates_h
 
 
+#include <base/config.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_levels.h>

@@ -9,6 +9,7 @@
 #ifndef __deal2__intergrid_map_h
 #define __deal2__intergrid_map_h
 
+#include <base/config.h>
 #include <base/smartpointer.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_accessor.h>

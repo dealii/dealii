@@ -13,6 +13,7 @@
 #ifndef __deal2__function_derivative_h
 #define __deal2__function_derivative_h
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/function.h>
 

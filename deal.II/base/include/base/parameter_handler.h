@@ -20,15 +20,17 @@
 
 
 
-// public classes; to be declared below
-class ParameterHandler;
-class MultipleParameterLoop;
-
-
+#include <base/config.h>
 #include <map>
 #include <vector>
 #include <string>
 #include <base/exceptions.h>
+
+
+// public classes; to be declared below
+class ParameterHandler;
+class MultipleParameterLoop;
+
 
 
 // forward declaration

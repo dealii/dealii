@@ -10,6 +10,7 @@
 #define __deal2__grid_in_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/smartpointer.h>
 #include <iostream>

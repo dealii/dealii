@@ -14,6 +14,7 @@
 #define __deal2__job_identifier_h
 
 
+#include <base/config.h>
 #include <string>
 
 /**

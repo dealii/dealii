@@ -10,6 +10,7 @@
 #define __deal2__vectors_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <dofs/function_map.h>
 #include <map>

@@ -14,6 +14,7 @@
 #define __deal2__quadrature_lib_h
 
 
+#include <base/config.h>
 #include <base/quadrature.h>
 
 

@@ -11,6 +11,7 @@
 
 
 
+#include <base/config.h>
 #include <base/smartpointer.h>
 #include <base/multithread_info.h>
 #include <base/data_out_base.h>

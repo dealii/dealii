@@ -10,6 +10,7 @@
 #define __deal2__matrices_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/thread_management.h>
 #include <dofs/function_map.h>

@@ -14,6 +14,7 @@
 #define __deal2__mg_dof_accessor_h
 
 
+#include <base/config.h>
 #include <dofs/dof_accessor.h>
 
 template <int dim> class MGDoFHandler;

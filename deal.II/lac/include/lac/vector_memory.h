@@ -14,6 +14,7 @@
 #define __deal2__vector_memory_h
 
 
+#include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/logstream.h>
 #include <base/thread_management.h>

@@ -14,11 +14,14 @@
 #define __deal2__tria_iterator_base_h
 
 
+#include <base/config.h>
+
 /**
  *   The three states an iterator can be in: valid, past-the-end and
  *   invalid.
  */
-enum IteratorState {
+enum IteratorState
+{
       valid,
       past_the_end,
       invalid

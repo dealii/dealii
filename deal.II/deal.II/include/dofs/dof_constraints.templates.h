@@ -14,6 +14,7 @@
 #define __deal2__dof_constraints_templates_h
 
 
+#include <base/config.h>
 #include <dofs/dof_constraints.h>
 
 

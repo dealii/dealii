@@ -14,6 +14,7 @@
 #define __deal2__shifted_matrix_h
 
 
+#include <base/config.h>
 #include <base/smartpointer.h>
 
 /**

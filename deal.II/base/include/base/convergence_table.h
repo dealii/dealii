@@ -14,6 +14,7 @@
 #define __deal2__convergence_table_h
 
 
+#include <base/config.h>
 #include <base/table_handler.h>
 
 

@@ -13,6 +13,7 @@
 #ifndef __deal2__matrix_out_h
 #define __deal2__matrix_out_h
 
+#include <base/config.h>
 #include <base/data_out_base.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>

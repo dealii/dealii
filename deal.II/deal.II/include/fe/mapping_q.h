@@ -14,6 +14,7 @@
 #define __deal2__mapping_q_h
 
 
+#include <base/config.h>
 #include <fe/mapping_q1.h>
 
 

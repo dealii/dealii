@@ -14,6 +14,8 @@
 #define __deal2__mg_dof_tools_h
 
 
+#include <base/config.h>
+
 
 /**
  * This is a collection of functions operating on, and manipulating

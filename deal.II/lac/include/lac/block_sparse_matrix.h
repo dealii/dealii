@@ -14,6 +14,7 @@
 #define __deal2__block_sparse_matrix_h
 
 
+#include <base/config.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
 #include <cmath>

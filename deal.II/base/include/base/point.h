@@ -14,6 +14,7 @@
 #define __deal2__point_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/tensor_base.h>
 

@@ -14,6 +14,7 @@
 #define __deal2__mapping_cartesian_h
 
 
+#include <base/config.h>
 #include <cmath>
 #include <fe/mapping.h>
 

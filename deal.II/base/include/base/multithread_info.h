@@ -15,6 +15,7 @@
 //----------------------------   multithread_info.h     ---------------------------
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 
 

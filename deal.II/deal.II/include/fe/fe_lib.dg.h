@@ -14,6 +14,7 @@
 #define __deal2__fe_lib_dg_h
 
 
+#include <base/config.h>
 #include<fe/fe_dgq.h>
 
 

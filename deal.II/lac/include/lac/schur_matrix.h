@@ -13,6 +13,7 @@
 #ifndef __deal2__schur_matrix_h
 #define __deal2__schur_matrix_h
 
+#include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <base/logstream.h>

@@ -15,6 +15,7 @@
 
 
 
+#include <base/config.h>
 #include <base/smartpointer.h>
 #include <base/thread_management.h>
 #include <vector>

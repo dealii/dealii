@@ -14,6 +14,7 @@
 #define __deal2__function_time_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 
 /**

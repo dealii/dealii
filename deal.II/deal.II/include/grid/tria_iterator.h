@@ -14,6 +14,7 @@
 
 
 //TODO:[WB] (compiler) Change <iostream> to <ostream> when that becomes available
+#include <base/config.h>
 #include <iterator>
 #include <iostream>
 #include <base/exceptions.h>

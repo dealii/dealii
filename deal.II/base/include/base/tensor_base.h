@@ -22,6 +22,7 @@
 
 //TODO:[WB] (compiler) Change <iostream> to <ostream> when that becomes available
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <iostream>
 #include <vector>

@@ -16,6 +16,7 @@
 
 /*----------------------------   fullmatrix.h     ---------------------------*/
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/vector2d.h>
 

@@ -13,6 +13,7 @@
 #ifndef __deal2__dof_print_solver_step_h
 #define __deal2__dof_print_solver_step_h
 
+#include <base/config.h>
 #include <base/logstream.h>
 #include <numerics/data_out.h>
 

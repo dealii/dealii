@@ -14,6 +14,8 @@
 #define __deal2__grid_tools_H
 
 
+#include <base/config.h>
+
 template <int dim> class Triangulation;
 
 

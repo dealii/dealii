@@ -13,6 +13,7 @@
 #ifndef __deal2__mapping_q1_eulerian_h
 #define __deal2__mapping_q1_eulerian_h
 
+#include <base/config.h>
 #include <base/smartpointer.h>
 #include <fe/mapping_q1.h> 
 

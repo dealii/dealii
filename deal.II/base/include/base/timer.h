@@ -13,6 +13,8 @@
 #ifndef __deal2__timer_h
 #define __deal2__timer_h
 
+#include <base/config.h>
+
 
 /**
  * This is a very simple class which provides information about the time

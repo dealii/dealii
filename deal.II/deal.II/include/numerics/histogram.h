@@ -10,6 +10,7 @@
 #define __deal2__histogram_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <lac/forward_declarations.h>
 #include <vector>

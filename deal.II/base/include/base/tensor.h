@@ -14,6 +14,7 @@
 #define __deal2__tensor_h
 
 
+#include <base/config.h>
 #include <base/tensor_base.h>
 
 template <int rank_, int dim> class Tensor;

@@ -14,6 +14,7 @@
 #define __deal2__gradient_estimator_h
 
 //TODO: Remove dependency on forward-declarations
+#include <base/config.h>
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
 #include <base/exceptions.h>

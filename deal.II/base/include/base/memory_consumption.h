@@ -14,6 +14,7 @@
 #define __deal2__memory_consumption_h
 
 
+#include <base/config.h>
 #include <string>
 #include <vector>
 #include <utility>

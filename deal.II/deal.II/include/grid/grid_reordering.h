@@ -10,6 +10,7 @@
 #define __deal2__grid_reordering_h
 
 
+#include <base/config.h>
 #include <map>
 #include <vector>
 #include <grid/tria.h>

@@ -16,6 +16,7 @@
 
 /*----------------------------   boundary-function.h     ---------------------------*/
 
+#include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/point.h>
 #include <grid/tria.h>

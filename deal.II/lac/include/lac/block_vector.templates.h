@@ -14,6 +14,7 @@
 #define __deal2__block_vector_templates_h
 
 
+#include <base/config.h>
 #include <base/memory_consumption.h>
 #include <lac/block_vector.h>
 #include <cmath>

@@ -14,6 +14,7 @@
 #define __deal2__eigen_h
 
 
+#include <base/config.h>
 #include <lac/shifted_matrix.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>

@@ -14,9 +14,9 @@
 #define __deal2__smartpointer_h
 
 
-#ifndef __subscriptor_H
+#include <base/config.h>
 #include <base/subscriptor.h>
-#endif
+
 
 /**
  * Smart pointers avoid destruction of an object in use. They can be used just

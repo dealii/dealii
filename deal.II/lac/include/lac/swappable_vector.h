@@ -14,8 +14,9 @@
 #define __deal2__swappable_vector_h
 
 
-#include <lac/vector.h>
+#include <base/config.h>
 #include <base/thread_management.h>
+#include <lac/vector.h>
 #include <string>
 
 

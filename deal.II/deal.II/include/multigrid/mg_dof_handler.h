@@ -13,6 +13,7 @@
 /*----------------------------   mg_dof.h     ---------------------------*/
 
 
+#include <base/config.h>
 #include <dofs/dof_handler.h>
 
 template <int dim> class MGDoFCellAccessor;

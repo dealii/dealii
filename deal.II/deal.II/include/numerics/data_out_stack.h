@@ -10,6 +10,7 @@
 #define __deal2__data_out_stack_h
 
 
+#include <base/config.h>
 #include <base/data_out_base.h>
 #include <base/smartpointer.h>
 #include <lac/vector.h>

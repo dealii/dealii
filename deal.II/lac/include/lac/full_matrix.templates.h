@@ -14,6 +14,7 @@
 #define __deal2__full_matrix_templates_h
 
 
+#include <base/config.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 

@@ -10,6 +10,7 @@
 #define __deal2__dof_renumbering_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 
 

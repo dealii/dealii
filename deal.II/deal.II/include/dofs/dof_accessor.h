@@ -14,6 +14,7 @@
 /*-------------------------   dof_iterator.h     ------------------------*/
 
 
+#include <base/config.h>
 #include <grid/tria_accessor.h>
 #include <vector>
 

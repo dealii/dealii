@@ -14,6 +14,7 @@
 #define __deal2__solver_bicgstab_h
 
 
+#include <base/config.h>
 #include <base/logstream.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>

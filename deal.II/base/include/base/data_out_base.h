@@ -14,6 +14,7 @@
 #define __deal2__data_out_base_h
 
 
+#include <base/config.h>
 #include <base/point.h>
 #include <base/vector2d.h>
 #include <grid/geometry_info.h>

@@ -14,6 +14,7 @@
 #define __deal2__tensor_product_polynomials_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/tensor.h>
 #include <base/point.h>

@@ -14,6 +14,7 @@
 #define __deal2__block_indices_h
 
 
+#include <base/config.h>
 #include <vector>
 
 

@@ -14,6 +14,7 @@
 #define __deal2__table_handler_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 
 #include <map>

@@ -14,14 +14,16 @@
 #define __deal2__sparsity_pattern_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
+
+#include <vector>
+
 
 template <typename number> class SparseMatrix;
 class CompressedSparsityPattern;
 
-#include <vector>
-#include <iterator>
 
 
 /**

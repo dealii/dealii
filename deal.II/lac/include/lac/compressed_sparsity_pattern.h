@@ -14,6 +14,7 @@
 #define __deal2__compressed_sparsity_pattern_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 

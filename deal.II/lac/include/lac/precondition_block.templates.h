@@ -14,6 +14,7 @@
 #define __deal2__precondition_block_templates_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/logstream.h>
 #include <base/memory_consumption.h>

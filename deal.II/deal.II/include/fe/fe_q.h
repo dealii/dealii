@@ -13,6 +13,7 @@
 #ifndef __deal2__fe_q_h
 #define __deal2__fe_q_h
 
+#include <base/config.h>
 #include <base/polynomial.h>
 #include <fe/fe.h>
 

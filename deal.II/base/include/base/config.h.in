@@ -1,0 +1,76 @@
+/* base/include/base/config.h.in.  Generated automatically from configure.in by autoheader.  */
+//----------------------------  config.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2001 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  config.h  ---------------------------
+#ifndef __deal2__config_h
+#define __deal2__config_h
+
+// Note: you should not usually have to change this file, as it is
+// automatically generated from the ./configure file in the top level
+// directory. If there are problems with the contents of this file,
+// rather than changing it, try to modify the mechanisms in
+// configure.in that generated this output. The reason is that you
+// would have to make these changes each time you compile a new
+// version of the library, or on a different computer. Furthermore, it
+// is important not to build different parts of the library with
+// different versions of this file.
+//
+// In case of problems in autodetection of features of your build
+// environment, contact the authors of the library.
+
+
+/* Define if you have the gethostname function.  */
+#undef HAVE_GETHOSTNAME
+
+/* Major version number of deal.II */
+#undef DEAL_II_MAJOR
+
+/* Minor version number of deal.II */
+#undef DEAL_II_MINOR
+
+/* Flag indicating whether the library shall be compiler for
+             multithreaded applications */
+#undef DEAL_II_USE_MT
+
+/* Backward compatibility support for functions
+                            and classes that do not take an explicit mapping
+                            variable, but rather use a default Q1 mapping instead */
+#undef DEAL_II_COMPAT_MAPPING
+
+/* Define if we have to work around a bug in IBM's xlC compiler */
+#undef XLC_WORK_AROUND_STD_BUG
+
+/* Define if the compiler's library in use provides a
+                 std::iterator class (early gcc versions did not) */
+#undef HAVE_STD_ITERATOR_CLASS
+
+/* Define if the compiler's library in use provides
+                 std::i/ostringstream classese (early gcc versions did not) */
+#undef HAVE_STD_STRINGSTREAM
+
+/* Define if you have the rand_r function */
+#undef DEAL_II_DECLARE_LRAND48
+
+/* Define if you have the rand_r function */
+#undef HAVE_RAND_R
+
+/* Availability of the MA27 algorithm from HSL */
+#undef HAVE_HSL_MA27
+
+/* Availability of the MA47 algorithm from HSL */
+#undef HAVE_HSL_MA47
+
+/* Enable the multigrid components of the library */
+#undef ENABLE_MULTIGRID
+
+
+#endif

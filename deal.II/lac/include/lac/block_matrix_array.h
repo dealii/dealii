@@ -13,6 +13,7 @@
 #ifndef __deal2__block_matrix_array_h
 #define __deal2__block_matrix_array_h
 
+#include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <vector>

@@ -10,6 +10,7 @@
 #define __deal2__persistent_tria_h
 
 
+#include <base/config.h>
 #include <base/smartpointer.h>
 #include <grid/tria.h>
 #include <vector>

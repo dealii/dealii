@@ -14,6 +14,7 @@
 #define __deal2__dof_tools_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <dofs/function_map.h>
 
@@ -683,6 +684,24 @@ class DoFTools
     extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
 			       std::vector<bool>   &selected_dofs);
 
+				     /**
+				      * Flag all those degrees of
+				      * freedom which are on cells
+				      * with the given subdomain
+				      * id. Note that DoFs on faces
+				      * can belong to cells with
+				      * differing subdomain ids, so
+				      * the sets of flagged degrees of
+				      * freedom are not mutually
+				      * exclusive for different
+				      * subdomain ids.
+				      */
+    template <int dim>
+    static void
+    extract_subdomain_dofs (const DoFHandler<dim> &dof_handler,
+			    const unsigned int     subdomain_id,
+			    std::vector<bool>     &selected_dofs);
+    
 				     /**
 				      * Count how many degrees of
 				      * freedom out of the total

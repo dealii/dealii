@@ -14,6 +14,7 @@
 #define __deal2__quadrature_h
 
 
+#include <base/config.h>
 #include <base/point.h>
 #include <base/subscriptor.h>
 #include <vector>

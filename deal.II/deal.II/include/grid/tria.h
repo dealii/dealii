@@ -10,6 +10,7 @@
 #define __deal2__tria_h
 
 
+#include <base/config.h>
 #include <vector>
 #include <base/point.h>
 #include <grid/geometry_info.h>

@@ -27,6 +27,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: <acronym>deal.II</acronym> now uses a file
+       <code>config.h</code> for most global preprocessor defines,
+       instead of an overly long list of compiler flags given on the
+       command line.
+       <br>
+       (WB 2001/10/27)
+       </p>
+
+  <li> <p>
        Changed: If available, the library now uses the C++ standard
        classes <code class="class">istringstream</code> and <code
        class="class">ostringstream</code> over the old classes
@@ -111,6 +120,27 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: <code>DoFTools::extract_subdomain_dofs</code> selects
+       those degrees of freedom which are located on cells with a
+       specified subdomain id.
+       <br>
+       (WB 2001/10/27)
+       </p>
+
+  <li> <p>
+       New: Cells now have an additional property
+       <em>subdomain_id</em> which can be used in parallel
+       computations to identify which cells are handled on which
+       processor. These flags are read and set using the functions
+       <code>cell->subdomain_id()</code> and
+       <code>cell->set_subdomain_id(new_id)</code>. The subdomain ids
+       are unsigned integers, so should be sufficiently large also for
+       larger numbers of subdomains.
+       <br>
+       (WB 2001/10/27)
+       </p>
+
   <li> <p>
        Fixed: the <code
        class="member">GridGenerator::hyper_rectangle</code> function

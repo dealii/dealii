@@ -14,6 +14,7 @@
 #define __deal2__precondition_selector_h
 
 
+#include <base/config.h>
 #include <base/smartpointer.h>
 #include <string>
 

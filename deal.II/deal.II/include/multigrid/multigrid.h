@@ -14,6 +14,7 @@
 #define __deal2__multigrid_h
 
 
+#include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/sparse_matrix.h>

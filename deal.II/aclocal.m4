@@ -288,7 +288,8 @@ int i=rand_r(&i);
 	],
 	[
 	  AC_MSG_RESULT(found)
-	  AC_DEFINE(HAVE_RAND_R)
+	  AC_DEFINE(HAVE_RAND_R, 1, 
+                    [Define if you have the rand_r function])
 	],
 	[
 	  AC_MSG_RESULT(no)
@@ -361,7 +362,8 @@ AC_DEFUN(DEAL_II_CHECK_IBM_XLC_ERROR, dnl
     ],
     [
       AC_MSG_RESULT(yes. trying to work around)
-      AC_DEFINE(XLC_WORK_AROUND_STD_BUG)
+      AC_DEFINE(XLC_WORK_AROUND_STD_BUG, 1, 
+                [Define if we have to work around a bug in IBM's xlC compiler])
     ])
 )
 
@@ -384,7 +386,9 @@ AC_DEFUN(DEAL_II_HAVE_STD_ITERATOR, dnl
     [],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_STD_ITERATOR_CLASS)
+      AC_DEFINE(HAVE_STD_ITERATOR_CLASS, 1,
+	        [Define if the compiler's library in use provides a
+                 std::iterator class (early gcc versions did not)])
     ],
     [
       AC_MSG_RESULT(no)
@@ -413,7 +417,9 @@ AC_DEFUN(DEAL_II_HAVE_STD_STRINGSTREAM, dnl
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_STD_STRINGSTREAM)
+      AC_DEFINE(HAVE_STD_STRINGSTREAM, 1, 
+                [Define if the compiler's library in use provides
+                 std::i/ostringstream classes (early gcc versions did not)])
     ],
     [
       AC_MSG_RESULT(no)
@@ -448,7 +454,8 @@ void f()
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(DEAL_II_DECLARE_LRAND48)
+      AC_DEFINE(DEAL_II_DECLARE_LRAND48, 1, 
+                [Define if you have the rand_r function])
     ])
 )
 

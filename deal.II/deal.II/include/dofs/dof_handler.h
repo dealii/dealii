@@ -11,6 +11,7 @@
 
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/smartpointer.h>
 #include <dofs/function_map.h>

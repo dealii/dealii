@@ -14,7 +14,9 @@
 #define __deal2__vector_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
+
 #include <cstdio>
 
 

@@ -15,6 +15,7 @@
 
 // This file contains simple preconditioners.
 
+#include <base/config.h>
 #include <lac/vector_memory.h>
 #include <base/smartpointer.h>
 

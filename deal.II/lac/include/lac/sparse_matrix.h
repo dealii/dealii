@@ -14,9 +14,7 @@
 #define __deal2__sparse_matrix_h
 
 
-/*----------------------------   sparse_matrix.h     ---------------------------*/
-
-
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>

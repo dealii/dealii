@@ -14,6 +14,7 @@
 #define __deal2__mapping_h
 
 
+#include <base/config.h>
 #include <cmath>
 #include <base/point.h>
 #include <base/subscriptor.h>

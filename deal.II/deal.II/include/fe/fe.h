@@ -14,6 +14,7 @@
 #ifndef __deal2__fe_h
 #define __deal2__fe_h
 
+#include <base/config.h>
 #include <fe/fe_base.h>
 #include <dofs/dof_handler.h>
 

@@ -14,6 +14,7 @@
 #define __deal2__solver_selector_h
 
 
+#include <base/config.h>
 #include <base/smartpointer.h>
 #include <lac/solver.h>
 #include <lac/vector.h>

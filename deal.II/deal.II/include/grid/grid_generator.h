@@ -14,6 +14,7 @@
 #define __deal2__grid_generator_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <map>
 

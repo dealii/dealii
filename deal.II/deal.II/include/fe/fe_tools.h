@@ -21,6 +21,7 @@ template <int dim> class DoFHandler;
 template <typename number> class Vector;
 template <int dim> class FE_Q;
 
+#include <base/config.h>
 #include <base/exceptions.h>
 
 /**

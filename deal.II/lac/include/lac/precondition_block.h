@@ -14,6 +14,7 @@
 #define __deal2__precondition_block_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>

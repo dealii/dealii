@@ -17,6 +17,7 @@
 /*----------------------------   fe_system.h     ---------------------------*/
 
 
+#include <base/config.h>
 #include <fe/fe.h>
 #include <vector>
 #include <utility>

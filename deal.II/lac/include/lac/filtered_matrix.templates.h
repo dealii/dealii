@@ -14,6 +14,7 @@
 #define __deal2__filtered_matrix_templates_h
 
 
+#include <base/config.h>
 #include <base/memory_consumption.h>
 #include <lac/filtered_matrix.h>
 #include <lac/sparse_matrix.h>

@@ -14,6 +14,8 @@
 #define __deal2__fe_update_flags_h
 
 
+#include <base/config.h>
+
 
 /**
  * Provide a set of flags which tells the @p{FEValues<>::reinit}

@@ -14,6 +14,7 @@
 #define __deal2__block_matrix_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/smartpointer.h>
 #include <lac/block_vector.h>

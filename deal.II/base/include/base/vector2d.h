@@ -13,6 +13,7 @@
 #ifndef __deal2__vector2d_h
 #define __deal2__vector2d_h
 
+#include <base/config.h>
 #include <base/subscriptor.h>
 
 

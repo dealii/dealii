@@ -14,6 +14,7 @@
 #define __deal2__block_vector_h
 
 
+#include <base/config.h>
 #include <lac/vector.h>
 #include <lac/block_indices.h>
 #include <base/exceptions.h>

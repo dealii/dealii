@@ -14,6 +14,7 @@
 #define __deal2__fe_lib_lagrange_h
 
 
+#include <base/config.h>
 #include<fe/fe_q.h>
 
 

@@ -14,6 +14,7 @@
 #define __deal2__dof_levels_h
 
 
+#include <base/config.h>
 #include <vector>
 
 

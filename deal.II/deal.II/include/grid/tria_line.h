@@ -14,6 +14,7 @@
 #define __deal2__tria_line_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 
 

@@ -13,6 +13,8 @@
 #ifndef __deal2__magic_numbers_h
 #define __deal2__magic_numbers_h
 
+#include <base/config.h>
+
 
 // This is a list of magic numbers used throughout the library.
 // They are collected in one file to avoid double usage.

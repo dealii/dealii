@@ -14,7 +14,9 @@
 #define __deal2__solver_control_h
 
 
+#include <base/config.h>
 #include <base/subscriptor.h>
+
 class ParameterHandler;
 
 

@@ -13,6 +13,7 @@
 #ifndef __deal2__solver_h
 #define __deal2__solver_h
 
+#include <base/config.h>
 #include <base/subscriptor.h>
 
 template <typename number> class Vector;

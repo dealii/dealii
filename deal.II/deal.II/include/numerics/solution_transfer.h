@@ -13,6 +13,7 @@
 /*----------------------------   solutiontransfer.h     ----------------------*/
 
 
+#include <base/config.h>
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
 

@@ -16,6 +16,7 @@
 
 /*----------------------------   solver_pgmres.h     ---------------------------*/
 
+#include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/logstream.h>
 #include <lac/solver.h>

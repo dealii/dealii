@@ -14,6 +14,7 @@
 #define __deal2__fe_values_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/point.h>

@@ -14,6 +14,7 @@
 #define __deal2__grid_refinement_h
 
 
+#include <base/config.h>
 #include <lac/vector.h>
 #include <vector>
 

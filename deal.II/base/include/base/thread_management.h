@@ -19,6 +19,7 @@
 #  include <ace/Synch.h>
 #endif
 
+#include <base/config.h>
 #include <base/exceptions.h>
 
 #include <utility>

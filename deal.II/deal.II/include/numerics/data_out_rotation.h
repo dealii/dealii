@@ -14,6 +14,7 @@
 #define __deal2__data_out_rotation_h
 
 
+#include <base/config.h>
 #include <numerics/data_out.h>
 
 #include <string>

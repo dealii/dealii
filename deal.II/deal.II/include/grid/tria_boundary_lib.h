@@ -14,6 +14,7 @@
 #define __deal2__tria_boundary_lib_h
 
 
+#include <base/config.h>
 #include <grid/tria_boundary.h>
 
 

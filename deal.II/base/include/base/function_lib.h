@@ -14,6 +14,7 @@
 #define __deal2__function_lib_h
 
 
+#include <base/config.h>
 #include <base/function.h>
 
 

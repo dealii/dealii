@@ -14,6 +14,7 @@
 #define __deal2__dof_constraints_h
 
 
+#include <base/config.h>
 #include <vector>
 #include <utility>
 #include <base/exceptions.h>

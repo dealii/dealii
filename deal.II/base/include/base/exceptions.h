@@ -14,6 +14,8 @@
 #define __deal2__exceptions_h
 
 
+#include <base/config.h>
+
 #include <exception>
 #include <iostream>
 #include <cstdlib>

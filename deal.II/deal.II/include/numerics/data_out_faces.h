@@ -10,6 +10,7 @@
 #define __deal2__data_out_faces_h
 
 
+#include <base/config.h>
 #include <numerics/data_out.h>
 
 #include <string>

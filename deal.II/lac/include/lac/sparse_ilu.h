@@ -14,6 +14,7 @@
 #define __deal2__sparse_ilu_h
 
 
+#include <base/config.h>
 #include <lac/sparse_matrix.h>
 
 

@@ -13,6 +13,7 @@
 #ifndef __deal2__fe_base_h
 #define __deal2__fe_base_h
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/point.h>
