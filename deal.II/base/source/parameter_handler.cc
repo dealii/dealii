@@ -622,7 +622,8 @@ bool ParameterHandler::get_bool (const std::string &entry_string) const
 
 
 
-std::ostream & ParameterHandler::print_parameters (std::ostream &out, OutputStyle style)
+std::ostream & ParameterHandler::print_parameters (std::ostream &out,
+						   const OutputStyle style)
 {
 				   // assert that only known formats are
 				   // given as "style"
