@@ -75,7 +75,7 @@ $(target) : $(libraries)
 
 # rule how to run the program
 run: $(target)
-	$(target) $(run-parameters)
+	./$(target) $(run-parameters)
 	$(additional-run-action)
 
 
@@ -87,7 +87,7 @@ run: $(target)
 %.o : %.cc
 	@echo ============================ Compiling with optimization:   $<
 	@echo $(CXX) ... -c $< -o $@
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
 # rules which files the libraries depend upon
