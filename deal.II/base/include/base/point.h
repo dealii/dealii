@@ -272,7 +272,7 @@ Point<dim> Point<dim>::operator - () const
 {
   Point<dim> result;
   for (unsigned int i=0; i<dim; ++i)
-    result.this->values[i] = -this->values[i];
+    result.values[i] = -this->values[i];
   return result;
 };
 
