@@ -109,6 +109,16 @@ class PersistentTriangulation : public Triangulation<dim>
     PersistentTriangulation (const Triangulation<dim> &coarse_grid);
 
 				     /**
+				      * Copy constructor. This operation
+				      * is only allowed, if the triangulation
+				      * underlying the object to be copied
+				      * is presently empty. Refinement flags
+				      * as well as the pointer to the
+				      * coarse grid are copied, however.
+				      */
+    PersistentTriangulation (const PersistentTriangulation<dim> &old_tria);
+    
+				     /**
 				      * Destructor.
 				      */
     virtual ~PersistentTriangulation ();
@@ -183,6 +193,10 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * Exception.
 				      */
     DeclException0 (ExcFunctionNotUseful);
+				     /**
+				      * Exception.
+				      */
+    DeclException0 (ExcTriaNotEmpty);
     
   private:
 				     /**

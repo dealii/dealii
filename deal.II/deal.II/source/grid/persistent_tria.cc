@@ -10,6 +10,21 @@ PersistentTriangulation (const Triangulation<dim> &coarse_grid) :
 {};
 
 
+template <int dim>
+PersistentTriangulation<dim>::
+PersistentTriangulation (const PersistentTriangulation<dim> &old_tria) :
+						 // default initialize
+						 // tria, i.e. it will be
+						 // empty on first use
+		Triangulation<dim> (),
+		coarse_grid (old_tria.coarse_grid),
+		refine_flags (old_tria.refine_flags),
+		coarsen_flags (old_tria.coarsen_flags)
+{
+  Assert (old_tria.n_levels() == 0, ExcTriaNotEmpty ());
+};
+
+
 
 template <int dim>
 PersistentTriangulation<dim>::~PersistentTriangulation () 
