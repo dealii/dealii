@@ -28,11 +28,12 @@ reference.exe      : reference.go abort.go       $(libraries)
 table.exe          : table.go                    $(libraries)
 tensor.exe         : tensor.go                   $(libraries)
 timer.exe          : timer.go                    $(libraries)
-auto_derivative_function.exe        : auto_derivative_function.go            $(libraries)
+auto_derivative_function.exe : auto_derivative_function.go $(libraries)
 
 
-tests = logtest reference quadrature_test table tensor \
-        timer polynomial1d polynomial_test auto_derivative_function
+tests = $(sort \
+          logtest reference quadrature_test table tensor \
+          timer polynomial1d polynomial_test auto_derivative_function)
 
 ############################################################
 

@@ -35,9 +35,10 @@ vector-vector.exe         : vector-vector.go                                $(li
 #mg.exe                   : mg.go                             testmatrix.go $(libraries)
 
 
-tests = sparse_matrices block_matrices block_vector block_vector_iterator \
-        full_matrix \
-        matrix_out solver sparsity_pattern sparse_ilu vector-vector
+tests = $(sort \
+          sparse_matrices block_matrices block_vector block_vector_iterator \
+          full_matrix \
+          matrix_out solver sparsity_pattern sparse_ilu vector-vector)
 
 ############################################################
 

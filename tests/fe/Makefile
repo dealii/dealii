@@ -43,11 +43,12 @@ anna_1.exe              : anna_1.go              $(libraries)
 anna_2.exe              : anna_2.go              $(libraries)
 anna_3.exe              : anna_3.go              $(libraries)
 
-tests = derivatives fe_data_test fe_traits fe_tools_test mapping \
-        mapping_c1 shapes numbering mapping_q1_eulerian \
-        transfer internals \
-        non_primitive_1 non_primitive_2 \
-        nedelec nedelec_2 nedelec_3 up_and_down anna_1 anna_2 anna_3
+tests = $(sort \
+          derivatives fe_data_test fe_traits fe_tools_test mapping \
+          mapping_c1 shapes numbering mapping_q1_eulerian \
+          transfer internals \
+          non_primitive_1 non_primitive_2 \
+          nedelec nedelec_2 nedelec_3 up_and_down anna_1 anna_2 anna_3)
 
 ############################################################
 

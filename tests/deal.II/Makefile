@@ -51,12 +51,13 @@ filtered_iterator.exe        : filtered_iterator.go                  $(lib-2d)  
 grid_in.exe                  : grid_in.go                            $(lib-2d)           $(libraries)
 
 
-tests = grid_test grid_transform dof_test data_out derivatives gradients \
-	constraints block_matrices second_derivatives derivative_approximation \
-        matrices error_estimator intergrid_constraints intergrid_map \
-        wave-test-3 dof_renumbering support_point_map filtered_matrix \
-	boundaries sparsity_pattern grid_tools subdomain_ids \
-	filtered_iterator grid_out grid_in
+tests = $(sort \
+          grid_test grid_transform dof_test data_out derivatives gradients \
+	  constraints block_matrices second_derivatives derivative_approximation \
+          matrices error_estimator intergrid_constraints intergrid_map \
+          wave-test-3 dof_renumbering support_point_map filtered_matrix \
+	  boundaries sparsity_pattern grid_tools subdomain_ids \
+	  filtered_iterator grid_out grid_in)
 
 ############################################################
 
