@@ -189,7 +189,8 @@ class DataIn {
  * This class implements an output mechanism for grid and simulation data
  * in several formats.
  * At present it supports output in UCD (unstructured cell data) and
- * partly in GNUPLOT format.
+ * GNUPLOT format. Partly supported are POVRAY and encapsulated postscript.
+ * The latter two allow for only one data set and do not support cell data.
  *
  * It allows the user to attach a degree of freedom handler object
  * (#DoFHandler#) which also gives access to the geometry data of the
@@ -211,8 +212,9 @@ class DataIn {
  * limitations in the present format, only node based data can be output,
  * so higher order elements are only written with their node values, no
  * interior or line values are used. No use is made of the possibility
- * to give cell and model data since these are not supported by all
- * UCD aware programs.
+ * to give model data since these are not supported by all
+ * UCD aware programs. You may give cell data, but that is not supported by
+ * all programs.
  *
  * The ASCII UCD format is used. In future versions, a binary version may
  * follow up.
@@ -343,9 +345,12 @@ class DataOut {
 				      *
 				      * It is assumed that the vector has the
 				      * same number of components as there are
-				      * degrees of freedom in the dof handler.
-				      * Therefore, no block vectors are allowed
-				      * at present.
+				      * degrees of freedom in the dof handler,
+				      * in which case it is assumed to be a
+				      * vector storing nodal data; or the size
+				      * may be the number of active cells on
+				      * the present grid, in which case it is
+				      * assumed to be a cell data vector.
 				      *
 				      * The name and unit of a data vector shall
 				      * only contain characters which are
@@ -396,18 +401,21 @@ class DataOut {
 
 				     /**
 				      * Write data of first vector and grid
-				      * in POVRAY format.
+				      * in POVRAY format. Further data vectors
+				      * as well as cell data is ignored.
 				      */
     void write_povray_mesh (ostream &out) const;
 
 				   /**
 				    * Write data of first vector and grid in
 				    * Encapsulated postscript format.
+				    * Further data vectors
+				    * as well as cell data is ignored.
 				    */
     void write_eps (ostream &out) const;
 
 				   /**
-				    *Write grid in Encapsulated
+				    * Write grid in Encapsulated
 				    * postscript format.
 				    */
     void write_epsgrid (ostream &out) const;
@@ -488,11 +496,12 @@ class DataOut {
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidVectorSize,
-		    int, int,
+    DeclException3 (ExcInvalidVectorSize,
+		    int, int, int,
 		    << "The vector has size " << arg1
 		    << " but the DoFHandler objects says there are " << arg2
-		    << " degrees of freedom.");
+		    << " degrees of freedom and there are " << arg3
+		    << " active cells.");
 				     /**
 				      * Exception
 				      */
@@ -552,9 +561,16 @@ class DataOut {
     const DoFHandler<dim>   *dofs;
 
 				     /**
-				      * List of data elements.
+				      * List of data elements with vectors of
+				      * values for each degree of freedom.
 				      */
-    vector<DataEntry>  data;
+    vector<DataEntry>  dof_data;
+
+				     /**
+				      * List of data elements with vectors of
+				      * values for each cell.
+				      */
+    vector<DataEntry>  cell_data;
 
 
 				     /**

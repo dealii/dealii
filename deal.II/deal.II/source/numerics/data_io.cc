@@ -207,8 +207,6 @@ void DataOut<dim>::add_data_vector (const Vector<double> &vec,
 				    const string  &name,
 				    const string  &units) {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
-  Assert (vec.size() == dofs->n_dofs(),
-	  ExcInvalidVectorSize (vec.size(), dofs->n_dofs()));
   Assert (name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 				 "0123456789_<>()") == string::npos,
@@ -219,14 +217,24 @@ void DataOut<dim>::add_data_vector (const Vector<double> &vec,
 	  ExcInvalidCharacter (units));
   
   DataEntry new_entry (&vec, name, units);
-  data.push_back (new_entry);
+  if (vec.size() == dofs->n_dofs())
+    dof_data.push_back (new_entry);
+  else
+    if (vec.size() == dofs->get_tria().n_active_cells())
+      cell_data.push_back (new_entry);
+    else
+      Assert (false,
+	      ExcInvalidVectorSize (vec.size(),
+				    dofs->n_dofs(),
+				    dofs->get_tria().n_active_cells()));
 };
 
 
 
 template <int dim>
 void DataOut<dim>::clear_data_vectors () {
-  data.erase (data.begin(), data.end());
+  dof_data.erase (dof_data.begin(), dof_data.end());
+  cell_data.erase (cell_data.begin(), cell_data.end());
 };
 
 
@@ -291,8 +299,8 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 				   // start with ucd data
   out << n_vertex_dofs << ' '
       << dofs->get_tria().n_active_cells() + n_boundary_faces() << ' '
-      << data.size() << ' '
-      << 0 << ' '                  // no cell data
+      << dof_data.size() << ' '
+      << cell_data.size() << ' '
       << 0                         // no model data
       << endl;
   
@@ -364,16 +372,16 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 
 				   // if data given: write data, else
 				   // only write grid
-  if (data.size() != 0)
+  if (dof_data.size() != 0)
     {      
-      out << data.size() << "    ";    // number of vectors
-      for (unsigned int i=0; i!=data.size(); ++i)
+      out << dof_data.size() << "    ";    // number of vectors
+      for (unsigned int i=0; i!=dof_data.size(); ++i)
 	out << 1 << ' ';               // number of components;
 				       // only 1 supported presently
       out << endl;
       
-      for (unsigned int i=0; i<data.size(); ++i)
-	out << data[i].name << ',' << data[i].units << endl;
+      for (unsigned int i=0; i<dof_data.size(); ++i)
+	out << dof_data[i].name << ',' << dof_data[i].units << endl;
 
       				       // AVS requires that the dof values
 				       // be given in exactly the same order
@@ -391,14 +399,35 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 	    {
 	      out << cell->vertex_dof_index(vertex,0) // vertex index
 		  << "   "; 
-	      for (unsigned int i=0; i!=data.size(); ++i)
-		out << (*data[i].data)(cell->vertex_dof_index(vertex,0)) << ' ';
+	      for (unsigned int i=0; i!=dof_data.size(); ++i)
+		out << (*dof_data[i].data)(cell->vertex_dof_index(vertex,0)) << ' ';
 	      out << endl;
 
 	      already_written[cell->vertex_dof_index(vertex,0)] = true;
 	    };
     };
-				   // no cell data
+
+  if (cell_data.size() != 0)
+    {
+      out << cell_data.size() << "    ";    // number of vectors
+      for (unsigned int i=0; i!=cell_data.size(); ++i)
+	out << 1 << ' ';               // number of components;
+				       // only 1 supported presently
+      out << endl;
+
+      for (unsigned int i=0; i<cell_data.size(); ++i)
+	out << cell_data[i].name << ',' << cell_data[i].units << endl;
+
+      unsigned int index;
+      for (cell=dofs->begin_active(), index=0; cell!=endc; ++cell, ++index)
+	{
+	  out << index << "  ";
+	  for (unsigned int i=0; i!=cell_data.size(); ++i)
+	    out << (*cell_data[i].data)(index) << ' ';
+	  out << endl;
+	};
+    };
+  
 				   // no model data
 
 				   // assert the stream is still ok
@@ -527,9 +556,13 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
-      for (unsigned int i=0; i!=data.size(); ++i)
+      for (unsigned int i=0; i!=dof_data.size(); ++i)
 	out << '<'
-	    << data[i].name << ':' << data[i].units
+	    << dof_data[i].name << ':' << dof_data[i].units
+	    << "> ";
+      for (unsigned int i=0; i!=cell_data.size(); ++i)
+	out << '<'
+	    << cell_data[i].name << ':' << cell_data[i].units
 	    << "> ";
       out << endl;
       
@@ -544,20 +577,18 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
   FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points));
   const StraightBoundary<dim> boundary;
   vector< vector <Vector<double> > >
-    values (data.size(),
+    values (dof_data.size(),
 	    vector< Vector<double> >(points.n_quadrature_points,
 				     Vector<double>(dofs->get_fe().n_components
 				     )));
 
-  for (cell=dofs->begin_active(); cell!=endc; ++cell) 
+  unsigned int cell_index=0;
+  for (cell=dofs->begin_active(); cell!=endc; ++cell, ++cell_index) 
     {
       fe.reinit(cell, boundary);
 
-      for (unsigned i=0; i<data.size(); ++i)
-      {
-//	values[i].resize(points.n_quadrature_points);
-	fe.get_function_values(*data[i].data, values[i]);
-      }
+      for (unsigned i=0; i<dof_data.size(); ++i)
+	fe.get_function_values(*dof_data[i].data, values[i]);
       
       unsigned supp_pt;
       
@@ -571,10 +602,14 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		  {
 		    Point<dim> pt = fe.quadrature_point(supp_pt);
 		    out << pt << "  ";
-		    for (unsigned int i=0; i!=data.size(); ++i)
+		    for (unsigned int i=0; i!=dof_data.size(); ++i)
 		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
 			out << values[i][supp_pt](j)
 			    << ' ';
+		    for (unsigned int i=0; i<cell_data.size(); ++i)
+		      out << (*cell_data[i].data)(cell_index)
+			  << ' ';
+		    
 		    out << endl;
 		  };
 		
@@ -593,10 +628,13 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		    Point<dim> pt = fe.quadrature_point(supp_pt);
 		    out << pt << "  ";
 		    
-		    for (unsigned int i=0; i!=data.size(); ++i)
+		    for (unsigned int i=0; i!=dof_data.size(); ++i)
 		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
 			out << values[i][supp_pt](j)
 			    << ' ';
+		    for (unsigned int i=0; i<cell_data.size(); ++i)
+		      out << (*cell_data[i].data)(cell_index)
+			  << ' ';
 		    out << endl;
 		  }
 		  out << endl;
@@ -626,10 +664,13 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 			    Point<dim> pt = fe.quadrature_point(supp_pt);
 			    out << pt << "  ";
 			    
-			    for (unsigned int i=0; i!=data.size(); ++i)
+			    for (unsigned int i=0; i!=dof_data.size(); ++i)
 			      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
 				out << values[i][supp_pt](j)
 				    << ' ';
+			    for (unsigned int i=0; i<cell_data.size(); ++i)
+			      out << (*cell_data[i].data)(cell_index)
+				  << ' ';
 			    out << endl;
 			  }
 			out << endl;
@@ -697,9 +738,9 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
-      for (unsigned int i=0; i!=data.size(); ++i)
+      for (unsigned int i=0; i!=dof_data.size(); ++i)
 	out << '<'
-	    << data[i].name << ':' << data[i].units
+	    << dof_data[i].name << ':' << dof_data[i].units
 	    << "> ";
       out << endl;
       
@@ -709,7 +750,8 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
   DoFHandler<dim>::active_cell_iterator cell;
   DoFHandler<dim>::active_cell_iterator endc = dofs->end();
 
-  for (cell=dofs->begin_active(); cell!=endc; ++cell) 
+  unsigned int cell_index=0;
+  for (cell=dofs->begin_active(); cell!=endc; ++cell, ++cell_index) 
     {
       switch (dim) 
 	{
@@ -721,8 +763,11 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 		  {
 		    out << cell->vertex(vertex)
 			<< "   ";
-		    for (unsigned int i=0; i!=data.size(); ++i)
-		      out << (*data[i].data)(cell->vertex_dof_index(vertex,0))
+		    for (unsigned int i=0; i!=dof_data.size(); ++i)
+		      out << (*dof_data[i].data)(cell->vertex_dof_index(vertex,0))
+			  << ' ';
+		    for (unsigned int i=0; i<cell_data.size(); ++i)
+		      out << (*cell_data[i].data)(cell_index)
 			  << ' ';
 		    out << endl;
 		  };
@@ -736,15 +781,21 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 		for (unsigned int vertex=0; vertex<4; ++vertex) 
 		  {
 		    out << cell->vertex(vertex) << "   ";
-		    for (unsigned int i=0; i!=data.size(); ++i)
-		      out << (*data[i].data)(cell->vertex_dof_index(vertex,0))
+		    for (unsigned int i=0; i!=dof_data.size(); ++i)
+		      out << (*dof_data[i].data)(cell->vertex_dof_index(vertex,0))
+			  << ' ';
+		    for (unsigned int i=0; i<cell_data.size(); ++i)
+		      out << (*cell_data[i].data)(cell_index)
 			  << ' ';
 		    out << endl;
 		  };
 						 // first vertex again
 		out << cell->vertex(0) << "   ";
-		for (unsigned int i=0; i!=data.size(); ++i)
-		  out << (*data[i].data)(cell->vertex_dof_index(0,0))
+		for (unsigned int i=0; i!=dof_data.size(); ++i)
+		  out << (*dof_data[i].data)(cell->vertex_dof_index(0,0))
+		      << ' ';
+		for (unsigned int i=0; i<cell_data.size(); ++i)
+		  out << (*cell_data[i].data)(cell_index)
 		      << ' ';
 		out << endl
 		    << endl
@@ -763,15 +814,21 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 		for (unsigned int vertex=0; vertex<4; ++vertex) 
 		  {
 		    out << cell->vertex(vertex) << "   ";
-		    for (unsigned int i=0; i!=data.size(); ++i)
-		      out << (*data[i].data)(cell->vertex_dof_index(vertex,0))
+		    for (unsigned int i=0; i!=dof_data.size(); ++i)
+		      out << (*dof_data[i].data)(cell->vertex_dof_index(vertex,0))
+			  << ' ';
+		    for (unsigned int i=0; i<cell_data.size(); ++i)
+		      out << (*cell_data[i].data)(cell_index)
 			  << ' ';
 		    out << endl;
 		  };
 						 // first vertex again
 		out << cell->vertex(0) << "   ";
-		for (unsigned int i=0; i!=data.size(); ++i)
-		  out << (*data[i].data)(cell->vertex_dof_index(0,0))
+		for (unsigned int i=0; i!=dof_data.size(); ++i)
+		  out << (*dof_data[i].data)(cell->vertex_dof_index(0,0))
+		      << ' ';
+		for (unsigned int i=0; i<cell_data.size(); ++i)
+		  out << (*cell_data[i].data)(cell_index)
 		      << ' ';
 		out << endl
 		    << endl
@@ -783,15 +840,21 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 		for (unsigned int vertex=4; vertex<8; ++vertex) 
 		  {
 		    out << cell->vertex(vertex) << "   ";
-		    for (unsigned int i=0; i!=data.size(); ++i)
-		      out << (*data[i].data)(cell->vertex_dof_index(vertex,0))
+		    for (unsigned int i=0; i!=dof_data.size(); ++i)
+		      out << (*dof_data[i].data)(cell->vertex_dof_index(vertex,0))
+			  << ' ';
+		    for (unsigned int i=0; i<cell_data.size(); ++i)
+		      out << (*cell_data[i].data)(cell_index)
 			  << ' ';
 		    out << endl;
 		  };
 						 // first vertex again
 		out << cell->vertex(4) << "   ";
-		for (unsigned int i=0; i!=data.size(); ++i)
-		  out << (*data[i].data)(cell->vertex_dof_index(4,0))
+		for (unsigned int i=0; i!=dof_data.size(); ++i)
+		  out << (*dof_data[i].data)(cell->vertex_dof_index(4,0))
+		      << ' ';
+		for (unsigned int i=0; i<cell_data.size(); ++i)
+		  out << (*cell_data[i].data)(cell_index)
 		      << ' ';
 		out << endl
 		    << endl
@@ -810,8 +873,11 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 		      = { 0, 4, 7, 3, 2, 6, 5, 1 };
 		    
 		    out << cell->vertex(vertex_list[vertex]) << "   ";
-		    for (unsigned int i=0; i!=data.size(); ++i)
-		      out << (*data[i].data)(cell->vertex_dof_index(vertex_list[vertex],0))
+		    for (unsigned int i=0; i!=dof_data.size(); ++i)
+		      out << (*dof_data[i].data)(cell->vertex_dof_index(vertex_list[vertex],0))
+			  << ' ';
+		    for (unsigned int i=0; i<cell_data.size(); ++i)
+		      out << (*cell_data[i].data)(cell_index)
 			  << ' ';
 		    out << endl;
 		  };
@@ -898,15 +964,15 @@ void DataOut<2>::write_povray_mesh (ostream &out) const {
 				       // y and z coordinates are switched
       out << "  triangle { ";
       out << '<' << cell->vertex(0)(0) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(0,0)) << ','
+	  << (*dof_data[0].data)(cell->vertex_dof_index(0,0)) << ','
 	  << cell->vertex(0)(1) << '>'
 	  << ", "
 	  << '<' << cell->vertex(1)(0) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(1,0)) << ','
+	  << (*dof_data[0].data)(cell->vertex_dof_index(1,0)) << ','
 	  << cell->vertex(1)(1) << '>'
 	  << ", "
 	  << '<' << cell->vertex(2)(0) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(2,0)) << ','
+	  << (*dof_data[0].data)(cell->vertex_dof_index(2,0)) << ','
 	  << cell->vertex(2)(1) << '>'
 	  << endl
 	  << "              texture { default_texture }"   << endl
@@ -914,15 +980,15 @@ void DataOut<2>::write_povray_mesh (ostream &out) const {
 	  << endl;
       out << "  triangle { ";
       out << '<' << cell->vertex(0)(0) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(0,0)) << ','
+	  << (*dof_data[0].data)(cell->vertex_dof_index(0,0)) << ','
 	  << cell->vertex(0)(1) << '>'
 	  << ", "
 	  << '<' << cell->vertex(2)(0) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(2,0)) << ','
+	  << (*dof_data[0].data)(cell->vertex_dof_index(2,0)) << ','
 	  << cell->vertex(2)(1) << '>'
 	  << ", "
 	  << '<' << cell->vertex(3)(0) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(3,0)) << ','
+	  << (*dof_data[0].data)(cell->vertex_dof_index(3,0)) << ','
 	  << cell->vertex(3)(1) << '>'
 	  << endl
 	  << "              texture { default_texture }"   << endl
@@ -1063,7 +1129,7 @@ void DataOut<2>::write_eps (ostream &out) const {
 	{
 	  x=cell->vertex(i)(0);
 	  y=cell->vertex(i)(1);
-	  z=(*data[0].data)(cell->vertex_dof_index(i,0));
+	  z=(*dof_data[0].data)(cell->vertex_dof_index(i,0));
 	  xmin = ( x < xmin ? x : xmin );
 	  xmax = ( x > xmax ? x : xmax );
 	  ymin = ( y < ymin ? y : ymin );
@@ -1083,10 +1149,10 @@ void DataOut<2>::write_eps (ostream &out) const {
 
   for (cell=dofs->begin_active(); cell!=endc; ++cell) 
     {
-      cx[0]=cell->vertex(0)(0); cy[0]=cell->vertex(0)(1); cz[0]=(*data[0].data)(cell->vertex_dof_index(0,0))*zscale;
-      cx[1]=cell->vertex(1)(0); cy[1]=cell->vertex(1)(1); cz[1]=(*data[0].data)(cell->vertex_dof_index(1,0))*zscale;;
-      cx[2]=cell->vertex(2)(0); cy[2]=cell->vertex(2)(1); cz[2]=(*data[0].data)(cell->vertex_dof_index(2,0))*zscale;;
-      cx[3]=cell->vertex(3)(0); cy[3]=cell->vertex(3)(1); cz[3]=(*data[0].data)(cell->vertex_dof_index(3,0))*zscale;;
+      cx[0]=cell->vertex(0)(0); cy[0]=cell->vertex(0)(1); cz[0]=(*dof_data[0].data)(cell->vertex_dof_index(0,0))*zscale;
+      cx[1]=cell->vertex(1)(0); cy[1]=cell->vertex(1)(1); cz[1]=(*dof_data[0].data)(cell->vertex_dof_index(1,0))*zscale;;
+      cx[2]=cell->vertex(2)(0); cy[2]=cell->vertex(2)(1); cz[2]=(*dof_data[0].data)(cell->vertex_dof_index(2,0))*zscale;;
+      cx[3]=cell->vertex(3)(0); cy[3]=cell->vertex(3)(1); cz[3]=(*dof_data[0].data)(cell->vertex_dof_index(3,0))*zscale;;
       
       // Turn and scale
 
