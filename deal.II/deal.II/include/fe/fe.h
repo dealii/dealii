@@ -21,8 +21,10 @@ template <int dim> class Quadrature;
   This class is an optimization which avoids evaluating the shape functions
   at the quadrature points each time a quadrature takes place. Rather, the
   values and gradients (and possibly higher order derivatives in future
-  versions of this library) are evaluated once and for all before doing the
-  quadrature itself.
+  versions of this library) are evaluated once and for all on the unit
+  cell before doing the quadrature itself. Only the Jacobian matrix of
+  the transformation from the unit cell to the real cell and the integration
+  points in real space are calculated each time we move on to a new cell.
 
   Objects of this class store a multitude of different values needed to
   do the assemblage steps on real cells rather than on the unit cell. Among
@@ -43,6 +45,16 @@ template <int dim> class Quadrature;
 template <int dim>
 class FEValues {
   public:
+				     /**
+				      * Number of quadrature points.
+				      */
+    const unsigned int n_quadrature_points;
+
+				     /**
+				      * Total number of shape functions.
+				      */
+    const unsigned int total_dofs;
+    
 				     /**
 				      * Constructor. Fill all arrays with the
 				      * values of the shape functions of the
@@ -76,6 +88,19 @@ class FEValues {
     const Point<dim> & shape_grad (const unsigned int i,
 				   const unsigned int j) const;
 
+				     /**
+				      * Return the position of the #i#th
+				      * quadrature point in real space.
+				      */
+    const Point<dim> & quadrature_point (const unsigned int i) const;
+
+				     /**
+				      * Return the Jacobi determinant times
+				      * the weight of the #i#th quadrature
+				      * point.
+				      */
+    double JxW (const unsigned int i) const;
+    
 				     /**
 				      * Reinitialize the gradients, Jacobi
 				      * determinants, etc for the given cell
@@ -394,7 +419,7 @@ class FiniteElementBase {
 
 
 /**
-  Define a finite element type.
+  Define a finite element class.
   */
 template <int dim>
 class FiniteElement;

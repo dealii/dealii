@@ -15,26 +15,28 @@ extern TriaIterator<1,CellAccessor<1> > __dummy2687; // for gcc2.8
 template <int dim>
 FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 			 const Quadrature<dim>    &quadrature) :
-		shape_values(fe.total_dofs, quadrature.n_quad_points),
+		n_quadrature_points(quadrature.n_quadrature_points),
+		total_dofs(fe.total_dofs),
+		shape_values(fe.total_dofs, quadrature.n_quadrature_points),
 		shape_gradients(fe.total_dofs,
-				vector<Point<dim> >(quadrature.n_quad_points)),
+				vector<Point<dim> >(quadrature.n_quadrature_points)),
 		unit_shape_gradients(fe.total_dofs,
-				     vector<Point<dim> >(quadrature.n_quad_points)),
-		weights(quadrature.n_quad_points, 0),
-		JxW_values(quadrature.n_quad_points, 0),
-		quadrature_points(quadrature.n_quad_points, Point<dim>()),
-		unit_quadrature_points(quadrature.n_quad_points, Point<dim>()),
-		jacobi_matrices (quadrature.n_quad_points)
+				     vector<Point<dim> >(quadrature.n_quadrature_points)),
+		weights(quadrature.n_quadrature_points, 0),
+		JxW_values(quadrature.n_quadrature_points, 0),
+		quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
+		unit_quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
+		jacobi_matrices (quadrature.n_quadrature_points)
 {
   for (unsigned int i=0; i<fe.total_dofs; ++i)
-    for (unsigned int j=0; j<quadrature.n_quad_points; ++j) 
+    for (unsigned int j=0; j<n_quadrature_points; ++j) 
       {
 	shape_values(i,j) = fe.shape_value(i, quadrature.quad_point(j));
 	unit_shape_gradients[i][j]
 	  = fe.shape_grad(i, quadrature.quad_point(j));
       };
 
-  for (unsigned int i=0; i<weights.size(); ++i) 
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
       weights[i] = quadrature.weight(i);
       unit_quadrature_points[i] = quadrature.quad_point(i);
@@ -66,6 +68,24 @@ FEValues<dim>::shape_grad (const unsigned int i,
 
 
 
+template <int dim>
+const Point<dim> & FEValues<dim>::quadrature_point (const unsigned int i) const {
+  Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
+  
+  return quadrature_points[i];
+};
+
+
+
+template <int dim>
+double FEValues<dim>::JxW (const unsigned int i) const {
+  Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
+  
+  return JxW_values[i];
+};
+
+
+
 void FEValues<1>::reinit (const Triangulation<1>::cell_iterator &cell,
 			  const FiniteElement<1>                &fe) {
   const unsigned int dim=1;
@@ -77,7 +97,7 @@ void FEValues<1>::reinit (const Triangulation<1>::cell_iterator &cell,
 		     quadrature_points);
 				   // compute gradients on real element
   for (unsigned int i=0; i<fe.total_dofs; ++i)
-    for (unsigned int j=0; j<quadrature_points.size(); ++j)
+    for (unsigned int j=0; j<n_quadrature_points; ++j)
       for (unsigned int s=0; s<dim; ++s)
 	{
 	  shape_gradients[i][j](s) = 0;
@@ -96,7 +116,7 @@ void FEValues<1>::reinit (const Triangulation<1>::cell_iterator &cell,
 				   // refer to the general doc for
 				   // why we take the inverse of the
 				   // determinant
-  for (unsigned int i=0; i<quadrature_points.size(); ++i)
+  for (unsigned int i=0; i<n_quadrature_points; ++i)
     JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
 };
 
@@ -113,7 +133,7 @@ void FEValues<2>::reinit (const Triangulation<2>::cell_iterator &cell,
 		     quadrature_points);
 				   // compute gradients on real element
   for (unsigned int i=0; i<fe.total_dofs; ++i)
-    for (unsigned int j=0; j<quadrature_points.size(); ++j)
+    for (unsigned int j=0; j<n_quadrature_points; ++j)
       for (unsigned int s=0; s<dim; ++s)
 	{
 	  shape_gradients[i][j](s) = 0;
@@ -130,7 +150,7 @@ void FEValues<2>::reinit (const Triangulation<2>::cell_iterator &cell,
 				   // refer to the general doc for
 				   // why we take the inverse of the
 				   // determinant
-  for (unsigned int i=0; i<quadrature_points.size(); ++i)
+  for (unsigned int i=0; i<n_quadrature_points; ++i)
     JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
 };
 
@@ -241,8 +261,7 @@ void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &ce
 				   // local mesh width
   double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
 
-  unsigned int n_points = unit_points.size();
-  for (unsigned int i=0; i<n_points; ++i) 
+  for (unsigned int i=0; i<points.size(); ++i) 
     {
       jacobians[i](0,0) = 1./h;
       points[i] = cell->vertex(0) + h*unit_points[i];

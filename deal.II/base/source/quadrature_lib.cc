@@ -10,7 +10,7 @@ QGauss2<1>::QGauss2 () :
   static const double xpts[] = { 0.288675135, 0.71132486 };
   static const double wts[]  = { 0.5, 0.5 };
 
-  for (unsigned int i=0; i<n_quad_points; ++i) 
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
       quadrature_points.push_back (Point<1> (xpts[i]));
       weights.push_back (wts[i]);
@@ -34,7 +34,7 @@ QGauss2x4<1>::QGauss2x4 () :
   static const double wts[]  = { 0.5*W0, 0.5*W1, 0.5*W1, 0.5*W0,
 				 0.5*W0, 0.5*W1, 0.5*W1, 0.5*W0 };
 
-  for (unsigned int i=0; i<n_quad_points; ++i) 
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
       quadrature_points.push_back (Point<1> (xpts[i]));
       weights.push_back (wts[i]);
@@ -56,7 +56,7 @@ QGauss4<1>::QGauss4 () :
   static const double xpts[] = { G0, G1, G2, G3 };
   static const double wts[]  = { W0, W1, W1, W0 };
 
-  for (unsigned int i=0; i<n_quad_points; ++i) 
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
       quadrature_points.push_back (Point<1> (xpts[i]));
       weights.push_back (wts[i]);
@@ -84,7 +84,7 @@ QGauss8<1>::QGauss8 () :
   static const double xpts[] = { G0, G1, G2, G3, G4, G5, G6, G7 };
   static const double wts[]  = { W0, W1, W2, W3, W3, W2, W1, W0 };
 
-  for (unsigned int i=0; i<n_quad_points; ++i) 
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
       quadrature_points.push_back (Point<1> (xpts[i]));
       weights.push_back (wts[i]);
@@ -108,7 +108,7 @@ QSimpson<1>::QSimpson () :
   static const double xpts[] = { 0.0, 0.5, 1.0 };
   static const double wts[]  = { 1./6., 2./3., 1./6. };
 
-  for (unsigned int i=0; i<n_quad_points; ++i) 
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
       quadrature_points.push_back (Point<1> (xpts[i]));
       weights.push_back (wts[i]);
@@ -123,7 +123,7 @@ QTrapez<1>::QTrapez () :
   static const double xpts[] = { 0.0, 1.0 };
   static const double wts[]  = { 0.5, 0.5 };
 
-  for (unsigned int i=0; i<n_quad_points; ++i) 
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
       quadrature_points.push_back (Point<1> (xpts[i]));
       weights.push_back (wts[i]);

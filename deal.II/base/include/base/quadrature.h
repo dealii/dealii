@@ -11,7 +11,11 @@
 
 
 /**
-  Base class for quadrature formulae in arbitrary dimensions.
+  Base class for quadrature formulae in arbitrary dimensions. This class
+  stores quadrature points and weights on the unit line [0,1], unit
+  square [0,1]x[0,1], etc. This information is used together with
+  objects of the \Ref{FiniteElement} class to compute the values stored
+  in the \Ref{FEValues} objects.
   */
 template <int dim>
 class Quadrature {
@@ -19,12 +23,12 @@ class Quadrature {
 				     /**
 				      * Number of quadrature points.
 				      */
-    const unsigned int n_quad_points;
+    const unsigned int n_quadrature_points;
 
 				     /**
 				      * Constructor.
 				      */
-    Quadrature (const unsigned int n_quad_points);
+    Quadrature (const unsigned int n_quadrature_points);
     
 				     /**
 				      * Return the #i#th quadrature point.
