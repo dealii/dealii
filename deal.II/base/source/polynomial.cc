@@ -14,27 +14,30 @@
 
 #include <base/polynomial.h>
 
-
-Polynomial::Polynomial (const std::vector<double> &a):
+template <typename number>
+Polynomial<number>::Polynomial (const std::vector<number> &a):
 		coefficients(a)
 {}
 
 
 
-Polynomial::Polynomial ()
+template <typename number>
+Polynomial<number>::Polynomial ()
   :
   coefficients(0)
 {}
 
 
 
-double Polynomial::value (const double x) const
+template <typename number>
+number
+Polynomial<number>::value (const number x) const
 {
   Assert (coefficients.size() > 0, ExcVoidPolynomial());
   const unsigned int m=coefficients.size();
 
 				   // Horner scheme
-  double value = coefficients.back();
+  number value = coefficients.back();
   for (int k=m-2; k>=0; --k)
     value = value*x + coefficients[k];
 
@@ -43,8 +46,10 @@ double Polynomial::value (const double x) const
 
 
 
-void Polynomial::value (const double         x,
-			std::vector<double> &values) const
+template <typename number>
+void
+Polynomial<number>::value (const number         x,
+			std::vector<number> &values) const
 {
   Assert (coefficients.size() > 0, ExcVoidPolynomial());
   Assert (values.size() > 0, ExcEmptyArray());
@@ -68,7 +73,7 @@ void Polynomial::value (const double         x,
 				   // then do it properly by the
 				   // full Horner scheme
   const unsigned int m=coefficients.size();
-  std::vector<double> a(coefficients);
+  std::vector<number> a(coefficients);
   unsigned int j_faculty=1;
   for (unsigned int j=0; j<values_size; ++j)
     {      
@@ -87,7 +92,7 @@ void Polynomial::value (const double         x,
 
 LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
 					  const unsigned int support_point):
-		Polynomial(compute_coefficients(n,support_point))
+		Polynomial<double>(compute_coefficients(n,support_point))
 {}
 
 
@@ -291,3 +296,7 @@ LagrangeEquidistant::compute_coefficients (const unsigned int n,
   
   return a;
 }
+
+template Polynomial<float>;
+template Polynomial<double>;
+template Polynomial<long double>;

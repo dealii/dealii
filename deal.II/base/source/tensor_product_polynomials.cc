@@ -30,7 +30,7 @@ number power(number x, unsigned int y)
 
 template <int dim>
 TensorProductPolynomials<dim>::TensorProductPolynomials(
-  const std::vector<SmartPointer<Polynomial> > &pols):
+  const std::vector<SmartPointer<Polynomial<double> > > &pols):
 		polynomials(pols),
 		n_tensor_pols(power(polynomials.size(), dim))
 {}

@@ -30,6 +30,7 @@
  *
  * @author Ralf Hartmann, Guido Kanschat, 2000
  */
+template <typename number>
 class Polynomial : public Subscriptor
 {
   public:
@@ -48,7 +49,7 @@ class Polynomial : public Subscriptor
 				      * the @p{coefficient} array
 				      * minus one.
 				      */
-    Polynomial (const std::vector<double> &coefficients);
+    Polynomial (const std::vector<number> &coefficients);
 
                                      /**
 				      * Default-Constructor.
@@ -63,7 +64,7 @@ class Polynomial : public Subscriptor
 				      * scheme for numerical stability
 				      * of the evaluation.
 				      */
-    double value (const double x) const;
+    number value (const number x) const;
     
 				     /**
 				      * Return the values and the
@@ -81,8 +82,8 @@ class Polynomial : public Subscriptor
 				      * scheme for numerical stability
 				      * of the evaluation.
 				      */
-    void value (const double         x,
-		std::vector<double> &values) const;
+    void value (const number         x,
+		std::vector<number> &values) const;
 
 				     /**
 				      * Exception
@@ -104,7 +105,7 @@ class Polynomial : public Subscriptor
 				      * passed down by derived
 				      * classes.
 				      */
-    std::vector<double> coefficients;
+    std::vector<number> coefficients;
 };
 
 
@@ -123,7 +124,7 @@ class Polynomial : public Subscriptor
  *
  * @author Ralf Hartmann, 2000
  */
-class LagrangeEquidistant: public Polynomial
+class LagrangeEquidistant: public Polynomial<double>
 {
   public:
 				     /**
@@ -141,15 +142,7 @@ class LagrangeEquidistant: public Polynomial
                                      /**
 				      * Default-constructor.
 				      */
-    LagrangeEquidistant ();
-    
-
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidSupportPoint,
-		    int,
-		    << "The support point " << arg1 << " is invalid.");
+    LagrangeEquidistant ();    
 
   private:
 
@@ -168,5 +161,46 @@ class LagrangeEquidistant: public Polynomial
 };
 
 
+/**
+ * Legendre polynomials of arbitrary order
+ *
+ * Constructing a Legendre polynomial of order @p{k}, the coefficients
+ * will be computed by the three-term recursion formula.  The
+ * coefficients are stored in a static data vector to be available
+ * when needed next time.
+ *
+ * @author Guido Kanschat, 2000
+ */
+template <typename number>
+class Legendre : public Polynomial<number>
+{
+public:
+				   /**
+				    * Constructor for polynomial of
+				    * order @p{k}.
+				    */
+  Legendre (unsigned int k);
+private:
+				   /**
+				    * Vector with already computed
+				    * coefficients.
+				    */
+  static std::vector<vector<number> > coefficients
+
+				   /**
+				    * Compute coefficients recursively.
+				    */
+  static void compute_coeficients (unsigned int k);
+
+				   /**
+				    * Get coefficients for
+				    * constructor.  This way, it can
+				    * use the non-standard constructor
+				    * of @ref{Polynomial}.
+				    */
+  static const std::vector<number>& get_coefficients (unsigned int k);
+}
+
 
 #endif
+
