@@ -67,6 +67,20 @@ GridReordering<dim>::Cell::Cell (const CellData<dim> &cd,
 };
 
 
+template <int dim>
+GridReordering<dim>::Cell::Cell (const Cell &c) :
+		CellData<dim> (c),
+                cell_no(c.cell_no),
+                track_back_to_cell(c.track_back_to_cell)
+{
+  for (unsigned int i=0; i<GridReorderingInfo<dim>::rotational_states_of_cells; ++i)
+    for (unsigned int j=0; j<GeometryInfo<dim>::faces_per_cell; ++j)
+      faces[i][j]=c.faces[i][j];
+
+  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+    neighbors[i]=c.neighbors[i];
+}
+
 
 template <int dim>
 inline

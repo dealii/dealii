@@ -658,6 +658,13 @@ class GridReordering : private GridReorderingInfo<dim>
 					  */
 	Cell (const CellData<dim> &cd,
 	      const unsigned int   cell_no);
+
+					 /**
+					  * Copy constructor to work
+					  * around a bug in a gcc3.0
+					  * snapshot.
+					  */
+	Cell (const Cell &);
 	
 					 /**
 					  * Count the existing neighbors
