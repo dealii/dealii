@@ -2389,6 +2389,59 @@ AC_DEFUN(DEAL_II_HAVE_BUILTIN_EXPECT, dnl
 
 
 dnl -------------------------------------------------------------
+dnl Newer versions of gcc have a very nice feature: you can set
+dnl a verbose terminate handler, that not only aborts a program
+dnl when an exception is thrown and not caught somewhere, but
+dnl before aborting it prints that an exception has been thrown,
+dnl and possibly what the std::exception::what() function has to
+dnl say. Since many people run into the trap of not having a
+dnl catch clause in main(), they wonder where that abort may be
+dnl coming from.  The terminate handler then at least says what is
+dnl missing in their program.
+dnl
+dnl This test checks whether this feature is available.
+dnl
+dnl Usage: DEAL_II_HAVE_VERBOSE_TERMINATE
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_HAVE_VERBOSE_TERMINATE, dnl
+[
+  AC_MSG_CHECKING(for __verbose_terminate_handler)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_LINK(
+    [
+#include <exception>
+
+namespace __gnu_cxx
+{
+  extern void __verbose_terminate_handler ();
+}
+
+struct preload_terminate_dummy
+{
+    preload_terminate_dummy()
+      { std::set_terminate (__gnu_cxx::__verbose_terminate_handler); }
+};
+
+static preload_terminate_dummy dummy;
+    ],
+    [
+	throw 1;
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_VERBOSE_TERMINATE, 1, 
+                [Define if the compiler provides __verbose_terminate_handler])
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl When compiling with ACE thread support, there are many constructs
 dnl that are not allowed in C++, or that yield warnings when compiling with
 dnl -pedantic. Check this, and if that is the case, set the variables

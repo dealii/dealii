@@ -223,6 +223,20 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: Newer versions of gcc have a very nice feature: you can set
+       a verbose terminate handler, that not only aborts a program
+       when an exception is thrown and not caught somewhere, but
+       before aborting it prints that an exception has been thrown,
+       and possibly what the std::exception::what() function has to
+       say. Since many people run into the trap of not having a
+       catch clause in main(), they wonder where that abort may be
+       coming from. The terminate handler then at least says what is
+       missing in their program.
+       <br>
+       (WB 2002/12/19)
+       </p>
+
+  <li> <p> 
        New: There is now a <code class="class">Patterns::List</code> pattern
        that matches a list of elements each of which has to satisfy a pattern
        that was given to the constructor.
