@@ -473,12 +473,11 @@ compute_2nd (const Mapping<dim>                   &mapping,
 	  & update_second_derivatives,
 	  ExcInternalError());
 
-  const unsigned int total_nonzero_components
-    = std::accumulate (n_nonzero_components_table.begin(),
-                       n_nonzero_components_table.end(),
-                       0U);
-//TODO:[WB] Could not compile this!  
-//  Assert (data.shape_2nd_derivatives.size() == total_nonzero_components,
+// make sure we have as many entries as there are nonzero components  
+//  Assert (data.shape_2nd_derivatives.size() ==
+//	    std::accumulate (n_nonzero_components_table.begin(),
+//                        n_nonzero_components_table.end(),
+//                        0U),
 //	  ExcInternalError());
 				   // Number of quadrature points
   const unsigned int n_q_points = data.shape_2nd_derivatives[0].size();
