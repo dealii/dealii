@@ -1,5 +1,5 @@
 // $Id$
-// Copyright (C) 2001 Ralf Hartmann
+// Copyright (C) 2001, 2002 Ralf Hartmann
 //
 // Shows the shape functions implemented and computes the area of cells.
 
@@ -506,10 +506,23 @@ void mapping_test()
 
 	    
 				   // Test for transform_*_to_*_cell
-	    if (dim==2 && true)
+	    if (true)
 	      {
 		Mapping<dim> &mapping=*mapping_ptr[j];
-		Point<dim> p_unit(6/7.,4/7.);
+		Point<dim> p_unit;
+		switch(dim)
+		  {
+		    case 1:
+			  p_unit=Point<dim>(6/7.);
+			  break;
+		    case 2:
+			  p_unit=Point<dim>(6/7.,4/7.);
+			  break;
+		    case 3:
+			  p_unit=Point<dim>(6/7.,4/7.,5/7.);
+			  break;
+		  }
+		
 		Point<dim> p_real=mapping.transform_unit_to_real_cell(cell, p_unit);
 		Point<dim> p_re_unit=mapping.transform_real_to_unit_cell(cell, p_real);
 		deallog << "p_unit=" << p_unit << ",  p_real=" << p_real
