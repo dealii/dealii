@@ -119,8 +119,7 @@ class BlockSparsityPatternBase : public Subscriptor
     
 				     /**
 				      * Resize the matrix. This
-				      * deletes all previously
-				      * existant blocks and replaces
+				      * deletes all blocks and replaces
 				      * them by unitialized ones,
 				      * i.e. ones for which also the
 				      * sizes are not yet set. You
