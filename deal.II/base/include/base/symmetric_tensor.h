@@ -841,8 +841,8 @@ class SymmetricTensor
 				     /**
 				      * Make a few more functions friends.
 				      */
-    template <int dim>
-    friend double trace (const SymmetricTensor<2,dim> &d);
+    template <int dim2>
+    friend double trace (const SymmetricTensor<2,dim2> &d);
 
     friend double determinant (const SymmetricTensor<2,1> &t);
     
