@@ -31,7 +31,7 @@ int main () {
   GridGenerator::hyper_cube (tria,0,1);
   tria.begin_active()->vertex(2)(0) = 2;
 
-  FELinear<2> fe;
+  FEQ1<2> fe;
   DoFHandler<2> dof(&tria);
   dof.distribute_dofs(fe);
 

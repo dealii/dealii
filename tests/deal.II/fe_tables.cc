@@ -115,24 +115,19 @@ main()
   
   deallog.pop();
   
-  TEST_ELEMENT(FEDGConstant<2>);
-  TEST_ELEMENT(FEDGLinear<2>);
+  TEST_ELEMENT(FEDG_Q0<2>);
+  TEST_ELEMENT(FEDG_Q1<2>);
   
-  TEST_ELEMENT(FELinear<2>);
-  TEST_ELEMENT(FEQuadraticSub<2>);
-  TEST_ELEMENT(FECubicSub<2>);
-  TEST_ELEMENT(FEQuarticSub<2>);
-/*
-  TEST_ELEMENT(FELinear<1>);
-  TEST_ELEMENT(FEQuadraticSub<1>);
-  TEST_ELEMENT(FECubicSub<1>);
-  TEST_ELEMENT(FEQuarticSub<1>);
-*/
-  TEST_MULTIPLE(FELinear<2>,3,2);
-  TEST_MULTIPLE(FEQuadraticSub<2>,3,2);
-  TEST_MULTIPLE(FECubicSub<2>,3,2);
+  TEST_ELEMENT(FEQ1<2>);
+  TEST_ELEMENT(FEQ2<2>);
+  TEST_ELEMENT(FEQ3<2>);
+  TEST_ELEMENT(FEQ4<2>);
+
+  TEST_MULTIPLE(FEQ1<2>,3,2);
+  TEST_MULTIPLE(FEQ2<2>,3,2);
+  TEST_MULTIPLE(FEQ3<2>,3,2);
   
-  TEST_MIXED2(FELinear<2>,1,FEDGConstant<2>,1,2);
-  TEST_MIXED2(FEQuadraticSub<2>,3,FELinear<2>,1,2);
-  TEST_MIXED2(FECubicSub<2>,3,FEQuadraticSub<2>,2,2);
+  TEST_MIXED2(FEQ1<2>,1,FEDG_Q0<2>,1,2);
+  TEST_MIXED2(FEQ2<2>,3,FEQ1<2>,1,2);
+  TEST_MIXED2(FEQ3<2>,3,FEQ2<2>,2,2);
 }

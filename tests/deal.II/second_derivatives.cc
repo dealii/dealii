@@ -22,7 +22,7 @@ int main () {
   Triangulation<2> tria;
   GridGenerator::hyper_cube (tria,0,1);
 
-  FELinear<2> fe;
+  FEQ1<2> fe;
   DoFHandler<2> dof(&tria);
   dof.distribute_dofs(fe);
 

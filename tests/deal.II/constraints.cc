@@ -242,10 +242,10 @@ int main () {
       switch (element)
 	{
 	  case 0:
-		fe = new FELinear<3>();
+		fe = new FEQ1<3>();
 		break;
 	  case 1:
-		fe = new FEQuadraticSub<3>();
+		fe = new FEQ2<3>();
 		break;
 	};
       

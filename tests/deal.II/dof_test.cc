@@ -284,7 +284,7 @@ void TestCases<dim>::run (const unsigned int test_case) {
 
 
   cout << "    Distributing degrees of freedom..." << endl;
-  FELinear<dim> fe;
+  FEQ1<dim> fe;
   dof->distribute_dofs (fe);
 
   cout << "    Renumbering degrees of freedom..." << endl;
