@@ -338,7 +338,21 @@ struct Patterns {
  *   a function named #get_parameters#. This should be declared #virtual#. #get_parameters#
  *   functions in derived classes should call the #BaseClass::get_parameters# function.
  *
- *   
+ *
+ *   \subsection{Experience with large parameter lists}
+ *  
+ *   Experience has shown that in programs defining larger numbers of parameters (more than,
+ *   say, fifty) it is advantageous to define an additional class holding these parameters.
+ *   This class is more like a C-style structure, having a large number of variables,
+ *   usually public. It then has at least two functions, which declare and parse the
+ *   parameters. In the main program, the main class has an object of this parameter class
+ *   and delegates declaration and parsing of parameters to this object.
+ *
+ *   The advantage of this approach is that you can keep out the technical details
+ *   (declaration and parsing) out of the main class and additionally don't clutter
+ *   up your main class with dozens or more variables denoting the parameters.
+ *
+ *
  *   \subsection{Possible future extensions}
  *   
  *   \begin{itemize}
