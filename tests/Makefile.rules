@@ -158,8 +158,8 @@ show-tests:
 
 Makefile.depend: $(shell echo *.cc)
 	@echo =====Dependencies== $@
-	@$(CXX) $(CXXFLAGS.g) $^ -M > $@
-	@perl -pi -e 's/(^[^.]+)\.$(OBJEXT):/\1.$(OBJEXT) \1.g.$(OBJEXT):/;' $@
+	@$D/common/scripts/make_dependencies $(INCLUDE) $^ \
+		| $(PERL) -pi -e 's/\.o:/.g.o:/g;' > $@
 
 
 .PHONY: report show-tests
