@@ -95,12 +95,12 @@ void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_functi
 					     vector< Vector<double> > &values) const
 {
   Assert (n_quadrature_points == values.size(),
-	  ExcWrongNoOfComponents());
+	  ExcWrongVectorSize(values.size(), n_quadrature_points));
   Assert (selected_dataset<shape_values.size(),
 	  ExcInvalidIndex (selected_dataset, shape_values.size()));
   for (unsigned i=0;i<values.size();++i)
     Assert (values[i].size() == fe->n_components,
-	    ExcWrongVectorSize(values.size(), n_quadrature_points));
+	    ExcWrongNoOfComponents());
 
 				   // get function values of dofs
 				   // on this cell
