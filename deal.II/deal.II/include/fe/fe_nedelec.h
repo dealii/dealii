@@ -79,7 +79,48 @@ template <int dim> class MappingQ;
  * and the curl will be computed correctly as well.
  * 
  * 
- * @sect3{Prolongation and restriction matrices}
+ * @sect3{Interpolation to finer and coarser meshes}
+ *
+ * Each finite element class in deal.II provides matrices that are
+ * used to interpolate from coarser to finer meshes and the other way
+ * round. Interpolation from a mother cell to its children is usually
+ * trivial, since finite element spaces are normally nested and this
+ * kind of interpolation is therefore exact. On the other hand, when
+ * we interpolate from child cells to the mother cell, we usually have
+ * to throw away some information.
+ *
+ * For continuous elements, this transfer usually happens by
+ * interpolating the values on the child cells at the support points
+ * of the shape functions of the mother cell. However, for
+ * discontinuous elements, we often use a projection from the child
+ * cells to the mother cell. The projection approach is only possible
+ * for discontinuous elements, since it cannot be guaranteed that the
+ * values of the projected functions on one cell and its neighbor
+ * match. In this case, only an interpolation can be
+ * used. (Internally, whether the values of a shape function are
+ * interpolated or projected, or better: whether the matrices the
+ * finite element provides are to be treated with the properties of a
+ * projection or of an interpolation, is controlled by the
+ * @p{restriction_is_additive} flag. See there for more information.)
+ *
+ * Here, things are not so simple: since the element has some
+ * continuity requirements across faces, we can only resort to some
+ * kind of interpolation. On the other hand, for the lowest order
+ * elements, the values of generating functionals are the (constant)
+ * tangential values of the shape functions. We would therefore really
+ * like to take the mean value of the tangential values of the child
+ * faces, and make this the value of the mother face. Then, however,
+ * taking a mean value of two piecewise constant function is not an
+ * interpolation, but a restriction. Since this is not possible, we
+ * cannot use this.
+ *
+ * To make a long story somewhat shorter, when interpolating from
+ * refined edges to a coarse one, we do not take the mean value, but
+ * pick only one (the one from the first child edge). While this is
+ * not optimal, it is certainly a valid choice (using an interpolation
+ * point that is not in the middle of the cell, but shifted to one
+ * side), and it also preserves the order of the interpolation.
+ * 
  *
  * @sect3{Numbering of the degrees of freedom (DoFs)}
  *
