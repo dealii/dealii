@@ -114,9 +114,7 @@
  * If an exception is thrown by method other than @p{vmult}, this
  * object may be left in an inconsistent state.
  *
- * @author Stephen "Cheffo" Kolaroff, 2002, based on SparseILU
- * implementation by Wolfgang Bangerth; unified interface: Ralf
- * Hartmann, 2003
+ * @author Stephen "Cheffo" Kolaroff, 2002, based on SparseILU implementation by Wolfgang Bangerth; unified interface: Ralf Hartmann, 2003
  */
 template <typename number>
 class SparseLUDecomposition : protected SparseMatrix<number>, 
@@ -284,7 +282,6 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				      * compability. It will be removed
 				      * in later versions.
 				      */
-
     void reinit ();
 
 				     /**
