@@ -584,20 +584,28 @@ void ElasticProblem<dim>::assemble_system ()
 		  cell_matrix(i,j) 
 		    += 
 						     // This first term is
-						     // ((lambda+mu) d_i u_i, d_j v_j).
+						     // (lambda d_i u_i, d_j v_j)
+						     // + (mu d_i u_j, d_j v_i).
 						     // Note that
 						     // ``shape_grad(i,q_point)''
 						     // returns the
 						     // gradient of
+						     // the only
+						     // nonzero
+						     // component of
 						     // the i-th shape
 						     // function at
 						     // quadrature
 						     // point
 						     // q_point. The
 						     // component
-						     // ``comp(i)'',
+						     // ``comp(i)'' of
+						     // the gradient,
 						     // which is the
 						     // derivative of
+						     // this only
+						     // nonzero vector
+						     // component of
 						     // the i-th shape
 						     // function with
 						     // respect to the
@@ -609,8 +617,11 @@ void ElasticProblem<dim>::assemble_system ()
 		    (
 		      (fe_values.shape_grad(i,q_point)[component_i] *
 		       fe_values.shape_grad(j,q_point)[component_j] *
-		       (lambda_values[q_point] +
-			mu_values[q_point]))
+		       lambda_values[q_point])
+		      +
+		      (fe_values.shape_grad(i,q_point)[component_j] *
+		       fe_values.shape_grad(j,q_point)[component_i] *
+		       mu_values[q_point])
 		      +
 						       // The second term is
 						       // (mu nabla u_i, nabla v_j).
