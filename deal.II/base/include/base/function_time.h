@@ -57,7 +57,8 @@
  *
  *  @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999
  */
-class FunctionTime {
+class FunctionTime
+{
   public:
 				     /**
 				      * Constructor. May take an initial vakue
@@ -95,6 +96,8 @@ class FunctionTime {
     double time;
 };
 
+
+
 /*------------------------------ Inline functions ------------------------------*/
 
 inline double
@@ -102,6 +105,7 @@ FunctionTime::get_time () const
 {
   return time;
 };
+
 
 #endif
 

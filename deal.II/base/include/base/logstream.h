@@ -42,7 +42,7 @@
  * <LI> #deallog.pop()# when leaving that stage entered with #push#.
  * </OL>
  *
- * @author Guido Kanschat, 1999
+ * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
 class LogStream
 {
@@ -107,6 +107,7 @@ class LogStream
 				      * Flag for printing execution time.
 				      */
     bool print_utime;
+
   public:
 				     /**
 				      * Standard constructor, since we
@@ -222,21 +223,18 @@ class LogStream
 				      */
     DeclException0 (ExcNoFileStreamGiven);
 
-private:
+  private:
                                      /**
 				      * Print head of line. This prints
 				      * optional time information and
 				      * the contents of the prefix stack.
 				      */
-  void print_line_head();
+    void print_line_head();
 };
 
 
 /* ----------------------------- Inline functions and templates ---------------- */
 
-
-// sorry for the weird following declaration spanning 5 lines, but
-// doc++ gets confused if we be more compact :-(
 
 template <class T>
 inline

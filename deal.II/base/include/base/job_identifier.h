@@ -25,15 +25,16 @@
  */
 class JobIdentifier
 {
-public:
-  JobIdentifier();
-  ~JobIdentifier();
-  
-  static const char* program_id();
-  const string operator () ()const;
-private:
-  string id;
+  public:
+    JobIdentifier();
+    ~JobIdentifier();
+    
+    static const char* program_id();
+    const string operator () ()const;
+  private:
+    string id;
 };
+
 
 /*------------------------------ Inline functions ------------------------------*/
 

@@ -16,6 +16,8 @@
 
 #include <base/function.h>
 
+
+
 /**
  * d-quadratic pillow on the unit hypercube.
  *
@@ -71,6 +73,8 @@ class PillowFunction : public Function<dim>
 			const unsigned int         component = 0) const;
 };
 
+
+
 /**
  * Cosine-shaped pillow function.
  * This is another function with zero boundary values on $[-1,1]^d$. In the interior
@@ -122,6 +126,7 @@ class CosineFunction : public Function<dim>
 };
 
 
+
 /**
  * Singularity on the L-shaped domain in 2D.
  * @author Guido Kanschat, 1999
@@ -168,6 +173,8 @@ class LSingularityFunction : public Function<2>
 			vector<double>            &values,
 			const unsigned int         component = 0) const;
 };
+
+
 
 /**
  * Singularity on the slit domain in 2D.

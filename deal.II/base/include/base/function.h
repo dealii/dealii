@@ -225,27 +225,31 @@ class Function : public FunctionTime,
 				       vector<vector<Tensor<1,dim> > > &gradients) const;
 
 				     /**
-				      * Compute the Laplacian of a given component at point #p#.
+				      * Compute the Laplacian of a
+				      * given component at point #p#.
 				      */
     virtual double laplacian (const Point<dim>   &p,
 			      const unsigned int  component = 0) const;
 
 				     /**
-				      * Compute the Laplacian of all components at point #p#
-				      * and store them in #values#.
+				      * Compute the Laplacian of all
+				      * components at point #p# and
+				      * store them in #values#.
 				      */
     virtual void vector_laplacian (const Point<dim>   &p,
 				     Vector<double>     &values) const;
     
 				     /**
-				      * Compute the Laplacian of one component at a set of points.
+				      * Compute the Laplacian of one
+				      * component at a set of points.
 				      */
     virtual void laplacian_list (const vector<Point<dim> > &points,
 				 vector<double>            &values,
 				 const unsigned int         component = 0) const;
 
 				     /**
-				      * Compute the Laplacians of all components at a set of points.
+				      * Compute the Laplacians of all
+				      * components at a set of points.
 				      */
     virtual void vector_laplacian_list (const vector<Point<dim> > &points,
 					vector<Vector<double> >   &values) const;
@@ -284,7 +288,8 @@ class Function : public FunctionTime,
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
-class ZeroFunction : public Function<dim> {
+class ZeroFunction : public Function<dim>
+{
   public:
 				     /**
 				      * Constructor. The number of
@@ -409,7 +414,8 @@ class ZeroFunction : public Function<dim> {
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
-class ConstantFunction : public ZeroFunction<dim> {
+class ConstantFunction : public ZeroFunction<dim>
+{
   public:
 				     /**
 				      * Constructor; takes the constant function
