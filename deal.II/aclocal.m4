@@ -1307,7 +1307,7 @@ unsigned int seed = 0;
 int i=rand_r(&i);
 	],
 	[
-	  AC_MSG_RESULT(found)
+	  AC_MSG_RESULT(yes)
 	  AC_DEFINE(HAVE_RAND_R, 1, 
                     [Define if you have the rand_r function])
 	],
