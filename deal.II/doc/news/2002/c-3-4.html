@@ -618,6 +618,23 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p> New: Function 
+       <code class="member">BlockSparseMatrix::print_formatted</code>
+       added, similar to the 
+       <code class="member">BlockVector::print_formatted</code> function.
+       <br>
+       (Brian Carnes 2003/06/02)
+       </p> 
+
+  <li> <p> New: Functions <code class="member">SparseMatrix::operator *=</code>
+       and <code class="member">SparseMatrix::operator /=</code> as well as 
+       <code class="member">BlockSparseMatrix::operator *=</code>
+       and <code class="member">BlockSparseMatrix::operator /=</code> 
+       are added.
+       <br>
+       (Brian Carnes 2003/06/02)
+       </p> 
+
   <li> <p> Deprecated: The functions <code class="member">Vector::scale</code>
        and <code class="member">BlockVector::scale</code> are now deprecated
        and will be removed in a future version. Use <code>operator*=</code> and
