@@ -627,10 +627,19 @@ FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
   switch (dim)
     {
       case 1:
-					 // This is not correct, but it
-					 // should not matter in 1D.
-	return true;
+      {
+					 // in 1d, things are simple. since
+					 // there is only one degree of
+					 // freedom per vertex in this
+					 // class, the first is on vertex 0
+					 // (==face 0 in some sense), the
+					 // second on face 1:
+	return (((shape_index == 0) && (face_index == 0)) ||
+		((shape_index == 1) && (face_index == 1)));
+      };
+      
       case 2:
+      {
 	if (face_index==0 && shape_index < n)
 	  return true;
 	if (face_index==1 && (shape_index % n) == degree)
@@ -640,31 +649,35 @@ FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
 	if (face_index==3 && (shape_index % n) == 0)
 	  return true;
 	return false;
+      };
+      
       case 3:
-	if (true)
-	  {
-	    const unsigned int in2 = shape_index % n2;
-	    
-					     // y=0
-	    if (face_index==0 && in2 < n )
-	      return true;
-					     // y=1
-	    if (face_index==1 && in2 >= n2-n)
-	      return true;
-					     // z=0
-	    if (face_index==2 && shape_index < n2)
-	      return true;
-					     // x=1
-	    if (face_index==3 && (shape_index % n) == n-1)
-	      return true;
-					     // z=1
-	    if (face_index==4 && shape_index >= dofs_per_cell - n2)
-	      return true;
-					     // x=0
-	    if (face_index==5 && (shape_index % n) == 0)
-	      return true;
-	    return false;
-	  }
+      {
+	const unsigned int in2 = shape_index % n2;
+	
+					 // y=0
+	if (face_index==0 && in2 < n )
+	  return true;
+					 // y=1
+	if (face_index==1 && in2 >= n2-n)
+	  return true;
+					 // z=0
+	if (face_index==2 && shape_index < n2)
+	  return true;
+					 // x=1
+	if (face_index==3 && (shape_index % n) == n-1)
+	  return true;
+					 // z=1
+	if (face_index==4 && shape_index >= dofs_per_cell - n2)
+	  return true;
+					 // x=0
+	if (face_index==5 && (shape_index % n) == 0)
+	  return true;
+	return false;
+      };
+
+      default:
+	    Assert (false, ExcNotImplemented());
     }
   return true;
 }

@@ -109,7 +109,9 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">FE_Q::has_support_on_face</code> always returned
        true in 1d, partly because faces are not really an issue in
        1d. It now does so only when the support point of the
-       respective shape function is actually the requested vertex.
+       respective shape function is actually the requested vertex. The
+       same applied to <code
+       class="member">FE_DGQ::has_support_on_face</code>
        <br>
        (WB 2002/06/13)
        </p>
