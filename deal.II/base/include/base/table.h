@@ -793,7 +793,6 @@ class TableBase : public Subscriptor
 				      */
     unsigned int size (unsigned int i) const;
     
-				      */
                                      /**
                                       * Return the sizes of this
                                       * object in each direction.
