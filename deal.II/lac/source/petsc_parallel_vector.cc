@@ -112,7 +112,7 @@ namespace PETScWrappers
     Vector::create_vector (const unsigned int  n,
                            const unsigned int  local_size)
     {
-      Assert (local_size < n, ExcIndexRange (local_size, 0, n));
+      Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
 
       const int ierr
         = VecCreateMPI (PETSC_COMM_SELF, local_size, n, &vector);

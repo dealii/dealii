@@ -37,10 +37,24 @@ namespace PETScWrappers
 
   
 
-  Vector::Vector (const VectorBase &v)
+  Vector::Vector (const Vector &v)
+                  :
+                  VectorBase ()
   {
-    Vector::create_vector (v.size());
-    VectorBase::operator = (v);
+                                     // first create a dummy vector, then copy
+                                     // over the other one
+    Vector::create_vector (1);
+    Vector::operator = (v);
+  }
+
+
+
+  Vector::Vector (const MPI::Vector &v)
+  {
+                                     // first create a dummy vector, then copy
+                                     // over the other one
+    Vector::create_vector (1);
+    Vector::operator = (v);
   }
 
 

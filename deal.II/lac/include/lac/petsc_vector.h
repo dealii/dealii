@@ -22,6 +22,7 @@
 #ifdef DEAL_II_USE_PETSC
 
 #include <lac/petsc_vector_base.h>
+#include <lac/petsc_parallel_vector.h>
 
 
 namespace PETScWrappers
@@ -72,17 +73,37 @@ namespace PETScWrappers
       explicit Vector (const ::Vector<Number> &v);
 
                                        /**
-                                        * Copy-constructor the
-                                        * values from a PETSc wrapper vector
-                                        * class.
+                                        * Copy-constructor the values from a
+                                        * PETSc wrapper vector class.
                                         */
-      explicit Vector (const VectorBase &v);
+      explicit Vector (const Vector &v);
+
+                                       /**
+                                        * Copy-constructor the values from a
+                                        * PETSc wrapper parallel vector class.
+                                        */
+      explicit Vector (const MPI::Vector &v);
 
                                        /**
                                         * Copy the given vector. Resize the
                                         * present vector if necessary.
                                         */
       Vector & operator = (const Vector &v);
+
+                                       /**
+                                        * Copy all the elements of the
+                                        * parallel vector @arg v into this
+                                        * local vector. Note that due to the
+                                        * communication model of MPI, @em all
+                                        * processes have to actually perform
+                                        * this operation, even if they do not
+                                        * use the result. It is not sufficient
+                                        * if only one processor tries to copy
+                                        * the elements from the other
+                                        * processors over to its own process
+                                        * space.
+                                        */
+      Vector & operator = (const MPI::Vector &v);
 
                                        /**
                                         * Set all components of the vector to
@@ -183,6 +204,26 @@ namespace PETScWrappers
       reinit (v.size(), true);
     
     const int ierr = VecCopy (v.vector, vector);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+    return *this;
+  }
+
+
+
+  inline
+  Vector &
+  Vector::operator = (const MPI::Vector &v)
+  {
+                                     // the petsc function we call wants to
+                                     // generate the vector itself, so destroy
+                                     // the old one first
+    int ierr = VecDestroy (vector);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // then do the gather operation
+    ierr = VecConvertMPIToSeqAll (static_cast<const Vec &>(v),
+                                            &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     
     return *this;
