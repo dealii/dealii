@@ -645,6 +645,8 @@ Point<dim> QuadAccessor<dim>::center () const {
 
 
 
+#if deal_II_dimension == 2
+
 template <>
 Point<2> QuadAccessor<2>::barycenter () const {
 				   // the evaluation of the formulae
@@ -731,7 +733,7 @@ double QuadAccessor<2>::measure () const {
 /*
   Get the computation of the measure by this little Maple script. We
   use the blinear mapping of the unit quad to the real quad. However,
-  every transformation mapping the unit faces to strait lines should
+  every transformation mapping the unit faces to straight lines should
   do.
 
   Remember that the area of the quad is given by
@@ -768,6 +770,7 @@ double QuadAccessor<2>::measure () const {
 	  x[0]*y[1]/2.0-x[3]*y[2]/2.0+x[1]*y[2]/2.0-x[2]*y[1]/2.0);
 };
 
+#endif
 
 
 template <int dim>
