@@ -1246,15 +1246,6 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 {
   Assert (static_cast<unsigned int>(std::distance (begin, end)) == n_rows,
 	  ExcIteratorRange (std::distance (begin, end), n_rows));
-
-				   // If the matrix has a zero
-				   // dimension, we are done here.
-  if ((n_rows == 0) || (n_cols ==0))
-    {
-      reinit(n_rows, n_cols, 0);
-      compressed = true;
-      return;
-    }
   
 				   // first determine row lengths for
 				   // each row. if the matrix is
