@@ -15,7 +15,136 @@
 
 
 template <int rank, int dim> class SymmetricTensor;
+template <int dim> class SymmetricTensor<2,dim>;
 
+
+namespace internal
+{
+  namespace SymmetricTensor
+  {
+    namespace Rank2Accessors
+    {
+
+                                       /**
+                                        * Switch type to select a tensor of
+                                        * rank 2 and dimension <tt>dim</tt>,
+                                        * switching on whether the tensor
+                                        * should be constant or not.
+                                        */
+      template <int dim, bool constness>
+      struct Types;
+
+                                       /**
+                                        * Switch type to select a tensor of
+                                        * rank 2 and dimension <tt>dim</tt>,
+                                        * switching on whether the tensor
+                                        * should be constant or not.
+                                        *
+                                        * Specialization for constant tensors.
+                                        */
+      template <int dim>
+      struct Types<dim,true>
+      {
+          typedef
+          const typename ::SymmetricTensor<2,dim>::StorageType
+          base_tensor_type;
+
+          typedef double reference;
+      };
+
+                                       /**
+                                        * Switch type to select a tensor of
+                                        * rank 2 and dimension <tt>dim</tt>,
+                                        * switching on whether the tensor
+                                        * should be constant or not.
+                                        *
+                                        * Specialization for non-constant
+                                        * tensors.
+                                        */
+      template <int dim>
+      struct Types<dim,false>
+      {
+          typedef
+          typename ::SymmetricTensor<2,dim>::StorageType
+          base_tensor_type;
+
+          typedef double &reference;
+      };
+
+
+                                       /**
+                                        * Accessor class to access the
+                                        * elements of individual rows in a
+                                        * symmetric tensor. Since the elements
+                                        * of symmetric tensors are not stored
+                                        * as in a table, the accessors are a
+                                        * little more involved.
+                                        *
+                                        * @author Wolfgang Bangerth, 2005
+                                        */
+      template <int dim, bool constness>
+      class RowAccessor 
+      {
+        public:
+                                           /**
+                                            * Import which tensor we work on.
+                                            */
+          typedef
+          typename Types<dim,constness>::base_tensor_type
+          base_tensor_type;
+
+                                           /**
+                                            * The type of a reference to an
+                                            * individual element of the
+                                            * symmetric tensor. If the tensor
+                                            * is constant, we can only return
+                                            * a value instead of a reference.
+                                            */
+          typedef typename Types<dim,constness>::reference reference;
+
+                                           /**
+                                            * Constructor. Take the tensor to
+                                            * access as well as the row we
+                                            * point to as arguments.
+                                            */
+          RowAccessor (const base_tensor_type  &tensor,
+                       const unsigned int  row);
+
+                                           /**
+                                            * Return a reference to an element
+                                            * of this row (if we point to a
+                                            * non-const tensor), or the value
+                                            * of the element (in case this is
+                                            * a constant tensor).
+                                            */
+          reference operator[] (const unsigned int column) const;
+          
+        private:
+                                           /**
+                                            * Reference to the tensor we
+                                            * access.
+                                            */
+          const base_tensor_type &base_tensor;
+
+                                           /**
+                                            * Index of the row we access.
+                                            */
+          const unsigned int row;
+
+                                           /**
+                                            * Make the symmetric tensor
+                                            * classes a friend, since they are
+                                            * the only ones who can create
+                                            * objects like this.
+                                            */
+          template <int,int> class ::SymmetricTensor;
+      };
+
+    }
+  }
+}
+
+          
 
 
 /**
@@ -59,6 +188,29 @@ class SymmetricTensor<2,dim>
 				      */
     static const unsigned int rank      = 2;
 
+                                     /**
+                                      * Number of independent components of a
+                                      * symmetric tensor of rank 2. We store
+                                      * only the upper right half of it. This
+                                      * information is probably of little
+                                      * interest to all except the accessor
+                                      * classes that need it.
+                                      */
+    static const unsigned int
+    n_tensor_components = (dim*dim + dim)/2;
+
+                                     /**
+                                      * Declare the type in which we actually
+                                      * store the data. This information is
+                                      * probably of little interest to all
+                                      * except the accessor classes that need
+                                      * it. In particular, you shouldn't make
+                                      * any assumptions about the storage
+                                      * format in your application programs.
+                                      */
+    typedef Tensor<1,n_tensor_components> StorageType;
+    
+    
                                      /**
                                       * Default constructor. Creates a zero
                                       * tensor.
@@ -135,6 +287,22 @@ class SymmetricTensor<2,dim>
     SymmetricTensor   operator - () const;
 
                                      /**
+                                      * Access the elements of a row of this
+                                      * symmetric tensor. This function is
+                                      * called for constant tensors.
+                                      */
+    internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,true>
+    operator [] (const unsigned int row) const;
+
+                                     /**
+                                      * Access the elements of a row of this
+                                      * symmetric tensor. This function is
+                                      * called for non-constant tensors.
+                                      */
+    internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,false>
+    operator [] (const unsigned int row);
+    
+                                     /**
                                       * Return the Frobenius-norm of a tensor,
                                       * i.e. the square root of the sum of
                                       * squares of all entries.
@@ -172,20 +340,6 @@ class SymmetricTensor<2,dim>
     
   private:
                                      /**
-                                      * Number of independent components of a
-                                      * symmetric tensor of rank 2. We store
-                                      * only the upper right half of it.
-                                      */
-    static const unsigned int
-    n_tensor_components = (dim*dim + dim)/2;
-
-                                     /**
-                                      * Declare the type in which we actually
-                                      * store the data.
-                                      */
-    typedef Tensor<1,n_tensor_components> StorageType;
-    
-                                     /**
                                       * Data storage for a symmetric tensor.
                                       */
     StorageType data;
@@ -194,6 +348,74 @@ class SymmetricTensor<2,dim>
 
 
 // ------------------------- inline functions ------------------------
+
+namespace internal
+{
+  namespace SymmetricTensor
+  {
+    namespace Rank2Accessors
+    {
+      template <int dim, bool constness>
+      RowAccessor<dim,constness>::
+      RowAccessor (const base_tensor_type &base_tensor,
+                   const unsigned int row)
+                      :
+                      base_tensor (base_tensor),
+                      row (row)
+      {
+        Assert (row < dim, ExcIndexRange (row, 0, dim));
+      }
+
+
+
+      template <int dim, bool constness>
+      typename RowAccessor<dim,constness>::reference
+      RowAccessor<dim,constness>::
+      operator[] (const unsigned int column) const
+      {
+        Assert (column < dim, ExcIndexRange (column, 0, dim));
+
+                                         // first treat the main diagonal
+                                         // elements, which are stored
+                                         // consecutively at the beginning
+        if (row == column)
+          return base_tensor[row];
+
+                                         // the rest is messier and requires a
+                                         // few switches. if someone has a
+                                         // better idea, help is welcome
+        switch (dim)
+          {
+            case 2:
+                  Assert (((row==1) && (column==0)) || ((row==0) && (column==1)),
+                          ExcInternalError());
+                  return base_tensor[2];
+
+            case 3:
+                  if (((row==0) && (column==1)) ||
+                      ((row==1) && (column==0)))
+                    return base_tensor[3];
+                  else if (((row==0) && (column==2)) ||
+                           ((row==2) && (column==0)))
+                    return base_tensor[4];
+                  else if (((row==1) && (column==2)) ||
+                           ((row==2) && (column==1)))
+                    return base_tensor[5];
+                  else
+                    Assert (false, ExcInternalError());
+
+            default:
+                  Assert (false, ExcNotImplemented());
+          }
+
+        Assert (false, ExcInternalError());
+        return 0;
+      }
+    }
+  }
+}
+
+
 
 template <int dim>
 inline
@@ -363,6 +585,26 @@ SymmetricTensor<2,dim>::memory_consumption ()
 
 
 
+template <int dim>
+internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,true>
+SymmetricTensor<2,dim>::operator [] (const unsigned int row) const
+{
+  return
+    internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,true> (data, row);
+}
+
+
+
+template <int dim>
+internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,false>
+SymmetricTensor<2,dim>::operator [] (const unsigned int row)
+{
+  return
+    internal::SymmetricTensor::Rank2Accessors::RowAccessor<dim,false> (data, row);
+}
+
+
+
 template <>
 double
 SymmetricTensor<2,1>::norm () const
@@ -393,25 +635,6 @@ SymmetricTensor<2,3>::norm () const
 /* ----------------- Non-member functions operating on tensors. ------------ */
 
 /**
- * Compute the determinant of a tensor of rank one and dimension
- * one. Since this is a number, the return value is, of course, the
- * number itself.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2005
- */
-inline
-double determinant (const SymmetricTensor<1,1> &t)
-{
-  Assert (false, ExcNotImplemented());
-  return 0;
-  
-//  return t[0];
-}
-
-
-
-/**
  * Compute the determinant of a tensor or rank 2, here for <tt>dim==2</tt>.
  *
  * @relates SymmetricTensor
@@ -420,11 +643,7 @@ double determinant (const SymmetricTensor<1,1> &t)
 inline
 double determinant (const SymmetricTensor<2,2> &t)
 {
-  Assert (false, ExcNotImplemented());
-  return 0;
-  
-//   return ((t[0][0] * t[1][1]) -
-// 	  (t[1][0] * t[0][1]));
+  return (t[0][0] * t[1][1] - 2*t[0][1]*t[0][1]);
 }
 
 
@@ -439,21 +658,14 @@ double determinant (const SymmetricTensor<2,2> &t)
 inline
 double determinant (const SymmetricTensor<2,3> &t)
 {
-  Assert (false, ExcNotImplemented());
-  return 0;
-  
-// 				   // get this using Maple:
-// 				   // with(linalg);
-// 				   // a := matrix(3,3);
-// 				   // x := det(a);
-// 				   // readlib(C);
-// 				   // C(x, optimized);
-//   return ( t[0][0]*t[1][1]*t[2][2]
-// 	   -t[0][0]*t[1][2]*t[2][1]
-// 	   -t[1][0]*t[0][1]*t[2][2]
-// 	   +t[1][0]*t[0][2]*t[2][1]
-// 	   +t[2][0]*t[0][1]*t[1][2]
-// 	   -t[2][0]*t[0][2]*t[1][1] );
+				   // in analogy to general tensors, but
+				   // there's something to be simplified for
+				   // the present case
+  return ( t[0][0]*t[1][1]*t[2][2]
+	   -t[0][0]*t[1][2]*t[1][2]
+	   -t[1][1]*t[0][2]*t[0][2]
+	   -t[2][2]*t[0][1]*t[0][1]
+	   +2*t[0][1]*t[0][2]*t[1][2] );
 }
 
 
@@ -468,82 +680,10 @@ double determinant (const SymmetricTensor<2,3> &t)
 template <int dim>
 double trace (const SymmetricTensor<2,dim> &d)
 {
-  Assert (false, ExcNotImplemented());
-  return 0;
-  
-//   double t=0;
-//   for (unsigned int i=0; i<dim; ++i)
-//     t += d[i][i];
-//   return t;
-}
-
-
-
-/**
- * Compute and return the inverse of the given tensor. Since the
- * compiler can perform the return value optimization, and since the
- * size of the return object is known, it is acceptable to return the
- * result by value, rather than by reference as a parameter.
- *
- * @relates SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-template <int dim>
-inline
-SymmetricTensor<2,dim>
-invert (const SymmetricTensor<2,dim> &t)
-{
-  Assert (false, ExcNotImplemented());
-  return SymmetricTensor<2,dim>();
-  
-//   SymmetricTensor<2,dim> return_tensor;
-//   switch (dim) 
-//     {
-//       case 1:
-// 	    return_tensor[0][0] = 1.0/t[0][0];
-// 	    return return_tensor;
-//       case 2:
-// 					     // this is Maple output,
-// 					     // thus a bit unstructured
-//       {
-// 	const double t4 = 1.0/(t[0][0]*t[1][1]-t[0][1]*t[1][0]);
-// 	return_tensor[0][0] = t[1][1]*t4;
-// 	return_tensor[0][1] = -t[0][1]*t4;
-// 	return_tensor[1][0] = -t[1][0]*t4;
-// 	return_tensor[1][1] = t[0][0]*t4;
-// 	return return_tensor;
-//       };
-      
-//       case 3:
-//       {
-// 	const double t4 = t[0][0]*t[1][1],
-// 		     t6 = t[0][0]*t[1][2],
-// 		     t8 = t[0][1]*t[1][0],
-// 		    t00 = t[0][2]*t[1][0],
-// 		    t01 = t[0][1]*t[2][0],
-// 		    t04 = t[0][2]*t[2][0],
-// 		    t07 = 1.0/(t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
-// 			       t00*t[2][1]+t01*t[1][2]-t04*t[1][1]);
-// 	return_tensor[0][0] = (t[1][1]*t[2][2]-t[1][2]*t[2][1])*t07;
-// 	return_tensor[0][1] = -(t[0][1]*t[2][2]-t[0][2]*t[2][1])*t07;
-// 	return_tensor[0][2] = -(-t[0][1]*t[1][2]+t[0][2]*t[1][1])*t07;
-// 	return_tensor[1][0] = -(t[1][0]*t[2][2]-t[1][2]*t[2][0])*t07;
-// 	return_tensor[1][1] = (t[0][0]*t[2][2]-t04)*t07;
-// 	return_tensor[1][2] = -(t6-t00)*t07;
-// 	return_tensor[2][0] = -(-t[1][0]*t[2][1]+t[1][1]*t[2][0])*t07;
-// 	return_tensor[2][1] = -(t[0][0]*t[2][1]-t01)*t07;
-// 	return_tensor[2][2] = (t4-t8)*t07;
-// 	return return_tensor;
-//       };
-
-// 					// if desired, take over the
-// 					// inversion of a 4x4 tensor
-// 					// from the FullMatrix
-       
-//       default:
-// 	    AssertThrow (false, ExcNotImplemented());
-//     };    
-//   return return_tensor;
+  double t=0;
+  for (unsigned int i=0; i<dim; ++i)
+    t += d[i][i];
+  return t;
 }
 
 
