@@ -133,14 +133,36 @@ void PreconditionBlockJacobi<number,inverse_type>
 ::operator() (Vector<number2>       &dst,
 	      const Vector<number2> &src) const
 {
-  Assert(A!=0, ExcNoMatrixGivenToUse());
+				   // introduce the following typedef
+				   // since in the use of exceptions,
+				   // strict C++ requires us to
+				   // specify them fully as they are
+				   // from a template dependent base
+				   // class. thus, we'd have to write
+				   // PreconditionBlock<number,inverse_type>::ExcNoMatrixGivenToUse,
+				   // which is lengthy, but also poses
+				   // some problems to the
+				   // preprocessor due to the comma in
+				   // the template arg list. we could
+				   // then wrap the whole thing into
+				   // parentheses, but that creates a
+				   // parse error for gcc for the
+				   // exceptions that do not take
+				   // args...
+  typedef PreconditionBlock<number,inverse_type> BaseClass;
+  Assert(A!=0, typename BaseClass::ExcNoMatrixGivenToUse());
+  
   const SparseMatrix<number> &M=*A;
-  Assert (M.m() == M.n(), ExcMatrixNotSquare());
-  Assert (blocksize!=0, ExcBlockSizeNotSet());
-  Assert (M.m()%blocksize==0, ExcWrongBlockSize(blocksize, M.m()));
   const unsigned int n_cells=M.m()/blocksize;
+
+  Assert (M.m() == M.n(),
+	  typename BaseClass::ExcMatrixNotSquare());
+  Assert (blocksize!=0,
+	  typename BaseClass::ExcBlockSizeNotSet());
+  Assert (M.m()%blocksize==0,
+	  typename BaseClass::ExcWrongBlockSize(blocksize, M.m()));
   Assert (inverse.size()==0 || inverse.size()==n_cells,
-	  ExcWrongNumberOfInverses(inverse.size(), n_cells));
+	  typename BaseClass::ExcWrongNumberOfInverses(inverse.size(), n_cells));
 
   Vector<number2> b_cell(blocksize), x_cell(blocksize);
 
@@ -216,14 +238,37 @@ template <typename number2>
 void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2>       &dst,
 							    const Vector<number2> &src) const
 {
-  Assert(A!=0, ExcNoMatrixGivenToUse());
+				   // introduce the following typedef
+				   // since in the use of exceptions,
+				   // strict C++ requires us to
+				   // specify them fully as they are
+				   // from a template dependent base
+				   // class. thus, we'd have to write
+				   // PreconditionBlock<number,inverse_type>::ExcNoMatrixGivenToUse,
+				   // which is lengthy, but also poses
+				   // some problems to the
+				   // preprocessor due to the comma in
+				   // the template arg list. we could
+				   // then wrap the whole thing into
+				   // parentheses, but that creates a
+				   // parse error for gcc for the
+				   // exceptions that do not take
+				   // args...
+  typedef PreconditionBlock<number,inverse_type> BaseClass;
+
+  Assert (A!=0, typename BaseClass::ExcNoMatrixGivenToUse());
+  
   const SparseMatrix<number> &M=*A;
-  Assert (M.m() == M.n(), ExcMatrixNotSquare());
-  Assert (blocksize!=0, ExcBlockSizeNotSet());
-  Assert (M.m()%blocksize==0, ExcWrongBlockSize(blocksize, M.m()));
   const unsigned int n_cells=M.m()/blocksize;
+
+  Assert (M.m() == M.n(),
+	  typename BaseClass::ExcMatrixNotSquare());
+  Assert (blocksize!=0,
+	  typename BaseClass::ExcBlockSizeNotSet());
+  Assert (M.m()%blocksize==0,
+	  typename BaseClass::ExcWrongBlockSize(blocksize, M.m()));
   Assert (inverse.size()==0 || inverse.size()==n_cells,
-	  ExcWrongNumberOfInverses(inverse.size(), n_cells));
+	  typename BaseClass::ExcWrongNumberOfInverses(inverse.size(), n_cells));
 
   const SparsityPattern &spars    = M.get_sparsity_pattern();
   const unsigned int    *rowstart = spars.get_rowstart_indices();
