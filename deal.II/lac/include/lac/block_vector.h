@@ -77,7 +77,7 @@ namespace BlockVectorIterators
 					* iterators. There, the block
 					* vector must not be constant.
 					*/
-      typedef BlockVector<number> BlockVector;
+      typedef ::BlockVector<number> BlockVector;
 
 				       /**
 					* Type of the numbers we point
@@ -110,7 +110,7 @@ namespace BlockVectorIterators
 					* the vector must be
 					* constant.
 					*/
-      typedef const Vector<number>      Vector;
+      typedef const ::Vector<number>      Vector;
 
 				       /**
 					* Type of the block vector
@@ -119,7 +119,7 @@ namespace BlockVectorIterators
 					* the block vector must be
 					* constant.
 					*/
-      typedef const BlockVector<number> BlockVector;
+      typedef const ::BlockVector<number> BlockVector;
 
 				       /**
 					* Type of the numbers we point
