@@ -31,8 +31,8 @@
 
 template <int dim>
 void MGTransferBlockBase::build_matrices (
-  const MGDoFHandler<dim>& mg_dof,
-  const std::vector<bool>& select)
+  const DoFHandler<dim>& dof,
+  const MGDoFHandler<dim>& mg_dof)
 {
 				   // Fill target component with
 				   // standard values (identity) if it
@@ -86,10 +86,6 @@ void MGTransferBlockBase::build_matrices (
   const unsigned int dofs_per_cell = fe.dofs_per_cell;  
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   
-				   // Selected refers to the component
-				   // in mg_target_component.
-  mg_selected = select;
-  
   Assert (mg_selected.size() == fe.n_components(),
 	  ExcDimensionMismatch(mg_selected.size(), fe.n_components()));
   
@@ -125,7 +121,14 @@ void MGTransferBlockBase::build_matrices (
       k += t;
     }
 
-// Building the matrices starts here!
+				   // Build index vectors for
+				   // copy_to_mg and
+				   // copy_from_mg. These vectors must
+				   // be prebuilt, since the
+				   // get_dof_indices functions are
+				   // too slow
+  
+// Building the prolongation matrices starts here!
   
 				   // reset the size of the array of
 				   // matrices. call resize(0) first,
@@ -325,24 +328,28 @@ MGTransferBlockBase::memory_consumption () const
 template <typename number>
 template <int dim>
 void MGTransferBlock<number>::build_matrices (
+  const DoFHandler<dim> &dof,
   const MGDoFHandler<dim> &mg_dof,
   std::vector<bool> select,
   const std::vector<unsigned int>& t_component,
   const std::vector<unsigned int>& mg_t_component)
 {
-  if (select.size() == 0)
-    select = std::vector<bool> (mg_dof.get_fe().n_components(), true);
+//TODO:[GK] What about selected?  
+  mg_selected = select;
+  if (mg_selected.size() == 0)
+    mg_selected = std::vector<bool> (mg_dof.get_fe().n_components(), true);
 
   target_component = t_component;
   mg_target_component = mg_t_component;
 
-  MGTransferBlockBase::build_matrices (mg_dof, select);
+  MGTransferBlockBase::build_matrices (dof, mg_dof);
 }
 
 
 template <typename number>
 template <int dim>
 void MGTransferSelect<number>::build_matrices (
+  const DoFHandler<dim> &dof,
   const MGDoFHandler<dim> &mg_dof,
   unsigned int select,
   unsigned int mg_select,
@@ -358,6 +365,8 @@ void MGTransferSelect<number>::build_matrices (
   mg_selected_component = mg_select;
   selected.resize(ncomp, false);
   selected[select] = true;
+  mg_selected.resize(ncomp, false);
+  mg_selected[mg_select] = true;
 				   // If components are renumbered,
 				   // find the first original
 				   // component corresponding to the
@@ -371,10 +380,15 @@ void MGTransferSelect<number>::build_matrices (
 	}
     }
     
-  std::vector<bool> s(ncomp, false);
-  s[mg_select] = true;
-
-  MGTransferBlockBase::build_matrices (mg_dof, s);
+  for (unsigned int i=0;i<mg_target_component.size();++i)
+    {
+      if (mg_target_component[i] == mg_select)
+	{
+	  mg_selected_component = i;
+	  break;
+	}
+    }    
+  MGTransferBlockBase::build_matrices (dof, mg_dof);
 }
 
 
@@ -383,28 +397,32 @@ void MGTransferSelect<number>::build_matrices (
 
 template
 void MGTransferBlock<float>::build_matrices<deal_II_dimension>
-(const MGDoFHandler<deal_II_dimension> &mg_dof,
+(const DoFHandler<deal_II_dimension> &,
+ const MGDoFHandler<deal_II_dimension> &,
  std::vector<bool>,
  const std::vector<unsigned int>&,
  const std::vector<unsigned int>&);
 
 template
 void MGTransferSelect<float>::build_matrices<deal_II_dimension>
-(const MGDoFHandler<deal_II_dimension> &mg_dof,
+(const DoFHandler<deal_II_dimension> &d,
+ const MGDoFHandler<deal_II_dimension> &,
  unsigned int, unsigned int,
  const std::vector<unsigned int>&,
  const std::vector<unsigned int>&);
 
 template
 void MGTransferBlock<double>::build_matrices<deal_II_dimension>
-(const MGDoFHandler<deal_II_dimension> &mg_dof,
+(const DoFHandler<deal_II_dimension> &,
+ const MGDoFHandler<deal_II_dimension> &,
  std::vector<bool>,
  const std::vector<unsigned int>&,
  const std::vector<unsigned int>&);
 
 template
 void MGTransferSelect<double>::build_matrices<deal_II_dimension>
-(const MGDoFHandler<deal_II_dimension> &mg_dof,
+(const DoFHandler<deal_II_dimension> &,
+ const MGDoFHandler<deal_II_dimension> &,
  unsigned int, unsigned int,
  const std::vector<unsigned int>&,
  const std::vector<unsigned int>&);

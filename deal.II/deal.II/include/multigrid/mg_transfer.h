@@ -26,6 +26,8 @@
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
 
+#include <dofs/dof_handler.h>
+
 #include <boost/shared_ptr.hpp>
 
 
@@ -238,23 +240,21 @@ class MGTransferBlockBase
 				      * Actually build the prolongation
 				      * matrices for each level.
 				      *
-				      * If a field selected is given,
-				      * only matrices for these
-				      * components are to be built. By
-				      * default, all matrices are
-				      * built.
-				      *
 				      * This function is only called
 				      * by derived classes. These can
 				      * also set the member variables
+				      * #selected and #mg_selected to
+				      * restrict the transfer matrices
+				      * to certain components.
+				      * Furthermore, they use
 				      * #target_component and
 				      * #mg_target_component for
 				      * re-ordering and grouping of
 				      * components.
 				      */
     template <int dim>
-    void build_matrices (const MGDoFHandler<dim>& mg_dof,
-			 const std::vector<bool>& selected);
+    void build_matrices (const DoFHandler<dim>& dof,
+			 const MGDoFHandler<dim>& mg_dof);
 
 				   /**
 				    * Flag of selected components.
@@ -346,6 +346,9 @@ class MGTransferBlockBase
 				      */
     std::vector<boost::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
 #endif
+
+    std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+    copy_to_and_from_indices;
 };
 
 //TODO:[GK] Update this class
@@ -415,7 +418,8 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * the <tt>selected</tt> argument
 				      */
     template <int dim>
-    void build_matrices (const MGDoFHandler<dim> &mg_dof,
+    void build_matrices (const DoFHandler<dim> &dof,
+			 const MGDoFHandler<dim> &mg_dof,
 			 std::vector<bool> selected = std::vector<bool>(),
 			 const std::vector<unsigned int>& target_component
 			 = std::vector<unsigned int>(),
@@ -610,7 +614,8 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * the <tt>selected</tt> argument
 				      */
     template <int dim>
-    void build_matrices (const MGDoFHandler<dim> &mg_dof,
+    void build_matrices (const DoFHandler<dim> &dof,
+			 const MGDoFHandler<dim> &mg_dof,
 			 unsigned int selected,
 			 unsigned int mg_selected,
 			 const std::vector<unsigned int>& target_component

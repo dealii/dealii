@@ -430,7 +430,7 @@ MGTransferSelect<number>::do_copy_to_mg (
 				       // one level higher
       if (static_cast<unsigned int>(level) < maxlevel)
 	{
-	  ;//	  restrict_and_add (level+1, dst[level], dst[level+1]);
+	  restrict_and_add (level+1, dst[level], dst[level+1]);
 	}
     };
 }
