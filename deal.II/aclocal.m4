@@ -76,7 +76,7 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 	AC_MSG_RESULT("no flag found!")
 	AC_MSG_ERROR("Could not determine multithreading flag for this platform. Aborting!")
   fi
-  LDFLAGS = "-$thread_flag $LDFLAGS"
+  LDFLAGS="-$thread_flag $LDFLAGS"
   AC_MSG_RESULT("-$thread_flag")
 ])
 
@@ -93,9 +93,7 @@ dnl   DEAL_II_TRY_COMPILER_FLAG([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl
 AC_DEFUN(DEAL_II_TRY_COMPILER_FLAG, dnl
 [
-  cat > conftest.$ac_ext <<EOF
-       int main() { return 0; }
-EOF
+  echo 'int main() { return 0; }' > conftest.$ac_ext
 
   dnl lets see whether the compiler generates output to stdout or stderr
   deal_II_compiler_output=`eval $ac_compile 2>&1`
