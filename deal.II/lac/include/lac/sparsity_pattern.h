@@ -22,6 +22,7 @@
 #include <iostream>
 
 
+class SparsityPattern;
 template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 class CompressedSparsityPattern;
@@ -31,6 +32,72 @@ class CompressedSparsityPattern;
 /*! @addtogroup Matrix1
  *@{
  */
+
+namespace internals
+{
+  namespace SparsityPatternIterators
+  {
+    
+                                     /**
+                                      * Accessor class for iterators into
+                                      * sparsity patterns. This class is also
+                                      * the base class for both const and
+                                      * non-const accessor classes into sparse
+                                      * matrices.
+                                      */
+    class Accessor
+    {
+      public:
+                                         /**
+                                          * Constructor.
+                                          */
+        Accessor (const SparsityPattern *matrix,
+                  const unsigned int     row,
+                  const unsigned int     index);
+
+                                         /**
+                                          * Row number of the element
+                                          * represented by this
+                                          * object.
+                                          */
+        unsigned int row() const;
+
+                                         /**
+                                          * Index in row of the element
+                                          * represented by this
+                                          * object.
+                                          */
+        unsigned int index() const;
+
+                                         /**
+                                          * Column number of the
+                                          * element represented by
+                                          * this object.
+                                          */
+        unsigned int column() const;
+	
+      protected:
+                                         /**
+                                          * The sparsity pattern we operate on
+                                          * accessed.
+                                          */
+        const SparsityPattern * sparsity_pattern;
+
+                                         /**
+                                          * Current row number.
+                                          */
+        unsigned int a_row;
+
+                                         /**
+                                          * Current index in row.
+                                          */
+        unsigned int a_index;
+    };
+    
+  }
+}
+
+
 
 /**
  * Structure representing the sparsity pattern of a sparse matrix.
@@ -1266,6 +1333,54 @@ class SparsityPattern : public Subscriptor
 
 /// @if NoDoc
 
+
+namespace internals
+{
+  namespace SparsityPatternIterators
+  {    
+    inline
+    Accessor::
+    Accessor (const SparsityPattern *sparsity_pattern,
+              const unsigned int     r,
+              const unsigned int     i)
+                    :
+                    sparsity_pattern(sparsity_pattern),
+                    a_row(r),
+                    a_index(i)
+    {}
+
+
+    inline
+    unsigned int
+    Accessor::row() const
+    {
+      return a_row;
+    }
+
+
+    inline
+    unsigned int
+    Accessor::column() const
+    {
+      return (sparsity_pattern
+              ->get_column_numbers()[sparsity_pattern
+                                     ->get_rowstart_indices()[a_row]+a_index]);
+    }
+
+
+    inline
+    unsigned int
+    Accessor::index() const
+    {
+      return a_index;
+    }
+
+    
+  }
+}
+    
+
+
 inline
 const unsigned int *
 SparsityPattern::optimized_lower_bound (const unsigned int *first,
@@ -1531,6 +1646,7 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 				   // entries within each row
   compress ();
 }
+
 
 /// @endif
 
