@@ -276,7 +276,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
 				   // make the connection graph
   SparsityPattern sparsity (dof_handler.n_dofs(level),
 			    dof_handler.max_couplings_between_dofs());
-  MGDoFTools::make_sparsity_pattern (dof_handler, sparsity, level);
+  MGTools::make_sparsity_pattern (dof_handler, sparsity, level);
     
   const unsigned int n_dofs = sparsity.n_rows();
 				   // store the new dof numbers; invalid_dof_index means
