@@ -54,10 +54,10 @@ class TensorProductPolynomials
 				      * case, the function will not
 				      * compute these values.
 				      */
-    void shape_values_and_grads(const Point<dim> &unit_point,
-				vector<double> &values,
-				vector<Tensor<1,dim> > &grads,
-				vector<Tensor<2,dim> > &grad_grads) const;
+    void compute (const Point<dim> &unit_point,
+		  vector<double> &values,
+		  vector<Tensor<1,dim> > &grads,
+		  vector<Tensor<2,dim> > &grad_grads) const;
 
 				     /**
 				      * Exception.

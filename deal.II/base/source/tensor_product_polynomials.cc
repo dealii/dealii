@@ -25,7 +25,7 @@ TensorProductPolynomials<dim>::TensorProductPolynomials(
 
 
 template <int dim>
-void TensorProductPolynomials<dim>::shape_values_and_grads(
+void TensorProductPolynomials<dim>::compute(
   const Point<dim> &p,
   vector<double> &values,
   vector<Tensor<1,dim> > &grads,

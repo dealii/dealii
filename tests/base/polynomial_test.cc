@@ -135,7 +135,7 @@ int main(int, char)
   double xi=0.35;
   double eta=0.62;
   Point<2> point(xi,eta);
-  tp_pol.shape_values_and_grads(point, vs, grads, grad_grads);
+  tp_pol.compute(point, vs, grads, grad_grads);
 
 				   // 4th shape function of Q3<2> is
 				   // equivalent to its 1st shape
