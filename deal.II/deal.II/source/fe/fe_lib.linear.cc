@@ -106,6 +106,18 @@ void FELinear<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 
 
 
+void FELinear<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
+				      const unsigned int,
+				      const Boundary<1> &,
+				      const vector<Point<0> > &,
+				      vector<Point<1> > &) const {
+  Assert (false, ExcInternalError());
+};
+
+
+
+
+
 FELinear<2>::FELinear () :
 		FiniteElement<2> (1, 0, 0)
 {
@@ -357,6 +369,35 @@ void FELinear<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
 
 
 
+void FELinear<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
+				      const unsigned int       face_no,
+				      const Boundary<2> &,
+				      const vector<Point<1> >  &unit_points,
+				      vector<Point<2> >        &normal_vectors) const {
+  Assert (unit_points.size() == normal_vectors.size(),
+	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
+
+  const DoFHandler<2>::face_iterator face = cell->face(face_no);
+				   // compute direction of line
+  const Point<2> line_direction = (face->vertex(1) - face->vertex(0));
+				   // rotate to the right by 90 degrees
+  const Point<2> normal_direction(line_direction(1),
+				  -line_direction(0));
+
+  if (face_no <= 1)
+				     // for sides 0 and 1: return the correctly
+				     // scaled vector
+    fill (normal_vectors.begin(), normal_vectors.end(),
+	  normal_direction / sqrt(normal_direction.square()));
+  else
+				     // for sides 2 and 3: scale and invert
+				     // vector
+    fill (normal_vectors.begin(), normal_vectors.end(),
+	  normal_direction / (-sqrt(normal_direction.square())));
+};
+
+
+
 
 
 
@@ -397,6 +438,18 @@ void FEQuadratic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 					 vector<double>      &) const {
   Assert (false, ExcInternalError());
 };
+
+
+
+void FEQuadratic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
+					 const unsigned int,
+					 const Boundary<1> &,
+					 const vector<Point<0> > &,
+					 vector<Point<1> > &) const {
+  Assert (false, ExcInternalError());
+};
+
+
 
 
 
@@ -483,6 +536,17 @@ void FEQuadratic<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator 
 
 
 
+template <int dim>
+void FEQuadratic<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &,
+					   const unsigned int,
+					   const Boundary<dim> &,
+					   const vector<Point<dim-1> > &,
+					   vector<Point<dim> > &) const {
+  Assert (false, ExcInternalError());
+};
+
+
+
 
 
 
@@ -521,6 +585,16 @@ void FECubic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 				     const Boundary<1>         &,
 				     const vector<Point<0> > &,
 				     vector<double>      &) const {
+  Assert (false, ExcInternalError());
+};
+
+
+
+void FECubic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
+				     const unsigned int,
+				     const Boundary<1> &,
+				     const vector<Point<0> > &,
+				     vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -596,6 +670,16 @@ void FECubic<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &,
   Assert (false, ExcNotImplemented());
 };
 
+
+
+template <int dim>
+void FECubic<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &,
+				       const unsigned int,
+				       const Boundary<dim> &,
+				       const vector<Point<dim-1> > &,
+				       vector<Point<dim> > &) const {
+  Assert (false, ExcInternalError());
+};
 
 
 

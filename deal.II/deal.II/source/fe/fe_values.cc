@@ -180,6 +180,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 		ansatz_points (fe.total_dofs, Point<dim>()),
 		jacobi_matrices (quadrature.n_quadrature_points,dFMatrix(dim,dim)),
 		face_jacobi_determinants (quadrature.n_quadrature_points,0),
+		normal_vectors (quadrature.n_quadrature_points,Point<dim>()),
 		update_flags (update_flags),
 		selected_face(0)
 {
@@ -299,6 +300,16 @@ const Point<dim> & FEFaceValues<dim>::ansatz_point (const unsigned int i) const 
 
 
 template <int dim>
+const Point<dim> & FEFaceValues<dim>::normal_vector (const unsigned int i) const {
+  Assert (i<normal_vectors.size(), ExcInvalidIndex(i, normal_vectors.size()));
+  Assert (update_flags & update_normal_vectors, ExcAccessToUninitializedField());
+  
+  return normal_vectors[i];
+};
+
+
+
+template <int dim>
 double FEFaceValues<dim>::JxW (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
   Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
@@ -332,6 +343,8 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 			    update_flags & update_q_points,
 			    face_jacobi_determinants,
 			    update_flags & update_JxW_values,
+			    normal_vectors,
+			    update_flags & update_normal_vectors,
 			    boundary);
 
 				   // compute gradients on real element if

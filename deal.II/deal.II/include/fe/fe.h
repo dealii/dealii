@@ -546,15 +546,16 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * performed by the specific finite element
 				      * class.
 				      *
-				      * Two fields remain to be finite element
+				      * Three fields remain to be finite element
 				      * specific in this standard implementation:
 				      * The jacobi determinants of the
 				      * transformation from the unit face to the
-				      * real face and the ansatz points. For
-				      * these two fields, there exist pure
-				      * virtual functions, #get_face_jacobians#
-				      * and the #get_face_ansatz_points#
-				      * function.
+				      * real face, the ansatz points
+				      * and the outward normal vectors. For
+				      * these fields, there exist pure
+				      * virtual functions, #get_face_jacobians#,
+				      * #get_face_ansatz_points# and
+				      * #get_normal_vectors#.
 				      *
 				      * Though there is a standard
 				      * implementation, there
@@ -587,6 +588,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      const bool           compute_q_points,
 				      vector<double>      &face_jacobi_determinants,
 				      const bool           compute_face_jacobians,
+				      vector<Point<dim> > &normal_vectors,
+				      const bool           compute_normal_vectors,
 				      const Boundary<dim> &boundary) const;
     
 				     /**
@@ -644,6 +647,25 @@ class FiniteElement : public FiniteElementBase<dim> {
 				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<double>      &face_jacobi_determinants) const =0;
+
+				     /**
+				      * Compute the normal vectors to the cell
+				      * at the quadrature points. See the
+				      * documentation for the #fill_fe_face_values#
+				      * function for more details. The function
+				      * must guarantee that the length of the
+				      * vectors be one.
+				      *
+				      * Since any implementation for one
+				      * dimension would be senseless, all
+				      * derived classes should throw an error
+				      * when called with #dim==1#.
+				      */
+    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+				     const unsigned int          face_no,
+				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<Point<dim> >         &normal_vectors) const =0;
     
 				     /**
 				      * Exception

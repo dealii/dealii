@@ -206,7 +206,7 @@ class FEValues {
 				      * segments, but higher order elements
 				      * may use other ways.)
 				      */
-    void reinit (const DoFHandler<dim>::cell_iterator &,
+    void reinit (const typename DoFHandler<dim>::cell_iterator &,
 		 const FiniteElement<dim> &,
 		 const Boundary<dim> &);
 
@@ -386,6 +386,14 @@ class FEValues {
   for the transformation of the unit face to the real face (needed to
   compute the weight factors for integration along faces). These two
   concepts have to be carefully separated.
+
+  Finally, we will often need the outward normal to a cell at the quadrature
+  points. While this could in principle be easily done using the Jacobi
+  matrices at the quadrature points and the normal vectors to the unit cell
+  (also easily derived, since they have an appealingly easy form for the unit
+  cell ;-), it is more efficiently done by the finite element class itself.
+  For example for (bi-, tri-)linear mappings the normal vector is readily
+  available without compicated matrix-vector-multiplications.
   */
 template <int dim>
 class FEFaceValues {
@@ -533,6 +541,21 @@ class FEFaceValues {
 				      * alike cells.
 				      */
     const vector<double> & get_JxW_values () const;
+
+				     /**
+				      * Return the outward normal vector to
+				      * the cell at the #i#th quadrature
+				      * point. The length of the vector
+				      * is normalized to one.
+				      */
+    const Point<dim> & normal_vector (const unsigned int i) const;
+    
+				     /**
+				      * Return the list of outward normal
+				      * vectors to the cell at the
+				      * quadrature points.
+				      */
+    const vector<Point<dim> > & get_normal_vectors () const;
     
 				     /**
 				      * Reinitialize the gradients, Jacobi
@@ -553,7 +576,7 @@ class FEFaceValues {
 				      * segments, but higher order elements
 				      * may use other ways.)
 				      */
-    void reinit (const DoFHandler<dim>::cell_iterator &cell,
+    void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
 		 const FiniteElement<dim>             &fe,
 		 const Boundary<dim>                  &boundary);
@@ -707,6 +730,13 @@ class FEFaceValues {
 				      * compute the JxW values.
 				      */
     vector<double>       face_jacobi_determinants;
+
+				     /**
+				      * List of outward normal vectors at the
+				      * quadrature points. This field is filled
+				      * in by the finite element class.
+				      */
+    vector<Point<dim> >  normal_vectors;
     
 				     /**
 				      * Store which fields are to be updated by
@@ -829,6 +859,16 @@ const vector<double> &
 FEFaceValues<dim>::get_JxW_values () const {
   Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
   return JxW_values;
+};
+
+
+
+template <int dim>
+inline
+const vector<Point<dim> > &
+FEFaceValues<dim>::get_normal_vectors () const {
+  Assert (update_flags & update_normal_vectors, ExcAccessToUninitializedField());
+  return normal_vectors;
 };
 
 

@@ -47,9 +47,15 @@ enum UpdateFlags {
 					* on which the ansatz functions are
 					* located.
 					*/
-      update_ansatz_points = 16
+      update_ansatz_points = 16,
+				       /**
+				        * Update the outward normal vectors
+				        * to the face relative to this cell.
+				        * This flag is only evaluated by
+				        * the #FEFaceValues# class.
+				        */
+      update_normal_vectors = 32
 };
-
 
 
 

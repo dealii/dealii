@@ -196,6 +196,8 @@ void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &
 					    const bool               ,
 					    vector<double>          &,
 					    const bool              ,
+					    vector<Point<1> >       &,
+					    const bool,
 					    const Boundary<1>       &) const {
   Assert (false, ExcNotImplemented());
 }
@@ -215,6 +217,8 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 					      const bool           compute_q_points,
 					      vector<double>      &face_jacobi_determinants,
 					      const bool           compute_face_jacobians,
+					      vector<Point<dim> > &normal_vectors,
+					      const bool           compute_normal_vectors,
 					      const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -232,17 +236,21 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 		  q_points, compute_q_points,
 		  boundary);
   
-  cout << "Global unit points:\n";
-  for (unsigned int p=0; p<unit_points.size(); ++p)
-    cout << "    " << global_unit_points[p] << endl;
-
   if (compute_ansatz_points)
     get_face_ansatz_points (cell->face(face_no), boundary, ansatz_points);
 
   if (compute_face_jacobians)
     get_face_jacobians (cell->face(face_no), boundary,
 			unit_points, face_jacobi_determinants);
+
+  if (compute_normal_vectors)
+    get_normal_vectors (cell, face_no, boundary,
+			unit_points, normal_vectors);
   
+  cout << "Global unit points:\n";
+  for (unsigned int p=0; p<unit_points.size(); ++p)
+    cout << "    " << global_unit_points[p] << endl;
+
   cout << "Global ansatz points:\n";
   for (unsigned int p=0; p<unit_points.size(); ++p)
     cout << "    " << ansatz_points[p] << endl;
