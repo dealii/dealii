@@ -309,7 +309,7 @@ MGDoFObjectAccessor<3, dim>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 						   const int           index,
 						   const AccessorData *local_data) :
 		MGDoFAccessor<dim> (local_data),
-		MGDoFObjectAccessor_Inheritance<2,dim>::BaseClass(tria,level,index,local_data) {};
+		MGDoFObjectAccessor_Inheritance<3,dim>::BaseClass(tria,level,index,local_data) {};
 
 
 
@@ -391,7 +391,7 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (vector<int> &dof_indices) const
 				 12*dof_handler->get_fe().dofs_per_line +
 				 6*dof_handler->get_fe().dofs_per_quad +
 				 dof_handler->get_fe().dofs_per_hex),
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<3>::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
@@ -525,9 +525,9 @@ template <>
 void
 MGDoFCellAccessor<1>::get_mg_dof_values (const Vector<double> &values,
 					 Vector<double>       &dof_values) const {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (mg_dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (mg_dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
   Assert (dof_values.size() == dof_handler->get_fe().total_dofs,
 	  ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
