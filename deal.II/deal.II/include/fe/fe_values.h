@@ -181,10 +181,6 @@ class FEValuesData
  *    is the suggested access to all finite element values. There should be
  *    no loss in performance with an optimizing compiler.
  *   
- *  \item @p{get_shape_values}, @p{get_shape_grads}, etc: these return
- *    a reference to a whole field. Usually these fields contain
- *    the values of all trial functions at all quadrature points.
- *
  *  \item @p{get_function_values}, @p{get_function_grads}, @p{...}:
  *    Compute a finite element function or its derivative
  *    in quadrature points.
