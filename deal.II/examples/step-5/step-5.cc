@@ -600,10 +600,8 @@ void LaplaceProblem<dim>::solve ()
 				   // inverted) and the relaxation
 				   // factor into one object. This can
 				   // be done like this:
-  PreconditionRelaxation<>
-    preconditioner(system_matrix,
-		   &SparseMatrix<double>::template precondition_SSOR<double>,
-		   1.2);
+  PreconditionSSOR<> preconditioner;
+  preconditioner.initialize(system_matrix, 1.2);
 				   // The default template parameters
 				   // of the PreconditionRelaxation
 				   // class are the matrix and the

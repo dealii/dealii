@@ -757,10 +757,8 @@ void ElasticProblem<dim>::solve ()
   PrimitiveVectorMemory<> vector_memory;
   SolverCG<>              cg (solver_control, vector_memory);
 
-  PreconditionRelaxation<>
-    preconditioner(system_matrix,
-		   &SparseMatrix<double>::template precondition_SSOR<double>,
-		   1.2);
+  PreconditionSSOR<> preconditioner;
+  preconditioner.initialize(system_matrix, 1.2);
 
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);

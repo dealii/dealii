@@ -452,10 +452,8 @@ void AdvectionProblem<dim>::solve ()
   PrimitiveVectorMemory<> vector_memory;
   SolverBicgstab<>        bicgstab (solver_control, vector_memory);
 
-  PreconditionRelaxation<>
-    preconditioner(system_matrix,
-		   &SparseMatrix<double>::template precondition_Jacobi<double>,
-		   1.0);
+  PreconditionJacobi<> preconditioner;
+  preconditioner.initialize(system_matrix, 1.0);
 
   bicgstab.solve (system_matrix, solution, system_rhs,
 		  preconditioner);
