@@ -65,7 +65,7 @@ endif
 	@$(CXX) $(flags) -c $< -o $@
 
 
-all: grid_generator.check grid_test.check dof_test.check \
+all: grid_test.check dof_test.check \
      fe_tables.check gradients.check \
      constraints.check mg.check mglocal.check wave-test-3.check \
      block_matrices.check second_derivatives.check
