@@ -42,18 +42,6 @@
       </dd>
 
       <dt>
-          <strong>2004/04/12: New example program for PETSc classes and
-          parallel computing</strong>
-      </dt>
-      <dd>
-          The step-17 example program shows how to use the new PETSc wrapper
-          classes, and how to do large-scale computations with up to many
-          millions of unknowns on a cluster of computers. This program shows
-          that deal.II is well-suited for truly massive parallel
-          computations.
-      </dd>
-
-      <dt>
           <strong>2004/03/08: Interfaces to PETSc and METIS</strong>
       </dt>
       <dd>
@@ -71,31 +59,6 @@
       </dd>
 
       <dt>
-          <strong>2003/08/19: Dependency generation accelerated</strong>
-      </dt>
-      <dd>
-          The script that generates dependency information between
-          sources and headers for Makefiles has been rewritten in C++,
-          after the old perl script became too slow with the growth of
-          the project. The new script is 2-5 times faster than the old one.
-      </dd>
-
-      <dt>
-          <strong>2003/04/30: New report on Nedelec elements</strong>
-      </dt>
-      <dd>
-          The next major version of the library will have support for
-          Nedelec elements for H-curl approximations of, for example,
-          the Maxwell equations. They were jointly implemented by
-          Wolfgang Bangerth and Anna Schneebeli of the University of
-          Basel, Switzerland, who has also contributed a
-	  <a href="../reports/nedelec/main.html" target="body">report on the
-          derivation and use of these elements</a>. It is available from the 
-	  <a href="../documentation.html" target="body">documentation
-          page</a>. 
-      </dd>
-
-      <dt>
           <strong>2003/04/27: <acronym>deal.II</acronym> now exceeds
           of 200,000 lines of code</strong>
       </dt>
@@ -103,20 +66,6 @@
           Since today, <acronym>deal.II</acronym> has now more than 200,000
           lines of code. The rate of growth continues to be close to
           3000 lines of code per month.
-      </dd>
-
-      <dt>
-          <strong>2003/02/06: A new multithreading scheme</strong> 
-      </dt>
-      <dd>
-          A new multithreading scheme has been put into place; it has
-          essentially the same functionality as the previous one, but
-          is simpler and more intuitive to use. It also allows to call
-          functions on a new thread that return values, and later
-          retrieve the returned value when the thread has finished. Some
-	  documentation of the scheme can be found
-	  <a href="../reports/new-threads/index.html" target="body">on this
-	  page</a>.
       </dd>
 
       <dt>
@@ -144,27 +93,6 @@
       </dd>
       
       <dt>
-          <strong>2002/11/27: Modified Incomplete Cholesky decomposition</strong>
-      </dt>
-      <dd>
-          There is now a Modified Incomplete Cholesky (MIC) decomposition in
-	  deal.II, which has been kindly contributed by
-	  <a href="mailto:cheffo@riflexo.com">Stephen Kolaroff</a>.
-      </dd>
-
-      <dt>
-          <strong>2002/10/14: Red Hat's gcc 2.96 supported</strong>
-      </dt>
-      <dd>
-          deal.II can now also be built with Red Hat's gcc 2.96 version. This
-	  should make it easier for users of Red Hat 7.x distributions, since
-	  they will no longer have to up- or downgrade their
-	  compilers. However, some problems remain; for more information, refer
-	  to the <a href="../faq.html" target="body">Frequently Asked
-	  Questions</a> section.
-      </dd>
-
-      <dt>
           <strong>2002/06/28: deal.II 64-bit ready</strong>
       </dt>
       <dd>
@@ -172,34 +100,6 @@
           tests on a Sparc machine with Solaris 9 in 64-bit mode have
           shown. We also have reports of people running deal.II on
           IA64 systems. 
-      </dd>
-
-      <dt>
-          <strong>2002/06/17: New report on assembling matrices</strong>
-      </dt>
-      <dd>
-          There is now
-	  <a href="../reports/assemble/index.html" target="body">a new report
-          on assembling matrices</a> available from the 
-	  <a href="../documentation.html" target="body">documentation
-          page</a>. The main focus is assembling of matrices for
-          vector-valued problems, where shape functions are
-          vector-valued, and may have only one or more non-zero vector
-          components. 
-      </dd>
-
-      <dt>
-          <strong>2002/06/10: Supporting framework for vector-valued
-          finite elements committed</strong>
-      </dt>
-      <dd>
-          <acronym>deal.II</acronym> supports vector-valued finite
-          elements for a long time, but only by composing them of
-          scalar elements. This excluded Nedelec or Raviart-Thomas
-          type elements, for which every shape function is
-          vector-valued and non-zero in all components. Support for
-          such elements is now available, and will be part of the next
-          version.
       </dd>
 
       <dt>
@@ -222,41 +122,6 @@
       </dd>
       
       <dt>
-          <strong>2002/05/05: New example program demonstrating
-          duality based error estimators</strong>
-      </dt>
-      <dd>
-          The step-14 example program in the tutorial demonstrates the
-          use of duality based error estimation strategies which have
-          been the focus of the Heidelberg group (from which the main
-          authors come) for the last years. Some more strategies for
-          modular and extensible programming are also discussed.
-      </dd>
-
-      <dt>
-          <strong>2002/04/30: Multi-threading support using POSIX</strong>
-      </dt>
-      <dd>
-          In all previous versions, <acronym>deal.II</acronym> used
-          the <a href="http://www.cs.wustl.edu/~schmidt/ACE.html"
-	  target="_top">ACE (Adaptive Communications Environment)</a>
-	  library to support cross-platform threading
-          facilities. While this is still supported, the default way
-          is now to use the POSIX threading functions that are
-          available on many systems.
-      </dd>
-
-      <dt>
-          <strong>2002/04/16: New example program showing
-          software design practices for finite element programs</strong>
-      </dt>
-      <dd>
-          The new step-13 example program in the tutorial explains a
-          number of techniques to write modular and extensible finite
-          element software.
-      </dd>
-
-      <dt>
           <strong>2002/03/07: New web home www.dealii.org and new
                               email addresses</strong> 
       </dt>
@@ -268,17 +133,6 @@
           changed. Though the old web home and the old addresses will
           be supported for some time we recommend to adjust the
           bookmarks and mail addresses accordingly.
-      </dd>
-      
-      <dt>
-          <strong>2002/02/11: New support for Tecplot binary output</strong>
-      </dt>
-      <dd>
-          Benjamin Shelton Kirk contributed binary
-          <a href="http://www.amtec.com">Tecplot</a> support.
-          This feature can be used to create more efficient data files
-          in the Tecplot FEBLOCK finite element format. For more information
-          look <a href="2002/3.3.0-vs-3.4.0.html" target="body">here</a>.
       </dd>
       
       <dt>
@@ -303,39 +157,6 @@
       </dd>
 
       <dt>
-          <strong>2002/01/30: New output formats OpenDX and Tecplot</strong>
-      </dt>
-      <dd>
-          Guido Kanschat and Benjamin Shelton Kirk contributed output
-          for OpenDX and Tecplot graphics formats, which are now
-          supported along a long list of other graphics
-          format. Switching output formats is possible at run time of
-          applications.
-      </dd>
-
-      <dt>
-          <strong>2001/12/07: Memory allocation and access checked
-          with <code>purify</code></strong>
-      </dt>
-      <dd>
-          We checked all example and test programs as well as a number of
-          large applications against the memory checker
-          <code>purify</code>. Only three memory leaks were found and
-          fixed. No invalid memory accesses were found. We believe
-          that no major memory leaks exist in the library any more. 
-      </dd>
-
-      <dt>
-          <strong>2001/11/21: New example program demonstrating
-          discontinuous Galerkin methods</strong>
-      </dt>
-      <dd>
-          A new example program (step-12 of the tutorial) explains the
-          assembling of matrices arising in discontinuous Galerkin
-          methods.
-      </dd>
-
-      <dt>
           <strong>2001/09/28: Version 3.2 released</strong>
       </dt>
       <dd>
@@ -344,15 +165,6 @@
 	  library.  There are many changes between version 3.1 and
 	  release 3.2. A complete list of these changes can be found
 	  <a href="2001/3.1.0-vs-3.2.0.html" target="body">here</a>.
-      </dd>
-
-      <dt>
-          <strong>2001/09/24: Eulerian mapping</strong> 
-      </dt>
-      <dd>
-          Michael Stadler has kindly provided an implementation of
-          Eulerian mappings, i.e. a mapping between unit cell and real
-          space that depends on a given vector field.
       </dd>
 
       <dt>
@@ -395,20 +207,6 @@
       </dd>
 
       <dt>
-          <strong>2001/03/06: Support for arbitrary mappings</strong>
-      </dt>
-      <dd>
-          The finite element classes have been redesigned from scratch
-          to allow for arbitrary mappings, as well as for elements
-          that depend on the actual cell shape, such as edge
-          elements. Presently, we have continuous and discontinous
-          Lagrange elements of arbitrary order implemented, as well as
-          polynomial mappings between unit and real cell of arbitrary
-          order. There is also a cubic C<sup>1</sup> mapping
-          implemented.
-      </dd>
-
-      <dt>
           <strong>2001/02/26: Support for Subroutines from the Harwell Subroutine 
 	          Library (HSL)</strong>
       </dt>
@@ -435,50 +233,6 @@
       </dd>
 
       <dt>
-          <strong>2001/01/16: Correct namespace <code>std::</code>
-          scoping</strong>  
-      </dt>
-      <dd>
-          All identifiers that the C++ standard (see
-          <a href="http://www.cygnus.com/misc/wp/dec96pub/"
-          target="_top">this page</a> for the public draft -- the
-          standard itself is not available online for copyright reasons)
-          mandates to be in namespace <code>std::</code> are correctly
-          prefixed by the namespace name. While previous gcc compilers
-          accepted these names also without the prefix, gcc 3.0 will
-          require them, as do some commercial compilers.
-      </dd>
-
-      <dt>
-          <strong>2000/11/27: Memory consumption monitoring</strong> 
-      </dt>
-      <dd>
-          Almost all classes in the library that store significant
-          amounts of data now have a function 
-	  <code class="member">memory_consumption</code> that returns an
-          estimate of the amount of memory (in bytes) used up by this
-	  class. These functions may be used to track down where memory
-          bottlenecks are located.
-      </dd>
-
-      <dt>
-          <strong>2000/08/30: New report on dimension 
-	                      independent programming</strong> 
-      </dt>
-      <dd>
-          There is now a
-	  <a href="../reports/dimension-independent/index.html"
-	   target="body">new report available online</a> on the basic
-	  ideas of dimension independent programming, as done in
-	  <acronym>deal.II</acronym> using all this
-	  `<code>template &lt;int dim&gt;</code>' stuff. This report
-	  is in fact an article in the proceeding of the IMACS
-	  conference (see the <a href="../publications/toc.html"
-	  target="body">publications page</a> for full bibliographical
-	  reference, it is publication 2000/4).
-      </dd>
-
-      <dt>
           <strong>2000/08/07: deal.II 3.0.1</strong> 
       </dt>
       <dd>
@@ -487,27 +241,6 @@
 	  <a href="2000/3.0.0-vs-3.0.1.html" target="body">this
 	  page</a>.
 	  (<a href="2000/03.html" target="body">Announcement</a>)
-      </dd>
-
-      <dt>
-          <strong>2000/06/28: kdoc2</strong> 
-      </dt>
-      <dd>
-          Our API documentation is now generated by
-	  <code class="program">kdoc2</code>, the successor of the
-	  <code class="program">kdoc1</code> script that was used
-	  previously. The generated pages are now much nicer and
-	  should also present a clearer view of the information
-	  contained. 
-      </dd>
-
-      <dt>
-          <strong>2000/04/14: New multithreading scheme</strong> 
-      </dt>
-      <dd>
-	  The new multithreading scheme is now in
-	  place; furthermore, there is a corresponding report available
-	  (<a href="2000/02.html" target="body">full text</a>).
       </dd>
 
       <dt>
