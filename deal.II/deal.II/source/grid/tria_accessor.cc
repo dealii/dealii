@@ -529,7 +529,7 @@ void CellAccessor<1>::set_material_id (const unsigned char mat_id) const {
 
 
 
-Triangulation<1>::substruct_iterator
+Triangulation<1>::face_iterator
 CellAccessor<1>::face (const unsigned int) const {
   Assert (false, ExcNotUsefulForThisDimension());
   return 0;
@@ -563,7 +563,7 @@ void CellAccessor<2>::set_material_id (const unsigned char mat_id) const {
 
 
 
-Triangulation<2>::substruct_iterator
+Triangulation<2>::face_iterator
 CellAccessor<2>::face (const unsigned int i) const {
   return line(i);
 };

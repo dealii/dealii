@@ -956,6 +956,161 @@ Triangulation<2>::last_active (const unsigned int level) const {
 
 
 
+
+
+TriaDimensionInfo<1>::raw_face_iterator
+Triangulation<1>::begin_raw_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+TriaDimensionInfo<1>::face_iterator
+Triangulation<1>::begin_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+TriaDimensionInfo<1>::active_face_iterator
+Triangulation<1>::begin_active_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+TriaDimensionInfo<1>::raw_face_iterator
+Triangulation<1>::end_face () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+TriaDimensionInfo<1>::raw_face_iterator
+Triangulation<1>::last_raw_face () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+TriaDimensionInfo<1>::raw_face_iterator
+Triangulation<1>::last_raw_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+TriaDimensionInfo<1>::face_iterator
+Triangulation<1>::last_face () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+TriaDimensionInfo<1>::face_iterator
+Triangulation<1>::last_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+TriaDimensionInfo<1>::active_face_iterator
+Triangulation<1>::last_active_face () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+TriaDimensionInfo<1>::active_face_iterator
+Triangulation<1>::last_active_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+
+TriaDimensionInfo<2>::raw_face_iterator
+Triangulation<2>::begin_raw_face (const unsigned int level) const {
+  return begin_raw_line (level);
+};
+
+
+
+TriaDimensionInfo<2>::face_iterator
+Triangulation<2>::begin_face (const unsigned int level) const {
+  return begin_line (level);
+};
+
+
+
+TriaDimensionInfo<2>::active_face_iterator
+Triangulation<2>::begin_active_face (const unsigned int level) const {
+  return begin_active_line (level);
+};
+
+
+
+TriaDimensionInfo<2>::raw_face_iterator
+Triangulation<2>::end_face () const {
+  return end_line ();
+};
+
+
+
+TriaDimensionInfo<2>::raw_face_iterator
+Triangulation<2>::last_raw_face () const {
+  return last_raw_line ();
+};
+
+
+
+TriaDimensionInfo<2>::raw_face_iterator
+Triangulation<2>::last_raw_face (const unsigned int level) const {
+  return last_raw_line (level);
+};
+
+
+
+TriaDimensionInfo<2>::face_iterator
+Triangulation<2>::last_face () const {
+  return last_line ();
+};
+
+
+
+TriaDimensionInfo<2>::face_iterator
+Triangulation<2>::last_face (const unsigned int level) const {
+  return last_line (level);
+};
+
+
+
+TriaDimensionInfo<2>::active_face_iterator
+Triangulation<2>::last_active_face () const {
+  return last_active_line ();
+};
+
+
+
+TriaDimensionInfo<2>::active_face_iterator
+Triangulation<2>::last_active_face (const unsigned int level) const {
+  return last_active_line (level);
+};
+
+
+
+
+
 template <int dim>
 typename TriaDimensionInfo<dim>::raw_line_iterator
 Triangulation<dim>::begin_raw_line (unsigned int level) const {

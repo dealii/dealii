@@ -463,7 +463,7 @@ class TriaDimensionInfo;
     #void *#. Thus these types exist, but are useless and will
     certainly make any involuntary use visible.
 
-    The same applies for the #substruct_iterator# types, since lines
+    The same applies for the #face_iterator# types, since lines
     have no substructures apart from vertices, which are handled in
     a different way, however.
     */
@@ -481,9 +481,9 @@ class TriaDimensionInfo<1> {
     typedef line_iterator        cell_iterator;
     typedef active_line_iterator active_cell_iterator;
 
-    typedef void * raw_substruct_iterator;
-    typedef void * substruct_iterator;
-    typedef void * active_substruct_iterator;
+    typedef void * raw_face_iterator;
+    typedef void * face_iterator;
+    typedef void * active_face_iterator;
 };
 
 
@@ -508,9 +508,9 @@ class TriaDimensionInfo<1> {
       typedef quad_iterator        cell_iterator;
       typedef active_quad_iterator active_cell_iterator;
 
-      typedef raw_line_iterator    raw_substruct_iterator;
-      typedef line_iterator        substruct_iterator;
-      typedef active_line_iterator active_substruct_iterator;    
+      typedef raw_line_iterator    raw_face_iterator;
+      typedef line_iterator        face_iterator;
+      typedef active_line_iterator active_face_iterator;    
     \end{verbatim}
     */
 class TriaDimensionInfo<2> {
@@ -527,9 +527,9 @@ class TriaDimensionInfo<2> {
     typedef quad_iterator        cell_iterator;
     typedef active_quad_iterator active_cell_iterator;
 
-    typedef raw_line_iterator    raw_substruct_iterator;
-    typedef line_iterator        substruct_iterator;
-    typedef active_line_iterator active_substruct_iterator;    
+    typedef raw_line_iterator    raw_face_iterator;
+    typedef line_iterator        face_iterator;
+    typedef active_line_iterator active_face_iterator;    
 };
 
 
@@ -601,9 +601,9 @@ class TriaDimensionInfo<2> {
       typedef quad_iterator        cell_iterator;
       typedef active_quad_iterator active_cell_iterator;
 
-      typedef raw_line_iterator    raw_substruct_iterator;
-      typedef line_iterator        substruct_iterator;
-      typedef active_line_iterator active_substruct_iterator;    
+      typedef raw_line_iterator    raw_face_iterator;
+      typedef line_iterator        face_iterator;
+      typedef active_line_iterator active_face_iterator;    
     \end{verbatim}
 
     By using the cell iterators, you can write code nearly independent of
@@ -1023,9 +1023,9 @@ class Triangulation : public TriaDimensionInfo<dim> {
     typedef typename TriaDimensionInfo<dim>::cell_iterator cell_iterator;
     typedef typename TriaDimensionInfo<dim>::active_cell_iterator active_cell_iterator;
 
-    typedef typename TriaDimensionInfo<dim>::raw_substruct_iterator raw_substruct_iterator;
-    typedef typename TriaDimensionInfo<dim>::substruct_iterator substruct_iterator;
-    typedef typename TriaDimensionInfo<dim>::active_substruct_iterator active_substruct_iterator;
+    typedef typename TriaDimensionInfo<dim>::raw_face_iterator raw_face_iterator;
+    typedef typename TriaDimensionInfo<dim>::face_iterator face_iterator;
+    typedef typename TriaDimensionInfo<dim>::active_face_iterator active_face_iterator;
 
 				     /**
 				      *  Create a triangulation and create
@@ -1338,6 +1338,109 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				     //@}
 
     				     /*---------------------------------------*/
+    				     /*---------------------------------------*/
+
+    				     /**
+				      *  @name Face iterator functions
+				      */
+				     /*@{*/
+				     /**
+				      *  Return iterator to the first face, used
+				      *  or not, on level #level#. If a level
+				      *  has no faces, a past-the-end iterator
+				      *  is returned.
+				      *
+				      *  This function calls #begin_raw_line#
+				      *  in 2D and #begin_raw_quad# in 3D.
+				      */
+    raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first used face
+				      *  on level #level#.
+				      *
+				      *  This function calls #begin_line#
+				      *  in 2D and #begin_quad# in 3D.
+				      */
+    face_iterator        begin_face       (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first active
+				      *  face on level #level#.
+				      *
+				      *  This function calls #begin_active_line#
+				      *  in 2D and #begin_active_quad# in 3D.
+				      */
+    active_face_iterator begin_active_face(const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator past the end; this
+				      *  iterator serves for comparisons of
+				      *  iterators with past-the-end or
+				      *  before-the-beginning states.
+				      *
+				      *  This function calls #end_line#
+				      *  in 2D and #end_quad# in 3D.
+				      */
+    raw_face_iterator    end_face () const;
+
+				     /**
+				      *  Return an iterator pointing to the
+				      *  last face, used or not.
+				      *
+				      *  This function calls #last_raw_line#
+				      *  in 2D and #last_raw_quad# in 3D.
+				      */
+    raw_face_iterator    last_raw_face () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  face of the level #level#, used or not.
+				      *
+				      *  This function calls #last_raw_line#
+				      *  in 2D and #last_raw_quad# in 3D.
+				      */
+    raw_face_iterator    last_raw_face (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used face.
+				      *
+				      *  This function calls #last_line#
+				      *  in 2D and #last_quad# in 3D.
+				      */
+    face_iterator        last_face () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used face on level #level#.
+				      *
+				      *  This function calls #last_line#
+				      *  in 2D and #last_quad# in 3D.
+				      */
+    face_iterator        last_face (const unsigned int level) const;
+
+    				     /**
+				      *  Return an iterator pointing to the last
+				      *  active face.
+				      *
+				      *  This function calls #last_active_line#
+				      *  in 2D and #last_active_quad# in 3D.
+				      */
+    active_face_iterator last_active_face () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  active face on level #level#.
+				      *
+				      *  This function calls #last_active_line#
+				      *  in 2D and #last_active_quad# in 3D.
+				      */
+    active_face_iterator last_active_face (const unsigned int level) const;
+				     //@}
+
+    
+				     /*---------------------------------------*/
 
 				     /**
 				      *  @name Line iterator functions

@@ -84,6 +84,23 @@ void DoFLineAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ve
 
 
 template <int dim, class BaseClass>
+void
+DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_indices.size() == 0, ExcVectorNotEmpty());
+  
+  dof_indices.reserve (dof_handler->get_selected_fe().total_dofs);
+  for (unsigned int vertex=0; vertex<2; ++vertex)
+    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
+      dof_indices.push_back (vertex_dof_index(vertex,d));
+  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
+    dof_indices.push_back (dof_index(d));
+};
+
+
+
+template <int dim, class BaseClass>
 TriaIterator<dim,DoFLineAccessor<dim,BaseClass> >
 DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
   TriaIterator<dim,DoFLineAccessor<dim,BaseClass> > q (tria,
@@ -178,6 +195,27 @@ void DoFQuadAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ve
 
 
 template <int dim, class BaseClass>
+void
+DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_indices.size() == 0, ExcVectorNotEmpty());
+  
+  dof_indices.reserve (dof_handler->get_selected_fe().total_dofs);
+  for (unsigned int vertex=0; vertex<4; ++vertex)
+    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
+      dof_indices.push_back (vertex_dof_index(vertex,d));
+  for (unsigned int line=0; line<4; ++line)
+    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
+      dof_indices.push_back (this->line(line)->dof_index(d));
+  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_quad; ++d)
+    dof_indices.push_back (dof_index(d));
+};
+
+
+
+
+template <int dim, class BaseClass>
 TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
 DoFQuadAccessor<dim,BaseClass>::line (const unsigned int i) const {
   Assert (i<4, ExcInvalidIndex (i, 0, 4));
@@ -257,7 +295,7 @@ DoFCellAccessor<dim>::child (const unsigned int i) const {
 
 
 
-DoFSubstructAccessor<1>::substruct_iterator
+DoFSubstructAccessor<1>::face_iterator
 DoFCellAccessor<1>::face (const unsigned int) const {
   Assert (false, ExcNotUsefulForThisDimension());
   return 0;
@@ -265,47 +303,10 @@ DoFCellAccessor<1>::face (const unsigned int) const {
 
 
 
-DoFSubstructAccessor<2>::substruct_iterator
+DoFSubstructAccessor<2>::face_iterator
 DoFCellAccessor<2>::face (const unsigned int i) const {
   return line(i);
 };
-
-
-
-void
-DoFCellAccessor<1>::get_dof_indices (vector<int> &dof_indices) const {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_indices.size() == 0, ExcVectorNotEmpty());
-  
-  dof_indices.reserve (dof_handler->get_selected_fe().total_dofs);
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
-      dof_indices.push_back (vertex_dof_index(vertex,d));
-  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
-    dof_indices.push_back (dof_index(d));
-};
-
-
-
-
-void
-DoFCellAccessor<2>::get_dof_indices (vector<int> &dof_indices) const {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_indices.size() == 0, ExcVectorNotEmpty());
-  
-  dof_indices.reserve (dof_handler->get_selected_fe().total_dofs);
-  for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
-      dof_indices.push_back (vertex_dof_index(vertex,d));
-  for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
-      dof_indices.push_back (this->line(line)->dof_index(d));
-  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_quad; ++d)
-    dof_indices.push_back (dof_index(d));
-};
-
 
 
 

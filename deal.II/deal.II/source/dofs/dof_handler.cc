@@ -174,6 +174,164 @@ DoFHandler<2>::last_active (const unsigned int level) const {
 
 //------------------------------------------------------------------
 
+
+
+DoFDimensionInfo<1>::raw_face_iterator
+DoFHandler<1>::begin_raw_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+DoFDimensionInfo<1>::face_iterator
+DoFHandler<1>::begin_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+DoFDimensionInfo<1>::active_face_iterator
+DoFHandler<1>::begin_active_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+DoFDimensionInfo<1>::raw_face_iterator
+DoFHandler<1>::end_face () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+DoFDimensionInfo<1>::raw_face_iterator
+DoFHandler<1>::last_raw_face () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+DoFDimensionInfo<1>::raw_face_iterator
+DoFHandler<1>::last_raw_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+DoFDimensionInfo<1>::face_iterator
+DoFHandler<1>::last_face () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+DoFDimensionInfo<1>::face_iterator
+DoFHandler<1>::last_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+DoFDimensionInfo<1>::active_face_iterator
+DoFHandler<1>::last_active_face () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+DoFDimensionInfo<1>::active_face_iterator
+DoFHandler<1>::last_active_face (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+
+
+DoFDimensionInfo<2>::raw_face_iterator
+DoFHandler<2>::begin_raw_face (const unsigned int level) const {
+  return begin_raw_line (level);
+};
+
+
+
+DoFDimensionInfo<2>::face_iterator
+DoFHandler<2>::begin_face (const unsigned int level) const {
+  return begin_line (level);
+};
+
+
+
+DoFDimensionInfo<2>::active_face_iterator
+DoFHandler<2>::begin_active_face (const unsigned int level) const {
+  return begin_active_line (level);
+};
+
+
+
+DoFDimensionInfo<2>::raw_face_iterator
+DoFHandler<2>::end_face () const {
+  return end_line ();
+};
+
+
+
+DoFDimensionInfo<2>::raw_face_iterator
+DoFHandler<2>::last_raw_face () const {
+  return last_raw_line ();
+};
+
+
+
+DoFDimensionInfo<2>::raw_face_iterator
+DoFHandler<2>::last_raw_face (const unsigned int level) const {
+  return last_raw_line (level);
+};
+
+
+
+DoFDimensionInfo<2>::face_iterator
+DoFHandler<2>::last_face () const {
+  return last_line ();
+};
+
+
+
+DoFDimensionInfo<2>::face_iterator
+DoFHandler<2>::last_face (const unsigned int level) const {
+  return last_line (level);
+};
+
+
+
+DoFDimensionInfo<2>::active_face_iterator
+DoFHandler<2>::last_active_face () const {
+  return last_active_line ();
+};
+
+
+
+DoFDimensionInfo<2>::active_face_iterator
+DoFHandler<2>::last_active_face (const unsigned int level) const {
+  return last_active_line (level);
+};
+
+
+
+// ---------------------------------------------------------------
+
+
+
 template <int dim>
 typename DoFHandler<dim>::raw_line_iterator
 DoFHandler<dim>::begin_raw_line (const unsigned int level) const {

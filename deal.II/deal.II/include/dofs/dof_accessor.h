@@ -55,6 +55,10 @@ class DoFAccessor {
 		    << "Invalid index " << arg1
 		    << ", index must be between " << arg2
 		    << " and " << arg3 << ".");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcVectorNotEmpty);
 
   protected:
 				     /**
@@ -164,6 +168,18 @@ class DoFLineAccessor :  public BaseClass, public DoFAccessor<dim> {
 			       const unsigned int i,
 			       const int          index) const;
 
+    				     /**
+				      * Return the indices of the dofs of this
+				      * line in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, 
+				      * dofs on line.
+				      *
+				      * The dof indices are appended to the end
+				      * of the vector. It is assumed that
+				      * the vector be empty beforehand.
+				      */
+    void get_dof_indices (vector<int> &dof_indices) const;
+
 				     /**
 				      * Return the #i#th child as a DoF line
 				      * iterator. This function is needed since
@@ -238,6 +254,19 @@ class DoFQuadAccessor :  public BaseClass, public DoFAccessor<dim> {
 			       const int          index) const;
 
     				     /**
+				      * Return the indices of the dofs of this
+				      * quad in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * The dof indices are appended to the end
+				      * of the vector. It is assumed that
+				      * the vector be empty beforehand.
+				      */
+    void get_dof_indices (vector<int> &dof_indices) const;
+
+    				     /**
 				      *  Return a pointer to the #i#th line
 				      *  bounding this #Quad#.
 				      */
@@ -308,11 +337,11 @@ class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
 		    DoFLineAccessor<1,CellAccessor<1> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
-				     // what a substruct_iterator is. Otherwise
+				     // what a face_iterator is. Otherwise
 				     // it would have to ask the DoFHandler<dim>
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
-    typedef void * substruct_iterator;
+    typedef void * face_iterator;
 };
 
 
@@ -333,11 +362,11 @@ class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
 		    DoFQuadAccessor<2,CellAccessor<2> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
-				     // what a substruct_iterator is. Otherwise
+				     // what a face_iterator is. Otherwise
 				     // it would have to ask the DoFHandler<dim>
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
-    typedef TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > > substruct_iterator;
+    typedef TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > > face_iterator;
 };
 
 
@@ -393,21 +422,8 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * This function is not implemented in 1D,
 				      * and maps to DoFQuadAccessor::line in 2D.
 				      */
-    typename DoFSubstructAccessor<dim>::substruct_iterator
+    typename DoFSubstructAccessor<dim>::face_iterator
     face (const unsigned int i) const;
-
-    				     /**
-				      * Return the indices of the dofs of this
-				      * cell in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * The dof indices are appended to the end
-				      * of the vector. It is assumed that
-				      * the vector be empty beforehand.
-				      */
-    void get_dof_indices (vector<int> &dof_indices) const;
 
     				     /**
 				      * Return the value of the given vector
@@ -424,10 +440,6 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
     void get_dof_values (const dVector  &values,
 			 vector<double> &dof_values) const;
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcVectorNotEmpty);
 				     /**
 				      * Exception
 				      */

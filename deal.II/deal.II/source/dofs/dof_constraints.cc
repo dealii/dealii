@@ -87,7 +87,7 @@ void ConstraintMatrix::clear () {
 void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 				 dSMatrixStruct       &condensed) const {
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (uncondensed.compressed == true, ExcMatrixNotClosed());
+  Assert (uncondensed.is_compressed() == true, ExcMatrixNotClosed());
   Assert (uncondensed.n_rows() == uncondensed.n_cols(),
 	  ExcMatrixNotSquare());
 
@@ -116,21 +116,23 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 
  
   next_constraint = lines.begin();
-  for (int row=0; row<uncondensed.rows; ++row)
+  for (int row=0; row<uncondensed.n_rows(); ++row)
     if (new_line[row] != -1)
 				       // line not constrained
 				       // copy entries if column will not
 				       // be condensed away, distribute
 				       // otherwise
-      for (int j=uncondensed.rowstart[row]; j<uncondensed.rowstart[row+1]; ++j)
-	if (new_line[uncondensed.colnums[j]] != -1)
-	  condensed.add (new_line[row], new_line[uncondensed.colnums[j]]);
+      for (int j=uncondensed.get_rowstart_indices()[row];
+	   j<uncondensed.get_rowstart_indices()[row+1]; ++j)
+	if (new_line[uncondensed.get_column_numbers()[j]] != -1)
+	  condensed.add (new_line[row], new_line[uncondensed.get_column_numbers()[j]]);
 	else 
 	  {
 					     // let c point to the constraint
 					     // of this column
 	    vector<ConstraintLine>::const_iterator c = lines.begin();
-	    while ((*c).line != (unsigned int)uncondensed.colnums[j]) ++c;
+	    while ((*c).line != (unsigned int)uncondensed.get_column_numbers()[j])
+	      ++c;
 
 	    for (unsigned int q=0; q!=(*c).entries.size(); ++q) 
 	      condensed.add (new_line[row], new_line[(*c).entries[q].first]);
@@ -138,13 +140,14 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
     else
 				       // line must be distributed
       {
-	for (int j=uncondensed.rowstart[row]; j<uncondensed.rowstart[row+1]; ++j)
+	for (int j=uncondensed.get_rowstart_indices()[row];
+	     j<uncondensed.get_rowstart_indices()[row+1]; ++j)
 					   // for each entry: distribute
-	  if (new_line[uncondensed.colnums[j]] != -1)
+	  if (new_line[uncondensed.get_column_numbers()[j]] != -1)
 					     // column is not constrained
 	    for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q) 
 		condensed.add (new_line[(*next_constraint).entries[q].first],
-			       new_line[uncondensed.colnums[j]]);
+			       new_line[uncondensed.get_column_numbers()[j]]);
 	
 	  else
 					     // not only this line but
@@ -153,7 +156,7 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 					       // let c point to the constraint
 					       // of this column
 	      vector<ConstraintLine>::const_iterator c = lines.begin();
-	      while ((*c).line != (unsigned int)uncondensed.colnums[j]) ++c;
+	      while ((*c).line != (unsigned int)uncondensed.get_column_numbers()[j]) ++c;
 	      
 	      for (unsigned int p=0; p!=(*c).entries.size(); ++p)
 		for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q)
@@ -171,7 +174,7 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 
 void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (sparsity.compressed == false, ExcMatrixIsClosed());
+  Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcMatrixNotSquare());
   
@@ -199,46 +202,52 @@ void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
   for (int row=0; row<n_rows; ++row)
     if (distribute[row] == -1)
 				       // regular line. loop over cols
-      for (int j=sparsity.rowstart[row]; j<sparsity.rowstart[row+1]; ++j)
+      for (int j=sparsity.get_rowstart_indices()[row];
+	   j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					 // end of row reached?
-	if (sparsity.colnums[j] == -1)
+	if (sparsity.get_column_numbers()[j] == -1)
 	  break;
 	else
 	  {
-	    if (distribute[sparsity.colnums[j]] != -1)
+	    if (distribute[sparsity.get_column_numbers()[j]] != -1)
 					       // distribute entry at regular
 					       // row #row# and irregular column
 					       // sparsity.colnums[j]
 	      for (unsigned int q=0;
-		   q!=lines[distribute[sparsity.colnums[j]]].entries.size(); ++q) 
+		   q!=lines[distribute[sparsity.get_column_numbers()[j]]].entries.size();
+		   ++q) 
 		sparsity.add (row,
-			      lines[distribute[sparsity.colnums[j]]].entries[q].first);
+			      lines[distribute[sparsity.get_column_numbers()[j]]].
+			      entries[q].first);
 	  }
     else
 				       // row must be distributed
-      for (int j=sparsity.rowstart[row]; j<sparsity.rowstart[row+1]; ++j)
+      for (int j=sparsity.get_rowstart_indices()[row];
+	   j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					 // end of row reached?
-	if (sparsity.colnums[j] == -1)
+	if (sparsity.get_column_numbers()[j] == -1)
 	  break;
 	else
 	  {
-	    if (distribute[sparsity.colnums[j]] == -1)
+	    if (distribute[sparsity.get_column_numbers()[j]] == -1)
 					       // distribute entry at irregular
 					       // row #row# and regular column
 					       // sparsity.colnums[j]
 	      for (unsigned int q=0;
 		   q!=lines[distribute[row]].entries.size(); ++q) 
 		sparsity.add (lines[distribute[row]].entries[q].first,
-			      sparsity.colnums[j]);
+			      sparsity.get_column_numbers()[j]);
 	    else
 					       // distribute entry at irregular
 					       // row #row# and irregular column
-					       // sparsity.colnums[j]
+					       // sparsity.get_column_numbers()[j]
 	      for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
 		for (unsigned int q=0;
-		     q!=lines[distribute[sparsity.colnums[j]]].entries.size(); ++q)
+		     q!=lines[distribute[sparsity.get_column_numbers()[j]]]
+				    .entries.size(); ++q)
 		  sparsity.add (lines[distribute[row]].entries[p].first,
-				lines[distribute[sparsity.colnums[j]]].entries[q].first);
+				lines[distribute[sparsity.get_column_numbers()[j]]]
+				.entries[q].first);
 	  };
   sparsity.compress();
 };
@@ -250,8 +259,8 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
   const dSMatrixStruct &uncondensed_struct = uncondensed.get_sparsity_pattern ();
   
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (uncondensed_struct.compressed == true, ExcMatrixNotClosed());
-  Assert (condensed.get_sparsity_pattern().compressed == true, ExcMatrixNotClosed());
+  Assert (uncondensed_struct.is_compressed() == true, ExcMatrixNotClosed());
+  Assert (condensed.get_sparsity_pattern().is_compressed() == true, ExcMatrixNotClosed());
   Assert (uncondensed_struct.n_rows() == uncondensed_struct.n_cols(),
 	  ExcMatrixNotSquare());
   Assert (condensed.n() == condensed.m(),
@@ -284,40 +293,43 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
 
  
   next_constraint = lines.begin();
-  for (int row=0; row<uncondensed_struct.rows; ++row)
+  for (int row=0; row<uncondensed_struct.n_rows(); ++row)
     if (new_line[row] != -1)
 				       // line not constrained
 				       // copy entries if column will not
 				       // be condensed away, distribute
 				       // otherwise
-      for (int j=uncondensed_struct.rowstart[row]; j<uncondensed_struct.rowstart[row+1]; ++j)
-	if (new_line[uncondensed_struct.colnums[j]] != -1)
-	  condensed.add (new_line[row], new_line[uncondensed_struct.colnums[j]],
-			 uncondensed.val[j]);
+      for (int j=uncondensed_struct.get_rowstart_indices()[row];
+	   j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
+	if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
+	  condensed.add (new_line[row], new_line[uncondensed_struct.get_column_numbers()[j]],
+			 uncondensed.global_entry(j));
 	else 
 	  {
 					     // let c point to the constraint
 					     // of this column
 	    vector<ConstraintLine>::const_iterator c = lines.begin();
-	    while ((*c).line != (unsigned int)uncondensed_struct.colnums[j]) ++c;
+	    while ((*c).line != (unsigned int)uncondensed_struct.get_column_numbers()[j]) ++c;
 
 	    for (unsigned int q=0; q!=(*c).entries.size(); ++q)
 					       // distribute to rows with
 					       // appropriate weight
 	      condensed.add (new_line[row], new_line[(*c).entries[q].first],
-			     uncondensed.val[j] * (*c).entries[q].second);
+			     uncondensed.global_entry(j) * (*c).entries[q].second);
 	  }
     else
 				       // line must be distributed
       {
-	for (int j=uncondensed_struct.rowstart[row]; j<uncondensed_struct.rowstart[row+1]; ++j)
+	for (int j=uncondensed_struct.get_rowstart_indices()[row];
+	     j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
 					   // for each column: distribute
-	  if (new_line[uncondensed_struct.colnums[j]] != -1)
+	  if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
 					     // column is not constrained
 	    for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q) 
 		condensed.add (new_line[(*next_constraint).entries[q].first],
-			       new_line[uncondensed_struct.colnums[j]],
-			       uncondensed.val[j] * (*next_constraint).entries[q].second);
+			       new_line[uncondensed_struct.get_column_numbers()[j]],
+			       uncondensed.global_entry(j) *
+			       (*next_constraint).entries[q].second);
 	
 	  else
 					     // not only this line but
@@ -326,13 +338,13 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
 					       // let c point to the constraint
 					       // of this column
 	      vector<ConstraintLine>::const_iterator c = lines.begin();
-	      while ((*c).line != (unsigned int)uncondensed_struct.colnums[j]) ++c;
+	      while ((*c).line != (unsigned int)uncondensed_struct.get_column_numbers()[j]) ++c;
 	      
 	      for (unsigned int p=0; p!=(*c).entries.size(); ++p)
 		for (unsigned int q=0; q!=(*next_constraint).entries.size(); ++q)
 		    condensed.add (new_line[(*next_constraint).entries[q].first],
 				   new_line[(*c).entries[p].first],
-				   uncondensed.val[j] *
+				   uncondensed.global_entry(j) *
 				   (*next_constraint).entries[q].second *
 				   (*c).entries[p].second);
 	    };
@@ -347,7 +359,7 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
   const dSMatrixStruct &sparsity = uncondensed.get_sparsity_pattern ();
 
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (sparsity.compressed == true, ExcMatrixNotClosed());
+  Assert (sparsity.is_compressed() == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcMatrixNotSquare());
   
@@ -378,67 +390,75 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
       
     if (distribute[row] == -1)
 				       // regular line. loop over cols
-      for (int j=sparsity.rowstart[row]; j<sparsity.rowstart[row+1]; ++j)
+      for (int j=sparsity.get_rowstart_indices()[row];
+	   j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					 // end of row reached?
-	if (sparsity.colnums[j] == -1)
+	if (sparsity.get_column_numbers()[j] == -1)
 	  break;
 	else
 	  {
-	    if (distribute[sparsity.colnums[j]] != -1)
+	    if (distribute[sparsity.get_column_numbers()[j]] != -1)
 					       // distribute entry at regular
 					       // row #row# and irregular column
-					       // sparsity.colnums[j]; set old
+					       // sparsity.get_column_numbers()[j]; set old
 					       // entry to zero
 	      {
 		for (unsigned int q=0;
-		     q!=lines[distribute[sparsity.colnums[j]]].entries.size(); ++q) 
+		     q!=lines[distribute[sparsity.get_column_numbers()[j]]]
+				    .entries.size(); ++q) 
 		  uncondensed.add (row,
-				   lines[distribute[sparsity.colnums[j]]].entries[q].first,
-				   uncondensed.val[j] *
-				   lines[distribute[sparsity.colnums[j]]].entries[q].second);
-		uncondensed.val[j] = 0.;
+				   lines[distribute[sparsity.get_column_numbers()[j]]]
+				   .entries[q].first,
+				   uncondensed.global_entry(j) *
+				   lines[distribute[sparsity.get_column_numbers()[j]]]
+				   .entries[q].second);
+		uncondensed.global_entry(j) = 0.;
 	      };
 	  }
     else
 				       // row must be distributed
-      for (int j=sparsity.rowstart[row]; j<sparsity.rowstart[row+1]; ++j)
+      for (int j=sparsity.get_rowstart_indices()[row];
+	   j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					 // end of row reached?
-	if (sparsity.colnums[j] == -1)
+	if (sparsity.get_column_numbers()[j] == -1)
 	  break;
 	else
 	  {
-	    if (distribute[sparsity.colnums[j]] == -1)
+	    if (distribute[sparsity.get_column_numbers()[j]] == -1)
 					       // distribute entry at irregular
 					       // row #row# and regular column
-					       // sparsity.colnums[j]. set old
+					       // sparsity.get_column_numbers()[j]. set old
 					       // entry to zero
 	      {
 		for (unsigned int q=0;
 		     q!=lines[distribute[row]].entries.size(); ++q) 
 		  uncondensed.add (lines[distribute[row]].entries[q].first,
-				   sparsity.colnums[j],
-				   uncondensed.val[j] *
+				   sparsity.get_column_numbers()[j],
+				   uncondensed.global_entry(j) *
 				   lines[distribute[row]].entries[q].second);
 		
-		uncondensed.val[j] = 0.;
+		uncondensed.global_entry(j) = 0.;
 	      }
 	    else
 					       // distribute entry at irregular
 					       // row #row# and irregular column
-					       // sparsity.colnums[j]
+					       // sparsity.get_column_numbers()[j]
 					       // set old entry to one if on main
 					       // diagonal, zero otherwise
 	      {
 		for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
 		  for (unsigned int q=0;
-		       q!=lines[distribute[sparsity.colnums[j]]].entries.size(); ++q)
+		       q!=lines[distribute[sparsity.get_column_numbers()[j]]]
+				      .entries.size(); ++q)
 		    uncondensed.add (lines[distribute[row]].entries[p].first,
-				     lines[distribute[sparsity.colnums[j]]].entries[q].first,
-				     uncondensed.val[j] *
+				     lines[distribute[sparsity.get_column_numbers()[j]]]
+				     .entries[q].first,
+				     uncondensed.global_entry(j) *
 				     lines[distribute[row]].entries[p].second *
-				     lines[distribute[sparsity.colnums[j]]].entries[q].second);
+				     lines[distribute[sparsity.get_column_numbers()[j]]]
+				     .entries[q].second);
 		
-		uncondensed.val[j] = (row == sparsity.colnums[j] ?
+		uncondensed.global_entry(j) = (row == sparsity.get_column_numbers()[j] ?
 				      1. : 0. );
 	      };
 	  };

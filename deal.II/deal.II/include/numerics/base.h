@@ -18,6 +18,8 @@ template <int dim> class FiniteElement;
 template <int dim> class Quadrature;
 template <int dim> class DataOut;
 template <int dim> class Function;
+template <int dim> class Equation;
+template <int dim> class Assembler;
 
 template <class Key, class T, class Compare = less<Key>, class Alloc = alloc> class map;
 
@@ -110,6 +112,16 @@ enum NormType {
   eliminating all coupling between this degree of freedom and others. Now
   also the column consists only of zeroes, apart from the main diagonal entry.
 
+  It seems as if we had to make clear not to overwrite the lines of other
+  boundary nodes when doing the Gauss elimination step. However, since we
+  reset the right hand side when passing such a node, it is not a problem
+  to change the right hand side values of other boundary nodes not yet
+  processed. It would be a problem to change those entries of nodes already
+  processed, but since the matrix entry of the present column on the row
+  of an already processed node is zero, the Gauss step does not change
+  the right hand side. We need therefore not take special care of other
+  boundary nodes.
+  
   To make solving faster, we preset the solution vector with the right boundary
   values. Since boundary nodes can never be hanging nodes, and since all other
   entries of the solution vector are zero, we need not condense the solution
@@ -123,7 +135,9 @@ enum NormType {
   since their search directions may contains components in the direction
   of the boundary node. For this reason, we perform a very simple line
   balancing by not setting the main diagonal entry to unity, but rather
-  to the value it had before deleting this line. Of course we have to change
+  to the value it had before deleting this line, or to the first nonzero
+  main diagonal entry if it is zero from a previous Gauss elimination
+  step. Of course we have to change
   the right hand side appropriately. This is not a very good
   strategy, but it at least should give the main diagonal entry a value
   in the right order of dimension, which makes the solving process a bit
@@ -135,6 +149,13 @@ enum NormType {
   not during solving iteratively, it may or may not be necessary to set
   the correct value after solving again. This question is an open one as of
   now and may be answered by future experience.
+
+  At present, boundary values are interpolated, i.e. a node is given the
+  point value of the boundary function. In some cases, it may be necessary
+  to use the L2-projection of the boundary function or any other method.
+  This can be done by overloading the virtual function
+  #make_boundary_value_list# which must return a list of boundary dofs
+  and their corresponding values.
   
 
   {\bf Computing errors}
@@ -194,7 +215,7 @@ class ProblemBase {
 				      * See the general documentation of this
 				      * class for more detail.
 				      */
-    typedef map<unsigned char,Function<dim> > DirichletBC;
+    typedef map<unsigned char,Function<dim>* > DirichletBC;
     
 				     /**
 				      * Constructor. Use this triangulation and
@@ -282,6 +303,18 @@ class ProblemBase {
 				      * want anything else.
 				      */
     virtual pair<char*,char*> get_solution_name () const;
+
+				     /**
+				      * Make up the list of node subject
+				      * to Dirichlet boundary conditions
+				      * and the values they are to be
+				      * assigned.
+				      *
+				      * See the general doc for more
+				      * information.
+				      */
+    virtual void make_boundary_value_list (const DirichletBC &dirichlet_bc,
+					   map<int,double>   &boundary_values) const;
     
 				     /**
 				      * Exception
@@ -299,6 +332,10 @@ class ProblemBase {
 				      * Exception
 				      */
     DeclException0 (ExcNotImplemented);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidBoundaryIndicator);
     
   protected:
 				     /**
@@ -344,9 +381,9 @@ class ProblemBase {
 				      * as described in the general
 				      * documentation.
 				      */
-    void apply_dirichlet_bc (dSMatrix &matrix,
-			     dVector  &solution,
-			     dVector  &right_hand_side,
+    void apply_dirichlet_bc (dSMatrix          &matrix,
+			     dVector           &solution,
+			     dVector           &right_hand_side,
 			     const DirichletBC &dirichlet_bc);
     
     friend class Assembler<dim>;

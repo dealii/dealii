@@ -11,6 +11,7 @@
 #include "../../../mia/vectormemory.h"
 #include "../../../mia/cg.h"
 
+#include <map.h>
 #include <algo.h>
 
 
@@ -273,7 +274,134 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 					   dVector  &solution,
 					   dVector  &right_hand_side,
 					   const DirichletBC &dirichlet_bc) {
-//  l;
+  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
+	  ExcInvalidBoundaryIndicator());
+  
+				   // first make up a list of dofs subject
+				   // to any boundary condition and which
+				   // value they take; if a node occurs
+				   // with two bc (e.g. a corner node, with
+				   // the lines in 2D being subject to
+				   // different bc's), the last value is taken
+  map<int,double> boundary_values;
+  make_boundary_value_list (dirichlet_bc, boundary_values);
+
+  map<int,double>::const_iterator dof, endd;
+  const unsigned int n_dofs   = (unsigned int)matrix.m();
+  const dSMatrixStruct &sparsity = matrix.get_sparsity_pattern();
+  const int *sparsity_rowstart = sparsity.get_rowstart_indices(),
+	    *sparsity_colnums  = sparsity.get_column_numbers();
+
+  for (dof=boundary_values.begin(), endd=boundary_values.end(); dof != endd; ++dof)
+    {
+				       // for each boundary dof:
+
+				       // set entries of this line
+				       // to zero
+      for (int j=sparsity_rowstart[(*dof).first];
+	   j<sparsity_rowstart[(*dof).first+1]; ++j)
+	if (sparsity_colnums[j] != (*dof).first)
+					   // if not main diagonal entry
+	  matrix.global_entry(j) = 0.;
+      
+				       // set right hand side to
+				       // wanted value: if main diagonal
+				       // entry nonzero, don't touch it
+				       // and scale rhs accordingly. If
+				       // zero, take the first main
+				       // diagonal entry we can find, or
+				       // one if no nonzero main diagonal
+				       // element exists.
+      if (matrix.diag_element((*dof).first) != 0.0)
+	right_hand_side((*dof).first) = (*dof).second *
+					matrix.diag_element((*dof).first);
+      else
+	{
+	  double first_diagonal_entry = 1;
+	  for (unsigned int i=0; i<n_dofs; ++i)
+	    if (matrix.diag_element(i) != 0)
+	      {
+		first_diagonal_entry = matrix.diag_element(i);
+		break;
+	      };
+	  
+	  matrix.set((*dof).first, (*dof).first,
+		     first_diagonal_entry);
+	  right_hand_side((*dof).first) = (*dof).second * first_diagonal_entry;
+	};
+
+				       // store the only nonzero entry
+				       // of this line for the Gauss
+				       // elimination step
+      const double diagonal_entry = matrix.diag_element((*dof).first);
+      
+
+				       // do the Gauss step
+      for (unsigned int row=0; row<n_dofs; ++row)
+	for (int j=sparsity_rowstart[row];
+	     j<sparsity_rowstart[row+1]; ++row)
+	  if ((sparsity_colnums[j] == (signed int)(*dof).first) &&
+	      ((signed int)row != (*dof).first))
+					     // this line has an entry
+					     // in the regarding column
+					     // but this is not the main
+					     // diagonal entry
+	    {
+					       // correct right hand side
+	      right_hand_side(row) -= matrix.global_entry(j)/diagonal_entry *
+				      (*dof).second;
+	      
+					       // set matrix entry to zero
+	      matrix.global_entry(j) = 0.;
+	    };
+      
+      
+				       // preset solution vector
+      solution((*dof).first) = (*dof).second;
+    };
+};
+
+
+
+
+
+void
+ProblemBase<1>::make_boundary_value_list (const DirichletBC &,
+					  map<int,double>   &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+
+template <int dim>
+void
+ProblemBase<dim>::make_boundary_value_list (const DirichletBC &dirichlet_bc,
+					    map<int,double>   &boundary_values) const {
+  DoFHandler<dim>::active_face_iterator face = dof_handler->begin_active_face(),
+					endf = dof_handler->end_face();
+  DirichletBC::const_iterator function_ptr;
+  for (; face!=endf; ++face)
+    if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
+	dirichlet_bc.end()) 
+				       // face is subject to one of the
+				       // bc listed in #dirichlet_bc#
+      {
+					 // get indices, physical location and
+					 // boundary values of dofs on this
+					 // face
+	vector<int>         face_dofs;
+	vector<Point<dim> > dof_locations;
+	vector<double>      dof_values;
+	
+	face->get_dof_indices (face_dofs);
+//physical location
+	(*function_ptr).second->value_list (dof_locations, dof_values);
+
+					 // enter into list
+	for (unsigned int i=0; i<face_dofs.size(); ++i) 
+	  boundary_values[face_dofs[i]] = dof_values[i];
+      };
 };
 
   
