@@ -10,6 +10,11 @@
 #include <lac/vector.h>
 
 
+MultiGridBase::~MultiGridBase () 
+{};
+
+
+
 MultiGridBase::MultiGridBase(MGTransferBase& transfer,
 			     unsigned maxlevel, unsigned minlevel,
 			     unsigned pre_smooth, unsigned post_smooth)
@@ -116,6 +121,16 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
   for (unsigned int level=0; level<n_levels-1; ++level)
     {
       prolongation_sparsities.push_back (SparseMatrixStruct());
+				       // reset the dimension of the structure.
+				       // note that for the number of entries
+				       // per row, the number of mother dofs
+				       // coupling to a child dof is
+				       // necessary. this, of course, is the
+				       // number of degrees of freedom per
+				       // cell
+      prolongation_sparsities.back().reinit (mg_dof.n_dofs(level+1),
+					     mg_dof.n_dofs(level),
+					     dofs_per_cell);
       
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
@@ -132,7 +147,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 		const FullMatrix<double> &prolongation
 		  = mg_dof.get_fe().prolongate(child);
 	    
-		cell->child(child)->get_dof_indices (dof_indices_child);
+		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
 						 // now tag the entries in the
 						 // matrix which will be used
@@ -147,6 +162,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 		      };
 	      };
 	  };
+      prolongation_sparsities[level].compress ();
 
       prolongation_matrices.push_back (SparseMatrix<float>());
       prolongation_matrices[level].reinit (prolongation_sparsities[level]);
@@ -168,7 +184,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 		const FullMatrix<double> &prolongation
 		  = mg_dof.get_fe().prolongate(child);
 	    
-		cell->child(child)->get_dof_indices (dof_indices_child);
+		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
 						 // now set the entries in the
 						 // matrix
