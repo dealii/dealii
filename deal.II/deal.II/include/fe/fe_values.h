@@ -223,7 +223,8 @@ class FEValuesBase {
 		  const unsigned int n_dofs,
 		  const unsigned int n_transform_functions,
 		  const unsigned int n_values_array,
-		  const UpdateFlags update_flags);
+		  const UpdateFlags         update_flags,
+		  const FiniteElement<dim> &fe);
     
 
 				     /**
@@ -551,6 +552,11 @@ class FEValuesBase {
 				      * safer.
 				      */
     DoFHandler<dim>::cell_iterator present_cell;
+
+				     /**
+				      * Store the finite element for later use.
+				      */
+    SmartPointer<const FiniteElement<dim> > fe;
 };
 
 
@@ -621,10 +627,6 @@ class FEValues : public FEValuesBase<dim> {
 		 const Boundary<dim> &);
 
   private:
-				     /**
-				      * Store the finite element for later use.
-				      */
-  SmartPointer<const FiniteElement<dim> > fe;
 				     /**
 				      * Store the gradients of the shape
 				      * functions at the quadrature points on
@@ -749,7 +751,8 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
 		      const unsigned int n_dofs,
 		      const unsigned int n_transform_functions,
 		      const unsigned int n_faces_or_subfaces,
-		      const UpdateFlags update_flags);
+		      const UpdateFlags         update_flags,
+		      const FiniteElement<dim> &fe);
 
     				     /**
 				      * Return the outward normal vector to
@@ -894,11 +897,6 @@ class FEFaceValues : public FEFaceValuesBase<dim> {
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
 		 const Boundary<dim>                  &boundary);
-private:
-				     /**
-				      * Store the finite element for later use.
-				      */
-  SmartPointer<const FiniteElement<dim> > fe;
 };
 
 
@@ -1055,11 +1053,6 @@ class FESubfaceValues : public FEFaceValuesBase<dim> {
 				      * Exception
 				      */
     DeclException0 (ExcReinitCalledWithBoundaryFace);
-private:
-				     /**
-				      * Store the finite element for later use.
-				      */
-  SmartPointer<const FiniteElement<dim> > fe;
 };
 
 
