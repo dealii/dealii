@@ -189,7 +189,7 @@ void Histogram::evaluate (const typename std::vector<Vector<number> > &values,
 
 				   // finally fill the intervals
   for (unsigned int i=0; i<values.size(); ++i)
-    for (Vector<number>::const_iterator p=values[i].begin();
+    for (typename Vector<number>::const_iterator p=values[i].begin();
 	 p < values[i].end(); ++p)
       {
 					 // find the right place for *p in
