@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004 by the deal.II authors
+//    Copyright (C) 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -355,6 +355,9 @@ namespace PETScWrappers
                             sparsity_pattern.row_length(i), &row_entries[0],
                             &row_values[0], INSERT_VALUES);
             }
+
+          compress ();
+          
 #else
 
                                            // first set up the column number
@@ -397,16 +400,43 @@ namespace PETScWrappers
                                         &rowstart_in_window[0],
                                         &colnums_in_window[0],
                                         0);
-      
-      
-#endif
 
+                                           // for some reason, it does not
+                                           // seem to be possible to force
+                                           // actual allocation of actual
+                                           // entries by using the last
+                                           // arguments to the call above. if
+                                           // we don't initialize the entries
+                                           // like in the following loop, then
+                                           // the program is unbearably slow
+                                           // because elements are allocated
+                                           // and accessed in random order,
+                                           // which is not what PETSc likes
+                                           //
+                                           // note that we actually have to
+                                           // set the entries to something
+                                           // non-zero!
+          for (unsigned int i=local_row_start; i<local_row_end; ++i)
+            for (unsigned int j=0; j<sparsity_pattern.row_length(i);
+                 ++j)
+              {
+                const int petsc_i = i;
+                const int petsc_j = sparsity_pattern.column_number(i,j);
+                const double value = 1;
+                MatSetValues (matrix, 1, &petsc_i, 1, &petsc_j,
+                              &value, INSERT_VALUES);
+              }
           compress ();
+
+                                           // set the dummy entries set above
+                                           // back to zero
+          *this = 0;
+          
+#endif
 
 //TODO: We should use the appropriate option with MatSetOption here indicating that we do not intend to add any further matrix entries. Maybe this would accelerate some things as well
         }
     }
-    
   }
 }
 
