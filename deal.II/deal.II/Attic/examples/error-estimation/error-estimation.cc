@@ -12,7 +12,7 @@
 #include <grid/grid_generator.h>
 #include <base/function.h>
 #include <basic/data_io.h>
-#include <basic/grid_io.h>
+#include <basic/grid_out.h>
 #include <base/parameter_handler.h>
 #include <fe/fe_lib.lagrange.h>
 #include <base/quadrature_lib.h>

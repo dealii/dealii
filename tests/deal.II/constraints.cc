@@ -26,7 +26,7 @@
 #include <lac/sparsematrix.h>
 #include <base/parameter_handler.h>
 #include <grid/dof_constraints.h>
-#include <basic/grid_io.h>
+#include <basic/grid_out.h>
 
 #include <fstream>
 #include <cmath>

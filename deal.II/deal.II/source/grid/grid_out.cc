@@ -2,7 +2,7 @@
 
 
 #include <base/point.h>
-#include <basic/grid_io.h>
+#include <basic/grid_out.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
