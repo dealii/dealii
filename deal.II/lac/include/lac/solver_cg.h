@@ -164,6 +164,8 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
   memory.free(VAp);
  
   // Output
+
+  deallog.pop();
  
   if (conv == SolverControl::failure)
     return exceeded;
