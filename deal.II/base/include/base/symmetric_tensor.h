@@ -1052,6 +1052,7 @@ SymmetricTensor<2,3>::operator * (const SymmetricTensor<2,3> &s) const
 
 
 
+template <>
 internal::SymmetricTensorAccessors::double_contraction_result<4,2,1>::type
 SymmetricTensor<4,1>::
 operator * (const SymmetricTensor<2,1> &s) const
