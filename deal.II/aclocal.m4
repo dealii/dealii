@@ -1692,6 +1692,7 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
     [
 	namespace NS {
 	  template <typename T>  class C  {
+	      C(const C<T>&);
 	      template <typename N> friend class C;
 	  };
 	};
@@ -1700,9 +1701,17 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
 
 	template <typename T> class X {
 	    template <typename N> friend class NS2::C;
+	    template <typename N> friend class NS::C;
 	};
 
 	template class X<int>;
+
+	namespace NS {
+  	  template<typename T>
+	  inline C<T>::C(const C<T>&)
+          {};
+	};
+
     ],
     [],
     [
