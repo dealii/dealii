@@ -135,7 +135,7 @@ void
 GridTools::rotate (const double      angle,
 		   Triangulation<2> &triangulation)
 {
-  transform (std::bind2nd(ptr_fun(&rotate2d),
+  transform (std::bind2nd(std::ptr_fun(&rotate2d),
 			  angle),
 	     triangulation);
 };
