@@ -78,6 +78,7 @@ template <typename number>
 BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ (
   const BlockSparseMatrixEZ<number> &m)
 		:
+                Subscriptor (m),
 		row_indices(m.row_indices),
 		column_indices(m.column_indices),
 		blocks(m.blocks)
@@ -87,8 +88,8 @@ BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ (
 
 template <typename number>
 void
-BlockSparseMatrixEZ<number>::reinit (unsigned int rows,
-				     unsigned int cols)
+BlockSparseMatrixEZ<number>::reinit (const unsigned int rows,
+				     const unsigned int cols)
 {
   row_indices.reinit(rows, 0);
   column_indices.reinit(cols, 0);
