@@ -122,19 +122,72 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual ~FESystem ();
 
+
+				     /** 
+				      * Number of different base
+				      * elements of this object.
+				      *
+				      * Since these objects can have
+				      * multiplicity and subobjects
+				      * themselves, this may be
+				      * smaller than the total number
+				      * of finite elements composed
+				      * into this structure.
+				      */
+    virtual unsigned int n_base_elements() const;
+
 				     /**
-				      * Compute flags for initial update only.
+				      * How often is a composing element used.
+				      *
+				      */
+    unsigned int element_multiplicity(unsigned int index) const;
+
+				     /**
+				      * Access to a composing element.
+				      *
+				      * If you assemble your system
+				      * matrix, you usually will not
+				      * want to have an FEValues object
+				      * with a lot of equal entries. Ok,
+				      * so initialize your FEValues with
+				      * the @p{base_element} you get by
+				      * this function. In a mixed
+				      * discretization, you can choose
+				      * the different base element types
+				      * by index.
+				      *
+				      */
+    virtual const FiniteElement<dim> & base_element(unsigned int index) const;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      *
+				      * This function is made virtual,
+				      * since finite element objects
+				      * are usually accessed through
+				      * pointers to their base class,
+				      * rather than the class itself.
+				      */
+    virtual unsigned int memory_consumption () const;
+    
+				     /**
+				      * Compute flags for initial
+				      * update only.
 				      */
     virtual UpdateFlags update_once (UpdateFlags flags) const;
   
 				     /**
-				      * Compute flags for update on each cell.
+				      * Compute flags for update on
+				      * each cell.
 				      */
     virtual UpdateFlags update_each (UpdateFlags flags) const;
 
 				     /**
-				      * Return the support points of the
-				      * trial functions on the unit cell.
+				      * Return the support points of
+				      * the trial functions on the
+				      * unit cell.
 				      *
 				      * The order of points in the
 				      * array matches that returned by
@@ -254,55 +307,6 @@ class FESystem : public FiniteElement<dim>
 		       typename Mapping<dim>::InternalDataBase      &mapping_data,
 		       typename Mapping<dim>::InternalDataBase      &fe_data,
 		       FEValuesData<dim>                    &data) const ;
-
-				     /** 
-				      * Number of different base
-				      * elements of this object.
-				      *
-				      * Since these objects can have
-				      * multiplicity and subobjects
-				      * themselves, this may be
-				      * smaller than the total number
-				      * of finite elements composed
-				      * into this structure.
-				      */
-    virtual unsigned int n_base_elements() const;
-
-				     /**
-				      * How often is a composing element used.
-				      *
-				      */
-    unsigned int element_multiplicity(unsigned int index) const;
-
-				     /**
-				      * Access to a composing element.
-				      *
-				      * If you assemble your system
-				      * matrix, you usually will not
-				      * want to have an FEValues object
-				      * with a lot of equal entries. Ok,
-				      * so initialize your FEValues with
-				      * the @p{base_element} you get by
-				      * this function. In a mixed
-				      * discretization, you can choose
-				      * the different base element types
-				      * by index.
-				      *
-				      */
-    virtual const FiniteElement<dim>& base_element(unsigned int index) const;
-
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      *
-				      * This function is made virtual,
-				      * since finite element objects
-				      * are usually accessed through
-				      * pointers to their base class,
-				      * rather than the class itself.
-				      */
-    virtual unsigned int memory_consumption () const;
 
   private:
 
