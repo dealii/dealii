@@ -75,12 +75,17 @@ FEQuarticSub<1>::shape_value(const unsigned int i,
 
 
 template <>
-Point<1>
+Tensor<1,1>
 FEQuarticSub<1>::shape_grad(const unsigned int i,
 			    const Point<1>    &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
   const double xi = p(0);
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
   switch (i)
     {
       case 0: return Point<1>(128.0/3.0*xi*xi*xi-80.0*xi*xi+140.0/3.0*xi-25.0/3.0);
@@ -1089,7 +1094,7 @@ FEQuarticSub<2>::shape_value (const unsigned int i,
 
 
 template <>
-Point<2>
+Tensor<1,2>
 FEQuarticSub<2>::shape_grad (const unsigned int i,
 			     const Point<2>    &p) const
 {
@@ -1097,6 +1102,11 @@ FEQuarticSub<2>::shape_grad (const unsigned int i,
 
   const double xi = p(0),
 	       eta= p(1);
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
   switch (i)
     {
       case 0: return Point<2>(-25.0/3.0+140.0/3.0*xi-80.0*xi*xi+128.0/3.0*xi*xi*xi+(625.0/9.0-3500.0/9.0*xi+2000.0/3.0*xi*xi-3200.0/9.0*xi*xi*xi)*eta+(-1750.0/9.0+9800.0/9.0*xi-5600.0/3.0*xi*xi+8960.0/9.0*xi*xi*xi)*eta*eta+(2000.0/9.0-11200.0/9.0*xi+6400.0/3.0*xi*xi-10240.0/9.0*xi*xi*xi)*eta*eta*eta+(-800.0/9.0+4480.0/9.0*xi-2560.0/3.0*xi*xi+4096.0/9.0*xi*xi*xi)*eta*eta*eta*eta,

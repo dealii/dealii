@@ -118,12 +118,17 @@ FEQuadraticSub<1>::shape_value(const unsigned int i,
 
 
 template <>
-Point<1>
+Tensor<1,1>
 FEQuadraticSub<1>::shape_grad(const unsigned int i,
 			      const Point<1>    &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
   const double xi = p(0);
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
   switch (i)
     {
       case 0: return Point<1>(-3+4*xi);
@@ -632,7 +637,7 @@ FEQuadraticSub<2>::shape_value (const unsigned int i,
 
 
 template <>
-Point<2>
+Tensor<1,2>
 FEQuadraticSub<2>::shape_grad (const unsigned int i,
 			       const Point<2>    &p) const
 {
@@ -640,6 +645,11 @@ FEQuadraticSub<2>::shape_grad (const unsigned int i,
 
   const double xi = p(0),
 	       eta= p(1);
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
   switch (i)
     {
       case 0: return Point<2>(-(2*xi-1)*(1-eta)*(2*eta-1)+2*(1-xi)*(1-eta)*(2*eta-1),

@@ -550,8 +550,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * function at the point #p#.
 				      * #p# is a point on the reference element,
 				      */
-    virtual Point<dim> shape_grad (const unsigned int  i,
-				   const Point<dim>   &p) const = 0;
+    virtual Tensor<1,dim> shape_grad (const unsigned int  i,
+				      const Point<dim>   &p) const = 0;
 
 				     /**
 				      * Return the tensor of second derivatives
@@ -639,7 +639,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >            &unit_points,
-				 vector<dFMatrix>    &jacobians,
+				 vector<Tensor<2,dim> >               &jacobians,
 				 const bool           compute_jacobians,
 				 vector<Point<dim> > &support_points,
 				 const bool           compute_support_points,
@@ -757,7 +757,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      const unsigned int           face_no,
 				      const vector<Point<dim-1> > &unit_points,
 				      const vector<Point<dim> >   &global_unit_points,
-				      vector<dFMatrix>    &jacobians,
+				      vector<Tensor<2,dim> >      &jacobians,
 				      const bool           compute_jacobians,
 				      vector<Point<dim> > &support_points,
 				      const bool           compute_support_points,
@@ -804,7 +804,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 					 const unsigned int           subface_no,
 					 const vector<Point<dim-1> > &unit_points,
 					 const vector<Point<dim> >   &global_unit_points,
-					 vector<dFMatrix>    &jacobians,
+					 vector<Tensor<2,dim> >      &jacobians,
 					 const bool           compute_jacobians,
 					 vector<Point<dim> > &q_points,
 					 const bool           compute_q_points,
@@ -863,8 +863,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * overwritten function has to be provided.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &support_points) const;
+				     const Boundary<dim> &boundary,
+				     vector<Point<dim> > &support_points) const;
     
 				     /**
 				      * Compute the off-points of the finite
@@ -907,8 +907,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * when called with #dim==1#.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &support_points) const =0;
+					  const Boundary<dim> &boundary,
+					  vector<Point<dim> > &support_points) const =0;
 
 				     /**
 				      * This is the second separated function

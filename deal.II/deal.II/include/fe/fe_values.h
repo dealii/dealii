@@ -118,6 +118,22 @@ template <int dim> class Quadrature;
  *  #FELinearMapping<dim>::fill_fe_values# function, where also a small test
  *  program is presented.
  *
+ *  The derivatives of the Jacobi matrices at the quadrature points with respect
+ *  to unit cell coordinates is stored in the field names
+ *  #jacobi_matrices_grad#. Since the gradient of a shape function is given by
+ *  $\partial_i \phi = \sum_k  \hat\partial_k \hat\phi  J_{ki}$, where $\hat$
+ *  denotes differentiation on the unit cell, the second derivative of a
+ *  function is given by
+ *  $\partial_j \partial i \phi
+ *   =
+ *   \hat\partial_l [ (\hat \partial_k \hat\phi) J_{ki} ] J_{lj}
+ *   =
+ *   (\hat\partial_k \hat\partial_l \hat\phi) J_{ki} J_{lj}
+ *   +
+ *   (\hat \partial_l \hat\phi) (\hat\partial_l J_{ki}) J_{lj}$.
+ *  While we already have access to the Jacobian matrix, the derivatives are
+ *  stored in the named field.
+ *
  *  
  *  \subsection{Member functions}
  *
@@ -289,8 +305,8 @@ class FEValuesBase {
 				      * The function returns the gradient on the
 				      * real element, not the reference element.
 				      */
-    const Point<dim> & shape_grad (const unsigned int function,
-				   const unsigned int quadrature_point) const;
+    const Tensor<1,dim> & shape_grad (const unsigned int function,
+				      const unsigned int quadrature_point) const;
 
 				     /** 
 				      * Return a pointer to the matrix holding
@@ -299,7 +315,7 @@ class FEValuesBase {
 				      * For the format of this matrix, see the
 				      * documentation for the matrix itself.
 				      */
-    const vector<vector<Point<dim> > > & get_shape_grads () const;
+    const vector<vector<Tensor<1,dim> > > & get_shape_grads () const;
     
 				     /**
 				      * Return the gradients of the finite
@@ -458,7 +474,18 @@ class FEValuesBase {
 				      * gradients on the real element, rather
 				      * than on the reference element.
 				      */
-    vector<vector<Point<dim> > >  shape_gradients;
+    vector<vector<Tensor<1,dim> > >  shape_gradients;
+
+				     /**
+				      * Store the 2nd derivatives of the shape
+				      * functions at the quadrature points.
+				      *
+				      * This field is reset each time
+				      * #reinit# is called and contains the
+				      * gradients on the real element, rather
+				      * than on the reference element.
+				      */
+    vector<vector<Tensor<2,dim> > >  shape_2nd_derivatives;
 
 				     /**
 				      * Store an array of the weights of the
@@ -516,8 +543,21 @@ class FEValuesBase {
 				      * transformation of the gradients to the
 				      * real cell.
 				      */
-    vector<dFMatrix>     jacobi_matrices;
+    vector<Tensor<2,dim> > jacobi_matrices;
 
+				     /**
+				      * Store the derivatives of the jacobi
+				      * matrices. If #J[j][k]# is the jacobi
+				      * matrix, then the index #[i][j][k]#
+				      * of this field denotes the derivation
+				      * of #J[j][k]# with respect to the
+				      * #i#th variable.
+				      *
+				      * The same general remarks apply as for
+				      * #jacobi_matrices#.
+				      */
+    vector<Tensor<3,dim> > jacobi_matrices_grad;
+    
 				     /**
 				      * Store the values of the basis functions
 				      * of the transformation from unit cell
@@ -646,7 +686,17 @@ class FEValues : public FEValuesBase<dim> {
 				      * of the object and contains the gradients
 				      * on the reference element.
 				      */
-    vector<vector<Point<dim> > >   unit_shape_gradients;
+    vector<vector<Tensor<1,dim> > > unit_shape_gradients;
+
+				     /**
+				      * Store the 2nd derivatives of the shape
+				      * functions at the quadrature points on
+				      * the unit cell.
+				      * This field is set up upon construction
+				      * of the object and contains the
+				      * derivatives on the reference element.
+				      */
+    vector<vector<Tensor<2,dim> > > unit_shape_2nd_derivatives;
     
 				     /**
 				      * Gradients of the basis
@@ -793,8 +843,18 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
 				      * subface, with indices like that:
 				      * #unit_shape_gradients[face][dof][q_point]#
 				      */
-    vector<vector<vector<Point<dim> > > > unit_shape_gradients;
+    vector<vector<vector<Tensor<1,dim> > > > unit_shape_gradients;
     
+				     /**
+				      * Store the 2nd derivatives of the shape
+				      * functions at the quadrature points on
+				      * the unit cell for each face.
+				      * This field is set up upon construction
+				      * of the object and contains the
+				      * derivatives on the reference element.
+				      */
+    vector<vector<vector<Tensor<2,dim> > > > unit_shape_2nd_derivatives;
+
 				     /**
 				      * Gradients of the basis
 				      * functions of the transformation.
@@ -1087,7 +1147,7 @@ const dFMatrix & FEValuesBase<dim>::get_shape_values () const {
 
 template <int dim>
 inline
-const vector<vector<Point<dim> > > &
+const vector<vector<Tensor<1,dim> > > &
 FEValuesBase<dim>::get_shape_grads () const {
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
   return shape_gradients;

@@ -323,7 +323,7 @@ double FECrissCross<1>::shape_value (const unsigned int, const Point<1> &) const
 
 
 template <>
-Point<1> FECrissCross<1>::shape_grad (const unsigned int, const Point<1> &) const {
+Tensor<1,1> FECrissCross<1>::shape_grad (const unsigned int, const Point<1> &) const {
   Assert (false, ExcNotUseful());
   return Point<1>();
 };
@@ -538,7 +538,7 @@ double FECrissCross<2>::shape_value (const unsigned int i,
 
 template <>
 inline
-Point<2> FECrissCross<2>::shape_grad (const unsigned int i, const Point<2> &p) const {
+Tensor<1,2> FECrissCross<2>::shape_grad (const unsigned int i, const Point<2> &p) const {
   Assert((i<total_dofs), ExcInvalidIndex(i));
 
   const double x = p(0),
@@ -927,7 +927,7 @@ void FECrissCross<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &ce
 template <int dim>
 void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 					const vector<Point<dim> >            &unit_points,
-					vector<dFMatrix>    &jacobians,
+					vector<Tensor<2,dim> >               &jacobians,
 					const bool           compute_jacobians,
 					vector<Point<dim> > &support_points,
 					const bool,
@@ -1023,16 +1023,16 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 			   vertices[0](1)+t28-t22*xi;
 	const double t38 = 1/(t24+t36);
 
-	jacobians[point](0,0) = (-vertices[0](1)+vertices[0](1)*xi-
-				 vertices[1](1)*xi+vertices[2](1)*xi+
-				 vertices[3](1)-vertices[3](1)*xi)*t38;
-	jacobians[point](0,1) = -(-vertices[0](0)+vertices[0](0)*xi-
-				  vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
-	jacobians[point](1,0) = -(-vertices[0](1)+vertices[0](1)*eta+
-				  vertices[1](1)-vertices[1](1)*eta+
-				  vertices[2](1)*eta-vertices[3](1)*eta)*t38;
-	jacobians[point](1,1) = (-vertices[0](0)+vertices[0](0)*eta+
-				 vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
+	jacobians[point][0][0] = (-vertices[0](1)+vertices[0](1)*xi-
+				  vertices[1](1)*xi+vertices[2](1)*xi+
+				  vertices[3](1)-vertices[3](1)*xi)*t38;
+	jacobians[point][0][1] = -(-vertices[0](0)+vertices[0](0)*xi-
+				   vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
+	jacobians[point][1][0] = -(-vertices[0](1)+vertices[0](1)*eta+
+				   vertices[1](1)-vertices[1](1)*eta+
+				   vertices[2](1)*eta-vertices[3](1)*eta)*t38;
+	jacobians[point][1][1] = (-vertices[0](0)+vertices[0](0)*eta+
+				  vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
       };
 };
 

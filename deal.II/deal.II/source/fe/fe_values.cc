@@ -27,12 +27,13 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 		total_dofs (n_dofs),
 		n_transform_functions (n_transform_functions),
 		shape_values (n_values_arrays, dFMatrix(n_dofs, n_q_points)),
-		shape_gradients (n_dofs, vector<Point<dim> >(n_q_points)),
+		shape_gradients (n_dofs, vector<Tensor<1,dim> >(n_q_points)),
 		weights (n_q_points, 0),
 		JxW_values (n_q_points, 0),
 		quadrature_points (n_q_points, Point<dim>()),
 		support_points (n_support_points, Point<dim>()),
-		jacobi_matrices (n_q_points, dFMatrix(dim,dim)),
+		jacobi_matrices (n_q_points, Tensor<2,dim>()),
+		jacobi_matrices_grad (n_q_points, Tensor<3,dim>()),
 		shape_values_transform (n_values_arrays,
 					dFMatrix(n_transform_functions,
 						 n_quadrature_points)),
@@ -85,7 +86,7 @@ void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
 
 
 template <int dim>
-const Point<dim> &
+const Tensor<1,dim> &
 FEValuesBase<dim>::shape_grad (const unsigned int i,
 			       const unsigned int j) const {
   Assert (i<shape_gradients.size(),
@@ -117,8 +118,11 @@ void FEValuesBase<dim>::get_function_grads (const dVector       &fe_function,
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
-      gradients[point] += (dof_values(shape_func) *
-			   shape_gradients[shape_func][point]);
+      {
+	Tensor<1,dim> tmp(shape_gradients[shape_func][point]);
+	tmp *= dof_values(shape_func);
+	gradients[point] += tmp;
+      };
 };
 
 
@@ -168,7 +172,9 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 				   update_flags,
 				   fe),
 		unit_shape_gradients(fe.total_dofs,
-				     vector<Point<dim> >(quadrature.n_quadrature_points)),
+				     vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
+		unit_shape_2nd_derivatives(fe.total_dofs,
+					   vector<Tensor<2,dim> >(quadrature.n_quadrature_points)),
 		unit_shape_gradients_transform(fe.n_transform_functions,
 					       vector<Point<dim> >(quadrature.n_quadrature_points)),
 		unit_quadrature_points(quadrature.get_quad_points())
@@ -182,6 +188,8 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 	shape_values[0](i,j) = fe.shape_value(i, unit_quadrature_points[j]);
 	unit_shape_gradients[i][j]
 	  = fe.shape_grad(i, unit_quadrature_points[j]);
+	unit_shape_2nd_derivatives[i][j]
+	  = fe.shape_grad_grad(i, unit_quadrature_points[j]);
       };
 
   for (unsigned int i=0; i<n_transform_functions; ++i)
@@ -218,7 +226,10 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 			jacobi_matrices,
 			update_flags & (update_jacobians  |
 					update_JxW_values |
-					update_gradients),
+					update_gradients  |
+					update_second_derivatives),
+//			jacobi_matrices_grad,
+//			update_flags & update_second_derivatives,
 			support_points,
 			update_flags & update_support_points,
 			quadrature_points,
@@ -233,16 +244,41 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
       for (unsigned int j=0; j<n_quadrature_points; ++j)
 	for (unsigned int s=0; s<dim; ++s)
 	  {
-	    shape_gradients[i][j](s) = 0;
+	    shape_gradients[i][j][s] = 0;
 	    
 					     // (grad psi)_s =
 					     // (grad_{\xi\eta})_b J_{bs}
 					     // with J_{bs}=(d\xi_b)/(dx_s)
 	    for (unsigned int b=0; b<dim; ++b)
-	      shape_gradients[i][j](s)
+	      shape_gradients[i][j][s]
 		+=
-		unit_shape_gradients[i][j](b) * jacobi_matrices[j](b,s);
+		unit_shape_gradients[i][j][b] * jacobi_matrices[j][b][s];
 	  };
+
+  
+  if (update_flags & update_second_derivatives)
+    for (unsigned int i=0; i<fe->total_dofs; ++i)
+      for (unsigned int j=0; j<n_quadrature_points; ++j)
+	{
+	  static Tensor<2,dim> tmp1, tmp2;
+
+					   // tmp1 := (d_k d_l phi) J_lj
+	  contract (tmp1, unit_shape_2nd_derivatives[i][j], jacobi_matrices[j]);
+					   // tmp2 := tmp1_kj J_ki
+	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
+
+
+					   // second part:
+					   // tmp1 := (d_k J_lj) (d_l phi)
+	  contract (tmp1, jacobi_matrices_grad[j], 2, unit_shape_gradients[i][j]);
+					   // tmp1_kj J_ki
+	  contract (shape_2nd_derivatives[i][j],
+		    jacobi_matrices[j], 1,
+		    tmp1, 1);
+
+					   // add up first contribution
+	  shape_2nd_derivatives[i][j] += tmp2;
+	};
   
   
 				   // compute Jacobi determinants in
@@ -252,7 +288,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				   // determinant
   if (update_flags & update_JxW_values) 
     for (unsigned int i=0; i<n_quadrature_points; ++i)
-      JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
+      JxW_values[i] = weights[i] / determinant(jacobi_matrices[i]);
 };
 
 
@@ -278,8 +314,11 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 				   update_flags,
 				   fe),
 		unit_shape_gradients (n_faces_or_subfaces,
-				      vector<vector<Point<dim> > >(n_dofs,
-								   vector<Point<dim> >(n_q_points))),
+				      vector<vector<Tensor<1,dim> > >(n_dofs,
+								   vector<Tensor<1,dim> >(n_q_points))),
+		unit_shape_2nd_derivatives(n_dofs,
+					   vector<vector<Tensor<2,dim> > >(n_dofs,
+									   vector<Tensor<2,dim> >(n_q_points))),
 		unit_shape_gradients_transform (n_faces_or_subfaces,
 						vector<vector<Point<dim> > >(n_transform_functions,
 									     vector<Point<dim> >(n_q_points))),
@@ -340,6 +379,8 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 	    = fe.shape_value(i, unit_quadrature_points[face][j]);
 	  unit_shape_gradients[face][i][j]
 	    = fe.shape_grad(i, unit_quadrature_points[face][j]);
+	  unit_shape_2nd_derivatives[face][i][j]
+	    = fe.shape_grad_grad(i, unit_quadrature_points[face][j]);
 	};
 
   for (unsigned int i=0; i<n_transform_functions; ++i)
@@ -403,10 +444,37 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 					     // (grad_{\xi\eta})_b J_{bs}
 					     // with J_{bs}=(d\xi_b)/(dx_s)
 	    for (unsigned int b=0; b<dim; ++b)
-	      shape_gradients[i][j](s)
-		+= (unit_shape_gradients[face_no][i][j](b) *
-		    jacobi_matrices[j](b,s));
+	      shape_gradients[i][j][s]
+		+= (unit_shape_gradients[face_no][i][j][b] *
+		    jacobi_matrices[j][b][s]);
       };
+
+
+  if (update_flags & update_second_derivatives)
+    for (unsigned int i=0; i<fe->total_dofs; ++i)
+      for (unsigned int j=0; j<n_quadrature_points; ++j)
+	{
+	  static Tensor<2,dim> tmp1, tmp2;
+
+					   // tmp1 := (d_k d_l phi) J_lj
+	  contract (tmp1, unit_shape_2nd_derivatives[face_no][i][j], jacobi_matrices[j]);
+					   // tmp2 := tmp1_kj J_ki
+	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
+
+
+					   // second part:
+					   // tmp1 := (d_k J_lj) (d_l phi)
+	  contract (tmp1,
+		    jacobi_matrices_grad[j], 2,
+		    unit_shape_gradients[face_no][i][j]);
+					   // tmp1_kj J_ki
+	  contract (shape_2nd_derivatives[i][j],
+		    jacobi_matrices[j], 1,
+		    tmp1, 1);
+
+					   // add up first contribution
+	  shape_2nd_derivatives[i][j] += tmp2;
+	};
   
   
 				   // compute Jacobi determinants in
@@ -424,7 +492,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 
 
 
-/*------------------------------- FEFaceValues -------------------------------*/
+/*------------------------------- FESubFaceValues -------------------------------*/
 
 
 template <int dim>
@@ -469,6 +537,10 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 	      = fe.shape_grad(i, unit_quadrature_points[face *
 						       GeometryInfo<dim>::
 						       subfaces_per_face+subface][j]);
+	    unit_shape_2nd_derivatives[face*GeometryInfo<dim>::subfaces_per_face+subface][i][j]
+	      = fe.shape_grad_grad(i, unit_quadrature_points[face *
+							    GeometryInfo<dim>::
+							    subfaces_per_face+subface][j]);
 	  };
   for (unsigned int i=0; i<n_transform_functions; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j)
@@ -542,10 +614,38 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 					     // (grad_{\xi\eta})_b J_{bs}
 					     // with J_{bs}=(d\xi_b)/(dx_s)
 	    for (unsigned int b=0; b<dim; ++b)
-	      shape_gradients[i][j](s)
-		+= (unit_shape_gradients[selected_dataset][i][j](b) *
-		    jacobi_matrices[j](b,s));
+	      shape_gradients[i][j][s]
+		+= (unit_shape_gradients[selected_dataset][i][j][b] *
+		    jacobi_matrices[j][b][s]);
       };
+
+  if (update_flags & update_second_derivatives)
+    for (unsigned int i=0; i<fe->total_dofs; ++i)
+      for (unsigned int j=0; j<n_quadrature_points; ++j)
+	{
+	  static Tensor<2,dim> tmp1, tmp2;
+
+					   // tmp1 := (d_k d_l phi) J_lj
+	  contract (tmp1,
+		    unit_shape_2nd_derivatives[selected_dataset][i][j],
+		    jacobi_matrices[j]);
+					   // tmp2 := tmp1_kj J_ki
+	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
+
+
+					   // second part:
+					   // tmp1 := (d_k J_lj) (d_l phi)
+	  contract (tmp1,
+		    jacobi_matrices_grad[j], 2,
+		    unit_shape_gradients[selected_dataset][i][j]);
+					   // tmp1_kj J_ki
+	  contract (shape_2nd_derivatives[i][j],
+		    jacobi_matrices[j], 1,
+		    tmp1, 1);
+
+					   // add up first contribution
+	  shape_2nd_derivatives[i][j] += tmp2;
+	};
   
   
 				   // compute Jacobi determinants in

@@ -44,8 +44,8 @@ class FELinear : public FELinearMapping<dim> {
 				      * Return the gradient of the #i#th shape
 				      * function at point #p# on the unit cell.
 				      */
-    virtual Point<dim> shape_grad(const unsigned int i,
-				  const Point<dim>& p) const;
+    virtual Tensor<1,dim> shape_grad(const unsigned int i,
+				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
@@ -56,7 +56,7 @@ class FELinear : public FELinearMapping<dim> {
 				      * derivatives on the unit cell are zero.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim>   &p) const = 0;
+					   const Point<dim>   &p) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -118,8 +118,8 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      * Return the gradient of the #i#th shape
 				      * function at point #p# on the unit cell.
 				      */
-    virtual Point<dim> shape_grad(const unsigned int i,
-				  const Point<dim>& p) const;
+    virtual Tensor<1,dim> shape_grad(const unsigned int i,
+				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
@@ -127,7 +127,7 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      * point #p# on the unit cell.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim>   &p) const = 0;
+					   const Point<dim>   &p) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -208,8 +208,8 @@ class FECubicSub : public FELinearMapping<dim> {
 				      * Return the gradient of the #i#th shape
 				      * function at point #p# on the unit cell.
 				      */
-    virtual Point<dim> shape_grad(const unsigned int i,
-				  const Point<dim>& p) const;
+    virtual Tensor<1,dim> shape_grad(const unsigned int i,
+				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
@@ -217,7 +217,7 @@ class FECubicSub : public FELinearMapping<dim> {
 				      * point #p# on the unit cell.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim>   &p) const = 0;
+					   const Point<dim>   &p) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -299,8 +299,8 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      * Return the gradient of the #i#th shape
 				      * function at point #p# on the unit cell.
 				      */
-    virtual Point<dim> shape_grad(const unsigned int i,
-				  const Point<dim>& p) const;
+    virtual Tensor<1,dim> shape_grad(const unsigned int i,
+				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
@@ -308,7 +308,7 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      * point #p# on the unit cell.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim>   &p) const = 0;
+					   const Point<dim>   &p) const;
 
 				     /**
 				      * Refer to the base class for detailed

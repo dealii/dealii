@@ -135,7 +135,7 @@ class FELinearMapping : public FiniteElement<dim> {
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >            &unit_points,
-				 vector<dFMatrix>    &jacobians,
+				 vector<Tensor<2,dim> >               &jacobians,
 				 const bool           compute_jacobians,
 				 vector<Point<dim> > &support_points,
 				 const bool           compute_support_points,

@@ -107,12 +107,17 @@ FECubicSub<1>::shape_value (const unsigned int i,
 
 
 template <>
-Point<1>
+Tensor<1,1>
 FECubicSub<1>::shape_grad (const unsigned int i,
 			   const Point<1>    &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
   const double xi = p(0);
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
   switch (i)
     {
       case 0: return Point<1>(-27.0/2.0*xi*xi+18.0*xi-11.0/2.0);
@@ -721,7 +726,7 @@ xi*xi)*eta*eta*eta;
 
 
 template <>
-Point<2>
+Tensor<1,2>
 FECubicSub<2>::shape_grad (const unsigned int i,
 			       const Point<2>    &p) const
 {
@@ -729,6 +734,11 @@ FECubicSub<2>::shape_grad (const unsigned int i,
 
   const double xi = p(0),
 	       eta= p(1);
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
   switch (i)
     {
       case 0: return Point<2>(-11.0/2.0+18.0*xi-27.0/2.0*xi*xi+(121.0/4.0-99.0*xi+297.0/4.0*xi*xi)*eta+(-99.0/2.0+162.0*xi-243.0/2.0*xi*xi)*eta*eta+(99.0/4.0-81.0*xi+243.0/4.0*xi*xi)*eta*eta*eta,

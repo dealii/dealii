@@ -181,8 +181,8 @@ class FECrissCross : public FiniteElement<dim> {
 				      * Return the gradient of the #i#th shape
 				      * function at point #p# on the unit cell.
 				      */
-    virtual Point<dim> shape_grad(const unsigned int i,
-				  const Point<dim>& p) const;
+    virtual Tensor<1,dim> shape_grad(const unsigned int i,
+				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
@@ -197,7 +197,7 @@ class FECrissCross : public FiniteElement<dim> {
 				      * need to do some evaluation by hand.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim>   &p) const = 0;
+					   const Point<dim>   &p) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -332,7 +332,7 @@ class FECrissCross : public FiniteElement<dim> {
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >            &unit_points,
-				 vector<dFMatrix>    &jacobians,
+				 vector<Tensor<2,dim> >               &jacobians,
 				 const bool           compute_jacobians,
 				 vector<Point<dim> > &support_points,
 				 const bool           compute_support_points,

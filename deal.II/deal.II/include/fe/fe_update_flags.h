@@ -65,7 +65,13 @@ enum UpdateFlags {
 					* an error, since normal vectors are
 					* not useful in that case.
 				        */
-      update_normal_vectors = 32
+      update_normal_vectors = 32,
+
+				       /**
+					* Update the second derivatives of the
+					* shape functions on the real cell.
+				        */
+      update_second_derivatives
 };
 
 

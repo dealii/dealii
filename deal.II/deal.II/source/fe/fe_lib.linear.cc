@@ -62,11 +62,16 @@ FELinear<1>::shape_value(const unsigned int i,
 
 template <>
 inline
-Point<1>
+Tensor<1,1>
 FELinear<1>::shape_grad(const unsigned int i,
 			const Point<1>&) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
   switch (i)
     {
     case 0: return Point<1>(-1.);
@@ -215,11 +220,16 @@ FELinear<2>::shape_value (const unsigned int i,
 
 template <>
 inline
-Point<2>
+Tensor<1,2>
 FELinear<2>::shape_grad (const unsigned int i,
 			 const Point<2>& p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
   switch (i)
     {
       case 0: return Point<2> (p(1)-1., p(0)-1.);

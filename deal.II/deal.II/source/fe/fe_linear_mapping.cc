@@ -279,7 +279,7 @@ void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator 
 template <int dim>
 void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 					   const vector<Point<dim> >            &unit_points,
-					   vector<dFMatrix>    &jacobians,
+					   vector<Tensor<2,dim> >               &jacobians,
 					   const bool           compute_jacobians,
 					   vector<Point<dim> > &support_points,
 					   const bool           compute_support_points,
@@ -429,40 +429,53 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 
   if (compute_jacobians)
     for (unsigned int point=0; point<n_points; ++point)
-      {
-	const double xi = unit_points[point](0);
-	const double eta= unit_points[point](1);
+      switch (dim)
+	{
+	  case 2:
+	  {
+	    
+	    const double xi = unit_points[point](0);
+	    const double eta= unit_points[point](1);
 	
-	const double t6 = vertices[0](0)*vertices[3](1);
-	const double t8 = vertices[2](0)*xi;
-	const double t10 = vertices[1](0)*eta;
-	const double t12 = vertices[3](0)*vertices[1](1);
-	const double t16 = vertices[3](0)*xi;
-	const double t20 = vertices[0](0)*vertices[1](1);
-	const double t22 = vertices[0](0)*vertices[2](1);
-	const double t24 = t6*xi-t8*vertices[1](1)-t10*vertices[3](1)+
-			   t12*eta-vertices[3](0)*vertices[2](1)*eta-
-			   t16*vertices[0](1)+t16*vertices[1](1)-t12+
-			   vertices[3](0)*vertices[0](1)-t20*eta+t22*eta;
-	const double t28 = vertices[1](0)*vertices[3](1);
-	const double t31 = vertices[2](0)*eta;
-	const double t36 = t8*vertices[0](1)+vertices[1](0)*vertices[2](1)*xi-
-			   t28*xi+t10*vertices[0](1)-t31*vertices[0](1)+
-			   t31*vertices[3](1)+t20-t6-vertices[1](0)*
-			   vertices[0](1)+t28-t22*xi;
-	const double t38 = 1/(t24+t36);
+	    const double t6 = vertices[0](0)*vertices[3](1);
+	    const double t8 = vertices[2](0)*xi;
+	    const double t10 = vertices[1](0)*eta;
+	    const double t12 = vertices[3](0)*vertices[1](1);
+	    const double t16 = vertices[3](0)*xi;
+	    const double t20 = vertices[0](0)*vertices[1](1);
+	    const double t22 = vertices[0](0)*vertices[2](1);
+	    const double t24 = t6*xi-t8*vertices[1](1)-t10*vertices[3](1)+
+			       t12*eta-vertices[3](0)*vertices[2](1)*eta-
+			       t16*vertices[0](1)+t16*vertices[1](1)-t12+
+			       vertices[3](0)*vertices[0](1)-t20*eta+t22*eta;
+	    const double t28 = vertices[1](0)*vertices[3](1);
+	    const double t31 = vertices[2](0)*eta;
+	    const double t36 = t8*vertices[0](1)+vertices[1](0)*vertices[2](1)*xi-
+			       t28*xi+t10*vertices[0](1)-t31*vertices[0](1)+
+			       t31*vertices[3](1)+t20-t6-vertices[1](0)*
+			       vertices[0](1)+t28-t22*xi;
+	    const double t38 = 1/(t24+t36);
 
-	jacobians[point](0,0) = (-vertices[0](1)+vertices[0](1)*xi-
-				 vertices[1](1)*xi+vertices[2](1)*xi+
-				 vertices[3](1)-vertices[3](1)*xi)*t38;
-	jacobians[point](0,1) = -(-vertices[0](0)+vertices[0](0)*xi-
-				  vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
-	jacobians[point](1,0) = -(-vertices[0](1)+vertices[0](1)*eta+
-				  vertices[1](1)-vertices[1](1)*eta+
-				  vertices[2](1)*eta-vertices[3](1)*eta)*t38;
-	jacobians[point](1,1) = (-vertices[0](0)+vertices[0](0)*eta+
-				 vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
-      };
+	    jacobians[point][0][0] = (-vertices[0](1)+vertices[0](1)*xi-
+				      vertices[1](1)*xi+vertices[2](1)*xi+
+				      vertices[3](1)-vertices[3](1)*xi)*t38;
+	    jacobians[point][0][1] = -(-vertices[0](0)+vertices[0](0)*xi-
+				       vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
+	    jacobians[point][1][0] = -(-vertices[0](1)+vertices[0](1)*eta+
+				       vertices[1](1)-vertices[1](1)*eta+
+				       vertices[2](1)*eta-vertices[3](1)*eta)*t38;
+	    jacobians[point][1][1] = (-vertices[0](0)+vertices[0](0)*eta+
+				      vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
+	    
+	    break;
+	  };
+
+	  default:
+						 // not implemented at present,
+						 // because of the changes above
+		Assert (false, ExcNotImplemented());
+	};
+  
   
     
   if (compute_support_points)

@@ -694,7 +694,7 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
   Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
   Assert (rhs.all_zero(), ExcObjectNotEmpty());
 
-  const vector<vector<Point<dim> > >&gradients = fe_values.get_shape_grads ();
+  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
   const dFMatrix       &values    = fe_values.get_shape_values ();
   vector<double>        rhs_values(fe_values.n_quadrature_points);
   const vector<double> &weights   = fe_values.get_JxW_values ();
@@ -748,7 +748,7 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 	  ExcWrongSize(cell_matrix.m(), total_dofs));
   Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
   
-  const vector<vector<Point<dim> > >&gradients = fe_values.get_shape_grads ();
+  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
   const vector<double> &weights   = fe_values.get_JxW_values ();
    
   if (coefficient != 0)
