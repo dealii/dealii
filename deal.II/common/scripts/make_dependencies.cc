@@ -78,7 +78,7 @@ void determine_direct_includes (const std::string &file)
                                   :
                                   "");
   std::ifstream in(file.c_str());
-  assert (in);
+  assert ((bool)in);
 
   std::string line;
   while (in) 
