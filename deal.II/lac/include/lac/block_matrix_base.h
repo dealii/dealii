@@ -450,6 +450,25 @@ class BlockMatrixBase : public Subscriptor
     value_type el (const unsigned int i,
                    const unsigned int j) const;
 
+				     /**
+				      * Return the main diagonal element in
+				      * the <i>i</i>th row. This function
+				      * throws an error if the matrix is not
+				      * quadratic and also if the diagonal
+				      * blocks of the matrix are not
+				      * quadratic.
+				      *
+				      * This function is considerably
+				      * faster than the operator()(),
+				      * since for quadratic matrices, the
+				      * diagonal entry may be the
+				      * first to be stored in each row
+				      * and access therefore does not
+				      * involve searching for the
+				      * right column number.
+				      */
+    value_type diag_element (const unsigned int i) const;
+
                                      /**
                                       * Call the compress() function on all
                                       * the subblocks of the matrix.
@@ -1373,6 +1392,21 @@ BlockMatrixBase<MatrixType>::el (const unsigned int i,
     col_index = column_block_indices.global_to_local (j);
   return block(row_index.first,col_index.first).el (row_index.second,
 						    col_index.second);
+}
+
+
+
+template <class MatrixType>
+inline
+typename BlockMatrixBase<MatrixType>::value_type
+BlockMatrixBase<MatrixType>::diag_element (const unsigned int i) const
+{
+  Assert (n_block_rows() == n_block_cols(),
+          ExcMatrixNotBlockSquare());
+
+  const std::pair<unsigned int,unsigned int>
+    index = row_block_indices.global_to_local (i);
+  return block(index.first,index.first).diag_element(index.second);
 }
 
 
