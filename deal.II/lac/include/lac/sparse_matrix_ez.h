@@ -1377,6 +1377,7 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
       Entry* entry = locate(i,j);
       if (entry != 0)
 	{
+	  entry->value = 0.;
 	}
     }
   else
