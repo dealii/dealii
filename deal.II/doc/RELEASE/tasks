@@ -17,6 +17,12 @@ when a new release shall be issued:
 4/ if a x.y.0 release, create a branch:
 	call common/scripts/cvs-create-branch <x> <y>
 
+   FOR DEAL.II 4.0 ONLY: DELETE BRANCH TAG AGAIN FROM
+     examples/step-15
+     examples/step-16
+     doc/tutorial/chapter-2.step-by-step/step-15.data
+     doc/tutorial/chapter-2.step-by-step/step-16.data
+
 5/  cvs update -P -r Branch-<x>-<y>
 	or
 	cvs checkout -P -r Branch-<x>-<y> deal.II
