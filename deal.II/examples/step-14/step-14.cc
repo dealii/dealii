@@ -1963,7 +1963,7 @@ namespace DualFunctional
   }
 
 
-				   // @sect4{The PointValueEvaluation class}
+				   // @sect4{The PointXDerivativeEvaluation class}
   
 				   // As second application, we again
 				   // consider the evaluation of the
@@ -3831,8 +3831,8 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 				   // formula:
   const FE_Q<dim>     primal_fe(descriptor.primal_fe_degree);
   const FE_Q<dim>     dual_fe(descriptor.dual_fe_degree);
-  const QGauss<dim>   quadrature(2*descriptor.dual_fe_degree+1);
-  const QGauss<dim-1> face_quadrature(2*descriptor.dual_fe_degree+1);
+  const QGauss<dim>   quadrature(descriptor.dual_fe_degree+1);
+  const QGauss<dim-1> face_quadrature(descriptor.dual_fe_degree+1);
 
 				   // Next, select one of the classes
 				   // implementing different
