@@ -43,7 +43,7 @@ class Polynomial : public Subscriptor
 				      * of the array denotes the
 				      * constant term, the second the
 				      * linear one, and so on. The
-				      * order of the polynomial
+				      * degree of the polynomial
 				      * represented by this object is
 				      * thus the number of elements in
 				      * the @p{coefficient} array
@@ -85,6 +85,17 @@ class Polynomial : public Subscriptor
     void value (const number         x,
 		std::vector<number> &values) const;
 
+				     /**
+				      * Degree of the polynomial. This
+				      * is the degree reflected by the
+				      * number of coefficients
+				      * provided by the
+				      * constructor. Leading non-zero
+				      * coefficients are not treated
+				      * separately.
+				      */
+    unsigned int degree () const;
+    
 				     /**
 				      * Exception
 				      */
@@ -213,6 +224,15 @@ class Legendre : public Polynomial<number>
     get_coefficients (const unsigned int k);
 };
 
+
+template <typename number>
+inline
+unsigned int
+Polynomial<number>::degree () const
+{
+  Assert (coefficients.size()>0, ExcVoidPolynomial());
+  return coefficients.size() - 1;
+}
 
 #endif
 

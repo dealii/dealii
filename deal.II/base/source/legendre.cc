@@ -91,15 +91,17 @@ Legendre<number>::compute_coefficients (const unsigned int k)
 
 	  std::vector<number> *ck = new std::vector<number>(k+1);
 	  
-	  const number a = 1./k+1;
-	  const number b = a*(2*k+1);
+	  const number a = 1./(k);
+	  const number b = a*(2*k-1);
+	  const number c = a*(k-1);
 	  
 	  (*ck)[k]   = b*(*coefficients[k-1])[k-1];
 	  (*ck)[k-1] = b*(*coefficients[k-1])[k-2];
 	  for (unsigned int i=1 ; i<= k-2 ; ++i)
 	    (*ck)[i] = b*(*coefficients[k-1])[i-1]
-		       - k*a*(*coefficients[k-2])[i];
-	  (*ck)[0]   = -k*a*(*coefficients[k-2])[0];
+		       -c*(*coefficients[k-2])[i];
+
+	  (*ck)[0]   = -c*(*coefficients[k-2])[0];
 
 					   // finally assign the newly
 					   // created vector to the
