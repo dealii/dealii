@@ -69,10 +69,10 @@ DEAL::Checking Q3 against Q3 in 1d:
 DEAL::Checking Q3 against Q3 in 1d:
 DEAL::Checking Q3 against Q3 in 2d:
 DEAL::6.3e+03 6.7e+02 1.1e+02
-DEAL::0.0 67. 19. -25. 23. 25. 62. 49. 23. 57. 62. 55. 31. 51. 59. 86. 94. 71. 89. 86. 1.e+02 84. 40. 85. 
+DEAL::0.0 67. 19. -25. 23. 25. 62. 49. 23. 57. 62. 55. 31. 51. 59. 86. 94. 71. 89. 86. 1.0e+02 84. 40. 85. 
 DEAL::Checking Q3 against Q3 in 2d:
 DEAL::6.3e+03 6.7e+02 1.1e+02
-DEAL::0.0 67. 19. -25. 23. 25. 62. 49. 23. 57. 62. 55. 31. 51. 59. 86. 94. 71. 89. 86. 1.e+02 84. 40. 85. 
+DEAL::0.0 67. 19. -25. 23. 25. 62. 49. 23. 57. 62. 55. 31. 51. 59. 86. 94. 71. 89. 86. 1.0e+02 84. 40. 85. 
 DEAL::Checking Q3 against Q3 in 3d:
 DEAL::Checking Q3 against Q3 in 3d:
 DEAL::Checking DGQ0 against DGQ0 in 1d:
@@ -140,7 +140,7 @@ DEAL::1.2e+03 85. 9.4
 DEAL::3.7 -0.71 1.4 0.82 2.0 2.0 3.5 2.7 3.5 3.8 4.1 4.5 4.7 5.6 6.6 6.3 7.2 7.5 8.3 7.5 9.1 
 DEAL::Checking DGQ4 against DGQ0 in 2d:
 DEAL::1.4e+03 4.6e+02 2.0e+02
-DEAL::87. 87. 1.e+02 1.e+02 1.e+02 1.e+02 2.0e+02 2.0e+02 2.0e+02 2.0e+02 
+DEAL::87. 87. 1.0e+02 1.0e+02 1.0e+02 1.0e+02 2.0e+02 2.0e+02 2.0e+02 2.0e+02 
 DEAL::Checking DGQ0 against DGQ4 in 3d:
 DEAL::Checking DGQ4 against DGQ0 in 3d:
 DEAL::3.2e+04 7.5e+03 2.2e+03
