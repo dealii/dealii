@@ -4,9 +4,10 @@
 
 #include <base/timer.h>
 #include <ctime>
+
+// this include should probably be properly
+// ./configure'd using the AC_HEADER_TIME macro:
 #include <sys/time.h>
-
-
 
 // maybe use times() instead of clock()?
 
