@@ -184,104 +184,35 @@ Point<dim>::Point (const Tensor<1,dim> &t) :
 
 
 
-template <>
+template <int dim>
 inline
-Point<1>::Point (const double x)
+Point<dim>::Point (const double x)
 {
+  Assert (dim==1, ExcInvalidConstructorCalled());
   values[0] = x;
 };
 
 
 
-template <>
+template <int dim>
 inline
-Point<1>::Point (const double, const double) 
+Point<dim>::Point (const double x, const double y)
 {
-  Assert (false, ExcInvalidConstructorCalled());
-};
-
-
-
-template <>
-inline
-Point<1>::Point (const double, const double, const double) 
-{
-  Assert (false, ExcInvalidConstructorCalled());
-};
-
-
-
-template <>
-inline
-Point<2>::Point (const double) 
-{
-  Assert (false, ExcInvalidConstructorCalled());
-};
-
-
-
-template <>
-inline
-Point<2>::Point (const double x, const double y) 
-{
+  Assert (dim==2, ExcInvalidConstructorCalled());
   values[0] = x;
   values[1] = y;
 };
 
 
 
-template <>
+template <int dim>
 inline
-Point<2>::Point (const double, const double, const double) 
+Point<dim>::Point (const double x, const double y, const double z)
 {
-  Assert (false, ExcInvalidConstructorCalled());
-};
-
-
-
-template <>
-inline
-Point<3>::Point (const double) 
-{
-  Assert (false, ExcInvalidConstructorCalled());
-};
-
-
-
-template <>
-inline
-Point<3>::Point (const double, const double) 
-{
-  Assert (false, ExcInvalidConstructorCalled());
-};
-
-
-
-template <>
-inline
-Point<3>::Point (const double x, const double y, const double z) 
-{
+  Assert (dim==3, ExcInvalidConstructorCalled());
   values[0] = x;
   values[1] = y;
   values[2] = z;
-};
-
-
-
-template <>
-inline
-Point<4>::Point (const double, const double) 
-{
-  Assert (false, ExcInvalidConstructorCalled());
-};
-
-
-
-template <>
-inline
-Point<4>::Point (const double, const double, const double) 
-{
-  Assert (false, ExcInvalidConstructorCalled());
 };
 
 
