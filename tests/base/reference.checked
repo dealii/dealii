@@ -11,7 +11,7 @@ DEAL::Construct C
 DEAL::Construct D
 DEAL::Destruct D
 --------------------------------------------------------
-An error occurred in line <20> of file <source/subscriptor.cc> in function
+An error occurred in line <29> of file <source/subscriptor.cc> in function
     Subscriptor::~Subscriptor()
 The violated condition was: 
     counter == 0
