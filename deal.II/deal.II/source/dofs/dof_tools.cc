@@ -533,8 +533,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				sparsity.add (dofs_on_this_cell[i],
 					      dofs_on_other_cell[j]);
 			      if (flux_dof_mask[j][i])
-				sparsity.add (dofs_on_other_cell[i],
-					      dofs_on_this_cell[j]);
+				sparsity.add (dofs_on_other_cell[j],
+					      dofs_on_this_cell[i]);
 			    }
 			}
 		      sub_neighbor->face(neighbor_face)->set_user_flag ();
@@ -549,8 +549,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 			    sparsity.add (dofs_on_this_cell[i],
 					  dofs_on_other_cell[j]);
 			  if (flux_dof_mask[j][i])
-			    sparsity.add (dofs_on_other_cell[i],
-					  dofs_on_this_cell[j]);
+			    sparsity.add (dofs_on_other_cell[j],
+					  dofs_on_this_cell[i]);
 			}
 		    }
 		  neighbor->face(neighbor_face)->set_user_flag (); 
