@@ -87,15 +87,43 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>                 &dof,
 	    ExcDimensionMismatch(mask[i].size(), dof.get_fe().n_components()));
 
 				   // first build a mask for each dof,
-				   // not like the one given which represents
-				   // components
+				   // not like the one given which
+				   // represents components. make sure
+				   // we do the right thing also with
+				   // respect to non-primitive shape
+				   // functions, which takes some
+				   // additional thought
   std::vector<std::vector<bool> > dof_mask(dofs_per_cell,
 					   std::vector<bool>(dofs_per_cell, false));
   for (unsigned int i=0; i<dofs_per_cell; ++i)
     for (unsigned int j=0; j<dofs_per_cell; ++j)
-      dof_mask[i][j] = mask
-		       [dof.get_fe().system_to_component_index(i).first]
-		       [dof.get_fe().system_to_component_index(j).first];
+      if (dof.get_fe().is_primitive(i) &&
+          dof.get_fe().is_primitive(j))
+        dof_mask[i][j] = mask
+                         [dof.get_fe().system_to_component_index(i).first]
+                         [dof.get_fe().system_to_component_index(j).first];
+      else
+        {
+          const unsigned int first_nonzero_comp_i
+            = (std::find (dof.get_fe().get_nonzero_components(i).begin(),
+                          dof.get_fe().get_nonzero_components(i).end(),
+                          true)
+               -
+               dof.get_fe().get_nonzero_components(i).begin());
+          const unsigned int first_nonzero_comp_j
+            = (std::find (dof.get_fe().get_nonzero_components(j).begin(),
+                          dof.get_fe().get_nonzero_components(j).end(),
+                          true)
+               -
+               dof.get_fe().get_nonzero_components(j).begin());
+          Assert (first_nonzero_comp_i < dof.get_fe().n_components(),
+                  ExcInternalError());
+          Assert (first_nonzero_comp_j < dof.get_fe().n_components(),
+                  ExcInternalError());          
+          
+          dof_mask[i][j] = mask[first_nonzero_comp_i][first_nonzero_comp_j];
+        }
+  
 
 
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
@@ -977,7 +1005,9 @@ void DoFTools::distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler
 	  ExcWrongSize (dof_data.size(), dof_handler.n_dofs()));
   Assert (component < fe.n_components(),
 	  ExcInvalidComponent(component, fe.n_components()));
-
+  Assert (fe.is_primitive() == true,
+          ExcFENotPrimitive());
+  
 				   // store a flag whether we should care
 				   // about different components. this is
 				   // just a simplification, we could ask
@@ -1238,9 +1268,11 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
 				 std::vector<bool>             &selected_dofs,
 				 const std::set<unsigned char> &boundary_indicators)
 {
-  Assert (component_select.size() == dof_handler.get_fe().n_components(),
+  const FiniteElement<dim> &fe = dof_handler.get_fe();
+  
+  Assert (component_select.size() == fe.n_components(),
 	  ExcWrongSize (component_select.size(),
-			dof_handler.get_fe().n_components()));
+			fe.n_components()));
   Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
 
@@ -1261,7 +1293,7 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
 				   // values
   selected_dofs.clear ();
   selected_dofs.resize (dof_handler.n_dofs(), false);
-  std::vector<unsigned int> face_dof_indices (dof_handler.get_fe().dofs_per_face);
+  std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
 
 				   // now loop over all cells and
 				   // check whether their faces are at
@@ -1287,14 +1319,65 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
 	  {
 	    cell->face(face)->get_dof_indices (face_dof_indices);
 
-	    for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
-	      if (!check_vector_component
-                  ||
-                  (component_select[dof_handler.get_fe().
-                                    face_system_to_component_index(i).first]
-                   == true))
+	    for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+	      if (!check_vector_component)
 		selected_dofs[face_dof_indices[i]] = true;
-	  };
+              else
+                                                 // check for
+                                                 // component is
+                                                 // required. somewhat
+                                                 // tricky as usual
+                                                 // for the case that
+                                                 // the shape function
+                                                 // is non-primitive,
+                                                 // but use usual
+                                                 // convention (see
+                                                 // docs)
+                {
+                                                   // first get at the
+                                                   // cell-global
+                                                   // number of a face
+                                                   // dof, to ask the
+                                                   // fe certain
+                                                   // questions
+                  const unsigned int cell_index
+                    = (dim == 1 ?
+                       i
+                       :
+                       (dim == 2 ?
+                        (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                        :
+                        (dim == 3 ?
+                         (i<4*fe.dofs_per_vertex ?
+                          i
+                          :
+                          (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                           i+4*fe.dofs_per_vertex
+                           :
+                           i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                         :
+                         static_cast<unsigned int>(-1))));
+                  if (fe.is_primitive (cell_index))
+                    selected_dofs[face_dof_indices[i]]
+                      = (component_select[fe.face_system_to_component_index(i).first]
+                         == true);
+                  else // not primitive
+                    {
+                      const unsigned int first_nonzero_comp
+                        = (std::find (fe.get_nonzero_components(cell_index).begin(),
+                                      fe.get_nonzero_components(cell_index).end(),
+                                      true)
+                           -
+                           fe.get_nonzero_components(cell_index).begin());
+                      Assert (first_nonzero_comp < fe.n_components(),
+                              ExcInternalError());
+                      
+                      selected_dofs[face_dof_indices[i]]
+                        = (component_select[first_nonzero_comp]
+                           == true);
+                    }
+                }
+	  }
 }
 
 
@@ -1307,16 +1390,18 @@ DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
 				 std::vector<bool>        &selected_dofs,
 				 const std::set<unsigned char> &boundary_indicators)
 {
-  Assert (component_select.size() == dof_handler.get_fe().n_components(),
+  const FiniteElement<1> &fe = dof_handler.get_fe();
+  
+  Assert (component_select.size() == fe.n_components(),
 	  ExcWrongSize (component_select.size(),
-			dof_handler.get_fe().n_components()));
+			fe.n_components()));
 	  
 				   // clear and reset array by default
 				   // values
   selected_dofs.clear ();
   selected_dofs.resize (dof_handler.n_dofs(), false);
 
-  Assert (dof_handler.get_fe().dofs_per_face == dof_handler.get_fe().dofs_per_vertex,
+  Assert (fe.dofs_per_face == fe.dofs_per_vertex,
 	  ExcInternalError());
 
 				   // let's see whether we have to
@@ -1344,21 +1429,62 @@ DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
 				       // check left-most vertex
       if (check_left_vertex)
 	if (cell->neighbor(0) == dof_handler.end())
-	  for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
-	    if (!check_vector_component
-                ||
-                (component_select[dof_handler.get_fe().
-                                  face_system_to_component_index(i).first] == true))
-	      selected_dofs[cell->vertex_dof_index(0,i)] = true;
-				       // check right-most vertex
+	  for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+	    if (!check_vector_component)
+              selected_dofs[cell->vertex_dof_index(0,i)] = true;
+            else
+                                               // check
+                                               // component. make sure
+                                               // we don't ask the
+                                               // wrong question
+                                               // (leading to an
+                                               // exception) in case
+                                               // the shape function
+                                               // is non-primitive. note
+                                               // that the face dof
+                                               // index i is also the
+                                               // cell dof index of a
+                                               // corresponding dof in 1d
+              {
+                const unsigned int component =
+                  (fe.is_primitive(i) ?
+                   fe.face_system_to_component_index(i).first :
+                   (std::find (fe.get_nonzero_components(i).begin(),
+                               fe.get_nonzero_components(i).end(),
+                               true)
+                    -
+                    fe.get_nonzero_components(i).begin()));
+                Assert (component < fe.n_components(),
+                        ExcInternalError());
+                
+                if (component_select[component] == true)
+                  selected_dofs[cell->vertex_dof_index(0,i)] = true;
+              }
+      
+				       // check right-most
+				       // vertex. same procedure here
+				       // as above
       if (check_right_vertex)
 	if (cell->neighbor(1) == dof_handler.end())
-	  for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
-	    if (!check_vector_component
-                ||
-                (component_select[dof_handler.get_fe().
-                                  face_system_to_component_index(i).first] == true))
-	      selected_dofs[cell->vertex_dof_index(1,i)] = true;
+	  for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+	    if (!check_vector_component)
+              selected_dofs[cell->vertex_dof_index(1,i)] = true;
+            else
+              {
+                const unsigned int component =
+                  (fe.is_primitive(i) ?
+                   fe.face_system_to_component_index(i).first :
+                   (std::find (fe.get_nonzero_components(i).begin(),
+                               fe.get_nonzero_components(i).end(),
+                               true)
+                    -
+                    fe.get_nonzero_components(i).begin()));
+                Assert (component < fe.n_components(),
+                        ExcInternalError());
+                
+                if (component_select[component] == true)
+                  selected_dofs[cell->vertex_dof_index(1,i)] = true;
+              }
     };
 }
 
