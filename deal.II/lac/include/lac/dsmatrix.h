@@ -172,6 +172,13 @@ class dSMatrix
 				     //
     void reinit (dSMatrixStruct &);
 
+				     /**
+				      * Release all memory and return to a state
+				      * just like after having called the
+				      * default constructor.
+				      */
+    void clear ();
+    
 				     //
     int m() const;
 				     //

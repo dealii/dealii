@@ -391,6 +391,15 @@ dSMatrix::reinit (dSMatrixStruct &sparsity) {
 
 
 
+void
+dSMatrix::clear () {
+  cols = 0;
+  if (val) delete[] val;
+  val = 0;
+  max_len = 0;
+};
+
+
 
 void
 dSMatrix::vmult(dVector& dst,const dVector& src) const
