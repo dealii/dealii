@@ -104,14 +104,14 @@ class Point : public Tensor<1,dim>
 				      *  @p{operator +=} instead since this does not
 				      *  need to copy a point at least once.
 				      */
-    Point<dim>   operator + (const Point<dim> &) const;
+    Point<dim>   operator + (const Tensor<1,dim> &) const;
 
 				     /**
 				      *  Subtract two point vectors. If possible, use
 				      *  @p{operator +=} instead since this does not
 				      *  need to copy a point at least once.
 				      */
-    Point<dim>   operator - (const Point<dim> &) const;
+    Point<dim>   operator - (const Tensor<1,dim> &) const;
 
 				     /**
 				      * The opposite vector.
@@ -131,7 +131,7 @@ class Point : public Tensor<1,dim>
 				     /**
 				      *  Returns the scalar product of two vectors.
 				      */
-    double       operator * (const Point<dim> &) const;
+    double       operator * (const Tensor<1,dim> &) const;
 
 				     /**
 				      *  Divide by a factor. If possible, use
@@ -240,7 +240,7 @@ double & Point<dim>::operator () (const unsigned int index)
 
 template <int dim>
 inline
-Point<dim> Point<dim>::operator + (const Point<dim> &p) const 
+Point<dim> Point<dim>::operator + (const Tensor<1,dim> &p) const 
 {
   return (Point<dim>(*this) += p);
 };
@@ -249,7 +249,7 @@ Point<dim> Point<dim>::operator + (const Point<dim> &p) const
 
 template <int dim>
 inline
-Point<dim> Point<dim>::operator - (const Point<dim> &p) const 
+Point<dim> Point<dim>::operator - (const Tensor<1,dim> &p) const 
 {
   return (Point<dim>(*this) -= p);
 };
@@ -279,7 +279,7 @@ Point<dim> Point<dim>::operator * (const double factor) const
 
 template <int dim>
 inline
-double Point<dim>::operator * (const Point<dim> &p) const 
+double Point<dim>::operator * (const Tensor<1,dim> &p) const 
 {
 				   // simply pass down
   return Tensor<1,dim>::operator * (p);
