@@ -67,6 +67,7 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 	  thread_flag=$i
 	  CXXFLAGSG="$CXXFLAGSG -$i"
 	  CXXFLAGSO="$CXXFLAGSO -$i"
+          LDFLAGS="$LDFLAGS -$i"
 	
 	  dnl The right parameter was found, so exit
 	  break
@@ -76,7 +77,6 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 	AC_MSG_RESULT("no flag found!")
 	AC_MSG_ERROR("Could not determine multithreading flag for this platform. Aborting!")
   fi
-  LDFLAGS="-$thread_flag $LDFLAGS"
   AC_MSG_RESULT("-$thread_flag")
 ])
 
