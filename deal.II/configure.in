@@ -583,7 +583,7 @@ if test "x$F77" != "x" ; then
 	F77_VERSION="SunF77"
 	F77FLAGSG="$FFLAGS -silent -g"
 	F77FLAGSO="$FFLAGS -silent -O3 -w"
-	LIBSS="$LIBS -lF77 -lsunmath -lM77"
+	LIBS="$LIBS -lF77 -lsunmath -lM77"
 
 	dnl If necessary, add shared lib flags
 	if test $enableshared = yes ; then
@@ -601,7 +601,7 @@ if test "x$F77" != "x" ; then
 	  F77_VERSION="MIPSproF77"
 	  F77FLAGSG="$FFLAGS -ansi -g"
 	  F77FLAGSO="$FFLAGS -O3 -woffall"
-	  LIBSS="$LIBS -lftn"
+	  LIBS="$LIBS -lftn"
 
 	  dnl If necessary, add shared lib flags
 	  if test $enableshared = yes ; then

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.63 
+# From configure.in Revision: 1.64 
 
 
 
@@ -2293,7 +2293,7 @@ if test "x$F77" != "x" ; then
 	F77_VERSION="SunF77"
 	F77FLAGSG="$FFLAGS -silent -g"
 	F77FLAGSO="$FFLAGS -silent -O3 -w"
-	LIBSS="$LIBS -lF77 -lsunmath -lM77"
+	LIBS="$LIBS -lF77 -lsunmath -lM77"
 
 		if test $enableshared = yes ; then
 	  F77FLAGSG="$F77FLAGSG -PIC"
@@ -2308,7 +2308,7 @@ if test "x$F77" != "x" ; then
 	  F77_VERSION="MIPSproF77"
 	  F77FLAGSG="$FFLAGS -ansi -g"
 	  F77FLAGSO="$FFLAGS -O3 -woffall"
-	  LIBSS="$LIBS -lftn"
+	  LIBS="$LIBS -lftn"
 
 	  	  if test $enableshared = yes ; then
 	    F77FLAGSG="$F77FLAGSG -shared -KPIC"
