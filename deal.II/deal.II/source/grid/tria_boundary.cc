@@ -109,12 +109,36 @@ Point<3>
 StraightBoundary<3>::
 get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const 
 {
+                                   // generate a new point in the middle of
+                                   // the face based on the points on the
+                                   // edges and the vertices.
+                                   //
+                                   // there is a pathological situation when
+                                   // this face is on a straight boundary, but
+                                   // one of its edges and the face behind it
+                                   // are not; if that face is refined first,
+                                   // the new point in the middle of that edge
+                                   // may not be at the same position as
+                                   // quad->line(.)->center() would have been,
+                                   // but would have been moved to the
+                                   // non-straight boundary. We cater to that
+                                   // situation by using existing edge
+                                   // midpoints if available, or center() if
+                                   // not
   return (quad->vertex(0) + quad->vertex(1) +
 	  quad->vertex(2) + quad->vertex(3) +
-	  quad->line(0)->center() +
-	  quad->line(1)->center() +
-  	  quad->line(2)->center() +
-  	  quad->line(3)->center()) / 8;
+	  (quad->line(0)->has_children() ?
+           quad->line(0)->child(0)->vertex(1) :
+           quad->line(0)->center()) +
+	  (quad->line(1)->has_children() ?
+           quad->line(1)->child(0)->vertex(1) :
+           quad->line(1)->center()) +
+	  (quad->line(2)->has_children() ?
+           quad->line(2)->child(0)->vertex(1) :
+           quad->line(2)->center()) +
+	  (quad->line(3)->has_children() ?
+           quad->line(3)->child(0)->vertex(1) :
+           quad->line(3)->center())               ) / 8;
 }
 
 #endif
