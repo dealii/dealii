@@ -30,9 +30,22 @@ class MGMatrix : public MGMatrixBase<VECTOR>,
 				     /**
 				      * Constructor. The argument is
 				      * handed over to the
-				      * @p{SmartPointer} constructor.
+				      * @p{SmartPointer}
+				      * constructor. The matrix object
+				      * must exist longer as the
+				      * @p{MGMatrix} object, since
+				      * only a pointer is stored.
 				      */
     MGMatrix (MGLevelObject<MATRIX>* = 0);
+    
+				     /**
+				      * Set the matrix object to be
+				      * used. The matrix object must
+				      * exist longer as the
+				      * @p{MGMatrix} object, since
+				      * only a pointer is stored.
+				      */
+    void set_matrix (MGLevelObject<MATRIX>* M);
     
 				     /**
 				      * Matrix-vector-multiplication on
@@ -94,6 +107,15 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >,
 		    MGLevelObject<MATRIX>* = 0);
 
 				     /**
+				      * Set the matrix object to be
+				      * used. The matrix object must
+				      * exist longer as the
+				      * @p{MGMatrix} object, since
+				      * only a pointer is stored.
+				      */
+    void set_matrix (MGLevelObject<MATRIX>* M);
+    
+				     /**
 				      * Select the block for
 				      * multiplication.
 				      */
@@ -151,6 +173,13 @@ MGMatrix<MATRIX, VECTOR>::MGMatrix (MGLevelObject<MATRIX>* p)
 		SmartPointer<MGLevelObject<MATRIX> > (p)
 {}
 
+
+template <class MATRIX, class VECTOR>
+void
+MGMatrix<MATRIX, VECTOR>::set_matrix (MGLevelObject<MATRIX>* p)
+{
+  (SmartPointer<MGLevelObject<MATRIX> >) (*this) = p;
+}
 
 
 template <class MATRIX, class VECTOR>
@@ -222,6 +251,14 @@ MGMatrixSelect (const unsigned int row,
   col(col)
 {}
 
+
+
+template <class MATRIX, typename number>
+void
+MGMatrixSelect<MATRIX, number>::set_matrix (MGLevelObject<MATRIX>* p)
+{
+  (SmartPointer<MGLevelObject<MATRIX> >) (*this) = p;
+}
 
 
 template <class MATRIX, typename number>
