@@ -1,3 +1,38 @@
+//----------------------------  make_dependencies.cc  ------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2003 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  make_dependencies.cc  ------------------------
+
+// Make a dependency file tree
+// usage: make_depencies -Iinc_path1 -Iinc_path2 ... -Bbasepath files
+
+// This program is basically a replacement for something like "gcc
+// -M", i.e. it egnerates for each input file a list of other files it
+// depends on by direct or indirect inclusion (or at least those files
+// that can be found in the directories specified by -I/path/.../
+// flags on the command line). The difference to gcc -M is that it is
+// much faster, since it doesn't really do much parsing except for
+// finding those lines that have a #include at the beginning
+//
+// The output looks like this:
+//
+//   $basepath/.o-file $basepath/.g.o-file: file included_files
+//
+// $basepath is the dir where the object files are to be placed (as
+// given by the -B parameter to this script)
+
+// Author: Wolfgang Bangerth, 2003 (and based on a previous perl
+// script written 1998, 1999, 2000, 2001, 2002)
+
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -16,6 +51,7 @@ std::vector<std::string> include_directories;
                                  // store the set of other files it
                                  // includes directly
 std::map<std::string,std::set<std::string> > direct_includes;
+
 
 
                                  // for the given file, fill a
@@ -153,9 +189,93 @@ void determine_direct_includes (const std::string &file)
 
 
 
+
                                  // return the set of all included
                                  // files, directly or indirectly, for
-                                 // the given file
+                                 // the given file. for this purpose,
+                                 // we consider the direct_includes
+                                 // variable to be a representation of
+                                 // a directed graph: given a file (a
+                                 // node in the graph), the elements
+                                 // of the include-set for this file
+                                 // are outgoing edges from this
+                                 // node. to get at all includes,
+                                 // direct and indirect, we keep a
+                                 // list starting with the direct
+                                 // includes, the collect all direct
+                                 // includes of the files in the list,
+                                 // then their include files, etc. We
+                                 // thus march in fronts through the
+                                 // graph.
+                                 //
+                                 // one of the complications we have
+                                 // to keep track of is that the graph
+                                 // may be cyclic (i.e. header files
+                                 // include each other mutually -- in
+                                 // the real program, one of the
+                                 // includes will be guarded by
+                                 // preprocessor #ifdefs, but we don't
+                                 // see them here), so we have to make
+                                 // sure we strip elements from the
+                                 // present front that we have already
+                                 // visited before
+                                 //
+                                 // this function could presumably be
+                                 // made more efficient in the
+                                 // following way: when we have more
+                                 // than one file for which we want to
+                                 // compute dependencies, we presently
+                                 // walk through the graph for each of
+                                 // them. however, they will likely
+                                 // have one or more includes in
+                                 // common, so they will also have
+                                 // parts of the dependency graph in
+                                 // common. if we could precompute the
+                                 // dependency graph for include files
+                                 // in advance, we wouldn't have to
+                                 // walk through _all_ the graph for
+                                 // each file we consider, but could
+                                 // just draw in blocks. the problem
+                                 // with that is that to make this
+                                 // efficient we cannot just compute
+                                 // the whole set of dependencies for
+                                 // _each_ file, but we have to do
+                                 // this on the fly and to avoid again
+                                 // problems with the cyclic nature we
+                                 // have to keep track where we are
+                                 // presently coming from. that's way
+                                 // too complicated for now and I
+                                 // leave it to times when dependency
+                                 // generation becomes again a
+                                 // noticable time hit
+                                 //
+                                 // one of the ideas to solve this
+                                 // problem would be to start at
+                                 // terminal nodes of the graph
+                                 // (i.e. nodes that have no outgoing
+                                 // edges) and fold these nodes into
+                                 // nodes that have only outgoing
+                                 // edges to terminal nodes. store the
+                                 // dependencies of these
+                                 // next-to-terminal nodes and remove
+                                 // the terminal ones. then start over
+                                 // again with the so generated
+                                 // graph. if we consider the files
+                                 // for which we want to compute
+                                 // dependency information as top
+                                 // level nodes (they will _only_ have
+                                 // outgoing nodes), we could
+                                 // presumable roll up the entire
+                                 // graph from the bottom (terminal
+                                 // nodes) and fold it one layer at a
+                                 // time
+                                 //
+                                 // in any case, there is presently no
+                                 // need for this since the actions of
+                                 // this function are presently not
+                                 // really time critical: parsing the
+                                 // files in the function above is a
+                                 // much bigger time-hit.
 std::set<std::string>
 get_all_includes (const std::string &name) 
 {
