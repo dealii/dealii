@@ -463,7 +463,6 @@ void FESystem<dim>::get_unit_support_points (vector<Point<dim> > &/*support_poin
 
 template <int dim>
 void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &/*cell*/,
-					const Boundary<dim> &/*boundary*/,
 					vector<Point<dim> > &/*support_points*/) const
 {
   Assert(false, ExcNotImplemented());
@@ -472,7 +471,7 @@ void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &/*
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
 
   vector<Point<dim> > base_support_points (base_element->total_dofs);
-  base_element->get_support_points (cell, boundary, base_support_points);
+  base_element->get_support_points (cell, base_support_points);
   
   for (unsigned int i=0; i<base_element->total_dofs; ++i) 
     for (unsigned int n=0; n<n_sub_elements; ++n)
@@ -484,7 +483,6 @@ void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &/*
 
 template <int dim>
 void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterator & face,
-					     const Boundary<dim> & boundary,
 					     vector<Point<dim> > & support_points) const
 {
   Assert (support_points.size() == dofs_per_face,
@@ -495,7 +493,7 @@ void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterato
   for (unsigned int base=0 ; base<n_base_elements(); ++base)
     {
       base_support_points.resize(base_element(base).dofs_per_face);
-      base_element(base).get_face_support_points (face, boundary, base_support_points);
+      base_element(base).get_face_support_points (face, base_support_points);
       for (unsigned int inbase = 0 ; inbase < element_multiplicity(base); ++inbase)
 	{
 	  for (unsigned int i=0; i<base_element(base).dofs_per_face; ++i)
@@ -513,7 +511,6 @@ void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterato
 
 template <int dim>
 void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &/*cell*/,
-					   const Boundary<dim> &/*boundary*/,
 					   FullMatrix<double>  &/*local_mass_matrix*/) const
 {
   Assert(false, ExcNotImplemented());
@@ -527,7 +524,7 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 				   // the base object
   FullMatrix<double> base_mass_matrix (base_element.total_dofs,
 			     base_element.total_dofs);
-  base_element.get_local_mass_matrix (cell, boundary, base_mass_matrix);
+  base_element.get_local_mass_matrix (cell, base_mass_matrix);
 
 
 				   // now distribute it to the mass matrix
@@ -562,12 +559,11 @@ Tensor<1,dim> FESystem<dim>::shape_grad_transform (const unsigned int i,
 
 template <int dim>
 void FESystem<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-					const Boundary<dim>         &boundary,
 					const vector<Point<dim-1> > &unit_points,
 					vector<double>      &face_jacobi_determinants) const
 {
-  base_elements[0].first->get_face_jacobians (face, boundary, unit_points,
-					face_jacobi_determinants);
+  base_elements[0].first->get_face_jacobians (face, unit_points,
+					      face_jacobi_determinants);
 };
 
 
@@ -588,11 +584,10 @@ void FESystem<dim>::get_subface_jacobians (const DoFHandler<dim>::face_iterator 
 template <int dim>
 void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 					const unsigned int          face_no,
-					const Boundary<dim>         &boundary,
 					const vector<Point<dim-1> > &unit_points,
 					vector<Point<dim> >         &normal_vectors) const
 {
-  base_elements[0].first->get_normal_vectors (cell, face_no, boundary, unit_points,
+  base_elements[0].first->get_normal_vectors (cell, face_no, unit_points,
 					normal_vectors);
 };
 
@@ -623,8 +618,7 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 			       vector<Point<dim> > &q_points,
 			       const bool           compute_q_points,
 			       const FullMatrix<double>  &shape_values_transform,
-			       const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
-			       const Boundary<dim> &boundary) const
+			       const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const
 {
   vector<Point<dim> > supp(base_elements[0].first->total_dofs);
 
@@ -632,7 +626,7 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 					  jacobians_grad, compute_jacobians_grad,
 					  support_points, compute_support_points,
 					  q_points, compute_q_points,
-					  shape_values_transform, shape_grad_transform, boundary);
+					  shape_values_transform, shape_grad_transform);
   
   if (compute_support_points)
     {
@@ -651,7 +645,7 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 						     jacobians_grad, false,
 						     supp, true,
 						     q_points, false,
-						     shape_values_transform, shape_grad_transform, boundary);
+						     shape_values_transform, shape_grad_transform);
 	  
 	  for (unsigned m=0 ; m < element_multiplicity(base) ; ++ m)
 	    {

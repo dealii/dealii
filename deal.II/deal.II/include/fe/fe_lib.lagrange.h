@@ -84,16 +84,14 @@ class FELinear : public FELinearMapping<dim> {
 				      * information on this function.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &support_points) const;
+				     vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &support_points) const;
+					  vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -109,7 +107,6 @@ class FELinear : public FELinearMapping<dim> {
 				      * is thrown instead.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					const Boundary<dim> &boundary,
 					FullMatrix<double> &local_mass_matrix) const;
 
   private:
@@ -265,16 +262,14 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      * information on this function.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &support_points) const;
+				     vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &support_points) const;
+					  vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -290,7 +285,6 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      * is thrown instead.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					const Boundary<dim> &boundary,
 					FullMatrix<double> &local_mass_matrix) const;
 
   private:
@@ -390,16 +384,14 @@ class FECubicSub : public FELinearMapping<dim> {
 				      * information on this function.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &support_points) const;
+				     vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &support_points) const;
+					  vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -415,7 +407,6 @@ class FECubicSub : public FELinearMapping<dim> {
 				      * is thrown instead.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					const Boundary<dim> &boundary,
 					FullMatrix<double> &local_mass_matrix) const;
 
   private:
@@ -516,16 +507,14 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      * information on this function.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &support_points) const;
+				     vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &support_points) const;
+					  vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -541,7 +530,6 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      * is thrown instead.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					const Boundary<dim> &boundary,
 					FullMatrix<double> &local_mass_matrix) const;
 
   private:

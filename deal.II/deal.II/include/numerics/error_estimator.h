@@ -112,6 +112,8 @@
  *
  *  \item No other boundary conditions are considered.
  *  \end{itemize}
+ *  The object describing the boundary conditions is obtained from the
+ *  triangulation.
  *
  *  Thanks go to Franz-Theo Suttmeier for clarifications about boundary
  *  conditions.
@@ -166,8 +168,6 @@ class KellyErrorEstimator {
 				      */
     static void estimate_error (const DoFHandler<dim>    &dof,
 				const Quadrature<dim-1>  &quadrature,
-				const FiniteElement<dim> &fe,
-				const Boundary<dim>      &boundary,
 				const FunctionMap        &neumann_bc,
 				const Vector<double>     &solution,
 				Vector<float>            &error,
@@ -221,8 +221,6 @@ class KellyErrorEstimator {
 				      */
     static void integrate_over_regular_face (const active_cell_iterator &cell,
 					     const unsigned int   face_no,
-					     const FiniteElement<dim> &fe,
-					     const Boundary<dim>      &boundary,
 					     const FunctionMap   &neumann_bc,
 					     const unsigned int   n_q_points,
 					     FEFaceValues<dim>   &fe_face_values_cell,
@@ -241,8 +239,6 @@ class KellyErrorEstimator {
 				      */
     static void integrate_over_irregular_face (const active_cell_iterator &cell,
 					       const unsigned int   face_no,
-					       const FiniteElement<dim> &fe,
-					       const Boundary<dim>      &boundary,
 					       const unsigned int    n_q_points,
 					       FEFaceValues<dim>    &fe_face_values,
 					       FESubfaceValues<dim> &fe_subface_values,

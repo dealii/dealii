@@ -45,7 +45,7 @@ print_fe_statistics(const FiniteElement<dim>& fe)
 
 //  fe.get_unit_support_points(unit_points);
 //  fe.get_support_points(cell, boundary, support_points);
-  fe.get_face_support_points(face, boundary, face_support_points);
+  fe.get_face_support_points(face, face_support_points);
   
   deallog << "total_dofs" << " " << fe.total_dofs;
   deallog << ": vertex" << " " << fe.dofs_per_vertex;

@@ -896,7 +896,8 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * This function is more or less an
 				      * interface to the #FEValues# class and
 				      * should not be used by users unless
-				      * absolutely needed.  */
+				      * absolutely needed.
+				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				 const vector<Point<dim> > &unit_points,
 				 vector<Tensor<2,dim> >    &jacobians,
@@ -908,8 +909,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				 vector<Point<dim> >       &q_points,
 				 const bool                 compute_q_points,
 				 const FullMatrix<double>            &shape_values_transform,
-				 const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
-				 const Boundary<dim> &boundary) const;
+				 const vector<vector<Tensor<1,dim> > > &shape_grads_transform) const;
 
 				     /**
 				      * Do the same thing that the other
@@ -1032,8 +1032,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      vector<Point<dim> > &normal_vectors,
 				      const bool           compute_normal_vectors,
 				      const FullMatrix<double>      &shape_values_transform,
-				      const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
-				      const Boundary<dim> &boundary) const;
+				      const vector<vector<Tensor<1,dim> > > &shape_grads_transform) const;
 
 				     /**
 				      * This function does almost the same as
@@ -1079,8 +1078,7 @@ class FiniteElement : public FiniteElementBase<dim>
 					 vector<Point<dim> > &normal_vectors,
 					 const bool           compute_normal_vectors,
 					 const FullMatrix<double>      &shape_values_transform,
-					 const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
-					 const Boundary<dim> &boundary) const;
+					 const vector<vector<Tensor<1,dim> > > &shape_grads_transform) const;
 
 				     /**
 				      * Return the support points of the
@@ -1127,9 +1125,18 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * equidistant off-points on the unit
 				      * line. For all other dimensions, an
 				      * overwritten function has to be provided.
+				      *
+				      * For higher order transformations than
+				      * the common (bi-, tri-)linear one,
+				      * information about the boundary is
+				      * needed, rather than only the readily
+				      * available information on the location
+				      * of the vertices. If necessary, we
+				      * therefore rely on the boundary object
+				      * of which a pointer is stored by the
+				      * triangulation.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     const Boundary<dim> &boundary,
 				     vector<Point<dim> > &support_points) const;
     
 				     /**
@@ -1171,9 +1178,15 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * dimension would be senseless, all
 				      * derived classes should throw an error
 				      * when called with #dim==1#.
+				      *
+				      * Regarding information about the
+				      * boundary, which is necessary for
+				      * higher order transformations than
+				      * the usual (bi-, tri-)linear ones,
+				      * refer to the #get_support_points#
+				      * function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  const Boundary<dim> &boundary,
 					  vector<Point<dim> > &support_points) const =0;
 
 				     /**
@@ -1188,9 +1201,15 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * dimension would be senseless, all
 				      * derived classes should throw an error
 				      * when called with #dim==1#.
+				      *
+				      * Regarding information about the
+				      * boundary, which is necessary for
+				      * higher order transformations than
+				      * the usual (bi-, tri-)linear ones,
+				      * refer to the #get_support_points#
+				      * function.
 				      */
     virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<double>      &face_jacobi_determinants) const =0;
 
@@ -1223,10 +1242,16 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * dimension would be senseless, all
 				      * derived classes should throw an error
 				      * when called with #dim==1#.
+				      *
+				      * Regarding information about the
+				      * boundary, which is necessary for
+				      * higher order transformations than
+				      * the usual (bi-, tri-)linear ones,
+				      * refer to the #get_support_points#
+				      * function.
 				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
-				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const =0;
 
@@ -1347,9 +1372,15 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * classes not implementing this function
 				      * are assumed to state this in their
 				      * documentation.
+				      *
+				      * Regarding information about the
+				      * boundary, which is necessary for
+				      * higher order transformations than
+				      * the usual (bi-, tri-)linear ones,
+				      * refer to the #get_support_points#
+				      * function.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					const Boundary<dim>           &boundary, 
 					FullMatrix<double>            &local_mass_matrix) const =0;
 
 				     /**

@@ -150,10 +150,8 @@ class ProblemBase {
 				      */
     virtual void assemble (const Equation<dim>      &equation,
 			   const Quadrature<dim>    &q,
-			   const FiniteElement<dim> &fe,
 			   const UpdateFlags         update_flags,
-			   const FunctionMap        &dirichlet_bc = FunctionMap(),
-			   const Boundary<dim>      &boundary = StraightBoundary<dim>());
+			   const FunctionMap        &dirichlet_bc = FunctionMap());
     
 				     /**
 				      * Solve the system of equations. This uses

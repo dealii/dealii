@@ -200,7 +200,7 @@ void NonlinearProblem<dim>::run () {
 	  assemble (equation, quadrature, fe,
 		    UpdateFlags(update_gradients | update_JxW_values |
 				update_q_points),
-		    dirichlet_bc, boundary);
+		    dirichlet_bc);
 	  
 	  cout << "        Solving..." << endl;
 	  solve ();
@@ -227,7 +227,7 @@ void NonlinearProblem<dim>::run () {
       Vector<float> error_indicator;
       KellyErrorEstimator<dim> ee;
       QSimpson<dim-1> eq;
-      ee.estimate_error (*dof, eq, fe, boundary,
+      ee.estimate_error (*dof, eq, fe,
 			 KellyErrorEstimator<dim>::FunctionMap(),
 			 solution,
 			 error_indicator);

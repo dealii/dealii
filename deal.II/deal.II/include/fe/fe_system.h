@@ -185,7 +185,6 @@ class FESystem //<dim>
 				      * refer to the #shape_value# function.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     const Boundary<dim> &boundary,
 				     vector<Point<dim> > &support_points) const;
 
 				     /**
@@ -193,7 +192,6 @@ class FESystem //<dim>
 				      * information on this function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  const Boundary<dim> &boundary,
 					  vector<Point<dim> > &support_points) const;
 
     				     /**
@@ -233,7 +231,6 @@ class FESystem //<dim>
 				      * information on this function.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					const Boundary<dim> &boundary,
 					FullMatrix<double> &local_mass_matrix) const;
 
 				     /**
@@ -270,7 +267,6 @@ class FESystem //<dim>
 				      * underlying object.
 				      */
     virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<double>      &face_jacobi_determinants) const;
 
@@ -306,7 +302,6 @@ class FESystem //<dim>
 				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
-				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;
 
@@ -345,8 +340,7 @@ class FESystem //<dim>
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const FullMatrix<double>  &shape_values_transform,
-				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
-				 const Boundary<dim> &boundary) const;
+				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const;
     
 				     /** 
 				      * Number of different base

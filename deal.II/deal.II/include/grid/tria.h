@@ -1509,6 +1509,28 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
     void set_boundary (const Boundary<dim> *boundary_object);
 
 				     /**
+				      * Return a constant reference to the boundary
+				      * object used for this triangulation. This
+				      * is necessary for a host of applications
+				      * that need to use the exact shape of the
+				      * boundary. Since the boundary used by all
+				      * these applications, it is useful to ask
+				      * the triangulation rather than asking
+				      * for another parameter for each of these
+				      * functions.
+				      *
+				      * If you need to store a pointer to the
+				      * boundary somewhere, for example
+				      * in the constructor of an object, for
+				      * later use in the member functions,
+				      * you should consider calling #subscribe#
+				      * on the boundary to guarantee that the
+				      * boundary object is still alive during
+				      * the lifetime of your object.
+				      */
+    const Boundary<dim> & get_boundary () const;
+    
+				     /**
 				      *  Copy a triangulation. This operation is
 				      *  not cheap, so you should be careful
 				      *  with using this. We do not implement

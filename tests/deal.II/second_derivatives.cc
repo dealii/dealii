@@ -27,7 +27,7 @@ int main () {
 
   StraightBoundary<2> b;
   QTrapez<2> q;
-  FEValues<2> fevalues(fe,q,update_second_derivatives);
+  FEValues<2> fevalues(fe,q,update_second_derivatives,b);
   
   
   Vector<double> val(4);
@@ -48,7 +48,7 @@ int main () {
       				   // move one vertex of the only cell
       if (loop==1)
 	tria.begin_active()->vertex(2)(0) = 2;
-      fevalues.reinit (dof.begin_active(),b);
+      fevalues.reinit (dof.begin_active());
       
       for (unsigned int vertex=0; vertex<4; ++vertex)
 	{

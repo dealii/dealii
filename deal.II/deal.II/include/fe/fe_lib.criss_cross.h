@@ -211,7 +211,6 @@ class FECrissCross : public FiniteElement<dim> {
 				      * information on this function.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     const Boundary<dim> &boundary,
 				     vector<Point<dim> > &support_points) const;
 
 				     /**
@@ -219,7 +218,6 @@ class FECrissCross : public FiniteElement<dim> {
 				      * information on this function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  const Boundary<dim> &boundary,
 					  vector<Point<dim> > &support_points) const;
 
     				     /**
@@ -227,7 +225,6 @@ class FECrissCross : public FiniteElement<dim> {
 				      * information on this function.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					const Boundary<dim> &boundary,
 					FullMatrix<double> &local_mass_matrix) const;
 
     				     /**
@@ -260,7 +257,6 @@ class FECrissCross : public FiniteElement<dim> {
 				      * simply returns the length of the face.
 				      */
     virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<double>      &face_jacobi_determinants) const;
 
@@ -293,7 +289,6 @@ class FECrissCross : public FiniteElement<dim> {
 				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
-				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;
 
@@ -326,10 +321,7 @@ class FECrissCross : public FiniteElement<dim> {
 				      * function simply passes through to
 				      * the one implemented in the base class.
 				      * For higher dimensional finite elements
-				      * we use linear mappings and therefore
-				      * the boundary object is ignored since
-				      * the boundary is approximated using
-				      * piecewise multilinear boundary segments.
+				      * we use multilinear mappings.
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >            &unit_points,
@@ -342,8 +334,7 @@ class FECrissCross : public FiniteElement<dim> {
 				 vector<Point<dim> >    &q_points,
 				 const bool              compute_q_points,
 				 const FullMatrix<double>         &shape_values_transform,
-				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
-				 const Boundary<dim> &boundary) const;
+				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const;
 
     DeclException0 (ExcNotUseful);
 };

@@ -73,6 +73,16 @@ void Triangulation<dim>::set_boundary (const Boundary<dim> *boundary_object) {
 
 
 
+template <int dim>
+const Boundary<dim> &
+Triangulation<dim>::get_boundary () const 
+{
+  return *boundary;
+};
+
+
+
+
 /*--------- Put the next functions a bit out-or-order to avoid use before
   --------- explicit specialization, which is not allowed.                */
 

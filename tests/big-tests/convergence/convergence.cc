@@ -324,7 +324,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   
   ProblemBase<dim>::FunctionMap dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
-  assemble (equation, *quadrature, *fe, update_flags, dirichlet_bc);
+  assemble (equation, *quadrature, update_flags, dirichlet_bc);
 
   cout << "    Solving..." << endl;
   solve ();

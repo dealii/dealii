@@ -22,7 +22,8 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 				 const unsigned int n_transform_functions,
 				 const unsigned int n_values_arrays,
 				 const UpdateFlags update_flags,
-				 const FiniteElement<dim> &fe) :
+				 const FiniteElement<dim> &fe,
+				 const Boundary<dim>      &boundary) :
 		n_quadrature_points (n_q_points),
 		total_dofs (total_dofs),
 		n_transform_functions (n_transform_functions),
@@ -40,7 +41,9 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 							   n_quadrature_points)),
 		selected_dataset (0),
 		update_flags (update_flags),
-		fe(&fe)        {};
+		fe(&fe),
+		boundary(&boundary)
+{};
 
 
 
@@ -274,14 +277,16 @@ double FEValuesBase<dim>::JxW (const unsigned int i) const {
 template <int dim>
 FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 			 const Quadrature<dim>    &quadrature,
-			 const UpdateFlags         update_flags) :
+			 const UpdateFlags         update_flags,
+			 const Boundary<dim>      &boundary) :
 		FEValuesBase<dim> (quadrature.n_quadrature_points,
 				   fe.total_dofs,
 				   fe.total_dofs,
 				   fe.n_transform_functions,
 				   1,
 				   update_flags,
-				   fe),
+				   fe,
+				   boundary),
 		unit_shape_gradients(fe.total_dofs,
 				     vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
 		unit_shape_2nd_derivatives(fe.total_dofs,
@@ -322,8 +327,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 
 
 template <int dim>
-void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
-			    const Boundary<dim>                           &boundary) {
+void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell) {
   present_cell = cell;
 				   // fill jacobi matrices and real
 				   // quadrature points
@@ -346,8 +350,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 			update_flags & update_support_points,
 			quadrature_points,
 			update_flags & update_q_points,
-			shape_values_transform[0], unit_shape_gradients_transform,
-			boundary);
+			shape_values_transform[0], unit_shape_gradients_transform);
   
 				   // compute gradients on real element if
 				   // requested
@@ -417,14 +420,16 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 					 const unsigned int n_transform_functions,
 					 const unsigned int n_faces_or_subfaces,
 					 const UpdateFlags         update_flags,
-					 const FiniteElement<dim> &fe) :
+					 const FiniteElement<dim> &fe,
+					 const Boundary<dim>      &boundary) :
 		FEValuesBase<dim> (n_q_points,
 				   n_support_points,
 				   total_dofs,
 				   n_transform_functions,
 				   n_faces_or_subfaces,
 				   update_flags,
-				   fe),
+				   fe,
+				   boundary),
 		unit_shape_gradients (n_faces_or_subfaces,
 				      vector<vector<Tensor<1,dim> > >(total_dofs,
 								   vector<Tensor<1,dim> >(n_q_points))),
@@ -464,14 +469,16 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const {
 template <int dim>
 FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				 const Quadrature<dim-1>  &quadrature,
-				 const UpdateFlags         update_flags) :
+				 const UpdateFlags         update_flags,
+				 const Boundary<dim>      &boundary) :
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_face,
 				       fe.total_dofs,
 				       fe.n_transform_functions,
 				       GeometryInfo<dim>::faces_per_cell,
 				       update_flags,
-				       fe)
+				       fe,
+				       boundary)
 {
   unit_face_quadrature_points = quadrature.get_quad_points();
   weights = quadrature.get_weights ();  
@@ -511,8 +518,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 
 template <int dim>
 void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
-				const unsigned int                             face_no,
-				const Boundary<dim>                           &boundary) {
+				const unsigned int                             face_no) {
   present_cell  = cell;
   selected_dataset = face_no;
 				   // fill jacobi matrices and real
@@ -545,8 +551,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 			     normal_vectors,
 			     update_flags & update_normal_vectors,
 			     shape_values_transform[face_no],
-			     unit_shape_gradients_transform[face_no],
-			     boundary);
+			     unit_shape_gradients_transform[face_no]);
 
 				   // compute gradients on real element if
 				   // requested
@@ -616,14 +621,16 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 template <int dim>
 FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       const Quadrature<dim-1>  &quadrature,
-				       const UpdateFlags         update_flags) :
+				       const UpdateFlags         update_flags,
+				       const Boundary<dim>      &boundary) :
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       0,
 				       fe.total_dofs,
 				       fe.n_transform_functions,
 				       GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::subfaces_per_face,
 				       update_flags,
-				       fe)
+				       fe,
+				       boundary)
 {
   Assert ((update_flags & update_support_points) == false,
 	  ExcInvalidUpdateFlag());
@@ -685,8 +692,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 template <int dim>
 void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				   const unsigned int         face_no,
-				   const unsigned int         subface_no,
-				   const Boundary<dim>       &boundary) {
+				   const unsigned int         subface_no) {
   Assert (cell->face(face_no)->at_boundary() == false,
 	  ExcReinitCalledWithBoundaryFace());
   
@@ -720,8 +726,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				normal_vectors,
 				update_flags & update_normal_vectors,
 				shape_values_transform[selected_dataset],
-				unit_shape_gradients_transform[selected_dataset],
-				boundary);
+				unit_shape_gradients_transform[selected_dataset]);
 
 				   // compute gradients on real element if
 				   // requested

@@ -44,8 +44,8 @@ FEDGConstant<1>::FEDGConstant () :
 
 
 template <>
-void FEDGConstant<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
-					  const Boundary<1>  &,
+void
+FEDGConstant<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
 					  vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
@@ -126,7 +126,6 @@ FEDGConstant<dim>::shape_grad_grad (const unsigned int i,
 
 template <int dim>
 void FEDGConstant<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					       const Boundary<dim> &,
 					       FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -151,7 +150,6 @@ FEDGConstant<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) co
 template <int dim>
 void
 FEDGConstant<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-				       const Boundary<dim>  &,
 				       vector<Point<dim> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
@@ -163,7 +161,6 @@ FEDGConstant<dim>::get_support_points (const typename DoFHandler<dim>::cell_iter
 template <int dim>
 void
 FEDGConstant<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-					    const Boundary<dim>  &,
 					    vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));

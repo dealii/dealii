@@ -350,7 +350,6 @@ void FECrissCross<1>::get_unit_support_points (vector<Point<1> >&) const {
 
 template <>
 void FECrissCross<1>::get_support_points (const DoFHandler<1>::cell_iterator &,
-					  const Boundary<1> &,
 					  vector<Point<1> > &) const {
   Assert (false, ExcNotUseful());
 };
@@ -359,7 +358,6 @@ void FECrissCross<1>::get_support_points (const DoFHandler<1>::cell_iterator &,
 
 template <>
 void FECrissCross<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
-					       const Boundary<1> &,
 					       vector<Point<1> > &) const {
   Assert (false, ExcNotUseful());
 };
@@ -368,7 +366,6 @@ void FECrissCross<1>::get_face_support_points (const DoFHandler<1>::face_iterato
 
 template <>
 void FECrissCross<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &,
-					     const Boundary<1> &,
 					     FullMatrix<double> &) const {
   Assert (false, ExcNotUseful());
 };
@@ -395,7 +392,6 @@ Tensor<1,1> FECrissCross<1>::shape_grad_transform (const unsigned int,
 
 template <>
 void FECrissCross<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
-					  const Boundary<1>       &,
 					  const vector<Point<0> > &,
 					  vector<double>      &) const {
   Assert (false, ExcNotUseful());
@@ -416,7 +412,6 @@ void FECrissCross<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator 
 template <>
 void FECrissCross<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					  const unsigned int,
-					  const Boundary<1>       &,
 					  const vector<Point<0> > &,
 					  vector<Point<1> >       &) const {
   Assert (false, ExcNotUseful());
@@ -447,8 +442,7 @@ void FECrissCross<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &,
 				       vector<Point<1> >    &,
 				       const bool            ,
 				       const FullMatrix<double>       &,
-				       const vector<vector<Tensor<1,1> > > &,
-				       const Boundary<1> &) const {
+				       const vector<vector<Tensor<1,1> > > &) const {
   Assert (false, ExcNotUseful());
 };
 
@@ -601,7 +595,6 @@ void FECrissCross<2>::get_unit_support_points (vector<Point<2> > &unit_points) c
 
 template <>
 void FECrissCross<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
-					  const Boundary<2> &,
 					  vector<Point<2> > &support_points) const {
   const unsigned int dim = 2;
   
@@ -639,7 +632,6 @@ void FECrissCross<2>::get_support_points (const DoFHandler<2>::cell_iterator &ce
 
 template <>
 void FECrissCross<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
-					       const Boundary<2> &,
 					       vector<Point<2> > &support_points) const {
   const unsigned int dim = 2;
   
@@ -656,7 +648,6 @@ void FECrissCross<2>::get_face_support_points (const DoFHandler<2>::face_iterato
 
 template <>
 void FECrissCross<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
-					     const Boundary<2> &,
 					     FullMatrix<double> &mass_matrix) const {
   Assert (mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(mass_matrix.n(),total_dofs));
@@ -818,7 +809,6 @@ Tensor<1,2> FECrissCross<2>::shape_grad_transform (const unsigned int i,
 
 template <>
 void FECrissCross<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
-					  const Boundary<2>       &,
 					  const vector<Point<1> > &unit_points,
 					  vector<double> &face_jacobians) const {
 				   // more or less copied from the linear
@@ -865,7 +855,6 @@ void FECrissCross<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator 
 template <>
 void FECrissCross<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 					  const unsigned int       face_no,
-					  const Boundary<2>       &,
 					  const vector<Point<1> > &unit_points,
 					  vector<Point<2> > &normal_vectors) const {
 				   // more or less copied from the linear
@@ -943,8 +932,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 					vector<Point<dim> >    &q_points,
 					const bool              compute_q_points,
 					const FullMatrix<double>         &shape_values_transform,
-					const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/,
-					const Boundary<dim> &boundary) const {
+					const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -958,7 +946,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 				   // we need the support points in any
 				   // way, wanted or not by the user
   if (compute_support_points)
-    get_support_points (cell, boundary, support_points);
+    get_support_points (cell, support_points);
 
   if (compute_q_points) 
     {

@@ -6,7 +6,6 @@
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/tria_boundary.h>
 #include <grid/tria.h>
 #include <grid/geometry_info.h>
 #include <base/quadrature_lib.h>
@@ -595,8 +594,8 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 
   QIteratedTrapez<dim> points(accuracy);
   
-  FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points));
-  const StraightBoundary<dim> boundary;
+  FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points),
+		   dofs->get_tria().get_boundary());
   vector< vector <vector<double> > >
     values (dof_data.size(),
 	    vector< vector<double> >(points.n_quadrature_points,
@@ -606,7 +605,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
   unsigned int cell_index=0;
   for (cell=dofs->begin_active(); cell!=endc; ++cell, ++cell_index) 
     {
-      fe.reinit(cell, boundary);
+      fe.reinit(cell);
 
       for (unsigned i=0; i<dof_data.size(); ++i)
 	fe.get_function_values(*dof_data[i].data, values[i]);

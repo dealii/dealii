@@ -104,10 +104,8 @@ class PoissonProblem {
 				      */
     virtual void assemble (const Equation<dim>      &equation,
 			   const Quadrature<dim>    &q,
-			   const FiniteElement<dim> &fe,
 			   const UpdateFlags         update_flags,
-			   const FunctionMap        &dirichlet_bc = FunctionMap(),
-			   const Boundary<dim>      &boundary = StraightBoundary<dim>());
+			   const FunctionMap        &dirichlet_bc = FunctionMap());
 
     int run (unsigned int level);
     void print_history (string filename) const;
@@ -326,10 +324,8 @@ void PoissonProblem<dim>::create_new () {
 template <int dim>
 void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
 				    const Quadrature<dim>    &quadrature,
-				    const FiniteElement<dim> &fe,
 				    const UpdateFlags         update_flags,
-				    const FunctionMap        &dirichlet_bc,
-				    const Boundary<dim>      &boundary) {
+				    const FunctionMap        &dirichlet_bc) {
   Assert ((tria!=0) && (dof!=0), ExcNoTriaSelected());
   
   system_sparsity.reinit (dof->DoFHandler<dim>::n_dofs(),
@@ -356,9 +352,7 @@ void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
 			   system_matrix,
 			   right_hand_side,
 			   quadrature,
-			   fe,
-			   update_flags,
-			   boundary);
+			   update_flags);
   active_assemble_iterator assembler (tria,
 				      tria->begin_active()->level(),
 				      tria->begin_active()->index(),
@@ -379,7 +373,7 @@ void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
 				   // apply Dirichlet bc as described
 				   // in the docs
   map<int, double> boundary_value_list;
-  VectorTools<dim>::interpolate_boundary_values (*dof, dirichlet_bc, boundary,
+  VectorTools<dim>::interpolate_boundary_values (*dof, dirichlet_bc,
 						 boundary_value_list);
   MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					   system_matrix, solution,
@@ -480,7 +474,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   
   map<unsigned char,const Function<dim>*> dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
-  assemble (equation, *quadrature, *fe, update_flags, dirichlet_bc);
+  assemble (equation, *quadrature, update_flags, dirichlet_bc);
 
   cout << "    Solving..." << endl;
   solve ();

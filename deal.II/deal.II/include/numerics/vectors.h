@@ -77,7 +77,7 @@ enum NormType {
  *   the projection.
  *
  *   In order to get proper results, it may necessary to treat boundary
- *   conditions right. Below are listed some cases wher this may be needed.
+ *   conditions right. Below are listed some cases where this may be needed.
  *   If needed, this is done by $L_2$-projection of the trace of the
  *   given function onto the finite element space restricted to the boundary
  *   of the domain, then taking this information and using it to eliminate
@@ -238,7 +238,9 @@ enum NormType {
  * \end{itemize}
  *
  * All functions use the finite element given to the #DoFHandler# object the last
- * time that the degrees of freedom were distributed over the triangulation.
+ * time that the degrees of freedom were distributed over the triangulation. Also,
+ * if access to an object describing the exact form of the boundary is needed, the
+ * pointer stored within the triangulation object is accessed.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -277,7 +279,6 @@ class VectorTools //<dim>
 				      * class for further information.
 				      */
     static void interpolate (const DoFHandler<dim>    &dof,
-			     const Boundary<dim>      &boundary,
 			     const Function<dim>      &function,
 			     Vector<double>           &vec);
 
@@ -317,7 +318,6 @@ class VectorTools //<dim>
 				      */
     static void project (const DoFHandler<dim>    &dof,
 			 const ConstraintMatrix   &constraints,
-			 const Boundary<dim>      &boundary,
 			 const Quadrature<dim>    &q,
 			 const Function<dim>      &function,
 			 Vector<double>           &vec,
@@ -333,7 +333,6 @@ class VectorTools //<dim>
 				      */				      
     static void create_right_hand_side (const DoFHandler<dim>    &dof,
 					const Quadrature<dim>    &q,
-					const Boundary<dim>      &boundary,
 					const Function<dim>      &rhs,
 					Vector<double>           &rhs_vector);
     
@@ -354,7 +353,6 @@ class VectorTools //<dim>
 				      */
     static void interpolate_boundary_values (const DoFHandler<dim> &dof,
 					     const FunctionMap     &dirichlet_bc,
-					     const Boundary<dim>   &boundary,
 					     map<int,double>       &boundary_values);
 
 				     /**
@@ -364,7 +362,6 @@ class VectorTools //<dim>
 				      */
     static void interpolate_boundary_values (const DoFHandler<dim> &dof,
 					     const VectorFunctionMap     &dirichlet_bc,
-					     const Boundary<dim>   &boundary,
 					     map<int,double>       &boundary_values);
 
 				     /**
@@ -383,7 +380,6 @@ class VectorTools //<dim>
     static void project_boundary_values (const DoFHandler<dim>    &dof,
 					 const FunctionMap        &boundary_functions,
 					 const Quadrature<dim-1>  &q,
-					 const Boundary<dim>      &boundary,
 					 map<int,double>          &boundary_values);
     
     				     /**
@@ -411,21 +407,18 @@ class VectorTools //<dim>
 				      const Function<dim>      &exact_solution,
 				      Vector<float>            &difference,
 				      const Quadrature<dim>    &q,
-				      const NormType           &norm,
-				      const Boundary<dim>      &boundary=StraightBoundary<dim>());
+				      const NormType           &norm);
 
 				     /**
 				      * Compute the error for the solution of a system.
 				      * See the other #integrate_difference#.
 				      */
-     static void integrate_difference (const DoFHandler<dim>   &dof,
+    static void integrate_difference (const DoFHandler<dim>   &dof,
  				      const Vector<double>     &fe_function,
  				      const VectorFunction<dim>&exact_solution,
  				      Vector<float>            &difference,
  				      const Quadrature<dim>    &q,
- 				      const FiniteElement<dim> &fe,
- 				      const NormType           &norm,
- 				      const Boundary<dim>      &boundary);
+ 				      const NormType           &norm);
     
 
 				     /**

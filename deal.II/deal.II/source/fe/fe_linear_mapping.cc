@@ -6,7 +6,6 @@
 #include <base/quadrature.h>
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
-#include <grid/tria_boundary.h>
 
 #include <cmath>
 
@@ -72,7 +71,6 @@ FELinearMapping<1>::shape_grad_transform(const unsigned int i,
 
 template <>
 void FELinearMapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
-					     const Boundary<1>         &,
 					     const vector<Point<0> > &,
 					     vector<double>      &) const {
   Assert (false, ExcInternalError());
@@ -93,7 +91,6 @@ void FELinearMapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterat
 template <>
 void FELinearMapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					     const unsigned int,
-					     const Boundary<1> &,
 					     const vector<Point<0> > &,
 					     vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
@@ -123,16 +120,14 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 					 vector<Point<1> >    &q_points,
 					 const bool            compute_q_points,
 					 const FullMatrix<double>       &shape_values_transform,
-					 const vector<vector<Tensor<1,1> > > &shape_gradients_transform,
-					 const Boundary<1> &boundary) const {
+					 const vector<vector<Tensor<1,1> > > &shape_gradients_transform) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
 				    jacobians_grad, compute_jacobians_grad,
 				    support_points, compute_support_points,
 				    q_points, compute_q_points,
-				    shape_values_transform, shape_gradients_transform,
-				    boundary);
+				    shape_values_transform, shape_gradients_transform);
 };
 
 
@@ -200,7 +195,6 @@ FELinearMapping<2>::shape_grad_transform (const unsigned int i,
 
 template <>
 void FELinearMapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
-					     const Boundary<2>         &,
 					     const vector<Point<1> > &unit_points,
 					     vector<double> &face_jacobians) const {
 				   // more or less copied from the linear
@@ -247,7 +241,6 @@ void FELinearMapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterat
 template <>
 void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 					     const unsigned int       face_no,
-					     const Boundary<2>       &,
 					     const vector<Point<1> > &unit_points,
 					     vector<Point<2> > &normal_vectors) const {
 				   // more or less copied from the linear
@@ -397,7 +390,6 @@ FELinearMapping<3>::shape_grad_transform (const unsigned int i,
 
 template <>
 void FELinearMapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &face,
-					     const Boundary<3>         &,
 					     const vector<Point<2> > &unit_points,
 					     vector<double> &face_jacobians) const {
   Assert (unit_points.size() == face_jacobians.size(),
@@ -482,7 +474,6 @@ void FELinearMapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterat
 template <>
 void FELinearMapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cell,
 					     const unsigned int       face_no,
-					     const Boundary<3>       &,
 					     const vector<Point<2> > &unit_points,
 					     vector<Point<3> > &normal_vectors) const {
   Assert (unit_points.size() == normal_vectors.size(),
@@ -566,8 +557,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 					   vector<Point<dim> > &q_points,
 					   const bool           compute_q_points,
 					   const FullMatrix<double>      &shape_values_transform,
-					   const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/,
-					   const Boundary<dim> &boundary) const
+					   const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/) const
 {
   Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -726,7 +716,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
     compute_jacobian_gradients (cell, unit_points, jacobians_grad);
     
   if (compute_support_points)
-    get_support_points (cell, boundary, support_points);
+    get_support_points (cell, support_points);
 };
 
 

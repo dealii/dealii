@@ -142,9 +142,7 @@ struct AssemblerData {
 		   SparseMatrix<double>     &matrix,
 		   Vector<double>           &rhs_vector,
 		   const Quadrature<dim>    &quadrature,
-		   const FiniteElement<dim> &fe,
-		   const UpdateFlags        &update_flags,
-		   const Boundary<dim>      &boundary);
+		   const UpdateFlags        &update_flags);
     
 				     /**
 				      * Pointer to the dof handler object
@@ -183,28 +181,11 @@ struct AssemblerData {
     const Quadrature<dim>  &quadrature;
     
 				     /**
-				      * Use this FE type for the assemblage
-				      * process. The FE object must match that
-				      * used to construct the #DoFHandler#
-				      * object.
-				      */
-    const FiniteElement<dim> &fe;
-    
-				     /**
 				      * Store which of the fields of the
 				      * FEValues object need to be reinitialized
 				      * on each cell.
 				      */
     const UpdateFlags       update_flags;
-
-				     /**
-				      * Store a pointer to the object describing
-				      * the boundary of the domain. This is
-				      * necessary, since we may want to use
-				      * curved faces of cells at the boundary
-				      * when using higher order elements.
-				      */
-    const Boundary<dim>     &boundary;
 };
 
 
@@ -305,35 +286,10 @@ class Assembler : public DoFCellAccessor<dim> {
     Vector<double>          &rhs_vector;
 
 				     /**
-				      * Pointer to the finite element used for
-				      * the assemblage process. We store a
-				      * pointer to the finite element, not a
-				      * copy, but this is not a problem, since
-				      * #Assembler# objects are usually created
-				      * and deleted by the
-				      * #ProblemBase::assemble# routine, which
-				      * itself gets passed the finite element;
-				      * the lifetime of the #Assembler# object
-				      * is thus less than the lifetime of the
-				      * finite element object and storing
-				      * a pointer is not risky.
-				      */
-    const FiniteElement<dim> &fe;
-
-				     /**
 				      * The finite element evaluated at the
 				      * quadrature points.
 				      */
     FEValues<dim>     fe_values;
-
-				     /**
-				      * Store a pointer to the object describing
-				      * the boundary of the domain. This is
-				      * necessary, since we may want to use
-				      * curved faces of cells at the boundary
-				      * when using higher order elements.
-				      */
-    const Boundary<dim> &boundary;
 };
 
     

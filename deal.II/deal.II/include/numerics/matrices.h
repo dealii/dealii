@@ -117,6 +117,8 @@
  * pattern, which can be created using the
  * #DoFHandler<>::make_boundary_sparsity_pattern# function.
  *
+ * The object describing the exact form of the boundary is obtained from the
+ * triangulation object.
  *
  * \subsection{Right hand sides}
  *
@@ -183,7 +185,6 @@ class MatrixCreator {
 				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
-				    const Boundary<dim>      &boundary,
 				    SparseMatrix<double>     &matrix,
 				    const Function<dim>      *a = 0);
 
@@ -206,7 +207,6 @@ class MatrixCreator {
 				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
-				    const Boundary<dim>      &boundary,
 				    SparseMatrix<double>     &matrix,
 				    const Function<dim>      &rhs,
 				    Vector<double>           &rhs_vector,
@@ -232,7 +232,6 @@ class MatrixCreator {
 				      * for more information.
 				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
-				    const Boundary<dim>      &boundary,
 				    SparseMatrix<double>     &matrix);
     
 				     /**
@@ -252,7 +251,6 @@ class MatrixCreator {
 				      */
     static void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Quadrature<dim-1>  &q,
-					     const Boundary<dim>      &boundary,
 					     SparseMatrix<double>     &matrix,
 					     const FunctionMap        &rhs,
 					     Vector<double>           &rhs_vector,
@@ -269,7 +267,6 @@ class MatrixCreator {
 				      */
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
-				       const Boundary<dim>      &boundary,
 				       SparseMatrix<double>     &matrix,
 				       const Function<dim>      *a = 0);
 
@@ -284,7 +281,6 @@ class MatrixCreator {
 				      */
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
-				       const Boundary<dim>      &boundary,
 				       SparseMatrix<double>     &matrix,
 				       const Function<dim>      &rhs,
 				       Vector<double>           &rhs_vector,

@@ -127,16 +127,14 @@ void FELinear<1>::get_unit_support_points (vector<Point<1> >  &support_points) c
 
 template <>
 void FELinear<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
-				     const Boundary<1>  &boundary,
-				     vector<Point<1> >  &support_points) const {
-  FiniteElement<1>::get_support_points (cell, boundary, support_points);
+				      vector<Point<1> >  &support_points) const {
+  FiniteElement<1>::get_support_points (cell, support_points);
 };
 
 
 
 template <>
 void FELinear<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
-					  const Boundary<1>  &,
 					  vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
@@ -145,7 +143,6 @@ void FELinear<1>::get_face_support_points (const typename DoFHandler<1>::face_it
 
 template <>
 void FELinear<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
-					 const Boundary<1> &,
 					 FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -313,7 +310,6 @@ FELinear<2>::shape_grad_grad (const unsigned int i,
 
 template <>
 void FELinear<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
-					 const Boundary<2> &,
 					 FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -849,7 +845,6 @@ FELinear<3>::shape_grad_grad (const unsigned int i,
 
 template <>
 void FELinear<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
-					 const Boundary<3> &,
 					 FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -884,7 +879,6 @@ void FELinear<3>::get_unit_support_points (vector<Point<3> > &unit_points) const
 template <int dim>
 void
 FELinear<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-				   const Boundary<dim>  &,
 				   vector<Point<dim> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
@@ -898,7 +892,6 @@ FELinear<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator
 template <int dim>
 void
 FELinear<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
-					const Boundary<dim>  &,
 					vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == dofs_per_face) &&
 	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),

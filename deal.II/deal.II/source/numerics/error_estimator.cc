@@ -30,8 +30,6 @@ inline static double sqr (const double x) {
 template <>
 void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
 					     const Quadrature<0> &,
-					     const FiniteElement<1> &,
-					     const Boundary<1> &,
 					     const FunctionMap &,
 					     const Vector<double> &,
 					     Vector<float> &,
@@ -45,8 +43,6 @@ void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
 template <int dim>
 void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					       const Quadrature<dim-1>  &quadrature,
-					       const FiniteElement<dim> &fe,
-					       const Boundary<dim>      &boundary,
 					       const FunctionMap        &neumann_bc,
 					       const Vector<double>     &solution,
 					       Vector<float>            &error,
@@ -81,15 +77,18 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 				   // need not compute all values on the
 				   // neighbor cells, so using two objects
 				   // gives us a performance gain).
-  FEFaceValues<dim> fe_face_values_cell (fe, quadrature,
+  FEFaceValues<dim> fe_face_values_cell (dof.get_fe(), quadrature,
 					 UpdateFlags(update_gradients      |
 						     update_JxW_values     |
 						     ((!neumann_bc.empty() ||
 						       (coefficient != 0))  ?
 						      update_q_points : 0) |
-						     update_normal_vectors)); 
-  FEFaceValues<dim> fe_face_values_neighbor (fe, quadrature, update_gradients);
-  FESubfaceValues<dim> fe_subface_values (fe, quadrature, update_gradients);
+						     update_normal_vectors),
+					 dof.get_tria().get_boundary()); 
+  FEFaceValues<dim> fe_face_values_neighbor (dof.get_fe(), quadrature, update_gradients,
+					     dof.get_tria().get_boundary());
+  FESubfaceValues<dim> fe_subface_values (dof.get_fe(), quadrature, update_gradients,
+					  dof.get_tria().get_boundary());
   
 				   // loop over all cells
   const active_cell_iterator endc = dof.end();
@@ -137,8 +136,7 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					   // is the same as that of this side,
 					   // then handle the integration of
 					   // these both cases together
-	  integrate_over_regular_face (cell, face_no, fe,
-				       boundary, neumann_bc,
+	  integrate_over_regular_face (cell, face_no, neumann_bc,
 				       n_q_points,
 				       fe_face_values_cell,
 				       fe_face_values_neighbor,
@@ -150,7 +148,7 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					   // special computations which do
 					   // not fit into the framework of
 					   // the above function
-	  integrate_over_irregular_face (cell, face_no, fe, boundary,
+	  integrate_over_irregular_face (cell, face_no,
 					 n_q_points,
 					 fe_face_values_cell,
 					 fe_subface_values,
@@ -190,8 +188,6 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 template <>
 void KellyErrorEstimator<1>::integrate_over_regular_face (const active_cell_iterator &,
 							  const unsigned int      ,
-							  const FiniteElement<1> &,
-							  const Boundary<1>      &,
 							  const FunctionMap      &,
 							  const unsigned int      ,
 							  FEFaceValues<1>        &,
@@ -208,8 +204,6 @@ template <>
 void KellyErrorEstimator<1>::
 integrate_over_irregular_face (const active_cell_iterator &,
 			       const unsigned int          ,
-			       const FiniteElement<1>     &,
-			       const Boundary<1>          &,
 			       const unsigned int          ,
 			       FEFaceValues<1>            &,
 			       FESubfaceValues<1>         &,
@@ -227,8 +221,6 @@ template <int dim>
 void KellyErrorEstimator<dim>::
 integrate_over_regular_face (const active_cell_iterator &cell,
 			     const unsigned int          face_no,
-			     const FiniteElement<dim>   &,
-			     const Boundary<dim>        &boundary,
 			     const FunctionMap          &neumann_bc,
 			     const unsigned int          n_q_points,
 			     FEFaceValues<dim>          &fe_face_values_cell,
@@ -240,7 +232,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
   
 				   // initialize data of the restriction
 				   // of this cell to the present face
-  fe_face_values_cell.reinit (cell, face_no, boundary);
+  fe_face_values_cell.reinit (cell, face_no);
   
 				   // set up a vector of the gradients
 				   // of the finite element function
@@ -278,7 +270,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 				       // get restriction of finite element
 				       // function of #neighbor# to the
 				       // common face.
-      fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor, boundary);
+      fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);
 
 				       // get a list of the gradients of
 				       // the finite element solution
@@ -382,8 +374,6 @@ template <int dim>
 void KellyErrorEstimator<dim>::
 integrate_over_irregular_face (const active_cell_iterator &cell,
 			       const unsigned int          face_no,
-			       const FiniteElement<dim>   &,
-			       const Boundary<dim>        &boundary,
 			       const unsigned int          n_q_points,
 			       FEFaceValues<dim>          &fe_face_values,
 			       FESubfaceValues<dim>       &fe_subface_values,
@@ -431,14 +421,14 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 				       // present cell to the subface and
 				       // store the gradient of the solution
 				       // in psi
-      fe_subface_values.reinit (cell, face_no, subface_no, boundary);
+      fe_subface_values.reinit (cell, face_no, subface_no);
       fe_subface_values.get_function_grads (solution, psi);
 
 				       // restrict the finite element on the
 				       // neighbor cell to the common #subface#.
 				       // store the gradient in #neighbor_psi#
       vector<Tensor<1,dim> > neighbor_psi (n_q_points);
-      fe_face_values.reinit (neighbor_child, neighbor_neighbor, boundary);
+      fe_face_values.reinit (neighbor_child, neighbor_neighbor);
       fe_face_values.get_function_grads (solution, neighbor_psi);
       
 				       // compute the jump in the gradients

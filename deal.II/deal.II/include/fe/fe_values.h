@@ -10,6 +10,7 @@
 #include <base/subscriptor.h>
 #include <lac/fullmatrix.h>
 #include <grid/dof.h>
+#include <grid/tria_boundary.h>
 #include <base/point.h>
 #include <grid/tria.h>
 #include <fe/fe_update_flags.h>
@@ -248,7 +249,8 @@ class FEValuesBase {
 		  const unsigned int n_transform_functions,
 		  const unsigned int n_values_array,
 		  const UpdateFlags         update_flags,
-		  const FiniteElement<dim> &fe);
+		  const FiniteElement<dim> &fe,
+		  const Boundary<dim>      &boundary);
     
 
 				     /**
@@ -691,7 +693,12 @@ class FEValuesBase {
 				     /**
 				      * Store the finite element for later use.
 				      */
-    SmartPointer<const FiniteElement<dim> > fe;
+    const SmartPointer<const FiniteElement<dim> > fe;
+
+				     /**
+				      * Store the boundary for later use.
+				      */
+    const SmartPointer<const Boundary<dim> > boundary;
 };
 
 
@@ -735,15 +742,6 @@ class FEValues : public FEValuesBase<dim> {
 				      * gradients, true quadrature points, etc.)
 				      * need to be initialized using the
 				      * #reinit# function.
-				      */
-    FEValues (const FiniteElement<dim> &,
-	      const Quadrature<dim> &,
-	      const UpdateFlags);
-    
-				     /**
-				      * Reinitialize the gradients, Jacobi
-				      * determinants, etc for the given cell
-				      * and the given finite element.
 				      *
 				      * This function needs a boundary object
 				      * passed, since this class needs to know
@@ -758,8 +756,17 @@ class FEValues : public FEValuesBase<dim> {
 				      * segments, but higher order elements
 				      * may use other ways.)
 				      */
-    void reinit (const typename DoFHandler<dim>::cell_iterator &,
-		 const Boundary<dim> &);
+    FEValues (const FiniteElement<dim> &fe,
+	      const Quadrature<dim>    &quadrature,
+	      const UpdateFlags         update_flags,
+	      const Boundary<dim>      &boundary);
+    
+				     /**
+				      * Reinitialize the gradients, Jacobi
+				      * determinants, etc for the given cell
+				      * and the given finite element.
+				      */
+    void reinit (const typename DoFHandler<dim>::cell_iterator &);
 
   private:
 				     /**
@@ -897,7 +904,8 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
 		      const unsigned int n_transform_functions,
 		      const unsigned int n_faces_or_subfaces,
 		      const UpdateFlags         update_flags,
-		      const FiniteElement<dim> &fe);
+		      const FiniteElement<dim> &fe,
+		      const Boundary<dim>      &boundary);
 
     				     /**
 				      * Return the outward normal vector to
@@ -1025,18 +1033,8 @@ class FEFaceValues : public FEFaceValuesBase<dim> {
 				      * gradients, true quadrature points, etc.)
 				      * need to be initialized using the
 				      * #reinit# function.
-				      */
-    FEFaceValues (const FiniteElement<dim> &,
-		  const Quadrature<dim-1> &,
-		  const UpdateFlags);
-
-				     /**
-				      * Reinitialize the gradients, Jacobi
-				      * determinants, etc for the face with
-				      * number #face_no# of #cell#
-				      * and the given finite element.
 				      *
-				      * The constructor needs a boundary object
+				      * This function needs a boundary object
 				      * passed, since this class needs to know
 				      * how to handle faces which are located
 				      * on the boundary of the domain. In that
@@ -1049,9 +1047,19 @@ class FEFaceValues : public FEFaceValuesBase<dim> {
 				      * segments, but higher order elements
 				      * may use other ways.)
 				      */
+    FEFaceValues (const FiniteElement<dim> &,
+		  const Quadrature<dim-1> &,
+		  const UpdateFlags,
+		  const Boundary<dim> &);
+
+				     /**
+				      * Reinitialize the gradients, Jacobi
+				      * determinants, etc for the face with
+				      * number #face_no# of #cell#
+				      * and the given finite element.
+				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
-		 const unsigned int                    face_no,
-		 const Boundary<dim>                  &boundary);
+		 const unsigned int                    face_no);
 };
 
 
@@ -1176,33 +1184,20 @@ class FESubfaceValues : public FEFaceValuesBase<dim> {
 				      * need to be initialized using the
 				      * #reinit# function.
 				      */
-    FESubfaceValues (const FiniteElement<dim> &,
-		     const Quadrature<dim-1> &,
-		     const UpdateFlags);
+    FESubfaceValues (const FiniteElement<dim> &fe,
+		     const Quadrature<dim-1>  &face_quadrature,
+		     const UpdateFlags         update_flags,
+		     const Boundary<dim>      &boundary);
 
 				     /**
 				      * Reinitialize the gradients, Jacobi
 				      * determinants, etc for the face with
 				      * number #face_no# of #cell#
 				      * and the given finite element.
-				      *
-				      * The constructor needs a boundary object
-				      * passed, since this class needs to know
-				      * how to handle faces which are located
-				      * on the boundary of the domain. In that
-				      * case, faces may be curved and the
-				      * calculation of quadrature points,
-				      * gradients and the like may need
-				      * additional effort, depending on the
-				      * mapping from the unit to the real cell
-				      * (linear mappings use straight boundary
-				      * segments, but higher order elements
-				      * may use other ways.)
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
-		 const unsigned int                    subface_no,
-		 const Boundary<dim>                  &boundary);
+		 const unsigned int                    subface_no);
 
 				     /**
 				      * Exception

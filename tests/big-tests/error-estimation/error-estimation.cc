@@ -466,7 +466,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   
       ProblemBase<dim>::FunctionMap dirichlet_bc;
       dirichlet_bc[0] = solution_function;
-      assemble (*equation, quadrature, fe, update_flags, dirichlet_bc);
+      assemble (*equation, quadrature, update_flags, dirichlet_bc);
 
 				       // if we have an old solution lying
 				       // around, use it to preset the solution
@@ -524,7 +524,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       cout << "    Estimating H1 error... ";
       KellyErrorEstimator<dim> ee;
       QSimpson<dim-1> eq;
-      ee.estimate_error (*dof, eq, fe, *boundary,
+      ee.estimate_error (*dof, eq,
 			 KellyErrorEstimator<dim>::FunctionMap(),
 			 solution,
 			 estimated_error_per_cell,

@@ -29,7 +29,6 @@ FEDGQuarticSub<dim>::FEDGQuarticSub():
 template <int dim>
 void
 FEDGLinear<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-					  const Boundary<dim>  &,
 					  vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
@@ -48,7 +47,6 @@ FEDGLinear<dim>::restrict (const unsigned int child) const {
 template <int dim>
 void
 FEDGQuadraticSub<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-						const Boundary<dim>  &,
 						vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
@@ -67,7 +65,6 @@ FEDGQuadraticSub<dim>::restrict (const unsigned int child) const {
 template <int dim>
 void
 FEDGCubicSub<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-					    const Boundary<dim>  &,
 					    vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
@@ -87,7 +84,6 @@ FEDGCubicSub<dim>::restrict (const unsigned int child) const {
 template <int dim>
 void
 FEDGQuarticSub<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-					      const Boundary<dim>  &,
 					      vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));

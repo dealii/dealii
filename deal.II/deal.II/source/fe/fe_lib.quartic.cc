@@ -149,17 +149,15 @@ void FEQuarticSub<1>::get_unit_support_points (vector<Point<1> > &unit_points) c
 
 template <>
 void FEQuarticSub<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
-					 const Boundary<1>  &boundary,
-					 vector<Point<1> >  &support_points) const {
-  FiniteElement<1>::get_support_points (cell, boundary, support_points);
+					  vector<Point<1> >  &support_points) const {
+  FiniteElement<1>::get_support_points (cell, support_points);
 };
 
 
 
 template <>
 void FEQuarticSub<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
-					      const Boundary<1>  &,
-					      vector<Point<1> >  &) const {
+					       vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -167,7 +165,6 @@ void FEQuarticSub<1>::get_face_support_points (const typename DoFHandler<1>::fac
 
 template <>
 void FEQuarticSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
-					     const Boundary<1> &,
 					     FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -1340,7 +1337,6 @@ FEQuarticSub<2>::shape_grad_grad (const unsigned int i,
 
 template <>
 void FEQuarticSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
-					     const Boundary<2> &,
 					     FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -2641,8 +2637,7 @@ void FEQuarticSub<2>::get_unit_support_points (vector<Point<2> > &unit_points) c
 
 template <>
 void FEQuarticSub<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
-					 const Boundary<2>&,
-					 vector<Point<2> >  &support_points) const {
+					  vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
 
@@ -2751,8 +2746,7 @@ void FEQuarticSub<2>::get_support_points (const typename DoFHandler<2>::cell_ite
 
 template <>
 void FEQuarticSub<2>::get_face_support_points (const typename DoFHandler<2>::face_iterator &face,
-					      const Boundary<2>  &,
-					      vector<Point<2> >  &support_points) const {
+					       vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
 

@@ -34,10 +34,9 @@ int main () {
   DoFHandler<2> dof(&tria);
   dof.distribute_dofs(fe);
 
-  StraightBoundary<2> b;
   QTrapez<2> q;
-  FEValues<2> fevalues(fe,q,update_gradients);
-  fevalues.reinit (dof.begin_active(),b);
+  FEValues<2> fevalues(fe,q,update_gradients,tria.get_boundary());
+  fevalues.reinit (dof.begin_active());
   
   
   Vector<double> val(4);

@@ -22,11 +22,8 @@
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Quadrature<dim>    &q,
-					     const Boundary<dim>      &boundary,
 					     SparseMatrix<double>     &matrix,
 					     const Function<dim> * const a) {
-  const FiniteElement<dim> &fe = dof.get_fe();
-
   Vector<double> dummy;    // no entries, should give an error if accessed
   UpdateFlags update_flags = update_JxW_values;
   if (a != 0)
@@ -34,7 +31,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
   const AssemblerData<dim> data (dof,
 				 true, false,  // assemble matrix but not rhs
 				 matrix, dummy,
-				 q, fe, update_flags, boundary);
+				 q, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
@@ -54,19 +51,16 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Quadrature<dim>    &q,
-					     const Boundary<dim>      &boundary,
 					     SparseMatrix<double>     &matrix,
 					     const Function<dim>      &rhs,
 					     Vector<double>           &rhs_vector,
 					     const Function<dim> * const a) {
-  const FiniteElement<dim> &fe = dof.get_fe();
-
   UpdateFlags update_flags = UpdateFlags(update_q_points |
 					 update_JxW_values);
   const AssemblerData<dim> data (dof,
 				 true, true,
 				 matrix, rhs_vector,
-				 q, fe,	 update_flags, boundary);
+				 q, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
@@ -84,7 +78,6 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
-					     const Boundary<dim>      &boundary,
 					     SparseMatrix<double>     &matrix) {
   const FiniteElement<dim> &fe = dof.get_fe();
 
@@ -98,7 +91,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
   for (; cell!=endc; ++cell) 
     {
       cell->get_dof_indices (dofs_on_this_cell);
-      fe.get_local_mass_matrix (cell, boundary, local_mass_matrix);
+      fe.get_local_mass_matrix (cell, local_mass_matrix);
       
       for (unsigned int i=0; i<total_dofs; ++i)
 	for (unsigned int j=0; j<total_dofs; ++j)
@@ -114,7 +107,6 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 template <>
 void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 						    const Quadrature<0>    &,
-						    const Boundary<1>      &,
 						    SparseMatrix<double>   &,
 						    const FunctionMap      &,
 						    Vector<double>         &,
@@ -130,7 +122,6 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 template <int dim>
 void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
 						      const Quadrature<dim-1>  &q,
-						      const Boundary<dim>      &boundary,
 						      SparseMatrix<double>     &matrix,
 						      const FunctionMap        &rhs,
 						      Vector<double>           &rhs_vector,
@@ -155,7 +146,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   
   
   UpdateFlags update_flags = UpdateFlags (update_JxW_values | update_q_points);
-  FEFaceValues<dim> fe_values (fe, q, update_flags);
+  FEFaceValues<dim> fe_values (fe, q, update_flags, dof.get_tria().get_boundary());
   
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active (),
 					endc = dof.end ();
@@ -168,7 +159,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 	  cell_matrix.clear ();
 	  cell_vector.clear ();
 	  
-	  fe_values.reinit (cell, face, boundary);
+	  fe_values.reinit (cell, face);
 
 	  const FullMatrix<double> &values    = fe_values.get_shape_values ();
 	  const vector<double>     &weights   = fe_values.get_JxW_values ();
@@ -325,11 +316,8 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
-						const Boundary<dim>      &boundary,
 						SparseMatrix<double>     &matrix,
 						const Function<dim> * const a) {
-  const FiniteElement<dim> &fe = dof.get_fe();
-
   Vector<double> dummy;   // no entries, should give an error if accessed
   UpdateFlags update_flags = UpdateFlags(update_gradients |
 					 update_JxW_values);
@@ -338,7 +326,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
   const AssemblerData<dim> data (dof,
 				 true, false,  // assemble matrix but not rhs
 				 matrix, dummy,
-				 q, fe,	 update_flags, boundary);
+				 q, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
@@ -357,22 +345,17 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
-						const Boundary<dim>      &boundary,
 						SparseMatrix<double>     &matrix,
 						const Function<dim>      &rhs,
 						Vector<double>           &rhs_vector,
 						const Function<dim> * const a) {
-  const FiniteElement<dim> &fe = dof.get_fe();
-
   UpdateFlags update_flags = UpdateFlags(update_q_points  |
 					 update_gradients |
 					 update_JxW_values);
   const AssemblerData<dim> data (dof,
 				 true, true,
 				 matrix, rhs_vector,
-				 q, fe,
-				 update_flags,
-				 boundary);
+				 q, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),

@@ -65,7 +65,6 @@ class FELinearMapping : public FiniteElement<dim> {
 				      * simply returns the length of the face.
 				      */
     virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<double>      &face_jacobi_determinants) const;
 
@@ -98,7 +97,6 @@ class FELinearMapping : public FiniteElement<dim> {
 				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
-				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;
 
@@ -131,10 +129,7 @@ class FELinearMapping : public FiniteElement<dim> {
 				      * function simply passes through to
 				      * the one implemented in the base class.
 				      * For higher dimensional finite elements
-				      * we use linear mappings and therefore
-				      * the boundary object is ignored since
-				      * the boundary is approximated using
-				      * piecewise multilinear boundary segments.
+				      * we use multilinear mappings.
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >            &unit_points,
@@ -147,8 +142,7 @@ class FELinearMapping : public FiniteElement<dim> {
 				 vector<Point<dim> >    &q_points,
 				 const bool              compute_q_points,
 				 const FullMatrix<double>         &shape_values_transform,
-				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
-				 const Boundary<dim> &boundary) const;
+				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const;
 
 				     /**
 				      * Compute the jacobian matrices

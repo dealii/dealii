@@ -44,7 +44,6 @@ inline double sqr_point (const Tensor<1,dim> &p) {
 
 template <int dim>
 void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
-				    const Boundary<dim>      &boundary,
 				    const Function<dim>      &function,
 				    Vector<double>           &vec)
 {
@@ -60,7 +59,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 				       // for each cell:
 				       // get location of finite element
 				       // off-points
-      fe.get_support_points (cell, boundary, support_points);
+      fe.get_support_points (cell, support_points);
 				       // get function values at these points
       function.value_list (support_points, dof_values_on_cell);
 				       // get indices of the dofs on this cell
@@ -100,7 +99,6 @@ VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
 template <>
 void VectorTools<1>::project (const DoFHandler<1>    &,
 			      const ConstraintMatrix &,
-			      const Boundary<1>      &,
 			      const Quadrature<1>    &,
 			      const Function<1>      &,
 			      Vector<double>         &,
@@ -124,7 +122,6 @@ void VectorTools<1>::project (const DoFHandler<1>    &,
 template <int dim>
 void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				const ConstraintMatrix   &constraints,
-				const Boundary<dim>      &boundary,
 				const Quadrature<dim>    &q,
 				const Function<dim>      &function,
 				Vector<double>           &vec,
@@ -167,7 +164,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 	for (unsigned char c=0; c<255; ++c)
 	  boundary_functions[c] = &function;
 	project_boundary_values (dof, boundary_functions, q_boundary,
-				 boundary, boundary_values);
+				 boundary_values);
       };
 
   
@@ -182,9 +179,8 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   
   SparseMatrix<double> mass_matrix (sparsity);
   Vector<double> tmp (mass_matrix.n());
-  MatrixCreator<dim>::create_mass_matrix (dof, boundary, mass_matrix);
-  VectorTools<dim>::create_right_hand_side (dof, q, boundary,
-					    function, tmp);
+  MatrixCreator<dim>::create_mass_matrix (dof, mass_matrix);
+  VectorTools<dim>::create_right_hand_side (dof, q, function, tmp);
 
   constraints.condense (mass_matrix);
   constraints.condense (tmp);
@@ -207,18 +203,15 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 template <int dim>
 void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 					       const Quadrature<dim>    &q,
-					       const Boundary<dim>      &boundary,
 					       const Function<dim>      &rhs,
 					       Vector<double>           &rhs_vector) {
-  const FiniteElement<dim> &fe = dof.get_fe();
-  
   UpdateFlags update_flags = UpdateFlags(update_q_points |
 					 update_JxW_values);
   SparseMatrix<double> dummy;
   const AssemblerData<dim> data (dof,
 				 false, true,
 				 dummy, rhs_vector,
-				 q, fe,	 update_flags, boundary);
+				 q, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
@@ -240,7 +233,6 @@ template <>
 void
 VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
 					     const FunctionMap &,
-					     const Boundary<1> &,
 					     map<int,double>   &)
 {
   Assert (false, ExcNotImplemented());
@@ -249,7 +241,6 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
 template <>
 void VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
 						  const VectorFunctionMap&,
-						  const Boundary<1>&,
 						  map<int,double>&)
 {
   Assert (false, ExcNotImplemented());
@@ -263,7 +254,6 @@ template <int dim>
 void
 VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					       const FunctionMap     &dirichlet_bc,
-					       const Boundary<dim>      &boundary,
 					       map<int,double>   &boundary_values) {
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
 	  ExcInvalidBoundaryIndicator());
@@ -293,7 +283,7 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					 // boundary values of dofs on this
 					 // face
 	face->get_dof_indices (face_dofs);
-	fe.get_face_support_points (face, boundary, dof_locations);
+	fe.get_face_support_points (face, dof_locations);
 	function_ptr->second->value_list (dof_locations, dof_values);
 
 					 // enter into list
@@ -306,7 +296,6 @@ template <int dim>
 void
 VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					       const VectorFunctionMap     &dirichlet_bc,
-					       const Boundary<dim>      &boundary,
 					       map<int,double>   &boundary_values)
 {
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
@@ -337,7 +326,7 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					 // boundary values of dofs on this
 					 // face
 	face->get_dof_indices (face_dofs);
-	fe.get_face_support_points (face, boundary, dof_locations);
+	fe.get_face_support_points (face, dof_locations);
 	function_ptr->second->value_list (dof_locations, dof_values);
 
 					 // enter into list
@@ -359,7 +348,6 @@ void
 VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 					   const FunctionMap        &boundary_functions,
 					   const Quadrature<dim-1>  &q,
-					   const Boundary<dim>      &boundary,
 					   map<int,double>   &boundary_values) {
   vector<int>    dof_to_boundary_mapping;
   dof.map_dof_to_boundary_indices (boundary_functions, dof_to_boundary_mapping);
@@ -395,7 +383,7 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   Vector<double>       rhs(sparsity.n_rows());
   
 
-  MatrixTools<dim>::create_boundary_mass_matrix (dof, q, boundary,
+  MatrixTools<dim>::create_boundary_mass_matrix (dof, q, 
 						 mass_matrix, boundary_functions,
 						 rhs, dof_to_boundary_mapping);
 
@@ -435,8 +423,7 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     const Function<dim>      &exact_solution,
 					     Vector<float>            &difference,
 					     const Quadrature<dim>    &q,
-					     const NormType           &norm,
-					     const Boundary<dim>      &boundary) {
+					     const NormType           &norm) {
   const FiniteElement<dim> &fe = dof.get_fe();
     
   difference.reinit (dof.get_tria().n_active_cells());
@@ -445,7 +432,7 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					  update_JxW_values);
   if ((norm==H1_seminorm) || (norm==H1_norm))
     update_flags = UpdateFlags (update_flags | update_gradients);
-  FEValues<dim> fe_values(fe, q, update_flags);
+  FEValues<dim> fe_values(fe, q, update_flags, dof.get_tria().get_boundary());
   
 				   // loop over all cells
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
@@ -454,7 +441,7 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
     {
       double diff=0;
 				       // initialize for this cell
-      fe_values.reinit (cell, boundary);
+      fe_values.reinit (cell);
 
       switch (norm) 
 	{
@@ -620,35 +607,33 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void
-VectorTools<dim>::integrate_difference (const DoFHandler<dim>   &dof,
+VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					const Vector<double>     &fe_function,
 					const VectorFunction<dim>&exact_solution,
 					Vector<float>            &difference,
 					const Quadrature<dim>    &q,
-					const FiniteElement<dim> &fe,
-					const NormType           &norm,
-					const Boundary<dim>      &boundary)
+					const NormType           &norm)
 {
-   Assert (fe == dof.get_fe(), ExcInvalidFE());
+  const FiniteElement<dim> &fe = dof.get_fe();
   
-   difference.reinit (dof.get_tria().n_active_cells());
+  difference.reinit (dof.get_tria().n_active_cells());
   
-   UpdateFlags update_flags = UpdateFlags (update_q_points  |
+  UpdateFlags update_flags = UpdateFlags (update_q_points  |
  					  update_JxW_values);
-   if ((norm==H1_seminorm) || (norm==H1_norm))
-     update_flags = UpdateFlags (update_flags | update_gradients);
-   FEValues<dim> fe_values(fe, q, update_flags);
+  if ((norm==H1_seminorm) || (norm==H1_norm))
+    update_flags = UpdateFlags (update_flags | update_gradients);
+  FEValues<dim> fe_values(fe, q, update_flags, dof.get_tria().get_boundary());
   
  				   // loop over all cells
-   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
  					endc = dof.end();
-   for (unsigned int index=0; cell != endc; ++cell, ++index)
-     {
-       double diff=0;
+  for (unsigned int index=0; cell != endc; ++cell, ++index)
+    {
+      double diff=0;
  				       // initialize for this cell
-       fe_values.reinit (cell, boundary);
-
-       switch (norm) 
+      fe_values.reinit (cell);
+      
+      switch (norm) 
  	{
  	  case mean:
  	  case L1_norm:
@@ -691,9 +676,9 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>   &dof,
  		fe_values.get_function_values (fe_function, function_values);
 
 /* 		transform (psi.begin(), psi.end(),
- 			   function_values.begin(),
- 			   psi.begin(),
- 			   minus<double>());
+		function_values.begin(),
+		psi.begin(),
+		minus<double>());
 */ 	      };	    
 
  					     // for L1_norm and Linfty_norm:
@@ -769,7 +754,7 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>   &dof,
  					     // in praxi: first compute
  					     // exact fe_function vector
 /* 	    exact_solution.gradient_list (fe_values.get_quadrature_points(),
- 					  psi);
+	    psi);
 */	    
  					     // then subtract finite element
  					     // fe_function
@@ -779,9 +764,9 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>   &dof,
  		fe_values.get_function_grads (fe_function, function_grads);
 
 /* 		transform (psi.begin(), psi.end(),
- 			   function_grads.begin(),
- 			   psi.begin(),
- 			   minus<Tensor<1,dim> >());
+		function_grads.begin(),
+		psi.begin(),
+		minus<Tensor<1,dim> >());
 */ 	      };
  					     // take square of integrand
  	    vector<double> psi_square (psi.size(), 0.0);
@@ -791,8 +776,8 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>   &dof,
  					     // add seminorm to L_2 norm or
  					     // to zero
 /* 	    diff += inner_product (psi_square.begin(), psi_square.end(),
- 				   fe_values.get_JxW_values().begin(),
- 				   0.0);
+	    fe_values.get_JxW_values().begin(),
+	    0.0);
  	    diff = sqrt(diff);
 */
  	    break;
@@ -805,9 +790,9 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>   &dof,
       
  				       // append result of this cell
  				       // to the end of the vector
-       difference(index) = diff;
-     };
- };
+      difference(index) = diff;
+    };
+};
 
 
 template VectorTools<deal_II_dimension>;
