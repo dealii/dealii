@@ -1,10 +1,11 @@
-/*----------------------------   io.h     ---------------------------*/
+/*----------------------------   data_io.h     ---------------------------*/
 /*      <Id:>                 */
 #ifndef __data_io_H
 #define __data_io_H
-/*----------------------------   io.h     ---------------------------*/
+/*----------------------------   data_io.h     ---------------------------*/
 
 #include <base/exceptions.h>
+#include <grid/geometry_info.h>
 #include <vector>
 #include <string>
 
@@ -25,7 +26,7 @@ class dVector;
  */
 template <int dim>
 struct CellData {
-    int           vertices[2<<dim];
+    int           vertices[GeometryInfo<dim>::vertices_per_cell];
     unsigned char material_id;
 };
 
@@ -533,7 +534,7 @@ class DataOut {
 		
 
 
-/*----------------------------   io.h     ---------------------------*/
+/*----------------------------   data_io.h     ---------------------------*/
 /* end of #ifndef __data_io_H */
 #endif
-/*----------------------------   io.h     ---------------------------*/
+/*----------------------------   data_io.h     ---------------------------*/
