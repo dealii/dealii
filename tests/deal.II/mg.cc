@@ -1,4 +1,5 @@
 // $Id$
+/* (c) Guido Kanschat, 1999 */
 
 // deal_II_libraries.g=-ldeal_II_2d.g
 // deal_II_libraries=-ldeal_II_2d
@@ -50,87 +51,95 @@ class MGSmootherLAC
     
 };
 
-main(int argc, const char** argv)
+main()
 {
-  unsigned int refine;
-  if (argc<=1)
-    {
-      cerr << "Usage:" << argv[0] << " <refinement>" << endl;
-      refine = 0;
-    }
-  else
-    refine = atoi(argv[1]);
-  
-
   Helmholtz equation;
   RHSFunction<2> rhs;
-  QGauss3<2> quadrature;
+  QGauss5<2> quadrature;
   
-  FELinear<2> fe;
-  Triangulation<2> tr;
-  MGDoFHandler<2> mgdof(&tr);
-  DoFHandler<2>& dof(mgdof);
-  
-  GridGenerator::hyper_cube(tr,-1.,1.);
-  tr.refine_global(refine);
-  dof.distribute_dofs(fe);
-
-  const unsigned int size = dof.n_dofs();
-  
-  SparseMatrixStruct structure(size, dof.max_couplings_between_dofs());
-  dof.make_sparsity_pattern(structure);
-  structure.compress();
-  
-  SparseMatrix<double> A(structure);
-  Vector<double> f(size);
-
-  equation.build_all(A,f,dof, quadrature, rhs);
-
-  Vector<double> u;
-  u.reinit(f);
-  PrimitiveVectorMemory<Vector<double> > mem;
-  SolverControl control(100, 1.e-15);
-  SolverCG<SparseMatrix<double>, Vector<double> >solver(control, mem);
-  
-  PreconditionIdentity<Vector<double> > precondition;
-  solver.solve(A,u,f,precondition);
-  
-  u = 0.;
-  vector<SparseMatrixStruct> mgstruct(tr.n_levels());
-  MGMatrix<SparseMatrix<float> > mgA(0,tr.n_levels()-1);
-  for (unsigned int i=0;i<tr.n_levels();++i)
+  FEQ1<2> fe1;
+  FEQ2<2> fe2;
+  FEQ3<2> fe3;
+  FEQ4<2> fe4;
+  for (unsigned int degree=1;degree<=4;degree++)
     {
-      mgstruct[i].reinit(mgdof.n_dofs(i), mgdof.n_dofs(i),
-			 mgdof.max_couplings_between_dofs());
-      mgdof.make_sparsity_pattern(i, mgstruct[i]);
-      mgstruct[i].compress();
+      Triangulation<2> tr;
+      MGDoFHandler<2> mgdof(&tr);
+      DoFHandler<2>& dof(mgdof);
+  
+      GridGenerator::hyper_cube(tr,-1.,1.);
+  
+      FiniteElement<2>* fe;
+      switch(degree)
+	{
+	  case 1: fe = &fe1; deallog.push("Q1"); break;
+	  case 2: fe = &fe2; deallog.push("Q2"); break;
+	  case 3: fe = &fe3; deallog.push("Q3"); break;
+	  case 4: fe = &fe4; deallog.push("Q4"); break;
+	}
+      
+      for (unsigned int step=0;step < 5; ++step)
+	{
+	  tr.refine_global(1);
+	  dof.distribute_dofs(*fe);
 
-      mgA[i].reinit(mgstruct[i]);
+	  const unsigned int size = dof.n_dofs();
+	  deallog << "DoFs " << size << endl;
+	  deallog << "Levels: " << tr.n_levels() << endl;
+	  
+	  SparseMatrixStruct structure(size, dof.max_couplings_between_dofs());
+	  dof.make_sparsity_pattern(structure);
+	  structure.compress();
+	  
+	  SparseMatrix<double> A(structure);
+	  Vector<double> f(size);
+	  
+	  equation.build_all(A,f,dof, quadrature, rhs);
+	  
+	  Vector<double> u;
+	  u.reinit(f);
+	  PrimitiveVectorMemory<Vector<double> > mem;
+	  SolverControl control(100, 1.e-12);
+	  SolverCG<SparseMatrix<double>, Vector<double> >solver(control, mem);
+	  
+	  PreconditionIdentity<Vector<double> > precondition;
+	  solver.solve(A,u,f,precondition);
+	  
+	  u = 0.;
+	  vector<SparseMatrixStruct> mgstruct(tr.n_levels());
+	  MGMatrix<SparseMatrix<float> > mgA(0,tr.n_levels()-1);
+	  for (unsigned int i=0;i<tr.n_levels();++i)
+	    {
+	      mgstruct[i].reinit(mgdof.n_dofs(i), mgdof.n_dofs(i),
+				 mgdof.max_couplings_between_dofs());
+	      mgdof.make_sparsity_pattern(i, mgstruct[i]);
+	      mgstruct[i].compress();
+	      
+	      mgA[i].reinit(mgstruct[i]);
+	    }
+	  equation.build_mgmatrix(mgA, mgdof, quadrature);
+	  
+	  SolverControl cgcontrol(10,0., false, false);
+	  PrimitiveVectorMemory<Vector<float> > cgmem;
+	  SolverCG<SparseMatrix<float>, Vector<float> > cgsolver(cgcontrol, cgmem);
+	  PreconditionIdentity<Vector<float> > cgprec;
+	  MGCoarseGridLACIteration<SolverCG<SparseMatrix<float>, Vector<float> >,
+	    SparseMatrix<float>, PreconditionIdentity<Vector<float> > >
+	    coarse(cgsolver, mgA[0], cgprec);
+	  
+	  MGSmootherLAC smoother(mgA);
+	  MGTransferPrebuilt transfer;
+	  transfer.build_matrices(mgdof);
+	  
+	  
+	  MG<2> multigrid(mgdof, mgA, transfer);
+	  PreconditionMG<MG<2>, Vector<double> >
+	    mgprecondition(multigrid, smoother, smoother, coarse);
+	  
+	  solver.solve(A, u, f, mgprecondition);
+	}
+      deallog.pop();
     }
-  equation.build_mgmatrix(mgA, mgdof, quadrature);
-  
-  SolverControl cgcontrol(10,0., false, false);
-  
-  PrimitiveVectorMemory<Vector<float> > cgmem;
-  SolverCG<SparseMatrix<float>, Vector<float> > cgsolver(cgcontrol, cgmem);
-  PreconditionIdentity<Vector<float> > cgprec;
-  MGCoarseGridLACIteration<SolverCG<SparseMatrix<float>, Vector<float> >,
-    SparseMatrix<float>, PreconditionIdentity<Vector<float> > >
-    coarse(cgsolver, mgA[0], cgprec);
-
-  MGSmootherLAC smoother(mgA);
-  MGTransferPrebuilt transfer;
-  transfer.build_matrices(mgdof);
-  
-  deallog << "Levels: " << tr.n_levels() << endl;
-  
-  MG<2> multigrid(mgdof, mgA, transfer);
-  PreconditionMG<MG<2>, Vector<double> >
-    mgprecondition(multigrid, smoother, smoother, coarse);
-  
-  solver.solve(A, u, f, mgprecondition);
-  
-  cerr << "OK" << endl;
 }
 
 template<int dim>
