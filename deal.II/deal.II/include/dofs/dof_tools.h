@@ -23,6 +23,7 @@ class SparsityPattern;
 template <typename number> class Vector;
 template <typename number> class FullMatrix;
 template <int dim> class Function;
+template <int dim> class Point;
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 class ConstraintMatrix;
