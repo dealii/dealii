@@ -33,7 +33,8 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		dofs_per_quad(dofs_per_quad),
 		dofs_per_hex(dofs_per_hex),
 		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex+
-			      GeometryInfo<dim>::faces_per_cell * dofs_per_quad),
+			      GeometryInfo<dim>::lines_per_face * dofs_per_line +
+			      dofs_per_quad),
 		first_line_index(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex),
 		first_quad_index(first_line_index+
 				 12*dofs_per_line),
@@ -59,7 +60,7 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		dofs_per_quad(dofs_per_quad),
 		dofs_per_hex(0),
 		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex+
-			      GeometryInfo<dim>::faces_per_cell * dofs_per_line),
+			      dofs_per_line),
 		first_line_index(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex),
 		first_quad_index(first_line_index+
 				 GeometryInfo<dim>::lines_per_cell * dofs_per_line),
@@ -83,7 +84,7 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(0),
 		dofs_per_hex(0),
-		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex),
+		dofs_per_face(dofs_per_vertex),
 		first_line_index(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex),
 		first_quad_index(first_line_index+
 				 GeometryInfo<dim>::lines_per_cell * dofs_per_line),
@@ -96,17 +97,6 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
   Assert(dim==1, ExcDimensionMismatch(1,dim));
 };
 
-
-
-// FiniteElementData<2>::FiniteElementData (const FiniteElementData<2> &fe_data) :
-// 		dofs_per_vertex(fe_data.dofs_per_vertex),
-// 		dofs_per_line(fe_data.dofs_per_line),
-// 		dofs_per_quad(fe_data.dofs_per_quad),
-// 		dofs_per_face(fe_data.dofs_per_face),
-// 		total_dofs (fe_data.total_dofs),
-// 		n_transform_functions (fe_data.n_transform_functions),
-// 		n_components(fe_data.n_components)
-// {};
 
 
 template<int dim>
