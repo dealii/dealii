@@ -4,7 +4,7 @@
 # Template for makefiles for the examples subdirectory. In principle,
 # everything should be done automatically if you set the target file
 # here correctly:
-target   = convergence
+target   = multigrid
 
 # All dependencies between files should be updated by the included
 # file Makefile.dep if necessary. Object files are compiled into

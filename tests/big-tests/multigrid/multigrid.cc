@@ -3,9 +3,9 @@
 
 
 #include <grid/tria.h>
-#include <grid/dof.h>
+#include <grid/mg_dof.h>
 #include <grid/tria_accessor.h>
-#include <grid/dof_accessor.h>
+#include <grid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
 #include <grid/dof_constraints.h>
@@ -14,7 +14,6 @@
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.criss_cross.h>
 #include <fe/quadrature_lib.h>
-#include <numerics/base.h>
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 
@@ -55,7 +54,7 @@ class PoissonEquation :  public Equation<dim> {
 
 
 template <int dim>
-class PoissonProblem : public ProblemBase<dim> {
+class PoissonProblem {
   public:
     PoissonProblem (unsigned int order);
 
@@ -66,7 +65,7 @@ class PoissonProblem : public ProblemBase<dim> {
     
   protected:
     Triangulation<dim> *tria;
-    DoFHandler<dim>    *dof;
+    MGDoFHandler<dim>  *dof;
     
     Function<dim>      *rhs;
     Function<dim>      *boundary_values;
@@ -231,7 +230,7 @@ void PoissonProblem<dim>::create_new () {
   clear ();
   
   tria = new Triangulation<dim>();
-  dof = new DoFHandler<dim> (tria);
+  dof = new MGDoFHandler<dim> (tria);
   set_tria_and_dof (tria, dof);
 };
 
