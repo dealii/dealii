@@ -68,7 +68,7 @@ template <int dim>
 void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof) 
 {
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
-  const unsigned int dofs_per_cell = mg_dof.get_fe().total_dofs;
+  const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
   
 				   // reset the size of the array of
 				   // matrices

@@ -37,8 +37,8 @@ Assembler<dim>::Assembler (Triangulation<dim>  *tria,
 			   const int            index,
 			   const AssemblerData *local_data) :
 		DoFCellAccessor<dim> (tria,level,index, &local_data->dof),
-		cell_matrix (dof_handler->get_fe().total_dofs),
-		cell_vector (Vector<double>(dof_handler->get_fe().total_dofs)),
+		cell_matrix (dof_handler->get_fe().dofs_per_cell),
+		cell_vector (Vector<double>(dof_handler->get_fe().dofs_per_cell)),
 		assemble_matrix (local_data->assemble_matrix),
 		assemble_rhs (local_data->assemble_rhs),
 		matrix(local_data->matrix),
@@ -61,7 +61,7 @@ template <int dim>
 void Assembler<dim>::assemble (const Equation<dim> &equation) {
 				   // re-init fe values for this cell
   fe_values.reinit (DoFHandler<dim>::cell_iterator (*this));
-  const unsigned int n_dofs = dof_handler->get_fe().total_dofs;
+  const unsigned int n_dofs = dof_handler->get_fe().dofs_per_cell;
 
   if (assemble_matrix)
     cell_matrix.clear ();

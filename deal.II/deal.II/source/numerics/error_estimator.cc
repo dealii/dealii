@@ -36,7 +36,7 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
 				       const vector<bool>   &component_mask_,
 				       const Function<1>    *coefficient)
 {
-  const unsigned int n_components = dof.get_fe().n_components;
+  const unsigned int n_components = dof.get_fe().n_components();
 
 				   // if no mask given: treat all components
   vector<bool> component_mask ((component_mask_.size() == 0)    ?
@@ -187,7 +187,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>    &dof,
 					 const vector<bool>       &component_mask_,
 					 const Function<dim>      *coefficient)
 {
-  const unsigned int n_components = dof.get_fe().n_components;
+  const unsigned int n_components = dof.get_fe().n_components();
 
   				   // if no mask given: treat all components
   vector<bool> component_mask ((component_mask_.size() == 0)    ?

@@ -181,7 +181,7 @@ void write_gnuplot (const MGDoFHandler<2>& dofs, const Vector<double>& v, unsign
   MGDoFHandler<2>::cell_iterator cell;
   MGDoFHandler<2>::cell_iterator endc = dofs.end(level);
 
-  Vector<double> values(dofs.get_fe().total_dofs);
+  Vector<double> values(dofs.get_fe().dofs_per_cell);
   
   unsigned int cell_index=0;
   for (cell=dofs.begin(level); cell!=endc; ++cell, ++cell_index) 

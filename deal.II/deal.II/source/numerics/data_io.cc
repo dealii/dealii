@@ -597,7 +597,7 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
   vector< vector <Vector<double> > >
     values (dof_data.size(),
 	    vector< Vector<double> >(points.n_quadrature_points,
-				     Vector<double>(dofs->get_fe().n_components
+				     Vector<double>(dofs->get_fe().n_components()
 				     )));
 
   unsigned int cell_index=0;
@@ -621,7 +621,7 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		    Point<dim> pt = fe.quadrature_point(supp_pt);
 		    out << pt << "  ";
 		    for (unsigned int i=0; i!=dof_data.size(); ++i)
-		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
+		      for (unsigned int j=0; j < dofs->get_fe().n_components(); ++j)
 			out << values[i][supp_pt](j)
 			    << ' ';
 		    for (unsigned int i=0; i<cell_data.size(); ++i)
@@ -647,7 +647,7 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		    out << pt << "  ";
 		    
 		    for (unsigned int i=0; i!=dof_data.size(); ++i)
-		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
+		      for (unsigned int j=0; j < dofs->get_fe().n_components(); ++j)
 			out << values[i][supp_pt](j)
 			    << ' ';
 		    for (unsigned int i=0; i<cell_data.size(); ++i)
@@ -683,7 +683,7 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 			    out << pt << "  ";
 			    
 			    for (unsigned int i=0; i!=dof_data.size(); ++i)
-			      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
+			      for (unsigned int j=0; j < dofs->get_fe().n_components(); ++j)
 				out << values[i][supp_pt](j)
 				    << ' ';
 			    for (unsigned int i=0; i<cell_data.size(); ++i)

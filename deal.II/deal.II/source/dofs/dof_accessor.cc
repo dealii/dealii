@@ -349,7 +349,7 @@ DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
   
   Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  DoFAccessor<1>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<1>::ExcVectorDoesNotMatch());
@@ -394,7 +394,7 @@ DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
   
   Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  DoFAccessor<1>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<1>::ExcVectorDoesNotMatch());
@@ -455,7 +455,7 @@ DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
   
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
@@ -504,7 +504,7 @@ DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
   
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
@@ -567,7 +567,7 @@ DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
 
   Assert (dof_handler != 0, DoFAccessor<3>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<3>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
@@ -620,7 +620,7 @@ DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
 
   Assert (dof_handler != 0, DoFAccessor<3>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<3>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
@@ -659,11 +659,11 @@ template <typename number>
 void
 DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
 						   Vector<number>       &interpolated_values) const {
-  const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
+  const unsigned int dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
   
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (interpolated_values.size() == total_dofs,
+  Assert (interpolated_values.size() == dofs_per_cell,
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
@@ -675,8 +675,8 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
   else
 				     // otherwise clobber them from the children
     {
-      Vector<number> tmp1(total_dofs);
-      Vector<number> tmp2(total_dofs);
+      Vector<number> tmp1(dofs_per_cell);
+      Vector<number> tmp2(dofs_per_cell);
       
       interpolated_values.clear ();
 
@@ -699,7 +699,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
 					   // end in adding up the contribution
 					   // from nodes on boundaries of
 					   // children more than once.
-	  for (unsigned int i=0; i<total_dofs; ++i)
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
 	      const unsigned int component
 		= dof_handler->get_fe().system_to_component_index(i).first;
@@ -721,11 +721,11 @@ template <typename number>
 void
 DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &local_values,
 						       Vector<number>       &values) const {
-  const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
+  const unsigned int dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
   
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (local_values.size() == total_dofs,
+  Assert (local_values.size() == dofs_per_cell,
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
@@ -737,7 +737,7 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
   else
 				     // otherwise distribute them to the children
     {
-      Vector<number> tmp(total_dofs);
+      Vector<number> tmp(dofs_per_cell);
       
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
 	   ++child)

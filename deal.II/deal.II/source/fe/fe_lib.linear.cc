@@ -73,7 +73,7 @@ double
 FEQ1<1>::shape_value(const unsigned int i,
 			 const Point<1>     &p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   switch (i)
     {
     case 0: return 1.-p(0);
@@ -90,7 +90,7 @@ Tensor<1,1>
 FEQ1<1>::shape_grad(const unsigned int i,
 			const Point<1>&) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // originally, the return type of the
 				   // function was Point<dim>, so we
 				   // still construct it as that. it should
@@ -112,7 +112,7 @@ Tensor<2,1>
 FEQ1<1>::shape_grad_grad (const unsigned int i,
 			      const Point<1> &) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // second derivatives on the unit cell
 				   // are always zero
   return Tensor<2,1>();
@@ -146,10 +146,10 @@ void FEQ1<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 template <>
 void FEQ1<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 					 FullMatrix<double> &local_mass_matrix) const {
-  Assert (local_mass_matrix.n() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
-  Assert (local_mass_matrix.m() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
+  Assert (local_mass_matrix.n() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+  Assert (local_mass_matrix.m() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
 
   const double h = cell->vertex(1)(0) - cell->vertex(0)(0);
   Assert (h>0, ExcJacobiDeterminantHasWrongSign());
@@ -245,7 +245,7 @@ double
 FEQ1<2>::shape_value (const unsigned int i,
 			  const Point<2>& p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   switch (i)
     {
       case 0: return (1.-p(0)) * (1.-p(1));
@@ -264,7 +264,7 @@ Tensor<1,2>
 FEQ1<2>::shape_grad (const unsigned int i,
 			 const Point<2>& p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // originally, the return type of the
 				   // function was Point<dim>, so we
 				   // still construct it as that. it should
@@ -288,7 +288,7 @@ Tensor<2,2>
 FEQ1<2>::shape_grad_grad (const unsigned int i,
 			      const Point<2> &) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
   switch (i)
     {
@@ -315,10 +315,10 @@ FEQ1<2>::shape_grad_grad (const unsigned int i,
 template <>
 void FEQ1<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					 FullMatrix<double> &local_mass_matrix) const {
-  Assert (local_mass_matrix.n() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
-  Assert (local_mass_matrix.m() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
+  Assert (local_mass_matrix.n() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+  Assert (local_mass_matrix.m() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
 
 /* Get the computation of the local mass matrix by these lines in maple:
 
@@ -420,8 +420,8 @@ void FEQ1<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 
 template <>
 void FEQ1<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
-  Assert (unit_points.size() == total_dofs,
-	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
+  Assert (unit_points.size() == dofs_per_cell,
+	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
 
   unit_points[0] = Point<2> (0,0);
   unit_points[1] = Point<2> (1,0);
@@ -706,7 +706,7 @@ double
 FEQ1<3>::shape_value (const unsigned int i,
 			  const Point<3>& p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   switch (i)
     {
       case 0: return 1.0-p(0)+(-1.0+p(0))*p(1)+(-1.0+p(0)+(1.0-p(0))*p(1))*p(2);
@@ -729,7 +729,7 @@ Tensor<1,3>
 FEQ1<3>::shape_grad (const unsigned int i,
 			 const Point<3>& p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // originally, the return type of the
 				   // function was Point<dim>, so we
 				   // still construct it as that. it should
@@ -773,7 +773,7 @@ Tensor<2,3>
 FEQ1<3>::shape_grad_grad (const unsigned int i,
 			      const Point<3> &p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
   Tensor<2,3> return_value;
   
@@ -852,10 +852,10 @@ FEQ1<3>::shape_grad_grad (const unsigned int i,
 template <>
 void FEQ1<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 					 FullMatrix<double> &local_mass_matrix) const {
-  Assert (local_mass_matrix.n() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
-  Assert (local_mass_matrix.m() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
+  Assert (local_mass_matrix.n() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+  Assert (local_mass_matrix.m() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
 
   AssertThrow (false, ExcComputationNotUseful(3));
 };
@@ -864,8 +864,8 @@ void FEQ1<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 
 template <>
 void FEQ1<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
-  Assert (unit_points.size() == total_dofs,
-	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
+  Assert (unit_points.size() == dofs_per_cell,
+	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
 
   unit_points[0] = Point<3> (0,0,0);
   unit_points[1] = Point<3> (1,0,0);
@@ -886,8 +886,8 @@ template <int dim>
 void
 FEQ1<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
 				   vector<Point<dim> >  &support_points) const {
-  Assert (support_points.size() == total_dofs,
-	  ExcWrongFieldDimension (support_points.size(), total_dofs));
+  Assert (support_points.size() == dofs_per_cell,
+	  ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
   
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
     support_points[vertex] = cell->vertex(vertex);

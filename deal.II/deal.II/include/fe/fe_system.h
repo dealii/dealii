@@ -552,7 +552,7 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 									   fe2, n2)),
 		base_elements(2)
 {
-  Assert(fe1.n_transform_functions == fe2.n_transform_functions,
+  Assert(fe1.n_transform_functions() == fe2.n_transform_functions(),
 	 ExcElementTransformNotEqual());
   
   base_elements[0] = ElementPair(new FE1, n1);
@@ -578,9 +578,9 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 									   fe3, n3)),
 		base_elements(3)
 {
-  Assert(fe1.n_transform_functions == fe2.n_transform_functions,
+  Assert(fe1.n_transform_functions() == fe2.n_transform_functions(),
 	 ExcElementTransformNotEqual());
-  Assert(fe1.n_transform_functions == fe3.n_transform_functions,
+  Assert(fe1.n_transform_functions() == fe3.n_transform_functions(),
 	 ExcElementTransformNotEqual());
   
   base_elements[0] = ElementPair(new FE1, n1);

@@ -46,11 +46,11 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 				    const Function<dim>   &function,
 				    Vector<double>        &vec)
 {
-  Assert (dof.get_fe().n_components == function.n_components,
+  Assert (dof.get_fe().n_components() == function.n_components,
 	  ExcComponentMismatch());
   
   const FiniteElement<dim> &fe           = dof.get_fe();
-  const unsigned int        n_components = fe.n_components;
+  const unsigned int        n_components = fe.n_components();
   const bool                fe_is_system = (n_components != 1);
   
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
@@ -67,7 +67,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 				   // avoided to evaluate
 				   // the vectorfunction multiply at
 				   // the same point on a cell.
-  vector<Point<dim> > unit_support_points (fe.total_dofs);
+  vector<Point<dim> > unit_support_points (fe.dofs_per_cell);
   fe.get_unit_support_points(unit_support_points);
 
 				   // The following works well
@@ -85,10 +85,10 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 				   // support point by setting
 				   // #true# in the boolean vector 
 				   // #is_representative_point#.
-//   vector<bool>  is_representative_point(fe.total_dofs, false);
+//   vector<bool>  is_representative_point(fe.dofs_per_cell, false);
 //   is_representative_point[0]=true;
 //   unsigned int n_rep_points=1;
-//   for (unsigned int last_rep_point=0, i=1; i<fe.total_dofs; ++i)
+//   for (unsigned int last_rep_point=0, i=1; i<fe.dofs_per_cell; ++i)
 //     {
 //       if (unit_support_points[i] != unit_support_points[last_rep_point])
 // 	{
@@ -98,12 +98,12 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 // 	}
 //    };
 
-//   vector<int>         dofs_on_cell (fe.total_dofs);
-//   vector<Point<dim> > support_points (fe.total_dofs);
+//   vector<int>         dofs_on_cell (fe.dofs_per_cell);
+//   vector<Point<dim> > support_points (fe.dofs_per_cell);
 
 //   vector<Point<dim> > rep_points (n_rep_points);
 //   vector<Vector<double> > function_values_at_rep_points (
-//     n_rep_points, Vector<double>(fe.n_components));
+//     n_rep_points, Vector<double>(fe.n_components()));
 
 //   for (; cell!=endc; ++cell)
 //     {
@@ -115,7 +115,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 // 				       // pick out the representative
 // 				       // support points
 //       unsigned int j=0;
-//       for (unsigned int i=0; i<fe.total_dofs; ++i)
+//       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 // 	if (is_representative_point[i])
 // 	  rep_points[j++]=support_points[i];
 //       Assert(j == n_rep_points, ExcInternalError());
@@ -133,7 +133,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 // 				       // therefore the first #last_rep_point# is 0
 // 				       // and we need to start with
 // 				       // `last_rep_point = -1'
-//       for (unsigned int i=0; i<fe.total_dofs; ++i)
+//       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 // 	{
 // 	  if (is_representative_point[i])
 // 	    ++last_rep_point;
@@ -164,7 +164,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 				   // point by the #dof_to_rep_dof_table#.
 
 				   // the following vector collects all dofs i,
-				   // 0<=i<fe.total_dofs, for that
+				   // 0<=i<fe.dofs_per_cell, for that
 				   // unit_support_points[i] 
 				   // is a representative one. i.e.
 				   // the following vector collects all rep dofs.
@@ -175,13 +175,13 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 				   // to the rep index.
   vector<unsigned int> dof_to_rep_index_table;
   unsigned int n_rep_points=0;
-  for (unsigned int i=0; i<fe.total_dofs; ++i)
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     {
       bool representative=true;
 				       // the following loop is looped
 				       // the other way round to get
 				       // the minimal effort of
-				       // O(fe.total_dofs) for multiple
+				       // O(fe.dofs_per_cell) for multiple
 				       // support points that are placed
 				       // one after the other.
       for (unsigned int j=dofs_of_rep_points.size(); j>0; --j)
@@ -203,10 +203,10 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 	}
     }
   Assert(dofs_of_rep_points.size()==n_rep_points, ExcInternalError());
-  Assert(dof_to_rep_index_table.size()==fe.total_dofs, ExcInternalError());
+  Assert(dof_to_rep_index_table.size()==fe.dofs_per_cell, ExcInternalError());
 
-  vector<int>         dofs_on_cell (fe.total_dofs);
-  vector<Point<dim> > support_points (fe.total_dofs);
+  vector<int>         dofs_on_cell (fe.dofs_per_cell);
+  vector<Point<dim> > support_points (fe.dofs_per_cell);
 
   vector<Point<dim> > rep_points (n_rep_points);
 
@@ -218,7 +218,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 				   // more efficient one respectively
   vector<double>          function_values_scalar (n_rep_points);
   vector<Vector<double> > function_values_system (n_rep_points,
-						  Vector<double>(fe.n_components));
+						  Vector<double>(fe.n_components()));
 
   for (; cell!=endc; ++cell)
     {
@@ -246,7 +246,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 					   // distribute the function
 					   // values to the global
 					   // vector
-	  for (unsigned int i=0; i<fe.total_dofs; ++i)
+	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	    {
 	      const unsigned int component
 		= fe.system_to_component_index(i).first;
@@ -265,7 +265,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim> &dof,
 					   // distribute the function
 					   // values to the global
 					   // vector
-	  for (unsigned int i=0; i<fe.total_dofs; ++i)
+	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	    vec(dofs_on_cell[i]) 
 	      = function_values_scalar[dof_to_rep_index_table[i]];
 	};
@@ -281,8 +281,8 @@ VectorTools<dim>::interpolate(const DoFHandler<dim>           &high_dof,
 			      const Vector<double>            &high,
 			      Vector<double>                  &low)
 {
-  Vector<double> cell_high(high_dof.get_fe().total_dofs);
-  Vector<double> cell_low(low_dof.get_fe().total_dofs);
+  Vector<double> cell_high(high_dof.get_fe().dofs_per_cell);
+  Vector<double> cell_low(low_dof.get_fe().dofs_per_cell);
   
   DoFHandler<dim>::active_cell_iterator h = high_dof.begin_active();
   DoFHandler<dim>::active_cell_iterator l = low_dof.begin_active();
@@ -333,7 +333,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				const Quadrature<dim-1>  &q_boundary,
 				const bool                project_to_boundary_first)
 {
-  Assert (dof.get_fe().n_components == function.n_components,
+  Assert (dof.get_fe().n_components() == function.n_components,
 	  ExcInvalidFE());
   
   const FiniteElement<dim> &fe = dof.get_fe();
@@ -435,7 +435,7 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 					       const Function<dim>      &rhs,
 					       Vector<double>           &rhs_vector)
 {
-  Assert (dof.get_fe().n_components == rhs.n_components,
+  Assert (dof.get_fe().n_components() == rhs.n_components,
 	  ExcComponentMismatch());
   
   UpdateFlags update_flags = UpdateFlags(update_q_points |
@@ -475,16 +475,16 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
 	  ExcInvalidBoundaryIndicator());
 
   const FiniteElement<1> &fe = dof.get_fe();
-  Assert (fe.n_components == boundary_function.n_components,
+  Assert (fe.n_components() == boundary_function.n_components,
 	  ExcComponentMismatch());
-  Assert (fe.dofs_per_vertex == fe.n_components,
+  Assert (fe.dofs_per_vertex == fe.n_components(),
 	  ExcComponentMismatch());
 
 				   // set the component mask to either
 				   // the original value or a vector
 				   // of #true#s
   const vector<bool> component_mask ((component_mask_.size() == 0) ?
-				     vector<bool> (fe.n_components, true) :
+				     vector<bool> (fe.n_components(), true) :
 				     component_mask_);
   Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
@@ -558,7 +558,7 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 	  ExcInvalidBoundaryIndicator());
 
   const FiniteElement<dim> &fe           = dof.get_fe();
-  const unsigned int        n_components = fe.n_components;
+  const unsigned int        n_components = fe.n_components();
   const bool                fe_is_system = (n_components != 1);
   
   Assert (n_components == boundary_function.n_components,
@@ -568,7 +568,7 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 				   // the original value or a vector
 				   // of #true#s
   const vector<bool> component_mask ((component_mask_.size() == 0) ?
-				     vector<bool> (fe.n_components, true) :
+				     vector<bool> (fe.n_components(), true) :
 				     component_mask_);
   Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
@@ -584,7 +584,7 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 				   // respectively
   vector<double>          dof_values_scalar (fe.dofs_per_face);
   vector<Vector<double> > dof_values_system (fe.dofs_per_face,
-					     Vector<double>(fe.n_components));
+					     Vector<double>(fe.n_components()));
 	
   DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
 					endf = dof.end_face();
@@ -636,7 +636,7 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 					   const Quadrature<dim-1>  &q,
 					   map<int,double>          &boundary_values)
 {
-  Assert (dof.get_fe().n_components == boundary_functions.begin()->second->n_components,
+  Assert (dof.get_fe().n_components() == boundary_functions.begin()->second->n_components,
 	  ExcComponentMismatch());
   
   vector<int>    dof_to_boundary_mapping;
@@ -722,7 +722,7 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 {
   const unsigned int        n_q_points   = q.n_quadrature_points;
   const FiniteElement<dim> &fe           = dof.get_fe();
-  const unsigned int        n_components = fe.n_components;
+  const unsigned int        n_components = fe.n_components();
   const bool                fe_is_system = (n_components != 1);
 
   Assert( !((n_components == 1) && (norm == mean)),

@@ -572,8 +572,8 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
 	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
   Assert ((!compute_q_points) || (q_points.size() == unit_points.size()),
 	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert ((!compute_support_points) || (support_points.size() == total_dofs),
-	  ExcWrongFieldDimension(support_points.size(), total_dofs));
+  Assert ((!compute_support_points) || (support_points.size() == dofs_per_cell),
+	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 
   
   unsigned int n_points=unit_points.size();

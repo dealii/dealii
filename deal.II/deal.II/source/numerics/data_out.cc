@@ -64,8 +64,8 @@ void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 	   (names.size() == 1))
 	  ||
 	  ((vec.size() == dofs->n_dofs()) &&
-	   (names.size() == dofs->get_fe().n_components)),
-	  ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components));
+	   (names.size() == dofs->get_fe().n_components())),
+	  ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components()));
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -153,7 +153,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions)
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
   
-  const unsigned int n_components   = dofs->get_fe().n_components;
+  const unsigned int n_components   = dofs->get_fe().n_components();
   const unsigned int n_datasets     = dof_data.size() * n_components +
 				      cell_data.size();
   

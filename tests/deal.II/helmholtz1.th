@@ -8,7 +8,7 @@ Helmholtz::build_all(MATRIX& A,
 		     const Quadrature<dim>& quadrature,
 		     const Function<dim>& rhs)
 {
-  const unsigned int fe_dofs = dof.get_fe().total_dofs;
+  const unsigned int fe_dofs = dof.get_fe().n_dofs_per_cell();
   FEValues<dim> fe(dof.get_fe(), quadrature,
 		   UpdateFlags(update_gradients | update_JxW_values |
 			       update_q_points));

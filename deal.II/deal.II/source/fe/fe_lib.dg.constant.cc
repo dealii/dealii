@@ -48,7 +48,7 @@ double
 FEDG_Q0<dim>::shape_value (const unsigned int i,
 				const Point<dim>&) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   return 1.;
 };
 
@@ -60,7 +60,7 @@ Tensor<1,dim>
 FEDG_Q0<dim>::shape_grad (const unsigned int i,
 			       const Point<dim>&) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   return Tensor<1,dim> ();
 };
 
@@ -72,7 +72,7 @@ Tensor<2,dim>
 FEDG_Q0<dim>::shape_grad_grad (const unsigned int i,
 				  const Point<dim> &) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
   return Tensor<2,dim>();
 };
@@ -82,10 +82,10 @@ FEDG_Q0<dim>::shape_grad_grad (const unsigned int i,
 template <int dim>
 void FEDG_Q0<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					       FullMatrix<double> &local_mass_matrix) const {
-  Assert (local_mass_matrix.n() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
-  Assert (local_mass_matrix.m() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
+  Assert (local_mass_matrix.n() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+  Assert (local_mass_matrix.m() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
 
   local_mass_matrix(0,0) = cell->measure();
 };
@@ -95,8 +95,8 @@ void FEDG_Q0<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &
 template <int dim>
 void
 FEDG_Q0<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) const {
-  Assert (unit_points.size() == total_dofs,
-	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
+  Assert (unit_points.size() == dofs_per_cell,
+	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
   for (unsigned int d=0; d<dim; ++d)
     unit_points[0](d) = 0.5;
 };
@@ -106,8 +106,8 @@ template <int dim>
 void
 FEDG_Q0<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
 				       vector<Point<dim> >  &support_points) const {
-  Assert (support_points.size() == total_dofs,
-	  ExcWrongFieldDimension (support_points.size(), total_dofs));
+  Assert (support_points.size() == dofs_per_cell,
+	  ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
   
   support_points[0] = cell->center();
 };

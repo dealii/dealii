@@ -46,16 +46,6 @@ class FiniteElementData
     const unsigned int dofs_per_hex;
 
 				     /**
-				      * Number of degrees of freedom on a
-				      * face. This information is
-				      * redundant to some fields in the
-				      * derived classes but makes
-				      * writing dimension independant
-				      * programs easier.
-				      */
-    const unsigned int dofs_per_face;
-    
-				     /**
 				      * First index of dof on a line.
 				      */
     const unsigned int first_line_index;
@@ -81,6 +71,16 @@ class FiniteElementData
     const unsigned int first_face_quad_index;
 
 				     /**
+				      * Number of degrees of freedom on a
+				      * face. This information is
+				      * redundant to some fields in the
+				      * derived classes but makes
+				      * writing dimension independant
+				      * programs easier.
+				      */
+    const unsigned int dofs_per_face;
+    
+				     /**
 				      * Total number of degrees of freedom
 				      * on a cell. This information is
 				      * redundant to some fields in the
@@ -88,7 +88,7 @@ class FiniteElementData
 				      * writing dimension independant
 				      * programs easier.
 				      */
-    const unsigned int total_dofs;
+    const unsigned int dofs_per_cell;
 
 				     /**
 				      * Number of basis functions used for the
@@ -96,20 +96,20 @@ class FiniteElementData
 				      * cell. For a linear mapping, this number
 				      * equals the number of vertices.
 				      */
-    const unsigned int n_transform_functions;
+    const unsigned int transform_functions;
 
     
 				     /**
 				      * Number of components and dimension of
 				      * the image space.
 				      */
-    const unsigned int n_components;
+    const unsigned int components;
 
     				     /**
 				      * Default constructor. Constructs
 				      * an element
 				      * which is not so useful. Checking
-				      * #total_dofs# is therefore a good way to
+				      * #dofs_per_cell# is therefore a good way to
 				      * check if something went wrong. 
 				      */
     FiniteElementData ();
@@ -150,10 +150,51 @@ class FiniteElementData
 				      * in derived classes virtual as well.
 				      */
     virtual ~FiniteElementData ();
+
+				     /**
+				      * Return the #dofs_per_vertex#.
+				      */
+    unsigned int n_dofs_per_vertex () const;
+
+				     /**
+				      * Return the #dofs_per_line#.
+				      */
+    unsigned int n_dofs_per_line () const;
+
+    				     /**
+				      * Return the #dofs_per_quad#.
+				      */
+    unsigned int n_dofs_per_quad () const;
+
+    				     /**
+				      * Return the #dofs_per_hex#.
+				      */
+    unsigned int n_dofs_per_hex () const;
+
+    				     /**
+				      * Return the #dofs_per_face#.
+				      */
+    unsigned int n_dofs_per_face () const;
+
+    				     /**
+				      * Return the #dofs_per_cell#.
+				      */
+    unsigned int n_dofs_per_cell () const;
+
+    				     /**
+				      * Return the #components#.
+				      */
+    unsigned int n_components () const;
+
+    				     /**
+				      * Return the #transform_functions#.
+				      */
+    unsigned int n_transform_functions () const;
+    
     
 				     /**
 				      * Comparison operator. It is not clear to
-				      * me why we have to declare and implement
+				      * me (WB) why we have to declare and implement
 				      * this one explicitely.
 				      */
     bool operator == (const FiniteElementData<dim> &) const;
@@ -1574,12 +1615,92 @@ class FiniteElement : public FiniteElementBase<dim>
 
 template <int dim>
 inline
+unsigned int 
+FiniteElementData<dim>::n_dofs_per_vertex () const
+{
+  return dofs_per_vertex;
+};
+
+
+
+template <int dim>
+inline
+unsigned int 
+FiniteElementData<dim>::n_dofs_per_line () const
+{
+  return dofs_per_line;
+};
+
+
+
+template <int dim>
+inline
+unsigned int 
+FiniteElementData<dim>::n_dofs_per_quad () const
+{
+  return dofs_per_quad;
+};
+
+
+
+template <int dim>
+inline
+unsigned int 
+FiniteElementData<dim>::n_dofs_per_hex () const
+{
+  return dofs_per_hex;
+};
+
+
+
+template <int dim>
+inline
+unsigned int 
+FiniteElementData<dim>::n_dofs_per_face () const
+{
+  return dofs_per_face;
+};
+
+
+
+template <int dim>
+inline
+unsigned int 
+FiniteElementData<dim>::n_dofs_per_cell () const
+{
+  return dofs_per_cell;
+};
+
+
+
+template <int dim>
+inline
+unsigned int 
+FiniteElementData<dim>::n_components () const
+{
+  return components;
+};
+
+
+
+template <int dim>
+inline
+unsigned int 
+FiniteElementData<dim>::n_transform_functions () const
+{
+  return transform_functions;
+};
+
+
+
+template <int dim>
+inline
 unsigned int
 FiniteElementBase<dim>::component_to_system_index (unsigned int component,
 						   unsigned int component_index) const
 {
-  Assert(component<n_components,
-	 ExcIndexRange(component, 0, n_components));
+  Assert(component<n_components(),
+	 ExcIndexRange(component, 0, n_components()));
   Assert(component_index<component_to_system_table[component].size(),
 	 ExcIndexRange(component_index, 0,
 		       component_to_system_table[component].size()));
@@ -1606,8 +1727,8 @@ unsigned int
 FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
 							unsigned int component_index) const
 {
-  Assert(component<n_components,
-	 ExcIndexRange(component, 0, n_components));
+  Assert(component<n_components(),
+	 ExcIndexRange(component, 0, n_components()));
   Assert(component_index<face_component_to_system_table[component].size(),
 	 ExcIndexRange(component_index, 0,
 		       face_component_to_system_table[component].size()));
@@ -1626,25 +1747,29 @@ FiniteElementBase<dim>::face_system_to_component_index (unsigned int index) cons
   return face_system_to_component_table[index];
 }
 
+
+
 template <int dim>  
 inline
 unsigned int
 FiniteElementBase<dim>::component_to_base (unsigned int index) const
 {
-  if (n_components == 1)
+  if (n_components() == 1)
     return 0;
   Assert(index < component_to_base_table.size(),
 	 ExcIndexRange(index, 0, component_to_base_table.size()));
   return component_to_base_table[index];
 }
 
+
+
 template <int dim>
 inline
 bool
 FiniteElementBase<dim>::restriction_is_additive (const unsigned int component) const
 {
-  Assert(component<n_components,
-	 ExcIndexRange(component, 0, n_components));
+  Assert(component<n_components(),
+	 ExcIndexRange(component, 0, n_components()));
   return restriction_is_additive_flags[component];
 }
 

@@ -1548,16 +1548,16 @@ void MGDoFHandler<dim>::make_sparsity_pattern (const unsigned int  level,
   Assert (sparsity.n_cols() == n_dofs(level),
 	  ExcDifferentDimensions (sparsity.n_cols(), n_dofs(level)));
 
-  const unsigned int total_dofs = selected_fe->total_dofs;
-  vector<int> dofs_on_this_cell(total_dofs);
+  const unsigned int dofs_per_cell = selected_fe->dofs_per_cell;
+  vector<int> dofs_on_this_cell(dofs_per_cell);
   cell_iterator cell = begin(level),
 		endc = end(level);
   for (; cell!=endc; ++cell) 
     {
       cell->get_mg_dof_indices (dofs_on_this_cell);
 				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<total_dofs; ++i)
-	for (unsigned int j=0; j<total_dofs; ++j)
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  sparsity.add (dofs_on_this_cell[i],
 			dofs_on_this_cell[j]);
     };

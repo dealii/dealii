@@ -81,7 +81,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     SparseMatrix<double>     &matrix) {
   const FiniteElement<dim> &fe = dof.get_fe();
 
-  const unsigned int dofs_per_cell = fe.total_dofs;
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
   
   FullMatrix<double>  local_mass_matrix (dofs_per_cell, dofs_per_cell);
   vector<int>         dofs_on_this_cell (dofs_per_cell);
@@ -128,7 +128,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 						      vector<int>              &dof_to_boundary_mapping,
 						      const Function<dim>      *a) {
   const FiniteElement<dim> &fe = dof.get_fe();
-  const unsigned int n_components  = fe.n_components;
+  const unsigned int n_components  = fe.n_components();
   const bool         fe_is_system  = (n_components != 1);
   
   Assert (matrix.n() == dof.n_boundary_dofs(rhs), ExcInternalError());
@@ -143,7 +143,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   Assert (n_components == rhs.begin()->second->n_components,
 	  ExcComponentMismatch());
   
-  const unsigned int dofs_per_cell = fe.total_dofs,
+  const unsigned int dofs_per_cell = fe.dofs_per_cell,
 		     dofs_per_face = fe.dofs_per_face;
   
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -196,9 +196,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 		  a->vector_value_list (fe_values.get_quadrature_points(),
 					coefficient_values_system);
 		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
 		      {
-			for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 			  if (fe.system_to_component_index(i).first ==
 			      fe.system_to_component_index(j).first)
 			    {
@@ -218,9 +218,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 		}
 	      else
 		for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		  for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
 		    {
-		      for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+		      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 			if (fe.system_to_component_index(i).first ==
 			    fe.system_to_component_index(j).first)
 			  {
@@ -246,9 +246,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 		  a->value_list (fe_values.get_quadrature_points(),
 				 coefficient_values_scalar);
 		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
 		      {
-			for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 			  cell_matrix(i,j) += (values(i,point) *
 					       values(j,point) *
 					       weights[point] *
@@ -260,9 +260,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 		}
 	      else
 		for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		  for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+		  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
 		    {
-		      for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+		      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 			cell_matrix(i,j) += (values(i,point) *
 					     values(j,point) *
 					     weights[point]);
@@ -392,7 +392,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
 						SparseMatrix<double>     &matrix,
 						const Function<dim> * const a) {
-  const unsigned int n_components  = dof.get_fe().n_components;
+  const unsigned int n_components  = dof.get_fe().n_components();
   Assert ((n_components==1) || (a==0), ExcNotImplemented());
 
   Vector<double> dummy;   // no entries, should give an error if accessed
@@ -459,7 +459,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						Vector<double>           &rhs_vector,
 						const Function<dim> * const a)
 {
-  const unsigned int n_components  = dof.get_fe().n_components;
+  const unsigned int n_components  = dof.get_fe().n_components();
   Assert ((n_components==1) || (a==0), ExcNotImplemented());
 
   UpdateFlags update_flags = UpdateFlags(update_q_points  |
@@ -645,10 +645,10 @@ template <int dim>
 void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
 				const FEValues<dim>     &fe_values,
 				const typename DoFHandler<dim>::cell_iterator &) const {
-  const unsigned int dofs_per_cell = fe_values.total_dofs,
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components;
+  const unsigned int n_components  = fe.n_components();
 
   Assert (cell_matrix.n() == dofs_per_cell,
 	  Equation<dim>::ExcWrongSize(cell_matrix.n(), dofs_per_cell));
@@ -733,10 +733,10 @@ void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 				const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
-  const unsigned int dofs_per_cell = fe_values.total_dofs,
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components;
+  const unsigned int n_components  = fe.n_components();
 
 				   // for system elements: not
 				   // implemented at present
@@ -798,10 +798,10 @@ void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 				const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
-  const unsigned int dofs_per_cell = fe_values.total_dofs,
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components;
+  const unsigned int n_components  = fe.n_components();
 
 				   // for system elements: not
 				   // implemented at present
@@ -843,10 +843,10 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
 				   const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
   
-  const unsigned int dofs_per_cell = fe_values.total_dofs,
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components;
+  const unsigned int n_components  = fe.n_components();
 
 				   // for system elements: might be
 				   // not so useful, not implemented
@@ -909,11 +909,11 @@ template <int dim>
 void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 				   const FEValues<dim> &fe_values,
 				   const DoFHandler<dim>::cell_iterator &) const {
-  const unsigned int dofs_per_cell = fe_values.total_dofs,
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
 
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components;
+  const unsigned int n_components  = fe.n_components();
 
 				   // for system elements: might be
 				   // not so useful, not implemented
@@ -966,10 +966,10 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 				   const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
-  const unsigned int dofs_per_cell = fe_values.total_dofs,
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components;
+  const unsigned int n_components  = fe.n_components();
 
 				   // for system elements: might be
 				   // not so useful, not implemented
@@ -1001,23 +1001,23 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
 						const FiniteElement<dim> &low,
 						FullMatrix<double>& result)
 {
-  Assert (high.n_components == low.n_components,
+  Assert (high.n_components() == low.n_components(),
 	  ExcInvalidFE());
   
-  result.reinit (low.total_dofs, high.total_dofs);
+  result.reinit (low.dofs_per_cell, high.dofs_per_cell);
 
 				   // Initialize FEValues at the support points
 				   // of the low element.
-  vector<double> phantom_weights(low.total_dofs,1.);
-  vector<Point<dim> > support_points(low.total_dofs);
+  vector<double> phantom_weights(low.dofs_per_cell,1.);
+  vector<Point<dim> > support_points(low.dofs_per_cell);
   low.get_unit_support_points(support_points);
   Quadrature<dim> low_points(support_points,
 			     phantom_weights);
 
   FEValues<dim> fe(high, low_points, UpdateFlags(0));
   
-  for (unsigned int i=0; i<low.total_dofs; ++i)
-    for (unsigned int j=0; j<high.total_dofs; ++j)
+  for (unsigned int i=0; i<low.dofs_per_cell; ++i)
+    for (unsigned int j=0; j<high.dofs_per_cell; ++j)
 				       // shape functions need to belong
 				       // to the same component
       if (low.system_to_component_index(i).first ==

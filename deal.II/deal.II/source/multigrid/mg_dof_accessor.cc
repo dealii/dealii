@@ -528,7 +528,7 @@ MGDoFCellAccessor<1>::get_mg_dof_values (const Vector<double> &values,
   Assert (dof_handler != 0, DoFAccessor<1>::DoFAccessor<1>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<1>::DoFAccessor<1>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::DoFAccessor<1>::ExcInvalidObject());
-  Assert (dof_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (dof_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
@@ -565,7 +565,7 @@ MGDoFCellAccessor<2>::get_mg_dof_values (const Vector<double> &values,
   Assert (dof_handler != 0, DoFAccessor<2>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<2>::ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, DoFAccessor<2>::ExcInvalidObject());
-  Assert (dof_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (dof_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  DoFAccessor<2>::ExcVectorDoesNotMatch());
   Assert (values.size() == mg_dof_handler->n_dofs(present_level),
 	  DoFAccessor<2>::ExcVectorDoesNotMatch());

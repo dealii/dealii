@@ -77,7 +77,7 @@
  *  use. Later on, the #fill_fe_*# functions are passed pointers to these
  *  arrays, which they may use to extract the values and gradients of the
  *  transform functions. If a concrete finite element choses not to use this
- *  field, it shall set its field #n_transform_functions# to zero.
+ *  field, it shall set its field #transform_functions# to zero.
  *
  *  The #unit_shape_grads_transform# array is provided by the derived classes
  *  to allow for the inclusion of multiple faces, etc.
@@ -220,7 +220,7 @@ class FEValuesBase
 				      * number of degrees of freedom per
 				      * cell, not per face.
 				      */
-    const unsigned int total_dofs;
+    const unsigned int dofs_per_cell;
 
 				     /**
 				      * Number of basis functions for the
@@ -246,7 +246,7 @@ class FEValuesBase
 				      */
     FEValuesBase (const unsigned int n_q_points,
 		  const unsigned int n_support_points,
-		  const unsigned int total_dofs,
+		  const unsigned int dofs_per_cell,
 		  const unsigned int n_transform_functions,
 		  const unsigned int n_values_array,
 		  const UpdateFlags         update_flags,
@@ -908,7 +908,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      */
     FEFaceValuesBase (const unsigned int n_q_points,
 		      const unsigned int n_support_points,
-		      const unsigned int total_dofs,
+		      const unsigned int dofs_per_cell,
 		      const unsigned int n_transform_functions,
 		      const unsigned int n_faces_or_subfaces,
 		      const UpdateFlags         update_flags,

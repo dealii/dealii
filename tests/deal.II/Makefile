@@ -67,6 +67,7 @@ targets = $(addsuffix .target, $(executables))
 %.target : %
 	@echo ============================ Executing Testcase:   $<
 	@./$< > $(subst testcase,output,$<)
+	@diff $(subst testcase,output,$<) $(subst testcase,expect,$<)
 
 # this is the main target
 # make dependence so that it first wants to compile all files then

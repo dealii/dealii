@@ -18,18 +18,18 @@
 template <int dim>
 FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 				 const unsigned int n_support_points,
-				 const unsigned int total_dofs,
+				 const unsigned int dofs_per_cell,
 				 const unsigned int n_transform_functions,
 				 const unsigned int n_values_arrays,
 				 const UpdateFlags update_flags,
 				 const FiniteElement<dim> &fe)
 		:
 		n_quadrature_points (n_q_points),
-		total_dofs (total_dofs),
+		dofs_per_cell (dofs_per_cell),
 		n_transform_functions (n_transform_functions),
-		shape_values (n_values_arrays, FullMatrix<double>(total_dofs, n_q_points)),
-		shape_gradients (total_dofs, vector<Tensor<1,dim> >(n_q_points)),
-		shape_2nd_derivatives (total_dofs, vector<Tensor<2,dim> >(n_q_points)),
+		shape_values (n_values_arrays, FullMatrix<double>(dofs_per_cell, n_q_points)),
+		shape_gradients (dofs_per_cell, vector<Tensor<1,dim> >(n_q_points)),
+		shape_2nd_derivatives (dofs_per_cell, vector<Tensor<2,dim> >(n_q_points)),
 		weights (n_q_points, 0),
 		JxW_values (n_q_points, 0),
 		quadrature_points (n_q_points, Point<dim>()),
@@ -66,7 +66,7 @@ template <int dim>
 void FEValuesBase<dim>::get_function_values (const Vector<double> &fe_function,
 					     vector<double>       &values) const
 {
-  Assert (fe->n_components == 1,
+  Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
   Assert (selected_dataset<shape_values.size(),
 	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
@@ -75,7 +75,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double> &fe_function,
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (total_dofs);
+  Vector<double> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -87,7 +87,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double> &fe_function,
 				   // add up contributions of trial
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
-    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+    for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       values[point] += (dof_values(shape_func) *
 			shape_values[selected_dataset](shape_func, point));
 };
@@ -102,12 +102,12 @@ void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_functi
   Assert (selected_dataset<shape_values.size(),
 	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   for (unsigned i=0;i<values.size();++i)
-    Assert (values[i].size() == fe->n_components,
+    Assert (values[i].size() == fe->n_components(),
 	    ExcWrongNoOfComponents());
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (total_dofs);
+  Vector<double> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -120,7 +120,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_functi
 				   // add up contributions of trial
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
-    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+    for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       values[point](fe->system_to_component_index(shape_func).first)
 	+= (dof_values(shape_func) * shape_values[selected_dataset](shape_func, point));
 };
@@ -147,14 +147,14 @@ template <int dim>
 void FEValuesBase<dim>::get_function_grads (const Vector<double>   &fe_function,
 					    vector<Tensor<1,dim> > &gradients) const
 {
-  Assert (fe->n_components == 1,
+  Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
   Assert (gradients.size() == n_quadrature_points,
 	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (total_dofs);
+  Vector<double> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -166,7 +166,7 @@ void FEValuesBase<dim>::get_function_grads (const Vector<double>   &fe_function,
 				   // add up contributions of trial
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
-    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+    for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
 	Tensor<1,dim> tmp(shape_gradients[shape_func][point]);
 	tmp *= dof_values(shape_func);
@@ -183,12 +183,12 @@ void FEValuesBase<dim>::get_function_grads (const Vector<double>            &fe_
   Assert (selected_dataset<shape_values.size(),
 	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   for (unsigned i=0;i<gradients.size();++i)
-    Assert (gradients[i].size() == fe->n_components,
-	    ExcWrongVectorSize(gradients[i].size(), fe->n_components));
+    Assert (gradients[i].size() == fe->n_components(),
+	    ExcWrongVectorSize(gradients[i].size(), fe->n_components()));
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (total_dofs);
+  Vector<double> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -201,7 +201,7 @@ void FEValuesBase<dim>::get_function_grads (const Vector<double>            &fe_
 				   // add up contributions of trial
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
-    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+    for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
 	Tensor<1,dim> tmp(shape_gradients[shape_func][point]);
 	tmp *= dof_values(shape_func);
@@ -230,14 +230,14 @@ template <int dim>
 void FEValuesBase<dim>::get_function_2nd_derivatives (const Vector<double>   &fe_function,
 						      vector<Tensor<2,dim> > &second_derivatives) const
 {
-  Assert (fe->n_components == 1,
+  Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
   Assert (second_derivatives.size() == n_quadrature_points,
 	  ExcWrongVectorSize(second_derivatives.size(), n_quadrature_points));
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<double> dof_values (total_dofs);
+  Vector<double> dof_values (dofs_per_cell);
   if (present_cell->active())
     present_cell->get_dof_values (fe_function, dof_values);
   else
@@ -249,7 +249,7 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const Vector<double>   &fe
 				   // add up contributions of trial
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
-    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+    for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
 	Tensor<2,dim> tmp(shape_2nd_derivatives[shape_func][point]);
 	tmp *= dof_values(shape_func);
@@ -303,24 +303,24 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 			 const UpdateFlags         update_flags)
 		:
 		FEValuesBase<dim> (quadrature.n_quadrature_points,
-				   fe.total_dofs,
-				   fe.total_dofs,
-				   fe.n_transform_functions,
+				   fe.dofs_per_cell,
+				   fe.dofs_per_cell,
+				   fe.transform_functions,
 				   1,
 				   update_flags,
 				   fe),
-		unit_shape_gradients(fe.total_dofs,
+		unit_shape_gradients(fe.dofs_per_cell,
 				     vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
-		unit_shape_2nd_derivatives(fe.total_dofs,
+		unit_shape_2nd_derivatives(fe.dofs_per_cell,
 					   vector<Tensor<2,dim> >(quadrature.n_quadrature_points)),
-		unit_shape_gradients_transform(fe.n_transform_functions,
+		unit_shape_gradients_transform(fe.n_transform_functions(),
 					       vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
 		unit_quadrature_points(quadrature.get_quad_points())
 {
   Assert ((update_flags & update_normal_vectors) == false,
 	  ExcInvalidUpdateFlag());
 
-  for (unsigned int i=0; i<fe.total_dofs; ++i)
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j) 
       {
 	shape_values[0](i,j) = fe.shape_value(i, unit_quadrature_points[j]);
@@ -377,7 +377,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 				   // compute gradients on real element if
 				   // requested
   if (update_flags & update_gradients) 
-    for (unsigned int i=0; i<fe->total_dofs; ++i)
+    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
 	for (unsigned int s=0; s<dim; ++s)
 	  {
@@ -394,7 +394,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
   
   Tensor<2,dim> tmp1, tmp2;
   if (update_flags & update_second_derivatives)
-    for (unsigned int i=0; i<fe->total_dofs; ++i)
+    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
 	{
 	  					   // tmp1 := (d_k d_l phi) J_lj
@@ -436,7 +436,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 template <int dim>
 FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 					 const unsigned int n_support_points,
-					 const unsigned int total_dofs,
+					 const unsigned int dofs_per_cell,
 					 const unsigned int n_transform_functions,
 					 const unsigned int n_faces_or_subfaces,
 					 const UpdateFlags         update_flags,
@@ -444,16 +444,16 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 		:
 		FEValuesBase<dim> (n_q_points,
 				   n_support_points,
-				   total_dofs,
+				   dofs_per_cell,
 				   n_transform_functions,
 				   n_faces_or_subfaces,
 				   update_flags,
 				   fe),
 		unit_shape_gradients (n_faces_or_subfaces,
-				      vector<vector<Tensor<1,dim> > >(total_dofs,
+				      vector<vector<Tensor<1,dim> > >(dofs_per_cell,
 								   vector<Tensor<1,dim> >(n_q_points))),
 		unit_shape_2nd_derivatives(n_faces_or_subfaces,
-					   vector<vector<Tensor<2,dim> > >(total_dofs,
+					   vector<vector<Tensor<2,dim> > >(dofs_per_cell,
 									   vector<Tensor<2,dim> >(n_q_points))),
 		unit_shape_gradients_transform (n_faces_or_subfaces,
 						vector<vector<Tensor<1,dim> > >(n_transform_functions,
@@ -492,8 +492,8 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_face,
-				       fe.total_dofs,
-				       fe.n_transform_functions,
+				       fe.dofs_per_cell,
+				       fe.n_transform_functions(),
 				       GeometryInfo<dim>::faces_per_cell,
 				       update_flags,
 				       fe)
@@ -509,7 +509,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     QProjector<dim>::project_to_face (quadrature, face, unit_quadrature_points[face]);
 
-  for (unsigned int i=0; i<fe.total_dofs; ++i)
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j) 
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	{
@@ -574,7 +574,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				   // compute gradients on real element if
 				   // requested
   if (update_flags & update_gradients) 
-    for (unsigned int i=0; i<fe->total_dofs; ++i)
+    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
       {
 	fill_n (shape_gradients[i].begin(),
 		n_quadrature_points,
@@ -593,7 +593,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 
   Tensor<2,dim> tmp1, tmp2;
   if (update_flags & update_second_derivatives)
-    for (unsigned int i=0; i<fe->total_dofs; ++i)
+    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
 	{
 					   // tmp1 := (d_k d_l phi) J_lj
@@ -642,8 +642,8 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       0,
-				       fe.total_dofs,
-				       fe.n_transform_functions,
+				       fe.dofs_per_cell,
+				       fe.n_transform_functions(),
 				       GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::subfaces_per_face,
 				       update_flags,
 				       fe)
@@ -665,7 +665,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 					   face, subface,
 					   unit_quadrature_points[face*(1<<(dim-1))+subface]);
 
-  for (unsigned int i=0; i<fe.total_dofs; ++i)
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j) 
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
@@ -748,7 +748,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   // compute gradients on real element if
 				   // requested
   if (update_flags & update_gradients) 
-    for (unsigned int i=0; i<fe->total_dofs; ++i) 
+    for (unsigned int i=0; i<fe->dofs_per_cell; ++i) 
       {
 	fill_n (shape_gradients[i].begin(),
 		n_quadrature_points,
@@ -766,7 +766,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 
   Tensor<2,dim> tmp1, tmp2;
   if (update_flags & update_second_derivatives)
-    for (unsigned int i=0; i<fe->total_dofs; ++i)
+    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
 	{
 					   // tmp1 := (d_k d_l phi) J_lj

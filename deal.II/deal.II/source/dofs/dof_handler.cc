@@ -1981,7 +1981,7 @@ void DoFHandler<dim>::make_sparsity_pattern (SparseMatrixStruct &sparsity) const
   Assert (sparsity.n_cols() == n_dofs(),
 	  ExcDifferentDimensions (sparsity.n_cols(), n_dofs()));
 
-  const unsigned int dofs_per_cell = selected_fe->total_dofs;
+  const unsigned int dofs_per_cell = selected_fe->dofs_per_cell;
   vector<int> dofs_on_this_cell(dofs_per_cell);
   active_cell_iterator cell = begin_active(),
 		       endc = end();
@@ -2003,18 +2003,18 @@ void
 DoFHandler<dim>::make_sparsity_pattern (const vector<vector<bool> > &mask,
 					SparseMatrixStruct          &sparsity) const
 {
-  const unsigned int dofs_per_cell = selected_fe->total_dofs;
+  const unsigned int dofs_per_cell = selected_fe->dofs_per_cell;
 
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (sparsity.n_rows() == n_dofs(),
 	  ExcDifferentDimensions (sparsity.n_rows(), n_dofs()));
   Assert (sparsity.n_cols() == n_dofs(),
 	  ExcDifferentDimensions (sparsity.n_cols(), n_dofs()));
-  Assert (mask.size() == selected_fe->n_components,
-	  ExcInvalidMaskDimension(mask.size(), selected_fe->n_components));
+  Assert (mask.size() == selected_fe->n_components(),
+	  ExcInvalidMaskDimension(mask.size(), selected_fe->n_components()));
   for (unsigned int i=0; i<mask.size(); ++i)
-    Assert (mask[i].size() == selected_fe->n_components,
-	    ExcInvalidMaskDimension(mask[i].size(), selected_fe->n_components));
+    Assert (mask[i].size() == selected_fe->n_components(),
+	    ExcInvalidMaskDimension(mask[i].size(), selected_fe->n_components()));
 
 				   // first build a mask for each dof,
 				   // not like the one given which represents
@@ -2302,15 +2302,15 @@ void DoFHandler<dim>::distribute_cell_to_dof_vector (const Vector<Number> &cell_
   Assert (cell_data.size()==tria->n_active_cells(),
 	  ExcWrongSize (cell_data.size(), tria->n_active_cells()));
   Assert (dof_data.size()==n_dofs(), ExcWrongSize (dof_data.size(), n_dofs()));
-  Assert (component < selected_fe->n_components,
-	  ExcInvalidComponent(component, selected_fe->n_components));
+  Assert (component < selected_fe->n_components(),
+	  ExcInvalidComponent(component, selected_fe->n_components()));
 
 				   // store a flag whether we should care
 				   // about different components. this is
 				   // just a simplification, we could ask
 				   // for this at every single place
 				   // equally well
-  const bool consider_components = (selected_fe->n_components != 1);
+  const bool consider_components = (selected_fe->n_components() != 1);
   
 				   // count how often we have added a value
 				   // in the sum for each dof
@@ -2319,7 +2319,7 @@ void DoFHandler<dim>::distribute_cell_to_dof_vector (const Vector<Number> &cell_
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   unsigned int present_cell = 0;
-  const unsigned int dofs_per_cell = selected_fe->total_dofs;
+  const unsigned int dofs_per_cell = selected_fe->dofs_per_cell;
   vector<int> dof_indices (dofs_per_cell);
 
   for (; cell!=endc; ++cell, ++present_cell) 

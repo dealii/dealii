@@ -122,8 +122,8 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 	   (names.size() == 1))
 	  ||
 	  ((vec.size() == dof_handler->n_dofs()) &&
-	   (names.size() == dof_handler->get_fe().n_components)),
-	  ExcInvalidNumberOfNames (names.size(), dof_handler->get_fe().n_components));
+	   (names.size() == dof_handler->get_fe().n_components())),
+	  ExcInvalidNumberOfNames (names.size(), dof_handler->get_fe().n_components()));
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -170,7 +170,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
   
   Assert (dof_handler != 0, ExcNoDoFHandlerSelected());
   
-  const unsigned int n_components   = dof_handler->get_fe().n_components;
+  const unsigned int n_components   = dof_handler->get_fe().n_components();
   const unsigned int n_datasets     = dof_data.size() * n_components +
 				      cell_data.size();
   

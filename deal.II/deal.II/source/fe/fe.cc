@@ -33,9 +33,6 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(dofs_per_quad),
 		dofs_per_hex(dofs_per_hex),
-		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex+
-			      GeometryInfo<dim>::lines_per_face * dofs_per_line +
-			      dofs_per_quad),
 		first_line_index(GeometryInfo<dim>::vertices_per_cell
 				 * dofs_per_vertex),
 		first_quad_index(first_line_index+
@@ -49,9 +46,12 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		first_face_quad_index(first_face_line_index+
 				      GeometryInfo<dim-1>::lines_per_cell
 				      * dofs_per_line),
-		total_dofs (first_hex_index+dofs_per_hex),
-		n_transform_functions (n_transform_functions),
-		n_components(n_components)
+		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex+
+			      GeometryInfo<dim>::lines_per_face * dofs_per_line +
+			      dofs_per_quad),
+		dofs_per_cell (first_hex_index+dofs_per_hex),
+		transform_functions (n_transform_functions),
+		components(n_components)
 {
   Assert(dim==3, ExcDimensionMismatch(3,dim));
 };
@@ -68,8 +68,6 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(dofs_per_quad),
 		dofs_per_hex(0),
-		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex+
-			      dofs_per_line),
 		first_line_index(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex),
 		first_quad_index(first_line_index+
 				 GeometryInfo<dim>::lines_per_cell * dofs_per_line),
@@ -80,9 +78,11 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		first_face_quad_index(first_line_index+
 				      GeometryInfo<dim-1>::lines_per_cell
 				      * dofs_per_line),
-		total_dofs (first_quad_index+dofs_per_quad),
-		n_transform_functions (n_transform_functions),
-		n_components(n_components)
+		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex+
+			      dofs_per_line),
+		dofs_per_cell (first_quad_index+dofs_per_quad),
+		transform_functions (n_transform_functions),
+		components(n_components)
 {
   Assert(dim==2, ExcDimensionMismatch(2,dim));
 };
@@ -98,7 +98,6 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(0),
 		dofs_per_hex(0),
-		dofs_per_face(dofs_per_vertex),
 		first_line_index(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex),
 		first_quad_index(first_line_index+
 				 GeometryInfo<dim>::lines_per_cell * dofs_per_line),
@@ -109,9 +108,10 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		first_face_quad_index(first_line_index+
 				      GeometryInfo<dim-1>::lines_per_cell
 				      * dofs_per_line),
-		total_dofs (first_line_index+dofs_per_line),
-		n_transform_functions (n_transform_functions),
-		n_components(n_components)
+		dofs_per_face(dofs_per_vertex),
+		dofs_per_cell (first_line_index+dofs_per_line),
+		transform_functions (n_transform_functions),
+		components(n_components)
 {
   Assert(dim==1, ExcDimensionMismatch(1,dim));
 };
@@ -132,8 +132,8 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 	  (dofs_per_line == f.dofs_per_line) &&
 	  (dofs_per_quad == f.dofs_per_quad) &&
 	  (dofs_per_hex == f.dofs_per_hex) &&
-	  (n_transform_functions == f.n_transform_functions) &&
-	  (n_components == f.n_components));
+	  (transform_functions == f.transform_functions) &&
+	  (components == f.components));
 };
 
 
@@ -146,20 +146,20 @@ template <int dim>
 FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data,
 					   const vector<bool> &restriction_is_additive_flags) :
 		FiniteElementData<dim> (fe_data),
-		system_to_component_table(total_dofs),
+		system_to_component_table(dofs_per_cell),
 		face_system_to_component_table(dofs_per_face),
-		component_to_system_table(n_components, vector<unsigned>(total_dofs)),
-		face_component_to_system_table(n_components, vector<unsigned>(dofs_per_face)),
-		component_to_base_table(n_components),
+		component_to_system_table(components, vector<unsigned>(dofs_per_cell)),
+		face_component_to_system_table(components, vector<unsigned>(dofs_per_face)),
+		component_to_base_table(components),
 		restriction_is_additive_flags(restriction_is_additive_flags)
 {
-  Assert(restriction_is_additive_flags.size()==fe_data.n_components,
-	 ExcWrongFieldDimension(restriction_is_additive_flags.size(),fe_data.n_components));
+  Assert(restriction_is_additive_flags.size()==fe_data.components,
+	 ExcWrongFieldDimension(restriction_is_additive_flags.size(),fe_data.components));
 
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
     {
-      restriction[i].reinit (total_dofs, total_dofs);
-      prolongation[i].reinit (total_dofs, total_dofs);
+      restriction[i].reinit (dofs_per_cell, dofs_per_cell);
+      prolongation[i].reinit (dofs_per_cell, dofs_per_cell);
     };
 
   switch (dim)
@@ -189,7 +189,7 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 				   // one component; if there are several, then
 				   // the constructor of the derived class needs
 				   // to fill these arrays
-  for (unsigned int j=0 ; j<total_dofs ; ++j)
+  for (unsigned int j=0 ; j<dofs_per_cell ; ++j)
     {
       system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
       component_to_system_table[0][j] = j;
@@ -283,8 +283,8 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
   Assert ((!compute_q_points) || (q_points.size() == unit_points.size()),
 	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert ((!compute_support_points) || (support_points.size() == total_dofs),
-	  ExcWrongFieldDimension(support_points.size(), total_dofs));
+  Assert ((!compute_support_points) || (support_points.size() == dofs_per_cell),
+	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 
 
 				   // local mesh width
@@ -364,8 +364,8 @@ void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterato
 
 template <>
 void FiniteElement<1>::get_unit_support_points (vector<Point<1> > &support_points) const {
-  Assert (support_points.size() == total_dofs,
-	  ExcWrongFieldDimension(support_points.size(), total_dofs));
+  Assert (support_points.size() == dofs_per_cell,
+	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 				   // compute support points. The first ones
 				   // belong to vertex one, the second ones
 				   // to vertex two, all following are
@@ -387,8 +387,8 @@ void FiniteElement<1>::get_unit_support_points (vector<Point<1> > &support_point
 template <>
 void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
 					   vector<Point<1> > &support_points) const {
-  Assert (support_points.size() == total_dofs,
-	  ExcWrongFieldDimension(support_points.size(), total_dofs));
+  Assert (support_points.size() == dofs_per_cell,
+	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 				   // compute support points. The first ones
 				   // belong to vertex one, the second ones
 				   // to vertex two, all following are

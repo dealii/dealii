@@ -141,11 +141,11 @@ FESystem<dim>::build_cell_table()
 				   // Initialize mapping from components to
 				   // linear index. Fortunately, this is
 				   // the inverse of what we just did.
-  for (unsigned int comp=0 ; comp<n_components ; ++comp)
+  for (unsigned int comp=0 ; comp<n_components() ; ++comp)
     component_to_system_table[comp]
-      .resize(base_element(component_to_base_table[comp]).total_dofs);
+      .resize(base_element(component_to_base_table[comp]).dofs_per_cell);
 
-  for (unsigned int sys=0 ; sys < total_dofs ; ++sys)
+  for (unsigned int sys=0 ; sys < dofs_per_cell ; ++sys)
     component_to_system_table[system_to_component_table[sys].first]
       [system_to_component_table[sys].second] = sys;
 }
@@ -252,9 +252,9 @@ FESystem<dim>::build_face_table()
 				   // Initialize mapping from components to
 				   // linear index. Fortunately, this is
 				   // the inverse of what we just did.
-  for (unsigned comp=0 ; comp<n_components ; ++comp)
+  for (unsigned comp=0 ; comp<n_components() ; ++comp)
     face_component_to_system_table[comp]
-      .resize(base_element(component_to_base_table[comp]).total_dofs);
+      .resize(base_element(component_to_base_table[comp]).dofs_per_cell);
 
   for (unsigned sys=0 ; sys < dofs_per_face ; ++sys)
     face_component_to_system_table[face_system_to_component_table[sys].first]
@@ -468,11 +468,11 @@ void FESystem<dim>::initialize ()
 				   // distribute the matrices of the base
 				   // finite elements to the matrices of
 				   // this object
-  for (unsigned int component=0; component<n_components; ++component)
+  for (unsigned int component=0; component<n_components(); ++component)
 				     // transform restriction and
 				     // prolongation matrices
-    for (unsigned int i=0; i<base_element(component_to_base_table[component]).total_dofs; ++i)
-      for (unsigned int j=0; j<base_element(component_to_base_table[component]).total_dofs; ++j)
+    for (unsigned int i=0; i<base_element(component_to_base_table[component]).dofs_per_cell; ++i)
+      for (unsigned int j=0; j<base_element(component_to_base_table[component]).dofs_per_cell; ++j)
 					 // only fill block diagonals, no
 					 // intermixing of subelements
 	for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
@@ -504,8 +504,8 @@ FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe_data,
 {
   return FiniteElementData<1> (fe_data.dofs_per_vertex * N,
 			       fe_data.dofs_per_line * N,
-			       fe_data.n_transform_functions,
-			       fe_data.n_components * N);
+			       fe_data.n_transform_functions(),
+			       fe_data.n_components() * N);
 };
 
 
@@ -518,8 +518,8 @@ FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe1,
 {
   return FiniteElementData<1> (fe1.dofs_per_vertex * N1 + fe2.dofs_per_vertex * N2 ,
 			       fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2 ,
-			       fe1.n_transform_functions,
-			       fe1.n_components * N1 + fe2.n_components * N2 );
+			       fe1.n_transform_functions(),
+			       fe1.n_components() * N1 + fe2.n_components() * N2 );
 };
 
 
@@ -538,10 +538,10 @@ FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe1,
 			       fe1.dofs_per_line * N1
 			       + fe2.dofs_per_line * N2
 			       + fe3.dofs_per_line * N3,
-			       fe1.n_transform_functions,
-			       fe1.n_components * N1
-			       + fe2.n_components * N2
-			       + fe3.n_components * N3);
+			       fe1.n_transform_functions(),
+			       fe1.n_components() * N1
+			       + fe2.n_components() * N2
+			       + fe3.n_components() * N3);
 };
 
 #endif
@@ -557,8 +557,8 @@ FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe_data,
   return FiniteElementData<2> (fe_data.dofs_per_vertex * N,
 			       fe_data.dofs_per_line * N,
 			       fe_data.dofs_per_quad * N,
-			       fe_data.n_transform_functions,
-			       fe_data.n_components * N);
+			       fe_data.n_transform_functions(),
+			       fe_data.n_components() * N);
 };
 
 template <>
@@ -571,8 +571,8 @@ FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe1,
   return FiniteElementData<2> (fe1.dofs_per_vertex * N1 + fe2.dofs_per_vertex * N2 ,
 			       fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2 ,
 			       fe1.dofs_per_quad * N1 + fe2.dofs_per_quad * N2 ,
-			       fe1.n_transform_functions,
-			       fe1.n_components * N1 + fe2.n_components * N2 );
+			       fe1.n_transform_functions(),
+			       fe1.n_components() * N1 + fe2.n_components() * N2 );
 };
 
 
@@ -594,10 +594,10 @@ FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe1,
 			       fe1.dofs_per_quad * N1
 			       + fe2.dofs_per_quad * N2
 			       + fe3.dofs_per_quad * N3 ,
-			       fe1.n_transform_functions,
-			       fe1.n_components * N1
-			       + fe2.n_components * N2
-			       + fe3.n_components * N3 );
+			       fe1.n_transform_functions(),
+			       fe1.n_components() * N1
+			       + fe2.n_components() * N2
+			       + fe3.n_components() * N3 );
 };
 
 #endif
@@ -614,8 +614,8 @@ FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe_data,
 			       fe_data.dofs_per_line * N,
 			       fe_data.dofs_per_quad * N,
 			       fe_data.dofs_per_hex * N,
-			       fe_data.n_transform_functions,
-			       fe_data.n_components * N);
+			       fe_data.n_transform_functions(),
+			       fe_data.n_components() * N);
 };
 
 template <>
@@ -629,8 +629,8 @@ FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe1,
 			       fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2 ,
 			       fe1.dofs_per_quad * N1 + fe2.dofs_per_quad * N2 ,
 			       fe1.dofs_per_hex * N1 + fe2.dofs_per_hex * N2 ,
-			       fe1.n_transform_functions,
-			       fe1.n_components * N1 + fe2.n_components * N2 );
+			       fe1.n_transform_functions(),
+			       fe1.n_components() * N1 + fe2.n_components() * N2 );
 };
 
 
@@ -655,10 +655,10 @@ FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe1,
 			       fe1.dofs_per_hex * N1
 			       + fe2.dofs_per_hex * N2
 			       + fe3.dofs_per_hex * N3 ,
-			       fe1.n_transform_functions,
-			       fe1.n_components * N1
-			       + fe2.n_components * N2
-			       + fe3.n_components * N3 );
+			       fe1.n_transform_functions(),
+			       fe1.n_components() * N1
+			       + fe2.n_components() * N2
+			       + fe3.n_components() * N3 );
 };
 
 #endif
@@ -671,7 +671,7 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 {
   vector<bool> tmp;
   for (unsigned int i=0; i<n_elements; ++i)
-    for (unsigned int component=0; component<fe.n_components; ++component)
+    for (unsigned int component=0; component<fe.n_components(); ++component)
       tmp.push_back (fe.restriction_is_additive (component));
   return tmp;
 };
@@ -686,10 +686,10 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 {
   vector<bool> tmp;
   for (unsigned int i=0; i<N1; ++i)
-    for (unsigned int component=0; component<fe1.n_components; ++component)
+    for (unsigned int component=0; component<fe1.n_components(); ++component)
       tmp.push_back (fe1.restriction_is_additive (component));
   for (unsigned int i=0; i<N2; ++i)
-    for (unsigned int component=0; component<fe2.n_components; ++component)
+    for (unsigned int component=0; component<fe2.n_components(); ++component)
       tmp.push_back (fe2.restriction_is_additive (component));
   return tmp;
 };
@@ -706,13 +706,13 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 {
   vector<bool> tmp;
   for (unsigned int i=0; i<N1; ++i)
-    for (unsigned int component=0; component<fe1.n_components; ++component)
+    for (unsigned int component=0; component<fe1.n_components(); ++component)
       tmp.push_back (fe1.restriction_is_additive (component));
   for (unsigned int i=0; i<N2; ++i)
-    for (unsigned int component=0; component<fe2.n_components; ++component)
+    for (unsigned int component=0; component<fe2.n_components(); ++component)
       tmp.push_back (fe2.restriction_is_additive (component));
   for (unsigned int i=0; i<N3; ++i)
-    for (unsigned int component=0; component<fe3.n_components; ++component)
+    for (unsigned int component=0; component<fe3.n_components(); ++component)
       tmp.push_back (fe3.restriction_is_additive (component));
   return tmp;
 };
@@ -725,7 +725,7 @@ double
 FESystem<dim>::shape_value (const unsigned int i,
 			    const Point<dim>  &p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
   pair<unsigned,unsigned> comp = system_to_component_index(i);
   
@@ -740,7 +740,7 @@ Tensor<1,dim>
 FESystem<dim>::shape_grad (const unsigned int  i,
 			   const Point<dim>   &p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
   pair<unsigned,unsigned> comp = system_to_component_index(i);
   
@@ -755,7 +755,7 @@ Tensor<2,dim>
 FESystem<dim>::shape_grad_grad (const unsigned int  i,
 				const Point<dim>   &p) const
  {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
 
   pair<unsigned,unsigned> comp = system_to_component_index(i);
@@ -770,21 +770,21 @@ template <int dim>
 void FESystem<dim>::get_unit_support_points (
   vector<Point<dim> > &unit_support_points) const
 {
-  Assert(unit_support_points.size() == total_dofs,
-	 ExcWrongFieldDimension (unit_support_points.size(), total_dofs));
+  Assert(unit_support_points.size() == dofs_per_cell,
+	 ExcWrongFieldDimension (unit_support_points.size(), dofs_per_cell));
 
-  vector<Point<dim> > base_unit_support_points (base_element(0).total_dofs);
+  vector<Point<dim> > base_unit_support_points (base_element(0).dofs_per_cell);
   unsigned int component = 0;
   for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
     {
-      const unsigned int base_element_total_dofs
-	=base_element(base_el).total_dofs;
+      const unsigned int base_element_dofs_per_cell
+	=base_element(base_el).dofs_per_cell;
  
-      base_unit_support_points.resize(base_element_total_dofs);
+      base_unit_support_points.resize(base_element_dofs_per_cell);
       base_element(base_el).get_unit_support_points (base_unit_support_points);
       for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n)
 	{
-	  for (unsigned int i=0; i<base_element_total_dofs; ++i)
+	  for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
 	    {
 	      unit_support_points[component_to_system_index(component,i)]
 		= base_unit_support_points[i];
@@ -799,14 +799,14 @@ void FESystem<dim>::get_unit_support_points (
 //   vector<vector<Point<dim> > > base_us_points(n_base_elements());
 //   for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
 //     {
-//       const unsigned int base_element_total_dofs
-// 	=base_element(base_el).total_dofs;
+//       const unsigned int base_element_dofs_per_cell
+// 	=base_element(base_el).dofs_per_cell;
 
-//       base_us_points[base_el].resize(base_element_total_dofs);
+//       base_us_points[base_el].resize(base_element_dofs_per_cell);
 //       base_element(base_el).get_unit_support_points (base_us_points[base_el]);
 //     }
 
-//   for (unsigned int i=0; i<total_dofs; ++i)
+//   for (unsigned int i=0; i<dofs_per_cell; ++i)
 //     {
 //       const unsigned int comp=system_to_component_index(i).first,
 // 		     base_dof=system_to_component_index(i).second,
@@ -822,21 +822,21 @@ template <int dim>
 void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &cell,
 					vector<Point<dim> > &support_points) const
 {
-  Assert(support_points.size() == total_dofs,
-	 ExcWrongFieldDimension (support_points.size(), total_dofs));
+  Assert(support_points.size() == dofs_per_cell,
+	 ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
 
-  vector<Point<dim> > base_support_points (base_element(0).total_dofs);
+  vector<Point<dim> > base_support_points (base_element(0).dofs_per_cell);
   unsigned int component = 0;
   for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
     {
-      const unsigned int base_element_total_dofs
-	=base_element(base_el).total_dofs;
+      const unsigned int base_element_dofs_per_cell
+	=base_element(base_el).dofs_per_cell;
       
-      base_support_points.resize(base_element_total_dofs);
+      base_support_points.resize(base_element_dofs_per_cell);
       base_element(base_el).get_support_points (cell, base_support_points);
       for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n)
 	{
-	  for (unsigned int i=0; i<base_element_total_dofs; ++i)
+	  for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
 	    {
 	      support_points[component_to_system_index(component,i)]
 		= base_support_points[i];
@@ -880,10 +880,10 @@ template <int dim>
 void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					   FullMatrix<double>  &local_mass_matrix) const
 {
-  Assert (local_mass_matrix.n() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
-  Assert (local_mass_matrix.m() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
+  Assert (local_mass_matrix.n() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+  Assert (local_mass_matrix.m() == dofs_per_cell,
+	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
 
 				   // track which component we are
 				   // presently working with, since we
@@ -895,9 +895,9 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
     {
 				       // first get the local mass matrix for
 				       // the base object
-      const unsigned int base_element_total_dofs=base_element(base_el).total_dofs;
-      FullMatrix<double> base_mass_matrix (base_element_total_dofs,
-					   base_element_total_dofs);
+      const unsigned int base_element_dofs_per_cell=base_element(base_el).dofs_per_cell;
+      FullMatrix<double> base_mass_matrix (base_element_dofs_per_cell,
+					   base_element_dofs_per_cell);
       base_element(base_el).get_local_mass_matrix (cell, base_mass_matrix);
       
 				       // now distribute it to the mass matrix
@@ -905,8 +905,8 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
       const unsigned int el_multiplicity=element_multiplicity(base_el);
       for (unsigned int n=0; n<el_multiplicity; ++n)
 	{
-	  for (unsigned int i=0; i<base_element_total_dofs; ++i)
-	    for (unsigned int j=0; j<base_element_total_dofs; ++j)
+	  for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
+	    for (unsigned int j=0; j<base_element_dofs_per_cell; ++j)
 					     // only fill diagonals of the blocks
 	      local_mass_matrix (component_to_system_index(component,i),
 				 component_to_system_index(component,j))
@@ -914,7 +914,7 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 	  ++component;
 	};
     };
-  Assert (component == n_components, ExcInternalError());
+  Assert (component == n_components(), ExcInternalError());
 };
 
 
@@ -999,7 +999,7 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 			       const FullMatrix<double>  &shape_values_transform,
 			       const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const
 {
-  vector<Point<dim> > supp(base_elements[0].first->total_dofs);
+  vector<Point<dim> > supp(base_elements[0].first->dofs_per_cell);
 
   base_elements[0].first->fill_fe_values (cell, unit_points, jacobians, compute_jacobians,
 					  jacobians_grad, compute_jacobians_grad,
@@ -1013,13 +1013,13 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
       
       for (unsigned m=0 ; m < element_multiplicity(0) ; ++ m)
 	{
-	  for (unsigned i=0 ; i < base_element(0).total_dofs ; ++i)
+	  for (unsigned i=0 ; i < base_element(0).dofs_per_cell ; ++i)
 	    support_points[component_to_system_index(component,i)] = supp[i];
 	  ++component;
 	}
       for (unsigned base=1 ; base < n_base_elements() ; ++base)
 	{
-	  supp.resize(base_elements[base].first->total_dofs);
+	  supp.resize(base_elements[base].first->dofs_per_cell);
 	  base_elements[base].first->fill_fe_values (cell, unit_points, jacobians, false,
 						     jacobians_grad, false,
 						     supp, true,
@@ -1028,7 +1028,7 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 	  
 	  for (unsigned m=0 ; m < element_multiplicity(base) ; ++ m)
 	    {
-	      for (unsigned i=0 ; i < base_element(base).total_dofs ; ++i)
+	      for (unsigned i=0 ; i < base_element(base).dofs_per_cell ; ++i)
 		support_points[component_to_system_index(component,i)] = supp[i];
 	      ++component;
 	    }

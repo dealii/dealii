@@ -19,21 +19,21 @@ DoFTools::extract_dofs(const DoFHandler<dim> &dof,
 		       vector<bool>          &selected_dofs)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
-  Assert(local_select.size() == fe.n_components,
-	 ExcDimensionMismatch(local_select.size(), fe.n_components));
+  Assert(local_select.size() == fe.n_components(),
+	 ExcDimensionMismatch(local_select.size(), fe.n_components()));
   Assert(selected_dofs.size() == dof.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs()));
 
 				   // preset all values by false
   fill_n (selected_dofs.begin(), dof.n_dofs(), false);
   
-  vector<int> indices(fe.total_dofs);
+  vector<int> indices(fe.dofs_per_cell);
   
   DoFHandler<dim>::active_cell_iterator c;
   for (c = dof.begin_active() ; c != dof.end() ; ++ c)
     {
       c->get_dof_indices(indices);
-      for (unsigned int i=0;i<fe.total_dofs;++i)
+      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
 	{
 	  const unsigned int component = fe.system_to_component_index(i).first;
 
@@ -53,21 +53,21 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 			     vector<bool>            &selected_dofs)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
-  Assert(local_select.size() == fe.n_components,
-	 ExcDimensionMismatch(local_select.size(), fe.n_components));
+  Assert(local_select.size() == fe.n_components(),
+	 ExcDimensionMismatch(local_select.size(), fe.n_components()));
   Assert(selected_dofs.size() == dof.n_dofs(level),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs(level)));
 
 				   // preset all values by false
   fill_n (selected_dofs.begin(), dof.n_dofs(level), false);
 
-  vector<int> indices(fe.total_dofs);
+  vector<int> indices(fe.dofs_per_cell);
   
   MGDoFHandler<dim>::cell_iterator c;
   for (c = dof.begin(level) ; c != dof.end(level) ; ++ c)
     {
       c->get_mg_dof_indices(indices);
-      for (unsigned int i=0;i<fe.total_dofs;++i)
+      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
 	{
 	  const unsigned int component = fe.system_to_component_index(i).first;
 	  if (local_select[component]  == true)

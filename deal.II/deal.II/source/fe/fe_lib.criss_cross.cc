@@ -516,7 +516,7 @@ inline
 double FECrissCross<2>::shape_value (const unsigned int i,
 				     const Point<2>    &p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
   const double x = p(0),
 	       y = p(1);
@@ -544,7 +544,7 @@ template <>
 inline
 Tensor<1,2> FECrissCross<2>::shape_grad (const unsigned int i, const Point<2> &p) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
   const double x = p(0),
 	       y = p(1);  
@@ -573,7 +573,7 @@ Tensor<2,2>
 FECrissCross<2>::shape_grad_grad (const unsigned int i,
 				  const Point<2> &) const
 {
-  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
+  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // second derivatives on the unit cell
 				   // are always zero, at least almost
 				   // everywhere. see the doc for more
@@ -585,8 +585,8 @@ FECrissCross<2>::shape_grad_grad (const unsigned int i,
 
 template <>
 void FECrissCross<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
-  Assert(unit_points.size()==total_dofs,
-	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
+  Assert(unit_points.size()==dofs_per_cell,
+	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
 
   unit_points[0] = Point<2> (0,0);
   unit_points[1] = Point<2> (1,0);
@@ -602,8 +602,8 @@ void FECrissCross<2>::get_support_points (const DoFHandler<2>::cell_iterator &ce
 					  vector<Point<2> > &support_points) const {
   const unsigned int dim = 2;
   
-  Assert (support_points.size() == total_dofs,
-	  ExcWrongFieldDimension (support_points.size(), total_dofs));
+  Assert (support_points.size() == dofs_per_cell,
+	  ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
 
 				   // copy vertices
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
@@ -653,10 +653,10 @@ void FECrissCross<2>::get_face_support_points (const DoFHandler<2>::face_iterato
 template <>
 void FECrissCross<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					     FullMatrix<double> &mass_matrix) const {
-  Assert (mass_matrix.n() == total_dofs,
-	  ExcWrongFieldDimension(mass_matrix.n(),total_dofs));
-  Assert (mass_matrix.m() == total_dofs,
-	  ExcWrongFieldDimension(mass_matrix.m(),total_dofs));
+  Assert (mass_matrix.n() == dofs_per_cell,
+	  ExcWrongFieldDimension(mass_matrix.n(),dofs_per_cell));
+  Assert (mass_matrix.m() == dofs_per_cell,
+	  ExcWrongFieldDimension(mass_matrix.m(),dofs_per_cell));
 
   const double x[4] = { cell->vertex(0)(0),
 			cell->vertex(1)(0),
@@ -941,8 +941,8 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
 	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert (support_points.size() == total_dofs,
-	  ExcWrongFieldDimension(support_points.size(), total_dofs));
+  Assert (support_points.size() == dofs_per_cell,
+	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 
   
   unsigned int n_points=unit_points.size();
@@ -966,7 +966,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 				       // N_j(xi_l) be the value of the associated
 				       // basis function at xi_l, then
 				       // x_l(xi_l) = sum_j p_j N_j(xi_l)
-      for (unsigned int j=0; j<n_transform_functions; ++j) 
+      for (unsigned int j=0; j<n_transform_functions(); ++j) 
 	for (unsigned int l=0; l<n_points; ++l) 
 	  q_points[l] += support_points[j] * shape_values_transform(j, l);
     };

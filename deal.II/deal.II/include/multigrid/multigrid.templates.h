@@ -18,7 +18,7 @@ template <typename number>
 void
 MG<dim>::copy_to_mg(const Vector<number>& src)
 {
-  const unsigned int dofs_per_cell = mg_dof_handler->get_fe().total_dofs;
+  const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
   const unsigned int dofs_per_face = mg_dof_handler->get_fe().dofs_per_face;
 
 				   // set the elements of the vectors
@@ -95,7 +95,7 @@ template <typename number>
 void
 MG<dim>::copy_from_mg(Vector<number> &dst) const
 {
-  const unsigned int dofs_per_cell = mg_dof_handler->get_fe().total_dofs;
+  const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
 
   vector<int> global_dof_indices (dofs_per_cell);
   vector<int> level_dof_indices (dofs_per_cell);

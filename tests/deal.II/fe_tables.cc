@@ -40,22 +40,22 @@ print_fe_statistics(const FiniteElement<dim>& fe)
 //  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   DoFHandler<dim>::active_face_iterator face = dof.begin_active_face();
 
-  vector<Point<dim> > unit_points(fe.total_dofs);
-  vector<Point<dim> > support_points(fe.total_dofs);
+  vector<Point<dim> > unit_points(fe.dofs_per_cell);
+  vector<Point<dim> > support_points(fe.dofs_per_cell);
   vector<Point<dim> > face_support_points(fe.dofs_per_face);
 
 //  fe.get_unit_support_points(unit_points);
 //  fe.get_support_points(cell, boundary, support_points);
   fe.get_face_support_points(face, face_support_points);
   
-  deallog << "total_dofs" << " " << fe.total_dofs;
+  deallog << "dofs_per_cell" << " " << fe.dofs_per_cell;
   deallog << ": vertex" << " " << fe.dofs_per_vertex;
   deallog << "  line" << " " << fe.dofs_per_line;
   deallog << "  quad" <<  " " <<fe.dofs_per_quad << endl;
-  deallog << "n_transform_fct " << fe.n_transform_functions << endl;
-  deallog << "n_components " << fe.n_components << endl;
+  deallog << "n_transform_fct " << fe.n_transform_functions() << endl;
+  deallog << "n_components " << fe.n_components() << endl;
   deallog.push("components");
-  for (unsigned i=0;i<fe.total_dofs;++i)
+  for (unsigned i=0;i<fe.dofs_per_cell;++i)
     {
       pair<unsigned,unsigned> p = fe.system_to_component_index(i);
       deallog << "Index " << i << " ("
