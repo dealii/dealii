@@ -200,7 +200,7 @@
 <ol>
   <li> <p>
        New: <code class="member">DoFTools::make_flux_sparsity_pattern</code>
-       can be optimized by providing two coefficient msatrices.
+       can be optimized by providing two coefficient matrices.
        <br>
        (GK 2000/05/25)
        </p>
@@ -299,7 +299,7 @@
        Several functions in <code class="class">ConstraintMatrix</code>.
        </ul>
        <br>
-       (WB 2000/05/16 ...)
+       (WB 2000/05/16 and later)
        </p>
 
   <li> <p>
@@ -367,20 +367,11 @@
        (WB 2000/05/10)
        </p>
 
-  <li> <p>
-       New: <code class="member">DataOut::clear_data_vectors</code>
-       allows to re-use an object without deleting the <code
-       class="class">DoFHandler</code>
+  <li> <p> 
+       New: <code class="member">IntergridMap::get_{source,destination}_grid</code> 
+       functions return the grids for which the map was created.
        <br>
-       (GK 2000/04/05)
-       </p>
-
-  <li> <p>
-       New: <code class="class">class DoFPrintSolverStep</code> prints
-       intermediate vectors of a solver as finite element functions using
-       <code class="class">DataOut</code>.
-       <br>
-       (GK 2000/04/05)
+       (WB 2000/04/19)
        </p>
 
   <li> <p>
@@ -407,11 +398,20 @@
        (WB 2000/04/14)
        </p>
 
-  <li> <p> 
-       New: <code class="member">IntergridMap::get_{source,destination}_grid</code> 
-       functions return the grids for which the map was created.
+  <li> <p>
+       New: <code class="member">DataOut::clear_data_vectors</code>
+       allows to re-use an object without deleting the <code
+       class="class">DoFHandler</code>
        <br>
-       (WB 2000/04/19)
+       (GK 2000/04/05)
+       </p>
+
+  <li> <p>
+       New: <code class="class">class DoFPrintSolverStep</code> prints
+       intermediate vectors of a solver as finite element functions using
+       <code class="class">DataOut</code>.
+       <br>
+       (GK 2000/04/05)
        </p>
 
 </ol>
