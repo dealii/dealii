@@ -362,17 +362,17 @@ GridGenerator::subdivided_hyper_rectangle (Triangulation<dim>              &tria
 				       // use a large epsilon to
 				       // compare numbers to avoid
 				       // roundoff problems.
-    double epsilon = 0.01*delta[0];
-    if (dim > 1)
-      epsilon = std::min(epsilon,0.01*delta[1]);
+      double epsilon = 0.01*delta[0];
+      if (dim > 1)
+        epsilon = std::min(epsilon,0.01*delta[1]);
     
-    if (dim > 2)
-      epsilon = std::min(epsilon,0.01*delta[2]);
+      if (dim > 2)
+        epsilon = std::min(epsilon,0.01*delta[2]);
     
-				     // actual code is external since
-				     // 1-D is different from 2/3D.
-    colorize_subdivided_hyper_rectangle (tria,p1,p2,epsilon);
-  }
+                                       // actual code is external since
+                                       // 1-D is different from 2/3D.
+      colorize_subdivided_hyper_rectangle (tria,p1,p2,epsilon);
+    }
 }
 
 
