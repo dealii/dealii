@@ -13,20 +13,46 @@
 /**
  * Workaround for a bug in egcs snapshot 1998/08/03.
  */
-template <int dim> struct BoundaryHelper;
+template <int dim>
+struct BoundaryHelper;
 
-template <> struct BoundaryHelper<1> {
-				     // actually, this does not make much
-				     // sense, but declaring a zero-sized
-				     // array is forbidden nowadays
+/**
+ * Workaround for a bug in egcs snapshot 1998/08/03.
+ */
+template <>
+struct BoundaryHelper<1> {
+				     /**
+				      * Declare a data type for the derived
+				      * classes.
+				      *
+				      * actually, this does not make much
+				      * sense, but declaring a zero-sized
+				      * array is forbidden nowadays.
+				      */
     typedef const Point<1> *PointArray[1];
 };
 
-template <> struct BoundaryHelper<2> {
+/**
+ * Workaround for a bug in egcs snapshot 1998/08/03.
+ */
+template <>
+struct BoundaryHelper<2> {
+				     /**
+				      * Declare a data type for the derived
+				      * classes.
+				      */
     typedef const Point<2> *PointArray[GeometryInfo<2>::vertices_per_face];
 };
 
-template <> struct BoundaryHelper<3> {
+/**
+ * Workaround for a bug in egcs snapshot 1998/08/03.
+ */
+template <>
+struct BoundaryHelper<3> {
+				     /**
+				      * Declare a data type for the derived
+				      * classes.
+				      */
     typedef const Point<3> *PointArray[GeometryInfo<3>::vertices_per_face];
 };
 
