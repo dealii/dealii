@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,10 +38,11 @@ template <int dim> class Quadrature;
 
 /**
  * Contains all data vectors for @p{FEValues}.
- *
  * This class has been extracted from @p{FEValuesBase} to be handed
  * over to the fill functions of @p{Mapping} and
- * @p{FiniteElement}. All data fields are public, but this is not
+ * @p{FiniteElement}.
+ *
+ * @note All data fields are public, but this is not
  * critical, because access to this object is private in @p{FEValues}.
  *
  * @author Guido Kanschat, 2000
@@ -219,9 +220,9 @@ class FEValuesData
 
 
 /**
- * Common features of @p{FEValues*} classes.
+ * @brief Common features of <tt>FEValues*</tt> classes.
  *
- * @p{FEValues*} objects are programming interfaces to finite element
+ * <tt>FEValues*</tt> objects are programming interfaces to finite element
  * and mapping classes on the one hand side, to cells and quadrature
  * rules on the other side. The reason for their existence is possible
  * optimization. Depending on the type of finite element and mapping,
@@ -231,22 +232,22 @@ class FEValuesData
  * be complex and depends on the actual finite element, it cannot be
  * left to the applications programmer.
  *
- * @p{FEValues*} provides only data handling: computations are left to
- * objects of type @ref{Mapping} and @ref{FiniteElement}. These
- * provide functions @p{get_*_data} and @p{fill_*_values} which are
- * called by the constructor and @p{reinit} functions of
- * @p{FEValues*}, respectively.
+ * <tt>FEValues*</tt> provides only data handling: computations are left to
+ * objects of type Mapping and FiniteElement. These
+ * provide functions <tt>get_*_data</tt> and <tt>fill_*_values</tt> which are
+ * called by the constructor and <tt>reinit</tt> functions of
+ * <tt>FEValues*</tt>, respectively.
  *
- * @sect3{General usage}
+ * @section FEValuesBaseGeneral General usage
  *
- * Usually, an object of @p{FEValues*} is used in integration loops
+ * Usually, an object of <tt>FEValues*</tt> is used in integration loops
  * over all cells of a triangulation. To take full advantage of the
  * optimization features, it should be constructed before the
  * loop. Then, it must be re-initialized for each grid cell. This is
  * like a magnifying glass being used to look at one item after the
  * other. A typical piece of code looks like this:
  *
- * @begin{verbatim}
+ * @code
  * FEValues values (mapping, finite_element, quadrature, flags);
  * for (cell = dof_handler.begin_active();
  *      cell != dof_handler.end();
@@ -255,7 +256,7 @@ class FEValuesData
  *     values.reinit(cell);
  *     ...
  *   }
- * @end{verbatim}
+ * @endcode
  *
  *
  *  @sect3{Member functions}
@@ -331,12 +332,12 @@ class FEValuesBase : protected FEValuesData<dim>
     
 				     /**
 				      * Constructor. Set up the array
-				      * sizes with @p{n_q_points}
-				      * quadrature points, @p{n_dof}
+				      * sizes with <tt>n_q_points</tt>
+				      * quadrature points, <tt>dofs_per_cell</tt>
 				      * trial functions per cell and
 				      * with the given pattern to
 				      * update the fields when the
-				      * @p{reinit} function of the
+				      * <tt>reinit</tt> function of the
 				      * derived classes is called. The
 				      * fields themselves are not set
 				      * up, this must happen in the
@@ -354,15 +355,13 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Destructor.
 				      */
     ~FEValuesBase ();
-    
 				     /**
-				      * Value of the @p{function_no}th
-				      * shape function at the
-				      * @p{point_no}th quadrature
-				      * point on the cell, face or
-				      * subface selected the last time
-				      * the @p{reinit} function of the
-				      * derived class was called.
+				      * Value of a shape function at a
+				      * quadrature point on the cell,
+				      * face or subface selected the
+				      * last time the <tt>reinit</tt>
+				      * function of the derived class
+				      * was called.
 				      *
 				      * If the shape function is
 				      * vector-valued, then this
@@ -372,10 +371,17 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * non-zero component (i.e. it is
 				      * not primitive), then throw an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * ExcShapeFunctionNotPrimitive. In
 				      * that case, use the
-				      * @ref{shape_value_component}
+				      * shape_value_component()
 				      * function.
+				      *
+				      * @arg function_no Number
+				      * of the shape function to be
+				      * computed
+				      * @arg point_no Number of
+				      * the quadrature point at which
+				      * function is to be computed
 				      */
     double shape_value (const unsigned int function_no,
 			const unsigned int point_no) const;
@@ -403,6 +409,14 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * is not primitive, but then it
 				      * is necessary since the other
 				      * function cannot be used.
+				      *
+				      * @arg function_no Number
+				      * of the shape function to be
+				      * computed
+				      * @arg point_no Number of
+				      * the quadrature point at which
+				      * function is to be computed
+				      * @arg component vector component to be computed
 				      */
     double shape_value_component (const unsigned int function_no,
 				  const unsigned int point_no,
@@ -412,10 +426,10 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Returns the values of the
 				      * finite element function
 				      * characterized by
-				      * @p{fe_function} restricted to
+				      * <tt>fe_function</tt> restricted to
 				      * the cell, face or subface
 				      * selected the last time the
-				      * @p{reinit} function of the
+				      * <tt>reinit</tt> function of the
 				      * derived class was called, at
 				      * the quadrature points.
 				      *
@@ -426,23 +440,23 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * To get values of
 				      * multi-component elements,
 				      * there is another
-				      * @p{get_function_values}
+				      * get_function_values() below,
 				      * returning a vector of vectors
 				      * of results.
 				      *
 				      * The function assumes that the
-				      * @p{values} object already has the
+				      * <tt>values</tt> object already has the
 				      * correct size. 
 				      *
 				      * The actual data type of the
 				      * input vector may be either a
-				      * @p{Vector<double>},
-				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double>}. It
+				      * Vector<double>,
+				      * Vector<float>, or
+				      * BlockVector<double>. It
 				      * represents a global vector of
 				      * DoF values associated with the
-				      * @ref{DofHandler} object with
-				      * which this @ref{FEValues}
+				      * DofHandler object with
+				      * which this FEValues
 				      * object was last initialized.
 				      */
     template <class InputVector, typename number>
@@ -461,13 +475,13 @@ class FEValuesBase : protected FEValuesData<dim>
 				      *
 				      * The actual data type of the
 				      * input vector may be either a
-				      * @p{Vector<double>},
-				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double>}. It
+				      * Vector<double>,
+				      * Vector<float>, or
+				      * BlockVector<double>. It
 				      * represents a global vector of
 				      * DoF values associated with the
-				      * @ref{DofHandler} object with
-				      * which this @ref{FEValues}
+				      * DofHandler object with
+				      * which this FEValues
 				      * object was last initialized.
 				      */
     template <class InputVector, typename number>
@@ -483,7 +497,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * get the derivative in one of
 				      * the coordinate directions, use
 				      * the appropriate function of
-				      * the @ref{Tensor} class to
+				      * the Tensor class to
 				      * extract one component. Since
 				      * only a reference to the
 				      * gradient's value is returned,
@@ -498,9 +512,9 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * non-zero component (i.e. it is
 				      * not primitive), then throw an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * ExcShapeFunctionNotPrimitive. In
 				      * that case, use the
-				      * @ref{shape_grad_component}
+				      * shape_grad_component()
 				      * function.
 				      */
     const Tensor<1,dim> &
@@ -514,14 +528,14 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * finite element is scalar, then
 				      * only component zero is allowed
 				      * and the return value equals
-				      * that of the @p{shape_grad}
+				      * that of the shape_grad()
 				      * function. If the finite
 				      * element is vector valued but
 				      * all shape functions are
 				      * primitive (i.e. they are
 				      * non-zero in only one
 				      * component), then the value
-				      * returned by @p{shape_grad}
+				      * returned by shape_grad()
 				      * equals that of this function
 				      * for exactly one
 				      * component. This function is
@@ -552,13 +566,13 @@ class FEValuesBase : protected FEValuesData<dim>
 				      *
 				      * The actual data type of the
 				      * input vector may be either a
-				      * @p{Vector<double>},
-				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double>}. It
+				      * Vector<double>,
+				      * Vector<float>, or
+				      * BlockVector<double>. It
 				      * represents a global vector of
 				      * DoF values associated with the
-				      * @ref{DofHandler} object with
-				      * which this @ref{FEValues}
+				      * DofHandler object with
+				      * which this FEValues
 				      * object was last initialized.
 				      *
 				      * The output are the gradients
