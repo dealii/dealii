@@ -231,9 +231,30 @@
     </p>
 
 
+
     <a name="examples">
     <h3>Writing example programs</h3>
 
+    <p>
+    At present, the tools that extract information from the example
+    programs are rather dumb. They are, to be precise, two Perl
+    scripts located in the directory of the
+    <code>deal.II/doc/tutorial</code> tree, where the HTML files are
+    generated. In principle, they extract plain text from all comments
+    in the programs that start with a double slash (C++ style
+    comment). Everything else is interpreted as program text and is
+    copied verbatim into the output.
+    </p>
+
+    <p>
+    In the future, it would certainly help if the scripts understood
+    something like a <code>title</code> or <code>section</code> tag
+    (preferably something similar to the DocBook SGML commands for
+    that) in the comments, which could help to better structure the
+    output, especially for the longer programs. One would probably
+    like to put a section break before each new function or class, or
+    something along these lines.
+    </p>
 
 
     <hr>
