@@ -67,7 +67,9 @@ Update DoFHandler::distribute_cell_to_dof_vector for higher order
   on the vertices).
 
 
-Use auto_ptr when available for the DataOut::boundary_faces function.
+Replace <multimap.h> in dof.cc by <multimap> and <pair.h> by
+  <pair> in dof_constraints.h
+
 
 
 
@@ -114,3 +116,4 @@ Why are there all these unsafe casts from VectorBase to dVector
 Optimize dSMatrixStruct::compress, using standard sort algorithms
   and only sorting the used range of indices, not those with
   -1 entries.
+
