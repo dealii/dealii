@@ -33,6 +33,9 @@
 /**
  * Implementation of the multigrid method.
  *
+ * Warning: multigrid on locally refined meshes only works with
+ * discontinuous finite elements.
+ *
  * The function actually performing a multi-level cycle,
  * @p{level_mgstep}, as well as the function @p{vcycle}, calling it,
  * require several helper classes handed over as template parameters.
