@@ -265,16 +265,21 @@ class FEValuesBase : protected FEValuesData<dim>
 			const unsigned int point_no) const;
 
 				     /**
-				      * Pointer to the matrix holding
-				      * all values of shape functions at all
-				      * integration points, on the present cell,
-				      * face or subface selected
-				      * the last time the @p{reinit} function
-				      * of the derived class was called.
-				      * For the format of this matrix, see the
-				      * documentation for the matrix itself.
+				      * This function is now
+				      * deprecated and will be removed
+				      * in the next release of the
+				      * deal.II library.
 				      *
-				      * Use of this function is deprecated.
+				      * Pointer to the matrix holding
+				      * all values of shape functions
+				      * at all integration points, on
+				      * the present cell, face or
+				      * subface selected the last time
+				      * the @p{reinit} function of the
+				      * derived class was called.  For
+				      * the format of this matrix, see
+				      * the documentation for the
+				      * matrix itself.
 				      */
     const typename FEValuesData<dim>::ShapeVector & get_shape_values () const;
 
@@ -351,6 +356,11 @@ class FEValuesBase : protected FEValuesData<dim>
 				      const unsigned int quadrature_point) const;
 
 				     /** 
+				      * This function is now
+				      * deprecated and will be removed
+				      * in the next release of the
+				      * deal.II library.
+				      *
 				      * Pointer to the matrix holding
 				      * all gradients of shape
 				      * functions at all integration
@@ -358,10 +368,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * For the format of this matrix,
 				      * see the documentation for the
 				      * matrix itself.
-				      *
-				      * Use of this function is
-				      * deprecated.
-				     */
+				      */
     const typename FEValuesData<dim>::GradientVector & get_shape_grads () const;
 
 				     /**
@@ -436,6 +443,11 @@ class FEValuesBase : protected FEValuesData<dim>
 						const unsigned int point_no) const;
 
 				     /**
+				      * This function is now
+				      * deprecated and will be removed
+				      * in the next release of the
+				      * deal.II library.
+				      *
 				      * Pointer to the
 				      * matrix holding all 2nd
 				      * derivatives of shape functions
