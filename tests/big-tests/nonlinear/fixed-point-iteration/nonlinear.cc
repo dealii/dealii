@@ -34,7 +34,8 @@ template <int dim>
 class RightHandSide :  public Function<dim> 
 {
   public:
-    double value (const Point<dim> &p) const 
+    virtual double value (const Point<dim> &p,
+			  const unsigned int) const 
       {
 	double x = 80;
 	for (unsigned int d=0; d<dim; ++d)
@@ -219,6 +220,7 @@ void NonlinearProblem<dim>::run () {
 	      DataOut<dim> out;
 	      ofstream gnuplot(filename.c_str());
 	      fill_data (out);
+	      out.build_patches ();
 	      out.write_gnuplot (gnuplot);
 	      gnuplot.close ();
 	    };
