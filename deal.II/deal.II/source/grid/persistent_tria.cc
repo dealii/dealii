@@ -1,6 +1,8 @@
 /* $Id$ */
 
 #include <grid/persistent_tria.h>
+#include <basic/magic_numbers.h>
+#include <iostream>
 
 
 template <int dim>
@@ -82,25 +84,6 @@ PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_
 };
 
 
-
-template <int dim>
-void
-PersistentTriangulation<dim>::block_write (ostream &) const 
-{
-  Assert (false, ExcFunctionNotUseful());
-};
-
-
-
-template <int dim>
-void
-PersistentTriangulation<dim>::block_read (istream &)
-{
-  Assert (false, ExcFunctionNotUseful());
-};
-
-
-
 template <int dim>
 void
 PersistentTriangulation<dim>::create_triangulation (const vector<Point<dim> >    &,
@@ -111,6 +94,61 @@ PersistentTriangulation<dim>::create_triangulation (const vector<Point<dim> >   
 };
 
 
+
+template <int dim>
+void
+PersistentTriangulation<dim>::write_flags(ostream &out) const
+{
+  const unsigned int n_flag_levels=refine_flags.size();
+  
+  AssertThrow (out, ExcIO());
+
+  out << mn_persistent_tria_flags_begin << ' ' << n_flag_levels << endl;
+
+  for (unsigned int i=0; i<n_flag_levels; ++i)
+    {
+      write_bool_vector (mn_tria_refine_flags_begin, refine_flags[i],
+			 mn_tria_refine_flags_end, out);
+      write_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags[i],
+			 mn_tria_coarsen_flags_end, out);
+    }
+  
+  out << mn_persistent_tria_flags_end << endl;
+
+  AssertThrow (out, ExcIO());
+}
+
+
+
+template <int dim>
+void
+PersistentTriangulation<dim>::read_flags(istream &in)
+{
+  Assert(refine_flags.size()==0 && coarsen_flags.size()==0, ExcTriaNotEmpty());
+
+  AssertThrow (in, ExcIO());
+
+  unsigned int magic_number;
+  in >> magic_number;
+  AssertThrow(magic_number==mn_persistent_tria_flags_begin, ExcGridReadError());
+
+  unsigned int n_flag_levels;
+  in >> n_flag_levels;
+  for (unsigned int i=0; i<n_flag_levels; ++i)
+    {
+      refine_flags.push_back (vector<bool>());
+      coarsen_flags.push_back (vector<bool>());
+      read_bool_vector (mn_tria_refine_flags_begin, refine_flags.back(),
+			mn_tria_refine_flags_end, in);
+      read_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags.back(),
+			mn_tria_coarsen_flags_end, in);
+    }
+  
+  in >> magic_number;
+  AssertThrow(magic_number==mn_persistent_tria_flags_end, ExcGridReadError());
+
+  AssertThrow (in, ExcIO());
+}
 
 
 // explicit instantiations

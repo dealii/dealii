@@ -171,23 +171,21 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * is not useful in the context of this
 				      * class.
 				      */
-    virtual void block_write (ostream &out) const;
-
-				     /**
-				      * Throw an error, since this function
-				      * is not useful in the context of this
-				      * class.
-				      */
-    virtual void block_read (istream &in);
-
-				     /**
-				      * Throw an error, since this function
-				      * is not useful in the context of this
-				      * class.
-				      */
     virtual void create_triangulation (const vector<Point<dim> >    &vertices,
 				       const vector<CellData<dim> > &cells,
 				       const SubCellData            &subcelldata);
+
+				     /**
+				      * Writes all refine flag to the ostream
+				      * #out#.
+				      */
+    virtual void write_flags(ostream &out) const;
+
+				     /**
+				      * Loads all refine flags that previously
+				      * were written by #save_refine_flags(...)#.
+				      */
+    virtual void read_flags(istream &in);
 
 				     /**
 				      * Exception.
