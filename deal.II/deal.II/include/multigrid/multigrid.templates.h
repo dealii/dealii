@@ -29,7 +29,7 @@ Multigrid<VECTOR>::Multigrid (const unsigned int minlevel,
 			      const MGTransferBase<VECTOR>& transfer,
 			      const MGSmootherBase<VECTOR>& pre_smooth,
 			      const MGSmootherBase<VECTOR>& post_smooth,
-			      Multigrid<VECTOR>::Cycle cycle)
+			      typename Multigrid<VECTOR>::Cycle cycle)
 		:
 		cycle_type(cycle),
 		minlevel(minlevel),
@@ -89,7 +89,7 @@ Multigrid<VECTOR>::set_minlevel(unsigned int l,
 
 template <class VECTOR>
 void
-Multigrid<VECTOR>::set_cycle(Multigrid<VECTOR>::Cycle c)
+Multigrid<VECTOR>::set_cycle(typename Multigrid<VECTOR>::Cycle c)
 {
   cycle_type = c;
 }
