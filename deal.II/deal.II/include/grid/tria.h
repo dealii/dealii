@@ -1552,6 +1552,28 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      *  beforehand.
 				      */
     void copy_triangulation (const Triangulation<dim> &old_tria);
+
+				     /**
+				      * Write out a triangulation en bloc, i.e.
+				      * in a binary or near binary format. Since
+				      * some of the data vectors describing a
+				      * triangulation are written en bloc
+				      * from memory to the stream, the file
+				      * resulting from this operation will not
+				      * be readable on other platforms; this
+				      * function along with the following is
+				      * only thought to support fast creation
+				      * of and restoration from temporary
+				      * files.
+				      */
+    void block_write (ostream &out) const;
+
+				     /**
+				      * Restore a triangulation written by the
+				      * above function. The present content of
+				      * the triangulation is obviously lost.
+				      */
+    void block_read (istream &in);
     
 				     /**
 				      * Create a triangulation from a list
