@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -571,6 +571,10 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSO="$CXXFLAGS -w"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-G"
+          AC_MSG_ERROR(Attention! deal.II is not known to work with SUN Compilers!
+	If you intend to port it, please remove this message
+	from aclocal.m4 and call autoconf and configure. If you do not understand
+	this, you will NOT want to do it!)
           ;;
   
       portland_group)
@@ -612,6 +616,10 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSO="$CXXFLAGS -q -O2"
           CXXFLAGSPIC=""
           LDFLAGSPIC=""
+          AC_MSG_ERROR(Attention! deal.II is not known to work with Borland C++!
+	If you intend to port it to Borland C++, please remove this message
+	from aclocal.m4 and call autoconf and configure. If you do not understand
+	this, you will NOT want to do it!)
           ;;
 
       *)
