@@ -41,7 +41,7 @@ template<typename number> class FullMatrix;
  * @author several, 1994-2003
  */
 template <typename number>
-class SparseMatrix : public Subscriptor
+class SparseMatrix : public virtual Subscriptor
 {
   public:
 				     /**
