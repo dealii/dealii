@@ -413,7 +413,7 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
     void initialize (const MATRIX& A,
 		     const std::vector<unsigned int>& permutation,
 		     typename PreconditionRelaxation<MATRIX>::AdditionalData
-		     parameters = AdditionalData());
+		     parameters = typename PreconditionRelaxation<MATRIX>::AdditionalData());
     
 				     /**
 				      * Apply preconditioner.
