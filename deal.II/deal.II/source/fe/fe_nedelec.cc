@@ -715,10 +715,10 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 					   // values...
 	  Assert (fe_data.shape_values[k].size() == n_q_points,
 		  ExcInternalError());
-	  mapping.transform_contravariant(&*shape_values.begin(),
-					  &*shape_values.end(),
-					  fe_data.shape_values[k].begin(),
-					  mapping_data);
+	  mapping.transform_covariant(&*shape_values.begin(),
+                                      &*shape_values.end(),
+                                      fe_data.shape_values[k].begin(),
+                                      mapping_data);
 
 					   // then copy over to target:
 	  for (unsigned int q=0; q<n_q_points; ++q)
@@ -730,16 +730,62 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
       
   if (flags & update_gradients)
     {
+      std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
+      std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
+
+      Assert (data.shape_values.n_rows() == dofs_per_cell * dim,
+	      ExcInternalError());
+      Assert (data.shape_values.n_cols() == n_q_points,
+	      ExcInternalError());
+
+                                       // loop over all shape
+                                       // functions, and treat the
+                                       // gradients of each shape
+                                       // function at all quadrature
+                                       // points
       for (unsigned int k=0; k<dofs_per_cell; ++k)
 	{
-	  Assert (false, ExcNotImplemented());
-// 	  Assert (data.shape_gradients[k].size() <=
-// 		  fe_data.shape_gradients[k].size(),
-// 		  ExcInternalError());	  
-// 	  mapping.transform_covariant(data.shape_gradients[k].begin(),
-// 				      data.shape_gradients[k].end(),
-// 				      fe_data.shape_gradients[k].begin(),
-// 				      mapping_data);
+                                           // treat the gradients of
+                                           // this particular shape
+                                           // function at all
+                                           // q-points. if Dv is the
+                                           // gradient of the shape
+                                           // function on the unit
+                                           // cell, then
+                                           // (J^-T)Dv(J^-1) is the
+                                           // value we want to have on
+                                           // the real cell. so, we
+                                           // will have to apply a
+                                           // covariant transformation
+                                           // to Dv twice. since the
+                                           // interface only allows
+                                           // multiplication with
+                                           // (J^-1) from the right,
+                                           // we have to trick a
+                                           // little in between
+	  Assert (fe_data.shape_gradients[k].size() == n_q_points,
+		  ExcInternalError());
+                                           // do first transformation
+	  mapping.transform_covariant(&*shape_grads1.begin(),
+                                      &*shape_grads1.end(),
+                                      fe_data.shape_gradients[k].begin(),
+                                      mapping_data);
+                                           // transpose matrix
+          for (unsigned int q=0; q<n_q_points; ++q)
+            shape_grads2[q] = transpose(shape_grads1[q]);
+                                           // do second transformation
+	  mapping.transform_covariant(&*shape_grads1.begin(),
+                                      &*shape_grads1.end(),
+                                      &*shape_grads2.begin(),
+                                      mapping_data);
+                                           // transpose back
+          for (unsigned int q=0; q<n_q_points; ++q)
+            shape_grads2[q] = transpose(shape_grads1[q]);
+          
+					   // then copy over to target:
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    for (unsigned int d=0; d<dim; ++d)
+	      data.shape_gradients[k*dim+d][q] = shape_grads2[q][d];
 	};
     }
 
