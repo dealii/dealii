@@ -255,6 +255,7 @@ namespace PETScWrappers
                const unsigned int               this_process,
                const bool                       preset_nonzero_locations)
     {
+//TODO[WB]: The next PETSc release should contain a function  MatMPI[B]AIJSetPreallocationCSR that we will want to use here     
       Assert (local_rows_per_process.size() == local_columns_per_process.size(),
               ExcInvalidSizes (local_rows_per_process.size(),
                                local_columns_per_process.size()));
