@@ -18,8 +18,6 @@
 
 template<typename number> class Vector;
 
-class iVector;
-
 
 
 /**
@@ -517,15 +515,6 @@ class FullMatrix : public Subscriptor
 				      * Add constant to diagonal elements of this
 				      */
     void diagadd (const number s);
-
-				     /**
-				      *  w+=part(A)*v. Conditional partial
-				      *  Matrix-vector-multiplication <p>
-				      *  (used elements of v determined by x)
-				      */
-    template<typename number2>
-    void gsmult (Vector<number2>& w, const Vector<number2>& v, const iVector& x) const;
-
 
 				     /**
 				      * Output of the matrix in user-defined format.

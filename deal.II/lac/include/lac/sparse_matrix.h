@@ -19,8 +19,6 @@
 //forward declarations
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;
-
-class iVector;
 class ostream;
 
 
@@ -242,10 +240,6 @@ class SparseMatrixStruct : public Subscriptor
 				     //////////
     void add_matrix (const unsigned int m, const unsigned int n,
 		     const int* rows, const int* cols);
-				     //////////
-    void add_matrix (const iVector& rowcols);
-				     //////////
-    void add_matrix (const iVector& rows, const iVector& cols);
 
 				     /**
 				      * Print the sparsity of the matrix

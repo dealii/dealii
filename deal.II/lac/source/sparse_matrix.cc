@@ -7,7 +7,6 @@
 
 
 #include <lac/sparsematrix.h>
-#include <lac/ivector.h>
 
 #include <iostream>
 #include <iomanip>
@@ -451,30 +450,6 @@ SparseMatrixStruct::add_matrix (const unsigned int m, const unsigned int n,
   for (unsigned i=0; i<m; ++i)
     for (unsigned j=0; j<n; ++j)
       add(rows[i], cols[j]);
-}
-
-
-
-void
-SparseMatrixStruct::add_matrix (const iVector& rowcols)
-{
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
-  unsigned int i,j;
-  for (i=0;i<rowcols.n();i++)
-    for (j=0;j<rowcols.n();j++)
-      add(rowcols(i), rowcols(j));
-}
-
-
-
-void
-SparseMatrixStruct::add_matrix (const iVector& rows, const iVector& cols)
-{
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
-  unsigned int i,j;
-  for (i=0;i<rows.n();i++)
-    for (j=0;j<cols.n();j++)
-      add(rows(i), cols(j));
 }
 
 

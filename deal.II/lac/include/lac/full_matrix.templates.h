@@ -1,9 +1,9 @@
 // $Id$
 
 #include <lac/vector.h>
-#include <lac/ivector.h>
 #include <lac/fullmatrix.h>
 
+#include <vector>
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
@@ -238,144 +238,9 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::gsmult (Vector<number2>& dst, const Vector<number2>& src, const iVector& gl) const
-{
-  Assert(n() == m(), ExcNotQuadratic());
-  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
-  Assert(gl.n() == n(), ExcDimensionMismatch(gl.n(), n()));
-
-  number2 s;
-  if ((n()==3) && (m()==3))
-  {
-    number2 s0=0.,s1=0.,s2=0.;
-    s   = src(0);
-    if(gl(1)<gl(0)) s1  = s*val[3]; if(gl(2)<gl(0))  s2  = s*val[6]; 
-    s   = src(1);
-    if(gl(0)<gl(1)) s0 += s*val[1]; if(gl(2)<gl(1))  s2 += s*val[7];
-    s   = src(2);
-    if(gl(0)<gl(2)) s0 += s*val[2]; if(gl(1)<gl(2))  s1 += s*val[5]; 
-
-    dst(0) += s0;
-    dst(1) += s1;
-    dst(2) += s2;
-  }
-  else if ((n()==4) && (m()==4))
-  {
-    number2 s0=0.,s1=0.,s2=0.,s3=0.;
-    s = src(0);
-    if(gl(1)<gl(0)) s1 = s*val[4];  if(gl(2)<gl(0)) s2 = s*val[8]; if(gl(3)<gl(0)) s3 = s*val[12];
-    s = src(1);
-    if(gl(0)<gl(1)) s0 += s*val[1]; if(gl(2)<gl(1)) s2 += s*val[9]; if(gl(3)<gl(1)) s3 += s*val[13];
-    s = src(2);
-    if(gl(0)<gl(2)) s0 += s*val[2]; if(gl(1)<gl(2)) s1 += s*val[6]; if(gl(3)<gl(2)) s3 += s*val[14];
-    s = src(3);
-    if(gl(0)<gl(3)) s0 += s*val[3]; if(gl(1)<gl(3)) s1 += s*val[7]; if(gl(2)<gl(3)) s2 += s*val[11];
-
-    dst(0) += s0;
-    dst(1) += s1;
-    dst(2) += s2;
-    dst(3) += s3;
-  }
-  else if ((n()==8) && (m()==8))
-  {
-    number2 s0=0.,s1=0.,s2=0.,s3=0.,s4=0.,s5=0.,s6=0.,s7=0.;
-    s = src(0);
-    if(gl(1)<gl(0)) s1 = s*val[8]; 
-    if(gl(2)<gl(0)) s2 = s*val[16]; 
-    if(gl(3)<gl(0)) s3 = s*val[24];
-    if(gl(4)<gl(0)) s4 = s*val[32]; 
-    if(gl(5)<gl(0)) s5 = s*val[40]; 
-    if(gl(6)<gl(0)) s6 = s*val[48]; 
-    if(gl(7)<gl(0)) s7 = s*val[56];
-    s = src(1);
-    if(gl(0)<gl(1)) s0 += s*val[1]; 
-    if(gl(2)<gl(1)) s2 += s*val[17]; 
-    if(gl(3)<gl(1)) s3 += s*val[25];
-    if(gl(4)<gl(1)) s4 += s*val[33]; 
-    if(gl(5)<gl(1)) s5 += s*val[41]; 
-    if(gl(6)<gl(1)) s6 += s*val[49]; 
-    if(gl(7)<gl(1)) s7 += s*val[57];
-    s = src(2);
-    if(gl(0)<gl(2)) s0 += s*val[2]; 
-    if(gl(1)<gl(2)) s1 += s*val[10]; 
-    if(gl(3)<gl(2)) s3 += s*val[26];
-    if(gl(4)<gl(2)) s4 += s*val[34]; 
-    if(gl(5)<gl(2)) s5 += s*val[42]; 
-    if(gl(6)<gl(2)) s6 += s*val[50]; 
-    if(gl(7)<gl(2)) s7 += s*val[58];
-    s = src(3);
-    if(gl(0)<gl(3)) s0 += s*val[3]; 
-    if(gl(1)<gl(3)) s1 += s*val[11]; 
-    if(gl(2)<gl(3)) s2 += s*val[19]; 
-    if(gl(4)<gl(3)) s4 += s*val[35]; 
-    if(gl(5)<gl(3)) s5 += s*val[43]; 
-    if(gl(6)<gl(3)) s6 += s*val[51]; 
-    if(gl(7)<gl(3)) s7 += s*val[59];
-    s = src(4);
-    if(gl(0)<gl(4)) s0 += s*val[4]; 
-    if(gl(1)<gl(4)) s1 += s*val[12]; 
-    if(gl(2)<gl(4)) s2 += s*val[20]; 
-    if(gl(3)<gl(4)) s3 += s*val[28];
-    if(gl(5)<gl(4)) s5 += s*val[44]; 
-    if(gl(6)<gl(4)) s6 += s*val[52]; 
-    if(gl(7)<gl(4)) s7 += s*val[60];
-    s = src(5);
-    if(gl(0)<gl(5)) s0 += s*val[5]; 
-    if(gl(1)<gl(5)) s1 += s*val[13]; 
-    if(gl(2)<gl(5)) s2 += s*val[21]; 
-    if(gl(3)<gl(5)) s3 += s*val[29];
-    if(gl(4)<gl(5)) s4 += s*val[37]; 
-    if(gl(6)<gl(5)) s6 += s*val[53]; 
-    if(gl(7)<gl(5)) s7 += s*val[61];
-    s = src(6);
-    if(gl(0)<gl(6)) s0 += s*val[6]; 
-    if(gl(1)<gl(6)) s1 += s*val[14]; 
-    if(gl(2)<gl(6)) s2 += s*val[22]; 
-    if(gl(3)<gl(6)) s3 += s*val[30];
-    if(gl(4)<gl(6)) s4 += s*val[38]; 
-    if(gl(5)<gl(6)) s5 += s*val[46]; 
-    if(gl(7)<gl(6)) s7 += s*val[62];
-    s = src(7);
-    if(gl(0)<gl(7)) s0 += s*val[7]; 
-    if(gl(1)<gl(7)) s1 += s*val[15]; 
-    if(gl(2)<gl(7)) s2 += s*val[23]; 
-    if(gl(3)<gl(7)) s3 += s*val[31];
-    if(gl(4)<gl(7)) s4 += s*val[39]; 
-    if(gl(5)<gl(7)) s5 += s*val[47]; 
-    if(gl(6)<gl(7)) s6 += s*val[55]; 
-    
-    dst(0) += s0;
-    dst(1) += s1;
-    dst(2) += s2;
-    dst(3) += s3;
-    dst(4) += s4;
-    dst(5) += s5;
-    dst(6) += s6;
-    dst(7) += s7;
-  }
-  else
-  {    
-    number* e = val;
-    const unsigned int size_m = m(),
-		       size_n = n();
-    for (unsigned int i=0; i<size_m; ++i)
-    {
-      s = 0.;
-      for (unsigned int j=0; j<size_n; ++j)
-	if(gl(i)<gl(j)) s += src(j) * *(e++);
-      dst(i) += s;
-    }
-  }
-}
-
-
-
-template <typename number>
-template <typename number2>
-void FullMatrix<number>::Tvmult (Vector<number2>& dst,
-				 const Vector<number2>& src,
-				 const bool adding) const
+void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
+				 const Vector<number2> &src,
+				 const bool             adding) const
 {
   Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
   Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
@@ -1393,12 +1258,13 @@ void
 FullMatrix<number>::gauss_jordan()
 {
   Assert (dim_range == dim_image, ExcNotQuadratic());
-  iVector p(n());
+  vector<unsigned int> p(n());
 
   unsigned int i,j,k,r;
   number max, hr;
 
-  for (i=0; i<n(); ++i) p(i) = i;
+  for (i=0; i<n(); ++i)
+    p[i] = i;
 
   for (j=0; j<n(); ++j)
     {
@@ -1421,7 +1287,9 @@ FullMatrix<number>::gauss_jordan()
 	    {
 	      hr = el(j,k) ; el(j,k) = el(r,k) ; el(r,k) = hr;
 	    }
-	  i = p(j) ; p(j) = p(r) ; p(r) = i;
+	  i = p[j];
+	  p[j] = p[r];
+	  p[r] = i;
 	}
 
 				       // transformation
@@ -1447,7 +1315,7 @@ FullMatrix<number>::gauss_jordan()
   Vector<number> hv(n());
   for (i=0; i<n(); ++i)
     {
-      for (k=0; k<n(); ++k) hv(p(k)) = el(i,k);
+      for (k=0; k<n(); ++k) hv(p[k]) = el(i,k);
       for (k=0; k<n(); ++k) el(i,k) = hv(k);
     }
 }
