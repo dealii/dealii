@@ -15,7 +15,7 @@
  * it was deleted some time before. Its main purpose is support for
  * time-dependent problems where one frequently deletes a triangulation due
  * to memory pressure and later wants to rebuild it; this class has all the
- * information to rebuild it exactly as it was beforem including the mapping
+ * information to rebuild it exactly as it was before including the mapping
  * of cell numbers to the geometrical cells.
  *
  * Basically, this is a drop-in replacement for the triangulation. Since it
@@ -176,14 +176,18 @@ class PersistentTriangulation : public Triangulation<dim>
 				       const SubCellData            &subcelldata);
 
 				     /**
-				      * Writes all refine flag to the ostream
-				      * #out#.
+				      * Writes all refine and coarsen
+				      * flags to the ostream #out#.
 				      */
     virtual void write_flags(ostream &out) const;
 
 				     /**
-				      * Loads all refine flags that previously
-				      * were written by #save_refine_flags(...)#.
+				      * Reads all refine and coarsen flags
+				      * that previously were written by
+				      * #write_flags(...)#. This is especially
+				      * useful for rebuilding the triangulation
+				      * after the end or breakdown of a program
+				      * and its restart.
 				      */
     virtual void read_flags(istream &in);
 
