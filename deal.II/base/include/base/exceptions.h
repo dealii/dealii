@@ -450,26 +450,38 @@ void __IssueError_Throw (const char *file,
  * mode error checking. It assert that a certain condition is
  * fulfilled, otherwise issues an error and aborts the program.
  *
- * The configuration parameter NO_THROW can be used to disable this
- * feature.  This should not be done on a regular basis, but gcc
- * 2.95.2 on DEC Alpha stops compiling here.
+ * On some systems (we only know of DEC Alpha systems running under
+ * OSF1 or Linux), the compiler fails to compile the @p{AssertThrow}
+ * macro properly, yielding an internal compiler error. We detect this
+ * at configure time. For these cases, the @p{AssertThrow} macro is
+ * implemented like the @p{Assert} macro in debug mode, i.e. it aborts
+ * the program if the assertion is not satisfied. This, however,
+ * happens in debug and optimized mode likewise.  Note that in these
+ * cases, the meaning of a program changes. In particular, one cannot
+ * catch exceptions thrown by @p{AssertThrow}, but we did not find
+ * another way to work around this compiler bug.
  *
  * See the @p{ExceptionBase} class for more information.
  *
  * @see ExceptionBase
  * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
-#ifndef NO_THROW
-#define AssertThrow(cond, exc)                                   \
-  {                                                              \
-    if (!(cond))                                                 \
-      __IssueError_Throw (__FILE__,                              \
-			  __LINE__,                              \
-			  __PRETTY_FUNCTION__, #cond, #exc, exc);\
+#ifndef DISABLE_ASSERT_THROW
+#define AssertThrow(cond, exc)                                    \
+  {                                                               \
+    if (!(cond))                                                  \
+      __IssueError_Throw (__FILE__,                               \
+			  __LINE__,                               \
+			  __PRETTY_FUNCTION__, #cond, #exc, exc); \
   }
 #else
-#define AssertThrow(cond, exc)                                   \
-   { if (!(cond)) abort(); }
+#define AssertThrow(cond, exc)                                    \
+  {                                                               \
+    if (!(cond))                                                  \
+      __IssueError_Assert (__FILE__,                              \
+			   __LINE__,                              \
+			   __PRETTY_FUNCTION__, #cond, #exc, exc);\
+  }
 #endif
 
 
