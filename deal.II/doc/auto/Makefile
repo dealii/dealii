@@ -198,8 +198,10 @@ doc++/%/index.html: %.doc++
 #################################################################################
 clean:
 	-rm -f kdoc/names.html kdoc/*.kdoc kdoc/*/*.html cvs-backlog/*.html \
-		latex/base.* latex/lac.* latex/dealII.* latex/deal_II_technical_reference.* \
-		doc++/base/* doc++/lac/* doc++/dealII/*
+		latex/base.* latex/lac.* latex/dealII.* \
+                latex/deal_II_technical_reference.* \
+		doc++/base/* doc++/lac/* doc++/dealII/* \
+		*.doc++
 
 
 .PHONY: default all kdoc $(kdoc.library-files) $(kdoc.library-files.rerun) doc++ clean
