@@ -57,6 +57,9 @@
                  std::i/ostringstream classes (early gcc versions did not) */
 #undef HAVE_STD_STRINGSTREAM
 
+/* Define if the compiler provides an <ostream> header file */
+#undef HAVE_STD_OSTREAM_HEADER
+
 /* Define if the compiler's library in use provides
                  std::numeric_limits classes in the appropriate header file */
 #undef HAVE_STD_NUMERIC_LIMITS
