@@ -47,10 +47,10 @@ lac: base
 1d: baseg lacg base lac
 	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 1d
 
-2d: base lac
+2d: baseg lacg base lac
 	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 2d
 
-3d: base lac
+3d: baseg lacg base lac
 	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 3d
 
 1dg: baseg lacg
