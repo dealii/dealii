@@ -80,9 +80,9 @@ lac: lacg laco
 3d: 3dg 3do
 
 $(LIBDIR):
-	mkdir $@
+	@mkdir $@
 
-baseg base lacg lac 1dg 1d 2dg 2d 3dg 3d all debug contrib : $(LIBDIR)
+baseg base lacg lac 1dg 1d 2dg 2d 3dg 3d all debug contrib : $(LIBDIR) deps
 
 all: deps
 	$(MAKE) $(MAKEOPTIONS) contrib base lac 2d 1d 3d
