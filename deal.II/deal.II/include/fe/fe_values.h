@@ -231,8 +231,8 @@ class FEValuesBase {
 				      * the last time the #reinit# function
 				      * of the derived class was called.
 				      */
-    double shape_value (const unsigned int i,
-			const unsigned int j) const;
+    double shape_value (const unsigned int function,
+			const unsigned int quadrature_point) const;
 
 				     /**
 				      * Return a pointer to the matrix holding
@@ -275,8 +275,8 @@ class FEValuesBase {
 				      * The function returns the gradient on the
 				      * real element, not the reference element.
 				      */
-    const Point<dim> & shape_grad (const unsigned int i,
-				   const unsigned int j) const;
+    const Point<dim> & shape_grad (const unsigned int function,
+				   const unsigned int quadrature_point) const;
 
 				     /** 
 				      * Return a pointer to the matrix holding
@@ -366,7 +366,7 @@ class FEValuesBase {
 				      * transformation's Jacobi matrix in
 				      * all cases).
 				      */
-    double JxW (const unsigned int i) const;
+    double JxW (const unsigned int quadrature_point) const;
 
 				     /**
 				      * Return a pointer to the array holding
