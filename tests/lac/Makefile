@@ -20,30 +20,23 @@ default: run-tests
 
 ############################################################
 
-block_matrices.exe        : block_matrices.g.$(OBJEXT)                  $(libraries)
-block_vector.exe          : block_vector.g.$(OBJEXT)                    $(libraries)
-block_vector_iterator.exe : block_vector_iterator.g.$(OBJEXT)           $(libraries)
-full_matrix.exe           : full_matrix.g.$(OBJEXT)                     $(libraries)
-matrix_out.exe            : matrix_out.g.$(OBJEXT)                      $(libraries)
-solver.exe                : solver.g.$(OBJEXT)                          $(libraries)
-eigen.exe                 : eigen.g.$(OBJEXT)                           $(libraries)
-sparse_matrices.exe       : sparse_matrices.g.$(OBJEXT)                 $(libraries)
-sparse_matrices.opt.exe   : sparse_matrices.$(OBJEXT)                   $(libraries_o)
-sparsity_pattern.exe      : sparsity_pattern.g.$(OBJEXT)                $(libraries)
-sparse_ilu.exe            : sparse_ilu.g.$(OBJEXT)                      $(libraries)
-vector-vector.exe         : vector-vector.g.$(OBJEXT)                   $(libraries)
-#mgbase.exe               : mgbase.g.$(OBJEXT)                          $(libraries)
-#mg.exe                   : mg.g.$(OBJEXT)                              $(libraries)
+tests_x = $(sort \
+            sparse_matrices block_matrices block_vector block_vector_iterator \
+            full_matrix \
+            matrix_out solver eigen sparsity_pattern sparse_ilu \
+            vector-vector)
 
-
-tests = $(sort \
-          sparse_matrices block_matrices block_vector block_vector_iterator \
-          full_matrix \
-          matrix_out solver eigen sparsity_pattern sparse_ilu \
-          vector-vector)
+# from above list of regular expressions, generate the real set of
+# tests
+expand = $(shell echo $(addsuffix .cc,$(1)) \
+           | $(PERL) -pi -e 's/\.cc//g;')
+tests = $(call expand,$(tests_x))
 
 ############################################################
 
 
 include ../Makefile.rules
 include Makefile.depend
+include Makefile.tests
+
+.PHONY: default
