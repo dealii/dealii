@@ -85,6 +85,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
 	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   Assert (values.size() == n_quadrature_points,
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+  Assert (update_flags & update_values, ExcAccessToUninitializedField());
 
 				   // get function values of dofs
 				   // on this cell
@@ -119,6 +120,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector       &fe_functio
   for (unsigned i=0;i<values.size();++i)
     Assert (values[i].size() == fe->n_components(),
 	    ExcWrongNoOfComponents());
+  Assert (update_flags & update_values, ExcAccessToUninitializedField());
 
 				   // get function values of dofs
 				   // on this cell
@@ -167,6 +169,7 @@ void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
 	  ExcWrongNoOfComponents());
   Assert (gradients.size() == n_quadrature_points,
 	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
+  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
 
 				   // get function values of dofs
 				   // on this cell
@@ -204,6 +207,7 @@ void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_
   for (unsigned i=0;i<gradients.size();++i)
     Assert (gradients[i].size() == fe->n_components(),
 	    ExcWrongVectorSize(gradients[i].size(), fe->n_components()));
+  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
 
 				   // get function values of dofs
 				   // on this cell
@@ -256,6 +260,7 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe
 	  ExcWrongNoOfComponents());
   Assert (second_derivatives.size() == n_quadrature_points,
 	  ExcWrongVectorSize(second_derivatives.size(), n_quadrature_points));
+  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
 
 				   // get function values of dofs
 				   // on this cell

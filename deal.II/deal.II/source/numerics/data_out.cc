@@ -211,7 +211,7 @@ void DataOut<dim>::build_some_patches (Data data)
   
   FEValues<dim> fe_patch_values(dofs->get_fe(),
 				patch_points,
-				update_default);
+				update_values);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
