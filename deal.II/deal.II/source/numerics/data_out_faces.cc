@@ -239,7 +239,7 @@ DataOutFaces<dim>::first_face ()
   for (; cell != dofs->end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->face(f)->at_boundary())
-	return make_pair (static_cast<typename FaceDescriptor::first_type>(cell), f);
+	return FaceDescriptor(cell, f);
 
 				   // ups, triangulation has no
 				   // boundary? impossible!
