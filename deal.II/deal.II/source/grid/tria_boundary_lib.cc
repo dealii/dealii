@@ -16,6 +16,7 @@
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
+#include <base/tensor.h>
 #include <cmath>
 
 
@@ -88,16 +89,24 @@ HyperBallBoundary<2>::get_intermediate_points_on_line (
     {
       Point<2> v0=line->vertex(0)-center,
 	       v1=line->vertex(1)-center;
-      double alpha0=atan(v0(1)/v0(0)),
-	     alpha1=atan(v1(1)/v1(0));
-      double dalpha=(alpha1-alpha0)/(n+1);
-      double alpha=alpha0+dalpha;
+      double eps=1e-14;
+      Assert(fabs(v0.square()-radius*radius)<eps, ExcInternalError());
+      Assert(fabs(v1.square()-radius*radius)<eps, ExcInternalError());
+      
+      double alpha=acos((v0*v1)/sqrt(v0.square()*v1.square()))/(n+1);
 
-      for (unsigned int i=0; i<n; ++i, alpha+=dalpha)
-	{
-	  points[i](0)=radius*cos(alpha)+center(0);
-	  points[i](1)=radius*sin(alpha)+center(1);
-	}
+      Tensor<2,2> S;
+      S[0][0]=cos(alpha);
+      S[1][0]=sin(alpha);
+      S[0][1]=-S[1][0];
+      S[1][1]=S[0][0];
+
+      contract(points[0], S, v0);
+      for (unsigned int i=1; i<n; ++i)
+	contract(points[i], S, points[i-1]);
+
+      for (unsigned int i=0; i<n; ++i)
+	points[i]+=center;
     }
 }
 
