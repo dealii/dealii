@@ -549,7 +549,7 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 		  out << setw(indent_level*2) << ""
 		      << "set "
 		      << ptr->first
-		      << setw(longest_entry-ptr->first.length()+2) << "= "
+		      << setw(longest_entry-ptr->first.length()+3) << "= "
 		      << ptr->second.first << endl;
 		  break;
 	    case LaTeX:
