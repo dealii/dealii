@@ -6712,7 +6712,7 @@ void Triangulation<dim>::execute_coarsening ()
 
 				   // now do the actual coarsening
 				   // step. Since the loop goes over
-				   // used cells only we need not
+				   // used cells we only need not
 				   // worry about deleting some cells
 				   // since the ++operator will then
 				   // just hop over them if we should
