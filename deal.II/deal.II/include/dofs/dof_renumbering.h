@@ -22,6 +22,7 @@
 
 #include <vector>
 
+// moved here from directory numerics. See there for previous logs.
 
 /**
  * Implementation of a number of renumbering algorithms for the degrees of
@@ -325,10 +326,11 @@ class DoFRenumbering
 				      * returns the renumbering
 				      * vector.
 				      */    
-    template <int dim>
+    template <int dim, class ITERATOR, class ENDITERATOR>
     static void
     compute_component_wise (std::vector<unsigned int>& new_index,
-			    const DoFHandler<dim>&     dof_handler,
+			    ITERATOR& start,
+			    const ENDITERATOR& end,
 			    const std::vector<unsigned int> &component_order = std::vector<unsigned int>());
     
 				     /**

@@ -51,6 +51,22 @@ extern "C" long int lrand48 (void);
 
 
 
+// The following two class is defined to be used in the compute_*
+// functions. Using them allows to use the same function to compute
+// level numbering for multigrid as well as numbering for the global
+// system matrix.
+template <class T>
+class WrapMGDoFIterator : public T
+{
+  public:
+    void get_dof_indices (std::vector<unsigned int>& v) const
+      {
+	T::get_mg_dof_indices(v);
+      }
+};
+
+
+
 template <int dim>
 void
 DoFRenumbering::Cuthill_McKee (
@@ -428,6 +444,7 @@ void DoFRenumbering::Cuthill_McKee (
 
 #ifdef DEBUG
 				   //  test for all indices numbered
+//TODO: Test fails. Do not check before unification.
   if (std::find (new_indices.begin(), new_indices.end(),
 		 DoFHandler<dim>::invalid_dof_index)
       !=
@@ -458,26 +475,38 @@ DoFRenumbering::component_wise (
   std::vector<unsigned int> renumbering (dof_handler.n_dofs(),
 					 DoFHandler<dim>::invalid_dof_index);
 
-  compute_component_wise(renumbering, dof_handler, component_order_arg);
+  typename DoFHandler<dim>::active_cell_iterator
+    start = dof_handler.begin_active();
+  const typename DoFHandler<dim>::cell_iterator
+    end = dof_handler.end();
+  
+  compute_component_wise<dim,
+    typename DoFHandler<dim>::active_cell_iterator,
+    typename DoFHandler<dim>::cell_iterator>(renumbering,
+					     start, end,
+					     component_order_arg);
 
   if (renumbering.size()!=0)
     dof_handler.renumber_dofs (renumbering);
 }
-  
 
 
-template <int dim>
+
+template <int dim, class ITERATOR, class ENDITERATOR>
 void
 DoFRenumbering::compute_component_wise (
   std::vector<unsigned int>& new_indices,
-  const DoFHandler<dim>&     dof_handler,
+  ITERATOR& start,
+  const ENDITERATOR& end,
   const std::vector<unsigned int> &component_order_arg)
 {
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
-  const FiniteElement<dim> &fe     = dof_handler.get_fe();
+// Modify for hp
+  const FiniteElement<dim>& fe = start->get_fe();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
-  Assert (new_indices.size() ==  dof_handler.n_dofs(),
-	  ExcDimensionMismatch(new_indices.size(), dof_handler.n_dofs()));
+//    Assert (new_indices.size() ==  start->dof_handler().n_dofs(),
+//  	  ExcDimensionMismatch(new_indices.size(),
+//  			       start->dof_handler.n_dofs()));
 
 				   // do nothing if the FE has only
 				   // one component
@@ -486,29 +515,32 @@ DoFRenumbering::compute_component_wise (
       new_indices.resize(0);
       return;
     }
-  
+
+				   // Copy last argument into a
+				   // writable vector.
   std::vector<unsigned int> component_order (component_order_arg);
+				   // If the last argument was an
+				   // empty vector, set up things to
+				   // store components in the order
+				   // found in the system.
   if (component_order.size() == 0)
     for (unsigned int i=0; i<fe.n_components(); ++i)
       component_order.push_back (i);
 
-				   // check whether the component list has
-				   // the right length and contains all
-				   // component numbers
   Assert (component_order.size() == fe.n_components(),
-	  ExcInvalidComponentOrder());
-  for (unsigned int i=0; i<fe.n_components(); ++i)
-    Assert (std::find (component_order.begin(), component_order.end(), i)
-	    != component_order.end(),
-	    ExcInvalidComponentOrder ());
-
+	  ExcDimensionMismatch(component_order.size(), fe.n_components()));
+  
+  for (unsigned int i=0; i< component_order.size(); ++i)
+    Assert(component_order[i] < fe.n_components(),
+	   ExcIndexRange(component_order[i], 0, fe.n_components()));
+  
 				   // vector to hold the dof indices on
 				   // the cell we visit at a time
   std::vector<unsigned int> local_dof_indices(dofs_per_cell);
 
                                    // prebuilt list to which component
 				   // a given dof on a cell
-				   // belongs. note that we get into
+				   // should go. note that we get into
 				   // trouble here if the shape
 				   // function is not primitive, since
 				   // then there is no single vector
@@ -519,7 +551,8 @@ DoFRenumbering::compute_component_wise (
   std::vector<unsigned int> component_list (dofs_per_cell);
   for (unsigned int i=0; i<component_list.size(); ++i)
     if (fe.is_primitive(i))
-      component_list[i] = fe.system_to_component_index(i).first;
+      component_list[i]
+	= component_order[fe.system_to_component_index(i).first];
     else
       {
         const unsigned int base_element =
@@ -538,7 +571,7 @@ DoFRenumbering::compute_component_wise (
                                          // then associate this degree
                                          // of freedom with this
                                          // component
-        component_list[i] = c;
+        component_list[i] = component_order[c];
       };
   
 				   // set up a map where for each
@@ -554,23 +587,21 @@ DoFRenumbering::compute_component_wise (
 				   // take care of that
   std::vector<std::vector<unsigned int> >
     component_to_dof_map (fe.n_components());
-  for (typename DoFHandler<dim>::active_cell_iterator
-         cell=dof_handler.begin_active();
-       cell!=dof_handler.end(); ++cell)
+  for (;start!=end;++start)
     {
 				       // on each cell: get dof indices
 				       // and insert them into the global
 				       // list using their component
-      cell->get_dof_indices (local_dof_indices);
+      start->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	component_to_dof_map[component_list[i]].push_back (local_dof_indices[i]);
     };
   
 				   // now we've got all indices sorted
 				   // into buckets labelled with their
-				   // component number. we've only got
-				   // to traverse this list and assign
-				   // the new indices
+				   // target component number. we've
+				   // only got to traverse this list
+				   // and assign the new indices
 				   //
 				   // however, we first want to sort
 				   // the indices entered into the
@@ -579,15 +610,16 @@ DoFRenumbering::compute_component_wise (
 				   // this also remove duplicate
 				   // entries
 				   //
-				   // note that we no
-				   // longer have to care about
-				   // non-primitive shape functions
-				   // since the buckets corresponding
-				   // to the second and following
-				   // vector components of a
+				   // note that we no longer have to
+				   // care about non-primitive shape
+				   // functions since the buckets
+				   // corresponding to the second and
+				   // following vector components of a
 				   // non-primitive FE will simply be
 				   // empty, everything being shoved
-				   // into the first one
+				   // into the first one. The same
+				   // holds if several components were
+				   // joined into a single target.
   for (unsigned int component=0; component<fe.n_components(); ++component)
     {
       std::sort (component_to_dof_map[component].begin(),
@@ -604,7 +636,7 @@ DoFRenumbering::compute_component_wise (
   unsigned int next_free_index = 0;
   for (unsigned int c=0; c<fe.n_components(); ++c)
     {
-      const unsigned int component = component_order[c];
+      const unsigned int component = c;
       
       const typename std::vector<unsigned int>::const_iterator
 	begin_of_component = component_to_dof_map[component].begin(),
@@ -616,8 +648,8 @@ DoFRenumbering::compute_component_wise (
 	new_indices[*dof_index] = next_free_index++;
     };
 
-  Assert (next_free_index == dof_handler.n_dofs(),
-	  ExcInternalError());
+//    Assert (next_free_index == dof_handler.n_dofs(),
+//  	  ExcInternalError());
 }
 
 
@@ -1098,12 +1130,12 @@ void DoFRenumbering::component_wise<deal_II_dimension>
 (DoFHandler<deal_II_dimension>&,
  const std::vector<unsigned int>&);
 
-template
-void
-DoFRenumbering::compute_component_wise<deal_II_dimension>
-(std::vector<unsigned int>&,
- const DoFHandler<deal_II_dimension>&,
- const std::vector<unsigned int>&);
+//  template
+//  void
+//  DoFRenumbering::compute_component_wise<deal_II_dimension>
+//  (std::vector<unsigned int>&,
+//   const DoFHandler<deal_II_dimension>&,
+//   const std::vector<unsigned int>&);
 
 template
 void DoFRenumbering::component_wise<deal_II_dimension>
