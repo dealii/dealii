@@ -17,8 +17,7 @@ template<int dim, typename number>
 SolutionTransfer<dim, number>::SolutionTransfer(const DoFHandler<dim> &dof):
 		dof_handler(&dof),
 		n_dofs_old(0),
-		prepared_for_pure_refinement(0),
-		prepared_for_coarsening_and_refinement(0)
+		prepared_for(none)
 {}
 
 
@@ -41,8 +40,7 @@ void SolutionTransfer<dim, number>::clear ()
   if (dof_values_on_cell.size())
     dof_values_on_cell.erase(dof_values_on_cell.begin(), dof_values_on_cell.end());
 
-  prepared_for_pure_refinement=false;
-  prepared_for_coarsening_and_refinement=false;
+  prepared_for=none;
 }
 
 
@@ -50,9 +48,9 @@ void SolutionTransfer<dim, number>::clear ()
 template<int dim, typename number>
 void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
 { 
-  Assert(!prepared_for_pure_refinement, ExcAlreadyPrepForRef());
-  Assert(!prepared_for_coarsening_and_refinement, 
-	 ExcAlreadyPrepForRefAndCoarse());
+  Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
+  Assert(prepared_for!=coarsening_and_refinement, 
+	 ExcAlreadyPrepForCoarseAndRef());
 
   clear();
 
@@ -85,7 +83,7 @@ void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
       else
 	cell->clear_user_pointer();
     }
-  prepared_for_pure_refinement=true;
+  prepared_for=pure_refinement;
 }
 
 
@@ -95,7 +93,7 @@ void
 SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
 						  Vector<number>       &out) const
 {
-  Assert(prepared_for_pure_refinement, ExcNotPrepared());
+  Assert(prepared_for==pure_refinement, ExcNotPrepared());
   Assert(in.size()==n_dofs_old, ExcWrongVectorSize(in.size(),n_dofs_old));
   Assert(out.size()==dof_handler->n_dofs(),
 	 ExcWrongVectorSize(out.size(),dof_handler->n_dofs()));
@@ -146,9 +144,9 @@ void
 SolutionTransfer<dim, number>::
 prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
 {
-  Assert(!prepared_for_pure_refinement, ExcAlreadyPrepForRef());
-  Assert(!prepared_for_coarsening_and_refinement, 
-	 ExcAlreadyPrepForRefAndCoarse());
+  Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
+  Assert(!prepared_for!=coarsening_and_refinement, 
+	 ExcAlreadyPrepForCoarseAndRef());
   
   const unsigned int in_size=all_in.size();
   Assert(in_size!=0, ExcNoInVectorsGiven());
@@ -254,7 +252,7 @@ prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
   Assert(n_sr==n_cells_to_stay_or_refine, ExcInternalError());
   Assert(n_cf==n_coarsen_fathers, ExcInternalError());
 
-  prepared_for_coarsening_and_refinement=true;
+  prepared_for=coarsening_and_refinement;
 }
 
 
@@ -274,10 +272,10 @@ void SolutionTransfer<dim, number>::
 interpolate (const vector<Vector<number> > &all_in,
 	     vector<Vector<number> >       &all_out) const
 {
-  Assert(prepared_for_coarsening_and_refinement, ExcNotPrepared());
+  Assert(prepared_for==coarsening_and_refinement, ExcNotPrepared());
   for (unsigned int i=0; i<all_in.size(); ++i)
     Assert (all_in[i].size() == n_dofs_old,
-	    ExcInvalidVectorSize(all_in[i].size(), n_dofs_old));
+	    ExcWrongVectorSize(all_in[i].size(), n_dofs_old));
 			      
   unsigned int out_size=all_out.size();
 

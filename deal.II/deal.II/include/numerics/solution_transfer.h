@@ -73,7 +73,8 @@ template <int dim> class DoFHandler;
 template<int dim, typename number>
 class SolutionTransfer
 {
-  public:	
+  public:
+    
 				     /**
 				      * Constructor, takes the current #DoFHandler#
 				      * as argument.
@@ -207,7 +208,7 @@ class SolutionTransfer
 				     /**
 				      * Exception
 				      */
-    DeclException0(ExcAlreadyPrepForRefAndCoarse);
+    DeclException0(ExcAlreadyPrepForCoarseAndRef);
 				     
 				     /**
 				      * Exception
@@ -236,14 +237,6 @@ class SolutionTransfer
 				      * Exception
 				      */
     DeclException0(ExcInternalError);
-
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidVectorSize,
-		    int, int,
-		    << "The data vector has the size " << arg1
-		    << ", but " << arg2 << " was expected.");
 				  
   private:
 
@@ -260,18 +253,17 @@ class SolutionTransfer
     unsigned int n_dofs_old;
 
 				     /**
-				      * Denotes whether the #SolutionTransfer#
-				      * is 'prepared for pure refinement'
-				      * or not.
+				      * #PreparationState# denotes the
+				      * three possible states of the
+				      * #SolutionTransfer#: being
+				      * prepared for 'pure refinement',
+				      * prepared for 'coarsening and
+				      * refinement' or not prepared.
 				      */
-    bool prepared_for_pure_refinement;
+    enum PreparationState {
+	  none, pure_refinement, coarsening_and_refinement
+    } prepared_for;
 
-				     /**
-				      * Denotes whether the #SolutionTransfer#
-				      * is 'prepared for coarsening and refinement'
-				      * or not.
-				      */
-    bool prepared_for_coarsening_and_refinement;
 
 				     /**
 				      * Is used for #prepare_for_refining#
