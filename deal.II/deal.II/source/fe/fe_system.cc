@@ -30,15 +30,15 @@ void FESystem<dim>::initialize_matrices () {
 	    {
 	      restriction[child] (i*n_sub_elements + n,
 				  j*n_sub_elements + n)
-		= base_element->restriction[child](i,j);
+		= base_element->restrict(child)(i,j);
 	      prolongation[child] (i*n_sub_elements + n,
 				   j*n_sub_elements + n)
-		= base_element->prolongation[child](i,j);
+		= base_element->prolongate(child)(i,j);
 	    };
 
 	  interface_constraints (i*n_sub_elements + n,
 				 j*n_sub_elements + n)
-	    = base_element->interface_constraints(i,j);
+	    = base_element->constraints()(i,j);
 	};
 };
 
