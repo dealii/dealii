@@ -676,9 +676,13 @@ class FilteredIterator : public BaseIterator
     const PredicateBase * predicate;
 
 #ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
+#  ifdef DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
+    template <typename> friend class PredicateTemplate;
+#  else
     template <typename T>
     template <typename>
     friend class FilteredIterator<T>::PredicateTemplate;
+#  endif
 #endif
 };
 
