@@ -62,6 +62,50 @@
     od:
   od:
 
+  print ("Computing restriction matrices"):
+  # to get the restriction (interpolation) matrices, evaluate
+  # the basis functions on the child cells at the global
+  # interpolation points
+  child_phi[0] := proc(i, x, y)
+                    if ((x>1/2) or (y>1/2)) then
+		      0:
+		    else
+		      phi[i](2*x,2*y):
+		    fi:
+		  end: 
+  child_phi[1] := proc(i, x, y)
+                    if ((x<1/2) or (y>1/2)) then
+		      0:
+		    else
+		      phi[i](2*x-1,2*y):
+		    fi:
+		  end: 
+  child_phi[2] := proc(i, x, y)
+                    if ((x<1/2) or (y<1/2)) then
+		      0:
+		    else
+		      phi[i](2*x-1,2*y-1):
+		    fi:
+		  end: 
+  child_phi[3] := proc(i, x, y)
+                    if ((x>1/2) or (y<1/2)) then
+		      0:
+		    else
+		      phi[i](2*x,2*y-1):
+		    fi:
+		  end: 
+  restriction := array(0..3,0..n_functions-1, 0..n_functions-1):
+  for child from 0 to 3 do
+    for j from 0 to n_functions-1 do
+      for k from 0 to n_functions-1 do
+        restriction[child,j,k] := child_phi[child](k,
+	                                           support_points[j][1],
+						   support_points[j][2]):
+      od:
+    od:
+  od:
+
+  
   # these are the basis functions differentiated with respect to
   # xi and eta. we need them for the computation of the jacobi
   # matrix, since we can't just differentiate a function.
@@ -238,6 +282,7 @@
   print ("writing data to files"):
   readlib(C):
   C(prolongation, filename=prolongation_2d):
+  C(restriction, filename=restriction_2d):
   C(array(1..2, [x[4], y[4]]), optimized, filename=crosspoint_2d):
   C(mass_matrix, optimized, filename=massmatrix_2d):
   
@@ -442,6 +487,15 @@ FECrissCross<2>::FECrissCross () :
   prolongation[3](3,3) = 1.0;
   prolongation[3](4,3) = 1.0/2.0;
   prolongation[3](4,4) = 1.0/2.0;
+
+  restriction[0](0,0) = 1.0;
+  restriction[0](4,2) = 1.0;
+  restriction[1](1,1) = 1.0;
+  restriction[1](4,3) = 1.0;
+  restriction[2](2,2) = 1.0;
+  restriction[2](4,0) = 1.0;
+  restriction[3](3,3) = 1.0;
+  restriction[3](4,1) = 1.0;
 };
 
 

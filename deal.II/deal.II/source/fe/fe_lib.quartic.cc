@@ -76,10 +76,38 @@
     od;
   od;
   
+  # to get the restriction (interpolation) matrices, evaluate
+  # the basis functions on the child cells at the global
+  # interpolation points
+  child_phi[0] := proc(i, point)
+                    if ((point<0) or (point>1/2)) then
+		      0:
+		    else
+		      phi(i,2*point):
+		    fi:
+		  end: 
+  child_phi[1] := proc(i, point)
+                    if ((point<1/2) or (point>1)) then
+		      0:
+		    else
+		      phi(i,2*point-1):
+		    fi:
+		  end: 
+  restriction := array(0..1,0..n_functions-1, 0..n_functions-1);  
+  for child from 0 to 1 do
+    for j from 0 to n_functions-1 do
+      for k from 0 to n_functions-1 do
+        restriction[child,j,k] := child_phi[child](k, support_points[j]):
+      od:
+    od:
+  od:
+
+
   readlib(C);
   C(phi_polynom, filename=shape_value_1d);
   C(grad_phi_polynom, filename=shape_grad_1d);
   C(prolongation, filename=prolongation_1d);
+  C(restriction, filename=restriction_1d);
   C(local_mass_matrix, optimized, filename=massmatrix_1d);
 
   -----------------------------------------------------------------------
@@ -93,6 +121,8 @@
   perl -pi -e 's/\[(\d+)\]\[(\d)\]/($1,$2)/g;' massmatrix_1d
   perl -pi -e 's/\[(\d+)\]\[(\d)\]\[(\d)\]/[$1]($2,$3)/g;' prolongation_1d
   perl -pi -e 's/.*= 0.0;\n//g;' prolongation_1d
+  perl -pi -e 's/\[(\d+)\]\[(\d)\]\[(\d)\]/[$1]($2,$3)/g;' restriction_1d
+  perl -pi -e 's/.*= 0.0;\n//g;' restriction_1d
   perl -pi -e 's/(t\d+) =/const double $1 =/g;' massmatrix_1d
 */
 
@@ -228,6 +258,50 @@
     od:
   od:
 
+  print ("Computing restriction matrices"):
+  # to get the restriction (interpolation) matrices, evaluate
+  # the basis functions on the child cells at the global
+  # interpolation points
+  child_phi[0] := proc(i, x, y)
+                    if ((x>1/2) or (y>1/2)) then
+		      0:
+		    else
+		      phi(i,2*x,2*y):
+		    fi:
+		  end: 
+  child_phi[1] := proc(i, x, y)
+                    if ((x<1/2) or (y>1/2)) then
+		      0:
+		    else
+		      phi(i,2*x-1,2*y):
+		    fi:
+		  end: 
+  child_phi[2] := proc(i, x, y)
+                    if ((x<1/2) or (y<1/2)) then
+		      0:
+		    else
+		      phi(i,2*x-1,2*y-1):
+		    fi:
+		  end: 
+  child_phi[3] := proc(i, x, y)
+                    if ((x>1/2) or (y<1/2)) then
+		      0:
+		    else
+		      phi(i,2*x,2*y-1):
+		    fi:
+		  end: 
+  restriction := array(0..3,0..n_functions-1, 0..n_functions-1):
+  for child from 0 to 3 do
+    for j from 0 to n_functions-1 do
+      for k from 0 to n_functions-1 do
+        restriction[child,j,k] := child_phi[child](k,
+	                                           support_points[j][1],
+						   support_points[j][2]):
+      od:
+    od:
+  od:
+
+
   print ("Computing local mass matrix"):
   # tphi are the basis functions of the linear element. These functions
   # are used for the computation of the subparametric transformation from
@@ -293,6 +367,7 @@
   C(phi_polynom, filename=shape_value_2d):
   C(grad_phi_polynom, filename=shape_grad_2d):
   C(prolongation, filename=prolongation_2d):
+  C(restriction, filename=restriction_2d);
   C(local_mass_matrix, optimized, filename=massmatrix_2d):
   C(interface_constraints, filename=constraints_2d):
   C(real_points, optimized, filename=real_points_2d);
@@ -310,6 +385,8 @@
   perl -pi -e 's/(t\d+) =/const double $1 =/g;' massmatrix_2d
   perl -pi -e 's/\[(\d+)\]\[(\d+)\]\[(\d+)\]/[$1]($2,$3)/g;' prolongation_2d
   perl -pi -e 's/.*= 0.0;\n//g;' prolongation_2d
+  perl -pi -e 's/\[(\d+)\]\[(\d+)\]\[(\d+)\]/[$1]($2,$3)/g;' restriction_2d
+  perl -pi -e 's/.*= 0.0;\n//g;' restriction_2d
   perl -pi -e 's/\[(\d+)\]\[(\d+)\]/($1,$2)/g;' constraints_2d
 */
 
@@ -349,6 +426,13 @@ FEQuarticSub<1>::FEQuarticSub () :
   prolongation[1](4,2) = 7.0/32.0;
   prolongation[1](4,3) = -35.0/64.0;
   prolongation[1](4,4) = 35.0/32.0;
+
+  restriction[0](0,0) = 1.0;
+  restriction[0](2,3) = 1.0;
+  restriction[0](3,1) = 1.0;
+  restriction[1](1,1) = 1.0;
+  restriction[1](3,0) = 1.0;
+  restriction[1](4,3) = 1.0;
 };
 
 
@@ -1176,6 +1260,43 @@ FEQuarticSub<2>::FEQuarticSub () :
   prolongation[3](23,19) = 35.0/32.0;
   prolongation[3](23,22) = -35.0/64.0;
   prolongation[3](24,19) = 1.0;
+
+  restriction[0](0,0) = 1.0;
+  restriction[0](4,5) = 1.0;
+  restriction[0](5,1) = 1.0;
+  restriction[0](13,14) = 1.0;
+  restriction[0](14,3) = 1.0;
+  restriction[0](16,24) = 1.0;
+  restriction[0](20,8) = 1.0;
+  restriction[0](23,11) = 1.0;
+  restriction[0](24,2) = 1.0;
+  restriction[1](1,1) = 1.0;
+  restriction[1](5,0) = 1.0;
+  restriction[1](6,5) = 1.0;
+  restriction[1](7,8) = 1.0;
+  restriction[1](8,2) = 1.0;
+  restriction[1](17,24) = 1.0;
+  restriction[1](20,14) = 1.0;
+  restriction[1](21,11) = 1.0;
+  restriction[1](24,3) = 1.0;
+  restriction[2](2,2) = 1.0;
+  restriction[2](8,1) = 1.0;
+  restriction[2](9,8) = 1.0;
+  restriction[2](11,3) = 1.0;
+  restriction[2](12,11) = 1.0;
+  restriction[2](18,24) = 1.0;
+  restriction[2](21,5) = 1.0;
+  restriction[2](22,14) = 1.0;
+  restriction[2](24,0) = 1.0;
+  restriction[3](3,3) = 1.0;
+  restriction[3](10,11) = 1.0;
+  restriction[3](11,2) = 1.0;
+  restriction[3](14,0) = 1.0;
+  restriction[3](15,14) = 1.0;
+  restriction[3](19,24) = 1.0;
+  restriction[3](22,8) = 1.0;
+  restriction[3](23,5) = 1.0;
+  restriction[3](24,1) = 1.0;
 };
 
 

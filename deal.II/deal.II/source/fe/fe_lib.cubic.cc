@@ -68,6 +68,34 @@
     od;
   od;
 
+
+  # to get the restriction (interpolation) matrices, evaluate
+  # the basis functions on the child cells at the global
+  # interpolation points
+  child_phi[0] := proc(i, point)
+                    if ((point<0) or (point>1/2)) then
+		      0:
+		    else
+		      phi(i,2*point):
+		    fi:
+		  end: 
+  child_phi[1] := proc(i, point)
+                    if ((point<1/2) or (point>1)) then
+		      0:
+		    else
+		      phi(i,2*point-1):
+		    fi:
+		  end: 
+  restriction := array(0..1,0..n_functions-1, 0..n_functions-1);  
+  for child from 0 to 1 do
+    for j from 0 to n_functions-1 do
+      for k from 0 to n_functions-1 do
+        restriction[child,j,k] := child_phi[child](k, support_points[j]):
+      od:
+    od:
+  od:
+
+  
   for i from 0 to n_functions-1 do
     for j from 0 to n_functions-1 do
       local_mass_matrix[i,j] := int(phi_polynom[i] * phi_polynom[j] * h,
@@ -79,6 +107,7 @@
   C(phi_polynom, filename=shape_value_1d);
   C(grad_phi_polynom, filename=shape_grad_1d);
   C(prolongation, filename=prolongation_1d);
+  C(restriction, filename=restriction_1d);
   C(local_mass_matrix, optimized, filename=massmatrix_1d);
 
   -----------------------------------------------------------------------
@@ -89,6 +118,7 @@
   perl -pi -e 's/grad_phi_polynom\[(\d)\] = (.*);/case $1: return Point<1>($2);/g;' shape_grad_1d
   perl -pi -e 's/\[(\d+)\]\[(\d)\]/($1,$2)/g;' massmatrix_1d
   perl -pi -e 's/\[(\d+)\]\[(\d)\]\[(\d)\]/[$1]($2,$3)/g;' prolongation_1d
+  perl -pi -e 's/\[(\d+)\]\[(\d)\]\[(\d)\]/[$1]($2,$3)/g;' restriction_1d
   perl -pi -e 's/(t\d+) =/const double $1 =/g;' massmatrix_1d
 */
 
@@ -211,6 +241,50 @@
     od:
   od:
 
+  print ("Computing restriction matrices"):
+  # to get the restriction (interpolation) matrices, evaluate
+  # the basis functions on the child cells at the global
+  # interpolation points
+  child_phi[0] := proc(i, x, y)
+                    if ((x>1/2) or (y>1/2)) then
+		      0:
+		    else
+		      phi(i,2*x,2*y):
+		    fi:
+		  end: 
+  child_phi[1] := proc(i, x, y)
+                    if ((x<1/2) or (y>1/2)) then
+		      0:
+		    else
+		      phi(i,2*x-1,2*y):
+		    fi:
+		  end: 
+  child_phi[2] := proc(i, x, y)
+                    if ((x<1/2) or (y<1/2)) then
+		      0:
+		    else
+		      phi(i,2*x-1,2*y-1):
+		    fi:
+		  end: 
+  child_phi[3] := proc(i, x, y)
+                    if ((x>1/2) or (y<1/2)) then
+		      0:
+		    else
+		      phi(i,2*x,2*y-1):
+		    fi:
+		  end: 
+  restriction := array(0..3,0..n_functions-1, 0..n_functions-1):
+  for child from 0 to 3 do
+    for j from 0 to n_functions-1 do
+      for k from 0 to n_functions-1 do
+        restriction[child,j,k] := child_phi[child](k,
+	                                           support_points[j][1],
+						   support_points[j][2]):
+      od:
+    od:
+  od:
+
+  
   print ("Computing local mass matrix"):
   # tphi are the basis functions of the linear element. These functions
   # are used for the computation of the subparametric transformation from
@@ -277,6 +351,7 @@
   C(phi_polynom, filename=shape_value_2d):
   C(grad_phi_polynom, filename=shape_grad_2d):
   C(prolongation, filename=prolongation_2d):
+  C(restriction, filename=restriction_2d):
   C(local_mass_matrix, optimized, filename=massmatrix_2d):
   C(interface_constraints, filename=constraints_2d):
   C(real_points, optimized, filename=real_points_2d);
@@ -293,6 +368,8 @@
   perl -pi -e 's/(t\d+) =/const double $1 =/g;' massmatrix_2d
   perl -pi -e 's/\[(\d+)\]\[(\d+)\]\[(\d+)\]/[$1]($2,$3)/g;' prolongation_2d
   perl -pi -e 's/.*= 0.0;\n//g;' prolongation_2d
+  perl -pi -e 's/\[(\d+)\]\[(\d+)\]\[(\d+)\]/[$1]($2,$3)/g;' restriction_2d
+  perl -pi -e 's/.*= 0.0;\n//g;' restriction_2d
   perl -pi -e 's/\[(\d+)\]\[(\d+)\]/($1,$2)/g;' constraints_2d
 */
 
@@ -338,6 +415,39 @@ FECubicSub<1>::FECubicSub () :
   prolongation[1](3,1) = 5.0/16.0;
   prolongation[1](3,2) = -5.0/16.0;
   prolongation[1](3,3) = 15.0/16.0;
+
+  restriction[0](0,0) = 1.0;
+  restriction[0](0,1) = 0.0;
+  restriction[0](0,2) = 0.0;
+  restriction[0](0,3) = 0.0;
+  restriction[0](1,0) = 0.0;
+  restriction[0](1,1) = 0.0;
+  restriction[0](1,2) = 0.0;
+  restriction[0](1,3) = 0.0;
+  restriction[0](2,0) = 0.0;
+  restriction[0](2,1) = 0.0;
+  restriction[0](2,2) = 0.0;
+  restriction[0](2,3) = 1.0;
+  restriction[0](3,0) = 0.0;
+  restriction[0](3,1) = 0.0;
+  restriction[0](3,2) = 0.0;
+  restriction[0](3,3) = 0.0;
+  restriction[1](0,0) = 0.0;
+  restriction[1](0,1) = 0.0;
+  restriction[1](0,2) = 0.0;
+  restriction[1](0,3) = 0.0;
+  restriction[1](1,0) = 0.0;
+  restriction[1](1,1) = 1.0;
+  restriction[1](1,2) = 0.0;
+  restriction[1](1,3) = 0.0;
+  restriction[1](2,0) = 0.0;
+  restriction[1](2,1) = 0.0;
+  restriction[1](2,2) = 0.0;
+  restriction[1](2,3) = 0.0;
+  restriction[1](3,0) = 0.0;
+  restriction[1](3,1) = 0.0;
+  restriction[1](3,2) = 1.0;
+  restriction[1](3,3) = 0.0;
 };
 
 
@@ -867,6 +977,23 @@ FECubicSub<2>::FECubicSub () :
   prolongation[3](15,13) = 25.0/256.0;
   prolongation[3](15,14) = -75.0/256.0;
   prolongation[3](15,15) = 225.0/256.0;
+
+  restriction[0](0,0) = 1.0;
+  restriction[0](4,5) = 1.0;
+  restriction[0](10,11) = 1.0;
+  restriction[0](12,14) = 1.0;
+  restriction[1](1,1) = 1.0;
+  restriction[1](5,4) = 1.0;
+  restriction[1](6,7) = 1.0;
+  restriction[1](13,15) = 1.0;
+  restriction[2](2,2) = 1.0;
+  restriction[2](7,6) = 1.0;
+  restriction[2](9,8) = 1.0;
+  restriction[2](14,12) = 1.0;
+  restriction[3](3,3) = 1.0;
+  restriction[3](8,9) = 1.0;
+  restriction[3](11,10) = 1.0;
+  restriction[3](15,13) = 1.0;
 };
 
 

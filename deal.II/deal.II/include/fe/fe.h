@@ -236,7 +236,8 @@ struct FiniteElementBase :
 				      * Return a readonly reference to the
 				      * matrix which describes the transfer of a
 				      * child with the given number to the
-				      * mother cell.
+				      * mother cell. See the #restriction# array
+				      * for more information.
 				      */
     const dFMatrix & restrict (const unsigned int child) const;
 
@@ -308,6 +309,29 @@ struct FiniteElementBase :
 				      * unrefined one, while the column indices
 				      * are for the refined cell's degrees of
 				      * freedom.
+				      *
+				      * In essence, using the matrices from the
+				      * children to the mother cell amounts to
+				      * computing the interpolation of the
+				      * function on the refined to the coarse
+				      * mesh. To get the vector of nodal values
+				      * of the interpolant on the mother cell,
+				      * you have to multiply the nodal value
+				      * vectors of each of the child cell with
+				      * the respective restriction matrix and
+				      * clobber these contributions together.
+				      * However, you must take care not to
+				      * #add# these together, since nodes which
+				      * belong to more than one child would then
+				      * be counted more than once; rather, you
+				      * have to overwrite the nonzero
+				      * contributions of each child into the
+				      * nodal value vector of the mother cell.
+				      *
+				      * To compute the interpolation of a
+				      * finite element field to a cell, you
+				      * may use the #interpolation# function.
+				      * See there for more information.
 				      *
 				      * Upon assembling the transfer matrix
 				      * between cells using this matrix array,

@@ -31,11 +31,6 @@ FELinear<1>::FELinear () :
 				   // we do not add up the contributions but
 				   // set them right into the matrices!
   restriction[0](0,0) = 1.0;
-  restriction[0](0,1) = 1./2.;
-  restriction[0](1,1) = 1./2.;
-
-  restriction[1](0,0) = 1./2.;
-  restriction[1](1,0) = 1./2.;
   restriction[1](1,1) = 1.0;
 
   prolongation[0](0,0) = 1.0;
@@ -138,44 +133,9 @@ FELinear<2>::FELinear () :
   interface_constraints(0,1) = 1./2.;
 
   restriction[0](0,0) = 1.0;
-  restriction[0](0,1) = 1./2.;
-  restriction[0](1,1) = 1./2.;
-  restriction[0](0,3) = 1./2.;
-  restriction[0](3,3) = 1./2.;
-  restriction[0](0,2) = 1./4.;
-  restriction[0](1,2) = 1./4.;
-  restriction[0](2,2) = 1./4.;
-  restriction[0](3,2) = 1./4.;
-
   restriction[1](1,1) = 1.0;
-  restriction[1](0,0) = 1./2.;
-  restriction[1](1,0) = 1./2.;
-  restriction[1](1,2) = 1./2.;
-  restriction[1](2,2) = 1./2.;
-  restriction[1](0,3) = 1./4.;
-  restriction[1](1,3) = 1./4.;
-  restriction[1](2,3) = 1./4.;
-  restriction[1](3,3) = 1./4.;
-
   restriction[2](2,2) = 1.0;
-  restriction[2](2,1) = 1./2.;
-  restriction[2](1,1) = 1./2.;
-  restriction[2](2,3) = 1./2.;
-  restriction[2](3,3) = 1./2.;
-  restriction[2](0,0) = 1./4.;
-  restriction[2](1,0) = 1./4.;
-  restriction[2](2,0) = 1./4.;
-  restriction[2](3,0) = 1./4.;
-
   restriction[3](3,3) = 1.0;
-  restriction[3](0,0) = 1./2.;
-  restriction[3](3,0) = 1./2.;
-  restriction[3](2,2) = 1./2.;
-  restriction[3](3,2) = 1./2.;
-  restriction[3](0,1) = 1./4.;
-  restriction[3](1,1) = 1./4.;
-  restriction[3](2,1) = 1./4.;
-  restriction[3](3,1) = 1./4.;
 
   prolongation[0](0,0) = 1.0;
   prolongation[0](1,0) = 1./2.;
