@@ -1391,39 +1391,44 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
 				   // get these numbers by drawing pictures
 				   // and counting...
 				   // example:
-				   // x-----x--x--o
-				   // |     |  |  |
-				   // |     x--x--x
-				   // |     |  |  |
-				   // x--x--*--x--x
-				   // |  |  |     |
-				   // x--x--x     |
-				   // |  |  |     |
-				   // o--x--x-----x
+				   //   |     |     |
+				   // --x-----x--x--X--
+				   //   |     |  |  |
+				   //   |     x--x--x
+				   //   |     |  |  |
+				   // --x--x--*--x--x--
+				   //   |  |  |     |
+				   //   x--x--x     |
+				   //   |  |  |     |
+				   // --X--x--x-----x--
+				   //   |     |     |
 				   // x = vertices connected with center vertex *;
-				   //   = total of 17
+				   //   = total of 19
+				   // (the X vertices are connected with * if
+				   // the vertices adjacent to X are hanging
+				   // nodes)
 				   // count lines -> 28 (don't forget to count
 				   // mother and children separately!)
   switch (tria->max_adjacent_cells())
     {
       case 4:
-	    return (17*selected_fe->dofs_per_vertex +
+	    return (19*selected_fe->dofs_per_vertex +
 		    28*selected_fe->dofs_per_line +
 		    8*selected_fe->dofs_per_quad);
       case 5:
-	    return (19*selected_fe->dofs_per_vertex +
+	    return (21*selected_fe->dofs_per_vertex +
 		    31*selected_fe->dofs_per_line +
 		    9*selected_fe->dofs_per_quad);
       case 6:
-	    return (25*selected_fe->dofs_per_vertex +
+	    return (28*selected_fe->dofs_per_vertex +
 		    42*selected_fe->dofs_per_line +
 		    12*selected_fe->dofs_per_quad);
       case 7:
-	    return (27*selected_fe->dofs_per_vertex +
+	    return (30*selected_fe->dofs_per_vertex +
 		    45*selected_fe->dofs_per_line +
 		    13*selected_fe->dofs_per_quad);
       case 8:
-	    return (33*selected_fe->dofs_per_vertex +
+	    return (37*selected_fe->dofs_per_vertex +
 		    56*selected_fe->dofs_per_line +
 		    16*selected_fe->dofs_per_quad);
       default:

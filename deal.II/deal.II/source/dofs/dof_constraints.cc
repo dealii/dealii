@@ -91,6 +91,7 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
   Assert (uncondensed.n_rows() == uncondensed.n_cols(),
 	  ExcMatrixNotSquare());
 
+  
 				   // store for each line of the matrix
 				   // its new line number
 				   // after compression. If the shift is
@@ -102,20 +103,40 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
   unsigned int n_rows = (unsigned int)uncondensed.n_rows();
-  for (unsigned int row=0; row!=n_rows; ++row)
-    if (row == (*next_constraint).line)
-      {
-					 // this line is constrained
-	new_line.push_back (-1);
-					 // note that #lines# is ordered
-	++next_constraint;
-	++shift;
-      }
-    else
-      new_line.push_back (row-shift);
+
+  if (next_constraint == lines.end()) 
+				     // if no constraint is to be handled
+    for (unsigned int row=0; row!=n_rows; ++row)
+      new_line.push_back (row);
+  else
+    for (unsigned int row=0; row!=n_rows; ++row) 
+      if (row == (*next_constraint).line)
+	{
+					   // this line is constrained
+	  new_line.push_back (-1);
+					   // note that #lines# is ordered	  
+	  ++shift;
+	  ++next_constraint;
+	  if (next_constraint == lines.end())
+					     // nothing more to do; finish rest
+					     // of loop
+	    {
+	      for (unsigned int i=row+1; i<n_rows; ++i)
+		new_line.push_back (i-shift);
+	      break;
+	    };
+	}
+      else
+	new_line.push_back (row-shift);
 
  
   next_constraint = lines.begin();
+				   // note: in this loop we need not check
+				   // whether #next_constraint# is a valid
+				   // iterator, since #next_constraint# is
+				   // only evaluated so often as there are
+				   // entries in new_line[*] which tells us
+				   // which constraints exist
   for (int row=0; row<uncondensed.n_rows(); ++row)
     if (new_line[row] != -1)
 				       // line not constrained
@@ -279,20 +300,40 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
   unsigned int n_rows = (unsigned int)uncondensed_struct.n_rows();
-  for (unsigned int row=0; row!=n_rows; ++row)
-    if (row == (*next_constraint).line)
-      {
-					 // this line is constrained
-	new_line.push_back (-1);
-					 // note that #lines# is ordered
-	++next_constraint;
-	++shift;
-      }
-    else
-      new_line.push_back (row-shift);
+
+  if (next_constraint == lines.end()) 
+				     // if no constraint is to be handled
+    for (unsigned int row=0; row!=n_rows; ++row)
+      new_line.push_back (row);
+  else
+    for (unsigned int row=0; row!=n_rows; ++row)
+      if (row == (*next_constraint).line)
+	{
+					   // this line is constrained
+	  new_line.push_back (-1);
+					   // note that #lines# is ordered
+	  ++shift;
+	  ++next_constraint;
+	  if (next_constraint == lines.end())
+					     // nothing more to do; finish rest
+					     // of loop
+	    {
+	      for (unsigned int i=row+1; i<n_rows; ++i)
+		new_line.push_back (i-shift);
+	      break;
+	    };
+	}
+      else
+	new_line.push_back (row-shift);
 
  
   next_constraint = lines.begin();
+				   // note: in this loop we need not check
+				   // whether #next_constraint# is a valid
+				   // iterator, since #next_constraint# is
+				   // only evaluated so often as there are
+				   // entries in new_line[*] which tells us
+				   // which constraints exist
   for (int row=0; row<uncondensed_struct.n_rows(); ++row)
     if (new_line[row] != -1)
 				       // line not constrained
@@ -487,20 +528,40 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
   unsigned int n_rows = (unsigned int)uncondensed.n();
-  for (unsigned int row=0; row!=n_rows; ++row)
-    if (row == (*next_constraint).line)
-      {
-					 // this line is constrained
-	new_line.push_back (-1);
-					 // note that #lines# is ordered
-	++next_constraint;
-	++shift;
-      }
-    else
-      new_line.push_back (row-shift);
+
+  if (next_constraint == lines.end()) 
+				     // if no constraint is to be handled
+    for (unsigned int row=0; row!=n_rows; ++row)
+      new_line.push_back (row);
+  else
+    for (unsigned int row=0; row!=n_rows; ++row)
+      if (row == (*next_constraint).line)
+	{
+					   // this line is constrained
+	  new_line.push_back (-1);
+					   // note that #lines# is ordered
+	  ++shift;
+	  ++next_constraint;
+	  if (next_constraint == lines.end())
+					     // nothing more to do; finish rest
+					     // of loop
+	    {
+	      for (unsigned int i=row+1; i<n_rows; ++i)
+		new_line.push_back (i-shift);
+	      break;
+	    };
+	}
+      else
+	new_line.push_back (row-shift);
 
  
   next_constraint = lines.begin();
+				   // note: in this loop we need not check
+				   // whether #next_constraint# is a valid
+				   // iterator, since #next_constraint# is
+				   // only evaluated so often as there are
+				   // entries in new_line[*] which tells us
+				   // which constraints exist
   for (int row=0; row<uncondensed.n(); ++row)
     if (new_line[row] != -1)
 				       // line not constrained
@@ -523,6 +584,10 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
 
 void ConstraintMatrix::condense (dVector &vec) const {
   Assert (sorted == true, ExcMatrixNotClosed());
+
+  if (lines.size() == 0)
+				     // nothing to do
+    return;
   
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   for (unsigned int row=0; row<(unsigned int)vec.n(); ++row)
@@ -537,6 +602,9 @@ void ConstraintMatrix::condense (dVector &vec) const {
 	vec(row) = 0.;
 	
 	++next_constraint;
+	if (next_constraint == lines.end())
+					   // nothing more to do
+	  break;
       };
 };
   
@@ -548,7 +616,7 @@ void ConstraintMatrix::distribute (const dVector &condensed,
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert ((unsigned int)condensed.n()+n_constraints() == (unsigned int)uncondensed.n(),
 	  ExcWrongDimension());
-  
+
 				   // store for each line of the new vector
 				   // its old line number before
 				   // distribution. If the shift is
@@ -560,20 +628,40 @@ void ConstraintMatrix::distribute (const dVector &condensed,
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
   unsigned int n_rows = (unsigned int)uncondensed.n();
-  for (unsigned int row=0; row!=n_rows; ++row)
-    if (row == (*next_constraint).line)
-      {
-					 // this line is constrained
-	old_line.push_back (-1);
-					 // note that #lines# is ordered
-	++next_constraint;
-	++shift;
-      }
-    else
-      old_line.push_back (row-shift);
+
+  if (next_constraint == lines.end()) 
+				     // if no constraint is to be handled
+    for (unsigned int row=0; row!=n_rows; ++row)
+      old_line.push_back (row);
+  else
+    for (unsigned int row=0; row!=n_rows; ++row)
+      if (row == (*next_constraint).line)
+	{
+					   // this line is constrained
+	  old_line.push_back (-1);
+					   // note that #lines# is ordered
+	  ++shift;
+	  ++next_constraint;
+	  if (next_constraint == lines.end())
+					     // nothing more to do; finish rest
+					     // of loop
+	    {
+	      for (unsigned int i=row+1; i<n_rows; ++i)
+		old_line.push_back (i-shift);
+	      break;
+	    };
+	}
+      else
+	old_line.push_back (row-shift);
 
  
   next_constraint = lines.begin();
+				   // note: in this loop we need not check
+				   // whether #next_constraint# is a valid
+				   // iterator, since #next_constraint# is
+				   // only evaluated so often as there are
+				   // entries in new_line[*] which tells us
+				   // which constraints exist
   for (unsigned int line=0; line<(unsigned int)uncondensed.n(); ++line) 
     if (old_line[line] != -1)
 				       // line was not condensed away
