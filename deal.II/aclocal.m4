@@ -272,11 +272,18 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
     dnl Set PIC flags. On some systems, -fpic/PIC is implied, so don't set
     dnl anything to avoid a warning. on AIX make sure we always pass -lpthread
-    dnl because this seems to be somehow required to make things work
+    dnl because this seems to be somehow required to make things work. Likewise
+    dnl DEC OSF.
     case "$target" in
       *aix* )
 	CXXFLAGSPIC=
 	LDFLAGSPIC=
+        LDFLAGS="$LDFLAGS -lpthread"
+	;;
+
+      *dec-osf* )
+	CXXFLAGSPIC="-fPIC"
+	LDFLAGSPIC="-fPIC"
         LDFLAGS="$LDFLAGS -lpthread"
 	;;
 

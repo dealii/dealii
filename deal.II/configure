@@ -2899,10 +2899,17 @@ echo "$as_me: error: Unrecognized compiler -- sorry" >&2;}
 
         CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
-            case "$target" in
+                    case "$target" in
       *aix* )
 	CXXFLAGSPIC=
 	LDFLAGSPIC=
+        LDFLAGS="$LDFLAGS -lpthread"
+	;;
+
+      *dec-osf* )
+	CXXFLAGSPIC="-fPIC"
+	LDFLAGSPIC="-fPIC"
+        LDFLAGS="$LDFLAGS -lpthread"
 	;;
 
       *)
