@@ -41,7 +41,8 @@
  * @author Wolfgang Bangerth, 1997
  */
 template <int dim>
-class Point : public Tensor<1,dim> {
+class Point : public Tensor<1,dim>
+{
   public:
 				     /**
 				      * Constructor. Initialize all entries
@@ -136,7 +137,7 @@ class Point : public Tensor<1,dim> {
     double              square () const;
 
 
-/**
+				     /**
 				      *  Exception
 				      */
     DeclException1 (ExcDimTooSmall,

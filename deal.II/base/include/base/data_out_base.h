@@ -408,7 +408,7 @@ class DataOutBase
     };
 
 
-/**
+				     /**
 				      * Flags describing the details of
 				      * output in UCD format.
 				      */
@@ -552,7 +552,7 @@ class DataOutBase
     };
 
 
-/**
+				     /**
 				      * Flags describing the details of
 				      * output in encapsulated postscript
 				      * format.
@@ -760,7 +760,7 @@ class DataOutBase
 	ColorFunction color_function;
 
 
-/**
+					 /**
 					  * Default colorization function. This
 					  * one does what one usually wants:
 					  * It shifts colors from black (lowest
@@ -932,7 +932,7 @@ class DataOutBase
 			   ostream                   &out);
 
 
-/**
+				     /**
 				      * Exception
 				      */
     DeclException2 (ExcUnexpectedNumberOfDatasets,
@@ -1222,7 +1222,7 @@ class DataOutInterface : private DataOutBase
     void set_flags (const GmvFlags &gmv_flags);
 
 
-/**
+				     /**
 				      * Provide a function which tells us which
 				      * suffix with a given output format
 				      * usually has. At present the following

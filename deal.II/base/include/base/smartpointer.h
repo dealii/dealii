@@ -76,7 +76,7 @@ class SmartPointer
     SmartPointer (T *t);
 
 
-/**
+				     /**
 				      * Destructor, removing the subscription.
 				      */
     ~SmartPointer();

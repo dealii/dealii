@@ -499,7 +499,7 @@ class SparsityPattern : public Subscriptor
     const unsigned int * get_column_numbers () const;
 
 
-/**
+				     /**
 				      * Exception
 				      */
     DeclException1 (ExcInvalidNumber,

@@ -143,7 +143,7 @@ class Solver
     };
 
 
-/**
+				     /**
 				      * Constructor. Assign a control
 				      * object which stores the required
 				      * precision and an object to provide

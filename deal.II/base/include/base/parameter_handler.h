@@ -120,7 +120,7 @@ struct Patterns {
     };
 
 
-/**
+				     /**
 				      * This class is much like the #Selection#
 				      * class, but it allows the input to be
 				      * a comma-separated list of values which
@@ -674,7 +674,7 @@ class ParameterHandler
     void clear ();
 
 
-/**
+				     /**
 				      * Declare a new entry with name #entry#,
 				      * default and for which
 				      * any input has to match the #pattern#
@@ -758,7 +758,7 @@ class ParameterHandler
 				   const unsigned int indent_level);
 
 
-/**
+				     /**
 				      * Exception
 				      */
     DeclException1 (ExcEntryAlreadyExists,

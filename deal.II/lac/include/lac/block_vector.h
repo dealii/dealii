@@ -150,7 +150,7 @@ class BlockVector
     Number linfty_norm () const;
 
 
-/**
+				     /**
 				      * Change the dimension of the vector to
 				      * #N#. The reserved memory for this vector
 				      * remains unchanged if possible, to make
@@ -227,7 +227,7 @@ class BlockVector
 //      const_iterator end () const;  
 
 
-/**
+				     /**
 				      * @name 2: Data-Access
 				      */
 				     //@{
@@ -244,7 +244,7 @@ class BlockVector
 				     //@}
 
 
-/**
+				     /**
 				      * @name 3: Modification of vectors
 				      */
 				     //@{
@@ -342,7 +342,7 @@ class BlockVector
 				     //@}
 
 
-/**
+				     /**
 				      * @name 5: Mixed stuff
 				      */
 				     //@{

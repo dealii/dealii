@@ -108,7 +108,7 @@ class ConvergenceTable: public TableHandler
 				     const RateMode rate_mode);
 
 
-/**
+				     /**
 				      * Evaluates the convergence rates of the
 				      * data column #data_column_key# 
 				      * due to the #RateMode#.

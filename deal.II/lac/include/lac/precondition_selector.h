@@ -124,7 +124,7 @@ class PreconditionSelector
     DeclException0 (ExcNoMatrixGivenToUse);
 
 
-protected:
+  protected:
     
 				     /**
 				      * Stores the name of the

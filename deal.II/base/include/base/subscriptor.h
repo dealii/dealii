@@ -102,7 +102,7 @@ class Subscriptor
     DeclException0(ExcNotUsed);
 
 
-private:
+  private:
     				     /**
 				      * Store the number of objects which
 				      * subscribed to this object. Initialally,
