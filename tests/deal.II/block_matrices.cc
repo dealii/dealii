@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
+/* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
 /* Program is based on /examples/step-3 
    Purpose: compare the results when using a normal matrix and
    a block matrix
