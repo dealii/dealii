@@ -177,7 +177,7 @@ clean-lib:
 
 # if that directory exists, go into 'tests' and clean up there as well
 clean-tests:
-	-cd tests ; $(MAKE) clean
+	-cd tests && $(MAKE) clean
 
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
