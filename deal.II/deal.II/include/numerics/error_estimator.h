@@ -8,6 +8,8 @@
 
 #include <base/exceptions.h>
 #include <base/function.h>
+#include <basic/forward-declarations.h>
+#include <grid/dof.h>
 #include <map>
 
 
@@ -191,7 +193,7 @@ class KellyErrorEstimator {
 				      * jumps of gradients. See the general
 				      * doc of this class for more information.
 				      */
-    typedef map<DoFHandler<dim>::face_iterator,double> FaceIntegrals;
+    typedef map<typename DoFHandler<dim>::face_iterator,double> FaceIntegrals;
 
 				     /**
 				      * Redeclare an active cell iterator.
