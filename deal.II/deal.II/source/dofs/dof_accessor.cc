@@ -256,13 +256,29 @@ DoFCellAccessor<dim>::child (const unsigned int i) const {
 
 
 
+
+DoFSubstructAccessor<1>::substruct_iterator
+DoFCellAccessor<1>::face (const unsigned int) const {
+  Assert (false, ExcNotUsefulForThisDimension());
+  return 0;
+};
+
+
+
+DoFSubstructAccessor<2>::substruct_iterator
+DoFCellAccessor<2>::face (const unsigned int i) const {
+  return line(i);
+};
+
+
+
 void
-DoFCellAccessor<1>::dof_indices (vector<int> &dof_indices) const {
+DoFCellAccessor<1>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_indices.size() == 0, ExcVectorNotEmpty());
   
-  dof_indices.reserve (dof_indices.size() +
-		       dof_handler->get_selected_fe().total_dofs);
+  dof_indices.reserve (dof_handler->get_selected_fe().total_dofs);
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
       dof_indices.push_back (vertex_dof_index(vertex,d));
@@ -274,19 +290,68 @@ DoFCellAccessor<1>::dof_indices (vector<int> &dof_indices) const {
 
 
 void
-DoFCellAccessor<2>::dof_indices (vector<int> &dof_indices) const {
+DoFCellAccessor<2>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_indices.size() == 0, ExcVectorNotEmpty());
   
-  dof_indices.reserve (dof_indices.size() +
-		       dof_handler->get_selected_fe().total_dofs);
+  dof_indices.reserve (dof_handler->get_selected_fe().total_dofs);
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
       dof_indices.push_back (vertex_dof_index(vertex,d));
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
       dof_indices.push_back (this->line(line)->dof_index(d));
+  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_quad; ++d)
+    dof_indices.push_back (dof_index(d));
 };
+
+
+
+
+void
+DoFCellAccessor<1>::get_dof_values (const dVector  &values,
+				    vector<double> &dof_values) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_values.size() == 0, ExcVectorNotEmpty());
+  Assert ((unsigned int)values.n() == dof_handler->n_dofs(),
+	  ExcVectorDoesNotMatch());
+  
+  dof_values.reserve (dof_handler->get_selected_fe().total_dofs);
+  for (unsigned int vertex=0; vertex<2; ++vertex)
+    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
+      dof_values.push_back (values(vertex_dof_index(vertex,d)));
+  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
+    dof_values.push_back (values(dof_index(d)));
+};
+
+
+
+
+void
+DoFCellAccessor<2>::get_dof_values (const dVector  &values,
+				    vector<double> &dof_values) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (dof_values.size() == 0, ExcVectorNotEmpty());
+  Assert ((unsigned int)values.n() == dof_handler->n_dofs(),
+	  ExcVectorDoesNotMatch());
+    
+  dof_values.reserve (dof_handler->get_selected_fe().total_dofs);
+  for (unsigned int vertex=0; vertex<4; ++vertex)
+    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
+      dof_values.push_back (values(vertex_dof_index(vertex,d)));
+  for (unsigned int line=0; line<4; ++line)
+    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
+      dof_values.push_back (values(this->line(line)->dof_index(d)));
+  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_quad; ++d)
+    dof_values.push_back (values(dof_index(d)));
+};
+
+
+
+
 
 
 

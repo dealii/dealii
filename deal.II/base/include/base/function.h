@@ -7,7 +7,7 @@
 
 //forward declaration
 template <int dim> class Point;
-template <class T> class vector;
+template <class T, class Alloc=alloc> class vector;
 
 
 

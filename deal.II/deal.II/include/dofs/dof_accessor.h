@@ -7,6 +7,8 @@
 
 template <int dim> class Triangulation;
 template <int dim> class DoFHandler;
+class dVector;
+
 
 #include <grid/tria_accessor.h>
 #include <vector.h>
@@ -239,7 +241,8 @@ class DoFQuadAccessor :  public BaseClass, public DoFAccessor<dim> {
 				      *  Return a pointer to the #i#th line
 				      *  bounding this #Quad#.
 				      */
-    TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > > line (const unsigned int i) const;
+    TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
+    line (const unsigned int i) const;
 
 				     /**
 				      * Return the #i#th child as a DoF quad
@@ -299,10 +302,17 @@ class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
 				      * Constructor
 				      */
     DoFSubstructAccessor (Triangulation<1> *tria,
-				 const int         level,
-				 const int         index,
-				 const void       *local_data) :
+			  const int         level,
+			  const int         index,
+			  const void       *local_data) :
 		    DoFLineAccessor<1,CellAccessor<1> > (tria,level,index,local_data) {};
+				     // do this here, since this way the
+				     // CellAccessor has the possibility to know
+				     // what a substruct_iterator is. Otherwise
+				     // it would have to ask the DoFHandler<dim>
+				     // which would need another big include
+				     // file and maybe cyclic interdependence
+    typedef void * substruct_iterator;
 };
 
 
@@ -317,10 +327,17 @@ class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
 				      * Constructor
 				      */
     DoFSubstructAccessor (Triangulation<2> *tria,
-				 const int         level,
-				 const int         index,
-				 const void       *local_data) :
+			  const int         level,
+			  const int         index,
+			  const void       *local_data) :
 		    DoFQuadAccessor<2,CellAccessor<2> > (tria,level,index,local_data) {};
+				     // do this here, since this way the
+				     // CellAccessor has the possibility to know
+				     // what a substruct_iterator is. Otherwise
+				     // it would have to ask the DoFHandler<dim>
+				     // which would need another big include
+				     // file and maybe cyclic interdependence
+    typedef TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > > substruct_iterator;
 };
 
 
@@ -370,6 +387,16 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
     TriaIterator<dim,DoFCellAccessor<dim> > child (const unsigned int) const;
 
     				     /**
+				      * Return an iterator to the #i#th face
+				      * of this cell.
+				      *
+				      * This function is not implemented in 1D,
+				      * and maps to DoFQuadAccessor::line in 2D.
+				      */
+    typename DoFSubstructAccessor<dim>::substruct_iterator
+    face (const unsigned int i) const;
+
+    				     /**
 				      * Return the indices of the dofs of this
 				      * cell in the standard ordering: dofs
 				      * on vertex 0, dofs on vertex 1, etc,
@@ -377,10 +404,38 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * dofs on quad 0, etc.
 				      *
 				      * The dof indices are appended to the end
-				      * of the vector. It is not assumed that
+				      * of the vector. It is assumed that
 				      * the vector be empty beforehand.
 				      */
-    void dof_indices (vector<int> &dof_indices) const;
+    void get_dof_indices (vector<int> &dof_indices) const;
+
+    				     /**
+				      * Return the value of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * The values are appended to the end
+				      * of the vector. It is assumed that
+				      * the vector be empty beforehand.
+				      */
+    void get_dof_values (const dVector  &values,
+			 vector<double> &dof_values) const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcVectorNotEmpty);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcVectorDoesNotMatch);
+    				     /**
+				      *  Exception
+				      */
+    DeclException0 (ExcNotUsefulForThisDimension);
 };
 
 

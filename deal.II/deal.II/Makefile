@@ -3,7 +3,7 @@
 
 all: deal.II doc examples
 
-clean: lib-clean doc-clean examples-clean
+clean: lib-clean examples-clean doc-clean
 
 
 deal.II:

@@ -36,15 +36,21 @@ Let ParameterHandler and DataIn/Out throw exceptions. Make more tests
 Replace function objects by mem_fun, fun_ptr, ... when member function
   templates are supported.
 
+Invent a way to tell FEValues::reinit which fields to reinit. If you
+  only want to integrate a FE solution over a cell, transforming the
+  gradients may be a rather expensive operation!
+
+  Check in FEValues::shape_grad whether the gardients have been
+  reinit'd last time to avoid people taking gradients which have not
+  been computed.
+
+implement ProblemBase::distribute_cell_to_dof_vector
+
+
 
 
 
 DEAL:
-make dSMatrixStruct warn if max # of entries per row is overrun!
-
-let dSMatrixStruct have an empty constructor to allow for member
-  objects being initialized later
-
 why do loops in dFMatrix run backwards?
 
 Let an empty dfmatrix assume it has dimensions zero rather than one!

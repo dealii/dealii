@@ -731,10 +731,18 @@ class TriaSubstructAccessor<1> :  public LineAccessor<1> {
 				      * Constructor
 				      */
     TriaSubstructAccessor (Triangulation<1> *tria,
-				 const int         level,
-				 const int         index,
-				 const void       *local_data) :
+			   const int         level,
+			   const int         index,
+			   const void       *local_data) :
 		    LineAccessor<1> (tria,level,index,local_data) {};
+
+    				     // do this here, since this way the
+				     // CellAccessor has the possibility to know
+				     // what a substruct_iterator is. Otherwise
+				     // it would have to ask the DoFHandler<dim>
+				     // which would need another big include
+				     // file and maybe cyclic interdependence
+    typedef void * substruct_iterator;
 };
 
 
@@ -749,10 +757,18 @@ class TriaSubstructAccessor<2> : public QuadAccessor<2> {
 				      * Constructor
 				      */
     TriaSubstructAccessor (Triangulation<2> *tria,
-				 const int         level,
-				 const int         index,
-				 const void       *local_data) :
+			   const int         level,
+			   const int         index,
+			   const void       *local_data) :
 		    QuadAccessor<2> (tria,level,index,local_data) {};
+
+    				     // do this here, since this way the
+				     // CellAccessor has the possibility to know
+				     // what a substruct_iterator is. Otherwise
+				     // it would have to ask the DoFHandler<dim>
+				     // which would need another big include
+				     // file and maybe cyclic interdependence
+    typedef TriaIterator<2,LineAccessor<2> > substruct_iterator;
 };
 
 
@@ -853,6 +869,16 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
 				      */
     TriaIterator<dim,CellAccessor<dim> > child (const unsigned int i) const;
 
+				     /**
+				      * Return an iterator to the #i#th face
+				      * of this cell.
+				      *
+				      * This function is not implemented in 1D,
+				      * and maps to QuadAccessor::line in 2D.
+				      */
+    typename TriaSubstructAccessor<dim>::substruct_iterator
+    face (const unsigned int i) const;
+    
 				     /**
 				      * Return the material id of this cell.
 				      */

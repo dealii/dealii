@@ -96,11 +96,12 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 						       present_level,
 						       present_index),
 		    fe);
+  const unsigned int n_dofs = dof_handler->get_selected_fe().total_dofs;
 
 				   // clear cell matrix
   if (assemble_matrix)
-    for (unsigned int i=0; i<dof_handler->get_selected_fe().total_dofs; ++i)
-      for (unsigned int j=0; j<dof_handler->get_selected_fe().total_dofs; ++j)
+    for (unsigned int i=0; i<n_dofs; ++i)
+      for (unsigned int j=0; j<n_dofs; ++j)
 	cell_matrix(i,j) = 0;
   
 
@@ -133,17 +134,17 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 
 				   // get indices of dofs
   vector<int> dofs;
-  dof_indices (dofs);
+  get_dof_indices (dofs);
   
 				   // distribute cell matrix
   if (assemble_matrix)
-    for (unsigned int i=0; i<dof_handler->get_selected_fe().total_dofs; ++i)
-      for (unsigned int j=0; j<dof_handler->get_selected_fe().total_dofs; ++j)
+    for (unsigned int i=0; i<n_dofs; ++i)
+      for (unsigned int j=0; j<n_dofs; ++j)
 	problem.system_matrix.add(dofs[i], dofs[j], cell_matrix(i,j));
 
 				   // distribute cell vector
   if (assemble_rhs)
-    for (unsigned int j=0; j<dof_handler->get_selected_fe().total_dofs; ++j)
+    for (unsigned int j=0; j<n_dofs; ++j)
       problem.right_hand_side(dofs[j]) += cell_vector(j);
 };
 

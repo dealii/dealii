@@ -529,6 +529,14 @@ void CellAccessor<1>::set_material_id (const unsigned char mat_id) const {
 
 
 
+Triangulation<1>::substruct_iterator
+CellAccessor<1>::face (const unsigned int) const {
+  Assert (false, ExcNotUsefulForThisDimension());
+  return 0;
+};
+
+
+
 /*------------------------ Functions: CellAccessor<2> -----------------------*/
 
 
@@ -551,6 +559,13 @@ void CellAccessor<2>::set_material_id (const unsigned char mat_id) const {
 	  typename TriaSubstructAccessor<2>::ExcRefineCellNotUsed());
   tria->levels[present_level]->quads.material_id[present_index]
     = mat_id;						 
+};
+
+
+
+Triangulation<2>::substruct_iterator
+CellAccessor<2>::face (const unsigned int i) const {
+  return line(i);
 };
 
 

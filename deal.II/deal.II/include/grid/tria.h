@@ -462,6 +462,10 @@ class TriaDimensionInfo;
     #Triangulation<1>#, the #quad_iterator#s are declared as
     #void *#. Thus these types exist, but are useless and will
     certainly make any involuntary use visible.
+
+    The same applies for the #substruct_iterator# types, since lines
+    have no substructures apart from vertices, which are handled in
+    a different way, however.
     */
 class TriaDimensionInfo<1> {
   public:
@@ -476,6 +480,10 @@ class TriaDimensionInfo<1> {
     typedef raw_line_iterator    raw_cell_iterator;
     typedef line_iterator        cell_iterator;
     typedef active_line_iterator active_cell_iterator;
+
+    typedef void * raw_substruct_iterator;
+    typedef void * substruct_iterator;
+    typedef void * active_substruct_iterator;
 };
 
 
@@ -499,6 +507,10 @@ class TriaDimensionInfo<1> {
       typedef raw_quad_iterator    raw_cell_iterator;
       typedef quad_iterator        cell_iterator;
       typedef active_quad_iterator active_cell_iterator;
+
+      typedef raw_line_iterator    raw_substruct_iterator;
+      typedef line_iterator        substruct_iterator;
+      typedef active_line_iterator active_substruct_iterator;    
     \end{verbatim}
     */
 class TriaDimensionInfo<2> {
@@ -514,6 +526,10 @@ class TriaDimensionInfo<2> {
     typedef raw_quad_iterator    raw_cell_iterator;
     typedef quad_iterator        cell_iterator;
     typedef active_quad_iterator active_cell_iterator;
+
+    typedef raw_line_iterator    raw_substruct_iterator;
+    typedef line_iterator        substruct_iterator;
+    typedef active_line_iterator active_substruct_iterator;    
 };
 
 
@@ -584,10 +600,17 @@ class TriaDimensionInfo<2> {
       typedef quad_line_iterator   raw_cell_iterator;    
       typedef quad_iterator        cell_iterator;
       typedef active_quad_iterator active_cell_iterator;
+
+      typedef raw_line_iterator    raw_substruct_iterator;
+      typedef line_iterator        substruct_iterator;
+      typedef active_line_iterator active_substruct_iterator;    
     \end{verbatim}
 
     By using the cell iterators, you can write code nearly independent of
-    the spatial dimension.
+    the spatial dimension. The same applies for substructure iterators,
+    where a substructure is defined as a face of a cell. The face of a
+    cell is be a vertex in 1D and a line in 2D; however, vertices are
+    handled in a different way and therefore lines have no faces.
 
     The #Triangulation# class offers functions like #begin_active# which gives
     you an iterator to the first active cell. There are quite a lot of functions
@@ -999,6 +1022,10 @@ class Triangulation : public TriaDimensionInfo<dim> {
     typedef typename TriaDimensionInfo<dim>::raw_cell_iterator raw_cell_iterator;
     typedef typename TriaDimensionInfo<dim>::cell_iterator cell_iterator;
     typedef typename TriaDimensionInfo<dim>::active_cell_iterator active_cell_iterator;
+
+    typedef typename TriaDimensionInfo<dim>::raw_substruct_iterator raw_substruct_iterator;
+    typedef typename TriaDimensionInfo<dim>::substruct_iterator substruct_iterator;
+    typedef typename TriaDimensionInfo<dim>::active_substruct_iterator active_substruct_iterator;
 
 				     /**
 				      *  Create a triangulation and create

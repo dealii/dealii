@@ -73,6 +73,15 @@ class FEValues {
 			const unsigned int j) const;
 
 				     /**
+				      * Return a pointer to the matrix holding
+				      * all values of shape functions at all
+				      * integration points, on the present cell.
+				      * For the format of this matrix, see the
+				      * documentation for the matrix itself.
+				      */
+    const dFMatrix & get_shape_values () const;
+    
+				     /**
 				      * Return the gradient of the #i#th shape
 				      * function at the #j# quadrature point.
 				      * If you want to get the derivative in
@@ -88,6 +97,15 @@ class FEValues {
     const Point<dim> & shape_grad (const unsigned int i,
 				   const unsigned int j) const;
 
+				     /** 
+				      * Return a pointer to the matrix holding
+				      * all gradients of shape functions at all
+				      * integration points, on the present cell.
+				      * For the format of this matrix, see the
+				      * documentation for the matrix itself.
+				      */
+    const vector<vector<Point<dim> > > & get_shape_grads () const;
+    
 				     /**
 				      * Return the position of the #i#th
 				      * quadrature point in real space.
@@ -95,11 +113,24 @@ class FEValues {
     const Point<dim> & quadrature_point (const unsigned int i) const;
 
 				     /**
+				      * Return a pointer to the vector of
+				      * quadrature points.
+				      */
+    const vector<Point<dim> > & get_quadrature_points () const;
+    
+				     /**
 				      * Return the Jacobi determinant times
 				      * the weight of the #i#th quadrature
 				      * point.
 				      */
     double JxW (const unsigned int i) const;
+
+				     /**
+				      * Return a pointer to the array holding
+				      * the JxW values at the different
+				      * quadrature points.
+				      */
+    const vector<double> & get_JxW_values () const;
     
 				     /**
 				      * Reinitialize the gradients, Jacobi
@@ -637,6 +668,48 @@ class FiniteElement<2> : public FiniteElementBase<2> {
 				 const vector<Point<2> >               &unit_points,
 				 vector<dFMatrix>  &jacobians,
 				 vector<Point<2> > &points) const;
+};
+
+
+
+
+
+/*------------------------ Inline functions -----------------------------------*/
+
+
+
+template <int dim>
+inline
+const dFMatrix & FEValues<dim>::get_shape_values () const {
+  return shape_values;
+};
+
+
+
+
+template <int dim>
+inline
+const vector<vector<Point<dim> > > &
+FEValues<dim>::get_shape_grads () const {
+  return shape_gradients;
+};
+
+
+
+template <int dim>
+inline
+const vector<Point<dim> > &
+FEValues<dim>::get_quadrature_points () const {
+  return quadrature_points;
+};
+
+
+
+template <int dim>
+inline
+const vector<double> &
+FEValues<dim>::get_JxW_values () const {
+  return JxW_values;
 };
 
 

@@ -1037,8 +1037,8 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 				       // both cells have no children
       {
 	vector<int> old_dofs, new_dofs;
-	old_cell->dof_indices (old_dofs);
-	new_cell->dof_indices (new_dofs);
+	old_cell->get_dof_indices (old_dofs);
+	new_cell->get_dof_indices (new_dofs);
 	Assert (old_dofs.size() == selected_fe->total_dofs,
 		ExcInternalError ());
 	Assert (new_dofs.size() == selected_fe->total_dofs,
@@ -1062,7 +1062,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	  
 					   // numbers of old dofs
 	  vector<int> old_dof_indices;
-	  old_cell->dof_indices (old_dof_indices);
+	  old_cell->get_dof_indices (old_dof_indices);
 
 	  Assert (old_dof_indices.size() == selected_fe->total_dofs,
 		  ExcInternalError ());
@@ -1071,7 +1071,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    {
 					       // numbers of child dofs
 	      vector<int> child_dof_indices;
-	      child[c]->dof_indices (child_dof_indices);
+	      child[c]->get_dof_indices (child_dof_indices);
 
 	      Assert (child_dof_indices.size() == selected_fe->total_dofs,
 		      ExcInternalError ());
@@ -1094,7 +1094,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	  
 	      					   // numbers of new dofs
 	  vector<int> new_dof_indices;
-	  new_cell->dof_indices(new_dof_indices);
+	  new_cell->get_dof_indices(new_dof_indices);
 
 	  Assert (new_dof_indices.size() == selected_fe->total_dofs,
 		  ExcInternalError ());
@@ -1103,7 +1103,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    {
 					       // numbers of child dofs
 	      vector<int> child_dof_indices;
-	      child[c]->dof_indices (child_dof_indices);
+	      child[c]->get_dof_indices (child_dof_indices);
 
 	      Assert (child_dof_indices.size() == selected_fe->total_dofs,
 		      ExcInternalError ());
@@ -1133,8 +1133,8 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 				       // both cells have no children
       {
 	vector<int> old_dofs, new_dofs;
-	old_cell->dof_indices (old_dofs);
-	new_cell->dof_indices (new_dofs);
+	old_cell->get_dof_indices (old_dofs);
+	new_cell->get_dof_indices (new_dofs);
 	Assert (old_dofs.size() == selected_fe->total_dofs,
 		ExcInternalError ());
 	Assert (new_dofs.size() == selected_fe->total_dofs,
@@ -1158,7 +1158,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	  
 					   // numbers of old dofs
 	  vector<int> old_dof_indices;
-	  old_cell->dof_indices (old_dof_indices);
+	  old_cell->get_dof_indices (old_dof_indices);
 
 	  Assert (old_dof_indices.size() == selected_fe->total_dofs,
 		  ExcInternalError ());
@@ -1167,7 +1167,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    {
 					       // numbers of child dofs
 	      vector<int> child_dof_indices;
-	      child[c]->dof_indices (child_dof_indices);
+	      child[c]->get_dof_indices (child_dof_indices);
 
 	      Assert (child_dof_indices.size() == selected_fe->total_dofs,
 		      ExcInternalError ());
@@ -1191,7 +1191,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	  
 	      					   // numbers of new dofs
 	  vector<int> new_dof_indices;
-	  new_cell->dof_indices(new_dof_indices);
+	  new_cell->get_dof_indices(new_dof_indices);
 
 	  Assert (new_dof_indices.size() == selected_fe->total_dofs,
 		  ExcInternalError ());
@@ -1200,7 +1200,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    {
 					       // numbers of child dofs
 	      vector<int> child_dof_indices;
-	      child[c]->dof_indices (child_dof_indices);
+	      child[c]->get_dof_indices (child_dof_indices);
 
 	      Assert (child_dof_indices.size() == selected_fe->total_dofs,
 		      ExcInternalError ());

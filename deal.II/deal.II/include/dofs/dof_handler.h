@@ -152,6 +152,10 @@ class DoFDimensionInfo<1> {
     typedef raw_line_iterator    raw_cell_iterator;
     typedef line_iterator        cell_iterator;
     typedef active_line_iterator active_cell_iterator;
+
+    typedef void * raw_substruct_iterator;
+    typedef void * substruct_iterator;
+    typedef void * active_substruct_iterator;
 };
 
 
@@ -177,6 +181,10 @@ class DoFDimensionInfo<2> {
     typedef raw_quad_iterator    raw_cell_iterator;
     typedef quad_iterator        cell_iterator;
     typedef active_quad_iterator active_cell_iterator;
+
+    typedef raw_line_iterator    raw_substruct_iterator;
+    typedef line_iterator        substruct_iterator;
+    typedef active_line_iterator active_substruct_iterator;    
 };
 
 
@@ -428,7 +436,11 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     typedef typename DoFDimensionInfo<dim>::cell_iterator cell_iterator;
     typedef typename DoFDimensionInfo<dim>::active_cell_iterator active_cell_iterator;
 
+    typedef typename DoFDimensionInfo<dim>::raw_substruct_iterator raw_substruct_iterator;
+    typedef typename DoFDimensionInfo<dim>::substruct_iterator substruct_iterator;
+    typedef typename DoFDimensionInfo<dim>::active_substruct_iterator active_substruct_iterator;
 
+    
 				     /**
 				      * Constructor. Take #tria# as the
 				      * triangulation to work on.
