@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,24 +41,37 @@ template <typename> class Vector;
 /**
  * Block matrix composed of different single matrices.
  *
- * Given a set of arbitrary matrices @p A_i, this class implements a
- * block matrix with block entries of the form <tt>M_{jk</tt> = s_{jk}A_i}.
- * Each @p A_i may be used several times with different prefix.
+ * Given a set of arbitrary matrices <i>A<sub>i</sub></i>, this class
+ * implements a block matrix with block entries of the form
+ * <i>M<sub>jk</sub> = s<sub>jk</sub>A<sub>i</sub></i>.  Each
+ * <i>A<sub>i</sub></i> may be used several times with different
+ * prefix. The matrices are not copied into the BlockMatrixArray
+ * object, but rather references to them will be stored along with
+ * factors and transposition flags.
  *
- * Non-zero entries are registered by the function @p enter, zero
- * entries are not stored at all. Using @p enter with the same
- * location <tt>(i,j)</tt> several times will add the corresponding
- * matrices in matrix-vector multiplications.
+ * Non-zero entries are registered by the function enter(), zero
+ * entries are not stored at all. Using enter() with the same location
+ * <tt>(i,j)</tt> several times will add the corresponding matrices in
+ * matrix-vector multiplications. These matrices will not be actually
+ * added, but the multiplications with them will be summed up.
  *
- * @sect3{Requirements}
+ * @note This mechanism makes it impossible to access single entries
+ * of BlockMatrixArray. In particular, (block) relaxation
+ * preconditioners based on PreconditionRelaxation or
+ * PreconditionBlock <b>cannot</b> be used with this class. If you
+ * need a preconditioner for a BlockMatrixArray object, use
+ * BlockTrianglePrecondition.
  *
- * The template argument @p MATRIX is a class providing the the
- * matrix-vector multiplication functions @p vmult etc. defined in
- * this class, but with arguments of type @p VECTOR instead of
+ * <h3>Requirements on MATRIX</h3>
+ *
+ * The template argument <tt>MATRIX</tt> is a class providing the the
+ * matrix-vector multiplication functions <tt>vmult</tt>,
+ * <tt>Tvmult</tt>, <tt>vmult_add</tt> and <tt>Tvmult_add</tt> used in
+ * this class, but with arguments of type <tt>VECTOR</tt> instead of
  * <tt>BlockVector<VECTOR></tt>. SparseMatrix is a possible entry
  * type.
  *
- * @author Guido Kanschat, 2000, 2001
+ * @author Guido Kanschat, 2000, 2001, 2005
  */
 template <class MATRIX>
 class BlockMatrixArray : public Subscriptor
@@ -114,7 +127,7 @@ class BlockMatrixArray : public Subscriptor
   
 				     /**
 				      * Matrix-vector multiplication
-				      * adding to @p dst.
+				      * adding to <tt>dst</tt>.
 				      */
     template <class number>
     void vmult_add (BlockVector<number>& dst,
@@ -131,7 +144,7 @@ class BlockMatrixArray : public Subscriptor
 				     /**
 				      * Transposed matrix-vector
 				      * multiplication adding to
-				      * @p dst.
+				      * <tt>dst</tt>.
 				      */
     template <class number>
     void Tvmult_add (BlockVector<number>& dst,
@@ -139,7 +152,20 @@ class BlockMatrixArray : public Subscriptor
 
 				     /**
 				      * Print the block structure as a
-				      * LaTeX-array.
+				      * LaTeX-array. This output will
+				      * not be very intuitive, since
+				      * the matrix object lacks
+				      * important information. What
+				      * you see is an entry for each
+				      * block showing all the matrices
+				      * with their multiplicaton
+				      * factors and possibly transpose
+				      * mark. The matrices itself are
+				      * numbered successively upon
+				      * being entred. If the same
+				      * matrix is entered several
+				      * times, it will be listed with
+				      * the same number everytime.
 				      */
     void print_latex (std::ostream& out) const;
     
