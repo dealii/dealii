@@ -27,6 +27,16 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: In multithreading mode, the compile flags now also have 
+       <code class="program">_REENTRANT</code> defined. If this flag
+       is defined, then the standard Unix headers also declare
+       reentrant versions (with suffix <code class="program">_r</code>)
+       of many functions.
+       <br>
+       (WB 2000/09/20)
+       </p>
+
+  <li> <p>
        New: Major and minor version numbers of the
        <acronym>deal.II</acronym> library are now passed to the
        compiler as preprocessor variables
