@@ -624,7 +624,7 @@ copy_to_mg (const MGDoFHandler<dim>             &mg_dof_handler,
 	    {
 //TODO:[GK] Not sure if this works if components are selected
 	      dst[level](level_dof_indices[i])
-		  = src(global_dof_indices[i]);
+		= src(global_dof_indices[i]);
 	    }
 //TODO: Special treatment of faces? Copy from MGTransferPrebuilt when done there.
 	}

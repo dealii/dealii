@@ -296,12 +296,6 @@ void MGTransferSelect<number>::build_matrices (
   s[select] = true;
 
   target_component = t_component;
-  if (target_component.size() == 0)
-    {
-      target_component.resize(ncomp);
-      for (unsigned int i=0;i<ncomp;++i)
-	target_component[i] = i;
-    }
   
   MGTransferBlockBase::build_matrices (mg_dof, s);
 }

@@ -388,8 +388,9 @@ MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
 }
 
 
-
-
+//TODO:[GK] Check if this function can be simplified
+// It took quite a lot of try and error to make it work with
+// target_component, so it is more grown than designed
 
 template<int dim, typename number>
 void
@@ -418,25 +419,33 @@ MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
   Assert (selected.size() == target_component.size(),
 	  ExcDimensionMismatch(selected.size(), target_component.size()));
 
-  unsigned int n_selected = std::accumulate (selected.begin(),
-					     selected.end(),
-					     0U);
-			     
+  std::vector<bool> target_selected(selected.size(), false);
+  for (unsigned int i=0;i<selected.size();++i)
+    if (selected[i]) target_selected[target_component[i]] = true;
+  
+  unsigned int n_selected = std::accumulate(target_selected.begin(),
+					    target_selected.end(),
+					    0U);
+  
   std::vector<std::vector<unsigned int> >
     ndofs(mg_dof.get_tria().n_levels(),
 	  std::vector<unsigned int>(target_component.size()));
 
-  count_dofs_per_component (mg_dof, ndofs);
+  count_dofs_per_component (mg_dof, ndofs, target_component);
   
   for (unsigned int level=v.get_minlevel();
        level<=v.get_maxlevel();++level)
     {
       v[level].reinit(n_selected, 0);
       unsigned int k=0;
-      for (unsigned int i=0;i<selected.size();++i)
-	if (selected[i])
-	  v[level].block(k++).reinit(ndofs[level][i]);
-      v[level].collect_sizes();
+      for (unsigned int i=0;i<selected.size() && (k<v[level].n_blocks());++i)
+	{
+	  if (selected[i])
+	    {
+	      v[level].block(k++).reinit(ndofs[level][i]);
+	    }
+	  v[level].collect_sizes();
+	}
     }
 }
 
