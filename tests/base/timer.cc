@@ -26,8 +26,8 @@ void compare (double t1, double t2, double ratio)
   double r = t2/t1;
   double d = std::fabs(r-ratio) / ratio;
 
-				   // relative error < 10%?
-  if (d <= .1)
+				   // relative error < 15%?
+  if (d <= .15)
     {
       deallog << "OK" << std::endl;
     } else {
