@@ -12,7 +12,7 @@
 
 
 // declare explicit specializations before use:
-template <> void FECubicSub<deal_II_dimension>::initialize_matrices ();
+template <> void FEQ3<deal_II_dimension>::initialize_matrices ();
 
 
 
@@ -20,7 +20,7 @@ template <> void FECubicSub<deal_II_dimension>::initialize_matrices ();
 #if deal_II_dimension == 1
 
 template <>
-FECubicSub<1>::FECubicSub () :
+FEQ3<1>::FEQ3 () :
 		FELinearMapping<1> (1, 2) {
   initialize_matrices ();
 };
@@ -28,7 +28,7 @@ FECubicSub<1>::FECubicSub () :
 
 
 template <>
-FECubicSub<1>::FECubicSub (const int) :
+FEQ3<1>::FEQ3 (const int) :
 		FELinearMapping<1> (0, 4)
 {
   initialize_matrices ();
@@ -37,7 +37,7 @@ FECubicSub<1>::FECubicSub (const int) :
 
 
 template <>
-void FECubicSub<1>::initialize_matrices () {
+void FEQ3<1>::initialize_matrices () {
   
   prolongation[0](0,0) = 1.0;
   prolongation[0](0,1) = 0.0;
@@ -110,7 +110,7 @@ void FECubicSub<1>::initialize_matrices () {
 
 template <>
 double
-FECubicSub<1>::shape_value (const unsigned int i,
+FEQ3<1>::shape_value (const unsigned int i,
 			    const Point<1>     &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -129,7 +129,7 @@ FECubicSub<1>::shape_value (const unsigned int i,
 
 template <>
 Tensor<1,1>
-FECubicSub<1>::shape_grad (const unsigned int i,
+FEQ3<1>::shape_grad (const unsigned int i,
 			   const Point<1>    &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -153,7 +153,7 @@ FECubicSub<1>::shape_grad (const unsigned int i,
 
 template <>
 Tensor<2,1>
-FECubicSub<1>::shape_grad_grad (const unsigned int i,
+FEQ3<1>::shape_grad_grad (const unsigned int i,
 				const Point<1>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -174,14 +174,14 @@ FECubicSub<1>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FECubicSub<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
+void FEQ3<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
   FiniteElement<1>::get_unit_support_points (unit_points);
 };
 
 
 
 template <>
-void FECubicSub<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
+void FEQ3<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
 					vector<Point<1> >  &support_points) const {
   FiniteElement<1>::get_support_points (cell, support_points);
 };
@@ -189,7 +189,7 @@ void FECubicSub<1>::get_support_points (const typename DoFHandler<1>::cell_itera
 
 
 template <>
-void FECubicSub<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
+void FEQ3<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
 					     vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
@@ -197,7 +197,7 @@ void FECubicSub<1>::get_face_support_points (const typename DoFHandler<1>::face_
 
 
 template <>
-void FECubicSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
+void FEQ3<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 					   FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -239,7 +239,7 @@ void FECubicSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &c
 #if deal_II_dimension == 2
 
 template <>
-FECubicSub<2>::FECubicSub () :
+FEQ3<2>::FEQ3 () :
 		FELinearMapping<2> (1, 2, 4)
 {
   interface_constraints(0,0) = -1.0/16.0;
@@ -263,7 +263,7 @@ FECubicSub<2>::FECubicSub () :
 
 
 template <>
-FECubicSub<2>::FECubicSub (const int) :
+FEQ3<2>::FEQ3 (const int) :
 		FELinearMapping<2> (0, 0, 16)
 {
   initialize_matrices ();
@@ -272,7 +272,7 @@ FECubicSub<2>::FECubicSub (const int) :
 
 
 template <>
-void FECubicSub<2>::initialize_matrices () {
+void FEQ3<2>::initialize_matrices () {
   prolongation[0](0,0) = 1.0;
   prolongation[0](1,0) = -1.0/16.0;
   prolongation[0](1,1) = -1.0/16.0;
@@ -696,7 +696,7 @@ void FECubicSub<2>::initialize_matrices () {
 
 template <>
 double
-FECubicSub<2>::shape_value (const unsigned int i,
+FEQ3<2>::shape_value (const unsigned int i,
 				const Point<2>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -762,7 +762,7 @@ xi*xi)*eta*eta*eta;
 
 template <>
 Tensor<1,2>
-FECubicSub<2>::shape_grad (const unsigned int i,
+FEQ3<2>::shape_grad (const unsigned int i,
 			       const Point<2>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -816,7 +816,7 @@ FECubicSub<2>::shape_grad (const unsigned int i,
 
 template <>
 Tensor<2,2>
-FECubicSub<2>::shape_grad_grad (const unsigned int i,
+FEQ3<2>::shape_grad_grad (const unsigned int i,
 				const Point<2>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -918,7 +918,7 @@ FECubicSub<2>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FECubicSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
+void FEQ3<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					   FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -1480,7 +1480,7 @@ void FECubicSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &c
 
 
 template <>
-void FECubicSub<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
+void FEQ3<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
 
@@ -1505,7 +1505,7 @@ void FECubicSub<2>::get_unit_support_points (vector<Point<2> > &unit_points) con
 
 
 template <>
-void FECubicSub<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
+void FEQ3<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
 					vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
@@ -1579,7 +1579,7 @@ void FECubicSub<2>::get_support_points (const typename DoFHandler<2>::cell_itera
 
 
 template <>
-void FECubicSub<2>::get_face_support_points (const typename DoFHandler<2>::face_iterator &face,
+void FEQ3<2>::get_face_support_points (const typename DoFHandler<2>::face_iterator &face,
 					     vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
@@ -1602,7 +1602,7 @@ void FECubicSub<2>::get_face_support_points (const typename DoFHandler<2>::face_
 #if deal_II_dimension == 3
 
 template <>
-FECubicSub<3>::FECubicSub () :
+FEQ3<3>::FEQ3 () :
 		FELinearMapping<3> (1, 2, 4, 8)
 {
       interface_constraints(0,0) = 1.0/256.0;
@@ -1864,7 +1864,7 @@ FECubicSub<3>::FECubicSub () :
 
 
 template <>
-FECubicSub<3>::FECubicSub (const int) :
+FEQ3<3>::FEQ3 (const int) :
 		FELinearMapping<3> (0, 0, 0, 64)
 {
   initialize_matrices ();
@@ -1873,7 +1873,7 @@ FECubicSub<3>::FECubicSub (const int) :
 
 
 template <>
-void FECubicSub<3>::initialize_matrices () {
+void FEQ3<3>::initialize_matrices () {
       prolongation[0](0,0) = 1.0;
       prolongation[0](1,0) = -1.0/16.0;
       prolongation[0](1,1) = -1.0/16.0;
@@ -9946,7 +9946,7 @@ void FECubicSub<3>::initialize_matrices () {
 
 template <>
 double
-FECubicSub<3>::shape_value (const unsigned int i,
+FEQ3<3>::shape_value (const unsigned int i,
 			    const Point<3>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -10559,7 +10559,7 @@ xi*xi+6561.0/2.0*xi*xi*xi)*eta*eta+(-6561.0/8.0*xi+6561.0/2.0*xi*xi-19683.0/8.0
 
 template <>
 Tensor<1,3>
-FECubicSub<3>::shape_grad (const unsigned int i,
+FEQ3<3>::shape_grad (const unsigned int i,
 			       const Point<3>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -10774,7 +10774,7 @@ FECubicSub<3>::shape_grad (const unsigned int i,
 
 template <>
 Tensor<2,3>
-FECubicSub<3>::shape_grad_grad (const unsigned int i,
+FEQ3<3>::shape_grad_grad (const unsigned int i,
 				const Point<3>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -11390,7 +11390,7 @@ return_value[2][2] = 2.0*(729.0/2.0*xi-1458.0*xi*xi+2187.0/2.0*xi*xi*xi)*eta+2.0
 
 template <>
 void
-FECubicSub<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
+FEQ3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 				      FullMatrix<double> &local_mass_matrix) const
 {
   Assert (local_mass_matrix.n() == total_dofs,
@@ -11404,7 +11404,7 @@ FECubicSub<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 
 
 template <>
-void FECubicSub<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
+void FEQ3<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
   unit_points[0] = Point<3>(0, 0, 0);
@@ -11476,7 +11476,7 @@ void FECubicSub<3>::get_unit_support_points (vector<Point<3> > &unit_points) con
 
 
 template <>
-void FECubicSub<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &cell,
+void FEQ3<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &cell,
 					vector<Point<3> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
@@ -11854,7 +11854,7 @@ void FECubicSub<3>::get_support_points (const typename DoFHandler<3>::cell_itera
 
 
 template <>
-void FECubicSub<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &face,
+void FEQ3<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &face,
 					     vector<Point<3> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
@@ -11897,5 +11897,5 @@ void FECubicSub<3>::get_face_support_points (const typename DoFHandler<3>::face_
 
 // explicit instantiations
 
-template class FECubicSub<deal_II_dimension>;
+template class FEQ3<deal_II_dimension>;
 

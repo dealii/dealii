@@ -11,14 +11,14 @@
 
 
 // declare explicit specializations before use:
-template <> void FEQuadraticSub<deal_II_dimension>::initialize_matrices ();
+template <> void FEQ2<deal_II_dimension>::initialize_matrices ();
 
 
 
 #if deal_II_dimension == 1
 
 template <>
-FEQuadraticSub<1>::FEQuadraticSub () :
+FEQ2<1>::FEQ2 () :
 		FELinearMapping<1> (1, 1) {
   initialize_matrices ();
 };
@@ -26,7 +26,7 @@ FEQuadraticSub<1>::FEQuadraticSub () :
 
 
 template <>
-FEQuadraticSub<1>::FEQuadraticSub (const int) :
+FEQ2<1>::FEQ2 (const int) :
 		FELinearMapping<1> (0, 3) {
   initialize_matrices ();
 };
@@ -34,7 +34,7 @@ FEQuadraticSub<1>::FEQuadraticSub (const int) :
 
 
 template <>
-void FEQuadraticSub<1>::initialize_matrices () {
+void FEQ2<1>::initialize_matrices () {
 /*
   Get the prolongation matrices by the following little maple script:
 
@@ -120,7 +120,7 @@ void FEQuadraticSub<1>::initialize_matrices () {
 
 template <>
 double
-FEQuadraticSub<1>::shape_value(const unsigned int i,
+FEQ2<1>::shape_value(const unsigned int i,
 			       const Point<1>     &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -138,7 +138,7 @@ FEQuadraticSub<1>::shape_value(const unsigned int i,
 
 template <>
 Tensor<1,1>
-FEQuadraticSub<1>::shape_grad(const unsigned int i,
+FEQ2<1>::shape_grad(const unsigned int i,
 			      const Point<1>    &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -161,7 +161,7 @@ FEQuadraticSub<1>::shape_grad(const unsigned int i,
 
 template <>
 Tensor<2,1>
-FEQuadraticSub<1>::shape_grad_grad (const unsigned int i,
+FEQ2<1>::shape_grad_grad (const unsigned int i,
 				    const Point<1>    &) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -185,14 +185,14 @@ FEQuadraticSub<1>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FEQuadraticSub<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
+void FEQ2<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
   FiniteElement<1>::get_unit_support_points (unit_points);
 };
 
 
 
 template <>
-void FEQuadraticSub<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
+void FEQ2<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
 					    vector<Point<1> >  &support_points) const {
   FiniteElement<1>::get_support_points (cell, support_points);
 };
@@ -200,7 +200,7 @@ void FEQuadraticSub<1>::get_support_points (const typename DoFHandler<1>::cell_i
 
 
 template <>
-void FEQuadraticSub<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
+void FEQ2<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
 						 vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
@@ -208,7 +208,7 @@ void FEQuadraticSub<1>::get_face_support_points (const typename DoFHandler<1>::f
 
 
 template <>
-void FEQuadraticSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
+void FEQ2<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 					       FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -231,7 +231,7 @@ void FEQuadraticSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterato
 #if deal_II_dimension == 2
 
 template <>
-FEQuadraticSub<2>::FEQuadraticSub () :
+FEQ2<2>::FEQ2 () :
 		FELinearMapping<2> (1, 1, 1)
 {
   interface_constraints(0,2) = 1.0;
@@ -248,7 +248,7 @@ FEQuadraticSub<2>::FEQuadraticSub () :
 
 
 template <>
-FEQuadraticSub<2>::FEQuadraticSub (const int) :
+FEQ2<2>::FEQ2 (const int) :
 		FELinearMapping<2> (0, 0, 9)
 {
   initialize_matrices ();
@@ -257,7 +257,7 @@ FEQuadraticSub<2>::FEQuadraticSub (const int) :
 
 
 template <>
-void FEQuadraticSub<2>::initialize_matrices () {
+void FEQ2<2>::initialize_matrices () {
 /*
   Get the prolongation and restriction matrices by the following little maple script:
 
@@ -644,7 +644,7 @@ void FEQuadraticSub<2>::initialize_matrices () {
 
 template <>
 double
-FEQuadraticSub<2>::shape_value (const unsigned int i,
+FEQ2<2>::shape_value (const unsigned int i,
 				const Point<2>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -670,7 +670,7 @@ FEQuadraticSub<2>::shape_value (const unsigned int i,
 
 template <>
 Tensor<1,2>
-FEQuadraticSub<2>::shape_grad (const unsigned int i,
+FEQ2<2>::shape_grad (const unsigned int i,
 			       const Point<2>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -710,7 +710,7 @@ FEQuadraticSub<2>::shape_grad (const unsigned int i,
 
 template <>
 Tensor<2,2>
-FEQuadraticSub<2>::shape_grad_grad (const unsigned int i,
+FEQ2<2>::shape_grad_grad (const unsigned int i,
 				    const Point<2>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -782,7 +782,7 @@ FEQuadraticSub<2>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FEQuadraticSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
+void FEQ2<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					       FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -1057,7 +1057,7 @@ void FEQuadraticSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterato
 
 
 template <>
-void FEQuadraticSub<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
+void FEQ2<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
   
@@ -1075,7 +1075,7 @@ void FEQuadraticSub<2>::get_unit_support_points (vector<Point<2> > &unit_points)
   
 
 template <>
-void FEQuadraticSub<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
+void FEQ2<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
 					    vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
@@ -1103,7 +1103,7 @@ void FEQuadraticSub<2>::get_support_points (const typename DoFHandler<2>::cell_i
 
 
 template <>
-void FEQuadraticSub<2>::get_face_support_points (const typename DoFHandler<2>::face_iterator &face,
+void FEQ2<2>::get_face_support_points (const typename DoFHandler<2>::face_iterator &face,
 						 vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
@@ -1120,7 +1120,7 @@ void FEQuadraticSub<2>::get_face_support_points (const typename DoFHandler<2>::f
 #if deal_II_dimension == 3
 
 template <>
-FEQuadraticSub<3>::FEQuadraticSub () :
+FEQ2<3>::FEQ2 () :
 		FELinearMapping<3> (1, 1, 1, 1)
 {
   interface_constraints(0,8) = 1.0;
@@ -1207,7 +1207,7 @@ FEQuadraticSub<3>::FEQuadraticSub () :
 
 
 template <>
-FEQuadraticSub<3>::FEQuadraticSub (const int) :
+FEQ2<3>::FEQ2 (const int) :
 		FELinearMapping<3> (0, 0, 0, 27)
 {
   initialize_matrices ();
@@ -1216,7 +1216,7 @@ FEQuadraticSub<3>::FEQuadraticSub (const int) :
 
 
 template <>
-void FEQuadraticSub<3>::initialize_matrices () {
+void FEQ2<3>::initialize_matrices () {
   prolongation[0](0,0) = 1.0;
   prolongation[0](1,8) = 1.0;
   prolongation[0](2,20) = 1.0;
@@ -2288,7 +2288,7 @@ void FEQuadraticSub<3>::initialize_matrices () {
 
 template <>
 double
-FEQuadraticSub<3>::shape_value (const unsigned int i,
+FEQ2<3>::shape_value (const unsigned int i,
 				const Point<3>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -2382,7 +2382,7 @@ xi)*eta*eta)*zeta+((-16.0+48.0*xi-32.0*xi*xi)*eta+(16.0-48.0*xi+32.0*xi*xi)*eta
 
 template <>
 Tensor<1,3>
-FEQuadraticSub<3>::shape_grad (const unsigned int i,
+FEQ2<3>::shape_grad (const unsigned int i,
 			       const Point<3>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -2486,7 +2486,7 @@ FEQuadraticSub<3>::shape_grad (const unsigned int i,
 
 template <>
 Tensor<2,3>
-FEQuadraticSub<3>::shape_grad_grad (const unsigned int i,
+FEQ2<3>::shape_grad_grad (const unsigned int i,
 				    const Point<3>    &p) const
 {
   Assert (i<total_dofs, ExcInvalidIndex(i));
@@ -2769,7 +2769,7 @@ return_value[2][2] = 2.0*(-64.0*xi+64.0*xi*xi)*eta+2.0*(64.0*xi-64.0*xi*xi)*eta*
 
 
 template <>
-void FEQuadraticSub<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
+void FEQ2<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 					       FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -2782,7 +2782,7 @@ void FEQuadraticSub<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterato
 
 
 template <>
-void FEQuadraticSub<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
+void FEQ2<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
   
@@ -2818,7 +2818,7 @@ void FEQuadraticSub<3>::get_unit_support_points (vector<Point<3> > &unit_points)
   
 
 template <>
-void FEQuadraticSub<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &cell,
+void FEQ2<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &cell,
 					    vector<Point<3> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
@@ -2918,7 +2918,7 @@ void FEQuadraticSub<3>::get_support_points (const typename DoFHandler<3>::cell_i
 
 
 template <>
-void FEQuadraticSub<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &face,
+void FEQ2<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &face,
 						 vector<Point<3> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
@@ -2941,5 +2941,5 @@ void FEQuadraticSub<3>::get_face_support_points (const typename DoFHandler<3>::f
 
 // explicit instantiations
 
-template class FEQuadraticSub<deal_II_dimension>;
+template class FEQ2<deal_II_dimension>;
 

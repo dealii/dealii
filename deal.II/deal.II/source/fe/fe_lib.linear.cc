@@ -13,7 +13,7 @@
 
 
 // declare explicit specializations before use:
-template <> void FELinear<deal_II_dimension>::initialize_matrices ();
+template <> void FEQ1<deal_II_dimension>::initialize_matrices ();
 
 
 
@@ -21,7 +21,7 @@ template <> void FELinear<deal_II_dimension>::initialize_matrices ();
 #if deal_II_dimension == 1
 
 template <>
-FELinear<1>::FELinear () :
+FEQ1<1>::FEQ1 () :
 		FELinearMapping<1> (1, 0)
 {
   initialize_matrices ();
@@ -29,7 +29,7 @@ FELinear<1>::FELinear () :
 
 
 template <>
-FELinear<1>::FELinear (const int) :
+FEQ1<1>::FEQ1 (const int) :
 		FELinearMapping<1> (0, 2)
 {
   initialize_matrices ();
@@ -39,7 +39,7 @@ FELinear<1>::FELinear (const int) :
 
 
 template <>
-void FELinear<1>::initialize_matrices () {
+void FEQ1<1>::initialize_matrices () {
 				   // for restriction and prolongation matrices:
 				   // note that we do not add up all the
 				   // contributions since then we would get
@@ -68,7 +68,7 @@ void FELinear<1>::initialize_matrices () {
 
 template <>
 double
-FELinear<1>::shape_value(const unsigned int i,
+FEQ1<1>::shape_value(const unsigned int i,
 			 const Point<1>     &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -85,7 +85,7 @@ FELinear<1>::shape_value(const unsigned int i,
 template <>
 inline
 Tensor<1,1>
-FELinear<1>::shape_grad(const unsigned int i,
+FEQ1<1>::shape_grad(const unsigned int i,
 			const Point<1>&) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -107,7 +107,7 @@ FELinear<1>::shape_grad(const unsigned int i,
 template <>
 inline
 Tensor<2,1>
-FELinear<1>::shape_grad_grad (const unsigned int i,
+FEQ1<1>::shape_grad_grad (const unsigned int i,
 			      const Point<1> &) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -119,14 +119,14 @@ FELinear<1>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FELinear<1>::get_unit_support_points (vector<Point<1> >  &support_points) const {
+void FEQ1<1>::get_unit_support_points (vector<Point<1> >  &support_points) const {
   FiniteElement<1>::get_unit_support_points (support_points);
 };
 
 
 
 template <>
-void FELinear<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
+void FEQ1<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
 				      vector<Point<1> >  &support_points) const {
   FiniteElement<1>::get_support_points (cell, support_points);
 };
@@ -134,7 +134,7 @@ void FELinear<1>::get_support_points (const typename DoFHandler<1>::cell_iterato
 
 
 template <>
-void FELinear<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
+void FEQ1<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
 					  vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
@@ -142,7 +142,7 @@ void FELinear<1>::get_face_support_points (const typename DoFHandler<1>::face_it
 
 
 template <>
-void FELinear<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
+void FEQ1<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 					 FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -164,7 +164,7 @@ void FELinear<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cel
 #if deal_II_dimension == 2
 
 template <>
-FELinear<2>::FELinear () :
+FEQ1<2>::FEQ1 () :
 		FELinearMapping<2> (1, 0, 0)
 {
   interface_constraints(0,0) = 1./2.;
@@ -176,7 +176,7 @@ FELinear<2>::FELinear () :
 
 
 template <>
-FELinear<2>::FELinear (const int) :
+FEQ1<2>::FEQ1 (const int) :
 		FELinearMapping<2> (0, 0, 4)
 {
   initialize_matrices ();
@@ -185,7 +185,7 @@ FELinear<2>::FELinear (const int) :
 
 
 template <>
-void FELinear<2>::initialize_matrices () {
+void FEQ1<2>::initialize_matrices () {
   restriction[0](0,0) = 1.0;
   restriction[1](1,1) = 1.0;
   restriction[2](2,2) = 1.0;
@@ -238,7 +238,7 @@ void FELinear<2>::initialize_matrices () {
 template <>
 inline
 double
-FELinear<2>::shape_value (const unsigned int i,
+FEQ1<2>::shape_value (const unsigned int i,
 			  const Point<2>& p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -257,7 +257,7 @@ FELinear<2>::shape_value (const unsigned int i,
 template <>
 inline
 Tensor<1,2>
-FELinear<2>::shape_grad (const unsigned int i,
+FEQ1<2>::shape_grad (const unsigned int i,
 			 const Point<2>& p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -281,7 +281,7 @@ FELinear<2>::shape_grad (const unsigned int i,
 template <>
 inline
 Tensor<2,2>
-FELinear<2>::shape_grad_grad (const unsigned int i,
+FEQ1<2>::shape_grad_grad (const unsigned int i,
 			      const Point<2> &) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -309,7 +309,7 @@ FELinear<2>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FELinear<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
+void FEQ1<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					 FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -415,7 +415,7 @@ void FELinear<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cel
 
 
 template <>
-void FELinear<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
+void FEQ1<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
 
@@ -432,7 +432,7 @@ void FELinear<2>::get_unit_support_points (vector<Point<2> > &unit_points) const
 #if deal_II_dimension == 3
 
 template <>
-FELinear<3>::FELinear () :
+FEQ1<3>::FEQ1 () :
 		FELinearMapping<3> (1, 0, 0, 0)
 {
   interface_constraints(0,0) = 1.0/4.0;
@@ -454,7 +454,7 @@ FELinear<3>::FELinear () :
 
 
 template <>
-FELinear<3>::FELinear (const int) :
+FEQ1<3>::FEQ1 (const int) :
 		FELinearMapping<3> (0, 0, 0, 8)
 {
   initialize_matrices ();
@@ -463,7 +463,7 @@ FELinear<3>::FELinear (const int) :
 
 
 template <>
-void FELinear<3>::initialize_matrices () {
+void FEQ1<3>::initialize_matrices () {
   restriction[0](0,0) = 1.0;
   restriction[1](1,1) = 1.0;
   restriction[2](2,2) = 1.0;
@@ -697,7 +697,7 @@ void FELinear<3>::initialize_matrices () {
 template <>
 inline
 double
-FELinear<3>::shape_value (const unsigned int i,
+FEQ1<3>::shape_value (const unsigned int i,
 			  const Point<3>& p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -720,7 +720,7 @@ FELinear<3>::shape_value (const unsigned int i,
 template <>
 inline
 Tensor<1,3>
-FELinear<3>::shape_grad (const unsigned int i,
+FEQ1<3>::shape_grad (const unsigned int i,
 			 const Point<3>& p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -764,7 +764,7 @@ FELinear<3>::shape_grad (const unsigned int i,
 template <>
 inline
 Tensor<2,3>
-FELinear<3>::shape_grad_grad (const unsigned int i,
+FEQ1<3>::shape_grad_grad (const unsigned int i,
 			      const Point<3> &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -844,7 +844,7 @@ FELinear<3>::shape_grad_grad (const unsigned int i,
 
 
 template <>
-void FELinear<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
+void FEQ1<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 					 FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -857,7 +857,7 @@ void FELinear<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 
 
 template <>
-void FELinear<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
+void FEQ1<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
 
@@ -878,7 +878,7 @@ void FELinear<3>::get_unit_support_points (vector<Point<3> > &unit_points) const
 
 template <int dim>
 void
-FELinear<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+FEQ1<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
 				   vector<Point<dim> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
@@ -891,7 +891,7 @@ FELinear<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator
 
 template <int dim>
 void
-FELinear<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+FEQ1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
 					vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == dofs_per_face) &&
 	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),
@@ -907,4 +907,4 @@ FELinear<dim>::get_face_support_points (const typename DoFHandler<dim>::face_ite
 
 // explicit instantiations
 
-template class FELinear<deal_II_dimension>;
+template class FEQ1<deal_II_dimension>;

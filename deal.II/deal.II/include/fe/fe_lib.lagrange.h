@@ -8,6 +8,10 @@
 
 #include <fe/fe_linear_mapping.h>
 
+#define FELinear FEQ1
+#define FEQuadraticSub FEQ2
+#define FECubicSub FEQ3
+#define FEQuarticSub FEQ4
 
 /**
  * Define a (bi-, tri-, etc)linear finite element in #dim# space dimensions,
@@ -29,12 +33,12 @@
  */
 
 template <int dim>
-class FELinear : public FELinearMapping<dim> {
+class FEQ1 : public FELinearMapping<dim> {
   public:
 				     /**
 				      * Constructor
 				      */
-    FELinear ();
+    FEQ1 ();
   protected:
 				     /**
 				      * Constructor that is called by the
@@ -45,7 +49,7 @@ class FELinear : public FELinearMapping<dim> {
 				      * matrices are build.
 				      * For more detail see class #FEDGLinear#.
 				      */
-    FELinear (const int);
+    FEQ1 (const int);
     
   public:
 				     /**
@@ -208,12 +212,12 @@ class FELinear : public FELinearMapping<dim> {
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
-class FEQuadraticSub : public FELinearMapping<dim> {
+class FEQ2 : public FELinearMapping<dim> {
   public:
 				     /**
 				      * Constructor
 				      */
-    FEQuadraticSub ();
+    FEQ2 ();
   protected:
 				     /**
 				      * Constructor that is called by the
@@ -226,7 +230,7 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      * For more detail see class 
 				      * #FEDGQuadraticSub#.
 				      */
-    FEQuadraticSub (const int);
+    FEQ2 (const int);
     
   public:
 				     /**
@@ -330,12 +334,12 @@ class FEQuadraticSub : public FELinearMapping<dim> {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FECubicSub : public FELinearMapping<dim> {
+class FEQ3 : public FELinearMapping<dim> {
   public:
 				     /**
 				      * Constructor
 				      */
-    FECubicSub ();
+    FEQ3 ();
 
   protected:
 				     /**
@@ -348,7 +352,7 @@ class FECubicSub : public FELinearMapping<dim> {
 				      * For more detail see class
 				      * #FEDGCubicSub#.
 				      */
-    FECubicSub (const int);
+    FEQ3 (const int);
 
   public:
 				     /**
@@ -453,12 +457,12 @@ class FECubicSub : public FELinearMapping<dim> {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FEQuarticSub : public FELinearMapping<dim> {
+class FEQ4 : public FELinearMapping<dim> {
   public:
 				     /**
 				      * Constructor
 				      */
-    FEQuarticSub ();
+    FEQ4 ();
 
   protected:
 				     /**
@@ -471,7 +475,7 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      * For more detail see class
 				      * #FEDGQuarticSub#.
 				      */
-    FEQuarticSub (const int);
+    FEQ4 (const int);
 
   public:
 				     /**
