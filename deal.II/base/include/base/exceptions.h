@@ -491,7 +491,7 @@ void __IssueError_Throw (const char *file,
  * @author Wolfgang Bangerth, November 1997
  */
 #define DeclException0(Exception0)  \
-class Exception0 :  public ExceptionBase {};
+class Exception0 :  public ExceptionBase {}
 
 
 
