@@ -206,6 +206,14 @@ Point<2>::Point (const double, const double, const double) {
 
 template <>
 inline
+Point<3>::Point (const double, const double) {
+  Assert (false, ExcInvalidConstructorCalled());
+};
+
+
+
+template <>
+inline
 Point<3>::Point (const double x, const double y, const double z) {
   values[0] = x;
   values[1] = y;
