@@ -315,12 +315,6 @@ class DoFHandler  :  public Subscriptor,
 				      * member function which also
 				      * releases the lock of this
 				      * object to the finite element.
-				      *
-				      * This function uses the user
-				      * flags of the triangulation
-				      * object, so make sure you don't
-				      * need them after calling this
-				      * function, or if so store them.
 				      */
     virtual void distribute_dofs (const FiniteElement<dim> &fe,
 				  const unsigned int        offset = 0);
