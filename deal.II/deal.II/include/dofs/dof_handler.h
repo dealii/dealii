@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -208,7 +208,7 @@ class DoFDimensionInfo<3>
  *
  * @sect3{User defined renumbering schemes}
  *
- * The @ref{DoFRenumbering} class offers a fixed number of renumbering
+ * The @ref{DoFRenumbering} class offers a number of renumbering
  * schemes like the Cuthill-McKey scheme. Basically, the function sets
  * up an array in which for each degree of freedom the index is stored
  * which is to be assigned by the renumbering. Using this array, the
