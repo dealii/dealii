@@ -14,6 +14,11 @@ o-files  = $(cc-files:.cc=.o)
 go-files = $(cc-files:.cc=.go)
 h-files  = $(wildcard ../include/*/*.h)
 
+forward-declarations = ../include/lac/forward-declarations.h
+
+D=../..
+include $D/deal.II/Make.forward-declarations
+
 
 %.go : %.cc Makefile
 	@echo ============================ Compiling with debugging information:   $<
@@ -34,11 +39,6 @@ clean:
 	rm -f *.o *.go *~ Makefile.dep ../lib/lib*
 
 
-# rule how to make the file containing all the forward declarations
-../include/lac/forward-declarations.h: $(filter-out %forward-declarations.h,$(h-files))
-	@echo ============================ Generating $@
-	@perl ../../deal.II/Make_forward_declarations $(filter-out %forward-declarations.h,$(h-files)) > $@
-
 
 
 
@@ -54,7 +54,7 @@ clean:
 #use perl to generate rules for the .go files as well
 #as to make rules not for tria.o and the like, but
 #rather for libbasic.a(tria.o)
-../lib/Makefile.dep: $(cc-files) $(h-files)
+../lib/Makefile.dep: $(cc-files) $(filter-out $(forward-declarations),$(h-files)) Makefile
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files) \
 		> ../lib/Makefile.dep

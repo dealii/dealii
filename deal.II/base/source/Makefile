@@ -2,12 +2,16 @@
 
 D=../..
 
-include $D/deal.II/Make.global_options
-
 cc-files = $(wildcard *.cc)
 o-files  = $(cc-files:.cc=.o)
 go-files = $(cc-files:.cc=.go)
 h-files  = $(wildcard ../include/*/*.h)
+
+forward-declarations = ../include/base/forward-declarations.h
+
+include $D/deal.II/Make.global_options
+include $D/deal.II/Make.forward-declarations
+
 
 
 %.go : %.cc Makefile
@@ -28,10 +32,6 @@ lib.g.a: ../lib/libbase.g.a($(go-files))
 clean:
 	rm -f *.o *.go *~ Makefile.dep ../lib/lib*
 
-# rule how to make the file containing all the forward declarations
-../include/base/forward-declarations.h: $(filter-out %forward-declarations.h,$(h-files))
-	@echo ============================ Generating $@
-	@perl ../../deal.II/Make_forward_declarations $(filter-out %forward-declarations.h,$(h-files)) > $@
 
 
 .PHONY: lib lib.a lib.g.a clean
@@ -46,7 +46,7 @@ clean:
 #use perl to generate rules for the .go files as well
 #as to make rules not for tria.o and the like, but
 #rather for libbasic.a(tria.o)
-../lib/Makefile.dep: $(cc-files) $(h-files)
+../lib/Makefile.dep: $(cc-files) $(filter-out $(forward-declarations),$(h-files)) Makefile
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/libbase $(INCLUDE) $(cc-files) \
 		> ../lib/Makefile.dep

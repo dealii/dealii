@@ -4,7 +4,7 @@
 all: lac
 
 clean: source-clean
-	rm -f *~ include/*~ include/*/*~ lib/lib* lib/Makefile.dep
+	rm -f *~ include/*~ include/*/*~ lib/lib* lib/Makefile.dep include/lac/forward-declarations.h*
 
 lac:
 	cd source ; make

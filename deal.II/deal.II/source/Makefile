@@ -12,12 +12,16 @@
 
 D=../..
 
-include $D/deal.II/Make.global_options
-
 cc-files = $(wildcard */*.cc)
 h-files  = $(wildcard ../include/*/*.h)
 
 forward-declarations = ../include/basic/forward-declarations.h
+
+include $D/deal.II/Make.global_options
+include $D/deal.II/Make.forward-declarations
+
+
+
 
 # strip subdirectories from cc file names, preprend a "../lib/[g]o"
 # and change the suffix. We place the object files with or without
