@@ -51,7 +51,7 @@ validate-xrefs:
 class_index.html: $(shell echo $D/base/include/base/*.h \
                                $D/lac/include/lac/*.h   \
                                $D/deal.II/include/*/*.h) \
-                  autogen-doc-all
+                  autogen-doc
 	@echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"\n\
                "http://www.w3.org/TR/REC-html40/strict.dtd">\n   \
                <html>\n\
