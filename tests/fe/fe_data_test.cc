@@ -20,6 +20,8 @@
 #include <dofs/dof_accessor.h>
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>
+#include <fe/fe_dgp.h>
+#include <fe/fe_raviart_thomas.h>
 #include <fe/fe_system.h>
 
 //TODO: Find support_on_face problems for test-no. > 7
@@ -32,9 +34,25 @@ void test_fe_datas()
   fe_datas.push_back(new FE_Q<dim> (1));
   fe_datas.push_back(new FE_Q<dim> (2));
   fe_datas.push_back(new FE_Q<dim> (4));
+  fe_datas.push_back(new FE_DGQ<dim> (1));
+  fe_datas.push_back(new FE_DGQ<dim> (2));
+  fe_datas.push_back(new FE_DGQ<dim> (4));
+  fe_datas.push_back(new FE_DGP<dim> (1));
+  fe_datas.push_back(new FE_DGP<dim> (2));
+  fe_datas.push_back(new FE_DGP<dim> (4));
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (2), 2));
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (1), 2,
 				       FE_Q<dim> (2), 1));
+  
+				   // Check Raviart-Thomas in 2d only
+  if (dim==2)
+    {
+      fe_datas.push_back(new FE_RaviartThomas<dim>(0));
+      fe_datas.push_back(new FE_RaviartThomas<dim>(1));
+      fe_datas.push_back(new FE_RaviartThomas<dim>(2));
+    }
+  
+
 				   // for dim==3 the constraints are
 				   // only hardcoded for Q1-Q2
   if (dim!=3)
@@ -64,8 +82,8 @@ void test_fe_datas()
   deallog << std::endl << "dim=" << dim << std::endl;
   for (unsigned int n=0; n<fe_datas.size(); ++n)
     {
-      FiniteElementData<dim> *fe_data=fe_datas[n];
-      deallog << "fe_data[" << n <<"]:" << std::endl;
+      FiniteElement<dim> *fe_data=fe_datas[n];
+      deallog << "fe_data[" << n <<"]:" << fe_data->get_name() << std::endl;
       deallog << "dofs_per_vertex=" << fe_data->dofs_per_vertex << std::endl;
       deallog << "dofs_per_line=" << fe_data->dofs_per_line << std::endl;
       deallog << "dofs_per_quad=" << fe_data->dofs_per_quad << std::endl;
