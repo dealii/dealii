@@ -338,7 +338,9 @@ DoFCellAccessor<1>::face (const unsigned int) const
 
    but this does not work, at least not at present using egcs1.1.1. we therefore
    separate the different implementations for the different dimensions using
-   the preprocecssor and double check using an assertion in the function body.
+   the preprocessor and double check using an assertion in the function body.
+
+//TODO: correct the pseudo-template thing   
 */
 template <int dim>
 template <typename number>
