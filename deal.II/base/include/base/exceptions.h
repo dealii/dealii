@@ -6,6 +6,8 @@
 
 
 #include <iostream.h>
+#include <exception>
+
 
 
 
@@ -25,7 +27,7 @@
 				  *  @see DeclException0
 				  *  @author Wolfgang Bangerth, November 1997
 				  */
-class ExceptionBase {
+class ExceptionBase : public exception {
   public:
     ExceptionBase () :
 		    file(""), line(0), function(""), cond(""), exc("")  {};
@@ -45,6 +47,7 @@ class ExceptionBase {
 				      * put it here.
 				      */
     ExceptionBase (const ExceptionBase &e) :
+		    exception(e),
 		    file(e.file), line(e.line), function(e.function),
 		    cond(e.cond), exc(e.exc) {};
 
@@ -54,11 +57,11 @@ class ExceptionBase {
 				      * put it here.
 				      */
     ExceptionBase & operator = (const ExceptionBase &e) {
-      file = e.file;
-      line = e.line;
+      file     = e.file;
+      line     = e.line;
       function = e.function;
-      cond = e.cond;
-      exc = e.exc;
+      cond     = e.cond;
+      exc      = e.exc;
       return *this;
     };
     
@@ -108,6 +111,21 @@ class ExceptionBase {
     void PrintInfo (ostream &out) const {
       out << "(none)" << endl;
     };
+
+    
+				     /**
+				      *  Function derived from the base class
+				      *  which allows to pass information like
+				      *  the line and name of the file where the
+				      *  exception occured as well as user
+				      *  information.
+				      *
+				      *  This function is mainly used when using
+				      *  exceptions declared by the
+				      *  #DeclException*# macros with the #throw#
+				      *  mechanism or the #Assert_or_Throw# macro.
+				      */
+//    virtual const char * what () const;
 
     
     const char *file;
@@ -428,8 +446,6 @@ class Exception5 : public ExceptionBase {                             \
 			   are rather used for the throw and catch
 			   way.
 */
-
-#include <exception>
 
 
 /**
