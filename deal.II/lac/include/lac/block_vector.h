@@ -390,7 +390,7 @@ BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n,
     {
       InputIterator end = start;
       std::advance (end, static_cast<signed int>(n[b]));
-      std::copy (start, end, block(b).begin());
+      std::copy (start, end, this->block(b).begin());
       start = end;
     };
   Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
@@ -434,8 +434,8 @@ BlockVector<Number>::operator = (const BlockVector<Number2> &v)
 template <typename Number>
 void BlockVector<Number>::scale (const value_type factor)
 {
-  for (unsigned int i=0;i<num_blocks;++i)
-    components[i].scale(factor);
+  for (unsigned int i=0; i<this->n_blocks();++i)
+    this->components[i].scale(factor);
 }
 
 

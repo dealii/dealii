@@ -88,7 +88,7 @@ BlockSparseMatrix<number>::operator = (const double d)
   
   for (unsigned int r=0; r<this->n_block_rows(); ++r)
     for (unsigned int c=0; c<this->n_block_cols(); ++c)
-      block(r,c) = d;
+      this->block(r,c) = d;
 
   return *this;
 }
@@ -110,7 +110,7 @@ reinit (const BlockSparsityPattern &sparsity)
 	this->sub_objects[r][c] = 0;
 	delete p;
       }
-  sub_objects.reinit (0,0);
+  this->sub_objects.reinit (0,0);
 
 				   // then associate new sparsity
 				   // pattern and resize

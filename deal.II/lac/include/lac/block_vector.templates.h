@@ -42,8 +42,8 @@ BlockVector<Number>::BlockVector (const BlockVector<Number>& v)
                 :
                 BlockVectorBase<Vector<Number> > ()
 {
-  components.resize (v.num_blocks);
-  block_indices = v.block_indices;
+  this->components.resize (v.num_blocks);
+  this->block_indices = v.block_indices;
   num_blocks = v.num_blocks;
   
   for (unsigned int i=0; i<num_blocks; ++i)
@@ -77,13 +77,13 @@ template <typename Number>
 void BlockVector<Number>::reinit (const std::vector<unsigned int> &n,
 				  const bool                       fast)
 {
-  block_indices.reinit (n);
-  num_blocks = n.size();
-  if (components.size() != num_blocks)
-    components.resize(num_blocks);
+  this->block_indices.reinit (n);
+  this->num_blocks = n.size();
+  if (this->components.size() != num_blocks)
+    this->components.resize(num_blocks);
   
-  for (unsigned int i=0; i<num_blocks; ++i)
-    components[i].reinit(n[i], fast);
+  for (unsigned int i=0; i<this->num_blocks; ++i)
+    this->components[i].reinit(n[i], fast);
 }
 
 
@@ -92,13 +92,13 @@ template <typename Number2>
 void BlockVector<Number>::reinit (const BlockVector<Number2>& v,
                                   const bool fast)
 {
-  block_indices = v.get_block_indices();
-  num_blocks = v.n_blocks();
-  if (components.size() != num_blocks)
-    components.resize(num_blocks);
+  this->block_indices = v.get_block_indices();
+  this->num_blocks = v.n_blocks();
+  if (this->components.size() != num_blocks)
+    this->components.resize(num_blocks);
   
-  for (unsigned int i=0;i<num_blocks;++i)
-    block(i).reinit(v.block(i), fast);
+  for (unsigned int i=0;i<this->num_blocks;++i)
+    this->block(i).reinit(v.block(i), fast);
 }
 
 
