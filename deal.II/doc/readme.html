@@ -615,6 +615,48 @@
     </p>
 
 
+    <a name="optional-software">
+    <h4>Optional Software Support</h4>
+
+    <p> <acronym>deal.II</acronym> comes with built-in support for an
+    increasing number of external software packages. These packages are
+    sometimes detected automatically, sometimes they must be enabled explicitly
+    during configuration by adding the option <tt>--with-package</tt>.
+    </p>
+
+    <p>These supported software packages comprise (the following list contains
+    trademarks belonging to their owners):
+    </p>
+
+    <dl>
+    <dt>TECPLOT</dt>
+    <dd>Autodetected if one of the variables <tt>$TECHOME</tt>,
+    <tt>$TEC80HOME</tt> or <tt>$TEC90HOME</tt> points to a valid installation
+    of the tecio library. If enabled, allows data output in TECPLOT format.
+    </dd>
+
+    <dt>UMFPACK</dt>
+    <dd>Enabled by <tt>--with-umfpack</tt>. Right now, only the included
+    version in the contrib directory is supported, but pre-installed versions
+    will be supported soon by using an argument to this option. Enabling
+    UMFPACK adds the class <tt>SparseDirectUMFPACK</tt> to the library.
+    Implies <tt>--with-blas</tt>
+    </dd>
+
+    <dt>Petsc</dt>
+    <dd></dd>
+
+    <dt>Metis</dt>
+    <dd></dd>
+
+    <dt>BLAS</dt>
+    <dd>Enabled by <tt>--with-blas=blasname</tt>. Requires
+    <tt>libblasname.a/so</tt> in your linkers seach path. It will add the
+    library and required FORTRAN libraries to the linker calls. BLAS
+    subroutines are not used within <acronym>deal.II</acronym>.
+     </dd>
+    </dl>
+
     <a name="compiler-flags">
     <h4>Compiler flags</h4>
 
