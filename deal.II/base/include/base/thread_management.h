@@ -561,8 +561,8 @@ namespace Threads
                                     * Upon program start, this number
                                     * is one. It is increased each
                                     * time a thread is created using
-                                    * the @ref{Threads::spawn} or
-                                    * @ref{Threads::spawn_n}
+                                    * the Threads::spawn or
+                                    * Threads::spawn_n()
                                     * functions. It is decreased once
                                     * a thread terminates by returning
                                     * from the function that was
@@ -2883,7 +2883,7 @@ namespace Threads
                                      /**
 				      * @internal
                                       * Class derived from
-                                      * @ref{thread_description_base}
+                                      * thread_description_base()
                                       * that also provides the
                                       * possibility to store a return
                                       * value.

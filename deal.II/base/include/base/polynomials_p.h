@@ -60,7 +60,7 @@ class PolynomialsP: public PolynomialSpace<dim>
 				      * Note, that this number is
 				      * <tt>PolynomialSpace::degree()-1</tt>,
 				      * compare definition in
-				      * @ref{PolynomialSpace}.
+				      * PolynomialSpace.
 				      */
     unsigned int degree() const;
 

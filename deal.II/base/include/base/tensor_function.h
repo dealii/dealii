@@ -27,7 +27,7 @@
 
 /**
  *  This class is a model for a tensor valued function. The interface
- *  of the class is mostly the same as that for the @ref{Function}
+ *  of the class is mostly the same as that for the Function
  *  class, with the exception that it does not support vector-valued
  *  functions with several components, but that the return type is
  *  always tensor-valued. The returned values of the evaluation of

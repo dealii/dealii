@@ -867,7 +867,7 @@ namespace Patterns
  *   be recognised if in the declaration multiple whitespace is used.
  *
  *   In entry names and values the following characters are not allowed: <tt>\#</tt>, <tt>{</tt>, 
- *   <tt>}</tt>, <tt>|</tt>. Their use is reserved for the @ref{MultipleParameterLoop} class.
+ *   <tt>}</tt>, <tt>|</tt>. Their use is reserved for the MultipleParameterLoop class.
  *   
  *   Comments starting with \# are skipped.
  *   
@@ -1148,10 +1148,10 @@ namespace Patterns
  *         set Maximum number of iterations = 100
  *       end
  *     end
- *   @end{verbatim}
+ *   @endverbatim
  *
  *   And here is the ouput of the program:
- *   @begin{verbatim}
+ *   @verbatim
  *     Line 8:
  *         The entry value
  *             Gauss-Seidel
@@ -1314,7 +1314,7 @@ class ParameterHandler
 				      * a comment when this class is
 				      * asked to write out all
 				      * declarations to a stream using
-				      * the @ref{print_parameters}
+				      * the print_parameters()
 				      * function.
 				      *
 				      * The function generates an
@@ -1407,7 +1407,7 @@ class ParameterHandler
 				      * from the actual value, as well
 				      * as the documenting string
 				      * given to the
-				      * @ref{declare_entry} function
+				      * declare_entry() function
 				      * if available.
 				      */
     std::ostream & print_parameters (std::ostream      &out,
@@ -1421,8 +1421,8 @@ class ParameterHandler
 				      * variable. This variable is
 				      * controlled by entering and
 				      * leaving subsections through
-				      * the @ref{enter_subsection} and
-				      * @ref{leave_subsection}
+				      * the enter_subsection() and
+				      * leave_subsection()
 				      * functions.
 				      *
 				      * In most cases, you will not
@@ -1453,8 +1453,8 @@ class ParameterHandler
 				      * variable. This variable is
 				      * controlled by entering and
 				      * leaving subsections through
-				      * the @ref{enter_subsection} and
-				      * @ref{leave_subsection}
+				      * the enter_subsection() and
+				      * leave_subsection()
 				      * functions.
 				      *
 				      * In most cases, you will not
@@ -1675,9 +1675,9 @@ class ParameterHandler
  *   of the two solvers.
  *
  *   Opposite to a variant entry, an array entry looks like this:
- *   @begin{verbatim}
+ *   @verbatim
  *     set Output file = ofile.{{ 1 | 2 | 3 | 4 }}
- *   @end{verbatim}
+ *   @endverbatim
  *   This indicates that if there are variant entries producing a total of four
  *   different runs will write their results to the files <tt>ofile.1</tt>, <tt>ofile.2</tt>,
  *   <tt>ofile.3</tt> and <tt>ofile.4</tt>, respectively. Array entries do not generate multiple

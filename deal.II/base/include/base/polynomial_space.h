@@ -36,12 +36,12 @@
  * P<sub>i</sub>(x)P<sub>j</sub>(y)P<sub>k</sub>(z)</i>, where the sum
  * of <i>i</i>, <i>j</i> and <i>k</i> is less than or equal <i>n</i>.
  *
- * The @ref{output_indices} function prints the ordering of the
+ * The output_indices() function prints the ordering of the
  * polynomials, i.e. for each dim-dimensional polynomial in the
  * polynomial space it gives the indices i,j,k of the one-dimensional
  * polynomials in x,y and z direction. The ordering of the
  * dim-dimensional polynomials can be changed by using the
- * @p{set_polynomial_ordering} function.
+ * set_polynomial_ordering() function.
  *
  * @author Guido Kanschat, 2002, Wolfgang Bangerth, 2003, Ralf Hartmann 2004
  */

@@ -170,9 +170,9 @@
  *  than that the program flow should not have reached a certain point,
  *  e.g. a <tt>default</tt> section of a <tt>switch</tt> statement. In this case,
  *  raise the exception by the following construct:
- *  @begin{verbatim}
+ *  @verbatim
  *    Assert (false, ExcInternalError());
- *  @end{verbatim}
+ *  @endverbatim
  *
  *  As mentioned above, the program is terminated once a call to
  *  <tt>Assert</tt> fails. However, there is one case where we do not want
@@ -507,7 +507,7 @@ namespace deal_II_exceptions
 /**
  *  Relay exceptions from the <tt>Assert</tt> macro to the
  *  <tt>__IssueError_Assert</tt> function. Used to convert the last
- *  argument from arbitrary type to @ref{ExceptionBase} which is not
+ *  argument from arbitrary type to ExceptionBase which is not
  *  possible inside the <tt>Assert</tt> macro due to syntactical
  *  difficulties in connection with the way we use the macro and the
  *  declaration of the exception classes.

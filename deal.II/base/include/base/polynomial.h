@@ -409,7 +409,7 @@ namespace Polynomials
                                         * constructor.  This way, it can
                                         * use the non-standard
                                         * constructor of
-                                        * @ref{Polynomial}.
+                                        * Polynomial.
                                         */
       static const std::vector<double> &
       get_coefficients (const unsigned int k);
@@ -482,9 +482,9 @@ namespace Polynomials
 				      *
 				      * This function may be
 				      * used to initialize the
-				      * @ref{TensorProductPolynomials},
-				      * @ref{AnisotropicPolynomials},
-				      * and @ref{PolynomialSpace}
+				      * TensorProductPolynomials,
+				      * AnisotropicPolynomials,
+				      * and PolynomialSpace
 				      * classes.
 				      */
       static
@@ -502,7 +502,7 @@ namespace Polynomials
 				      * constructor.  This way, it can
 				      * use the non-standard
 				      * constructor of
-				      * @ref{Polynomial}.
+				      * Polynomial.
 				      */
      static const std::vector<double> &
      get_coefficients (const unsigned int p);

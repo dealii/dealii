@@ -24,7 +24,7 @@
  * The coefficients of these quadrature rules are computed by the
  * function found in <tt>Numerical Recipies</tt>. For lower order
  * quadrature rules, the use of this class is thus equivalent to the
- * use of the @ref{QGauss1} through @ref{QGauss7} classes, for which
+ * use of the QGauss1 through QGauss7 classes, for which
  * the coefficients are hardcoded, but this class can provide higher
  * order formulae as well.
  *

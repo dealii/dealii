@@ -43,12 +43,12 @@
  * P<sub>2</sub>(x)P<sub>2</sub>(y), P<sub>3</sub>(x)P<sub>2</sub>(y),
  * ...</i> and likewise in 3d.
  *
- * The @ref{output_indices} function prints the ordering of the
+ * The output_indices() function prints the ordering of the
  * dim-dimensional polynomials, i.e. for each polynomial in the
  * polynomial space it gives the indices i,j,k of the one-dimensional
  * polynomials in x,y and z direction. The ordering of the
  * dim-dimensional polynomials can be changed by using the
- * @p{set_renumbering} function. 
+ * set_renumbering() function. 
  * 
  * @author Ralf Hartmann, 2000, 2004, Guido Kanschat, 2000, Wolfgang Bangerth 2003
  */
@@ -553,7 +553,7 @@ TensorProductPolynomials(const std::vector<Pol> &pols)
 				   // per default set this index map
 				   // to identity. This map can be
 				   // changed by the user through the
-				   // set_renumbering function
+				   // set_renumbering() function
   for (unsigned int i=0; i<n_tensor_pols; ++i)
     {
       index_map[i]=i;

@@ -21,7 +21,7 @@
 
 /**
  * Namespace implementing some concrete classes derived from the
- * @ref{Function} class that describe actual functions. This is rather
+ * Function class that describe actual functions. This is rather
  * a collection of classes that we have needed for our own programs
  * once and thought they might be useful to others as well at some
  * point.

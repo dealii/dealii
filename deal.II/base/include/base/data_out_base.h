@@ -169,10 +169,10 @@ class ParameterHandler;
  *
  * Given the lines as described above, a cut through this data in Gnuplot
  * can then be achieved like this:
- * @begin{verbatim}
+ * @verbatim
  *   set data style lines
  *   splot [:][:][0:] "T" using 1:2:($3==.5 ? $4 : -1)
- * @end{verbatim}
+ * @endverbatim
  * This command plots data in x- and y-direction unbounded, but in z-direction
  * only those data points which are above the x-y-plane (we assume here a
  * positive solution, if it has negative values, you might want to decrease the
@@ -197,7 +197,7 @@ class ParameterHandler;
  *
  * The output uses two different povray-objects:
  *
- * @begin{itemize}
+ * <ul>
  * @item <tt>BICUBIC_PATCH</tt>
  * A <tt>bicubic_patch</tt> is a 3-dimensional Bezier patch. It consists of 16 Points
  * describing the surface. The 4 corner points are touched by the object,
@@ -214,7 +214,7 @@ class ParameterHandler;
  * 
  * Using the smooth flag povray interpolates the normals on the triangles,
  * imitating a curved surface
- * @end{itemize}
+ * </ul>
  *
  * All objects get one texture definition called Tex. This texture has to be
  * declared somewhere before the object data. This may be in an external 
@@ -226,9 +226,9 @@ class ParameterHandler;
  *
  * You need povray (>=3.0) to render the scene. The minimum options for povray
  * are:
- * @begin{verbatim}
+ * @verbatim
  *   povray +I<inputfile> +W<horiz. size> +H<ver. size> +L<include path>
- * @end{verbatim}
+ * @endverbatim
  * If the external file "data.inc" is used, the path to this file has to be
  * included in the povray options.
  *
@@ -359,7 +359,7 @@ class DataOutBase
 				      * <tt>n_subdivision</tt> = 4 because
 				      * the number of cells is
 				      * equal to <tt>2^dim</tt>.
-				      * @begin{verbatim}
+				      * @verbatim
 				      *  __ __ __ __
 				      * |  |  |  |  |
 				      * |__|__|__|__| 
@@ -369,7 +369,7 @@ class DataOutBase
 				      * |__|__|__|__| 
 				      * |  |  |  |  |
 				      * |__|__|__|__|
-				      * @end{verbatim}
+				      * @endverbatim
 				      * @author Wolfgang Bangerth
 				      */
     template <int dim, int spacedim=dim>
@@ -454,7 +454,7 @@ class DataOutBase
 					  * <tt>(0, 3, 1,2)</tt> in 2d, and 
 					  * <tt>(0, 4, 3, 7, 1, 5, 2, 6)</tt>
 					  * in 3d as following:
-					  * @begin{verbatim}
+					  * @verbatim
 					  *  
 					  *      7________6
 					  *      /       /|
@@ -465,7 +465,7 @@ class DataOutBase
 					  *   |  /    |  /
 					  *   | /     | /
 					  *  0|/______1/
-					  * @end{verbatim}
+					  * @endverbatim
 					  * 
 					  * For exemple in 2d: If
 					  * <tt>subdivisions==2</tt> the
@@ -473,7 +473,7 @@ class DataOutBase
 					  * given by the following
 					  * numeration:
 					  *
-					  * @begin{verbatim}
+					  * @verbatim
 					  *  2 ____5 ____8
 					  *   |     |     |
 					  *   |     |     | 
@@ -483,7 +483,7 @@ class DataOutBase
 					  *   |     |     | 
 					  *   |     |     | 
 					  *  0|____3|____6|
-					  * @end{verbatim}
+					  * @endverbatim
 					  *
 					  * Since the number of data vectors
 					  * is usually the same for all
@@ -876,7 +876,7 @@ class DataOutBase
 					  * Gnuplot-default of 0 is
 					  * the following:
 					  *
-					  * @begin{verbatim}
+					  * @verbatim
 					  *  
 					  *          3________7
 					  *          /       /|
@@ -888,7 +888,7 @@ class DataOutBase
 					  *       | /     | /
 					  *      1|/______5/
 					  *
-					  * @end{verbatim}
+					  * @endverbatim
 					  */
 	double turn_angle;
 
@@ -1876,7 +1876,7 @@ class DataOutInterface : private DataOutBase
 				      * suffix with a given output format
 				      * usually has. At present the following
 				      * formats are defined:
-				      * @begin{itemize}
+				      * <ul>
 				      * @item <tt>dx</tt>: <tt>.dx</tt>
 				      * @item <tt>ucd</tt>: <tt>.inp</tt>
 				      * @item <tt>gnuplot</tt>: <tt>.gnuplot</tt>
@@ -1884,7 +1884,7 @@ class DataOutInterface : private DataOutBase
 				      * @item <tt>eps</tt>: <tt>.eps</tt>
 				      * @item <tt>gmv</tt>: <tt>.gmv</tt>
 				      * @item <tt>vtk</tt>: <tt>.vtk</tt>.
-				      * @end{itemize}
+				      * </ul>
 				      *
 				      * If this function is called
 				      * with no argument or

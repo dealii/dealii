@@ -30,11 +30,11 @@
  *  for time dependent problems.
  *
  *  Access to the time goes through the following functions:
- *  @begin{verbatim}
+ *  @verbatim
  *  @item <tt>get_time</tt>: return the present value of the time variable.
  *  @item <tt>set_time</tt>: set the time value to a specific value.
  *  @item <tt>advance_time</tt>: increase the time by a certain time step.
- *  @end{verbatim}
+ *  @endverbatim
  *  The latter two functions are virtual, so that derived classes can
  *  perform computations which need only be done once for every new time.
  *  For example, if a time dependent function had a factor <tt>sin(t)</tt>, then

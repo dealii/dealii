@@ -132,7 +132,7 @@ class Quadrature : public Subscriptor
 				      * is therefore not meant to
 				      * actually perform integrations,
 				      * but rather to be used with
-				      * @ref{FEValues} objects in
+				      * FEValues objects in
 				      * order to find the position of
 				      * some points (the quadrature
 				      * points in this object) on the
@@ -373,7 +373,7 @@ class QProjector
 				      * cell, one set of which will
 				      * then be selected at each
 				      * time. This is used in the
-				      * @ref{FEFaceValues} class,
+				      * FEFaceValues class,
 				      * where we initialize the
 				      * values, derivatives, etc on
 				      * all faces at once, while

@@ -32,15 +32,15 @@
 /**
  * A class that simplifies the process of execution logging. It does so by
  * providing
- * @begin{itemize}
+ * <ul>
  * @item a push and pop mechanism for prefixes, and
  * @item the possibility of distributing information to files and the
  *   console.
- * @end{itemize}
+ * </ul>
  *
  * The usual usage of this class is through the pregenerated object
  * <tt>deallog</tt>. Typical steps are
- * @begin{itemize}
+ * <ul>
  * @item <tt>deallog.attach(std::ostream)</tt>: write logging information into a file.
  * @item <tt>deallog.depth_console(n)</tt>: restrict output on screen to outer loops.
  * @item Before entering a new phase of your program, e.g. a new loop,
@@ -48,7 +48,7 @@
  * @item <tt>deallog << anything << std::endl;</tt> to write logging information
  *       (Usage of <tt>std::endl</tt> is mandatory!).
  * @item <tt>deallog.pop()</tt> when leaving that stage entered with <tt>push</tt>.
- * @end{itemize}
+ * </ul>
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003
  */

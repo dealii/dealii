@@ -23,12 +23,12 @@
 
 /**
  * This class implements the quadrature rule passed to its constructor
- * as a string. Supported quadratures are @ref{QGauss} (of all
- * orders), @ref{QMidpoint}, @ref{QMilne}, @ref{QSimpson},
- * @ref{QTrapez} and @ref{QWeddle}.
+ * as a string. Supported quadratures are QGauss (of all
+ * orders), QMidpoint, QMilne, QSimpson,
+ * QTrapez and QWeddle.
  *
  * This class is useful if you want to use flexible quadrature rules,
- * that are read from a parameter file (see @ref{ParameterHandler} for
+ * that are read from a parameter file (see ParameterHandler for
  * this).
  * 
  * @author Ralf Schulz, 2003
@@ -54,7 +54,7 @@ class QuadratureSelector : public Quadrature<dim>
 				      * as a list separated by <tt>|</tt>,
 				      * so that you can use it for the
 				      * definition of parameter files
-				      * (see @ref{ParameterHandler} for
+				      * (see ParameterHandler for
 				      * details).
 				      */
     static std::string get_quadrature_names();

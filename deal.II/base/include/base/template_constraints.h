@@ -32,12 +32,12 @@ template <bool, typename> struct constraint_and_return_value;
  * is only considered in a call, if all parts of its signature can be
  * instantiated with the template parameter replaced by the respective
  * types/values in this particular call. Example:
- * @begin{verbatim}
+ * @verbatim
  *   template <typename T>
  *   typename T::type  foo(T) {...};
  *   ...
  *   foo(1);
- * @end{verbatim}
+ * @endverbatim
  * The compiler should detect that in this call, the template
  * parameter T must be identified with the type "int". However,
  * the return type T::type does not exist. The trick now is
@@ -47,27 +47,27 @@ template <bool, typename> struct constraint_and_return_value;
  * 
  * The idea is then to make the return type un-instantiatable if
  * certain constraints on the template types are not satisfied:
- * @begin{verbatim}
+ * @verbatim
  *   template <bool, typename> struct constraint_and_return_value;
  *   template <typename T> struct constraint_and_return_value<true,T> {
  *     typedef T type;
  *   };
- * @end{verbatim}
+ * @endverbatim
  * constraint_and_return_value<false,T> is not defined. Given something like
- * @begin{verbatim}
+ * @verbatim
  *   template <typename>
  *   struct int_or_double         { static const bool value = false;};
  *   template <>
  *   struct int_or_double<int>    { static const bool value = true; };
  *   template <>
  *   struct int_or_double<double> { static const bool value = true; };
- * @end{verbatim}
+ * @endverbatim
  * we can write a template
- * @begin{verbatim}
+ * @verbatim
  *   template <typename T>
  *   typename constraint_and_return_value<int_or_double<T>::value,void>::type
  *   f (T);
- * @end{verbatim}
+ * @endverbatim
  * which can only be instantiated if T=int or T=double. A call to
  * f('c') will just fail with a compiler error: "no instance of
  * f(char) found". On the other hand, if the predicate in the first
