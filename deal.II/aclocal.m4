@@ -1966,67 +1966,6 @@ AC_DEFUN(DEAL_II_CHECK_TEMPL_CONST_MEM_PTR_BUG, dnl
 
 
 dnl -------------------------------------------------------------
-dnl More Intel ICC 5.0.1 compiler lossage with pointers to constant
-dnl member functions
-dnl ---------------------------------
-dnl template <class Class> struct Y {
-dnl   typedef void (Class::*FunPtr) ();
-dnl   FunPtr fun_ptr;
-dnl   Class *object;
-dnl   void foo () {
-dnl     (object->*fun_ptr)();
-dnl   };
-dnl };
-dnl
-dnl struct X {};
-dnl
-dnl template class Y<const X>;
-dnl ---------------------------------
-dnl Again, it does not store the information that the member function pointer
-dnl refers to a constant object, so complains that the object is constant,
-dnl but the member function is not.
-dnl
-dnl Usage: DEAL_II_CHECK_CONST_MEM_FUN_PTR_BUG
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_CONST_MEM_FUN_PTR_BUG, dnl
-[
-  AC_MSG_CHECKING(for const member function pointers bug)
-  AC_LANG(C++)
-  CXXFLAGS="$CXXFLAGSG"
-  AC_TRY_COMPILE(
-    [
-	template <class Class> struct Y {
-	  typedef void (Class::*FunPtr) ();
-	  FunPtr fun_ptr;
-	  Class *object;
-	  void foo () {
-	    (object->*fun_ptr)();
-	  };
-	};
-
-	struct X {};
-
-	template class Y<const X>;
-    ],
-    [],
-    [
-      AC_MSG_RESULT(no)
-    ],
-    [
-      AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_CONST_MEM_FUN_PTR_BUG, 1, 
-                     [Define if we have to work around another bug in Intel's icc
-                      compiler in which the compiler refuses to store the const
-                      attribute at a member function pointer with a constant class.
-                      See the aclocal.m4 file in the top-level directory
-                      for a description of this bug.])
-    ])
-])
-
-
-
-dnl -------------------------------------------------------------
 dnl DEC/Compaq's cxx compiler does not want us to implement
 dnl virtual functions that were declared abstract before. We do
 dnl this with the destructor of the Function class, since we want
