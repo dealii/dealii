@@ -96,6 +96,7 @@ LAPACKFullMatrix<number>::vmult (
 
 
 template <typename number>
+void
 LAPACKFullMatrix<number>::Tvmult (
   Vector<number>       &w,
   const Vector<number> &v,
