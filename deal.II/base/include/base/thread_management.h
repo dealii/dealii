@@ -1765,9 +1765,9 @@ namespace Threads
                                       * type.
                                       */
     template <typename RT, typename PFun, typename ArgList>
-    static inline void call (PFun     fun_ptr,
-                             ArgList &arg_list,
-                             internal::return_value<RT> &ret_val)
+    inline void call (PFun     fun_ptr,
+		      ArgList &arg_list,
+		      internal::return_value<RT> &ret_val)
     {
       Caller<RT>::do_call (fun_ptr, arg_list, ret_val,
                            int2type<boost::tuples::length<ArgList>::value>());
@@ -1785,10 +1785,10 @@ namespace Threads
                                       * return type.
                                       */
     template <typename RT, typename PFun, typename C, typename ArgList>
-    static inline void call (PFun     fun_ptr,
-                             C       &obj,
-                             ArgList &arg_list,
-                             internal::return_value<RT> &ret_val)
+    inline void call (PFun     fun_ptr,
+		      C       &obj,
+		      ArgList &arg_list,
+		      internal::return_value<RT> &ret_val)
     {
       Caller<RT>::do_call (fun_ptr, obj, arg_list, ret_val,
                            int2type<boost::tuples::length<ArgList>::value>());
