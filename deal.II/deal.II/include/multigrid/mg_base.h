@@ -139,7 +139,10 @@ class MGTransferBase : public Subscriptor
 
 				     /**
 				      * Prolongate a vector from level
-				      * #to_level-1# to level #to_level#.
+				      * #to_level-1# to level
+				      * #to_level#. The previous
+				      * content of #dst# is
+				      * overwritten.
 				      *
 				      * #src# is assumed to be a vector with
 				      * as many elements as there are degrees
