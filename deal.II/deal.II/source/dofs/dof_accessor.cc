@@ -534,11 +534,11 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
 					   // get the values from the present
 					   // child, if necessary by
 					   // interpolation itself
-	  child(child)->get_interpolated_dof_values (values,
+	  this->child(child)->get_interpolated_dof_values (values,
 						     tmp1);
 					   // interpolate these to the mother
 					   // cell
-	  dof_handler->get_fe()->restrict(child).vmult (tmp2, tmp1);
+	  dof_handler->get_fe().restrict(child).vmult (tmp2, tmp1);
 	  
 					   // now write those entries in tmp2
 					   // which are != 0 into the output
@@ -550,6 +550,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
 	  for (unsigned int i=0; i<total_dofs; ++i)
 	    if (tmp2(i) != 0)
 	      interpolated_values(i) = tmp2(i);
+	};
     };
 };
 
