@@ -21,6 +21,7 @@
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/mapping_q1.h>
 
 #ifdef DEAL_II_USE_MT
 #include <base/thread_management.h>
@@ -36,11 +37,14 @@ void DataOutFaces<dim>::build_some_patches (Data data)
   QTrapez<1>        q_trapez;
   QIterated<dim-1>  patch_points (q_trapez, data.n_subdivisions);
   
-				   // this constructor implicitely
-				   // uses a MappingQ1 mapping
-  FEFaceValues<dim> fe_patch_values(dofs->get_fe(),
-				    patch_points,
-				    update_values);
+				   // since most output formats can't
+				   // handle cells that are not
+				   // transformed using a Q1 mapping,
+				   // we don't support anything else
+				   // as well
+  static const MappingQ1<dim> mapping;
+  FEFaceValues<dim> fe_patch_values (mapping, dofs->get_fe(),
+				     patch_points, update_values);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
