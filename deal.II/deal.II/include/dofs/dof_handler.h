@@ -482,7 +482,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				     /**
 				      * Destructor
 				      */
-    ~DoFHandler ();
+    virtual ~DoFHandler ();
     
 				     /**
 				      * Go through the triangulation and
@@ -499,7 +499,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * don't need them after calling this
 				      * function, or if so store them.
 				      */
-    void distribute_dofs (const FiniteElementBase<dim> &);
+    virtual void distribute_dofs (const FiniteElementBase<dim> &);
 
 				     /**
 				      * Renumber the degrees of freedom according
@@ -513,9 +513,9 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * See the general documentation of this
 				      * class for more details.
 				      */
-    void renumber_dofs (const RenumberingMethod method,
-			const bool use_constraints         = false,
-			const vector<int> &starting_points = vector<int>());
+    virtual void renumber_dofs (const RenumberingMethod method,
+				const bool use_constraints         = false,
+				const vector<int> &starting_points = vector<int>());
     
 				     /**
 				      * Make up the constraint matrix which
@@ -1161,7 +1161,9 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 
 				     /**
 				      * Return a constant reference to the
-				      * selected finite element object.
+				      * selected finite element object. This
+				      * function is inline, so it should
+				      * be reasonably fast.
 				      */
     const FiniteElementBase<dim> & get_selected_fe () const;
 
@@ -1227,8 +1229,27 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 		    int, int,
 		    << "The dimension " << arg1 << " of the vector is wrong. "
 		    << "It should be " << arg2);
-    
+
   protected:
+    
+				     /**
+				      * Address of the triangulation to
+				      * work on.
+				      */
+    Triangulation<dim> * const tria;
+
+				     /**
+				      * Store a copy of the finite element given
+				      * latest for the distribution of dofs. In
+				      * fact, since the FE base class itself has
+				      * not much functionality, this object only
+				      * stores numbers such as the number of
+				      * dofs per line, but also restriction
+				      * and prolongation matrices, etc.
+				      */
+    const FiniteElementBase<dim>   *selected_fe;
+
+  private:
 				     /**
 				      * Reserve enough space in the 
 				      * #levels[]# objects to store the
@@ -1289,29 +1310,12 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 			dSMatrix            &transfer_matrix) const;
 
 				     /**
-				      * Address of the triangulation to
-				      * work on.
-				      */
-    Triangulation<dim> * const tria;
-
-				     /**
 				      * Space to store the DoF numbers for the
 				      * different levels. Analogous to the
 				      * #levels[]# tree of the \Ref{Triangulation}
 				      * objects.
 				      */
     vector<DoFLevel<dim>*>    levels;
-
-				     /**
-				      * Store a copy of the finite element given
-				      * latest for the distribution of dofs. In
-				      * fact, since the FE base class itself has
-				      * not much functionality, this object only
-				      * stores numbers such as the number of
-				      * dofs per line, but also restriction
-				      * and prolongation matrices, etc.
-				      */
-    const FiniteElementBase<dim>   *selected_fe;
 
 				     /**
 				      * Store the number of dofs created last
@@ -1330,6 +1334,20 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     friend class DoFLineAccessor<dim, CellAccessor<dim> >;
     friend class DoFQuadAccessor<dim, QuadAccessor<dim> >;
     friend class DoFQuadAccessor<dim, CellAccessor<dim> >;
+};
+
+
+
+
+
+
+/* ----------------------- Inline functions ---------------------------------- */
+
+
+template <int dim>
+inline
+const FiniteElementBase<dim> & DoFHandler<dim>::get_selected_fe () const {
+  return *selected_fe;
 };
 
 

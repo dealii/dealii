@@ -760,13 +760,6 @@ const Triangulation<dim> & DoFHandler<dim>::get_tria () const {
 
 
 template <int dim>
-const FiniteElementBase<dim> & DoFHandler<dim>::get_selected_fe () const {
-  return *selected_fe;
-};
-
-
-
-template <int dim>
 void DoFHandler<dim>::distribute_dofs (const FiniteElementBase<dim> &fe) {
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
   
