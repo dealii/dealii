@@ -318,6 +318,17 @@ class FullMatrix : public vector2d<number>
     number2 matrix_scalar_product (const Vector<number2> &u,
 				   const Vector<number2> &v) const;
 
+				     /**
+				      * Symmetrize the matrix by
+				      * forming the mean value between
+				      * the existing matrix and its
+				      * transpose, $A = \frac 12(A+A^T)$.
+				      *
+				      * Obviously the matrix must be
+				      * square for this operation.
+				      */
+    void symmetrize ();
+    
     				     /**
 				      * Return the $l_1$-norm of the matrix, i.e.
 				      * $|M|_1=max_{all columns j}\sum_{all 
@@ -374,13 +385,13 @@ class FullMatrix : public vector2d<number>
     
 				     /**
 				      * A=Inverse(A). Inversion of
-				      * this matrix by
-				      * Gauss-Jordan algorithm with
-				      * partial pivoting.  This
-				      * process is well-behaved for
-				      * positive definite matrices,
-				      * but be aware of round-off
-				      * errors in the indefinite case.
+				      * this matrix by Gauss-Jordan
+				      * algorithm with partial
+				      * pivoting.  This process is
+				      * well-behaved for positive
+				      * definite matrices, but be
+				      * aware of round-off errors in
+				      * the indefinite case.
 				      *
 				      * The numerical effort to invert
 				      * an @p{n x n} matrix is of the
@@ -389,12 +400,14 @@ class FullMatrix : public vector2d<number>
     void gauss_jordan ();
 
 				     /**
-                                      * Computes the determinant of a matrix.
-                                      * This is only implemented for one two and
-                                      * three dimensions, since for higher
-                                      * dimensions the numerical work explodes.
-                                      * Obviously, the matrix needs to be square
-                                      * for this function.
+                                      * Computes the determinant of a
+                                      * matrix.  This is only
+                                      * implemented for one, two, and
+                                      * three dimensions, since for
+                                      * higher dimensions the
+                                      * numerical work explodes.
+                                      * Obviously, the matrix needs to
+                                      * be square for this function.
                                       */
     double determinant () const;
 
@@ -482,15 +495,17 @@ class FullMatrix : public vector2d<number>
 		     const Vector<number3>& b) const;
 
 				     /**
-				      * Forward elimination of lower triangle.
-				      * Inverts the lower triangle of a
-				      * quadratic matrix.
+				      * Forward elimination of lower
+				      * triangle.  Inverts the lower
+				      * triangle of a quadratic
+				      * matrix.
 				      *
-				      * If the matrix has more columns than rows,
-				      * this function only operates on the left
-				      * square submatrix. If there are more rows,
-				      * the upper square part of the matrix
-				      * is considered
+				      * If the matrix has more columns
+				      * than rows, this function only
+				      * operates on the left square
+				      * submatrix. If there are more
+				      * rows, the upper square part of
+				      * the matrix is considered
 				      */
     template<typename number2>
     void forward (Vector<number2>       &dst,
@@ -506,12 +521,15 @@ class FullMatrix : public vector2d<number>
 
 				     /**
 				      * QR-factorization of a matrix.
-				      * The orthogonal transformation Q is
-				      * applied to the vector y and this matrix.
+				      * The orthogonal transformation
+				      * Q is applied to the vector y
+				      * and this matrix.
 				      *
-				      * After execution of householder, the upper
-				      * triangle contains the resulting matrix R,
-				      * the lower the incomplete factorization
+				      * After execution of
+				      * householder, the upper
+				      * triangle contains the
+				      * resulting matrix R, the lower
+				      * the incomplete factorization
 				      * matrices.
 				      */
     template<typename number2>

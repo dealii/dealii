@@ -292,15 +292,16 @@ double FullMatrix<number>::residual (Vector<number2>& dst,
 }
 
 
+
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::forward (Vector<number2>& dst,
-				  const Vector<number2>& src) const
+void FullMatrix<number>::forward (Vector<number2>       &dst,
+				  const Vector<number2> &src) const
 {
   Assert (data() != 0, ExcEmptyMatrix());
   
-  Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  Assert (dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
+  Assert (src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   unsigned int i,j;
   unsigned int nu = ( (m()<n()) ? m() : n());
@@ -314,10 +315,11 @@ void FullMatrix<number>::forward (Vector<number2>& dst,
 }
 
 
+
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::backward (Vector<number2>& dst,
-				   const Vector<number2>& src) const
+void FullMatrix<number>::backward (Vector<number2>       &dst,
+				   const Vector<number2> &src) const
 {
   Assert (data() != 0, ExcEmptyMatrix());
   
@@ -333,20 +335,12 @@ void FullMatrix<number>::backward (Vector<number2>& dst,
 }
 
 
-/*  template <typename number> */
-/*  template <typename number2> */
-/*  FullMatrix<number>& */
-/*  FullMatrix<number>::operator = (const FullMatrix<number2>& m)  */
-/*  { */
-  
-/*  } */
-
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::fill (const FullMatrix<number2>& src,
-			       const unsigned int i,
-			       const unsigned int j)
+void FullMatrix<number>::fill (const FullMatrix<number2> &src,
+			       const unsigned int         i,
+			       const unsigned int         j)
 {
   Assert (n() >= src.n() + j, ExcInvalidDestination(n(), src.n(), j));
   Assert (m() >= src.m() + i, ExcInvalidDestination(m(), src.m(), i));
@@ -595,6 +589,23 @@ number2 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
     };
 
   return sum;
+};
+
+
+
+template <typename number>
+void
+FullMatrix<number>::symmetrize ()
+{
+  Assert (m() == n(), ExcNotQuadratic());
+  
+  const unsigned int N = m();
+  for (unsigned int i=0; i<N; ++i)
+    for (unsigned int j=i+1; j<N; ++j)
+      {
+	const number t = (el(i,j) + el(j,i)) / 2;
+	el(i,j) = el(j,i) = t;
+      };
 };
 
 
