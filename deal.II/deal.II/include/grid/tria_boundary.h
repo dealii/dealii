@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -370,6 +370,8 @@ class StraightBoundary : public Boundary<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
+/// @if NoDoc
+
 template <>
 void
 StraightBoundary<1>::
@@ -403,9 +405,6 @@ StraightBoundary<3>::
 get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
 				 std::vector<Point<3> > &points) const;
 
-
-
-/*----------------------------   boundary-function.h     ---------------------------*/
+/// @endif
 
 #endif
-/*----------------------------   boundary-function.h     ---------------------------*/

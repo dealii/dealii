@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -3489,6 +3489,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 /* -------------- declaration of explicit specializations ------------- */
 
+/// @if NoDoc
 
 template <> TriaDimensionInfo<1>::cell_iterator Triangulation<1>::begin (const unsigned int level) const;
 template <> TriaDimensionInfo<1>::raw_cell_iterator Triangulation<1>::end () const;
@@ -3635,5 +3636,6 @@ template <> void CellData<1>::rotate (const unsigned int);
 template <> void CellData<2>::rotate (const unsigned int times);
 template <> void CellData<3>::rotate (const unsigned int times);
 
+/// @endif
 
 #endif

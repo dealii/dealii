@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -341,6 +341,8 @@ class GridIn
 
 /* -------------- declaration of explicit specializations ------------- */
 
+/// @if NoDoc
+
 template <>
 void
 GridIn<2>::debug_output_grid (const std::vector<CellData<2> > &cells,
@@ -352,5 +354,6 @@ GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
 			      const std::vector<Point<3> >    &vertices,
 			      std::ostream                    &out);
 
+/// @endif
 
 #endif

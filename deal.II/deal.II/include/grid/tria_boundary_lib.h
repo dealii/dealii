@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -476,6 +476,8 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
+/// @if NoDoc
+
 template <>
 Point<1>
 HyperBallBoundary<1>::
@@ -524,5 +526,6 @@ HalfHyperShellBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 			 Boundary<1>::FaceVertexNormals &) const;
 
+/// @endif
 
 #endif

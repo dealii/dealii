@@ -2597,6 +2597,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
+/// @if NoDoc
+
 template <> Point<2> TriaObjectAccessor<2, 2>::barycenter () const;
 template <> Point<3> TriaObjectAccessor<2, 3>::barycenter () const;
 template <> Point<3> TriaObjectAccessor<3, 3>::barycenter () const;
@@ -2640,5 +2642,6 @@ template <> double TriaObjectAccessor<3, 3>::measure () const;
 // include more templates in debug and optimized mode
 #  include "tria_accessor.templates.h"
 
+/// @endif
 
 #endif
