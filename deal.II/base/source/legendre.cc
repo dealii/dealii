@@ -15,6 +15,8 @@
 #include <base/polynomial.h>
 #include <base/thread_management.h>
 
+#include <cmath>
+
 //TODO:[?] This class leaks memory, but only at the very end of a program.
 // Since it expands the Legendre<number>::coefficients array, the elements
 // of this static variable are not destroyed at the end of the program
@@ -22,9 +24,6 @@
 // not be used anyway then), it is a little confusing when looking at
 // a memory checked such as "purify". Maybe, this should be handled somehow
 // to avoid this confusion in future.
-
-//TODO:[GK] These polynomials are orthogonal on [-1,1], but the
-//integral over p^2 is not 1. Find out if this is ok.
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
