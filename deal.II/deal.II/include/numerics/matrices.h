@@ -24,7 +24,7 @@ template<typename number> class FullMatrix;
 template<typename number> class SparseMatrix;
 
 template <typename number, int rows, int columns  >  class BlockSparseMatrix;
-template <int n_blocks, typename Number> class BlockVector;
+template <typename Number> class BlockVector;
 
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
@@ -461,8 +461,8 @@ class MatrixTools : public MatrixCreator<dim>
     static void
     apply_boundary_values (const map<unsigned int,double> &boundary_values,
 			   BlockSparseMatrix<double,blocks,blocks> &matrix,
-			   BlockVector<blocks,double> &solution,
-			   BlockVector<blocks,double> &right_hand_side,
+			   BlockVector<double> &solution,
+			   BlockVector<double> &right_hand_side,
 			   const bool                  eliminate_columns = true);
     
 				     /**

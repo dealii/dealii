@@ -164,10 +164,6 @@ class Histogram
 				     /**
 				      * Exception.
 				      */
-    DeclException0 (ExcIO);
-				     /**
-				      * Exception.
-				      */
     DeclException2 (ExcIncompatibleArraySize,
 		    int, int,
 		    << "The two array sizes " << arg1 << " and " << arg2

@@ -414,10 +414,6 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcIO);
-				     /**
-				      * Exception
-				      */
     DeclException4 (ExcEntryAlreadyExists,
 		    int, int, double, double,
 		    << "The entry for the indices " << arg1 << " and "

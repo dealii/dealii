@@ -1,7 +1,7 @@
 # $Id$
 # Common Makefile for all test directories
 
-all: base lac fe deal.II big-tests
+all: base lac deal.II big-tests fe
 
 base:
 	cd base ; $(MAKE)

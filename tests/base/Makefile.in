@@ -35,12 +35,12 @@ libs     = $(lib-lac.o)      \
 
 ifeq ($(debug-mode),on)
 libraries = $(libs.g)
-flags     = $(CXXFLAGS.g) $(CXXFLAGS)
+flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
 endif
 
 ifeq ($(debug-mode),off)
 libraries = $(libs)
-flags     = $(CXXFLAGS.o) $(CXXFLAGS)
+flags     = $(CXXFLAGS.o) $(CXXFLAGS) -Wno-missing-noreturn
 endif
 
 

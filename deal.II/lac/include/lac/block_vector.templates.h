@@ -19,36 +19,39 @@
 #include <algorithm>
 
 
-template <int n_blocks, typename Number>
-BlockVector<n_blocks,Number>::BlockVector ()
-  : block_indices(n_blocks)
+template <typename Number>
+BlockVector<Number>::BlockVector (unsigned int num_blocks)
+  : components(num_blocks),
+    block_indices(num_blocks),
+    num_blocks(num_blocks)
 {}
 
 
 
-template <int n_blocks, typename Number>
-BlockVector<n_blocks,Number>::BlockVector (const vector<unsigned int> &n)
-  : block_indices(n_blocks)
+template <typename Number>
+BlockVector<Number>::BlockVector (const vector<unsigned int> &n)
+  : block_indices(num_blocks)
 {
   reinit (n, false);
 }
 
 
-template <int n_blocks, typename Number>
-BlockVector<n_blocks,Number>::BlockVector (const BlockVector<n_blocks,Number>& v)
-		: block_indices(n_blocks)
+template <typename Number>
+BlockVector<Number>::BlockVector (const BlockVector<Number>& v)
+  : components(v.num_blocks),
+    block_indices(v.block_indices),
+    num_blocks(v.num_blocks)    
 {
-  block_indices = v.block_indices;
-  for (unsigned int i=0; i<n_blocks; ++i)
+  for (unsigned int i=0; i<num_blocks; ++i)
     components[i] = v.components[i];
 }
 
 
 // see the .h file for why this function was disabled
 //
-// template <int n_blocks, typename Number>
+// template <typename Number>
 // template <typename OtherNumber>
-// BlockVector<n_blocks,Number>::Vector (const BlockVector<n_blocks, OtherNumber>& v) :
+// BlockVector<Number>::Vector (const BlockVector< OtherNumber>& v) :
 // 		dim(v.size()),
 // 		maxdim(v.size()),
 // 		val(0)
@@ -62,58 +65,69 @@ BlockVector<n_blocks,Number>::BlockVector (const BlockVector<n_blocks,Number>& v
 // }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::reinit (const vector<unsigned int> &n,
-					   const bool                  fast)
+template <typename Number>
+void BlockVector<Number>::reinit (const vector<unsigned int> &n,
+				  const bool                  fast)
 {
   block_indices.reinit (n);
-  for (unsigned int i=0; i<n_blocks; ++i)
+  num_blocks = n.size();
+  if (components.size() != num_blocks)
+    components.resize(num_blocks);
+  
+  for (unsigned int i=0; i<num_blocks; ++i)
     components[i].reinit(n[i], fast);
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::reinit (const BlockVector<n_blocks,Number>& v,
+template <typename Number>
+void BlockVector<Number>::reinit (const BlockVector<Number>& v,
 					   const bool fast)
 {
   block_indices = v.block_indices;
-  for (unsigned int i=0;i<n_blocks;++i)
+  num_blocks = v.num_blocks;
+  if (components.size() != num_blocks)
+    components.resize(num_blocks);
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     components[i].reinit(v.components[i], fast);
 }
 
 
 
-template <int n_blocks, typename Number>
-BlockVector<n_blocks,Number>::~BlockVector ()
+template <typename Number>
+BlockVector<Number>::~BlockVector ()
 {}
 
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::swap (BlockVector<n_blocks,Number> &v)
+template <typename Number>
+void BlockVector<Number>::swap (BlockVector<Number> &v)
 {
-  for (unsigned int i=0; i<n_blocks; ++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+  for (unsigned int i=0; i<num_blocks; ++i)
     ::swap (components[i], v.components[i]);
   ::swap (block_indices, v.block_indices);
 };
 
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::clear ()
+template <typename Number>
+void BlockVector<Number>::clear ()
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].clear();
     }
 }
 
 
-template <int n_blocks, typename Number>
-bool BlockVector<n_blocks,Number>::all_zero () const
+template <typename Number>
+bool BlockVector<Number>::all_zero () const
 {
   bool result = true;
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       result = result && components[i].all_zero();
     }
@@ -121,11 +135,14 @@ bool BlockVector<n_blocks,Number>::all_zero () const
 }
 
 
-template <int n_blocks, typename Number>
-Number BlockVector<n_blocks,Number>::operator * (const BlockVector<n_blocks,Number>& v) const
+template <typename Number>
+Number BlockVector<Number>::operator * (const BlockVector<Number>& v) const
 {
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
   Number sum = 0.;
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       sum += components[i]*v.components[i];
     }
@@ -133,11 +150,11 @@ Number BlockVector<n_blocks,Number>::operator * (const BlockVector<n_blocks,Numb
 }
 
 
-template <int n_blocks, typename Number>
-Number BlockVector<n_blocks,Number>::norm_sqr () const
+template <typename Number>
+Number BlockVector<Number>::norm_sqr () const
 {
   Number sum = 0.;
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       sum += components[i].norm_sqr();
     }
@@ -145,11 +162,11 @@ Number BlockVector<n_blocks,Number>::norm_sqr () const
 };
 
 
-template <int n_blocks, typename Number>
-Number BlockVector<n_blocks,Number>::mean_value () const
+template <typename Number>
+Number BlockVector<Number>::mean_value () const
 {
   Number sum = 0.;
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       sum += components[i].mean_value() * components[i].size();
     }
@@ -157,11 +174,11 @@ Number BlockVector<n_blocks,Number>::mean_value () const
 }
 
 
-template <int n_blocks, typename Number>
-Number BlockVector<n_blocks,Number>::l1_norm () const
+template <typename Number>
+Number BlockVector<Number>::l1_norm () const
 {
   Number sum = 0.;
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       sum += components[i].l1_norm();
     }
@@ -169,18 +186,18 @@ Number BlockVector<n_blocks,Number>::l1_norm () const
 }
 
 
-template <int n_blocks, typename Number>
-Number BlockVector<n_blocks,Number>::l2_norm () const
+template <typename Number>
+Number BlockVector<Number>::l2_norm () const
 {
   return sqrt(norm_sqr());
 }
 
 
-template <int n_blocks, typename Number>
-Number BlockVector<n_blocks,Number>::linfty_norm () const
+template <typename Number>
+Number BlockVector<Number>::linfty_norm () const
 {
   Number sum = 0.;
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       Number newval = components[i].linfty_norm();
       if (sum<newval)
@@ -190,20 +207,23 @@ Number BlockVector<n_blocks,Number>::linfty_norm () const
 }
 
 
-template <int n_blocks, typename Number>
-BlockVector<n_blocks,Number>&
-BlockVector<n_blocks,Number>::operator += (const BlockVector<n_blocks,Number>& v)
+template <typename Number>
+BlockVector<Number>&
+BlockVector<Number>::operator += (const BlockVector<Number>& v)
 {
   add (v);
   return *this;
 }
 
 
-template <int n_blocks, typename Number>
-BlockVector<n_blocks,Number>&
-BlockVector<n_blocks,Number>::operator -= (const BlockVector<n_blocks,Number>& v)
+template <typename Number>
+BlockVector<Number>&
+BlockVector<Number>::operator -= (const BlockVector<Number>& v)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i] -= v.components[i];
     }
@@ -211,94 +231,124 @@ BlockVector<n_blocks,Number>::operator -= (const BlockVector<n_blocks,Number>& v
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::add (const Number v)
+template <typename Number>
+void BlockVector<Number>::add (const Number a)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
-      components[i].add(v);
+      components[i].add(a);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::add (const BlockVector<n_blocks,Number>& v)
+template <typename Number>
+void BlockVector<Number>::add (const BlockVector<Number>& v)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].add(v.components[i]);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::add (const Number a,
-					const BlockVector<n_blocks,Number>& v)
+template <typename Number>
+void BlockVector<Number>::add (const Number a,
+			       const BlockVector<Number>& v)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].add(a, v.components[i]);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::add (const Number a,
-					const BlockVector<n_blocks,Number>& v,
-					const Number b,
-					const BlockVector<n_blocks,Number>& w)
+template <typename Number>
+void BlockVector<Number>::add (const Number a,
+			       const BlockVector<Number>& v,
+			       const Number b,
+			       const BlockVector<Number>& w)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (num_blocks == w.num_blocks,
+	  ExcDimensionMismatch(num_blocks, w.num_blocks));
+  
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].add(a, v.components[i], b, w.components[i]);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::sadd (const Number x,
-					 const BlockVector<n_blocks,Number>& v)
+template <typename Number>
+void BlockVector<Number>::sadd (const Number x,
+				const BlockVector<Number>& v)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].sadd(x, v.components[i]);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
-					 const BlockVector<n_blocks,Number>& v)
+template <typename Number>
+void BlockVector<Number>::sadd (const Number x, const Number a,
+				const BlockVector<Number>& v)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].sadd(x, a, v.components[i]);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
-					 const BlockVector<n_blocks,Number>& v,
-					 const Number b,
-					 const BlockVector<n_blocks,Number>& w)
+template <typename Number>
+void BlockVector<Number>::sadd (const Number x, const Number a,
+				const BlockVector<Number>& v,
+				const Number b,
+				const BlockVector<Number>& w)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (num_blocks == w.num_blocks,
+	  ExcDimensionMismatch(num_blocks, w.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].sadd(x, a, v.components[i], b, w.components[i]);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
-					 const BlockVector<n_blocks,Number>& v,
-					 const Number b,
-					 const BlockVector<n_blocks,Number>& w,
-					 const Number c,
-					 const BlockVector<n_blocks,Number>& y)
+template <typename Number>
+void BlockVector<Number>::sadd (const Number x, const Number a,
+				const BlockVector<Number>& v,
+				const Number b,
+				const BlockVector<Number>& w,
+				const Number c,
+				const BlockVector<Number>& y)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));  
+  Assert (num_blocks == w.num_blocks,
+	  ExcDimensionMismatch(num_blocks, w.num_blocks));
+  Assert (num_blocks == y.num_blocks,
+	  ExcDimensionMismatch(num_blocks, y.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].sadd(x, a, v.components[i],
 			 b, w.components[i], c, y.components[i]);
@@ -306,44 +356,52 @@ void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::scale (const Number factor)
+template <typename Number>
+void BlockVector<Number>::scale (const Number factor)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].scale(factor);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::equ (const Number a,
-					const BlockVector<n_blocks,Number>& v,
-					const Number b,
-					const BlockVector<n_blocks,Number>& w)
+template <typename Number>
+void BlockVector<Number>::equ (const Number a,
+			       const BlockVector<Number>& v,
+			       const Number b,
+			       const BlockVector<Number>& w)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (num_blocks == w.num_blocks,
+	  ExcDimensionMismatch(num_blocks, w.num_blocks));  
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].equ( a, v.components[i], b, w.components[i]);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::equ (const Number a,
-					const BlockVector<n_blocks,Number>& v)
+template <typename Number>
+void BlockVector<Number>::equ (const Number a,
+			       const BlockVector<Number>& v)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].equ( a, v.components[i]);
     }
 }
 
 
-template <int n_blocks, typename Number>
-BlockVector<n_blocks,Number>& BlockVector<n_blocks,Number>::operator = (const Number s)
+template <typename Number>
+BlockVector<Number>& BlockVector<Number>::operator = (const Number s)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i] = s;
     }
@@ -351,11 +409,14 @@ BlockVector<n_blocks,Number>& BlockVector<n_blocks,Number>::operator = (const Nu
 }
 
 
-template <int n_blocks, typename Number>
-BlockVector<n_blocks,Number>&
-BlockVector<n_blocks,Number>::operator = (const BlockVector<n_blocks,Number>& v)
+template <typename Number>
+BlockVector<Number>&
+BlockVector<Number>::operator = (const BlockVector<Number>& v)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i] = v.components[i];
     }
@@ -363,12 +424,15 @@ BlockVector<n_blocks,Number>::operator = (const BlockVector<n_blocks,Number>& v)
 }
 
 
-template <int n_blocks, typename Number>
+template <typename Number>
 template<typename Number2>
-BlockVector<n_blocks,Number>&
-BlockVector<n_blocks,Number>::operator = (const BlockVector<n_blocks, Number2>& v)
+BlockVector<Number>&
+BlockVector<Number>::operator = (const BlockVector< Number2>& v)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i] = v.components[i];
     }
@@ -376,13 +440,13 @@ BlockVector<n_blocks,Number>::operator = (const BlockVector<n_blocks, Number2>& 
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::print (ostream &out,
-					  unsigned int precision,
-					  bool scientific,
-					  bool across) const
+template <typename Number>
+void BlockVector<Number>::print (ostream &out,
+				 unsigned int precision,
+				 bool scientific,
+				 bool across) const
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       if (across)
 	out << 'C' << i << ':';
@@ -393,20 +457,20 @@ void BlockVector<n_blocks,Number>::print (ostream &out,
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::block_write (ostream &out) const
+template <typename Number>
+void BlockVector<Number>::block_write (ostream &out) const
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].block_write(out);
     }
 }
 
 
-template <int n_blocks, typename Number>
-void BlockVector<n_blocks,Number>::block_read (istream &in)
+template <typename Number>
+void BlockVector<Number>::block_read (istream &in)
 {
-  for (unsigned int i=0;i<n_blocks;++i)
+  for (unsigned int i=0;i<num_blocks;++i)
     {
       components[i].block_read(in);
     }  

@@ -171,10 +171,6 @@ class TriangulationLevel<0>
 		    int, int,
 		    << "The containers have sizes " << arg1 << " and "
 		    << arg2 << ", which is not as expected.");
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcIO);
 };
 
 

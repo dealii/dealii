@@ -134,7 +134,7 @@ class BlockIndices
 inline
 BlockIndices::BlockIndices (unsigned int n_blocks)
   : n_blocks(n_blocks),
-    start_indices(n_blocks)
+    start_indices(n_blocks+1)
 {
   for (unsigned int i=0; i<=n_blocks; ++i)
     start_indices[i] = 0;
@@ -144,6 +144,8 @@ BlockIndices::BlockIndices (unsigned int n_blocks)
 
 inline
 BlockIndices::BlockIndices (const vector<unsigned int> &n)
+  : n_blocks(n.size()),
+    start_indices(n.size()+1)
 {
   reinit (n);
 };
@@ -183,7 +185,7 @@ BlockIndices::global_to_local (const unsigned int i) const
 inline
 unsigned int
 BlockIndices::local_to_global (const unsigned int block,
-					 const unsigned int index) const
+			       const unsigned int index) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   Assert (index < start_indices[block+1]-start_indices[block],
@@ -215,8 +217,8 @@ inline
 BlockIndices &
 BlockIndices::operator = (const BlockIndices &b)
 {
-  for (unsigned int i=0; i<=n_blocks; ++i)
-    start_indices[i] = b.start_indices[i];
+  start_indices = b.start_indices;
+  n_blocks = b.n_blocks;
   return *this;
 };
 
@@ -226,6 +228,9 @@ inline
 bool
 BlockIndices::operator == (const BlockIndices &b) const
 {
+  if (n_blocks != b.n_blocks)
+    return false;
+  
   for (unsigned int i=0; i<=n_blocks; ++i)
     if (start_indices[i] != b.start_indices[i])
       return false;
@@ -239,6 +244,9 @@ inline
 void
 BlockIndices::swap (BlockIndices &b)
 {
+  Assert (n_blocks == b.n_blocks,
+	  ExcDimensionMismatch(n_blocks, b.n_blocks));  
+
   for (unsigned int i=0; i<=n_blocks; ++i)
     std::swap (start_indices[i], b.start_indices[i]);
 };

@@ -1128,18 +1128,6 @@ class ParameterHandler
     DeclException1 (ExcConversionError,
 		    string,
 		    << "Error when trying to convert the following string: " << arg1);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotImplemented);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInternalError);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcIO);
     
   private:
 				     /**

@@ -537,14 +537,6 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcInternalError);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcIO);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInvalidConstructorCall);
 				     /**
 				      * Exception

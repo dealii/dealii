@@ -596,10 +596,6 @@ class FullMatrix : public Subscriptor
 		    int,
 		    << "This function is not implemented for the given"
 		    << " matrix dimension " << arg1);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcIO);
 
   private:
 				     /**

@@ -198,7 +198,7 @@ switch (test_case)
 	tria.execute_coarsening_and_refinement ();
 
 	Triangulation<dim>::active_cell_iterator cell;
-	for (int i=0; i<(dim==2 ? 5 : 2); ++i) 
+	for (int i=0; i<(dim==2 ? 3 : 2); ++i) 
 	  {
 					     // refine the presently
 					     // second last cell 17
@@ -235,7 +235,7 @@ switch (test_case)
 	tria.execute_coarsening_and_refinement ();
 	
  	Triangulation<dim>::active_cell_iterator cell, endc;
-	const unsigned int steps[4] = { 0, 5, 3, 2 };
+	const unsigned int steps[4] = { 0, 2, 2, 2 };
  	for (unsigned int i=0; i<steps[dim]; ++i) 
  	  {
  	    cell = tria.begin_active();
@@ -256,7 +256,7 @@ switch (test_case)
     };
 
 
-GridOut().write_gnuplot (tria, logfile);
+GridOut().write_ucd (tria, logfile);
     
   deallog << "     Total number of cells        = " << tria.n_cells() << endl
        << "     Total number of active cells = " << tria.n_active_cells() << endl;

@@ -14,8 +14,5 @@
 #include <lac/block_vector.templates.h>
 
 // explicit instantiations
-template class BlockVector<2,double>;
-template class BlockVector<3,double>;
-
-template class BlockVector<2,float>;
-template class BlockVector<3,float>;
+template class BlockVector<double>;
+template class BlockVector<float>;

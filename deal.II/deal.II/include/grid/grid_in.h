@@ -192,10 +192,6 @@ class GridIn
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcIO);
-				     /**
-				      * Exception
-				      */
     DeclException1 (ExcDBMESHWrongDimension,
 		    int,
 		    << "The specified dimension " << arg1

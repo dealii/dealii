@@ -35,7 +35,7 @@ void test ()
   
   BlockIndices i1(ivector);
   BlockIndices i2 = i1;
-  BlockIndices i3(13);
+  BlockIndices i3(0);
   i3.reinit(ivector);
 
   deallog.push("global->local");

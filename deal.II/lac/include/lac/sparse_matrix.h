@@ -718,10 +718,6 @@ class SparseMatrix : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcIO);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInvalidConstructorCall);
     
   private:

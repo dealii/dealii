@@ -553,10 +553,6 @@ class GridOut
 				      * Exception
 				      */
     DeclException0 (ExcInvalidState);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcIO);
 
   private:
 

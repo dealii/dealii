@@ -37,12 +37,12 @@ libs     = $(lib-deal2-2d.o) \
 
 ifeq ($(debug-mode),on)
 libraries = $(libs.g)
-flags     = $(CXXFLAGS.g) $(CXXFLAGS)
+flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
 endif
 
 ifeq ($(debug-mode),off)
 libraries = $(libs)
-flags     = $(CXXFLAGS.o) $(CXXFLAGS)
+flags     = $(CXXFLAGS.o) $(CXXFLAGS) -Wno-missing-noreturn
 endif
 
 # If in multithread mode, add the ACE library to the libraries which

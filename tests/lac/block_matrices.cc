@@ -144,13 +144,13 @@ void test ()
 				   // now allocate two block vectors
 				   // and see what we can get after
 				   // vmults:
-  BlockVector<2,double> src;
+  BlockVector<double> src;
   vector<unsigned int> src_sizes (2);
   src_sizes[0] = 10;
   src_sizes[1] = 19;
   src.reinit (src_sizes);
 
-  BlockVector<3,double> dst;
+  BlockVector<double> dst;
   vector<unsigned int> dst_sizes (3);
   dst_sizes[0] = 2;
   dst_sizes[1] = 7;

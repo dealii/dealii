@@ -689,8 +689,8 @@ template <int blocks>
 void
 MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
 					 BlockSparseMatrix<double,blocks,blocks>  &matrix,
-					 BlockVector<blocks,double>   &solution,
-					 BlockVector<blocks,double>   &right_hand_side,
+					 BlockVector<double>   &solution,
+					 BlockVector<double>   &right_hand_side,
 					 const bool                    preserve_symmetry)
 {
   Assert (matrix.n() == matrix.m(),
@@ -1399,8 +1399,8 @@ void
 MatrixTools<deal_II_dimension>::
 apply_boundary_values (const map<unsigned int,double> &,
 		       BlockSparseMatrix<double,2,2>  &,
-		       BlockVector<2,double>          &,
-		       BlockVector<2,double>          &,
+		       BlockVector<double>          &,
+		       BlockVector<double>          &,
 		       const bool);
 
 template
@@ -1408,8 +1408,9 @@ void
 MatrixTools<deal_II_dimension>::
 apply_boundary_values (const map<unsigned int,double> &,
 		       BlockSparseMatrix<double,3,3>  &,
-		       BlockVector<3,double>          &,
-		       BlockVector<3,double>          &,
+		       BlockVector<double>          &,
+		       BlockVector<double>          &,
 		       const bool);
+
 
 

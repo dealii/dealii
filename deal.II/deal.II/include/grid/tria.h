@@ -2936,10 +2936,6 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * Exception
 				      */
     DeclException0 (ExcInteriorQuadCantBeBoundary);
-                                     /**
-				      * Exception
-				      */				      
-    DeclException0 (ExcInternalError);
 				     /**
 				      * Exception
 				      */
@@ -2947,10 +2943,6 @@ class Triangulation : public TriaDimensionInfo<dim>,
 		    int,
 		    << "You tried to do something on level " << arg1
 		    << ", but this level is empty.");
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcIO);
 				     /*@}*/
   protected:
 

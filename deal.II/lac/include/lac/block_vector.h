@@ -45,7 +45,7 @@
  *
  * @author Guido Kanschat, 1999; Wolfgang Bangerth, 2000
  */
-template <int n_blocks, typename Number>
+template <typename Number>
 class BlockVector
 {
   public:
@@ -71,14 +71,14 @@ class BlockVector
 				     /**
 				      *  Dummy-Constructor. Dimension=0
 				      */
-    BlockVector ();
+    BlockVector (unsigned int num_blocks = 0);
     
 				     /**
 				      * Copy-Constructor. Dimension set to
 				      * that of V, all components are copied
 				      * from V
 				      */
-    BlockVector (const BlockVector<n_blocks,Number>& V);
+    BlockVector (const BlockVector<Number>& V);
 
 
 // note: I disabled this function for the time being, since egcs1.1.2
@@ -99,8 +99,10 @@ class BlockVector
 //     BlockVector (const BlockVector<OtherNumber> &v);
     
 				     /**
-				      * Constructor. Set dimension to @p{n} and
-				      * initialize all elements with zero.
+				      * Constructor. Set the number of
+				      * blocks to @p{n.size()} and
+				      * initialize each block with
+				      * @p{n[i]} zero elements.
 				      */
     BlockVector (const vector<unsigned int> &n);
 
@@ -110,18 +112,22 @@ class BlockVector
     ~BlockVector ();
 
 				     /**
-				      * Change the dimension of the vector to
-				      * @p{N}. The reserved memory for this vector
-				      * remains unchanged if possible, to make
-				      * things faster, but this may waste some
-				      * memory, so take this in the back of your
-				      * head.
-				      * However, if @p{N==0} all memory is freed,
-				      * i.e. if you want to resize the vector
-				      * and release the memory not needed, you
-				      * have to first call @p{reinit(0)} and then
-				      * @p{reinit(N)}. This cited behaviour is
-				      * analogous to that of the STL containers.
+				      * Reinitialize the BlockVector
+				      * such that it contains
+				      * @p{N.size()} blocks. Each
+				      * Block is reinitialized to
+				      * dimension @p{N[i]}.
+				      *
+				      * If the number of blocks is the
+				      * same as before this function
+				      * was called, all vectors remain
+				      * the same and @p{reinit} is
+				      * called for each vector. While
+				      * reinitailizing a usual vector
+				      * can consume a lot of time,
+				      * this function here definitely
+				      * has a potential to slow down a
+				      * program considerably.
 				      *
 				      * On @p{fast==false}, the vector is filled by
 				      * zeros.
@@ -138,7 +144,7 @@ class BlockVector
 				      * this function is the same as calling
 				      * @p{reinit (V.size(), fast)}.
 				      */
-    void reinit (const BlockVector<n_blocks,Number> &V,
+    void reinit (const BlockVector<Number> &V,
 		 const bool                          fast=false);
     
 				     /**
@@ -165,6 +171,13 @@ class BlockVector
 				      * temporary storage and move
 				      * data around.
 				      *
+				      * Limitation: right now this
+				      * function only works if both
+				      * vectors have the same number
+				      * of blocks. If needed, the
+				      * numbers of blocks should be
+				      * exchanged, too.
+				      *
 				      * This function is analog to the
 				      * the @p{swap} function of all C++
 				      * standard containers. Also,
@@ -173,7 +186,7 @@ class BlockVector
 				      * @p{u.swap(v)}, again in analogy
 				      * to standard functions.
 				      */
-    void swap (BlockVector<n_blocks,Number> &v);
+    void swap (BlockVector<Number> &v);
     
 				     /**
 				      * Access to a single block.
@@ -202,25 +215,25 @@ class BlockVector
 				     /**
 				      * $U(0-N) = s$: fill all components.
 				      */
-    BlockVector<n_blocks,Number> & operator= (const Number s);
+    BlockVector<Number> & operator= (const Number s);
     
 				     /**
 				      *  $U = V$: copy all components.
 				      */
-    BlockVector<n_blocks,Number> &
-    operator= (const BlockVector<n_blocks,Number>& V);
+    BlockVector<Number> &
+    operator= (const BlockVector<Number>& V);
 
 				     /**
 				      * $U = V$ for different types.
 				      */
     template<typename Number2>
-    BlockVector<n_blocks,Number> &
-    operator= (const BlockVector<n_blocks, Number2>& V);
+    BlockVector<Number> &
+    operator= (const BlockVector< Number2>& V);
     
 				     /**
 				      * $U = U * V$: scalar product.
 				      */
-    Number operator* (const BlockVector<n_blocks,Number>& V) const;
+    Number operator* (const BlockVector<Number>& V) const;
 
 				     /**
 				      * Return square of the $l_2$-norm.
@@ -253,7 +266,11 @@ class BlockVector
 				      */
     Number linfty_norm () const;
 
-
+				     /**
+				      * Number of blocks.
+				      */
+    unsigned int n_blocks () const;
+  
   				     /**
   				      * Return dimension of the vector. This is the
 				      * sum of the dimensions of all components.
@@ -295,15 +312,15 @@ class BlockVector
 				      * Addition operator.
 				      * Fast equivalent to @p{U.add(1, V)}.
 				      */
-    BlockVector<n_blocks,Number> &
-    operator += (const BlockVector<n_blocks,Number> &V);
+    BlockVector<Number> &
+    operator += (const BlockVector<Number> &V);
 
     				     /**
 				      * Subtraction operator.
 				      * Fast equivalent to @p{U.add(-1, V)}.
 				      */
-    BlockVector<n_blocks,Number> &
-    operator -= (const BlockVector<n_blocks,Number> &V);
+    BlockVector<Number> &
+    operator -= (const BlockVector<Number> &V);
 
 				     /**
 				      * $U(0-DIM)+=s$.
@@ -317,49 +334,49 @@ class BlockVector
 				      * Simple vector addition, equal to the
 				      * @p{operator +=}.
 				      */
-    void add (const BlockVector<n_blocks,Number>& V);
+    void add (const BlockVector<Number>& V);
     
 				     /**
 				      * U+=a*V.
 				      * Simple addition of a scaled vector.
 				      */
-    void add (const Number a, const BlockVector<n_blocks,Number>& V);
+    void add (const Number a, const BlockVector<Number>& V);
     
 				     /**
 				      * U+=a*V+b*W.
 				      * Multiple addition of scaled vectors.
 				      */
-    void add (const Number a, const BlockVector<n_blocks,Number>& V,
-	      const Number b, const BlockVector<n_blocks,Number>& W);
+    void add (const Number a, const BlockVector<Number>& V,
+	      const Number b, const BlockVector<Number>& W);
     
 				     /**
 				      * U=s*U+V.
 				      * Scaling and simple vector addition.
 				      */
-    void sadd (const Number s, const BlockVector<n_blocks,Number>& V);
+    void sadd (const Number s, const BlockVector<Number>& V);
     
 				     /**
 				      * U=s*U+a*V.
 				      * Scaling and simple addition.
 				      */
-    void sadd (const Number s, const Number a, const BlockVector<n_blocks,Number>& V);
+    void sadd (const Number s, const Number a, const BlockVector<Number>& V);
     
 				     /**
 				      * U=s*U+a*V+b*W.
 				      * Scaling and multiple addition.
 				      */
     void sadd (const Number s, const Number a,
-	       const BlockVector<n_blocks,Number>& V,
-	       const Number b, const BlockVector<n_blocks,Number>& W);
+	       const BlockVector<Number>& V,
+	       const Number b, const BlockVector<Number>& W);
     
 				     /**
 				      * U=s*U+a*V+b*W+c*X.
 				      * Scaling and multiple addition.
 				      */
     void sadd (const Number s, const Number a,
-	       const BlockVector<n_blocks,Number>& V,
-	       const Number b, const BlockVector<n_blocks,Number>& W, 
-	       const Number c, const BlockVector<n_blocks,Number>& X);
+	       const BlockVector<Number>& V,
+	       const Number b, const BlockVector<Number>& W, 
+	       const Number c, const BlockVector<Number>& X);
     
 				     /**
 				      * Scale each element of the vector by the
@@ -373,14 +390,14 @@ class BlockVector
 				     /**
 				      *  U=a*V. Replacing.
 				      */
-    void equ (const Number a, const BlockVector<n_blocks,Number>& V);
+    void equ (const Number a, const BlockVector<Number>& V);
     
 				     /**
 				      * U=a*V+b*W.
 				      * Replacing by sum.
 				      */
-    void equ (const Number a, const BlockVector<n_blocks,Number>& V,
-	      const Number b, const BlockVector<n_blocks,Number>& W);
+    void equ (const Number a, const BlockVector<Number>& V,
+	      const Number b, const BlockVector<Number>& W);
 
 				     //@}
 
@@ -439,7 +456,7 @@ class BlockVector
 				     /**
 				      * Pointer to the array of components.
 				      */
-    Vector<Number> components[n_blocks];
+    vector<Vector<Number> > components;
 
 				     /**
 				      * Object managing the
@@ -448,23 +465,39 @@ class BlockVector
 				      * different blocks.
 				      */
     BlockIndices block_indices;
+  private:
+				   /**
+				    * The number of blocks. This
+				    * number is redundant to
+				    * @p{components.size()} and stored
+				    * here for convenience.
+				    */
+  unsigned int num_blocks;
 };
 
 
 /*----------------------- Inline functions ----------------------------------*/
 
 
-template <int n_blocks, typename Number>
+template <typename Number>
 inline
-unsigned int BlockVector<n_blocks,Number>::size () const
+unsigned int BlockVector<Number>::size () const
 {
   return block_indices.total_size();
 }
 
 
-template <int n_blocks, typename Number>
+template <typename Number>
 inline
-Number BlockVector<n_blocks,Number>::operator() (const unsigned int i) const
+unsigned int BlockVector<Number>::n_blocks () const
+{
+  return num_blocks;
+}
+
+
+template <typename Number>
+inline
+Number BlockVector<Number>::operator() (const unsigned int i) const
 {
   const pair<unsigned int,unsigned int> local_index
     = block_indices.global_to_local (i);
@@ -472,9 +505,9 @@ Number BlockVector<n_blocks,Number>::operator() (const unsigned int i) const
 }
 
 
-template <int n_blocks, typename Number>
+template <typename Number>
 inline
-Number& BlockVector<n_blocks,Number>::operator() (const unsigned int i)
+Number& BlockVector<Number>::operator() (const unsigned int i)
 {
   const pair<unsigned int,unsigned int> local_index
     = block_indices.global_to_local (i);
@@ -483,34 +516,34 @@ Number& BlockVector<n_blocks,Number>::operator() (const unsigned int i)
 
 
 
-template <int n_blocks, typename Number>
+template <typename Number>
 inline
 Vector<Number>&
-BlockVector<n_blocks,Number>::block(unsigned int i)
+BlockVector<Number>::block(unsigned int i)
 {
-  Assert(i<n_blocks, ExcIndexRange(i,0,n_blocks));
+  Assert(i<num_blocks, ExcIndexRange(i,0,num_blocks));
 
   return components[i];
 }
 
 
 
-template <int n_blocks, typename Number>
+template <typename Number>
 inline
 const Vector<Number>&
-BlockVector<n_blocks,Number>::block(unsigned int i) const
+BlockVector<Number>::block(unsigned int i) const
 {
-  Assert(i<n_blocks, ExcIndexRange(i,0,n_blocks));
+  Assert(i<num_blocks, ExcIndexRange(i,0,num_blocks));
 
   return components[i];
 }
 
 
 
-template <int n_blocks, typename Number>
+template <typename Number>
 inline
 const BlockIndices&
-BlockVector<n_blocks,Number>::get_block_indices () const
+BlockVector<Number>::get_block_indices () const
 {
   return block_indices;
 }
@@ -523,10 +556,10 @@ BlockVector<n_blocks,Number>::get_block_indices () const
  *
  * @author Wolfgang Bangerth, 2000
  */
-template <int n_blocks, typename Number>
+template <typename Number>
 inline
-void swap (BlockVector<n_blocks,Number> &u,
-	   BlockVector<n_blocks,Number> &v)
+void swap (BlockVector<Number> &u,
+	   BlockVector<Number> &v)
 {
   u.swap (v);
 };

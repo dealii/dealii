@@ -879,10 +879,7 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<float> &,
 					     vector<float>      &) const;
 template
-void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<2,double> &,
-					     vector<double>      &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<3,double> &,
+void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<double> &,
 					     vector<double>      &) const;
 
 //-----------------------------------------------------------------------------
@@ -894,10 +891,7 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_values (const Vector<float> &,
 					     vector<Vector<float> > &) const;
 template
-void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<2,double> &,
-					     vector<Vector<double> >     &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<3,double> &,
+void FEValuesBase<deal_II_dimension>::get_function_values (const BlockVector<double> &,
 					     vector<Vector<double> >     &) const;
 
 //-----------------------------------------------------------------------------
@@ -909,10 +903,7 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_grads (const Vector<float> &,
 					     vector<Tensor<1,deal_II_dimension> > &) const;
 template
-void FEValuesBase<deal_II_dimension>::get_function_grads (const BlockVector<2,double> &,
-					     vector<Tensor<1,deal_II_dimension> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads (const BlockVector<3,double> &,
+void FEValuesBase<deal_II_dimension>::get_function_grads (const BlockVector<double> &,
 					     vector<Tensor<1,deal_II_dimension> > &) const;
 
 //-----------------------------------------------------------------------------
@@ -924,10 +915,7 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_grads (const Vector<float> &,
 					     vector<vector<Tensor<1,deal_II_dimension> > > &) const;
 template
-void FEValuesBase<deal_II_dimension>::get_function_grads (const BlockVector<2,double> &,
-					     vector<vector<Tensor<1,deal_II_dimension> > > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads (const BlockVector<3,double> &,
+void FEValuesBase<deal_II_dimension>::get_function_grads (const BlockVector<double> &,
 					     vector<vector<Tensor<1,deal_II_dimension> > > &) const;
 
 //-----------------------------------------------------------------------------
@@ -939,8 +927,5 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const Vector<float> &,
 					     vector<Tensor<2,deal_II_dimension> > &) const;
 template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const BlockVector<2,double> &,
-					     vector<Tensor<2,deal_II_dimension> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const BlockVector<3,double> &,
+void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const BlockVector<double> &,
 					     vector<Tensor<2,deal_II_dimension> > &) const;

@@ -478,7 +478,7 @@ void ConstraintMatrix::print (ostream &out) const {
 // where the vector/matrix can be replaced using a preprocessor
 // variable VectorType/MatrixType. note that we cannot do so by using
 // a preprocessor function with one arg, since
-// #vector_functions(BlockVector<2,double>)# is not recognized as one
+// #vector_functions(BlockVector<double>)# is not recognized as one
 // arg, and putting parentheses around the arg yields incorrect
 // syntax...
 
@@ -509,11 +509,7 @@ vector_functions;
 vector_functions;
 #undef VectorType
 
-#define VectorType BlockVector<2,double>
-vector_functions;
-#undef VectorType
-
-#define VectorType BlockVector<3,double>
+#define VectorType BlockVector<double>
 vector_functions;
 #undef VectorType
 

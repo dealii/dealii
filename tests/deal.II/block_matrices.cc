@@ -76,7 +76,7 @@ template <class Vector, class Matrix, class Sparsity>
 void LaplaceProblem<Vector,Matrix,Sparsity>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (5);
+  triangulation.refine_global (3);
   deallog << "Number of active cells: "
        << triangulation.n_active_cells()
        << endl;
@@ -138,7 +138,7 @@ void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_v
 
 
 template <>
-void LaplaceProblem<BlockVector<2,double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern<2,2> >::reinit_sparsity () 
+void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern<2,2> >::reinit_sparsity () 
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   const unsigned int block_size[2] = { n_dofs/3, n_dofs - n_dofs/3 };
@@ -153,7 +153,7 @@ void LaplaceProblem<BlockVector<2,double>,BlockSparseMatrix<double,2,2>,BlockSpa
 
 
 template <>
-void LaplaceProblem<BlockVector<2,double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern<2,2> >::reinit_vectors () 
+void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern<2,2> >::reinit_vectors () 
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   const unsigned int block_size_[2] = { n_dofs/3, n_dofs - n_dofs/3 };
@@ -167,7 +167,7 @@ void LaplaceProblem<BlockVector<2,double>,BlockSparseMatrix<double,2,2>,BlockSpa
 
 
 template <>
-void LaplaceProblem<BlockVector<3,double>,BlockSparseMatrix<double,3,3>,BlockSparsityPattern<3,3> >::reinit_sparsity () 
+void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,3,3>,BlockSparsityPattern<3,3> >::reinit_sparsity () 
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   const unsigned int block_size[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
@@ -182,7 +182,7 @@ void LaplaceProblem<BlockVector<3,double>,BlockSparseMatrix<double,3,3>,BlockSpa
 
 
 template <>
-void LaplaceProblem<BlockVector<3,double>,BlockSparseMatrix<double,3,3>,BlockSparsityPattern<3,3> >::reinit_vectors () 
+void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,3,3>,BlockSparsityPattern<3,3> >::reinit_vectors () 
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   const unsigned int block_size_[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
@@ -282,10 +282,11 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::run ()
   solve ();
 
   for (unsigned int i=0; i<solution.size(); ++i)
-    deallog << typeid(Vector).name ()
-	    << ' '
-	    << typeid(Matrix).name ()
-	    << '-'
+    deallog
+				       //<< typeid(Vector).name ()
+				       //<< ' '
+				       //<< typeid(Matrix).name ()
+				       //<< '-'
 	    << i << ' ' << solution(i) << endl;
 };
 
@@ -329,7 +330,7 @@ int main ()
   
   if (true)
     {
-      LaplaceProblem<BlockVector<2,double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern<2,2> >
+      LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern<2,2> >
 	laplace_problem;  
       laplace_problem.run ();
       
@@ -341,7 +342,7 @@ int main ()
 
   if (true)
     {
-      LaplaceProblem<BlockVector<3,double>,BlockSparseMatrix<double,3,3>,BlockSparsityPattern<3,3> >
+      LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,3,3>,BlockSparsityPattern<3,3> >
 	laplace_problem;  
       laplace_problem.run ();
       
