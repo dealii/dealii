@@ -113,7 +113,7 @@ main ()
       for (unsigned int i=0;i<4;++i)
 	{
 					   // Setup rotation matrix
-	  C.clear();
+	  C.set_zero();
 	  C.diagadd(1.);
 	  C(i,i) = C(i+1,i+1) = std::cos(i+1.);
 	  C(i+1,i) = std::sin(i+1.);

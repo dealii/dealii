@@ -481,7 +481,7 @@ void LaplaceProblem::assemble_system ()
 				       // to global matrix and global
 				       // right hand side to zero,
 				       // before we fill them.
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       cell_rhs = 0;
 
 				       // Assemble the matrix: For the

@@ -517,7 +517,7 @@ void ElasticProblem<dim>::assemble_system ()
 						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       cell_rhs = 0;
 
       fe_values.reinit (cell);

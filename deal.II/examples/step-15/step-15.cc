@@ -100,7 +100,7 @@ double gradient_power (const Tensor<1,dim> &v,
   Assert ((n/2)*2 == n, ExcMessage ("Value of 'n' must be even"));
   double p = 1;
   for (unsigned int k=0; k<n; k+=2)
-    p += (v*v);
+    p *= (v*v);
   return p;
 }
 
@@ -463,7 +463,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                        // First, clear the objects that hold
                                        // the local matrix and right hand side
                                        // contributions for this cell:
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       cell_rhs = 0;
 
                                        // Then initialize the values and
@@ -699,7 +699,7 @@ MinimizationProblem<dim>::line_search (const Vector<double> &update) const
     {
                                        // At the present location, which is
                                        // ``present_solution+alpha*update'',
-                                       // evaluate the energy"
+                                       // evaluate the energy
       tmp = present_solution;
       tmp.add (alpha, update);
       const double f_a = energy (dof_handler, tmp);

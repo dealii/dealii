@@ -207,7 +207,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 					   // soon as possible
 	};
 
-      M_cell.clear ();
+      M_cell.set_zero ();
       
       for (unsigned int cell=0; cell<nblocks; ++cell)
 	{

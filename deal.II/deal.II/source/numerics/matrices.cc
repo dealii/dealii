@@ -137,7 +137,7 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
     {
       fe_values.reinit (cell);
       
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       cell->get_dof_indices (dof_indices);
       
       if (coefficient != 0)
@@ -325,7 +325,7 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
     {
       fe_values.reinit (cell);
       
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       local_rhs = 0;
       cell->get_dof_indices (dof_indices);
       
@@ -583,7 +583,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
       if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
 	  boundary_functions.end())
 	{
-	  cell_matrix.clear ();
+	  cell_matrix.set_zero ();
 	  cell_vector = 0;
 	  
 	  fe_values.reinit (cell, face);
@@ -959,7 +959,7 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
     {
       fe_values.reinit (cell);
       
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       cell->get_dof_indices (dof_indices);
       
       if (coefficient != 0)
@@ -1150,7 +1150,7 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
     {
       fe_values.reinit (cell);
       
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       local_rhs = 0;
       cell->get_dof_indices (dof_indices);
       

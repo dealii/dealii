@@ -373,6 +373,13 @@ class FullMatrix : public Table<2,number>
 				      * Final iterator of row <tt>r</tt>.
 				      */
     const_iterator end (const unsigned int r) const;
+
+				     /**
+				      * Set all entries to zero, but
+				      * do not change the size of the
+				      * matrix.
+				      */
+    void set_zero ();
     
 				     /**
 				      * Scale the entire matrix by a
@@ -976,6 +983,9 @@ class FullMatrix : public Table<2,number>
     DeclException0 (ExcSourceEqualsDestination);
 
     friend class Accessor;
+
+  private:
+    void clear ();
 };
 
 /*@}*/
@@ -985,7 +995,8 @@ class FullMatrix : public Table<2,number>
 
 
 template <typename number>
-inline unsigned int
+inline
+unsigned int
 FullMatrix<number>::m() const
 {
   return this->n_rows();
@@ -994,11 +1005,23 @@ FullMatrix<number>::m() const
 
 
 template <typename number>
-inline unsigned int
+inline
+unsigned int
 FullMatrix<number>::n() const
 {
   return this->n_cols();
 }
+
+
+
+template <typename number>
+void
+FullMatrix<number>::set_zero ()
+{
+  if (this->n_elements() != 0)
+    std::fill_n (this->val, this->n_elements(), number());
+}
+
 
 
 template <typename number>
@@ -1008,6 +1031,8 @@ void FullMatrix<number>::fill (const number2* src)
 {
   Table<2,number>::fill(src);
 }
+
+
 
 template <typename number>
 template <class MATRIX>

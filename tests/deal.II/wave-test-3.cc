@@ -2413,7 +2413,7 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
       cell->get_dof_values (*this->u, local_u);
       cell->get_dof_values (*this->v, local_v);
 
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       this->density->value_list (fe_values.get_quadrature_points(),
 			   density_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -2426,7 +2426,7 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
 
       total_energy += 1./2. * cell_matrix.matrix_norm_square (local_v);
 
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       this->stiffness->value_list (fe_values.get_quadrature_points(),
 			     stiffness_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -4772,8 +4772,8 @@ FEValues<dim>  fe_values (fe, quadrature,
        cell != dof_handler->end(); ++cell)
     {
       fe_values.reinit (cell);
-      cell_mass_matrix.clear ();
-      cell_laplace_matrix.clear ();
+      cell_mass_matrix.set_zero ();
+      cell_laplace_matrix.set_zero ();
       cell->get_dof_indices (dof_indices_on_cell);
 
       if (!density_constant || !stiffness_constant)
@@ -5280,7 +5280,7 @@ TimeStep_Dual<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &ol
       old_cell->get_dof_values (previous_time_level.u, tmp);
       cell_matrix.vmult (local_M_u, tmp);
 
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       std::vector<double> stiffness_values(fe_values.n_quadrature_points);
       this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					stiffness_values);
@@ -5396,7 +5396,7 @@ TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_
 	  old_child->get_dof_values (previous_time_level.u, local_old_dof_values_u);
 	  old_child->get_dof_values (previous_time_level.v, local_old_dof_values_v);
 
-	  cell_matrix.clear ();
+	  cell_matrix.set_zero ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  this->parameters.density->value_list (fe_values.get_quadrature_points(),
 					  density_values);
@@ -5411,7 +5411,7 @@ TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
 
-	  cell_matrix.clear ();
+	  cell_matrix.set_zero ();
 	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 						stiffness_values);
@@ -5493,7 +5493,7 @@ TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell
       else
 	{
 	  fe_values.reinit (new_child);
-	  cell_matrix.clear ();
+	  cell_matrix.set_zero ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  this->parameters.density->value_list (fe_values.get_quadrature_points(),
 					  density_values);
@@ -5508,7 +5508,7 @@ TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
 
-	  cell_matrix.clear ();
+	  cell_matrix.set_zero ();
 	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					    stiffness_values);
@@ -7030,7 +7030,7 @@ TimeStep_Primal<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &
       old_cell->get_dof_values (previous_time_level.v, tmp);
       cell_matrix.vmult (local_M_v, tmp);
 
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       std::vector<double> stiffness_values(fe_values.n_quadrature_points);
       this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					    stiffness_values);
@@ -7150,7 +7150,7 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 	  old_child->get_dof_values (previous_time_level.u, local_old_dof_values_u);
 	  old_child->get_dof_values (previous_time_level.v, local_old_dof_values_v);
       
-	  cell_matrix.clear ();
+	  cell_matrix.set_zero ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  this->parameters.density->value_list (fe_values.get_quadrature_points(),
 					  density_values);
@@ -7165,7 +7165,7 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
       
-	  cell_matrix.clear ();
+	  cell_matrix.set_zero ();
 
 	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
@@ -7248,7 +7248,7 @@ TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::ce
       else
 	{
 	  fe_values.reinit (new_child);
-	  cell_matrix.clear ();
+	  cell_matrix.set_zero ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  this->parameters.density->value_list (fe_values.get_quadrature_points(),
 					      density_values);
@@ -7263,7 +7263,7 @@ TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::ce
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
 
-	  cell_matrix.clear ();
+	  cell_matrix.set_zero ();
 	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 						stiffness_values);

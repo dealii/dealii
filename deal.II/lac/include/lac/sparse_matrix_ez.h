@@ -411,8 +411,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * to a state just like after
 				      * having called the default
 				      * constructor. It also forgets
-				      * the sparsity pattern it was
-				      * previously tied to.
+				      * its sparsity pattern.
 				      */
     void clear ();
     

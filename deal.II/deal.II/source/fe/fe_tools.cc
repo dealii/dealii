@@ -323,7 +323,7 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 	 ExcMatrixDimensionMismatch(matrix.m(), matrix.n(),
 				    fe2.dofs_per_cell,
 				    fe1.dofs_per_cell));
-  matrix.clear();
+  matrix.set_zero();
   
   unsigned int n1 = fe1.dofs_per_cell;
   unsigned int n2 = fe2.dofs_per_cell;

@@ -1035,7 +1035,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
     {
 				       // First clear old contents of
 				       // the cell contributions...
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       cell_rhs = 0;
 
 				       // ... then initialize

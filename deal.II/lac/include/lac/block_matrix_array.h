@@ -81,7 +81,8 @@ class BlockMatrixArray : public Subscriptor
 		bool transpose = false);
 
 				     /**
-				      * Delete all entries
+				      * Delete all entries, i.e. reset
+				      * the matrix to an empty state.
 				      */
     void clear();
     

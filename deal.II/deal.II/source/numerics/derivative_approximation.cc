@@ -696,14 +696,14 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
       DerivativeDescription::symmetrize (projected_derivative);
       
                                        // compute Y^-1 g
-      typename DerivativeDescription::Derivative derivative;
-      Tensor<2,dim> Y_inverse = invert(Y);
+      const Tensor<2,dim> Y_inverse = invert(Y);
       
+      typename DerivativeDescription::Derivative derivative;
       contract (derivative, Y_inverse, projected_derivative);
 
       *derivative_norm_on_this_cell
 	= DerivativeDescription::derivative_norm (derivative);
-    };
+    }
 }
 
 

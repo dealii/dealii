@@ -214,7 +214,7 @@ void LaplaceProblem<dim>::assemble_system ()
 						 endc = mg_dof_handler.end();
   for (; cell!=endc; ++cell)
     {
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
       cell_rhs = 0;
 
 				       // As before, we want the
@@ -324,7 +324,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 				       // Remember the level of the
 				       // current cell.
       const unsigned int level = cell->level();
-      cell_matrix.clear ();
+      cell_matrix.set_zero ();
 
 				       // Compute the values specified
 				       // by update flags above.
