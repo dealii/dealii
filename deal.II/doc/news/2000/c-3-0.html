@@ -448,7 +448,16 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-       New: The <code class="class">DataOut_Faces</code> allows to
+       Extended: The <code class="class">KellyErrorEstimator</code>
+       class is now able to estimate errors for several solution
+       vectors at the same time, provided they live on the same
+       <code class="class">DoFHandler</code> object.
+       <br>
+       (WB 2000/09/11)
+       </p>       
+
+  <li> <p>
+       New: The <code class="class">DataOut_Faces</code> class allows to
        output faces instead of cells. This might be handy for 3d
        computations if one is only interested in surface plots, or
        cuts through the domain.
