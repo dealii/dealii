@@ -228,15 +228,17 @@
     ======================================================================
     </code></pre>
 
+    <p>
     To execute one of the commands, type `make target-name'. Please
     note that building all libraries in debug and optimized mode
-    presently takes about an hour on a Sun Ultra 450, so you may want
-    to do this during lunchtime. Also, note that building all
+    presently takes about two hours on a Sun Ultra 450 (with 250 MHz),
+    or about one hour on a Pentium III 450 Mhz, so you may want to do
+    this during lunchtime or night. Also, note that building all
     libraries requires 200-250 MB of free disk space (depending on
-    platform). 
+    platform).
+    </p>
 
     <p>
-
     In case you have a multi-processor machine, you can call `make
     PAR=-j4 target-name' to let `make' call multiple instances of the
     compiler (in this case four). Since the make files are written in
@@ -247,9 +249,9 @@
     parallel makes will sometimes fail when compiling the library for
     the first time (this is due to a bug in `make'); in that case,
     simply re-run `make', or run it without `-jN'.
+    </p>
 
     <p>
-
     After `make' has finished, you will have two sets of
     libraries. The first consists of the files
     <ul>
@@ -276,7 +278,9 @@
       for one and three spatial dimensions.
       </p>
     </ul>
+    </p>
 
+    <p>
     For each library, there will also be another library with the
     suffix <code>.g.a</code> instead of <code>.a</code>. The
     difference between the two sets of libraries is the following:
@@ -324,6 +328,7 @@
       they run stable and are used in production mode.
       </p>
     </ul>
+    </p>
 
     <p>
     Apart from the libraries, you should generate the full set of
