@@ -1257,9 +1257,10 @@ class Table<2,T> : public TableBase<2,T>
 
 
 /**
- * A class representing a transpose two-dimensional table, i.e. a
- * matrix of objects (not necessarily only numbers) in column first
- * numbering (FORTRAN convention).
+ * A class representing a transpose two-dimensional table, i.e. a matrix of
+ * objects (not necessarily only numbers) in column first numbering (FORTRAN
+ * convention). The only real difference is therefore really in the storage
+ * format.
  *
  * This class copies the functions of Table<2,T>, but the element
  * access and the dimensions will be for the transpose ordering of the
