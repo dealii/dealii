@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,8 +12,9 @@
 //----------------------------  mapping_q4_3d.cc  ---------------------------
 
 
-// this test used to fail somewhere in the 3d parts of MappingQ for
-// fourth order mappings
+// this test used to fail somewhere in the 3d parts of MappingQ for fourth
+// order mappings. it later turned out that the weird error was simply that
+// something wasn't implemented, which is now the case
 
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
@@ -46,8 +47,13 @@ int main ()
   MappingQ<3> mapping(4);
   QGauss3<2> q_face;
   FEFaceValues<3> fe_face_values (mapping, fe, q_face,
-                                  update_normal_vectors | update_JxW_values);
+                                  update_normal_vectors |
+                                  update_JxW_values);
   fe_face_values.reinit (dof_handler.begin_active(), 0);
+
+                                   // if we got here, we got past the previous
+                                   // abort
+  deallog << "OK" << std::endl;
 }
 
   
