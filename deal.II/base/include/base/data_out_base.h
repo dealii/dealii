@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,10 +53,10 @@ class ParameterHandler;
  * be provided by derived class which have a user callable interface then.
  *
  *
- * @sect3{Interface}
+ * @section DataOutBaseInterface Interface
  * This class has an interface that is not usually called by a user directly;
- * also, it consists of @p{static} functions only. Usually, derived classes will
- * inherit this class @p{protected} to hide this interface to the users of thes
+ * also, it consists of <tt>static</tt> functions only. Usually, derived classes will
+ * inherit this class <tt>protected</tt> to hide this interface to the users of thes
  * classes.
  *
  * The interface of this class basically consists of the declaration of a data
@@ -66,7 +66,7 @@ class ParameterHandler;
  * In addition to the list of patches, a name for each data set may be given.
  *
  *
- * @sect3{Patches}
+ * @subsection DataOutBasePatches Patches
  * Grids can be thought of as a collection of cells; if you want to write out
  * data on such a grid, you can do so by writing them one cell at a time.
  * The functions in this class therefore take a list of objects describing the
@@ -78,38 +78,38 @@ class ParameterHandler;
  * example, you may have higher order elements and printing the values at
  * the vertices only is not enough. For this reason, we not only provide
  * writing the data on the vertices only, but the data is organizes as a
- * tensor product grid on each cell. The parameter @p{n_subdivision}, which is
+ * tensor product grid on each cell. The parameter <tt>n_subdivision</tt>, which is
  * given for each patch separately, denotes how often the cell is to be
- * divided for output; for example, @p{n_subdivisions==1} yields no subdivision
- * of the cell, @p{n_subdivisions==2} will produce a grid of 3 times 3 points
+ * divided for output; for example, <tt>n_subdivisions==1</tt> yields no subdivision
+ * of the cell, <tt>n_subdivisions==2</tt> will produce a grid of 3 times 3 points
  * in two spatial dimensions and 3 times 3 times 3 points in three dimensions,
- * @p{n_subdivisions==2} will yield 4 times 4 (times 4) points, etc. The actual
+ * <tt>n_subdivisions==2</tt> will yield 4 times 4 (times 4) points, etc. The actual
  * location of these points on the patch will be computed by a multilinear
  * transformation from the vertices given for this patch.
  *
  * Given these comments, the actual data to be printed on this patch of
  * points consists of several data sets each of which has a value at each
- * of the patch points. For example with @p{n_subdivisions==2} in two space
+ * of the patch points. For example with <tt>n_subdivisions==2</tt> in two space
  * dimensions, each data set has to provide nine values, and since the
  * patch is to be printed as a tensor product (or its transformation to the
  * real space cell), its values are to be ordered like
- * @p{(x0,y0) (x0,y1) (x0,y2) (x1,y0) (x1,y1) (x1,y2) (x2,y0) (x2,y1) (x2,y2)},
+ * <i>(x0,y0) (x0,y1) (x0,y2) (x1,y0) (x1,y1) (x1,y2) (x2,y0) (x2,y1) (x2,y2)</i>,
  * i.e. the z-coordinate runs fastest, then the y-coordinate, then x (if there
  * are that many space directions).
  *
  *
- * @sect3{Generalized patches}
+ * @subsection DataOutBaseGP Generalized patches
  *
  * In general, the patches as explained above might be too
  * restricted. For example, one might want to draw only the outer
  * faces of a domain in a three-dimensional computation, if one is not
  * interested in what happens inside. Then, the objects that should be
  * drawn are two-dimensional in a three-dimensional world. The
- * @p{Patch} class and associated output functions handle these
- * cases. The @p{Patch} class therefore takes two template parameters,
- * the first, named @p{dim} denoting the dimension of the object (in
+ * Patch class and associated output functions handle these
+ * cases. The Patch class therefore takes two template parameters,
+ * the first, named <tt>dim</tt> denoting the dimension of the object (in
  * the above example, this would be two), while the second, named
- * @p{spacedim}, denotes the dimension of the embedding space (this
+ * <tt>spacedim</tt>, denotes the dimension of the embedding space (this
  * would be three). The corner points of a patch have the dimension of
  * the space, while their number is determined by the dimension of the
  * patch. By default, the second template parameter has the same value
@@ -117,9 +117,9 @@ class ParameterHandler;
  * than a face or something else.
  *
  *
- * @sect2{Supported output formats}
+ * @section DataOutBaseFormats Supported output formats
  *
- * @sect3{OpenDX (IBM Open Visualization Data Explorer}
+ * @subsection DataOutBaseOpenDX OpenDX (IBM Open Visualization Data Explorer}
  *
  * Since Data Explorer (DX) is distributed as OpenSource, there is a
  * well-accessible visualization tool for all (at least Unix-based)
@@ -127,7 +127,7 @@ class ParameterHandler;
  * included.
  *
  * 
- * @sect3{UCD format}
+ * @subsection DataOutBaseUCD AVS UCD format
  *
  * The UCD format is described in the AVS developer's guide. Due to
  * limitations in the present format, only node based data can be output,
@@ -142,7 +142,7 @@ class ParameterHandler;
  * patch to the same value.
  *
  *
- * @sect3{GNUPLOT format}
+ * @subsection DataOutBaseGNUPLOT GNUPLOT format
  *
  * The GNUPLOT format is not able to handle data on unstructured grids
  * directly. Directly would mean that you only give the vertices and
@@ -176,11 +176,11 @@ class ParameterHandler;
  * This command plots data in x- and y-direction unbounded, but in z-direction
  * only those data points which are above the x-y-plane (we assume here a
  * positive solution, if it has negative values, you might want to decrease the
- * lower bound). Furthermore, it only takes the data points with z-values (@p{$3})
- * equal to 0.5, i.e. a cut through the domain at @p{z=0.5}. For the data points
- * on this plane, the data values of the first data set (@p{$4}) are raised in
+ * lower bound). Furthermore, it only takes the data points with z-values (<tt>$3</tt>)
+ * equal to 0.5, i.e. a cut through the domain at <tt>z=0.5</tt>. For the data points
+ * on this plane, the data values of the first data set (<tt>$4</tt>) are raised in
  * z-direction above the x-y-plane; all other points are denoted the value
- * @p{-1} instead of the value of the data vector and are not plotted due to
+ * <tt>-1</tt> instead of the value of the data vector and are not plotted due to
  * the lower bound in z plotting direction, given in the third pair of brackets.
  *
  * Of course, more complex cuts are possible, including nonlinear
@@ -188,7 +188,7 @@ class ParameterHandler;
  * cut-surface are plotted.
  *
  *
- * @sect3{POVRAY format}
+ * @subsection DataOutBasePOVRAY POVRAY format
  *
  * Output in this format creates a povray source file, include standard
  * camera and light source definition for rendering with povray 3.1
@@ -198,15 +198,15 @@ class ParameterHandler;
  * The output uses two different povray-objects:
  *
  * @begin{itemize}
- * @item @p{BICUBIC_PATCH}
- * A @p{bicubic_patch} is a 3-dimensional Bezier patch. It consists of 16 Points
+ * @item <tt>BICUBIC_PATCH</tt>
+ * A <tt>bicubic_patch</tt> is a 3-dimensional Bezier patch. It consists of 16 Points
  * describing the surface. The 4 corner points are touched by the object,
  * while the other 12 points pull and stretch the patch into shape.
- * One @p{bicubic_patch} is generated on each patch. Therefor the number of 
+ * One <tt>bicubic_patch</tt> is generated on each patch. Therefor the number of 
  * subdivisions has to be 3 to provide the patch with 16 points.
  * A bicubic patch is not exact but generates very smooth images.
  *
- * @item @p{MESH}
+ * @item <tt>MESH</tt>
  * The mesh object is used to store large number of triangles.
  * Every square of the patch data is split into one upper-left and one 
  * lower-right triangle. If the number of subdivisions is three, 32 triangle
@@ -219,7 +219,7 @@ class ParameterHandler;
  * All objects get one texture definition called Tex. This texture has to be
  * declared somewhere before the object data. This may be in an external 
  * data file or at the beginning of the output file.
- * Setting the @p{external_data} flag to false, an standard camera, light and
+ * Setting the <tt>external_data</tt> flag to false, an standard camera, light and
  * texture (scaled to fit the scene) is added to the outputfile. Set to true
  * an include file "data.inc" is included. This file is not generated by deal
  * and has to include camera, light and the texture definition Tex.
@@ -233,7 +233,7 @@ class ParameterHandler;
  * included in the povray options.
  *
  *
- * @sect3{EPS format}
+ * @subsection DataOutBaseEPS EPS (encapsulated Postscript<sup>TM</sup> format
  *
  * Output in this format circumvents the use of auxiliary graphic programs
  * converting some output format into a graphics format. This has the advantage
@@ -268,7 +268,7 @@ class ParameterHandler;
  * five digits, to keep picture size at a reasonable size.
  *
  * All parameters along with their default values are listed in the documentation
- * of the @p{EpsFlags} member class of this class. See there for more and detailed
+ * of the <tt>EpsFlags</tt> member class of this class. See there for more and detailed
  * information.
  *
  * Please note that due to the various transformations each patch has to undergo
@@ -276,13 +276,13 @@ class ParameterHandler;
  * of patches.
  *
  *
- * @sect3{GMV format}
+ * @subsection DataOutBaseGMV GMV format
  *
- * The @p{write_gmv} function and the @p{write} function through the @p{gmv} parameter
- * write the data in a format understood by the GMV (general mesh viewer)
- * program. This program is able to generate 2d and 3d plots of almost
- * arbitrarily many data sets, along with shading, cuts through data sets and
- * many other nifty features.
+ * The write_gmv() function writes the data in a format understood by
+ * the GMV (general mesh viewer) program. This program is able to
+ * generate 2d and 3d plots of almost arbitrarily many data sets,
+ * along with shading, cuts through data sets and many other nifty
+ * features.
  *
  * Data is written in the following format: nodes are considered the points
  * of the patches. In spatial dimensions less than three, zeroes are
@@ -291,39 +291,43 @@ class ParameterHandler;
  * (bi-,tri-)linear elements.
  *
  *
- * @sect3{Tecplot format}
+ * @subsection DataOutBaseTecplot Tecplot format
  *
- * The @p{write_tecplot} function and the @p{write} function through the @p{tecplot}
- * parameter write the data in the Tecplot @url{http://www.amtec.com} FEBLOCK format. The
- * program supports 1, 2, and 3D data and has features such as contouring, slicing,
- * drawing streamlines, and animation. Patches are written as a collection of
- * quadrilaterals in 2D or bricks in 3D, with the nodal values interpolated to
- * (bi-,tri-) linear elements. These functions will write Tecplot ASCII formatted files.
+ * The write_tecplot() function writes the data in <a
+ * href="http://www.amtec.com">Tecplot</a> FEBLOCK format. The program
+ * supports 1, 2, and 3D data and has features such as contouring,
+ * slicing, drawing streamlines, and animation. Patches are written as
+ * a collection of quadrilaterals in 2D or bricks in 3D, with the
+ * nodal values interpolated to (bi-,tri-) linear elements. These
+ * functions will write Tecplot ASCII formatted files.
  * 
- * Additionally, Tecplot binary output is supported through the @p{write_tecplot_binary}
- * and the @p{write} function through the @p{tecplot_binary} parameter.  For this to work
- * properly @p{./configure} checks for the Tecplot API at build time. To write Tecplot binary
- * files directly make sure that the TECHOME environment variable points to the
- * Tecplot installation directory, and that the files $TECHOME/include/TECIO.h
- * and $TECHOME/lib/tecio.a are readable.  If these files are not availabe (or in the
- * case of 1D) @p{write_tecplot_binary} will simply call @p{write_tecplot} and thus larger
- * ASCII data files will be produced rather than more efficient Tecplot binary files.
- * For more information consult the Tecplot Users and Reference manuals.
+ * Additionally, Tecplot binary output is supported through
+ * write_tecplot_binary().  For this to work properly
+ * <tt>./configure</tt> checks for the Tecplot API at build time. To
+ * write Tecplot binary files directly make sure that the TECHOME
+ * environment variable points to the Tecplot installation directory,
+ * and that the files @$TECHOME/include/TECIO.h and
+ * @$TECHOME/lib/tecio.a are readable.  If these files are not
+ * availabe (or in the case of 1D) <tt>write_tecplot_binary</tt> will
+ * simply call <tt>write_tecplot</tt> and thus larger ASCII data files
+ * will be produced rather than more efficient Tecplot binary files.
+ * For more information consult the Tecplot Users and Reference
+ * manuals.
  *
  *
  *
- * @sect3{VTK format}
+ * @subsection DataOutBaseVTK VTK format
  *
- * This is the file format used by the Visualization Toolkit (VTK, see
- * @url{http://www.kitware.com/vtk.html}), as
- * described in their manual, section 14.3. It is similar to the GMV
- * format, see there for more information.
+ * This is the file format used by the Visualization Toolkit <a
+ * href="http://www.kitware.com/vtk.html">VTK</a>, as described in
+ * their manual, section 14.3. It is similar to the GMV format, see
+ * there for more information.
  *
  *
- * @sect2{Output parameters}
+ * @section DataOutBaseOP Output parameters
  *
- * All functions take a parameter which is a structure of type @p{XFlags}, where
- * @p{X} is the name of the output format. To find out what flags are presently
+ * All functions take a parameter which is a structure of type <tt>XFlags</tt>, where
+ * <tt>X</tt> is the name of the output format. To find out what flags are presently
  * supported, read the documentation of the different structures.
  *
  * Note that usually the output formats used for scientific visualization
@@ -344,17 +348,17 @@ class DataOutBase
   public:
 				     /**
 				      * Data structure describing a
-				      * patch of data in @p{dim} space
+				      * patch of data in <tt>dim</tt> space
 				      * dimensions. See the general
 				      * documentation of the
-				      * @p{DataOutBase} class for more
+				      * <tt>DataOutBase</tt> class for more
 				      * information on its contents
 				      * and purposes.  In the case of
 				      * two dimensions, the next
 				      * picture ist an example of
-				      * @p{n_subdivision} = 4 because
+				      * <tt>n_subdivision</tt> = 4 because
 				      * the number of cells is
-				      * equal to @p{2^dim}.
+				      * equal to <tt>2^dim</tt>.
 				      * @begin{verbatim}
 				      *  __ __ __ __
 				      * |  |  |  |  |
@@ -409,9 +413,9 @@ class DataOutBase
 					 /**
 					  * Number of subdivisions with
 					  * which this patch is to be
-					  * written. @p{1} means no
-					  * subdivision, @p{2} means
-					  * bisection, @p{3} trisection,
+					  * written. <tt>1</tt> means no
+					  * subdivision, <tt>2</tt> means
+					  * bisection, <tt>3</tt> trisection,
 					  * etc.
 					  */
 	unsigned int n_subdivisions;
@@ -419,36 +423,36 @@ class DataOutBase
 					 /**
 					  * Data vectors. The format is
 					  * as follows:
-					  * @p{data(i,.)} denotes the data
-					  * belonging to the @p{i}th data
-					  * vector. @p{data.n()}
+					  * <tt>data(i,.)</tt> denotes the data
+					  * belonging to the <tt>i</tt>th data
+					  * vector. <tt>data.n()</tt>
 					  * therefore equals the number
 					  * of output points; this
-					  * number is @p{(subdivisions+1)^{dim}}.
-					  * @p{data.m()} equals the number of
+					  * number is <tt>(subdivisions+1)^{dim</tt>}.
+					  * <tt>data.m()</tt> equals the number of
 					  * data vectors.
 					  *
 					  * Within each column,
-					  * @p{data(.,j)} are the data
+					  * <tt>data(.,j)</tt> are the data
 					  * values at the output point
-					  * @p{j}, where @p{j} runs first
+					  * <tt>j</tt>, where <tt>j</tt> runs first
 					  * over the last direction,
 					  * then over the second last
 					  * one etc, just as if it was
 					  * organized as an array
-					  * @p{double[x][y][z]}. This is
+					  * <tt>double[x][y][z]</tt>. This is
 					  * also the order of points
 					  * as provided by the
-					  * @p{QIterated} class when
-					  * used with the @p{QTrapez}
+					  * <tt>QIterated</tt> class when
+					  * used with the <tt>QTrapez</tt>
 					  * class as subquadrature.
 					  * Note that if
-					  * @p{subdivisions==1}, the
-					  * elements of @p{data[i]}
+					  * <tt>subdivisions==1</tt>, the
+					  * elements of <tt>data[i]</tt>
 					  * correspond to vertices
-					  * @p{(0,1)} in 1d, 
-					  * @p{(0, 3, 1,2)} in 2d, and 
-					  * @p{(0, 4, 3, 7, 1, 5, 2, 6)}
+					  * <tt>(0,1)</tt> in 1d, 
+					  * <tt>(0, 3, 1,2)</tt> in 2d, and 
+					  * <tt>(0, 4, 3, 7, 1, 5, 2, 6)</tt>
 					  * in 3d as following:
 					  * @begin{verbatim}
 					  *  
@@ -464,8 +468,8 @@ class DataOutBase
 					  * @end{verbatim}
 					  * 
 					  * For exemple in 2d: If
-					  * @p{subdivisions==2} the
-					  * elements of @p{data[i]} are
+					  * <tt>subdivisions==2</tt> the
+					  * elements of <tt>data[i]</tt> are
 					  * given by the following
 					  * numeration:
 					  *
@@ -483,7 +487,7 @@ class DataOutBase
 					  *
 					  * Since the number of data vectors
 					  * is usually the same for all
-					  * patches to be printed, @p{data.size()}
+					  * patches to be printed, <tt>data.size()</tt>
 					  * should yield the same value for all
 					  * patches provided.
 					  */
@@ -491,7 +495,7 @@ class DataOutBase
 	
 					 /**
 					  * Default constructor. Sets
-					  * @p{n_subdivisions} to one.
+					  * <tt>n_subdivisions</tt> to one.
 					  */
 	Patch ();
 
@@ -504,7 +508,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{std::map} type with a
+					  * STL <tt>std::map</tt> type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -564,7 +568,7 @@ class DataOutBase
 
 					 /**
 					  * Read the parameters declared in
-					  * @p{declare_parameters} and set the
+					  * <tt>declare_parameters</tt> and set the
 					  * flags for this output format
 					  * accordingly.
 					  *
@@ -598,7 +602,7 @@ class DataOutBase
 					  * by this, so you can switch it off
 					  * this way.
 					  *
-					  * Default: @p{true}.
+					  * Default: <tt>true</tt>.
 					  */
 	bool write_preamble;
 	
@@ -616,7 +620,7 @@ class DataOutBase
 
 					 /**
 					  * Read the parameters declared in
-					  * @p{declare_parameters} and set the
+					  * <tt>declare_parameters</tt> and set the
 					  * flags for this output format
 					  * accordingly.
 					  *
@@ -634,7 +638,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{std::map} type with a
+					  * STL <tt>std::map</tt> type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -658,7 +662,7 @@ class DataOutBase
 					  * structure. Remove this member
 					  * when adding the first flag to
 					  * this structure (and remove the
-					  * @p{private} as well).
+					  * <tt>private</tt> as well).
 					  */
 	int dummy;
 
@@ -672,7 +676,7 @@ class DataOutBase
 
 					 /**
 					  * Read the parameters declared in
-					  * @p{declare_parameters} and set the
+					  * <tt>declare_parameters</tt> and set the
 					  * flags for this output format
 					  * accordingly.
 					  *
@@ -690,7 +694,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{std::map} type with a
+					  * STL <tt>std::map</tt> type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -751,7 +755,7 @@ class DataOutBase
 
 					 /**
 					  * Read the parameters declared in
-					  * @p{declare_parameters} and set the
+					  * <tt>declare_parameters</tt> and set the
 					  * flags for this output format
 					  * accordingly.
 					  *
@@ -769,7 +773,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{std::map} type with a
+					  * STL <tt>std::map</tt> type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -793,7 +797,7 @@ class DataOutBase
 					  * for generating the height
 					  * information. By default, the
 					  * first data vector is taken,
-					  * i.e. @p{height_vector==0}, if
+					  * i.e. <tt>height_vector==0</tt>, if
 					  * there is any data vector. If there
 					  * is no data vector, no height
 					  * information is generated.
@@ -804,23 +808,26 @@ class DataOutBase
 					  * Number of the vector which is
 					  * to be taken to colorize cells.
 					  * The same applies as for
-					  * @p{height_vector}.
+					  * <tt>height_vector</tt>.
 					  */
 	unsigned int color_vector;
 	
 					 /**
 					  * Enum denoting the possibilities
 					  * whether the scaling should be done
-					  * such that the given @p{size} equals
+					  * such that the given <tt>size</tt> equals
 					  * the width or the height of
 					  * the resulting picture.
 					  */
 	enum SizeType {
-	      width, height
+					       /// Scale to given width
+	      width,
+					       /// Scale to given height
+	      height
 	};
 
 					 /**
-					  * See above. Default is @p{width}.
+					  * See above. Default is <tt>width</tt>.
 					  */
 	SizeType size_type;
 	
@@ -831,7 +838,7 @@ class DataOutBase
 					  * strange unit 1/72 inch. Whether
 					  * this is height or width is
 					  * specified by the flag
-					  * @p{size_type}.
+					  * <tt>size_type</tt>.
 					  *
 					  * Default is 300, which represents
 					  * a size of roughly 10 cm.
@@ -899,7 +906,7 @@ class DataOutBase
 					  * mountainous area" in the opposite
 					  * case.
 					  *
-					  * Default is @p{1.0}.
+					  * Default is <tt>1.0</tt>.
 					  */
 	double z_scaling;
 
@@ -909,7 +916,7 @@ class DataOutBase
 					  * parts of each patch) are to be
 					  * plotted.
 					  *
-					  * Default: @p{true}.
+					  * Default: <tt>true</tt>.
 					  */
 	bool   draw_mesh;
 
@@ -924,31 +931,31 @@ class DataOutBase
 					  * the background by cells in the
 					  * foreground.
 					  *
-					  * If this flag is @p{false} and @p{draw_mesh}
-					  * is @p{false} as well, nothing will be
+					  * If this flag is <tt>false</tt> and <tt>draw_mesh</tt>
+					  * is <tt>false</tt> as well, nothing will be
 					  * printed.
 					  *
-					  * If this flag is @p{true}, then the cells
+					  * If this flag is <tt>true</tt>, then the cells
 					  * will be drawn either colored by one
-					  * of the data sets (if @p{shade_cells} is
-					  * @p{true}), or pure white (if
-					  * @p{shade_cells} is false or if there are
+					  * of the data sets (if <tt>shade_cells</tt> is
+					  * <tt>true</tt>), or pure white (if
+					  * <tt>shade_cells</tt> is false or if there are
 					  * no data sets).
 					  *
-					  * Default is @p{true}.
+					  * Default is <tt>true</tt>.
 					  */
 	bool   draw_cells;
 
 					 /**
 					  * Flag to determine whether the cells
 					  * shall be colorized by the data
-					  * set denoted by @p{color_vector}, or
+					  * set denoted by <tt>color_vector</tt>, or
 					  * simply be painted in white. This
 					  * flag only makes sense if
-					  * @p{draw_cells==true}. Colorization is
-					  * done through the @p{color_function}.
+					  * <tt>draw_cells==true</tt>. Colorization is
+					  * done through the <tt>color_function</tt>.
 					  *
-					  * Default is @p{true}.
+					  * Default is <tt>true</tt>.
 					  */
 	bool   shade_cells;
 
@@ -963,7 +970,7 @@ class DataOutBase
 	    float blue;
 
 					     /**
-					      * Return @p{true} if the
+					      * Return <tt>true</tt> if the
 					      * color represented by
 					      * the three color values
 					      * is a grey scale,
@@ -992,7 +999,7 @@ class DataOutBase
 					  * This is a pointer to the function
 					  * which is used to colorize the cells.
 					  * By default, it points to the
-					  * static function @p{default_color_function}
+					  * static function <tt>default_color_function</tt>
 					  * which is a member of this class.
 					  */
 	ColorFunction color_function;
@@ -1021,7 +1028,7 @@ class DataOutBase
 					  * between black (lowest values)
 					  * and white (highest values). You
 					  * may use it by setting the
-					  * @p{color_function} variable to the
+					  * <tt>color_function</tt> variable to the
 					  * address of this function.
 					  */
 	static RgbValues
@@ -1039,7 +1046,7 @@ class DataOutBase
 					  * reversed to the previous
 					  * one. You may use it by
 					  * setting the
-					  * @p{color_function}
+					  * <tt>color_function</tt>
 					  * variable to the address of
 					  * this function.
 					  */
@@ -1077,7 +1084,7 @@ class DataOutBase
 
 					 /**
 					  * Read the parameters declared in
-					  * @p{declare_parameters} and set the
+					  * <tt>declare_parameters</tt> and set the
 					  * flags for this output format
 					  * accordingly.
 					  *
@@ -1095,7 +1102,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{std::map} type with a
+					  * STL <tt>std::map</tt> type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -1119,7 +1126,7 @@ class DataOutBase
 					  * structure. Remove this member
 					  * when adding the first flag to
 					  * this structure (and remove the
-					  * @p{private} as well).
+					  * <tt>private</tt> as well).
 					  */
 	int dummy;
 
@@ -1133,7 +1140,7 @@ class DataOutBase
 
 					 /**
 					  * Read the parameters declared in
-					  * @p{declare_parameters} and set the
+					  * <tt>declare_parameters</tt> and set the
 					  * flags for this output format
 					  * accordingly.
 					  *
@@ -1151,7 +1158,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{std::map} type with a
+					  * STL <tt>std::map</tt> type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -1196,7 +1203,7 @@ class DataOutBase
 
 					 /**
 					  * Read the parameters declared in
-					  * @p{declare_parameters} and set the
+					  * <tt>declare_parameters</tt> and set the
 					  * flags for this output format
 					  * accordingly.
 					  *
@@ -1214,7 +1221,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{std::map} type with a
+					  * STL <tt>std::map</tt> type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -1239,7 +1246,7 @@ class DataOutBase
 					  * structure. Remove this member
 					  * when adding the first flag to
 					  * this structure (and remove the
-					  * @p{private} as well).
+					  * <tt>private</tt> as well).
 					  */
 	int dummy;
 
@@ -1253,7 +1260,7 @@ class DataOutBase
 
 					 /**
 					  * Read the parameters declared in
-					  * @p{declare_parameters} and set the
+					  * <tt>declare_parameters</tt> and set the
 					  * flags for this output format
 					  * accordingly.
 					  *
@@ -1271,7 +1278,7 @@ class DataOutBase
 					  * not be determined exactly
 					  * (for example: what is the
 					  * memory consumption of an
-					  * STL @p{std::map} type with a
+					  * STL <tt>std::map</tt> type with a
 					  * certain number of
 					  * elements?), this is only
 					  * an estimate. however often
@@ -1377,7 +1384,7 @@ class DataOutBase
 				      * to the output stream in Tecplot
 				      * binary format. See the general
 				      * documentation for more information
-				      * on the parameters. @p{tecplot_binary_file_name}
+				      * on the parameters. <tt>tecplot_binary_file_name</tt>
 				      * (specified through the TecplotFlags
 				      * struct) indicates the name of the file
 				      * to be written.  If the file name is not
@@ -1415,7 +1422,7 @@ class DataOutBase
 				      * not be determined exactly
 				      * (for example: what is the
 				      * memory consumption of an
-				      * STL @p{std::map} type with a
+				      * STL <tt>std::map</tt> type with a
 				      * certain number of
 				      * elements?), this is only
 				      * an estimate. however often
@@ -1498,7 +1505,7 @@ class DataOutBase
 					  * Data value from which the actual
 					  * colors will be computed by
 					  * the colorization function stated
-					  * in the @p{EpsFlags} class.
+					  * in the <tt>EpsFlags</tt> class.
 					  */
 	float color_value;
 	
@@ -1520,7 +1527,7 @@ class DataOutBase
 
 				     /**
 				      * This is a helper function for
-				      * the @p{write_gmv}
+				      * the <tt>write_gmv</tt>
 				      * function. There, the data in
 				      * the patches needs to be copied
 				      * around as output is one
@@ -1549,14 +1556,14 @@ class DataOutBase
 
 
 /**
- * This class is the interface to the @p{DataOutBase} class, as already its name
+ * This class is the interface to the <tt>DataOutBase</tt> class, as already its name
  * might suggest. It does not offer much functionality apart from a way to
  * access the implemented formats and a way to dynamically dispatch what output
  * format to chose.
  *
  * This class is thought as a base class to classes actually
  * generating data for output. It has two abstract virtual functions,
- * @p{get_patches} and @p{get_dataset_names} which are to produce the data
+ * <tt>get_patches</tt> and <tt>get_dataset_names</tt> which are to produce the data
  * which is actually needed. These are the only functions that need to
  * be overloaded by a derived class.  In additional to that, it has a
  * function for each output format supported by the underlying base
@@ -1570,41 +1577,41 @@ class DataOutBase
  * the abstract interface to derived classes briefly discussed above.
  *
  *
- * @sect3{Output flags}
+ * @section DataOutInterfaceOF Output flags
  *
  * The way we treat flags in this class is very similar to that used in
- * the @p{GridOut} class. For detailed information on the why's and how's,
+ * the <tt>GridOut</tt> class. For detailed information on the why's and how's,
  * as well as an example of programming, we refer to the documentation
  * of that class.
  *
  * In basics, this class stores a set of flags for each output format
- * supported by the underlying @p{DataOutBase} class. These are used
- * whenever one of the @p{write_*} functions is used. By default, the
+ * supported by the underlying <tt>DataOutBase</tt> class. These are used
+ * whenever one of the <tt>write_*</tt> functions is used. By default, the
  * values of these flags are set to reasonable start-ups, but in case
  * you want to change them, you can create a structure holding the flags
- * for one of the output formats and set it using the @p{set_flags} functions
+ * for one of the output formats and set it using the <tt>set_flags</tt> functions
  * of this class to determine all future output the object might produce
  * by that output format.
  *
  * For information on what parameters are supported by different output
- * functions, please see the documentation of the @p{DataOutBase} class and
+ * functions, please see the documentation of the <tt>DataOutBase</tt> class and
  * its member classes.
  *
  *
- * @sect2{Run time selection of output parameters}
+ * @section DataOutInterfaceSelectP Run time selection of output parameters
  *
  * In the output flags classes, described above, many flags are
  * defined for output in the different formats. In order to make them
- * available to the input file handler class @p{ParameterHandler}, each
+ * available to the input file handler class <tt>ParameterHandler</tt>, each
  * of these has a function declaring these flags to the parameter
  * handler and to read them back from an actual input file. In order
  * to avoid that in user programs these functions have to be called
  * for each available output format and the respective flag class, the
- * present @p{DataOut_Interface} class offers a function
- * @p{declare_parameters} which calls the respective function of all
+ * present <tt>DataOut_Interface</tt> class offers a function
+ * <tt>declare_parameters</tt> which calls the respective function of all
  * known output format flags classes. The flags of each such format
  * are packed together in a subsection in the input file.
- * Likewise, there is a function @p{parse_parameters} which reads
+ * Likewise, there is a function <tt>parse_parameters</tt> which reads
  * these parameters and stores them in the flags associated with
  * this object (see above).
  * 
@@ -1612,7 +1619,7 @@ class DataOutBase
  * presently implemented.
  *
  * Usage is as follows:
- * @begin{verbatim}
+ * @code
  *                               // within function declaring parameters:
  *   ...
  *   prm.enter_subsection ("Output format options");
@@ -1628,24 +1635,24 @@ class DataOutBase
  *   out.parse_parameters (prm);
  *   prm.leave_subsection ();
  *   ...
- * @end{verbatim}
- * Note that in the present example, the class @p{DataOut} was used. However, any
- * other class derived from @p{DataOut_Interface} would work alike.
+ * @endcode
+ * Note that in the present example, the class <tt>DataOut</tt> was used. However, any
+ * other class derived from <tt>DataOut_Interface</tt> would work alike.
  *
  *
- * @sect3{Run time selection of formats}
+ * @section DataOutInterfaceSelectF Run time selection of formats
  *
- * This class, much like the @p{GridOut} class, has a set of functions
- * providing a list of supported output formats, an @p{enum} denoting
+ * This class, much like the <tt>GridOut</tt> class, has a set of functions
+ * providing a list of supported output formats, an <tt>enum</tt> denoting
  * all these and a function to parse a string and return the respective
- * @p{enum} value if it is a valid output format's name. Finally, there
- * is a function @p{write}, which takes a value of this @p{enum} and
- * dispatches to one of the actual @p{write_*} functions depending on
+ * <tt>enum</tt> value if it is a valid output format's name. Finally, there
+ * is a function <tt>write</tt>, which takes a value of this <tt>enum</tt> and
+ * dispatches to one of the actual <tt>write_*</tt> functions depending on
  * the output format selected by this value. 
  *
  * The functions offering the different output format names are,
- * respectively, @p{default_suffix}, @p{parse_output_format}, and
- * @p{get_output_format_names}. They make the selection of ouput formats
+ * respectively, <tt>default_suffix</tt>, <tt>parse_output_format</tt>, and
+ * <tt>get_output_format_names</tt>. They make the selection of ouput formats
  * in parameter files much easier, and especially independent of
  * the formats presently implemented. User programs need therefore not
  * be changed whenever a new format is implemented.
@@ -1653,9 +1660,9 @@ class DataOutBase
  * Additionally, objects of this class have a default format, which
  * can be set by the parameter "Output format" of the parameter
  * file. Within a program, this can be changed by the member function
- * @p{set_default_format}. Using this default format, it is possible to leave
+ * <tt>set_default_format</tt>. Using this default format, it is possible to leave
  * the format selection completely to the parameter file. A suitable
- * suffix for the output file name can be obtained by @p{default_suffix}
+ * suffix for the output file name can be obtained by <tt>default_suffix</tt>
  * without arguments.
  *
  * @author Wolfgang Bangerth, 1999
@@ -1716,48 +1723,48 @@ class DataOutInterface : private DataOutBase
 
 				     /**
 				      * Obtain data through the
-				      * @p{get_patches} function and
-				      * write it to @p{out} in OpenDX
+				      * <tt>get_patches</tt> function and
+				      * write it to <tt>out</tt> in OpenDX
 				      * format.
 				      */
     void write_dx (std::ostream &out) const;
 
 				     /**
 				      * Obtain data through the
-				      * @p{get_patches} function and
-				      * write it to @p{out} in UCD
+				      * <tt>get_patches</tt> function and
+				      * write it to <tt>out</tt> in UCD
 				      * format.
 				      */
     void write_ucd (std::ostream &out) const;
 
 				     /**
 				      * Obtain data through the
-				      * @p{get_patches} function and
-				      * write it to @p{out} in GNUPLOT
+				      * <tt>get_patches</tt> function and
+				      * write it to <tt>out</tt> in GNUPLOT
 				      * format.
 				      */
     void write_gnuplot (std::ostream &out) const;
 
     				     /**
 				      * Obtain data through the
-				      * @p{get_patches} function and
-				      * write it to @p{out} in POVRAY
+				      * <tt>get_patches</tt> function and
+				      * write it to <tt>out</tt> in POVRAY
 				      * format.
 				      */
     void write_povray (std::ostream &out) const;
 
 				     /**
 				      * Obtain data through the
-				      * @p{get_patches} function and
-				      * write it to @p{out} in EPS
+				      * <tt>get_patches</tt> function and
+				      * write it to <tt>out</tt> in EPS
 				      * format.
 				      */
     void write_eps (std::ostream &out) const;
 
     				     /**
 				      * Obtain data through the
-				      * @p{get_patches} function and
-				      * write it to @p{out} in GMV
+				      * <tt>get_patches</tt> function and
+				      * write it to <tt>out</tt> in GMV
 				      * format.
 				      */
     void write_gmv (std::ostream &out) const;
@@ -1765,15 +1772,15 @@ class DataOutInterface : private DataOutBase
 
     				     /**
 				      * Obtain data through the
-				      * @p{get_patches} function and
-				      * write it to @p{out} in Tecplot
+				      * <tt>get_patches</tt> function and
+				      * write it to <tt>out</tt> in Tecplot
 				      * format.
 				      */
     void write_tecplot (std::ostream &out) const;
 
     				     /**
 				      * Obtain data through the
-				      * @p{get_patches} function and
+				      * <tt>get_patches</tt> function and
 				      * write it in the Tecplot binary
 				      * output format. Note that the name
 				      * of the output file must be specified
@@ -1783,25 +1790,25 @@ class DataOutInterface : private DataOutBase
 
     				     /**
 				      * Obtain data through the
-				      * @p{get_patches} function and
-				      * write it to @p{out} in Vtk
+				      * <tt>get_patches</tt> function and
+				      * write it to <tt>out</tt> in Vtk
 				      * format.
 				      */
     void write_vtk (std::ostream &out) const;
 
 				     /**
-				      * Write data and grid to @p{out}
+				      * Write data and grid to <tt>out</tt>
 				      * according to the given data
 				      * format. This function simply
 				      * calls the appropriate
-				      * @p{write_*} function. If no
+				      * <tt>write_*</tt> function. If no
 				      * output format is requested,
-				      * the @p{default_format} is
+				      * the <tt>default_format</tt> is
 				      * written.
 				      *
 				      * An error occurs if no format
 				      * is provided and the default
-				      * format is @p{default_format}.
+				      * format is <tt>default_format</tt>.
 				      */
     void write (std::ostream       &out,
 		const OutputFormat  output_format = default_format) const;
@@ -1810,7 +1817,7 @@ class DataOutInterface : private DataOutBase
 				      * Set the default format. The
 				      * value set here is used
 				      * anytime, output for format
-				      * @p{default_format} is
+				      * <tt>default_format</tt> is
 				      * requested.
 				      */
     void set_default_format (const OutputFormat default_format);
@@ -1870,25 +1877,25 @@ class DataOutInterface : private DataOutBase
 				      * usually has. At present the following
 				      * formats are defined:
 				      * @begin{itemize}
-				      * @item @p{dx}: @p{.dx}
-				      * @item @p{ucd}: @p{.inp}
-				      * @item @p{gnuplot}: @p{.gnuplot}
-				      * @item @p{povray}: @p{.pov}
-				      * @item @p{eps}: @p{.eps}
-				      * @item @p{gmv}: @p{.gmv}
-				      * @item @p{vtk}: @p{.vtk}.
+				      * @item <tt>dx</tt>: <tt>.dx</tt>
+				      * @item <tt>ucd</tt>: <tt>.inp</tt>
+				      * @item <tt>gnuplot</tt>: <tt>.gnuplot</tt>
+				      * @item <tt>povray</tt>: <tt>.pov</tt>
+				      * @item <tt>eps</tt>: <tt>.eps</tt>
+				      * @item <tt>gmv</tt>: <tt>.gmv</tt>
+				      * @item <tt>vtk</tt>: <tt>.vtk</tt>.
 				      * @end{itemize}
 				      *
 				      * If this function is called
 				      * with no argument or
-				      * @p{default_format}, the suffix
-				      * for the @p{default_format} is
+				      * <tt>default_format</tt>, the suffix
+				      * for the <tt>default_format</tt> is
 				      * returned.
 				      */
     std::string default_suffix (const OutputFormat output_format = default_format) const;
 
 				     /**
-				      * Return the @p{OutputFormat}
+				      * Return the <tt>OutputFormat</tt>
 				      * value corresponding to the
 				      * given string. If the string
 				      * does not match any known
@@ -1910,10 +1917,9 @@ class DataOutInterface : private DataOutBase
 				      * To get a list of presently
 				      * available format names,
 				      * e.g. to give it to the
-				      * @p{ParameterHandler} class,
+				      * ParameterHandler class,
 				      * use the function
-				      * @p{get_output_format_names
-				      * ()}.
+				      * get_output_format_names().
 				      */
     static OutputFormat parse_output_format (const std::string &format_name);
 
@@ -1921,9 +1927,9 @@ class DataOutInterface : private DataOutBase
 				      * Return a list of implemented
 				      * output formats. The different
 				      * names are separated by
-				      * vertical bar signs (@p{`|'})
+				      * vertical bar signs (<tt>`|'</tt>)
 				      * as used by the
-				      * @p{ParameterHandler} classes.
+				      * ParameterHandler classes.
 				      */
     static std::string get_output_format_names ();
 
@@ -1933,7 +1939,7 @@ class DataOutInterface : private DataOutBase
 				      * subsections within the
 				      * parameter file for each output
 				      * format and call the respective
-				      * @p{declare_parameters}
+				      * <tt>declare_parameters</tt>
 				      * functions of the flag classes
 				      * for each output format.
 				      *
@@ -1957,7 +1963,7 @@ class DataOutInterface : private DataOutBase
 
 				     /**
 				      * Read the parameters declared
-				      * in @p{declare_parameters} and
+				      * in <tt>declare_parameters</tt> and
 				      * set the flags for the output
 				      * formats accordingly.
 				      *
@@ -1965,7 +1971,7 @@ class DataOutInterface : private DataOutBase
 				      * overwrite all previous
 				      * contents of the flag objects
 				      * as default-constructed or set
-				      * by the @p{set_flags} function.
+				      * by the set_flags() function.
 				      */
     void parse_parameters (ParameterHandler &prm);
     
@@ -1978,7 +1984,7 @@ class DataOutInterface : private DataOutBase
 				      * not be determined exactly
 				      * (for example: what is the
 				      * memory consumption of an
-				      * STL @p{std::map} type with a
+				      * STL <tt>std::map</tt> type with a
 				      * certain number of
 				      * elements?), this is only
 				      * an estimate. however often
@@ -1997,9 +2003,9 @@ class DataOutInterface : private DataOutBase
 				      * This is the abstract function
 				      * through which derived classes
 				      * propagate preprocessed data in
-				      * the form of @p{Patch}
+				      * the form of Patch
 				      * structures (declared in the
-				      * base class @p{DataOutBase}) to
+				      * base class DataOutBase) to
 				      * the actual output
 				      * function. You need to overload
 				      * this function to allow the
@@ -2024,7 +2030,7 @@ class DataOutInterface : private DataOutBase
 				      * this format, if output format
 				      * default_format is
 				      * requested. It can be changed
-				      * by the @p{set_format} function
+				      * by the <tt>set_format</tt> function
 				      * or in a parameter file.
 				      */
     OutputFormat default_fmt;
@@ -2032,7 +2038,7 @@ class DataOutInterface : private DataOutBase
 				     /**
 				      * Flags to be used upon output
 				      * of OpenDX data. Can be changed by
-				      * using the @p{set_flags}
+				      * using the <tt>set_flags</tt>
 				      * function.
 				      */
     DXFlags     dx_flags;
@@ -2040,7 +2046,7 @@ class DataOutInterface : private DataOutBase
 				     /**
 				      * Flags to be used upon output
 				      * of UCD data. Can be changed by
-				      * using the @p{set_flags}
+				      * using the <tt>set_flags</tt>
 				      * function.
 				      */
     UcdFlags     ucd_flags;
@@ -2049,14 +2055,14 @@ class DataOutInterface : private DataOutBase
 				      * Flags to be used upon output
 				      * of GNUPLOT data. Can be
 				      * changed by using the
-				      * @p{set_flags} function.
+				      * <tt>set_flags</tt> function.
 				      */
     GnuplotFlags gnuplot_flags;
 
     				     /**
 				      * Flags to be used upon output
 				      * of POVRAY data. Can be changed
-				      * by using the @p{set_flags}
+				      * by using the <tt>set_flags</tt>
 				      * function.
 				      */
     PovrayFlags povray_flags;
@@ -2065,7 +2071,7 @@ class DataOutInterface : private DataOutBase
 				      * Flags to be used upon output
 				      * of EPS data in one space
 				      * dimension. Can be changed by
-				      * using the @p{set_flags}
+				      * using the <tt>set_flags</tt>
 				      * function.
 				      */
     EpsFlags     eps_flags;    
@@ -2074,7 +2080,7 @@ class DataOutInterface : private DataOutBase
 				      * Flags to be used upon output
 				      * of gmv data in one space
 				      * dimension. Can be changed by
-				      * using the @p{set_flags}
+				      * using the <tt>set_flags</tt>
 				      * function.
 				      */
     GmvFlags     gmv_flags;
@@ -2083,7 +2089,7 @@ class DataOutInterface : private DataOutBase
 				      * Flags to be used upon output
 				      * of Tecplot data in one space
 				      * dimension. Can be changed by
-				      * using the @p{set_flags}
+				      * using the <tt>set_flags</tt>
 				      * function.
 				      */
     TecplotFlags tecplot_flags;
@@ -2092,7 +2098,7 @@ class DataOutInterface : private DataOutBase
 				      * Flags to be used upon output
 				      * of vtk data in one space
 				      * dimension. Can be changed by
-				      * using the @p{set_flags}
+				      * using the <tt>set_flags</tt>
 				      * function.
 				      */
     VtkFlags     vtk_flags;
