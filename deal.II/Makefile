@@ -215,9 +215,7 @@ build-test:
 	echo BUILDTESTNOTE=$(BUILDTESTNOTE)        | tee -a build-test-log
 	(./configure $(BUILDTESTFLAGS) 2>&1) > build-test-config
 	if test -f common/Make.global_options ; then \
-	   grep GXX-VERSION-DETAILED common/Make.global_options ; \
-	   grep CC-VERSION common/Make.global_options ; \
-	   grep F77-VERSION common/Make.global_options ; \
+	   grep '^enable-shared' common/Make.global_options ; \
 	   grep enable-multithreading common/Make.global_options ; \
 	   grep with-multithreading common/Make.global_options ; \
 	   grep USE_CONTRIB_PETSC common/Make.global_options ; \
@@ -231,41 +229,32 @@ build-test:
 	cat build-test-config                 | tee -a build-test-log
 	echo END CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`   | tee -a build-test-log
 	echo                                  | tee -a build-test-log
-	if ! test -f common/Make.global_options ; then \
-	  mail build-failure@dealii.org < build-test-log 2>&1 ; \
-	  exit ; \
-	 fi
-	if (($(MAKE) BUILDTEST= build-test-do 2>&1) | tee -a build-test-log) ; then \
-	   mail build-success@dealii.org < build-test-log 2>&1 ; \
-         else \
-	   mail build-failure@dealii.org < build-test-log 2>&1 ; \
-	 fi
-
+	$(MAKE) BUILDTEST= build-test-do 2>&1 | tee -a build-test-log
 
 # target to do the actual compilation tests for an automated build test. build
 # the library, the example programs, and the doxygen example programs. if the
 # testsuite has been checked out, run that, too, and send the results to the
 # testsuite server
 build-test-do:
-	echo BEGIN MAKE LIB OUTPUT `date -u '+%Y-%m-%d %T'`
+	@echo BEGIN MAKE LIB OUTPUT `date -u '+%Y-%m-%d %T'`
 	$(MAKE) all
-	echo END MAKE LIB OUTPUT `date -u '+%Y-%m-%d %T'`
-	echo 
-	echo BEGIN MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
+	@echo END MAKE LIB OUTPUT `date -u '+%Y-%m-%d %T'`
+	@echo 
+	@echo BEGIN MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
 	cd examples ; $(MAKE)
-	echo END MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
-	echo 
-	echo BEGIN MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
+	@echo END MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
+	@echo 
+	@echo BEGIN MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
 	cd doc/doxygen ; $(MAKE)
-	echo END MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
-	echo 
+	@echo END MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
+	@echo 
 	if test -d tests ; then \
-	   echo BEGIN MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
+	   @echo BEGIN MAKE TESTS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
 	   cd tests ; $(MAKE) report+mail ; \
-	   echo END MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
-	   echo ; \
+	   @echo END MAKE TESTS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
+	   @echo ; \
 	 fi
-
+	@echo BUILD TEST SUCCESSFUL `date -u '+%Y-%m-%d %T'`
 
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
