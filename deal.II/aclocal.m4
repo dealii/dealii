@@ -632,7 +632,8 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
 [
   if test "x$F77" != "x" ; then
     F77_VERSION_STRING="`($F77 -v 2>&1)`"
-    if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" ; then
+    if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" -o \
+	    -n "`echo $F77_VERSION_STRING | grep \"gcc version\"`" ; then
       dnl Yes, this is a GNU g77 version. find out the right version
       G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
       case "$G77_VERSION_STRING" in
