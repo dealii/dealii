@@ -30,6 +30,7 @@ tests_x =  logtest \
 	   table \
 	   tensor \
 	   symmetric_tensor_* \
+	   full_tensor_* \
            timer \
 	   threads \
 	   polynomial* \
