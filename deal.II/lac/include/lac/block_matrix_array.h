@@ -64,7 +64,7 @@ template <typename> class Vector;
  *
  * <h3>Requirements on MATRIX</h3>
  *
- * The template argument <tt>MATRIX</tt> is a class providing the the
+ * The template argument <tt>MATRIX</tt> is a class providing the
  * matrix-vector multiplication functions <tt>vmult</tt>,
  * <tt>Tvmult</tt>, <tt>vmult_add</tt> and <tt>Tvmult_add</tt> used in
  * this class, but with arguments of type <tt>VECTOR</tt> instead of
