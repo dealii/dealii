@@ -1100,9 +1100,9 @@ namespace LaplaceSolver
 				   // indicators to account for the
 				   // fact that we are going to
 				   // evaluate these quantities. This
-				   // class implements such a weight,
-				   // and should serve as basis for
-				   // further experiments.
+				   // class accepts such a weighting
+				   // function as argument to its
+				   // constructor:
   template <int dim>
   class RefinementWeightedKelly : public PrimalSolver<dim>
   {
@@ -1112,9 +1112,13 @@ namespace LaplaceSolver
 			       const Quadrature<dim>    &quadrature,
 			       const Quadrature<dim-1>  &face_quadrature,
 			       const Function<dim>      &rhs_function,
-			       const Function<dim>      &boundary_values);
+			       const Function<dim>      &boundary_values,
+			       const Function<dim>      &weighting_function);
 
       virtual void refine_grid ();
+
+    private:
+      const SmartPointer<const Function<dim> > weighting_function;
   };
 
 
@@ -1126,12 +1130,14 @@ namespace LaplaceSolver
 			   const Quadrature<dim>    &quadrature,
 			   const Quadrature<dim-1>  &face_quadrature,
 			   const Function<dim>      &rhs_function,
-			   const Function<dim>      &boundary_values)
+			   const Function<dim>      &boundary_values,
+			   const Function<dim>      &weighting_function)
 		  :
 		  Base<dim> (coarse_grid),
                   PrimalSolver<dim> (coarse_grid, fe, quadrature,
 				     face_quadrature,
-				     rhs_function, boundary_values)
+				     rhs_function, boundary_values),
+                  weighting_function (&weighting_function)
   {};
 
 
@@ -1158,38 +1164,15 @@ namespace LaplaceSolver
 					estimated_error);
 
 				     // Now we are going to weight
-				     // these indicators by some
-				     // function that you might want
-				     // to change:
+				     // these indicators by the value
+				     // of the function given to the
+				     // constructor:
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
-      {
-					 // First we compute the
-					 // coordinates and mesh size
-					 // of this cell. To use the
-					 // mesh size, remove the
-					 // comment signs, the line
-					 // is only commented out to
-					 // avoid warnings by the
-					 // compiler.
-/*  	const double x = cell->center()(0); */
-/*  	const double y = cell->center()(1); */
-/*  	const double h = cell->diameter();  */
-
-					 // From this we compute the
-					 // weight with which we'd
-					 // like to multiply the
-					 // precomputed indicator. My
-					 // default is boring but
-					 // efficient. Do it better!
-	const double weight = 1.;
-
-					 // Finally use this weight:
-	estimated_error(cell_index) *= weight;
-      };
-    
+      estimated_error(cell_index)
+	*= weighting_function->value (cell->center());
     
     GridRefinement::refine_and_coarsen_fixed_number (*triangulation,
 						     estimated_error,
@@ -1337,10 +1320,13 @@ namespace Data
 				   // @sect4{The SetUpBase and SetUp classes}
   
 				   // Based on the above description,
-				   // the ``SetUpBase'' class then looks
-				   // like this:
+				   // the ``SetUpBase'' class then
+				   // looks as follows. To allow using
+				   // the ``SmartPointer'' class with
+				   // this class, we derived from the
+				   // ``Subscriptor'' class.
   template <int dim>
-  struct SetUpBase
+  struct SetUpBase : public Subscriptor
   {
       virtual
       const Function<dim> &  get_boundary_values () const = 0;
@@ -2160,7 +2146,29 @@ namespace LaplaceSolver
 				   // ``DualFunctionalBase'' object
 				   // that will assemble the right
 				   // hand side vector of the dual
-				   // problem. The rest is trivial:
+				   // problem. The rest of the class
+				   // is rather trivial.
+				   //
+				   // Since both primal and dual
+				   // solver will use the same
+				   // triangulation, but different
+				   // discretizations, it now becomes
+				   // clear why we have made the
+				   // ``Base'' class a virtual one:
+				   // since the final class will be
+				   // derived from both
+				   // ``PrimalSolver'' as well as
+				   // ``DualSolver'', it would have
+				   // two ``Base'' instances, would we
+				   // not have marked the inheritance
+				   // as virtual. Since in many
+				   // applications the base class
+				   // would store much more
+				   // information than just the
+				   // triangulation which needs to be
+				   // shared between primal and dual
+				   // solvers, we do not usually want
+				   // to use two such base classes.
   template <int dim>
   class DualSolver : public Solver<dim>
   {
@@ -2247,7 +2255,23 @@ namespace LaplaceSolver
 
 				   // @sect4{The WeightedResidual class}
 
-				   //TODO!
+				   // Here finally comes the main
+				   // class of this program, the one
+				   // that implements the dual
+				   // weighted residual error
+				   // estimator. It joins the primal
+				   // and dual solver classes to use
+				   // them for the computation of
+				   // primal and dual solutions, and
+				   // implements the error
+				   // representation formula for use
+				   // as error estimate and mesh
+				   // refinement.
+				   //
+				   // The first few of the functions
+				   // of this class are mostly
+				   // overriders of the respective
+				   // functions of the base class:
   template <int dim>
   class WeightedResidual : public PrimalSolver<dim>,
 			   public DualSolver<dim>
@@ -2281,81 +2305,144 @@ namespace LaplaceSolver
       output_solution () const;
 
     private:
+				       // In the private section, we
+				       // have two functions that are
+				       // used to call the
+				       // ``solve_problem'' functions
+				       // of the primal and dual base
+				       // classes. These two functions
+				       // will be called in parallel
+				       // by the ``solve_problem''
+				       // function of this class.
+      void solve_primal_problem ();
+      void solve_dual_problem ();
+				       // Then declare abbreviations
+				       // for active cell iterators,
+				       // to avoid that we have to
+				       // write this lengthy name
+				       // over and over again:
+					
+      typedef
+      typename DoFHandler<dim>::active_cell_iterator
+      active_cell_iterator;
 
-				       /**
-					* Declare a data type to
-					* represent the mapping
-					* between faces and integrated
-					* jumps of gradients of each
-					* of the solution
-					* vectors. Note that the terms
-					* on the edges do not carry an
-					* orientation, since if we
-					* consider it from one or the
-					* other adjacent cell, both
-					* the normal vector and the
-					* jump term change their
-					* sign. We can thus store the
-					* edge terms with faces,
-					* without reference to the
-					* cells from which we compute
-					* them.
-					*/
+				       // Next, declare a data type
+				       // that we will us to store the
+				       // contribution of faces to the
+				       // error estimator. The idea is
+				       // that we can compute the face
+				       // terms from each of the two
+				       // cells to this face, as they
+				       // are the same when viewed
+				       // from both sides. What we
+				       // will do is to compute them
+				       // only once, based on some
+				       // rules explained below which
+				       // of the two adjacent cells
+				       // will be in charge to do
+				       // so. We then store the
+				       // contribution of each face in
+				       // a map mapping faces to their
+				       // values, and only collect the
+				       // contributions for each cell
+				       // by looping over the cells a
+				       // second time and grabbing the
+				       // values from the map.
+				       //
+				       // The data type of this map is
+				       // declared here:
       typedef
       typename std::map<typename DoFHandler<dim>::face_iterator,double>
       FaceIntegrals;
 
-
-				       /**
-					* Redeclare an active cell iterator.
-					* This is simply for convenience.
-					*/
-      typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
-
-				       /**
-				      * All data needed by the several
-				      * functions of the error
-				      * estimator is gathered in this
-				      * struct. It is passed as a
-				      * reference to the separate
-				      * functions in this class.
-				      *
-				      * The reason for invention of
-				      * this object is two-fold:
-				      * first, class member data is
-				      * not possible because no real
-				      * object is created (all
-				      * functions are @p{static}),
-				      * which is a historical
-				      * reason. Second, if we don't
-				      * collect the data the various
-				      * functions need somewhere at a
-				      * central place, that would mean
-				      * that the functions would have
-				      * to allocate them upon
-				      * need. However, then some
-				      * variables would be allocated
-				      * over and over again, which can
-				      * take a significant amount of
-				      * time (10-20 per cent) and most
-				      * importantly, memory allocation
-				      * requires synchronisation in
-				      * multithreaded mode. While that
-				      * is done by the C++ library and
-				      * has not to be handcoded, it
-				      * nevertheless seriously damages
-				      * the ability to efficiently run
-				      * the functions of this class in
-				      * parallel, since they are quite
-				      * often blocked by these
-				      * synchronisation points.
-				      *
-				      * Thus, every thread gets an
-				      * instance of this class to work
-				      * with and needs not allocate
-				      * memory itself, or synchronise
-				      * with other threads.
-				      */
+				       // In the computation of the
+				       // error estimates on cells and
+				       // faces, we need a number of
+				       // helper objects, such as
+				       // ``FEValues'' and
+				       // ``FEFaceValues'' functions,
+				       // but also temporary objects
+				       // storing the values and
+				       // gradients of primal and dual
+				       // solutions, for
+				       // example. These fields are
+				       // needed in the three
+				       // functions that do the
+				       // integration on cells, and
+				       // regular and irregular faces,
+				       // respectively.
+				       //
+				       // There are three reasonable
+				       // ways to provide these
+				       // fields: first, as local
+				       // variables in the function
+				       // that needs them; second, as
+				       // member variables of this
+				       // class; third, as arguments
+				       // passed to that function.
+				       //
+				       // These three alternatives all
+				       // have drawbacks: the third
+				       // that their number is not
+				       // neglectable and would make
+				       // calling these functions a
+				       // lengthy enterprise. The
+				       // second has the drawback that
+				       // it disallows
+				       // parallelization, since the
+				       // threads that will compute
+				       // the error estimate have to
+				       // have their own copies of
+				       // these variables each, so
+				       // member variables of the
+				       // enclosing class will not
+				       // work. The first approach,
+				       // although straightforward,
+				       // has a subtle but important
+				       // drawback: we will call these
+				       // functions over and over
+				       // again, many thousand times
+				       // maybe; it has now turned out
+				       // that allocating vectors and
+				       // other objects that need
+				       // memory from the heap is an
+				       // expensive business in terms
+				       // of run-time, since memory
+				       // allocation is expensive when
+				       // several threads are
+				       // involved. In our experience,
+				       // more than 20 per cent of the
+				       // total run time of error
+				       // estimation functions are due
+				       // to memory allocation, if
+				       // done on a per-call level. It
+				       // is thus significantly better
+				       // to allocate the memory only
+				       // once, and recycle the
+				       // objects as often as
+				       // possible.
+				       //
+				       // What to do? Our answer is to
+				       // use a variant of the third
+				       // strategy, namely generating
+				       // these variables once in the
+				       // main function of each
+				       // thread, and passing them
+				       // down to the functions that
+				       // do the actual work. To avoid
+				       // that we have to give these
+				       // functions a dozen or so
+				       // arguments, we pack all these
+				       // variables into two
+				       // structures, one which is
+				       // used for the computations on
+				       // cells, the other doing them
+				       // on the faces. Instead of
+				       // many individual objects, we
+				       // will then only pass one such
+				       // object to these functions,
+				       // making their calling
+				       // sequence simpler.
       struct CellData
       {
 	  FEValues<dim>    fe_values;
@@ -2365,7 +2452,7 @@ namespace LaplaceSolver
 	  std::vector<double> rhs_values;	  
 	  std::vector<double> dual_weights;	  
 	  typename std::vector<Tensor<2,dim> > cell_grad_grads;
-	  CellData (const FiniteElement<dim> &dof_handler,
+	  CellData (const FiniteElement<dim> &fe,
 		    const Quadrature<dim>    &quadrature,
 		    const Function<dim>      &right_hand_side);
       };
@@ -2380,13 +2467,24 @@ namespace LaplaceSolver
 	  std::vector<double> dual_weights;	  
 	  typename std::vector<Tensor<1,dim> > cell_grads;
 	  typename std::vector<Tensor<1,dim> > neighbor_grads;
-	  FaceData (const FiniteElement<dim> &dof_handler,
+	  FaceData (const FiniteElement<dim> &fe,
 		    const Quadrature<dim-1>  &face_quadrature);
       };
 
       
 
-
+				       // Regarding the evaluation of
+				       // the error estimator, we have
+				       // two driver functions that do
+				       // this: the first is called to
+				       // generate the cell-wise
+				       // estimates, and splits up the
+				       // task in a number of threads
+				       // each of which work on a
+				       // subset of the cells. The
+				       // first function will run the
+				       // second for each of these
+				       // threads:
       void estimate_error (Vector<float> &error_indicators) const;
 
       void estimate_some (const Vector<double> &primal_solution,
@@ -2396,6 +2494,15 @@ namespace LaplaceSolver
 			  Vector<float>        &error_indicators,
 			  FaceIntegrals        &face_integrals) const;
 
+				       // Then we have functions that
+				       // do the actual integration of
+				       // the error representation
+				       // formula. They will treat the
+				       // terms on the cell interiors,
+				       // on those faces that have no
+				       // hanging nodes, and on those
+				       // faces with hanging nodes,
+				       // respectively:
       void
       integrate_over_cell (const active_cell_iterator &cell,
 			   const unsigned int          cell_index,
@@ -2403,27 +2510,7 @@ namespace LaplaceSolver
 			   const Vector<double>       &dual_weights,
 			   CellData                   &cell_data,
 			   Vector<float>              &error_indicators) const;
-      
-				       /**
-					* Actually do the computation on
-					* a face which has no hanging
-					* nodes (it is regular), i.e.
-					* either on the other side there
-					* is nirvana (face is at
-					* boundary), or the other side's
-					* refinement level is the same
-					* as that of this side, then
-					* handle the integration of
-					* these both cases together.
-					*
-					* The meaning of the parameters
-					* becomes clear when looking at
-					* the source code. This function
-					* is only externalized from
-					* @p{estimate_error} to avoid
-					* ending up with a function of
-					* 500 lines of code.
-					*/
+
       void
       integrate_over_regular_face (const active_cell_iterator &cell,
 				   const unsigned int          face_no,
@@ -2431,18 +2518,6 @@ namespace LaplaceSolver
 				   const Vector<double>       &dual_weights,
 				   FaceData                   &face_data,
 				   FaceIntegrals              &face_integrals) const;
-      
-
-				       /**
-					* The same applies as for the
-					* function above, except that
-					* integration is over face
-					* @p{face_no} of @p{cell}, where
-					* the respective neighbor is
-					* refined, so that the
-					* integration is a bit more
-					* complex.
-					*/
       void
       integrate_over_irregular_face (const active_cell_iterator &cell,
 				     const unsigned int          face_no,
@@ -2454,8 +2529,15 @@ namespace LaplaceSolver
 
 
 
-
-
+				   // In the implementation of this
+				   // class, we first have the
+				   // constructors of the ``CellData''
+				   // and ``FaceData'' member classes,
+				   // and the ``WeightedResidual''
+				   // constructor. They only
+				   // initialize fields to their
+				   // correct lengths, so we do not
+				   // have to discuss them to length.
   template <int dim>
   WeightedResidual<dim>::CellData::
   CellData (const FiniteElement<dim> &fe,
@@ -2531,18 +2613,49 @@ namespace LaplaceSolver
   {};
 
 
+				   // The next five functions are
+				   // boring, as they simply relay
+				   // their work to the base
+				   // classes. The first calls the
+				   // primal and dual solvers in
+				   // parallel, while postprocessing
+				   // the solution and retrieving the
+				   // number of degrees of freedom is
+				   // done by the primal class.
   template <int dim>
   void
   WeightedResidual<dim>::solve_problem ()
   {
-    PrimalSolver<dim>::solve_problem ();
-    DualSolver<dim>::solve_problem ();
+    Threads::ThreadManager thread_manager;
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate (&WeightedResidual<2>::solve_primal_problem)
+		    .collect_args (this));
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate (&WeightedResidual<2>::solve_dual_problem)
+		    .collect_args (this));
+    thread_manager.wait ();
   };
 
+  
+  template <int dim>
+  void
+  WeightedResidual<dim>::solve_primal_problem ()
+  {
+    PrimalSolver<dim>::solve_problem ();
+  };
 
   template <int dim>
   void
-  WeightedResidual<dim>::postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
+  WeightedResidual<dim>::solve_dual_problem ()
+  {
+    DualSolver<dim>::solve_problem ();
+  };
+  
+
+  template <int dim>
+  void
+  WeightedResidual<dim>::
+  postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
   {
     PrimalSolver<dim>::postprocess (postprocessor);
   };
@@ -2557,6 +2670,13 @@ namespace LaplaceSolver
 
 
 
+				   // Now, it is becoming more
+				   // interesting: the ``refine_grid''
+				   // function asks the error
+				   // estimator to compute the
+				   // cell-wise error indicators, then
+				   // uses their absolute values for
+				   // mesh refinement.
   template <int dim>
   void
   WeightedResidual<dim>::refine_grid ()
@@ -2591,19 +2711,6 @@ namespace LaplaceSolver
     GridRefinement::refine_and_coarsen_fixed_fraction (*triangulation,
 						       error_indicators,
 						       0.8, 0.02);
-
-				     // Alternatively, we might fall
-				     // back to refining and
-				     // coarsening a fixed fraction of
-				     // all cells, say 30 per cent for
-				     // refinement, and 3 per cent for
-				     // coarsening. If you want that,
-				     // uncomment the following lines,
-				     // and remove the lines above.
-/*      GridRefinement::refine_and_coarsen_fixed_number (*triangulation, */
-/*  						     error_indicators,   */
-/*  						     0.3, 0.03);         */
-
     triangulation->execute_coarsening_and_refinement ();
   };
   
@@ -2872,12 +2979,14 @@ namespace LaplaceSolver
 				     // this, note that the cell terms
 				     // are already set, and that only
 				     // the edge terms need to be
-				     // collected. Thus, loop over
-				     // all cells and their faces,
-				     // make sure that the
-				     // contributions of each of the
-				     // faces are there, and add them
-				     // up.
+				     // collected. Thus, loop over all
+				     // cells and their faces, make
+				     // sure that the contributions of
+				     // each of the faces are there,
+				     // and add them up. Only take
+				     // half of the jump term, since
+				     // the other half will be taken
+				     // by the neighboring cell.
     unsigned int present_cell=0;  
     for (active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
 	 cell!=DualSolver<dim>::dof_handler.end();
@@ -3280,7 +3389,23 @@ namespace LaplaceSolver
 	    ExcInternalError());
 
 				     // ...then store computed value
-				     // at assigned location:
+				     // at assigned location. Note
+				     // that the stored value does not
+				     // contain the factor 1/2 that
+				     // appears in the error
+				     // representation. The reason is
+				     // that the term actually does
+				     // not have this factor if we
+				     // loop over all faces in the
+				     // triangulation, but only
+				     // appears if we write it as a
+				     // sum over all cells and all
+				     // faces of each cell; we thus
+				     // visit the same face twice. We
+				     // take account of this by using
+				     // this factor 1/2 later, when we
+				     // sum up the contributions for
+				     // each cell individually.
     face_integrals[cell->face(face_no)] = face_integral;
   };
 
@@ -3444,40 +3569,190 @@ namespace LaplaceSolver
 };
 
 
-				 // TODO!!
+				 // @sect3{A simulation framework}
+
+				 // In the previous example program,
+				 // we have had two functions that
+				 // were used to drive the process of
+				 // solving on subsequently finer
+				 // grids. We extend this here to
+				 // allow for a number of parameters
+				 // to be passed to these functions,
+				 // and put all of that into framework
+				 // class.
+				 //
+				 // You will have noted that this
+				 // program is built up of a number of
+				 // small parts (evaluation functions,
+				 // solver classes implementing
+				 // various refinement methods,
+				 // different dual functionals,
+				 // different problem and data
+				 // descriptions), which makes the
+				 // program relatively simple to
+				 // extend, but also allows to solve a
+				 // large number of different problems
+				 // by replacing one part by
+				 // another. We reflect this
+				 // flexibility by declaring a
+				 // structure in the following
+				 // framework class that holds a
+				 // number of parameters that may be
+				 // set to test various combinations
+				 // of the parts of this program, and
+				 // which can be used to test it at
+				 // various problems and
+				 // discretizations in a simple way.
 template <int dim>
 struct Framework
 {
   public:
+				     // First, we declare two
+				     // abbreviations for simple use
+				     // of the respective data types:
     typedef Evaluation::EvaluationBase<dim> Evaluator;
     typedef std::list<Evaluator*>           EvaluatorList;
 
+
+				     // Then we have the structure
+				     // which declares all the
+				     // parameters that may be set. In
+				     // the default constructor of the
+				     // structure, these values are
+				     // all set to default values, for
+				     // simple use.
     struct ProblemDescription 
     {
+					 // First allow the degrees of
+					 // the piecewise polynomials
+					 // by which the primal and
+					 // dual problems will be
+					 // discretized. They default
+					 // to (bi-, tri-)linear
+					 // ansatz functions for the
+					 // primal, and (bi-,
+					 // tri-)quadratic ones for
+					 // the dual problem. If a
+					 // refinement criterion is
+					 // chosen that does not need
+					 // the solution of a dual
+					 // problem, the value of the
+					 // dual finite element degree
+					 // is of course ignored.
 	unsigned int primal_fe_degree;
 	unsigned int dual_fe_degree;
 
-	const Data::SetUpBase<dim> *data;
-	const DualFunctional::DualFunctionalBase<dim> *dual_functional;
+					 // Then have an object that
+					 // describes the problem
+					 // type, i.e. right hand
+					 // side, domain, boundary
+					 // values, etc. The pointer
+					 // needed here defaults to
+					 // the Null pointer, i.e. you
+					 // will have to set it in
+					 // actual instances of this
+					 // object to make it useful.
+	SmartPointer<const Data::SetUpBase<dim> > data;
 
-	EvaluatorList evaluator_list;
-
-	unsigned int max_degrees_of_freedom;
-
+					 // Since we allow to use
+					 // different refinement
+					 // criteria (global
+					 // refinement, refinement by
+					 // the Kelly error indicator,
+					 // possibly with a weight,
+					 // and using the dual
+					 // estimator), define a
+					 // number of enumeration
+					 // values, and subsequently a
+					 // variable of that type. It
+					 // will default to
+					 // ``dual_weighted_error_estimator''.
 	enum RefinementCriterion {
 	      dual_weighted_error_estimator,
 	      global_refinement,
+	      kelly_indicator,
 	      weighted_kelly_indicator
 	};
 
 	RefinementCriterion refinement_criterion;
+
+					 // Next, an object that
+					 // describes the dual
+					 // functional. It is only
+					 // needed if the dual
+					 // weighted residual
+					 // refinement is chosen, and
+					 // also defaults to a Null
+					 // pointer.
+	SmartPointer<const DualFunctional::DualFunctionalBase<dim> > dual_functional;
+
+					 // Then a list of evaluation
+					 // objects. Its default value
+					 // is empty, i.e. no
+					 // evaluation objects.
+	EvaluatorList evaluator_list;
+
+					 // Next to last, a function
+					 // that is used as a weight
+					 // to the
+					 // ``RefinementWeightedKelly''
+					 // class. The default value
+					 // of this pointer is zero,
+					 // but you have to set it to
+					 // some other value if you
+					 // want to use the
+					 // ``weighted_kelly_indicator''
+					 // refinement criterion.
+	SmartPointer<const Function<dim> > kelly_weight;
+
+					 // Finally, we have a
+					 // variable that denotes the
+					 // maximum number of degrees
+					 // of freedom we allow for
+					 // the (primal)
+					 // discretization. If it is
+					 // exceeded, we stop the
+					 // process of solving and
+					 // intermittend mesh
+					 // refinement. Its default
+					 // value is 20,000.
+	unsigned int max_degrees_of_freedom;
+
+					 // Finally the default
+					 // constructor of this class:
+	ProblemDescription ();
     };
-    
+
+				     // The driver framework class
+				     // only has one method which
+				     // calls solver and mesh
+				     // refinement intermittently, and
+				     // does some other small tasks in
+				     // between. Since it does not
+				     // need data besides the
+				     // parameters given to it, we
+				     // make it static:
     static void run (const ProblemDescription &descriptor);
 };
 
 
+				 // As for the implementation, first
+				 // the constructor of the parameter
+				 // object, setting all values to
+				 // their defaults:
+template <int dim>
+Framework<dim>::ProblemDescription::ProblemDescription ()
+		:
+		primal_fe_degree (1),
+		dual_fe_degree (2),
+		refinement_criterion (dual_weighted_error_estimator),
+		max_degrees_of_freedom (20000)
+{};
 
+
+
+				 // Then the function which drives the
+				 // whole process:
 template <int dim>
 void Framework<dim>::run (const ProblemDescription &descriptor)
 {
@@ -3495,45 +3770,85 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
   const QGauss<dim>   quadrature(2*descriptor.dual_fe_degree+1);
   const QGauss<dim-1> face_quadrature(2*descriptor.dual_fe_degree+1);
 
+				   // Next, select one of the classes
+				   // implementing different
+				   // refinement criteria.
   LaplaceSolver::Base<dim> * solver = 0;
-  using namespace LaplaceSolver;
   switch (descriptor.refinement_criterion)
     {
       case ProblemDescription::dual_weighted_error_estimator:
-	    solver
-	      = new WeightedResidual<dim> (triangulation,
-					   primal_fe,
-					   dual_fe,
-					   quadrature,
-					   face_quadrature,
-					   descriptor.data->get_right_hand_side(),
-					   descriptor.data->get_boundary_values(),
-					   *descriptor.dual_functional);
-	    break;
+      {
+	using namespace LaplaceSolver;
+	solver
+	  = new WeightedResidual<dim> (triangulation,
+				       primal_fe,
+				       dual_fe,
+				       quadrature,
+				       face_quadrature,
+				       descriptor.data->get_right_hand_side(),
+				       descriptor.data->get_boundary_values(),
+				       *descriptor.dual_functional);
+	break;
+      };
+       
       case ProblemDescription::global_refinement:
-	    solver
-	      = new RefinementGlobal<dim> (triangulation,
-					   primal_fe,
-					   quadrature,
-					   face_quadrature,
-					   descriptor.data->get_right_hand_side(),
-					   descriptor.data->get_boundary_values());
-	    break;
-      case ProblemDescription::weighted_kelly_indicator:
-	    solver
-	      = new RefinementWeightedKelly<dim> (triangulation,
-						  primal_fe,
-						  quadrature,
-						  face_quadrature,
-						  descriptor.data->get_right_hand_side(),
-						  descriptor.data->get_boundary_values());
-	    break;
+      {
+	using namespace LaplaceSolver;
+	solver
+	  = new RefinementGlobal<dim> (triangulation,
+				       primal_fe,
+				       quadrature,
+				       face_quadrature,
+				       descriptor.data->get_right_hand_side(),
+				       descriptor.data->get_boundary_values());
+	break;
+      };
+       
+      case ProblemDescription::kelly_indicator:
+      {
+	using namespace LaplaceSolver;
+	solver
+	  = new RefinementKelly<dim> (triangulation,
+				      primal_fe,
+				      quadrature,
+				      face_quadrature,
+				      descriptor.data->get_right_hand_side(),
+				      descriptor.data->get_boundary_values());
+	break;
+      };
 
+      case ProblemDescription::weighted_kelly_indicator:
+      {
+	using namespace LaplaceSolver;
+	solver
+	  = new RefinementWeightedKelly<dim> (triangulation,
+					      primal_fe,
+					      quadrature,
+					      face_quadrature,
+					      descriptor.data->get_right_hand_side(),
+					      descriptor.data->get_boundary_values(),
+					      *descriptor.kelly_weight);
+	break;
+      };
+	    
       default:
 	    AssertThrow (false, ExcInternalError());
     };
   
-
+				   // Now that all objects are in
+				   // place, run the main loop. The
+				   // stopping criterion is
+				   // implemented at the bottom of the
+				   // loop.
+				   //
+				   // In the loop, first set the new
+				   // cycle number, then solve the
+				   // problem, output its solution(s),
+				   // apply the evaluation objects to
+				   // it, then decide whether we want
+				   // to refine the mesh further and
+				   // solve again on this mesh, or
+				   // jump out of the loop.
   for (unsigned int step=0; true; ++step)
     {
       std::cout << "Refinement cycle: "	<< step
@@ -3560,9 +3875,11 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
       else
 	break;
     };
-	
-  std::cout << std::endl;
 
+				   // After the loop has run, clean up
+				   // the screen, and delete objects
+				   // no more needed:
+  std::cout << std::endl;
   delete solver;
   solver = 0;
 };
