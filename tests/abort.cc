@@ -32,6 +32,9 @@ namespace  deal_II_exceptions
 
 extern "C"
 void abort()
+#ifdef DEAL_II_ABORT_NOTHROW_EXCEPTION
+  throw ()
+#endif
 {
   deallog << "Abort!!!" << std::endl;
   deal_II_exceptions::internals::n_treated_exceptions = 0;
