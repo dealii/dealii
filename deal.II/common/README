@@ -13,8 +13,13 @@ In order to use the deal.II library (and its sublibraries /base and
     compilers might work as well. egcs1.0 will not work, however.
     gcc2.95 works.
   - Perl: any Perl 5.x version should work.
-  - Make: we use GNU make, version 3.75. Other make programs are not standardized
-    and will quite surely fail to work.
+  - Make: we use GNU make, version 3.75. We also use GNU make 3.78
+    which has much better support for parallel builds, so you may
+    want to consider this version if you have a multiprocessor
+    system. GNU make 3.77 had a serious flaw in the $(wildcard ...)
+    function which prevented us from compiling some parts of the
+    library (most of our Makefiles are fixed, though). Other make
+    programs are not standardized and will quite surely fail to work.
   - In case you want to generate the documentation from the header
     files, you only need Perl installed.
   - In case you want the printable documentation, however, you need
