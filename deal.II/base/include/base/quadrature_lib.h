@@ -146,11 +146,17 @@ class QTrapez : public Quadrature<dim> {
     QTrapez ();
 };
 
+
 /**
  * Iterated trapezoidal rule.  The original reason for implementing
  * this was gnuplot output for patches.  Before this comment is
  * removed, please do not rely on the correctness of the quadrature
  * weights.
+ *
+ * For internal use, it may be worth to know that the points are
+ * ordered in a fashion such that the last coordinate is the one which
+ * runs fastest, and when overflowing moving ahead the second last
+ * coordinate, and so on.
  */
 template <int dim>
 class QIteratedTrapez :

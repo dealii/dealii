@@ -140,6 +140,12 @@ class Quadrature {
  *  functions). However, since they have no local data, all functions are
  *  declared #static# and can be called without creating an object of this
  *  class.
+ *
+ *  For the 3d case, you should note that the orientation of faces is even
+ *  more intricate than for two dimensions. Quadrature formulae are projected
+ *  upon the faces in their standard orientation, not to the inside or outside
+ *  of the hexahedron! Refer to the documentation of the #Triangulation# class
+ *  for a description of the orientation of the different faces.
  */
 template <int dim>
 class QProjector {
