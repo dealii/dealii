@@ -80,5 +80,37 @@ pgCC-Fatal-/home/wolf/bin/pgcc/linux86/bin/pgcpp1 TERMINATED by signal 6
     </p>
 
 
+    <p>
+    When the next version came (4.0), we found the front-end much
+    improved. However, the real showstopper is that for this code
+    <code>
+    <pre>
+    template &lt;int dim&gt; struct C {
+      void f();
+    };
+
+    template &lt;&gt; void C&lt;1&gt;::f() {};
+    </pre>
+    </code>
+    no code is generated for <code>C&lt1&gt::f</code> unless the
+    function is used later on in the file. In contrast to
+    non-specialized template functions, this case is also not handled
+    by pgcc's prelinker which would otherwise instantiate missing
+    templates. Since we have many (many many) specializations of
+    member functions in the .cc files in the library, that means that
+    code for these functions is never generated. Consequently, one
+    gets linker errors later on.
+    </p>
+
+    <p>
+    We believe that pgcc's behavior is not in accordance with the
+    standards, and is also not useful, since it forces the programmer
+    to put explicit specializations of functions into header files. We
+    had a long email exchange with Portland Group people in the summer
+    of 2002, who promised to review the matter. Unfortunately, the
+    problem still exists in pgcc 4.1 as of June 2003, making pgcc
+    still unusable to compile deal.II.
+    </p>
+
   </body>
 </html>
