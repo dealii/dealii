@@ -156,6 +156,16 @@ class SchurMatrix :
   void postprocess (BlockVector<double>& dst,
 		    const BlockVector<double>& src,
 		    const BlockVector<double>& rhs) const;
+
+				   /**
+				    * Select debugging information for
+				    * log-file.  Debug level 1 is
+				    * defined and writes the norm of
+				    * every vector before and after
+				    * each operation. Debug level 0
+				    * turns off debugging information.
+				    */
+  void debug_level(unsigned int l);
   private:
 				   /**
 				    * No copy constructor.
@@ -191,6 +201,11 @@ class SchurMatrix :
 				    * Optional signature of the @p{u}-vector.
 				    */
   std::vector<unsigned int> signature;
+  
+				   /**
+				    * Switch for debugging information.
+				    */
+  unsigned int debug;
 };
 
 template <class MA_inverse, class MB, class MDt, class MC>
@@ -203,8 +218,18 @@ SchurMatrix<MA_inverse, MB, MDt, MC>
 	      const std::vector<unsigned int>& signature)
 		: Ainv(&Ainv), B(&B), Dt(&Dt), C(&C),
 		  mem(mem),
-		  signature(signature)
+		signature(signature),
+		debug(0)
 {
+}
+
+
+template <class MA_inverse, class MB, class MDt, class MC>
+void
+SchurMatrix<MA_inverse, MB, MDt, MC>
+::debug_level(unsigned int l)
+{
+  debug = l;
 }
 
 
@@ -214,18 +239,33 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
 	const BlockVector<double>& src) const
 {
   deallog.push("Schur");
+  if (debug > 0)
+    deallog << "src:" << src.l2_norm() << std::endl;
+  
   C->vmult(dst, src);
+  if (debug > 0)
+    deallog << "C:" << dst.l2_norm() << std::endl;
+
   BlockVector<double>* h1 = mem.alloc();
   if (signature.size()>0)
     h1->reinit(signature);
   else
     h1->reinit(B->n_block_cols(), src.block(0).size());
   Dt->Tvmult(*h1,src);
+  if (debug > 0)
+    deallog << "Dt:" << h1->l2_norm() << std::endl;
+
   BlockVector<double>* h2 = mem.alloc();
   h2->reinit(*h1);
   Ainv->vmult(*h2, *h1);
+  if (debug > 0)
+    deallog << "Ainverse:" << h2->l2_norm() << std::endl;
+
   mem.free(h1);
   B->vmult_add(dst, *h2);
+  if (debug > 0)
+    deallog << "dst:" << dst.l2_norm() << std::endl;
+
   mem.free(h2);
   deallog.pop();
 }
@@ -255,13 +295,19 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
 	  ExcDimensionMismatch(dst.n_blocks(), B->n_block_rows()));
   
   deallog.push("Schur-prepare");
+  if (debug > 0)
+    deallog << "src:" << src.l2_norm() << std::endl;
   BlockVector<double>* h1 = mem.alloc();
   if (signature.size()>0)
     h1->reinit(signature);
   else
     h1->reinit(B->n_block_cols(), src.block(0).size());
   Ainv->vmult(*h1, src);
+  if (debug > 0)
+    deallog << "Ainverse:" << h1->l2_norm() << std::endl;
   B->vmult_add(dst, *h1);
+  if (debug > 0)
+    deallog << "dst:" << dst.l2_norm() << std::endl;
   mem.free(h1);
   deallog.pop();
 }
@@ -281,14 +327,20 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
 	  ExcDimensionMismatch(src.n_blocks(), B->n_block_rows()));
   
   deallog.push("Schur-post");
+  if (debug > 0)
+    deallog << "src:" << src.l2_norm() << std::endl;
   BlockVector<double>* h1 = mem.alloc();
   if (signature.size()>0)
     h1->reinit(signature);
   else
     h1->reinit(B->n_block_cols(), src.block(0).size());
   Dt->Tvmult(*h1, src);
+  if (debug > 0)
+    deallog << "Dt:" << h1->l2_norm() << std::endl;
   h1->sadd(-1.,rhs);
   Ainv->vmult(dst,*h1);
+  if (debug > 0)
+    deallog << "dst:" << dst.l2_norm() << std::endl;
   mem.free(h1);
   deallog.pop();
 }

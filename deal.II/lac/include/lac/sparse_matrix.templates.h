@@ -278,7 +278,8 @@ SparseMatrix<number>::add_scaled (const number factor,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const
+SparseMatrix<number>::vmult (Vector<somenumber>& dst,
+			     const Vector<somenumber>& src) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
