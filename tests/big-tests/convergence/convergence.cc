@@ -2,6 +2,7 @@
 /* Copyright W. Bangerth, University of Heidelberg, 1998 */
 
 
+#include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -61,7 +62,8 @@ template <int dim>
 class PoissonProblem : public ProblemBase<dim> {
   public:
     PoissonProblem (unsigned int order);
-
+    ~PoissonProblem ();
+    
     void clear ();
     void create_new ();
     int run (unsigned int level);
@@ -205,6 +207,12 @@ PoissonProblem<dim>::PoissonProblem (unsigned int order) :
 		tria(0), dof(0), rhs(0),
 		boundary_values(0), order(order) {};
 
+
+template <int dim>
+PoissonProblem<dim>::~PoissonProblem () 
+{
+  clear ();
+};
 
 
 
@@ -497,6 +505,7 @@ void PoissonProblem<dim>::print_history (string filename) const {
 
 
 int main () {
+  deallog.depth_console (0);
   for (unsigned int order=0; order<5; ++order) 
     {
       PoissonProblem<2> problem (order);
