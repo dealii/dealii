@@ -30,36 +30,9 @@
 
 
 
-#if deal_II_dimension == 1
-
-template <>
-void DataOutRotation<1>::build_some_patches (Data)
+template <int dim>
+void DataOutRotation<dim>::build_some_patches (Data data)
 {
-				   // this function could certainly be
-				   // implemented quite easily, but I
-				   // haven't done so yet. it may even
-				   // be included into the general
-				   // template below, if one were not
-				   // to choose y as rotational
-				   // variable but z, since then one
-				   // could loop over all quadrature
-				   // points as outer loop and over
-				   // the symmetry variable inside, as
-				   // the latter is only repeated
-  Assert (false, ExcNotImplemented());
-};
-
-#endif
-
-
-
-#if deal_II_dimension == 2
-
-template <>
-void DataOutRotation<2>::build_some_patches (Data data)
-{
-  const unsigned int dim = 2;
-  
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
   
@@ -84,7 +57,7 @@ void DataOutRotation<2>::build_some_patches (Data data)
 				   // initial direction at the end
 				   // again
   const double pi = 3.14159265358979323846;
-  vector<Point<3> > angle_directions (n_patches_per_circle+1);
+  vector<Point<dim+1> > angle_directions (n_patches_per_circle+1);
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
       angle_directions[i][0] = cos(2*pi*i/n_patches_per_circle);
@@ -120,18 +93,56 @@ void DataOutRotation<2>::build_some_patches (Data data)
 					   // from the vertices of the
 					   // cell, which has one
 					   // dimension less, however.
-	  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+	  switch (dim)
 	    {
-	      const Point<dim> v = cell->vertex(vertex);
-	      patch->vertices[vertex] = v(0) * angle_directions[angle];
-	      patch->vertices[vertex][2] = v(1);
+	      case 1:
+	      {
+		const double r1 = cell->vertex(0)(0),
+			     r2 = cell->vertex(2)(0);
+		Assert (r1 >= 0, ExcRadialVariableHasNegativeValues(r1));	
+		Assert (r2 >= 0, ExcRadialVariableHasNegativeValues(r2));
+		
+		patch->vertices[0] = r1*angle_directions[angle];
+		patch->vertices[1] = r2*angle_directions[angle];
+		patch->vertices[2] = r2*angle_directions[angle+1];
+		patch->vertices[3] = r1*angle_directions[angle+1];
 
-	      patch->vertices[vertex+GeometryInfo<dim>::vertices_per_cell]
-		= v(0) * angle_directions[angle+1];
-	      patch->vertices[vertex+GeometryInfo<dim>::vertices_per_cell][2]
-		= v(1);
+		break;
+	      };
+	       
+	      case 2:
+	      {
+		for (unsigned int vertex=0;
+		     vertex<GeometryInfo<dim>::vertices_per_cell;
+		     ++vertex)
+		  {
+		    const Point<dim> v = cell->vertex(vertex);
+		    
+						     // make sure that the
+						     // radial variable does
+						     // attain negative
+						     // values
+		    Assert (v(0) >= 0, ExcRadialVariableHasNegativeValues(v(0)));
+		    
+						     // now set the vertices
+						     // of the patch
+		    patch->vertices[vertex] = v(0) * angle_directions[angle];
+		    patch->vertices[vertex][2] = v(1);
+		    
+		    patch->vertices[vertex+GeometryInfo<dim>::vertices_per_cell]
+		      = v(0) * angle_directions[angle+1];
+		    patch->vertices[vertex+GeometryInfo<dim>::vertices_per_cell][2]
+		      = v(1);
+		  };
+		
+		break;
+	      };
+
+	      default:
+		    Assert (false, ExcNotImplemented());
 	    };
-
+	  
+	       
 					   // then fill in data
 	  if (data.n_datasets > 0)
 	    {
@@ -144,14 +155,30 @@ void DataOutRotation<2>::build_some_patches (Data data)
 		    {
 		      fe_patch_values.get_function_values (*dof_data[dataset].data,
 							   data.patch_values);
-		      for (unsigned int x=0; x<n_points; ++x)
-			for (unsigned int y=0; y<n_points; ++y)
-			  for (unsigned int z=0; z<n_points; ++z)
-			    patch->data(dataset,
-					x*n_points*n_points +
-					y*n_points +
-					z)
-			      = data.patch_values[x*n_points+z];
+		      switch (dim)
+			{
+			  case 1:
+				for (unsigned int x=0; x<n_points; ++x)
+				  for (unsigned int y=0; y<n_points; ++y)
+				    patch->data(dataset,
+						x*n_points + y)
+					= data.patch_values[x];
+				break;
+				
+			  case 2:
+				for (unsigned int x=0; x<n_points; ++x)
+				  for (unsigned int y=0; y<n_points; ++y)
+				    for (unsigned int z=0; z<n_points; ++z)
+				      patch->data(dataset,
+						  x*n_points*n_points +
+						  y*n_points +
+						  z)
+					= data.patch_values[x*n_points+z];
+				break;
+				
+			  default:
+				Assert (false, ExcNotImplemented());
+			};
 		    }
 		  else
 						     // system of components
@@ -160,14 +187,32 @@ void DataOutRotation<2>::build_some_patches (Data data)
 							   data.patch_values_system);
 		      for (unsigned int component=0; component<data.n_components;
 			   ++component)
-		      for (unsigned int x=0; x<n_points; ++x)
-			for (unsigned int y=0; y<n_points; ++y)
-			  for (unsigned int z=0; z<n_points; ++z)
-			    patch->data(dataset*data.n_components+component,
-					x*n_points*n_points +
-					y*n_points +
-					z)
-			      = data.patch_values_system[x*n_points+z](component);
+			{
+			  switch (dim)
+			    {
+			      case 1:
+				    for (unsigned int x=0; x<n_points; ++x)
+				      for (unsigned int y=0; y<n_points; ++y)
+					patch->data(dataset*data.n_components+component,
+						    x*n_points + y)
+					    = data.patch_values_system[x](component);
+				    break;
+
+			      case 2:
+				    for (unsigned int x=0; x<n_points; ++x)
+				      for (unsigned int y=0; y<n_points; ++y)
+					for (unsigned int z=0; z<n_points; ++z)
+					  patch->data(dataset*data.n_components+component,
+						      x*n_points*n_points +
+						      y*n_points +
+						      z)
+					    = data.patch_values_system[x*n_points+z](component);
+				    break;
+
+			      default:
+				    Assert (false, ExcNotImplemented());
+			    };
+			};
 		    };
 		};
 		  
@@ -175,14 +220,31 @@ void DataOutRotation<2>::build_some_patches (Data data)
 	      for (unsigned int dataset=0; dataset<cell_data.size(); ++dataset)
 		{
 		  const double value = (*cell_data[dataset].data)(cell_number);
-		  for (unsigned int x=0; x<n_points; ++x)
-		    for (unsigned int y=0; y<n_points; ++y)
-		      for (unsigned int z=0; z<n_points; ++z)
-			patch->data(dataset+dof_data.size()*data.n_components,
-				    x*n_points*n_points +
-				    y*n_points +
-				    z)
-			  = value;
+		  switch (dim)
+		    {
+		      case 1:
+			    for (unsigned int x=0; x<n_points; ++x)
+			      for (unsigned int y=0; y<n_points; ++y)
+				patch->data(dataset+dof_data.size()*data.n_components,
+					    x*n_points +
+					    y)
+				  = value;
+			    break;
+			    
+		      case 2:
+			    for (unsigned int x=0; x<n_points; ++x)
+			      for (unsigned int y=0; y<n_points; ++y)
+				for (unsigned int z=0; z<n_points; ++z)
+				  patch->data(dataset+dof_data.size()*data.n_components,
+					      x*n_points*n_points +
+					      y*n_points +
+					      z)
+				    = value;
+			    break;
+
+		      default:
+			    Assert (false, ExcNotImplemented());
+		    };
 		};
 	    };
 	};
@@ -210,13 +272,12 @@ void DataOutRotation<2>::build_some_patches (Data data)
     };
 };
 
-#endif
 
 
 #if deal_II_dimension == 3
 
 template <>
-void DataOutRotation<2>::build_some_patches (Data)
+void DataOutRotation<3>::build_some_patches (Data)
 {
 				   // would this function make any
 				   // sense after all? who would want
