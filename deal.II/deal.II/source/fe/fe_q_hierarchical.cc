@@ -11,16 +11,7 @@
 //
 //----------------------------------------------------------------
 
-#include <base/quadrature.h>
-#include <base/polynomial.h>
-#include <base/tensor_product_polynomials.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe.h>
-#include <fe/mapping.h>
 #include <fe/fe_q_hierarchical.h>
-#include <fe/fe_values.h>
 
 #include <cmath>
 #ifdef HAVE_STD_STRINGSTREAM

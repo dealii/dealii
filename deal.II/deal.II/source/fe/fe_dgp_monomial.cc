@@ -11,25 +11,13 @@
 //
 //----------------------------------------------------------------
 
-#include <base/quadrature.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe.h>
-#include <fe/mapping.h>
 #include <fe/fe_dgp_monomial.h>
-#include <fe/fe_values.h>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
 #else
 #  include <strstream>
 #endif
-
-
-// TEST
-#include <base/polynomial.h>
-
 
 
 // namespace for some functions that are used in this file.
