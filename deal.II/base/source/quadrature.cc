@@ -91,7 +91,7 @@ const Point<0> & Quadrature<0>::quad_point (const unsigned int) const {
 
 template <int dim>
 const Point<dim> & Quadrature<dim>::quad_point (const unsigned int i) const {
-  Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
+  Assert (i<n_quadrature_points, ExcIndexRange(i, 0, n_quadrature_points));
   return quadrature_points[i];
 };
 
@@ -122,7 +122,7 @@ double Quadrature<0>::weight (const unsigned int) const {
 
 template <int dim>
 double Quadrature<dim>::weight (const unsigned int i) const {
-  Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
+  Assert (i<n_quadrature_points, ExcIndexRange(i, 0, n_quadrature_points));
   return weights[i];
 };
 
@@ -148,7 +148,7 @@ void QProjector<2>::project_to_face (const Quadrature<1> &quadrature,
 				     const unsigned int   face_no,
 				     vector<Point<2> >   &q_points) {
   const unsigned int dim=2;
-  Assert (face_no<2*dim, ExcInvalidIndex (face_no, 2*dim));
+  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
   
   for (unsigned int p=0; p<quadrature.n_quadrature_points; ++p)
     switch (face_no)
@@ -177,7 +177,7 @@ void QProjector<3>::project_to_face (const Quadrature<2> &quadrature,
 				     const unsigned int   face_no,
 				     vector<Point<3> >   &q_points) {
   const unsigned int dim=3;
-  Assert (face_no<2*dim, ExcInvalidIndex (face_no, 2*dim));
+  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
   
   for (unsigned int p=0; p<quadrature.n_quadrature_points; ++p)
     switch (face_no)
@@ -226,8 +226,8 @@ void QProjector<2>::project_to_subface (const Quadrature<1> &quadrature,
 					const unsigned int   subface_no,
 					vector<Point<2> >   &q_points) {
   const unsigned int dim=2;
-  Assert (face_no<2*dim, ExcInvalidIndex (face_no, 2*dim));
-  Assert (subface_no<(1<<(dim-1)), ExcInvalidIndex (face_no, 1<<(dim-1)));
+  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
   
   for (unsigned int p=0; p<quadrature.n_quadrature_points; ++p)
     switch (face_no)
@@ -299,8 +299,8 @@ void QProjector<3>::project_to_subface (const Quadrature<2> &quadrature,
 					const unsigned int   subface_no,
 					vector<Point<3> >   &q_points) {
   const unsigned int dim=3;
-  Assert (face_no<2*dim, ExcInvalidIndex (face_no, 2*dim));
-  Assert (subface_no<(1<<(dim-1)), ExcInvalidIndex (face_no, 1<<(dim-1)));
+  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
 
 
 				   // for all faces and subfaces: first project

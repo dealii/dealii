@@ -135,12 +135,6 @@ class Point : public Tensor<1,dim> {
 		    int,
 		    << "Given dimensions must be >= 1, but was " << arg1);
 				     /**
-				      *  Exception
-				      */
-    DeclException1 (ExcInvalidIndex,
-		    int,
-		    << "Invalid index " << arg1);
-				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidConstructorCalled);
@@ -223,7 +217,7 @@ Point<3>::Point (const double x, const double y, const double z) {
 template <int dim>
 inline
 double Point<dim>::operator () (const unsigned int index) const {
-  Assert (index<dim, ExcInvalidIndex (index));
+  Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
 
@@ -232,7 +226,7 @@ double Point<dim>::operator () (const unsigned int index) const {
 template <int dim>
 inline
 double & Point<dim>::operator () (const unsigned int index) {
-  Assert (index<dim, ExcInvalidIndex (index));
+  Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
 

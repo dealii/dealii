@@ -120,13 +120,6 @@ class Quadrature {
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The index " << arg1
-		    << " is out of range, it should be less than " << arg2);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInternalError);
     
   protected:
@@ -257,13 +250,6 @@ class QProjector {
 				    const unsigned int       subface_no,
 				    vector<Point<dim> >     &q_points);
 
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The index " << arg1
-		    << " is out of range, it should be less than " << arg2);
 				     /**
 				      * Exception
 				      */

@@ -224,11 +224,6 @@ DeclException2(ExcWrongVectorSize, int, int, << "Tensor has " << arg1
 DeclException1 (ExcDimTooSmall,
 		int,
 		<< "Given dimensions must be >= 1, but was " << arg1);
-DeclException1 (ExcInvalidIndex,
-		int,
-		<< "Invalid index " << arg1);
-
-
 
 
 				 /**
@@ -284,7 +279,7 @@ template <int dim>
 inline
 double Tensor<1,dim>::
 operator [] (const unsigned int index) const {
-  Assert (index<dim, ExcInvalidIndex (index));
+  Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
 
@@ -294,7 +289,7 @@ template <int dim>
 inline
 double & Tensor<1,dim>::
 operator [] (const unsigned int index) {
-  Assert (index<dim, ExcInvalidIndex (index));
+  Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
 

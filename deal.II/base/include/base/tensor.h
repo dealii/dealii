@@ -220,7 +220,7 @@ inline
 Tensor<rank_-1,dim> &
 Tensor<rank_,dim>::
 operator[] (const unsigned int i) {
-  Assert (i<dim, ExcInvalidIndex(i));
+  Assert (i<dim, ExcIndexRange(i, 0, dim));
   
   return subtensor[i];
 };
@@ -232,7 +232,7 @@ inline
 const Tensor<rank_-1,dim> &
 Tensor<rank_,dim>::
 operator[] (const unsigned int i) const {
-  Assert (i<dim, ExcInvalidIndex(i));
+  Assert (i<dim, ExcIndexRange(i, 0, dim));
   
   return subtensor[i];
 };
