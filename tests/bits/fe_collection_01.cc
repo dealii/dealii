@@ -1,4 +1,4 @@
-//----------------------------  fe_tools_01a.cc  ---------------------------
+//----------------------------  fe_collection_01a.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  fe_tools_01a.cc  ---------------------------
+//----------------------------  fe_collection_01a.cc  ---------------------------
 
 // FECollection would throw an exception when its destructor is called. Check
 // that this is fixed
@@ -41,7 +41,7 @@ check ()
 
 int main()
 {
-  std::ofstream logfile("deal_solver_01.output");
+  std::ofstream logfile("fe_collection_01.output");
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
