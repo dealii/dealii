@@ -25,11 +25,14 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
+#include <fe/fe.h>
+#include <numerics/dof_renumbering.h>
+
+#ifdef ENABLE_MULTIGRID
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_dof_tools.h>
-#include <fe/fe.h>
-#include <numerics/dof_renumbering.h>
+#endif
 
 #include <vector>
 #include <map>
@@ -263,6 +266,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler
 };
 
 
+#ifdef ENABLE_MULTIGRID
 template <int dim>
 void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler,
 				    const unsigned int               level,
@@ -427,7 +431,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
 				   // thus needs an own function
   dof_handler.renumber_dofs (level, new_number);
 };
-
+#endif
 
 
 template <int dim>
@@ -616,7 +620,7 @@ DoFRenumbering::cell_wise_dg (DoFHandler<dim>& dof,
 }
 
 
-
+#ifdef ENABLE_MULTIGRID
 template <int dim>
 void
 DoFRenumbering::cell_wise_dg (MGDoFHandler<dim>& dof,
@@ -670,6 +674,7 @@ DoFRenumbering::cell_wise_dg (MGDoFHandler<dim>& dof,
 
   dof.renumber_dofs(level, reverse);
 }
+#endif
 
 /**
  * Provide comparator for DoFCellAccessors
@@ -720,7 +725,7 @@ DoFRenumbering::downstream_dg (DoFHandler<dim>& dof,
 }
 
 
-
+#ifdef ENABLE_MULTIGRID
 template <int dim>
 void
 DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
@@ -739,7 +744,7 @@ DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
 
   cell_wise_dg(dof, level, ordered_cells);
 }
-
+#endif
 
 
 template <int dim>
@@ -767,12 +772,6 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<deal_II_dimension>&,
 				    const std::vector<unsigned int>&);
 
 template
-void DoFRenumbering::Cuthill_McKee (MGDoFHandler<deal_II_dimension>&,
-				    const unsigned int,
-				    const bool,
-				    const std::vector<unsigned int>&);
-
-template
 void DoFRenumbering::component_wise (DoFHandler<deal_II_dimension>&,
 				     const std::vector<unsigned int>&);
 
@@ -782,17 +781,7 @@ void DoFRenumbering::cell_wise_dg (DoFHandler<deal_II_dimension>&,
 				   const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
-void DoFRenumbering::cell_wise_dg (MGDoFHandler<deal_II_dimension>&,
-				   const unsigned int,
-				   const std::vector<MGDoFHandler<deal_II_dimension>::cell_iterator>&);
-
-template
 void DoFRenumbering::downstream_dg (DoFHandler<deal_II_dimension>&,
-				    const Point<deal_II_dimension>&);
-
-template
-void DoFRenumbering::downstream_dg (MGDoFHandler<deal_II_dimension>&,
-				    const unsigned int,
 				    const Point<deal_II_dimension>&);
 
 template
@@ -801,3 +790,21 @@ void DoFRenumbering::sort_selected_dofs_back (DoFHandler<deal_II_dimension> &,
 
 template
 void DoFRenumbering::random (DoFHandler<deal_II_dimension> &);
+
+#ifdef ENABLE_MULTIGRID
+template
+void DoFRenumbering::Cuthill_McKee (MGDoFHandler<deal_II_dimension>&,
+				    const unsigned int,
+				    const bool,
+				    const std::vector<unsigned int>&);
+template
+void DoFRenumbering::cell_wise_dg (MGDoFHandler<deal_II_dimension>&,
+				   const unsigned int,
+				   const std::vector<MGDoFHandler<deal_II_dimension>::cell_iterator>&);
+
+template
+void DoFRenumbering::downstream_dg (MGDoFHandler<deal_II_dimension>&,
+				    const unsigned int,
+				    const Point<deal_II_dimension>&);
+
+#endif

@@ -21,8 +21,6 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_constraints.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <dofs/dof_tools.h>
@@ -30,6 +28,11 @@
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/vector.h>
+
+#ifdef ENABLE_MULTIGRID
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
+#endif
 
 #include <algorithm>
 #include <numeric>
@@ -899,6 +902,7 @@ DoFTools::extract_dofs (const DoFHandler<dim>      &dof,
 }
 
 
+#ifdef ENABLE_MULTIGRID
 template<int dim>
 void
 DoFTools::extract_level_dofs(const unsigned int       level,
@@ -929,7 +933,7 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 	}
     }
 }
-
+#endif
 
 
 #if deal_II_dimension != 1
@@ -2341,11 +2345,13 @@ DoFTools::distribute_cell_to_dof_vector (const DoFHandler<deal_II_dimension> &do
 template void DoFTools::extract_dofs(const DoFHandler<deal_II_dimension>& dof,
 				     const std::vector<bool>& component_select,
 				     std::vector<bool>& selected_dofs);
+
+#ifdef ENABLE_MULTIGRID
 template void DoFTools::extract_level_dofs(const unsigned int level,
 					   const MGDoFHandler<deal_II_dimension>& dof,
 					   const std::vector<bool>& component_select,
 					   std::vector<bool>& selected_dofs);
-
+#endif
 
 #if deal_II_dimension != 1
 template

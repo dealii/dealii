@@ -19,11 +19,13 @@
 #include <fe/fe.h>
 #include <grid/tria_accessor.h>
 #include <dofs/dof_accessor.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
 
+#ifdef ENABLE_MULTIGRID
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
+#endif
 
 // helper function to aquire the number of levels within a grid
 template <class GridClass>
@@ -215,6 +217,7 @@ InterGridMap<GridClass,dim>::memory_consumption () const
 // explicit instantiations
 template class InterGridMap<Triangulation, deal_II_dimension>;
 template class InterGridMap<DoFHandler, deal_II_dimension>;
+
+#ifdef ENABLE_MULTIGRID
 template class InterGridMap<MGDoFHandler, deal_II_dimension>;
-
-
+#endif
