@@ -46,7 +46,7 @@ namespace internal
     				     /**
 				      * Accessor class for iterators
 				      */
-    template <typename number>
+    template <class BlockMatrix>
     class Accessor
     {
       public:
@@ -54,9 +54,7 @@ namespace internal
                                           * Typedef the value type of the
                                           * matrix we point into.
                                           */
-        typedef
-        typename BlockSparseMatrix<number>::value_type
-        value_type;
+        typedef typename BlockMatrix::value_type value_type;
         
 					 /**
 					  * Constructor. Since we use
@@ -64,9 +62,9 @@ namespace internal
 					  * access, a const matrix
 					  * pointer is sufficient.
 					  */
-	Accessor (const BlockSparseMatrix<number> *m,
-		  const unsigned int               row,
-		  const unsigned int               index);
+	Accessor (const BlockMatrix  *m,
+		  const unsigned int  row,
+		  const unsigned int  index);
 	
 					 /**
 					  * Row number of the element
@@ -112,15 +110,13 @@ namespace internal
 					 /**
 					  * The matrix accessed.
 					  */
-	const BlockSparseMatrix<number>* matrix;
+	const BlockMatrix * matrix;
 	
 					 /**
 					  * Iterator of the underlying matrix
 					  * class.
 					  */
-	typename
-        BlockSparseMatrix<number>::BlockType::const_iterator
-        base_iterator;
+	typename BlockMatrix::BlockType::const_iterator base_iterator;
 	
 					 /**
 					  * Number of block where row lies in.
@@ -159,16 +155,16 @@ namespace internal
 				     /**
 				      * STL conforming iterator.
 				      */
-    template <typename number>
-    class ConstIterator : private Accessor<number>
+    template <class BlockMatrix>
+    class ConstIterator : private Accessor<BlockMatrix>
     {
       public:
                                          /**
                                           * Constructor.
                                           */ 
-	ConstIterator(const BlockSparseMatrix<number>*,
-                      const unsigned int row,
-                      const unsigned int   index);
+	ConstIterator(const BlockMatrix  *matrix,
+                      const unsigned int  row,
+                      const unsigned int  index);
 	  
                                          /**
                                           * Prefix increment.
@@ -183,12 +179,12 @@ namespace internal
                                          /**
                                           * Dereferencing operator.
                                           */
-	const Accessor<number> & operator* () const;
+	const Accessor<BlockMatrix> & operator* () const;
 
                                          /**
                                           * Dereferencing operator.
                                           */
-	const Accessor<number> * operator-> () const;
+	const Accessor<BlockMatrix> * operator-> () const;
 
                                          /**
                                           * Comparison. True, if
@@ -267,11 +263,18 @@ class BlockSparseMatrix : public Subscriptor
     typedef typename BlockType::value_type value_type;
     typedef value_type             *pointer;
     typedef const value_type       *const_pointer;
-    typedef internal::BlockMatrixIterators::ConstIterator<number> iterator;
-    typedef internal::BlockMatrixIterators::ConstIterator<number> const_iterator;
     typedef value_type             &reference;
     typedef const value_type       &const_reference;
     typedef size_t                  size_type;
+
+    typedef
+    internal::BlockMatrixIterators::ConstIterator<BlockSparseMatrix>
+    iterator;
+
+    typedef
+    internal::BlockMatrixIterators::ConstIterator<BlockSparseMatrix>
+    const_iterator;
+    
 
 				     /**
 				      * Constructor; initializes the
@@ -479,6 +482,18 @@ class BlockSparseMatrix : public Subscriptor
 	      const number value);
     
 				     /**
+				      * Add <tt>value</tt> to the element
+				      * <tt>(i,j)</tt>.  Throws an error if
+				      * the entry does not
+				      * exist. Still, it is allowed to
+				      * store zero values in
+				      * non-existent fields.
+				      */
+    void add (const unsigned int i,
+              const unsigned int j,
+	      const number value);
+
+				     /**
 				      * Multiply the entire matrix by a
 				      * fixed factor.
 				      */
@@ -490,17 +505,6 @@ class BlockSparseMatrix : public Subscriptor
 				      */
     BlockSparseMatrix & operator /= (const number factor);
     
-				     /**
-				      * Add <tt>value</tt> to the element
-				      * <tt>(i,j)</tt>.  Throws an error if
-				      * the entry does not
-				      * exist. Still, it is allowed to
-				      * store zero values in
-				      * non-existent fields.
-				      */
-    void add (const unsigned int i, const unsigned int j,
-	      const number value);
-
 				     /**
 				      * Copy the given matrix to this
 				      * one.  The operation throws an
@@ -945,7 +949,7 @@ class BlockSparseMatrix : public Subscriptor
     template <typename>
     friend class internal::BlockMatrixIterators::ConstIterator;
 #else
-    typedef internal::BlockMatrixIterators::Accessor<number> Accessor;
+    typedef internal::BlockMatrixIterators::Accessor<BlockSparseMatrix> Accessor;
     friend class Accessor;
     
     friend class const_iterator;
@@ -962,12 +966,12 @@ namespace internal
 {
   namespace BlockMatrixIterators
   {
-    template <typename number>
+    template <class BlockMatrix>
     inline
-    Accessor<number>::
-    Accessor (const BlockSparseMatrix<number> *matrix,
-              const unsigned int               r,
-              const unsigned int               i)
+    Accessor<BlockMatrix>::
+    Accessor (const BlockMatrix  *matrix,
+              const unsigned int  r,
+              const unsigned int  i)
                     :
                     matrix(matrix),
                     base_iterator(matrix->block(0,0).begin()),
@@ -996,55 +1000,55 @@ namespace internal
     }
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
     unsigned int
-    Accessor<number>::row() const
+    Accessor<BlockMatrix>::row() const
     {
       return row_start + base_iterator->row();
     }
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
     unsigned int
-    Accessor<number>::index() const
+    Accessor<BlockMatrix>::index() const
     {
       return a_index;
     }
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
     unsigned int
-    Accessor<number>::column() const
+    Accessor<BlockMatrix>::column() const
     {
       return col_start + base_iterator->column();
     }
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
     unsigned int
-    Accessor<number>::block_row() const
+    Accessor<BlockMatrix>::block_row() const
     {
       return row_block;
     }
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
     unsigned int
-    Accessor<number>::block_column() const
+    Accessor<BlockMatrix>::block_column() const
     {
       return col_block;
     }
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
-    typename Accessor<number>::value_type
-    Accessor<number>::value () const
+    typename Accessor<BlockMatrix>::value_type
+    Accessor<BlockMatrix>::value () const
     {
       return base_iterator->value();
     }
@@ -1053,22 +1057,22 @@ namespace internal
 //----------------------------------------------------------------------//
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
-    ConstIterator<number>::
-    ConstIterator (const BlockSparseMatrix<number>* m,
+    ConstIterator<BlockMatrix>::
+    ConstIterator (const BlockMatrix *m,
                    const unsigned int r,
                    const unsigned int i)
                     :
-                    Accessor<number>(m, r, i)
+                    Accessor<BlockMatrix>(m, r, i)
     {}
 
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
-    ConstIterator<number> &
-    ConstIterator<number>::operator++ ()
+    ConstIterator<BlockMatrix> &
+    ConstIterator<BlockMatrix>::operator++ ()
     {
       Assert (this->row_block<this->matrix->n_block_rows(), ExcIteratorPastEnd());
 
@@ -1131,7 +1135,7 @@ namespace internal
 
 
 
-//  template <typename number>
+//  template <class BlockMatrix>
 //  inline
 //  const_iterator&
 //  ConstIterator::operator++ (int)
@@ -1142,29 +1146,29 @@ namespace internal
 
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
-    const Accessor<number> &
-    ConstIterator<number>::operator* () const
+    const Accessor<BlockMatrix> &
+    ConstIterator<BlockMatrix>::operator* () const
     {
       return *this;
     }
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
-    const Accessor<number> *
-    ConstIterator<number>::operator-> () const
+    const Accessor<BlockMatrix> *
+    ConstIterator<BlockMatrix>::operator-> () const
     {
       return this;
     }
 
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
     bool
-    ConstIterator<number>::
+    ConstIterator<BlockMatrix>::
     operator == (const ConstIterator& i) const
     {
       if (this->matrix != i->matrix)
@@ -1179,10 +1183,10 @@ namespace internal
 
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
     bool
-    ConstIterator<number>::
+    ConstIterator<BlockMatrix>::
     operator != (const ConstIterator& i) const
     {
       return !(*this == i);
@@ -1190,10 +1194,10 @@ namespace internal
 
 
 
-    template <typename number>
+    template <class BlockMatrix>
     inline
     bool
-    ConstIterator<number>::
+    ConstIterator<BlockMatrix>::
     operator < (const ConstIterator& i) const
     {
       if (this->row_block < i->row_block)
