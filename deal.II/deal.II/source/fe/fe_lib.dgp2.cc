@@ -30,7 +30,7 @@ FEDG_P2<1>::FEDG_P2 () :
 		FEQ1Mapping<1> (0, 3, 0, 0, 1,
 				vector<bool> (1, true))
 {
-  initialize_matrices ();
+//  initialize_matrices ();
 };
 
 
@@ -136,7 +136,7 @@ FEDG_P2<2>::FEDG_P2 () :
 		FEQ1Mapping<2> (0, 0, 6, 0, 1,
 				vector<bool> (1, true))
 {
-  initialize_matrices ();
+//  initialize_matrices ();
 };
 
 
@@ -237,7 +237,7 @@ FEDG_P2<3>::FEDG_P2 () :
 		FEQ1Mapping<3> (0, 0, 0, 4, 1,
 				vector<bool> (1, true))
 {
-  initialize_matrices ();
+//  initialize_matrices ();
 };
 
 
