@@ -797,6 +797,15 @@ namespace Functions
   class CutOffFunctionBase : public Function<dim>
   {
     public:
+				       /**
+					* Value used in the
+					* constructor of this and
+					* derived classes to denote
+					* that no component is
+					* selected.
+					*/
+      static const unsigned int no_component = static_cast<unsigned int>(-1);
+
   				       /**
 					* Constructor. Arguments are the
 					* center of the ball and its
@@ -811,7 +820,7 @@ namespace Functions
       CutOffFunctionBase (const double radius = 1.,
 			  const Point<dim> = Point<dim>(),
 			  const unsigned int n_components = 1,
-			  const unsigned int select = no_component);
+			  const unsigned int select = CutOffFunctionBase<dim>::no_component);
       
 				       /**
 					* Move the center of the ball
@@ -841,11 +850,6 @@ namespace Functions
 					* the same in all components.
 					*/
       const unsigned int selected;
-				       /**
-					* Value for no selected component.
-					*/
-      static const unsigned int no_component = static_cast<unsigned int>(-1);
-
   };
   
   
@@ -876,7 +880,7 @@ namespace Functions
       CutOffFunctionLinfty (const double radius = 1.,
 			    const Point<dim> = Point<dim>(),
 			    const unsigned int n_components = 1,
-			    const unsigned int select = no_component);
+			    const unsigned int select = CutOffFunctionBase<dim>::no_component);
     
 				       /**
 					* Function value at one point.
@@ -925,7 +929,7 @@ namespace Functions
       CutOffFunctionW1 (const double radius = 1.,
 			const Point<dim> = Point<dim>(),
 			const unsigned int n_components = 1,
-			const unsigned int select = no_component);
+			const unsigned int select = CutOffFunctionBase<dim>::no_component);
     
 				       /**
 					* Function value at one point.
@@ -975,7 +979,7 @@ namespace Functions
       CutOffFunctionCinfty (const double radius = 1.,
 			    const Point<dim> = Point<dim>(),
 			    const unsigned int n_components = 1,
-			    const unsigned int select = no_component);
+			    const unsigned int select = CutOffFunctionBase<dim>::no_component);
     
 				       /**
 					* Function value at one point.
