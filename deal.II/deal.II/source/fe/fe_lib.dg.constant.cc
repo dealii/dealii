@@ -14,7 +14,7 @@
 
 template <>
 FEDG_Q0<1>::FEDG_Q0 () :
-		FELinearMapping<1> (0, 1)
+		FEQ1Mapping<1> (0, 1)
 {
 				   // for restriction and prolongation matrices:
 				   // note that we do not add up all the
@@ -59,7 +59,7 @@ FEDG_Q0<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator
 
 template <>
 FEDG_Q0<2>::FEDG_Q0 () :
-		FELinearMapping<2> (0, 0, 1)
+		FEQ1Mapping<2> (0, 0, 1)
 {
 				   // The restriction matrices got crazy values
 				   // as it is yet not clear how they should work

@@ -19,14 +19,14 @@ template <> void FEQ4<deal_II_dimension>::initialize_matrices ();
 
 template <>
 FEQ4<1>::FEQ4 () :
-		FELinearMapping<1> (1, 3) {
+		FEQ1Mapping<1> (1, 3) {
   initialize_matrices ();
 };
 
 
 template <>
 FEQ4<1>::FEQ4 (const int) :
-		FELinearMapping<1> (0, 5) {
+		FEQ1Mapping<1> (0, 5) {
   initialize_matrices ();
 };
 
@@ -218,7 +218,7 @@ void FEQ4<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 
 template <>
 FEQ4<2>::FEQ4 () :
-		FELinearMapping<2> (1, 3, 9)
+		FEQ1Mapping<2> (1, 3, 9)
 {
   interface_constraints(0,3) = 1.0;
   interface_constraints(1,0) = 35.0/128.0;
@@ -251,7 +251,7 @@ FEQ4<2>::FEQ4 () :
 
 template <>
 FEQ4<2>::FEQ4 (const int) :
-		FELinearMapping<2> (0, 0, 25)
+		FEQ1Mapping<2> (0, 0, 25)
 {
   initialize_matrices ();
 };

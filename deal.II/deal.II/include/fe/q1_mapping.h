@@ -1,10 +1,10 @@
-/*----------------------------   fe_linear_mapping.h     ---------------------------*/
+/*----------------------------   q1_mapping.h     ---------------------------*/
 /*      $Id$                 */
 /*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __fe_linear_mapping_H
-#define __fe_linear_mapping_H
-/*----------------------------   fe_linear_mapping.h     ---------------------------*/
-
+#ifndef __fe_q1_mapping_H
+#define __fe_q1_mapping_H
+/*----------------------------   q1_mapping.h     ---------------------------*/
+// File has moved from fe_linear_mapping.h
 
 #include <cmath>
 #include <fe/fe.h>
@@ -19,7 +19,7 @@
  * are implemented here and do not have to be taken care of later.
  */
 template <int dim>
-class FELinearMapping
+class FEQ1Mapping
   :
   public FiniteElement<dim>
 {
@@ -32,7 +32,7 @@ class FELinearMapping
 				      * two space dimensions, #dofs_per_hex#
 				      * shall be zero.
 				      */
-    FELinearMapping (const unsigned int dofs_per_vertex,
+    FEQ1Mapping (const unsigned int dofs_per_vertex,
 		     const unsigned int dofs_per_line,
 		     const unsigned int dofs_per_quad=0,
 		     const unsigned int dofs_per_hex =0,
@@ -181,7 +181,7 @@ class FELinearMapping
 
 
 
-/*----------------------------   fe_linear_mapping.h     ---------------------------*/
-/* end of #ifndef __fe_linear_mapping_H */
+/*----------------------------   q1_mapping.h     ---------------------------*/
+/* end of #ifndef __q1_mapping_H */
 #endif
-/*----------------------------   fe_linear_mapping.h     ---------------------------*/
+/*----------------------------   q1_mapping.h     ---------------------------*/

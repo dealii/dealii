@@ -1,8 +1,9 @@
 /* $Id$ */
 /* Copyright W. Bangerth, University of Heidelberg, 1998 */
 
+// moved from file fe_linear_mapping_jacobians.cc
 
-#include <fe/fe_linear_mapping.h>
+#include <fe/q1_mapping.h>
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
 
@@ -11,7 +12,7 @@
 
 
 /**
- * This file has been singled out from fe_linear_mapping.cc because the computation
+ * This file has been singled out from q1_mapping.cc because the computation
  * of the 3d matrices is so extremely large that it can't be done with
  * optimization switched on. On the other hand, this also is not necessary,
  * because Maple outputs fairly good optimized code already. Singling out this file
@@ -24,7 +25,7 @@
 #if deal_II_dimension == 1
 
 template <>
-void FELinearMapping<1>::compute_jacobian_matrices (const DoFHandler<1>::cell_iterator &cell,
+void FEQ1Mapping<1>::compute_jacobian_matrices (const DoFHandler<1>::cell_iterator &cell,
 						    const vector<Point<1> > &unit_points,
 						    vector<Tensor<2,1> >    &jacobians) 
 {
@@ -40,7 +41,7 @@ void FELinearMapping<1>::compute_jacobian_matrices (const DoFHandler<1>::cell_it
 
 
 template <>
-void FELinearMapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_iterator &,
+void FEQ1Mapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_iterator &,
 						     const vector<Point<1> > &unit_points,
 						     vector<Tensor<3,1> >    &jacobians_grad) 
 {
@@ -62,7 +63,7 @@ void FELinearMapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_i
 #if deal_II_dimension == 2
 
 template <>
-void FELinearMapping<2>::compute_jacobian_matrices (const DoFHandler<2>::cell_iterator &cell,
+void FEQ1Mapping<2>::compute_jacobian_matrices (const DoFHandler<2>::cell_iterator &cell,
 						    const vector<Point<2> > &unit_points,
 						    vector<Tensor<2,2> >    &jacobians) 
 {
@@ -115,7 +116,7 @@ void FELinearMapping<2>::compute_jacobian_matrices (const DoFHandler<2>::cell_it
 
 
 template <>
-void FELinearMapping<2>::compute_jacobian_gradients (const DoFHandler<2>::cell_iterator &cell,
+void FEQ1Mapping<2>::compute_jacobian_gradients (const DoFHandler<2>::cell_iterator &cell,
 						     const vector<Point<2> > &unit_points,
 						     vector<Tensor<3,2> >    &jacobians_grad) 
 {
@@ -199,7 +200,7 @@ void FELinearMapping<2>::compute_jacobian_gradients (const DoFHandler<2>::cell_i
 #if deal_II_dimension == 3
 
 template <>
-void FELinearMapping<3>::compute_jacobian_matrices (const DoFHandler<3>::cell_iterator &cell,
+void FEQ1Mapping<3>::compute_jacobian_matrices (const DoFHandler<3>::cell_iterator &cell,
 						    const vector<Point<3> > &unit_points,
 						    vector<Tensor<2,3> >    &jacobians) 
 {
@@ -1336,7 +1337,7 @@ void FELinearMapping<3>::compute_jacobian_matrices (const DoFHandler<3>::cell_it
 
 
 template <>
-void FELinearMapping<3>::compute_jacobian_gradients (const DoFHandler<3>::cell_iterator &cell,
+void FEQ1Mapping<3>::compute_jacobian_gradients (const DoFHandler<3>::cell_iterator &cell,
 						     const vector<Point<3> > &unit_points,
 						     vector<Tensor<3,3> >    &jacobians_grad) 
 {

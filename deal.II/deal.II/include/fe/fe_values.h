@@ -111,7 +111,7 @@
  *  \textit{from the right}; the whole situation is a bit confusing and it
  *  either takes deep though or trial-and-error to do it right. Some more
  *  information on this can be found in the source code documentation for the
- *  #FELinearMapping<dim>::fill_fe_values# function, where also a small test
+ *  #FEQ1Mapping<dim>::fill_fe_values# function, where also a small test
  *  program is presented.
  *
  *  The derivatives of the Jacobi matrices at the quadrature points with respect

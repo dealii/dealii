@@ -1,8 +1,9 @@
 /* $Id$ */
 /* Copyright W. Bangerth, University of Heidelberg, 1998 */
 
+// moved from file fe_linear_mapping.cc
 
-#include <fe/fe_linear_mapping.h>
+#include <fe/q1_mapping.h>
 #include <base/quadrature.h>
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
@@ -11,14 +12,14 @@
 
 
 
-/*---------------------------- FELinearMapping ----------------------------------*/
+/*---------------------------- FEQ1Mapping ----------------------------------*/
 
 
 
 #if deal_II_dimension == 1
 
 template <>
-FELinearMapping<1>::FELinearMapping (const unsigned int dofs_per_vertex,
+FEQ1Mapping<1>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 				     const unsigned int dofs_per_line,
 				     const unsigned int dofs_per_quad,
 				     const unsigned int dofs_per_hex,
@@ -37,7 +38,7 @@ FELinearMapping<1>::FELinearMapping (const unsigned int dofs_per_vertex,
 template <>
 inline
 double
-FELinearMapping<1>::shape_value_transform (const unsigned int i,
+FEQ1Mapping<1>::shape_value_transform (const unsigned int i,
 					   const Point<1>     &p) const
 {
   Assert((i<2), ExcInvalidIndex(i));
@@ -55,7 +56,7 @@ FELinearMapping<1>::shape_value_transform (const unsigned int i,
 template <>
 inline
 Tensor<1,1>
-FELinearMapping<1>::shape_grad_transform(const unsigned int i,
+FEQ1Mapping<1>::shape_grad_transform(const unsigned int i,
 					 const Point<1>&) const
 {
   Assert((i<2), ExcInvalidIndex(i));
@@ -70,7 +71,7 @@ FELinearMapping<1>::shape_grad_transform(const unsigned int i,
 
 
 template <>
-void FELinearMapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
+void FEQ1Mapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 					     const vector<Point<0> > &,
 					     vector<double>      &) const {
   Assert (false, ExcInternalError());
@@ -79,7 +80,7 @@ void FELinearMapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator 
 
 
 template <>
-void FELinearMapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
+void FEQ1Mapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
 						const unsigned int           ,
 						const vector<Point<0> > &,
 						vector<double>      &) const {
@@ -89,7 +90,7 @@ void FELinearMapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterat
 
 
 template <>
-void FELinearMapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
+void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					     const unsigned int,
 					     const vector<Point<0> > &,
 					     vector<Point<1> > &) const {
@@ -99,7 +100,7 @@ void FELinearMapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator 
 
 
 template <>
-void FELinearMapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
+void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					    const unsigned int,
 					    const unsigned int,
 					    const vector<Point<0> > &,
@@ -109,7 +110,7 @@ void FELinearMapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator 
 
 
 template <>
-void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
+void FEQ1Mapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 					 const vector<Point<1> > &unit_points,
 					 vector<Tensor<2,1> >    &jacobians,
 					 const bool            compute_jacobians,
@@ -139,7 +140,7 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 #if deal_II_dimension == 2
 
 template <>
-FELinearMapping<2>::FELinearMapping (const unsigned int dofs_per_vertex,
+FEQ1Mapping<2>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 				     const unsigned int dofs_per_line,
 				     const unsigned int dofs_per_quad,
 				     const unsigned int dofs_per_hex,
@@ -158,7 +159,7 @@ FELinearMapping<2>::FELinearMapping (const unsigned int dofs_per_vertex,
 template <>
 inline
 double
-FELinearMapping<2>::shape_value_transform (const unsigned int i,
+FEQ1Mapping<2>::shape_value_transform (const unsigned int i,
 					   const Point<2>& p) const
 {
   Assert((i<4), ExcInvalidIndex(i));
@@ -177,7 +178,7 @@ FELinearMapping<2>::shape_value_transform (const unsigned int i,
 template <>
 inline
 Tensor<1,2>
-FELinearMapping<2>::shape_grad_transform (const unsigned int i,
+FEQ1Mapping<2>::shape_grad_transform (const unsigned int i,
 					  const Point<2>& p) const
 {
   Assert((i<4), ExcInvalidIndex(i));
@@ -194,7 +195,7 @@ FELinearMapping<2>::shape_grad_transform (const unsigned int i,
 
 
 template <>
-void FELinearMapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
+void FEQ1Mapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
 					     const vector<Point<1> > &unit_points,
 					     vector<double> &face_jacobians) const {
 				   // more or less copied from the linear
@@ -215,7 +216,7 @@ void FELinearMapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator 
 
 
 template <>
-void FELinearMapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &face,
+void FEQ1Mapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &face,
 						const unsigned int           ,
 						const vector<Point<1> > &unit_points,
 						vector<double> &face_jacobians) const {
@@ -239,7 +240,7 @@ void FELinearMapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterat
 
 
 template <>
-void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
+void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 					     const unsigned int       face_no,
 					     const vector<Point<1> > &unit_points,
 					     vector<Point<2> > &normal_vectors) const {
@@ -270,7 +271,7 @@ void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator 
 
 
 template <>
-void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
+void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 					     const unsigned int       face_no,
 					     const unsigned int,
 					     const vector<Point<1> > &unit_points,
@@ -311,7 +312,7 @@ void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator 
 #if deal_II_dimension == 3
 
 template <>
-FELinearMapping<3>::FELinearMapping (const unsigned int dofs_per_vertex,
+FEQ1Mapping<3>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 				     const unsigned int dofs_per_line,
 				     const unsigned int dofs_per_quad,
 				     const unsigned int dofs_per_hex,
@@ -329,7 +330,7 @@ FELinearMapping<3>::FELinearMapping (const unsigned int dofs_per_vertex,
 template <>
 inline
 double
-FELinearMapping<3>::shape_value_transform (const unsigned int i,
+FEQ1Mapping<3>::shape_value_transform (const unsigned int i,
 					   const Point<3>& p) const
 {
   Assert((i<8), ExcInvalidIndex(i));
@@ -352,7 +353,7 @@ FELinearMapping<3>::shape_value_transform (const unsigned int i,
 template <>
 inline
 Tensor<1,3>
-FELinearMapping<3>::shape_grad_transform (const unsigned int i,
+FEQ1Mapping<3>::shape_grad_transform (const unsigned int i,
 					  const Point<3>& p) const
 {
   Assert((i<8), ExcInvalidIndex(i));
@@ -389,7 +390,7 @@ FELinearMapping<3>::shape_grad_transform (const unsigned int i,
 
 
 template <>
-void FELinearMapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &face,
+void FEQ1Mapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &face,
 					     const vector<Point<2> > &unit_points,
 					     vector<double> &face_jacobians) const {
   Assert (unit_points.size() == face_jacobians.size(),
@@ -461,7 +462,7 @@ void FELinearMapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator 
 
 
 template <>
-void FELinearMapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &/*face*/,
+void FEQ1Mapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &/*face*/,
 						const unsigned int           ,
 						const vector<Point<2> > &unit_points,
 						vector<double> &face_jacobians) const {
@@ -472,7 +473,7 @@ void FELinearMapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterat
 
 
 template <>
-void FELinearMapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cell,
+void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cell,
 					     const unsigned int       face_no,
 					     const vector<Point<2> > &unit_points,
 					     vector<Point<3> > &normal_vectors) const {
@@ -527,7 +528,7 @@ void FELinearMapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator 
 
 
 template <>
-void FELinearMapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*cell*/,
+void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*cell*/,
 					     const unsigned int       /*face_no*/,
 					     const unsigned int,
 					     const vector<Point<2> > &unit_points,
@@ -546,7 +547,7 @@ void FELinearMapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator 
 
 
 template <int dim>
-void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 					   const vector<Point<dim> >            &unit_points,
 					   vector<Tensor<2,dim> >               &jacobians,
 					   const bool              compute_jacobians,
@@ -724,4 +725,4 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 
 /*------------------------------- Explicit Instantiations -------------*/
 
-template class FELinearMapping<deal_II_dimension>;
+template class FEQ1Mapping<deal_II_dimension>;

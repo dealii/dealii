@@ -6,17 +6,10 @@
 /*----------------------------   fe_lib.h     ---------------------------*/
 
 
-#include <fe/fe_linear_mapping.h>
-
-#define FELinear FEQ1
-#define FEQuadraticSub FEQ2
-#define FECubicSub FEQ3
-#define FEQuarticSub FEQ4
+#include <fe/q1_mapping.h>
 
 /**
- * Define a (bi-, tri-, etc)linear finite element in #dim# space dimensions,
- * along with (bi-, tri-)linear (therefore isoparametric) transforms from the
- * unit cell to the real cell.
+ * Isoparametric Q1 finite element in #dim# space dimensions.
  *
  * The linear, isoparametric mapping from a point $\vec \xi$ on the unit cell
  * to a point $\vec x$ on the real cell is defined as
@@ -32,7 +25,10 @@
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
-class FEQ1 : public FELinearMapping<dim> {
+class FEQ1
+  :
+  public FEQ1Mapping<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -42,7 +38,7 @@ class FEQ1 : public FELinearMapping<dim> {
 				     /**
 				      * Constructor that is called by the
 				      * constructor of the derived
-				      * #FEDGLinear# class.
+				      * #FEDG_Q1# class.
 				      * It uses  no dofs in the vertices and 
 				      * $2^d$ dofs per cell. No constraint
 				      * matrices are build.
@@ -129,8 +125,8 @@ class FEQ1 : public FELinearMapping<dim> {
 
 
 /**
- * Define a (bi-, tri-, etc)quadratic finite element in #dim# space dimensions.
- * A linear (subparametric) mapping from the unit cell
+ * Subparametric Q2 finite element in #dim# space dimensions.
+ * A Q1 mapping from the unit cell
  * to the real cell is implemented.
  *
  * The numbering of the degrees of freedom is as follows:
@@ -211,7 +207,10 @@ class FEQ1 : public FELinearMapping<dim> {
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
-class FEQ2 : public FELinearMapping<dim> {
+class FEQ2
+  :
+  public FEQ1Mapping<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -307,8 +306,8 @@ class FEQ2 : public FELinearMapping<dim> {
 
 
 /**
- * Define a (bi-, tri-, etc)cubic finite element in #dim# space dimensions.
- * A linear (subparametric) mapping from the unit cell
+ * Subparametric Q3 finite element in #dim# space dimensions.
+ * A Q1 mapping from the unit cell
  * to the real cell is implemented.
  *
  * The numbering of degrees of freedom in one spatial dimension is as follows:
@@ -333,7 +332,10 @@ class FEQ2 : public FELinearMapping<dim> {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FEQ3 : public FELinearMapping<dim> {
+class FEQ3
+  :
+  public FEQ1Mapping<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -428,7 +430,7 @@ class FEQ3 : public FELinearMapping<dim> {
 
 
 /**
- * Define a (bi-, tri-, etc)quartic finite element in #dim# space dimensions.
+ * Subparametric Q4 finite element in #dim# space dimensions.
  * A linear (subparametric) mapping from the unit cell
  * to the real cell is implemented.
  *
@@ -456,7 +458,10 @@ class FEQ3 : public FELinearMapping<dim> {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FEQ4 : public FELinearMapping<dim> {
+class FEQ4
+  :
+  public FEQ1Mapping<dim>
+{
   public:
 				     /**
 				      * Constructor

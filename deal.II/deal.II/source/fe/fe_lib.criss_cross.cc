@@ -988,7 +988,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 
   The scheme laid down above was originally used. Due to recent advances
   in the authors understanding of most basic things, it was dropped and
-  replaced by the following version. See #FELinearMapping<dim>::fill_fe_values#
+  replaced by the following version. See #FEQ1Mapping<dim>::fill_fe_values#
   for more information on this.
 */
 

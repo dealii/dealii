@@ -21,7 +21,7 @@
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDG_Q0 : public FELinearMapping<dim> {
+class FEDG_Q0 : public FEQ1Mapping<dim> {
   public:
 				     /**
 				      * Constructor
