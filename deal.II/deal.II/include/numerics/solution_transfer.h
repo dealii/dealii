@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -111,9 +111,9 @@
  * soltrans.interpolate(solution, interpolated_solution);
  * @end{verbatim}
  *
- * Multiple calling of the function 
+ * Multiple calls to the function 
  * @p{interpolate (const Vector<number> &in, Vector<number> &out)}
- * is NOT allowed. Interpolating several functions can be performed in one step
+ * are NOT allowed. Interpolating several functions can be performed in one step
  * by using 
  * @p{void interpolate (const vector<Vector<number> >&all_in, vector<Vector<number> >&all_out) const},
  * and using the respective @p{prepare_for_coarsening_and_refinement} function 
