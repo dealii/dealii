@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,7 +53,7 @@ template <class Vector, class Matrix, class Sparsity>
 class LaplaceProblem 
 {
   public:
-    LaplaceProblem ();
+    LaplaceProblem (const unsigned int n_blocks);
 
     void run ();
     void reinit_sparsity ();
@@ -65,6 +65,8 @@ class LaplaceProblem
     void make_grid_and_dofs ();
     void assemble_system ();
     void solve ();
+
+    const unsigned int n_blocks;
 
     Triangulation<2>     triangulation;
     FEQ1<2>              fe;
@@ -78,24 +80,26 @@ class LaplaceProblem
 
 
 template <class Vector, class Matrix, class Sparsity>
-LaplaceProblem<Vector,Matrix,Sparsity>::LaplaceProblem () :
+LaplaceProblem<Vector,Matrix,Sparsity>::LaplaceProblem (const unsigned int n_blocks) :
+		n_blocks (n_blocks),
 		dof_handler (triangulation)
 {
-  sparsity_pattern.reinit (system_matrix.n_block_rows(),
-			   system_matrix.n_block_cols());
+  sparsity_pattern.reinit (n_blocks, n_blocks);
 };
 
 
 
 template <>
-LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::LaplaceProblem () :
+LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::LaplaceProblem (const unsigned int n_blocks) :
+		n_blocks (n_blocks),
 		dof_handler (triangulation)
 {};
 
 
 
 template <>
-LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::LaplaceProblem () :
+LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::LaplaceProblem (const unsigned int n_blocks) :
+		n_blocks (n_blocks),
 		dof_handler (triangulation)
 {};
 
@@ -167,59 +171,79 @@ void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_v
 
 
 template <>
-void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern>::reinit_sparsity () 
+void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityPattern>::reinit_sparsity () 
 {
-  const unsigned int n_dofs = dof_handler.n_dofs();
-  const unsigned int block_size[2] = { n_dofs/3, n_dofs - n_dofs/3 };
+  switch (n_blocks)
+    {
+      case 2:
+      {
+	const unsigned int n_dofs = dof_handler.n_dofs();
+	const unsigned int block_size[2] = { n_dofs/3, n_dofs - n_dofs/3 };
+	
+	for (unsigned int i=0; i<2; ++i)
+	  for (unsigned int j=0; j<2; ++j)
+	    sparsity_pattern.block(i,j).reinit (block_size[i], block_size[j],
+						dof_handler.max_couplings_between_dofs());
+	sparsity_pattern.collect_sizes ();
 
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<2; ++j)
-      sparsity_pattern.block(i,j).reinit (block_size[i], block_size[j],
-					  dof_handler.max_couplings_between_dofs());
-  sparsity_pattern.collect_sizes ();
+	break;
+      };
+
+      case 3:
+      {
+	const unsigned int n_dofs = dof_handler.n_dofs();
+	const unsigned int block_size[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
+	
+	for (unsigned int i=0; i<3; ++i)
+	  for (unsigned int j=0; j<3; ++j)
+	    sparsity_pattern.block(i,j).reinit (block_size[i], block_size[j],
+						dof_handler.max_couplings_between_dofs());
+	sparsity_pattern.collect_sizes ();
+
+	break;
+      };
+
+      default:
+	    AssertThrow (false, ExcNotImplemented());
+    }; 
 };
 
 
 
 template <>
-void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern>::reinit_vectors () 
+void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityPattern>::reinit_vectors () 
 {
-  const unsigned int n_dofs = dof_handler.n_dofs();
-  const unsigned int block_size_[2] = { n_dofs/3, n_dofs - n_dofs/3 };
-  const vector<unsigned int> block_size (&block_size_[0],
-					 &block_size_[2]);
-					 
-  solution.reinit (block_size);
-  system_rhs.reinit (block_size);
-};
+  switch (n_blocks)
+    {
+      case 2:
+      {
+	const unsigned int n_dofs = dof_handler.n_dofs();
+	const unsigned int block_size_[2] = { n_dofs/3, n_dofs - n_dofs/3 };
+	const vector<unsigned int> block_size (&block_size_[0],
+					       &block_size_[2]);
+	
+	solution.reinit (block_size);
+	system_rhs.reinit (block_size);
 
+	break;
+      };
+       
+      case 3:
+      {
+	const unsigned int n_dofs = dof_handler.n_dofs();
+	const unsigned int block_size_[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
+	const vector<unsigned int> block_size (&block_size_[0],
+					       &block_size_[3]);
+	
+	solution.reinit (block_size);
+	system_rhs.reinit (block_size);
 
-
-template <>
-void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,3,3>,BlockSparsityPattern>::reinit_sparsity () 
-{
-  const unsigned int n_dofs = dof_handler.n_dofs();
-  const unsigned int block_size[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
-
-  for (unsigned int i=0; i<3; ++i)
-    for (unsigned int j=0; j<3; ++j)
-      sparsity_pattern.block(i,j).reinit (block_size[i], block_size[j],
-					  dof_handler.max_couplings_between_dofs());
-  sparsity_pattern.collect_sizes ();
-};
-
-
-
-template <>
-void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,3,3>,BlockSparsityPattern>::reinit_vectors () 
-{
-  const unsigned int n_dofs = dof_handler.n_dofs();
-  const unsigned int block_size_[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
-  const vector<unsigned int> block_size (&block_size_[0],
-					 &block_size_[3]);
-					 
-  solution.reinit (block_size);
-  system_rhs.reinit (block_size);
+	break;
+      };
+       
+      default:
+	    AssertThrow (false, ExcNotImplemented());
+    };
 };
 
 
@@ -336,7 +360,7 @@ int main ()
   if (true)
     {
       LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>
-	laplace_problem;  
+	laplace_problem (2);
       laplace_problem.run ();
       
       solutions.push_back (vector<double>());
@@ -348,7 +372,7 @@ int main ()
   if (true)
     {
       LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>
-	laplace_problem;  
+	laplace_problem (3);
       laplace_problem.run ();
       
       solutions.push_back (vector<double>());
@@ -359,8 +383,8 @@ int main ()
   
   if (true)
     {
-      LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern>
-	laplace_problem;  
+      LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityPattern>
+	laplace_problem (2);
       laplace_problem.run ();
       
       solutions.push_back (vector<double>());
@@ -371,8 +395,8 @@ int main ()
 
   if (true)
     {
-      LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double,3,3>,BlockSparsityPattern>
-	laplace_problem;  
+      LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityPattern>
+	laplace_problem (3);  
       laplace_problem.run ();
       
       solutions.push_back (vector<double>());
