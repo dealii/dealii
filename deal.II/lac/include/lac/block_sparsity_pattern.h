@@ -43,18 +43,6 @@
  * that all sub-matrices in a column have to have the same number of
  * columns.
  *
- *
- * @sect2{On template instantiations}
- *
- * Member functions of this class are either implemented in this file
- * or in a file of the same name with suffix ``.templates.h''. For the
- * most common combinations of the template parameters, instantiations
- * of this class are provided in a file with suffix ``.cc'' in the
- * ``source'' directory. If you need an instantiation that is not
- * listed there, you have to include this file along with the
- * corresponding ``.templates.h'' file and instantiate the respective
- * class yourself.
- *
  * @author Wolfgang Bangerth, 2000
  */
 class BlockSparsityPattern : public Subscriptor
@@ -126,7 +114,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * @p{reinit} functions of the
 				      * blocks themselves. Do not
 				      * forget to call
-				      * @p{collect_size} after that on
+				      * @p{collect_sizes} after that on
 				      * this object.
 				      *
 				      * The reason that you have to
