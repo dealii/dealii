@@ -520,8 +520,8 @@ MappingQ<3>::set_laplace_on_hex_vector(std::vector<std::vector<double> > &lohvs)
 				   // at the outer rim should be
 				   // one. check this
   for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
-    Assert(fabs(std::accumulate(lohvs[unit_point].begin(),
-				lohvs[unit_point].end(),0.) - 1)<1e-13,
+    Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
+				     lohvs[unit_point].end(),0.) - 1)<1e-13,
 	   ExcInternalError());
   
 				   // TEST output

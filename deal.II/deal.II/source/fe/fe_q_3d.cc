@@ -369,6 +369,7 @@ namespace FE_Q_3d
 
 // embedding matrices
 
+template <>
 const double * const 
 FE_Q<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell] =
 {
@@ -383,6 +384,7 @@ FE_Q<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell] =
 };
 
 
+template <>
 const unsigned int
 FE_Q<3>::Matrices::n_embedding_matrices
   = sizeof(FE_Q<3>::Matrices::embedding) /
@@ -429,6 +431,9 @@ namespace FE_Q_3d
   };
 };
 
+
+
+template <>
 const double * const 
 FE_Q<3>::Matrices::constraint_matrices[] =
 {
@@ -436,6 +441,9 @@ FE_Q<3>::Matrices::constraint_matrices[] =
   FE_Q_3d::constraint_q2
 };
 
+
+
+template <>
 const unsigned int 
 FE_Q<3>::Matrices::n_constraint_matrices
   = sizeof(FE_Q<3>::Matrices::constraint_matrices) /

@@ -128,6 +128,7 @@ namespace FE_DGQ_1d
 
 
 
+template <>
 const double * const FE_DGQ<1>::Matrices::embedding[] =
 {	
       FE_DGQ_1d::dgq0_into_dgq0_refined,
@@ -138,6 +139,8 @@ const double * const FE_DGQ<1>::Matrices::embedding[] =
 };
 
 
+
+template <>
 const unsigned int FE_DGQ<1>::Matrices::n_embedding_matrices
   = sizeof(FE_DGQ<1>::Matrices::embedding) /
     sizeof(FE_DGQ<1>::Matrices::embedding[0]);
@@ -145,6 +148,7 @@ const unsigned int FE_DGQ<1>::Matrices::n_embedding_matrices
 
 
 
+template <>
 const double * const FE_DGQ<1>::Matrices::projection_matrices[] =
 {
       FE_DGQ_1d::dgq0_refined_onto_dgq0,
@@ -158,6 +162,8 @@ const double * const FE_DGQ<1>::Matrices::projection_matrices[] =
 };
 
 
+
+template <>
 const unsigned int FE_DGQ<1>::Matrices::n_projection_matrices
   = sizeof(FE_DGQ<1>::Matrices::projection_matrices) /
     sizeof(FE_DGQ<1>::Matrices::projection_matrices[0]);
