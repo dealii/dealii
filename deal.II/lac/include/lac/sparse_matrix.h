@@ -1048,6 +1048,13 @@ class SparseMatrix : public Subscriptor
 				     // make all other sparse matrices
 				     // friends
     template <typename somenumber> friend class SparseMatrix<somenumber>;
+
+				     /** 
+				      * Made #operator =# private to
+				      * avoid improper use.
+				      */
+    SparseMatrix<number>& operator = (const SparseMatrix<number> &);
+
 };
 
 
