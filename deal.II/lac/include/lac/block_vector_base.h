@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <lac/exceptions.h>
 #include <lac/block_indices.h>
 
 #include <vector>
