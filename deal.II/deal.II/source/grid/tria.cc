@@ -29,8 +29,8 @@
 
 
 template <int dim>
-const StraightBoundary<dim> & Triangulation<dim>::straight_boundary
-= StraightBoundary<dim>();
+const StraightBoundary<dim> Triangulation<dim>::straight_boundary;
+
 
 
 template <int dim>

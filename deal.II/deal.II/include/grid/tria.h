@@ -1586,7 +1586,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * default argument in
 				      * @p{set_boundary}.
 				      */
-    static const StraightBoundary<dim>& straight_boundary;
+    static const StraightBoundary<dim> straight_boundary;
 
   public:
     
