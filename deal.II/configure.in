@@ -348,33 +348,6 @@ fi
 
 
 
-dnl On some systems (well, DEC Alphas are the only ones we know of),
-dnl gcc2.95 throws the hands in the air if it sees one of the AssertThrow
-dnl calls, and dies with an internal compiler error. If this is the case,
-dnl we disable AssertThrow and simply replace it with an `abort' if the
-dnl condition is not satisfied. Check this for debug and optimized mode
-dnl compiler flags, and define `DISABLE_ASSERT_THROW' if necessary.
-DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG, CXXFLAGSG="-DDISABLE_ASSERT_THROW $CXXFLAGSG")
-DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO, CXXFLAGSO="-DDISABLE_ASSERT_THROW $CXXFLAGSO")
-
-dnl IBM's xlC compiler has a problem with some kind of code that does not
-dnl "using namespace std;" Try to work around if necessary
-DEAL_II_CHECK_IBM_XLC_ERROR
-
-dnl See whether we can use the std::iterator class
-DEAL_II_HAVE_STD_ITERATOR
-
-dnl See whether we have to declare lrand48 ourselves with -ansi
-DEAL_II_HAVE_LRAND48_DECLARED
-
-dnl See whether getrusage() is declared properly
-DEAL_II_CHECK_GETRUSAGE
-
-dnl Likewise for isnan()
-DEAL_II_CHECK_ISNAN
-
-
-
 
 
 dnl -------------------------------------------------------------
@@ -443,6 +416,42 @@ fi
 AC_SUBST(withmultithreading)
 
 
+
+
+
+dnl --------------------------------------------------------------
+dnl Various kludges for various systems: some systems need special
+dnl treatment for some things. Since they sometimes depend on 
+dnl whether other flags are set (e.g. the need for defining
+dnl -D__EXTENSIONS__ depends on whether we use/not use threading
+dnl options), this is done after checking for multithreading
+dnl --------------------------------------------------------------
+
+
+dnl On some systems (well, DEC Alphas are the only ones we know of),
+dnl gcc2.95 throws the hands in the air if it sees one of the AssertThrow
+dnl calls, and dies with an internal compiler error. If this is the case,
+dnl we disable AssertThrow and simply replace it with an `abort' if the
+dnl condition is not satisfied. Check this for debug and optimized mode
+dnl compiler flags, and define `DISABLE_ASSERT_THROW' if necessary.
+DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG, CXXFLAGSG="-DDISABLE_ASSERT_THROW $CXXFLAGSG")
+DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO, CXXFLAGSO="-DDISABLE_ASSERT_THROW $CXXFLAGSO")
+
+dnl IBM's xlC compiler has a problem with some kind of code that does not
+dnl "using namespace std;" Try to work around if necessary
+DEAL_II_CHECK_IBM_XLC_ERROR
+
+dnl See whether we can use the std::iterator class
+DEAL_II_HAVE_STD_ITERATOR
+
+dnl See whether we have to declare lrand48 ourselves with -ansi
+DEAL_II_HAVE_LRAND48_DECLARED
+
+dnl See whether getrusage() is declared properly
+DEAL_II_CHECK_GETRUSAGE
+
+dnl Likewise for isnan()
+DEAL_II_CHECK_ISNAN
 
 
 
