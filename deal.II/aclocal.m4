@@ -488,8 +488,9 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
         dnl Umh, still something else unknown. Try to find it out by a
         dnl different method (-V instead of -v):
         F77_VERSION_STRING=`($F77 -V 2>&1)`
-        if test -n "`echo $F77_VERSION_STRING | grep \"WorkShop Compilers\"`" ; then
-  
+        if test -n "`echo $F77_VERSION_STRING | grep \"WorkShop Compilers\"`" \
+                -o \
+                -n "`echo $F77_VERSION_STRING | grep \"Forte Developer\"`" ; then
           dnl OK, this is the Sun Fortran77 compiler
   	  AC_MSG_RESULT(F77 compiler is Sun WorkShop f77)
   	  F77_VERSION="SunF77"
