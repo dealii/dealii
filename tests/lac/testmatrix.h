@@ -1,7 +1,6 @@
 // $Id$
 
 #include <base/exceptions.h>
-#include <lac/forward_declarations.h>
 
 /**
  * Finite difference matrix on uniform grid.
