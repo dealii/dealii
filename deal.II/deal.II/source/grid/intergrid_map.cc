@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,10 +22,8 @@
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
 
-#ifdef ENABLE_MULTIGRID
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
-#endif
 
 // helper function to aquire the number of levels within a grid
 template <class GridClass>
@@ -218,6 +216,4 @@ InterGridMap<GridClass,dim>::memory_consumption () const
 template class InterGridMap<Triangulation, deal_II_dimension>;
 template class InterGridMap<DoFHandler, deal_II_dimension>;
 
-#ifdef ENABLE_MULTIGRID
 template class InterGridMap<MGDoFHandler, deal_II_dimension>;
-#endif

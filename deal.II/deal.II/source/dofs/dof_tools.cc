@@ -29,10 +29,8 @@
 #include <lac/block_sparsity_pattern.h>
 #include <lac/vector.h>
 
-#ifdef ENABLE_MULTIGRID
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
-#endif
 
 #include <algorithm>
 #include <numeric>
@@ -1184,7 +1182,6 @@ DoFTools::extract_dofs (const DoFHandler<dim>      &dof,
 }
 
 
-#ifdef ENABLE_MULTIGRID
 template<int dim>
 void
 DoFTools::extract_level_dofs(const unsigned int       level,
@@ -1280,7 +1277,6 @@ DoFTools::extract_level_dofs(const unsigned int       level,
         selected_dofs[indices[i]] = local_selected_dofs[i];
     }
 }
-#endif
 
 
 #if deal_II_dimension != 1
@@ -3046,13 +3042,11 @@ template void DoFTools::extract_dofs<deal_II_dimension>
  const std::vector<bool>& component_select,
  std::vector<bool>& selected_dofs);
 
-#ifdef ENABLE_MULTIGRID
 template void DoFTools::extract_level_dofs<deal_II_dimension>
 (const unsigned int level,
  const MGDoFHandler<deal_II_dimension>& dof,
  const std::vector<bool>& component_select,
  std::vector<bool>& selected_dofs);
-#endif
 
 #if deal_II_dimension != 1
 template

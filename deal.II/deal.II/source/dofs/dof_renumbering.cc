@@ -29,11 +29,9 @@
 #include <fe/fe.h>
 #include <dofs/dof_renumbering.h>
 
-#ifdef ENABLE_MULTIGRID
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_dof_tools.h>
-#endif
 
 #include <vector>
 #include <map>
@@ -354,7 +352,6 @@ DoFRenumbering::compute_Cuthill_McKee (
 }
 
 
-#ifdef ENABLE_MULTIGRID
 template <int dim>
 void DoFRenumbering::Cuthill_McKee (
   MGDoFHandler<dim>               &dof_handler,
@@ -523,7 +520,6 @@ void DoFRenumbering::Cuthill_McKee (
 				   // thus needs an own function
   dof_handler.renumber_dofs (level, new_indices);
 }
-#endif
 
 
 template <int dim>
@@ -884,7 +880,6 @@ DoFRenumbering::compute_cell_wise_dg (
 }
 
 
-#ifdef ENABLE_MULTIGRID
 template <int dim>
 void DoFRenumbering::cell_wise_dg (
   MGDoFHandler<dim>& dof,
@@ -938,7 +933,6 @@ void DoFRenumbering::cell_wise_dg (
 
   dof.renumber_dofs(level, reverse);
 }
-#endif
 
 /**
  * Provide comparator for DoFCellAccessors
