@@ -45,7 +45,7 @@ using namespace std;
 
 
 //TODO: Comment?? Use proper mapping!
-static const MappingQ1<deal_II_dimension> mapping;
+static const MappingQ1<deal_II_dimension> mapping_q1;
 
 
 
@@ -172,7 +172,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 //TODO: Higher order mapping?  
 				   // Transformed support points are computed by
 				   // FEValues
-  FEValues<dim> fe_values (mapping, fe, support_quadrature, update_q_points);
+  FEValues<dim> fe_values (mapping_q1, fe, support_quadrature, update_q_points);
   
   for (; cell!=endc; ++cell)
     {
@@ -435,7 +435,7 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
   UpdateFlags update_flags = UpdateFlags(update_values   |
 					 update_q_points |
 					 update_JxW_values);
-  FEValues<dim> fe_values (mapping, fe, quadrature, update_flags);
+  FEValues<dim> fe_values (mapping_q1, fe, quadrature, update_flags);
 
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points,
@@ -641,7 +641,7 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 
   std::vector<double> dummy_weights (unit_support_points.size());
   Quadrature<dim-1> aux_quad (unit_support_points, dummy_weights);
-  FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);
+  FEFaceValues<dim> fe_values (mapping_q1, fe, aux_quad, update_q_points);
 
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
@@ -814,7 +814,7 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
   if ((norm==H1_seminorm) || (norm==H1_norm))
     update_flags = UpdateFlags (update_flags | update_gradients);
   
-  FEValues<dim> fe_values(mapping, fe, q, update_flags);
+  FEValues<dim> fe_values(mapping_q1, fe, q, update_flags);
 
   std::vector< Vector<double> >        function_values (n_q_points,
 							Vector<double>(n_components));
@@ -1121,7 +1121,7 @@ VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
   Assert (component < dof.get_fe().n_components(),
 	  ExcIndexRange(component, 0, dof.get_fe().n_components()));
   
-  FEValues<dim> fe(mapping, dof.get_fe(), quadrature,
+  FEValues<dim> fe(mapping_q1, dof.get_fe(), quadrature,
 		   UpdateFlags(update_JxW_values
 			       | update_values));
 
