@@ -19,7 +19,7 @@
 #  include <string>
 #endif
 
-#if defined(__sun__)
+#if defined(__sun__) || defined(__osf__)
 #  include <unistd.h>
 #endif
 
