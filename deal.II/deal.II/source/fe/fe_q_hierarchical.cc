@@ -154,7 +154,7 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 	    dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
 	  
 	  // interior edges
-	  for (unsigned int j=0; j<degree-1; j++)
+	  for (unsigned int j=0; j<(degree-1); j++)
 	  {
 	    this->interface_constraints(5 + j,face_renumber[i]) = 
 	      dofs_subcell[0](1, i % dofs_1d) * 
@@ -171,7 +171,7 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 	  }
 
 	  // boundary edges
-	  for (unsigned int j=0; j<degree-1; j++)
+	  for (unsigned int j=0; j<(degree-1); j++)
 	  {
 	    // bottom edge 
 	    this->interface_constraints(5 + 4*(degree-1) + j,face_renumber[i]) =
@@ -204,8 +204,8 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 	  }
 
 	  // interior faces
-	  for (unsigned int j=0; j<degree-1; j++)
-	    for (unsigned int k=0; k<degree-1; k++)
+	  for (unsigned int j=0; j<(degree-1); j++)
+	    for (unsigned int k=0; k<(degree-1); k++)
 	    {
 	      // subcell 0
 	      this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1),face_renumber[i]) =
