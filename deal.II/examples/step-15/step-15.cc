@@ -373,19 +373,108 @@ void MinimizationProblem<1>::initialize ()
 
 
 
-template <int dim>
-void MinimizationProblem<dim>::refine_grid ()
+template <>
+void MinimizationProblem<1>::refine_grid ()
 {
+  const unsigned int dim = 1;
+  
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-  typename FunctionMap<dim>::type neumann_boundary;
+  QTrapez<dim> quadrature;
+  FEValues<dim> fe_values (fe, quadrature,
+                           update_values   | update_gradients |
+                           update_second_derivatives |
+                           update_q_points | update_JxW_values);
 
-  KellyErrorEstimator<dim>::estimate (dof_handler,
-				      Quadrature<dim-1>(1),
-				      neumann_boundary,
-				      present_solution,
-				      estimated_error_per_cell);
+  FEValues<dim> neighbor_fe_values (fe, quadrature,
+                                    update_gradients);
 
+  std::vector<double> local_values (quadrature.n_quadrature_points);
+  std::vector<Tensor<1,dim> > local_gradients (quadrature.n_quadrature_points);
+  std::vector<Tensor<2,dim> > local_2nd_derivs (quadrature.n_quadrature_points);
+
+  DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active (),
+    endc = dof_handler.end ();
+  for (unsigned int index = 0; cell!=endc; ++cell, ++index)
+    {
+      fe_values.reinit (cell);
+      fe_values.get_function_values (present_solution, local_values);
+      fe_values.get_function_grads (present_solution, local_gradients);
+      fe_values.get_function_2nd_derivatives (present_solution, local_2nd_derivs);
+
+      double cell_residual_norm = 0;
+      for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+        {
+          const double x             = fe_values.quadrature_point(q)[0];
+          const double u             = local_values[q];
+          const double u_prime       = local_gradients[q][0];
+          const double u_doubleprime = local_2nd_derivs[q][0][0];
+          const double local_residual_value
+            = ((x-u*u*u) * std::pow(u_prime, 4) *
+               (u*u*u_prime*u_prime
+                +
+                5*(x-u*u*u)*u_doubleprime
+                +
+                2*u_prime*(1-3*u*u*u_prime)));
+          
+          cell_residual_norm += (local_residual_value * local_residual_value *
+                                 fe_values.JxW(q));
+        }
+
+      estimated_error_per_cell(index) = cell_residual_norm *
+                                        cell->diameter() * cell->diameter();
+
+      const double u_left  = local_values[0];
+      const double u_right = local_values[1];
+
+      const double u_prime_left  = local_gradients[0][0];
+      const double u_prime_right = local_gradients[1][0];
+
+      const double x_left  = fe_values.quadrature_point(0)[0];
+      const double x_right = fe_values.quadrature_point(1)[0];
+
+      Assert (x_left  == cell->vertex(0)[0], ExcInternalError());
+      Assert (x_right == cell->vertex(1)[0], ExcInternalError());
+
+      if (cell->at_boundary(0) == false)
+        {
+          DoFHandler<dim>::cell_iterator left_neighbor = cell->neighbor(0);
+          while (left_neighbor->has_children())
+            left_neighbor = left_neighbor->child(1);
+          
+          neighbor_fe_values.reinit (left_neighbor);
+          neighbor_fe_values.get_function_grads (present_solution, local_gradients);
+
+          const double neighbor_u_prime_left = local_gradients[1][0];
+
+          const double left_jump = std::pow(x_left-std::pow(u_left,3), 2) *
+                                   (std::pow(neighbor_u_prime_left,5) -
+                                    std::pow(u_prime_left,5));
+          estimated_error_per_cell(index) += left_jump * left_jump *
+                                             cell->diameter();
+        }
+
+      if (cell->at_boundary(1) == false)
+        {
+          DoFHandler<dim>::cell_iterator right_neighbor = cell->neighbor(1);
+          while (right_neighbor->has_children())
+            right_neighbor = right_neighbor->child(0);
+          
+          neighbor_fe_values.reinit (right_neighbor);
+          neighbor_fe_values.get_function_grads (present_solution, local_gradients);
+
+          const double neighbor_u_prime_right = local_gradients[0][0];
+
+          const double right_jump = std::pow(x_right-std::pow(u_right,3), 2) *
+                                   (std::pow(neighbor_u_prime_right,5) -
+                                    std::pow(u_prime_right,5));
+          estimated_error_per_cell(index) += right_jump * right_jump *
+                                             cell->diameter();
+        }
+      
+    } 
+  
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						   estimated_error_per_cell,
 						   0.3, 0.03);
