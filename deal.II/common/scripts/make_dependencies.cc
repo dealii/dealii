@@ -405,22 +405,26 @@ int main (int argc, char **argv)
       if (basename.rfind ("/") != std::string::npos)
         basename = std::string (basename.begin()+basename.rfind("/")+1,
                                 basename.end());
-      
-      std::cout << basepath << "/" << basename << ".o: \\"
-                << std::endl
-                << "\t\t" << *file;
-      
+
+                                       // get all direct and indirect
+                                       // includes for this file...
       const std::set<std::string> includes = get_all_includes (*file);
 
+                                       // ...write the rule for the .o
+                                       // file...
+      std::cout << basepath << "/" << basename << ".o: \\"
+                << std::endl
+                << "\t\t" << *file;      
       for (std::set<std::string>::const_iterator i=includes.begin();
            i!=includes.end(); ++i)
         std::cout << "\\\n\t\t" << *i;
       std::cout << std::endl;
 
+                                       // ...and a similar rule for
+                                       // the .g.o file
       std::cout << basepath << "/" << basename << ".g.o: \\"
                 << std::endl
                 << "\t\t" << *file;
-      
       for (std::set<std::string>::const_iterator i=includes.begin();
            i!=includes.end(); ++i)
         std::cout << "\\\n\t\t" << *i;
