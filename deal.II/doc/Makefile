@@ -22,19 +22,23 @@ tutorial:
 development:
 	cd development ; $(MAKE)
 
-glossary: glossary/index.html
+glossary:
+	cd glossary ; $(MAKE)
+
 
 validate-xrefs:
 	@echo "Validating cross-references in HTML files."
 	cd tutorial ; $(MAKE) validate-xrefs
 	cd development ; $(MAKE) validate-xrefs
+	cd glossary ; $(MAKE) validate-xrefs
+
 
 clean:
 	cd auto ; $(MAKE) clean
 	cd tutorial ; $(MAKE) clean
 	cd development ; $(MAKE) clean
+	cd glossary ; $(MAKE) clean
+
 
 .PHONY: default all autogen-doc autogen-doc-all tutorial clean development validate-xrefs glossary
 
-glossary/index.html: glossary/extract.pl glossary/glossary.data
-	perl $^ > $@
