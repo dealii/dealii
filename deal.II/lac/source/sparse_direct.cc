@@ -20,6 +20,7 @@
 #include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <errno.h>
 
 
 // if we know that at least one of the HSL functions are there,
