@@ -636,7 +636,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
                                        deal_II_numbers::invalid_unsigned_int);
   
   for (unsigned int c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = static_cast<signed int>(c);
+    distribute[lines[c].line] = c;
 
   const unsigned int n_rows = sparsity.n_rows();
   for (unsigned int row=0; row<n_rows; ++row)
@@ -748,7 +748,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
                                        deal_II_numbers::invalid_unsigned_int);
   
   for (unsigned int c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = static_cast<signed int>(c);
+    distribute[lines[c].line] = c;
 
   const unsigned int n_rows = sparsity.n_rows();
   for (unsigned int row=0; row<n_rows; ++row)
