@@ -15,6 +15,15 @@
 
 <ol>
   <li> <p>
+       Fixed: Templatized classes which had a default template
+       argument that contains colons (such as nested types) did
+       not show up in the forward declaration files, and were also
+       missing from the class index. This is fixed now.
+       <br>
+       (WB 2001/05/02)
+       </p>
+
+  <li> <p>
        Fixed: The vertex numbers written by the <code
        class="class">GridOut</code>::<code
        class="member">write_ucd_faces</code> function are now also
