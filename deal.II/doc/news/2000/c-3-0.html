@@ -106,6 +106,17 @@
 <h3>base</h3>
 
 <ol>
+  <li> <p> 
+       New: <code class="class">Timer</code> now uses the system
+       function <code class="member">getrusage (RUSAGE_CHILDREN,
+       .)</code> that is need in multithreading. But still the <code
+       class="class">Timer</code> class does not yet work in
+       multithreading, as getrusage with flag RUSAGE_CHILDREN gives always
+       0 (at least on Solaris7).
+       <br>
+       (Ralf Hartmann 2000/08/25)
+       </p>   
+
   <li> <p>
        New: There are now a set of functions
        <code class="member">outer_product</code> that for the outer

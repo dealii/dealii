@@ -96,6 +96,29 @@ class Timer
 				      */
     double              start_time;
 
+
+				     /**
+				      * Similar to @p{start_time}, but
+				      * needed for children threads
+				      * in multithread mode. Value of
+				      * the user time when @p{start}
+				      * was called the last time or
+				      * when the object was created
+				      * and no @p{stop} was issued in
+				      * between.
+				      *
+				      * For some reason (error in
+				      * operating system?) the
+				      * function call
+				      * @p{getrusage(RUSAGE_CHILDREN,.)}
+				      * gives always 0 (at least
+				      * on Solaris7). Hence the
+				      * @p{Timer} class still does not
+				      * yet work for multithreading
+				      * mode.
+				      */
+    double              start_time_children;
+
 				     /**
 				      * Accumulated time for all previous
 				      * @p{start}/@p{stop} cycles. The time for

@@ -46,6 +46,10 @@ void Timer::start ()
   rusage usage;
   getrusage (RUSAGE_SELF, &usage);
   start_time = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
+
+  rusage usage_children;
+  getrusage (RUSAGE_CHILDREN, &usage_children);
+  start_time_children = usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
 }
 
 
@@ -59,6 +63,12 @@ double Timer::stop ()
       getrusage (RUSAGE_SELF, &usage);
       const double dtime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
       cumulative_time += dtime - start_time;
+
+      rusage usage_children;
+      getrusage (RUSAGE_CHILDREN, &usage_children);
+      const double dtime_children =
+	usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
+      cumulative_time += dtime_children - start_time_children;
     }
   return cumulative_time;
 }
@@ -72,8 +82,13 @@ double Timer::operator() () const
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
+      
+      rusage usage_children;
+      getrusage (RUSAGE_CHILDREN, &usage_children);
+      const double dtime_children =
+	usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
 
-      return dtime - start_time + cumulative_time;
+      return dtime - start_time + dtime_children - start_time_children + cumulative_time;
     }
   else
     return cumulative_time;
