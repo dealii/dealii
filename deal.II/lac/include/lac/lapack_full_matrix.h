@@ -317,9 +317,9 @@ std::complex<number>
 LAPACKFullMatrix<number>::eigenvalue (unsigned int i) const
 {
   Assert (state & LAPACKSupport::eigenvalues, ExcInvalidState());
-  Assert (wr.size() == n_rows(), ExcInternalError());
-  Assert (wi.size() == n_rows(), ExcInternalError());
-  Assert (i<n_rows(), ExcIndexRange(i,0,n_rows()));
+  Assert (wr.size() == this->n_rows(), ExcInternalError());
+  Assert (wi.size() == this->n_rows(), ExcInternalError());
+  Assert (i<this->n_rows(), ExcIndexRange(i,0,this->n_rows()));
   
   return std::complex<number>(wr[i], wi[i]);
 }
