@@ -113,8 +113,8 @@ class GridGenerator
 				      * first two parameters give the
 				      * lower and upper bound of the
 				      * inner hypercube in all
-				      * coordinate directions. @p
-				      * thickness marks the size of
+				      * coordinate directions.
+				      * #thickness# marks the size of
 				      * the layer cells.
 				      *
 				      * If the flag colorize is set,
