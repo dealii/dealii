@@ -106,7 +106,7 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 		solver(0),
 		matrix(0),
 		precondition(0)
-{};
+{}
 
 
 template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
@@ -118,7 +118,7 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 		solver(&s),
 		matrix(&m),
 		precondition(&p)
-{};
+{}
 
 
 template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
@@ -131,7 +131,7 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
   solver = &s;
   matrix = &m;
   precondition = &p;
-};
+}
 
 
 template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
@@ -142,7 +142,7 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
   solver = 0;
   matrix = 0;
   precondition = 0;
-};
+}
 
 
 template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>

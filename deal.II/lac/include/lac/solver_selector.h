@@ -211,12 +211,12 @@ SolverSelector<VECTOR>::SolverSelector(const std::string    &solver_name,
 		solver_name(solver_name),
 		control(&control),
 		vector_memory(&vector_memory)
-{};
+{}
 
 
 template <class VECTOR>
 SolverSelector<VECTOR>::~SolverSelector()
-{};
+{}
 
 
 template <class VECTOR>
@@ -253,14 +253,14 @@ SolverSelector<VECTOR>::solve(const Matrix &A,
     }
   else
     Assert(false,ExcSolverDoesNotExist(solver_name));
-};
+}
 
 
 template <class VECTOR>
 std::string SolverSelector<VECTOR>::get_solver_names()
 {
   return "richardson|cg|bicgstab|gmres";
-};
+}
 
 
 template <class VECTOR>
@@ -292,7 +292,7 @@ void SolverSelector<VECTOR>::set_data(
   const typename SolverBicgstab<VECTOR>::AdditionalData &data) 
 { 
   bicgstab_data=data; 
-};
+}
 
 
 #endif
