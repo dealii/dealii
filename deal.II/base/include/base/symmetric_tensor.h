@@ -1802,4 +1802,171 @@ operator * (const SymmetricTensor<2,3> &s,
 
 
 
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in the symmetric tensor of rank 2 that is given as first
+ * argument to this function. This operation is the symmetric tensor
+ * analogon of a matrix-vector multiplication.
+ *
+ * This function does the same as a respective operator*, but it avoid
+ * a temporary object (that the compiler can optimize away in many
+ * cases, however).
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+void
+double_contract (SymmetricTensor<2,1> &tmp,
+		 const SymmetricTensor<4,1> &t,
+		 const SymmetricTensor<2,1> &s)
+{
+  tmp[0][0] = t[0][0][0][0] * s[0][0];
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in the symmetric tensor of rank 2 that is given as first
+ * argument to this function. This operation is the symmetric tensor
+ * analogon of a matrix-vector multiplication.
+ *
+ * This function does the same as a respective operator*, but it avoid
+ * a temporary object (that the compiler can optimize away in many
+ * cases, however).
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+void
+double_contract (SymmetricTensor<2,1> &tmp,
+		 const SymmetricTensor<2,1> &s,
+		 const SymmetricTensor<4,1> &t)
+{
+  tmp[0][0] = t[0][0][0][0] * s[0][0];
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in the symmetric tensor of rank 2 that is given as first
+ * argument to this function. This operation is the symmetric tensor
+ * analogon of a matrix-vector multiplication.
+ *
+ * This function does the same as a respective operator*, but it avoid
+ * a temporary object (that the compiler can optimize away in many
+ * cases, however).
+ *
+ * @related SymmetricTensor @author Wolfgang Bangerth, 2005
+ */
+void
+double_contract (SymmetricTensor<2,2> &tmp,
+		 const SymmetricTensor<4,2> &t,
+		 const SymmetricTensor<2,2> &s)
+{
+  const unsigned int dim = 2;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i; j<dim; ++j)
+      tmp[i][j] = t[i][j][0][0] * s[0][0] +
+		  t[i][j][1][1] * s[1][1] +
+		  2 * t[i][j][0][1] * s[0][1];
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in the symmetric tensor of rank 2 that is given as first
+ * argument to this function. This operation is the symmetric tensor
+ * analogon of a matrix-vector multiplication.
+ *
+ * This function does the same as a respective operator*, but it avoid
+ * a temporary object (that the compiler can optimize away in many
+ * cases, however).
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+void
+double_contract (SymmetricTensor<2,2> &tmp,
+		 const SymmetricTensor<2,2> &s,
+		 const SymmetricTensor<4,2> &t)
+{
+  const unsigned int dim = 2;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i; j<dim; ++j)
+      tmp[i][j] = s[0][0] * t[0][0][i][j] * +
+		  s[1][1] * t[1][1][i][j] +
+		  2 * s[0][1] * t[0][1][i][j];
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in the symmetric tensor of rank 2 that is given as first
+ * argument to this function. This operation is the symmetric tensor
+ * analogon of a matrix-vector multiplication.
+ *
+ * This function does the same as a respective operator*, but it avoid
+ * a temporary object (that the compiler can optimize away in many
+ * cases, however).
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+void
+double_contract (SymmetricTensor<2,3> &tmp,
+		 const SymmetricTensor<4,3> &t,
+		 const SymmetricTensor<2,3> &s)
+{
+  const unsigned int dim = 3;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i; j<dim; ++j)
+      tmp[i][j] = t[i][j][0][0] * s[0][0] +
+		  t[i][j][1][1] * s[1][1] +
+		  t[i][j][2][2] * s[2][2] +
+		  2 * t[i][j][0][1] * s[0][1] +
+		  2 * t[i][j][0][2] * s[0][2] +
+		  2 * t[i][j][1][2] * s[1][2];
+}
+
+
+
+/**
+ * Double contraction between a rank-4 and a rank-2 symmetric tensor,
+ * resulting in the symmetric tensor of rank 2 that is given as first
+ * argument to this function. This operation is the symmetric tensor
+ * analogon of a matrix-vector multiplication.
+ *
+ * This function does the same as a respective operator*, but it avoid
+ * a temporary object (that the compiler can optimize away in many
+ * cases, however).
+ *
+ * @related SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+void
+double_contract (SymmetricTensor<2,3> &tmp,
+		 const SymmetricTensor<2,3> &s,
+		 const SymmetricTensor<4,3> &t)
+{
+  const unsigned int dim = 3;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i; j<dim; ++j)
+      tmp[i][j] = s[0][0] * t[0][0][i][j] +
+		  s[1][1] * t[1][1][i][j] +
+		  s[2][2] * t[2][2][i][j] +
+		  2 * s[0][1] * t[0][1][i][j] +
+		  2 * s[0][2] * t[0][2][i][j] +
+		  2 * s[1][2] * t[1][2][i][j];
+}
+
+
+
 #endif
