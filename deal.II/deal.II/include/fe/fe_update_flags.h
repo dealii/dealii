@@ -23,78 +23,59 @@
  * A variable of this type has to be passed to the constructor of the
  * @p{FEValues} object. You can select more than one flag by concatenation
  * using the @p{|} (bitwise @p{or}) operator.
+ *
+ *
+ * @sect2{Description of Flags}
+ *
+ * The following flags are declared:
+ * @begin{itemize}
+ *   @item @p{update_default  = 0}: Default: update nothing.
+ *   @item @p{update_values = 1}: Compute the values of the shape
+ *     functions at the quadrature points on the real space cell. For the
+ *     usual Lagrange elements, these values are equal to the values of
+ *     the shape functions at the quadrature points on the unit cell, but
+ *     they are different for more complicated elements, such as BDM or
+ *     Raviart-Thomas elements.
+ *   @item @p{update_q_points = 2}: Compute quadrature points in real
+ *     space (not on unit cell).
+ *   @item @p{update_gradients = 4}: Transform gradients on unit cell to
+ *     gradients on real cell.
+ *   @item @p{update_jacobians = 8}: Compute jacobian matrices of the
+ *     transform between unit and real cell
+ *     in the evaluation points.
+ *   @item @p{update_JxW_values = 16}: Compute the JxW values (Jacobian
+ *     determinant at the quadrature point
+ *     times the weight of this point).
+ *   @item @p{update_support_points = 32}: Compute the points on the real cell
+ *     on which the trial functions are located.
+ *     Giving this flag to the
+ *     @p{FESubfaceValues} class will result
+ *     in an error, since support points are
+ *     not useful in that case.
+ *   @item @p{update_normal_vectors = 64}: Update the outward normal vectors
+ *     to the face relative to this cell.
+ *     This flag is only evaluated by
+ *     the @p{FEFaceValues} class.
+ *     Giving this flag to the
+ *     @p{FEValues} class will result in
+ *     an error, since normal vectors are
+ *     not useful in that case.
+ *   @item @p{update_second_derivatives = 128}: Update the second derivatives of the
+ *     shape functions on the real cell.
+ * @end{itemize}
+ *
+ * @author Wolfgang Bangerth, 1998, 1999
  */
-enum UpdateFlags {
-				       /**
-					* Default: update nothing.
-					*/
-      update_default  = 0,
-				       /**
-					* Compute the values of the
-					* shape functions at the
-					* quadrature points on the
-					* real space cell. For the
-					* usual Lagrange elements,
-					* these values are equal to
-					* the values of the shape
-					* functions at the quadrature
-					* points on the unit cell, but
-					* they are different for more
-					* complicated elements, such
-					* as BDM or Raviart-Thomas
-					* elements.
-					*/
-      update_values = 1,
-				       /**
-					* Compute quadrature points in real
-					* space (not on unit cell).
-					*/
-      update_q_points = 2,
-				       /**
-					* Transform gradients on unit cell to
-					* gradients on real cell.
-					*/
-      update_gradients = 4,
-				       /**
-					* Compute jacobian matrices of the
-					* transform between unit and real cell
-					* in the evaluation points.
-					*/
-      update_jacobians = 8,
-				       /**
-					* Compute the JxW values (Jacobian
-					* determinant at the quadrature point
-					* times the weight of this point).
-					*/
-      update_JxW_values = 16,
-				       /**
-					* Compute the points on the real cell
-					* on which the trial functions are
-					* located.
-					*
-					* Giving this flag to the
-					* @p{FESubfaceValues} class will result
-					* in an error, since support points are
-					* not useful in that case.
-					*/
-      update_support_points = 32,
-				       /**
-				        * Update the outward normal vectors
-				        * to the face relative to this cell.
-				        * This flag is only evaluated by
-				        * the @p{FEFaceValues} class.
-					*
-					* Giving this flag to the
-					* @p{FEValues} class will result in
-					* an error, since normal vectors are
-					* not useful in that case.
-				        */
-      update_normal_vectors = 64,
-
-				       /**
-					* Update the second derivatives of the
-					* shape functions on the real cell.
-				        */
+enum UpdateFlags
+{
+      update_default            = 0,
+      update_values             = 1,
+      update_q_points           = 2,
+      update_gradients          = 4,
+      update_jacobians          = 8,
+      update_JxW_values         = 16,
+      update_support_points     = 32,
+      update_normal_vectors     = 64,
       update_second_derivatives = 128
 };
 
