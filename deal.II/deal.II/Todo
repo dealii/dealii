@@ -63,10 +63,6 @@ In VectorTools::project_boundary_values, no condensation of sparsity
   acceptable for higher dimensions. Fix this.
 
 
-Re-enable printing of a preamble to ucd files in data_io.cc. This
-  was disabled because DEALVISION couldn't handle these.
-
-
 Triangulation prepare_* functions:
   Document that multiple loops of preparation for refinement and
   coarsening do not interact, so smoothing may only be optimal if
