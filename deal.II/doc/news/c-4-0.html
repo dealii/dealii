@@ -631,15 +631,27 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
-
-  <li> <p> Improved: <code class="class">Triangulation</code> has
-  functions <code class="member">n_faces</code> and <code
-  class="member">n_active_faces</code>, globally as well as by level,
-  similar to <code class="member">n_cells</code>.
-  <br>
-  (GK 2004/05/18)
+  <li> <p> Improved: The <code
+       class="member">DoFTools::compute_Cuthill_McKee</code> function
+       needs to build a sparsity pattern for its operations, and uses
+       the <code
+       class="member">DoFHandler::max_couplings_per_dof</code>
+       function for this. However, the estimates returned by the
+       latter function are rather bad in 3d, leading to excessive
+       memory allocation in the Cuthill McKee algorithm in 3d. This is
+       fixed by using an intermediate compressed sparsity pattern
+       instead if we are in 3d.
+       <br>
+       (WB 2004/05/18)
   </p>
 
+  <li> <p> Improved: <code class="class">Triangulation</code> has
+       functions <code class="member">n_faces</code> and <code
+       class="member">n_active_faces</code>, globally as well as by level,
+       similar to <code class="member">n_cells</code>.
+       <br>
+       (GK 2004/05/18)
+  </p>
 
   <li> <p>
        New: Added support for <a href="http://www.geuz.org/gmsh/"

@@ -19,6 +19,7 @@
 //    of numbers. Simple task.
 
 #include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
@@ -127,19 +128,48 @@ DoFRenumbering::compute_Cuthill_McKee (
   const bool                 use_constraints,
   const std::vector<unsigned int>& starting_indices)
 {
-				   // make the connection graph
-  SparsityPattern sparsity (dof_handler.n_dofs(),
-			    dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity);
-
+				   // make the connection graph. in
+				   // more than 2d use an intermediate
+				   // compressed sparsity pattern
+				   // since the we don't have very
+				   // good estimates for
+				   // max_couplings_between_dofs() in
+				   // 3d and this then leads to
+				   // excessive memory consumption
+				   //
+				   // note that if constraints are not
+				   // requested, then the
+				   // 'constraints' object will be
+				   // empty, and calling condense with
+				   // it is a no-op
+  ConstraintMatrix constraints;
   if (use_constraints) 
     {
-      ConstraintMatrix constraints;
       DoFTools::make_hanging_node_constraints (dof_handler, constraints);
       constraints.close ();
-      constraints.condense (sparsity);
-    };
+    }
     
+  SparsityPattern sparsity;
+  if (dim <= 2)
+    {
+      sparsity.reinit (dof_handler.n_dofs(),
+		       dof_handler.n_dofs(),
+		       dof_handler.max_couplings_between_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler, sparsity);
+      constraints.condense (sparsity);
+    }
+  else
+    {
+      CompressedSparsityPattern csp (dof_handler.n_dofs(),
+				     dof_handler.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler, csp);
+      constraints.condense (csp);
+      sparsity.copy_from (csp);
+    }
+
+				   // constraints are not needed anymore
+  constraints.clear ();
+  
   const unsigned int n_dofs = sparsity.n_rows();
 				   // store the new dof numbers; invalid_dof_index means
 				   // that no new number was chosen yet
@@ -334,6 +364,8 @@ void DoFRenumbering::Cuthill_McKee (
   const bool                       reversed_numbering,
   const std::vector<unsigned int> &starting_indices)
 {
+//TODO: we should be doing the same here as in the other compute_CMK function to preserve some memory
+  
 				   // make the connection graph
   SparsityPattern sparsity (dof_handler.n_dofs(level),
 			    dof_handler.max_couplings_between_dofs());
