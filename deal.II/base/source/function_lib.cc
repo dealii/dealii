@@ -4,6 +4,8 @@
 #include <base/point.h>
 #include <base/function_lib.h>
 
+#include <cmath>
+
 //TODO: Derivatives in 3d wrong (GK!)
 
 template<int dim>
@@ -162,7 +164,176 @@ PillowFunction<dim>::gradient_list (const vector<Point<dim> > &points,
     }
 }
 
+//////////////////////////////////////////////////////////////////////
+
+
+double
+LSingularityFunction::value (const Point<2>   &p,
+			    const unsigned int) const
+{
+  double x = p(0);
+  double y = p(1);
+
+  if ((x>=0) && (y>=0))
+    return 0.;
+  
+  double phi = atan2(y,-x)+M_PI;
+  double r2 = x*x+y*y;
+
+  return pow(r2,1./3.) * sin(2./3.*phi);
+}
+
+
+void
+LSingularityFunction::value_list (const vector<Point<2> > &points,
+				 vector<double>            &values,
+				 const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcVectorHasWrongSize(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      double x = points[i](0);
+      double y = points[i](1);
+
+      if ((x>=0) && (y>=0))
+	values[i] = 0.;
+      else
+	{
+	  double phi = atan2(y,-x)+M_PI;
+	  double r2 = x*x+y*y;
+
+	  values[i] = pow(r2,1./3.) * sin(2./3.*phi);
+	}
+    }
+}
+
+
+double
+LSingularityFunction::laplacian (const Point<2>   &,
+			    const unsigned int) const
+{
+  return 0.;
+}
+
+
+void
+LSingularityFunction::laplacian_list (const vector<Point<2> > &points,
+				     vector<double>            &values,
+				     const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcVectorHasWrongSize(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    values[i] = 0.;
+}
+
+
+//TODO: Implement derivatives
+
+Tensor<1,2>
+LSingularityFunction::gradient (const Point<2>   &/*p*/,
+			       const unsigned int) const
+{
+  Assert(false, ExcNotImplemented());
+  return Tensor<1,2>();
+}
+
+
+void
+LSingularityFunction::gradient_list (const vector<Point<2> > &points,
+				    vector<Tensor<1,2> >    &gradients,
+				    const unsigned int) const
+{
+  Assert (gradients.size() == points.size(),
+	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+  Assert(false, ExcNotImplemented());
+}
+
+//////////////////////////////////////////////////////////////////////
+
+
+double
+SlitSingularityFunction::value (const Point<2>   &p,
+			    const unsigned int) const
+{
+  double x = p(0);
+  double y = p(1);
+
+  double phi = atan2(x,-y)+M_PI;
+  double r2 = x*x+y*y;
+
+  return pow(r2,.25) * sin(.5*phi);
+}
+
+
+void
+SlitSingularityFunction::value_list (const vector<Point<2> > &points,
+				 vector<double>            &values,
+				 const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcVectorHasWrongSize(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      double x = points[i](0);
+      double y = points[i](1);
+
+      double phi = atan2(x,-y)+M_PI;
+      double r2 = x*x+y*y;
+
+      values[i] = pow(r2,.25) * sin(.5*phi);
+    }
+}
+
+
+double
+SlitSingularityFunction::laplacian (const Point<2>   &,
+			    const unsigned int) const
+{
+  return 0.;
+}
+
+
+void
+SlitSingularityFunction::laplacian_list (const vector<Point<2> > &points,
+				     vector<double>            &values,
+				     const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcVectorHasWrongSize(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    values[i] = 0.;
+}
+
+
+//TODO: Implement derivatives
+
+Tensor<1,2>
+SlitSingularityFunction::gradient (const Point<2>   &/*p*/,
+			       const unsigned int) const
+{
+  Assert(false, ExcNotImplemented());
+  return Tensor<1,2>();
+}
+
+
+void
+SlitSingularityFunction::gradient_list (const vector<Point<2> > &points,
+				    vector<Tensor<1,2> >    &gradients,
+				    const unsigned int) const
+{
+  Assert (gradients.size() == points.size(),
+	  ExcVectorHasWrongSize(gradients.size(), points.size()));
+  Assert(false, ExcNotImplemented());
+}
+
+//////////////////////////////////////////////////////////////////////
+
 template PillowFunction<1>;
 template PillowFunction<2>;
 template PillowFunction<3>;
-

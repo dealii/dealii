@@ -9,9 +9,9 @@
 #include <base/function.h>
 
 /**
- * n-quadratic pillow on the unit square.
+ * d-quadratic pillow on the unit hypercube.
  *
- * This is a function for testing the implementation. It has zero
+ * This is a function for testing the implementation. It has zero Dirichlet
  * boundary values on the domain $(-1,1)^d$. In the inside, it is the
  * product of $x_i^2-1$.
  *
@@ -20,7 +20,7 @@
  * @author: Guido Kanschat, 1999
  */
 template<int dim>
-class PillowFunction : Function<dim>
+class PillowFunction : public Function<dim>
 {
   public:
 				     /**
@@ -59,6 +59,100 @@ class PillowFunction : Function<dim>
 				      * Laplacian at multiple points.
 				      */
     void laplacian_list(const vector<Point<dim> > &points,
+			vector<double>            &values,
+			const unsigned int         component = 0) const;
+};
+
+/**
+ * Singularity on the L-shaped domain in 2D.
+ * @author Guido Kanschat, 1999
+ */
+class LSingularityFunction : public Function<2>
+{
+  public:
+				     /**
+				      * The value at a single point.
+				      */
+    virtual double value (const Point<2>   &p,
+			  const unsigned int  component = 0) const;
+
+				     /**
+				      * Values at multiple points.
+				      */
+    virtual void value_list (const vector<Point<2> > &points,
+			     vector<double>            &values,
+			     const unsigned int         component = 0) const;
+
+				     /**
+				      * Gradient at a single point.
+				      */
+    virtual Tensor<1,2> gradient (const Point<2>   &p,
+				    const unsigned int  component = 0) const;
+
+				     /**
+				      * Gradients at multiple points.
+				      */
+    virtual void gradient_list (const vector<Point<2> > &points,
+				vector<Tensor<1,2> >    &gradients,
+				const unsigned int         component = 0) const;
+
+				     /**
+				      * Laplacian at a single point.
+				      */
+    double laplacian(const Point<2>   &p,
+		     const unsigned int  component = 0) const;
+
+				     /**
+				      * Laplacian at multiple points.
+				      */
+    void laplacian_list(const vector<Point<2> > &points,
+			vector<double>            &values,
+			const unsigned int         component = 0) const;
+};
+
+/**
+ * Singularity on the slit domain in 2D.
+ * @author Guido Kanschat, 1999
+ */
+class SlitSingularityFunction : public Function<2>
+{
+  public:
+				     /**
+				      * The value at a single point.
+				      */
+    virtual double value (const Point<2>   &p,
+			  const unsigned int  component = 0) const;
+
+				     /**
+				      * Values at multiple points.
+				      */
+    virtual void value_list (const vector<Point<2> > &points,
+			     vector<double>            &values,
+			     const unsigned int         component = 0) const;
+
+				     /**
+				      * Gradient at a single point.
+				      */
+    virtual Tensor<1,2> gradient (const Point<2>   &p,
+				    const unsigned int  component = 0) const;
+
+				     /**
+				      * Gradients at multiple points.
+				      */
+    virtual void gradient_list (const vector<Point<2> > &points,
+				vector<Tensor<1,2> >    &gradients,
+				const unsigned int         component = 0) const;
+
+				     /**
+				      * Laplacian at a single point.
+				      */
+    double laplacian(const Point<2>   &p,
+		     const unsigned int  component = 0) const;
+
+				     /**
+				      * Laplacian at multiple points.
+				      */
+    void laplacian_list(const vector<Point<2> > &points,
 			vector<double>            &values,
 			const unsigned int         component = 0) const;
 };
