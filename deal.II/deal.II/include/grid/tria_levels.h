@@ -40,7 +40,7 @@ class TriangulationLevel
  *  Store all information which belongs to one level of the multilevel hierarchy.
  *
  *  In @ref{TriangulationLevel<0>} all data is stored which is not
- *  dependant on the dimension, e.g. a field to store the
+ *  dependent on the dimension, e.g. a field to store the
  *  refinement flag for the cells (what a cell actually is
  *  is declared elsewhere), etc. Actually, it is only cell-based
  *  data, like neighborship info or refinement flags. There is another

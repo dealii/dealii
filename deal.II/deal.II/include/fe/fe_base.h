@@ -95,7 +95,7 @@ class FiniteElementData
 				      * face. This information is
 				      * redundant to some fields in the
 				      * derived classes but makes
-				      * writing dimension independant
+				      * writing dimension independent
 				      * programs easier.
 				      */
     const unsigned int dofs_per_face;
@@ -105,7 +105,7 @@ class FiniteElementData
 				      * on a cell. This information is
 				      * redundant to some fields in the
 				      * derived classes but makes
-				      * writing dimension independant
+				      * writing dimension independent
 				      * programs easier.
 				      */
     const unsigned int dofs_per_cell;

@@ -114,7 +114,7 @@ class ConstraintMatrix;
  *   The projection of the boundary values first, then eliminating them from
  *   the global system of equations is not needed usually. It may be necessary
  *   if you want to enforce special restrictions on the boundary values of the
- *   projected function, for example in time dependant problems: you may want
+ *   projected function, for example in time dependent problems: you may want
  *   to project the initial values but need consistency with the boundary
  *   values for later times. Since the latter are projected onto the boundary
  *   in each time step, it is necessary that we also project the boundary

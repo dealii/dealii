@@ -761,7 +761,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        problems and an algorithm to reorder cells such that they
  *        satisfy the conditions outlined above.
  *
- *     @item Copying a triangulation: when computing on time dependant meshes
+ *     @item Copying a triangulation: when computing on time dependent meshes
  *        of when using adaptive refinement, you will often want to create a
  *        new triangulation to be the same as another one. This is facilitated
  *        by the @p{copy_triangulation} function.
