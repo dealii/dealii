@@ -49,22 +49,22 @@ else
   libo: $(LIBDIR)/liblac.a
 endif
 
+forward: $(forward-declarations)
 
-
-$(LIBDIR)/liblac.a: $(forward-declarations) $(o-files)
+$(LIBDIR)/liblac.a: $(o-files)
 	@echo =====lac==============optimized==$(MT)== Linking library:   $(@F)
 	@ar ru $@ $(o-files)
 
-$(LIBDIR)/liblac.g.a: $(forward-declarations) $(go-files)
+$(LIBDIR)/liblac.g.a: $(go-files)
 	@echo =====lac==============debug======$(MT)== Linking library:   $(@F)
 	@ar ru $@ $(go-files)
 
 
-$(LIBDIR)/liblac.so: $(forward-declarations) $(o-files)
+$(LIBDIR)/liblac.so: $(o-files)
 	@echo =====lac==============optimized==$(MT)== Linking library:   $(@F)
 	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files)
 
-$(LIBDIR)/liblac.g.so: $(forward-declarations) $(go-files)
+$(LIBDIR)/liblac.g.so: $(go-files)
 	@echo =====lac==============debug======$(MT)== Linking library:   $(@F)
 	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files)
 
@@ -79,7 +79,7 @@ clean:
 #one of the cc-/h-files changed. Make detects whether
 #to remake this file upon inclusion at the bottom
 #of this file.
-Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
+Makefile.dep: $(cc-files) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/lac" $(cc-files) \
 		> Makefile.dep

@@ -13,9 +13,12 @@ help:
 	@echo "=                                                                      ="
 	@echo "= The following targets exist:                                         ="
 	@echo "=    baseg lacg : debug libraries \"base\" and \"lac\"                     ="
+	@echo "=    baseo laco : optimized libraries \"base\" and \"lac\"                 ="
 	@echo "=    base lac   : debug and optimized libraries \"base\" and \"lac\"       ="
 	@echo "=    1dg 2dg 3dg: deal.II debug version for specified dimension        ="
+	@echo "=    1do 2do 3do: deal.II optimized version for specified dimension    ="
 	@echo "=    1d 2d 3d   : deal.II debug and optimized for specified dimension  ="
+	@echo "=    forward    : forward_declarations.h for all libraries             ="
 	@echo "=                                                                      ="
 	@echo "=    contrib    : additional libraries in contrib, if there are any    ="
 	@echo "=                                                                      ="
@@ -35,15 +38,13 @@ help:
 baseg:
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
 
-base:
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
+baseo:
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) lib
 
 lacg: 
 	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
 
-lac:
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
+laco:
 	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) lib
 
 1dg:
@@ -55,48 +56,34 @@ lac:
 3dg:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
 
-1d:
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
+1do:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
 
-2d:
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
+2do:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
 
-3d:
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
+3do:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
+
+base: baseg baseo
+lac: lacg laco
+1d: 1dg 1do
+2d: 2dg 2do
+3d: 3dg 3do
+
+forward:
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) forward
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) forward
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) forward
 
 $(LIBDIR):
 	mkdir $@
 
 baseg base lacg lac 1dg 1d 2dg 2d 3dg 3d all debug contrib : $(LIBDIR)
 
-all: contrib
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) lib
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) lib
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
-
-debug: contrib
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
-
-optimized:
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libo
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libo
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
+all: contrib base lac 2d 1d 3d forward
+debug: contrib baseg lacg 2dg 1dg 3dg forward
+optimized: contrib baseo laco 2do 1do 3do forward
 
 contrib:
 	cd $D/contrib ; $(MAKE)

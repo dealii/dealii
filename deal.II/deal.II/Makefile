@@ -32,12 +32,13 @@ else
   3d : $(LIBDIR)/libdeal_II_3d.a
 endif
 
-
 # create lists of file names
 cc-files     = $(shell echo source/*/*.cc)
 h-files      = $(sort $(shell echo include/*/*.h))
 
 forward-declarations = $D/deal.II/include/grid/forward_declarations.h
+
+forward: $(forward-declarations)
 
 
 # strip subdirectories from cc file names, preprend a "lib/[g]o"
@@ -151,7 +152,7 @@ $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 #one of the cc-/h-files changed. Make detects whether
 #to remake this file upon inclusion at the bottom
 #of this file.
-Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
+Makefile.dep: $(cc-files) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \

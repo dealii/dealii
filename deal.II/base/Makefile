@@ -76,21 +76,22 @@ else
   libo: $(LIBDIR)/libbase.a
 endif
 
+forward: $(forward-declarations)
 
-$(LIBDIR)/libbase.a: $(forward-declarations) $(o-files)
+$(LIBDIR)/libbase.a: $(o-files)
 	@echo =====base=============optimized==$(MT)== Linking library:   $(@F)
 	@ar ru $@ $(o-files)
 
-$(LIBDIR)/libbase.g.a: $(forward-declarations) $(go-files)
+$(LIBDIR)/libbase.g.a: $(go-files)
 	@echo =====base=============debug======$(MT)== Linking library:   $(@F)
 	@ar ru $@ $(go-files)
 
 
-$(LIBDIR)/libbase.so: $(forward-declarations) $(o-files)
+$(LIBDIR)/libbase.so: $(o-files)
 	@echo =====base=============optimized==$(MT)== Linking library:   $(@F)
 	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files)
 
-$(LIBDIR)/libbase.g.so: $(forward-declarations) $(go-files)
+$(LIBDIR)/libbase.g.so: $(go-files)
 	@echo =====base=============debug======$(MT)== Linking library:   $(@F)
 	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files)
 
@@ -110,7 +111,7 @@ clean:
 #note that here we translate file names with data_out_base
 #to three file names with the dimension for which we compile
 #appended
-Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
+Makefile.dep: $(cc-files) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/base" $(cc-files) \
 		| $(PERL) -p -e 's!(.*/base/data_out_base)((.g)?.o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
