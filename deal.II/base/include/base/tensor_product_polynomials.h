@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -39,7 +39,9 @@ class TensorProductPolynomials
 				     /**
 				      * Constructor. @p{pols} is a
 				      * vector of pointers to
-				      * one-dimensional polynomials.
+				      * one-dimensional polynomials
+				      * and will be copied into the
+				      * member variable @p{polynomials}.
 				      */
     TensorProductPolynomials(const vector<SmartPointer<Polynomial> > &pols);
 
@@ -60,6 +62,13 @@ class TensorProductPolynomials
 		  vector<Tensor<2,dim> > &grad_grads) const;
 
 				     /**
+				      * Returns the number of tensor
+				      * product polynomials. For $n$
+				      * 1d polynomials this is $n^dim$.
+				      */
+    unsigned int n_tensor_product_polynomials() const;
+
+				     /**
 				      * Exception.
 				      */
     DeclException3 (ExcDimensionMismatch2,
@@ -73,6 +82,13 @@ class TensorProductPolynomials
 				      * given to the constructor.
 				      */
     vector<SmartPointer<Polynomial> > polynomials;
+
+				     /**
+				      * Number of tensor product
+				      * polynomials. For $n$ 1d
+				      * polynomials this is $n^dim$.
+				      */
+    const unsigned int n_tensor_pols;
 };
 
 
