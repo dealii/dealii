@@ -25,7 +25,7 @@ class ostream;
 
 
 
-/*
+/**
  * Structure representing the sparsity pattern of a sparse matrix.
  *
  * @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth
@@ -570,7 +570,7 @@ class SparseMatrixStruct : public Subscriptor
 
 
 
-/*
+/**
  * Sparse matrix.
  *
  * @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth 1998
@@ -1219,7 +1219,7 @@ SparseMatrixStruct::column_number (const unsigned int row,
 
   return colnums[rowstart[row]+index];
 }
-
+ 
 
 template <typename number>
 inline
