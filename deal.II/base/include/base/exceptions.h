@@ -291,8 +291,8 @@ class ExceptionBase : public exception {
 				      *  condition and the name of the exception as
 				      *  a char pointer.
 				      */
-    void SetFields (const char* f,
-		    const int l,
+    void SetFields (const char *f,
+		    const int   l,
 		    const char *func,
 		    const char *c,
 		    const char *e);

@@ -534,6 +534,15 @@ class SparseMatrixStruct : public Subscriptor
 				      * was called for this object.
 				      */
     bool compressed;
+
+				     /**
+				      * Copy operator. Declare but don't
+				      * define it and make it private above
+				      * that to avoid that anyone tries to
+				      * use this operator.
+				      */
+    SparseMatrixStruct & operator = (const SparseMatrixStruct &);
+
     
     template <typename number> friend class SparseMatrix;
 };

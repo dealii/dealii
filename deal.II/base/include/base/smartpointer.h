@@ -47,6 +47,14 @@ class SmartPointer
 				      */
     SmartPointer();
 
+				     /*
+				      * Copy constructor for
+				      * #SmartPointer#. We copy the object
+				      * subscribed to from #tt#, but subscribe
+				      * ourselves to it again.
+				      */
+    SmartPointer (const SmartPointer<T> &tt);
+
 				     /**
 				      * Constructor taking a normal pointer.
 				      * If possible, i.e. if the pointer
@@ -118,6 +126,16 @@ SmartPointer<T>::SmartPointer () :
 template <typename T>
 SmartPointer<T>::SmartPointer (T *t) :
 		t (t)
+{
+  if (t)
+    t->subscribe();
+};
+
+
+
+template <typename T>
+SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt) :
+		t (tt.t)
 {
   if (t)
     t->subscribe();
