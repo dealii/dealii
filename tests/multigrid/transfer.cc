@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -86,6 +86,7 @@ void check_select(const FiniteElement<dim>& fe,
   tr.refine_global(2);
   
   MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim>& dof=mgdof;
   mgdof.distribute_dofs(fe);
   DoFRenumbering::component_wise(mgdof, target_component);
   vector<unsigned int> ndofs(fe.n_components());
@@ -109,7 +110,7 @@ void check_select(const FiniteElement<dim>& fe,
   
   
   MGTransferSelect<double> transfer;
-  transfer.build_matrices(mgdof, selected, mg_selected,
+  transfer.build_matrices(dof, mgdof, selected, mg_selected,
 			  target_component, mg_target_component);
 
   Vector<double> u2(mg_ndofs[2][mg_selected]);
@@ -221,7 +222,7 @@ int main()
   std::ofstream logfile("transfer.output");
   logfile.precision(3);
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
   
 //  check_simple (FE_DGP<2>(0));
 //  check_simple (FE_DGP<2>(1));
@@ -230,8 +231,6 @@ int main()
 //  check_simple (FE_Q<2>(1));
 //  check_simple (FE_Q<2>(2));
 
-  std::cerr << "Select" << std::endl;
-  
   std::vector<unsigned int> v1(4);
   std::vector<unsigned int> v2(4);
   std::vector<unsigned int> v3(4);

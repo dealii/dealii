@@ -1,7 +1,6 @@
-# Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -23,9 +22,9 @@ default: run-tests
 ############################################################
 
 transfer.exe      : transfer.g.$(OBJEXT) $(lib-2d)           $(libraries)
-mg1.exe           : mg1.g.$(OBJEXT)      $(lib-2d)           $(libraries)
+cycles.exe        : cycles.g.$(OBJEXT)   $(lib-2d)           $(libraries)
 
-tests = transfer
+tests = cycles transfer
 
 ############################################################
 
