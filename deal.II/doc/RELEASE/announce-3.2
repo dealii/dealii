@@ -1,16 +1,15 @@
-Version 3.2 of the well-known object-oriented finite element library
-deal.II has been released. It is available from the deal.II home-page
-at
+Version 3.2 of the well-known deal.II object-oriented finite element library
+has been released. It is available from the deal.II home-page at
 
       http://gaia.iwr.uni-heidelberg.de/~deal
 
 The most important improvements are:
 
 - Mapping of arbitrary order at curved boundaries. This includes the
-  possibility of using hypo-, iso- and hyper-parametric elements, as
-  well as shape functions depending on the actual grid cell..
+  possibility of using sub-, iso- and super-parametric elements, as
+  well as C1 mappings and shape functions depending on the actual grid cell.
 - A matrix class for conveniently filtering Dirichlet boundary values
-  without reassembling the system matrix.
+  without modifying the system matrix.
 - A wide variety of target systems by ISO C++ conformance.
 
 
@@ -26,10 +25,10 @@ All main features of the previous versions have been continued and improved:
 - Locally refined grids
 - Continuous and discontinuous elements of higher order
 - Fast linear algebra
-- Built-in support for symmetric multi-processing
+- Built-in support for symmetric multi-processing (SMP)
 - Output for a variety of visualization platforms
 
-An still, deal.II is distributed under an Open Source license and it
+deal.II is distributed under an Open Source license and it
 is free for non-commercial use.
 
 
