@@ -175,7 +175,7 @@ int main ()
 {
   logfile.precision(4);
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
 
   test<1> ();
   test<2> ();
