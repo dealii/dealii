@@ -5,8 +5,15 @@
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
 
 #include <lac/dvector.h>
-#include <math.h>
-#include <algo.h>
+#include <cmath>
+#include <algorithm>
+
+
+inline double sqr (const double x) {
+  return x*x;
+};
+
+
 
 dVector::dVector () :
 		dim(0),
@@ -41,8 +48,7 @@ dVector::dVector (const dVector& v) :
     {
       val = new double[maxdim];
       Assert (val != 0, ExcOutOfMemory());
-      for (unsigned int i=0; i<dim; ++i)
-	val[i] = v.val[i];
+      copy (v.begin(), v.end(), begin());
     }
 }
 
@@ -91,13 +97,15 @@ dVector::~dVector ()
 
 
 void dVector::clear () {
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] = 0.;
+  fill (begin(), end(), 0.);
 }
 
 
 double dVector::operator * (const dVector& v) const
 {
+  if (&v == this)
+    return norm_sqr();
+  
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   
   double sum0 = 0,
@@ -108,17 +116,20 @@ double dVector::operator * (const dVector& v) const
 				   // use modern processors better by
 				   // allowing pipelined commands to be
 				   // executed in parallel
-  for (unsigned int i=0; i<(dim/4); ++i) 
+  const_iterator ptr  = begin(),
+		 vptr = v.begin(),
+		 eptr = ptr + (dim/4)*4;
+  while (ptr!=eptr)
     {
-      sum0 += val[4*i] * v.val[4*i];
-      sum1 += val[4*i+1] * v.val[4*i+1];
-      sum2 += val[4*i+2] * v.val[4*i+2];
-      sum3 += val[4*i+3] * v.val[4*i+3];
+      sum0 += (*ptr++ * *vptr++);
+      sum1 += (*ptr++ * *vptr++);
+      sum2 += (*ptr++ * *vptr++);
+      sum3 += (*ptr++ * *vptr++);
     };
 				   // add up remaining elements
-  for (unsigned int i=(dim/4)*4; i<dim; ++i)
-    sum0 += val[i] * v.val[i];
-  
+  while (ptr != end())
+    sum0 += *ptr++ * *vptr++;
+    
   return sum0+sum1+sum2+sum3;
 }
 
@@ -134,16 +145,18 @@ double dVector::norm_sqr () const
 				   // use modern processors better by
 				   // allowing pipelined commands to be
 				   // executed in parallel
-  for (unsigned int i=0; i<(dim/4); ++i) 
+  const_iterator ptr  = begin(),
+		 eptr = ptr + (dim/4)*4;
+  while (ptr!=eptr)
     {
-      sum0 += val[4*i] * val[4*i];
-      sum1 += val[4*i+1] * val[4*i+1];
-      sum2 += val[4*i+2] * val[4*i+2];
-      sum3 += val[4*i+3] * val[4*i+3];
+      sum0 += sqr(*ptr++);
+      sum1 += sqr(*ptr++);
+      sum2 += sqr(*ptr++);
+      sum3 += sqr(*ptr++);
     };
 				   // add up remaining elements
-  for (unsigned int i=(dim/4)*4; i<dim; ++i)
-    sum0 += val[i] * val[i];
+  while (ptr != end())
+    sum0 += sqr(*ptr++);
   
   return sum0+sum1+sum2+sum3;
 };
@@ -160,16 +173,18 @@ double dVector::mean_value () const
 				   // use modern processors better by
 				   // allowing pipelined commands to be
 				   // executed in parallel
-  for (unsigned int i=0; i<(dim/4); ++i) 
+  const_iterator ptr  = begin(),
+		 eptr = ptr + (dim/4)*4;
+  while (ptr!=eptr)
     {
-      sum0 += val[4*i];
-      sum1 += val[4*i+1];
-      sum2 += val[4*i+2];
-      sum3 += val[4*i+3];
+      sum0 += *ptr++;
+      sum1 += *ptr++;
+      sum2 += *ptr++;
+      sum3 += *ptr++;
     };
 				   // add up remaining elements
-  for (unsigned int i=(dim/4)*4; i<dim; ++i)
-    sum0 += val[i];
+  while (ptr != end())
+    sum0 += *ptr++;
   
   return (sum0+sum1+sum2+sum3)/size();
 };
@@ -186,16 +201,18 @@ double dVector::l1_norm () const
 				   // use modern processors better by
 				   // allowing pipelined commands to be
 				   // executed in parallel
-  for (unsigned int i=0; i<(dim/4); ++i) 
+  const_iterator ptr  = begin(),
+		 eptr = ptr + (dim/4)*4;
+  while (ptr!=eptr)
     {
-      sum0 += fabs(val[4*i]);
-      sum1 += fabs(val[4*i+1]);
-      sum2 += fabs(val[4*i+2]);
-      sum3 += fabs(val[4*i+3]);
+      sum0 += fabs(*ptr++);
+      sum1 += fabs(*ptr++);
+      sum2 += fabs(*ptr++);
+      sum3 += fabs(*ptr++);
     };
 				   // add up remaining elements
-  for (unsigned int i=(dim/4)*4; i<dim; ++i)
-    sum0 += fabs(val[i]);
+  while (ptr != end())
+    sum0 += fabs(*ptr++);
   
   return sum0+sum1+sum2+sum3;
 };
@@ -204,26 +221,7 @@ double dVector::l1_norm () const
 
 double dVector::l2_norm () const
 {
-  double sum0 = 0,
-	 sum1 = 0,
-	 sum2 = 0,
-	 sum3 = 0;
-
-				   // use modern processors better by
-				   // allowing pipelined commands to be
-				   // executed in parallel
-  for (unsigned int i=0; i<(dim/4); ++i) 
-    {
-      sum0 += val[4*i] * val[4*i];
-      sum1 += val[4*i+1] * val[4*i+1];
-      sum2 += val[4*i+2] * val[4*i+2];
-      sum3 += val[4*i+3] * val[4*i+3];
-    };
-				   // add up remaining elements
-  for (unsigned int i=(dim/4)*4; i<dim; ++i)
-    sum0 += val[i] * val[i];
-  
-  return sqrt(sum0+sum1+sum2+sum3);
+  return sqrt(norm_sqr());
 };
 
 
@@ -255,11 +253,7 @@ double dVector::linfty_norm () const {
 
 dVector& dVector::operator += (const dVector& v)
 {
-  if (v.dim != dim)
-    reinit (v, true);
-
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] += v.val[i];
+  add (v);
   return *this;
 }
 
@@ -267,11 +261,13 @@ dVector& dVector::operator += (const dVector& v)
 
 dVector& dVector::operator -= (const dVector& v)
 {
-  if (v.dim != dim)
-    reinit (v, true);
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin();
+  while (i_ptr!=i_end)
+    *i_ptr++ -= *v_ptr++;
 
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] -= v.val[i];
   return *this;
 }
 
@@ -279,7 +275,10 @@ dVector& dVector::operator -= (const dVector& v)
 
 void dVector::add (const double v)
 {
-  for (unsigned int i = 0; i < dim; ++i) val[i] += v;
+  iterator i_ptr = begin(),
+	   i_end = end();
+  while (i_ptr!=i_end)
+    *i_ptr++ += v;
 }
 
 
@@ -287,7 +286,11 @@ void dVector::add (const double v)
 void dVector::add (const dVector& v)
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i = 0; i < dim; ++i) val[i] += v(i);
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin();
+  while (i_ptr!=i_end)
+    *i_ptr++ += *v_ptr++;
 }
 
 
@@ -295,7 +298,11 @@ void dVector::add (const dVector& v)
 void dVector::add (const double a, const dVector& v)
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i = 0; i < dim; ++i) val[i] += a * v(i);
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin();
+  while (i_ptr!=i_end)
+    *i_ptr++ += a * *v_ptr++;
 }
 
 
@@ -305,8 +312,12 @@ void dVector::add (const double a, const dVector& v,
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
-  for (unsigned int i = 0; i < dim; ++i)
-    val[i] += a * v.val[i] + b * w.val[i];
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin(),
+		 w_ptr = w.begin();
+  while (i_ptr!=i_end)
+    *i_ptr++ += a * *v_ptr++ + b * *w_ptr++;
 }
 
 
@@ -314,8 +325,11 @@ void dVector::add (const double a, const dVector& v,
 void dVector::sadd (const double x, const dVector& v)
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i = 0; i < dim; ++i)
-    val[i] = x * val[i] + v.val[i];
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin();
+  for (; i_ptr!=i_end; ++i_ptr)
+    *i_ptr = x * *i_ptr  + *v_ptr++;
 }
 
 
@@ -323,8 +337,11 @@ void dVector::sadd (const double x, const dVector& v)
 void dVector::sadd (const double x, const double a, const dVector& v)
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i = 0; i < dim; ++i)
-    val[i] = x * val[i] + a * v.val[i];
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin();
+  for (; i_ptr!=i_end; ++i_ptr)
+    *i_ptr = x * *i_ptr  +  a * *v_ptr++;
 }
 
 
@@ -334,8 +351,12 @@ void dVector::sadd (const double x, const double a,
 {
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
-  for (unsigned int i = 0; i < dim; ++i)
-    val[i] = x * val[i] + a * v.val[i] + b * w.val[i];
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin(),
+		 w_ptr = w.begin();
+  for (; i_ptr!=i_end; ++i_ptr)
+    *i_ptr = x * *i_ptr  +  a * *v_ptr++  + b * *w_ptr++;
 }
 
 
@@ -347,17 +368,23 @@ void dVector::sadd (const double x, const double a,
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
   Assert (dim == y.dim, ExcDimensionsDontMatch(dim, y.dim));
-  for (unsigned int i = 0; i < dim; ++i)
-    val[i] = x * val[i] + a * v.val[i] + b * w.val[i] 
-	     + c * y.val[i];
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin(),
+		 w_ptr = w.begin(),
+		 y_ptr = y.begin();
+  
+  for (; i_ptr!=i_end; ++i_ptr)
+    *i_ptr = (x * *i_ptr)  +  (a * *v_ptr++)  +  (b * *w_ptr++)  + (c * *y_ptr++);
 }
 
 
 
 void dVector::scale (const double factor)
 {
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] *= factor;
+  iterator ptr=begin(), eptr=end();
+  while (ptr!=eptr)
+    *ptr++ *= factor;
 }
 
 
@@ -365,9 +392,14 @@ void dVector::scale (const double factor)
 void dVector::equ (const double a, const dVector& u,
 		   const double b, const dVector& v)
 {
+  Assert (dim == u.dim, ExcDimensionsDontMatch(dim, u.dim));
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] = a*u.val[i] + b*v.val[i];
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator u_ptr = u.begin(),
+		 v_ptr = v.begin();
+  while (i_ptr!=i_end)
+    *i_ptr++ = a * *u_ptr++  + b * *v_ptr++;
 }
 
 
@@ -375,8 +407,11 @@ void dVector::equ (const double a, const dVector& u,
 void dVector::equ (const double a, const dVector& u)
 {
   Assert (dim == u.dim, ExcDimensionsDontMatch(dim, u.dim));
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] = a*u.val[i];
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator u_ptr = u.begin();
+  while (i_ptr!=i_end)
+    *i_ptr++ = a * *u_ptr++;
 }
 
 
@@ -387,16 +422,19 @@ void dVector::ratio (const dVector &a, const dVector &b) {
 				   // no need to reinit with zeros, since
 				   // we overwrite them anyway
   reinit (a.size(), true);
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] = a.val[i] / b.val[i];
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator a_ptr = a.begin(),
+		 b_ptr = b.begin();
+  while (i_ptr!=i_end)
+    *i_ptr++ = *a_ptr++ / *b_ptr++;
 };
 
 
 
 dVector& dVector::operator = (const double s)
 {
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] = s;
+  fill (begin(), end(), s);
   return *this;
 }
 
@@ -405,10 +443,9 @@ dVector& dVector::operator = (const double s)
 dVector& dVector::operator = (const dVector& v)
 {
   if (v.dim != dim)
-    reinit (v, true);
+    reinit (v.dim, true);
 
-  for (unsigned int i=0; i<dim; ++i)
-    val[i] = v.val[i];
+  copy (v.begin(), v.end(), begin());
   return *this;
 }
 
