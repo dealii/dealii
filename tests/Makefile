@@ -84,6 +84,9 @@ output-bits: abort.o
 output-deal.II: abort.o
 	cd deal.II ; $(MAKE) output
 
+output-multigrid: abort.o
+	cd multigrid ; $(MAKE) output
+
 
 # collect all header files, and for each try to do the following:
 # generate a file tmp.cc that contains nothing but "#include <xxx>"
@@ -158,6 +161,12 @@ clean-deal.II:
 
 distclean-deal.II:
 	cd deal.II ; $(MAKE) distclean
+
+clean-multigrid:
+	cd multigrid ; $(MAKE) clean
+
+distclean-multigrid:
+	cd multigrid ; $(MAKE) distclean
 
 clean-bits:
 	cd bits ; $(MAKE) clean
