@@ -417,7 +417,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::vmult (Vector<number2>       &ds
 				       // blocks.
 				       // row, column are the global numbering
 				       // of the unkowns.
-  unsigned int row, column, row_cell, block_start=0;
+  unsigned int row, row_cell, block_start=0;
   number2 b_cell_row;
 
   if (!this->inverses_ready())
@@ -525,7 +525,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &d
 				       // blocks.
 				       // row, column are the global numbering
 				       // of the unkowns.
-  unsigned int row, column, row_cell, block_start = 0;
+  unsigned int row, row_cell, block_start = 0;
   unsigned int block_end=this->blocksize *n_cells;
   number2 b_cell_row;
 
