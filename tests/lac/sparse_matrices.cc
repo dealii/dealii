@@ -21,8 +21,10 @@
 #include <lac/vector.h>
 #include <lac/solver_richardson.h>
 #include <lac/precondition.h>
+#include <lac/precondition_block.h>
 
 #include <lac/sparse_matrix_ez.templates.h>
+#include <lac/precondition_block.templates.h>
 
 #include <fstream>
 #include <cstdio>
@@ -54,6 +56,15 @@ check_vmult_quadratic(std::vector<double>& residuals,
   sor.initialize(A, 1.2);
   PreconditionSSOR<MATRIX> ssor;
   ssor.initialize(A, 1.2);
+  PreconditionBlockJacobi<MATRIX, float> block_jacobi;
+  block_jacobi.initialize(A, (unsigned int) (sqrt(A.n()+.3)), 1.2);
+  block_jacobi.invert_diagblocks();
+  PreconditionBlockSSOR<MATRIX, float> block_ssor;
+  block_ssor.initialize(A, (unsigned int) (sqrt(A.n()+.3)), 1.2);
+  block_ssor.invert_diagblocks();
+  PreconditionBlockSOR<MATRIX, float> block_sor;
+  block_sor.initialize(A, (unsigned int) (sqrt(A.n()+.3)), 1.2);
+  block_sor.invert_diagblocks();
   
   u = 0.;
   f = 1.;
@@ -62,6 +73,10 @@ check_vmult_quadratic(std::vector<double>& residuals,
   PREC_CHECK(prich, solve, jacobi);
   PREC_CHECK(prich, solve, ssor);
   PREC_CHECK(prich, solve, sor);
+  u = 0.;
+  PREC_CHECK(prich, solve, block_jacobi);
+  PREC_CHECK(prich, solve, block_ssor);
+  PREC_CHECK(prich, solve, block_sor);
   
   u = 0.;
   deallog << "Transpose" << std::endl;
@@ -69,6 +84,10 @@ check_vmult_quadratic(std::vector<double>& residuals,
   PREC_CHECK(prich, Tsolve, jacobi);
   PREC_CHECK(prich, Tsolve, ssor);
   PREC_CHECK(prich, Tsolve, sor);
+  u = 0.;
+  PREC_CHECK(prich, Tsolve, block_jacobi);
+  PREC_CHECK(prich, Tsolve, block_ssor);
+  PREC_CHECK(prich, Tsolve, block_sor);
   deallog.pop();
 }
 
@@ -110,7 +129,7 @@ int main()
   deallog.depth_console(1000);
   deallog.log_execution_time(true);
   deallog.log_time_differences(true);
-  const unsigned int size = 500;
+  const unsigned int size = 50;
   const unsigned int row_length = 9;
 #endif
   
@@ -156,7 +175,7 @@ int main()
   testproblem.nine_point(E);
   check_vmult_quadratic(E_res, E, "9-SparseMatrixEZ<double>");
 
-  for (unsigned int i=0;i<A_res.size();++i)
+  for (unsigned int i=0;i<E_res.size();++i)
     if (std::fabs(A_res[i] - E_res[i]) > 1.e-14)
       deallog << "SparseMatrix and SparseMatrixEZ differ!!!"
 	      << std::endl;

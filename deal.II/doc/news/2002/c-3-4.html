@@ -234,6 +234,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p> Changed: The classes <code
+  class="class">PreconditionBlock</code>, <code
+  class="class">PreconditionBlockJacobi</code>, <code
+  class="class">PreconditionBlockSOR</code>, and <code
+  class="class">PreconditionBlockSSOR</code> have changed their
+  template signature. The first template argument is now the matrix
+  type, not just a number type.
+  <br>
+  (GK 2002/09/18)
+  </p>
+
   <li> <p> New: class <code class="class">BlockVector</code> has a
   function <code class="member">collect_sizes()</code>, very much as
   <code class="class">BlockSparsityPattern</code>. This allows

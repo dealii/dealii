@@ -1292,7 +1292,7 @@ inline
 number SparseMatrixEZ<number>::operator() (const unsigned int i,
 					   const unsigned int j) const
 {
-  Entry* entry = locate(i,j);
+  const Entry* entry = locate(i,j);
   if (entry)
     return entry->value;
   Assert(false, ExcInvalidEntry(i,j));

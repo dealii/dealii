@@ -24,8 +24,8 @@
 #include <lac/sparse_matrix.h>
 
 
-template <typename number, typename inverse_type>
-PreconditionBlock<number,inverse_type>::PreconditionBlock ():
+template <class MATRIX, typename inverse_type>
+PreconditionBlock<MATRIX,inverse_type>::PreconditionBlock ():
 		blocksize(0),
 		A(0),
 		store_diagonals(false),
@@ -33,8 +33,8 @@ PreconditionBlock<number,inverse_type>::PreconditionBlock ():
 {};
 
 
-template <typename number, typename inverse_type>
-PreconditionBlock<number,inverse_type>::~PreconditionBlock ()
+template <class MATRIX, typename inverse_type>
+PreconditionBlock<MATRIX,inverse_type>::~PreconditionBlock ()
 {
   if (var_inverse.size()!=0)
     var_inverse.erase(var_inverse.begin(), var_inverse.end());
@@ -43,8 +43,8 @@ PreconditionBlock<number,inverse_type>::~PreconditionBlock ()
 }
 
 
-template <typename number, typename inverse_type>
-void PreconditionBlock<number,inverse_type>::clear ()
+template <class MATRIX, typename inverse_type>
+void PreconditionBlock<MATRIX,inverse_type>::clear ()
 {
   if (var_inverse.size()!=0)
     var_inverse.erase(var_inverse.begin(), var_inverse.end());
@@ -56,8 +56,8 @@ void PreconditionBlock<number,inverse_type>::clear ()
 }
 
 
-template <typename number, typename inverse_type>
-void PreconditionBlock<number,inverse_type>::initialize (const SparseMatrix<number> &M,
+template <class MATRIX, typename inverse_type>
+void PreconditionBlock<MATRIX,inverse_type>::initialize (const MATRIX &M,
 							 const unsigned int bsize,
 							 const double relax)
 {
@@ -71,9 +71,9 @@ void PreconditionBlock<number,inverse_type>::initialize (const SparseMatrix<numb
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 const FullMatrix<inverse_type>&
-PreconditionBlock<number,inverse_type>::inverse(unsigned int i) const
+PreconditionBlock<MATRIX,inverse_type>::inverse(unsigned int i) const
 {
   if (same_diagonal)
     return var_inverse[0];
@@ -83,9 +83,9 @@ PreconditionBlock<number,inverse_type>::inverse(unsigned int i) const
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 const FullMatrix<inverse_type>&
-PreconditionBlock<number,inverse_type>::diagonal(unsigned int i) const
+PreconditionBlock<MATRIX,inverse_type>::diagonal(unsigned int i) const
 {
   Assert(store_diagonals, ExcDiagonalsNotStored());
   
@@ -97,37 +97,37 @@ PreconditionBlock<number,inverse_type>::diagonal(unsigned int i) const
 }
 
 
-template <typename number, typename inverse_type>
-unsigned int PreconditionBlock<number,inverse_type>::block_size() const
+template <class MATRIX, typename inverse_type>
+unsigned int PreconditionBlock<MATRIX,inverse_type>::block_size() const
 {
   return blocksize;
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 void
-PreconditionBlock<number,inverse_type>::set_same_diagonal()
+PreconditionBlock<MATRIX,inverse_type>::set_same_diagonal()
 {
   Assert(var_inverse.size()==0, ExcInverseMatricesAlreadyExist());
   same_diagonal = true;
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 bool
-PreconditionBlock<number,inverse_type>::inverses_ready() const
+PreconditionBlock<MATRIX,inverse_type>::inverses_ready() const
 {
   return (var_inverse.size() != 0);
 }
 
 
-template <typename number, typename inverse_type>
-void PreconditionBlock<number,inverse_type>::invert_diagblocks()
+template <class MATRIX, typename inverse_type>
+void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 {
   Assert (A!=0, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
 
-  const SparseMatrix<number> &M=*A;
+  const MATRIX &M=*A;
   Assert (var_inverse.size()==0, ExcInverseMatricesAlreadyExist());
 
   const unsigned int n_cells = M.m()/blocksize;
@@ -147,11 +147,12 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 
       for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
 	{
-	  SparseMatrix<number>::const_iterator entry = M.begin(row_cell);
-	  const SparseMatrix<number>::const_iterator row_end = M.end(row_cell);
-	  while(entry != row_end && entry->column() < blocksize)
+	  typename MATRIX::const_iterator entry = M.begin(row_cell);
+	  const typename MATRIX::const_iterator row_end = M.end(row_cell);
+	  while(entry != row_end)
 	    {
-	      M_cell(row_cell, entry->column()) = entry->value();
+	      if (entry->column() < blocksize)
+		M_cell(row_cell, entry->column()) = entry->value();
 	      ++entry;
 	    }
 	}
@@ -202,18 +203,18 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 	  for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
 	    {
 	      const unsigned int row = row_cell + cell_start;
-	      SparseMatrix<number>::const_iterator entry = M.begin(row);
-	      const SparseMatrix<number>::const_iterator row_end = M.end(row);
+	      typename MATRIX::const_iterator entry = M.begin(row);
+	      const typename MATRIX::const_iterator row_end = M.end(row);
 
-	      while (entry != row_end && entry->column()<cell_start)
-		++entry;
-	      while(entry != row_end)
+	      for (;entry != row_end; ++entry)
 		{
+		  if (entry->column()<cell_start)
+		    continue;
+		  
 		  const unsigned int column_cell = entry->column()-cell_start;
 		  if (column_cell >= blocksize)
-		    break;
+		    continue;
 		  M_cell(row_cell, column_cell) = entry->value();
-		  ++entry;
 		}
 	    }
 
@@ -226,9 +227,9 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 unsigned int
-PreconditionBlock<number,inverse_type>::memory_consumption () const
+PreconditionBlock<MATRIX,inverse_type>::memory_consumption () const
 {
   unsigned int mem = sizeof(*this);
   for (unsigned int i=0; i<var_inverse.size(); ++i)
@@ -244,9 +245,9 @@ PreconditionBlock<number,inverse_type>::memory_consumption () const
 /*--------------------- PreconditionBlockJacobi -----------------------*/
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<number,inverse_type>
+void PreconditionBlockJacobi<MATRIX,inverse_type>
 ::do_vmult (Vector<number2>       &dst,
 	    const Vector<number2> &src,
 	    bool adding) const
@@ -267,10 +268,10 @@ void PreconditionBlockJacobi<number,inverse_type>
 				   // parse error for gcc for the
 				   // exceptions that do not take
 				   // args...
-  typedef PreconditionBlock<number,inverse_type> BaseClass;
+  typedef PreconditionBlock<MATRIX,inverse_type> BaseClass;
   Assert(this->A!=0, ExcNotInitialized());
   
-  const SparseMatrix<number> &M=*this->A;
+  const MATRIX &M=*this->A;
   const unsigned int n_cells=M.m()/this->blocksize;
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
@@ -337,9 +338,9 @@ void PreconditionBlockJacobi<number,inverse_type>
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<number,inverse_type>
+void PreconditionBlockJacobi<MATRIX,inverse_type>
 ::vmult (Vector<number2>       &dst,
 	 const Vector<number2> &src) const
 {
@@ -347,9 +348,9 @@ void PreconditionBlockJacobi<number,inverse_type>
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<number,inverse_type>
+void PreconditionBlockJacobi<MATRIX,inverse_type>
 ::Tvmult (Vector<number2>       &dst,
 	  const Vector<number2> &src) const
 {
@@ -357,9 +358,9 @@ void PreconditionBlockJacobi<number,inverse_type>
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<number,inverse_type>
+void PreconditionBlockJacobi<MATRIX,inverse_type>
 ::vmult_add (Vector<number2>       &dst,
 	     const Vector<number2> &src) const
 {
@@ -367,9 +368,9 @@ void PreconditionBlockJacobi<number,inverse_type>
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<number,inverse_type>
+void PreconditionBlockJacobi<MATRIX,inverse_type>
 ::Tvmult_add (Vector<number2>       &dst,
 	      const Vector<number2> &src) const
 {
@@ -379,9 +380,9 @@ void PreconditionBlockJacobi<number,inverse_type>
 
 /*--------------------- PreconditionBlockSOR -----------------------*/
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<number,inverse_type>::vmult (Vector<number2>       &dst,
+void PreconditionBlockSOR<MATRIX,inverse_type>::vmult (Vector<number2>       &dst,
 						       const Vector<number2> &src) const
 {
 				   // introduce the following typedef
@@ -400,16 +401,12 @@ void PreconditionBlockSOR<number,inverse_type>::vmult (Vector<number2>       &ds
 				   // parse error for gcc for the
 				   // exceptions that do not take
 				   // args...
-  typedef PreconditionBlock<number,inverse_type> BaseClass;
+  typedef PreconditionBlock<MATRIX,inverse_type> BaseClass;
 
   Assert (this->A!=0, ExcNotInitialized());
   
-  const SparseMatrix<number> &M=*this->A;
+  const MATRIX &M=*this->A;
   const unsigned int n_cells=M.m()/this->blocksize;
-
-  const SparsityPattern &spars    = M.get_sparsity_pattern();
-  const unsigned int    *rowstart = spars.get_rowstart_indices();
-  const unsigned int    *columns  = spars.get_column_numbers();
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
@@ -420,7 +417,7 @@ void PreconditionBlockSOR<number,inverse_type>::vmult (Vector<number2>       &ds
 				       // blocks.
 				       // row, column are the global numbering
 				       // of the unkowns.
-  unsigned int row, column, row_cell, begin_diag_block=0;
+  unsigned int row, column, row_cell, block_start=0;
   number2 b_cell_row;
 
   if (!this->inverses_ready())
@@ -428,44 +425,55 @@ void PreconditionBlockSOR<number,inverse_type>::vmult (Vector<number2>       &ds
       FullMatrix<number> M_cell(this->blocksize);
       for (unsigned int cell=0; cell<n_cells; ++cell)
 	{
-	  for (row=cell*this->blocksize, row_cell=0;
-	       row_cell<this->blocksize;
+	  for (row = block_start, row_cell = 0;
+	       row_cell < this->blocksize;
 	       ++row_cell, ++row)
 	    {
+	      const typename MATRIX::const_iterator row_end = M.end(row);
+	      typename MATRIX::const_iterator entry = M.begin(row);
+	      
 	      b_cell_row=src(row);
-	      for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
-		if ((column=columns[j]) < begin_diag_block)
-		    b_cell_row -= M.global_entry(j) * dst(column);
+	      for (; entry != row_end; ++entry)
+		{
+		  const unsigned int column = entry->column();
+		  if (column < block_start)
+		    b_cell_row -= entry->value() * dst(column);
+		  else if (column < block_start + this->blocksize)
+		    {
+		      const unsigned int column_cell = column - block_start;
+		      M_cell(row_cell, column_cell) = entry->value();
+		    }
+		}
 	      b_cell(row_cell)=b_cell_row;
-	      for (unsigned int column_cell=0, column=cell*this->blocksize;
-		   column_cell<this->blocksize;
-		   ++column_cell, ++column)
-		  M_cell(row_cell,column_cell)=M(row,column);
 	    }
 	  M_cell.householder(b_cell);
 	  M_cell.backward(x_cell,b_cell);
 					   // distribute x_cell to dst
-	  for (row=cell*this->blocksize, row_cell=0;
+	  for (row=block_start, row_cell=0;
 	       row_cell<this->blocksize;
 	       ++row_cell, ++row)
 	    dst(row)=this->relaxation*x_cell(row_cell);
 	  
-	  begin_diag_block+=this->blocksize;
+	  block_start+=this->blocksize;
 	}
     }
   else
     for (unsigned int cell=0; cell<n_cells; ++cell)
       {
-	for (row=cell*this->blocksize, row_cell=0;
+	for (row = block_start, row_cell = 0;
 	     row_cell<this->blocksize;
 	     ++row_cell, ++row)
 	  {
+	    const typename MATRIX::const_iterator row_end = M.end(row);
+	    typename MATRIX::const_iterator entry = M.begin(row);
+	    
 	    b_cell_row=src(row);
-	    for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
-	      if ((column=columns[j]) < begin_diag_block)
-		{
-		  b_cell_row -= M.global_entry(j) * dst(column);
-		}
+	    for (; entry != row_end; ++entry)
+	      {
+		const unsigned int column = entry->column();
+		if (column < block_start)
+		  b_cell_row -= entry->value() * dst(column);
+	      }		      
 	    b_cell(row_cell)=b_cell_row;
 	  }
 	this->inverse(cell).vmult(x_cell, b_cell);
@@ -475,14 +483,14 @@ void PreconditionBlockSOR<number,inverse_type>::vmult (Vector<number2>       &ds
 	     ++row_cell, ++row)
 	  dst(row)=this->relaxation*x_cell(row_cell);
 	
-	begin_diag_block+=this->blocksize;
+	block_start+=this->blocksize;
       }
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &dst,
+void PreconditionBlockSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &dst,
 						       const Vector<number2> &src) const
 {
 				   // introduce the following typedef
@@ -501,16 +509,12 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 				   // parse error for gcc for the
 				   // exceptions that do not take
 				   // args...
-  typedef PreconditionBlock<number,inverse_type> BaseClass;
+  typedef PreconditionBlock<MATRIX,inverse_type> BaseClass;
 
   Assert (this->A!=0, ExcNotInitialized());
   
-  const SparseMatrix<number> &M=*this->A;
+  const MATRIX &M=*this->A;
   const unsigned int n_cells=M.m()/this->blocksize;
-
-  const SparsityPattern &spars    = M.get_sparsity_pattern();
-  const unsigned int    *rowstart = spars.get_rowstart_indices();
-  const unsigned int    *columns  = spars.get_column_numbers();
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
@@ -521,8 +525,8 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 				       // blocks.
 				       // row, column are the global numbering
 				       // of the unkowns.
-  unsigned int row, column, row_cell;
-  unsigned int end_diag_block=this->blocksize *n_cells;
+  unsigned int row, column, row_cell, block_start = 0;
+  unsigned int block_end=this->blocksize *n_cells;
   number2 b_cell_row;
 
   if (!this->inverses_ready())
@@ -532,23 +536,26 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 	{
 	  unsigned int cell = (unsigned int) icell;
 					   // Collect upper triangle
-	  for (row=cell*this->blocksize, row_cell=0;
+	  for (row = block_start, row_cell = 0;
 	       row_cell<this->blocksize;
 	       ++row_cell, ++row)
 	    {
+	    const typename MATRIX::const_iterator row_end = M.end(row);
+	    typename MATRIX::const_iterator entry = M.begin(row);
+	    
 	      b_cell_row=src(row);
-	      for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
+	      for (; entry != row_end; ++entry)
 		{
-		  column=columns[j];
-		  if (column >= end_diag_block)
-		    b_cell_row -= M.global_entry(j) * dst(column);
+		  const unsigned int column = entry->column();
+		  if (column >= block_end)
+		    b_cell_row -= entry->value() * dst(column);
+		  else if (column >= block_start)
+		    {
+		      const unsigned int column_cell = column - block_start;
+		      M_cell(row_cell, column_cell) = entry->value();
+		    }
 		}
-	      
 	      b_cell(row_cell)=b_cell_row;
-					       // Collect diagonal block
-	      for (unsigned int column_cell=0, column=cell*this->blocksize;
-		   column_cell<this->blocksize; ++column_cell, ++column)
-		  M_cell(row_cell,column_cell)=M(row,column);
 	    }
 	  M_cell.householder(b_cell);
 	  M_cell.backward(x_cell,b_cell);
@@ -558,7 +565,8 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 	       ++row_cell, ++row)
 	    dst(row)=this->relaxation*x_cell(row_cell);
 	  
-	  end_diag_block-=this->blocksize;
+	  block_end   -= this->blocksize;
+	  block_start += this->blocksize;
 	}
     }
   else
@@ -569,13 +577,16 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 	     row_cell<this->blocksize;
 	     ++row_cell, ++row)
 	  {
+	    const typename MATRIX::const_iterator row_end = M.end(row);
+	    typename MATRIX::const_iterator entry = M.begin(row);
+	    
 	    b_cell_row=src(row);
-	    for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
+	    for (; entry != row_end; ++entry)
 	      {
-		column=columns[j];
-		if (column >= end_diag_block)
-		  b_cell_row -= M.global_entry(j) * dst(column);
-	      }
+		const unsigned int column = entry->column();
+		if (column >= block_end)
+		  b_cell_row -= entry->value() * dst(column);
+	      }		      
 	    b_cell(row_cell)=b_cell_row;
 	  }
 	this->inverse(cell).vmult(x_cell, b_cell);
@@ -585,29 +596,30 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 	     ++row_cell, ++row)
 	  dst(row)=this->relaxation*x_cell(row_cell);
 	
-	end_diag_block-=this->blocksize;
+	block_end   -= this->blocksize;
+	block_start += this->blocksize;
       }
 }
 
 //----------------------------------------------------------------------//
 
 
-template <typename number, typename inverse_type>
-PreconditionBlockSSOR<number,inverse_type>::PreconditionBlockSSOR ()
+template <class MATRIX, typename inverse_type>
+PreconditionBlockSSOR<MATRIX,inverse_type>::PreconditionBlockSSOR ()
 {
   this->store_diagonals = 1;
 }
 
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSSOR<number,inverse_type>::vmult (Vector<number2>       &dst,
+void PreconditionBlockSSOR<MATRIX,inverse_type>::vmult (Vector<number2>       &dst,
 							const Vector<number2> &src) const
 {
   Vector<number2> help;
   help.reinit(dst);
   
-  PreconditionBlockSOR<number,inverse_type>::vmult(help, src);
+  PreconditionBlockSOR<MATRIX,inverse_type>::vmult(help, src);
 
   Vector<inverse_type> cell_src(this->blocksize);
   Vector<inverse_type> cell_dst(this->blocksize);
@@ -628,18 +640,18 @@ void PreconditionBlockSSOR<number,inverse_type>::vmult (Vector<number2>       &d
 	help(row+row_cell)=this->relaxation*cell_dst(row_cell);
     }
   
-  PreconditionBlockSOR<number,inverse_type>::Tvmult(dst, help);
+  PreconditionBlockSOR<MATRIX,inverse_type>::Tvmult(dst, help);
 }
 
-template <typename number, typename inverse_type>
+template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSSOR<number,inverse_type>::Tvmult (Vector<number2>       &dst,
+void PreconditionBlockSSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &dst,
 							const Vector<number2> &src) const
 {
   Vector<number2> help;
   help.reinit(dst);
   
-  PreconditionBlockSOR<number,inverse_type>::Tvmult(help, src);
+  PreconditionBlockSOR<MATRIX,inverse_type>::Tvmult(help, src);
 
   Vector<inverse_type> cell_src(this->blocksize);
   Vector<inverse_type> cell_dst(this->blocksize);
@@ -660,7 +672,7 @@ void PreconditionBlockSSOR<number,inverse_type>::Tvmult (Vector<number2>       &
 	help(row+row_cell)=this->relaxation*cell_dst(row_cell);
     }
   
-  PreconditionBlockSOR<number,inverse_type>::vmult(dst, help);
+  PreconditionBlockSOR<MATRIX,inverse_type>::vmult(dst, help);
 }
 
 #endif

@@ -75,9 +75,15 @@ template <typename number> class Vector;
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
-template<typename number, typename inverse_type = number>
+template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlock : public virtual Subscriptor
 {
+  private:
+				     /**
+				      * Define number type of matrix.
+				      */
+    typedef typename MATRIX::value_type number;
+    
   public:
 				     /**
 				      * Constructor.
@@ -102,7 +108,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * parameter for derived classes
 				      * may be provided.
 				      */
-    void initialize (const SparseMatrix<number>& A,
+    void initialize (const MATRIX& A,
 		     const unsigned int block_size,
 		     const double relaxation = 1.);
 
@@ -243,7 +249,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * @p{vmult} function of the
 				      * derived classes.
 				      */
-    SmartPointer<const SparseMatrix<number> > A;
+    SmartPointer<const MATRIX> A;
 				     /**
 				      * Relaxation parameter to be
 				      * used by derived classes.
@@ -293,31 +299,37 @@ class PreconditionBlock : public virtual Subscriptor
  * See @ref{PreconditionBlock} for requirements on the matrix.
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
-template<typename number, typename inverse_type = number>
+template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockJacobi : public virtual Subscriptor,
-				private PreconditionBlock<number,inverse_type>
+				private PreconditionBlock<MATRIX, inverse_type>
 {
+  private:
+				     /**
+				      * Define number type of matrix.
+				      */
+    typedef typename MATRIX::value_type number;
+    
   public:
 				     /**
 				      * Make initialization function
 				      * publicly available.
 				      */
-    PreconditionBlock<number,inverse_type>::initialize;
+    PreconditionBlock<MATRIX, inverse_type>::initialize;
     
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<number,inverse_type>::clear;
+    PreconditionBlock<MATRIX, inverse_type>::clear;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<number,inverse_type>::set_same_diagonal;
+    PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
 
 				     /**
 				      * Make function public.
 				      */
-    PreconditionBlock<number,inverse_type>::invert_diagblocks;
+    PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
     
 				     /**
 				      * Execute block Jacobi
@@ -384,31 +396,37 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  * See @ref{PreconditionBlock} for requirements on the matrix.
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
-template<typename number, typename inverse_type = number>
+template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockSOR : public virtual Subscriptor,
-			     protected PreconditionBlock<number,inverse_type>
+			     protected PreconditionBlock<MATRIX, inverse_type>
 {
+  private:
+				     /**
+				      * Define number type of matrix.
+				      */
+    typedef typename MATRIX::value_type number;
+    
   public:
 				     /**
 				      * Make initialization function
 				      * publicly available.
 				      */
-    PreconditionBlock<number,inverse_type>::initialize;
+    PreconditionBlock<MATRIX, inverse_type>::initialize;
     
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<number,inverse_type>::clear;
+    PreconditionBlock<MATRIX, inverse_type>::clear;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<number,inverse_type>::set_same_diagonal;
+    PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<number,inverse_type>::invert_diagblocks;
+    PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
 
 				     /**
 				      * Execute block SOR
@@ -447,10 +465,16 @@ class PreconditionBlockSOR : public virtual Subscriptor,
  * See @ref{PreconditionBlock} for requirements on the matrix.
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
-template<typename number, typename inverse_type = number>
+template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockSSOR : public virtual Subscriptor,
-			      private PreconditionBlockSOR<number,inverse_type>
+			      private PreconditionBlockSOR<MATRIX, inverse_type>
 {
+  private:
+				     /**
+				      * Define number type of matrix.
+				      */
+    typedef typename MATRIX::value_type number;
+    
   public:
 				     /**
 				      * Constructor.
@@ -460,22 +484,22 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				      * Make initialization function
 				      * publicly available.
 				      */
-    PreconditionBlockSOR<number,inverse_type>::initialize;
+    PreconditionBlockSOR<MATRIX,inverse_type>::initialize;
     
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlockSOR<number,inverse_type>::clear;
+    PreconditionBlockSOR<MATRIX,inverse_type>::clear;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlockSOR<number,inverse_type>::set_same_diagonal;
+    PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlockSOR<number,inverse_type>::invert_diagblocks;
+    PreconditionBlockSOR<MATRIX,inverse_type>::invert_diagblocks;
 
 				     /**
 				      * Execute block SSOR
