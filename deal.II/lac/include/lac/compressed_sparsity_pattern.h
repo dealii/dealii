@@ -353,8 +353,6 @@ class CompressedSparsityPattern : public Subscriptor
 				      * entries.
 				      */
     std::vector<std::set<unsigned int> > column_indices;
-
-    friend class SparsityPattern;
 };
 
 /*@}*/
