@@ -184,13 +184,13 @@ HyperBallBoundary<3>::get_intermediate_points_on_quad (
   unsigned int m=static_cast<unsigned int> (sqrt(points.size()));
   Assert(points.size()==m*m, ExcInternalError());
 
-  vector<Point<3> > lp3(m);
-  vector<Point<3> > lp1(m);
+  std::vector<Point<3> > lp3(m);
+  std::vector<Point<3> > lp1(m);
   
   get_intermediate_points_on_line(quad->line(3), lp3);
   get_intermediate_points_on_line(quad->line(1), lp1);
   
-  vector<Point<3> > lps(m);
+  std::vector<Point<3> > lps(m);
   for (unsigned int i=0; i<m; ++i)
     {
       get_intermediate_points_between_points(lp3[i], lp1[i], lps);
