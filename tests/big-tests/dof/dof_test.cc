@@ -4,6 +4,7 @@
 
 
 #include <basic/grid_out.h>
+#include <basic/dof_tools.h>
 #include <grid/dof.h>
 #include <grid/tria.h>
 #include <fe/fe_lib.lagrange.h>
@@ -363,7 +364,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 			       dof->max_couplings_between_dofs());
   
   
-  dof->make_sparsity_pattern (sparsity);
+  DoFTools::make_sparsity_pattern (*dof, sparsity);
   int unconstrained_bandwidth = sparsity.bandwidth();
 
   cout << "    Writing sparsity pattern..." << endl;
