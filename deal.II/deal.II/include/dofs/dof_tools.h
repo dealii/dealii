@@ -11,11 +11,16 @@
 
 
 
-// This is part of the original documentation of DoFHandler
-// I tried to put the essential part into the documentation of
-// the function, where it belongs. Still, I keep it for a while,
-// to be able to recover missing information.
-/*
+/**
+ * This is a collection of functions operating on, and manipulating
+ * the numbers of degrees of freedom. The documentation of the member
+ * functions will provide more information, but for functions that
+ * exist in multiple versions, there are sections in this global
+ * documentation stating some commonalities.
+ *
+ * All member functions are static, so there is no need to create an
+ * object of class #DoFTools#.
+ *
  * \subsection{Setting up sparsity patterns}
  *
  * When assembling system matrices, the entries are usually of the form
@@ -37,39 +42,30 @@
  * other basis functions on a cell adjacent to the boundary vanish at the
  * boundary itself, except for those which are located on the boundary.
  *
- */
-
-/**
- * Operations on DoF-numbers.
- * This is a collection of functions manipulating the numbers of
- * degrees of freedom. The documentation of the member functions will
- * provide more information.
- *
- * All member functions are static, so there is no need to create an
- * object of class #DoFTools#.
- * @author Guido Kanschat, 1999
+ * @author Wolfgang Bangerth and others, 1999
  */
 class DoFTools
 {
   public:
 				     /**
-				      * Locate non-zero entries of the system matrix.
+				      * Locate non-zero entries of the
+				      * system matrix.
 				      *
-				      * This function computes the possible
-				      * positions of non-zero entries
-				      * in the global system
+				      * This function computes the
+				      * possible positions of non-zero
+				      * entries in the global system
 				      * matrix. We assume that a
-				      * finite element basis function
-				      * is non-zero on a cell only if
-				      * its dual degree of freedom is
-				      * associated with the interior,
-				      * a face, an edge or a vertex of
-				      * this cell. As a result, the
-				      * matrix entry between two basis
-				      * functions can be non-zero only
-				      * if they correspond to degrees
-				      * of freedom of at least one
-				      * common
+				      * certain finite element basis
+				      * function is non-zero on a cell
+				      * only if its degree of freedom
+				      * is associated with the
+				      * interior, a face, an edge or a
+				      * vertex of this cell. As a
+				      * result, the matrix entry
+				      * between two basis functions
+				      * can be non-zero only if they
+				      * correspond to degrees of
+				      * freedom of at least one common
 				      * cell. Therefore,
 				      * #make_sparsity_pattern# just
 				      * loops over all cells and
@@ -78,10 +74,11 @@ class DoFTools
 				      *
 				      * Since this process is purely
 				      * local, the sparsity pattern
-				      * does not provide for entries introduced by
-				      * the elimination of hanging nodes.
-				      * They have to be taken care of
-				      * by a call to 
+				      * does not provide for entries
+				      * introduced by the elimination
+				      * of hanging nodes.  They have
+				      * to be taken care of by a call
+				      * to
 				      * #ConstraintMatrix::condense()#
 				      * afterwards.
 				      *
@@ -90,8 +87,8 @@ class DoFTools
 				      * after generating the pattern.
 				      */
     template<int dim>
-    static void make_sparsity_pattern (const DoFHandler<dim>& dof,
-				       SparseMatrixStruct &);
+    static void make_sparsity_pattern (const DoFHandler<dim> &dof,
+				       SparseMatrixStruct    &sparsity_pattern);
 
 				     /**
 				      * Locate non-zero entries for
@@ -139,9 +136,9 @@ class DoFTools
 				      * elements if not specified by the mask.
 				      */
     template<int dim>
-    static void make_sparsity_pattern (const DoFHandler<dim>& dof,
+    static void make_sparsity_pattern (const DoFHandler<dim>       &dof,
 				       const vector<vector<bool> > &mask,
-				       SparseMatrixStruct          &);
+				       SparseMatrixStruct          &sparsity_pattern);
 
     				     /**
 				      * Write the sparsity structure of the
@@ -166,9 +163,9 @@ class DoFTools
 				      */
     template<int dim>
     static void
-    make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
-				    const vector<int> &dof_to_boundary_mapping,
-				    SparseMatrixStruct &); 
+    make_boundary_sparsity_pattern (const DoFHandler<dim> &dof,
+				    const vector<int>     &dof_to_boundary_mapping,
+				    SparseMatrixStruct    &sparsity_pattern); 
 
 				     /**
 				      * Write the sparsity structure of the
@@ -203,7 +200,11 @@ class DoFTools
 				    SparseMatrixStruct &sparsity); 
 
 				     /**
-				      * Generate sparsity pattern for fluxes.
+				      * Generate sparsity pattern for
+				      * fluxes, i.e. formulations of
+				      * the discrete problem with
+				      * discontinuous elements which
+				      * couple across faces of cells.
 				      * This is a replacement of the
 				      * function
 				      * #make_sparsity_pattern# for
@@ -215,8 +216,8 @@ class DoFTools
 				      * considered.
 				      */
     template<int dim>
-    static void make_flux_sparsity_pattern (const DoFHandler<dim>&,
-					    SparseMatrixStruct &);
+    static void make_flux_sparsity_pattern (const DoFHandler<dim> &dof_handler,
+					    SparseMatrixStruct    &sparsity_pattern);
     
 				     /**
 				      * Extract the indices of the degrees
@@ -234,7 +235,7 @@ class DoFTools
 				      * finite element used by #dof#.
 				      */
     template<int dim>
-    static void extract_dofs(const DoFHandler<dim> &dof,
+    static void extract_dofs(const DoFHandler<dim> &dof_handler,
 			     const vector<bool>    &select,
 			     vector<bool>          &selected_dofs);
 
