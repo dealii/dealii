@@ -164,8 +164,14 @@ void LaplaceProblem<dim>::setup_system ()
   std::vector<bool> boundary_dofs (dof_handler.n_dofs(), false);
   DoFTools::extract_boundary_dofs (dof_handler, std::vector<bool>(1,true),
 				   boundary_dofs);
-  
-				   // Let us first pick out the first
+
+				   // Now first for the generation of
+				   // the constraints: as mentioned in
+				   // the introduction, we constrain
+				   // one of the nodes on the boundary
+				   // by the values of all other DoFs
+				   // on the boundary. So, let us
+				   // first pick out the first
 				   // boundary node from this list. We
 				   // do that by searching for the
 				   // first ``true'' value in the
@@ -180,7 +186,22 @@ void LaplaceProblem<dim>::setup_system ()
 				boundary_dofs.end(),
 				true),
 		     boundary_dofs.begin());
-	
+
+				   // Then generate a constraints
+				   // object with just this one
+				   // constraint. First clear all
+				   // previous content (which might
+				   // reside there from the previous
+				   // computation on a once coarser
+				   // grid), then add this one line
+				   // constraining the
+				   // ``first_boundary_dof'' to the
+				   // sum of other boundary DoFs each
+				   // with weight -1. Finally, close
+				   // the constraints object, i.e. do
+				   // some internal bookkeeping on it
+				   // for faster processing of what is
+				   // to come later:
   mean_value_constraints.clear ();
   mean_value_constraints.add_line (first_boundary_dof);
   for (unsigned int i=first_boundary_dof+1; i<dof_handler.n_dofs(); ++i)
@@ -189,13 +210,100 @@ void LaplaceProblem<dim>::setup_system ()
 					i, -1);
   mean_value_constraints.close ();
 
+				   // Next task is to generate a
+				   // sparsity pattern. This is indeed
+				   // a tricky task here. Usually, we
+				   // just call
+				   // ``DoFTools::make_sparsity_pattern''
+				   // and condense the result using
+				   // the hanging node constraints. We
+				   // have no hanging node constraints
+				   // here (since we only refine
+				   // globally in this example), but
+				   // we have this global constraint
+				   // on the boundary. This poses one
+				   // severe problem in this context:
+				   // the ``SparsityPattern'' class
+				   // wants us to state beforehand the
+				   // maximal number of entries per
+				   // row, either for all rows or for
+				   // each row separately. There are
+				   // functions in the library which
+				   // can tell you this number in case
+				   // you just have hanging node
+				   // constraints (namely
+				   // ``DoFHandler::max_coupling_between_dofs''),
+				   // but how is this for the present
+				   // case? The difficulty arises
+				   // because the elimination of the
+				   // constrained degree of freedom
+				   // requires a number of additional
+				   // entries in the matrix at places
+				   // that are not so simple to
+				   // determine. We would therefore
+				   // have a problem had we to give a
+				   // maximal number of entries per
+				   // row here.
+				   //
+				   // Since this can be so difficult
+				   // that no reasonable answer can be
+				   // given that allows allocation of
+				   // only a reasonable amount of
+				   // memory, there is a class
+				   // ``CompressedSparsityPattern'',
+				   // that can help us out here. It
+				   // does not require that we know in
+				   // advance how many entries rows
+				   // could have, but allows just
+				   // about any length. It is thus
+				   // significantly more flexible in
+				   // case you do not have good
+				   // estimates of row lengths,
+				   // however at the price that
+				   // building up such a pattern is
+				   // also significantly more
+				   // expensive than building up a
+				   // pattern for which you had
+				   // information in
+				   // advance. Nevertheless, as we
+				   // have no other choice here, we'll
+				   // just build such an object by
+				   // initializing it with the
+				   // dimensions of the matrix and
+				   // calling another function
+				   // ``DoFTools::make_sparsity_pattern''
+				   // to get the sparsity pattern due
+				   // to the differential operator,
+				   // then condense it with the
+				   // constraints object which adds
+				   // those positions in the sparsity
+				   // pattern that are required for
+				   // the elimination of the
+				   // constraint.
   CompressedSparsityPattern csp (dof_handler.n_dofs(),
 				 dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, csp);
   mean_value_constraints.condense (csp);
 
+				   // Finally, once we have the full
+				   // pattern, we can initialize an
+				   // object of type
+				   // ``SparsityPattern'' from it and
+				   // in turn initialize the matrix
+				   // with it. Note that this is
+				   // actually necessary, since the
+				   // ``CompressedSparsityPattern'' is
+				   // so inefficient compared to the
+				   // ``SparsityPattern'' class due to
+				   // the more flexible data
+				   // structures it has to use, that
+				   // we can impossibly base the
+				   // sparse matrix class on it, but
+				   // rather need an object of type
+				   // ``SparsityPattern'', which we
+				   // generate by copying from the
+				   // intermediate object.
   sparsity_pattern.copy_from (csp);
-
   system_matrix.reinit (sparsity_pattern);
 };
 
