@@ -26,6 +26,15 @@ documentation, etc</a>.
 <h3>General</h3>
 
 <ol>
+  <li> <p> Fixed: Previously, the $(INCLUDE) variable in Makefiles
+       included the values of the $INCLUDE environment variable. This
+       is not desirable, since the compiler evaluates that variable
+       anyway and the Makefile variable has <code>-I</code> prefixed
+       to all paths while the environment variable has not.
+       <br>
+       (WB 2001/11/29)
+       </p>
+
   <li> <p> Removed: the option to generate printable documentation was
        removed. Since this comprised approximately 2000 pages and
        since we believe that the online documentation is rather good,

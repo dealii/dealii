@@ -93,7 +93,9 @@ ifeq ($(USE_CONTRIB_HSL),yes)
 endif
 
 
-# include paths. add library paths to existing variable
+# include paths. do not take into account a possibly existing
+# environment variable, since the compiler will evaluate the value of
+# that anyway at compile time
 
 include-path-base        = $D/base/include
 include-path-lac         = $D/lac/include
@@ -101,10 +103,10 @@ include-path-deal2       = $D/deal.II/include
 include-path-contrib-hsl = $D/contrib/hsl/include
 
 
-INCLUDE           += $(addprefix -I, $(include-path-base) \
-                                     $(include-path-lac)  \
-                                     $(include-path-deal2)\
-				     $(include-path-contrib-hsl))
+INCLUDE           = $(addprefix -I, $(include-path-base) \
+                                    $(include-path-lac)  \
+                                    $(include-path-deal2)\
+			            $(include-path-contrib-hsl))
 
 # compiler flags for debug and optimized mode
 CXXFLAGS.g   = @DEFS@ @CXXFLAGSG@  $(INCLUDE)
