@@ -316,7 +316,7 @@ class SparseMatrixEZ : public Subscriptor
 					  * class being granted
 					  * friendship...
 					  */
-#ifdef DEAL_II_NESTED_NESTED_FRIEND_BUG	
+#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG	
 	template <typename> friend class SparseMatrixEZ;
 #endif
     };
@@ -1006,8 +1006,10 @@ class SparseMatrixEZ : public Subscriptor
                                       * standard, but some compilers
                                       * require this...
                                       */
+#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG    
     friend class const_iterator;
     friend class const_iterator::Accessor;
+#endif
 };
 
 
