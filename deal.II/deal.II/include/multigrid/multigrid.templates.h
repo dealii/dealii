@@ -1,15 +1,15 @@
-//----------------------------  multigrid.templates.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  multigrid.templates.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__multigrid_templates_h
 #define __deal2__multigrid_templates_h
 #include <multigrid/multigrid.h>
@@ -34,7 +34,7 @@ Multigrid<VECTOR>::set_edge_matrices (const MGMatrixBase<VECTOR>& down,
 
 template <class VECTOR>
 void
-Multigrid<VECTOR>::level_mgstep(const unsigned int level)
+Multigrid<VECTOR>::level_v_step(const unsigned int level)
 {
   solution[level] = 0.;
   
@@ -73,12 +73,12 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
 
 //    deallog << "recursion " << level << endl;
 				   // do recursion
-  level_mgstep(level-1);
+  level_v_step(level-1);
 
 				   // reset size of the auxiliary
 				   // vector, since it has been
 				   // resized in the recursive call to
-				   // level_mgstep directly above
+				   // level_v_step directly above
   t[level] = 0.;
 
 				   // do coarse grid correction
@@ -115,7 +115,7 @@ Multigrid<VECTOR>::vcycle()
       t[level].reinit(defect[level]);
     }
 
-  level_mgstep (maxlevel);
+  level_v_step (maxlevel);
 //  abort ();
 }
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -39,8 +39,8 @@
  * continuous elements with hanging nodes; in fact, most people you
  * meet on conferences seem to deny this.
  *
- * The function actually performing a multi-level cycle,
- * @p level_mgstep, as well as the function @p vcycle, calling it,
+ * The function actually performing a multi-level V-cycle,
+ * @p level_v_step, as well as the function @p vcycle, calling it,
  * require several helper classes handed over as template parameters.
  * These classes have to meet the following requirements:
  *
@@ -133,7 +133,7 @@ class Multigrid : public Subscriptor
 				      *
 				      * The actual work for this
 				      * function is done in
-				      * @p level_mgstep.
+				      * @p level_v_step.
 				      */
     void vcycle();
 
@@ -161,7 +161,7 @@ class Multigrid : public Subscriptor
 				      * is used to solve the matrix of
 				      * this level.
 				      */
-    void level_mgstep (const unsigned int level);
+    void level_v_step (const unsigned int level);
 
 				     /**
 				      * Level for coarse grid solution.
