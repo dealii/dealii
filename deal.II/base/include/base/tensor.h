@@ -487,6 +487,24 @@ void contract (Tensor<4,dim>       &dest,
 
 
 
+template <int rank>
+inline
+double determinant (const Tensor<rank,1> &t) {
+				   // determinant of tensors of
+				   // dimension one and arbitrary rank can
+				   // be computed by recursion
+  return determinant(t[0]);
+};
+
+
+inline
+double determinant (const Tensor<1,1> &t) {
+  return t[0];
+};
+
+
+
+
 inline
 double determinant (const Tensor<2,2> &t) {
   return ((t[0][0] * t[1][1]) -
