@@ -64,6 +64,12 @@ class Quadrature {
     double weight (const unsigned int i) const;
 
 				     /**
+				      * Return a reference to the whole array
+				      * of weights.
+				      */
+    const vector<double> & get_weights () const;
+    
+				     /**
 				      * Exception
 				      */
     DeclException2 (ExcInvalidIndex,
@@ -84,6 +90,73 @@ class Quadrature {
 				      * derived classes.
 				      */
     vector<double>      weights;
+};
+
+
+
+
+/**
+   This class is a helper class to facilitate the usage of quadrature formulae
+   on faces or subfaces of cells. It computes the locations of quadrature
+   points on the unit cell from a quadrature object for a mannifold of
+   one dimension less than that of the cell and the number of the face.
+   For example, giving the Simpson rule in one dimension and using the
+   #project_to_face# function with face number 1, the returned points will
+   be $(1,0)$, $(1,0.5)$ and $(1,1)$. Note that faces have an orientation,
+   so when projecting to face 3, you will get $(0,0)$, $(0,0.5)$ and $(0,1)$,
+   which is in clockwise sense, while for face 1 the points were in
+   counterclockwise sense.
+
+   For the projection to subfaces (i.e. to the children of a face of the
+   unit cell), the same applies as above. Note the order in which the
+   children of a face are numbered, which in two dimensions coincides
+   with the orientation of the face.
+   
+   The different functions are grouped into a common class to avoid putting
+   them into global namespace (and to make documentation easier, since
+   presently the documentation tool can only handle classes, not global
+   functions). However, since they have no local data, all functions are
+   declared #static# and can be called without creating an object of this
+   class.
+*/
+template <int dim>
+class QProjector {
+  public:
+				     /**
+				      * Compute the quadrature points on the
+				      * cell if the given quadrature formula
+				      * is used on face #face_no#. For further
+				      * details, see the general doc for
+				      * this class.
+				      */
+    static void project_to_face (const Quadrature<dim-1> &quadrature,
+				 const unsigned int       face_no,
+				 vector<Point<dim> >     &q_points);
+
+    				     /**
+				      * Compute the quadrature points on the
+				      * cell if the given quadrature formula
+				      * is used on face #face_no#, subface
+				      * number #subface_no#. For further
+				      * details, see the general doc for
+				      * this class.
+				      */
+    static void project_to_subface (const Quadrature<dim-1> &quadrature,
+				    const unsigned int       face_no,
+				    const unsigned int       subface_no,
+				    vector<Point<dim> >     &q_points);
+
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The index " << arg1
+		    << " is out of range, it should be less than " << arg2);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
 };
 
 
