@@ -892,6 +892,8 @@ class FullMatrix : public Table<2,number>
 		    int,
 		    << "This function is not implemented for the given"
 		    << " matrix dimension " << arg1);
+    
+    friend class const_iterator::Accessor;
 };
 
 /*@}*/
