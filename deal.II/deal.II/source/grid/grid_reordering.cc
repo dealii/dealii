@@ -579,8 +579,8 @@ namespace internal
   namespace GridReordering3d
   {
     DeclException1 (GridOrientError,
-		    std::string,
-		    <<  "Grid Orientation Error"<< arg1);
+		    char *,
+		    <<  "Grid Orientation Error" << arg1);
 
 
     //Switched two ints so that v1<v2;
