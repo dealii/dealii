@@ -195,4 +195,21 @@ class QWeddle : public Quadrature<dim>
 };
 
 
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <> QGauss<1>::QGauss (unsigned int n);
+template <> QGauss2<1>::QGauss2 ();
+template <> QGauss3<1>::QGauss3 ();
+template <> QGauss4<1>::QGauss4 ();
+template <> QGauss5<1>::QGauss5 ();
+template <> QGauss6<1>::QGauss6 ();
+template <> QGauss7<1>::QGauss7 ();
+template <> QMidpoint<1>::QMidpoint ();
+template <> QTrapez<1>::QTrapez ();
+template <> QSimpson<1>::QSimpson ();
+template <> QMilne<1>::QMilne ();
+template <> QWeddle<1>::QWeddle ();
+
+
 #endif

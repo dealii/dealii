@@ -367,6 +367,25 @@ class StraightBoundary : public Boundary<dim>
 
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+template <>
+void
+StraightBoundary<1>::
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 FaceVertexNormals &) const;
+template <>
+void
+StraightBoundary<2>::
+get_normals_at_vertices (const Triangulation<2>::face_iterator &face,
+			 Boundary<2>::FaceVertexNormals &face_vertex_normals) const;
+template <>
+void
+StraightBoundary<3>::
+get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
+			 Boundary<3>::FaceVertexNormals &face_vertex_normals) const;
+
+
 /*----------------------------   boundary-function.h     ---------------------------*/
 
 #endif

@@ -1032,6 +1032,55 @@ class DoFTools
 
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+template <>
+void
+DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
+					  const DoFHandler<1>::FunctionMap  &function_map,
+					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+					  SparsityPattern    &sparsity);
+template <>
+void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
+					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
+					       SparsityPattern    &sparsity);
+template <>
+void DoFTools::make_hanging_node_constraints (const DoFHandler<1> &,
+					      ConstraintMatrix &);
+template <>
+void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &,
+					      ConstraintMatrix &);
+template <>
+void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &,
+					      ConstraintMatrix &);
+template <>
+void
+DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
+				 const std::vector<bool>  &component_select,
+				 std::vector<bool>        &selected_dofs,
+				 const std::set<unsigned char> &boundary_indicators);
+template <>
+void
+DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
+				     std::vector<bool>   &selected_dofs);
+template <>
+void
+DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
+				     std::vector<bool>   &selected_dofs);
+template <>
+void
+DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
+				     std::vector<bool>   &selected_dofs);
+template <>
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
+					    const std::set<unsigned char> &boundary_indicators,
+					    std::vector<unsigned int> &mapping);
+template <>
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
+					    std::vector<unsigned int> &mapping);
+
+
+
 // ---------------------- inline and template functions --------------------
 
 template <int dim, class Comp>

@@ -357,4 +357,55 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
 
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+template <>
+Point<1>
+HyperBallBoundary<1>::
+get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const;
+template <>
+void
+HyperBallBoundary<1>::get_intermediate_points_on_line (
+  const Triangulation<1>::line_iterator &,
+  std::vector<Point<1> > &) const;
+template <>
+void
+HyperBallBoundary<3>::get_intermediate_points_on_quad (
+  const Triangulation<3>::quad_iterator &quad,
+  std::vector<Point<3> > &points) const;
+template <>
+void
+HyperBallBoundary<1>::
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 FaceVertexNormals &) const;
+template <>
+Point<1>
+HalfHyperBallBoundary<1>::
+get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const;
+template <>
+void
+HalfHyperBallBoundary<1>::
+get_intermediate_points_on_quad (const Triangulation<1>::quad_iterator &,
+				 std::vector<Point<1> > &) const;
+template <>
+void
+HalfHyperBallBoundary<1>::
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 Boundary<1>::FaceVertexNormals &) const;
+template <>
+Point<1>
+HalfHyperShellBoundary<1>::
+get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const;
+template <>
+void
+HalfHyperShellBoundary<1>::
+get_intermediate_points_on_quad (const Triangulation<1>::quad_iterator &,
+				 std::vector<Point<1> > &) const;
+template <>
+void
+HalfHyperShellBoundary<1>::
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 Boundary<1>::FaceVertexNormals &) const;
+
+
 #endif

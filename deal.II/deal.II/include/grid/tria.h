@@ -324,10 +324,6 @@ class TriaDimensionInfo<3>
 
 /*------------------------------------------------------------------------*/
 
-//TODO:[WB] (compiler) Move the TriaNumberCache into the Triangulation class
-//  once the compiler supports this (gcc2.95 does not allow this at present)
-
-
 
 /**
  * Cache class used to store the number of used and active elements
@@ -3225,6 +3221,156 @@ class Triangulation : public TriaDimensionInfo<dim>,
     friend class DoFHandler<dim>;
     friend class MGDoFHandler<dim>;
 };
+
+
+
+/* -------------- declaration of explicit specializations ------------- */
+
+
+template <> TriaDimensionInfo<1>::cell_iterator Triangulation<1>::begin (const unsigned int level) const;
+template <> TriaDimensionInfo<1>::raw_cell_iterator Triangulation<1>::end () const;
+template <> TriaDimensionInfo<2>::cell_iterator Triangulation<2>::begin (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::raw_cell_iterator Triangulation<2>::end () const;
+template <> TriaDimensionInfo<3>::cell_iterator Triangulation<3>::begin (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::raw_cell_iterator Triangulation<3>::end () const;
+template <> void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
+							 const std::vector<CellData<1> > &cells,
+							 const SubCellData                          &subcelldata);
+template <> void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
+							 const std::vector<CellData<2> > &cells,
+							 const SubCellData                          &subcelldata);
+template <> void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
+							 const std::vector<CellData<3> > &cells,
+							 const SubCellData                          &subcelldata);
+template <> void Triangulation<1>::distort_random (const double factor,
+						   const bool   keep_boundary);
+template <> void Triangulation<1>::clear_user_pointers ();
+template <> void Triangulation<1>::clear_user_flags ();
+template <> void Triangulation<2>::clear_user_pointers ();
+template <> void Triangulation<2>::clear_user_flags ();
+template <> void Triangulation<3>::clear_user_pointers ();
+template <> void Triangulation<3>::clear_user_flags ();
+template <> void Triangulation<1>::save_user_flags_quad (std::ostream &) const;
+template <> void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const;
+template <> void Triangulation<1>::load_user_flags_quad (std::istream &);
+template <> void Triangulation<1>::load_user_flags_quad (const std::vector<bool> &);
+template <> void Triangulation<1>::save_user_flags_hex (std::ostream &) const;
+template <> void Triangulation<1>::save_user_flags_hex (std::vector<bool> &) const;
+template <> void Triangulation<1>::load_user_flags_hex (std::istream &);
+template <> void Triangulation<1>::load_user_flags_hex (const std::vector<bool> &);
+template <> void Triangulation<2>::save_user_flags_hex (std::ostream &) const;
+template <> void Triangulation<2>::save_user_flags_hex (std::vector<bool> &) const;
+template <> void Triangulation<2>::load_user_flags_hex (std::istream &);
+template <> void Triangulation<2>::load_user_flags_hex (const std::vector<bool> &);
+template <> TriaDimensionInfo<1>::raw_cell_iterator Triangulation<1>::begin_raw (const unsigned int level) const;
+template <> TriaDimensionInfo<1>::active_cell_iterator Triangulation<1>::begin_active (const unsigned int level) const;
+template <> TriaDimensionInfo<1>::raw_cell_iterator Triangulation<1>::last_raw () const;
+template <> TriaDimensionInfo<1>::raw_cell_iterator Triangulation<1>::last_raw (const unsigned int level) const;
+template <> TriaDimensionInfo<1>::cell_iterator Triangulation<1>::last () const;
+template <> TriaDimensionInfo<1>::cell_iterator Triangulation<1>::last (const unsigned int level) const;
+template <> TriaDimensionInfo<1>::active_cell_iterator Triangulation<1>::last_active () const;
+template <> TriaDimensionInfo<1>::active_cell_iterator Triangulation<1>::last_active (const unsigned int level) const;
+template <> TriaDimensionInfo<1>::raw_face_iterator Triangulation<1>::begin_raw_face (const unsigned int) const;
+template <> TriaDimensionInfo<1>::face_iterator Triangulation<1>::begin_face (const unsigned int) const;
+template <> TriaDimensionInfo<1>::active_face_iterator Triangulation<1>::begin_active_face (const unsigned int) const;
+template <> TriaDimensionInfo<1>::raw_face_iterator Triangulation<1>::end_face () const;
+template <> TriaDimensionInfo<1>::raw_face_iterator Triangulation<1>::last_raw_face () const;
+template <> TriaDimensionInfo<1>::raw_face_iterator Triangulation<1>::last_raw_face (const unsigned int) const;
+template <> TriaDimensionInfo<1>::face_iterator Triangulation<1>::last_face () const;
+template <> TriaDimensionInfo<1>::face_iterator Triangulation<1>::last_face (const unsigned int) const;
+template <> TriaDimensionInfo<1>::active_face_iterator Triangulation<1>::last_active_face () const;
+template <> TriaDimensionInfo<1>::active_face_iterator Triangulation<1>::last_active_face (const unsigned int) const;
+template <> TriaDimensionInfo<1>::raw_quad_iterator Triangulation<1>::begin_raw_quad (const unsigned int) const;
+template <> TriaDimensionInfo<1>::quad_iterator Triangulation<1>::begin_quad (const unsigned int) const;
+template <> TriaDimensionInfo<1>::active_quad_iterator Triangulation<1>::begin_active_quad (const unsigned int) const;
+template <> TriaDimensionInfo<1>::raw_quad_iterator Triangulation<1>::end_quad () const;
+template <> TriaDimensionInfo<1>::raw_quad_iterator Triangulation<1>::last_raw_quad (const unsigned int) const;
+template <> TriaDimensionInfo<1>::raw_quad_iterator Triangulation<1>::last_raw_quad () const;
+template <> TriaDimensionInfo<1>::quad_iterator Triangulation<1>::last_quad (const unsigned int) const;
+template <> TriaDimensionInfo<1>::quad_iterator Triangulation<1>::last_quad () const;
+template <> TriaDimensionInfo<1>::active_quad_iterator Triangulation<1>::last_active_quad (const unsigned int) const;
+template <> TriaDimensionInfo<1>::active_quad_iterator Triangulation<1>::last_active_quad () const;
+template <> TriaDimensionInfo<1>::raw_hex_iterator Triangulation<1>::begin_raw_hex (const unsigned int) const;
+template <> TriaDimensionInfo<1>::hex_iterator Triangulation<1>::begin_hex (const unsigned int) const;
+template <> TriaDimensionInfo<1>::active_hex_iterator Triangulation<1>::begin_active_hex (const unsigned int) const;
+template <> TriaDimensionInfo<1>::raw_hex_iterator Triangulation<1>::end_hex () const;
+template <> TriaDimensionInfo<1>::raw_hex_iterator Triangulation<1>::last_raw_hex (const unsigned int) const;
+template <> TriaDimensionInfo<1>::raw_hex_iterator Triangulation<1>::last_raw_hex () const;
+template <> TriaDimensionInfo<1>::hex_iterator Triangulation<1>::last_hex (const unsigned int) const;
+template <> TriaDimensionInfo<1>::hex_iterator Triangulation<1>::last_hex () const;
+template <> TriaDimensionInfo<1>::active_hex_iterator Triangulation<1>::last_active_hex (const unsigned int) const;
+template <> TriaDimensionInfo<1>::active_hex_iterator Triangulation<1>::last_active_hex () const;
+template <> TriaDimensionInfo<2>::raw_cell_iterator Triangulation<2>::begin_raw (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::active_cell_iterator Triangulation<2>::begin_active (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::raw_cell_iterator Triangulation<2>::last_raw () const;
+template <> TriaDimensionInfo<2>::raw_cell_iterator Triangulation<2>::last_raw (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::cell_iterator Triangulation<2>::last () const;
+template <> TriaDimensionInfo<2>::cell_iterator Triangulation<2>::last (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::active_cell_iterator Triangulation<2>::last_active () const;
+template <> TriaDimensionInfo<2>::active_cell_iterator Triangulation<2>::last_active (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::raw_face_iterator Triangulation<2>::begin_raw_face (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::face_iterator Triangulation<2>::begin_face (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::active_face_iterator Triangulation<2>::begin_active_face (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::raw_face_iterator Triangulation<2>::end_face () const;
+template <> TriaDimensionInfo<2>::raw_face_iterator Triangulation<2>::last_raw_face () const;
+template <> TriaDimensionInfo<2>::raw_face_iterator Triangulation<2>::last_raw_face (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::face_iterator Triangulation<2>::last_face () const;
+template <> TriaDimensionInfo<2>::face_iterator Triangulation<2>::last_face (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::active_face_iterator Triangulation<2>::last_active_face () const;
+template <> TriaDimensionInfo<2>::active_face_iterator Triangulation<2>::last_active_face (const unsigned int level) const;
+template <> TriaDimensionInfo<2>::raw_hex_iterator Triangulation<2>::begin_raw_hex (const unsigned int) const;
+template <> TriaDimensionInfo<2>::hex_iterator Triangulation<2>::begin_hex (const unsigned int) const;
+template <> TriaDimensionInfo<2>::active_hex_iterator Triangulation<2>::begin_active_hex (const unsigned int) const;
+template <> TriaDimensionInfo<2>::raw_hex_iterator Triangulation<2>::end_hex () const;
+template <> TriaDimensionInfo<2>::raw_hex_iterator Triangulation<2>::last_raw_hex (const unsigned int) const;
+template <> TriaDimensionInfo<2>::raw_hex_iterator Triangulation<2>::last_raw_hex () const;
+template <> TriaDimensionInfo<2>::hex_iterator Triangulation<2>::last_hex (const unsigned int) const;
+template <> TriaDimensionInfo<2>::hex_iterator Triangulation<2>::last_hex () const;
+template <> TriaDimensionInfo<2>::active_hex_iterator Triangulation<2>::last_active_hex (const unsigned int) const;
+template <> TriaDimensionInfo<2>::active_hex_iterator Triangulation<2>::last_active_hex () const;
+template <> TriaDimensionInfo<3>::raw_cell_iterator Triangulation<3>::begin_raw (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::active_cell_iterator Triangulation<3>::begin_active (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::raw_cell_iterator Triangulation<3>::last_raw () const;
+template <> TriaDimensionInfo<3>::raw_cell_iterator Triangulation<3>::last_raw (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::cell_iterator Triangulation<3>::last () const;
+template <> TriaDimensionInfo<3>::cell_iterator Triangulation<3>::last (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::active_cell_iterator Triangulation<3>::last_active () const;
+template <> TriaDimensionInfo<3>::active_cell_iterator Triangulation<3>::last_active (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::raw_face_iterator Triangulation<3>::begin_raw_face (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::face_iterator Triangulation<3>::begin_face (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::active_face_iterator Triangulation<3>::begin_active_face (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::raw_face_iterator Triangulation<3>::end_face () const;
+template <> TriaDimensionInfo<3>::raw_face_iterator Triangulation<3>::last_raw_face () const;
+template <> TriaDimensionInfo<3>::raw_face_iterator Triangulation<3>::last_raw_face (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::face_iterator Triangulation<3>::last_face () const;
+template <> TriaDimensionInfo<3>::face_iterator Triangulation<3>::last_face (const unsigned int level) const;
+template <> TriaDimensionInfo<3>::active_face_iterator Triangulation<3>::last_active_face () const;
+template <> TriaDimensionInfo<3>::active_face_iterator Triangulation<3>::last_active_face (const unsigned int level) const;
+template <> unsigned int Triangulation<1>::n_active_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<1>::n_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<2>::n_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<2>::n_active_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<3>::n_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<1>::n_quads () const;
+template <> unsigned int Triangulation<1>::n_quads (const unsigned int) const;
+template <> unsigned int Triangulation<1>::n_active_quads (const unsigned int) const;
+template <> unsigned int Triangulation<1>::n_active_quads () const;
+template <> unsigned int Triangulation<1>::max_adjacent_cells () const;
+template <> void Triangulation<1>::execute_refinement ();
+template <> void Triangulation<2>::execute_refinement ();
+template <> void Triangulation<3>::execute_refinement ();
+template <> void Triangulation<3>::prepare_refinement_dim_dependent ();
+template <> void Triangulation<1>::delete_children (cell_iterator &cell);
+template <> void Triangulation<2>::delete_children (cell_iterator &cell);
+template <> void Triangulation<3>::delete_children (cell_iterator &cell);
+template <> void Triangulation<1>::update_number_cache_quads ();
+template <> void Triangulation<1>::update_number_cache_hexes ();
+template <> void Triangulation<2>::update_number_cache_hexes ();
+
+template <> void CellData<1>::rotate (const unsigned int);
+template <> void CellData<2>::rotate (const unsigned int times);
+template <> void CellData<3>::rotate (const unsigned int times);
 
 
 #endif

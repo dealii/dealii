@@ -747,4 +747,24 @@ class GridOut
 };
 
 
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <>
+unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const;
+template <>
+void GridOut::write_ucd_faces (const Triangulation<1> &,
+			       const unsigned int,
+			       std::ostream &) const;
+template <>
+void GridOut::write_gnuplot (const Triangulation<1> &tria,
+			     std::ostream           &out,
+			     const Mapping<1>       *);
+template <>
+void GridOut::write_eps (const Triangulation<1> &,
+			 std::ostream &,
+			 const Mapping<1> *);
+
+
+
 #endif

@@ -343,4 +343,59 @@ class QProjector : public Quadrature<dim>
 };
 
 
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <>
+Quadrature<0>::Quadrature (const unsigned int);
+template <>
+Quadrature<0>::Quadrature (const Quadrature<-1> &,
+			   const Quadrature<1> &);
+template <>
+Quadrature<1>::Quadrature (const Quadrature<0> &,
+			   const Quadrature<1> &);
+template <>
+const Point<0> & Quadrature<0>::point (const unsigned int) const;
+template <>
+const std::vector<Point<0> > & Quadrature<0>::get_points () const;
+template <>
+double Quadrature<0>::weight (const unsigned int) const;
+template <>
+const std::vector<double> & Quadrature<0>::get_weights () const;
+template <>
+void QProjector<1>::project_to_face (const Quadrature<0> &,
+				     const unsigned int,
+				     std::vector<Point<1> > &);
+template <>
+void QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
+				     const unsigned int        face_no,
+				     std::vector<Point<2> >   &q_points);
+template <>
+void QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
+				     const unsigned int      face_no,
+				     std::vector<Point<3> > &q_points);
+template <>
+void QProjector<1>::project_to_subface (const Quadrature<0> &,
+					const unsigned int,
+					const unsigned int,
+					std::vector<Point<1> > &);
+template <>
+void QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
+					const unsigned int      face_no,
+					const unsigned int      subface_no,
+					std::vector<Point<2> > &q_points);
+template <>
+void QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
+					const unsigned int      face_no,
+					const unsigned int      subface_no,
+					std::vector<Point<3> > &q_points);
+template <>
+bool
+QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature);
+template <>
+QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
+			 const unsigned int   n_copies);
+
+
+
 #endif

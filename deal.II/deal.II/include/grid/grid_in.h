@@ -307,4 +307,19 @@ class GridIn
 };
 
 
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <>
+void
+GridIn<2>::debug_output_grid (const std::vector<CellData<2> > &cells,
+			      const std::vector<Point<2> >    &vertices,
+			      std::ostream                    &out);
+template <>
+void
+GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
+			      const std::vector<Point<3> >    &vertices,
+			      std::ostream                    &out);
+
+
 #endif

@@ -1158,6 +1158,19 @@ class DoFHandler  :  public Subscriptor,
 
 
 
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
+template <> unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
+template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const;
+template <> unsigned int DoFHandler<1>::max_couplings_between_dofs () const;
+template <> unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const;
+template <> unsigned int DoFHandler<2>::max_couplings_between_dofs () const;
+template <> unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const;
+template <> unsigned int DoFHandler<3>::max_couplings_between_dofs () const;
+
+
 /* ----------------------- Inline functions ---------------------------------- */
 
 

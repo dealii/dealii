@@ -1255,6 +1255,13 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+template <> TriaIterator<1, DoFObjectAccessor<0,1> > DoFCellAccessor<1>::face (const unsigned int) const;
+template <> TriaIterator<2, DoFObjectAccessor<1,2> > DoFCellAccessor<2>::face (const unsigned int i) const;
+template <> TriaIterator<3, DoFObjectAccessor<2,3> > DoFCellAccessor<3>::face (const unsigned int i) const;
+
+
 // if in optimized mode: include more templates
 #ifndef DEBUG
 #  include "dof_accessor.templates.h"

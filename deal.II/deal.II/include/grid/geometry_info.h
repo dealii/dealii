@@ -194,6 +194,15 @@ struct GeometryInfo<0>
 
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+
+template <> const unsigned int GeometryInfo<1>::opposite_face[GeometryInfo<1>::faces_per_cell];
+template <> const unsigned int GeometryInfo<2>::opposite_face[GeometryInfo<2>::faces_per_cell];
+template <> const unsigned int GeometryInfo<3>::opposite_face[GeometryInfo<3>::faces_per_cell];
+
+
+
 
 /*---------------------------- Inline functions --------------------------------*/
 

@@ -937,4 +937,15 @@ class GridReordering : private GridReorderingInfo<dim>
 
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+template <> const unsigned int GridReorderingInfo<2>::rotational_states_of_cells;
+template <> const unsigned int GridReorderingInfo<2>::rotational_states_of_faces;
+template <> const unsigned int GridReorderingInfo<3>::rotational_states_of_cells;
+template <> const unsigned int GridReorderingInfo<3>::rotational_states_of_faces;
+template <> void GridReordering<2>::Cell::insert_faces (std::map<Face,FaceData> &global_faces);
+template <> void GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces);
+template <> void GridReordering<1>::reorder_cells (std::vector<CellData<1> > &);
+
+
 #endif

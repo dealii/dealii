@@ -358,4 +358,87 @@ class GridGenerator
 };
 
 
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <>
+void
+GridGenerator::colorize_hyper_rectangle (Triangulation<1> &);
+template <>
+void GridGenerator::hyper_cube_slit (Triangulation<1> &,
+				     const double,
+				     const double);
+template <>
+void GridGenerator::hyper_L (Triangulation<1> &,
+			     const double,
+			     const double);
+template <>
+void GridGenerator::hyper_ball (Triangulation<1> &,
+				const Point<1> &,
+				const double);
+template <>
+void GridGenerator::hyper_shell (Triangulation<1> &,
+				 const Point<1> &,
+				 const double,
+				 const double,
+				 const unsigned int);
+template <>
+void
+GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
+				const double left,
+				const double right);
+template <>
+void
+GridGenerator::hyper_L (Triangulation<2> &tria,
+			const double a,
+			const double b);
+template <>
+void
+GridGenerator::hyper_ball (Triangulation<2> &tria,
+			   const Point<2>    &p,
+			   const double      radius);
+template <>
+void GridGenerator::hyper_shell (Triangulation<2>   &tria,
+				 const Point<2>     &center,
+				 const double        inner_radius,
+				 const double        outer_radius,
+				 const unsigned int  n_cells);
+template <>
+void
+GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
+				 const Point<2>     &center,
+				 const double        inner_radius,
+				 const double        outer_radius,
+				 const unsigned int  n_cells);
+template <>
+void GridGenerator::hyper_cube_slit (Triangulation<3> &,
+				     const double,
+				     const double);
+template<>
+void GridGenerator::enclosed_hyper_cube (Triangulation<3> &tria,
+					 const double l,
+					 const double r,
+					 const double d,
+					 bool colorize);
+template <>
+void
+GridGenerator::hyper_L (Triangulation<3> &tria,
+			const double a,
+			const double b);
+template <>
+void
+GridGenerator::hyper_ball (Triangulation<3> &tria,
+			   const Point<3>   &p,
+			   const double radius);
+template <>
+void GridGenerator::hyper_shell (Triangulation<3>   &,
+				 const Point<3>     &,
+				 const double        ,
+				 const double        ,
+				 const unsigned int  );
+template <>
+void GridGenerator::laplace_transformation (Triangulation<1> &,
+					    const std::map<unsigned int,Point<1> > &);
+
+
 #endif
