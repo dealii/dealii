@@ -944,7 +944,17 @@ integrate_over_irregular_face (Data                       &data,
 		      data.coefficient_values[point](component);
 	    };
 	};
-      
+
+				       // get the weights for the
+				       // integration. note that it
+				       // does not matter whether we
+				       // take the JxW values from the
+				       // fe_face_values or the
+				       // fe_subface_values, as the
+				       // first is on the small
+				       // neighbor cell, while the
+				       // latter is on the refined
+				       // face of the big cell here
       data.JxW_values = fe_face_values.get_JxW_values();
       
 				       // take the square of the phi[i]
