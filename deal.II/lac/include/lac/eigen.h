@@ -297,7 +297,7 @@ EigenInverse<VECTOR>::solve (double       &value,
   ShiftedMatrix <MATRIX> A_s(A, -value);
 
 				   // Define solver
-  ReductionControl inner_control (100, 1.e-16, 1.e-8, false, false);
+  ReductionControl inner_control (A.m(), 1.e-16, 1.e-8, false, false);
   PreconditionIdentity prec;
   SolverCG<VECTOR>
     solver(inner_control, memory);
