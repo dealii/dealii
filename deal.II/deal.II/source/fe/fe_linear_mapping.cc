@@ -53,9 +53,9 @@ FELinearMapping<1>::shape_grad_transform(const unsigned int i,
 
 template <>
 void FELinearMapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
-					    const Boundary<1>         &,
-					    const vector<Point<0> > &,
-					    vector<double>      &) const {
+					     const Boundary<1>         &,
+					     const vector<Point<0> > &,
+					     vector<double>      &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -63,9 +63,9 @@ void FELinearMapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator 
 
 template <>
 void FELinearMapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
-					       const unsigned int           ,
-					       const vector<Point<0> > &,
-					       vector<double>      &) const {
+						const unsigned int           ,
+						const vector<Point<0> > &,
+						vector<double>      &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -73,10 +73,10 @@ void FELinearMapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterat
 
 template <>
 void FELinearMapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
-					    const unsigned int,
-					    const Boundary<1> &,
-					    const vector<Point<0> > &,
-					    vector<Point<1> > &) const {
+					     const unsigned int,
+					     const Boundary<1> &,
+					     const vector<Point<0> > &,
+					     vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -286,7 +286,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 					   vector<Point<dim> > &q_points,
 					   const bool           compute_q_points,
 					   const dFMatrix      &shape_values_transform,
-					   const vector<vector<Point<dim> > > &shape_grad_transform,
+					   const vector<vector<Point<dim> > > &/*shape_grad_transform*/,
 					   const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -344,7 +344,13 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 
   However, we rewrite the loops to only compute the gradient once for
   each integration point and basis function.
-*/
+
+  Indeed, this was the old way we did it; the code is below. However, there
+  is a more efficient way, namely setting up M analytically, doing the
+  inversion analyically and only then doing the evaluation; a small Maple
+  script does this (it is part of the <lagrange> script in the <scripts>
+  subdirectory).
+  
   if (compute_jacobians) 
     {
       dFMatrix M(dim,dim);
@@ -364,6 +370,101 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 	};
     };
 
+    
+  One last note regarding whether we have to invert M or M transposed: it is
+  easy to try out, by computing the gradients of a function on a distorted
+  cell (just move one vertex) where the nodal values for linear elements
+  are one for the moved vertex and zero otherwise. Please also note that
+  when computing the gradients on the real cell, the jacobian matrix
+  is multiplied to the unit cell gradient *from the right*! be very careful
+  with these things.
+
+  The following little program tests the correct behaviour (you have to find
+  out the right include files, I tested it within a whole project with far
+  more include files than necessary):
+
+  -------------------------------------------
+  int main () {
+    Triangulation<2> tria;
+    tria.create_hypercube (0,1);
+    tria.begin_active()->vertex(2)(0) = 2;
+
+    DoFHandler<2> dof(&tria);
+    FELinear<2> fe;
+    dof.distribute_dofs(fe);
+
+    StraightBoundary<2> b;
+    QTrapez<2> q;
+    FEValues<2> fevalues(fe,q,update_gradients);
+    fevalues.reinit (dof.begin_active(),b);
+  
+  
+    dVector val(4);
+    val(2) = 1;
+
+    vector<Point<2> > grads(4);
+    fevalues.get_function_grads (val, grads);
+
+    for (unsigned int i=0; i<4; ++i)
+      cout << "Vertex " << i
+	   << "   grad=" << grads[i] << endl;
+  };
+  ---------------------------------------------
+  
+  The correct output should be
+  --------------------------------
+  Vertex 0   grad=0 0
+  Vertex 1   grad=0.5 0
+  Vertex 2   grad=0 1
+  Vertex 3   grad=0.5 0.5
+  --------------------------------
+  and the wrong would be
+  --------------------------------
+  Vertex 0   grad=0 0
+  Vertex 1   grad=0.5 0
+  Vertex 2   grad=-1 1
+  Vertex 3   grad=0 1
+  --------------------------------  
+*/
+
+  if (compute_jacobians)
+    for (unsigned int point=0; point<n_points; ++point)
+      {
+	const double xi = unit_points[point](0);
+	const double eta= unit_points[point](1);
+	
+	const double t6 = vertices[0](0)*vertices[3](1);
+	const double t8 = vertices[2](0)*xi;
+	const double t10 = vertices[1](0)*eta;
+	const double t12 = vertices[3](0)*vertices[1](1);
+	const double t16 = vertices[3](0)*xi;
+	const double t20 = vertices[0](0)*vertices[1](1);
+	const double t22 = vertices[0](0)*vertices[2](1);
+	const double t24 = t6*xi-t8*vertices[1](1)-t10*vertices[3](1)+
+			   t12*eta-vertices[3](0)*vertices[2](1)*eta-
+			   t16*vertices[0](1)+t16*vertices[1](1)-t12+
+			   vertices[3](0)*vertices[0](1)-t20*eta+t22*eta;
+	const double t28 = vertices[1](0)*vertices[3](1);
+	const double t31 = vertices[2](0)*eta;
+	const double t36 = t8*vertices[0](1)+vertices[1](0)*vertices[2](1)*xi-
+			   t28*xi+t10*vertices[0](1)-t31*vertices[0](1)+
+			   t31*vertices[3](1)+t20-t6-vertices[1](0)*
+			   vertices[0](1)+t28-t22*xi;
+	const double t38 = 1/(t24+t36);
+
+	jacobians[point](0,0) = (-vertices[0](1)+vertices[0](1)*xi-
+				 vertices[1](1)*xi+vertices[2](1)*xi+
+				 vertices[3](1)-vertices[3](1)*xi)*t38;
+	jacobians[point](0,1) = -(-vertices[0](0)+vertices[0](0)*xi-
+				  vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
+	jacobians[point](1,0) = -(-vertices[0](1)+vertices[0](1)*eta+
+				  vertices[1](1)-vertices[1](1)*eta+
+				  vertices[2](1)*eta-vertices[3](1)*eta)*t38;
+	jacobians[point](1,1) = (-vertices[0](0)+vertices[0](0)*eta+
+				 vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
+      };
+  
+    
   if (compute_support_points)
     get_support_points (cell, boundary, support_points);
 };

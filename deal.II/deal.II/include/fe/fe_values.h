@@ -107,6 +107,17 @@ template <int dim> class Quadrature;
  *  transformation from unit to real face to compute the determinant of the
  *  Jacobi matrix to get the scaling of the surface element $do$.
  *
+ *  The question whether to compute the Jacobi matrix as the inverse of another
+ *  matrix M (which we can compute from the transformation, while we can't do
+ *  so for the Jacobi matrix itself) or its transpose is a bit delicate. It
+ *  should be kept in mind that when we compute the gradients in real space
+ *  from those on the unit cell, we multiply with the Jacobi matrix
+ *  \textit{from the right}; the whole situation is a bit confusing and it
+ *  either takes deep though or trial-and-error to do it right. Some more
+ *  information on this can be found in the source code documentation for the
+ *  #FELinearMapping<dim>::fill_fe_values# function, where also a small test
+ *  program is presented.
+ *
  *  
  *  \subsection{Member functions}
  *
