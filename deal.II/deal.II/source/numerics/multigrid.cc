@@ -13,17 +13,6 @@
 
 
 
-// ab hier Wolfgang
-
-
-
-/* ------------------------------ MGTransferBase --------------------------- */
-
-MGTransferBase::~MGTransferBase () 
-{};
-
-
-
 /* ----------------------------- MGTransferPrebuilt ------------------------ */
 
 
