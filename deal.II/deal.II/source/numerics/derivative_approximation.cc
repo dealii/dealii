@@ -123,6 +123,29 @@ derivative_norm (const Derivative &d)
 
 template <int dim>
 inline
+double
+DerivativeApproximation::SecondDerivative<dim>::
+derivative_norm (const Derivative &d)
+{
+				   // computing the spectral norm is
+				   // not so simple in general. it is
+				   // feasible for dim==3, since then
+				   // there are still closed form
+				   // expressions of the roots of the
+				   // third order characteristic
+				   // polynomial, and they can easily
+				   // be computed using
+				   // maple. however, for higher
+				   // dimensions, some other method
+				   // needs to be employed.
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <int dim>
+inline
 void
 DerivativeApproximation::SecondDerivative<dim>::symmetrize (Derivative &d)
 {
