@@ -136,6 +136,12 @@
    the top-level directory. */
 #undef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
 
+/* Defined if the compiler requires the use of the template keyword for
+   disambiguation keyword in certain contexts in which it is not supposed to
+   do so. For the exact failure mode, look at aclocal.m4 in the top-level
+   directory. */
+#undef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+
 /* Define if we have to work around a bug with some compilers that will not
    allow us to specify a fully specialized class of a template as a friend.
    See the aclocal.m4 file in the top-level directory for a description of

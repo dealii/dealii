@@ -2715,6 +2715,66 @@ AC_DEFUN(DEAL_II_CHECK_ARRAY_CONDITIONAL_DECAY_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl Some versions of gcc get this example wrong:
+dnl ---------------------------------
+dnl struct X
+dnl {
+dnl     template <typename T> void operator << (T);
+dnl };
+dnl 
+dnl void f()
+dnl {
+dnl   X x;
+dnl   x.operator << <double> (1);
+dnl }
+dnl ---------------------------------
+dnl They want to see a "template" for disambiguation in
+dnl    x.template operator << <double> (1);
+dnl which shouldn't be necessary since the left hand side of the
+dnl dot operator is not template dependent. Surprisingly, this is
+dnl only the case for operators, not if operator<< were a regular
+dnl function. Annoyingly, other compilers barf on seeing the
+dnl disambiguating "template" keyword.
+dnl
+dnl Usage: DEAL_II_CHECK_TEMPL_OP_DISAMBIGUATION_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TEMPL_OP_DISAMBIGUATION_BUG, dnl
+[
+  AC_MSG_CHECKING(for template operator disambiguation bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      struct X
+      {
+          template <typename T> void operator << (T);
+      };
+      
+      void f()
+      {
+        X x;
+        x.operator << <double> (1);
+      }
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG, 1, 
+                     [Defined if the compiler requires the use of the
+                      template keyword for disambiguation keyword in
+                      certain contexts in which it is not supposed to
+                      do so. For the exact failure mode, look at
+                      aclocal.m4 in the top-level directory.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl The boost::shared_ptr class has a templated assignment operator
 dnl but no assignment operator matching the default operator
 dnl signature (this if for boost 1.29 at least). So when using

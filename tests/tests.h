@@ -16,7 +16,7 @@
 
 // common definitions used in all the tests
 
-
+#include <base/config.h>
 #include <base/logstream.h>
 #include <cmath>
 
@@ -29,9 +29,17 @@ LogStream & operator << (LogStream &logstream,
                          const double d)
 {
   if (std::fabs (d) < 1e-10)
-    logstream.operator << <double> (0.);
+    logstream.
+#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+      template
+#endif
+      operator << <double> (0.);
   else
-    logstream.operator << <double> (d);
+    logstream.
+#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+      template
+#endif
+      operator << <double> (d);
   return logstream;
 }
 
@@ -41,9 +49,17 @@ LogStream & operator << (LogStream &logstream,
                          const float d)
 {
   if (std::fabs (d) < 1e-8)
-    logstream.operator << <float> (0.);
+    logstream.
+#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+      template
+#endif
+      operator << <float> (0.);
   else
-    logstream.operator << <float> (d);
+    logstream.
+#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+      template
+#endif
+      operator << <float> (d);
   return logstream;
 }
 
