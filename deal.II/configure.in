@@ -311,30 +311,6 @@ DEAL_II_CHECK_COMPAT_BLOCKER
 
 
 dnl -------------------------------------------------------------
-dnl Multigrid
-dnl -------------------------------------------------------------
-
-dnl    Test if multigrid should be enabled
-dnl    default is yes if multigrid directory present
-AC_ARG_ENABLE(multigrid,
-[  --enable-multigrid      include multigrid code in library],
-    enablemultigrid=$enableval,
-    if test -r deal.II/include/multigrid/multigrid.h ; then
-      enablemultigrid=yes ;
-    else
-      enablemultigrid=no ;
-    fi)
-if test "$enablemultigrid" = yes ; then
-   AC_MSG_RESULT(configuring multigrid)
-   AC_DEFINE(ENABLE_MULTIGRID, 1, 
-             [Enable the multigrid components of the library])
-fi
-AC_SUBST(enablemultigrid)
-
-
-
-
-dnl -------------------------------------------------------------
 dnl                  Existence of additional libraries
 dnl -------------------------------------------------------------
 
