@@ -2,7 +2,7 @@
 
 
 # generic targets
-default: autogen-doc tutorial development validate-xrefs glossary
+default: autogen-doc tutorial development glossary validate-xrefs
 
 all: default autogen-doc-all
 
