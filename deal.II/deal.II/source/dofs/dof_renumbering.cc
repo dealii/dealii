@@ -498,6 +498,40 @@ DoFRenumbering::component_wise (
 
 
 
+template <int dim>
+void DoFRenumbering::component_wise (
+  MGDoFHandler<dim>& dof_handler,
+  unsigned int level,
+  const std::vector<unsigned int> &component_order_arg)
+{
+  std::vector<unsigned int> renumbering (dof_handler.n_dofs(level),
+					 DoFHandler<dim>::invalid_dof_index);
+
+  typedef
+    WrapMGDoFIterator<typename MGDoFHandler<dim>::cell_iterator> ITERATOR;
+  
+  typename MGDoFHandler<dim>::cell_iterator
+    istart =dof_handler.begin(level);
+  ITERATOR start = istart;
+  typename MGDoFHandler<dim>::cell_iterator
+    iend = dof_handler.end(level);
+  const ITERATOR end = iend;
+
+  unsigned int result =
+    compute_component_wise<dim, ITERATOR, ITERATOR>(
+      renumbering, start, end, component_order_arg);
+
+  if (result == 0) return;
+  
+  Assert (result == dof_handler.n_dofs(level),
+	  ExcRenumberingIncomplete());
+  
+  if (renumbering.size()!=0)
+    dof_handler.renumber_dofs (renumbering);
+}
+
+
+
 template <int dim, class ITERATOR, class ENDITERATOR>
 unsigned int
 DoFRenumbering::compute_component_wise (
@@ -655,38 +689,6 @@ DoFRenumbering::compute_component_wise (
     };
 
   return next_free_index;
-}
-
-
-
-template <int dim>
-void DoFRenumbering::component_wise (
-  MGDoFHandler<dim>& dof_handler,
-  unsigned int level,
-  const std::vector<unsigned int> &component_order_arg)
-{
-  std::vector<unsigned int> renumbering (dof_handler.n_dofs(level),
-					 DoFHandler<dim>::invalid_dof_index);
-
-  typedef
-    WrapMGDoFIterator<typename MGDoFHandler<dim>::cell_iterator> ITERATOR;
-  
-  typename MGDoFHandler<dim>::cell_iterator
-    istart =dof_handler.begin(level);
-  ITERATOR start = istart;
-  typename MGDoFHandler<dim>::cell_iterator
-    iend = dof_handler.end(level);
-  const ITERATOR end = iend;
-
-  unsigned int result =
-    compute_component_wise<dim, ITERATOR, ITERATOR>(
-      renumbering, start, end, component_order_arg);
-
-  Assert (result == dof_handler.n_dofs(level),
-	  ExcRenumberingIncomplete());
-  
-  if (renumbering.size()!=0)
-    dof_handler.renumber_dofs (renumbering);
 }
 
 
