@@ -107,6 +107,23 @@ FullMatrix<number>::operator *= (const double factor)
 
 
 template <typename number>
+FullMatrix<number> &
+FullMatrix<number>::operator /= (const double factor)
+{
+  number       *p = &this->el(0,0);
+  const number *e = &this->el(0,0) + n()*m();
+
+  const number factor_inv = 1./factor;
+  
+  while (p != e)
+    *p++ *= factor_inv;
+
+  return *this;
+}
+
+
+
+template <typename number>
 template <typename number2>
 void
 FullMatrix<number>::vmult (Vector<number2>& dst,

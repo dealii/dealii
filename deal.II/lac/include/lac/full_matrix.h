@@ -239,6 +239,12 @@ class FullMatrix : public Table<2,number>
 				      * fixed factor.
 				      */
     FullMatrix & operator *= (const double factor);
+
+				     /**
+				      * Scale the entire matrix by the
+				      * inverse of the given factor.
+				      */
+    FullMatrix & operator /= (const double factor);
     
 				     /**
 				      * Weighted addition. The matrix
