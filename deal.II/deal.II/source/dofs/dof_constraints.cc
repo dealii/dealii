@@ -358,7 +358,9 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
     distribute[lines[c].line] = c;
 
   int n_rows = sparsity.n_rows();
-  for (int row=0; row<n_rows; ++row)
+  for (int row=0; row<n_rows; ++row) 
+    {
+      
     if (distribute[row] == -1)
 				       // regular line. loop over cols
       for (int j=sparsity.rowstart[row]; j<sparsity.rowstart[row+1]; ++j)
@@ -402,6 +404,7 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
 				   sparsity.colnums[j],
 				   uncondensed.val[j] *
 				   lines[distribute[row]].entries[q].second);
+		
 		uncondensed.val[j] = 0.;
 	      }
 	    else
@@ -419,10 +422,12 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
 				     uncondensed.val[j] *
 				     lines[distribute[row]].entries[p].second *
 				     lines[distribute[sparsity.colnums[j]]].entries[q].second);
+		
 		uncondensed.val[j] = (row == sparsity.colnums[j] ?
 				      1. : 0. );
 	      };
 	  };
+    };
 };
 
 

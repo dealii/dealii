@@ -1237,31 +1237,38 @@ unsigned int DoFHandler<1>::max_couplings_between_dofs () const {
 
 unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
   Assert (selected_fe != 0, ExcNoFESelected());
-  unsigned int max_adjacent_cells = tria->max_adjacent_cells();
+  const unsigned int max_adjacent_cells = tria->max_adjacent_cells();
 
 				   // get these numbers by drawing pictures
 				   // and counting...
+				   // example:
+				   // x-----x--x--o
+				   // |     |  |  |
+				   // |     x--x--x
+				   // |     |  |  |
+				   // x--x--*--x--x
+				   // |  |  |     |
+				   // x--x--x     |
+				   // |  |  |     |
+				   // o--x--x-----x
+				   // x = vertices connected with center vertex *;
+				   //   = total of 17
+				   // count lines -> 28 (don't forget to count
+				   // mother and children separately!)
   if (max_adjacent_cells == 4)
-    return (13*selected_fe->dofs_per_vertex +
-	    20*selected_fe->dofs_per_line +
+    return (17*selected_fe->dofs_per_vertex +
+	    28*selected_fe->dofs_per_line +
 	    8*selected_fe->dofs_per_quad);
   else
     if (max_adjacent_cells == 5)
-      return (15*selected_fe->dofs_per_vertex +
-	      23*selected_fe->dofs_per_line +
+      return (19*selected_fe->dofs_per_vertex +
+	      27*selected_fe->dofs_per_line +
 	      9*selected_fe->dofs_per_quad);
     else
-      if (max_adjacent_cells == 6)
-					 // are you really sure you
-					 // want to use such grids??
-	return (19*selected_fe->dofs_per_vertex +
-		30*selected_fe->dofs_per_line +
-		16*selected_fe->dofs_per_quad);
-      else 
-	{
-	  Assert (false, ExcNotImplemented());
-	  return 0;
-	};
+      {
+	Assert (false, ExcNotImplemented());
+	return 0;
+      };
 };
 
 
