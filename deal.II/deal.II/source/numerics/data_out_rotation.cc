@@ -98,7 +98,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 	      case 1:
 	      {
 		const double r1 = cell->vertex(0)(0),
-			     r2 = cell->vertex(2)(0);
+			     r2 = cell->vertex(1)(0);
 		Assert (r1 >= 0, ExcRadialVariableHasNegativeValues(r1));	
 		Assert (r2 >= 0, ExcRadialVariableHasNegativeValues(r2));
 		
