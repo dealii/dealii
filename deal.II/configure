@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.32 
+# From configure.in Revision: 1.33 
 
 
 
@@ -562,14 +562,14 @@ fi
 DEAL2_DIR=`pwd`
 
 
-DEAL_2_MAJOR=`cat Version | perl -pi -e 's/^(\d+)\..*/$1/;'`
-DEAL_2_MINOR=`cat Version | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
+DEAL_II_MAJOR=`cat Version | perl -pi -e 's/^(\d+)\..*/$1/;'`
+DEAL_II_MINOR=`cat Version | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
 cat >> confdefs.h <<EOF
-#define DEAL_2_MAJOR $DEAL_2_MAJOR
+#define DEAL_II_MAJOR $DEAL_II_MAJOR
 EOF
 
 cat >> confdefs.h <<EOF
-#define DEAL_2_MINOR $DEAL_2_MINOR
+#define DEAL_II_MINOR $DEAL_II_MINOR
 EOF
 
 echo "$ac_t""Configuring deal.II version `cat Version`" 1>&6
@@ -2021,8 +2021,8 @@ s%@oldincludedir@%$oldincludedir%g
 s%@infodir@%$infodir%g
 s%@mandir@%$mandir%g
 s%@DEAL2_DIR@%$DEAL2_DIR%g
-s%@DEAL_2_MAJOR@%$DEAL_2_MAJOR%g
-s%@DEAL_2_MINOR@%$DEAL_2_MINOR%g
+s%@DEAL_II_MAJOR@%$DEAL_II_MAJOR%g
+s%@DEAL_II_MINOR@%$DEAL_II_MINOR%g
 s%@host@%$host%g
 s%@host_alias@%$host_alias%g
 s%@host_cpu@%$host_cpu%g

@@ -28,8 +28,8 @@ PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
 with-multithreading  = @withmultithreading@
 enable-shared        = @enableshared@
-DEAL_2_MAJOR         = @DEAL_2_MAJOR@
-DEAL_2_MINOR         = @DEAL_2_MINOR@
+DEAL_II_MAJOR        = @DEAL_II_MAJOR@
+DEAL_II_MINOR        = @DEAL_II_MINOR@
 
 
 ######################################################
