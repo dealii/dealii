@@ -257,8 +257,8 @@ class GridIn
 				      * have to eliminate unused
 				      * vertices beforehand.
 				      */
-    static void delete_unused_vertices (typename std::vector<Point<dim> >    &vertices,
-					typename std::vector<CellData<dim> > &cells,
+    static void delete_unused_vertices (std::vector<Point<dim> >    &vertices,
+					std::vector<CellData<dim> > &cells,
 					SubCellData                          &subcelldata);
 
 				     /**
@@ -306,8 +306,8 @@ class GridIn
 				      * without further ado by the
 				      * user.
 				      */
-    static void debug_output_grid (const typename std::vector<CellData<dim> > &cells,
-				   const typename std::vector<Point<dim> >    &vertices,
+    static void debug_output_grid (const std::vector<CellData<dim> > &cells,
+				   const std::vector<Point<dim> >    &vertices,
 				   std::ostream                               &out);
 };
 

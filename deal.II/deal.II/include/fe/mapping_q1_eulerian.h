@@ -144,7 +144,7 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 				      */
     virtual void compute_mapping_support_points(
       const typename Triangulation<dim>::cell_iterator &cell,
-      typename std::vector<Point<dim> > &a) const;
+      std::vector<Point<dim> > &a) const;
     
 };
 

@@ -44,7 +44,7 @@ template <int dim>
 void
 Boundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &,
-				 typename std::vector<Point<dim> > &) const
+				 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
@@ -55,7 +55,7 @@ template <int dim>
 void
 Boundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &,
-				 typename std::vector<Point<dim> > &) const
+				 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
@@ -126,7 +126,7 @@ template <int dim>
 void
 StraightBoundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &,
-				 typename std::vector<Point<dim> > &) const
+				 std::vector<Point<dim> > &) const
 {
   Assert(false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
 }
@@ -139,7 +139,7 @@ template <int dim>
 void
 StraightBoundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				 typename std::vector<Point<dim> > &points) const
+				 std::vector<Point<dim> > &points) const
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
@@ -164,7 +164,7 @@ template <int dim>
 void
 StraightBoundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &,
-				 typename std::vector<Point<dim> > &) const
+				 std::vector<Point<dim> > &) const
 {
   Assert(false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
 }
@@ -175,7 +175,7 @@ template <int dim>
 void
 StraightBoundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				 typename std::vector<Point<dim> > &points) const
+				 std::vector<Point<dim> > &points) const
 {
   const unsigned int n=points.size(),
 		     m=static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));

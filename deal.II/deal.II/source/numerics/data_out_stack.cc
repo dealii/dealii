@@ -355,7 +355,7 @@ DataOutStack<dim>::memory_consumption () const
 
 
 template <int dim>
-const typename std::vector< ::DataOutBase::Patch<dim+1> > &
+const std::vector< ::DataOutBase::Patch<dim+1> > &
 DataOutStack<dim>::get_patches () const
 {
   return patches;

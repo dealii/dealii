@@ -526,7 +526,7 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * general documentation of this
 				      * class.
 				      */
-    static void reorder_cells (typename std::vector<CellData<dim> > &original_cells);
+    static void reorder_cells (std::vector<CellData<dim> > &original_cells);
     
   private:
 
@@ -689,7 +689,7 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * @p{adjacent_cells} field
 					  * of the inserted faces.
 					  */
-	void insert_faces (typename std::map<Face,FaceData > &global_faces);
+	void insert_faces (std::map<Face,FaceData > &global_faces);
 
 					 /**
 					  * Find out the neighbors of the
@@ -878,11 +878,11 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * as recursive calls but rather
 				      * as eliminated tail-recursion.
 				      */
-    static void track_back (typename std::vector<Cell>  &cells,
+    static void track_back (std::vector<Cell>  &cells,
 			    RotationStack               &rotation_states,
 			    const unsigned int          track_back_to_cell);
 
-    static bool try_rotate_single_neighbors (typename std::vector<Cell>  &cells,
+    static bool try_rotate_single_neighbors (std::vector<Cell>  &cells,
 					     RotationStack               &rotation_states);
     
 				     /**
@@ -902,8 +902,8 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * between original cells and
 				      * presorted cells.
 				      */
-    static void find_reordering (typename std::vector<Cell>           &cells,
-				 typename std::vector<CellData<dim> > &original_cells,
+    static void find_reordering (std::vector<Cell>           &cells,
+				 std::vector<CellData<dim> > &original_cells,
 				 const std::vector<unsigned int>      &new_cell_numbers);
 
 				     /**
@@ -919,8 +919,8 @@ class GridReordering : private GridReorderingInfo<dim>
 				      */
     static
     std::vector<unsigned int>
-    presort_cells (typename std::vector<Cell>       &cells,
-		   typename std::map<Face,FaceData> &faces);
+    presort_cells (std::vector<Cell>       &cells,
+		   std::map<Face,FaceData> &faces);
 
 				     /** 
 				      * By the resolution of Defect

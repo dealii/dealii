@@ -1050,7 +1050,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * are numbers which start from
 				      * zero on each level.
 				      */
-    typename std::vector<DoFLevel<dim>*>    mg_levels;
+    std::vector<DoFLevel<dim>*>    mg_levels;
 
 				     /**
 				      * For each vertex there is a
@@ -1059,7 +1059,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * different levels it lives on
 				      * and which are these levels.
 				      */
-    typename std::vector<MGVertexDoFs>      mg_vertex_dofs;
+    std::vector<MGVertexDoFs>      mg_vertex_dofs;
     
 				     /**
 				      * Vectors storing the number of

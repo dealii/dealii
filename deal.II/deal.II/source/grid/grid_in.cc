@@ -419,8 +419,8 @@ void GridIn<dim>::skip_comment_lines (std::istream &in,
 
 template <int dim>
 void
-GridIn<dim>::delete_unused_vertices (typename std::vector<Point<dim> >    &vertices,
-				     typename std::vector<CellData<dim> > &cells,
+GridIn<dim>::delete_unused_vertices (std::vector<Point<dim> >    &vertices,
+				     std::vector<CellData<dim> > &cells,
 				     SubCellData                          &subcelldata)
 {
 				   // first check which vertices are
@@ -474,9 +474,9 @@ GridIn<dim>::delete_unused_vertices (typename std::vector<Point<dim> >    &verti
 
 
 template <int dim>
-void GridIn<dim>::debug_output_grid (const typename std::vector<CellData<dim> > &/*cells*/,
-				     const typename std::vector<Point<dim> >    &/*vertices*/,
-				     std::ostream                               &/*out*/)
+void GridIn<dim>::debug_output_grid (const std::vector<CellData<dim> > &/*cells*/,
+				     const std::vector<Point<dim> >    &/*vertices*/,
+				     std::ostream                      &/*out*/)
 {
   Assert (false, ExcNotImplemented());
 };

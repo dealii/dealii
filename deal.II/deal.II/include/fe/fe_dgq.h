@@ -454,7 +454,7 @@ class FE_DGQ : public FiniteElement<dim>
 					  * multiplication) when
 					  * visiting an actual cell.
 					  */				      
-	typename std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
+	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
     };
     
 				     /**

@@ -799,7 +799,7 @@ class FE_Q : public FiniteElement<dim>
 					  * multiplication) when
 					  * visiting an actual cell.
 					  */      
-	typename std::vector<typename std::vector<Tensor<1,dim> > > shape_gradients;
+	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
     };
     
 				     /**

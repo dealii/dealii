@@ -1768,7 +1768,7 @@ void MGDoFHandler<dim>::clear_space ()
 
 				   // also delete vector of vertex
 				   // indices
-  typename std::vector<MGVertexDoFs> tmp;
+  std::vector<MGVertexDoFs> tmp;
   std::swap (mg_vertex_dofs, tmp);
 };
 

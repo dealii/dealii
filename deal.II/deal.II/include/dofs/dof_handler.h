@@ -1129,7 +1129,7 @@ class DoFHandler  :  public Subscriptor,
 				      * @p{levels[]} tree of the @ref{Triangulation}
 				      * objects.
 				      */
-    typename std::vector<DoFLevel<dim>*>    levels;
+    std::vector<DoFLevel<dim>*>    levels;
 
 				     /**
 				      * Store the number of dofs created last

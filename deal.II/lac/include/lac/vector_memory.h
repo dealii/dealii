@@ -155,12 +155,12 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * vector is used, second the
 				      * vector itself.
 				      */
-    typedef typename std::pair<bool, Vector*> entry_type;
+    typedef std::pair<bool, Vector*> entry_type;
 
 				     /**
 				      * Array of allocated vectors.
 				      */
-    typename std::vector<entry_type> pool;
+    std::vector<entry_type> pool;
     
 				     /**
 				      * Overall number of allocations.

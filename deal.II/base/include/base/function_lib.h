@@ -52,7 +52,7 @@ namespace Functions
 				       /**
 					* Function values at multiple points.
 					*/
-      virtual void value_list (const typename std::vector<Point<dim> > &points,
+      virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
       
@@ -65,8 +65,8 @@ namespace Functions
 				       /**
 					  Gradients at multiple points.
 				       */
-      virtual void gradient_list (const typename std::vector<Point<dim> > &points,
-				  typename std::vector<Tensor<1,dim> >    &gradients,
+      virtual void gradient_list (const std::vector<Point<dim> > &points,
+				  std::vector<Tensor<1,dim> >    &gradients,
 				  const unsigned int              component = 0) const;
       
 				       /**
@@ -78,7 +78,7 @@ namespace Functions
 				       /**
 					* Laplacian of the function at multiple points.
 					*/
-      virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
+      virtual void laplacian_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
 				   const unsigned int              component = 0) const;
   };
@@ -104,7 +104,7 @@ namespace Functions
 				       /**
 					* Function values at multiple points.
 					*/
-      virtual void value_list (const typename std::vector<Point<dim> > &points,
+      virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
       
@@ -117,8 +117,8 @@ namespace Functions
 				       /**
 					  Gradients at multiple points.
 				       */
-      virtual void gradient_list (const typename std::vector<Point<dim> > &points,
-				  typename std::vector<Tensor<1,dim> >    &gradients,
+      virtual void gradient_list (const std::vector<Point<dim> > &points,
+				  std::vector<Tensor<1,dim> >    &gradients,
 				  const unsigned int              component = 0) const;
       
 				       /**
@@ -130,7 +130,7 @@ namespace Functions
 				       /**
 					* Laplacian of the function at multiple points.
 					*/
-      virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
+      virtual void laplacian_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
 				   const unsigned int              component = 0) const;
   };
@@ -171,7 +171,7 @@ namespace Functions
 				       /**
 					* Values at multiple points.
 					*/
-      virtual void value_list (const typename std::vector<Point<dim> > &points,
+      virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
       
@@ -184,8 +184,8 @@ namespace Functions
 				       /**
 					* Gradients at multiple points.
 					*/
-      virtual void gradient_list (const typename std::vector<Point<dim> > &points,
-				  typename std::vector<Tensor<1,dim> >    &gradients,
+      virtual void gradient_list (const std::vector<Point<dim> > &points,
+				  std::vector<Tensor<1,dim> >    &gradients,
 				  const unsigned int              component = 0) const;
       
 				       /**
@@ -197,7 +197,7 @@ namespace Functions
 				       /**
 					* Laplacian at multiple points.
 					*/
-      virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
+      virtual void laplacian_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
 				   const unsigned int              component = 0) const;
     private:
@@ -225,7 +225,7 @@ namespace Functions
 				       /**
 					* Values at multiple points.
 					*/
-      virtual void value_list (const typename std::vector<Point<dim> > &points,
+      virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
       
@@ -238,8 +238,8 @@ namespace Functions
 				       /**
 					* Gradients at multiple points.
 					*/
-      virtual void gradient_list (const typename std::vector<Point<dim> > &points,
-				  typename std::vector<Tensor<1,dim> >    &gradients,
+      virtual void gradient_list (const std::vector<Point<dim> > &points,
+				  std::vector<Tensor<1,dim> >    &gradients,
 				  const unsigned int              component = 0) const;
       
 				       /**
@@ -251,7 +251,7 @@ namespace Functions
 				       /**
 					* Laplacian at multiple points.
 					*/
-      virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
+      virtual void laplacian_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
 				   const unsigned int              component = 0) const;
       
@@ -264,8 +264,8 @@ namespace Functions
 				       /**
 					* Gradients at multiple points.
 					*/
-      virtual void hessian_list (const typename std::vector<Point<dim> > &points,
-				 typename std::vector<Tensor<2,dim> >    &hessians,
+      virtual void hessian_list (const std::vector<Point<dim> > &points,
+				 std::vector<Tensor<2,dim> >    &hessians,
 				 const unsigned int              component = 0) const;
   };
   
@@ -288,7 +288,7 @@ namespace Functions
 				       /**
 					* Values at multiple points.
 					*/
-      virtual void value_list (const typename std::vector<Point<dim> > &points,
+      virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
       
@@ -301,8 +301,8 @@ namespace Functions
 				       /**
 					* Gradients at multiple points.
 					*/
-      virtual void gradient_list (const typename std::vector<Point<dim> > &points,
-				  typename std::vector<Tensor<1,dim> >    &gradients,
+      virtual void gradient_list (const std::vector<Point<dim> > &points,
+				  std::vector<Tensor<1,dim> >    &gradients,
 				  const unsigned int              component = 0) const;
       
 				       /**
@@ -314,7 +314,7 @@ namespace Functions
 				       /**
 					* Laplacian at multiple points.
 					*/
-      virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
+      virtual void laplacian_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
 				   const unsigned int              component = 0) const;
   };
@@ -459,7 +459,7 @@ namespace Functions
 				       /**
 					* Function values at multiple points.
 					*/
-      virtual void value_list (const typename std::vector<Point<dim> > &points,
+      virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
       
@@ -472,8 +472,8 @@ namespace Functions
 				       /**
 					  Gradients at multiple points.
 				       */
-      virtual void gradient_list (const typename std::vector<Point<dim> > &points,
-				  typename std::vector<Tensor<1,dim> >    &gradients,
+      virtual void gradient_list (const std::vector<Point<dim> > &points,
+				  std::vector<Tensor<1,dim> >    &gradients,
 				  const unsigned int              component = 0) const;
       
 				       /**
@@ -485,7 +485,7 @@ namespace Functions
 				       /**
 					* Laplacian of the function at multiple points.
 					*/
-      virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
+      virtual void laplacian_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
 				   const unsigned int              component = 0) const;
       
@@ -672,7 +672,7 @@ namespace Functions
 					* coefficients in each space
 					* direction as argument.
 					*/
-      FourierSineSum (const typename std::vector<Point<dim> > &fourier_coefficients,
+      FourierSineSum (const std::vector<Point<dim> > &fourier_coefficients,
 		      const std::vector<double>      &weights);
       
 				       /**
@@ -714,7 +714,7 @@ namespace Functions
 					* Stored Fourier coefficients
 					* and weights.
 					*/
-      const typename std::vector<Point<dim> > fourier_coefficients;
+      const std::vector<Point<dim> > fourier_coefficients;
       const std::vector<double>      weights;
   };
 
@@ -738,7 +738,7 @@ namespace Functions
 					* coefficients in each space
 					* direction as argument.
 					*/
-      FourierCosineSum (const typename std::vector<Point<dim> > &fourier_coefficients,
+      FourierCosineSum (const std::vector<Point<dim> > &fourier_coefficients,
 			const std::vector<double>      &weights);
       
 				       /**
@@ -780,7 +780,7 @@ namespace Functions
 					* Stored Fourier coefficients
 					* and weights.
 					*/
-      const typename std::vector<Point<dim> > fourier_coefficients;
+      const std::vector<Point<dim> > fourier_coefficients;
       const std::vector<double>      weights;
   };
 
@@ -891,14 +891,14 @@ namespace Functions
 				       /**
 					* Function values at multiple points.
 					*/
-      virtual void value_list (const typename std::vector<Point<dim> > &points,
+      virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
 
 				       /**
 					* Function values at multiple points.
 					*/
-      virtual void vector_value_list (const typename std::vector<Point<dim> > &points,
+      virtual void vector_value_list (const std::vector<Point<dim> > &points,
 				      std::vector<Vector<double> >           &values) const;
   };
   
@@ -940,14 +940,14 @@ namespace Functions
 				       /**
 					* Function values at multiple points.
 					*/
-      virtual void value_list (const typename std::vector<Point<dim> > &points,
+      virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
 
 				       /**
 					* Function values at multiple points.
 					*/
-      virtual void vector_value_list (const typename std::vector<Point<dim> > &points,
+      virtual void vector_value_list (const std::vector<Point<dim> > &points,
 				      std::vector<Vector<double> >           &values) const;
   };
   
@@ -990,14 +990,14 @@ namespace Functions
 				       /**
 					* Function values at multiple points.
 					*/
-      virtual void value_list (const typename std::vector<Point<dim> > &points,
+      virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
 
 				       /**
 					* Function values at multiple points.
 					*/
-      virtual void vector_value_list (const typename std::vector<Point<dim> > &points,
+      virtual void vector_value_list (const std::vector<Point<dim> > &points,
 				      std::vector<Vector<double> >           &values) const;
 
 				       /**

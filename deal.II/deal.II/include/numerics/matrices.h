@@ -410,7 +410,7 @@ class MatrixCreator
 					  * Abbreviation for a pair of
 					  * iterators.
 					  */
-	typedef typename std::pair<active_cell_iterator,active_cell_iterator> iterator_pair;
+	typedef std::pair<active_cell_iterator,active_cell_iterator> iterator_pair;
 	
 					 /**
 					  * Constructor. Initialize

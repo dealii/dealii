@@ -493,7 +493,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
   Quadrature<dim> *q_projector=0;
   if (mapping!=0)
     {
-      typename std::vector<Point<dim-1> > boundary_points(n_points);
+      std::vector<Point<dim-1> > boundary_points(n_points);
       for (unsigned int i=0; i<n_points; ++i)
 	boundary_points[i](0)= 1.*(i+1)/(n_points+1);
 
@@ -807,7 +807,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					     // points on a face and
 					     // project them onto the
 					     // faces of a unit cell
-	    typename std::vector<Point<dim-1> > boundary_points (n_points);
+	    std::vector<Point<dim-1> > boundary_points (n_points);
 	    
 	    for (unsigned int i=0; i<n_points; ++i)
 	      boundary_points[i](0) = 1.*(i+1)/(n_points+1);

@@ -71,7 +71,7 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     typename std::vector<Point<dim> > &points) const;
+				     std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Refer to the general
@@ -84,7 +84,7 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     typename std::vector<Point<dim> > &points) const;
+				     std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Compute the normals to the
@@ -135,7 +135,7 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * base class.
 				      */
     void get_intermediate_points_between_points (const Point<dim> &p0, const Point<dim> &p1,
-						 typename std::vector<Point<dim> > &points) const;    
+						 std::vector<Point<dim> > &points) const;    
 };
 
 
@@ -192,7 +192,7 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     typename std::vector<Point<dim> > &points) const;
+				     std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Refer to the general
@@ -205,7 +205,7 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     typename std::vector<Point<dim> > &points) const;
+				     std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Compute the normals to the
@@ -286,7 +286,7 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * base class.
 				      */
     void get_intermediate_points_between_points (const Point<dim> &p0, const Point<dim> &p1,
-						 typename std::vector<Point<dim> > &points) const;    
+						 std::vector<Point<dim> > &points) const;    
 };
 
 
@@ -338,7 +338,7 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     typename std::vector<Point<dim> > &points) const;
+				     std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Refer to the general
@@ -351,7 +351,7 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     typename std::vector<Point<dim> > &points) const;
+				     std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Compute the normals to the
@@ -442,7 +442,7 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     typename std::vector<Point<dim> > &points) const;
+				     std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Refer to the general
@@ -455,7 +455,7 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     typename std::vector<Point<dim> > &points) const;
+				     std::vector<Point<dim> > &points) const;
 
 				     /**
 				      * Compute the normals to the

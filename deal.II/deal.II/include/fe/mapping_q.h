@@ -94,9 +94,9 @@ class MappingQ : public MappingQ1<dim>
 				      */
     virtual void
     transform_contravariant (typename std::vector<Tensor<1,dim> >::iterator begin,
-			 typename std::vector<Tensor<1,dim> >::const_iterator end,
-			 typename std::vector<Tensor<1,dim> >::const_iterator src,
-			 const typename Mapping<dim>::InternalDataBase &mapping_data) const;    
+			     typename std::vector<Tensor<1,dim> >::const_iterator end,
+			     typename std::vector<Tensor<1,dim> >::const_iterator src,
+			     const typename Mapping<dim>::InternalDataBase &mapping_data) const;    
 
 				     /**
 				      * Return the degree of the
@@ -137,7 +137,7 @@ class MappingQ : public MappingQ1<dim>
 					  * Filled (hardcoded) once in
 					  * @p{get_face_data}.
 					  */
-        typename std::vector<typename std::vector<Point<dim> > > unit_normals;
+        std::vector<std::vector<Point<dim> > > unit_normals;
 
 					 /**
 					  * Flag that is set by the
@@ -225,7 +225,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     virtual void
     add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
-			     typename std::vector<Point<dim> > &a) const;
+			     std::vector<Point<dim> > &a) const;
 
 				     /**
 				      * For @p{dim=3}. Append the
@@ -252,7 +252,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     virtual void
     add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
-			    typename std::vector<Point<dim> > &a) const;
+			    std::vector<Point<dim> > &a) const;
     
   private:
     
@@ -288,7 +288,7 @@ class MappingQ : public MappingQ1<dim>
 				      * derivatives.
 				      */
     virtual void
-    compute_shapes_virtual (const typename std::vector<Point<dim> > &unit_points,
+    compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
 			    typename MappingQ1<dim>::InternalData &data) const;
 
 				     /**
@@ -345,7 +345,7 @@ class MappingQ : public MappingQ1<dim>
 				      * points are appended.
 				      */
     void apply_laplace_vector(const std::vector<std::vector<double> > &lvs,
-			      typename std::vector<Point<dim> > &a) const;
+			      std::vector<Point<dim> > &a) const;
     
 				     /**
 				      * Computes the support points of
@@ -353,7 +353,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     virtual void compute_mapping_support_points(
       const typename Triangulation<dim>::cell_iterator &cell,
-      typename std::vector<Point<dim> > &a) const;
+      std::vector<Point<dim> > &a) const;
 
 				     /**
 				      * Computes all support points of
@@ -371,7 +371,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     void compute_support_points_laplace(
       const typename Triangulation<dim>::cell_iterator &cell,
-      typename std::vector<Point<dim> > &a) const;
+      std::vector<Point<dim> > &a) const;
     
 				     /**
 				      * Simple version of the
@@ -395,7 +395,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     void compute_support_points_simple(
       const typename Triangulation<dim>::cell_iterator &cell,
-      typename std::vector<Point<dim> > &a) const;    
+      std::vector<Point<dim> > &a) const;    
     
 				     /**
 				      * For @p{dim=2} and 3. Simple
@@ -408,7 +408,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
 //TODO:[RH] (later) remove this function altogether?    
     void fill_quad_support_points_simple (const typename Triangulation<dim>::cell_iterator &cell,
-					  typename std::vector<Point<dim> > &a) const;
+					  std::vector<Point<dim> > &a) const;
     
 				     /**
 				      * Needed by the

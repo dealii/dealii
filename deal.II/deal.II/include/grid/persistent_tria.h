@@ -214,8 +214,8 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * is not useful in the context of this
 				      * class.
 				      */
-    virtual void create_triangulation (const typename std::vector<Point<dim> >    &vertices,
-				       const typename std::vector<CellData<dim> > &cells,
+    virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
+				       const std::vector<CellData<dim> > &cells,
 				       const SubCellData                          &subcelldata);
 
 				     /**

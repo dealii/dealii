@@ -55,7 +55,7 @@ class PolynomialSpace
 				      * @p{Polynomial<double>}.
 				      */
     template <class Pol>
-    PolynomialSpace(const typename std::vector<Pol> &pols);
+    PolynomialSpace(const std::vector<Pol> &pols);
 
 				     /**
 				      * Computes the value and the
@@ -81,8 +81,8 @@ class PolynomialSpace
 				      */
     void compute (const Point<dim>                     &unit_point,
 		  std::vector<double>                  &values,
-		  typename std::vector<Tensor<1,dim> > &grads,
-		  typename std::vector<Tensor<2,dim> > &grad_grads) const;
+		  std::vector<Tensor<1,dim> > &grads,
+		  std::vector<Tensor<2,dim> > &grad_grads) const;
     
 				     /**
 				      * Computes the value of the
@@ -179,7 +179,7 @@ class PolynomialSpace
 template <int dim>
 template <class Pol>
 PolynomialSpace<dim>::
-PolynomialSpace (const typename std::vector<Pol> &pols)
+PolynomialSpace (const std::vector<Pol> &pols)
 		:
 		polynomials (pols.begin(), pols.end()),
 		n_pols (compute_n_pols(polynomials.size()))

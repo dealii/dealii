@@ -125,8 +125,8 @@ PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_
 
 template <int dim>
 void
-PersistentTriangulation<dim>::create_triangulation (const typename std::vector<Point<dim> >    &,
-						    const typename std::vector<CellData<dim> > &,
+PersistentTriangulation<dim>::create_triangulation (const std::vector<Point<dim> >    &,
+						    const std::vector<CellData<dim> > &,
 						    const SubCellData                 &)
 {
   Assert (false, ExcFunctionNotUseful());

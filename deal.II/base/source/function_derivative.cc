@@ -34,7 +34,7 @@ FunctionDerivative<dim>::FunctionDerivative (const Function<dim> &f,
 
 template <int dim>
 FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
-					     const typename std::vector<Point<dim> >& dir,
+					     const std::vector<Point<dim> >& dir,
 					     const double h)
 		:
 		Function<dim> (f.n_components, f.get_time()),
@@ -92,7 +92,7 @@ using namespace std;
 
 template <int dim>
 void
-FunctionDerivative<dim>::value_list (const typename std::vector<Point<dim> > &points,
+FunctionDerivative<dim>::value_list (const std::vector<Point<dim> > &points,
 				     std::vector<double>            &values,
 				     const unsigned int              component) const
 {

@@ -205,7 +205,7 @@ class FilteredMatrix : public Subscriptor
 				      * freedom index and the value it
 				      * shall have.
 				      */
-    typedef typename std::pair<unsigned int,value_type> IndexValuePair;
+    typedef std::pair<unsigned int,value_type> IndexValuePair;
 
 				     /**
 				      * Default constructor. You will
@@ -488,7 +488,7 @@ class FilteredMatrix : public Subscriptor
 				      * the value to which it shall be
 				      * fixed.
 				      */
-    typename std::vector<IndexValuePair> constraints;
+    std::vector<IndexValuePair> constraints;
 
 				     /**
 				      * Vector to be used as temporary
@@ -561,7 +561,7 @@ class FilteredMatrix : public Subscriptor
 				      * matrix types.
 				      */
     void get_column_entries (const unsigned int           index,
-			     typename std::vector<IndexValuePair> &column_entries,
+			     std::vector<IndexValuePair> &column_entries,
 			     const bool                   matrix_is_symmetric) const;
 };
 

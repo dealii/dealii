@@ -45,7 +45,7 @@ struct FunctionMap
 				      * name it in the fashion of the
 				      * STL local typedefs.
 				      */
-    typedef typename std::map<unsigned char, const Function<dim>*> type;
+    typedef std::map<unsigned char, const Function<dim>*> type;
 };
 
 

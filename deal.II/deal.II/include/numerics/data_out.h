@@ -475,13 +475,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * List of data elements with vectors of
 				      * values for each degree of freedom.
 				      */
-    typename std::vector<DataEntry>  dof_data;
+    std::vector<DataEntry>  dof_data;
 
 				     /**
 				      * List of data elements with vectors of
 				      * values for each cell.
 				      */
-    typename std::vector<DataEntry>  cell_data;
+    std::vector<DataEntry>  cell_data;
 
 				     /**
 				      * This is a list of patches that is
@@ -490,7 +490,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * in the output routines of the base
 				      * classes.
 				      */
-    typename std::vector<Patch> patches;
+    std::vector<Patch> patches;
 
 				     /**
 				      * Function by which the base
@@ -498,7 +498,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * what patches they shall write
 				      * to a file.
 				      */
-    virtual const typename std::vector<Patch> &
+    virtual const std::vector<Patch> &
     get_patches () const;
 
 				     /**

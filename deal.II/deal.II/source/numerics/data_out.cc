@@ -309,7 +309,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_dataset_names ()
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-const typename std::vector< ::DataOutBase::Patch<patch_dim, patch_space_dim> > &
+const std::vector< ::DataOutBase::Patch<patch_dim, patch_space_dim> > &
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;
@@ -478,7 +478,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // clear the patches array
   if (true)
     {
-      typename std::vector< ::DataOutBase::Patch<dim> > dummy;
+      std::vector< ::DataOutBase::Patch<dim> > dummy;
       this->patches.swap (dummy);
     };
   

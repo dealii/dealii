@@ -367,7 +367,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * List of patches of all past and
 				      * present parameter value data sets.
 				      */
-    typename std::vector< ::DataOutBase::Patch<dim+1> >   patches;
+    std::vector< ::DataOutBase::Patch<dim+1> >   patches;
 
 				     /**
 				      * Structure holding data vectors
@@ -398,12 +398,12 @@ class DataOutStack : public DataOutInterface<dim+1>
 				     /**
 				      * List of DoF data vectors.
 				      */
-    typename std::vector<DataVector> dof_data;
+    std::vector<DataVector> dof_data;
 
 				     /**
 				      * List of cell data vectors.
 				      */
-    typename std::vector<DataVector> cell_data;
+    std::vector<DataVector> cell_data;
     
 				     /**
 				      * This is the function through
@@ -413,7 +413,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * the base class @ref{DataOutBase}) to
 				      * the actual output function.
 				      */
-    virtual const typename std::vector< ::DataOutBase::Patch<dim+1> > & get_patches () const;
+    virtual const std::vector< ::DataOutBase::Patch<dim+1> > & get_patches () const;
 
 
 				     /**

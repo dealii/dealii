@@ -358,7 +358,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				     /**
 				      * Array of sparsity patterns.
 				      */
-    typename std::vector<typename std::vector<SmartPointer<SparsityPatternBase> > > sub_objects;
+    std::vector<std::vector<SmartPointer<SparsityPatternBase> > > sub_objects;
 
 				     /**
 				      * Object storing and managing

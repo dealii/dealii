@@ -404,7 +404,7 @@ class FiniteElementBase : public Subscriptor,
 					  * entries in lower dimensions
 					  * are missing.
 					  */
-	typename std::vector<FEValues<dim>*> differences;
+	std::vector<FEValues<dim>*> differences;
     };
   
 				     /**
@@ -851,7 +851,7 @@ class FiniteElementBase : public Subscriptor,
 				      * See the class documentation
 				      * for details on support points.
 				      */
-    const typename std::vector<Point<dim> > &
+    const std::vector<Point<dim> > &
     get_unit_support_points () const;    
 
 				     /**
@@ -920,7 +920,7 @@ class FiniteElementBase : public Subscriptor,
 				      * See the class documentation
 				      * for details on support points.
 				      */
-    const typename std::vector<Point<dim-1> > &
+    const std::vector<Point<dim-1> > &
     get_unit_face_support_points () const;    
 
 				     /**
@@ -1303,7 +1303,7 @@ class FiniteElementBase : public Subscriptor,
 				      * support points. In that case,
 				      * this field remains empty.
 				      */
-    typename std::vector<Point<dim> > unit_support_points;
+    std::vector<Point<dim> > unit_support_points;
 
 				     /**
 				      * Same for the faces. See the
@@ -1313,7 +1313,7 @@ class FiniteElementBase : public Subscriptor,
 				      * what contributes a face
 				      * support point.
 				      */
-    typename std::vector<Point<dim-1> > unit_face_support_points;
+    std::vector<Point<dim-1> > unit_face_support_points;
 
 				     /**
 				      * For each shape function, give

@@ -452,7 +452,7 @@ class FESystem : public FiniteElement<dim>
 				      * Pairs of multiplicity and
 				      * element type.
 				      */
-    typedef typename std::pair<const FiniteElement<dim> *, unsigned int> ElementPair;
+    typedef std::pair<const FiniteElement<dim> *, unsigned int> ElementPair;
     
 				     /**
 				      * Pointer to underlying finite
@@ -465,7 +465,7 @@ class FESystem : public FiniteElement<dim>
 				      * created by the constructor and
 				      * constant afterwards.
 				      */
-    typename std::vector<ElementPair> base_elements;
+    std::vector<ElementPair> base_elements;
 
 
 				     /**
@@ -772,7 +772,7 @@ class FESystem : public FiniteElement<dim>
 					  * by the InternalData
 					  * constructor.
 					  */
-	typename std::vector<FEValuesData<dim> *> base_fe_values_datas;
+	std::vector<FEValuesData<dim> *> base_fe_values_datas;
     };
 };
 

@@ -16,7 +16,7 @@
 #include <base/exceptions.h>
 
 template <typename number>
-Polynomial<number>::Polynomial (const typename std::vector<number> &a):
+Polynomial<number>::Polynomial (const std::vector<number> &a):
 		coefficients(a)
 {}
 
@@ -42,7 +42,7 @@ Polynomial<number>::value (const number x) const
 template <typename number>
 void
 Polynomial<number>::value (const number         x,
-			typename std::vector<number> &values) const
+			std::vector<number> &values) const
 {
   Assert (coefficients.size() > 0, ExcVoidPolynomial());
   Assert (values.size() > 0, ExcEmptyArray());
@@ -94,7 +94,7 @@ Polynomial<number>::value (const number         x,
 
 template <typename number>
 void
-Polynomial<number>::scale(typename std::vector<number>& coefficients,
+Polynomial<number>::scale(std::vector<number>& coefficients,
 			   const number factor)
 {
   double f = 1.;
@@ -119,7 +119,7 @@ Polynomial<number>::scale(const number factor)
 
 template <typename number>
 void
-Polynomial<number>::multiply(typename std::vector<number>& coefficients,
+Polynomial<number>::multiply(std::vector<number>& coefficients,
 			     const number factor)
 {
   for (typename std::vector<number>::iterator c = coefficients.begin();
@@ -132,7 +132,7 @@ Polynomial<number>::multiply(typename std::vector<number>& coefficients,
 template <typename number>
 template <typename number2>
 void
-Polynomial<number>::shift(typename std::vector<number>& coefficients,
+Polynomial<number>::shift(std::vector<number>& coefficients,
 			  const number2 offset)
 {  
 #ifdef DEAL_II_LONG_DOUBLE_LOOP_BUG

@@ -458,7 +458,7 @@ class FE_Nedelec : public FiniteElement<dim>
 					  * multiplication) when
 					  * visiting an actual cell.
 					  */
-	typename std::vector<typename std::vector<Tensor<2,dim> > > shape_gradients;
+	std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
     };
     
 				     /**

@@ -345,7 +345,7 @@ class Mapping : public Subscriptor
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                         &quadrature,
 		    InternalDataBase                              &internal,
-		    typename std::vector<Point<dim> >             &quadrature_points,
+		    std::vector<Point<dim> >             &quadrature_points,
 		    std::vector<double>                           &JxW_values) const = 0;
 
 				     /**
@@ -374,10 +374,10 @@ class Mapping : public Subscriptor
 			 const unsigned int                        face_no,
 			 const Quadrature<dim-1>                  &quadrature,
 			 InternalDataBase                         &internal,
-			 typename std::vector<Point<dim> >        &quadrature_points,
+			 std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>                      &JxW_values,
-			 typename std::vector<Tensor<1,dim> >     &boundary_form,
-			 typename std::vector<Point<dim> >        &normal_vectors) const = 0;
+			 std::vector<Tensor<1,dim> >     &boundary_form,
+			 std::vector<Point<dim> >        &normal_vectors) const = 0;
 
 				     /**
 				      * See above.
@@ -388,10 +388,10 @@ class Mapping : public Subscriptor
 			    const unsigned int                        sub_no,
 			    const Quadrature<dim-1>                  &quadrature,
 			    InternalDataBase                         &internal,
-			    typename std::vector<Point<dim> >        &quadrature_points,
+			    std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>                      &JxW_values,
-			    typename std::vector<Tensor<1,dim> >     &boundary_form,
-			    typename std::vector<Point<dim> >        &normal_vectors) const = 0;
+			    std::vector<Tensor<1,dim> >     &boundary_form,
+			    std::vector<Point<dim> >        &normal_vectors) const = 0;
 
 				     /**
 				      * Give class @p{FEValues} access

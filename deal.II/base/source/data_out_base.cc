@@ -66,7 +66,7 @@ DataOutBase::Patch<dim,spacedim>::memory_consumption () const
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_ucd (const typename std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
 			     const UcdFlags                          &flags,
 			     std::ostream                            &out) 
@@ -476,7 +476,7 @@ void DataOutBase::write_ucd (const typename std::vector<Patch<dim,spacedim> > &p
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			    const std::vector<std::string>          &data_names,
 			    const DXFlags                           &flags,
 			    std::ostream                            &out) 
@@ -974,7 +974,7 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_gnuplot (const typename std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
 				 const std::vector<std::string>          &data_names,
 				 const GnuplotFlags                      &/*flags*/,
 				 std::ostream                            &out) 
@@ -1262,7 +1262,7 @@ void DataOutBase::write_gnuplot (const typename std::vector<Patch<dim,spacedim> 
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches,
 				const std::vector<std::string>          &data_names,
 				const PovrayFlags                       &flags,
 				std::ostream                            &out) 
@@ -1624,7 +1624,7 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &/*data_names*/,
 			     const EpsFlags                          &flags,
 			     std::ostream                            &out) 
@@ -1988,7 +1988,7 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_gmv (const typename std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
 			     const GmvFlags                          &/*flags*/,
 			     std::ostream                            &out) 
@@ -2067,7 +2067,7 @@ void DataOutBase::write_gmv (const typename std::vector<Patch<dim,spacedim> > &p
   std::vector<std::vector<double> > data_vectors (n_data_sets,
 						  std::vector<double> (n_nodes));
   Threads::ThreadManager thread_manager;
-  void (*fun_ptr) (const typename std::vector<Patch<dim,spacedim> > &,
+  void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
 		   std::vector<std::vector<double> >                &)
     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
   Threads::spawn (thread_manager,
@@ -2303,7 +2303,7 @@ void DataOutBase::write_gmv (const typename std::vector<Patch<dim,spacedim> > &p
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_tecplot (const typename std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
 				 const std::vector<std::string>          &data_names,
 				 const TecplotFlags                      &/*flags*/,
 				 std::ostream                            &out)
@@ -2447,7 +2447,7 @@ void DataOutBase::write_tecplot (const typename std::vector<Patch<dim,spacedim> 
    std::vector<std::vector<double> > data_vectors (n_data_sets,
 						   std::vector<double> (n_nodes));
    Threads::ThreadManager thread_manager;
-   void (*fun_ptr) (const typename std::vector<Patch<dim,spacedim> > &,
+   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
 		    std::vector<std::vector<double> >                &)
      = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
    Threads::spawn (thread_manager,
@@ -2720,7 +2720,7 @@ int & TecplotMacros::cd(const unsigned int i, const unsigned int j)
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_tecplot_binary (const typename std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > &patches,
 					const std::vector<std::string>          &data_names,
 					const TecplotFlags                      &flags,
 					std::ostream                            &out)
@@ -2874,7 +2874,7 @@ void DataOutBase::write_tecplot_binary (const typename std::vector<Patch<dim,spa
    std::vector<std::vector<double> > data_vectors (n_data_sets,
 						   std::vector<double> (n_nodes));
    Threads::ThreadManager thread_manager;
-   void (*fun_ptr) (const typename std::vector<Patch<dim,spacedim> > &,
+   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
 		    std::vector<std::vector<double> >                &)
      = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
    Threads::spawn (thread_manager,
@@ -3102,7 +3102,7 @@ void DataOutBase::write_tecplot_binary (const typename std::vector<Patch<dim,spa
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
 			     const VtkFlags                          &/*flags*/,
 			     std::ostream                            &out) 
@@ -3198,7 +3198,7 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
   std::vector<std::vector<double> > data_vectors (n_data_sets,
 						  std::vector<double> (n_nodes));
   Threads::ThreadManager thread_manager;
-  void (*fun_ptr) (const typename std::vector<Patch<dim,spacedim> > &,
+  void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
 		   std::vector<std::vector<double> >                &)
     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
   Threads::spawn (thread_manager,
@@ -3433,7 +3433,7 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
 
 template <int dim, int spacedim>
 void
-DataOutBase::write_gmv_reorder_data_vectors (const typename std::vector<Patch<dim,spacedim> > &patches,
+DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
 					     std::vector<std::vector<double> >       &data_vectors)
 {
 				   // unlike in the main function, we

@@ -176,7 +176,7 @@ class AutoDerivativeFunction : public Function<dim>
 				      * @p{formula}.
 				      */
     virtual void vector_gradient (const Point<dim>            &p,
-				  typename std::vector<Tensor<1,dim> > &gradients) const;
+				  std::vector<Tensor<1,dim> > &gradients) const;
     
 				     /**
 				      * Set @p{gradients} to the
@@ -192,8 +192,8 @@ class AutoDerivativeFunction : public Function<dim>
 				      * @p{DifferenceFormula}
 				      * @p{formula}.
 				      */
-    virtual void gradient_list (const typename std::vector<Point<dim> > &points,
-				typename std::vector<Tensor<1,dim> >    &gradients,
+    virtual void gradient_list (const std::vector<Point<dim> > &points,
+				std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
     
 				     /**
@@ -215,8 +215,8 @@ class AutoDerivativeFunction : public Function<dim>
 				      * @p{DifferenceFormula}
 				      * @p{formula}.
 				      */
-    virtual void vector_gradient_list (const typename std::vector<Point<dim> > &points,
-				       typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const;
+    virtual void vector_gradient_list (const std::vector<Point<dim> > &points,
+				       std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
 
 				     /**
 				      * Returns a
@@ -243,7 +243,7 @@ class AutoDerivativeFunction : public Function<dim>
 				      * Includes the unit vectors
 				      * scaled by @p{h}.
 				      */
-    typename std::vector<Tensor<1,dim> > ht;
+    std::vector<Tensor<1,dim> > ht;
     
 				     /**
 				      * Difference formula. Set by the

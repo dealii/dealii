@@ -135,8 +135,8 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 				     const unsigned int        face_no,
 				     const unsigned int        sub_no,
 				     InternalData             &data,
-				     typename std::vector<Point<dim> > &quadrature_points,
-				     typename std::vector<Point<dim> > &normal_vectors) const
+				     std::vector<Point<dim> > &quadrature_points,
+				     std::vector<Point<dim> > &normal_vectors) const
 {
   UpdateFlags update_flags(data.current_update_flags());
 
@@ -278,7 +278,7 @@ void
 MappingCartesian<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator& cell,
 				       const Quadrature<dim>& q, 
 				       typename Mapping<dim>::InternalDataBase& mapping_data,
-				       typename std::vector<Point<dim> >& quadrature_points,
+				       std::vector<Point<dim> >& quadrature_points,
 				       std::vector<double>& JxW_values) const
 {
 				   // convert data object to internal
@@ -287,7 +287,7 @@ MappingCartesian<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iter
 				   // possible
   InternalData &data = dynamic_cast<InternalData&> (mapping_data);
 
-  typename std::vector<Point<dim> > dummy;
+  std::vector<Point<dim> > dummy;
   
   compute_fill (cell, invalid_face_number, invalid_face_number,
 		data,
@@ -317,10 +317,10 @@ MappingCartesian<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell
 					    const unsigned int            face_no,
 					    const Quadrature<dim-1>      &q,
 					    typename Mapping<dim>::InternalDataBase &mapping_data,
-					    typename std::vector<Point<dim> >     &quadrature_points,
+					    std::vector<Point<dim> >     &quadrature_points,
 					    std::vector<double>          &JxW_values,
-					    typename std::vector<Tensor<1,dim> >  &boundary_forms,
-					    typename std::vector<Point<dim> >     &normal_vectors) const
+					    std::vector<Tensor<1,dim> >  &boundary_forms,
+					    std::vector<Point<dim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -363,10 +363,10 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::c
 					       const unsigned int       sub_no,
 					       const Quadrature<dim-1> &q,
 					       typename Mapping<dim>::InternalDataBase &mapping_data,
-					       typename std::vector<Point<dim> >     &quadrature_points,
+					       std::vector<Point<dim> >     &quadrature_points,
 					       std::vector<double>          &JxW_values,
-					       typename std::vector<Tensor<1,dim> >  &boundary_forms,
-					       typename std::vector<Point<dim> >     &normal_vectors) const
+					       std::vector<Tensor<1,dim> >  &boundary_forms,
+					       std::vector<Point<dim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with

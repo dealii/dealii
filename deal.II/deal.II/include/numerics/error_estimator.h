@@ -484,18 +484,18 @@ class KellyErrorEstimator
 					  * index of the solution
 					  * vector.
 					  */
-	typename std::vector<typename std::vector<typename std::vector<Tensor<1,dim> > > > psi;
+	std::vector<std::vector<std::vector<Tensor<1,dim> > > > psi;
 
 					 /**
 					  * The same vector for a neighbor cell
 					  */
-	typename std::vector<typename std::vector<typename std::vector<Tensor<1,dim> > > > neighbor_psi;
+	std::vector<std::vector<std::vector<Tensor<1,dim> > > > neighbor_psi;
 
 					 /**
 					  * The normal vectors of the finite
 					  * element function on one face
 					  */
-	typename std::vector<Point<dim> > normal_vectors;
+	std::vector<Point<dim> > normal_vectors;
 
 					 /**
 					  * Two arrays needed for the

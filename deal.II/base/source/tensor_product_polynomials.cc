@@ -110,8 +110,8 @@ template <int dim>
 void TensorProductPolynomials<dim>::compute(
   const Point<dim>                     &p,
   std::vector<double>                  &values,
-  typename std::vector<Tensor<1,dim> > &grads,
-  typename std::vector<Tensor<2,dim> > &grad_grads) const
+  std::vector<Tensor<1,dim> > &grads,
+  std::vector<Tensor<2,dim> > &grad_grads) const
 {
   const unsigned int n_pols=polynomials.size();
   

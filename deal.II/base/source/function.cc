@@ -54,7 +54,7 @@ using namespace std;
 #endif
 
 template <int dim>
-void Function<dim>::value_list (const typename std::vector<Point<dim> > &points,
+void Function<dim>::value_list (const std::vector<Point<dim> > &points,
 				std::vector<double>                     &values,
 				const unsigned int                       component) const
 {
@@ -70,7 +70,7 @@ void Function<dim>::value_list (const typename std::vector<Point<dim> > &points,
 
 
 template <int dim>
-void Function<dim>::vector_value_list (const typename std::vector<Point<dim> > &points,
+void Function<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 				       std::vector<Vector<double> >   &values) const
 {
 				   // check whether component is in
@@ -95,15 +95,15 @@ Tensor<1,dim> Function<dim>::gradient (const Point<dim> &,
 
 template <int dim>
 void Function<dim>::vector_gradient (const Point<dim>       &,
-				     typename std::vector<Tensor<1,dim> > &) const
+				     std::vector<Tensor<1,dim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 };
 
 
 template <int dim>
-void Function<dim>::gradient_list (const typename std::vector<Point<dim> > &points,
-				   typename std::vector<Tensor<1,dim> >    &gradients,
+void Function<dim>::gradient_list (const std::vector<Point<dim> > &points,
+				   std::vector<Tensor<1,dim> >    &gradients,
 				   const unsigned int              component) const
 {
   Assert (gradients.size() == points.size(),
@@ -115,8 +115,8 @@ void Function<dim>::gradient_list (const typename std::vector<Point<dim> > &poin
 
 
 template <int dim>
-void Function<dim>::vector_gradient_list (const typename std::vector<Point<dim> >            &points,
-					  typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const
+void Function<dim>::vector_gradient_list (const std::vector<Point<dim> >            &points,
+					  std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -151,7 +151,7 @@ void Function<dim>::vector_laplacian (const Point<dim> &,
 
 
 template <int dim>
-void Function<dim>::laplacian_list (const typename std::vector<Point<dim> > &points,
+void Function<dim>::laplacian_list (const std::vector<Point<dim> > &points,
 				    std::vector<double>            &laplacians,
 				    const unsigned int              component) const
 {
@@ -167,7 +167,7 @@ void Function<dim>::laplacian_list (const typename std::vector<Point<dim> > &poi
 
 
 template <int dim>
-void Function<dim>::vector_laplacian_list (const typename std::vector<Point<dim> > &points,
+void Function<dim>::vector_laplacian_list (const std::vector<Point<dim> > &points,
 					   std::vector<Vector<double> >   &laplacians) const
 {
 				   // check whether component is in
@@ -225,7 +225,7 @@ void ZeroFunction<dim>::vector_value (const Point<dim> &,
 
 
 template <int dim>
-void ZeroFunction<dim>::value_list (const typename std::vector<Point<dim> > &points,
+void ZeroFunction<dim>::value_list (const std::vector<Point<dim> > &points,
 				    std::vector<double>            &values,
 				    const unsigned int         /*component*/) const {
   Assert (values.size() == points.size(),
@@ -236,7 +236,7 @@ void ZeroFunction<dim>::value_list (const typename std::vector<Point<dim> > &poi
 
 
 template <int dim>
-void ZeroFunction<dim>::vector_value_list (const typename std::vector<Point<dim> > &points,
+void ZeroFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 					   std::vector<Vector<double> >   &values) const
 {
   Assert (values.size() == points.size(),
@@ -261,7 +261,7 @@ Tensor<1,dim> ZeroFunction<dim>::gradient (const Point<dim> &,
 
 template <int dim>
 void ZeroFunction<dim>::vector_gradient (const Point<dim>       &,
-					 typename std::vector<Tensor<1,dim> > &gradients) const
+					 std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (gradients.size() == this->n_components,
 	  ExcDimensionMismatch(gradients.size(), this->n_components));
@@ -272,8 +272,8 @@ void ZeroFunction<dim>::vector_gradient (const Point<dim>       &,
 
 
 template <int dim>
-void ZeroFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &points,
-				       typename std::vector<Tensor<1,dim> >    &gradients,
+void ZeroFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
+				       std::vector<Tensor<1,dim> >    &gradients,
 				       const unsigned int              /*component*/) const
 {
   Assert (gradients.size() == points.size(),
@@ -285,8 +285,8 @@ void ZeroFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &
 
 
 template <int dim>
-void ZeroFunction<dim>::vector_gradient_list (const typename std::vector<Point<dim> >            &points,
-					      typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const
+void ZeroFunction<dim>::vector_gradient_list (const std::vector<Point<dim> >            &points,
+					      std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -334,7 +334,7 @@ void ConstantFunction<dim>::vector_value (const Point<dim> &,
 
 
 template <int dim>
-void ConstantFunction<dim>::value_list (const typename std::vector<Point<dim> > &points,
+void ConstantFunction<dim>::value_list (const std::vector<Point<dim> > &points,
 					std::vector<double>            &values,
 					const unsigned int              /*component*/) const
 {
@@ -346,7 +346,7 @@ void ConstantFunction<dim>::value_list (const typename std::vector<Point<dim> > 
 
 
 template <int dim>
-void ConstantFunction<dim>::vector_value_list (const typename std::vector<Point<dim> > &points,
+void ConstantFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 					       std::vector<Vector<double> >   &values) const
 {
   Assert (values.size() == points.size(),
@@ -397,7 +397,7 @@ void ComponentSelectFunction<dim>::vector_value (const Point<dim> &,
 
 
 template <int dim>
-void ComponentSelectFunction<dim>::vector_value_list (const typename std::vector<Point<dim> > &points,
+void ComponentSelectFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 						      std::vector<Vector<double> >   &values) const
 {
   Assert (values.size() == points.size(),

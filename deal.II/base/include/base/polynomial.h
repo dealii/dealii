@@ -50,7 +50,7 @@ class Polynomial : public Subscriptor
 				      * the @p{coefficient} array
 				      * minus one.
 				      */
-    Polynomial (const typename std::vector<number> &coefficients);
+    Polynomial (const std::vector<number> &coefficients);
     
 				     /**
 				      * Return the value of this
@@ -78,8 +78,8 @@ class Polynomial : public Subscriptor
 				      * scheme for numerical stability
 				      * of the evaluation.
 				      */
-    void value (const number                  x,
-		typename std::vector<number> &values) const;
+    void value (const number         x,
+		std::vector<number> &values) const;
 
 				     /**
 				      * Degree of the polynomial. This
@@ -155,22 +155,24 @@ class Polynomial : public Subscriptor
   protected:
 
 				     /**
-				      * This function performs the actual scaling.
+				      * This function performs the
+				      * actual scaling.
 				      */
-    static void scale (typename std::vector<number>& coefficients,
-		       const number factor);
+    static void scale (std::vector<number> &coefficients,
+		       const number         factor);
 
 				     /**
-				      * This function performs the actual shift
+				      * This function performs the
+				      * actual shift
 				      */
     template <typename number2>
-    static void shift (typename std::vector<number>& coefficients,
-		       const number2 shift);
+    static void shift (std::vector<number> &coefficients,
+		       const number2        shift);
 
 				     /**
 				      * Multiply polynomial by a factor.
 				      */
-    static void multiply (typename std::vector<number>& coefficients,
+    static void multiply (std::vector<number>& coefficients,
 			  const number factor);
     
 				     /**
@@ -185,7 +187,7 @@ class Polynomial : public Subscriptor
 				      * since we want to allow copying
 				      * of polynomials.
 				      */
-    typename std::vector<number> coefficients;
+    std::vector<number> coefficients;
 };
 
 
@@ -302,7 +304,7 @@ class Legendre : public Polynomial<number>
 				     /**
 				      * Coefficients for the interval $[0,1]$.
 				      */
-    static typename std::vector<const typename std::vector<number> *> shifted_coefficients;
+    static std::vector<const std::vector<number> *> shifted_coefficients;
     
 				     /**
 				      * Vector with already computed
@@ -314,7 +316,7 @@ class Legendre : public Polynomial<number>
 				      * vectors in order to simplify
 				      * programming multithread-safe.
 				      */
-    static typename std::vector<const typename std::vector<number> *> recursive_coefficients;
+    static std::vector<const std::vector<number> *> recursive_coefficients;
     
 				     /**
 				      * Compute coefficients recursively.
@@ -328,7 +330,7 @@ class Legendre : public Polynomial<number>
 				      * constructor of
 				      * @ref{Polynomial}.
 				      */
-    static const typename std::vector<number> &
+    static const std::vector<number> &
     get_coefficients (const unsigned int k);
 };
 

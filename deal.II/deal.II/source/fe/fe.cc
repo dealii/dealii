@@ -327,7 +327,7 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 
 
 template <int dim>
-const typename std::vector<Point<dim> > &
+const std::vector<Point<dim> > &
 FiniteElementBase<dim>::get_unit_support_points () const
 {
 				   // a finite element may define
@@ -352,7 +352,7 @@ FiniteElementBase<dim>::has_support_points () const
 
 
 template <int dim>
-const typename std::vector<Point<dim-1> > &
+const std::vector<Point<dim-1> > &
 FiniteElementBase<dim>::get_unit_face_support_points () const
 {
 				   // a finite element may define

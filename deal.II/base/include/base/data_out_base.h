@@ -1276,7 +1276,7 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_dx (const typename std::vector<Patch<dim,spacedim> > &patches,
+    static void write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			  const std::vector<std::string>          &data_names,
 			  const DXFlags                          &flags,
 			  std::ostream                            &out);
@@ -1289,7 +1289,7 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_ucd (const typename std::vector<Patch<dim,spacedim> > &patches,
+    static void write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
 			   const UcdFlags                          &flags,
 			   std::ostream                            &out);
@@ -1302,7 +1302,7 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_gnuplot (const typename std::vector<Patch<dim,spacedim> > &patches,
+    static void write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
 			       const std::vector<std::string>          &data_names,
 			       const GnuplotFlags                      &flags,
 			       std::ostream                            &out);
@@ -1315,7 +1315,7 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_povray (const typename std::vector<Patch<dim,spacedim> > &patches,
+    static void write_povray (const std::vector<Patch<dim,spacedim> > &patches,
 			      const std::vector<std::string>          &data_names,
 			      const PovrayFlags                       &flags,
 			      std::ostream                            &out);
@@ -1328,7 +1328,7 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_eps (const typename std::vector<Patch<dim,spacedim> > &patches,
+    static void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
 			   const EpsFlags                          &flags,
 			   std::ostream                            &out);
@@ -1341,7 +1341,7 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_gmv (const typename std::vector<Patch<dim,spacedim> > &patches,
+    static void write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
 			   const GmvFlags                          &flags,
 			   std::ostream                            &out);
@@ -1354,7 +1354,7 @@ class DataOutBase
 				      * on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_tecplot (const typename std::vector<Patch<dim,spacedim> > &patches,
+    static void write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
 			       const std::vector<std::string>          &data_names,
 			       const TecplotFlags                      &flags,
 			       std::ostream                            &out);
@@ -1375,7 +1375,7 @@ class DataOutBase
 				      * ASCII output is still produced.
 				      */
     template <int dim, int spacedim>
-    static void write_tecplot_binary (const typename std::vector<Patch<dim,spacedim> > &patches,
+    static void write_tecplot_binary (const std::vector<Patch<dim,spacedim> > &patches,
 				      const std::vector<std::string>          &data_names,
 				      const TecplotFlags                      &flags,
 				      std::ostream                            &out);
@@ -1388,7 +1388,7 @@ class DataOutBase
 				      * information on the parameters.
 				      */
     template <int dim, int spacedim>
-    static void write_vtk (const typename std::vector<Patch<dim,spacedim> > &patches,
+    static void write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
 			   const VtkFlags                          &flags,
 			   std::ostream                            &out);
@@ -1526,7 +1526,7 @@ class DataOutBase
 				      */
     template <int dim, int spacedim>
     static void
-    write_gmv_reorder_data_vectors (const typename std::vector<Patch<dim,spacedim> > &patches,
+    write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
 				    std::vector<std::vector<double> >       &data_vectors);
 
 };
@@ -1949,7 +1949,7 @@ class DataOutInterface : private DataOutBase
 				      * output functions to know what
 				      * they shall print.
 				      */
-    virtual const typename std::vector<typename DataOutBase::Patch<dim,spacedim> > &
+    virtual const std::vector<typename DataOutBase::Patch<dim,spacedim> > &
     get_patches () const = 0;
 
 				     /**

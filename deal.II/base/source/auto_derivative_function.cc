@@ -118,7 +118,7 @@ AutoDerivativeFunction<dim>::gradient (const Point<dim>   &p,
 
 template <int dim>
 void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
-						   typename std::vector<Tensor<1,dim> > &gradients) const
+						   std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (gradients.size() == this->n_components,
 	  ExcDimensionMismatch(gradients.size(), this->n_components));
@@ -188,8 +188,8 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
 
 
 template <int dim>
-void AutoDerivativeFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &points,
-						 typename std::vector<Tensor<1,dim> >    &gradients,
+void AutoDerivativeFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
+						 std::vector<Tensor<1,dim> >    &gradients,
 						 const unsigned int              comp) const
 {
   Assert (gradients.size() == points.size(),
@@ -247,8 +247,8 @@ void AutoDerivativeFunction<dim>::gradient_list (const typename std::vector<Poin
 template <int dim>
 void 
 AutoDerivativeFunction<dim>::
-vector_gradient_list (const typename std::vector<Point<dim> >            &points,
-		      typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const
+vector_gradient_list (const std::vector<Point<dim> >            &points,
+		      std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));

@@ -205,7 +205,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const typename std::vector<T> &v);
+  unsigned int memory_consumption (const std::vector<T> &v);
 
 				   /**
 				    * Estimate the amount of memory
@@ -293,7 +293,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const typename std::vector<T *> &v);
+  unsigned int memory_consumption (const std::vector<T *> &v);
 
 				   /** 
 				    * Specialization of the
@@ -318,7 +318,7 @@ namespace MemoryConsumption
 				    */
   template <typename A, typename B>
   inline
-  unsigned int memory_consumption (const typename std::pair<A,B> &p);
+  unsigned int memory_consumption (const std::pair<A,B> &p);
     
 				   /**
 				    * Return the amount of memory
@@ -466,7 +466,7 @@ namespace MemoryConsumption
 #endif
 
   template <typename T>
-  unsigned int memory_consumption (const typename std::vector<T> &v)
+  unsigned int memory_consumption (const std::vector<T> &v)
   {
     unsigned int mem = sizeof(std::vector<T>);
     const unsigned int n = v.size();
@@ -544,7 +544,7 @@ namespace MemoryConsumption
     
   template <typename T>
   inline
-  unsigned int memory_consumption (const typename std::vector<T *> &v)
+  unsigned int memory_consumption (const std::vector<T *> &v)
   {
     return (v.capacity() * sizeof(T *) +
 	    sizeof(v));
@@ -554,7 +554,7 @@ namespace MemoryConsumption
 				    
   template <typename A, typename B>
   inline
-  unsigned int memory_consumption (const typename std::pair<A,B> &p)
+  unsigned int memory_consumption (const std::pair<A,B> &p)
   {
     return (memory_consumption(p.first) +
 	    memory_consumption(p.second));

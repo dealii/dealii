@@ -97,8 +97,8 @@ namespace Functions
 
   template<int dim>
   void 
-  CutOffFunctionLinfty<dim>::value_list (const typename std::vector<Point<dim> > &points,
-					 std::vector<double>                     &values,
+  CutOffFunctionLinfty<dim>::value_list (const std::vector<Point<dim> > &points,
+					 std::vector<double>            &values,
 					 const unsigned int component) const
   {
     Assert (values.size() == points.size(),
@@ -120,7 +120,7 @@ namespace Functions
   template<int dim>
   void
   CutOffFunctionLinfty<dim>::vector_value_list (
-    const typename std::vector<Point<dim> > &points,
+    const std::vector<Point<dim> > &points,
     std::vector<Vector<double> >           &values) const
   {
     Assert (values.size() == points.size(),
@@ -169,8 +169,8 @@ namespace Functions
 
   template<int dim>
   void 
-  CutOffFunctionW1<dim>::value_list (const typename std::vector<Point<dim> > &points,
-				     std::vector<double>                     &values,
+  CutOffFunctionW1<dim>::value_list (const std::vector<Point<dim> > &points,
+				     std::vector<double>            &values,
 				     const unsigned int component) const
   {
     Assert (values.size() == points.size(),
@@ -193,7 +193,7 @@ namespace Functions
   template<int dim>
   void
   CutOffFunctionW1<dim>::vector_value_list (
-    const typename std::vector<Point<dim> > &points,
+    const std::vector<Point<dim> > &points,
     std::vector<Vector<double> >           &values) const
   {
     Assert (values.size() == points.size(),
@@ -247,8 +247,8 @@ namespace Functions
 
   template<int dim>
   void 
-  CutOffFunctionCinfty<dim>::value_list (const typename std::vector<Point<dim> > &points,
-					 std::vector<double>                     &values,
+  CutOffFunctionCinfty<dim>::value_list (const std::vector<Point<dim> > &points,
+					 std::vector<double>            &values,
 					 const unsigned int component) const
   {
     Assert (values.size() == points.size(),
@@ -278,7 +278,7 @@ namespace Functions
   template<int dim>
   void
   CutOffFunctionCinfty<dim>::vector_value_list (
-    const typename std::vector<Point<dim> > &points,
+    const std::vector<Point<dim> > &points,
     std::vector<Vector<double> >           &values) const
   {
     Assert (values.size() == points.size(),

@@ -52,8 +52,8 @@ using namespace std;
 
 template <int rank, int dim>
 void
-TensorFunction<rank, dim>::value_list (const typename std::vector<Point<dim> > &points,
-				       typename std::vector<value_type>        &values) const
+TensorFunction<rank, dim>::value_list (const std::vector<Point<dim> > &points,
+				       std::vector<value_type>        &values) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -74,8 +74,8 @@ TensorFunction<rank, dim>::gradient (const Point<dim> &) const
 
 template <int rank, int dim>
 void
-TensorFunction<rank, dim>::gradient_list (const typename std::vector<Point<dim> >   &points,
-					  typename std::vector<gradient_type> &gradients) const
+TensorFunction<rank, dim>::gradient_list (const std::vector<Point<dim> >   &points,
+					  std::vector<gradient_type> &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));

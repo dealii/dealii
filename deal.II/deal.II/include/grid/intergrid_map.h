@@ -206,7 +206,7 @@ class InterGridMap
 				      * The actual data. Hold one iterator
 				      * for each cell on each level.
 				      */
-    typename std::vector<typename std::vector<cell_iterator> > mapping;
+    std::vector<std::vector<cell_iterator> > mapping;
 
 				     /**
 				      * Store a pointer to the source grid.

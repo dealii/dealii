@@ -59,6 +59,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	AC_MSG_RESULT(C++ compiler is gcc-3.2)
   	GXX_VERSION=gcc3.2
   	;;
+      *3.3*)
+  	AC_MSG_RESULT(C++ compiler is gcc-3.3)
+  	GXX_VERSION=gcc3.3
+  	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	dnl These compilers are too old to support a useful subset
   	dnl of modern C++, so we don't support them
@@ -556,9 +560,16 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
   	  AC_MSG_RESULT(F77 compiler is gcc-3.2)
   	  F77_VERSION=gcc3.2
   	  ;;
+        *3.3*)
+  	  AC_MSG_RESULT(F77 compiler is gcc-3.3)
+  	  F77_VERSION=gcc3.3
+  	  ;;
         *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	  dnl These compilers are too old to support a useful subset
-  	  dnl of modern C++, so we don't support them
+  	  dnl of modern C++, so we don't support them. gcc2.7.2 is 
+	  dnl probably the only one that around on reasonably modern
+	  dnl systems these times, but maybe someone tries to run
+	  dnl deal.II on really old systems?
   	  AC_MSG_RESULT(F77 compiler is $G77_VERSION_STRING)
   	  AC_MSG_ERROR(F77 compiler is not supported)
   	  ;;
@@ -630,7 +641,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 [
   case "$F77_VERSION" in
-    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.0 | gcc3.1 | gcc3.2)
+    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.[0123])
         F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
         F77FLAGSO="$FFLAGS -O2"
   

@@ -712,7 +712,8 @@ FullMatrix<number>::print (std::ostream       &s,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::add (const number s,const FullMatrix<number2>& src)
+FullMatrix<number>::add (const number               s,
+			 const FullMatrix<number2> &src)
 {
   Assert (this->data() != 0, ExcEmptyMatrix());
   

@@ -86,7 +86,7 @@ template <int dim>
 void
 CylinderBoundary<dim>::get_intermediate_points_on_line (
   const typename Triangulation<dim>::line_iterator &line,
-  typename std::vector<Point<dim> > &points) const
+  std::vector<Point<dim> > &points) const
 {
   if (points.size()==1)
     points[0]=get_new_point_on_line(line);
@@ -99,7 +99,7 @@ template <int dim>
 void
 CylinderBoundary<dim>::get_intermediate_points_between_points (
   const Point<dim> &v0, const Point<dim> &v1,
-  typename std::vector<Point<dim> > &points) const
+  std::vector<Point<dim> > &points) const
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
@@ -166,7 +166,7 @@ template <int dim>
 void
 CylinderBoundary<dim>::get_intermediate_points_on_quad (
   const typename Triangulation<dim>::quad_iterator &,
-  typename std::vector<Point<dim> > &) const
+  std::vector<Point<dim> > &) const
 {
   Assert(false, Boundary<dim>::ExcFunctionNotUseful(dim));
 }
@@ -303,7 +303,7 @@ template <int dim>
 void
 HyperBallBoundary<dim>::get_intermediate_points_on_line (
   const typename Triangulation<dim>::line_iterator &line,
-  typename std::vector<Point<dim> > &points) const
+  std::vector<Point<dim> > &points) const
 {
   if (points.size()==1)
     points[0]=get_new_point_on_line(line);
@@ -316,7 +316,7 @@ template <int dim>
 void
 HyperBallBoundary<dim>::get_intermediate_points_between_points (
   const Point<dim> &p0, const Point<dim> &p1,
-  typename std::vector<Point<dim> > &points) const
+  std::vector<Point<dim> > &points) const
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
@@ -428,7 +428,7 @@ template <int dim>
 void
 HyperBallBoundary<dim>::get_intermediate_points_on_quad (
   const typename Triangulation<dim>::quad_iterator &,
-  typename std::vector<Point<dim> > &) const
+  std::vector<Point<dim> > &) const
 {
   Assert(false, Boundary<dim>::ExcFunctionNotUseful(dim));
 }
@@ -541,7 +541,7 @@ template <int dim>
 void
 HalfHyperBallBoundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				 typename std::vector<Point<dim> > &points) const
+				 std::vector<Point<dim> > &points) const
 {
 				   // check whether center of object is
 				   // at x==0, since then it belongs
@@ -560,7 +560,7 @@ template <int dim>
 void
 HalfHyperBallBoundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				 typename std::vector<Point<dim> > &points) const
+				 std::vector<Point<dim> > &points) const
 {
 				   // check whether center of object is
 				   // at x==0, since then it belongs
@@ -709,7 +709,7 @@ template <int dim>
 void
 HalfHyperShellBoundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				 typename std::vector<Point<dim> > &points) const
+				 std::vector<Point<dim> > &points) const
 {
 				   // check whether center of object is
 				   // at x==0, since then it belongs
@@ -728,7 +728,7 @@ template <int dim>
 void
 HalfHyperShellBoundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				 typename std::vector<Point<dim> > &points) const
+				 std::vector<Point<dim> > &points) const
 {
 				   // check whether center of object is
 				   // at x==0, since then it belongs

@@ -233,7 +233,7 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Computed once.
 					  */
-	typename std::vector<Tensor<1,dim> > shape_derivatives;
+	std::vector<Tensor<1,dim> > shape_derivatives;
 	
 					 /**
 					  * Tensors of covariant
@@ -241,7 +241,7 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Computed on each cell.
 					  */
-	typename std::vector<Tensor<2,dim> > covariant;
+	std::vector<Tensor<2,dim> > covariant;
 	
 					 /**
 					  * Tensors of covariant
@@ -249,7 +249,7 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Computed on each cell.
 					  */
-	typename std::vector<Tensor<2,dim> > contravariant;
+	std::vector<Tensor<2,dim> > contravariant;
 	
 					 /**
 					  * Unit tangential vectors. Used
@@ -259,19 +259,19 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Filled once.
 					  */
-        typename std::vector<typename std::vector<Tensor<1,dim> > > unit_tangentials;
+        std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 	
 					 /**
 					  * Auxuliary vectors for internal use.
 					  */
-        typename std::vector<typename std::vector<Tensor<1,dim> > > aux;
+        std::vector<std::vector<Tensor<1,dim> > > aux;
 
 					 /**
 					  * Stores the support points of
 					  * the mapping shape functions on
 					  * the @p{cell_of_current_support_points}.
 					  */
-	typename std::vector<Point<dim> > mapping_support_points;
+	std::vector<Point<dim> > mapping_support_points;
 	
 					 /**
 					  * Stores the cell of which the
@@ -359,7 +359,7 @@ class MappingQ1 : public Mapping<dim>
 				      * @p{data.is_mapping_q1_data}
 				      * equals @p{true} or @p{false}.
 				      */
-    void compute_shapes (const typename std::vector<Point<dim> > &unit_points,
+    void compute_shapes (const std::vector<Point<dim> > &unit_points,
 			 InternalData &data) const;
 
 				     /**
@@ -400,7 +400,7 @@ class MappingQ1 : public Mapping<dim>
 		       const unsigned int   npts,
 		       const unsigned int   offset,
 		       InternalData        &data,
-		       typename std::vector<Point<dim> > &quadrature_points) const;
+		       std::vector<Point<dim> > &quadrature_points) const;
     
 				     /**
 				      * Do the computation for the
@@ -413,16 +413,16 @@ class MappingQ1 : public Mapping<dim>
 			    const unsigned int      offset,
 			    const std::vector<double>   &weights,
 			    InternalData           &mapping_data,
-			    typename std::vector<Point<dim> >    &quadrature_points,
+			    std::vector<Point<dim> >    &quadrature_points,
 			    std::vector<double>         &JxW_values,
-			    typename std::vector<Tensor<1,dim> > &boundary_form,
-			    typename std::vector<Point<dim> > &normal_vectors) const;
+			    std::vector<Tensor<1,dim> > &boundary_form,
+			    std::vector<Point<dim> > &normal_vectors) const;
     
 				     /**
 				      * Compute shape values and/or
 				      * derivatives.
 				      */
-    virtual void compute_shapes_virtual (const typename std::vector<Point<dim> > &unit_points,
+    virtual void compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
 					 InternalData &data) const;
 
 				     /**
@@ -535,7 +535,7 @@ class MappingQ1 : public Mapping<dim>
 				      */
     virtual void compute_mapping_support_points(
       const typename Triangulation<dim>::cell_iterator &cell,
-      typename std::vector<Point<dim> > &a) const;
+      std::vector<Point<dim> > &a) const;
 
 				     /**
 				      * Number of shape functions. Is

@@ -95,7 +95,7 @@ unsigned int GridReordering<dim>::Cell::count_neighbors () const
 
 template <int dim>
 void
-GridReordering<dim>::Cell::insert_faces (typename std::map<Face,FaceData> &/*global_faces*/)
+GridReordering<dim>::Cell::insert_faces (std::map<Face,FaceData> &/*global_faces*/)
 {
   Assert (false, ExcNotImplemented());
 };
@@ -730,9 +730,9 @@ GridReordering<dim>::FaceData::FaceData () :
 
 template <int dim>
 inline
-void GridReordering<dim>::track_back (typename std::vector<Cell> &cells,
-				      RotationStack              &rotation_states,
-				      const unsigned              tbtc)
+void GridReordering<dim>::track_back (std::vector<Cell> &cells,
+				      RotationStack     &rotation_states,
+				      const unsigned     tbtc)
 {
   unsigned int track_back_to_cell = tbtc;
   
@@ -806,8 +806,8 @@ void GridReordering<dim>::track_back (typename std::vector<Cell> &cells,
 
 
 template <int dim>
-bool GridReordering<dim>::try_rotate_single_neighbors (typename std::vector<Cell> &cells,
-						       RotationStack              &rotation_states)
+bool GridReordering<dim>::try_rotate_single_neighbors (std::vector<Cell> &cells,
+						       RotationStack     &rotation_states)
 {
 				   // the rotation state of the cell
 				   // which we try to add by rotating
@@ -922,8 +922,8 @@ bool GridReordering<dim>::try_rotate_single_neighbors (typename std::vector<Cell
 
 
 template <int dim>
-void GridReordering<dim>::find_reordering (typename std::vector<Cell>           &cells,
-					   typename std::vector<CellData<dim> > &original_cells,
+void GridReordering<dim>::find_reordering (std::vector<Cell>           &cells,
+					   std::vector<CellData<dim> > &original_cells,
 					   const std::vector<unsigned int>      &new_cell_numbers)
 {
 //  cout << "Starting..." << flush;
@@ -1110,8 +1110,8 @@ void GridReordering<dim>::find_reordering (typename std::vector<Cell>           
 
 template <int dim>
 std::vector<unsigned int>
-GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
-				    typename std::map<Face,FaceData> &faces)
+GridReordering<dim>::presort_cells (std::vector<Cell>       &cells,
+				    std::map<Face,FaceData> &faces)
 {
 				   // first find the cell with the
 				   // least neighbors
@@ -1264,7 +1264,7 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
 		      
 
 template <int dim>
-void GridReordering<dim>::reorder_cells (typename std::vector<CellData<dim> > &original_cells)
+void GridReordering<dim>::reorder_cells (std::vector<CellData<dim> > &original_cells)
 {
 				   // we need more information than
 				   // provided by the input parameter,

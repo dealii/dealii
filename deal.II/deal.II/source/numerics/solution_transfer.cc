@@ -151,7 +151,7 @@ void SolutionTransfer<dim, number>::refine_interpolate (Vector<number> &vec) con
 template<int dim, typename number>
 void
 SolutionTransfer<dim, number>::
-prepare_for_coarsening_and_refinement(const typename std::vector<Vector<number> > &all_in)
+prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in)
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
   Assert(!prepared_for!=coarsening_and_refinement, 
@@ -277,8 +277,8 @@ SolutionTransfer<dim, number>::prepare_for_coarsening_and_refinement(const Vecto
 
 template<int dim, typename number>
 void SolutionTransfer<dim, number>::
-interpolate (const typename std::vector<Vector<number> > &all_in,
-	     typename std::vector<Vector<number> >       &all_out) const
+interpolate (const std::vector<Vector<number> > &all_in,
+	     std::vector<Vector<number> >       &all_out) const
 {
   Assert(prepared_for==coarsening_and_refinement, ExcNotPrepared());
   for (unsigned int i=0; i<all_in.size(); ++i)

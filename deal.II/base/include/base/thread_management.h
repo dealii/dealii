@@ -4577,7 +4577,7 @@ namespace Threads
 				    * @p{[begin[i],end[i])}.
 				    */
   template <typename ForwardIterator>
-  typename std::vector<typename std::pair<ForwardIterator,ForwardIterator> >
+  std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
 	       const ForwardIterator &end,
 	       const unsigned int n_intervals);
@@ -7374,12 +7374,12 @@ namespace Threads
 
   
   template <typename ForwardIterator>
-  typename std::vector<typename std::pair<ForwardIterator,ForwardIterator> >
+  std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
 	       const ForwardIterator &end,
 	       const unsigned int     n_intervals)
   {
-    typedef typename std::pair<ForwardIterator,ForwardIterator> IteratorPair;
+    typedef std::pair<ForwardIterator,ForwardIterator> IteratorPair;
 
 				     // in non-multithreaded mode, we
 				     // often have the case that this
@@ -7389,7 +7389,7 @@ namespace Threads
 				     // case efficiently
     
     if (n_intervals==1)
-      return (typename std::vector<IteratorPair>
+      return (std::vector<IteratorPair>
 	      (1, IteratorPair(begin, end)));
     
 				     // if more than one interval

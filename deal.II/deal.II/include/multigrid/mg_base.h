@@ -101,7 +101,7 @@ class MGLevelObject : public Subscriptor
 				     /**
 				      * Array of the objects to be held.
 				      */
-    typename std::vector<Object> objects;
+    std::vector<Object> objects;
 };
 
 

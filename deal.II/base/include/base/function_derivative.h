@@ -81,7 +81,7 @@ class FunctionDerivative : public Function<dim>
 				      * values are accessed.
 				      */
     FunctionDerivative (const Function<dim>            &f,
-			const typename std::vector<Point<dim> > &direction,
+			const std::vector<Point<dim> > &direction,
 			const double                    h = 1.e-6);
     
 				     /**
@@ -109,7 +109,7 @@ class FunctionDerivative : public Function<dim>
 				      * Function values at multiple
 				      * points.
 				      */
-    virtual void value_list (const typename std::vector<Point<dim> > &points,
+    virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<double>                     &values,
 			     const unsigned int                       component = 0) const;    
 
@@ -156,7 +156,7 @@ class FunctionDerivative : public Function<dim>
 				      * increment vector for the
 				      * formula.
 				      */
-    typename std::vector<Point<dim> > incr;
+    std::vector<Point<dim> > incr;
 };
 
 #endif

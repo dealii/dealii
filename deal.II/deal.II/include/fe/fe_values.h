@@ -103,7 +103,7 @@ class FEValuesData
 				      * @ref{ShapeVector} data type.
 				      */
     typedef
-    typename std::vector<typename std::vector<Tensor<1,dim> > >
+    std::vector<std::vector<Tensor<1,dim> > >
     GradientVector;
 
 				     /**
@@ -111,7 +111,7 @@ class FEValuesData
 				      * derivatives.
 				      */
     typedef
-    typename std::vector<typename std::vector<Tensor<2,dim> > >
+    std::vector<std::vector<Tensor<2,dim> > >
     GradGradVector;
     
 				     /**
@@ -165,21 +165,21 @@ class FEValuesData
 				      * real element, rather than on the
 				      * reference element.
 				      */
-    typename std::vector<Point<dim> >  quadrature_points;
+    std::vector<Point<dim> >  quadrature_points;
 
 				     /**
 				      * List of outward normal vectors at the
 				      * quadrature points. This field is filled
 				      * in by the finite element class.
 				      */
-    typename std::vector<Point<dim> >  normal_vectors;
+    std::vector<Point<dim> >  normal_vectors;
 
                                      /**
 				      * List of boundary forms at the
 				      * quadrature points. This field is filled
 				      * in by the finite element class.
 				      */
-    typename std::vector<Tensor<1,dim> >  boundary_forms;
+    std::vector<Tensor<1,dim> >  boundary_forms;
 
 				     /**
 				      * Indicate the first row which a
@@ -442,7 +442,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector& fe_function,
-			      typename std::vector<number>& values) const;
+			      std::vector<number>& values) const;
 
 				     /**
 				      * Access to vector valued finite
@@ -462,7 +462,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector       &fe_function,
-			      typename std::vector<Vector<number> > &values) const;
+			      std::vector<Vector<number> > &values) const;
 
     				     /**
 				      * Gradient of the @p{i}th shape
@@ -547,7 +547,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector      &fe_function,
-			     typename std::vector<Tensor<1,dim> > &gradients) const;
+			     std::vector<Tensor<1,dim> > &gradients) const;
 
 				     /**
 				      * Return the gradients of the finite
@@ -576,7 +576,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector               &fe_function,
-			     typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const;
+			     std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
 
     				     /**
 				      * 2nd derivatives of
@@ -663,7 +663,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector>
     void get_function_2nd_derivatives (const InputVector& fe_function,
-				       typename std::vector<Tensor<2,dim> >& second_derivatives) const;
+				       std::vector<Tensor<2,dim> >& second_derivatives) const;
 
     
 				     /**
@@ -690,7 +690,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector>
     void get_function_2nd_derivatives (const InputVector      &fe_function,
-				       typename std::vector<typename std::vector<Tensor<2,dim> > > &second_derivatives) const;
+				       std::vector<std::vector<Tensor<2,dim> > > &second_derivatives) const;
     
 				     /**
 				      * Position of the @p{i}th
@@ -702,7 +702,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Return a pointer to the vector of
 				      * quadrature points.
 				      */
-    const typename std::vector<Point<dim> > & get_quadrature_points () const;
+    const std::vector<Point<dim> > & get_quadrature_points () const;
 
 				     /**
 				      * Mapped quadrature weight. This
@@ -995,13 +995,13 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * vectors to the cell at the
 				      * quadrature points.
 				      */
-    const typename std::vector<Point<dim> > & get_normal_vectors () const;
+    const std::vector<Point<dim> > & get_normal_vectors () const;
 
 				     /**
 				      * Return the list of outward normal
 				      * vectors times quadrature weights.
 				      */
-    const typename std::vector<Tensor<1,dim> > & get_boundary_forms () const;
+    const std::vector<Tensor<1,dim> > & get_boundary_forms () const;
 
 				     /**
 				      * Return the present

@@ -48,7 +48,7 @@ class TensorProductPolynomials
 				      * member variable @p{polynomials}.
 				      */
     template <class Pol>
-    TensorProductPolynomials(const typename std::vector<Pol> &pols);
+    TensorProductPolynomials(const std::vector<Pol> &pols);
 
 				     /**
 				      * Computes the value and the
@@ -76,8 +76,8 @@ class TensorProductPolynomials
 				      */
     void compute(const Point<dim>                     &unit_point,
 		 std::vector<double>                  &values,
-		 typename std::vector<Tensor<1,dim> > &grads,
-		 typename std::vector<Tensor<2,dim> > &grad_grads) const;
+		 std::vector<Tensor<1,dim> > &grads,
+		 std::vector<Tensor<2,dim> > &grad_grads) const;
     
 				     /**
 				      * Computes the value of the
@@ -214,7 +214,7 @@ class TensorProductPolynomials
 template <int dim>
 template <class Pol>
 TensorProductPolynomials<dim>::
-TensorProductPolynomials(const typename std::vector<Pol> &pols)
+TensorProductPolynomials(const std::vector<Pol> &pols)
 		:
 		polynomials (pols.begin(), pols.end()),
 		n_tensor_pols(power(pols.size(), dim)),

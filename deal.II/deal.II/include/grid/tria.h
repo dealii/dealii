@@ -1851,8 +1851,8 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * and the @ref{GridIn} and
 				      * @ref{GridReordering} class.
 				      */
-    virtual void create_triangulation (const typename std::vector<Point<dim> >    &vertices,
-				       const typename std::vector<CellData<dim> > &cells,
+    virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
+				       const std::vector<CellData<dim> > &cells,
 				       const SubCellData                          &subcelldata);
 
 				     /**
@@ -2941,7 +2941,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * function
 				      * @ref{get_used_vertices}.
 				      */
-    const typename std::vector<Point<dim> > &
+    const std::vector<Point<dim> > &
     get_vertices () const;
     
 				     /**
@@ -3241,13 +3241,13 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *
 				      *  Usage is like @p{levels[3]->quads}.
 				      */
-    typename std::vector<TriangulationLevel<dim>*> levels;
+    std::vector<TriangulationLevel<dim>*> levels;
 
 				     /**
 				      *  Array of the vertices of this
 				      *  triangulation.
 				      */
-    typename std::vector<Point<dim> >              vertices;
+    std::vector<Point<dim> >              vertices;
 
 				     /**
 				      *  Array storing a bit-pattern which

@@ -170,8 +170,8 @@ class Quadrature : public Subscriptor
 				      * the weights sum up to one, but
 				      * this is not checked.
 				      */
-    Quadrature (const typename std::vector<Point<dim> > &points,
-		const std::vector<double>               &weights);
+    Quadrature (const std::vector<Point<dim> > &points,
+		const std::vector<double>      &weights);
 
 				     /**
 				      * Construct a dummy quadrature
@@ -188,7 +188,7 @@ class Quadrature : public Subscriptor
 				      * transformed cell in real
 				      * space.
 				      */
-    Quadrature (const typename std::vector<Point<dim> > &points);
+    Quadrature (const std::vector<Point<dim> > &points);
 
 				     /**
 				      * Constructor for a one-point
@@ -211,7 +211,7 @@ class Quadrature : public Subscriptor
 				      * Return a reference to the whole array of
 				      * quadrature points.
 				      */
-    const typename std::vector<Point<dim> > & get_points () const;
+    const std::vector<Point<dim> > & get_points () const;
     
 				     /**
 				      * Return the weight of the @p{i}th
@@ -238,7 +238,7 @@ class Quadrature : public Subscriptor
 				      * List of quadrature points. To be filled
 				      * by the constructors of derived classes.
 				      */
-    typename std::vector<Point<dim> > quadrature_points;
+    std::vector<Point<dim> > quadrature_points;
 
 				     /**
 				      * List of weights of the quadrature points.
@@ -420,7 +420,7 @@ class QProjector
 				      */
     static void project_to_face (const SubQuadrature &quadrature,
 				 const unsigned int      face_no,
-				 typename std::vector<Point<dim> > &q_points);
+				 std::vector<Point<dim> > &q_points);
 
     				     /**
 				      * Compute the quadrature points
@@ -434,7 +434,7 @@ class QProjector
     static void project_to_subface (const SubQuadrature &quadrature,
 				    const unsigned int   face_no,
 				    const unsigned int   subface_no,
-				    typename std::vector<Point<dim> > &q_points);
+				    std::vector<Point<dim> > &q_points);
 
 				     /**
 				      * Take a face quadrature formula

@@ -49,20 +49,20 @@ Histogram::Interval::memory_consumption () const
 
 
 template <typename number>
-void Histogram::evaluate (const typename std::vector<Vector<number> > &values,
-			  const std::vector<double>                   &_y_values,
-			  const unsigned int                           n_intervals,
-			  const IntervalSpacing                        interval_spacing)
+void Histogram::evaluate (const std::vector<Vector<number> > &values,
+			  const std::vector<double>          &y_values_,
+			  const unsigned int                  n_intervals,
+			  const IntervalSpacing               interval_spacing)
 {
   Assert (values.size() > 0, ExcEmptyData());
   Assert (n_intervals > 0, ExcInvalidIntervals());
   for (unsigned int i=0; i<values.size(); ++i)
     Assert (values[i].size() > 0, ExcEmptyData());
-  Assert (values.size() == _y_values.size(),
-	  ExcIncompatibleArraySize(values.size(), _y_values.size()));
+  Assert (values.size() == y_values_.size(),
+	  ExcIncompatibleArraySize(values.size(), y_values_.size()));
 
 				   // store y_values
-  y_values = _y_values;
+  y_values = y_values_;
   
 				   // first find minimum and maximum value
 				   // in the indicators

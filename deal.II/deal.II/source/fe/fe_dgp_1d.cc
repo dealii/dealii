@@ -142,12 +142,12 @@ const double * const
 FE_DGP<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell] =
 {
   {FE_DGP_1d::dgp0_into_dgp0_refined_0, FE_DGP_1d::dgp0_into_dgp0_refined_1},
-    {FE_DGP_1d::dgp1_into_dgp1_refined_0, FE_DGP_1d::dgp1_into_dgp1_refined_1},
-      {FE_DGP_1d::dgp2_into_dgp2_refined_0, FE_DGP_1d::dgp2_into_dgp2_refined_1},
-	{FE_DGP_1d::dgp3_into_dgp3_refined_0, FE_DGP_1d::dgp3_into_dgp3_refined_1},
-	  {FE_DGP_1d::dgp4_into_dgp4_refined_0, FE_DGP_1d::dgp4_into_dgp4_refined_1},
-	    {FE_DGP_1d::dgp5_into_dgp5_refined_0, FE_DGP_1d::dgp5_into_dgp5_refined_1},
-	      {FE_DGP_1d::dgp6_into_dgp6_refined_0, FE_DGP_1d::dgp6_into_dgp6_refined_1}
+  {FE_DGP_1d::dgp1_into_dgp1_refined_0, FE_DGP_1d::dgp1_into_dgp1_refined_1},
+  {FE_DGP_1d::dgp2_into_dgp2_refined_0, FE_DGP_1d::dgp2_into_dgp2_refined_1},
+  {FE_DGP_1d::dgp3_into_dgp3_refined_0, FE_DGP_1d::dgp3_into_dgp3_refined_1},
+  {FE_DGP_1d::dgp4_into_dgp4_refined_0, FE_DGP_1d::dgp4_into_dgp4_refined_1},
+  {FE_DGP_1d::dgp5_into_dgp5_refined_0, FE_DGP_1d::dgp5_into_dgp5_refined_1},
+  {FE_DGP_1d::dgp6_into_dgp6_refined_0, FE_DGP_1d::dgp6_into_dgp6_refined_1}
 };
 
 template <>

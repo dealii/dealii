@@ -72,7 +72,7 @@ class MappingC1 : public MappingQ<dim>
 				      */
     virtual void
     add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
-			     typename std::vector<Point<dim> > &a) const;
+			     std::vector<Point<dim> > &a) const;
 
 				     /**
 				      * For @p{dim=3}. Append the
@@ -98,7 +98,7 @@ class MappingC1 : public MappingQ<dim>
 				      */
     virtual void
     add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
-			    typename std::vector<Point<dim> > &a) const;
+			    std::vector<Point<dim> > &a) const;
 };
 
 

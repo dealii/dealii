@@ -145,7 +145,7 @@ FEValuesBase<dim>::~FEValuesBase ()
 template <int dim>
 template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (const InputVector            &fe_function,
-					     typename std::vector<number> &values) const
+					     std::vector<number> &values) const
 {
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe->n_components() == 1,
@@ -183,7 +183,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector            &fe_fu
 template <int dim>
 template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (const InputVector                     &fe_function,
-					     typename std::vector<Vector<number> > &values) const
+					     std::vector<Vector<number> > &values) const
 {
   Assert (n_quadrature_points == values.size(),
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
@@ -228,7 +228,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector                  
 
 
 template <int dim>
-const typename std::vector<Point<dim> > &
+const std::vector<Point<dim> > &
 FEValuesBase<dim>::get_quadrature_points () const
 {
   Assert (this->update_flags & update_q_points, ExcAccessToUninitializedField());
@@ -252,7 +252,7 @@ template <class InputVector>
 void
 FEValuesBase<dim>::
 get_function_grads (const InputVector                    &fe_function,
-		    typename std::vector<Tensor<1,dim> > &gradients) const
+		    std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
 
@@ -296,7 +296,7 @@ template <class InputVector>
 void
 FEValuesBase<dim>::
 get_function_grads (const InputVector                                           &fe_function,
-		    typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const
+		    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (n_quadrature_points == gradients.size(),
 	  ExcWrongNoOfComponents());
@@ -352,7 +352,7 @@ template <class InputVector>
 void
 FEValuesBase<dim>::
 get_function_2nd_derivatives (const InputVector                    &fe_function,
-			      typename std::vector<Tensor<2,dim> > &second_derivatives) const
+			      std::vector<Tensor<2,dim> > &second_derivatives) const
 {
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
@@ -395,7 +395,7 @@ template <class InputVector>
 void
 FEValuesBase<dim>::
 get_function_2nd_derivatives (const InputVector                                           &fe_function,
-			      typename std::vector<typename std::vector<Tensor<2,dim> > > &second_derivs) const
+			      std::vector<std::vector<Tensor<2,dim> > > &second_derivs) const
 {
   Assert (n_quadrature_points == second_derivs.size(),
 	  ExcWrongNoOfComponents());
@@ -647,7 +647,7 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 
 
 template <int dim>
-const typename std::vector<Point<dim> > &
+const std::vector<Point<dim> > &
 FEFaceValuesBase<dim>::get_normal_vectors () const
 {
   Assert (this->update_flags & update_normal_vectors,
@@ -658,7 +658,7 @@ FEFaceValuesBase<dim>::get_normal_vectors () const
 
 
 template <int dim>
-const typename std::vector<Tensor<1,dim> > &
+const std::vector<Tensor<1,dim> > &
 FEFaceValuesBase<dim>::get_boundary_forms () const
 {
   Assert (this->update_flags & update_boundary_forms,

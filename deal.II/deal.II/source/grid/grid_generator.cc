@@ -848,7 +848,7 @@ void GridGenerator::laplace_transformation (Triangulation<1> &,
 
 template <int dim>
 void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
-					    const typename std::map<unsigned int,Point<dim> > &new_points)
+					    const std::map<unsigned int,Point<dim> > &new_points)
 {
 				   // first provide everything that is
 				   // needed for solving a Laplace

@@ -67,7 +67,7 @@ class MappingCartesian : public Mapping<dim>
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>& quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
-		    typename std::vector<Point<dim> >        &quadrature_points,
+		    std::vector<Point<dim> >        &quadrature_points,
 		    std::vector<double>             &JxW_values) const ;
 
 				     /**
@@ -79,10 +79,10 @@ class MappingCartesian : public Mapping<dim>
 			 const unsigned int face_no,
 			 const Quadrature<dim-1>& quadrature,
 			 typename Mapping<dim>::InternalDataBase &mapping_data,
-			 typename std::vector<Point<dim> >        &quadrature_points,
+			 std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
-			 typename std::vector<Tensor<1,dim> >        &boundary_form,
-			 typename std::vector<Point<dim> >        &normal_vectors) const ;
+			 std::vector<Tensor<1,dim> >        &boundary_form,
+			 std::vector<Point<dim> >        &normal_vectors) const ;
 
 				     /**
 				      * Implementation of the interface in
@@ -94,10 +94,10 @@ class MappingCartesian : public Mapping<dim>
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,
 			    typename Mapping<dim>::InternalDataBase &mapping_data,
-			    typename std::vector<Point<dim> >        &quadrature_points,
+			    std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
-			    typename std::vector<Tensor<1,dim> >        &boundary_form,
-			    typename std::vector<Point<dim> >        &normal_vectors) const ;
+			    std::vector<Tensor<1,dim> >        &boundary_form,
+			    std::vector<Point<dim> >        &normal_vectors) const ;
 
 
 				     /**
@@ -116,9 +116,9 @@ class MappingCartesian : public Mapping<dim>
 				      */
     virtual void
     transform_contravariant (typename std::vector<Tensor<1,dim> >::iterator begin,
-			 typename std::vector<Tensor<1,dim> >::const_iterator end,
-			 typename std::vector<Tensor<1,dim> >::const_iterator src,
-			 const typename Mapping<dim>::InternalDataBase &mapping_data) const;
+			     typename std::vector<Tensor<1,dim> >::const_iterator end,
+			     typename std::vector<Tensor<1,dim> >::const_iterator src,
+			     const typename Mapping<dim>::InternalDataBase &mapping_data) const;
 
 				     /**
 				      * Transforms the point @p{p} on
@@ -162,7 +162,6 @@ class MappingCartesian : public Mapping<dim>
     DeclException0 (ExcInvalidData);
 
   protected:
-
 				     /** 
 				      * Storage for internal data of
 				      * d-linear transformation.
@@ -196,7 +195,7 @@ class MappingCartesian : public Mapping<dim>
 					  * points. Especially, all
 					  * points of all faces.
 					  */
-	typename std::vector<Point<dim> > quadrature_points;
+	std::vector<Point<dim> > quadrature_points;
 	
 					 /**
 					  * Unit tangential vectors. Used
@@ -206,12 +205,12 @@ class MappingCartesian : public Mapping<dim>
 					  *
 					  * Filled once.
 					  */
-        typename std::vector<typename std::vector<Tensor<1,dim> > > unit_tangentials;
+        std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 	
 					 /**
 					  * Auxiliary vectors for internal use.
 					  */
-        typename std::vector<typename std::vector<Tensor<1,dim> > > aux;
+        std::vector<std::vector<Tensor<1,dim> > > aux;
     };
     
 				     /**
@@ -222,8 +221,8 @@ class MappingCartesian : public Mapping<dim>
 		       const unsigned int face_no,
 		       const unsigned int sub_no,
 		       InternalData& data,
-		       typename std::vector<Point<dim> > &quadrature_points,
-		       typename std::vector<Point<dim> >& normal_vectors) const;
+		       std::vector<Point<dim> > &quadrature_points,
+		       std::vector<Point<dim> >& normal_vectors) const;
 
   private:
 				     /**

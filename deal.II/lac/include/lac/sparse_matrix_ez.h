@@ -754,7 +754,7 @@ class SparseMatrixEZ : public Subscriptor
 					  * entries of a row ordered
 					  * by column number.
 					  */
-	typename std::vector<Entry> values;
+	std::vector<Entry> values;
       };
     
     

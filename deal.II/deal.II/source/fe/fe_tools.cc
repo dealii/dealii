@@ -50,7 +50,7 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 				   // Initialize FEValues for fe1 at
 				   // the unit support points of the
 				   // fe2 element.
-  const typename std::vector<Point<dim> > &
+  const std::vector<Point<dim> > &
     fe2_support_points = fe2.get_unit_support_points ();
 
   Assert(fe2_support_points.size()==fe2.dofs_per_cell,
