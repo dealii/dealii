@@ -2930,7 +2930,7 @@ AC_DEFUN(DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT, dnl
     CXXFLAGS="-Wsynth -Werror -I `pwd`/contrib/boost/include"
     AC_TRY_COMPILE(
       [
-#       include <boost_local/shared_ptr.hpp>
+#       include <boost/shared_ptr.hpp>
       ],
       [
         boost::shared_ptr<int> a,b;
