@@ -109,11 +109,16 @@ all-headers:
 	 done
 	@rm -rf tmp-all-headers
 
-# Generate a link to system specific test program output
 
+# generate a link to system specific test program output. we create
+# the name out of the system and compiler. unfortunately, for intel
+# compilers, the variable $(GXX-VERSION) reads intel_icc7.1 (with
+# proper version number), while for some historic reason we have named
+# the directories in the results/ tree with just icc7.1 (i.e. without
+# the preceding intel_). Thus, strip this part of the compiler name
 compare:
 	cd results; $(MAKE)
-	ln -s results/$(TARGET)+$(GXX-VERSION) compare
+	ln -s results/$(TARGET)+$(GXX-VERSION:intel_%=%) compare
 
 resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
