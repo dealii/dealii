@@ -1334,6 +1334,11 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
 {
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
+
+				   // ignore zero additions
+  if (value == 0)
+    return;
+  
   Entry* entry = allocate(i,j);
   entry->value += value;
 }
