@@ -9,15 +9,6 @@ CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
            -fno-rtti $(INCLUDE)
 
-ifeq ($(shell uname),Linux)
-CXX       = /home/wolf/bin/gcc/bin/c++
-endif
-
-ifeq ($(shell uname),SunOS)
-CXX       = c++
-endif
-
-
 cc-files = $(wildcard *.cc)
 o-files  = $(cc-files:.cc=.o)
 go-files = $(cc-files:.cc=.go)

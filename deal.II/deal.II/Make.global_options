@@ -26,10 +26,6 @@ CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -fno-rtti $(INCLUDE) \
            -Ddeal_II_dimension=$(deal_II_dimension)
 
-ifeq ($(shell uname),Linux)
-CXX       = /home/wolf/bin/gcc/bin/c++
-endif
-
 %.go : %.cc Makefile
 	@echo "======================== Compiling (DEBUG):" $<
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@

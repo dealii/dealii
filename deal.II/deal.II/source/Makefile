@@ -37,15 +37,6 @@ CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -fno-rtti $(INCLUDE) \
            -Ddeal_II_dimension=$(deal_II_dimension)
 
-ifeq ($(shell uname),Linux)
-CXX       = /home/wolf/bin/gcc/bin/c++
-endif
-
-ifeq ($(shell uname),SunOS)
-CXX       = g++
-endif
-
-
 %.go :
 	@echo ============================ Compiling with debugging information:   $<
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@

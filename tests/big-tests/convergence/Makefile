@@ -39,7 +39,7 @@ delete-files = *gnuplot *.eps *ucd *history
 #deal include base path
 D = ../../..
 
-include ../../Make.global_options
+include $D/deal.II/Make.global_options
 
 # get lists of files we need
 cc-files    = $(wildcard *.cc)
