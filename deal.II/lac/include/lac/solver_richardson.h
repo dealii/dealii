@@ -75,9 +75,18 @@ class SolverRichardson : private Solver<VECTOR>
 				      */
     template<class MATRIX, class PRECONDITIONER>
     typename Solver<VECTOR>::ReturnState solve (const MATRIX &A,
-						       VECTOR       &x,
-						       const VECTOR &b,
-						       const PRECONDITIONER& precondition);
+						VECTOR       &x,
+						const VECTOR &b,
+						const PRECONDITIONER& precondition);
+
+				     /**
+				      * Solve $A^Tx=b$ for $x$.
+				      */
+    template<class MATRIX, class PRECONDITIONER>
+    typename Solver<VECTOR>::ReturnState Tsolve (const MATRIX &A,
+						 VECTOR       &x,
+						 const VECTOR &b,
+						 const PRECONDITIONER& precondition);
 
 				     /**
 				      * Set the damping-coefficient.
@@ -171,6 +180,53 @@ SolverRichardson<VECTOR>::solve (const MATRIX &A,
 	break;
 
       precondition.vmult(d,r);
+      x.add(additional_data.omega,d);
+      print_vectors(iter,x,r,d);
+    }
+
+				   // Deallocate Memory
+  memory.free(Vr);
+  memory.free(Vd);
+
+  deallog.pop();
+				   // Output
+  if (conv == SolverControl::failure)
+    return exceeded;
+  else
+    return success;
+}
+
+
+template<class VECTOR>
+template<class MATRIX, class PRECONDITIONER>
+typename Solver<VECTOR>::ReturnState 
+SolverRichardson<VECTOR>::Tsolve (const MATRIX &A,
+				  VECTOR       &x,
+				  const VECTOR &b,
+				  const PRECONDITIONER& precondition)
+{
+  SolverControl::State conv=SolverControl::iterate;
+
+				   // Memory allocation
+  Vr  = memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
+  Vd  = memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
+
+  deallog.push("Richardson");
+
+				   // Main loop
+  for(int iter=0; conv==SolverControl::iterate; iter++)
+    {
+				       // Do not use Tresidual,
+				       // but do it in 2 steps
+      A.Tvmult(r,x);
+      r.sadd(-1.,1.,b);
+      res=sqrt(r*r);
+
+      conv = control().check (iter, criterion());
+      if (conv != SolverControl::iterate)
+	break;
+
+      precondition.Tvmult(d,r);
       x.add(additional_data.omega,d);
       print_vectors(iter,x,r,d);
     }
