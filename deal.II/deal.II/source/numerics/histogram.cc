@@ -205,13 +205,13 @@ void Histogram::write_gnuplot (ostream &out) const
 	for (unsigned int n=0; n<intervals[i].size(); ++n)
 	  out << intervals[i][n].left_point
 	      << ' '
-	      << i
+	      << y_values[i]
 	      << ' '
 	      << intervals[i][n].content
 	      << endl
 	      << intervals[i][n].right_point
 	      << ' '
-	      << i
+	      << y_values[i]
 	      << ' '
 	      << intervals[i][n].content
 	      << endl;
@@ -221,13 +221,17 @@ void Histogram::write_gnuplot (ostream &out) const
 	for (unsigned int n=0; n<intervals[i].size(); ++n)
 	  out << intervals[i][n].left_point
 	      << ' '
-	      << i+1
+	      << (i<intervals.size()-1 ?
+		  y_values[i+1] :
+		  y_values[i] + (y_values[i]-y_values[i-1]))
 	      << ' '
 	      << intervals[i][n].content
 	      << endl
 	      << intervals[i][n].right_point
 	      << ' '
-	      << i+1
+	      << (i<intervals.size()-1 ?
+		  y_values[i+1] :
+		  y_values[i] + (y_values[i]-y_values[i-1]))
 	      << ' '
 	      << intervals[i][n].content
 	      << endl;
