@@ -136,7 +136,7 @@ namespace Evaluation
 	   ++vertex)
 	if (cell->vertex(vertex) == evaluation_point)
 	  {
-	    point_value = solution(cell->vertex_dof_index(vertex,0));
+	    point_value = 1.-solution(cell->vertex_dof_index(vertex,0));
 
 	    evaluation_point_found = true;
 	    break;
@@ -1279,6 +1279,18 @@ namespace LaplaceSolver
   };
 
 
+				   // @sect3{Estimating errors}
+
+				   // @sect4{Error estimation driver functions}
+				   //
+				   // As for the actual computation of
+				   // error estimates, let's start
+				   // with the function that drives
+				   // all this, i.e. calls those
+				   // functions that actually do the
+				   // work, and finally collects the
+				   // results.
+  
   template <int dim>
   void
   WeightedResidual<dim>::
@@ -1312,24 +1324,36 @@ namespace LaplaceSolver
 				       *PrimalSolver<dim>::fe,
 				       dual_weights);
     
-    
-				     // Map of integrals indexed by
-				     // the corresponding face. In this map
-				     // we store the integrated jump of the
-				     // gradient for each face.
-				     // At the end of the function, we again
-				     // loop over the cells and collect the
-				     // contributions of the different faces
-				     // of the cell.
-				     // 
-				     // The initial values for all faces
-				     // are set to -1e20. It would cost
-				     // a lot of time to synchronise the
-				     // initialisation (i.e. the
-				     // creation of new keys) of the map
-				     // in multithreaded mode. Negative
-				     // value indicates that the face
-				     // has not yet been processed.
+				     // Then we set up a map between
+				     // face iterators and their jump
+				     // term contributions of faces to
+				     // the error estimator. The
+				     // reason is that we compute the
+				     // jump terms only once, from one
+				     // side of the face, and want to
+				     // collect them only afterwards
+				     // when looping over all cells a
+				     // second time.
+				     //
+				     // We initialize this map already
+				     // with a value of -1e20 for all
+				     // faces, since this value will
+				     // strike in the results if
+				     // something should go wrong and
+				     // we fail to compute the value
+				     // for a face for some
+				     // reason. Secondly, we
+				     // initialize the map once before
+				     // we branch to different threads
+				     // since this way the map's
+				     // structure is no more modified
+				     // by the individual threads,
+				     // only existing entries are set
+				     // to new values. This relieves
+				     // us from the necessity to
+				     // synchronise the threads
+				     // through a mutex each time they
+				     // write to this map.
     FaceIntegrals face_integrals;
     for (active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
 	 cell!=DualSolver<dim>::dof_handler.end();
@@ -1339,25 +1363,20 @@ namespace LaplaceSolver
 	   ++face_no)
 	face_integrals[cell->face(face_no)].first = -1e20;
 
-				     // reserve one slot for each cell
-				     // and set it to zero
+				     // Then set up a vector with
+				     // error indicators.  Reserve one
+				     // slot for each cell and set it
+				     // to zero.
     error_indicators.reinit (DualSolver<dim>::dof_handler
 			     .get_tria().n_active_cells());
 
-
-				   // all the data needed in the error
-				   // estimator by each of the threads
-				   // is gathered in the following
-				   // stuctures
-				   //
-				   // note that if no component mask
-				   // was given, then treat all
-				   // components
+				     // Now start a number of threads
+				     // which compute the error
+				     // formula on parts of all the
+				     // cells, and once they are all
+				     // started wait until they have
+				     // all finished:
     const unsigned int n_threads = multithread_info.n_default_threads;
-  
-				     // split all cells into threads if
-				     // multithreading is used and run
-				     // the whole thing
     Threads::ThreadManager thread_manager;
     for (unsigned int i=0; i<n_threads; ++i)
       Threads::spawn (thread_manager,
@@ -1370,35 +1389,48 @@ namespace LaplaceSolver
 				     error_indicators,
 				     face_integrals));
     thread_manager.wait();
-  
-				     // finally add up the
-				     // contributions of the faces for
-				     // each cell
-  
+
+				     // Once the error contributions
+				     // are computed, sum them up. For
+				     // this, note that the cell terms
+				     // are already set, and that only
+				     // the edge terms need to be
+				     // collected. For this, loop over
+				     // all cells and their faces,
+				     // make sure that the
+				     // contributions of each of the
+				     // faces are there, and add them
+				     // up.
     unsigned int present_cell=0;  
     for (active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
 	 cell!=DualSolver<dim>::dof_handler.end();
 	 ++cell, ++present_cell)
-      {
-					 // loop over all faces of this cell
-	for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
-	     ++face_no)
-	  {
-	    Assert(face_integrals.find(cell->face(face_no)) != face_integrals.end(),
-		   ExcInternalError());
-	    if (true || (face_integrals[cell->face(face_no)].second
-		==
-			 cell))
-	      error_indicators(present_cell)
-		+= -0.5*face_integrals[cell->face(face_no)].first;
-	    else
-	      error_indicators(present_cell)
-		-= -0.5*face_integrals[cell->face(face_no)].first;
-	  };
-      };
+      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
+	   ++face_no)
+	{
+	  Assert(face_integrals.find(cell->face(face_no)) != face_integrals.end(),
+		 ExcInternalError());
+	  if (true || (face_integrals[cell->face(face_no)].second
+		       ==
+		       cell))
+	    error_indicators(present_cell)
+	      += -0.5*face_integrals[cell->face(face_no)].first;
+	  else
+	    error_indicators(present_cell)
+	      -= -0.5*face_integrals[cell->face(face_no)].first;
+	};
   };
 
 
+				   // @sect4{Estimating on a subset of cells}
+
+				   // Next we have the function that
+				   // is called to estimate the error
+				   // on a subset of cells. The
+				   // function may be called multiply
+				   // if the library was configured to
+				   // use multi-threading. Here it
+				   // goes:
   template <int dim>
   void
   WeightedResidual<dim>::
@@ -1409,48 +1441,69 @@ namespace LaplaceSolver
 		 Vector<float>        &error_indicators,
 		 FaceIntegrals        &face_integrals) const
   {
-    FaceData face_data (*DualSolver<dim>::fe,
-			*DualSolver<dim>::face_quadrature);    
+				     // At the beginning, we
+				     // initialize two variables for
+				     // each thread which may be
+				     // running this function. The
+				     // reason for these functions was
+				     // discussed above, when the
+				     // respective classes were
+				     // discussed, so we here only
+				     // point out that since they are
+				     // local to the function that is
+				     // spawned when running more than
+				     // one thread, the data of these
+				     // objects exists actually once
+				     // per thread, so we don't have
+				     // to take care about
+				     // synchronising access to them.
     CellData cell_data (*DualSolver<dim>::fe,
 			*DualSolver<dim>::quadrature,
 			*PrimalSolver<dim>::rhs_function);
+    FaceData face_data (*DualSolver<dim>::fe,
+			*DualSolver<dim>::face_quadrature);    
 
-				   // First calculate the start cell
-				   // for this thread. We let the
-				   // different threads run on
-				   // interleaved cells, i.e. for
-				   // example if we have 4 threads,
-				   // then the first thread treates
-				   // cells 0, 4, 8, etc, while the
-				   // second threads works on cells 1,
-				   // 5, 9, and so on. The reason is
-				   // that it takes vastly more time
-				   // to work on cells with hanging
-				   // nodes than on regular cells, but
-				   // such cells are not evenly
-				   // distributed across the range of
-				   // cell iterators, so in order to
-				   // have the different threads do
-				   // approximately the same amount of
-				   // work, we have to let them work
-				   // interleaved to the effect of a
-				   // pseudorandom distribution of the
-				   // `hard' cells to the different
-				   // threads.
+				     // Then calculate the start cell
+				     // for this thread. We let the
+				     // different threads run on
+				     // interleaved cells, i.e. for
+				     // example if we have 4 threads,
+				     // then the first thread treates
+				     // cells 0, 4, 8, etc, while the
+				     // second threads works on cells 1,
+				     // 5, 9, and so on. The reason is
+				     // that it takes vastly more time
+				     // to work on cells with hanging
+				     // nodes than on regular cells, but
+				     // such cells are not evenly
+				     // distributed across the range of
+				     // cell iterators, so in order to
+				     // have the different threads do
+				     // approximately the same amount of
+				     // work, we have to let them work
+				     // interleaved to the effect of a
+				     // pseudorandom distribution of the
+				     // `hard' cells to the different
+				     // threads.
     active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
     for (unsigned int t=0;
 	 (t<this_thread) && (cell!=DualSolver<dim>::dof_handler.end());
 	 ++t, ++cell);
-
   
-				     // Then loop over all cells. The
+				     // Next loop over all cells. The
 				     // check for loop end is done at
 				     // the end of the loop, along
 				     // with incrementing the loop
 				     // index.
     for (unsigned int cell_index=this_thread; true; )
       {
-	
+					 // First task on each cell is
+					 // to compute the cell
+					 // residual contributions of
+					 // this cell, and put them
+					 // into the
+					 // ``error_indicators''
+					 // variable:
 	integrate_over_cell (cell, cell_index,
 			     primal_solution,
 			     dual_weights,
@@ -1591,6 +1644,11 @@ namespace LaplaceSolver
   };
 
 
+				   // @sect4{Computing cell term error contributions}
+
+				   // As for the actual computation of
+				   // the error contributions, first
+				   // turn to the cell terms:
   template <int dim>
   void WeightedResidual<dim>::
   integrate_over_cell (const active_cell_iterator &cell,
@@ -1600,14 +1658,27 @@ namespace LaplaceSolver
 		       CellData                   &cell_data,
 		       Vector<float>              &error_indicators) const
   {
+				     // The tasks to be done are what
+				     // appears natural from looking
+				     // at the error estimation
+				     // formula: first compute the the
+				     // right hand side and the
+				     // Laplacian of the numerical
+				     // solution at the quadrature
+				     // points for the cell residual,
     cell_data.fe_values.reinit (cell);
     cell_data.right_hand_side
       ->value_list (cell_data.fe_values.get_quadrature_points(),
 		    cell_data.rhs_values);
     cell_data.fe_values.get_function_2nd_derivatives (primal_solution,
 						      cell_data.cell_grad_grads);
+
+				     // ...then get the dual weights...
     cell_data.fe_values.get_function_values (dual_weights,
 					     cell_data.dual_weights);
+
+				     // ...and finally build the sum
+				     // over all quadrature points:
     double sum = 0;
     for (unsigned int p=0; p<cell_data.fe_values.n_quadrature_points; ++p)
       sum += ((cell_data.rhs_values[p]+trace(cell_data.cell_grad_grads[p])) *
@@ -1615,7 +1686,21 @@ namespace LaplaceSolver
 	      cell_data.fe_values.JxW (p));
     error_indicators(cell_index) += sum;
   };
+
+
+				   // @sect4{Computing edgel term error contributions - 1}
   
+				   // On the other hand, computation
+				   // of the edge terms for the error
+				   // estimate is not so
+				   // simple. First, we have to
+				   // distinguish between faces with
+				   // and without hanging
+				   // nodes. Because it is the simple
+				   // case, we first consider the case
+				   // without hanging nodes on a face
+				   // (let's call this the `regular'
+				   // case):
   template <int dim>
   void WeightedResidual<dim>::
   integrate_over_regular_face (const active_cell_iterator &cell,
@@ -1727,6 +1812,9 @@ namespace LaplaceSolver
   };
 
 
+  				   // @sect4{Computing edgel term
+  				   // error contributions - 2}
+				   // We are still missing the case of faces with hanging nodes. This is what is covered in this function:
 
   template <int dim>
   void WeightedResidual<dim>::
@@ -1912,7 +2000,7 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 	};
 
 
-      if (solver.n_dofs() < 5000)
+      if (solver.n_dofs() < 2000)
 	solver.refine_grid ();
       else
 	break;
