@@ -104,12 +104,12 @@ int main()
       cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
 
-      tr.refine_global(1);
+      tr.refine_global(2);
       dof.distribute_dofs(*fe);
       const unsigned int size = dof.n_dofs();
       deallog << "DoFs " << size << endl;
       deallog << "Levels: " << tr.n_levels() << endl;
-      for (unsigned int step=1;step < 5; ++step)
+      for (unsigned int step=14;step < 15; ++step)
 	{
 	  deallog << "smoothing-steps" << step << endl;
 	  SparsityPattern structure(size, dof.max_couplings_between_dofs());
@@ -130,6 +130,16 @@ int main()
 	  hanging_nodes.condense(A);
 	  hanging_nodes.condense(f);
 
+	  if (true)
+	    {
+	      ofstream out_file("MGf");
+	      DataOut<2> out;
+	      out.attach_dof_handler(dof);
+	      out.add_data_vector(f, "v");
+	      out.build_patches(5);
+	      out.write_gnuplot(out_file);
+	    }
+	  
 	  Vector<double> u;
 	  u.reinit(f);
 	  PrimitiveVectorMemory<> mem;
@@ -149,7 +159,7 @@ int main()
 	    }
 	  equation.build_mgmatrix(mgA, mgdof, quadrature);
 	  
-	  SolverControl cgcontrol(20,0., false, false);
+	  SolverControl cgcontrol(2000,1.e-14, false, false);
 	  PrimitiveVectorMemory<> cgmem;
 	  SolverCG<> cgsolver(cgcontrol, cgmem);
 	  PreconditionIdentity cgprec;
@@ -175,11 +185,18 @@ Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer, tr.n_level
 	  hanging_nodes.distribute(u);
 
 	  DataOut<2> out;
-	  ofstream ofile("out.gnuplot");
+	  char* name = new char[100];
+
+	  sprintf(name, "MG-Q%d-%d", degree, step);
+	  
+	  ofstream ofile(name);
 	  out.attach_dof_handler(dof);
 	  out.add_data_vector(u,"u");
-	  out.build_patches(4);
+	  out.add_data_vector(f,"f");
+	  out.build_patches(5);
 	  out.write_gnuplot(ofile);
+
+	  delete[] name;
 	}
       deallog.pop();
     }
@@ -190,34 +207,9 @@ double
 RHSFunction<dim>::value (const Point<dim>&p,
 			 const unsigned int) const
 {
-//  return 1.;
+  return 1.;
   
   return p(0)*p(0)+p(1)*p(1);
   
   return (2.1)*(sin(p(0))* sin(p(1)));
-}
-
-
-void write_gnuplot (const MGDoFHandler<2>& dofs, const Vector<double>& v, unsigned int level,
-		    ostream &out)
-{
-  MGDoFHandler<2>::cell_iterator cell;
-  MGDoFHandler<2>::cell_iterator endc = dofs.end(level);
-
-  Vector<double> values(dofs.get_fe().dofs_per_cell);
-  
-  unsigned int cell_index=0;
-  for (cell=dofs.begin(level); cell!=endc; ++cell, ++cell_index) 
-    {
-      cell->get_mg_dof_values(v, values);
-      
-      out << cell->vertex(0) << "  " << values(0) << endl;
-      out << cell->vertex(1) << "  " << values(1) << endl;
-      out << endl;
-      out << cell->vertex(3) << "  " << values(3) << endl;
-      out << cell->vertex(2) << "  " << values(2) << endl;
-      out << endl;
-      out << endl;
-    }
-  out << endl;
 }

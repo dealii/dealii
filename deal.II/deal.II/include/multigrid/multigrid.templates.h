@@ -117,7 +117,8 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
 						   // Delete values on refinement edge,
 						   // since restriction will add them again.
 		  for (unsigned int i=0; i<dofs_per_face; ++i)
-		    defect[level](level_face_indices[i]) = 0.;
+		    defect[level](level_face_indices[i])
+		      = 0.;
 		};
 	    };
 	};
@@ -187,19 +188,21 @@ Multigrid<dim>::print_vector (const unsigned int level,
 			      const Vector<double>& v,
 			      const char* name) const
 {
-  Vector<double> out_vector;
-  
   const DoFHandler<dim>* dof = mg_dof_handler;
+  
+  Vector<double> out_vector(dof->n_dofs());
+
+  out_vector = -10000;
   
   const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
 
   vector<unsigned int> global_dof_indices (dofs_per_cell);
   vector<unsigned int> level_dof_indices (dofs_per_cell);
 
-  DoFHandler<dim>::cell_iterator
-    global_cell = dof->begin(level);
-  MGDoFHandler<dim>::cell_iterator
-    level_cell = mg_dof_handler->begin(level);
+  DoFHandler<dim>::active_cell_iterator
+    global_cell = dof->begin_active(level);
+  MGDoFHandler<dim>::active_cell_iterator
+    level_cell = mg_dof_handler->begin_active(level);
   const MGDoFHandler<dim>::cell_iterator
     endc = mg_dof_handler->end(level);
 

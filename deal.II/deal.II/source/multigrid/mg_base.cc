@@ -43,7 +43,7 @@ MGBase::vcycle(const MGSmootherBase     &pre_smooth,
 	       const MGCoarseGridSolver &coarse_grid_solver)
 {
   level_mgstep (maxlevel, pre_smooth, post_smooth, coarse_grid_solver);
-  abort ();
+//  abort ();
 }
 
 
@@ -63,6 +63,8 @@ MGBase::level_mgstep(const unsigned int        level,
   if (level == minlevel)
     {
       coarse_grid_solver(level, solution[level], defect[level]);
+      sprintf(name, "MG%d-solution",level);
+      print_vector(level, solution[level], name);
       return;
     }
 
@@ -99,13 +101,14 @@ MGBase::level_mgstep(const unsigned int        level,
 
   solution[level] += t;
   
-				   // smoothing (modify solution again)
-//TODO: what happens here? smooth overwrites the solution[level],
-//TODO: so the previous two statements should have no effect. No?  
+				   // post-smoothing
+
   post_smooth.smooth(level, solution[level], defect[level]);
 
   sprintf(name, "MG%d-post",level);
   print_vector(level, solution[level], name);
+
+  delete[] name;
 }
 
 
