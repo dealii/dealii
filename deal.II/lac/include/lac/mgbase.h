@@ -10,6 +10,7 @@
 #include <lac/vector.h>
 
 #include <vector>
+#include <base/smartpointer.h>
 
 #define FLOAT float
 
@@ -20,8 +21,15 @@
  * grid solution in a derived class.
  */
 class MGCoarseGridSolver
+  :
+  public Subscriptor
 {
   public:
+				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~MGCoarseGridSolver();
+    
 				     /**
 				      * Coarse grid solving method.
 				      * This is only the interface for
@@ -98,7 +106,9 @@ class MGSmootherIdentity
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-class MGTransferBase  :  public Subscriptor
+class MGTransferBase
+  :
+  public Subscriptor
 {
   public:
 				     /**
@@ -274,6 +284,8 @@ class MGCoarseGridLACIteration
  * @author Guido Kanschat, 1999
  * */
 class MGBase
+  :
+  public Subscriptor
 {
   private:
     MGBase(const MGBase&);
@@ -368,6 +380,59 @@ class MGBase
 };
 
 
+
+/**
+ * Multi-level preconditioner.
+ * Here, we collect all information needed for multi-level preconditioning
+ * and provide the standard interface for LAC iterative methods.
+ *
+ * The template parameter class #MG# is required to inherit #MGBase#.
+ * Furthermore, it needs functions #void copy_to_mg(const VECTOR&)#
+ * to store #src# in the right hand side of the multi-level method and
+ * #void copy_from_mg(VECTOR&)# to store the result of the v-cycle in #dst#.
+ * @author Guido Kanschat, 1999
+ */
+template<class MG, class VECTOR>
+class PreconditionMG
+{
+  public:
+				     /**
+				      * Constructor.
+				      * Arguments are the multigrid object,
+				      * pre-smoother, post-smoother and
+				      * coarse grid solver.
+				      */
+    PreconditionMG(MG& mg,
+		   const MGSmootherBase& pre,
+		   const MGSmootherBase& post,
+		   const MGCoarseGridSolver& coarse);
+				     /**
+				      * Preconditioning operator.
+				      * This is the operator used by LAC
+				      * iterative solvers.
+				      */
+    void operator() (VECTOR& dst, const VECTOR& src) const;
+  private:
+				     /**
+				      * The mulrigrid object.
+				      */
+    SmartPointer<MG> multigrid;
+				     /**
+				      * The pre-smoothing object.
+				      */
+    SmartPointer<const MGSmootherBase> pre;
+				     /**
+				      * The post-smoothing object.
+				      */
+    SmartPointer<const MGSmootherBase> post;
+				     /**
+				      * The coarse grid solver.
+				      */
+    SmartPointer<const MGCoarseGridSolver> coarse;
+};
+
+
+
 template<class SOLVER, class MATRIX, class PRECOND>
 MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>
 ::MGCoarseGridLACIteration(SOLVER& s, const MATRIX& m, const PRECOND& p)
@@ -435,6 +500,29 @@ MGMatrix<MATRIX>::operator[](unsigned int i) const
 {
   Assert((i>=minlevel)&&(i<minlevel+size()),ExcIndexRange(i,minlevel,minlevel+size()));
   return vector<MATRIX>::operator[](i-minlevel);
+}
+
+//////////////////////////////////////////////////////////////////////
+
+template<class MG, class VECTOR>
+PreconditionMG<MG, VECTOR>::PreconditionMG(MG& mg,
+			       const MGSmootherBase& pre,
+			       const MGSmootherBase& post,
+			       const MGCoarseGridSolver& coarse)
+		:
+		multigrid(&mg),
+		pre(&pre),
+		post(&post),
+		coarse(&coarse)
+{}
+
+template<class MG, class VECTOR>
+void
+PreconditionMG<MG, VECTOR>::operator() (VECTOR& dst, const VECTOR& src) const
+{
+  multigrid->copy_to_mg(src);
+  multigrid->vcycle(*pre, *post, *coarse);
+  multigrid->copy_from_mg(dst);
 }
 
 
