@@ -32,7 +32,7 @@
 
 #if DEAL_II_USE_MT == 1
 
-#if defined(__linux__)
+#  if defined(__linux__)
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
@@ -55,9 +55,7 @@ unsigned int MultithreadInfo::get_n_cpus()
   return nCPU;
 }
 
-
-#elif defined(__sun__) || defined(__osf__) || defined(_AIX)
-
+#  elif defined(__sun__) || defined(__osf__) || defined(_AIX)
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
@@ -65,16 +63,14 @@ unsigned int MultithreadInfo::get_n_cpus()
 }
 
 
-#elif defined(__sgi__)
-
+#  elif defined(__sgi__)
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
   return sysconf(_SC_NPROC_ONLN);
 }
 
-
-#else
+#  else
 
 // if you get to see this warning, then this can have two reasons: either
 // because you fell through all of the above #if clauses and on your system
@@ -85,17 +81,17 @@ unsigned int MultithreadInfo::get_n_cpus()
 // about the warning (although it is acknowledged that it is annoying),
 // otherwise you might want to consider implementing the missing feature
 // and submitting it back to the authors of the library.
-#warning Detection of Processors not supported on this OS
+#    warning Detection of Processors not supported on this OS
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
   return 1;
 }
 
-#endif
+#  endif
 
 
-#else				 // not in multithreadmode
+#else				 // not in MT mode
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
