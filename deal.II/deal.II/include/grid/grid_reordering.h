@@ -16,7 +16,6 @@
 
 #include <map>
 #include <vector>
-#include <stack>
 #include <grid/tria.h>
 
 
@@ -110,6 +109,20 @@ class GridReordering : private GridReorderingInfo<dim>
     class Cell;
     class Face;
     class FaceData;
+
+				     /**
+				      * Typedef for a stack type that
+				      * describes the rotational
+				      * states of all cells that have
+				      * already been fitted into the
+				      * grid. It is mostly used like a
+				      * stack, but sometimes we need
+				      * random access into values
+				      * below the top, so we can't use
+				      * the @p{stack} adaptor from
+				      * STL.
+				      */
+    typedef vector<unsigned int> RotationStack;
     
 				     /**
 				      * Class that describes the
@@ -402,10 +415,13 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * as recursive calls but rather
 				      * as eliminated tail-recursion.
 				      */
-    static void track_back (vector<Cell>                               &cells,
-			    stack<unsigned int, vector<unsigned int> > &rotation_states,
-			    unsigned int                                track_back_to_cell);
+    static void track_back (vector<Cell>  &cells,
+			    RotationStack &rotation_states,
+			    unsigned int   track_back_to_cell);
 
+    static bool try_rotate_single_neighbors (vector<Cell>  &cells,
+					     RotationStack &rotation_states);
+    
 				     /**
 				      * This is the main function that
 				      * does the main work. It is
