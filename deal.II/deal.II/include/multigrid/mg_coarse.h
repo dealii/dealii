@@ -53,6 +53,11 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
     void initialize (SOLVER        &,
 		     const MATRIX  &,
 		     const PRECOND &);
+
+				     /**
+				      * Clear all pointers.
+				      */
+    void clear ();
     
 				     /**
 				      * Implementation of the abstract
@@ -132,6 +137,17 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
   solver = &s;
   matrix = &m;
   precondition = &p;
+};
+
+
+template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
+void
+MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+::clear()
+{
+  solver = 0;
+  matrix = 0;
+  precondition = 0;
 };
 
 
