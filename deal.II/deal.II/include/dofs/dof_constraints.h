@@ -132,6 +132,9 @@ class ConstraintMatrix {
 				      * the columns before usage of the matrix.
 				      * This is done through this function.
 				      *
+				      * Also, zero entries are discarded, since
+				      * they are not needed.
+				      *
 				      * After closing, no more entries are
 				      * accepted.
 				      */
