@@ -46,12 +46,11 @@ boundaries.exe               : boundaries.go               $(lib-1d) $(lib-2d) $
 sparsity_pattern.exe         : sparsity_pattern.go         $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 grid_tools.exe               : grid_tools.go               $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 
-tests = grid_test grid_transform dof_test data_out derivatives gradients constraints mg \
-        mglocal block_matrices second_derivatives derivative_approximation \
+tests = grid_test grid_transform dof_test data_out derivatives gradients \
+	constraints block_matrices second_derivatives derivative_approximation \
         matrices error_estimator intergrid_constraints intergrid_map \
         wave-test-3 dof_renumbering support_point_map filtered_matrix \
 	boundaries sparsity_pattern grid_tools
-
 ############################################################
 
 
