@@ -245,6 +245,15 @@ class BlockSparsityPattern : public Subscriptor
 				      * sub-objects.
 				      */
     BlockIndices<columns> column_indices;
+
+				     /**
+				      * Make the block sparse matrix a
+				      * friend, so that it can use our
+				      * #row_indices# and
+				      * #column_indices# objects.
+				      */
+    template <typename number, int r, int c>
+    friend class BlockSparseMatrix;
 };
 
 
@@ -344,7 +353,7 @@ void
 BlockSparsityPattern<rows,columns>::compress ()
 {
   for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<rows; ++j)
+    for (unsigned int j=0; j<columns; ++j)
       sub_objects[i][j].compress ();
 };
 
@@ -355,7 +364,7 @@ bool
 BlockSparsityPattern<rows,columns>::empty () const
 {
   for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<rows; ++j)
+    for (unsigned int j=0; j<columns; ++j)
       if (sub_objects[i][j].empty () == false)
 	return false;
   return true;
@@ -436,7 +445,7 @@ BlockSparsityPattern<rows,columns>::n_nonzero_elements () const
 {
   unsigned int count = 0;
   for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<rows; ++j)
+    for (unsigned int j=0; j<columns; ++j)
       count += sub_objects[i][j].n_nonzero_elements ();
   return count;
 };
@@ -448,7 +457,7 @@ bool
 BlockSparsityPattern<rows,columns>::is_compressed () const
 {
   for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<rows; ++j)
+    for (unsigned int j=0; j<columns; ++j)
       if (sub_objects[i][j].is_compressed () == false)
 	return false;
   return true;
