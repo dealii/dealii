@@ -98,7 +98,10 @@ class PreconditionBlock : public virtual Subscriptor
 					  * parameter.
 					  */
 	AdditionalData (const unsigned int block_size,
-			const double relaxation = 1.);
+			const double relaxation = 1.,
+			const bool invert_diagonal = true,
+			const bool same_diagonal = false,
+			const bool store_diagonals = false);
 
 					 /**
 					  * Relaxation parameter.
@@ -109,6 +112,22 @@ class PreconditionBlock : public virtual Subscriptor
 					  * Block size.
 					  */
 	unsigned int block_size;
+
+					 /**
+					  * Invert diagonal during initialization.
+					  */
+	bool invert_diagonal;
+
+					 /**
+					  * Assume all diagonal blocks
+					  * are equal to save memory.
+					  */
+	bool same_diagonal;
+
+					 /**
+					  * Store original diagonal blocks.
+					  */
+	bool store_diagonals;
     };
     
     
@@ -585,10 +604,16 @@ template<class MATRIX, typename inverse_type>
 inline
 PreconditionBlock<MATRIX, inverse_type>::AdditionalData::
 AdditionalData (const unsigned int block_size,
-		const double relaxation)
+		const double relaxation,
+		const bool invert_diagonal,
+		const bool same_diagonal,
+		const bool store_diagonals)
 		:
 		relaxation (relaxation),
-		block_size(block_size)
+		block_size(block_size),
+		invert_diagonal(invert_diagonal),
+		same_diagonal(same_diagonal),
+		store_diagonals(store_diagonals)
 {}
 
 

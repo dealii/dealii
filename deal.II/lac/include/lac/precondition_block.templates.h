@@ -70,6 +70,10 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   Assert (A->m()%bsize==0, ExcWrongBlockSize(bsize, A->m()));
   blocksize=bsize;
   relaxation = parameters.relaxation;
+  same_diagonal = parameters.same_diagonal;
+  store_diagonals = parameters.store_diagonals;
+  if (parameters.invert_diagonal)
+    invert_diagblocks();
 }
 
 
