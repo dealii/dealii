@@ -1345,6 +1345,11 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   Similarly we define, that the four children of a quad are adjacent to the
  *   vertex with the same number of the old quad.
  *
+ *   Note that information about several of these conventions can be
+ *   extracted at run- or compile-time from the member functions and
+ *   variables of the @ref{GeometryInfo} classes.
+ *
+ *
  *   @sect4{Coordinate systems}
  *
  *   When explicit coordinates are required for points in a cell (e.g for
@@ -1364,10 +1369,11 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   @sect3{Implementation conventions for three spatial dimensions}
  *
- *   By convention, we will use the following numbering for vertices, lines and
- *   faces of hexahedra in three space dimensions. Before giving these 
- *   conventions we declare the following sketch to be the standard way of
- *   drawing 3d pictures of hexahedra:
+ *   By convention, we will use the following numbering conventions
+ *   for vertices, lines and faces of hexahedra in three space
+ *   dimensions. Before giving these conventions we declare the
+ *   following sketch to be the standard way of drawing 3d pictures of
+ *   hexahedra: 
  *   @begin{verbatim}
  *         *-------*        *-------*
  *        /|       |       /       /|
@@ -1383,6 +1389,11 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   The left part of the picture shows the left, bottom and back face of the
  *   cube, while the right one shall be the top, right and front face. You may
  *   recover the whole cube by moving the two parts together into one.
+ *
+ *   Note again that information about several of the following
+ *   conventions can be extracted at run- or compile-time from the
+ *   member functions and variables of the @ref{GeometryInfo} classes.
+ *
  *
  *   @sect4{Vertices}
  *
