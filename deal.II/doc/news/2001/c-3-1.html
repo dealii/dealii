@@ -235,6 +235,21 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: There is now a (private) function <code
+       class="member">SparsityPattern::optimized_lower_bound</code>
+       that is used as an optimized replacement for <code
+       class="member">std::lower_bound</code> for searching in the
+       column number arrays. It unrolls small loops and it also seems
+       that the compiler is able to optimized it better due to
+       eliminated template parameters, making it about twice as fast
+       as the standard implementation. In effect, it also speeds up
+       the SSOR preconditioner that spent about one third of its time
+       in that function by approximately 15 per cent.
+       <br>
+       (WB 2001/04/25)
+       </p>
+
+  <li> <p>
        New: There is now a function <code
        class="member">Vector::scale(Vector)</code>
        that scales each element of the vector by the corresponding

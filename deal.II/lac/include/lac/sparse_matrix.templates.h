@@ -32,6 +32,8 @@
 #endif
 
 
+
+
 template <typename number>
 SparseMatrix<number>::SparseMatrix () :
 		cols(0),
@@ -774,12 +776,12 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
 				       // line denotes the diagonal element,
 				       // which we need not check.
       const unsigned int first_right_of_diagonal_index
-	= (std::lower_bound (&cols->colnums[*rowstart_ptr+1],
-			     &cols->colnums[*(rowstart_ptr+1)],
-			     row)
+	= (SparsityPattern::optimized_lower_bound (&cols->colnums[*rowstart_ptr+1],
+						   &cols->colnums[*(rowstart_ptr+1)],
+						   row)
 	   -
 	   &cols->colnums[0]);
-				       
+      
       for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
 	*dst_ptr -= om* val[j] * dst(cols->colnums[j]);
 
@@ -798,9 +800,9 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
   for (int row=n-1; row>=0; --row, --rowstart_ptr, --dst_ptr)
     {
       const unsigned int first_right_of_diagonal_index
-	= (std::lower_bound (&cols->colnums[*rowstart_ptr+1],
-			     &cols->colnums[*(rowstart_ptr+1)],
-			     static_cast<unsigned int>(row)) -
+	= (SparsityPattern::optimized_lower_bound (&cols->colnums[*rowstart_ptr+1],
+						   &cols->colnums[*(rowstart_ptr+1)],
+						   static_cast<unsigned int>(row)) -
 	   &cols->colnums[0]);
       for (unsigned int j=first_right_of_diagonal_index; j<*(rowstart_ptr+1); ++j)
 	if (cols->colnums[j] > static_cast<unsigned int>(row))

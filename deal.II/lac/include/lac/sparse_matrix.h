@@ -876,7 +876,6 @@ class SparseMatrix : public Subscriptor
 			    const std::pair<unsigned int,unsigned int> interval,
 			    somenumber               *partial_norm) const;
 
-
 				     // make all other sparse matrices
 				     // friends
     template <typename somenumber> friend class SparseMatrix;
@@ -884,6 +883,7 @@ class SparseMatrix : public Subscriptor
 
 
 /*---------------------- Inline functions -----------------------------------*/
+
 
 
 template <typename number>

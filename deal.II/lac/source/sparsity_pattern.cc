@@ -496,6 +496,7 @@ SparsityPattern::max_entries_per_row () const
 
 
 
+inline
 unsigned int
 SparsityPattern::operator () (const unsigned int i,
 			      const unsigned int j) const
@@ -505,19 +506,16 @@ SparsityPattern::operator () (const unsigned int i,
   Assert (j<cols, ExcInvalidIndex(j,cols));
   Assert (compressed, ExcNotCompressed());
 
+				   // let's see whether there is
+				   // something in this line
+  if (rowstart[i] == rowstart[i+1])
+    return invalid_entry;
+  
 				   // check first entry separately, since
 				   // for square matrices this is
-				   // the diagonal entry (check only
-				   // if a first entry exists)
-  if (rowstart[i] != rowstart[i+1]) 
-    {
-      if (j == colnums[rowstart[i]])
-	return rowstart[i];
-    }
-  else
-				     // no first entry exists for this
-				     // line
-    return invalid_entry;
+				   // the diagonal entry
+  if ((i==j) && (rows==cols))
+    return rowstart[i];
 
 				   // all other entries are sorted, so
 				   // we can use a binary seach algorithm
@@ -529,9 +527,12 @@ SparsityPattern::operator () (const unsigned int i,
 				   // at the top of this function, so it
 				   // may not be called for noncompressed
 				   // structures.
-  const unsigned int * const p = std::lower_bound (&colnums[rowstart[i]+1],
-						   &colnums[rowstart[i+1]],
-						   j);
+  const unsigned int * const sorted_region_start = (rows==cols ?
+						    &colnums[rowstart[i]+1] :
+						    &colnums[rowstart[i]]);
+  const unsigned int * const p = optimized_lower_bound (sorted_region_start,
+							&colnums[rowstart[i+1]],
+							j);
   if ((*p == j) &&
       (p != &colnums[rowstart[i+1]]))
     return (p - &colnums[0]);
