@@ -570,7 +570,7 @@ namespace LaplaceSolver
       assemble_matrix (LinearSystem                                         &linear_system,
 		       const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
 		       const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-		       Threads::ThreadMutex                                 &mutex) const      ;
+		       Threads::ThreadMutex                                 &mutex) const;
   };
 
 
