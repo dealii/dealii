@@ -38,9 +38,17 @@
 #include <numerics/data_out.h>
 #include <numerics/error_estimator.h>
 
-                                 // And here come the things that we need
-                                 // particularly for this example program and
-                                 // that weren't in step-8. First, we are
+                                 // And here come the things that we
+                                 // need particularly for this example
+                                 // program and that weren't in
+                                 // step-8. First, we replace the
+                                 // standard output ``std::cout'' by a
+                                 // new stream ``pout'' which is used
+                                 // in parallel computations for
+                                 // generating output only on one of
+                                 // the processes.
+#include <base/conditional_ostream.h>
+				 // Then, we are
                                  // going to replace all linear algebra
                                  // components that involve the (global)
                                  // linear system by classes that wrap
@@ -1203,25 +1211,31 @@ void ElasticProblem<dim>::refine_grid ()
 
 
 
-                                 // Lastly, here is the driver function. It is
-                                 // almost unchanged from step-8, with the
-                                 // exception that we make sure that output is
-                                 // only generated from the first process (by
-                                 // checking that ``this_mpi_process'' equals
-                                 // zero), to avoid getting the same lines of
-                                 // output over and over again, once per
-                                 // process. Apart from this, the only other
-                                 // cosmetic change is that we output how many
-                                 // degrees of freedom there are per process,
-                                 // and how many iterations it took for the
+                                 // Lastly, here is the driver
+                                 // function. It is almost unchanged
+                                 // from step-8, with the exception
+                                 // that we replace ``std::cout'' by
+                                 // the ``pout'' stream. By setting
+                                 // its condition to
+                                 // ``this_mpi_process==0'', we make
+                                 // sure that output is only generated
+                                 // from the first process and that we
+                                 // don't get the same lines of output
+                                 // over and over again, once per
+                                 // process. Apart from this, the only
+                                 // other cosmetic change is that we
+                                 // output how many degrees of freedom
+                                 // there are per process, and how
+                                 // many iterations it took for the
                                  // linear solver to converge:
 template <int dim>
 void ElasticProblem<dim>::run () 
 {
+  pout.set_condition(this_mpi_process == 0);
+
   for (unsigned int cycle=0; cycle<10; ++cycle)
     {
-      if (this_mpi_process == 0)
-        std::cout << "Cycle " << cycle << ':' << std::endl;
+      pout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	{
@@ -1231,32 +1245,27 @@ void ElasticProblem<dim>::run ()
       else
 	refine_grid ();
 
-      if (this_mpi_process == 0)
-        std::cout << "   Number of active cells:       "
-                  << triangulation.n_active_cells()
-                  << std::endl;
+      pout << "   Number of active cells:       "
+	   << triangulation.n_active_cells()
+	   << std::endl;
 
       setup_system ();
 
-      if (this_mpi_process == 0)
-        {
-          std::cout << "   Number of degrees of freedom: "
-                    << dof_handler.n_dofs()
-                    << " (by partition:";
-          for (unsigned int p=0; p<n_mpi_processes; ++p)
-            std::cout << (p==0 ? ' ' : '+')
-                      << (DoFTools::
-                          count_dofs_with_subdomain_association (dof_handler,
-                                                                 p));
-          std::cout << ")" << std::endl;
-        }
+      pout << "   Number of degrees of freedom: "
+		<< dof_handler.n_dofs()
+		<< " (by partition:";
+      for (unsigned int p=0; p<n_mpi_processes; ++p)
+	pout << (p==0 ? ' ' : '+')
+	     << (DoFTools::
+		 count_dofs_with_subdomain_association (dof_handler,
+							p));
+      pout << ")" << std::endl;
       
       assemble_system ();
       const unsigned int n_iterations = solve ();
   
-      if (this_mpi_process == 0)
-        std::cout << "   Solver converged in " << n_iterations
-                  << " iterations." << std::endl;
+      pout << "   Solver converged in " << n_iterations
+	   << " iterations." << std::endl;
       
       output_results (cycle);
     }
