@@ -243,7 +243,7 @@ class AdvectionField : public TensorFunction<1,dim>
 				     // follows:
     DeclException2 (ExcDimensionMismatch,
 		    unsigned int, unsigned int,
-		    << "The std::vector has size " << arg1 << " but should have "
+		    << "The vector has size " << arg1 << " but should have "
 		    << arg2 << " elements.");
 				     // The syntax may look a little
 				     // strange, but is
