@@ -29,6 +29,8 @@ plot_shape_functions(FiniteElement<dim>& finel, const char* name)
 
   sprintf(fname, "%s.dat", name);
   ofstream gnuplot(fname);
+  gnuplot.setf(ios::fixed);
+  gnuplot.precision (3);
 
   unsigned int k=0;
   for (unsigned int m=0;m<=div;++m)
