@@ -194,6 +194,16 @@ Polynomial<number>::shift(const number2 offset)
 }
 
 
+template <typename number>
+void
+Polynomial<number>::print(std::ostream& out) const
+{
+  for (int i=degree();i>=0;--i)
+    {
+      out << coefficients[i] << " x^" << i << std::endl;
+    }
+}
+
 // ------------------------------------------------------------ //
 
 

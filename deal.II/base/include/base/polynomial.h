@@ -135,7 +135,12 @@ class Polynomial : public Subscriptor
 				      */
     template <typename number2>
     void shift (const number2 offset);
-    
+
+				     /**
+				      * Print coefficients.
+				      */
+    void print(std::ostream& out) const;
+				      
 				     /**
 				      * Exception
 				      */
