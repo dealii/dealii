@@ -135,7 +135,7 @@ derivative_norm (const Derivative &d)
 				   //
 				   // if the d_11=a, d_22=b,
 				   // d_12=d_21=c
-  const double radicand = sqr(d[0][0] - d[1][1]) + 4*sqr(d[0][1]);
+  const double radicand = ::sqr(d[0][0] - d[1][1]) + 4*::sqr(d[0][1]);
   const double eigenvalues[2]
     = { 0.5*(d[0][0] + d[1][1] + sqrt(radicand)),
 	0.5*(d[0][0] + d[1][1] - sqrt(radicand))  };

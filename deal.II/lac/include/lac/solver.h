@@ -130,7 +130,7 @@ class SolverControl;
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997, 1998, 1999
  */
-template <class Vector = Vector<double> >
+template <class Vector = ::Vector<double> >
 class Solver
 {
   public:

@@ -13,8 +13,10 @@
 
 
 #include <base/memory_consumption.h>
+#include <base/smartpointer.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
+#include <fe/fe.h>
 #include <grid/tria_accessor.h>
 #include <dofs/dof_accessor.h>
 #include <multigrid/mg_dof_handler.h>

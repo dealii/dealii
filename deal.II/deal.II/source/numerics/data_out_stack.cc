@@ -23,6 +23,12 @@
 #include <fe/fe_values.h>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
 
 template <int dim>
 unsigned int
@@ -336,7 +342,7 @@ DataOutStack<dim>::memory_consumption () const
 
 
 template <int dim>
-const std::vector<DataOutBase::Patch<dim+1> > &
+const typename std::vector<typename DataOutBase::Patch<dim+1> > &
 DataOutStack<dim>::get_patches () const
 {
   return patches;

@@ -1591,7 +1591,7 @@ bool CellAccessor<2>::at_boundary () const
 template <>
 unsigned char CellAccessor<2>::material_id () const
 {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), TriaAccessor<2>::ExcCellNotUsed());
   return tria->levels[present_level]->quads.material_id[present_index];
 };
 
@@ -1600,7 +1600,7 @@ unsigned char CellAccessor<2>::material_id () const
 template <>
 void CellAccessor<2>::set_material_id (const unsigned char mat_id) const
 {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), TriaAccessor<2>::ExcCellNotUsed());
   tria->levels[present_level]->quads.material_id[present_index]
     = mat_id;						 
 };

@@ -303,3 +303,65 @@ AC_DEFUN(DEAL_II_CHECK_ASSERT_THROW, dnl
 )
 
 
+
+dnl IBM xlC 5.0 from the VisualAge C++ pack has a bug with the following 
+dnl code. We can work around it if we insert code like "using namespace std;"
+dnl in the right place, but we'd like to do so only if absolutely necessary.
+dnl Check whether the compiler which we are using has this bug.
+dnl
+dnl Usage: DEAL_II_CHECK_IBM_XLC_ERROR
+dnl
+AC_DEFUN(DEAL_II_CHECK_IBM_XLC_ERROR, dnl
+  AC_MSG_CHECKING(for std::vector bug)
+  AC_LANG_CPLUSPLUS
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      namespace std {
+        template <class _Ty>                             class allocator {};
+        template<class _Ty, class _Ax = allocator<_Ty> > class vector{};
+      }
+
+      struct X {};
+      template <int dim> void g (const std::vector<X> &x);
+
+      void f ()  {
+        std::vector<X> x;
+        g<1> (x);
+      };
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. trying to work around)
+      AC_DEFINE(XLC_WORK_AROUND_STD_BUG)
+    ])
+)
+
+
+dnl gcc2.95 doesn't have the std::iterator class, but the standard requires it, so
+dnl check whether we have to work around it
+dnl
+dnl Usage: DEAL_II_HAVE_STD_ITERATOR
+dnl
+AC_DEFUN(DEAL_II_HAVE_STD_ITERATOR, dnl
+  AC_MSG_CHECKING(for std::iterator class)
+  AC_LANG_CPLUSPLUS
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <iterator>
+      class MyIterator : public std::iterator<std::bidirectional_iterator_tag,int>
+      {};
+    ],
+    [],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_STD_ITERATOR_CLASS)
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+)>>>>>>> 1.18.2.1

@@ -1,9 +1,5 @@
 //----------------------------  fe_system.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -185,7 +181,7 @@ class FESystem : public FiniteElement<dim>
 				      * For the ordering of shape functions
 				      * refer to the @p{shape_value} function.
 				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &support_points) const;
+    virtual void get_unit_support_points (typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -194,15 +190,15 @@ class FESystem : public FiniteElement<dim>
 				      * For the ordering of shape functions
 				      * refer to the @p{shape_value} function.
 				      */
-    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     std::vector<Point<dim> > &support_points) const;
+    virtual void get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+				     typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Fill the local mass matrix. The elements
@@ -248,7 +244,7 @@ class FESystem : public FiniteElement<dim>
 				      * Refer to the base class for more
 				      * information on this function.
 				      */
-    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
 					FullMatrix<double> &local_mass_matrix) const;
 
 				     /**
@@ -264,7 +260,7 @@ class FESystem : public FiniteElement<dim>
 				      * the @p{transform} function of
 				      * @p{base_element(0)}.
 				      */
-    virtual Point<dim> transform_unit_to_real_cell (const DoFHandler<dim>::cell_iterator cell,
+    virtual Point<dim> transform_unit_to_real_cell (const typename DoFHandler<dim>::cell_iterator &cell,
 						    const Point<dim> &p) const;
 
 				     /**
@@ -280,7 +276,7 @@ class FESystem : public FiniteElement<dim>
 				      * the @p{transform} function of
 				      * @p{base_element(0)}.
 				      */
-    virtual Point<dim> transform_real_to_unit_cell (const DoFHandler<dim>::cell_iterator cell,
+    virtual Point<dim> transform_real_to_unit_cell (const typename DoFHandler<dim>::cell_iterator &cell,
 						    const Point<dim> &p) const;
 
 				     /**
@@ -316,9 +312,9 @@ class FESystem : public FiniteElement<dim>
 				      * function simply passes down to the
 				      * underlying object.
 				      */
-    virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const std::vector<Point<dim-1> > &unit_points,
-				     std::vector<double>      &face_jacobi_determinants) const;
+    virtual void get_face_jacobians (const typename DoFHandler<dim>::face_iterator &face,
+				     const typename std::vector<Point<dim-1> > &unit_points,
+				     typename std::vector<double>      &face_jacobi_determinants) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -331,10 +327,10 @@ class FESystem : public FiniteElement<dim>
 				      * function simply passes down to the
 				      * underlying object.
 				      */
-    virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+    virtual void get_subface_jacobians (const typename DoFHandler<dim>::face_iterator &face,
 					const unsigned int           subface_no,
-					const std::vector<Point<dim-1> > &unit_points,
-					std::vector<double>      &face_jacobi_determinants) const;
+					const typename std::vector<Point<dim-1> > &unit_points,
+					typename std::vector<double>      &face_jacobi_determinants) const;
 
 				     /**
 				      * Return the normal vectors to the
@@ -350,10 +346,10 @@ class FESystem : public FiniteElement<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
-				     const std::vector<Point<dim-1> > &unit_points,
-				     std::vector<Point<dim> >         &normal_vectors) const;
+				     const typename std::vector<Point<dim-1> > &unit_points,
+				     typename std::vector<Point<dim> >         &normal_vectors) const;
 
 				     /**
 				      * Return the normal vectors to the
@@ -370,29 +366,29 @@ class FESystem : public FiniteElement<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int           face_no,
 				     const unsigned int           subface_no,
-				     const std::vector<Point<dim-1> > &unit_points,
-				     std::vector<Point<dim> >         &normal_vectors) const;
+				     const typename std::vector<Point<dim-1> > &unit_points,
+				     typename std::vector<Point<dim> >         &normal_vectors) const;
 
 				     /**
 				      * Implementation of the
 				      * corresponding function of
 				      * @p{FiniteElement}.
 				      */
-    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				 const std::vector<Point<dim> >            &unit_points,
-				 std::vector<Tensor<2,dim> >               &jacobians,
+    virtual void fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+				 const typename std::vector<Point<dim> >            &unit_points,
+				 typename std::vector<Tensor<2,dim> >               &jacobians,
 				 const bool              compute_jacobians,
-				 std::vector<Tensor<3,dim> > &jacobians_grad,
+				 typename std::vector<Tensor<3,dim> > &jacobians_grad,
 				 const bool              compute_jacobians_grad,
-				 std::vector<Point<dim> > &support_points,
+				 typename std::vector<Point<dim> > &support_points,
 				 const bool           compute_support_points,
-				 std::vector<Point<dim> > &q_points,
+				 typename std::vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const FullMatrix<double>  &shape_values_transform,
-				 const std::vector<std::vector<Tensor<1,dim> > > &shape_grad_transform) const;
+				 const typename std::vector<typename std::vector<Tensor<1,dim> > > &shape_grad_transform) const;
     
 				     /** 
 				      * Number of different base
@@ -449,7 +445,7 @@ class FESystem : public FiniteElement<dim>
 				      * Pairs of multiplicity and
 				      * element type.
 				      */
-    typedef std::pair<const FiniteElement<dim> *, unsigned int> ElementPair;
+    typedef typename std::pair<const FiniteElement<dim> *, unsigned int> ElementPair;
     
 				     /**
 				      * Pointer to underlying finite
@@ -462,7 +458,7 @@ class FESystem : public FiniteElement<dim>
 				      * created by the constructor and
 				      * constant afterwards.
 				      */
-    std::vector<ElementPair> base_elements;
+    typename std::vector<ElementPair> base_elements;
 
 
 				     /**

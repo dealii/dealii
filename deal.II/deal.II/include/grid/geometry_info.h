@@ -1,9 +1,5 @@
 //----------------------------  geometry_info.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -33,35 +29,35 @@
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999
  */
-template <int _dim>
+template <int dim_>
 struct GeometryInfo
 {
 				     /**
 				      * Present dimension. Does not
 				      * look useful, but might be.
 				      */
-    static const unsigned int dim               = _dim;
+    static const unsigned int dim               = dim_;
 
 				     /**
 				      * Number of children a cell has.
 				      */
-    static const unsigned int children_per_cell = (1<<_dim);
+    static const unsigned int children_per_cell = (1<<dim_);
 
 				     /**
 				      * Number of faces a cell has.
 				      */
-    static const unsigned int faces_per_cell    = 2*_dim;
+    static const unsigned int faces_per_cell    = 2*dim_;
 
 				     /**
 				      * Number of children each face has
 				      * when the adjacent cell is refined.
 				      */
-    static const unsigned int subfaces_per_face = GeometryInfo<_dim-1>::children_per_cell;
+    static const unsigned int subfaces_per_face = GeometryInfo<dim_-1>::children_per_cell;
 
 				     /**
 				      * Number of vertices a cell has.
 				      */
-    static const unsigned int vertices_per_cell = (1<<_dim);
+    static const unsigned int vertices_per_cell = (1<<dim_);
 
 				     /**
 				      * Number of vertices each face has.
@@ -72,17 +68,17 @@ struct GeometryInfo
 				      * @p{for (i=0; i<vertices_per_face; ++i)},
 				      * at least if @p{i} is an @p{unsigned int}.
 				      */
-    static const unsigned int vertices_per_face = GeometryInfo<_dim-1>::vertices_per_cell;
+    static const unsigned int vertices_per_face = GeometryInfo<dim_-1>::vertices_per_cell;
 
 				     /**
 				      * Number of lines each face has.
 				      */
-    static const unsigned int lines_per_face = GeometryInfo<_dim-1>::lines_per_cell;
+    static const unsigned int lines_per_face = GeometryInfo<dim_-1>::lines_per_cell;
     
 				     /**
 				      * Number of quads on each face.
 				      */
-    static const unsigned int quads_per_face = GeometryInfo<_dim-1>::quads_per_cell;
+    static const unsigned int quads_per_face = GeometryInfo<dim_-1>::quads_per_cell;
 
 				     /**
 				      * Number of lines of a cell.
@@ -101,16 +97,16 @@ struct GeometryInfo
 				      * hypercube and the copy by
 				      * lines.
 				      */
-    static const unsigned int lines_per_cell = (2*GeometryInfo<dim-1>::lines_per_cell
-						+ GeometryInfo<dim-1>::vertices_per_cell);
+    static const unsigned int lines_per_cell = (2*GeometryInfo<dim_-1>::lines_per_cell
+						+ GeometryInfo<dim_-1>::vertices_per_cell);
     
 				     /**
 				      * Number of quadrilaterals of a cell.
 				      *
 				      * Computation is analogous to @p{lines_per_cell}.
 				      */
-    static const unsigned int quads_per_cell = (2*GeometryInfo<dim-1>::quads_per_cell
-						+ GeometryInfo<dim-1>::lines_per_cell);
+    static const unsigned int quads_per_cell = (2*GeometryInfo<dim_-1>::quads_per_cell
+						+ GeometryInfo<dim_-1>::lines_per_cell);
 
 				     /**
 				      * Number of hexahedra of a cell.
@@ -120,8 +116,8 @@ struct GeometryInfo
 				      * important for more than three
 				      * dimensions!
 				      */
-    static const unsigned int hexes_per_cell = (2*GeometryInfo<dim-1>::hexes_per_cell
-						+ GeometryInfo<dim-1>::quads_per_cell);
+    static const unsigned int hexes_per_cell = (2*GeometryInfo<dim_-1>::hexes_per_cell
+						+ GeometryInfo<dim_-1>::quads_per_cell);
 
 				     /**
 				      * List of numbers which is
@@ -174,7 +170,6 @@ struct GeometryInfo
 				      */
     static unsigned int child_cell_on_face (unsigned int face,
 					    unsigned int subface);
-
 };
 
 

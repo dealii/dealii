@@ -1,9 +1,5 @@
 //----------------------------  vectors.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -440,7 +436,7 @@ class VectorTools
 				      */
     template <int dim>
     static void project_boundary_values (const DoFHandler<dim>    &dof,
-					 const std::map<unsigned char,const Function<dim>*> &boundary_function,
+					 const typename std::map<unsigned char,const Function<dim>*> &boundary_function,
 					 const Quadrature<dim-1>  &q,
 					 std::map<unsigned int,double> &boundary_values);
     

@@ -163,7 +163,6 @@ BlockSparseMatrix<number>::get_sparsity_pattern () const
 };
 
 
-
 template <typename number>
 unsigned int
 BlockSparseMatrix<number>::memory_consumption () const

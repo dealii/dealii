@@ -12,7 +12,15 @@
 //----------------------------  fe_lib.dg.cc  ---------------------------
 
 
-#include<fe/fe_lib.dg.h>
+#include <fe/fe_lib.dg.h>
+#include <grid/tria.h>
+
+
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
 
 
 #if deal_II_dimension == 1
@@ -4428,7 +4436,7 @@ FEDG_Q4<3>::FEDG_Q4():
 template <int dim>
 void
 FEDG_Q1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-				       std::vector<Point<dim> >  &support_points) const
+				       typename std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
@@ -4439,7 +4447,7 @@ FEDG_Q1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 template <int dim>
 void
 FEDG_Q2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-				       std::vector<Point<dim> >  &support_points) const
+				       typename std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
@@ -4450,7 +4458,7 @@ FEDG_Q2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 template <int dim>
 void
 FEDG_Q3<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-				       std::vector<Point<dim> >  &support_points) const
+				       typename std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
@@ -4461,7 +4469,7 @@ FEDG_Q3<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
 template <int dim>
 void
 FEDG_Q4<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-				       std::vector<Point<dim> >  &support_points) const
+				       typename std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));

@@ -13,10 +13,18 @@
 
 
 #include <fe/fe_lib.dgp.h>
+#include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <grid/geometry_info.h>
 #include <algorithm>
+
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
 
 
 // declare explicit specializations before use:
@@ -216,7 +224,8 @@ template <>
 void FEDG_P2<2>::get_unit_support_points (std::vector<Point<2> > &unit_points) const
 {
   Assert (unit_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
+	  FiniteElementBase<2>::ExcWrongFieldDimension (unit_points.size(),
+							dofs_per_cell));
 
   unit_points[0] = Point<2> (.5,.5);
   unit_points[1] = Point<2> (1,0);
@@ -303,23 +312,29 @@ FEDG_P2<3>::shape_grad_grad (const unsigned int i,
 };
 
 
+
 template <>
 void FEDG_P2<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 					FullMatrix<double> &local_mass_matrix) const
 {
   Assert (local_mass_matrix.n() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+	  FiniteElementBase<3>::ExcWrongFieldDimension(local_mass_matrix.n(),
+						       dofs_per_cell));
   Assert (local_mass_matrix.m() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
+	  FiniteElementBase<3>::ExcWrongFieldDimension(local_mass_matrix.m(),
+						       dofs_per_cell));
 
   throw ExcComputationNotUseful(3);
 };
 
 
+
 template <>
-void FEDG_P2<3>::get_unit_support_points (std::vector<Point<3> > &unit_points) const {
+void FEDG_P2<3>::get_unit_support_points (std::vector<Point<3> > &unit_points) const
+{
   Assert (unit_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
+	  FiniteElementBase<3>::ExcWrongFieldDimension (unit_points.size(),
+							dofs_per_cell));
 
   unit_points[0] = Point<3> (.5,.5,.5);
   unit_points[1] = Point<3> (1,0,0);
@@ -334,7 +349,7 @@ void FEDG_P2<3>::get_unit_support_points (std::vector<Point<3> > &unit_points) c
 template <int dim>
 void
 FEDG_P2<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-				  std::vector<Point<dim> >  &support_points) const
+				  typename std::vector<Point<dim> >  &support_points) const
 {
   Assert (support_points.size() == dofs_per_cell,
 	  typename FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),
@@ -348,7 +363,7 @@ FEDG_P2<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator 
 template <int dim>
 void
 FEDG_P2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
-				       std::vector<Point<dim> >  &support_points) const
+				       typename std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == dofs_per_face) &&
 	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),

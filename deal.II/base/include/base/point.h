@@ -385,5 +385,34 @@ Point<dim> operator * (const double factor, const Point<dim> &p)
 };
 
 
+/**
+ * Output operator for points. Print the elements consecutively,
+ * with a space in between.
+ */
+template <int dim>
+inline
+std::ostream & operator << (std::ostream &out, const Point<dim> &p)
+{
+  for (unsigned int i=0; i<dim-1; ++i)
+    out << p[i] << ' ';
+  out << p[dim-1];
+
+  return out;
+};
+
+
+
+/** 
+ * Output operator for points of dimension 1. This is implemented
+ * specialized from the general template in order to avoid a compiler
+ * warning that the loop is empty.  
+ */
+inline
+std::ostream & operator << (std::ostream &out, const Point<1> &p)
+{
+  out << p[0];
+
+  return out;
+};
 
 #endif

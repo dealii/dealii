@@ -14,8 +14,14 @@
 
 #include <base/memory_consumption.h>
 #include <fe/fe_system.h>
+#include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
+
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
 
 
 
@@ -768,7 +774,7 @@ FESystem<dim>::shape_grad_grad (const unsigned int  i,
 
 template <int dim>
 void FESystem<dim>::get_unit_support_points (
-  std::vector<Point<dim> > &unit_support_points) const
+  typename std::vector<Point<dim> > &unit_support_points) const
 {
   Assert(unit_support_points.size() == dofs_per_cell,
 	 typename FiniteElementBase<dim>::
@@ -820,8 +826,8 @@ void FESystem<dim>::get_unit_support_points (
 
 
 template <int dim>
-void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-					std::vector<Point<dim> > &support_points) const
+void FESystem<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+					typename std::vector<Point<dim> > &support_points) const
 {
   Assert(support_points.size() == dofs_per_cell,
 	 typename FiniteElementBase<dim>::
@@ -851,8 +857,8 @@ void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &ce
 
 
 template <int dim>
-void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterator & face,
-					     std::vector<Point<dim> > & support_points) const
+void FESystem<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator & face,
+					     typename std::vector<Point<dim> > & support_points) const
 {
   Assert (support_points.size() == dofs_per_face,
 	  typename FiniteElementBase<dim>::
@@ -880,7 +886,7 @@ void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterato
 
 
 template <int dim>
-void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+void FESystem<dim>::get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
 					   FullMatrix<double>  &local_mass_matrix) const
 {
   Assert (local_mass_matrix.n() == dofs_per_cell,
@@ -927,7 +933,7 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 
 template <int dim>
 Point<dim> FESystem<dim>::transform_unit_to_real_cell (
-  const DoFHandler<dim>::cell_iterator cell,
+  const typename DoFHandler<dim>::cell_iterator &cell,
   const Point<dim> &p) const
 {
   return base_elements[0].first->transform_unit_to_real_cell(cell, p);
@@ -936,7 +942,7 @@ Point<dim> FESystem<dim>::transform_unit_to_real_cell (
 
 template <int dim>
 Point<dim> FESystem<dim>::transform_real_to_unit_cell (
-  const DoFHandler<dim>::cell_iterator cell,
+  const typename DoFHandler<dim>::cell_iterator &cell,
   const Point<dim> &p) const
 {
   return base_elements[0].first->transform_real_to_unit_cell(cell, p);
@@ -960,9 +966,9 @@ Tensor<1,dim> FESystem<dim>::shape_grad_transform (const unsigned int i,
 
 
 template <int dim>
-void FESystem<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-					const std::vector<Point<dim-1> > &unit_points,
-					std::vector<double>      &face_jacobi_determinants) const
+void FESystem<dim>::get_face_jacobians (const typename DoFHandler<dim>::face_iterator &face,
+					const typename std::vector<Point<dim-1> > &unit_points,
+					typename std::vector<double>      &face_jacobi_determinants) const
 {
   base_elements[0].first->get_face_jacobians (face, unit_points,
 					      face_jacobi_determinants);
@@ -970,10 +976,10 @@ void FESystem<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &fa
 
 
 template <int dim>
-void FESystem<dim>::get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+void FESystem<dim>::get_subface_jacobians (const typename DoFHandler<dim>::face_iterator &face,
 					   const unsigned int           subface_no,
-					   const std::vector<Point<dim-1> > &unit_points,
-					   std::vector<double>      &face_jacobi_determinants) const
+					   const typename std::vector<Point<dim-1> > &unit_points,
+					   typename std::vector<double>      &face_jacobi_determinants) const
 {
   base_elements[0].first->get_subface_jacobians (face, subface_no, unit_points,
 						 face_jacobi_determinants);
@@ -981,10 +987,10 @@ void FESystem<dim>::get_subface_jacobians (const DoFHandler<dim>::face_iterator 
 
 
 template <int dim>
-void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+void FESystem<dim>::get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
 					const unsigned int          face_no,
-					const std::vector<Point<dim-1> > &unit_points,
-					std::vector<Point<dim> >         &normal_vectors) const
+					const typename std::vector<Point<dim-1> > &unit_points,
+					typename std::vector<Point<dim> >         &normal_vectors) const
 {
   base_elements[0].first->get_normal_vectors (cell, face_no, unit_points,
 					      normal_vectors);
@@ -992,11 +998,11 @@ void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &ce
 
 
 template <int dim>
-void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+void FESystem<dim>::get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
 					const unsigned int          face_no,
 					const unsigned int          subface_no,
-					const std::vector<Point<dim-1> > &unit_points,
-					std::vector<Point<dim> >         &normal_vectors) const
+					const typename std::vector<Point<dim-1> > &unit_points,
+					typename std::vector<Point<dim> >         &normal_vectors) const
 {
   base_elements[0].first->get_normal_vectors (cell, face_no, subface_no, unit_points,
 					      normal_vectors);
@@ -1005,18 +1011,18 @@ void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &ce
 
 template <int dim>
 void
-FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-			       const std::vector<Point<dim> >            &unit_points,
-			       std::vector<Tensor<2,dim> >               &jacobians,
+FESystem<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+			       const typename std::vector<Point<dim> >            &unit_points,
+			       typename std::vector<Tensor<2,dim> >               &jacobians,
 			       const bool              compute_jacobians,
-			       std::vector<Tensor<3,dim> > &jacobians_grad,
+			       typename std::vector<Tensor<3,dim> > &jacobians_grad,
 			       const bool              compute_jacobians_grad,
-			       std::vector<Point<dim> > &support_points,
+			       typename std::vector<Point<dim> > &support_points,
 			       const bool           compute_support_points,
-			       std::vector<Point<dim> > &q_points,
+			       typename std::vector<Point<dim> > &q_points,
 			       const bool           compute_q_points,
 			       const FullMatrix<double>  &shape_values_transform,
-			       const std::vector<std::vector<Tensor<1,dim> > > &shape_grad_transform) const
+			       const typename std::vector<typename std::vector<Tensor<1,dim> > > &shape_grad_transform) const
 {
 				   // if we are to compute the support
 				   // points, then we need to get them

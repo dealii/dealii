@@ -30,6 +30,12 @@
 #include <algorithm>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
 template <int dim>
 void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
 				    const bool                       reversed_numbering,
@@ -545,7 +551,7 @@ DoFRenumbering::sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
 template <int dim>
 void
 DoFRenumbering::cell_wise_dg (DoFHandler<dim>& dof,
-			      const std::vector<typename DoFHandler<dim>::cell_iterator>& cells)
+			      const typename std::vector<typename DoFHandler<dim>::cell_iterator>& cells)
 {
   Assert(cells.size() == dof.get_tria().n_active_cells(),
 	 ExcDimensionMismatch(cells.size(),
@@ -599,7 +605,7 @@ template <int dim>
 void
 DoFRenumbering::cell_wise_dg (MGDoFHandler<dim>& dof,
 			      unsigned int level,
-			      const std::vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
+			      const typename std::vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
 {
   Assert(cells.size() == dof.get_tria().n_cells(level),
 	 ExcDimensionMismatch(cells.size(),
@@ -718,12 +724,6 @@ DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
   cell_wise_dg(dof, level, ordered_cells);
 }
 
-
-// for whatever reason, the random_shuffle function used below needs
-// lrand48 to be declared (rather than do so itself. however,
-// inclusion of <cstdlib> or <stdlib.h> does not help, so we declare
-// that function ourselves
-extern "C" long int lrand48 (void);
 
 
 template <int dim>

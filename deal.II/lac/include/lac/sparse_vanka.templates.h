@@ -28,6 +28,12 @@
 #include <map>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+  using namespace std;
+#endif
+
+
 template<typename number>
 SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 				 const std::vector<bool>    &selected,

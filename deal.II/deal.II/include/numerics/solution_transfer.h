@@ -1,9 +1,5 @@
 //----------------------------  solution_transfer.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -202,7 +198,7 @@ class SolutionTransfer
 				      * onto the new (refined and/or
 				      * coarsenend) grid.
 				      */
-    void prepare_for_coarsening_and_refinement (const std::vector<Vector<number> > &all_in);
+    void prepare_for_coarsening_and_refinement (const typename std::vector<Vector<number> > &all_in);
     
 				     /**
 				      * Same as previous function
@@ -266,8 +262,8 @@ class SolutionTransfer
 				      * several functions can be
 				      * performed in one step.
 				      */
-    void interpolate (const std::vector<Vector<number> >&all_in,
-		      std::vector<Vector<number> >      &all_out) const;
+    void interpolate (const typename std::vector<Vector<number> >&all_in,
+		      typename std::vector<Vector<number> >      &all_out) const;
       
 				     /**
 				      * Same as the previous function.
@@ -394,7 +390,7 @@ class SolutionTransfer
 	unsigned int memory_consumption () const;
 	
 	std::vector<unsigned int>    *indices_ptr;
-	std::vector<Vector<number> > *dof_values_ptr;
+	typename std::vector<Vector<number> > *dof_values_ptr;
     };
 
 				     /**
@@ -406,7 +402,7 @@ class SolutionTransfer
 				      * collecting all these structures in a vector
 				      * helps avoiding fraqmentation of the memory.
 				      */
-    std::vector<Pointerstruct> all_pointerstructs;
+    typename std::vector<Pointerstruct> all_pointerstructs;
 
 				     /**
 				      * Is used for
@@ -415,7 +411,7 @@ class SolutionTransfer
 				      * of all cells that'll be coarsened
 				      * will be stored in this vector.
 				      */
-    std::vector<std::vector<Vector<number> > > dof_values_on_cell;
+    typename std::vector<std::vector<Vector<number> > > dof_values_on_cell;
 };
 
 

@@ -1,9 +1,5 @@
 //----------------------------  tria_iterator.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -222,7 +218,12 @@ template <int dim> class Triangulation;
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim, typename Accessor>
-class TriaRawIterator : public std::bidirectional_iterator<Accessor,int>
+class TriaRawIterator :
+#ifdef HAVE_STD_ITERATOR_CLASS  
+               public std::iterator<std::bidirectional_iterator_tag,int>
+#else
+               bidirectional_iterator<Accessor,int>
+#endif
 {
   public:
 				     /**

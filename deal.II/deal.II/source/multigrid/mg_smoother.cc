@@ -13,6 +13,7 @@
 
 
 #include <grid/tria.h>
+#include <dofs/dof_constraints.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>

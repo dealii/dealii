@@ -40,7 +40,7 @@ class SquareFunction : public Function<dim>
 				     /**
 				      * Function values at multiple points.
 				      */
-    virtual void value_list (const std::vector<Point<dim> > &points,
+    virtual void value_list (const typename std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
 
@@ -53,8 +53,8 @@ class SquareFunction : public Function<dim>
 				     /**
 					Gradients at multiple points.
 				     */
-    virtual void gradient_list (const std::vector<Point<dim> > &points,
-				std::vector<Tensor<1,dim> >    &gradients,
+    virtual void gradient_list (const typename std::vector<Point<dim> > &points,
+				typename std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
 
 				     /**
@@ -66,7 +66,7 @@ class SquareFunction : public Function<dim>
 				     /**
 				      * Laplacian of the function at multiple points.
 				      */
-    virtual void laplacian_list (const std::vector<Point<dim> > &points,
+    virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int              component = 0) const;
 };
@@ -92,7 +92,7 @@ class Q1WedgeFunction : public Function<dim>
 				     /**
 				      * Function values at multiple points.
 				      */
-    virtual void value_list (const std::vector<Point<dim> > &points,
+    virtual void value_list (const typename std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
 
@@ -105,8 +105,8 @@ class Q1WedgeFunction : public Function<dim>
 				     /**
 					Gradients at multiple points.
 				     */
-    virtual void gradient_list (const std::vector<Point<dim> > &points,
-				std::vector<Tensor<1,dim> >    &gradients,
+    virtual void gradient_list (const typename std::vector<Point<dim> > &points,
+				typename std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
      
 				     /**
@@ -118,7 +118,7 @@ class Q1WedgeFunction : public Function<dim>
 				     /**
 				      * Laplacian of the function at multiple points.
 				      */
-    virtual void laplacian_list (const std::vector<Point<dim> > &points,
+    virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int              component = 0) const;
 };
@@ -159,7 +159,7 @@ class PillowFunction : public Function<dim>
 				     /**
 				      * Values at multiple points.
 				      */
-    virtual void value_list (const std::vector<Point<dim> > &points,
+    virtual void value_list (const typename std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
 
@@ -172,8 +172,8 @@ class PillowFunction : public Function<dim>
 				     /**
 				      * Gradients at multiple points.
 				      */
-    virtual void gradient_list (const std::vector<Point<dim> > &points,
-				std::vector<Tensor<1,dim> >    &gradients,
+    virtual void gradient_list (const typename std::vector<Point<dim> > &points,
+				typename std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
 
 				     /**
@@ -185,7 +185,7 @@ class PillowFunction : public Function<dim>
 				     /**
 				      * Laplacian at multiple points.
 				      */
-    virtual void laplacian_list (const std::vector<Point<dim> > &points,
+    virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int              component = 0) const;
   private:
@@ -213,7 +213,7 @@ class CosineFunction : public Function<dim>
 				     /**
 				      * Values at multiple points.
 				      */
-    virtual void value_list (const std::vector<Point<dim> > &points,
+    virtual void value_list (const typename std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
 
@@ -226,8 +226,8 @@ class CosineFunction : public Function<dim>
 				     /**
 				      * Gradients at multiple points.
 				      */
-    virtual void gradient_list (const std::vector<Point<dim> > &points,
-				std::vector<Tensor<1,dim> >    &gradients,
+    virtual void gradient_list (const typename std::vector<Point<dim> > &points,
+				typename std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
 
 				     /**
@@ -239,7 +239,7 @@ class CosineFunction : public Function<dim>
 				     /**
 				      * Laplacian at multiple points.
 				      */
-    virtual void laplacian_list (const std::vector<Point<dim> > &points,
+    virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int              component = 0) const;
 };
@@ -263,7 +263,7 @@ class ExpFunction : public Function<dim>
 				     /**
 				      * Values at multiple points.
 				      */
-    virtual void value_list (const std::vector<Point<dim> > &points,
+    virtual void value_list (const typename std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
 
@@ -276,8 +276,8 @@ class ExpFunction : public Function<dim>
 				     /**
 				      * Gradients at multiple points.
 				      */
-    virtual void gradient_list (const std::vector<Point<dim> > &points,
-				std::vector<Tensor<1,dim> >    &gradients,
+    virtual void gradient_list (const typename std::vector<Point<dim> > &points,
+				typename std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
 
 				     /**
@@ -289,7 +289,7 @@ class ExpFunction : public Function<dim>
 				     /**
 				      * Laplacian at multiple points.
 				      */
-    virtual void laplacian_list (const std::vector<Point<dim> > &points,
+    virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int              component = 0) const;
 };
@@ -428,7 +428,7 @@ class JumpFunction : public Function<dim>
 				     /**
 				      * Function values at multiple points.
 				      */
-    virtual void value_list (const std::vector<Point<dim> > &points,
+    virtual void value_list (const typename std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
 
@@ -441,8 +441,8 @@ class JumpFunction : public Function<dim>
 				     /**
 					Gradients at multiple points.
 				     */
-    virtual void gradient_list (const std::vector<Point<dim> > &points,
-				std::vector<Tensor<1,dim> >    &gradients,
+    virtual void gradient_list (const typename std::vector<Point<dim> > &points,
+				typename std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
 
 				     /**
@@ -454,7 +454,7 @@ class JumpFunction : public Function<dim>
 				     /**
 				      * Laplacian of the function at multiple points.
 				      */
-    virtual void laplacian_list (const std::vector<Point<dim> > &points,
+    virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int              component = 0) const;
 

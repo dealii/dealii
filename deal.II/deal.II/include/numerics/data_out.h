@@ -1,9 +1,5 @@
 //----------------------------  data_out.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -398,13 +394,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * List of data elements with vectors of
 				      * values for each degree of freedom.
 				      */
-    std::vector<DataEntry>  dof_data;
+    typename std::vector<DataEntry>  dof_data;
 
 				     /**
 				      * List of data elements with vectors of
 				      * values for each cell.
 				      */
-    std::vector<DataEntry>  cell_data;
+    typename std::vector<DataEntry>  cell_data;
 
 				     /**
 				      * This is a list of patches that is
@@ -413,7 +409,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * in the output routines of the base
 				      * classes.
 				      */
-    std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > patches;
+    typename std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > patches;
 
 				     /**
 				      * Function by which the base
@@ -421,7 +417,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * what patches they shall write
 				      * to a file.
 				      */
-    virtual const std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > &
+    virtual const typename std::vector<typename DataOutBase::Patch<patch_dim,patch_space_dim> > &
     get_patches () const;
 
 				     /**

@@ -1,9 +1,5 @@
 //----------------------------  dof_accessor.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -145,6 +141,7 @@ class DoFAccessor
 template <int celldim, int dim>
 class DoFObjectAccessor_Inheritance 
 {
+  public:
 				     /**
 				      * Declaration of the @p{typedef}.
 				      * See the full documentation for
@@ -170,6 +167,7 @@ class DoFObjectAccessor_Inheritance
 template <int dim>
 class DoFObjectAccessor_Inheritance<dim,dim>
 {
+  public:
 				     /**
 				      * Declaration of the @p{typedef}.
 				      * See the full documentation for
@@ -222,7 +220,8 @@ class DoFObjectAccessor_Inheritance<dim,dim>
 template<int celldim, int dim>
 class DoFObjectAccessor : public DoFAccessor<dim>,
 			  public TriaObjectAccessor<celldim,dim>
-{  public:
+{
+  public:
 				     /**
 				      * Data type  passed by the iterator class.
 				      */

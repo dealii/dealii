@@ -72,9 +72,15 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
 
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
 template <int dim>
 void
-FunctionDerivative<dim>::value_list (const std::vector<Point<dim> > &points,
+FunctionDerivative<dim>::value_list (const typename std::vector<Point<dim> > &points,
 				     std::vector<double>            &values,
 				     const unsigned int              component) const
 {
@@ -158,6 +164,6 @@ FunctionDerivative<dim>::memory_consumption () const
 };
 
 
-template FunctionDerivative<1>;
-template FunctionDerivative<2>;
-template FunctionDerivative<3>;
+template class FunctionDerivative<1>;
+template class FunctionDerivative<2>;
+template class FunctionDerivative<3>;

@@ -85,8 +85,8 @@ class TensorFunction : public FunctionTime,
 				      * the right size, i.e.  the same
 				      * size as the @p{points} array.  
 				      */
-    virtual void value_list (const std::vector<Point<dim> > &points,
-			     std::vector<Tensor<rank,dim> > &values) const;
+    virtual void value_list (const typename std::vector<Point<dim> > &points,
+			     typename std::vector<Tensor<rank,dim> > &values) const;
 
 				     /**
 				      * Return the gradient of the
@@ -102,8 +102,8 @@ class TensorFunction : public FunctionTime,
 				      * the right size, i.e.  the same
 				      * size as the @p{points} array.  
 				      */
-    virtual void gradient_list (const std::vector<Point<dim> >   &points,
-				std::vector<Tensor<rank+1,dim> > &gradients) const;
+    virtual void gradient_list (const typename std::vector<Point<dim> >   &points,
+				typename std::vector<Tensor<rank+1,dim> > &gradients) const;
 
 				     /**
 				      * Exception

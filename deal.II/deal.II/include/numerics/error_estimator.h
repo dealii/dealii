@@ -1,9 +1,5 @@
 //----------------------------  error_estimator.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -216,7 +212,7 @@ class KellyErrorEstimator
 				      *	for each boundary indicator, which is
 				      *	guaranteed by the @p{map} data type.
 				      */    
-    typedef std::map<unsigned char,const Function<dim>*> FunctionMap;
+    typedef typename std::map<unsigned char,const Function<dim>*> FunctionMap;
 
 
 				     /**
@@ -359,14 +355,14 @@ class KellyErrorEstimator
 				      * general documentation of this
 				      * class for more information.
 				      */
-    typedef std::map<typename DoFHandler<dim>::face_iterator,std::vector<double> > FaceIntegrals;
+    typedef typename std::map<typename DoFHandler<dim>::face_iterator,std::vector<double> > FaceIntegrals;
 
 
 				     /**
 				      * Redeclare an active cell iterator.
 				      * This is simply for convenience.
 				      */
-    typedef DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
 
 
 				     /**
@@ -465,18 +461,18 @@ class KellyErrorEstimator
 					  * index of the solution
 					  * vector.
 					  */
-	std::vector<std::vector<std::vector<Tensor<1,dim> > > > psi;
+	typename std::vector<typename std::vector<typename std::vector<Tensor<1,dim> > > > psi;
 
 					 /**
 					  * The same vector for a neighbor cell
 					  */
-	std::vector<std::vector<std::vector<Tensor<1,dim> > > > neighbor_psi;
+	typename std::vector<typename std::vector<typename std::vector<Tensor<1,dim> > > > neighbor_psi;
 
 					 /**
 					  * The normal vectors of the finite
 					  * element function on one face
 					  */
-	vector<std::Point<dim> > normal_vectors;
+	typename std::vector<Point<dim> > normal_vectors;
 
 					 /**
 					  * Two arrays needed for the
@@ -571,6 +567,21 @@ class KellyErrorEstimator
 					       const unsigned int          face_no,
 					       FEFaceValues<dim>          &fe_face_values,
 					       FESubfaceValues<dim>       &fe_subface_values);
+
+				     /** 
+				      * By the resolution of Defect
+				      * Report 45 to the ISO C++ 1998
+				      * standard, nested classes
+				      * automatically have access to
+				      * members of the enclosing
+				      * class. Nevertheless, some
+				      * compilers don't implement this
+				      * resolution yet, so we have to
+				      * make them @p{friend}, which
+				      * doesn't hurt on the other
+				      * compilers as well.
+				      */
+    friend class Data;
 };
 
 

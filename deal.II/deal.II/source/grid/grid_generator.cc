@@ -214,17 +214,17 @@ template <>
 void GridGenerator::hyper_ball<> (Triangulation<2> &tria,
 				  const Point<2>    &p,
 				  const double      radius) {
-  const double a = 1./(1+sqrt(2)); // equilibrate cell sizes at transition
+  const double a = 1./(1+sqrt(2.0)); // equilibrate cell sizes at transition
 				   // from the inner part to the radial
 				   // cells
-  const Point<2> vertices[8] = { p+Point<2>(-1,-1)*(radius/sqrt(2)),
-				   p+Point<2>(+1,-1)*(radius/sqrt(2)),
-				   p+Point<2>(-1,-1)*(radius/sqrt(2)*a),
-				   p+Point<2>(+1,-1)*(radius/sqrt(2)*a),
-				   p+Point<2>(-1,+1)*(radius/sqrt(2)*a),
-				   p+Point<2>(+1,+1)*(radius/sqrt(2)*a),
-				   p+Point<2>(-1,+1)*(radius/sqrt(2)),
-				   p+Point<2>(+1,+1)*(radius/sqrt(2)) };
+  const Point<2> vertices[8] = { p+Point<2>(-1,-1)*(radius/sqrt(2.0)),
+				   p+Point<2>(+1,-1)*(radius/sqrt(2.0)),
+				   p+Point<2>(-1,-1)*(radius/sqrt(2.0)*a),
+				   p+Point<2>(+1,-1)*(radius/sqrt(2.0)*a),
+				   p+Point<2>(-1,+1)*(radius/sqrt(2.0)*a),
+				   p+Point<2>(+1,+1)*(radius/sqrt(2.0)*a),
+				   p+Point<2>(-1,+1)*(radius/sqrt(2.0)),
+				   p+Point<2>(+1,+1)*(radius/sqrt(2.0)) };
   
   const int cell_vertices[5][4] = {{0, 1, 3, 2},
 				   {0, 2, 4, 6},

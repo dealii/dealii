@@ -29,6 +29,11 @@ BlockVector<Number>::BlockVector (unsigned int n_blocks,
 
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+  using namespace std;
+#endif
+
 template <typename Number>
 BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n)
 {

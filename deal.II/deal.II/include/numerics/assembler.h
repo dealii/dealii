@@ -1,9 +1,5 @@
 //----------------------------  assembler.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -17,6 +13,8 @@
 /*----------------------------   problem_assembler.h     ---------------------------*/
 
 #include <base/exceptions.h>
+#include <lac/full_matrix.h>
+#include <lac/vector.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <fe/fe_values.h>
@@ -63,7 +61,7 @@ class Equation
     virtual void assemble (FullMatrix<double>  &cell_matrix,
 			   Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
-			   const DoFHandler<dim>::cell_iterator &cell) const;
+			   const typename DoFHandler<dim>::cell_iterator &cell) const;
 
 				     /**
 				      * Virtual function which only assembles
@@ -80,7 +78,7 @@ class Equation
 				      */
     virtual void assemble (FullMatrix<double>  &cell_matrix,
 			   const FEValues<dim> &fe_values,
-			   const DoFHandler<dim>::cell_iterator &cell) const;
+			   const typename DoFHandler<dim>::cell_iterator &cell) const;
 
 				     /**
 				      * Virtual function which only assembles
@@ -97,7 +95,7 @@ class Equation
 				      */
     virtual void assemble (Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
-			   const DoFHandler<dim>::cell_iterator &cell) const;
+			   const typename DoFHandler<dim>::cell_iterator &cell) const;
 
 				     /**
 				      * Return number of equations for this

@@ -13,10 +13,18 @@
 
 
 #include <fe/fe_lib.lagrange.h>
+#include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <grid/geometry_info.h>
 #include <algorithm>
+
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
 
 
 // declare explicit specializations before use:
@@ -305,9 +313,11 @@ template <>
 void FEQ1<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 				     FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+	  FiniteElementBase<2>::ExcWrongFieldDimension(local_mass_matrix.n(),
+						       dofs_per_cell));
   Assert (local_mass_matrix.m() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
+	  FiniteElementBase<2>::ExcWrongFieldDimension(local_mass_matrix.m(),
+						       dofs_per_cell));
 
 /* Get the computation of the local mass matrix by these lines in maple:
 
@@ -355,13 +365,13 @@ void FEQ1<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
    which is sufficient since $det J$ is a bilinear function.
 */
   Assert ((-x[0]+x[1])*(-y[0]+y[3])-(-x[0]+x[3])*(-y[0]+y[1]),  // xi=eta=0
-	  ExcJacobiDeterminantHasWrongSign());
+	  FiniteElement<2>::ExcJacobiDeterminantHasWrongSign());
   Assert ((x[2]-x[3])*(-y[0]+y[3])-(-x[0]+x[3])*(y[2]-y[3]),    // xi=0, eta=1
-	  ExcJacobiDeterminantHasWrongSign());
+	  FiniteElement<2>::ExcJacobiDeterminantHasWrongSign());
   Assert ((x[2]-x[3])*(-y[1]+y[2])-(-x[1]+x[2])*(y[2]-y[3]),    // xi=eta=1
-	  ExcJacobiDeterminantHasWrongSign());
+	  FiniteElement<2>::ExcJacobiDeterminantHasWrongSign());
   Assert ((-x[0]+x[1])*(-y[1]+y[2])-(-x[1]+x[2])*(-y[0]+y[1]),  // xi=1, eta=0
-	  ExcJacobiDeterminantHasWrongSign());
+	  FiniteElement<2>::ExcJacobiDeterminantHasWrongSign());
   
   const double t1 = x[1]*y[3],
 	       t2 = x[1]*y[2],
@@ -409,7 +419,8 @@ void FEQ1<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 template <>
 void FEQ1<2>::get_unit_support_points (std::vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
+	  FiniteElementBase<2>::ExcWrongFieldDimension (unit_points.size(),
+							dofs_per_cell));
 
   unit_points[0] = Point<2> (0,0);
   unit_points[1] = Point<2> (1,0);
@@ -833,20 +844,26 @@ FEQ1<3>::shape_grad_grad (const unsigned int i,
 
 template <>
 void FEQ1<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
-				     FullMatrix<double> &local_mass_matrix) const {
+				     FullMatrix<double> &local_mass_matrix) const
+{
   Assert (local_mass_matrix.n() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+	  FiniteElementBase<3>::ExcWrongFieldDimension(local_mass_matrix.n(),
+						       dofs_per_cell));
   Assert (local_mass_matrix.m() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
+	  FiniteElementBase<3>::ExcWrongFieldDimension(local_mass_matrix.m(),
+						       dofs_per_cell));
 
   throw ExcComputationNotUseful(3);
 };
 
 
+
 template <>
-void FEQ1<3>::get_unit_support_points (std::vector<Point<3> > &unit_points) const {
+void FEQ1<3>::get_unit_support_points (std::vector<Point<3> > &unit_points) const
+{
   Assert (unit_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
+	  FiniteElementBase<3>::ExcWrongFieldDimension (unit_points.size(),
+							dofs_per_cell));
 
   unit_points[0] = Point<3> (0,0,0);
   unit_points[1] = Point<3> (1,0,0);
@@ -865,7 +882,7 @@ void FEQ1<3>::get_unit_support_points (std::vector<Point<3> > &unit_points) cons
 template <int dim>
 void
 FEQ1<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-			       std::vector<Point<dim> >  &support_points) const {
+			       typename std::vector<Point<dim> >  &support_points) const {
   Assert (support_points.size() == dofs_per_cell,
 	  typename FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),
 								   dofs_per_cell));
@@ -878,7 +895,7 @@ FEQ1<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &ce
 template <int dim>
 void
 FEQ1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
-				    std::vector<Point<dim> >  &support_points) const {
+				    typename std::vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == dofs_per_face) &&
 	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),
 	  typename FiniteElementBase<dim>::

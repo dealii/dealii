@@ -122,7 +122,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
 					     // first row
 	    add_value(rate_key, std::string("-"));
 	    for (unsigned int i=1; i<n; ++i)
-	      add_value(rate_key, log(values[i-1]/values[i])/log(2));
+	      add_value(rate_key, log(values[i-1]/values[i])/log(2.0));
 	    break;
       default:
 	    ExcNotImplemented();  

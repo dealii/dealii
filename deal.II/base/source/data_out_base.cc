@@ -23,6 +23,13 @@
 #include <set>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
+
 template <int dim, int spacedim>
 DataOutBase::Patch<dim,spacedim>::Patch () :
 		n_subdivisions (1)
@@ -50,7 +57,7 @@ DataOutBase::Patch<dim,spacedim>::memory_consumption () const
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_ucd (const typename std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
 			     const UcdFlags                          &flags,
 			     std::ostream                            &out) 
@@ -460,7 +467,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_gnuplot (const typename std::vector<Patch<dim,spacedim> > &patches,
 				 const std::vector<std::string>          &data_names,
 				 const GnuplotFlags                      &/*flags*/,
 				 std::ostream                            &out) 
@@ -748,7 +755,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> > &patches,
 				const std::vector<std::string>          &data_names,
 				const PovrayFlags                       &flags,
 				std::ostream                            &out) 
@@ -954,13 +961,13 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 			  << ver[dl](0) << ","   
 			  << patch->data(0,dl) << ","
 			  << ver[dl](1) << ">, <"
-			  << nrml[dl] << ">," << std::endl
-			  << " \t<" 
+			  << nrml[dl] << ">," << std::endl;
+		      out << " \t<" 
 			  << ver[dl+n_subdivisions+1](0) << "," 
 			  << patch->data(0,dl+n_subdivisions+1)  << ","
 			  << ver[dl+n_subdivisions+1](1) << ">, <"
-			  << nrml[dl+n_subdivisions+1] << ">," << std::endl 
-			  << "\t<" 
+			  << nrml[dl+n_subdivisions+1] << ">," << std::endl;
+		      out << "\t<" 
 			  << ver[dl+n_subdivisions+2](0) << "," 
 			  << patch->data(0,dl+n_subdivisions+2)  << ","
 			  << ver[dl+n_subdivisions+2](1) << ">, <"
@@ -971,13 +978,13 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 			  << ver[dl](0) << "," 
 			  << patch->data(0,dl) << ","
 			  << ver[dl](1) << ">, <"
-			  << nrml[dl] << ">," << std::endl 
-			  << "\t<" 
+			  << nrml[dl] << ">," << std::endl;
+		      out << "\t<" 
 			  << ver[dl+n_subdivisions+2](0) << "," 
 			  << patch->data(0,dl+n_subdivisions+2)  << ","
 			  << ver[dl+n_subdivisions+2](1) << ">, <"
-			  << nrml[dl+n_subdivisions+2] << ">," << std::endl 
-			  << "\t<" 
+			  << nrml[dl+n_subdivisions+2] << ">," << std::endl;
+		      out << "\t<" 
 			  << ver[dl+1](0) << "," 
 			  << patch->data(0,dl+1)  << ","
 			  << ver[dl+1](1) << ">, <"
@@ -990,12 +997,12 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 		      out << "triangle {" << std::endl << "\t<" 
 			  << ver[dl](0) << "," 
 			  << patch->data(0,dl) << ","
-			  << ver[dl](1) << ">," << std::endl
-			  << "\t<" 
+			  << ver[dl](1) << ">," << std::endl;
+		      out << "\t<" 
 			  << ver[dl+n_subdivisions+1](0) << "," 
 			  << patch->data(0,dl+n_subdivisions+1)  << ","
-			  << ver[dl+n_subdivisions+1](1) << ">," << std::endl 
-			  << "\t<" 
+			  << ver[dl+n_subdivisions+1](1) << ">," << std::endl;
+		      out << "\t<" 
 			  << ver[dl+n_subdivisions+2](0) << "," 
 			  << patch->data(0,dl+n_subdivisions+2)  << ","
 			  << ver[dl+n_subdivisions+2](1) << ">}" << std::endl; 
@@ -1004,12 +1011,12 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 		      out << "triangle {" << std::endl << "\t<" 
 			  << ver[dl](0) << "," 
 			  << patch->data(0,dl) << ","
-			  << ver[dl](1) << ">," << std::endl 
-			  << "\t<"
+			  << ver[dl](1) << ">," << std::endl;
+		      out << "\t<"
 			  << ver[dl+n_subdivisions+2](0) << "," 
 			  << patch->data(0,dl+n_subdivisions+2)  << ","
-			  << ver[dl+n_subdivisions+2](1) << ">," << std::endl 
-			  << "\t<" 
+			  << ver[dl+n_subdivisions+2](1) << ">," << std::endl;
+		      out << "\t<" 
 			  << ver[dl+1](0) << "," 
 			  << patch->data(0,dl+1)  << ","
 			  << ver[dl+1](1) << ">}" << std::endl;
@@ -1050,7 +1057,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &/*data_names*/,
 			     const EpsFlags                          &flags,
 			     std::ostream                            &out) 
@@ -1389,7 +1396,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_gmv (const typename std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
 			     const GmvFlags                          &/*flags*/,
 			     std::ostream                            &out) 
@@ -1563,7 +1570,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 					     // d>spacedim. write zeros instead
 	    {
 	      const unsigned int n_points
-		= static_cast<unsigned int>(pow (n_subdivisions+1, dim));
+		= static_cast<unsigned int>(pow (static_cast<double>(n_subdivisions+1), dim));
 	      for (unsigned int i=0; i<n_points; ++i)
 		out << "0 ";
 	    };
@@ -1703,7 +1710,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 
 template <int dim, int spacedim>
 void
-DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
+DataOutBase::write_gmv_reorder_data_vectors (const typename std::vector<Patch<dim,spacedim> > &patches,
 					     std::vector<std::vector<double> >       &data_vectors)
 {
 				   // unlike in the main function, we
@@ -1796,7 +1803,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_ucd (std::ostream &out) const 
 {
   DataOutBase::write_ucd (get_patches(), get_dataset_names(),
-					ucd_flags, out);
+			  ucd_flags, out);
 };
 
 
@@ -1954,7 +1961,7 @@ std::string DataOutInterface<dim,spacedim>::default_suffix (OutputFormat output_
 
 
 template <int dim, int spacedim>
-DataOutInterface<dim,spacedim>::OutputFormat
+typename DataOutInterface<dim,spacedim>::OutputFormat
 DataOutInterface<dim,spacedim>::parse_output_format (const std::string &format_name)
 {
   if (format_name == "ucd")

@@ -32,6 +32,11 @@
 #include <base/timer.h>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
 
 static
 inline
@@ -808,7 +813,7 @@ integrate_over_regular_face (Data                       &data,
     for (unsigned int component=0; component<n_components; ++component)
       if (data.component_mask[component] == true)
 	for (unsigned int p=0; p<n_q_points; ++p)
-	  face_integral[n] += sqr(data.phi[n][p][component]) *
+	  face_integral[n] += ::sqr(data.phi[n][p][component]) *
 			      data.JxW_values[p];
   
   data.face_integrals[face] = face_integral;
@@ -964,7 +969,7 @@ integrate_over_irregular_face (Data                       &data,
 	for (unsigned int component=0; component<n_components; ++component)
 	  if (data.component_mask[component] == true)
 	    for (unsigned int p=0; p<n_q_points; ++p)
-	      face_integral[n] += sqr(data.phi[n][p][component]) *
+	      face_integral[n] += ::sqr(data.phi[n][p][component]) *
 				  data.JxW_values[p];
 
       data.face_integrals[neighbor_child->face(neighbor_neighbor)] = face_integral;

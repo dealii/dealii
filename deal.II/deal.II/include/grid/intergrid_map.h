@@ -1,9 +1,5 @@
 //----------------------------  intergrid_map.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -13,7 +9,8 @@
 #ifndef __deal2__intergrid_map_h
 #define __deal2__intergrid_map_h
 
-template <class T> class SmartPointer;
+#include <base/smartpointer.h>
+
 
 /**
  * This class provides a map between two grids which are derived from
@@ -200,7 +197,7 @@ class InterGridMap
 				      * The actual data. Hold one iterator
 				      * for each cell on each level.
 				      */
-    std::vector<std::vector<cell_iterator> > mapping;
+    typename std::vector<typename std::vector<cell_iterator> > mapping;
 
 				     /**
 				      * Store a pointer to the source grid.

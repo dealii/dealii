@@ -13,6 +13,7 @@
 
 
 #include <fe/q1_mapping.h>
+#include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 
@@ -37,7 +38,8 @@ void FEQ1Mapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_itera
 						     std::vector<Tensor<3,1> >    &jacobians_grad) 
 {
   Assert (unit_points.size() == jacobians_grad.size(),
-	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
+	  FiniteElementBase<3>::ExcWrongFieldDimension(jacobians_grad.size(),
+						       unit_points.size()));
 
 				   // derivative of the
 				   // jacobian is always zero
@@ -58,7 +60,8 @@ void FEQ1Mapping<2>::compute_jacobian_gradients (const DoFHandler<2>::cell_itera
 						     std::vector<Tensor<3,2> >    &jacobians_grad) 
 {
   Assert (unit_points.size() == jacobians_grad.size(),
-	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
+	  FiniteElementBase<2>::ExcWrongFieldDimension(jacobians_grad.size(),
+						       unit_points.size()));
 
   const unsigned int dim = 2;
   
@@ -141,7 +144,8 @@ void FEQ1Mapping<3>::compute_jacobian_gradients (const DoFHandler<3>::cell_itera
 						     std::vector<Tensor<3,3> >    &jacobians_grad) 
 {
   Assert (unit_points.size() == jacobians_grad.size(),
-	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
+	  FiniteElementBase<3>::ExcWrongFieldDimension(jacobians_grad.size(),
+						       unit_points.size()));
 
   const unsigned int dim = 3;
   

@@ -542,8 +542,8 @@ void TimeStepBase_Tria<dim>::restore_grid ()
 
 template <int dim>
 static void
-mirror_refinement_flags (const Triangulation<dim>::cell_iterator &new_cell,
-			 const Triangulation<dim>::cell_iterator &old_cell)
+mirror_refinement_flags (const typename Triangulation<dim>::cell_iterator &new_cell,
+			 const typename Triangulation<dim>::cell_iterator &old_cell)
 {
 				   // mirror the refinement
 				   // flags from the present time level to
@@ -589,8 +589,8 @@ mirror_refinement_flags (const Triangulation<dim>::cell_iterator &new_cell,
 
 template <int dim>
 static bool
-adapt_grids (const Triangulation<dim>::cell_iterator &cell1,
-	     const Triangulation<dim>::cell_iterator &cell2)
+adapt_grids (const typename Triangulation<dim>::cell_iterator &cell1,
+	     const typename Triangulation<dim>::cell_iterator &cell2)
 {
 
   if (cell2->has_children() && cell1->has_children()) 

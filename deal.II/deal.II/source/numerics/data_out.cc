@@ -30,6 +30,13 @@
 #include <strstream>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
+
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataEntry::
 DataEntry (const Vector<double> *data,
@@ -237,7 +244,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_dataset_names ()
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-const std::vector<typename DataOutBase::Patch<patch_dim, patch_space_dim> > &
+const typename std::vector<typename DataOutBase::Patch<patch_dim, patch_space_dim> > &
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;

@@ -1,9 +1,5 @@
 //----------------------------  data_out_stack.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -16,6 +12,7 @@
 
 #include <base/data_out_base.h>
 #include <base/smartpointer.h>
+#include <lac/vector.h>
 
 #include <string>
 #include <vector>
@@ -362,7 +359,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * List of patches of all past and
 				      * present parameter value data sets.
 				      */
-    std::vector<DataOutBase::Patch<dim+1> >   patches;
+    typename std::vector<DataOutBase::Patch<dim+1> >   patches;
 
 				     /**
 				      * Structure holding data vectors
@@ -393,12 +390,12 @@ class DataOutStack : public DataOutInterface<dim+1>
 				     /**
 				      * List of DoF data vectors.
 				      */
-    std::vector<DataVector> dof_data;
+    typename std::vector<DataVector> dof_data;
 
 				     /**
 				      * List of cell data vectors.
 				      */
-    std::vector<DataVector> cell_data;
+    typename std::vector<DataVector> cell_data;
     
 				     /**
 				      * This is the function through
@@ -408,7 +405,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * the base class @ref{DataOutBase}) to
 				      * the actual output function.
 				      */
-    virtual const std::vector<DataOutBase::Patch<dim+1> > & get_patches () const;
+    virtual const typename std::vector<typename DataOutBase::Patch<dim+1> > & get_patches () const;
 
 
 				     /**

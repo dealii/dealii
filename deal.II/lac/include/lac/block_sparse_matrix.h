@@ -511,7 +511,7 @@ class BlockSparseMatrix : public Subscriptor
 				     /**
 				      * Array of sub-matrices.
 				      */
-    std::vector<std::vector<SmartPointer<SparseMatrix<number> > > > sub_objects;
+    typename std::vector<std::vector<SmartPointer<SparseMatrix<number> > > > sub_objects;
 };
 
 

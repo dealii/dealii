@@ -194,7 +194,7 @@ namespace MemoryConsumption
 				    * vectors of bools.
 				    */
   template <typename T>
-  unsigned int memory_consumption (const std::vector<T> &v);
+  unsigned int memory_consumption (const typename std::vector<T> &v);
 
 				   /**
 				    * Estimate the amount of memory
@@ -274,7 +274,23 @@ namespace MemoryConsumption
 				    * for a vector of pointers.
 				    */
   template <typename T>
-  unsigned int memory_consumption (const std::vector<T *> &v);
+  unsigned int memory_consumption (const typename std::vector<T *> &v);
+
+				   /** 
+				    * Specialization of the
+				    * determination of the memory
+				    * consumption of a vector, here
+				    * for a vector of strings. This
+				    * function is not necessary from a
+				    * struct C++ viewpoint, since it
+				    * could be generated, but is
+				    * necessary for compatibility with
+				    * IBM's xlC 5.0 compiler, and
+				    * doesn't harm for other compilers
+				    * as well.  
+				    */
+  unsigned int memory_consumption (const std::vector<std::string> &v);
+
 
 				   /**
 				    * Determine an estimate of the
@@ -282,7 +298,7 @@ namespace MemoryConsumption
 				    * consumed by a pair of values.
 				    */
   template <typename A, typename B>
-  unsigned int memory_consumption (const std::pair<A,B> &p);
+  unsigned int memory_consumption (const typename std::pair<A,B> &p);
     
 				   /**
 				    * Return the amount of memory
@@ -413,8 +429,13 @@ namespace MemoryConsumption
 
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+  using namespace std;
+#endif
+
   template <typename T>
-  unsigned int memory_consumption (const std::vector<T> &v)
+  unsigned int memory_consumption (const typename std::vector<T> &v)
   {
     unsigned int mem = sizeof(std::vector<T>);
     const unsigned int n = v.size();
@@ -492,7 +513,7 @@ namespace MemoryConsumption
     
   template <typename T>
   inline
-  unsigned int memory_consumption (const std::vector<T *> &v)
+  unsigned int memory_consumption (const typename std::vector<T *> &v)
   {
     return (v.capacity() * sizeof(T *) +
 	    sizeof(v));
@@ -502,7 +523,7 @@ namespace MemoryConsumption
 				    
   template <typename A, typename B>
   inline
-  unsigned int memory_consumption (const std::pair<A,B> &p)
+  unsigned int memory_consumption (const typename std::pair<A,B> &p)
   {
     return (memory_consumption(p.first) +
 	    memory_consumption(p.second));

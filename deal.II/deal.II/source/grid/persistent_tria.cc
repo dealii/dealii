@@ -18,6 +18,13 @@
 #include <iostream>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
+
 template <int dim>
 PersistentTriangulation<dim>::
 PersistentTriangulation (const Triangulation<dim> &coarse_grid) :
@@ -95,8 +102,8 @@ PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_
 
 template <int dim>
 void
-PersistentTriangulation<dim>::create_triangulation (const std::vector<Point<dim> >    &,
-						    const std::vector<CellData<dim> > &,
+PersistentTriangulation<dim>::create_triangulation (const typename std::vector<Point<dim> >    &,
+						    const typename std::vector<CellData<dim> > &,
 						    const SubCellData                 &)
 {
   Assert (false, ExcFunctionNotUseful());

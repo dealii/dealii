@@ -1165,13 +1165,13 @@ void MultipleParameterLoop::init_branches ()
 				   // finally calculate number of branches
   n_branches = 1;
   for (unsigned int i=0; i<multiple_choices.size(); ++i)
-    if (multiple_choices[i].type == variant)
+    if (multiple_choices[i].type == Entry::variant)
       n_branches *= multiple_choices[i].different_values.size();
 
 				   // check whether array entries have the correct
 				   // number of entries
   for (unsigned int i=0; i<multiple_choices.size(); ++i)
-    if (multiple_choices[i].type == array)
+    if (multiple_choices[i].type == Entry::array)
       if (multiple_choices[i].different_values.size() != n_branches)
 	std::cerr << "    The entry value" << std::endl
 		  << "        " << multiple_choices[i].entry_value << std::endl
@@ -1232,7 +1232,7 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
       Section* pd = get_present_defaults_subsection ();
       int selection = (run_no/possibilities) % choice->different_values.size();
       std::string entry_value;
-      if (choice->type == variant)
+      if (choice->type == Entry::variant)
 	entry_value = choice->different_values[selection];
       else 
 	{
@@ -1278,7 +1278,7 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
       subsection_path.swap (choice->subsection_path);
 
 				       // move ahead if it was a variant entry
-      if (choice->type == variant)
+      if (choice->type == Entry::variant)
 	possibilities *= choice->different_values.size();
     };
   
@@ -1348,9 +1348,9 @@ void MultipleParameterLoop::Entry::split_different_values ()
 				   // entry ({...}) or an array ({{...}})
   if ((entry_value.find("{{") != std::string::npos) &&
       (entry_value.find("}}") != std::string::npos))
-    type = array;
+    type = Entry::array;
   else
-    type = variant;
+    type = Entry::variant;
 };
 
 

@@ -12,6 +12,10 @@
 //----------------------------  dof_accessor.cc  ---------------------------
 
 
+#include <lac/vector.h>
+#include <lac/block_vector.h>
+#include <lac/sparse_matrix.h>
+
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_accessor.templates.h>
 #include <dofs/dof_handler.h>
@@ -19,10 +23,6 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
-
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/sparse_matrix.h>
 
 #include <vector>
 
@@ -714,7 +714,7 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   if (!has_children())
-				     // if this cell has no children: simply
+                                     // if this cell has no children: simply
 				     // set the values on this cell
     set_dof_values (local_values, values);
   else

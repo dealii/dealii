@@ -1,9 +1,5 @@
 //----------------------------  dof_renumbering.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -296,7 +292,7 @@ class DoFRenumbering
     template <int dim>
     static void
     cell_wise_dg (DoFHandler<dim>                     &dof_handler,
-		  const std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
+		  const typename std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
     
 
 				     /**
@@ -307,9 +303,9 @@ class DoFRenumbering
 				      */
     template <int dim>
     static void
-    cell_wise_dg (MGDoFHandler<dim>                                       &dof_handler,
-		  const unsigned int                                       level,
-		  const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
+    cell_wise_dg (MGDoFHandler<dim>   &dof_handler,
+		  const unsigned int   level,
+		  const typename std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
     
 
 				     /**

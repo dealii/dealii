@@ -39,10 +39,14 @@ SquareFunction<dim>::value (const Point<dim>   &p,
 }
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
 
 template<int dim>
 void
-SquareFunction<dim>::value_list (const std::vector<Point<dim> > &points,
+SquareFunction<dim>::value_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int) const
 {
@@ -68,7 +72,7 @@ SquareFunction<dim>::laplacian (const Point<dim>   &,
 
 template<int dim>
 void
-SquareFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
+SquareFunction<dim>::laplacian_list (const typename std::vector<Point<dim> > &points,
 				     std::vector<double>            &values,
 				     const unsigned int) const
 {
@@ -93,8 +97,8 @@ SquareFunction<dim>::gradient (const Point<dim>   &p,
 
 template<int dim>
 void
-SquareFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
-				    std::vector<Tensor<1,dim> >    &gradients,
+SquareFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &points,
+				    typename std::vector<Tensor<1,dim> >    &gradients,
 				    const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
@@ -120,7 +124,7 @@ Q1WedgeFunction<dim>::value (const Point<dim>   &p,
 
 template<int dim>
 void
-Q1WedgeFunction<dim>::value_list (const std::vector<Point<dim> > &points,
+Q1WedgeFunction<dim>::value_list (const typename std::vector<Point<dim> > &points,
 				  std::vector<double>            &values,
 				  const unsigned int) const
 {
@@ -146,7 +150,7 @@ Q1WedgeFunction<dim>::laplacian (const Point<dim>   &,
 
 template<int dim>
 void
-Q1WedgeFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
+Q1WedgeFunction<dim>::laplacian_list (const typename std::vector<Point<dim> > &points,
 				      std::vector<double>            &values,
 				      const unsigned int) const
 {
@@ -174,8 +178,8 @@ Q1WedgeFunction<dim>::gradient (const Point<dim>   &p,
 
 template<int dim>
 void
-Q1WedgeFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
-				     std::vector<Tensor<1,dim> >    &gradients,
+Q1WedgeFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &points,
+				     typename std::vector<Tensor<1,dim> >    &gradients,
 				     const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
@@ -220,7 +224,7 @@ PillowFunction<dim>::value (const Point<dim>   &p,
 
 template<int dim>
 void
-PillowFunction<dim>::value_list (const std::vector<Point<dim> > &points,
+PillowFunction<dim>::value_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int) const
 {
@@ -272,7 +276,7 @@ PillowFunction<dim>::laplacian (const Point<dim>   &p,
 
 template<int dim>
 void
-PillowFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
+PillowFunction<dim>::laplacian_list (const typename std::vector<Point<dim> > &points,
 				     std::vector<double>            &values,
 				     const unsigned int) const
 {
@@ -329,8 +333,8 @@ PillowFunction<dim>::gradient (const Point<dim>   &p,
 
 template<int dim>
 void
-PillowFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
-				    std::vector<Tensor<1,dim> >    &gradients,
+PillowFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &points,
+				    typename std::vector<Tensor<1,dim> >    &gradients,
 				    const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
@@ -382,7 +386,7 @@ CosineFunction<dim>::value (const Point<dim>   &p,
 
 template<int dim>
 void
-CosineFunction<dim>::value_list (const std::vector<Point<dim> > &points,
+CosineFunction<dim>::value_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int) const
 {
@@ -430,7 +434,7 @@ CosineFunction<dim>::laplacian (const Point<dim>   &p,
 
 template<int dim>
 void
-CosineFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
+CosineFunction<dim>::laplacian_list (const typename std::vector<Point<dim> > &points,
 				     std::vector<double>            &values,
 				     const unsigned int) const
 {
@@ -485,8 +489,8 @@ CosineFunction<dim>::gradient (const Point<dim>   &p,
 
 template<int dim>
 void
-CosineFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
-				    std::vector<Tensor<1,dim> >    &gradients,
+CosineFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &points,
+				    typename std::vector<Tensor<1,dim> >    &gradients,
 				    const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
@@ -538,7 +542,7 @@ ExpFunction<dim>::value (const Point<dim>   &p,
 
 template<int dim>
 void
-ExpFunction<dim>::value_list (const std::vector<Point<dim> > &points,
+ExpFunction<dim>::value_list (const typename std::vector<Point<dim> > &points,
 			      std::vector<double>            &values,
 			      const unsigned int) const
 {
@@ -586,7 +590,7 @@ ExpFunction<dim>::laplacian (const Point<dim>   &p,
 
 template<int dim>
 void
-ExpFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
+ExpFunction<dim>::laplacian_list (const typename std::vector<Point<dim> > &points,
 				  std::vector<double>            &values,
 				  const unsigned int) const
 {
@@ -641,8 +645,8 @@ ExpFunction<dim>::gradient (const Point<dim>   &p,
 
 template<int dim>
 void
-ExpFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
-				 std::vector<Tensor<1,dim> >    &gradients,
+ExpFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &points,
+				 typename std::vector<Tensor<1,dim> >    &gradients,
 				 const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
@@ -891,7 +895,7 @@ JumpFunction<dim>::value (const Point<dim>   &p,
 
 template<int dim>
 void
-JumpFunction<dim>::value_list (const std::vector<Point<dim> > &p,
+JumpFunction<dim>::value_list (const typename std::vector<Point<dim> > &p,
 			       std::vector<double>          &values,
 			       const unsigned int) const
 {
@@ -919,7 +923,7 @@ JumpFunction<dim>::laplacian (const Point<dim>   &p,
 
 template<int dim>
 void
-JumpFunction<dim>::laplacian_list (const std::vector<Point<dim> > &p,
+JumpFunction<dim>::laplacian_list (const typename std::vector<Point<dim> > &p,
 				   std::vector<double>          &values,
 				   const unsigned int) const
 {
@@ -955,8 +959,8 @@ JumpFunction<dim>::gradient (const Point<dim>   &p,
 
 template<int dim>
 void
-JumpFunction<dim>::gradient_list (const std::vector<Point<dim> > &p,
-				  std::vector<Tensor<1,dim> >  &gradients,
+JumpFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &p,
+				  typename std::vector<Tensor<1,dim> >  &gradients,
 				  const unsigned int) const
 {
   Assert (gradients.size() == p.size(),
@@ -983,21 +987,21 @@ JumpFunction<dim>::memory_consumption () const
 };
 
 
-template SquareFunction<1>;
-template SquareFunction<2>;
-template SquareFunction<3>;
-template Q1WedgeFunction<1>;
-template Q1WedgeFunction<2>;
-template Q1WedgeFunction<3>;
-template PillowFunction<1>;
-template PillowFunction<2>;
-template PillowFunction<3>;
-template CosineFunction<1>;
-template CosineFunction<2>;
-template CosineFunction<3>;
-template ExpFunction<1>;
-template ExpFunction<2>;
-template ExpFunction<3>;
-template JumpFunction<1>;
-template JumpFunction<2>;
-template JumpFunction<3>;
+template class SquareFunction<1>;
+template class SquareFunction<2>;
+template class SquareFunction<3>;
+template class Q1WedgeFunction<1>;
+template class Q1WedgeFunction<2>;
+template class Q1WedgeFunction<3>;
+template class PillowFunction<1>;
+template class PillowFunction<2>;
+template class PillowFunction<3>;
+template class CosineFunction<1>;
+template class CosineFunction<2>;
+template class CosineFunction<3>;
+template class ExpFunction<1>;
+template class ExpFunction<2>;
+template class ExpFunction<3>;
+template class JumpFunction<1>;
+template class JumpFunction<2>;
+template class JumpFunction<3>;

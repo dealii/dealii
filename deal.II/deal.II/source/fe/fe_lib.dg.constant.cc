@@ -13,10 +13,18 @@
 
 
 #include <fe/fe_lib.dg.h>
+#include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <grid/geometry_info.h>
 #include <algorithm>
+
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
 
 
 template <int dim>
@@ -89,7 +97,7 @@ FEDG_Q0<dim>::shape_grad_grad (const unsigned int i,
 
 
 template <int dim>
-void FEDG_Q0<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+void FEDG_Q0<dim>::get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
 					  FullMatrix<double> &local_mass_matrix) const
 {
   Assert (local_mass_matrix.n() == dofs_per_cell,
@@ -106,7 +114,7 @@ void FEDG_Q0<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &
 
 template <int dim>
 void
-FEDG_Q0<dim>::get_unit_support_points (std::vector<Point<dim> > &unit_points) const
+FEDG_Q0<dim>::get_unit_support_points (typename std::vector<Point<dim> > &unit_points) const
 {
   Assert (unit_points.size() == dofs_per_cell,
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
@@ -119,7 +127,7 @@ FEDG_Q0<dim>::get_unit_support_points (std::vector<Point<dim> > &unit_points) co
 template <int dim>
 void
 FEDG_Q0<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-				  std::vector<Point<dim> >  &support_points) const
+				  typename std::vector<Point<dim> >  &support_points) const
 {
   Assert (support_points.size() == dofs_per_cell,
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
@@ -132,7 +140,7 @@ FEDG_Q0<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator 
 template <int dim>
 void
 FEDG_Q0<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-				       std::vector<Point<dim> >  &support_points) const
+				       typename std::vector<Point<dim> >  &support_points) const
 {
   Assert ((support_points.size() == 0),
 	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));

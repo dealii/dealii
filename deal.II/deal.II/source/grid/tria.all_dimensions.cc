@@ -18,6 +18,7 @@
 #include <grid/tria_boundary.h>
 
 #include <algorithm>
+#include <functional>
 #include <numeric>
 
 

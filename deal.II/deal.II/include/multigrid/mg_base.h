@@ -1,9 +1,5 @@
 //----------------------------  mg_base.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -20,6 +16,7 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/vector.h>
+#include <lac/sparsity_pattern.h>
 
 #include <vector>
 
@@ -103,7 +100,7 @@ class MGLevelObject : public Subscriptor
 				     /**
 				      * Array of the objects to be held.
 				      */
-    std::vector<Object> objects;
+    typename std::vector<Object> objects;
 };
 
 

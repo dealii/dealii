@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>The deal.II Readme -- Installation Instructions</title>
+    <meta name="author" content="Wolfgang Bangerth <deal@iwr.uni-heidelberg.de>">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+
+
+    <h1>Installation instructions for IBM AIX using the xlC compiler</h1>
+
+    <p>
+    First note that <acronym>deal.II</acronym> does not yet work with
+    IBM xlC compiler version 5.0, i.e. the compiler from the Visual
+    Age for C++ package. We have tried to make it run and have fixed
+    as many places as possible in order to reduce the number of
+    errors, but have not been able to work around some problems.
+    </p>
+
+    <p>
+    xlC 5.0 has large problems mainly in the following areas:
+    <ul>
+    <li> <p> 
+         Templatized member functions of classes. We have not been
+         able to explicitely instantiate them, nor to take the address
+         of such functions. For example, the following program fails:
+	 </p>
+
+	 <p>
+	 <code>
+	 <pre>
+	 aixterm7:/u/sfb359/q71> cat t.cc
+	     class X {
+	       template <int dim> void f() {};
+	       template <int dim> void g();
+	     };
+
+	     template <int dim> 
+	     void X::g () {
+	       void (X::*p) () = &X::template f<dim>;
+	     };
+
+	     // explicit instantiation
+	     template void X::g<1> ();
+	 aixterm7:/u/sfb359/q71> /usr/vacpp/bin/xlC -c t.cc -o /dev/null
+	     "t.cc", line 8.22: 1540-0130 (S) "X::f" is not declared.
+	     "t.cc", line 7.6: 1540-0700 (I) The previous message was produced while processing "X::g<1>()".
+	 </pre>
+	 </code>
+	 </p>
+
+    <li> <p>
+         A compiler bug prevented us from compiling this snippet:
+	 <code>
+	 <pre>
+	 aixterm7:/u/sfb359/q71> cat t.cc
+             namespace std {
+               template <class _Ty>                             class allocator {};
+               template<class _Ty, class _Ax = allocator<_Ty> > class vector{};
+             }
+
+             struct X {};
+             template <int dim> void g (const std::vector<X> &x);
+
+             void f ()  {
+               std::vector<X> x;
+               g<1> (x);
+             };
+         aixterm7:/u/sfb359/q71> /usr/vacpp/bin/xlC -c t.cc -o /dev/null
+             "t.cc", line 11.9: 1540-0130 (S) "allocator" is not declared.
+             "t.cc", line 11.9: 1540-0700 (I) The previous message was produced while processing "g".
+	 </pre>
+	 </code>
+	 This also happens when the first four lines declaring the
+	 namespace <code>std::</code> are replaced by 
+	 <code>#include &lt;vector&gt;</code>.
+	 </p>
+
+    <li> <p>
+         There's another nasty bug that does not allow such code:
+	 <code>
+	 <pre>
+	 aixterm7:/u/sfb359/q71> cat t.cc
+             #include <vector>
+             class X{};
+
+             void f() {
+               std::vector<X> v;
+               std::vector<X>::iterator       i1=v.begin();
+               std::vector<X>::const_iterator i2=v.begin();
+               bool x = (i1 != i2);
+             };
+         aixterm7:/u/sfb359/q71> /usr/vacpp/bin/xlC -c t.cc -o /dev/null
+             "t.cc", line 8.16: 1540-0218 (S) The call does not match any parameter list for "operator!=".
+             "/usr/vacpp/include/xutility", line 247.14: 1540-1283 (I) "std::_Ptrit<X,int,X *,X &,X *,X &>::operator!=(const _Myt &) const" is not a viable candidate.
+             "t.cc", line 8.19: 1540-0256 (I) A parameter of type "const std::_Ptrit<X,int,X *,X &,X *,X &> &" cannot be initialized with an expression of type "std::vector<X,std::allocator<X> >::const_iterator".
+             "/usr/vacpp/include/utility", line 59.14: 1540-1283 (I) "template <class _T1, class _T2> std::operator!=(const pair<_T1,_T2> &, const pair<_T1,_T2> &)" is not a viable candidate.
+             "/usr/vacpp/include/xutility", line 362.14: 1540-1283 (I) "template <class _RI> std::operator!=(const reverse_iterator<_RI> &, const reverse_iterator<_RI> &)" is not a viable candidate.
+             "/usr/vacpp/include/xutility", line 477.14: 1540-1283 (I) "template <class _E, class _Tr> std::operator!=(const istreambuf_iterator<_E,_Tr> &, const istreambuf_iterator<_E,_Tr> &)" is not a viable candidate.
+             "/usr/vacpp/include/iterator", line 167.14: 1540-1283 (I) "template <class _Ty, class _E, class _Tr, class _Dist> std::operator!=(const istream_iterator<_Ty,_E,_Tr,_Dist> &, const istream_iterator<_Ty,_E,_Tr,_Dist> &)" is not a viable candidate.
+             "/usr/vacpp/include/xmemory", line 127.14: 1540-1283 (I) "template <class _Ty, class _U> std::operator!=(const allocator<_Ty> &, const allocator<_U> &)" is not a viable candidate.
+             "/usr/vacpp/include/vector", line 293.14: 1540-1283 (I) "template <class _Ty, class _A> std::operator!=(const vector<_Ty,_A> &, const vector<_Ty,_A> &)" is not a viable candidate.
+	 </pre>
+	 </code>
+	 </p>
+
+    <li> <p>
+         Finally, there was a bug (sorry, I can't reproduce it
+         presently in a small code snippet) which yielded this funny
+         error message:
+	 <pre>
+	 <code>
+             "source/dofs/dof_accessor.cc", line 720.80: 1540-0216 (S) An
+             expression of type "const Vector<double>" cannot be converted to
+             "const Vector<double>". 
+	 </pre>
+	 </code>
+	 </p>
+    </ul>
+    </p>
+
+    <p>
+    At this point, I gave up. In summary, there may have only be half
+    a dozen bugs in the compiler that were triggered several hundred
+    times, but as long as these are not fixed in the compiler itself,
+    I see no way to use xlC for deal.II. Nevertheless, as gcc also
+    runs on this platform, there is an alternative which you can fall
+    back on.
+    </p>
+
+  </body>
+</html>

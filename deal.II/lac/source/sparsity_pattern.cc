@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numeric>
-
+#include <functional>
 
 
 const unsigned int SparsityPattern::invalid_entry;

@@ -1,9 +1,5 @@
 //----------------------------  grid_in.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -256,9 +252,9 @@ class GridIn
 				      * have to eliminate unused
 				      * vertices beforehand.
 				      */
-    static void delete_unused_vertices (std::vector<Point<dim> >    &vertices,
-					std::vector<CellData<dim> > &cells,
-					SubCellData                 &subcelldata);
+    static void delete_unused_vertices (typename std::vector<Point<dim> >    &vertices,
+					typename std::vector<CellData<dim> > &cells,
+					SubCellData                          &subcelldata);
 
 				     /**
 				      * This function can write the
@@ -305,9 +301,9 @@ class GridIn
 				      * without further ado by the
 				      * user.
 				      */
-    static void debug_output_grid (const std::vector<CellData<dim> > &cells,
-				   const std::vector<Point<dim> >    &vertices,
-				   std::ostream                      &out);
+    static void debug_output_grid (const typename std::vector<CellData<dim> > &cells,
+				   const typename std::vector<Point<dim> >    &vertices,
+				   std::ostream                               &out);
 };
 
 

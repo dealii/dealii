@@ -86,9 +86,9 @@ class FunctionDerivative : public Function<dim>
 				     /**
 				      * Function values at multiple points.
 				      */
-    virtual void value_list (const std::vector<Point<dim> > &points,
-			     std::vector<double>            &values,
-			     const unsigned int              component = 0) const;    
+    virtual void value_list (const typename std::vector<Point<dim> > &points,
+			     std::vector<double>                     &values,
+			     const unsigned int                       component = 0) const;    
 
 				     /**
 				      * Determine an estimate for

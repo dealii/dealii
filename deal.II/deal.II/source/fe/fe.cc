@@ -20,11 +20,31 @@
 #include <dofs/dof_accessor.h>
 #include <grid/tria_boundary.h>
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
+
 
 /*------------------------------- FiniteElementData ----------------------*/
 
 template <int dim>
-FiniteElementData<dim>::FiniteElementData ()
+FiniteElementData<dim>::FiniteElementData () :
+		dofs_per_vertex(static_cast<unsigned int>(-1)),
+		dofs_per_line(static_cast<unsigned int>(-1)),
+		dofs_per_quad(static_cast<unsigned int>(-1)),
+		dofs_per_hex(static_cast<unsigned int>(-1)),
+		first_line_index(static_cast<unsigned int>(-1)),
+		first_quad_index(static_cast<unsigned int>(-1)),
+		first_hex_index(static_cast<unsigned int>(-1)),
+		first_face_line_index(static_cast<unsigned int>(-1)),
+		first_face_quad_index(static_cast<unsigned int>(-1)),
+		dofs_per_face(static_cast<unsigned int>(-1)),
+		dofs_per_cell(static_cast<unsigned int>(-1)),
+		transform_functions(static_cast<unsigned int>(-1)),
+		components(static_cast<unsigned int>(-1))
 {
   Assert (false, ExcNotImplemented());
 };
@@ -141,6 +161,7 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 
 
 /*------------------------------- FiniteElementBase ----------------------*/
+
 
 
 template <int dim>
@@ -430,41 +451,41 @@ void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &c
 
 
 template <int dim>
-void FiniteElement<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
-					 const std::vector<Point<dim> > &,
-					 std::vector<Tensor<2,dim> > &,
+void FiniteElement<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &,
+					 const typename std::vector<Point<dim> > &,
+					 typename std::vector<Tensor<2,dim> > &,
 					 const bool,
-					 std::vector<Tensor<3,dim> > &,
+					 typename std::vector<Tensor<3,dim> > &,
 					 const bool,
-					 std::vector<Point<dim> > &,
+					 typename std::vector<Point<dim> > &,
 					 const bool,
-					 std::vector<Point<dim> > &,
+					 typename std::vector<Point<dim> > &,
 					 const bool,
 					 const FullMatrix<double>      &,
-					 const std::vector<std::vector<Tensor<1,dim> > > &) const {
+					 const typename std::vector<typename std::vector<Tensor<1,dim> > > &) const {
   Assert (false, ExcPureFunctionCalled());
 };
 
 
 template <int dim>
-void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterator &cell,
+void FiniteElement<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
 					      const unsigned int           face_no,
-					      const std::vector<Point<dim-1> > &unit_points,
-					      const std::vector<Point<dim> > &global_unit_points,
-					      std::vector<Tensor<2,dim> >    &jacobians,
+					      const typename std::vector<Point<dim-1> > &unit_points,
+					      const typename std::vector<Point<dim> > &global_unit_points,
+					      typename std::vector<Tensor<2,dim> >    &jacobians,
 					      const bool           compute_jacobians,
-					      std::vector<Tensor<3,dim> >    &jacobians_grad,
+					      typename std::vector<Tensor<3,dim> >    &jacobians_grad,
 					      const bool           compute_jacobians_grad,
-					      std::vector<Point<dim> > &support_points,
+					      typename std::vector<Point<dim> > &support_points,
 					      const bool           compute_support_points,
-					      std::vector<Point<dim> > &q_points,
+					      typename std::vector<Point<dim> > &q_points,
 					      const bool           compute_q_points,
 					      std::vector<double>      &face_jacobi_determinants,
 					      const bool           compute_face_jacobians,
-					      std::vector<Point<dim> > &normal_vectors,
+					      typename std::vector<Point<dim> > &normal_vectors,
 					      const bool           compute_normal_vectors,
 					      const FullMatrix<double>      &shape_values_transform,
-					      const std::vector<std::vector<Tensor<1,dim> > > &shape_gradients_transform) const
+					      const typename std::vector<typename std::vector<Tensor<1,dim> > > &shape_gradients_transform) const
 {
   Assert (jacobians.size() == unit_points.size(),
 	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
@@ -502,23 +523,23 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 
 
 template <int dim>
-void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_iterator &cell,
+void FiniteElement<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
 						 const unsigned int           face_no,
 						 const unsigned int           subface_no,
-						 const std::vector<Point<dim-1> > &unit_points,
-						 const std::vector<Point<dim> > &global_unit_points,
-						 std::vector<Tensor<2,dim> >    &jacobians,
+						 const typename std::vector<Point<dim-1> > &unit_points,
+						 const typename std::vector<Point<dim> > &global_unit_points,
+						 typename std::vector<Tensor<2,dim> >    &jacobians,
 						 const bool           compute_jacobians,
-						 std::vector<Tensor<3,dim> >    &jacobians_grad,
+						 typename std::vector<Tensor<3,dim> >    &jacobians_grad,
 						 const bool           compute_jacobians_grad,
-						 std::vector<Point<dim> > &q_points,
+						 typename std::vector<Point<dim> > &q_points,
 						 const bool           compute_q_points,
 						 std::vector<double>      &face_jacobi_determinants,
 						 const bool           compute_face_jacobians,
-						 std::vector<Point<dim> > &normal_vectors,
+						 typename std::vector<Point<dim> > &normal_vectors,
 						 const bool           compute_normal_vectors,
 						 const FullMatrix<double>      &shape_values_transform,
-						 const std::vector<std::vector<Tensor<1,dim> > > &shape_gradients_transform) const
+						 const typename std::vector<std::vector<Tensor<1,dim> > > &shape_gradients_transform) const
 {
   Assert (jacobians.size() == unit_points.size(),
 	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
@@ -550,7 +571,7 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 
 template <int dim>
 void
-FiniteElement<dim>::get_unit_support_points (std::vector<Point<dim> > &) const
+FiniteElement<dim>::get_unit_support_points (typename std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 };
@@ -558,8 +579,8 @@ FiniteElement<dim>::get_unit_support_points (std::vector<Point<dim> > &) const
 
 template <int dim>
 void
-FiniteElement<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &,
-					std::vector<Point<dim> > &) const
+FiniteElement<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &,
+					typename std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 };

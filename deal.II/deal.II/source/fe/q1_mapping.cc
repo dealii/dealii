@@ -16,10 +16,18 @@
 #include <base/quadrature.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
+#include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 
 #include <cmath>
+
+
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
 
 
 /*---------------------------- FEQ1Mapping ----------------------------------*/
@@ -199,7 +207,8 @@ void FEQ1Mapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &fac
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == face_jacobians.size(),
-	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
+	  FiniteElementBase<2>::ExcWrongFieldDimension (unit_points.size(),
+							face_jacobians.size()));
 
 				   // a linear mapping for a single line
 				   // produces particularly simple
@@ -220,9 +229,10 @@ void FEQ1Mapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == face_jacobians.size(),
-	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
+	  FiniteElementBase<2>::ExcWrongFieldDimension (unit_points.size(),
+							face_jacobians.size()));
   Assert (face->at_boundary() == false,
-	  ExcBoundaryFaceUsed ());
+	  FiniteElement<2>::ExcBoundaryFaceUsed ());
 
 				   // a linear mapping for a single line
 				   // produces particularly simple
@@ -243,7 +253,8 @@ void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cel
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == normal_vectors.size(),
-	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
+	  FiniteElementBase<2>::ExcWrongFieldDimension (unit_points.size(),
+							normal_vectors.size()));
 
   const DoFHandler<2>::face_iterator face = cell->face(face_no);
 				   // compute direction of line
@@ -277,9 +288,10 @@ void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cel
 				   // subface have the same direction as that
 				   // for the face
   Assert (unit_points.size() == normal_vectors.size(),
-	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
+	  FiniteElementBase<2>::ExcWrongFieldDimension (unit_points.size(),
+							normal_vectors.size()));
   Assert (cell->face(face_no)->at_boundary() == false,
-	  ExcBoundaryFaceUsed ());
+	  FiniteElement<2>::ExcBoundaryFaceUsed ());
 
   const DoFHandler<2>::face_iterator face = cell->face(face_no);
 				   // compute direction of line
@@ -385,7 +397,8 @@ void FEQ1Mapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &fac
 					 const std::vector<Point<2> > &unit_points,
 					 std::vector<double> &face_jacobians) const {
   Assert (unit_points.size() == face_jacobians.size(),
-	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
+	  FiniteElementBase<3>::ExcWrongFieldDimension (unit_points.size(),
+							face_jacobians.size()));
 
 				   // the computation of the face jacobians is
 				   // along the following lines: let x_i be
@@ -457,7 +470,8 @@ void FEQ1Mapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &
 					    const std::vector<Point<2> > &unit_points,
 					    std::vector<double> &face_jacobians) const {
   Assert (false,
-	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
+	  FiniteElementBase<3>::ExcWrongFieldDimension (unit_points.size(),
+							face_jacobians.size()));
 };
 
 
@@ -467,7 +481,8 @@ void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cel
 					 const std::vector<Point<2> > &unit_points,
 					 std::vector<Point<3> > &normal_vectors) const {
   Assert (unit_points.size() == normal_vectors.size(),
-	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
+	  FiniteElementBase<3>::ExcWrongFieldDimension (unit_points.size(),
+							normal_vectors.size()));
   
 				   // taken from the same script as is
 				   // the computation of the jacobian
@@ -527,7 +542,8 @@ void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*c
 				   // subface have the same direction as that
 				   // for the face
   Assert (false,
-	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
+	  FiniteElementBase<3>::ExcWrongFieldDimension (unit_points.size(),
+							normal_vectors.size()));
 };
 
 #endif
@@ -535,7 +551,7 @@ void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*c
 
 template <int dim>
 Point<dim> FEQ1Mapping<dim>::transform_unit_to_real_cell (
-  const DoFHandler<dim>::cell_iterator cell,
+  const typename DoFHandler<dim>::cell_iterator &cell,
   const Point<dim> &p) const
 {
   Point<dim> p_real;
@@ -547,7 +563,7 @@ Point<dim> FEQ1Mapping<dim>::transform_unit_to_real_cell (
 
 template <int dim>
 Point<dim> FEQ1Mapping<dim>::transform_real_to_unit_cell (
-  const DoFHandler<dim>::cell_iterator cell,
+  const typename DoFHandler<dim>::cell_iterator &cell,
   const Point<dim> &p) const
 {
 				   // Newton iteration to solve
@@ -599,18 +615,18 @@ Point<dim> FEQ1Mapping<dim>::transform_real_to_unit_cell (
 
   
 template <int dim>
-void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				       const std::vector<Point<dim> >            &unit_points,
-				       std::vector<Tensor<2,dim> >               &jacobians,
+void FEQ1Mapping<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+				       const typename std::vector<Point<dim> >            &unit_points,
+				       typename std::vector<Tensor<2,dim> >               &jacobians,
 				       const bool              compute_jacobians,
-				       std::vector<Tensor<3,dim> > &jacobians_grad,
+				       typename std::vector<Tensor<3,dim> > &jacobians_grad,
 				       const bool              compute_jacobians_grad,
-				       std::vector<Point<dim> > &support_points,
+				       typename std::vector<Point<dim> > &support_points,
 				       const bool           compute_support_points,
-				       std::vector<Point<dim> > &q_points,
+				       typename std::vector<Point<dim> > &q_points,
 				       const bool           compute_q_points,
 				       const FullMatrix<double>      &shape_values_transform,
-				       const std::vector<std::vector<Tensor<1,dim> > > &shape_grad_transform) const
+				       const typename std::vector<typename std::vector<Tensor<1,dim> > > &shape_grad_transform) const
 {
   Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
 	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),

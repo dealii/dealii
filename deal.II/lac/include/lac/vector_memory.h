@@ -16,6 +16,7 @@
 
 #include <base/subscriptor.h>
 #include <base/logstream.h>
+#include <lac/vector.h>
 
 #include <vector>
 
@@ -32,7 +33,7 @@
  * sophisticated management of vectors. One of these has to be
  * applied by the user according to his needs.
  */
-template<class Vector = Vector<double> >
+template<class Vector = ::Vector<double> >
 class VectorMemory : public Subscriptor
 {
   public:
@@ -72,7 +73,7 @@ class VectorMemory : public Subscriptor
  * vectors as needed from the global heap, i.e. performs no
  * specially adapted actions to the purpose of this class.
  */
-template<class Vector = Vector<double> >
+template<class Vector = ::Vector<double> >
 class PrimitiveVectorMemory : public VectorMemory<Vector>
 {
   public:
@@ -108,7 +109,7 @@ class PrimitiveVectorMemory : public VectorMemory<Vector>
  * 
  * @author Guido Kanschat, 1999
  */
-template<class Vector = Vector<double> >
+template<class Vector = ::Vector<double> >
 class GrowingVectorMemory : public VectorMemory<Vector>
 {
   public:
@@ -151,12 +152,12 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * vector is used, second the
 				      * vector itself.
 				      */
-    typedef std::pair<bool, Vector* > entry_type;
+    typedef typename std::pair<bool, Vector* > entry_type;
 
 				     /**
 				      * Array of allocated vectors.
 				      */
-    std::vector<entry_type> pool;
+    typename std::vector<entry_type> pool;
     
 				     /**
 				      * Overall number of allocations.
@@ -168,7 +169,7 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 /* --------------------- inline functions ---------------------- */
 
 
-template<typename Vector>
+template <typename Vector>
 GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size)
 		: pool(initial_size)
 {

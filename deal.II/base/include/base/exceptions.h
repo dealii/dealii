@@ -14,8 +14,8 @@
 #define __deal2__exceptions_h
 
 
+#include <iosfwd>
 #include <iostream>
-#include <exception>
 #include <cstdlib>
 
 #ifndef __GNUC__

@@ -1,9 +1,5 @@
 //----------------------------  data_out_faces.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -118,7 +114,7 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 				      * aliased to a name that is
 				      * better to type.
 				      */
-    typedef std::pair<typename DoFHandler<dim>::cell_iterator,unsigned int> FaceDescriptor;
+    typedef typename std::pair<typename DoFHandler<dim>::cell_iterator,unsigned int> FaceDescriptor;
     
     
 				     /**

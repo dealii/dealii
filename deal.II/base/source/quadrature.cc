@@ -20,6 +20,7 @@
 
 template <>
 Quadrature<0>::Quadrature (const unsigned int)
+              : n_quadrature_points(0)
 {};
 
 
@@ -33,8 +34,14 @@ Quadrature<dim>::Quadrature (const unsigned int n_q) :
 
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
 template <int dim>
-Quadrature<dim>::Quadrature (const std::vector<Point<dim> >  &points,
+Quadrature<dim>::Quadrature (const typename std::vector<Point<dim> >  &points,
 			     const std::vector<double>       &weights)
 		: n_quadrature_points(points.size()),
 		  quadrature_points(points),
@@ -58,7 +65,8 @@ Quadrature<0>::Quadrature (const Quadrature<-1> &,
 
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &,
-			   const Quadrature<1> &)
+			   const Quadrature<1> &) :
+                n_quadrature_points (0)
 {
   Assert (false, ExcInternalError());
 };
@@ -139,7 +147,7 @@ const std::vector<Point<0> > & Quadrature<0>::get_points () const
 
 
 template <int dim>
-const std::vector<Point<dim> > & Quadrature<dim>::get_points () const
+const typename std::vector<Point<dim> > & Quadrature<dim>::get_points () const
 {
   return quadrature_points;
 };
@@ -552,8 +560,8 @@ void QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
 
 template <int dim>
 void
-QProjector<dim>::project_to_faces (const Quadrature<dim-1>  &quadrature,
-				   std::vector<Point<dim> > &q_points)
+QProjector<dim>::project_to_faces (const Quadrature<dim-1>           &quadrature,
+				   typename std::vector<Point<dim> > &q_points)
 {
   unsigned int npt = quadrature.n_quadrature_points;
   unsigned int nf = GeometryInfo<dim>::faces_per_cell;
@@ -575,8 +583,8 @@ QProjector<dim>::project_to_faces (const Quadrature<dim-1>  &quadrature,
 
 template <int dim>
 void
-QProjector<dim>::project_to_subfaces (const Quadrature<dim-1>  &quadrature,
-				      std::vector<Point<dim> > &q_points)
+QProjector<dim>::project_to_subfaces (const Quadrature<dim-1>           &quadrature,
+				      typename std::vector<Point<dim> > &q_points)
 {
   unsigned int npt = quadrature.n_quadrature_points;
   unsigned int nf = GeometryInfo<dim>::faces_per_cell;

@@ -107,7 +107,7 @@ FullMatrix<double>::invert (const FullMatrix<double> &M)
   double* s = new double[dim_range];
   
   double* matrix = new double[dim_range*dim_range];
-  copy (&M.val[0], &M.val[dim_image*dim_range], matrix);
+  std::copy (&M.val[0], &M.val[dim_image*dim_range], matrix);
   
 
   int erg = dgelss_ (&dim_range, &dim_range, &dim_range,
@@ -125,9 +125,9 @@ FullMatrix<double>::invert (const FullMatrix<double> &M)
 //  double condition = s[0]/s[dim_range-1];
   
   if (info!=0)
-    deallog << "inverting error " << info << ' ' << erg << std::endl;
+    deallog << "inverting error " << info << ' ' << erg << endl;
   if (rank<(int)dim_range)
-    deallog << "rank deficiency " << rank << std::endl;
+    deallog << "rank deficiency " << rank << endl;
   delete[] work;
   delete[] s;
   delete[] matrix;

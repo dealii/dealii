@@ -1,9 +1,5 @@
 //----------------------------  tria.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -1818,9 +1814,9 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * and the @ref{GridIn} and
 				      * @ref{GridReordering} class.
 				      */
-    virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
-				       const std::vector<CellData<dim> > &cells,
-				       const SubCellData                 &subcelldata);
+    virtual void create_triangulation (const typename std::vector<Point<dim> >    &vertices,
+				       const typename std::vector<CellData<dim> > &cells,
+				       const SubCellData                          &subcelldata);
 
 				     /**
 				      * Distort the grid by randomly
@@ -3109,13 +3105,13 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *
 				      *  Usage is like @p{levels[3]->quads}.
 				      */
-    std::vector<TriangulationLevel<dim>*> levels;
+    typename std::vector<TriangulationLevel<dim>*> levels;
 
 				     /**
 				      *  Array of the vertices of this
 				      *  triangulation.
 				      */
-    std::vector<Point<dim> >              vertices;
+    typename std::vector<Point<dim> >              vertices;
 
 				     /**
 				      *  Array storing a bit-pattern which

@@ -1,9 +1,5 @@
 //----------------------------  fe_lib.dg.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -66,27 +62,27 @@ class FEDG_Q0 : public FEQ1Mapping<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &support_points) const;
+    virtual void get_unit_support_points (typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     std::vector<Point<dim> > &support_points) const;
+    virtual void get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+				     typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
 					FullMatrix<double> &local_mass_matrix) const;
 };
 
@@ -124,8 +120,8 @@ class FEDG_Q1 : public FEQ1<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 };
 
 
@@ -161,8 +157,8 @@ class FEDG_Q2 : public FEQ2<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 };
 
 
@@ -198,8 +194,8 @@ class FEDG_Q3 : public FEQ3<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 };
 
 
@@ -235,8 +231,8 @@ class FEDG_Q4 : public FEQ4<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 };
 
 

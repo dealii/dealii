@@ -24,6 +24,12 @@
 #include <lac/block_vector.h>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
 /*------------------------------- FEValuesBase ---------------------------*/
 
 
@@ -78,7 +84,7 @@ double FEValuesBase<dim>::shape_value (const unsigned int i,
 template <int dim>
 template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
-					     std::vector<number>    &values) const
+					     typename std::vector<number>    &values) const
 {
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
@@ -112,7 +118,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
 template <int dim>
 template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (const InputVector       &fe_function,
-					     std::vector<Vector<number> > &values) const
+					     typename std::vector<Vector<number> > &values) const
 {
   Assert (n_quadrature_points == values.size(),
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
@@ -164,7 +170,7 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
-					    std::vector<Tensor<1,dim> > &gradients) const
+					    typename std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
@@ -199,7 +205,7 @@ void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
 template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_function,
-					    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
+					    typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (n_quadrature_points == gradients.size(),
 	  ExcWrongNoOfComponents());
@@ -255,7 +261,7 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe_function,
-						      std::vector<Tensor<2,dim> > &second_derivatives) const
+						      typename std::vector<Tensor<2,dim> > &second_derivatives) const
 {
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
@@ -292,7 +298,7 @@ template <class InputVector>
 void
 FEValuesBase<dim>::
 get_function_2nd_derivatives (const InputVector               &fe_function,
-			      std::vector<std::vector<Tensor<2,dim> > > &second_derivs) const
+			      typename std::vector<typename std::vector<Tensor<2,dim> > > &second_derivs) const
 {
   Assert (n_quadrature_points == second_derivs.size(),
 	  ExcWrongNoOfComponents());

@@ -19,9 +19,10 @@
 #include <numeric>
 #include <algorithm>
 #include <cmath>
-
-#include <math.h>
+#include <functional>
 #include <fstream>
+
+
 
 template<typename number>
 void GridRefinement::qsort_index(const Vector<number>      &a,
@@ -249,6 +250,10 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
 
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
 
 
 template <int dim, typename number>

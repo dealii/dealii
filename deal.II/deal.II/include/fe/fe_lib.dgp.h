@@ -1,9 +1,5 @@
 //----------------------------  fe_lib.dgp.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -68,21 +64,21 @@ class FEDG_P1 : public FEQ1Mapping<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &support_points) const;
+    virtual void get_unit_support_points (typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     std::vector<Point<dim> > &support_points) const;
+    virtual void get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+				     typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -97,7 +93,7 @@ class FEDG_P1 : public FEQ1Mapping<dim>
 				      * costs. The specified exception
 				      * is thrown instead.
 				      */
-    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
 					FullMatrix<double> &local_mass_matrix) const;
 
   private:
@@ -162,21 +158,21 @@ class FEDG_P2 : public FEQ1Mapping<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &support_points) const;
+    virtual void get_unit_support_points (typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     std::vector<Point<dim> > &support_points) const;
+    virtual void get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+				     typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -191,7 +187,7 @@ class FEDG_P2 : public FEQ1Mapping<dim>
 				      * costs. The specified exception
 				      * is thrown instead.
 				      */
-    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
 					FullMatrix<double> &local_mass_matrix) const;
 
   private:
@@ -256,21 +252,21 @@ class FEDG_P3 : public FEQ1Mapping<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &support_points) const;
+    virtual void get_unit_support_points (typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     std::vector<Point<dim> > &support_points) const;
+    virtual void get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+				     typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -285,7 +281,7 @@ class FEDG_P3 : public FEQ1Mapping<dim>
 				      * costs. The specified exception
 				      * is thrown instead.
 				      */
-    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
 					FullMatrix<double> &local_mass_matrix) const;
 
   private:
@@ -350,21 +346,21 @@ class FEDG_P4 : public FEQ1Mapping<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &support_points) const;
+    virtual void get_unit_support_points (typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     std::vector<Point<dim> > &support_points) const;
+    virtual void get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+				     typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -379,7 +375,7 @@ class FEDG_P4 : public FEQ1Mapping<dim>
 				      * costs. The specified exception
 				      * is thrown instead.
 				      */
-    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
 					FullMatrix<double> &local_mass_matrix) const;
 
   private:

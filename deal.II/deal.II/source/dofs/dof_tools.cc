@@ -32,6 +32,13 @@
 #include <algorithm>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
+
 template <int dim, class SparsityPattern>
 void
 DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
@@ -174,7 +181,7 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 template <int dim>
 void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
-					       const DoFHandler<dim>::FunctionMap  &boundary_indicators,
+					       const typename DoFHandler<dim>::FunctionMap  &boundary_indicators,
 					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
 					       SparsityPattern    &sparsity)
 {
@@ -920,7 +927,6 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
 };
 
 #endif
-
 
 
 #if deal_II_dimension == 2

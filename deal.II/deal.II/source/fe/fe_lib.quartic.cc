@@ -13,6 +13,7 @@
 
 
 #include <fe/fe_lib.lagrange.h>
+#include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <grid/geometry_info.h>
@@ -1339,9 +1340,11 @@ template <>
 void FEQ4<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 				     FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+	  FiniteElementBase<2>::ExcWrongFieldDimension(local_mass_matrix.n(),
+						       dofs_per_cell));
   Assert (local_mass_matrix.m() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
+	  FiniteElementBase<2>::ExcWrongFieldDimension(local_mass_matrix.m(),
+						       dofs_per_cell));
 
   const double x[4] = { cell->vertex(0)(0),
 			cell->vertex(1)(0),
@@ -1366,13 +1369,13 @@ void FEQ4<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
    which is sufficient since $det J$ is a bilinear function.
 */
   Assert ((-x[0]+x[1])*(-y[0]+y[3])-(-x[0]+x[3])*(-y[0]+y[1]),  // xi=eta=0
-	  ExcJacobiDeterminantHasWrongSign());
+	  FiniteElement<2>::ExcJacobiDeterminantHasWrongSign());
   Assert ((x[2]-x[3])*(-y[0]+y[3])-(-x[0]+x[3])*(y[2]-y[3]),    // xi=0, eta=1
-	  ExcJacobiDeterminantHasWrongSign());
+	  FiniteElement<2>::ExcJacobiDeterminantHasWrongSign());
   Assert ((x[2]-x[3])*(-y[1]+y[2])-(-x[1]+x[2])*(y[2]-y[3]),    // xi=eta=1
-	  ExcJacobiDeterminantHasWrongSign());
+	  FiniteElement<2>::ExcJacobiDeterminantHasWrongSign());
   Assert ((-x[0]+x[1])*(-y[1]+y[2])-(-x[1]+x[2])*(-y[0]+y[1]),  // xi=1, eta=0
-	  ExcJacobiDeterminantHasWrongSign());
+	  FiniteElement<2>::ExcJacobiDeterminantHasWrongSign());
 
   const double t1 = -x[0]+x[1];
   const double t2 = y[0]-y[1]+y[2]-y[3];
@@ -2603,7 +2606,8 @@ void FEQ4<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 template <>
 void FEQ4<2>::get_unit_support_points (std::vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
+	  FiniteElementBase<2>::ExcWrongFieldDimension (unit_points.size(),
+							dofs_per_cell));
 
   unit_points[0] = Point<2>(0,0);
   unit_points[1] = Point<2>(1,0);
@@ -2635,9 +2639,11 @@ void FEQ4<2>::get_unit_support_points (std::vector<Point<2> > &unit_points) cons
 
 template <>
 void FEQ4<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
-				  std::vector<Point<2> >  &support_points) const {
+				  std::vector<Point<2> >  &support_points) const
+{
   Assert (support_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
+	  FiniteElementBase<2>::ExcWrongFieldDimension (support_points.size(),
+							dofs_per_cell));
 
   const double x[4] = { cell->vertex(0)(0),
 			cell->vertex(1)(0),
@@ -2745,7 +2751,8 @@ template <>
 void FEQ4<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 				       std::vector<Point<2> >  &support_points) const {
   Assert (support_points.size() == dofs_per_face,
-	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
+	  FiniteElementBase<2>::ExcWrongFieldDimension (support_points.size(),
+							dofs_per_face));
 
   for (unsigned int vertex=0; vertex<2; ++vertex)
     support_points[vertex] = face->vertex(vertex);

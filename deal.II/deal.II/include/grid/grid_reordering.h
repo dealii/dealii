@@ -1,9 +1,5 @@
 //----------------------------  grid_reordering.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -525,7 +521,7 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * general documentation of this
 				      * class.
 				      */
-    static void reorder_cells (std::vector<CellData<dim> > &original_cells);
+    static void reorder_cells (typename std::vector<CellData<dim> > &original_cells);
     
   private:
 
@@ -681,7 +677,7 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * @p{adjacent_cells} field
 					  * of the inserted faces.
 					  */
-	void insert_faces (std::map<Face,FaceData > &global_faces);
+	void insert_faces (typename std::map<Face,FaceData > &global_faces);
 
 					 /**
 					  * Find out the neighbors of the
@@ -754,9 +750,11 @@ class GridReordering : private GridReorderingInfo<dim>
     {
 					 /**
 					  * Indices of the vertices of
-					  * this face.
+					  * this face. The size of the array 
+					  * is equal to
+					  * @p{GeometryInfo<dim>::vertices_per_face}.
 					  */
-	unsigned int vertices[GeometryInfo<dim>::vertices_per_face];
+	unsigned int vertices[1<<(dim-1)];
 
 					 /**
 					  * Comparison operator. Use
@@ -868,12 +866,12 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * as recursive calls but rather
 				      * as eliminated tail-recursion.
 				      */
-    static void track_back (std::vector<Cell>  &cells,
-			    RotationStack      &rotation_states,
-			    const unsigned int  track_back_to_cell);
+    static void track_back (typename std::vector<Cell>  &cells,
+			    RotationStack               &rotation_states,
+			    const unsigned int          track_back_to_cell);
 
-    static bool try_rotate_single_neighbors (std::vector<Cell>  &cells,
-					     RotationStack      &rotation_states);
+    static bool try_rotate_single_neighbors (typename std::vector<Cell>  &cells,
+					     RotationStack               &rotation_states);
     
 				     /**
 				      * This is the main function that
@@ -892,9 +890,9 @@ class GridReordering : private GridReorderingInfo<dim>
 				      * between original cells and
 				      * presorted cells.
 				      */
-    static void find_reordering (std::vector<Cell>               &cells,
-				 std::vector<CellData<dim> >     &original_cells,
-				 const std::vector<unsigned int> &new_cell_numbers);
+    static void find_reordering (typename std::vector<Cell>           &cells,
+				 typename std::vector<CellData<dim> > &original_cells,
+				 const std::vector<unsigned int>      &new_cell_numbers);
 
 				     /**
 				      * Preorder the incoming cells by
@@ -909,8 +907,25 @@ class GridReordering : private GridReorderingInfo<dim>
 				      */
     static
     std::vector<unsigned int>
-    presort_cells (std::vector<Cell>       &cells,
-		   std::map<Face,FaceData> &faces);
+    presort_cells (typename std::vector<Cell>       &cells,
+		   typename std::map<Face,FaceData> &faces);
+
+				     /** 
+				      * By the resolution of Defect
+				      * Report 45 to the ISO C++ 1998
+				      * standard, nested classes
+				      * automatically have access to
+				      * members of the enclosing
+				      * class. Nevertheless, some
+				      * compilers don't implement this
+				      * resolution yet, so we have to
+				      * make them @p{friend}, which
+				      * doesn't hurt on the other
+				      * compilers as well.
+				      */
+    friend class Cell;
+    friend class Face;
+    friend class FaceData;
 };
 
 

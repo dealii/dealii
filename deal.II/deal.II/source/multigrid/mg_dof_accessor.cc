@@ -24,6 +24,13 @@
 #include <lac/sparse_matrix.h>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
+
 /* ------------------------ MGDoFLineAccessor --------------------------- */
 
 template <int dim>

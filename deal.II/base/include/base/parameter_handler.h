@@ -1625,17 +1625,6 @@ class MultipleParameterLoop : public ParameterHandler
     unsigned int memory_consumption () const;
 
   private:
-				     /**
-				      * Declare what a multiple entry
-				      * is: a variant * entry (in
-				      * curly braces @p{{}}) or an
-				      * array (in double curly braces
-				      * @p{{{}}}).
-				      */
-    enum MultipleEntryType 
-    {
-	  variant, array
-    };
 
 				     /**
 				      * An object in the list of entries with
@@ -1644,6 +1633,18 @@ class MultipleParameterLoop : public ParameterHandler
     class Entry 
     {
       public:
+      /**
+       * Declare what a multiple entry
+       * is: a variant * entry (in
+       * curly braces @p{{}}) or an
+       * array (in double curly braces
+       * @p{{{}}}).
+       */
+      enum MultipleEntryType 
+      {
+	variant, array
+      };
+
 					 /**
 					  * Constructor
 					  */

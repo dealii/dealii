@@ -1,9 +1,5 @@
 //----------------------------  dof_handler.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -257,7 +253,7 @@ class DoFHandler  :  public Subscriptor,
 				      *	for each boundary indicator, which is
 				      *	guaranteed by the @p{map} data type.
 				      */
-    typedef std::map<unsigned char,const Function<dim>*> FunctionMap;
+    typedef typename std::map<unsigned char,const Function<dim>*> FunctionMap;
 
 				     /**
 				      * When the arrays holding the
@@ -1137,7 +1133,7 @@ class DoFHandler  :  public Subscriptor,
 				      * @p{levels[]} tree of the @ref{Triangulation}
 				      * objects.
 				      */
-    std::vector<DoFLevel<dim>*>    levels;
+    typename std::vector<DoFLevel<dim>*>    levels;
 
 				     /**
 				      * Store the number of dofs created last

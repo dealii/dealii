@@ -1,9 +1,5 @@
 //----------------------------  fe_lib.criss_cross.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -186,7 +182,7 @@ class FECrissCross : public FiniteElement<dim>
 				      * @p{p_real} on the real cell
 				      * @p{cell} and returns @p{p_real}.
 				      */
-    virtual Point<dim> transform_unit_to_real_cell (const DoFHandler<dim>::cell_iterator cell,
+    virtual Point<dim> transform_unit_to_real_cell (const typename DoFHandler<dim>::cell_iterator &cell,
 						    const Point<dim> &p) const;
     
 				     /**
@@ -195,7 +191,7 @@ class FECrissCross : public FiniteElement<dim>
 				      * @p{p_unit} on the unit cell
 				      * @p{cell} and returns @p{p_unit}.
 				      */
-    virtual Point<dim> transform_real_to_unit_cell (const DoFHandler<dim>::cell_iterator cell,
+    virtual Point<dim> transform_real_to_unit_cell (const typename DoFHandler<dim>::cell_iterator &cell,
 						    const Point<dim> &p) const;
 
 				     /**
@@ -231,27 +227,27 @@ class FECrissCross : public FiniteElement<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &support_points) const;
+    virtual void get_unit_support_points (typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				     std::vector<Point<dim> > &support_points) const;
+    virtual void get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+				     typename std::vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					  std::vector<Point<dim> > &support_points) const;
+    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					  typename std::vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
 					FullMatrix<double> &local_mass_matrix) const;
 
     				     /**
@@ -283,9 +279,9 @@ class FECrissCross : public FiniteElement<dim>
 				      * In two spatial dimensions, this function
 				      * simply returns the length of the face.
 				      */
-    virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const std::vector<Point<dim-1> > &unit_points,
-				     std::vector<double>      &face_jacobi_determinants) const;
+    virtual void get_face_jacobians (const typename DoFHandler<dim>::face_iterator &face,
+				     const typename std::vector<Point<dim-1> > &unit_points,
+				     typename std::vector<double>      &face_jacobi_determinants) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -295,10 +291,10 @@ class FECrissCross : public FiniteElement<dim>
 				      * simply returns half the length of the
 				      * whole face.
 				      */
-    virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+    virtual void get_subface_jacobians (const typename DoFHandler<dim>::face_iterator &face,
 					const unsigned int           subface_no,
-					const std::vector<Point<dim-1> > &unit_points,
-					std::vector<double>      &face_jacobi_determinants) const;
+					const typename std::vector<Point<dim-1> > &unit_points,
+					typename std::vector<double>      &face_jacobi_determinants) const;
 
 				     /**
 				      * Return the normal vectors to the
@@ -314,10 +310,10 @@ class FECrissCross : public FiniteElement<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
-				     const std::vector<Point<dim-1> > &unit_points,
-				     std::vector<Point<dim> >         &normal_vectors) const;
+				     const typename std::vector<Point<dim-1> > &unit_points,
+				     typename std::vector<Point<dim> >         &normal_vectors) const;
 
 				     /**
 				      * Return the normal vectors to the
@@ -334,11 +330,11 @@ class FECrissCross : public FiniteElement<dim>
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int           face_no,
 				     const unsigned int           subface_no,
-				     const std::vector<Point<dim-1> > &unit_points,
-				     std::vector<Point<dim> >         &normal_vectors) const;    
+				     const typename std::vector<Point<dim-1> > &unit_points,
+				     typename std::vector<Point<dim> >         &normal_vectors) const;    
 
 				     /**
 				      * Refer to the base class for detailed
@@ -350,18 +346,18 @@ class FECrissCross : public FiniteElement<dim>
 				      * For higher dimensional finite elements
 				      * we use multilinear mappings.
 				      */
-    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				 const std::vector<Point<dim> >            &unit_points,
-				 std::vector<Tensor<2,dim> >               &jacobians,
+    virtual void fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+				 const typename std::vector<Point<dim> >            &unit_points,
+				 typename std::vector<Tensor<2,dim> >               &jacobians,
 				 const bool              compute_jacobians,
-				 std::vector<Tensor<3,dim> > &jacobians_grad,
+				 typename std::vector<Tensor<3,dim> > &jacobians_grad,
 				 const bool              compute_jacobians_grad,
-				 std::vector<Point<dim> >    &support_points,
+				 typename std::vector<Point<dim> >    &support_points,
 				 const bool              compute_support_points,
-				 std::vector<Point<dim> >    &q_points,
+				 typename std::vector<Point<dim> >    &q_points,
 				 const bool              compute_q_points,
 				 const FullMatrix<double>         &shape_values_transform,
-				 const std::vector<std::vector<Tensor<1,dim> > > &shape_grad_transform) const;
+				 const typename std::vector<typename std::vector<Tensor<1,dim> > > &shape_grad_transform) const;
 
     DeclException0 (ExcNotUseful);
 };

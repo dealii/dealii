@@ -49,10 +49,10 @@ Histogram::Interval::memory_consumption () const
 
 
 template <typename number>
-void Histogram::evaluate (const std::vector<Vector<number> > &values,
-			  const std::vector<double>          &_y_values,
-			  const unsigned int             n_intervals,
-			  const IntervalSpacing          interval_spacing)
+void Histogram::evaluate (const typename std::vector<Vector<number> > &values,
+			  const std::vector<double>                   &_y_values,
+			  const unsigned int                           n_intervals,
+			  const IntervalSpacing                        interval_spacing)
 {
   Assert (values.size() > 0, ExcEmptyData());
   Assert (n_intervals > 0, ExcInvalidIntervals());
@@ -344,10 +344,10 @@ Histogram::memory_consumption () const
 
 // explicit instantiations for float
 template
-void Histogram::evaluate (const std::vector<Vector<float> >  &values,
-			  const std::vector<double>          &y_values, 
-			  const unsigned int             n_intervals,
-			  const IntervalSpacing          interval_spacing);
+void Histogram::evaluate (const std::vector<Vector<float> > &values,
+			  const std::vector<double>                  &y_values, 
+			  const unsigned int                          n_intervals,
+			  const IntervalSpacing                       interval_spacing);
 template
 void Histogram::evaluate (const Vector<float>   &values,
 			  const unsigned int     n_intervals,
@@ -357,9 +357,9 @@ void Histogram::evaluate (const Vector<float>   &values,
 // explicit instantiations for double
 template
 void Histogram::evaluate (const std::vector<Vector<double> >  &values,
-			  const std::vector<double>           &y_values, 
-			  const unsigned int              n_intervals,
-			  const IntervalSpacing           interval_spacing);
+			  const std::vector<double>                    &y_values, 
+			  const unsigned int                            n_intervals,
+			  const IntervalSpacing                         interval_spacing);
 template
 void Histogram::evaluate (const Vector<double>   &values,
 			  const unsigned int      n_intervals,

@@ -36,6 +36,12 @@
 #include <cmath>
 
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
+
 static inline double sqr (const double x)
 {
   return x*x;
@@ -711,7 +717,7 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 template <int dim>
 void
 VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
-				      const std::map<unsigned char,const Function<dim>*> &boundary_functions,
+				      const typename std::map<unsigned char,const Function<dim>*> &boundary_functions,
 				      const Quadrature<dim-1>  &q,
 				      std::map<unsigned int,double> &boundary_values)
 {

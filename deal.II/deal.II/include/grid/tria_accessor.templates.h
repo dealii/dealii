@@ -1,9 +1,5 @@
 //----------------------------  tria_accessor.templates.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -903,32 +899,39 @@ TriaObjectAccessor<celldim,dim>::operator -- ()
 template <>
 inline
 TriaIterator<1,TriaObjectAccessor<0, 1> >
-CellAccessor<1>::face (const unsigned int) const {
-  Assert (false, ExcNotUsefulForThisDimension());
+CellAccessor<1>::face (const unsigned int) const 
+{
+  Assert (false, TriaAccessor<1>::ExcNotUsefulForThisDimension());
   return TriaIterator<1,TriaObjectAccessor<0, 1> >();
 };
+
 
 
 template <>
 inline
 Triangulation<2>::face_iterator
-CellAccessor<2>::face (const unsigned int i) const {
+CellAccessor<2>::face (const unsigned int i) const 
+{
   return line(i);
 };
+
 
 
 template <>
 inline
 Triangulation<3>::face_iterator
-CellAccessor<3>::face (const unsigned int i) const {
-  return quad(i);
+CellAccessor<3>::face (const unsigned int i) const 
+{
+  return this->quad(i);
 };
+
 
 
 template <int dim>
 inline
 int
-CellAccessor<dim>::neighbor_index (const unsigned int i) const {
+CellAccessor<dim>::neighbor_index (const unsigned int i) const 
+{
   Assert (i<GeometryInfo<dim>::faces_per_cell,
 	  typename TriaAccessor<dim>::ExcInvalidNeighbor(i));
   return tria->levels[present_level]->

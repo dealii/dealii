@@ -504,28 +504,36 @@ unsigned int Vector<Number>::size () const
 
 template <typename Number>
 inline
-Vector<Number>::iterator Vector<Number>::begin () {
+typename Vector<Number>::iterator 
+Vector<Number>::begin () 
+{
   return &val[0];
 };
 
 
 template <typename Number>
 inline
-Vector<Number>::const_iterator Vector<Number>::begin () const {
+typename Vector<Number>::const_iterator 
+Vector<Number>::begin () const 
+{
   return &val[0];
 };
 
 
 template <typename Number>
 inline
-Vector<Number>::iterator Vector<Number>::end () {
+typename Vector<Number>::iterator
+Vector<Number>::end () 
+{
   return &val[dim];
 };
 
 
 template <typename Number>
 inline
-Vector<Number>::const_iterator Vector<Number>::end () const {
+typename Vector<Number>::const_iterator
+Vector<Number>::end () const 
+{
   return &val[dim];
 };
 

@@ -495,7 +495,7 @@ class BlockVector
 				     /**
 				      * Pointer to the array of components.
 				      */
-    std::vector<Vector<Number> > components;
+    typename std::vector<Vector<Number> > components;
 
 				     /**
 				      * Object managing the

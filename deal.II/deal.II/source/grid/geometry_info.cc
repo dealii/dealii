@@ -15,18 +15,11 @@
 #include <grid/geometry_info.h>
 
 
-// egcs 1.1 does not need these definitions of static member
-// variables, as later compilers should need. on the other hand, if we
-// define them, then egcs1.1 wants initialization, which we would have
-// to mirror from the .h file. rather, we omit it here
-
-#if ! ((__GNUC__==2) && (__GNUC_MINOR__ < 95))
-const unsigned int GeometryInfo<deal_II_dimension>::vertices_per_cell;
-const unsigned int GeometryInfo<deal_II_dimension>::lines_per_cell;
-const unsigned int GeometryInfo<deal_II_dimension>::quads_per_cell;
-const unsigned int GeometryInfo<deal_II_dimension>::hexes_per_cell;
-const unsigned int GeometryInfo<deal_II_dimension>::children_per_cell;
-#endif
+template <> const unsigned int GeometryInfo<deal_II_dimension>::vertices_per_cell;
+template <> const unsigned int GeometryInfo<deal_II_dimension>::lines_per_cell;
+template <> const unsigned int GeometryInfo<deal_II_dimension>::quads_per_cell;
+template <> const unsigned int GeometryInfo<deal_II_dimension>::hexes_per_cell;
+template <> const unsigned int GeometryInfo<deal_II_dimension>::children_per_cell;
 
 
 template <>

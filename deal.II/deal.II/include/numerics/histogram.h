@@ -1,9 +1,5 @@
 //----------------------------  histogram.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -109,10 +105,10 @@ class Histogram
 				      * on this.
 				      */
     template <typename number>
-    void evaluate (const std::vector<Vector<number> > &values,
-		   const std::vector<double>          &y_values,
-		   const unsigned int                  n_intervals,
-		   const IntervalSpacing               interval_spacing = linear);
+    void evaluate (const typename std::vector<Vector<number> > &values,
+		   const std::vector<double>                   &y_values,
+		   const unsigned int                           n_intervals,
+		   const IntervalSpacing                        interval_spacing = linear);
 
 				     /**
 				      * This function is only a wrapper

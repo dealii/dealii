@@ -105,10 +105,11 @@ AC_PATH_PROG(CC,$CC)
 
 
 
-dnl    Find the right C++ compiler. This modifies the following
-dnl    variables: CXX, GXX, CXXFLAGS
+dnl Find the right C++ compiler. Note that for historical reasons, the
+dnl compiler name and version is in the name GXX_VERSION, even if the
+dnl compiler is not GCC.
 AC_PROG_CXX
-AC_PATH_PROG(CXX,$CXX)
+AC_PATH_PROG(CXX,$CXX) 
 if test "$GXX" = yes ; then
   # find out the right version
   GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
@@ -141,9 +142,22 @@ if test "$GXX" = yes ; then
 	;;
   esac
 else
-  AC_MSG_ERROR(No configuration options for this C++ compiler
-               supported at present)
-  exit 1
+
+  dnl Check for IBM xlC. For some reasons, depending on some environment variables,
+  dnl moon position, and other reasons unknown to me, the compiler displays
+  dnl different names in the first line of output, so check various possibilities
+  is_ibm_xlc="`($CXX 2>&1) | egrep 'VisualAge C++|C Set ++|C for AIX Compiler'`"
+  if test "x$is_ibm_xlc" != "x"  ; then
+    dnl Ah, this is IBM's C++ compiler. Unfortunately, we don't presently
+    dnl know how to check the version number, so assume that is sufficiently
+    dnl high...
+    AC_MSG_RESULT(compiler is IBM xlC)
+    GXX_VERSION=ibm_xlc
+  else
+    AC_MSG_ERROR(No configuration options for this C++ compiler
+                 supported at present)
+    exit 1
+  fi
 fi
 AC_SUBST(GXX_VERSION)
 
@@ -199,7 +213,7 @@ if test "$GXX" = yes ; then
 
   case "$GXX_VERSION" in
     egcs1.1 | gcc2.95)
-	CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
+	CXXFLAGSG="$CXXFLAGSG -DDEBUG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
 	CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
 	;;
 
@@ -208,18 +222,25 @@ if test "$GXX" = yes ; then
   esac
 
 else
-  dnl Other compiler
 
-  dnl For DECs cxx we should use the following options:
-  dnl   CXXFLAGSO: -ansi_alias -O3
-  dnl   CXXFLAGSG: -std strict_ansi_errors -w0
-  dnl if necessary: -shared, -pthread 
-  dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
-  dnl                -pch? -noimplicit_include?
+  if test "x$GXX_VERSION" = "xibm_xlc" ; then
+	CXXFLAGSG="$CXXFLAGS -g -check=bounds -info=all -qrtti=all"
+	CXXFLAGSO="$CXXFLAGS -O2 -w -qansialias -qrtti=all"
+  else
 
-  AC_MSG_ERROR(No compiler options for this C++ compiler
-               specified at present)
-  exit 1
+    dnl Other compiler
+
+    dnl For DECs cxx we should use the following options:
+    dnl   CXXFLAGSO: -ansi_alias -O3
+    dnl   CXXFLAGSG: -std strict_ansi_errors -w0
+    dnl if necessary: -shared, -pthread 
+    dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
+    dnl                -pch? -noimplicit_include?
+
+    AC_MSG_ERROR(No compiler options for this C++ compiler
+                 specified at present)
+    exit 1
+  fi
 fi
 
 AC_SUBST(CXXFLAGSG)
@@ -293,6 +314,13 @@ dnl condition is not satisfied. Check this for debug and optimized mode
 dnl compiler flags, and define `DISABLE_ASSERT_THROW' if necessary.
 DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG, CXXFLAGSG="-DDISABLE_ASSERT_THROW $CXXFLAGSG")
 DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO, CXXFLAGSO="-DDISABLE_ASSERT_THROW $CXXFLAGSO")
+
+dnl IBM's xlC compiler has a problem with some kind of code that does not
+dnl "using namespace std;" Try to work around if necessary
+DEAL_II_CHECK_IBM_XLC_ERROR
+
+dnl See whether we can use the std::iterator class
+DEAL_II_HAVE_STD_ITERATOR
 
 
 
@@ -445,13 +473,25 @@ dnl   headers to make reentrant functions (with suffix _r) declared
 dnl - remove -ansi from compiler flags again, since ACE yields hundreds of
 dnl   error messages with this flag
 if test "$enablemultithreading" = yes ; then
-  DEAL_II_GET_THREAD_FLAGS
-  DEAL_II_THREAD_CPPFLAGS
+  if test "$GXX" = yes ; then
+    DEAL_II_GET_THREAD_FLAGS
+    DEAL_II_THREAD_CPPFLAGS
 
-  AC_DEFINE(__USE_MALLOC)
-  AC_DEFINE(_REENTRANT)
+    AC_DEFINE(__USE_MALLOC)
+    AC_DEFINE(_REENTRANT)
 
-  CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
+    CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
+  else
+    if test "x$GXX_VERSION" = "xibm_xlc" ; then
+      CXXFLAGSG = "$CXXFLAGSG -threaded"  
+      CXXFLAGSO = "$CXXFLAGSO -threaded"
+    else
+      dnl Other compiler
+      AC_MSG_ERROR(No threading compiler options for this C++ compiler
+                   specified at present)
+      exit 1
+    fi
+  fi
 fi
 
 

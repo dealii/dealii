@@ -1,9 +1,5 @@
 //----------------------------  fe_values.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -315,7 +311,7 @@ class FEValuesBase
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector &fe_function,
-			      std::vector<number>    &values) const;
+			      typename std::vector<number>    &values) const;
 
 				     /**
 				      * Access to vector valued finite
@@ -334,7 +330,7 @@ class FEValuesBase
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector       &fe_function,
-			      std::vector<Vector<number> > &values) const;
+			      typename std::vector<Vector<number> > &values) const;
 
     				     /**
 				      * Return the gradient of the @p{i}th shape
@@ -359,7 +355,7 @@ class FEValuesBase
 				      * For the format of this matrix, see the
 				      * documentation for the matrix itself.
 				      */
-    const std::vector<std::vector<Tensor<1,dim> > > & get_shape_grads () const;
+    const typename std::vector<typename std::vector<Tensor<1,dim> > > & get_shape_grads () const;
 
 				     /**
 				      * Return the gradients of the finite
@@ -383,7 +379,7 @@ class FEValuesBase
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector      &fe_function,
-			     std::vector<Tensor<1,dim> > &gradients) const;
+			     typename std::vector<Tensor<1,dim> > &gradients) const;
 
 				     /**
 				      * Return the gradients of the finite
@@ -412,7 +408,7 @@ class FEValuesBase
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector               &fe_function,
-			     std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
+			     typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const;
 
     				     /**
 				      * Return the 2nd derivatives of
@@ -445,7 +441,7 @@ class FEValuesBase
 				      * documentation for the matrix
 				      * itself.
 				      */
-    const std::vector<std::vector<Tensor<2,dim> > > & get_shape_2nd_derivatives () const;
+    const typename std::vector<typename std::vector<Tensor<2,dim> > > & get_shape_2nd_derivatives () const;
     
 				     /**
 				      * Return the tensor of second
@@ -466,7 +462,7 @@ class FEValuesBase
 				      */
     template <class InputVector>
     void get_function_2nd_derivatives (const InputVector      &fe_function,
-				       std::vector<Tensor<2,dim> > &second_derivatives) const;
+				       typename std::vector<Tensor<2,dim> > &second_derivatives) const;
 
     
 				     /**
@@ -493,7 +489,7 @@ class FEValuesBase
 				      */
     template <class InputVector>
     void get_function_2nd_derivatives (const InputVector      &fe_function,
-				       std::vector<std::vector<Tensor<2,dim> > > &second_derivatives) const;
+				       typename std::vector<typename std::vector<Tensor<2,dim> > > &second_derivatives) const;
     
 				     /**
 				      * Return the position of the @p{i}th
@@ -514,7 +510,7 @@ class FEValuesBase
 				      * Return a pointer to the vector of
 				      * quadrature points.
 				      */
-    const std::vector<Point<dim> > & get_quadrature_points () const;
+    const typename std::vector<Point<dim> > & get_quadrature_points () const;
 
 				     /**
 				      * Return the point in real space where
@@ -544,7 +540,7 @@ class FEValuesBase
 				      * denoting the location of the trial
 				      * functions.
 				      */
-    const std::vector<Point<dim> > & get_support_points () const;
+    const typename std::vector<Point<dim> > & get_support_points () const;
     
 				     /**
 				      * Return the Jacobi determinant times
@@ -582,7 +578,7 @@ class FEValuesBase
 				     /**
 				      * Return the present cell.
 				      */
-    const DoFHandler<dim>::cell_iterator & get_cell() const;
+    const typename DoFHandler<dim>::cell_iterator & get_cell() const;
 
 				     /**
 				      * Determine an estimate for the
@@ -657,7 +653,7 @@ class FEValuesBase
 				      * gradients on the real element, rather
 				      * than on the reference element.
 				      */
-    std::vector<std::vector<Tensor<1,dim> > >  shape_gradients;
+    typename std::vector<typename std::vector<Tensor<1,dim> > >  shape_gradients;
 
 				     /**
 				      * Store the 2nd derivatives of the shape
@@ -668,7 +664,7 @@ class FEValuesBase
 				      * gradients on the real element, rather
 				      * than on the reference element.
 				      */
-    std::vector<std::vector<Tensor<2,dim> > >  shape_2nd_derivatives;
+    typename std::vector<typename std::vector<Tensor<2,dim> > >  shape_2nd_derivatives;
 
 				     /**
 				      * Store an array of the weights of the
@@ -702,7 +698,7 @@ class FEValuesBase
 				      * real element, rather than on the
 				      * reference element.
 				      */
-    std::vector<Point<dim> >  quadrature_points;
+    typename std::vector<Point<dim> >  quadrature_points;
 
     				     /**
 				      * Array of points denoting the off-point
@@ -711,7 +707,7 @@ class FEValuesBase
 				      * on the unit cell, so no function is
 				      * provided for this).
 				      */
-    std::vector<Point<dim> >  support_points;
+    typename std::vector<Point<dim> >  support_points;
     
 				     /**
 				      * Store the jacobi matrices at the
@@ -726,7 +722,7 @@ class FEValuesBase
 				      * transformation of the gradients to the
 				      * real cell.
 				      */
-    std::vector<Tensor<2,dim> > jacobi_matrices;
+    typename std::vector<Tensor<2,dim> > jacobi_matrices;
 
 				     /**
 				      * Store the derivatives of the jacobi
@@ -739,7 +735,7 @@ class FEValuesBase
 				      * The same general remarks apply as for
 				      * @p{jacobi_matrices}.
 				      */
-    std::vector<Tensor<3,dim> > jacobi_matrices_grad;
+    typename std::vector<Tensor<3,dim> > jacobi_matrices_grad;
     
 				     /**
 				      * Store the values of the basis functions
@@ -785,7 +781,7 @@ class FEValuesBase
 				      * to the @p{get_function_*} functions
 				      * safer.
 				      */
-    DoFHandler<dim>::cell_iterator present_cell;
+    typename DoFHandler<dim>::cell_iterator present_cell;
 
 				     /**
 				      * Store the finite element for later use.
@@ -876,7 +872,7 @@ class FEValues : public FEValuesBase<dim>
 				      * of the object and contains the gradients
 				      * on the reference element.
 				      */
-    std::vector<std::vector<Tensor<1,dim> > > unit_shape_gradients;
+    typename std::vector<typename std::vector<Tensor<1,dim> > > unit_shape_gradients;
 
 				     /**
 				      * Store the 2nd derivatives of the shape
@@ -886,7 +882,7 @@ class FEValues : public FEValuesBase<dim>
 				      * of the object and contains the
 				      * derivatives on the reference element.
 				      */
-    std::vector<std::vector<Tensor<2,dim> > > unit_shape_2nd_derivatives;
+    typename std::vector<typename std::vector<Tensor<2,dim> > > unit_shape_2nd_derivatives;
     
 				     /**
 				      * Gradients of the basis
@@ -894,7 +890,7 @@ class FEValues : public FEValuesBase<dim>
 				      * Analogous to the @p{shape_values_transform}
 				      * array of the base class.
 				      */
-    std::vector<std::vector<Tensor<1,dim> > > unit_shape_gradients_transform;
+    typename std::vector<typename std::vector<Tensor<1,dim> > > unit_shape_gradients_transform;
     
 				     /**
 				      * Array of quadrature points in the unit
@@ -902,7 +898,7 @@ class FEValues : public FEValuesBase<dim>
 				      * construction and contains the quadrature
 				      * points on the reference element.
 				      */
-    std::vector<Point<dim> >  unit_quadrature_points;    
+    typename std::vector<Point<dim> >  unit_quadrature_points;    
 };
 
 
@@ -1016,13 +1012,13 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * vectors to the cell at the
 				      * quadrature points.
 				      */
-    const std::vector<Point<dim> > & get_normal_vectors () const;
+    const typename std::vector<Point<dim> > & get_normal_vectors () const;
 
 				     /**
 				      * Return the present
 				      * face.
 				      */
-    DoFHandler<dim>::face_iterator get_face() const;
+    typename DoFHandler<dim>::face_iterator get_face() const;
 
 				     /**
 				      * Determine an estimate for the
@@ -1045,7 +1041,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * subface, with indices like that:
 				      * @p{unit_shape_gradients[face][dof][q_point]}
 				      */
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > unit_shape_gradients;
+    typename std::vector<typename std::vector<typename std::vector<Tensor<1,dim> > > > unit_shape_gradients;
     
 				     /**
 				      * Store the 2nd derivatives of the shape
@@ -1055,7 +1051,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * of the object and contains the
 				      * derivatives on the reference element.
 				      */
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > unit_shape_2nd_derivatives;
+    typename std::vector<typename std::vector<typename std::vector<Tensor<2,dim> > > > unit_shape_2nd_derivatives;
 
 				     /**
 				      * Gradients of the basis
@@ -1063,7 +1059,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * Analogous to the @p{shape_values_transform}
 				      * array of the base class.
 				      */
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > unit_shape_gradients_transform;
+    typename std::vector<typename std::vector<typename std::vector<Tensor<1,dim> > > > unit_shape_gradients_transform;
 
     				     /**
 				      * Array of quadrature points on the
@@ -1071,7 +1067,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * alike field of the quadrature formula
 				      * passed upon construction.
 				      */
-    std::vector<Point<dim-1> > unit_face_quadrature_points;
+    typename std::vector<Point<dim-1> > unit_face_quadrature_points;
     
 				     /**
 				      * Array of quadrature points in the unit
@@ -1084,7 +1080,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * those on the unit face, but are stored
 				      * as coordinates on the unit cell.
 				      */
-    std::vector<std::vector<Point<dim> > > unit_quadrature_points;
+    typename std::vector<typename std::vector<Point<dim> > > unit_quadrature_points;
     
 				     /**
 				      * List of values denoting the determinant
@@ -1099,7 +1095,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * quadrature points. This field is filled
 				      * in by the finite element class.
 				      */
-    std::vector<Point<dim> >  normal_vectors;
+    typename std::vector<Point<dim> >  normal_vectors;
 
 				     /**
 				      * Stores the face or subface,
@@ -1108,7 +1104,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * function was called. Is used
 				      * by the @p{get_face} function.
 				      */
-    DoFHandler<dim>::face_iterator present_face;
+    typename DoFHandler<dim>::face_iterator present_face;
 };
 
 
@@ -1348,7 +1344,7 @@ const FullMatrix<double> & FEValuesBase<dim>::get_shape_values () const
 
 template <int dim>
 inline
-const std::vector<std::vector<Tensor<1,dim> > > &
+const typename std::vector<typename std::vector<Tensor<1,dim> > > &
 FEValuesBase<dim>::get_shape_grads () const
 {
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
@@ -1359,7 +1355,7 @@ FEValuesBase<dim>::get_shape_grads () const
 
 template <int dim>
 inline
-const std::vector<std::vector<Tensor<2,dim> > > &
+const typename std::vector<typename std::vector<Tensor<2,dim> > > &
 FEValuesBase<dim>::get_shape_2nd_derivatives () const
 {
   Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
@@ -1370,7 +1366,7 @@ FEValuesBase<dim>::get_shape_2nd_derivatives () const
 
 template <int dim>
 inline
-const std::vector<Point<dim> > &
+const typename std::vector<Point<dim> > &
 FEValuesBase<dim>::get_quadrature_points () const
 {
   Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
@@ -1381,7 +1377,7 @@ FEValuesBase<dim>::get_quadrature_points () const
 
 template <int dim>
 inline
-const std::vector<Point<dim> > &
+const typename std::vector<Point<dim> > &
 FEValuesBase<dim>::get_support_points () const
 {
   Assert (update_flags & update_support_points, ExcAccessToUninitializedField());
@@ -1413,7 +1409,7 @@ FEValuesBase<dim>::get_fe () const
 
 template <int dim>
 inline
-const DoFHandler<dim>::cell_iterator &
+const typename DoFHandler<dim>::cell_iterator &
 FEValuesBase<dim>::get_cell() const
 {
   return present_cell;
@@ -1423,7 +1419,7 @@ FEValuesBase<dim>::get_cell() const
 
 template <int dim>
 inline
-const std::vector<Point<dim> > &
+const typename std::vector<Point<dim> > &
 FEFaceValuesBase<dim>::get_normal_vectors () const
 {
   Assert (update_flags & update_normal_vectors,
@@ -1432,10 +1428,12 @@ FEFaceValuesBase<dim>::get_normal_vectors () const
 };
 
 
+
 template <int dim>
 inline
-DoFHandler<dim>::face_iterator
-FEFaceValuesBase<dim>::get_face() const {
+typename DoFHandler<dim>::face_iterator
+FEFaceValuesBase<dim>::get_face() const 
+{
   return present_face;
 };
 

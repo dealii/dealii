@@ -1,9 +1,5 @@
 //----------------------------  mg_dof_handler.h  ---------------------------
-//    $Id$
 //    Version: $Name$
-//
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
-//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -944,7 +940,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * numbers which start from zero on each
 				      * level.
 				      */
-    std::vector<DoFLevel<dim>*>    mg_levels;
+    typename std::vector<DoFLevel<dim>*>    mg_levels;
 
 				     /**
 				      * For each vertex there is a list of
@@ -952,7 +948,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * on the different levels it lives on and
 				      * which are these levels.
 				      */
-    std::vector<MGVertexDoFs>      mg_vertex_dofs;
+    typename std::vector<MGVertexDoFs>      mg_vertex_dofs;
     
 				     /**
 				      * Vectors storing the number of degrees of

@@ -203,14 +203,14 @@ Number Vector<Number>::norm_sqr () const
 		 eptr = ptr + (dim/4)*4;
   while (ptr!=eptr)
     {
-      sum0 += sqr(*ptr++);
-      sum1 += sqr(*ptr++);
-      sum2 += sqr(*ptr++);
-      sum3 += sqr(*ptr++);
+      sum0 += ::sqr(*ptr++);
+      sum1 += ::sqr(*ptr++);
+      sum2 += ::sqr(*ptr++);
+      sum3 += ::sqr(*ptr++);
     };
 				   // add up remaining elements
   while (ptr != end())
-    sum0 += sqr(*ptr++);
+    sum0 += ::sqr(*ptr++);
   
   return sum0+sum1+sum2+sum3;
 };

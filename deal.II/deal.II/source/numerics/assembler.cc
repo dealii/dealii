@@ -20,6 +20,11 @@
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
 
 template <int dim>
 Assembler<dim>::AssemblerData::AssemblerData (const DoFHandler<dim>    &dof,

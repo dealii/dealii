@@ -31,6 +31,11 @@
 #include <set>
 #include <cmath>
 
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+using namespace std;
+#endif
+
 
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
@@ -1102,7 +1107,7 @@ template <int dim>
 void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 				Vector<double>      &rhs,
 				const FEValues<dim> &fe_values,
-				const DoFHandler<dim>::cell_iterator &) const
+				const typename DoFHandler<dim>::cell_iterator &) const
 {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
@@ -1168,7 +1173,7 @@ void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 template <int dim>
 void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 				const FEValues<dim> &fe_values,
-				const DoFHandler<dim>::cell_iterator &) const
+				const typename DoFHandler<dim>::cell_iterator &) const
 {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
@@ -1213,7 +1218,7 @@ template <int dim>
 void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
 				   Vector<double>             &rhs,
 				   const FEValues<dim>        &fe_values,
-				   const DoFHandler<dim>::cell_iterator &) const
+				   const typename DoFHandler<dim>::cell_iterator &) const
 {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
   
@@ -1282,7 +1287,7 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
 template <int dim>
 void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 				   const FEValues<dim> &fe_values,
-				   const DoFHandler<dim>::cell_iterator &) const
+				   const typename DoFHandler<dim>::cell_iterator &) const
 {
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
@@ -1338,7 +1343,7 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 template <int dim>
 void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 				   const FEValues<dim> &fe_values,
-				   const DoFHandler<dim>::cell_iterator &) const
+				   const typename DoFHandler<dim>::cell_iterator &) const
 {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 

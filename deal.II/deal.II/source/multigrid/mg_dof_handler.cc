@@ -1417,7 +1417,8 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 template <>
 void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 				     const std::vector<unsigned int>  &new_numbers) {
-  Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
+  Assert (new_numbers.size() == n_dofs(level), 
+	  DoFHandler<2>::ExcRenumberingIncomplete());
   
   for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
        i!=mg_vertex_dofs.end(); ++i)
@@ -1582,8 +1583,8 @@ template <>
 void MGDoFHandler<2>::reserve_space () {
   const unsigned int dim = 2;
   
-  Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
+  Assert (selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
+  Assert (tria->n_levels() > 0, DoFHandler<2>::ExcInvalidTriangulation());
   
 				   ////////////////////////////
 				   // DESTRUCTION
