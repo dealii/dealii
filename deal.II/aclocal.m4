@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl author: Wolfgang Bangerth, 2000
+dnl Copyright (C) 2000, 2001, 2002 by the deal.II authors
 dnl
 dnl $Id$
 
