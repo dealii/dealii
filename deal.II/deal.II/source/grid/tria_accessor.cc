@@ -19,6 +19,7 @@
 #include <grid/tria_accessor.templates.h>
 #include <grid/tria_iterator.templates.h>
 #include <grid/geometry_info.h>
+#include <fe/mapping_q1.h>
 
 #include <cmath>
 
@@ -1832,8 +1833,41 @@ void CellAccessor<3>::recursively_set_material_id (const unsigned char mat_id) c
 template <>
 bool CellAccessor<3>::point_inside (const Point<3> &p) const
 {
-  Assert (false, ExcNotImplemented() );
-  return false;
+				   // original implementation by Joerg
+				   // Weimar
+  
+                                   // we first eliminate points based
+                                   // on the maximum and minumum of
+                                   // the corner coordinates, then
+                                   // transform to the unit cell, and
+                                   // check there.
+  const unsigned int dim = 3;
+  Point<dim> maxp = this->vertex(0);
+  Point<dim> minp = this->vertex(0);
+
+  for (unsigned int v=1; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (unsigned int d=0; d<dim; ++d)
+      {
+	maxp[d] = std::max (maxp[d],this->vertex(v)[d]);
+	minp[d] = std::min (minp[d],this->vertex(v)[d]);
+      }
+
+				   // rule out points outside the
+				   // bounding box of this cell
+  for (unsigned int d=0; d<dim; d++)
+    if ((p[d] < minp[d]) || (p[d] > maxp[d]))
+      return false;
+
+				   // now we need to check more
+				   // carefully: transform to the
+				   // unit cube
+				   // and check there.
+  static const MappingQ1<dim> mapping;
+
+  const TriaRawIterator<dim, CellAccessor<dim> > cell_iterator (*this);
+  return (GeometryInfo<dim>::
+	  is_inside_unit_cell (mapping.transform_real_to_unit_cell(cell_iterator,
+								   p)));
 }
 
 
