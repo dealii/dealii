@@ -154,10 +154,10 @@ StraightBoundary<dim>::get_intermediate_points_on_quad (
   const double ds=1./(m+1);
   double y=ds;
 
-  const Point<dim> vertices[4] = { line->vertex(0),
-				   line->vertex(1),
-				   line->vertex(2),
-				   line->vertex(3) };
+  const Point<dim> vertices[4] = { quad->vertex(0),
+				   quad->vertex(1),
+				   quad->vertex(2),
+				   quad->vertex(3) };
 
   for (unsigned int i=0; i<n; ++i, y+=ds)
     {
