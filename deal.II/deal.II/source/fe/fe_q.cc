@@ -959,8 +959,8 @@ FE_Q<dim>::face_lexicographic_to_hierarchic_numbering (const unsigned int       
 
 template <>
 void
-FE_Q<1>::build_face_renumbering (const unsigned int,
-				 std::vector<unsigned int>&)
+FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int,
+						     std::vector<unsigned int>&)
 {}
 
 #endif
