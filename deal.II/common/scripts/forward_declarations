@@ -13,7 +13,7 @@
 #   forward declarations file itself
 # - compare old and new forward-declarations files. if they
 #   differ (i.e. the result of 'diff' is a nonzero string) copy
-#   the nes file over the old one and thus also change the time 
+#   the new file over the old one and thus also change the time 
 #   stamp of that file. if they don't differ, then do nothing 
 #   and in particular don't touch the time stamp to avoid that
 #   'make' thinks it has to remake all object files
