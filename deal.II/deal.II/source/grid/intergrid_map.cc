@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,6 +50,16 @@ get_n_levels (const Triangulation<dim> &grid)
 				   // we can ask directly.
   return grid.n_levels();
 }
+
+
+template <template <int> class GridClass, int dim>
+InterGridMap<GridClass,dim>::InterGridMap ()
+		:
+		source_grid(0, typeid(*this).name()),
+		destination_grid(0, typeid(*this).name())
+{}
+
+
 
 
 template <template <int> class GridClass, int dim>
