@@ -232,8 +232,11 @@ dSMatrixStruct::compress ()
 
 
 int
-dSMatrixStruct::operator () (const unsigned int i, const unsigned int j)
+dSMatrixStruct::operator () (const unsigned int i, const unsigned int j) const
 {
+  Assert (i<rows, ExcInvalidIndex(i,rows));
+  Assert (j<cols, ExcInvalidIndex(j,cols));
+
   for (unsigned int k=rowstart[i] ; k<rowstart[i+1] ; k++)
     if (colnums[k] == (signed int)j) return k;
   return -1;
@@ -470,6 +473,29 @@ dSMatrix::Tvmult (dVector& dst, const dVector& src) const
 	}
     }
 }
+
+
+
+double
+dSMatrix::matrix_norm (const dVector& v) const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert(m() == v.n(), ExcDimensionsDontMatch(m(),v.n()));
+  Assert(n() == v.n(), ExcDimensionsDontMatch(n(),v.n()));
+
+  double sum = 0.;
+  for (unsigned int i=0;i<m();i++)
+    {
+      double s = 0.;
+      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j) 
+	s += val[j] * v(cols->colnums[j]);
+      sum += s*v(i);
+    };
+
+  return sum;
+}
+
+
 
 double
 dSMatrix::residual (dVector& dst, const dVector& u, const dVector& b)

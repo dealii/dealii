@@ -54,7 +54,7 @@ public:
 				     //////////
     void compress ();
 				     //////////
-    int operator() (const unsigned int i, const unsigned int j);
+    int operator() (const unsigned int i, const unsigned int j) const;
 				     //////////
     void add (const unsigned int i, const unsigned int j);
 				     //////////
@@ -83,6 +83,12 @@ public:
 				      * access to the rowstart array, but
 				      * readonly.
 				      *
+				      * Though the return value is declared
+				      * #const#, you shoudl be aware that it
+				      * may change if you call any nonconstant
+				      * function of objects which operate on
+				      * it.
+				      *
 				      * You should use this interface very
 				      * carefully and only if you are absolutely
 				      * sure to know what you do. You should
@@ -99,6 +105,12 @@ public:
 				      * This is kind of an expert mode: get
 				      * access to the colnums array, but
 				      * readonly.
+				      *
+				      * Though the return value is declared
+				      * #const#, you shoudl be aware that it
+				      * may change if you call any nonconstant
+				      * function of objects which operate on
+				      * it.
 				      *
 				      * You should use this interface very
 				      * carefully and only if you are absolutely
@@ -146,7 +158,7 @@ CLASS
    */
 class dSMatrix
 {
-    dSMatrixStruct * cols;
+    const dSMatrixStruct * cols;
     double* val;
     unsigned int max_len;
   public:
@@ -287,6 +299,30 @@ class dSMatrix
 				     //
     void Tvmult (dVector& dst,const dVector& src) const;
   
+
+				     /**
+				      * Return the norm of the vector #v# with
+				      * respect to the norm induced by this
+				      * matrix, i.e. $\left<v,Mv\right>$. This
+				      * is useful, e.g. in the finite element
+				      * context, where the $L_2$ norm of a
+				      * function equals the matrix norm with
+				      * respect to the mass matrix of the vector
+				      * representing the nodal values of the
+				      * finite element function.
+				      *
+				      * Note the order in which the matrix
+				      * appears. For non-symmetric matrices
+				      * there is a difference whether the
+				      * matrix operates on the first
+				      * or on the second operand of the
+				      * scalar product.
+				      *
+				      * Obviously, the matrix needs to be square
+				      * for this operation.
+				      */
+    double matrix_norm (const dVector &v) const;
+    
 				     //
     double residual (dVector& dst, const dVector& x, const dVector& b);
 				     //
@@ -309,6 +345,12 @@ class dSMatrix
 				      * Return a (constant) reference to the
 				      * underlying sparsity pattern of this
 				      * matrix.
+				      *
+				      * Though the return value is declared
+				      * #const#, you shoudl be aware that it
+				      * may change if you call any nonconstant
+				      * function of objects which operate on
+				      * it.
 				      */
     const dSMatrixStruct & get_sparsity_pattern () const;
 
