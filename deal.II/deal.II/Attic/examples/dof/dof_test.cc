@@ -3,7 +3,7 @@
 
 #include <grid/dof.h>
 #include <grid/tria.h>
-#include <fe/fe_lib.h>
+#include <fe/fe_lib.lagrange.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>

@@ -15,7 +15,7 @@
 #include <basic/data_io.h>
 #include <basic/function.h>
 #include <basic/parameter_handler.h>
-#include <fe/fe_lib.h>
+#include <fe/fe_lib.lagrange.h>
 #include <fe/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>

@@ -9,7 +9,7 @@
 #include <grid/dof_constraints.h>
 #include <basic/function.h>
 #include <basic/data_io.h>
-#include <fe/fe_lib.h>
+#include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.criss_cross.h>
 #include <fe/quadrature_lib.h>
 #include <numerics/base.h>
