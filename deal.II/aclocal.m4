@@ -657,7 +657,7 @@ dnl
 dnl Usage: DEAL_II_HAVE_STD_OSTREAM_HEADER
 dnl
 AC_DEFUN(DEAL_II_HAVE_STD_OSTREAM_HEADER, dnl
-  AC_MSG_CHECKING(for ostream header)
+  AC_MSG_CHECKING(for <ostream> header)
   AC_LANG_CPLUSPLUS
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
@@ -676,3 +676,32 @@ void f (const std::ostream &out);
       AC_MSG_RESULT(no)
     ])
 )
+
+
+
+dnl Check whether the numeric_limits classes are available
+dnl
+dnl Usage: DEAL_II_HAVE_STD_OSTREAM_HEADER
+dnl
+AC_DEFUN(DEAL_II_HAVE_STD_IOSFWD_HEADER, dnl
+  AC_MSG_CHECKING(for <iosfwd> header)
+  AC_LANG_CPLUSPLUS
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <iosfwd>
+void f (const std::ostream &out);
+void g () { f(cout); };
+    ],
+    [
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_STD_IOSFWD_HEADER, 1, 
+                [Define if the compiler provides an <iosfwd> header file])
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+)
+
