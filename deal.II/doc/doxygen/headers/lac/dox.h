@@ -99,9 +99,13 @@
 /**
  * @defgroup PETSc PETSc
  * The classes in this module are wrappers around functionality provided by
- * the PETSc library. THe provide a modern object-oriented interface that is
+ * the PETSc library. They provide a modern object-oriented interface that is
  * compatible with the interfaces of the other linear algebra classes in
  * deal.II.
+ *
+ * These classes are only available if a PETSc installation was detected
+ * during configuration of deal.II. Refer to the README file for more details
+ * about this.
  *
  * @author Wolfgang Bangerth, 2004
  */
