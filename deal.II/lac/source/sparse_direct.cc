@@ -239,6 +239,7 @@ namespace CommunicationsLog
 
   void list_communication () 
   {
+    sleep (random()%4);
                                      // make sure only one thread is
                                      // writing out at a time
     static Threads::ThreadMutex write_lock;
@@ -308,8 +309,6 @@ void monitor_child_liveness (const pid_t child_pid)
 {
   while (true)
     {
-      std::cerr << "+++ monitoring child " << child_pid << std::endl;
-      
       int ret = kill (child_pid, 0);
       if (ret != 0)
         if ((ret == -1) && (errno == ESRCH))
@@ -370,8 +369,8 @@ struct SparseDirectMA27::DetachedModeData
             int ret;
             do
               ret = write (server_client_pipe[1],
-                           reinterpret_cast<const char *> (t),
-                           sizeof(T) * N);
+                           reinterpret_cast<const char *> (t) + count,
+                           sizeof(T) * N - count);
             while ((ret<0) && (errno==EINTR));
             if (ret < 0)
               die ("error on client side in 'put'", ret, errno);
