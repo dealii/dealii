@@ -18,6 +18,7 @@
 
 
 template <typename T> class vector2d;
+template <typename T> class FullMatrix;
 
 
 /**
