@@ -52,7 +52,7 @@ void GridIn<dim>::read_ucd (istream &in)
   in.putback (c);
 
 
-unsigned int n_vertices;
+  unsigned int n_vertices;
   unsigned int n_cells;
   int dummy;
 

@@ -57,7 +57,7 @@ void InterGridMap<GridClass,dim>::make_mapping (const GridClass<dim> &source_gri
   clear ();
 
 
-// then set up the containers from
+				   // then set up the containers from
 				   // scratch and fill them with end-iterators
   const unsigned int n_levels = get_n_levels(source_grid);
   mapping.resize (n_levels);
