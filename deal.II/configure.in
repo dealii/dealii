@@ -256,8 +256,12 @@ else
     else
       
       if test "x$GXX_VERSION" = "xintel_icc" ; then
-        CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info"
-        CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w"
+	dnl Disable some compiler warnings, as they often are wrong on
+	dnl out code:
+	dnl #175: subscript out of range (doesn't take into account that
+	dnl       some code is only reachable for some dimensions)
+        CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -DDEBUG -inline_debug_info"
+        CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -unroll -w0"
 
       else
 
@@ -285,7 +289,6 @@ dnl ======================================================================
 dnl Check for operating system properties like header files and
 dnl special functions.
 dnl ======================================================================
-AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_FUNCS(gethostname)
 
 
