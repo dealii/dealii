@@ -89,7 +89,7 @@ template<typename number> class FullMatrix;
 template <typename number>
 class SparseMatrixEZ : public Subscriptor
 {
-  private:
+  public:
 				     /**
 				      * The class for storing the
 				      * column number of an entry
@@ -326,7 +326,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * matrix.
 				      */
     explicit SparseMatrixEZ (unsigned int n_rows,
-			     unsigned int n_columns = n_rows,
+			     unsigned int n_columns,
 			     unsigned int default_row_length = Entry::invalid,
 			     unsigned int default_increment = Entry::invalid);
     
@@ -358,7 +358,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * matrix.
 				      */
     void reinit (unsigned int n_rows,
-		 unsigned int n_columns = n_rows,
+		 unsigned int n_columns,
 		 unsigned int default_row_length = Entry::invalid,
 		 unsigned int default_increment = Entry::invalid);
 
@@ -1065,8 +1065,8 @@ SparseMatrixEZ<number>::const_iterator::operator++ ()
 {
   Assert (this->a_row < this->matrix->m(), ExcIteratorPastEnd());
   
-  ++a_index;
-  if (this->a_index >= this->matrix->row_info[a_row].length)
+  ++(this->a_index);
+  if (this->a_index >= this->matrix->row_info[this->a_row].length)
     {
       this->a_index = 0;
       this->a_row++;
@@ -1399,12 +1399,12 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
   const typename MATRIXB::const_iterator b_final = B.end();
   while (b1 != b_final)
     {
-      const unsigned int i = b->row();
-      const unsigned int k = b->column();
+      const unsigned int i = b1->row();
+      const unsigned int k = b1->column();
       while (b2 != b_final)
 	{
-	  const unsigned int j = b->row();
-	  const unsigned int l = b->column();
+	  const unsigned int j = b2->row();
+	  const unsigned int l = b2->column();
 	  
 	  const typename MATRIXA::value_type a = A.el(k,l);
 	  
