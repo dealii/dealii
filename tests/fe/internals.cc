@@ -13,6 +13,7 @@
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_dgp.h>
+#include <fe/fe_nedelec.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 #include <vector>
@@ -147,6 +148,9 @@ main()
   CHECK_ALL(Q,1,3);
   CHECK_ALL(Q,2,3);
 
+  CHECK_ALL(Nedelec, 1, 2);
+  CHECK_ALL(Nedelec, 1, 3);
+  
   CHECK_SYS1(FE_Q<2>(1),3,2);
   CHECK_SYS1(FE_DGQ<2>(2),2,2);
 //  CHECK_SYS1(FE_DGP<2>(3),1,2);
@@ -168,6 +172,16 @@ main()
  	     FESystem<2>(FE_DGQ<2>(3),3), 1,
  	     FESystem<2>(FE_Q<2>(2),3,
  			 FE_DGQ<2>(0),1),2,
+ 	     2);
+
+                                   // systems with Nedelec elements
+  CHECK_SYS2 (FE_DGQ<2>(3), 1,
+              FE_Nedelec<2>(1), 2,
+              2);
+  CHECK_SYS3(FE_Nedelec<2>(1), 1,
+ 	     FESystem<2>(FE_DGQ<2>(3),3), 1,
+ 	     FESystem<2>(FE_Q<2>(2),3,
+ 			 FE_Nedelec<2>(1),2),2,
  	     2);
   
   return 0;
