@@ -62,28 +62,14 @@ void check_this (Triangulation<3> &tria)
             const unsigned int neighbor_neighbor
               = cell->neighbor_of_neighbor (face_no);
 
-                                             // see whether face and
-                                             // the neighbor's
-                                             // counterface share the
-                                             // same indexing of
-                                             // children. if not so,
-                                             // translate child
-                                             // indices
-            const bool face_orientations_match
-              = (neighbor->face_orientation(neighbor_neighbor) ==
-                 cell->face_orientation(face_no));
-            static const unsigned int subface_translation[4]
-              = { 0, 3, 2, 1 };
-            const unsigned int neighbor_child_index
-              = (GeometryInfo<3>::
-                 child_cell_on_face(neighbor_neighbor,
-                                    (face_orientations_match ?
-                                     subface_no :
-                                     subface_translation[subface_no])));
-            const DoFHandler<3>::active_cell_iterator neighbor_child
-              = neighbor->child(neighbor_child_index);
+	    const DoFHandler<3>::face_iterator subface=
+	      cell->face(face_no)->child(subface_no);
+	    unsigned int i=0;
+	    for (; i<GeometryInfo<3>::children_per_cell; ++i)
+	      if (neighbor->child(i)->face(neighbor_neighbor)==subface)
+		break;
 
-            Assert (neighbor_child ==
+            Assert (neighbor->child(i)==
                     cell->neighbor_child_on_subface (face_no,
                                                      subface_no),
                     ExcInternalError());
