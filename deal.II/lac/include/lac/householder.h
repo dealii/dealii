@@ -86,12 +86,12 @@ Householder<number>::Householder(const FullMatrix<number2>& M)
   Assert (this->n_cols() <= this->n_rows(),
 	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
 
-  for (unsigned int j=0 ; j<n() ; ++j)
+  for (unsigned int j=0 ; j<this->n() ; ++j)
   {
     number2 sigma = 0;
     unsigned int i;
 				     // sigma = ||v||^2
-    for (i=j ; i<m() ; ++i)
+    for (i=j ; i<this->m() ; ++i)
       sigma += this->el(i,j)*this->el(i,j);
 				     // We are ready if the column is
 				     // empty. Are we?
@@ -107,20 +107,20 @@ Householder<number>::Householder(const FullMatrix<number2>& M)
     diagonal[j] = beta*(this->el(j,j) - s);
     this->el(j,j) = s;
 
-    for (i=j+1 ; i<m() ; ++i)
+    for (i=j+1 ; i<this->m() ; ++i)
       this->el(i,j) *= beta;
 
 
 				     // For all subsequent columns do
 				     // the Householder reflexion
-    for (unsigned int k=j+1 ; k<n() ; ++k)
+    for (unsigned int k=j+1 ; k<this->n() ; ++k)
     {
       number2 sum = diagonal[j]*this->el(j,k);
-      for (i=j+1 ; i<m() ; ++i)
+      for (i=j+1 ; i<this->m() ; ++i)
 	sum += this->el(i,j)*this->el(i,k);
 
       this->el(j,k) -= sum*this->diagonal[j];
-      for (i=j+1 ; i<m() ; ++i)
+      for (i=j+1 ; i<this->m() ; ++i)
 	this->el(i,k) -= sum*this->el(i,j);
     }    
   }
@@ -139,22 +139,22 @@ Householder<number>::least_squares (Vector<number2>& dst,
 
 				   // Multiply Q_n ... Q_2 Q_1 src
 				   // Where Q_i = I-v_i v_i^T
-  for (unsigned int j=0;j<n();++j)
+  for (unsigned int j=0;j<this->n();++j)
     {
 				       // sum = v_i^T src
       number2 sum = diagonal[j]*src(j);
-      for (unsigned int i=j+1 ; i<m() ; ++i)
+      for (unsigned int i=j+1 ; i<this->m() ; ++i)
 	sum += this->el(i,j)*src(i);
 				       // src -= v * sum
       src(j) -= sum*diagonal[j];
-      for (unsigned int i=j+1 ; i<m() ; ++i)
+      for (unsigned int i=j+1 ; i<this->m() ; ++i)
 	src(i) -= sum*this->el(i,j);
     }
   
   backward(dst, src);
   
   number2 sum = 0.;
-  for (unsigned int i=n() ; i<m() ; ++i) sum += src(i) * src(i);
+  for (unsigned int i=this->n() ; i<this->m() ; ++i) sum += src(i) * src(i);
   return std::sqrt(sum);
 }
 
