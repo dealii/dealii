@@ -1161,7 +1161,6 @@ inline
 typename SparseMatrixEZ<number>::const_iterator&
 SparseMatrixEZ<number>::const_iterator::operator++ ()
 {
-//TODO[GK]: exclude entries with column index -1, i.e. simply jump over them  
   Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
   
   ++(accessor.a_index);
