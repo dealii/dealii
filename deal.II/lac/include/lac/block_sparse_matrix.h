@@ -631,7 +631,7 @@ class BlockSparseMatrix : public Subscriptor
 			      const BlockVector<somenumber> &src,
 			      const number                   omega = 1.) const;
 
-                                     /* call print functions for 
+                                     /* Call print functions for 
 				      * the SparseMatrix blocks.
 				      */
     void print_formatted (std::ostream       &out,
