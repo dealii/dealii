@@ -3,12 +3,13 @@
 /*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __fe_values_H
 #define __fe_values_H
-/*----------------------------   fe_values.h     ---------------------------*/
+/*---------------------------   fe_values.h     ---------------------------*/
 
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <lac/fullmatrix.h>
+#include <grid/dof.h>
 #include <base/point.h>
 #include <grid/tria.h>
 #include <fe/fe_update_flags.h>
