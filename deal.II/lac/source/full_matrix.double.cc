@@ -101,13 +101,17 @@ FullMatrix<double>::invert (const FullMatrix<double> &M)
   double* work = new double[lwork];
   int info;
   
-  const char* trans = "N";
+//  const char* trans = "N";
   int rank;
   const double rcond=-1.;
   double* s = new double[dim_range];
   
+  double* matrix = new double[dim_range*dim_range];
+  copy (&M.val[0], &M.val[dim_image*dim_range], matrix);
+  
+
   int erg = dgelss_ (&dim_range, &dim_range, &dim_range,
-		     M.val, &dim_range,
+		     matrix, &dim_range,
 		     val, &dim_range,
 		     s, &rcond, &rank,
 		     work, &lwork,
@@ -118,14 +122,12 @@ FullMatrix<double>::invert (const FullMatrix<double> &M)
 //  		    work, &lwork,
 //  		    &info);
 
-  double condition = s[0]/s[dim_range-1];
+//  double condition = s[0]/s[dim_range-1];
   
   if (info!=0)
     deallog << "inverting error " << info << ' ' << erg << endl;
   if (rank<(int)dim_range)
     deallog << "rank deficiency " << rank << endl;
-  if (condition > 1.e6)
-    deallog << "Condition " <<  condition << endl;
   delete[] work;
   delete[] s;
 }
