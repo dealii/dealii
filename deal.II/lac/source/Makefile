@@ -50,13 +50,16 @@ clean:
 #to remake this file upon inclusion at the bottom
 #of this file.
 #
-#use perl to generate rules for the .go files as well
-#as to make rules not for tria.o and the like, but
-#rather for libbasic.a(tria.o)
-../lib/Makefile.dep: $(cc-files) $(filter-out $(forward-declarations),$(h-files)) Makefile
+#see the Makefile of the deal.II directory for a thorough
+#description of what happens here
+../lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
+ifeq (0,${MAKELEVEL})
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files) \
 		> ../lib/Makefile.dep
+else
+	@echo ============================ Not remaking Makefile since in nested mode
+endif
 
 
 include ../lib/Makefile.dep
