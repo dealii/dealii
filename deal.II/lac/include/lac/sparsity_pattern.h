@@ -1,9 +1,17 @@
-/*----------------------------   sparsity_pattern.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __sparsity_pattern_H
-#define __sparsity_pattern_H
-/*----------------------------   sparsity_pattern.h     ---------------------------*/
-
+//----------------------------  sparsity_pattern.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparsity_pattern.h  ---------------------------
+#ifndef __deal2__sparsity_pattern_h
+#define __deal2__sparsity_pattern_h
 
 
 #include <base/exceptions.h>
@@ -11,8 +19,6 @@
 #include <lac/forward_declarations.h>
 
 #include <vector>
-
-
 
 
 /**
@@ -491,9 +497,9 @@ class SparsityPattern : public Subscriptor
 				      * information!
 				      */
     const unsigned int * get_column_numbers () const;
-    
-    
-				     /**
+
+
+/**
 				      * Exception
 				      */
     DeclException1 (ExcInvalidNumber,
@@ -670,15 +676,12 @@ class SparsityPattern : public Subscriptor
 				      */
     bool compressed;
 
-    
-    template <typename number> friend class SparseMatrix;
+
+template <typename number> friend class SparseMatrix;
 };
 
 
-
-
 /*---------------------- Inline functions -----------------------------------*/
-
 
 
 inline
@@ -689,14 +692,12 @@ SparsityPattern::n_rows () const
 };
 
 
-
 inline
 unsigned int
 SparsityPattern::n_cols () const
 {
   return cols;
 };
-
 
 
 inline
@@ -707,14 +708,12 @@ SparsityPattern::is_compressed () const
 };
 
 
-
 inline
 const unsigned int *
 SparsityPattern::get_rowstart_indices () const
 {
   return rowstart;
 };
-
 
 
 inline
@@ -725,7 +724,6 @@ SparsityPattern::get_column_numbers () const
 };
 
 
-
 inline
 unsigned int
 SparsityPattern::row_length (const unsigned int row) const
@@ -733,7 +731,6 @@ SparsityPattern::row_length (const unsigned int row) const
   Assert(row<rows, ExcIndexRange(row,0,rows));
   return rowstart[row+1]-rowstart[row];
 }
-
 
 
 inline
@@ -748,7 +745,6 @@ SparsityPattern::column_number (const unsigned int row,
 }
 
 
-
 inline
 unsigned int
 SparsityPattern::n_nonzero_elements () const
@@ -759,8 +755,4 @@ SparsityPattern::n_nonzero_elements () const
 };
 
 
-
-/*----------------------------   sparsity_pattern.h     ---------------------------*/
-/* end of #ifndef __sparsity_pattern_H */
 #endif
-/*----------------------------   sparsity_pattern.h     ---------------------------*/

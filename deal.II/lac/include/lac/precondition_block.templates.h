@@ -1,6 +1,17 @@
-/*-----------------   precondition_block.templates.h     ----------------------*/
-/*      $Id$                 */
-/*           Ralf Hartmann, University of Heidelberg                           */
+//----------------------------  precondition_block.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  precondition_block.templates.h  ---------------------------
+#ifndef __deal2__precondition_block_templates_h
+#define __deal2__precondition_block_templates_h
 
 
 #include <lac/precondition_block.h>
@@ -15,14 +26,12 @@ PreconditionBlock<number,inverse_type>::PreconditionBlock ():
 		A(0)  {};
 
 
-
 template <typename number, typename inverse_type>
 PreconditionBlock<number,inverse_type>::~PreconditionBlock ()
 {
   if (inverse.size()!=0)
     inverse.erase(inverse.begin(), inverse.end());
 }
-
 
 
 template <typename number, typename inverse_type>
@@ -34,7 +43,6 @@ void PreconditionBlock<number,inverse_type>::clear ()
 }
 
 
-
 template <typename number, typename inverse_type>
 void PreconditionBlock<number,inverse_type>::use_matrix(
   const SparseMatrix<number> &M)
@@ -43,19 +51,16 @@ void PreconditionBlock<number,inverse_type>::use_matrix(
 }
 
 
-
 template <typename number, typename inverse_type>
 void PreconditionBlock<number,inverse_type>::set_block_size(unsigned int bsize) {
   blocksize=bsize;
 }
 
 
-
 template <typename number, typename inverse_type>
 unsigned int PreconditionBlock<number,inverse_type>::block_size() const {
   return blocksize;
 }
-
 
 
 template <typename number, typename inverse_type>
@@ -119,7 +124,6 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 }
 
 
-
 /*--------------------- PreconditionBlockSOR -----------------------*/
 
 template<typename number, typename inverse_type>
@@ -127,10 +131,8 @@ PreconditionBlockSOR<number,inverse_type>::PreconditionBlockSOR(const number ome
 		omega(omega)  {}
 
 
-
 template<typename number, typename inverse_type>
 PreconditionBlockSOR<number,inverse_type>::~PreconditionBlockSOR(){}
-
 
 
 template <typename number, typename inverse_type>
@@ -211,7 +213,4 @@ void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2>     
 }
 
 
-
-
-
-/*----------------------   precondition_block.templates.h     ----------------*/
+#endif

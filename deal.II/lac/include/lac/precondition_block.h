@@ -1,8 +1,18 @@
-/*----------------------------   precondition_block.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __precondition_block_H
-#define __precondition_block_H
-/*----------------------------   precondition_block.h     ---------------------------*/
+//----------------------------  precondition_block.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  precondition_block.h  ---------------------------
+#ifndef __deal2__precondition_block_h
+#define __deal2__precondition_block_h
+
 
 #include <lac/forward_declarations.h>
 #include <base/exceptions.h>
@@ -190,7 +200,6 @@ class PreconditionBlock: public Subscriptor
 };
 
 
-
 /**
  * Block SOR preconditioning.
  *
@@ -243,9 +252,5 @@ class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
 };
 
 
-
-/*------------------------   precondition_block.h     ---------------------------*/
-/* end of #ifndef __precondition_block_H */
 #endif
-/*------------------------   precondition_block.h     ---------------------------*/
 

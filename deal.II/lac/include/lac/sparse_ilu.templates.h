@@ -1,7 +1,19 @@
-/*----------------------------   matrix_decompositions.templates.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __matrix_decompositions_templates_H
-#define __matrix_decompositions_templates_H
+//----------------------------  sparse_ilu.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparse_ilu.templates.h  ---------------------------
+#ifndef __deal2__sparse_ilu_templates_h
+#define __deal2__sparse_ilu_templates_h
+
+
 /*----------------------------   matrix_decompositions.templates.h     ---------------------------*/
 
 
@@ -12,18 +24,15 @@
 #include <cmath>
 
 
-
 template <typename number>
 SparseILU<number>::SparseILU () 
 {};
-
 
 
 template <typename number>
 SparseILU<number>::SparseILU (const SparsityPattern &sparsity) :
 		SparseMatrix<number> (sparsity)
 {};
-
 
 
 template <typename number>
@@ -33,14 +42,11 @@ void SparseILU<number>::reinit ()
 };
 
 
-
 template <typename number>
 void SparseILU<number>::reinit (const SparsityPattern &sparsity)
 {
   SparseMatrix<number>::reinit (sparsity);
 };
-
-
 
 
 template <typename number>
@@ -53,9 +59,9 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   Assert (matrix.m()==m(),        ExcSizeMismatch(matrix.m(), m()));
   
   Assert (strengthen_diagonal>=0, ExcInvalidStrengthening (strengthen_diagonal));
-  
-  
-				   // first thing: copy over all elements
+
+
+// first thing: copy over all elements
 				   // of #matrix# to the present object
 				   //
 				   // note that some elements in this
@@ -104,9 +110,9 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 
 	*diagonal_element += strengthen_diagonal * rowsum;
       };
-  
-	  
-				   // now work only on this
+
+
+// now work only on this
 				   // matrix
   const SparsityPattern             &sparsity = get_sparsity_pattern();
   const unsigned int * const rowstart_indices = sparsity.get_rowstart_indices();
@@ -127,8 +133,8 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
           a[i,j] -= a[i,k] * a[k,j]
 */
 
-  
-				   // i := row
+
+// i := row
   for (unsigned int row=1; row<m(); ++row)
     {
 				       // invert diagonal element of the
@@ -260,8 +266,6 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 };
 
 
-
-
 template <typename number>
 template <typename somenumber>
 void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
@@ -332,9 +336,7 @@ void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
 };
 
 
-
-
 /*----------------------------   matrix_decompositions.templates.h     ---------------------------*/
-/* end of #ifndef __matrix_decompositions_templates_H */
+
 #endif
 /*----------------------------   matrix_decompositions.templates.h     ---------------------------*/

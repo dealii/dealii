@@ -1,17 +1,21 @@
-/*----------------------------   vector.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __vector_H
-#define __vector_H
-/*----------------------------   vector.h     ---------------------------*/
+//----------------------------  vector.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  vector.h  ---------------------------
+#ifndef __deal2__vector_h
+#define __deal2__vector_h
 
-// This file was once part of the DEAL Library
-// DEAL is Copyright(1995) by
-// Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
-// Revised and extended by Wolfgang Bangerth
 
 #include <base/exceptions.h>
 #include <cstdio>
-
 
 
 /**
@@ -43,9 +47,9 @@ class Vector {
     typedef value_type& reference;
     typedef const value_type& const_reference;
     typedef size_t size_type;
-    
 
-				     /**
+
+/**
 				      * @name 1: Basic Object-handling 
 				      */
 				     //@{
@@ -153,9 +157,9 @@ class Vector {
 				      * $l_\infty$-norm of a vector.
 				      */
     Number linfty_norm () const;
-    
-    
-				     /**
+
+
+/**
 				      * Change the dimension of the vector to
 				      * #N#. The reserved memory for this vector
 				      * remains unchanged if possible, to make
@@ -233,9 +237,9 @@ class Vector {
 				      */
     const_iterator end () const;  
 				     //@}
-    
-    
-				     /**
+
+
+/**
 				      * @name 2: Data-Access
 				      */
 				     //@{
@@ -250,9 +254,9 @@ class Vector {
 				      */
     Number& operator() (const unsigned int i);
 				     //@}
-    
-    
-				     /**
+
+
+/**
 				      * @name 3: Modification of vectors
 				      */
 				     //@{
@@ -358,9 +362,9 @@ class Vector {
     void ratio (const Vector<Number> &a,
 		const Vector<Number> &b);
 				     //@}
-    
-    
-				     /**
+
+
+/**
 				      * @name 5: Mixed stuff
 				      */
 				     //@{
@@ -463,10 +467,6 @@ class Vector {
 };
 
 
-
-
-
-
 /*----------------------- Inline functions ----------------------------------*/
 
 
@@ -478,13 +478,11 @@ unsigned int Vector<Number>::size () const
 }
 
 
-
 template <typename Number>
 inline
 Vector<Number>::iterator Vector<Number>::begin () {
   return &val[0];
 };
-
 
 
 template <typename Number>
@@ -494,7 +492,6 @@ Vector<Number>::const_iterator Vector<Number>::begin () const {
 };
 
 
-
 template <typename Number>
 inline
 Vector<Number>::iterator Vector<Number>::end () {
@@ -502,13 +499,11 @@ Vector<Number>::iterator Vector<Number>::end () {
 };
 
 
-
 template <typename Number>
 inline
 Vector<Number>::const_iterator Vector<Number>::end () const {
   return &val[dim];
 };
-
 
 
 template <typename Number>
@@ -520,7 +515,6 @@ Number Vector<Number>::operator() (const unsigned int i) const
 }
 
 
-
 template <typename Number>
 inline
 Number& Vector<Number>::operator() (const unsigned int i)
@@ -530,10 +524,4 @@ Number& Vector<Number>::operator() (const unsigned int i)
 }
 
 
-
-
-
-/*----------------------------   vector.h     ---------------------------*/
-/* end of #ifndef __vector_H */
 #endif
-/*----------------------------   vector.h     ---------------------------*/

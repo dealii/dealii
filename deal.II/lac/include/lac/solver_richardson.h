@@ -1,15 +1,21 @@
-/*----------------------------   solver_richardson.h     ---------------------------*/
-/*   $Id$              */
-/*            Ralf Hartmann, University of Heidelberg                               */
-#ifndef __solver_richardson_H
-#define __solver_richardson_H
-/*----------------------------   solver_richardson.h     ---------------------------*/
-
+//----------------------------  solver_richardson.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solver_richardson.h  ---------------------------
+#ifndef __deal2__solver_richardson_h
+#define __deal2__solver_richardson_h
 
 
 #include <lac/solver.h>
 #include <lac/solver_control.h>
-
 
 
 /**
@@ -115,8 +121,6 @@ class SolverRichardson : public Solver<Matrix, Vector>
 };
 
 
-
-
 /*----------------- Implementation of the Richardson Method ------------------*/
 
 
@@ -186,7 +190,4 @@ SolverRichardson<Matrix,Vector>::set_omega(double om)
 }
 
 
-/*------------------   solver_richardson.h     ----------------------*/
-/* end of #ifndef __solver_richardson_H */
 #endif
-/*------------------   solver_richardson.h     ----------------------*/

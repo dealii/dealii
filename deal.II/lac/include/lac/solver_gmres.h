@@ -1,7 +1,19 @@
-/*----------------------------   solver_pgmres.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __solver_pgmres_H
-#define __solver_pgmres_H
+//----------------------------  solver_gmres.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solver_gmres.h  ---------------------------
+#ifndef __deal2__solver_gmres_h
+#define __deal2__solver_gmres_h
+
+
 /*----------------------------   solver_pgmres.h     ---------------------------*/
 
 
@@ -10,7 +22,6 @@
 #include <lac/solver_control.h>
 #include <lac/full_matrix.h>
 #include <vector>
-
 
 
 /**
@@ -135,8 +146,6 @@ class SolverGMRES : public Solver<MATRIX, VECTOR>
 };
 
 
-
-
 /* --------------------- Inline and template functions ------------------- */
 
 
@@ -150,7 +159,6 @@ SolverGMRES<MATRIX,VECTOR>::SolverGMRES (SolverControl        &cn,
   Assert (additional_data.max_n_tmp_vectors >= 10, 
 	  ExcTooFewTmpVectors (additional_data.max_n_tmp_vectors));
 };
-
 
 
 template <class MATRIX, class VECTOR>
@@ -178,8 +186,6 @@ SolverGMRES<MATRIX,VECTOR>::givens_rotation (Vector<double> &h,
   b(col+1)= -si(col)*b(col);
   b(col) *=  ci(col);
 }
-
-
 
 
 template<class MATRIX, class VECTOR>
@@ -236,7 +242,7 @@ SolverGMRES<MATRIX,VECTOR>::solve (const MATRIX& A,
                    h    (n_tmp_vectors-1);
 
 
-  unsigned int dim = 0;
+unsigned int dim = 0;
 
   SolverControl::State iteration_state = SolverControl::iterate;
   
@@ -250,8 +256,8 @@ SolverGMRES<MATRIX,VECTOR>::solve (const MATRIX& A,
   VECTOR &v = *tmp_vectors[0];
   VECTOR &p = *tmp_vectors[n_tmp_vectors-1];
 
-  
-				   ///////////////////////////////////
+
+///////////////////////////////////
 				   // outer iteration: loop until we
 				   // either reach convergence or the
 				   // maximum number of iterations is
@@ -394,9 +400,6 @@ SolverGMRES<MATRIX,VECTOR>::solve (const MATRIX& A,
 };
 
 
-  
-
-
 template<class MATRIX, class VECTOR>
 double
 SolverGMRES<MATRIX,VECTOR>::criterion () 
@@ -409,8 +412,7 @@ SolverGMRES<MATRIX,VECTOR>::criterion ()
 };
 
 
-
 /*----------------------------   solver_pgmres.h     ---------------------------*/
-/* end of #ifndef __solver_pgmres_H */
+
 #endif
 /*----------------------------   solver_pgmres.h     ---------------------------*/

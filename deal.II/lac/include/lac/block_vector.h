@@ -1,6 +1,18 @@
-/*      $Id$                 */
-#ifndef __lac__block_vector_H
-#define __lac__block_vector_H
+//----------------------------  block_vector.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  block_vector.h  ---------------------------
+#ifndef __deal2__block_vector_h
+#define __deal2__block_vector_h
+
 
 #include <lac/vector.h>
 #include <base/exceptions.h>
@@ -136,9 +148,9 @@ class BlockVector
 				      * $l_\infty$-norm of a vector.
 				      */
     Number linfty_norm () const;
-    
-    
-				     /**
+
+
+/**
 				      * Change the dimension of the vector to
 				      * #N#. The reserved memory for this vector
 				      * remains unchanged if possible, to make
@@ -214,9 +226,8 @@ class BlockVector
 //  				      */
 //      const_iterator end () const;  
 
-    
-    
-				     /**
+
+/**
 				      * @name 2: Data-Access
 				      */
 				     //@{
@@ -231,9 +242,9 @@ class BlockVector
 				      */
     Number& operator() (const unsigned int i);
 				     //@}
-    
-    
-				     /**
+
+
+/**
 				      * @name 3: Modification of vectors
 				      */
 				     //@{
@@ -329,9 +340,9 @@ class BlockVector
 	      const Number b, const BlockVector<n_blocks,Number>& W);
 
 				     //@}
-    
-    
-				     /**
+
+
+/**
 				      * @name 5: Mixed stuff
 				      */
 				     //@{
@@ -429,10 +440,6 @@ class BlockVector
 };
 
 
-
-
-
-
 /*----------------------- Inline functions ----------------------------------*/
 
 
@@ -444,13 +451,11 @@ unsigned int BlockVector<n_blocks,Number>::size () const
 }
 
 
-
 //  template <int n_blocks, typename Number>
 //  inline
 //  BlockVector<n_blocks,Number>::iterator BlockVector<n_blocks,Number>::begin () {
 //    return &val[0];
 //  };
-
 
 
 //  template <int n_blocks, typename Number>
@@ -460,7 +465,6 @@ unsigned int BlockVector<n_blocks,Number>::size () const
 //  };
 
 
-
 //  template <int n_blocks, typename Number>
 //  inline
 //  BlockVector<n_blocks,Number>::iterator BlockVector<n_blocks,Number>::end () {
@@ -468,13 +472,11 @@ unsigned int BlockVector<n_blocks,Number>::size () const
 //  };
 
 
-
 //  template <typename Number>
 //  inline
 //  BlockVector<n_blocks,Number>::const_iterator BlockVector<n_blocks,Number>::end () const {
 //    return &val[dim];
 //  };
-
 
 
 template <int n_blocks, typename Number>
@@ -488,7 +490,6 @@ Number BlockVector<n_blocks,Number>::operator() (const unsigned int i) const
 
   return components[j](i-start[j]);
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -522,7 +523,6 @@ BlockVector<n_blocks,Number>::block(unsigned int i) const
 
   return components[i];
 }
-
 
 
 #endif

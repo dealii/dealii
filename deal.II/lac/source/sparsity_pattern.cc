@@ -1,9 +1,15 @@
-// $Id$
-
-// This file was once part of the DEAL Library
-// DEAL is Copyright(1995) by
-// Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
-// Revised, modified and extended by Wolfgang Bangerth, 1998, 1999
+//----------------------------  sparsity_pattern.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparsity_pattern.cc  ---------------------------
 
 
 #include <lac/sparse_matrix.h>
@@ -25,7 +31,6 @@ SparsityPattern::SparsityPattern () :
 };
 
 
-
 SparsityPattern::SparsityPattern (const SparsityPattern &s) :
 		Subscriptor(),
 		max_dim(0),
@@ -42,7 +47,6 @@ SparsityPattern::SparsityPattern (const SparsityPattern &s) :
 };
 
 
-
 SparsityPattern::SparsityPattern (const unsigned int m,
 				  const unsigned int n,
 				  const unsigned int max_per_row) 
@@ -53,7 +57,6 @@ SparsityPattern::SparsityPattern (const unsigned int m,
 {
   reinit (m,n,max_per_row);
 };
-
 
 
 SparsityPattern::SparsityPattern (const unsigned int          m,
@@ -68,7 +71,6 @@ SparsityPattern::SparsityPattern (const unsigned int          m,
 };
 
 
-
 SparsityPattern::SparsityPattern (const unsigned int n,
 				  const unsigned int max_per_row)
 		: max_dim(0),
@@ -80,7 +82,6 @@ SparsityPattern::SparsityPattern (const unsigned int n,
 };
 
 
-
 SparsityPattern::SparsityPattern (const unsigned int          m,
 				  const vector<unsigned int> &row_lengths) 
 		: max_dim(0),
@@ -90,7 +91,6 @@ SparsityPattern::SparsityPattern (const unsigned int          m,
 {
   reinit (m, m, row_lengths);
 };
-
 
 
 SparsityPattern::SparsityPattern (const SparsityPattern &original,
@@ -176,13 +176,11 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
 };
 
 
-
 SparsityPattern::~SparsityPattern ()
 {
   if (rowstart != 0)  delete[] rowstart;
   if (colnums != 0)   delete[] colnums;
 }
-
 
 
 SparsityPattern &
@@ -202,8 +200,6 @@ SparsityPattern::operator = (const SparsityPattern &s)
 };
 
 
-
-
 void
 SparsityPattern::reinit (const unsigned int m,
 			 const unsigned int n,
@@ -214,7 +210,6 @@ SparsityPattern::reinit (const unsigned int m,
   const vector<unsigned int> row_lengths (m, max_per_row);
   reinit (m, n, row_lengths);
 };
-
 
 
 void
@@ -256,7 +251,7 @@ SparsityPattern::reinit (const unsigned int m,
 		    *max_element(row_lengths.begin(), row_lengths.end()));
 
 
-				   // allocate memory for the rowstart
+// allocate memory for the rowstart
 				   // values, if necessary
   if (rows > max_dim)
     {
@@ -320,8 +315,8 @@ SparsityPattern::compress ()
 				   // now allocate the respective memory
   unsigned int *new_colnums = new unsigned int[nonzero_elements];
 
-  
-				   // reserve temporary storage to
+
+// reserve temporary storage to
 				   // store the entries of one row
   vector<unsigned int> tmp_entries (max_row_length);
   
@@ -403,7 +398,6 @@ SparsityPattern::compress ()
 };
 
 
-
 bool
 SparsityPattern::empty () const {
 				   // let's try to be on the safe side of
@@ -429,7 +423,6 @@ SparsityPattern::empty () const {
 };
 
 
-
 unsigned int
 SparsityPattern::max_entries_per_row () const 
 {
@@ -449,7 +442,6 @@ SparsityPattern::max_entries_per_row () const
 
   return m;
 };
-
 
 
 unsigned int
@@ -496,7 +488,6 @@ SparsityPattern::operator () (const unsigned int i,
 }
 
 
-
 void
 SparsityPattern::add (const unsigned int i,
 		      const unsigned int j)
@@ -526,7 +517,6 @@ SparsityPattern::add (const unsigned int i,
 }
 
 
-
 void
 SparsityPattern::print_gnuplot (ostream &out) const
 {
@@ -538,7 +528,6 @@ SparsityPattern::print_gnuplot (ostream &out) const
 
   AssertThrow (out, ExcIO());
 }
-
 
 
 unsigned int

@@ -1,9 +1,17 @@
-// $Id$
-
-// This file was once part of the DEAL Library
-// DEAL is Copyright(1995) by
-// Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
-// Revised, modified and extended by Wolfgang Bangerth, 1998, 1999
+//----------------------------  sparse_matrix.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparse_matrix.templates.h  ---------------------------
+#ifndef __deal2__sparse_matrix_templates_h
+#define __deal2__sparse_matrix_templates_h
 
 
 #include <lac/sparse_matrix.h>
@@ -22,9 +30,6 @@
 
 #  define NTHREADS 4
 #endif
-
-
-
 
 
 template <typename number>
@@ -48,7 +53,6 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
 };
 
 
-
 template <typename number>
 SparseMatrix<number>&
 SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
@@ -59,7 +63,6 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 
   return *this;
 };
-
 
 
 template <typename number>
@@ -73,7 +76,6 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c) :
 };
 
 
-
 template <typename number>
 SparseMatrix<number>::~SparseMatrix ()
 {
@@ -84,7 +86,6 @@ SparseMatrix<number>::~SparseMatrix ()
   if (val != 0)
     delete[] val;
 };
-
 
 
 template <typename number>
@@ -115,7 +116,6 @@ SparseMatrix<number>::reinit ()
 }
 
 
-
 template <typename number>
 void
 SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
@@ -128,7 +128,6 @@ SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
   
   reinit ();
 };
-
 
 
 template <typename number>
@@ -144,7 +143,6 @@ SparseMatrix<number>::clear ()
 };
 
 
-
 template <typename number>
 bool
 SparseMatrix<number>::empty () const
@@ -156,7 +154,6 @@ SparseMatrix<number>::empty () const
 };
 
 
-
 template <typename number>
 unsigned int
 SparseMatrix<number>::n_nonzero_elements () const
@@ -164,7 +161,6 @@ SparseMatrix<number>::n_nonzero_elements () const
   Assert (cols != 0, ExcMatrixNotInitialized());
   return cols->n_nonzero_elements ();
 };
-
 
 
 template <typename number>
@@ -181,7 +177,6 @@ SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
   
   return *this;
 };
-
 
 
 template <typename number>
@@ -201,7 +196,6 @@ SparseMatrix<number>::add_scaled (const number factor,
   while (val_ptr != end_ptr)
     *val_ptr++ += factor * *matrix_ptr++;
 };
-
 
 
 template <typename number>
@@ -274,7 +268,6 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
 };
 
 
-
 template <typename number>
 template <typename somenumber>
 void
@@ -303,7 +296,6 @@ SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 };
 
 
-
 template <typename number>
 template <typename somenumber>
 void
@@ -325,7 +317,6 @@ SparseMatrix<number>::Tvmult (Vector<somenumber>& dst, const Vector<somenumber>&
 	}
     }
 }
-
 
 
 template <typename number>
@@ -372,7 +363,6 @@ SparseMatrix<number>::Tvmult_add (Vector<somenumber>& dst, const Vector<somenumb
 	}
     }
 }
-
 
 
 template <typename number>
@@ -451,7 +441,6 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
 
   return sum;
 };
-
 
 
 template <typename number>
@@ -639,7 +628,6 @@ SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 };
 
 
-
 template <typename number>
 template <typename somenumber>
 void
@@ -663,7 +651,6 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>& dst,
 				     // rowstart[i]
     *dst_ptr = om * *src_ptr / val[*rowstart_ptr];
 };
-
 
 
 template <typename number>
@@ -733,7 +720,6 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
 }
 
 
-
 template <typename number>
 template <typename somenumber>
 void
@@ -747,7 +733,6 @@ SparseMatrix<number>::precondition_SOR (Vector<somenumber>& dst, const Vector<so
   dst = src;
   SOR(dst,om);
 };
-
 
 
 template <typename number>
@@ -877,7 +862,6 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
 }
 
 
-
 template <typename number>
 const SparsityPattern &
 SparseMatrix<number>::get_sparsity_pattern () const
@@ -885,7 +869,6 @@ SparseMatrix<number>::get_sparsity_pattern () const
   Assert (cols != 0, ExcMatrixNotInitialized());
   return *cols;
 };
-
 
 
 template <typename number>
@@ -899,7 +882,6 @@ void SparseMatrix<number>::print (ostream &out) const {
 
   AssertThrow (out, ExcIO());
 };
-
 
 
 template <typename number>
@@ -941,3 +923,4 @@ void SparseMatrix<number>::print_formatted (ostream &out,
 //  out.setf (0, ios::floatfield);                 // reset output format
 };
 
+#endif

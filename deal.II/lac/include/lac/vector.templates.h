@@ -1,9 +1,18 @@
-// $Id$
+//----------------------------  vector.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  vector.templates.h  ---------------------------
+#ifndef __deal2__vector_templates_h
+#define __deal2__vector_templates_h
 
-// This file was once part of the DEAL Library
-// DEAL is Copyright(1995) by
-// Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
-// Revised and extended by Wolfgang Bangerth, 1998, 1999
 
 #include <lac/vector.h>
 #include <cmath>
@@ -16,14 +25,12 @@ static inline Number sqr (const Number x) {
 };
 
 
-
 template <typename Number>
 Vector<Number>::Vector () :
 		dim(0),
 		maxdim(0),
 		val(0)
 {}
-
 
 
 template <typename Number>
@@ -34,7 +41,6 @@ Vector<Number>::Vector (const unsigned int n) :
 {
   reinit (n, false);
 }
-
 
 
 template <typename Number>
@@ -50,7 +56,6 @@ Vector<Number>::Vector (const Vector<Number>& v) :
       copy (v.begin(), v.end(), begin());
     }
 }
-
 
 
 // see the .h file for why this function was disabled
@@ -69,7 +74,6 @@ Vector<Number>::Vector (const Vector<Number>& v) :
 //       copy (v.begin(), v.end(), begin());
 //     }
 // }
-
 
 
 template <typename Number>
@@ -95,13 +99,10 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast) {
 }
 
 
-
 template <typename Number>
 void Vector<Number>::reinit (const Vector<Number>& v, const bool fast) {
   reinit (v.size(), fast);
 };
-
-
 
 
 template <typename Number>
@@ -111,13 +112,11 @@ Vector<Number>::~Vector ()
 }
 
 
-
 template <typename Number>
 void Vector<Number>::clear () {
   if (dim>0)
     fill (begin(), end(), 0.);
 }
-
 
 
 template <typename Number>
@@ -131,7 +130,6 @@ bool Vector<Number>::all_zero () const {
       return false;
   return true;
 };
-
 
 
 template <typename Number>
@@ -170,7 +168,6 @@ Number Vector<Number>::operator * (const Vector<Number>& v) const
 }
 
 
-
 template <typename Number>
 Number Vector<Number>::norm_sqr () const
 {
@@ -199,7 +196,6 @@ Number Vector<Number>::norm_sqr () const
   
   return sum0+sum1+sum2+sum3;
 };
-
 
 
 template <typename Number>
@@ -232,7 +228,6 @@ Number Vector<Number>::mean_value () const
 };
 
 
-
 template <typename Number>
 Number Vector<Number>::l1_norm () const
 {
@@ -263,13 +258,11 @@ Number Vector<Number>::l1_norm () const
 };
 
 
-
 template <typename Number>
 Number Vector<Number>::l2_norm () const
 {
   return sqrt(norm_sqr());
 };
-
 
 
 template <typename Number>
@@ -295,9 +288,6 @@ Number Vector<Number>::linfty_norm () const {
   return max (max(max0, max1),
 	      max(max2, max3));
 };
-  
-
-
 
 
 template <typename Number>
@@ -308,7 +298,6 @@ Vector<Number>& Vector<Number>::operator += (const Vector<Number>& v)
   add (v);
   return *this;
 }
-
 
 
 template <typename Number>
@@ -327,7 +316,6 @@ Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
 }
 
 
-
 template <typename Number>
 void Vector<Number>::add (const Number v)
 {
@@ -338,7 +326,6 @@ void Vector<Number>::add (const Number v)
   while (i_ptr!=i_end)
     *i_ptr++ += v;
 }
-
 
 
 template <typename Number>
@@ -355,7 +342,6 @@ void Vector<Number>::add (const Vector<Number>& v)
 }
 
 
-
 template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number>& v)
 {
@@ -368,7 +354,6 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v)
   while (i_ptr!=i_end)
     *i_ptr++ += a * *v_ptr++;
 }
-
 
 
 template <typename Number>
@@ -387,7 +372,6 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v,
 }
 
 
-
 template <typename Number>
 void Vector<Number>::sadd (const Number x, const Vector<Number>& v)
 {
@@ -401,7 +385,6 @@ void Vector<Number>::sadd (const Number x, const Vector<Number>& v)
 }
 
 
-
 template <typename Number>
 void Vector<Number>::sadd (const Number x, const Number a, const Vector<Number>& v)
 {
@@ -413,7 +396,6 @@ void Vector<Number>::sadd (const Number x, const Number a, const Vector<Number>&
   for (; i_ptr!=i_end; ++i_ptr)
     *i_ptr = x * *i_ptr  +  a * *v_ptr++;
 }
-
 
 
 template <typename Number>
@@ -430,7 +412,6 @@ void Vector<Number>::sadd (const Number x, const Number a,
   for (; i_ptr!=i_end; ++i_ptr)
     *i_ptr = x * *i_ptr  +  a * *v_ptr++  + b * *w_ptr++;
 }
-
 
 
 template <typename Number>
@@ -453,7 +434,6 @@ void Vector<Number>::sadd (const Number x, const Number a,
 }
 
 
-
 template <typename Number>
 void Vector<Number>::scale (const Number factor)
 {
@@ -463,7 +443,6 @@ void Vector<Number>::scale (const Number factor)
   while (ptr!=eptr)
     *ptr++ *= factor;
 }
-
 
 
 template <typename Number>
@@ -482,7 +461,6 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 }
 
 
-
 template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number>& u)
 {
@@ -494,7 +472,6 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u)
   while (i_ptr!=i_end)
     *i_ptr++ = a * *u_ptr++;
 }
-
 
 
 template <typename Number>
@@ -514,7 +491,6 @@ void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b) {
 };
 
 
-
 template <typename Number>
 Vector<Number>& Vector<Number>::operator = (const Number s)
 {
@@ -522,7 +498,6 @@ Vector<Number>& Vector<Number>::operator = (const Number s)
   fill (begin(), end(), s);
   return *this;
 }
-
 
 
 template <typename Number>
@@ -536,7 +511,6 @@ Vector<Number>::operator = (const Vector<Number>& v)
   
   return *this;
 }
-
 
 
 template <typename Number>
@@ -553,7 +527,6 @@ Vector<Number>::operator = (const Vector<Number2>& v)
 }
 
 
-
 template <typename Number>
 void Vector<Number>::print (FILE* f, const char* format) const
 {
@@ -565,7 +538,6 @@ void Vector<Number>::print (FILE* f, const char* format) const
 }
 
 
-
 template <typename Number>
 void Vector<Number>::print (const char* format) const
 {
@@ -575,7 +547,6 @@ void Vector<Number>::print (const char* format) const
     printf (format, val[j]);
   printf ("\n");
 }
-
 
 
 template <typename Number>
@@ -606,7 +577,6 @@ void Vector<Number>::print (ostream &out,
 };
 
 
-
 template <typename Number>
 void Vector<Number>::block_write (ostream &out) const {
   AssertThrow (out, ExcIO());
@@ -619,7 +589,6 @@ void Vector<Number>::block_write (ostream &out) const {
   
   AssertThrow (out, ExcIO());
 };
-
 
 
 template <typename Number>
@@ -643,5 +612,6 @@ void Vector<Number>::block_read (istream &in) {
   in >> c;
   AssertThrow (c==']', ExcIO());
   AssertThrow (in, ExcIO());
-};
+}
 
+#endif

@@ -1,21 +1,26 @@
-/*----------------------------   sparsematrix.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __sparsematrix_H
-#define __sparsematrix_H
-/*----------------------------   sparsematrix.h     ---------------------------*/
+//----------------------------  sparse_matrix.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparse_matrix.h  ---------------------------
+#ifndef __deal2__sparse_matrix_h
+#define __deal2__sparse_matrix_h
 
 
-// This file was once part of the DEAL Library
-// DEAL is Copyright(1995) by
-// Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
-// Revised, modified and extended by Wolfgang Bangerth
+/*----------------------------   sparsematrix.h     ---------------------------*/
 
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/sparsity_pattern.h>
-
 
 
 /**
@@ -63,9 +68,9 @@ class SparseMatrix : public Subscriptor
 				      * #copy_from# function.
 				      */
     SparseMatrix (const SparseMatrix &);
-    
-    
-				     /**
+
+
+/**
 				      * Constructor. Takes the given matrix
 				      * sparsity structure to represent the
 				      * sparsity pattern of this matrix. You
@@ -91,9 +96,8 @@ class SparseMatrix : public Subscriptor
 				      */
     SparseMatrix<number>& operator = (const SparseMatrix<number> &);
 
-    
 
-				     /**
+/**
 				      * Reinitialize the object but keep to
 				      * the sparsity pattern previously used.
 				      * This may be necessary if you #reinit#'d
@@ -645,18 +649,14 @@ class SparseMatrix : public Subscriptor
 			    somenumber               *partial_norm) const;
 
 
-				     // make all other sparse matrices
+// make all other sparse matrices
 				     // friends
     template <typename somenumber> friend class SparseMatrix;
 };
 
 
-
-
-
 /*---------------------- Inline functions -----------------------------------*/
 
- 
 
 template <typename number>
 inline
@@ -667,7 +667,6 @@ unsigned int SparseMatrix<number>::m () const
 };
 
 
-
 template <typename number>
 inline
 unsigned int SparseMatrix<number>::n () const
@@ -675,7 +674,6 @@ unsigned int SparseMatrix<number>::n () const
   Assert (cols != 0, ExcMatrixNotInitialized());
   return cols->cols;
 };
-
 
 
 template <typename number>
@@ -694,7 +692,6 @@ void SparseMatrix<number>::set (const unsigned int i,
 };
 
 
-
 template <typename number>
 inline
 void SparseMatrix<number>::add (const unsigned int i, const unsigned int j,
@@ -709,9 +706,6 @@ void SparseMatrix<number>::add (const unsigned int i, const unsigned int j,
 };
 
 
-
-
-
 template <typename number>
 inline
 number SparseMatrix<number>::operator () (const unsigned int i,
@@ -722,7 +716,6 @@ number SparseMatrix<number>::operator () (const unsigned int i,
 	  ExcInvalidIndex(i,j));
   return val[cols->operator()(i,j)];
 };
-
 
 
 template <typename number>
@@ -740,7 +733,6 @@ number SparseMatrix<number>::diag_element (const unsigned int i) const
 };
 
 
-
 template <typename number>
 inline
 number & SparseMatrix<number>::diag_element (const unsigned int i)
@@ -756,7 +748,6 @@ number & SparseMatrix<number>::diag_element (const unsigned int i)
 };
 
 
-
 template <typename number>
 inline
 number
@@ -770,7 +761,6 @@ SparseMatrix<number>::raw_entry (const unsigned int row,
 };
 
 
-
 template <typename number>
 inline
 number SparseMatrix<number>::global_entry (const unsigned int j) const
@@ -778,7 +768,6 @@ number SparseMatrix<number>::global_entry (const unsigned int j) const
   Assert (cols != 0, ExcMatrixNotInitialized());
   return val[j];
 };
-
 
 
 template <typename number>
@@ -790,9 +779,8 @@ number & SparseMatrix<number>::global_entry (const unsigned int j)
 };
 
 
-
 /*----------------------------   sparsematrix.h     ---------------------------*/
-/* end of #ifndef __sparsematrix_H */
+
 #endif
 /*----------------------------   sparsematrix.h     ---------------------------*/
 

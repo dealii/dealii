@@ -1,8 +1,18 @@
-/*----------------------------   solver_qmrs.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __lac__solver_qmrs_H
-#define __lac__solver_qmrs_H
-/*----------------------------   solver_qmrs.h     ---------------------------*/
+//----------------------------  solver_qmrs.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solver_qmrs.h  ---------------------------
+#ifndef __deal2__solver_qmrs_h
+#define __deal2__solver_qmrs_h
+
 
 //TODO: Check for programming errors!!!
 
@@ -163,10 +173,8 @@ class SolverQMRS : public Solver<Matrix,Vector>
 };
 
 
-
-
 /*------------------------- Implementation ----------------------------*/
- 
+
 
 template<class Matrix, class Vector>
 SolverQMRS<Matrix,Vector>::SolverQMRS(SolverControl &cn,
@@ -183,7 +191,6 @@ SolverQMRS<Matrix,Vector>::criterion()
 {
   return sqrt(res2);
 };
-
 
 
 template<class Matrix, class Vector>
@@ -289,8 +296,8 @@ SolverQMRS<Matrix,Vector>::iterate(const Preconditioner& precondition)
   rho = q*v;
   //deallog << "rho:" << rho << endl;
 
-  
-  while (state == SolverControl::iterate)
+
+while (state == SolverControl::iterate)
     {
       step++; it++;
 				       // Step 1
@@ -345,8 +352,4 @@ SolverQMRS<Matrix,Vector>::iterate(const Preconditioner& precondition)
 }
 
 
-
-/*----------------------------   solver_qmrs.h     ---------------------------*/
-/* end of #ifndef __solver_qmrs_H */
 #endif
-/*----------------------------   solver_qmrs.h     ---------------------------*/

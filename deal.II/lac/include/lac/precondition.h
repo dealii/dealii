@@ -1,10 +1,17 @@
-/*----------------------------   precondition.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __precondition_H
-#define __precondition_H
-/*----------------------------   precondition.h     ---------------------------*/
-
-
+//----------------------------  precondition.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  precondition.h  ---------------------------
+#ifndef __deal2__precondition_h
+#define __deal2__precondition_h
 
 
 /**
@@ -24,8 +31,6 @@ class PreconditionIdentity
     template<class VECTOR>
     void operator() (VECTOR&, const VECTOR&) const;
 };
-
-
 
 
 /**
@@ -113,7 +118,6 @@ class PreconditionUseMatrix
 				      */
     const function_ptr precondition;
 };
-
 
 
 /**
@@ -250,7 +254,6 @@ class PreconditionLACSolver
 };
 
 
-
 /* ---------------------------------- Inline functions ------------------- */
 
 template<class VECTOR>
@@ -314,9 +317,4 @@ PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::operator() (VECTOR& dst,
 }
 
 
-
-
-/*----------------------------   precondition.h     ---------------------------*/
-/* end of #ifndef __precondition_H */
 #endif
-/*----------------------------   precondition.h     ---------------------------*/

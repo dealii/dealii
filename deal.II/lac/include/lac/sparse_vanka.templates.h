@@ -1,5 +1,18 @@
-// $Id$
-// Copyright Guido Kanschat, 1999
+//----------------------------  sparse_vanka.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparse_vanka.templates.h  ---------------------------
+#ifndef __deal2__sparse_vanka_templates_h
+#define __deal2__sparse_vanka_templates_h
+
 
 #include <lac/sparse_vanka.h>
 #include <lac/full_matrix.h>
@@ -12,7 +25,6 @@
 
 #include <algorithm>
 #include <map>
-
 
 
 template<typename number>
@@ -46,7 +58,6 @@ SparseVanka<number>::~SparseVanka()
       if (p != 0) delete p;
     }
 }
-
 
 
 template <typename number>
@@ -113,7 +124,6 @@ SparseVanka<number>::compute_inverses ()
 };
 
 
-
 template <typename number>
 void
 SparseVanka<number>::compute_inverses (const unsigned int begin,
@@ -130,7 +140,6 @@ SparseVanka<number>::compute_inverses (const unsigned int begin,
     if (selected[row] == true)
       compute_inverse (row, local_index);
 };
-
 
 
 template <typename number>
@@ -205,8 +214,6 @@ SparseVanka<number>::compute_inverse (const unsigned int               row,
 };
 
 
-
-
 template<typename number>
 template<typename number2>
 void
@@ -219,8 +226,6 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 				   // that actually does the work
   apply_preconditioner (dst, src);
 };
-
-
 
 
 template<typename number>
@@ -242,7 +247,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
     = matrix->get_sparsity_pattern();
 
 
-				   // store whether we shall work on
+// store whether we shall work on
 				   // the whole matrix, or only on
 				   // blocks. this variable is used to
 				   // optimize access to vectors a
@@ -383,8 +388,6 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 };
 
 
-
-
 template <typename number>
 SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
 					    const vector<bool>         &selected,
@@ -400,7 +403,6 @@ SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
 {
   compute_dof_masks (M, selected, blocking_strategy);
 };
-
 
 
 template <typename number>
@@ -567,8 +569,6 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
 };
 
 
-
-
 template <typename number>
 template <typename number2>
 void SparseBlockVanka<number>::operator() (Vector<number2>       &dst,
@@ -608,5 +608,7 @@ void SparseBlockVanka<number>::operator() (Vector<number2>       &dst,
 	apply_preconditioner (dst, src,
 			      &dof_masks[block]);
 #endif
-    };
-};
+    }
+}
+
+#endif

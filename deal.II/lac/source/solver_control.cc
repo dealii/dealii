@@ -1,4 +1,16 @@
-// $Id$
+//----------------------------  solver_control.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solver_control.cc  ---------------------------
+
 
 #include <base/logstream.h>
 #include <lac/solver_control.h>
@@ -39,9 +51,9 @@ SolverControl::check (const unsigned int step,
     {
       deallog << "Starting value " << check_value << endl;
     }
-  
 
-  if (step>=maxsteps)
+
+if (step>=maxsteps)
     {
       if (log_result)
 	deallog << "Failure step " << step
@@ -59,13 +71,11 @@ SolverControl::check (const unsigned int step,
 };
 
 
-
 double
 SolverControl::last_value() const
 {
   return lvalue;
 };
-
 
 
 unsigned int
@@ -75,10 +85,7 @@ SolverControl::last_step() const
 };
 
 
-
-
 /*----------------------- ReductionControl ---------------------------------*/
-
 
 
 ReductionControl::ReductionControl(const unsigned int n,
@@ -100,7 +107,6 @@ double
 ReductionControl::initial_value() const {
   return initial_val;
 };
-    
 
 
 SolverControl::State

@@ -1,16 +1,23 @@
-/*----------------------------   solver_cg.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __solver_cg_H
-#define __solver_cg_H
-/*----------------------------   solver_cg.h     ---------------------------*/
-
+//----------------------------  solver_cg.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solver_cg.h  ---------------------------
+#ifndef __deal2__solver_cg_h
+#define __deal2__solver_cg_h
 
 
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <base/logstream.h>
 #include <cmath>
-
 
 
 /**
@@ -98,10 +105,8 @@ class SolverCG : public Solver<Matrix,Vector>
 };
 
 
-
-
 /*------------------------- Implementation ----------------------------*/
- 
+
 
 template<class Matrix, class Vector>
 SolverCG<Matrix,Vector>::SolverCG(SolverControl &cn,
@@ -116,7 +121,6 @@ SolverCG<Matrix,Vector>::criterion()
 {
   return sqrt(res2);
 };
-
 
 
 template<class Matrix, class Vector>
@@ -196,8 +200,8 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
       it++;
     };
 
-    
-  // Deallocate Memory
+
+// Deallocate Memory
  
   memory.free(Vr);
   memory.free(Vp);
@@ -215,9 +219,4 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
 };
 
 
-
-
-/*----------------------------   solver_cg.h     ---------------------------*/
-/* end of #ifndef __solver_cg_H */
 #endif
-/*----------------------------   solver_cg.h     ---------------------------*/

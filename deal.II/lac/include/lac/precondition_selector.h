@@ -1,9 +1,17 @@
-/*----------------------   precondition_selector.h     -------------------------*/
-/*      $Id$                 */
-/*                Ralf Hartmann, University of Heidelberg                       */
-#ifndef __precondition_selector_H
-#define __precondition_selector_H
-/*----------------------   precondition_selector.h     -------------------------*/
+//----------------------------  precondition_selector.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  precondition_selector.h  ---------------------------
+#ifndef __deal2__precondition_selector_h
+#define __deal2__precondition_selector_h
 
 
 #include <base/smartpointer.h>
@@ -116,7 +124,7 @@ class PreconditionSelector
     DeclException0 (ExcNoMatrixGivenToUse);
 
 
-  protected:
+protected:
     
 				     /**
 				      * Stores the name of the
@@ -202,8 +210,4 @@ string PreconditionSelector<Matrix,Vector>::get_precondition_names()
 }
 
 
-
-/*----------------------------   precondition_selector.h     ---------------------------*/
-/* end of #ifndef __precondition_selector_H */
 #endif
-/*----------------------------   precondition_selector.h     ---------------------------*/

@@ -1,10 +1,20 @@
-/*----------------------------   sparse_vanka.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __sparse_vanka_H
-#define __sparse_vanka_H
-/* Copyright Guido Kanschat, 1999 */
-/*----------------------------   sparse_vanka.h     ---------------------------*/
+//----------------------------  sparse_vanka.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparse_vanka.h  ---------------------------
+#ifndef __deal2__sparse_vanka_h
+#define __deal2__sparse_vanka_h
 
+
+/* Copyright Guido Kanschat, 1999 */
 
 
 #include <base/smartpointer.h>
@@ -310,7 +320,6 @@ class SparseVanka
 };
 
 
-
 /**
  * Block version of the sparse Vanka preconditioner. This class
  * divides the matrix into blocks and works on the diagonal blocks
@@ -525,10 +534,4 @@ class SparseBlockVanka : public SparseVanka<number>
 };
 
 
-
-
-
-/*----------------------------   sparse_vanka.h     ---------------------------*/
-/* end of #ifndef __sparse_vanka_H */
 #endif
-/*----------------------------   sparse_vanka.h     ---------------------------*/

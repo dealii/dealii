@@ -1,15 +1,23 @@
-/*----------------------------   vector_memory.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __lac__vector_memory_H
-#define __lac__vector_memory_H
-/*----------------------------   vector_memory.h     ---------------------------*/
+//----------------------------  vector_memory.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  vector_memory.h  ---------------------------
+#ifndef __deal2__vector_memory_h
+#define __deal2__vector_memory_h
 
 
 #include <base/subscriptor.h>
 #include <base/logstream.h>
 
 #include <vector>
-
 
 
 /**
@@ -56,9 +64,6 @@ class VectorMemory : public Subscriptor
 				      */
     DeclException0(ExcNotAllocatedHere);
 };
-
-
-
 
 
 /**
@@ -160,7 +165,6 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 };
 
 
-
 /* --------------------- inline functions ---------------------- */
 
 
@@ -176,7 +180,6 @@ GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size
     }
   n_alloc = 0;
 }
-
 
 
 template<typename Vector>
@@ -199,7 +202,6 @@ GrowingVectorMemory<Vector>::~GrowingVectorMemory()
 }
 
 
-
 template<typename Vector>
 Vector*
 GrowingVectorMemory<Vector>::alloc()
@@ -220,8 +222,7 @@ GrowingVectorMemory<Vector>::alloc()
   return t.second;
 }
 
-  
-  
+
 template<typename Vector>
 void
 GrowingVectorMemory<Vector>::free(const Vector* const v)
@@ -238,8 +239,5 @@ GrowingVectorMemory<Vector>::free(const Vector* const v)
 }
 
 
-/*----------------------------   vector_memory.h     ---------------------------*/
-/* end of #ifndef __vector_memory_H */
 #endif
-/*----------------------------   vector_memory.h     ---------------------------*/
 

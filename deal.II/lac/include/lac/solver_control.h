@@ -1,8 +1,17 @@
-/*----------------------------   solver_control.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __solver_control_H
-#define __solver_control_H
-/*----------------------------   solver_control.h     ---------------------------*/
+//----------------------------  solver_control.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solver_control.h  ---------------------------
+#ifndef __deal2__solver_control_h
+#define __deal2__solver_control_h
 
 
 #include <base/subscriptor.h>
@@ -161,10 +170,6 @@ class SolverControl : public Subscriptor
 };
 
 
-
-
-
-
 /**
  * Specialization of #SolverControl# which returns #success# if either
  * the specified tolerance is achieved or if the initial residual (or
@@ -216,9 +221,9 @@ class ReductionControl : public SolverControl
 				      * criterion.
 				      */
     double initial_value() const;
-    
 
-  protected:
+
+protected:
 				     /**
 				      * Desired reduction factor.
 				      */
@@ -239,9 +244,4 @@ class ReductionControl : public SolverControl
 };
 
 
-
-
-/*----------------------------   solver_control.h     ---------------------------*/
-/* end of #ifndef __solver_control_H */
 #endif
-/*----------------------------   solver_control.h     ---------------------------*/

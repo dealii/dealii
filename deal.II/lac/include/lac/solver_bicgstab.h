@@ -1,8 +1,18 @@
-/*----------------------------   solver_bicgstab.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __solver_bicgstab_H
-#define __solver_bicgstab_H
-/*----------------------------   solver_bicgstab.h     ---------------------------*/
+//----------------------------  solver_bicgstab.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solver_bicgstab.h  ---------------------------
+#ifndef __deal2__solver_bicgstab_h
+#define __deal2__solver_bicgstab_h
+
 
 #include <base/logstream.h>
 #include <lac/solver.h>
@@ -185,7 +195,6 @@ SolverBicgstab<Matrix, Vector>::start()
 }
 
 
-
 template<class Matrix, class Vector>
 template<class Preconditioner>
 typename Solver<Matrix,Vector>::ReturnState
@@ -284,7 +293,4 @@ SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
 }
 
 
-/*----------------------------   solver_bicgstab.h     ---------------------------*/
-/* end of #ifndef __solver_bicgstab_H */
 #endif
-/*----------------------------   solver_bicgstab.h     ---------------------------*/

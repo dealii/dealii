@@ -1,14 +1,16 @@
-// $Id$
+//----------------------------  full_matrix.float.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  full_matrix.float.cc  ---------------------------
 
-// Driver for FullMatrix template instantiation.
-
-/* Instantiation is controlled by preprocessor symbols:
- *
- * 1. TYPEMAT : numerical type used in the matrix
- * 2. TYPEVEC : numerical type for vector entries
- * 3. TYPERES : numerical type for entries in the right hand side vector
- * 4. TYPEMAT2: numerical type for the second matrix
- */
 
 #include <lac/full_matrix.templates.h>
 

@@ -1,9 +1,18 @@
-// $Id$
+//----------------------------  block_vector.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  block_vector.templates.h  ---------------------------
+#ifndef __deal2__block_vector_templates_h
+#define __deal2__block_vector_templates_h
 
-// This file was once part of the DEAL Library
-// DEAL is Copyright(1995) by
-// Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
-// Revised and extended by Wolfgang Bangerth, 1998, 1999
 
 #include <lac/block_vector.h>
 #include <cmath>
@@ -17,14 +26,12 @@ static inline Number sqr (const Number x)
 };
 
 
-
 template <int n_blocks, typename Number>
 BlockVector<n_blocks,Number>::BlockVector ()
 {
   for (unsigned int i=0;i<=n_blocks;++i)
     start[n_blocks] = 0;
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -34,7 +41,6 @@ BlockVector<n_blocks,Number>::BlockVector (const vector<unsigned int>& n)
 
   reinit (n, false);
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -47,7 +53,6 @@ BlockVector<n_blocks,Number>::BlockVector (const BlockVector<n_blocks,Number>& v
     }
   start[n_blocks] = v.start[n_blocks];
 }
-
 
 
 // see the .h file for why this function was disabled
@@ -68,7 +73,6 @@ BlockVector<n_blocks,Number>::BlockVector (const BlockVector<n_blocks,Number>& v
 // }
 
 
-
 template <int n_blocks, typename Number>
 void BlockVector<n_blocks,Number>::reinit (const vector<unsigned int>& n,
 					    const bool fast)
@@ -87,7 +91,6 @@ void BlockVector<n_blocks,Number>::reinit (const vector<unsigned int>& n,
 }
 
 
-
 template <int n_blocks, typename Number>
 void BlockVector<n_blocks,Number>::reinit (const BlockVector<n_blocks,Number>& v,
 					    const bool fast)
@@ -101,13 +104,10 @@ void BlockVector<n_blocks,Number>::reinit (const BlockVector<n_blocks,Number>& v
 }
 
 
-
-
 template <int n_blocks, typename Number>
 BlockVector<n_blocks,Number>::~BlockVector ()
 {
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -118,7 +118,6 @@ void BlockVector<n_blocks,Number>::clear ()
       components[i].clear();
     }
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -133,7 +132,6 @@ bool BlockVector<n_blocks,Number>::all_zero () const
 }
 
 
-
 template <int n_blocks, typename Number>
 Number BlockVector<n_blocks,Number>::operator * (const BlockVector<n_blocks,Number>& v) const
 {
@@ -144,7 +142,6 @@ Number BlockVector<n_blocks,Number>::operator * (const BlockVector<n_blocks,Numb
     }
   return sum;
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -159,7 +156,6 @@ Number BlockVector<n_blocks,Number>::norm_sqr () const
 };
 
 
-
 template <int n_blocks, typename Number>
 Number BlockVector<n_blocks,Number>::mean_value () const
 {
@@ -170,7 +166,6 @@ Number BlockVector<n_blocks,Number>::mean_value () const
     }
   return sum/size();
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -185,13 +180,11 @@ Number BlockVector<n_blocks,Number>::l1_norm () const
 }
 
 
-
 template <int n_blocks, typename Number>
 Number BlockVector<n_blocks,Number>::l2_norm () const
 {
   return sqrt(norm_sqr());
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -206,9 +199,6 @@ Number BlockVector<n_blocks,Number>::linfty_norm () const
     }
   return sum;
 }
-  
-
-
 
 
 template <int n_blocks, typename Number>
@@ -217,7 +207,6 @@ BlockVector<n_blocks,Number>& BlockVector<n_blocks,Number>::operator += (const B
   add (v);
   return *this;
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -231,7 +220,6 @@ BlockVector<n_blocks,Number>& BlockVector<n_blocks,Number>::operator -= (const B
 }
 
 
-
 template <int n_blocks, typename Number>
 void BlockVector<n_blocks,Number>::add (const Number v)
 {
@@ -240,7 +228,6 @@ void BlockVector<n_blocks,Number>::add (const Number v)
       components[i].add(v);
     }
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -253,7 +240,6 @@ void BlockVector<n_blocks,Number>::add (const BlockVector<n_blocks,Number>& v)
 }
 
 
-
 template <int n_blocks, typename Number>
 void BlockVector<n_blocks,Number>::add (const Number a,
 					 const BlockVector<n_blocks,Number>& v)
@@ -263,7 +249,6 @@ void BlockVector<n_blocks,Number>::add (const Number a,
       components[i].add(a, v.components[i]);
     }
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -279,7 +264,6 @@ void BlockVector<n_blocks,Number>::add (const Number a,
 }
 
 
-
 template <int n_blocks, typename Number>
 void BlockVector<n_blocks,Number>::sadd (const Number x,
 					  const BlockVector<n_blocks,Number>& v)
@@ -289,7 +273,6 @@ void BlockVector<n_blocks,Number>::sadd (const Number x,
       components[i].sadd(x, v.components[i]);
     }
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -303,7 +286,6 @@ void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
 }
 
 
-
 template <int n_blocks, typename Number>
 void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
 					  const BlockVector<n_blocks,Number>& v,
@@ -315,7 +297,6 @@ void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
       components[i].sadd(x, a, v.components[i], b, w.components[i]);
     }
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -334,7 +315,6 @@ void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
 }
 
 
-
 template <int n_blocks, typename Number>
 void BlockVector<n_blocks,Number>::scale (const Number factor)
 {
@@ -343,7 +323,6 @@ void BlockVector<n_blocks,Number>::scale (const Number factor)
       components[i].scale(factor);
     }
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -357,7 +336,6 @@ void BlockVector<n_blocks,Number>::equ (const Number a,
       components[i].equ( a, v.components[i], b, w.components[i]);
     }
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -382,7 +360,6 @@ BlockVector<n_blocks,Number>& BlockVector<n_blocks,Number>::operator = (const Nu
 }
 
 
-
 template <int n_blocks, typename Number>
 BlockVector<n_blocks,Number>&
 BlockVector<n_blocks,Number>::operator = (const BlockVector<n_blocks,Number>& v)
@@ -393,7 +370,6 @@ BlockVector<n_blocks,Number>::operator = (const BlockVector<n_blocks,Number>& v)
     }
   return *this;
 }
-
 
 
 template <int n_blocks, typename Number>
@@ -426,7 +402,6 @@ void BlockVector<n_blocks,Number>::print (ostream &out,
 }
 
 
-
 template <int n_blocks, typename Number>
 void BlockVector<n_blocks,Number>::block_write (ostream &out) const
 {
@@ -445,3 +420,5 @@ void BlockVector<n_blocks,Number>::block_read (istream &in)
       components[i].block_read(in);
     }  
 }
+
+#endif

@@ -1,13 +1,20 @@
-/*----------------------------   solver.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __solver_H
-#define __solver_H
-/*----------------------------   solver.h     ---------------------------*/
-
+//----------------------------  solver.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solver.h  ---------------------------
+#ifndef __deal2__solver_h
+#define __deal2__solver_h
 
 
 #include <lac/forward_declarations.h>
-
 
 
 /**
@@ -134,10 +141,9 @@ class Solver
     enum ReturnState {
 	  success=0, exceeded, breakdown
     };
-    
-    
-    
-				     /**
+
+
+/**
 				      * Constructor. Assign a control
 				      * object which stores the required
 				      * precision and an object to provide
@@ -181,7 +187,6 @@ SolverControl & Solver<Matrix,Vector>::control() const
 };
 
 
-
 template<class Matrix, class Vector>
 inline
 Solver<Matrix, Vector>::Solver(SolverControl &cn, VectorMemory<Vector> &mem)
@@ -190,7 +195,4 @@ Solver<Matrix, Vector>::Solver(SolverControl &cn, VectorMemory<Vector> &mem)
 {};
 
 
-/*----------------------------   solver.h     ---------------------------*/
-/* end of #ifndef __solver_H */
 #endif
-/*----------------------------   solver.h     ---------------------------*/

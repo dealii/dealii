@@ -1,14 +1,20 @@
-/*----------------------------   fullmatrix.h     ---------------------------*/
-//      $Id$
-#ifndef __lac_fullmatrix_H
-#define __lac_fullmatrix_H
-/*----------------------------   fullmatrix.h     ---------------------------*/
+//----------------------------  full_matrix.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  full_matrix.h  ---------------------------
+#ifndef __deal2__full_matrix_h
+#define __deal2__full_matrix_h
 
-// This file is part of the DEAL Library
-// DEAL is Copyright(1995) by
-// Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
-// Revised by Wolfgang Bangerth
 
+/*----------------------------   fullmatrix.h     ---------------------------*/
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
@@ -17,7 +23,6 @@
 // forward declarations
 
 template<typename number> class Vector;
-
 
 
 /**
@@ -128,9 +133,9 @@ class FullMatrix : public Subscriptor
 				      */
     template<typename number2>
     FullMatrix<number>& operator = (const FullMatrix<number2>& src);
-    
-    
-				     /**
+
+
+/**
 				      * Fill rectangular block.
 				      *
 				      * The matrix #src# is copied
@@ -655,9 +660,6 @@ class FullMatrix : public Subscriptor
 };
 
 
-
-
-
 /*-------------------------Inline functions -------------------------------*/
 
 template <typename number>
@@ -720,9 +722,7 @@ FullMatrix<number>::operator() (const unsigned int i, const unsigned int j)
 }
 
 
-
-
 /*----------------------------   fullmatrix.h     ---------------------------*/
-/* end of #ifndef __lac_fullmatrix_H */
+
 #endif
 /*----------------------------   fullmatrix.h     ---------------------------*/

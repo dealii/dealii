@@ -1,13 +1,20 @@
-/*----------------------------   matrix_decompositions.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __sparse_ilu_H
-#define __sparse_ilu_H
-/*----------------------------   sparse_ilu.h     ---------------------------*/
+//----------------------------  sparse_ilu.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparse_ilu.h  ---------------------------
+#ifndef __deal2__sparse_ilu_h
+#define __deal2__sparse_ilu_h
 
 
 #include <lac/sparse_matrix.h>
-
-
 
 
 /**
@@ -207,9 +214,4 @@ SparseILU<number>::operator() (Vector<somenumber>       &dst,
 }
 
 
-
-
-/*----------------------------   sparse_ilu.h     ---------------------------*/
-/* end of #ifndef __sparse_ilu_H */
 #endif
-/*----------------------------   sparse_ilu.h     ---------------------------*/

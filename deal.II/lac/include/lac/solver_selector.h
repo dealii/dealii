@@ -1,9 +1,18 @@
-/*----------------------------   solver_selector.h     ---------------------------*/
-/*      $Id$                 */
-/*                Ralf Hartmann, University of Heidelberg                         */
-#ifndef __solver_selector_H
-#define __solver_selector_H
-/*----------------------------   solver_selector.h     ---------------------------*/
+//----------------------------  solver_selector.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solver_selector.h  ---------------------------
+#ifndef __deal2__solver_selector_h
+#define __deal2__solver_selector_h
+
 
 #include <base/smartpointer.h>
 #include <lac/solver.h>
@@ -193,7 +202,6 @@ class SolverSelector
 };
 
 
-
 /* --------------------- Inline and template functions ------------------- */
 
 
@@ -207,11 +215,9 @@ SolverSelector<Matrix, Vector>::SolverSelector(string solver_name,
 {};
 
 
-
 template <class Matrix, class Vector>
 SolverSelector<Matrix, Vector>::~SolverSelector()
 {};
-
 
 
 template <class Matrix, class Vector>
@@ -253,13 +259,11 @@ SolverSelector<Matrix, Vector>::solve(const Matrix &A,
 };
 
 
-
 template <class Matrix, class Vector>
 string SolverSelector<Matrix, Vector>::get_solver_names()
 {
   return "richardson|cg|bicgstab|gmres";
 };
-
 
 
 template <class Matrix, class Vector>
@@ -294,8 +298,4 @@ void SolverSelector<Matrix, Vector>::set_data(
 };
 
 
-
-/*----------------------------   solver_selector.h     ---------------------------*/
-/* end of #ifndef __solver_selector_H */
 #endif
-/*----------------------------   solver_selector.h     ---------------------------*/
