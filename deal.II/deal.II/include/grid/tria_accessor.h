@@ -1935,7 +1935,21 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 
 				     /**
 				      * Test whether the point @p{p}
-				      * is inside this cell.
+				      * is inside this cell. Points on
+				      * the boundary are counted as
+				      * being inside the cell.
+				      *
+				      * Note that this function
+				      * assumes that the mapping
+				      * between unit cell and real
+				      * cell is (bi-, tri-)linear,
+				      * i.e. that faces in 2d and
+				      * edges in 3d are straight
+				      * lines. If you have higher
+				      * order transformations, results
+				      * may be different as to whether
+				      * a point is in- or outside the
+				      * cell in real space.
 				      */
     bool point_inside (const Point<dim> &p) const;
     
