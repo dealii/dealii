@@ -58,7 +58,7 @@ class Ball
       };
 
 
-virtual Point<dim>
+    virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
       {
 	Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad(quad);
@@ -118,7 +118,7 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
       return middle;
 
 
-double x=middle(0),
+  double x=middle(0),
 	 y=middle(1);
   
   if (y<x)
@@ -135,6 +135,7 @@ double x=middle(0),
   
   return middle;
 };
+
 
 
 template <int dim>
@@ -171,6 +172,7 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
 };
 
 
+
 template <int dim>
 class TestCases
 {
@@ -189,9 +191,11 @@ class TestCases
 };
 
 
+
 template <int dim>
 TestCases<dim>::TestCases () :
 		tria(0), dof(0) {};
+
 
 
 template <int dim>
@@ -200,6 +204,7 @@ TestCases<dim>::~TestCases ()
   if (dof)  delete dof;
   if (tria) delete tria;
 };
+
 
 
 template <int dim>
@@ -213,6 +218,7 @@ void TestCases<dim>::create_new ()
 
   dof = new DoFHandler<dim> (*tria);
 };
+
 
 
 template <int dim>
@@ -288,7 +294,7 @@ void TestCases<dim>::run (const unsigned int test_case)
     };
 
 
-deallog << "    Distributing degrees of freedom..." << endl;
+  deallog << "    Distributing degrees of freedom..." << endl;
   FEQ1<dim> fe;
   dof->distribute_dofs (fe);
 
@@ -299,14 +305,14 @@ deallog << "    Distributing degrees of freedom..." << endl;
 			    dof->max_couplings_between_dofs());
 
 
-DoFTools::make_sparsity_pattern (*dof, sparsity);
+  DoFTools::make_sparsity_pattern (*dof, sparsity);
   int unconstrained_bandwidth = sparsity.bandwidth();
 
   deallog << "    Writing sparsity pattern..." << endl;
   sparsity.print_gnuplot (logfile);
 
 
-// computing constraints
+				   // computing constraints
   deallog << "    Computing constraints..." << endl;
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (*dof, constraints);
@@ -317,19 +323,20 @@ DoFTools::make_sparsity_pattern (*dof, sparsity);
   sparsity.print_gnuplot (logfile);
 
 
-deallog << endl
-       << "    Total number of cells         = " << tria->n_cells() << endl
-       << "    Total number of active cells  = " << tria->n_active_cells() << endl
-       << "    Number of DoFs                = " << dof->n_dofs() << endl
-       << "    Number of constraints         = " << constraints.n_constraints() << endl
-       << "    Unconstrained matrix bandwidth= " << unconstrained_bandwidth << endl
-       << "    Constrained matrix bandwidth  = " << sparsity.bandwidth()
-       << endl << endl;
+  deallog << endl
+	  << "    Total number of cells         = " << tria->n_cells() << endl
+	  << "    Total number of active cells  = " << tria->n_active_cells() << endl
+	  << "    Number of DoFs                = " << dof->n_dofs() << endl
+	  << "    Number of constraints         = " << constraints.n_constraints() << endl
+	  << "    Unconstrained matrix bandwidth= " << unconstrained_bandwidth << endl
+	  << "    Constrained matrix bandwidth  = " << sparsity.bandwidth()
+	  << endl << endl;
 
 				   // release the lock that dof has to the
 				   // finite element object
   dof->clear ();
 };
+
 
 
 int main ()
