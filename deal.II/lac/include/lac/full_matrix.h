@@ -350,7 +350,13 @@ class FullMatrix : public Subscriptor
 				     /**
 				      * Compute the quadratic matrix norm.
 				      * Return value is the root of the square
-				      * sum of all matrix entries.
+				      * sum of all matrix entries. Also called
+				      * Frobenius Norm.
+				      * 
+				      * This norm is compatible with the l2
+				      * vector norm. But it is not a natural
+				      * matrix norm (cf Rannacher Numeric0),
+				      * therefore it is not called l2_norm.
 				      */
     number norm2 () const;
     
