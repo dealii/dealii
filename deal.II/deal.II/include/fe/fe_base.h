@@ -406,7 +406,7 @@ class FiniteElementData
  * constraints that are entered more than once (as is necessary for the case
  * above), it insists that the weights are exactly the same.
  *
- * @author Wolfgang Bangerth, 1998, 2002, Ralf Hartmann, Guido Kanschat, 2001
+ * @author Wolfgang Bangerth, 1998, 2002; Ralf Hartmann, Guido Kanschat, 2001
  */
 template <int dim>
 class FiniteElementBase : public Subscriptor,
