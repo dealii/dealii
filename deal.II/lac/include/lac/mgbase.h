@@ -493,7 +493,7 @@ template<class VECTOR>
 void
 MGVector<VECTOR>::clear()
 {
-  vector<VECTOR>::iterator v;
+  typename vector<VECTOR>::iterator v;
   for (v = begin(); v != end(); ++v)
     v->clear();
   
