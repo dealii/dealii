@@ -3982,7 +3982,7 @@ AC_DEFUN(DEAL_II_CHECK_GETHOSTNAME, dnl
 
 int main()
 {
-   char buf\[100\];
+   char buf[100];
    gethostname(buf,99);
 
    volatile long double x=1.0;
