@@ -3149,6 +3149,34 @@ class Triangulation : public Subscriptor
 				  std::istream            &in);
 
   private:
+
+				     /**
+				      * The (public) clear() will only
+				      * work when the triangulation is
+				      * not subscriped to by other
+				      * users. The
+				      * clear_despite_subscriptions()
+				      * function now allows the
+				      * triangulation being cleared
+				      * even when there are
+				      * subscriptions.
+				      *
+				      * Make sure, you know what you
+				      * do, when calling this
+				      * function, as its use is
+				      * reasonable in very rare cases,
+				      * only. For example, when the
+				      * subscriptions were for the
+				      * initially empty Triangulation
+				      * and the Triangulation object
+				      * wants to release its memory
+				      * before throwing an assertion
+				      * due to input errors (e.g. in
+				      * the create_triangulation()
+				      * function).
+				      */
+    void clear_despite_subscriptions ();
+    
 				     /**
 				      *  Refine all cells on all levels which
 				      *  were previously flagged for refinement.
