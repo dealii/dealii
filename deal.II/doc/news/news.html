@@ -27,11 +27,23 @@
     </p>
 
 
-
     <dir>
     <dl>
       <dt>
-          <strong>2001/11/21: New example program concerning discontinuous
+          <strong>2001/12/07: Memory allocation and access checked
+          with <code>purify</code></strong>
+      </dt>
+      <dd>
+          We checked all example and test programs as well as a number of
+          large applications against the memory checker
+          <code>purify</code>. Only three memory leaks were found and
+          fixed. No invalid memory accesses were found. We believe
+          that no major memory leaks exist in the library any more. 
+	  </p>
+      </dd>
+
+      <dt>
+          <strong>2001/11/21: New example program demonstrating discontinuous
           Galerkin methods</strong>
       </dt>
       <dd>
