@@ -703,6 +703,20 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * @p{merge_patches} function.
 				      */
     template <int,int,int> friend class DataOut_DoFData;
+
+#ifdef DEAL_II_CHECK_NESTED_CLASS_FRIEND_BUG
+                                     /**
+                                      * Make DataEntry a friend. This should
+                                      * not be strictly necessary, since
+                                      * members are implicitly friends, but in
+                                      * this case it seems as if icc needs
+                                      * this. Otherwise, it complains that
+                                      * DataEntry can't derive from
+                                      * DataEntryBase since the latter is a
+                                      * private member of DataOut_DoFData.
+                                      */
+    template <typename> friend class DataEntry;
+#endif
 };
 
 
