@@ -16,5 +16,5 @@ void
 LogStream::attach(ostream& o)
 {
   file = &o;
-  o << "DEAL:" << dealjobid();
+  o << dealjobid();
 }
