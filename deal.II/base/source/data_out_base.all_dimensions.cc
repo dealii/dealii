@@ -9,7 +9,13 @@ DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
 		write_preamble (write_preamble)
 {};
 
-
+DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
+				       const bool bicubic_patch,
+				       const bool external_data) :
+		smooth (smooth),
+		bicubic_patch(bicubic_patch),
+		external_data(external_data)
+{};
 
 void DataOutBase::UcdFlags::declare_parameters (ParameterHandler &prm)
 {
@@ -37,14 +43,23 @@ void DataOutBase::GnuplotFlags::parse_parameters (ParameterHandler &/*prm*/)
 
 
 
-void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &/*prm*/)
+void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &prm)
 {
+  prm.declare_entry ("Use smooth triangles", "false",
+		     Patterns::Bool());
+  prm.declare_entry ("Use bicubic patches", "false",
+		     Patterns::Bool());
+  prm.declare_entry ("Include external file", "true",
+		     Patterns::Bool ());
 };
 
 
 
-void DataOutBase::PovrayFlags::parse_parameters (ParameterHandler &/*prm*/)
+void DataOutBase::PovrayFlags::parse_parameters (ParameterHandler &prm)
 {
+  smooth        = prm.get_bool ("Use smooth triangles");
+  bicubic_patch = prm.get_bool ("Use bicubic patches");
+  external_data = prm.get_bool ("Include external file");
 };
 
 
