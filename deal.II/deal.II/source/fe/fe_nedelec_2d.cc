@@ -34,6 +34,7 @@ namespace FE_Nedelec_2d
 
   static const double q1_into_q1_refined_1[] =
   {
+	0
 //TODO[Anna]	
 //  	13.5/27., 13.5/27., 0., 0.,
 //  	0., 1., 0., 0.,
@@ -43,6 +44,7 @@ namespace FE_Nedelec_2d
 
   static const double q1_into_q1_refined_2[] =
   {
+	0
 //  	6.75/27., 6.75/27., 6.75/27., 6.75/27.,
 //  	0., 13.5/27., 13.5/27., 0.,
 //  	0., 0., 1., 0.,
@@ -51,6 +53,7 @@ namespace FE_Nedelec_2d
 
   static const double q1_into_q1_refined_3[] =
   {
+	0
 //  	13.5/27., 0., 0., 13.5/27.,
 //  	6.75/27., 6.75/27., 6.75/27., 6.75/27.,
 //  	0., 0., 13.5/27., 13.5/27.,
