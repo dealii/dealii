@@ -892,7 +892,15 @@ namespace StandardExceptions
   DeclException3 (ExcIndexRange, int, int, int,
 		  << "Index " << arg1 << " is not in ["
 		  << arg2 << "," << arg3 << "[");
-
+  
+				   /**
+				    * This exception is thrown if the
+				    * iterator you incremented or
+				    * decremented was already at its
+				    * final state.
+				    */
+  DeclException0 (ExcIteratorPastEnd);
+  
 				   /**
 				    * This exception works around a
 				    * design flaw in the
