@@ -686,8 +686,8 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>   &dof,
  					     // fe_function
  	    if (true) 
  	      {
- 		vector< Vector<double> > function_values (n_q_points,
-							  Vector<double>(fe.n_components));
+ 		vector< vector<double> > function_values (n_q_points,
+							  vector<double>(fe.n_components));
  		fe_values.get_function_values (fe_function, function_values);
 
 /* 		transform (psi.begin(), psi.end(),
