@@ -403,6 +403,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: The <code
+       class="member">DoFRenumbering::component_wise</code> function accepts a
+       parameter indicating the order in which the degrees of freedom
+       corresponding to one vector component are to be sorted. However, it did
+       not honor this order, but always sorted them in the order in which the
+       components appear. This is now fixed.
+       <br>
+       (WB 2002/10/17)
+       </p>
+
+  <li> <p> 
        New: The <code
        class="member">FiniteElement::system_to_base_index</code> function now
        exports the values of the <code

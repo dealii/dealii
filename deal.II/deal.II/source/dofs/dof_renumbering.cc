@@ -538,6 +538,16 @@ DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handler,
 				   // within each component and during
 				   // this also remove duplicate
 				   // entries
+				   //
+				   // note that we no
+				   // longer have to care about
+				   // non-primitive shape functions
+				   // since the buckets corresponding
+				   // to the second and following
+				   // vector components of a
+				   // non-primitive FE will simply be
+				   // empty, everything being shoved
+				   // into the first one
   for (unsigned int component=0; component<fe.n_components(); ++component)
     {
       std::sort (component_to_dof_map[component].begin(),
@@ -547,12 +557,17 @@ DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handler,
                              component_to_dof_map[component].end()),
                 component_to_dof_map[component].end());
     };
-  
+
+                                   // now concatenate all the
+                                   // components in the order the user
+                                   // desired to see
   unsigned int next_free_index = 0;
   std::vector<unsigned int> new_indices (dof_handler.n_dofs(),
 					 DoFHandler<dim>::invalid_dof_index);
-  for (unsigned int component=0; component<fe.n_components(); ++component)
+  for (unsigned int c=0; c<fe.n_components(); ++c)
     {
+      const unsigned int component = component_order[c];
+      
       const typename std::vector<unsigned int>::const_iterator
 	begin_of_component = component_to_dof_map[component].begin(),
 	end_of_component   = component_to_dof_map[component].end();
@@ -602,8 +617,7 @@ void DoFRenumbering::component_wise (MGDoFHandler<dim>& dof_handler,
 				   // vector to hold the dof indices on
 				   // the cell we visit at a time
   std::vector<unsigned int> local_dof_indices(dofs_per_cell);
-				   // prebuilt list to which component
-				   // a given dof on a cell belongs
+
                                    // prebuilt list to which component
 				   // a given dof on a cell
 				   // belongs. note that we get into
@@ -637,7 +651,7 @@ void DoFRenumbering::component_wise (MGDoFHandler<dim>& dof_handler,
                                          // of freedom with this
                                          // component
         component_list[i] = c;
-      };
+      };  
 
     				   // set up a map where for each
 				   // component the respective degrees
@@ -651,7 +665,8 @@ void DoFRenumbering::component_wise (MGDoFHandler<dim>& dof_handler,
 				   // multiply, so we will have to
 				   // take care of that
   std::vector<std::vector<unsigned int> > component_to_dof_map (fe.n_components());
-  for (typename MGDoFHandler<dim>::cell_iterator cell=dof_handler.begin(level);
+  for (typename MGDoFHandler<dim>::cell_iterator
+         cell=dof_handler.begin(level);
        cell!=dof_handler.end(level); ++cell)
     {
 				       // on each cell: get dof indices
@@ -674,31 +689,48 @@ void DoFRenumbering::component_wise (MGDoFHandler<dim>& dof_handler,
 				   // within each component and during
 				   // this also remove duplicate
 				   // entries
+				   //
+				   // note that we no
+				   // longer have to care about
+				   // non-primitive shape functions
+				   // since the buckets corresponding
+				   // to the second and following
+				   // vector components of a
+				   // non-primitive FE will simply be
+				   // empty, everything being shoved
+				   // into the first one
   for (unsigned int component=0; component<fe.n_components(); ++component)
     {
       std::sort (component_to_dof_map[component].begin(),
 		 component_to_dof_map[component].end());
-      component_to_dof_map[component].erase (std::unique (component_to_dof_map[component].begin(),
-							  component_to_dof_map[component].end()),
-					     component_to_dof_map[component].end());
+      component_to_dof_map[component]
+        .erase (std::unique (component_to_dof_map[component].begin(),
+                             component_to_dof_map[component].end()),
+                component_to_dof_map[component].end());
     };
-  
+
+                                   // now concatenate all the
+                                   // components in the order the user
+                                   // desired to see  
   unsigned int next_free_index = 0;
   std::vector<unsigned int> new_indices (dof_handler.n_dofs(level),
 					 DoFHandler<dim>::invalid_dof_index);
-  for (unsigned int component=0; component<fe.n_components(); ++component)
+  for (unsigned int c=0; c<fe.n_components(); ++c)
     {
+      const unsigned int component = component_order[c];
+      
       const typename std::vector<unsigned int>::const_iterator
 	begin_of_component = component_to_dof_map[component].begin(),
 	end_of_component   = component_to_dof_map[component].end();
       
-      for (typename std::vector<unsigned int>::const_iterator dof_index = begin_of_component;
+      for (typename std::vector<unsigned int>::const_iterator
+             dof_index = begin_of_component;
 	   dof_index != end_of_component; ++dof_index)
 	  new_indices[*dof_index] = next_free_index++;
     };
 
-//  Assert (next_free_index == dof_handler.n_dofs(level),
-//	  ExcInternalError());
+  Assert (next_free_index == dof_handler.n_dofs(level),
+          ExcInternalError());
 
   dof_handler.renumber_dofs (level, new_indices);
 };
