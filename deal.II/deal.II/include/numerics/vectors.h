@@ -283,7 +283,7 @@ class VectorTools {
 			 const Function<dim>      &function,
 			 dVector                  &vec,
 			 const bool                enforce_zero_boundary = false,
-			 const Quadrature<dim-1>  &q_boundary = QGauss2<dim>(),
+			 const Quadrature<dim-1>  &q_boundary = QGauss2<dim-1>(),
 			 const bool                project_to_boundary_first = false);
 
 				     /**
