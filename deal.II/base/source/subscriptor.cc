@@ -1,0 +1,40 @@
+/*      $Id$                 */
+
+#include <base/subscriptor.h>
+
+
+
+Subscriptor::Subscriptor () :
+		counter (0)
+{};
+
+
+
+Subscriptor::Subscriptor (const Subscriptor &) :
+		counter (0)
+{};
+
+
+
+Subscriptor::~Subscriptor () {
+  Assert (counter == 0, InUse());
+};
+
+
+
+Subscriptor & Subscriptor::operator = (const Subscriptor &) {
+  return *this;
+};
+
+
+
+void Subscriptor::subscribe () const {
+  ++counter;
+};
+
+
+
+void Subscriptor::unsubscribe () const {
+  Assert (counter>0, NotUsed());
+  --counter;
+};

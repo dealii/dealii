@@ -32,77 +32,135 @@
  * }
  * delete p;
  * \end{verbatim}
+ *
+ * Note that a smart pointer can handle #const#ness of an object, i.e.
+ * a #SmartPointer<const ABC># really behaves as if it were a pointer to
+ * a constant object (disallowing write access when dereferenced), while
+ * #SmartPointer<ABC># is a mutable pointer.
  */
-template<class T>
+template<typename T>
 class SmartPointer
 {
-    T* t;
-
   public:
 				     /**
-				      * Constructor taking a normal pointer.
+				      * Standard constructor for null pointer.
 				      */
-    SmartPointer(T* tt) :
-		    t(tt) 
-      {
-	if (t)
-	  t->subscribe();
-      }
+    SmartPointer();
 
-				   /**
-				    * Standard constructor for null pointer.
-				    */
-  SmartPointer() :
-		  t(0)
-      {}
+				     /**
+				      * Constructor taking a normal pointer.
+				      * If possible, i.e. if the pointer
+				      * is not a null pointer, the constructor
+				      * subscribes to the given object to
+				      * lock it, i.e. to prevent its
+				      * destruction before the end of its use.
+				      */
+    SmartPointer (T *t);
+
+    
 
 				     /**
 				      * Destructor, removing the subscription.
 				      */
-    ~SmartPointer()
-      {
-	if (t)
-	  t->unsubscribe();
-      }
-				   /**
-				    * Assignment operator. Change of
-				    * subscription is necessary.
-				    */
-  SmartPointer<T>& operator=(T* tt)
-      {
-	if (t)
-	  t->unsubscribe();
-	t = tt;
-	if (tt)
-	  tt->subscribe();
-	return *this;
-      }
+    ~SmartPointer();
+    
+				     /**
+				      * Assignment operator. Change of
+				      * subscription is necessary.
+				      */
+    SmartPointer<T> & operator= (T *tt);
   
 
 				     /**
 				      * Conversion to normal pointer.
 				      */
-    operator T* () const
-      {
-	return t;
-      }
-
+    operator T* () const;
+    
 				     /**
 				      * Dereferencing operator.
 				      */
-    T& operator* () const
-      {
-	return *t;
-      }
-
+    T& operator * () const;
+    
 				     /**
 				      * Dereferencing operator.
 				      */
-    T* operator -> () const
-      {
-	return t;
-      }
+    T * operator -> () const;
+    
+  private:
+				     /**
+				      * Pointer to the object we want
+				      * to subscribt to.
+				      */
+    const T* t;
 };
+
+
+
+
+
+/* --------------------------- Template functions ------------------------------*/
+
+
+template <typename T>
+SmartPointer<T>::SmartPointer () :
+		t (0)
+{};
+
+
+
+template <typename T>
+SmartPointer<T>::SmartPointer (const T *t) :
+		t (t)
+{
+  if (t)
+    t->subscribe();
+};
+
+
+
+template <typename T>
+SmartPointer<T>::~SmartPointer () {
+  if (t)
+    t->unsubscribe();
+};
+
+
+
+template <typename T>
+SmartPointer<T> & operator = (const T *tt) {
+  if (t)
+    t->unsubscribe();
+  t = tt;
+  if (tt)
+    tt->subscribe();
+  return *this;
+};
+
+
+
+template <typename T>
+inline
+SmartPointer<T>::operator T* () const {
+  return t;
+};
+
+
+
+template <typename T>
+inline
+T & SmartPointer<T>::operator * () const {
+  return *t;
+};
+
+
+
+template <typename T>
+inline
+T * SmartPointer<T>::operator -> () const {
+  return t;
+};
+
+
 
 
 

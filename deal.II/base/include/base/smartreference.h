@@ -12,7 +12,7 @@
  * resolve the dot operator in a convenient manner. The use of
  * #SmartPointer# is recommended, instead.
  */
-template<class T>
+template<typename T>
 class SmartReference
 {
     T& t;
