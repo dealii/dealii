@@ -238,11 +238,372 @@ class TriaAccessor
 
 /**
  * Common template for line, quad, hex.
- * @author Guido Kanschat, 1999
+ * According to #celldim# objects of this class represent lines,
+ quadrilaterals, or hexahedra in #dim# space dimensions.
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
 template<int celldim, int dim>
-class TriaObjectAccessor;
+class TriaObjectAccessor :  public TriaAccessor<dim>
+{
+  public:
+				     /**
+				      * Constructor.
+				      * By default, an illegal
+				      * accessor is constructed.
+				      */
+    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
+		 const int           level      = -1,
+		 const int           index      = -1,
+		 const void         *local_data = 0) :
+		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
+				     /**
+				      *  Copy the data of a line. Only
+				      * implemented for #celldim==1#.
+				      */
+
+    void set (const Line&) const;
+				     /**
+				      *  Copy the data of the given quad. Only
+				      * implemented for #celldim==2#.
+				      */
+    void set (const Quad&) const;
+				     /**
+				      *  Copy the data of the given hex. Only
+				      * implemented for #celldim==3#.
+				      */
+    void set (const Hexahedron&) const;
+    
+				     /**
+				      *  Index of vertex. The convention regarding the
+				      *  numbering of vertices is laid down
+				      *  in the documentation of the
+				      *  #Triangulation# class.
+				      */ 
+    int vertex_index (const unsigned int i) const;
+
+    				     /**
+				      *  Reference (not an iterator!)
+				      *  to the #i#th vertex.
+				      */
+    Point<dim> & vertex (const unsigned int i) const;
+
+				     /**
+				      *  Pointer to the #i#th line
+				      *  bounding this object.
+				      *
+				      * Implemented only for #celldim>1#.
+				      */
+    TriaIterator<dim,TriaObjectAccessor<1, dim> > line (const unsigned int i) const;
+
+				     /**
+				      * Line index of the #i#th
+				      * line. The level is naturally
+				      * the same as that of the object.
+				      *
+				      * Implemented only for #celldim>1#.
+				      */
+    unsigned int line_index (const unsigned int i) const;
+    
+    				     /**
+				      *  Pointer to the #i#th quad
+				      *  bounding this object.
+				      *
+				      * Implemented only for #celldim>2#.
+				      */
+    TriaIterator<dim,TriaObjectAccessor<2, dim> > quad (const unsigned int i) const;
+
+				     /**
+				      * Quad index of the #i#th
+				      * quad. The level is naturally
+				      * the same as that of the object.
+				      *
+				      * Implemented only for #celldim>2#.
+				      */
+    unsigned int quad_index (const unsigned int i) const;
+
+				     /**
+				      *  Test for the element being used
+				      *  or not.
+				      */
+    bool used () const;
+
+				     /**
+				      *  Set the #used# flag. You should know
+				      *  quite exactly what you are doing of you
+				      *  touch this function. It is exclusively
+				      *  for internal use in the library.
+				      */
+    void set_used_flag () const;
+
+				     /**
+				      *  Clear the #used# flag. You should know
+				      *  quite exactly what you are doing of you
+				      *  touch this function. It is exclusively
+				      *  for internal use in the library.
+				      */
+    void clear_used_flag () const;
+
+    				     /**
+				      *  Read the user flag.
+				      */
+    bool user_flag_set () const;
+
+				     /**
+				      *  Set the user flag.
+				      */
+    void set_user_flag () const;
+
+				     /**
+				      *  Clear the user flag.
+				      */
+    void clear_user_flag () const;
+
+				     /**
+				      *  Set the user flag for this
+				      * and all descendants.
+				      */
+    void recursively_set_user_flag () const;
+
+    				     /**
+				      *  Clear the user flag for this
+				      * and all descendants. 
+				      */
+    void recursively_clear_user_flag () const;
+
+				     /**
+				      * Set the user pointer
+				      * to #p#.
+				      */
+    void set_user_pointer (void *p) const;
+
+				     /**
+				      * Reset the user pointer
+				      * to a #NULL# pointer.
+				      */
+    void clear_user_pointer () const;
+
+				     /**
+				      * Access the value of the user pointer. It is in the
+				      * responsibility of the user to make
+				      * sure that the pointer points to
+				      * something useful. You should use the
+				      * new style cast operator to maintain
+				      * a minimum of typesafety, e.g.
+				      * #A *a=static_cast<A*>(cell->user_pointer());#.
+				      */
+    void * user_pointer () const;
+
+				     /**
+				      *  Pointer to the #i#th
+				      *  child.
+				      */
+    TriaIterator<dim,TriaObjectAccessor<3, dim> > child (const unsigned int i) const;
+
+				     /**
+				      *  Index of the #i#th child.
+				      *  The level of the child is one higher
+				      *  than that of the present cell.
+				      *  If the child does not exist, -1
+				      *  is returned.
+				      */
+    int child_index (const unsigned int i) const;
+
+				     /**
+				      *  Set the child field. Since we
+				      *  only store the index of the first
+				      *  child (the others follow directly)
+				      *  only one child index is to be
+				      *  given. The level of the child is
+				      *  one level up of the level of the
+				      *  cell to which this iterator points.
+				      */
+    void set_children (const int index) const;
+	
+				     /**
+				      *  Clear the child field, i.e. set
+				      *  it to a value which indicates
+				      *  that this cell has no children.
+				      */
+    void clear_children () const;
+    
+				     /**
+				      *  Test whether the object has children.
+				      */
+    bool has_children () const;
+
+				     /**
+				      * Number of times that this
+				      * object is refined. Note that not all
+				      * its children are refined that often
+				      * (which is why we prepend #max_#), 
+				      * the returned number is rather the
+				      * maximum number of refinement in
+				      * any branch of children of this object.
+				      */
+    unsigned int max_refinement_depth () const;    
+    
+				     /**
+				      * Boundary indicator of this
+				      * object.
+				      * If the return value is 255, then this
+				      * line is in the interior of the domain.
+				      *
+				      * Since boundary data is only useful
+				      * for structures with a dimension less
+				      * than the dimension of a cell, this
+				      * function issues an error if #dim<4#.
+				      */
+    unsigned char boundary_indicator () const;
+
+				     /**
+				      * Set the boundary indicator.
+				      * The same applies as for the
+				      * #boundary_indicator()# function.
+				      *
+				      * Caution: Never set the
+				      * boundary indicator to 255, unless
+				      * you exactly know what you are doing!
+				      * This value is reserved for
+				      * another purpose and algorithms may
+				      * not work if boundary cells have have
+				      * this boundary indicator or if interior
+				      * cells have boundary indicators other
+				      * than 255.
+				      */
+    void set_boundary_indicator (unsigned char) const;
+
+				     /**
+				      * Return whether this object is at the
+				      * boundary. This is checked via
+				      * the boundary indicator field, which
+				      * is always 255 if the hex is in the
+				      * interior of the domain. Obviously,
+				      * the use of this function is only
+				      * possible for #dim>celldim#;
+				      * however, for #dim==celldim#, an object is
+				      * a cell and the #CellAccessor# class
+				      * offers another possibility to
+				      * determine whether a cell is at the
+				      * boundary or not.
+				      */
+    bool at_boundary () const;
+
+				     /**
+				      * Diameter of the object.
+				      *
+				      * The diameter of an object is computed to
+				      * be the largest diagonal. This
+				      * is not necessarily the true
+				      * diameter, but completely
+				      * sufficient for computations.
+				      */
+    double diameter () const;
+
+    				     /**
+				      * Center of the object. The
+				      * center of an object is defined to be
+				      * the average of the vertices,
+				      * which is also where the
+				      * (dim-)linear mapping places the midpoint
+				      * of the unit cell in real space.
+				      * However, this may not be the
+				      * barycenter of the object.
+				      */
+    Point<dim> center () const;
+
+				     /**
+				      * Barycenter of the object.
+				      */
+    Point<dim> barycenter () const;
+
+				     /**
+				      * Volume of the object.
+				      * Here, the volume is defined to
+				      * be confined by the (dim-)linear
+				      * mapping of the unit cell.
+				      * No information
+				      * about the boundary is used. If
+				      * a more sophisticated computation
+				      * is needed, try the volume of an
+				      * appropriate finite element class.
+				      */
+    double measure () const;
+
+				     /**
+				      * Number of active
+				      * descendants.
+				      * This function only counts the number
+				      * of active descendants, i.e. the number
+				      * of descendants which are not further
+				      * refined. Thus, if all of the eight
+				      * children of a hex are further
+				      * refined exactly once, the returned
+				      * number will be 64, not 80.
+				      *
+				      * If the present cell is not refined,
+				      * one is returned.
+				      */
+    unsigned int number_of_children () const;
+
+  private:
+    				     /**
+				      *  Copy operator. This is normally
+				      *  used in a context like
+				      *  #iterator a,b;  *a=*b;#. Since
+				      *  the meaning is to copy the object
+				      *  pointed to by #b# to the object
+				      *  pointed to by #a# and since
+				      *  accessors are not real but
+				      *  virtual objects, this operation
+				      *  is not useful for iterators on
+				      *  triangulations. We declare this
+				      *  function here private, thus it may
+				      *  not be used from outside.
+				      *  Furthermore it is not implemented
+				      *  and will give a linker error if
+				      *  used anyway.
+				      */
+    void operator = (const TriaObjectAccessor<3, dim> &);
+
+  protected:
+				     /**@name Advancement of iterators*/
+				     /*@{*/
+				     /**
+				      *  This operator advances the iterator to
+				      *  the next element.
+				      *
+				      *  The next element is next on this
+				      *  level if there are more. If the
+				      *  present element is the last on
+				      *  this level, the first on the
+				      *  next level is accessed.
+				      */
+    void operator ++ ();
+
+    				     /**
+				      *  This operator moves the iterator to
+				      *  the previous element.
+				      *
+				      *  The previous element is previous on
+				      *  this level if #index>0#. If the
+				      *  present element is the first on
+				      *  this level, the last on the
+				      *  previous level is accessed.
+				      */
+    void operator -- ();
+				     /*@}*/
+
+				     /**
+				      * Declare some friends.
+				      */
+    template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
+};
+
+
+template<int dim>
+class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
+{};
 
 
 
@@ -930,12 +1291,13 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class HexAccessor :  public TriaAccessor<dim> {
+class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
+{
   public:
 				     /**
 				      *  Constructor.
 				      */
-    HexAccessor (Triangulation<dim> *parent     = 0,
+    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
 		 const int           level      = -1,
 		 const int           index      = -1,
 		 const void         *local_data = 0) :
@@ -1067,7 +1429,7 @@ class HexAccessor :  public TriaAccessor<dim> {
 				      *  Return a pointer to the #i#th
 				      *  child.
 				      */
-    TriaIterator<dim,HexAccessor<dim> > child (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<3, dim> > child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the #i#th child.
@@ -1240,7 +1602,7 @@ class HexAccessor :  public TriaAccessor<dim> {
 				      *  and will give a linker error if
 				      *  used anyway.
 				      */
-    void operator = (const HexAccessor &);
+    void operator = (const TriaObjectAccessor<3, dim> &);
 
   protected:
 				     /**@name Advancement of iterators*/
@@ -1301,7 +1663,7 @@ class TriaSubstructAccessor;
  * \begin{verbatim}
  *   TriaSubstructAccessor<1> := TriaObjectAccessor<1, 1>;
  *   TriaSubstructAccessor<2> := TriaObjectAccessor<2, 2>;
- *   TriaSubstructAccessor<3> := HexAccessor<3>;
+ *   TriaSubstructAccessor<3> := TriaObjectAccessor<3, 3>;
  * \end{verbatim}
  * We do this rather complex (and needless, provided C++ the needed constructs!)
  * class hierarchy manipulation, since this way we can declare and implement
@@ -1380,13 +1742,13 @@ class TriaSubstructAccessor<2> : public TriaObjectAccessor<2, 2> {
  * @see TriaSubstructAccessor<1>
  */
 template <>
-class TriaSubstructAccessor<3> : public HexAccessor<3> {
+class TriaSubstructAccessor<3> : public TriaObjectAccessor<3, 3> {
   public:
 				     /**
 				      * Propagate the AccessorData type
 				      * into the present class.
 				      */
-    typedef HexAccessor<3>::AccessorData AccessorData;
+    typedef TriaObjectAccessor<3, 3>::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
@@ -1395,7 +1757,7 @@ class TriaSubstructAccessor<3> : public HexAccessor<3> {
 			   const int         level,
 			   const int         index,
 			   const void       *local_data) :
-		    HexAccessor<3> (tria,level,index,local_data) {};
+		    TriaObjectAccessor<3, 3> (tria,level,index,local_data) {};
 
     				     // do this here, since this way the
 				     // CellAccessor has the possibility to know

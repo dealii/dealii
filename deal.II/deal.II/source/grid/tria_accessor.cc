@@ -567,17 +567,17 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const {
 
 
 
-/*------------------------ Functions: HexAccessor ---------------------------*/
+/*------------------------ Functions: TriaObjectAccessor ---------------------------*/
 
 template <int dim>
-void HexAccessor<dim>::set (const Hexahedron &hex) const {
+void TriaObjectAccessor<3, dim>::set (const Hexahedron &hex) const {
   tria->levels[present_level]->hexes.hexes[present_index] = hex;
 };
 
 
 
 template <int dim>
-int HexAccessor<dim>::vertex_index (const unsigned int corner) const {
+int TriaObjectAccessor<3, dim>::vertex_index (const unsigned int corner) const {
   Assert (corner<8, ExcIndexRange(corner,0,8));
 
 				   // get the corner indices by asking
@@ -593,14 +593,14 @@ int HexAccessor<dim>::vertex_index (const unsigned int corner) const {
 
 template <int dim>
 Point<dim> &
-HexAccessor<dim>::vertex (const unsigned int i) const {
+TriaObjectAccessor<3, dim>::vertex (const unsigned int i) const {
   return tria->vertices[vertex_index(i)];
 };
 
 
 
 template <int dim>
-void HexAccessor<dim>::set_used_flag () const {
+void TriaObjectAccessor<3, dim>::set_used_flag () const {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   tria->levels[present_level]->hexes.used[present_index] = true;
 };
@@ -608,7 +608,7 @@ void HexAccessor<dim>::set_used_flag () const {
 
 
 template <int dim>
-void HexAccessor<dim>::clear_used_flag () const {
+void TriaObjectAccessor<3, dim>::clear_used_flag () const {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   tria->levels[present_level]->hexes.used[present_index] = false;
 };
@@ -617,7 +617,7 @@ void HexAccessor<dim>::clear_used_flag () const {
 
 
 template <int dim>
-void HexAccessor<dim>::recursively_set_user_flag () const {
+void TriaObjectAccessor<3, dim>::recursively_set_user_flag () const {
   set_user_flag ();
 
   if (has_children())
@@ -628,7 +628,7 @@ void HexAccessor<dim>::recursively_set_user_flag () const {
 
 
 template <int dim>
-void HexAccessor<dim>::recursively_clear_user_flag () const {
+void TriaObjectAccessor<3, dim>::recursively_clear_user_flag () const {
   clear_user_flag ();
 
   if (has_children())
@@ -639,7 +639,7 @@ void HexAccessor<dim>::recursively_clear_user_flag () const {
 
 
 template <int dim>
-void HexAccessor<dim>::set_user_pointer (void *p) const {
+void TriaObjectAccessor<3, dim>::set_user_pointer (void *p) const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_pointers[present_index] = p;
 };
@@ -647,7 +647,7 @@ void HexAccessor<dim>::set_user_pointer (void *p) const {
 
 
 template <int dim>
-void HexAccessor<dim>::clear_user_pointer () const {
+void TriaObjectAccessor<3, dim>::clear_user_pointer () const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_pointers[present_index] = 0;
 };
@@ -655,7 +655,7 @@ void HexAccessor<dim>::clear_user_pointer () const {
 
 
 template <int dim>
-void * HexAccessor<dim>::user_pointer () const {
+void * TriaObjectAccessor<3, dim>::user_pointer () const {
   Assert (used(), ExcCellNotUsed());
   return tria->levels[present_level]->hexes.user_pointers[present_index];
 };
@@ -663,7 +663,7 @@ void * HexAccessor<dim>::user_pointer () const {
 
 
 template <int dim>
-void HexAccessor<dim>::set_children (const int index) const {
+void TriaObjectAccessor<3, dim>::set_children (const int index) const {
   Assert (used(), ExcCellNotUsed());
   Assert ((index==-1) ||
 	  (!has_children() && (index>=0)), ExcCantSetChildren(index));
@@ -674,14 +674,14 @@ void HexAccessor<dim>::set_children (const int index) const {
 
 
 template <int dim>
-void HexAccessor<dim>::clear_children () const {
+void TriaObjectAccessor<3, dim>::clear_children () const {
   set_children (-1);
 };
 
 
 
 template <int dim>
-unsigned char HexAccessor<dim>::boundary_indicator () const {
+unsigned char TriaObjectAccessor<3, dim>::boundary_indicator () const {
   Assert (dim<4, ExcNotUsefulForThisDimension());
   Assert (used(), ExcCellNotUsed());
 
@@ -691,7 +691,7 @@ unsigned char HexAccessor<dim>::boundary_indicator () const {
 
 
 template <int dim>
-void HexAccessor<dim>::set_boundary_indicator (unsigned char boundary_ind) const {
+void TriaObjectAccessor<3, dim>::set_boundary_indicator (unsigned char boundary_ind) const {
   Assert (dim<4, ExcNotUsefulForThisDimension());
   Assert (used(), ExcCellNotUsed());
 
@@ -701,7 +701,7 @@ void HexAccessor<dim>::set_boundary_indicator (unsigned char boundary_ind) const
 
 
 template <int dim>
-bool HexAccessor<dim>::at_boundary () const {
+bool TriaObjectAccessor<3, dim>::at_boundary () const {
 				   // error checking is done
 				   // in boundary_indicator()
   return (boundary_indicator() != 255);
@@ -710,7 +710,7 @@ bool HexAccessor<dim>::at_boundary () const {
 
 
 template <int dim>
-double HexAccessor<dim>::diameter () const {
+double TriaObjectAccessor<3, dim>::diameter () const {
   return sqrt(max( max((vertex(6)-vertex(0)).square(),
 		       (vertex(7)-vertex(1)).square()),
 		   max((vertex(4)-vertex(2)).square(),
@@ -720,7 +720,7 @@ double HexAccessor<dim>::diameter () const {
 
 
 template <int dim>
-Point<dim> HexAccessor<dim>::center () const {
+Point<dim> TriaObjectAccessor<3, dim>::center () const {
   return (vertex(0)+vertex(1)+vertex(2)+vertex(3)+
 	  vertex(4)+vertex(5)+vertex(6)+vertex(7))/8.;
 };
@@ -730,7 +730,7 @@ Point<dim> HexAccessor<dim>::center () const {
 #if deal_II_dimension == 3
 
 template <>
-Point<3> HexAccessor<3>::barycenter () const {
+Point<3> TriaObjectAccessor<3, 3>::barycenter () const {
 /*
   Get the computation of the barycenter by this little Maple script. We
   use the trilinear mapping of the unit hex to the real hex.
@@ -1380,7 +1380,7 @@ x[7]*y[3]-z[5]*x[6]*y[4]-z[5]*x[4]*y[1]+z[5]*x[4]*y[6]+x[1]*y[6]*z[2]+x[2]*y[6]
 
 
 template <>
-double HexAccessor<3>::measure () const {
+double TriaObjectAccessor<3, 3>::measure () const {
 /*
   Get the computation of the measure by the same little Maple script as above.
 */
@@ -1459,7 +1459,7 @@ y[2]*x[3]*z[6]/12.0+s2+s1+x[2]*y[0]*z[3]/12.0;
 
 
 template <int dim>
-unsigned int HexAccessor<dim>::number_of_children () const {
+unsigned int TriaObjectAccessor<3, dim>::number_of_children () const {
   if (!has_children())
     return 1;
   else
@@ -1632,10 +1632,10 @@ template class TriaActiveIterator<deal_II_dimension,TriaObjectAccessor<2, deal_I
 #endif
 
 #if deal_II_dimension >= 3
-template class HexAccessor<deal_II_dimension>;
-template class TriaRawIterator<deal_II_dimension,HexAccessor<deal_II_dimension> >;
-template class TriaIterator<deal_II_dimension,HexAccessor<deal_II_dimension> >;
-template class TriaActiveIterator<deal_II_dimension,HexAccessor<deal_II_dimension> >;
+template class TriaObjectAccessor<3, deal_II_dimension>;
+template class TriaRawIterator<deal_II_dimension,TriaObjectAccessor<3, deal_II_dimension> >;
+template class TriaIterator<deal_II_dimension,TriaObjectAccessor<3, deal_II_dimension> >;
+template class TriaActiveIterator<deal_II_dimension,TriaObjectAccessor<3, deal_II_dimension> >;
 #endif
 
 

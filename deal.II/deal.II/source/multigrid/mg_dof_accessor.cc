@@ -301,21 +301,21 @@ MGDoFObjectAccessor<2, dim,BaseClass>::copy_from (const MGDoFObjectAccessor<2, d
 
 
 
-/* ------------------------ MGDoFHexAccessor --------------------------- */
+/* ------------------------ MGDoFObjectAccessor --------------------------- */
 
 template <int dim, typename BaseClass>
-MGDoFHexAccessor<dim,BaseClass>::MGDoFHexAccessor (Triangulation<dim> *tria,
+MGDoFObjectAccessor<3, dim,BaseClass>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 						   const int           level,
 						   const int           index,
 						   const AccessorData *local_data) :
 		MGDoFAccessor<dim> (local_data),
-		DoFHexAccessor<dim,BaseClass>(tria,level,index,local_data) {};
+		DoFObjectAccessor<3, dim,BaseClass>(tria,level,index,local_data) {};
 
 
 
 template <int dim, typename BaseClass>
 inline
-int MGDoFHexAccessor<dim,BaseClass>::mg_dof_index (const unsigned int i) const {
+int MGDoFObjectAccessor<3, dim,BaseClass>::mg_dof_index (const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -331,7 +331,7 @@ int MGDoFHexAccessor<dim,BaseClass>::mg_dof_index (const unsigned int i) const {
 
 
 template <int dim, typename BaseClass>
-void MGDoFHexAccessor<dim,BaseClass>::set_mg_dof_index (const unsigned int i,
+void MGDoFObjectAccessor<3, dim,BaseClass>::set_mg_dof_index (const unsigned int i,
 							const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
@@ -349,7 +349,7 @@ void MGDoFHexAccessor<dim,BaseClass>::set_mg_dof_index (const unsigned int i,
 
 template <int dim, typename BaseClass>
 inline
-int MGDoFHexAccessor<dim,BaseClass>::mg_vertex_dof_index (const unsigned int vertex,
+int MGDoFObjectAccessor<3, dim,BaseClass>::mg_vertex_dof_index (const unsigned int vertex,
 							  const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
@@ -365,7 +365,7 @@ int MGDoFHexAccessor<dim,BaseClass>::mg_vertex_dof_index (const unsigned int ver
 
   
 template <int dim, typename BaseClass>
-void MGDoFHexAccessor<dim,BaseClass>::set_mg_vertex_dof_index (const unsigned int vertex,
+void MGDoFObjectAccessor<3, dim,BaseClass>::set_mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i,
 							       const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -383,7 +383,7 @@ void MGDoFHexAccessor<dim,BaseClass>::set_mg_vertex_dof_index (const unsigned in
 
 template <int dim, typename BaseClass>
 void
-MGDoFHexAccessor<dim,BaseClass>::get_mg_dof_indices (vector<int> &dof_indices) const {
+MGDoFObjectAccessor<3, dim,BaseClass>::get_mg_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
@@ -415,7 +415,7 @@ MGDoFHexAccessor<dim,BaseClass>::get_mg_dof_indices (vector<int> &dof_indices) c
 
 template <int dim, typename BaseClass>
 TriaIterator<dim,MGDoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
-MGDoFHexAccessor<dim,BaseClass>::line (const unsigned int i) const {
+MGDoFObjectAccessor<3, dim,BaseClass>::line (const unsigned int i) const {
   Assert (i<12, ExcIndexRange (i, 0, 12));
 
   return TriaIterator<dim,MGDoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
@@ -431,7 +431,7 @@ MGDoFHexAccessor<dim,BaseClass>::line (const unsigned int i) const {
 
 template <int dim, typename BaseClass>
 TriaIterator<dim,MGDoFObjectAccessor<2, dim,TriaObjectAccessor<2, dim> > >
-MGDoFHexAccessor<dim,BaseClass>::quad (const unsigned int i) const {
+MGDoFObjectAccessor<3, dim,BaseClass>::quad (const unsigned int i) const {
   Assert (i<12, ExcIndexRange (i, 0, 6));
 
   return TriaIterator<dim,MGDoFObjectAccessor<2, dim,TriaObjectAccessor<2, dim> > >
@@ -446,9 +446,9 @@ MGDoFHexAccessor<dim,BaseClass>::quad (const unsigned int i) const {
 
 
 template <int dim, typename BaseClass>
-TriaIterator<dim,MGDoFHexAccessor<dim,BaseClass> >
-MGDoFHexAccessor<dim,BaseClass>::child (const unsigned int i) const {
-  TriaIterator<dim,MGDoFHexAccessor<dim,BaseClass> > q (tria,
+TriaIterator<dim,MGDoFObjectAccessor<3, dim,BaseClass> >
+MGDoFObjectAccessor<3, dim,BaseClass>::child (const unsigned int i) const {
+  TriaIterator<dim,MGDoFObjectAccessor<3, dim,BaseClass> > q (tria,
 							present_level+1,
 							child_index (i),
 							mg_dof_handler);
@@ -464,8 +464,8 @@ MGDoFHexAccessor<dim,BaseClass>::child (const unsigned int i) const {
 
 template <int dim, typename BaseClass>
 void
-MGDoFHexAccessor<dim,BaseClass>::copy_from (const MGDoFHexAccessor<dim,BaseClass> &a) {
-  DoFHexAccessor<dim,BaseClass>::copy_from (a);
+MGDoFObjectAccessor<3, dim,BaseClass>::copy_from (const MGDoFObjectAccessor<3, dim,BaseClass> &a) {
+  DoFObjectAccessor<3, dim,BaseClass>::copy_from (a);
   set_mg_dof_handler (a.mg_dof_handler);
 };
 
@@ -616,13 +616,13 @@ template class TriaActiveIterator<2,MGDoFCellAccessor<2> >;
 #if deal_II_dimension == 3
 template class MGDoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> >;
 template class MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> >;
-template class MGDoFHexAccessor<3,HexAccessor<3> >;
-template class MGDoFHexAccessor<3,CellAccessor<3> >;
+template class MGDoFObjectAccessor<3, 3,TriaObjectAccessor<3, 3> >;
+template class MGDoFObjectAccessor<3, 3,CellAccessor<3> >;
 template class MGDoFCellAccessor<3>;
 
 template class TriaRawIterator<3,MGDoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
 template class TriaRawIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;
-template class TriaRawIterator<3,MGDoFHexAccessor<3,HexAccessor<3> > >;
+template class TriaRawIterator<3,MGDoFObjectAccessor<3, 3,TriaObjectAccessor<3, 3> > >;
 template class TriaRawIterator<3,MGDoFCellAccessor<3> >;
 template class TriaIterator<3,MGDoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
 template class TriaIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;

@@ -338,7 +338,9 @@ class MGDoFObjectAccessor<2, dim, BaseClass> :  public MGDoFAccessor<dim>, publi
  * @see DoFLineAccessor
  */
 template <int dim, typename BaseClass>
-class MGDoFHexAccessor :  public MGDoFAccessor<dim>, public DoFHexAccessor<dim, BaseClass> {
+class MGDoFObjectAccessor<3, dim, BaseClass> :  public MGDoFAccessor<dim>,
+						public DoFObjectAccessor<3, dim, BaseClass>
+{
   public:
 				     /**
 				      * Declare the data type that this accessor
@@ -351,14 +353,14 @@ class MGDoFHexAccessor :  public MGDoFAccessor<dim>, public DoFHexAccessor<dim, 
 				      * Default constructor, unused thus
 				      * not implemented.
 				      */
-    MGDoFHexAccessor ();
+    MGDoFObjectAccessor ();
 
     				     /**
 				      * Constructor. The #local_data#
 				      * argument is assumed to be a pointer
 				      * to a #DoFHandler<dim># object.
 				      */
-    MGDoFHexAccessor (Triangulation<dim> *tria,
+    MGDoFObjectAccessor (Triangulation<dim> *tria,
 		      const int           level,
 		      const int           index,
 		      const AccessorData *local_data);
@@ -429,13 +431,13 @@ class MGDoFHexAccessor :  public MGDoFAccessor<dim>, public DoFHexAccessor<dim, 
 				      * class returns a hex accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,MGDoFHexAccessor<dim,BaseClass> > child (const unsigned int) const;
+    TriaIterator<dim,MGDoFObjectAccessor<3, dim,BaseClass> > child (const unsigned int) const;
     
 				     /**
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const MGDoFHexAccessor<dim,BaseClass> &a);
+    void copy_from (const MGDoFObjectAccessor<3, dim,BaseClass> &a);
 };
 
 
@@ -559,14 +561,14 @@ class MGDoFSubstructAccessor<2> : public MGDoFObjectAccessor<2, 2,CellAccessor<2
  * @see MGDoFSubstructAccessor<1>
  */
 template <>
-class MGDoFSubstructAccessor<3> : public MGDoFHexAccessor<3,CellAccessor<3> > {
+class MGDoFSubstructAccessor<3> : public MGDoFObjectAccessor<3, 3,CellAccessor<3> > {
   public:
 				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef MGDoFHexAccessor<3,CellAccessor<3> >::AccessorData AccessorData;
+    typedef MGDoFObjectAccessor<3, 3,CellAccessor<3> >::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
@@ -575,7 +577,7 @@ class MGDoFSubstructAccessor<3> : public MGDoFHexAccessor<3,CellAccessor<3> > {
 			    const int         level,
 			    const int         index,
 			    const AccessorData *local_data) :
-		    MGDoFHexAccessor<3,CellAccessor<3> > (tria,level,index,local_data) {};
+		    MGDoFObjectAccessor<3, 3,CellAccessor<3> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
 				     // what a face_iterator is. Otherwise

@@ -1568,8 +1568,8 @@ class DoFHandler  :  public Subscriptor,
     friend class DoFObjectAccessor<1, dim, CellAccessor<dim> >;
     friend class DoFObjectAccessor<2, dim, TriaObjectAccessor<2, dim> >;
     friend class DoFObjectAccessor<2, dim, CellAccessor<dim> >;
-    friend class DoFHexAccessor<dim, HexAccessor<dim> >;
-    friend class DoFHexAccessor<dim, CellAccessor<dim> >;
+    friend class DoFObjectAccessor<3, dim, TriaObjectAccessor<3, dim> >;
+    friend class DoFObjectAccessor<3, dim, CellAccessor<dim> >;
 };
 
 

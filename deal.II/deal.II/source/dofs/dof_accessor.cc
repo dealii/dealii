@@ -210,11 +210,11 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 
 
 
-/*------------------------- Functions: DoFHexAccessor -----------------------*/
+/*------------------------- Functions: DoFObjectAccessor -----------------------*/
 
 
 template <int dim, typename BaseClass>
-void DoFHexAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
+void DoFObjectAccessor<3, dim,BaseClass>::set_dof_index (const unsigned int i,
 						    const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -230,7 +230,7 @@ void DoFHexAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 template <int dim, typename BaseClass>
-void DoFHexAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
+void DoFObjectAccessor<3, dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
 							   const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -248,7 +248,7 @@ void DoFHexAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ver
 
 
 template <int dim, typename BaseClass>
-void DoFHexAccessor<dim,BaseClass>::
+void DoFObjectAccessor<3, dim,BaseClass>::
 distribute_local_to_global (const Vector<double> &local_source,
 			    Vector<double>       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -275,7 +275,7 @@ distribute_local_to_global (const Vector<double> &local_source,
 
 
 template <int dim, typename BaseClass>
-void DoFHexAccessor<dim,BaseClass>::
+void DoFObjectAccessor<3, dim,BaseClass>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
 			    SparseMatrix<double>     &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -813,13 +813,13 @@ template class TriaActiveIterator<2,DoFCellAccessor<2> >;
 #if deal_II_dimension == 3
 template class DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> >;
 template class DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> >;
-template class DoFHexAccessor<3,HexAccessor<3> >;
-template class DoFHexAccessor<3,CellAccessor<3> >;
+template class DoFObjectAccessor<3, 3,TriaObjectAccessor<3, 3> >;
+template class DoFObjectAccessor<3, 3,CellAccessor<3> >;
 template class DoFCellAccessor<3>;
 
 template class TriaRawIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
 template class TriaRawIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;
-template class TriaRawIterator<3,DoFHexAccessor<3,HexAccessor<3> > >;
+template class TriaRawIterator<3,DoFObjectAccessor<3, 3,TriaObjectAccessor<3, 3> > >;
 template class TriaRawIterator<3,DoFCellAccessor<3> >;
 template class TriaIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
 template class TriaIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;

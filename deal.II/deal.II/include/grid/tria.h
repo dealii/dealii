@@ -3005,7 +3005,7 @@ class Triangulation
     friend class TriaAccessor<dim>;
     friend class TriaObjectAccessor<1, dim>;
     friend class TriaObjectAccessor<2, dim>;
-    friend class HexAccessor<dim>;
+    friend class TriaObjectAccessor<3, dim>;
 
     friend class CellAccessor<dim>;
     
@@ -3018,7 +3018,7 @@ class Triangulation
 
     friend class TriaRawIterator<3,TriaObjectAccessor<1, 3> >;
     friend class TriaRawIterator<3,TriaObjectAccessor<2, 3> >;
-    friend class TriaRawIterator<3,HexAccessor<3> >;
+    friend class TriaRawIterator<3,TriaObjectAccessor<3, 3> >;
     friend class TriaRawIterator<3,CellAccessor<3> >;
 
     friend class DoFHandler<dim>;

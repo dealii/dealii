@@ -427,14 +427,14 @@ TriaObjectAccessor<2, dim>::operator -- () {
 
 
 
-/*------------------------ Functions: HexAccessor ---------------------------*/
+/*------------------------ Functions: TriaObjectAccessor ---------------------------*/
 
 
 
 template <int dim>
 inline
 bool
-HexAccessor<dim>::used () const {
+TriaObjectAccessor<3, dim>::used () const {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return tria->levels[present_level]->hexes.used[present_index];
 };
@@ -444,7 +444,7 @@ HexAccessor<dim>::used () const {
 template <int dim>
 inline
 bool
-HexAccessor<dim>::user_flag_set () const {
+TriaObjectAccessor<3, dim>::user_flag_set () const {
   Assert (used(), ExcCellNotUsed());
   return tria->levels[present_level]->hexes.user_flags[present_index];
 };
@@ -454,7 +454,7 @@ HexAccessor<dim>::user_flag_set () const {
 template <int dim>
 inline
 void
-HexAccessor<dim>::set_user_flag () const {
+TriaObjectAccessor<3, dim>::set_user_flag () const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_flags[present_index] = true;
 };
@@ -463,7 +463,7 @@ HexAccessor<dim>::set_user_flag () const {
 
 template <int dim>
 inline
-void HexAccessor<dim>::clear_user_flag () const {
+void TriaObjectAccessor<3, dim>::clear_user_flag () const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_flags[present_index] = false;
 };
@@ -474,7 +474,7 @@ void HexAccessor<dim>::clear_user_flag () const {
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<1, dim> >
-HexAccessor<dim>::line (const unsigned int i) const {
+TriaObjectAccessor<3, dim>::line (const unsigned int i) const {
   Assert (used(), ExcCellNotUsed());
   Assert (i<12, ExcIndexRange (i,0,12));
   
@@ -504,7 +504,7 @@ HexAccessor<dim>::line (const unsigned int i) const {
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<2, dim> >
-HexAccessor<dim>::quad (const unsigned int i) const {
+TriaObjectAccessor<3, dim>::quad (const unsigned int i) const {
   Assert (used(), ExcCellNotUsed());
   return
     TriaIterator<dim,TriaObjectAccessor<2, dim> >
@@ -520,7 +520,7 @@ HexAccessor<dim>::quad (const unsigned int i) const {
 template <int dim>
 inline
 unsigned int
-HexAccessor<dim>::line_index (unsigned int i) const {
+TriaObjectAccessor<3, dim>::line_index (unsigned int i) const {
   Assert (i<12, ExcIndexRange(i,0,12));
 
   if (i<4)
@@ -549,7 +549,7 @@ HexAccessor<dim>::line_index (unsigned int i) const {
 template <int dim>
 inline
 unsigned int
-HexAccessor<dim>::quad_index (unsigned int i) const {
+TriaObjectAccessor<3, dim>::quad_index (unsigned int i) const {
   Assert (i<6, ExcIndexRange(i,0,6));
 
   return tria->levels[present_level]->hexes.hexes[present_index].quad(i);
@@ -559,11 +559,11 @@ HexAccessor<dim>::quad_index (unsigned int i) const {
 
 template <int dim>
 inline
-TriaIterator<dim,HexAccessor<dim> >
-HexAccessor<dim>::child (const unsigned int i) const {
+TriaIterator<dim,TriaObjectAccessor<3, dim> >
+TriaObjectAccessor<3, dim>::child (const unsigned int i) const {
   Assert (i<6, ExcIndexRange(i,0,6));
   
-  TriaIterator<dim,HexAccessor<dim> > q (tria, present_level+1, child_index (i));
+  TriaIterator<dim,TriaObjectAccessor<3, dim> > q (tria, present_level+1, child_index (i));
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
@@ -576,7 +576,7 @@ HexAccessor<dim>::child (const unsigned int i) const {
 
 template <int dim>
 inline
-int HexAccessor<dim>::child_index (unsigned int i) const {
+int TriaObjectAccessor<3, dim>::child_index (unsigned int i) const {
   Assert (i<8, ExcIndexRange(i,0,8));
   return tria->levels[present_level]->hexes.children[present_index]+i;
 };
@@ -584,7 +584,7 @@ int HexAccessor<dim>::child_index (unsigned int i) const {
 
 
 template <int dim>
-bool HexAccessor<dim>::has_children () const {
+bool TriaObjectAccessor<3, dim>::has_children () const {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->hexes.children[present_index] != -1);
 };
@@ -594,7 +594,7 @@ bool HexAccessor<dim>::has_children () const {
 template <int dim>
 inline
 unsigned int
-HexAccessor<dim>::max_refinement_depth () const
+TriaObjectAccessor<3, dim>::max_refinement_depth () const
 {
   if (!has_children())
     return 0;
@@ -618,7 +618,7 @@ HexAccessor<dim>::max_refinement_depth () const
 template <int dim>
 inline
 void
-HexAccessor<dim>::operator ++ () {
+TriaObjectAccessor<3, dim>::operator ++ () {
   ++present_index;
 				   // is index still in the range of
 				   // the vector?
@@ -644,7 +644,7 @@ HexAccessor<dim>::operator ++ () {
 template <int dim>
 inline
 void
-HexAccessor<dim>::operator -- () {
+TriaObjectAccessor<3, dim>::operator -- () {
   --present_index;
 				   // is index still in the range of
 				   // the vector?

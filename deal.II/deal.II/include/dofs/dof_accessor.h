@@ -413,7 +413,9 @@ class DoFObjectAccessor<2, dim, BaseClass> :  public DoFAccessor<dim>,
  * @see DoFLineAccessor
  */
 template <int dim, typename BaseClass>
-class DoFHexAccessor :  public DoFAccessor<dim>, public BaseClass {
+class DoFObjectAccessor<3, dim, BaseClass> :  public DoFAccessor<dim>,
+					      public BaseClass
+{
   public:
 				     /**
 				      * Declare the data type that this accessor
@@ -426,14 +428,14 @@ class DoFHexAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * Default constructor, unused thus
 				      * not implemented.
 				      */
-    DoFHexAccessor ();
+    DoFObjectAccessor ();
 
     				     /**
 				      * Constructor. The #local_data#
 				      * argument is assumed to be a pointer
 				      * to a #DoFHandler<dim># object.
 				      */
-    DoFHexAccessor (Triangulation<dim> *tria,
+    DoFObjectAccessor (Triangulation<dim> *tria,
 		    const int           level,
 		    const int           index,
 		    const AccessorData *local_data) :
@@ -500,7 +502,7 @@ class DoFHexAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * class returns a hex accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFHexAccessor<dim,BaseClass> > child (const unsigned int) const;
+    TriaIterator<dim,DoFObjectAccessor<3, dim,BaseClass> > child (const unsigned int) const;
 
 				     /**
 				      * Distribute a local (cell based) vector
@@ -532,7 +534,7 @@ class DoFHexAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const DoFHexAccessor<dim,BaseClass> &a);
+    void copy_from (const DoFObjectAccessor<3, dim,BaseClass> &a);
 };
 
 
@@ -660,7 +662,7 @@ class DoFSubstructAccessor<2> : public DoFObjectAccessor<2, 2,CellAccessor<2> > 
  * @see DoFSubstructAccessor<1>
  */
 template <>
-class DoFSubstructAccessor<3> : public DoFHexAccessor<3,CellAccessor<3> > {
+class DoFSubstructAccessor<3> : public DoFObjectAccessor<3, 3,CellAccessor<3> > {
   public:
 				     /**
 				      * Declare the data type that this accessor
@@ -676,7 +678,7 @@ class DoFSubstructAccessor<3> : public DoFHexAccessor<3,CellAccessor<3> > {
 			  const int         level,
 			  const int         index,
 			  const AccessorData *local_data) :
-		    DoFHexAccessor<3,CellAccessor<3> > (tria,level,index,local_data) {};
+		    DoFObjectAccessor<3, 3,CellAccessor<3> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
 				     // what a face_iterator is. Otherwise

@@ -962,8 +962,8 @@ class MGDoFHandler
     friend class MGDoFObjectAccessor<1, dim, CellAccessor<dim> >;
     friend class MGDoFObjectAccessor<2, dim, TriaObjectAccessor<2, dim> >;
     friend class MGDoFObjectAccessor<2, dim, CellAccessor<dim> >;
-    friend class MGDoFHexAccessor<dim, HexAccessor<dim> >;
-    friend class MGDoFHexAccessor<dim, CellAccessor<dim> >;
+    friend class MGDoFObjectAccessor<3, dim, TriaObjectAccessor<3, dim> >;
+    friend class MGDoFObjectAccessor<3, dim, CellAccessor<dim> >;
 };
 
     
