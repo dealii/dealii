@@ -19,7 +19,7 @@ CXXFLAGS.g= -ansi -DDEBUG -ggdb -Wall -W -Wconversion \
             $(INCLUDE)
 CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
             -felide-constructors -fnonnull-objects \
-	    -fno-vtable-thunks -ftemplate-depth-32 -pg\
+	    -fno-vtable-thunks -ftemplate-depth-32\
             $(INCLUDE)
 
 
