@@ -850,8 +850,6 @@ FETools::lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
 
 /*-------------- Explicit Instantiations -------------------------------*/
 
-//TODO:[RH] Why do the instantiations for float and double differ?
-
 template
 void FETools::get_interpolation_matrix<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &,
@@ -929,13 +927,30 @@ void FETools::interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
  const DoFHandler<deal_II_dimension> &, Vector<float> &);
 template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<float> &);
+template
 void FETools::back_interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
  const FiniteElement<deal_II_dimension> &, Vector<float> &);
 template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const Vector<float> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<float> &);
+template
 void FETools::interpolation_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
  const FiniteElement<deal_II_dimension> &, Vector<float> &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const Vector<float> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<float> &);
 template
 void FETools::extrapolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
@@ -992,13 +1007,30 @@ void FETools::interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
  const DoFHandler<deal_II_dimension> &, BlockVector<float> &);
 template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ BlockVector<float> &);
+template
 void FETools::back_interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
  const FiniteElement<deal_II_dimension> &, BlockVector<float> &);
 template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const BlockVector<float> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ BlockVector<float> &);
+template
 void FETools::interpolation_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
  const FiniteElement<deal_II_dimension> &, BlockVector<float> &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const BlockVector<float> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ BlockVector<float> &);
 template
 void FETools::extrapolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
