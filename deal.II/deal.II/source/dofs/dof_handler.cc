@@ -15,6 +15,7 @@
 
 
 
+
 template <int dim>
 DoFHandler<dim>::DoFHandler (Triangulation<dim> *tria) :
 		tria(tria),
@@ -31,6 +32,9 @@ DoFHandler<dim>::~DoFHandler () {
 
 
 
+
+
+#if deal_II_dimension == 1
 
 template <>
 DoFHandler<1>::raw_cell_iterator
@@ -109,93 +113,6 @@ DoFHandler<1>::active_cell_iterator
 DoFHandler<1>::last_active (const unsigned int level) const {
   return last_active_line (level);
 };
-
-
-
-
-
-template <>
-DoFHandler<2>::raw_cell_iterator
-DoFHandler<2>::begin_raw (const unsigned int level) const {
-  return begin_raw_quad (level);
-};
-
-
-
-template <>
-DoFHandler<2>::cell_iterator
-DoFHandler<2>::begin (const unsigned int level) const {
-  return begin_quad (level);
-};
-
-
-
-template <>
-DoFHandler<2>::active_cell_iterator
-DoFHandler<2>::begin_active (const unsigned int level) const {
-  return begin_active_quad (level);
-};
-
-
-
-template <>
-DoFHandler<2>::raw_cell_iterator
-DoFHandler<2>::end () const {
-  return end_quad ();
-};
-
-
-
-template <>
-DoFHandler<2>::raw_cell_iterator
-DoFHandler<2>::last_raw () const {
-  return last_raw_quad ();
-};
-
-
-
-template <>
-DoFHandler<2>::raw_cell_iterator
-DoFHandler<2>::last_raw (const unsigned int level) const {
-  return last_raw_quad (level);
-};
-
-
-
-template <>
-DoFHandler<2>::cell_iterator
-DoFHandler<2>::last () const {
-  return last_quad ();
-};
-
-
-
-template <>
-DoFHandler<2>::cell_iterator
-DoFHandler<2>::last (const unsigned int level) const {
-  return last_quad (level);
-};
-
-
-
-template <>
-DoFHandler<2>::active_cell_iterator
-DoFHandler<2>::last_active () const {
-  return last_active_quad ();
-};
-
-
-
-template <>
-DoFHandler<2>::active_cell_iterator
-DoFHandler<2>::last_active (const unsigned int level) const {
-  return last_active_quad (level);
-};
-
-
-
-
-//------------------------------------------------------------------
 
 
 
@@ -290,6 +207,176 @@ DoFHandler<1>::last_active_face (const unsigned int) const {
 
 
 
+template <>
+DoFHandler<1>::raw_quad_iterator
+DoFHandler<1>::begin_raw_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+DoFHandler<1>::quad_iterator
+DoFHandler<1>::begin_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+DoFHandler<1>::active_quad_iterator
+DoFHandler<1>::begin_active_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+DoFHandler<1>::raw_quad_iterator
+DoFHandler<1>::end_quad () const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+DoFHandler<1>::raw_quad_iterator
+DoFHandler<1>::last_raw_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+template <>
+DoFHandler<1>::quad_iterator
+DoFHandler<1>::last_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+DoFHandler<1>::active_quad_iterator
+DoFHandler<1>::last_active_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+DoFHandler<1>::raw_quad_iterator
+DoFHandler<1>::last_raw_quad () const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+DoFHandler<1>::quad_iterator
+DoFHandler<1>::last_quad () const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+DoFHandler<1>::active_quad_iterator
+DoFHandler<1>::last_active_quad () const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+#endif
+
+
+#if deal_II_dimension == 2
+
+template <>
+DoFHandler<2>::raw_cell_iterator
+DoFHandler<2>::begin_raw (const unsigned int level) const {
+  return begin_raw_quad (level);
+};
+
+
+
+template <>
+DoFHandler<2>::cell_iterator
+DoFHandler<2>::begin (const unsigned int level) const {
+  return begin_quad (level);
+};
+
+
+
+template <>
+DoFHandler<2>::active_cell_iterator
+DoFHandler<2>::begin_active (const unsigned int level) const {
+  return begin_active_quad (level);
+};
+
+
+
+template <>
+DoFHandler<2>::raw_cell_iterator
+DoFHandler<2>::end () const {
+  return end_quad ();
+};
+
+
+
+template <>
+DoFHandler<2>::raw_cell_iterator
+DoFHandler<2>::last_raw () const {
+  return last_raw_quad ();
+};
+
+
+
+template <>
+DoFHandler<2>::raw_cell_iterator
+DoFHandler<2>::last_raw (const unsigned int level) const {
+  return last_raw_quad (level);
+};
+
+
+
+template <>
+DoFHandler<2>::cell_iterator
+DoFHandler<2>::last () const {
+  return last_quad ();
+};
+
+
+
+template <>
+DoFHandler<2>::cell_iterator
+DoFHandler<2>::last (const unsigned int level) const {
+  return last_quad (level);
+};
+
+
+
+template <>
+DoFHandler<2>::active_cell_iterator
+DoFHandler<2>::last_active () const {
+  return last_active_quad ();
+};
+
+
+
+template <>
+DoFHandler<2>::active_cell_iterator
+DoFHandler<2>::last_active (const unsigned int level) const {
+  return last_active_quad (level);
+};
+
 
 template <>
 DoFDimensionInfo<2>::raw_face_iterator
@@ -369,9 +456,8 @@ DoFHandler<2>::last_active_face (const unsigned int level) const {
   return last_active_line (level);
 };
 
+#endif
 
-
-// ---------------------------------------------------------------
 
 
 
@@ -408,15 +494,6 @@ DoFHandler<dim>::begin_active_line (const unsigned int level) const {
 
 
 
-template <>
-DoFHandler<1>::raw_quad_iterator
-DoFHandler<1>::begin_raw_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
-
-
-
 template <int dim>
 typename DoFHandler<dim>::raw_quad_iterator
 DoFHandler<dim>::begin_raw_quad (const unsigned int level) const {
@@ -428,15 +505,6 @@ DoFHandler<dim>::begin_raw_quad (const unsigned int level) const {
 
 
 
-template <>
-DoFHandler<1>::quad_iterator
-DoFHandler<1>::begin_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
-
-
-
 template <int dim>
 typename DoFHandler<dim>::quad_iterator
 DoFHandler<dim>::begin_quad (const unsigned int level) const {
@@ -444,15 +512,6 @@ DoFHandler<dim>::begin_quad (const unsigned int level) const {
 			tria->begin_quad(level)->level(),
 			tria->begin_quad(level)->index(),
 			this);
-};
-
-
-
-template <>
-DoFHandler<1>::active_quad_iterator
-DoFHandler<1>::begin_active_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
-  return 0;
 };
 
 
@@ -476,21 +535,11 @@ DoFHandler<dim>::end_line () const {
 
 
 
-template <>
-DoFHandler<1>::raw_quad_iterator
-DoFHandler<1>::end_quad () const {
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
-
-
-
 template <int dim>
 typename DoFHandler<dim>::raw_quad_iterator
 DoFHandler<dim>::end_quad () const {
   return raw_quad_iterator (tria, -1, -1, this);
 };
-
 
 
 
@@ -527,14 +576,6 @@ DoFHandler<dim>::last_active_line (const unsigned int level) const {
 
 
 
-template <>
-DoFHandler<1>::raw_quad_iterator
-DoFHandler<1>::last_raw_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
-
-
 template <int dim>
 typename DoFHandler<dim>::raw_quad_iterator
 DoFHandler<dim>::last_raw_quad (const unsigned int level) const {
@@ -547,15 +588,6 @@ DoFHandler<dim>::last_raw_quad (const unsigned int level) const {
 
 
 
-template <>
-DoFHandler<1>::quad_iterator
-DoFHandler<1>::last_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
-
-
-
 template <int dim>
 typename DoFHandler<dim>::quad_iterator
 DoFHandler<dim>::last_quad (const unsigned int level) const {
@@ -565,15 +597,6 @@ DoFHandler<dim>::last_quad (const unsigned int level) const {
 			this);
 };
 
-
-
-
-template <>
-DoFHandler<1>::active_quad_iterator
-DoFHandler<1>::last_active_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
 
 
 
@@ -597,15 +620,6 @@ DoFHandler<dim>::last_raw_line () const {
 
 
 
-template <>
-DoFHandler<1>::raw_quad_iterator
-DoFHandler<1>::last_raw_quad () const {
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
-
-
-
 template <int dim>
 typename DoFHandler<dim>::raw_quad_iterator
 DoFHandler<dim>::last_raw_quad () const {
@@ -618,15 +632,6 @@ template <int dim>
 typename DoFHandler<dim>::line_iterator
 DoFHandler<dim>::last_line () const {
   return last_line (levels.size()-1);
-};
-
-
-
-template <>
-DoFHandler<1>::quad_iterator
-DoFHandler<1>::last_quad () const {
-  Assert (false, ExcNotImplemented());
-  return 0;
 };
 
 
@@ -648,20 +653,18 @@ DoFHandler<dim>::last_active_line () const {
 
 
 
-template <>
-DoFHandler<1>::active_quad_iterator
-DoFHandler<1>::last_active_quad () const {
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
-
-
-
 template <int dim>
 typename DoFHandler<dim>::active_quad_iterator
 DoFHandler<dim>::last_active_quad () const {
   return last_active_quad (levels.size()-1);
 };
+
+
+
+
+
+
+//------------------------------------------------------------------
 
 
 
@@ -676,12 +679,27 @@ unsigned int DoFHandler<dim>::n_dofs () const {
 
 
 
+#if deal_II_dimension == 1
+
 template <>
 unsigned int DoFHandler<1>::n_boundary_dofs () const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());
   return 0;
 };
+
+
+
+template <>
+unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+#endif
+
+
 
 
 
@@ -705,14 +723,6 @@ unsigned int DoFHandler<dim>::n_boundary_dofs () const {
   return boundary_dofs.size();
 };    
 
-
-
-template <>
-unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const {
-  Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (false, ExcNotImplemented());
-  return 0;
-};
 
 
 template <int dim>
@@ -777,6 +787,8 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElementBase<dim> &fe) {
 
 
 
+#if deal_II_dimension == 1
+
 template <>
 unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
 						     unsigned int          next_free_dof) {
@@ -826,8 +838,10 @@ unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
   return next_free_dof;
 };
 
+#endif
 
 
+#if deal_II_dimension == 2
 
 template <>
 unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
@@ -873,6 +887,8 @@ unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
   
   return next_free_dof;
 };
+
+#endif
 
 
 
@@ -1058,6 +1074,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 };
 
 
+#if deal_II_dimension == 1
 
 template <>
 void DoFHandler<1>::do_renumbering (const vector<int> &new_numbers) {
@@ -1078,7 +1095,10 @@ void DoFHandler<1>::do_renumbering (const vector<int> &new_numbers) {
 	*i = new_numbers[*i];
 };
 
+#endif
 
+
+#if deal_II_dimension == 2
 
 template <>
 void DoFHandler<2>::do_renumbering (const vector<int> &new_numbers) {
@@ -1099,8 +1119,10 @@ void DoFHandler<2>::do_renumbering (const vector<int> &new_numbers) {
     };
 };
 
+#endif
 
 
+#if deal_II_dimension == 1
 
 template <>
 void DoFHandler<1>::make_constraint_matrix (ConstraintMatrix &cm) const {
@@ -1108,8 +1130,11 @@ void DoFHandler<1>::make_constraint_matrix (ConstraintMatrix &cm) const {
   cm.close ();
 };
 
+#endif
 
-  
+
+
+#if deal_II_dimension == 2
 
 template <>
 void DoFHandler<2>::make_constraint_matrix (ConstraintMatrix &constraints) const {
@@ -1177,6 +1202,7 @@ void DoFHandler<2>::make_constraint_matrix (ConstraintMatrix &constraints) const
   constraints.close ();
 };
 
+#endif
 
 
 
@@ -1204,6 +1230,7 @@ void DoFHandler<dim>::make_sparsity_pattern (dSMatrixStruct &sparsity) const {
 };
 
 
+#if deal_II_dimension == 1
 
 template <>
 void DoFHandler<1>::make_boundary_sparsity_pattern (const vector<int> &,
@@ -1211,6 +1238,18 @@ void DoFHandler<1>::make_boundary_sparsity_pattern (const vector<int> &,
     Assert (selected_fe != 0, ExcNoFESelected());
     Assert (false, ExcInternalError());
 };
+
+
+
+template <>
+void DoFHandler<1>::make_boundary_sparsity_pattern (const FunctionMap &,
+						    const vector<int> &,
+						    dSMatrixStruct &) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcInternalError());
+};
+
+#endif
 
 
 
@@ -1248,16 +1287,6 @@ void DoFHandler<dim>::make_boundary_sparsity_pattern (const vector<int> &dof_to_
 	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
 			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
       };
-};
-
-
-
-template <>
-void DoFHandler<1>::make_boundary_sparsity_pattern (const FunctionMap &,
-						    const vector<int> &,
-						    dSMatrixStruct &) const {
-  Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (false, ExcInternalError());
 };
 
 
@@ -1519,6 +1548,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 
 
 
+#if deal_II_dimension == 1
 
 template <>
 unsigned int DoFHandler<1>::max_couplings_between_dofs () const {
@@ -1527,6 +1557,35 @@ unsigned int DoFHandler<1>::max_couplings_between_dofs () const {
 };
 
 
+
+template <>
+unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcInternalError());
+  return 0;
+};
+
+
+
+template <>
+unsigned int DoFHandler<1>::max_transfer_entries (const unsigned int max_level_diff) const {
+  Assert (max_level_diff<2, ExcOnlyOnelevelTransferImplemented());
+  switch (max_level_diff)
+    {
+      case 0:
+	    return 1;
+      case 1:
+	    return (2*selected_fe->dofs_per_line+
+		    selected_fe->dofs_per_vertex) * 2 + 1;
+    };
+  return 0;
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 2
 
 template <>
 unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
@@ -1584,35 +1643,9 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
 
 
 template <>
-unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const {
-  Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (false, ExcInternalError());
-  return 0;
-};
-
-
-
-template <>
 unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const {
   Assert (selected_fe != 0, ExcNoFESelected());
   return 3*selected_fe->dofs_per_vertex + 2*selected_fe->dofs_per_line;
-};
-
-
-
-
-template <>
-unsigned int DoFHandler<1>::max_transfer_entries (const unsigned int max_level_diff) const {
-  Assert (max_level_diff<2, ExcOnlyOnelevelTransferImplemented());
-  switch (max_level_diff)
-    {
-      case 0:
-	    return 1;
-      case 1:
-	    return (2*selected_fe->dofs_per_line+
-		    selected_fe->dofs_per_vertex) * 2 + 1;
-    };
-  return 0;
 };
 
 
@@ -1631,6 +1664,10 @@ unsigned int DoFHandler<2>::max_transfer_entries (const unsigned int max_level_d
     };
   return 0;
 };
+
+#endif
+
+
 
 
 
@@ -1678,11 +1715,24 @@ void DoFHandler<dim>::distribute_cell_to_dof_vector (const dVector &cell_data,
 
 
 
+#if deal_II_dimension == 1
+
 template <>
 void DoFHandler<1>::map_dof_to_boundary_indices (vector<int> &) const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());
 };
+
+
+
+template <>
+void DoFHandler<1>::map_dof_to_boundary_indices (const FunctionMap &,
+						 vector<int> &) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcNotImplemented());
+};
+
+#endif
 
 
 
@@ -1710,15 +1760,6 @@ void DoFHandler<dim>::map_dof_to_boundary_indices (vector<int> &mapping) const {
 
   Assert (static_cast<unsigned int>(next_boundary_index) == n_boundary_dofs(),
 	  ExcInternalError());
-};
-
-
-
-template <>
-void DoFHandler<1>::map_dof_to_boundary_indices (const FunctionMap &,
-						 vector<int> &) const {
-  Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (false, ExcNotImplemented());
 };
 
 
@@ -1759,7 +1800,7 @@ void DoFHandler<dim>::map_dof_to_boundary_indices (const FunctionMap &boundary_i
 
 
 
-
+#if deal_II_dimension == 1
 
 template <>
 void DoFHandler<1>::reserve_space () {
@@ -1786,7 +1827,10 @@ void DoFHandler<1>::reserve_space () {
     };
 };
 
+#endif
 
+
+#if deal_II_dimension == 2
 
 template <>
 void DoFHandler<2>::reserve_space () {
@@ -1818,13 +1862,12 @@ void DoFHandler<2>::reserve_space () {
     };
 };
 
-
+#endif
 
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-template class DoFHandler<1>;
-template class DoFHandler<2>;
+template class DoFHandler<deal_II_dimension>;
 
 
 

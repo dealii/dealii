@@ -497,13 +497,11 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 
 /*------------------------------- Explicit Instantiations -------------*/
 
-template class FEValuesBase<1>;
-template class FEValuesBase<2>;
+template class FEValuesBase<deal_II_dimension>;
+template class FEValues<deal_II_dimension>;
 
-template class FEValues<1>;
-template class FEValues<2>;
-
-template class FEFaceValuesBase<2>;
-template class FEFaceValues<2>;
-template class FESubfaceValues<2>;
-
+#if deal_II_dimension >= 2
+template class FEFaceValuesBase<deal_II_dimension>;
+template class FEFaceValues<deal_II_dimension>;
+template class FESubfaceValues<deal_II_dimension>;
+#endif

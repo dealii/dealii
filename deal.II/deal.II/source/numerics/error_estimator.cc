@@ -17,11 +17,13 @@
 
 
 
-inline double sqr (const double x) {
+inline static double sqr (const double x) {
   return x*x;
 };
 
 
+
+#if deal_II_dimension == 1
 
 template <>
 void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
@@ -34,6 +36,7 @@ void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
   Assert(false, ExcNotImplemented());
 };
 
+#endif
 
 
 template <int dim>
@@ -173,7 +176,7 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 
 
 
-
+#if deal_II_dimension == 1
 
 template <>
 void KellyErrorEstimator<1>::integrate_over_regular_face (const active_cell_iterator &,
@@ -189,6 +192,23 @@ void KellyErrorEstimator<1>::integrate_over_regular_face (const active_cell_iter
   Assert (false, ExcInternalError());
 };
 
+
+
+template <>
+void KellyErrorEstimator<1>::
+integrate_over_irregular_face (const active_cell_iterator &,
+			       const unsigned int          ,
+			       const FiniteElement<1>     &,
+			       const Boundary<1>          &,
+			       const unsigned int          ,
+			       FEFaceValues<1>            &,
+			       FESubfaceValues<1>         &,
+			       FaceIntegrals              &,
+			       const dVector              &) {
+  Assert (false, ExcInternalError());
+};
+
+#endif
 
 
 
@@ -336,22 +356,6 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 
 
 
-template <>
-void KellyErrorEstimator<1>::
-integrate_over_irregular_face (const active_cell_iterator &,
-			       const unsigned int          ,
-			       const FiniteElement<1>     &,
-			       const Boundary<1>          &,
-			       const unsigned int          ,
-			       FEFaceValues<1>            &,
-			       FESubfaceValues<1>         &,
-			       FaceIntegrals              &,
-			       const dVector              &) {
-  Assert (false, ExcInternalError());
-};
-
-
-
 template <int dim>
 void KellyErrorEstimator<dim>::
 integrate_over_irregular_face (const active_cell_iterator &cell,
@@ -474,5 +478,4 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 
 // explicit instantiations
 
-template class KellyErrorEstimator<1>;
-template class KellyErrorEstimator<2>;
+template class KellyErrorEstimator<deal_II_dimension>;

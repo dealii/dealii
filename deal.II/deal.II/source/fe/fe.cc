@@ -12,6 +12,7 @@
 
 /*------------------------------- FiniteElementData ----------------------*/
 
+#if deal_II_dimension == 1
 
 bool FiniteElementData<1>::operator== (const FiniteElementData<1> &f) const {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
@@ -19,7 +20,11 @@ bool FiniteElementData<1>::operator== (const FiniteElementData<1> &f) const {
 	  (total_dofs == f.total_dofs));
 };
 
+#endif
 
+
+
+#if deal_II_dimension == 2
 
 bool FiniteElementData<2>::operator== (const FiniteElementData<2> &f) const {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
@@ -28,14 +33,14 @@ bool FiniteElementData<2>::operator== (const FiniteElementData<2> &f) const {
 	  (total_dofs == f.total_dofs));
 };
 
-
+#endif
 
 
 
 /*------------------------------- FiniteElementBase ----------------------*/
 
 
-
+#if deal_II_dimension == 1
 
 template <>
 FiniteElementBase<1>::FiniteElementBase (const unsigned int dofs_per_vertex,
@@ -56,7 +61,10 @@ FiniteElementBase<1>::FiniteElementBase (const unsigned int dofs_per_vertex,
   interface_constraints(0,0)=1.;
 };
 
+#endif
 
+
+#if deal_II_dimension == 2
 
 template <>
 FiniteElementBase<2>::FiniteElementBase (const unsigned int dofs_per_vertex,
@@ -75,6 +83,8 @@ FiniteElementBase<2>::FiniteElementBase (const unsigned int dofs_per_vertex,
   interface_constraints.reinit (dofs_per_vertex+2*dofs_per_line,
 				2*dofs_per_vertex+dofs_per_line);
 };
+
+#endif
 
 
 
@@ -126,6 +136,8 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 // egcs wants this, but gcc2.8.1 produces an internal compiler error, so
 // we drop this declaration again for the time being
 
+#if deal_II_dimension == 1
+
 //template <>
 //void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &cell,
 //					  const Boundary<1> &,
@@ -170,20 +182,6 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 };
 
 
-template <int dim>
-void FiniteElement<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
-					 const vector<Point<dim> > &,
-					 vector<dFMatrix> &,
-					 const bool,
-					 vector<Point<dim> > &,
-					 const bool,
-					 vector<Point<dim> > &,
-					 const bool,
-					 const Boundary<dim> &) const {
-  Assert (false, ExcPureFunctionCalled());
-};
-
-
 
 template <>
 void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &,
@@ -202,6 +200,68 @@ void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &
 					    const bool,
 					    const Boundary<1>       &) const {
   Assert (false, ExcNotImplemented());
+};
+
+
+template <>
+void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
+					       const unsigned int       ,
+					       const unsigned int       ,
+					       const vector<Point<0> > &,
+					       const vector<Point<1> > &,
+					       vector<dFMatrix>        &,
+					       const bool               ,
+					       vector<Point<1> >       &,
+					       const bool               ,
+					       vector<double>          &,
+					       const bool               ,
+					       vector<Point<1> >       &,
+					       const bool,
+					       const Boundary<1>       &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &cell,
+					  const Boundary<1> &,
+					  vector<Point<1> > &ansatz_points) const {
+  Assert (ansatz_points.size() == total_dofs,
+	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
+				   // compute ansatz points. The first ones
+				   // belong to vertex one, the second ones
+				   // to vertex two, all following are
+				   // equally spaced along the line
+  unsigned int next = 0;
+				   // local mesh width
+  const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
+				   // first the dofs in the vertices
+  for (unsigned int vertex=0; vertex<2; vertex++) 
+    for (unsigned int i=0; i<dofs_per_vertex; ++i)
+      ansatz_points[next++] = cell->vertex(vertex);
+  
+				   // now dofs on line
+  for (unsigned int i=0; i<dofs_per_line; ++i) 
+    ansatz_points[next++] = cell->vertex(0) +
+			    Point<1>((i+1.0)/(total_dofs+1.0)*h);
+};
+
+#endif
+
+
+
+template <int dim>
+void FiniteElement<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
+					 const vector<Point<dim> > &,
+					 vector<dFMatrix> &,
+					 const bool,
+					 vector<Point<dim> > &,
+					 const bool,
+					 vector<Point<dim> > &,
+					 const bool,
+					 const Boundary<dim> &) const {
+  Assert (false, ExcPureFunctionCalled());
 };
 
 
@@ -253,26 +313,6 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 
 
 
-template <>
-void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
-					       const unsigned int       ,
-					       const unsigned int       ,
-					       const vector<Point<0> > &,
-					       const vector<Point<1> > &,
-					       vector<dFMatrix>        &,
-					       const bool               ,
-					       vector<Point<1> >       &,
-					       const bool               ,
-					       vector<double>          &,
-					       const bool               ,
-					       vector<Point<1> >       &,
-					       const bool,
-					       const Boundary<1>       &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-
 template <int dim>
 void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_iterator &cell,
 						 const unsigned int           face_no,
@@ -313,33 +353,6 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 
 
 
-
-template <>
-void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &cell,
-					  const Boundary<1> &,
-					  vector<Point<1> > &ansatz_points) const {
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
-				   // compute ansatz points. The first ones
-				   // belong to vertex one, the second ones
-				   // to vertex two, all following are
-				   // equally spaced along the line
-  unsigned int next = 0;
-				   // local mesh width
-  const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
-				   // first the dofs in the vertices
-  for (unsigned int vertex=0; vertex<2; vertex++) 
-    for (unsigned int i=0; i<dofs_per_vertex; ++i)
-      ansatz_points[next++] = cell->vertex(vertex);
-  
-				   // now dofs on line
-  for (unsigned int i=0; i<dofs_per_line; ++i) 
-    ansatz_points[next++] = cell->vertex(0) +
-			    Point<1>((i+1.0)/(total_dofs+1.0)*h);
-};
-
-
-
 template <int dim>
 void FiniteElement<dim>::get_ansatz_points (const DoFHandler<dim>::cell_iterator &,
 					    const Boundary<dim> &,
@@ -351,14 +364,8 @@ void FiniteElement<dim>::get_ansatz_points (const DoFHandler<dim>::cell_iterator
 
 /*------------------------------- Explicit Instantiations -------------*/
 
-template class FiniteElementData<1>;
-template class FiniteElementData<2>;
-
-template class FiniteElementBase<1>;
-template class FiniteElementBase<2>;
-
-template class FiniteElement<1>;
-template class FiniteElement<2>;
-
+template class FiniteElementData<deal_II_dimension>;
+template class FiniteElementBase<deal_II_dimension>;
+template class FiniteElement<deal_II_dimension>;
 
 

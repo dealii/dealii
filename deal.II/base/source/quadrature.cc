@@ -46,6 +46,7 @@ const vector<double> & Quadrature<dim>::get_weights () const {
 
 
 
+#if deal_II_dimension == 2
 
 template <>
 void QProjector<2>::project_to_face (const Quadrature<1> &quadrature,
@@ -147,9 +148,10 @@ void QProjector<2>::project_to_subface (const Quadrature<1> &quadrature,
       };
 };
 
+#endif
 
 
 
-// explicite instantiations
+// explicit instantiations; note: we need them all for all dimensions
 template class Quadrature<1>;
 template class Quadrature<2>;

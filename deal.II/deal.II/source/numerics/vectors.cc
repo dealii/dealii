@@ -71,6 +71,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 
 
 
+#if deal_II_dimension == 1
 
 template <>
 void VectorTools<1>::project (const DoFHandler<1>    &,
@@ -91,6 +92,8 @@ void VectorTools<1>::project (const DoFHandler<1>    &,
 				   // project_boundary_values function?
   Assert (false, ExcNotImplemented());
 };
+
+#endif
 
 
 
@@ -204,6 +207,8 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 
 
 
+#if deal_II_dimension == 1
+
 template <>
 void
 VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
@@ -214,6 +219,7 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
   Assert (false, ExcNotImplemented());
 };
 
+#endif
 
 
 
@@ -527,5 +533,4 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 };
 
 
-template VectorTools<1>;
-template VectorTools<2>;
+template VectorTools<deal_II_dimension>;

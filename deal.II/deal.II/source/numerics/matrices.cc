@@ -104,6 +104,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
 
 
+#if deal_II_dimension == 1
 
 template <>
 void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
@@ -117,6 +118,8 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 						    const Function<1>      *) {
   Assert (false, ExcNotImplemented());
 };
+
+#endif
 
 
 
@@ -713,12 +716,8 @@ void LaplaceMatrix<dim>::assemble (dVector             &rhs,
 
 
 
-template class MatrixCreator<1>;
-template class MatrixCreator<2>;
-template class MatrixTools<1>;
-template class MatrixTools<2>;
-template class MassMatrix<1>;
-template class MassMatrix<2>;
-template class LaplaceMatrix<1>;
-template class LaplaceMatrix<2>;
+template class MatrixCreator<deal_II_dimension>;
+template class MatrixTools<deal_II_dimension>;
+template class MassMatrix<deal_II_dimension>;
+template class LaplaceMatrix<deal_II_dimension>;
 

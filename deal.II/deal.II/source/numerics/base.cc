@@ -177,5 +177,4 @@ pair<char*,char*> ProblemBase<dim>::get_solution_name () const {
 
 
 // explicit instantiations
-template class ProblemBase<1>;
-template class ProblemBase<2>;
+template class ProblemBase<deal_II_dimension>;

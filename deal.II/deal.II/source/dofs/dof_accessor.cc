@@ -15,7 +15,7 @@
 /*------------------------- Functions: DoFLineAccessor -----------------------*/
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 int DoFLineAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -32,7 +32,7 @@ int DoFLineAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 void DoFLineAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 						    const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -49,7 +49,7 @@ void DoFLineAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 int DoFLineAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -66,7 +66,7 @@ int DoFLineAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 
 
   
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 void DoFLineAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
 							   const int index) const {
@@ -84,7 +84,7 @@ void DoFLineAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ve
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 void
 DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -105,7 +105,7 @@ DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 TriaIterator<dim,DoFLineAccessor<dim,BaseClass> >
 DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
   TriaIterator<dim,DoFLineAccessor<dim,BaseClass> > q (tria,
@@ -122,7 +122,7 @@ DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 void DoFLineAccessor<dim,BaseClass>::copy_from (const DoFLineAccessor<dim,BaseClass> &a) {
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
@@ -133,7 +133,7 @@ void DoFLineAccessor<dim,BaseClass>::copy_from (const DoFLineAccessor<dim,BaseCl
 /*------------------------- Functions: DoFQuadAccessor -----------------------*/
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 int DoFQuadAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -148,7 +148,7 @@ int DoFQuadAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 void DoFQuadAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 						    const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -164,7 +164,7 @@ void DoFQuadAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 int DoFQuadAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -181,7 +181,7 @@ int DoFQuadAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 
 
   
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 void DoFQuadAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
 							   const int index) const {
@@ -199,7 +199,7 @@ void DoFQuadAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ve
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 void
 DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -225,7 +225,7 @@ DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
 DoFQuadAccessor<dim,BaseClass>::line (const unsigned int i) const {
   Assert (i<4, ExcInvalidIndex (i, 0, 4));
@@ -241,7 +241,7 @@ DoFQuadAccessor<dim,BaseClass>::line (const unsigned int i) const {
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 TriaIterator<dim,DoFQuadAccessor<dim,BaseClass> >
 DoFQuadAccessor<dim,BaseClass>::child (const unsigned int i) const {
   TriaIterator<dim,DoFQuadAccessor<dim,BaseClass> > q (tria,
@@ -258,7 +258,7 @@ DoFQuadAccessor<dim,BaseClass>::child (const unsigned int i) const {
 
 
 
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 void DoFQuadAccessor<dim,BaseClass>::copy_from (const DoFQuadAccessor<dim,BaseClass> &a) {
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
@@ -303,20 +303,13 @@ DoFCellAccessor<dim>::child (const unsigned int i) const {
 
 
 
+#if deal_II_dimension == 1
 
 template <>
 DoFSubstructAccessor<1>::face_iterator
 DoFCellAccessor<1>::face (const unsigned int) const {
   Assert (false, ExcNotUsefulForThisDimension());
   return 0;
-};
-
-
-
-template <>
-DoFSubstructAccessor<2>::face_iterator
-DoFCellAccessor<2>::face (const unsigned int i) const {
-  return line(i);
 };
 
 
@@ -342,6 +335,17 @@ DoFCellAccessor<1>::get_dof_values (const dVector &values,
     *next_dof_value++ = values(dof_index(d));
 };
 
+#endif
+
+
+
+#if deal_II_dimension == 2
+
+template <>
+DoFSubstructAccessor<2>::face_iterator
+DoFCellAccessor<2>::face (const unsigned int i) const {
+  return line(i);
+};
 
 
 
@@ -370,7 +374,7 @@ DoFCellAccessor<2>::get_dof_values (const dVector &values,
     *next_dof_value++ = values(dof_index(d));
 };
 
-
+#endif
 
 
 
@@ -379,23 +383,27 @@ DoFCellAccessor<2>::get_dof_values (const dVector &values,
 
 
 // explicit instantiations
+#if deal_II_dimension == 1
 template class DoFLineAccessor<1,CellAccessor<1> >;
 template class DoFCellAccessor<1>;
 
+template class TriaRawIterator<1,DoFCellAccessor<1> >;
+template class TriaIterator<1,DoFCellAccessor<1> >;
+template class TriaActiveIterator<1,DoFCellAccessor<1> >;
+#endif
+
+#if deal_II_dimension == 2
 template class DoFLineAccessor<2,LineAccessor<2> >;
 template class DoFQuadAccessor<2,QuadAccessor<2> >;
 template class DoFQuadAccessor<2,CellAccessor<2> >;
 template class DoFCellAccessor<2>;
 
-template class TriaRawIterator<1,DoFCellAccessor<1> >;
 template class TriaRawIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
 template class TriaRawIterator<2,DoFCellAccessor<2> >;
-
-template class TriaIterator<1,DoFCellAccessor<1> >;
 template class TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
 template class TriaIterator<2,DoFCellAccessor<2> >;
-
-template class TriaActiveIterator<1,DoFCellAccessor<1> >;
 template class TriaActiveIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
 template class TriaActiveIterator<2,DoFCellAccessor<2> >;
+#endif
+
 

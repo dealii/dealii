@@ -4,6 +4,13 @@
 #include <cmath>
 
 
+// please note: for a given dimension, we need the quadrature formulae
+// for all lower dimensions as well. That is why in this file the check
+// is for deal_II_dimension >= any_number and not for ==
+
+
+
+#if deal_II_dimension >= 1
 
 template <>
 QGauss2<1>::QGauss2 () :
@@ -26,40 +33,6 @@ QGauss2<1>::QGauss2 () :
       weights[i] = wts[i];
     };
 };
-
-
-
-template <>
-QGauss2<2>::QGauss2 () :
-		Quadrature<2> (4)
-{
-				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(1./3.), sqrt(1./3.) };
-				   // weights on [-1,1]
-  static const double wts_normal[]  = { 1., 1. };
-
-				   // points and weights on [0,1]^2
-  static const double xpts[] = { (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.  };
-  static const double ypts[] = { (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.  };
-  static const double wts[]  = { wts_normal[0]/4.,
-				 wts_normal[1]/4.,
-				 wts_normal[0]/4.,
-				 wts_normal[1]/4.  };
-
-  for (unsigned int i=0; i<n_quadrature_points; ++i) 
-    {
-      quadrature_points[i] = Point<2>(xpts[i], ypts[i]);
-      weights[i] = wts[i];
-    };
-};
-
-
 
 
 
@@ -90,61 +63,6 @@ QGauss3<1>::QGauss3 () :
       weights[i] = wts[i];
     };
 };
-
-
-
-template <>
-QGauss3<2>::QGauss3 () :
-		Quadrature<2> (9)
-{
-				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(3./5.),
-					0.,
-					sqrt(3./5.) };
-				   // weights on [-1,1]
-  static const double wts_normal[]  = { 5./9.,
-					8./9.,
-					5./9. };
-
-				   // points and weights on [0,1]^2
-  static const double xpts[] = { (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.  };
-  static const double ypts[] = { (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[2]+1)/2.  };
-  static const double wts[]  = { wts_normal[0]/2.*wts_normal[0]/2.,
-				 wts_normal[1]/2.*wts_normal[0]/2.,
-				 wts_normal[2]/2.*wts_normal[0]/2.,
-				 wts_normal[0]/2.*wts_normal[1]/2.,
-				 wts_normal[1]/2.*wts_normal[1]/2.,
-				 wts_normal[2]/2.*wts_normal[1]/2.,
-				 wts_normal[0]/2.*wts_normal[2]/2.,
-				 wts_normal[1]/2.*wts_normal[2]/2.,
-				 wts_normal[2]/2.*wts_normal[2]/2. };
-  
-  for (unsigned int i=0; i<n_quadrature_points; ++i) 
-    {
-      quadrature_points[i] = Point<2>(xpts[i], ypts[i]);
-      weights[i] = wts[i];
-    };
-};
-
-
-
-
 
 
 template <>
@@ -182,81 +100,6 @@ QGauss4<1>::QGauss4 () :
 
 
 template <>
-QGauss4<2>::QGauss4 () :
-		Quadrature<2> (16)
-{
-				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(1./7.*(3-4*sqrt(0.3))),
-					-sqrt(1./7.*(3+4*sqrt(0.3))),
-					+sqrt(1./7.*(3-4*sqrt(0.3))),
-					+sqrt(1./7.*(3+4*sqrt(0.3))) };
-				   // weights on [-1,1]
-  static const double wts_normal[]  = { 1./2. + 1./12.*sqrt(10./3.),
-					1./2. - 1./12.*sqrt(10./3.),
-					1./2. + 1./12.*sqrt(10./3.),
-					1./2. - 1./12.*sqrt(10./3.) };
-
-				   // points and weights on [0,1]^2
-  static const double xpts[] = { (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-  				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-  				 (xpts_normal[3]+1)/2.  };
-  static const double ypts[] = { (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-  				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[3]+1)/2.};
-  static const double wts[]  = { wts_normal[0]/2.*wts_normal[0]/2.,
-				 wts_normal[1]/2.*wts_normal[0]/2.,
-				 wts_normal[2]/2.*wts_normal[0]/2.,
-				 wts_normal[3]/2.*wts_normal[0]/2.,
-				 wts_normal[0]/2.*wts_normal[1]/2.,
-				 wts_normal[1]/2.*wts_normal[1]/2.,
-				 wts_normal[2]/2.*wts_normal[1]/2.,
-				 wts_normal[3]/2.*wts_normal[1]/2.,
-				 wts_normal[0]/2.*wts_normal[2]/2.,
-				 wts_normal[1]/2.*wts_normal[2]/2.,
-				 wts_normal[2]/2.*wts_normal[2]/2.,
-  				 wts_normal[3]/2.*wts_normal[2]/2.,
-  				 wts_normal[0]/2.*wts_normal[3]/2.,
-				 wts_normal[1]/2.*wts_normal[3]/2.,
-				 wts_normal[2]/2.*wts_normal[3]/2.,
-  				 wts_normal[3]/2.*wts_normal[3]/2. };
-  
-  for (unsigned int i=0; i<n_quadrature_points; ++i) 
-    {
-      quadrature_points[i] = Point<2>(xpts[i], ypts[i]);
-      weights[i] = wts[i];
-    };
-};
-
-
-
-
-template <>
 QGauss5<1>::QGauss5 () :
 		Quadrature<1> (5)
 {
@@ -288,123 +131,6 @@ QGauss5<1>::QGauss5 () :
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
       quadrature_points[i] = Point<1>(xpts[i]);
-      weights[i] = wts[i];
-    };
-};
-
-
-
-template <>
-QGauss5<2>::QGauss5 () :
-		Quadrature<2> (25)
-{
-				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(1./9.*(5.-2*sqrt(10./7.))),
-					-sqrt(1./9.*(5.+2*sqrt(10./7.))),
-					0,
-					+sqrt(1./9.*(5.-2*sqrt(10./7.))),
-					+sqrt(1./9.*(5.+2*sqrt(10./7.))) };
-				   // weights on [-1,1]
-  static const double wts_normal[]  = { 0.3*(-0.7+5.*sqrt(0.7))/(-2.+5.*sqrt(0.7)),
-					0.3*(+0.7+5.*sqrt(0.7))/(+2.+5.*sqrt(0.7)),
-					128./225.,
-					0.3*(-0.7+5.*sqrt(0.7))/(-2.+5.*sqrt(0.7)),
-					0.3*(+0.7+5.*sqrt(0.7))/(+2.+5.*sqrt(0.7)) };
-
-				   // points and weights on [0,1]^2
-  static const double xpts[] = { (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[4]+1)/2.,
-				 
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[4]+1)/2.,
-				 
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-  				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[4]+1)/2.,
-				 
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-  				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[4]+1)/2.,
-				 
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-  				 (xpts_normal[3]+1)/2.,
-  				 (xpts_normal[4]+1)/2. };
-
-  static const double ypts[] = { (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 (xpts_normal[0]+1)/2.,
-				 
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 
-  				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 
-  				 (xpts_normal[4]+1)/2.,
-  				 (xpts_normal[4]+1)/2.,
-  				 (xpts_normal[4]+1)/2.,
-  				 (xpts_normal[4]+1)/2.,
-  				 (xpts_normal[4]+1)/2. };
-
-  static const double wts[]  = { wts_normal[0]/2.*wts_normal[0]/2.,
-				 wts_normal[1]/2.*wts_normal[0]/2.,
-				 wts_normal[2]/2.*wts_normal[0]/2.,
-				 wts_normal[3]/2.*wts_normal[0]/2.,
-				 wts_normal[4]/2.*wts_normal[0]/2.,
-				 
-				 wts_normal[0]/2.*wts_normal[1]/2.,
-				 wts_normal[1]/2.*wts_normal[1]/2.,
-				 wts_normal[2]/2.*wts_normal[1]/2.,
-				 wts_normal[3]/2.*wts_normal[1]/2.,
-				 wts_normal[4]/2.*wts_normal[1]/2.,
-				 
-				 wts_normal[0]/2.*wts_normal[2]/2.,
-				 wts_normal[1]/2.*wts_normal[2]/2.,
-				 wts_normal[2]/2.*wts_normal[2]/2.,
-  				 wts_normal[3]/2.*wts_normal[2]/2.,
-				 wts_normal[4]/2.*wts_normal[2]/2.,
-				 
-  				 wts_normal[0]/2.*wts_normal[3]/2.,
-				 wts_normal[1]/2.*wts_normal[3]/2.,
-				 wts_normal[2]/2.*wts_normal[3]/2.,
-  				 wts_normal[3]/2.*wts_normal[3]/2.,
-				 wts_normal[4]/2.*wts_normal[3]/2.,
-
-    				 wts_normal[0]/2.*wts_normal[4]/2.,
-				 wts_normal[1]/2.*wts_normal[4]/2.,
-				 wts_normal[2]/2.*wts_normal[4]/2.,
-  				 wts_normal[3]/2.*wts_normal[4]/2.,
-				 wts_normal[4]/2.*wts_normal[4]/2.  };
-  
-  for (unsigned int i=0; i<n_quadrature_points; ++i) 
-    {
-      quadrature_points[i] = Point<2>(xpts[i], ypts[i]);
       weights[i] = wts[i];
     };
 };
@@ -549,12 +275,6 @@ QGauss8<1>::QGauss8 () :
 
 
 
-
-
-
-
-
-
 template <>
 QMidpoint<1>::QMidpoint () :
 		Quadrature<1>(1)
@@ -562,17 +282,6 @@ QMidpoint<1>::QMidpoint () :
   quadrature_points[0] = Point<1>(0.5);
   weights[0] = 1.0;
 };
-
-
-
-template <>
-QMidpoint<2>::QMidpoint () :
-		Quadrature<2>(1)
-{
-  quadrature_points[0] = Point<2> (1./2., 1./2.);
-  weights[0] = 1.0;
-};
-
 
 
 
@@ -588,6 +297,310 @@ QSimpson<1>::QSimpson () :
       quadrature_points[i] = Point<1>(xpts[i]);
       weights[i] = wts[i];
     };
+};
+
+
+
+template <>
+QTrapez<1>::QTrapez () :
+		Quadrature<1> (2)
+{
+  static const double xpts[] = { 0.0, 1.0 };
+  static const double wts[]  = { 0.5, 0.5 };
+
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
+    {
+      quadrature_points[i] = Point<1>(xpts[i]);
+      weights[i] = wts[i];
+    };
+};
+
+#endif
+
+
+
+#if deal_II_dimension >= 2
+
+template <>
+QGauss2<2>::QGauss2 () :
+		Quadrature<2> (4)
+{
+				   // points on [-1,1]
+  static const double xpts_normal[] = { -sqrt(1./3.), sqrt(1./3.) };
+				   // weights on [-1,1]
+  static const double wts_normal[]  = { 1., 1. };
+
+				   // points and weights on [0,1]^2
+  static const double xpts[] = { (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.  };
+  static const double ypts[] = { (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.  };
+  static const double wts[]  = { wts_normal[0]/4.,
+				 wts_normal[1]/4.,
+				 wts_normal[0]/4.,
+				 wts_normal[1]/4.  };
+
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
+    {
+      quadrature_points[i] = Point<2>(xpts[i], ypts[i]);
+      weights[i] = wts[i];
+    };
+};
+
+
+
+template <>
+QGauss3<2>::QGauss3 () :
+		Quadrature<2> (9)
+{
+				   // points on [-1,1]
+  static const double xpts_normal[] = { -sqrt(3./5.),
+					0.,
+					sqrt(3./5.) };
+				   // weights on [-1,1]
+  static const double wts_normal[]  = { 5./9.,
+					8./9.,
+					5./9. };
+
+				   // points and weights on [0,1]^2
+  static const double xpts[] = { (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.  };
+  static const double ypts[] = { (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[2]+1)/2.  };
+  static const double wts[]  = { wts_normal[0]/2.*wts_normal[0]/2.,
+				 wts_normal[1]/2.*wts_normal[0]/2.,
+				 wts_normal[2]/2.*wts_normal[0]/2.,
+				 wts_normal[0]/2.*wts_normal[1]/2.,
+				 wts_normal[1]/2.*wts_normal[1]/2.,
+				 wts_normal[2]/2.*wts_normal[1]/2.,
+				 wts_normal[0]/2.*wts_normal[2]/2.,
+				 wts_normal[1]/2.*wts_normal[2]/2.,
+				 wts_normal[2]/2.*wts_normal[2]/2. };
+  
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
+    {
+      quadrature_points[i] = Point<2>(xpts[i], ypts[i]);
+      weights[i] = wts[i];
+    };
+};
+
+
+
+template <>
+QGauss4<2>::QGauss4 () :
+		Quadrature<2> (16)
+{
+				   // points on [-1,1]
+  static const double xpts_normal[] = { -sqrt(1./7.*(3-4*sqrt(0.3))),
+					-sqrt(1./7.*(3+4*sqrt(0.3))),
+					+sqrt(1./7.*(3-4*sqrt(0.3))),
+					+sqrt(1./7.*(3+4*sqrt(0.3))) };
+				   // weights on [-1,1]
+  static const double wts_normal[]  = { 1./2. + 1./12.*sqrt(10./3.),
+					1./2. - 1./12.*sqrt(10./3.),
+					1./2. + 1./12.*sqrt(10./3.),
+					1./2. - 1./12.*sqrt(10./3.) };
+
+				   // points and weights on [0,1]^2
+  static const double xpts[] = { (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+  				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+  				 (xpts_normal[3]+1)/2.  };
+  static const double ypts[] = { (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+  				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[3]+1)/2.};
+  static const double wts[]  = { wts_normal[0]/2.*wts_normal[0]/2.,
+				 wts_normal[1]/2.*wts_normal[0]/2.,
+				 wts_normal[2]/2.*wts_normal[0]/2.,
+				 wts_normal[3]/2.*wts_normal[0]/2.,
+				 wts_normal[0]/2.*wts_normal[1]/2.,
+				 wts_normal[1]/2.*wts_normal[1]/2.,
+				 wts_normal[2]/2.*wts_normal[1]/2.,
+				 wts_normal[3]/2.*wts_normal[1]/2.,
+				 wts_normal[0]/2.*wts_normal[2]/2.,
+				 wts_normal[1]/2.*wts_normal[2]/2.,
+				 wts_normal[2]/2.*wts_normal[2]/2.,
+  				 wts_normal[3]/2.*wts_normal[2]/2.,
+  				 wts_normal[0]/2.*wts_normal[3]/2.,
+				 wts_normal[1]/2.*wts_normal[3]/2.,
+				 wts_normal[2]/2.*wts_normal[3]/2.,
+  				 wts_normal[3]/2.*wts_normal[3]/2. };
+  
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
+    {
+      quadrature_points[i] = Point<2>(xpts[i], ypts[i]);
+      weights[i] = wts[i];
+    };
+};
+
+
+
+template <>
+QGauss5<2>::QGauss5 () :
+		Quadrature<2> (25)
+{
+				   // points on [-1,1]
+  static const double xpts_normal[] = { -sqrt(1./9.*(5.-2*sqrt(10./7.))),
+					-sqrt(1./9.*(5.+2*sqrt(10./7.))),
+					0,
+					+sqrt(1./9.*(5.-2*sqrt(10./7.))),
+					+sqrt(1./9.*(5.+2*sqrt(10./7.))) };
+				   // weights on [-1,1]
+  static const double wts_normal[]  = { 0.3*(-0.7+5.*sqrt(0.7))/(-2.+5.*sqrt(0.7)),
+					0.3*(+0.7+5.*sqrt(0.7))/(+2.+5.*sqrt(0.7)),
+					128./225.,
+					0.3*(-0.7+5.*sqrt(0.7))/(-2.+5.*sqrt(0.7)),
+					0.3*(+0.7+5.*sqrt(0.7))/(+2.+5.*sqrt(0.7)) };
+
+				   // points and weights on [0,1]^2
+  static const double xpts[] = { (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[4]+1)/2.,
+				 
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[4]+1)/2.,
+				 
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+  				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[4]+1)/2.,
+				 
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+  				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[4]+1)/2.,
+				 
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+  				 (xpts_normal[3]+1)/2.,
+  				 (xpts_normal[4]+1)/2. };
+
+  static const double ypts[] = { (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 (xpts_normal[0]+1)/2.,
+				 
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 (xpts_normal[1]+1)/2.,
+				 
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 (xpts_normal[2]+1)/2.,
+				 
+  				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 (xpts_normal[3]+1)/2.,
+				 
+  				 (xpts_normal[4]+1)/2.,
+  				 (xpts_normal[4]+1)/2.,
+  				 (xpts_normal[4]+1)/2.,
+  				 (xpts_normal[4]+1)/2.,
+  				 (xpts_normal[4]+1)/2. };
+
+  static const double wts[]  = { wts_normal[0]/2.*wts_normal[0]/2.,
+				 wts_normal[1]/2.*wts_normal[0]/2.,
+				 wts_normal[2]/2.*wts_normal[0]/2.,
+				 wts_normal[3]/2.*wts_normal[0]/2.,
+				 wts_normal[4]/2.*wts_normal[0]/2.,
+				 
+				 wts_normal[0]/2.*wts_normal[1]/2.,
+				 wts_normal[1]/2.*wts_normal[1]/2.,
+				 wts_normal[2]/2.*wts_normal[1]/2.,
+				 wts_normal[3]/2.*wts_normal[1]/2.,
+				 wts_normal[4]/2.*wts_normal[1]/2.,
+				 
+				 wts_normal[0]/2.*wts_normal[2]/2.,
+				 wts_normal[1]/2.*wts_normal[2]/2.,
+				 wts_normal[2]/2.*wts_normal[2]/2.,
+  				 wts_normal[3]/2.*wts_normal[2]/2.,
+				 wts_normal[4]/2.*wts_normal[2]/2.,
+				 
+  				 wts_normal[0]/2.*wts_normal[3]/2.,
+				 wts_normal[1]/2.*wts_normal[3]/2.,
+				 wts_normal[2]/2.*wts_normal[3]/2.,
+  				 wts_normal[3]/2.*wts_normal[3]/2.,
+				 wts_normal[4]/2.*wts_normal[3]/2.,
+
+    				 wts_normal[0]/2.*wts_normal[4]/2.,
+				 wts_normal[1]/2.*wts_normal[4]/2.,
+				 wts_normal[2]/2.*wts_normal[4]/2.,
+  				 wts_normal[3]/2.*wts_normal[4]/2.,
+				 wts_normal[4]/2.*wts_normal[4]/2.  };
+  
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
+    {
+      quadrature_points[i] = Point<2>(xpts[i], ypts[i]);
+      weights[i] = wts[i];
+    };
+};
+
+
+
+template <>
+QMidpoint<2>::QMidpoint () :
+		Quadrature<2>(1)
+{
+  quadrature_points[0] = Point<2> (1./2., 1./2.);
+  weights[0] = 1.0;
 };
 
 
@@ -615,25 +628,6 @@ QSimpson<2>::QSimpson () :
 
 
 
-
-
-
-template <>
-QTrapez<1>::QTrapez () :
-		Quadrature<1> (2)
-{
-  static const double xpts[] = { 0.0, 1.0 };
-  static const double wts[]  = { 0.5, 0.5 };
-
-  for (unsigned int i=0; i<n_quadrature_points; ++i) 
-    {
-      quadrature_points[i] = Point<1>(xpts[i]);
-      weights[i] = wts[i];
-    };
-};
-
-
-
 template <>
 QTrapez<2>::QTrapez () :
 		Quadrature<2> (4)
@@ -649,6 +643,4 @@ QTrapez<2>::QTrapez () :
     };
 };
 
-
-
-
+#endif

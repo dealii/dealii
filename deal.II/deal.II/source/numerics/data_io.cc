@@ -388,10 +388,14 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 
 
 
+#if deal_II_dimension == 1
+
 template <>
 unsigned int DataOut<1>::n_boundary_faces () const {
   return 0;
 };
+
+#endif
 
 
 
@@ -411,11 +415,15 @@ unsigned int DataOut<dim>::n_boundary_faces () const {
 
 
 
+
+#if deal_II_dimension == 1
+
 template <>
 void DataOut<1>::write_ucd_faces (ostream &, const unsigned int) const {
   return;
 };
 
+#endif
 
 
 template <int dim>
@@ -594,7 +602,6 @@ string DataOut<dim>::default_suffix (const OutputFormat output_format) {
 
 
 //explicite instantiations
-template class DataIn<1>;
-template class DataIn<2>;
-template class DataOut<1>;
-template class DataOut<2>;
+
+template class DataIn<deal_II_dimension>;
+template class DataOut<deal_II_dimension>;

@@ -69,10 +69,6 @@ IteratorState TriaAccessor<dim>::state () const {
 
 
 
-template class TriaAccessor<1>;
-template class TriaAccessor<2>;
-
-
 
 
 /*------------------------ Functions: LineAccessor ---------------------------*/
@@ -279,10 +275,6 @@ double LineAccessor<dim>::diameter () const {
 
 
 
-
-
-template class LineAccessor<1>;
-template class LineAccessor<2>;
 
 
 /*------------------------ Functions: QuadAccessor ---------------------------*/
@@ -519,14 +511,13 @@ double QuadAccessor<dim>::diameter () const {
 
 
 
-template class QuadAccessor<2>;
-
-
 
 
 
 /*------------------------ Functions: CellAccessor<1> -----------------------*/
 
+
+#if deal_II_dimension == 1
 
 template <>
 bool CellAccessor<1>::at_boundary () const {
@@ -561,10 +552,12 @@ CellAccessor<1>::face (const unsigned int) const {
   return 0;
 };
 
-
+#endif
 
 /*------------------------ Functions: CellAccessor<2> -----------------------*/
 
+
+#if deal_II_dimension == 2
 
 template <>
 bool CellAccessor<2>::at_boundary () const {
@@ -597,6 +590,8 @@ Triangulation<2>::face_iterator
 CellAccessor<2>::face (const unsigned int i) const {
   return line(i);
 };
+
+#endif
 
 
 /*------------------------ Functions: CellAccessor<dim> -----------------------*/
@@ -760,25 +755,25 @@ bool CellAccessor<dim>::active () const {
 
 
 // explicit instantiations
-template class CellAccessor<1>;
-template class CellAccessor<2>;
+template class TriaAccessor<deal_II_dimension>;
+template class LineAccessor<deal_II_dimension>;
+template class CellAccessor<deal_II_dimension>;
+template class TriaRawIterator<deal_II_dimension,LineAccessor<deal_II_dimension> >;
+template class TriaRawIterator<deal_II_dimension,CellAccessor<deal_II_dimension> >;
+template class TriaIterator<deal_II_dimension,LineAccessor<deal_II_dimension> >;
+template class TriaIterator<deal_II_dimension,CellAccessor<deal_II_dimension> >;
+template class TriaActiveIterator<deal_II_dimension,LineAccessor<deal_II_dimension> >;
+template class TriaActiveIterator<deal_II_dimension,CellAccessor<deal_II_dimension> >;
 
-template class TriaRawIterator<1,LineAccessor<1> >;
-template class TriaRawIterator<1,CellAccessor<1> >;
-template class TriaRawIterator<2,LineAccessor<2> >;
-template class TriaRawIterator<2,QuadAccessor<2> >;
-template class TriaRawIterator<2,CellAccessor<2> >;
+#if deal_II_dimension >= 2
+template class QuadAccessor<deal_II_dimension>;
+template class TriaRawIterator<deal_II_dimension,QuadAccessor<deal_II_dimension> >;
+template class TriaIterator<deal_II_dimension,QuadAccessor<deal_II_dimension> >;
+template class TriaActiveIterator<deal_II_dimension,QuadAccessor<deal_II_dimension> >;
+#endif
 
-template class TriaIterator<1,LineAccessor<1> >;
-template class TriaIterator<1,CellAccessor<1> >;
-template class TriaIterator<2,LineAccessor<2> >;
-template class TriaIterator<2,QuadAccessor<2> >;
-template class TriaIterator<2,CellAccessor<2> >;
 
-template class TriaActiveIterator<1,LineAccessor<1> >;
-template class TriaActiveIterator<1,CellAccessor<1> >;
-template class TriaActiveIterator<2,LineAccessor<2> >;
-template class TriaActiveIterator<2,QuadAccessor<2> >;
-template class TriaActiveIterator<2,CellAccessor<2> >;
+
+
 
 

@@ -158,20 +158,10 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 
 
 // explicit instantiations
-template class Equation<1>;
-template class Equation<2>;
+template class Equation<deal_II_dimension>;
+template class Assembler<deal_II_dimension>;
+template class AssemblerData<deal_II_dimension>;
 
-template class Assembler<1>;
-template class Assembler<2>;
-
-
-template class AssemblerData<1>;
-template class AssemblerData<2>;
-
-
-template class TriaRawIterator<1,Assembler<1> >;
-template class TriaIterator<1,Assembler<1> >;
-template class TriaActiveIterator<1,Assembler<1> >;
-template class TriaRawIterator<2,Assembler<2> >;
-template class TriaIterator<2,Assembler<2> >;
-template class TriaActiveIterator<2,Assembler<2> >;
+template class TriaRawIterator<deal_II_dimension,Assembler<deal_II_dimension> >;
+template class TriaIterator<deal_II_dimension,Assembler<deal_II_dimension> >;
+template class TriaActiveIterator<deal_II_dimension,Assembler<deal_II_dimension> >;

@@ -5,7 +5,7 @@
 
 
 
-
+#if deal_II_dimension == 1
 
 void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
@@ -24,7 +24,11 @@ void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
       };
 };
 
+#endif
 
+
+
+#if deal_II_dimension == 2
 
 void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
@@ -50,6 +54,8 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
       };
 };
 
+#endif
+
 
 
 template <int dim>
@@ -73,5 +79,4 @@ void PoissonEquation<dim>::assemble (dVector             &,
 
 
 
-template class PoissonEquation<1>;
 template class PoissonEquation<2>;
