@@ -195,7 +195,7 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
                    h    (n_tmp_vectors-1);
 
 
-  unsigned int dim;
+  unsigned int dim = 0;
 
   SolverControl::State iteration_state = SolverControl::iterate;
   
