@@ -215,7 +215,7 @@ build-test:
 	echo BUILDTESTNOTE=$(BUILDTESTNOTE)        | tee -a build-test-log
 	(./configure $(BUILDTESTFLAGS) 2>&1) > build-test-config
 	if test -f common/Make.global_options ; then \
-	   grep GXX-VERSION common/Make.global_options ; \
+	   grep GXX-VERSION-DETAILED common/Make.global_options ; \
 	   grep CC-VERSION common/Make.global_options ; \
 	   grep F77-VERSION common/Make.global_options ; \
 	   grep enable-multithreading common/Make.global_options ; \
