@@ -10,12 +10,12 @@
 #define __deal2__data_out_h
 
 
-#include <base/data_out_base.h>
 #include <base/smartpointer.h>
 #include <base/multithread_info.h>
+#include <base/data_out_base.h>
+#include <dofs/dof_handler.h>
 
 
-template <int dim> class DoFHandler;
 
 /**
  * This is an abstract class which provides the functionality to generate
@@ -409,7 +409,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * in the output routines of the base
 				      * classes.
 				      */
-    typename std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > patches;
+    typename std::vector<typename DataOutBase::Patch<patch_dim,patch_space_dim> > patches;
 
 				     /**
 				      * Function by which the base
