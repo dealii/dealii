@@ -18,6 +18,7 @@ help:
 	@echo "=  contrib: make additional libraries in contrib, if there are any   ="
 	@echo "=  all: base, lac, 1d, 2d and 3d, contrib                            ="
 	@echo "=  debug: baseg, lacg, 1dg, 2dg and 3dg, contrib                     ="
+	@echo "=  optimized: base, lac, 1d, 2d, and 3d optimized libraries only     ="
 	@echo "=  online-doc: generate the documentation in HTML format             ="
 	@echo "=  TODO: create a TODO file from TODO lines in the source files      ="
 	@echo "=  TAGS: create a TAGS file from include and source files            ="
@@ -92,6 +93,13 @@ debug: contrib
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
+
+optimized:
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libo
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libo
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
 contrib:
 	cd $D/contrib ; $(MAKE)

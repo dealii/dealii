@@ -25,7 +25,7 @@ documentation, etc</a>.
 <p>
 All entries are signed with the names of the author. Regular
 contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
-(Guido Kanschat), RH (Ralf Hartmann), BK (Benjamin Shelton Kirk).
+(Guido Kanschat), RH (Ralf Hartmann), BK (Benjamin S. Kirk).
 </p>
 
 
@@ -42,6 +42,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        individual subdirs.
        <br>
        (WB 2002/02/11)
+       </p>
+  <li> <p> 
+       Added: The top-level Makefile now supports "optimized" as a
+       target that builds only optimized versions of the <code>base</code>,
+       <code>lac</code>, <code>1d</code>, <code>2d</code>, and <code>3d</code>
+       libraries. 
+       <br>
+       (BK 2002/02/19)
        </p>
 </ol>
 
@@ -86,6 +94,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <br>
        (BK 2002/02/11)
        </p>
+
+  <li> <p>
+       Changed: The function <code class="class">MultithreadInfo</code>::
+       <code class="member">get_n_cpus</code> now reports the proper number
+       of CPUs when running on Silicon Graphics.
+       <br>
+       (BK 2002/02/19)
+       </p> 
 </ol>
 
 

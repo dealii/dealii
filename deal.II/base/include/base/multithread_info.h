@@ -94,9 +94,9 @@ class MultithreadInfo
 				     /**
 				      * Private function to determine
 				      * the number of CPUs.
-				      * Implementation for Linux and
-				      * Sun machines; if no detection
-				      * of the number of CPUs is
+				      * Implementation for Linux, OSF,
+				      * SGI, and Sun machines; if no
+				      * detection of the number of CPUs is
 				      * supported, or if detection
 				      * fails, this function returns
 				      * one.
