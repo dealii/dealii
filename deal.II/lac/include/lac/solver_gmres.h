@@ -28,6 +28,89 @@
 #include <cmath>
 
 
+namespace internal
+{
+				   /**
+				    * A namespace for a helper class
+				    * to the GMRES solver.
+				    */
+  namespace SolverGMRES
+  {
+				     /**
+				      * Class to hold temporary
+				      * vectors.  This class
+				      * automatically allocates a new
+				      * vector, once it is needed.
+				      *
+				      * A future version should also
+				      * be able to shift through
+				      * vectors automatically,
+				      * avoiding restart.
+				      */
+    
+    template <class VECTOR>
+    class TmpVectors
+    {
+      public:
+					 /**
+					  * Constructor. Prepares an
+					  * array of @p{VECTOR} of
+					  * length @p{max_size}.
+					  */
+	TmpVectors(const unsigned int    max_size,
+		   VectorMemory<VECTOR> &vmem);
+
+                                         /**
+					  * Delete all allocated vectors.
+					  */
+	~TmpVectors();
+
+					 /**
+					  * Get vector number
+					  * @p{i}. If this vector was
+					  * unused before, an error
+					  * occurs.
+					  */
+	VECTOR& operator[] (const unsigned int i) const;
+	
+					 /**
+					  * Get vector number
+					  * @p{i}. Allocate it if
+					  * necessary.
+					  *
+					  * If a vector must be
+					  * allocated, @p{temp} is
+					  * used to reinit it to the
+					  * proper dimensions.
+					  */
+	VECTOR& operator() (const unsigned int i,
+			    const VECTOR      &temp);
+	
+      private:
+					 /**
+					  * Pool were vectors are
+					  * obtained from.
+					  */
+	VectorMemory<VECTOR> &mem;
+        
+					 /**
+					  * Field for storing the
+					  * vectors.
+					  */
+	std::vector<VECTOR*> data;
+        
+					 /**
+					  * Offset of the first
+					  * vector. This is for later
+					  * when vector rotation will
+					  * be implemented.
+					  */
+	unsigned int offset;
+    };    
+  }
+}
+
+
 /**
  * Implementation of the Restarted Preconditioned Direct Generalized
  * Minimal Residual Method. The stopping criterion is the norm of the
@@ -199,77 +282,6 @@ class SolverGMRES : public Solver<VECTOR>
     FullMatrix<double> H1;
     
   private:
-				     /**
-				      * Class to hold temporary
-				      * vectors.  This class
-				      * automatically allocates a new
-				      * vector, once it is needed.
-				      *
-				      * A future version should also
-				      * be able to shift through
-				      * vectors automatically,
-				      * avoiding restart.
-				      */
-    
-    class TmpVectors
-    {
-      public:
-					 /**
-					  * Constructor. Prepares an
-					  * array of @p{VECTOR} of
-					  * length @p{max_size}.
-					  */
-	TmpVectors(const unsigned int    max_size,
-		   VectorMemory<VECTOR> &vmem);
-
-                                         /**
-					  * Delete all allocated vectors.
-					  */
-	~TmpVectors();
-
-					 /**
-					  * Get vector number
-					  * @p{i}. If this vector was
-					  * unused before, an error
-					  * occurs.
-					  */
-	VECTOR& operator[] (const unsigned int i) const;
-	
-					 /**
-					  * Get vector number
-					  * @p{i}. Allocate it if
-					  * necessary.
-					  *
-					  * If a vector must be
-					  * allocated, @p{temp} is
-					  * used to reinit it to the
-					  * proper dimensions.
-					  */
-	VECTOR& operator() (const unsigned int i,
-			    const VECTOR      &temp);
-	
-      private:
-					 /**
-					  * Pool were vectors are
-					  * obtained from.
-					  */
-	VectorMemory<VECTOR> &mem;
-        
-					 /**
-					  * Field for storing the
-					  * vectors.
-					  */
-	std::vector<VECTOR*> data;
-        
-					 /**
-					  * Offset of the first
-					  * vector. This is for later
-					  * when vector rotation will
-					  * be implemented.
-					  */
-	unsigned int offset;
-    };
-
     				     /**
 				      * No copy constructor.
 				      */
@@ -279,54 +291,61 @@ class SolverGMRES : public Solver<VECTOR>
 
 /* --------------------- Inline and template functions ------------------- */
 
-template <class VECTOR>
-inline
-SolverGMRES<VECTOR>::TmpVectors::
-TmpVectors (const unsigned int    max_size,
-            VectorMemory<VECTOR> &vmem)
-		:
-		mem(vmem),
-		data (max_size, 0),
-		offset(0)
-{}
 
-
-template <class VECTOR>
-inline
-SolverGMRES<VECTOR>::TmpVectors::~TmpVectors ()
+namespace internal
 {
-  for (typename std::vector<VECTOR*>::iterator v = data.begin();
-       v != data.end(); ++v)
-    if (*v != 0)
-      mem.free(*v);
-}
+  namespace SolverGMRES
+  {
+    template <class VECTOR>
+    inline
+    TmpVectors<VECTOR>::
+    TmpVectors (const unsigned int    max_size,
+		VectorMemory<VECTOR> &vmem)
+		    :
+		    mem(vmem),
+		    data (max_size, 0),
+		    offset(0)
+    {}
 
 
-template <class VECTOR>
-inline VECTOR&
-SolverGMRES<VECTOR>::TmpVectors::operator[] (const unsigned int i) const
-{
-  Assert (i+offset<data.size(),
-	  ExcIndexRange(i, -offset, data.size()-offset));
-  
-  Assert (data[i-offset] != 0, ExcNotInitialized());
-  return *data[i-offset];
-}
-
-
-template <class VECTOR>
-inline VECTOR&
-SolverGMRES<VECTOR>::TmpVectors::operator() (const unsigned int i,
-					     const VECTOR      &temp)
-{
-  Assert (i+offset<data.size(),
-	  ExcIndexRange(i,-offset, data.size()-offset));
-  if (data[i-offset] == 0)
+    template <class VECTOR>
+    inline
+    TmpVectors<VECTOR>::~TmpVectors ()
     {
-      data[i-offset] = mem.alloc();
-      data[i-offset]->reinit(temp);
+      for (typename std::vector<VECTOR*>::iterator v = data.begin();
+	   v != data.end(); ++v)
+	if (*v != 0)
+	  mem.free(*v);
     }
-  return *data[i-offset];
+
+
+    template <class VECTOR>
+    inline VECTOR&
+    TmpVectors<VECTOR>::operator[] (const unsigned int i) const
+    {
+      Assert (i+offset<data.size(),
+	      ExcIndexRange(i, -offset, data.size()-offset));
+  
+      Assert (data[i-offset] != 0, ExcNotInitialized());
+      return *data[i-offset];
+    }
+
+
+    template <class VECTOR>
+    inline VECTOR&
+    TmpVectors<VECTOR>::operator() (const unsigned int i,
+				    const VECTOR      &temp)
+    {
+      Assert (i+offset<data.size(),
+	      ExcIndexRange(i,-offset, data.size()-offset));
+      if (data[i-offset] == 0)
+	{
+	  data[i-offset] = mem.alloc();
+	  data[i-offset]->reinit(temp);
+	}
+      return *data[i-offset];
+    }
+  }
 }
 
 
@@ -389,7 +408,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
 				   // Generate an object where basis
 				   // vectors are stored.
-  TmpVectors tmp_vectors (n_tmp_vectors, this->memory);
+  internals::SolverGMRES::TmpVectors<VECTOR> tmp_vectors (n_tmp_vectors, this->memory);
   
 				   // number of the present iteration; this
 				   // number is not reset to zero upon a
