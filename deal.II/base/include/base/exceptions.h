@@ -926,7 +926,18 @@ namespace StandardExceptions
   DeclException3 (ExcIndexRange, int, int, int,
 		  << "Index " << arg1 << " is not in ["
 		  << arg2 << "," << arg3 << "[");
-  
+
+				   /**
+				    * This exception indicates that
+				    * the first argument should be an
+				    * integer multiple of the second,
+				    * but is not.
+				    */
+  DeclException2 (ExcNotMultiple, int, int,
+		  << "Division " << arg1
+		  << " by " << arg2
+		  << " has remainder different from zero");
+		  
 				   /**
 				    * This exception is thrown if the
 				    * iterator you incremented or
