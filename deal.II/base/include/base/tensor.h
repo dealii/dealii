@@ -402,12 +402,10 @@ Tensor<rank_,dim>::memory_consumption ()
  * Output operator for tensors. Print the elements consecutively, with
  * a space in between, two spaces between rank 1 subtensors, three
  * between rank 2 and so on.
- *
- * @relates Tensor
  */
-template <class STREAM, int rank_, int dim>
+template <int rank_, int dim>
 inline
-STREAM & operator << (STREAM &out, const Tensor<rank_,dim> &p)
+std::ostream & operator << (std::ostream &out, const Tensor<rank_,dim> &p)
 {
   for (unsigned int i=0; i<dim-1; ++i)
     out << p[i] << ' ';
