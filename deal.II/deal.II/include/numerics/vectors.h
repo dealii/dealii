@@ -174,7 +174,7 @@ class ConstraintMatrix;
  *
  *   Usually, all other boundary conditions, such as inhomogeneous Neumann values
  *   or mixed boundary conditions are handled in the weak formulation. No attempt
- *   is made to include these into the process of assemblage therefore.
+ *   is made to include these into the process of matrix and vector assembly therefore.
  *
  *   Within this function, boundary values are interpolated, i.e. a node is given
  *   the point value of the boundary function. In some cases, it may be necessary
@@ -584,11 +584,11 @@ class VectorTools
 				      * boundary. If the
 				      * @p{boundary_values} contained
 				      * values before, the new ones
-				      * are added, or the old one
+				      * are added, or the old ones
 				      * overwritten if a node of the
-				      * boundary part to be projected
-				      * on already was in the
-				      * variable.
+				      * boundary part to be used
+				      * was already in the
+				      * map of boundary values.
 				      *
 				      * The parameter
 				      * @p{boundary_component}
@@ -612,7 +612,11 @@ class VectorTools
 				      * number of entries equals the
 				      * number of components in the
 				      * boundary functions and the
-				      * finite element.
+				      * finite element, and those
+				      * components in the given
+				      * boundary function will be used
+				      * for which the respective flag
+				      * was set in the component mask.
 				      *
 				      * It is assumed that the number
 				      * of components of the function
