@@ -19,6 +19,10 @@
 
 #include <cstdio>
 
+/*! @addtogroup Vectors
+ *@{
+ */
+
 
 /**
  * Numerical vector of data.  For this class there are different types
@@ -580,6 +584,7 @@ class Vector
     template <typename Number2> friend class Vector;    
 };
 
+/*@}*/
 /*----------------------- Inline functions ----------------------------------*/
 
 
@@ -773,6 +778,9 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
   return *this;
 }
 
+/*! @addtogroup Vectors
+ *@{
+ */
 
 
 /**
@@ -789,6 +797,6 @@ void swap (Vector<Number> &u, Vector<Number> &v)
   u.swap (v);
 }
 
-
+/*@}*/
 
 #endif

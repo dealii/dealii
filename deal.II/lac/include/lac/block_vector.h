@@ -27,6 +27,9 @@
 template <typename Number>
 class BlockVector;
 
+/*! @addtogroup Vectors
+ *@{
+ */
 
 namespace internal
 {
@@ -1238,6 +1241,8 @@ class BlockVector
     template <typename Number2> friend class BlockVector;
 };
 
+/*@}*/
+
 /*----------------------- Inline functions ----------------------------------*/
 
 
@@ -1842,6 +1847,10 @@ namespace internal
 } //namespace internal
 
 
+/*! @addtogroup Vectors
+ *@{
+ */
+
 /**
  * Global function @p{swap} which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
@@ -1858,6 +1867,6 @@ void swap (BlockVector<Number> &u,
 }
 
 
-
+/*@}*/
 
 #endif

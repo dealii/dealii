@@ -22,7 +22,10 @@
 
 #include <vector>
 
+/*!@addtogroup VMemory */
+/*@{*/
 
+//! Base class for vector memory management
 /**
  * Memory management base class for vectors. This is an abstract base
  * class used by all iterative methods to allocate space for
@@ -37,7 +40,7 @@
  *
  * @author Guido Kanschat, 1998-2003
 */
-template<class Vector = ::Vector<double> >
+template<class VECTOR = ::Vector<double> >
 class VectorMemory : public Subscriptor
 {
   public:
@@ -52,13 +55,13 @@ class VectorMemory : public Subscriptor
 				     /**
 				      * Return new vector from the pool.
 				      */
-    virtual Vector* alloc() = 0;
+    virtual VECTOR* alloc() = 0;
     
 				     /**
 				      * Return a vector into the pool
 				      * for later use.
 				      */
-    virtual void free (const Vector * const) = 0;
+    virtual void free (const VECTOR * const) = 0;
 				     /**
 				      * No more available vectors.
 				      */
@@ -70,15 +73,15 @@ class VectorMemory : public Subscriptor
     DeclException0(ExcNotAllocatedHere);
 };
 
-
+//! Sample implementation using system memory management.
 /**
  * Simple memory management.  This memory class is just made for
  * tests. It just allocates and deletes
  * vectors as needed from the global heap, i.e. performs no
  * specially adapted actions to the purpose of this class.
  */
-template<class Vector = ::Vector<double> >
-class PrimitiveVectorMemory : public VectorMemory<Vector>
+template<class VECTOR = ::Vector<double> >
+class PrimitiveVectorMemory : public VectorMemory<VECTOR>
 {
   public:
 				     /**
@@ -90,21 +93,21 @@ class PrimitiveVectorMemory : public VectorMemory<Vector>
 				      * Allocate a vector
 				      * from the global heap.
 				      */
-    virtual Vector* alloc()
+    virtual VECTOR* alloc()
       {
-	return new Vector();
+	return new VECTOR();
       }
     
 				     /**
 				      * Return a vector to the global heap.
 				      */
-    virtual void free (const Vector * const v)
+    virtual void free (const VECTOR * const v)
       {
 	delete v;
       }
 };
 
-
+//! Keeps all vectors and avoids reallocation.
 /**
  * Memory keeping allocated vectors.  This @p{VectorMemory} is able to
  * grow infinitely (according to computer memory).  A vector once
@@ -113,8 +116,8 @@ class PrimitiveVectorMemory : public VectorMemory<Vector>
  * 
  * @author Guido Kanschat, 1999
  */
-template<class Vector = ::Vector<double> >
-class GrowingVectorMemory : public VectorMemory<Vector>
+template<class VECTOR = ::Vector<double> >
+class GrowingVectorMemory : public VectorMemory<VECTOR>
 {
   public:
 				     /**
@@ -141,13 +144,13 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				     /**
 				      * Return new vector from the pool.
 				      */
-    virtual Vector* alloc();
+    virtual VECTOR* alloc();
     
 				     /**
 				      * Return a vector into the pool
 				      * for later use.
 				      */
-    virtual void free (const Vector * const);
+    virtual void free (const VECTOR * const);
 
   private:
 				     /**
@@ -157,7 +160,7 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * vector is used, second the
 				      * vector itself.
 				      */
-    typedef std::pair<bool, Vector*> entry_type;
+    typedef std::pair<bool, VECTOR*> entry_type;
 
 				     /**
 				      * Array of allocated vectors.
@@ -177,11 +180,13 @@ class GrowingVectorMemory : public VectorMemory<Vector>
     Threads::ThreadMutex mutex;
 };
 
+/*@}*/
+
 /* --------------------- inline functions ---------------------- */
 
 
-template <typename Vector>
-GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size)
+template <typename VECTOR>
+GrowingVectorMemory<VECTOR>::GrowingVectorMemory(const unsigned int initial_size)
 		: pool(initial_size)
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
@@ -190,7 +195,7 @@ GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size
        ++i)
     {
       i->first = false;
-      i->second = new Vector;
+      i->second = new VECTOR;
     };
 
 				   // no vectors yet claimed
@@ -199,8 +204,8 @@ GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size
 
 
 
-template<typename Vector>
-GrowingVectorMemory<Vector>::~GrowingVectorMemory()
+template<typename VECTOR>
+GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
 
@@ -230,9 +235,9 @@ GrowingVectorMemory<Vector>::~GrowingVectorMemory()
 
 
 
-template<typename Vector>
-Vector *
-GrowingVectorMemory<Vector>::alloc()
+template<typename VECTOR>
+VECTOR *
+GrowingVectorMemory<VECTOR>::alloc()
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
   ++n_alloc;
@@ -247,7 +252,7 @@ GrowingVectorMemory<Vector>::alloc()
 	}
     }
   
-  const entry_type t (true, new Vector);
+  const entry_type t (true, new VECTOR);
   pool.push_back(t);
   
   return t.second;
@@ -255,9 +260,9 @@ GrowingVectorMemory<Vector>::alloc()
 
 
 
-template<typename Vector>
+template<typename VECTOR>
 void
-GrowingVectorMemory<Vector>::free(const Vector* const v)
+GrowingVectorMemory<VECTOR>::free(const VECTOR* const v)
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
   for (typename std::vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
@@ -268,7 +273,7 @@ GrowingVectorMemory<Vector>::free(const Vector* const v)
 	  return;
 	}
     }
-  Assert(false, typename VectorMemory<Vector>::ExcNotAllocatedHere());
+  Assert(false, typename VectorMemory<VECTOR>::ExcNotAllocatedHere());
 }
 
 
