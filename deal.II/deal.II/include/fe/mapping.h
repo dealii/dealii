@@ -238,7 +238,7 @@ class Mapping : public Subscriptor
 				      *
 				      * The list of arguments is as follows:
 				      * we transform as many elements in the
-				      * @p input field, starting from @offset,
+				      * @p input field, starting from @p offset,
 				      * as there are elements in @p
 				      * output. The @p input array may hold
 				      * more elements than are needed (some
@@ -285,7 +285,7 @@ class Mapping : public Subscriptor
 				      * 
 				      * The list of arguments is as follows:
 				      * we transform as many elements in the
-				      * @p input field, starting from @offset,
+				      * @p input field, starting from @p offset,
 				      * as there are elements in @p
 				      * output. The @p input array may hold
 				      * more elements than are needed (some
