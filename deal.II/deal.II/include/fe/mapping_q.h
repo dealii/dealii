@@ -27,13 +27,11 @@ class LagrangeEquidistant;
 //      see upcoming paper.
 
 
+//TODO: more docs
 /**
- * Mapping class that uses Qp-mappings on boundary AND on inner
- * cells. The mapping shape functions make use of tensor product
- * polynomials with equidistant support points.
- *
- * Make sure elsewhere (e.g. in FEValues) that on inner cells only Q1
- * mappings are used.
+ * Mapping class that uses Qp-mappings on boundary cells. The mapping
+ * shape functions make use of tensor product polynomials with
+ * equidistant (on the unit cell) support points.
  *  
  * @author Ralf Hartmann, Guido Kanschat 2000, 2001
  */
@@ -180,13 +178,13 @@ class MappingQ : public MappingQ1<dim>
     };
 
 				     /**
-				      * For @p{dim=2,3}. Append
-				      * (appends) the support points
-				      * of all shape functions located
-				      * on bounding lines to the
-				      * vector @p{a}. Points located
-				      * on the line but on vertices
-				      * are not included.
+				      * For @p{dim=2,3}. Append the
+				      * support points of all shape
+				      * functions located on bounding
+				      * lines to the vector
+				      * @p{a}. Points located on the
+				      * line but on vertices are not
+				      * included.
 				      *
 				      * Needed by the
 				      * @p{compute_support_points_simple(laplace)}
@@ -203,8 +201,8 @@ class MappingQ : public MappingQ1<dim>
 				      * on the boundary.
 				      */
     virtual void
-    add_line_support_points (const Triangulation<dim>::cell_iterator &cell,
-			     std::vector<Point<dim> > &a) const;
+    add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
+			     typename std::vector<Point<dim> > &a) const;
 
 				     /**
 				      * For @p{dim=3}. Append the
@@ -231,7 +229,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     virtual void
     add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
-			    std::vector<Point<dim> > &a) const;
+			    typename std::vector<Point<dim> > &a) const;
     
   private:
     
