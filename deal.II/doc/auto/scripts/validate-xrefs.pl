@@ -15,7 +15,7 @@ foreach $filename (@ARGV) {
     print "File: $filename\n" if $debug;
     while (<IN>) {
         # first find all hrefs
-        while ( /href=\"?(.*?)[\s\"]/gi ) {
+        while ( /<\s*a\s+href=\"?(.*?)[\s\"]/gi ) {
 	    # then decide whether they are relevant for 
             # our purpose
 	    $link = $1;
