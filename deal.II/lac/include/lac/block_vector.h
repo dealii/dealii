@@ -19,22 +19,21 @@
  *
  * @author Guido Kanschat, 1999
  */
-
 template <int n_blocks, typename Number>
 class BlockVector
 {
- public:
+  public:
 				     /**
 				      *  Dummy-Constructor. Dimension=0
 				      */
-  BlockVector ();
+    BlockVector ();
     
-  /**
+				     /**
 				      * Copy-Constructor. Dimension set to
 				      * that of V, all components are copied
 				      * from V
 				      */
-  BlockVector (const BlockVector<n_blocks, Number>& V);
+    BlockVector (const BlockVector<n_blocks, Number>& V);
 
 
 // note: I disabled this function for the time being, since egcs1.1.2
@@ -58,12 +57,12 @@ class BlockVector
 				      * Constructor. Set dimension to #n# and
 				      * initialize all elements with zero.
 				      */
-  BlockVector (const vector<unsigned int>& n);
+    BlockVector (const vector<unsigned int>& n);
 
                                      /**
 				      * Destructor. Clears memory
 				      */
-  ~BlockVector ();
+    ~BlockVector ();
 
 				     /**
 				      * Access to a single block.
@@ -82,61 +81,61 @@ class BlockVector
 				      * the size of the vector, unlike the
 				      * STL's #vector<>::clear# function.
 				      */
-  void clear ();
+    void clear ();
     
 				     /**
 				      * $U(0-N) = s$: fill all components.
 				      */
-  BlockVector<n_blocks, Number> & operator= (const Number s);
+    BlockVector<n_blocks, Number> & operator= (const Number s);
     
 				     /**
 				      *  $U = V$: copy all components.
 				      */
-  BlockVector<n_blocks, Number> &
+    BlockVector<n_blocks, Number> &
     operator= (const BlockVector<n_blocks, Number>& V);
 
 				     /**
 				      * $U = V$ for different types.
 				      */
-  template<typename Number2>
+    template<typename Number2>
     BlockVector<n_blocks, Number> &
-      operator= (const BlockVector<n_blocks, Number2>& V);
+    operator= (const BlockVector<n_blocks, Number2>& V);
     
 				     /**
 				      * $U = U * V$: scalar product.
 				      */
-  Number operator* (const BlockVector<n_blocks, Number>& V) const;
+    Number operator* (const BlockVector<n_blocks, Number>& V) const;
 
 				     /**
 				      * Return square of the $l_2$-norm.
 				      */
-  Number norm_sqr () const;
+    Number norm_sqr () const;
 
 				     /**
 				      * Return the mean value of the elements of
 				      * this vector.
 				      */
-  Number mean_value () const;
+    Number mean_value () const;
 
 				     /**
 				      * Return the $l_1$-norm of the vector, i.e.
 				      * the sum of the absolute values.
 				      */
-  Number l1_norm () const;
+    Number l1_norm () const;
 
 				     /**
 				      * Return the $l_2$-norm of the vector, i.e.
 				      * the square root of the sum of the
 				      * squares of the elements.
 				      */
-  Number l2_norm () const;
+    Number l2_norm () const;
 
 				     /**
 				      * Return the maximum absolute value of the
 				      * elements of this vector, which is the
 				      * $l_\infty$-norm of a vector.
 				      */
-  Number linfty_norm () const;
+    Number linfty_norm () const;
     
     
 				     /**
@@ -156,8 +155,8 @@ class BlockVector
 				      * On #fast==false#, the vector is filled by
 				      * zeros.
 				      */ 
-  void reinit (const vector<unsigned int>& N,
-	       const bool         fast=false);
+    void reinit (const vector<unsigned int>& N,
+		 const bool         fast=false);
     
 				     /**
 				      * Change the dimension to that of the
@@ -168,14 +167,14 @@ class BlockVector
 				      * this function is the same as calling
 				      * #reinit (V.size(), fast)#.
 				      */
-  void reinit (const BlockVector<n_blocks, Number> &V,
-	       const bool            fast=false);
+    void reinit (const BlockVector<n_blocks, Number> &V,
+		 const bool            fast=false);
     
   				     /**
   				      * Return dimension of the vector. This is the
 				      * sum of the dimensions of all components.
   				      */
-      unsigned int size () const;
+    unsigned int size () const;
 
 				     /**
 				      * Return whether the vector contains only
@@ -185,7 +184,7 @@ class BlockVector
 				      * not in debug mode since it uses quite
 				      * some time.
 				      */
-  bool all_zero () const;
+    bool all_zero () const;
 
 // See above.    
 //  				     /**
@@ -224,13 +223,13 @@ class BlockVector
 				     /**
 				      * Access components, returns U(i).
 				      */
-  Number operator() (const unsigned int i) const;
+    Number operator() (const unsigned int i) const;
     
 				     /**
 				      * Access components, returns U(i)
 				      * as a writeable reference.
 				      */
-  Number& operator() (const unsigned int i);
+    Number& operator() (const unsigned int i);
 				     //@}
     
     
@@ -242,7 +241,7 @@ class BlockVector
 				      * Addition operator.
 				      * Fast equivalent to #U.add(1, V)#.
 				      */
-  BlockVector<n_blocks, Number> &
+    BlockVector<n_blocks, Number> &
     operator += (const BlockVector<n_blocks, Number> &V);
 
     				     /**
@@ -250,63 +249,63 @@ class BlockVector
 				      * Fast equivalent to #U.add(-1, V)#.
 				      */
     BlockVector<n_blocks, Number> &
-      operator -= (const BlockVector<n_blocks, Number> &V);
+    operator -= (const BlockVector<n_blocks, Number> &V);
 
 				     /**
 				      * $U(0-DIM)+=s$.
 				      * Addition of #s# to all components. Note
 				      * that #s# is a scalar and not a vector.
 				      */
-  void add (const Number s);
+    void add (const Number s);
     
 				     /**
 				      * U+=V.
 				      * Simple vector addition, equal to the
 				      * #operator +=#.
 				      */
-  void add (const BlockVector<n_blocks, Number>& V);
+    void add (const BlockVector<n_blocks, Number>& V);
     
 				     /**
 				      * U+=a*V.
 				      * Simple addition of a scaled vector.
 				      */
-  void add (const Number a, const BlockVector<n_blocks, Number>& V);
+    void add (const Number a, const BlockVector<n_blocks, Number>& V);
     
 				     /**
 				      * U+=a*V+b*W.
 				      * Multiple addition of scaled vectors.
 				      */
-  void add (const Number a, const BlockVector<n_blocks, Number>& V,
-	    const Number b, const BlockVector<n_blocks, Number>& W);
+    void add (const Number a, const BlockVector<n_blocks, Number>& V,
+	      const Number b, const BlockVector<n_blocks, Number>& W);
     
 				     /**
 				      * U=s*U+V.
 				      * Scaling and simple vector addition.
 				      */
-  void sadd (const Number s, const BlockVector<n_blocks, Number>& V);
+    void sadd (const Number s, const BlockVector<n_blocks, Number>& V);
     
 				     /**
 				      * U=s*U+a*V.
 				      * Scaling and simple addition.
 				      */
-  void sadd (const Number s, const Number a, const BlockVector<n_blocks, Number>& V);
+    void sadd (const Number s, const Number a, const BlockVector<n_blocks, Number>& V);
     
 				     /**
 				      * U=s*U+a*V+b*W.
 				      * Scaling and multiple addition.
 				      */
-  void sadd (const Number s, const Number a,
-	     const BlockVector<n_blocks, Number>& V,
-	     const Number b, const BlockVector<n_blocks, Number>& W);
+    void sadd (const Number s, const Number a,
+	       const BlockVector<n_blocks, Number>& V,
+	       const Number b, const BlockVector<n_blocks, Number>& W);
     
 				     /**
 				      * U=s*U+a*V+b*W+c*X.
 				      * Scaling and multiple addition.
 				      */
-  void sadd (const Number s, const Number a,
-	     const BlockVector<n_blocks, Number>& V,
-	     const Number b, const BlockVector<n_blocks, Number>& W, 
-	     const Number c, const BlockVector<n_blocks, Number>& X);
+    void sadd (const Number s, const Number a,
+	       const BlockVector<n_blocks, Number>& V,
+	       const Number b, const BlockVector<n_blocks, Number>& W, 
+	       const Number c, const BlockVector<n_blocks, Number>& X);
     
 				     /**
 				      * Scale each element of the vector by the
@@ -315,19 +314,19 @@ class BlockVector
 				      * in my eyes is an extremely unintuitive
 				      * naming and was thus replaced.
 				      */
-  void scale (const Number factor);
+    void scale (const Number factor);
     
 				     /**
 				      *  U=a*V. Replacing.
 				      */
-  void equ (const Number a, const BlockVector<n_blocks, Number>& V);
+    void equ (const Number a, const BlockVector<n_blocks, Number>& V);
     
 				     /**
 				      * U=a*V+b*W.
 				      * Replacing by sum.
 				      */
-  void equ (const Number a, const BlockVector<n_blocks, Number>& V,
-	    const Number b, const BlockVector<n_blocks, Number>& W);
+    void equ (const Number a, const BlockVector<n_blocks, Number>& V,
+	      const Number b, const BlockVector<n_blocks, Number>& W);
 
 				     //@}
     
@@ -339,20 +338,20 @@ class BlockVector
 				     /**
 				      *  Output of vector in user-defined format.
 				      */
-  void print (FILE* fp, const char* format = 0) const;
+    void print (FILE* fp, const char* format = 0) const;
     
 				     /**
 				      *  Output of vector in user-defined format.
 				      */
-  void print (const char* format = 0) const;
+    void print (const char* format = 0) const;
 
 				     /**
 				      * Print to a stream.
 				      * 
 				      */
-  void print (ostream &, unsigned int precision = 3,
-	      bool scientific = true,
-	      bool across = true) const;
+    void print (ostream &, unsigned int precision = 3,
+		bool scientific = true,
+		bool across = true) const;
 
 				     /**
 				      * Write the vector en bloc to a file. This
@@ -362,7 +361,7 @@ class BlockVector
 				      * a different operating system of number
 				      * format.
 				      */
-  void block_write (ostream &out) const;
+    void block_write (ostream &out) const;
 
 				     /**
 				      * Read a vector en block from a file. This
@@ -379,54 +378,54 @@ class BlockVector
 				      * data as a vector stored bitwise to a
 				      * file, but not more.
 				      */
-  void block_read (istream &in);
+    void block_read (istream &in);
 				     //@}
 
 				     /**
 				      * Exception
 				      */
-  DeclException2 (ExcDimensionsDontMatch,
-		  int, int,
-		  << "The dimensions " << arg1 << " and " << arg2
-		  << " do not match here.");
+    DeclException2 (ExcDimensionsDontMatch,
+		    int, int,
+		    << "The dimensions " << arg1 << " and " << arg2
+		    << " do not match here.");
 				     /**
 				      * Exception
 				      */
-  DeclException2 (ExcInvalidIndex,
-		  int, int,
-		  << "The given index " << arg1
-		  << " should be less than " << arg2 << ".");
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The given index " << arg1
+		    << " should be less than " << arg2 << ".");
 				     /**
 				      * Exception
 				      */
-  DeclException1 (ExcInvalidNumber,
-		  int,
-		  << "The provided number is invalid here: " << arg1);
+    DeclException1 (ExcInvalidNumber,
+		    int,
+		    << "The provided number is invalid here: " << arg1);
 				     /**
 				      * Exception
 				      */
-  DeclException0 (ExcOutOfMemory);
+    DeclException0 (ExcOutOfMemory);
 				     /**
 				      * Exception
 				      */
-  DeclException0 (ExcEmptyVector);
+    DeclException0 (ExcEmptyVector);
 				     /**
 				      * Exception
 				      */
-  DeclException0 (ExcIO);
+    DeclException0 (ExcIO);
 
   protected:
 				     /**
 				      * Pointer to the array of components.
 				      */
-  Vector<Number> components[n_blocks];
+    Vector<Number> components[n_blocks];
 
                                      /**
 				      * Global starting index of each vector.
 				      * The last andredundant value is the total
 				      * number of entries.
 				      */
-  unsigned int start[n_blocks+1];
+    unsigned int start[n_blocks+1];
 };
 
 
