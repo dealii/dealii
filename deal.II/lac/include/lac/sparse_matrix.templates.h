@@ -22,6 +22,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <functional>
+#include <cmath>
 
 #ifdef DEAL_II_USE_MT
 #  include <vector>
