@@ -25,12 +25,14 @@ CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
 	    -fno-vtable-thunks -ftemplate-depth-32 \
             $(INCLUDE)
 
+
+
 # DEAL_II_USE_MT=true
 
 ifeq ($(DEAL_II_USE_MT),true)
   INCLUDE    += -I $(ACE_ROOT)
-  CXXFLAGS.g += -DDEAL_II_USE_MT
-  CXXFLAGS.o += -DDEAL_II_USE_MT
+  CXXFLAGS.g += -DDEAL_II_USE_MT -threads
+  CXXFLAGS.o += -DDEAL_II_USE_MT -threads
 
   user-libs  += $(ACE_ROOT)/ace/libACE.so
 endif
