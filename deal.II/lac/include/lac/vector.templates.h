@@ -19,6 +19,7 @@
 #include <algorithm>
 
 
+
 template <typename Number>
 static inline Number sqr (const Number x) {
   return x*x;
@@ -77,6 +78,14 @@ Vector<Number>::Vector (const Vector<Number>& v) :
 
 
 template <typename Number>
+Vector<Number>::~Vector ()
+{
+  if (val) delete[] val;
+}
+
+
+
+template <typename Number>
 void Vector<Number>::reinit (const unsigned int n, const bool fast) {
   if (n==0) 
     {
@@ -100,27 +109,35 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast) {
 
 
 template <typename Number>
-void Vector<Number>::reinit (const Vector<Number>& v, const bool fast) {
+void Vector<Number>::reinit (const Vector<Number>& v, const bool fast)
+{
   reinit (v.size(), fast);
 };
 
 
 template <typename Number>
-Vector<Number>::~Vector ()
+void Vector<Number>::clear ()
 {
-  if (val) delete[] val;
-}
-
-
-template <typename Number>
-void Vector<Number>::clear () {
   if (dim>0)
     fill (begin(), end(), 0.);
 }
 
 
+
 template <typename Number>
-bool Vector<Number>::all_zero () const {
+void
+Vector<Number>::swap (Vector<Number> &v)
+{
+  std::swap (dim,    v.dim);
+  std::swap (maxdim, v.maxdim);
+  std::swap (val,    v.val);
+};
+
+
+
+template <typename Number>
+bool Vector<Number>::all_zero () const
+{
   Assert (dim!=0, ExcEmptyVector());
   
   const_iterator p = begin(),

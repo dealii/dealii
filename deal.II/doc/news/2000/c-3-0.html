@@ -73,10 +73,19 @@
        </p>
 
   <li> <p>
-       New: <code class="class">Solver*</code>: There is a virtual function
+       New: <code class="class">SolverXX</code>: There is a virtual function
        <code>print_vectors</code> called in every step. It is void in the
        solver itself but can be used to print intermediate iteration
        vectors.
+       </p>
+
+  <li> <p>
+       New: there are now functions <code class="member">Vector::swap</code> 
+       and <code class="member">BlockVector::swap</code>, as well as
+       global functions <code class="member">swap(u,v)</code> that
+       exchange the data of two vectors without needing a temporary
+       vector and without copying around data. Their run-time is
+       therefore independent of the length of the vectors.
        </p>
 </ol>
 

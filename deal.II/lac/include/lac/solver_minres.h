@@ -208,9 +208,9 @@ SolverMinRes<VECTOR>::solve (const MATRIX &A,
   v.reinit(VS,true);
 
 				   // some values needed
-  vector<double> delta(3);
-  vector<double> f(2);
-  vector<double> e(2); 
+  double delta[3];
+  double f[2];
+  double e[2]; 
 
   double r_l2 = 0;
   double r0   = 0;
@@ -222,7 +222,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX &A,
   double d = 0;  
 
 				   // The iteration step.
-  int j = 1;
+  unsigned int j = 1;
   
 
 				   // Start of the solution process
@@ -314,11 +314,24 @@ SolverMinRes<VECTOR>::solve (const MATRIX &A,
 				       // All vectors have to be shifted
 				       // one iteration step.
 				       // This should be changed one time.
-      m[2] = m[1];
-      m[1] = m[0];
+				       //
+				       // the previous code was like this:
+				       //   m[2] = m[1];
+				       //   m[1] = m[0];
+				       // but it can be made more efficient,
+				       // since the value of m[0] is no more
+				       // needed in the next iteration
+      swap (m[2], m[1]);
+      swap (m[1], m[0]);
+      
+				       // likewise, but reverse direction:
+				       //   u[0] = u[1];
+				       //   u[1] = u[2];
+      swap (u[0], u[1]);
+      swap (u[1], u[2]);
 
-      u[0] = u[1];
-      u[1] = u[2];
+				       // these are scalars, so need
+				       // to bother
       f[0] = f[1];
       e[0] = e[1];
       delta[0] = delta[1];

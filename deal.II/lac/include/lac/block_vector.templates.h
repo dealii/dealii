@@ -104,10 +104,25 @@ void BlockVector<n_blocks,Number>::reinit (const BlockVector<n_blocks,Number>& v
 }
 
 
+
 template <int n_blocks, typename Number>
 BlockVector<n_blocks,Number>::~BlockVector ()
 {
 }
+
+
+
+template <int n_blocks, typename Number>
+void BlockVector<n_blocks,Number>::swap (BlockVector<n_blocks,Number> &v)
+{
+  for (unsigned int i=0; i<n_blocks; ++i)
+    {
+      swap (components[i], v.components[i]);
+      swap (start[i],      v.start[i]);
+    };
+  swap (start[n_blocks], v.start[n_blocks]);
+};
+
 
 
 template <int n_blocks, typename Number>

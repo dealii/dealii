@@ -77,14 +77,36 @@ class BlockVector
     ~BlockVector ();
 
 				     /**
-				      * Access to a single block.
-				      */
-    Vector<Number>& block(unsigned int i);
+				      * Change the dimension of the vector to
+				      * #N#. The reserved memory for this vector
+				      * remains unchanged if possible, to make
+				      * things faster, but this may waste some
+				      * memory, so take this in the back of your
+				      * head.
+				      * However, if #N==0# all memory is freed,
+				      * i.e. if you want to resize the vector
+				      * and release the memory not needed, you
+				      * have to first call #reinit(0)# and then
+				      * #reinit(N)#. This cited behaviour is
+				      * analogous to that of the STL containers.
+				      *
+				      * On #fast==false#, the vector is filled by
+				      * zeros.
+				      */ 
+    void reinit (const vector<unsigned int>& N,
+		 const bool         fast=false);
     
 				     /**
-				      * Read-only access to a single block.
+				      * Change the dimension to that of the
+				      * vector #V#. The same applies as for
+				      * the other #reinit# function.
+				      *
+				      * The elements of #V# are not copied, i.e.
+				      * this function is the same as calling
+				      * #reinit (V.size(), fast)#.
 				      */
-    const Vector<Number>& block(unsigned int i) const;
+    void reinit (const BlockVector<n_blocks,Number> &V,
+		 const bool            fast=false);
     
 				     /**
 				      * Set all entries to zero. Equivalent to
@@ -94,6 +116,41 @@ class BlockVector
 				      * STL's #vector<>::clear# function.
 				      */
     void clear ();
+    
+				     /**
+				      * Swap the contents of this
+				      * vector and the other vector
+				      * #v#. One could do this
+				      * operation with a temporary
+				      * variable and copying over the
+				      * data elements, but this
+				      * function is significantly more
+				      * efficient since it only swaps
+				      * the pointers to the data of
+				      * the two vectors and therefore
+				      * does not need to allocate
+				      * temporary storage and move
+				      * data around.
+				      *
+				      * This function is analog to the
+				      * the #swap# function of all C++
+				      * standard containers. Also,
+				      * there is a global function
+				      * #swap(u,v)# that simply calls
+				      * #u.swap(v)#, again in analogy
+				      * to standard functions.
+				      */
+    void swap (BlockVector<n_blocks,Number> &v);
+    
+				     /**
+				      * Access to a single block.
+				      */
+    Vector<Number>& block(unsigned int i);
+    
+				     /**
+				      * Read-only access to a single block.
+				      */
+    const Vector<Number>& block(unsigned int i) const;
     
 				     /**
 				      * $U(0-N) = s$: fill all components.
@@ -150,38 +207,6 @@ class BlockVector
     Number linfty_norm () const;
 
 
-				     /**
-				      * Change the dimension of the vector to
-				      * #N#. The reserved memory for this vector
-				      * remains unchanged if possible, to make
-				      * things faster, but this may waste some
-				      * memory, so take this in the back of your
-				      * head.
-				      * However, if #N==0# all memory is freed,
-				      * i.e. if you want to resize the vector
-				      * and release the memory not needed, you
-				      * have to first call #reinit(0)# and then
-				      * #reinit(N)#. This cited behaviour is
-				      * analogous to that of the STL containers.
-				      *
-				      * On #fast==false#, the vector is filled by
-				      * zeros.
-				      */ 
-    void reinit (const vector<unsigned int>& N,
-		 const bool         fast=false);
-    
-				     /**
-				      * Change the dimension to that of the
-				      * vector #V#. The same applies as for
-				      * the other #reinit# function.
-				      *
-				      * The elements of #V# are not copied, i.e.
-				      * this function is the same as calling
-				      * #reinit (V.size(), fast)#.
-				      */
-    void reinit (const BlockVector<n_blocks,Number> &V,
-		 const bool            fast=false);
-    
   				     /**
   				      * Return dimension of the vector. This is the
 				      * sum of the dimensions of all components.
@@ -523,6 +548,23 @@ BlockVector<n_blocks,Number>::block(unsigned int i) const
 
   return components[i];
 }
+
+
+/**
+ * Global function #swap# which overloads the default implementation
+ * of the C++ standard library which uses a temporary object. The
+ * function simply exchanges the data of the two vectors.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <int n_blocks, typename Number>
+inline
+void swap (BlockVector<n_blocks,Number> &u, BlockVector<n_blocks,Number> &v)
+{
+  u.swap (v);
+};
+
+
 
 
 #endif

@@ -104,7 +104,64 @@ class Vector {
 				      * the size of the vector, unlike the
 				      * STL's #vector<>::clear# function.
 				      */
-    void clear ();
+    void clear ();    
+
+				     /**
+				      * Change the dimension of the vector to
+				      * #N#. The reserved memory for this vector
+				      * remains unchanged if possible, to make
+				      * things faster, but this may waste some
+				      * memory, so take this in the back of your
+				      * head.
+				      * However, if #N==0# all memory is freed,
+				      * i.e. if you want to resize the vector
+				      * and release the memory not needed, you
+				      * have to first call #reinit(0)# and then
+				      * #reinit(N)#. This cited behaviour is
+				      * analogous to that of the STL containers.
+				      *
+				      * On #fast==false#, the vector is filled by
+				      * zeros.
+				      */ 
+    void reinit (const unsigned int N,
+		 const bool         fast=false);
+    
+				     /**
+				      * Change the dimension to that of the
+				      * vector #V#. The same applies as for
+				      * the other #reinit# function.
+				      *
+				      * The elements of #V# are not copied, i.e.
+				      * this function is the same as calling
+				      * #reinit (V.size(), fast)#.
+				      */
+    void reinit (const Vector<Number> &V,
+		 const bool            fast=false);
+
+				     /**
+				      * Swap the contents of this
+				      * vector and the other vector
+				      * #v#. One could do this
+				      * operation with a temporary
+				      * variable and copying over the
+				      * data elements, but this
+				      * function is significantly more
+				      * efficient since it only swaps
+				      * the pointers to the data of
+				      * the two vectors and therefore
+				      * does not need to allocate
+				      * temporary storage and move
+				      * data around.
+				      *
+				      * This function is analog to the
+				      * the #swap# function of all C++
+				      * standard containers. Also,
+				      * there is a global function
+				      * #swap(u,v)# that simply calls
+				      * #u.swap(v)#, again in analogy
+				      * to standard functions.
+				      */
+    void swap (Vector<Number> &v);
     
 				     /**
 				      * $U(0-N) = s$: fill all components.
@@ -158,39 +215,6 @@ class Vector {
 				      */
     Number linfty_norm () const;
 
-
-				     /**
-				      * Change the dimension of the vector to
-				      * #N#. The reserved memory for this vector
-				      * remains unchanged if possible, to make
-				      * things faster, but this may waste some
-				      * memory, so take this in the back of your
-				      * head.
-				      * However, if #N==0# all memory is freed,
-				      * i.e. if you want to resize the vector
-				      * and release the memory not needed, you
-				      * have to first call #reinit(0)# and then
-				      * #reinit(N)#. This cited behaviour is
-				      * analogous to that of the STL containers.
-				      *
-				      * On #fast==false#, the vector is filled by
-				      * zeros.
-				      */ 
-    void reinit (const unsigned int N,
-		 const bool         fast=false);
-    
-				     /**
-				      * Change the dimension to that of the
-				      * vector #V#. The same applies as for
-				      * the other #reinit# function.
-				      *
-				      * The elements of #V# are not copied, i.e.
-				      * this function is the same as calling
-				      * #reinit (V.size(), fast)#.
-				      */
-    void reinit (const Vector<Number> &V,
-		 const bool            fast=false);
-    
 				     /**
 				      * Return dimension of the vector. This
 				      * function was formerly called #n()#, but
@@ -204,7 +228,7 @@ class Vector {
 				      * Return whether the vector contains only
 				      * elements with value zero. This function
 				      * is mainly for internal consistency
-				      * check and should seldomly be used when
+				      * checks and should seldomly be used when
 				      * not in debug mode since it uses quite
 				      * some time.
 				      */
@@ -522,6 +546,23 @@ Number& Vector<Number>::operator() (const unsigned int i)
   Assert (i<dim, ExcIndexRange(i,0,dim));
   return val[i];
 }
+
+
+
+/**
+ * Global function #swap# which overloads the default implementation
+ * of the C++ standard library which uses a temporary object. The
+ * function simply exchanges the data of the two vectors.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <typename Number>
+inline
+void swap (Vector<Number> &u, Vector<Number> &v)
+{
+  u.swap (v);
+};
+
 
 
 #endif
