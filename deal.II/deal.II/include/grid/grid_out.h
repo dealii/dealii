@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -144,11 +144,15 @@ namespace GridOutFlags
       bool write_cell_numbers;
 
 				       /**
-					* This is the number of
-					* points on a boundary face,
-					* that are ploted
-					* additionally to the
-					* vertices of the face.
+					* Based on the vertices of the
+					* face and
+					* <tt>n_boundary_face_points</tt>
+					* additional points a tensor
+					* product mesh (tranformed to
+					* the real space) of
+					* $(n_boundary_face_points+2)^{dim-1}$
+					* points is plotted on each
+					* boundary face.
 					*/
       unsigned int n_boundary_face_points;
       
