@@ -19,6 +19,7 @@
 #include <cmath>
 
 
+
 // have a lock that guarantees that at most one thread is changing and
 // accessing the @p{coefficients} arrays of classes implementing
 // polynomials with tables. make this lock local to this file.
@@ -710,9 +711,10 @@ namespace Polynomials
                                      // check: does the information
                                      // already exist?
     if (  (recursive_coefficients.size() < k+1) ||
-	  ((recursive_coefficients.size() >= k+1) && (recursive_coefficients[k] == 0)) )
-                                       // no, then generate the
-                                       // respective coefficients
+	  ((recursive_coefficients.size() >= k+1) && 
+           (recursive_coefficients[k] == 0)) )
+				           // no, then generate the
+				           // respective coefficients
       {
 	recursive_coefficients.resize (k+1, 0);
       
@@ -727,12 +729,12 @@ namespace Polynomials
                                              // coefficients array to
                                              // make it const
 	    std::vector<number> *c0 = new std::vector<number>(2);
-	    (*c0)[0] =  1.0;
-	    (*c0)[1] = -1.0;
+	    (*c0)[0] =  1.;
+	    (*c0)[1] = -1.;
 
 	    std::vector<number> *c1 = new std::vector<number>(2);
-	    (*c1)[0] = 0.0;
-	    (*c1)[1] = 1.0;
+	    (*c1)[0] = 0.;
+	    (*c1)[1] = 1.;
 
                                              // now make these arrays
                                              // const
@@ -741,13 +743,17 @@ namespace Polynomials
 	  }
 	else if (k==2)
 	  {
+            coefficients_lock.release ();
 	    compute_coefficients(1);
+	    coefficients_lock.acquire ();
 
 	    std::vector<number> *c2 = new std::vector<number>(3);
-	    
-	    (*c2)[0] =   0.;
-	    (*c2)[1] =  -4.;
-	    (*c2)[2] =   4.;
+
+	    const number a = 1.; //1./8.;
+
+	    (*c2)[0] =   0.*a;
+	    (*c2)[1] =  -4.*a;
+	    (*c2)[2] =   4.*a;
 	    
 	    recursive_coefficients[2] = c2;
 	  }
@@ -766,21 +772,27 @@ namespace Polynomials
 	    coefficients_lock.acquire ();
 
 	    std::vector<number> *ck = new std::vector<number>(k+1);
-	    
-	    (*ck)[0] = -(*recursive_coefficients[k-1])[0];
-	    
-	    for (unsigned int i=1; i<=k-1; ++i)
-	      (*ck)[i] = ( 2.*(*recursive_coefficients[k-1])[i-1]
-			   - (*recursive_coefficients[k-1])[i] );
+	   
+	    const number a = 1.; //1./(2.*k);
+
+	    (*ck)[0] = - a*(*recursive_coefficients[k-1])[0];
 	  
-	    (*ck)[k] = 2.*(*recursive_coefficients[k-1])[k-1];
-                                             // for even degrees, we need
-                                             // to add a multiple of
-                                             // basis fcn phi_2
+	    for (unsigned int i=1; i<=k-1; ++i)
+		(*ck)[i] = a*( 2.*(*recursive_coefficients[k-1])[i-1]
+			       - (*recursive_coefficients[k-1])[i] );
+	  
+	    (*ck)[k] = a*2.*(*recursive_coefficients[k-1])[k-1];
+	                                  // for even degrees, we need
+	                                  // to add a multiple of
+	                                  // basis fcn phi_2
 	    if ( (k%2) == 0 )
 	      {
-		(*ck)[1] += (*recursive_coefficients[2])[1];
-		(*ck)[2] += (*recursive_coefficients[2])[2];
+		number b = 1.; //8.;
+		//for (unsigned int i=1; i<=k; i++)
+		//  b /= 2.*i;
+
+		(*ck)[1] += b*(*recursive_coefficients[2])[1];
+		(*ck)[2] += b*(*recursive_coefficients[2])[2];
 	      }	  
                                              // finally assign the newly
                                              // created vector to the
@@ -802,8 +814,11 @@ namespace Polynomials
     compute_coefficients (k);
 
 				   // then get a pointer to the array
-				   // of coefficients.
+				   // of coefficients. do that in a MT
+                                     // safe way
+    coefficients_lock.acquire ();
     const std::vector<number> *p = recursive_coefficients[k];
+    coefficients_lock.release ();
 
 				   // return the object pointed
 				   // to. since this object does not
