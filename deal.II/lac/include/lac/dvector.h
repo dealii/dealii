@@ -363,63 +363,6 @@ class dVector {
     
     
 				     /**
-				      * @name 4: Modification of components
-				      */
-				     //@{
-				     /**
-				      *  U(i)=0             . ONE Component only
-				      */
-    void czero (const unsigned int i);
-    
-				     /**
-				      *  U(i)=a*V(j)        . Replacing
-				      */
-    void cequ(unsigned int i, const dVector& V,
-	      double a, unsigned int j);
-    
-				     /**
-				      *  U(i)=a*V(j)+b*V(k) . Replacing by sum
-				      */
-    void cequ (const unsigned int i, const dVector& V,
-	       const double a, const unsigned int j,
-	       const double b, const unsigned int k);
-    
-				     /**
-				      * U(i)=a*V(j)+b*V(k)+c*V(l)+d*V(m).
-				      * Replacing by sum
-				      */
-    void cequ (const unsigned int i, const dVector& V,
-	       const double a, const unsigned int j,
-	       const double b, const unsigned int k,
-	       const double c, const unsigned int l,
-	       const double d, const unsigned int m);
-    
-				     /**
-				      *  U(i)+=a*V(j)       . Simple addition
-				      */
-    void cadd (const unsigned int i, const dVector& V,
-	       const double a, const unsigned int j);
-    
-				     /**
-				      *  U(i)+=a*V(j)+b*V(k). Multiple addition
-				      */ 
-    void cadd (const unsigned int i, const dVector& V,
-	       const double a, const unsigned int j,
-	       const double b, const unsigned int k);
-    
-				     /**
-				      * U(i)+=a*V(j)+b*V(k)+c*V(l)+d*V(m).
-				      * Multiple addition
-				      */
-    void cadd (const unsigned int i, const dVector& V,
-	       const double a, const unsigned int j,
-	       const double b, const unsigned int k,
-	       const double c, const unsigned int l,
-	       const double d, const unsigned int m);
-				     //@}
-    
-    
-				     /**
 				      * @name 5: Mixed stuff
 				      */
 				     //@{
