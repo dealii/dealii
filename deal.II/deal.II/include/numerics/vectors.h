@@ -843,9 +843,12 @@ class VectorTools
 				      * Point error evaluation. Find
 				      * the first cell containing the
 				      * given point and compute the
-				      * difference of a finite element
+				      * difference of a (possibly
+				      * vector-valued) finite element
 				      * function and a continuous
-				      * function at this point.
+				      * function (with as many vector
+				      * components as the finite
+				      * element) at this point.
 				      *
 				      * Since the function uses a
 				      * simple test for checking
