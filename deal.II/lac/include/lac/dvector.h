@@ -7,17 +7,10 @@
 
 #ifndef __lac_dvector_h
 #define __lac_dvector_h
-#include <stdio.h>
-#ifndef __base_types_h
-#include <base/types.h>
-#endif
-//#ifndef __base_errors_h
-//#include <base/errors.h>
-//#endif
-#ifndef __lac_vectorbase_h
-#include <lac/vectorbase.h>
-#endif
 
+#include <cstdio>
+#include <base/types.h>
+#include <lac/vectorbase.h>
 #include <base/exceptions.h>
 
 
