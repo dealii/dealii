@@ -1455,36 +1455,62 @@ class Triangulation
 				      */
     ~Triangulation ();
     
-				     /**
-				      *  Assign a boundary object to the
-				      *  triangulation. If a face with boundary number #number#
-				      *  is refined, this object is used to find
-				      *  the location of new vertices
-				      *  on the boundary. This will also be true for non-linear
-				      *  transformations of cells to the unit cell in shape
-				      *  function calculations. Multiple calls to this function are
-				      *  allowed to store different boundary curves or surfaces.
+				     /**					
+				      * Assign a boundary object to
+				      * the triangulation. If a face
+				      * with boundary number #number#
+				      * is refined, this object is
+				      * used to find the location of
+				      * new vertices on the
+				      * boundary. This will also be
+				      * true for non-linear
+				      * transformations of cells to
+				      * the unit cell in shape
+				      * function
+				      * calculations. Multiple calls
+				      * to this function are allowed
+				      * to store different boundary
+				      * curves or surfaces.
 				      *
-				      * Numbers of boundary object correspond to material numbers of
-				      * faces at the boundary, for instance the material id in a UCD
-				      * input file. They are not necessarily consecutive but must be
-				      * in the range 0-254.
+				      * Numbers of boundary objects
+				      * correspond to material numbers
+				      * of faces at the boundary, for
+				      * instance the material id in a
+				      * UCD input file. They are not
+				      * necessarily consecutive but
+				      * must be in the range 0-254.
+				      * Material IDs on boundaries are
+				      * also called boundary indicators
+				      * and are accessed with accessor
+				      * functions of that name.
 				      *
-				      * The #boundary_object# is not copied and MUST persist
-				      * until the triangulation is destroyed. Otherwise,
-				      * the #Subscriptor# class will issue #ExcObjectInUse#.
-				      * This is also true for triangulations generated from this
-				      * one by #copy_triangulation#.
+				      * The #boundary_object# is not
+				      * copied and MUST persist until
+				      * the triangulation is
+				      * destroyed. Otherwise, the
+				      * #Subscriptor# class will issue
+				      * #ExcObjectInUse#.  This is
+				      * also true for triangulations
+				      * generated from this one by
+				      * #copy_triangulation#.
 				      *
-				      *  It is possible to remove or replace
-				      *  the boundary object during the lifetime
-				      *  of a non-empty triangulation. Usually, this is done
-				      *  before the first refinement and is dangerous afterwards.
-				      *  Removal of a boundary object is done by
-				      *  #set_boundary(number)#.
+				      * It is possible to remove or
+				      * replace the boundary object
+				      * during the lifetime of a
+				      * non-empty
+				      * triangulation. Usually, this
+				      * is done before the first
+				      * refinement and is dangerous
+				      * afterwards.  Removal of a
+				      * boundary object is done by
+				      * #set_boundary(number)#, which
+				      * uses the default argument of this
+				      * function and resets the boundary
+				      * approximation by a piecewise
+				      * straight one.
 				      */
-    void set_boundary (unsigned int number,
-		       const Boundary<dim>& boundary_object = straight_boundary);
+    void set_boundary (unsigned int         number,
+		       const Boundary<dim> &boundary_object = straight_boundary);
 
 				     /**
 				      * Return a constant reference to a boundary
