@@ -165,8 +165,10 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
   switch (dim)
     {
       case 1:
-	    interface_constraints.reinit (1,1);
-	    interface_constraints(0,0)=1.;
+	    Assert ((interface_constraints.m() == 0) &&
+		    (interface_constraints.n() == 0),
+		    ExcInternalError());
+	    
 	    break;
 	    
       case 2:
