@@ -70,7 +70,7 @@ class SparseMatrix : public Subscriptor
     SparseMatrix (const SparseMatrix &);
 
 
-/**
+				     /**
 				      * Constructor. Takes the given matrix
 				      * sparsity structure to represent the
 				      * sparsity pattern of this matrix. You
@@ -97,7 +97,7 @@ class SparseMatrix : public Subscriptor
     SparseMatrix<number>& operator = (const SparseMatrix<number> &);
 
 
-/**
+				     /**
 				      * Reinitialize the object but keep to
 				      * the sparsity pattern previously used.
 				      * This may be necessary if you #reinit#'d
@@ -649,7 +649,7 @@ class SparseMatrix : public Subscriptor
 			    somenumber               *partial_norm) const;
 
 
-// make all other sparse matrices
+				     // make all other sparse matrices
 				     // friends
     template <typename somenumber> friend class SparseMatrix;
 };
