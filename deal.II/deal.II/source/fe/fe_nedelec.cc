@@ -288,7 +288,6 @@ FE_Nedelec<dim>::shape_value_component (const unsigned int i,
 					       // only non-zero
 					       // component is
 					       // requested:
-//[Anna]:checked: OK	      
 	      const double x = p(0),
 			   y = p(1),
 			   z = p(2);
@@ -366,7 +365,6 @@ FE_Nedelec<dim>::shape_grad_component (const unsigned int i,
 					       // component, thrid
 					       // index=component
 					       // within gradient
-//[Anna]: checked:OK	      
 	      static const double unit_gradients[4][2][2]
 		= { { {0.,-1.}, {0.,0.} },
 		    { {0.,0.},  {1.,0.} },
