@@ -30,7 +30,9 @@ template <int celldim, int dim> class MGDoFObjectAccessor;
  * @see MGDoFDimensionInfo<2>
  */
 template <int dim>
-class MGDoFDimensionInfo;
+class MGDoFDimensionInfo
+{};
+
 
 
 /**
@@ -38,7 +40,8 @@ class MGDoFDimensionInfo;
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
-class MGDoFDimensionInfo<1> {
+class MGDoFDimensionInfo<1>
+{
   public:
     typedef TriaRawIterator<1,MGDoFCellAccessor<1> >    raw_line_iterator;
     typedef TriaIterator<1,MGDoFCellAccessor<1> >       line_iterator;
@@ -62,12 +65,14 @@ class MGDoFDimensionInfo<1> {
 };
 
 
+
 /**
  * Define some types for the DoF handling in two dimensions.
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
-class MGDoFDimensionInfo<2> {
+class MGDoFDimensionInfo<2>
+{
   public:
     typedef TriaRawIterator<2,MGDoFObjectAccessor<1, 2> >    raw_line_iterator;
     typedef TriaIterator<2,MGDoFObjectAccessor<1, 2> >       line_iterator;
@@ -91,12 +96,14 @@ class MGDoFDimensionInfo<2> {
 };
 
 
+
 /**
  * Define some types for the DoF handling in two dimensions.
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
-class MGDoFDimensionInfo<3> {
+class MGDoFDimensionInfo<3>
+{
   public:
     typedef TriaRawIterator<3,MGDoFObjectAccessor<1, 3> >    raw_line_iterator;
     typedef TriaIterator<3,MGDoFObjectAccessor<1, 3> >       line_iterator;
@@ -118,6 +125,7 @@ class MGDoFDimensionInfo<3> {
     typedef quad_iterator        face_iterator;
     typedef active_quad_iterator active_face_iterator;    
 };
+
 
 
 /**

@@ -109,12 +109,17 @@ struct SubCellData {
 
 
 /**
- *  This class implements some types which differ between the dimensions.
- *  Declare it to have a template parameter, but do not actually declare
- *  other types than those explicitely instantiated.
+ *  This class implements some types which differ between the
+ *  dimensions.  Declare it to have a template parameter, but do not
+ *  actually declare anything concrete apart from the other classes
+ *  which are explicitely instantiated ones with the same name.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class TriaDimensionInfo;
+class TriaDimensionInfo
+{};
+
 
 
 /**
@@ -142,9 +147,12 @@ class TriaDimensionInfo;
  *  The same applies for the @p{face_iterator} types, since lines
  *  have no substructures apart from vertices, which are handled in
  *  a different way, however.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <>
-class TriaDimensionInfo<1> {
+class TriaDimensionInfo<1>
+{
   public:
     typedef TriaRawIterator<1,CellAccessor<1> >    raw_line_iterator;
     typedef TriaIterator<1,CellAccessor<1> >       line_iterator;
@@ -166,6 +174,7 @@ class TriaDimensionInfo<1> {
     typedef void * face_iterator;
     typedef void * active_face_iterator;
 };
+
 
 
 /**
@@ -199,9 +208,12 @@ class TriaDimensionInfo<1> {
  *    typedef line_iterator        face_iterator;
  *    typedef active_line_iterator active_face_iterator;    
  *  @end{verbatim}
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <>
-class TriaDimensionInfo<2> {
+class TriaDimensionInfo<2>
+{
   public:
     typedef TriaRawIterator<2,TriaObjectAccessor<1, 2> >    raw_line_iterator;
     typedef TriaIterator<2,TriaObjectAccessor<1, 2> >       line_iterator;
@@ -225,6 +237,7 @@ class TriaDimensionInfo<2> {
 };
 
 
+
 /**
  *  This class implements some types which differ between the dimensions.
  *  These are the declararions for the 3D case only.
@@ -241,9 +254,12 @@ class TriaDimensionInfo<2> {
  *    typedef quad_iterator        face_iterator;
  *    typedef active_quad_iterator active_face_iterator;    
  *  @end{verbatim}
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <>
-class TriaDimensionInfo<3> {
+class TriaDimensionInfo<3>
+{
   public:
     typedef TriaRawIterator<3,TriaObjectAccessor<1, 3> >    raw_line_iterator;
     typedef TriaIterator<3,TriaObjectAccessor<1, 3> >       line_iterator;
@@ -265,6 +281,7 @@ class TriaDimensionInfo<3> {
     typedef quad_iterator        face_iterator;
     typedef active_quad_iterator active_face_iterator;    
 };
+
 
 
 /*------------------------------------------------------------------------*/

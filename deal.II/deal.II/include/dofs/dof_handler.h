@@ -38,15 +38,20 @@ template <int dim> class Triangulation;
  * 
  * @see DoFDimensionInfo<1>
  * @see DoFDimensionInfo<2>
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class DoFDimensionInfo;
+class DoFDimensionInfo
+{};
 
 
 /**
  * Define some types for the DoF handling in one dimension.
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 class DoFDimensionInfo<1>
 {
@@ -78,6 +83,8 @@ class DoFDimensionInfo<1>
  * Define some types for the DoF handling in two dimensions.
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 class DoFDimensionInfo<2>
 {
@@ -109,6 +116,8 @@ class DoFDimensionInfo<2>
  * Define some types for the DoF handling in two dimensions.
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<3>}.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 class DoFDimensionInfo<3>
 {
