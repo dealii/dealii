@@ -1637,62 +1637,62 @@ class Triangulation : public Subscriptor
     void clear ();
     
 				     /**					
-				      * Assign a boundary object to
-				      * the triangulation. If a face
-				      * with boundary number @p number
-				      * is refined, this object is
-				      * used to find the location of
-				      * new vertices on the
-				      * boundary. This will also be
-				      * true for non-linear
-				      * transformations of cells to
-				      * the unit cell in shape
-				      * function
-				      * calculations. Multiple calls
-				      * to this function are allowed
-				      * to store different boundary
-				      * curves or surfaces.
+				      * Assign a boundary object to a certain
+				      * part of the boundary of a the
+				      * triangulation. If a face with boundary
+				      * number @p number is refined, this
+				      * object is used to find the location of
+				      * new vertices on the boundary. It is
+				      * also used for for non-linear (i.e.:
+				      * non-Q1) transformations of cells to
+				      * the unit cell in shape function
+				      * calculations.
 				      *
-				      * Numbers of boundary objects
-				      * correspond to material numbers
-				      * of faces at the boundary, for
-				      * instance the material id in a
-				      * UCD input file. They are not
-				      * necessarily consecutive but
-				      * must be in the range 0-254.
-				      * Material IDs on boundaries are
-				      * also called boundary indicators
-				      * and are accessed with accessor
-				      * functions of that name.
+				      * Numbers of boundary objects correspond
+				      * to material numbers of faces at the
+				      * boundary, for instance the material id
+				      * in a UCD input file. They are not
+				      * necessarily consecutive but must be in
+				      * the range 0-254.  Material IDs on
+				      * boundaries are also called boundary
+				      * indicators and are accessed with
+				      * accessor functions of that name.
 				      *
-				      * The @p boundary_object is not
-				      * copied and MUST persist until
-				      * the triangulation is
-				      * destroyed. Otherwise, the
-				      * Subscriptor class will issue
-				      * @p ExcObjectInUse.  This is
-				      * also true for triangulations
-				      * generated from this one by
-				      * @p copy_triangulation.
+				      * The @p boundary_object is not copied
+				      * and MUST persist until the
+				      * triangulation is destroyed. This is
+				      * also true for triangulations generated
+				      * from this one by @p
+				      * copy_triangulation.
 				      *
-				      * It is possible to remove or
-				      * replace the boundary object
-				      * during the lifetime of a
-				      * non-empty
-				      * triangulation. Usually, this
-				      * is done before the first
-				      * refinement and is dangerous
-				      * afterwards.  Removal of a
+				      * It is possible to remove or replace
+				      * the boundary object during the
+				      * lifetime of a non-empty
+				      * triangulation. Usually, this is done
+				      * before the first refinement and is
+				      * dangerous afterwards. Removal of a
 				      * boundary object is done by
-				      * <tt>set_boundary(number)</tt>, which
-				      * uses the default argument of this
-				      * function and replaces the boundary
-				      * approximation by a piecewise
-				      * straight line.
+				      * <tt>set_boundary(number)</tt>,
+				      * i.e. the function of same name but
+				      * only one argument. This operation then
+				      * replaces the boundary object given
+				      * before by a straight boundary
+				      * approximation.
 				      */
     void set_boundary (const unsigned int   number,
-		       const Boundary<dim> &boundary_object = *straight_boundary);
+		       const Boundary<dim> &boundary_object);
 
+                                     /**
+                                      * Reset those parts of the boundary with
+                                      * the given number to use a straight
+                                      * boundary approximation. This is the
+                                      * default state of a triangulation, and
+                                      * undoes assignment of a different
+                                      * boundary object by the function of
+                                      * same name and two arguments.
+                                      */
+    void set_boundary (const unsigned int number);
+    
 				     /**
 				      * Return a constant reference to
 				      * a boundary object used for

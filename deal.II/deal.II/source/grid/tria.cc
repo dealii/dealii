@@ -122,6 +122,16 @@ Triangulation<dim>::set_boundary (const unsigned int number,
 }
 
 
+
+template <int dim>
+void
+Triangulation<dim>::set_boundary (const unsigned int number)
+{
+  set_boundary (number, *straight_boundary);
+}
+
+
+
 template <int dim>
 const Boundary<dim> &
 Triangulation<dim>::get_boundary (const unsigned int number) const 
