@@ -16,12 +16,12 @@
 
 
 /**
- *  Implementation of the error estimator by Kelly, Gago, Zienkiewicz and
- *  Babuska.
- *  This error estimator tries to approximate the error per cell by integration
- *  of the jump of the gradient of the solution along the faces of each cell.
- *  It can be understood as a gradient recovery estimator; see the survey
- *  of Ainsworth for a complete discussion.
+ *  Implementation of the error estimator by Kelly, Gago, Zienkiewicz
+ *  and Babuska.  This error estimator tries to approximate the error
+ *  per cell by integration of the jump of the gradient of the
+ *  solution along the faces of each cell.  It can be understood as a
+ *  gradient recovery estimator; see the survey of Ainsworth for a
+ *  complete discussion.
  *
  *  It seem as if this error estimator should only be valid for linear trial
  *  spaces, and there are indications that for higher order trial spaces the
@@ -83,6 +83,28 @@
  *  the diameter of the cell.
  *  
  *
+ *  \subsection{Vector-valued functions}
+ *
+ *  If the finite element field for which the error is to be estimated
+ *  is vector-valued, i.e. the finite element has more than one
+ *  component, then all the above can be applied to all or only some
+ *  components at the same time. The main function of this class takes
+ *  a list of flags denoting the components for which components the
+ *  error estimator is to be applied; by default, it is a list of only
+ *  #true#s, meaning that all variables shall be treated.
+ *
+ *  In case the different components of a field have different
+ *  physical meaning (for example velocity and pressure in the Stokes
+ *  equations), it would be senseless to use the same coefficient for
+ *  all components. In that case, you can pass a function with as many
+ *  components as there are components in the finite element field and
+ *  each component of the error estimator will then be weighted by the
+ *  respective component in this coefficient function. In the other
+ *  case, when all components have the same meaning (for example the
+ *  displacements in Lame's equations of elasticity), you can specify
+ *  a scalar coefficient which will then be used for all components.
+ *
+ *
  *  \subsection{Boundary values}
  *  
  *  If the face is at the boundary, i.e. there is no neighboring cell to which
@@ -108,7 +130,9 @@
  *  \item The face belongs to a Neumann boundary.  In this case, the
  *    contribution of the face $F\in\partial K$ looks like
  *    $$ \int_F \left|g-a\frac{\partial u_h}{\partial n}\right|^2 ds $$
- *    where $g$ is the Neumann boundary function.
+ *    where $g$ is the Neumann boundary function. If the finite element is
+ *    vector-valued, then obviously the function denoting the Neumann boundary
+ *    conditions needs to be vector-valued as well.
  *
  *  \item No other boundary conditions are considered.
  *  \end{itemize}
@@ -160,30 +184,50 @@ class KellyErrorEstimator {
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
 
 				     /**
-				      * Implementation of the error estimator
-				      * described above. You may give a
-				      * coefficient, but there is a default
-				      * value which denotes the constant
-				      * coefficient with value one.
+				      * Implementation of the error
+				      * estimator described above. You
+				      * may give a coefficient, but
+				      * there is a default value which
+				      * denotes the constant
+				      * coefficient with value
+				      * one. The coefficient function
+				      * may either be a scalar one, in
+				      * which case it is used for all
+				      * components of the finite
+				      * element, or a vector-valued
+				      * one with as many components as
+				      * there are in the finite
+				      * element; in the latter case,
+				      * each component is weighted by
+				      * the respective component in
+				      * the coefficient.
 				      *
-				      * You must give the component if the
-				      * finite element in use by the #dof#
-				      * object has more than one component.
-				      * This number shall be between zero
-				      * and the number of components within
-				      * the finite element. If the finite
-				      * element has only one component,
-				      * then the parameter selecting the
-				      * component shall be zero, which is
-				      * also the default value.
+				      * You might give a list of
+				      * components you want to
+				      * evaluate, in case the finite
+				      * element used by the
+				      * #DoFHandler# object is
+				      * vector-valued. You then have
+				      * to set those entries to true
+				      * in the bit-vector
+				      * #component_mask# for which the
+				      * respective component is to be
+				      * used in the error
+				      * estimator. The default is to
+				      * use all components, which is
+				      * done by either providing a
+				      * bit-vector with all-set
+				      * entries, or an empty
+				      * bit-vector.
 				      */
-    static void estimate (const DoFHandler<dim>    &dof,
-			  const Quadrature<dim-1>  &quadrature,
-			  const FunctionMap        &neumann_bc,
-			  const Vector<double>     &solution,
-			  Vector<float>            &error,
-			  const Function<dim>      *coefficient = 0,
-			  const unsigned int        selected_component = 0);
+    static void estimate (const DoFHandler<dim>   &dof,
+			  const Quadrature<dim-1> &quadrature,
+			  const FunctionMap       &neumann_bc,
+			  const Vector<double>    &solution,
+			  Vector<float>           &error,
+			  const vector<bool>      &component_mask = vector<bool>(),
+			  const Function<dim>     *coefficients   = 0);
+    
 				     /**
 				      * Exception
 				      */
@@ -191,12 +235,16 @@ class KellyErrorEstimator {
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidComponent,
-		    int, int,
-		    << "The component you gave (" << arg1 << ") "
-		    << "is invalid with respect to the number "
-		    << "of components in the finite element "
-		    << "(" << arg2 << ")");
+    DeclException0 (ExcInvalidComponentMask);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidCoefficient);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidBoundaryFunction);
+    
   private:
 				     /**
 				      * Declare a data type to represent the
@@ -238,8 +286,7 @@ class KellyErrorEstimator {
 					     FEFaceValues<dim>   &fe_face_values_neighbor,
 					     FaceIntegrals       &face_integrals,
 					     const Vector<double>&solution,
-					     const unsigned int   n_components,
-					     const unsigned int   selected_component,
+					     const vector<bool>  &component_mask,
 					     const Function<dim> *coefficient);
 
 				     /**
@@ -257,8 +304,7 @@ class KellyErrorEstimator {
 					       FESubfaceValues<dim> &fe_subface_values,
 					       FaceIntegrals        &face_integrals,
 					       const Vector<double> &solution,
-					       const unsigned int    n_components,
-					       const unsigned int    selected_component,
+					       const vector<bool>   &component_mask,
 					       const Function<dim>  *coefficient);
 };
 
