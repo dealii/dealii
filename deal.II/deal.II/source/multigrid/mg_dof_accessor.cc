@@ -201,7 +201,6 @@ MGDoFObjectAccessor<2, dim>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 
 
 template <int dim>
-inline
 unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -384,7 +383,6 @@ MGDoFObjectAccessor<3, dim>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 
 
 template <int dim>
-inline
 unsigned int MGDoFObjectAccessor<3, dim>::mg_dof_index (const unsigned int i) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -418,7 +416,6 @@ void MGDoFObjectAccessor<3, dim>::set_mg_dof_index (const unsigned int i,
 
 
 template <int dim>
-inline
 unsigned int MGDoFObjectAccessor<3, dim>::mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i) const
 {
