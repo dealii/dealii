@@ -185,6 +185,8 @@ struct FiniteElementData<2> {
  * The different matrices are initialized with the correct size, such that in
  * the derived (concrete) finite element classes, their entries must only be
  * filled in; no resizing is needed.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 struct FiniteElementBase : public FiniteElementData<dim> {
@@ -380,6 +382,43 @@ struct FiniteElementBase : public FiniteElementData<dim> {
  * degree of freedom to other degrees of freedom which are themselves
  * constrained. Only one level of indirection is allowed. It is not known
  * at the time of this writing whether this is a constraint itself.
+ *
+ *
+ * \subsection{Notes on extending the finite element library}
+ *
+ * The #deal.II# library was mainly made to use lagrange elements of arbitrary
+ * order. For this reason, there may be places in the library where it uses
+ * features of finite elements which may not be as general as desirable as may
+ * be. Most of these restrictions don't come to mind and may cause problems
+ * if someone wanted to implement a finite element which does not satisfy these
+ * restrictions, leading to strange problems in places one does not expect.
+ *
+ * This section tries to collect some of these restrictions which are known.
+ * There is no guarantee that this list is complete; in fact, doubts are in
+ * place that that be so.
+ *
+ * \begin{itemize}
+ * \item Lagrange elements: at several places in the library, use is made of the
+ *   assumption that the basis functions of a finite element corresponds to a
+ *   function value (as opposed to derivatives or the like, as used in the
+ *   Hermitean finite element class or in the quintic Argyris element). It is
+ *   further assumed that a basis function takes its nominal value at a
+ *   certain point (e.g. linear ansatz functions take their value in the
+ *   corners of the element; this restriction rules out spectral elements for
+ *   the present library).
+ *
+ *   Both these assumptions are used when interpolation of a continuous
+ *   function to the finite element space is applied. At present, only two
+ *   places where this is used in the library come to mind to the author,
+ *   namely the treating of boundary values in the #ProblemBase# class and
+ *   the interpolation in the #VectorCreator# collection. You should also
+ *   look out for other places where explicit use of the ansatz points is
+ *   made if you want to use elements of other classes. A hint may be the
+ *   use of the #get_ansatz_points# and #get_face_ansatz_points# functions
+ *   of this class.
+ * \end{itemize}
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class FiniteElement : public FiniteElementBase<dim> {
@@ -636,18 +675,56 @@ class FiniteElement : public FiniteElementBase<dim> {
 					 const Boundary<dim> &boundary) const;
 
 				     /**
+				      * Compute the off-points of the finite
+				      * element basis functions on the given
+				      * cell.
+				      *
+				      * This function implements a subset of
+				      * the information delivered by the
+				      * #fill_fe_values# function to the
+				      * #FEValues# class. However, since it
+				      * is useful to use information about
+				      * off-points without using #FEValues#
+				      * objects (e.g. in interpolating functions
+				      * to the finite element space), this
+				      * function is excluded from the
+				      * abovementioned one.
+				      *
+				      * The function assumes that the
+				      * #ansatz_points# array already has the
+				      * right size. The order of points in
+				      * the array matches that returned by
+				      * the #face->get_dof_indices# function.
+				      *
+				      * For one space dimension there is a
+				      * standard implementation assuming
+				      * equidistant off-points on the unit
+				      * line. For all other dimensions, an
+				      * overwritten function has to be provided.
+				      */
+    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+				    const Boundary<dim> &boundary,
+				    vector<Point<dim> > &ansatz_points) const;
+    
+				     /**
+				      * Compute the off-points of the finite
+				      * element basis functions located on the
+				      * face. It only returns the off-points
+				      * of the ansatz functions which are
+				      * located on the face, rather than of
+				      * all basis functions, which is done by
+				      * the #get_ansatz_points# function.
+				      *
 				      * This function produces a subset of
 				      * the information provided by the
-				      * #fill_fe_face_values()# function,
-				      * namely the ansatz function off-points
-				      * of those ansatz functions located on
-				      * the face. However, you should not try
+				      * #fill_fe_face_values()# function.
+				      * However, you should not try
 				      * to implement this function using the
 				      * abovementioned function, since usually
 				      * that function uses this function to
 				      * compute information.
 				      *
-				      * This function is excluded from the
+				      * The function is excluded from the
 				      * abovementioned one, since no information
 				      * about the neighboring cell is needed,
 				      * such that loops over faces alone are
@@ -656,7 +733,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * to interpolate boundary values to the
 				      * finite element functions. If integration
 				      * along faces is needed, we still need
-				      * the #fill_fe_values# function.
+				      * the #fill_fe_face_values# function.
 				      *
 				      * The function assumes that the
 				      * #ansatz_points# array already has the

@@ -71,6 +71,14 @@ class FELinear : public FiniteElement<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
+    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+				    const Boundary<dim> &boundary,
+				    vector<Point<dim> > &ansatz_points) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
     virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
 					 const Boundary<dim> &boundary,
 					 vector<Point<dim> > &ansatz_points) const;
@@ -194,6 +202,14 @@ class FEQuadratic : public FiniteElement<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
+    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+				    const Boundary<dim> &boundary,
+				    vector<Point<dim> > &ansatz_points) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
     virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
 					 const Boundary<dim> &boundary,
 					 vector<Point<dim> > &ansatz_points) const;
@@ -284,6 +300,14 @@ class FECubic : public FiniteElement<dim> {
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const Boundary<dim> &boundary) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+				    const Boundary<dim> &boundary,
+				    vector<Point<dim> > &ansatz_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
