@@ -31,22 +31,55 @@
  * work even if number or type of the additional parameters for a certain
  * solver changes.
  *
- * However, since the BiCGStab method does not need additional data, the respective
- * structure is empty and does not offer any functionality. The constructor
- * has a default argument, so you may call it without the additional
- * parameter.
+ * The Bicgstab-method has two additional parameters: the first is a
+ * boolean, deciding whether to compute the actual residual in each
+ * step (@p{true}) or to use the length of the computed orthogonal
+ * residual (@{false} , not implemented yet). Remark, that computing
+ * the residual causes a third matrix-vector-multiplication, though no
+ * additional preconditioning, in each step.
+ *
+ * The second parameter is the size of a breakdown criterion. It is
+ * difficult to find a general good criterion, so if things do not
+ * work for you, try to change this value.
  */
 template <class VECTOR = Vector<double> >
 class SolverBicgstab : private Solver<VECTOR>
 {
   public:
     				     /**
-				      * Standardized data struct to
-				      * pipe additional data to the
-				      * solver. This solver does not
-				      * need additional data yet.
+				      * There are two possibilities to compute
+				      * the residual: one is an estimate using
+				      * the computed value @p{tau}. The other
+				      * is exact computation using another matrix
+				      * vector multiplication.
+				      *
+				      * Bicgstab, is susceptible to breakdowns, so
+				      * we need a parameter telling us, which
+				      * numbers are considered zero.
 				      */
-    struct AdditionalData {};
+    struct AdditionalData
+    {
+					 /**
+					  * Constructor.
+					  *
+					  * The default is no exact residual
+					  * computation and breakdown
+					  * parameter 1e-16.
+					  */
+	AdditionalData(bool exact_residual = false,
+		       double breakdown=1.e-10) :
+			exact_residual(exact_residual),
+			breakdown(breakdown)
+	  {}
+					 /**
+					  * Flag for exact computation of residual.
+					  */
+	bool exact_residual;
+					 /**
+					  * Breakdown threshold.
+					  */
+	double breakdown;
+    };
 
 				     /**
 				      * Constructor.
@@ -162,6 +195,11 @@ class SolverBicgstab : private Solver<VECTOR>
 				      * Residual.
 				      */
     double res;
+
+				     /**
+				      * Additional parameters..
+				      */
+    AdditionalData additional_data;
   
   private:
 				     /**
@@ -184,9 +222,10 @@ class SolverBicgstab : private Solver<VECTOR>
 template<class VECTOR>
 SolverBicgstab<VECTOR>::SolverBicgstab (SolverControl &cn,
 					VectorMemory<VECTOR> &mem,
-					const AdditionalData &)
+					const AdditionalData &data)
 		:
-		Solver<VECTOR>(cn,mem)
+		Solver<VECTOR>(cn,mem),
+		additional_data(data)
 {}
 
 
