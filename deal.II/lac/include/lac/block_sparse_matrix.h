@@ -369,6 +369,21 @@ class BlockSparseMatrix : public Subscriptor
 			   const BlockVector<columns,somenumber> &v) const;
     
 				     /**
+				      * Compute the residual of an
+				      * equation #Ax=b#, where the
+				      * residual is defined to be
+				      * #r=b-Ax# with #x# typically
+				      * being an approximate of the
+				      * true solution of the
+				      * equation. Write the residual
+				      * into #dst#.
+				      */
+    template <typename somenumber>
+    somenumber residual (BlockVector<rows,somenumber>          &dst,
+			 const BlockVector<columns,somenumber> &x,
+			 const BlockVector<rows,somenumber>    &b) const;
+
+				     /**
 				      * Return a (constant) reference
 				      * to the underlying sparsity
 				      * pattern of this matrix.
@@ -645,6 +660,53 @@ matrix_scalar_product (const BlockVector<rows,somenumber>    &u,
       result += block(row,col).matrix_scalar_product (u.block(row),
 						      v.block(col));
   return result;
+};
+
+
+
+template <typename number, int  rows, int columns>
+template <typename somenumber>
+somenumber
+BlockSparseMatrix<number,rows,columns>::
+residual (BlockVector<rows,somenumber>          &dst,
+	  const BlockVector<columns,somenumber> &x,
+	  const BlockVector<rows,somenumber>    &b) const
+{
+				   // in block notation, the residual is
+				   // #r_i = b_i - \sum_j A_ij x_j#.
+				   // this can be written as
+				   // #r_i = b_i - A_i0 x_0 - \sum_{j>0} A_ij x_j#.
+				   //
+				   // for the first two terms, we can
+				   // call the residual function of
+				   // A_i0. for the other terms, we
+				   // use vmult_add. however, we want
+				   // to subtract, so in order to
+				   // avoid a temporary vector, we
+				   // perform a sign change of the
+				   // first two term before, and after
+				   // adding up
+  for (unsigned int row=0; row<rows; ++row)
+    {
+      block(row,0).residual (dst.block(row),
+			     x.block(0),
+			     b.block(row));
+      
+      for (unsigned int i=0; i<dst.block(row).size(); ++i)
+	dst.block(row)(i) = -dst.block(row)(i);
+      
+      for (unsigned int col=1; col<columns; ++col)
+	block(row,col).vmult_add (dst.block(row),
+				  x.block(col));
+
+      for (unsigned int i=0; i<dst.block(row).size(); ++i)
+	dst.block(row)(i) = -dst.block(row)(i);
+    };
+
+  somenumber res = 0;
+  for (unsigned int row=0; row<rows; ++row)
+    res += dst.block(row).norm_sqr ();
+  return sqrt(res);
 };
 
 

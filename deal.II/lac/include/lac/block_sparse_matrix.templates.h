@@ -75,6 +75,7 @@ reinit (const BlockSparsityPattern<rows,columns> &sparsity)
 };
 
 
+
 template <typename number, int  rows, int columns>
 void
 BlockSparseMatrix<number,rows,columns>::clear () 
