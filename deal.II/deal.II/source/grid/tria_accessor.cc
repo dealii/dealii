@@ -2022,10 +2022,10 @@ void CellAccessor<dim>::set_neighbor (const unsigned int i,
 	  typename TriaSubstructAccessor<dim>::ExcInvalidNeighbor(i));
   tria->levels[present_level]->
     neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first
-    = pointer.accessor.present_level;
+    = pointer->present_level;
   tria->levels[present_level]->
     neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second
-    = pointer.accessor.present_index;
+    = pointer->present_index;
 };
 
 
