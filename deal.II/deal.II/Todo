@@ -1,0 +1,45 @@
+Replace the declaration of vector<bool> in tria.h by something real
+  when gcc2.8 is available
+
+Make some functions in the iterators inlined, if the compiler
+  accepts them in gcc2.8
+
+Make the iterator functions (begin_*, end) templated with gcc2.8,
+  let the dimension then be templated (gcc2.8 chokes ober the return
+  type)
+
+Rewrite code like
+      int flagged_cells = 0;
+      for (; cell!=endc; ++cell)
+	if (cell->refine_flag_set())
+	  ++flagged_cells;
+  using the STL count() operation with a member function predicate if
+  available.
+
+Change function args of DoFHandler::transfer_cell to
+  cell_iterators when "typename" keyword is available (i.e.
+  if gcc2.8 is available)
+
+Write monitors to control whether enough memory was allocated for
+  the vectors (i.e. after a process, whether size()==capacity()).
+  (for DoF)
+
+Write Triangulation::mesh_function.
+
+Unify CellAccessor<1> and <2> by renaming
+    LineAccessor<dim> -> SubstructAccessor<dim,1>
+    QuadAccessor<dim> -> SubstructAccessor<dim,2>
+  and deriving CellAccessor<dim> from SubstructAccessor<dim,dim>
+  Do the same with DoFLineAccessor and DoFQuadAccessor
+
+Add support for fast assemblage of mass matrices.
+
+
+
+
+DEAL:
+make dSMatrixStruct warn if max # of entries per row is overrun!
+
+why do loops in dFMatrix run backwards?
+
+Let an empty dfmatrix assume it has dimensions zero rather than one!

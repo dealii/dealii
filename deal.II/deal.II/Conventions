@@ -1,0 +1,27 @@
+Here are some conventions for source code of the deal.II library:
+=================================================================
+
+1./ Functions which return the number of something (number of cells,
+  degrees of freedom, etc) should start with n_*
+
+2./ Function which set a bit or flag should start with set_* (an
+  unfortunate relict is the flag_refine function); functions which
+  clear bits of flags should be named clear_*
+
+3./ After each function, at least three empty lines are expected to
+  enable better readability. One empty line occurs in functions to
+  group blocks of code, two empty lines are not enough to distinguish
+  visibly enough.
+
+4./ Whenever an integer variable can only assume nonnegative values,
+  it has to be marked as unsigned int.
+
+5./ Whenever an argument will not be changed, it should be marked
+  const, even if it passed by value. This makes programs more readable
+  and lets the compiler issue warnings if such a parameter variable is
+  changed, which is often either involuntarily or poor style.
+
+6./ Whenever a function does not change any of the member variable of
+  the embedding class/object, it should be marked as const.
+
+7./ Each class has to have at least 200 pages of documentation ;-)

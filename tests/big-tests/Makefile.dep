@@ -1,0 +1,33 @@
+grid_test.o: grid/grid_test.cc ../include/grid/tria_iterator.h \
+ /usr/local/include/g++/iterator.h /usr/local/include/g++/function.h \
+ /usr/local/include/g++/stl_config.h \
+ /usr/local/include/g++/stl_relops.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/stddef.h \
+ /usr/local/include/g++/stl_function.h \
+ /usr/local/include/g++/iostream.h /usr/local/include/g++/streambuf.h \
+ /usr/local/include/g++/libio.h /usr/local/lib/g++-include/_G_config.h \
+ /usr/local/include/g++/stl_iterator.h \
+ /usr/local/include/g++/type_traits.h \
+ /usr/local/include/g++/stl_construct.h \
+ /usr/local/lib/g++-include/new.h /usr/local/lib/g++-include/std/new.h \
+ /usr/local/lib/g++-include/std/cstddef.h \
+ /usr/local/include/g++/stl_raw_storage_iter.h \
+ ../include/basic/exceptions.h ../include/grid/point.h \
+ ../include/grid/tria_accessor.h ../include/grid/tria.h \
+ /usr/local/include/g++/vector.h /usr/local/include/g++/algobase.h \
+ /usr/local/include/g++/pair.h /usr/local/include/g++/stl_pair.h \
+ /usr/local/include/g++/stl_algobase.h /usr/include/string.h \
+ /usr/include/sys/feature_tests.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/limits.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/syslimits.h \
+ /usr/include/limits.h /usr/include/sys/isa_defs.h \
+ /usr/include/stdlib.h /usr/local/include/g++/stl_uninitialized.h \
+ /usr/local/include/g++/alloc.h /usr/local/include/g++/stl_alloc.h \
+ /usr/local/sparc-sun-solaris2.5.1/include/assert.h \
+ /usr/local/include/g++/stl_vector.h ../include/grid/tria_line.h \
+ ../include/grid/tria_quad.h ../include/grid/tria_boundary.h \
+ /usr/local/include/g++/cmath \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/math.h \
+ /usr/include/math.h /usr/include/floatingpoint.h /usr/include/stdio.h \
+ /usr/include/sys/va_list.h /usr/include/sys/ieeefp.h \
+ /usr/local/include/g++/fstream.h

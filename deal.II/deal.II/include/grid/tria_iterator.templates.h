@@ -1,0 +1,384 @@
+/* $Id$ */
+
+#include <grid/tria.h>
+#include <grid/tria_iterator.h>
+
+
+/* Note: This file only contains template definitions and will thus
+   not produce an object file. It is rather thought to be included
+   into the *_accessor.cc files.
+*/
+
+
+
+/*------------------------ Functions: TriaRawIterator ------------------*/
+
+
+template <int dim, class Accessor>
+TriaRawIterator<dim,Accessor>::TriaRawIterator () :
+		accessor (0, -2, -2, 0) {};
+
+
+
+template <int dim, class Accessor>
+TriaRawIterator<dim,Accessor>::TriaRawIterator (const TriaRawIterator<dim,Accessor> &i) :
+		accessor (i.accessor) {};
+
+
+
+template <int dim, class Accessor>
+TriaRawIterator<dim,Accessor>::TriaRawIterator (Triangulation<dim> *parent,
+						const int           level,
+						const int           index,
+						const void         *local_data) :
+		accessor (parent, level, index, local_data) {};
+
+
+
+template <int dim, class Accessor>
+TriaRawIterator<dim,Accessor> &
+TriaRawIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) {
+  accessor.copy_from (i.accessor);
+  
+  return *this;
+};
+
+
+
+template <int dim, class Accessor>
+bool
+TriaRawIterator<dim,Accessor>::operator == (const TriaRawIterator<dim,Accessor> &i) const {
+  return accessor == i.accessor;
+};
+
+
+
+template <int dim, class Accessor>
+bool
+TriaRawIterator<dim,Accessor>::operator != (const TriaRawIterator<dim,Accessor> &i) const {
+  return accessor != i.accessor;
+};
+
+
+
+template <int dim, class Accessor>
+TriaRawIterator<dim,Accessor> TriaRawIterator<dim,Accessor>::operator ++ (int) {
+  TriaRawIterator<dim,Accessor> tmp(*this);
+  this->operator++ ();
+  
+  return tmp;
+};
+
+
+
+template <int dim, class Accessor>
+TriaRawIterator<dim,Accessor> TriaRawIterator<dim,Accessor>::operator -- (int) {
+  TriaRawIterator<dim,Accessor> tmp(*this);
+  this->operator-- ();
+  
+  return tmp;
+};
+
+
+
+
+/*-----------------------  functions: TriaIterator ---------------*/
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor>::TriaIterator () :
+		TriaRawIterator<dim,Accessor> () {};
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor>::
+TriaIterator (const TriaIterator<dim,Accessor> &i) :
+		TriaRawIterator<dim,Accessor> ((TriaRawIterator<dim,Accessor>)i) {};
+
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor>::
+TriaIterator (const TriaRawIterator<dim,Accessor> &i) :
+		TriaRawIterator<dim,Accessor> (i)
+{
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // used() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end)
+    Assert (accessor.used(),
+	    ExcAssignmentOfUnusedObject());
+#endif  
+};
+
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor>::TriaIterator (Triangulation<dim> *parent,
+					  const int           level,
+					  const int           index,
+					  const void         *local_data) :
+		TriaRawIterator<dim,Accessor> (parent, level, index, local_data)
+{
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // used() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end)
+    Assert (accessor.used(),
+	    ExcAssignmentOfUnusedObject());
+#endif  
+};
+
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor> &
+TriaIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &i) {
+  accessor.copy_from (i.accessor);
+  return *this;
+};
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor> &
+TriaIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) {
+  accessor.copy_from (i.accessor);
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // used() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end) 
+    Assert (accessor.used(),
+	    ExcAssignmentOfUnusedObject());
+#endif  
+  return *this;
+};
+
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor> & TriaIterator<dim,Accessor>::operator ++ () {
+  while (TriaRawIterator<dim,Accessor>::operator++(),
+	 (state() == valid))
+    if (accessor.used() == true)
+      return *this;
+  return *this;
+};
+
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor>  TriaIterator<dim,Accessor>::operator ++ (int) {
+  TriaIterator<dim,Accessor> tmp(*this);
+  this->operator++ ();
+  
+  return tmp;
+};
+
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor> & TriaIterator<dim,Accessor>::operator -- () {
+  while (TriaRawIterator<dim,Accessor>::operator--(),
+	 (state() == valid))
+    if (accessor.used() == true)
+      return *this;
+  return *this;
+};
+
+
+template <int dim, class Accessor>
+TriaIterator<dim,Accessor>  TriaIterator<dim,Accessor>::operator -- (int) {
+  TriaIterator<dim,Accessor> tmp(*this);
+  this->operator-- ();
+  
+  return tmp;
+};
+
+
+
+/*-----------------------  functions: TriaActiveIterator ---------------*/
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor>::TriaActiveIterator () :
+		TriaIterator<dim,Accessor> () {};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor>::
+TriaActiveIterator (const TriaActiveIterator<dim,Accessor> &i) :
+		TriaIterator<dim,Accessor> ((TriaIterator<dim,Accessor>) i) {};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor>::
+TriaActiveIterator (const TriaRawIterator<dim,Accessor> &i) :
+		TriaIterator<dim,Accessor> (i)
+{
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // has_children() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end) 
+    Assert (accessor.has_children()==false,
+	    ExcAssignmentOfInactiveObject());
+#endif  
+};
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor>::
+TriaActiveIterator (const TriaIterator<dim,Accessor> &i) :
+		TriaIterator<dim,Accessor> (i)
+{
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // has_children() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end) 
+    Assert (accessor.has_children()==false,
+	    ExcAssignmentOfInactiveObject());
+#endif  
+};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor>::TriaActiveIterator (Triangulation<dim> *parent,
+						      const int           level,
+						      const int           index,
+						      const void         *local_data) :
+		TriaIterator<dim,Accessor> (parent, level, index, local_data)
+{
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // has_children() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end) 
+    Assert (accessor.has_children()==false,
+	    ExcAssignmentOfInactiveObject());
+#endif  
+};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor> &
+TriaActiveIterator<dim,Accessor>::operator = (const TriaActiveIterator<dim,Accessor> &i) {
+  accessor.copy_from (i.accessor);
+  return *this;
+};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor> &
+TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) {
+  accessor.copy_from (i.accessor);
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // has_chidlren() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end) 
+    Assert (accessor.used() && accessor.has_children()==false,
+	    ExcAssignmentOfInactiveObject());
+#endif  
+  return *this;
+};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor> &
+TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &i) {
+  accessor.copy_from (i.accessor);
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // has_children() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end) 
+    Assert (accessor.has_children()==false,
+	    ExcAssignmentOfInactiveObject());
+#endif  
+  return *this;
+};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor> & TriaActiveIterator<dim,Accessor>::operator ++ () {
+  while (TriaIterator<dim,Accessor>::operator++(),
+	 (state() == valid))
+    if (accessor.has_children() == false)
+      return *this;
+  return *this;
+};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor> TriaActiveIterator<dim,Accessor>::operator ++ (int) {
+  TriaActiveIterator<dim,Accessor> tmp(*this);
+  this->operator++ ();
+  
+  return tmp;
+};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor> & TriaActiveIterator<dim,Accessor>::operator -- () {
+  while (TriaIterator<dim,Accessor>::operator--(),
+	 (state() == valid))
+    if (accessor.has_children() == false)
+      return *this;
+  return *this;
+};
+
+
+
+template <int dim, class Accessor>
+TriaActiveIterator<dim,Accessor> TriaActiveIterator<dim,Accessor>::operator -- (int) {
+  TriaActiveIterator<dim,Accessor> tmp(*this);
+  this->operator-- ();
+  
+  return tmp;
+};
+
+
+
+
+
+
+
+
+

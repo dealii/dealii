@@ -1,0 +1,16 @@
+set size 0.721,1
+set data style lines
+set term postscript eps
+
+set output "grid.1.eps"
+plot "grid.1"
+
+set output "grid.2.eps"
+plot "grid.2"
+
+set output "grid.3.eps"
+plot "grid.3"
+
+set output "grid.4.eps"
+plot "grid.4"
+

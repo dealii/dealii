@@ -1,0 +1,62 @@
+set size 0.721,1
+set data style lines
+set noxtics
+set noytics
+set noxzeroaxis
+set noyzeroaxis
+set nokey
+set term postscript eps
+
+!echo "  Making <grid.zoom_in.eps>"
+set output "grid.zoom_in.eps"
+plot "grid.zoom_in"
+
+!echo "  Making <grid.ball.eps>"
+set output "grid.ball.eps"
+plot "grid.ball"
+
+!echo "  Making <grid.curved_line.eps>"
+set output "grid.curved_line.eps"
+plot "grid.curved_line"
+
+!echo "  Making <grid.random.eps>"
+set output "grid.random.eps"
+plot "grid.random"
+
+
+
+set data style dots
+
+!echo "  Making <sparsity.zoom_in.eps>"
+set output "sparsity.zoom_in.eps"
+plot "sparsity.zoom_in"
+
+!echo "  Making <sparsity.ball.eps>"
+set output "sparsity.ball.eps"
+plot "sparsity.ball"
+
+!echo "  Making <sparsity.curved_line.eps>"
+set output "sparsity.curved_line.eps"
+plot "sparsity.curved_line"
+
+!echo "  Making <sparsity.random.eps>"
+set output "sparsity.random.eps"
+plot "sparsity.random"
+
+
+
+!echo "  Making <sparsity.c.zoom_in.eps>"
+set output "sparsity.c.zoom_in.eps"
+plot "sparsity.c.zoom_in"
+
+!echo "  Making <sparsity.c.ball.eps>"
+set output "sparsity.c.ball.eps"
+plot "sparsity.c.ball"
+
+!echo "  Making <sparsity.c.curved_line.eps>"
+set output "sparsity.c.curved_line.eps"
+plot "sparsity.c.curved_line"
+
+!echo "  Making <sparsity.c.random.eps>"
+set output "sparsity.c.random.eps"
+plot "sparsity.c.random"
