@@ -7,8 +7,7 @@
 
 #include <iostream.h>
 #include <exception>
-
-
+#include <stdlib.h>
 
 #ifndef __GNUC__
 #  define __PRETTY_FUNCTION__ "(unknown)"
