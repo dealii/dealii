@@ -475,6 +475,81 @@ double QuadAccessor<2>::measure () const {
 #endif
 
 
+
+#if deal_II_dimension == 3
+
+template <>
+Point<3> QuadAccessor<3>::barycenter () const {
+				   // the evaluation of the formulae
+				   // is a bit tricky when done dimension
+				   // independant, so we write this function
+				   // for 2D and 3D separately
+/*
+  To compute the barycenter, we first have to find out the size of
+  an area element in real space; this equals the Jacobian determinant
+  at this point, then. To do so, find out the points in real space
+  belonging to
+    xi,eta
+    xi+dxi, eta
+    xi, eta+deta
+  To this end, remember that the mapping is
+    x(xi,eta) = \sum_i=0^3 x_i phi_i(xi,eta)
+    y(xi,eta) = \sum_i=0^3 y_i phi_i(xi,eta)
+    z(xi,eta) = \sum_i=0^3 z_i phi_i(xi,eta)
+  with x_i, y_i being the four vertices and the phi_i the shape functions
+  corresponding to these four vertices of this face. Now the real space
+  points belonging to the above points on the unit face are:
+    x, y, z
+    x+sum x_i \partial_xi phi_i(xi,eta) dxi,
+       y+sum y_i \partial_xi phi_i(xi,eta) dxi,
+       z+sum z_i \partial_xi phi_i(xi,eta) dxi
+    x+sum x_i \partial_eta phi_i(xi,eta) deta,
+       y+sum y_i \partial_eta phi_i(xi,eta) deta,
+       z+sum z_i \partial_eta phi_i(xi,eta) deta
+  The unit infinitesimal vectors at the point xi,eta have the direction
+    dxi, 0
+    0, deta
+  and are therefore in real space
+    sum x_i \partial_xi phi_i(xi,eta) dxi,
+      sum y_i \partial_xi phi_i(xi,eta) dxi,
+      sum z_i \partial_xi phi_i(xi,eta) dxi
+    sum x_i \partial_eta phi_i(xi,eta) deta,
+      sum y_i \partial_eta phi_i(xi,eta) deta
+      sum z_i \partial_eta phi_i(xi,eta) deta
+  or in other form:
+    \partial_xi (x,y,z) dxi
+    \partial_eta (x,y,z) deta
+  Then the area element is the length of the cross-product of these two vectors and
+  the Jacobian determinant is this expression divided by dxi deta:
+    |J| = |(\partial_xi (x,y,z) \times (\partial_eta (x,y,z)|
+
+  There is a script in the deal.II/source/fe/scripts/3d directory, which does
+  these computations in Maple.
+*/
+  Assert (false, ExcNotImplemented());
+  
+  return Point<3> ();
+};
+
+
+
+
+template <>
+double QuadAccessor<3>::measure () const {
+				   // the evaluation of the formulae
+				   // is a bit tricky when done dimension
+				   // independant, so we write this function
+				   // for 2D and 3D separately
+				   //
+				   // for documentation, see the barycenter
+				   // function above.
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+#endif
+
+
 template <int dim>
 unsigned int QuadAccessor<dim>::number_of_children () const {
   if (!has_children())
