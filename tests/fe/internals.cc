@@ -122,11 +122,14 @@ main()
   CHECK_M(DGQ,3,2);
   CHECK_M(DGQ,4,2);
 
-  CHECK_M(DGP,0,2);
-  CHECK_M(DGP,1,2);
-  CHECK_M(DGP,2,2);
-  CHECK_M(DGP,3,2);
-  CHECK_M(DGP,4,2);
+                                   // DGP elements presently have no
+                                   // restriction matrices, so cannot
+                                   // be tested
+//   CHECK_M(DGP,0,2);
+//   CHECK_M(DGP,1,2);
+//   CHECK_M(DGP,2,2);
+//   CHECK_M(DGP,3,2);
+//   CHECK_M(DGP,4,2);
 
   CHECK_ALL(Q,1,2);
   CHECK_ALL(Q,2,2);
@@ -136,36 +139,36 @@ main()
   CHECK_M(DGQ,1,3);
   CHECK_M(DGQ,2,3);
 
-  CHECK_M(DGP,0,3);
-  CHECK_M(DGP,1,3);
-  CHECK_M(DGP,2,3);
+                                   // see above
+//   CHECK_M(DGP,0,3);
+//   CHECK_M(DGP,1,3);
+//   CHECK_M(DGP,2,3);
 
   CHECK_ALL(Q,1,3);
   CHECK_ALL(Q,2,3);
 
   CHECK_SYS1(FE_Q<2>(1),3,2);
   CHECK_SYS1(FE_DGQ<2>(2),2,2);
-  CHECK_SYS1(FE_DGP<2>(3),1,2);
+//  CHECK_SYS1(FE_DGP<2>(3),1,2);
 
   CHECK_SYS2(FE_Q<2>(1),3,FE_DGQ<2>(2),2,2);
-  CHECK_SYS2(FE_DGQ<2>(2),2,FE_DGP<2>(3),1,2);
-  CHECK_SYS2(FE_DGP<2>(3),1,FE_DGQ<2>(2),2,2);
+//   CHECK_SYS2(FE_DGQ<2>(2),2,FE_DGP<2>(3),1,2);
+//   CHECK_SYS2(FE_DGP<2>(3),1,FE_DGQ<2>(2),2,2);
 
-  CHECK_SYS3(FE_Q<2>(1),3,FE_DGP<2>(3),1,FE_Q<2>(1),3,2);
+//   CHECK_SYS3(FE_Q<2>(1),3,FE_DGP<2>(3),1,FE_Q<2>(1),3,2);
   CHECK_SYS3(FE_DGQ<2>(2),2,FE_DGQ<2>(2),2,FE_Q<2>(3),3,2);
-  CHECK_SYS3(FE_DGP<2>(3),1,FE_DGP<2>(3),1,FE_Q<2>(2),3,2);
+//   CHECK_SYS3(FE_DGP<2>(3),1,FE_DGP<2>(3),1,FE_Q<2>(2),3,2);
 
-				   // systems of systems
-  
+				   // systems of systems  
   CHECK_SYS3((FESystem<2>(FE_Q<2>(1),3)), 3,
-	     FE_DGP<2>(3), 1,
+	     FE_DGQ<2>(3), 1,
 	     FE_Q<2>(1), 3,
 	     2);
-//    CHECK_SYS3(FE_DGP<2>(3), 1,
-//  	     FESystem<2>(FE_DGP<2>(3),3), 1,
-//  	     FESystem<2>(FE_Q<2>(2),3,
-//  			 FE_DGQ<2>(0),1),2,
-//  	     2);
+  CHECK_SYS3(FE_DGQ<2>(3), 1,
+ 	     FESystem<2>(FE_DGQ<2>(3),3), 1,
+ 	     FESystem<2>(FE_Q<2>(2),3,
+ 			 FE_DGQ<2>(0),1),2,
+ 	     2);
   
   return 0;
 }
