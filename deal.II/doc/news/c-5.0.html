@@ -201,6 +201,14 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: The new <code class="member">FEValuesBase::get_cell</code>
+       function returns the current cell, i.e. the latest cell the
+       <code class="class">FEValues</code> object was reinited with.
+       <br> 
+       (RH 2004/06/22)
+       </p>
+
+  <li> <p>
        Changed: The <code
        class="member">MatrixTools::local_apply_boundary_values</code> function
        used to set the diagonal entries of boundary nodes to one. This is a
