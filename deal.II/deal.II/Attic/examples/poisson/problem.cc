@@ -448,7 +448,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   
   FELinear<dim>                   fe;
   PoissonEquation<dim>            equation (*rhs);
-  QGauss3<dim>                    quadrature;
+  QGauss2<dim>                    quadrature;
   
   cout << "    Distributing dofs... "; 
   dof->distribute_dofs (fe);
