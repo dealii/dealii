@@ -131,11 +131,9 @@ inconvenience this causes.
        New: Class <code class="class">FunctionParser</code>. Wrapper
        class for the fparser library (see 
        <a href="http://www.students.tut.fi/~warp/FunctionParser/">
-       http://www.students.tut.fi/~warp/FunctionParser/</a>.
-       (Luca Heltai, 2005/03/07).
-
+       http://www.students.tut.fi/~warp/FunctionParser/</a>).
        <br> 
-       (GK, 2005/03/02)
+       (Luca Heltai, 2005/03/07).
        </p>
 
   <li> <p>
@@ -166,7 +164,6 @@ inconvenience this causes.
   <li> <p>
        New: The <code class="class">PreconditionRichardson</code>
        implements a Richardson preconditioner.
-
        <br> 
        (GK, 2005/03/10)
        </p>
@@ -212,6 +209,46 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Improved: By employing the new <code
+       class="class">GeometryInfo</code>::<code
+       class="member">line_to_cell_vertices</code>, <code
+       class="class">GeometryInfo</code>::<code
+       class="member">face_to_cell_vertices</code> and <code
+       class="class">GeometryInfo</code>::<code
+       class="member">face_to_cell_lines</code> functions the <code
+       class="class">Triangulation</code>::<code
+       class="member">create_triangulation</code> functions are now
+       implemented independent of given conventions for the numbering
+       of vertices, lines and faces.
+       <br>
+       (RH, 2005/03/11)
+       </p>
+
+  <li> <p>
+       New: The new <code class="class">GeometryInfo</code>::<code
+       class="member">line_to_cell_vertices</code> function maps line
+       vertex numbers to cell vertex numbers.
+       <br> 
+       (RH, 2005/03/11)
+       </p>
+
+  <li> <p>
+       New: The new <code class="class">GeometryInfo</code>::<code
+       class="member">face_to_cell_lines</code> function maps face
+       line numbers to cell line numbers.
+       <br> 
+       (RH, 2005/03/11)
+       </p>
+
+  <li> <p>
+       New: The new <code class="class">GeometryInfo</code>::<code
+       class="member">face_to_cell_vertices</code> function maps face
+       vertex numbers to cell vertex numbers.
+       <br> 
+       (RH, 2005/03/11)
+       </p>
+
   <li> <p>
        Fixed: There was a bug in the <code
        class="class">KellyErrorEstimator</code> class that resulted in
