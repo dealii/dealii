@@ -15,6 +15,7 @@
 // 1d-polynomials, to make sure that all changes we make to these classes
 // do not change the results of these classes.
 
+// added Hierarchical test on 2/11/03 - Brian Carnes
 
 #include <iostream>
 #include <fstream>
@@ -112,6 +113,42 @@ int main ()
 		    << " after shift: " << q[i].value(2.*x-1.)
 		    << " != " << p[i].value(x)
 		    << std::endl;
+	}
+    }
+
+  deallog << "Hierarchical" << std::endl;
+  
+  p.clear ();
+  for (unsigned int i=0;i<12;++i)
+    {
+      p.push_back (Hierarchical<double>(i));
+    }
+
+  for (unsigned int i=0;i<p.size();++i)
+    {
+      deallog << "N0(P" << i << ")"
+	      << " =" << p[i].value(0.) << std::endl;
+    }
+
+  for (unsigned int i=0;i<p.size();++i)
+    {
+      deallog << "N1(P" << i << ")"
+	      << " =" << p[i].value(1.) << std::endl;
+    }
+
+  std::vector<double> values (p.size());
+
+  for (unsigned int j=2; j<p.size(); ++j)
+    {
+      double factor = 1.;
+      for (unsigned int k=0; k<j;++k)
+	factor /= 2. * (j-k);
+
+      for (unsigned int i=0;i<p.size();++i)
+	{
+	  p[i].value (.5, values);
+	  deallog << "N" << j << "(P" << i << ")"
+		  << " =" << values[j] * factor << std::endl;
 	}
     }
 }
