@@ -475,15 +475,33 @@ MappingQ<dim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
 				       // not precomputed, then do so now
       if (dim==2)
 	compute_laplace_vector(loqvs);
-      
-				       // for dim==3 don't throw an
-				       // ExcNotImplemented here to
-				       // allow the creating of that
-				       // MappingQ<3> object. But an
-				       // ExcLaplaceVectorNotSet
-				       // assertion is thrown when the
-				       // apply_laplace_vector
-				       // function is called.
+      else
+					 // computing the Laplace
+					 // vector for faces is not
+					 // supported in 3d at
+					 // present. presumably, doing
+					 // so would not be so hard:
+					 // we would only have to call
+					 // the function in 2d,
+					 // i.e. the quad values in 3d
+					 // are equal to the cell
+					 // values in 2d. however,
+					 // that would require us to
+					 // link in the 2d library,
+					 // which is kind of awkward
+					 // (note that
+					 // compute_laplace_vector
+					 // really makes use of a lot
+					 // of 2d stuff, such as
+					 // FEValues etc). an
+					 // alternative would be to
+					 // precompute the values of
+					 // this array for a couple of
+					 // higher mapping orders, pin
+					 // down their values and
+					 // insert them into the array
+					 // above.
+	Assert (false, ExcNotImplemented());
     }
 
 				   // the sum of weights of the points
@@ -592,9 +610,9 @@ MappingQ<dim>::compute_laplace_vector(Table<2,double> &lvs) const
   for (unsigned int point=0; point<n_q_points; ++point)
     for (unsigned int i=0; i<n_inner; ++i)
       for (unsigned int j=0; j<n_inner; ++j)
-	S(i,j)+=contract(quadrature_data.derivative(point, n_outer+i),
-			 quadrature_data.derivative(point, n_outer+j))
-		*quadrature.weight(point);
+	S(i,j) += contract(quadrature_data.derivative(point, n_outer+i),
+			   quadrature_data.derivative(point, n_outer+j))
+		  * quadrature.weight(point);
   
 				   // Compute the components of T to be the
 				   // product of gradients of inner and
@@ -603,9 +621,9 @@ MappingQ<dim>::compute_laplace_vector(Table<2,double> &lvs) const
   for (unsigned int point=0; point<n_q_points; ++point)
     for (unsigned int i=0; i<n_inner; ++i)
       for (unsigned int k=0; k<n_outer; ++k)
-	T(i,k)+=contract(quadrature_data.derivative(point, n_outer+i),
-			 quadrature_data.derivative(point, k))
-		*quadrature.weight(point);
+	T(i,k) += contract(quadrature_data.derivative(point, n_outer+i),
+			   quadrature_data.derivative(point, k))
+		  *quadrature.weight(point);
   
   FullMatrix<double> S_1(n_inner);
   S_1.invert(S);
