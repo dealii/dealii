@@ -29,6 +29,7 @@
 #include <multigrid/mg_dof_handler.h>
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>
+#include <fe/fe_dgp.h>
 #include <fe/fe_system.h>
 
 #include <fstream>
@@ -70,13 +71,75 @@ print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
 }
 
 
+template <int dim>
+void
+check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
+{
+  const FiniteElement<dim>& element = mgdof.get_fe();
+  DoFHandler<dim>& dof = mgdof;
+  
+				   // Prepare a reordering of
+				   // components for later use
+  std::vector<unsigned int> order(element.n_components());
+  for (unsigned int i=0; i<order.size(); ++i) order[i] = order.size()-i-1;
+
+  Point<dim> direction;
+  for (unsigned int i=0;i<dim;++i)
+    direction(i) = pow(10.,i);
+  
+				   // Check global ordering
+  print_dofs (dof);
+  
+  if (discontinuous)
+    {
+      DoFRenumbering::downstream_dg(dof, direction);
+    }
+  else
+    {
+      DoFRenumbering::Cuthill_McKee (dof);
+      print_dofs (dof);
+      DoFRenumbering::Cuthill_McKee (dof, true);
+      print_dofs (dof);
+      DoFRenumbering::Cuthill_McKee (dof, true, true);
+      print_dofs (dof);
+    }
+  
+  
+  DoFRenumbering::component_wise (dof, order);
+  print_dofs (dof);
+
+  std::vector<bool> selected_dofs (dof.n_dofs(), false);
+  for (unsigned int i=0; i<dof.n_dofs(); ++i) if (i%2==0) selected_dofs[i] = true;
+  DoFRenumbering::sort_selected_dofs_back (dof, selected_dofs);
+  print_dofs (dof);
+
+				   // Check level ordering
+  for (unsigned int level=0;level<dof.get_tria().n_levels();++level)
+    {
+      print_dofs (mgdof, level);
+
+// Reinsert after fixing
+//        DoFRenumbering::Cuthill_McKee (mgdof, level);
+//        print_dofs (mgdof, level);
+//        DoFRenumbering::Cuthill_McKee (mgdof, level, true);
+//        print_dofs (mgdof, level);
+
+      if (discontinuous)
+	{
+	  DoFRenumbering::downstream_dg(mgdof, level, direction);
+	}
+  
+      DoFRenumbering::component_wise (mgdof, order);
+      print_dofs (mgdof, level);
+    }
+
+}
+
 
 template <int dim>
 void
 check ()
 {
-  Functions::CosineFunction<dim> cosine;
-  
   Triangulation<dim> tr;  
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
@@ -87,49 +150,18 @@ check ()
   tr.execute_coarsening_and_refinement ();
   if (dim==1)
     tr.refine_global(2);
-  
-  FESystem<dim> element (FE_Q<dim>(2), 2, FE_DGQ<dim>(1), 1);
+
   MGDoFHandler<dim> mgdof(tr);
-  DoFHandler<dim>& dof = mgdof;
-  dof.distribute_dofs(element);
-
-				   // Prepare a reordering of
-				   // components for later use
-  std::vector<unsigned int> order(element.n_components());
-  for (unsigned int i=0; i<order.size(); ++i) order[i] = order.size()-i-1;
-
-				   // Check global ordering
-  print_dofs (dof);
   
-  DoFRenumbering::Cuthill_McKee (dof);
-  print_dofs (dof);
-  DoFRenumbering::Cuthill_McKee (dof, true);
-  print_dofs (dof);
-  DoFRenumbering::Cuthill_McKee (dof, true, true);
-  print_dofs (dof);
-
-  DoFRenumbering::component_wise (dof, order);
-  print_dofs (dof);
-
-  std::vector<bool> selected_dofs (dof.n_dofs(), false);
-  for (unsigned int i=0; i<dof.n_dofs(); ++i) if (i%2==0) selected_dofs[i] = true;
-  DoFRenumbering::sort_selected_dofs_back (dof, selected_dofs);
-  print_dofs (dof);
-
-				   // Check level ordering
-  for (unsigned int level=0;level<tr.n_levels();++level)
-    {
-      print_dofs (mgdof, level);
-
-// Reinsert after fixing
-//        DoFRenumbering::Cuthill_McKee (mgdof, level);
-//        print_dofs (mgdof, level);
-//        DoFRenumbering::Cuthill_McKee (mgdof, level, true);
-//        print_dofs (mgdof, level);
-
-      DoFRenumbering::component_wise (mgdof, order);
-      print_dofs (mgdof, level);
-    }
+  FESystem<dim> e1 (FE_Q<dim>(2), 2, FE_DGQ<dim>(1), 1);
+  mgdof.distribute_dofs(e1);
+  check_renumbering(mgdof, false);
+  mgdof.clear();
+  
+  FESystem<dim> e2 (FE_DGP<dim>(2), 2, FE_DGQ<dim>(1), 1);
+  mgdof.distribute_dofs(e2);
+  check_renumbering(mgdof, true);
+  mgdof.clear();
 }
 
 
