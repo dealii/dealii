@@ -105,6 +105,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> Fixed: <code
+       class="member">FE_Q::has_support_on_face</code> always returned
+       true in 1d, partly because faces are not really an issue in
+       1d. It now does so only when the support point of the
+       respective shape function is actually the requested vertex.
+       <br>
+       (WB 2002/06/13)
+       </p>
+
   <li> <p> New: The existing <code
        class="member">FETools::interpolate</code>, <code
        class="member">FETools::back_interpolate</code> and <code
@@ -121,14 +130,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (RH 2002/06/13)
        </p>
 
-  <li> <p> Change: The constructor of <code
+  <li> <p> Changed: The constructor of <code
        class="class">DoFHandler</code> now takes a reference to a
        <tt>const</tt> <code class="class">Triangulation</code>.
        <br>
        (RH 2002/06/12)
        </p>
 
-  <li> <p> Change: The constructors of all <code
+  <li> <p> Changed: The constructors of all <code
        class="class">DoFAccessor</code>, <code
        class="class">TriaAccessor</code> and <code
        class="class">TriaIterator</code> classes now take pointers to
@@ -137,7 +146,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (RH 2002/06/12)
        </p>
 
-  <li> <p> Change: <code
+  <li> <p> Changed: <code
        class="member">Triangulation::clear_user_flags</code> and <code
        class="member">Triangulation::clear_user_pointers</code> are
        now <tt>const</tt> functions.

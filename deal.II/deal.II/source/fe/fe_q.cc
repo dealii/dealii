@@ -1314,79 +1314,66 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
   unsigned int shape_index = shape_index_;
-    
+
+				   // in 1d, things are simple. since
+				   // there is only one degree of
+				   // freedom per vertex in this
+				   // class, the first is on vertex 0
+				   // (==face 0 in some sense), the
+				   // second on face 1:
   if (dim==1)
-    return true;
-  const unsigned int cell_start = (dim==2)
-				  ? first_quad_index
-				  : first_hex_index;
-  const unsigned int face_start = (dim==2)
-				  ? first_line_index
-				  : first_quad_index;
+    return (((shape_index == 0) && (face_index == 0)) ||
+	    ((shape_index == 1) && (face_index == 1)));
+  else
+				     // more dimensions
+    {
+      const unsigned int cell_start = (dim==2)
+				      ? first_quad_index
+				      : first_hex_index;
+      const unsigned int face_start = (dim==2)
+				      ? first_line_index
+				      : first_quad_index;
   
-				   // Interior degrees of
-				   // freedom correspond to
-				   // shape functions with
-				   // support inside the cell.
-  if (shape_index >= cell_start)
-    return false;
-				   // Shape functions are sorted
-				   // by face. If we dived by
-				   // the number of shapes per
-				   // face, the result must be
-				   // equal to the face index.
-  if (shape_index >= face_start)
-    {
-      shape_index -= first_line_index;
-      shape_index /=  dofs_per_face;
-      return (shape_index == face_index);
-    }
-				   // Only degrees of freedom on
-				   // a vertex are left.
-  shape_index /=  dofs_per_vertex;
-				   // Use a table to figure out
-				   // which face is neighbor to
-				   // which vertex.
-  switch (100*dim+10*face_index+shape_index)
-    {
-      case 200:
-      case 230:
-      case 201:
-      case 211:
-      case 212:
-      case 222:
-      case 223:
-      case 233:
-      case 300:
-      case 320:
-      case 350:
-      case 301:
-      case 321:
-      case 331:
-      case 302:
-      case 332:
-      case 342:
-      case 303:
-      case 343:
-      case 353:
-      case 314:
-      case 324:
-      case 354:
-      case 315:
-      case 325:
-      case 335:
-      case 316:
-      case 336:
-      case 346:
-      case 317:
-      case 347:
-      case 357:
-	return true;
-      default:
+				       // Interior degrees of
+				       // freedom correspond to
+				       // shape functions with
+				       // support inside the cell.
+      if (shape_index >= cell_start)
 	return false;
-    }
-  return true;
-}
+				       // Shape functions are sorted
+				       // by face. If we dived by
+				       // the number of shapes per
+				       // face, the result must be
+				       // equal to the face index.
+      if (shape_index >= face_start)
+	{
+	  shape_index -= first_line_index;
+	  shape_index /=  dofs_per_face;
+	  return (shape_index == face_index);
+	}
+				       // Only degrees of freedom on
+				       // a vertex are left.
+      shape_index /=  dofs_per_vertex;
+				       // Use a table to figure out
+				       // which face is neighbor to
+				       // which vertex.
+      switch (100*dim+10*face_index+shape_index)
+	{
+	  case 200:	  case 230:	  case 201:	  case 211:
+	  case 212:	  case 222:	  case 223:	  case 233:
+	  case 300:	  case 320:	  case 350:	  case 301:
+	  case 321:	  case 331:	  case 302:	  case 332:
+	  case 342:	  case 303:	  case 343:	  case 353:
+	  case 314:	  case 324:	  case 354:	  case 315:
+	  case 325:	  case 335:	  case 316:	  case 336:
+	  case 346:	  case 317:	  case 347:	  case 357:
+		return true;
+	  default:
+		return false;
+	}
+      return true;
+    };
+};
 
 
 
