@@ -23,6 +23,7 @@ default: run-tests
 ############################################################
 
 tests_x = anna_? \
+	  gerold_1 \
 	  geometry_info_1 \
 	  point_inside_? \
 	  full_matrix_1 \

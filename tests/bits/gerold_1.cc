@@ -1,5 +1,5 @@
 
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -7,9 +7,8 @@
 /*    further information on this license.                        */
 
 
-// check whether we can read a 3d grid. this test is presenty
-// disabled, since we cannot read the file, and this will not be fixed
-// in the near future.
+// check whether we can read a 3d grid. this test used to fail until late
+// 2003, when the necessary infrastructure was created
 
 #include "../tests.h"
 #include <grid/tria.h>
@@ -79,7 +78,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
+  deallog << "Solving problem in " << dim << " space dimensions." << std::endl;
   
  
   
@@ -90,14 +89,14 @@ void LaplaceProblem<dim>::run ()
   std::ifstream input_file("gerold_1.inp");
  
 
-  cout << "read ucd data file" << endl;
+  deallog << "read ucd data file" << std::endl;
 
 
   grid_in.read_ucd(input_file);
-  cout << "ucd data file readin exe" << endl;
-
+  deallog << "ucd data file readin exe" << std::endl;
 };
-			
+
+
 int main () 
 {
   std::ofstream logfile("gerold_1.output");
