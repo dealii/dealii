@@ -66,7 +66,15 @@ class BlockIndices
 				      * the block, the second the
 				      * index within that.
 				      */
-    pair<unsigned int,unsigned int> global_to_local (const unsigned int i) const;
+    pair<unsigned int,unsigned int>
+    global_to_local (const unsigned int i) const;
+
+				     /**
+				      * Return the global index of
+				      * #index# in block #block#.
+				      */
+    unsigned int local_to_global (const unsigned int block,
+				  const unsigned int index) const;
 
 				     /**
 				      * Return the total number of
@@ -154,6 +162,20 @@ BlockIndices<n_blocks>::global_to_local (const unsigned int i) const
     --block;
 
   return make_pair<unsigned int>(block, i-start_indices[block]);
+};
+
+
+template <int n_blocks>
+inline
+unsigned int
+BlockIndices<n_blocks>::local_to_global (const unsigned int block,
+					 const unsigned int index) const
+{
+  Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
+  Assert (index < start_indices[block+1]-start_indices[block],
+	  ExcIndexRange (index, 0, start_indices[block+1]-start_indices[block]));
+
+  return start_indices[block]+index;
 };
 
 
