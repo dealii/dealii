@@ -12,17 +12,12 @@
 //----------------------------  block_matrix_array_01.cc  ---------------------------
 
 
-// the class BlockMatrixArray had no local type value_type that is
-// needed in some places. in particular, this is needed for
-// PreconditionBlockSSOR
-//
-// the test also didn't link before, due to some functions that were
-// either missing or in the wrong place
+// This tests the construction of a BlockMatrixArray and outputs the
+// entered blocks using print_latex.
 
 #include <base/logstream.h>
 #include <lac/block_matrix_array.h>
-#include <lac/sparse_matrix.h>
-#include <lac/precondition_block.h>
+#include <lac/full_matrix.h>
 #include <iostream>
 #include <fstream>
 
@@ -31,14 +26,22 @@ int main ()
 {
   std::ofstream logfile("block_matrix_array_01.output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
+  deallog.depth_console(10);
 
-  BlockMatrixArray<SparseMatrix<double> >::value_type i = 1.0;
-  deallog << i << std::endl;
+  FullMatrix<double> A1(4,4);
+  FullMatrix<double> A2(4,4);
+  FullMatrix<double> B(4,3);
+  FullMatrix<double> C(3,3);
+  
+  BlockMatrixArray<FullMatrix<double> > block(2,2);
+  
+  block.enter(A1,0,0);
+  block.enter(A2,0,0,2,true);
+  block.enter(B,0,1,-3.);
+  block.enter(B,0,1,-3.,true);
+  block.enter(C,1,1,1.,true);
 
-				   // the following did not compile
-				   // right away
-  PreconditionBlockSSOR<BlockMatrixArray<SparseMatrix<double> > > p;
+  block.print_latex(deallog);
   
   return 0;
 }
