@@ -63,7 +63,8 @@ get_q_face (Function<dim>&)
 Quadrature<0> &
 get_q_face (Function<1>&)
 {
-  return *static_cast<Quadrature<0>*>(0);
+  Quadrature<0> *q = 0;
+  return *q;
 }
 
 

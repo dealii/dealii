@@ -64,7 +64,8 @@ boundary_q (const DoFHandler<dim> &)
 const Quadrature<0> &
 boundary_q (const DoFHandler<1> &)
 {
-  return *static_cast<const Quadrature<0>*>(0);
+  static const Quadrature<0> *q = 0;
+  return *q;
 }
 
 
