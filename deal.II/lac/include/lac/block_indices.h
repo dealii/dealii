@@ -47,6 +47,14 @@ class BlockIndices
 				      * size of the vector
 				      */
     BlockIndices (const vector<unsigned int> &n);
+
+				     /**
+				      * Reinitialize the number of
+				      * blocks and assign each block
+				      * the same number of elements.
+				      */
+    void reinit (const unsigned int n_blocks,
+		 const unsigned int n_elements_per_block);
     
 				     /**
 				      * Reinitialize the number of
@@ -148,6 +156,17 @@ BlockIndices::BlockIndices (const vector<unsigned int> &n)
     start_indices(n.size()+1)
 {
   reinit (n);
+};
+
+
+
+inline
+void
+BlockIndices::reinit (const unsigned int n_blocks,
+		      const unsigned int n_elements_per_block)
+{
+  const vector<unsigned int> v(n_blocks, n_elements_per_block);
+  reinit (v);
 };
 
 

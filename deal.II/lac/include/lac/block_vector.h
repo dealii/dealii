@@ -130,17 +130,17 @@ class BlockVector
 				      */
     ~BlockVector ();
 
-				   /**
-				    * Reinitialize the BlockVector to
-				    * contain @p{num_blocks} blocks of
-				    * size @p{block_size} each.
-				    *
-				    * If @p{fast==false}, the vector
-				    * is filled with zeros.
-				    */
-  void reinit (const unsigned int num_blocks,
-	       const unsigned int block_size,
-	       const bool fast = false);
+				     /**
+				      * Reinitialize the BlockVector to
+				      * contain @p{num_blocks} blocks of
+				      * size @p{block_size} each.
+				      *
+				      * If @p{fast==false}, the vector
+				      * is filled with zeros.
+				      */
+    void reinit (const unsigned int num_blocks,
+		 const unsigned int block_size,
+		 const bool fast = false);
   
 				     /**
 				      * Reinitialize the BlockVector

@@ -1692,10 +1692,7 @@ DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 
 template void
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
-				 BlockSparsityPattern<2,2>    &sparsity);
-template void
-DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
-				 BlockSparsityPattern<3,3>    &sparsity);
+				 BlockSparsityPattern                &sparsity);
 
 template void 
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
@@ -1705,12 +1702,7 @@ DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 template void 
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 				 const vector<vector<bool> > &mask,
-				 BlockSparsityPattern<2,2>   &sparsity);
-
-template void 
-DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
-				 const vector<vector<bool> > &mask,
-				 BlockSparsityPattern<3,3>   &sparsity);
+				 BlockSparsityPattern        &sparsity);
 
 template
 void

@@ -719,7 +719,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
   map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
 					    endd = boundary_values.end();
   const unsigned int n_dofs = matrix.m();
-  const BlockSparsityPattern<blocks,blocks> &
+  const BlockSparsityPattern &
     sparsity_pattern = matrix.get_sparsity_pattern();
 
 				   // if a diagonal entry is zero

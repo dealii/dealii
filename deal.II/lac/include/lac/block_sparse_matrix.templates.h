@@ -27,7 +27,7 @@ BlockSparseMatrix<number,rows,columns>::BlockSparseMatrix () :
 
 template <typename number, int  rows, int columns>
 BlockSparseMatrix<number,rows,columns>::
-BlockSparseMatrix (const BlockSparsityPattern<rows,columns> &sparsity)
+BlockSparseMatrix (const BlockSparsityPattern &sparsity)
 {
   reinit (sparsity);
 };
@@ -65,7 +65,7 @@ BlockSparseMatrix<number,rows,columns>::reinit ()
 template <typename number, int  rows, int columns>
 void
 BlockSparseMatrix<number,rows,columns>::
-reinit (const BlockSparsityPattern<rows,columns> &sparsity)
+reinit (const BlockSparsityPattern &sparsity)
 {
   sparsity_pattern = &sparsity;
   
@@ -112,7 +112,7 @@ BlockSparseMatrix<number,rows,columns>::n_nonzero_elements () const
 
 
 template <typename number, int  rows, int columns>
-const BlockSparsityPattern<rows,columns> &
+const BlockSparsityPattern &
 BlockSparseMatrix<number,rows,columns>::get_sparsity_pattern () const
 {
   return *sparsity_pattern;

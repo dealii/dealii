@@ -16,6 +16,7 @@
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <base/smartpointer.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/block_indices.h>
 
@@ -28,12 +29,11 @@
  * calls to its member functions to calls to the respective member
  * functions of the member sparsity patterns.
  *
- * The largest difference between the @p{SparsityPattern} class and this
- * class is probably the absence of several of the constructors as
- * well as the absenceof the @p{reinit} functions. The reason is that
- * mostly, the matrices have different properties and you will want to
- * initialize the blocks making up the matrix separately. You can
- * access the different blocks using the @p{block(row,col)} function.
+ * The largest difference between the @p{SparsityPattern} class and
+ * this class is that mostly, the matrices have different properties
+ * and you will want to work on the blocks making up the matrix rather
+ * than the whole matrix. You can access the different blocks using
+ * the @p{block(row,col)} function.
  *
  * Attention: this object is not automatically notified if the size of
  * one of its subobjects' size is changed. After you initialize the
@@ -57,7 +57,6 @@
  *
  * @author Wolfgang Bangerth, 2000
  */
-template <int rows, int columns=rows>
 class BlockSparsityPattern : public Subscriptor
 {
   public:
@@ -88,10 +87,70 @@ class BlockSparsityPattern : public Subscriptor
     BlockSparsityPattern ();
 
 				     /**
-				      * Copy operator. For this the same holds
-				      * as for the copy constructor: it is
-				      * declared, defined and fine to be called,
-				      * but the latter only for empty objects.
+				      * Initialize the matrix with the
+				      * given number of block rows and
+				      * columns. The blocks themselves
+				      * are still empty, and you have
+				      * to call @p{collect_args} after
+				      * you assign them sizes.
+				      */
+    BlockSparsityPattern (const unsigned int n_rows,
+			  const unsigned int n_columns);
+
+				     /**
+				      * Copy constructor. This
+				      * constructor is only allowed to
+				      * be called if the sparsity pattern to be
+				      * copied is empty, i.e. there
+				      * are no block allocated at
+				      * present. This is for the same
+				      * reason as for the
+				      * @p{SparsityPattern}, see there
+				      * for the details.
+				      */
+    BlockSparsityPattern (const BlockSparsityPattern &bsp);
+
+				     /**
+				      * Destructor.
+				      */
+    ~BlockSparsityPattern ();
+    
+				     /**
+				      * Resize the matrix. This
+				      * deletes all previously
+				      * existant blocks and replaces
+				      * them by unitialized ones,
+				      * i.e. ones for which also the
+				      * sizes are not yet set. You
+				      * have to do that by calling the
+				      * @p{reinit} functions of the
+				      * blocks themselves. Do not
+				      * forget to call
+				      * @p{collect_size} after that on
+				      * this object.
+				      *
+				      * The reason that you have to
+				      * set sizes of the blocks
+				      * yourself is that the sizes may
+				      * be varying, the maximum number
+				      * of elements per row may be
+				      * varying, etc. It is simpler
+				      * not to reproduce the interface
+				      * of the @p{SparsityPattern}
+				      * class here but rather let the
+				      * user call whatever function
+				      * she desires.
+				      */
+    void reinit (const unsigned int n_rows,
+		 const unsigned int n_columns);
+    
+				     /**
+				      * Copy operator. For this the
+				      * same holds as for the copy
+				      * constructor: it is declared,
+				      * defined and fine to be called,
+				      * but the latter only for empty
+				      * objects.
 				      */
     BlockSparsityPattern & operator = (const BlockSparsityPattern &);
 
@@ -154,17 +213,17 @@ class BlockSparsityPattern : public Subscriptor
 				      */
     void compress ();
 
-				   /**
-				    * Return the number of blocks in a
-				    * column.
-				    */
-  unsigned int n_block_rows () const;
-  
-				   /**
-				    * Return the number of blocks in a
-				    * row.
-				    */
-  unsigned int n_block_cols () const;
+				     /**
+				      * Return the number of blocks in a
+				      * column.
+				      */
+    unsigned int n_block_rows () const;
+    
+				     /**
+				      * Return the number of blocks in a
+				      * row.
+				      */
+    unsigned int n_block_cols () const;
   
 				     /**
 				      * Return whether the object is
@@ -202,7 +261,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * and then relays to that block.
 				      */
     void add (const unsigned int i, const unsigned int j);
-	
+    
 				     /**
 				      * Return number of rows of this
 				      * matrix, which equals the
@@ -272,13 +331,30 @@ class BlockSparsityPattern : public Subscriptor
 		    int, int, int, int,
 		    << "The blocks [" << arg1 << ',' << arg2 << "] and ["
 		    << arg3 << ',' << arg4 << "] have differing column numbers.");
-    
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcIncompatibleSizes,
+		    int, int,
+		    << "The number of blocks " << arg1 << " and " << arg2
+		    << " are different.");
     
   private:
+
+				     /**
+				      * Number of block rows.
+				      */
+    unsigned int rows;
+
+				     /**
+				      * Number of block columns.
+				      */
+    unsigned int columns;
+    
 				     /**
 				      * Array of sparsity patterns.
 				      */
-    SparsityPattern sub_objects[rows][columns];
+    vector<vector<SmartPointer<SparsityPattern> > > sub_objects;
 
 				     /**
 				      * Object storing and managing
@@ -312,53 +388,48 @@ class BlockSparsityPattern : public Subscriptor
 
 
 
-template <int rows, int columns>
 inline
 SparsityPattern &
-BlockSparsityPattern<rows,columns>::block (const unsigned int row,
-					   const unsigned int column)
+BlockSparsityPattern::block (const unsigned int row,
+			     const unsigned int column)
 {
-  return sub_objects[row][column];
+  return *sub_objects[row][column];
 };
 
 
 
-template <int rows, int columns>
 inline
 const SparsityPattern &
-BlockSparsityPattern<rows,columns>::block (const unsigned int row,
-					   const unsigned int column) const
+BlockSparsityPattern::block (const unsigned int row,
+			     const unsigned int column) const
 {
-  return sub_objects[row][column];
+  return *sub_objects[row][column];
 };
 
 
 
-template <int rows, int columns>
 inline
 const BlockIndices &
-BlockSparsityPattern<rows,columns>::get_row_indices () const
+BlockSparsityPattern::get_row_indices () const
 {
   return row_indices;
 };
 
 
 
-template <int rows, int columns>
 inline
 const BlockIndices &
-BlockSparsityPattern<rows,columns>::get_column_indices () const
+BlockSparsityPattern::get_column_indices () const
 {
   return column_indices;
 };
 
 
 
-template <int rows, int columns>
 inline
 void
-BlockSparsityPattern<rows,columns>::add (const unsigned int i,
-					 const unsigned int j)
+BlockSparsityPattern::add (const unsigned int i,
+			   const unsigned int j)
 {
 				   // if you get an error here, are
 				   // you sure you called
@@ -366,26 +437,24 @@ BlockSparsityPattern<rows,columns>::add (const unsigned int i,
   const pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
     col_index = column_indices.global_to_local (j);
-  sub_objects[row_index.first][col_index.first].add (row_index.second,
-						     col_index.second);
+  sub_objects[row_index.first][col_index.first]->add (row_index.second,
+						      col_index.second);
 };
 
 
 
-template <int rows, int columns>
 inline
 unsigned int
-BlockSparsityPattern<rows,columns>::n_block_cols () const
+BlockSparsityPattern::n_block_cols () const
 {
   return columns;
 }
 
 
 
-template <int rows, int columns>
 inline
 unsigned int
-BlockSparsityPattern<rows,columns>::n_block_rows () const
+BlockSparsityPattern::n_block_rows () const
 {
   return rows;
 }

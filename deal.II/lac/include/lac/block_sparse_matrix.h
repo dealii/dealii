@@ -97,7 +97,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * long as @p{reinit} is not called
 				      * with a new sparsity structure.
 				      */
-    BlockSparseMatrix (const BlockSparsityPattern<rows,columns> &sparsity);
+    BlockSparseMatrix (const BlockSparsityPattern &sparsity);
 
     
 
@@ -144,7 +144,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * The elements of the matrix are
 				      * set to zero by this function.
 				      */
-    virtual void reinit (const BlockSparsityPattern<rows,columns> &sparsity);
+    virtual void reinit (const BlockSparsityPattern &sparsity);
 
     
 				     /**
@@ -178,17 +178,17 @@ class BlockSparseMatrix : public Subscriptor
 				      */
     virtual void clear ();
     
-				   /**
-				    * Return the number of blocks in a
-				    * column.
-				    */
-  unsigned int n_block_rows () const;
-  
-				   /**
-				    * Return the number of blocks in a
-				    * row.
-				    */
-  unsigned int n_block_cols () const;
+				     /**
+				      * Return the number of blocks in a
+				      * column.
+				      */
+    unsigned int n_block_rows () const;
+    
+				     /**
+				      * Return the number of blocks in a
+				      * row.
+				      */
+    unsigned int n_block_cols () const;
   
 				     /**
 				      * Return whether the object is
@@ -434,7 +434,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * function of objects which
 				      * operate on it.
 				      */
-    const BlockSparsityPattern<rows,columns> &
+    const BlockSparsityPattern &
     get_sparsity_pattern () const;
 
 				     /**
@@ -452,7 +452,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * it using the @p{SmartPointer}
 				      * class.
 				      */
-    SmartPointer<const BlockSparsityPattern<rows,columns> > sparsity_pattern;
+    SmartPointer<const BlockSparsityPattern> sparsity_pattern;
 
 				     /**
 				      * Array of sub-matrices.
