@@ -583,7 +583,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                            // run the detached solver
                                            // slave instead
           const char * const program_name = DEAL_II_PATH"/lib/bin/detached_ma27";
-          const char * const child_argv[] = { program_name, 0 };
+          const char * const child_argv[] = { program_name, NULL };
           execv(program_name, const_cast<char * const *>(child_argv));
 
                                            // usually execv does not
