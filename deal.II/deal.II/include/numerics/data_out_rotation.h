@@ -56,7 +56,7 @@ template <int dim> class DoFHandler;
  * @ref{DoFHandler} object passed to this class is taken as the radial
  * variable, and the output will then be either a circle or a ring
  * domain. It is in the user's responsibility to assure that the
- * radial only attains non-negative values.
+ * radial coordinate only attains non-negative values.
  *
  *
  * @sect3{Details for 2d computations}
