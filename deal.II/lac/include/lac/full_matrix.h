@@ -935,9 +935,9 @@ void
 FullMatrix<number>::copy_from (const MATRIX& M)
 {
   reinit (M.m(), M.n());
-  typename MATRIX::const_iterator entry;
   const typename MATRIX::const_iterator end = M.end();
-  for (entry = M.begin(); entry != end; ++entry)
+  for (typename MATRIX::const_iterator entry = M.begin();
+       entry != end; ++entry)
     el(entry->row(), entry->column()) = entry->value();
 }
 
