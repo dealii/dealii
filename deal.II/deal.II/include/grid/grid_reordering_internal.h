@@ -427,9 +427,13 @@ namespace internal
     };
 
   
-    class ElementInfo
+    struct ElementInfo
     {
-      public:
+					 /**
+					  * Constructor.
+					  */
+	ElementInfo ();
+	
                                          /**
                                           * The numbers of the edges
                                           * coming into node i are
@@ -461,9 +465,9 @@ namespace internal
         int nodes_on_face[6][4];
     };
 
-    class DealElemInfo : public ElementInfo
+    
+    struct DealElemInfo : public ElementInfo
     {
-      public:
         DealElemInfo();
     };
 
@@ -474,19 +478,14 @@ namespace internal
                                       * A conectivity and orientation
                                       * aware edge class.
                                       */
-    class Edge
+    struct Edge
     {
-      public:
                                          /**
                                           * Simple constructor
                                           */
-        Edge (int n0, int n1, int orient=0)
-                        :
-                        orientation_flag(orient),
-                        group(0),
-                        num_neighbouring_cubes(0),
-                        neighbouring_cubes(NULL)
-          {nodes[0]=n0; nodes[1]=n1;};
+        Edge (int n0,
+	      int n1,
+	      int orient=0);
       
                                          /**
                                           * Simple Destructor
@@ -539,18 +538,17 @@ namespace internal
                                       * TODO: Need to move conectivity information out 
                                       *       of cell and into edge.
                                       */
-    class Cell
+    struct Cell
     {
-      public:
                                          /**
                                           * The IDs for each of the edges.
                                           */
-        int edges[12];
+        int edges[GeometryInfo<3>::lines_per_cell];
         
                                          /**
                                           * The IDs for each of the nodes.
                                           */        
-        int nodes[8];  
+        int nodes[GeometryInfo<3>::vertices_per_cell];  
 
                                          /**
                                           * Which way do the edges
@@ -560,7 +558,7 @@ namespace internal
                                           * (1) or node 1 is the base
                                           * (-1).
                                           */
-        int local_orientation_flags[12];
+        int local_orientation_flags[GeometryInfo<3>::lines_per_cell];
         
                                          /**
                                           * An internal flag used to
@@ -574,36 +572,12 @@ namespace internal
                                          /**
                                           * Copy Constructor
                                           */
-        Cell (const Cell &c)
-	  {
-	    for(int i=0;i<12;++i)
-              {
-                edges[i]=c.edges[i];
-                local_orientation_flags[i]=c.local_orientation_flags[i];
-              }
-	    for(int i=0;i<8;++i)
-              {
-                nodes[i]=c.nodes[i];
-              }
-	    waiting_to_be_processed=c.waiting_to_be_processed;
-	  }
+        Cell (const Cell &c);
 
                                          /**
                                           * Default Constructor
                                           */
-        Cell()
-	  {
-	    for(int i=0;i<12;++i)
-              {
-                edges[i]=-1;
-                local_orientation_flags[i]=1;
-              }
-	    for(int i=0;i<8;++i)
-              {
-                nodes[i]=-1;
-              }
-	    waiting_to_be_processed=false;
-	  }
+        Cell();
     };
 
 
@@ -684,18 +658,14 @@ namespace internal
     };
 
 
+    
     class Orienter
     {
       public:
                                          /**
                                           * Constructor.
                                           */
-        Orienter()
-          {
-            for (unsigned int i=0; i<12; ++i)
-              edge_orient_array[i]=false;
-          }
-
+        Orienter();
 
                                          /**
                                           * The cube we're looking at now.
@@ -708,7 +678,7 @@ namespace internal
                                           */
         unsigned int marker_cube;
 
-        std::vector<int> SheetToProcess;
+        std::vector<int> sheet_to_process;
 
         int cur_edge_group;
 
@@ -717,20 +687,20 @@ namespace internal
         bool orient_edges (Mesh &m);
         void orient_cubes (Mesh &m);
       
-        bool GetNextUnorientedCube (Mesh &m);
+        bool get_next_unoriented_cube (Mesh &m);
         bool is_oriented (const Mesh &m,
                           int cell_num);
 
-        bool OrientEdgesInCurrentCube (Mesh &m);
-        bool OrientEdgeSetInCurrentCube (Mesh &m,
-                                         int edge_set);
-        bool OrientNextUnorientedEdge (Mesh &m);
-        bool Consistent (Mesh &m,
+        bool orient_edges_in_current_cube (Mesh &m);
+        bool orient_edge_set_in_current_cube (Mesh &m,
+					      int edge_set);
+        bool orient_next_unoriented_edge (Mesh &m);
+        bool consistent (Mesh &m,
                          int cell_num);
 
 
-        void GetAdjacentCubes (Mesh &m);
-        bool GetNextActiveCube (Mesh &m);
+        void get_adjacent_cubes (Mesh &m);
+        bool get_next_active_cube (Mesh &m);
     };
 
 
