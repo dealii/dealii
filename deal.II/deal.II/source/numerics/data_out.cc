@@ -37,7 +37,8 @@
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataEntry::
 DataEntry (const Vector<double> *data,
-	   const std::vector<std::string> &names) :
+	   const std::vector<std::string> &names)
+		:
 		single_data(data),
 		has_block(false),
 		names(names)
@@ -48,7 +49,8 @@ DataEntry (const Vector<double> *data,
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataEntry::
 DataEntry (const BlockVector<double> *data,
-	   const std::vector<std::string> &names) :
+	   const std::vector<std::string> &names)
+		:
 		block_data(data),
 		has_block(true),
 		names(names)
@@ -70,7 +72,8 @@ DataEntry::memory_consumption () const
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataOut_DoFData () :
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataOut_DoFData ()
+		:
 		dofs(0)
 {}
 
@@ -253,55 +256,6 @@ clear_input_data_references ()
       dofs->unsubscribe ();
       dofs = 0;
     };
-}
-
-
-
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
-merge_patches (const DataOut_DoFData        &source,
-	       const Point<patch_space_dim> &shift)
-{
-  const std::vector<Patch> source_patches = source.get_patches ();
-  Assert (patches.size () != 0,        ExcNoPatches ());
-  Assert (source_patches.size () != 0, ExcNoPatches ());
-                                   // check equality of component
-                                   // names
-  Assert (get_dataset_names() == source.get_dataset_names(),
-          ExcIncompatibleDatasetNames());
-                                   // make sure patches are compatible
-  Assert (patches[0].n_subdivisions == source_patches[0].n_subdivisions,
-          ExcIncompatiblePatchLists());
-  Assert (patches[0].data.n_rows() == source_patches[0].data.n_rows(),
-          ExcIncompatiblePatchLists());
-  Assert (patches[0].data.n_cols() == source_patches[0].data.n_cols(),
-          ExcIncompatiblePatchLists());
-
-                                   // merge patches. store old number
-                                   // of elements, since we need to
-                                   // adjust patch numbers, etc
-                                   // afterwards
-  const unsigned int old_n_patches = patches.size();
-  patches.insert (patches.end(),
-                  source_patches.begin(),
-                  source_patches.end());
-
-				   // perform shift, if so desired
-  if (shift != Point<patch_space_dim>())
-    for (unsigned int i=old_n_patches; i<patches.size(); ++i)
-      for (unsigned int v=0; v<GeometryInfo<patch_dim>::vertices_per_cell; ++v)
-	patches[i].vertices[v] += shift;
-  
-                                   // adjust patch numbers
-  for (unsigned int i=old_n_patches; i<patches.size(); ++i)
-    patches[i].patch_index += old_n_patches;
-  
-                                   // adjust patch neighbors
-  for (unsigned int i=old_n_patches; i<patches.size(); ++i)
-    for (unsigned int n=0; n<GeometryInfo<patch_dim>::faces_per_cell; ++n)
-      if (patches[i].neighbors[n] != Patch::no_neighbor)
-        patches[i].neighbors[n] += old_n_patches;
 }
 
 
@@ -583,13 +537,13 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 
   const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
 
-				   // before we start the loop:
-				   // create a quadrature rule that
-				   // actually has the points on this
-				   // patch
+ 				   // before we start the loop:
+ 				   // create a quadrature rule that
+ 				   // actually has the points on this
+ 				   // patch
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, n_subdivisions);
-
+  
   const unsigned int n_q_points     = patch_points.n_quadrature_points;
   const unsigned int n_components   = this->dofs->get_fe().n_components();
   const unsigned int n_datasets     = this->dof_data.size() * n_components +
@@ -733,6 +687,7 @@ add_data_vector<BlockVector<double> > (
   const std::string    &name,
   const DataVectorType  type);
 
+
 template class DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>;
 template void
 DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
@@ -790,5 +745,6 @@ add_data_vector<BlockVector<double> > (
   const BlockVector<double> &vec,
   const std::string    &name,
   const DataVectorType  type);
+
 
 #endif

@@ -400,7 +400,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * object did not yet set up any
                                       * patches.
                                       */
-    void merge_patches (const DataOut_DoFData        &source,
+    template <int dof_handler_dim2>
+    void merge_patches (const DataOut_DoFData<dof_handler_dim2,patch_dim,patch_space_dim> &source,
 			const Point<patch_space_dim> &shift = Point<patch_space_dim>());
     
 				     /**
@@ -585,6 +586,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * of the base class.
 				      */
     virtual std::vector<std::string> get_dataset_names () const;
+
+				     /**
+				      * Make all template siblings
+				      * friends. Needed for the
+				      * @p{merge_patches} function.
+				      */
+    template <int,int,int> friend class DataOut_DoFData;
 };
 
 
@@ -756,6 +764,58 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      */
     void build_some_patches (Data data);
 };
+
+
+
+// -------------------- template and inline functions ------------------------
+
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim2>
+void
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+merge_patches (const DataOut_DoFData<dof_handler_dim2,patch_dim,patch_space_dim> &source,
+	       const Point<patch_space_dim> &shift)
+{
+  const std::vector<Patch> source_patches = source.get_patches ();
+  Assert (patches.size () != 0,        ExcNoPatches ());
+  Assert (source_patches.size () != 0, ExcNoPatches ());
+                                   // check equality of component
+                                   // names
+  Assert (get_dataset_names() == source.get_dataset_names(),
+          ExcIncompatibleDatasetNames());
+                                   // make sure patches are compatible
+  Assert (patches[0].n_subdivisions == source_patches[0].n_subdivisions,
+          ExcIncompatiblePatchLists());
+  Assert (patches[0].data.n_rows() == source_patches[0].data.n_rows(),
+          ExcIncompatiblePatchLists());
+  Assert (patches[0].data.n_cols() == source_patches[0].data.n_cols(),
+          ExcIncompatiblePatchLists());
+
+                                   // merge patches. store old number
+                                   // of elements, since we need to
+                                   // adjust patch numbers, etc
+                                   // afterwards
+  const unsigned int old_n_patches = patches.size();
+  patches.insert (patches.end(),
+                  source_patches.begin(),
+                  source_patches.end());
+
+				   // perform shift, if so desired
+  if (shift != Point<patch_space_dim>())
+    for (unsigned int i=old_n_patches; i<patches.size(); ++i)
+      for (unsigned int v=0; v<GeometryInfo<patch_dim>::vertices_per_cell; ++v)
+	patches[i].vertices[v] += shift;
+  
+                                   // adjust patch numbers
+  for (unsigned int i=old_n_patches; i<patches.size(); ++i)
+    patches[i].patch_index += old_n_patches;
+  
+                                   // adjust patch neighbors
+  for (unsigned int i=old_n_patches; i<patches.size(); ++i)
+    for (unsigned int n=0; n<GeometryInfo<patch_dim>::faces_per_cell; ++n)
+      if (patches[i].neighbors[n] != Patch::no_neighbor)
+        patches[i].neighbors[n] += old_n_patches;
+}
 
 
 #endif
