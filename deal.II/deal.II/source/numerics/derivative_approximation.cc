@@ -304,7 +304,7 @@ C DEFINE A TEST MATRIX
 				   // degenerate case with three
 				   // identical eigenvalues. check
 				   // this first
-  if (R < 1e-14*am)
+  if (R < 1e-14*std::fabs(am))
     EE[0] = EE[1] = EE[2] = am;
   else
     {
@@ -313,7 +313,7 @@ C DEFINE A TEST MATRIX
       const double R3 = R*R*R;
       const double XX = 4. * J3 / R3;
       const double YY = 1. - std::fabs(XX);
-      
+
       Assert (YY > -1e-14, ExcInternalError());
       
       if (YY < 0)
@@ -332,8 +332,6 @@ C DEFINE A TEST MATRIX
 	};
     };
 
-  cout << "EE=" << EE[0] << ' ' << EE[1] << ' ' << EE[2] << endl;
-  
   return std::max (std::fabs (EE[0]),
 		   std::max (std::fabs (EE[1]),
 			     std::fabs (EE[2])));
