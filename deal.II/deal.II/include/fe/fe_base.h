@@ -1495,9 +1495,68 @@ FiniteElementBase<dim>::face_system_to_component_index (const unsigned int index
 {
   Assert(index < face_system_to_component_table.size(),
 	 ExcIndexRange(index, 0, face_system_to_component_table.size()));
-//TODO: check for primitivity of this shape function. this needs the global dof index
-//    Assert (is_primitive (face_to_cell_index(index)),
-//  	  typename FiniteElementBase<dim>::ExcShapeFunctionNotPrimitive(index));
+
+                                   // in debug mode, check whether the
+                                   // function is primitive, since
+                                   // otherwise the result may have no
+                                   // meaning
+                                   //
+                                   // since the primitivity tables are
+                                   // all geared towards cell dof
+                                   // indices, rather than face dof
+                                   // indices, we have to work a
+                                   // little bit...
+                                   //
+                                   // in 1d, the face index is equal
+                                   // to the cell index
+  Assert (((dim == 1) && is_primitive(index))
+          ||
+                                           // in 2d, construct it like
+                                           // this:
+          ((dim == 2) &&
+           is_primitive (index < (GeometryInfo<2>::vertices_per_face *
+                                  this->dofs_per_vertex)
+                         ?
+                         index
+                         :
+                         GeometryInfo<2>::vertices_per_cell *
+                         this->dofs_per_vertex +
+                         (index -
+                          GeometryInfo<2>::vertices_per_face *
+                          this->dofs_per_vertex)))
+          ||
+                                           // likewise in 3d, but more
+                                           // complicated
+          ((dim == 3) &&
+           is_primitive (index < (GeometryInfo<3>::vertices_per_face *
+                                  this->dofs_per_vertex)
+                         ?
+                         index
+                         :
+                         (index < (GeometryInfo<3>::vertices_per_face *
+                                   this->dofs_per_vertex
+                                   +
+                                   GeometryInfo<3>::lines_per_face *
+                                   this->dofs_per_line)
+                          ?
+                          GeometryInfo<3>::vertices_per_cell *
+                          this->dofs_per_vertex +
+                          (index -
+                           GeometryInfo<3>::vertices_per_face *
+                           this->dofs_per_vertex)
+                          :
+                          GeometryInfo<3>::vertices_per_cell *
+                          this->dofs_per_vertex +
+                          GeometryInfo<3>::lines_per_cell *
+                          this->dofs_per_line +
+                          (index -
+                           GeometryInfo<3>::vertices_per_face *
+                           this->dofs_per_vertex
+                           -
+                           GeometryInfo<3>::lines_per_face *
+                           this->dofs_per_line)))),
+          typename FiniteElementBase<dim>::ExcShapeFunctionNotPrimitive(index));
+
   return face_system_to_component_table[index];
 }
 
