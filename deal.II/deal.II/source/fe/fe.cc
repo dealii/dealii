@@ -246,14 +246,6 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
   if (compute_normal_vectors)
     get_normal_vectors (cell, face_no, boundary,
 			unit_points, normal_vectors);
-  
-  cout << "Global unit points:\n";
-  for (unsigned int p=0; p<unit_points.size(); ++p)
-    cout << "    " << global_unit_points[p] << endl;
-
-  cout << "Global ansatz points:\n";
-  for (unsigned int p=0; p<unit_points.size(); ++p)
-    cout << "    " << ansatz_points[p] << endl;
 };
 
 
