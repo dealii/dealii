@@ -264,9 +264,13 @@ AC_SUBST(enableshared)
 AC_SUBST(lib_suffix)
 
 dnl Also look for RANLIB, since some rather old systems (ah, and MAC OS X!)
-dnl still require it for statically linked libraries
+dnl still require it for statically linked libraries. On other systems, 
+dnl RANLIB is not available, so skip the second check that tries to get
+dnl the full path for the executable that was found in the first one.
 AC_PROG_RANLIB
-AC_PATH_PROG(RANLIB,$RANLIB)
+if test "$RANLIB" != ":" ; then
+  AC_PATH_PROG(RANLIB,$RANLIB)
+fi
 AC_SUBST(RANLIB)
 
 
