@@ -385,7 +385,7 @@ AC_DEFUN(DEAL_II_HAVE_LRAND48_DECLARED, dnl
 void f()
 {
   std::vector<unsigned int> new_indices;
-  random_shuffle (new_indices.begin(), new_indices.end());
+  std::random_shuffle (new_indices.begin(), new_indices.end());
 };
     ],
     [],
