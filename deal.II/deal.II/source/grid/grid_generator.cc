@@ -21,6 +21,7 @@
 #include <lac/solver_cg.h>
 #include <lac/sparse_matrix.h>
 #include <grid/grid_generator.h>
+#include <grid/grid_reordering.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -794,30 +795,10 @@ GridGenerator::hyper_L (Triangulation<3> &tria,
 
 
 void
-GridGenerator::hyper_ball (Triangulation<3> &/*tria*/,
-			   const Point<3>   &/*p*/,
-			   const double /*radius*/)
+GridGenerator::hyper_ball (Triangulation<3> &tria,
+			   const Point<3>   &p,
+			   const double radius)
 {
-				   // this function used to be
-				   // implemented by the code below,
-				   // but it turned out that it didn't
-				   // work as expected: there were
-				   // faces that we used in both
-				   // orientations, leading the
-				   // triangulation function to
-				   // believe that the faces were
-				   // external, even though they were
-				   // in fact internal to the
-				   // ball. this leads to strange
-				   // results.
-				   //
-				   // since we haven't found a working
-				   // enumeration of cell vertices and
-				   // faces, this function is disabled
-				   // altogether
-  Assert(false, ExcNotImplemented());
-
-/*  
   const double a = 1./(1+std::sqrt(3.0)); // equilibrate cell sizes at transition
 				          // from the inner part to the radial
 				          // cells
@@ -828,34 +809,34 @@ GridGenerator::hyper_ball (Triangulation<3> &/*tria*/,
 				     // cell
       p+Point<3>(-1,-1,-1)*(radius/std::sqrt(3.0)*a),
       p+Point<3>(+1,-1,-1)*(radius/std::sqrt(3.0)*a),
-      p+Point<3>(+1,+1,-1)*(radius/std::sqrt(3.0)*a),
-      p+Point<3>(-1,+1,-1)*(radius/std::sqrt(3.0)*a),
-      p+Point<3>(-1,-1,+1)*(radius/std::sqrt(3.0)*a),
       p+Point<3>(+1,-1,+1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(-1,-1,+1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(-1,+1,-1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(+1,+1,-1)*(radius/std::sqrt(3.0)*a),
       p+Point<3>(+1,+1,+1)*(radius/std::sqrt(3.0)*a),
       p+Point<3>(-1,+1,+1)*(radius/std::sqrt(3.0)*a),
 				       // now the eight vertices at
 				       // the outer sphere
       p+Point<3>(-1,-1,-1)*(radius/std::sqrt(3.0)),
       p+Point<3>(+1,-1,-1)*(radius/std::sqrt(3.0)),
-      p+Point<3>(+1,+1,-1)*(radius/std::sqrt(3.0)),
-      p+Point<3>(-1,+1,-1)*(radius/std::sqrt(3.0)),
-      p+Point<3>(-1,-1,+1)*(radius/std::sqrt(3.0)),
       p+Point<3>(+1,-1,+1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(-1,-1,+1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(-1,+1,-1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(+1,+1,-1)*(radius/std::sqrt(3.0)),
       p+Point<3>(+1,+1,+1)*(radius/std::sqrt(3.0)),
-      p+Point<3>(-1,+1,+1)*(radius/std::sqrt(3.0))
+      p+Point<3>(-1,+1,+1)*(radius/std::sqrt(3.0)),
       };
 
 				   // one needs to draw the seven cubes to
 				   // understand what's going on here
   const unsigned int n_cells = 7;
-  const int cell_vertices[n_cells][8] = {{0, 1, 2, 3, 4, 5, 6, 7},
-					 {8, 9, 10, 11, 0, 1, 2, 3},
-					 {9, 13, 14, 10, 1, 5, 6, 2},
-					 {12, 4, 7, 15, 13, 5, 6, 14},
-					 {8, 0, 3, 11, 12, 4, 7, 15},
-					 {11, 10,14, 15, 3, 2, 6, 7},
-					 {8, 9, 13, 12, 0, 1, 5, 4}};
+  const int cell_vertices[n_cells][8] = {{0, 1, 2, 3, 4, 5, 6, 7}, // center
+					 {8, 9, 1, 0, 12, 13, 5, 4}, // bottom
+					 {9, 13, 14, 10, 1, 5, 6, 2}, // right
+					 {11, 10, 14, 15, 3, 2, 6, 7}, // top
+					 {8, 0, 3, 11, 12, 4, 7, 15}, // left
+					 {8, 9, 10, 11, 0, 1, 2, 3}, // front
+					 {12, 4, 7, 15, 13, 5, 6, 14}}; // back
   
   std::vector<CellData<3> > cells (n_cells, CellData<3>());
   
@@ -865,11 +846,12 @@ GridGenerator::hyper_ball (Triangulation<3> &/*tria*/,
 	cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     };
+
+  GridReordering<3>::reorder_cells (cells);
   
   tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[n_vertices]),
 			     cells,
 			     SubCellData());       // no boundary information
-*/			     
 }
 
 
@@ -936,6 +918,8 @@ GridGenerator::cylinder (Triangulation<3> &tria,
 	cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     };
+  
+  GridReordering<3>::reorder_cells (cells);
   
   tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[24]),
 			     cells,
