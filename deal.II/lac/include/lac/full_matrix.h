@@ -30,8 +30,6 @@ template<typename number> class Vector;
 
 
 /**
- * @brief Rectangular/quadratic full matrix.
- *
  * Implementation of a classical rectangular scheme of numbers. The
  * data type of the entries is provided in the template argument
  * <tt>number</tt>.  The interface is quite fat and in fact has grown every
@@ -109,7 +107,7 @@ class FullMatrix : public Table<2,number>
 					  */
 	unsigned short a_col;
 
-					 /**
+					 /*
 					  * Make enclosing class a
 					  * friend.
 					  */
@@ -353,14 +351,14 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Number of rows of this matrix.
 				      * To remember: this matrix is an
-				      * $m \times n$-matrix.
+				      * <i>m x n</i>-matrix.
 				      */
     unsigned int m () const;
     
 				     /**
 				      * Number of columns of this matrix.
 				      * To remember: this matrix is an
-				      * $m \times n$-matrix.
+				      * <i>m x n</i>-matrix.
 				      */
     unsigned int n () const;
 
@@ -399,52 +397,55 @@ class FullMatrix : public Table<2,number>
     number2 matrix_norm_square (const Vector<number2> &v) const;
 
 				     /**
-				      * Build the matrix scalar product
-				      * <tt>u^T M v</tt>. This function is mostly
-				      * useful when building the cellwise
-				      * scalar product of two functions in
-				      * the finite element context.
+				      * Build the matrix scalar
+				      * product <tt>u<sup>T</sup> M
+				      * v</tt>. This function is
+				      * mostly useful when building
+				      * the cellwise scalar product of
+				      * two functions in the finite
+				      * element context.
 				      */
     template<typename number2>
     number2 matrix_scalar_product (const Vector<number2> &u,
 				   const Vector<number2> &v) const;
 
     				     /**
-				      * Return the $l_1$-norm of the matrix, i.e.
-				      * $|M|_1=max_{all columns j}\sum_{all 
-				      * rows i} |M_ij|$,
-				      * (max. sum of columns). This is the
-				      * natural matrix norm that is compatible
-				      * to the $l_1$-norm for vectors, i.e.
-				      * $|Mv|_1\leq |M|_1 |v|_1$.
-				      * (cf. Rannacher Numerik0)
+				      * Return the
+				      * <i>l<sub>1</sub></i>-norm of
+				      * the matrix, where
+				      * $||M||_1 = \max_j \sum_i
+				      * |M_{ij}|$ (maximum of
+				      * the sums over columns).
 				      */
     number l1_norm () const;
 
     				     /**
-				      * Return the $l_\infty$-norm of the
-				      * matrix, i.e.
-				      * $|M|_\infty=\max_{all rows i}\sum_{all 
-				      * columns j} |M_{ij}|$,
-				      * (max. sum of rows).
-				      * This is the
-				      * natural matrix norm that is compatible
-				      * to the $l_\infty$-norm of vectors, i.e.
-				      * $|Mv|_\infty \leq |M|_\infty |v|_\infty$.
-				      * (cf. Rannacher Numerik0)
+				      * Return the
+				      * <i>l<sub>&infin;</sub></i>-norm
+				      * of the matrix, where
+				      * $||M||_\infty = \max_i \sum_j
+				      * |M_{ij}|$ (maximum of the sums
+				      * over rows).
 				      */
     number linfty_norm () const;
     
 				     /**
-				      * Compute the quadratic matrix norm.
-				      * Return value is the root of the square
-				      * sum of all matrix entries. Also called
-				      * Frobenius norm.
-				      * 
-				      * This norm is compatible with the $l_2$
-				      * vector norm. But it is not a natural
-				      * matrix norm (cf Rannacher Numeric0),
-				      * therefore it is not called $l_2$-norm.
+				      * Compute the Frobenius norm of
+				      * the matrix.  Return value is
+				      * the root of the square sum of
+				      * all matrix entries.
+				      *
+				      * @note For the timid among us:
+				      * this norm is not the norm
+				      * compatible with the
+				      * <i>l<sub>2</sub></i>-norm of
+				      * the vector space.
+				      */
+    number frobenius_norm () const;
+
+				     /**
+				      * @deprecated Old name for
+				      * frobenius_norm().
 				      */
     number norm2 () const;
 
@@ -635,9 +636,10 @@ class FullMatrix : public Table<2,number>
     
 				     /**
 				      * Weighted addition of the
-				      * transpose of <tt>B</tt> to <tt>this</tt>.
+				      * transpose of <tt>B</tt> to
+				      * <tt>this</tt>.
 				      *
-				      * $A += s B^T$
+				      * <i>A += s B<sup>T</sup></i>
 				      */
     template<typename number2>
     void Tadd (const number               s,
@@ -674,23 +676,25 @@ class FullMatrix : public Table<2,number>
 	       const unsigned int src_offset_j = 0);
 
 				     /**
-				      * $A(i,1...n)+=s*A(j,1...n)$.
-				      * Simple addition of rows of this
+				      * <i>A(i,1...n) +=
+				      * s*A(j,1...n)</i>.  Simple
+				      * addition of rows of this
 				      */
     void add_row (const unsigned int i,
 		  const number       s,
 		  const unsigned int j);
 
 				     /**
-				      * $A(i,1...n)+=s*A(j,1...n)+t*A(k,1...n)$.
-				      * Multiple addition of rows of this.
+				      * <i>A(i,1...n) += s*A(j,1...n)
+				      * + t*A(k,1...n)</i>.  Multiple
+				      * addition of rows of this.
 				      */
     void add_row (const unsigned int i,
 		  const number s, const unsigned int j,
 		  const number t, const unsigned int k);
 
 				     /**
-				      * $A(1...n,i)+=s*A(1...n,j)$.
+				      * <i>A(1...n,i) += s*A(1...n,j)</i>.
 				      *  Simple addition of columns of this.
 				      */
     void add_col (const unsigned int i,
@@ -698,31 +702,36 @@ class FullMatrix : public Table<2,number>
 		  const unsigned int j);
 
 				     /**
-				      * $A(1...n,i)+=s*A(1...n,j)+t*A(1...n,k)$.
-				      *  Multiple addition of columns of this.
+				      * <i>A(1...n,i) += s*A(1...n,j)
+				      * + t*A(1...n,k)</i>.  Multiple
+				      * addition of columns of this.
 				      */
     void add_col (const unsigned int i,
 		  const number s, const unsigned int j,
 		  const number t, const unsigned int k);
 
 				     /**
-				      * Swap  A(i,1...n) <-> A(j,1...n).
-				      * Swap rows i and j of this
+				      * Swap <i>A(i,1...n) <->
+				      * A(j,1...n)</i>.  Swap rows i
+				      * and j of this
 				      */
     void swap_row (const unsigned int i,
 		   const unsigned int j);
 
 				     /**
-				      *  Swap  A(1...n,i) <-> A(1...n,j).
-				      *  Swap columns i and j of this
+				      *  Swap <i>A(1...n,i) <->
+				      *  A(1...n,j)</i>.  Swap columns
+				      *  i and j of this
 				      */
     void swap_col (const unsigned int i,
 		   const unsigned int j);
 
 				     /**
-				      *  A(i,i)+=B(i,1...n). Addition of complete
-				      *  rows of B to diagonal-elements of this ; <p>
-				      *  ( i = 1 ... m )
+				      *  <i>A(i,i) +=
+				      *  B(i,1...n)</i>. Addition of
+				      *  complete rows of B to
+				      *  diagonal-elements of this ;
+				      *  <p> ( i = 1 ... m )
 				      */
     template<typename number2>
     void add_diag (const number               s,
@@ -740,7 +749,8 @@ class FullMatrix : public Table<2,number>
 				      * Symmetrize the matrix by
 				      * forming the mean value between
 				      * the existing matrix and its
-				      * transpose, $A = \frac 12(A+A^T)$.
+				      * transpose, <i>A =
+				      * 1/2(A+A<sup>T</sup>)</i>.
 				      *
 				      * Obviously the matrix must be
 				      * quadratic for this operation.
@@ -808,10 +818,10 @@ class FullMatrix : public Table<2,number>
 				      * to <tt>C</tt>.
 				      *
 				      * if (adding)
-				      *  $C += A*B$
+				      *  <i>C += A*B</i>
 				      *
 				      * if (!adding)
-				      *  $C = A*B$
+				      *  <i>C = A*B</i>
 				      *
 				      * Assumes that <tt>A</tt> and <tt>B</tt> have
 				      * compatible sizes and that <tt>C</tt>
@@ -832,13 +842,14 @@ class FullMatrix : public Table<2,number>
 				      * to <tt>C</tt>.
 				      *
 				      * if (adding)
-				      *  $C += A^T*B$
+				      *  <i>C += A<sup>T</sup>*B</i>
 				      *
 				      * if (!adding)
-				      *  $C = A^T*B$
+				      *  <i>C = A<sup>T</sup>*B</i>
 				      *
-				      * Assumes that <tt>A</tt> and <tt>B</tt> have
-				      * compatible sizes and that <tt>C</tt>
+				      * Assumes that <tt>A</tt> and
+				      * <tt>B</tt> have compatible
+				      * sizes and that <tt>C</tt>
 				      * already has the right size.
 				      */
     template<typename number2>
@@ -855,10 +866,10 @@ class FullMatrix : public Table<2,number>
 				      * to <tt>w</tt>.
 				      *
 				      * if (adding)
-				      *  $w += A*v$
+				      *  <i>w += A*v</i>
 				      *
 				      * if (!adding)
-				      *  $w = A*v$
+				      *  <i>w = A*v</i>
                                       *
                                       * Source and destination must
                                       * not be the same vector.
@@ -870,7 +881,7 @@ class FullMatrix : public Table<2,number>
     
 				     /**
 				      * Adding Matrix-vector-multiplication.
-				      *  $w += A*v$
+				      *  <i>w += A*v</i>
                                       *
                                       * Source and destination must
                                       * not be the same vector.
@@ -882,7 +893,18 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Transpose
 				      * matrix-vector-multiplication.
-				      * See vmult() above.
+				      *
+				      * The optional parameter
+				      * <tt>adding</tt> determines, whether the
+				      * result is stored in <tt>w</tt> or added
+				      * to <tt>w</tt>.
+				      *
+				      * if (adding)
+				      *  <i>w += A<sup>T</sup>*v</i>
+				      *
+				      * if (!adding)
+				      *  <i>w = A<sup>T</sup>*v</i>
+                                      *
                                       *
                                       * Source and destination must
                                       * not be the same vector.
@@ -895,7 +917,7 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Adding transpose
 				      * matrix-vector-multiplication.
-				      * See vmult() above.
+				      *  <i>w += A<sup>T</sup>*v</i>
                                       *
                                       * Source and destination must
                                       * not be the same vector.
