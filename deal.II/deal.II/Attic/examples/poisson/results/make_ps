@@ -4,6 +4,7 @@ set noytics
 set noztics
 set nokey
 set para
+set hidden3d
 set term postscript eps
 
 !echo "  Making <zoom_in.eps>"
