@@ -19,27 +19,49 @@
 
 
 
-template <typename number, int  rows, int columns>
-BlockSparseMatrix<number,rows,columns>::BlockSparseMatrix () :
+template <typename number>
+BlockSparseMatrix<number>::BlockSparseMatrix () :
+		rows (0),
+		columns (0),
 		sparsity_pattern (0)
 {};
 
 
 
-template <typename number, int  rows, int columns>
-BlockSparseMatrix<number,rows,columns>::
-BlockSparseMatrix (const BlockSparsityPattern &sparsity)
+template <typename number>
+BlockSparseMatrix<number>::
+BlockSparseMatrix (const BlockSparsityPattern &sparsity) :
+		rows (0),
+		columns (0)
 {
   reinit (sparsity);
 };
 
 
 
-template <typename number, int  rows, int columns>
-BlockSparseMatrix<number,rows,columns> &
-BlockSparseMatrix<number,rows,columns>::
-operator = (const BlockSparseMatrix<number,rows,columns> &m) 
+template <typename number>
+BlockSparseMatrix<number>::~BlockSparseMatrix ()
 {
+  				   // delete previous content of
+				   // the subobjects array
+  for (unsigned int r=0; r<rows; ++r)
+    for (unsigned int c=0; c<columns; ++c)
+      {
+	SparseMatrix<number> *p = sub_objects[r][c];
+	sub_objects[r][c] = 0;
+	delete p;
+      };
+};
+
+
+
+template <typename number>
+BlockSparseMatrix<number> &
+BlockSparseMatrix<number>::
+operator = (const BlockSparseMatrix<number> &m) 
+{
+  Assert (rows == m.rows, ExcIncompatibleObjects());
+  Assert (columns == m.columns, ExcIncompatibleObjects());
 				   // this operator does not do
 				   // anything except than checking
 				   // whether the base objects want to
@@ -52,9 +74,9 @@ operator = (const BlockSparseMatrix<number,rows,columns> &m)
 
  
 
-template <typename number, int  rows, int columns>
+template <typename number>
 void
-BlockSparseMatrix<number,rows,columns>::reinit ()
+BlockSparseMatrix<number>::reinit ()
 {
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
@@ -63,23 +85,44 @@ BlockSparseMatrix<number,rows,columns>::reinit ()
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 void
-BlockSparseMatrix<number,rows,columns>::
+BlockSparseMatrix<number>::
 reinit (const BlockSparsityPattern &sparsity)
 {
-  sparsity_pattern = &sparsity;
-  
+				   // first delete previous content of
+				   // the subobjects array
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
-      block(r,c).reinit (sparsity.block(r,c));
+      {
+	SparseMatrix<number> *p = sub_objects[r][c];
+	sub_objects[r][c] = 0;
+	delete p;
+      };
+  sub_objects.clear ();
+
+				   // then associate new sparsity
+				   // pattern and resize
+  sparsity_pattern = &sparsity;
+  rows = sparsity.n_block_rows();
+  columns = sparsity.n_block_cols();
+  sub_objects = vector<vector<SmartPointer<SparseMatrix<number> > > >
+		(rows, vector<SmartPointer<SparseMatrix<number> > > (columns, 0));
+
+				   // and reinitialize the blocks
+  for (unsigned int r=0; r<rows; ++r)
+    for (unsigned int c=0; c<columns; ++c)
+      {
+	sub_objects[r][c] = new SparseMatrix<number>();
+	block(r,c).reinit (sparsity.block(r,c));
+      };
 };
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 void
-BlockSparseMatrix<number,rows,columns>::clear () 
+BlockSparseMatrix<number>::clear () 
 {
   sparsity_pattern = 0;
   for (unsigned int r=0; r<rows; ++r)
@@ -89,9 +132,9 @@ BlockSparseMatrix<number,rows,columns>::clear ()
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 bool
-BlockSparseMatrix<number,rows,columns>::empty () const
+BlockSparseMatrix<number>::empty () const
 {
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
@@ -103,32 +146,33 @@ BlockSparseMatrix<number,rows,columns>::empty () const
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 unsigned int
-BlockSparseMatrix<number,rows,columns>::n_nonzero_elements () const
+BlockSparseMatrix<number>::n_nonzero_elements () const
 {
   return sparsity_pattern->n_nonzero_elements ();
 };
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 const BlockSparsityPattern &
-BlockSparseMatrix<number,rows,columns>::get_sparsity_pattern () const
+BlockSparseMatrix<number>::get_sparsity_pattern () const
 {
   return *sparsity_pattern;
 };
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 unsigned int
-BlockSparseMatrix<number,rows,columns>::memory_consumption () const
+BlockSparseMatrix<number>::memory_consumption () const
 {
   unsigned int mem = sizeof(*this);
+  mem += MemoryConsumption::memory_consumption (sub_objects);
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
-      mem += MemoryConsumption::memory_consumption(sub_objects[r][c]);
+      mem += MemoryConsumption::memory_consumption(*sub_objects[r][c]);
   return mem;
 };
 

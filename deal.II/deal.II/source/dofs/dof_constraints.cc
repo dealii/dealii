@@ -689,11 +689,7 @@ matrix_functions_2;
 #undef MatrixType
 
 // block sparse matrices are only implemented for one of the two matrix functions
-#define MatrixType BlockSparseMatrix<double,2,2>
-matrix_functions_2;
-#undef MatrixType
-
-#define MatrixType BlockSparseMatrix<double,3,3>
+#define MatrixType BlockSparseMatrix<double>
 matrix_functions_2;
 #undef MatrixType
 

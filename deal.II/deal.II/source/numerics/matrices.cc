@@ -685,20 +685,23 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 
 
 template <int dim>
-template <int blocks>
 void
 MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
-					 BlockSparseMatrix<double,blocks,blocks>  &matrix,
+					 BlockSparseMatrix<double>  &matrix,
 					 BlockVector<double>   &solution,
 					 BlockVector<double>   &right_hand_side,
 					 const bool                    preserve_symmetry)
 {
+  const unsigned int blocks = matrix.n_block_rows();
+  
   Assert (matrix.n() == matrix.m(),
 	  ExcDimensionsDontMatch(matrix.n(), matrix.m()));
   Assert (matrix.n() == right_hand_side.size(),
 	  ExcDimensionsDontMatch(matrix.n(), right_hand_side.size()));
   Assert (matrix.n() == solution.size(),
 	  ExcDimensionsDontMatch(matrix.n(), solution.size()));
+  Assert (matrix.n_block_rows() == matrix.n_block_cols(),
+	  ExcMatrixNotBlockSquare());
   Assert (matrix.get_sparsity_pattern().get_row_indices() == 
 	  matrix.get_sparsity_pattern().get_column_indices(),
 	  ExcMatrixNotBlockSquare());
@@ -1398,18 +1401,9 @@ template
 void
 MatrixTools<deal_II_dimension>::
 apply_boundary_values (const map<unsigned int,double> &,
-		       BlockSparseMatrix<double,2,2>  &,
-		       BlockVector<double>          &,
-		       BlockVector<double>          &,
-		       const bool);
-
-template
-void
-MatrixTools<deal_II_dimension>::
-apply_boundary_values (const map<unsigned int,double> &,
-		       BlockSparseMatrix<double,3,3>  &,
-		       BlockVector<double>          &,
-		       BlockVector<double>          &,
+		       BlockSparseMatrix<double>      &,
+		       BlockVector<double>            &,
+		       BlockVector<double>            &,
 		       const bool);
 
 

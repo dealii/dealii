@@ -35,6 +35,9 @@ template <typename Number> class BlockVector;
  * preconditioners, where each block belongs to a specific component
  * of the equation you are presently discretizing.
  *
+ * Note that the number of blocks and rows are implicitely determined
+ * by the sparsity pattern objects used.
+ *
  *
  * @sect2{On template instantiations}
  *
@@ -49,7 +52,7 @@ template <typename Number> class BlockVector;
  *
  * @author Wolfgang Bangerth, 2000
  */
-template <typename number, int  rows, int columns=rows>
+template <typename number>
 class BlockSparseMatrix : public Subscriptor
 {
   public:
@@ -60,19 +63,25 @@ class BlockSparseMatrix : public Subscriptor
     typedef number value_type;
     
 				     /**
-				      * Constructor; initializes the matrix to
-				      * be empty, without any structure, i.e.
-				      * the matrix is not usable at all. This
-				      * constructor is therefore only useful
-				      * for matrices which are members of a
-				      * class. All other matrices should be
-				      * created at a point in the data flow
-				      * where all necessary information is
+				      * Constructor; initializes the
+				      * matrix to be empty, without
+				      * any structure, i.e.  the
+				      * matrix is not usable at
+				      * all. This constructor is
+				      * therefore only useful for
+				      * matrices which are members of
+				      * a class. All other matrices
+				      * should be created at a point
+				      * in the data flow where all
+				      * necessary information is
 				      * available.
 				      *
-				      * You have to initialize
-				      * the matrix before usage with
-				      * @p{reinit(BlockSparsityPattern)}.
+				      * You have to initialize the
+				      * matrix before usage with
+				      * @p{reinit(BlockSparsityPattern)}. The
+				      * number of blocks per row and
+				      * column are then determined by
+				      * that function.
 				      */
     BlockSparseMatrix ();
 
@@ -99,15 +108,21 @@ class BlockSparseMatrix : public Subscriptor
 				      */
     BlockSparseMatrix (const BlockSparsityPattern &sparsity);
 
+				     /**
+				      * Destructor.
+				      */
+    virtual ~BlockSparseMatrix ();
+    
     
 
 				     /** 
 				      * Pseudo operator only copying
-				      * empty objects.
+				      * empty objects. The sizes of
+				      * the block matrices need to be
+				      * the same.
 				      */
-    BlockSparseMatrix<number,rows,columns> &
-    operator = (const BlockSparseMatrix<number,rows,columns> &);
-
+    BlockSparseMatrix<number> &
+    operator = (const BlockSparseMatrix<number> &);
 
 				     /**
 				      * Reinitialize the object but
@@ -116,8 +131,10 @@ class BlockSparseMatrix : public Subscriptor
 				      * necessary if you @p{reinit}'d
 				      * the sparsity structure and
 				      * want to update the size of the
-				      * matrix. It only calls @p{reinit}
-				      * on the sub-matrices.
+				      * matrix. It only calls
+				      * @p{reinit} on the
+				      * sub-matrices. The size of this
+				      * matrix is unchanged.
 				      *
 				      * If the sparsity pattern has
 				      * not changed, then the effect
@@ -179,14 +196,18 @@ class BlockSparseMatrix : public Subscriptor
     virtual void clear ();
     
 				     /**
-				      * Return the number of blocks in a
-				      * column.
+				      * Return the number of blocks in
+				      * a column. Returns zero if no
+				      * sparsity pattern is presently
+				      * associated to this matrix.
 				      */
     unsigned int n_block_rows () const;
     
 				     /**
-				      * Return the number of blocks in a
-				      * row.
+				      * Return the number of blocks in
+				      * a row. Returns zero if no
+				      * sparsity pattern is presently
+				      * associated to this matrix.
 				      */
     unsigned int n_block_cols () const;
   
@@ -276,8 +297,8 @@ class BlockSparseMatrix : public Subscriptor
 				      * reference to @p{this}.
 				      */
     template <typename somenumber>
-    BlockSparseMatrix<number,rows,columns> &
-    copy_from (const BlockSparseMatrix<somenumber,rows,columns> &source);
+    BlockSparseMatrix<number> &
+    copy_from (const BlockSparseMatrix<somenumber> &source);
 
 				     /**
 				      * Add @p{matrix} scaled by
@@ -296,7 +317,7 @@ class BlockSparseMatrix : public Subscriptor
 				      */
     template <typename somenumber>
     void add_scaled (const number factor,
-		     const BlockSparseMatrix<somenumber,rows,columns> &matrix);
+		     const BlockSparseMatrix<somenumber> &matrix);
     
 				     /**
 				      * Return the value of the entry (i,j).
@@ -307,7 +328,8 @@ class BlockSparseMatrix : public Subscriptor
 				      * throws an exception if the wanted
 				      * element does not exist in the matrix.
 				      */
-    number operator () (const unsigned int i, const unsigned int j) const;
+    number operator () (const unsigned int i,
+			const unsigned int j) const;
 
 
 				     /**
@@ -316,7 +338,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * being this matrix.
 				      */
     template <typename somenumber>
-    void vmult (BlockVector<somenumber>          &dst,
+    void vmult (BlockVector<somenumber>       &dst,
 		const BlockVector<somenumber> &src) const;
     
 				     /**
@@ -328,7 +350,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * transposed matrix.
 				      */
     template <typename somenumber>
-    void Tvmult (BlockVector<somenumber>    &dst,
+    void Tvmult (BlockVector<somenumber>       &dst,
 		 const BlockVector<somenumber> &src) const;
   
 				     /**
@@ -338,7 +360,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * matrix.
 				      */
     template <typename somenumber>
-    void vmult_add (BlockVector<somenumber>          &dst,
+    void vmult_add (BlockVector<somenumber>       &dst,
 		    const BlockVector<somenumber> &src) const;
     
 				     /**
@@ -350,7 +372,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * the transposed matrix.
 				      */
     template <typename somenumber>
-    void Tvmult_add (BlockVector<somenumber>    &dst,
+    void Tvmult_add (BlockVector<somenumber>       &dst,
 		     const BlockVector<somenumber> &src) const;
   
 				     /**
@@ -386,7 +408,7 @@ class BlockSparseMatrix : public Subscriptor
 				      */    
     template <typename somenumber>
     somenumber
-    matrix_scalar_product (const BlockVector<somenumber>    &u,
+    matrix_scalar_product (const BlockVector<somenumber> &u,
 			   const BlockVector<somenumber> &v) const;
     
 				     /**
@@ -400,9 +422,9 @@ class BlockSparseMatrix : public Subscriptor
 				      * into @p{dst}.
 				      */
     template <typename somenumber>
-    somenumber residual (BlockVector<somenumber>          &dst,
+    somenumber residual (BlockVector<somenumber>       &dst,
 			 const BlockVector<somenumber> &x,
-			 const BlockVector<somenumber>    &b) const;
+			 const BlockVector<somenumber> &b) const;
 
 				     /**
 				      * Apply the Jacobi
@@ -418,9 +440,9 @@ class BlockSparseMatrix : public Subscriptor
 				      * for this operation.
 				      */
     template <typename somenumber>
-    void precondition_Jacobi (BlockVector<somenumber>          &dst,
+    void precondition_Jacobi (BlockVector<somenumber>       &dst,
 			      const BlockVector<somenumber> &src,
-			      const number                           omega = 1.) const;
+			      const number                   omega = 1.) const;
 
 				     /**
 				      * Return a (constant) reference
@@ -448,8 +470,33 @@ class BlockSparseMatrix : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotBlockSquare);
+
+				     /**
+				      * Exception.
+				      */
+    DeclException0 (ExcIncompatibleObjects);
     
   private:
+				     /**
+				      * Number of block rows in this
+				      * matrix. Is set by default to
+				      * zero, and is only changed if a
+				      * sparsity pattern is given to
+				      * the constructor or the
+				      * @p{reinit} function.
+				      */
+    unsigned int rows;
+
+				     /**
+				      * Number of block columns in this
+				      * matrix. Is set by default to
+				      * zero, and is only changed if a
+				      * sparsity pattern is given to
+				      * the constructor or the
+				      * @p{reinit} function.
+				      */
+    unsigned int columns;
+    
     				     /**
 				      * Pointer to the block sparsity
 				      * pattern used for this
@@ -464,7 +511,7 @@ class BlockSparseMatrix : public Subscriptor
 				     /**
 				      * Array of sub-matrices.
 				      */
-    SparseMatrix<number> sub_objects[rows][columns];
+    vector<vector<SmartPointer<SparseMatrix<number> > > > sub_objects;
 };
 
 
@@ -473,60 +520,60 @@ class BlockSparseMatrix : public Subscriptor
 /* ------------------------- Template functions ---------------------- */
 
 
-template <typename number, int rows, int columns>
+template <typename number>
 inline
 SparseMatrix<number> &
-BlockSparseMatrix<number,rows,columns>::block (const unsigned int row,
-					       const unsigned int column)
+BlockSparseMatrix<number>::block (const unsigned int row,
+				  const unsigned int column)
 {
   Assert (row<rows, ExcIndexRange (row, 0, rows));
   Assert (column<columns, ExcIndexRange (column, 0, columns));
   
-  return sub_objects[row][column];
+  return *sub_objects[row][column];
 };
 
 
 
-template <typename number, int rows, int columns>
+template <typename number>
 inline
 const SparseMatrix<number> &
-BlockSparseMatrix<number,rows,columns>::block (const unsigned int row,
-					       const unsigned int column) const
+BlockSparseMatrix<number>::block (const unsigned int row,
+				  const unsigned int column) const
 {
   Assert (row<rows, ExcIndexRange (row, 0, rows));
   Assert (column<columns, ExcIndexRange (column, 0, columns));
   
-  return sub_objects[row][column];
+  return *sub_objects[row][column];
 };
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 inline
 unsigned int
-BlockSparseMatrix<number,rows,columns>::m () const
+BlockSparseMatrix<number>::m () const
 {
   return sparsity_pattern->n_rows();
 };
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 inline
 unsigned int
-BlockSparseMatrix<number,rows,columns>::n () const
+BlockSparseMatrix<number>::n () const
 {
   return sparsity_pattern->n_cols();
 };
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 inline
 void
-BlockSparseMatrix<number,rows,columns>::set (const unsigned int i,
-					     const unsigned int j,
-					     const number value)
+BlockSparseMatrix<number>::set (const unsigned int i,
+				const unsigned int j,
+				const number value)
 {
   const pair<unsigned int,unsigned int>
     row_index = sparsity_pattern->row_indices.global_to_local (i),
@@ -538,12 +585,12 @@ BlockSparseMatrix<number,rows,columns>::set (const unsigned int i,
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 inline
 void
-BlockSparseMatrix<number,rows,columns>::add (const unsigned int i,
-					     const unsigned int j,
-					     const number value)
+BlockSparseMatrix<number>::add (const unsigned int i,
+				const unsigned int j,
+				const number value)
 {
   const pair<unsigned int,unsigned int>
     row_index = sparsity_pattern->row_indices.global_to_local (i),
@@ -555,11 +602,11 @@ BlockSparseMatrix<number,rows,columns>::add (const unsigned int i,
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 inline
 number
-BlockSparseMatrix<number,rows,columns>::operator () (const unsigned int i,
-						     const unsigned int j) const
+BlockSparseMatrix<number>::operator () (const unsigned int i,
+					const unsigned int j) const
 {
   const pair<unsigned int,unsigned int>
     row_index = sparsity_pattern->row_indices.global_to_local (i),
@@ -571,11 +618,11 @@ BlockSparseMatrix<number,rows,columns>::operator () (const unsigned int i,
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
-BlockSparseMatrix<number,rows,columns> &
-BlockSparseMatrix<number,rows,columns>::
-copy_from (const BlockSparseMatrix<somenumber,rows,columns> &source)
+BlockSparseMatrix<number> &
+BlockSparseMatrix<number>::
+copy_from (const BlockSparseMatrix<somenumber> &source)
 {
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
@@ -586,12 +633,12 @@ copy_from (const BlockSparseMatrix<somenumber,rows,columns> &source)
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number,rows,columns>::
+BlockSparseMatrix<number>::
 add_scaled (const number factor,
-	    const BlockSparseMatrix<somenumber,rows,columns> &matrix)
+	    const BlockSparseMatrix<somenumber> &matrix)
 {
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
@@ -601,12 +648,11 @@ add_scaled (const number factor,
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number,rows,columns>::
-vmult (BlockVector<somenumber>          &dst,
-       const BlockVector<somenumber> &src) const
+BlockSparseMatrix<number>::vmult (BlockVector<somenumber>       &dst,
+				  const BlockVector<somenumber> &src) const
 {
   Assert (dst.n_blocks() == rows,
 	  ExcDimensionMismatch(dst.n_blocks(), rows));
@@ -618,19 +664,18 @@ vmult (BlockVector<somenumber>          &dst,
       block(row,0).vmult (dst.block(row),
 			  src.block(0));
       for (unsigned int col=1; col<columns; ++col)
-      block(row,col).vmult_add (dst.block(row),
-				src.block(col));
+	block(row,col).vmult_add (dst.block(row),
+				  src.block(col));
     };
 };
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number,rows,columns>::
-vmult_add (BlockVector<somenumber>          &dst,
-	   const BlockVector<somenumber> &src) const
+BlockSparseMatrix<number>::vmult_add (BlockVector<somenumber>       &dst,
+				      const BlockVector<somenumber> &src) const
 {
   Assert (dst.n_blocks() == rows,
 	  ExcDimensionMismatch(dst.n_blocks(), rows));
@@ -642,20 +687,19 @@ vmult_add (BlockVector<somenumber>          &dst,
       block(row,0).vmult_add (dst.block(row),
 			      src.block(0));
       for (unsigned int col=1; col<columns; ++col)
-      block(row,col).vmult_add (dst.block(row),
-				src.block(col));
+	block(row,col).vmult_add (dst.block(row),
+				  src.block(col));
     };
 };
 
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number,rows,columns>::
-Tvmult (BlockVector<somenumber>   &/*dst*/,
-	const BlockVector<somenumber> &/*src*/) const
+BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>   &/*dst*/,
+				   const BlockVector<somenumber> &/*src*/) const
 {
 				   // presently not
 				   // implemented. should be simple,
@@ -666,12 +710,11 @@ Tvmult (BlockVector<somenumber>   &/*dst*/,
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number,rows,columns>::
-Tvmult_add (BlockVector<somenumber>    &/*dst*/,
-	    const BlockVector<somenumber> &/*src*/) const
+BlockSparseMatrix<number>::Tvmult_add (BlockVector<somenumber>    &/*dst*/,
+				       const BlockVector<somenumber> &/*src*/) const
 {
 				   // presently not
 				   // implemented. should be simple,
@@ -682,11 +725,10 @@ Tvmult_add (BlockVector<somenumber>    &/*dst*/,
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
 somenumber
-BlockSparseMatrix<number,rows,columns>::
-matrix_norm_square (const BlockVector<somenumber> &v) const
+BlockSparseMatrix<number>::matrix_norm_square (const BlockVector<somenumber> &v) const
 {
   Assert (rows == columns, ExcMatrixNotBlockSquare());
   Assert (v.n_blocks() == rows,
@@ -705,10 +747,10 @@ matrix_norm_square (const BlockVector<somenumber> &v) const
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
 somenumber
-BlockSparseMatrix<number,rows,columns>::
+BlockSparseMatrix<number>::
 matrix_scalar_product (const BlockVector<somenumber>    &u,
 		       const BlockVector<somenumber> &v) const
 {
@@ -727,10 +769,10 @@ matrix_scalar_product (const BlockVector<somenumber>    &u,
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
 somenumber
-BlockSparseMatrix<number,rows,columns>::
+BlockSparseMatrix<number>::
 residual (BlockVector<somenumber>          &dst,
 	  const BlockVector<somenumber> &x,
 	  const BlockVector<somenumber>    &b) const
@@ -780,10 +822,10 @@ residual (BlockVector<somenumber>          &dst,
 
 
 
-template <typename number, int  rows, int columns>
+template <typename number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number,rows,columns>::
+BlockSparseMatrix<number>::
 precondition_Jacobi (BlockVector<somenumber>          &dst,
 		     const BlockVector<somenumber> &src,
 		     const number                           omega) const
@@ -801,23 +843,23 @@ precondition_Jacobi (BlockVector<somenumber>          &dst,
 };
 
 
-template <typename number, int rows, int columns>
+template <typename number>
 inline
 unsigned int
-BlockSparseMatrix<number,rows,columns>::n_block_cols () const
+BlockSparseMatrix<number>::n_block_cols () const
 {
   return columns;
-}
+};
 
 
 
-template <typename number, int rows, int columns>
+template <typename number>
 inline
 unsigned int
-BlockSparseMatrix<number,rows,columns>::n_block_rows () const
+BlockSparseMatrix<number>::n_block_rows () const
 {
   return rows;
-}
+};
 
 
 #endif    // __deal2__block_sparse_matrix_h

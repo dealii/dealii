@@ -23,7 +23,7 @@ template<typename number> class Vector;
 template<typename number> class FullMatrix;
 template<typename number> class SparseMatrix;
 
-template <typename number, int rows, int columns  >  class BlockSparseMatrix;
+template <typename number> class BlockSparseMatrix;
 template <typename Number> class BlockVector;
 
 template <int dim> class DoFHandler;
@@ -457,13 +457,12 @@ class MatrixTools : public MatrixCreator<dim>
 				      * works for block sparse
 				      * matrices and block vectors
 				      */
-    template <int blocks>
     static void
     apply_boundary_values (const map<unsigned int,double> &boundary_values,
-			   BlockSparseMatrix<double,blocks,blocks> &matrix,
+			   BlockSparseMatrix<double> &matrix,
 			   BlockVector<double> &solution,
 			   BlockVector<double> &right_hand_side,
-			   const bool                  eliminate_columns = true);
+			   const bool           eliminate_columns = true);
     
 				     /**
 				      * Exception

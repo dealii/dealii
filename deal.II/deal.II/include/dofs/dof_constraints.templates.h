@@ -262,16 +262,20 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 
 
 
-template <typename number, int blocks>
+template <typename number>
 void
-ConstraintMatrix::condense (BlockSparseMatrix<number,blocks,blocks> &uncondensed) const
+ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 {
+  const unsigned int blocks = uncondensed.n_block_rows();
+  
   const BlockSparsityPattern &
     sparsity = uncondensed.get_sparsity_pattern ();
 
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
+	  ExcMatrixNotSquare());
+  Assert (sparsity.n_block_rows() == sparsity.n_block_cols(),
 	  ExcMatrixNotSquare());
   Assert (sparsity.n_block_rows() == sparsity.n_block_cols(),
 	  ExcMatrixNotSquare());

@@ -385,7 +385,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * @p{row_indices} and
 				      * @p{column_indices} objects.
 				      */
-    template <typename number, int r, int c>
+    template <typename number>
     friend class BlockSparseMatrix;
 };
 

@@ -124,7 +124,7 @@ void test ()
   
 				   // now make a matrix with this
 				   // sparsity pattern
-  BlockSparseMatrix<double,3,2> bsm (bsp);
+  BlockSparseMatrix<double> bsm (bsp);
   deallog << total_nonzero_elements << "=="
 	  << bsm.n_nonzero_elements()
 	  << endl;

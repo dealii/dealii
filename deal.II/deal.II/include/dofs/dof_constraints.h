@@ -22,7 +22,7 @@
 class SparsityPattern;
 class BlockSparsityPattern;
 template <typename number> class SparseMatrix;
-template <typename number, int rows, int columns> class BlockSparseMatrix;
+template <typename number> class BlockSparseMatrix;
 class BlockIndices;
 
 /**
@@ -287,8 +287,8 @@ class ConstraintMatrix : public Subscriptor
 				      * condenses square block sparse
 				      * matrices.
 				      */
-    template <typename number, int blocks>
-    void condense (BlockSparseMatrix<number,blocks,blocks> &sparsity) const;
+    template <typename number>
+    void condense (BlockSparseMatrix<number> &matrix) const;
     
 				     /**
 				      * Condense the given vector @p{uncondensed}

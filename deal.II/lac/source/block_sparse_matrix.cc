@@ -14,17 +14,5 @@
 #include <lac/block_sparse_matrix.templates.h>
 
 // explicit instantiations
-template class BlockSparseMatrix<double,2,2>;
-template class BlockSparseMatrix<double,2,3>;
-
-template class BlockSparseMatrix<double,3,2>;
-template class BlockSparseMatrix<double,3,3>;
-
-
-
-template class BlockSparseMatrix<float,2,2>;
-template class BlockSparseMatrix<float,2,3>;
-
-template class BlockSparseMatrix<float,3,2>;
-template class BlockSparseMatrix<float,3,3>;
-
+template class BlockSparseMatrix<double>;
+template class BlockSparseMatrix<float>;
