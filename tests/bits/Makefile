@@ -27,6 +27,7 @@ tests_x = anna_? \
 	  geometry_info_1 \
 	  point_inside_? \
 	  full_matrix_1 \
+	  block_matrix_array_* \
 	  data_out_0* \
           data_out_faces_0* \
 	  data_out_rotation_0* \
@@ -66,8 +67,7 @@ tests_x = anna_? \
 	  umfpack_* \
 	  fe_q_3d* \
           rt_* \
-	  nedelec_* \
-	  block_matrix_array_*
+	  nedelec_*
 
 # tests for the hp branch:
 #	  fe_collection_*
