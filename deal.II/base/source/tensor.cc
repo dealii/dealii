@@ -54,8 +54,8 @@ Tensor<rank_, dim>::unroll (Vector<double> &result) const
 
 template <int rank_, int dim>
 void
-Tensor<rank_, dim>::unroll_recursion (Vector<double>     &result,
-                                      const unsigned int &index) const
+Tensor<rank_, dim>::unroll_recursion (Vector<double> &result,
+                                      unsigned int   &index) const
 {
   for (unsigned i=0; i<dim; ++i)
     {
@@ -67,8 +67,8 @@ Tensor<rank_, dim>::unroll_recursion (Vector<double>     &result,
 
 template<int dim>
 void
-Tensor<1,dim>::unroll_recursion (Vector<double>     &result,
-                                 const unsigned int &index) const
+Tensor<1,dim>::unroll_recursion (Vector<double> &result,
+                                 unsigned int   &index) const
 {
   for (unsigned i=0; i<dim; ++i)
     result(index++) = operator[](i);  

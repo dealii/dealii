@@ -264,8 +264,8 @@ class Tensor<1,dim>
 				      * case, even if it should be
 				      * public for your compiler.
 				      */
-    void unroll_recursion (Vector<double>     &result,
-			   const unsigned int &start_index) const;
+    void unroll_recursion (Vector<double> &result,
+			   unsigned int   &start_index) const;
     
   private:
 				     /**
