@@ -209,8 +209,8 @@ void LaplaceProblem<dim>::setup_system ()
 					     mg_dof_handler.n_dofs(level),
 					     mg_dof_handler.max_couplings_between_dofs()); //xxx
       MGDoFTools::make_sparsity_pattern (mg_dof_handler,
-					 level,
-					 level_sparsity_patterns[level]);
+					 level_sparsity_patterns[level],
+					 level);
       level_sparsity_patterns[level].compress();
 
       level_system_matrices[level].reinit (level_sparsity_patterns[level]);
