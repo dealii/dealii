@@ -561,40 +561,83 @@ FESystem<dim>::shape_grad_grad (const unsigned int  i,
 
 
 template <int dim>
-void FESystem<dim>::get_unit_support_points (vector<Point<dim> > &/*support_points*/) const
+void FESystem<dim>::get_unit_support_points (
+  vector<Point<dim> > &unit_support_points) const
 {
-  Assert(false, ExcNotImplemented());
-/*
-  Assert (support_points.size() == total_dofs,
-	  ExcWrongFieldDimension (support_points.size(), total_dofs));
+  Assert(unit_support_points.size() == total_dofs,
+	 ExcWrongFieldDimension (unit_support_points.size(), total_dofs));
 
-  vector<Point<dim> > base_support_points (base_element->total_dofs);
-  base_element->get_unit_support_points (base_support_points);
-  
-  for (unsigned int i=0; i<base_element->total_dofs; ++i) 
-    for (unsigned int n=0; n<n_sub_elements; ++n)
-      support_points[i*n_sub_elements+n] = base_support_points[i];
-*/
+  vector<Point<dim> > base_unit_support_points (base_element(0).total_dofs);
+  unsigned int component = 0;
+  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
+    {
+      const unsigned int base_element_total_dofs
+	=base_element(base_el).total_dofs;
+ 
+      base_unit_support_points.resize(base_element_total_dofs);
+      base_element(base_el).get_unit_support_points (base_unit_support_points);
+      for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n)
+	{
+	  for (unsigned int i=0; i<base_element_total_dofs; ++i)
+	    {
+	      unit_support_points[component_to_system_index(component,i)]
+		= base_unit_support_points[i];
+	    }
+	  ++component;
+	}
+    }
+
+				   // An alternative version
+
+				   // base unit support points
+//   vector<vector<Point<dim> > > base_us_points(n_base_elements());
+//   for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
+//     {
+//       const unsigned int base_element_total_dofs
+// 	=base_element(base_el).total_dofs;
+
+//       base_us_points[base_el].resize(base_element_total_dofs);
+//       base_element(base_el).get_unit_support_points (base_us_points[base_el]);
+//     }
+
+//   for (unsigned int i=0; i<total_dofs; ++i)
+//     {
+//       const unsigned int comp=system_to_component_index(i).first,
+// 		     base_dof=system_to_component_index(i).second,
+// 		      base_el=component_to_base_table[comp];
+      
+//       unit_support_points[i]=base_us_points[base_el][base_dof];
+//    }
 };
 
 
 
 template <int dim>
-void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &/*cell*/,
-					vector<Point<dim> > &/*support_points*/) const
+void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &cell,
+					vector<Point<dim> > &support_points) const
 {
-  Assert(false, ExcNotImplemented());
-/*
-  Assert (support_points.size() == total_dofs,
-	  ExcWrongFieldDimension (support_points.size(), total_dofs));
+  Assert(support_points.size() == total_dofs,
+	 ExcWrongFieldDimension (support_points.size(), total_dofs));
 
-  vector<Point<dim> > base_support_points (base_element->total_dofs);
-  base_element->get_support_points (cell, base_support_points);
-  
-  for (unsigned int i=0; i<base_element->total_dofs; ++i) 
-    for (unsigned int n=0; n<n_sub_elements; ++n)
-      support_points[i*n_sub_elements+n] = base_support_points[i];
-*/
+  vector<Point<dim> > base_support_points (base_element(0).total_dofs);
+  unsigned int component = 0;
+  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
+    {
+      const unsigned int base_element_total_dofs
+	=base_element(base_el).total_dofs;
+      
+      base_support_points.resize(base_element_total_dofs);
+      base_element(base_el).get_support_points (cell, base_support_points);
+      for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n)
+	{
+	  for (unsigned int i=0; i<base_element_total_dofs; ++i)
+	    {
+	      support_points[component_to_system_index(component,i)]
+		= base_support_points[i];
+	    }
+	  ++component;
+	}
+    }
 };
 
 
