@@ -497,7 +497,7 @@ class FiniteElementBase :
  * is needed in case two quads meet at a common line of which one is refined
  * once more than the other one. Then there are constraints referring to the
  * hanging nodes on that side of the line which is refined. These constraints
- * are represented by a $n\times m$-matrix #interface_constraints#, where $n$ is the
+ * are represented by a $m\times n$-matrix #interface_constraints#, where $n$ is the
  * number of degrees of freedom on the refined side (those dofs on the middle
  * vertex plus those on the two lines), and $m$ is that of the unrefined side
  * (those dofs on the two vertices plus those on the line). The matrix is thus
