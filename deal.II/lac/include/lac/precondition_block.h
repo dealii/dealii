@@ -557,7 +557,7 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 //----------------------------------------------------------------------//
 
 template<class MATRIX, typename inverse_type>
-bool
+inline bool
 PreconditionBlock<MATRIX, inverse_type>::empty () const
 {
   if (A == 0)

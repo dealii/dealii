@@ -165,7 +165,7 @@ PointerMatrix<MATRIX, VECTOR>::PointerMatrix (const MATRIX* M)
 {}
 
 template<class MATRIX, class VECTOR>
-const PointerMatrix<MATRIX, VECTOR>&
+inline const PointerMatrix<MATRIX, VECTOR>&
 PointerMatrix<MATRIX, VECTOR>::operator= (const MATRIX* M)
 {
   m = M;
@@ -173,7 +173,7 @@ PointerMatrix<MATRIX, VECTOR>::operator= (const MATRIX* M)
 }
 
 template<class MATRIX, class VECTOR>
-bool
+inline bool
 PointerMatrix<MATRIX, VECTOR>::empty () const
 {
   if (m == 0)
@@ -182,7 +182,7 @@ PointerMatrix<MATRIX, VECTOR>::empty () const
 }
 
 template<class MATRIX, class VECTOR>
-void
+inline void
 PointerMatrix<MATRIX, VECTOR>::vmult (VECTOR& dst,
 				      const VECTOR& src) const
 {
@@ -192,7 +192,7 @@ PointerMatrix<MATRIX, VECTOR>::vmult (VECTOR& dst,
 
 
 template<class MATRIX, class VECTOR>
-void
+inline void
 PointerMatrix<MATRIX, VECTOR>::Tvmult (VECTOR& dst,
 				       const VECTOR& src) const
 {
@@ -202,7 +202,7 @@ PointerMatrix<MATRIX, VECTOR>::Tvmult (VECTOR& dst,
 
 
 template<class MATRIX, class VECTOR>
-void
+inline void
 PointerMatrix<MATRIX, VECTOR>::vmult_add (VECTOR& dst,
 					  const VECTOR& src) const
 {
@@ -212,7 +212,7 @@ PointerMatrix<MATRIX, VECTOR>::vmult_add (VECTOR& dst,
 
 
 template<class MATRIX, class VECTOR>
-void
+inline void
 PointerMatrix<MATRIX, VECTOR>::Tvmult_add (VECTOR& dst,
 					   const VECTOR& src) const
 {

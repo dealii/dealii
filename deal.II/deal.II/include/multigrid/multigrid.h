@@ -376,7 +376,7 @@ PreconditionMG<dim, VECTOR, TRANSFER>
 {}
 
 template<int dim, class VECTOR, class TRANSFER>
-bool
+inline bool
 PreconditionMG<dim, VECTOR, TRANSFER>::empty () const
 {
   return false;
