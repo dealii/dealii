@@ -65,14 +65,31 @@ endif
 	@echo "======================optimized========= Linking library:   libpetsc$(lib-suffix)"
 	@$(CXX) -shared -o libpetsc$(lib-suffix) \
 		-Wl,-rpath,$(lib-contrib-petsc-path.o) $(xlib.o)
-  else
-    external-links-petsc:
+else
+
+  # As I don't know how to merge archives, here a workaround: First extract all
+  # the archives into a newly created directory. Then put all the files into a
+  # single new archive. Do the same for debug and optimized mode.
+  external-links-petsc:
 	@echo Setting up libraries for PETSc
-	@echo "======================debug============= Linking library:   libpetsc.g$(lib-suffix)"
-	@$(AR) ru libpetsc.g$(lib-suffix)  $(xlib.g)
-	@echo "======================optimized========= Linking library:   libpetsc$(lib-suffix)"
-	@$(AR) ru libpetsc$(lib-suffix) $(xlib.o)
-  endif
+	@echo "======================debug============= Linking library:   libpetsc.g.a"
+	@mkdir ar_tmp; cd ar_tmp; \
+	 for arfile in $(xlib.g) ; do \
+	   $(AR) x $$arfile; \
+	 done
+	@$(AR) ru libpetsc.g.a ar_tmp/*
+	@rm -r ar_tmp
+	@$(RANLIB) libpetsc.g.a
+	@echo "======================optimized========= Linking library:   libpetsc.a"
+	@mkdir ar_tmp; cd ar_tmp; \
+	 for arfile in $(xlib.o) ; do \
+	   $(AR) x $$arfile; \
+	 done
+	@$(AR) ru libpetsc.a ar_tmp/*
+	@rm -r ar_tmp
+	@$(RANLIB) libpetsc.a
+endif
+
 
 else
   external-links-petsc:
