@@ -133,7 +133,7 @@ TAGS: $(filter-out %/forward_declarations.h,                                \
 
 
 clean: clean-base clean-lac clean-dealII clean-doc
-	-cd $D/common ; rm -f TODO TAGS
+	-rm -f TODO common/TAGS
 
 clean-base:
 	cd $D/base ; $(MAKE) clean
