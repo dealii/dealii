@@ -35,7 +35,9 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 {
   const unsigned int fe_dofs = dofs->get_fe().total_dofs;
   const unsigned int face_dofs = dofs->get_fe().dofs_per_face;
-  
+
+				   // set the elements of the vectors
+				   // on all levels to zero
   d.clear();
 //  hanging_nodes.condense(src);
   
@@ -51,7 +53,7 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 //     out.write_gnuplot(of,1);
 //   }
 
-  for (int level = maxlevel ; level >= (int) minlevel ; --level)
+  for (int level = maxlevel; level >= static_cast<int>(minlevel); --level)
     {
       DoFHandler<dim>::active_cell_iterator dc = dofs->DoFHandler<dim>::begin_active(level);
       MGDoFHandler<dim>::active_cell_iterator c = dofs->begin_active(level);
