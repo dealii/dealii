@@ -105,13 +105,13 @@ class FEValuesData
 				      * is the same as for the
 				      * ShapeVector data type.
 				      */
-    typedef Table<2,Tensor<1,dim> > GradientVector;
+    typedef std::vector<std::vector<Tensor<1,dim> > > GradientVector;
 
 				     /**
 				      * Likewise for second order
 				      * derivatives.
 				      */
-    typedef Table<2,Tensor<2,dim> > GradGradVector;
+    typedef std::vector<std::vector<Tensor<2,dim> > > GradGradVector;
     
 				     /**
 				      * Store the values of the shape
@@ -1342,10 +1342,10 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 	  ExcAccessToUninitializedField());
   Assert (fe->is_primitive (i),
 	  ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->shape_gradients.n_rows(),
-	  ExcIndexRange (i, 0, this->shape_gradients.n_rows()));
-  Assert (j<this->shape_gradients.n_cols(),
-	  ExcIndexRange (j, 0, this->shape_gradients.n_cols()));
+  Assert (i<this->shape_gradients.size(),
+	  ExcIndexRange (i, 0, this->shape_gradients.size()));
+  Assert (j<this->shape_gradients[0].size(),
+	  ExcIndexRange (j, 0, this->shape_gradients[0].size()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
@@ -1438,10 +1438,10 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 	  ExcAccessToUninitializedField());
   Assert (fe->is_primitive (i),
 	  ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->shape_2nd_derivatives.n_rows(),
-	  ExcIndexRange (i, 0, this->shape_2nd_derivatives.n_rows()));
-  Assert (j<this->shape_2nd_derivatives.n_cols(),
-	  ExcIndexRange (j, 0, this->shape_2nd_derivatives.n_cols()));
+  Assert (i<this->shape_2nd_derivatives.size(),
+	  ExcIndexRange (i, 0, this->shape_2nd_derivatives.size()));
+  Assert (j<this->shape_2nd_derivatives[0].size(),
+	  ExcIndexRange (j, 0, this->shape_2nd_derivatives[0].size()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:

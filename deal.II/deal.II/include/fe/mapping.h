@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -237,33 +237,23 @@ class Mapping : public Subscriptor
 				      * transpose if the inverse
 				      * matrix.
 				      *
-				      * The range of vectors spanned
-				      * by @p begin and @p end must
-				      * have as many elements as there
-				      * are quadrature points (not
-				      * tested inside the function).
-				      * Also note the different
-				      * convention for parameters
-				      * compared to the standard C++
-				      * @p transform function: here,
-				      * first destination, then source
-				      * are specified, and the number
-				      * of elements is determined by a
-				      * range of destination
-				      * vectors. This convention is
-				      * due to the way the function is
-				      * usually called.
-				      *
-				      * The vector @p src must
-				      * contain at least as many
-				      * elements as there are
-				      * quadrature points.
+				      * The list of arguments is as follows:
+				      * we transform as many elements in the
+				      * @p input field, starting from @offset,
+				      * as there are elements in @p
+				      * output. The @p input array may hold
+				      * more elements than are needed (some
+				      * finite element classes use this for a
+				      * denser storage of data), but it needs
+				      * to have at least
+				      * <tt>output.size()</tt> elements
+				      * starting with element @p offset.
 				      */
     virtual
     void
-    transform_covariant (Tensor<1,dim>          *begin,
-			 Tensor<1,dim>          *end,
-			 const Tensor<1,dim>    *src,
+    transform_covariant (const std::vector<Tensor<1,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<1,dim> >       &output,
 			 const InternalDataBase &internal) const = 0;
 
                                      /**
@@ -276,13 +266,13 @@ class Mapping : public Subscriptor
                                       *
                                       * The same applies as to the
                                       * function above regarding input
-                                      * and output ranges.
+                                      * and output arguments.
                                       */
     virtual
     void
-    transform_covariant (Tensor<2,dim>          *begin,
-			 Tensor<2,dim>          *end,
-			 const Tensor<2,dim>    *src,
+    transform_covariant (const std::vector<Tensor<2,dim> > &input,
+                         const unsigned int                 offset,
+			 std::vector<Tensor<2,dim> >       &output,
 			 const InternalDataBase &internal) const = 0;
     
 				     /**
@@ -294,34 +284,24 @@ class Mapping : public Subscriptor
 				      * of the transformation from
 				      * unit to real space cell.
 				      * 
-				      * The range of vectors spanned
-				      * by @p begin and @p end must
-				      * have as many elements as there
-				      * are quadrature points (not
-				      * tested inside the function).
-				      * Also note the different
-				      * convention for parameters
-				      * compared to the standard C++
-				      * @p transform function: here,
-				      * first destination, then source
-				      * are specified, and the number
-				      * of elements is determined by a
-				      * range of destination
-				      * vectors. This convention is
-				      * due to the way the function is
-				      * usually called.
-				      *
-				      * The vector @p src must
-				      * contain at least as many
-				      * elements as there are
-				      * quadrature points.
+				      * The list of arguments is as follows:
+				      * we transform as many elements in the
+				      * @p input field, starting from @offset,
+				      * as there are elements in @p
+				      * output. The @p input array may hold
+				      * more elements than are needed (some
+				      * finite element classes use this for a
+				      * denser storage of data), but it needs
+				      * to have at least
+				      * <tt>output.size()</tt> elements
+				      * starting with element @p offset.
 				      */
     virtual
     void
-    transform_contravariant (Tensor<1,dim>          *begin,
-			     Tensor<1,dim>          *end,
-			     const Tensor<1,dim>    *src,
-			     const InternalDataBase &internal) const = 0;
+    transform_contravariant (const std::vector<Tensor<1,dim> > &input,
+                             const unsigned int                 offset,
+			     std::vector<Tensor<1,dim> >       &output,
+			     const typename Mapping<dim>::InternalDataBase &internal) const = 0;
 
                                      /**
                                       * Transform a set of matrices
@@ -340,14 +320,14 @@ class Mapping : public Subscriptor
                                       *
                                       * The same applies as to the
                                       * function above regarding input
-                                      * and output ranges.
+                                      * and output arguments.
                                       */
-    virtual
-    void
-    transform_contravariant (Tensor<2,dim>          *begin,
-                             Tensor<2,dim>          *end,
-                             const Tensor<2,dim>    *src,
-                             const InternalDataBase &internal) const = 0;
+    
+    virtual void
+    transform_contravariant (const std::vector<Tensor<2,dim> > &intput,
+                             const unsigned int                 offset,
+			     std::vector<Tensor<2,dim> > &output,
+			     const typename Mapping<dim>::InternalDataBase &internal) const = 0;
     
 				     /**
 				      * Indicate fields to be updated

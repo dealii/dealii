@@ -375,7 +375,7 @@ class FE_Poly : public FiniteElement<dim>
 					  * them over when visiting a
 					  * concrete cell.
 					  */
-	Table<2,double> shape_values;
+	std::vector<std::vector<double> > shape_values;
 
 					 /**
 					  * Array with shape function
@@ -395,7 +395,7 @@ class FE_Poly : public FiniteElement<dim>
 					  * multiplication) when
 					  * visiting an actual cell.
 					  */      
-	Table<2,Tensor<1,dim> > shape_gradients;
+	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
     };
     
 				     /**

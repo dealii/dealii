@@ -66,12 +66,12 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
 			      n_quadrature_points);
 
   if (flags & update_gradients)
-    this->shape_gradients.reinit(n_nonzero_shape_components,
-				 n_quadrature_points);
+    this->shape_gradients.resize (n_nonzero_shape_components,
+                                  std::vector<Tensor<1,dim> > (n_quadrature_points));
 
   if (flags & update_second_derivatives)
-    this->shape_2nd_derivatives.reinit(n_nonzero_shape_components,
-				       n_quadrature_points);
+    this->shape_2nd_derivatives.resize (n_nonzero_shape_components,
+                                        std::vector<Tensor<2,dim> > (n_quadrature_points));
   
   if (flags & update_q_points)
     this->quadrature_points.resize(n_quadrature_points);

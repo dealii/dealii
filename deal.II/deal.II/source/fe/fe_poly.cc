@@ -183,15 +183,15 @@ FE_Poly<POLY,dim>::get_data (const UpdateFlags      update_flags,
   if (flags & update_values)
     {
       values.resize (this->dofs_per_cell);
-      data->shape_values.reinit (this->dofs_per_cell,
-				 n_q_points);
+      data->shape_values.resize (this->dofs_per_cell,
+				 std::vector<double> (n_q_points));
     }
 
   if (flags & update_gradients)
     {
       grads.resize (this->dofs_per_cell);
-      data->shape_gradients.reinit (this->dofs_per_cell,
-				    n_q_points);
+      data->shape_gradients.resize (this->dofs_per_cell,
+				    std::vector<Tensor<1,dim> > (n_q_points));
     }
 
 				   // if second derivatives through
@@ -235,11 +235,11 @@ FE_Poly<POLY,dim>::get_data (const UpdateFlags      update_flags,
 template <class POLY, int dim>
 void
 FE_Poly<POLY,dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-			   const typename DoFHandler<dim>::cell_iterator &cell,
-			   const Quadrature<dim>                &quadrature,
-			   typename Mapping<dim>::InternalDataBase &mapping_data,
-			   typename Mapping<dim>::InternalDataBase &fedata,
-			   FEValuesData<dim>                    &data) const
+                                   const typename DoFHandler<dim>::cell_iterator &cell,
+                                   const Quadrature<dim>                &quadrature,
+                                   typename Mapping<dim>::InternalDataBase &mapping_data,
+                                   typename Mapping<dim>::InternalDataBase &fedata,
+                                   FEValuesData<dim>                    &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -260,11 +260,10 @@ FE_Poly<POLY,dim>::fill_fe_values (const Mapping<dim>                   &mapping
 	  Assert (data.shape_gradients[k].size() <=
 		  fe_data.shape_gradients[k].size(),
 		  ExcInternalError());	  
-	  mapping.transform_covariant(data.shape_gradients[k].begin(),
-				      data.shape_gradients[k].end(),
-				      fe_data.shape_gradients[k].begin(),
+	  mapping.transform_covariant(fe_data.shape_gradients[k], 0,
+                                      data.shape_gradients[k],
 				      mapping_data);
-	};
+	}
     }
 
   const typename QProjector<dim>::DataSetDescriptor dsd;
@@ -313,11 +312,10 @@ FE_Poly<POLY,dim>::fill_fe_face_values (const Mapping<dim>                   &ma
 	  Assert (data.shape_gradients[k].size() + offset <=
 		  fe_data.shape_gradients[k].size(),
 		  ExcInternalError());
-	  mapping.transform_covariant(data.shape_gradients[k].begin(),
-				      data.shape_gradients[k].end(),
-				      fe_data.shape_gradients[k].begin()+offset,
+	  mapping.transform_covariant(fe_data.shape_gradients[k], offset,
+                                      data.shape_gradients[k],
 				      mapping_data);
-	};
+	}
     }
 
   if (flags & update_second_derivatives)
@@ -365,11 +363,10 @@ FE_Poly<POLY,dim>::fill_fe_subface_values (const Mapping<dim>                   
 	  Assert (data.shape_gradients[k].size() + offset <=
 		  fe_data.shape_gradients[k].size(),
 		  ExcInternalError());
-	  mapping.transform_covariant(data.shape_gradients[k].begin(),
-				      data.shape_gradients[k].end(),
-				      fe_data.shape_gradients[k].begin()+offset,
+	  mapping.transform_covariant(fe_data.shape_gradients[k], offset,
+                                      data.shape_gradients[k],
 				      mapping_data);
-	};
+	}
     }
   
   if (flags & update_second_derivatives)

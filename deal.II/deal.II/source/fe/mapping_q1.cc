@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -354,13 +354,13 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 
   if (data.update_flags & update_boundary_forms)
     {
-      data.aux.reinit(dim-1, n_original_q_points);      
+      data.aux.resize (dim-1, std::vector<Tensor<1,dim> > (n_original_q_points));
       
 				       // Compute tangentials to the
 				       // unit cell.
       const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
-      data.unit_tangentials.reinit(nfaces*(dim-1),
-				   n_original_q_points);
+      data.unit_tangentials.resize (nfaces*(dim-1),
+                                    std::vector<Tensor<1,dim> > (n_original_q_points));
       for (unsigned int i=0; i<nfaces; ++i)
 	{
 					   // Base index of the
@@ -607,43 +607,39 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
       
       Assert (data.aux[0].size() <= data.unit_tangentials[face_no].size(),
 	      ExcInternalError());
-      transform_contravariant(data.aux[0].begin(),
-			      data.aux[0].end(),
-			      data.unit_tangentials[face_no].begin(),
+      transform_contravariant(data.unit_tangentials[face_no], 0,
+                              data.aux[0],
 			      data);
 
       typename std::vector<Tensor<1,dim> >::iterator
 	result = boundary_forms.begin();
       const typename std::vector<Tensor<1,dim> >::iterator
 	end = boundary_forms.end();
-      const Tensor<1,dim> *
-	tang1 = data.aux[0].begin();
       
       switch (dim)
 	{
 	  case 2:
           {
-            for (; result != end; ++result, ++tang1)
-              cross_product (*result, *tang1);
+            for (unsigned int i=0; result != end; ++result, ++i)
+              cross_product (*result, data.aux[0][i]);
             break;
           };
 
 	  case 3:
           {
             Assert (face_no+GeometryInfo<dim>::faces_per_cell <
-                    data.unit_tangentials.n_rows(),
+                    data.unit_tangentials.size(),
                     ExcInternalError());
             Assert (data.aux[1].size() <=
                     data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell].size(),
                     ExcInternalError());
-            transform_contravariant(data.aux[1].begin(),
-                                    data.aux[1].end(),
-                                    data.unit_tangentials[
-                                      face_no+GeometryInfo<dim>::faces_per_cell].begin(),
+            transform_contravariant(data.unit_tangentials[
+                                      face_no+GeometryInfo<dim>::faces_per_cell], 0,
+                                    data.aux[1],
                                     data);
-            const Tensor<1,dim> *tang2 = data.aux[1].begin();
-            for (;result != end; ++result, ++tang1, ++tang2)
-              cross_product (*result, *tang1, *tang2);
+            for (unsigned int i=0; result != end; ++result, ++i)
+              cross_product (*result, data.aux[0][i], data.aux[1][i]);
+
             break;
           };
 
@@ -787,10 +783,10 @@ MappingQ1<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
 
 template <int dim>
 void
-MappingQ1<dim>::transform_covariant (Tensor<1,dim>       *begin,
-				     Tensor<1,dim>       *end,
-				     const Tensor<1,dim> *src,
-				     const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ1<dim>::transform_covariant (const std::vector<Tensor<1,dim> > &input,
+                                     const unsigned int                 offset,
+                                     std::vector<Tensor<1,dim> >       &output,
+                                     const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -799,27 +795,20 @@ MappingQ1<dim>::transform_covariant (Tensor<1,dim>       *begin,
   Assert (data.update_flags & update_covariant_transformation,
 	  ExcAccessToUninitializedField());
 
-//TODO: [GK] Can we do a similar assertion?  
-//  Assert (dst.size() == data.contravariant.size(),
-//	  ExcDimensionMismatch(dst.size() + src_offset, data.contravariant.size()));
+  Assert (output.size() + offset <= input.size(), ExcInternalError());
 
-  typename std::vector<Tensor<2,dim> >::const_iterator
-    tensor = data.covariant.begin();
-  
-  while (begin!=end)
-    {
-      contract (*(begin++), *(src++), *(tensor++));
-    }
+  for (unsigned int i=0; i<output.size(); ++i)
+    contract (output[i], input[i+offset], data.covariant[i]);
 }
 
 
 
 template <int dim>
 void
-MappingQ1<dim>::transform_covariant (Tensor<2,dim>       *begin,
-				     Tensor<2,dim>       *end,
-				     const Tensor<2,dim> *src,
-				     const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ1<dim>::transform_covariant (const std::vector<Tensor<2,dim> > &input,
+                                     const unsigned int                 offset,
+                                     std::vector<Tensor<2,dim> >       &output,
+                                     const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -828,17 +817,10 @@ MappingQ1<dim>::transform_covariant (Tensor<2,dim>       *begin,
   Assert (data.update_flags & update_covariant_transformation,
 	  ExcAccessToUninitializedField());
 
-//TODO: [GK] Can we do a similar assertion?  
-//  Assert (dst.size() == data.contravariant.size(),
-//	  ExcDimensionMismatch(dst.size() + src_offset, data.contravariant.size()));
+  Assert (output.size() + offset <= input.size(), ExcInternalError());
 
-  typename std::vector<Tensor<2,dim> >::const_iterator
-    tensor = data.covariant.begin();
-  
-  while (begin!=end)
-    {
-      contract (*(begin++), *(src++), *(tensor++));
-    }
+  for (unsigned int i=0; i<output.size(); ++i)
+    contract (output[i], input[i+offset], data.covariant[i]);
 }
 
 
@@ -846,9 +828,9 @@ MappingQ1<dim>::transform_covariant (Tensor<2,dim>       *begin,
 template <int dim>
 void
 MappingQ1<dim>::
-transform_contravariant (Tensor<1,dim>       *begin,
-                         Tensor<1,dim>       *end,
-                         const Tensor<1,dim> *src,
+transform_contravariant (const std::vector<Tensor<1,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<1,dim> >       &output,
                          const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
@@ -858,11 +840,10 @@ transform_contravariant (Tensor<1,dim>       *begin,
   Assert (data.update_flags & update_contravariant_transformation,
 	  ExcAccessToUninitializedField());
 
-  typename std::vector<Tensor<2,dim> >::const_iterator
-    tensor = data.contravariant.begin();
-  
-  while (begin!=end)
-    contract (*(begin++), *(tensor++), *(src++));
+  Assert (output.size() + offset <= input.size(), ExcInternalError());
+
+  for (unsigned int i=0; i<output.size(); ++i)
+    contract (output[i], data.contravariant[i], input[i+offset]);
 }
 
 
@@ -870,9 +851,9 @@ transform_contravariant (Tensor<1,dim>       *begin,
 template <int dim>
 void
 MappingQ1<dim>::
-transform_contravariant (Tensor<2,dim>       *begin,
-                         Tensor<2,dim>       *end,
-                         const Tensor<2,dim> *src,
+transform_contravariant (const std::vector<Tensor<2,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<2,dim> >       &output,
                          const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
@@ -882,11 +863,10 @@ transform_contravariant (Tensor<2,dim>       *begin,
   Assert (data.update_flags & update_contravariant_transformation,
 	  ExcAccessToUninitializedField());
 
-  typename std::vector<Tensor<2,dim> >::const_iterator
-    tensor = data.contravariant.begin();
-  
-  while (begin!=end)
-    contract (*(begin++), *(tensor++), *(src++));
+  Assert (output.size() + offset <= input.size(), ExcInternalError());
+
+  for (unsigned int i=0; i<output.size(); ++i)
+    contract (output[i], data.contravariant[i], input[i+offset]);
 }
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -931,10 +931,12 @@ FE_Nedelec<dim>::get_data (const UpdateFlags      update_flags,
  				   // necessary. otherwise, don't
  				   // allocate memory
    if (flags & update_values)
-     data->shape_values.reinit (this->dofs_per_cell, n_q_points);
+     data->shape_values.resize (this->dofs_per_cell,
+                                std::vector<Tensor<1,dim> > (n_q_points));
 
    if (flags & update_gradients)
-     data->shape_gradients.reinit (this->dofs_per_cell, n_q_points);
+     data->shape_gradients.resize (this->dofs_per_cell,
+                                   std::vector<Tensor<2,dim> > (n_q_points));
 
  				   // if second derivatives through
  				   // finite differencing is required,
@@ -1021,9 +1023,8 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 					   // values...
 	  Assert (fe_data.shape_values[k].size() == n_q_points,
 		  ExcInternalError());
-	  mapping.transform_covariant(&*shape_values.begin(),
-                                      &*shape_values.end(),
-                                      fe_data.shape_values[k].begin(),
+	  mapping.transform_covariant(fe_data.shape_values[k], 0,
+                                      shape_values,
                                       mapping_data);
 
 					   // then copy over to target:
@@ -1039,9 +1040,9 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
       std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
-      Assert (data.shape_gradients.n_rows() == this->dofs_per_cell * dim,
+      Assert (data.shape_gradients.size() == this->dofs_per_cell * dim,
 	      ExcInternalError());
-      Assert (data.shape_gradients.n_cols() == n_q_points,
+      Assert (data.shape_gradients[0].size() == n_q_points,
 	      ExcInternalError());
 
                                        // loop over all shape
@@ -1072,17 +1073,14 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 	  Assert (fe_data.shape_gradients[k].size() == n_q_points,
 		  ExcInternalError());
                                            // do first transformation
-	  mapping.transform_covariant(&*shape_grads1.begin(),
-                                      &*shape_grads1.end(),
-                                      fe_data.shape_gradients[k].begin(),
+	  mapping.transform_covariant(fe_data.shape_gradients[k], 0,
+                                      shape_grads1,
                                       mapping_data);
                                            // transpose matrix
           for (unsigned int q=0; q<n_q_points; ++q)
             shape_grads2[q] = transpose(shape_grads1[q]);
                                            // do second transformation
-	  mapping.transform_covariant(&*shape_grads1.begin(),
-                                      &*shape_grads1.end(),
-                                      &*shape_grads2.begin(),
+	  mapping.transform_covariant(shape_grads2, 0, shape_grads1,
                                       mapping_data);
                                            // transpose back
           for (unsigned int q=0; q<n_q_points; ++q)
@@ -1149,7 +1147,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
                                        // check size of array. in 3d,
                                        // we have faces oriented both
                                        // ways
-      Assert (fe_data.shape_values.n_cols() ==
+      Assert (fe_data.shape_values[0].size() ==
               GeometryInfo<dim>::faces_per_cell * n_q_points *
               (dim == 3 ? 2 : 1),
               ExcInternalError());
@@ -1165,9 +1163,8 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
 	{
 					   // first transform shape
 					   // values...
-	  mapping.transform_covariant(&*shape_values.begin(),
-                                      &*shape_values.end(),
-                                      fe_data.shape_values[k].begin()+offset,
+	  mapping.transform_covariant(fe_data.shape_values[k], offset,
+                                      shape_values,
                                       mapping_data);
 
 					   // then copy over to target:
@@ -1183,7 +1180,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
                                        // check size of array. in 3d,
                                        // we have faces oriented both
                                        // ways
-      Assert (fe_data.shape_gradients.n_cols() ==
+      Assert (fe_data.shape_gradients[0].size() ==
               GeometryInfo<dim>::faces_per_cell * n_q_points *
               (dim == 3 ? 2 : 1),
               ExcInternalError());
@@ -1191,9 +1188,9 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
       std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
-      Assert (data.shape_gradients.n_rows() == this->dofs_per_cell * dim,
+      Assert (data.shape_gradients.size() == this->dofs_per_cell * dim,
 	      ExcInternalError());
-      Assert (data.shape_gradients.n_cols() == n_q_points,
+      Assert (data.shape_gradients[0].size() == n_q_points,
 	      ExcInternalError());
 
                                        // loop over all shape
@@ -1223,17 +1220,14 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
                                            // little in between
                                            // 
                                            // do first transformation
-	  mapping.transform_covariant(&*shape_grads1.begin(),
-                                      &*shape_grads1.end(),
-                                      fe_data.shape_gradients[k].begin()+offset,
+	  mapping.transform_covariant(fe_data.shape_gradients[k], offset,
+                                      shape_grads1,
                                       mapping_data);
                                            // transpose matrix
           for (unsigned int q=0; q<n_q_points; ++q)
             shape_grads2[q] = transpose(shape_grads1[q]);
                                            // do second transformation
-	  mapping.transform_covariant(&*shape_grads1.begin(),
-                                      &*shape_grads1.end(),
-                                      &*shape_grads2.begin(),
+	  mapping.transform_covariant(shape_grads2, 0, shape_grads1,
                                       mapping_data);
                                            // transpose back
           for (unsigned int q=0; q<n_q_points; ++q)
@@ -1296,7 +1290,7 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
 				   // number of conversions
   if (flags & update_values)
     {
-      Assert (fe_data.shape_values.n_cols() ==
+      Assert (fe_data.shape_values[0].size() ==
  	      GeometryInfo<dim>::subfaces_per_face *
               GeometryInfo<dim>::faces_per_cell *
 	      n_q_points,
@@ -1313,9 +1307,8 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
 	{
 					   // first transform shape
 					   // values...
-	  mapping.transform_covariant(&*shape_values.begin(),
-                                      &*shape_values.end(),
-                                      fe_data.shape_values[k].begin()+offset,
+	  mapping.transform_covariant(fe_data.shape_values[k], offset,
+                                      shape_values,
                                       mapping_data);
 
 					   // then copy over to target:
@@ -1328,7 +1321,7 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
       
   if (flags & update_gradients)
     {
-      Assert (fe_data.shape_gradients.n_cols() ==
+      Assert (fe_data.shape_gradients.size() ==
               GeometryInfo<dim>::faces_per_cell *
 	      GeometryInfo<dim>::subfaces_per_face *
 	      n_q_points,
@@ -1337,9 +1330,9 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
       std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
-      Assert (data.shape_gradients.n_rows() == this->dofs_per_cell * dim,
+      Assert (data.shape_gradients.size() == this->dofs_per_cell * dim,
 	      ExcInternalError());
-      Assert (data.shape_gradients.n_cols() == n_q_points,
+      Assert (data.shape_gradients[0].size() == n_q_points,
 	      ExcInternalError());
 
                                        // loop over all shape
@@ -1369,17 +1362,14 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
                                            // little in between
                                            // 
                                            // do first transformation
-	  mapping.transform_covariant(&*shape_grads1.begin(),
-                                      &*shape_grads1.end(),
-                                      fe_data.shape_gradients[k].begin()+offset,
+	  mapping.transform_covariant(fe_data.shape_gradients[k], offset,
+                                      shape_grads1,
                                       mapping_data);
                                            // transpose matrix
           for (unsigned int q=0; q<n_q_points; ++q)
             shape_grads2[q] = transpose(shape_grads1[q]);
                                            // do second transformation
-	  mapping.transform_covariant(&*shape_grads1.begin(),
-                                      &*shape_grads1.end(),
-                                      &*shape_grads2.begin(),
+	  mapping.transform_covariant(shape_grads2, 0, shape_grads1,
                                       mapping_data);
                                            // transpose back
           for (unsigned int q=0; q<n_q_points; ++q)

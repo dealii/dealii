@@ -86,9 +86,9 @@ class MappingQ1 : public Mapping<dim>
 				      * Mapping.
 				      */
     virtual void
-    transform_covariant (Tensor<1,dim>          *begin,
-			 Tensor<1,dim>          *end,
-			 const Tensor<1,dim>    *src,
+    transform_covariant (const std::vector<Tensor<1,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<1,dim> > &output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
@@ -96,9 +96,9 @@ class MappingQ1 : public Mapping<dim>
 				      * Mapping.
 				      */
     virtual void
-    transform_covariant (Tensor<2,dim>          *begin,
-			 Tensor<2,dim>          *end,
-			 const Tensor<2,dim>    *src,
+    transform_covariant (const std::vector<Tensor<2,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<2,dim> >       &output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
@@ -106,9 +106,9 @@ class MappingQ1 : public Mapping<dim>
 				      * Mapping.
 				      */
     virtual void
-    transform_contravariant (Tensor<1,dim>          *begin,
-			     Tensor<1,dim>          *end,
-			     const Tensor<1,dim>    *src,
+    transform_contravariant (const std::vector<Tensor<1,dim> > &input,
+                             const unsigned int                 offset,
+			     std::vector<Tensor<1,dim> >       &output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
@@ -116,9 +116,9 @@ class MappingQ1 : public Mapping<dim>
 				      * Mapping.
 				      */
     virtual void
-    transform_contravariant (Tensor<2,dim>          *begin,
-			     Tensor<2,dim>          *end,
-			     const Tensor<2,dim>    *src,
+    transform_contravariant (const std::vector<Tensor<2,dim> > &intput,
+                             const unsigned int                 offset,
+			     std::vector<Tensor<2,dim> > &output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
@@ -305,12 +305,12 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Filled once.
 					  */
-        Table<2,Tensor<1,dim> > unit_tangentials;
+        std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 	
 					 /**
-					  * Auxuliary vectors for internal use.
+					  * Auxiliary vectors for internal use.
 					  */
-        Table<2,Tensor<1,dim> > aux;
+        std::vector<std::vector<Tensor<1,dim> > > aux;
 
 					 /**
 					  * Stores the support points of

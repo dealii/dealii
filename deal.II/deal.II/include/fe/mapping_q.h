@@ -82,9 +82,9 @@ class MappingQ : public MappingQ1<dim>
 				      * interface in Mapping.
 				      */
     virtual void
-    transform_covariant (Tensor<1,dim>          *begin,
-			 Tensor<1,dim>          *end,
-			 const Tensor<1,dim>    *src,
+    transform_covariant (const std::vector<Tensor<1,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<1,dim> > &output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
@@ -92,9 +92,9 @@ class MappingQ : public MappingQ1<dim>
 				      * interface in Mapping.
 				      */
     virtual void
-    transform_covariant (Tensor<2,dim>          *begin,
-			 Tensor<2,dim>          *end,
-			 const Tensor<2,dim>    *src,
+    transform_covariant (const std::vector<Tensor<2,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<2,dim> >       &output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
@@ -102,9 +102,9 @@ class MappingQ : public MappingQ1<dim>
 				      * interface in Mapping.
 				      */
     virtual void
-    transform_contravariant (Tensor<1,dim>          *begin,
-			     Tensor<1,dim>          *end,
-			     const Tensor<1,dim>    *src,
+    transform_contravariant (const std::vector<Tensor<1,dim> > &input,
+                             const unsigned int                 offset,
+			     std::vector<Tensor<1,dim> >       &output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;    
 
 				     /**
@@ -112,9 +112,9 @@ class MappingQ : public MappingQ1<dim>
 				      * interface in Mapping.
 				      */
     virtual void
-    transform_contravariant (Tensor<2,dim>          *begin,
-			     Tensor<2,dim>          *end,
-			     const Tensor<2,dim>    *src,
+    transform_contravariant (const std::vector<Tensor<2,dim> > &intput,
+                             const unsigned int                 offset,
+			     std::vector<Tensor<2,dim> >       &output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;    
     
 				     /**

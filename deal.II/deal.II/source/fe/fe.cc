@@ -478,10 +478,10 @@ compute_2nd (const Mapping<dim>                   &mapping,
                        n_nonzero_components_table.end(),
                        0U);
   
-  Assert (data.shape_2nd_derivatives.n_rows() == total_nonzero_components,
+  Assert (data.shape_2nd_derivatives.size() == total_nonzero_components,
 	  ExcInternalError());
 				   // Number of quadrature points
-  const unsigned int n_q_points = data.shape_2nd_derivatives.n_cols();
+  const unsigned int n_q_points = data.shape_2nd_derivatives[0].size();
 
 				   // first reinit the fe_values
 				   // objects used for the finite
@@ -496,7 +496,8 @@ compute_2nd (const Mapping<dim>                   &mapping,
 				   // quotients of gradients in each
 				   // direction (first index) and at
 				   // all q-points (second index)
-  Table<2,Tensor<1,dim> >    diff_quot (dim, n_q_points);
+  std::vector<std::vector<Tensor<1,dim> > >
+    diff_quot (dim, std::vector<Tensor<1,dim> > (n_q_points));
   std::vector<Tensor<1,dim> > diff_quot2 (n_q_points);
 
 				   // for all nonzero components of
@@ -588,13 +589,13 @@ compute_2nd (const Mapping<dim>                   &mapping,
             Assert (diff_quot2.size() <=
                     diff_quot[d].size(),
                     ExcInternalError());
-            mapping.transform_covariant (&*diff_quot2.begin(), &*diff_quot2.end(),
-                                         diff_quot[d].begin(),
+            mapping.transform_covariant (diff_quot[d], 0, diff_quot2,
                                          mapping_internal);
             
             for (unsigned int q=0; q<n_q_points; ++q)
               for (unsigned int d1=0; d1<dim; ++d1)
-                data.shape_2nd_derivatives[total_index][q][d][d1] = diff_quot2[q][d1];
+                data.shape_2nd_derivatives[total_index][q][d][d1]
+                  = diff_quot2[q][d1];
           }
       }
 }

@@ -80,28 +80,44 @@ class MappingCartesian : public Mapping<dim>
 			    std::vector<Tensor<1,dim> >        &boundary_form,
 			    std::vector<Point<dim> >        &normal_vectors) const ;
 
+				     /**
+				      * Implementation of the
+				      * interface in Mapping.
+				      */
     virtual void
-    transform_covariant (Tensor<1,dim>          *begin,
-			 Tensor<1,dim>          *end,
-			 const Tensor<1,dim>    *src,
+    transform_covariant (const std::vector<Tensor<1,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<1,dim> > &output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
 
+				     /**
+				      * Implementation of the
+				      * interface in Mapping.
+				      */
     virtual void
-    transform_covariant (Tensor<2,dim>          *begin,
-			 Tensor<2,dim>          *end,
-			 const Tensor<2,dim>    *src,
+    transform_covariant (const std::vector<Tensor<2,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<2,dim> >       &output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
+				     /**
+				      * Implementation of the
+				      * interface in Mapping.
+				      */
     virtual void
-    transform_contravariant (Tensor<1,dim>          *begin,
-			     Tensor<1,dim>          *end,
-			     const Tensor<1,dim>    *src,
+    transform_contravariant (const std::vector<Tensor<1,dim> > &input,
+                             const unsigned int                 offset,
+			     std::vector<Tensor<1,dim> >       &output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
     
+				     /**
+				      * Implementation of the
+				      * interface in Mapping.
+				      */
     virtual void
-    transform_contravariant (Tensor<2,dim>          *begin,
-			     Tensor<2,dim>          *end,
-			     const Tensor<2,dim>    *src,
+    transform_contravariant (const std::vector<Tensor<2,dim> > &input,
+                             const unsigned int                 offset,
+			     std::vector<Tensor<2,dim> >       &output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
 
     virtual Point<dim>

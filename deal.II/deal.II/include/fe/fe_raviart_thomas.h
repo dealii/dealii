@@ -540,7 +540,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 					  * multiplication with the
 					  * Jacobian of the mapping.
 					  */
-	Table<2,Tensor<1,dim> > shape_values;
+	std::vector<std::vector<Tensor<1,dim> > > shape_values;
 
 					 /**
 					  * Array with shape function
@@ -560,7 +560,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 					  * multiplication) when
 					  * visiting an actual cell.
 					  */
-	Table<2,Tensor<2,dim> > shape_gradients;
+	std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
     };
     
 				     /**

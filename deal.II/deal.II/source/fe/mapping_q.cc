@@ -1145,14 +1145,16 @@ add_quad_support_points(const typename Triangulation<dim>::cell_iterator &,
 template <int dim>
 void
 MappingQ<dim>::
-transform_covariant (Tensor<1,dim>       *begin,
-                     Tensor<1,dim>       *end,
-                     const Tensor<1,dim> *src,
+transform_covariant (const std::vector<Tensor<1,dim> > &input,
+                     const unsigned int                 offset,
+                     std::vector<Tensor<1,dim> >       &output,
                      const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
+
+  Assert (output.size() + offset <= input.size(), ExcInternalError());
   
   typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
@@ -1169,23 +1171,25 @@ transform_covariant (Tensor<1,dim>       *begin,
 	tensor = data->covariant.begin();    
     }
 
-  while (begin!=end)
-    contract (*(begin++), *(src++), *(tensor++));
+  for (unsigned int i=0; i<output.size(); ++i)
+    contract (output[i], input[i+offset], *(tensor++));
 }
 
 
 
 template <int dim>
 void
-MappingQ<dim>::transform_covariant (Tensor<2,dim>       *begin,
-				    Tensor<2,dim>       *end,
-				    const Tensor<2,dim> *src,
-				    const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::transform_covariant (const std::vector<Tensor<2,dim> > &input,
+                                    const unsigned int                 offset,
+                                    std::vector<Tensor<2,dim> >       &output,
+                                    const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
-  
+
+  Assert (output.size() + offset <= input.size(), ExcInternalError());
+
   typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
   if (q1_data->is_mapping_q1_data)
@@ -1201,8 +1205,8 @@ MappingQ<dim>::transform_covariant (Tensor<2,dim>       *begin,
 	tensor = data->covariant.begin();
     }
 
-  while (begin!=end)
-    contract (*(begin++), *(src++), *(tensor++));
+  for (unsigned int i=0; i<output.size(); ++i)
+    contract (output[i], input[i+offset], *(tensor++));
 }
 
 
@@ -1210,15 +1214,17 @@ MappingQ<dim>::transform_covariant (Tensor<2,dim>       *begin,
 template <int dim>
 void
 MappingQ<dim>::
-transform_contravariant (Tensor<1,dim>       *begin,
-                         Tensor<1,dim>       *end,
-                         const Tensor<1,dim> *src,
+transform_contravariant (const std::vector<Tensor<1,dim> > &input,
+                         const unsigned int                 offset,
+                         std::vector<Tensor<1,dim> >       &output,
                          const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
   
+  Assert (output.size() + offset <= input.size(), ExcInternalError());
+
   typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
   if (q1_data->is_mapping_q1_data)
@@ -1234,23 +1240,25 @@ transform_contravariant (Tensor<1,dim>       *begin,
 	tensor = data->contravariant.begin();    
     }
   
-  while (begin!=end)
-    contract (*(begin++), *(tensor++), *(src++));
+  for (unsigned int i=0; i<output.size(); ++i)
+    contract (output[i], *(tensor++), input[i+offset]);
 }
 
 
 
 template <int dim>
 void
-MappingQ<dim>::transform_contravariant (Tensor<2,dim>       *begin,
-					Tensor<2,dim>       *end,
-					const Tensor<2,dim> *src,
-					const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::transform_contravariant (const std::vector<Tensor<2,dim> > &input,
+                                        const unsigned int                 offset,
+                                        std::vector<Tensor<2,dim> >       &output,
+                                        const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
   
+  Assert (output.size() + offset <= input.size(), ExcInternalError());
+
   typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
   if (q1_data->is_mapping_q1_data)
@@ -1266,8 +1274,8 @@ MappingQ<dim>::transform_contravariant (Tensor<2,dim>       *begin,
 	tensor = data->contravariant.begin();    
     }
 
-  while (begin!=end)
-    contract (*(begin++), *(tensor++), *(src++));
+  for (unsigned int i=0; i<output.size(); ++i)
+    contract (output[i], *(tensor++), input[i+offset]);
 }
 
 
