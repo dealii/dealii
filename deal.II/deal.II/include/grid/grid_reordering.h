@@ -224,7 +224,7 @@ namespace internal
 					 /**
 					  * Local side numbers on quads 0 and 1.
 					  */
-	int lsn0, lsn1;
+	unsigned int lsn0, lsn1;
 	bool Oriented;
 
 					 /**

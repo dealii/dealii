@@ -1403,7 +1403,7 @@ namespace internal
       int qctr=0;
       for(std::vector<MQuad>::iterator it=mquads.begin(); it!=mquads.end(); ++it)
 	{
-	  for(int i=0;i<4;++i)
+	  for(unsigned int i=0;i<4;++i)
 	    {
 	      MSide &ss =sides[(*it).side[i]];
 	      if(ss.Q0==static_cast<unsigned int>(-1))
