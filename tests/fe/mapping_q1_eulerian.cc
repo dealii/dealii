@@ -1,5 +1,5 @@
 // $Id$
-// Copyright (C) 2001 Michael Stadler, Wolfgang Bangerth
+// Copyright (C) 2001, 2002 Michael Stadler, Wolfgang Bangerth
 //
 
 #include <base/quadrature_lib.h>
@@ -12,7 +12,6 @@
 #include <fe/fe_system.h>
 #include <fe/mapping_q1_eulerian.h>
 #include <fe/fe_values.h>
-#include <fe/fe_lib.lagrange.h>
 #include <vector>
 #include <fstream>
 #include <string>

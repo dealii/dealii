@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    std::copyright (C) 1998, 1999, 2000, 2001 by Wolfgang Bangerth
+//    std::copyright (C) 1998, 1999, 2000, 2001, 2002 by Wolfgang Bangerth
 //
 //    This file is subject to QPL and may not be  distributed
 //    without std::copyright and license information. Please refer
@@ -29,6 +29,7 @@
 #include <grid/forward_declarations.h>
 #include <lac/vector.h>
 
+#include <fe/fe_q.h>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -997,11 +998,11 @@ inline number sqr (const number a) {
  */
 template <int dim>
 struct FEHelper {
-    static const FEQ1<dim>           fe_linear;
-    static const FEQ2<dim>           fe_quadratic_sub;
+    static const FE_Q<dim>           fe_linear;
+    static const FE_Q<dim>           fe_quadratic_sub;
 #if 2 < 3    
-    static const FEQ3<dim>           fe_cubic_sub;
-    static const FEQ4<dim>           fe_quartic_sub;
+    static const FE_Q<dim>           fe_cubic_sub;
+    static const FE_Q<dim>           fe_quartic_sub;
 #endif
 
     static const QGauss2<dim>        q_gauss_2;
@@ -1040,6 +1041,12 @@ struct FEHelper {
     static const Quadrature<dim-1>  & get_quadrature_face (const std::string &name);
 };
 
+template<int dim> const FE_Q<dim> FEHelper<dim>::fe_linear(1);
+template<int dim> const FE_Q<dim> FEHelper<dim>::fe_quadratic_sub(2);
+#if 2 < 3    
+template<int dim> const FE_Q<dim> FEHelper<dim>::fe_cubic_sub(3);
+template<int dim> const FE_Q<dim> FEHelper<dim>::fe_quartic_sub(4);
+#endif
 
 template <int dim> class DualFunctional;
 template <int dim> class EvaluationBase;
@@ -7584,19 +7591,16 @@ void UserMatrix::precondition (Vector<double> &dst,
 };
 
 
-
-
-#include <fe/fe_lib.lagrange.h>
 #include <fe/mapping_q1.h>
 #include <base/quadrature_lib.h>
 
 
 
-const FEQ1<2>   FEHelper<2>::fe_linear;
-const FEQ2<2>   FEHelper<2>::fe_quadratic_sub;
+const FE_Q<2>   FEHelper<2>::fe_linear(1);
+const FE_Q<2>   FEHelper<2>::fe_quadratic_sub(2);
 #if 2 < 3
-const FEQ3<2>   FEHelper<2>::fe_cubic_sub;
-const FEQ4<2>   FEHelper<2>::fe_quartic_sub;
+const FE_Q<2>   FEHelper<2>::fe_cubic_sub(3);
+const FE_Q<2>   FEHelper<2>::fe_quartic_sub(4);
 #endif
     
 const QGauss2<2> FEHelper<2>::q_gauss_2;

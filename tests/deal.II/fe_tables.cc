@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,8 +15,6 @@
 #include <base/exceptions.h>
 #include <base/point.h>
 #include <lac/vector.h>
-#include <fe/fe_lib.lagrange.h>
-#include <fe/fe_lib.dg.h>
 #include <fe/fe_system.h>
 #include <fe/fe_tools.h>
 #include <grid/tria.h>

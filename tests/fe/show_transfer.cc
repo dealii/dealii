@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,8 +21,6 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
-#include <fe/fe_lib.lagrange.h>
-#include <fe/fe_lib.dg.h>
 #include <fe/fe_values.h>
 #include <multigrid/multigrid.h>
 #include <multigrid/mg_dof_handler.h>
