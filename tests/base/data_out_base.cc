@@ -19,6 +19,8 @@
 #include <fstream>
 #include <string>
 
+//TODO: Several functions are commented out since implementations are missing
+
 #define WRITE(type) DataOutBase::write_ ## type (patches, names, type ## flags, out)
 
 template <int dim, int spacedim>
@@ -31,15 +33,21 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
   names[1] = std::string("last name");
 
   DataOutBase::DXFlags dxflags;
-//    DataOutBase::EpsFlags epsflags;
-//    DataOutBase::GnuplotFlags gnuplotflags;
-//    DataOutBase::GmvFlags gmvflags;
-//    DataOutBase::PovrayFlags povrayflags;
-//    DataOutBase::UcdFlags ucdflags;
-//    DataOutBase::VtkFlags vtkflags;
+//  DataOutBase::EpsFlags epsflags;
+  DataOutBase::GnuplotFlags gnuplotflags;
+  DataOutBase::GmvFlags gmvflags;
+  DataOutBase::PovrayFlags povrayflags;
+  DataOutBase::UcdFlags ucdflags;
+  DataOutBase::VtkFlags vtkflags;
   
   WRITE(dx);
-  
+//  WRITE(eps);
+  WRITE(gnuplot);
+  WRITE(gmv);
+  if (dim==2 && spacedim==2)
+    WRITE(povray);
+  WRITE(ucd);
+  WRITE(vtk);
 }
 
 template<int dim>
@@ -168,19 +176,31 @@ create_patches(std::vector<DataOutBase::Patch<dim,spacedim> >& patches)
 }
 
 
+template<int dim, int spacedim>
+void test(std::ostream& out)
+{
+  std::vector<DataOutBase::Patch<dim, spacedim> > patches;
+  create_patches(patches);
+  write_patches(patches, out);
+}
+
+
 int main()
 {
   std::ofstream logfile("data_out_base.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  std::vector<DataOutBase::Patch<1,1> > patch11;
-  std::vector<DataOutBase::Patch<1,2> > patch12;
-  std::vector<DataOutBase::Patch<1,3> > patch13;
-  std::vector<DataOutBase::Patch<2,2> > patch22;
-  std::vector<DataOutBase::Patch<2,3> > patch23;
-  std::vector<DataOutBase::Patch<3,3> > patch33;
-
-  create_patches(patch33);
-  write_patches(patch33, logfile);
+//TODO: write_eps says ExcNotImplemented  
+//  test<1,1>(logfile);
+  test<1,2>(logfile);
+//TODO: Instantiations missing (linker error)  
+//  test<1,3>(logfile);
+  test<2,2>(logfile);
+  test<2,3>(logfile);
+  test<3,3>(logfile);
+//    test<1,4>(logfile);
+//    test<2,4>(logfile);
+//    test<3,4>(logfile);
+//    test<4,4>(logfile);
 }
