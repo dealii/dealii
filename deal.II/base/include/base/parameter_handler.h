@@ -780,7 +780,7 @@ class ParameterHandler
 				      * are no changed entry values in a
 				      * subsection; therefore #enter_subsection#
 				      * has to create the tree in both #Defaults#
-				      * and #changed_entries.
+				      * and #changed_entries#.
 				      */
     Section changed_entries;
 
@@ -851,7 +851,7 @@ class ParameterHandler
  *   of the two solvers.
  *
  *   Opposite to a variant entry, an array entry looks like this:
- *   \begin{verabtim}
+ *   \begin{verbatim}
  *     set Output file = ofile.{{ 1 | 2 | 3 | 4 }}
  *   \end{verbatim}
  *   This indicates that if there are variant entries producing a total of four
@@ -1141,7 +1141,7 @@ class MultipleParameterLoop : public ParameterHandler {
 					  * Construct an object with given subsection
 					  * path, name and value. The splitting up
 					  * into the different variants is done
-					  * later by #split_different_values.
+					  * later by #split_different_values#.
 					  */
 	Entry (const vector<string> &Path, const string &Name, const string &Value);
 

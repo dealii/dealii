@@ -442,8 +442,8 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
     IteratorState state () const;
 
 				     /**
-				      * Print the iterator in the form
-				      * #level.index# to #out#.
+				      * Print the iterator to #out#. The
+				      * format is like #level.index#.
 				      */
     void print (ostream &out) const;
 
@@ -872,15 +872,20 @@ TriaRawIterator<dim,Accessor>::operator -> () {
 
 template <int dim, typename Accessor>
 inline
-IteratorState TriaRawIterator<dim,Accessor>::state () const {
+IteratorState
+TriaRawIterator<dim,Accessor>::state () const {
   return accessor.state ();
 };
 
 
 
+// sorry that the declaration of this function looks so ragged; I had
+// to do it this way since otherwise doc++ could not parse it correctly.
 template <int dim, typename Accessor>
 inline
-bool TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const {
+bool
+TriaRawIterator<dim,Accessor>::
+operator < (const TriaRawIterator &i) const {
   Assert (state() != invalid, ExcDereferenceInvalidObject());
   Assert (i.state() != invalid, ExcDereferenceInvalidObject());
   
@@ -920,7 +925,8 @@ TriaRawIterator<dim,Accessor>::operator -- () {
 
 template <int dim, typename Accessor>
 inline
-void TriaRawIterator<dim,Accessor>::print (ostream &out) const {
+void
+TriaRawIterator<dim,Accessor>::print (ostream &out) const {
   out << accessor.level() << "." << accessor.index();
 };
 

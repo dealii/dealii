@@ -416,12 +416,12 @@ class FiniteElementBase :
 				      * with embedded spaces, the basis function
 				      * phi0[i] on the coarse grid can be
 				      * expressed by
-				      * \sum_c \sum_j p^c_{ji) phi1[j]
+				      * $\sum_c \sum_j p^c_{ji} phi1[j]$
 				      * where the sum over c runs over the child
-				      * cells and phi1[j] is the j_th basis
-				      * function on the c_th child cell. Note
+				      * cells and phi1[j] is the jth basis
+				      * function on the cth child cell. Note
 				      * that we need here the transpose of the
-				      * matrix p^c (p^c is returned by this
+				      * matrix $p^c$ ($p^c$ is returned by this
 				      * function with parameter c).
 				      *
 				      * Upon assembling the transfer matrix
@@ -537,7 +537,7 @@ class FiniteElementBase :
  * of the bounding lines of the quadrilateral,
  * $n=5d_v..5d_v+4*d_l-1$ are for the degrees of freedom on
  * the four lines connecting the center vertex to the outer boundary of the
- * mother face, n=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1# for the degrees of freedom
+ * mother face, $n=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1$ for the degrees of freedom
  * on the small lines surrounding the quad,
  * and $n=5d_v+12*d_l...5d_v+12*d_l+4*d_q-1$ for the dofs on the
  * four child faces. Note the direction of the lines at the boundary of the

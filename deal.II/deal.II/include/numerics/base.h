@@ -72,7 +72,7 @@
  *
  * To actually apply the boundary conditions, use is made of the
  * #MatrixTools::apply_boundary_values# function and by interpolation of
- * the boundary_values using the #MatrixTool::interpolate_boundary_values#
+ * the #boundary_values# using the #MatrixTool::interpolate_boundary_values#
  * function. See there for more information.
  *
  *

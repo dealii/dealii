@@ -9,7 +9,11 @@
  *   The three states an iterator can be in: valid, past-the-end and
  *   invalid.
  */
-enum IteratorState { valid, past_the_end, invalid };
+enum IteratorState {
+      valid,
+      past_the_end,
+      invalid
+};
 
 
 

@@ -118,9 +118,9 @@
  *  The derivatives of the Jacobi matrices at the quadrature points with respect
  *  to unit cell coordinates is stored in the field names
  *  #jacobi_matrices_grad#. Since the gradient of a shape function is given by
- *  $\partial_i \phi = \sum_k  \hat\partial_k \hat\phi  J_{ki}$, where $\hat$
- *  denotes differentiation on the unit cell, the second derivative of a
- *  function is given by
+ *  $\partial_i \phi = \sum_k  \hat\partial_k \hat\phi  J_{ki}$, where
+ *  $\hat\partial$ denotes differentiation on the unit cell, the second
+ *  derivative of a function is given by
  *  $\partial_j \partial i \phi
  *   =
  *   \hat\partial_l [ (\hat \partial_k \hat\phi) J_{ki} ] J_{lj}

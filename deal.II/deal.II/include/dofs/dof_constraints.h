@@ -72,7 +72,7 @@
  *   consumption for those iterative solution methods using a larger number of
  *   auxiliary vectors (e.g. methods using explicite orthogonalization
  *   procedures).
- * \end{verbatim}
+ * \end{itemize}
  *
  * Usually, the second way is chosen since memory consumption upon construction
  * of a second matrix rules out the first possibility.

@@ -668,14 +668,14 @@ class SparseMatrix
 
 				     /**
 				      * Matrix-vector multiplication: let
-				      * #dst = M*src# with #M# being this matrix.
+				      * $dst = M*src$ with $M$ being this matrix.
 				      */
     template <typename somenumber>
     void vmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
     
 				     /**
 				      * Matrix-vector multiplication: let
-				      * #dst = M^T*src# with #M# being this
+				      * $dst = M^T*src$ with $M$ being this
 				      * matrix. This function does the same as
 				      * #vmult# but takes the transposed matrix.
 				      */
@@ -690,9 +690,9 @@ class SparseMatrix
     void backward_forward (Vector<somenumber>& v);
     
 				     /**
-				      * Return the norm of the vector #v# with
+				      * Return the norm of the vector $v$ with
 				      * respect to the norm induced by this
-				      * matrix, i.e. $\left<v,Mv\right>$. This
+				      * matrix, i.e. $\left(v,Mv\right)$. This
 				      * is useful, e.g. in the finite element
 				      * context, where the $L_2$ norm of a
 				      * function equals the matrix norm with

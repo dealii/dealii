@@ -58,7 +58,6 @@ class Vector {
 				     /**
 				      * Declare iterator types just like those
 				      * for the C++ standard library:
-				      *
 				      * Data type stored by this container.
 				      */
     typedef Number value_type;
@@ -276,17 +275,19 @@ class Vector {
 				      */
 				     //@{
 				     /**
+				      * Addition operator.
 				      * Fast equivalent to #U.add(1, V)#.
 				      */
     Vector<Number> & operator += (const Vector<Number> &V);
 
     				     /**
+				      * Subtraction operator.
 				      * Fast equivalent to #U.add(-1, V)#.
 				      */
     Vector<Number> & operator -= (const Vector<Number> &V);
 
 				     /**
-				      * U(0-DIM)+=s.
+				      * $U(0-DIM)+=s$.
 				      * Addition of #s# to all components. Note
 				      * that #s# is a scalar and not a vector.
 				      */

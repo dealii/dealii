@@ -494,7 +494,7 @@ class TriaDimensionInfo<3> {
  *       boundary approximation object if you want the triangulation to be refined
  *       at the outer boundaries.
  *   
- *     \item Reading in a triangulation: By using an object of the \Ref{#DataIn#}
+ *     \item Reading in a triangulation: By using an object of the #DataIn#
  *        class, you can read in fairly general triangulations. See there for
  *        more information. The mentioned class uses the interface described
  *        directly below to transfer the data into the triangulation.

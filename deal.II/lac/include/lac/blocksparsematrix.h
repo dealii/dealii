@@ -112,7 +112,7 @@ class BlockSparseMatrix: public SparseMatrix<number>
 				     /**
 				      * Set the right block size before calling
 				      * #precondition_BlockSOR#.
-				      * If block_size==1 BlockSOR is the
+				      * If #block_size==1# BlockSOR is the
 				      * same as SOR.
 				      */
     void set_block_size (const unsigned int bsize);

@@ -13,7 +13,7 @@
 
 
 /**
- * A class that simplifies the process of execution logging by
+ * A class that simplifies the process of execution logging. It does so by
  * providing
  * \begin{itemize}
  * \item a push and pop mechanism for prefixes, and
@@ -165,7 +165,7 @@ class LogStream
 
 				     /**
 				      * Kludge to make one of the egcs snapshots
-				      * happy, since it produces an internal
+				      * happy. Necessary since it produces an internal
 				      * compiler error when accessing #s.std#.
 				      * Remove this function at the first
 				      * possible time.

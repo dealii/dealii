@@ -131,8 +131,8 @@ class SolutionTransfer
 				      * refinement, to the function #out#
 				      * which then is a vector on the refined grid.
 				      * It assumes the vectors having the
-				      * right sizes (i.e. in.size()==n_dofs_old,
-				      * out.size()==n_dofs_refined)
+				      * right sizes (i.e. #in.size()==n_dofs_old#,
+				      * #out.size()==n_dofs_refined#)
        				      *
 				      * Calling this function is allowed only
 				      * if #prepare_for_pure_refinement# is called
@@ -287,7 +287,7 @@ class SolutionTransfer
 				      * will be refined) or the
 				      * #vector<double> dof_values# (if the
 				      * children of this cell will be deleted)
-				      * is needed, hence one user_pointer should
+				      * is needed, hence one #user_pointer# should
 				      * be sufficient, but to allow some errorchecks
 				      * and to preserve the user from making
 				      * user errors the #user_pointer# will be

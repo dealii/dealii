@@ -286,7 +286,7 @@ class FullMatrix
 				     /**
 				      * Matrix-matrix-multiplication using
 				      * transpose of #this#.
-				      * $C=A^T*B.
+				      * $C=A^T*B$.
 				      */
     template<typename number2>
     void Tmmult (FullMatrix<number2>& C, const FullMatrix<number2>& B) const;
@@ -317,7 +317,7 @@ class FullMatrix
 				     /**
 				      * Return the norm of the vector #v# with
 				      * respect to the norm induced by this
-				      * matrix, i.e. $\left<v,Mv\right>$. This
+				      * matrix, i.e. $\left(v,Mv\right)$. This
 				      * is useful, e.g. in the finite element
 				      * context, where the $L_2$ norm of a
 				      * function equals the matrix norm with

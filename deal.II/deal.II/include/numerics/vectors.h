@@ -221,16 +221,16 @@ enum NormType {
  *   The $H_1$ seminorm is the $L_2$ norm of the gradient of the difference. The
  *   full $H_1$ norm is the sum of the seminorm and the $L_2$ norm.
  * 
- *   To get the {\it global} L_1 error, you have to sum up the entries in
+ *   To get the {\it global} $L_1$ error, you have to sum up the entries in
  *   #difference#, e.g. using #Vector<double>::l1_norm# function.
- *   For the global L_2 difference, you have to sum up the squares of the
+ *   For the global $L_2$ difference, you have to sum up the squares of the
  *   entries and take the root of the sum, e.g. using #Vector<double>::l2_norm#.
  *   These two operations represent the
- *   l_1 and l_2 norms of the vectors, but you need not take the absolute
+ *   $l_1$ and $l_2$ norms of the vectors, but you need not take the absolute
  *   value of each entry, since the cellwise norms are already positive.
  *  
  *   To get the global mean difference, simply sum up the elements as above.
- *   To get the L_\infty norm, take the maximum of the vector elements, e.g.
+ *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
  *   using the #Vector<double>::linfty_norm# function.
  *
  *   For the global $H_1$ norm and seminorm, the same rule applies as for the

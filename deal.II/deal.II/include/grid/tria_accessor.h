@@ -574,7 +574,7 @@ class QuadAccessor :  public TriaAccessor<dim> {
     void set (const Quad &q) const;
     
 				     /**
-				      *  Return index of vertex #i=0,1,2,3# of
+				      *  Return index of vertex #i=0 through 3# of
 				      *  a quad. The #i#th vertex is the common
 				      *  one of line #i# and #(i+3)%4#. See also
 				      *  the introduced convention
@@ -920,7 +920,7 @@ class HexAccessor :  public TriaAccessor<dim> {
     void set (const Hexahedron &h) const;
     
 				     /**
-				      *  Return index of vertex #i=0,...,7# of
+				      *  Return index of vertex #i=0 through 7# of
 				      *  a hex. The convention regarding the
 				      *  numbering of vertices is laid down
 				      *  in the documentation of the
