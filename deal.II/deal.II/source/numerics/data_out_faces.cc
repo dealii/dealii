@@ -14,6 +14,7 @@
 
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <numerics/data_out_faces.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
@@ -78,16 +79,26 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	    {
 	      if (data.n_components == 1)
 		{
-		  fe_patch_values.get_function_values (*dof_data[dataset].data,
-						       data.patch_values);
+		  if (dof_data[dataset].has_block)
+		    fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+							 data.patch_values);
+		  else
+		    fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+							 data.patch_values);
+
 		  for (unsigned int q=0; q<n_q_points; ++q)
 		    patch->data(dataset,q) = data.patch_values[q];
 		}
 	      else
 						 // system of components
 		{
-		  fe_patch_values.get_function_values (*dof_data[dataset].data,
-						       data.patch_values_system);
+		  if (dof_data[dataset].has_block)
+		    fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+							 data.patch_values_system);
+		  else
+		    fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+							 data.patch_values_system);
+
 		  for (unsigned int component=0; component<data.n_components;
 		       ++component)
 		    for (unsigned int q=0; q<n_q_points; ++q)
@@ -99,10 +110,18 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 					   // then do the cell data
 	  for (unsigned int dataset=0; dataset<cell_data.size(); ++dataset)
 	    {
-	      const double value = (*cell_data[dataset].data)(face_number);
-	      for (unsigned int q=0; q<n_q_points; ++q)
-		patch->data(dataset+dof_data.size()*data.n_components,q) =
-		  value;
+	      if (cell_data[dataset].has_block)
+		{
+		  const double value = (*cell_data[dataset].block_data)(face_number);
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    patch->data(dataset+dof_data.size()*data.n_components,q) =
+		      value;
+		} else {
+		  const double value = (*cell_data[dataset].single_data)(face_number);
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    patch->data(dataset+dof_data.size()*data.n_components,q) =
+		      value;
+		} 
 	    };
 	};
       				       // next cell (patch) in this thread

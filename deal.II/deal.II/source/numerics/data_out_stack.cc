@@ -16,6 +16,7 @@
 #include <base/quadrature_lib.h>
 #include <base/memory_consumption.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>

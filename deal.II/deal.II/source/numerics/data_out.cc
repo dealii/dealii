@@ -15,6 +15,7 @@
 #include <base/quadrature_lib.h>
 #include <base/memory_consumption.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <numerics/data_out.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
@@ -42,7 +43,19 @@ template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataEntry::
 DataEntry (const Vector<double> *data,
 	   const std::vector<std::string> &names) :
-		data(data),
+		single_data(data),
+		has_block(false),
+		names(names)
+{};
+
+
+
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataEntry::
+DataEntry (const BlockVector<double> *data,
+	   const std::vector<std::string> &names) :
+		block_data(data),
+		has_block(true),
 		names(names)
 {};
 
@@ -53,7 +66,7 @@ unsigned int
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
 DataEntry::memory_consumption () const
 {
-  return (sizeof (data) +
+  return (sizeof (single_data) + sizeof (block_data) +
 	  MemoryConsumption::memory_consumption (names));
 };
 
@@ -95,9 +108,10 @@ attach_dof_handler (const DoFHandler<dof_handler_dim> &d)
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <class VECTOR>
 void
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
-add_data_vector (const Vector<double>           &vec,
+add_data_vector (const VECTOR                   &vec,
 		 const std::vector<std::string> &names,
 		 const DataVectorType            type)
 {
@@ -162,9 +176,10 @@ add_data_vector (const Vector<double>           &vec,
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <class VECTOR>
 void
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
-add_data_vector (const Vector<double> &vec,
+add_data_vector (const VECTOR         &vec,
 		 const std::string    &name,
 		 const DataVectorType  type)
 {
@@ -215,10 +230,16 @@ void
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_input_data_references ()
 {
   for (unsigned int i=0; i<dof_data.size(); ++i)
-    dof_data[i].data = 0;
+    {
+      dof_data[i].single_data = 0;
+      dof_data[i].block_data = 0;
+    }
   
   for (unsigned int i=0; i<cell_data.size(); ++i)
-    cell_data[i].data = 0;
+    {
+      cell_data[i].single_data = 0;
+      cell_data[i].block_data = 0;
+    }
 
   if (dofs != 0)
     {
@@ -345,16 +366,26 @@ void DataOut<dim>::build_some_patches (Data data)
 	    {
 	      if (data.n_components == 1)
 		{
-		  fe_patch_values.get_function_values (*dof_data[dataset].data,
-						       data.patch_values);
+		  if (dof_data[dataset].has_block)
+		    fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+							 data.patch_values);
+		  else
+		    fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+							 data.patch_values);
+
 		  for (unsigned int q=0; q<n_q_points; ++q)
 		    patch->data(dataset,q) = data.patch_values[q];
 		}
 	      else
 						 // system of components
 		{
-		  fe_patch_values.get_function_values (*dof_data[dataset].data,
-						       data.patch_values_system);
+		  if (dof_data[dataset].has_block)
+		    fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+							 data.patch_values_system);
+		  else
+		    fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+							 data.patch_values_system);
+
 		  for (unsigned int component=0; component<data.n_components;
 		       ++component)
 		    for (unsigned int q=0; q<n_q_points; ++q)
@@ -366,10 +397,18 @@ void DataOut<dim>::build_some_patches (Data data)
 					   // then do the cell data
 	  for (unsigned int dataset=0; dataset<cell_data.size(); ++dataset)
 	    {
-	      const double value = (*cell_data[dataset].data)(cell_number);
-	      for (unsigned int q=0; q<n_q_points; ++q)
-		patch->data(dataset+dof_data.size()*data.n_components,q) =
-		  value;
+	      if (cell_data[dataset].has_block)
+		{
+		  const double value = (*cell_data[dataset].block_data)(cell_number);
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    patch->data(dataset+dof_data.size()*data.n_components,q) =
+		      value;
+		} else {
+		  const double value = (*cell_data[dataset].single_data)(cell_number);
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    patch->data(dataset+dof_data.size()*data.n_components,q) =
+		      value;
+		} 
 	    };
 	};
       				       // next cell (patch) in this thread
@@ -501,11 +540,75 @@ DataOut<dim>::next_cell (const typename DoFHandler<dim>::cell_iterator &cell)
 
 // explicit instantiations
 template class DataOut_DoFData<deal_II_dimension,deal_II_dimension>;
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::add_data_vector (
+  const Vector<double> &vec,
+  const std::vector<std::string>    &name,
+  const DataVectorType  type);
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::add_data_vector (
+  const BlockVector<double> &vec,
+  const std::vector<std::string>    &name,
+  const DataVectorType  type);
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::add_data_vector (
+  const Vector<double> &vec,
+  const std::string    &name,
+  const DataVectorType  type);
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::add_data_vector (
+  const BlockVector<double> &vec,
+  const std::string    &name,
+  const DataVectorType  type);
+
 template class DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>;
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::add_data_vector (
+  const Vector<double> &vec,
+  const std::vector<std::string>    &name,
+  const DataVectorType  type);
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::add_data_vector (
+  const BlockVector<double> &vec,
+  const std::vector<std::string>    &name,
+  const DataVectorType  type);
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::add_data_vector (
+  const Vector<double> &vec,
+  const std::string    &name,
+  const DataVectorType  type);
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::add_data_vector (
+  const BlockVector<double> &vec,
+  const std::string    &name,
+  const DataVectorType  type);
+
 template class DataOut<deal_II_dimension>;
+
 
 
 // for 3d, also generate an extra class
 #if deal_II_dimension >= 2
 template class DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>;
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::add_data_vector (
+  const Vector<double> &vec,
+  const std::vector<std::string>    &name,
+  const DataVectorType  type);
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::add_data_vector (
+  const BlockVector<double> &vec,
+  const std::vector<std::string>    &name,
+  const DataVectorType  type);
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::add_data_vector (
+  const Vector<double> &vec,
+  const std::string    &name,
+  const DataVectorType  type);
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::add_data_vector (
+  const BlockVector<double> &vec,
+  const std::string    &name,
+  const DataVectorType  type);
+
 #endif

@@ -16,6 +16,7 @@
 #include <base/data_out_base.h>
 #include <dofs/dof_handler.h>
 
+template<typename number> class BlockVector;
 
 
 /**
@@ -266,7 +267,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * class to see which characters
 				      * are valid and which are not.
 				      */
-    void add_data_vector (const Vector<double>           &data,
+  template <class VECTOR>
+    void add_data_vector (const VECTOR                   &data,
 			  const std::vector<std::string> &names,
 			  const DataVectorType            type = type_automatic);
 
@@ -294,7 +296,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * underscore and the number of
 				      * each component to @p{name}
 				      */
-    void add_data_vector (const Vector<double> &data,
+  template <class VECTOR>
+    void add_data_vector (const VECTOR         &data,
 			  const std::string    &name,
 			  const DataVectorType  type = type_automatic);
 
@@ -408,6 +411,12 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 		   const std::vector<std::string> &names = std::vector<std::string>());
 
 					 /**
+					  * Constructor for block vector data.
+					  */
+	DataEntry (const BlockVector<double>      *data,
+		   const std::vector<std::string> &names = std::vector<std::string>());
+
+					 /**
 					  * Determine an estimate for the
 					  * memory consumption (in bytes)
 					  * of this object.
@@ -421,8 +430,22 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * pointed to remains with
 					  * the caller of this class.
 					  */
-	const Vector<double> *data;
-	
+      const Vector<double> *single_data;
+
+				       /**
+					* Pointer to a block vector of
+					* data.  Either this pointer
+					* or the previous is used,
+					* depending on the stored
+					* vector type.
+					*/
+      const BlockVector<double>* block_data;
+
+				       /**
+					* True if stored vector is a block vector.
+					*/
+      bool has_block;
+
 					 /**
 					  * Names of the components of this
 					  * data vector.

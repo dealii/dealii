@@ -85,6 +85,27 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Improved: Both functions <code
+       class="class">DataOut_DoFData</code>::<code
+       class="member">add_data_vector</code> accepts <code
+       class="class">BlockVector</code> as argument.
+       <br>
+       (GK 2001/10/12)
+       </p>
+
+  <li> <p>
+       Improved: Both functions <code
+       class="class">VectorTools</code>::<code
+       class="member">integrate_difference</code> take ingoing and
+       outgoing vector types as template arguments. This allows
+       applying them to <code class="class">BlockVector</code> and of
+       outputting a vector of doubles suitable for <code
+       class="class">DataOut</code>.
+       <br>
+       (GK 2001/10/12)
+       </p>
+
+  <li> <p>
        Fixed: Functions creating sparsity patterns for DG elements in
        <code class="class">DoFTools</code> get the pattern type as
        template argument, too..

@@ -14,6 +14,7 @@
 
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <numerics/data_out_rotation.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
@@ -165,8 +166,13 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 		{
 		  if (data.n_components == 1)
 		    {
-		      fe_patch_values.get_function_values (*dof_data[dataset].data,
-							   data.patch_values);
+		      if (dof_data[dataset].has_block)
+			fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+							     data.patch_values);
+		      else
+			fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+							     data.patch_values);
+
 		      switch (dim)
 			{
 			  case 1:
@@ -195,8 +201,13 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 		  else
 						     // system of components
 		    {
-		      fe_patch_values.get_function_values (*dof_data[dataset].data,
-							   data.patch_values_system);
+		      if (dof_data[dataset].has_block)
+			fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+							     data.patch_values_system);
+		      else
+			fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+							     data.patch_values_system);
+
 		      for (unsigned int component=0; component<data.n_components;
 			   ++component)
 			{
@@ -231,7 +242,9 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 					       // then do the cell data
 	      for (unsigned int dataset=0; dataset<cell_data.size(); ++dataset)
 		{
-		  const double value = (*cell_data[dataset].data)(cell_number);
+		  const double value = cell_data[dataset].has_block ?
+		    (*cell_data[dataset].block_data)(cell_number) :
+		    (*cell_data[dataset].single_data)(cell_number);
 		  switch (dim)
 		    {
 		      case 1:

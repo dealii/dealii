@@ -746,12 +746,12 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for more information.
 				      */
-    template <int dim>
+    template <int dim, class InVector, class OutVector>
     static void integrate_difference (const Mapping<dim>    &mapping,
 				      const DoFHandler<dim> &dof,
-				      const Vector<double>  &fe_function,
+				      const InVector        &fe_function,
 				      const Function<dim>   &exact_solution,
-				      Vector<float>         &difference,
+				      OutVector             &difference,
 				      const Quadrature<dim> &q,
 				      const NormType        &norm,
 				      const Function<dim>   *weight=0);
@@ -761,11 +761,11 @@ class VectorTools
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
-    template <int dim>
+    template <int dim, class InVector, class OutVector>
     static void integrate_difference (const DoFHandler<dim> &dof,
-				      const Vector<double>  &fe_function,
+				      const InVector        &fe_function,
 				      const Function<dim>   &exact_solution,
-				      Vector<float>         &difference,
+				      OutVector             &difference,
 				      const Quadrature<dim> &q,
 				      const NormType        &norm,
 				      const Function<dim>   *weight=0);
