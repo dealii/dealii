@@ -42,6 +42,11 @@ namespace internal
         const unsigned int face_no,
         const unsigned int n_quadrature_points)
   {
+    Assert (dim != 1, ExcInternalError());
+    Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+            ExcInternalError());
+    Assert (n_quadrature_points > 0, ExcInternalError());
+    
     switch (dim)
       {
         case 1:
@@ -77,6 +82,15 @@ namespace internal
             const unsigned int subface_no,
             const unsigned int n_quadrature_points)
   {
+    Assert (dim != 1, ExcInternalError());
+    Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+            ExcInternalError());
+                                     // the trick with +1 prevents
+                                     // that we get a warning in 1d
+    Assert (subface_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
+            ExcInternalError());
+    Assert (n_quadrature_points > 0, ExcInternalError());
+    
     switch (dim)
       {
         case 1:
