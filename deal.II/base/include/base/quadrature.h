@@ -21,55 +21,28 @@
 /**
  * Base class for quadrature formulae in arbitrary dimensions. This class
  * stores quadrature points and weights on the unit line [0,1], unit
- * square [0,1]x[0,1], etc. This information is used together with
- * objects of the \Ref{FiniteElement} class to compute the values stored
- * in the \Ref{FEValues} objects.
+ * square [0,1]x[0,1], etc.
  *
- * There are a number of derived classes, denoting concrete integration
- * formulae. These are named by a prefixed #Q#, the name of the formula
- * (e.g. #Midpoint# or #Gauss#) and finally (for Gauss integration 
- * formulae) the number of quadrature points.
+ * There are a number of derived classes, denoting concrete
+ * integration formulae. Their names names prefixed by #Q#. By now,
+ * there are several Newton-Cotes formulae, @ref{QMidpoint},
+ * @ref{QTrapez} and @ref{QSimpson}, as well as N-point Gauss formulae
+ * @p{QGaussN}. The names refer to the one-dimensional formulae. The
+ * schemes for higher dimensions are tensor products of
+ * these. Therefore, a three-dimensional @ref{QGauss5} formula has 125
+ * quadrature points.
  *
- * For each quadrature formula
- * there exists a number #m#, that denotes the maximal degree of polynomials
- * the formula of integration is exact for. This number is given 
- * in the documentation of each formula. The order of integration is then
- * given by #m+1#, that means that the error representation of the quadrature 
- * formula includes the $(m+1).$ derivative of the function to be integrated.
- * As the $(m+1).$ derivate of polynomials of degree #m# is 0, the order of
- * integration is always one larger than the degree of polynomials the
- * quadrature formula is exact for. For example, the #Midpoint# quadrature
- * formula is exact for polynomials of degree 1 (linear polynomials) and its order
- * of integration is 2, i.e. `The midpoint-formula is of order 2'.
- * 
- * Note the special case of Gauss integration formulae: The number #n# in the
- * n-Point-Gauss Quadrature formula #QGaussn# denotes the number of quadrature
- * points of the formula in one dimension. This formula is exact for polynomials
- * of degree #2n-1# and its order of integration is #2n#. For example,
- * #QGauss2<1># denotes the 2-Point-Gauss quadrature formula in 1 dimension.
- * It is exact for polynomials of degree 3 and its order of integration is 4.
+ * For each quadrature formula we denote by #m#, the maximal degree of
+ * polynomials integrated exactly. This number is given in the
+ * documentation of each formula. The order of the integration error
+ * is #m+1#, that is, the error is the size of the cell two the #m+1#
+ * by the Bramble-Hilbert Lemma. The number #m# is to be found in the
+ * documentation of each concrete formula. For the optimal formulae
+ * @p{QGaussN} we have $m = 2N-1$. The tensor product formulae are
+ * exact on tensor product polynomials of degree #m# in each space
+ * direction, but they are still only of #m+1#st order.
  *
- * Most integration formulae in more than one space dimension are tensor
- * products of quadrature formulae in one space dimension, or more
- * generally the tensor product of a formula in #(dim-1)# dimensions and
- * one in one dimension. There is a special constructor to generate a
- * quadrature formula from two others.
- * For example, the #QGauss2<dim># formulae includes $2^dim$ quadrature points
- * in #dim# dimensions but is still exact for polynomials of degree 3 and its
- * order of integration is 4.
- *
- * For some programs it is necessary to have a quadrature object for faces.
- * These programs fail to link if compiled for only one space dimension,
- * since there quadrature rules for faces just don't make no sense. In
- * order to allow these programs to be linked anyway, for class #Quadrature<0>#
- * all functions are provided in the #quadrature.cc# file, but they will
- * throw exceptions if actually called. The only function which is allowed
- * to be called is the constructor taking one integer, which in this case
- * ignores its parameter, and of course the destructor. Besides this, it is
- * necessary to provide a class #Point<0># to make the compiler happy. This
- * class also does nothing.
- *
- * @author Wolfgang Bangerth, 1998, documentation: Ralf Hartmann, 1999
+ * @author Wolfgang Bangerth, 1998, 1999, 2000
  */
 template <int dim>
 class Quadrature
@@ -108,13 +81,13 @@ class Quadrature
 				     /**
 				      * Return the #i#th quadrature point.
 				      */
-    const Point<dim> & quad_point (const unsigned int i) const;
+    const Point<dim> & point (const unsigned int i) const;
 
 				     /**
 				      * Return a reference to the whole array of
 				      * quadrature points.
 				      */
-    const vector<Point<dim> > & get_quad_points () const;
+    const vector<Point<dim> > & get_points () const;
     
 				     /**
 				      * Return the weight of the #i#th
@@ -127,12 +100,7 @@ class Quadrature
 				      * of weights.
 				      */
     const vector<double> & get_weights () const;
-    
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInternalError);
-    
+
   protected:
 				     /**
 				      * List of quadrature points. To be filled
@@ -237,7 +205,8 @@ class QIterated : public Quadrature<dim>
  *  for a description of the orientation of the different faces.
  */
 template <int dim>
-class QProjector {
+class QProjector
+{
   public:
 				     /**
 				      * Compute the quadrature points on the
@@ -250,6 +219,14 @@ class QProjector {
 				 const unsigned int       face_no,
 				 vector<Point<dim> >     &q_points);
 
+				     /**
+				      * Projection to all faces.
+				      * Generate a formula that integrates
+				      * over all faces at the same time.
+				      */
+    static void project_to_faces (const Quadrature<dim-1> &quadrature,
+				  vector<Point<dim> >     &q_points);
+    
     				     /**
 				      * Compute the quadrature points on the
 				      * cell if the given quadrature formula
@@ -264,9 +241,14 @@ class QProjector {
 				    vector<Point<dim> >     &q_points);
 
 				     /**
-				      * Exception
+				      * Projection to all child faces.
+				      * Project to the children of all
+				      * faces at the same time. The
+				      * ordering is first by face,
+				      * then by subface
 				      */
-    DeclException0 (ExcInternalError);
+    static void project_to_subfaces (const Quadrature<dim-1> &quadrature,
+				     vector<Point<dim> >     &q_points);
 };
 
 
