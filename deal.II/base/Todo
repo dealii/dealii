@@ -20,3 +20,9 @@ Put Tensor<1,dim>::array_size directly into the array type. At
 Fill in docs for the timer class. Hopefully finally find a way to
   let it measure times larger than half an hour.
 > Operating system dependence. Grrr. Guido
+
+
+Revert istrstream(p.c_str()) to istrstream(p) when possible
+  (parameter_handler.cc)
+
+
