@@ -42,9 +42,10 @@
  * indicating error codes, etc. It also manages allocation of the
  * right amount of temporary storage required by these functions.
  *
- * For a description of the steps necessary for the installation of
- * HSL subroutines, read the section on external libraries in the
- * <tt>deal.II</tt> ReadMe file.
+ * Note that this class only works if configuration of the deal.II library has
+ * detected the presence of this solver. Please read the README file on what
+ * the configure script is looking for and how to provide it.
+ *
  *
  * @section SPDMA1 Interface and Method
  *
@@ -610,7 +611,11 @@ class SparseDirectMA27 : public Subscriptor
  * indicating error codes, etc. It also manages allocation of the
  * right amount of temporary storage required by these functions.
  *
+ * Note that this class only works if configuration of the deal.II library has
+ * detected the presence of this solver. Please read the README file on what
+ * the configure script is looking for and how to provide it.
  *
+ * 
  * @section SPDMA47a Interface and Method
  *
  * For the meaning of the three functions initialize(), factorize(),
@@ -981,6 +986,289 @@ class SparseDirectMA47 : public Subscriptor
                       double             *rhs_and_solution,
                       unsigned int       *IW1,
                       const unsigned int *ICNTL);
+};
+
+
+
+
+/**
+ * This class provides an interface to the sparse direct solver UMFPACK (see
+ * <a href="http://www.cise.ufl.edu/research/sparse/umfpack">this
+ * link</a>). UMFPACK is a set of routines for solving unsymmetric sparse
+ * linear systems, Ax=b, using the Unsymmetric-pattern MultiFrontal method and
+ * direct sparse LU factorization. Matrices may have symmetric or unsymmetrix
+ * sparsity patterns, and may have unsymmetric entries.
+ *
+ * Note that this class only works if configuration of the deal.II library has
+ * detected the presence of this solver. Please read the README file on
+ * what the configure script is looking for and how to provide it.
+ *
+ * @author Wolfgang Bangerth, 2004
+ */
+class SparseDirectUMFPACK : public Subscriptor
+{
+  public:
+				     /**
+				      * Constructor. See the
+				      * documentation of this class
+				      * for the meaning of the
+				      * parameters to this function.
+				      */
+    SparseDirectUMFPACK ();
+
+                                     /**
+                                      * Destructor.
+                                      */
+    ~SparseDirectUMFPACK ();    
+    
+				     /**
+				      * This function does nothing. It is only
+				      * here to provide an interface that is
+				      * consistent with that of the HSL MA27
+				      * and MA47 solver classes.
+				      */
+    void initialize (const SparsityPattern &sparsity_pattern);
+
+				     /**
+				      * Factorize the matrix. This function
+				      * may be called multiple times for
+				      * different matrices, after the object
+				      * of this class has been initialized for
+				      * a certain sparsity pattern. You may
+				      * therefore save some computing time if
+				      * you want to invert several matrices
+				      * with the same sparsity
+				      * pattern. However, note that the bulk
+				      * of the computing time is actually
+				      * spent in the factorization, so this
+				      * functionality may not always be of
+				      * large benefit.
+				      *
+				      * If the initialization step has
+				      * not been performed yet, then
+				      * the initialize() function is
+				      * called at the beginning of
+				      * this function.
+				      *
+				      * This function copies the contents of
+				      * the matrix into its own storage; the
+				      * matrix can therefore be deleted after
+				      * this operation, even if subsequent
+				      * solves are required.
+				      */
+    void factorize (const SparseMatrix<double> &matrix);
+
+				     /**
+				      * Solve for a certain right hand
+				      * side vector. This function may
+				      * be called multiple times for
+				      * different right hand side
+				      * vectors after the matrix has
+				      * been factorized. This yields a
+				      * big saving in computing time,
+				      * since the actual solution is
+				      * fast, compared to the
+				      * factorization of the matrix.
+				      *
+				      * The solution will be returned
+				      * in place of the right hand
+				      * side vector.
+				      *
+				      * If the factorization has not
+				      * happened before, strange
+				      * things will happen. Note that
+				      * we can't actually call the
+				      * factorize() function from
+				      * here if it has not yet been
+				      * called, since we have no
+				      * access to the actual matrix.
+				      */
+    void solve (Vector<double> &rhs_and_solution) const;
+
+				     /**
+				      * Call the three functions above
+				      * in that order, i.e. perform
+				      * the whole solution process for
+				      * the given right hand side
+				      * vector.
+				      *
+				      * The solution will be returned
+				      * in place of the right hand
+				      * side vector.
+				      */
+    void solve (const SparseMatrix<double> &matrix,
+		Vector<double>             &rhs_and_solution);
+
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcMatrixNotSquare);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcUMFPACKError);
+    
+  private:
+                                     /**
+                                      * The UMFPACK routines allocate objects
+                                      * in which they store information about
+                                      * symbolic and numeric values of the
+                                      * decomposition. The actual data type of
+                                      * these objects is opaque, and only
+                                      * passed around as void pointers.
+                                      */
+    void *symbolic_decomposition;
+    void *numeric_decomposition;
+
+                                     /**
+                                      * Free all memory that hasn't been freed
+                                      * yet.
+                                      */
+    void clear ();
+
+                                     /**
+                                      * The arrays in which we store the data
+                                      * for the solver.
+                                      */
+    std::vector<int> Ap;
+    std::vector<int> Ai;
+    std::vector<double> Ax;
+
+                                     /**
+                                      * Control and info arrays for the solver
+                                      * routines.
+                                      */
+    std::vector<double> control;
+};
+
+
+
+class SparseDirectSuperLU : public Subscriptor
+{
+  public:
+				     /**
+				      * Constructor. See the
+				      * documentation of this class
+				      * for the meaning of the
+				      * parameters to this function.
+				      */
+    SparseDirectSuperLU ();
+
+                                     /**
+                                      * Destructor.
+                                      */
+    ~SparseDirectSuperLU ();    
+    
+				     /**
+				      * This function does nothing. It is only
+				      * here to provide an interface that is
+				      * consistent with that of the HSL MA27
+				      * and MA47 solver classes.
+				      */
+    void initialize (const SparsityPattern &sparsity_pattern);
+
+				     /**
+				      * Factorize the matrix. This function
+				      * may be called multiple times for
+				      * different matrices, after the object
+				      * of this class has been initialized for
+				      * a certain sparsity pattern. You may
+				      * therefore save some computing time if
+				      * you want to invert several matrices
+				      * with the same sparsity
+				      * pattern. However, note that the bulk
+				      * of the computing time is actually
+				      * spent in the factorization, so this
+				      * functionality may not always be of
+				      * large benefit.
+				      *
+				      * If the initialization step has
+				      * not been performed yet, then
+				      * the initialize() function is
+				      * called at the beginning of
+				      * this function.
+				      *
+				      * This function copies the contents of
+				      * the matrix into its own storage; the
+				      * matrix can therefore be deleted after
+				      * this operation, even if subsequent
+				      * solves are required.
+				      */
+    void factorize (const SparseMatrix<double> &matrix);
+
+				     /**
+				      * Solve for a certain right hand
+				      * side vector. This function may
+				      * be called multiple times for
+				      * different right hand side
+				      * vectors after the matrix has
+				      * been factorized. This yields a
+				      * big saving in computing time,
+				      * since the actual solution is
+				      * fast, compared to the
+				      * factorization of the matrix.
+				      *
+				      * The solution will be returned
+				      * in place of the right hand
+				      * side vector.
+				      *
+				      * If the factorization has not
+				      * happened before, strange
+				      * things will happen. Note that
+				      * we can't actually call the
+				      * factorize() function from
+				      * here if it has not yet been
+				      * called, since we have no
+				      * access to the actual matrix.
+				      */
+    void solve (Vector<double> &rhs_and_solution) const;
+
+				     /**
+				      * Call the three functions above
+				      * in that order, i.e. perform
+				      * the whole solution process for
+				      * the given right hand side
+				      * vector.
+				      *
+				      * The solution will be returned
+				      * in place of the right hand
+				      * side vector.
+				      */
+    void solve (const SparseMatrix<double> &matrix,
+		Vector<double>             &rhs_and_solution);
+
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcMatrixNotSquare);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcSuperLUError);
+    
+  private:
+                                     /**
+                                      * A data type that holds all the data we
+                                      * need to preserve between calls to
+                                      * factorize() and solve(). The actual
+                                      * definition of this structure is in the
+                                      * source file since it depends on
+                                      * SuperLU's data types and we don't want
+                                      * to include their header file into this
+                                      * one.
+                                      */
+    struct Data;
+
+                                     /**
+                                      * One such object.
+                                      */
+    Data *data;
+    
+                                     /**
+                                      * Free all memory that hasn't been freed
+                                      * yet.
+                                      */
+    void clear ();
 };
 
 /*@}*/

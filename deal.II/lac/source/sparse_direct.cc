@@ -42,6 +42,17 @@
 #  include <hsl/hsl.h>
 #endif
 
+
+// if configured for UMFPACK, include respective file. annoyingly the UMFPACK
+// files don't seem to have extern "C" wrapped around their headers...
+#ifdef DEAL_II_USE_UMFPACK
+extern "C" {
+#  include <umfpack.h>
+}
+#endif
+
+#include "/home/bangerth/tmp/superlu/SuperLU_3.0/SRC/dsp_defs.h"
+
 // if the HSL functions are not there, define them empty and throw an
 // exception
 #ifndef HAVE_HSL_MA27
@@ -1570,6 +1581,539 @@ call_ma47cd (const unsigned int *n_rows,           //scalar
   HSL::MA47::ma47cd_(n_rows, A, LA,
 		     IW, LIW, &W[0],
 		     rhs_and_solution, IW1, ICNTL);  
+}
+
+
+
+
+SparseDirectUMFPACK::SparseDirectUMFPACK ()
+                :
+                symbolic_decomposition (0),
+                numeric_decomposition (0),
+                control (UMFPACK_CONTROL)
+{
+  umfpack_di_defaults (&control[0]);
+}
+
+
+
+SparseDirectUMFPACK::~SparseDirectUMFPACK ()
+{
+  clear ();
+}
+
+
+void
+SparseDirectUMFPACK::clear ()
+{
+                                   // delete objects that haven't been deleted
+                                   // yet
+  if (symbolic_decomposition != 0)
+    {
+      umfpack_di_free_symbolic (&symbolic_decomposition);
+      symbolic_decomposition = 0;
+    }
+
+  if (numeric_decomposition != 0)
+    {
+      umfpack_di_free_numeric (&numeric_decomposition);
+      numeric_decomposition = 0;
+    }
+  
+  {
+    std::vector<int> tmp;
+    tmp.swap (Ap);
+  }
+
+  {
+    std::vector<int> tmp;
+    tmp.swap (Ai);
+  }
+  
+  {
+    std::vector<double> tmp;
+    tmp.swap (Ax);
+  }
+
+  umfpack_di_defaults (&control[0]);
+}
+
+
+
+void
+SparseDirectUMFPACK::
+initialize (const SparsityPattern &)
+{}
+
+
+
+void
+SparseDirectUMFPACK::
+factorize (const SparseMatrix<double> &matrix)
+{
+  Assert (matrix.m() == matrix.n(), ExcMatrixNotSquare())
+  
+  clear ();
+
+  const unsigned int N = matrix.m();
+
+                                   // copy over the data from the matrix to
+                                   // the data structures UMFPACK wants. note
+                                   // two things: first, UMFPACK wants
+                                   // compressed column storage whereas we
+                                   // always do compressed row storage; we
+                                   // work around this by, rather than
+                                   // shuffling things around, copy over the
+                                   // data we have, but then call the
+                                   // umfpack_di_solve function with the
+                                   // UMFPACK_At argument, meaning that we
+                                   // want to solve for the transpose system
+                                   //
+                                   // second: the data we have in the sparse
+                                   // matrices is "almost" right already;
+                                   // UMFPACK wants the entries in each row
+                                   // (i.e. really: column) to be sorted in
+                                   // ascending order. we almost have that,
+                                   // except that we usually store the
+                                   // diagonal first in each row to allow for
+                                   // some optimizations. thus, we have to
+                                   // resort things a little bit, but only
+                                   // within each row
+                                   //
+                                   // final note: if the matrix has entries in
+                                   // the sparsity pattern that are actually
+                                   // occupied by entries that have a zero
+                                   // numerical value, then we keep them
+                                   // anyway. people are supposed to provide
+                                   // accurate sparsity patterns.
+  Ap.resize (N+1);
+  Ai.resize (matrix.get_sparsity_pattern().n_nonzero_elements());
+  Ax.resize (matrix.get_sparsity_pattern().n_nonzero_elements());
+
+                                   // first fill row lengths array
+  Ap[0] = 0;
+  for (unsigned int row=1; row<=N; ++row)
+    Ap[row] = Ap[row-1] + matrix.get_sparsity_pattern().row_length(row-1);
+  Assert (static_cast<unsigned int>(Ap.back()) == Ai.size(),
+          ExcInternalError());
+  
+                                   // then copy over matrix elements
+  {
+    unsigned int index = 0;
+    for (SparseMatrix<double>::const_iterator p=matrix.begin();
+         p!=matrix.end(); ++p, ++index)
+      {
+        Ai[index] = p->column();
+        Ax[index] = p->value();
+      }
+    Assert (index == Ai.size(), ExcInternalError());
+  }
+
+                                   // finally do the copying around of entries
+                                   // so that the diagonal entry is in the
+                                   // right place. note that this is easy to
+                                   // detect: since all entries apart from the
+                                   // diagonal entry are sorted, we know that
+                                   // the diagonal entry is in the wrong place
+                                   // if and only if its column index is
+                                   // larger than the column index of the
+                                   // second entry in a row
+                                   //
+                                   // ignore rows with only one or no entry
+  {
+    for (unsigned int row=0; row<N; ++row)
+      {
+                                         // we may have to move some elements
+                                         // that are left of the diagonal but
+                                         // presently after the diagonal entry
+                                         // to the left, whereas the diagonal
+                                         // entry has to move to the right. we
+                                         // could first figure out where to
+                                         // move everything to, but for
+                                         // simplicity we just make a series
+                                         // of swaps instead (this is kind of
+                                         // a single run of bubble-sort, which
+                                         // gives us the desired result since
+                                         // the array is already "almost"
+                                         // sorted)
+                                         //
+                                         // in the first loop, the condition
+                                         // in the while-header also checks
+                                         // that the row has at least two
+                                         // entries and that the diagonal
+                                         // entry is really in the wrong place
+        int cursor = Ap[row];
+        while ((cursor < Ap[row+1]-1) &&
+               (Ai[cursor] > Ai[cursor+1]))
+          {
+            std::swap (Ai[cursor], Ai[cursor+1]);
+            std::swap (Ax[cursor], Ax[cursor+1]);
+            ++cursor;
+          }
+      }
+  }
+  
+  
+        
+  int status;
+
+  status = umfpack_di_symbolic (N, N,
+                                &Ap[0], &Ai[0], &Ax[0],
+                                &symbolic_decomposition,
+                                &control[0], 0);
+  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError());
+  
+  status = umfpack_di_numeric (&Ap[0], &Ai[0], &Ax[0],
+                               symbolic_decomposition,
+                               &numeric_decomposition,
+                               &control[0], 0);
+  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError());
+
+  umfpack_di_free_symbolic (&symbolic_decomposition) ;
+}
+
+
+
+void
+SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
+{
+                                   // make sure that some kind of factorize()
+                                   // call has happened before
+  Assert (Ap.size() != 0, ExcNotInitialized());
+  Assert (Ai.size() != 0, ExcNotInitialized());
+  Assert (Ai.size() == Ax.size(), ExcNotInitialized());
+  
+  Vector<double> rhs (rhs_and_solution.size());
+  rhs = rhs_and_solution;
+  
+                                   // solve the system. note that since
+                                   // UMFPACK wants compressed column storage
+                                   // instead of the compressed row storage
+                                   // format we use in deal.II's
+                                   // SparsityPattern classes, we solve for
+                                   // UMFPACK's A^T instead
+  const int status
+    = umfpack_di_solve (UMFPACK_At,
+                        &Ap[0], &Ai[0], &Ax[0],
+                        rhs_and_solution.begin(), rhs.begin(),
+                        numeric_decomposition,
+                        &control[0], 0);
+  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError());
+}
+
+
+
+void
+SparseDirectUMFPACK::solve (const SparseMatrix<double> &matrix,
+                            Vector<double>             &rhs_and_solution)
+{
+  factorize (matrix);
+  solve (rhs_and_solution);
+}
+
+
+
+
+
+SparseDirectSuperLU::SparseDirectSuperLU ()
+                :
+                data (0)
+{}
+
+
+
+struct SparseDirectSuperLU::Data
+{
+    SuperMatrix A, X, L, U;
+    std::vector<int> perm_r;
+    std::vector<int> perm_c;
+    std::vector<double> solution;
+    std::vector<double> R,C;
+    std::vector<int> etree;
+    char equed[1];
+    void *work;
+    int lwork;
+
+    Data (const unsigned int N);
+    ~Data ();
+};
+
+
+SparseDirectSuperLU::Data::Data (const unsigned int N)
+                :
+                perm_r (N),
+                perm_c (N),
+                solution (N),
+                R (N),
+                C (N),
+                etree (N),
+                work (0),
+                lwork (0)
+{}
+
+
+SparseDirectSuperLU::Data::~Data ()
+{  
+  Destroy_SuperMatrix_Store(&A);
+  Destroy_SuperMatrix_Store(&X);
+  Destroy_SuperNode_Matrix(&L);
+  Destroy_CompCol_Matrix(&U);
+}
+
+
+
+SparseDirectSuperLU::~SparseDirectSuperLU ()
+{
+  clear ();
+}
+
+
+void
+SparseDirectSuperLU::clear ()
+{
+  if (data != 0)
+    delete data;
+  data = 0;
+}
+
+
+
+void
+SparseDirectSuperLU::
+initialize (const SparsityPattern &)
+{}
+
+
+
+void
+SparseDirectSuperLU::
+factorize (const SparseMatrix<double> &matrix)
+{
+  Assert (matrix.m() == matrix.n(), ExcMatrixNotSquare());
+
+                                   // delete old objects if there are any
+  clear ();
+
+  const unsigned int N = matrix.m();
+
+                                   // copy over the data from the matrix to
+                                   // the data structures SuperLU wants. note
+                                   // two things: first, SuperLU wants
+                                   // compressed column storage whereas we
+                                   // always do compressed row storage; we
+                                   // work around this by, rather than
+                                   // shuffling things around, copy over the
+                                   // data we have, but then call the
+                                   // umfpack_di_solve function with the
+                                   // SuperLU_At argument, meaning that we
+                                   // want to solve for the transpose system
+                                   //
+                                   // second: the data we have in the sparse
+                                   // matrices is "almost" right already;
+                                   // SuperLU wants the entries in each row
+                                   // (i.e. really: column) to be sorted in
+                                   // ascending order. we almost have that,
+                                   // except that we usually store the
+                                   // diagonal first in each row to allow for
+                                   // some optimizations. thus, we have to
+                                   // resort things a little bit, but only
+                                   // within each row
+                                   //
+                                   // final note: if the matrix has entries in
+                                   // the sparsity pattern that are actually
+                                   // occupied by entries that have a zero
+                                   // numerical value, then we keep them
+                                   // anyway. people are supposed to provide
+                                   // accurate sparsity patterns.
+  std::vector<int> Ap (N+1);
+  std::vector<int> Ai (matrix.get_sparsity_pattern().n_nonzero_elements());
+  std::vector<double> Ax (matrix.get_sparsity_pattern().n_nonzero_elements());
+
+                                   // first fill row lengths array
+  Ap[0] = 0;
+  for (unsigned int row=1; row<=N; ++row)
+    Ap[row] = Ap[row-1] + matrix.get_sparsity_pattern().row_length(row-1);
+  Assert (static_cast<unsigned int>(Ap.back()) == Ai.size(),
+          ExcInternalError());
+  
+                                   // then copy over matrix elements
+  {
+    unsigned int index = 0;
+    for (SparseMatrix<double>::const_iterator p=matrix.begin();
+         p!=matrix.end(); ++p, ++index)
+      {
+        Ai[index] = p->column();
+        Ax[index] = p->value();
+      }
+    Assert (index == Ai.size(), ExcInternalError());
+  }
+
+                                   // finally do the copying around of entries
+                                   // so that the diagonal entry is in the
+                                   // right place. note that this is easy to
+                                   // detect: since all entries apart from the
+                                   // diagonal entry are sorted, we know that
+                                   // the diagonal entry is in the wrong place
+                                   // if and only if its column index is
+                                   // larger than the column index of the
+                                   // second entry in a row
+                                   //
+                                   // ignore rows with only one or no entry
+  {
+    for (unsigned int row=0; row<N; ++row)
+      {
+                                         // we may have to move some elements
+                                         // that are left of the diagonal but
+                                         // presently after the diagonal entry
+                                         // to the left, whereas the diagonal
+                                         // entry has to move to the right. we
+                                         // could first figure out where to
+                                         // move everything to, but for
+                                         // simplicity we just make a series
+                                         // of swaps instead (this is kind of
+                                         // a single run of bubble-sort, which
+                                         // gives us the desired result since
+                                         // the array is already "almost"
+                                         // sorted)
+                                         //
+                                         // in the first loop, the condition
+                                         // in the while-header also checks
+                                         // that the row has at least two
+                                         // entries and that the diagonal
+                                         // entry is really in the wrong place
+        int cursor = Ap[row];
+        while ((cursor < Ap[row+1]-1) &&
+               (Ai[cursor] > Ai[cursor+1]))
+          {
+            std::swap (Ai[cursor], Ai[cursor+1]);
+            std::swap (Ax[cursor], Ax[cursor+1]);
+            ++cursor;
+          }
+      }
+  }
+
+
+                                   // now factorize the matrix. we need a
+                                   // dummy rhs vector as well as
+                                   // an object to hold the data we need
+  data = new Data (N);
+  
+  std::vector<double> dummy_rhs (N);  
+  SuperMatrix B;
+  
+  dCreate_CompRow_Matrix(&data->A, N, N, Ax.size(),
+                         &Ax[0], &Ai[0], &Ap[0], SLU_NC, SLU_D, SLU_GE);
+  
+  dCreate_Dense_Matrix(&B, N, 1, &dummy_rhs[0], N,
+                       SLU_DN, SLU_D, SLU_GE);
+  dCreate_Dense_Matrix(&data->X, N, 1, &data->solution[0], N,
+                       SLU_DN, SLU_D, SLU_GE);
+
+                                   // set options. note that just as with
+                                   // umfpack, we solve the transpose system,
+                                   // since we give compressed row storage and
+                                   // superlu wants compressed column storage
+  superlu_options_t options;
+  set_default_options(&options);
+  options.Trans = TRANS;
+
+                                   // this seems to be crucial. without we get
+                                   // atrocious performance
+  options.ColPerm = MMD_AT_PLUS_A;
+  options.SymmetricMode = YES;
+  
+                                   // indicate that we don't actually want to
+                                   // solve anything, just to factorize
+  B.ncol = 0;
+
+                                   // lots of unused output arguments of dgssvx
+  int info;
+  double rpg, rcond;
+  double ferr[1];
+  double berr[1];
+  mem_usage_t mem_usage;
+
+  SuperLUStat_t stat;
+  StatInit(&stat);
+  
+                                   // do the factorization
+  dgssvx(&options, &data->A, &data->perm_c[0], &data->perm_r[0],
+         &data->etree[0], data->equed, &data->R[0], &data->C[0],
+         &data->L, &data->U, data->work, data->lwork, &B,
+         &data->X, &rpg, &rcond, ferr, berr,
+         &mem_usage, &stat, &info);
+  AssertThrow (info == 0, ExcSuperLUError());
+
+                                   // delete temp vector again
+  Destroy_SuperMatrix_Store (&B);
+  StatFree(&stat);
+}
+
+
+
+void
+SparseDirectSuperLU::solve (Vector<double> &rhs_and_solution) const
+{
+  const unsigned int N = rhs_and_solution.size();
+
+                                   // create rhs vector
+  SuperMatrix B;
+  dCreate_Dense_Matrix(&B, N, 1, rhs_and_solution.begin(), N,
+                       SLU_DN, SLU_D, SLU_GE);
+
+                                   // set options. note that just as with
+                                   // umfpack, we solve the transpose system,
+                                   // since we give compressed row storage and
+                                   // superlu wants compressed column storage
+  superlu_options_t options;
+  set_default_options(&options);
+  options.Trans = TRANS;
+
+                                   // this seems to be crucial. without we get
+                                   // atrocious performance
+  options.ColPerm = MMD_AT_PLUS_A;
+  options.SymmetricMode = YES;
+
+                                   // indicate that the matrix has already
+                                   // been factorized
+  options.Fact = FACTORED;
+
+                                   // lots of unused output arguments of dgssvx
+  int info;
+  double rpg, rcond;
+  double ferr[1];
+  double berr[1];
+  mem_usage_t mem_usage;
+
+  SuperLUStat_t stat;
+  StatInit(&stat);
+
+                                   // do the solve
+  dgssvx(&options, &data->A, &data->perm_c[0], &data->perm_r[0],
+         &data->etree[0], data->equed, &data->R[0], &data->C[0],
+         &data->L, &data->U, data->work, data->lwork,
+         &B, &data->X, &rpg, &rcond, ferr, berr,
+         &mem_usage, &stat, &info);
+  AssertThrow (info == 0, ExcSuperLUError());
+
+                                   // copy result
+  std::copy ((double*) ((DNformat*) data->X.Store)->nzval,
+             (double*) ((DNformat*) data->X.Store)->nzval + N,
+             rhs_and_solution.begin());
+
+                                   // delete temp vectors
+  Destroy_SuperMatrix_Store(&B);
+  StatFree(&stat);
+}
+
+
+
+void
+SparseDirectSuperLU::solve (const SparseMatrix<double> &matrix,
+                            Vector<double>             &rhs_and_solution)
+{
+  factorize (matrix);
+  solve (rhs_and_solution);
 }
 
 
