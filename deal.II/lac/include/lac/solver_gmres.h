@@ -354,7 +354,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
 				   // Generate an object where basis
 				   // vectors are stored.
-  TmpVectors tmp_vectors (n_tmp_vectors, memory);
+  TmpVectors tmp_vectors (n_tmp_vectors, this->memory);
   
 				   // number of the present iteration; this
 				   // number is not reset to zero upon a
@@ -420,7 +420,7 @@ unsigned int dim = 0;
 				       // check here, the next scaling
 				       // operation would produce
 				       // garbage
-      iteration_state = control().check (accumulated_iterations, rho);
+      iteration_state = this->control().check (accumulated_iterations, rho);
       if (iteration_state != SolverControl::iterate)
 	break;
       
@@ -488,7 +488,7 @@ unsigned int dim = 0;
 					   /*  residual  */
 	  rho = fabs(gamma(dim));
     
-	  iteration_state = control().check (accumulated_iterations, rho);
+	  iteration_state = this->control().check (accumulated_iterations, rho);
 	};
 
 				       // end of inner iteration. now
@@ -524,9 +524,9 @@ unsigned int dim = 0;
   deallog.pop();
 				   // in case of failure: throw
 				   // exception
-  if (control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (control().last_step(),
-					control().last_value());
+  if (this->control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
 				   // otherwise exit as normal
 };
 

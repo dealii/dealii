@@ -28,10 +28,10 @@
 #include <dofs/dof_tools.h>
 #include <fe/fe.h>
 
-//#include <multigrid/mg_tools.templates.h>
-
+#include <vector>
 #include <algorithm>
 #include <numeric>
+
 
 template <int dim, class SparsityPattern>
 void MGTools::make_sparsity_pattern (const MGDoFHandler<dim> &dof,
@@ -376,15 +376,15 @@ MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
 template<int dim, typename number>
 void
 MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
-			   MGLevelObject<BlockVector<number> >& v,
-			   const std::vector<bool>& selected)
+                        MGLevelObject<BlockVector<number> >& v,
+                        const std::vector<bool>& selected)
 {
   const unsigned int ncomp = mg_dof.get_fe().n_components();
   
   if (selected.size() == 0)
     {
       selected.resize(ncomp);
-      fill_n (selected.begin(), ncomp, true);
+      std::fill_n (selected.begin(), ncomp, true);
     }
 
   Assert (selected.size() == ncomp,

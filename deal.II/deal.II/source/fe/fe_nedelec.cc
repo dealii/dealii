@@ -772,10 +772,10 @@ FE_Nedelec<dim>::get_data (const UpdateFlags      update_flags,
  				   // necessary. otherwise, don't
  				   // allocate memory
    if (flags & update_values)
-     data->shape_values.reinit (dofs_per_cell, n_q_points);
+     data->shape_values.reinit (this->dofs_per_cell, n_q_points);
 
    if (flags & update_gradients)
-     data->shape_gradients.reinit (dofs_per_cell, n_q_points);
+     data->shape_gradients.reinit (this->dofs_per_cell, n_q_points);
 
  				   // if second derivatives through
  				   // finite differencing is required,
@@ -791,7 +791,7 @@ FE_Nedelec<dim>::get_data (const UpdateFlags      update_flags,
  				   // the unit cell, and need to be
  				   // transformed when visiting an
  				   // actual cell
-   for (unsigned int i=0; i<dofs_per_cell; ++i)
+   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
      for (unsigned int q=0; q<n_q_points; ++q)
        {
 	 if (flags & update_values)
@@ -851,12 +851,12 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
     {
       std::vector<Tensor<1,dim> > shape_values (n_q_points);
 
-      Assert (data.shape_values.n_rows() == dofs_per_cell * dim,
+      Assert (data.shape_values.n_rows() == this->dofs_per_cell * dim,
 	      ExcInternalError());
       Assert (data.shape_values.n_cols() == n_q_points,
 	      ExcInternalError());
       
-      for (unsigned int k=0; k<dofs_per_cell; ++k)
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	{
 					   // first transform shape
 					   // values...
@@ -880,7 +880,7 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
       std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
-      Assert (data.shape_gradients.n_rows() == dofs_per_cell * dim,
+      Assert (data.shape_gradients.n_rows() == this->dofs_per_cell * dim,
 	      ExcInternalError());
       Assert (data.shape_gradients.n_cols() == n_q_points,
 	      ExcInternalError());
@@ -890,7 +890,7 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
                                        // gradients of each shape
                                        // function at all quadrature
                                        // points
-      for (unsigned int k=0; k<dofs_per_cell; ++k)
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	{
                                            // treat the gradients of
                                            // this particular shape
@@ -993,7 +993,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
       Assert (data.shape_values.n_cols() == n_q_points,
 	      ExcInternalError());
       
-      for (unsigned int k=0; k<dofs_per_cell; ++k)
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	{
 					   // first transform shape
 					   // values...
@@ -1021,7 +1021,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
       std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
-      Assert (data.shape_gradients.n_rows() == dofs_per_cell * dim,
+      Assert (data.shape_gradients.n_rows() == this->dofs_per_cell * dim,
 	      ExcInternalError());
       Assert (data.shape_gradients.n_cols() == n_q_points,
 	      ExcInternalError());
@@ -1031,7 +1031,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
                                        // gradients of each shape
                                        // function at all quadrature
                                        // points
-      for (unsigned int k=0; k<dofs_per_cell; ++k)
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	{
                                            // treat the gradients of
                                            // this particular shape
@@ -1131,12 +1131,12 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
       
       std::vector<Tensor<1,dim> > shape_values (n_q_points);
 
-      Assert (data.shape_values.n_rows() == dofs_per_cell * dim,
+      Assert (data.shape_values.n_rows() == this->dofs_per_cell * dim,
 	      ExcInternalError());
       Assert (data.shape_values.n_cols() == n_q_points,
 	      ExcInternalError());
       
-      for (unsigned int k=0; k<dofs_per_cell; ++k)
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	{
 					   // first transform shape
 					   // values...
@@ -1164,7 +1164,7 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
       std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
-      Assert (data.shape_gradients.n_rows() == dofs_per_cell * dim,
+      Assert (data.shape_gradients.n_rows() == this->dofs_per_cell * dim,
 	      ExcInternalError());
       Assert (data.shape_gradients.n_cols() == n_q_points,
 	      ExcInternalError());
@@ -1174,7 +1174,7 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
                                        // gradients of each shape
                                        // function at all quadrature
                                        // points
-      for (unsigned int k=0; k<dofs_per_cell; ++k)
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	{
                                            // treat the gradients of
                                            // this particular shape

@@ -42,7 +42,7 @@ MGSmootherRelaxation<MATRIX, VECTOR>
 {
   h1.reinit(u);
   h2.reinit(u);
-  for(unsigned i=0;i<get_steps();++i)
+  for(unsigned i=0; i<this->get_steps(); ++i)
     {
       (*matrix)[level].residual(h1, u, rhs);
       set_zero_interior_boundary(level,h1);

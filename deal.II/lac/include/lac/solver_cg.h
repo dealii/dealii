@@ -240,10 +240,10 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   conv = this->control().check(0,res);
   if (conv) 
     {
-      memory.free(Vr);
-      memory.free(Vp);
-      memory.free(Vz);
-      memory.free(VAp);
+      this->memory.free(Vr);
+      this->memory.free(Vp);
+      this->memory.free(Vz);
+      this->memory.free(VAp);
       deallog.pop();
       return;
     };
@@ -287,10 +287,10 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 
 
 				   // Deallocate Memory
-  memory.free(Vr);
-  memory.free(Vp);
-  memory.free(Vz);
-  memory.free(VAp);
+  this->memory.free(Vr);
+  this->memory.free(Vp);
+  this->memory.free(Vz);
+  this->memory.free(VAp);
  
 				   // Output
   deallog.pop();

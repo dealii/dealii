@@ -284,7 +284,7 @@ FESystem<dim>::shape_value_component (const unsigned int i,
 
                                    // if this value is supposed to be
                                    // zero, then return right away...
-  if (nonzero_components[i][component] == false)
+  if (this->nonzero_components[i][component] == false)
     return 0;
   
                                    // ...otherwise: first find out to
@@ -336,7 +336,7 @@ FESystem<dim>::shape_grad_component (const unsigned int i,
   
                                    // if this value is supposed to be
                                    // zero, then return right away...
-  if (nonzero_components[i][component] == false)
+  if (this->nonzero_components[i][component] == false)
     return Tensor<1,dim>();
 
                                    // ...otherwise: first find out to
@@ -388,7 +388,7 @@ FESystem<dim>::shape_grad_grad_component (const unsigned int i,
   
                                    // if this value is supposed to be
                                    // zero, then return right away...
-  if (nonzero_components[i][component] == false)
+  if (this->nonzero_components[i][component] == false)
     return Tensor<2,dim>();
 
                                    // ...otherwise: first find out to
@@ -769,7 +769,7 @@ compute_fill (const Mapping<dim>                   &mapping,
             if (this->system_to_base_table[system_index].first.first == base_no)
               {
                 const unsigned int
-                  base_index = system_to_base_table[system_index].second;
+                  base_index = this->system_to_base_table[system_index].second;
                 Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
 
                                                  // now copy. if the

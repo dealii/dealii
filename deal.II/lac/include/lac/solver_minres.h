@@ -191,13 +191,13 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 
   
 				   // Memory allocation
-  Vu0  = memory.alloc();
-  Vu1  = memory.alloc();
-  Vu2  = memory.alloc();
-  Vv   = memory.alloc();
-  Vm0  = memory.alloc();
-  Vm1  = memory.alloc();
-  Vm2  = memory.alloc();
+  Vu0  = this->memory.alloc();
+  Vu1  = this->memory.alloc();
+  Vu2  = this->memory.alloc();
+  Vv   = this->memory.alloc();
+  Vm0  = this->memory.alloc();
+  Vm1  = this->memory.alloc();
+  Vm2  = this->memory.alloc();
 				   // define some aliases for simpler access
   typedef VECTOR vecref;
   vecref u[3] = {*Vu0, *Vu1, *Vu2};
@@ -257,7 +257,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   m[1].reinit(VS);
   m[2].reinit(VS);
 				   
-  conv = control().check(0,r_l2);
+  conv = this->control().check(0,r_l2);
   
   while (conv==SolverControl::iterate)
     {      
@@ -313,7 +313,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
       x.add (tau, m[0]);
       r_l2 *= fabs(s);
 
-      conv = control().check(j,r_l2);
+      conv = this->control().check(j,r_l2);
       
 				       // next iteration step
       ++j;
@@ -345,21 +345,21 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
     }
 
 				   // Deallocation of Memory
-  memory.free(Vu0);
-  memory.free(Vu1);
-  memory.free(Vu2);
-  memory.free(Vv); 
-  memory.free(Vm0);
-  memory.free(Vm1);
-  memory.free(Vm2);
+  this->memory.free(Vu0);
+  this->memory.free(Vu1);
+  this->memory.free(Vu2);
+  this->memory.free(Vv); 
+  this->memory.free(Vm0);
+  this->memory.free(Vm1);
+  this->memory.free(Vm2);
 				   // Output
   deallog.pop ();
   
 				   // in case of failure: throw
 				   // exception
-  if (control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (control().last_step(),
-					control().last_value());
+  if (this->control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
 				   // otherwise exit as normal
 };
 

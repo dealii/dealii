@@ -475,7 +475,8 @@ compute_2nd (const Mapping<dim>                   &mapping,
                   for (unsigned int k=0; k<=n; ++k)
                     while (nonzero_components[shape_index][component] == false)
                       ++component;
-                  Assert (component < n_components(), ExcInternalError());
+                  Assert (component < this->n_components(),
+                          ExcInternalError());
 
                   right = fe_internal.differences[d1]
                           ->shape_grad_component(shape_index, q, component);
