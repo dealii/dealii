@@ -13,7 +13,7 @@
 
 template <>
 FELinear<1>::FELinear () :
-		FiniteElement<1> (1, 0)
+		FELinearMapping<1> (1, 0)
 {
 				   // for restriction and prolongation matrices:
 				   // note that we do not add up all the
@@ -80,25 +80,6 @@ FELinear<1>::shape_grad(const unsigned int i,
 
 
 template <>
-void FELinear<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
-				  const vector<Point<1> >            &unit_points,
-				  vector<dFMatrix>  &jacobians,
-				  const bool         compute_jacobians,
-				  vector<Point<1> > &ansatz_points,
-				  const bool         compute_ansatz_points,
-				  vector<Point<1> > &q_points,
-				  const bool         compute_q_points,
-				  const Boundary<1> &boundary) const {
-				   // simply pass down
-  FiniteElement<1>::fill_fe_values (cell, unit_points,
-				    jacobians, compute_jacobians,
-				    ansatz_points, compute_ansatz_points,
-				    q_points, compute_q_points, boundary);
-};
-
-
-
-template <>
 void FELinear<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
 				     const Boundary<1>  &boundary,
 				     vector<Point<1> >  &ansatz_points) const {
@@ -111,48 +92,6 @@ template <>
 void FELinear<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
 					  const Boundary<1>  &,
 					  vector<Point<1> >  &) const {
-  Assert (false, ExcInternalError());
-};
-
-
-
-template <>
-void FELinear<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
-				      const Boundary<1>         &,
-				      const vector<Point<0> > &,
-				      vector<double>      &) const {
-  Assert (false, ExcInternalError());
-};
-
-
-
-template <>
-void FELinear<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
-					 const unsigned int           ,
-					 const vector<Point<0> > &,
-					 vector<double>      &) const {
-  Assert (false, ExcInternalError());
-};
-
-
-
-template <>
-void FELinear<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
-				      const unsigned int,
-				      const Boundary<1> &,
-				      const vector<Point<0> > &,
-				      vector<Point<1> > &) const {
-  Assert (false, ExcInternalError());
-};
-
-
-
-template <>
-void FELinear<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
-				      const unsigned int,
-				      const unsigned int,
-				      const vector<Point<0> > &,
-				      vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -183,7 +122,7 @@ void FELinear<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cel
 
 template <>
 FELinear<2>::FELinear () :
-		FiniteElement<2> (1, 0, 0)
+		FELinearMapping<2> (1, 0, 0)
 {
   interface_constraints(0,0) = 1./2.;
   interface_constraints(0,1) = 1./2.;
@@ -413,206 +352,7 @@ void FELinear<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cel
 
 
 
-template <>
-void FELinear<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
-				      const Boundary<2>         &,
-				      const vector<Point<1> > &unit_points,
-				      vector<double>      &face_jacobians) const {
-  Assert (unit_points.size() == face_jacobians.size(),
-	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
-
-				   // a linear mapping for a single line
-				   // produces particularly simple
-				   // expressions for the jacobi
-				   // determinant :-)
-  const double h = sqrt((face->vertex(1) - face->vertex(0)).square());
-  fill_n (face_jacobians.begin(),
-	  unit_points.size(),
-	  h);  
-};
-
-
-
-template <>
-void FELinear<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &face,
-					 const unsigned int,
-					 const vector<Point<1> > &unit_points,
-					 vector<double>      &face_jacobians) const {
-  Assert (unit_points.size() == face_jacobians.size(),
-	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
-  Assert (face->at_boundary() == false,
-	  ExcBoundaryFaceUsed ());
-
-				   // a linear mapping for a single line
-				   // produces particularly simple
-				   // expressions for the jacobi
-				   // determinant :-)
-  const double h = sqrt((face->vertex(1) - face->vertex(0)).square());
-  fill_n (face_jacobians.begin(),
-	  unit_points.size(),
-	  h/2);
-};
-
-
-
-template <>
-void FELinear<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
-				      const unsigned int       face_no,
-				      const Boundary<2> &,
-				      const vector<Point<1> >  &unit_points,
-				      vector<Point<2> >        &normal_vectors) const {
-  Assert (unit_points.size() == normal_vectors.size(),
-	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
-
-  const DoFHandler<2>::face_iterator face = cell->face(face_no);
-				   // compute direction of line
-  const Point<2> line_direction = (face->vertex(1) - face->vertex(0));
-				   // rotate to the right by 90 degrees
-  const Point<2> normal_direction(line_direction(1),
-				  -line_direction(0));
-
-  if (face_no <= 1)
-				     // for sides 0 and 1: return the correctly
-				     // scaled vector
-    fill (normal_vectors.begin(), normal_vectors.end(),
-	  normal_direction / sqrt(normal_direction.square()));
-  else
-				     // for sides 2 and 3: scale and invert
-				     // vector
-    fill (normal_vectors.begin(), normal_vectors.end(),
-	  normal_direction / (-sqrt(normal_direction.square())));
-};
-
-
-
-template <>
-void FELinear<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
-				      const unsigned int       face_no,
-				      const unsigned int,
-				      const vector<Point<1> >  &unit_points,
-				      vector<Point<2> >        &normal_vectors) const {
-				   // note, that in 2D the normal vectors to the
-				   // subface have the same direction as that
-				   // for the face
-  Assert (unit_points.size() == normal_vectors.size(),
-	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
-  Assert (cell->face(face_no)->at_boundary() == false,
-	  ExcBoundaryFaceUsed ());
-
-  const DoFHandler<2>::face_iterator face = cell->face(face_no);
-				   // compute direction of line
-  const Point<2> line_direction = (face->vertex(1) - face->vertex(0));
-				   // rotate to the right by 90 degrees
-  const Point<2> normal_direction(line_direction(1),
-				  -line_direction(0));
-
-  if (face_no <= 1)
-				     // for sides 0 and 1: return the correctly
-				     // scaled vector
-    fill (normal_vectors.begin(), normal_vectors.end(),
-	  normal_direction / sqrt(normal_direction.square()));
-  else
-				     // for sides 2 and 3: scale and invert
-				     // vector
-    fill (normal_vectors.begin(), normal_vectors.end(),
-	  normal_direction / (-sqrt(normal_direction.square())));
-};
-
 #endif
-
-
-
-template <int dim>
-void FELinear<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				    const vector<Point<dim> >            &unit_points,
-				    vector<dFMatrix>    &jacobians,
-				    const bool           compute_jacobians,
-				    vector<Point<dim> > &ansatz_points,
-				    const bool           compute_ansatz_points,
-				    vector<Point<dim> > &q_points,
-				    const bool           compute_q_points,
-				    const Boundary<dim> &boundary) const {
-  Assert (jacobians.size() == unit_points.size(),
-	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
-  Assert (q_points.size() == unit_points.size(),
-	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
-  
-  unsigned int n_points=unit_points.size();
-
-  Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-  for (unsigned int l=0; l<GeometryInfo<dim>::vertices_per_cell; ++l)
-    vertices[l] = cell->vertex(l);
-  
-
-  if (compute_q_points) 
-    {
-				       // initialize points to zero
-      for (unsigned int i=0; i<n_points; ++i)
-	q_points[i] = Point<dim> ();
-      
-				       // note: let x_l be the vector of the
-				       // lth quadrature point in real space and
-				       // xi_l that on the unit cell, let further
-				       // p_j be the vector of the jth vertex
-				       // of the cell in real space and
-				       // N_j(xi_l) be the value of the associated
-				       // basis function at xi_l, then
-				       // x_l(xi_l) = sum_j p_j N_j(xi_l)
-      for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j) 
-	for (unsigned int l=0; l<n_points; ++l) 
-	  q_points[l] += vertices[j] *
-			 FELinear<dim>::shape_value(j, unit_points[l]);
-    };
-  
-
-/* jacobi matrices: compute d(x)/d(xi) and invert this
-   Let M(l) be the inverse of J at the quadrature point l, then
-     M_{ij}(l) = sum_s p_i(s) d(N_s(l))/d(xi_j)
-   where p_i(s) is the i-th coordinate of the s-th vertex vector,
-   N_s(l) is the value of the s-th vertex shape function at the
-   quadrature point l.
-
-   We could therefore write:
-   l=0..n_points-1
-     i=0..dim-1
-       j=0..dim-1
-         M_{ij}(l) = 0
-	 s=0..n_vertices
-	   M_{ij}(l) += p_i(s) d(N_s(l))/d(xi_j)
-
-  However, we rewrite the loops to only compute the gradient once for
-  each integration point and basis function.
-*/
-  if (compute_jacobians) 
-    {
-      dFMatrix M(dim,dim);
-      for (unsigned int l=0; l<n_points; ++l) 
-	{
-	  M.clear ();
-	  for (unsigned int s=0; s<GeometryInfo<dim>::vertices_per_cell; ++s)
-	    {
-					       // we want a linear transform and
-					       // if we prepend the class name in
-					       // front of the #shape_grad#, we
-					       // need not use virtual function
-					       // calls.
-	      const Point<dim> gradient
-		= FELinear<dim>::shape_grad (s, unit_points[l]);
-	      for (unsigned int i=0; i<dim; ++i)
-		for (unsigned int j=0; j<dim; ++j)
-		  M(i,j) += vertices[s](i) * gradient(j);
-	    };
-	  jacobians[l].invert(M);
-	};
-    };
-
-				   // compute ansatz points, which are
-				   // the corners for linear elements
-  if (compute_ansatz_points)
-    get_ansatz_points (cell, boundary, ansatz_points);
-};
 
 
 
