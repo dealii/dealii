@@ -1,5 +1,5 @@
-//----------------------------  petsc_07.cc  ---------------------------
-//    petsc_07.cc,v 1.4 2003/07/03 10:31:46 guido Exp
+//----------------------------  petsc_09.cc  ---------------------------
+//    petsc_09.cc,v 1.4 2003/07/03 10:31:46 guido Exp
 //    Version: 
 //
 //    Copyright (C) 2004 by the deal.II authors and Anna Schneebeli
@@ -9,10 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  petsc_07.cc  ---------------------------
+//----------------------------  petsc_09.cc  ---------------------------
 
 
-// check petsc_wrappers::SparseMatrix::linfty_norm
+// check petsc_wrapper::SparseMatrix::operator *=
 
 #include "../tests.h"
 #include <lac/petsc_sparse_matrix.h>    
@@ -22,20 +22,32 @@
 
 void test (petsc_wrappers::SparseMatrix &m)
 {
-                                   // first set a few entries. count how many
-                                   // entries we have
+                                   // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
       if ((i+2*j+1) % 3 == 0)
-        m.set (i,j, i*j*.5+.5);  
+        m.set (i,j, i*j*.5+.5);
 
   m.compress ();
-
-                                   // compare against the exact value of the
-                                   // linfty-norm (max row-sum)
-  deallog << m.linfty_norm() << std::endl;
-  Assert (m.linfty_norm() == 8.5, ExcInternalError());
   
+                                   // then multiply everything by 1.25 and
+                                   // make sure we retrieve the values we
+                                   // expect
+  m *= 1.25;
+  
+  for (unsigned int i=0; i<m.m(); ++i)
+    for (unsigned int j=0; j<m.m(); ++j)
+      if ((i+2*j+1) % 3 == 0)
+        {
+          Assert (m(i,j) == (i*j*.5+.5)*1.25, ExcInternalError());
+          Assert (m.el(i,j) == (i*j*.5+.5)*1.25, ExcInternalError());
+        }
+      else
+        {
+          Assert (m(i,j) == 0, ExcInternalError());
+          Assert (m.el(i,j) == 0, ExcInternalError());
+        }
+
   deallog << "OK" << std::endl;
 }
 
@@ -43,7 +55,7 @@ void test (petsc_wrappers::SparseMatrix &m)
 
 int main (int argc,char **argv) 
 {
-  std::ofstream logfile("petsc_07.output");
+  std::ofstream logfile("petsc_09.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

@@ -12,7 +12,7 @@
 //----------------------------  petsc_06.cc  ---------------------------
 
 
-// check l1_norm
+// check petsc_wrappers::SparseMatrix::l1_norm
 
 #include "../tests.h"
 #include <lac/petsc_sparse_matrix.h>    

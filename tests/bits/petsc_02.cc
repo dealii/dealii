@@ -12,7 +12,8 @@
 //----------------------------  petsc_02.cc  ---------------------------
 
 
-// check setting elements in a petsc matrix using add()
+// check setting elements in a petsc matrix using
+// petsc_wrappers::SparseMatrix::add()
 
 #include "../tests.h"
 #include <lac/petsc_sparse_matrix.h>    

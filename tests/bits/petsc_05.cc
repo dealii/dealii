@@ -12,7 +12,8 @@
 //----------------------------  petsc_05.cc  ---------------------------
 
 
-// check querying the number of nonzero elements
+// check querying the number of nonzero elements in
+// petsc_wrappers::SparseMatrix
 
 #include "../tests.h"
 #include <lac/petsc_sparse_matrix.h>    
