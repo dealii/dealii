@@ -45,10 +45,14 @@
       <li> A fairly complete C++ compiler. We use 
            <a href="http://gcc.gnu.org" target="_top">egcs1.1.2 and
 	   gcc2.95</a> but other compilers might work as well. egcs1.0
-	   and older gcc versions will not work, however. (We are
-           interested in writing portable C++, so if you find
+	   and older gcc versions will not work, however. Also, Sun
+           Workshop C++ 5.0 will not work since it does not support
+           template member functions.
+
+	   <p>
+           We are interested in writing portable C++, so if you find
            something that does not work with your compiler, we are
-           likely to consider accepting patches.)
+           likely to accept patches.
 
       <li> Perl: any Perl 5.x version should work.
 
