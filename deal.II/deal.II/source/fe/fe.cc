@@ -37,6 +37,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		JxW_values(quadrature.n_quadrature_points, 0),
 		quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
 		unit_quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
+		ansatz_points (fe.total_dofs, Point<dim>()),
 		jacobi_matrices (quadrature.n_quadrature_points,
 				 dFMatrix(dim,dim)),
 		update_flags (update_flags)
@@ -253,6 +254,14 @@ void FiniteElementBase<dim>::fill_fe_values (const typename Triangulation<dim>::
 
 
 
+template <int dim>
+void FiniteElementBase<dim>::face_ansatz_points (const typename Triangulation<dim>::face_iterator &,
+						 vector<Point<dim> > &) const {
+  Assert (false, ExcPureFunctionCalled());
+};
+  
+
+
 /*------------------------------- FiniteElement ----------------------*/
 
 
@@ -272,6 +281,14 @@ void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &ce
 				       const bool         compute_ansatz_points,
 				       vector<Point<1> > &q_points,
 				       const bool         compute_q_points) const {
+  Assert (jacobians.size() == unit_points.size(),
+	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
+  Assert (q_points.size() == unit_points.size(),
+	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
+  Assert (ansatz_points.size() == total_dofs,
+	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
+
+
 				   // local mesh width
   const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
 
@@ -306,6 +323,13 @@ void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &ce
 
 
 
+void FiniteElement<1>::face_ansatz_points (const typename Triangulation<1>::face_iterator &,
+					   vector<Point<1> > &) const {
+				   // is this function useful in 1D?
+  Assert (false, ExcPureFunctionCalled());
+};
+
+
 bool FiniteElement<2>::operator == (const FiniteElement<2> &f) const {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
 	  (dofs_per_line == f.dofs_per_line) &&
@@ -323,6 +347,14 @@ void FiniteElement<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				       const bool,
 				       vector<Point<2> > &,
 				       const bool) const {
+  Assert (false, ExcPureFunctionCalled());
+};
+
+
+
+void FiniteElement<2>::face_ansatz_points (const typename Triangulation<2>::face_iterator &,
+					   vector<Point<2> > &) const {
+				   // is this function useful in 1D?
   Assert (false, ExcPureFunctionCalled());
 };
 

@@ -1095,7 +1095,14 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 
 				     /**
 				      * Store a copy of the finite element given
-				      * latest for the distribution of dofs.
+				      * latest for the distribution of dofs. In
+				      * fact, since the FE class itself has not
+				      * much functionality, this object only
+				      * stores numbers such as the number of
+				      * dofs per line etc. Calling any of the
+				      * more specific functions will result in
+				      * an error about calling a pure virtual
+				      * function.
 				      */
     FiniteElement<dim>       *selected_fe;
 

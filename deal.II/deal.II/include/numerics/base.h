@@ -331,8 +331,9 @@ class ProblemBase {
 				      * See the general doc for more
 				      * information.
 				      */
-    virtual void make_boundary_value_list (const DirichletBC &dirichlet_bc,
-					   map<int,double>   &boundary_values) const;
+    virtual void make_boundary_value_list (const DirichletBC        &dirichlet_bc,
+					   const FiniteElement<dim> &fe,
+					   map<int,double>          &boundary_values) const;
     
 				     /**
 				      * Exception
@@ -406,7 +407,8 @@ class ProblemBase {
     void apply_dirichlet_bc (dSMatrix          &matrix,
 			     dVector           &solution,
 			     dVector           &right_hand_side,
-			     const DirichletBC &dirichlet_bc);
+			     const DirichletBC &dirichlet_bc,
+			     const FiniteElement<dim> &fe);
     
     friend class Assembler<dim>;
 };

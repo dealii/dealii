@@ -68,6 +68,10 @@ class FELinear : public FiniteElement<dim> {
 				      * function is therefore not implemented
 				      * by the FE<2> base class, but is made
 				      * pure virtual.
+				      *
+				      * The function assumes that the fields
+				      * already have the right number of
+				      * elements.
 				      */
     virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >               &unit_points,
@@ -77,6 +81,21 @@ class FELinear : public FiniteElement<dim> {
 				 const bool           compute_ansatz_points,
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points) const;
+
+				     /**
+				      * Return the ansatz points this FE has
+				      * on a face if a cell would have the
+				      * given face as a side. Since we have no
+				      * degrees of freedom on the faces for
+				      * the linear ansatz, the ansatz points are
+				      * simply the vertices of the face.
+				      *
+				      * The function assumes that the fields
+				      * already have the right number of
+				      * elements.
+				      */
+    virtual void face_ansatz_points (const Triangulation<dim>::face_iterator &face,
+				     vector<Point<dim> >  &ansatz_points) const;
 };
 
 
@@ -133,6 +152,10 @@ class FEQuadratic : public FiniteElement<dim> {
 				      * function is therefore not implemented
 				      * by the FE<2> base class, but is made
 				      * pure virtual.
+				      *
+				      * The function assumes that the fields
+				      * already have the right number of
+				      * elements.
 				      */
     virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >               &unit_points,
@@ -198,6 +221,10 @@ class FECubic : public FiniteElement<dim> {
 				      * function is therefore not implemented
 				      * by the FE<2> base class, but is made
 				      * pure virtual.
+				      *
+				      * The function assumes that the fields
+				      * already have the right number of
+				      * elements.
 				      */
     virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >               &unit_points,

@@ -5,6 +5,8 @@
 #include <grid/tria_accessor.h>
 
 
+
+
 FELinear<1>::FELinear () :
 		FiniteElement<1> (1, 0)
 {
@@ -91,6 +93,12 @@ void FELinear<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				    q_points, compute_q_points);
 };
 
+
+
+void FELinear<1>::face_ansatz_points (const Triangulation<1>::face_iterator &,
+				      vector<Point<1> > &) const {
+  Assert (false, ExcPureFunctionCalled());
+};
 
 
 
@@ -239,8 +247,15 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 				  const bool         compute_ansatz_points,
 				  vector<Point<2> > &q_points,
 				  const bool         compute_q_points) const {
+  Assert (jacobians.size() == unit_points.size(),
+	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
+  Assert (q_points.size() == unit_points.size(),
+	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
+  Assert (ansatz_points.size() == total_dofs,
+	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
+  
   const unsigned int dim=2;
-  const unsigned int n_vertices=4;
+  const unsigned int n_vertices=(1<<dim);
   unsigned int n_points=unit_points.size();
 
   Point<dim> vertices[n_vertices];
@@ -318,6 +333,20 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 
 
 
+template <int dim>
+void FELinear<dim>::face_ansatz_points (const typename Triangulation<dim>::face_iterator &face,
+					vector<Point<dim> >  &ansatz_points) const {
+  Assert (ansatz_points.size() == (1<<(dim-1)),
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension (ansatz_points.size(),
+								   1<<(dim-1)));
+  
+  for (unsigned int vertex=0; vertex<(1<<(dim-1)); ++vertex)
+    ansatz_points[vertex] = face->vertex(vertex);
+};
+
+
+
+
 
 
 
@@ -383,13 +412,20 @@ FEQuadratic<dim>::shape_grad (const unsigned int i,
 
 
 void FEQuadratic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
-				     const vector<Point<2> >               &,
-				     vector<dFMatrix>  &,
+				     const vector<Point<2> >               &unit_points,
+				     vector<dFMatrix>  &jacobians,
 				     const bool,
-				     vector<Point<2> > &,
+				     vector<Point<2> > &ansatz_points,
 				     const bool,
-				     vector<Point<2> > &,
+				     vector<Point<2> > &q_points,
 				     const bool) const {
+  Assert (jacobians.size() == unit_points.size(),
+	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
+  Assert (q_points.size() == unit_points.size(),
+	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
+  Assert (ansatz_points.size() == total_dofs,
+	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
+
   Assert (false, typename FiniteElementBase<2>::ExcNotImplemented());
 };
 
@@ -452,13 +488,20 @@ FECubic<dim>::shape_grad (const unsigned int i,
 
 
 void FECubic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
-				 const vector<Point<2> >               &,
-				 vector<dFMatrix>  &,
+				 const vector<Point<2> >               &unit_points,
+				 vector<dFMatrix>  &jacobians,
 				 const bool,
-				 vector<Point<2> > &,
+				 vector<Point<2> > &ansatz_points,
 				 const bool,
-				 vector<Point<2> > &,
+				 vector<Point<2> > &q_points,
 				 const bool) const {
+  Assert (jacobians.size() == unit_points.size(),
+	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
+  Assert (q_points.size() == unit_points.size(),
+	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
+  Assert (ansatz_points.size() == total_dofs,
+	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
+
   Assert (false, typename FiniteElementBase<2>::ExcNotImplemented());
 };
 

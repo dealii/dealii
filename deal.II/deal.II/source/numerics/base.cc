@@ -113,7 +113,8 @@ void ProblemBase<dim>::assemble (const Equation<dim>               &equation,
 				   // apply Dirichlet bc as described
 				   // in the docs
   apply_dirichlet_bc (system_matrix, solution,
-		      right_hand_side, dirichlet_bc);
+		      right_hand_side,
+		      dirichlet_bc, fe);
   
 				   // condense system matrix in-place
   constraints.condense (system_matrix);
@@ -307,11 +308,12 @@ template <int dim>
 void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 					   dVector  &solution,
 					   dVector  &right_hand_side,
-					   const DirichletBC &dirichlet_bc) {
+					   const DirichletBC &dirichlet_bc,
+					   const FiniteElement<dim> &fe) {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
 	  ExcInvalidBoundaryIndicator());
-  
+
 				   // first make up a list of dofs subject
 				   // to any boundary condition and which
 				   // value they take; if a node occurs
@@ -319,7 +321,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 				   // the lines in 2D being subject to
 				   // different bc's), the last value is taken
   map<int,double> boundary_values;
-  make_boundary_value_list (dirichlet_bc, boundary_values);
+  make_boundary_value_list (dirichlet_bc, fe, boundary_values);
 
   map<int,double>::const_iterator dof, endd;
   const unsigned int n_dofs   = (unsigned int)matrix.m();
@@ -346,10 +348,16 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 				       // zero, take the first main
 				       // diagonal entry we can find, or
 				       // one if no nonzero main diagonal
-				       // element exists.
+				       // element exists. Normally, however,
+				       // the main diagonal entry should
+				       // not be zero.
+				       //
+				       // store the new rhs entry to make
+				       // the gauss step more efficient
+      double new_rhs;
       if (matrix.diag_element((*dof).first) != 0.0)
-	right_hand_side((*dof).first) = (*dof).second *
-					matrix.diag_element((*dof).first);
+	new_rhs = right_hand_side((*dof).first)
+		= (*dof).second * matrix.diag_element((*dof).first);
       else
 	{
 	  double first_diagonal_entry = 1;
@@ -362,19 +370,19 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 	  
 	  matrix.set((*dof).first, (*dof).first,
 		     first_diagonal_entry);
-	  right_hand_side((*dof).first) = (*dof).second * first_diagonal_entry;
+	  new_rhs = right_hand_side((*dof).first)
+		  = (*dof).second * first_diagonal_entry;
 	};
-
+      
 				       // store the only nonzero entry
 				       // of this line for the Gauss
 				       // elimination step
       const double diagonal_entry = matrix.diag_element((*dof).first);
-      
 
 				       // do the Gauss step
-      for (unsigned int row=0; row<n_dofs; ++row)
+      for (unsigned int row=0; row<n_dofs; ++row) 
 	for (int j=sparsity_rowstart[row];
-	     j<sparsity_rowstart[row+1]; ++row)
+	     j<sparsity_rowstart[row+1]; ++j)
 	  if ((sparsity_colnums[j] == (signed int)(*dof).first) &&
 	      ((signed int)row != (*dof).first))
 					     // this line has an entry
@@ -384,7 +392,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 	    {
 					       // correct right hand side
 	      right_hand_side(row) -= matrix.global_entry(j)/diagonal_entry *
-				      (*dof).second;
+				      new_rhs;
 	      
 					       // set matrix entry to zero
 	      matrix.global_entry(j) = 0.;
@@ -402,6 +410,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 
 void
 ProblemBase<1>::make_boundary_value_list (const DirichletBC &,
+					  const FiniteElement<1> &,
 					  map<int,double>   &) const {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());  
   Assert (false, ExcNotImplemented());
@@ -413,13 +422,28 @@ ProblemBase<1>::make_boundary_value_list (const DirichletBC &,
 template <int dim>
 void
 ProblemBase<dim>::make_boundary_value_list (const DirichletBC &dirichlet_bc,
+					    const FiniteElement<dim> &fe,
 					    map<int,double>   &boundary_values) const {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
-  
+
+				   // use two face iterators, since we need
+				   // a DoF-iterator for the dof indices, but
+				   // a Tria-iterator for the fe object
   DoFHandler<dim>::active_face_iterator face = dof_handler->begin_active_face(),
 					endf = dof_handler->end_face();
+  Triangulation<dim>::active_face_iterator tface = tria->begin_active_face();
+  
   DirichletBC::const_iterator function_ptr;
-  for (; face!=endf; ++face)
+
+				   // field to store the indices of dofs
+				   // initialize once to get the size right
+				   // for the following fields.
+  vector<int>         face_dofs;
+  face->get_dof_indices (face_dofs);
+  vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
+  vector<double>      dof_values;
+	
+  for (; face!=endf; ++face, ++tface)
     if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
 	dirichlet_bc.end()) 
 				       // face is subject to one of the
@@ -428,17 +452,10 @@ ProblemBase<dim>::make_boundary_value_list (const DirichletBC &dirichlet_bc,
 					 // get indices, physical location and
 					 // boundary values of dofs on this
 					 // face
-	vector<int>         face_dofs;
-	vector<Point<dim> > dof_locations;
-	vector<double>      dof_values;
-	
+	face_dofs.erase (face_dofs.begin(), face_dofs.end());
+	dof_values.erase (dof_values.begin(), dof_values.end());
 	face->get_dof_indices (face_dofs);
-
-//physical location
-//	Assert (false, ExcNotImplemented());
-	dof_locations.insert (dof_locations.begin(),
-			      face_dofs.size(), Point<dim>());
-	
+	fe.face_ansatz_points (tface, dof_locations);
 	(*function_ptr).second->value_list (dof_locations, dof_values);
 
 					 // enter into list

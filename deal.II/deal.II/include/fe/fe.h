@@ -35,7 +35,7 @@ template <int dim> class Quadrature;
   the real cell at the quadrature points and so on.
 
   The Jacobian matrix is defined to be
-  $$ J_{ij} = {d\xi_i \over d\x_j} $$
+  $$ J_{ij} = {d\xi_i \over dx_j} $$
   which is the form needed to compute the gradient on the real cell from
   the gradient on the unit cell. If we want to transform the area element
   $dx dy$ from the real to the unit cell, we have to take the determinant of
@@ -392,7 +392,7 @@ class FiniteElementBase {
 				      * should really be pure, but then we could
 				      * not make copies of a finite element
 				      * object even if we did not intend to use
-				      * this function. Therefore, we ommit the
+				      * this function. Therefore, we omit the
 				      * #=0# signature and implement this function
 				      * by throwing an exception.
 				      * #p# is a point on the reference element.
@@ -406,7 +406,7 @@ class FiniteElementBase {
 				      * should really be pure, but then we could
 				      * not make copies of a finite element
 				      * object even if we did not intend to use
-				      * this function. Therefore, we ommit the
+				      * this function. Therefore, we omit the
 				      * #=0# signature and implement this function
 				      * by throwing an exception.
 				      * #p# is a point on the reference element,
@@ -472,6 +472,10 @@ class FiniteElementBase {
 				      * higher dimensions, it depends on the
 				      * present fe and needs reimplementation
 				      * by the user.
+				      *
+				      * The function assumes that the fields
+				      * already have the right number of
+				      * elements.
 				      */
     virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >               &unit_points,
@@ -481,6 +485,21 @@ class FiniteElementBase {
 				 const bool           compute_ansatz_points,
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points) const;
+
+				     /**
+				      * Return the ansatz points this FE has
+				      * on a face if a cell would have the
+				      * given face as a side. This function is
+				      * needed for higher order elements, if
+				      * we want to use curved boundary
+				      * approximations.
+				      *
+				      * The function assumes that the fields
+				      * already have the right number of
+				      * elements.
+				      */
+    virtual void face_ansatz_points (const Triangulation<dim>::face_iterator &face,
+				     vector<Point<dim> >  &ansatz_points) const;
     
 				     /**
 				      * Comparison operator. We also check for
@@ -512,7 +531,13 @@ class FiniteElementBase {
 				      * Exception
 				      */
     DeclException0 (ExcNotImplemented);
-    
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcWrongFieldDimension,
+		    int, int,
+		    << "The field has not the assumed dimension " << arg2
+		    << ", but has " << arg1 << " elements.");
   protected:
 				     /**
 				      * Have #N=2^dim# matrices keeping the
@@ -598,6 +623,12 @@ class FiniteElement;
   elements which are no more valid.
 
   Consequence: make sure the copy constructor is correct.
+
+  This class should really be a pure one, with functions having the #=0#
+  signature. However, some instances of this class need to be floating around
+  anyhow (e.g. the #DoFHandler# class keeps a copy, only to have the values
+  of #dof_per*# available), so we do not make it pure but rather implement
+  those functions which should in fact be pure to throw an error.
   */
 class FiniteElement<1> : public FiniteElementBase<1> {
   public:
@@ -670,6 +701,10 @@ class FiniteElement<1> : public FiniteElementBase<1> {
 				      * distance to the origin. The standard
 				      * implementation distributes the dofs on
 				      * the line equidistantly.
+				      *
+				      * The function assumes that the fields
+				      * already have the right number of
+				      * elements.
 				      */
     virtual void fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				 const vector<Point<1> >               &unit_points,
@@ -679,6 +714,20 @@ class FiniteElement<1> : public FiniteElementBase<1> {
 				 const bool         compute_ansatz_points,
 				 vector<Point<1> > &q_points,
 				 const bool         compute_q_points) const;
+
+				     /**
+				      * Return the ansatz points this FE has
+				      * on a face if a cell would have the
+				      * given face as a side. This function is
+				      * needed for higher order elements, if
+				      * we want to use curved boundary
+				      * approximations.
+				      *
+				      * Question: is this function useful in 1D?
+				      * At present it is not implemented.
+				      */
+    virtual void face_ansatz_points (const Triangulation<1>::face_iterator &face,
+				     vector<Point<1> >  &ansatz_points) const;
 };
 
 
@@ -719,6 +768,12 @@ class FiniteElement<1> : public FiniteElementBase<1> {
 
   If you want to extend this class (not by derivation, but by adding new
   elements), see \Ref{FiniteElement<1>}
+
+  This class should really be a pure one, with functions having the #=0#
+  signature. However, some instances of this class need to be floating around
+  anyhow (e.g. the #DoFHandler# class keeps a copy, only to have the values
+  of #dof_per*# available), so we do not make it pure but rather implement
+  those functions which should in fact be pure to throw an error.
   */
 class FiniteElement<2> : public FiniteElementBase<2> {
   public:
@@ -796,6 +851,10 @@ class FiniteElement<2> : public FiniteElementBase<2> {
 				      * function is therefore not implemented
 				      * by the FE<2> base class, but is made
 				      * pure virtual.
+				      *
+				      * The function assumes that the fields
+				      * already have the right number of
+				      * elements.
 				      */
     virtual void fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 				 const vector<Point<2> >               &unit_points,
@@ -805,6 +864,21 @@ class FiniteElement<2> : public FiniteElementBase<2> {
 				 const bool         compute_ansatz_points,
 				 vector<Point<2> > &q_points,
 				 const bool         compute_q_points) const;
+
+				     /**
+				      * Return the ansatz points this FE has
+				      * on a face if a cell would have the
+				      * given face as a side. This function is
+				      * needed for higher order elements, if
+				      * we want to use curved boundary
+				      * approximations.
+				      *
+				      * The function assumes that the fields
+				      * already have the right number of
+				      * elements.
+				      */
+    virtual void face_ansatz_points (const Triangulation<2>::face_iterator &face,
+				     vector<Point<2> >  &ansatz_points) const;
 };
 
 
