@@ -25,11 +25,13 @@
 #include <numeric>
 
 
+template <int dim>
+const bool MappingQ<dim>::use_mapping_q_on_all_cells;
+
 
 template<int dim>
 MappingQ<dim>::InternalData::InternalData (const unsigned int n_shape_functions):
 		MappingQ1<dim>::InternalData(n_shape_functions),
-//TODO: in 1d, use_mapping_q1_on_current_cell is always false, but should be true.
 		use_mapping_q1_on_current_cell(false),
 		mapping_q1_data(1 << dim)
 {
@@ -50,11 +52,7 @@ MappingQ<1>::MappingQ (const unsigned int):
 		n_outer(0),
 		tensor_pols(0),
 		n_shape_functions(2),
-		renumber(0),
-//TODO: why have two ways to compute? if they both work, choose one and remove the other    
-		alternative_normals_computation(false),
-//TODO: remove use_mapping_q_on_all_cells as it is set to false in the constructor and never set again    
-		use_mapping_q_on_all_cells(false)
+		renumber(0)
 {}
 
 
@@ -86,11 +84,7 @@ MappingQ<dim>::MappingQ (const unsigned int p):
 			:8+12*(degree-1)+6*(degree-1)*(degree-1)),
 		tensor_pols(0),
 		n_shape_functions(power(degree+1,dim)),
-		renumber(0),
-//TODO: why have two ways to compute? if they both work, choose one and remove the other    
-		alternative_normals_computation(false),
-//TODO: remove use_mapping_q_on_all_cells as it is set to false in the constructor and never set again    
-		use_mapping_q_on_all_cells(false)
+		renumber(0)
 {
 				   // Construct the tensor product
 				   // polynomials used as shape
@@ -192,21 +186,6 @@ MappingQ<dim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_poin
 
 
 template <int dim>
-UpdateFlags
-MappingQ<dim>::update_each (const UpdateFlags in) const
-{
-  UpdateFlags out=MappingQ1<dim>::update_each(in);
-
-  if (in & update_normal_vectors)
-    if (alternative_normals_computation)
-      out |= update_covariant_transformation;
-
-  return out;
-}
-
-
-
-template <int dim>
 Mapping<dim>::InternalDataBase*
 MappingQ<dim>::get_data (const UpdateFlags update_flags,
 			 const Quadrature<dim> &quadrature) const
@@ -232,10 +211,9 @@ MappingQ<dim>::get_face_data (const UpdateFlags update_flags,
   compute_face_data (update_flags, q,
 		     quadrature.n_quadrature_points, *data);
   if (!use_mapping_q_on_all_cells)
-    MappingQ1<dim>::compute_face_data (update_flags, q,
-				       quadrature.n_quadrature_points,
-				       data->mapping_q1_data);
-
+    compute_face_data (update_flags, q,
+		       quadrature.n_quadrature_points,
+		       data->mapping_q1_data);
   return data;
 }
 
@@ -251,67 +229,10 @@ MappingQ<dim>::get_subface_data (const UpdateFlags update_flags,
   compute_face_data (update_flags, q,
 		     quadrature.n_quadrature_points, *data);
   if (!use_mapping_q_on_all_cells)
-    MappingQ1<dim>::compute_face_data (update_flags, q,
-				       quadrature.n_quadrature_points,
-				       data->mapping_q1_data);
-
+    compute_face_data (update_flags, q,
+		       quadrature.n_quadrature_points,
+		       data->mapping_q1_data);
   return data;
-}
-
-
-
-template <int dim>
-void
-MappingQ<dim>::compute_face_data (UpdateFlags                   update_flags,
-				  const Quadrature<dim>        &q,
-				  const unsigned int            n_original_q_points,
-				  MappingQ1<dim>::InternalData &mapping_q1_data) const
-{
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
-  InternalData &data = dynamic_cast<InternalData&> (mapping_q1_data);
-  
-  MappingQ1<dim>::compute_face_data(update_flags, q,
-				    n_original_q_points, data);
-
-//TODO: externalize this to a proper template function. or: scrap the whole function for 1d since it doesn't make much sense anyway?
-#if (deal_II_dimension>1)
-  if ((data.update_flags & update_normal_vectors)
-      && alternative_normals_computation)
-    {
-      const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
-      data.unit_normals.resize(nfaces);
-      std::vector<Tensor<1,dim> > n(nfaces);
-      if (dim==2)
-	{
-	  n[0][1]=-1;
-	  n[1][0]=1;
-	  n[2][1]=1;
-	  n[3][0]=-1;
-	}
-      else if (dim==3)
-	{
-	  n[0][1]=-1;
-	  n[1][1]=1;
-	  n[2][2]=-1;
-	  n[3][0]=1;
-	  n[4][2]=1;
-	  n[5][0]=-1;		  
-	}
-      else
-	Assert(false, ExcNotImplemented());
-      
-      for (unsigned int i=0; i<nfaces; ++i)
-	{
-	  data.unit_normals[i].resize(n_original_q_points);
-	  fill (data.unit_normals[i].begin(),
-		data.unit_normals[i].end(),
-		n[i]);
-	}
-    }
-#endif
 }
 
 
@@ -341,12 +262,14 @@ MappingQ<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
+  MappingQ1<dim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
-    MappingQ1<dim>::fill_fe_values(cell, q, data.mapping_q1_data,
-				   quadrature_points, JxW_values);
+    p_data=&data.mapping_q1_data;
   else
-    MappingQ1<dim>::fill_fe_values(cell, q, data,
-				   quadrature_points, JxW_values);
+    p_data=&data;
+  
+  MappingQ1<dim>::fill_fe_values(cell, q, *p_data,
+				 quadrature_points, JxW_values);
 }
 
 
@@ -373,7 +296,7 @@ MappingQ<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterato
 				   // treated by a reduced Q1 mapping,
 				   // e.g. if the cell is in the
 				   // interior of the domain
-//TODO: shouldn't we ask whether the face is at the boundary, rather than the cell?  
+//TODO: (comment needed) shouldn't we ask whether the face is at the boundary, rather than the cell?
   data.use_mapping_q1_on_current_cell=!(use_mapping_q_on_all_cells
 					|| cell->has_boundary_lines());
 
@@ -383,18 +306,17 @@ MappingQ<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterato
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
+  MappingQ1<dim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
-    MappingQ1<dim>::compute_fill_face (cell, face_no, false,
-				       npts, offset, q.get_weights(),
-				       data.mapping_q1_data,
-				       quadrature_points, JxW_values,
-				       exterior_forms, normal_vectors);
+    p_data=&data.mapping_q1_data;
   else
-    compute_fill_face (cell, face_no, false,
-		       npts, offset, q.get_weights(),
-		       data,
-		       quadrature_points, JxW_values,
-		       exterior_forms, normal_vectors);
+    p_data=&data;
+
+  compute_fill_face (cell, face_no, false,
+		     npts, offset, q.get_weights(),
+		     *p_data,
+		     quadrature_points, JxW_values,
+		     exterior_forms, normal_vectors);
 }
 
 
@@ -421,7 +343,7 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
 				   // treated by a reduced Q1 mapping,
 				   // e.g. if the cell is in the
 				   // interior of the domain
-//TODO: shouldn't we ask whether the face is at the boundary, rather than the cell?  
+//TODO: (comment needed) shouldn't we ask whether the face is at the boundary, rather than the cell?  
   data.use_mapping_q1_on_current_cell=!(use_mapping_q_on_all_cells
 					|| cell->has_boundary_lines());
 
@@ -432,18 +354,17 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
+  MappingQ1<dim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
-    MappingQ1<dim>::compute_fill_face (cell, face_no, true,
-				       npts, offset, q.get_weights(),
-				       data.mapping_q1_data,
-				       quadrature_points, JxW_values,
-				       exterior_forms, normal_vectors);
+    p_data=&data.mapping_q1_data;
   else
-    compute_fill_face (cell, face_no, true,
-		       npts, offset, q.get_weights(),
-		       data,
-		       quadrature_points, JxW_values,
-		       exterior_forms, normal_vectors);
+    p_data=&data;
+
+  compute_fill_face (cell, face_no, true,
+		     npts, offset, q.get_weights(),
+		     *p_data,
+		     quadrature_points, JxW_values,
+		     exterior_forms, normal_vectors);
 }
 
 
@@ -508,7 +429,8 @@ MappingQ<dim>::set_laplace_on_quad_vector(std::vector<std::vector<double> > &loq
 				   // not precomputed, then do so now
       if (dim==2)
 	compute_laplace_vector(loqvs);
-//TODO: what if dim==3?
+      else
+	Assert(false, ExcNotImplemented());
     }
 
 				   // the sum of weights of the points
@@ -756,8 +678,11 @@ MappingQ<dim>::compute_mapping_support_points(
   if (use_mapping_q_on_all_cells || cell->has_boundary_lines())
     compute_support_points_laplace(cell, a);
 //  compute_support_points_simple(cell, a);
-//TODO: can we delete the previous line?  
-
+//TODO: (later) can we delete the previous line?  
+				   // keep last line for easy
+				   // switching between the two
+				   // possible cases of computing the
+				   // support points.
   else
 				     // otherwise: use a Q1 mapping
 				     // for which the mapping shape
@@ -802,7 +727,7 @@ MappingQ<dim>::compute_support_points_laplace(const typename Triangulation<dim>:
 					       // points located on
 					       // the boundary faces
 	      add_line_support_points (cell, a);
-	      add_face_support_points (cell, a);
+	      add_quad_support_points (cell, a);
               apply_laplace_vector (laplace_on_hex_vector, a);
 	      break;
 	      
@@ -814,14 +739,14 @@ MappingQ<dim>::compute_support_points_laplace(const typename Triangulation<dim>:
 
 
 
-//TODO: remove the following function altogether
+//TODO: (later) remove the following function altogether
 template <int dim>
 void
 MappingQ<dim>::compute_support_points_simple(const typename Triangulation<dim>::cell_iterator &cell,
 					     std::vector<Point<dim> > &a) const
 {
+  Assert(a.size()==0, ExcInternalError());
 				   // the vertices first
-// TODO: check for size of 'a' first?
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     a.push_back(cell->vertex(i));
   
@@ -856,10 +781,6 @@ MappingQ<dim>::compute_support_points_simple(const typename Triangulation<dim>::
 					     // the midpoint between
 					     // the middle point and
 					     // the 4 vertices
-	    
-					     // TODO: better position of
-					     // points: transform them by
-					     // a Q2 transformation.
 	    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	      a.push_back(middle*2./3.+cell->vertex(vertex_mapping[i])/3.);
 	    break;
@@ -919,6 +840,7 @@ void
 MappingQ<dim>::add_line_support_points (const Triangulation<dim>::cell_iterator &cell,
 					std::vector<Point<dim> > &a) const
 {
+  static const StraightBoundary<dim> straight_boundary;
 				   // if we only need the midpoint,
 				   // then ask for it.
   if (degree==2)
@@ -968,10 +890,10 @@ MappingQ<dim>::add_line_support_points (const Triangulation<dim>::cell_iterator 
 
 #if deal_II_dimension==3
 
-//TODO: rename function to add_quad_support_points, to unify notation
+
 template<>
 void
-MappingQ<3>::add_face_support_points(const Triangulation<3>::cell_iterator &cell,
+MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 				     std::vector<Point<3> >                &a) const
 {
   const unsigned int faces_per_cell    = GeometryInfo<3>::faces_per_cell,
@@ -994,6 +916,14 @@ MappingQ<3>::add_face_support_points(const Triangulation<3>::cell_iterator &cell
 				      {9,5,10,1},
 				      {2,10,6,11},
 				      {8,7,11,3}};
+
+  static StraightBoundary<3> straight_boundary;
+				   // used if face quad at boundary or
+				   // entirely in the interior of the
+				   // domain
+  std::vector<Point<3> > quad_points ((degree-1)*(degree-1));
+				   // used if only one line of face quad is at boundary
+  std::vector<Point<3> > b(4*degree);
   
   
 				   // loop over all faces and collect points on them
@@ -1017,9 +947,6 @@ MappingQ<3>::add_face_support_points(const Triangulation<3>::cell_iterator &cell
 				       // on it
       if (face->at_boundary())
 	{
-//TODO: move this variable out of the inner loop	  
-	  std::vector<Point<3> > quad_points ((degree-1)*(degree-1));
-
 	  face->get_triangulation().get_boundary(face->boundary_indicator())
 	    .get_intermediate_points_on_quad (face, quad_points);
 	  a.insert (a.end(), quad_points.begin(), quad_points.end());
@@ -1043,14 +970,14 @@ MappingQ<3>::add_face_support_points(const Triangulation<3>::cell_iterator &cell
 					   // separately
 	  if (lines_at_boundary>0)
 	    {
+					       // b is of size
+					       // 4*degree, make sure
+					       // that this is the
+					       // right size
+	      Assert(b.size()==vertices_per_face+lines_per_face*(degree-1),
+		     ExcDimensionMismatch(b.size(), vertices_per_face+lines_per_face*(degree-1)));
+	      
 					       // sort the points into b
-//TODO: this is not thread-safe!!! b might be used for objects with
-//TODO: different degrees at the same time!
-	      static std::vector<Point<3> > b;
-	      b.resize(4*degree);
-	      Assert(4*degree==vertices_per_face+lines_per_face*(degree-1),
-		     ExcDimensionMismatch(4*degree,
-					  vertices_per_face+lines_per_face*(degree-1)));
 	      for (unsigned int i=0; i<vertices_per_face; ++i)
 		b[i]=a[face_vertex_to_cell_vertex[face_no][i]];
 		      
@@ -1058,7 +985,12 @@ MappingQ<3>::add_face_support_points(const Triangulation<3>::cell_iterator &cell
 		for (unsigned int j=0; j<degree-1; ++j)
 		  b[vertices_per_face+i*(degree-1)+j]=
 		    a[vertices_per_cell+face_line_to_cell_line[face_no][i]*(degree-1)+j];
-		  
+
+					       // Now b includes the
+					       // right order of
+					       // support points on
+					       // the quad to apply
+					       // the laplace vector
 	      apply_laplace_vector(laplace_on_quad_vector, b);
 	      Assert(b.size()==4*degree+(degree-1)*(degree-1),
 		     ExcDimensionMismatch(b.size(), 4*degree+(degree-1)*(degree-1)));
@@ -1073,9 +1005,6 @@ MappingQ<3>::add_face_support_points(const Triangulation<3>::cell_iterator &cell
 					       // intermediate points
 					       // from a straight
 					       // boundary object
-//TODO: move this variable out of the loop	      
-	      std::vector<Point<3> > quad_points ((degree-1)*(degree-1));
-	      
 	      straight_boundary.get_intermediate_points_on_quad (face, quad_points);
 	      a.insert (a.end(), quad_points.begin(), quad_points.end());
 	    }
@@ -1085,15 +1014,14 @@ MappingQ<3>::add_face_support_points(const Triangulation<3>::cell_iterator &cell
 
 #endif
 
+
 template<int dim>
 void
-MappingQ<dim>::add_face_support_points(const typename Triangulation<dim>::cell_iterator &,
+MappingQ<dim>::add_quad_support_points(const typename Triangulation<dim>::cell_iterator &,
 				       std::vector<Point<dim> > &) const
 {
   Assert(false, ExcInternalError());
 }
-
-
 
 
 #if deal_II_dimension==3
@@ -1103,6 +1031,8 @@ void
 MappingQ<3>::fill_quad_support_points_simple (const Triangulation<3>::cell_iterator &cell,
 					      std::vector<Point<3> > &a) const
 {
+  static StraightBoundary<3> straight_boundary;
+
   const Boundary<3> *boundary = 0;
 
   std::vector<Point<3> > quad_points;
@@ -1129,61 +1059,6 @@ void
 MappingQ<dim>::fill_quad_support_points_simple (const Triangulation<dim>::cell_iterator &,
 						std::vector<Point<dim> > &) const
 {}
-
-
-
-//TODO: remove call of cross_product for dim==2
-#if deal_II_dimension==2
-
-void cross_product (Tensor<1,2> &, const Tensor<1,2> &, const Tensor<1,2> &)
-{
-  Assert(false, ExcInternalError());
-}
-
-#endif
-
-template <int dim>
-void
-MappingQ<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator &cell,
-				  const unsigned int            face_no,
-				  const bool                    is_subface,
-				  const unsigned int            npts,
-				  const unsigned int            offset,
-				  const std::vector<double>         &weights,
-				  MappingQ1<dim>::InternalData &mapping_q1_data,
-				  std::vector<Point<dim> >          &quadrature_points,
-				  std::vector<double>               &JxW_values,
-				  std::vector<Tensor<1,dim> >       &boundary_forms,
-				  std::vector<Point<dim> >          &normal_vectors) const
-{
-  MappingQ1<dim>::compute_fill_face (cell, face_no, is_subface,
-				     npts,
-				     offset,
-				     weights,
-				     mapping_q1_data,
-				     quadrature_points,
-				     JxW_values,
-				     boundary_forms,
-				     normal_vectors);
-  
-  const UpdateFlags update_flags(mapping_q1_data.current_update_flags());
-
-  if ((update_flags & update_normal_vectors)
-      && alternative_normals_computation)
-    {
-      InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_q1_data);
-      Assert(data_ptr!=0, ExcInternalError());
-      InternalData &data=*data_ptr;
-
-      transform_covariant(normal_vectors,
-			  data.unit_normals[face_no],
-			  data, 0);
-      
-      for (unsigned int i=0; i<normal_vectors.size(); ++i)
-	normal_vectors[i] /= sqrt(normal_vectors[i].square());
-    }
-}
-
 
 
 template <int dim>
