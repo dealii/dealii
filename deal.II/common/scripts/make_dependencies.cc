@@ -76,8 +76,8 @@ void determine_direct_includes (const std::string &file)
                                    // it already here
   std::string present_path;
   if (file.find ('/') != std::string::npos)
-      present_path = std::string (file.begin(),
-				  file.begin()+file.rfind ('/')+1);
+    present_path = std::string (file.begin(),
+				file.begin()+file.rfind ('/')+1);
 
   std::ifstream in(file.c_str());
   assert ((bool)in);
