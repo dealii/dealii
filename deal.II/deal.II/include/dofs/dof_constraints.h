@@ -476,6 +476,13 @@ class ConstraintMatrix : public Subscriptor
 					  * relation.
 					  */
 	bool operator < (const ConstraintLine &) const;
+
+					 /**
+					  * Determine an estimate for the
+					  * memory consumption (in bytes)
+					  * of this object.
+					  */
+	unsigned int memory_consumption () const;
     };
 
 				     /**

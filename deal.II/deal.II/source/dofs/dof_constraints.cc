@@ -15,6 +15,7 @@
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_constraints.templates.h>
 
+#include <base/memory_consumption.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
@@ -30,6 +31,15 @@ bool
 ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 {
   return line < a.line;
+};
+
+
+
+unsigned int
+ConstraintMatrix::ConstraintLine::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (line) +
+	  MemoryConsumption::memory_consumption (entries));
 };
 
 
@@ -601,7 +611,8 @@ unsigned int ConstraintMatrix::max_constraint_indirections () const
 
     
 
-void ConstraintMatrix::print (ostream &out) const {
+void ConstraintMatrix::print (ostream &out) const
+{
   for (unsigned int i=0; i!=lines.size(); ++i)
     for (unsigned int j=0; j!=lines[i].entries.size(); ++j)
       out << "    " << lines[i].line
@@ -609,6 +620,15 @@ void ConstraintMatrix::print (ostream &out) const {
 	  << ":  " << lines[i].entries[j].second << endl;
 
   AssertThrow (out, ExcIO());
+};
+
+
+
+unsigned int
+ConstraintMatrix::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (lines) +
+	  MemoryConsumption::memory_consumption (sorted));
 };
 
 
