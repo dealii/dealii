@@ -129,7 +129,7 @@ TAGS:
 
 
 
-clean: clean-contrib clean-base clean-lac clean-dealII clean-doc clean-examples clean-lib clean-tests
+clean: clean-contrib clean-base clean-lac clean-dealII clean-doc clean-examples clean-lib clean-tests clean-common-scripts
 	-rm -f TODO common/TAGS
 
 clean-contrib:
@@ -157,6 +157,9 @@ clean-lib:
 clean-tests:
 	-cd tests && $(MAKE) clean
 
+clean-common-scripts:
+	cd $D/common/scripts && $(MAKE) clean
+
 distclean: clean
 	cd lib && $(MAKE) distclean
 	-cd tests && $(MAKE) distclean
@@ -164,5 +167,6 @@ distclean: clean
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
         online-doc printable-doc tex-doc contrib \
         clean clean-contrib clean-base clean-lac clean-dealII \
-	clean-doc clean-examples clean-lib clean-tests distclean \
+	clean-doc clean-examples clean-lib clean-tests clean-common-scripts \
+	distclean \
 	TAGS TODO
