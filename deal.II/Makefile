@@ -154,6 +154,7 @@ clean-tests:
 
 distclean: clean
 	cd lib && $(MAKE) distclean
+	-cd tests && $(MAKE) distclean
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
         online-doc printable-doc tex-doc contrib \
