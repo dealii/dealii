@@ -79,11 +79,11 @@ endif
 
 $(LIBDIR)/libbase.a: $(forward-declarations) $(o-files)
 	@echo =====base=============optimized==$(MT)== Linking library:   $(@F)
-	@ar ruv $@ $(o-files)
+	@ar ru $@ $(o-files)
 
 $(LIBDIR)/libbase.g.a: $(forward-declarations) $(go-files)
 	@echo =====base=============debug======$(MT)== Linking library:   $(@F)
-	@ar ruv $@ $(go-files)
+	@ar ru $@ $(go-files)
 
 
 $(LIBDIR)/libbase.so: $(forward-declarations) $(o-files)

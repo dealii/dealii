@@ -53,11 +53,11 @@ endif
 
 $(LIBDIR)/liblac.a: $(forward-declarations) $(o-files)
 	@echo =====lac==============optimized==$(MT)== Linking library:   $(@F)
-	@ar ruv $@ $(o-files)
+	@ar ru $@ $(o-files)
 
 $(LIBDIR)/liblac.g.a: $(forward-declarations) $(go-files)
 	@echo =====lac==============debug======$(MT)== Linking library:   $(@F)
-	@ar ruv $@ $(go-files)
+	@ar ru $@ $(go-files)
 
 
 $(LIBDIR)/liblac.so: $(forward-declarations) $(o-files)
