@@ -4,8 +4,10 @@
 include ../common/Make.global_options
 
 
-# by default make sublibs
-default: hsl umfpack functionparser
+# by default make sublibs. the functionparser is not part of the
+# default make list, since it needs to be built *before* the rest of
+# this stuff as it is needed by libbase
+default: hsl umfpack 
 
 
 ifeq ($(USE_CONTRIB_HSL),yes)
