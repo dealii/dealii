@@ -23,7 +23,7 @@ debug-mode = on
 # Define library names
 ############################################################
 
-libs.g   = $(lib-deal2-2d.g) \
+libs.g   = $(lib-deal2-3d.g) $(lib-deal2-2d.g) \
            $(lib-lac.g)      \
            $(lib-base.g)
 libs     = $(lib-deal2-2d.o) \
@@ -98,6 +98,19 @@ show_transform-o-files = $(show_transform-cc-files:.cc=.o)
 endif
 
 show_transform: $(show_transform-o-files) $(libraries)
+	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
+
+############################################################
+
+internals-cc-files = internals.cc
+
+ifeq ($(debug-mode),on)
+internals-o-files = $(internals-cc-files:.cc=.go)
+else
+internals-o-files = $(internals-cc-files:.cc=.o)
+endif
+
+internals: $(internals-o-files) $(libraries)
 	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
 
 ############################################################
