@@ -44,7 +44,7 @@ template <int dim>
 void GridOut::write_dx (const Triangulation<dim> &tria,
 			std::ostream             &out) 
 {
-//  Assert(false, ExcNotImplemented());
+  Assert(dx_flags.write_all_faces, ExcNotImplemented());
   AssertThrow (out, ExcIO());
 				   // Copied and adapted from write_ucd
   const std::vector<Point<dim> > &vertices    = tria.get_vertices();
