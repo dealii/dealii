@@ -92,25 +92,31 @@ $(LIBDIR)/3d/%.$(OBJEXT) :
 $(LIBDIR)/libdeal_II_1d.g.a: $(go-files-1d)
 	@echo "=====deal.II====1d====debug======$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(go-files-1d)
+	@$(RANLIB) $@
 $(LIBDIR)/libdeal_II_1d.a: $(o-files-1d)
 	@echo "=====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files-1d)
+	@$(RANLIB) $@
 
 
 $(LIBDIR)/libdeal_II_2d.g.a: $(go-files-2d)
 	@echo "=====deal.II====2d====debug======$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(go-files-2d)
+	@$(RANLIB) $@
 $(LIBDIR)/libdeal_II_2d.a: $(o-files-2d)
 	@echo "=====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files-2d)
+	@$(RANLIB) $@
 
 
 $(LIBDIR)/libdeal_II_3d.g.a: $(go-files-3d)
 	@echo "=====deal.II====3d====debug======$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(go-files-3d)
+	@$(RANLIB) $@
 $(LIBDIR)/libdeal_II_3d.a: $(o-files-3d)
 	@echo "=====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files-3d)
+	@$(RANLIB) $@
 
 
 $(LIBDIR)/libdeal_II_1d.g.so: $(go-files-1d)

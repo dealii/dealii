@@ -46,10 +46,12 @@ endif
 $(LIBDIR)/liblac.a: $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files)
+	@$(RANLIB) $@
 
 $(LIBDIR)/liblac.g.a: $(go-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(go-files)
+	@$(RANLIB) $@
 
 
 $(LIBDIR)/liblac.so: $(o-files)

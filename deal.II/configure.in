@@ -263,6 +263,12 @@ fi
 AC_SUBST(enableshared)
 AC_SUBST(lib_suffix)
 
+dnl Also look for RANLIB, since some rather old systems (ah, and MAC OS X!)
+dnl still require it for statically linked libraries
+AC_PROG_RANLIB
+AC_PATH_PROG(RANLIB,$RANLIB)
+AC_SUBST(RANLIB)
+
 
 
 dnl --------------------------------------------------------------
