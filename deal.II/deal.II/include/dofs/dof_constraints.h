@@ -178,6 +178,28 @@ class ConstraintMatrix : public Subscriptor
 				      * through all entries.
 				      */
     bool is_constrained (const unsigned int index) const;
+
+				     /**
+				      * Return the maximum number of
+				      * other dofs that one dof is
+				      * constrained to. For example,
+				      * in 2d a hanging node is
+				      * constrained only to its two
+				      * neighbors, so the returned
+				      * value would be #2#. However,
+				      * for higher order elements
+				      * and/or higher dimensions, or
+				      * other types of constraints,
+				      * this number is no more
+				      * obvious.
+				      *
+				      * The name indicates that within
+				      * the system matrix, references
+				      * to a constrained node are
+				      * indirected to the nodes it is
+				      * constrained to.
+				      */
+    unsigned int max_constraint_indirections () const;
     
 				     /**
 				      * Condense a given sparsity pattern. This

@@ -370,6 +370,19 @@ bool ConstraintMatrix::is_constrained (const unsigned int index) const
 };
 
 
+
+unsigned int ConstraintMatrix::max_constraint_indirections () const 
+{
+  unsigned int return_value = 0;
+  for (vector<ConstraintLine>::const_iterator i=lines.begin();
+       i!=lines.end(); ++i)
+    return_value = max(return_value, i->entries.size());
+
+  return return_value;
+};
+
+    
+
 void ConstraintMatrix::print (ostream &out) const {
   for (unsigned int i=0; i!=lines.size(); ++i)
     for (unsigned int j=0; j!=lines[i].entries.size(); ++j)
