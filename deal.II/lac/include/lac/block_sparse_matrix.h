@@ -326,7 +326,17 @@ class BlockSparseMatrix : public Subscriptor
 				      * be square for this operation.
 				      */
     template <typename somenumber>
-    somenumber matrix_norm_square (const BlockVector<rows,somenumber> &v) const;
+    somenumber
+    matrix_norm_square (const BlockVector<rows,somenumber> &v) const;
+
+				     /**
+				      * Compute the matrix scalar
+				      * product $\left(u,Mv\right)$.
+				      */    
+    template <typename somenumber>
+    somenumber
+    matrix_scalar_product (const BlockVector<rows,somenumber>    &u,
+			   const BlockVector<columns,somenumber> &v) const;
     
 				     /**
 				      * Return a (constant) reference
@@ -669,6 +679,23 @@ matrix_norm_square (const BlockVector<rows,somenumber> &v) const
 	norm_sqr += block(row,col).matrix_scalar_product (v.block(row),
 							  v.block(col));
   return norm_sqr;
+};
+
+
+
+template <typename number, int  rows, int columns>
+template <typename somenumber>
+somenumber
+BlockSparseMatrix<number,rows,columns>::
+matrix_scalar_product (const BlockVector<rows,somenumber>    &u,
+		       const BlockVector<columns,somenumber> &v) const
+{
+  somenumber result = 0;
+  for (unsigned int row=0; row<rows; ++row)
+    for (unsigned int col=0; col<columns; ++col)
+      result += block(row,col).matrix_scalar_product (u.block(row),
+						      v.block(col));
+  return result;
 };
 
 

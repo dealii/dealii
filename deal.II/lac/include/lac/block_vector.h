@@ -31,7 +31,7 @@
  * can do, plus the access to a single #Vector# inside the
  * #BlockVector# by #block(i)#.
  *
- * @author Guido Kanschat, 1999
+ * @author Guido Kanschat, 1999; Wolfgang Bangerth, 2000
  */
 template <int n_blocks, typename Number>
 class BlockVector
@@ -224,35 +224,6 @@ class BlockVector
 				      * some time.
 				      */
     bool all_zero () const;
-
-// See above.    
-//  				     /**
-//  				      * Make the #Vector# class a bit like the
-//  				      * #vector<># class of the C++ standard
-//  				      * library by returning iterators to
-//  				      * the start and end of the elements of this
-//  				      * vector.
-//  				      */
-//      iterator begin ();
-
-//  				     /**
-//  				      * Return constant iterator to the start of
-//  				      * the vectors.
-//  				      */
-//      const_iterator begin () const;
-
-//  				     /**
-//  				      * Return an iterator pointing to the
-//  				      * element past the end of the array.
-//  				      */
-//      iterator end ();
-
-//      				     /**
-//  				      * Return a constant iterator pointing to
-//  				      * the element past the end of the array.
-//  				      */
-//      const_iterator end () const;  
-
 
 				     /**
 				      * @name 2: Data-Access
@@ -477,34 +448,6 @@ unsigned int BlockVector<n_blocks,Number>::size () const
 {
   return block_indices.total_size();
 }
-
-
-//  template <int n_blocks, typename Number>
-//  inline
-//  BlockVector<n_blocks,Number>::iterator BlockVector<n_blocks,Number>::begin () {
-//    return &val[0];
-//  };
-
-
-//  template <int n_blocks, typename Number>
-//  inline
-//  BlockVector<n_blocks,Number>::const_iterator BlockVector<n_blocks,Number>::begin () const {
-//    return &val[0];
-//  };
-
-
-//  template <int n_blocks, typename Number>
-//  inline
-//  BlockVector<n_blocks,Number>::iterator BlockVector<n_blocks,Number>::end () {
-//    return &val[dim];
-//  };
-
-
-//  template <typename Number>
-//  inline
-//  BlockVector<n_blocks,Number>::const_iterator BlockVector<n_blocks,Number>::end () const {
-//    return &val[dim];
-//  };
 
 
 template <int n_blocks, typename Number>
