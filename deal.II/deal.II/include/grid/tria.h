@@ -1634,7 +1634,7 @@ class Triangulation
 				      *  Delete the object and all levels of
 				      *  the hierarchy.
 				      */
-    ~Triangulation ();
+    virtual ~Triangulation ();
     
 				     /**					
 				      * Assign a boundary object to
@@ -1809,7 +1809,10 @@ class Triangulation
 				      *  and #execute_coarsening_and_refinement()#.
 				      *  This function actually starts the
 				      *  refinement process, so you have no way
-				      *  to store the refinement flags.
+				      *  to store the refinement flags unless
+				      *  you overload the
+				      *  #execute_coarsening_and_refinement#
+				      *  function.
 				      */
     void refine_global (const unsigned int times);
 
@@ -1931,8 +1934,13 @@ class Triangulation
 				      *
                                       * See the general docs for more
                                       * information.
+				      *
+				      * Note that this function is #virtual# to
+				      * allow derived classes to insert hooks,
+				      * such as saving refinement flags and the
+				      * like.
 				      */
-    void execute_coarsening_and_refinement ();
+    virtual void execute_coarsening_and_refinement ();
     
 				     /**
 				      * Do both preparation for refinement and
@@ -2997,22 +3005,6 @@ class Triangulation
   protected:
 
 				     /**
-				      *  Refine all cells on all levels which
-				      *  were previously flagged for refinement.
-				      */ 
-    void execute_refinement ();
-
-				     /**
-				      * Coarsen all cells which were flagged for
-				      * coarsening, or rather: delete all
-				      * children of those cells of which all
-				      * child cells are flagged for coarsening
-				      * and several other constraints hold (see
-				      * the general doc of this class).
-				      */
-    void execute_coarsening ();
-
-				     /**
 				      *  Write a bool vector to the given stream,
 				      *  writing a pre- and a postfix magica
 				      *  number. The vector is written in an
@@ -3048,6 +3040,23 @@ class Triangulation
 				  const unsigned int  magic_number2,
 				  istream            &in);
     
+  private:
+				     /**
+				      *  Refine all cells on all levels which
+				      *  were previously flagged for refinement.
+				      */ 
+    void execute_refinement ();
+
+				     /**
+				      * Coarsen all cells which were flagged for
+				      * coarsening, or rather: delete all
+				      * children of those cells of which all
+				      * child cells are flagged for coarsening
+				      * and several other constraints hold (see
+				      * the general doc of this class).
+				      */
+    void execute_coarsening ();
+
 				     /**
 				      * Actually delete a cell, or rather all
 				      * it children, which is the
