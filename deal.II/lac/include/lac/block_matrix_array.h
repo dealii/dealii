@@ -618,7 +618,7 @@ BlockTrianglePrecondition<MATRIX>::vmult_add (
   Assert (src.n_blocks() == n_block_cols(),
 	  ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
-  BlockVector<number>& aux;
+  BlockVector<number> aux;
   aux.reinit(dst);
   vmult(aux, src);
   dst.add(aux);
