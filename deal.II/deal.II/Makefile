@@ -44,12 +44,12 @@ h-files      = $(sort $(shell echo include/*/*.h))
 # would be the same for both debug and non-debug versions, if we
 # don't care about different directories
 tmp1        = $(notdir $(cc-files))
-o-files-1d  = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.o) )
-go-files-1d = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.g.o))
-o-files-2d  = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.o) )
-go-files-2d = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.g.o))
-o-files-3d  = $(addprefix $(LIBDIR)/3d/, $(tmp1:.cc=_3d.o) )
-go-files-3d = $(addprefix $(LIBDIR)/3d/, $(tmp1:.cc=_3d.g.o))
+o-files-1d  = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.$(OBJEXT)) )
+go-files-1d = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.g.$(OBJEXT)))
+o-files-2d  = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.$(OBJEXT)) )
+go-files-2d = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.g.$(OBJEXT)))
+o-files-3d  = $(addprefix $(LIBDIR)/3d/, $(tmp1:.cc=_3d.$(OBJEXT)) )
+go-files-3d = $(addprefix $(LIBDIR)/3d/, $(tmp1:.cc=_3d.g.$(OBJEXT)))
 
 o-files  = $(o-files-1d)  $(o-files-2d)  $(o-files-3d)
 go-files = $(go-files-1d) $(go-files-2d) $(go-files-3d)
@@ -64,24 +64,24 @@ else
   MT = ==
 endif
 
-$(LIBDIR)/1d/%.g.o :
+$(LIBDIR)/1d/%.g.$(OBJEXT) :
 	@echo "=====deal.II====1d====debug======$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
-$(LIBDIR)/1d/%.o :
+$(LIBDIR)/1d/%.$(OBJEXT) :
 	@echo "=====deal.II====1d====optimized==$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
 
-$(LIBDIR)/2d/%.g.o :
+$(LIBDIR)/2d/%.g.$(OBJEXT) :
 	@echo "=====deal.II====2d====debug======$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
-$(LIBDIR)/2d/%.o :
+$(LIBDIR)/2d/%.$(OBJEXT) :
 	@echo "=====deal.II====2d====optimized==$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
 
-$(LIBDIR)/3d/%.g.o :
+$(LIBDIR)/3d/%.g.$(OBJEXT) :
 	@echo "=====deal.II====3d====debug======$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
-$(LIBDIR)/3d/%.o :
+$(LIBDIR)/3d/%.$(OBJEXT) :
 	@echo "=====deal.II====3d====optimized==$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
@@ -152,7 +152,7 @@ Makefile.dep: $(cc-files) $(h-files) Makefile
 	@echo "============================ Remaking deal.II/Makefile"
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
-		| $(PERL) -pe 's!((\.g)?.o):!_DIM_PLACEHOLDER$$1:!g;' \
+		| $(PERL) -pe 's!((\.g)?.$(OBJEXT)):!_DIM_PLACEHOLDER$$1:!g;' \
 	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/$$2_1d$$3 $$1/2d/$$2_2d$$3 $$1/3d/$$2_3d$$3:!g;'\
 		> Makefile.dep
 

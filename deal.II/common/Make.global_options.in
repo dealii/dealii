@@ -64,6 +64,7 @@ vpath %.so $(libdir)
 
 
 lib-suffix = @lib_suffix@
+OBJEXT     = @OBJEXT@
 
 lib-base.o     = $(LIBDIR)/libbase$(lib-suffix)
 lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)

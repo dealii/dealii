@@ -11,15 +11,15 @@ D=..
 # files for data_out_base.cc, which is why we use the several
 # intermediate o-files-base* rules
 cc-files     = $(shell echo source/*.cc)
-o-files-base1= $(addprefix $(LIBDIR)/base/, $(patsubst source/%,%,$(cc-files:.cc=.o)))
-o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1)) \
-               $(patsubst %.o,%_1d.o,$(filter %data_out_base.o, $(o-files-base1))) \
-               $(patsubst %.o,%_2d.o,$(filter %data_out_base.o, $(o-files-base1))) \
-               $(patsubst %.o,%_3d.o,$(filter %data_out_base.o, $(o-files-base1))) \
-               $(patsubst %.o,%_4d.o,$(filter %data_out_base.o, $(o-files-base1)))
+o-files-base1= $(addprefix $(LIBDIR)/base/, $(patsubst source/%,%,$(cc-files:.cc=.$(OBJEXT))))
+o-files-base2= $(filter-out %data_out_base.$(OBJEXT), $(o-files-base1)) \
+               $(patsubst %.$(OBJEXT),%_1d.$(OBJEXT),$(filter %data_out_base.$(OBJEXT), $(o-files-base1))) \
+               $(patsubst %.$(OBJEXT),%_2d.$(OBJEXT),$(filter %data_out_base.$(OBJEXT), $(o-files-base1))) \
+               $(patsubst %.$(OBJEXT),%_3d.$(OBJEXT),$(filter %data_out_base.$(OBJEXT), $(o-files-base1))) \
+               $(patsubst %.$(OBJEXT),%_4d.$(OBJEXT),$(filter %data_out_base.$(OBJEXT), $(o-files-base1)))
 o-files-base3= $(sort $(o-files-base2))
 o-files      = $(o-files-base3)
-go-files     = $(o-files-base3:.o=.g.o)
+go-files     = $(o-files-base3:.$(OBJEXT)=.g.$(OBJEXT))
 h-files      = $(sort $(shell echo include/base/*.h))
 
 # get options which hold for all files of the project
@@ -53,11 +53,11 @@ else
   MT = ==
 endif
 
-$(LIBDIR)/base/%.g.o :
+$(LIBDIR)/base/%.g.$(OBJEXT) :
 	@echo =====base=============debug======$(MT)== $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
 	@$(CXX) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
-$(LIBDIR)/base/%.o :
+$(LIBDIR)/base/%.$(OBJEXT) :
 	@echo =====base=============optimized==$(MT)== $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
 	@$(CXX) $(CXXFLAGS.o) $(maybe-define-dimension) -c $< -o $@
@@ -110,7 +110,7 @@ clean:
 Makefile.dep: $(cc-files) $(h-files) Makefile
 	@echo ============================ Remaking base/Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/base" $(cc-files) \
-		| $(PERL) -p -e 's!(.*/base/data_out_base)((.g)?.o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
+		| $(PERL) -p -e 's!(.*/base/data_out_base)((.g)?.$(OBJEXT))!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
 		> Makefile.dep
 
 

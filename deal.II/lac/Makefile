@@ -10,11 +10,9 @@ D=..
 # files for data_out_base.cc, which is why we use the several
 # intermediate o-files-base* rules
 cc-files     = $(shell echo source/*.cc)
-o-files-base1= $(addprefix $(LIBDIR)/lac/, $(patsubst source/%,%,$(cc-files:.cc=.o)))
-o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1))
-o-files-base3= $(sort $(o-files-base2))
-o-files      = $(o-files-base3)
-go-files     = $(o-files-base3:.o=.g.o)
+o-files-base = $(addprefix $(LIBDIR)/lac/, $(patsubst source/%,%,$(cc-files:.cc=.$(OBJEXT))))
+o-files      = $(sort $(o-files-base))
+go-files     = $(o-files:.$(OBJEXT)=.g.$(OBJEXT))
 h-files      = $(sort $(shell echo include/lac/*.h))
 
 # get options which hold for all files of the project
@@ -28,10 +26,10 @@ else
   MT = ==
 endif
 
-$(LIBDIR)/lac/%.g.o :
+$(LIBDIR)/lac/%.g.$(OBJEXT) :
 	@echo "=====lac==============debug======$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-$(LIBDIR)/lac/%.o :
+$(LIBDIR)/lac/%.$(OBJEXT) :
 	@echo "=====lac==============optimized==$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
