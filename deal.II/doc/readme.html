@@ -29,18 +29,23 @@
     In order to use the deal.II library (and its sub-libraries /base
     and /lac) you need to have the following programs installed:
     <ul>
-      <li> A fairly complete C++ compiler. We use egcs1.1.2 and
-	    gcc2.95 but other compilers might work as well. egcs1.0
-	    and older gcc versions will not work, however.
+      <li> A fairly complete C++ compiler. We use 
+           <a href="http://gcc.gnu.org">egcs1.1.2 and
+	   gcc2.95</a> but other compilers might work as well. egcs1.0
+	   and older gcc versions will not work, however. (We are
+           interested in writing portable C++, so if you find
+           something that does not work with your compiler, we are
+           likely to consider accepting patches.)
 
       <li> Perl: any Perl 5.x version should work.
 
-      <li> Make: we use GNU make, version 3.75. We also use GNU make
-           3.78 which has much better support for parallel builds, so
-           you may want to consider this version if you have a
-           multiprocessor system. GNU make 3.77 had a serious flaw in
-           the <code>$(wildcard ...)</code> function which prevented
-           us from compiling some parts of the library (most of our
+      <li> Make: we use <a href="http://www.gnu.org">GNU make</a>,
+           version 3.75. We also use GNU make 3.78 which has much
+           better support for parallel builds, so you may want to
+           consider this version if you have a multiprocessor
+           system. GNU make 3.77 had a serious flaw in the
+           <code>$(wildcard ...)</code> function which prevented us
+           from compiling some parts of the library (most of our
            Makefiles use a workaround, though). Other make programs
            (i.e. non-GNU flavors) are not standardized and will
            probably fail to work.
