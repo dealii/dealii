@@ -97,7 +97,7 @@ tex-doc:
 	@echo
 
 TODO:
-	@cat ../deal.II/Todo > TODO
+	@cat ../base/Todo ../lac/Todo ../deal.II/Todo > TODO
 	@grep //TODO ../base/include/*/*.h ../base/source/*.cc  ../lac/include/*/*.h ../lac/source/*.cc  ../deal.II/include/*/*.h ../deal.II/source/*/*.cc >> TODO
 #	@grep \#TODO Makefile Make.g* Makefile.template ../*/source/Makefile ../*/Makefile >> TODO
 

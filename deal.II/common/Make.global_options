@@ -18,11 +18,11 @@ INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
             -I$D/base/include
 CXXFLAGS.g= -DDEBUG -ggdb -Wall -W -Wconversion \
             -Winline -Woverloaded-virtual\
-	    -fno-vtable-thunks -ftemplate-depth-32\
+	    -ftemplate-depth-32\
             $(INCLUDE)
 CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
             -felide-constructors -fnonnull-objects \
-	    -fno-vtable-thunks -ftemplate-depth-32 \
+	    -ftemplate-depth-32 \
             $(INCLUDE)
 
 # DEAL_II_USE_MT=true
