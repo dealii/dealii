@@ -427,6 +427,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
 				   // release the lock that the dof object
 				   // has to the finite element object
   dof->clear ();
+  tria->set_boundary (0);
   
   delete fe;
   delete quadrature;
