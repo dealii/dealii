@@ -22,7 +22,7 @@
  * Gauss-Legendre quadrature of arbitrary order.
  *
  * The coefficients of these quadrature rules are computed by the
- * function found in @p{Numerical Recipies}. For lower order
+ * function found in <tt>Numerical Recipies</tt>. For lower order
  * quadrature rules, the use of this class is thus equivalent to the
  * use of the @ref{QGauss1} through @ref{QGauss7} classes, for which
  * the coefficients are hardcoded, but this class can provide higher
@@ -35,9 +35,9 @@ class QGauss : public Quadrature<dim>
 {
   public:
 				   /**
-				    * Generate a formula with @p{p}
+				    * Generate a formula with <tt>p</tt>
 				    * quadrature points, exact for
-				    * polynomials of degree @p{2p-1}.
+				    * polynomials of degree <tt>2p-1</tt>.
 				    */
     QGauss (const unsigned int p);
 };
@@ -46,6 +46,8 @@ class QGauss : public Quadrature<dim>
 
 
 /**
+ * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
+ *
  *  2-Point-Gauss quadrature formula, exact for polynomials of degree 3.
  *
  *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
@@ -61,6 +63,8 @@ class QGauss2 : public Quadrature<dim>
 
 
 /**
+ * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
+ *
  *  3-Point-Gauss quadrature formula, exact for polynomials of degree 5.
  *
  *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
@@ -76,6 +80,8 @@ class QGauss3 : public Quadrature<dim>
 
 
 /**
+ * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
+ *
  * 4-Point-Gauss quadrature formula, exact for polynomials of degree 7.
  *
  *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
@@ -91,6 +97,8 @@ class QGauss4 : public Quadrature<dim>
 
 
 /**
+ * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
+ *
  *  5-Point-Gauss quadrature formula, exact for polynomials of degree 9.
  *
  *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
@@ -106,6 +114,8 @@ class QGauss5 : public Quadrature<dim>
 
 
 /**
+ * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
+ *
  *  6-Point-Gauss quadrature formula, exact for polynomials of degree 11.
  *  We have not found explicit
  *  representations of the zeros of the Legendre functions of sixth
@@ -126,6 +136,8 @@ class QGauss6 : public Quadrature<dim>
 
 
 /**
+ * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
+ *
  *  7-Point-Gauss quadrature formula, exact for polynomials of degree 13.
  *  We have not found explicit
  *  representations of the zeros of the Legendre functions of sixth
