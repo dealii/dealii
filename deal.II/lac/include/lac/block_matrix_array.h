@@ -782,7 +782,7 @@ BlockTrianglePrecondition<MATRIX,number>::do_row (
   typename std::vector<typename BlockMatrixArray<MATRIX,number>::Entry>::const_iterator
     diagonal = end;  
   
-  Vector<number>* p_aux = mem->alloc();
+  Vector<number>* p_aux = this->mem->alloc();
   Vector<number>& aux = *p_aux;
   
   aux.reinit(dst.block(row_num), true);
@@ -813,7 +813,7 @@ BlockTrianglePrecondition<MATRIX,number>::do_row (
     diagonal->matrix->vmult(aux, dst.block(row_num));
   dst.block(row_num).equ (diagonal->prefix, aux);
   
-  mem->free(p_aux);
+  this->mem->free(p_aux);
 }
 
 
