@@ -2020,7 +2020,16 @@ inline
 typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::begin () const
 {
-  return const_iterator(this, 0, 0);
+                                   // search for the first line with a nonzero
+                                   // number of entries
+  for (unsigned int r=0; r<n(); ++r)
+    if (cols->row_length(r) > 0)
+      return const_iterator(this, r, 0);
+
+                                   // alright, this matrix is completely
+                                   // empty. that's strange but ok. simply
+                                   // return the end() iterator
+  return end();
 }
 
 
@@ -2038,7 +2047,16 @@ inline
 typename SparseMatrix<number>::iterator
 SparseMatrix<number>::begin ()
 {
-  return iterator(this, 0, 0);
+                                   // search for the first line with a nonzero
+                                   // number of entries
+  for (unsigned int r=0; r<n(); ++r)
+    if (cols->row_length(r) > 0)
+      return iterator(this, r, 0);
+
+                                   // alright, this matrix is completely
+                                   // empty. that's strange but ok. simply
+                                   // return the end() iterator
+  return end();
 }
 
 
