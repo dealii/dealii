@@ -210,6 +210,16 @@ Point<1>::Point (const double, const double, const double)
 };
 
 
+
+template <>
+inline
+Point<2>::Point (const double) 
+{
+  Assert (false, ExcInvalidConstructorCalled());
+};
+
+
+
 template <>
 inline
 Point<2>::Point (const double x, const double y) 
@@ -223,15 +233,6 @@ Point<2>::Point (const double x, const double y)
 template <>
 inline
 Point<2>::Point (const double, const double, const double) 
-{
-  Assert (false, ExcInvalidConstructorCalled());
-};
-
-
-
-template <>
-inline
-Point<3>::Point (const double, const double) 
 {
   Assert (false, ExcInvalidConstructorCalled());
 };
