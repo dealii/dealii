@@ -56,6 +56,8 @@ FunctionDerivative<dim>::set_formula (DifferenceFormula form)
   formula = form;
 }
 
+
+
 template <int dim>
 double
 FunctionDerivative<dim>::value (const Point<dim>   &p,
@@ -86,10 +88,7 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
 using namespace std;
 #endif
 
-//TODO:[WB] Optimize construction of vectors thread-safe
-// Right now, vectors are allocated each time value_list is called.
-// This costs a lot of time and should be replaced by a static object,
-// but that would not be thread-safe anymore.
+
 
 template <int dim>
 void
@@ -98,7 +97,7 @@ FunctionDerivative<dim>::value_list (const typename std::vector<Point<dim> > &po
 				     const unsigned int              component) const
 {
   const unsigned int n = points.size();
-  bool variable_direction = (incr.size() == 1) ? false : true;
+  const bool variable_direction = (incr.size() == 1) ? false : true;
   if (variable_direction)
     Assert (incr.size() == points.size(),
 	    ExcDimensionMismatch(incr.size(), points.size()));
@@ -107,65 +106,88 @@ FunctionDerivative<dim>::value_list (const typename std::vector<Point<dim> > &po
     {
       case Euler:
       {
-	std::vector<Point<dim> > p1(n);
-	std::vector<Point<dim> > p2(n);
-	std::vector<double> e2(n);
-	for (unsigned int i=0;i<n;++i)
+					 // let p1 and p2 be arrays of
+					 // evaluation points shifted
+					 // a little in direction j
+	std::vector<Point<dim> > p1 = points;
+	std::vector<Point<dim> > p2 = points;
+
+	for (unsigned int i=0; i<n; ++i)
 	  {
 	    const unsigned int j = (variable_direction) ? i:0;
-	    p1[i] = points[i]+incr[j];
-	    p2[i] = points[i]-incr[j];
-	  }
-	f.value_list(p1, values, component);
-	f.value_list(p2, e2, component);
-      
-	for (unsigned int i=0;i<n;++i)
-	  {
-	    values[i] = (values[i]-e2[i])/(2*h);
-	  }
-	break;
-      }    
-      case UpwindEuler:
-      {
-	std::vector<Point<dim> > p2(n);
-	std::vector<double> e2(n);
-	for (unsigned int i=0;i<n;++i)
-	  {
-	    const unsigned int j = (variable_direction) ? i:0;
-	    p2[i] = points[i]-incr[j];
-	  }
-	f.value_list(points, values, component);
-	f.value_list(p2, e2, component);
-	for (unsigned int i=0;i<n;++i)
-	  values[i] = (values[i]-e2[i])/h;
+	    p1[i] += incr[j];
+	    p2[i] -= incr[j];
+	  }	
+
+					 // next get values of
+					 // functions at these points
+	std::vector<double> values2(n);
+	f.value_list(p1, values,  component);
+	f.value_list(p2, values2, component);
+
+					 // finally compute finite
+					 // differences
+	for (unsigned int i=0; i<n; ++i)
+	  values[i] = (values[i]-values2[i])/(2*h);
+	  
 	break;
       }
+       
+      case UpwindEuler:
+      {
+					 // compute upwind points
+	std::vector<Point<dim> > p2 = points;
+	for (unsigned int i=0; i<n; ++i)
+	  {
+	    const unsigned int j = (variable_direction) ? i:0;
+	    p2[i] -= incr[j];
+	  }
+
+					 // get values at points
+	std::vector<double> values2(n);
+	f.value_list(points, values,  component);
+	f.value_list(p2,     values2, component);
+
+					 // compute finite differences
+	for (unsigned int i=0; i<n; ++i)
+	  values[i] = (values[i]-values2[i])/h;
+	break;
+      }
+       
       case FourthOrder:
       {
-	std::vector<Point<dim> > p_p(n);
+					 // first compute evaluation
+					 // points
+	std::vector<Point<dim> > p_p = points;
 	std::vector<Point<dim> > p_pp(n);
-	std::vector<Point<dim> > p_m(n);
+	std::vector<Point<dim> > p_m = points;
 	std::vector<Point<dim> > p_mm(n);
+	for (unsigned int i=0;i<n;++i)
+	  {
+	    const unsigned int j = (variable_direction) ? i:0;
+	    p_p[i] += incr[j];
+	    p_pp[i] = p_p[i]+incr[j];
+	    p_m[i] -= incr[j];
+	    p_mm[i] = p_m[i]-incr[j];
+	  }
+
+					 // next compute values of
+					 // function at these
+					 // points. use @p{values} for
+					 // @p{e_mm}
 	std::vector<double> e_p(n);
 	std::vector<double> e_pp(n);
 	std::vector<double> e_m(n);
-	for (unsigned int i=0;i<n;++i)
-	  {
-	    const unsigned int j = (variable_direction) ? i:0;
-	    p_p[i] = points[i]+incr[j];
-	    p_pp[i] = p_p[i]+incr[j];
-	    p_m[i] = points[i]-incr[j];
-	    p_mm[i] = p_m[i]-incr[j];
-	  }
+
 	f.value_list(p_mm, values, component);
-	f.value_list(p_pp, e_pp, component);
-	f.value_list(p_p, e_p, component);
-	f.value_list(p_m, e_m, component);
-      
-	for (unsigned int i=0;i<n;++i)
-	  {
-	    values[i] = (values[i]-e_pp[i]+8*(e_p[i]-e_m[i]))/(12*h);
-	  }
+	f.value_list(p_pp, e_pp,   component);
+	f.value_list(p_p,  e_p,    component);
+	f.value_list(p_m,  e_m,    component);
+
+					 // compute finite differences
+	for (unsigned int i=0; i<n; ++i)
+	  values[i] = (values[i]-e_pp[i]+8*(e_p[i]-e_m[i]))/(12*h);
+	  
 	break;
       }    
 
@@ -186,6 +208,8 @@ FunctionDerivative<dim>::memory_consumption () const
 };
 
 
+
+// explicit instantiations
 template class FunctionDerivative<1>;
 template class FunctionDerivative<2>;
 template class FunctionDerivative<3>;
