@@ -265,10 +265,10 @@ FiniteElementBase<dim>::prolongation_is_implemented () const
 {
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
     {
-      Assert ((prolongation[c].m() == dofs_per_cell) ||
+      Assert ((prolongation[c].m() == this->dofs_per_cell) ||
               (prolongation[c].m() == 0),
               ExcInternalError());
-      Assert ((prolongation[c].n() == dofs_per_cell) ||
+      Assert ((prolongation[c].n() == this->dofs_per_cell) ||
               (prolongation[c].n() == 0),
               ExcInternalError());
       if ((prolongation[c].m() == 0) ||
