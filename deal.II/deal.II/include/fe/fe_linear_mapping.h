@@ -13,13 +13,16 @@
 
 
 /**
- * Abstract base class for concrete finite elements which use a
- * (bi-,tri-)linear mapping from the unit cell to the real cell. Some
- * functions can be singled out from these elements and are collected
- * in this one.
+ * Implementation of Q1 transformation to the unit cell.
+ * All finite element classes using a Q1 mapping of the grid cell to the
+ * unit cell may be derived from this class. The grid transformation functions
+ * are implemented here and do not have to be taken care of later.
  */
 template <int dim>
-class FELinearMapping : public FiniteElement<dim> {
+class FELinearMapping
+  :
+  public FiniteElement<dim>
+{
   public:
 				     /**
 				      * Constructor. Simply passes through
