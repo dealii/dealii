@@ -1,7 +1,7 @@
 ######################################################################
 # $Id$
 #
-# Copyright (C) 2001, 2003, the deal.II authors
+# Copyright (C) 2001, 2003, 2005, the deal.II authors
 #
 # Remove insignificant volatile data from output files of tests
 #
@@ -11,6 +11,11 @@
 #  start and final residual in iterations
 #  small doubles
 ######################################################################
+
+# Remove absolute path names
+$D = $0;
+$D =~ s!common/scripts/normalize.pl!!;
+s!$D!DEAL_II_PATH/!g;
 
 # Remove JobID
 
