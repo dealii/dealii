@@ -56,10 +56,10 @@ template <typename number2>
 LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator = (const FullMatrix<number2>& M)
 {
-  Assert (n_rows() == M.m(), ExcDimensionMismatch(n_rows(), M.m()));
-  Assert (n_cols() == M.n(), ExcDimensionMismatch(n_cols(), M.n()));
-  for (unsigned int i=0;i<n_rows();++i)
-    for (unsigned int j=0;j<n_cols();++j)
+  Assert (this->n_rows() == M.m(), ExcDimensionMismatch(this->n_rows(), M.m()));
+  Assert (this->n_cols() == M.n(), ExcDimensionMismatch(this->n_cols(), M.n()));
+  for (unsigned int i=0;i<this->n_rows();++i)
+    for (unsigned int j=0;j<this->n_cols();++j)
       (*this)(i,j) = M(i,j);
   return *this;
 }
@@ -173,7 +173,7 @@ LAPACKFullMatrix<number>::Tvmult_add (
 }
 
 
-template LAPACKFullMatrix<double>;
+template class LAPACKFullMatrix<double>;
 template LAPACKFullMatrix<double> &
 LAPACKFullMatrix<double>::operator = (const FullMatrix<double>& M);
 template LAPACKFullMatrix<double> &
