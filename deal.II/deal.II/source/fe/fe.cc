@@ -21,7 +21,9 @@ FiniteElementData<1>::FiniteElementData () :
 		dofs_per_line(0),
 		dofs_per_face(0),
 		total_dofs(0),
-		n_transform_functions(0) {
+		n_transform_functions(0),
+		n_components(0)
+{
   Assert (false, ExcInternalError());
 };
 
@@ -29,12 +31,14 @@ FiniteElementData<1>::FiniteElementData () :
 
 FiniteElementData<1>::FiniteElementData (const unsigned int dofs_per_vertex,
 					 const unsigned int dofs_per_line,
-					 const unsigned int n_transform_functions) :
+					 const unsigned int n_transform_functions,
+					 const unsigned int n_components) :
 		dofs_per_vertex(dofs_per_vertex),
 		dofs_per_line(dofs_per_line),
 		dofs_per_face(dofs_per_vertex),
 		total_dofs (2*dofs_per_vertex+dofs_per_line),
-		n_transform_functions(n_transform_functions)
+		n_transform_functions(n_transform_functions),
+		n_components(n_components)
 {};
 
 
@@ -44,7 +48,8 @@ FiniteElementData<1>::FiniteElementData (const FiniteElementData<1> &fe_data) :
 		dofs_per_line(fe_data.dofs_per_line),
 		dofs_per_face(fe_data.dofs_per_face),
 		total_dofs (fe_data.total_dofs),
-		n_transform_functions(fe_data.n_transform_functions)
+		n_transform_functions(fe_data.n_transform_functions),
+		n_components(fe_data.n_components)
 {};
 
 
@@ -52,7 +57,8 @@ FiniteElementData<1>::FiniteElementData (const FiniteElementData<1> &fe_data) :
 bool FiniteElementData<1>::operator== (const FiniteElementData<1> &f) const {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
 	  (dofs_per_line == f.dofs_per_line) &&
-	  (total_dofs == f.total_dofs));
+	  (total_dofs == f.total_dofs) &&
+	  (n_components == f.n_components));
 };
 
 #endif
@@ -68,7 +74,9 @@ FiniteElementData<2>::FiniteElementData () :
 		dofs_per_quad(0),
 		dofs_per_face(0),
 		total_dofs(0),
-		n_transform_functions(0) {
+		n_transform_functions(0),
+		n_components(0)
+{
   Assert (false, ExcInternalError());
 };
 
@@ -77,7 +85,8 @@ FiniteElementData<2>::FiniteElementData () :
 FiniteElementData<2>::FiniteElementData (const unsigned int dofs_per_vertex,
 					 const unsigned int dofs_per_line,
 					 const unsigned int dofs_per_quad,
-					 const unsigned int n_transform_functions) :
+					 const unsigned int n_transform_functions,
+					 const unsigned int n_components) :
 		dofs_per_vertex(dofs_per_vertex),
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(dofs_per_quad),
@@ -86,7 +95,8 @@ FiniteElementData<2>::FiniteElementData (const unsigned int dofs_per_vertex,
 		total_dofs (4*dofs_per_vertex+
 			    4*dofs_per_line+
 			    dofs_per_quad),
-		n_transform_functions (n_transform_functions)
+		n_transform_functions (n_transform_functions),
+		n_components(n_components)
 {};
 
 
@@ -97,7 +107,8 @@ FiniteElementData<2>::FiniteElementData (const FiniteElementData<2> &fe_data) :
 		dofs_per_quad(fe_data.dofs_per_quad),
 		dofs_per_face(fe_data.dofs_per_face),
 		total_dofs (fe_data.total_dofs),
-		n_transform_functions (fe_data.n_transform_functions)
+		n_transform_functions (fe_data.n_transform_functions),
+		n_components(fe_data.n_components)
 {};
 
 
@@ -106,7 +117,8 @@ bool FiniteElementData<2>::operator== (const FiniteElementData<2> &f) const {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
 	  (dofs_per_line == f.dofs_per_line) &&
 	  (dofs_per_quad == f.dofs_per_quad) &&
-	  (total_dofs == f.total_dofs));
+	  (total_dofs == f.total_dofs) &&
+	  (n_components == f.n_components));
 };
 
 #endif

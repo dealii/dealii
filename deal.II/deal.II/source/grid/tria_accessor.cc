@@ -8,6 +8,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.templates.h>
 #include <grid/geometry_info.h>
+#include <math.h>
 
 /* Note: explicit instantiations at the end of the different sections!       */
 

@@ -9,7 +9,6 @@
 #include <fe/fe_linear_mapping.h>
 
 
-
 /**
  * Define a (bi-, tri-, etc)linear finite element in #dim# space dimensions,
  * along with (bi-, tri-)linear (therefore isoparametric) transforms from the

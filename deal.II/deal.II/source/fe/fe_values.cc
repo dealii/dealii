@@ -62,7 +62,10 @@ double FEValuesBase<dim>::shape_value (const unsigned int i,
 
 template <int dim>
 void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
-					     vector<double> &values) const {
+					     vector<double> &values) const
+{
+  Assert (fe.n_components == 1,
+	  ExcWrongNoOfComponents());
   Assert (selected_dataset<shape_values.size(),
 	  ExcInvalidIndex (selected_dataset, shape_values.size()));
   Assert (values.size() == n_quadrature_points,

@@ -8,7 +8,7 @@
 
 #include <fe/fe.h>
 #include <base/quadrature.h>
-
+#include <math.h>
 
 /**
  * This class implements a rather unusual macro element, the so-called

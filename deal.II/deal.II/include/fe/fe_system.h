@@ -21,9 +21,8 @@
  * shape functions. These #N# shape functions for each degree of freedom
  * of the basic finite element are numbered consecutively, i.e. for
  * the common case of a velocity #(u,v,w)#, the sequence of basis functions
- * would be #u1, v1, w1, u2, v2, w2, ..., uN, vN, wN#. The other possibility
- * would have been #u1, ..., uN, v1, ..., vN, w1, ...wN#, but we chose the
- * first way.
+ * will be #u1, v1, w1, u2, v2, w2, ..., uN, vN, wN# compared to
+ *  #u1, ..., uN, v1, ..., vN, w1, ...wN#.
  *
  * Using this scheme, the overall numbering of degrees of freedom is as
  * follows: for each subobject (vertex, line, quad, or hex), the degrees
@@ -42,7 +41,7 @@
  * \end{itemize}
  *
  * In the most cases, the composed element behaves as if it were a usual element
- * with more degrees of freedom. Howeverm the underlying structure is visible in
+ * with more degrees of freedom. However the underlying structure is visible in
  * the restriction, prolongation and interface constraint matrices, which do not
  * couple the degrees of freedom of the subobject. E.g. the continuity requirement
  * is imposed for the shape functions of the subobjects separately; no requirement
@@ -66,7 +65,14 @@
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
-class FESystem : public FiniteElement<dim> {
+class FESystem : public FiniteElement<dim>
+{
+				   /**
+				    * Copy constructor prohibited.
+				    */
+  FESystem(const FESystem<dim>&);
+  
+
   public:
 
 				     /**
@@ -298,8 +304,48 @@ class FESystem : public FiniteElement<dim> {
 				     const unsigned int           subface_no,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;    
-    
+
+				     /**
+				      * Number of subelements of this object.
+				      * Since these objects can have
+				      * subobjects themselves, this may be
+				      * smaller than the total number of finite
+				      * elements composed into this structure.
+				      * This is definitely not what you'd
+				      * usally intend, so don't do it!
+				      */
+    const unsigned int n_sub_elements;
+
+				   /**
+				    * Access to the single valued element.
+				    *
+				    * If you assemble your system
+				    * matrix, you usually will not
+				    * want to have an FEValues object
+				    * with a lot of equal entries. Ok,
+				    * so initialize your FEValues with
+				    * the #base_element# yuo get by
+				    * this function.
+				    *
+				    */
+  const FiniteElement<dim>& get_base_element() const;
+
+				   /**
+				    * Calculate the actual position.
+				    *
+				    * For a given #component#
+				    * (e.g. u,v,w in the example
+				    * above) of the #base# function of
+				    * the #base_element#, return the
+				    * actual index in the local
+				    * degrees of freedom vector of the
+				    * system.
+				    *
+				    */
+  unsigned index(unsigned component, unsigned base) const;
+  
   private:
+
 				     /**
 				      * Pointer to an object of the underlying
 				      * finite element class. This object is
@@ -307,14 +353,6 @@ class FESystem : public FiniteElement<dim> {
 				      */
     const FiniteElement<dim> *const base_element;
 
-				     /**
-				      * Number of subelements of this object.
-				      * Since these objects may have
-				      * subobjects themselves, this may be
-				      * smaller than the total number of finite
-				      * elements composed into this structure.
-				      */
-    const unsigned int n_sub_elements;
     
 				     /**
 				      * Helper function used in the constructor:
@@ -352,11 +390,25 @@ class FESystem : public FiniteElement<dim> {
 /* ------------------------- template functions ------------------------- */
 
 template <int dim>
+inline const FiniteElement<dim>&
+FESystem<dim>::get_base_element() const
+{
+  return *base_element;
+}
+
+template <int dim>
+inline unsigned
+FESystem<dim>::index(unsigned component, unsigned base) const
+{
+  return n_sub_elements * base + component;
+}
+
+template <int dim>
 template <typename FE>
 FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
 		FiniteElement (multiply_dof_numbers(fe, n_elements)),
-		base_element (new FE()),
-		n_sub_elements (n_elements)
+		n_sub_elements (n_elements),
+		base_element (new FE())
 {
   base_element->subscribe ();
   initialize_matrices ();

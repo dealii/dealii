@@ -64,6 +64,11 @@ struct FiniteElementData<1> {
 				      */
     const unsigned int n_transform_functions;
     
+				   /**
+				    * Number of components.
+				    */
+  const unsigned int n_components;
+
     				     /**
 				      * Default constructor. Constructs an element
 				      * which is not so useful. Checking
@@ -78,7 +83,8 @@ struct FiniteElementData<1> {
 				      */
     FiniteElementData (const unsigned int dofs_per_vertex,
 		       const unsigned int dofs_per_line,
-		       const unsigned int n_transform_functions);
+		       const unsigned int n_transform_functions,
+		       const unsigned int n_components = 1);
 
 				     /**
 				      * Another frequently used useful
@@ -152,6 +158,11 @@ struct FiniteElementData<2> {
 				      */
     const unsigned int n_transform_functions;
 
+				   /**
+				    * Number of components.
+				    */
+  const unsigned int n_components;
+
     				     /**
 				      * Default constructor. Constructs an element
 				      * which is not so useful. Checking
@@ -167,7 +178,8 @@ struct FiniteElementData<2> {
     FiniteElementData (const unsigned int dofs_per_vertex,
 		       const unsigned int dofs_per_line,
 		       const unsigned int dofs_per_quad,
-		       const unsigned int n_transform_functions);
+		       const unsigned int n_transform_functions,
+		       const unsigned int n_components = 1);
 
     				     /**
 				      * Another frequently used useful
@@ -1121,6 +1133,17 @@ class FiniteElement : public FiniteElementBase<dim> {
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary, 
 					dFMatrix            &local_mass_matrix) const =0;
+
+				   /**
+				    * Compute system index from components.
+				    */
+  virtual unsigned component_to_system_index (unsigned component,
+					      unsigned component_index) const;
+  
+				   /**
+				    * Compute component and index from system index.
+				    */
+  virtual pair<unsigned,unsigned> system_to_component_index (unsigned index) const; 
     
 				     /**
 				      * Exception

@@ -286,12 +286,30 @@ class FEValuesBase {
 				      * of the derived class was called,
 				      * at the quadrature points.
 				      *
+				      * To get values of
+				      * multi-component elements,
+				      * there is another
+				      * #get_function_values#
+				      * returning a vector of vectors of
+				      * results.
+				      *
 				      * The function assumes that the
 				      * #values# object already has the
-				      * right size.
+				      * right size. 
 				      */
     void get_function_values (const dVector      &fe_function,
 			      vector<double>     &values) const;
+
+				   /**
+				    * Access to vector valued finite element functions.
+				    *
+				    * This function does the same as
+				    * the other #get_function_values#,
+				    * but applied to multi-component
+				    * elements.
+				    */
+    void get_function_values (const dVector      &fe_function,
+			      vector<vector<double> >     &values) const;
 
     				     /**
 				      * Return the gradient of the #i#th shape
@@ -471,6 +489,10 @@ class FEValuesBase {
 				     /**
 				      * Exception
 				      */
+  DeclException0 (ExcWrongNoOfComponents);
+				   /**
+				    * Exception.
+				    */
     DeclException2 (ExcWrongVectorSize,
 		    int, int,
 		    << "Vector has wrong size " << arg1

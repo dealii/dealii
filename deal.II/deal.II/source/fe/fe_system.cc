@@ -9,7 +9,8 @@
 
 
 template <int dim>
-FESystem<dim>::~FESystem () {
+FESystem<dim>::~FESystem ()
+{
   base_element->unsubscribe ();
   delete base_element;
 };
@@ -17,11 +18,12 @@ FESystem<dim>::~FESystem () {
 
 
 template <int dim>
-void FESystem<dim>::initialize_matrices () {
+void FESystem<dim>::initialize_matrices ()
+{
 				   // distribute the matrices of the base
 				   // finite element to the matrices of
 				   // this object
-  for (unsigned int i=0; i<base_element->total_dofs; ++i)
+/*  for (unsigned int i=0; i<base_element->total_dofs; ++i)
     for (unsigned int j=0; j<base_element->total_dofs; ++j)
       for (unsigned int n=0; n<n_sub_elements; ++n)
 					 // only fill diagonals of the blocks
@@ -40,7 +42,7 @@ void FESystem<dim>::initialize_matrices () {
 				 j*n_sub_elements + n)
 	    = base_element->constraints()(i,j);
 	};
-};
+*/};
 
 
 
@@ -53,7 +55,8 @@ FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe_data,
 				   const unsigned int          N) {
   return FiniteElementData<1> (fe_data.dofs_per_vertex * N,
 			       fe_data.dofs_per_line * N,
-			       fe_data.n_transform_functions);
+			       fe_data.n_transform_functions,
+			       fe_data.n_components * N);
 };
 
 #endif
@@ -68,7 +71,8 @@ FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe_data,
   return FiniteElementData<2> (fe_data.dofs_per_vertex * N,
 			       fe_data.dofs_per_line * N,
 			       fe_data.dofs_per_quad * N,
-			       fe_data.n_transform_functions);
+			       fe_data.n_transform_functions,
+			       fe_data.n_components * N);
 };
 
 #endif

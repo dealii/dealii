@@ -6,6 +6,7 @@
 /*----------------------------   fe_linear_mapping.h     ---------------------------*/
 
 
+#include <math.h>
 #include <fe/fe.h>
 
 
