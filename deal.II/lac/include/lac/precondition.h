@@ -214,7 +214,7 @@ class PreconditionRelaxation
  * preconditionig method.
  *
  * Usually, the use of #ReductionControl# is preferred over the use of
- * the basic #SolverControl in defining this solver.
+ * the basic #SolverControl# in defining this solver.
  *
  * @author Guido Kanschat, 1999
  */
