@@ -165,64 +165,64 @@ class MGCoarseGridLACIteration :  public Subscriptor
  * context. This class is an abstract one and has no implementations of
  * possible algorithms for these operations.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002
  */
-//  template <class VECTOR>
-//  class MGTransferBase : public Subscriptor
-//  {
-//    public:
-//  				     /**
-//  				      * Destructor. Does nothing here, but
-//  				      * needs to be declared virtual anyway.
-//  				      */
-//      virtual ~MGTransferBase();
+ template <class VECTOR>
+ class MGTransfer : public Subscriptor
+ {
+   public:
+ 				     /**
+ 				      * Destructor. Does nothing here, but
+ 				      * needs to be declared virtual anyway.
+ 				      */
+     virtual ~MGTransfer();
 
-//  				     /**
-//  				      * Prolongate a vector from level
-//  				      * @p{to_level-1} to level
-//  				      * @p{to_level}. The previous
-//  				      * content of @p{dst} is
-//  				      * overwritten.
-//  				      *
-//  				      * @p{src} is assumed to be a vector with
-//  				      * as many elements as there are degrees
-//  				      * of freedom on the coarser level of
-//  				      * the two involved levels, while @p{src}
-//  				      * shall have as many elements as there
-//  				      * are degrees of freedom on the finer
-//  				      * level.
-//  				      */
-//      virtual void prolongate (const unsigned int to_level,
-//  			     VECTOR&            dst,
-//  			     const VECTOR&      src) const = 0;
+ 				     /**
+ 				      * Prolongate a vector from level
+ 				      * @p{to_level-1} to level
+ 				      * @p{to_level}. The previous
+ 				      * content of @p{dst} is
+ 				      * overwritten.
+ 				      *
+ 				      * @p{src} is assumed to be a vector with
+ 				      * as many elements as there are degrees
+ 				      * of freedom on the coarser level of
+ 				      * the two involved levels, while @p{src}
+ 				      * shall have as many elements as there
+ 				      * are degrees of freedom on the finer
+ 				      * level.
+ 				      */
+     virtual void prolongate (const unsigned int to_level,
+ 			     VECTOR&            dst,
+ 			     const VECTOR&      src) const = 0;
 
-//  				     /**
-//  				      * Restrict a vector from level
-//  				      * @p{from_level} to level
-//  				      * @p{from_level-1} and add this
-//  				      * restriction to
-//  				      * @p{dst}. Obviously, if the
-//  				      * refined region on level
-//  				      * @p{from_level} is smaller than
-//  				      * that on level @p{from_level-1},
-//  				      * some degrees of freedom in
-//  				      * @p{dst} are not covered and will
-//  				      * not be altered. For the other
-//  				      * degress of freedom, the result
-//  				      * of the restriction is added.
-//  				      *
-//  				      * @p{src} is assumed to be a vector with
-//  				      * as many elements as there are degrees
-//  				      * of freedom on the finer level of
-//  				      * the two involved levels, while @p{src}
-//  				      * shall have as many elements as there
-//  				      * are degrees of freedom on the coarser
-//  				      * level.
-//  				      */
-//      virtual void restrict_and_add (const unsigned int from_level,
-//  				   VECTOR&            dst,
-//  				   const VECTOR&      src) const = 0;
-//  };
+ 				     /**
+ 				      * Restrict a vector from level
+ 				      * @p{from_level} to level
+ 				      * @p{from_level-1} and add this
+ 				      * restriction to
+ 				      * @p{dst}. Obviously, if the
+ 				      * refined region on level
+ 				      * @p{from_level} is smaller than
+ 				      * that on level @p{from_level-1},
+ 				      * some degrees of freedom in
+ 				      * @p{dst} are not covered and will
+ 				      * not be altered. For the other
+ 				      * degress of freedom, the result
+ 				      * of the restriction is added.
+ 				      *
+ 				      * @p{src} is assumed to be a vector with
+ 				      * as many elements as there are degrees
+ 				      * of freedom on the finer level of
+ 				      * the two involved levels, while @p{src}
+ 				      * shall have as many elements as there
+ 				      * are degrees of freedom on the coarser
+ 				      * level.
+ 				      */
+     virtual void restrict_and_add (const unsigned int from_level,
+ 				   VECTOR&            dst,
+ 				   const VECTOR&      src) const = 0;
+ };
 
 
 

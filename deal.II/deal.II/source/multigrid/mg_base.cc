@@ -19,16 +19,16 @@
 #include <cmath>
 
 
-//////////////////////////////////////////////////////////////////////
-
-//  template <class VECTOR>
-//  MGTransferBase<VECTOR>::~MGTransferBase()
-//  {};
 
 
-//  // Explicit instantiations
+ template <class VECTOR>
+ MGTransfer<VECTOR>::~MGTransfer()
+ {};
 
-//  template class MGTransferBase<Vector<double> >;
-//  template class MGTransferBase<Vector<float> >;
-//  template class MGTransferBase<BlockVector<double> >;
-//  template class MGTransferBase<BlockVector<float> >;
+
+ // Explicit instantiations
+
+ template class MGTransfer<Vector<double> >;
+ template class MGTransfer<Vector<float> >;
+ template class MGTransfer<BlockVector<double> >;
+ template class MGTransfer<BlockVector<float> >;

@@ -29,9 +29,10 @@ template <int dim> class MGDoFHandler;
  * once by looping over all cells and storing the result in a matrix for
  * each level, but requires additional memory.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002
  */
-class MGTransferPrebuilt : public Subscriptor // MGTransferBase<Vector<double> > 
+template<typename number>
+class MGTransferPrebuilt : public MGTransfer<Vector<number> > 
 {
   public:
 				     /**
@@ -62,8 +63,8 @@ class MGTransferPrebuilt : public Subscriptor // MGTransferBase<Vector<double> >
 				      * level.
 				      */
     virtual void prolongate (const unsigned int    to_level,
-			     Vector<double>       &dst,
-			     const Vector<double> &src) const;
+			     Vector<number>       &dst,
+			     const Vector<number> &src) const;
 
 				     /**
 				      * Restrict a vector from level
@@ -89,8 +90,8 @@ class MGTransferPrebuilt : public Subscriptor // MGTransferBase<Vector<double> >
 				      * level.
 				      */
     virtual void restrict_and_add (const unsigned int    from_level,
-				   Vector<double>       &dst,
-				   const Vector<double> &src) const;
+				   Vector<number>       &dst,
+				   const Vector<number> &src) const;
 
     				     /**
 				      * Transfer from a vector on the
@@ -101,7 +102,7 @@ class MGTransferPrebuilt : public Subscriptor // MGTransferBase<Vector<double> >
     template<int dim, class InVector>
     void
     copy_to_mg (const MGDoFHandler<dim>& mg_dof,
-		MGLevelObject<Vector<double> > &dst,
+		MGLevelObject<Vector<number> > &dst,
 		const InVector &src) const;
 
 				     /**
@@ -111,7 +112,7 @@ class MGTransferPrebuilt : public Subscriptor // MGTransferBase<Vector<double> >
 				      * Copies data from active
 				      * portions of an MGVector into
 				      * the respective positions of a
-				      * @p{Vector<double>}. In order to
+				      * @p{Vector<number>}. In order to
 				      * keep the result consistent,
 				      * constrained degrees of freedom
 				      * are set to zero.
@@ -120,7 +121,7 @@ class MGTransferPrebuilt : public Subscriptor // MGTransferBase<Vector<double> >
     void
     copy_from_mg (const MGDoFHandler<dim>& mg_dof,
 		  OutVector &dst,
-		  const MGLevelObject<Vector<double> > &src) const;
+		  const MGLevelObject<Vector<number> > &src) const;
 
 				     /**
 				      * Add a multi-level vector to a
@@ -134,7 +135,7 @@ class MGTransferPrebuilt : public Subscriptor // MGTransferBase<Vector<double> >
     void
     copy_from_mg_add (const MGDoFHandler<dim>& mg_dof,
 		      OutVector &dst,
-		      const MGLevelObject<Vector<double> > &src) const;
+		      const MGLevelObject<Vector<number> > &src) const;
 
 				     /**
 				      * Finite element does not
@@ -241,9 +242,10 @@ class MGTransferBlockBase
  * transfer routines may only have as many components as there are
  * @p{true}s in the selected-field.
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001, 2002
  */
-class MGTransferBlock : public Subscriptor, // MGTransferBase<BlockVector<double> >,
+template <typename number>
+class MGTransferBlock : public MGTransfer<BlockVector<number> >,
 			private MGTransferBlockBase
 {
   public:
@@ -286,8 +288,8 @@ class MGTransferBlock : public Subscriptor, // MGTransferBase<BlockVector<double
 				      * level.
 				      */
     virtual void prolongate (const unsigned int    to_level,
-			     BlockVector<double>       &dst,
-			     const BlockVector<double> &src) const;
+			     BlockVector<number>       &dst,
+			     const BlockVector<number> &src) const;
 
 				     /**
 				      * Restrict a vector from level
@@ -313,8 +315,8 @@ class MGTransferBlock : public Subscriptor, // MGTransferBase<BlockVector<double
 				      * level.
 				      */
     virtual void restrict_and_add (const unsigned int    from_level,
-				   BlockVector<double>       &dst,
-				   const BlockVector<double> &src) const;
+				   BlockVector<number>       &dst,
+				   const BlockVector<number> &src) const;
 
   protected: 
 };
@@ -327,9 +329,10 @@ class MGTransferBlock : public Subscriptor, // MGTransferBase<BlockVector<double
  * selecting a single component. The transfer operators themselves are
  * implemented for simple vectors again.
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001, 2002
  */
-class MGTransferSelect : public Subscriptor, // MGTransferBase<Vector<double> >,
+template <typename number>
+class MGTransferSelect : public MGTransfer<Vector<number> >,
 			 private MGTransferBlockBase
 {
   public:
@@ -369,8 +372,8 @@ class MGTransferSelect : public Subscriptor, // MGTransferBase<Vector<double> >,
 				      * level.
 				      */
     virtual void prolongate (const unsigned int    to_level,
-			     Vector<double>       &dst,
-			     const Vector<double> &src) const;
+			     Vector<number>       &dst,
+			     const Vector<number> &src) const;
 
 				     /**
 				      * Restrict a vector from level
@@ -396,8 +399,8 @@ class MGTransferSelect : public Subscriptor, // MGTransferBase<Vector<double> >,
 				      * level.
 				      */
     virtual void restrict_and_add (const unsigned int    from_level,
-				   Vector<double>       &dst,
-				   const Vector<double> &src) const;
+				   Vector<number>       &dst,
+				   const Vector<number> &src) const;
 
     				     /**
 				      * Transfer from a vector on the
@@ -408,7 +411,7 @@ class MGTransferSelect : public Subscriptor, // MGTransferBase<Vector<double> >,
     template<int dim, class InVector>
     void
     copy_to_mg (const MGDoFHandler<dim>& mg_dof,
-		MGLevelObject<Vector<double> > &dst,
+		MGLevelObject<Vector<number> > &dst,
 		const InVector &src) const;
 
 				     /**
@@ -418,7 +421,7 @@ class MGTransferSelect : public Subscriptor, // MGTransferBase<Vector<double> >,
 				      * Copies data from active
 				      * portions of an MGVector into
 				      * the respective positions of a
-				      * @p{Vector<double>}. In order to
+				      * @p{Vector<number>}. In order to
 				      * keep the result consistent,
 				      * constrained degrees of freedom
 				      * are set to zero.
@@ -427,7 +430,7 @@ class MGTransferSelect : public Subscriptor, // MGTransferBase<Vector<double> >,
     void
     copy_from_mg (const MGDoFHandler<dim>& mg_dof,
 		  OutVector &dst,
-		  const MGLevelObject<Vector<double> > &src) const;
+		  const MGLevelObject<Vector<number> > &src) const;
 
 				     /**
 				      * Add a multi-level vector to a
@@ -441,7 +444,7 @@ class MGTransferSelect : public Subscriptor, // MGTransferBase<Vector<double> >,
     void
     copy_from_mg_add (const MGDoFHandler<dim>& mg_dof,
 		      OutVector &dst,
-		      const MGLevelObject<Vector<double> > &src) const;
+		      const MGLevelObject<Vector<number> > &src) const;
 
   private:
 

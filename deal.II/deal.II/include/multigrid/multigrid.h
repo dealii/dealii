@@ -54,7 +54,7 @@
  * returning the solution to the system @p{Ax=b} on the coarsest level
  * in @p{x}.
  * 
- * @author Guido Kanschat, 1999, 2001
+ * @author Guido Kanschat, 1999, 2001, 2002
  */
 template <class VECTOR>
 class Multigrid : public Subscriptor
@@ -111,9 +111,9 @@ class Multigrid : public Subscriptor
 				      * function is done in
 				      * @p{level_mgstep}.
 				      */
-    template <class MATRIX, class TRANSFER, class SMOOTHER, class COARSE>
+    template <class MATRIX, class SMOOTHER, class COARSE>
     void vcycle(const MGLevelObject<MATRIX>& matrix,
-		const TRANSFER&              transfer,
+		const MGTransfer<VECTOR>&    transfer,
 		const SMOOTHER&              pre_smooth,
 		const SMOOTHER&              post_smooth,
 		const COARSE&                cgs);
@@ -143,10 +143,10 @@ class Multigrid : public Subscriptor
 				      * is used to solve the matrix of
 				      * this level.
 				      */
-    template <class MATRIX, class TRANSFER, class SMOOTHER, class COARSE>
+    template <class MATRIX, class SMOOTHER, class COARSE>
     void level_mgstep (const unsigned int           level,
 		       const MGLevelObject<MATRIX>& matrix,
-		       const TRANSFER&              transfer,
+		       const MGTransfer<VECTOR>& transfer,
 		       const SMOOTHER&              pre_smooth,
 		       const SMOOTHER&              post_smooth,
 		       const COARSE&                cgs);
@@ -189,7 +189,7 @@ class Multigrid : public Subscriptor
     DeclException2(ExcSwitchedLevels, int, int,
 		   << "minlevel and maxlevel switched, should be: "
 		   << arg1 << "<=" << arg2);
-    template<int dim, class MATRIX, class VECTOR2, class TRANSFER, class SMOOTHER, class COARSE> friend class PreconditionMG;
+    template<int dim, class MATRIX, class VECTOR2, class SMOOTHER, class TRANSFER, class COARSE> friend class PreconditionMG;
 };
 
 
@@ -203,7 +203,7 @@ class Multigrid : public Subscriptor
  * to store @p{src} in the right hand side of the multi-level method and
  * @p{void copy_from_mg(VECTOR&)} to store the result of the v-cycle in @p{dst}.
  *
- * @author Guido Kanschat, 1999
+ * @author Guido Kanschat, 1999, 2000, 2001, 2002
  */
 template<int dim, class MATRIX, class VECTOR, class TRANSFER, class SMOOTHER, class COARSE>
 class PreconditionMG : public Subscriptor
@@ -218,7 +218,7 @@ class PreconditionMG : public Subscriptor
     PreconditionMG(const MGDoFHandler<dim>&     mg_dof,
 		   Multigrid<VECTOR>&           mg,
 		   const MGLevelObject<MATRIX>& matrix,
-		   const TRANSFER&              transfer,
+		   const TRANSFER& transfer,
 		   const SMOOTHER&              pre,
 		   const SMOOTHER&              post,
 		   const COARSE&                coarse);
@@ -326,11 +326,11 @@ Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 
 
 template <class VECTOR>
-template <class MATRIX, class TRANSFER, class SMOOTHER, class COARSE>
+template <class MATRIX, class SMOOTHER, class COARSE>
 void
 Multigrid<VECTOR>::level_mgstep(const unsigned int        level,
 				const MGLevelObject<MATRIX>& matrix,
-				const TRANSFER&              transfer,
+				const MGTransfer<VECTOR>& transfer,
 				const SMOOTHER     &pre_smooth,
 				const SMOOTHER     &post_smooth,
 				const COARSE &coarse_grid_solver)
@@ -413,10 +413,10 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int        level,
 
 
 template <class VECTOR>
-template <class MATRIX, class TRANSFER, class SMOOTHER, class COARSE>
+template <class MATRIX, class SMOOTHER, class COARSE>
 void
 Multigrid<VECTOR>::vcycle(const MGLevelObject<MATRIX>& matrix,
-			  const TRANSFER&              transfer,
+			  const MGTransfer<VECTOR>& transfer,
 			  const SMOOTHER     &pre_smooth,
 			  const SMOOTHER     &post_smooth,
 			  const COARSE &coarse_grid_solver)

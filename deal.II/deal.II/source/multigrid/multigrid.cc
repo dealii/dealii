@@ -28,8 +28,10 @@
 /* ----------------------------- MGTransferPrebuilt ------------------------ */
 
 
+template <typename number>
 template <int dim>
-void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof) 
+void MGTransferPrebuilt<number>::build_matrices (
+  const MGDoFHandler<dim> &mg_dof) 
 {
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
@@ -144,8 +146,9 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 
 
 template <int dim>
-void MGTransferBlockBase::build_matrices (const MGDoFHandler<dim> &mg_dof,
-				      std::vector<bool> select) 
+void MGTransferBlockBase::build_matrices (
+  const MGDoFHandler<dim> &mg_dof,
+  std::vector<bool> select) 
 {
   const FiniteElement<dim>& fe = mg_dof.get_fe();
   const unsigned int n_components  = fe.n_components();
@@ -306,9 +309,11 @@ void MGTransferBlockBase::build_matrices (const MGDoFHandler<dim> &mg_dof,
 };
 
 
+template <typename number>
 template <int dim>
-void MGTransferBlock::build_matrices (const MGDoFHandler<dim> &mg_dof,
-					  std::vector<bool> select) 
+void MGTransferBlock<number>::build_matrices (
+  const MGDoFHandler<dim> &mg_dof,
+  std::vector<bool> select) 
 {
   if (select.size() == 0)
     select = std::vector<bool> (mg_dof.get_fe().n_components(), true);
@@ -317,9 +322,11 @@ void MGTransferBlock::build_matrices (const MGDoFHandler<dim> &mg_dof,
 }
 
 
+template <typename number>
 template <int dim>
-void MGTransferSelect::build_matrices (const MGDoFHandler<dim> &mg_dof,
-					 unsigned int select)
+void MGTransferSelect<number>::build_matrices (
+  const MGDoFHandler<dim> &mg_dof,
+  unsigned int select)
 {
   selected = select;
   std::vector<bool> s(mg_dof.get_fe().n_components(), false);
@@ -333,15 +340,29 @@ void MGTransferSelect::build_matrices (const MGDoFHandler<dim> &mg_dof,
 // explicit instatations
 
 template
-void MGTransferPrebuilt::build_matrices<deal_II_dimension>
+void MGTransferPrebuilt<float>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof);
 
 template
-void MGTransferBlock::build_matrices<deal_II_dimension>
+void MGTransferBlock<float>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
  std::vector<bool>);
 
 template
-void MGTransferSelect::build_matrices<deal_II_dimension>
+void MGTransferSelect<float>::build_matrices<deal_II_dimension>
+(const MGDoFHandler<deal_II_dimension> &mg_dof,
+ unsigned int);
+
+template
+void MGTransferPrebuilt<double>::build_matrices<deal_II_dimension>
+(const MGDoFHandler<deal_II_dimension> &mg_dof);
+
+template
+void MGTransferBlock<double>::build_matrices<deal_II_dimension>
+(const MGDoFHandler<deal_II_dimension> &mg_dof,
+ std::vector<bool>);
+
+template
+void MGTransferSelect<double>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
  unsigned int);

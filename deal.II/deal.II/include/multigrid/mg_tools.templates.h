@@ -26,11 +26,13 @@
 //TODO:[?] This function needs to be specially implemented, since in 2d mode we use faces
 #if deal_II_dimension == 1
 
+template <typename number>
 template <int dim, class InVector>
 void
-MGTransferPrebuilt::copy_to_mg (const MGDoFHandler<dim>&,
-				MGLevelObject<Vector<double> >&,
-				const InVector&) const
+MGTransferPrebuilt<number>::copy_to_mg (
+  const MGDoFHandler<dim>&,
+  MGLevelObject<Vector<number> >&,
+  const InVector&) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -38,11 +40,13 @@ MGTransferPrebuilt::copy_to_mg (const MGDoFHandler<dim>&,
 #else
 
 
+template <typename number>
 template <int dim, class InVector>
 void
-MGTransferPrebuilt::copy_to_mg (const MGDoFHandler<dim>& mg_dof_handler,
-				MGLevelObject<Vector<double> >& dst,
-				const InVector& src) const
+MGTransferPrebuilt<number>::copy_to_mg (
+  const MGDoFHandler<dim>& mg_dof_handler,
+  MGLevelObject<Vector<number> >& dst,
+  const InVector& src) const
 {
 
 				   // Make src a real finite element function
@@ -136,11 +140,13 @@ MGTransferPrebuilt::copy_to_mg (const MGDoFHandler<dim>& mg_dof_handler,
 #endif
 
 
+template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferPrebuilt::copy_from_mg(const MGDoFHandler<dim>& mg_dof_handler,
-				 OutVector &dst,
-				 const MGLevelObject<Vector<double> > &src) const
+MGTransferPrebuilt<number>::copy_from_mg(
+  const MGDoFHandler<dim>& mg_dof_handler,
+  OutVector &dst,
+  const MGLevelObject<Vector<number> > &src) const
 {
   const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
 
@@ -180,11 +186,13 @@ MGTransferPrebuilt::copy_from_mg(const MGDoFHandler<dim>& mg_dof_handler,
 //TODO:[GK]  constraints->set_zero(dst);
 }
 
+template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferPrebuilt::copy_from_mg_add(const MGDoFHandler<dim>& mg_dof_handler,
-				     OutVector &dst,
-				     const MGLevelObject<Vector<double> > &src) const
+MGTransferPrebuilt<number>::copy_from_mg_add(
+  const MGDoFHandler<dim>& mg_dof_handler,
+  OutVector &dst,
+  const MGLevelObject<Vector<number> > &src) const
 {
   const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
 
@@ -230,11 +238,13 @@ MGTransferPrebuilt::copy_from_mg_add(const MGDoFHandler<dim>& mg_dof_handler,
 //TODO:[?] This function needs to be specially implemented, since in 2d mode we use faces
 #if deal_II_dimension == 1
 
+template <typename number>
 template <int dim, class InVector>
 void
-MGTransferSelect::copy_to_mg (const MGDoFHandler<dim>&,
-				MGLevelObject<Vector<double> >&,
-				const InVector&) const
+MGTransferSelect<number>::copy_to_mg (
+  const MGDoFHandler<dim>&,
+  MGLevelObject<Vector<number> >&,
+  const InVector&) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -242,11 +252,13 @@ MGTransferSelect::copy_to_mg (const MGDoFHandler<dim>&,
 #else
 
 
+template <typename number>
 template <int dim, class InVector>
 void
-MGTransferSelect::copy_to_mg (const MGDoFHandler<dim>& mg_dof_handler,
-				MGLevelObject<Vector<double> >& dst,
-				const InVector& osrc) const
+MGTransferSelect<number>::copy_to_mg (
+  const MGDoFHandler<dim>& mg_dof_handler,
+  MGLevelObject<Vector<number> >& dst,
+  const InVector& osrc) const
 {
 				   // Make src a real finite element function
   InVector src = osrc;
@@ -353,11 +365,13 @@ MGTransferSelect::copy_to_mg (const MGDoFHandler<dim>& mg_dof_handler,
 #endif
 
 
+template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferSelect::copy_from_mg(const MGDoFHandler<dim>& mg_dof_handler,
-				 OutVector &dst,
-				 const MGLevelObject<Vector<double> > &src) const
+MGTransferSelect<number>::copy_from_mg(
+  const MGDoFHandler<dim>& mg_dof_handler,
+  OutVector &dst,
+  const MGLevelObject<Vector<number> > &src) const
 {
 
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
@@ -409,11 +423,13 @@ MGTransferSelect::copy_from_mg(const MGDoFHandler<dim>& mg_dof_handler,
 //TODO:[GK]  constraints->set_zero(dst);
 }
 
+template <typename number>
 template <int dim, class OutVector>
 void
-MGTransferSelect::copy_from_mg_add(const MGDoFHandler<dim>& mg_dof_handler,
-				     OutVector &dst,
-				     const MGLevelObject<Vector<double> > &src) const
+MGTransferSelect<number>::copy_from_mg_add(
+  const MGDoFHandler<dim>& mg_dof_handler,
+  OutVector &dst,
+  const MGLevelObject<Vector<number> > &src) const
 {
 
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();

@@ -512,7 +512,7 @@ template void MGTools::reinit_vector<deal_II_dimension> (const MGDoFHandler<deal
 
 
 //  template void MGTools::copy_to_mg<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-//  				   const MGTransferBase<Vector<double> >&,
+//  				   const MGTransfer<Vector<double> >&,
 //  				   MGLevelObject<Vector<double> >&,
 //  				   const Vector<double>&);
 
@@ -525,7 +525,7 @@ template void MGTools::reinit_vector<deal_II_dimension> (const MGDoFHandler<deal
 //  					const MGLevelObject<Vector<double> >&);
 
 //  template void MGTools::copy_to_mg<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-//  				   const MGTransferBase<Vector<double> >&,
+//  				   const MGTransfer<Vector<double> >&,
 //  				   MGLevelObject<Vector<double> >&,
 //  				   const Vector<float>&);
 
@@ -538,7 +538,7 @@ template void MGTools::reinit_vector<deal_II_dimension> (const MGDoFHandler<deal
 //  					const MGLevelObject<Vector<float> >&);
 
 //  template void MGTools::copy_to_mg<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-//  				   const MGTransferBase<Vector<double> >&,
+//  				   const MGTransfer<Vector<double> >&,
 //  				   MGLevelObject<Vector<double> >&,
 //  				   const BlockVector<double>&);
 
@@ -551,7 +551,7 @@ template void MGTools::reinit_vector<deal_II_dimension> (const MGDoFHandler<deal
 //  					const MGLevelObject<Vector<double> >&);
 
 //  template void MGTools::copy_to_mg<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-//  				   const MGTransferBase<Vector<double> >&,
+//  				   const MGTransfer<Vector<double> >&,
 //  				   MGLevelObject<Vector<double> >&,
 //  				   const BlockVector<float>&);
 
