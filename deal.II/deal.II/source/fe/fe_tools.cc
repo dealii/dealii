@@ -15,11 +15,13 @@
 #include <base/quadrature.h>
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
-#include <grid/persistent_tria.h>
+#include <grid/tria.h>
+#include <grid/grid_generator.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe_tools.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/mapping_q1.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 
@@ -52,10 +54,18 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
   fe2.get_unit_support_points (fe2_support_points);
   Quadrature<dim> fe2_support_points_quadrature(fe2_support_points,
 						phantom_weights);
-  
-  FEValues<dim> fe_values(
-    fe1, fe2_support_points_quadrature, update_values);
 
+				   // This is a bad workaround as we
+				   // can't ask the FEs for their shape
+				   // values any more.
+				   // TODO: do this better.
+  Triangulation<dim> tria;
+  DoFHandler<dim> dof_handler(tria);
+  GridGenerator::hyper_cube(tria);
+  dof_handler.distribute_dofs(fe1);
+  MappingQ1<dim> mapping_q1;
+  FEValues<dim> fe_values(mapping_q1, fe1, fe2_support_points_quadrature, update_values);
+  fe_values.reinit(dof_handler.begin_active());
   
   for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)	
     {

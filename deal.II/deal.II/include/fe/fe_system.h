@@ -1,5 +1,9 @@
 //----------------------------  fe_system.h  ---------------------------
+//    $Id$
 //    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
@@ -19,36 +23,34 @@
 
 
 /**
- * This class provides an interface to group several equal elements together
- * into one. To the outside world, the resulting object looks just like
- * a usual finite element object, which is composed of several other finite
- * elements of the same class each.
+ * This class provides an interface to group several elements together
+ * into one. To the outside world, the resulting object looks just
+ * like a usual finite element object, which is composed of several
+ * other finite elements that are possibly of different type.
+
+ * The overall numbering of degrees of freedom is as follows: for each
+ * subobject (vertex, line, quad, or hex), the degrees of freedom are
+ * numbered such that we run over all subelements first, before
+ * turning for the next dof on this subobject or for the next
+ * subobject. For example, for a element of three components in one
+ * space dimension, the first two components being cubic lagrange
+ * elements and the third being a quadratic lagrange element, the
+ * ordering for the system @p{s=(u,v,p)} is:
  *
- * Basically, this composed finite element has @p{N} times as many degrees of
- * freedom (and therefore also @p{N} times as many shape functions) as a single
- * object of the underlying finite element would have had. Among these,
- * always @p{N} have the same properties, i.e. are represented by the same
- * shape functions. These @p{N} shape functions for each degree of freedom
- * of the basic finite element are numbered consecutively, i.e. for
- * the common case of a velocity @p{(u,v,w)}, the sequence of basis functions
- * will be @p{u1, v1, w1, u2, v2, w2, ..., uN, vN, wN} compared to
- *  @p{u1, ..., uN, v1, ..., vN, w1, ...wN}.
- *
- * Using this scheme, the overall numbering of degrees of freedom is as
- * follows: for each subobject (vertex, line, quad, or hex), the degrees
- * of freedom are numbered such that we run over all subelements first,
- * before turning for the next dof on this subobject or for the next subobject.
- * For example, for the bicubic element in one space dimension, and for
- * two subobjects grouped together by this class, the ordering for
- * the system @p{s=(u,v)} is:
  * @begin{itemize}
- * @item First vertex: @p{u0, v0 = s0, s1}
- * @item Second vertex: @p{u1, v1 = s2, s3}
- * @item First degree of freedom on the line (=cell):
- *   @p{u2, v2 = s3, s4}
- * @item Second degree of freedom on the line:
- *   @p{u3, v3 = s5, s6}.
+ * @item First vertex: @p{u0, v0, p0 = s0, s1, s2}
+ * @item Second vertex: @p{u1, v1, p1 = s3, s4, s5}
+ * @item First component on the line:
+ *   @p{u2, u3 = s4, s5}
+ * @item Second component on the line:
+ *   @p{v2, v3 = s6, s7}.
+ * @item Third component on the line:
+ *   @p{p2 = s8}.
  * @end{itemize}
+ * Do not rely on this numbering in your application as these
+ * internals might change in future. Rather use the functions
+ * @p{system_to_component_index} and @p{component_to_system_index},
+ * instead.
  *
  * In the most cases, the composed element behaves as if it were a usual element
  * with more degrees of freedom. However the underlying structure is visible in
@@ -60,19 +62,7 @@
  * coupled to @p{u} at the vertices and the line on the larger cell next to this
  * vertex, there is no interaction with @p{v} and @p{w} of this or the other cell.
  *
- * Likewise, the matrix computed by the @p{get_local_mass_matrix} function, which
- * originally is defined to be $m_{ij} = \int_K \phi_i \phi_j dx$ contains
- * only those $m_{ij}$ for which the respective shape functions belong to the
- * same subobject, all other entries are set to zero. The matrix therefore is
- * a block matrix, where each block is a diagonal matrix with entries equal to
- * the entry at this block's position in the local mass matrix of a single
- * finite element object. This behaviour is consistent with one common use
- * of the mass matrix, which is in projecting functions onto the grid; in this
- * case, one wants to project each component of the function (here it is a vector
- * function) to the respective component of the finite element, without interaction
- * of the different components.
- *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, reimplementation Ralf Hartmann 2001.
  */
 template <int dim>
 class FESystem : public FiniteElement<dim>
@@ -104,8 +94,7 @@ class FESystem : public FiniteElement<dim>
 				      * class needs to be of the same dimension
 				      * as is this object.
 				      */
-    template <class FE>
-    FESystem (const FE &fe, const unsigned int n_elements);
+    FESystem (const FiniteElement<dim> &fe, const unsigned int n_elements);
 
 				     /** 
 				      * Constructor for mixed
@@ -114,282 +103,158 @@ class FESystem : public FiniteElement<dim>
 				      *
 				      * See the other constructor.
 				      */
-    template <class FE1, class FE2>
-    FESystem (const FE1 &fe1, const unsigned int n1,
-	      const FE2 &fe2, const unsigned int n2);
+    FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
+	      const FiniteElement<dim> &fe2, const unsigned int n2);
 
-    				     /** 
+				     /** 
 				      * Constructor for mixed
 				      * discretizations with three
 				      * base elements.
 				      *
 				      * See the other constructor.
 				      */
-    template <class FE1, class FE2, class FE3>
-    FESystem (const FE1 &fe1, const unsigned int n1,
-	      const FE2 &fe2, const unsigned int n2,
-	      const FE3 &fe3, const unsigned int n3);
+    FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
+	      const FiniteElement<dim> &fe2, const unsigned int n2,
+	      const FiniteElement<dim> &fe3, const unsigned int n3);
 
 				     /**
 				      * Destructor.
 				      */
     virtual ~FESystem ();
 
+				     /**
+				      * Compute flags for initial update only.
+				      */
+    virtual UpdateFlags update_once (UpdateFlags flags) const;
+  
+				     /**
+				      * Compute flags for update on each cell.
+				      */
+    virtual UpdateFlags update_each (UpdateFlags flags) const;
+
+				     /**
+				      * Return the support points of the
+				      * trial functions on the unit cell.
+				      *
+				      * The order of points in the
+				      * array matches that returned by
+				      * the @p{cell->get_dof_indices}
+				      * function, but:
+				      *
+				      * If the shape functions of one
+				      * of the base elements are not
+				      * Lagrangian interpolants at
+				      * some points, the size of the
+				      * array will be zero after
+				      * calling this function.
+				      */
+    virtual void get_unit_support_points (typename std::vector<Point<dim> > &) const;    
+
+				     /**
+				      * Return the support points of
+				      * the trial functions on the
+				      * first face of the unit cell.
+				      *
+				      * The order of points in the
+				      * array matches that returned by
+				      * the @p{cell->get_dof_indices}
+				      * function, but:
+				      *
+				      * If the shape functions of one
+				      * of the base elements are not
+				      * Lagrangian interpolants at some
+				      * points, the size of the array
+				      * will be zero.
+				      */
+    virtual void get_unit_face_support_points (typename std::vector<Point<dim-1> > &) const;    
+  
+  protected:
+				     /**
+				      * @p{clone} function instead of
+				      * a copy constructor.
+				      *
+				      * This function is needed by the
+				      * constructors of @p{FESystem}.
+				      */
+    virtual FiniteElement<dim> *clone() const;
+  
+				     /**
+				      * Prepare internal data
+				      * structures and fill in values
+				      * independent of the cell.
+				      */
+    virtual typename Mapping<dim>::InternalDataBase*
+    get_data (const UpdateFlags,
+	      const Mapping<dim>& mapping,
+	      const Quadrature<dim>& quadrature) const ;
+
+				     /**
+				      * Implementation of the same
+				      * function in
+				      * @ref{FiniteElement}.
+				      */
+    virtual void
+    fill_fe_values (const Mapping<dim>                   &mapping,
+		    const typename DoFHandler<dim>::cell_iterator &cell,
+		    const Quadrature<dim>                &quadrature,
+		    Mapping<dim>::InternalDataBase      &mapping_data,
+		    Mapping<dim>::InternalDataBase      &fe_data,
+		    FEValuesData<dim>                    &data) const;
+
+				     /**
+				      * Implementation of the same
+				      * function in
+				      * @ref{FiniteElement}.
+				      */    
+    virtual void
+    fill_fe_face_values (const Mapping<dim>                   &mapping,
+			 const typename DoFHandler<dim>::cell_iterator &cell,
+			 const unsigned int                    face_no,
+			 const Quadrature<dim-1>              &quadrature,
+			 typename Mapping<dim>::InternalDataBase      &mapping_data,
+			 typename Mapping<dim>::InternalDataBase      &fe_data,
+			 FEValuesData<dim>                    &data) const ;
+
     				     /**
-				      * Return the value of the @p{i}th shape
-				      * function at point @p{p} on the unit cell.
-				      *
-				      * For an element composed of @p{N}
-				      * subelements, the first @p{N} shape
-				      * functions refer to the zeroth shape
-				      * function of the underlying object,
-				      * the shape functions @p{N..2N-1} refer
-				      * to the base shape function with
-				      * number @p{1}, and so on. The @p{i} shape
-				      * function therefore equals the
-				      * @p{i/N} the shape function of the
-				      * base object.
+				      * Implementation of the same
+				      * function in
+				      * @ref{FiniteElement}.
 				      */
-    virtual double shape_value(const unsigned int i,
-			       const Point<dim>  &p) const;
-
-				     /**
-				      * Return the gradient of the @p{i}th shape
-				      * function at point @p{p} on the unit cell.
-				      *
-				      * For the ordering of shape functions
-				      * refer to the @p{shape_value} function.
-				      */
-    virtual Tensor<1,dim> shape_grad(const unsigned int i,
-				     const Point<dim>& p) const;
-
-				     /**
-				      * Return the tensor of second derivatives
-				      * of the @p{i}th shape function at
-				      * point @p{p} on the unit cell.
-				      *
-				      * For the ordering of shape functions
-				      * refer to the @p{shape_value} function.
-				      */
-    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim>   &p) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      *
-				      * For the ordering of shape functions
-				      * refer to the @p{shape_value} function.
-				      */
-    virtual void get_unit_support_points (typename std::vector<Point<dim> > &support_points) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      *
-				      * For the ordering of shape functions
-				      * refer to the @p{shape_value} function.
-				      */
-    virtual void get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-				     typename std::vector<Point<dim> > &support_points) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
-					  typename std::vector<Point<dim> > &support_points) const;
-
-    				     /**
-				      * Fill the local mass matrix. The elements
-				      * of this matrix are the integrals
-				      * $\int_K \phi_i \phi_j dx$ over a given
-				      * cell $K$. However, here only those
-				      * elements of the matrix are set for which
-				      * the shape functions $\phi_i$ and
-				      * $\phi_j$ belong to the same component,
-				      * i.e. the resulting matrix is a block
-				      * diagonal matrix where each block is a
-				      * matrix with values equal to
-				      * the respective entry of the local mass
-				      * matrix for the underlying finite element
-				      * class. This definition of the mass
-				      * matrix for systems of finite elements
-				      * is consistent with the use of the matrix
-				      * for the projection of initial values and
-				      * the like, where the components are not
-				      * coupled to each other. Also in most
-				      * other cases you will not want the
-				      * coupling terms to appear in the mass
-				      * matrix.
-				      *
-				      * If the shape functions of this element
-				      * were numbered such that the first
-				      * numbers are for the shape functions of
-				      * the first component, then those for
-				      * the second component, and so on, then
-				      * the mass matrix generated by this
-				      * function would be a block diagonal
-				      * matrix with each block being the mass
-				      * matrix of the base finite element as
-				      * described above. However, this is
-				      * not the numbering used by the
-				      * @p{FESystem} class, so the block
-				      * structure is usually lost for
-				      * the @em{local} mass matrices, but
-				      * can be recovered in the global
-				      * matrix by suitable renumbering
-				      * of global DoF numbers.
-				      *
-				      * Refer to the base class for more
-				      * information on this function.
-				      */
-    virtual void get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
-					FullMatrix<double> &local_mass_matrix) const;
-
-				     /**
-				      * Transforms the point @p{p} on
-				      * the unit cell to the point
-				      * @p{p_real} on the real cell
-				      * @p{cell} and returns
-				      * @p{p_real}. As the
-				      * transformation mapping of each
-				      * @p{FiniteElement} of this
-				      * @p{FESystem} should be the
-				      * same, this function just calls
-				      * the @p{transform} function of
-				      * @p{base_element(0)}.
-				      */
-    virtual Point<dim> transform_unit_to_real_cell (const typename DoFHandler<dim>::cell_iterator &cell,
-						    const Point<dim> &p) const;
-
-				     /**
-				      * Transforms the point @p{p} on
-				      * the real cell to the point
-				      * @p{p_unit} on the unit cell
-				      * @p{cell} and returns
-				      * @p{p_unit}. As the
-				      * transformation mapping of each
-				      * @p{FiniteElement} of this
-				      * @p{FESystem} should be the
-				      * same, this function just calls
-				      * the @p{transform} function of
-				      * @p{base_element(0)}.
-				      */
-    virtual Point<dim> transform_real_to_unit_cell (const typename DoFHandler<dim>::cell_iterator &cell,
-						    const Point<dim> &p) const;
-
-				     /**
-				      * Return the value of the @p{i}th shape
-				      * function of the transformation mapping
-				      * from unit cell to real cell. Since
-				      * the transform functions are not
-				      * touched when clustering several finite
-				      * element objects together using this
-				      * class, this function simply passes down
-				      * the call to the respective function of
-				      * the underlying element.
-				      */
-    virtual double shape_value_transform (const unsigned int i,
-					  const Point<dim> &p) const;
-
-				     /**
-				      * Same as above: return gradient of the
-				      * @p{i}th shape function for the mapping
-				      * from unit to real cell.
-				      */
-    virtual Tensor<1,dim> shape_grad_transform (const unsigned int i,
-						const Point<dim> &p) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      *
-				      * Since this function is only about the
-				      * mapping from unit to real cell, it
-				      * is not affected by putting several
-				      * equal elements together, so this
-				      * function simply passes down to the
-				      * underlying object.
-				      */
-    virtual void get_face_jacobians (const typename DoFHandler<dim>::face_iterator &face,
-				     const typename std::vector<Point<dim-1> > &unit_points,
-				     typename std::vector<double>      &face_jacobi_determinants) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      *
-				      * Since this function is only about the
-				      * mapping from unit to real cell, it
-				      * is not affected by putting several
-				      * equal elements together, so this
-				      * function simply passes down to the
-				      * underlying object.
-				      */
-    virtual void get_subface_jacobians (const typename DoFHandler<dim>::face_iterator &face,
-					const unsigned int           subface_no,
-					const typename std::vector<Point<dim-1> > &unit_points,
-					typename std::vector<double>      &face_jacobi_determinants) const;
-
-				     /**
-				      * Return the normal vectors to the
-				      * face with number @p{face_no} of @p{cell}.
-				      *
-				      * Since this function is only about the
-				      * mapping from unit to real cell, it
-				      * is not affected by putting several
-				      * equal elements together, so this
-				      * function simply passes down to the
-				      * underlying object.
-				      *
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int          face_no,
-				     const typename std::vector<Point<dim-1> > &unit_points,
-				     typename std::vector<Point<dim> >         &normal_vectors) const;
-
-				     /**
-				      * Return the normal vectors to the
-				      * subface with number @p{subface_no} of
-				      * the face with number @p{face_no} of @p{cell}.
-				      *
-				      * Since this function is only about the
-				      * mapping from unit to real cell, it
-				      * is not affected by putting several
-				      * equal elements together, so this
-				      * function simply passes down to the
-				      * underlying object.
-				      *
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int           face_no,
-				     const unsigned int           subface_no,
-				     const typename std::vector<Point<dim-1> > &unit_points,
-				     typename std::vector<Point<dim> >         &normal_vectors) const;
-
-				     /**
-				      * Implementation of the
-				      * corresponding function of
-				      * @p{FiniteElement}.
-				      */
-    virtual void fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
-				 const typename std::vector<Point<dim> >            &unit_points,
-				 typename std::vector<Tensor<2,dim> >               &jacobians,
-				 const bool              compute_jacobians,
-				 typename std::vector<Tensor<3,dim> > &jacobians_grad,
-				 const bool              compute_jacobians_grad,
-				 typename std::vector<Point<dim> > &support_points,
-				 const bool           compute_support_points,
-				 typename std::vector<Point<dim> > &q_points,
-				 const bool           compute_q_points,
-				 const FullMatrix<double>  &shape_values_transform,
-				 const typename std::vector<typename std::vector<Tensor<1,dim> > > &shape_grad_transform) const;
+    virtual void
+    fill_fe_subface_values (const Mapping<dim>                   &mapping,
+			    const typename DoFHandler<dim>::cell_iterator &cell,
+			    const unsigned int                    face_no,
+			    const unsigned int                    sub_no,
+			    const Quadrature<dim-1>              &quadrature,
+			    typename Mapping<dim>::InternalDataBase      &mapping_data,
+			    typename Mapping<dim>::InternalDataBase      &fe_data,
+			    FEValuesData<dim>                    &data) const ;
     
+
+				     /**
+				      * Calles (among other things)
+				      * @p{fill_fe_([sub]face)_values}
+				      * of the base elements. Calles
+				      * @p{fill_fe_values} if
+				      * @p{face_no==-1} and
+				      * @p{sub_no==-1}; calles
+				      * @p{fill_fe_face_values} if
+				      * @p{face_no==-1} and
+				      * @p{sub_no!=-1}; and calles
+				      * @p{fill_fe_subface_values} if 
+				      * @p{face_no!=-1} and
+				      * @p{sub_no!=-1}.
+				      */
+    template <int dim_1>
+    void compute_fill (const Mapping<dim>                   &mapping,
+		       const typename DoFHandler<dim>::cell_iterator &cell,
+		       const unsigned int                    face_no,
+		       const unsigned int                    sub_no,
+		       const Quadrature<dim_1>              &quadrature,
+		       typename Mapping<dim>::InternalDataBase      &mapping_data,
+		       typename Mapping<dim>::InternalDataBase      &fe_data,
+		       FEValuesData<dim>                    &data) const ;
+
 				     /** 
 				      * Number of different base
 				      * elements of this object.
@@ -486,7 +351,7 @@ class FESystem : public FiniteElement<dim>
 			  const FiniteElementData<dim> &fe2,
 			  const unsigned int            N2);
 
-    				     /**
+				     /**
 				      * Same as above for mixed elements
 				      * with three different sub-elements.
 				      */
@@ -511,7 +376,7 @@ class FESystem : public FiniteElement<dim>
     compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
 					   const unsigned int        N);
     
-    				     /**
+				     /**
 				      * Same as above for mixed elements
 				      * with two different sub-elements.
 				      */
@@ -521,7 +386,7 @@ class FESystem : public FiniteElement<dim>
 					   const FiniteElement<dim> &fe2,
 					   const unsigned int        N2);
 
-    				     /**
+				     /**
 				      * Same as above for mixed elements
 				      * with three different sub-elements.
 				      */
@@ -562,11 +427,143 @@ class FESystem : public FiniteElement<dim>
 				      * Used by @p{initialize}.
 				      */
     void build_interface_constraints ();
-    
+
 				     /**
-				      *Exception.
+				      * Usually: Fields of
+				      * cell-independent data.
+				      *
+				      * But for @p{FESystem} this
+				      * @p{InternalData} class does
+				      * not itself store the data but
+				      * only pointers to
+				      * @p{InternalDatas} of the base
+				      * elements.
 				      */
-    DeclException0(ExcElementTransformNotEqual);
+    class InternalData : public FiniteElementBase<dim>::InternalDataBase
+    {
+      public:
+					 /**
+					  * Constructor. Is called by
+					  * the @p{get_data}
+					  * function. Sets the size of
+					  * the @p{base_fe_datas}
+					  * vector to
+					  * @p{n_base_elements}.
+					  */
+	InternalData(const unsigned int n_base_elements);
+	
+					 /**
+					  * Destructor. Deletes all
+					  * @p{InternalDatas} whose
+					  * pointers are stored by the
+					  * @p{base_fe_datas}
+					  * vector.
+					  */
+	~InternalData();
+
+					 /**
+					  * Flag for computation of
+					  * second derivatives.
+					  */
+	bool second_flag;
+	
+					 /**
+					  * Gives write-access to the
+					  * pointer to a
+					  * @p{InternalData} of the
+					  * @p{base_no}th base
+					  * element.
+					  */
+	void set_fe_data(unsigned int base_no,
+			 typename FiniteElementBase<dim>::InternalDataBase *);
+
+					 /**
+					  * Gives read-access to the
+					  * pointer to a
+					  * @p{InternalData} of the
+					  * @p{base_no}th base element.
+					  */	
+	typename FiniteElementBase<dim>::InternalDataBase &get_fe_data(unsigned int base_no) const;
+
+
+					 /**
+					  * Gives write-access to the
+					  * pointer to a
+					  * @p{FEValuesData} for the
+					  * @p{base_no}th base
+					  * element.
+					  */
+	void set_fe_values_data(unsigned int base_no,
+				FEValuesData<dim> *);
+
+					 /**
+					  * Gives read-access to the
+					  * pointer to a
+					  * @p{FEValuesData} for the
+					  * @p{base_no}th base element.
+					  */	
+	FEValuesData<dim> &get_fe_values_data(unsigned int base_no) const;
+
+					 /**
+					  * Deletes the
+					  * @p{FEValuesData} the
+					  * @p{fe_datas[base_no]}
+					  * pointer is pointing
+					  * to. Sets
+					  * @p{fe_datas[base_no]} to
+					  * zero.
+					  *
+					  * This function is used to
+					  * delete @p{FEValuesData}
+					  * that are needed only on
+					  * the first cell but not any
+					  * more afterwards.  This is
+					  * the case for
+					  * e.g. Lagrangian elements
+					  * (see e.g. @p{FE_Q}
+					  * classes).
+					  */
+	void delete_fe_values_data(unsigned int base_no);
+	
+      private:
+	
+					 /**
+					  * Pointers to the
+					  * @p{InternalDatas} of the
+					  * base elements. They are
+					  * accessed to by the
+					  * @p{set_} and
+					  * @p{get_fe_data}
+					  * functions.
+					  *
+					  * The size of this vector is
+					  * set to @p{n_base_elements}
+					  * by the InternalData
+					  * constructor.  It is
+					  * filled by the @p{get_data}
+					  * function.
+					  */
+	typename std::vector<FiniteElementBase<dim>::InternalDataBase *> base_fe_datas;
+
+					 /**
+					  * Pointers to the
+					  * @p{FEValuesDatas}
+					  * that are given to the
+					  * @p{fill_fe_values}
+					  * function of the base
+					  * elements. They are
+					  * accessed to by the
+					  * @p{set_} and
+					  * @p{get_fe_values_data}
+					  * functions.
+					  *
+					  * The size of this vector is
+					  * set to @p{n_base_elements}
+					  * by the InternalData
+					  * constructor.
+					  */
+	typename std::vector<FEValuesData<dim> *> base_fe_values_datas;
+    };
 };
 
 
@@ -581,44 +578,38 @@ FESystem<dim>::n_base_elements() const
 
 
 template <int dim>
-template <class FE>
-FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
+FESystem<dim>::FESystem (const FiniteElement<dim> &fe, const unsigned int n_elements) :
 		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements),
 				    compute_restriction_is_additive_flags (fe, n_elements)),
   base_elements(1)
 {
-  base_elements[0] = ElementPair(new FE, n_elements);
+  base_elements[0] = ElementPair(fe.clone(), n_elements);
   base_elements[0].first -> subscribe ();
   initialize ();
 };
 
 
 template <int dim>
-template <class FE1, class FE2>
-FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
-			 const FE2 &fe2, const unsigned int n2)
+FESystem<dim>::FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
+			 const FiniteElement<dim> &fe2, const unsigned int n2)
 		:
 		FiniteElement<dim> (multiply_dof_numbers(fe1, n1, fe2, n2),
 				    compute_restriction_is_additive_flags (fe1, n1,
 									   fe2, n2)),
   base_elements(2)
 {
-  Assert(fe1.n_transform_functions() == fe2.n_transform_functions(),
-	 ExcElementTransformNotEqual());
-  
-  base_elements[0] = ElementPair(new FE1, n1);
+  base_elements[0] = ElementPair(fe1.clone(), n1);
   base_elements[0].first -> subscribe ();
-  base_elements[1] = ElementPair(new FE2, n2);
+  base_elements[1] = ElementPair(fe2.clone(), n2);
   base_elements[1].first -> subscribe ();
   initialize ();
 };
 
 
 template <int dim>
-template <class FE1, class FE2, class FE3>
-FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
-			 const FE2 &fe2, const unsigned int n2,
-			 const FE3 &fe3, const unsigned int n3)
+FESystem<dim>::FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
+			 const FiniteElement<dim> &fe2, const unsigned int n2,
+			 const FiniteElement<dim> &fe3, const unsigned int n3)
 		:
 		FiniteElement<dim> (multiply_dof_numbers(fe1, n1,
 							 fe2, n2,
@@ -628,16 +619,11 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 									   fe3, n3)),
   base_elements(3)
 {
-  Assert(fe1.n_transform_functions() == fe2.n_transform_functions(),
-	 ExcElementTransformNotEqual());
-  Assert(fe1.n_transform_functions() == fe3.n_transform_functions(),
-	 ExcElementTransformNotEqual());
-  
-  base_elements[0] = ElementPair(new FE1, n1);
+  base_elements[0] = ElementPair(fe1.clone(), n1);  
   base_elements[0].first -> subscribe ();
-  base_elements[1] = ElementPair(new FE2, n2);
+  base_elements[1] = ElementPair(fe2.clone(), n2);
   base_elements[1].first -> subscribe ();
-  base_elements[2] = ElementPair(new FE3, n3);
+  base_elements[2] = ElementPair(fe3.clone(), n3);
   base_elements[2].first -> subscribe ();
   initialize ();
 };
@@ -660,6 +646,68 @@ FESystem<dim>::base_element(unsigned int index) const
   Assert (index < base_elements.size(), 
 	  ExcIndexRange(index, 0, base_elements.size()));
   return *base_elements[index].first;
+}
+
+
+template <int dim>
+inline FiniteElementBase<dim>::InternalDataBase &
+FESystem<dim>::
+InternalData::get_fe_data(unsigned int base_no) const
+{
+  Assert(base_no<base_fe_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_datas.size()));
+  return *base_fe_datas[base_no];
+}
+
+
+
+template <int dim>
+inline void
+FESystem<dim>::
+InternalData::set_fe_data(unsigned int base_no,
+			  FiniteElementBase<dim>::InternalDataBase *ptr)
+{
+  Assert(base_no<base_fe_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_datas.size()));
+  base_fe_datas[base_no]=ptr;
+}
+
+
+template <int dim>
+inline FEValuesData<dim> &
+FESystem<dim>::
+InternalData::get_fe_values_data(unsigned int base_no) const
+{
+  Assert(base_no<base_fe_values_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
+  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
+  return *base_fe_values_datas[base_no];
+}
+
+
+
+template <int dim>
+inline void
+FESystem<dim>::
+InternalData::set_fe_values_data(unsigned int base_no,
+				 FEValuesData<dim> *ptr)
+{
+  Assert(base_no<base_fe_values_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
+  base_fe_values_datas[base_no]=ptr;
+}
+
+
+template <int dim>
+inline void
+FESystem<dim>::
+InternalData::delete_fe_values_data(unsigned int base_no)
+{
+  Assert(base_no<base_fe_values_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
+  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
+  delete base_fe_values_datas[base_no];
+  base_fe_values_datas[base_no]=0;
 }
 
 

@@ -14,6 +14,9 @@
 
 #include <fe/fe.h>
 #include <base/memory_consumption.h>
+#include <fe/mapping.h>
+#include <fe/mapping_q1.h>
+#include <fe/fe_values.h>
 #include <base/quadrature.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -25,149 +28,62 @@
 using namespace std;
 #endif
 
-
-
-
-/*------------------------------- FiniteElementData ----------------------*/
-
-template <int dim>
-FiniteElementData<dim>::FiniteElementData () :
-		dofs_per_vertex(static_cast<unsigned int>(-1)),
-		dofs_per_line(static_cast<unsigned int>(-1)),
-		dofs_per_quad(static_cast<unsigned int>(-1)),
-		dofs_per_hex(static_cast<unsigned int>(-1)),
-		first_line_index(static_cast<unsigned int>(-1)),
-		first_quad_index(static_cast<unsigned int>(-1)),
-		first_hex_index(static_cast<unsigned int>(-1)),
-		first_face_line_index(static_cast<unsigned int>(-1)),
-		first_face_quad_index(static_cast<unsigned int>(-1)),
-		dofs_per_face(static_cast<unsigned int>(-1)),
-		dofs_per_cell(static_cast<unsigned int>(-1)),
-		transform_functions(static_cast<unsigned int>(-1)),
-		components(static_cast<unsigned int>(-1))
-{
-  Assert (false, ExcNotImplemented());
-};
-
-
-template <int dim>
-FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
-					   const unsigned int dofs_per_line,
-					   const unsigned int dofs_per_quad,
-					   const unsigned int dofs_per_hex,
-					   const unsigned int n_transform_functions,
-					   const unsigned int n_components) :
-		dofs_per_vertex(dofs_per_vertex),
-		dofs_per_line(dofs_per_line),
-		dofs_per_quad(dofs_per_quad),
-		dofs_per_hex(dofs_per_hex),
-		first_line_index(GeometryInfo<dim>::vertices_per_cell
-				 * dofs_per_vertex),
-		first_quad_index(first_line_index+
-				 GeometryInfo<dim>::lines_per_cell
-				 * dofs_per_line),
-		first_hex_index(first_quad_index+
-				GeometryInfo<dim>::faces_per_cell
-				* dofs_per_quad),
-		first_face_line_index(GeometryInfo<dim-1>::vertices_per_cell
-				      * dofs_per_vertex),
-		first_face_quad_index(first_face_line_index+
-				      GeometryInfo<dim-1>::lines_per_cell
-				      * dofs_per_line),
-		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex+
-			      GeometryInfo<dim>::lines_per_face * dofs_per_line +
-			      dofs_per_quad),
-		dofs_per_cell (first_hex_index+dofs_per_hex),
-		transform_functions (n_transform_functions),
-		components(n_components)
-{
-  Assert(dim==3, ExcDimensionMismatch(3,dim));
-};
-
-
-template <int dim>
-FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
-					   const unsigned int dofs_per_line,
-					   const unsigned int dofs_per_quad,
-					   const unsigned int n_transform_functions,
-					   const unsigned int n_components) :
-		dofs_per_vertex(dofs_per_vertex),
-		dofs_per_line(dofs_per_line),
-		dofs_per_quad(dofs_per_quad),
-		dofs_per_hex(0),
-		first_line_index(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex),
-		first_quad_index(first_line_index+
-				 GeometryInfo<dim>::lines_per_cell * dofs_per_line),
-		first_hex_index(first_quad_index+
-				GeometryInfo<dim>::quads_per_cell*dofs_per_quad),
-		first_face_line_index(GeometryInfo<dim-1>::vertices_per_cell
-				      * dofs_per_vertex),
-		first_face_quad_index(first_line_index+
-				      GeometryInfo<dim-1>::lines_per_cell
-				      * dofs_per_line),
-		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex+
-			      dofs_per_line),
-		dofs_per_cell (first_quad_index+dofs_per_quad),
-		transform_functions (n_transform_functions),
-		components(n_components)
-{
-  Assert(dim==2, ExcDimensionMismatch(2,dim));
-};
-
-
-template <int dim>
-FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
-					   const unsigned int dofs_per_line,
-					   const unsigned int n_transform_functions,
-					   const unsigned int n_components) :
-		dofs_per_vertex(dofs_per_vertex),
-		dofs_per_line(dofs_per_line),
-		dofs_per_quad(0),
-		dofs_per_hex(0),
-		first_line_index(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex),
-		first_quad_index(first_line_index+
-				 GeometryInfo<dim>::lines_per_cell * dofs_per_line),
-		first_hex_index(first_quad_index+
-				GeometryInfo<dim>::quads_per_cell*dofs_per_quad),
-		first_face_line_index(GeometryInfo<dim-1>::vertices_per_cell
-				      * dofs_per_vertex),
-		first_face_quad_index(first_line_index+
-				      GeometryInfo<dim-1>::lines_per_cell
-				      * dofs_per_line),
-		dofs_per_face(dofs_per_vertex),
-		dofs_per_cell (first_line_index+dofs_per_line),
-		transform_functions (n_transform_functions),
-		components(n_components)
-{
-  Assert(dim==1, ExcDimensionMismatch(1,dim));
-};
-
-
-template <int dim>
-FiniteElementData<dim>::~FiniteElementData ()
-{};
-
-
-template<int dim>
-bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
-{
-  return ((dofs_per_vertex == f.dofs_per_vertex) &&
-	  (dofs_per_line == f.dofs_per_line) &&
-	  (dofs_per_quad == f.dofs_per_quad) &&
-	  (dofs_per_hex == f.dofs_per_hex) &&
-	  (transform_functions == f.transform_functions) &&
-	  (components == f.components));
-};
-
-
 /*------------------------------- FiniteElementBase ----------------------*/
+
+
+template <int dim>
+void
+FiniteElementBase<dim>::
+InternalDataBase::initialize (const FiniteElement<dim>* element,
+			      const Mapping<dim>& mapping,
+			      const Quadrature<dim>& quadrature)
+{
+				   // We compute difference
+				   // quotients of gradients
+  UpdateFlags diff_flags = update_gradients;
+  
+				   // We will need shifted
+				   // quadrature formulae
+  std::vector<Point<dim> > diff_points (quadrature.n_quadrature_points);
+  std::vector<double> diff_weights (quadrature.n_quadrature_points, 0);
+  
+				   // The star has 2dim points
+  differences.resize(2*dim);
+  for (unsigned int d=0;d<dim;++d)
+    {
+      Point<dim> shift;
+      shift (d) = 1.e-6;
+      for (unsigned int i=0;i<diff_points.size();++i)
+	diff_points[i] = quadrature.point(i) + shift;
+      Quadrature<dim> plus_quad (diff_points, diff_weights);
+      differences[d] =
+	new FEValues<dim> (mapping, *element, plus_quad, diff_flags);
+      for (unsigned int i=0;i<diff_points.size();++i)
+	diff_points[i] = quadrature.point(i) - shift;
+      Quadrature<dim> minus_quad (diff_points, diff_weights);
+      differences[d+dim] =
+	new FEValues<dim> (mapping, *element, minus_quad, diff_flags);	  
+    }
+}
+
+
+
+
+template <int dim>
+FiniteElementBase<dim>::InternalDataBase::~InternalDataBase ()
+{
+  for (unsigned int i=0;i<differences.size ();++i)
+    if (differences[i] != 0)
+      delete differences[i];
+}
+
 
 
 
 template <int dim>
 FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data,
 					   const std::vector<bool> &restriction_is_additive_flags) :
-		FiniteElementData<dim> (fe_data),
+  FiniteElementData<dim> (fe_data),
   system_to_component_table(dofs_per_cell),
   face_system_to_component_table(dofs_per_face),
   component_to_system_table(components, std::vector<unsigned>(dofs_per_cell)),
@@ -176,7 +92,7 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 							       restriction_is_additive_flags(restriction_is_additive_flags)
 {
   Assert(restriction_is_additive_flags.size()==fe_data.components,
-	 ExcWrongFieldDimension(restriction_is_additive_flags.size(),fe_data.components));
+	 ExcDimensionMismatch(restriction_is_additive_flags.size(),fe_data.components));
 
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
     {
@@ -232,6 +148,7 @@ FiniteElementBase<dim>::restrict (const unsigned int child) const
 {
   Assert (child<GeometryInfo<dim>::children_per_cell,
 	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
+  Assert (restriction[child].n() != 0, ExcProjectionVoid());
   return restriction[child];
 };
 
@@ -242,6 +159,7 @@ FiniteElementBase<dim>::prolongate (const unsigned int child) const
 {
   Assert (child<GeometryInfo<dim>::children_per_cell,
 	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
+  Assert (prolongation[child].n() != 0, ExcEmbeddingVoid());
   return prolongation[child];
 };
 
@@ -250,8 +168,11 @@ template <int dim>
 const FullMatrix<double> &
 FiniteElementBase<dim>::constraints () const
 {
+  Assert ((dofs_per_face  == 0) || (interface_constraints.m() != 0),
+	  ExcConstraintsVoid());
+  
   if (dim==1)
-    Assert ((interface_constraints.m()==1) && (interface_constraints.n()==1),
+    Assert ((interface_constraints.m()==0) && (interface_constraints.n()==0),
 	    ExcWrongInterfaceMatrixSize(interface_constraints.m(),
 					interface_constraints.n()));
   
@@ -290,300 +211,112 @@ FiniteElementBase<dim>::memory_consumption () const
 };
 
 
-/*------------------------------- FiniteElement ----------------------*/
+template <int dim>
+void
+FiniteElementBase<dim>::
+compute_2nd (const Mapping<dim> &mapping,
+	     const DoFHandler<dim>::cell_iterator &cell,
+	     const unsigned int offset,
+	     Mapping<dim>::InternalDataBase &mapping_internal,
+	     InternalDataBase& fe_internal,
+	     FEValuesData<dim>& data) const
+{
+				   // Number of quadrature points
+  const unsigned int n = data.shape_2nd_derivatives[0].size();
+  
+  for (unsigned int d=0;d<dim;++d)
+    {
+      fe_internal.differences[d]->reinit(cell);
+      fe_internal.differences[d+dim]->reinit(cell);
+    }
 
+  std::vector<std::vector<Tensor<1,dim> > > diff_quot (dim, std::vector<Tensor<1,dim> >(n));
+  std::vector<Tensor<1,dim> > diff_quot2 (n);
+				   // Loop over shape functions
+  for (unsigned int shape=0; shape<dofs_per_cell; ++shape)
+    {
+      
+				       // Fill difference quotients
+      for (unsigned int d1=0;d1<dim;++d1)
+					 // Loop over quadrature points
+	for (unsigned int k=0;k<n;++k)
+	  {
+	    const Tensor<1,dim>& right
+	      = fe_internal.differences[d1]->shape_grad(shape, k);
+	    const Tensor<1,dim>& left
+	      = fe_internal.differences[d1+dim]->shape_grad(shape, k);
+	    for (unsigned int d=0;d<dim;++d)
+	      diff_quot[d][k][d1] = (.5/1.e-6) * (right[d]-left[d]);
+	  }
+      
+      for (unsigned int d=0;d<dim;++d)
+	{
+	  mapping.transform_covariant (diff_quot2, diff_quot[d],
+				       mapping_internal, offset);
+
+	  for (unsigned int k=0;k<n;++k)
+	    for (unsigned int d1=0;d1<dim;++d1)
+	      data.shape_2nd_derivatives[shape][k][d][d1] = diff_quot2[k][d1];
+	}
+    }
+}
+
+
+/*------------------------------- FiniteElement ----------------------*/
 
 template <int dim>
 FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data,
 				   const std::vector<bool> &restriction_is_additive_flags) :
 		FiniteElementBase<dim> (fe_data,
-					restriction_is_additive_flags) {};
+					restriction_is_additive_flags)
+{}
 
-#if deal_II_dimension == 1
-
-template <>
-void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
-					   std::vector<Point<1> > &support_points) const;
-
-
-template <>
-void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
-				       const std::vector<Point<1> > &unit_points,
-				       std::vector<Tensor<2,1> >    &jacobians,
-				       const bool            compute_jacobians,
-				       std::vector<Tensor<3,1> > &jacobians_grad,
-				       const bool            compute_jacobians_grad,
-				       std::vector<Point<1> >    &support_points,
-				       const bool            compute_support_points,
-				       std::vector<Point<1> >    &q_points,
-				       const bool            compute_q_points,
-				       const FullMatrix<double>       &,
-				       const std::vector<std::vector<Tensor<1,1> > > &) const {
-  Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
-	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
-  Assert ((!compute_jacobians_grad) || (jacobians_grad.size() == unit_points.size()),
-	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
-  Assert ((!compute_q_points) || (q_points.size() == unit_points.size()),
-	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert ((!compute_support_points) || (support_points.size() == dofs_per_cell),
-	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
-
-
-				   // local mesh width
-  const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
-
-  for (unsigned int i=0; i<q_points.size(); ++i) 
-    {
-      if (compute_jacobians)
-	jacobians[i][0][0] = 1./h;
-
-				       // gradient of jacobian is zero
-      if (compute_jacobians_grad)
-	jacobians_grad[i] = Tensor<3,1>();
-      
-      if (compute_q_points)
-					 // assume a linear mapping from unit
-					 // to real space. overload this
-					 // function if you don't like that
-	q_points[i] = cell->vertex(0) + h*unit_points[i];
-    };
-
-				   // compute support points. The first ones
-				   // belong to vertex one, the second ones
-				   // to vertex two, all following are
-				   // equally spaced along the line
-  if (compute_support_points)
-    get_support_points (cell, support_points);
-};
-
-
-
-template <>
-void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &,
-					    const unsigned int       ,
-					    const std::vector<Point<0> > &,
-					    const std::vector<Point<1> > &,
-					    std::vector<Tensor<2,1> >    &,
-					    const bool               ,
-					    std::vector<Tensor<3,1> >    &,
-					    const bool               ,
-					    std::vector<Point<1> >       &,
-					    const bool               ,
-					    std::vector<Point<1> >       &,
-					    const bool               ,
-					    std::vector<double>          &,
-					    const bool              ,
-					    std::vector<Point<1> >       &,
-					    const bool,
-					    const FullMatrix<double>          &,
-					    const std::vector<std::vector<Tensor<1,1> > > &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-template <>
-void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
-					       const unsigned int       ,
-					       const unsigned int       ,
-					       const std::vector<Point<0> > &,
-					       const std::vector<Point<1> > &,
-					       std::vector<Tensor<2,1> >    &,
-					       const bool               ,
-					       std::vector<Tensor<3,1> >    &,
-					       const bool               ,
-					       std::vector<Point<1> >       &,
-					       const bool               ,
-					       std::vector<double>          &,
-					       const bool               ,
-					       std::vector<Point<1> >       &,
-					       const bool,
-					       const FullMatrix<double>          &,
-					       const std::vector<std::vector<Tensor<1,1> > > &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-template <>
-void FiniteElement<1>::get_unit_support_points (std::vector<Point<1> > &support_points) const {
-  Assert (support_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
-				   // compute support points. The first ones
-				   // belong to vertex one, the second ones
-				   // to vertex two, all following are
-				   // equally spaced along the line
-  unsigned int next = 0;
-				   // first the dofs in the vertices
-  for (unsigned int i=0; i<dofs_per_vertex; ++i)
-    support_points[next++] = Point<1>(0.0);
-  for (unsigned int i=0; i<dofs_per_vertex; ++i)
-    support_points[next++] = Point<1>(1.0);
-  
-				   // now dofs on line
-  for (unsigned int i=0; i<dofs_per_line; ++i) 
-    support_points[next++] = Point<1>((i+1.0)/(dofs_per_line+1.0));
-};
-
-
-template <>
-void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
-					   std::vector<Point<1> > &support_points) const {
-  Assert (support_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
-				   // compute support points. The first ones
-				   // belong to vertex one, the second ones
-				   // to vertex two, all following are
-				   // equally spaced along the line
-  unsigned int next = 0;
-				   // local mesh width
-  const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
-				   // first the dofs in the vertices
-  for (unsigned int vertex=0; vertex<2; vertex++) 
-    for (unsigned int i=0; i<dofs_per_vertex; ++i)
-      support_points[next++] = cell->vertex(vertex);
-  
-				   // now dofs on line
-  for (unsigned int i=0; i<dofs_per_line; ++i) 
-    support_points[next++] = cell->vertex(0) +
-			     Point<1>((i+1.0)/(dofs_per_line+1.0)*h);
-};
-
-#endif
 
 
 template <int dim>
-void FiniteElement<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &,
-					 const typename std::vector<Point<dim> > &,
-					 typename std::vector<Tensor<2,dim> > &,
-					 const bool,
-					 typename std::vector<Tensor<3,dim> > &,
-					 const bool,
-					 typename std::vector<Point<dim> > &,
-					 const bool,
-					 typename std::vector<Point<dim> > &,
-					 const bool,
-					 const FullMatrix<double>      &,
-					 const typename std::vector<typename std::vector<Tensor<1,dim> > > &) const {
-  Assert (false, ExcPureFunctionCalled());
-};
+FiniteElement<dim>::~FiniteElement ()
+{}
 
-
-template <int dim>
-void FiniteElement<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
-					      const unsigned int           face_no,
-					      const typename std::vector<Point<dim-1> > &unit_points,
-					      const typename std::vector<Point<dim> > &global_unit_points,
-					      typename std::vector<Tensor<2,dim> >    &jacobians,
-					      const bool           compute_jacobians,
-					      typename std::vector<Tensor<3,dim> >    &jacobians_grad,
-					      const bool           compute_jacobians_grad,
-					      typename std::vector<Point<dim> > &support_points,
-					      const bool           compute_support_points,
-					      typename std::vector<Point<dim> > &q_points,
-					      const bool           compute_q_points,
-					      std::vector<double>      &face_jacobi_determinants,
-					      const bool           compute_face_jacobians,
-					      typename std::vector<Point<dim> > &normal_vectors,
-					      const bool           compute_normal_vectors,
-					      const FullMatrix<double>      &shape_values_transform,
-					      const typename std::vector<typename std::vector<Tensor<1,dim> > > &shape_gradients_transform) const
-{
-  Assert (jacobians.size() == unit_points.size(),
-	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
-								  unit_points.size()));
-  Assert (q_points.size() == unit_points.size(),
-	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(q_points.size(),
-								  unit_points.size()));
-  Assert (global_unit_points.size() == unit_points.size(),
-	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(global_unit_points.size(),
-								  unit_points.size()));
-  Assert (support_points.size() == dofs_per_face,
-	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(support_points.size(),
-								  dofs_per_face));
-  
-				   // size not checked since not used
-  static std::vector<Point<dim> > dummy(0);
-  fill_fe_values (cell, global_unit_points,
-		  jacobians, compute_jacobians,
-		  jacobians_grad, compute_jacobians_grad,
-		  dummy, false,
-		  q_points, compute_q_points,
-		  shape_values_transform, shape_gradients_transform);
-  
-  if (compute_support_points)
-    get_face_support_points (cell->face(face_no), support_points);
-
-  if (compute_face_jacobians)
-    get_face_jacobians (cell->face(face_no),
-			unit_points,
-			face_jacobi_determinants);
-
-  if (compute_normal_vectors)
-    get_normal_vectors (cell, face_no, unit_points, normal_vectors);
-};
-
-
-template <int dim>
-void FiniteElement<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
-						 const unsigned int           face_no,
-						 const unsigned int           subface_no,
-						 const typename std::vector<Point<dim-1> > &unit_points,
-						 const typename std::vector<Point<dim> > &global_unit_points,
-						 typename std::vector<Tensor<2,dim> >    &jacobians,
-						 const bool           compute_jacobians,
-						 typename std::vector<Tensor<3,dim> >    &jacobians_grad,
-						 const bool           compute_jacobians_grad,
-						 typename std::vector<Point<dim> > &q_points,
-						 const bool           compute_q_points,
-						 std::vector<double>      &face_jacobi_determinants,
-						 const bool           compute_face_jacobians,
-						 typename std::vector<Point<dim> > &normal_vectors,
-						 const bool           compute_normal_vectors,
-						 const FullMatrix<double>      &shape_values_transform,
-						 const typename std::vector<std::vector<Tensor<1,dim> > > &shape_gradients_transform) const
-{
-  Assert (jacobians.size() == unit_points.size(),
-	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
-								  unit_points.size()));
-  Assert (q_points.size() == unit_points.size(),
-	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(q_points.size(),
-								  unit_points.size()));
-  Assert (global_unit_points.size() == unit_points.size(),
-	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(global_unit_points.size(),
-								  unit_points.size()));
-
-  static std::vector<Point<dim> > dummy(0); // size not checked since not used
-  fill_fe_values (cell, global_unit_points,
-		  jacobians, compute_jacobians,
-		  jacobians_grad, compute_jacobians_grad,
-		  dummy, false,
-		  q_points, compute_q_points,
-		  shape_values_transform, shape_gradients_transform);
-  
-  if (compute_face_jacobians)
-    get_subface_jacobians (cell->face(face_no), subface_no,
-			   unit_points, face_jacobi_determinants);
-
-  if (compute_normal_vectors)
-    get_normal_vectors (cell, face_no, subface_no,
-			unit_points, normal_vectors);
-};
 
 
 template <int dim>
 void
-FiniteElement<dim>::get_unit_support_points (typename std::vector<Point<dim> > &) const
+FiniteElement<dim>::get_unit_support_points (std::vector<Point<dim> > &points) const
 {
-  Assert (false, ExcPureFunctionCalled());
-};
+  points.resize(0);
+}
+
+    
+template <int dim>
+void
+FiniteElement<dim>::get_unit_face_support_points (std::vector<Point<dim-1> > &points) const
+{
+  points.resize(0);
+}
+
+    
+
+template <int dim>
+Mapping<dim>::InternalDataBase*
+FiniteElement<dim>::get_face_data (const UpdateFlags flags,
+				   const Mapping<dim>& mapping,
+				   const Quadrature<dim-1> &quadrature) const
+{
+  QProjector<dim> q(quadrature, false);
+  return get_data (flags, mapping, q);
+}
 
 
 template <int dim>
-void
-FiniteElement<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &,
-					typename std::vector<Point<dim> > &) const
+Mapping<dim>::InternalDataBase*
+FiniteElement<dim>::get_subface_data (const UpdateFlags flags,
+				      const Mapping<dim>& mapping,
+				      const Quadrature<dim-1> &quadrature) const
 {
-  Assert (false, ExcPureFunctionCalled());
-};
+  QProjector<dim> q(quadrature, true);
+  return get_data (flags, mapping, q);
+  
+}
 
 
 template <int dim>
@@ -592,6 +325,16 @@ FiniteElement<dim>::n_base_elements() const
 {
   return 1;
 }
+
+template <int dim>
+unsigned int
+FiniteElement<dim>::memory_consumption () const
+{
+  return FiniteElementBase<dim>::memory_consumption ();
+}
+
+
+
 
 template <int dim>
 const FiniteElement<dim>&
@@ -603,7 +346,6 @@ FiniteElement<dim>::base_element(unsigned index) const
 
 /*------------------------------- Explicit Instantiations -------------*/
 
-template class FiniteElementData<deal_II_dimension>;
 template class FiniteElementBase<deal_II_dimension>;
 template class FiniteElement<deal_II_dimension>;
 

@@ -1,0 +1,114 @@
+//----------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------------------------------------------
+
+// Transfer matrices for finite elements
+
+static double q1_into_q1_refined_0[] =
+{
+  1., 0.,
+  13.5/27., 13.5/27.,
+};
+
+static double q1_into_q1_refined_1[] =
+{
+ 13.5/27., 13.5/27.,
+ 0., 1.,
+};
+
+static double q2_into_q2_refined_0[] =
+{
+  1., 0., 0.,
+  0., 0., 1.,
+ 10.125/27., -3.375/27., 20.25/27.,
+};
+
+static double q2_into_q2_refined_1[] =
+{
+ 0., 0., 1.,
+ 0., 1., 0.,
+ -3.375/27., 10.125/27., 20.25/27.,
+};
+
+static double q3_into_q3_refined_0[] =
+{
+ 1., 0., 0., 0.,
+ -1.6875/27., -1.6875/27., 15.1875/27., 15.1875/27.,
+ 8.4375/27., 1.6875/27., 25.3125/27., -8.4375/27.,
+ 0., 0., 1., 0.
+};
+
+static double q3_into_q3_refined_1[] =
+{
+ -1.6875/27., -1.6875/27., 15.1875/27., 15.1875/27.,
+ 0., 1., 0., 0.,
+ 0., 0., 0., 1.,
+ 1.6875/27., 8.4375/27., -8.4375/27., 25.3125/27.,
+};
+
+static double q4_into_q4_refined_0[] =
+{
+  1., 0., 0., 0., 0.,
+  0., 0., 0., 1., 0.,
+ 7.3828125/27., -1.0546875/27., 29.53125/27., -14.765625/27., 5.90625/27.,
+  0., 0., 1., 0., 0.,
+ -1.0546875/27., 0.6328125/27., 12.65625/27., 18.984375/27., -4.21875/27.,
+};
+
+static double q4_into_q4_refined_1[] =
+{
+  0., 0., 0., 1., 0.,
+  0., 1., 0., 0., 0.,
+  0.6328125/27., -1.0546875/27., -4.21875/27., 18.984375/27., 12.65625/27.,
+  0., 0., 0., 0., 1.,
+ -1.0546875/27., 7.3828125/27., 5.90625/27., -14.765625/27., 29.53125/27.,
+};
+
+static double * embedding0[] =
+{
+  q1_into_q1_refined_0,
+  q2_into_q2_refined_0,
+  q3_into_q3_refined_0,
+  q4_into_q4_refined_0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+};
+
+static double * embedding1[] =
+{
+  q1_into_q1_refined_1,
+  q2_into_q2_refined_1,
+  q3_into_q3_refined_1,
+  q4_into_q4_refined_1,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+};
+
+static double** embedding2;
+static double** embedding3;
+static double** embedding4;
+static double** embedding5;
+static double** embedding6;
+static double** embedding7;
+
+// No constrants in 1d
+
+static double ** constraint_matrices = 0;
+

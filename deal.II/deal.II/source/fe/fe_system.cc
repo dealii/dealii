@@ -13,10 +13,14 @@
 
 
 #include <base/memory_consumption.h>
-#include <fe/fe_system.h>
+#include <base/quadrature.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
+#include <fe/mapping.h>
+#include <fe/fe_system.h>
+#include <fe/fe_values.h>
+
 
 // if necessary try to work around a bug in the IBM xlC compiler
 #ifdef XLC_WORK_AROUND_STD_BUG
@@ -34,6 +38,431 @@ FESystem<dim>::~FESystem ()
       delete base_elements[i].first;
     }
 };
+
+
+template <int dim>
+FiniteElement<dim>*
+FESystem<dim>::clone() const
+{
+  FiniteElement<dim> *fe=0;
+  switch (n_base_elements())
+    {
+      case 1:
+	    fe=new FESystem(base_element(0),
+			    element_multiplicity(0));
+      case 2:
+	    fe=new FESystem(base_element(0),
+			    element_multiplicity(0),
+			    base_element(1),
+			    element_multiplicity(1));
+      case 3:
+	    fe=new FESystem(base_element(0),
+			    element_multiplicity(0),
+			    base_element(1),
+			    element_multiplicity(1),
+			    base_element(2),
+			    element_multiplicity(2));
+      default:
+	    Assert(false, ExcNotImplemented());
+    }
+  return fe;
+}
+
+
+template <int dim>
+void FESystem<dim>::get_unit_support_points (
+  typename std::vector<Point<dim> > &unit_support_points) const
+{
+  unit_support_points.resize(dofs_per_cell);
+  
+  typename std::vector<Point<dim> > base_unit_support_points (base_element(0).dofs_per_cell);
+  unsigned int comp = 0;
+  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
+    {
+      const unsigned int base_element_dofs_per_cell
+	=base_element(base_el).dofs_per_cell;
+ 
+      base_element(base_el).get_unit_support_points (base_unit_support_points);
+      if (base_unit_support_points.size()==0)
+	{
+	  base_unit_support_points.resize(0);
+	  return;
+	}
+      
+      Assert(base_unit_support_points.size()==base_element_dofs_per_cell,
+	     ExcInternalError());
+      for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n, ++comp)
+	for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
+	  unit_support_points[component_to_system_index(comp,i)]
+	    = base_unit_support_points[i];
+    }
+}
+
+
+
+template <int dim>
+void FESystem<dim>::get_unit_face_support_points (
+  typename std::vector<Point<dim-1> > &unit_support_points) const
+{
+  unit_support_points.resize(dofs_per_face);
+  
+  typename std::vector<Point<dim-1> > base_unit_support_points (base_element(0).dofs_per_cell);
+  unsigned int comp = 0;
+  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
+    {
+      const unsigned int base_element_dofs_per_face
+	=base_element(base_el).dofs_per_face;
+ 
+      base_element(base_el).get_unit_face_support_points (base_unit_support_points);
+      
+				       // for elements that don't have
+				       // unit support points this
+				       // function is not implemented
+      Assert(base_unit_support_points.size()==base_element_dofs_per_face,
+	     ExcNotImplemented());
+      for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n, ++comp)
+	for (unsigned int i=0; i<base_element_dofs_per_face; ++i)
+	  unit_support_points[face_component_to_system_index(comp,i)]
+	    = base_unit_support_points[i];
+    }
+}
+
+
+template <int dim>
+UpdateFlags
+FESystem<dim>::update_once (UpdateFlags flags) const
+{
+  UpdateFlags out = update_default;
+  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+    {
+      out |= base_element(base_no).update_once(flags);
+    }
+  return out;
+}
+
+
+template <int dim>
+UpdateFlags
+FESystem<dim>::update_each (UpdateFlags flags) const
+{
+  UpdateFlags out = update_default;
+  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+    {
+      out |= base_element(base_no).update_each(flags);
+    }
+  return out;
+}
+
+
+template <int dim>
+Mapping<dim>::InternalDataBase*
+FESystem<dim>::get_data (UpdateFlags flags,
+			 const Mapping<dim>& mapping,
+			 const Quadrature<dim>& quadrature) const
+{
+  InternalData* data = new InternalData(n_base_elements());
+
+  data->second_flag = flags & update_second_derivatives;
+
+				   // Make sure that this object
+				   // computes 2nd derivatives itself
+  if (data->second_flag)
+    {
+      flags = UpdateFlags (flags ^ update_second_derivatives);
+      data->initialize (this, mapping, quadrature);
+    }
+  
+  
+  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+    {
+      typename Mapping<dim>::InternalDataBase *base_fe_data_base =
+	base_element(base_no).get_data(flags, mapping, quadrature);
+      FiniteElementBase<dim>::InternalDataBase *base_fe_data =
+	dynamic_cast<typename FiniteElementBase<dim>::InternalDataBase *>
+	(base_fe_data_base);
+      
+      data->set_fe_data(base_no, base_fe_data);
+      data->update_once|=base_fe_data->update_once;
+      data->update_each|=base_fe_data->update_each;
+      
+				       // The FEValuesData @p{data}
+				       // given to the
+				       // @p{fill_fe_values} function
+				       // includes the FEValuesDatas
+				       // of the FESystem. Here the
+				       // FEValuesDatas @p{*base_data}
+				       // needs to be created that
+				       // later will be given to the
+				       // @p{fill_fe_values} functions
+				       // of the base
+				       // elements. @p{base_data->initialize}
+				       // cannot be called earlier as
+				       // in the @p{fill_fe_values}
+				       // function called for the
+				       // first cell. This is because
+				       // the initialize function
+				       // needs the update flags as
+				       // argument.
+				       //
+				       // The pointers @p{base_data}
+				       // are stored into the
+				       // FESystem::InternalData
+				       // @p{data}, similar to the
+				       // storing of the
+				       // @p{base_fe_data}s.
+      FEValuesData<dim> *base_data=new FEValuesData<dim>();
+      data->set_fe_values_data(base_no, base_data);
+    }
+  data->update_flags=data->update_once | data->update_each;
+  Assert(data->update_once==update_once(flags), ExcInternalError());
+  Assert(data->update_each==update_each(flags), ExcInternalError());
+  return data;
+}
+
+
+
+template <int dim>
+void
+FESystem<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
+			       const DoFHandler<dim>::cell_iterator &cell,
+			       const Quadrature<dim>                &quadrature,
+			       Mapping<dim>::InternalDataBase      &mapping_data,
+			       Mapping<dim>::InternalDataBase      &fe_data,
+			       FEValuesData<dim>                    &data) const
+{
+  const unsigned int minus_1=static_cast<unsigned int> (-1);
+  compute_fill(mapping, cell, minus_1, minus_1,
+	       quadrature, mapping_data, fe_data, data);
+}
+
+
+template <int dim>
+void
+FESystem<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
+				    const DoFHandler<dim>::cell_iterator &cell,
+				    const unsigned int                    face_no,
+				    const Quadrature<dim-1>              &quadrature,
+				    Mapping<dim>::InternalDataBase      &mapping_data,
+				    Mapping<dim>::InternalDataBase      &fe_data,
+				    FEValuesData<dim>                    &data) const
+{
+  const unsigned int minus_1=static_cast<unsigned int> (-1);
+  compute_fill(mapping, cell, face_no, minus_1,
+	       quadrature, mapping_data, fe_data, data);
+
+}
+
+
+
+template <int dim>
+void
+FESystem<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
+				       const DoFHandler<dim>::cell_iterator &cell,
+				       const unsigned int                    face_no,
+				       const unsigned int                    sub_no,
+				       const Quadrature<dim-1>              &quadrature,
+				       Mapping<dim>::InternalDataBase      &mapping_data,
+				       Mapping<dim>::InternalDataBase      &fe_data,
+				       FEValuesData<dim>                    &data) const
+{
+  compute_fill(mapping, cell, face_no, sub_no,
+	       quadrature, mapping_data, fe_data, data);
+}
+
+
+
+template <int dim>
+template <int dim_1>
+void
+FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
+			     const DoFHandler<dim>::cell_iterator &cell,
+			     const unsigned int                    face_no,
+			     const unsigned int                    sub_no,
+			     const Quadrature<dim_1>              &quadrature,
+			     Mapping<dim>::InternalDataBase      &mapping_data,
+			     Mapping<dim>::InternalDataBase      &fedata,
+			     FEValuesData<dim>                    &data) const
+{       
+  InternalData& fe_data = dynamic_cast<InternalData&> (fedata);
+  
+				   // Either dim_1==dim (fill_fe_values)
+				   // or dim_1==dim-1 (fill_fe_(sub)face_values)
+  Assert(dim_1==dim || dim_1==dim-1, ExcInternalError());
+  const UpdateFlags flags(dim_1==dim ?
+			  fe_data.current_update_flags() :
+			  fe_data.update_flags);
+
+
+  if (flags & (update_values | update_gradients))
+    {
+      if (fe_data.first_cell)
+	{
+					   // Initialize the FEValuesDatas
+					   // for the base elements.
+					   // Originally this is the task
+					   // of FEValues::FEValues() but
+					   // the latter initializes
+					   // the FEValuesDatas only of the
+					   // FESystem but not the
+					   // FEValuesDatas needed by the
+					   // base elements.
+	  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+	    {
+					       // Pointer needed to get
+					       // the update flags of the
+					       // base element
+	      Mapping<dim>::InternalDataBase &base_fe_data=
+		fe_data.get_fe_data(base_no);
+	      
+					       // compute update flags ...
+	      const UpdateFlags base_update_flags(mapping_data.update_flags
+						  | base_fe_data.update_flags);
+	      
+					       // Initialize the FEValuesDatas
+					       // for the base elements.
+	      FEValuesData<dim> &base_data=fe_data.get_fe_values_data(base_no);
+	      const FiniteElement<dim> &base_fe=base_element(base_no);
+	      base_data.initialize(quadrature.n_quadrature_points,
+				   base_fe.dofs_per_cell,
+				   base_update_flags);
+	    }
+	}
+      
+				       // fill_fe_face_values needs
+				       // argument Quadrature<dim-1>
+				       // for both cases
+				       // dim_1==dim-1 and
+				       // dim_1=dim. Hence the
+				       // following workaround
+      const Quadrature<dim>   *cell_quadrature = 0;
+      const Quadrature<dim-1> *face_quadrature = 0;
+      
+				       // static cast to the
+				       // common base class of
+				       // quadrature being either
+				       // Quadrature<dim> or
+				       // Quadrature<dim-1>:
+      const Subscriptor* quadrature_base_pointer = &quadrature;
+
+      const unsigned int minus_1=static_cast<unsigned int> (-1);  
+      if (face_no==minus_1)
+	{
+	  Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
+	  cell_quadrature=dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer);
+	  Assert (cell_quadrature != 0, ExcInternalError());
+	}
+      else
+	{
+	  Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
+	  face_quadrature=dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
+	  Assert (face_quadrature != 0, ExcInternalError());
+	}
+
+      
+      for (unsigned int base_no=0, comp=0; base_no<n_base_elements(); ++base_no)
+	{
+	  const FiniteElement<dim> &base_fe=base_element(base_no);
+	  FiniteElementBase<dim>::InternalDataBase &base_fe_data=
+	    fe_data.get_fe_data(base_no);
+
+					   // Make sure that in the
+					   // case of fill_fe_values
+					   // the data is only copied
+					   // from base_data to data
+					   // if base_data is
+					   // changed. therefore use
+					   // fe_fe_data.current_update_flags()
+	  
+					   // for the case of
+					   // fill_fe_(sub)face_values
+					   // the data needs to be
+					   // copied from base_data to
+					   // data on each face,
+					   // therefore use
+					   // base_fe_data.update_flags.
+	  
+					   // Store these flags into
+					   // base_flags before
+					   // calling
+					   // base_fe.fill_fe_([sub]face_)values
+					   // as the latter changes
+					   // the return value of
+					   // base_fe_data.current_update_flags()
+	  const UpdateFlags base_flags(dim_1==dim ?
+				       base_fe_data.current_update_flags() :
+				       base_fe_data.update_flags);
+	  
+	  FEValuesData<dim> &base_data=fe_data.get_fe_values_data(base_no);
+
+	  if (face_no==minus_1)
+	    base_fe.fill_fe_values(mapping, cell,
+				   *cell_quadrature, mapping_data, base_fe_data, base_data);
+	  else if (sub_no==minus_1)
+	    base_fe.fill_fe_face_values(mapping, cell, face_no,
+					*face_quadrature, mapping_data, base_fe_data, base_data);
+	  else
+	    base_fe.fill_fe_subface_values(mapping, cell, face_no, sub_no,
+					   *face_quadrature, mapping_data, base_fe_data, base_data);
+
+	  for (unsigned int m=0; m<element_multiplicity(base_no); ++m, ++comp)
+	    for (unsigned int point=0; point<quadrature.n_quadrature_points; ++point)
+	      for (unsigned int k=0; k<base_fe.dofs_per_cell; ++k)
+		{
+		  const unsigned int system_index=component_to_system_index(comp,k);
+		  if (base_flags & update_values)
+		    data.shape_values(system_index, point)=
+		      base_data.shape_values(k,point);
+		  
+		  if (base_flags & update_gradients)
+		    data.shape_gradients[system_index][point]=
+		      base_data.shape_gradients[k][point];
+		
+		  if (base_flags & update_second_derivatives)
+		    data.shape_2nd_derivatives[system_index][point]=
+		      base_data.shape_2nd_derivatives[k][point];
+		}
+	}
+  
+
+      if (fe_data.first_cell)
+	{
+	  fe_data.first_cell = false;
+	  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+	    Assert(fe_data.get_fe_data(base_no).first_cell==false, ExcInternalError());
+	  
+					   // delete FEValuesDatas that
+					   // are not needed any more
+	  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+	    {
+					       // Pointer needed to get
+					       // the update flags of the
+					       // base element
+	      Mapping<dim>::InternalDataBase &base_fe_data=
+		fe_data.get_fe_data(base_no);
+	      
+					       // compute update flags ...
+	      UpdateFlags base_flags_each(
+		dim_1==dim ?
+		mapping_data.update_each | base_fe_data.update_each :
+		mapping_data.update_flags | base_fe_data.update_flags);
+	      
+	      if (base_flags_each==update_default)
+		fe_data.delete_fe_values_data(base_no);
+	    }
+	}
+    }
+  if (fe_data.second_flag)
+    {
+      unsigned int offset = 0;
+      if (face_no != static_cast<unsigned int> (-1))
+	offset = (sub_no == static_cast<unsigned int> (-1))
+		 ? face_no * quadrature.n_quadrature_points
+		 :(face_no * GeometryInfo<dim>::subfaces_per_face
+		   + sub_no) * quadrature.n_quadrature_points;  
+      compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    }
+}
+
 
 
 template <int dim>
@@ -478,6 +907,29 @@ void FESystem<dim>::initialize ()
 {
   build_cell_table();
   build_face_table();
+  
+  // Check if matrices are void.
+
+  bool do_restriction = true;
+  bool do_prolongation = true;
+
+  for (unsigned int i=0;i<n_base_elements(); ++i)
+    {
+      if (base_element(i).restriction[0].n() == 0)
+	do_restriction = false;
+      if (base_element(i).prolongation[0].n() == 0)
+	do_prolongation = false;
+    }
+  
+  // Void matrices if not defined for all base elements
+
+  if (!do_restriction)
+    for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+      restriction[i].reinit(0,0);
+  if (!do_prolongation)
+    for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+      prolongation[i].reinit(0,0);
+	
 				   // distribute the matrices of the base
 				   // finite elements to the matrices of
 				   // this object
@@ -490,189 +942,95 @@ void FESystem<dim>::initialize ()
 					 // intermixing of subelements
 	for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
 	  {
-	    restriction[child] (component_to_system_index (component,i),
-				component_to_system_index (component, j))
-	      = base_element(component_to_base_table[component]).restrict(child)(i,j);
-	    prolongation[child] (component_to_system_index (component,i),
-				 component_to_system_index (component, j))
-	      = base_element(component_to_base_table[component]).prolongate(child)(i,j);
+	    if (do_restriction)
+	      restriction[child] (component_to_system_index (component,i),
+				  component_to_system_index (component, j))
+		= base_element(component_to_base_table[component]).restrict(child)(i,j);
+	    if (do_prolongation)
+	      prolongation[child] (component_to_system_index (component,i),
+				   component_to_system_index (component, j))
+		= base_element(component_to_base_table[component]).prolongate(child)(i,j);
 	  };
 
 
 				   // now set up the interface constraints.
 				   // this is kind'o hairy, so don't try
 				   // to do it dimension independent
+
+				   // TODO: there's an assertion thrown for
+				   // dim=3 and for FESystem(FE_Q<dim> (3), 2) and for
+				   // FESystem<dim>(FE_Q<dim> (1), 2, FE_Q<dim> (3), 1)
+				   // and for FESystem<dim>(FE_Q<dim> (4), 2))
   build_interface_constraints ();
 };
 
 
-#if deal_II_dimension == 1
 
-template <>
-FiniteElementData<1>
-FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe_data,
-				   const unsigned int          N)
+template <int dim>
+FiniteElementData<dim>
+FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
+				     const unsigned int            N)
 {
-  return FiniteElementData<1> (fe_data.dofs_per_vertex * N,
-			       fe_data.dofs_per_line * N,
-			       fe_data.n_transform_functions(),
-			       fe_data.n_components() * N);
+  std::vector<unsigned int> dpo;
+  dpo.push_back(fe_data.dofs_per_vertex * N);
+  dpo.push_back(fe_data.dofs_per_line * N);
+  if (dim>1) dpo.push_back(fe_data.dofs_per_quad * N);
+  if (dim>2) dpo.push_back(fe_data.dofs_per_hex * N);
+  
+  return FiniteElementData<dim> (dpo, fe_data.n_components() * N);
 };
 
 
-template <>
-FiniteElementData<1>
-FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe1,
-				   const unsigned int          N1,
-				   const FiniteElementData<1> &fe2,
-				   const unsigned int          N2)
+
+template <int dim>
+FiniteElementData<dim>
+FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+				     const unsigned int            N1,
+				     const FiniteElementData<dim> &fe2,
+				     const unsigned int            N2)
 {
-  return FiniteElementData<1> (fe1.dofs_per_vertex * N1 + fe2.dofs_per_vertex * N2 ,
-			       fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2 ,
-			       fe1.n_transform_functions(),
-			       fe1.n_components() * N1 + fe2.n_components() * N2 );
+  std::vector<unsigned int> dpo;
+  dpo.push_back(fe1.dofs_per_vertex * N1 + fe2.dofs_per_vertex * N2);
+  dpo.push_back(fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2);
+  if (dim>1) dpo.push_back(fe1.dofs_per_quad * N1 + fe2.dofs_per_quad * N2);
+  if (dim>2) dpo.push_back(fe1.dofs_per_hex * N1 + fe2.dofs_per_hex * N2);
+  
+  return FiniteElementData<dim> (dpo,
+				 fe1.n_components() * N1 +
+				 fe2.n_components() * N2);
 };
 
 
-template <>
-FiniteElementData<1>
-FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe1,
-				   const unsigned int          N1,
-				   const FiniteElementData<1> &fe2,
-				   const unsigned int          N2,
-				   const FiniteElementData<1> &fe3,
-				   const unsigned int          N3)
+
+template <int dim>
+FiniteElementData<dim>
+FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+				     const unsigned int            N1,
+				     const FiniteElementData<dim> &fe2,
+				     const unsigned int            N2,
+				     const FiniteElementData<dim> &fe3,
+				     const unsigned int            N3)
 {
-  return FiniteElementData<1> (fe1.dofs_per_vertex * N1
-			       + fe2.dofs_per_vertex * N2
-			       + fe3.dofs_per_vertex * N3,
-			       fe1.dofs_per_line * N1
-			       + fe2.dofs_per_line * N2
-			       + fe3.dofs_per_line * N3,
-			       fe1.n_transform_functions(),
-			       fe1.n_components() * N1
-			       + fe2.n_components() * N2
-			       + fe3.n_components() * N3);
+  std::vector<unsigned int> dpo;
+  dpo.push_back(fe1.dofs_per_vertex * N1 +
+		fe2.dofs_per_vertex * N2 +
+		fe3.dofs_per_vertex * N3);
+  dpo.push_back(fe1.dofs_per_line * N1 +
+		fe2.dofs_per_line * N2 +
+		fe3.dofs_per_line * N3);
+  if (dim>1) dpo.push_back(fe1.dofs_per_quad * N1 +
+			   fe2.dofs_per_quad * N2 +
+			   fe3.dofs_per_quad * N3);
+  if (dim>2) dpo.push_back(fe1.dofs_per_hex * N1 +
+			   fe2.dofs_per_hex * N2 +
+			   fe3.dofs_per_hex * N3);
+  
+  return FiniteElementData<dim> (dpo,
+				 fe1.n_components() * N1 +
+				 fe2.n_components() * N2 +
+				 fe3.n_components() * N3);
 };
 
-#endif
-
-
-#if deal_II_dimension == 2
-
-template <>
-FiniteElementData<2>
-FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe_data,
-				   const unsigned int          N)
-{
-  return FiniteElementData<2> (fe_data.dofs_per_vertex * N,
-			       fe_data.dofs_per_line * N,
-			       fe_data.dofs_per_quad * N,
-			       fe_data.n_transform_functions(),
-			       fe_data.n_components() * N);
-};
-
-template <>
-FiniteElementData<2>
-FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe1,
-				   const unsigned int          N1,
-				   const FiniteElementData<2> &fe2,
-				   const unsigned int          N2)
-{
-  return FiniteElementData<2> (fe1.dofs_per_vertex * N1 + fe2.dofs_per_vertex * N2 ,
-			       fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2 ,
-			       fe1.dofs_per_quad * N1 + fe2.dofs_per_quad * N2 ,
-			       fe1.n_transform_functions(),
-			       fe1.n_components() * N1 + fe2.n_components() * N2 );
-};
-
-
-template <>
-FiniteElementData<2>
-FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe1,
-				   const unsigned int          N1,
-				   const FiniteElementData<2> &fe2,
-				   const unsigned int          N2,
-				   const FiniteElementData<2> &fe3,
-				   const unsigned int          N3)
-{
-  return FiniteElementData<2> (fe1.dofs_per_vertex * N1
-			       + fe2.dofs_per_vertex * N2
-			       + fe3.dofs_per_vertex * N3 ,
-			       fe1.dofs_per_line * N1
-			       + fe2.dofs_per_line * N2
-			       + fe3.dofs_per_line * N3 ,
-			       fe1.dofs_per_quad * N1
-			       + fe2.dofs_per_quad * N2
-			       + fe3.dofs_per_quad * N3 ,
-			       fe1.n_transform_functions(),
-			       fe1.n_components() * N1
-			       + fe2.n_components() * N2
-			       + fe3.n_components() * N3 );
-};
-
-#endif
-
-
-#if deal_II_dimension == 3
-
-template <>
-FiniteElementData<3>
-FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe_data,
-				   const unsigned int          N)
-{
-  return FiniteElementData<3> (fe_data.dofs_per_vertex * N,
-			       fe_data.dofs_per_line * N,
-			       fe_data.dofs_per_quad * N,
-			       fe_data.dofs_per_hex * N,
-			       fe_data.n_transform_functions(),
-			       fe_data.n_components() * N);
-};
-
-template <>
-FiniteElementData<3>
-FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe1,
-				   const unsigned int          N1,
-				   const FiniteElementData<3> &fe2,
-				   const unsigned int          N2)
-{
-  return FiniteElementData<3> (fe1.dofs_per_vertex * N1 + fe2.dofs_per_vertex * N2 ,
-			       fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2 ,
-			       fe1.dofs_per_quad * N1 + fe2.dofs_per_quad * N2 ,
-			       fe1.dofs_per_hex * N1 + fe2.dofs_per_hex * N2 ,
-			       fe1.n_transform_functions(),
-			       fe1.n_components() * N1 + fe2.n_components() * N2 );
-};
-
-
-template <>
-FiniteElementData<3>
-FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe1,
-				   const unsigned int          N1,
-				   const FiniteElementData<3> &fe2,
-				   const unsigned int          N2,
-				   const FiniteElementData<3> &fe3,
-				   const unsigned int          N3)
-{
-  return FiniteElementData<3> (fe1.dofs_per_vertex * N1
-			       + fe2.dofs_per_vertex * N2
-			       + fe3.dofs_per_vertex * N3 ,
-			       fe1.dofs_per_line * N1
-			       + fe2.dofs_per_line * N2
-			       + fe3.dofs_per_line * N3 ,
-			       fe1.dofs_per_quad * N1
-			       + fe2.dofs_per_quad * N2
-			       + fe3.dofs_per_quad * N3 ,
-			       fe1.dofs_per_hex * N1
-			       + fe2.dofs_per_hex * N2
-			       + fe3.dofs_per_hex * N3 ,
-			       fe1.n_transform_functions(),
-			       fe1.n_components() * N1
-			       + fe2.n_components() * N2
-			       + fe3.n_components() * N3 );
-};
-
-#endif
 
 
 template <int dim>
@@ -730,369 +1088,44 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 
 
 template <int dim>
-double
-FESystem<dim>::shape_value (const unsigned int i,
-			    const Point<dim>  &p) const
-{
-  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
-
-  std::pair<unsigned,unsigned> comp = system_to_component_index(i);
-  
-  return base_element(component_to_base_table[comp.first])
-    .shape_value(comp.second, p);
-};
-
-
-template <int dim>
-Tensor<1,dim>
-FESystem<dim>::shape_grad (const unsigned int  i,
-			   const Point<dim>   &p) const
-{
-  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
-
-  std::pair<unsigned,unsigned> comp = system_to_component_index(i);
-  
-  return base_element(component_to_base_table[comp.first])
-    .shape_grad(comp.second, p);
-};
-
-
-template <int dim>
-Tensor<2,dim>
-FESystem<dim>::shape_grad_grad (const unsigned int  i,
-				const Point<dim>   &p) const
-{
-  Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
-
-
-  std::pair<unsigned,unsigned> comp = system_to_component_index(i);
-  
-  return base_element(component_to_base_table[comp.first])
-    .shape_grad_grad(comp.second, p);
-};
-
-
-template <int dim>
-void FESystem<dim>::get_unit_support_points (
-  typename std::vector<Point<dim> > &unit_support_points) const
-{
-  Assert(unit_support_points.size() == dofs_per_cell,
-	 typename FiniteElementBase<dim>::
-	 ExcWrongFieldDimension (unit_support_points.size(),
-				 dofs_per_cell));
-
-  std::vector<Point<dim> > base_unit_support_points (base_element(0).dofs_per_cell);
-  unsigned int component = 0;
-  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
-    {
-      const unsigned int base_element_dofs_per_cell
-	=base_element(base_el).dofs_per_cell;
- 
-      base_unit_support_points.resize(base_element_dofs_per_cell);
-      base_element(base_el).get_unit_support_points (base_unit_support_points);
-      for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n)
-	{
-	  for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
-	    {
-	      unit_support_points[component_to_system_index(component,i)]
-		= base_unit_support_points[i];
-	    }
-	  ++component;
-	}
-    }
-
-				   // An alternative version
-
-				   // base unit support points
-//   vector<vector<Point<dim> > > base_us_points(n_base_elements());
-//   for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
-//     {
-//       const unsigned int base_element_dofs_per_cell
-// 	=base_element(base_el).dofs_per_cell;
-
-//       base_us_points[base_el].resize(base_element_dofs_per_cell);
-//       base_element(base_el).get_unit_support_points (base_us_points[base_el]);
-//     }
-
-//   for (unsigned int i=0; i<dofs_per_cell; ++i)
-//     {
-//       const unsigned int comp=system_to_component_index(i).first,
-// 		     base_dof=system_to_component_index(i).second,
-// 		      base_el=component_to_base_table[comp];
-      
-//       unit_support_points[i]=base_us_points[base_el][base_dof];
-//    }
-};
-
-
-template <int dim>
-void FESystem<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-					typename std::vector<Point<dim> > &support_points) const
-{
-  Assert(support_points.size() == dofs_per_cell,
-	 typename FiniteElementBase<dim>::
-	 ExcWrongFieldDimension (support_points.size(),
-				 dofs_per_cell));
-
-  std::vector<Point<dim> > base_support_points (base_element(0).dofs_per_cell);
-  unsigned int component = 0;
-  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
-    {
-      const unsigned int base_element_dofs_per_cell
-	=base_element(base_el).dofs_per_cell;
-      
-      base_support_points.resize(base_element_dofs_per_cell);
-      base_element(base_el).get_support_points (cell, base_support_points);
-      for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n)
-	{
-	  for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
-	    {
-	      support_points[component_to_system_index(component,i)]
-		= base_support_points[i];
-	    }
-	  ++component;
-	}
-    }
-};
-
-
-template <int dim>
-void FESystem<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator & face,
-					     typename std::vector<Point<dim> > & support_points) const
-{
-  Assert (support_points.size() == dofs_per_face,
-	  typename FiniteElementBase<dim>::
-	  ExcWrongFieldDimension (support_points.size(),
-				  dofs_per_face));
-
-  std::vector<Point<dim> > base_support_points (base_element(0).dofs_per_face);
-  unsigned int comp = 0;
-  for (unsigned int base=0 ; base<n_base_elements(); ++base)
-    {
-      base_support_points.resize(base_element(base).dofs_per_face);
-      base_element(base).get_face_support_points (face, base_support_points);
-      for (unsigned int inbase = 0 ; inbase < element_multiplicity(base); ++inbase)
-	{
-	  for (unsigned int i=0; i<base_element(base).dofs_per_face; ++i)
-	    {
-	      support_points[face_component_to_system_index(comp,i)]
-		= base_support_points[i];
-	    }
-	  
-	  ++comp;
-	}
-    }
-}
-
-
-template <int dim>
-void FESystem<dim>::get_local_mass_matrix (const typename DoFHandler<dim>::cell_iterator &cell,
-					   FullMatrix<double>  &local_mass_matrix) const
-{
-  Assert (local_mass_matrix.n() == dofs_per_cell,
-	  typename FiniteElementBase<dim>::
-	  ExcWrongFieldDimension(local_mass_matrix.n(),
-				 dofs_per_cell));
-  Assert (local_mass_matrix.m() == dofs_per_cell,
-	  typename FiniteElementBase<dim>::
-	  ExcWrongFieldDimension(local_mass_matrix.m(),
-				 dofs_per_cell));
-
-				   // track which component we are
-				   // presently working with, since we
-				   // only have the number of the base
-				   // element and the number within
-				   // its multiplicity
-  unsigned int component = 0;  
-  for (unsigned int base_el=0; base_el<n_base_elements(); ++base_el)
-    {
-				       // first get the local mass matrix for
-				       // the base object
-      const unsigned int base_element_dofs_per_cell=base_element(base_el).dofs_per_cell;
-      FullMatrix<double> base_mass_matrix (base_element_dofs_per_cell,
-					   base_element_dofs_per_cell);
-      base_element(base_el).get_local_mass_matrix (cell, base_mass_matrix);
-      
-				       // now distribute it to the mass matrix
-				       // of this object
-      const unsigned int el_multiplicity=element_multiplicity(base_el);
-      for (unsigned int n=0; n<el_multiplicity; ++n)
-	{
-	  for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<base_element_dofs_per_cell; ++j)
-					       // only fill diagonals of the blocks
-	      local_mass_matrix (component_to_system_index(component,i),
-				 component_to_system_index(component,j))
-		= base_mass_matrix (i,j);
-	  ++component;
-	};
-    };
-  Assert (component == n_components(), ExcInternalError());
-};
-
-
-template <int dim>
-Point<dim> FESystem<dim>::transform_unit_to_real_cell (
-  const typename DoFHandler<dim>::cell_iterator &cell,
-  const Point<dim> &p) const
-{
-  return base_elements[0].first->transform_unit_to_real_cell(cell, p);
-};
-
-
-template <int dim>
-Point<dim> FESystem<dim>::transform_real_to_unit_cell (
-  const typename DoFHandler<dim>::cell_iterator &cell,
-  const Point<dim> &p) const
-{
-  return base_elements[0].first->transform_real_to_unit_cell(cell, p);
-};
-
-
-template <int dim>
-double FESystem<dim>::shape_value_transform (const unsigned int i,
-					     const Point<dim>  &p) const
-{
-  return base_elements[0].first->shape_value_transform(i,p);
-};
-
-
-template <int dim>
-Tensor<1,dim> FESystem<dim>::shape_grad_transform (const unsigned int i,
-						   const Point<dim>  &p) const
-{
-  return base_elements[0].first->shape_grad_transform (i, p);
-};
-
-
-template <int dim>
-void FESystem<dim>::get_face_jacobians (const typename DoFHandler<dim>::face_iterator &face,
-					const typename std::vector<Point<dim-1> > &unit_points,
-					typename std::vector<double>      &face_jacobi_determinants) const
-{
-  base_elements[0].first->get_face_jacobians (face, unit_points,
-					      face_jacobi_determinants);
-};
-
-
-template <int dim>
-void FESystem<dim>::get_subface_jacobians (const typename DoFHandler<dim>::face_iterator &face,
-					   const unsigned int           subface_no,
-					   const typename std::vector<Point<dim-1> > &unit_points,
-					   typename std::vector<double>      &face_jacobi_determinants) const
-{
-  base_elements[0].first->get_subface_jacobians (face, subface_no, unit_points,
-						 face_jacobi_determinants);
-};
-
-
-template <int dim>
-void FESystem<dim>::get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
-					const unsigned int          face_no,
-					const typename std::vector<Point<dim-1> > &unit_points,
-					typename std::vector<Point<dim> >         &normal_vectors) const
-{
-  base_elements[0].first->get_normal_vectors (cell, face_no, unit_points,
-					      normal_vectors);
-};
-
-
-template <int dim>
-void FESystem<dim>::get_normal_vectors (const typename DoFHandler<dim>::cell_iterator &cell,
-					const unsigned int          face_no,
-					const unsigned int          subface_no,
-					const typename std::vector<Point<dim-1> > &unit_points,
-					typename std::vector<Point<dim> >         &normal_vectors) const
-{
-  base_elements[0].first->get_normal_vectors (cell, face_no, subface_no, unit_points,
-					      normal_vectors);
-};
-
-
-template <int dim>
-void
-FESystem<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
-			       const typename std::vector<Point<dim> >            &unit_points,
-			       typename std::vector<Tensor<2,dim> >               &jacobians,
-			       const bool              compute_jacobians,
-			       typename std::vector<Tensor<3,dim> > &jacobians_grad,
-			       const bool              compute_jacobians_grad,
-			       typename std::vector<Point<dim> > &support_points,
-			       const bool           compute_support_points,
-			       typename std::vector<Point<dim> > &q_points,
-			       const bool           compute_q_points,
-			       const FullMatrix<double>  &shape_values_transform,
-			       const typename std::vector<typename std::vector<Tensor<1,dim> > > &shape_grad_transform) const
-{
-				   // if we are to compute the support
-				   // points, then we need to get them
-				   // from each base element. the
-				   // following variable is used as
-				   // temporary
-  std::vector<Point<dim> > supp(compute_support_points ?
-				base_elements[0].first->dofs_per_cell :
-				0);
-
-  base_elements[0].first->fill_fe_values (cell, unit_points, jacobians, compute_jacobians,
-					  jacobians_grad, compute_jacobians_grad,
-					  supp, compute_support_points,
-					  q_points, compute_q_points,
-					  shape_values_transform, shape_grad_transform);
-  
-  if (compute_support_points)
-    {
-				       // for the first base element, we
-				       // have obtained the support
-				       // points above already
-      unsigned int component = 0;
-      for (unsigned int m=0 ; m < element_multiplicity(0) ; ++ m)
-	{
-	  for (unsigned int i=0 ; i < base_element(0).dofs_per_cell ; ++i)
-	    support_points[component_to_system_index(component,i)] = supp[i];
-	  ++component;
-	}
-
-				       // if there are more base
-				       // elements, we still have to
-				       // get the support points from
-				       // them
-      for (unsigned int base=1 ; base < n_base_elements() ; ++base)
-	{
-	  supp.resize(base_elements[base].first->dofs_per_cell);
-	  base_elements[base].first->fill_fe_values (cell, unit_points, jacobians, false,
-						     jacobians_grad, false,
-						     supp, true,
-						     q_points, false,
-						     shape_values_transform, shape_grad_transform);
-	  
-	  for (unsigned int m=0 ; m < element_multiplicity(base) ; ++ m)
-	    {
-	      for (unsigned int i=0 ; i < base_element(base).dofs_per_cell ; ++i)
-		support_points[component_to_system_index(component,i)] = supp[i];
-	      ++component;
-	    }
-	}    
-    }
-}
-
-
-
-template <int dim>
 unsigned int
 FESystem<dim>::memory_consumption () const 
 {
-				   // neglect size of data stored in
-				   // @p{base_elements} due to some
-				   // problems with teh
-				   // compiler. should be neglectable
-				   // after all, considering the size
-				   // of the data of the subelements
+                                 // neglect size of data stored in
+                                 // @p{base_elements} due to some
+                                 // problems with teh
+                                 // compiler. should be neglectable
+                                 // after all, considering the size
+                                 // of the data of the subelements
   unsigned int mem = (FiniteElement<dim>::memory_consumption () +
-		      sizeof (base_elements));
+                    sizeof (base_elements));
   for (unsigned int i=0; i<base_elements.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*base_elements[i].first);
   return mem;
 };
+
+
+template <int dim>
+FESystem<dim>::InternalData::InternalData(const unsigned int n_base_elements):
+		base_fe_datas(n_base_elements),
+		base_fe_values_datas(n_base_elements)
+{}
+
+
+
+template <int dim>
+FESystem<dim>::InternalData::~InternalData()
+{
+  for (unsigned int i=0; i<base_fe_datas.size(); ++i)
+    if (base_fe_datas[i])
+      delete base_fe_datas[i];
+  
+  for (unsigned int i=0; i<base_fe_values_datas.size(); ++i)
+    if (base_fe_values_datas[i])
+      delete base_fe_values_datas[i];
+}
+
+
 
 
 

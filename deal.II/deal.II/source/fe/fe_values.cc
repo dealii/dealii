@@ -13,6 +13,7 @@
 
 
 #include <fe/fe.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
 #include <base/memory_consumption.h>
 #include <base/quadrature.h>
@@ -23,11 +24,52 @@
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 
+#include <iomanip>
 
 // if necessary try to work around a bug in the IBM xlC compiler
 #ifdef XLC_WORK_AROUND_STD_BUG
 using namespace std;
 #endif
+
+static MappingQ1<deal_II_dimension> mapping_q1;
+
+template <int dim>
+void
+FEValuesData<dim>::initialize (const unsigned int n_quadrature_points,
+			       unsigned int n_shapes,
+			       const UpdateFlags flags)
+{
+  if (flags & update_values)
+    shape_values.reinit(n_shapes, n_quadrature_points);
+
+  if (flags & update_gradients)
+    {
+      shape_gradients.resize(n_shapes);
+      for (unsigned int i=0;i<n_shapes;++i)
+	shape_gradients[i].resize(n_quadrature_points);
+    }
+
+  if (flags & update_second_derivatives)
+    {      
+    shape_2nd_derivatives.resize(n_shapes);
+      for (unsigned int i=0;i<n_shapes;++i)
+	shape_2nd_derivatives[i].resize(n_quadrature_points);
+    }
+  
+  if (flags & update_q_points)
+    quadrature_points.resize(n_quadrature_points);
+
+  if (flags & update_JxW_values)
+    JxW_values.resize(n_quadrature_points);
+
+  if (flags & update_boundary_forms)
+    boundary_forms.resize(n_quadrature_points);
+
+  if (flags & update_normal_vectors)
+    normal_vectors.resize(n_quadrature_points);
+
+//Todo: support points missing
+}
 
 
 /*------------------------------- FEValuesBase ---------------------------*/
@@ -35,50 +77,40 @@ using namespace std;
 
 template <int dim>
 FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
-				 const unsigned int n_support_points,
 				 const unsigned int dofs_per_cell,
-				 const unsigned int n_transform_functions,
-				 const unsigned int n_values_arrays,
-				 const UpdateFlags update_flags,
+				 const unsigned int,
+				 const UpdateFlags flags,
+				 const Mapping<dim>       &mapping,
 				 const FiniteElement<dim> &fe)
 		:
 		n_quadrature_points (n_q_points),
 		dofs_per_cell (dofs_per_cell),
-		n_transform_functions (n_transform_functions),
-		shape_values (n_values_arrays, FullMatrix<double>(dofs_per_cell, n_q_points)),
-		shape_gradients (dofs_per_cell, std::vector<Tensor<1,dim> >(n_q_points)),
-		shape_2nd_derivatives (dofs_per_cell, std::vector<Tensor<2,dim> >(n_q_points)),
-		weights (n_q_points, 0),
-		JxW_values (n_q_points, 0),
-		quadrature_points (n_q_points, Point<dim>()),
-		support_points (n_support_points, Point<dim>()),
-		jacobi_matrices (n_q_points, Tensor<2,dim>()),
-		jacobi_matrices_grad (n_q_points, Tensor<3,dim>()),
-		shape_values_transform (n_values_arrays,
-					FullMatrix<double>(n_transform_functions,
-							   n_quadrature_points)),
-		selected_dataset (0),
-		update_flags (update_flags),
-		fe(&fe)
-{};
-
+		mapping(&mapping),
+		fe(&fe),
+		mapping_data(0),
+		fe_data(0)
+{
+  update_flags = flags;
+}
 
 
 template <int dim>
-double FEValuesBase<dim>::shape_value (const unsigned int i,
-				       const unsigned int j) const
+FEValuesBase<dim>::~FEValuesBase ()
 {
-  Assert (update_flags & update_values, ExcAccessToUninitializedField());
-  Assert (selected_dataset<shape_values.size(),
-	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
-  Assert (i<shape_values[selected_dataset].m(),
-	  ExcIndexRange (i, 0, shape_values[selected_dataset].m()));
-  Assert (j<shape_values[selected_dataset].n(),
-	  ExcIndexRange (j, 0, shape_values[selected_dataset].n()));
+  if (fe_data)
+    {
+      Mapping<dim>::InternalDataBase *tmp1=fe_data;
+      fe_data=0;
+      delete tmp1;
+    }
 
-  return shape_values[selected_dataset](i,j);
-};
-
+  if (mapping_data)
+    {
+      Mapping<dim>::InternalDataBase *tmp1=mapping_data;
+      mapping_data=0;
+      delete tmp1;
+    }
+}
 
 
 template <int dim>
@@ -86,13 +118,11 @@ template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
 					     typename std::vector<number>    &values) const
 {
+  Assert (update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
-  Assert (selected_dataset<shape_values.size(),
-	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   Assert (values.size() == n_quadrature_points,
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
-  Assert (update_flags & update_values, ExcAccessToUninitializedField());
 
 				   // get function values of dofs
 				   // on this cell
@@ -110,9 +140,8 @@ void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       values[point] += (dof_values(shape_func) *
-			shape_values[selected_dataset](shape_func, point));
+			shape_values(shape_func, point));
 };
-
 
 
 template <int dim>
@@ -122,8 +151,6 @@ void FEValuesBase<dim>::get_function_values (const InputVector       &fe_functio
 {
   Assert (n_quadrature_points == values.size(),
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
-  Assert (selected_dataset<shape_values.size(),
-	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   for (unsigned i=0;i<values.size();++i)
     Assert (values[i].size() == fe->n_components(),
 	    ExcWrongNoOfComponents());
@@ -146,25 +173,54 @@ void FEValuesBase<dim>::get_function_values (const InputVector       &fe_functio
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       values[point](fe->system_to_component_index(shape_func).first)
-	+= (dof_values(shape_func) * shape_values[selected_dataset](shape_func, point));
+	+= (dof_values(shape_func) * shape_values(shape_func, point));
 };
 
 
 
 template <int dim>
-const Tensor<1,dim> &
-FEValuesBase<dim>::shape_grad (const unsigned int i,
-			       const unsigned int j) const
+const typename FEValuesData<dim>::ShapeVector &
+FEValuesBase<dim>::get_shape_values () const
 {
-  Assert (i<shape_gradients.size(),
-	  ExcIndexRange (i, 0, shape_gradients.size()));
-  Assert (j<shape_gradients[i].size(),
-	  ExcIndexRange (j, 0, shape_gradients[i].size()));
-  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
-
-  return shape_gradients[i][j];
+  Assert (update_flags & update_values, ExcAccessToUninitializedField());
+  return shape_values;
 };
 
+
+template <int dim>
+const typename FEValuesData<dim>::GradientVector &
+FEValuesBase<dim>::get_shape_grads () const
+{
+  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
+  return shape_gradients;
+};
+
+
+template <int dim>
+const typename std::vector<typename std::vector<Tensor<2,dim> > > &
+FEValuesBase<dim>::get_shape_2nd_derivatives () const
+{
+  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  return shape_2nd_derivatives;
+};
+
+
+template <int dim>
+const typename std::vector<Point<dim> > &
+FEValuesBase<dim>::get_quadrature_points () const
+{
+  Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
+  return quadrature_points;
+};
+
+
+template <int dim>
+const std::vector<double> &
+FEValuesBase<dim>::get_JxW_values () const
+{
+  Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  return JxW_values;
+}
 
 
 template <int dim>
@@ -172,11 +228,12 @@ template <class InputVector>
 void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
 					    typename std::vector<Tensor<1,dim> > &gradients) const
 {
+  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
+
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
   Assert (gradients.size() == n_quadrature_points,
 	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
-  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
 
 				   // get function values of dofs
 				   // on this cell
@@ -209,8 +266,6 @@ void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_
 {
   Assert (n_quadrature_points == gradients.size(),
 	  ExcWrongNoOfComponents());
-  Assert (selected_dataset<shape_values.size(),
-	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   for (unsigned i=0;i<gradients.size();++i)
     Assert (gradients[i].size() == fe->n_components(),
 	    ExcWrongVectorSize(gradients[i].size(), fe->n_components()));
@@ -241,23 +296,6 @@ void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_
 };
 
 
-
-template <int dim>
-const Tensor<2,dim> &
-FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
-					 const unsigned int j) const
-{
-  Assert (i<shape_2nd_derivatives.size(),
-	  ExcIndexRange (i, 0, shape_2nd_derivatives.size()));
-  Assert (j<shape_2nd_derivatives[i].size(),
-	  ExcIndexRange (j, 0, shape_2nd_derivatives[i].size()));
-  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
-
-  return shape_2nd_derivatives[i][j];
-};
-
-
-
 template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe_function,
@@ -278,7 +316,7 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe
     present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
-  fill_n (second_derivatives.begin(), n_quadrature_points, Tensor<2,dim>());
+  std::fill_n (second_derivatives.begin(), n_quadrature_points, Tensor<2,dim>());
 
 				   // add up contributions of trial
 				   // functions
@@ -292,7 +330,6 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe
 };
 
 
-
 template <int dim>
 template <class InputVector>
 void
@@ -302,8 +339,6 @@ get_function_2nd_derivatives (const InputVector               &fe_function,
 {
   Assert (n_quadrature_points == second_derivs.size(),
 	  ExcWrongNoOfComponents());
-  Assert (selected_dataset<shape_values.size(),
-	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   for (unsigned i=0;i<second_derivs.size();++i)
     Assert (second_derivs[i].size() == fe->n_components(),
 	    ExcWrongVectorSize(second_derivs[i].size(), fe->n_components()));
@@ -339,31 +374,20 @@ template <int dim>
 const Point<dim> &
 FEValuesBase<dim>::quadrature_point (const unsigned int i) const
 {
-  Assert (i<quadrature_points.size(), ExcIndexRange(i, 0, quadrature_points.size()));
   Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
+  Assert (i<quadrature_points.size(), ExcIndexRange(i, 0, quadrature_points.size()));
   
   return quadrature_points[i];
 };
 
 
 
-template <int dim>
-const Point<dim> &
-FEValuesBase<dim>::support_point (const unsigned int i) const
-{
-  Assert (i<support_points.size(), ExcIndexRange(i, 0, support_points.size()));
-  Assert (update_flags & update_support_points, ExcAccessToUninitializedField());
-  
-  return support_points[i];
-};
-
-
 
 template <int dim>
 double FEValuesBase<dim>::JxW (const unsigned int i) const
 {
-  Assert (i<JxW_values.size(), ExcIndexRange(i, 0, JxW_values.size()));
   Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  Assert (i<JxW_values.size(), ExcIndexRange(i, 0, JxW_values.size()));
   
   return JxW_values[i];
 };
@@ -377,15 +401,8 @@ FEValuesBase<dim>::memory_consumption () const
   return (MemoryConsumption::memory_consumption (shape_values) +
 	  MemoryConsumption::memory_consumption (shape_gradients) +
 	  MemoryConsumption::memory_consumption (shape_2nd_derivatives) +
-	  MemoryConsumption::memory_consumption (weights) +
 	  MemoryConsumption::memory_consumption (JxW_values) +
 	  MemoryConsumption::memory_consumption (quadrature_points) +
-	  MemoryConsumption::memory_consumption (support_points) +
-	  MemoryConsumption::memory_consumption (jacobi_matrices) +
-	  MemoryConsumption::memory_consumption (jacobi_matrices_grad) +
-	  MemoryConsumption::memory_consumption (shape_values_transform) +
-	  MemoryConsumption::memory_consumption (selected_dataset) +
-	  MemoryConsumption::memory_consumption (jacobi_matrices) +
 	  sizeof(update_flags) +
 	  MemoryConsumption::memory_consumption (present_cell) +
 	  MemoryConsumption::memory_consumption (fe));
@@ -395,141 +412,95 @@ FEValuesBase<dim>::memory_consumption () const
 /*------------------------------- FEValues -------------------------------*/
 
 template <int dim>
-FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
-			 const Quadrature<dim>    &quadrature,
+FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
+			 const FiniteElement<dim> &fe,
+			 const Quadrature<dim>    &q,
 			 const UpdateFlags         update_flags)
 		:
-		FEValuesBase<dim> (quadrature.n_quadrature_points,
+		FEValuesBase<dim> (q.n_quadrature_points,
 				   fe.dofs_per_cell,
-				   fe.dofs_per_cell,
-				   fe.transform_functions,
 				   1,
 				   update_flags,
+				   mapping,
 				   fe),
-  unit_shape_gradients(fe.dofs_per_cell,
-		       std::vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
-			 unit_shape_2nd_derivatives(fe.dofs_per_cell,
-						    std::vector<Tensor<2,dim> >(quadrature.n_quadrature_points)),
-						      unit_shape_gradients_transform(fe.n_transform_functions(),
-										     std::vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
-										       unit_quadrature_points(quadrature.get_points())
+		quadrature (q)
 {
   Assert ((update_flags & update_normal_vectors) == false,
 	  typename FEValuesBase<dim>::ExcInvalidUpdateFlag());
 
-  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    for (unsigned int j=0; j<n_quadrature_points; ++j) 
-      {
-	shape_values[0](i,j) = fe.shape_value(i, unit_quadrature_points[j]);
-	unit_shape_gradients[i][j]
-	  = fe.shape_grad(i, unit_quadrature_points[j]);
-	if (update_flags & update_second_derivatives)
-	  unit_shape_2nd_derivatives[i][j]
-	    = fe.shape_grad_grad(i, unit_quadrature_points[j]);
-      };
+  UpdateFlags flags = mapping.update_once (update_flags);
+  flags |= mapping.update_each (update_flags);
+  flags |= fe.update_once (update_flags);
+  flags |= fe.update_each (update_flags);
 
-  for (unsigned int i=0; i<n_transform_functions; ++i)
-    for (unsigned int j=0; j<n_quadrature_points; ++j)
-      {
-	shape_values_transform[0] (i,j)
-	  = fe.shape_value_transform (i, unit_quadrature_points[j]);
-	unit_shape_gradients_transform[i][j]
-	  = fe.shape_grad_transform(i, unit_quadrature_points[j]);
-      };
-  
-  weights = quadrature.get_weights ();
+  mapping_data = mapping.get_data(flags, quadrature);
+  fe_data      = fe.get_data(flags, mapping, quadrature);
+
+  UpdateFlags allflags = mapping_data->update_once | mapping_data->update_each;
+  allflags |= fe_data->update_once | fe_data->update_each;
+
+  FEValuesData<dim>::initialize(n_quadrature_points,
+				dofs_per_cell,
+				allflags);
 };
 
+
+template <int dim>
+FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
+			 const Quadrature<dim>    &q,
+			 const UpdateFlags         update_flags)
+  :
+  FEValuesBase<dim> (q.n_quadrature_points,
+		     fe.dofs_per_cell,
+		     1,
+		     update_flags,
+		     mapping_q1,
+		     fe),
+  quadrature (q)
+{
+  Assert ((update_flags & update_normal_vectors) == false,
+	  FEValuesBase<dim>::ExcInvalidUpdateFlag());
+
+  UpdateFlags flags = mapping_q1.update_once (update_flags);
+  flags |= mapping_q1.update_each (update_flags);
+  flags |= fe.update_once (update_flags);
+  flags |= fe.update_each (update_flags);
+
+  mapping_data = mapping_q1.get_data(flags, quadrature);
+  fe_data      = fe.get_data(flags, mapping_q1, quadrature);
+
+  FEValuesData<dim>::initialize(n_quadrature_points,
+				dofs_per_cell,
+				flags);
+}
 
 
 template <int dim>
 void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 {
-  present_cell = cell;
-
 				   // assert that the finite elements
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-  Assert (static_cast<const FiniteElementData<dim>&>(*fe)
-	  ==
+  Assert (static_cast<const FiniteElementData<dim>&>(*fe) ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
+
+  present_cell = cell;
+
+  get_mapping().fill_fe_values(cell,
+			       quadrature,
+			       *mapping_data,
+			       quadrature_points,
+			       JxW_values);
   
-				   // fill jacobi matrices and real
-				   // quadrature points
-  if ((update_flags & update_jacobians)          ||
-      (update_flags & update_JxW_values)         ||
-      (update_flags & update_q_points)           ||
-      (update_flags & update_gradients)          ||
-      (update_flags & update_second_derivatives) ||
-      (update_flags & update_support_points))
-    fe->fill_fe_values (cell,
-			unit_quadrature_points,
-			jacobi_matrices,
-			update_flags & (update_jacobians  |
-					update_JxW_values |
-					update_gradients  |
-					update_second_derivatives),
-			jacobi_matrices_grad,
-			update_flags & update_second_derivatives,
-			support_points,
-			update_flags & update_support_points,
-			quadrature_points,
-			update_flags & update_q_points,
-			shape_values_transform[0], unit_shape_gradients_transform);
-  
-				   // compute gradients on real element if
-				   // requested
-  if (update_flags & update_gradients) 
-    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
-      for (unsigned int j=0; j<n_quadrature_points; ++j)
-	for (unsigned int s=0; s<dim; ++s)
-	  {
-	    shape_gradients[i][j][s] = 0;
-	    
-					     // (grad psi)_s =
-					     // (grad_{\xi\eta})_b J_{bs}
-					     // with J_{bs}=(d\xi_b)/(dx_s)
-	    for (unsigned int b=0; b<dim; ++b)
-	      shape_gradients[i][j][s]
-		+=
-		unit_shape_gradients[i][j][b] * jacobi_matrices[j][b][s];
-	  };
-  
-  Tensor<2,dim> tmp1, tmp2;
-  if (update_flags & update_second_derivatives)
-    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
-      for (unsigned int j=0; j<n_quadrature_points; ++j)
-	{
-					   // tmp1 := (d_k d_l phi) J_lj
-	  contract (tmp1, unit_shape_2nd_derivatives[i][j], jacobi_matrices[j]);
-					   // tmp2 := tmp1_kj J_ki
-	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
-
-
-					   // second part:
-					   // tmp1 := (d_k J_lj) (d_l phi)
-	  contract (tmp1, jacobi_matrices_grad[j], 2, unit_shape_gradients[i][j]);
-					   // tmp1_kj J_ki
-	  contract (shape_2nd_derivatives[i][j],
-		    jacobi_matrices[j], 1,
-		    tmp1, 1);
-
-					   // add up first contribution
-	  shape_2nd_derivatives[i][j] += tmp2;
-	};
-
-
-				   // compute Jacobi determinants in
-				   // quadrature points.
-				   // refer to the general doc for
-				   // why we take the inverse of the
-				   // determinant
-  if (update_flags & update_JxW_values) 
-    for (unsigned int i=0; i<n_quadrature_points; ++i)
-      JxW_values[i] = weights[i] / determinant(jacobi_matrices[i]);
-};
+  get_fe().fill_fe_values(get_mapping(),
+			  cell,
+			  quadrature,
+			  *mapping_data,
+			  *fe_data,
+			  *this);
+}
 
 
 
@@ -537,11 +508,7 @@ template <int dim>
 unsigned int
 FEValues<dim>::memory_consumption () const
 {
-  return (FEValuesBase<dim>::memory_consumption () +
-	  MemoryConsumption::memory_consumption (unit_shape_gradients) +
-	  MemoryConsumption::memory_consumption (unit_shape_2nd_derivatives) +
-	  MemoryConsumption::memory_consumption (unit_shape_gradients_transform) +
-	  MemoryConsumption::memory_consumption (unit_quadrature_points));
+  return FEValuesBase<dim>::memory_consumption ();
 };
 
 
@@ -550,69 +517,75 @@ FEValues<dim>::memory_consumption () const
 
 template <int dim>
 FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
-					 const unsigned int n_support_points,
 					 const unsigned int dofs_per_cell,
-					 const unsigned int n_transform_functions,
 					 const unsigned int n_faces_or_subfaces,
-					 const UpdateFlags         update_flags,
-					 const FiniteElement<dim> &fe)
-		:
-		FEValuesBase<dim> (n_q_points,
-				   n_support_points,
-				   dofs_per_cell,
-				   n_transform_functions,
-				   n_faces_or_subfaces,
-				   update_flags,
-				   fe),
-  unit_shape_gradients (n_faces_or_subfaces,
-			std::vector<std::vector<Tensor<1,dim> > >(dofs_per_cell,
-								  std::vector<Tensor<1,dim> >(n_q_points))),
-								    unit_shape_2nd_derivatives(n_faces_or_subfaces,
-											       std::vector<std::vector<Tensor<2,dim> > >(dofs_per_cell,
-																	 std::vector<Tensor<2,dim> >(n_q_points))),
-																	   unit_shape_gradients_transform (n_faces_or_subfaces,
-																					   std::vector<std::vector<Tensor<1,dim> > >(n_transform_functions,
-																										     std::vector<Tensor<1,dim> >(n_q_points))),
-																										       unit_face_quadrature_points (n_q_points, Point<dim-1>()),
-																														      unit_quadrature_points (n_faces_or_subfaces,
-																																	      std::vector<Point<dim> >(n_q_points, Point<dim>())),
-																																					 face_jacobi_determinants (n_q_points, 0),
-																																					 normal_vectors (n_q_points)
+					 const UpdateFlags update_flags,
+					 const Mapping<dim> &mapping,      
+					 const FiniteElement<dim> &fe,
+					 const Quadrature<dim-1>& quadrature)
+  :
+  FEValuesBase<dim> (n_q_points,
+		     dofs_per_cell,
+		     n_faces_or_subfaces,
+		     update_flags,
+		     mapping,
+		     fe),
+  quadrature(quadrature)
 {};
 
 
-
 template <int dim>
-const Point<dim> &
-FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
+const std::vector<Point<dim> > &
+FEFaceValuesBase<dim>::get_normal_vectors () const
 {
-  Assert (i<normal_vectors.size(), ExcIndexRange(i, 0, normal_vectors.size()));
   Assert (update_flags & update_normal_vectors,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-  
-  return normal_vectors[i];
+  return normal_vectors;
 };
 
 
-
-
 template <int dim>
-unsigned int
-FEFaceValuesBase<dim>::memory_consumption () const
+const std::vector<Tensor<1,dim> > &
+FEFaceValuesBase<dim>::get_boundary_forms () const
 {
-  return (FEValuesBase<dim>::memory_consumption () +
-	  MemoryConsumption::memory_consumption (unit_shape_gradients) +
-	  MemoryConsumption::memory_consumption (unit_shape_2nd_derivatives) +
-	  MemoryConsumption::memory_consumption (unit_shape_gradients_transform) +
-	  MemoryConsumption::memory_consumption (unit_face_quadrature_points) +
-	  MemoryConsumption::memory_consumption (unit_quadrature_points) +
-	  MemoryConsumption::memory_consumption (face_jacobi_determinants) +
-	  MemoryConsumption::memory_consumption (normal_vectors) +
-	  MemoryConsumption::memory_consumption (present_face));
+  Assert (update_flags & update_boundary_forms,
+	  FEValuesBase<dim>::ExcAccessToUninitializedField());
+  return boundary_forms;
 };
 
 
 /*------------------------------- FEFaceValues -------------------------------*/
+
+
+template <int dim>
+FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
+				 const FiniteElement<dim> &fe,
+				 const Quadrature<dim-1>  &quadrature,
+				 const UpdateFlags         update_flags)
+		:
+		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
+				       fe.dofs_per_cell,
+				       GeometryInfo<dim>::faces_per_cell,
+				       update_flags,
+				       mapping,
+				       fe, quadrature)
+{
+  UpdateFlags flags = mapping.update_once (update_flags);
+  flags |= mapping.update_each (update_flags);
+  flags |= fe.update_once (update_flags);
+  flags |= fe.update_each (update_flags);
+
+  mapping_data = mapping.get_face_data(flags, quadrature);
+  fe_data      = fe.get_face_data(flags, mapping, quadrature);
+
+  UpdateFlags allflags = mapping_data->update_once | mapping_data->update_each;
+  allflags |= fe_data->update_once | fe_data->update_each;
+
+  FEValuesData<dim>::initialize(n_quadrature_points,
+				dofs_per_cell,
+				allflags);
+};
+
 
 
 template <int dim>
@@ -621,158 +594,89 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				 const UpdateFlags         update_flags)
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
-				       fe.dofs_per_face,
 				       fe.dofs_per_cell,
-				       fe.n_transform_functions(),
 				       GeometryInfo<dim>::faces_per_cell,
 				       update_flags,
-				       fe)
+				       mapping_q1,
+				       fe, quadrature)
 {
-  unit_face_quadrature_points = quadrature.get_points();
-  weights = quadrature.get_weights ();  
+  UpdateFlags flags = mapping_q1.update_once (update_flags);
+  flags |= mapping_q1.update_each (update_flags);
+  flags |= fe.update_once (update_flags);
+  flags |= fe.update_each (update_flags);
 
-  				   // set up an array of the unit points
-				   // on the given face, but in coordinates
-				   // of the space with @p{dim} dimensions.
-				   // the points are still on the unit
-				   // cell, not on the real cell.
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    QProjector<dim>::project_to_face (quadrature, face, unit_quadrature_points[face]);
+  mapping_data = mapping_q1.get_face_data(flags, quadrature);
+  fe_data      = fe.get_face_data(flags, mapping_q1, quadrature);
 
-  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    for (unsigned int j=0; j<n_quadrature_points; ++j) 
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	{
-	  shape_values[face](i,j)
-	    = fe.shape_value(i, unit_quadrature_points[face][j]);
-	  unit_shape_gradients[face][i][j]
-	    = fe.shape_grad(i, unit_quadrature_points[face][j]);
-	  if (update_flags & update_second_derivatives)
-	    unit_shape_2nd_derivatives[face][i][j]
-	      = fe.shape_grad_grad(i, unit_quadrature_points[face][j]);
-	};
-
-  for (unsigned int i=0; i<n_transform_functions; ++i)
-    for (unsigned int j=0; j<n_quadrature_points; ++j)
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	{
-	  shape_values_transform[face] (i,j)
-	    = fe.shape_value_transform (i, unit_quadrature_points[face][j]);
-	  unit_shape_gradients_transform[face][i][j]
-	    = fe.shape_grad_transform(i, unit_quadrature_points[face][j]);
-	};
+  FEValuesData<dim>::initialize(n_quadrature_points,
+				dofs_per_cell,
+				flags);
 };
 
 
-template <int dim>
-void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
-				const unsigned int                             face_no)
-{
-  present_cell  = cell;
-  present_face  = cell->face(face_no);
-  selected_dataset = face_no;
 
+template <int dim>
+void FEFaceValues<dim>::reinit (const typename
+				DoFHandler<dim>::cell_iterator &cell,
+				const unsigned int              face_no)
+{
 				   // assert that the finite elements
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-  Assert (static_cast<const FiniteElementData<dim>&>(*fe)
-	  ==
+  Assert (static_cast<const FiniteElementData<dim>&>(*fe) ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
-  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
-	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
+
+  present_cell  = cell;
+  present_face  = cell->face(face_no);
+
+  get_mapping().fill_fe_face_values(cell, face_no,
+				    quadrature,
+				    *mapping_data,
+				    quadrature_points,
+				    JxW_values,
+				    boundary_forms,
+				    normal_vectors);
   
-				   // fill jacobi matrices and real
-				   // quadrature points
-  if ((update_flags & update_jacobians)          ||
-      (update_flags & update_JxW_values)         ||
-      (update_flags & update_q_points)           ||
-      (update_flags & update_gradients)          ||
-      (update_flags & update_second_derivatives) ||
-      (update_flags & update_support_points)     ||
-      (update_flags & update_normal_vectors)     ||
-      (update_flags & update_JxW_values))
-    fe->fill_fe_face_values (cell,
-			     face_no,
-			     unit_face_quadrature_points,
-			     unit_quadrature_points[face_no],
-			     jacobi_matrices,
-			     update_flags & (update_jacobians |
-					     update_gradients |
-					     update_JxW_values |
-					     update_second_derivatives),
-			     jacobi_matrices_grad,
-			     update_flags & update_second_derivatives,
-			     support_points,
-			     update_flags & update_support_points,
-			     quadrature_points,
-			     update_flags & update_q_points,
-			     face_jacobi_determinants,
-			     update_flags & update_JxW_values,
-			     normal_vectors,
-			     update_flags & update_normal_vectors,
-			     shape_values_transform[face_no],
-			     unit_shape_gradients_transform[face_no]);
-
-				   // compute gradients on real element if
-				   // requested
-  if (update_flags & update_gradients) 
-    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
-      {
-	fill_n (shape_gradients[i].begin(),
-		n_quadrature_points,
-		Tensor<1,dim>());
-	for (unsigned int j=0; j<n_quadrature_points; ++j) 
-	  for (unsigned int s=0; s<dim; ++s)
-					     // (grad psi)_s =
-					     // (grad_{\xi\eta})_b J_{bs}
-					     // with J_{bs}=(d\xi_b)/(dx_s)
-	    for (unsigned int b=0; b<dim; ++b)
-	      shape_gradients[i][j][s]
-		+= (unit_shape_gradients[face_no][i][j][b] *
-		    jacobi_matrices[j][b][s]);
-      };
-
-
-  Tensor<2,dim> tmp1, tmp2;
-  if (update_flags & update_second_derivatives)
-    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
-      for (unsigned int j=0; j<n_quadrature_points; ++j)
-	{
-					   // tmp1 := (d_k d_l phi) J_lj
-	  contract (tmp1, unit_shape_2nd_derivatives[face_no][i][j], jacobi_matrices[j]);
-					   // tmp2 := tmp1_kj J_ki
-	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
-
-
-					   // second part:
-					   // tmp1 := (d_k J_lj) (d_l phi)
-	  contract (tmp1,
-		    jacobi_matrices_grad[j], 2,
-		    unit_shape_gradients[face_no][i][j]);
-					   // tmp1_kj J_ki
-	  contract (shape_2nd_derivatives[i][j],
-		    jacobi_matrices[j], 1,
-		    tmp1, 1);
-
-					   // add up first contribution
-	  shape_2nd_derivatives[i][j] += tmp2;
-	};
-
-
-				   // compute Jacobi determinants in
-				   // quadrature points.
-				   // refer to the general doc for
-				   // why we take the inverse of the
-				   // determinant
-  if (update_flags & update_JxW_values) 
-    for (unsigned int i=0; i<n_quadrature_points; ++i)
-      JxW_values[i] = weights[i] * face_jacobi_determinants[i];
+  get_fe().fill_fe_face_values(get_mapping(),
+			       cell, face_no,
+			  quadrature,
+			  *mapping_data,
+			  *fe_data,
+			  *this);
 };
 
 
 /*------------------------------- FESubFaceValues -------------------------------*/
+
+
+template <int dim>
+FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
+				       const FiniteElement<dim> &fe,
+				       const Quadrature<dim-1>  &quadrature,
+				       const UpdateFlags         update_flags)
+		:
+		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
+				       fe.dofs_per_cell,
+				       GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::subfaces_per_face,
+				       update_flags,
+				       mapping,
+				       fe, quadrature)
+{
+  UpdateFlags flags = mapping.update_once (update_flags);
+  flags |= mapping.update_each (update_flags);
+  flags |= fe.update_once (update_flags);
+  flags |= fe.update_each (update_flags);
+
+  mapping_data = mapping.get_subface_data(flags, quadrature);
+  fe_data      = fe.get_subface_data(flags, mapping, quadrature);
+
+  FEValuesData<dim>::initialize(n_quadrature_points,
+				dofs_per_cell,
+				flags);
+}
+
 
 
 template <int dim>
@@ -781,68 +685,24 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       const UpdateFlags         update_flags)
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
-				       0,
 				       fe.dofs_per_cell,
-				       fe.n_transform_functions(),
 				       GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::subfaces_per_face,
 				       update_flags,
-				       fe)
+				       mapping_q1,
+				       fe, quadrature)
 {
-  Assert ((update_flags & update_support_points) == false,
-	  typename FEValuesBase<dim>::ExcInvalidUpdateFlag());
-  
-  unit_face_quadrature_points = quadrature.get_points();
-  weights = quadrature.get_weights ();  
+  UpdateFlags flags = mapping_q1.update_once (update_flags);
+  flags |= mapping_q1.update_each (update_flags);
+  flags |= fe.update_once (update_flags);
+  flags |= fe.update_each (update_flags);
 
-  				   // set up an array of the unit points
-				   // on the given face, but in coordinates
-				   // of the space with @p{dim} dimensions.
-				   // the points are still on the unit
-				   // cell, not on the real cell.
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-      QProjector<dim>::project_to_subface (quadrature,
-					   face, subface,
-					   unit_quadrature_points[face*(1<<(dim-1))+subface]);
+  mapping_data = mapping_q1.get_subface_data(flags, quadrature);
+  fe_data      = fe.get_subface_data(flags, mapping_q1, quadrature);
 
-  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    for (unsigned int j=0; j<n_quadrature_points; ++j) 
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-	  {
-	    shape_values[face*GeometryInfo<dim>::subfaces_per_face+subface](i,j)
-	      = fe.shape_value(i, unit_quadrature_points[face *
-							GeometryInfo<dim>::
-							subfaces_per_face+subface][j]);
-	    unit_shape_gradients[face*GeometryInfo<dim>::subfaces_per_face+subface][i][j]
-	      = fe.shape_grad(i, unit_quadrature_points[face *
-						       GeometryInfo<dim>::
-						       subfaces_per_face+subface][j]);
-	    if (update_flags & update_second_derivatives)
-	      unit_shape_2nd_derivatives[face*GeometryInfo<dim>::subfaces_per_face+subface][i][j]
-		= fe.shape_grad_grad(i, unit_quadrature_points[face *
-							      GeometryInfo<dim>::
-							      subfaces_per_face+subface][j]);
-	  };
-  for (unsigned int i=0; i<n_transform_functions; ++i)
-    for (unsigned int j=0; j<n_quadrature_points; ++j)
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-	  {
-	    shape_values_transform[face*GeometryInfo<dim>::subfaces_per_face+subface] (i,j)
-	      = fe.shape_value_transform (i, unit_quadrature_points[face *
-								   GeometryInfo<dim>::
-								   subfaces_per_face +
-								   subface][j]);
-	    unit_shape_gradients_transform[face *
-					  GeometryInfo<dim>::subfaces_per_face +
-					  subface][i][j]
-	      = fe.shape_grad_transform(i, unit_quadrature_points[face *
-								 GeometryInfo<dim>::
-								 subfaces_per_face +
-								 subface][j]);
-	  };
-};
+  FEValuesData<dim>::initialize(n_quadrature_points,
+				dofs_per_cell,
+				flags);
+}
 
 
 
@@ -851,113 +711,39 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   const unsigned int         face_no,
 				   const unsigned int         subface_no)
 {
-  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
-	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
-	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
-  Assert (cell->face(face_no)->at_boundary() == false,
-	  ExcReinitCalledWithBoundaryFace());
-  Assert (cell->face(face_no)->has_children()== true,
-	  ExcFaceHasNoSubfaces());
-  
-  present_cell  = cell;
-  present_face = cell->face(face_no)->child(subface_no);
-  selected_dataset = face_no*(1<<(dim-1)) + subface_no;
-
 				   // assert that the finite elements
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-  Assert (static_cast<const FiniteElementData<dim>&>(*fe)
-	  ==
+  Assert (static_cast<const FiniteElementData<dim>&>(*fe) ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
-    
-				   // fill jacobi matrices and real
-				   // quadrature points
-  if ((update_flags & update_jacobians)          ||
-      (update_flags & update_JxW_values)         ||
-      (update_flags & update_q_points)           ||
-      (update_flags & update_gradients)          ||
-      (update_flags & update_second_derivatives) ||
-      (update_flags & update_normal_vectors)     ||
-      (update_flags & update_JxW_values))
-    fe->fill_fe_subface_values (cell,
-				face_no,
-				subface_no,
-				unit_face_quadrature_points,
-				unit_quadrature_points[selected_dataset],
-				jacobi_matrices,
-				update_flags & (update_jacobians |
-						update_gradients |
-						update_JxW_values|
-						update_second_derivatives),
-				jacobi_matrices_grad,
-				update_flags & update_second_derivatives,
-				quadrature_points,
-				update_flags & update_q_points,
-				face_jacobi_determinants,
-				update_flags & update_JxW_values,
-				normal_vectors,
-				update_flags & update_normal_vectors,
-				shape_values_transform[selected_dataset],
-				unit_shape_gradients_transform[selected_dataset]);
+  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
+	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
 
-				   // compute gradients on real element if
-				   // requested
-  if (update_flags & update_gradients) 
-    for (unsigned int i=0; i<fe->dofs_per_cell; ++i) 
-      {
-	fill_n (shape_gradients[i].begin(),
-		n_quadrature_points,
-		Tensor<1,dim>());
-	for (unsigned int j=0; j<n_quadrature_points; ++j) 
-	  for (unsigned int s=0; s<dim; ++s)
-					     // (grad psi)_s =
-					     // (grad_{\xi\eta})_b J_{bs}
-					     // with J_{bs}=(d\xi_b)/(dx_s)
-	    for (unsigned int b=0; b<dim; ++b)
-	      shape_gradients[i][j][s]
-		+= (unit_shape_gradients[selected_dataset][i][j][b] *
-		    jacobi_matrices[j][b][s]);
-      };
+//TODO: Reinsert this assertion? It tests a necessary, not a sufficient condition
+  //  Assert (cell->face(face_no)->at_boundary() == false,
+  //	  ExcReinitCalledWithBoundaryFace());
+  
+  present_cell  = cell;
+  present_face  = cell->face(face_no);
 
-  Tensor<2,dim> tmp1, tmp2;
-  if (update_flags & update_second_derivatives)
-    for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
-      for (unsigned int j=0; j<n_quadrature_points; ++j)
-	{
-					   // tmp1 := (d_k d_l phi) J_lj
-	  contract (tmp1,
-		    unit_shape_2nd_derivatives[selected_dataset][i][j],
-		    jacobi_matrices[j]);
-					   // tmp2 := tmp1_kj J_ki
-	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
-
-
-					   // second part:
-					   // tmp1 := (d_k J_lj) (d_l phi)
-	  contract (tmp1,
-		    jacobi_matrices_grad[j], 2,
-		    unit_shape_gradients[selected_dataset][i][j]);
-					   // tmp1_kj J_ki
-	  contract (shape_2nd_derivatives[i][j],
-		    jacobi_matrices[j], 1,
-		    tmp1, 1);
-
-					   // add up first contribution
-	  shape_2nd_derivatives[i][j] += tmp2;
-	};
-
-
-				   // compute Jacobi determinants in
-				   // quadrature points.
-				   // refer to the general doc for
-				   // why we take the inverse of the
-				   // determinant
-  if (update_flags & update_JxW_values) 
-    for (unsigned int i=0; i<n_quadrature_points; ++i)
-      JxW_values[i] = weights[i] * face_jacobi_determinants[i];
+  get_mapping().fill_fe_subface_values(cell, face_no, subface_no,
+				       quadrature,
+				       *mapping_data,
+				       quadrature_points,
+				       JxW_values,
+				       boundary_forms,
+				       normal_vectors);
+  
+  get_fe().fill_fe_subface_values(get_mapping(),
+				  cell, face_no, subface_no,
+				  quadrature,
+				  *mapping_data,
+				  *fe_data,
+				  *this);
 };
 
 
