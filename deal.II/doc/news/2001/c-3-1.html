@@ -569,6 +569,14 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: in a rather rare case, some work was done twice in the
+       <code class="class">KellyErrorEstimator</code> class when in
+       multithread mode. This is now fixed.
+       <br>
+       (WB 2001/08/24)
+       </p>
+
+  <li> <p>
        New: There is now a class <code class="class">GridTools</code>
        which provides algorithms working on triangulations. At
        present, it offers a function computing the diameter of a
