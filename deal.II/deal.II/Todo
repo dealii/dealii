@@ -22,9 +22,6 @@ Unify CellAccessor<1> and <2> by renaming
     QuadAccessor<dim> -> SubstructAccessor<dim,2>
   and deriving CellAccessor<dim> from SubstructAccessor<dim,dim>
   Do the same with DoFLineAccessor and DoFQuadAccessor
-
-
-Make AssemblerData a local class to Assembler again if gcc2.8 supports it.
   
 
 Remove gcc2.8 workaround with DoFSubstructAccessor for general <dim>
@@ -32,12 +29,6 @@ Remove gcc2.8 workaround with DoFSubstructAccessor for general <dim>
 
 Check usage of vector<>s: functions should assume that the objects have
   the right size already.
-
-
-Update DataIO for ucd i/o of boundary flags and material values:
-  is it correct if for the number of elements I give the number
-  of cells + number of faces with boundary id .neq. 0 ? Or must
-  I give the number of cells?
 
 
 Update DoFHandler::distribute_cell_to_dof_vector for higher order
@@ -51,14 +42,6 @@ Remove FiniteElementData<>::operator == and let it be generated
 
 Look at the fill_fe_values functions for possible optimizations
   since this is one of the most often called functions.
-
-
-Try to find out what happens if DoFAccessor::get_dof_values is
-  called for a non-active object: what about dof numbers
-  on non-active lines/quads? Are they all -1? Can we check for
-  that. The problem is that we can't really check for activity
-  for faces and the like, since they may have children but be
-  part of active cells anyway.
 
 
 Change <iostream> to <ostream> in grid/point.h and
@@ -125,9 +108,6 @@ I suppose the [mg_]get_dof_values really belongs to the
 
 
 FeValues: add flexibility for update flags
-
-
-Remove all fe& in vectors.h
 
 
 No support points for non-Lagrangian elements? Check for Langrange in
