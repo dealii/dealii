@@ -13,6 +13,7 @@
 
 
 #include <base/quadrature_lib.h>
+#include <base/memory_consumption.h>
 #include <lac/vector.h>
 #include <numerics/data_out.h>
 #include <grid/tria.h>
@@ -28,6 +29,7 @@
 
 #include <strstream>
 
+
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataEntry::
 DataEntry (const Vector<double> *data,
@@ -35,6 +37,20 @@ DataEntry (const Vector<double> *data,
 		data(data),
 		names(names)
 {};
+
+
+
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+unsigned int
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataEntry::memory_consumption () const
+{
+  return (sizeof (data) +
+	  MemoryConsumption::memory_consumption (names) +
+	  MemoryConsumption::memory_consumption (units));
+};
+
+
 
 
 
@@ -225,6 +241,19 @@ const vector<typename DataOutBase::Patch<patch_dim, patch_space_dim> > &
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;
+};
+
+
+
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+unsigned int
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::memory_consumption () const
+{
+  return (DataOutInterface<patch_dim,patch_space_dim>::memory_consumption () +
+	  MemoryConsumption::memory_consumption (dofs) +
+	  MemoryConsumption::memory_consumption (dof_data) +
+	  MemoryConsumption::memory_consumption (cell_data) +
+	  MemoryConsumption::memory_consumption (patches));
 };
 
 

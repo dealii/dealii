@@ -271,7 +271,14 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * in this object.
 				      */
     void clear ();
-    
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
 				     /**
 				      * Exception
 				      */
@@ -374,6 +381,13 @@ class DataOutStack : public DataOutInterface<dim+1>
 					  * within each such data set.
 					  */
 	vector<string> names;
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this object.
+					  */
+	unsigned int memory_consumption () const;
     };
 
 				     /**

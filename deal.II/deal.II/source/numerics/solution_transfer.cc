@@ -12,6 +12,7 @@
 //----------------------------  solution_transfer.cc  ---------------------------
 
 
+#include <base/memory_consumption.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <grid/tria_accessor.h>
@@ -352,6 +353,7 @@ interpolate (const vector<Vector<number> > &all_in,
 }
 
 
+
 template<int dim, typename number>
 void SolutionTransfer<dim, number>::interpolate(const Vector<number> &in,
 						Vector<number>       &out) const
@@ -364,6 +366,30 @@ void SolutionTransfer<dim, number>::interpolate(const Vector<number> &in,
 	      all_out);
   out=all_out[0];
 }
+
+
+
+template<int dim, typename number>
+unsigned int
+SolutionTransfer<dim, number>::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (dof_handler) +
+	  MemoryConsumption::memory_consumption (n_dofs_old) +
+	  sizeof (prepared_for) +
+	  MemoryConsumption::memory_consumption (indices_on_cell) +
+	  MemoryConsumption::memory_consumption (all_pointerstructs) +
+	  MemoryConsumption::memory_consumption (dof_values_on_cell));
+};
+
+
+
+template<int dim, typename number>
+unsigned int
+SolutionTransfer<dim, number>::Pointerstruct::memory_consumption () const
+{
+  return sizeof(*this);
+};
+
 
 
 template class SolutionTransfer<deal_II_dimension, float>;

@@ -14,12 +14,24 @@
 
 #include <numerics/data_out_stack.h>
 #include <base/quadrature_lib.h>
+#include <base/memory_consumption.h>
 #include <lac/vector.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+
+
+
+template <int dim>
+unsigned int
+DataOutStack<dim>::DataVector::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (data) +
+	  MemoryConsumption::memory_consumption (names));
+};
+
 
 
 template <int dim>
@@ -306,12 +318,29 @@ void DataOutStack<dim>::finish_parameter_value ()
 };
 
 
+
+template <int dim>
+unsigned int
+DataOutStack<dim>::memory_consumption () const
+{
+  return (DataOutInterface<dim+1>::memory_consumption () +
+	  MemoryConsumption::memory_consumption (parameter) +
+	  MemoryConsumption::memory_consumption (parameter_step) +
+	  MemoryConsumption::memory_consumption (dof_handler) +
+	  MemoryConsumption::memory_consumption (patches) +
+	  MemoryConsumption::memory_consumption (dof_data) +
+	  MemoryConsumption::memory_consumption (cell_data));
+};
+
+
+
 template <int dim>
 const vector<DataOutBase::Patch<dim+1> > &
 DataOutStack<dim>::get_patches () const
 {
   return patches;
 };
+
 
 
 template <int dim>

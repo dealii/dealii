@@ -20,6 +20,7 @@
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
 
+#include <base/smartpointer.h>
 #include <base/exceptions.h>
 #include <vector>
 
@@ -281,6 +282,13 @@ class SolutionTransfer
     void interpolate (const Vector<number> &in,
 		      Vector<number>       &out) const;
 
+    				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
 				     /**
 				      * Exception
 				      */
@@ -325,7 +333,7 @@ class SolutionTransfer
 				      * Pointer to the degree of freedom handler
 				      * to work with.
 				      */
-    const DoFHandler<dim> *dof_handler;
+    SmartPointer<const DoFHandler<dim> > dof_handler;
     
 				     /**
 				      * Stores the number of DoFs before the
@@ -383,6 +391,8 @@ class SolutionTransfer
 				      * 'multiplied' by this structure.
 				      */
     struct Pointerstruct {
+	unsigned int memory_consumption () const;
+	
 	vector<unsigned int>    *indices_ptr;
 	vector<Vector<number> > *dof_values_ptr;
     };

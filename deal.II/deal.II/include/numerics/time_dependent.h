@@ -19,6 +19,7 @@
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <base/smartpointer.h>
 #include <grid/forward_declarations.h>
 #include <lac/forward_declarations.h>
 
@@ -672,6 +673,13 @@ class TimeDependent
     virtual void end_sweep (const unsigned int n_threads = 1);
 
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+    
+				     /**
 				      * Exception.
 				      */
     DeclException0 (ExcInvalidPosition);
@@ -974,6 +982,21 @@ class TimeStepBase : public Subscriptor
 				      */
     double get_forward_timestep () const;
     
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      *
+				      * You will want to overload
+				      * this function in derived
+				      * classes to compute the
+				      * amount memory used by the
+				      * derived class, and add the
+				      * result of this function to
+				      * your result.
+				      */
+    virtual unsigned int memory_consumption () const;
+
 				     /**
 				      * Exception
 				      */
@@ -1309,6 +1332,21 @@ class TimeStepBase_Tria :  public TimeStepBase
     void save_refine_flags ();
 
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      *
+				      * You will want to overload
+				      * this function in derived
+				      * classes to compute the
+				      * amount memory used by the
+				      * derived class, and add the
+				      * result of this function to
+				      * your result.
+				      */
+    virtual unsigned int memory_consumption () const;
+
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcGridNotDeleted);
@@ -1338,8 +1376,9 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * is set through the
 				      * constructor; ownership remains
 				      * with the owner of this
-				      * management object.  */
-    const Triangulation<dim> &coarse_grid;
+				      * management object.
+				      */
+    SmartPointer<const Triangulation<dim> > coarse_grid;
     
 				     /**
 				      * Some flags about how this time level

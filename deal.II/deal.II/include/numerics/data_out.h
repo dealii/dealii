@@ -15,6 +15,7 @@
 
 
 #include <base/data_out_base.h>
+#include <base/smartpointer.h>
 #include <base/multithread_info.h>
 
 
@@ -302,6 +303,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      */
     virtual void clear ();
 
+    				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
 				     /**
 				      * Exception
 				      */
@@ -351,9 +359,20 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  */
 	DataEntry (const Vector<double> *data = 0,
 		   const vector<string> &names = vector<string>());
+
+					 /**
+					  * Determine an estimate for the
+					  * memory consumption (in bytes)
+					  * of this object.
+					  */
+	unsigned int memory_consumption () const;
 	
 					 /**
-					  * Pointer to the data vector.
+					  * Pointer to the data
+					  * vector. Note that
+					  * ownership of the vector
+					  * pointed to remains with
+					  * the caller of this class.
 					  */
 	const Vector<double> *data;
 	
@@ -373,7 +392,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				     /**
 				      * Pointer to the dof handler object.
 				      */
-    const DoFHandler<dof_handler_dim> *dofs;
+    SmartPointer<const DoFHandler<dof_handler_dim> > dofs;
 
 				     /**
 				      * List of data elements with vectors of

@@ -12,6 +12,7 @@
 //----------------------------  histogram.cc  ---------------------------
 
 
+#include <base/memory_consumption.h>
 #include <lac/vector.h>
 #include <numerics/histogram.h>
 #include <algorithm>
@@ -29,12 +30,22 @@ bool Histogram::logarithmic_less (const number n1,
 };
 
 
+
 Histogram::Interval::Interval (const double left_point,
 			       const double right_point) :
 		left_point (left_point),
 		right_point (right_point),
 		content (0)
 {};
+
+
+
+unsigned int
+Histogram::Interval::memory_consumption () const
+{
+  return sizeof(*this);
+};
+
 
 
 template <typename number>
@@ -212,6 +223,7 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
 };
 
 
+
 template <typename number>
 void Histogram::evaluate (const Vector<number>    &values,
 			  const unsigned int       n_intervals,
@@ -221,6 +233,7 @@ void Histogram::evaluate (const Vector<number>    &values,
 				       values);
   evaluate (values_list, vector<double>(1,0.), n_intervals, interval_spacing);
 };
+
 
 
 void Histogram::write_gnuplot (ostream &out) const
@@ -294,10 +307,12 @@ void Histogram::write_gnuplot (ostream &out) const
 };
 
 
+
 string Histogram::get_interval_spacing_names () 
 {
   return "linear|logarithmic";
 };
+
 
 
 Histogram::IntervalSpacing
@@ -315,6 +330,16 @@ Histogram::parse_interval_spacing (const string &name)
 	return linear;
       };
 };
+
+
+
+unsigned int
+Histogram::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (intervals) +
+	  MemoryConsumption::memory_consumption (y_values));
+};
+
 
 
 // explicit instantiations for float

@@ -149,6 +149,13 @@ class Histogram
 				      */
     static IntervalSpacing parse_interval_spacing (const string &name);
     
+    				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
 				     /**
 				      * Exception.
 				      */
@@ -190,6 +197,13 @@ class Histogram
 					  */
 	Interval (const double left_point,
 		  const double right_point);
+
+					 /**
+					  * Determine an estimate for the
+					  * memory consumption (in bytes)
+					  * of this object.
+					  */
+	unsigned int memory_consumption () const;
 
 					 /**
 					  * Left bound of the interval.

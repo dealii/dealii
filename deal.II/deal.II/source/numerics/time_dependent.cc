@@ -13,6 +13,7 @@
 
 
 #include <numerics/time_dependent.h>
+#include <base/memory_consumption.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -226,12 +227,29 @@ void TimeDependent::end_sweep (const unsigned int n_threads)
 }
 
 
+
 void TimeDependent::end_sweep (const unsigned int begin,
 			       const unsigned int end)
 {     
   for (unsigned int step=begin; step<end; ++step)
     timesteps[step]->end_sweep ();
 };
+
+
+
+unsigned int TimeDependent::memory_consumption () const
+{
+  unsigned int mem = (MemoryConsumption::memory_consumption (timesteps) +
+		      MemoryConsumption::memory_consumption (sweep_no) +
+		      sizeof(timestepping_data_primal) +
+		      sizeof(timestepping_data_dual) +
+		      sizeof(timestepping_data_postprocess));
+  for (unsigned int i=0; i<timesteps.size(); ++i)
+    mem += MemoryConsumption::memory_consumption (*timesteps[i]);
+
+  return mem;
+};
+
 
 
 /* --------------------------------------------------------------------- */
@@ -246,8 +264,10 @@ TimeStepBase::TimeStepBase (const double time) :
 {};
 
 
+
 TimeStepBase::~TimeStepBase () 
 {};
+
 
 
 void
@@ -255,9 +275,11 @@ TimeStepBase::wake_up (const unsigned )
 {};
 
 
+
 void
 TimeStepBase::sleep (const unsigned)
 {};
+
 
 
 void
@@ -265,9 +287,11 @@ TimeStepBase::start_sweep ()
 {};
 
 
+
 void
 TimeStepBase::end_sweep () 
 {};
+
 
 
 void
@@ -277,11 +301,13 @@ TimeStepBase::init_for_primal_problem ()
 };
 
 
+
 void
 TimeStepBase::init_for_dual_problem () 
 {
   next_action = dual_problem;
 };
+
 
 
 void
@@ -291,11 +317,13 @@ TimeStepBase::init_for_postprocessing ()
 };
 
 
+
 void
 TimeStepBase::solve_dual_problem () 
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
+
 
 
 void
@@ -305,6 +333,7 @@ TimeStepBase::postprocess_timestep ()
 };
 
 
+
 double
 TimeStepBase::get_time () const 
 {
@@ -312,11 +341,13 @@ TimeStepBase::get_time () const
 };
 
 
+
 unsigned int
 TimeStepBase::get_timestep_no () const 
 {
   return timestep_no;
 };
+
 
 
 double
@@ -327,12 +358,14 @@ TimeStepBase::get_backward_timestep () const
 };
 
 
+
 double
 TimeStepBase::get_forward_timestep () const
 {
   Assert (next_timestep != 0, ExcCantComputeTimestep());
   return next_timestep->time - time;
 };
+
 
 
 void
@@ -342,11 +375,13 @@ TimeStepBase::set_previous_timestep (const TimeStepBase *previous)
 };
 
 
+
 void
 TimeStepBase::set_next_timestep (const TimeStepBase *next)
 {
   next_timestep     = next;
 };
+
 
 
 void
@@ -356,10 +391,20 @@ TimeStepBase::set_timestep_no (const unsigned int step_no)
 };
 
 
+
 void
 TimeStepBase::set_sweep_no (const unsigned int sweep)
 {
   sweep_no = sweep;
+};
+
+
+
+unsigned int
+TimeStepBase::memory_consumption () const
+{
+				   // only simple data types
+  return sizeof(*this);
 };
 
 
@@ -370,10 +415,11 @@ template <int dim>
 TimeStepBase_Tria<dim>::TimeStepBase_Tria() :
 		TimeStepBase (0),
 		tria (0),
-		coarse_grid (*reinterpret_cast<Triangulation<dim>*>(0))
+		coarse_grid (0)
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
+
 
 
 template <int dim>
@@ -383,12 +429,11 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria (const double              time,
 					   const RefinementFlags    &refinement_flags) :
 		TimeStepBase (time),
 		tria(0),
-		coarse_grid (coarse_grid),
+		coarse_grid (&coarse_grid),
 		flags (flags),
 		refinement_flags (refinement_flags)
-{
-  coarse_grid.subscribe();
-};
+{};
+
 
 
 template <int dim>
@@ -401,20 +446,23 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
     }
   else
     Assert (tria==0, ExcInternalError());
-
-  coarse_grid.unsubscribe();
+  
+  coarse_grid = 0;
 };
+
 
 
 template <int dim>
 void
-TimeStepBase_Tria<dim>::wake_up (const unsigned wakeup_level) {
+TimeStepBase_Tria<dim>::wake_up (const unsigned wakeup_level)
+{
   TimeStepBase::wake_up (wakeup_level);
   
   if (wakeup_level == flags.wakeup_level_to_build_grid)
     if (flags.delete_and_rebuild_tria || !tria)
       restore_grid ();
 };
+
 
 
 template <int dim>
@@ -437,6 +485,7 @@ TimeStepBase_Tria<dim>::sleep (const unsigned sleep_level)
 };
 
 
+
 template <int dim>
 void TimeStepBase_Tria<dim>::save_refine_flags ()
 {
@@ -449,8 +498,10 @@ void TimeStepBase_Tria<dim>::save_refine_flags ()
 };
 
 
+
 template <int dim>
-void TimeStepBase_Tria<dim>::restore_grid () {
+void TimeStepBase_Tria<dim>::restore_grid ()
+{
   Assert (tria == 0, ExcGridNotDeleted());
   Assert (refine_flags.size() == coarsen_flags.size(),
 	  ExcInternalError());
@@ -459,7 +510,7 @@ void TimeStepBase_Tria<dim>::restore_grid () {
 				   // set it to a copy of the coarse grid
   tria = new Triangulation<dim> ();
   tria->subscribe();
-  tria->copy_triangulation (coarse_grid);
+  tria->copy_triangulation (*coarse_grid);
 
 				   // for each of the previous refinement
 				   // sweeps
@@ -488,10 +539,12 @@ void TimeStepBase_Tria<dim>::restore_grid () {
 };
 
 
+
 template <int dim>
 static void
 mirror_refinement_flags (const Triangulation<dim>::cell_iterator &new_cell,
-			 const Triangulation<dim>::cell_iterator &old_cell) {
+			 const Triangulation<dim>::cell_iterator &old_cell)
+{
 				   // mirror the refinement
 				   // flags from the present time level to
 				   // the previous if the dual problem was
@@ -533,10 +586,12 @@ mirror_refinement_flags (const Triangulation<dim>::cell_iterator &new_cell,
 };
 
 
+
 template <int dim>
 static bool
 adapt_grids (const Triangulation<dim>::cell_iterator &cell1,
-	     const Triangulation<dim>::cell_iterator &cell2) {
+	     const Triangulation<dim>::cell_iterator &cell2)
+{
 
   if (cell2->has_children() && cell1->has_children()) 
     {
@@ -635,10 +690,12 @@ adapt_grids (const Triangulation<dim>::cell_iterator &cell1,
 };    
 
 
+
 template <int dim>
 static bool
 adapt_grids (Triangulation<dim> &tria1,
-	     Triangulation<dim> &tria2) {
+	     Triangulation<dim> &tria2)
+{
   bool grids_changed = false;
   
   Triangulation<dim>::cell_iterator cell1 = tria1.begin(),
@@ -652,6 +709,7 @@ adapt_grids (Triangulation<dim> &tria1,
 
   return grids_changed;
 };
+
 
 
 template <int dim>
@@ -1050,6 +1108,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 };
 
 
+
 template <int dim>
 void TimeStepBase_Tria<dim>::init_for_refinement () 
 {
@@ -1057,10 +1116,27 @@ void TimeStepBase_Tria<dim>::init_for_refinement ()
 };
 
 
+
 template <int dim>
-TimeStepBase_Tria<dim>::Flags::Flags () {
+unsigned int
+TimeStepBase_Tria<dim>::memory_consumption () const
+{
+  return (TimeStepBase::memory_consumption () +
+	  sizeof(tria) +
+	  MemoryConsumption::memory_consumption (coarse_grid) +
+	  sizeof(flags) + sizeof(refinement_flags) +
+	  MemoryConsumption::memory_consumption (refine_flags) +
+	  MemoryConsumption::memory_consumption (coarsen_flags));
+};
+
+
+
+template <int dim>
+TimeStepBase_Tria<dim>::Flags::Flags ()
+{
   Assert (false, ExcInternalError());
 };
+
 
 
 template <int dim>
