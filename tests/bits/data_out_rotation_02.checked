@@ -818,7 +818,7 @@ triangle {
 %%Title: deal.II Output
 %%Creator: the deal.II library
 
-%%BoundingBox: 0 0 299 506
+%%BoundingBox: 0 0 300 506
 /m {moveto} bind def
 /l {lineto} bind def
 /s {setrgbcolor} bind def
@@ -5530,7 +5530,7 @@ triangle {
 %%Title: deal.II Output
 %%Creator: the deal.II library
 
-%%BoundingBox: 0 0 299 656
+%%BoundingBox: 0 0 300 656
 /m {moveto} bind def
 /l {lineto} bind def
 /s {setrgbcolor} bind def
@@ -10242,7 +10242,7 @@ triangle {
 %%Title: deal.II Output
 %%Creator: the deal.II library
 
-%%BoundingBox: 0 0 299 806
+%%BoundingBox: 0 0 300 806
 /m {moveto} bind def
 /l {lineto} bind def
 /s {setrgbcolor} bind def
@@ -14954,7 +14954,7 @@ triangle {
 %%Title: deal.II Output
 %%Creator: the deal.II library
 
-%%BoundingBox: 0 0 299 412
+%%BoundingBox: 0 0 300 412
 /m {moveto} bind def
 /l {lineto} bind def
 /s {setrgbcolor} bind def
@@ -19666,7 +19666,7 @@ triangle {
 %%Title: deal.II Output
 %%Creator: the deal.II library
 
-%%BoundingBox: 0 0 299 824
+%%BoundingBox: 0 0 300 824
 /m {moveto} bind def
 /l {lineto} bind def
 /s {setrgbcolor} bind def
@@ -24378,7 +24378,7 @@ triangle {
 %%Title: deal.II Output
 %%Creator: the deal.II library
 
-%%BoundingBox: 0 0 299 1274
+%%BoundingBox: 0 0 300 1275
 /m {moveto} bind def
 /l {lineto} bind def
 /s {setrgbcolor} bind def
