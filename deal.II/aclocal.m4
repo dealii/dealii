@@ -1180,7 +1180,7 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
     AIXF77)
 	dnl Set flags for AIX's xlf compiler. -qextname instructs the compiler
 	dnl to append an underscore to external function names, which is what
-	dnl we expect when linking to the HSL functions
+	dnl we expect when linking with FORTRAN functions
         F77FLAGSG="$FFLAGS -g -qextname"
         F77FLAGSO="$FFLAGS -O3 -w -qextname"
         F77LIBS="$F77LIBS -lxlf90"  
@@ -4037,10 +4037,11 @@ AC_DEFUN(DEAL_II_CONFIGURE_HSL, dnl
   
   if test "x$hsl_subroutines" != "x" ; then
     AC_MSG_RESULT($hsl_subroutines)
-    USE_CONTRIB_HSL=yes
+    AC_SUBST(HSL_LIB,'$(LIBDIR)/libhsl$(lib-suffix)')
+    AC_SUBST(HSL_INCLUDE_DIR,'-I$D/contrib/hsl/include')
+    AC_SUBST(NEEDS_F77LIBS,"yes")
   else
     AC_MSG_RESULT(none found)
-    USE_CONTRIB_HSL=no
   fi
 ])
 
@@ -4289,4 +4290,50 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
               [Defined if a Metis installation was found and is going
                to be used])
   fi
+])
+
+
+dnl --------------------------------------------------
+dnl What to do if UMFPack is selected
+dnl --------------------------------------------------
+AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
+[
+  AC_MSG_CHECKING(UmfPack library)
+  if test "x$1" != "xyes" ; then
+    AC_MSG_RESULT(external version not yet supported)
+  else
+    AC_SUBST(UMFPACK_LIB, '$(LIBDIR)/liblac_umfpack.$(lib-suffix)')
+    AC_SUBST(UMFPACK_LIBG, '$(LIBDIR)/liblac_umfpack.g.$(lib-suffix)')
+    AC_SUBST(UMFPACK_INCLUDE_DIR,'-I$D/contrib/umfpack/UMFPACK/Include')
+    AC_MSG_RESULT(using included version)
+  fi
+  AC_DEFINE(HAVE_UMFPACK,1,[UMFPACK is $1])
+  if test "x$with_blas" = "x" ; then
+    with_blas="yes"
+  fi
+])
+
+
+dnl --------------------------------------------------
+dnl Include the BLAS library
+dnl --------------------------------------------------
+AC_DEFUN(DEAL_II_WITH_BLAS, dnl
+[
+  if test "x$1" != "xyes" ; then
+    AC_CHECK_LIB($1, daxpy_,
+      [
+        AC_SUBST(BLAS_LIB,"-l$1")
+      ],
+      AC_MSG_RESULT(not found),
+      $F77LIBS)
+  else
+    AC_CHECK_LIB(blas, daxpy_,
+      [
+        AC_SUBST(BLAS_LIB,"-lblas")
+      ],
+      AC_MSG_RESULT(not found),
+      $F77LIBS)
+  fi
+  AC_DEFINE(HAVE_BLAS)
+  AC_SUBST(NEEDS_F77LIBS, "yes")
 ])

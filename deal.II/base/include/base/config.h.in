@@ -206,6 +206,15 @@
 /* Availability of the MA47 algorithm from HSL */
 #undef HAVE_HSL_MA47
 
+/* Use the UMFPack library? */
+#undef HAVE_UMFPACK
+
+/* Have LAPACK library? */
+#undef HAVE_LAPACK
+
+/* Have BLAS library? */
+#undef HAVE_BLAS
+
 /* Define if you have the rand_r function */
 #undef HAVE_RAND_R
 

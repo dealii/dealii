@@ -157,8 +157,6 @@ AC_SUBST(withmultithreading)
 
 
 
-
-
 dnl --------------------------------------------------------------
 dnl                   Kludges and C++ compatibility
 dnl --------------------------------------------------------------
@@ -337,7 +335,24 @@ DEAL_II_CONFIGURE_METIS
 AC_SUBST(USE_CONTRIB_METIS)
 AC_SUBST(DEAL_II_METIS_DIR)
 
+dnl Check for UMFPack. This is more an enable for the contributed version,
+dnl but it should become a real --with-umfpack later
+AC_ARG_WITH(umfpack,
+  [  --with-umfpack=umfpack-root-directory,
+      use contributed UMFPack is no directory is given.
+      Default is not to use UMFPack],
+  DEAL_II_WITH_UMFPACK($withval),
+  withumfpack=no)
 
+
+dnl Check for LAPACK
+AC_CHECK_LIB(lapack, degsl_)
+
+dnl Check for blas. Must be after UMFPack and LAPACK!
+AC_ARG_WITH(blas,
+  [  --with-blas=blaslib use the blas library],
+  DEAL_II_WITH_BLAS($withval),
+  withblas=no)
 
 dnl -------------------------------------------------------------
 dnl       Optimizations and consistency of compiler flags
@@ -363,9 +378,9 @@ dnl -------------------------------------------------------------
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- configuring other programs -----------------)
 
-DEAL_II_CHECK_KDOC
-AC_SUBST(kdocdir)
-AC_SUBST(kdocversion)
+dnl DEAL_II_CHECK_KDOC
+dnl AC_SUBST(kdocdir)
+dnl AC_SUBST(kdocversion)
 
 DEAL_II_CHECK_DOXYGEN
 AC_SUBST(DOXYGEN)

@@ -34,7 +34,8 @@ LDFLAGS              = @LDFLAGS@
 F77                  = @F77@
 F77-VERSION          = @F77_VERSION@
 F77LIBS              = @F77LIBS@
-LIBS                 = @LIBS@
+NEEDS_F77LIBS        = @NEEDS_F77LIBS@
+LIBS                 = @LIBS@ @BLAS_LIB@ @HSL_LIB@
 LIBDIR               = $D/lib
 PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
@@ -42,8 +43,6 @@ with-multithreading  = @withmultithreading@
 enable-shared        = @enableshared@
 DEAL_II_MAJOR        = @DEAL_II_MAJOR@
 DEAL_II_MINOR        = @DEAL_II_MINOR@
-
-USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 
 USE_CONTRIB_PETSC    = @USE_CONTRIB_PETSC@
 DEAL_II_PETSC_DIR    = @DEAL_II_PETSC_DIR@
@@ -60,8 +59,8 @@ TECIO_LIBRARY        = @TECPLOT_LIBRARY_PATH@
 
 TARGET               = @target@
 
-# if HSL sublibs are used, add F77 libs to linker flags
-ifeq ($(USE_CONTRIB_HSL),yes)
+# if FORTRAN sublibs are used, add F77 libs to linker flags
+ifeq ($(NEEDS_F77LIBS),yes)
   LDFLAGS += $(F77LDFLAGS)
   LIBS    += $(F77LIBS)
 endif
@@ -90,8 +89,8 @@ EXEEXT     = @EXEEXT@
 lib-base.o     = $(LIBDIR)/libbase$(lib-suffix)
 lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)
 
-lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) $(LIBDIR)/liblac_umfpack$(lib-suffix) -lblas
-lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) $(LIBDIR)/liblac_umfpack$(lib-suffix) -lblas
+lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) @UMFPACK_LIB@
+lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) @UMFPACK_LIBG@
 
 lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
 lib-deal2-2d.o = $(LIBDIR)/libdeal_II_2d$(lib-suffix)
@@ -100,8 +99,6 @@ lib-deal2-3d.o = $(LIBDIR)/libdeal_II_3d$(lib-suffix)
 lib-deal2-1d.g = $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
 lib-deal2-2d.g = $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
 lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
-
-lib-contrib-hsl = $(LIBDIR)/libhsl$(lib-suffix)
 
 # since the PETSc libs are called the same for both debug and
 # optimized mode, we have to have a trick to let the executable
@@ -118,15 +115,6 @@ lib-contrib-petsc.o = $(LIBDIR)/libpetsc$(lib-suffix)
 
 # same for metis, except that there is only one library in that case
 lib-contrib-metis = $(DEAL_II_METIS_DIR)/libmetis.a
-
-
-
-
-# if HSL is used, always link it in conjunction with liblac
-ifeq ($(USE_CONTRIB_HSL),yes)
-  lib-lac.g += $(lib-contrib-hsl)
-  lib-lac.o += $(lib-contrib-hsl)
-endif
 
 
 # if PETSC is used, we need to add a number of libraries to what
@@ -152,8 +140,6 @@ endif
 include-path-base            = $D/base/include
 include-path-lac             = $D/lac/include
 include-path-deal2           = $D/deal.II/include
-include-path-contrib-hsl     = $D/contrib/hsl/include
-include-path-contrib-umfpack = $D/contrib/umfpack/UMFPACK/Include
 include-path-contrib-boost   = $D/contrib/boost/include
 include-path-tecplot         = $(TECIO_INCLUDE)
 include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
@@ -163,10 +149,9 @@ include-path-metis           = $(DEAL_II_METIS_DIR)/Lib
 INCLUDE           = $(addprefix -I, $(include-path-base) \
                                     $(include-path-lac)  \
                                     $(include-path-deal2)\
-			            $(include-path-contrib-hsl)\
-			            $(include-path-contrib-umfpack)\
 			            $(include-path-contrib-boost)\
-				    $(include-path-tecplot))
+				    $(include-path-tecplot)) \
+	@UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@
 
 # add PETSc and METIS include path if necessary. this rule
 # (and the one further down below to get correct flags) should eventually
