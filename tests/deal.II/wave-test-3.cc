@@ -6509,6 +6509,7 @@ vector<double> stiffness(fe_values.n_quadrature_points);
 return error_on_cell;
 };
 
+#include <fe/fe_tools.h>
 
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::make_interpolation_matrices () {
@@ -6518,22 +6519,14 @@ void TimeStep_ErrorEstimation<dim>::make_interpolation_matrices () {
   embedding_matrix.reinit (dual_fe.dofs_per_cell,
 			   primal_fe.dofs_per_cell);
 
-  vector<Point<dim> > unit_support_points (dual_fe.dofs_per_cell);
-  dual_fe.get_unit_support_points (unit_support_points);
-  
-  for (unsigned int i=0; i<dual_fe.dofs_per_cell; ++i)
-    for (unsigned int j=0; j<primal_fe.dofs_per_cell; ++j)
-      embedding_matrix(i,j) = primal_fe.shape_value (j, unit_support_points[i]);
+  FETools::get_interpolation_matrix (primal_fe, dual_fe,
+				     embedding_matrix);
 
 
   FullMatrix<double> inverse_interpolation (primal_fe.dofs_per_cell,
 					    dual_fe.dofs_per_cell);
-  unit_support_points.resize (primal_fe.dofs_per_cell);
-  primal_fe.get_unit_support_points (unit_support_points);
-  
-  for (unsigned int i=0; i<primal_fe.dofs_per_cell; ++i)
-    for (unsigned int j=0; j<dual_fe.dofs_per_cell; ++j)
-      inverse_interpolation(i,j) = dual_fe.shape_value (j, unit_support_points[i]);
+  FETools::get_interpolation_matrix (dual_fe, primal_fe,
+				     inverse_interpolation);
 
   interpolation_matrix.reinit (dual_fe.dofs_per_cell, dual_fe.dofs_per_cell);
   embedding_matrix.mmult (interpolation_matrix, inverse_interpolation);
@@ -7588,7 +7581,7 @@ void UserMatrix::precondition (Vector<double> &dst,
 
 
 
-#include <fe/fe_q.h>
+#include <fe/fe_lib.lagrange.h>
 #include <fe/mapping_q1.h>
 #include <base/quadrature_lib.h>
 
