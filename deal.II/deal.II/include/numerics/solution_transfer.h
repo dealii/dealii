@@ -52,7 +52,7 @@ template <int dim> class DoFHandler;
  * soltrans.interpolate(solution);
  * \end{verbatim}
  
- * Multiple calling of this function #void interpolate (Vector<number> &out) const#
+ * Multiple calling of the function #void interpolate (Vector<number> &out) const#
  * is NOT allowed. Interpolating several functions can be performed in one step
  * by using #void interpolate (vector<Vector<number> >&all_out) const#, and
  * using the respective #prepare_for_coarsening_and_refinement# function taking
@@ -60,14 +60,81 @@ template <int dim> class DoFHandler;
  * triangulation (see there).
  * \end{itemize}
  *
- * For deleting all stored data in and reinitializing the
- * #SolutionTransfer# use the #clear()# function.
+ * For deleting all stored data in #SolutionTransfer# and reinitializing it
+ * use the #clear()# function.
  *
  * Note that the #user_pointer# of some cells are used. Be sure that you don't need
  * them otherwise.
  *
  * The template argument #number# denotes the data type of the vectors you want
  * to transfer.
+ *
+ * \subsection{Implementation}
+ * \begin{itemize}
+ * \item Solution transfer while pure refinement. Assume that we have got a
+ * solution vector on the current (original) grid.
+ * Each entry of this vector belongs to one of the
+ * DoFs of the discretisation. If we now refine the grid then the calling of
+ * #DoFHandler::distribute_dofs(...)# will change at least some of the
+ * DoF indices. Hence we need to store the DoF indices of all active cells
+ * before the refinement. The #user_pointer# of each active cell
+ * is used to point to the vector of these DoF indices of that cell, all other
+ * #user_pointers# are cleared. All this is
+ * done by #prepare_for_pure_refinement()#.
+ *
+ * In the function #refine_interpolate(in,out)# and on each cell where the
+ * #user_pointer# is set (i.e. the cells that were active in the original grid)
+ * we can now access the local values of the solution vector #in#
+ * on that cell by using the stored DoF indices. These local values are
+ * interpolated and set into the vector #out# that is at the end the
+ * discrete function #in# interpolated on the refined mesh.
+ *
+ * The #refine_interpolate(in,out)# function can be called multiplely for
+ * arbitrary many discrete functions (solution vectors) on the original grid. 
+ *
+ * \item Solution transfer while coarsening and refinement. After 
+ * calling #Triangulation::prepare_coarsening_and_refinement# the
+ * coarsen flags of either all or none of the children of a 
+ * (father-)cell are set. While coarsening 
+ * (#Triangulation::execute_coarsening_and_refinement#)
+ * the cells that are not needed any more will be deleted from the #Triangulation#.
+ * 
+ * For the interpolation from the (to be coarsenend) children to their father
+ * the children cells are needed. Hence this interpolation
+ * and the storing of the interpolated values of each of the discrete functions
+ * that we want to interpolate needs to take place before these children cells
+ * are coarsened (and deleted!!). Again the #user_pointers# of the cells are
+ * set to point to these values (see below). 
+ * Additionally the DoF indices of the cells
+ * that will not be coarsened need to be stored according to the solution
+ * transfer while pure refinement (cf there). All this is performed by
+ * #prepare_coarsening_and_refinement(all_in)# where the 
+ * #vector<Vector<number> >vector all_in# includes
+ * all discrete functions to be interpolated onto the new grid.
+ *
+ * As we need two different kinds of pointers (#vector<int> *# for the Dof
+ * indices and #vector<Vector<number> > *# for the interpolated DoF values)
+ * we use the #Pointerstruct# that includes both of these pointers and
+ * the #user_pointer# of each cell points to these #Pointerstructs#. 
+ * On each cell only one of the two different pointers is used at one time 
+ * hence we could use the
+ * #void * user_pointer# as #vector<int> *# at one time and as 
+ * #vector<Vector<number> > *# at the other but using this #Pointerstruct#
+ * in between makes the use of these pointers more safe and gives better
+ * possibility to expand their usage.
+ * 
+ * In #interpolate(all_in, all_out)# the refined cells are treated according
+ * to the solution transfer while pure refinement. Additionally, on each
+ * cell that is coarsened (hence previously was a father cell), 
+ * the values of the discrete
+ * functions in #all_out# are set to the stored local interpolated values 
+ * that are accessible due to the 'vector<Vector<number> > *' pointer in 
+ * #Pointerstruct# that is pointed to by the user_pointer of that cell.
+ * It is clear that #interpolate(all_in, all_out)# only can be called with
+ * the #vector<Vector<number> > all_in# that previously was the parameter
+ * of the #prepare_coarsening_and_refinement(all_in)# function. Hence 
+ * #interpolate(all_in, all_out)# can (in contrast to 
+ * #refine_interpolate(in, out)#) only be called once.
  *
  * @author Ralf Hartmann, 1999
  */
@@ -120,7 +187,7 @@ class SolutionTransfer
 				     /**
 				      * Same as previous function
 				      * but for only one discrete function
-				      * to interpolate.
+				      * to be interpolated.
 				      */
     void prepare_for_coarsening_and_refinement (const Vector<number> &in);
 		      
@@ -146,8 +213,8 @@ class SolutionTransfer
 			     Vector<number> &out) const;
     
 				     /**
-				      * Same as #interpolate(Vector<number> in,
-				      * Vector<number> out)# but it interpolates
+				      * Same as #interpolate(in,out)#
+				      * but it interpolates
 				      * just 'in-place'. Therefore #vec# will be
 				      * reinitialized to the new needed vector
 				      * dimension.
@@ -161,9 +228,8 @@ class SolutionTransfer
 				      * the refined and/or coarsenend grid.
 				      * It assumes the vectors in #all_in#
 				      * denote the same vectors
-				      * as in #all_in# as parameter
-				      * of #prepare_for_refinement_and_coarsening
-				      * (vector<Vector<number> > &all_in)#.
+				      * as in #all_in# as parameter of
+				      * #prepare_for_refinement_and_coarsening(all_in)#.
 				      * However, there is no way of verifying
 				      * this internally, so be careful here.
 				      *
@@ -189,9 +255,8 @@ class SolutionTransfer
 				      * Multiple calling of this function is
 				      * NOT allowed. Interpolating
 				      * several functions can be performed
-				      * in one step by using #void 
-				      * interpolate (vector<Vector<number>
-				      * >&all_out) const#
+				      * in one step by using
+				      * #interpolate (all_out)#
 				      */
     void interpolate (const Vector<number> &in,
 		      Vector<number>       &out) const;
@@ -317,16 +382,6 @@ class SolutionTransfer
 				      * will be stored in this vector.
 				      */
     vector<vector<Vector<number> > > dof_values_on_cell;
-
-				     /**
-				      * After calling 
-				      * #prepare_for_refinement_and_coarsening
-				      * (vector<Vector<number> > &all_in)#
-				      * this pointer points to the vector
-				      * #all_in# for later comparison with
-				      * the vector #all_out#
-				      */
-//    const vector<Vector<number> > * vecs_ptr;
 };
 
 
