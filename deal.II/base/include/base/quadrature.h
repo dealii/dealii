@@ -151,7 +151,7 @@ class Quadrature
  *
  * In one space dimension, the given base formula is copied and scaled onto
  * a given number of subintervals of length #1/n_copies#. If the quadrature
- * formula uses both end points of theunit interval, then in the interior
+ * formula uses both end points of the unit interval, then in the interior
  * of the iterated quadrature formula there would be quadrature points which
  * are used twice; we merge them into one with a weight which is the sum
  * of the weights of the left- and the rightmost quadrature point.
