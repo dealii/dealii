@@ -28,8 +28,8 @@
  * Representation of the space of polynomials of degree at most n in
  * higher dimensions.
  *
- * Given a vector of @{n} one-dimensional polynomials @{P0} to @{Pn},
- * where @{Pi} has degree @p{i}, this class generates all polynomials
+ * Given a vector of @p{n} one-dimensional polynomials @p{P0} to @p{Pn},
+ * where @p{Pi} has degree @p{i}, this class generates all polynomials
  * of the form @p{ Pijk(x,y,z) = Pi(x)Pj(y)Pk(z)}, where the sum of
  * @p{i}, @p{j} and @p{k} is less than or equal @p{n}.
  *

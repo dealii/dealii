@@ -26,7 +26,7 @@
 /**
  * Tensor product of given polynomials.
  *
- * Given a vector of @{n} one-dimensional polynomials @{P1} to @{Pn},
+ * Given a vector of @p{n} one-dimensional polynomials @p{P1} to @p{Pn},
  * this class generates @p{n} to the power of @p{dim} polynomials of
  * the form @p{ Qijk(x,y,z) = Pi(x)Pj(y)Pk(z)}. If the base
  * polynomials are mutually orthogonal on the interval $[-1,1]$ or
@@ -226,8 +226,8 @@ class TensorProductPolynomials
 /**
  * Anisotropic tensor product of given polynomials.
  *
- * Given one-dimensional polynomials @{Px1}, @{Px2}, ... in
- * x-direction, @{Py1}, @{Py2}, ... in y-direction, and so on, this
+ * Given one-dimensional polynomials @p{Px1}, @p{Px2}, ... in
+ * x-direction, @p{Py1}, @p{Py2}, ... in y-direction, and so on, this
  * class generates polynomials of the form @p{ Qijk(x,y,z) =
  * Pxi(x)Pyj(y)Pzk(z)}. If the base polynomials are mutually
  * orthogonal on the interval $[-1,1]$ or $[0,d], then the tensor

@@ -19,7 +19,7 @@
 
 #include <cmath>
 
-/*! @addtogroup LAC
+/*! @addtogroup Preconditioners
  *@{
  */
 

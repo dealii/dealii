@@ -306,7 +306,7 @@ class ParameterHandler;
  * files directly make sure that the TECHOME environment variable points to the
  * Tecplot installation directory, and that the files $TECHOME/include/TECIO.h
  * and $TECHOME/lib/tecio.a are readable.  If these files are not availabe (or in the
- * case of 1D) @p{write_tecplot_binary} will simply call @{write_tecplot} and thus larger
+ * case of 1D) @p{write_tecplot_binary} will simply call @p{write_tecplot} and thus larger
  * ASCII data files will be produced rather than more efficient Tecplot binary files.
  * For more information consult the Tecplot Users and Reference manuals.
  *
@@ -1669,7 +1669,50 @@ class DataOutInterface : private DataOutBase
 				      * the presently supported output
 				      * formats.
 				      */
-    enum OutputFormat { default_format, dx, ucd, gnuplot, povray, eps, gmv, tecplot, tecplot_binary, vtk };
+    enum OutputFormat {
+	  default_format,
+					   /**
+					    * Output for IBM OpenDX.
+					    */
+	  dx,
+					   /**
+					    * Output in AVS UCD format.
+					    */
+	  ucd,
+					   /**
+					    * Output for the gnuplot tool.
+					    */
+	  gnuplot,
+					   /**
+					    * Output for the povray raytracer.
+					    */
+	  povray,
+					   /**
+					    * Output in encapsulated
+					    * PostScript.
+					    */
+	  eps,
+					   /**
+					    * Output for GMV.
+					    */
+	  gmv,
+					   /**
+					    * Output for tecplot in
+					    * text format.
+					    */
+	  
+	  tecplot,
+					   /**
+					    * Output for tecplot in
+					    * binaryformat. Faster and
+					    * smaller than text
+					    * format.
+					    */
+	  tecplot_binary,
+					   /**
+					    * Output in VTK format.
+					    */
+	  vtk };
 
 				     /**
 				      * Obtain data through the

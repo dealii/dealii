@@ -20,11 +20,6 @@
 #include <string>
 
 
-/*! @addtogroup LAC
- *@{
- */
-
-
 /**
  * This class is a wrapper to the @p{Vector} class which allows to swap
  * out the data to a file and reload it later on. It handles the
@@ -309,8 +304,6 @@ class SwappableVector : public Vector<number>
 				      */
     void reload_vector (const bool set_flag);
 };
-
-/*@}*/
 
 /*----------------------------   swappable_vector.h     ---------------------------*/
 /* end of #ifndef __deal2__swappable_vector_h */

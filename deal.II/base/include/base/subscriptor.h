@@ -22,6 +22,7 @@
 namespace internal
 {
 				   /**
+				    * @internal
 				    * A namespace in which we
 				    * implement helper classes for the
 				    * subscriptor class.
@@ -29,6 +30,7 @@ namespace internal
   namespace Subscriptor
   {
                                      /**
+				      * @internal
                                       * Template class that declares
                                       * in inner typedef with the
                                       * following semantics: if the
@@ -71,6 +73,7 @@ namespace internal
     };
 
                                      /**
+				      * @internal
                                       * Specialization of the template
                                       * for the case that the first
                                       * template argument is

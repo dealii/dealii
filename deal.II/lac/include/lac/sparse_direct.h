@@ -24,7 +24,7 @@
 
 
 
-/*! @addtogroup LAC
+/*! @addtogroup Preconditioners
  *@{
  */
 

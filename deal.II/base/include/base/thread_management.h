@@ -34,7 +34,9 @@
 
 
 
-
+/**
+ * A namespace for the implementation of thread management in deal.II.
+ */
 namespace Threads 
 {
 /**
@@ -645,6 +647,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * If in a sub-thread an
                                       * exception is thrown, it is not
                                       * propagated to the main
@@ -676,6 +679,7 @@ namespace Threads
     void handle_std_exception (const std::exception &exc);
 
                                      /**
+				      * @internal
                                       * Same as above, but the type of
                                       * the exception is not derived
                                       * from @p{std::exception}, so
@@ -685,6 +689,7 @@ namespace Threads
     void handle_unknown_exception ();
 
                                      /**
+				      * @internal
                                       * The following function is used
                                       * for internal bookkeeping of the
                                       * number of existing threads. It
@@ -696,6 +701,7 @@ namespace Threads
     void register_thread ();
   
                                      /**
+				      * @internal
                                       * The following function is used
                                       * for internal bookkeeping of the
                                       * number of existing threads. It
@@ -775,6 +781,7 @@ namespace Threads
   namespace internal 
   {
                                      /**
+				      * @internal
                                       * A type that is used to
                                       * distinguish argument lists of
                                       * functions by enumeration.
@@ -788,7 +795,8 @@ namespace Threads
   namespace internal 
   {
                                      /**
-                                      * Given an arbitrary type RT,
+				      * @internal
+				      * Given an arbitrary type RT,
                                       * store an element of it and grant
                                       * access to it through functions
                                       * get() and set(). There are
@@ -809,6 +817,7 @@ namespace Threads
 
   
                                      /**
+				      * @internal
                                       * Given an arbitrary type RT,
                                       * store an element of it and grant
                                       * access to it through functions
@@ -833,6 +842,7 @@ namespace Threads
 
   
                                      /**
+				      * @internal
                                       * Given an arbitrary type RT,
                                       * store an element of it and grant
                                       * access to it through functions
@@ -853,6 +863,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Call arbitrary functions with
                                       * return type RT. For each number
                                       * of arguments to these functions,
@@ -1309,6 +1320,7 @@ namespace Threads
 
   
                                      /**
+				      * @internal
                                       * Call arbitrary functions with
                                       * void return type. For each
                                       * number of arguments to these
@@ -1739,6 +1751,7 @@ namespace Threads
   
 
                                      /**
+				      * @internal
                                       * Call an arbitrary function by
                                       * dispatching to the functions in
                                       * the Caller class based on the
@@ -1758,6 +1771,7 @@ namespace Threads
 
   
                                      /**
+				      * @internal
                                       * Call an arbitrary member
                                       * function by dispatching to the
                                       * functions in the Caller class
@@ -1781,6 +1795,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments, and whether the
@@ -1800,6 +1815,7 @@ namespace Threads
   
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1813,6 +1829,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1827,6 +1844,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1840,6 +1858,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1854,6 +1873,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1868,6 +1888,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1883,6 +1904,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1898,6 +1920,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1914,6 +1937,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1930,6 +1954,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1947,6 +1972,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1964,6 +1990,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -1982,6 +2009,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2000,6 +2028,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2019,6 +2048,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2038,6 +2068,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2058,6 +2089,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2078,6 +2110,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2099,6 +2132,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2120,6 +2154,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2143,6 +2178,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2165,6 +2201,7 @@ namespace Threads
     };
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments. This is the
@@ -2189,6 +2226,7 @@ namespace Threads
   
 
                                      /**
+				      * @internal
                                       * Construct a pointer to member
                                       * function based on the template
                                       * arguments, and whether the
@@ -2220,6 +2258,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments, and whether the
@@ -2237,6 +2276,7 @@ namespace Threads
   
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2250,6 +2290,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2263,6 +2304,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2277,6 +2319,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2292,6 +2335,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2308,6 +2352,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2325,6 +2370,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2343,6 +2389,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2362,6 +2409,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2382,6 +2430,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2404,6 +2453,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Construct a pointer to non-member
                                       * function based on the template
                                       * arguments. This is the
@@ -2427,6 +2477,7 @@ namespace Threads
   
 
                                      /**
+				      * @internal
                                       * Construct a pointer to
                                       * non-member function based on the
                                       * template arguments. We do this
@@ -2453,6 +2504,7 @@ namespace Threads
   namespace internal 
   {
                                      /**
+				      * @internal
                                       * Extract the Nth element of the
                                       * type list and make it a
                                       * reference.
@@ -2465,6 +2517,7 @@ namespace Threads
     };
   
                                      /**
+				      * @internal
                                       * Specializations of this template
                                       * declare a typedef to a tuple
                                       * type that has the same basic
@@ -2482,6 +2535,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2495,6 +2549,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2510,6 +2565,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2526,6 +2582,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2543,6 +2600,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2561,6 +2619,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2580,6 +2639,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2601,6 +2661,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2622,6 +2683,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2644,6 +2706,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2667,6 +2730,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * Make a tuple type of all
                                       * references out of the given
                                       * tuple. Specialization for tuple
@@ -2692,6 +2756,7 @@ namespace Threads
 
   
                                      /**
+				      * @internal
                                       * Declare a typedef to a tuple
                                       * type that has the same basic
                                       * types as the template
@@ -2718,6 +2783,7 @@ namespace Threads
   namespace internal 
   {
                                      /**
+				      * @internal
                                       * Base class describing a
                                       * thread. This is the basic
                                       * class abstracting the
@@ -2815,6 +2881,7 @@ namespace Threads
 #  endif     // defined(DEAL_II_USE_MT_POSIX)
 
                                      /**
+				      * @internal
                                       * Class derived from
                                       * @ref{thread_description_base}
                                       * that also provides the
@@ -2968,6 +3035,7 @@ namespace Threads
   {
 
                                      /**
+				      * @internal
                                       * Base class for the classes
                                       * wrapping function pointers and
                                       * arguments for non-member and
@@ -3041,6 +3109,7 @@ namespace Threads
   
 
                                      /**
+				      * @internal
                                       * Wrap the arguments to a
                                       * non-member or static member
                                       * function and provide an entry
@@ -3193,6 +3262,7 @@ namespace Threads
   
   
                                      /**
+				      * @internal
                                       * Wrap the arguments to a member
                                       * function and provide an entry
                                       * point for a new thread that
@@ -3351,6 +3421,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * General template declaration
                                       * of a class that is used to
                                       * encapsulate arguments to
@@ -3379,6 +3450,7 @@ namespace Threads
 
 
                                      /**
+				      * @internal
                                       * General template declaration
                                       * of a class that is used to
                                       * encapsulate arguments to
@@ -3411,6 +3483,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with no arguments.
                                       */
@@ -3470,6 +3543,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 1 argument.
                                       */
@@ -3529,6 +3603,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 2 arguments.
                                       */
@@ -3589,6 +3664,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 3 arguments.
                                       */
@@ -3656,6 +3732,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 4 arguments.
                                       */
@@ -3723,6 +3800,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 5 arguments.
                                       */
@@ -3794,6 +3872,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 6 arguments.
                                       */
@@ -3867,6 +3946,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 7 arguments.
                                       */
@@ -3948,6 +4028,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 8 arguments.
                                       */
@@ -4034,6 +4115,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 9 arguments.
                                       */
@@ -4122,6 +4204,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for member
                                       * functions with 10 arguments.
                                       */
@@ -4216,6 +4299,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for
                                       * functions with no arguments.
                                       */
@@ -4262,6 +4346,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Encapsulator class for
                                       * functions with 1 argument.
                                       */
@@ -4902,6 +4987,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * General template declaration
                                       * of a class that is used to
                                       * forward arguments to
@@ -4926,6 +5012,7 @@ namespace Threads
     class fun_forwarder;
 
                                      /**
+				      * @internal
                                       * General template declaration
                                       * of a class that is used to
                                       * forward arguments to
@@ -4953,6 +5040,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with no arguments.
                                       */
@@ -4981,6 +5069,7 @@ namespace Threads
 
  
                                    /**
+				    * @internal
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with no arguments. This is the
@@ -4996,6 +5085,7 @@ namespace Threads
   }
 
                                    /**
+				    * @internal
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * no arguments. This is the
@@ -5018,6 +5108,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 1 argument.
                                       */
@@ -5046,6 +5137,7 @@ namespace Threads
 
  
                                    /**
+				    * @internal
                                     * Overload of the non-const spawn
                                     * function for member functions with
                                     * 1 argument. This is the
@@ -5061,6 +5153,7 @@ namespace Threads
   }
 
                                    /**
+				    * @internal
                                     * Overload of the spawn function for
                                     * const member functions with 1
                                     * argument. This is the
@@ -5083,6 +5176,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 2
                                       * arguments.
@@ -5114,6 +5208,7 @@ namespace Threads
 
 
                                    /**
+				    * @internal
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 2 arguments. This is the
@@ -5129,6 +5224,7 @@ namespace Threads
   }
 
                                    /**
+				    * @internal
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 2 arguments. This is the version
@@ -5150,6 +5246,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 3
                                       * arguments.
@@ -5224,6 +5321,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 4
                                       * arguments.
@@ -5298,6 +5396,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 5
                                       * arguments.
@@ -5376,6 +5475,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 6
                                       * arguments.
@@ -5456,6 +5556,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 7
                                       * arguments.
@@ -5544,6 +5645,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 8
                                       * arguments.
@@ -5637,6 +5739,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 9
                                       * arguments.
@@ -5732,6 +5835,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for member
                                       * functions with 10
                                       * arguments.
@@ -5833,6 +5937,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with no arguments.
                                       */
@@ -5883,6 +5988,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 1 argument.
                                       */
@@ -5932,6 +6038,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 2 arguments.
                                       */
@@ -5982,6 +6089,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 3 arguments.
                                       */
@@ -6037,6 +6145,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 4 arguments.
                                       */
@@ -6092,6 +6201,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 5 arguments.
                                       */
@@ -6149,6 +6259,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 6 arguments.
                                       */
@@ -6207,6 +6318,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 7 arguments.
                                       */
@@ -6270,6 +6382,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 8 arguments.
                                       */
@@ -6336,6 +6449,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 9 arguments.
                                       */
@@ -6404,6 +6518,7 @@ namespace Threads
   namespace internal
   {
                                      /**
+				      * @internal
                                       * Forwarder class for functions
                                       * with 10 arguments.
                                       */

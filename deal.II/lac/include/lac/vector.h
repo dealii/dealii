@@ -20,10 +20,6 @@
 #include <cstdio>
 
 
-/*! @addtogroup LAC
- *@{
- */
-
 /**
  * Numerical vector of data.  For this class there are different types
  * of functions available. The first type of function mesures the norm
@@ -584,7 +580,6 @@ class Vector
     template <typename Number2> friend class Vector;    
 };
 
-/*@}*/
 /*----------------------- Inline functions ----------------------------------*/
 
 

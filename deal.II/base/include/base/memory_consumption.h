@@ -56,7 +56,7 @@
  *
  * Finally, if we cannot reduce a type @p{T} further, because it is
  * neither atomic nor a known C++ data type, we call a member function
- * @{T::memory_consumption} on it, which we assume to exist. Almost
+ * @p{T::memory_consumption} on it, which we assume to exist. Almost
  * all classes in the deal.II library have such a function. This way,
  * if we call @p{memory_consumption(v)} on a vector @p{v} of type
  * @p{FullMatrix<double>}, we first reduce this to a loop in which we

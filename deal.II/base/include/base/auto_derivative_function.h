@@ -80,8 +80,17 @@ class AutoDerivativeFunction : public Function<dim>
 				      */
     enum DifferenceFormula
     {
+					   /**
+					    * Symmetric Euler scheme
+					    */
 	  Euler,
+					   /**
+					    * Upwind Euler scheme
+					    */
 	  UpwindEuler,
+					   /**
+					    * Difference formula of 4th order.
+					    */
 	  FourthOrder
     };
 

@@ -18,7 +18,7 @@
 #include <lac/sparse_decomposition.h>
 
 
-/*! @addtogroup LAC
+/*! @addtogroup Preconditioners
  *@{
  */
 

@@ -1198,7 +1198,20 @@ class ParameterHandler
 				      * formats.
 				      */
     enum OutputStyle {
-	  Text, LaTeX, HTML
+					   /**
+					    * Write human readable output.
+					    */
+	  Text,
+					   /**
+					    * Write paramteters as a
+					    * LaTeX table.
+					    */
+	  LaTeX,
+					   /**
+					    * Write parameters as an
+					    * HTML table.
+					    */
+	  HTML
     };
 
 

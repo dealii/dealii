@@ -276,6 +276,7 @@ namespace internal
 {
 
 /**
+ * @internal
  * Have a namespace in which we declare some classes that are used to
  * access the elements of tables using the @p{operator[]}. These are
  * quite technical, since they have to do their work recursively (due
@@ -295,6 +296,7 @@ namespace internal
   namespace TableBaseAccessors
   {
 /**
+ * @internal
  * Have a class which declares some nested typedefs, depending on its
  * template parameters. The general template declares nothing, but
  * there are more useful specializations regaring the last parameter
@@ -306,6 +308,7 @@ namespace internal
     {};
 
 /**
+ * @internal
  * Have a class which declares some nested typedefs, depending on its
  * template parameters. Specialization for accessors to constant
  * objects.
@@ -317,6 +320,7 @@ namespace internal
     };
 
 /**
+ * @internal
  * Have a class which declares some nested typedefs, depending on its
  * template parameters. Specialization for accessors to non-constant
  * objects.
@@ -329,6 +333,7 @@ namespace internal
   
 
 /**
+ * @internal
  * Class that acts as accessor to subobjects of tables of type
  * @p{Table<N,T>}. The template parameter @p{C} may be either true or
  * false, and indicates whether the objects worked on are constant or
@@ -469,6 +474,7 @@ namespace internal
 
   
 /**
+ * @internal
  * Accessor class for tables. This is the specialization for the last
  * index, which actually allows access to the elements of the table,
  * rather than recursively returning access objects for further

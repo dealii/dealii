@@ -18,11 +18,6 @@
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
 
-/*! @addtogroup LAC
- *@{
- */
-
-
 /**
  * Output a matrix in graphical form using the generic format
  * independent output routines of the base class. The matrix is
@@ -304,8 +299,6 @@ class MatrixOut : public DataOutInterface<2,2>
 				       const Options      &options);
 };
 
-
-/*@}*/
 
 /* ---------------------- Template and inline functions ------------- */
 
