@@ -17,7 +17,7 @@
  * where the convergence rate is the quotient of two following rows, and 
  * #ConvergenceTable::reduction_rate_log2#, that evaluates the order of convergence.
  * These standard evaluations are useful for global refinement, for local refinement
- * this may not be a appropriate method, as the convergence rates should be
+ * this may not be an appropriate method, as the convergence rates should be
  * set in relation to the number of cells or the number of DoFs. The
  * implementations of these non-standard methods is left to a user.
  *
@@ -126,7 +126,7 @@ class ConvergenceTable: public TableHandler
 				      * of `all' columns (see the following 
 				      * two functions).
 				      *
-				      * The Column::flag==1 is preserved for
+				      * The Column::flag==1 is reserved for
 				      * omitting the column from convergence
 				      * rate evalution.
 				      */
@@ -139,20 +139,24 @@ class ConvergenceTable: public TableHandler
 				      * #reference_column_key#. This
 				      * function evaluates the rates of
 				      * ALL columns except of the 
-				      * #omit_columns# and previously
+				      * columns that are to be omitted
+				      * (see previous function)
+				      * and execpt of the columns that are
+				      * previously
 				      * evaluated rate columns.
 				      * This function allows to evaluate
 				      * the convergence rate for almost all
 				      * columns of a table without calling
 				      * #evaluate_convergence_rates(data_column, ...)#
-				      * for each column seperately.
+				      * for each column separately.
 				      *
 				      * Example: 
 				      * Columns like #n cells# or 
 				      * #n dofs# columns may be wanted
 				      * to be omitted in the evaluation
 				      * of the convergence rates. Hence they
-				      * should be included into #omit_columns#.
+				      * should omitted by calling the
+				      * #omit_column_from_convergence_rate_evaluation(..)#.
 				      */
     void evaluate_all_convergence_rates(const string &reference_column_key,
 					const RateMode rate_mode);
@@ -162,7 +166,10 @@ class ConvergenceTable: public TableHandler
 				      * due to the #rate_mode#. This
 				      * function evaluates the rates of
 				      * ALL columns except of the 
-				      * #omit_columns# and previously
+				      * columns that are to be omitted
+				      * (see previous function)
+				      * and execpt of the columns that are
+				      * previously
 				      * evaluated rate columns.
 				      * This function allows to evaluate
 				      * the convergence rate for almost all
@@ -175,7 +182,8 @@ class ConvergenceTable: public TableHandler
 				      * #n dofs# columns may be wanted
 				      * to be omitted in the evaluation
 				      * of the convergence rates. Hence they
-				      * should be included into #omit_columns#.
+				      * should omitted by calling the
+				      * #omit_column_from_convergence_rate_evaluation(..)#.
 				      */
     void evaluate_all_convergence_rates(const RateMode rate_mode);
 
