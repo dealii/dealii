@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -476,31 +476,24 @@ MappingQ<dim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
       if (dim==2)
 	compute_laplace_vector(loqvs);
       else
-					 // computing the Laplace
-					 // vector for faces is not
-					 // supported in 3d at
-					 // present. presumably, doing
-					 // so would not be so hard:
-					 // we would only have to call
-					 // the function in 2d,
-					 // i.e. the quad values in 3d
-					 // are equal to the cell
-					 // values in 2d. however,
-					 // that would require us to
-					 // link in the 2d library,
-					 // which is kind of awkward
-					 // (note that
-					 // compute_laplace_vector
-					 // really makes use of a lot
-					 // of 2d stuff, such as
-					 // FEValues etc). an
-					 // alternative would be to
-					 // precompute the values of
-					 // this array for a couple of
-					 // higher mapping orders, pin
-					 // down their values and
-					 // insert them into the array
-					 // above.
+					 // computing the Laplace vector for
+					 // faces is not supported in 3d at
+					 // present. presumably, doing so
+					 // would not be so hard: we would
+					 // only have to call the function in
+					 // 2d, i.e. the quad(=face) values in
+					 // 3d are equal to the quad(=cell)
+					 // values in 2d. however, that would
+					 // require us to link in the 2d
+					 // library, which is kind of awkward
+					 // (note that compute_laplace_vector
+					 // really makes use of a lot of 2d
+					 // stuff, such as FEValues etc). an
+					 // alternative would be to precompute
+					 // the values of this array for a
+					 // couple of higher mapping orders,
+					 // pin down their values and insert
+					 // them into the array above.
 	Assert (false, ExcNotImplemented());
     }
 
