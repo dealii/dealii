@@ -41,10 +41,10 @@ MG<dim>::MG(const MGDoFHandler<dim>               &mg_dof_handler,
 
 template <int dim>
 void
-MG<dim>::level_vmult(const unsigned int    level,
-		     Vector<double>       &result,
-		     const Vector<double> &u,
-		     const Vector<double> &/* rhs */)
+MG<dim>::level_vmult (const unsigned int    level,
+		      Vector<double>       &result,
+		      const Vector<double> &u,
+		      const Vector<double> &/* rhs */)
 {
   (*level_matrices)[level].vmult(result,u);
   result.scale(-1.);
@@ -101,7 +101,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 				       // cell
       prolongation_sparsities.back().reinit (mg_dof.n_dofs(level+1),
 					     mg_dof.n_dofs(level),
-//TODO: evil hack, must be corrected!!!
+//TODO: evil hack, must be corrected!
 					     dofs_per_cell+1);
       
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
@@ -194,6 +194,7 @@ void MGTransferPrebuilt::restrict_and_add (const unsigned int   from_level,
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
+
   prolongation_matrices[from_level-1].Tvmult_add (dst, src);
 };
 
