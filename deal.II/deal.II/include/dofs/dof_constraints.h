@@ -108,7 +108,7 @@ class ConstraintMatrix : public Subscriptor
     ConstraintMatrix ();
 
 
-/**
+				     /**
 				      * Add a new line to the matrix.
 				      */
     void add_line (const unsigned int line);
@@ -194,7 +194,7 @@ class ConstraintMatrix : public Subscriptor
 		   SparsityPattern       &condensed) const;
 
 
-/**
+				     /**
 				      * This function does much the same as
 				      * the above one, except that it condenses
 				      * the matrix struct 'in-place'. It does
@@ -282,7 +282,7 @@ class ConstraintMatrix : public Subscriptor
     void set_zero (Vector<number> &vec) const;
 
 
-/**
+				     /**
 				      * Print the constraint lines. Mainly for
 				      * debugging purposes.
 				      *
@@ -297,7 +297,7 @@ class ConstraintMatrix : public Subscriptor
     void print (ostream &) const;
 
 
-/**
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcMatrixIsClosed);
