@@ -6,8 +6,8 @@
 /*----------------------------   boundary-function.h     ---------------------------*/
 
 #include <base/point.h>
+#include <base/subscriptor.h>
 #include <grid/geometry_info.h>
-#include <math.h>
 
 
 
@@ -87,7 +87,7 @@ struct BoundaryHelper<3> {
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class Boundary {
+class Boundary : public Subscriptor {
   public:
 				     /**
 				      *  Typedef an array of the needed number
@@ -102,7 +102,14 @@ class Boundary {
 //    typedef const Point<dim>* PointArray[((dim==1) ?
 //					  1 :
 //					  GeometryInfo<dim>::vertices_per_face)];
-    
+
+				     /**
+				      * Destructor. Does nothing here, but
+				      * needs to be declared to make it
+				      * virtual.
+				      */
+    virtual ~Boundary ();
+        
 				     /**
 				      *  This function calculates the position
 				      *  of the new vertex.
@@ -131,13 +138,7 @@ class StraightBoundary : public Boundary<dim> {
 				      *  This function calculates the position
 				      *  of the new vertex.
 				      */
-    virtual Point<dim> in_between (const PointArray &neighbors) const {
-      Point<dim> p;
-      for (int i=0; i<(1<<(dim-1)); ++i)
-	p += *neighbors[i];
-      p /= (1<<(dim-1))*1.0;
-      return p;
-    };
+    virtual Point<dim> in_between (const PointArray &neighbors) const;
 };
 
 
@@ -169,16 +170,7 @@ class HyperBallBoundary : public StraightBoundary<dim> {
 				      *  This function calculates the position
 				      *  of the new vertex.
 				      */
-    virtual Point<dim> in_between (const PointArray &neighbors) const {
-      Point<dim> middle = StraightBoundary<dim>::in_between(neighbors);
-
-      middle -= center;
-				       // project to boundary
-      middle *= radius / sqrt(middle.square());
-
-      middle += center;
-      return middle;
-    };
+    virtual Point<dim> in_between (const PointArray &neighbors) const;
 
 
   private:
