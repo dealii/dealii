@@ -40,7 +40,9 @@ DataOutBase::Patch<dim,spacedim>::Patch () :
 		n_subdivisions (1)
 
 				   // all the other data has a
-				   // constructor of its own
+				   // constructor of its own, except
+				   // for the "neighbors" field, which
+				   // we set to invalid values.
 {
   for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
     neighbors[i] = no_neighbor;
