@@ -29,7 +29,8 @@ help:
 	@echo "=    TODO       : create a \"TODO\" file from the source files           ="
 	@echo "=    TAGS       : create a TAGS file from include and source files     ="
 	@echo "=                                                                      ="
-	@echo "=    clean      : removes all object files, libraries, etc in subdirs  ="
+	@echo "=    clean      : removes all object files in subdirs                  ="
+	@echo "=    distclean  : removes all object files, libraries, etc in subdirs  ="
 	@echo "========================================================================"
 
 
@@ -151,11 +152,11 @@ clean-lib:
 clean-tests:
 	-cd tests && $(MAKE) clean
 
-veryclean: clean
-	cd lib ; $(MAKE) veryclean
+distclean: clean
+	cd lib ; $(MAKE) distclean
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
         online-doc printable-doc tex-doc contrib \
         clean clean-contrib clean-base clean-lac clean-dealII \
-	clean-doc clean-examples clean-lib clean-tests veryclean \
+	clean-doc clean-examples clean-lib clean-tests distclean \
 	TAGS TODO

@@ -24,7 +24,7 @@ clean-base clean-lac clean-1d clean-2d clean-3d:
 clean-contrib:
 	-rm contrib/*/*.o
 
-veryclean: clean
+distclean: clean
 	-rm -f lib* bin/*
 
 .PHONY: clean clean-objects 
