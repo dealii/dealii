@@ -1697,6 +1697,5 @@ string DataOutInterface<dim>::get_output_format_names () {
   
 // explicit instantiations. functions in DataOutBase are instantiated by
 // the respective functions in DataOut_Interface
-template class DataOutInterface<1>;
-template class DataOutInterface<2>;
-template class DataOutInterface<3>;
+template class DataOutInterface<data_out_dimension>;
+
