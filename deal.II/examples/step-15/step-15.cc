@@ -1091,7 +1091,22 @@ void MinimizationProblem<dim>::run ()
   std::cout << std::endl;
 }
 
-    
+
+                                 // Finally: ``main()''. This function does
+                                 // what all its counterparts in previous
+                                 // examples already did, i.e. create an
+                                 // object of the main class, and hand off
+                                 // work to them, only retaining its role as a
+                                 // guard to catch exceptions and print some
+                                 // information if we get one. The only
+                                 // difference is that it generates objects
+                                 // multiple times and runs them. Since the
+                                 // initial value for each run is a random
+                                 // function, where the random number
+                                 // generator returns different values each
+                                 // time, all these runs are actually
+                                 // different, although it may seem that they
+                                 // are independent of each other.
 int main () 
 {
   try
