@@ -718,6 +718,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       New: There is now a function <code
+       class="member">FiniteElement::constraints_are_implemented</code> that
+       informs the caller about whether the finite element in question in fact
+       implements its hanging node constraints.
+       <br>
+       (WB 2003/02/15)
+       </p>
+
+  <li> <p>
        Fixed: The <code
        class="member">ConstraintMatrix::is_identity_constrained</code> function
        would previously generate a segmentation fault if called on a constraint
