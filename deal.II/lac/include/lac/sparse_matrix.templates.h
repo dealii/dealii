@@ -962,9 +962,12 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst, const number om) const
     {
       somenumber s = dst(row);
       for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
-	if (cols->colnums[j] < row)
-	  s -= val[j] * dst(cols->colnums[j]);
-
+	{
+	  const unsigned int col = cols->colnums[j];
+	  if (col < row)
+	  s -= val[j] * dst(col);
+	}
+      
       dst(row) = s * om / val[cols->rowstart[row]];
     }
 }
@@ -998,7 +1001,8 @@ template <typename somenumber>
 void
 SparseMatrix<number>::PSOR (
   Vector<somenumber>& dst,
-  const std::vector<unsigned int> permutation,
+  const std::vector<unsigned int>& permutation,
+  const std::vector<unsigned int>& inverse_permutation,
   const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
@@ -1007,6 +1011,8 @@ SparseMatrix<number>::PSOR (
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert (m() == permutation.size(),
 	  ExcDimensionMismatch(m(), permutation.size()));
+  Assert (m() == inverse_permutation.size(),
+	  ExcDimensionMismatch(m(), inverse_permutation.size()));
 
   for (unsigned int urow=0; urow<m(); ++urow)
     {
@@ -1014,8 +1020,8 @@ SparseMatrix<number>::PSOR (
       somenumber s = dst(row);
       for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
 	{
-	  const unsigned int col = permutation[cols->colnums[j]];
-	  if (col < row)
+	  const unsigned int col = cols->colnums[j];
+	  if (inverse_permutation[col] < urow)
 	    s -= val[j] * dst(col);
 	}
 
@@ -1029,7 +1035,8 @@ template <typename somenumber>
 void
 SparseMatrix<number>::TPSOR (
   Vector<somenumber>& dst,
-  const std::vector<unsigned int> permutation,
+  const std::vector<unsigned int>& permutation,
+  const std::vector<unsigned int>& inverse_permutation,
   const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
@@ -1038,6 +1045,8 @@ SparseMatrix<number>::TPSOR (
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert (m() == permutation.size(),
 	  ExcDimensionMismatch(m(), permutation.size()));
+  Assert (m() == inverse_permutation.size(),
+	  ExcDimensionMismatch(m(), inverse_permutation.size()));
 
   for (unsigned int urow=m(); urow != 0;)
     {
@@ -1046,8 +1055,8 @@ SparseMatrix<number>::TPSOR (
       somenumber s = dst(row);
       for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
 	{
-	  const unsigned int col = permutation[cols->colnums[j]];
-	  if (col > row)
+	  const unsigned int col = cols->colnums[j];
+	  if (inverse_permutation[col] > urow)
 	    s -= val[j] * dst(col);
 	}
 

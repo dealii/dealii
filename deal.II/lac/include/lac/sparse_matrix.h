@@ -814,14 +814,17 @@ class SparseMatrix : public Subscriptor
 				      * that is, first the row
 				      * @p{permutation[0]}, then
 				      * @p{permutation[1]} and so
-				      * on.
+				      * on. For efficiency reasons,
+				      * the permutation as well as its
+				      * inverse are required.
 				      *
 				      * @p{omega} is the relaxation
 				      * parameter.
 				      */
     template <typename somenumber>
     void PSOR (Vector<somenumber> &v,
-	      const std::vector<unsigned int> permutation,
+	      const std::vector<unsigned int>& permutation,
+	      const std::vector<unsigned int>& inverse_permutation,
 	      const number        om = 1.) const;
 
 				     /**
@@ -834,14 +837,17 @@ class SparseMatrix : public Subscriptor
 				      * that is, first the row
 				      * @p{permutation[m()-1]}, then
 				      * @p{permutation[m()-2]} and so
-				      * on.
+				      * on. For efficiency reasons,
+				      * the permutation as well as its
+				      * inverse are required.
 				      *
 				      * @p{omega} is the relaxation
 				      * parameter.
 				      */
     template <typename somenumber>
     void TPSOR (Vector<somenumber> &v,
-	      const std::vector<unsigned int> permutation,
+	      const std::vector<unsigned int>& permutation,
+	      const std::vector<unsigned int>& inverse_permutation,
 	      const number        om = 1.) const;
 
 				     /**

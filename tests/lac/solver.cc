@@ -31,7 +31,7 @@
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_method( SOLVER& solver, const MATRIX& A,
+check_solve( SOLVER& solver, const MATRIX& A,
 	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
 {
   u = 0.;
@@ -39,6 +39,23 @@ check_method( SOLVER& solver, const MATRIX& A,
   try 
     {
       solver.solve(A,u,f,P);
+    }
+  catch (std::exception& e)
+    {
+      deallog << e.what() << std::endl;
+    }  
+}
+
+template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
+void
+check_Tsolve(SOLVER& solver, const MATRIX& A,
+	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
+{
+  u = 0.;
+  f = 1.;
+  try 
+    {
+      solver.Tsolve(A,u,f,P);
     }
   catch (std::exception& e)
     {
@@ -59,6 +76,8 @@ int main()
   SolverControl verbose_control(100, 1.e-3, true);
   SolverCG<> cg(control, mem);
   SolverGMRES<> gmres(control, mem, 8);
+  SolverGMRES<>::AdditionalData(8, true);
+  SolverGMRES<> gmresright(control, mem, 8);  
   SolverBicgstab<> bicgstab(control, mem);
   SolverRichardson<> rich(control, mem);
   SolverQMRS<> qmrs(control, mem);
@@ -84,11 +103,17 @@ int main()
       prec_ssor.initialize(A, 1.2);
 
       std::vector<unsigned int> permutation(dim);
+      std::vector<unsigned int> inverse_permutation(dim);
       for (unsigned int i=0;i<dim;++i)
-	permutation(i) = dim-i-1;
+	permutation[i] = dim-i-1;
+      for (unsigned int i=0;i<dim;++i)
+	inverse_permutation[permutation[i]] = i;
+
+      for (unsigned int i=0;i<dim;++i)
+	permutation[i] = dim-i-1;
       
       PreconditionPSOR<> prec_psor;
-      prec_psor.initialize(A, permutation, 1.2);
+      prec_psor.initialize(A, permutation, inverse_permutation, 1.2);
       
       Vector<double>  f(dim);
       Vector<double>  u(dim);
@@ -110,46 +135,56 @@ int main()
 	  deallog.push("no-fail");
 
 	  control.set_max_steps(10);
-	  check_method(cg,A,u,f,prec_no);
-	  check_method(bicgstab,A,u,f,prec_no);
-	  check_method(gmres,A,u,f,prec_no);
-	  check_method(qmrs,A,u,f,prec_no);
+	  check_solve(cg,A,u,f,prec_no);
+	  check_solve(bicgstab,A,u,f,prec_no);
+	  check_solve(gmres,A,u,f,prec_no);
+	  check_solve(gmresright,A,u,f,prec_no);
+	  check_solve(qmrs,A,u,f,prec_no);
 	  control.set_max_steps(100);
 	  
 	  deallog.pop();
 	  
 	  deallog.push("no");
 	  
-	  check_method(cg,A,u,f,prec_no);
-	  check_method(bicgstab,A,u,f,prec_no);
-	  check_method(gmres,A,u,f,prec_no);
-	  check_method(qmrs,A,u,f,prec_no);
+	  check_solve(cg,A,u,f,prec_no);
+	  check_solve(bicgstab,A,u,f,prec_no);
+	  check_solve(gmres,A,u,f,prec_no);
+	  check_solve(gmresright,A,u,f,prec_no);
+	  check_solve(qmrs,A,u,f,prec_no);
 	  
 	  deallog.pop();
 	  
 	  deallog.push("ssor");
 	  
-	  check_method(rich,A,u,f,prec_ssor);
-	  check_method(cg,A,u,f,prec_ssor);
-	  check_method(bicgstab,A,u,f,prec_ssor);
-	  check_method(gmres,A,u,f,prec_ssor);
-	  check_method(qmrs,A,u,f,prec_ssor);
+	  check_Tsolve(rich,A,u,f,prec_ssor);
+	  check_solve(rich,A,u,f,prec_ssor);
+	  check_solve(cg,A,u,f,prec_ssor);
+	  check_solve(bicgstab,A,u,f,prec_ssor);
+	  check_solve(gmres,A,u,f,prec_ssor);
+	  check_solve(gmresright,A,u,f,prec_ssor);
+	  check_solve(qmrs,A,u,f,prec_ssor);
 	  
 	  deallog.pop();
 	  
 	  deallog.push("sor");
 	  
-	  check_method(rich,A,u,f,prec_sor);
-	  check_method(cg,A,u,f,prec_sor);
-	  check_method(bicgstab,A,u,f,prec_sor);
-	  check_method(gmres,A,u,f,prec_sor);
+	  check_Tsolve(rich,A,u,f,prec_sor);
+	  check_solve(rich,A,u,f,prec_sor);
+	  check_solve(cg,A,u,f,prec_sor);
+	  check_solve(bicgstab,A,u,f,prec_sor);
+	  check_solve(gmres,A,u,f,prec_sor);
+	  check_solve(gmresright,A,u,f,prec_sor);
+	  
+	  deallog.pop();
 	  
 	  deallog.push("psor");
 	  
-	  check_method(rich,A,u,f,prec_psor);
-	  check_method(cg,A,u,f,prec_psor);
-	  check_method(bicgstab,A,u,f,prec_psor);
-	  check_method(gmres,A,u,f,prec_psor);
+	  check_Tsolve(rich,A,u,f,prec_psor);
+	  check_solve(rich,A,u,f,prec_psor);
+	  check_solve(cg,A,u,f,prec_psor);
+	  check_solve(bicgstab,A,u,f,prec_psor);
+	  check_solve(gmres,A,u,f,prec_psor);
+	  check_solve(gmresright,A,u,f,prec_psor);
 	  
 	  deallog.pop();
 	}

@@ -67,6 +67,16 @@ template void SparseMatrix<TYPEMAT>::TSOR<TYPE2> (Vector<TYPE2> &,
 						  const TYPEMAT) const;
 template void SparseMatrix<TYPEMAT>::SSOR<TYPE2> (Vector<TYPE2> &,
 						  const TYPEMAT) const;
+template void SparseMatrix<TYPEMAT>::PSOR<TYPE2> (
+  Vector<TYPE2> &,
+  const std::vector<unsigned int>&,
+  const std::vector<unsigned int>&,
+  const TYPEMAT) const;
+template void SparseMatrix<TYPEMAT>::TPSOR<TYPE2> (
+  Vector<TYPE2> &,
+  const std::vector<unsigned int>&,
+  const std::vector<unsigned int>&,
+  const TYPEMAT) const;
 template void SparseMatrix<TYPEMAT>::SOR_step<TYPE2> (Vector<TYPE2> &, const Vector<TYPE2> &,
 						      const TYPEMAT) const;
 template void SparseMatrix<TYPEMAT>::TSOR_step<TYPE2> (Vector<TYPE2> &,

@@ -374,13 +374,14 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
  * //...initialize and build A
  *
  * std::vector<unsigned int> permutation(x.size());
+ * std::vector<unsigned int> inverse_permutation(x.size());
  *
- * //...fill permutation with reasonable values
+ * //...fill permutation and its inverse with reasonable values
  *
  *     // Define and initialize preconditioner
  *
  * PreconditionPSOR<SparseMatrix<double> > precondition;
- * precondition.initialize (A, permutation, .6);
+ * precondition.initialize (A, permutation, inverse_permutation, .6);
  *
  * solver.solve (A, x, b, precondition);
  * @end{itemize}
@@ -412,6 +413,7 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
 				      */
     void initialize (const MATRIX& A,
 		     const std::vector<unsigned int>& permutation,
+		     const std::vector<unsigned int>& inverse_permutation,
 		     typename PreconditionRelaxation<MATRIX>::AdditionalData
 		     parameters = typename PreconditionRelaxation<MATRIX>::AdditionalData());
     
@@ -432,6 +434,11 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
 				      * Storage for the permutation vector.
 				      */
     const std::vector<unsigned int>* permutation;
+				     /**
+				      * Storage for the inverse
+				      * permutation vector.
+				      */
+    const std::vector<unsigned int>* inverse_permutation;
 };
 
 
@@ -712,9 +719,11 @@ inline void
 PreconditionPSOR<MATRIX>::initialize (
   const MATRIX &rA,
   const std::vector<unsigned int>& p,
+  const std::vector<unsigned int>& ip,
   typename PreconditionRelaxation<MATRIX>::AdditionalData parameters)
 {
   permutation = &p;
+  inverse_permutation = &ip;
   PreconditionRelaxation<MATRIX>::initialize(rA, parameters);
 }
 
@@ -726,7 +735,7 @@ PreconditionPSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   dst = src;
-  this->A->PSOR (dst, *permutation, this->relaxation);
+  this->A->PSOR (dst, *permutation, *inverse_permutation, this->relaxation);
 }
 
 
@@ -738,7 +747,7 @@ PreconditionPSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   dst = src;
-  this->A->TPSOR (dst, *permutation, this->relaxation);
+  this->A->TPSOR (dst, *permutation, *inverse_permutation, this->relaxation);
 }
 
 
