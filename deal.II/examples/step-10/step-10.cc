@@ -475,9 +475,20 @@ void compute_pi_by_area ()
 					   // cast to double as there
 					   // is no add_value(string,
 					   // long double) function
-					   // implemented.
+					   // implemented. Note that
+	                                   // this also concerns the
+	                                   // second call as the ``fabs''
+	                                   // function in the ``std''
+	                                   // namespace is overloaded on
+	                                   // its argument types, so there
+	                                   // exists a version taking
+	                                   // and returning a ``long double'',
+	                                   // in contrast to the global
+	                                   // namespace where only one such
+	                                   // function is declared (which
+	                                   // takes and returns a double).
 	  table.add_value("eval.pi", static_cast<double> (area));
-	  table.add_value("error", std::fabs(area-pi));
+	  table.add_value("error",   static_cast<double> (std::fabs(area-pi)));
 	};
 
 				       // We want to compute
@@ -594,7 +605,7 @@ void compute_pi_by_perimeter ()
 					   // Then store the evaluated
 					   // values in the table...
 	  table.add_value("eval.pi", static_cast<double> (perimeter/2.));
-	  table.add_value("error", std::fabs(perimeter/2.-pi));
+	  table.add_value("error",   static_cast<double> (std::fabs(perimeter/2.-pi)));
 	};
 
 				       // ...and end this function as
