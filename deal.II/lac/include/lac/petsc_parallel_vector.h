@@ -395,7 +395,7 @@ namespace PETScWrappers
                                        // if the vectors have different sizes,
                                        // then first resize the present one
       if (size() != v.size())
-        reinit (v.size(), v.local_size(), v.communicator, true);
+        reinit (v.communicator, v.size(), v.local_size(), true);
     
       const int ierr = VecCopy (v.vector, vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
