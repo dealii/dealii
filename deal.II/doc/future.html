@@ -52,10 +52,14 @@
 
     <li> <p>
          <strong>The <I>hp</I>-method of finite elements:</strong>
-	 This will need a major restructuring of the basic classes
-	 handling degrees of freedom and is therefore not planned for
-	 the immediate future.
-
+	 Implementing this will need a class analogous to the
+         <code>DoFHandler</code> class, as well as extensions to the finite
+         element classes where descriptions of interface conditions to
+         other finite elements on neighboring cells are needed. While
+         the latter is probably straightforward, the first is a major
+         task and is not planned for the immediate future. We would,
+         however, offer advice if anyone wanted to implement this.
+	 </p>
 
     <li> <p>
          <strong>Linear solvers:</strong>
@@ -90,12 +94,22 @@
 	 </p>
 
     <li> <p>
-         <strong>More example and test programs:</strong>
+         <strong>More example programs:</strong>
 	 There are still many aspects of the library that are not yet
          covered by the example programs. This is certainly something
-         that should be improved, but is time consuming. A complete
+         that should be improved, but is time consuming. 
+	 </p>
+
+    <li> <p>
+         <strong>A better test-suite:</strong>
+	 We have a small suite of programs (approximately 20 programs
+         at present) that can be run automatically for regression
+         tests. Some of these are modified real-life applications, so
+         they should cover a relevant part of the library, but it
+         would be necessary to reach every corner of the library to be
+         sure a certain patch does not break something. Also, a complete
 	 test-suite for the library would be quite valuable for ports
-	 to new computer systems. 
+	 to new computer systems and compilers.
 	 </p>
 
     <li> <p>
