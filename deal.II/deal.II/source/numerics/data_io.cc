@@ -103,7 +103,7 @@ void DataIn<dim>::read_ucd (istream &in) {
 
   for (unsigned int cell=0; cell<n_cells; ++cell) 
     {
-      String cell_type;
+      string cell_type;
       int material_id;
       
       in >> dummy          // cell number
@@ -184,8 +184,8 @@ DataOut<dim>::DataEntry::DataEntry () :
 
 template <int dim>
 DataOut<dim>::DataEntry::DataEntry (const dVector *data,
-				    const String name,
-				    const String units) :
+				    const string name,
+				    const string units) :
 			data(data), name(name), units(units) {};
 
 
@@ -206,8 +206,8 @@ void DataOut<dim>::attach_dof_handler (DoFHandler<dim> &d) {
 
 template <int dim>
 void DataOut<dim>::add_data_vector (const dVector &vec,
-				    const String  &name,
-				    const String  &units) {
+				    const string  &name,
+				    const string  &units) {
   DataEntry new_entry (&vec, name, units);
   data.push_back (new_entry);
 };

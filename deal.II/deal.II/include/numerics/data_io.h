@@ -6,15 +6,7 @@
 
 #include <base/exceptions.h>
 #include <vector.h>
-
-#ifdef DEBUG
-#  define _G_NO_NRV     // don't use GNU's named return values in debug modes
-#  include <String.h>   // because if we did we'd harvest tons of warnings.
-#  undef _G_NO_NRV
-#else
-#  include <String.h>
-#endif
-
+#include <string>
 
 template <int dim> class Triangulation;
 template <int dim> class DoFHandler;
@@ -360,8 +352,8 @@ class DataOut {
 				      * at present.
 				      */
     void add_data_vector (const dVector &data,
-			  const String  &name,
-			  const String  &units="<dimensionless>");
+			  const string  &name,
+			  const string  &units="<dimensionless>");
 
 				     /**
 				      * Release the pointers to the data
@@ -419,7 +411,7 @@ class DataOut {
 					 /**
 					  * Constructor
 					  */
-	DataEntry (const dVector *data, const String name, const String units);
+	DataEntry (const dVector *data, const string name, const string units);
 	
 					 /**
 					  * Pointer to the data vector.
@@ -428,12 +420,12 @@ class DataOut {
 					 /**
 					  * Name of this component.
 					  */
-	String   name;
+	string   name;
 					 /**
 					  * Physical unit name of this
 					  * component.
 					  */
-	String   units;
+	string   units;
     };
 
 				     /**
