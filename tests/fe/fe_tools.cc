@@ -2,7 +2,7 @@
 //    fe_tools.cc,v 1.1 2003/11/28 15:03:26 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 
 #include "../tests.h"
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include <base/logstream.h>
@@ -28,6 +29,49 @@
 #include <fe/fe_tools.h>
 
 
+template <typename number>
+void print_formatted (const FullMatrix<number> &A,
+		      const unsigned int        precision,
+		      const unsigned int        width)
+{
+  for (unsigned int i=0; i<A.m(); ++i)
+    {
+      for (unsigned int j=0; j<A.n(); ++j)
+	{
+	  if (A(i,j) != 0)
+	    deallog << std::setw(width) << std::setprecision(precision)
+		    << A(i,j);
+	  else
+	    deallog << std::setw(width) << std::setprecision(precision)
+		    << "~";
+	  deallog << ' ';
+	};
+      deallog << std::endl;
+    };
+}
+
+
+
+template<int dim>
+void test_embedding (const FiniteElement<dim>& fe)
+{  
+  const unsigned int n = fe.dofs_per_cell;
+  const unsigned int nc= GeometryInfo<dim>::children_per_cell;
+  
+  FullMatrix<double> P[nc];
+  for (unsigned int i=0;i<nc;++i)
+    P[i].reinit(n,n);
+  
+  FETools::compute_embedding_matrices(fe, P);
+  
+  for (unsigned int i=0;i<nc;++i)
+    {
+      deallog << fe.get_name() << " embedding " << i << std::endl;
+      print_formatted(P[i], 3, 6);
+    }
+}
+
+  
 template<int dim>
 void test_projection (const FiniteElement<dim>& fe1,
 		      const FiniteElement<dim>& fe2,
@@ -61,6 +105,14 @@ void test_projection (std::ostream& out)
   FE_DGP<dim> p3(3);
   FE_DGP<dim> p4(4);
 
+  test_embedding(q0);
+  test_embedding(q1);
+  test_embedding(q2);
+  test_embedding(q3);
+  test_embedding(p1);
+  test_embedding(p2);
+  test_embedding(p3);
+  
   test_projection(p1,p0, out);
   test_projection(p0,p1, out);
   test_projection(p2,p1, out);
