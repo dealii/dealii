@@ -824,8 +824,6 @@ DoFRenumbering::compute_sort_selected_dofs_back (
       };
   Assert (next_unselected == n_selected_dofs, ExcInternalError());
   Assert (next_selected == n_dofs, ExcInternalError());
-
-  return new_indices;
 }
 
 
