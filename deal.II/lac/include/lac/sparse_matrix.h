@@ -425,7 +425,11 @@ template <typename number>
 class SparseMatrix
 {
   public:
-
+				     /**
+				      * Type of matrix entries.
+				      */
+    typedef number entry_type;
+    
 				     /**
 				      * Constructor; initializes the matrix to
 				      * be empty, without any structure, i.e.
