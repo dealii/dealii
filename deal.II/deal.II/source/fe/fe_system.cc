@@ -361,8 +361,9 @@ void FESystem<dim>::build_interface_constraints ()
 					 // no coupling
 	if (n_index.first == m_index.first)
 	  interface_constraints(m,n)
-	    = base_element(n_index.first).constraints()(m_index.second,
-							n_index.second);
+	    = (base_element(component_to_base_table[n_index.first])
+	       .constraints()(m_index.second,
+			      n_index.second));
       };
 };
 
