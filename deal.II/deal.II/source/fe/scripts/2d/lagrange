@@ -1,12 +1,14 @@
 # Maple script to compute much of the data needed to implement the
 # family of Lagrange elements in 2d. Expects that the fields denoting
-# position and number of support points, etc are already set.
+# position and number of support points, etc are already set. Note that
+# we assume a bilinear mapping from the unit to the real cell.
 #
 # $Id$
 # Author: Wolfgang Bangerth, 1998
 
   phi_polynom := array(0..n_functions-1):
   grad_phi_polynom := array(0..n_functions-1,0..1):
+  grad_grad_phi_polynom := array(0..n_functions-1,0..1,0..1):
   local_mass_matrix := array(0..n_functions-1, 0..n_functions-1):
   prolongation := array(0..3,0..n_functions-1, 0..n_functions-1):
   interface_constraints := array(0..2*(n_face_functions-2)+1-1,
@@ -37,6 +39,11 @@
     phi_polynom[i] := subs(solve(equation_system), trial_function):
     grad_phi_polynom[i,0] := diff(phi_polynom[i], xi):
     grad_phi_polynom[i,1] := diff(phi_polynom[i], eta):
+
+    grad_grad_phi_polynom[i,0,0] := diff(phi_polynom[i], xi, xi):
+    grad_grad_phi_polynom[i,0,1] := diff(phi_polynom[i], xi, eta):
+    grad_grad_phi_polynom[i,1,0] := diff(phi_polynom[i], eta,xi):
+    grad_grad_phi_polynom[i,1,1] := diff(phi_polynom[i], eta,eta):
   od:
 
   phi:= proc(i,x,y) subs(xi=x, eta=y, phi_polynom[i]): end:
@@ -122,6 +129,14 @@
   # unit cell to real cell.
   # x and y are arrays holding the x- and y-values of the four vertices
   # of this cell in real space. 
+  #
+  # Since we're already at it and need it anyway, we also compute the
+  # Jacobian matrix of the transform and its derivatives. For the
+  # question of whether to take the given form or its transpose, refer
+  # to the documentation of the FEValues class and the source code
+  # documentation of FELinearMapping::fill_fe_values. Also note, that
+  # the computed inverse is multiplied to the unit cell gradients
+  # *from the right*. 
   x := array(0..3);
   y := array(0..3);
   tphi[0] := (1-xi)*(1-eta):
@@ -130,7 +145,24 @@
   tphi[3] := (1-xi)*eta:
   x_real := sum(x[s]*tphi[s], s=0..3):
   y_real := sum(y[s]*tphi[s], s=0..3):
-  detJ := diff(x_real,xi)*diff(y_real,eta) - diff(x_real,eta)*diff(y_real,xi):
+  Jacobian := linalg[matrix](2,2, [[diff(x_real,xi), diff(x_real,eta)],
+                                   [diff(y_real,xi), diff(y_real,eta)]]):
+  inverseJacobian := linalg[inverse](Jacobian):
+  detJ := linalg[det](Jacobian):
+
+  grad_inverseJacobian := array(1..2, 1..2, 1..2):
+  for i from 1 to 2 do
+    for j from 1 to 2 do
+      for k from 1 to 2 do
+        if (i=1) then
+          grad_inverseJacobian[i,j,k] := diff (inverseJacobian[j,k], xi):
+        else 
+          grad_inverseJacobian[i,j,k] := diff (inverseJacobian[j,k], eta):
+        fi:
+      od:
+    od:
+  od:
+
   for i from 0 to n_functions-1 do
     print ("line", i):
     for j from 0 to n_functions-1 do

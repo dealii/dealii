@@ -52,17 +52,18 @@
   constrained_face_support_points[4] := 5/6:
 
   # do the real work
-  read "lagrange"
+  read "lagrange":
 
   
   # write data to files
   print ("writing data to files"):
   readlib(C):
-  C(phi_polynom, filename=cubic2d.shape_value):
-  C(grad_phi_polynom, filename=cubic2d.shape_grad):
-  C(prolongation, filename=cubic2d.prolongation):
-  C(restriction, filename=cubic2d.restriction):
-  C(local_mass_matrix, optimized, filename=cubic2d.massmatrix):
-  C(interface_constraints, filename=cubic2d.constraints):
-  C(real_points, optimized, filename=cubic2d.real_points):
+  C(phi_polynom, filename=cubic2d_shape_value):
+  C(grad_phi_polynom, filename=cubic2d_shape_grad):
+  C(grad_grad_phi_polynom, filename=cubic2d_shape_grad_grad):
+  C(prolongation, filename=cubic2d_prolongation):
+  C(restriction, filename=cubic2d_restriction):
+  C(local_mass_matrix, optimized, filename=cubic2d_massmatrix):
+  C(interface_constraints, filename=cubic2d_constraints):
+  C(real_points, optimized, filename=cubic2d_real_points):
 

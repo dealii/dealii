@@ -66,17 +66,18 @@
 
 
   # do the real work
-  read "lagrange"
+  read "lagrange":
 
   
   # write data to files
   print ("writing data to files"):
   readlib(C):
-  C(phi_polynom, filename=quartic2d.shape_value):
-  C(grad_phi_polynom, filename=quartic2d.shape_grad):
-  C(prolongation, filename=quartic2d.prolongation):
-  C(restriction, filename=quartic2d.restriction):
-  C(local_mass_matrix, optimized, filename=quartic2d.massmatrix):
-  C(interface_constraints, filename=quartic2d.constraints):
-  C(real_points, optimized, filename=quartic2d.real_points):
+  C(phi_polynom, filename=quartic2d_shape_value):
+  C(grad_phi_polynom, filename=quartic2d_shape_grad):
+  C(grad_grad_phi_polynom, filename=quartic2d_shape_grad_grad):
+  C(prolongation, filename=quartic2d_prolongation):
+  C(restriction, filename=quartic2d_restriction):
+  C(local_mass_matrix, optimized, filename=quartic2d_massmatrix):
+  C(interface_constraints, filename=quartic2d_constraints):
+  C(real_points, optimized, filename=quartic2d_real_points):
 
