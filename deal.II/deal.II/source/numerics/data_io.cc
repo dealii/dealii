@@ -590,7 +590,8 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
   DoFHandler<dim>::active_cell_iterator cell;
   DoFHandler<dim>::active_cell_iterator endc = dofs->end();
 
-  QIteratedTrapez<dim> points(accuracy);
+  QTrapez<1>     q_trapez;
+  QIterated<dim> points (q_trapez, accuracy);
   
   FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points));
   vector< vector <Vector<double> > >
