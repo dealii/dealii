@@ -138,6 +138,7 @@ dnl does not tell deal.II to actually use it, but the
 dnl compiler flags are set to allow for it.
 DEAL_II_CHECK_MULTITHREADING
 DEAL_II_SET_MULTITHREADING_FLAGS
+DEAL_II_CHECK_PARTLY_BRACKETED_INITIALIZER
 AC_SUBST(enablemultithreading)
 
 dnl Next also check whether the MT code shall be used through POSIX

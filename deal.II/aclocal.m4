@@ -902,6 +902,51 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
 
 
 dnl -------------------------------------------------------------
+dnl On some systems, notably AIX and SUN Solaris, using threads
+dnl leads to warnings since the POSIX_MUTEX_INITIALIZER preprocessor
+dnl variable used to initialize POSIX mutex objects does not contain
+dnl initializers for all elements of the mutex. This is not wrong,
+dnl but leads to the message "warning: aggregate has a partly
+dnl bracketed initializer", which is annoying since it shows up
+dnl _very_ often in our files, although this is something that
+dnl happens inside gcc systems headers. So avoid the warning if
+dnl necessary
+dnl
+dnl Usage:
+dnl   DEAL_II_CHECK_CHECK_PARTLY_BRACKETED_INITIALIZER
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_PARTLY_BRACKETED_INITIALIZER, dnl
+[
+  if test "$enablemultithreading" = yes ; then
+    case "$GXX_VERSION" in
+      gcc*)
+  	AC_MSG_CHECKING(for only partly bracketed mutex initializer)
+	CXXFLAGS="$CXXFLAGSG -Werror"
+	AC_LANG(C++)
+	AC_TRY_COMPILE(
+   	[
+#	include <vector>
+	],
+        [;],
+        [
+	  AC_MSG_RESULT(no)
+        ],
+        [
+	  AC_MSG_RESULT(yes)
+	  CXXFLAGSG="$CXXFLAGSG -Wno-missing-braces"
+	  CXXFLAGSO="$CXXFLAGSO -Wno-missing-braces"
+        ])
+	;;
+      *)
+        ;;
+    esac
+  fi
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Test which library the MT code shall use to support threads.
 dnl We used to support either POSIX or ACE, but support for ACE
 dnl has now been deleted and we only use POSIX these days. However,
