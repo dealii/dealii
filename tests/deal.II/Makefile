@@ -262,7 +262,7 @@ target1: $(target1-o-files) $(libraries)
 
 %.output:%.testcase
 	@echo =====Running======= $<
-	@$<
+	@./$<
 	@perl -pi -e 's/JobId.*//;s/value.*//;' $@
 
 %.check:%.output
