@@ -564,6 +564,8 @@ void DataOut<dim>::write (ostream &out,
       case gnuplot:
 	    write_gnuplot (out);
 	    break;
+      default:
+	    Assert (false, ExcNotImplemented());
     };
 };
 
@@ -577,6 +579,9 @@ string DataOut<dim>::default_suffix (const OutputFormat output_format) {
 	    return ".inp";
       case gnuplot:
 	    return ".gnuplot";
+      default:
+	    Assert (false, ExcNotImplemented());
+	    return "";
     };
 };
   
