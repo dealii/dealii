@@ -17,7 +17,7 @@
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
 #include <base/exceptions.h>
-
+#include <fe/fe_update_flags.h>
 #include <utility>
 
 
