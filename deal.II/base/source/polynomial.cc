@@ -134,11 +134,19 @@ template <typename number2>
 void
 Polynomial<number>::shift(typename std::vector<number>& coefficients,
 			  const number2 offset)
-{
+{  
+#ifdef DEAL_II_LONG_DOUBLE_LOOP_BUG
+  AssertThrow (false,
+	       ExcMessage("Sorry, but the compiler you are using has a bug that disallows "
+			  "compilation of this function, so you cannot use it. Read more "
+			  "about the bug and when it occurs in the aclocal.m4 file in the "
+			  "top level directory (watch for the string "
+			  "DEAL_II_LONG_DOUBLE_LOOP_BUG)"));
+#else  
 				   // Copy coefficients to a vector of
 				   // accuracy given by the argument
-  std::vector<number2> new_coefficients(coefficients.size());
-  new_coefficients.assign(coefficients.begin(), coefficients.end());
+  std::vector<number2> new_coefficients(coefficients.begin(),
+					coefficients.end());
   
 				   // Traverse all coefficients from
 				   // c_1. c_0 will be modified by
@@ -181,7 +189,10 @@ Polynomial<number>::shift(typename std::vector<number>& coefficients,
 				       // triangle.
       Assert (binomial_coefficient == 1, ExcInternalError());
     }
+
+				   // copy new elements to old vector
   coefficients.assign(new_coefficients.begin(), new_coefficients.end());
+#endif
 }
 
 
@@ -466,13 +477,5 @@ template void Polynomial<float>::shift(const float offset);
 template void Polynomial<float>::shift(const double offset);
 template void Polynomial<double>::shift(const double offset);
 template void Polynomial<long double>::shift(const long double offset);
-
-// gcc 3.1 crashes with an internal error when trying to instantiate
-// these functions.
-// TODO[WB]: check this with an autoconf macro. also fix the #ifdef so that it only works when GCC is actually used!
-#if ((__GNUC__ == 3) && (__GNUC_MINOR__ == 1))
-#warning Polynomial::shift with long double has been disabled in gcc 3.1
-#else
 template void Polynomial<float>::shift(const long double offset);
 template void Polynomial<double>::shift(const long double offset);
-#endif
