@@ -1,0 +1,24 @@
+Conventions for the /tests/deal.II directory:
+=============================================
+
+Since the files in this directory may need to be linked against one or
+more of the deal_II_?d.[g.]a libraries and since we do not want to
+specify this in the Makefile explicitely, please use the following two
+lines somewhere in the .cc file for the respective testcase:
+
+// deal_II_libraries.g=-ldeal_II_2d.g
+// deal_II_libraries=-ldeal_II_2d
+
+Respectively, if the program needs to be linked with the 3d library,
+replace 2d by 3d. If the program needs to be linked against both, then
+write 
+
+// deal_II_libraries.g=-ldeal_II_2d.g -ldeal_II_3d.g
+// deal_II_libraries=-ldeal_II_2d -ldeal_II_3d
+
+
+East test case shall give its output (apart from errors) to
+'cout'. For each test case, there shall be a file with the name of the
+test case and the extension '.expect' which contains the output that
+we expect if program and library are working as expected. The actual
+output of the program is autoamtically compared against this file.
