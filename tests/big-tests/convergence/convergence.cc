@@ -7,7 +7,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/tria_boundary.h>
+#include <grid/tria_boundary_lib.h>
 #include <grid/dof_constraints.h>
 #include <grid/grid_generator.h>
 #include <base/function.h>

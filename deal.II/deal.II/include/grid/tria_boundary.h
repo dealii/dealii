@@ -158,59 +158,6 @@ class StraightBoundary : public Boundary<dim> {
 
 
 
-/**
- *   Specialisation of \Ref{Boundary}<dim>, which places the new point on
- *   the boundary of a ball in arbitrary dimension. It works by projecting
- *   the point in the middle of the old points onto the ball. The middle is
- *   defined as the arithmetic mean of the points. 
- *
- *   The center of the ball and its radius may be given upon construction of
- *   an object of this type. They default to the origin and a radius of 1.0.
- *
- *   This class is derived from #StraightBoundary# rather than from
- *   #Boundary#, which would seem natural, since this way we can use the
- *   #StraightBoundary<dim>::in_between(neighbors)# function.
- */
-template <int dim>
-class HyperBallBoundary : public StraightBoundary<dim> {
-  public:
-				     /**
-				      * Constructor
-				      */
-    HyperBallBoundary (const Point<dim> p=Point<dim>(), const double radius=1.0) :
-		    center(p), radius(radius) {};
-
-				     /**
-				      * Refer to the general documentation of
-				      * this class and the documentation of the
-				      * base class.
-				      */
-    virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
-
-				     /**
-				      * Refer to the general documentation of
-				      * this class and the documentation of the
-				      * base class.
-				      */
-    virtual Point<dim>
-    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
-
-
-  private:
-				     /**
-				      * Center point of the hyperball.
-				      */
-    const Point<dim> center;
-
-				     /**
-				      * Radius of the hyperball.
-				      */
-    const double radius;
-};
-
-    
-
 
 /*----------------------------   boundary-function.h     ---------------------------*/
 /* end of #ifndef __tria_boundary_H */

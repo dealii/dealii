@@ -66,40 +66,8 @@ StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>:
 
 
 
-template <int dim>
-Point<dim>
-HyperBallBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
-{
-  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
-  
-  middle -= center;
-				   // project to boundary
-  middle *= radius / sqrt(middle.square());
-  
-  middle += center;
-  return middle;
-};
-
-
-
-template <int dim>
-Point<dim>
-HyperBallBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
-{
-  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
-  
-  middle -= center;
-				   // project to boundary
-  middle *= radius / sqrt(middle.square());
-  
-  middle += center;
-  return middle;
-};
-
-
-
 
 // explicit instantiations
 template class Boundary<deal_II_dimension>;
 template class StraightBoundary<deal_II_dimension>;
-template class HyperBallBoundary<deal_II_dimension>;
+

@@ -7,6 +7,10 @@
 
 #include <base/forward-declarations.h>
 #include <basic/forward-declarations.h>
+#include <base/exceptions.h>
+
+
+
 
 /**
  * This class offers triangulations of some standard domains such as hypercubes,
@@ -32,7 +36,7 @@
  *    \item Hyper balls:
  *      You get the circle or ball (or generalized: hyperball) around origin
  *      #p# and with radius #r# by calling
- *      #Triangulation<dim>::hyper_ball (p, r)#. The circle is triangulated
+ *      #GridGenerator::hyper_ball (tria, p, r)#. The circle is triangulated
  *      by five cells, the ball by seven cells. The diameter of the center cell is
  *      chosen so that the aspect ratio of the boundary cells after one refinement
  *      is minimized in some way. To create a hyperball in one dimension results in
@@ -41,14 +45,42 @@
  *      Do not forget to also attach a suitable boundary approximation object
  *      to the triangulation object you passed to this function if you later want
  *      the triangulation to be refined at the outer boundaries.
+ *
+ *    \item Hyper shell: A hyper shell is the region between two hyper
+ *      sphere with the same origin. Therefore, it is a ring in two
+ *      spatial dimensions. To triangulation it, call the function
+ *      #GridGenerator::hyper_shell (tria, origin, inner_radius,
+ *      outer_radius, N)#, where the center of the spheres as well as
+ *      the inner and outer radius of the two spheres are given as
+ *      shown.
+ *
+ *      The parameter #N# denotes how many cells are to be used for
+ *      this coarse triangulation. It defaults to zero, which tells
+ *      the function to chose the number itself; this, then, is done
+ *      such that the aspect ration of the resulting cells is as small
+ *      as possible. However, it should be mentioned that this
+ *      function does not work very well if the inner radius is much
+ *      smaller than the outer radius since only one layer of cells is
+ *      used in the radial direction.
+ *
+ *      You need to attach a boundary object to the triangulation. A
+ *      suitable boundary class is provided as #HyperSphereBoundary#
+ *      in the library.
+ *
+ * \item Slit domain: The slit domain is a variant of the hyper cube
+ *      domain. In two spatial dimensions, it is a square into which a slit
+ *      is sawed; if the initial square is though to be composed of four
+ *      smaller squares, then two of them are not connected even though
+ *      they are neighboring each other. Analogously, into the cube in
+ *      three spatial dimensions, a half-plane is sawed, disconnecting four
+ *      of the eight child-cubes from one of their neighbors.
  * \end{itemize}
  *
- * @author Wolfgang Bangerth, 1998, 1999
+ * @author Wolfgang Bangerth, 1998, 1999. Slit domain by Stefan Nauber, 1999
  */
-class GridGenerator 
+class GridGenerator
 {
   public:
-
     				     /**
 				      * Initialize the given triangulation with a
 				      * hypercube (line in 1D, square in 2D, etc)
@@ -106,11 +138,45 @@ class GridGenerator
 				      * from the middle of the top
 				      * boundary to the middle of the
 				      * area.
+				      *
+				      * The triangulation needs to be void
+				      * upon calling this function.
 				      */
     template <int dim>
     static void hyper_cube_slit (Triangulation<dim> &tria,
 				 const double        left = 0.,
 				 const double        right= 1.);
+
+				     /**
+				      * Produce a hyper-shell,
+				      * i.e. the space between two
+				      * circles in two space
+				      * dimensions and the region
+				      * between two spheres in 3d,
+				      * with given inner and outer
+				      * radius and a given number of
+				      * elements for this initial
+				      * triangulation. If the number
+				      * of initial cells is zero (as
+				      * is the default), then it is
+				      * computed adaptively such that
+				      * the resulting elements have
+				      * the least aspect ratio.
+				      *
+				      * The triangulation needs to be void
+				      * upon calling this function.
+				      */
+    template <int dim>
+    static void hyper_shell (Triangulation<dim> &tria,
+			     const Point<dim>   &center,
+			     const double        inner_radius,
+			     const double        outer_radius,
+			     const unsigned int  n_cells = 0);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidRadii);
 };
 
 
