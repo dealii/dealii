@@ -1481,4 +1481,8 @@ template class FESubfaceValues<deal_II_dimension>;
 #define IN PETScWrappers::Vector
 #include "fe_values.instance.h"
 #undef IN
+
+#define IN PETScWrappers::BlockVector
+#include "fe_values.instance.h"
+#undef IN
 #endif
