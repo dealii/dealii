@@ -1199,7 +1199,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *                                        // for all boundaries with
  *                                        // boundary indicator 0
  *       Ball ball;
- *       tria.set_boundary (0, &ball);
+ *       tria.set_boundary (0, ball);
  *
  *       // read some coarse grid
  *
