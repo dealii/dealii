@@ -347,6 +347,8 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 	  ExcDimensionsDontMatch(matrix.n(), matrix.m()));
   Assert (matrix.n() == right_hand_side.size(),
 	  ExcDimensionsDontMatch(matrix.n(), right_hand_side.size()));
+  Assert (matrix.n() == solution.size(),
+	  ExcDimensionsDontMatch(matrix.n(), solution.size()));
 				   // if no boundary values are to be applied
 				   // simply return
   if (boundary_values.size() == 0)
