@@ -1090,24 +1090,31 @@ class BlockVector
 	       const Number c, const BlockVector<Number>& X);
     
 				     /**
-				      * Scale each element of the vector by the
-				      * given factor. This function was
-				      * previously called @p{equ(Number)}, which
-				      * in my eyes is an extremely unintuitive
-				      * naming and was thus replaced.
+				      * Scale each element of the
+				      * vector by the given factor.
+				      *
+				      * This function is deprecated
+				      * and will be removed in a
+				      * future version. Use
+				      * @p{operator *=} and
+				      * @p{operator /=} instead.
 				      */
     void scale (const Number factor);
     
 				     /**
 				      * Scale each element of the
 				      * vector by a constant
-				      * value. This operator is an
-				      * alias to the @ref{scale}
-				      * function, except that it
-				      * returns a reference to itself.
+				      * value.
 				      */
     BlockVector<Number> & operator *= (const Number factor);
 
+				     /**
+				      * Scale each element of the
+				      * vector by the inverse of the
+				      * given value.
+				      */
+    BlockVector<Number> & operator /= (const Number factor);
+    
 				     /**
 				      * Multiply each element of this
 				      * vector by the corresponding
@@ -1298,9 +1305,21 @@ Number& BlockVector<Number>::operator() (const unsigned int i)
 
 template <typename Number>
 inline
-BlockVector<Number> & BlockVector<Number>::operator *= (const Number factor) 
+BlockVector<Number> &
+BlockVector<Number>::operator *= (const Number factor) 
 {
   scale (factor);
+  return *this;
+}
+
+
+
+template <typename Number>
+inline
+BlockVector<Number> &
+BlockVector<Number>::operator /= (const Number factor) 
+{
+  scale (1./factor);
   return *this;
 }
 

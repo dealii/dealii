@@ -399,18 +399,29 @@ class Vector
 				     /**
 				      * Scale each element of the
 				      * vector by the given factor.
+				      *
+				      * This function is deprecated
+				      * and will be removed in a
+				      * future version. Use
+				      * @p{operator *=} and
+				      * @p{operator /=} instead.
 				      */
     void scale (const Number factor);
 
+    
 				     /**
 				      * Scale each element of the
 				      * vector by a constant
-				      * value. This operator is an
-				      * alias to the @ref{scale}
-				      * function, except that it
-				      * returns a reference to itself.
+				      * value.
 				      */
     Vector<Number> & operator *= (const Number factor);
+
+				     /**
+				      * Scale each element of the
+				      * vector by the inverse of the
+				      * given value.
+				      */
+    Vector<Number> & operator /= (const Number factor);
     
 				     /**
 				      * Scale each element of this
@@ -734,6 +745,16 @@ inline
 Vector<Number> & Vector<Number>::operator *= (const Number factor) 
 {
   scale (factor);
+  return *this;
+}
+
+
+
+template <typename Number>
+inline
+Vector<Number> & Vector<Number>::operator /= (const Number factor) 
+{
+  scale (1./factor);
   return *this;
 }
 
