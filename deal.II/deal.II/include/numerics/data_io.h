@@ -43,6 +43,85 @@ template <class T> struct less;
   warning is issued. The vertex and cell numbering in the UCD file, which
   need not be consecutively, is lost upon transfer to the triangulation
   object, since this one needs consecutively numbered elements.
+
+
+  {\bf Structure of input grid data}
+  
+  It is your duty to use a correct numbering of vertices in the cell list,
+  i.e. for lines, you have to first give the vertex with the lower coordinate
+  value, then that with the higher coordinate value. For quadrilaterals in
+  two dimensions, the vertex indices in the #quad# list have to be such that
+  the vertices are numbered in counter-clockwise sense.
+
+  In two dimensions, another difficulty occurs, which has to do with the sense
+  of a quadrilateral. A quad consists of four lines which have a direction,
+  which is per definitionem as follows:
+  \begin{verbatim}
+    3-->--2
+    |     |
+    ^     ^
+    |     |
+    0-->--1
+  \end{verbatim}
+  Now, two adjacent cells must have a vertex numbering such that the direction
+  of the common side is the same. For example, the following two quads
+  \begin{verbatim}
+    3---4---5
+    |   |   |
+    0---1---2
+  \end{verbatim}
+  may be characterised by the vertex numbers (0 1 4 3) and (1 2 5 4), since
+  the middle line would get the direction #1->4# when viewed from both cells.
+  The numbering (0 1 4 3) and (5 4 1 2) would not be allowed, since the left
+  quad would give the common line the direction #1->4#, while the right one
+  would want to use #4->1#, leading to ambiguity. The #Triangulation# object
+  is capable of detecting this special case, which can be eliminated by
+  rotating the indices of the right quad by two. However, it would not
+  know what to do if you gave the vertex indices (4 1 2 5), since then it
+  would have to rotate by one element or three, the decision which to take is
+  not yet implemented.
+
+  There are more ambiguous cases, where the triangulation may not know what
+  to do at all without the use of very sophisticated algorithms. On such example
+  is the following:
+  \begin{verbatim}
+    9---10-----11
+    |   |    / |
+    6---7---8  |
+    |   |   |  |
+    3---4---5  |
+    |   |    \ |
+    0---1------2
+  \end{verbatim}
+  Assume that you had numbered the vertices in the cells at the left boundary
+  in a way, that the following line directions are induced:
+  \begin{verbatim}
+    9->-10-----11
+    ^   ^    / |
+    6->-7---8  |
+    ^   ^   |  |
+    3->-4---5  |
+    ^   ^    \ |
+    0->-1------2
+  \end{verbatim}
+  (This could for example be done by using the indices (0 1 4 3), (3 4 7 6),
+  (6 7 10 9) for the three cells). Now, you will not find a way of giving
+  indices for the right cells, without introducing either ambiguity for
+  one line or other, or without violating that within each cells, there must be
+  one vertex from which both lines are directed away and the opposite one to
+  which both adjacent lines point to.
+
+  The solution in this case is to renumber one of the three left cells, e.g.
+  by reverting the sense of the line between vertices 7 and 10 by numbering
+  the top left cell by (9 6 7 10).
+
+  But this is a thing that the triangulation
+  object can't do for you, since it would involve backtracking to cells
+  already created when we find that we can't number the indices of one of
+  the rightmost cells consistently. It is neither clear how to do this
+  backtracking nor whether it can be done with a stopping algorithm, if
+  possible within polynomial time. This kind of numbering must be made
+  upon construction of the coarse grid, unfortunately.
   */
 template <int dim>
 class DataIn {
@@ -72,7 +151,13 @@ class DataIn {
 				      * Exception
 				      */
     DeclException0 (ExcNoTriangulationSelected);
-    
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidVertexIndex,
+		    int, int,
+		    << "Trying to access invalid vertex index " << arg2
+		    << " while creating cell " << arg1);  
   private:
 				     /**
 				      * Store address of the triangulation to
@@ -127,20 +212,34 @@ class DataIn {
 
   {\bg GNUPLOT format}
 
-  The gnuplot format is not able to handle data on unstructured grids, so
-  the actual data is ignored in two and three space dimension. In one
-  dimension, both mesh and data is written, in two and three dimensions
-  only the grid is printed as a sequence of lines.
+  The GNUPLOT format is not able to handle data on unstructured grids
+  directly. Directly would mean that you only give the vertices and
+  the solution values thereon and the program constructs its own grid
+  to represent the data. This is only possible for a structured tensor
+  product grid in two dimensions.
+
+  In one dimension, the format is obviously #x v1 v2 ...#, where #x#
+  is the coordinate value of a grid point, while the #vi# are the
+  vector elements referring to the present node. Within GNUPLOT,
+  call #plot "filename" using 1:x#. #x# denotes the number of the data set you
+  want to see plus one. For example #using 1:4# would mean to plot the
+  third data vector.
 
   For more than one dimension, the #DataOut<dim>::write_gnuplot()# somehow
   duplicates the functionality of the #Triangulation<dim>::print_gnuplot()#
-  functions. These, however, offer more functionality.
+  functions. These, however, offer more functionality in some respect.
+  The grid is represented as a sequence of lines, where each cell is
+  a sequence of five vertices (the first one is appended to close the
+  contour of the cell) with the data appended after each vertex. Each cell
+  is therefore a sequence of five lines #x y v1 v2 ...# forming together
+  the bounding line of this cell. After each cell, two newlines are inserted
+  to prevent GNUPLOT from joining the lines bounding two cells.
 
-  To view the results in two or three dimensions, use #set data style lines#
-  within gnuplot and call #plot "filename"#. In one dimension call
-  #plot "filename" using 1:x#. #x# denotes the number of the data set you
-  want to see plus one. For example #using 1:4# would mean to plot the
-  third data vector.
+  To view the results in two dimensions, use #set data style lines#
+  within gnuplot and call #plot "filename"# to see the grid. Use
+  #set parametric# and #splot "filename" using 1:2:x# to get a 3d surface
+  plot of the (#x-2#)th data set. For example, using #x=4# would mean to
+  plot the second data set.
   */
 template <int dim>  
 class DataOut {
@@ -176,9 +275,9 @@ class DataOut {
 				      * Therefore, no block vectors are allowed
 				      * at present.
 				      */
-    void add_data_vector (dVector &data,
-			  String  &name,
-			  String  &units="<dimensionless>");
+    void add_data_vector (const dVector &data,
+			  const String  &name,
+			  const String  &units="<dimensionless>");
 
 				     /**
 				      * Release the pointers to the data
@@ -203,8 +302,7 @@ class DataOut {
     void write_ucd (ostream &out) const;
 
 				     /**
-				      * Write data and grid in one dimension,
-				      * only grid in two or three dimensions.
+				      * Write data and grid in GNUPLOT format.
 				      */
     void write_gnuplot (ostream &out) const;
     
@@ -220,7 +318,6 @@ class DataOut {
 				      * Exception
 				      */
     DeclException0 (ExcNoDoFHandlerSelected);
-    
   private:
 
 				     /**
@@ -229,9 +326,31 @@ class DataOut {
 				      */
     struct DataEntry {
 					 /**
+					  * Default constructor, constructs
+					  * invalid object, but is needed for
+					  * the STL classes.
+					  */
+	DataEntry () :
+							 // don't know why we have
+							 // to define here, gcc2.8
+							 // should be able to handle
+							 // this in the .cc file
+			data(0), name(""), units("") {};
+			
+					 /**
+					  * Constructor
+					  */
+	DataEntry (const dVector *data, const String name, const String units) :
+							 // don't know why we have
+							 // to define here, gcc2.8
+							 // should be able to handle
+							 // this in the .cc file
+			data(data), name(name), units(units) {};
+
+					 /**
 					  * Pointer to the data vector.
 					  */
-	dVector *data;
+	const dVector *data;
 					 /**
 					  * Name of this component.
 					  */
