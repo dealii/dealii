@@ -6,17 +6,22 @@
 #on multiprocessor machines. Feel free to use this feature,
 #it gives you quicker compile time and annoys those FEATFLOW
 #people ;-)
-
+#
+#I think I have removed any non-supported cross-references, so you
+#should be able to compile with an arbitrary number of processes.
 
 cc-files = $(wildcard */*.cc)
 h-files  = $(wildcard ../include/*/*.h)
 
-# strip subdirectories from cc file names, preprend a "../lib/"
-# and change the suffix:
+# strip subdirectories from cc file names, preprend a "../lib/[g]o"
+# and change the suffix. We place the object files with or without
+# debug info in different directories, since we want to use the
+# -frepo switch to gcc; this, however, creates a .rpo file which
+# would be the same for both debug and non-debug versions, if we
+# don't care about different directories
 tmp1     = $(notdir $(cc-files))
-tmp2     = $(addprefix ../lib/, $(tmp1))
-o-files  = $(tmp2:.cc=.o)
-go-files = $(tmp2:.cc=.go)
+o-files  = $(addprefix ../lib/o/,  $(tmp1:.cc=.o) )
+go-files = $(addprefix ../lib/go/, $(tmp2:.cc=.go))
 
 
 deal_II_dimension=2
@@ -25,12 +30,12 @@ CXX       = c++
 INCLUDE   = -I../include -I../../lac/include \
             -I../../base/include -I../../mia/include
 CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual -fno-rtti  \
+            -Winline -Woverloaded-virtual -fno-rtti  -frepo\
             $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
            -fno-rtti $(INCLUDE) \
-           -Ddeal_II_dimension=$(deal_II_dimension)
+           -Ddeal_II_dimension=$(deal_II_dimension) -frepo
 
 ifeq ($(shell uname),Linux)
 CXX       = /home/wolf/bin/gcc/bin/c++
@@ -96,6 +101,7 @@ clean:
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/libgrid $(INCLUDE) $(cc-files) \
 		| perl -p -e 's!^.*\(.*/(.*)\):!../lib/$$1:!g;' \
+		| perl -pe 's!(/[^/]+\.(o|go)):!/$$2$$1:!g;' \
 		> ../lib/Makefile.dep
 
 
