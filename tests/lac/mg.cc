@@ -18,7 +18,7 @@
 #include <lac/mgbase.h>
 
 #define TYPE  long double
-#define ACCURACY 1.e-19
+#define ACCURACY 1.e-18
 
 template<class VECTOR>
 void print_vector(ostream& s, const VECTOR& v)
@@ -29,7 +29,7 @@ void print_vector(ostream& s, const VECTOR& v)
   for (unsigned int i=0;i<n;++i)
     {
       for (unsigned int j=0;j<n;++j)
-//	s << ((FLOAT)i)/n << '\t' << ((FLOAT)j)/n << '\t' << v(k++) << endl;
+//	s << ((float)i)/n << '\t' << ((float)j)/n << '\t' << v(k++) << endl;
 	s << '\t' << v(k++);
       s << endl;
     }
@@ -44,16 +44,16 @@ class FDMG
 				     /**
 				      * Pointer to the level matrices.
 				      */
-    SmartPointer<MGMatrix<SparseMatrix<FLOAT> > >matrices;
+    SmartPointer<MGMatrix<SparseMatrix<float> > >matrices;
   public:
-    FDMG(unsigned int maxlevel, MGMatrix<SparseMatrix<FLOAT> >& matrices,
+    FDMG(unsigned int maxlevel, MGMatrix<SparseMatrix<float> >& matrices,
 	 FDMGTransfer& transfer);
     
     
     virtual void level_residual (unsigned int level,
-				 Vector<FLOAT>& dst,
-				 const Vector<FLOAT>& src,
-				 const Vector<FLOAT>& rhs);
+				 Vector<float>& dst,
+				 const Vector<float>& src,
+				 const Vector<float>& rhs);
 
     void copy_to_mg(const Vector<TYPE>& rhs);
     void copy_from_mg(Vector<TYPE>& lsg);
@@ -64,45 +64,20 @@ class MGSmootherLAC
   public MGSmootherBase
 {
   private:
-    SmartPointer<MGMatrix<SparseMatrix<FLOAT> > >matrices;
+    SmartPointer<MGMatrix<SparseMatrix<float> > >matrices;
   public:
-    MGSmootherLAC(MGMatrix<SparseMatrix<FLOAT> >&);
+    MGSmootherLAC(MGMatrix<SparseMatrix<float> >&);
     
     virtual void smooth (const unsigned int level,
-			 Vector<FLOAT> &u,
-			 const Vector<FLOAT> &rhs) const;
+			 Vector<float> &u,
+			 const Vector<float> &rhs) const;
     
 };
 
-typedef MGCoarseGridLACIteration<SolverCG<SparseMatrix<FLOAT> , Vector<FLOAT>  >,
-SparseMatrix<FLOAT>, /*PreconditionRelaxation<SparseMatrix<FLOAT> ,*/
-  PreconditionIdentity<Vector<FLOAT> > >
+typedef MGCoarseGridLACIteration<SolverCG<SparseMatrix<float> , Vector<float>  >,
+SparseMatrix<float>, /*PreconditionRelaxation<SparseMatrix<float> ,*/
+  PreconditionIdentity<Vector<float> > >
 Coarse;
-
-class MGPrecondition
-{
-  private:
-    FDMG& mg;
-    MGSmootherBase& smooth;
-    Coarse& coarse;
-  public:
-    MGPrecondition(FDMG& m, MGSmootherBase& s, Coarse& c)
-		    :
-		    mg(m), smooth(s), coarse(c)
-      {}
-    
-    
-    void operator () (Vector<TYPE>& dst, const Vector<TYPE>& src) const
-      {
-//	print_vector(cout, src);
-	
-	mg.copy_to_mg(src);
-	mg.vcycle(smooth,smooth,coarse);
-	mg.copy_from_mg(dst);
-      }
-    
-    
-};
 
 
 main()
@@ -122,9 +97,9 @@ main()
   FDMGTransfer transfer(maxsize, maxsize, maxlevel);
 
 				   // coarse grid solver
-  PrimitiveVectorMemory<Vector<FLOAT> > cgmem;
+  PrimitiveVectorMemory<Vector<float> > cgmem;
   ReductionControl cgcontrol(100, 1.e-30, 1.e-2, false, false);
-  SolverCG<SparseMatrix<FLOAT> , Vector<FLOAT> > cgcg(cgcontrol,cgmem);
+  SolverCG<SparseMatrix<float> , Vector<float> > cgcg(cgcontrol,cgmem);
 
   
   for (unsigned int level = 0; level <= maxlevel; ++level)
@@ -138,7 +113,7 @@ main()
 
 				       // Make matrix
       vector<SparseMatrixStruct >  structure(maxlevel+1);
-      MGMatrix<SparseMatrix<FLOAT> > A(minlevel,maxlevel);
+      MGMatrix<SparseMatrix<float> > A(minlevel,maxlevel);
 
       FDMatrix testproblem(size, size);
 
@@ -156,9 +131,9 @@ main()
       
       FDMG multigrid(level, A, transfer);
 
-//      PreconditionRelaxation<SparseMatrix<FLOAT> , Vector<FLOAT> >
-      PreconditionIdentity<Vector<FLOAT> >
-	cgprec;//(A[minlevel], &SparseMatrix<FLOAT> ::template precondition_SSOR<FLOAT>, 1.2);
+//      PreconditionRelaxation<SparseMatrix<float> , Vector<float> >
+      PreconditionIdentity<Vector<float> >
+	cgprec;//(A[minlevel], &SparseMatrix<float> ::template precondition_SSOR<float>, 1.2);
       
       Coarse coarsegrid(cgcg, A[minlevel], cgprec);
       
@@ -168,8 +143,8 @@ main()
       PreconditionMG<FDMG, Vector<TYPE> >
 	precondition(multigrid, smoother, smoother, coarsegrid);
 
-//      SolverRichardson<SparseMatrix<FLOAT> , Vector<TYPE> > solver(control, mem);
-      SolverCG<SparseMatrix<FLOAT> , Vector<TYPE> > solver(control, mem);
+//      SolverRichardson<SparseMatrix<float> , Vector<TYPE> > solver(control, mem);
+      SolverCG<SparseMatrix<float> , Vector<TYPE> > solver(control, mem);
 
       Vector<TYPE> u(dim);
       Vector<TYPE> f(dim);
@@ -182,7 +157,7 @@ main()
     }
 }
 
-FDMG::FDMG(unsigned int maxlevel, MGMatrix<SparseMatrix<FLOAT> >& matrices,
+FDMG::FDMG(unsigned int maxlevel, MGMatrix<SparseMatrix<float> >& matrices,
 	   FDMGTransfer& transfer)
 		:
 		MGBase(transfer, maxlevel, 0),
@@ -198,9 +173,9 @@ FDMG::FDMG(unsigned int maxlevel, MGMatrix<SparseMatrix<FLOAT> >& matrices,
 
 void
 FDMG::level_residual (unsigned int level,
-		      Vector<FLOAT>& dst,
-		      const Vector<FLOAT>& src,
-		      const Vector<FLOAT>& rhs)
+		      Vector<float>& dst,
+		      const Vector<float>& src,
+		      const Vector<float>& rhs)
 {
   (*matrices)[level].residual(dst, src, rhs);
 }
@@ -218,7 +193,7 @@ FDMG::copy_from_mg(Vector<TYPE>& v)
 }
 
 
-MGSmootherLAC::MGSmootherLAC(MGMatrix<SparseMatrix<FLOAT> >& matrix)
+MGSmootherLAC::MGSmootherLAC(MGMatrix<SparseMatrix<float> >& matrix)
 		:
 		matrices(&matrix)
 {}
@@ -226,14 +201,14 @@ MGSmootherLAC::MGSmootherLAC(MGMatrix<SparseMatrix<FLOAT> >& matrix)
 
 void
 MGSmootherLAC::smooth (const unsigned int level,
-		       Vector<FLOAT> &u,
-		       const Vector<FLOAT> &rhs) const
+		       Vector<float> &u,
+		       const Vector<float> &rhs) const
 {
   SolverControl control(1,1.e-300,false,false);
-  PrimitiveVectorMemory<Vector<FLOAT> > mem;
-  SolverRichardson<SparseMatrix<FLOAT> , Vector<FLOAT>  > rich(control, mem);
-  PreconditionRelaxation<SparseMatrix<FLOAT> , Vector<FLOAT> >
-    prec((*matrices)[level], &SparseMatrix<FLOAT> ::template precondition_SSOR<FLOAT>, 1.);
+  PrimitiveVectorMemory<Vector<float> > mem;
+  SolverRichardson<SparseMatrix<float> , Vector<float>  > rich(control, mem);
+  PreconditionRelaxation<SparseMatrix<float> , Vector<float> >
+    prec((*matrices)[level], &SparseMatrix<float> ::template precondition_SSOR<float>, 1.);
 
   rich.solve((*matrices)[level], u, rhs, prec);
 }

@@ -66,16 +66,16 @@ class FDMGTransfer
 				      * function in #MGTranferBase#.
 				      */
     virtual void prolongate (const unsigned int   to_level,
-			     Vector<FLOAT>       &dst,
-			     const Vector<FLOAT> &src) const;
+			     Vector<float>       &dst,
+			     const Vector<float> &src) const;
 
 				     /**
 				      * Implementation of abstract
 				      * function in #MGTranferBase#.
 				      */
     virtual void restrict (const unsigned int   from_level,
-			   Vector<FLOAT>       &dst,
-			   const Vector<FLOAT> &src) const;
+			   Vector<float>       &dst,
+			   const Vector<float> &src) const;
 
 				     /**
 				      * Exception.
@@ -91,7 +91,7 @@ class FDMGTransfer
 				     /**
 				      * Prolongation matrices.
 				      */
-    vector<SparseMatrix<FLOAT> > matrices;
+    vector<SparseMatrix<float> > matrices;
 
 				     /**
 				      * Matrix generator.
@@ -101,5 +101,5 @@ class FDMGTransfer
 				      * fine to coarse (#vmult#).
 				      */
     void build_matrix(unsigned int nx, unsigned int ny,
-		      SparseMatrixStruct&, SparseMatrix<FLOAT>&);
+		      SparseMatrixStruct&, SparseMatrix<float>&);
 };
