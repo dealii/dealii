@@ -1,7 +1,7 @@
 /* $Id$ */
 
 
-#include <basic/data_out_base.h>
+#include <base/data_out_base.h>
 #include <iomanip>
 #include <ctime>
 #include <cmath>
@@ -848,7 +848,10 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 					 // will store the minimum and
 					 // maximum values of the field
 					 // to be used for colorization
-	double min_color_value, max_color_value;
+					 //
+					 // preset them by 0 to calm down the
+					 // compiler; they are initialized later
+	double min_color_value=0, max_color_value=0;
 	
 					 // compute the cells for output and
 					 // enter them into the set above
@@ -1694,4 +1697,6 @@ string DataOutInterface<dim>::get_output_format_names () {
   
 // explicit instantiations. functions in DataOutBase are instantiated by
 // the respective functions in DataOut_Interface
-template class DataOutInterface<deal_II_dimension>;
+template class DataOutInterface<1>;
+template class DataOutInterface<2>;
+template class DataOutInterface<3>;
