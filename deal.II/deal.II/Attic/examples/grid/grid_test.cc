@@ -80,7 +80,8 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
 				   // z-value of the midpoint is either
 				   // 0 or 1, then the z-values of all
 				   // vertices of the line is like that
-  if (((middle(2) == 0) || (middle(2) == 1))
+  if (dim>=3)
+    if (((middle(2) == 0) || (middle(2) == 1))
 				       // find out, if the line is in the
 				       // interior of the top or bottom face
 				       // of the domain, or at the edge.
@@ -93,8 +94,8 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
 				       // id was invented after the above was
 				       // written, so we are not very strict
 				       // here with using these flags
-      && (line->boundary_indicator() == 1))
-    return middle;
+	&& (line->boundary_indicator() == 1))
+      return middle;
 
 
   double x=middle(0),
