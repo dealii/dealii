@@ -43,10 +43,7 @@
     operating system. It should therefore be rather simple to port it
     to other systems, at least with the compilers stated above. See <a
     href="http:porting.html">here</a>, if your system is not on this
-    list. Note that we have supported egcs 1.1.x in previous releases
-    of the library (up to <acronym>deal.II</acronym> 3.0), but due to
-    some missing feature in the support of Standard C++, we now only
-    support later versions of gcc.
+    list.
     </p>
 
     <p>
@@ -55,14 +52,22 @@
     <ul>
       <li> <p>
            A fairly complete C++ compiler. We use 
-           <a href="http://gcc.gnu.org" target="_top">egcs1.1.2 and
-	   gcc2.95</a> but other compilers might work as well. egcs1.0
+           <a href="http://gcc.gnu.org" target="_top">gcc2.95</a> but
+           other compilers might work as well. egcs1.x 
 	   and older gcc versions will not work, however. Also, Sun
            Workshop C++ 5.0 will not work since it does not support
            template member functions, and IBM C Set++ 3.0 will not
            work since they only have non-ISO header file names (with
            appended .h; probably, version 3.0 is not the most recent
-           one, but we don't have access to newer ones).
+           one, but we don't have access to newer ones). 
+	   </p>
+
+	   <p>
+	   Note that we have supported egcs 1.1.x in previous releases
+           of the library (up to <acronym>deal.II</acronym> 3.0), but
+           due to some missing feature in the support of Standard C++,
+           we now only support later versions of gcc for releases of
+           <acronym>deal.II</acronym> after version 3.0.x.
 	   </p>
 
 	   <p>
