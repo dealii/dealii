@@ -484,8 +484,8 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style) {
 
 
 
-void ParameterHandler::print_parameters_section (ostream &out,
-						 const OutputStyle style,
+void ParameterHandler::print_parameters_section (ostream           &out,
+						 const OutputStyle  style,
 						 const unsigned int indent_level) {
 				   // assert that only known formats are
 				   // given as "style"
@@ -515,12 +515,12 @@ void ParameterHandler::print_parameters_section (ostream &out,
 	  {
 	    case Text:
 		  out << setw(indent_level*2) << ""
+		      << "set "
 		      << ptr->first
 		      << setw(longest_entry-ptr->first.length()+3) << " = "
 		      << pc->entries[ptr->first].first
-		      << "  <"
+		      << "  #"
 		      << pd->entries[ptr->first].first
-		      << ">"
 		      << endl;
 		  break;
 	    case LaTeX:
@@ -540,6 +540,7 @@ void ParameterHandler::print_parameters_section (ostream &out,
 	  {
 	    case Text:
 		  out << setw(indent_level*2) << ""
+		      << "set "
 		      << ptr->first
 		      << setw(longest_entry-ptr->first.length()+2) << "= "
 		      << ptr->second.first << endl;
@@ -582,6 +583,8 @@ void ParameterHandler::print_parameters_section (ostream &out,
       switch (style) 
 	{
 	  case Text:
+		out << setw(indent_level*2) << ""
+		    << "end" << endl;
 		break;
 	  case LaTeX:
 		out << "\\end{itemize}"

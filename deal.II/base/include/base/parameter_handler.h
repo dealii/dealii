@@ -575,19 +575,23 @@ struct Patterns {
  *
  *     Listing of Parameters
  *     ---------------------
- *       Equation 1  = Poisson  <Laplace>
- *       Equation 2  = Navier-Stokes  <Elasticity>
- *       Output file= out
+ *       set Equation 1  = Poisson  # Laplace
+ *       set Equation 2  = Navier-Stokes  # Elasticity
+ *       set Output file = out
  *       subsection Equation 1
- *         Matrix type = Sparse  <Sparse>
+ *         set Matrix type = Sparse  # Sparse
  *         subsection Linear solver
- *           Maximum number of iterations = 40  <20>
- *           Solver                      = CG
+ *           set Maximum number of iterations = 40  # 20
+ *           set Solver                       = CG
+ *         end
+ *       end
  *       subsection Equation 2
- *         Matrix type = Full  <Sparse>
+ *         set Matrix type = Full  # Sparse
  *         subsection Linear solver
- *           Maximum number of iterations = 100  <20>
- *           Solver                       = CG  <CG>
+ *           set Maximum number of iterations = 100  # 20
+ *           set Solver                       = CG   # CG
+ *         end
+ *       end
  *
  *
  *     Getting parameters:
@@ -719,10 +723,21 @@ class ParameterHandler
 				      * #bool#.
 				      */
     bool           get_bool (const string &entry_string) const;
+
 				     /**
 				      * Print all parameters with the given style
-				      * to #out#. Presently only Text and LaTeX
+				      * to #out#. Presently only #Text# and #LaTeX#
 				      * are implemented.
+				      *
+				      * In #Text# format, the output is formatted
+				      * in such a way that it is possible to
+				      * use it for later input again. This is most
+				      * useful to record the parameters set for
+				      * a specific run, since if you output the
+				      * parameters using this function into a log
+				      * file, you can always recover the results
+				      * by simply copying the output to your
+				      * input file.
 				      */
     ostream & print_parameters (ostream &out, const OutputStyle style);
 
