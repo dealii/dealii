@@ -426,6 +426,27 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 	    out << (*cell_data[i].data)(index) << ' ';
 	  out << endl;
 	};
+
+				       // strange enough, but true: the ucd
+				       // format requires that the number of
+				       // cell data entries be the same as
+				       // there were cells. cells however
+				       // include those boundary faces with
+				       // an indicator other than zero, so
+				       // we may have printed faces as well
+				       // in the above list of cells. we
+				       // have to give respective values
+				       // here as well. since faces have no
+				       // natural value when cell data is
+				       // concerned, we assign a zero.
+      for (unsigned int i=0; i<n_boundary_faces(); ++i, ++index)
+	{
+	  out << index << "  ";
+	  for (unsigned int j=0; j!=cell_data.size(); ++j)
+	    out << "0 ";
+	  out << endl;
+	};
+      
     };
   
 				   // no model data
