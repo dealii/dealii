@@ -66,6 +66,24 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 
 
 
+template <int dim>
+Point<dim>
+HyperBallBoundary<dim>::get_center () const 
+{
+  return center;
+};
+
+
+
+template <int dim>
+double
+HyperBallBoundary<dim>::get_radius () const 
+{
+  return radius;
+};
+
+
+
 
 template <int dim>
 HalfHyperBallBoundary<dim>::HalfHyperBallBoundary (const Point<dim> center,

@@ -50,7 +50,16 @@ class HyperBallBoundary : public StraightBoundary<dim> {
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 
+				     /**
+				      * Return the center of the ball.
+				      */
+    Point<dim> get_center () const;
 
+				     /**
+				      * Return the radius of the ball.
+				      */
+    double get_radius () const;
+    
   protected:
 				     /**
 				      * Center point of the hyperball.
