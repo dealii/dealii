@@ -366,6 +366,7 @@ class VectorTools //<dim>
 					     const VectorFunctionMap     &dirichlet_bc,
 					     const Boundary<dim>   &boundary,
 					     map<int,double>       &boundary_values);
+
 				     /**
 				      * Project #function# to the boundary
 				      * of the domain, using the given quadrature
