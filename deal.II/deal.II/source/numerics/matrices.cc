@@ -524,9 +524,24 @@ void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &bo
   const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
   const unsigned int *sparsity_colnums  = sparsity.get_column_numbers();
 
+				   // if a diagonal entry is zero
+				   // later, then we use another
+				   // number instead. take it to be
+				   // the first nonzero diagonal
+				   // element of the matrix, or 1 if
+				   // there is no such thing
+  double first_nonzero_diagonal_entry = 1;
+  for (unsigned int i=0; i<n_dofs; ++i)
+    if (matrix.diag_element(i) != 0)
+      {
+	first_nonzero_diagonal_entry = matrix.diag_element(i);
+	break;
+      };
+
+  
   for (; dof != endd; ++dof)
     {
-      Assert (dof->first <= n_dofs, ExcInternalError());
+      Assert (dof->first < n_dofs, ExcInternalError());
       
       const unsigned int dof_number = dof->first;
 				       // for each boundary dof:
@@ -563,20 +578,10 @@ void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &bo
 		= dof->second * matrix.diag_element(dof_number);
       else
 	{
-	  double first_diagonal_entry = 1;
-	  for (unsigned int i=0; i<n_dofs; ++i)
-	    if (matrix.diag_element(i) != 0)
-	      {
-		first_diagonal_entry = matrix.diag_element(i);
-		break;
-	      };
-
-					   // use the SparseMatrix<double>:: as a workaround
-					   // for a bug in egcs
-	  matrix.SparseMatrix<double>::set(dof_number, dof_number,
-					   first_diagonal_entry);
+	  matrix.set (dof_number, dof_number,
+		      first_nonzero_diagonal_entry);
 	  new_rhs = right_hand_side(dof_number)
-		  = dof->second * first_diagonal_entry;
+		  = dof->second * first_nonzero_diagonal_entry;
 	};
       
 				       // store the only nonzero entry
