@@ -262,7 +262,7 @@
  * details of the viewpoint, light source, etc.
  *
  *
- * @author Wolfgang Bangerth 1999; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class
+ * @author Wolfgang Bangerth 1999; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class; Povray output by Thomas Richter 1999
  */
 class DataOutBase 
 {
@@ -436,9 +436,11 @@ class DataOutBase
     };
 
     				     /**
-				      * Flags describing the details of
-				      * output in Povray format. At
-				      * present no flags are implemented.
+				      * Flags describing the details
+				      * of output in Povray
+				      * format. Several flags are
+				      * implemented, see their
+				      * respective documentation.
 				      */
     struct PovrayFlags 
     {
