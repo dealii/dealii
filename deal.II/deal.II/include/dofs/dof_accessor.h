@@ -118,7 +118,7 @@ class DoFAccessor {
  * from. By default, #DoFObjectAccessor<celldim,dim># derives from
  * the #typedef# in the general #DoFObjectAccessor_Inheritance<celldim,dim>#
  * class, which is #TriaObjectAccessor<celldim,dim>#,
- * but if #celldim==dim#, then the specialization #TriaObjectAccessor<dim,dim>#
+ * but if #celldim==dim#, then the specialization #DoFObjectAccessor_Inheritance<dim,dim>#
  * is used which declares its local type to be #CellAccessor<dim>#. Therefore,
  * the inheritance is automatically chosen to be from #CellAccessor# if the
  * object under consideration has full dimension, i.e. constitutes a cell.
@@ -129,7 +129,7 @@ template <int celldim, int dim>
 class DoFObjectAccessor_Inheritance 
 {
 				     /**
-				      * Declaaration of the #typedef#.
+				      * Declaration of the #typedef#.
 				      * See the full documentation for
 				      * more information.
 				      */
@@ -144,7 +144,7 @@ class DoFObjectAccessor_Inheritance
  * from. By default, #DoFObjectAccessor<celldim,dim># derives from
  * the #typedef# in the general #DoFObjectAccessor_Inheritance<celldim,dim>#
  * class, which is #TriaObjectAccessor<celldim,dim>#,
- * but if #celldim==dim#, then the specialization #TriaObjectAccessor<dim,dim>#
+ * but if #celldim==dim#, then the specialization #DoFObjectAccessor_Inheritance<dim,dim>#
  * is used which declares its local type to be #CellAccessor<dim>#. Therefore,
  * the inheritance is automatically chosen to be from #CellAccessor# if the
  * object under consideration has full dimension, i.e. constitutes a cell.
@@ -155,7 +155,7 @@ template <int dim>
 class DoFObjectAccessor_Inheritance<dim,dim>
 {
 				     /**
-				      * Declaaration of the #typedef#.
+				      * Declaration of the #typedef#.
 				      * See the full documentation for
 				      * more information.
 				      */
