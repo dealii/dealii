@@ -454,7 +454,7 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
     void print (ostream &out) const;
 
 
-/**@name Exceptions*/
+				     /**@name Exceptions*/
 				     /*@{*/
 				     /**
 				      *  Exception
@@ -477,7 +477,7 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
     Accessor accessor;
 
 
-/**
+				     /**
 				      * Make all other iterator class templates
 				      * friends of this class. This is
 				      * necessary for the implementation of
@@ -817,6 +817,7 @@ TriaRawIterator<dim,Accessor>::TriaRawIterator (const Accessor &a) :
 {};
 
 
+
 template <int dim, typename Accessor>
 template <typename OtherAccessor>
 inline
@@ -825,54 +826,64 @@ TriaRawIterator<dim,Accessor>::TriaRawIterator (const TriaRawIterator<dim,OtherA
 {};
 
 
+
 template <int dim, typename Accessor>
 inline
 const Accessor &
-TriaRawIterator<dim,Accessor>::operator * () const {
+TriaRawIterator<dim,Accessor>::operator * () const
+{
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return accessor;
 };
+
 
 
 template <int dim, typename Accessor>
 inline
 Accessor &
-TriaRawIterator<dim,Accessor>::operator * () {
+TriaRawIterator<dim,Accessor>::operator * ()
+{
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return accessor;
 };
 
 
+
 template <int dim, typename Accessor>
 inline
 const Accessor *
-TriaRawIterator<dim,Accessor>::operator -> () const {
+TriaRawIterator<dim,Accessor>::operator -> () const
+{
   return &(this->operator* ());
 };
+
 
 
 template <int dim, typename Accessor>
 inline
 Accessor *
-TriaRawIterator<dim,Accessor>::operator -> () {
+TriaRawIterator<dim,Accessor>::operator -> ()
+{
   return &(this->operator* ());
 };
+
 
 
 template <int dim, typename Accessor>
 inline
 IteratorState
-TriaRawIterator<dim,Accessor>::state () const {
+TriaRawIterator<dim,Accessor>::state () const
+{
   return accessor.state ();
 };
 
 
-// sorry that the declaration of this function looks so ragged; I had
-// to do it this way since otherwise doc++ could not parse it correctly.
+
 template <int dim, typename Accessor>
 inline
 bool
-TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const {
+TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const
+{
   Assert (state() != invalid, ExcDereferenceInvalidObject());
   Assert (i.state() != invalid, ExcDereferenceInvalidObject());
   Assert (&accessor.get_triangulation() == &i.accessor.get_triangulation(),
@@ -890,7 +901,8 @@ TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const {
 template <int dim, typename Accessor>
 inline
 TriaRawIterator<dim,Accessor> &
-TriaRawIterator<dim,Accessor>::operator ++ () {
+TriaRawIterator<dim,Accessor>::operator ++ ()
+{
   Assert (state() == valid, ExcAdvanceInvalidObject());
 
   ++accessor;
@@ -898,10 +910,12 @@ TriaRawIterator<dim,Accessor>::operator ++ () {
 };
 
 
+
 template <int dim, typename Accessor>
 inline
 TriaRawIterator<dim,Accessor> &
-TriaRawIterator<dim,Accessor>::operator -- () {
+TriaRawIterator<dim,Accessor>::operator -- ()
+{
   Assert (state() == valid, ExcAdvanceInvalidObject());
 
   --accessor;
@@ -909,12 +923,15 @@ TriaRawIterator<dim,Accessor>::operator -- () {
 };
 
 
+
 template <int dim, typename Accessor>
 inline
 void
-TriaRawIterator<dim,Accessor>::print (ostream &out) const {
+TriaRawIterator<dim,Accessor>::print (ostream &out) const
+{
   out << accessor.level() << "." << accessor.index();
 };
+
 
 
 template <int dim, typename Accessor>
@@ -923,6 +940,7 @@ inline
 TriaIterator<dim,Accessor>::TriaIterator (const TriaIterator<dim,OtherAccessor> &i)
 		: TriaRawIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
 {};
+
 
 
 template <int dim, typename Accessor>
@@ -945,12 +963,14 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,OtherAccesso
 };
 
 
+
 template <int dim, typename Accessor>
 template <typename OtherAccessor>
 inline
 TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i)
 		: TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
 {};
+
 
 
 template <int dim, typename Accessor>
@@ -973,28 +993,35 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 };
 
 
+
 template <int dim, typename Accessor>
 inline
-ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i) {
+ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i)
+{
   i.print(out);
   return out;
 };
 
 
+
 template <int dim, typename Accessor>
 inline
-ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i) {
+ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i)
+{
   i.print(out);
   return out;
 };
 
 
+
 template <int dim, typename Accessor>
 inline
-ostream & operator << (ostream &out, const TriaActiveIterator<dim,Accessor> &i) {
+ostream & operator << (ostream &out, const TriaActiveIterator<dim,Accessor> &i)
+{
   i.print(out);
   return out;
 };
+
 
 
 // if in optimized mode: include more templates
