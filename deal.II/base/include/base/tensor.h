@@ -128,13 +128,13 @@ class Tensor
 				      *  i.e. multiply all components by
 				      *  <tt>factor</tt>.
 				      */
-    Tensor<rank_,dim> & operator *= (const double &factor);
+    Tensor<rank_,dim> & operator *= (const double factor);
 
 				     /**
 				      *  Scale the vector by
 				      *  <tt>1/factor</tt>.
 				      */
-    Tensor<rank_,dim> & operator /= (const double &factor);
+    Tensor<rank_,dim> & operator /= (const double factor);
 
 				     /**
 				      *  Add two tensors. If possible, you
@@ -333,7 +333,7 @@ Tensor<rank_,dim>::operator -= (const Tensor<rank_,dim> &p)
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
-Tensor<rank_,dim>::operator *= (const double &s)
+Tensor<rank_,dim>::operator *= (const double s)
 {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] *= s;
@@ -344,7 +344,7 @@ Tensor<rank_,dim>::operator *= (const double &s)
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
-Tensor<rank_,dim>::operator /= (const double &s)
+Tensor<rank_,dim>::operator /= (const double s)
 {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] /= s;

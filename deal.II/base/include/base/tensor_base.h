@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -175,12 +175,12 @@ class Tensor<1,dim>
 				      * <tt>factor</tt>, i.e. multiply all
 				      * coordinates by <tt>factor</tt>.
 				      */
-    Tensor<1,dim> & operator *= (const double &factor);
+    Tensor<1,dim> & operator *= (const double factor);
 
 				     /**
 				      * Scale the vector by <tt>1/factor</tt>.
 				      */
-    Tensor<1,dim> & operator /= (const double &factor);
+    Tensor<1,dim> & operator /= (const double factor);
 
 				     /**
 				      * Returns the scalar product of
@@ -520,7 +520,7 @@ Tensor<1,dim> & Tensor<1,dim>::operator -= (const Tensor<1,dim> &p)
 
 template <int dim>
 inline
-Tensor<1,dim> & Tensor<1,dim>::operator *= (const double &s)
+Tensor<1,dim> & Tensor<1,dim>::operator *= (const double s)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] *= s;
@@ -531,7 +531,7 @@ Tensor<1,dim> & Tensor<1,dim>::operator *= (const double &s)
 
 template <int dim>
 inline
-Tensor<1,dim> & Tensor<1,dim>::operator /= (const double &s)
+Tensor<1,dim> & Tensor<1,dim>::operator /= (const double s)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] /= s;
