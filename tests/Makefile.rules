@@ -1,5 +1,5 @@
 ######################################################################
-# $Id$
+# Makefile.rules,v 1.11 2001/04/24 13:18:09 wolf Exp
 #
 # Copyright (C) 2001, the deal.II authors
 #
@@ -121,10 +121,10 @@ run-tests: $(sort $(tests:%=%.check))
 ############################################################
 
 clean:
-	rm -f Makefile.depend *.o *.go *.output
+	-rm -f Makefile.depend *.o *.go *.output
 
 veryclean: clean
-	rm -f *.exe *.testcase *.inp *.gpl *.eps *.gnuplot
+	-rm -f *.exe *.testcase *.inp *.gpl *.eps *.gnuplot
 
 
 
