@@ -94,6 +94,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
+  <li> <p> New: <acronym>deal.II</acronym> is now able to interface to the 
+       <a href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
+       target="_top">METIS</a> library to generate domain partitionings. This
+       is enabled if a METIS installation is detected, which either happens
+       automatically in <code>./configure</code>, or
+       by passing a value to the switch <code>--with-metis</code> to configure
+       the path of a METIS installation. For more information see the README
+       file. 
+       <br>
+       (WB 2004/03/08)
+       </p>
+
   <li> <p>
        New: We now support MIPSpro compiler version 7.41 from SGI. deal.II
        now runs on IRIX64 machines in 64-bit mode.
@@ -107,7 +119,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> New: <acronym>deal.II</acronym> now comes with a complete set of
-       wrappers classes for PETSc vectors, matrices, linear solvers and
+       wrappers classes for <a href="http://www.mcs.anl.gov/petsc/"
+       target="_top">PETSc</a> vectors, matrices, linear solvers and 
        preconditioners. Many of the algorithms in deal.II have also been
        updated to make use of these wrappers. All of this is only enabled if a
        PETSc installation is detected. This either happens automatically in
@@ -115,7 +128,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        by passing values to the switches <code>--with-petsc</code> and
        <code>--with-petsc-arch</code> to configure path and architecture of an
        existing PETSc installation. If these switches are not used, then
-       environment variables are searched for this information.
+       environment variables are searched for this information. For more
+       information see the README file.
        <br>
        (WB 2004/03/01)
        </p>
