@@ -522,17 +522,21 @@ namespace Polynomials
 
 
 
-//TODO[WB]: Treat the same way as above
-#if ((__GNUC__ == 3) && (__GNUC_MINOR__ == 1))
-#define SHIFT_TYPE double
-#else
-#define SHIFT_TYPE long double
-#endif
-
   template <typename number>
   void
   Legendre<number>::compute_coefficients (const unsigned int k_)
   {
+                                     // make sure we call the
+                                     // Polynomial::shift function
+                                     // only with an argument with
+                                     // which it will not crash the
+                                     // compiler
+#ifdef DEAL_II_LONG_DOUBLE_LOOP_BUG
+    typedef double SHIFT_TYPE;
+#else
+    typedef long double SHIFT_TYPE;
+#endif
+    
     unsigned int k = k_;
 
                                      // first make sure that no other
@@ -579,9 +583,9 @@ namespace Polynomials
             c0 = new std::vector<number>(*c0);
             c1 = new std::vector<number>(*c1);
 	  
-            Polynomial<number>::shift(*c0, (SHIFT_TYPE) -1.);
+            Polynomial<number>::template shift<SHIFT_TYPE> (*c0, -1.);
             Polynomial<number>::scale(*c0, 2.);
-            Polynomial<number>::shift(*c1, (SHIFT_TYPE) -1.);
+            Polynomial<number>::template shift<SHIFT_TYPE> (*c1, -1.);
             Polynomial<number>::scale(*c1, 2.);
             Polynomial<number>::multiply(*c1, std::sqrt(3.));
             shifted_coefficients[0]=c0;
@@ -623,7 +627,7 @@ namespace Polynomials
                                              // and compute the
                                              // coefficients for [0,1]
             ck = new std::vector<number>(*ck);
-            shift(*ck,(SHIFT_TYPE) -1.);
+            Polynomial<number>::template shift<SHIFT_TYPE> (*ck, -1.);
             Polynomial<number>::scale(*ck, 2.);
             Polynomial<number>::multiply(*ck, std::sqrt(2.*k+1.));
             shifted_coefficients[k] = ck;
