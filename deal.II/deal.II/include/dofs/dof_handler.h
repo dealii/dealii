@@ -1370,7 +1370,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * Address of the triangulation to
 				      * work on.
 				      */
-    Triangulation<dim>       *tria;
+    Triangulation<dim> * const tria;
 
 				     /**
 				      * Space to store the DoF numbers for the
