@@ -52,7 +52,7 @@ FEDG_P3<1>::shape_value(const unsigned int i,
       case 0: return 1.;
       case 1: return p(0);
       case 2: return p(0)*p(0);
-      case 2: return p(0)*p(0)*p(0);
+      case 3: return p(0)*p(0)*p(0);
     }
   return 0.;
 }
@@ -75,7 +75,7 @@ FEDG_P3<1>::shape_grad(const unsigned int i,
       case 0: return Point<1>(-1.);
       case 1: return Point<1>(1.);
       case 2: return Point<1>(2.*p(0));
-      case 2: return Point<1>(3.*p(0)*p(0));
+      case 3: return Point<1>(3.*p(0)*p(0));
 	    
     }
   return Point<1>();
@@ -282,7 +282,7 @@ template <>
 inline
 Tensor<1,3>
 FEDG_P3<3>::shape_grad (const unsigned int i,
-			 const Point<3>& p) const
+			 const Point<3>&) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // originally, the return type of the
@@ -305,7 +305,7 @@ template <>
 inline
 Tensor<2,3>
 FEDG_P3<3>::shape_grad_grad (const unsigned int i,
-			      const Point<3> &p) const
+			      const Point<3> &) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 

@@ -116,7 +116,7 @@ void FEDG_P2<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 
 
 template <>
-void FEDG_P2<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
+void FEDG_P2<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &,
 					 FullMatrix<double> &local_mass_matrix) const
 {
   Assert(false, ExcNotImplemented());
@@ -271,7 +271,7 @@ template <>
 inline
 Tensor<1,3>
 FEDG_P2<3>::shape_grad (const unsigned int i,
-			 const Point<3>& p) const
+			 const Point<3>&) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // originally, the return type of the
@@ -294,7 +294,7 @@ template <>
 inline
 Tensor<2,3>
 FEDG_P2<3>::shape_grad_grad (const unsigned int i,
-			      const Point<3> &p) const
+			      const Point<3> &) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
