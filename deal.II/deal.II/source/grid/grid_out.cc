@@ -45,9 +45,8 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
   
 
 				   // write preamble
-  if (true)
+  if (ucd_flags.write_preamble)
     {
-/*      
 				       // block this to have local
 				       // variables destroyed after
 				       // use
@@ -66,12 +65,13 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 	  << "# For a description of the UCD format see the AVS Developer's guide."
 	  << endl
 	  << "#" << endl;
-*/
     };
 
 				   // start with ucd data
   out << n_vertices << ' '
-      << tria.n_active_cells() + n_boundary_faces(tria)
+      << tria.n_active_cells() + (ucd_flags.write_faces ?
+				  n_boundary_faces(tria) :
+				  0)
       << " 0 0 0"                  // no data
       << endl;
 
@@ -130,7 +130,8 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 
 				   // write faces with non-zero boundary
 				   // indicator
-  write_ucd_faces (tria, cell_index, out);
+  if (ucd_flags.write_faces)
+    write_ucd_faces (tria, cell_index, out);
     
   AssertThrow (out, ExcIO());
 };
@@ -223,7 +224,8 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
   const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
   for (; cell!=endc; ++cell)
     {
-      out << "# cell " << cell << endl;
+      if (gnuplot_flags.write_cell_numbers)
+	out << "# cell " << cell << endl;
       
       switch (dim)
 	{
@@ -286,7 +288,19 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 			 ostream                  &out) 
 {
   typedef list<pair<Point<2>,Point<2> > > LineList;
-  
+
+				   // get a pointer to the flags
+				   // common to all dimensions,
+				   // in order to avoid the recurring
+				   // distinctions between
+				   // eps_flags_1, eps_flags_2, ...
+  const EpsFlagsBase &eps_flags_base = (dim==1 ?
+					eps_flags_1 :
+					(dim==2 ?
+					 eps_flags_2 :
+					 (dim==3 ?
+					  eps_flags_3 :
+					  *(EpsFlagsBase*)0)));
   
   AssertThrow (out, ExcIO());
 
@@ -345,9 +359,15 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					 // spectator to the origin.
 					 //
 					 // we chose here the viewpoint as in
-					 // gnuplot
-	const double z_angle    = 60;
-	const double turn_angle = 30;
+					 // gnuplot as default.
+					 //
+					 // note: the following might be wrong
+					 // if one of the base vectors below
+					 // is in direction of the viewer, but
+					 // I am too tired at present to fix
+					 // this
+	const double z_angle    = eps_flags_3.azimut_angle;
+	const double turn_angle = eps_flags_3.turn_angle;
 	const double pi = 3.1415926536;
 	const Point<dim> view_direction(-sin(z_angle * 2.*pi / 360.) * sin(turn_angle * 2.*pi / 360.),
 					+sin(z_angle * 2.*pi / 360.) * cos(turn_angle * 2.*pi / 360.),
@@ -415,7 +435,10 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				   // don't scale in y-direction to
 				   // preserve the shape of the
 				   // triangulation
-  const double scale = 300. / (x_max - x_min);
+  const double scale = (eps_flags_base.size /
+			(eps_flags_base.size_type==EpsFlagsBase::width ?
+			 x_max - x_min :
+			 y_min - y_max));
   
   
 				   // now write preamble
@@ -440,7 +463,9 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					 // lower left corner
 	  << "0 0 "
 					 // upper right corner
-	  << "300 " << static_cast<unsigned int>( (y_max-y_min) * scale )
+	  << static_cast<unsigned int>( (x_max-x_min) * scale )
+	  << ' '
+	  << static_cast<unsigned int>( (y_max-y_min) * scale )
 	  << endl;
 
 				       // define some abbreviations to keep
@@ -454,7 +479,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	  << endl;
 
 				       // set fine lines
-      out << "0.5 setlinewidth" << endl;
+      out << eps_flags_base.line_width << " setlinewidth" << endl;
     };
 
 				   // now write the lines
