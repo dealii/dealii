@@ -20,9 +20,25 @@ template <int dim> class Quadrature;
   Represent a finite element evaluated with a specific quadrature rule.
   This class is an optimization which avoids evaluating the shape functions
   at the quadrature points each time a quadrature takes place. Rather, the
-  values and gradients (and possibly higher oder derivatives in future
+  values and gradients (and possibly higher order derivatives in future
   versions of this library) are evaluated once and for all before doing the
   quadrature itself.
+
+  Objects of this class store a multitude of different values needed to
+  do the assemblage steps on real cells rather than on the unit cell. Among
+  these values are the values and gradients of the shape functions at the
+  quadrature points on the real and the unit cell, the location of the
+  quadrature points on the real and on the unit cell, the weights of the
+  quadrature points, the Jacobian matrices of the mapping from the unit to
+  the real cell at the quadrature points and so on.
+
+  The Jacobian matrix is defined to be
+  $$ J_{ij} = {d\xi_i \over d\x_j} $$
+  which is the form needed to compute the gradient on the real cell from
+  the gradient on the unit cell. If we want to transform the area element
+  $dx dy$ from the real to the unit cell, we have to take the determinant of
+  the inverse matrix, which is the reciprocal value of the determinant of the
+  matrix defined above.
   */
 template <int dim>
 class FEValues {
@@ -123,7 +139,11 @@ class FEValues {
 				      * Store an array of weights times the
 				      * Jacobi determinant at the quadrature
 				      * points. This function is reset each time
-				      * #reinit# is called.
+				      * #reinit# is called. The Jacobi determinant
+				      * is actually the reciprocal value of the
+				      * Jacobi matrices stored in this class,
+				      * see the general documentation of this
+				      * class for more information.
 				      */
     vector<double>       JxW_values;
 
@@ -258,15 +278,25 @@ class FiniteElementBase {
     const dFMatrix & constraints () const;
     
 				     /**
-				      * Compute the jacobian matrix and the
+				      * Compute the Jacobian matrix and the
 				      * quadrature points from the given cell
 				      * and the given quadrature points on the
-				      * unit cell. The jacobian matrix is to
+				      * unit cell. The Jacobian matrix is to
 				      * be computed at every quadrature point.
 				      * This function has to be in the finite
 				      * element class, since different finite
 				      * elements need different transformations
 				      * of the unit cell to a real cell.
+				      *
+				      * Refer to the documentation of the
+				      * \Ref{FEValues} class for a definition
+				      * of the Jacobi matrix.
+				      *
+				      * It is provided for the finite element
+				      * class in one space dimension, but for
+				      * higher dimensions, it depends on the
+				      * present fe and needs reimplementation
+				      * by the user.
 				      */
     virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >               &unit_points,
@@ -431,6 +461,33 @@ class FiniteElement<1> : public FiniteElementBase<1> {
 				      * as for the base class.
 				      */
     bool operator == (const FiniteElement<1> &f) const;
+
+				     /**
+				      * Compute the Jacobian matrix and the
+				      * quadrature points from the given cell
+				      * and the given quadrature points on the
+				      * unit cell. The Jacobian matrix is to
+				      * be computed at every quadrature point.
+				      *
+				      * Refer to the documentation of the
+				      * \Ref{FEValues} class for a definition
+				      * of the Jacobi matrix.
+				      *
+				      * For one dimensional finite elements,
+				      * these transformations are usually the
+				      * same, linear ones, so we provide
+				      * them in the FE<1> base class. You may,
+				      * however override this implementation
+				      * if you would like to use finite elements
+				      * of higher than first order with
+				      * non-equidistant integration points, e.g.
+				      * with an exponential dependence from the
+				      * distance to the origin.
+				      */
+    virtual void fill_fe_values (const Triangulation<1>::cell_iterator &cell,
+				 const vector<Point<1> >               &unit_points,
+				 vector<dFMatrix>  &jacobians,
+				 vector<Point<1> > &points) const;
 };
 
 
@@ -526,6 +583,31 @@ class FiniteElement<2> : public FiniteElementBase<2> {
 				      * as for the base class.
 				      */
     bool operator == (const FiniteElement<2> &f) const;
+
+				     /**
+				      * Compute the Jacobian matrix and the
+				      * quadrature points from the given cell
+				      * and the given quadrature points on the
+				      * unit cell. The Jacobian matrix is to
+				      * be computed at every quadrature point.
+				      *
+				      * Refer to the documentation of the
+				      * \Ref{FEValues} class for a definition
+				      * of the Jacobi matrix.
+				      *
+				      * For two dimensional finite elements,
+				      * these transformations are usually
+				      * dependent on the actual finite element,
+				      * which is expressed by the names
+				      * sub- and isoparametric elements. This
+				      * function is therefore not implemented
+				      * by the FE<2> base class, but is made
+				      * pure virtual.
+				      */
+    virtual void fill_fe_values (const Triangulation<2>::cell_iterator &cell,
+				 const vector<Point<2> >               &unit_points,
+				 vector<dFMatrix>  &jacobians,
+				 vector<Point<2> > &points) const;
 };
 
 
