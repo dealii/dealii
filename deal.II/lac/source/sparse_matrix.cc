@@ -366,6 +366,14 @@ SparseMatrixStruct::operator () (const unsigned int i, const unsigned int j) con
 
 				   // all other entries are sorted, so
 				   // we can use a binary seach algorithm
+				   //
+				   // note that the entries are only sorted
+				   // upon compression, so this would fail
+				   // for non-compressed sparsity patterns;
+				   // however, that is why the Assertion is
+				   // at the top of this function, so it
+				   // may not be called for noncompressed
+				   // structures.
   const int * const p = lower_bound (&colnums[rowstart[i]+1],
 				     &colnums[rowstart[i+1]],
 				     static_cast<signed int>(j));
