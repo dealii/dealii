@@ -128,14 +128,15 @@ class EigenPower : private Solver<VECTOR>
     virtual ~EigenPower ();
 
 				     /**
-				      * Power method. @p x is the (not
-				      * necessarily normalized) start
-				      * vector for the power
+				      * Power method. @p{x} is the
+				      * (not necessarily normalized)
+				      * start vector for the power
 				      * method. After the iteration,
-				      * @p value is the approximated
-				      * eigenvalue and @p x is the
+				      * @p{value} is the approximated
+				      * eigenvalue and @p{x} is the
 				      * corresponding eigenvector,
-				      * normalized with respect to the l2-norm.
+				      * normalized with respect to the
+				      * l2-norm.
 				      */
     template <class MATRIX>
     typename Solver<VECTOR>::ReturnState
@@ -204,14 +205,14 @@ class EigenInverse : private Solver<VECTOR>
     virtual ~EigenInverse ();
 
 				     /**
-				      * Inverse method. @p value is
+				      * Inverse method. @p{value} is
 				      * the start guess for the
-				      * eigenvalue and @p x is the
+				      * eigenvalue and @p{x} is the
 				      * (not necessarily normalized)
 				      * start vector for the power
 				      * method. After the iteration,
-				      * @p value is the approximated
-				      * eigenvalue and @p x is the
+				      * @p{value} is the approximated
+				      * eigenvalue and @p{x} is the
 				      * corresponding eigenvector,
 				      * normalized with respect to the
 				      * l2-norm.

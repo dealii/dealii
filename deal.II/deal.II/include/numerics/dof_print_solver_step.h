@@ -39,9 +39,9 @@ class DoFPrintSolverStep :
 				     /**
 				      * Constructor.  First, we take
 				      * the arguments needed for the
-				      * solver. @p data_out is the object
-				      * doing the output as a finite element
-				      * function.
+				      * solver. @p{data_out} is the
+				      * object doing the output as a
+				      * finite element function.
 				      *
 				      * One output file with the name
 				      * @p{basename.[step].[suffix]}
