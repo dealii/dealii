@@ -649,12 +649,12 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 #else
 
 void
-VectorTools::create_boundary_right_hand_side (const Mapping<1>    &mapping,
-					      const DoFHandler<1> &dof_handler,
-					      const Quadrature<0> &quadrature,
-					      const Function<1>   &rhs_function,
-					      Vector<double>      &rhs_vector,
-					      const std::set<unsigned char> &boundary_indicators)
+VectorTools::create_boundary_right_hand_side (const Mapping<1>    &,
+					      const DoFHandler<1> &,
+					      const Quadrature<0> &,
+					      const Function<1>   &,
+					      Vector<double>      &,
+					      const std::set<unsigned char> &)
 {
   Assert (false, ExcImpossibleInDim(1));
 };
