@@ -63,6 +63,13 @@ LogStream::get_file_stream()
 }
 
 
+const std::string&
+LogStream::get_prefix() const
+{
+  return prefixes.top();
+}
+
+
 void
 LogStream::push (const std::string& text)
 {
@@ -125,7 +132,7 @@ LogStream::print_line_head()
 	}
     }
   
-  const std::string& head = prefixes.top();
+  const std::string& head = get_prefix();
 
   if (prefixes.size() <= std_depth)
     {

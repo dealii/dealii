@@ -78,6 +78,11 @@ class LogStream
 				      * Gives the file stream.
 				      */
     std::ostream& get_file_stream ();
+
+				     /**
+				      * Return the prefix string.
+				      */
+    const std::string& get_prefix () const;
     
 				     /**
 				      * Push another prefix on the
