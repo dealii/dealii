@@ -43,9 +43,9 @@ double sqr (const double x)
 }
 
 
-template <int dim>
+template <typename CellIterator>
 static
-void advance_by_n (typename DoFHandler<dim>::active_cell_iterator &cell,
+void advance_by_n (CellIterator &cell,
                    const unsigned int n)
 {
   for (unsigned int t=0;
@@ -516,8 +516,7 @@ estimate_some (const Mapping<dim>                  &mapping,
 
   
 				   // loop over all cells for this thread
-  for (; cell!=dof_handler.end();
-       advance_by_n<dim>(cell,this_thread.second))
+  for (; cell!=dof_handler.end(); advance_by_n(cell,this_thread.second))
     {
       
 				       // loop over all faces of this cell
