@@ -151,7 +151,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				       // and since it makes the backward
 				       // step when applying the decomposition
 				       // significantly faster
-      AssertThrow((this->global_entry(this->rowstart_indices[row-1]) !=0),
+      AssertThrow((this->global_entry(rowstart_indices[row-1]) !=0),
 		  ExcDivideByZero());
       
       this->global_entry (rowstart_indices[row-1])
