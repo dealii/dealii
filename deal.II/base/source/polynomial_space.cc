@@ -125,7 +125,7 @@ PolynomialSpace<dim>::output_indices(std::ostream &out) const
 
 template <int dim>
 void
-PolynomialSpace<dim>::set_renumbering(
+PolynomialSpace<dim>::set_numbering(
   const std::vector<unsigned int> &renumber)
 {
   Assert(renumber.size()==index_map.size(),

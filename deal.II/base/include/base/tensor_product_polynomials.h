@@ -81,19 +81,19 @@ class TensorProductPolynomials
 				      * Stores a copy of
 				      * <tt>renumber</tt>.
 				      */
-    void set_renumbering(const std::vector<unsigned int> &renumber);
+    void set_numbering(const std::vector<unsigned int> &renumber);
 
 				     /**
 				      * Gives read access to the
-				      * renumbering vector.
+				      * renumber vector.
 				      */
-    const std::vector<unsigned int> &get_renumbering() const;
+    const std::vector<unsigned int> &get_numbering() const;
 
 				     /**
 				      * Gives read access to the
-				      * inverse renumbering vector.
+				      * inverse renumber vector.
 				      */
-    const std::vector<unsigned int> &get_renumbering_inverse() const;
+    const std::vector<unsigned int> &get_numbering_inverse() const;
 
 				     /**
 				      * Computes the value and the
@@ -274,7 +274,7 @@ class TensorProductPolynomials
 template <int dim>
 inline
 const std::vector<unsigned int> &
-TensorProductPolynomials<dim>::get_renumbering() const
+TensorProductPolynomials<dim>::get_numbering() const
 {
   return index_map;
 }
@@ -283,7 +283,7 @@ TensorProductPolynomials<dim>::get_renumbering() const
 template <int dim>
 inline
 const std::vector<unsigned int> &
-TensorProductPolynomials<dim>::get_renumbering_inverse() const
+TensorProductPolynomials<dim>::get_numbering_inverse() const
 {
   return index_map_inverse;
 }

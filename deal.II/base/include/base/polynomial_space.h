@@ -75,10 +75,11 @@ class PolynomialSpace
 				     /**
 				      * Sets the ordering of the
 				      * polynomials. Requires
-				      * <tt>index_map.size()==n()</tt>. Stores
-				      * a copy of <tt>index_map</tt>.
+				      * <tt>renumber.size()==n()</tt>.
+				      * Stores a copy of
+				      * <tt>renumber</tt>.
 				      */
-    void set_renumbering(const std::vector<unsigned int> &index_map);
+    void set_numbering(const std::vector<unsigned int> &renumber);
     
 				     /**
 				      * Computes the value and the

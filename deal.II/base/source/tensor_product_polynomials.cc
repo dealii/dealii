@@ -83,7 +83,7 @@ TensorProductPolynomials<dim>::output_indices(std::ostream &out) const
 
 template <int dim>
 void
-TensorProductPolynomials<dim>::set_renumbering(
+TensorProductPolynomials<dim>::set_numbering(
   const std::vector<unsigned int> &renumber)
 {
   Assert(renumber.size()==index_map.size(),
