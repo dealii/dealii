@@ -575,6 +575,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       out.add_data_vector (h1_error_per_dof, "H1_Error");
       out.add_data_vector (estimated_error_per_dof, "Estimated_Error");
       out.add_data_vector (error_ratio, "Ratio_True_to_Estimated_Error");
+      out.build_patches ();
       string filename = prm.get ("Output base filename");
       switch (refine_mode) 
 	{
