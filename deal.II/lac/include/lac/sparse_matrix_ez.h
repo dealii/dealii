@@ -877,6 +877,35 @@ class SparseMatrixEZ : public Subscriptor
 //  			  const char         *zero_string = " ",
 //  			  const double        denominator = 1.) const;
 
+    				     /**
+				      * Write the data of this object
+				      * in binary mode to a file.
+				      *
+				      * Note that this binary format
+				      * is platform dependent.
+				      */
+    void block_write (std::ostream &out) const;
+
+				     /**
+				      * Read data that has previously
+				      * been written by
+				      * @p{block_write}.
+				      *
+				      * The object is resized on this
+				      * operation, and all previous
+				      * contents are lost.
+				      *
+				      * A primitive form of error
+				      * checking is performed which
+				      * will recognize the bluntest
+				      * attempts to interpret some
+				      * data as a vector stored
+				      * bitwise to a file, but not
+				      * more.
+				      */
+    void block_read (std::istream &in);
+
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -922,12 +951,22 @@ class SparseMatrixEZ : public Subscriptor
 		   << ") cannot be allocated.");
   private:
 				     /**
-				      * Find an entry. Return a
+				      * Find an entry and return a
+				      * const pointer. Return a
 				      * zero-pointer if the entry does
 				      * not exist.
 				      */
     const Entry* locate (const unsigned int row,
 			 const unsigned int col) const;
+
+				     /**
+				      * Find an entry and return a
+				      * writable pointer. Return a
+				      * zero-pointer if the entry does
+				      * not exist.
+				      */
+    Entry* locate (const unsigned int row,
+		   const unsigned int col);
 
 				     /**
 				      * Find an entry or generate it.
@@ -1201,9 +1240,9 @@ unsigned int SparseMatrixEZ<number>::n () const
 
 template <typename number>
 inline
-const typename SparseMatrixEZ<number>::Entry*
+typename SparseMatrixEZ<number>::Entry*
 SparseMatrixEZ<number>::locate (const unsigned int row,
-				const unsigned int col) const
+				const unsigned int col)
 {
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
@@ -1212,7 +1251,7 @@ SparseMatrixEZ<number>::locate (const unsigned int row,
   const unsigned int end = r.start + r.length;
   for (unsigned int i=r.start;i<end;++i)
     {
-      const Entry * const entry = &data[i];
+      Entry * const entry = &data[i];
       if (entry->column == col)
 	return entry;
       if (entry->column == Entry::invalid)
@@ -1221,6 +1260,17 @@ SparseMatrixEZ<number>::locate (const unsigned int row,
   return 0;
 }
 
+
+
+template <typename number>
+inline
+const typename SparseMatrixEZ<number>::Entry*
+SparseMatrixEZ<number>::locate (const unsigned int row,
+				const unsigned int col) const
+{
+  SparseMatrixEZ<number>* t = const_cast<SparseMatrixEZ<number>*> (this);
+  return t->locate(row,col);
+}
 
 
 template <typename number>

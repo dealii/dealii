@@ -409,4 +409,91 @@ SparseMatrixEZ<number>::print_statistics(STREAM& out, bool full)
 }
 
 
+template <typename number>
+void
+SparseMatrixEZ<number>::block_write (std::ostream &out) const 
+{
+  AssertThrow (out, ExcIO());
+  
+                                   // first the simple objects,
+                                   // bracketed in [...]
+  out << '[' << row_info.size() << "]["
+      << n_columns << "]["
+      << data.size() << "]["
+      << increment << "][";
+                                   // then write out real data
+  typename std::vector<RowInfo>::const_iterator r = row_info.begin();
+  const typename std::vector<RowInfo>::const_iterator re = row_info.end();
+  
+  while (r != re)
+    {
+      out.write(reinterpret_cast<const char*>(&*r),
+		sizeof(RowInfo));
+      ++r;
+    }
+
+  out << "][";
+  
+  typename std::vector<Entry>::const_iterator d = data.begin();
+  const typename std::vector<Entry>::const_iterator de = data.end();
+
+  while (d != de)
+    {
+      out.write(reinterpret_cast<const char*>(&*d),
+		sizeof(Entry));
+      ++d;
+    }
+  
+  out << ']';
+  
+  AssertThrow (out, ExcIO());
+}
+
+
+#define CHECKFOR(in,a,c) {in >> c; AssertThrow(c == a, ExcIO());}
+
+template <typename number>
+void
+SparseMatrixEZ<number>::block_read (std::istream &in)
+{
+  AssertThrow (in, ExcIO());
+
+  char c;
+  int n;
+                                   // first read in simple data
+  CHECKFOR(in,'[',c);
+  in >> n;
+  row_info.resize(n);
+  
+  CHECKFOR(in,']',c);
+  CHECKFOR(in,'[',c);
+  in >> n_columns;
+  
+  CHECKFOR(in,']',c);
+  CHECKFOR(in,'[',c);
+  in >> n;
+  data.resize(n);
+  
+  CHECKFOR(in,']',c);
+  CHECKFOR(in,'[',c);
+  in >> increment;
+
+  CHECKFOR(in,']',c);
+  CHECKFOR(in,'[',c);
+
+                                   // then read data
+  for (unsigned int i=0;i<row_info.size();++i)
+    in.read(reinterpret_cast<char*>(&row_info[i]),
+	    sizeof(RowInfo));
+  
+  CHECKFOR(in,']',c);
+  CHECKFOR(in,'[',c);
+	    
+  for (unsigned int i=0;i<data.size();++i)
+    in.read(reinterpret_cast<char*>(&data[i]),
+	    sizeof(Entry));
+  
+  CHECKFOR(in,']',c);
+}
+
 #endif // __deal2__sparse_matrix_ez_templates_h
