@@ -95,6 +95,8 @@ template <int dim>
 void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 					    const string         &name)
 {
+//TODO: Guido fixes the following when string operators work properly
+// There was a problem with stringstreams (Linux, egcs1.2)
 //  unsigned int n = dofs->get_fe().n_components ();
 //    if (n > 1)
 //      {
@@ -104,9 +106,10 @@ void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 //  	  names[i] = name + string("_");
 //  	}
 //    }
-//TODO: Murks hier
   add_data_vector (vec, vector<string>(1,name));
 }
+
+
 
 
 template <int dim>
