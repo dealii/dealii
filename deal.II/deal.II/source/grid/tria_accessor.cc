@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2200,12 +2200,46 @@ neighbor_child_on_subface (const unsigned int face,
                           (face_orientations_match ?
                            subface :
                            subface_translation[subface])));
-  TriaIterator<3,CellAccessor<3> > neighbor_child=
+  const TriaIterator<3,CellAccessor<3> > neighbor_child=
     this->neighbor(face)->child(neighbor_child_index);
 
-  Assert(this->face(face)->child(subface)==
-	 neighbor_child->face(neighbor_neighbor), ExcInternalError());
-  
+                                   // if the face on the side of the present
+                                   // cell is in the correct order, then make
+                                   // sure that the neighbor child cell we
+                                   // have found shares the desired subface.
+                                   //
+                                   // otherwise: if the face is turned
+                                   // inside out when viewed from the
+                                   // present cell, then the subface we are
+                                   // interested in is not
+                                   // this->face(face)->child(subface), but
+                                   // instead
+                                   // this->face(face)->child(subface'),
+                                   // where subface' is the translated
+                                   // subface number. this is so because we
+                                   // only store the face only once, so its
+                                   // children are defined in terms of its
+                                   // own (circular) orientation, not in
+                                   // terms of face_orientation as viewed
+                                   // from one of the adjacent cells. in
+                                   // that case, cell->face(f)->subface(sf)
+                                   // may yield unexpected results; in that
+                                   // case, a caller may need to adjust
+                                   // according to the face_orientation
+                                   // flag, though one in general only wants
+                                   // to loop over all subfaces, and not
+                                   // pick a particular one
+  Assert(((this->face_orientation(face) == true)
+          &&
+          (this->face(face)->child(subface) ==
+           neighbor_child->face(neighbor_neighbor)))
+         ||
+         ((this->face_orientation(face) == false)
+          &&
+          (this->face(face)->child(subface_translation[subface]) ==
+           neighbor_child->face(neighbor_neighbor))),
+         ExcInternalError());
+
   return neighbor_child;
 }
 

@@ -390,6 +390,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: In rare cases of 3d meshes with a certain topology, we triggered
+       an assertion in
+       <code>TriaAccessor::neighbor_child_on_subface</code>. It turns out that
+       the code actually computes the correct answer, but the assertion had a
+       condition that doesn't always have to be satisfied. This bogus
+       assertion is now fixed.
+       <br>
+       (WB 2004/11/12)
+       </p>
+
+  <li> <p>
        Fixed: The <code>GridGenerator::cylinder</code> function in 3d
        assigned the wrong boundary value to the top and bottom part of
        the cylinder if the half length of the cylinder was not equal
