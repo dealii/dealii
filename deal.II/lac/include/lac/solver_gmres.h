@@ -550,7 +550,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
       gamma_=new ::Vector<double> (gamma.size());
     }
 
-///////////////////////////////////
+                                   ///////////////////////////////////
 				   // outer iteration: loop until we
 				   // either reach convergence or the
 				   // maximum number of iterations is
