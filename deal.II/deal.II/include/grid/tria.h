@@ -2928,12 +2928,13 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				  istream            &in);
     
 				     /**
-				      * Actually delete a cell, which is the
+				      * Actually delete a cell, or rather all
+				      * it children, which is the
 				      * main step for the coarsening process.
 				      * This is the dimension dependent part
 				      * of #execute_coarsening#.
 				      */
-    void delete_cell (cell_iterator &cell);
+    void delete_children (cell_iterator &cell);
 
 				     /**
 				      * Some dimension dependent stuff for

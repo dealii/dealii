@@ -3695,7 +3695,7 @@ void Triangulation<dim>::execute_coarsening_and_refinement () {
 
 template <>
 void Triangulation<1>::execute_refinement () {
-  const unsigned int dim = 2;
+  const unsigned int dim = 1;
   
 				   // check whether a new level is needed
 				   // we have to check for this on the
@@ -5815,7 +5815,7 @@ void Triangulation<dim>::execute_coarsening () {
       if (cell->user_flag_set())
 					 // use a separate function, since this
 					 // is dimension specific
-	delete_cell (cell);
+	delete_children (cell);
   				   // in principle no user flags should be
 				   // set any more at this point
 #if DEBUG
@@ -6501,11 +6501,104 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 
 
 
+#if deal_II_dimension == 1
+
+template <>
+void Triangulation<1>::delete_children (cell_iterator &cell) {
+  const unsigned int dim=1;
+				   // first we need to reset the
+				   // neighbor pointers of the neighbors
+				   // of this cell's children to this
+				   // cell. This is different for one
+				   // dimension, since there neighbors
+				   // can have a refinement level
+				   // differing from that of this cell's
+				   // children by more than one level.
+
+  Assert (!cell->child(0)->has_children() && !cell->child(1)->has_children(),
+	  ExcInternalError());
+  
+				   // first do it for the cells to the
+				   // left
+  if (cell->neighbor(0)->has_children())
+    {
+      cell_iterator neighbor = cell->neighbor(0);
+      Assert (neighbor->level() == cell->level(), ExcInternalError());
+      
+				       // right child
+      neighbor = neighbor->child(1);
+      while (1)
+	{
+	  Assert (neighbor->neighbor(1) == cell->child(0),
+		  ExcInternalError());
+	  neighbor->set_neighbor (1, cell);
+
+					   // move on to further children
+					   // on the boundary between this
+					   // cell and its neighbor
+	  if (neighbor->has_children())
+	    neighbor = neighbor->child(1);
+	  else
+	    break;
+	};
+    };
+
+  				   // now do it for the cells to the
+				   // left
+  if (cell->neighbor(1)->has_children())
+    {
+      cell_iterator neighbor = cell->neighbor(1);
+      Assert (neighbor->level() == cell->level(), ExcInternalError());
+      
+				       // left child
+      neighbor = neighbor->child(0);
+      while (1)
+	{
+	  Assert (neighbor->neighbor(0) == cell->child(1),
+		  ExcInternalError());
+	  neighbor->set_neighbor (0, cell);
+
+					   // move on to further children
+					   // on the boundary between this
+					   // cell and its neighbor
+	  if (neighbor->has_children())
+	    neighbor = neighbor->child(0);
+	  else
+	    break;
+	};
+    };
+
+	
+				   // delete the vertex which will not be
+				   // needed anymore. This vertex is the
+				   // second of the second line of the
+				   // first child
+  vertices_used[cell->child(0)->vertex_index(1)] = false;
+
+				   // invalidate children.
+				   // clear user pointers, to avoid that
+				   // they may appear at unwanted places
+				   // later on...
+  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+    {
+      cell->child(child)->clear_user_pointer();
+      cell->child(child)->clear_user_flag();
+      cell->child(child)->clear_used_flag();
+    };
+  
+  
+				   // delete pointer to children
+  cell->set_children (-1);
+  cell->clear_user_flag();
+};
+
+#endif
+
 
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::delete_cell (cell_iterator &cell) {
+void Triangulation<2>::delete_children (cell_iterator &cell) {
   const unsigned int dim=2;
 				   // first we need to reset the
 				   // neighbor pointers of the neighbors
@@ -6636,7 +6729,7 @@ void Triangulation<2>::delete_cell (cell_iterator &cell) {
 
 
 template <>
-void Triangulation<3>::delete_cell (cell_iterator &cell) {
+void Triangulation<3>::delete_children (cell_iterator &cell) {
   const unsigned int dim=3;
 				   // first we need to reset the
 				   // neighbor pointers of the neighbors
