@@ -223,7 +223,7 @@ void check ()
 
 int main ()
 {
-  logfile.precision(4);
+  logfile.precision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -6,6 +6,8 @@ DEAL::Mapping1d-0-Q1fixed.output
 DEAL::  area=2.00
 DEAL::Mapping1d-0-Q1.output
 DEAL::  area=2.00
+DEAL::Mapping1d-0-Cartesian.output
+DEAL::  area=2.00
 DEAL::dim=2
 DEAL::Triangulation0:
 DEAL::exact_area=9.00
@@ -38,6 +40,13 @@ DEAL::  area=6.82
 DEAL::MappingFace2d-2-Q4.output
 DEAL::MappingSubface2d-2-Q4.output
 DEAL::p_unit=0.86 0.57,  p_real=3.71 2.38,  p_re_unit=0.86 0.57
+DEAL::Triangulation3:
+DEAL::exact_area=1.50
+DEAL::Mapping2d-3-Cartesian.output
+DEAL::  area=1.50
+DEAL::MappingFace2d-3-Cartesian.output
+DEAL::MappingSubface2d-3-Cartesian.output
+DEAL::p_unit=0.86 0.57,  p_real=1.86 3.36,  p_re_unit=0.86 0.57
 DEAL::dim=3
 DEAL::Triangulation0:
 DEAL::exact_area=8.00
@@ -63,3 +72,9 @@ DEAL::Mapping3d-3-Q3.output
 DEAL::  area=2.72
 DEAL::MappingFace3d-3-Q3.output
 DEAL::MappingSubface3d-3-Q3.output
+DEAL::Triangulation4:
+DEAL::exact_area=4.50
+DEAL::Mapping3d-4-Cartesian.output
+DEAL::  area=1.00
+DEAL::MappingFace3d-4-Cartesian.output
+DEAL::MappingSubface3d-4-Cartesian.output

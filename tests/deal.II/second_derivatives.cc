@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,7 @@
 int main ()
 {
   ofstream logfile("second_derivatives.output");
-  logfile.precision(3);
+  logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
 

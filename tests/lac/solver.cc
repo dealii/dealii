@@ -42,7 +42,7 @@ int main()
 {
   ofstream logfile("solver.output");
   logfile.setf(ios::fixed);
-  logfile.precision(3);
+  logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
   

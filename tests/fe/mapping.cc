@@ -12,6 +12,7 @@
 #include <grid/grid_generator.h>
 #include <grid/grid_out.h>
 #include <grid/tria_boundary_lib.h>
+#include <fe/mapping_cartesian.h>
 #include <fe/mapping_q1.h>
 #include <fe/mapping_q.h>
 #include <fe/fe_q.h>
@@ -42,7 +43,6 @@ plot_transformation(Mapping<dim> &mapping,
 				      | update_JxW_values));
 
   fe_values.reinit(cell);
-  const std::vector<double> &JxW=fe_values.get_JxW_values();
   
   std::ofstream gnuplot(name);
   gnuplot.precision(PRECISION);
@@ -55,7 +55,7 @@ plot_transformation(Mapping<dim> &mapping,
 	  for (unsigned int nx=0; nx<=div; ++nx)
 	    {
 	      gnuplot << fe_values.quadrature_point(k);
-	      double J = JxW[k] / q.weight(k);
+	      double J = fe_values.JxW(k) / q.weight(k);
 	      gnuplot << ' ' << J << std::endl;
 	      ++k;
 	    }
@@ -222,6 +222,7 @@ void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
   exact_areas.push_back(2.);
   show[0][0]=1;
   show[0][1]=1;
+  show[0][5]=1;
 }
 
 
@@ -233,7 +234,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
 {
   Triangulation<2> *tria;
   show.clear();
-  show.resize(3, std::vector<unsigned int> (mapping_size,0));
+  show.resize(4, std::vector<unsigned int> (mapping_size,0));
 				   // tria0: 3x3 square rotated
   if (1)
     {
@@ -258,7 +259,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       exact_areas.push_back(9.);
     }
   
-				   // tria1: arbitrary rectangle
+				   // tria1: arbitrary quadrilateral
   if (1)
     {
       tria=new Triangulation<2>();
@@ -271,7 +272,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
     }
   
 				   // tria2: crazy cell
-  if (1)
+  if (2)
     {
       Boundary<2> *boundary1=new HyperBallBoundary<2>(Point<2>(3,1), 2);
       Boundary<2> *boundary2=new HyperBallBoundary<2>(Point<2>(2,5), sqrt(5));
@@ -293,8 +294,23 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       double pi=acos(-1);
       double alpha=2*atan(0.5);
       exact_areas.push_back(4+pi-2.5*(alpha-sin(alpha)));
-      for (unsigned int i=0; i<mapping_size; ++i)
+      for (unsigned int i=0; i<=4; ++i)
 	show[2][i]=1;
+    }
+
+  if (3)
+    {
+      tria=new Triangulation<2>();
+      tria_ptr.push_back(tria);
+      Point<2> p0;
+      Point<2> p1;
+      p0(0) = 1.;
+      p0(1) = 2.5;
+      p1(0) = 2.;
+      p1(1) = 4.;
+      GridGenerator::hyper_rectangle(*tria, p0, p1);
+      exact_areas.push_back(1.5);
+      show[3][5] = 1;
     }
 }
 
@@ -307,7 +323,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
 {
   Triangulation<3> *tria;
   show.clear();
-  show.resize(4, std::vector<unsigned int> (mapping_size,0));
+  show.resize(5, std::vector<unsigned int> (mapping_size,0));
   
 				   // 2x2 cube
   if (1)
@@ -318,7 +334,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       exact_areas.push_back(8.);
     }
 
-				   // arbitrary rectangle
+				   // arbitrary quadrilateral
   if (1)
     {
       tria=new Triangulation<3>();
@@ -332,7 +348,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
     }
 
 				   // cube+part of ball
-  if (1)
+  if (2)
     {
       Point<3> m(2,2,2);
       Point<3> v(3,3,3);
@@ -351,7 +367,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
     }
 
 				   // eighth of ball
-  if (1)
+  if (3)
     {
       Point<3> p(0,0,0);
       const double r=sqrt(3.);
@@ -368,6 +384,22 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       for (unsigned int i=0; i<4; ++i)
 	show[3][i]=1;
     }
+  if (4)
+    {
+      tria=new Triangulation<3>();
+      tria_ptr.push_back(tria);
+      Point<3> p0;
+      Point<3> p1;
+      p0(0) = 1.;
+      p0(1) = 2.5;
+      p0(2) = 3.;
+      p1(0) = 2.;
+      p1(1) = 4.;
+      p1(2) = 6.;
+      GridGenerator::hyper_rectangle(*tria, p0, p1);
+      exact_areas.push_back(4.5);
+      show[4][5] = 1;
+    }
 }
 
   
@@ -379,6 +411,7 @@ void mapping_test()
   std::vector<Mapping<dim> *> mapping_ptr;
   std::vector<std::string> mapping_strings;
 
+  MappingCartesian<dim> cart;
   MappingQ1<dim> q1_old;
   MappingQ<dim> q1(1);
   MappingQ<dim> q2(2);
@@ -389,11 +422,13 @@ void mapping_test()
   mapping_ptr.push_back(&q2);
   mapping_ptr.push_back(&q3);
   mapping_ptr.push_back(&q4);
+  mapping_ptr.push_back(&cart);
   mapping_strings.push_back("Q1fixed");
   mapping_strings.push_back("Q1");
   mapping_strings.push_back("Q2");
   mapping_strings.push_back("Q3");
   mapping_strings.push_back("Q4");
+  mapping_strings.push_back("Cartesian");
 
   mapping_size=mapping_ptr.size();
   

@@ -38,6 +38,7 @@ void Q3_4th_shape_function_values_and_grads_dim2(
 int main(int, char)
 {
   ofstream logfile("polynomial_test.output");
+  logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
   

@@ -23,7 +23,7 @@ DEAL:sor:Richardson::Starting
 DEAL:sor:Richardson::Convergence step 7 
 DEAL:sor:cg::Starting 
 DEAL:sor:cg::Failure step 100 
-DEAL:sor::Iterative method reported convergence failure in step 100 with residual 0.25
+DEAL:sor::Iterative method reported convergence failure in step 100 with residual 0.258509
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 5 
 DEAL:sor:GMRES::Starting 
@@ -52,7 +52,7 @@ DEAL:sor:Richardson::Starting
 DEAL:sor:Richardson::Convergence step 88 
 DEAL:sor:cg::Starting 
 DEAL:sor:cg::Failure step 100 
-DEAL:sor::Iterative method reported convergence failure in step 100 with residual 5.64
+DEAL:sor::Iterative method reported convergence failure in step 100 with residual 5.64329
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 14 
 DEAL:sor:GMRES::Starting 

@@ -7788,7 +7788,7 @@ int main ()
 {
   deallog.attach(logfile);
   logfile.setf(ios::fixed);
-  logfile.precision (3);
+  logfile.precision (2);
   deallog.depth_console(0);
 
   WaveProblem<2> waves;

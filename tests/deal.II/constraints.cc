@@ -233,7 +233,7 @@ void make_tria (Triangulation<3> &tria, int step)
 int main ()
 {
   ofstream logfile("constraints.output");
-  logfile.precision (3);
+  logfile.precision (2);
   deallog.attach(logfile);
   deallog.depth_console(0);
 

@@ -102,7 +102,7 @@ void check ()
 int main ()
 {
   ofstream logfile("intergrid_map.output");
-  logfile.precision(4);
+  logfile.precision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

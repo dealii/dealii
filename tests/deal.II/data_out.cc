@@ -254,7 +254,8 @@ void LaplaceProblem<dim>::run ()
 int main () 
 {
   deallog.depth_console (0);
-
+  logfile.precision(2);
+  
   LaplaceProblem<2> laplace_problem_2d;
   laplace_problem_2d.run ();
 
