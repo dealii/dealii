@@ -90,7 +90,7 @@ int main ()
       for (unsigned int j=0;j<p.size();++j)
 	{
 	  double x = (double) j/p.size();
-	  if (fabs(q[i].value(2.*x)-p[i].value(x)) > 1.e-15)
+	  if (std::fabs(q[i].value(2.*x)-p[i].value(x)) > 1.e-15)
 	    deallog << "Polynomial " << i
 		    << ": Values q(" << 2.*x
 		    << ") and p(" << x
@@ -102,12 +102,12 @@ int main ()
       for (unsigned int j=0;j<p.size();++j)
 	{
 	  double x = (double) j/p.size();
-	  double diff = fabs(q[i].value(2.*x-1.)-p[i].value(x));
+	  double diff = std::fabs(q[i].value(2.*x-1.)-p[i].value(x));
 	  if (diff > 1.e-13)
 	    deallog << "Polynomial " << i
 		    << ": Values q(" << 2.*x-1.
 		    << ") and p(" << x
-		    << ") differ by 10^" << log(diff)/log(10)
+		    << ") differ by 10^" << std::log(diff)/log(10)
 		    << " after shift: " << q[i].value(2.*x-1.)
 		    << " != " << p[i].value(x)
 		    << std::endl;

@@ -45,14 +45,14 @@ void check_poly(const Point<dim> &x,
     {
 				       // Check if compute_value is ok
       double val1 = p.compute_value(k,x);
-      if (fabs(val1 - values1[k]) > 5.0E-16)
+      if (std::fabs(val1 - values1[k]) > 5.0E-16)
 	deallog << 'P' << k << ": values differ " << val1 << " != "
 		<< values1[k] << std::endl;
       double val2 = q.compute_value(k,x);
-      if (fabs(val2 - values2[k]) > 5.0E-16)
+      if (std::fabs(val2 - values2[k]) > 5.0E-16)
 	deallog << 'Q' << k << ": values differ " << val2 << " != "
 		<< values2[k] << std::endl;
-      if (fabs(val2 - val1) > 5.0E-16)
+      if (std::fabs(val2 - val1) > 5.0E-16)
 	deallog << "PQ" << k << ": values differ " << val1 << " != "
 		<< val2 << std::endl;
 
@@ -91,8 +91,8 @@ void check_poly(const Point<dim> &x,
                                        // somewhat to make them
                                        // significant despite our
                                        // two-post-dot-digits limit
-      values1[k] *= pow(10, dim);
-      gradients1[k] *= pow(10, dim);
+      values1[k] *= std::pow(10, dim);
+      gradients1[k] *= std::pow(10, dim);
       
       deallog << 'P' << k << "\t= " << values1[k]
 	      << "\tgradient\t";
