@@ -16,25 +16,11 @@
 
 #include <base/exceptions.h>
 #include <base/function.h>
+#include <base/multithread_info.h>
 #include <grid/forward_declarations.h>
 #include <dofs/dof_handler.h>
 #include <map>
 
-				 // if multithreaded set number
-				 // of threads to use.
-				 // The default number of threads can
-				 // be set during the compiling with
-				 // the flag N_THREADS.
-#ifdef DEAL_II_USE_MT
- #ifndef N_THREADS
-  #define N_THREADS 4
- #endif
-#else
- #ifdef N_THREADS
-  #undef N_THREADS
- #endif
- #define N_THREADS 1
-#endif
 
 
 /**
@@ -247,23 +233,25 @@ class KellyErrorEstimator
 				      *
 				      * The estimator supports
 				      * multithreading and splits the
-				      * cells to #N_THREADS# (default)
-				      * threads. The number of threads
-				      * to be used in multithreaded
-				      * mode can be set with the last
-				      * parameter of the error
-				      * estimator.  Multithreading is
-				      * only implemented in two and
-				      * three dimensions.
+				      * cells to
+				      * #multithread_info.n_default_threads#
+				      * (default) threads. The number
+				      * of threads to be used in
+				      * multithreaded mode can be set
+				      * with the last parameter of the
+				      * error estimator.
+				      * Multithreading is only
+				      * implemented in two and three
+				      * dimensions.
 				      */
     static void estimate (const DoFHandler<dim>   &dof,
 			  const Quadrature<dim-1> &quadrature,
 			  const FunctionMap       &neumann_bc,
 			  const Vector<double>    &solution,
 			  Vector<float>           &error,
-			  const vector<bool>      &component_mask_ = vector<bool>(),
+			  const vector<bool>      &component_mask = vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
-			  unsigned int            n_threads=N_THREADS);
+			  unsigned int            n_threads = multithread_info.n_default_threads);
     
 				     /**
 				      * Exception
@@ -332,7 +320,7 @@ private:
 				      * is done by the C++ library and
 				      * has not to be handcoded, it
 				      * nevertheless seriously damages
-				      * tha ability to efficiently run
+				      * the ability to efficiently run
 				      * the functions of this class in
 				      * parallel, since they are quite
 				      * often blocked by these
@@ -422,7 +410,7 @@ private:
     };
 
 
-/**
+				     /**
 				      * Computates the error on all cells
 				      * of the domain with the number n,
 				      * satisfying
@@ -458,9 +446,7 @@ private:
 				      * to avoid ending up with a function
 				      * of 500 lines of code.
 				      */
-
-
-static void integrate_over_regular_face (Data                       &data,
+    static void integrate_over_regular_face (Data                       &data,
 					     const unsigned int          this_thread,
 					     const active_cell_iterator &cell,
 					     const unsigned int          face_no,
@@ -468,7 +454,7 @@ static void integrate_over_regular_face (Data                       &data,
 					     FEFaceValues<dim>          &fe_face_values_neighbor);
 
 
-/**
+				     /**
 				      * The same applies as for the function
 				      * above, except that integration is
 				      * over face #face_no# of #cell#, where

@@ -17,6 +17,8 @@
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
 #include <base/data_out_base.h>
+#include <base/multithread_info.h>
+
 
 
 /**
@@ -391,13 +393,18 @@ class DataOut : public DataOut_DoFData<dim>
 				      * general documentation of this class
 				      * for further information.
 				      *
-				      * The functions supports multithreading.
+				      * The function supports
+				      * multithreading, if deal.II is
+				      * compiled in multithreading
+				      * mode. The default number of
+				      * threads to be used to build
+				      * the patches is set to
+				      * #multithread_info.n_default_threads#.
 				      */
     virtual void build_patches (const unsigned int n_subdivisions = 1,
-				const unsigned int n_threads_     = 1);
+				const unsigned int n_threads      = multithread_info.n_default_threads);
 
-
-/**
+				     /**
 				      * Return the first cell which we
 				      * want output for. The default
 				      * implementation returns the first
@@ -453,14 +460,14 @@ class DataOut : public DataOut_DoFData<dim>
 	  {}
     };
 				     /**
-				      * Builds every #n_threads's#
+				      * Builds every #n_threads#'s
 				      * patch. This function may be
-				      * called parallel.
+				      * called in parallel.
 				      * If multithreading is not
 				      * used, the function is called
 				      * once and generates all patches.
 				      */
-    void * DataOut<dim>::build_some_patches (Data data);
+    void DataOut<dim>::build_some_patches (Data data);
 };
 
 

@@ -340,10 +340,9 @@ DoFHandler<dim>::active_cell_iterator cell=data.dof.begin_active();
 				   // be used, the threads would take widely
 				   // spread times to calculate their cells.
   for (unsigned int t=0;t<this_thread;++t,++cell);
-
 				   // loop over all cells for this thread
 				   // the iteration of cell is done at the end
-  for (;cell!=data.endc;)
+  for (; cell!=data.endc; )
     {
       
 				       // loop over all faces of this cell
@@ -381,7 +380,7 @@ DoFHandler<dim>::active_cell_iterator cell=data.dof.begin_active();
 	    };
 
 
-if (cell->face(face_no)->has_children() == false)
+	  if (cell->face(face_no)->has_children() == false)
 					     // if the face is a regular one, i.e.
 					     // either on the other side there is
 					     // nirvana (face is at boundary), or
@@ -407,9 +406,11 @@ if (cell->face(face_no)->has_children() == false)
 	};
 
 				       // next cell in this thread
-      for (unsigned int t=0;((t<data.n_threads)&&(cell!=data.endc));++t,++cell) {};
+      for (unsigned int t=0;((t<data.n_threads)&&(cell!=data.endc));++t,++cell)
+	{};
     };
 };
+
 
 
 template <int dim>
@@ -450,7 +451,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof,
 				   // of the cell.
 				   // the values for all faces are set to
 				   // -10e20. It would cost a lot of time
-				   // to syncronisise the initialisation
+				   // to synchronise the initialisation
 				   // of the map in multithreaded mode.
 				   // negative value indicates that the
 				   // face is not calculated.
@@ -460,7 +461,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof,
       data.face_integrals[cell->face(face_no)]=-10e20;
 
 
-// split all cells into threads
+				   // split all cells into threads
 				   // if multithreading is used
 #ifdef DEAL_II_USE_MT
 
@@ -478,17 +479,15 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof,
 	      FunData (data,0,&KellyErrorEstimator::estimate_some));
 
 
-// get start cells for each thread
+				   // get start cells for each thread
   for (unsigned int l=0;l<data.n_threads;++l)
-    {
-      fun_data[l].arg2=l;
-    };
+    fun_data[l].arg2=l;
+    
     
 				   // now spawn the threads
   for (unsigned int i=0;i<data.n_threads; ++i)
-    {
-      thread_manager.spawn(&fun_data[i],THR_SCOPE_SYSTEM | THR_DETACHED);
-    };
+    thread_manager.spawn(&fun_data[i],THR_SCOPE_SYSTEM | THR_DETACHED);
+    
 				   // wait for all threads to return
   thread_manager.wait();
   
@@ -665,7 +664,7 @@ integrate_over_regular_face (Data                       &data,
     };
 
 
-if (face->at_boundary() == true)
+  if (face->at_boundary() == true)
 				     // neumann boundary face. compute
 				     // difference between normal
 				     // derivative and boundary function
@@ -689,7 +688,7 @@ if (face->at_boundary() == true)
     };
 
 
-// now phi contains the following:
+				   // now phi contains the following:
 				   // - for an internal face, phi=[a du/dn]
 				   // - for a neumann boundary face,
 				   //   phi=a du/dn-g
@@ -710,6 +709,7 @@ if (face->at_boundary() == true)
   
   data.face_integrals[face] = face_integral;
 };
+
 
 
 template <int dim>
@@ -800,7 +800,7 @@ integrate_over_irregular_face (Data                       &data,
       data.normal_vectors[this_thread]=fe_face_values.get_normal_vectors();
 
 
-for (unsigned int component=0; component<data.n_components; ++component)
+      for (unsigned int component=0; component<data.n_components; ++component)
 	for (unsigned int point=0; point<data.n_q_points; ++point)
 	  data.phi[this_thread][point][component] =
 	    data.psi[this_thread][point][component]*
@@ -847,7 +847,7 @@ for (unsigned int component=0; component<data.n_components; ++component)
     };
 
 
-// finally loop over all subfaces to
+				   // finally loop over all subfaces to
 				   // collect the contributions of the
 				   // subfaces and store them with the
 				   // mother face
@@ -865,7 +865,6 @@ for (unsigned int component=0; component<data.n_components; ++component)
     };
 
   data.face_integrals[face] = sum;
-
 };
 
 

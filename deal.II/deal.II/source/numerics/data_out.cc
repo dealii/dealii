@@ -146,6 +146,7 @@ vector<string> DataOut_DoFData<dim>::get_dataset_names () const
 };
 
 
+
 template <int dim>
 const vector<typename DataOutBase::Patch<dim> > &
 DataOut_DoFData<dim>::get_patches () const
@@ -154,8 +155,9 @@ DataOut_DoFData<dim>::get_patches () const
 };
 
 
+
 template <int dim>
-void * DataOut<dim>::build_some_patches (Data data)
+void DataOut<dim>::build_some_patches (Data data)
 {
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
@@ -224,8 +226,6 @@ void * DataOut<dim>::build_some_patches (Data data)
 	   ++i,++patch,++cell_number,cell=next_cell(cell));
       
     };
-  
-  return 0;
 }
 
 
@@ -233,14 +233,12 @@ template <int dim>
 void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				  const unsigned int n_threads_) 
 {
-  unsigned int n_threads = n_threads_;
-
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
 
-				   // if not in multithread mode
-				   // set nr of threads to one
-#ifndef DEAL_II_USE_MT
-  n_threads = 1;
+#ifdef DEAL_II_USE_MT
+  const unsigned int n_threads = n_threads_;
+#else
+  const unsigned int n_threads = 1;
 #endif
 
 
@@ -301,7 +299,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
   ThreadManager thread_manager;
   
   typedef ThreadManager::Mem_Fun_Data1
-    <DataOut<dim>, Data > MemFunData;
+    <DataOut<dim>, Data> MemFunData;
   
 				   // One struct of this type for every thread
   vector<MemFunData> mem_fun_data (n_threads,

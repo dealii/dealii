@@ -663,9 +663,11 @@ class TimeDependent
 				      * The parameter denotes the
 				      * number of threads that shall
 				      * be spawned in parallel. It
-				      * defaults to only one thread,
-				      * and the value is ignored if
-				      * not in multithread mode.
+				      * defaults to only one thread to
+				      * avoid hidden synchronisation
+				      * problems, and the value is
+				      * ignored if not in multithread
+				      * mode.
 				      */
     virtual void end_sweep (const unsigned int n_threads = 1);
 
@@ -726,6 +728,7 @@ class TimeDependent
     void end_sweep (const unsigned int begin_timestep,
 		    const unsigned int end_timestep);
 };
+
 
 
 /**
