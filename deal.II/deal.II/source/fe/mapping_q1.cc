@@ -95,13 +95,13 @@ namespace internal
       {
         case 1:
         case 2:
-              return ((face_no * GeometryInfo<dim>::faces_per_cell +
+              return ((face_no * GeometryInfo<dim>::subfaces_per_face +
                        subface_no)
                       * n_quadrature_points);
 
                                                // for 3d, same as above:
         case 3:
-              return (((face_no * GeometryInfo<dim>::faces_per_cell +
+              return (((face_no * GeometryInfo<dim>::subfaces_per_face +
                         subface_no)
                        + (cell->get_face_orientation(face_no) == true ?
                           0 :
