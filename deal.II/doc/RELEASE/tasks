@@ -23,7 +23,13 @@ when a new release shall be issued:
 
 6/ change the content of the `Version' file on both HEAD and branch
 
-7/ test the branch thoroughly
+7/ test the branch thoroughly:
+	make all
+	cd tests
+	make all
+	cd ../examples
+	make all
+	make run
 
 8/ run `make validate-xrefs' on the branch to check that the changes
   do not point to nirvana
