@@ -340,10 +340,10 @@ void dVector::equ (const double a, const dVector& u,
 
 
 
-void dVector::equ (const double a)
+void dVector::scale (const double factor)
 {
   for (unsigned int i=0; i<dim; i++)
-    val[i] *= a;
+    val[i] *= factor;
 }
 
 

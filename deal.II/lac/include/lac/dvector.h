@@ -79,6 +79,7 @@ class dVector : public VectorBase
 				      * #v = 0#, but more obvious and faster.
 				      */
     void clear ();
+    
 				     /**
 				      *  U(0-N) = s       . Fill all components
 				      */
@@ -217,9 +218,13 @@ class dVector : public VectorBase
 	       const double c, const dVector& X);
     
 				     /**
-				      *  U=s*U            . Scaling
+				      * Scale each element of the vector by the
+				      * given factor. This function was
+				      * previously called #equ(double)#, which
+				      * in my eyes is an extremely unintuitive
+				      * naming and was thus replaced.
 				      */
-    void equ (const double s);
+    void scale (const double factor);
     
 				     /**
 				      *  U=a*V            . Replacing

@@ -414,7 +414,7 @@ dSMatrix::copy_from (const dSMatrix &matrix) {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  for (unsigned int i = 0 ; i<cols->vec_len; i++)
+  for (unsigned int i = 0 ; i<cols->vec_len; ++i)
     val[i] = matrix.val[i];
 
   return *this;
@@ -427,7 +427,7 @@ dSMatrix::add_scaled (const double factor, const dSMatrix &matrix) {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  for (unsigned int i = 0 ; i<cols->vec_len; i++)
+  for (unsigned int i = 0 ; i<cols->vec_len; ++i)
     val[i] += factor*matrix.val[i];
 };
 
@@ -440,14 +440,11 @@ dSMatrix::vmult (dVector& dst, const dVector& src) const
   Assert(m() == dst.n(), ExcDimensionsDontMatch(m(),dst.n()));
   Assert(n() == src.n(), ExcDimensionsDontMatch(n(),src.n()));
 
-  for (unsigned int i=0;i<m();i++)
+  for (unsigned int i=0; i<m(); ++i)
     {
       double s = 0.;
-      for (unsigned int j=cols->rowstart[i]; j < cols->rowstart[i+1] ;j++) 
-	{
-	  int p = cols->colnums[j];
-	  s += val[j] * src(p);
-	}
+      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j) 
+	s += val[j] * src(cols->colnums[j]);
       dst(i) = s;
     }
 }
