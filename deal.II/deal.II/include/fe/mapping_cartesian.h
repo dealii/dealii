@@ -15,8 +15,10 @@
 
 
 #include <base/config.h>
+#include <base/table.h>
 #include <cmath>
 #include <fe/mapping.h>
+
 
 /**
  * Mapping of an axis-parallel cell.
