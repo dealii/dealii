@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -107,7 +107,7 @@ FullMatrix<TYPEMAT>::residual<TYPEVEC,TYPERES>(Vector<TYPEVEC>&,
 
 // Experimental code
 
-#ifdef HAVE_LIBLAPACK
+#ifdef HAVE_LIBLAPACK_AND_REALLY_USE_IT_HERE
 extern "C" int dgels_ (const char* trans,
 		       const unsigned int* M, const unsigned int* N,
 		       const unsigned int* NRHS,
