@@ -92,7 +92,8 @@ class SolverRichardson : public Solver<Matrix, Vector>
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
-    Vector *Vr, *Vd;
+    Vector *Vr;
+    Vector *Vd;
 
 				     /**
 				      * Damping parameter.

@@ -172,46 +172,6 @@ class Solver
 };
 
 
-
-
-
-/**
- * Base class for non-symmetric linear solvers.  A second entry point
- * allows the simultaneous computation of a dual problem.
- */
-template<class Matrix, class Vector>
-class SolverDual : public Solver<Matrix, Vector>
-{
-  public:
-				     /**
-				      * Constructor.
-				      */
-    SolverDual(SolverControl&, VectorMemory<Vector>&);
-    
-				     /**
-				      * Solve the original problem
-				      * $Ax=b$.
-				      */
-    typename Solver<Matrix,Vector>::ReturnState solve (const Matrix &A,
-						       Vector       &x,
-						       const Vector &b) = 0;
-
-				     /**
-				      * Solve the two problems
-				      * $Ax=b1$ and $A^Tz=b2$ simultanously.
-				      */
-    typename Solver<Matrix,Vector>::ReturnState solve (const Matrix &A,
-						       Vector       &x,
-						       const Vector &b1,
-						       Vector       &z,
-						       const Vector &b2) = 0;
-};
-
-
-
-
-
-
 /*-------------------------------- Inline functions ------------------------*/
 
 template <class Matrix, class Vector>
