@@ -870,6 +870,9 @@ class TriaDimensionInfo<2> {
       than #N log N# for sorting all values.
 
       A typical value for the fraction of cells to be refined is 0.3.
+      However, for singular functions or error functionals, you may want to
+      chose a smaller value to avoid overrefinement in regions which do not
+      contribute much to the error.
 
     \item #refine_fixed_fraction#: this function computes the threshold such
       that the number of cells getting flagged for refinement makes up for a
@@ -878,12 +881,38 @@ class TriaDimensionInfo<2> {
       criterion greater than the threshold together account for half of the
       total error.
       
-      It is assumed that the criterion is a value in a certain norm over each
-      element, such that the square of the total error is the sum over the
-      squares of the criteria on the cells.
+      This strategy is more suited for singular functions and error
+      functionals, but may lead to very slow convergence of the grid
+      if only few cells are refined in each step.
 
-      ** Fix me: implementation
+      From the implementational point, this time we really need to
+      sort the array of criteria. However, it is not necessary to sort
+      the whole array, since for example if you chose the fraction at
+      50 per cent of the total error, it is only necessary to sort at
+      most the 50 per cent of cells ranking topmost in the list of error
+      per cell. It is thus reasonable to use an algorithm like
+      #partial_sort# of the C++ standard library, which only sorts part
+      of the array and lets the rest unsorted. However, in many cases
+      much fewer than 50 per cent of the cells account for 50 per cent
+      of the error, so it may be possible to get away with sorting less
+      than 50 per cent of the cells. We therefore divide the whole lot
+      of 50 per cent of cells into, say, 5 parts, first sort for the
+      10 per cent with highest error; look whether they together make up
+      for 50 per cent and if so thats ok, we can leave the rest unsorted;
+      if not, sort the next 10 per cent, and so on. The default is to
+      devide the maximum number of cells which may get refined (which
+      equals the fraction of the total error, as explained above) into
+      five parts, but this value may be given as a parameter to the
+      #refine_fixed_fraction# function. For highly singular error
+      functionals, it may be more efficient to chose a greater number
+      than five. Chosing a value which is too large should not lead to
+      a large performance drawback; chosing too small a value however
+      may lead to significantly higher computational costs for sorting
+      than necessary.
 
+      Just like the other strategy described above, this function only
+      computes the threshold value and then passes over to #refine#.
+      
       A typical value for the fraction of the total error is 0.5.
     \end{itemize}
 
@@ -891,6 +920,10 @@ class TriaDimensionInfo<2> {
     different strategies for refinement, see the paper of R. Becker and
     R. Rannacher titled "A Feed-Back Approach to Error Control in Finite
     Element Methods: Basic Analysis and Examples".
+
+    It is assumed that the criterion is a value in a certain norm over each
+    element, such that the square of the total error is the sum over the
+    squares of the criteria on the cells.
 
 
     {\bf Material and boundary information}
@@ -1272,12 +1305,15 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *
 				      * #fraction_of_error# shall be a value
 				      * between zero and one.
+				      * #n_sorting_parts# shall be one or
+				      * greater.
 				      *
 				      * Refer to the general doc of this class
 				      * for more information.
 				      */
-    void refine_fixed_fraction (const dVector &criteria,
-				const double   fraction_of_error);
+    void refine_fixed_fraction (const dVector      &criteria,
+				const double        fraction_of_error,
+				const unsigned int  n_sorting_parts = 5);
     
 				     /**
 				      *  Refine all cells on all levels which
@@ -2026,6 +2062,10 @@ class Triangulation : public TriaDimensionInfo<dim> {
 		    int, int,
 		    << "The given vector has " << arg1
 		    << " elements, but " << arg2 << " were expected.");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidParameterValue);
 				     //@}
   protected:
 				     /**
