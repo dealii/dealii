@@ -1,16 +1,5 @@
 # $Id$
 
-################################################################ 
-# This example program will only work if PETSc is installed. If this
-# is not the case, then simply redefine the main targets to to nothing
-ifneq ($(USE_CONTRIB_PETSC),yes)
-default:
-run:
-endif
-#
-################################################################
-
-
 
 # For the small projects Makefile, you basically need to fill in only
 # four fields.
@@ -55,6 +44,25 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov
 # deal.II top level directory and to include the file with the global
 # settings
 include $D/common/Make.global_options
+
+################################################################ 
+# This example program will only work if PETSc is installed. If this
+# is not the case, then simply redefine the main targets to to nothing
+ifneq ($(USE_CONTRIB_PETSC),yes)
+default run:
+	@echo
+	@echo "===========================================================" 
+	@echo "=   This program cannot be compiled without PETSc. Make   ="
+	@echo "=   sure you have PETSc installed and detected during     ="
+	@echo "=   configuration of deal.II                              ="
+	@echo "==========================================================="
+	@echo
+
+else
+#
+################################################################
+
+
 
 
 # Since the whole project consists of only one file, we need not
@@ -160,3 +168,4 @@ Makefile.dep: $(target).cc Makefile \
 include Makefile.dep
 
 
+endif  # CONTRIB_USE_PETSC
