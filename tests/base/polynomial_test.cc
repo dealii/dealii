@@ -42,6 +42,10 @@ void check_poly(const Point<dim>& x,
   
   for (unsigned int k=0;k<n;++k)
     {
+                                       // first make sure the
+                                       // individual functions work in
+                                       // a consistent way
+      
 				       // Check if compute_value is ok
       double val = p.compute_value(k,x);
       //if (val != values[k])
@@ -61,6 +65,15 @@ void check_poly(const Point<dim>& x,
 	deallog << 'P' << k << ": second derivatives differ " << grad2 << " != "
 		<< second[k] << std::endl;
 
+
+                                       // finally output values,
+                                       // gradients, etc, to make sure
+                                       // that they are not only
+                                       // consistent, but also
+                                       // correct. Multiply them
+                                       // somewhat to make them
+                                       // significant despite our
+                                       // two-post-dot-digits limit
       values[k] *= pow(10, dim);
       gradients[k] *= pow(10, dim);
       
