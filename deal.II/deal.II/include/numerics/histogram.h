@@ -5,6 +5,7 @@
 /*----------------------------   histogram.h     ---------------------------*/
 
 
+#include <base/exceptions.h>
 #include <lac/forward-declarations.h>
 #include <vector>
 
