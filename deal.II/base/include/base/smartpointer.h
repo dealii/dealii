@@ -65,11 +65,18 @@ class SmartPointer
     ~SmartPointer();
     
 				     /**
-				      * Assignment operator. Change of
+				      * Assignment operator for
+				      * normal pointers. Change of
 				      * subscription is necessary.
 				      */
     SmartPointer<T> & operator= (T *tt);
-  
+
+				     /**
+				      *Assignment operator for
+				      * #SmartPointer#. Change of
+				      * subscription is necessary.
+				      */
+    SmartPointer<T> & operator= (const SmartPointer<T>& tt);
 
 				     /**
 				      * Conversion to normal pointer.
@@ -91,7 +98,7 @@ class SmartPointer
 				      * Pointer to the object we want
 				      * to subscribt to.
 				      */
-    const T* t;
+  T * t;
 };
 
 
@@ -136,6 +143,16 @@ SmartPointer<T> & SmartPointer<T>::operator = (T *tt) {
   return *this;
 };
 
+
+template <typename T>
+SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt) {
+  if (t)
+    t->unsubscribe();
+  t = (T*) tt;
+  if (tt)
+    tt->subscribe();
+  return *this;
+};
 
 
 template <typename T>
