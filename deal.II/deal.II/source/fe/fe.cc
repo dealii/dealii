@@ -15,7 +15,6 @@
 #include <fe/fe.h>
 #include <base/memory_consumption.h>
 #include <fe/mapping.h>
-#include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
 #include <base/quadrature.h>
 #include <grid/tria.h>

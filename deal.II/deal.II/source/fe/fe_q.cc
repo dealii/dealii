@@ -19,7 +19,6 @@
 #include <dofs/dof_accessor.h>
 #include <fe/fe.h>
 #include <fe/mapping.h>
-#include <fe/mapping_q1.h>
 #include <fe/fe_q.h>
 #include <fe/fe_values.h>
 

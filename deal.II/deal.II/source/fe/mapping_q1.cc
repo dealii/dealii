@@ -41,57 +41,6 @@ MappingQ1<dim>::InternalData::InternalData (const unsigned int n_shape_functions
 
 
 
-template<int dim>
-double
-MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
-				     const unsigned int shape_nr) const
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
-	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-		       shape_values.size()));
-  return shape_values [qpoint*n_shape_functions + shape_nr];
-}
-
-
-
-template <int dim>
-double &
-MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
-				     const unsigned int shape_nr)
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
-	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-		       shape_values.size()));
-  return shape_values [qpoint*n_shape_functions + shape_nr];
-}
-
-
-template <int dim>
-Tensor<1,dim>
-MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
-					  const unsigned int shape_nr) const
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-		       shape_derivatives.size()));
-  return shape_derivatives [qpoint*n_shape_functions + shape_nr];
-}
-
-
-
-template <int dim>
-Tensor<1,dim> &
-MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
-					  const unsigned int shape_nr)
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-		       shape_derivatives.size()));
-  return shape_derivatives [qpoint*n_shape_functions + shape_nr];
-}
-
-
-
 template <int dim>
 unsigned int
 MappingQ1<dim>::InternalData::memory_consumption () const
