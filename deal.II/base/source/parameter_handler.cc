@@ -13,6 +13,7 @@
 
 
 #include <base/parameter_handler.h>
+#include <base/logstream.h>
 #include <fstream>
 #include <iomanip>
 #include <strstream>
@@ -627,6 +628,17 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style)
 };
 
 
+void
+ParameterHandler::log_parameters (LogStream &out)
+{
+  out.push("parameters");
+				   // dive recursively into the subsections
+  log_parameters_section (out);
+
+  out.pop();
+};
+
+
 
 void ParameterHandler::print_parameters_section (ostream           &out,
 						 const OutputStyle  style,
@@ -750,6 +762,45 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
+    };
+};
+
+
+
+void ParameterHandler::log_parameters_section (LogStream           &out)
+{
+  Section *pd = get_present_defaults_subsection ();
+  Section *pc = get_present_changed_subsection ();
+
+				   // traverse entry list
+  Section::EntryType::const_iterator ptr;
+
+				   // first find out the longest entry name
+  unsigned int longest_entry = 0;
+  for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
+    if (ptr->first.length() > longest_entry)
+      longest_entry = ptr->first.length();
+
+				   // print entries one by one
+  for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
+    {
+				       // check whether this entry is listed
+				       // in the Changed tree and actually
+				       // differs from the default value
+      out << ptr->first << setw(longest_entry-ptr->first.length()+2) << "= "
+	  << ptr->second.first << endl;
+    };
+
+
+				   // now transverse subsections tree
+  map<string, Section*>::const_iterator ptrss;
+  for (ptrss = pd->subsections.begin(); ptrss != pd->subsections.end(); ++ptrss)
+    {
+      out.push(ptrss->first);
+      enter_subsection (ptrss->first);
+      log_parameters_section (out);
+      leave_subsection ();
+      out.pop();
     };
 };
 

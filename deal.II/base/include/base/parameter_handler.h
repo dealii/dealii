@@ -26,7 +26,7 @@ class MultipleParameterLoop;
 
 class istream;
 class ostream;
-
+class LogStream;
 
 /**
  * List of possible output formats.
@@ -1098,6 +1098,23 @@ class ParameterHandler
 				   const OutputStyle Style,
 				   const unsigned int indent_level);
 
+				   /**
+				    * Print parameters to a logstream.
+				    * This function allows to print
+				    * all parameters into a log-file.
+				    * Sections will be indented in the
+				    * usual log-file style.
+				    */
+    void log_parameters (LogStream& out);
+
+				   /**
+				    * Log parameters in
+				    * subsection. The subsection is
+				    * determined by the
+				    * @p{subsection_path} member *
+				    * variable.
+				    */
+  void log_parameters_section (LogStream& out);
 
 				     /**
 				      * Exception
