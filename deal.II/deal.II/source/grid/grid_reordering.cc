@@ -635,7 +635,7 @@ namespace internal
 					     // numbers on edge
 					     // edge_num
 	    Cell & cur_cell = cell_list[cur_cell_id];
-					     // m.DumpCell(cur_cell);
+// m.DumpCell(cur_cell);
 	    for(unsigned short int edge_num=0; 
 		edge_num<12; 
 		++edge_num)
@@ -1225,7 +1225,7 @@ namespace internal
 				       // If so orient all edges
 				       // consistantly.
       cur_flag = 1;
-      for(int i=4*n; i<4*(n+1); ++i)
+      for (int i=4*n; i<4*(n+1); ++i)
 	{
 // std::cout<<i<<" ORIENTING\n";
 	  if ((edge_flags&cur_flag)!=0)
