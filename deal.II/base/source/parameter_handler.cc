@@ -151,9 +151,9 @@ namespace Patterns
     sequence = seq;
 
     while (sequence.find(" |") != string::npos)
-      sequence.replace (sequence.find(" |"), 2, '|');
+      sequence.replace (sequence.find(" |"), 2, "|");
     while (sequence.find("| ") != string::npos)
-      sequence.replace (sequence.find("| "), 2, '|');
+      sequence.replace (sequence.find("| "), 2, "|");
   };
 
 
@@ -201,9 +201,9 @@ namespace Patterns
   
     sequence = seq;
     while (sequence.find(" |") != string::npos)
-      sequence.replace (sequence.find(" |"), 2, '|');
+      sequence.replace (sequence.find(" |"), 2, "|");
     while (sequence.find("| ") != string::npos)
-      sequence.replace (sequence.find("| "), 2, '|');
+      sequence.replace (sequence.find("| "), 2, "|");
   };
 
 
@@ -762,9 +762,9 @@ bool ParameterHandler::scan_line (string line,
   if (line.find('#') != string::npos)
     line.erase (line.find("#"), string::npos);
 				   // replace every whitespace sequence
-				   // by ' '
+				   // by " "
   while (line.find('\t') != string::npos)
-    line.replace (line.find('\t'), 1, ' ');
+    line.replace (line.find('\t'), 1, " ");
   while (line.find("  ") != string::npos)
     line.erase (line.find("  "), 1);
   				   // now every existing whitespace
@@ -1205,9 +1205,9 @@ void MultipleParameterLoop::Entry::split_different_values ()
   
 				   // delete spaces around '|'
   while (multiple.find(" |") != string::npos)
-    multiple.replace (multiple.find(" |"), 2, '|');
+    multiple.replace (multiple.find(" |"), 2, "|");
   while (multiple.find("| ") != string::npos)
-    multiple.replace (multiple.find("| "), 2, '|');
+    multiple.replace (multiple.find("| "), 2, "|");
 
   while (multiple.find('|') != string::npos) 
     {
