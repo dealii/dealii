@@ -217,7 +217,10 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 
 template <int dim>
 void FEValuesBase<dim>::get_function_2nd_derivatives (const Vector<double>   &fe_function,
-						      vector<Tensor<2,dim> > &second_derivatives) const {
+						      vector<Tensor<2,dim> > &second_derivatives) const
+{
+  Assert (fe->n_components == 1,
+	  ExcWrongNoOfComponents());
   Assert (second_derivatives.size() == n_quadrature_points,
 	  ExcWrongVectorSize(second_derivatives.size(), n_quadrature_points));
 
