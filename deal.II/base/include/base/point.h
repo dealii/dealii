@@ -156,148 +156,194 @@ class Point : public Tensor<1,dim>
 template <int dim>
 inline
 Point<dim>::Point (const bool initialize) :
-		Tensor<1,dim>(initialize) {};
+		Tensor<1,dim>(initialize) 
+{};
+
 
 
 template <int dim>
 inline
 Point<dim>::Point (const Tensor<1,dim> &t) :
-		Tensor<1,dim>(t) {};
+		Tensor<1,dim>(t) 
+{};
+
 
 
 template <>
 inline
-Point<1>::Point (const double x) {
+Point<1>::Point (const double x)
+{
   values[0] = x;
 };
 
 
+
 template <>
 inline
-Point<1>::Point (const double, const double) {
+Point<1>::Point (const double, const double) 
+{
+  Assert (false, ExcInvalidConstructorCalled());
+};
+
+
+
+template <>
+inline
+Point<1>::Point (const double, const double, const double) 
+{
   Assert (false, ExcInvalidConstructorCalled());
 };
 
 
 template <>
 inline
-Point<1>::Point (const double, const double, const double) {
-  Assert (false, ExcInvalidConstructorCalled());
-};
-
-
-template <>
-inline
-Point<2>::Point (const double x, const double y) {
+Point<2>::Point (const double x, const double y) 
+{
   values[0] = x;
   values[1] = y;
 };
 
 
+
 template <>
 inline
-Point<2>::Point (const double, const double, const double) {
+Point<2>::Point (const double, const double, const double) 
+{
   Assert (false, ExcInvalidConstructorCalled());
 };
 
 
+
 template <>
 inline
-Point<3>::Point (const double, const double) {
+Point<3>::Point (const double, const double) 
+{
   Assert (false, ExcInvalidConstructorCalled());
 };
 
 
+
 template <>
 inline
-Point<3>::Point (const double x, const double y, const double z) {
+Point<3>::Point (const double x, const double y, const double z) 
+{
   values[0] = x;
   values[1] = y;
   values[2] = z;
 };
 
 
+
 template <>
 inline
-Point<4>::Point (const double, const double) {
+Point<4>::Point (const double, const double) 
+{
   Assert (false, ExcInvalidConstructorCalled());
 };
 
 
+
 template <>
 inline
-Point<4>::Point (const double, const double, const double) {
+Point<4>::Point (const double, const double, const double) 
+{
   Assert (false, ExcInvalidConstructorCalled());
 };
+
 
 
 template <int dim>
 inline
-double Point<dim>::operator () (const unsigned int index) const {
+double Point<dim>::operator () (const unsigned int index) const
+ {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
 
 
+
 template <int dim>
 inline
-double & Point<dim>::operator () (const unsigned int index) {
+double & Point<dim>::operator () (const unsigned int index) 
+{
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
 
 
+
 template <int dim>
 inline
-Point<dim> Point<dim>::operator + (const Point<dim> &p) const {
+Point<dim> Point<dim>::operator + (const Point<dim> &p) const 
+{
   return (Point<dim>(*this) += p);
 };
 
 
+
 template <int dim>
 inline
-Point<dim> Point<dim>::operator - (const Point<dim> &p) const {
+Point<dim> Point<dim>::operator - (const Point<dim> &p) const 
+{
   return (Point<dim>(*this) -= p);
 };
 
 
+
 template <int dim>
 inline
-Point<dim> Point<dim>::operator * (const double factor) const {
+Point<dim> Point<dim>::operator * (const double factor) const 
+{
   return (Point<dim>(*this) *= factor);
 };
 
 
+
 template <int dim>
 inline
-double Point<dim>::operator * (const Point<dim> &p) const {
+double Point<dim>::operator * (const Point<dim> &p) const 
+{
 				   // simply pass down
   return Tensor<1,dim>::operator * (p);
 };
 
 
-template <int dim>
-inline
-Point<dim> operator * (const double factor, const Point<dim> &p) {
-  return p*factor;
-};
 
 
 template <int dim>
 inline
-Point<dim> Point<dim>::operator / (const double factor) const {
-  return (Point<dim>(*this) /= factor);
-};
-
-
-template <int dim>
-inline
-double Point<dim>::square () const {
+double Point<dim>::square () const 
+{
   double q=0;
   for (unsigned int i=0; i<dim; ++i)
     q += values[i] * values[i];
   return q;
 };
+
+
+
+template <int dim>
+inline
+Point<dim> Point<dim>::operator / (const double factor) const 
+{
+  return (Point<dim>(*this) /= factor);
+};
+
+
+
+/*------------------------------- Global functions: Point ---------------------------*/
+
+
+/**
+ * Global operator scaling a point vector by a scalar.
+ */
+template <int dim>
+inline
+Point<dim> operator * (const double factor, const Point<dim> &p) 
+{
+  return p*factor;
+};
+
 
 
 #endif
