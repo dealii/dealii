@@ -306,6 +306,55 @@ void ConstantFunction<dim>::vector_value_list (const vector<Point<dim> > &points
 };
 
 
+template <int dim>
+double Function<dim>::laplacian (const Point<dim> &,
+			     const unsigned int) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return 0;
+}
+
+
+
+template <int dim>
+void Function<dim>::vector_laplacian (const Point<dim> &,
+				  Vector<double>   &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+}
+
+
+
+template <int dim>
+void Function<dim>::laplacian_list (const vector<Point<dim> > &points,
+				vector<double>            &laplacians,
+				const unsigned int         component) const
+{
+				   // check whether component is in
+				   // the valid range is up to the
+				   // derived class
+  Assert (laplacians.size() == points.size(),
+	  ExcVectorHasWrongSize(laplacians.size(), points.size()));
+
+  for (unsigned int i=0; i<points.size(); ++i)
+    laplacians[i]  = this->laplacian (points[i], component);
+}
+
+
+
+template <int dim>
+void Function<dim>::vector_laplacian_list (const vector<Point<dim> > &points,
+				       vector<Vector<double> >   &laplacians) const
+{
+				   // check whether component is in
+				   // the valid range is up to the
+				   // derived class
+  Assert (laplacians.size() == points.size(),
+	  ExcVectorHasWrongSize(laplacians.size(), points.size()));
+
+  for (unsigned int i=0; i<points.size(); ++i)
+    this->vector_laplacian (points[i], laplacians[i]);
+}
 
 
 // explicit instantiations
