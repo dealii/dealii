@@ -23,6 +23,9 @@ lib-path-base  = $D/base/lib
 lib-path-lac   = $D/lac/lib
 lib-path-deal2 = $D/deal.II/lib
 
+LIBPATH        = -L$(lib-path-base) -L$(lib-path-lac) -L$(lib-path-deal2)
+
+
 # add search path for libraries for make dependencies
 
 vpath %.a $(lib-path-base)
@@ -42,11 +45,13 @@ INCLUDE     += $(base-include) $(lac-include) $(deal-include)
 CXXFLAGS.g   = -DDEBUG -ggdb -Wall -W -Wconversion \
                -Winline -Woverloaded-virtual\
 	       -ftemplate-depth-32\
-               $(INCLUDE)
+               $(INCLUDE) \
+	       $(LIBPATH)
 CXXFLAGS.o   = -O2 -Wuninitialized -ffast-math \
                -felide-constructors -fnonnull-objects \
 	       -ftemplate-depth-32 \
-               $(INCLUDE)
+               $(INCLUDE) \
+	       $(LIBPATH)
 
 
 # if not egcs-1.1 we can use additional flags for which that compiler
