@@ -128,7 +128,22 @@ sub make_include_tree {
 		}
 	    } else {
 		# included by "..."
-		# only append file if it exists
+		# only append file if it exists or can be found
+
+		# first find out the path of the present file
+		# and then join the path to the included one
+		if ($filename =~ /\//){
+		    $path = $filename;
+		    # strip filename, leave path
+		    $path =~ s!/[^/]*$!/!g;
+		}
+		else
+		{
+		    $path = "./";
+		}
+		    
+		$include = $path . $include;
+
 		if (-r $include) {
 		    $include_files{$filename} =
 			join (' ', $include, $include_files{$filename});
