@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,17 +17,22 @@
 // TYPEMAT and TYPEVEC are defined in sparsematrix?.cc
 
 template void SparseMatrix<TYPEMAT>::
-vmult<TYPEVEC> (Vector<TYPEVEC> &,
-                const Vector<TYPEVEC> &) const;
+vmult (Vector<TYPEVEC> &, const Vector<TYPEVEC> &) const;
 template void SparseMatrix<TYPEMAT>::
-Tvmult<TYPEVEC> (Vector<TYPEVEC> &,
-                 const Vector<TYPEVEC> &) const;
+Tvmult (Vector<TYPEVEC> &, const Vector<TYPEVEC> &) const;
 template void SparseMatrix<TYPEMAT>::
-vmult_add<TYPEVEC> (Vector<TYPEVEC> &,
-                    const Vector<TYPEVEC> &) const;
+vmult_add (Vector<TYPEVEC> &, const Vector<TYPEVEC> &) const;
 template void SparseMatrix<TYPEMAT>::
-Tvmult_add<TYPEVEC> (Vector<TYPEVEC> &,
-                     const Vector<TYPEVEC> &) const;
+Tvmult_add (Vector<TYPEVEC> &, const Vector<TYPEVEC> &) const;
+
+template void SparseMatrix<TYPEMAT>::
+vmult (BlockVector<TYPEVEC> &, const BlockVector<TYPEVEC> &) const;
+template void SparseMatrix<TYPEMAT>::
+Tvmult (BlockVector<TYPEVEC> &, const BlockVector<TYPEVEC> &) const;
+template void SparseMatrix<TYPEMAT>::
+vmult_add (BlockVector<TYPEVEC> &, const BlockVector<TYPEVEC> &) const;
+template void SparseMatrix<TYPEMAT>::
+Tvmult_add (BlockVector<TYPEVEC> &, const BlockVector<TYPEVEC> &) const;
 
 template TYPEVEC
 SparseMatrix<TYPEMAT>::

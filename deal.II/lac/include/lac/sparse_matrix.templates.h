@@ -277,10 +277,10 @@ SparseMatrix<number>::add_scaled (const number factor,
 
 
 template <typename number>
-template <typename somenumber>
+template <class OutVector, class InVector>
 void
-SparseMatrix<number>::vmult (Vector<somenumber>& dst,
-			     const Vector<somenumber>& src) const
+SparseMatrix<number>::vmult (OutVector& dst,
+			     const InVector& src) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -314,13 +314,13 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst,
 				       // correct type right away:
       typedef
 	void (SparseMatrix<number>::*mem_fun_p)
-	(Vector<somenumber> &,
-	 const Vector<somenumber> &,
+	(OutVector &,
+	 const InVector &,
 	 const unsigned int        ,
 	 const unsigned int) const;
       const mem_fun_p comp
 	= (&SparseMatrix<number>::
-           template threaded_vmult<somenumber>);
+           template threaded_vmult<InVector,OutVector>);
       Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
 	threads += Threads::spawn (*this, comp) (dst, src,
@@ -336,10 +336,10 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst,
 				       // do it in an oldfashioned way
       const number       *val_ptr    = &val[cols->rowstart[0]];
       const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-      somenumber         *dst_ptr    = &dst(0);
+      typename OutVector::iterator dst_ptr = dst.begin();
       for (unsigned int row=0; row<n_rows; ++row)
 	{
-	  somenumber s = 0.;
+	  typename OutVector::value_type s = 0.;
 	  const number *const val_end_of_row = &val[cols->rowstart[row+1]];
 	  while (val_ptr != val_end_of_row)
 	    s += *val_ptr++ * src(*colnum_ptr++);
@@ -350,10 +350,10 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst,
 
 
 template <typename number>
-template <typename somenumber>
+template <class OutVector, class InVector>
 void
-SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
-				      const Vector<somenumber> &src,
+SparseMatrix<number>::threaded_vmult (OutVector       &dst,
+				      const InVector &src,
 				      const unsigned int        begin_row,
 				      const unsigned int        end_row) const
 {
@@ -363,10 +363,10 @@ SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 
   const number       *val_ptr    = &val[cols->rowstart[begin_row]];
   const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
-  somenumber         *dst_ptr    = &dst(begin_row);
+  typename OutVector::iterator dst_ptr = dst.begin() + begin_row;
   for (unsigned int row=begin_row; row<end_row; ++row)
     {
-      somenumber s = 0.;
+      typename OutVector::value_type s = 0.;
       const number *const val_end_of_row = &val[cols->rowstart[row+1]];
       while (val_ptr != val_end_of_row)
 	s += *val_ptr++ * src(*colnum_ptr++);
@@ -376,10 +376,10 @@ SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 
 
 template <typename number>
-template <typename somenumber>
+template <class OutVector, class InVector>
 void
-SparseMatrix<number>::Tvmult (Vector<somenumber>& dst,
-                              const Vector<somenumber>& src) const
+SparseMatrix<number>::Tvmult (OutVector& dst,
+                              const InVector& src) const
 {
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols != 0, ExcMatrixNotInitialized());
@@ -402,10 +402,10 @@ SparseMatrix<number>::Tvmult (Vector<somenumber>& dst,
 
 
 template <typename number>
-template <typename somenumber>
+template <class OutVector, class InVector>
 void
-SparseMatrix<number>::vmult_add (Vector<somenumber>& dst,
-                                 const Vector<somenumber>& src) const
+SparseMatrix<number>::vmult_add (OutVector& dst,
+                                 const InVector& src) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -417,10 +417,10 @@ SparseMatrix<number>::vmult_add (Vector<somenumber>& dst,
   const unsigned int  n_rows     = m();
   const number       *val_ptr    = &val[cols->rowstart[0]];
   const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-  somenumber         *dst_ptr    = &dst(0);
+  typename OutVector::iterator dst_ptr    = dst.begin();
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      somenumber s = 0.;
+      typename OutVector::value_type s = 0.;
       const number *const val_end_of_row = &val[cols->rowstart[row+1]];
       while (val_ptr != val_end_of_row)
 	s += *val_ptr++ * src(*colnum_ptr++);
@@ -430,10 +430,10 @@ SparseMatrix<number>::vmult_add (Vector<somenumber>& dst,
 
 
 template <typename number>
-template <typename somenumber>
+template <class OutVector, class InVector>
 void
-SparseMatrix<number>::Tvmult_add (Vector<somenumber>& dst,
-                                  const Vector<somenumber>& src) const
+SparseMatrix<number>::Tvmult_add (OutVector& dst,
+                                  const InVector& src) const
 {
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols != 0, ExcMatrixNotInitialized());

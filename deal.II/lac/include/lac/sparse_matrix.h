@@ -370,18 +370,20 @@ namespace internals
   }
 }
 
+//TODO: Add multithreading to the other vmult functions.
 
 /**
- * Sparse matrix. This class implements the function to store values in the
- * locations of a sparse matrix denoted by a @ref SparsityPattern. The
- * separation of sparsity pattern and values is done since one can store data
- * elements of different type in these locations without the SparsityPattern
- * having to know this, and more importantly one can associate more than one
- * matrix with the same sparsity pattern.
+ * Sparse matrix. This class implements the function to store values
+ * in the locations of a sparse matrix denoted by a
+ * SparsityPattern. The separation of sparsity pattern and values is
+ * done since one can store data elements of different type in these
+ * locations without the SparsityPattern having to know this, and more
+ * importantly one can associate more than one matrix with the same
+ * sparsity pattern.
  *
  * @ref Instantiations some
  
- * @author several, 1994-2003
+ * @author several, 1994-2004
  */
 template <typename number>
 class SparseMatrix : public virtual Subscriptor
@@ -907,9 +909,9 @@ class SparseMatrix : public virtual Subscriptor
                                       * Source and destination must
                                       * not be the same vector.
 				      */
-    template <typename somenumber>
-    void vmult (Vector<somenumber>       &dst,
-		const Vector<somenumber> &src) const;
+    template <class OutVector, class InVector>
+    void vmult (OutVector& dst,
+		const InVector& src) const;
     
 				     /**
 				      * Matrix-vector multiplication:
@@ -922,9 +924,9 @@ class SparseMatrix : public virtual Subscriptor
                                       * Source and destination must
                                       * not be the same vector.
 				      */
-    template <typename somenumber>
-    void Tvmult (Vector<somenumber>       &dst,
-		 const Vector<somenumber> &src) const;
+    template <class OutVector, class InVector>
+    void Tvmult (OutVector& dst,
+		 const InVector& src) const;
   
 				     /**
 				      * Adding Matrix-vector
@@ -936,9 +938,9 @@ class SparseMatrix : public virtual Subscriptor
                                       * Source and destination must
                                       * not be the same vector.
 				      */
-    template <typename somenumber>
-    void vmult_add (Vector<somenumber>       &dst,
-		    const Vector<somenumber> &src) const;
+    template <class OutVector, class InVector>
+    void vmult_add (OutVector& dst,
+		    const InVector& src) const;
     
 				     /**
 				      * Adding Matrix-vector
@@ -953,9 +955,9 @@ class SparseMatrix : public virtual Subscriptor
                                       * Source and destination must
                                       * not be the same vector.
 				      */
-    template <typename somenumber>
-    void Tvmult_add (Vector<somenumber>       &dst,
-		     const Vector<somenumber> &src) const;
+    template <class OutVector, class InVector>
+    void Tvmult_add (OutVector& dst,
+		     const InVector& src) const;
   
 				     /**
 				      * Return the square of the norm
@@ -1508,9 +1510,9 @@ class SparseMatrix : public virtual Subscriptor
 				      * in the case of enabled
 				      * multithreading.
 				      */
-    template <typename somenumber>
-    void threaded_vmult (Vector<somenumber>       &dst,
-			 const Vector<somenumber> &src,
+    template <class OutVector, class InVector>
+    void threaded_vmult (OutVector& dst,
+			 const InVector& src,
 			 const unsigned int        begin_row,
 			 const unsigned int        end_row) const;
 
