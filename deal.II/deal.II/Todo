@@ -148,3 +148,5 @@ Review DoFCellAccessor<dim>::get_interpolated_dof_values: it may be
   really be written but are not because the nodal value was zero.
 
 
+Check optimized code with -Winline and act accordingly. Unfortunately,
+  most warnings are from the STL.

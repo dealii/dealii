@@ -1,6 +1,6 @@
 /* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
-
+/* Copyright W. Bangerth, Guido Kanschat, Stefan Nauber  */
+/* University of Heidelberg, 1998, 1999                  */
 
 #include <basic/data_io.h>
 #include <grid/dof.h>
@@ -703,7 +703,7 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 
 
 template <>
-void DataOut<2>::write_povray (ostream &out) const {
+void DataOut<2>::write_povray_mesh (ostream &out) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
 
   				   // write preamble
@@ -738,18 +738,20 @@ void DataOut<2>::write_povray (ostream &out) const {
 
 				   // declare standard texture
   out << "#declare default_texture = texture {"         << endl
-      << "        pigment { color rgb<0.2, 0.2, 0.8> }" << endl
-      << "        finish  { ambient 0.2 diffuse 0.5  }" << endl
+      << "        pigment { color White }" << endl
+      << "        finish  { ambient 0.2 diffuse 0.6 specular 0.5 }" << endl
       << "}" << endl << endl;				
 
 				   // write camera and light sources
   out << "camera {"                  << endl
-      << "  location <-1, -3, 2>"    << endl
-      << "  look_at  <1.5, 3.5, -2>" << endl
+      << "  location <8, 10, -20>"    << endl
+      << "  angle 7" << endl
+      << "  look_at  <0., 0., 0.>" << endl
+      << "  sky  <0., 0., 1.>" << endl
       << "}"                         << endl
       << endl
       << "light_source {"            << endl
-      << "  <-1, 2, 2> White"        << endl
+      << "  <20, 20, -20> White"        << endl
       << "}"                         << endl
       << endl;
       
@@ -763,28 +765,35 @@ void DataOut<2>::write_povray (ostream &out) const {
   for (cell=dofs->begin_active(); cell!=endc; ++cell) 
     {
 				       // write cell as two triangles
+				       // y and z coordinates are switched
       out << "  triangle { ";
-      out << '<' << cell->vertex(0)(0) << ',' << cell->vertex(0)(1) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(0,0))           << '>'
+      out << '<' << cell->vertex(0)(0) << ','
+	  << (*data[0].data)(cell->vertex_dof_index(0,0)) << ','
+	  << cell->vertex(0)(1) << '>'
 	  << ", "
-	  << '<' << cell->vertex(1)(0) << ',' << cell->vertex(1)(1) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(1,0))           << '>'
+	  << '<' << cell->vertex(1)(0) << ','
+	  << (*data[0].data)(cell->vertex_dof_index(1,0)) << ','
+	  << cell->vertex(1)(1) << '>'
 	  << ", "
-	  << '<' << cell->vertex(2)(0) << ',' << cell->vertex(2)(1) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(2,0))           << '>'
+	  << '<' << cell->vertex(2)(0) << ','
+	  << (*data[0].data)(cell->vertex_dof_index(2,0)) << ','
+	  << cell->vertex(2)(1) << '>'
 	  << endl
 	  << "              texture { default_texture }"   << endl
 	  << "           }"
 	  << endl;
       out << "  triangle { ";
-      out << '<' << cell->vertex(0)(0) << ',' << cell->vertex(0)(1) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(0,0))           << '>'
+      out << '<' << cell->vertex(0)(0) << ','
+	  << (*data[0].data)(cell->vertex_dof_index(0,0)) << ','
+	  << cell->vertex(0)(1) << '>'
 	  << ", "
-	  << '<' << cell->vertex(2)(0) << ',' << cell->vertex(2)(1) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(2,0))           << '>'
+	  << '<' << cell->vertex(2)(0) << ','
+	  << (*data[0].data)(cell->vertex_dof_index(2,0)) << ','
+	  << cell->vertex(2)(1) << '>'
 	  << ", "
-	  << '<' << cell->vertex(3)(0) << ',' << cell->vertex(3)(1) << ','
-	  << (*data[0].data)(cell->vertex_dof_index(3,0))           << '>'
+	  << '<' << cell->vertex(3)(0) << ','
+	  << (*data[0].data)(cell->vertex_dof_index(3,0)) << ','
+	  << cell->vertex(3)(1) << '>'
 	  << endl
 	  << "              texture { default_texture }"   << endl
 	  << "           }"
@@ -795,46 +804,217 @@ void DataOut<2>::write_povray (ostream &out) const {
   AssertThrow (out, ExcIO());
 };
 
+template <>
+void DataOut<2>::write_epsgrid (ostream &out) const {
+  Assert (dofs != 0, ExcNoDoFHandlerSelected());
+  
+  // write preamble
+  if (true) 
+    {
+      // block this to have local
+      // variables destroyed after
+      // use
+      time_t  time1= time (0);
+      tm     *time = localtime(&time1); 
+      out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
+	  << "%%Title: Deal Output" << endl
+	  << "%%Creator: the deal.II library" << endl
+	  << "%%Creation Date: " 
+	  << time->tm_year+1900 << "/"
+	  << time->tm_mon+1 << "/"
+	  << time->tm_mday << " - "
+	  << time->tm_hour << ":"
+	  << setw(2) << time->tm_min << ":"
+	  << setw(2) << time->tm_sec << endl
+	  << "%%BoundingBox: 0 0 310 310" << endl;
+    };  
+
+  // Get scaling factors for Bounding Box 310 x 310
+  
+  DoFHandler<2>::active_cell_iterator cell;
+  DoFHandler<2>::active_cell_iterator endc = dofs->end();
+  double x, y, xmin=0, xmax=0, ymin=0, ymax=0, scale, xofs, yofs;
+  int i;
+
+  for (cell=dofs->begin_active(); cell!=endc; ++cell)
+    {
+      for (i=0; i<4; i++)
+	{
+	  x=cell->vertex(i)(0);
+	  y=cell->vertex(i)(1);
+	  xmin = ( x < xmin ? x : xmin );
+	  xmax = ( x > xmax ? x : xmax );
+	  ymin = ( y < ymin ? y : ymin );
+	  ymax = ( y > ymax ? y : ymax );
+	}
+    }
+  x = xmax - xmin;
+  y = ymax - ymin;
+  scale = 300 / (x > y ? x : y);
+  xofs = -(xmin*scale)+5;
+  yofs = -(ymin*scale)+5;
+
+  for (cell=dofs->begin_active(); cell!=endc; ++cell) 
+    {
+      out << (cell->vertex(0)(0))*scale+xofs << " " 
+	  << (cell->vertex(0)(1))*scale+yofs << " moveto "
+	  << (cell->vertex(1)(0))*scale+xofs << " " 
+	  << (cell->vertex(1)(1))*scale+yofs << " lineto "
+	  << (cell->vertex(2)(0))*scale+xofs << " " 
+	  << (cell->vertex(2)(1))*scale+yofs << " lineto "
+	  << (cell->vertex(3)(0))*scale+xofs << " " 
+	  << (cell->vertex(3)(1))*scale+yofs << " lineto "
+	  << (cell->vertex(0)(0))*scale+xofs << " " 
+	  << (cell->vertex(0)(1))*scale+yofs << " lineto "
+	  << " closepath stroke" << endl;
+    };
+  out << "showpage" << endl;     
+
+  AssertThrow (out, ExcIO());
+};
       
+template <>
+void DataOut<2>::write_eps (ostream &out) const {
+  Assert (dofs != 0, ExcNoDoFHandlerSelected());
+  
+  // write preamble
+  if (true) 
+    {
+      // block this to have local
+      // variables destroyed after
+      // use
+      time_t  time1= time (0);
+      tm     *time = localtime(&time1); 
+      out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
+	  << "%%Title: Deal Output" << endl
+	  << "%%Creator: the deal.II library" << endl
+	  << "%%Creation Date: " 
+	  << time->tm_year+1900 << "/"
+	  << time->tm_mon+1 << "/"
+	  << time->tm_mday << " - "
+	  << time->tm_hour << ":"
+	  << setw(2) << time->tm_min << ":"
+	  << setw(2) << time->tm_sec << endl
+	  << "%%BoundingBox: -220 -261 220 450" << endl;
+    };  
+
+  // Get scaling factors for Bounding Box 310 x 310
+  
+  DoFHandler<2>::active_cell_iterator cell;
+  DoFHandler<2>::active_cell_iterator endc = dofs->end();
+
+  double x, y, z, xmin=0, xmax=0, ymin=0, ymax=0, zmin=0, zmax=0, zscale, scale, xofs, yofs;
+  double cx[4], cy[4], cz[4];
+  int i;
+
+  for (cell=dofs->begin_active(); cell!=endc; ++cell)
+    {
+      for (i=0; i<4; i++)
+	{
+	  x=cell->vertex(i)(0);
+	  y=cell->vertex(i)(1);
+	  z=(*data[0].data)(cell->vertex_dof_index(i,0));
+	  xmin = ( x < xmin ? x : xmin );
+	  xmax = ( x > xmax ? x : xmax );
+	  ymin = ( y < ymin ? y : ymin );
+	  ymax = ( y > ymax ? y : ymax );
+	  zmin = ( z < zmin ? z : zmin );
+	  zmax = ( z > zmax ? z : zmax );
+	}
+    }
+  x = xmax - xmin;
+  y = ymax - ymin;
+  z = zmax - zmin;
+  zscale = (x>y ? x : y)/z;
+  scale = 300 / (x > y ? x : y);
+  xofs = -(xmin*scale)+5;
+  yofs = -(ymin*scale)+5;
+
+
+  for (cell=dofs->begin_active(); cell!=endc; ++cell) 
+    {
+      cx[0]=cell->vertex(0)(0); cy[0]=cell->vertex(0)(1); cz[0]=(*data[0].data)(cell->vertex_dof_index(0,0))*zscale;
+      cx[1]=cell->vertex(1)(0); cy[1]=cell->vertex(1)(1); cz[1]=(*data[0].data)(cell->vertex_dof_index(1,0))*zscale;;
+      cx[2]=cell->vertex(2)(0); cy[2]=cell->vertex(2)(1); cz[2]=(*data[0].data)(cell->vertex_dof_index(2,0))*zscale;;
+      cx[3]=cell->vertex(3)(0); cy[3]=cell->vertex(3)(1); cz[3]=(*data[0].data)(cell->vertex_dof_index(3,0))*zscale;;
+      
+      // Turn and scale
+
+      for (i=0;i<4;i++)
+	{
+	  // x =  0.707 * cx[i] - 0.707 * cy[i] + 0.000 * cz[i];
+	  // y =  0.354 * cx[i] + 0.354 * cy[i] + 0.866 * cz[i];
+	  // z = -0.559 * cx[i] - 0.559 * cy[i] + 0.500 * cz[i];
+
+	  x = 0.707 * (cx[i] - cy[i]);
+	  y = 0.354 * (cx[i] + cy[i]) + 0.866 * cz[i];
+
+	  cx[i]=x*scale+xofs;
+	  cy[i]=y*scale+yofs;
+	}
+
+      out << cx[0] << " " << cy[0] << " moveto "
+	  << cx[1] << " " << cy[1] << " lineto "
+	  << cx[2] << " " << cy[2] << " lineto "
+	  << cx[3] << " " << cy[3] << " lineto "
+	  << cx[0] << " " << cy[0] << " lineto "
+	  << " closepath stroke" << endl;
+    };
+  out << "showpage" << endl;     
+
+  AssertThrow (out, ExcIO());
+};
+
 
 template <int dim>
 void DataOut<dim>::write (ostream &out,
 			  const OutputFormat output_format) const {
   switch (output_format) 
     {
-      case ucd:
-	    write_ucd (out);
-	    break;
-      case gnuplot:
-	    write_gnuplot (out);
-	    break;
-      case gnuplot_draft:
-	    write_gnuplot_draft (out);
-	    break;
-      case povray:
-	    write_povray (out);
-	    break;
-      default:
-	    Assert (false, ExcNotImplemented());
+    case ucd:
+      write_ucd (out);
+      break;
+    case gnuplot:
+      write_gnuplot (out);
+      break;
+    case gnuplot_draft:
+      write_gnuplot_draft (out);
+      break;
+    case povray_mesh:
+      write_povray_mesh (out);
+      break;
+    case eps:
+      write_eps(out);
+      break;
+    case epsgrid:
+      write_epsgrid(out);
+      break;
+    default:
+      Assert (false, ExcNotImplemented());
     };
 };
 
 
 
 template <int dim>
-string DataOut<dim>::default_suffix (const OutputFormat output_format) {
+string DataOut<dim>::default_suffix (const OutputFormat output_format) 
+{
   switch (output_format) 
     {
-      case ucd:
-	    return ".inp";
-      case gnuplot:
-      case gnuplot_draft:
-	    return ".gnuplot";
-      case povray:
-	    return ".pov";
-      default:
-	    Assert (false, ExcNotImplemented());
-	    return "";
+    case ucd:
+      return ".inp";
+    case gnuplot: 
+    case gnuplot_draft: 
+      return ".gnuplot";
+    case povray_mesh: 
+      return ".pov";
+    case eps: 
+      return ".eps";
+    case epsgrid: 
+      return ".eps";
+    default: 
+      Assert (false, ExcNotImplemented()); 
+      return "";
     };
 };
   
@@ -852,8 +1032,14 @@ DataOut<dim>::parse_output_format (const string format_name) {
   if (format_name == "gnuplot draft")
     return gnuplot_draft;
 
-  if (format_name == "povray")
-    return povray;
+  if (format_name == "povray mesh")
+    return povray_mesh;
+
+  if (format_name == "eps")
+    return eps;
+
+  if (format_name == "epsgrid")
+    return epsgrid;
 
   AssertThrow (false, ExcInvalidState ());
 };
@@ -862,7 +1048,7 @@ DataOut<dim>::parse_output_format (const string format_name) {
 
 template <int dim>
 string DataOut<dim>::get_output_format_names () {
-  return "ucd|gnuplot|gnuplot draft|povray";
+  return "ucd|gnuplot|gnuplot draft|povray mesh|eps|epsgrid";
 };
 
 

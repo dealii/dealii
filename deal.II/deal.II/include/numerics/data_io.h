@@ -287,7 +287,7 @@ class DataIn {
  * also plot discontinuities, if they are there.
  *
  *
- * \subsection{POVRAY format}
+ * \subsection{POVRAY mesh format}
  *
  * POVRAY is a ray tracing tool in the public domain and poduces high quality
  * images of three dimensional scenes. Since this tool can handle only one
@@ -301,8 +301,15 @@ class DataIn {
  * support bilinear quadrilaterals and using polygons as vastly suboptimal in
  * term of memory and speed to the triangle mesh supported by POVRAY.
  *
+ * \subsection{Encapsulated Postscript format}
  *
- * @author Wolfgang Bangerth, 1998; GNUPLOT 'quality' format by Guido Kanschat with documentation by Wolfgang Bangerth, 1998
+ * There exist two functions for generating encapsulated Postscript
+ * (EPS) without the need for another graphics tool.
+ * #write_epsgrid# writes just the 2d grid. The function
+ * #write_eps# uses the first data vector to produce a surface plot.
+ *
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat, Stefan Nauber, 1998, 1999
  */
 template <int dim>  
 class DataOut {
@@ -311,7 +318,7 @@ class DataOut {
 				      * Provide a data type specifying the
 				      * presently supported output formats.
 				      */
-    enum OutputFormat { ucd, gnuplot, gnuplot_draft, povray };
+    enum OutputFormat { ucd, gnuplot, gnuplot_draft, povray_mesh, eps, epsgrid };
     
 				     /**
 				      * Constructor
@@ -395,7 +402,19 @@ class DataOut {
 				      * Write data of first vector and grid
 				      * in POVRAY format.
 				      */
-    void write_povray (ostream &out) const;
+    void write_povray_mesh (ostream &out) const;
+
+				   /**
+				    * Write data of first vector and grid in
+				    * Encapsulated postscript format.
+				    */
+    void write_eps (ostream &out) const;
+
+				   /**
+				    *Write grid in Encapsulated
+				    * postscript format.
+				    */
+    void write_epsgrid (ostream &out) const;
 
 				     /**
 				      * Write data and grid to #out# according
@@ -405,8 +424,7 @@ class DataOut {
 				      *
 				      * In case of gnuplot output, the
 				      * standard accuracy of 1 is
-				      * chosen.
-				      */
+				      * chosen.  */
     void write (ostream &out, const OutputFormat output_format) const;
     
 				     /**
@@ -418,7 +436,7 @@ class DataOut {
 				      * \item #ucd#: #.inp#
 				      * \item #gnuplot# and #gnuplot_draft#:
 				      *    #.gnuplot#
-				      * \item #povray#: #.pov#
+				      * \item #povray_mesh#: #.pov#
 				      * \end{itemize}
 				      *
 				      * Since this function does not need data
