@@ -1442,6 +1442,284 @@ namespace Threads
   
   
 /**
+ * Class to store the parameters of a function with 9 arguments. For more
+ * information on use and internals of this class see the report on
+ * multithreading.
+ *
+ * @author Wolfgang Bangerth, 2001
+ */
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
+  class FunData9 : public FunDataBase
+  {
+    public:
+				       /**
+					* Typedef a pointer to a global
+					* function which we will call
+					* from this class.
+					*/
+      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9);
+
+				       /**
+					* Constructor. Store pointer to
+					* the function and the values of
+					* the arguments.
+					*/
+      FunData9 (FunPtr fun_ptr,
+		Arg1   arg1,
+		Arg2   arg2,
+		Arg3   arg3,
+		Arg4   arg4,
+		Arg5   arg5,
+		Arg6   arg6,
+		Arg7   arg7,
+		Arg8   arg8,
+		Arg9   arg9);
+
+				       /**
+					* Copy constructor.
+					*/
+      FunData9 (const FunData9 &fun_data9);
+
+				       /**
+					* Virtual constructor.
+					*/
+      virtual FunDataBase * clone () const;
+
+    private:
+
+				       /**
+					* Pointer to the function to be
+					* called and values of the
+					* arguments to be passed.
+					*/
+      FunPtr fun_ptr;
+
+				       /**
+					* Values of the arguments of the
+					* function to be called.
+					*/
+      Arg1   arg1;
+      Arg2   arg2;
+      Arg3   arg3;
+      Arg4   arg4;
+      Arg5   arg5;
+      Arg6   arg6;
+      Arg7   arg7;
+      Arg8   arg8;
+      Arg9   arg9;
+      
+				       /**
+					* Static function used as entry
+					* point for the new thread.
+					*/
+      static void * thread_entry_point (void *arg);
+
+				       /**
+					* Helper class, used to collect
+					* the values of the parameters
+					* which we will pass to the
+					* function, once we know its
+					* type.
+					*/
+      class ArgCollector
+      {
+	public:
+					   /**
+					    * Typedef the function
+					    * pointer type of the
+					    * underlying class to a
+					    * local type.
+					    */
+	  typedef FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::FunPtr FunPtr;
+	
+					   /**
+					    * Constructor. Take and store a
+					    * pointer to the function which
+					    * is to be called.
+					    */
+	  ArgCollector (FunPtr fun_ptr);
+    
+					   /**
+					    * Take the arguments with
+					    * which we want to call the
+					    * function and produce and
+					    * object of the desired type
+					    * from that.
+					    */
+	  FunEncapsulation collect_args (Arg1 arg1,
+					 Arg2 arg2,
+					 Arg3 arg3,
+					 Arg4 arg4,
+					 Arg5 arg5,
+					 Arg6 arg6,
+					 Arg7 arg7,
+					 Arg8 arg8,
+					 Arg9 arg9);
+    
+	private:
+					   /**
+					    * Space to temporarily store
+					    * the function pointer.
+					    */
+	  FunPtr fun_ptr;
+      };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_>
+      friend
+      typename FunData9<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
+				   Arg4_, Arg5_, Arg6_,
+				   Arg7_, Arg8_, Arg9_));
+  };
+  
+  
+/**
+ * Class to store the parameters of a function with 10 arguments. For more
+ * information on use and internals of this class see the report on
+ * multithreading.
+ *
+ * @author Wolfgang Bangerth, 2001
+ */
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  class FunData10 : public FunDataBase
+  {
+    public:
+				       /**
+					* Typedef a pointer to a global
+					* function which we will call
+					* from this class.
+					*/
+      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10);
+
+				       /**
+					* Constructor. Store pointer to
+					* the function and the values of
+					* the arguments.
+					*/
+      FunData10 (FunPtr fun_ptr,
+		 Arg1   arg1,
+		 Arg2   arg2,
+		 Arg3   arg3,
+		 Arg4   arg4,
+		 Arg5   arg5,
+		 Arg6   arg6,
+		 Arg7   arg7,
+		 Arg8   arg8,
+		 Arg9   arg9,
+		 Arg10  arg10);
+
+				       /**
+					* Copy constructor.
+					*/
+      FunData10 (const FunData10 &fun_data10);
+
+				       /**
+					* Virtual constructor.
+					*/
+      virtual FunDataBase * clone () const;
+
+    private:
+
+				       /**
+					* Pointer to the function to be
+					* called and values of the
+					* arguments to be passed.
+					*/
+      FunPtr fun_ptr;
+
+				       /**
+					* Values of the arguments of the
+					* function to be called.
+					*/
+      Arg1   arg1;
+      Arg2   arg2;
+      Arg3   arg3;
+      Arg4   arg4;
+      Arg5   arg5;
+      Arg6   arg6;
+      Arg7   arg7;
+      Arg8   arg8;
+      Arg9   arg9;
+      Arg10  arg10;
+      
+				       /**
+					* Static function used as entry
+					* point for the new thread.
+					*/
+      static void * thread_entry_point (void *arg);
+
+				       /**
+					* Helper class, used to collect
+					* the values of the parameters
+					* which we will pass to the
+					* function, once we know its
+					* type.
+					*/
+      class ArgCollector
+      {
+	public:
+					   /**
+					    * Typedef the function
+					    * pointer type of the
+					    * underlying class to a
+					    * local type.
+					    */
+	  typedef FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::FunPtr FunPtr;
+	
+					   /**
+					    * Constructor. Take and store a
+					    * pointer to the function which
+					    * is to be called.
+					    */
+	  ArgCollector (FunPtr fun_ptr);
+    
+					   /**
+					    * Take the arguments with
+					    * which we want to call the
+					    * function and produce and
+					    * object of the desired type
+					    * from that.
+					    */
+	  FunEncapsulation collect_args (Arg1 arg1,
+					 Arg2 arg2,
+					 Arg3 arg3,
+					 Arg4 arg4,
+					 Arg5 arg5,
+					 Arg6 arg6,
+					 Arg7 arg7,
+					 Arg8 arg8,
+					 Arg9 arg9,
+					 Arg10 arg10);
+    
+	private:
+					   /**
+					    * Space to temporarily store
+					    * the function pointer.
+					    */
+	  FunPtr fun_ptr;
+      };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_, typename Arg10_>
+      friend
+      typename FunData10<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,Arg10_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
+				   Arg4_, Arg5_, Arg6_,
+				   Arg7_, Arg8_, Arg9_,
+				   Arg10_));
+  };
+  
+  
+/**
  * Class to store the parameters of a void function. For more
  * information on use and internals of this class see the report on
  * multithreading.
@@ -2578,6 +2856,38 @@ namespace Threads
 
 
 				   /**
+				    * Encapsulate a function pointer
+				    * into an object with which a new
+				    * thread can later be spawned.
+				    * For more information on use and
+				    * internals of this class see the
+				    * report on multithreading.
+				    *
+				    * This function exists once for
+				    * each number of parameters.
+				    */
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
+  typename FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
+  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9));
+
+
+				   /**
+				    * Encapsulate a function pointer
+				    * into an object with which a new
+				    * thread can later be spawned.
+				    * For more information on use and
+				    * internals of this class see the
+				    * report on multithreading.
+				    *
+				    * This function exists once for
+				    * each number of parameters.
+				    */
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
+  typename FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
+  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10));
+
+
+				   /**
 				    * Encapsulate a member function
 				    * pointer into an object with
 				    * which a new thread can later be
@@ -3562,15 +3872,16 @@ namespace Threads
 /* ---------------------- FunData8 implementation ------------------------ */
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::FunData8 (FunPtr fun_ptr,
-								       Arg1   arg1,
-								       Arg2   arg2,
-								       Arg3   arg3,
-								       Arg4   arg4,
-								       Arg5   arg5,
-								       Arg6   arg6,
-								       Arg7   arg7,
-								       Arg8   arg8) :
+  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::
+  FunData8 (FunPtr fun_ptr,
+	    Arg1   arg1,
+	    Arg2   arg2,
+	    Arg3   arg3,
+	    Arg4   arg4,
+	    Arg5   arg5,
+	    Arg6   arg6,
+	    Arg7   arg7,
+	    Arg8   arg8) :
 		  FunDataBase (&FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::thread_entry_point),
 		  fun_ptr (fun_ptr),
 		  arg1 (arg1),
@@ -3586,7 +3897,8 @@ namespace Threads
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::FunData8 (const FunData8 &fun_data) :
+  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::
+  FunData8 (const FunData8 &fun_data) :
 		  FunDataBase (fun_data),
 		  fun_ptr (fun_data.fun_ptr),
 		  arg1 (fun_data.arg1),
@@ -3670,6 +3982,261 @@ namespace Threads
     return new FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>(fun_ptr, arg1, arg2,
 								      arg3, arg4, arg5, arg6,
 								      arg7, arg8);
+  };
+ 
+  
+
+/* ---------------------- FunData9 implementation ------------------------ */
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
+  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::
+  FunData9 (FunPtr fun_ptr,
+	    Arg1   arg1,
+	    Arg2   arg2,
+	    Arg3   arg3,
+	    Arg4   arg4,
+	    Arg5   arg5,
+	    Arg6   arg6,
+	    Arg7   arg7,
+	    Arg8   arg8,
+	    Arg9   arg9) :
+		  FunDataBase (&FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::thread_entry_point),
+		  fun_ptr (fun_ptr),
+		  arg1 (arg1),
+		  arg2 (arg2),
+		  arg3 (arg3),
+		  arg4 (arg4),
+		  arg5 (arg5),
+		  arg6 (arg6),
+		  arg7 (arg7),
+		  arg8 (arg8),
+		  arg9 (arg9)
+  {};
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
+  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::
+  FunData9 (const FunData9 &fun_data) :
+		  FunDataBase (fun_data),
+		  fun_ptr (fun_data.fun_ptr),
+		  arg1 (fun_data.arg1),
+		  arg2 (fun_data.arg2),
+		  arg3 (fun_data.arg3),
+		  arg4 (fun_data.arg4),
+		  arg5 (fun_data.arg5),
+		  arg6 (fun_data.arg6),
+		  arg7 (fun_data.arg7),
+		  arg8 (fun_data.arg8),
+		  arg9 (fun_data.arg9)
+  {};
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
+  FunDataBase *
+  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::clone () const 
+  {
+    return new FunData9 (*this);
+  };
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
+  void *
+  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::thread_entry_point (void *arg) 
+  {
+				     // convenience typedef, since we
+				     // will need that class name
+				     // several times below
+    typedef FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType> ThisClass;
+  
+    FunEncapsulation *fun_encapsulation
+      = reinterpret_cast<FunEncapsulation*>(arg);
+    const ThisClass *fun_data
+      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
+
+				     // copy the parameters
+    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    Arg1              arg1    = fun_data->arg1;
+    Arg2              arg2    = fun_data->arg2;
+    Arg3              arg3    = fun_data->arg3;
+    Arg4              arg4    = fun_data->arg4;
+    Arg5              arg5    = fun_data->arg5;
+    Arg6              arg6    = fun_data->arg6;
+    Arg7              arg7    = fun_data->arg7;
+    Arg8              arg8    = fun_data->arg8;
+    Arg9              arg9    = fun_data->arg9;    
+
+
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
+    fun_data->lock.release ();
+
+				     // call the function
+    (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+  
+    return 0;
+  };
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
+  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
+		  fun_ptr (fun_ptr)
+  {};
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
+  FunEncapsulation
+  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::ArgCollector::
+  collect_args (Arg1 arg1,
+		Arg2 arg2,
+		Arg3 arg3,
+		Arg4 arg4,
+		Arg5 arg5,
+		Arg6 arg6,
+		Arg7 arg7,
+		Arg8 arg8,
+		Arg9 arg9)
+  {
+    return
+      new FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>
+      (fun_ptr, arg1, arg2,
+       arg3, arg4, arg5, arg6,
+       arg7, arg8, arg9);
+  };
+ 
+  
+
+/* ---------------------- FunData10 implementation ------------------------ */
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::
+  FunData10 (FunPtr fun_ptr,
+	     Arg1   arg1,
+	     Arg2   arg2,
+	     Arg3   arg3,
+	     Arg4   arg4,
+	     Arg5   arg5,
+	     Arg6   arg6,
+	     Arg7   arg7,
+	     Arg8   arg8,
+	     Arg9   arg9,
+	     Arg10  arg10) :
+		  FunDataBase (&FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::thread_entry_point),
+		  fun_ptr (fun_ptr),
+		  arg1 (arg1),
+		  arg2 (arg2),
+		  arg3 (arg3),
+		  arg4 (arg4),
+		  arg5 (arg5),
+		  arg6 (arg6),
+		  arg7 (arg7),
+		  arg8 (arg8),
+		  arg9 (arg9),
+		  arg10 (arg10)
+  {};
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::
+  FunData10 (const FunData10 &fun_data) :
+		  FunDataBase (fun_data),
+		  fun_ptr (fun_data.fun_ptr),
+		  arg1 (fun_data.arg1),
+		  arg2 (fun_data.arg2),
+		  arg3 (fun_data.arg3),
+		  arg4 (fun_data.arg4),
+		  arg5 (fun_data.arg5),
+		  arg6 (fun_data.arg6),
+		  arg7 (fun_data.arg7),
+		  arg8 (fun_data.arg8),
+		  arg9 (fun_data.arg9),
+		  arg10 (fun_data.arg10)
+  {};
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  FunDataBase *
+  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::clone () const 
+  {
+    return new FunData10 (*this);
+  };
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  void *
+  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::thread_entry_point (void *arg) 
+  {
+				     // convenience typedef, since we
+				     // will need that class name
+				     // several times below
+    typedef FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType> ThisClass;
+  
+    FunEncapsulation *fun_encapsulation
+      = reinterpret_cast<FunEncapsulation*>(arg);
+    const ThisClass *fun_data
+      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
+
+				     // copy the parameters
+    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    Arg1              arg1    = fun_data->arg1;
+    Arg2              arg2    = fun_data->arg2;
+    Arg3              arg3    = fun_data->arg3;
+    Arg4              arg4    = fun_data->arg4;
+    Arg5              arg5    = fun_data->arg5;
+    Arg6              arg6    = fun_data->arg6;
+    Arg7              arg7    = fun_data->arg7;
+    Arg8              arg8    = fun_data->arg8;
+    Arg9              arg9    = fun_data->arg9;
+    Arg10             arg10   = fun_data->arg10;
+
+
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
+    fun_data->lock.release ();
+
+				     // call the function
+    (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+  
+    return 0;
+  };
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
+		  fun_ptr (fun_ptr)
+  {};
+
+
+
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  FunEncapsulation
+  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::
+  collect_args (Arg1 arg1,
+		Arg2 arg2,
+		Arg3 arg3,
+		Arg4 arg4,
+		Arg5 arg5,
+		Arg6 arg6,
+		Arg7 arg7,
+		Arg8 arg8,
+		Arg9 arg9,
+		Arg10 arg10)
+  {
+    return
+      new FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>
+      (fun_ptr, arg1, arg2,
+       arg3, arg4, arg5, arg6,
+       arg7, arg8, arg9, arg10);
   };
  
   
@@ -4500,6 +5067,26 @@ namespace Threads
 
 
   
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
+  typename FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
+  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5,
+			       Arg6, Arg7, Arg8, Arg9))
+  {
+    return fun_ptr;
+  };
+
+
+  
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
+  typename FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
+  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5,
+			       Arg6, Arg7, Arg8, Arg9, Arg10))
+  {
+    return fun_ptr;
+  };
+
+
+  
   template <class Class>
   typename MemFunData0<Class,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)())
@@ -4565,9 +5152,22 @@ namespace Threads
   
   template <typename ForwardIterator>
   std::vector<std::pair<ForwardIterator,ForwardIterator> >
-  split_range (const ForwardIterator &begin, const ForwardIterator &end,
-	       const unsigned int n_intervals)
+  split_range (const ForwardIterator &begin,
+	       const ForwardIterator &end,
+	       const unsigned int     n_intervals)
   {
+				     // in non-multithreaded mode, we
+				     // often have the case that this
+				     // function is called with
+				     // n_intervals==1, so have a
+				     // shortcut here to handle that
+				     // case efficiently
+    if (n_intervals==1)
+      return (std::vector<std::pair<ForwardIterator,ForwardIterator> >
+	      (1, make_pair<ForwardIterator>(begin, end)));
+    
+				     // if more than one interval
+				     // requested, do the full work
     const unsigned int n_elements              = distance (begin, end);
     const unsigned int n_elements_per_interval = n_elements / n_intervals;
     const unsigned int residual                = n_elements % n_intervals;
