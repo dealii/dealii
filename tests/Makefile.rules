@@ -124,7 +124,7 @@ run-tests: $(tests:%=%.check)
 ############################################################
 
 clean:
-	-rm -f Makefile.depend *.o *.go *.output
+	-rm -f Makefile.depend *.o *.go *.output *~
 
 veryclean: clean
 	-rm -f *.exe *.testcase *.inp *.gpl *.eps *.gnuplot
