@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.33 
+# From configure.in Revision: 1.34 
 
 
 
@@ -1700,8 +1700,9 @@ rm -f conftest*
 echo "configure:1701: checking whether isnan is declared with debug flags" >&5
   
   CXXFLAGS=$CXXFLAGSG
+  deal_II_isnan_flag=""
   cat > conftest.$ac_ext <<EOF
-#line 1705 "configure"
+#line 1706 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -1713,7 +1714,7 @@ int main() {
     
 ; return 0; }
 EOF
-if { (eval echo configure:1717: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1718: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	echo "$ac_t"""yes"" 1>&6
@@ -1723,57 +1724,109 @@ if { (eval echo configure:1717: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; 
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  
-			deal_II_isnan_flag=""
-	for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
-	  CXXFLAGS="$CXXFLAGSG $testflag"
-          cat > conftest.$ac_ext <<EOF
-#line 1733 "configure"
+fi
+rm -f conftest*
+
+
+  if test $deal_II_isnan_flag = "" ; then
+            cat > conftest.$ac_ext <<EOF
+#line 1734 "configure"
 #include "confdefs.h"
 
 #include <cmath>
-	    
+      
 int main() {
 
-		double d=0;
-		isnan (d);
-	    
+	  double d=0;
+	  _isnan (d);
+      
 ; return 0; }
 EOF
-if { (eval echo configure:1745: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1746: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
-	  					deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
-		break;
-	    
+	  echo "$ac_t"""yes"" 1>&6
+	  deal_II_isnan_flag="-DHAVE_UNDERSCORE_ISNAN"
+	  CXXFLAGSG="$deal_II_isnan_flag $CXXFLAGSG"
+      
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
+fi
+rm -f conftest*
+  fi
+
+
+    if test $deal_II_isnan_flag = "" ; then
+            deal_II_isnan_flag=""
+    for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
+      CXXFLAGS="$CXXFLAGSG $testflag"
+      cat > conftest.$ac_ext <<EOF
+#line 1766 "configure"
+#include "confdefs.h"
+
+#include <cmath>
+	
+int main() {
+
+	  double d=0;
+	  isnan (d);
+	
+; return 0; }
+EOF
+if { (eval echo configure:1778: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
-                	    
+	  	  	  deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
+	  break;
+	
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
 fi
 rm -f conftest*
-	done
 
-				if test "$deal_II_isnan_flag" = "" ; then
-	  echo "$ac_t""no." 1>&6
-	else
+                        cat > conftest.$ac_ext <<EOF
+#line 1791 "configure"
+#include "confdefs.h"
 
-  	  	  echo "$ac_t""using $testflag" 1>&6
-	  CXXFLAGSG="$deal_II_isnan_flag $CXXFLAGSG"
-	fi
-    
+#include <cmath>
+	
+int main() {
+
+	  double d=0;
+	  _isnan (d);
+	
+; return 0; }
+EOF
+if { (eval echo configure:1803: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+  rm -rf conftest*
+  
+	  	  	  deal_II_isnan_flag="-DHAVE_UNDERSCORE_ISNAN $testflag"
+	  break;
+	
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
 fi
 rm -f conftest*
+    done
+
+                if test "$deal_II_isnan_flag" = "" ; then
+      echo "$ac_t""no." 1>&6
+    else
+            echo "$ac_t""using $testflag" 1>&6
+      CXXFLAGSG="$deal_II_isnan_flag $CXXFLAGSG"
+    fi
+  fi
 
     echo $ac_n "checking whether isnan is declared with optimized flags""... $ac_c" 1>&6
-echo "configure:1773: checking whether isnan is declared with optimized flags" >&5
+echo "configure:1825: checking whether isnan is declared with optimized flags" >&5
   
   CXXFLAGS=$CXXFLAGSO
+  deal_II_isnan_flag=""
   cat > conftest.$ac_ext <<EOF
-#line 1777 "configure"
+#line 1830 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -1785,7 +1838,7 @@ int main() {
     
 ; return 0; }
 EOF
-if { (eval echo configure:1789: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1842: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	echo "$ac_t"""yes"" 1>&6
@@ -1795,50 +1848,101 @@ if { (eval echo configure:1789: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; 
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  
-			deal_II_isnan_flag=""
-	for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
-	  CXXFLAGS="$CXXFLAGSO $testflag"
-          cat > conftest.$ac_ext <<EOF
-#line 1805 "configure"
+fi
+rm -f conftest*
+
+
+  if test $deal_II_isnan_flag = "" ; then
+            cat > conftest.$ac_ext <<EOF
+#line 1858 "configure"
 #include "confdefs.h"
 
 #include <cmath>
-	    
+      
 int main() {
 
-		double d=0;
-		isnan (d);
-	    
+	  double d=0;
+	  _isnan (d);
+      
 ; return 0; }
 EOF
-if { (eval echo configure:1817: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1870: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
-	  					deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
-		break;
-	    
+	  echo "$ac_t"""yes"" 1>&6
+	  deal_II_isnan_flag="-DHAVE_UNDERSCORE_ISNAN"
+	  CXXFLAGSO="$deal_II_isnan_flag $CXXFLAGSO"
+      
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
+fi
+rm -f conftest*
+  fi
+
+
+    if test $deal_II_isnan_flag = "" ; then
+            deal_II_isnan_flag=""
+    for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
+      CXXFLAGS="$CXXFLAGSO $testflag"
+      cat > conftest.$ac_ext <<EOF
+#line 1890 "configure"
+#include "confdefs.h"
+
+#include <cmath>
+	
+int main() {
+
+	  double d=0;
+	  isnan (d);
+	
+; return 0; }
+EOF
+if { (eval echo configure:1902: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
-                	    
+	  	  	  deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
+	  break;
+	
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
 fi
 rm -f conftest*
-	done
 
-				if test "$deal_II_isnan_flag" = "" ; then
-	  echo "$ac_t""no." 1>&6
-	else
+                        cat > conftest.$ac_ext <<EOF
+#line 1915 "configure"
+#include "confdefs.h"
 
-  	  	  echo "$ac_t""using $testflag" 1>&6
-	  CXXFLAGSO="$deal_II_isnan_flag $CXXFLAGSO"
-	fi
-    
+#include <cmath>
+	
+int main() {
+
+	  double d=0;
+	  _isnan (d);
+	
+; return 0; }
+EOF
+if { (eval echo configure:1927: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+  rm -rf conftest*
+  
+	  	  	  deal_II_isnan_flag="-DHAVE_UNDERSCORE_ISNAN $testflag"
+	  break;
+	
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
 fi
 rm -f conftest*
+    done
+
+                if test "$deal_II_isnan_flag" = "" ; then
+      echo "$ac_t""no." 1>&6
+    else
+            echo "$ac_t""using $testflag" 1>&6
+      CXXFLAGSO="$deal_II_isnan_flag $CXXFLAGSO"
+    fi
+  fi
 
 
 
@@ -1859,16 +1963,16 @@ esac
 
 CXXFLAGS="$CXXFLAGSG"
 echo $ac_n "checking for consistency of CXXFLAGSG flags""... $ac_c" 1>&6
-echo "configure:1863: checking for consistency of CXXFLAGSG flags" >&5
+echo "configure:1967: checking for consistency of CXXFLAGSG flags" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1865 "configure"
+#line 1969 "configure"
 #include "confdefs.h"
 
 int main() {
 ;
 ; return 0; }
 EOF
-if { (eval echo configure:1872: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1976: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
     echo "$ac_t""yes" 1>&6
@@ -1886,16 +1990,16 @@ rm -f conftest*
 
 CXXFLAGS="$CXXFLAGSO"
 echo $ac_n "checking for consistency of CXXFLAGSO flags""... $ac_c" 1>&6
-echo "configure:1890: checking for consistency of CXXFLAGSO flags" >&5
+echo "configure:1994: checking for consistency of CXXFLAGSO flags" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1892 "configure"
+#line 1996 "configure"
 #include "confdefs.h"
 
 int main() {
 ;
 ; return 0; }
 EOF
-if { (eval echo configure:1899: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2003: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
     echo "$ac_t""yes" 1>&6

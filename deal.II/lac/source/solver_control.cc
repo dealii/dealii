@@ -68,6 +68,12 @@ SolverControl::check (const unsigned int step,
   if ((step >= maxsteps) ||
 #ifdef HAVE_ISNAN
       isnan(check_value) ||
+#else
+#  if HAVE_UNDERSCORE_ISNAN
+				       // on Microsoft Windows, the
+				       // function is called _isnan
+      _isnan(check_value) ||
+#  endif
 #endif
       (check_failure && (check_value > failure_residual))
   )
