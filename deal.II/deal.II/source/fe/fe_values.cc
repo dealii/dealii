@@ -140,7 +140,10 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 
 template <int dim>
 void FEValuesBase<dim>::get_function_grads (const Vector<double>   &fe_function,
-					    vector<Tensor<1,dim> > &gradients) const {
+					    vector<Tensor<1,dim> > &gradients) const
+{
+  Assert (fe->n_components == 1,
+	  ExcWrongNoOfComponents());
   Assert (gradients.size() == n_quadrature_points,
 	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
 
