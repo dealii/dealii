@@ -54,6 +54,11 @@ export CXX=CC
 
 export CC=cc
 
+# Additional command names
+
+CVS=cvs
+MAKE=make
+
 # Make sure the right compiler, linker and libraries are found first
 
 #export PATH=/mypath/bin:$PATH
@@ -79,7 +84,7 @@ MAIL='mail'
 
 mkdir $target
 cd $target
-cvs co deal.II
+$CVS co deal.II
 cd deal.II
 
 # Echo system information for later parsing
@@ -94,9 +99,9 @@ echo "BUILDING LIBRARY AT " `date` | tee -a log
 # now build the library. either write "succeeded" or "failed"
 # into the file "result", and append all the output into "log"
 
-(if (nice -19 make all -k 2>&1) ; then 
+(if ($MAKE all -k 2>&1) ; then 
 	echo "BUILDING EXAMPLES AT " `date` | tee -a log
-        if (cd examples ; nice -19 make -k 2>&1) ; then
+        if (cd examples ; $MAKE -k 2>&1) ; then
 		result=succeeded ;
 	else
 		result=failed ;
