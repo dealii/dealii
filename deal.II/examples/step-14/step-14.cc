@@ -3946,7 +3946,7 @@ int main ()
 				       // ``Exercise_2_3'', but you
 				       // can also use
 				       // ``CurvedRidges<dim>'':
-      descriptor.data = new Data::SetUp<Data::CurvedRidges<dim>,dim> ();
+      descriptor.data = new Data::SetUp<Exercise_2_3<dim>,dim> ();
       
 				       // Next set first a dual
 				       // functional, then a list of
