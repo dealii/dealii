@@ -1538,9 +1538,11 @@ void DataOutBase::write_gmv (const typename std::vector<Patch<dim,spacedim> > &p
   std::vector<std::vector<double> > data_vectors (n_data_sets,
 						  std::vector<double> (n_nodes));
   Threads::ThreadManager thread_manager;
+  void (*fun_ptr) (const typename std::vector<Patch<dim,spacedim> > &,
+		   std::vector<std::vector<double> >                &)
+    = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
   Threads::spawn (thread_manager,
-		  Threads::encapsulate (&DataOutBase::template
-					write_gmv_reorder_data_vectors<dim,spacedim>)
+		  Threads::encapsulate (fun_ptr)
 		  .collect_args(patches, data_vectors));
 
 				   ///////////////////////////////
@@ -1868,9 +1870,11 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
   std::vector<std::vector<double> > data_vectors (n_data_sets,
 						  std::vector<double> (n_nodes));
   Threads::ThreadManager thread_manager;
+  void (*fun_ptr) (const typename std::vector<Patch<dim,spacedim> > &,
+		   std::vector<std::vector<double> >                &)
+    = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
   Threads::spawn (thread_manager,
-		  Threads::encapsulate (&DataOutBase::template
-					write_gmv_reorder_data_vectors<dim,spacedim>)
+		  Threads::encapsulate (fun_ptr)
 		  .collect_args(patches, data_vectors));
 
 				   ///////////////////////////////
