@@ -21,7 +21,62 @@
 
 
 /**
- * Basic types, vectors of basic types, strings, vectors of composed types 
+ * This namespace provides functions helping to determine the amount
+ * of memory used by objects. The goal is not necessarily to give the
+ * amount of memory used up to the last bit (what is the memory used
+ * by an STL @p{map<>} object?), but rather to aid in the search for
+ * memory bottlenecks.
+ *
+ * The functions in this namespace work basically by reducing each
+ * object to its basics as far as they are known from this place. They
+ * do not attempt to know what goes on in each object, if they are not
+ * basic types (such as @p{int} or @p{double}) or STL containers (such
+ * as @p{vectors}). The method goes as follows: if the object with
+ * which a @p{memory_consumption} function from this namespace is an
+ * atomic type, the return its size by applying the @p{sizeof}
+ * operator to it. If this is not the case, then try to reduce it to
+ * more basic types.
+ *
+ * For example, if it is a C-style array or a standard C++ @p{vector},
+ * then sum up the sizes of the array elements by calling
+ * @p{memory_consumption} on each of them. This way, we can also
+ * reduce objects of type @p{vector<vector<double> >} to its atomic
+ * types, and can thus determine the memory used even if the sizes of
+ * the elements of the outermost vector differ (e.g. the first
+ * sub-vector has 3 and the second sub-vector has 10 elements).
+ *
+ * There are two exceptions to simply adding up the sizes of the
+ * subobjects: for C++ @p{vector} objects, we also have to add the
+ * size of the vector object, i.e. @p{sizeof(vector<T>)}, to the sizes
+ * of the elements. Secondly, for the most common used vectors, such
+ * as @p{vector<double>} and @p{vector<unsigned int>} we determine the
+ * size without a loop but rather directly, since we know that the
+ * sizes of the elements are constant.
+ *
+ * Finally, if we cannot reduce a type @p{T} further, because it is
+ * neither atomic nor a known C++ data type, we call a member function
+ * @{T::memory_consumption} on it, which we assume to exist. Almost
+ * all classes in the deal.II library have such a function. This way,
+ * if we call @p{memory_consumption(v)} on a vector @p{v} of type
+ * @p{FullMatrix<double>}, we first reduce this to a loop in which we
+ * call @p{memory_consumption(v[i])}, and because there is no such
+ * function handling this explicitely, we try to call
+ * @p{v[i].memory_consumption()}.
+ *
+ *
+ * @sect3{Extending this namespace}
+ *
+ * The functions in this namespace and the functionality provided by
+ * it live on the assumption that there is either a function
+ * @p{memory_consumption(T)} in this namespace determining the amount
+ * of memory use by objects of type @p{T}, or that the class @p{T} has
+ * a function of that name as member function. While the latter is
+ * true for almost all class in deal.II, we have only implemented the
+ * first kind of functions for the most common data types, such as
+ * atomic types, strings, C++ vectors, C-style arrays, and C++
+ * pairs. These functions therefore do not cover, for example, C++
+ * maps, lists, etc. If you need such functions feel free to implement
+ * them and send them to us for inclusion.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -32,95 +87,56 @@ namespace MemoryConsumption
 				    * in bytes consumed by a @p{bool}
 				    * variable.
 				    */
-    inline
-    unsigned int memory_consumption (const bool) 
-    {
-      return sizeof(bool);
-    };
+  unsigned int memory_consumption (const bool);
 
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a @p{char}
 				    * variable.
 				    */
-    inline
-    unsigned int memory_consumption (const char)
-    {
-      return sizeof(char);
-    };
+  unsigned int memory_consumption (const char);
 
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a
 				    * @p{short int} variable.
 				    */
-    inline
-    unsigned int memory_consumption (const short int) 
-    {
-      return sizeof(short int);
-    };
-  
+  unsigned int memory_consumption (const short int);
 
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a
 				    * @p{short unsigned int} variable.
 				    */
-    inline
-    unsigned int memory_consumption (const short unsigned int) 
-    {
-      return sizeof(short unsigned int);
-    };
-
-
+  unsigned int memory_consumption (const short unsigned int);
 
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a @p{int}
 				    * variable.
 				    */
-    inline
-    unsigned int memory_consumption (const int) 
-    {
-      return sizeof(int);
-    };
-  
+  unsigned int memory_consumption (const int);
 
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a @p{unsigned int}
 				    * variable.
 				    */
-    inline
-    unsigned int memory_consumption (const unsigned int) 
-    {
-      return sizeof(unsigned int);
-    };
-
+  unsigned int memory_consumption (const unsigned int);
 
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a @p{float}
 				    * variable.
 				    */
-    inline
-    unsigned int memory_consumption (const float)
-    {
-      return sizeof(float);
-    };
-
-
+  unsigned int memory_consumption (const float);
 
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a @p{double}
 				    * variable.
 				    */
-    inline
-    unsigned int memory_consumption (const double)
-    {
-      return sizeof(double);
-    };
+  unsigned int memory_consumption (const double);
 
 				   /**
 				    * Determine an estimate of the
@@ -128,7 +144,7 @@ namespace MemoryConsumption
 				    * consumed by a @p{string}
 				    * variable.
 				    */
-    unsigned int memory_consumption (const string &s);
+  unsigned int memory_consumption (const string &s);
 
 				   /**
 				    * Determine an estimate of the
@@ -177,244 +193,359 @@ namespace MemoryConsumption
 				    * applies for the special case of
 				    * vectors of bools.
 				    */
-    template <typename T>
-      unsigned int memory_consumption (const vector<T> &v)
-      {
-	unsigned int mem = sizeof(vector<T>);
-	const unsigned int n = v.size();
-	for (unsigned int i=0; i<n; ++i)
-	  mem += memory_consumption(v[i]);
-	mem += (v.capacity() - n)*sizeof(T);
-	return mem;
-      };
+  template <typename T>
+  unsigned int memory_consumption (const vector<T> &v);
 
-
-
-				     /**
-				      * Estimate the amount of memory
-				      * (in bytes) occupied by a
-				      * C-style array. Since in this
-				      * library we do not usually
-				      * store simple data elements
-				      * like @p{double}s in such
-				      * arrays (but rather use STL
-				      * @p{vector}s or deal.II
-				      * @p{Vector} objects), we do not
-				      * provide specializations like
-				      * for the @p{vector} arrays, but
-				      * always use the loop over all
-				      * elements.
-				      */
-    template <typename T, int N>
-      unsigned int memory_consumption (const T (&v)[N])
-      {
-	unsigned int mem = 0;
-	for (unsigned int i=0; i<N; ++i)
-	  mem += memory_consumption(v[i]);
-	return mem;
-      };
-
-
-				     /**
-				      * Specialization of the
-				      * determination of the memory
-				      * consumption of a vector, here
-				      * for a vector of @p{bool}s.
-				      *
-				      * This is a special case, as the
-				      * bools are not stored
-				      * one-by-one, but as a bit
-				      * field.
-				      */
-    inline
-      unsigned int memory_consumption (const vector<bool> &v)
-      {
-	return v.capacity() / 8 + sizeof(v);
-      };
-
+				   /**
+				    * Estimate the amount of memory
+				    * (in bytes) occupied by a
+				    * C-style array. Since in this
+				    * library we do not usually
+				    * store simple data elements
+				    * like @p{double}s in such
+				    * arrays (but rather use STL
+				    * @p{vector}s or deal.II
+				    * @p{Vector} objects), we do not
+				    * provide specializations like
+				    * for the @p{vector} arrays, but
+				    * always use the loop over all
+				    * elements.
+				    */
+  template <typename T, int N>
+  unsigned int memory_consumption (const T (&v)[N]);
+  
+				   /**
+				    * Specialization of the
+				    * determination of the memory
+				    * consumption of a vector, here
+				    * for a vector of @p{bool}s.
+				    *
+				    * This is a special case, as the
+				    * bools are not stored
+				    * one-by-one, but as a bit
+				    * field.
+				    */
+  unsigned int memory_consumption (const vector<bool> &v);
     
-				     /**
-				      * Specialization of the
-				      * determination of the memory
-				      * consumption of a vector, here
-				      * for a vector of @p{int}s.
-				      */
-    inline
-      unsigned int memory_consumption (const vector<int> &v)
-      {
-	return (v.capacity() * sizeof(int) +
-		sizeof(v));
-      };
+				   /**
+				    * Specialization of the
+				    * determination of the memory
+				    * consumption of a vector, here
+				    * for a vector of @p{int}s.
+				    */
+  unsigned int memory_consumption (const vector<int> &v);
     
+				   /**
+				    * Specialization of the
+				    * determination of the memory
+				    * consumption of a vector, here
+				    * for a vector of @p{double}s.
+				    */
+  unsigned int memory_consumption (const vector<double> &v);
     
-				     /**
-				      * Specialization of the
-				      * determination of the memory
-				      * consumption of a vector, here
-				      * for a vector of @p{double}s.
-				      */
-    inline
-      unsigned int memory_consumption (const vector<double> &v)
-      {
-	return (v.capacity() * sizeof(double) +
-		sizeof(v));
-      };
+				   /**
+				    * Specialization of the
+				    * determination of the memory
+				    * consumption of a vector, here
+				    * for a vector of @p{float}s.
+				    */
+  unsigned int memory_consumption (const vector<float> &v);
     
+				   /**
+				    * Specialization of the
+				    * determination of the memory
+				    * consumption of a vector, here
+				    * for a vector of @p{char}s.
+				    */
+  unsigned int memory_consumption (const vector<char> &v);
     
-				     /**
-				      * Specialization of the
-				      * determination of the memory
-				      * consumption of a vector, here
-				      * for a vector of @p{float}s.
-				      */
-    inline
-      unsigned int memory_consumption (const vector<float> &v)
-      {
-	return (v.capacity() * sizeof(float) +
-		sizeof(v));
-      };
+				   /**
+				    * Specialization of the
+				    * determination of the memory
+				    * consumption of a vector, here
+				    * for a vector of @p{unsigned char}s.
+				    */
+  unsigned int memory_consumption (const vector<unsigned char> &v);
     
+				   /**
+				    * Specialization of the
+				    * determination of the memory
+				    * consumption of a vector, here
+				    * for a vector of pointers.
+				    */
+  template <typename T>
+  unsigned int memory_consumption (const vector<T *> &v);
+
+				   /**
+				    * Determine an estimate of the
+				    * amount of memory in bytes
+				    * consumed by a pair of values.
+				    */
+  template <typename A, typename B>
+  unsigned int memory_consumption (const pair<A,B> &p);
     
-				     /**
-				      * Specialization of the
-				      * determination of the memory
-				      * consumption of a vector, here
-				      * for a vector of @p{char}s.
-				      */
-    inline
-      unsigned int memory_consumption (const vector<char> &v)
-      {
-	return (v.capacity() * sizeof(char) +
-		sizeof(v));
-      };
-    
+				   /**
+				    * Return the amount of memory
+				    * used by a pointer. Make sure
+				    * that you are really interested
+				    * in this, and not the amount of
+				    * memory required by the object
+				    * pointed to.
+				    */
+  template <typename T>
+  unsigned int memory_consumption (const T * const);
 
-    
-				     /**
-				      * Specialization of the
-				      * determination of the memory
-				      * consumption of a vector, here
-				      * for a vector of @p{unsigned char}s.
-				      */
-    inline
-      unsigned int memory_consumption (const vector<unsigned char> &v)
-      {
-	return (v.capacity() * sizeof(unsigned char) +
-		sizeof(v));
-      };
+				   /**
+				    * Return the amount of memory
+				    * used by a pointer. Make sure
+				    * that you are really interested
+				    * in this, and not the amount of
+				    * memory required by the object
+				    * pointed to.
+				    *
+				    * This function is the same as
+				    * above, but for non-const
+				    * pointers
+				    */
+  template <typename T>
+  unsigned int memory_consumption (T * const);
 
-
-
-    
-				     /**
-				      * Specialization of the
-				      * determination of the memory
-				      * consumption of a vector, here
-				      * for a vector of pointers.
-				      */
-    template <typename T>
-    inline
-      unsigned int memory_consumption (const vector<T *> &v)
-      {
-	return (v.capacity() * sizeof(T *) +
-		sizeof(v));
-      };
-    
-
-				     /**
-				      * Determine an estimate of the
-				      * amount of memory in bytes
-				      * consumed by a pair of values.
-				      */
-    template <typename A, typename B>
-      inline
-      unsigned int memory_consumption (const pair<A,B> &p)
-      {
-	return (memory_consumption(p.first) +
-		memory_consumption(p.second));
-      };
-    
-				     /**
-				      * Return the amount of memory
-				      * used by a pointer. Make sure
-				      * that you are really interested
-				      * in this, and not the amount of
-				      * memory required by the object
-				      * pointed to.
-				      */
-    template <typename T>
-      inline
-      unsigned int
-      memory_consumption (const T * const)
-      {
-	return sizeof(T*);
-      };
-
-
-
-				     /**
-				      * Return the amount of memory
-				      * used by a pointer. Make sure
-				      * that you are really interested
-				      * in this, and not the amount of
-				      * memory required by the object
-				      * pointed to.
-				      *
-				      * This function is the same as
-				      * above, but for non-const
-				      * pointers
-				      */
-    template <typename T>
-      inline
-      unsigned int
-      memory_consumption (T * const)
-      {
-	return sizeof(T*);
-      };
-
-
-
-				     /**
-				      * Return the amount of memory
-				      * used by a void pointer. Make
-				      * sure that you are really
-				      * interested in this, and not
-				      * the amount of memory required
-				      * by the object pointed to.
-				      *
-				      * Note that we needed this
-				      * function since @p{void} is no
-				      * type and a @p{void*} is thus
-				      * not caught by the general
-				      * @p{T*} template function
-				      * above.
-				      */
-    inline
-      unsigned int
-      memory_consumption (void * const)
-      {
-	return sizeof(void*);
-      };
+				   /**
+				    * Return the amount of memory
+				    * used by a void pointer. Make
+				    * sure that you are really
+				    * interested in this, and not
+				    * the amount of memory required
+				    * by the object pointed to.
+				    *
+				    * Note that we needed this
+				    * function since @p{void} is no
+				    * type and a @p{void*} is thus
+				    * not caught by the general
+				    * @p{T*} template function
+				    * above.
+				    */
+  unsigned int memory_consumption (void * const);
     
     
-				     /**
-				      * For all other types which are
-				      * not explicitely listed: try if
-				      * there is a member function
-				      * called
-				      * @p{memory_consumption}. If
-				      * this is not the case, then the
-				      * compiler will in any case
-				      * complain that this last exit
-				      * does not work.
-				      */
-    template <typename T>
-      inline
-      unsigned int
-      memory_consumption (const T &t)
-      {
-	return t.memory_consumption();
-      };
+				   /**
+				    * For all other types which are
+				    * not explicitely listed: try if
+				    * there is a member function
+				    * called
+				    * @p{memory_consumption}. If
+				    * this is not the case, then the
+				    * compiler will in any case
+				    * complain that this last exit
+				    * does not work.
+				    */
+  template <typename T>
+  unsigned int memory_consumption (const T &t);
+}
+
+
+
+// now comes the implementation of these functions
+
+namespace MemoryConsumption
+{
+  inline
+  unsigned int memory_consumption (const bool) 
+  {
+    return sizeof(bool);
+  };
+  
+  
+  
+  inline
+  unsigned int memory_consumption (const char)
+  {
+    return sizeof(char);
+  };
+  
+
+
+  inline
+  unsigned int memory_consumption (const short int) 
+  {
+    return sizeof(short int);
+  };
+  
+
+
+  inline
+  unsigned int memory_consumption (const short unsigned int) 
+  {
+    return sizeof(short unsigned int);
+  };
+
+
+
+  inline
+  unsigned int memory_consumption (const int) 
+  {
+    return sizeof(int);
+  };
+  
+
+
+  inline
+  unsigned int memory_consumption (const unsigned int) 
+  {
+    return sizeof(unsigned int);
+  };
+
+
+
+  inline
+  unsigned int memory_consumption (const float)
+  {
+    return sizeof(float);
+  };
+
+
+
+  inline
+  unsigned int memory_consumption (const double)
+  {
+    return sizeof(double);
+  };
+
+
+
+  template <typename T>
+  unsigned int memory_consumption (const vector<T> &v)
+  {
+    unsigned int mem = sizeof(vector<T>);
+    const unsigned int n = v.size();
+    for (unsigned int i=0; i<n; ++i)
+      mem += memory_consumption(v[i]);
+    mem += (v.capacity() - n)*sizeof(T);
+    return mem;
+  };
+
+
+
+  template <typename T, int N>
+  unsigned int memory_consumption (const T (&v)[N])
+  {
+    unsigned int mem = 0;
+    for (unsigned int i=0; i<N; ++i)
+      mem += memory_consumption(v[i]);
+    return mem;
+  };
+
+
+
+  inline
+  unsigned int memory_consumption (const vector<bool> &v)
+  {
+    return v.capacity() / 8 + sizeof(v);
+  };
+
+
+  
+  inline
+  unsigned int memory_consumption (const vector<int> &v)
+  {
+    return (v.capacity() * sizeof(int) +
+	    sizeof(v));
+  };
+    
+    
+
+  inline
+  unsigned int memory_consumption (const vector<double> &v)
+  {
+    return (v.capacity() * sizeof(double) +
+	    sizeof(v));
+  };
+    
+    
+
+  inline
+  unsigned int memory_consumption (const vector<float> &v)
+  {
+    return (v.capacity() * sizeof(float) +
+	    sizeof(v));
+  };
+    
+    
+	
+  inline
+  unsigned int memory_consumption (const vector<char> &v)
+  {
+    return (v.capacity() * sizeof(char) +
+	    sizeof(v));
+  };
+    
+
+    
+  inline
+  unsigned int memory_consumption (const vector<unsigned char> &v)
+  {
+    return (v.capacity() * sizeof(unsigned char) +
+	    sizeof(v));
+  };
+
+
+    
+  template <typename T>
+  inline
+  unsigned int memory_consumption (const vector<T *> &v)
+  {
+    return (v.capacity() * sizeof(T *) +
+	    sizeof(v));
+  };
+    
+
+				    
+  template <typename A, typename B>
+  inline
+  unsigned int memory_consumption (const pair<A,B> &p)
+  {
+    return (memory_consumption(p.first) +
+	    memory_consumption(p.second));
+  };
+
+  
+		
+  template <typename T>
+  inline
+  unsigned int
+  memory_consumption (const T * const)
+  {
+    return sizeof(T*);
+  };
+
+
+		
+  template <typename T>
+  inline
+  unsigned int
+  memory_consumption (T * const)
+  {
+    return sizeof(T*);
+  };
+
+  
+	
+  inline
+  unsigned int
+  memory_consumption (void * const)
+  {
+    return sizeof(void*);
+  };
+    
+    
+	
+  template <typename T>
+  inline
+  unsigned int
+  memory_consumption (const T &t)
+  {
+    return t.memory_consumption();
+  };
 }
 
 
