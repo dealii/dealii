@@ -56,10 +56,31 @@ Triangulation<dim>::~Triangulation ()
 {
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
+  levels.clear ();
 
   for (unsigned int i=0;i<255;++i)
     boundary[i]->unsubscribe ();
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::clear () 
+{
+  for (unsigned int i=0; i<levels.size(); ++i)
+    delete levels[i];
   levels.clear ();
+
+  vertices.clear ();
+  vertices_used.clear ();
+  
+  for (unsigned int i=0; i<255; ++i)
+    {
+      boundary[i]->unsubscribe ();
+      boundary[i] = 0;
+    };
+
+  number_cache = TriaNumberCache<dim>();
 };
 
 
@@ -161,6 +182,9 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (levels.size () == 0, ExcTriangulationNotEmpty());
 
+  Assert (old_tria.levels.size() != 0, ExcInternalError());
+  Assert (old_tria.vertices.size() != 0, ExcInternalError());
+  
 				   // copy normal elements
   vertices      = old_tria.vertices;
   vertices_used = old_tria.vertices_used;

@@ -1635,6 +1635,12 @@ class Triangulation
 				      *  the hierarchy.
 				      */
     virtual ~Triangulation ();
+
+				     /**
+				      * Reset this triangulation into a
+				      * virgin state by deleting all data.
+				      */
+    void clear ();
     
 				     /**					
 				      * Assign a boundary object to
