@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,7 +19,7 @@
 #  include <string>
 #endif
 
-#if defined(__sun__) || defined(__osf__)
+#if defined(__sun__) || defined(__osf__) || defined(_AIX)
 #  include <unistd.h>
 #endif
 
@@ -56,7 +56,7 @@ unsigned int MultithreadInfo::get_n_cpus()
 }
 
 
-#elif defined(__sun__) || defined(__osf__)
+#elif defined(__sun__) || defined(__osf__) || defined(_AIX)
 
 
 unsigned int MultithreadInfo::get_n_cpus()
