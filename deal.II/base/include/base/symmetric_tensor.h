@@ -36,6 +36,13 @@ namespace internal
                                       * symmetric rank-2 tensors into
                                       * symmetric rank-2 tensors, so they can
                                       * be represented as matrices, etc.
+                                      *
+                                      * This information is probably of little
+                                      * interest to all except the accessor
+                                      * classes that need it. In particular,
+                                      * you shouldn't make any assumptions
+                                      * about the storage format in your
+                                      * application programs.
                                       */
     template <int rank, int dim>
     struct StorageType;
@@ -50,24 +57,47 @@ namespace internal
                                          /**
                                           * Number of independent components of a
                                           * symmetric tensor of rank 2. We store
-                                          * only the upper right half of it. This
-                                          * information is probably of little
-                                          * interest to all except the accessor
-                                          * classes that need it.
+                                          * only the upper right half of it.
                                           */
         static const unsigned int
         n_independent_components = (dim*dim + dim)/2;
 
                                          /**
                                           * Declare the type in which we actually
-                                          * store the data. This information is
-                                          * probably of little interest to all
-                                          * except the accessor classes that need
-                                          * it. In particular, you shouldn't make
-                                          * any assumptions about the storage
-                                          * format in your application programs.
+                                          * store the data.
                                           */
         typedef Tensor<1,n_independent_components> base_tensor_type;
+    };
+
+
+
+                                     /**
+                                      * Specialization of StorageType for
+                                      * rank-4 tensors.
+                                      */
+    template <int dim>
+    struct StorageType<4,dim> 
+    {
+                                         /**
+                                          * Number of independent components
+                                          * of a symmetric tensor of rank
+                                          * 2. Since rank-4 tensors are
+                                          * mappings between such objects, we
+                                          * need this information.
+                                          */
+        static const unsigned int
+        n_rank2_components = (dim*dim + dim)/2;
+
+                                         /**
+                                          * Declare the type in which we
+                                          * actually store the data. Symmetric
+                                          * rank-4 tensors are mappings
+                                          * between symmetric rank-2 tensors,
+                                          * so we can represent the data as a
+                                          * matrix if we represent the rank-2
+                                          * tensors as vectors.
+                                          */
+        typedef Tensor<2,n_rank2_components> base_tensor_type;
     };
     
     
