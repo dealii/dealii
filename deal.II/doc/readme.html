@@ -446,6 +446,34 @@
       flag and Doc++ is not in your PATH variable, then it is not
       possible to generate printable documentation.
       </p>
+
+    <li>
+      <p>
+      <code>--enable-compat-blocker=...</code>: the library offers
+      various functions that maintain compatibility with older
+      versions of <acronym>deal.II</acronym>, for example many
+      functions that assume that the mapping between unit and real
+      cell is a (bi-, tri-)linear one. There are respective functions
+      that take a mapping object, and the compatibility functions
+      simply call these with a Q1 mapping object.
+      </p>
+      
+      <p>
+      When converting old programs, and also sometimes with new
+      programs, you may want to make sure that these compatibility
+      functions are not called, to ensure that the mapping taken is
+      always the same. In that case, you can configure the library
+      with the flag
+      <code>--enable-compat-blocker=mapping</code>. After
+      recompilation of the library, each access to these functions is
+      blocked, and an exception is thrown.
+      </p>  
+
+      <p>
+      In later versions of the library, other compatibility blockers
+      will be implemented as well, as we extend the functionality of
+      the library.
+      </p>
     </ul>
 
     <p>
