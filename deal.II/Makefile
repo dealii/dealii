@@ -151,7 +151,7 @@ TAGS: $(filter-out %/forward_declarations.h,                                \
 	@cd $D/common ; etags $^
 
 
-clean: clean-contrib clean-base clean-lac clean-dealII clean-doc clean-examples clean-lib
+clean: clean-contrib clean-base clean-lac clean-dealII clean-doc clean-examples clean-lib clean-tests
 	-rm -f TODO common/TAGS
 
 clean-contrib:
@@ -175,8 +175,12 @@ clean-examples:
 clean-lib:
 	-rm $(LIBDIR)/lib*
 
+# if that directory exists, go into 'tests' and clean up there as well
+clean-tests:
+	-cd tests ; $(MAKE) clean
+
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
         online-doc printable-doc tex-doc contrib \
         clean clean-contrib clean-base clean-lac clean-dealII \
-	clean-doc clean-examples clean-lib TAGS TODO
+	clean-doc clean-examples clean-lib clean-tests TAGS TODO
