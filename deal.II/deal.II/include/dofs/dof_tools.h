@@ -807,6 +807,7 @@ class DoFTools
 				      * only need one object of this
 				      * type.
 				      */
+//TODO:[WB] document last argument    
     template <int dim>
     static void
     compute_intergrid_constraints (const DoFHandler<dim>              &coarse_grid,
@@ -814,7 +815,8 @@ class DoFTools
 				   const DoFHandler<dim>              &fine_grid,
 				   const unsigned int                  fine_component,
 				   const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-				   ConstraintMatrix                   &constraints);
+				   ConstraintMatrix                   &constraints,
+				   std::vector<std::map<unsigned int, float> > *transfer_representation = 0);
 
 				     /**
 				      * Create a mapping from degree

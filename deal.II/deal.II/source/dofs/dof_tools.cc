@@ -1170,7 +1170,8 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 					 const DoFHandler<dim>              &fine_grid,
 					 const unsigned int                  fine_component,
 					 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-					 ConstraintMatrix                   &constraints)
+					 ConstraintMatrix                   &constraints,
+					 std::vector<std::map<unsigned int, float> > *transfer_representation)
 {
 				   // aliases to the finite elements
 				   // used by the dof handlers:
@@ -1333,7 +1334,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // the weights array was actually
 				   // of FullMatrix<double> type. this
 				   // wasted huge amounts of memory,
-				   // but was fast. nontheless, since
+				   // but was fast. nonetheless, since
 				   // the memory consumption was
 				   // quadratic in the number of
 				   // degrees of freedom, this was not
@@ -1439,7 +1440,49 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
     };
 #endif
 
+				   // if the user wants to have a
+				   // representation of the transfer
+				   // matrix, the provide it
+  if (transfer_representation != 0)
+    {
+      transfer_representation->clear ();
+      transfer_representation->resize (weights.size());
 
+      const unsigned int n_global_parm_dofs
+	= std::count_if (weight_mapping.begin(), weight_mapping.end(),
+			 std::bind2nd (std::not_equal_to<int> (), -1));
+      
+				       // first construct the inverse
+				       // mapping of weight_mapping
+      std::vector<unsigned int> inverse_weight_mapping (n_global_parm_dofs,
+							DoFHandler<dim>::invalid_dof_index);
+      for (unsigned int i=0; i<weight_mapping.size(); ++i)
+	{
+	  const unsigned int parameter_dof = weight_mapping[i];
+					   // if this global dof is a
+					   // parameter
+	  if (parameter_dof != static_cast<unsigned int>(-1))
+	    {
+	      Assert (parameter_dof < n_global_parm_dofs, ExcInternalError());
+	      Assert (inverse_weight_mapping[parameter_dof] == DoFHandler<dim>::invalid_dof_index,
+		      ExcInternalError());
+	      
+	      inverse_weight_mapping[parameter_dof] = i;
+	    };
+	};
+
+				       // next copy over weights array
+				       // and replace respective
+				       // numbers
+      for (unsigned int i=0; i<n_coarse_dofs; ++i)
+	{
+	  std::map<unsigned int, float>::const_iterator j = weights[i].begin();
+	  for (; j!=weights[i].end(); ++j)
+	    (*transfer_representation)[i][inverse_weight_mapping[j->first]] = j->second;
+	};
+    };
+
+  
 				   // now we know that the weights in
 				   // each row constitute a
 				   // constraint. enter this into the
@@ -2076,7 +2119,8 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<deal_II_dimension> &,
 					 const DoFHandler<deal_II_dimension> &,
 					 const unsigned int                   ,
 					 const InterGridMap<DoFHandler,deal_II_dimension> &,
-					 ConstraintMatrix                    &);
+					 ConstraintMatrix                    &,
+					 std::vector<std::map<unsigned int, float> > *);
 
 
 
