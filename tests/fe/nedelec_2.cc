@@ -85,7 +85,6 @@ template<int dim>
 inline void
 check ()
 {
-  FE_Nedelec<dim> fe_ned(1);
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
 
