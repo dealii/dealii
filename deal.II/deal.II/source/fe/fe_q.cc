@@ -25,6 +25,9 @@
 
 namespace 
 {
+#ifdef DEAL_II_ANON_NAMESPACE_BUG
+  static
+#endif
   std::vector<unsigned int>
   invert_numbering (const std::vector<unsigned int> &in)
   {
