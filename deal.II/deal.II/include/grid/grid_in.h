@@ -35,14 +35,36 @@ template <int dim> class Triangulation;
  * will be undefined afterwards. Upon input, only lines in one dimension
  * and line and quads in two dimensions are accepted. All other cell types
  * (e.g. triangles in two dimensions, quads and hexes in 3d) are rejected.
- * The vertex and cell numbering in the UCD file, which
+ * The vertex and cell numbering in the input file, which
  * need not be consecutively, is lost upon transfer to the triangulation
  * object, since this one needs consecutively numbered elements.
  *
- * Material indicators are accepted to denote the material id of cells and
+ * Material indicators are accepted to denote the material ID of cells and
  * to denote boundary part indication for lines in 2D. Read the according
  * sections in the documentation of the @ref{Triangulation} class for
  * further details.
+ *
+ *
+ * @sect3{Supported input formats}
+ *
+ * At present, the following input formats are supported:
+ * @begin{itemize}
+ * @item @p{UCD} (unstructured cell data) format: this format is used
+ * for grid input as well as data output. If there are data vectors in
+ * the input file, they are ignored, as we are only interested in the
+ * grid in this class. The exact description of the format can be
+ * found in the AVS Explorer manual (see @url{http://www.avs.com}).
+ * The @p{UCD} format can be read by the @p{read_ucd} function.
+ *
+ * @item @p{DB mesh} format: this format is used by the @p{BAMG} mesh
+ * generator (see
+ * @url{http://www-rocq.inria.fr/gamma/cdrom/www/bamg/eng.htm}. The
+ * documentation of the format in the @p{BAMG} manual is very
+ * incomplete, so we don't actually parse many of the fields of the
+ * output since we don't know their meaning, but the data that is read
+ * is enough to build up the mesh as intended by the mesh generator.
+ * This format can be read by the @p{read_dbmesh} function.
+ * @end{itemize}
  *
  *
  * @sect3{Structure of input grid data}
@@ -147,6 +169,13 @@ class GridIn
     void read_ucd (istream &);
 
 				     /**
+				      * Read grid data from a file
+				      * containing data in the DB mesh
+				      * format.
+				      */
+    void read_dbmesh (istream &);
+    
+				     /**
 				      * Exception
 				      */
     DeclException1 (ExcUnknownIdentifier,
@@ -168,11 +197,22 @@ class GridIn
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcInternalError);
+    DeclException1 (ExcInvalidDBMESHInput,
+		    string,
+		    << "The string <" << arg1 << "> is not recognized at the present"
+		    << " position of a DB Mesh file.");
+    
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcIO);
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcDBMESHWrongDimension,
+		    int,
+		    << "The specified dimension " << arg1
+		    << " is not the same as that of the triangulation to be created.");
     
   private:
 				     /**
@@ -180,6 +220,31 @@ class GridIn
 				      * be fed with the data read in.
 				      */
     SmartPointer<Triangulation<dim> > tria;
+
+				     /**
+				      * Skip empty lines in the input
+				      * stream, i.e. lines that
+				      * contain either nothing or only
+				      * whitespace.
+				      */
+    static void skip_empty_lines (istream &in);
+    
+				     /**
+				      * Skip lines of comment that
+				      * start with the indicated
+				      * character (e.g. @p{#})
+				      * following the point where the
+				      * given input stream presently
+				      * is. After the call to this
+				      * function, the stream is at the
+				      * start of the first line after
+				      * the comment lines, or at the
+				      * same position as before if
+				      * there were no lines of
+				      * comments.
+				      */
+    static void skip_comment_lines (istream    &in,
+				    const char  comment_start);
 };
 
 
