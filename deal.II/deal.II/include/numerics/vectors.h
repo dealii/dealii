@@ -398,14 +398,14 @@ class VectorTools {
 				      * Compute the error for the solution of a system.
 				      * See the other #integrate_difference#.
 				      */
-//     static void integrate_difference (const DoFHandler<dim>    &dof,
-// 				      const Vector<double>     &fe_function,
-// 				      const TensorFunction<1,dim>&exact_solution,
-// 				      Vector<float>            &difference,
-// 				      const Quadrature<dim>    &q,
-// 				      const FiniteElement<dim> &fe,
-// 				      const NormType           &norm,
-// 				      const Boundary<dim>      &boundary);
+     static void integrate_difference (const DoFHandler<dim>   &dof,
+ 				      const Vector<double>     &fe_function,
+ 				      const VectorFunction<dim>&exact_solution,
+ 				      Vector<float>            &difference,
+ 				      const Quadrature<dim>    &q,
+ 				      const FiniteElement<dim> &fe,
+ 				      const NormType           &norm,
+ 				      const Boundary<dim>      &boundary);
     
 
 				     /**

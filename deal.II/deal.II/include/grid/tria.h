@@ -1676,7 +1676,8 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * much needed here and saving memory may
 				      * be a good goal when using many cells.
 				      */
-    void refine (const Vector<float> &criteria,
+    template <typename number>
+    void refine (const Vector<number> &criteria,
 		 const double         threshold);
 
 				     /**
@@ -1692,7 +1693,8 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * much needed here and saving memory may
 				      * be a good goal when using many cells.
 				      */
-    void coarsen (const Vector<float> &criteria,
+    template <typename number>
+    void coarsen (const Vector<number> &criteria,
 		  const double         threshold);
     
 				     /**
@@ -1716,7 +1718,8 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * much needed here and saving memory may
 				      * be a good goal when using many cells.
 				      */
-    void refine_and_coarsen_fixed_number (const Vector<float> &criteria,
+    template <typename number>
+    void refine_and_coarsen_fixed_number (const Vector<number> &criteria,
 					  const double         top_fraction_of_cells,
 					  const double         bottom_fraction_of_cells);
 
@@ -1741,7 +1744,8 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * much needed here and saving memory may
 				      * be a good goal when using many cells.
 				      */
-    void refine_and_coarsen_fixed_fraction (const Vector<float> &criteria,
+    template<typename number>
+    void refine_and_coarsen_fixed_fraction (const Vector<number> &criteria,
 					    const double         top_fraction,
 					    const double         bottom_fraction);
     

@@ -11,7 +11,7 @@
 #include <base/point.h>
 #include <base/functiontime.h>
 #include <base/tensorindex.h>
-
+#include <lac/forward-declarations.h>
 
 template<int rank_, int dim>
 class Tensor;
@@ -53,7 +53,7 @@ class VectorFunction :
 				      * the same size as the #n_components#
 				      * array.
 				      */
-    virtual void value (const Point<dim>  &p, vector<double> &values) const;
+    virtual void value (const Point<dim>  &p, Vector<double> &values) const;
 
 				     /**
 				      * Set #values# to the point values
@@ -64,7 +64,7 @@ class VectorFunction :
 				      * array.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
-			     vector<vector<double> > &values) const;
+			     vector<Vector<double> > &values) const;
 
 				     /**
 				      * Set #gradients# to the gradients of
@@ -175,8 +175,14 @@ class TensorFunction :
 				     /**
 				      * See #VectorFunction#.
 				      */  
+    virtual void value (const Point<dim> &points,
+			     Vector<double> &values) const;
+
+				     /**
+				      * See #VectorFunction#.
+				      */  
     virtual void value_list (const vector<Point<dim> > &points,
-			     vector<vector<double> > &values) const;
+			     vector<Vector<double> > &values) const;
 
 				     /**
 				      * See #VectorFunction#.

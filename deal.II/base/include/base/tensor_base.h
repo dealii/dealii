@@ -13,8 +13,7 @@
 #include <base/exceptions.h>
 #include <iostream>
 #include <vector>
-
-
+#include <lac/forward-declarations.h>
 
 
 // general template; specialized for rank==1; the general template is in
@@ -171,7 +170,7 @@ class Tensor<1,dim> {
 				      * usual in C++, the rightmost
 				      * index marches fastest.
 				      */
-    void unroll(vector<double> & result) const;
+    void unroll(Vector<double> & result) const;
      
   protected:
 				     /**
@@ -182,15 +181,17 @@ class Tensor<1,dim> {
 				     /**
 				      * Help function for unroll.
 				      */
-    void unroll_recursion(vector<double> & result, unsigned& start_index) const;
+    void unroll_recursion(Vector<double> & result, unsigned& start_index) const;
 
     template<>
-    friend void Tensor<2,dim>::unroll_recursion(vector<double> &, unsigned&) const;
+    friend void Tensor<2,dim>::unroll_recursion(Vector<double> &, unsigned&) const;
 };
 
-
-
-
+				 /**
+				  * Exception
+				  */
+DeclException2(ExcWrongVectorSize, unsigned, int, << "Tensor has " << arg1
+	       << " entries, but vector has size " << arg2);
 DeclException1 (ExcDimTooSmall,
 		int,
 		<< "Given dimensions must be >= 1, but was " << arg1);

@@ -3761,9 +3761,10 @@ void Triangulation<3>::print_gnuplot (ostream &out,
 
 
 
-template <int dim>
-void Triangulation<dim>::refine (const Vector<float> &criteria,
-				 const double         threshold) {
+template <int dim> template <typename number>
+void Triangulation<dim>::refine (const Vector<number> &criteria,
+				 const double         threshold)
+{
   Assert (criteria.size() == n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), n_active_cells()));
 
@@ -3785,9 +3786,10 @@ void Triangulation<dim>::refine (const Vector<float> &criteria,
 
 
 
-template <int dim>
-void Triangulation<dim>::coarsen (const Vector<float> &criteria,
-				  const double         threshold) {
+template <int dim> template <typename number>
+void Triangulation<dim>::coarsen (const Vector<number> &criteria,
+				  const double         threshold)
+{
   Assert (criteria.size() == n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), n_active_cells()));
 
@@ -3801,10 +3803,12 @@ void Triangulation<dim>::coarsen (const Vector<float> &criteria,
 
 
 
-template <int dim>
-void Triangulation<dim>::refine_and_coarsen_fixed_number (const Vector<float> &criteria,
-							  const double         top_fraction,
-							  const double         bottom_fraction) {
+template <int dim> template <typename number>
+void
+Triangulation<dim>::refine_and_coarsen_fixed_number (const Vector<number> &criteria,
+						     const double         top_fraction,
+						     const double         bottom_fraction)
+{
 				   // correct number of cells is
 				   // checked in #refine#
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
@@ -3817,7 +3821,7 @@ void Triangulation<dim>::refine_and_coarsen_fixed_number (const Vector<float> &c
   const int coarsen_cells = max(static_cast<int>(bottom_fraction*criteria.size()),
 				1);
   
-  Vector<float> tmp(criteria);  
+  Vector<number> tmp(criteria);  
   nth_element (tmp.begin(), tmp.begin()+refine_cells,
 	       tmp.end(),
 	       greater<double>());
@@ -3839,9 +3843,9 @@ double sqr(double a) {
 
 
 
-template <int dim>
+template <int dim> template <typename number>
 void
-Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<float> &criteria,
+Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &criteria,
 						       const double         top_fraction,
 						       const double         bottom_fraction) {
 				   // correct number of cells is
@@ -3854,7 +3858,7 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<float> &crit
 				   // error, which is what we have to sum
 				   // up and compare with
 				   // #fraction_of_error*total_error#.
-  Vector<float> tmp(criteria);
+  Vector<number> tmp(criteria);
   const double total_error = tmp.l1_norm();
 
   Vector<float> partial_sums(criteria.size());
@@ -7047,4 +7051,37 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
 
 // explicit instantiations
 template class Triangulation<deal_II_dimension>;
+
+template void Triangulation<deal_II_dimension>
+::refine (const Vector<float> &, const double);
+
+template void Triangulation<deal_II_dimension>
+::refine (const Vector<double> &, const double);
+
+template void Triangulation<deal_II_dimension>
+::coarsen (const Vector<float> &, const double);
+
+template void Triangulation<deal_II_dimension>
+::coarsen (const Vector<double> &, const double);
+
+
+template void Triangulation<deal_II_dimension>
+::refine_and_coarsen_fixed_number (const Vector<double> &,
+				   const double         top_fraction,
+				   const double         bottom_fraction);
+
+template void Triangulation<deal_II_dimension>
+::refine_and_coarsen_fixed_number (const Vector<float> &criteria,
+				   const double         top_fraction,
+				   const double         bottom_fraction);
+
+template void Triangulation<deal_II_dimension>
+::refine_and_coarsen_fixed_fraction (const Vector<double> &criteria,
+				     const double         top_fraction,
+				     const double         bottom_fraction);
+
+template void Triangulation<deal_II_dimension>
+::refine_and_coarsen_fixed_fraction (const Vector<float> &criteria,
+				     const double         top_fraction,
+				     const double         bottom_fraction);
 

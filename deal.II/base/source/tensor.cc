@@ -2,17 +2,24 @@
 
 #include <base/tensor.h>
 #include <cmath>
+#include <lac/vector.h>
 
 
-template <int dim> void
-Tensor<1,dim>::unroll( vector<double>& result) const
+template <int dim>
+void
+Tensor<1,dim>::unroll( Vector<double>& result) const
 {
-  Assert(false,	 ExcNotImplemented());
+  Assert(result.size()==dim,
+	 ExcWrongVectorSize(dim, result.size()));
+
+  unsigned index = 0;
+  unroll_recursion(result,index);
 }
 
 
-template <int rank_, int dim> void
-Tensor<rank_, dim>::unroll( vector<double>& result) const
+template <int rank_, int dim>
+void
+Tensor<rank_, dim>::unroll( Vector<double>& result) const
 {
   Assert(result.size()==pow(dim,rank_),
 	 ExcWrongVectorSize(pow(dim,rank_), result.size()));
@@ -22,8 +29,9 @@ Tensor<rank_, dim>::unroll( vector<double>& result) const
 }
 
 
-template <int rank_, int dim> void
-Tensor<rank_, dim>::unroll_recursion( vector<double>& result, unsigned& index) const
+template <int rank_, int dim>
+void
+Tensor<rank_, dim>::unroll_recursion( Vector<double>& result, unsigned& index) const
 {
   for (unsigned i=0; i<dim; ++i)
     {
@@ -33,13 +41,14 @@ Tensor<rank_, dim>::unroll_recursion( vector<double>& result, unsigned& index) c
 }
 
 
-template<int dim> void
-Tensor<1,dim>::unroll_recursion( vector<double>& result, unsigned& index) const
+template<int dim>
+void
+Tensor<1,dim>::unroll_recursion( Vector<double>& result, unsigned& index) const
 {
   for (unsigned i=0; i<dim; ++i)
     {
-      cerr << "[" << index << ',' << operator[](i) << ']' << endl;
-      result[index++] = operator[](i);
+//      cerr << "[" << index << ',' << operator[](i) << ']' << endl;
+      result(index++) = operator[](i);
     }
   
 }

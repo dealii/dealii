@@ -5,6 +5,7 @@
 #include <vector>
 #include <base/tensor.h>
 #include <cmath>
+#include <lac/vector.h>
 
 template <int dim>
 VectorFunction<dim>::VectorFunction(unsigned n_components, const double initial_time)
@@ -29,7 +30,7 @@ VectorFunction<dim>::operator () (const Point<dim> &, unsigned) const
 */
 
 template <int dim> void
-VectorFunction<dim>::value (const Point<dim>  &, vector<double> &) const
+VectorFunction<dim>::value (const Point<dim>  &, Vector<double> &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
@@ -37,7 +38,7 @@ VectorFunction<dim>::value (const Point<dim>  &, vector<double> &) const
 
 template <int dim> void
 VectorFunction<dim>::value_list (const vector<Point<dim> > &,
-				 vector<vector<double> > &) const
+				 vector<Vector<double> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
@@ -139,7 +140,7 @@ TensorFunction<rank_, dim>::value (const Point<dim>  &p, vector<double> &erg) co
 
 template <int rank_, int dim> void
 TensorFunction<rank_, dim>::value_list (const vector<Point<dim> > & points,
-				 vector<vector<double> > & values) const
+				 vector<Vector<double> > & values) const
 {
   Assert (values.size() == points.size(),
 	  ExcVectorHasWrongSize(values.size(), points.size()));

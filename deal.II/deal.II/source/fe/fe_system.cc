@@ -36,7 +36,7 @@ void FESystem<dim>::initialize ()
   
 				   // 1. Vertices
       total_index = 0;
-  for (unsigned vertex_number= 0 ; vertex_number < GeometryInfo<2>::vertices_per_cell ;
+  for (unsigned vertex_number= 0 ; vertex_number < GeometryInfo<dim>::vertices_per_cell ;
        ++vertex_number)
     {
       unsigned comp_start = 0;
@@ -60,7 +60,7 @@ void FESystem<dim>::initialize ()
     }
   
 				   // 2. Lines
-  for (unsigned line_number= 0 ; line_number < GeometryInfo<2>::lines_per_cell ;
+  for (unsigned line_number= 0 ; line_number < GeometryInfo<dim>::lines_per_cell ;
        ++line_number)
     {
       unsigned comp_start = 0;
@@ -85,7 +85,7 @@ void FESystem<dim>::initialize ()
     }
   
 				   // 3. Quads
-  for (unsigned quad_number= 0 ; quad_number < GeometryInfo<2>::quads_per_cell ;
+  for (unsigned quad_number= 0 ; quad_number < GeometryInfo<dim>::quads_per_cell ;
        ++quad_number)
     {
       unsigned comp_start = 0;
@@ -110,7 +110,7 @@ void FESystem<dim>::initialize ()
     }
   
 				   // 4. Hex
-  for (unsigned hex_number= 0 ; hex_number < GeometryInfo<2>::hexes_per_cell ;
+  for (unsigned hex_number= 0 ; hex_number < GeometryInfo<dim>::hexes_per_cell ;
        ++hex_number)
     {
       unsigned comp_start = 0;

@@ -4,7 +4,9 @@ while(<>)
 {
     next if (m/DeclException/);
     chop;
-    if (m/(.+)=(.+)/)
+    s/\</\&lt\;/g;
+    s/\>/\&gt\;/g;
+    if (m/(.+)=([^=]+)=?$/)
     {
 	@n = split "::", $1;
 
@@ -13,7 +15,7 @@ while(<>)
 	{
 	    $entry .= "+" . pop @n;
 	}
-	$entry .= '=' . $2 . '=' . $library;
+	$entry .= ',' . $2 . ',' . $library;
 	push @entries, $entry;
     }
     else
@@ -34,7 +36,7 @@ EOT
     ;
 foreach $entry (sort @entries)
 {
-    @l = split "=", $entry;
+    @l = split ",", $entry;
     @c = split '\+', @l[0];
     @f = split "#", @l[1];
 

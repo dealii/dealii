@@ -138,7 +138,7 @@ class Tensor {
 				      * usual in C++, the rightmost
 				      * index marches fastest.
 				      */
-    void unroll(vector<double> & result) const;
+    void unroll(Vector<double> & result) const;
     
 
 				     /**
@@ -146,18 +146,18 @@ class Tensor {
 				      */
     void clear ();
 
-				     /**
-				      * Exception
-				      */
-    DeclException2(ExcWrongVectorSize, unsigned, int, << "Tensor has " << arg1
-		   << " entries, but vector has size " << arg2);
+// 				     /**
+// 				      * Exception
+// 				      */
+//     DeclException2(ExcWrongVectorSize, unsigned, int, << "Tensor has " << arg1
+// 		   << " entries, but vector has size " << arg2);
     
-				     /**
-				      *  Exception
-				      */
-    DeclException1 (ExcInvalidIndex,
-		    int,
-		    << "Invalid index " << arg1);
+// 				     /**
+// 				      *  Exception
+// 				      */
+//     DeclException1 (ExcInvalidIndex,
+// 		    int,
+// 		    << "Invalid index " << arg1);
   private:
 				     /**
 				      * Array of tensors holding the
@@ -168,10 +168,10 @@ class Tensor {
 				     /**
 				      * Help function for unroll.
 				      */
-    void unroll_recursion(vector<double> & result, unsigned& start_index) const;
+    void unroll_recursion(Vector<double> & result, unsigned& start_index) const;
 
     template<>
-    friend void Tensor<rank_+1,dim>::unroll_recursion(vector<double> &, unsigned&) const;
+    friend void Tensor<rank_+1,dim>::unroll_recursion(Vector<double> &, unsigned&) const;
 };
 
 

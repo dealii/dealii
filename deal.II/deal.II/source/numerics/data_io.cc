@@ -543,8 +543,11 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
   
   FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points));
   const StraightBoundary<dim> boundary;
-  vector< vector <vector<double> > >
-    values (data.size(), vector< vector<double> >(dofs->get_fe().n_components, vector<double>(points.n_quadrature_points)));
+  vector< vector <Vector<double> > >
+    values (data.size(),
+	    vector< Vector<double> >(points.n_quadrature_points,
+				     Vector<double>(dofs->get_fe().n_components
+				     )));
 
   for (cell=dofs->begin_active(); cell!=endc; ++cell) 
     {
@@ -570,7 +573,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		    out << pt << "  ";
 		    for (unsigned int i=0; i!=data.size(); ++i)
 		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
-			out << values[i][j][supp_pt]
+			out << values[i][supp_pt](j)
 			    << ' ';
 		    out << endl;
 		  };
@@ -592,7 +595,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		    
 		    for (unsigned int i=0; i!=data.size(); ++i)
 		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
-			out << values[i][j][supp_pt]
+			out << values[i][supp_pt](j)
 			    << ' ';
 		    out << endl;
 		  }
@@ -625,7 +628,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 			    
 			    for (unsigned int i=0; i!=data.size(); ++i)
 			      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
-				out << values[i][j][supp_pt]
+				out << values[i][supp_pt](j)
 				    << ' ';
 			    out << endl;
 			  }

@@ -304,7 +304,7 @@ class FEValuesBase {
 				    * elements.
 				    */
     void get_function_values (const Vector<double>    &fe_function,
-			      vector<vector<double> > &values) const;
+			      vector<Vector<double> > &values) const;
 
     				     /**
 				      * Return the gradient of the #i#th shape
