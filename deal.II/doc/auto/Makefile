@@ -1,12 +1,17 @@
 # $Id$
 
-KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
-KDOCINCLUDE = -lbase -llac -lbasic -lgrid -ldof -lnumerics -ltransport
 
+##########################################################################
+# Change this section only, if you want to add a documentation library   #
+##########################################################################
+#
+# specify which are the include files that a specific documentation libary
+# depends upon
 kdoc.base = $(wildcard ../../base/include/base/*.h)
 kdoc.lac  = $(wildcard ../../lac/include/lac/*.h)
 kdoc.basic= $(wildcard ../../deal.II/include/basic/*.h)
-kdoc.grid = $(wildcard ../../deal.II/include/grid/tria*.h) ../../deal.II/include/grid/geometry_info.h
+kdoc.grid = $(wildcard ../../deal.II/include/grid/tria*.h)\
+            ../../deal.II/include/grid/geometry_info.h
 kdoc.dof  = $(wildcard ../../deal.II/include/grid/dof*.h) \
             $(wildcard ../../deal.II/include/grid/mg_*.h) \
             $(wildcard ../../deal.II/include/fe/*.h)
@@ -16,94 +21,73 @@ kdoc.num  = $(wildcard ../../deal.II/include/numerics/*.h)
 # we need not take care of cross-dependencies each time 
 kdoc.transport     = $(wildcard ../../projects/transport/trans_dg/*.h)
 kdoc.wave-equation = $(wildcard ../../projects/wave-equation/include/*.h)
-kdoc.projects      = $(kdoc.transport) $(kdoc.wave-equation)
 
 
+# specify the names of the resulting doc libraries
+kdoc.library-files = kdoc/base.kdoc         \
+                     kdoc/lac.kdoc          \
+                     kdoc/basic.kdoc        \
+                     kdoc/grid.kdoc         \
+                     kdoc/dof.kdoc          \
+                     kdoc/numerics.kdoc     \
+                     kdoc/transport.kdoc    \
+                     kdoc/wave-equation.kdoc
+##########################################################################
+# End of changeable section                                              #
+##########################################################################
 
-kdoc.all  = $(kdoc.base) $(kdoc.lac) $(kdoc.basic) $(kdoc.grid) $(kdoc.dof) $(kdoc.num) \
-            $(kdoc.projects)
 
-all-include-files = $(wildcard ../../deal.II/include/*/*.h \
-                               ../../lac/include/lac/*.h   \
-                               ../../base/include/base/*.h \
-                               ../../projects/transport/trans_dg/*.h \
-                               ../../projects/wave-equation/include/*.h \
-                     )
+# make rule names to rerun the generation of a library
+kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
 
 
+KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
 
+
+# by default: make docu libraries and generate an index of all names
 default: kdoc kdoc/names.html
+
+# alternatively: do the above and also generate a backlog of CVS
+# changes in the last 100 days
 all: default cvslog
 
 cvslog:
 	cd ../.. ; perl doc/auto/scripts/cvs2html -o doc/auto/cvs-backlog/newdeal -a -k -D 100
 
 
-# make sure that the *.kdoc files exist by
-# using the dependancies and the following rules.
-kdoc: kdoc/base.kdoc kdoc/lac.kdoc kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc\
-      kdoc/transport.kdoc kdoc/wave-equation.kdoc \
-      $(kdoc.all) kdoc-rerun
-
-kdoc-rerun:
-	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dbase \
-		 base $(kdoc.base:../..%=../../..%)
-	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dlac \
-		 lac $(kdoc.lac:../..%=../../..%)
-	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dbasic \
-		 basic $(kdoc.basic:../..%=../../..%)
-	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dgrid  \
-		grid  $(kdoc.grid:../..%=../../..%)
-	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -ddof   \
-		dof   $(kdoc.dof:../..%=../../..%)
-	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dnumerics   \
-		numerics $(kdoc.num:../..%=../../..%)
-	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dtransport   \
-		transport $(kdoc.transport:../..%=../../..%)
-	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dwave-equation   \
-		wave-equation $(kdoc.wave-equation:../..%=../../..%)
-# output the names of the files which were not processed since they should
-# be added to one of the above lists.
-	@echo -------------------------------------------------------------
-	@echo Unprocessed include files:
-	@echo "  " $(filter-out $(kdoc.all), $(all-include-files))
+# make the .kdoc files twice: once without and a second time with
+# crossreferencing the other libraries
+kdoc: $(kdoc.library-files) $(kdoc.library-files.rerun)
 
 
-kdoc/base.kdoc: $(kdoc.base)
-	@cd kdoc ; perl $(KDOCFLAGS) -dbase \
-		base $(kdoc.base:../..%=../../..%)
+# rule how to generate the documentation the first time, i.e. without
+# crossreferencing the other doc-libraries. we do not try to make it
+# dependent on anything, since it needs to be generated anyway
+#
+# since the rule is a rather complex one, involving the computation of
+# variable names, here is the stripped down version for the base library:
+# kdoc/base.kdoc:
+#	@cd kdoc ; perl $(KDOCFLAGS) -dbase \
+#		base $(kdoc.base:../..%=../../..%)
+$(kdoc.library-files):
+	@cd kdoc ;                                                 \
+	 perl   $(KDOCFLAGS)                                       \
+		-d$(subst .kdoc,,$(subst kdoc/,,$@))               \
+		$(subst .kdoc,,$(subst kdoc/,,$@))                 \
+		$($(subst /,.,$(subst .kdoc,,$@)):../..%=../../..%)
 
-kdoc/lac.kdoc: $(kdoc.lac)
-	@cd kdoc ; perl $(KDOCFLAGS) -dlac  \
-		lac   $(kdoc.lac:../..%=../../..%)
-
-kdoc/basic.kdoc: $(kdoc.basic)
-	@cd kdoc ; perl $(KDOCFLAGS) -dbasic \
-		basic $(kdoc.basic:../..%=../../..%)
-
-kdoc/grid.kdoc: $(kdoc.grid)
-	@cd kdoc ; perl $(KDOCFLAGS) -dgrid  \
-		grid   $(kdoc.grid:../..%=../../..%)
-
-kdoc/dof.kdoc: $(kdoc.tria)
-	@cd kdoc ; perl $(KDOCFLAGS) -ddof   \
-		dof     $(kdoc.dof:../..%=../../..%)
-
-kdoc/numerics.kdoc: $(kdoc.num)
-	@cd kdoc ; perl $(KDOCFLAGS) -dnumerics   \
-		numerics $(kdoc.num:../..%=../../..%)
-
-kdoc/transport.kdoc: $(kdoc.transport)
-	@cd kdoc ; perl $(KDOCFLAGS) -dtransport   \
-		transport $(kdoc.transport:../..%=../../..%)
-
-kdoc/wave-equation.kdoc: $(kdoc.wave-equation)
-	@cd kdoc ; perl $(KDOCFLAGS) -dwave-equation   \
-		wave-equation $(kdoc.wave-equation:../..%=../../..%)
+# rule how to generate the documentation the second time, i.e. with
+# crossreferencing the other doc-libraries this time. the rule is
+# similar to the above one, but includes the other libraries
+$(kdoc.library-files.rerun):
+	@cd kdoc ;                                                       \
+	 perl   $(KDOCFLAGS) $(kdoc.library-files:kdoc/%.kdoc=-l%)       \
+		-d$(subst .kdoc.rerun,,$(subst kdoc/,,$@))               \
+		$(subst .kdoc.rerun,,$(subst kdoc/,,$@))                 \
+		$($(subst /,.,$(subst .kdoc.rerun,,$@)):../..%=../../..%)
 
 
-kdoc/names.html: kdoc/base.kdoc kdoc/lac.kdoc kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc \
-                 kdoc/transport.kdoc kdoc/wave-equation.kdoc
+kdoc/names.html: $(kdoc.libray-files)
 	@cd kdoc ; perl ../scripts/index.pl *.kdoc > names.html
 
 
@@ -111,5 +95,4 @@ clean:
 	-rm -f kdoc/names.html kdoc/*.kdoc kdoc/*/*.html cvs-backlog/*.html
 
 
-
-.PHONY: default all kdoc-rerun clean
+.PHONY: default all kdoc $(kdoc.library-files) $(kdoc.library-files.rerun) clean
