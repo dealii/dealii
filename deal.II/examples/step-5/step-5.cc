@@ -470,10 +470,10 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // Instead of writing
 				       // fe_values.shape_value(j,q)
 				       // we can now write
-				       // shape_values(j,q), i.e. the
+				       // shape_values[j][q], i.e. the
 				       // function call needed
 				       // previously for each access
-				       // has been optimized away.
+				       // will be optimized away.
 				       //
 				       // There are alike functions
 				       // for almost all data elements
@@ -487,7 +487,8 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // in the matrix (j,q) now
 				       // needs to be the gradient of
 				       // the shape function, which is
-				       // a vector.
+				       // a tensor rather than a
+				       // scalar.
 				       //
 				       // Similarly, access to the
 				       // place where quadrature
@@ -514,23 +515,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // fe_values object is no more
 				       // explicitely needed to access
 				       // the different fields (see
-				       // below). Unfortunately,
-				       // things became a bit
-				       // inconsistent, since the
-				       // shape values are accessed
-				       // via the FullMatrix operator
-				       // (), i.e. using parentheses,
-				       // while all the other fields
-				       // are accessed through vector
-				       // operator [], i.e. using
-				       // brackets. This is due to
-				       // historical reasons and
-				       // frequently leads to a bit of
-				       // confusion, but since the
-				       // places where this happens
-				       // are few in well-written
-				       // programs, this is not too
-				       // big a problem.
+				       // below).
 
 				       // There is one more thing: in
 				       // this example, we want to use
@@ -610,7 +595,7 @@ void LaplaceProblem<dim>::assemble_system ()
 					     // For the right hand
 					     // side, a constant value
 					     // is used again:
-	    cell_rhs(i) += (shape_values (i,q_point) *
+	    cell_rhs(i) += (shape_values[i][q_point] *
 			    1.0 *
 			    JxW_values[q_point]);
 	  };

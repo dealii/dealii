@@ -1045,13 +1045,13 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      cell_matrix(i,j) += ((advection_directions[q_point] *
 				    shape_grads[j][q_point]    *
-				    (shape_values(i,q_point) +
+				    (shape_values[i][q_point] +
 				     delta *
 				     (advection_directions[q_point] *
 				      shape_grads[i][q_point]))) *
 				   JxW_values[q_point]);
 
-	    cell_rhs(i) += ((shape_values (i,q_point) +
+	    cell_rhs(i) += ((shape_values[i][q_point] +
 			     delta *
 			     (advection_directions[q_point] *
 			      shape_grads[i][q_point])        ) *
@@ -1175,14 +1175,14 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 		    for (unsigned int j=0; j<dofs_per_cell; ++j)
 		      cell_matrix(i,j) -= (face_advection_directions[q_point] *
 					   normal_vectors[q_point] *
-					   face_shape_values(i,q_point) *
-					   face_shape_values(j,q_point) *
+					   face_shape_values[i][q_point] *
+					   face_shape_values[j][q_point] *
 					   face_JxW_values[q_point]);
 		    
 		    cell_rhs(i) -= (face_advection_directions[q_point] *
 				    normal_vectors[q_point] *
 				    face_boundary_values[q_point] *
-				    face_shape_values(i,q_point) *
+				    face_shape_values[i][q_point] *
 				    face_JxW_values[q_point]);
 		  };
 	  };

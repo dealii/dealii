@@ -888,13 +888,13 @@ void LaplaceProblem<dim>::assemble_system ()
 				    shape_grads[j][q_point] *
 				    JxW_values[q_point])
 				   +
-				   (shape_values(i,q_point) *
-				    shape_values(j,q_point) *
+				   (shape_values[i][q_point] *
+				    shape_values[j][q_point] *
 				    JxW_values[q_point]));
 
 	    cell_rhs(i) += (shape_values (i,q_point) *
 			    rhs_values [q_point] *
-			    fe_values.JxW (q_point));
+			    JxW_values[q_point]);
 	  };
 
 				       // Then there is that second
@@ -988,7 +988,7 @@ void LaplaceProblem<dim>::assemble_system ()
 						 // shape function:
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  cell_rhs(i) += (neumann_value *
-				  face_shape_values(i,q_point) *
+				  face_shape_values[i][q_point] *
 				  face_JxW_values[q_point]);
 	      };
 	  };

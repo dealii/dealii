@@ -533,9 +533,9 @@ void LaplaceProblem<dim>::assemble_system ()
 				    shape_grads[j][q_point])   *
 				   JxW_values[q_point]);
 
-	    cell_rhs(i) += (shape_values (i,q_point) *
+	    cell_rhs(i) += (shape_values[i][q_point] *
 			    1.0 *
-			    fe_values.JxW (q_point));
+			    JxW_values[q_point]);
 	  };
 
 

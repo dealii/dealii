@@ -690,7 +690,7 @@ void ElasticProblem<dim>::assemble_system ()
 	    component_i = fe.system_to_component_index(i).first;
 	  
 	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	    cell_rhs(i) += shape_values(i,q_point) *
+	    cell_rhs(i) += shape_values[i][q_point] *
 			   rhs_values[q_point](component_i) *
 			   JxW_values[q_point];
 	};
