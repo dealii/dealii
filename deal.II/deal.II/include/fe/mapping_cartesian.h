@@ -109,6 +109,16 @@ class MappingCartesian : public Mapping<dim>
 			 Tensor<1,dim>          *end,
 			 const Tensor<1,dim>    *src,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    transform_covariant (Tensor<2,dim>          *begin,
+			 Tensor<2,dim>          *end,
+			 const Tensor<2,dim>    *src,
+			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
 				      * Implementation of the interface in
@@ -118,6 +128,16 @@ class MappingCartesian : public Mapping<dim>
     transform_contravariant (Tensor<1,dim>          *begin,
 			     Tensor<1,dim>          *end,
 			     const Tensor<1,dim>    *src,
+			     const typename Mapping<dim>::InternalDataBase &internal) const;
+    
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    transform_contravariant (Tensor<2,dim>          *begin,
+			     Tensor<2,dim>          *end,
+			     const Tensor<2,dim>    *src,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
 
 				     /**
@@ -205,12 +225,12 @@ class MappingCartesian : public Mapping<dim>
 					  *
 					  * Filled once.
 					  */
-        vector2d<Tensor<1,dim> > unit_tangentials;
+        Table<2,Tensor<1,dim> > unit_tangentials;
 	
 					 /**
 					  * Auxiliary vectors for internal use.
 					  */
-        vector2d<Tensor<1,dim> > aux;
+        Table<2,Tensor<1,dim> > aux;
     };
     
 				     /**

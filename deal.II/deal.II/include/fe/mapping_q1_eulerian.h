@@ -95,8 +95,8 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 				      * can be initialized by
 				      * @p{DoFObjectAccessor::set_dof_values()}.
 				      */
-    MappingQ1Eulerian ( const Vector<double>  &euler_transform_vectors,
-		        const DoFHandler<dim> &shiftmap_dof_handler);
+    MappingQ1Eulerian (const Vector<double>  &euler_transform_vectors,
+                       const DoFHandler<dim> &shiftmap_dof_handler);
 
 
 				     /**

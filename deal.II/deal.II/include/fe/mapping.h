@@ -18,7 +18,6 @@
 #include <cmath>
 #include <base/point.h>
 #include <base/subscriptor.h>
-#include <base/vector2d.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <fe/fe_update_flags.h>
@@ -195,16 +194,40 @@ class Mapping : public Subscriptor
     };
     
 				     /**
-				      * Tranform a field of covariant
-				      * vectors. The vector spanned by
-				      * @p{begin} and @p{end} must
+				      * Transform a field of covariant
+				      * vectors. The covariant
+				      * transformation multiplies a
+				      * vector from the right with the
+				      * inverse of the Jacobian matrix
+				      * of the transformation from
+				      * unit to real space
+				      * cell. Alternatively, this is
+				      * equivalent to a multiplication
+				      * from the left with the
+				      * transpose if the inverse
+				      * matrix.
+				      *
+				      * The range of vectors spanned
+				      * by @p{begin} and @p{end} must
 				      * have as many elements as there
 				      * are quadrature points (not
 				      * tested inside the function).
+				      * Also note the different
+				      * convention for parameters
+				      * compared to the standard C++
+				      * @p{transform} function: here,
+				      * first destination, then source
+				      * are specified, and the number
+				      * of elements is determined by a
+				      * range of destination
+				      * vectors. This convention is
+				      * due to the way the function is
+				      * usually called.
 				      *
 				      * The vector @p{src} must
 				      * contain at least as many
-				      * elements.
+				      * elements as there are
+				      * quadrature points.
 				      */
     virtual
     void
@@ -212,19 +235,56 @@ class Mapping : public Subscriptor
 			 Tensor<1,dim>          *end,
 			 const Tensor<1,dim>    *src,
 			 const InternalDataBase &internal) const = 0;
+
+                                     /**
+                                      * Transform a set of matrices
+                                      * covariantly, i.e. multiply
+                                      * each function in the input
+                                      * range by the Jacobian matrices
+                                      * at the different quadrature
+                                      * points from the left.
+                                      *
+                                      * The same applies as to the
+                                      * function above regarding input
+                                      * and output ranges.
+                                      */
+    virtual
+    void
+    transform_covariant (Tensor<2,dim>          *begin,
+			 Tensor<2,dim>          *end,
+			 const Tensor<2,dim>    *src,
+			 const InternalDataBase &internal) const = 0;
     
 				     /**
-				      * Tranform a field of
+				      * Transform a field of
 				      * contravariant vectors. The
-				      * vector spanned by @p{begin}
-				      * and @p{end} must have as many
-				      * elements as there are
-				      * quadrature points (not tested
-				      * inside the function).
+				      * contravariant transformation
+				      * multiplies a vector from the
+				      * left with the Jacobian matrix
+				      * of the transformation from
+				      * unit to real space cell.
+				      * 
+				      * The range of vectors spanned
+				      * by @p{begin} and @p{end} must
+				      * have as many elements as there
+				      * are quadrature points (not
+				      * tested inside the function).
+				      * Also note the different
+				      * convention for parameters
+				      * compared to the standard C++
+				      * @p{transform} function: here,
+				      * first destination, then source
+				      * are specified, and the number
+				      * of elements is determined by a
+				      * range of destination
+				      * vectors. This convention is
+				      * due to the way the function is
+				      * usually called.
 				      *
 				      * The vector @p{src} must
 				      * contain at least as many
-				      * elements.
+				      * elements as there are
+				      * quadrature points.
 				      */
     virtual
     void
@@ -233,6 +293,32 @@ class Mapping : public Subscriptor
 			     const Tensor<1,dim>    *src,
 			     const InternalDataBase &internal) const = 0;
 
+                                     /**
+                                      * Transform a set of matrices
+                                      * contravariantly, i.e. multiply
+                                      * each function in the input
+                                      * range by the inverse Jacobian
+                                      * matrices at the different
+                                      * quadrature points from the
+                                      * right. Note that here it is no
+                                      * more equivalent to
+                                      * multiplication with the
+                                      * transpose of the inverse
+                                      * matrices from the left, unless
+                                      * the matrices to be multiplied
+                                      * with are symmetric.
+                                      *
+                                      * The same applies as to the
+                                      * function above regarding input
+                                      * and output ranges.
+                                      */
+    virtual
+    void
+    transform_contravariant (Tensor<2,dim>          *begin,
+                             Tensor<2,dim>          *end,
+                             const Tensor<2,dim>    *src,
+                             const InternalDataBase &internal) const = 0;
+    
 				     /**
 				      * Indicate fields to be updated
 				      * in the constructor of
@@ -352,7 +438,7 @@ class Mapping : public Subscriptor
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                         &quadrature,
 		    InternalDataBase                              &internal,
-		    std::vector<Point<dim> >             &quadrature_points,
+		    std::vector<Point<dim> >                      &quadrature_points,
 		    std::vector<double>                           &JxW_values) const = 0;
 
 				     /**

@@ -61,8 +61,6 @@ MappingQ<dim>::InternalData::memory_consumption () const
 // cells are scaled linearly
 template<>
 MappingQ<1>::MappingQ (const unsigned int):
-		laplace_on_quad_vector(0),
-		laplace_on_hex_vector(0),
 		degree(1),
 		n_inner(0),
 		n_outer(0),
@@ -100,9 +98,8 @@ static number power(const number x, const unsigned int y)
 
 
 template<int dim>
-MappingQ<dim>::MappingQ (const unsigned int p):
-		laplace_on_quad_vector(0),
-		laplace_on_hex_vector(0),
+MappingQ<dim>::MappingQ (const unsigned int p)
+                :
 		degree(p),
 		n_inner(power(degree-1, dim)),
 		n_outer((dim==2) ? 4+4*(degree-1)
@@ -409,7 +406,7 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
 
 template <>
 void
-MappingQ<1>::set_laplace_on_quad_vector(vector2d<double> &) const
+MappingQ<1>::set_laplace_on_quad_vector(Table<2,double> &) const
 {
   Assert(false, ExcInternalError());
 }
@@ -418,7 +415,7 @@ MappingQ<1>::set_laplace_on_quad_vector(vector2d<double> &) const
 
 template <int dim>
 void
-MappingQ<dim>::set_laplace_on_quad_vector(vector2d<double> &loqvs) const
+MappingQ<dim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
 {
   Assert(degree>1, ExcInternalError());
   const unsigned int n_inner_2d=(degree-1)*(degree-1);
@@ -490,7 +487,7 @@ MappingQ<dim>::set_laplace_on_quad_vector(vector2d<double> &loqvs) const
 
 template <>
 void
-MappingQ<3>::set_laplace_on_hex_vector(vector2d<double> &lohvs) const
+MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const
 {
   Assert(degree>1, ExcInternalError());
 
@@ -536,7 +533,7 @@ MappingQ<3>::set_laplace_on_hex_vector(vector2d<double> &lohvs) const
 
 template <int dim>
 void
-MappingQ<dim>::set_laplace_on_hex_vector(vector2d<double> &) const
+MappingQ<dim>::set_laplace_on_hex_vector(Table<2,double> &) const
 {
   Assert(false, ExcInternalError());
 }
@@ -548,7 +545,7 @@ MappingQ<dim>::set_laplace_on_hex_vector(vector2d<double> &) const
 
 template <>
 void
-MappingQ<1>::compute_laplace_vector(vector2d<double> &) const
+MappingQ<1>::compute_laplace_vector(Table<2,double> &) const
 {
   Assert(false, ExcInternalError());
 }
@@ -558,7 +555,7 @@ MappingQ<1>::compute_laplace_vector(vector2d<double> &) const
 
 template <int dim>
 void
-MappingQ<dim>::compute_laplace_vector(vector2d<double> &lvs) const
+MappingQ<dim>::compute_laplace_vector(Table<2,double> &lvs) const
 {
   Assert(lvs.n_rows()==0, ExcInternalError());
   Assert(dim==2 || dim==3, ExcNotImplemented());
@@ -617,7 +614,7 @@ MappingQ<dim>::compute_laplace_vector(vector2d<double> &lvs) const
 
 template <int dim>
 void
-MappingQ<dim>::apply_laplace_vector(const vector2d<double> &lvs,
+MappingQ<dim>::apply_laplace_vector(const Table<2,double> &lvs,
 				    std::vector<Point<dim> > &a) const
 {
   Assert(lvs.n_rows()!=0, ExcLaplaceVectorNotSet(degree));
@@ -1086,6 +1083,40 @@ MappingQ<dim>::transform_covariant (Tensor<1,dim>       *begin,
 }
 
 
+
+template <int dim>
+void
+MappingQ<dim>::transform_covariant (Tensor<2,dim>       *begin,
+				    Tensor<2,dim>       *end,
+				    const Tensor<2,dim> *src,
+				    const typename Mapping<dim>::InternalDataBase &mapping_data) const
+{
+  const typename MappingQ1<dim>::InternalData *q1_data =
+    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
+  Assert(q1_data!=0, ExcInternalError());
+  
+  typename std::vector<Tensor<2,dim> >::const_iterator tensor;
+
+  if (q1_data->is_mapping_q1_data)
+    tensor = q1_data->covariant.begin();
+  else
+    {
+      const InternalData *data = dynamic_cast<const InternalData *> (q1_data);
+      Assert(data!=0, ExcInternalError());
+
+      if (data->use_mapping_q1_on_current_cell)
+	tensor = data->mapping_q1_data.covariant.begin();
+      else
+	tensor = data->covariant.begin();
+    }
+  while (begin!=end)
+    {
+      contract (*(begin++), *(src++), *(tensor++));
+    }
+}
+
+
+
 template <int dim>
 void
 MappingQ<dim>::transform_contravariant (Tensor<1,dim>       *begin,
@@ -1116,6 +1147,40 @@ MappingQ<dim>::transform_contravariant (Tensor<1,dim>       *begin,
       contract (*(begin++), *(tensor++), *(src++));
     }
 }
+
+
+
+template <int dim>
+void
+MappingQ<dim>::transform_contravariant (Tensor<2,dim>       *begin,
+					Tensor<2,dim>       *end,
+					const Tensor<2,dim> *src,
+					const typename Mapping<dim>::InternalDataBase &mapping_data) const
+{
+  const typename MappingQ1<dim>::InternalData *q1_data =
+    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
+  Assert(q1_data!=0, ExcInternalError());
+  
+  typename std::vector<Tensor<2,dim> >::const_iterator tensor;
+
+  if (q1_data->is_mapping_q1_data)
+    tensor = q1_data->contravariant.begin();
+  else
+    {
+      const InternalData *data = dynamic_cast<const InternalData *> (q1_data);
+      Assert(data!=0, ExcInternalError());
+
+      if (data->use_mapping_q1_on_current_cell)
+	tensor = data->mapping_q1_data.contravariant.begin();
+      else
+	tensor = data->contravariant.begin();    
+    }
+  while (begin!=end)
+    {
+      contract (*(begin++), *(tensor++), *(src++));
+    }
+}
+
 
 
 template <int dim>

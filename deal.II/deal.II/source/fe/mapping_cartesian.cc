@@ -460,6 +460,33 @@ MappingCartesian<dim>::transform_covariant (Tensor<1,dim>       *begin,
 }
 
 
+
+template <int dim>
+void
+MappingCartesian<dim>::transform_covariant (Tensor<2,dim>       *begin,
+					    Tensor<2,dim>       *end,
+					    const Tensor<2,dim> *src,
+					    const typename Mapping<dim>::InternalDataBase &mapping_data) const
+{
+  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
+
+  Assert (data.update_flags & update_covariant_transformation,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+  
+				   // simply scale by inverse Jacobian
+				   // (which is diagonal here)
+  while (begin!=end)
+    {
+      for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int p=0; p<dim; ++p)
+	(*begin)[d][p] = (*src)[d][p] / data.length[p];
+      begin++;
+      src++;
+    }
+}
+
+
+
 template <int dim>
 void
 MappingCartesian<dim>::transform_contravariant (Tensor<1,dim>       *begin,
@@ -486,6 +513,37 @@ MappingCartesian<dim>::transform_contravariant (Tensor<1,dim>       *begin,
       ++src;
     }
 }
+
+
+
+template <int dim>
+void
+MappingCartesian<dim>::transform_contravariant (Tensor<2,dim>       *begin,
+						Tensor<2,dim>       *end,
+						const Tensor<2,dim> *src,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+{
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
+  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
+
+  Assert (data.update_flags & update_contravariant_transformation,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+
+				   // simply scale by Jacobian
+				   // (which is diagonal here)
+  while (begin!=end)
+    {
+      for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int p=0; p<dim; ++p)
+	(*begin)[d][p] = data.length[d] * (*src)[d][p];
+      begin++;
+      src++;
+    }
+}
+
 
 
 template <int dim>

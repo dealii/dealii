@@ -467,47 +467,45 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
 //	      ExcDimensionMismatch(covariant_grads.size(), npts));
     }
   
-  std::vector<Point<dim> > &a=data.mapping_support_points;
-  
-				   // store all Lagrangian
-				   // support points in a
-  if (a.size()==0
-      || (&cell->get_triangulation() !=
-	  &data.cell_of_current_support_points->get_triangulation())
-      || (cell!=data.cell_of_current_support_points))
+				   // if necessary, recompute the
+				   // support points of the
+				   // transformation of this cell
+  if ((data.mapping_support_points.size() == 0)
+      ||
+      (&cell->get_triangulation() !=
+       &data.cell_of_current_support_points->get_triangulation())
+      ||
+      (cell != data.cell_of_current_support_points))
     {
-      compute_mapping_support_points(cell, a);
-      data.cell_of_current_support_points=cell;
+      compute_mapping_support_points(cell, data.mapping_support_points);
+      data.cell_of_current_support_points = cell;
     }
-  
-  for (unsigned int point=0; point<npts; ++point)
-    {
-				       // First, compute function
-				       // values and derivatives
-      for (unsigned int k=0; k<data.n_shape_functions; ++k)
-	{
-	  if (update_flags & update_q_points)
-	    {
-	      quadrature_points[point]
-		+= data.shape(point+offset,k) * a[k];
-	    }
-	  if (update_flags & update_contravariant_transformation)
-	    {
-	      for (unsigned int i=0; i<dim; ++i)
-		for (unsigned int j=0; j<dim; ++j)
-		  data.contravariant[point][i][j]
-		    += data.derivative(point+offset, k)[j]
-		    * a[k][i];
-	    }
-	}
 
-				       // Invert contravariant for
+                                   // first compute quadrature points
+  if (update_flags & update_q_points)
+    for (unsigned int point=0; point<npts; ++point)
+      for (unsigned int k=0; k<data.n_shape_functions; ++k)
+        quadrature_points[point]
+          += data.shape(point+offset,k) * data.mapping_support_points[k];
+  
+                                   // then Jacobians
+  if (update_flags & update_contravariant_transformation)
+    for (unsigned int point=0; point<npts; ++point)
+      for (unsigned int k=0; k<data.n_shape_functions; ++k)
+        for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int j=0; j<dim; ++j)
+            data.contravariant[point][i][j]
+              += (data.derivative(point+offset, k)[j]
+                  *
+                  data.mapping_support_points[k][i]);
+
+				       // invert contravariant for
 				       // covariant transformation
 				       // matrices
-      if (update_flags & update_covariant_transformation)
-	data.covariant[point]
-	  = invert(data.contravariant[point]);
-    }
+  if (update_flags & update_covariant_transformation)
+    for (unsigned int point=0; point<npts; ++point)
+      data.covariant[point] = invert(data.contravariant[point]);
+
   data.first_cell = false;
 }
 
@@ -798,13 +796,44 @@ MappingQ1<dim>::transform_covariant (Tensor<1,dim>       *begin,
 //  Assert (dst.size() == data.contravariant.size(),
 //	  ExcDimensionMismatch(dst.size() + src_offset, data.contravariant.size()));
 
-  typename std::vector<Tensor<2,dim> >::const_iterator tensor = data.covariant.begin();
+  typename std::vector<Tensor<2,dim> >::const_iterator
+    tensor = data.covariant.begin();
   
   while (begin!=end)
     {
       contract (*(begin++), *(src++), *(tensor++));
     }
 }
+
+
+
+template <int dim>
+void
+MappingQ1<dim>::transform_covariant (Tensor<2,dim>       *begin,
+				     Tensor<2,dim>       *end,
+				     const Tensor<2,dim> *src,
+				     const typename Mapping<dim>::InternalDataBase &mapping_data) const
+{
+  const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
+  Assert(data_ptr!=0, ExcInternalError());
+  const InternalData &data=*data_ptr;
+
+  Assert (data.update_flags & update_covariant_transformation,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+
+//TODO: [GK] Can we do a similar assertion?  
+//  Assert (dst.size() == data.contravariant.size(),
+//	  ExcDimensionMismatch(dst.size() + src_offset, data.contravariant.size()));
+
+  typename std::vector<Tensor<2,dim> >::const_iterator
+    tensor = data.covariant.begin();
+  
+  while (begin!=end)
+    {
+      contract (*(begin++), *(src++), *(tensor++));
+    }
+}
+
 
 
 template <int dim>
@@ -821,13 +850,40 @@ MappingQ1<dim>::transform_contravariant (Tensor<1,dim>       *begin,
   Assert (data.update_flags & update_contravariant_transformation,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
-  typename std::vector<Tensor<2,dim> >::const_iterator tensor = data.contravariant.begin();
+  typename std::vector<Tensor<2,dim> >::const_iterator
+    tensor = data.contravariant.begin();
   
   while (begin!=end)
     {
       contract (*(begin++), *(tensor++), *(src++));
     }
 }
+
+
+template <int dim>
+void
+MappingQ1<dim>::transform_contravariant (Tensor<2,dim>       *begin,
+					 Tensor<2,dim>       *end,
+					 const Tensor<2,dim> *src,
+					 const typename Mapping<dim>::InternalDataBase &mapping_data) const
+{
+  const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
+  Assert(data_ptr!=0, ExcInternalError());
+  const InternalData &data=*data_ptr;
+
+  Assert (data.update_flags & update_contravariant_transformation,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+
+  typename std::vector<Tensor<2,dim> >::const_iterator
+    tensor = data.contravariant.begin();
+  
+  while (begin!=end)
+    {
+      contract (*(begin++), *(tensor++), *(src++));
+    }
+}
+
+
 
 template <int dim>
 Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
