@@ -5,7 +5,7 @@
 /*----------------------------   fe_lib.h     ---------------------------*/
 
 
-#include <fe/fe.h>
+#include <fe/fe_linear_mapping.h>
 
 
 
