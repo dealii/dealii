@@ -291,7 +291,15 @@ dSMatrixStruct::bandwidth () const
 					 // the entries of this line
 	break;
   return b;
-}
+};
+
+
+
+unsigned int
+dSMatrixStruct::n_nonzero_elements () const {
+  Assert (compressed, ExcNotCompressed());
+  return colnums[rows]-colnums[0];
+};
 
 
 
@@ -354,6 +362,14 @@ dSMatrix::clear () {
   if (val) delete[] val;
   val = 0;
   max_len = 0;
+};
+
+
+
+unsigned int
+dSMatrix::n_nonzero_elements () const {
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  return cols->n_nonzero_elements ();
 };
 
 

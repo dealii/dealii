@@ -190,6 +190,20 @@ class dSMatrixStruct
     unsigned int bandwidth () const;
 
 				     /**
+				      * Return the number of nonzero elements of
+				      * this matrix. Actually, it returns the
+				      * number of entries in the sparsity
+				      * pattern; if any of the entries should
+				      * happen to be zero, it is counted
+				      * anyway.
+				      *
+				      * This function may only be called if the
+				      * matrix struct is compressed. It does not
+				      * make too much sense otherwise anyway.
+				      */
+    unsigned int n_nonzero_elements () const;
+
+				     /**
 				      * Return whether the structure is
 				      * compressed or not.
 				      */
@@ -366,7 +380,7 @@ class dSMatrix
     void clear ();
     
 				     /**
-				      * Return the dimension of the imga space.
+				      * Return the dimension of the image space.
 				      * To remember: the matrix is of dimension
 				      * $m \times n$.
 				      */
@@ -379,6 +393,16 @@ class dSMatrix
 				      */
     unsigned int n () const;
 
+				     /**
+				      * Return the number of nonzero elements of
+				      * this matrix. Actually, it returns the
+				      * number of entries in the sparsity
+				      * pattern; if any of the entries should
+				      * happen to be zero, it is counted
+				      * anyway.
+				      */
+    unsigned int n_nonzero_elements () const;
+    
 				     /**
 				      * Set the element #(i,j)# to #value#.
 				      * Throws an error if the entry does
