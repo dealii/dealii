@@ -271,7 +271,7 @@ SolverBicgstab<VECTOR>::start(const MATRIX& A)
   Vp->reinit(*Vx);
   Vv->reinit(*Vx);
   *Vrbar = *Vr;
-  return state = control().check(step, res);
+  return control().check(step, res);
 }
 
 
