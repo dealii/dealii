@@ -1360,7 +1360,13 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
       const unsigned int face_start = (dim==2)
 				      ? this->first_line_index
 				      : this->first_quad_index;
-  
+      const unsigned int edge_start = this->first_line_index;
+      
+      const unsigned int dofs_per_face = (dim==2)
+					 ? this->dofs_per_line
+					 : this->dofs_per_quad;
+      const unsigned int dofs_per_edge = this->dofs_per_line;
+      
 				       // Interior degrees of
 				       // freedom correspond to
 				       // shape functions with
@@ -1368,22 +1374,34 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
       if (shape_index >= cell_start)
 	return false;
 				       // Shape functions are sorted
-				       // by face. If we dived by
+				       // by face. If we divide by
 				       // the number of shapes per
 				       // face, the result must be
 				       // equal to the face index.
       if (shape_index >= face_start)
 	{
-	  shape_index -= this->first_line_index;
-	  shape_index /=  this->dofs_per_face;
+	  shape_index -= face_start;
+	  shape_index /=  dofs_per_face;
 	  return (shape_index == face_index);
 	}
+				       // In 3D, we must process edges
+				       // like faces.
+      if (shape_index >= edge_start)
+	{
+	  shape_index -= edge_start;
+	  shape_index /=  dofs_per_edge;
+	  return (shape_index == face_index);
+	}
+      
 				       // Only degrees of freedom on
 				       // a vertex are left.
       shape_index /=  this->dofs_per_vertex;
 				       // Use a table to figure out
 				       // which face is neighbor to
-				       // which vertex.
+				       // which vertex. This seems to
+				       // be the most reasonable way,
+				       // considering the way how
+				       // edges and faces are numbered
       switch (100*dim+10*face_index+shape_index)
 	{
 	  case 200:	  case 230:	  case 201:	  case 211:
