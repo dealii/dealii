@@ -142,6 +142,10 @@ Polynomial<number>::shift(std::vector<number>& coefficients,
 			  "about the bug and when it occurs in the aclocal.m4 file in the "
 			  "top level directory (watch for the string "
 			  "DEAL_II_LONG_DOUBLE_LOOP_BUG)"));
+				   // calm down warning for unused
+				   // args. note that this code is
+				   // actually unreachable
+  coefficients[0] = offset;
 #else  
 				   // Copy coefficients to a vector of
 				   // accuracy given by the argument
