@@ -464,7 +464,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * Abbreviate the somewhat lengthy
 				      * name for the @p{Patch} class.
 				      */
-    typedef typename DataOutBase::Patch<patch_dim,patch_space_dim> Patch;
+    typedef ::DataOutBase::Patch<patch_dim,patch_space_dim> Patch;
 
 				     /**
 				      * Pointer to the dof handler object.
@@ -645,7 +645,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * for finding neighbors.
 				      */
     typedef std::map<typename DoFHandler<dim>::cell_iterator,
-      typename std::vector<typename DataOutBase::Patch<dim> >::iterator>
+      typename std::vector<::DataOutBase::Patch<dim> >::iterator>
       PatchMap;
     
 				     /**

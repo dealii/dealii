@@ -49,7 +49,7 @@ void DataOutFaces<dim>::build_some_patches (Data data)
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   unsigned int face_number = 0;
-  typename std::vector<DataOutBase::Patch<dim-1,dim> >::iterator patch = this->patches.begin();
+  typename std::vector<::DataOutBase::Patch<dim-1,dim> >::iterator patch = this->patches.begin();
   FaceDescriptor face=first_face();
 
 				   // get first face in this thread
@@ -173,7 +173,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
 				   // clear the patches array
   if (true)
     {
-      std::vector<DataOutBase::Patch<dim-1,dim> > dummy;
+      std::vector<::DataOutBase::Patch<dim-1,dim> > dummy;
       this->patches.swap (dummy);
     };
   
@@ -207,7 +207,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
 				   // values. note that the evaluation
 				   // points on the face have to be
 				   // repeated in angular direction
-  DataOutBase::Patch<dim-1,dim>  default_patch;
+  ::DataOutBase::Patch<dim-1,dim>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
   this->patches.insert (patches.end(), n_patches, default_patch);

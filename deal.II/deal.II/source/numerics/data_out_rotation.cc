@@ -78,7 +78,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
   
   
   unsigned int cell_number = 0;
-  typename std::vector<DataOutBase::Patch<dim+1> >::iterator patch = this->patches.begin();
+  typename std::vector<::DataOutBase::Patch<dim+1> >::iterator patch = this->patches.begin();
   typename DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
@@ -351,7 +351,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 				   // clear the patches array
   if (true)
     {
-      std::vector<DataOutBase::Patch<dim+1> > dummy;
+      std::vector<::DataOutBase::Patch<dim+1> > dummy;
       this->patches.swap (dummy);
     };
   
@@ -392,7 +392,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 				   // values. note that the evaluation
 				   // points on the cell have to be
 				   // repeated in angular direction
-  DataOutBase::Patch<dim+1>  default_patch;
+  ::DataOutBase::Patch<dim+1>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets,
 			     n_q_points * (n_subdivisions+1));

@@ -309,7 +309,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_dataset_names ()
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-const typename std::vector<typename DataOutBase::Patch<patch_dim, patch_space_dim> > &
+const typename std::vector<::DataOutBase::Patch<patch_dim, patch_space_dim> > &
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;
@@ -352,7 +352,7 @@ void DataOut<dim>::build_some_patches (Data data)
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   unsigned int cell_number = 0;
-  typename std::vector<typename DataOutBase::Patch<dim> >::iterator patch = this->patches.begin();
+  typename std::vector<::DataOutBase::Patch<dim> >::iterator patch = this->patches.begin();
   typename DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
@@ -478,7 +478,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // clear the patches array
   if (true)
     {
-      typename std::vector<DataOutBase::Patch<dim> > dummy;
+      typename std::vector<::DataOutBase::Patch<dim> > dummy;
       this->patches.swap (dummy);
     };
   
@@ -519,7 +519,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // or similar operations are used
 				   // which would regularly overflow
 				   // the allocated amount of memory
-  DataOutBase::Patch<dim>  default_patch;
+  ::DataOutBase::Patch<dim>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
   this->patches.insert (patches.end(), n_patches, default_patch);
@@ -542,7 +542,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // First, number patches
 				   // consecutively.
   unsigned int patch_no = 0;
-  for (typename std::vector<typename DataOutBase::Patch<dim> >::iterator
+  for (typename std::vector<::DataOutBase::Patch<dim> >::iterator
 	 patch = patches.begin(); patch != patches.end(); ++patch)
     patch->me = patch_no++;
 
@@ -556,7 +556,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
     {
       const typename DoFHandler<dim>::cell_iterator
 	cell = map_entry->first;
-      const typename std::vector<typename DataOutBase::Patch<dim> >::iterator
+      const typename std::vector<::DataOutBase::Patch<dim> >::iterator
 	patch = map_entry->second;
 
 				       // loop over all faces and see
@@ -580,7 +580,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 					   // if there is a neighbor,
 					   // get its patch...
 	  const typename
-	    std::vector<typename DataOutBase::Patch<dim> >::iterator
+	    std::vector<::DataOutBase::Patch<dim> >::iterator
 	    neighbor_patch = patch_map.find(cell->neighbor(i))->second;
 					   // ...and set its neighbor
 					   // pointer set
