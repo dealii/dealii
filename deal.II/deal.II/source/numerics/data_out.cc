@@ -238,6 +238,10 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 #ifdef DEAL_II_USE_MT
   const unsigned int n_threads = n_threads_;
 #else
+				   // access this variable to avoid
+				   // compiler warning about unused
+				   // var:
+  (void)n_threads_;
   const unsigned int n_threads = 1;
 #endif
 
