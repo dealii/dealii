@@ -41,7 +41,7 @@ print_dofs (const DoFHandler<dim> &dof)
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
        cell != dof.end(); ++cell)
     {
-      deallog << "Cell " << cell;
+      deallog << "Cell " << cell << " -- ";
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
 	deallog << v[i] << ' ';
