@@ -129,7 +129,7 @@ BlockIndices<n_blocks>::reinit (const vector<unsigned int> &n)
 
   start_indices[0] = 0;
   for (unsigned int i=1; i<=n_blocks; ++i)
-    start_indices[i] = start_indices[i-1] + n[i];
+    start_indices[i] = start_indices[i-1] + n[i-1];
 };
 
 
