@@ -5,11 +5,25 @@
 #include <base/quadrature.h>
 
 
+template <>
+Quadrature<0>::Quadrature (const unsigned int)
+{};
+
+
+
 template <int dim>
 Quadrature<dim>::Quadrature (const unsigned int n_q) :
 		n_quadrature_points(n_q),
 		quadrature_points (n_q, Point<dim>()),
 		weights (n_q, 0) {};
+
+
+// template <>
+// Quadrature<0>::Quadrature (const Quadrature<-1> &,
+// 			   const Quadrature<1> &) {
+//   Assert (false, ExcInternalError());
+// };
+
 
 
 template <>
@@ -64,6 +78,15 @@ Quadrature<dim>::~Quadrature () {};
 
 
 
+template <>
+const Point<0> & Quadrature<0>::quad_point (const unsigned int) const {
+  Assert (false, ExcInternalError());
+  static const Point<0> dummy;
+  return dummy;
+};
+
+
+
 template <int dim>
 const Point<dim> & Quadrature<dim>::quad_point (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
@@ -72,9 +95,25 @@ const Point<dim> & Quadrature<dim>::quad_point (const unsigned int i) const {
 
 
 
+template <>
+const vector<Point<0> > & Quadrature<0>::get_quad_points () const {
+  Assert (false, ExcInternalError());
+  return quadrature_points;
+};
+
+
+
 template <int dim>
 const vector<Point<dim> > & Quadrature<dim>::get_quad_points () const {
   return quadrature_points;
+};
+
+
+
+template <>
+double Quadrature<0>::weight (const unsigned int) const {
+  Assert (false, ExcInternalError());
+  return 0;
 };
 
 
@@ -89,6 +128,14 @@ double Quadrature<dim>::weight (const unsigned int i) const {
 
 template <int dim>
 const vector<double> & Quadrature<dim>::get_weights () const {
+  return weights;
+};
+
+
+
+template <>
+const vector<double> & Quadrature<0>::get_weights () const {
+  Assert (false, ExcInternalError());
   return weights;
 };
 

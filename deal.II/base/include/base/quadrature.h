@@ -32,6 +32,16 @@
  * one in one dimension. There is a special constructor to generate a
  * quadrature formula from two others.
  *
+ *
+ * For some programs it is necessary to have a quadrature object for faces.
+ * These programs fail to link if compiled for only one space dimension,
+ * since there quadrature rules for faces just don't make no sense. In
+ * order to allow these programs to be linked anyway, for class #Quadrature<0>#
+ * all functions are provided in the #quadrature.cc# file, but they will
+ * throw exceptions if actually called. The only function which is allowed
+ * to be called is the constructor taking one integer, which in this case
+ * ignores its parameter, and of course the destructor.
+ *
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
