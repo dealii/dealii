@@ -200,8 +200,8 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions)
 				   // actually create the patches
   vector<DataOutBase::Patch<dim> >::iterator patch = patches.begin();
   unsigned int                               cell_number = 0;
-  for (DoFHandler<dim>::active_cell_iterator cell=dofs->begin_active();
-       cell != dofs->end(); ++cell, ++patch, ++cell_number)
+  for (DoFHandler<dim>::active_cell_iterator cell=first_cell();
+       cell != dofs->end(); cell=next_cell(cell), ++patch, ++cell_number)
     {
       Assert (patch != patches.end(), ExcInternalError());
       
