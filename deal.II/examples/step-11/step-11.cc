@@ -8,6 +8,7 @@
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
+#include <base/table_handler.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
@@ -41,7 +42,7 @@
 				 // following file for its
 				 // declaration:
 #include <algorithm>
-
+#include <iomanip>
 
 
 				 // Then we declare a class which
@@ -93,6 +94,8 @@ class LaplaceProblem
 
     Vector<double>       solution;
     Vector<double>       system_rhs;
+
+    TableHandler         output_table;
 };
 
 
@@ -555,13 +558,10 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // vector:
   const double norm = norm_per_cell.l2_norm();
 
-				   // Last task -- show output:
-  std::cout << "  " << triangulation.n_active_cells() << " cells:  "
-	    << "  |u|_1="
-	    << norm
-	    << ", error="
-	    << fabs(norm-sqrt(3.14159265358/2))
-	    << std::endl;
+				   // Last task -- generate output:
+  output_table.add_value ("cells", triangulation.n_active_cells());
+  output_table.add_value ("|u|_1", norm);
+  output_table.add_value ("error", fabs(norm-sqrt(3.14159265358/2)));
 };
 
 
@@ -626,6 +626,14 @@ void LaplaceProblem<dim>::run ()
       setup_system ();
       assemble_and_solve ();
     };
+
+				   // After all the data is generated,
+				   // write a table of results to the
+				   // screen:
+  output_table.set_precision("|u|_1", 6);
+  output_table.set_scientific("error", true);
+  output_table.write_text (std::cout);
+  std::cout << std::endl;
 };
 
     
