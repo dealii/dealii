@@ -173,7 +173,7 @@ TriaObjectAccessor<1,dim>::child (const unsigned int i) const
 template <int dim>
 inline
 int
-TriaObjectAccessor<1,dim>::child_index (unsigned int i) const
+TriaObjectAccessor<1,dim>::child_index (unsigned const int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
   return tria->levels[present_level]->lines.children[present_index]+i;
@@ -328,7 +328,7 @@ TriaObjectAccessor<2,dim>::line (const unsigned int i) const
 template <int dim>
 inline
 unsigned int
-TriaObjectAccessor<2,dim>::line_index (unsigned int i) const
+TriaObjectAccessor<2,dim>::line_index (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
 
@@ -357,7 +357,7 @@ TriaObjectAccessor<2,dim>::child (const unsigned int i) const
 
 template <int dim>
 inline
-int TriaObjectAccessor<2,dim>::child_index (unsigned int i) const
+int TriaObjectAccessor<2,dim>::child_index (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
   return tria->levels[present_level]->quads.children[present_index]+i;
@@ -553,7 +553,7 @@ TriaObjectAccessor<3,dim>::quad (const unsigned int i) const
 template <int dim>
 inline
 unsigned int
-TriaObjectAccessor<3,dim>::line_index (unsigned int i) const
+TriaObjectAccessor<3,dim>::line_index (const unsigned int i) const
 {
   Assert (i<12, ExcIndexRange(i,0,12));
 
@@ -583,7 +583,7 @@ TriaObjectAccessor<3,dim>::line_index (unsigned int i) const
 template <int dim>
 inline
 unsigned int
-TriaObjectAccessor<3,dim>::quad_index (unsigned int i) const
+TriaObjectAccessor<3,dim>::quad_index (const unsigned int i) const
 {
   Assert (i<6, ExcIndexRange(i,0,6));
 
@@ -611,7 +611,7 @@ TriaObjectAccessor<3,dim>::child (const unsigned int i) const
 
 template <int dim>
 inline
-int TriaObjectAccessor<3,dim>::child_index (unsigned int i) const
+int TriaObjectAccessor<3,dim>::child_index (const unsigned int i) const
 {
   Assert (i<8, ExcIndexRange(i,0,8));
   return tria->levels[present_level]->hexes.children[present_index]+i;
@@ -820,7 +820,7 @@ TriaObjectAccessor<celldim,dim>::quad (const unsigned int i) const
 template<int celldim, int dim>
 inline
 unsigned int
-TriaObjectAccessor<celldim,dim>::line_index (unsigned int i) const
+TriaObjectAccessor<celldim,dim>::line_index (const unsigned int i) const
 {
   Assert (i < GeometryInfo<celldim>::lines_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::lines_per_cell));
@@ -860,7 +860,7 @@ TriaObjectAccessor<celldim,dim>::line_index (unsigned int i) const
 template<int celldim, int dim>
 inline
 unsigned int
-TriaObjectAccessor<celldim,dim>::quad_index (unsigned int i) const
+TriaObjectAccessor<celldim,dim>::quad_index (const unsigned int i) const
 {
   Assert (i < GeometryInfo<celldim>::quads_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::quads_per_cell));
@@ -891,7 +891,7 @@ TriaObjectAccessor<celldim,dim>::child (const unsigned int i) const
 
 template<int celldim, int dim>
 inline
-int TriaObjectAccessor<celldim,dim>::child_index (unsigned int i) const
+int TriaObjectAccessor<celldim,dim>::child_index (const unsigned int i) const
 {
   Assert (i < GeometryInfo<celldim>::children_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::children_per_cell));

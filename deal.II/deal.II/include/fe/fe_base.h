@@ -1047,8 +1047,8 @@ FiniteElementData<dim>::n_components () const
 template <int dim>
 inline
 unsigned int
-FiniteElementBase<dim>::component_to_system_index (unsigned int component,
-						   unsigned int component_index) const
+FiniteElementBase<dim>::component_to_system_index (const unsigned int component,
+						   const unsigned int component_index) const
 {
   Assert(component<n_components(),
 	 ExcIndexRange(component, 0, n_components()));
@@ -1062,7 +1062,7 @@ FiniteElementBase<dim>::component_to_system_index (unsigned int component,
 template <int dim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElementBase<dim>::system_to_component_index (unsigned int index) const
+FiniteElementBase<dim>::system_to_component_index (const unsigned int index) const
 {
   Assert(index < system_to_component_table.size(),
 	 ExcIndexRange(index, 0, system_to_component_table.size()));
@@ -1073,8 +1073,8 @@ FiniteElementBase<dim>::system_to_component_index (unsigned int index) const
 template <int dim>
 inline
 unsigned int
-FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
-							unsigned int component_index) const
+FiniteElementBase<dim>::face_component_to_system_index (const unsigned int component,
+							const unsigned int component_index) const
 {
   Assert(component<n_components(),
 	 ExcIndexRange(component, 0, n_components()));
@@ -1088,7 +1088,7 @@ FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
 template <int dim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElementBase<dim>::face_system_to_component_index (unsigned int index) const
+FiniteElementBase<dim>::face_system_to_component_index (const unsigned int index) const
 {
   Assert(index < face_system_to_component_table.size(),
 	 ExcIndexRange(index, 0, face_system_to_component_table.size()));

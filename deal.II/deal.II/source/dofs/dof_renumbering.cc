@@ -620,7 +620,7 @@ DoFRenumbering::cell_wise_dg (DoFHandler<dim>& dof,
 template <int dim>
 void
 DoFRenumbering::cell_wise_dg (MGDoFHandler<dim>& dof,
-			      unsigned int level,
+			      const unsigned int level,
 			      const typename std::vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
 {
   Assert(cells.size() == dof.get_tria().n_cells(level),
@@ -783,7 +783,7 @@ void DoFRenumbering::cell_wise_dg (DoFHandler<deal_II_dimension>&,
 
 template
 void DoFRenumbering::cell_wise_dg (MGDoFHandler<deal_II_dimension>&,
-				   unsigned int,
+				   const unsigned int,
 				   const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
@@ -792,7 +792,7 @@ void DoFRenumbering::downstream_dg (DoFHandler<deal_II_dimension>&,
 
 template
 void DoFRenumbering::downstream_dg (MGDoFHandler<deal_II_dimension>&,
-				    unsigned int,
+				    const unsigned int,
 				    const Point<deal_II_dimension>&);
 
 template
