@@ -34,6 +34,7 @@ namespace
 }
 
 
+
 namespace Polynomials
 {
 
@@ -41,7 +42,8 @@ namespace Polynomials
 
 
   template <typename number>
-  Polynomial<number>::Polynomial (const std::vector<number> &a):
+  Polynomial<number>::Polynomial (const std::vector<number> &a)
+                  :
                   coefficients(a)
   {}
 
@@ -119,8 +121,8 @@ namespace Polynomials
 
   template <typename number>
   void
-  Polynomial<number>::scale(std::vector<number>& coefficients,
-                            const number factor)
+  Polynomial<number>::scale(std::vector<number> &coefficients,
+                            const number         factor)
   {
     double f = 1.;
     for (typename std::vector<number>::iterator c = coefficients.begin();
@@ -841,11 +843,26 @@ namespace Polynomials
   std::vector<Polynomial<number> >
   Hierarchical<number>::generate_complete_basis (const unsigned int degree)
   {
-    std::vector<Polynomial<double> > v;
-    v.reserve(degree+1);
-    for (unsigned int i=0; i<=degree; ++i)
-      v.push_back (Hierarchical<double>(i));
-    return v;
+    if (degree==0)
+                                       // create constant
+                                       // polynomial. note that we
+                                       // can't use the other branch
+                                       // of the if-statement, since
+                                       // calling the constructor of
+                                       // this class with argument
+                                       // zero does _not_ create the
+                                       // constant polynomial, but
+                                       // rather 1-x
+      return std::vector<Polynomial<double> >
+        (1, Polynomial<double> (std::vector<double> (1,1.)));
+    else
+      {
+        std::vector<Polynomial<double> > v;
+        v.reserve(degree+1);
+        for (unsigned int i=0; i<=degree; ++i)
+          v.push_back (Hierarchical<double>(i));
+        return v;
+      }
   }
 }
 
