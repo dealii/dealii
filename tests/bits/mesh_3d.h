@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d.h  ---------------------------
 //    $Id$
-//    Version: 
+//    Version: $Name$ 
 //
 //    Copyright (C) 2003, 2004 by the deal.II authors
 //

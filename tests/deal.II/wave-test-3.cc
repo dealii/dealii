@@ -1,6 +1,6 @@
 //----------------------------  wave-test-3.cc  ---------------------------
 //    $Id$
-//    Version: 
+//    Version: $Name$ 
 //
 //    std::copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by Wolfgang Bangerth
 //

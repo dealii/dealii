@@ -1,6 +1,6 @@
 //----------------------------  hyper_ball_3d.cc  ---------------------------
 //    $Id$
-//    Version: 
+//    Version: $Name$ 
 //
 //    Copyright (C) 2003, 2004 by the deal.II authors
 //

@@ -1,6 +1,6 @@
 //----------------------------  petsc_34.cc  ---------------------------
 //    $Id$
-//    Version: 
+//    Version: $Name$ 
 //
 //    Copyright (C) 2004 by the deal.II authors
 //

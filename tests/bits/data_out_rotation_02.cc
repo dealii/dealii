@@ -1,6 +1,6 @@
 //----------------------------  data_out_rotation_02.cc  ---------------------------
 //    $Id$
-//    Version: 
+//    Version: $Name$ 
 //
 //    Copyright (C) 2003, 2004 by the deal.II authors
 //

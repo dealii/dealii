@@ -1,6 +1,6 @@
 //----------------------------  q_point_sum_1.cc  ---------------------------
 //    $Id$
-//    Version: 
+//    Version: $Name$ 
 //
 //    Copyright (C) 2003, 2004 by the deal.II authors
 //
