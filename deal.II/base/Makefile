@@ -15,7 +15,8 @@ o-files-base1= $(addprefix lib/o/, $(patsubst source/%,%,$(cc-files:.cc=.o)))
 o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1)) \
                $(patsubst %.o,%_1d.o,$(filter %data_out_base.o, $(o-files-base1))) \
                $(patsubst %.o,%_2d.o,$(filter %data_out_base.o, $(o-files-base1))) \
-               $(patsubst %.o,%_3d.o,$(filter %data_out_base.o, $(o-files-base1)))
+               $(patsubst %.o,%_3d.o,$(filter %data_out_base.o, $(o-files-base1))) \
+               $(patsubst %.o,%_4d.o,$(filter %data_out_base.o, $(o-files-base1)))
 o-files-base3= $(sort $(o-files-base2))
 o-files      = $(o-files-base3)
 go-files     = $(patsubst lib/o/%,lib/go/%,$(o-files-base3:.o=.go))
@@ -43,7 +44,8 @@ include $D/common/Make.global_options
 # substituted and the result of the variable is an empty string
 maybe-define-dimension1 = $(strip $(findstring 1,$(findstring _1d.,$@)) \
                                   $(findstring 2,$(findstring _2d.,$@)) \
-                                  $(findstring 3,$(findstring _3d.,$@)))
+                                  $(findstring 3,$(findstring _3d.,$@)) \
+                                  $(findstring 4,$(findstring _4d.,$@)))
 maybe-define-dimension  = $(patsubst %,-Ddata_out_dimension=%,$(maybe-define-dimension1))
 
 # production rules
@@ -87,7 +89,7 @@ clean:
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@perl $D/common/scripts/Make_dep_2.pl $(INCLUDE) $(cc-files) \
-		| perl -p -e 's!(lib/g?o/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2!g;' \
+		| perl -p -e 's!(lib/g?o/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
 		> lib/Makefile.dep
 
 
