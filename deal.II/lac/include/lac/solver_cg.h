@@ -220,8 +220,16 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
   int  it=0;
   double res,gh,alpha,beta;
 
-  A.vmult(g,x);
-  g.sadd(-1.,1.,b);
+				   // compute residual. if vector is
+				   // zero, then short-circuit the
+				   // full computation
+  if (!x.all_zero())
+    {
+      A.vmult(g,x);
+      g.sadd(-1.,1.,b);
+    }
+  else
+    g = b;
   res = g.l2_norm();
   
   conv = control().check(0,res);
