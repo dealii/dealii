@@ -26,7 +26,7 @@ DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CV
 #
 ^tests.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/tests.html > /tmp/Ttests; mv /tmp/Ttests $CVSROOT/LOG/tests.html; chmod a+r $CVSROOT/LOG/tests.html
 #
-^deal.II/lac.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/lac.html > /tmp/Tlac; mv /tmp/Tlac $CVSROOT/LOG/lac.html; chmod a+r $CVSROOT/LOG/lac.html
+^deal.II/lac.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/lac-2000.html > /tmp/Tlac; mv /tmp/Tlac $CVSROOT/LOG/lac-2000.html; chmod a+r $CVSROOT/LOG/lac-2000.html
 #
 ^deal.II/deal.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/deal-2000.html > /tmp/Tdeal; mv /tmp/Tdeal $CVSROOT/LOG/deal-2000.html; chmod a+r $CVSROOT/LOG/deal-2000.html
 #
