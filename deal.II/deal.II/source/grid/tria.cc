@@ -2137,6 +2137,17 @@ void Triangulation<1>::execute_refinement () {
 #ifdef DEBUG
   for (unsigned int level=0; level<levels.size(); ++level) 
     levels[level]->monitor_memory (1);
+
+				   // check whether really all refinement flags
+				   // are reset (also of previously non-active
+				   // cells which we may not have touched. If
+				   // the refinement flag of a non-active cell
+				   // is set, something went wrong since the
+				   // cell-accessors should have caught this)
+  cell_iterator cell = begin(),
+		endc = end();
+  while (cell != endc)
+    Assert (!(cell++)->refine_flag_set(), ExcInternalError ());  
 #endif
 };
 
@@ -2710,10 +2721,28 @@ void Triangulation<2>::execute_refinement () {
 #ifdef DEBUG
   for (unsigned int level=0; level<levels.size(); ++level) 
     levels[level]->monitor_memory (2);
+
+				   // check whether really all refinement flags
+				   // are reset (also of previously non-active
+				   // cells which we may not have touched. If
+				   // the refinement flag of a non-active cell
+				   // is set, something went wrong since the
+				   // cell-accessors should have caught this)
+  cell_iterator cell = begin(),
+		endc = end();
+  while (cell != endc)
+    Assert (!(cell++)->refine_flag_set(), ExcInternalError ());
 #endif
 };
 
-  
+
+
+
+template <int dim>
+void Triangulation<dim>::execute_coarsening () {
+  Assert (false, ExcInternalError());
+};
+
 
 
 template <int dim>
@@ -2815,6 +2844,11 @@ void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
   refine_flags.insert (refine_flags.end(),
 		       total_cells - refine_flags.size(),
 		       false);
+  
+  coarsen_flags.reserve (total_cells);
+  coarsen_flags.insert (coarsen_flags.end(),
+			total_cells - coarsen_flags.size(),
+			false);
 
   neighbors.reserve (total_cells*(2*dimension));
   neighbors.insert (neighbors.end(),
@@ -2830,12 +2864,18 @@ void TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) c
 //	  refine_flags.size()<256,
 //	  ExcMemoryWasted ("refine_flags",
 //			   refine_flags.size(), refine_flags.capacity()));
+//  Assert (coarsen_flags.size() == coarsen_flags.capacity() ||
+//	  coarsen_flags.size()<256,
+//	  ExcMemoryWasted ("coarsen_flags",
+//			   coarsen_flags.size(), coarsen_flags.capacity()));
 //  Assert (neighbors.size() ==  neighbors.capacity() ||
 //	  neighbors.size()<256,
 //	  ExcMemoryWasted ("neighbors",
 //			   neighbors.size(), neighbors.capacity()));
   Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
 	  ExcMemoryInexact (refine_flags.size(), neighbors.size()));
+  Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),
+	  ExcMemoryInexact (coarsen_flags.size(), neighbors.size()));
 };
 
 

@@ -884,8 +884,9 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
     bool refine_flag_set () const;
 
 				     /**
-				      *  Flag the cell pointed to
-				      *  for refinement.
+				      *  Flag the cell pointed to fo
+				      *  refinement. This function is only
+				      *  allowed for active cells.
 				      */
     void set_refine_flag () const;
 
@@ -893,6 +894,25 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
 				      *  Clear the refinement flag.
 				      */
     void clear_refine_flag () const;
+
+
+    				     /**
+				      *  Return whether the coarsen flag
+				      *  is set or not.
+				      */
+    bool coarsen_flag_set () const;
+
+				     /**
+				      *  Flag the cell pointed to for
+				      *  coarsening. This function is only
+				      *  allowed for active cells.
+				      */
+    void set_coarsen_flag () const;
+
+				     /**
+				      *  Clear the coarsen flag.
+				      */
+    void clear_coarsen_flag () const;
 
 				     /**
 				      *  Return a pointer to the #i#th

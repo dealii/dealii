@@ -83,6 +83,13 @@ class TriangulationLevel<0> {
 				      *  that of the #quads# vector, etc.
 				      */
     vector<bool> refine_flags;
+
+				     /**
+				      * Same meaning as the one above, but
+				      * specifies whether a cell must be
+				      * coarsened.
+				      */
+    vector<bool> coarsen_flags;
     
 				     /**
 				      *  Levels and indices of the neighbors
@@ -1075,7 +1082,11 @@ class TriaDimensionInfo<2> {
  *
  *   You may write other information to the output file between different sets
  *   of refinement information, as long as you read it upon re-creation of the
- *   grid.
+ *   grid. You should make sure that the other information in the new
+ *   triangulation which is to be created from the saves flags, matches that of
+ *   the old triangulation, for example the smoothing level; if not, the
+ *   cells actually created from the flags may be other ones, since smoothing
+ *   adds additional cells, but the number depending on the smoothing level.
  *
  *
  *   \subsection{User flags}
@@ -1507,6 +1518,21 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  This function is dimension specific.
 				      */ 
     void execute_refinement ();
+
+				     /**
+				      * Coarsen all cells which were flagged for
+				      * coarsening, or rather: delete all
+				      * children of those cells of which all
+				      * child cells are flagged for coarsening
+				      * and several other constraints hold (see
+				      * the general doc of this class).
+				      *
+				      * The function resets all refinement
+				      * flags to false.
+				      *
+				      * This function is dimension specific.
+				      */
+    void execute_coarsening ();
 				     /*@}*/
 
 				     /**

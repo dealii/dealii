@@ -651,7 +651,13 @@ bool CellAccessor<dim>::at_boundary (const unsigned int i) const {
 
 template <int dim>
 bool CellAccessor<dim>::refine_flag_set () const {
-  Assert (used() && active(),
+  Assert (used(), typename TriaSubstructAccessor<dim>::ExcCellNotUsed());
+				   // cells flagged for refinement must be active
+				   // (the #set_refine_flag# function checks this,
+				   // but activity may change when refinement is
+				   // executed and for some reason the refine
+				   // flag is not cleared).
+  Assert (active() ||  !tria->levels[present_level]->refine_flags[present_index],
 	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
   return tria->levels[present_level]->refine_flags[present_index];
 };
@@ -672,6 +678,39 @@ void CellAccessor<dim>::clear_refine_flag () const {
   Assert (used() && active(),
 	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
   tria->levels[present_level]->refine_flags[present_index] = false;
+};
+
+
+
+template <int dim>
+bool CellAccessor<dim>::coarsen_flag_set () const {
+  Assert (used(), typename TriaSubstructAccessor<dim>::ExcCellNotUsed());
+				   // cells flagged for coarsening must be active
+				   // (the #set_refine_flag# function checks this,
+				   // but activity may change when refinement is
+				   // executed and for some reason the refine
+				   // flag is not cleared).
+  Assert (active() ||  !tria->levels[present_level]->coarsen_flags[present_index],
+	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
+  return tria->levels[present_level]->coarsen_flags[present_index];
+};
+
+
+
+template <int dim>
+void CellAccessor<dim>::set_coarsen_flag () const {
+  Assert (used() && active(),
+	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
+  tria->levels[present_level]->coarsen_flags[present_index] = true;
+};
+
+
+
+template <int dim>
+void CellAccessor<dim>::clear_coarsen_flag () const {
+  Assert (used() && active(),
+	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
+  tria->levels[present_level]->coarsen_flags[present_index] = false;
 };
 
 

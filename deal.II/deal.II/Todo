@@ -106,6 +106,9 @@ Remove the this-> coding in tria_iterator.templates.h. These were
 Re-enable printing of a preamble to ucd files in data_io.cc.
 
 
+Implement coarsening of grids and update docs for that.
+
+
 
 
 DEAL:
