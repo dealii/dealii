@@ -434,7 +434,9 @@ const double * const FE_DGQ<2>::Matrices::embedding[] =
       FE_DGQ_2d::dgq1_into_dgq1_refined,
       FE_DGQ_2d::dgq2_into_dgq2_refined,
       FE_DGQ_2d::dgq3_into_dgq3_refined,
-      FE_DGQ_2d::dgq4_into_dgq4_refined
+      FE_DGQ_2d::dgq4_into_dgq4_refined,
+      FE_DGQ_2d::dgq5_into_dgq5_refined,
+      FE_DGQ_2d::dgq6_into_dgq6_refined
 };
 
 const unsigned int FE_DGQ<2>::Matrices::n_embedding_matrices
