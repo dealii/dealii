@@ -543,10 +543,6 @@ void ElasticProblem<dim>::assemble_system ()
 		       shape_grads[j][q_point][component_j] *
 		       (lambda_values[q_point] +
 			mu_values[q_point]))
-		      +                             // (mu d_i u_j, d_i v_j)
-		      (shape_grads[i][q_point][component_j] *
-		       shape_grads[j][q_point][component_i] *
-		       mu_values[q_point])
 		      +                             // (mu d_i v_j, d_i v_j)
 		      ((component_i == component_j) ?
 		       (shape_grads[i][q_point] *
@@ -592,6 +588,9 @@ void ElasticProblem<dim>::assemble_system ()
 	};
     };
 
+  hanging_node_constraints.condense (system_matrix);
+  hanging_node_constraints.condense (system_rhs);
+
 				   // The interpolation of the
 				   // boundary values needs a small
 				   // modification: since the solution
@@ -621,9 +620,6 @@ void ElasticProblem<dim>::assemble_system ()
 					   system_matrix,
 					   solution,
 					   system_rhs);
-
-  hanging_node_constraints.condense (system_matrix);
-  hanging_node_constraints.condense (system_rhs);
 };
 
 
