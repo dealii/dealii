@@ -223,6 +223,35 @@ class FiniteElementData
  * transfer, respectively.
  *
  *
+ * @section{Support points}
+ *
+ * Since a @ref{FiniteElement} does not have information on the actual
+ * grid cell, it can only provide support points on the unit
+ * cell. Support points on the actual grid cell must be computed by
+ * mapping these points. The class used for this kind of operation is
+ * @ref{FEValues}. In most cases, code of the following type will
+ * serve to provide the mapped support points.
+ *
+ * @begin{verbatim}
+ * Quadrature<dim> dummy_quadrature (fe.get_unit_support_points());
+ * FEValues<dim>   fe_values (mapping, fe, dummy_quadrature,
+ *                            update_q_points);
+ * fe_values.reinit (cell);
+ * Point<dim>& mapped_point = fe_values.quadrature_point (i);
+ * @end{verbatim}
+ *
+ * Alternatively, the points can be transformed one-by-one:
+ * @begin{verbatim}
+ * const vector<Point<dim> >& unit_points =
+ *    fe.get_unit_support_points();
+ *
+ * Point<dim> mapped_point =
+ *    mapping.transform_unit_to_real_cell (cell, unit_points[i]);
+ * @end{verbatim}
+ * This is a shortcut, and as all shortcuts should be used cautiously.
+ * If the mapping of all support points is needed, the first variant should
+ * be preferred for efficiency.
+ *
  * \subsection{Finite elements in one dimension}
  *
  * Finite elements in one dimension need only set the @p{restriction}
@@ -320,7 +349,7 @@ class FiniteElementData
  * introduced from the two sides are unique; it is able to handle the fact
  * that the constraints for some of the dofs are entered more than once.
  *
- * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001
+ * @author Wolfgang Bangerth, 1998, Ralf Hartmann, Guido Kanschat, 2001
  */
 template <int dim>
 class FiniteElementBase : public Subscriptor,
@@ -630,6 +659,9 @@ class FiniteElementBase : public Subscriptor,
 				      * returned by the
 				      * @p{cell->get_dof_indices}
 				      * function.
+				      *
+				      * See the class documentation
+				      * for details on support points.
 				      */
     const std::vector<Point<dim> > & get_unit_support_points () const;    
 
@@ -695,6 +727,9 @@ class FiniteElementBase : public Subscriptor,
 				      * that returned by the
 				      * @p{cell->get_dof_indices}
 				      * function.
+				      *
+				      * See the class documentation
+				      * for details on support points.
 				      */
     const std::vector<Point<dim-1> > & get_unit_face_support_points () const;    
 
