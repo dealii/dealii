@@ -186,6 +186,12 @@ class FullMatrix : public vector2d<number>
 
     
 				     /**
+				      * Scale the entire matrix by a
+				      * fixed factor.
+				      */
+    FullMatrix & operator *= (const double factor);
+    
+				     /**
 				      * Weighted addition. The matrix
 				      * @p{s*B} is added to @p{this}.
 				      *
@@ -195,12 +201,6 @@ class FullMatrix : public vector2d<number>
     void add (const number               s,
 	      const FullMatrix<number2> &B);
 
-				     /**
-				      * Scale the entire matrix by a
-				      * fixed factor.
-				      */
-    FullMatrix & operator *= (const double factor);
-    
 				     /**
 				      * Weighted addition of the
 				      * transpose of @p{B} to @p{this}.
