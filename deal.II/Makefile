@@ -156,8 +156,11 @@ clean-lib:
 clean-tests:
 	-cd tests && $(MAKE) clean
 
+veryclean: clean
+	cd lib ; $(MAKE) veryclean
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
         online-doc printable-doc tex-doc contrib \
         clean clean-contrib clean-base clean-lac clean-dealII \
-	clean-doc clean-examples clean-lib clean-tests TAGS TODO
+	clean-doc clean-examples clean-lib clean-tests veryclean \
+	TAGS TODO
