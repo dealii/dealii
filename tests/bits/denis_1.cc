@@ -46,8 +46,8 @@ class F : public Function<2>
         double x, y, r;
         x = p(0);
         y = p(1);
-        r = sqrt( x*x + y*y );
-        return 0.5 * ( 1 - tanh( ( r - 0.5 )
+        r = std::sqrt( x*x + y*y );
+        return 0.5 * ( 1 - std::tanh( ( r - 0.5 )
                                  /( 2*M_SQRT2 * delta ) ) ) ;
       };
 };
