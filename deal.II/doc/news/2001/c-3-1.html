@@ -111,6 +111,16 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Fix: in the triangulation, the <code
+       class="member">straight_boundary</code> variable, which is a
+       reference, was assigned the address of a temporary object. It
+       is unclear how this could have worked for three years, but it
+       apparently did...
+       <br>
+       (WB 2001/02/26)
+       </p>
+
   <li> <p> 
        New: The <code class="class">DoFTools</code> class now has
        a function <code class="member">count_dofs_per_component</code>
