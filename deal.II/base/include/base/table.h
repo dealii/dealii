@@ -15,6 +15,7 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
+#include <base/smartpointer.h>
 
 #include <cstddef>
 #include <algorithm>
@@ -398,7 +399,7 @@ namespace TableBaseAccessors
                                         * no reason not to make these
                                         * elements constant.
                                         */
-      const TableType &table;
+      SmartPointer<const TableType> table;
       const pointer   data;
   };
 
@@ -502,7 +503,7 @@ namespace TableBaseAccessors
                                         * no reason not to make these
                                         * elements constant.
                                         */
-      const TableType &table;
+      SmartPointer<const TableType> table;
       const pointer   data;
   };
 };
@@ -1622,7 +1623,7 @@ namespace TableBaseAccessors
   Accessor<N,T,C,P>::Accessor (const TableType &table,
                                const pointer    data)
                   :
-                  table (table),
+                  table (&table),
                   data (data)
   {};
 
@@ -1633,24 +1634,24 @@ namespace TableBaseAccessors
   Accessor<N,T,C,P-1>
   Accessor<N,T,C,P>::operator [] (const unsigned int i) const 
   {
-    Assert (i < table.size()[N-P],
-            ExcIndexRange (i, 0, table.size()[N-P]));
+    Assert (i < table->size()[N-P],
+            ExcIndexRange (i, 0, table->size()[N-P]));
 
                                      // access i-th
                                      // subobject. optimize on the
                                      // case i==0
     if (i==0)
-      return Accessor<N,T,C,P-1> (table, data);
+      return Accessor<N,T,C,P-1> (*table, data);
     else 
       {
                                          // note: P>1, otherwise the
                                          // specialization would have
                                          // been taken!
-        unsigned int subobject_size = table.size()[N-1];
+        unsigned int subobject_size = table->size()[N-1];
         for (int p=P-1; p>1; --p)
-          subobject_size *= table.size()[N-p];
+          subobject_size *= table->size()[N-p];
         const pointer new_data = data + i*subobject_size;
-        return Accessor<N,T,C,P-1> (table, new_data);
+        return Accessor<N,T,C,P-1> (*table, new_data);
       };
   };
 
@@ -1661,7 +1662,7 @@ namespace TableBaseAccessors
   Accessor<N,T,C,1>::Accessor (const TableType &table,
                                const pointer    data)
                   :
-                  table (table),
+                  table (&table),
                   data (data)
   {};
 
@@ -1672,8 +1673,8 @@ namespace TableBaseAccessors
   typename Accessor<N,T,C,1>::reference
   Accessor<N,T,C,1>::operator [] (const unsigned int i) const 
   {
-    Assert (i < table.size()[N-1],
-            ExcIndexRange (i, 0, table.size()[N-1]));
+    Assert (i < table->size()[N-1],
+            ExcIndexRange (i, 0, table->size()[N-1]));
     return data[i];
   };
 
@@ -1684,7 +1685,7 @@ namespace TableBaseAccessors
   unsigned int
   Accessor<N,T,C,1>::size () const
   {
-    return table.size()[N-1];
+    return table->size()[N-1];
   };
 
 
@@ -1704,7 +1705,7 @@ namespace TableBaseAccessors
   typename Accessor<N,T,C,1>::iterator
   Accessor<N,T,C,1>::end () const
   {
-    return data+table.size()[N-1];
+    return data+table->size()[N-1];
   };
 };
 
