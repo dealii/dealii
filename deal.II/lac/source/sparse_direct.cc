@@ -390,8 +390,18 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                        ExcMessage ("execv returned, which it is not supposed to do!"));
           std::exit(1);
         };
-                                       // parent process continues here.
-                                       // close unneeded end of pipe
+                                       // parent process continues
+                                       // here.  first thing is to
+                                       // send the process id of the
+                                       // present process. this is
+                                       // used to make sure that the
+                                       // client can end itself when
+                                       // it finds that the master
+                                       // process was somehow
+                                       // terminated without sending
+                                       // him this information
+      const pid_t parent_pid = std::getpid();
+      detached_mode_data->put (&parent_pid, 1, "parent_pid");
     };
   
   
