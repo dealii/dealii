@@ -5,15 +5,6 @@ Remove the comment signs in the monitor_* functions in tria.cc
   memory checks failed.
 
 
-Rewrite code like
-      int flagged_cells = 0;
-      for (; cell!=endc; ++cell)
-	if (cell->refine_flag_set())
-	  ++flagged_cells;
-  using the STL count() operation with a member function predicate if
-  available.
-
-
 Write monitors to control whether enough memory was allocated for
   the vectors (i.e. after a process, whether size()==capacity()).
   (for DoF)
@@ -104,8 +95,11 @@ Implement coarsening of grids and update docs for that. Note the
   Coarsening on the contrary never deletes additional cells.
   Update algo section in tria docs for new smoothing strategies.
 
-  What happens if cells on the coarest level are flagged??
+  Document that multiple loops of preparation for refinement and
+  coarsening do not interact, so smoothing may only be optimal if
+  #prepare_*# are called intermittently until nothing more changed.
 
+  Document the behaviour of #prepare_*# and of the return value.
 
 
 Check all places where condensation of matrices/vectors and
@@ -117,7 +111,9 @@ Check all places where condensation of matrices/vectors and
   of the 3D library.
 
 
-Delete exception Triangulation<>::ExcUnusedMemoryAtEnd
+Revert istrstream(p.c_str()) to istrstream(p) when possible
+  (parameter_handler.cc)
+
 
 
 
