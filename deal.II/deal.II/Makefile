@@ -82,10 +82,18 @@ lib/3d/o/%.o :
 	@echo =====deal.II====3d====optimized===== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
-# special rules for exceptional files
+
+# special rules for exceptional files. they simply take too long to compile!
 lib/3d/o/q1_mapping.jacobians_3d.o:
 	@echo =====deal.II====3d====opt==special== $(<:source/%=%)
 	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=3 -c $< -o $@
+
+ifeq ($(GXX-Version),gcc2.95)
+lib/2d/o/fe_lib.quartic_2d.o:
+	@echo =====deal.II====2d====opt==special== $(<:source/%=%)
+	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=2 -c $< -o $@
+endif
+
 
 
 # rules how to make the libraries themselves
@@ -168,26 +176,15 @@ include $D/common/scripts/forward_declarations
 
 
 
-################### an additional rule for the examples
-
-examples:
-	cd examples ; $(MAKE)
-
-
-
 ################### some clean-up rules
 
-clean: examples-clean lib-clean 
-
-lib-clean:
+clean: 
 	-rm -f *~ */*~ */*/*~ include/grid/forward_declarations.h*
 	cd lib ; $(MAKE) clean
 
-examples-clean:
-	cd examples ; $(MAKE) clean
 
 ###################
 
-.PHONY: all deal.II examples TAGS
-.PHONY: clean lib-clean examples-clean source-clean
+.PHONY: all deal.II TAGS
+.PHONY: clean lib-clean source-clean
 .PHONY: default 1d 2d 3d all clean

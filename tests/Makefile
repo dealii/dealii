@@ -6,9 +6,10 @@ all:
 	cd lac ; $(MAKE)
 	cd fe ; $(MAKE)
 	cd deal.II ; $(MAKE)
+	cd big-tests ; $(MAKE)
 
 
-clean: clean-base clean-lac clean-deal.II clean-fe
+clean: clean-base clean-lac clean-deal.II clean-fe clean-big
 
 clean-base:
 	cd base ; $(MAKE) clean
@@ -22,5 +23,8 @@ clean-fe:
 clean-deal.II:
 	cd deal.II ; $(MAKE) clean
 
+clean-big:
+	cd big-tests ; $(MAKE) clean
 
-.PHONY: all clean clean-base clean-lac clean-fe clean-deal.II
+
+.PHONY: all clean clean-base clean-lac clean-fe clean-deal.II clean-big
