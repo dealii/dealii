@@ -25,7 +25,7 @@ AC_PROG_CXX
 if test $GXX = yes ; then
   # find out the right version
   GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
-  if test -n `echo $GCC_VERSION_STRING | grep egcs-1.1` ; then
+  if test -n `echo $GXX_VERSION_STRING | grep egcs-1.1` ; then
     AC_MSG_RESULT(Found egcs-1.1)
     GXX_VERSION=egcs1.1
   else
