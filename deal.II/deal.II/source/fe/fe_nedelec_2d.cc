@@ -93,8 +93,10 @@ sizeof(FE_Nedelec<2>::Matrices::embedding[0]);
 // Here, the same applies as for the embedding matrices: since the DoF
 // values are not only multiplied by the values of the shape function
 // on the unit cell, but also by the transformation, we have to
-// multiply the value on the large face by two to get the same value
-// back on the small face
+// multiply the value on the large face by 1/2 to get the same value
+// back on the small face.  in other words, if a DoF has weight 1 on
+// the big cell, then it has to have weight 1/2 on the small ones, in
+// order to give the same value of the shape function in real space
 namespace FE_Nedelec_2d 
 {
   static const double constraint_q1[] =
@@ -108,7 +110,7 @@ namespace FE_Nedelec_2d
 					 // issue with the
 					 // transformation described
 					 // above
-  	2., 2.
+  	1./2., 1./2.
   };
 
 };
