@@ -36,13 +36,16 @@ nedelec_3.exe           : nedelec_3.g.$(OBJEXT)           $(libraries)
 non_primitive_1.exe     : non_primitive_1.g.$(OBJEXT)     $(libraries)
 non_primitive_2.exe     : non_primitive_2.g.$(OBJEXT)     $(libraries)
 numbering.exe           : numbering.g.$(OBJEXT)           $(libraries)
+dgq_1.exe               : dgq_1.g.$(OBJEXT)               $(libraries)
 q_1.exe                 : q_1.g.$(OBJEXT)                 $(libraries)
 q_2.exe                 : q_2.g.$(OBJEXT)                 $(libraries)
 q_3.exe                 : q_3.g.$(OBJEXT)                 $(libraries)
+q_4.exe                 : q_4.g.$(OBJEXT)                 $(libraries)
 rt_1.exe                : rt_1.g.$(OBJEXT)                $(libraries)
 rt_2.exe                : rt_2.g.$(OBJEXT)                $(libraries)
 rt_3.exe                : rt_3.g.$(OBJEXT)                $(libraries)
 rt_4.exe                : rt_4.g.$(OBJEXT)                $(libraries)
+system_1.exe            : system_1.g.$(OBJEXT)            $(libraries)
 shapes.exe              : shapes.g.$(OBJEXT)              $(libraries)
 transfer.exe		: transfer.g.$(OBJEXT)	          $(libraries)
 up_and_down.exe         : up_and_down.g.$(OBJEXT)         $(libraries)
@@ -50,7 +53,9 @@ up_and_down.exe         : up_and_down.g.$(OBJEXT)         $(libraries)
 tests = fe_data_test fe_traits fe_tools_test mapping \
         mapping_c1 shapes derivatives numbering mapping_q1_eulerian \
         transfer internals \
-	q_1 q_2 q_3 \
+	dgq_1 \
+	q_1 q_2 q_3 q_4 \
+	system_1 \
         non_primitive_1 non_primitive_2 \
         nedelec nedelec_2 nedelec_3 up_and_down
 
