@@ -8,6 +8,16 @@
 
 
 
+TimeDependent::TimeSteppingData::TimeSteppingData (const unsigned int look_ahead,
+						   const unsigned int look_back)
+		:
+		look_ahead (look_ahead),
+		look_back (look_back)
+{};
+
+
+
+
 TimeDependent::TimeDependent (const TimeSteppingData &data_primal):
 		sweep_no (static_cast<unsigned int>(-1)),
 		timestepping_data_primal (data_primal)
@@ -32,26 +42,43 @@ TimeDependent::insert_timestep (TimeStepBase      *new_timestep,
 	  ExcInvalidPosition(position, timesteps.size()));
 
 				   // lock this timestep from deletion
-  timesteps.back()->subscribe();
+  new_timestep->subscribe();
 
 				   // first insert the new time step
 				   // into the doubly linked list
 				   // of timesteps
-  if (position != 0)
+  if (position == timesteps.size())
     {
-      timesteps[position]->set_next_timestep (new_timestep);
-      new_timestep->set_previous_timestep (timesteps[position]);
+				       // at the end
+      new_timestep->set_next_timestep (0);
+      if (timesteps.size() > 0)
+	{
+	  timesteps.back()->set_next_timestep (new_timestep);
+	  new_timestep->set_previous_timestep (timesteps.back());
+	}
+      else
+	new_timestep->set_previous_timestep (0);
     }
   else
-    new_timestep->set_previous_timestep (0);
-  
-  if (position+1 < timesteps.size())
-    {
-      timesteps[position+1]->set_previous_timestep (new_timestep);
-      new_timestep->set_next_timestep (timesteps[position+1]);
-    }
-  else
-    new_timestep->set_next_timestep (0);
+    if (position == 0)
+      {
+					 // at the beginning
+	new_timestep->set_previous_timestep (0);
+	if (timesteps.size() > 0)
+	  {
+	    timesteps[0]->set_previous_timestep (new_timestep);
+	    new_timestep->set_next_timestep (timesteps[0]);
+	  }
+	else
+	  new_timestep->set_next_timestep (0);
+      }
+    else
+      {
+					 // inner time step
+	timesteps[position-1]->set_next_timestep (new_timestep);
+	new_timestep->set_next_timestep (timesteps[position]);
+	timesteps[position]->set_previous_timestep (new_timestep);
+      };
 
 				   // finally enter it into the
 				   // array
@@ -299,10 +326,10 @@ TimeStepBase_Tria<dim>::Flags::Flags (const unsigned int max_refinement_level,
 		wakeup_level_to_build_grid (wakeup_level_to_build_grid),
 		sleep_level_to_delete_grid (sleep_level_to_delete_grid)
 {
-  Assert (!delete_and_rebuild_tria || (wakeup_level_to_build_grid>=1),
-	  ExcInvalidParameter(wakeup_level_to_build_grid));
-  Assert (!delete_and_rebuild_tria || (sleep_level_to_delete_grid>=1),
-	  ExcInvalidParameter(sleep_level_to_delete_grid));
+//   Assert (!delete_and_rebuild_tria || (wakeup_level_to_build_grid>=1),
+// 	  ExcInvalidParameter(wakeup_level_to_build_grid));
+//   Assert (!delete_and_rebuild_tria || (sleep_level_to_delete_grid>=1),
+// 	  ExcInvalidParameter(sleep_level_to_delete_grid));
 };
 
 
@@ -348,7 +375,7 @@ TimeStepBase_Tria<dim>::wake_up (const unsigned wakeup_level) {
   TimeStepBase::wake_up (wakeup_level);
   
   if (wakeup_level == flags.wakeup_level_to_build_grid)
-    if (flags.delete_and_rebuild_tria)
+    if (flags.delete_and_rebuild_tria || !tria)
       restore_grid ();
 };
 
