@@ -62,7 +62,7 @@
  *
  * Path lists are by default starting with the current directory
  * (<tt>""</tt>), followed optionally by a standard directory of
- * <acronym>deal.II</acronym>. Use show() to find out the path list
+ * deal.II. Use show() to find out the path list
  * for a given class. Paths and suffixes can be added using the
  * functions add_path() and add_suffix(), repectively.
  *
