@@ -322,6 +322,7 @@ wave-test-3.output: wave-test-3.testcase
 
 %.check:%.output
 	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============' $<
+	@touch $@
 ############################################################
 # Cleanup targets
 ############################################################

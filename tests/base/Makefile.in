@@ -180,6 +180,7 @@ target1: $(target1-o-files) $(libraries)
 
 %.check:%.output
 	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
+	@touch $@
 ############################################################
 # Cleanup targets
 ############################################################
