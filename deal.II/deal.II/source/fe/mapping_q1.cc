@@ -947,8 +947,8 @@ MappingQ1<dim>::InternalData*
 MappingQ1<dim>::get_cell_data(const typename Triangulation<dim>::cell_iterator cell,
 			      const UpdateFlags update_flags) const
 {
-  static Point<dim> dummy_p;
-  static Quadrature<dim> dummy_quadrature(dummy_p);
+  static const Point<dim> dummy_p;
+  static const Quadrature<dim> dummy_quadrature(dummy_p);
 
   InternalData *mdata=dynamic_cast<InternalData *> (
     get_data(update_flags, dummy_quadrature));

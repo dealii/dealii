@@ -933,7 +933,7 @@ MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell
 				      {2,10,6,11},
 				      {8,7,11,3}};
 
-  static StraightBoundary<3> straight_boundary;
+  static const StraightBoundary<3> straight_boundary;
 				   // used if face quad at boundary or
 				   // entirely in the interior of the
 				   // domain
@@ -1047,7 +1047,7 @@ void
 MappingQ<3>::fill_quad_support_points_simple (const Triangulation<3>::cell_iterator &cell,
 					      std::vector<Point<3> > &a) const
 {
-  static StraightBoundary<3> straight_boundary;
+  static const StraightBoundary<3> straight_boundary;
 
   const Boundary<3> *boundary = 0;
 

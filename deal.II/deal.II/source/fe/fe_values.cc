@@ -33,7 +33,7 @@ using namespace std;
 
 
 // TODO: replace this by non-global object
-static MappingQ1<deal_II_dimension> mapping_q1;
+static const MappingQ1<deal_II_dimension> mapping_q1;
 
 template <int dim>
 void

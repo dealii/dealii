@@ -29,8 +29,8 @@ using namespace std;
 #endif
 
 
-
-static MappingQ1<deal_II_dimension> mapping;
+//TODO: purge this variable
+static const MappingQ1<deal_II_dimension> mapping;
 
 template <int dim>
 Assembler<dim>::AssemblerData::AssemblerData (const DoFHandler<dim>    &dof,

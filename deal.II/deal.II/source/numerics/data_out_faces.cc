@@ -25,7 +25,7 @@
 #include <fe/mapping_q1.h>
 
 //TODO: Do this more clever
-static MappingQ1<deal_II_dimension> mapping;
+static const MappingQ1<deal_II_dimension> mapping;
 
 #ifdef DEAL_II_USE_MT
 #include <base/thread_management.h>

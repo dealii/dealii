@@ -66,7 +66,7 @@ void CellData<3>::rotate (const unsigned int times)
 				   // list the 24 ways to rotate a
 				   // cell, by the ways by which the
 				   // vertices are then permuted
-  static unsigned int rotations[24][GeometryInfo<3>::vertices_per_cell]
+  static const unsigned int rotations[24][GeometryInfo<3>::vertices_per_cell]
     = {   {0,1,2,3,4,5,6,7},
 	  {1,5,6,2,0,4,7,3},
 	  {5,4,7,6,1,0,3,2},

@@ -42,7 +42,7 @@ using namespace std;
 
 
 //TODO: Comment?? Use proper mapping!
-static MappingQ1<deal_II_dimension> mapping;
+static const MappingQ1<deal_II_dimension> mapping;
 
 
 

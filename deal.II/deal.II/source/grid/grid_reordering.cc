@@ -942,14 +942,6 @@ void GridReordering<dim>::find_reordering (typename std::vector<Cell>           
 				       // cell in the present
 				       // orientation is valid
       check_topmost_cell:
-
-      static unsigned int max_size = 0;
-      if (rotation_states.size() > max_size)
-	{
-	  max_size = rotation_states.size();
-//  	  if (max_size % 10 == 0)
-//  	    cout << "New max size " << rotation_states.size() << endl;
-	};
       
       const typename std::vector<Cell>::iterator
 	try_cell = cells.begin() + rotation_states.size()-1;
