@@ -307,6 +307,18 @@ Point<dim> LineAccessor<dim>::center () const {
 
 
 
+template <int dim>
+Point<dim> LineAccessor<dim>::barycenter () const {
+  return (vertex(1)+vertex(0))/2.;
+};
+
+
+
+template <int dim>
+double LineAccessor<dim>::measure () const {
+  return sqrt((vertex(1)-vertex(0)).square());
+};
+  
 
 
 
@@ -568,6 +580,131 @@ double QuadAccessor<dim>::diameter () const {
 template <int dim>
 Point<dim> QuadAccessor<dim>::center () const {
   return (vertex(0)+vertex(1)+vertex(2)+vertex(3))/4.;
+};
+
+
+
+template <>
+Point<2> QuadAccessor<2>::barycenter () const {
+				   // the evaluation of the formulae
+				   // is a bit tricky when done dimension
+				   // independant, so we write this function
+				   // for 2D and 3D separately
+/*
+  Get the computation of the barycenter by this little Maple script. We
+  use the blinear mapping of the unit quad to the real quad. However,
+  every transformation mapping the unit faces to strait lines should
+  do.
+
+  Remember that the area of the quad is given by
+  |K| = \int_K 1 dx dy  = \int_{\hat K} |det J| d(xi) d(eta)
+  and that the barycenter is given by
+  \vec x_s = 1/|K| \int_K \vec x dx dy
+           = 1/|K| \int_{\hat K} \vec x(xi,eta) |det J| d(xi) d(eta)
+
+  # x and y are arrays holding the x- and y-values of the four vertices
+  # of this cell in real space. 
+  x := array(0..3);
+  y := array(0..3);
+  tphi[0] := (1-xi)*(1-eta):
+  tphi[1] := xi*(1-eta):
+  tphi[2] := xi*eta:
+  tphi[3] := (1-xi)*eta:
+  x_real := sum(x[s]*tphi[s], s=0..3):
+  y_real := sum(y[s]*tphi[s], s=0..3):
+  detJ := diff(x_real,xi)*diff(y_real,eta) - diff(x_real,eta)*diff(y_real,xi):
+
+  measure := simplify ( int ( int (detJ, xi=0..1), eta=0..1)):
+
+  xs := simplify (1/measure * int ( int (x_real * detJ, xi=0..1), eta=0..1)):
+  ys := simplify (1/measure * int ( int (y_real * detJ, xi=0..1), eta=0..1)):
+  readlib(C):
+
+  C(array(1..2, [xs, ys]), optimized);
+*/
+
+  const double x[4] = { vertex(0)(0),
+			vertex(1)(0),
+			vertex(2)(0),
+			vertex(3)(0)  };
+  const double y[4] = { vertex(0)(1),
+			vertex(1)(1),
+			vertex(2)(1),
+			vertex(3)(1)  };
+  const double t1 = x[0]*x[1];
+  const double t4 = x[2]*x[3];
+  const double t7 = x[0]*x[3];
+  const double t9 = x[1]*x[2];
+  const double t11 = x[0]*x[0];
+  const double t13 = x[1]*x[1];
+  const double t15 = x[2]*x[2];
+  const double t17 = x[3]*x[3];
+  const double t25 = -t1*y[0]+t1*y[1]-t4*y[2]+t4*y[3]+t7*y[0]-t9*y[1]
+		     +t11*y[1]-t13*y[0]+t15*y[3]-t17*y[2]-t11*y[3]
+		     +t13*y[2]-t15*y[1]+t17*y[0]+t9*y[2]-t7*y[3];
+  const double t35 = 1/(-x[0]*y[3]-x[1]*y[0]+x[2]*y[3]+x[3]*y[0]
+			+x[0]*y[1]-x[3]*y[2]+x[1]*y[2]-x[2]*y[1]);
+  const double t38 = y[3]*x[3];
+  const double t40 = y[0]*x[0];
+  const double t42 = y[1]*x[1];
+  const double t44 = y[2]*x[2];
+  const double t50 = y[0]*y[0];
+  const double t52 = y[1]*y[1];
+  const double t54 = y[2]*y[2];
+  const double t56 = y[3]*y[3];
+  const double t62 = -t38*y[2]+t40*y[1]-t42*y[0]+t44*y[3]-t40*y[3]
+		     +t42*y[2]-t44*y[1]+t38*y[0]-x[1]*t50+x[0]*t52
+		     -x[3]*t54+x[2]*t56+x[3]*t50-x[2]*t52+x[1]*t54-x[0]*t56;
+  return Point<2> (t25*t35/3.0, t62*t35/3.0);
+};
+
+
+
+
+template <>
+double QuadAccessor<2>::measure () const {
+				   // the evaluation of the formulae
+				   // is a bit tricky when done dimension
+				   // independant, so we write this function
+				   // for 2D and 3D separately
+/*
+  Get the computation of the measure by this little Maple script. We
+  use the blinear mapping of the unit quad to the real quad. However,
+  every transformation mapping the unit faces to strait lines should
+  do.
+
+  Remember that the area of the quad is given by
+  \int_K 1 dx dy  = \int_{\hat K} |det J| d(xi) d(eta)
+
+  # x and y are arrays holding the x- and y-values of the four vertices
+  # of this cell in real space. 
+  x := array(0..3);
+  y := array(0..3);
+  tphi[0] := (1-xi)*(1-eta):
+  tphi[1] := xi*(1-eta):
+  tphi[2] := xi*eta:
+  tphi[3] := (1-xi)*eta:
+  x_real := sum(x[s]*tphi[s], s=0..3):
+  y_real := sum(y[s]*tphi[s], s=0..3):
+  detJ := diff(x_real,xi)*diff(y_real,eta) - diff(x_real,eta)*diff(y_real,xi):
+
+  measure := simplify ( int ( int (detJ, xi=0..1), eta=0..1)):
+  readlib(C):
+
+  C(measure, optimized);
+*/
+
+  const double x[4] = { vertex(0)(0),
+			vertex(1)(0),
+			vertex(2)(0),
+			vertex(3)(0)  };
+  const double y[4] = { vertex(0)(1),
+			vertex(1)(1),
+			vertex(2)(1),
+			vertex(3)(1)  };
+
+  return (-x[0]*y[3]/2.0-x[1]*y[0]/2.0+x[2]*y[3]/2.0+x[3]*y[0]/2.0+
+	  x[0]*y[1]/2.0-x[3]*y[2]/2.0+x[1]*y[2]/2.0-x[2]*y[1]/2.0);
 };
 
 

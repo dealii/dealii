@@ -462,7 +462,23 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      * midpoint of the line in real space.
 				      */
     Point<dim> center () const;
+
+				     /**
+				      * Return the barycenter of the line,
+				      * which is the midpoint. The same
+				      * applies as for the #center# function
+				      * with regard to lines at the boundary.
+				      */
+    Point<dim> barycenter () const;
     
+				     /**
+				      * Return the length of the line.
+				      * The same
+				      * applies as for the #center# function
+				      * with regard to lines at the boundary.
+				      */
+    double measure () const;
+
   private:
     				     /**
 				      *  Copy operator. This is normally
@@ -758,6 +774,27 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      * midpoint of the quad in real space.
 				      */
     Point<dim> center () const;
+
+				     /**
+				      * Return the barycenter of the aud,
+				      * which is the midpoint. The same
+				      * applies as for the #center# function
+				      * with regard to quads at the boundary.
+				      */
+    Point<dim> barycenter () const;
+
+				     /**
+				      * Return the area of the quad. With
+				      * area, we mean the area included by
+				      * the straight lines connecting the
+				      * four vertices, i.e. no information
+				      * about the boundary is used; if
+				      * you want other than bilinearly
+				      * mapped unit quadrilaterals, ask the
+				      * appropriate finite element class
+				      * for the area of this quad.
+				      */
+    double measure () const;
 
   private:
     				     /**
