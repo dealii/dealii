@@ -36,11 +36,10 @@
    */
 #undef DEAL_II_COMPAT_MAPPING
 
-/* Define if we have to work around another bug in Intel's icc compiler in
-   which the compiler refuses to store the const attribute at a member
-   function pointer with a constant class. See the aclocal.m4 file in the
-   top-level directory for a description of this bug. */
-#undef DEAL_II_CONST_MEM_FUN_PTR_BUG
+/* Defined if the compiler needs a workaround for certain problems with taking
+   the address of template template functions. For the details, look at
+   aclocal.m4 in the top-level directory. */
+#undef DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
 
 /* Flag indicating whether the library shall be compiled to use the Tecplot
    interface */
@@ -93,10 +92,6 @@
    friends of the enclosing class. */
 #undef DEAL_II_NESTED_CLASS_FRIEND_BUG
 
-/* Defined if the compiler does not allow to make a class a friend to which we
-   do not have access. */
-#undef DEAL_II_NESTED_NESTED_FRIEND_BUG
-
 /* Path to the deal.II directory */
 #undef DEAL_II_PATH
 
@@ -114,12 +109,6 @@
    class template parameter. For the exact failure mode, look at aclocal.m4 in
    the top-level directory. */
 #undef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
-
-/* Define if we have to work around a bug in Intel's icc compiler in which the
-   compiler refuses to consider a template when given a pointer to a constant
-   member function. See the aclocal.m4 file in the top-level directory for a
-   description of this bug. */
-#undef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
 
 /* Define if we have to work around a bug with some compilers that will not
    allow us to specify a fully specialized class of a template as a friend.
