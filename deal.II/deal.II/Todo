@@ -79,6 +79,9 @@ No support points for non-Lagrangian elements? Check for Langrange in
 interpolation?
 
 
+Think about the problem pointed at in the documentation of
+  FiniteElementBase::restriction.
+
 Implement the random distortion in Triangulation for hanging nodes
   also. Hanging nodes need to be reset to the correct mean value
   at the end, which is simple for 2D but difficult for 3D. Maybe take
