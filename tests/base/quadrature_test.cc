@@ -1,6 +1,6 @@
 //----------------------------  quadrature_test.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    quadrature_test.cc,v 1.18 2003/01/08 17:58:18 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -168,13 +168,13 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 	      exact_int = 2 * (sub ? 2:1) / (double) (i+1);
 	      break;
 	    case 3:
-	      exact_int = 3 * (sub ? 4:1) / (double) (i+1)/(i+1);
+	      exact_int = 3 * (sub ? 8:2) / (double) (i+1)/(i+1);
 	      break;
 	    }
       
 	  err = std::fabs(quadrature_int-exact_int);
 	}
-      while (err<5e-15);
+      while (err<2e-14);
 				       // Uncomment here for testing
       //      deallog << " (Int " << quadrature_int << '-' << exact_int << '=' << err << ")";
       deallog << " is exact for polynomials of degree " << i-1 << std::endl;
