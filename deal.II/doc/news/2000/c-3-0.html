@@ -13,6 +13,16 @@
 <h3>General</h3>
 <ol>
   <li> <p>
+       Fixed: the 
+       <code class="program">common/scripts/make_dependencies.pl</code> 
+       script that sets up the dependencies for the make files had a
+       problem when the path to the library included special characters
+       such as `+'. This is now fixed.
+       <br>
+       (WB 2000/06/15)
+       </p>
+
+  <li> <p>
        New: the <code class="program">configure</code> script now
        checks whether the <code>getrusage</code> function is properly
        declared (this function is used in the timer class). The
