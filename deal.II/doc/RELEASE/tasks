@@ -22,3 +22,4 @@ when a new release shall be issued:
 14/ wait overnight
 
 15/ announce the release
+       follow the instructions in ./announce.pl
