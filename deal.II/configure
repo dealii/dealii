@@ -6014,6 +6014,13 @@ echo "${ECHO_T}" >&6
 echo "$as_me:$LINENO: result: --------------------- generating output ---------------------" >&5
 echo "${ECHO_T}--------------------- generating output ---------------------" >&6
 
+
+
+
+
+
+
+
                                                   ac_config_files="$ac_config_files common/Make.global_options common/Makefile.template doc/Makefile doc/auto/Makefile doc/auto/kdoc/Makefile"
 
 

@@ -1,4 +1,6 @@
 /* base/include/base/config.h.in.  Generated from configure.in by autoheader.  */
+
+
 //----------------------------  config.h  ---------------------------
 //    $Id$
 //    Version: $Name$
@@ -26,6 +28,7 @@
 //
 // In case of problems in autodetection of features of your build
 // environment, contact the authors of the library.
+
 
 
 /* Backward compatibility support for functions and classes that do not take
@@ -155,4 +158,7 @@
    */
 #undef XLC_WORK_AROUND_STD_BUG
 
+
+
 #endif
+
