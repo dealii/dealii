@@ -95,8 +95,11 @@ enum NormType {
  *   called with a map of boundary functions in which all boundary indicators
  *   from zero to 254 (255 is used for other purposes, see the #Triangulation#
  *   class documentation) point to the function to be projected. The projection
- *   to the boundary takes place using a second quadrature formula given to
- *   the #project# function.
+ *   to the boundary takes place using a second quadrature formula on the
+ *   boundary given to the #project# function. The first quadrature formula is
+ *   used to compute the right hand side, while the global projection is done by
+ *   exact integration of the mass matrix instead of evaluating it by a quadrature
+ *   formula. This is faster in this case and more accurate.
  *
  *   The projection of the boundary values first, then eliminating them from
  *   the global system of equations is not needed usually. It may be necessary
@@ -132,6 +135,12 @@ enum NormType {
  *   method without preconditioning and without multigrid. This is clearly not
  *   too efficient, but sufficient in many cases and simple to implement. This
  *   detail may change in the future.
+ *
+ * \item Creation of right hand side vectors:
+ *   The #create_right_hand_side# function computes the vector
+ *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. This is the same as what the
+ *   #MatrixCreator::create_*# functions which take a right hand side do,
+ *   but without assembling a matrix.
  *
  * \item Interpolation of boundary values:
  *   The #MatrixTools::apply_boundary_values# function takes a list
@@ -285,14 +294,27 @@ class VectorTools {
     static void project (const DoFHandler<dim>    &dof,
 			 const ConstraintMatrix   &constraints,
 			 const FiniteElement<dim> &fe,
-			 const Quadrature<dim>    &q,
 			 const Boundary<dim>      &boundary,
+			 const Quadrature<dim>    &q,
 			 const Function<dim>      &function,
 			 dVector                  &vec,
 			 const bool                enforce_zero_boundary = false,
 			 const Quadrature<dim-1>  &q_boundary = QGauss2<dim-1>(),
 			 const bool                project_to_boundary_first = false);
 
+				     /**
+				      * Create a right hand side vector.
+				      *
+				      * See the general documentation of this
+				      * class for further information.
+				      */				      
+    static void create_right_hand_side (const DoFHandler<dim>    &dof,
+					const FiniteElement<dim> &fe,
+					const Quadrature<dim>    &q,
+					const Boundary<dim>      &boundary,
+					const Function<dim>      &rhs,
+					dVector                  &rhs_vector);
+    
 				     /**
 				      * Make up the list of node subject
 				      * to Dirichlet boundary conditions
