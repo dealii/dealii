@@ -143,6 +143,13 @@ class FETools
 				      * function space on the whole
 				      * triangulation, although it is
 				      * of course Q1 on each cell.
+				      *
+				      * To make the field conforming
+				      * again, you have to have a
+				      * hanging node constraints
+				      * object, and call its
+				      * @p{distribute} function on the
+				      * result of this function.
 				      */
     template <int dim, typename number>
     static void interpolate (const DoFHandler<dim> &dof1,
