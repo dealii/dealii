@@ -993,9 +993,10 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 		weights[point];
 };
 
+//TODO: check correctness of this function and use FEValues
 
-
-template<int dim> void
+template<int dim>
+void
 MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
 						const FiniteElement<dim> &low,
 						FullMatrix<double>& result)
@@ -1005,16 +1006,27 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
   
   result.reinit (low.total_dofs, high.total_dofs);
 
-  vector<Point<dim> > unit_support_points (high.total_dofs);
-  high.get_unit_support_points (unit_support_points);
+				   // Initialize FEValues at the support points
+				   // of the low element.
+  vector<double> phantom_weights(low.total_dofs,1.);
+  vector<Point<dim> > support_points(low.total_dofs);
+  low.get_unit_support_points(support_points);
+  Quadrature<dim> low_points(support_points,
+			     phantom_weights);
+
+  FEValues<dim> fe(high, low_points, UpdateFlags(0));
   
+//TODO: This could be less inefficient by going component by component
+//TODO: Does it work for multi-component?
+
   for (unsigned int i=0; i<low.total_dofs; ++i)
     for (unsigned int j=0; j<high.total_dofs; ++j)
 				       // shape functions need to belong
 				       // to the same component
       if (low.system_to_component_index(i).first ==
 	  high.system_to_component_index(j).first)
-	result(i,j) = high.shape_value (j, unit_support_points[i]);
+// This is Id at the moment
+	result(i,j) = fe.shape_value(j,i);
 }
 
 
