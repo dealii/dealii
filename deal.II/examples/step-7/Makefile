@@ -72,7 +72,7 @@ libs.o   = $(lib-deal2-2d.o) \
 # file. Note that by default we use the extension .go for object files
 # compiled in debug mode and .o for object files in optimized mode.
 ifeq ($(debug-mode),on)
-  libraries = $(target).go $(libs.g)
+  libraries = $(target).g.o $(libs.g)
   flags     = $(CXXFLAGS.g)
 else
   libraries = $(target).o $(libs.o)
@@ -114,10 +114,10 @@ clean:
 # compiler are usually not of much interest, we suppress the actual
 # command line using the `at' sign in the first column of the rules
 # and write the string indicating what we do instead.
-%.go : %.cc
+./%.g.o :
 	@echo ==============debug========= $(<F)
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-%.o : %.cc
+./%.o :
 	@echo ==============optimized===== $(<F)
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
@@ -148,7 +148,7 @@ Makefile.dep: $(target).cc Makefile \
                            $(include-path-lac)/lac/*.h      \
                            $(include-path-deal2)/*/*.h)
 	@echo ============================ Remaking Makefile
-	@$(PERL) $D/common/scripts/make_dependencies.pl  $(INCLUDE) $(target).cc \
+	@$(PERL) $D/common/scripts/make_dependencies.pl  $(INCLUDE) -B. $(target).cc \
 		| $(PERL) -pi -e 's!lib/g?o/!!g;' \
 		> Makefile.dep
 
