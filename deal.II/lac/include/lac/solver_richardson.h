@@ -206,8 +206,7 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
 
       if (!additional_data.use_preconditioned_residual)
 	{
-	  res = r*r;
-	  res=sqrt(res);
+	  res = r.l2_norm();
 	  conv = control().check (iter, criterion());
 	  if (conv != SolverControl::iterate)
 	    break;
@@ -216,8 +215,7 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
       precondition.vmult(d,r);
       if (additional_data.use_preconditioned_residual)
 	{
-	  res = d*d;
-	  res=sqrt(res);
+	  res = d.l2_norm();
 	  conv = control().check (iter, criterion());
 	  if (conv != SolverControl::iterate)
 	    break;
@@ -264,7 +262,7 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
 				       // but do it in 2 steps
       A.Tvmult(r,x);
       r.sadd(-1.,1.,b);
-      res=sqrt(r*r);
+      res=r.l2_norm();
 
       conv = control().check (iter, criterion());
       if (conv != SolverControl::iterate)
