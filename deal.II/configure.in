@@ -265,7 +265,7 @@ if test "$GXX" = yes ; then
   dnl causes this.
   DEAL_II_CHECK_ADVANCE_WARNING
   if test "x$DEAL_II_ADVANCE_WARNING" = "xyes" ; then
-    CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-W//g;'`"
+    CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-W //g;'`"
   fi
 
 else
