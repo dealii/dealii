@@ -856,6 +856,9 @@ class TriaDimensionInfo<2> {
  *   upon refinement. In principle, all user pointers should be #NULL# pointers
  *   at the time a line, quad, etc comes into life. #NULL# pointers are always
  *   a good choice, since they raise an exception when being dereferenced.
+ *   The usual warning about the missing type safety of #void# pointers are
+ *   obviously in place here; responsibility for correctness of types etc
+ *   lies entirely with the user of the pointer.
  *
  *
  *   \subsection{Boundary approximation}
