@@ -586,31 +586,59 @@ void
 dSMatrix::precondition_SSOR (dVector& dst, const dVector& src,
 			     const double om) const
 {
+				   // to understand how this function works
+				   // you may want to take a look at the CVS
+				   // archives to see the original version
+				   // which is much clearer...
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
 
-  const unsigned int  n = src.size();
-  unsigned int  j;
+  const unsigned int  n            = src.size();
+  const unsigned int *rowstart_ptr = &cols->rowstart[0];
+  double             *dst_ptr      = &dst(0);
   
-  for (unsigned int row=0; row<n; ++row)
+  for (unsigned int row=0; row<n; ++row, ++dst_ptr, ++rowstart_ptr)
     {
-      dst(row) = src(row);
-      for (j=cols->rowstart[row]; j<cols->rowstart[row+1] ;j++)
-	if ((unsigned int)cols->colnums[j] < row)
-	  dst(row) -= om* val[j] * dst(cols->colnums[j]);
-      dst(row) /= val[cols->rowstart[row]];
-    }
-  for (unsigned int row=0; row<n; ++row)
-    dst(row) *= (2.-om)*val[cols->rowstart[row]];
+      *dst_ptr = src(row);
+				       // find the first element in this line
+				       // which is on the right of the diagonal.
+				       // we need to precondition with the
+				       // elements on the left only.
+				       // note: the first entry in each
+				       // line denotes the diagonal element,
+				       // which we need not check.
+      const unsigned int first_right_of_diagonal_index
+	= (lower_bound (&cols->colnums[*rowstart_ptr+1],
+			&cols->colnums[*(rowstart_ptr+1)],
+			static_cast<signed int>(row)) -
+	   &cols->colnums[0]);
+				       
+      for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
+	*dst_ptr -= om* val[j] * dst(cols->colnums[j]);
+      *dst_ptr /= val[*rowstart_ptr];
+    };
   
-  for (int row=n-1; row>=0; --row)
+  rowstart_ptr = &cols->rowstart[0];
+  dst_ptr      = &dst(0);
+  for (unsigned int row=0; row<n; ++row, ++rowstart_ptr, ++dst_ptr)
+    *dst_ptr *= (2.-om)*val[*rowstart_ptr];
+
+  rowstart_ptr = &cols->rowstart[n-1];
+  dst_ptr      = &dst(n-1);
+  for (int row=n-1; row>=0; --row, --rowstart_ptr, --dst_ptr)
     {
-      for (j=cols->rowstart[row];j<cols->rowstart[row+1];j++)
+      const unsigned int first_right_of_diagonal_index
+	= (lower_bound (&cols->colnums[*rowstart_ptr+1],
+			&cols->colnums[*(rowstart_ptr+1)],
+			static_cast<signed int>(row)) -
+	   &cols->colnums[0]);
+      for (unsigned int j=first_right_of_diagonal_index; j<*(rowstart_ptr+1); ++j)
 	if (cols->colnums[j] > row)
-	  dst(row) -= om* val[j] * dst(cols->colnums[j]);
-      dst(row) /= val[cols->rowstart[row]];
-    }
+	  *dst_ptr -= om* val[j] * dst(cols->colnums[j]);
+      
+      *dst_ptr /= val[*rowstart_ptr];
+    };
 }
 
 void
