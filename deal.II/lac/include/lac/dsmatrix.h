@@ -110,54 +110,61 @@ CLASS
    */
 class dSMatrix
 {
-  dSMatrixStruct& cols;
-  double* val;
-  int max_len;
- public:
-  //////////
-  void reinit();
-  //////////
-  dSMatrix(dSMatrixStruct& c)
-    : cols(c), val(0), max_len(0)
-    {
-      reinit();
-    }
-  //////////
-  ~dSMatrix()
-    {
-      delete[] val;
-    }
+    dSMatrixStruct * cols;
+    double* val;
+    int max_len;
+  public:
+				     //
+    void reinit();
+				     //
+    void reinit (dSMatrixStruct &);
+				     //
+    dSMatrix(dSMatrixStruct& c)
+		    : cols(&c), val(0), max_len(0)
+      {
+	reinit();
+      }
+				     //
+    ~dSMatrix()
+      {
+	delete[] val;
+      }
 
-  //////////
-  int m() const { return cols.rows; }
-  //////////
-  int n() const { return cols.cols; }
+				     //
+    int m() const { return cols->rows; }
+				     //
+    int n() const { return cols->cols; }
 
-  //////////
-  void set(int i,int j,double value) { val[cols(i,j)] = value; }
-  //////////
-  void add(int i,int j,double value) { val[cols(i,j)]+= value; }
+				     //
+    void set(int i,int j,double value) { val[cols->operator()(i,j)] = value; }
+				     //
+    void add(int i,int j,double value) { val[cols->operator()(i,j)]+= value; }
   
-  //////////
-  void vmult (dVector& dst,const dVector& src);
-  //////////
-  void Tvmult(dVector& dst,const dVector& src);
+				     //
+    void vmult (dVector& dst,const dVector& src);
+				     //
+    void Tvmult(dVector& dst,const dVector& src);
   
-  //////////
-  double residual (dVector& dst,const dVector& x,const dVector& b);
-  //////////
-  void Jacobi_precond(dVector& dst,const dVector& src,double om = 1.);
-  //////////
-  void SSOR_precond(dVector& dst,const dVector& src,double om = 1.);
-  //////////
-  void SOR_precond(dVector& dst,const dVector& src,double om = 1.);
-  //////////
-  void SSOR(dVector& dst,double om = 1.);
-  //////////
-  void SOR(dVector& dst,double om = 1.);
-  //////////
-  void precondition(dVector& dst,const dVector& src) { dst=src; }
+				     //
+    double residual (dVector& dst,const dVector& x,const dVector& b);
+				     //
+    void Jacobi_precond(dVector& dst,const dVector& src,double om = 1.);
+				     //
+    void SSOR_precond(dVector& dst,const dVector& src,double om = 1.);
+				     //
+    void SOR_precond(dVector& dst,const dVector& src,double om = 1.);
+				     //
+    void SSOR(dVector& dst,double om = 1.);
+				     //
+    void SOR(dVector& dst,double om = 1.);
+				     //
+    void precondition(dVector& dst,const dVector& src) { dst=src; }
 
     void print (ostream &) const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotCompressed);
 };
 #endif

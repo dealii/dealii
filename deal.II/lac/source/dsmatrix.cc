@@ -255,18 +255,6 @@ dSMatrixStruct::add_matrix(const iVector& rows, const iVector& cols)
       add(rows(i), cols(j));
 }
 
-void
-dSMatrix::reinit()
-{
-  if(max_len<cols.vec_len)
-  {
-    if (val) delete[] val;
-    val = new double[cols.vec_len];
-    max_len = cols.vec_len;
-  }
-//  memset(val, 0, sizeof(*val) * cols.vec_len);
-  for (int i = cols.vec_len-1 ; i>=0 ; i--) val[i] = 0;
-}
 
 void
 dSMatrixStruct::print_gnuplot (ostream &out) const
@@ -296,6 +284,34 @@ dSMatrixStruct::bandwidth () const
   return b;
 }
 
+
+
+void
+dSMatrix::reinit()
+{
+  Assert (cols->compressed, ExcNotCompressed());
+  
+  if(max_len<cols->vec_len)
+  {
+    if (val) delete[] val;
+    val = new double[cols->vec_len];
+    max_len = cols->vec_len;
+  }
+//  memset(val, 0, sizeof(*val) * cols->vec_len);
+  for (int i = cols->vec_len-1 ; i>=0 ; i--) val[i] = 0;
+}
+
+
+
+void
+dSMatrix::reinit (dSMatrixStruct &sparsity) {
+  cols = &sparsity;
+  reinit ();
+};
+
+
+
+
 void
 dSMatrix::vmult(dVector& dst,const dVector& src)
 {
@@ -305,9 +321,9 @@ dSMatrix::vmult(dVector& dst,const dVector& src)
   for (int i=0;i<m();i++)
     {
       double s = 0.;
-      for (int j=cols.rowstart[i]; j < cols.rowstart[i+1] ;j++) 
+      for (int j=cols->rowstart[i]; j < cols->rowstart[i+1] ;j++) 
 	{
-	  int p = cols.colnums[j];
+	  int p = cols->colnums[j];
 	  s += val[j] * src(p);
 	}
       dst(i) = s;
@@ -326,9 +342,9 @@ dSMatrix::Tvmult(dVector& dst,const dVector& src)
   
   for (i=0;i<m();i++)
     {
-      for (int j=cols.rowstart[i]; j<cols.rowstart[i+1] ;j++)
+      for (int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  int p = cols.colnums[j];
+	  int p = cols->colnums[j];
 	  dst(p) += val[j] * src(i);
 	}
     }
@@ -345,9 +361,9 @@ dSMatrix::residual(dVector& dst,const dVector& u,const dVector& b)
   for (int i=0;i<m();i++)
     {
       s = b(i);
-      for (int j=cols.rowstart[i]; j<cols.rowstart[i+1] ;j++)
+      for (int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  int p = cols.colnums[j];
+	  int p = cols->colnums[j];
 	  s -= val[j] * u(p);
 	}
       dst(i) = s;
@@ -363,7 +379,7 @@ dSMatrix::Jacobi_precond(dVector& dst,const dVector& src,double om)
 
   for (int i=0;i<n;++i)
     {
-      dst(i) = om * src(i) * val[cols.rowstart[i]];
+      dst(i) = om * src(i) * val[cols->rowstart[i]];
     }
 }
 
@@ -376,23 +392,23 @@ dSMatrix::SSOR_precond(dVector& dst,const dVector& src,double om)
   for (i=0;i<n;i++)
     {
       dst(i) = src(i);
-      for (j=cols.rowstart[i]; j<cols.rowstart[i+1] ;j++)
+      for (j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  p = cols.colnums[j];
+	  p = cols->colnums[j];
 	  if (p<i) dst(i) -= om* val[j] * dst(p);
 	}
-      dst(i) /= val[cols.rowstart[i]];
+      dst(i) /= val[cols->rowstart[i]];
     }
-  for (i=0;i<n;i++) dst(i) *= (2.-om)*val[cols.rowstart[i]];
+  for (i=0;i<n;i++) dst(i) *= (2.-om)*val[cols->rowstart[i]];
   
   for (i=n-1;i>=0;i--)
     {
-      for (j=cols.rowstart[i];j<cols.rowstart[i+1];j++)
+      for (j=cols->rowstart[i];j<cols->rowstart[i+1];j++)
 	{
-	  p = cols.colnums[j];
+	  p = cols->colnums[j];
 	  if (p>i) dst(i) -= om* val[j] * dst(p);
 	}
-      dst(i) /= val[cols.rowstart[i]];
+      dst(i) /= val[cols->rowstart[i]];
     }
 }
 
@@ -412,13 +428,13 @@ dSMatrix::SOR(dVector& dst, double om)
   for (int i=0;i<m();i++)
     {
       double s = dst(i);
-      for (int j=cols.rowstart[i]; j<cols.rowstart[i+1] ;j++)
+      for (int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  int p = cols.colnums[j];
+	  int p = cols->colnums[j];
 	  if (p<i)
 	    s -= val[j] * dst(p);
 	}
-      dst(i) = s * om / val[cols.rowstart[i]];
+      dst(i) = s * om / val[cols->rowstart[i]];
     }
 }
 
@@ -432,36 +448,36 @@ dSMatrix::SSOR(dVector& dst, double om)
   for (i=0;i<n;i++)
     {
       s = 0.;
-      for (j=cols.rowstart[i]; j<cols.rowstart[i+1] ;j++)
+      for (j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  p = cols.colnums[j];
+	  p = cols->colnums[j];
 	  if (p>=0)
 	    {
 	      if (i>j) s += val[j] * dst(p);
 	    }
 	}
       dst(i) -= s * om;
-      dst(i) /= val[cols.rowstart[i]];
+      dst(i) /= val[cols->rowstart[i]];
     }
 
   for (i=n-1;i>=0;i--)
     {
       s = 0.;
-      for (j=cols.rowstart[i]; j<cols.rowstart[i+1] ;j++)
+      for (j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
 	{
-	  p = cols.colnums[j];
+	  p = cols->colnums[j];
 	  if (p>=0)
 	    {
 	      if (i<j) s += val[j] * dst(p);
 	    }
 	}
-      dst(i) -= s * om / val[cols.rowstart[i]];
+      dst(i) -= s * om / val[cols->rowstart[i]];
     }
 }
 
 
 void dSMatrix::print (ostream &out) const {
-  for (int i=0; i<cols.rows; ++i)
-    for (int j=cols.rowstart[i]; j<cols.rowstart[i+1]; ++j)
-      out << "(" << i << "," << cols.colnums[j] << ") " << val[j] << endl;
+  for (int i=0; i<cols->rows; ++i)
+    for (int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
+      out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << endl;
 };
