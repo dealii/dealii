@@ -143,10 +143,10 @@ void test(const Triangulation<dim> &tria,
   data_out.attach_dof_handler (dof_handler1);
   data_out.add_data_vector (function1, fe_string1);
   data_out.build_patches (2);
-  std::string file1_name=fe_string1+"_function.gnuplot";
-  std::ofstream file1(file1_name.c_str());
-  data_out.write_gnuplot(file1);
-  file1.close();
+//    std::string file1_name=fe_string1+"_function.gnuplot";
+//    std::ofstream file1(file1_name.c_str());
+//    data_out.write_gnuplot(file1);
+//    file1.close();
   data_out.clear();
 
   std::string file2_name=fe_string1+"_";
