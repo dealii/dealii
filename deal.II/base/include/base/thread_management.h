@@ -745,7 +745,7 @@ namespace Threads
     
 				     // if more than one interval
 				     // requested, do the full work
-    const unsigned int n_elements              = distance (begin, end);
+    const unsigned int n_elements              = std::distance (begin, end);
     const unsigned int n_elements_per_interval = n_elements / n_intervals;
     const unsigned int residual                = n_elements % n_intervals;
     
