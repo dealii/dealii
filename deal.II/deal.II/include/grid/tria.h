@@ -68,6 +68,7 @@ class TriangulationLevel;
  *
  *  @memo Information belonging to one level of the multilevel hierarchy.
  */
+template <>
 class TriangulationLevel<0> {
   public:
 				     /**
@@ -194,6 +195,7 @@ class TriangulationLevel<0> {
  *
  *  @memo Information belonging to one level of the multilevel hierarchy.
  */
+template <>
 class TriangulationLevel<1> : public TriangulationLevel<0> {
   private:
 
@@ -333,6 +335,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
  *
  *  @memo Information belonging to one level of the multilevel hierarchy.
  */
+template <>
 class TriangulationLevel<2> :  public TriangulationLevel<1>
 {
 				     /**
@@ -463,6 +466,7 @@ class TriaDimensionInfo;
  *  have no substructures apart from vertices, which are handled in
  *  a different way, however.
  */
+template <>
 class TriaDimensionInfo<1> {
   public:
     typedef TriaRawIterator<1,CellAccessor<1> >    raw_line_iterator;
@@ -509,6 +513,7 @@ class TriaDimensionInfo<1> {
  *    typedef active_line_iterator active_face_iterator;    
  *  \end{verbatim}
  */
+template <>
 class TriaDimensionInfo<2> {
   public:
     typedef TriaRawIterator<2,LineAccessor<2> >    raw_line_iterator;
@@ -779,6 +784,21 @@ class TriaDimensionInfo<2> {
  *        hold for the data read from an UCD or any other input file, but
  *        also for the data passed to the
  *        #Triangulation<dim>::create_triangulation (2)# function.
+ *
+ *     \item Copying a triangulation: when computing on time dependant meshes
+ *        of when using adaptive refinement, you will often want to create a
+ *        new triangulation to be the same as another one. This is facilitated
+ *        by the #copy_triangulation# function.
+ *
+ *        It is guaranteed that vertex, line or cell numbers in the two
+ *        triangulations are the same and that two iterators walking on the
+ *        two triangulations visit matching cells if the are incremented in
+ *        parallel. It may be conceivable to implement a clean-up in the copy
+ *        operation, which eliminates holes of unused memory, re-joins
+ *        scattered data and so on. In principle this would be a useful
+ *        operation but guaranteeing some parallelity in the two triangulations
+ *        seems more important since usually data will have to be transferred
+ *        between the grids.
  *   \end{itemize}
  *
  *   The material id for each cell must be specified upon construction of
@@ -1259,6 +1279,22 @@ class Triangulation : public TriaDimensionInfo<dim> {
     Triangulation (const bool smooth_grid = false);
 
 				     /**
+				      *  Copy constructor. You should really
+				      *  use the #copy_triangulation# function,
+				      *  so we declare this function but let
+				      *  it throw an internal error. The
+				      *  reason for this is that we may use
+				      *  triangulation objects in collection,
+				      *  but inside them sometimes strange
+				      *  operations like copying happen which
+				      *  should be avoided for objects as
+				      *  large as triangulations. By throwing
+				      *  an error, one easily finds these
+				      *  places and can find other ways.
+				      */
+    Triangulation (const Triangulation<dim> &t);
+    
+				     /**
 				      *  Delete the object and all levels of
 				      *  the hierarchy.
 				      */
@@ -1274,9 +1310,39 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  that it is not destroyed before
 				      *  #Triangulation<>::execute_refinement()#
 				      *  is called the last time.
+				      *
+				      *  If you copy this triangulation to
+				      *  another one using the
+				      *  #copy_triangulation# function, you must
+				      *  make sure that the lifetime of boundary
+				      *  object extends to the lifetime of the
+				      *  new triangulation as well.
 				      */
     void set_boundary (const Boundary<dim> *boundary_object);
 
+				     /**
+				      *  Copy a triangulation. This operation is
+				      *  not cheap, so you should be careful
+				      *  with using this. We do not implement
+				      *  this function as a copy constructor,
+				      *  since it makes it easier to maintain
+				      *  collections of triangulations if you
+				      *  can assign them values later on.
+				      *
+				      *  Keep in mind that this function also
+				      *  copies the pointer to the boundary
+				      *  descriptor previously set by the
+				      *  #set_boundary# function. You must
+				      *  therefore also guarantee that the
+				      *  boundary objects has a lifetime at
+				      *  least as long as the copied
+				      *  triangulation.
+				      *
+				      *  This triangulation must be empty
+				      *  beforehand.
+				      */
+    void copy_triangulation (const Triangulation<dim> &old_tria);
+    
 				     /**
 				      * Create a triangulation from a list
 				      * of vertices and a list of cells, each of
@@ -1341,7 +1407,7 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      * The triangulation needs to be void
 				      * upon calling this function.
 				      */
-    void create_hyper_ball (const Point<dim> center = Point<dim>(),
+    void create_hyper_ball (const Point<dim> &center = Point<dim>(),
 			    const double radius = 1.);
     
 				      
