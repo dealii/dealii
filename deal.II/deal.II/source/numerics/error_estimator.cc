@@ -44,7 +44,7 @@ double sqr (const double x)
 
 
 template <typename CellIterator>
-static
+inline
 void advance_by_n (CellIterator &cell,
                    const unsigned int n)
 {
