@@ -53,7 +53,7 @@
  * <a href="http://www.cse.clrc.ac.uk/Activity/HSL">documentation</a>
  * of these functions. In practice, you will most often call the
  * second solve() function, which solves the linear system for a
- * given right hand sidem but one can as well call the three functions
+ * given right hand side, but one can as well call the three functions
  * separately if, for example, one would like to solve the same matrix
  * for several right hand side vectors; the MA27 solver can do this
  * efficiently, as it computes a decomposition of the matrix, so that
@@ -76,7 +76,7 @@
  * only states that the values have to be <b>at least</b> as large as
  * the estimates, a hint that is not very useful oftentimes (in my
  * humble opinion, the lack of dynamic memory allocation mechanism is
- * a good reason not to program in Fortran 77...).
+ * a good reason not to program in Fortran 77 :-).
  *
  * In our experience, it is often necessary to go beyond the proposed
  * values (most often for <tt>LA</tt>, but also for <tt>LIW1</tt>). The first
@@ -614,7 +614,7 @@ class SparseDirectMA27 : public Subscriptor
  * <a href="http://www.cse.clrc.ac.uk/Activity/HSL">documentation</a>
  * of these functions. In practice, one will most often call the
  * second solve() function, which solves the linear system for a given
- * right hand sidem but one can as well call the three functions
+ * right hand side, but one can as well call the three functions
  * separately if, for example, one would like to solve the same matrix
  * for several right hand side vectors; the MA47 solver can do this
  * efficiently, as it computes a decomposition of the matrix, so that
