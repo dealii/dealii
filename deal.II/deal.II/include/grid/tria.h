@@ -839,7 +839,7 @@ class TriaDimensionInfo<2> {
  *   above, so there is also a practical justification for the above.
  *   It can also be shown, that such degradation occurs if the
  *   triangulation contains vertices which are member of cells with levels
- *   differing by more than one level. On such example is the following:
+ *   differing by more than one. One such example is the following:
  *   \begin{verbatim}
  *     |     |     |     |
  *     x-----x-----x--x--x--
@@ -856,8 +856,8 @@ class TriaDimensionInfo<2> {
  *     |           |     |
  *     x-----------x-----x--
  *   \end{verbatim}
- *   It seems that in two space dimensions, the maximu jump in levels between
- *   cells sharing a common vertex is two (as in the example above), this is
+ *   It seems that in two space dimensions, the maximum jump in levels between
+ *   cells sharing a common vertex is two (as in the example above). This is
  *   not true if more than four cells meet at a vertex. It is not uncommon
  *   that a coarse (initial) mesh contains vertices at which six or even eight
  *   cells meet, when small features of the domain have to be resolved even on
@@ -982,7 +982,7 @@ class TriaDimensionInfo<2> {
  *
  *   It is assumed that the criterion is a value in a certain norm over each
  *   element, such that the square of the total error is the sum over the
- *   squares of the criteria on the cells.
+ *   squares of the criteria on the cells. The criteria shall be positive.
  *
  *
  *   \subsection{Material and boundary information}
