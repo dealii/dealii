@@ -476,4 +476,8 @@ namespace PETScWrappers
   
 }
 
+#else
+// On gcc2.95 on Alpha OSF1, the native assembler does not like empty
+// files, so provide some dummy code
+namespace { void dummy () {} }
 #endif // DEAL_II_USE_PETSC
