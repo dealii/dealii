@@ -40,11 +40,11 @@ void MGDoFHandler<dim>::MGVertexDoFs::init (const unsigned int cl,
 
   const unsigned int n_levels = finest_level-coarsest_level + 1;
   
-  indices = new int[n_levels * dofs_per_vertex];
+  indices = new unsigned int[n_levels * dofs_per_vertex];
   Assert (indices != 0, ExcNoMemory ());
 
   for (unsigned int i=0; i<n_levels*dofs_per_vertex; ++i)
-    indices[i] = -1;
+    indices[i] = DoFHandler<dim>::invalid_dof_index;
 };
 
 
@@ -1430,7 +1430,7 @@ MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
-      if (cell->mg_vertex_dof_index(vertex, 0) == -1)
+      if (cell->mg_vertex_dof_index(vertex, 0) == DoFHandler<2>::invalid_dof_index)
 	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
 	  cell->set_mg_vertex_dof_index (vertex, d, next_free_dof++);
     
@@ -1443,7 +1443,7 @@ MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // distribute dofs if necessary:
 					 // check whether line dof is already
 					 // numbered (check only first dof)
-	if (line->mg_dof_index(0) == -1)
+	if (line->mg_dof_index(0) == DoFHandler<2>::invalid_dof_index)
 					   // if not: distribute dofs
 	  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
 	    line->set_mg_dof_index (d, next_free_dof++);	    
@@ -1478,7 +1478,7 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
-      if (cell->mg_vertex_dof_index(vertex, 0) == -1)
+      if (cell->mg_vertex_dof_index(vertex, 0) == DoFHandler<3>::invalid_dof_index)
 	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
 	  cell->set_mg_vertex_dof_index (vertex, d, next_free_dof++);
     
@@ -1491,7 +1491,7 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // distribute dofs if necessary:
 					 // check whether line dof is already
 					 // numbered (check only first dof)
-	if (line->mg_dof_index(0) == -1)
+	if (line->mg_dof_index(0) == DoFHandler<3>::invalid_dof_index)
 					   // if not: distribute dofs
 	  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
 	    line->set_mg_dof_index (d, next_free_dof++);	    
@@ -1506,7 +1506,7 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // distribute dofs if necessary:
 					 // check whether line dof is already
 					 // numbered (check only first dof)
-	if (quad->mg_dof_index(0) == -1)
+	if (quad->mg_dof_index(0) == DoFHandler<3>::invalid_dof_index)
 					   // if not: distribute dofs
 	  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
 	    quad->set_mg_dof_index (d, next_free_dof++);	    
@@ -1543,7 +1543,7 @@ unsigned int MGDoFHandler<dim>::n_dofs (const unsigned int level) const {
 
 template <>
 void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
-				     const vector<int> &new_numbers) {
+				     const vector<unsigned int> &new_numbers) {
   Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
   
 				   // note that we can not use cell iterators
@@ -1563,10 +1563,10 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 		      new_numbers[i->get_index (level, d,
 						selected_fe->dofs_per_vertex)]);
 
-  for (vector<int>::iterator i=mg_levels[level]->line_dofs.begin();
+  for (vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i) 
     {
-      Assert (*i != -1, ExcInternalError());
+      Assert (*i != DoFHandler<1>::invalid_dof_index, ExcInternalError());
       *i = new_numbers[*i];
     };
 };
@@ -1580,7 +1580,7 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 
 template <>
 void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
-				     const vector<int>  &new_numbers) {
+				     const vector<unsigned int>  &new_numbers) {
   Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
   
   for (vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
@@ -1594,17 +1594,17 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 		      new_numbers[i->get_index (level, d,
 						selected_fe->dofs_per_vertex)]);
   
-  for (vector<int>::iterator i=mg_levels[level]->line_dofs.begin();
+  for (vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i)
     {
-      Assert (*i != -1, ExcInternalError());
+      Assert (*i != DoFHandler<2>::invalid_dof_index, ExcInternalError());
       *i = new_numbers[*i];
     };
 
-  for (vector<int>::iterator i=mg_levels[level]->quad_dofs.begin();
+  for (vector<unsigned int>::iterator i=mg_levels[level]->quad_dofs.begin();
        i!=mg_levels[level]->quad_dofs.end(); ++i)
     {
-      Assert (*i != -1, ExcInternalError());
+      Assert (*i != DoFHandler<2>::invalid_dof_index, ExcInternalError());
       *i = new_numbers[*i];
     };
 };
@@ -1617,7 +1617,7 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 
 template <>
 void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
-				     const vector<int>  &new_numbers) {
+				     const vector<unsigned int>  &new_numbers) {
   Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
   
   for (vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
@@ -1631,24 +1631,24 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 		      new_numbers[i->get_index (level, d,
 						selected_fe->dofs_per_vertex)]);
   
-  for (vector<int>::iterator i=mg_levels[level]->line_dofs.begin();
+  for (vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i)
     {
-      Assert (*i != -1, ExcInternalError());
+      Assert (*i != DoFHandler<3>::invalid_dof_index, ExcInternalError());
       *i = new_numbers[*i];
     };
 
-  for (vector<int>::iterator i=mg_levels[level]->quad_dofs.begin();
+  for (vector<unsigned int>::iterator i=mg_levels[level]->quad_dofs.begin();
        i!=mg_levels[level]->quad_dofs.end(); ++i)
     {
-      Assert (*i != -1, ExcInternalError());
+      Assert (*i != DoFHandler<3>::invalid_dof_index, ExcInternalError());
       *i = new_numbers[*i];
     };
 
-  for (vector<int>::iterator i=mg_levels[level]->hex_dofs.begin();
+  for (vector<unsigned int>::iterator i=mg_levels[level]->hex_dofs.begin();
        i!=mg_levels[level]->hex_dofs.end(); ++i)
     {
-      Assert (*i != -1, ExcInternalError());
+      Assert (*i != DoFHandler<3>::invalid_dof_index, ExcInternalError());
       *i = new_numbers[*i];
     };
 };
@@ -1692,9 +1692,9 @@ void MGDoFHandler<1>::reserve_space () {
     {
       mg_levels.push_back (new DoFLevel<1>);
 
-      mg_levels.back()->line_dofs = vector<int>(tria->levels[i]->lines.lines.size() *
-						selected_fe->dofs_per_line,
-						-1);
+      mg_levels.back()->line_dofs = vector<unsigned int>(tria->levels[i]->lines.lines.size() *
+							 selected_fe->dofs_per_line,
+							 DoFHandler<1>::invalid_dof_index);
     };
 
 				   // now allocate space for the
@@ -1778,12 +1778,12 @@ void MGDoFHandler<2>::reserve_space () {
     {
       mg_levels.push_back (new DoFLevel<2>);
 
-      mg_levels.back()->line_dofs = vector<int> (tria->levels[i]->lines.lines.size() *
-						 selected_fe->dofs_per_line,
-						 -1);
-      mg_levels.back()->quad_dofs = vector<int> (tria->levels[i]->quads.quads.size() *
-						 selected_fe->dofs_per_quad,
-						 -1);
+      mg_levels.back()->line_dofs = vector<unsigned int> (tria->levels[i]->lines.lines.size() *
+							  selected_fe->dofs_per_line,
+							  DoFHandler<2>::invalid_dof_index);
+      mg_levels.back()->quad_dofs = vector<unsigned int> (tria->levels[i]->quads.quads.size() *
+							  selected_fe->dofs_per_quad,
+							  DoFHandler<2>::invalid_dof_index);
     };
 
   
@@ -1870,15 +1870,15 @@ void MGDoFHandler<3>::reserve_space () {
     {
       mg_levels.push_back (new DoFLevel<3>);
 
-      mg_levels.back()->line_dofs = vector<int> (tria->levels[i]->lines.lines.size() *
-						 selected_fe->dofs_per_line,
-						 -1);
-      mg_levels.back()->quad_dofs = vector<int> (tria->levels[i]->quads.quads.size() *
-						 selected_fe->dofs_per_quad,
-						 -1);
-      mg_levels.back()->hex_dofs = vector<int> (tria->levels[i]->hexes.hexes.size() *
-						selected_fe->dofs_per_hex,
-						-1);
+      mg_levels.back()->line_dofs = vector<unsigned int> (tria->levels[i]->lines.lines.size() *
+							  selected_fe->dofs_per_line,
+							  DoFHandler<3>::invalid_dof_index);
+      mg_levels.back()->quad_dofs = vector<unsigned int> (tria->levels[i]->quads.quads.size() *
+							  selected_fe->dofs_per_quad,
+							  DoFHandler<3>::invalid_dof_index);
+      mg_levels.back()->hex_dofs = vector<unsigned int> (tria->levels[i]->hexes.hexes.size() *
+							 selected_fe->dofs_per_hex,
+							 DoFHandler<3>::invalid_dof_index);
     };
 
   

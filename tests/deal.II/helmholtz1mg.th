@@ -13,7 +13,7 @@ Helmholtz::build_mgmatrix(MGLevelObject<MATRIX>& A,
   
   Vector<double> elvec(fe_dofs);
   FullMatrix<double> elmat(fe_dofs);
-  vector<int> indices(fe_dofs);
+  vector<unsigned int> indices(fe_dofs);
 
 ////////////////////////////////////////////////////
 // Loop for computing the element matrices

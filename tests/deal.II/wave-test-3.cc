@@ -2137,7 +2137,7 @@ void EndEnergy<dim>::compute_vectors (const PartOfDomain pod,
   vector<double> density_values(quadrature->n_quadrature_points);
   vector<double> stiffness_values(quadrature->n_quadrature_points);
 
-  vector<int> cell_dof_indices (dofs_per_cell);
+  vector<unsigned int> cell_dof_indices (dofs_per_cell);
 
   for (; cell!=endc; ++cell, ++primal_cell)
     {
@@ -2264,7 +2264,7 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<int> cell_dof_indices (dofs_per_cell);
+  vector<unsigned int> cell_dof_indices (dofs_per_cell);
 
   FEFaceValues<dim> fe_face_values (*fe, *quadrature_face,
 				    UpdateFlags(update_values         |
@@ -2334,7 +2334,7 @@ void EarthSurface<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<int> face_dof_indices (face_dofs);
+  vector<unsigned int> face_dof_indices (face_dofs);
 
   for (; cell!=endc; ++cell)
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
@@ -2398,7 +2398,7 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<int> dof_indices (fe->dofs_per_cell);
+  vector<unsigned int> dof_indices (fe->dofs_per_cell);
   FEFaceValues<dim> fe_face_values (*fe, *quadrature_face, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
@@ -2468,7 +2468,7 @@ void SplitLine<1>::compute_endtime_vectors (Vector<double> &final_u_bar,
 					endc = dof->end ();
 
   FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
-  vector<int> cell_dof_indices (dofs_per_cell);
+  vector<unsigned int> cell_dof_indices (dofs_per_cell);
 
   for (; cell!=endc; ++cell)
     {
@@ -2518,7 +2518,7 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<int> dof_indices (fe->dofs_per_cell);
+  vector<unsigned int> dof_indices (fe->dofs_per_cell);
   FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
@@ -2567,7 +2567,7 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<int> dof_indices (fe->dofs_per_cell);
+  vector<unsigned int> dof_indices (fe->dofs_per_cell);
   FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
@@ -5533,7 +5533,7 @@ void TimeStep_Wave<dim>::create_matrices ()
 
 				   // indices of all the dofs on this
 				   // cell
-  vector<int>    dof_indices_on_cell (dofs_per_cell);
+  vector<unsigned int>    dof_indices_on_cell (dofs_per_cell);
   FullMatrix<double> cell_mass_matrix (dofs_per_cell, dofs_per_cell);
   FullMatrix<double> cell_laplace_matrix (dofs_per_cell, dofs_per_cell);
 
@@ -5928,7 +5928,7 @@ void TimeStep_Dual<dim>::do_timestep ()
 				   // zero. we re-use them later, and because
 				   // zero is such a universal constant, we
 				   // don't even need to recompute the values!
-  map<int,double> boundary_value_list;
+  map<unsigned int,double> boundary_value_list;
   if (dim != 1)
     {
       static const ZeroFunction<dim> boundary_values;
@@ -6210,7 +6210,7 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 
 				       // transfer into the global
 				       // right hand side
-      vector<int> new_dof_indices (dofs_per_cell, -1);
+      vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -6245,7 +6245,7 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       
 				       // transfer into the global
 				       // right hand side
-      vector<int> new_dof_indices (dofs_per_cell);
+      vector<unsigned int> new_dof_indices (dofs_per_cell);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	{
@@ -6461,7 +6461,7 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 	    
 				   // indices of the dofs of a cell on
 				   // the new grid
-  vector<int> new_dof_indices (dofs_per_cell, -1);
+  vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
 
       
 				       // loop over the child cells
@@ -8263,7 +8263,7 @@ void TimeStep_Primal<dim>::do_timestep ()
       parameters.boundary_values_u->set_time (time);
       parameters.boundary_values_v->set_time (time);
       
-      map<int,double> boundary_value_list;
+      map<unsigned int,double> boundary_value_list;
       VectorTools::interpolate_boundary_values (*dof_handler, 0,
 						     *(parameters.boundary_values_u),
 						     boundary_value_list);
@@ -8289,7 +8289,7 @@ void TimeStep_Primal<dim>::do_timestep ()
 				   // at all
   if (dim != 1)
     {
-      map<int,double> boundary_value_list;
+      map<unsigned int,double> boundary_value_list;
       VectorTools::interpolate_boundary_values (*dof_handler, 0,
 						     *(parameters.boundary_values_v),
 						     boundary_value_list);
@@ -8535,7 +8535,7 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 
 				       // transfer into the global
 				       // right hand side
-      vector<int> new_dof_indices (dofs_per_cell, -1);
+      vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -8571,7 +8571,7 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 
 				       // transfer into the global
 				       // right hand side
-      vector<int> new_dof_indices (dofs_per_cell);
+      vector<unsigned int> new_dof_indices (dofs_per_cell);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	{
@@ -8791,7 +8791,7 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 	    
 				   // indices of the dofs of a cell on
 				   // the new grid
-  vector<int> new_dof_indices (dofs_per_cell, -1);
+  vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
 
       
 				       // loop over the child cells

@@ -175,9 +175,14 @@ class DoFObjectAccessor_Inheritance<dim,dim>
 
 
 /**
- * Common template for line, quad, hex.
+ * Common template for access to the data on a line, quad, hex. Note
+ * that this class is only here for documentation purposes, the actual
+ * implementation of functions is in classes with specialized template
+ * parameters. In this class here, we only collect all functions which
+ * are in the specialized classes for simpler reference. Some
+ * functions, however, might be missing in the specialized classes,
+ * such as #quad# in the accessors for lines and quads, etc.
  *
- * Access to the degrees of freedom located on lines.
  * This class follows mainly the route laid out by the accessor library
  * declared in the triangulation library (\Ref{TriaAccessor}). It enables
  * the user to access the degrees of freedom on the lines (there are similar
@@ -190,27 +195,25 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  *
  * The \Ref{DoFDimensionInfo} classes inherited by the \Ref{DoFHandler} classes
  * declare typedefs to iterators using the accessors declared in this class
- * hierarchy tree. Usage is best to happens through these typedefs, since they
+ * hierarchy tree. Usage is best to happen through these typedefs, since they
  * are more secure to changes in the class naming and template interface as well
  * as they provide easier typing (much less complicated names!).
  * 
  * 
  * \subsection{Notes about the class hierarchy structure}
  *
- * Inheritance from #DoFObjectAccessor_Inheritance<1,dim>::BaseClass# yields
- * inheritance from #CellAccessor<1># if #dim==1# and from
- * #TriaObjectAccessor<1,dim># for all other #dim# values. Thus, an object
- * of this class shares all features of cells in one dimension, but behaves
- * like an ordinary line in all other cases.
+ * See the report on this subject, which is available from the general
+ * documentation directory.
  *
- * @author Wolfgang Bangerth, 1998
- * Internal: inheritance is necessary for the general template due to
- * a compiler error.
- * @author Guido Kanschat, 1999
+ *
+ * @author Wolfgang Bangerth, 1998; Guido Kanschat, 1999
+ * 
+ * (Internal: inheritance is necessary for the general template due to
+ * a compiler error.)
  */
 template<int celldim, int dim>
 class DoFObjectAccessor : public DoFAccessor<dim>,
-			  public TriaObjectAccessor<celldim,dim>//DoFObjectAccessor_Inheritance<celldim,dim>::BaseClass
+			  public TriaObjectAccessor<celldim,dim>
 {  public:
 				     /**
 				      * Data type  passed by the iterator class.
@@ -408,6 +411,7 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
 };
 
 
+
 /**
  * Access to the degrees of freedom located on lines.
  * This class follows mainly the route laid out by the accessor library
@@ -467,9 +471,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * to a #DoFHandler<dim># object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
-		     const int           level,
-		     const int           index,
-		     const AccessorData *local_data) :
+		       const int           level,
+		       const int           index,
+		       const AccessorData *local_data) :
 		    DoFAccessor<dim> (local_data),
 		    DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,level,index) {};
     
@@ -477,20 +481,21 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * Return the index of the #i#th degree
 				      * of freedom of this line.
 				      */
-    int dof_index (const unsigned int i) const;
+    unsigned int dof_index (const unsigned int i) const;
 
     				     /**
 				      * Set the index of the #i#th degree
 				      * of freedom of this line to #index#.
 				      */
-    void set_dof_index (const unsigned int i, const int index) const;
+    void set_dof_index (const unsigned int i,
+			const unsigned int index) const;
 
 				     /**
 				      * Return the index of the #i#th degree
 				      * on the #vertex#th vertex.
 				      */
-    int vertex_dof_index (const unsigned int vertex,
-			  const unsigned int i) const;
+    unsigned int vertex_dof_index (const unsigned int vertex,
+				   const unsigned int i) const;
 
 				     /**
 				      * Set the index of the #i#th degree
@@ -498,7 +503,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
-			       const int          index) const;
+			       const unsigned int index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -509,7 +514,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
 				      */
-    void get_dof_indices (vector<int> &dof_indices) const;
+    void get_dof_indices (vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the values of the given vector
@@ -643,20 +648,21 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * Return the index of the #i#th degree
 				      * of freedom of this quad.
 				      */
-    int dof_index (const unsigned int i) const;
+    unsigned int dof_index (const unsigned int i) const;
 
     				     /**
 				      * Set the index of the #i#th degree
 				      * of freedom of this quad to #index#.
 				      */
-    void set_dof_index (const unsigned int i, const int index) const;
+    void set_dof_index (const unsigned int i,
+			const unsigned int index) const;
 
 				     /**
 				      * Return the index of the #i#th degree
 				      * on the #vertex#th vertex.
 				      */
-    int vertex_dof_index (const unsigned int vertex,
-			  const unsigned int i) const;
+    unsigned int vertex_dof_index (const unsigned int vertex,
+				   const unsigned int i) const;
 
 				     /**
 				      * Set the index of the #i#th degree
@@ -664,7 +670,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
-			       const int          index) const;
+			       const unsigned int index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -676,7 +682,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
 				      */
-    void get_dof_indices (vector<int> &dof_indices) const;
+    void get_dof_indices (vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the values of the given vector
@@ -820,20 +826,21 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * Return the index of the #i#th degree
 				      * of freedom of this hex.
 				      */
-    int dof_index (const unsigned int i) const;
+    unsigned int dof_index (const unsigned int i) const;
 
     				     /**
 				      * Set the index of the #i#th degree
 				      * of freedom of this hex to #index#.
 				      */
-    void set_dof_index (const unsigned int i, const int index) const;
+    void set_dof_index (const unsigned int i,
+			const unsigned int index) const;
 
 				     /**
 				      * Return the index of the #i#th degree
 				      * on the #vertex#th vertex.
 				      */
-    int vertex_dof_index (const unsigned int vertex,
-			  const unsigned int i) const;
+    unsigned int vertex_dof_index (const unsigned int vertex,
+				   const unsigned int i) const;
 
 				     /**
 				      * Set the index of the #i#th degree
@@ -841,7 +848,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
-			       const int          index) const;
+			       const unsigned int index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -853,7 +860,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
 				      */
-    void get_dof_indices (vector<int> &dof_indices) const;
+    void get_dof_indices (vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the values of the given vector
@@ -975,7 +982,8 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class DoFCellAccessor :  public DoFObjectAccessor<dim, dim> {
+class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
+{
   public:
 				     /**
 				      * Declare the data type that this accessor

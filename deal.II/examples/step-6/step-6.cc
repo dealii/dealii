@@ -449,15 +449,15 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // per cell before: the following
 				   // value will be set to 9 (in 2D)
 				   // now, where it was 4 before.
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
-  FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_rhs (dofs_per_cell);
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
 
-  vector<int>        local_dof_indices (dofs_per_cell);
+  vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  vector<double>     coefficient_values (n_q_points);
+  vector<double>       coefficient_values (n_q_points);
 
 				   // We can now go on with assembling
 				   // the matrix and right hand
@@ -554,7 +554,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // from the system of equations
 				   // happens *after* the elimination
 				   // of hanging nodes.
-  map<int,double> boundary_values;
+  map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(),

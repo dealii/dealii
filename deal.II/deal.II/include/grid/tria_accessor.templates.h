@@ -204,14 +204,14 @@ TriaObjectAccessor<1,dim>::operator ++ () {
 				   // the vector?
   while (present_index
 	 >=
-	 (int)tria->levels[present_level]->lines.lines.size())
+	 static_cast<int>(tria->levels[present_level]->lines.lines.size()))
     {
 				       // no -> go one level up until we find
 				       // one with more than zero cells
       ++present_level;
       present_index = 0;
 				       // highest level reached?
-      if (present_level >= (int)tria->levels.size()) 
+      if (present_level >= static_cast<int>(tria->levels.size()))
 	{
 					   // return with past the end pointer
 	  present_level = present_index = -1;
@@ -384,13 +384,13 @@ TriaObjectAccessor<2,dim>::operator ++ () {
 				   // the vector?
   while (present_index
 	 >=
-	 (int)tria->levels[present_level]->quads.quads.size()) 
+	 static_cast<int>(tria->levels[present_level]->quads.quads.size()))
     {
 				       // no -> go one level up
       ++present_level;
       present_index = 0;
 				       // highest level reached?
-      if (present_level >= (int)tria->levels.size()) 
+      if (present_level >= static_cast<int>(tria->levels.size()))
 	{
 					   // return with past the end pointer
 	  present_level = present_index = -1;
@@ -632,13 +632,13 @@ TriaObjectAccessor<3,dim>::operator ++ () {
 				   // the vector?
   while (present_index
 	 >=
-	 (int)tria->levels[present_level]->hexes.hexes.size()) 
+	 static_cast<int>(tria->levels[present_level]->hexes.hexes.size()))
     {
 				       // no -> go one level up
       ++present_level;
       present_index = 0;
 				       // highest level reached?
-      if (present_level >= (int)tria->levels.size()) 
+      if (present_level >= static_cast<int>(tria->levels.size()))
 	{
 					   // return with past the end pointer
 	  present_level = present_index = -1;
@@ -914,13 +914,13 @@ TriaObjectAccessor<celldim,dim>::operator ++ () {
 				   // the vector?
   while (present_index
 	 >=
-	 (int)tria->levels[present_level]->hexes.hexes.size()) 
+	 static_cast<int>(tria->levels[present_level]->hexes.hexes.size()))
     {
 				       // no -> go one level up
       ++present_level;
       present_index = 0;
 				       // highest level reached?
-      if (present_level >= (int)tria->levels.size()) 
+      if (present_level >= static_cast<int>(tria->levels.size()))
 	{
 					   // return with past the end pointer
 	  present_level = present_index = -1;

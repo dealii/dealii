@@ -33,7 +33,7 @@ MGDoFObjectAccessor<1, dim>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 
 
 template <int dim>
-int MGDoFObjectAccessor<1, dim>::mg_dof_index (const unsigned int i) const
+unsigned int MGDoFObjectAccessor<1, dim>::mg_dof_index (const unsigned int i) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -53,7 +53,7 @@ int MGDoFObjectAccessor<1, dim>::mg_dof_index (const unsigned int i) const
 
 template <int dim>
 void MGDoFObjectAccessor<1, dim>::set_mg_dof_index (const unsigned int i,
-						    const int index) const
+						    const unsigned int index) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -71,8 +71,8 @@ void MGDoFObjectAccessor<1, dim>::set_mg_dof_index (const unsigned int i,
 
 
 template <int dim>
-int MGDoFObjectAccessor<1, dim>::mg_vertex_dof_index (const unsigned int vertex,
-						      const unsigned int i) const
+unsigned int MGDoFObjectAccessor<1, dim>::mg_vertex_dof_index (const unsigned int vertex,
+							       const unsigned int i) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -90,7 +90,7 @@ int MGDoFObjectAccessor<1, dim>::mg_vertex_dof_index (const unsigned int vertex,
 template <int dim>
 void MGDoFObjectAccessor<1, dim>::set_mg_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
-							   const int index) const
+							   const unsigned int index) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -107,7 +107,7 @@ void MGDoFObjectAccessor<1, dim>::set_mg_vertex_dof_index (const unsigned int ve
 
 template <int dim>
 void
-MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (vector<int> &dof_indices) const
+MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indices) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -118,7 +118,7 @@ MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (vector<int> &dof_indices) const
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  vector<int>::iterator next = dof_indices.begin();
+  vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = mg_vertex_dof_index(vertex,d);
@@ -204,7 +204,7 @@ MGDoFObjectAccessor<2, dim>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 
 template <int dim>
 inline
-int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) const
+unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -222,7 +222,7 @@ int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) const
 
 template <int dim>
 void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
-						    const int index) const
+						    const unsigned int index) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -240,8 +240,8 @@ void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
 
 template <int dim>
 inline
-int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned int vertex,
-						      const unsigned int i) const
+unsigned int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned int vertex,
+							       const unsigned int i) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -259,7 +259,7 @@ int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned int vertex,
 template <int dim>
 void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
-							   const int index) const
+							   const unsigned int index) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -276,7 +276,7 @@ void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int ve
 
 template <int dim>
 void
-MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (vector<int> &dof_indices) const
+MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indices) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -289,7 +289,7 @@ MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (vector<int> &dof_indices) const
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  vector<int>::iterator next = dof_indices.begin();
+  vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = mg_vertex_dof_index(vertex,d);
@@ -399,7 +399,7 @@ MGDoFObjectAccessor<3, dim>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 
 template <int dim>
 inline
-int MGDoFObjectAccessor<3, dim>::mg_dof_index (const unsigned int i) const
+unsigned int MGDoFObjectAccessor<3, dim>::mg_dof_index (const unsigned int i) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -417,7 +417,7 @@ int MGDoFObjectAccessor<3, dim>::mg_dof_index (const unsigned int i) const
 
 template <int dim>
 void MGDoFObjectAccessor<3, dim>::set_mg_dof_index (const unsigned int i,
-						    const int index) const
+						    const unsigned int index) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -435,8 +435,8 @@ void MGDoFObjectAccessor<3, dim>::set_mg_dof_index (const unsigned int i,
 
 template <int dim>
 inline
-int MGDoFObjectAccessor<3, dim>::mg_vertex_dof_index (const unsigned int vertex,
-						      const unsigned int i) const
+unsigned int MGDoFObjectAccessor<3, dim>::mg_vertex_dof_index (const unsigned int vertex,
+							       const unsigned int i) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -454,7 +454,7 @@ int MGDoFObjectAccessor<3, dim>::mg_vertex_dof_index (const unsigned int vertex,
 template <int dim>
 void MGDoFObjectAccessor<3, dim>::set_mg_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
-							   const int index) const
+							   const unsigned int index) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -471,7 +471,7 @@ void MGDoFObjectAccessor<3, dim>::set_mg_vertex_dof_index (const unsigned int ve
 
 template <int dim>
 void
-MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (vector<int> &dof_indices) const
+MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indices) const
 {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -486,7 +486,7 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (vector<int> &dof_indices) const
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
-  vector<int>::iterator next = dof_indices.begin();
+  vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = mg_vertex_dof_index(vertex,d);

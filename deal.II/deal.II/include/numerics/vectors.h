@@ -397,11 +397,11 @@ class VectorTools
 				      * information.
 				      */
     template <int dim>
-    static void interpolate_boundary_values (const DoFHandler<dim> &dof,
-					     const unsigned char    boundary_component,
-					     const Function<dim>   &boundary_function,
-					     map<int,double>       &boundary_values,
-					     const vector<bool>    &component_mask = vector<bool>());
+    static void interpolate_boundary_values (const DoFHandler<dim>    &dof,
+					     const unsigned char       boundary_component,
+					     const Function<dim>      &boundary_function,
+					     map<unsigned int,double> &boundary_values,
+					     const vector<bool>       &component_mask = vector<bool>());
 
 //TODO: Update project_boundary_values for more components
 //TODO: Replace FunctionMap
@@ -425,10 +425,10 @@ class VectorTools
 				      * class for further information.
 				      */
     template <int dim>
-    static void project_boundary_values (const DoFHandler<dim>  &dof,
+    static void project_boundary_values (const DoFHandler<dim>    &dof,
 					 const map<unsigned char,const Function<dim>*> &boundary_function,
-					 const Quadrature<dim-1>&q,
-					 map<int,double>        &boundary_values);
+					 const Quadrature<dim-1>  &q,
+					 map<unsigned int,double> &boundary_values);
     
     				     /**
 				      * Compute the error of the finite element solution.

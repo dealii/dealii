@@ -387,8 +387,8 @@ void LaplaceProblem::assemble_system ()
 				   // `dofs_per_cell' and `n_q_points'
 				   // are more or less standard names
 				   // for these purposes.
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
 				   // Now, we said that we wanted to
 				   // assemble the global matrix and
@@ -408,8 +408,8 @@ void LaplaceProblem::assemble_system ()
 				   // for the right hand side vector,
 				   // although access times are not so
 				   // problematic for them.
-  FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_rhs (dofs_per_cell);
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
 
 				   // When assembling the
 				   // contributions of each cell, we
@@ -424,7 +424,7 @@ void LaplaceProblem::assemble_system ()
 				   // degrees of freedom. When we get
 				   // them, we need a scratch array
 				   // for these numbers:
-  vector<int>        local_dof_indices (dofs_per_cell);
+  vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // Now for th loop over all
 				   // cells. You have seen before how
@@ -638,7 +638,7 @@ void LaplaceProblem::assemble_system ()
 				   // mapping of DoF numbers to
 				   // boundary values is done by the
 				   // `map' class.
-  map<int,double> boundary_values;
+  map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<2>(),

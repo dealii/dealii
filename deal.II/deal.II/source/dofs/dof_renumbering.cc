@@ -18,10 +18,11 @@
 
 
 template <int dim>
-void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
-				    const bool         reversed_numbering,
-				    const bool         use_constraints,
-				    const vector<int> &starting_indices) {
+void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>            &dof_handler,
+				    const bool                  reversed_numbering,
+				    const bool                  use_constraints,
+				    const vector<unsigned int> &starting_indices)
+{
 				   // make the connection graph
   SparsityPattern sparsity (dof_handler.n_dofs(),
 			    dof_handler.max_couplings_between_dofs());
@@ -35,23 +36,24 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
       constraints.condense (sparsity);
     };
     
-  const int n_dofs = sparsity.n_rows();
-				   // store the new dof numbers; -1 means
+  const unsigned int n_dofs = sparsity.n_rows();
+				   // store the new dof numbers; invalid_dof_index means
 				   // that no new number was chosen yet
-  vector<int> new_number(sparsity.n_rows(), -1);
+  vector<unsigned int> new_number(sparsity.n_rows(), DoFHandler<dim>::invalid_dof_index);
   
 				   // store the indices of the dofs renumbered
 				   // in the last round. Default to starting
 				   // points
-  vector<int> last_round_dofs (starting_indices);
+  vector<unsigned int> last_round_dofs (starting_indices);
   
 				   // delete disallowed elements
   for (unsigned int i=0; i<last_round_dofs.size(); ++i)
-    if ((last_round_dofs[i]<0) || (last_round_dofs[i]>=n_dofs))
-      last_round_dofs[i] = -1;
+    if ((last_round_dofs[i]==DoFHandler<dim>::invalid_dof_index) ||
+	(last_round_dofs[i]>=n_dofs))
+      last_round_dofs[i] = DoFHandler<dim>::invalid_dof_index;
   
   remove_if (last_round_dofs.begin(), last_round_dofs.end(),
-	     bind2nd(equal_to<int>(), -1));
+	     bind2nd(equal_to<unsigned int>(), DoFHandler<dim>::invalid_dof_index));
   
 				   // now if no valid points remain:
 				   // find dof with lowest coordination
@@ -59,9 +61,9 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
   
   if (last_round_dofs.size() == 0)
     {
-      int          starting_point   = -1;
+      unsigned int starting_point   = DoFHandler<dim>::invalid_dof_index;
       unsigned int min_coordination = n_dofs;
-      for (int row=0; row<n_dofs; ++row) 
+      for (unsigned int row=0; row<n_dofs; ++row) 
 	{
 	  unsigned int j;
 
@@ -92,7 +94,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
 				       // if that should be the case, we can
 				       // chose an arbitrary dof as starting
 				       // point, e.g. the one with number zero
-      if (starting_point == -1)
+      if (starting_point == DoFHandler<dim>::invalid_dof_index)
 	starting_point = 0;
       
 				       // initialize the first dof
@@ -101,7 +103,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
   
 
 				   // store next free dof index
-  int         next_free_number = 0;
+  unsigned int next_free_number = 0;
 
 				   // enumerate the first round dofs
   for (unsigned int i=0; i!=last_round_dofs.size(); ++i)
@@ -115,7 +117,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
     {
 				       // store the indices of the dofs to be
 				       // renumbered in the next round
-      vector<int> next_round_dofs;
+      vector<unsigned int> next_round_dofs;
 
 				       // find all neighbors of the
 				       // dofs numbered in the last
@@ -132,14 +134,14 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
       sort (next_round_dofs.begin(), next_round_dofs.end());
 
 				       // delete multiple entries
-      vector<int>::iterator end_sorted;
+      vector<unsigned int>::iterator end_sorted;
       end_sorted = unique (next_round_dofs.begin(), next_round_dofs.end());
       next_round_dofs.erase (end_sorted, next_round_dofs.end());
 
 				       // eliminate dofs which are
 				       // already numbered
       for (int s=next_round_dofs.size()-1; s>=0; --s)
-	if (new_number[next_round_dofs[s]] != -1)
+	if (new_number[next_round_dofs[s]] != DoFHandler<dim>::invalid_dof_index)
 	  next_round_dofs.erase (&next_round_dofs[s]);
 
 				       // check whether there are any new
@@ -157,7 +159,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
       
 				       // find coordination number for
 				       // each of these dofs
-      for (vector<int>::iterator s=next_round_dofs.begin();
+      for (vector<unsigned int>::iterator s=next_round_dofs.begin();
 	   s!=next_round_dofs.end(); ++s) 
 	{
 	  unsigned int coordination = 0;
@@ -188,14 +190,14 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
 
 #ifdef DEBUG
 				   //  test for all indices numbered
-  if (find (new_number.begin(), new_number.end(), -1) != new_number.end())
+  if (find (new_number.begin(), new_number.end(), DoFHandler<dim>::invalid_dof_index) != new_number.end())
     Assert (false, ExcRenumberingIncomplete());
   Assert (next_free_number == n_dofs,
 	  ExcRenumberingIncomplete());
 #endif
 
   if (reversed_numbering)
-    for (vector<int>::iterator i=new_number.begin(); i!=new_number.end(); ++i)
+    for (vector<unsigned int>::iterator i=new_number.begin(); i!=new_number.end(); ++i)
       *i = n_dofs-*i;
 
 				   // actually perform renumbering;
@@ -208,32 +210,33 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
 
 
 template <int dim>
-void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
-				    const unsigned int      level,
-				    const bool              reversed_numbering,
-				    const vector<int>      &starting_indices) {
+void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
+				    const unsigned int          level,
+				    const bool                  reversed_numbering,
+				    const vector<unsigned int> &starting_indices) {
 				   // make the connection graph
   SparsityPattern sparsity (dof_handler.n_dofs(level),
 			    dof_handler.max_couplings_between_dofs());
   MGDoFTools::make_sparsity_pattern (dof_handler, level, sparsity);
     
-  const int n_dofs = sparsity.n_rows();
-				   // store the new dof numbers; -1 means
+  const unsigned int n_dofs = sparsity.n_rows();
+				   // store the new dof numbers; invalid_dof_index means
 				   // that no new number was chosen yet
-  vector<int> new_number(n_dofs, -1);
+  vector<unsigned int> new_number(n_dofs, DoFHandler<dim>::invalid_dof_index);
   
 				   // store the indices of the dofs renumbered
 				   // in the last round. Default to starting
 				   // points
-  vector<int> last_round_dofs (starting_indices);
+  vector<unsigned int> last_round_dofs (starting_indices);
   
 				   // delete disallowed elements
   for (unsigned int i=0; i<last_round_dofs.size(); ++i)
-    if ((last_round_dofs[i]<0) || (last_round_dofs[i]>=n_dofs))
-      last_round_dofs[i] = -1;
+    if ((last_round_dofs[i]==DoFHandler<dim>::invalid_dof_index) ||
+	(last_round_dofs[i]>=n_dofs))
+      last_round_dofs[i] = DoFHandler<dim>::invalid_dof_index;
   
   remove_if (last_round_dofs.begin(), last_round_dofs.end(),
-	     bind2nd(equal_to<int>(), -1));
+	     bind2nd(equal_to<unsigned int>(), DoFHandler<dim>::invalid_dof_index));
   
 				   // now if no valid points remain:
 				   // find dof with lowest coordination
@@ -241,9 +244,9 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
   
   if (last_round_dofs.size() == 0)
     {
-      int          starting_point   = -1;
+      unsigned int starting_point   = DoFHandler<dim>::invalid_dof_index;
       unsigned int min_coordination = n_dofs;
-      for (int row=0; row<n_dofs; ++row) 
+      for (unsigned int row=0; row<n_dofs; ++row) 
 	{
 	  unsigned int j;
 	  for (j=sparsity.get_rowstart_indices()[row];
@@ -265,7 +268,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
   
 
 				   // store next free dof index
-  int         next_free_number = 0;
+  unsigned int next_free_number = 0;
 
 				   // enumerate the first round dofs
   for (unsigned int i=0; i!=last_round_dofs.size(); ++i)
@@ -279,7 +282,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
     {
 				       // store the indices of the dofs to be
 				       // renumbered in the next round
-      vector<int> next_round_dofs;
+      vector<unsigned int> next_round_dofs;
 
 				       // find all neighbors of the
 				       // dofs numbered in the last
@@ -296,14 +299,14 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
       sort (next_round_dofs.begin(), next_round_dofs.end());
 
 				       // delete multiple entries
-      vector<int>::iterator end_sorted;
+      vector<unsigned int>::iterator end_sorted;
       end_sorted = unique (next_round_dofs.begin(), next_round_dofs.end());
       next_round_dofs.erase (end_sorted, next_round_dofs.end());
 
 				       // eliminate dofs which are
 				       // already numbered
       for (int s=next_round_dofs.size()-1; s>=0; --s)
-	if (new_number[next_round_dofs[s]] != -1)
+	if (new_number[next_round_dofs[s]] != DoFHandler<dim>::invalid_dof_index)
 	  next_round_dofs.erase (&next_round_dofs[s]);
 
 				       // check whether there are any new
@@ -321,7 +324,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
       
 				       // find coordination number for
 				       // each of these dofs
-      for (vector<int>::iterator s=next_round_dofs.begin();
+      for (vector<unsigned int>::iterator s=next_round_dofs.begin();
 	   s!=next_round_dofs.end(); ++s) 
 	{
 	  unsigned int coordination = 0;
@@ -350,14 +353,17 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
 
 #ifdef DEBUG
 				   //  test for all indices numbered
-  if (find (new_number.begin(), new_number.end(), -1) != new_number.end())
+  if (find (new_number.begin(), new_number.end(),
+	    DoFHandler<dim>::invalid_dof_index)
+      !=
+      new_number.end())
     Assert (false, ExcRenumberingIncomplete());
   Assert (next_free_number == n_dofs,
 	  ExcRenumberingIncomplete());
 #endif
 
   if (reversed_numbering)
-    for (vector<int>::iterator i=new_number.begin(); i!=new_number.end(); ++i)
+    for (vector<unsigned int>::iterator i=new_number.begin(); i!=new_number.end(); ++i)
       *i = n_dofs-*i;
 
 				   // actually perform renumbering;
@@ -396,7 +402,7 @@ void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 
 				   // vector to hold the dof indices on
 				   // the cell we visit at a time
-  vector<int> local_dof_indices(dofs_per_cell);
+  vector<unsigned int> local_dof_indices(dofs_per_cell);
 				   // prebuilt list to which component
 				   // a given dof on a cell belongs
   vector<unsigned int> component_list (dofs_per_cell);
@@ -412,7 +418,7 @@ void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 				   // sorted by dof index. note also that some
 				   // dof indices are entered multiply, so we
 				   // will have to take care of that
-  vector<vector<int> > component_to_dof_map (dof_handler.get_fe().n_components());
+  vector<vector<unsigned int> > component_to_dof_map (dof_handler.get_fe().n_components());
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     {
@@ -443,20 +449,20 @@ void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 					     component_to_dof_map[component].end());
     };
   
-  int next_free_index = 0;
-  vector<int> new_indices (dof_handler.n_dofs(), -1);
+  unsigned int next_free_index = 0;
+  vector<unsigned int> new_indices (dof_handler.n_dofs(), DoFHandler<dim>::invalid_dof_index);
   for (unsigned int component=0; component<dof_handler.get_fe().n_components(); ++component)
     {
-      const typename vector<int>::const_iterator
+      const typename vector<unsigned int>::const_iterator
 	begin_of_component = component_to_dof_map[component].begin(),
 	end_of_component   = component_to_dof_map[component].end();
             
-      for (typename vector<int>::const_iterator dof_index = begin_of_component;
+      for (typename vector<unsigned int>::const_iterator dof_index = begin_of_component;
 	   dof_index != end_of_component; ++dof_index)
 	new_indices[*dof_index] = next_free_index++;
     };
 
-  Assert (next_free_index == static_cast<int>(dof_handler.n_dofs()),
+  Assert (next_free_index == dof_handler.n_dofs(),
 	  ExcInternalError());
 
   dof_handler.renumber_dofs (new_indices);
@@ -472,13 +478,13 @@ template
 void DoFRenumbering::Cuthill_McKee (DoFHandler<deal_II_dimension> &dof_handler,
 				    const bool                     reversed_numbering,
 				    const bool                     use_constraints,
-				    const vector<int>             &starting_indices);
+				    const vector<unsigned int>    &starting_indices);
 
 template
 void DoFRenumbering::Cuthill_McKee (MGDoFHandler<deal_II_dimension> &dof_handler,
 				    const unsigned int               level,
 				    const bool                       reversed_numbering,
-				    const vector<int>               &starting_indices);
+				    const vector<unsigned int>      &starting_indices);
 
 template
 void DoFRenumbering::component_wise (DoFHandler<deal_II_dimension> &dof_handler,

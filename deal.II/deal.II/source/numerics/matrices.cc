@@ -84,8 +84,8 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   
-  FullMatrix<double>  local_mass_matrix (dofs_per_cell, dofs_per_cell);
-  vector<int>         dofs_on_this_cell (dofs_per_cell);
+  FullMatrix<double>   local_mass_matrix (dofs_per_cell, dofs_per_cell);
+  vector<unsigned int> dofs_on_this_cell (dofs_per_cell);
   
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
@@ -111,7 +111,7 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 						    SparseMatrix<double>   &,
 						    const FunctionMap      &,
 						    Vector<double>         &,
-						    vector<int>            &,
+						    vector<unsigned int>   &,
 						    const Function<1>      *) {
   Assert (false, ExcNotImplemented());
 };
@@ -126,7 +126,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 						      SparseMatrix<double>     &matrix,
 						      const FunctionMap        &rhs,
 						      Vector<double>           &rhs_vector,
-						      vector<int>              &dof_to_boundary_mapping,
+						      vector<unsigned int>     &dof_to_boundary_mapping,
 						      const Function<dim>      *a) {
   const FiniteElement<dim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
@@ -137,12 +137,22 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
   Assert (rhs.size() != 0, ExcInternalError());
   Assert (dof.get_fe() == fe, ExcInternalError());
-  Assert (dof_to_boundary_mapping.size() == dof.n_dofs(), ExcInternalError());
-  Assert (*max_element(dof_to_boundary_mapping.begin(),dof_to_boundary_mapping.end()) ==
-	  (signed int)matrix.n()-1,
+  Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
 	  ExcInternalError());
   Assert (n_components == rhs.begin()->second->n_components,
 	  ExcComponentMismatch());
+#ifdef DEBUG
+  if (true)
+    {
+      unsigned int max_element = 0;
+      for (vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
+	   i!=dof_to_boundary_mapping.end(); ++i)
+	if ((*i != DoFHandler<dim>::invalid_dof_index) &&
+	    (*i > max_element))
+	  max_element = *i;
+      Assert (max_element  == matrix.n()-1, ExcInternalError());
+    };
+#endif
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell,
 		     dofs_per_face = fe.dofs_per_face;
@@ -167,8 +177,8 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
 					     Vector<double>(n_components));
 
-  vector<int> dofs (dofs_per_cell);
-  vector<int> dofs_on_face_vector (dofs_per_face);
+  vector<unsigned int> dofs (dofs_per_cell);
+  vector<unsigned int> dofs_on_face_vector (dofs_per_face);
   set<int> dofs_on_face;
 
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active (),
@@ -491,7 +501,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 
 
 template <int dim>
-void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_values,
+void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
 					      SparseMatrix<double>  &matrix,
 					      Vector<double>   &solution,
 					      Vector<double>   &right_hand_side) {
@@ -507,8 +517,8 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
     return;
   
   
-  map<int,double>::const_iterator  dof  = boundary_values.begin(),
-				   endd = boundary_values.end();
+  map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
+					    endd = boundary_values.end();
   const unsigned int n_dofs             = matrix.m();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
   const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
@@ -516,9 +526,9 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 
   for (; dof != endd; ++dof)
     {
-      Assert (dof->first >= 0, ExcInternalError());
+      Assert (dof->first <= n_dofs, ExcInternalError());
       
-      const unsigned int dof_number = static_cast<unsigned int>(dof->first);
+      const unsigned int dof_number = dof->first;
 				       // for each boundary dof:
       
 				       // set entries of this line

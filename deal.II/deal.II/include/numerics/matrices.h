@@ -267,7 +267,7 @@ class MatrixCreator
 					     SparseMatrix<double>     &matrix,
 					     const FunctionMap        &rhs,
 					     Vector<double>           &rhs_vector,
-					     vector<int>              &vec_to_dof_mapping,
+					     vector<unsigned int>     &vec_to_dof_mapping,
 					     const Function<dim>      *a = 0);
 
 				     /**
@@ -411,7 +411,8 @@ class MatrixCreator
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class MatrixTools : public MatrixCreator<dim> {
+class MatrixTools : public MatrixCreator<dim>
+{
   public:
 				     /**
 				      * Apply dirichlet boundary conditions
@@ -419,7 +420,7 @@ class MatrixTools : public MatrixCreator<dim> {
 				      * as described in the general
 				      * documentation.
 				      */
-    static void apply_boundary_values (const map<int,double> &boundary_values,
+    static void apply_boundary_values (const map<unsigned int,double> &boundary_values,
 				       SparseMatrix<double>  &matrix,
 				       Vector<double>        &solution,
 				       Vector<double>        &right_hand_side);

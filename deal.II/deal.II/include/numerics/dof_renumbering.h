@@ -171,10 +171,10 @@ class DoFRenumbering
 				      * different methods.
 				      */
     template <int dim>
-    static void Cuthill_McKee (DoFHandler<dim>   &dof_handler,
-			       const bool         reversed_numbering = false,
-			       const bool         use_constraints    = false,
-			       const vector<int> &starting_indices   = vector<int>());
+    static void Cuthill_McKee (DoFHandler<dim>            &dof_handler,
+			       const bool                  reversed_numbering = false,
+			       const bool                  use_constraints    = false,
+			       const vector<unsigned int> &starting_indices   = vector<unsigned int>());
 
 				     /**
 				      * Renumber the degrees of freedom
@@ -196,10 +196,10 @@ class DoFRenumbering
 				      * different methods.
 				      */
     template <int dim>
-    static void Cuthill_McKee (MGDoFHandler<dim> &dof_handler,
-			       const unsigned int level,
-			       const bool         reversed_numbering = false,
-			       const vector<int> &starting_indices   = vector<int> ());
+    static void Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
+			       const unsigned int          level,
+			       const bool                  reversed_numbering = false,
+			       const vector<unsigned int> &starting_indices   = vector<unsigned int> ());
 
 				     /**
 				      * Sort the degrees of freedom by

@@ -20,7 +20,7 @@ void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<dim> &mg_dof_handler,
 	  ExcDimensionMismatch (sparsity.n_cols(), mg_dof_handler.n_dofs(level)));
 
   const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
-  vector<int> dofs_on_this_cell(dofs_per_cell);
+  vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(level),
 				   endc = mg_dof_handler.end(level);
   for (; cell!=endc; ++cell) 

@@ -16,7 +16,8 @@
  * other types than those explicitely instantiated.
  */
 template <int N>
-class DoFLevel {
+class DoFLevel
+{
   private:
 				     /**
 				      * Make the constructor private to avoid
@@ -72,14 +73,15 @@ class DoFLevel {
  * different treatment in multigrid environments. If no multigrid is used, the
  * indices are stored in the #vertex_dofs# array of the #DoFHandler# class.
  */
-class DoFLevel<1> {
+class DoFLevel<1>
+{
   public:
 				     /**
 				      * Store the global indices of the degrees
 				      * of freedom. See \Ref{DoFLevel} for
 				      * detailed information.
 				      */
-    vector<int> line_dofs;
+    vector<unsigned int> line_dofs;
 };
 
 
@@ -96,7 +98,7 @@ class DoFLevel<2> : public DoFLevel<1> {
 				      * of freedom. See \Ref{DoFLevel} for
 				      * detailed information.
 				      */
-    vector<int> quad_dofs;
+    vector<unsigned int> quad_dofs;
 };
 
 
@@ -112,7 +114,7 @@ class DoFLevel<3> : public DoFLevel<2> {
 				      * of freedom. See \Ref{DoFLevel} for
 				      * detailed information.
 				      */
-    vector<int> hex_dofs;
+    vector<unsigned int> hex_dofs;
 };
 
 

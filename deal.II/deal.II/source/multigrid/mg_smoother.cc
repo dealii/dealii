@@ -64,11 +64,11 @@ MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps)
 				   // to much memory by later copying the
 				   // content of this vector to its final
 				   // destination
-  vector<int> boundary_dofs;
+  vector<unsigned int> boundary_dofs;
 
 				   // temporary to hold the dof indices
 				   // on a face between to levels
-  vector<int> dofs_on_face (mg_dof.get_fe().dofs_per_face);
+  vector<unsigned int> dofs_on_face (mg_dof.get_fe().dofs_per_face);
 
   for (unsigned int level=1; level<n_levels; ++level)
     {
@@ -119,7 +119,7 @@ MGSmoother::set_zero_interior_boundary (const unsigned int  level,
   if (level==0)
     return;
   else
-    for (vector<int>::const_iterator p=interior_boundary_dofs[level-1].begin();
+    for (vector<unsigned int>::const_iterator p=interior_boundary_dofs[level-1].begin();
 	 p!=interior_boundary_dofs[level-1].end(); ++p)
       u(*p) = 0;
 };

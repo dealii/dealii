@@ -298,7 +298,7 @@ DoFHandler<1>::last_active_quad () const {
 
 template <>
 DoFHandler<1>::raw_hex_iterator
-DoFHandler<1>::begin_raw_hex (unsigned int) const {
+DoFHandler<1>::begin_raw_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
 };
@@ -307,7 +307,7 @@ DoFHandler<1>::begin_raw_hex (unsigned int) const {
 
 template <>
 DoFHandler<1>::hex_iterator
-DoFHandler<1>::begin_hex (unsigned int) const {
+DoFHandler<1>::begin_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
 };
@@ -316,7 +316,7 @@ DoFHandler<1>::begin_hex (unsigned int) const {
 
 template <>
 DoFHandler<1>::active_hex_iterator
-DoFHandler<1>::begin_active_hex (unsigned int) const {
+DoFHandler<1>::begin_active_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
 };
@@ -550,7 +550,7 @@ DoFHandler<2>::last_active_face (const unsigned int level) const {
 
 template <>
 DoFHandler<2>::raw_hex_iterator
-DoFHandler<2>::begin_raw_hex (unsigned int) const {
+DoFHandler<2>::begin_raw_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
 };
@@ -559,7 +559,7 @@ DoFHandler<2>::begin_raw_hex (unsigned int) const {
 
 template <>
 DoFHandler<2>::hex_iterator
-DoFHandler<2>::begin_hex (unsigned int) const {
+DoFHandler<2>::begin_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
 };
@@ -568,7 +568,7 @@ DoFHandler<2>::begin_hex (unsigned int) const {
 
 template <>
 DoFHandler<2>::active_hex_iterator
-DoFHandler<2>::begin_active_hex (unsigned int) const {
+DoFHandler<2>::begin_active_hex (const unsigned int) const {
   Assert (false, ExcNotImplemented());
   return 0;
 };
@@ -1304,7 +1304,7 @@ unsigned int DoFHandler<dim>::n_boundary_dofs () const {
   set<int> boundary_dofs;
 
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
-  vector<int> dofs_on_face(dofs_per_face);
+  vector<unsigned int> dofs_on_face(dofs_per_face);
   active_face_iterator face = begin_active_face (),
 		       endf = end_face();
   for (; face!=endf; ++face)
@@ -1328,7 +1328,7 @@ unsigned int DoFHandler<dim>::n_boundary_dofs (const FunctionMap &boundary_indic
   set<int> boundary_dofs;
 
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
-  vector<int> dofs_on_face(dofs_per_face);
+  vector<unsigned int> dofs_on_face(dofs_per_face);
   active_face_iterator face = begin_active_face (),
 		       endf = end_face();
   for (; face!=endf; ++face)
@@ -1454,7 +1454,7 @@ unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
-      if (cell->vertex_dof_index(vertex, 0) == -1)
+      if (cell->vertex_dof_index(vertex, 0) == invalid_dof_index)
 	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
 	  cell->set_vertex_dof_index (vertex, d, next_free_dof++);
     
@@ -1467,7 +1467,7 @@ unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
 					 // distribute dofs if necessary:
 					 // check whether line dof is already
 					 // numbered (check only first dof)
-	if (line->dof_index(0) == -1)
+	if (line->dof_index(0) == invalid_dof_index)
 					   // if not: distribute dofs
 	  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
 	    line->set_dof_index (d, next_free_dof++);	    
@@ -1501,7 +1501,7 @@ unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
-      if (cell->vertex_dof_index(vertex, 0) == -1)
+      if (cell->vertex_dof_index(vertex, 0) == invalid_dof_index)
 	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
 	  cell->set_vertex_dof_index (vertex, d, next_free_dof++);
     
@@ -1514,7 +1514,7 @@ unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
 					 // distribute dofs if necessary:
 					 // check whether line dof is already
 					 // numbered (check only first dof)
-	if (line->dof_index(0) == -1)
+	if (line->dof_index(0) == invalid_dof_index)
 					   // if not: distribute dofs
 	  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
 	    line->set_dof_index (d, next_free_dof++);	    
@@ -1529,7 +1529,7 @@ unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
 					 // distribute dofs if necessary:
 					 // check whether quad dof is already
 					 // numbered (check only first dof)
-	if (quad->dof_index(0) == -1)
+	if (quad->dof_index(0) == invalid_dof_index)
 					   // if not: distribute dofs
 	  for (unsigned int d=0; d<selected_fe->dofs_per_quad; ++d)
 	    quad->set_dof_index (d, next_free_dof++);	    
@@ -1555,17 +1555,17 @@ unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
 #if deal_II_dimension == 1
 
 template <>
-void DoFHandler<1>::renumber_dofs (const vector<int> &new_numbers) {
+void DoFHandler<1>::renumber_dofs (const vector<unsigned int> &new_numbers) {
   Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 #ifdef DEBUG
 				   // assert that the new indices are
 				   // consecutively numbered
   if (true)
     {
-      vector<int> tmp(new_numbers);
+      vector<unsigned int> tmp(new_numbers);
       sort (tmp.begin(), tmp.end());
-      vector<int>::const_iterator p = tmp.begin();
-      int                         i = 0;
+      vector<unsigned int>::const_iterator p = tmp.begin();
+      unsigned int                         i = 0;
       for (; p!=tmp.end(); ++p, ++i)
 	Assert (*p == i, ExcNewNumbersNotConsecutive(i));
     };
@@ -1577,22 +1577,22 @@ void DoFHandler<1>::renumber_dofs (const vector<int> &new_numbers) {
 				   // two cells more than once. Anyway, this
 				   // way it's not only more correct but also
 				   // faster; note, however, that dof numbers
-				   // may be -1, namely when the appropriate
+				   // may be invalid_dof_index, namely when the appropriate
 				   // vertex/line/etc is unused
-  for (vector<int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-    if (*i != -1)
+  for (vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
+    if (*i != invalid_dof_index)
       *i = new_numbers[*i];
     else
-				       // if index is -1: check if this one
+				       // if index is invalid_dof_index: check if this one
 				       // really is unused
       Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
 				 selected_fe->dofs_per_vertex] == false,
 	      ExcInternalError ());
   
   for (unsigned int level=0; level<levels.size(); ++level) 
-    for (vector<int>::iterator i=levels[level]->line_dofs.begin();
+    for (vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
 	 i!=levels[level]->line_dofs.end(); ++i)
-      if (*i != -1)
+      if (*i != invalid_dof_index)
 	*i = new_numbers[*i];
 };
 
@@ -1602,17 +1602,17 @@ void DoFHandler<1>::renumber_dofs (const vector<int> &new_numbers) {
 #if deal_II_dimension == 2
 
 template <>
-void DoFHandler<2>::renumber_dofs (const vector<int> &new_numbers) {
+void DoFHandler<2>::renumber_dofs (const vector<unsigned int> &new_numbers) {
   Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 #ifdef DEBUG
 				   // assert that the new indices are
 				   // consecutively numbered
   if (true)
     {
-      vector<int> tmp(new_numbers);
+      vector<unsigned int> tmp(new_numbers);
       sort (tmp.begin(), tmp.end());
-      vector<int>::const_iterator p = tmp.begin();
-      int                         i = 0;
+      vector<unsigned int>::const_iterator p = tmp.begin();
+      unsigned int                         i = 0;
       for (; p!=tmp.end(); ++p, ++i)
 	Assert (*p == i, ExcNewNumbersNotConsecutive(i));
     };
@@ -1624,13 +1624,13 @@ void DoFHandler<2>::renumber_dofs (const vector<int> &new_numbers) {
 				   // two cells more than once. Anyway, this
 				   // way it's not only more correct but also
 				   // faster; note, however, that dof numbers
-				   // may be -1, namely when the appropriate
+				   // may be invalid_dof_index, namely when the appropriate
 				   // vertex/line/etc is unused
-  for (vector<int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-    if (*i != -1)
+  for (vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
+    if (*i != invalid_dof_index)
       *i = new_numbers[*i];
     else
-				       // if index is -1: check if this one
+				       // if index is invalid_dof_index: check if this one
 				       // really is unused
       Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
 				 selected_fe->dofs_per_vertex] == false,
@@ -1638,13 +1638,13 @@ void DoFHandler<2>::renumber_dofs (const vector<int> &new_numbers) {
   
   for (unsigned int level=0; level<levels.size(); ++level) 
     {
-      for (vector<int>::iterator i=levels[level]->line_dofs.begin();
+      for (vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
 	   i!=levels[level]->line_dofs.end(); ++i)
-	if (*i != -1)
+	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
-      for (vector<int>::iterator i=levels[level]->quad_dofs.begin();
+      for (vector<unsigned int>::iterator i=levels[level]->quad_dofs.begin();
 	   i!=levels[level]->quad_dofs.end(); ++i)
-	if (*i != -1)
+	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
     };
 };
@@ -1655,17 +1655,17 @@ void DoFHandler<2>::renumber_dofs (const vector<int> &new_numbers) {
 #if deal_II_dimension == 3
 
 template <>
-void DoFHandler<3>::renumber_dofs (const vector<int> &new_numbers) {
+void DoFHandler<3>::renumber_dofs (const vector<unsigned int> &new_numbers) {
   Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 #ifdef DEBUG
 				   // assert that the new indices are
 				   // consecutively numbered
   if (true)
     {
-      vector<int> tmp(new_numbers);
+      vector<unsigned int> tmp(new_numbers);
       sort (tmp.begin(), tmp.end());
-      vector<int>::const_iterator p = tmp.begin();
-      int                         i = 0;
+      vector<unsigned int>::const_iterator p = tmp.begin();
+      unsigned int                         i = 0;
       for (; p!=tmp.end(); ++p, ++i)
 	Assert (*p == i, ExcNewNumbersNotConsecutive(i));
     };
@@ -1677,13 +1677,13 @@ void DoFHandler<3>::renumber_dofs (const vector<int> &new_numbers) {
 				   // two cells more than once. Anyway, this
 				   // way it's not only more correct but also
 				   // faster; note, however, that dof numbers
-				   // may be -1, namely when the appropriate
+				   // may be invalid_dof_index, namely when the appropriate
 				   // vertex/line/etc is unused
-  for (vector<int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-    if (*i != -1)
+  for (vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
+    if (*i != invalid_dof_index)
       *i = new_numbers[*i];
     else
-				       // if index is -1: check if this one
+				       // if index is invalid_dof_index: check if this one
 				       // really is unused
       Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
 				 selected_fe->dofs_per_vertex] == false,
@@ -1691,17 +1691,17 @@ void DoFHandler<3>::renumber_dofs (const vector<int> &new_numbers) {
   
   for (unsigned int level=0; level<levels.size(); ++level) 
     {
-      for (vector<int>::iterator i=levels[level]->line_dofs.begin();
+      for (vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
 	   i!=levels[level]->line_dofs.end(); ++i)
-	if (*i != -1)
+	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
-      for (vector<int>::iterator i=levels[level]->quad_dofs.begin();
+      for (vector<unsigned int>::iterator i=levels[level]->quad_dofs.begin();
 	   i!=levels[level]->quad_dofs.end(); ++i)
-	if (*i != -1)
+	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
-      for (vector<int>::iterator i=levels[level]->hex_dofs.begin();
+      for (vector<unsigned int>::iterator i=levels[level]->hex_dofs.begin();
 	   i!=levels[level]->hex_dofs.end(); ++i)
-	if (*i != -1)
+	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
     };
 };
@@ -1860,7 +1860,7 @@ unsigned int DoFHandler<3>::max_couplings_between_boundary_dofs () const {
 #if deal_II_dimension == 1
 
 template <>
-void DoFHandler<1>::map_dof_to_boundary_indices (vector<int> &) const {
+void DoFHandler<1>::map_dof_to_boundary_indices (vector<unsigned int> &) const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());
 };
@@ -1869,7 +1869,7 @@ void DoFHandler<1>::map_dof_to_boundary_indices (vector<int> &) const {
 
 template <>
 void DoFHandler<1>::map_dof_to_boundary_indices (const FunctionMap &,
-						 vector<int> &) const {
+						 vector<unsigned int> &) const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());
 };
@@ -1879,15 +1879,16 @@ void DoFHandler<1>::map_dof_to_boundary_indices (const FunctionMap &,
 
 
 template <int dim>
-void DoFHandler<dim>::map_dof_to_boundary_indices (vector<int> &mapping) const {
+void DoFHandler<dim>::map_dof_to_boundary_indices (vector<unsigned int> &mapping) const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
 
   mapping.clear ();
-  mapping.insert (mapping.end(), n_dofs(), -1);
+  mapping.insert (mapping.end(), n_dofs(), invalid_dof_index);
   
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
-  vector<int> dofs_on_face(dofs_per_face);
-  int next_boundary_index = 0;
+  vector<unsigned int> dofs_on_face(dofs_per_face);
+  unsigned int next_boundary_index = 0;
   
   active_face_iterator face = begin_active_face(),
 		       endf = end_face();
@@ -1896,33 +1897,34 @@ void DoFHandler<dim>::map_dof_to_boundary_indices (vector<int> &mapping) const {
       {
 	face->get_dof_indices (dofs_on_face);
 	for (unsigned int i=0; i<dofs_per_face; ++i)
-	  if (mapping[dofs_on_face[i]] == -1)
+	  if (mapping[dofs_on_face[i]] == invalid_dof_index)
 	    mapping[dofs_on_face[i]] = next_boundary_index++;
       };
 
-  Assert (static_cast<unsigned int>(next_boundary_index) == n_boundary_dofs(),
+  Assert (next_boundary_index == n_boundary_dofs(),
 	  ExcInternalError());
 };
 
 
 
 template <int dim>
-void DoFHandler<dim>::map_dof_to_boundary_indices (const FunctionMap &boundary_indicators,
-						   vector<int> &mapping) const {
+void DoFHandler<dim>::map_dof_to_boundary_indices (const FunctionMap    &boundary_indicators,
+						   vector<unsigned int> &mapping) const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (boundary_indicators.find(255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
 
   mapping.clear ();
-  mapping.insert (mapping.end(), n_dofs(), -1);
+  mapping.insert (mapping.end(), n_dofs(), invalid_dof_index);
 
 				   // return if there is nothing to do
   if (boundary_indicators.size() == 0)
     return;
   
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
-  vector<int> dofs_on_face(dofs_per_face);
-  int next_boundary_index = 0;
+  vector<unsigned int> dofs_on_face(dofs_per_face);
+  unsigned int next_boundary_index = 0;
   
   active_face_iterator face = begin_active_face(),
 		       endf = end_face();
@@ -1932,12 +1934,11 @@ void DoFHandler<dim>::map_dof_to_boundary_indices (const FunctionMap &boundary_i
       {
 	face->get_dof_indices (dofs_on_face);
 	for (unsigned int i=0; i<dofs_per_face; ++i)
-	  if (mapping[dofs_on_face[i]] == -1)
+	  if (mapping[dofs_on_face[i]] == invalid_dof_index)
 	    mapping[dofs_on_face[i]] = next_boundary_index++;
       };
 
-  Assert (static_cast<unsigned int>(next_boundary_index)
-	  == n_boundary_dofs(boundary_indicators),
+  Assert (next_boundary_index == n_boundary_dofs(boundary_indicators),
 	  ExcInternalError());
 };
 
@@ -1955,17 +1956,17 @@ void DoFHandler<1>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs = vector<int>(tria->vertices.size()*
-			    selected_fe->dofs_per_vertex,
-			    -1);
+  vertex_dofs = vector<unsigned int>(tria->vertices.size()*
+				     selected_fe->dofs_per_vertex,
+				     invalid_dof_index);
     
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<1>);
 
-      levels.back()->line_dofs = vector<int>(tria->levels[i]->lines.lines.size() *
-					     selected_fe->dofs_per_line,
-					     -1);
+      levels.back()->line_dofs = vector<unsigned int>(tria->levels[i]->lines.lines.size() *
+						      selected_fe->dofs_per_line,
+						      invalid_dof_index);
     };
 };
 
@@ -1986,19 +1987,19 @@ void DoFHandler<2>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs = vector<int>(tria->vertices.size()*
-			    selected_fe->dofs_per_vertex,
-			    -1);
+  vertex_dofs = vector<unsigned int>(tria->vertices.size()*
+				     selected_fe->dofs_per_vertex,
+				     invalid_dof_index);
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<2>);
 
-      levels.back()->line_dofs = vector<int> (tria->levels[i]->lines.lines.size() *
-					      selected_fe->dofs_per_line,
-					      -1);
-      levels.back()->quad_dofs = vector<int> (tria->levels[i]->quads.quads.size() *
-					      selected_fe->dofs_per_quad,
-					      -1);
+      levels.back()->line_dofs = vector<unsigned int> (tria->levels[i]->lines.lines.size() *
+						       selected_fe->dofs_per_line,
+						       invalid_dof_index);
+      levels.back()->quad_dofs = vector<unsigned int> (tria->levels[i]->quads.quads.size() *
+						       selected_fe->dofs_per_quad,
+						       invalid_dof_index);
     };
 };
 
@@ -2018,22 +2019,22 @@ void DoFHandler<3>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs = vector<int>(tria->vertices.size()*
-			    selected_fe->dofs_per_vertex,
-			    -1);
+  vertex_dofs = vector<unsigned int>(tria->vertices.size()*
+				     selected_fe->dofs_per_vertex,
+				     invalid_dof_index);
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<3>);
 
-      levels.back()->line_dofs = vector<int> (tria->levels[i]->lines.lines.size() *
-					      selected_fe->dofs_per_line,
-					      -1);
-      levels.back()->quad_dofs = vector<int> (tria->levels[i]->quads.quads.size() *
-					      selected_fe->dofs_per_quad,
-					      -1);
-      levels.back()->hex_dofs = vector<int> (tria->levels[i]->hexes.hexes.size() *
-					     selected_fe->dofs_per_hex,
-					     -1);
+      levels.back()->line_dofs = vector<unsigned int> (tria->levels[i]->lines.lines.size() *
+						       selected_fe->dofs_per_line,
+						       invalid_dof_index);
+      levels.back()->quad_dofs = vector<unsigned int> (tria->levels[i]->quads.quads.size() *
+						       selected_fe->dofs_per_quad,
+						       invalid_dof_index);
+      levels.back()->hex_dofs = vector<unsigned int> (tria->levels[i]->hexes.hexes.size() *
+						      selected_fe->dofs_per_hex,
+						      invalid_dof_index);
     };
 };
 

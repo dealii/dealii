@@ -198,7 +198,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * order of the old indices.
 				      */
     void renumber_dofs (const unsigned int level,
-			const vector<int> &new_numbers);
+			const vector<unsigned int> &new_numbers);
 
 				     /*--------------------------------------*/
     
@@ -840,9 +840,9 @@ class MGDoFHandler : public DoFHandler<dim>
 					  * The function is inline, so should
 					  * be reasonably fast.
 					  */
-	int get_index (const unsigned int level,
-		       const unsigned int dof_number,
-		       const unsigned int dofs_per_vertex) const;
+	unsigned int get_index (const unsigned int level,
+				const unsigned int dof_number,
+				const unsigned int dofs_per_vertex) const;
 
 					 /**
 					  * Return the index of the coarsest
@@ -892,7 +892,7 @@ class MGDoFHandler : public DoFHandler<dim>
 					 /**
 					  * Array holding the indices.
 					  */
-	int         *indices;
+	unsigned int *indices;
     };
 
 
@@ -990,9 +990,10 @@ void MGDoFHandler<dim>::MGVertexDoFs::set_index  (const unsigned int level,
 
 template <int dim>
 inline
-int MGDoFHandler<dim>::MGVertexDoFs::get_index  (const unsigned int level,
-						 const unsigned int dof_number,
-						 const unsigned int dofs_per_vertex) const {
+unsigned int
+MGDoFHandler<dim>::MGVertexDoFs::get_index  (const unsigned int level,
+					     const unsigned int dof_number,
+					     const unsigned int dofs_per_vertex) const {
   Assert ((level >= coarsest_level) && (level <= finest_level),
 	  ExcInvalidLevel(level));
   Assert (dof_number < dofs_per_vertex,

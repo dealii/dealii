@@ -248,22 +248,23 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 				      * of freedom of this line on the level
 				      * this line lives on.
 				      */
-    int mg_dof_index (const unsigned int i) const;
+    unsigned int mg_dof_index (const unsigned int i) const;
 
     				     /**
 				      * Set the index of the #i#th degree
 				      * of freedom of this line on the
 				      * level this line lives on to #index#.
 				      */
-    void set_mg_dof_index (const unsigned int i, const int index) const;
+    void set_mg_dof_index (const unsigned int i,
+			   const unsigned int index) const;
 
 				     /**
 				      * Return the index of the #i#th degree
 				      * on the #vertex#th vertex for the
 				      * level this line lives on.
 				      */
-    int mg_vertex_dof_index (const unsigned int vertex,
-			     const unsigned int i) const;
+    unsigned int mg_vertex_dof_index (const unsigned int vertex,
+				      const unsigned int i) const;
 
 				     /**
 				      * Set the index of the #i#th degree
@@ -272,7 +273,7 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 				      */
     void set_mg_vertex_dof_index (const unsigned int vertex,
 				  const unsigned int i,
-				  const int          index) const;
+				  const unsigned int index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -285,7 +286,7 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 				      * indices refer to the local numbering
 				      * for the level this line lives on.
 				      */
-    void get_mg_dof_indices (vector<int> &dof_indices) const;
+    void get_mg_dof_indices (vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the value of the given vector
@@ -367,22 +368,23 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				      * of freedom of this quad on the level
 				      * this quad lives on.
 				      */
-    int mg_dof_index (const unsigned int i) const;
+    unsigned int mg_dof_index (const unsigned int i) const;
 
     				     /**
 				      * Set the index of the #i#th degree
 				      * of freedom of this quad on the
 				      * level this quad lives on to #index#.
 				      */
-    void set_mg_dof_index (const unsigned int i, const int index) const;
+    void set_mg_dof_index (const unsigned int i,
+			   const unsigned int index) const;
 
 				     /**
 				      * Return the index of the #i#th degree
 				      * on the #vertex#th vertex for the level
 				      * this quad lives on.
 				      */
-    int mg_vertex_dof_index (const unsigned int vertex,
-			     const unsigned int i) const;
+    unsigned int mg_vertex_dof_index (const unsigned int vertex,
+				      const unsigned int i) const;
 
 				     /**
 				      * Set the index of the #i#th degree
@@ -391,7 +393,7 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				      */
     void set_mg_vertex_dof_index (const unsigned int vertex,
 				  const unsigned int i,
-				  const int          index) const;
+				  const unsigned int index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -405,7 +407,7 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				      * indices refer to the local numbering
 				      * for the level this quad lives on.
 				      */
-    void get_mg_dof_indices (vector<int> &dof_indices) const;
+    void get_mg_dof_indices (vector<unsigned int> &dof_indices) const;
  
     				     /**
 				      * Return the value of the given vector
@@ -493,22 +495,23 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 				      * of freedom of this hex on the level
 				      * this quad lives on.
 				      */
-    int mg_dof_index (const unsigned int i) const;
+    unsigned int mg_dof_index (const unsigned int i) const;
 
     				     /**
 				      * Set the index of the #i#th degree
 				      * of freedom of this hex on the
 				      * level this hex lives on to #index#.
 				      */
-    void set_mg_dof_index (const unsigned int i, const int index) const;
+    void set_mg_dof_index (const unsigned int i,
+			   const unsigned int index) const;
 
 				     /**
 				      * Return the index of the #i#th degree
 				      * on the #vertex#th vertex for the level
 				      * this hex lives on.
 				      */
-    int mg_vertex_dof_index (const unsigned int vertex,
-			     const unsigned int i) const;
+    unsigned int mg_vertex_dof_index (const unsigned int vertex,
+				      const unsigned int i) const;
 
 				     /**
 				      * Set the index of the #i#th degree
@@ -517,7 +520,7 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 				      */
     void set_mg_vertex_dof_index (const unsigned int vertex,
 				  const unsigned int i,
-				  const int          index) const;
+				  const unsigned int index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -531,7 +534,7 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 				      * indices refer to the local numbering
 				      * for the level this hex lives on.
 				      */
-    void get_mg_dof_indices (vector<int> &dof_indices) const;
+    void get_mg_dof_indices (vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the value of the given vector

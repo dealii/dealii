@@ -232,16 +232,16 @@ void LaplaceProblem<dim>::assemble_system ()
 				       update_q_points  |
 				       update_JxW_values));
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
-  FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_rhs (dofs_per_cell);
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
 
-  vector<int>        local_dof_indices (dofs_per_cell);
+  vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // FIX
-  vector<double>     coefficient_values (n_q_points, 1.0);
+  vector<double>       coefficient_values (n_q_points, 1.0);
 
 				   // not only active cells
   MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
@@ -309,7 +309,7 @@ void LaplaceProblem<dim>::assemble_system ()
   hanging_node_constraints.condense (global_system_matrix);
   hanging_node_constraints.condense (system_rhs);
 
-//    map<int,double> boundary_values;
+//    map<unsigned int,double> boundary_values;
 //    VectorTools::interpolate_boundary_values (mg_dof_handler,
 //  					    0,
 //  					    ZeroFunction<dim>(),

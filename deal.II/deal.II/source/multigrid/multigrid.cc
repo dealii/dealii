@@ -77,8 +77,8 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 				   // two fields which will store the
 				   // indices of the multigrid dofs
 				   // for a cell and one of its children
-  vector<int> dof_indices_mother (dofs_per_cell);
-  vector<int> dof_indices_child (dofs_per_cell);
+  vector<unsigned int> dof_indices_mother (dofs_per_cell);
+  vector<unsigned int> dof_indices_child (dofs_per_cell);
   
 				   // for each level: first build the sparsity
 				   // pattern of the matrices and then build the

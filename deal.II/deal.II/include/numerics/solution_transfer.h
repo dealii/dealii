@@ -121,13 +121,13 @@
  * #vector<Vector<number> >vector all_in# includes
  * all discrete functions to be interpolated onto the new grid.
  *
- * As we need two different kinds of pointers (#vector<int> *# for the Dof
+ * As we need two different kinds of pointers (#vector<unsigned int> *# for the Dof
  * indices and #vector<Vector<number> > *# for the interpolated DoF values)
  * we use the #Pointerstruct# that includes both of these pointers and
  * the #user_pointer# of each cell points to these #Pointerstructs#. 
  * On each cell only one of the two different pointers is used at one time 
  * hence we could use the
- * #void * user_pointer# as #vector<int> *# at one time and as 
+ * #void * user_pointer# as #vector<unsigned int> *# at one time and as 
  * #vector<Vector<number> > *# at the other but using this #Pointerstruct#
  * in between makes the use of these pointers more safe and gives better
  * possibility to expand their usage.
@@ -348,7 +348,7 @@ class SolutionTransfer
 				      * and stores all dof indices
 				      * of the cells that'll be refined
 				      */
-    vector<vector<int> > indices_on_cell;
+    vector<vector<unsigned int> > indices_on_cell;
 
 				     /**
 				      * All cell data (the dof indices and
@@ -359,7 +359,7 @@ class SolutionTransfer
 				      * data need to be packetized in a structure.
 				      * Note that in our case on each cell
 				      * either the
-				      * #vector<int> indices# (if the cell
+				      * #vector<unsigned int> indices# (if the cell
 				      * will be refined) or the
 				      * #vector<double> dof_values# (if the
 				      * children of this cell will be deleted)
@@ -370,7 +370,7 @@ class SolutionTransfer
 				      * 'multiplied' by this structure.
 				      */
     struct Pointerstruct {
-	vector<int> *indices_ptr;
+	vector<unsigned int>    *indices_ptr;
 	vector<Vector<number> > *dof_values_ptr;
     };
 

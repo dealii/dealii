@@ -26,7 +26,8 @@
 
 template <int dim>
 void DoFObjectAccessor<1, dim>::set_dof_index (const unsigned int i,
-					       const int index) const {
+					       const unsigned int index) const
+{
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -44,7 +45,8 @@ void DoFObjectAccessor<1, dim>::set_dof_index (const unsigned int i,
 template <int dim>
 void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i,
-						      const int index) const {
+						      const unsigned int index) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
@@ -74,7 +76,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   const unsigned int n_dofs = local_source.size();
   
 				   // get indices of dofs
-  vector<int> dofs (n_dofs);
+  vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell vector
@@ -103,7 +105,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   const unsigned int n_dofs = local_source.m();
 
 				   // get indices of dofs
-  vector<int> dofs (n_dofs);
+  vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell matrix
@@ -181,7 +183,8 @@ DoFObjectAccessor<1,dim>::set_dof_values (const Vector<number> &local_values,
 
 template <int dim>
 void DoFObjectAccessor<2, dim>::set_dof_index (const unsigned int i,
-					       const int index) const {
+					       const unsigned int index) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -196,9 +199,11 @@ void DoFObjectAccessor<2, dim>::set_dof_index (const unsigned int i,
 
 
 template <int dim>
-void DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
-							   const unsigned int i,
-							   const int index) const {
+void
+DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
+						 const unsigned int i,
+						 const unsigned int index) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
@@ -229,7 +234,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   const unsigned int n_dofs = local_source.size();
 
 				   // get indices of dofs
-  vector<int> dofs (n_dofs);
+  vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell vector
@@ -259,7 +264,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   const unsigned int n_dofs = local_source.m();
 
 				   // get indices of dofs
-  vector<int> dofs (n_dofs);
+  vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell matrix
@@ -348,7 +353,8 @@ DoFObjectAccessor<2,dim>::set_dof_values (const Vector<number> &local_values,
 
 template <int dim>
 void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
-					       const int index) const {
+					       const unsigned int index) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -365,7 +371,8 @@ void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
 template <int dim>
 void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i,
-						      const int index) const {
+						      const unsigned int index) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (vertex<8, ExcIndexRange (i,0,8));
@@ -397,7 +404,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   const unsigned int n_dofs = local_source.size();
 
 				   // get indices of dofs
-  vector<int> dofs (n_dofs);
+  vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell vector
@@ -429,7 +436,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   const unsigned int n_dofs = local_source.m();
 
 				   // get indices of dofs
-  vector<int> dofs (n_dofs);
+  vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
   
 				   // distribute cell matrix

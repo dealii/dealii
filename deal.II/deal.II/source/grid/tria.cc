@@ -2020,7 +2020,7 @@ Triangulation<1>::last_active_face (const unsigned int) const {
 
 template <>
 TriaDimensionInfo<1>::raw_quad_iterator
-Triangulation<1>::begin_raw_quad (unsigned int) const {
+Triangulation<1>::begin_raw_quad (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -2029,7 +2029,7 @@ Triangulation<1>::begin_raw_quad (unsigned int) const {
 
 template <>
 TriaDimensionInfo<1>::quad_iterator
-Triangulation<1>::begin_quad (unsigned int) const {
+Triangulation<1>::begin_quad (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -2038,7 +2038,7 @@ Triangulation<1>::begin_quad (unsigned int) const {
 
 template <>
 TriaDimensionInfo<1>::active_quad_iterator
-Triangulation<1>::begin_active_quad (unsigned int) const {
+Triangulation<1>::begin_active_quad (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -2110,7 +2110,7 @@ Triangulation<1>::last_active_quad () const {
 
 template <>
 TriaDimensionInfo<1>::raw_hex_iterator
-Triangulation<1>::begin_raw_hex (unsigned int) const {
+Triangulation<1>::begin_raw_hex (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -2119,7 +2119,7 @@ Triangulation<1>::begin_raw_hex (unsigned int) const {
 
 template <>
 TriaDimensionInfo<1>::hex_iterator
-Triangulation<1>::begin_hex (unsigned int) const {
+Triangulation<1>::begin_hex (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -2128,7 +2128,7 @@ Triangulation<1>::begin_hex (unsigned int) const {
 
 template <>
 TriaDimensionInfo<1>::active_hex_iterator
-Triangulation<1>::begin_active_hex (unsigned int) const {
+Triangulation<1>::begin_active_hex (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -2352,7 +2352,7 @@ Triangulation<2>::last_active_face (const unsigned int level) const {
 
 template <>
 TriaDimensionInfo<2>::raw_hex_iterator
-Triangulation<2>::begin_raw_hex (unsigned int) const {
+Triangulation<2>::begin_raw_hex (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -2361,7 +2361,7 @@ Triangulation<2>::begin_raw_hex (unsigned int) const {
 
 template <>
 TriaDimensionInfo<2>::hex_iterator
-Triangulation<2>::begin_hex (unsigned int) const {
+Triangulation<2>::begin_hex (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -2370,7 +2370,7 @@ Triangulation<2>::begin_hex (unsigned int) const {
 
 template <>
 TriaDimensionInfo<2>::active_hex_iterator
-Triangulation<2>::begin_active_hex (unsigned int) const {
+Triangulation<2>::begin_active_hex (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };

@@ -19,7 +19,9 @@
 
 template <int dim>
 inline
-int DoFObjectAccessor<1,dim>::dof_index (const unsigned int i) const {
+unsigned int
+DoFObjectAccessor<1,dim>::dof_index (const unsigned int i) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -36,8 +38,10 @@ int DoFObjectAccessor<1,dim>::dof_index (const unsigned int i) const {
 
 template <int dim>
 inline
-int DoFObjectAccessor<1,dim>::vertex_dof_index (const unsigned int vertex,
-						      const unsigned int i) const {
+unsigned int
+DoFObjectAccessor<1,dim>::vertex_dof_index (const unsigned int vertex,
+					    const unsigned int i) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
@@ -55,7 +59,8 @@ int DoFObjectAccessor<1,dim>::vertex_dof_index (const unsigned int vertex,
 template <int dim>
 inline
 void
-DoFObjectAccessor<1,dim>::get_dof_indices (vector<int> &dof_indices) const {
+DoFObjectAccessor<1,dim>::get_dof_indices (vector<unsigned int> &dof_indices) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (dof_indices.size() == (2*dof_handler->get_fe().dofs_per_vertex +
@@ -64,7 +69,7 @@ DoFObjectAccessor<1,dim>::get_dof_indices (vector<int> &dof_indices) const {
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  vector<int>::iterator next = dof_indices.begin();
+  vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = vertex_dof_index(vertex,d);
@@ -77,7 +82,8 @@ DoFObjectAccessor<1,dim>::get_dof_indices (vector<int> &dof_indices) const {
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<1,dim> >
-DoFObjectAccessor<1,dim>::child (const unsigned int i) const {
+DoFObjectAccessor<1,dim>::child (const unsigned int i) const
+{
   TriaIterator<dim,DoFObjectAccessor<1,dim> > q (tria,
 						       present_level+1,
 						       child_index (i),
@@ -95,7 +101,8 @@ DoFObjectAccessor<1,dim>::child (const unsigned int i) const {
 template <int dim>
 inline
 void
-DoFObjectAccessor<1,dim>::copy_from (const DoFObjectAccessor<1,dim> &a) {
+DoFObjectAccessor<1,dim>::copy_from (const DoFObjectAccessor<1,dim> &a)
+{
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
@@ -107,7 +114,8 @@ DoFObjectAccessor<1,dim>::copy_from (const DoFObjectAccessor<1,dim> &a) {
 
 template <int dim>
 inline
-int DoFObjectAccessor<2,dim>::dof_index (const unsigned int i) const {
+unsigned int DoFObjectAccessor<2,dim>::dof_index (const unsigned int i) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -123,8 +131,10 @@ int DoFObjectAccessor<2,dim>::dof_index (const unsigned int i) const {
 
 template <int dim>
 inline
-int DoFObjectAccessor<2,dim>::vertex_dof_index (const unsigned int vertex,
-						      const unsigned int i) const {
+unsigned int
+DoFObjectAccessor<2,dim>::vertex_dof_index (const unsigned int vertex,
+					    const unsigned int i) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
@@ -142,7 +152,8 @@ int DoFObjectAccessor<2,dim>::vertex_dof_index (const unsigned int vertex,
 template <int dim>
 inline
 void
-DoFObjectAccessor<2,dim>::get_dof_indices (vector<int> &dof_indices) const {
+DoFObjectAccessor<2,dim>::get_dof_indices (vector<unsigned int> &dof_indices) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (dof_indices.size() == (4*dof_handler->get_fe().dofs_per_vertex +
@@ -153,7 +164,7 @@ DoFObjectAccessor<2,dim>::get_dof_indices (vector<int> &dof_indices) const {
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  vector<int>::iterator next = dof_indices.begin();
+  vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = vertex_dof_index(vertex,d);
@@ -169,7 +180,8 @@ DoFObjectAccessor<2,dim>::get_dof_indices (vector<int> &dof_indices) const {
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<1,dim> >
-DoFObjectAccessor<2,dim>::line (const unsigned int i) const {
+DoFObjectAccessor<2,dim>::line (const unsigned int i) const
+{
   Assert (i<4, ExcIndexRange (i, 0, 4));
 
   return TriaIterator<dim,DoFObjectAccessor<1,dim> >
@@ -186,7 +198,8 @@ DoFObjectAccessor<2,dim>::line (const unsigned int i) const {
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<2,dim> >
-DoFObjectAccessor<2,dim>::child (const unsigned int i) const {
+DoFObjectAccessor<2,dim>::child (const unsigned int i) const
+{
   TriaIterator<dim,DoFObjectAccessor<2,dim> > q (tria,
 						  present_level+1,
 						  child_index (i),
@@ -204,7 +217,8 @@ DoFObjectAccessor<2,dim>::child (const unsigned int i) const {
 template <int dim>
 inline
 void
-DoFObjectAccessor<2,dim>::copy_from (const DoFObjectAccessor<2,dim> &a) {
+DoFObjectAccessor<2,dim>::copy_from (const DoFObjectAccessor<2,dim> &a)
+{
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
@@ -212,12 +226,14 @@ DoFObjectAccessor<2,dim>::copy_from (const DoFObjectAccessor<2,dim> &a) {
 
 
 
-/*------------------------- Functions: DoFObjectAccessor -----------------------*/
+/*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
 
 
 template <int dim>
 inline
-int DoFObjectAccessor<3,dim>::dof_index (const unsigned int i) const {
+unsigned int
+DoFObjectAccessor<3,dim>::dof_index (const unsigned int i) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -233,8 +249,10 @@ int DoFObjectAccessor<3,dim>::dof_index (const unsigned int i) const {
 
 template <int dim>
 inline
-int DoFObjectAccessor<3,dim>::vertex_dof_index (const unsigned int vertex,
-						      const unsigned int i) const {
+unsigned int
+DoFObjectAccessor<3,dim>::vertex_dof_index (const unsigned int vertex,
+					    const unsigned int i) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (vertex<8, ExcIndexRange (i,0,8));
@@ -252,7 +270,8 @@ int DoFObjectAccessor<3,dim>::vertex_dof_index (const unsigned int vertex,
 template <int dim>
 inline
 void
-DoFObjectAccessor<3,dim>::get_dof_indices (vector<int> &dof_indices) const {
+DoFObjectAccessor<3,dim>::get_dof_indices (vector<unsigned int> &dof_indices) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (dof_indices.size() == (8*dof_handler->get_fe().dofs_per_vertex +
@@ -265,7 +284,7 @@ DoFObjectAccessor<3,dim>::get_dof_indices (vector<int> &dof_indices) const {
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
-  vector<int>::iterator next = dof_indices.begin();
+  vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = vertex_dof_index(vertex,d);
@@ -284,7 +303,8 @@ DoFObjectAccessor<3,dim>::get_dof_indices (vector<int> &dof_indices) const {
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<1,dim> >
-DoFObjectAccessor<3,dim>::line (const unsigned int i) const {
+DoFObjectAccessor<3,dim>::line (const unsigned int i) const
+{
   TriaIterator<dim,TriaObjectAccessor<1,dim> > l = BaseClass::line(i);
   return TriaIterator<dim,DoFObjectAccessor<1,dim> >
     (
@@ -300,7 +320,8 @@ DoFObjectAccessor<3,dim>::line (const unsigned int i) const {
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<2,dim> >
-DoFObjectAccessor<3,dim>::quad (const unsigned int i) const {
+DoFObjectAccessor<3,dim>::quad (const unsigned int i) const
+{
   Assert (i<6, ExcIndexRange (i, 0, 6));
 
   return TriaIterator<dim,DoFObjectAccessor<2,dim> >
@@ -317,7 +338,8 @@ DoFObjectAccessor<3,dim>::quad (const unsigned int i) const {
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<3,dim> >
-DoFObjectAccessor<3,dim>::child (const unsigned int i) const {
+DoFObjectAccessor<3,dim>::child (const unsigned int i) const
+{
   TriaIterator<dim,DoFObjectAccessor<3,dim> > q (tria,
 						  present_level+1,
 						  child_index (i),
@@ -333,7 +355,8 @@ DoFObjectAccessor<3,dim>::child (const unsigned int i) const {
 
 
 template <int dim>
-void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a) {
+void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a)
+{
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
@@ -347,7 +370,8 @@ void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a) {
 template <int dim>
 inline
 TriaIterator<dim,DoFCellAccessor<dim> >
-DoFCellAccessor<dim>::neighbor (const unsigned int i) const {
+DoFCellAccessor<dim>::neighbor (const unsigned int i) const
+{
   TriaIterator<dim,DoFCellAccessor<dim> > q (tria,
 					     neighbor_level (i),
 					     neighbor_index (i),
@@ -365,7 +389,8 @@ DoFCellAccessor<dim>::neighbor (const unsigned int i) const {
 template <int dim>
 inline
 TriaIterator<dim,DoFCellAccessor<dim> >
-DoFCellAccessor<dim>::child (const unsigned int i) const {
+DoFCellAccessor<dim>::child (const unsigned int i) const
+{
   TriaIterator<dim,DoFCellAccessor<dim> > q (tria,
 					     present_level+1,
 					     child_index (i),

@@ -186,7 +186,7 @@ class DoFDimensionInfo<3> {
  * schemes like the Cuthill-McKey scheme. Basically, the function sets
  * up an array in which for each degree of freedom the index is stored
  * which is to be assigned by the renumbering. Using this array, the
- * #renumber_dofs(vector<int>)# function is called, which actually
+ * #renumber_dofs(vector<unsigned int>)# function is called, which actually
  * does the change from old DoF indices to the ones given in the
  * array. In some cases, however, a user may want to compute her own
  * renumbering order; in this case, allocate an array with one element
@@ -194,7 +194,7 @@ class DoFDimensionInfo<3> {
  * respective degree of freedom shall be assigned. This number may,
  * for example, be obtained by sorting the support points of the
  * degrees of freedom in downwind direction.  Then call the
- * #renumber_dofs(vector<int>)# with the array, which converts old
+ * #renumber_dofs(vector<unsigned int>)# with the array, which converts old
  * into new degree of freedom indices.
  *
  *
@@ -236,11 +236,11 @@ class DoFDimensionInfo<3> {
  * boundary parts are continuous, i.e. the indices of degrees of freedom on
  * different parts may be intermixed.
  *
- * Degrees of freedom on the boundary but not on one of the specified boundary
- * parts are given the index #-1#, as if they were in the interior. If no
- * boundary indicator was given or if no face of a cell has a boundary indicator
- * contained in the given list, the vector of new indices consists solely of
- * #-1#s.
+ * Degrees of freedom on the boundary but not on one of the specified
+ * boundary parts are given the index #invalid_dof_index#, as if they
+ * were in the interior. If no boundary indicator was given or if no
+ * face of a cell has a boundary indicator contained in the given
+ * list, the vector of new indices consists solely of #invalid_dof_index#s.
  *
  * The question what a degree of freedom on the boundary is, is not so easy.
  * It should really be a degree of freedom of which the respective basis
@@ -300,6 +300,22 @@ class DoFHandler  :  public Subscriptor,
 				      */
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
 
+				     /**
+				      * When the arrays holding the
+				      * DoF indices are set up, but
+				      * before they are filled with
+				      * actual values, they are set to
+				      * an invalid value, in order to
+				      * monitor possible
+				      * problems. This invalid value
+				      * is the constant defined here.
+				      *
+				      * Please note that you should
+				      * not rely on it having a
+				      * certain value, but rather take
+				      * its symbolic name.
+				      */
+    static const unsigned int invalid_dof_index = static_cast<unsigned int>(-1);
     
 				     /**
 				      * Constructor. Take #tria# as the
@@ -379,7 +395,7 @@ class DoFHandler  :  public Subscriptor,
 				      * wants to implement an ordering scheme
 				      * herself, for example downwind numbering.
 				      */
-    void renumber_dofs (const vector<int> &new_numbers);
+    void renumber_dofs (const vector<unsigned int> &new_numbers);
 
 				     /**
 				      * Return the maximum number of
@@ -419,22 +435,28 @@ class DoFHandler  :  public Subscriptor,
     unsigned int max_couplings_between_boundary_dofs () const;
 
 				     /**
-				      * Create a mapping from degree of freedom
-				      * indices to the index of that degree
-				      * of freedom on the boundary. After this
-				      * operation, #mapping[dof]# gives the
-				      * index of the the degree of freedom with
-				      * global number #dof# in the list of
-				      * degrees of freedom on the boundary.
-				      * If the degree of freedom requested is
-				      * not on the boundary, the value of
-				      * #mapping[dof]# is #-1#. This function is
-				      * mainly used when setting up matrices and
-				      * vectors on the boundary from the trial
-				      * functions, which have global numbers,
-				      * while the matrices and vectors use
-				      * numbers of the trial functions local
-				      * to the boundary.
+				      * Create a mapping from degree
+				      * of freedom indices to the
+				      * index of that degree of
+				      * freedom on the boundary. After
+				      * this operation, #mapping[dof]#
+				      * gives the index of the the
+				      * degree of freedom with global
+				      * number #dof# in the list of
+				      * degrees of freedom on the
+				      * boundary.  If the degree of
+				      * freedom requested is not on
+				      * the boundary, the value of
+				      * #mapping[dof]# is
+				      * #invalid_dof_index#. This
+				      * function is mainly used when
+				      * setting up matrices and
+				      * vectors on the boundary from
+				      * the trial functions, which
+				      * have global numbers, while the
+				      * matrices and vectors use
+				      * numbers of the trial functions
+				      * local to the boundary.
 				      *
 				      * Prior content of #mapping# is deleted.
 				      *
@@ -443,7 +465,7 @@ class DoFHandler  :  public Subscriptor,
 				      * for more information on boundary
 				      * treatment.
 				      */
-    void map_dof_to_boundary_indices (vector<int> &mapping) const;
+    void map_dof_to_boundary_indices (vector<unsigned int> &mapping) const;
 
 				     /**
 				      * Same as the previous function, except
@@ -453,8 +475,8 @@ class DoFHandler  :  public Subscriptor,
 				      * See the general doc of this class for
 				      * more information.
 				      */
-    void map_dof_to_boundary_indices (const FunctionMap &boundary_indicators,
-				      vector<int> &mapping) const;
+    void map_dof_to_boundary_indices (const FunctionMap    &boundary_indicators,
+				      vector<unsigned int> &mapping) const;
 
 				     /**
 				      *  @name Cell iterator functions
@@ -1182,7 +1204,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Array to store the indices for degrees
 				      * of freedom located at vertices.
 				      */
-    vector<int>               vertex_dofs;
+    vector<unsigned int>      vertex_dofs;
     
     
 #if (__GNUC__==2) && (__GNUC_MINOR__ < 95)

@@ -84,7 +84,7 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 
 
 				   // get indices of dofs
-  vector<int> dofs (n_dofs);
+  vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
 
 				   // one could use the

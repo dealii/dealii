@@ -58,8 +58,8 @@ void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
   const unsigned int dofs_per_cell  = dof_handler->get_fe().dofs_per_cell;
   n_dofs_old=dof_handler->n_dofs();
 
-  indices_on_cell=vector<vector<int> > (n_active_cells,
-					vector<int> (dofs_per_cell));
+  indices_on_cell=vector<vector<unsigned int> > (n_active_cells,
+						 vector<unsigned int> (dofs_per_cell));
 
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();
@@ -104,7 +104,7 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();
 
-  vector<int> *indexptr;  
+  vector<unsigned int> *indexptr;  
 
   for (; cell!=endc; ++cell) 
     {
@@ -116,7 +116,7 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
 					 // which is both done by one
 					 // function
 	{
-	  indexptr=static_cast<vector<int> *>(cell->user_pointer());
+	  indexptr=static_cast<vector<unsigned int> *>(cell->user_pointer());
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    local_values(i)=in(indexptr->operator[](i));
 	  cell->set_dof_values_by_interpolation(local_values, out);
@@ -188,8 +188,8 @@ prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
 					 GeometryInfo<dim>::children_per_cell;
 
 				   // allocate the needed memory
-  indices_on_cell    = vector<vector<int> > (n_cells_to_stay_or_refine,
-					    vector<int> (dofs_per_cell));
+  indices_on_cell    = vector<vector<unsigned int> > (n_cells_to_stay_or_refine,
+						      vector<unsigned int> (dofs_per_cell));
   dof_values_on_cell
     = vector<vector<Vector<number> > > (n_coarsen_fathers,
 					vector<Vector<number> > (in_size,
@@ -294,10 +294,10 @@ interpolate (const vector<Vector<number> > &all_in,
   const unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
   Vector<number> local_values(dofs_per_cell);
 
-  vector<int>             *indexptr;
+  vector<unsigned int>    *indexptr;
   Pointerstruct           *structptr;
   vector<Vector<number> > *valuesptr;
-  vector<int>              dofs(dofs_per_cell);
+  vector<unsigned int>     dofs(dofs_per_cell);
 
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 				 endc = dof_handler->end();

@@ -453,13 +453,13 @@ void ElasticProblem<dim>::assemble_system ()
 				   // degrees of freedom per cell of
 				   // the Q1 element, but this is not
 				   // something we need to care about.
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
-  FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_rhs (dofs_per_cell);
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
 
-  vector<int>        local_dof_indices (dofs_per_cell);
+  vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // As was shown in previous
 				   // examples as well, we need a
@@ -729,7 +729,7 @@ void ElasticProblem<dim>::assemble_system ()
 				   // we need to pass ``dim'' as
 				   // number of components to the zero
 				   // function as well.
-  map<int,double> boundary_values;
+  map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(dim),

@@ -352,13 +352,13 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // all the necessary work for you
 				   // and you don't have to care about
 				   // the dimension dependent parts:
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
-  FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_rhs (dofs_per_cell);
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
 
-  vector<int>        local_dof_indices (dofs_per_cell);
+  vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // Note here, that a cell is a
 				   // quadrilateral in two space
@@ -446,7 +446,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // would like to use (i.e. the
 				   // BoundaryValues class declared
 				   // above):
-  map<int,double> boundary_values;
+  map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    BoundaryValues<dim>(),

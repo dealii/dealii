@@ -29,9 +29,9 @@ Multigrid<dim>::copy_to_mg(const Vector<number>& src)
   defect.clear();
 //  constraints->condense(src);
   
-  vector<int> global_dof_indices (dofs_per_cell);
-  vector<int> level_dof_indices  (dofs_per_cell);
-  vector<int> level_face_indices (dofs_per_face);
+  vector<unsigned int> global_dof_indices (dofs_per_cell);
+  vector<unsigned int> level_dof_indices  (dofs_per_cell);
+  vector<unsigned int> level_face_indices (dofs_per_face);
 
 				   // initialize the objects with
 				   // their correct size
@@ -111,8 +111,8 @@ Multigrid<dim>::copy_from_mg(Vector<number> &dst) const
 {
   const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
 
-  vector<int> global_dof_indices (dofs_per_cell);
-  vector<int> level_dof_indices (dofs_per_cell);
+  vector<unsigned int> global_dof_indices (dofs_per_cell);
+  vector<unsigned int> level_dof_indices (dofs_per_cell);
 
   DoFHandler<dim>::active_cell_iterator
     global_cell = mg_dof_handler->DoFHandler<dim>::begin_active();

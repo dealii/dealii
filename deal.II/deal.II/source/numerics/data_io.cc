@@ -1214,7 +1214,7 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
   DoFHandler<dim>::active_cell_iterator       cell;
   const DoFHandler<dim>::active_cell_iterator endc = dofs->end();
   
-  vector<int> dof_to_vertex_map (dofs->n_dofs(), -1);
+  vector<unsigned int> dof_to_vertex_map (dofs->n_dofs(), DoFHandler<dim>::invalid_dof_index);
   unsigned int used_vertices = 0;
   if (true)
     {
@@ -1225,7 +1225,8 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
 	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
 					   // check whether we
 					   // already treated this vertex
-	  if (dof_to_vertex_map[cell->vertex_dof_index(vertex,0)] == -1)
+	  if (dof_to_vertex_map[cell->vertex_dof_index(vertex,0)] ==
+	      DoFHandler<dim>::invalid_dof_index)
 	    {
 	      vertices[next_free_vertex] = cell->vertex(vertex);
 

@@ -125,7 +125,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 
 				   // apply Dirichlet bc as described
 				   // in the docs
-  map<int, double> boundary_value_list;
+  map<unsigned int, double> boundary_value_list;
 
   for (FunctionMap::const_iterator dirichlet = dirichlet_bc.begin() ;
        dirichlet != dirichlet_bc.end() ; ++dirichlet)

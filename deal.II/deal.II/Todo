@@ -142,3 +142,5 @@ Use a correct strategy to output the reduction rate for adaptively
   refined grids in examples/error-estimation
 
 
+Why is dof_renumbering.h in include/numerics, but dof_renumbering.cc
+  in source/dofs??

@@ -179,9 +179,9 @@ class DoFTools
 				      */
     template<int dim>
     static void
-    make_boundary_sparsity_pattern (const DoFHandler<dim> &dof,
-				    const vector<int>     &dof_to_boundary_mapping,
-				    SparsityPattern       &sparsity_pattern); 
+    make_boundary_sparsity_pattern (const DoFHandler<dim>      &dof,
+				    const vector<unsigned int> &dof_to_boundary_mapping,
+				    SparsityPattern            &sparsity_pattern); 
 
 				     /**
 				      * Write the sparsity structure of the
@@ -218,7 +218,7 @@ class DoFTools
     static void
     make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 				    const typename DoFHandler<dim>::FunctionMap &boundary_indicators,
-				    const vector<int>  &dof_to_boundary_mapping,
+				    const vector<unsigned int>  &dof_to_boundary_mapping,
 				    SparsityPattern    &sparsity); 
 
 				     /**

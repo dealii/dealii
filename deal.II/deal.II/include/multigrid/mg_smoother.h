@@ -181,7 +181,7 @@ class MGSmoother : public MGSmootherBase
 				      * These arrays are set by the constructor.
 				      * The entries for each level are sorted ascendingly.
 				      */
-    vector<vector<int> > interior_boundary_dofs;
+    vector<vector<unsigned int> > interior_boundary_dofs;
 };
 
 
