@@ -517,10 +517,6 @@ void
 SparsityPattern::copy_from (const CompressedSparsityPattern &csp,
 			    const bool optimize_diag) 
 {
-//   copy_from (csp.n_rows(), csp.n_cols(),
-// 	     csp.column_indices.begin(),
-// 	     csp.column_indices.end(),
-// 	     optimize_diag);
 				   // first determine row lengths for
 				   // each row. if the matrix is
 				   // quadratic, then we might have to
