@@ -494,7 +494,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           LDFLAGS="$LDFLAGS -lm"
   
           CXXFLAGSPIC="-shared"
-          LDFLAGSPIC="-shared"
+          LDFLAGSPIC=""
           ;;
   
       sun_workshop | sun_forte)
