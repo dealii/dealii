@@ -250,8 +250,3 @@ template class FESystem<deal_II_dimension>;
 
 
 
-#include <fe/fe_lib.lagrange.h>
-FELinear<2> fl;
-FESystem<2> fe(fl, 2);
-
-
