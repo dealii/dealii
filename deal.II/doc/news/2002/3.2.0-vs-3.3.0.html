@@ -13,13 +13,12 @@
 
 <h2>Changes between versions 3.2.0 and 3.3.0</h2>
 
-This is the list of changes made after the release of 
-<acronym>deal.II</acronym> version 3.2. It is subdivided into changes
-made to the three sub-libraries <a href="#base">base</a>, 
-<a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
+This is a quite extensive list of changes made between versions 3.2.0
+and 3.3.0 of <acronym>deal.II</acronym>. It is subdivided into changes
+made to the three sub-libraries <a href="#base">base</a>, <a
+href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
 changes to the <a href="#general">general infrastructure,
 documentation, etc</a>.
-
 
 
 <a name="general"></a>
@@ -232,6 +231,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+
+       Improved: all sparsity pattern classes have a function <code
+       class="member">exists</code>, allowing you to check whether a
+       certain index pair has been allocated in the pattern.
+       <br>
+       (GK 2002/02/01)
+       </p>
+
+  <li> <p>
        Fixed: Allocation of temporary vectors in <code
        class="member">FilteredMatrix::allocate_tmp_vector</code>
        is now faster since it does no more copy the value of the
@@ -332,11 +340,26 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: The classes <code class="class">FEQ1</code>-<code
+       class="class">FEQ4</code>, <code
+       class="class">FEDG_Q1</code><code class="class">FEDG_Q4</code>
+       as well as the files with their definitions,
+       <tt>fe/fe_lib.lagrange.h</tt> and <tt>fe/fe_lib.dg.h</tt>
+       ceased to exist. They had been left in for backward
+       compatibility in an earlier version, but their existence is
+       more confusing than helpful. Please change your code to use the
+       classes <code class="class">FE_Q</code> and <code
+       class="class">FE_DGQ</code>, respectively.
+       <br>
+       (GK 2002/02/01)
+       </p>
+
+  <li> <p>
        New: The <code class="class">FilteredIterator</code> class
        provides a view on ranges of iterators by iterating over only
        those objects that satisfy a certain predicate.
        <br>
-       (GK 2002/01/07)
+       (WB 2002/01/07)
        </p>
 
   <li> <p>
