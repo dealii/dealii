@@ -33,6 +33,24 @@ void check_poly(const Point<dim>& x,
   
   for (unsigned int k=0;k<n;++k)
     {
+				       // Check if compute_value is ok
+      double val = p.compute_value(k,x);
+      if (val != values[k])
+	deallog << 'P' << k << ": values differ " << val << " != "
+		<< values[k] << std::endl;
+
+				       // Check if compute_grad is ok
+      Tensor<1,dim> grad = p.compute_grad(k,x);
+      if (grad != gradients[k])
+	deallog << 'P' << k << ": gradients differ " << grad << " != "
+		<< gradients[k] << std::endl;
+      
+				       // Check if compute_grad_grad is ok
+      Tensor<2,dim> grad2 = p.compute_grad_grad(k,x);
+      if (grad2 != second[k])
+	deallog << 'P' << k << ": second derivatives differ " << grad2 << " != "
+		<< second[k] << std::endl;
+      
       values[k] *= pow(10, dim);
       gradients[k] *= pow(10, dim);
       
@@ -98,15 +116,21 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
+  deallog.push("Lagrange");
   std::vector<Polynomial<double> > p;
   for (unsigned int i=0;i<3;++i)
     p.push_back (LagrangeEquidistant(3, i));
 
   check_dimensions(p);
 
+  deallog.pop();
+  deallog.push("Legendre");
+  
   p.clear ();
   for (unsigned int i=0;i<3;++i)
     p.push_back (Legendre<double>(i));
 
   check_dimensions(p);
+
+  deallog.pop();
 }

@@ -1,129 +1,129 @@
 
-DEAL:1d:Tensor::P0	= -0.62	gradient	1.2		2nd	4.5	
-DEAL:1d:Tensor::P1	= 5.6	gradient	-34.		2nd	-4.5	
-DEAL:1d:Tensor::P2	= 5.6	gradient	34.		2nd	-4.5	
-DEAL:1d:Tensor::
-DEAL:1d:Polyno::P0	= -0.62	gradient	1.2		2nd	4.5	
-DEAL:1d:Polyno::P1	= 5.6	gradient	-34.		2nd	-4.5	
-DEAL:1d:Polyno::P2	= 5.6	gradient	34.		2nd	-4.5	
-DEAL:1d:Polyno::
-DEAL:2d:Tensor::P0	= -1.4	gradient	2.8	15.		2nd	1.0	-0.30	-0.30	-0.79	
-DEAL:2d:Tensor::P1	= 13.	gradient	-76.	-1.4e+02		2nd	-1.0	8.2	8.2	7.1	
-DEAL:2d:Tensor::P2	= 13.	gradient	76.	-1.4e+02		2nd	-1.0	-8.2	-8.2	7.1	
-DEAL:2d:Tensor::P3	= -6.3	gradient	13.	-10.		2nd	4.5	0.20	0.20	1.8	
-DEAL:2d:Tensor::P4	= 57.	gradient	-3.4e+02	91.		2nd	-4.5	-5.5	-5.5	-16.	
-DEAL:2d:Tensor::P5	= 57.	gradient	3.4e+02	91.		2nd	-4.5	5.5	5.5	-16.	
-DEAL:2d:Tensor::P6	= 1.8	gradient	-3.6	-6.8		2nd	-1.3	0.14	0.14	-1.2	
-DEAL:2d:Tensor::P7	= -16.	gradient	97.	61.		2nd	1.3	-3.6	-3.6	11.	
-DEAL:2d:Tensor::P8	= -16.	gradient	-97.	61.		2nd	1.3	3.6	3.6	11.	
-DEAL:2d:Tensor::
-DEAL:2d:Polyno::P0	= -1.4	gradient	2.8	15.		2nd	1.0	-0.30	-0.30	-0.79	
-DEAL:2d:Polyno::P1	= 13.	gradient	-76.	-1.4e+02		2nd	-1.0	8.2	8.2	7.1	
-DEAL:2d:Polyno::P2	= 13.	gradient	76.	-1.4e+02		2nd	-1.0	-8.2	-8.2	7.1	
-DEAL:2d:Polyno::P3	= -6.3	gradient	13.	-10.		2nd	4.5	0.20	0.20	1.8	
-DEAL:2d:Polyno::P4	= 57.	gradient	-3.4e+02	91.		2nd	-4.5	-5.5	-5.5	-16.	
-DEAL:2d:Polyno::P5	= 1.8	gradient	-3.6	-6.8		2nd	-1.3	0.14	0.14	-1.2	
-DEAL:2d:Polyno::
-DEAL:3d:Tensor::P0	= -0.54	gradient	1.1	5.9	18.		2nd	0.039	-0.012	-0.037	-0.012	-0.030	-0.20	-0.037	-0.20	-0.14	
-DEAL:3d:Tensor::P1	= 4.9	gradient	-29.	-53.	-1.7e+02		2nd	-0.039	0.32	0.99	0.32	0.27	1.8	0.99	1.8	1.2	
-DEAL:3d:Tensor::P2	= 4.9	gradient	29.	-53.	-1.7e+02		2nd	-0.039	-0.32	-0.99	-0.32	0.27	1.8	-0.99	1.8	1.2	
-DEAL:3d:Tensor::P3	= -2.4	gradient	4.9	-3.9	83.		2nd	0.17	0.0078	-0.17	0.0078	0.069	0.13	-0.17	0.13	-0.62	
-DEAL:3d:Tensor::P4	= 22.	gradient	-1.3e+02	35.	-7.5e+02		2nd	-0.17	-0.21	4.5	-0.21	-0.62	-1.2	4.5	-1.2	5.6	
-DEAL:3d:Tensor::P5	= 22.	gradient	1.3e+02	35.	-7.5e+02		2nd	-0.17	0.21	-4.5	0.21	-0.62	-1.2	-4.5	-1.2	5.6	
-DEAL:3d:Tensor::P6	= 0.69	gradient	-1.4	-2.6	-24.		2nd	-0.050	0.0052	0.047	0.0052	-0.048	0.089	0.047	0.089	0.18	
-DEAL:3d:Tensor::P7	= -6.2	gradient	37.	23.	2.1e+02		2nd	0.050	-0.14	-1.3	-0.14	0.43	-0.80	-1.3	-0.80	-1.6	
-DEAL:3d:Tensor::P8	= -6.2	gradient	-37.	23.	2.1e+02		2nd	0.050	0.14	1.3	0.14	0.43	-0.80	1.3	-0.80	-1.6	
-DEAL:3d:Tensor::P9	= -15.	gradient	29.	1.6e+02	12.		2nd	1.0	-0.32	-0.024	-0.32	-0.82	-0.13	-0.024	-0.13	0.29	
-DEAL:3d:Tensor::P10	= 1.3e+02	gradient	-7.9e+02	-1.4e+03	-1.1e+02		2nd	-1.0	8.6	0.65	8.6	7.4	1.2	0.65	1.2	-2.6	
-DEAL:3d:Tensor::P11	= 1.3e+02	gradient	7.9e+02	-1.4e+03	-1.1e+02		2nd	-1.0	-8.6	-0.65	-8.6	7.4	1.2	-0.65	1.2	-2.6	
-DEAL:3d:Tensor::P12	= -65.	gradient	1.3e+02	-1.1e+02	54.		2nd	4.7	0.21	-0.11	0.21	1.9	0.087	-0.11	0.087	1.3	
-DEAL:3d:Tensor::P13	= 5.9e+02	gradient	-3.5e+03	9.5e+02	-4.8e+02		2nd	-4.7	-5.7	2.9	-5.7	-17.	-0.78	2.9	-0.78	-12.	
-DEAL:3d:Tensor::P14	= 5.9e+02	gradient	3.5e+03	9.5e+02	-4.8e+02		2nd	-4.7	5.7	-2.9	5.7	-17.	-0.78	-2.9	-0.78	-12.	
-DEAL:3d:Tensor::P15	= 19.	gradient	-37.	-70.	-15.		2nd	-1.3	0.14	0.031	0.14	-1.3	0.058	0.031	0.058	-0.37	
-DEAL:3d:Tensor::P16	= -1.7e+02	gradient	1.0e+03	6.3e+02	1.4e+02		2nd	1.3	-3.8	-0.83	-3.8	12.	-0.52	-0.83	-0.52	3.4	
-DEAL:3d:Tensor::P17	= -1.7e+02	gradient	-1.0e+03	6.3e+02	1.4e+02		2nd	1.3	3.8	0.83	3.8	12.	-0.52	0.83	-0.52	3.4	
-DEAL:3d:Tensor::P18	= 1.3	gradient	-2.6	-14.	-37.		2nd	-0.095	0.029	0.074	0.029	0.074	0.40	0.074	0.40	-0.16	
-DEAL:3d:Tensor::P19	= -12.	gradient	71.	1.3e+02	3.3e+02		2nd	0.095	-0.78	-2.0	-0.78	-0.67	-3.6	-2.0	-3.6	1.5	
-DEAL:3d:Tensor::P20	= -12.	gradient	-71.	1.3e+02	3.3e+02		2nd	0.095	0.78	2.0	0.78	-0.67	-3.6	2.0	-3.6	1.5	
-DEAL:3d:Tensor::P21	= 6.0	gradient	-12.	9.6	-1.7e+02		2nd	-0.43	-0.019	0.33	-0.019	-0.17	-0.27	0.33	-0.27	-0.74	
-DEAL:3d:Tensor::P22	= -54.	gradient	3.2e+02	-86.	1.5e+03		2nd	0.43	0.52	-9.0	0.52	1.5	2.4	-9.0	2.4	6.6	
-DEAL:3d:Tensor::P23	= -54.	gradient	-3.2e+02	-86.	1.5e+03		2nd	0.43	-0.52	9.0	-0.52	1.5	2.4	9.0	2.4	6.6	
-DEAL:3d:Tensor::P24	= -1.7	gradient	3.4	6.4	48.		2nd	0.12	-0.013	-0.096	-0.013	0.12	-0.18	-0.096	-0.18	0.21	
-DEAL:3d:Tensor::P25	= 15.	gradient	-92.	-57.	-4.3e+02		2nd	-0.12	0.34	2.6	0.34	-1.1	1.6	2.6	1.6	-1.9	
-DEAL:3d:Tensor::P26	= 15.	gradient	92.	-57.	-4.3e+02		2nd	-0.12	-0.34	-2.6	-0.34	-1.1	1.6	-2.6	1.6	-1.9	
-DEAL:3d:Tensor::
-DEAL:3d:Polyno::P0	= -0.54	gradient	1.1	5.9	18.		2nd	0.039	-0.012	-0.037	-0.012	-0.030	-0.20	-0.037	-0.20	-0.14	
-DEAL:3d:Polyno::P1	= 4.9	gradient	-29.	-53.	-1.7e+02		2nd	-0.039	0.32	0.99	0.32	0.27	1.8	0.99	1.8	1.2	
-DEAL:3d:Polyno::P2	= 4.9	gradient	29.	-53.	-1.7e+02		2nd	-0.039	-0.32	-0.99	-0.32	0.27	1.8	-0.99	1.8	1.2	
-DEAL:3d:Polyno::P3	= -2.4	gradient	4.9	-3.9	83.		2nd	0.17	0.0078	-0.17	0.0078	0.069	0.13	-0.17	0.13	-0.62	
-DEAL:3d:Polyno::P4	= 22.	gradient	-1.3e+02	35.	-7.5e+02		2nd	-0.17	-0.21	4.5	-0.21	-0.62	-1.2	4.5	-1.2	5.6	
-DEAL:3d:Polyno::P5	= 0.69	gradient	-1.4	-2.6	-24.		2nd	-0.050	0.0052	0.047	0.0052	-0.048	0.089	0.047	0.089	0.18	
-DEAL:3d:Polyno::P6	= -15.	gradient	29.	1.6e+02	12.		2nd	1.0	-0.32	-0.024	-0.32	-0.82	-0.13	-0.024	-0.13	0.29	
-DEAL:3d:Polyno::P7	= 1.3e+02	gradient	-7.9e+02	-1.4e+03	-1.1e+02		2nd	-1.0	8.6	0.65	8.6	7.4	1.2	0.65	1.2	-2.6	
-DEAL:3d:Polyno::P8	= -65.	gradient	1.3e+02	-1.1e+02	54.		2nd	4.7	0.21	-0.11	0.21	1.9	0.087	-0.11	0.087	1.3	
-DEAL:3d:Polyno::P9	= 1.3	gradient	-2.6	-14.	-37.		2nd	-0.095	0.029	0.074	0.029	0.074	0.40	0.074	0.40	-0.16	
-DEAL:3d:Polyno::
-DEAL:1d:Tensor::P0	= 10.	gradient	0.0		2nd	0.0	
-DEAL:1d:Tensor::P1	= 5.0	gradient	10.		2nd	0.0	
-DEAL:1d:Tensor::P2	= -1.2	gradient	15.		2nd	3.0	
-DEAL:1d:Tensor::
-DEAL:1d:Polyno::P0	= 10.	gradient	0.0		2nd	0.0	
-DEAL:1d:Polyno::P1	= 5.0	gradient	10.		2nd	0.0	
-DEAL:1d:Polyno::P2	= -1.2	gradient	15.		2nd	3.0	
-DEAL:1d:Polyno::
-DEAL:2d:Tensor::P0	= 1.0e+02	gradient	0.0	0.0		2nd	0.0	0.0	0.0	0.0	
-DEAL:2d:Tensor::P1	= 50.	gradient	1.0e+02	0.0		2nd	0.0	0.0	0.0	0.0	
-DEAL:2d:Tensor::P2	= -12.	gradient	1.5e+02	-0.0		2nd	3.0	0.0	0.0	-0.0	
-DEAL:2d:Tensor::P3	= 20.	gradient	0.0	1.0e+02		2nd	0.0	0.0	0.0	0.0	
-DEAL:2d:Tensor::P4	= 10.	gradient	20.	50.		2nd	0.0	1.0	1.0	0.0	
-DEAL:2d:Tensor::P5	= -2.5	gradient	30.	-12.		2nd	0.60	1.5	1.5	-0.0	
-DEAL:2d:Tensor::P6	= -44.	gradient	-0.0	60.		2nd	-0.0	0.0	0.0	3.0	
-DEAL:2d:Tensor::P7	= -22.	gradient	-44.	30.		2nd	-0.0	0.60	0.60	1.5	
-DEAL:2d:Tensor::P8	= 5.5	gradient	-66.	-7.5		2nd	-1.3	0.90	0.90	-0.38	
-DEAL:2d:Tensor::
-DEAL:2d:Polyno::P0	= 1.0e+02	gradient	0.0	0.0		2nd	0.0	0.0	0.0	0.0	
-DEAL:2d:Polyno::P1	= 50.	gradient	1.0e+02	0.0		2nd	0.0	0.0	0.0	0.0	
-DEAL:2d:Polyno::P2	= -12.	gradient	1.5e+02	-0.0		2nd	3.0	0.0	0.0	-0.0	
-DEAL:2d:Polyno::P3	= 20.	gradient	0.0	1.0e+02		2nd	0.0	0.0	0.0	0.0	
-DEAL:2d:Polyno::P4	= 10.	gradient	20.	50.		2nd	0.0	1.0	1.0	0.0	
-DEAL:2d:Polyno::P5	= -44.	gradient	-0.0	60.		2nd	-0.0	0.0	0.0	3.0	
-DEAL:2d:Polyno::
-DEAL:3d:Tensor::P0	= 1.0e+03	gradient	0.0	0.0	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Tensor::P1	= 5.0e+02	gradient	1.0e+03	0.0	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Tensor::P2	= -1.2e+02	gradient	1.5e+03	-0.0	-0.0		2nd	3.0	0.0	0.0	0.0	-0.0	-0.0	0.0	-0.0	-0.0	
-DEAL:3d:Tensor::P3	= 2.0e+02	gradient	0.0	1.0e+03	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Tensor::P4	= 1.0e+02	gradient	2.0e+02	5.0e+02	0.0		2nd	0.0	1.0	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Tensor::P5	= -25.	gradient	3.0e+02	-1.2e+02	-0.0		2nd	0.60	1.5	0.0	1.5	-0.0	-0.0	0.0	-0.0	-0.0	
-DEAL:3d:Tensor::P6	= -4.4e+02	gradient	-0.0	6.0e+02	-0.0		2nd	-0.0	0.0	-0.0	0.0	3.0	0.0	-0.0	0.0	-0.0	
-DEAL:3d:Tensor::P7	= -2.2e+02	gradient	-4.4e+02	3.0e+02	-0.0		2nd	-0.0	0.60	-0.0	0.60	1.5	0.0	-0.0	0.0	-0.0	
-DEAL:3d:Tensor::P8	= 55.	gradient	-6.6e+02	-75.	0.0		2nd	-1.3	0.90	-0.0	0.90	-0.38	-0.0	-0.0	-0.0	0.0	
-DEAL:3d:Tensor::P9	= 3.0e+02	gradient	0.0	0.0	1.0e+03		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Tensor::P10	= 1.5e+02	gradient	3.0e+02	0.0	5.0e+02		2nd	0.0	0.0	1.0	0.0	0.0	0.0	1.0	0.0	0.0	
-DEAL:3d:Tensor::P11	= -38.	gradient	4.5e+02	-0.0	-1.2e+02		2nd	0.90	0.0	1.5	0.0	-0.0	-0.0	1.5	-0.0	-0.0	
-DEAL:3d:Tensor::P12	= 60.	gradient	0.0	3.0e+02	2.0e+02		2nd	0.0	0.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	
-DEAL:3d:Tensor::P13	= 30.	gradient	60.	1.5e+02	1.0e+02		2nd	0.0	0.30	0.20	0.30	0.0	0.50	0.20	0.50	0.0	
-DEAL:3d:Tensor::P14	= -7.5	gradient	90.	-38.	-25.		2nd	0.18	0.45	0.30	0.45	-0.0	-0.12	0.30	-0.12	-0.0	
-DEAL:3d:Tensor::P15	= -1.3e+02	gradient	-0.0	1.8e+02	-4.4e+02		2nd	-0.0	0.0	-0.0	0.0	0.90	0.60	-0.0	0.60	-0.0	
-DEAL:3d:Tensor::P16	= -66.	gradient	-1.3e+02	90.	-2.2e+02		2nd	-0.0	0.18	-0.44	0.18	0.45	0.30	-0.44	0.30	-0.0	
-DEAL:3d:Tensor::P17	= 16.	gradient	-2.0e+02	-23.	55.		2nd	-0.40	0.27	-0.66	0.27	-0.11	-0.075	-0.66	-0.075	0.0	
-DEAL:3d:Tensor::P18	= -3.6e+02	gradient	-0.0	-0.0	9.0e+02		2nd	-0.0	-0.0	0.0	-0.0	-0.0	0.0	0.0	0.0	3.0	
-DEAL:3d:Tensor::P19	= -1.8e+02	gradient	-3.6e+02	-0.0	4.5e+02		2nd	-0.0	-0.0	0.90	-0.0	-0.0	0.0	0.90	0.0	1.5	
-DEAL:3d:Tensor::P20	= 46.	gradient	-5.5e+02	0.0	-1.1e+02		2nd	-1.1	-0.0	1.3	-0.0	0.0	-0.0	1.3	-0.0	-0.38	
-DEAL:3d:Tensor::P21	= -73.	gradient	-0.0	-3.6e+02	1.8e+02		2nd	-0.0	-0.0	0.0	-0.0	-0.0	0.90	0.0	0.90	0.60	
-DEAL:3d:Tensor::P22	= -36.	gradient	-73.	-1.8e+02	90.		2nd	-0.0	-0.36	0.18	-0.36	-0.0	0.45	0.18	0.45	0.30	
-DEAL:3d:Tensor::P23	= 9.1	gradient	-1.1e+02	46.	-22.		2nd	-0.22	-0.55	0.27	-0.55	0.0	-0.11	0.27	-0.11	-0.075	
-DEAL:3d:Tensor::P24	= 1.6e+02	gradient	0.0	-2.2e+02	-4.0e+02		2nd	0.0	-0.0	-0.0	-0.0	-1.1	0.54	-0.0	0.54	-1.3	
-DEAL:3d:Tensor::P25	= 80.	gradient	1.6e+02	-1.1e+02	-2.0e+02		2nd	0.0	-0.22	-0.40	-0.22	-0.55	0.27	-0.40	0.27	-0.66	
-DEAL:3d:Tensor::P26	= -20.	gradient	2.4e+02	27.	49.		2nd	0.48	-0.33	-0.59	-0.33	0.14	-0.068	-0.59	-0.068	0.17	
-DEAL:3d:Tensor::
-DEAL:3d:Polyno::P0	= 1.0e+03	gradient	0.0	0.0	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Polyno::P1	= 5.0e+02	gradient	1.0e+03	0.0	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Polyno::P2	= -1.2e+02	gradient	1.5e+03	-0.0	-0.0		2nd	3.0	0.0	0.0	0.0	-0.0	-0.0	0.0	-0.0	-0.0	
-DEAL:3d:Polyno::P3	= 2.0e+02	gradient	0.0	1.0e+03	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Polyno::P4	= 1.0e+02	gradient	2.0e+02	5.0e+02	0.0		2nd	0.0	1.0	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Polyno::P5	= -4.4e+02	gradient	-0.0	6.0e+02	-0.0		2nd	-0.0	0.0	-0.0	0.0	3.0	0.0	-0.0	0.0	-0.0	
-DEAL:3d:Polyno::P6	= 3.0e+02	gradient	0.0	0.0	1.0e+03		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
-DEAL:3d:Polyno::P7	= 1.5e+02	gradient	3.0e+02	0.0	5.0e+02		2nd	0.0	0.0	1.0	0.0	0.0	0.0	1.0	0.0	0.0	
-DEAL:3d:Polyno::P8	= 60.	gradient	0.0	3.0e+02	2.0e+02		2nd	0.0	0.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	
-DEAL:3d:Polyno::P9	= -3.6e+02	gradient	-0.0	-0.0	9.0e+02		2nd	-0.0	-0.0	0.0	-0.0	-0.0	0.0	0.0	0.0	3.0	
-DEAL:3d:Polyno::
+DEAL:Lagrange:1d:Tensor::P0	= -0.62	gradient	1.2		2nd	4.5	
+DEAL:Lagrange:1d:Tensor::P1	= 5.6	gradient	-34.		2nd	-4.5	
+DEAL:Lagrange:1d:Tensor::P2	= 5.6	gradient	34.		2nd	-4.5	
+DEAL:Lagrange:1d:Tensor::
+DEAL:Lagrange:1d:Polyno::P0	= -0.62	gradient	1.2		2nd	4.5	
+DEAL:Lagrange:1d:Polyno::P1	= 5.6	gradient	-34.		2nd	-4.5	
+DEAL:Lagrange:1d:Polyno::P2	= 5.6	gradient	34.		2nd	-4.5	
+DEAL:Lagrange:1d:Polyno::
+DEAL:Lagrange:2d:Tensor::P0	= -1.4	gradient	2.8	15.		2nd	1.0	-0.30	-0.30	-0.79	
+DEAL:Lagrange:2d:Tensor::P1	= 13.	gradient	-76.	-1.4e+02		2nd	-1.0	8.2	8.2	7.1	
+DEAL:Lagrange:2d:Tensor::P2	= 13.	gradient	76.	-1.4e+02		2nd	-1.0	-8.2	-8.2	7.1	
+DEAL:Lagrange:2d:Tensor::P3	= -6.3	gradient	13.	-10.		2nd	4.5	0.20	0.20	1.8	
+DEAL:Lagrange:2d:Tensor::P4	= 57.	gradient	-3.4e+02	91.		2nd	-4.5	-5.5	-5.5	-16.	
+DEAL:Lagrange:2d:Tensor::P5	= 57.	gradient	3.4e+02	91.		2nd	-4.5	5.5	5.5	-16.	
+DEAL:Lagrange:2d:Tensor::P6	= 1.8	gradient	-3.6	-6.8		2nd	-1.3	0.14	0.14	-1.2	
+DEAL:Lagrange:2d:Tensor::P7	= -16.	gradient	97.	61.		2nd	1.3	-3.6	-3.6	11.	
+DEAL:Lagrange:2d:Tensor::P8	= -16.	gradient	-97.	61.		2nd	1.3	3.6	3.6	11.	
+DEAL:Lagrange:2d:Tensor::
+DEAL:Lagrange:2d:Polyno::P0	= -1.4	gradient	2.8	15.		2nd	1.0	-0.30	-0.30	-0.79	
+DEAL:Lagrange:2d:Polyno::P1	= 13.	gradient	-76.	-1.4e+02		2nd	-1.0	8.2	8.2	7.1	
+DEAL:Lagrange:2d:Polyno::P2	= 13.	gradient	76.	-1.4e+02		2nd	-1.0	-8.2	-8.2	7.1	
+DEAL:Lagrange:2d:Polyno::P3	= -6.3	gradient	13.	-10.		2nd	4.5	0.20	0.20	1.8	
+DEAL:Lagrange:2d:Polyno::P4	= 57.	gradient	-3.4e+02	91.		2nd	-4.5	-5.5	-5.5	-16.	
+DEAL:Lagrange:2d:Polyno::P5	= 1.8	gradient	-3.6	-6.8		2nd	-1.3	0.14	0.14	-1.2	
+DEAL:Lagrange:2d:Polyno::
+DEAL:Lagrange:3d:Tensor::P0	= -0.54	gradient	1.1	5.9	18.		2nd	0.039	-0.012	-0.037	-0.012	-0.030	-0.20	-0.037	-0.20	-0.14	
+DEAL:Lagrange:3d:Tensor::P1	= 4.9	gradient	-29.	-53.	-1.7e+02		2nd	-0.039	0.32	0.99	0.32	0.27	1.8	0.99	1.8	1.2	
+DEAL:Lagrange:3d:Tensor::P2	= 4.9	gradient	29.	-53.	-1.7e+02		2nd	-0.039	-0.32	-0.99	-0.32	0.27	1.8	-0.99	1.8	1.2	
+DEAL:Lagrange:3d:Tensor::P3	= -2.4	gradient	4.9	-3.9	83.		2nd	0.17	0.0078	-0.17	0.0078	0.069	0.13	-0.17	0.13	-0.62	
+DEAL:Lagrange:3d:Tensor::P4	= 22.	gradient	-1.3e+02	35.	-7.5e+02		2nd	-0.17	-0.21	4.5	-0.21	-0.62	-1.2	4.5	-1.2	5.6	
+DEAL:Lagrange:3d:Tensor::P5	= 22.	gradient	1.3e+02	35.	-7.5e+02		2nd	-0.17	0.21	-4.5	0.21	-0.62	-1.2	-4.5	-1.2	5.6	
+DEAL:Lagrange:3d:Tensor::P6	= 0.69	gradient	-1.4	-2.6	-24.		2nd	-0.050	0.0052	0.047	0.0052	-0.048	0.089	0.047	0.089	0.18	
+DEAL:Lagrange:3d:Tensor::P7	= -6.2	gradient	37.	23.	2.1e+02		2nd	0.050	-0.14	-1.3	-0.14	0.43	-0.80	-1.3	-0.80	-1.6	
+DEAL:Lagrange:3d:Tensor::P8	= -6.2	gradient	-37.	23.	2.1e+02		2nd	0.050	0.14	1.3	0.14	0.43	-0.80	1.3	-0.80	-1.6	
+DEAL:Lagrange:3d:Tensor::P9	= -15.	gradient	29.	1.6e+02	12.		2nd	1.0	-0.32	-0.024	-0.32	-0.82	-0.13	-0.024	-0.13	0.29	
+DEAL:Lagrange:3d:Tensor::P10	= 1.3e+02	gradient	-7.9e+02	-1.4e+03	-1.1e+02		2nd	-1.0	8.6	0.65	8.6	7.4	1.2	0.65	1.2	-2.6	
+DEAL:Lagrange:3d:Tensor::P11	= 1.3e+02	gradient	7.9e+02	-1.4e+03	-1.1e+02		2nd	-1.0	-8.6	-0.65	-8.6	7.4	1.2	-0.65	1.2	-2.6	
+DEAL:Lagrange:3d:Tensor::P12	= -65.	gradient	1.3e+02	-1.1e+02	54.		2nd	4.7	0.21	-0.11	0.21	1.9	0.087	-0.11	0.087	1.3	
+DEAL:Lagrange:3d:Tensor::P13	= 5.9e+02	gradient	-3.5e+03	9.5e+02	-4.8e+02		2nd	-4.7	-5.7	2.9	-5.7	-17.	-0.78	2.9	-0.78	-12.	
+DEAL:Lagrange:3d:Tensor::P14	= 5.9e+02	gradient	3.5e+03	9.5e+02	-4.8e+02		2nd	-4.7	5.7	-2.9	5.7	-17.	-0.78	-2.9	-0.78	-12.	
+DEAL:Lagrange:3d:Tensor::P15	= 19.	gradient	-37.	-70.	-15.		2nd	-1.3	0.14	0.031	0.14	-1.3	0.058	0.031	0.058	-0.37	
+DEAL:Lagrange:3d:Tensor::P16	= -1.7e+02	gradient	1.0e+03	6.3e+02	1.4e+02		2nd	1.3	-3.8	-0.83	-3.8	12.	-0.52	-0.83	-0.52	3.4	
+DEAL:Lagrange:3d:Tensor::P17	= -1.7e+02	gradient	-1.0e+03	6.3e+02	1.4e+02		2nd	1.3	3.8	0.83	3.8	12.	-0.52	0.83	-0.52	3.4	
+DEAL:Lagrange:3d:Tensor::P18	= 1.3	gradient	-2.6	-14.	-37.		2nd	-0.095	0.029	0.074	0.029	0.074	0.40	0.074	0.40	-0.16	
+DEAL:Lagrange:3d:Tensor::P19	= -12.	gradient	71.	1.3e+02	3.3e+02		2nd	0.095	-0.78	-2.0	-0.78	-0.67	-3.6	-2.0	-3.6	1.5	
+DEAL:Lagrange:3d:Tensor::P20	= -12.	gradient	-71.	1.3e+02	3.3e+02		2nd	0.095	0.78	2.0	0.78	-0.67	-3.6	2.0	-3.6	1.5	
+DEAL:Lagrange:3d:Tensor::P21	= 6.0	gradient	-12.	9.6	-1.7e+02		2nd	-0.43	-0.019	0.33	-0.019	-0.17	-0.27	0.33	-0.27	-0.74	
+DEAL:Lagrange:3d:Tensor::P22	= -54.	gradient	3.2e+02	-86.	1.5e+03		2nd	0.43	0.52	-9.0	0.52	1.5	2.4	-9.0	2.4	6.6	
+DEAL:Lagrange:3d:Tensor::P23	= -54.	gradient	-3.2e+02	-86.	1.5e+03		2nd	0.43	-0.52	9.0	-0.52	1.5	2.4	9.0	2.4	6.6	
+DEAL:Lagrange:3d:Tensor::P24	= -1.7	gradient	3.4	6.4	48.		2nd	0.12	-0.013	-0.096	-0.013	0.12	-0.18	-0.096	-0.18	0.21	
+DEAL:Lagrange:3d:Tensor::P25	= 15.	gradient	-92.	-57.	-4.3e+02		2nd	-0.12	0.34	2.6	0.34	-1.1	1.6	2.6	1.6	-1.9	
+DEAL:Lagrange:3d:Tensor::P26	= 15.	gradient	92.	-57.	-4.3e+02		2nd	-0.12	-0.34	-2.6	-0.34	-1.1	1.6	-2.6	1.6	-1.9	
+DEAL:Lagrange:3d:Tensor::
+DEAL:Lagrange:3d:Polyno::P0	= -0.54	gradient	1.1	5.9	18.		2nd	0.039	-0.012	-0.037	-0.012	-0.030	-0.20	-0.037	-0.20	-0.14	
+DEAL:Lagrange:3d:Polyno::P1	= 4.9	gradient	-29.	-53.	-1.7e+02		2nd	-0.039	0.32	0.99	0.32	0.27	1.8	0.99	1.8	1.2	
+DEAL:Lagrange:3d:Polyno::P2	= 4.9	gradient	29.	-53.	-1.7e+02		2nd	-0.039	-0.32	-0.99	-0.32	0.27	1.8	-0.99	1.8	1.2	
+DEAL:Lagrange:3d:Polyno::P3	= -2.4	gradient	4.9	-3.9	83.		2nd	0.17	0.0078	-0.17	0.0078	0.069	0.13	-0.17	0.13	-0.62	
+DEAL:Lagrange:3d:Polyno::P4	= 22.	gradient	-1.3e+02	35.	-7.5e+02		2nd	-0.17	-0.21	4.5	-0.21	-0.62	-1.2	4.5	-1.2	5.6	
+DEAL:Lagrange:3d:Polyno::P5	= 0.69	gradient	-1.4	-2.6	-24.		2nd	-0.050	0.0052	0.047	0.0052	-0.048	0.089	0.047	0.089	0.18	
+DEAL:Lagrange:3d:Polyno::P6	= -15.	gradient	29.	1.6e+02	12.		2nd	1.0	-0.32	-0.024	-0.32	-0.82	-0.13	-0.024	-0.13	0.29	
+DEAL:Lagrange:3d:Polyno::P7	= 1.3e+02	gradient	-7.9e+02	-1.4e+03	-1.1e+02		2nd	-1.0	8.6	0.65	8.6	7.4	1.2	0.65	1.2	-2.6	
+DEAL:Lagrange:3d:Polyno::P8	= -65.	gradient	1.3e+02	-1.1e+02	54.		2nd	4.7	0.21	-0.11	0.21	1.9	0.087	-0.11	0.087	1.3	
+DEAL:Lagrange:3d:Polyno::P9	= 1.3	gradient	-2.6	-14.	-37.		2nd	-0.095	0.029	0.074	0.029	0.074	0.40	0.074	0.40	-0.16	
+DEAL:Lagrange:3d:Polyno::
+DEAL:Legendre:1d:Tensor::P0	= 10.	gradient	0.0		2nd	0.0	
+DEAL:Legendre:1d:Tensor::P1	= 5.0	gradient	10.		2nd	0.0	
+DEAL:Legendre:1d:Tensor::P2	= -1.2	gradient	15.		2nd	3.0	
+DEAL:Legendre:1d:Tensor::
+DEAL:Legendre:1d:Polyno::P0	= 10.	gradient	0.0		2nd	0.0	
+DEAL:Legendre:1d:Polyno::P1	= 5.0	gradient	10.		2nd	0.0	
+DEAL:Legendre:1d:Polyno::P2	= -1.2	gradient	15.		2nd	3.0	
+DEAL:Legendre:1d:Polyno::
+DEAL:Legendre:2d:Tensor::P0	= 1.0e+02	gradient	0.0	0.0		2nd	0.0	0.0	0.0	0.0	
+DEAL:Legendre:2d:Tensor::P1	= 50.	gradient	1.0e+02	0.0		2nd	0.0	0.0	0.0	0.0	
+DEAL:Legendre:2d:Tensor::P2	= -12.	gradient	1.5e+02	-0.0		2nd	3.0	0.0	0.0	-0.0	
+DEAL:Legendre:2d:Tensor::P3	= 20.	gradient	0.0	1.0e+02		2nd	0.0	0.0	0.0	0.0	
+DEAL:Legendre:2d:Tensor::P4	= 10.	gradient	20.	50.		2nd	0.0	1.0	1.0	0.0	
+DEAL:Legendre:2d:Tensor::P5	= -2.5	gradient	30.	-12.		2nd	0.60	1.5	1.5	-0.0	
+DEAL:Legendre:2d:Tensor::P6	= -44.	gradient	-0.0	60.		2nd	-0.0	0.0	0.0	3.0	
+DEAL:Legendre:2d:Tensor::P7	= -22.	gradient	-44.	30.		2nd	-0.0	0.60	0.60	1.5	
+DEAL:Legendre:2d:Tensor::P8	= 5.5	gradient	-66.	-7.5		2nd	-1.3	0.90	0.90	-0.38	
+DEAL:Legendre:2d:Tensor::
+DEAL:Legendre:2d:Polyno::P0	= 1.0e+02	gradient	0.0	0.0		2nd	0.0	0.0	0.0	0.0	
+DEAL:Legendre:2d:Polyno::P1	= 50.	gradient	1.0e+02	0.0		2nd	0.0	0.0	0.0	0.0	
+DEAL:Legendre:2d:Polyno::P2	= -12.	gradient	1.5e+02	-0.0		2nd	3.0	0.0	0.0	-0.0	
+DEAL:Legendre:2d:Polyno::P3	= 20.	gradient	0.0	1.0e+02		2nd	0.0	0.0	0.0	0.0	
+DEAL:Legendre:2d:Polyno::P4	= 10.	gradient	20.	50.		2nd	0.0	1.0	1.0	0.0	
+DEAL:Legendre:2d:Polyno::P5	= -44.	gradient	-0.0	60.		2nd	-0.0	0.0	0.0	3.0	
+DEAL:Legendre:2d:Polyno::
+DEAL:Legendre:3d:Tensor::P0	= 1.0e+03	gradient	0.0	0.0	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Tensor::P1	= 5.0e+02	gradient	1.0e+03	0.0	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Tensor::P2	= -1.2e+02	gradient	1.5e+03	-0.0	-0.0		2nd	3.0	0.0	0.0	0.0	-0.0	-0.0	0.0	-0.0	-0.0	
+DEAL:Legendre:3d:Tensor::P3	= 2.0e+02	gradient	0.0	1.0e+03	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Tensor::P4	= 1.0e+02	gradient	2.0e+02	5.0e+02	0.0		2nd	0.0	1.0	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Tensor::P5	= -25.	gradient	3.0e+02	-1.2e+02	-0.0		2nd	0.60	1.5	0.0	1.5	-0.0	-0.0	0.0	-0.0	-0.0	
+DEAL:Legendre:3d:Tensor::P6	= -4.4e+02	gradient	-0.0	6.0e+02	-0.0		2nd	-0.0	0.0	-0.0	0.0	3.0	0.0	-0.0	0.0	-0.0	
+DEAL:Legendre:3d:Tensor::P7	= -2.2e+02	gradient	-4.4e+02	3.0e+02	-0.0		2nd	-0.0	0.60	-0.0	0.60	1.5	0.0	-0.0	0.0	-0.0	
+DEAL:Legendre:3d:Tensor::P8	= 55.	gradient	-6.6e+02	-75.	0.0		2nd	-1.3	0.90	-0.0	0.90	-0.38	-0.0	-0.0	-0.0	0.0	
+DEAL:Legendre:3d:Tensor::P9	= 3.0e+02	gradient	0.0	0.0	1.0e+03		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Tensor::P10	= 1.5e+02	gradient	3.0e+02	0.0	5.0e+02		2nd	0.0	0.0	1.0	0.0	0.0	0.0	1.0	0.0	0.0	
+DEAL:Legendre:3d:Tensor::P11	= -38.	gradient	4.5e+02	-0.0	-1.2e+02		2nd	0.90	0.0	1.5	0.0	-0.0	-0.0	1.5	-0.0	-0.0	
+DEAL:Legendre:3d:Tensor::P12	= 60.	gradient	0.0	3.0e+02	2.0e+02		2nd	0.0	0.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	
+DEAL:Legendre:3d:Tensor::P13	= 30.	gradient	60.	1.5e+02	1.0e+02		2nd	0.0	0.30	0.20	0.30	0.0	0.50	0.20	0.50	0.0	
+DEAL:Legendre:3d:Tensor::P14	= -7.5	gradient	90.	-38.	-25.		2nd	0.18	0.45	0.30	0.45	-0.0	-0.12	0.30	-0.12	-0.0	
+DEAL:Legendre:3d:Tensor::P15	= -1.3e+02	gradient	-0.0	1.8e+02	-4.4e+02		2nd	-0.0	0.0	-0.0	0.0	0.90	0.60	-0.0	0.60	-0.0	
+DEAL:Legendre:3d:Tensor::P16	= -66.	gradient	-1.3e+02	90.	-2.2e+02		2nd	-0.0	0.18	-0.44	0.18	0.45	0.30	-0.44	0.30	-0.0	
+DEAL:Legendre:3d:Tensor::P17	= 16.	gradient	-2.0e+02	-23.	55.		2nd	-0.40	0.27	-0.66	0.27	-0.11	-0.075	-0.66	-0.075	0.0	
+DEAL:Legendre:3d:Tensor::P18	= -3.6e+02	gradient	-0.0	-0.0	9.0e+02		2nd	-0.0	-0.0	0.0	-0.0	-0.0	0.0	0.0	0.0	3.0	
+DEAL:Legendre:3d:Tensor::P19	= -1.8e+02	gradient	-3.6e+02	-0.0	4.5e+02		2nd	-0.0	-0.0	0.90	-0.0	-0.0	0.0	0.90	0.0	1.5	
+DEAL:Legendre:3d:Tensor::P20	= 46.	gradient	-5.5e+02	0.0	-1.1e+02		2nd	-1.1	-0.0	1.3	-0.0	0.0	-0.0	1.3	-0.0	-0.38	
+DEAL:Legendre:3d:Tensor::P21	= -73.	gradient	-0.0	-3.6e+02	1.8e+02		2nd	-0.0	-0.0	0.0	-0.0	-0.0	0.90	0.0	0.90	0.60	
+DEAL:Legendre:3d:Tensor::P22	= -36.	gradient	-73.	-1.8e+02	90.		2nd	-0.0	-0.36	0.18	-0.36	-0.0	0.45	0.18	0.45	0.30	
+DEAL:Legendre:3d:Tensor::P23	= 9.1	gradient	-1.1e+02	46.	-22.		2nd	-0.22	-0.55	0.27	-0.55	0.0	-0.11	0.27	-0.11	-0.075	
+DEAL:Legendre:3d:Tensor::P24	= 1.6e+02	gradient	0.0	-2.2e+02	-4.0e+02		2nd	0.0	-0.0	-0.0	-0.0	-1.1	0.54	-0.0	0.54	-1.3	
+DEAL:Legendre:3d:Tensor::P25	= 80.	gradient	1.6e+02	-1.1e+02	-2.0e+02		2nd	0.0	-0.22	-0.40	-0.22	-0.55	0.27	-0.40	0.27	-0.66	
+DEAL:Legendre:3d:Tensor::P26	= -20.	gradient	2.4e+02	27.	49.		2nd	0.48	-0.33	-0.59	-0.33	0.14	-0.068	-0.59	-0.068	0.17	
+DEAL:Legendre:3d:Tensor::
+DEAL:Legendre:3d:Polyno::P0	= 1.0e+03	gradient	0.0	0.0	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Polyno::P1	= 5.0e+02	gradient	1.0e+03	0.0	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Polyno::P2	= -1.2e+02	gradient	1.5e+03	-0.0	-0.0		2nd	3.0	0.0	0.0	0.0	-0.0	-0.0	0.0	-0.0	-0.0	
+DEAL:Legendre:3d:Polyno::P3	= 2.0e+02	gradient	0.0	1.0e+03	0.0		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Polyno::P4	= 1.0e+02	gradient	2.0e+02	5.0e+02	0.0		2nd	0.0	1.0	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Polyno::P5	= -4.4e+02	gradient	-0.0	6.0e+02	-0.0		2nd	-0.0	0.0	-0.0	0.0	3.0	0.0	-0.0	0.0	-0.0	
+DEAL:Legendre:3d:Polyno::P6	= 3.0e+02	gradient	0.0	0.0	1.0e+03		2nd	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+DEAL:Legendre:3d:Polyno::P7	= 1.5e+02	gradient	3.0e+02	0.0	5.0e+02		2nd	0.0	0.0	1.0	0.0	0.0	0.0	1.0	0.0	0.0	
+DEAL:Legendre:3d:Polyno::P8	= 60.	gradient	0.0	3.0e+02	2.0e+02		2nd	0.0	0.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	
+DEAL:Legendre:3d:Polyno::P9	= -3.6e+02	gradient	-0.0	-0.0	9.0e+02		2nd	-0.0	-0.0	0.0	-0.0	-0.0	0.0	0.0	0.0	3.0	
+DEAL:Legendre:3d:Polyno::
