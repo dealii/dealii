@@ -364,7 +364,8 @@ class FE_Q_Hierarchical : public FiniteElement<dim>
 				      * @p{this}, and all other
 				      * indices throw an error.
 				      */
-    virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
+    virtual const FiniteElement<dim> &
+    base_element (const unsigned int index) const;
     
                                      /**
                                       * Multiplicity of base element
