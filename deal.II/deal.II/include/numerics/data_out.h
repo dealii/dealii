@@ -349,6 +349,27 @@ class DataOut_DoFData : public DataOutInterface<dim>
  * class's documentation has an example of using nodal data to generate
  * output.
  *
+ *
+ * \subsection{Extensions}
+ *
+ * By default, this class produces patches for all active cells. Sometimes,
+ * this is not what you want, maybe because they are simply too many (and too
+ * small to be seen individually) or because you only want to see a certain
+ * region of the domain, or for some other reason.
+ *
+ * For this, internally the #build_patches# function does not generate
+ * the sequence of cells to be converted into patches itself, but relies
+ * on the two functions #first_cell# and #next_cell#. By default, they
+ * return the first active cell, and the next active cell, respectively.
+ * Since they are #virtual# functions, you may overload them to select other
+ * cells for output. If cells are not active, interpolated values are taken
+ * for output instead of the exact values on active cells.
+ *
+ * The two functions are not constant, so you may store information within
+ * your derived class about the last accessed cell. This is useful if the
+ * information of the last cell which was accessed is not sufficient to
+ * determine the next one.
+ *
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
@@ -356,14 +377,47 @@ class DataOut : public DataOut_DoFData<dim>
 {
   public:
     				     /**
-				      * This is the central and only function of
+				      * This is the central function of
 				      * this class since it builds the list of
 				      * patches to be written by the low-level
 				      * functions of the base class. See the
 				      * general documentation of this class
 				      * for further information.
 				      */
-    virtual void build_patches (const unsigned int n_subdivisions = 1);    
+    virtual void build_patches (const unsigned int n_subdivisions = 1);
+
+				     /**
+				      * Return the first cell which we
+				      * want output for. The default
+				      * implementation returns the first
+				      * active cell, but you might want
+				      * to return other cells in a derived
+				      * class.
+				      */
+    virtual typename DoFHandler<dim>::cell_iterator
+    first_cell ();
+    
+				     /**
+				      * Return the next cell after #cell# which
+				      * we want output for.
+				      * If there are no more cells,
+				      * #dofs->end()# shall be returned.
+				      *
+				      * The default
+				      * implementation returns the next
+				      * active cell, but you might want
+				      * to return other cells in a derived
+				      * class. Note that the default
+				      * implementation assumes that
+				      * the given #cell# is active, which
+				      * is guaranteed as long as #first_cell#
+				      * is also used from the default
+				      * implementation. Overloading only one
+				      * of the two functions might not be
+				      * a good idea.
+				      */
+    virtual typename DoFHandler<dim>::cell_iterator
+    next_cell (const typename DoFHandler<dim>::cell_iterator &cell);
 };
 
 

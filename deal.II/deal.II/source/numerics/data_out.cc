@@ -169,8 +169,9 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions)
 				   // create patches of and make sure
 				   // there is enough memory for that
   unsigned int n_patches = 0;
-  for (DoFHandler<dim>::active_cell_iterator cell=dofs->begin_active();
-       cell != dofs->end(); ++cell)
+  for (DoFHandler<dim>::active_cell_iterator cell=first_cell();
+       cell != dofs->end();
+       cell = next_cell(cell))
     ++n_patches;
 
 
@@ -245,9 +246,32 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions)
 
 
 
+template <int dim>
+typename DoFHandler<dim>::cell_iterator
+DataOut<dim>::first_cell () 
+{
+  return dofs->begin_active ();
+};
+
+
+
+template <int dim>
+typename DoFHandler<dim>::cell_iterator
+DataOut<dim>::next_cell (const typename DoFHandler<dim>::cell_iterator &cell) 
+{
+				   // convert the iterator to an
+				   // active_iterator and advance
+				   // this to the next active cell
+  typename DoFHandler<dim>::active_cell_iterator active_cell = cell;
+  ++active_cell;
+  return active_cell;
+};
 
 
 
 // explicit instantiations
 template class DataOut_DoFData<deal_II_dimension>;
 template class DataOut<deal_II_dimension>;
+
+
+
