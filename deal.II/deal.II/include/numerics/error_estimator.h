@@ -22,6 +22,8 @@ class dVector;
 
 
 /**
+   Implementation of the error estimator by Kelly, Gago, Zienkiewicz and
+   Babuska.
    This error estimator tries to approximate the error per cell by integration
    of the jump of the gradient of the solution along the faces of each cell.
    It can be understood as a gradient recovery estimator; see the survey
