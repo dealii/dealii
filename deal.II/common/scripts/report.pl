@@ -10,10 +10,18 @@ while (<>)
 	$result = $3;
 	$name   = $4;
 
-	$results{$date}{$dir.':'.$name} = '<img src="pictures/ok.gif" size="1">'
-	    if ($result eq '+');
-	$results{$date}{$dir.':'.$name} = '<img src="pictures/fail.gif" size="1">'
-	    if ($result eq '-');
+	$total_testcases{$date}++;
+
+	if ($result eq '+') {
+	    $results{$date}{$dir.':'.$name} 
+	    = '<img src="pictures/ok.gif" size="1">';
+	}
+	else
+	{
+	    $results{$date}{$dir.':'.$name}
+	    = '<img src="pictures/fail.gif" size="1">';
+	    $failed_testcases{$date}++;
+	};
     }
 }
 
@@ -141,7 +149,7 @@ print TABLE_FILE <<"EOT"
 
 <h3 align="center">Results for $this_year/$this_month</h3>
 <table>
-<tr><th>Date
+<tr><th>Date <th> Fail
 EOT
     ;
 
@@ -157,6 +165,14 @@ EOT
     }
 
     print TABLE_FILE "<tr><td>$date  ";
+
+    $failed_testcases{$date} = 0 if (!defined $failed_testcases{$date});
+
+    print TABLE_FILE "<td><b style=\"color:blue;\">" if ($failed_testcases{$date} == 0);
+    print TABLE_FILE "<td><b style=\"color:red;\">" if ($failed_testcases{$date} != 0);
+
+    print TABLE_FILE "$failed_testcases{$date}/$total_testcases{$date}</b></td>";
+
     foreach $name (sort keys %testcase)
     {
 	$_ = $results{$date}{$name};
