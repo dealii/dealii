@@ -29,7 +29,7 @@ cvslog:
 
 # make sure that the *.kdoc files exist by
 # using the dependancies and the following rules.
-kdoc: kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc $(kdoc.all) kdoc-rerun
+kdoc: kdoc/base.kdoc kdoc/lac.kdoc kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc $(kdoc.all) kdoc-rerun
 
 kdoc-rerun:
 	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dbase \
