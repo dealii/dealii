@@ -453,8 +453,7 @@ void __IssueError_Throw (const char *file,
  * On some systems (we only know of DEC Alpha systems running under
  * OSF1 or Linux), the compiler fails to compile the @p{AssertThrow}
  * macro properly, yielding an internal compiler error. We detect this
- * at configure time. For these cases, the @p{AssertThrow} macro is
- * implemented like the @p{Assert} macro in debug mode, i.e. it aborts
+ * at configure time. For these cases, the @p{AssertThrow} macro aborts
  * the program if the assertion is not satisfied. This, however,
  * happens in debug and optimized mode likewise.  Note that in these
  * cases, the meaning of a program changes. In particular, one cannot
@@ -478,9 +477,7 @@ void __IssueError_Throw (const char *file,
 #define AssertThrow(cond, exc)                                    \
   {                                                               \
     if (!(cond))                                                  \
-      __IssueError_Assert (__FILE__,                              \
-			   __LINE__,                              \
-			   __PRETTY_FUNCTION__, #cond, #exc, exc);\
+      abort ();                                                   \
   }
 #endif
 
