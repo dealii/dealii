@@ -744,6 +744,24 @@
       METIS version 4.0.1, and newer versions should presumable work as well.
       </p>
       
+      <p>
+      Using METIS requires some editing though: in the METIS header
+      <code>Lib/proto.h</code> that is automatically include from METIS's main
+      header <code>Lib/metis.h</code>, a number of functions from the C
+      standard lib are declared with signatures that differ from the ones in
+      the system headers (that alone is a good reason not to ever declare
+      system functions yourself, but oh well...) in that they do not have
+      exception specifications that are given in the system headers. With some
+      compilers, you will then get compilation errors on one or two deal.II
+      files. It is easy to work around this by first compiling METIS, then
+      trying to compile deal.II, and then simply remove each function
+      signature which the compiler complains about. The ones most likely
+      affected are <code>srand48()</code>, <code>drand48()</code>, and
+      <code>log2</code>. Since you have already compile METIS and deal.II does
+      not need these function declarations itself, just removing their
+      declarations should not be a problem.
+      </p>
+
 
       <li>
       <p>
