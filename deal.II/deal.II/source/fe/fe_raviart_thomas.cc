@@ -1658,8 +1658,9 @@ FE_RaviartThomas<dim>::fill_fe_face_values (const Mapping<dim>                  
 				   // number of conversions
   if (flags & update_values)
     {
-      Assert (fe_data.shape_values.size() ==
-              GeometryInfo<dim>::faces_per_cell * n_q_points,
+      Assert (fe_data.shape_values[0].size() ==
+              GeometryInfo<dim>::faces_per_cell * n_q_points *
+	      (dim == 3 ? 2 : 1),
               ExcInternalError());
       
       std::vector<Tensor<1,dim> > shape_values (n_q_points);
