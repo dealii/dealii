@@ -82,7 +82,7 @@ check_boundary (const DoFHandler<dim> &dof,
   matrix.reinit (sparsity);
   
   Vector<double> rhs (dof.n_boundary_dofs(function_map));
-  MatrixTools<dim>::
+  MatrixTools::
     create_boundary_mass_matrix (mapping, dof,
 				 face_quadrature, matrix,
 				 function_map, rhs,
@@ -168,12 +168,12 @@ check ()
       switch (test)
 	{
 	  case 0:
-		MatrixTools<dim>::
+		MatrixTools::
 		  create_mass_matrix (mapping, dof,
 				      quadrature, matrix, &coefficient);
 		break;
 	  case 1:
-		MatrixTools<dim>::
+		MatrixTools::
 		  create_laplace_matrix (mapping, dof,
 					 quadrature, matrix, &coefficient);
 		break;

@@ -5321,9 +5321,9 @@ void TimeStep_Dual<dim>::do_timestep ()
       
       VectorTools::interpolate_boundary_values (*dof_handler, 0, boundary_values,
 						     boundary_value_list);
-      MatrixTools<dim>::apply_boundary_values (boundary_value_list,
-					       system_matrix, v,
-					       right_hand_side1);
+      MatrixTools::apply_boundary_values (boundary_value_list,
+					  system_matrix, v,
+					  right_hand_side1);
     };
   
   const unsigned int solver_steps1 = solve (system_matrix, v, right_hand_side1);
@@ -5338,9 +5338,9 @@ void TimeStep_Dual<dim>::do_timestep ()
     };
   constraints.condense (right_hand_side2);
   if (dim != 1)
-    MatrixTools<dim>::apply_boundary_values (boundary_value_list,
-					     system_matrix, u,
-					     right_hand_side2);
+    MatrixTools::apply_boundary_values (boundary_value_list,
+					system_matrix, u,
+					right_hand_side2);
   
   if (parameters.extrapolate_old_solutions)
     {
@@ -7095,9 +7095,9 @@ assemble_vectors (right_hand_side1, right_hand_side2);
       VectorTools::interpolate_boundary_values (*dof_handler, 0,
 						     *(parameters.boundary_values_u),
 						     boundary_value_list);
-      MatrixTools<dim>::apply_boundary_values (boundary_value_list,
-					       system_matrix, u,
-					       right_hand_side1);
+      MatrixTools::apply_boundary_values (boundary_value_list,
+					  system_matrix, u,
+					  right_hand_side1);
     };
 
   const unsigned int solver_steps1 = solve (system_matrix, u, right_hand_side1);
@@ -7119,9 +7119,9 @@ assemble_vectors (right_hand_side1, right_hand_side2);
       VectorTools::interpolate_boundary_values (*dof_handler, 0,
 						     *(parameters.boundary_values_v),
 						     boundary_value_list);
-      MatrixTools<dim>::apply_boundary_values (boundary_value_list,
-					       system_matrix, v,
-					       right_hand_side2);
+      MatrixTools::apply_boundary_values (boundary_value_list,
+					  system_matrix, v,
+					  right_hand_side2);
     };
 
 

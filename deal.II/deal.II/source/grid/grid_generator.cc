@@ -757,7 +757,7 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
   
   QGauss4<dim> quadrature;
   
-  MatrixCreator<dim>::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S);
+  MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S);
 
 				   // set up the boundary values for
 				   // the laplace problem

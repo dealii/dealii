@@ -532,6 +532,16 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: The <code class="class">MatrixCreator</code> and <code
+       class="class">MatrixTools</code> class have lost their template
+       arguments. Rather, the individual functions now are templated
+       on their own, so the compiler can pick out the correct space
+       dimension on its own.
+       <br>
+       (WB 2001/08/15)
+       </p>
+
+  <li> <p>
        Extended: <code class="member">ConstraintMatrix::merge</code>
        can now handle arguments which further constrain the present object.
        <br>

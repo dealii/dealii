@@ -79,7 +79,7 @@ solve_eliminated (std::map<unsigned int,double> &bv,
 		  Vector<double>                &u,
 		  Vector<double>                &f)
 {
-  MatrixTools<dim>::apply_boundary_values (bv, A, u, f);
+  MatrixTools::apply_boundary_values (bv, A, u, f);
   
   SolverControl control (1000, 1.e-10, false, false);
   PrimitiveVectorMemory<Vector<double> > mem;

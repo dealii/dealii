@@ -23,7 +23,6 @@ template <int dim> class FEValues;
 template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
 template <int dim> class FESystem;
-template <int dim> class MatrixCreator;
 
 
 /**

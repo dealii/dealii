@@ -400,16 +400,16 @@ void VectorTools::project (const Mapping<dim>       &mapping,
   SparseMatrix<double> mass_matrix (sparsity);
   Vector<double> tmp (mass_matrix.n());
 
-  MatrixCreator<dim>::create_mass_matrix (mapping, dof, quadrature, mass_matrix);
+  MatrixCreator::create_mass_matrix (mapping, dof, quadrature, mass_matrix);
   
   VectorTools::create_right_hand_side (mapping, dof, quadrature, function, tmp);
 
   constraints.condense (mass_matrix);
   constraints.condense (tmp);
   if (boundary_values.size() != 0)
-    MatrixTools<dim>::apply_boundary_values (boundary_values,
-					     mass_matrix, vec, tmp,
-					     true);
+    MatrixTools::apply_boundary_values (boundary_values,
+					mass_matrix, vec, tmp,
+					true);
 
   SolverControl           control(1000,1e-16);
   PrimitiveVectorMemory<> memory;
@@ -876,9 +876,9 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
   Vector<double>       rhs(sparsity.n_rows());
 
 
-  MatrixCreator<dim>::create_boundary_mass_matrix (mapping, dof, q, 
-						   mass_matrix, boundary_functions,
-						   rhs, dof_to_boundary_mapping);
+  MatrixCreator::create_boundary_mass_matrix (mapping, dof, q, 
+					      mass_matrix, boundary_functions,
+					      rhs, dof_to_boundary_mapping);
 
 				   // same thing as above: if dim>=3 we need
 				   // to consider constraints

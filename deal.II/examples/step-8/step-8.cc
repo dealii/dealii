@@ -732,10 +732,10 @@ void ElasticProblem<dim>::assemble_system ()
 					    0,
 					    ZeroFunction<dim>(dim),
 					    boundary_values);
-  MatrixTools<dim>::apply_boundary_values (boundary_values,
-					   system_matrix,
-					   solution,
-					   system_rhs);
+  MatrixTools::apply_boundary_values (boundary_values,
+				      system_matrix,
+				      solution,
+				      system_rhs);
 };
 
 

@@ -12,6 +12,7 @@
 
 #include <base/exceptions.h>
 #include <base/thread_management.h>
+#include <dofs/function_map.h>
 #include <map>
 
 
@@ -29,7 +30,6 @@ template <int dim> class Mapping;
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 template <int dim> class FEValues;
-template <int dim> class FunctionMap;
 
 
 
@@ -183,8 +183,6 @@ template <int dim> class FunctionMap;
  *
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
-//TODO: [WB] remove template arg and make functions static once FunctionMap is globalized
-template <int dim>
 class MatrixCreator
 {
   public:
@@ -200,6 +198,7 @@ class MatrixCreator
 				      * See the general doc of this class
 				      * for more information.
 				      */
+    template <int dim>
     static void create_mass_matrix (const Mapping<dim>       &mapping,
 				    const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
@@ -211,6 +210,7 @@ class MatrixCreator
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
+    template <int dim>
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<double>     &matrix,
@@ -229,6 +229,7 @@ class MatrixCreator
 				      * See the general doc of this
 				      * class for more information.
 				      */
+    template <int dim>
     static void create_mass_matrix (const Mapping<dim>       &mapping,
 				    const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
@@ -242,6 +243,7 @@ class MatrixCreator
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
+    template <int dim>
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<double>     &matrix,
@@ -269,15 +271,30 @@ class MatrixCreator
 				      * See the general doc of this
 				      * class for more information.
 				      */
+    template <int dim>
     static
     void create_boundary_mass_matrix (const Mapping<dim>       &mapping,
 				      const DoFHandler<dim>    &dof,
 				      const Quadrature<dim-1>  &q,
 				      SparseMatrix<double>     &matrix,
-				      const typename FunctionMap<dim>::type        &boundary_functions,
+				      const typename FunctionMap<dim>::type &boundary_functions,
 				      Vector<double>           &rhs_vector,
 				      std::vector<unsigned int>&dof_to_boundary_mapping,
 				      const Function<dim> * const a = 0);
+
+				     /**
+				      * Same function, but for 1d.
+				      */
+    static
+    void create_boundary_mass_matrix (const Mapping<1>       &mapping,
+				      const DoFHandler<1>    &dof,
+				      const Quadrature<0>    &q,
+				      SparseMatrix<double>   &matrix,
+				      const FunctionMap<1>::type &boundary_functions,
+				      Vector<double>         &rhs_vector,
+				      std::vector<unsigned int>&dof_to_boundary_mapping,
+				      const Function<1> * const a = 0);
+
 
 				     /**
 				      * Calls the
@@ -285,6 +302,7 @@ class MatrixCreator
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
+    template <int dim>
     static
     void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
 				      const Quadrature<dim-1>  &q,
@@ -307,6 +325,7 @@ class MatrixCreator
 				      * See the general doc of this
 				      * class for more information.
 				      */
+    template <int dim>
     static void create_laplace_matrix (const Mapping<dim>       &mapping,
 				       const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
@@ -318,6 +337,7 @@ class MatrixCreator
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
+    template <int dim>
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
@@ -330,6 +350,7 @@ class MatrixCreator
 				      * See the general doc of this
 				      * class for more information.
 				      */
+    template <int dim>
     static void create_level_laplace_matrix (unsigned int             level,
 					     const MGDoFHandler<dim>& dof,
 					     const Quadrature<dim>&   q,
@@ -350,6 +371,7 @@ class MatrixCreator
 				      * See the general doc of this
 				      * class for more information.
 				      */
+    template <int dim>
     static void create_laplace_matrix (const Mapping<dim>       &mapping,
 				       const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
@@ -363,6 +385,7 @@ class MatrixCreator
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
+    template <int dim>
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
@@ -378,17 +401,50 @@ class MatrixCreator
   private:
 				     /**
 				      * Convenience abbreviation for
-				      * DoF handler cell iterators.
+				      * pairs of DoF handler cell
+				      * iterators. This type works
+				      * just like a
+				      * @p{std::pair<iterator,iterator>}
+				      * but is templatized on the
+				      * space dimension.
 				      */
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    template <int dim>
+    struct IteratorRange 
+    {
+					 /**
+					  * Typedef for the iterator type.
+					  */
+	typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
 
-				     /**
-				      * Pair of iterators denoting a
-				      * half-open range.
-				      */
-    typedef std::pair<active_cell_iterator,active_cell_iterator> IteratorRange;
+					 /**
+					  * Abbreviation for a pair of
+					  * iterators.
+					  */
+	typedef typename std::pair<active_cell_iterator,active_cell_iterator> iterator_pair;
+	
+					 /**
+					  * Constructor. Initialize
+					  * the two values by the
+					  * given values.
+					  */
+	IteratorRange (const active_cell_iterator &first,
+		       const active_cell_iterator &second);
+
+					 /**
+					  * Constructor taking a pair
+					  * of values for
+					  * initialization.
+					  */
+	IteratorRange (const iterator_pair &ip);
+	
+					 /**
+					  * Pair of iterators denoting
+					  * a half-open range.
+					  */
+	active_cell_iterator first, second;
+    };
     
-
+    
 				     /**
 				      * Version of the same function
 				      * (without suffix @p{_1}) with
@@ -399,13 +455,14 @@ class MatrixCreator
 				      * used to synchronise access to
 				      * the matrix.
 				      */
+    template <int dim>
     static
     void create_mass_matrix_1 (const Mapping<dim>       &mapping,
 			       const DoFHandler<dim>    &dof,
 			       const Quadrature<dim>    &q,
 			       SparseMatrix<double>     &matrix,
 			       const Function<dim> * const a,
-			       const IteratorRange      &range,
+			       const IteratorRange<dim>  range,
 			       Threads::ThreadMutex     &mutex);
 
 				     /**
@@ -418,6 +475,7 @@ class MatrixCreator
 				      * used to synchronise access to
 				      * the matrix.
 				      */
+    template <int dim>
     static
     void create_mass_matrix_2 (const Mapping<dim>       &mapping,
 			       const DoFHandler<dim>    &dof,
@@ -426,7 +484,7 @@ class MatrixCreator
 			       const Function<dim>      &rhs,
 			       Vector<double>           &rhs_vector,
 			       const Function<dim> * const a,
-			       const IteratorRange      &range,
+			       const IteratorRange<dim>  range,
 			       Threads::ThreadMutex     &mutex);
 
 				     /**
@@ -439,13 +497,14 @@ class MatrixCreator
 				      * used to synchronise access to
 				      * the matrix.
 				      */
+    template <int dim>
     static
     void create_laplace_matrix_1 (const Mapping<dim>       &mapping,
 				  const DoFHandler<dim>    &dof,
 				  const Quadrature<dim>    &q,
 				  SparseMatrix<double>     &matrix,
 				  const Function<dim> * const a,
-				  const IteratorRange      &range,
+				  const IteratorRange<dim>  range,
 				  Threads::ThreadMutex     &mutex);
 
 				     /**
@@ -458,6 +517,7 @@ class MatrixCreator
 				      * used to synchronise access to
 				      * the matrix.
 				      */
+    template <int dim>
     static
     void create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 				  const DoFHandler<dim>    &dof,
@@ -466,7 +526,7 @@ class MatrixCreator
 				  const Function<dim>      &rhs,
 				  Vector<double>           &rhs_vector,
 				  const Function<dim> * const a,
-				  const IteratorRange      &range,
+				  const IteratorRange<dim>  range,
 				  Threads::ThreadMutex     &mutex);
 
 				     /**
@@ -479,6 +539,7 @@ class MatrixCreator
 				      * used to synchronise access to
 				      * the matrix.
 				      */
+    template <int dim>
     static
     void create_boundary_mass_matrix_1 (const Mapping<dim>       &mapping,
 					const DoFHandler<dim>    &dof,
@@ -488,35 +549,10 @@ class MatrixCreator
 					Vector<double>           &rhs_vector,
 					std::vector<unsigned int>&dof_to_boundary_mapping,
 					const Function<dim> * const a,
-					const IteratorRange      &range,
+					const IteratorRange<dim>  range,
 					Threads::ThreadMutex     &mutex);
 };
 
-
-/* -------------- declaration of explicit specializations ------------- */
-
-
-template <> void MatrixCreator<1>::create_boundary_mass_matrix (
-  const Mapping<1>          &,
-  const DoFHandler<1>       &,
-  const Quadrature<0>       &,
-  SparseMatrix<double>      &,
-  const FunctionMap<1>::type&,
-  Vector<double>            &,
-  std::vector<unsigned int> &,
-  const Function<1>         * const);
-
-template <> void MatrixCreator<1>::create_boundary_mass_matrix_1 (
-  const Mapping<1>          &,
-  const DoFHandler<1>       &,
-  const Quadrature<0>       &,
-  SparseMatrix<double>      &,
-  const FunctionMap<1>::type&,
-  Vector<double>            &,
-  std::vector<unsigned int> &,
-  const Function<1> * const ,
-  const IteratorRange       &,
-  Threads::ThreadMutex      &);
 
 
 /**
@@ -628,8 +664,7 @@ template <> void MatrixCreator<1>::create_boundary_mass_matrix_1 (
  * 
  * @author Wolfgang Bangerth, 1998, 2000
  */
-template <int dim>
-class MatrixTools : public MatrixCreator<dim>
+class MatrixTools : public MatrixCreator
 {
   public:
 				     /**
