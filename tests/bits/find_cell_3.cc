@@ -29,16 +29,18 @@
 
 void check (Triangulation<3> &tria)
 {
+  Point<3> p(1./3.,1./2.,-1./5.);
+  
   Triangulation<3>::active_cell_iterator cell
-    = GridTools::find_active_cell_around_point (tria,
-                                                Point<3>(1./3.,
-                                                         1./2.,
-                                                         2./3.));
+    = GridTools::find_active_cell_around_point (tria, p);
 
   deallog << cell << std::endl;
   for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
     deallog << "<" << cell->vertex(v) << "> ";
   deallog << std::endl;
+
+  Assert (p.distance (cell->center()) < cell->diameter()/2,
+	  ExcInternalError());
 }
 
 
