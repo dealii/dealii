@@ -422,61 +422,21 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	    Assert (false,
 		    ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex],
                                            n_vertices));
-	  };
-      
-      
-      std::pair<int,int> line_vertices[4] = {   // note the order of the vertices
-	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
-	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
-	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
-	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[3])  };
-
-				       // note the following: if the
-				       // sense of the vertices of a
-				       // cell is correct, but the
-				       // vertices are given in an
-				       // order which makes the sense
-				       // of one line ambiguous when
-				       // viewed from the two adjacent
-				       // cells, we can heal this by
-				       // shifting the vertex indices
-				       // of one cell by two
-				       // (diagonally exchanging the
-				       // two vertices from which the
-				       // four lines originate and to
-				       // which they converge).  If
-				       // two lines are wrong, we
-				       // could heal this by rotating
-				       // by one or three vertices,
-				       // but deciding this is
-				       // difficult and not
-				       // implemented.
-//        for (unsigned int line=0; line<4; ++line)
-//  	if (needed_lines.find(std::make_pair(line_vertices[line].second,
-//  				  	     line_vertices[line].first))
-//  	    !=
-//  	    needed_lines.end())
-//  	  {
-//  					     // rotate vertex numbers
-//  	    std::swap (cells[cell].vertices[0], cells[cell].vertices[2]);
-//  	    std::swap (cells[cell].vertices[1], cells[cell].vertices[3]);
-//  					     // remake lines
-//  	    line_vertices[0]
-//  	      = std::make_pair (cells[cell].vertices[0], cells[cell].vertices[1]);
-//  	    line_vertices[1]
-//  	      = std::make_pair (cells[cell].vertices[1], cells[cell].vertices[2]);
-//  	    line_vertices[2]
-//  	      = std::make_pair (cells[cell].vertices[0], cells[cell].vertices[3]);
-//  	    line_vertices[3]
-//  	      = std::make_pair (cells[cell].vertices[3], cells[cell].vertices[2]);
-//  					     // allow for only one such
-//  					     // rotation
-//  	    break;
-//  	  };
+	  }
 
 
-      for (unsigned int line=0; line<4; ++line)
+      for (unsigned int line=0; line<GeometryInfo<dim>::faces_per_cell; ++line)
 	{
+				       // given a line vertex number
+				       // (0,1) on a specific line we
+				       // get the cell vertex number
+				       // (0-4) through the
+				       // line_to_cell_vertices
+				       // function
+	  std::pair<int,int> line_vertices(
+	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
+	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
+
 					   // assert that the line was
 					   // not already inserted in
 					   // reverse order. This
@@ -503,8 +463,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 					   // the second it would be
 					   // 4->1.  This will cause
 					   // the exception.
-	  if (! (needed_lines.find(std::make_pair(line_vertices[line].second,
-						  line_vertices[line].first))
+	  if (! (needed_lines.find(std::make_pair(line_vertices.second,
+						  line_vertices.first))
 		 ==
 		 needed_lines.end()))
 	    {
@@ -518,9 +478,9 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 					   // invalid iterator if line
 					   // already exists, then
 					   // nothing bad happens here
-	  needed_lines[line_vertices[line]] = end_line();
-	};
-    };
+	  needed_lines[line_vertices] = end_line();
+	}
+    }
 
 
 				   // check that every vertex has at
@@ -535,7 +495,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 					   // this line
 	  ++vertex_touch_count[i->first.first];
 	  ++vertex_touch_count[i->first.second];
-	};
+	}
 
 				       // assert minimum touch count
 				       // is at least two. if not so,
@@ -547,8 +507,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  clear_despite_subscriptions();
 	  
 	  AssertThrow (false, ExcGridHasInvalidVertices());
-	};
-    };
+	}
+    }
 	
   				   // reserve enough space
   levels.push_back (new TriangulationLevel<dim>);
@@ -568,8 +528,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  line->clear_user_flag ();
 	  line->clear_user_pointer ();
 	  i->second = line;
-	};
-    };
+	}
+    }
 
 
 				   // store for each line index
@@ -582,13 +542,11 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
       raw_cell_iterator cell = begin_raw_quad();
       for (unsigned int c=0; c<cells.size(); ++c, ++cell)
 	{
-					   // list of iterators of
-					   // lines
-	  const line_iterator lines[4] = {
-		needed_lines[std::make_pair(cells[c].vertices[0], cells[c].vertices[1])],
-		needed_lines[std::make_pair(cells[c].vertices[1], cells[c].vertices[2])],
-		needed_lines[std::make_pair(cells[c].vertices[3], cells[c].vertices[2])],
-		needed_lines[std::make_pair(cells[c].vertices[0], cells[c].vertices[3])]};
+	  line_iterator lines[GeometryInfo<dim>::lines_per_cell];
+	  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+	    lines[line]=needed_lines[std::make_pair(
+	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
+	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)])];
 	  
 	  cell->set (Quad(lines[0]->index(),
 			  lines[1]->index(),
@@ -603,22 +561,10 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 					   // note that this cell is
 					   // adjacent to the four
 					   // lines
-	  for (unsigned int line=0; line<4; ++line)
+	  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
 	    adjacent_cells[lines[line]->index()].push_back (cell);
-	  
-					   // make some checks on the
-					   // vertices and their
-					   // ordering
-	  Assert (lines[0]->vertex_index(0) == lines[3]->vertex_index(0),
-		  ExcInternalErrorOnCell(c));
-	  Assert (lines[0]->vertex_index(1) == lines[1]->vertex_index(0),
-		  ExcInternalErrorOnCell(c));
-	  Assert (lines[1]->vertex_index(1) == lines[2]->vertex_index(1),
-		  ExcInternalErrorOnCell(c));
-	  Assert (lines[2]->vertex_index(0) == lines[3]->vertex_index(1),
-		  ExcInternalErrorOnCell(c));
-	};
-    };
+	}
+    }
 
 
   for (line_iterator line=begin_line(); line!=end_line(); ++line) 
@@ -632,7 +578,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  clear_despite_subscriptions();
 	  
 	  AssertThrow (false, ExcInternalError());
-	};
+	}
 
 				       // if only one cell: line is at
 				       // boundary -> give it the
@@ -643,7 +589,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
       else
 					 // interior line -> 255
       	line->set_boundary_indicator (255);
-    };
+    }
 
 				   // set boundary indicators where
 				   // given
@@ -674,8 +620,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 
 	      AssertThrow (false, ExcLineInexistant(line_vertices.first,
 						    line_vertices.second));
-	    };
-	};
+	    }
+	}
 
 				       // assert that we only set
 				       // boundary info once
@@ -686,7 +632,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  
 	  AssertThrow (false, ExcMultiplySetLineInfoOfLine(
 	    line_vertices.first, line_vertices.second));
-	};
+	}
       
 				       // Assert that only exterior lines
 				       // are given a boundary indicator
@@ -695,10 +641,10 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  clear_despite_subscriptions();
 	  
 	  AssertThrow (false, ExcInteriorLineCantBeBoundary());
-	};
+	}
 
       line->set_boundary_indicator (boundary_line->material_id);
-    };
+    }
 
 
 				   // finally update neighborship info
@@ -829,50 +775,41 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	    AssertThrow (false,
 			 ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex],
 						n_vertices));
-	  };
-      
-      
-      std::pair<int,int> line_vertices[12] = {   // note the order of the vertices
-					 // front face
-	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
-	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
-	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
-	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
-					   // back face
-	  std::make_pair (cells[cell].vertices[4], cells[cell].vertices[5]),
-	  std::make_pair (cells[cell].vertices[5], cells[cell].vertices[6]),
-	  std::make_pair (cells[cell].vertices[7], cells[cell].vertices[6]),
-	  std::make_pair (cells[cell].vertices[4], cells[cell].vertices[7]),
-					   // connects of front and
-					   // back face
-	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[4]),
-	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[5]),
-	  std::make_pair (cells[cell].vertices[2], cells[cell].vertices[6]),
-	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
-	  };
+	  }      
 
-      for (unsigned int line=0; line<12; ++line)
+      
+      for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
 	{
+				       // given a line vertex number
+				       // (0,1) on a specific line we
+				       // get the cell vertex number
+				       // (0-7) through the
+				       // line_to_cell_vertices
+				       // function
+	  std::pair<int,int> line_vertices(
+	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
+	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
+	  
 					   // assert that the line was
 					   // not already inserted in
 					   // reverse order
-	  if (! (needed_lines.find(std::make_pair(line_vertices[line].second,
-						  line_vertices[line].first))
+	  if (! (needed_lines.find(std::make_pair(line_vertices.second,
+						  line_vertices.first))
 		 ==
 		 needed_lines.end()))
 	    {
 	      clear_despite_subscriptions();
 
 	      AssertThrow (false, ExcGridHasInvalidCell(cell));
-	    };
+	    }
 		  
 					   // insert line, with
 					   // invalid iterator if line
 					   // already exists, then
 					   // nothing bad happens here
-	  needed_lines[line_vertices[line]] = end_line();
-	};
-    };
+	  needed_lines[line_vertices] = end_line();
+	}
+    }
 
 
 				   /////////////////////////////////
@@ -890,7 +827,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // this line
 	  ++vertex_touch_count[i->first.first];
 	  ++vertex_touch_count[i->first.second];
-	};
+	}
 
  				       // assert minimum touch count
  				       // is at least three. if not so,
@@ -902,8 +839,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  clear_despite_subscriptions();
 
 	  AssertThrow (false, ExcGridHasInvalidVertices());
-	};
-    };
+	}
+    }
 
 
 				   ///////////////////////////////////
@@ -929,8 +866,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // now set the iterator for
 					   // this line
 	  i->second = line;
-	};
-    };
+	}
+    }
 
 
 				   ///////////////////////////////////////////
@@ -969,58 +906,25 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // (pairs of their vertex
 				       // indices) in place, but
 				       // before they are really
-				       // needed. This is just copied
-				       // from above.
-      std::pair<int,int> line_list[12] = {   // note the order of the vertices
-					 // front face
-	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
-	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
-	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
-	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
-					   // back face
-	  std::make_pair (cells[cell].vertices[4], cells[cell].vertices[5]),
-	  std::make_pair (cells[cell].vertices[5], cells[cell].vertices[6]),
-	  std::make_pair (cells[cell].vertices[7], cells[cell].vertices[6]),
-	  std::make_pair (cells[cell].vertices[4], cells[cell].vertices[7]),
-					   // connects of front and back face
-	  std::make_pair (cells[cell].vertices[0], cells[cell].vertices[4]),
-	  std::make_pair (cells[cell].vertices[1], cells[cell].vertices[5]),
-	  std::make_pair (cells[cell].vertices[2], cells[cell].vertices[6]),
-	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
-	  };
+				       // needed.
+      std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell];
+      for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+	line_list[line]=std::pair<int,int> (
+	  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
+	  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
 
-      Quad faces[6]
-	= {
-					       // front face
-	      Quad (needed_lines[line_list[0]]->index(),
-		    needed_lines[line_list[1]]->index(),
-		    needed_lines[line_list[2]]->index(),
-		    needed_lines[line_list[3]]->index()),
-					       // back face
-	      Quad (needed_lines[line_list[4]]->index(),
-		    needed_lines[line_list[5]]->index(),
-		    needed_lines[line_list[6]]->index(),
-		    needed_lines[line_list[7]]->index()),
-					       // bottom face
-	      Quad (needed_lines[line_list[0]]->index(),
-		    needed_lines[line_list[9]]->index(),
-		    needed_lines[line_list[4]]->index(),
-		    needed_lines[line_list[8]]->index()),
-					       // right face
-	      Quad (needed_lines[line_list[9]]->index(),
-		    needed_lines[line_list[5]]->index(),
-		    needed_lines[line_list[10]]->index(),
-		    needed_lines[line_list[1]]->index()),
-					       // top face
-	      Quad (needed_lines[line_list[2]]->index(),
-		    needed_lines[line_list[10]]->index(),
-		    needed_lines[line_list[6]]->index(),
-		    needed_lines[line_list[11]]->index()),
-					       // left face
-	      Quad (needed_lines[line_list[8]]->index(),
-		    needed_lines[line_list[7]]->index(),
-		    needed_lines[line_list[11]]->index(),
-		    needed_lines[line_list[3]]->index())    };
+      Quad faces[GeometryInfo<dim>::faces_per_cell];
+				       // given a face line number
+				       // (0-3) on a specific face we
+				       // get the cell line number
+				       // (0-11) through the
+				       // face_to_cell_lines function
+      for$(unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	faces[face]=Quad (
+	  needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,0)]]->index(),
+	  needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,1)]]->index(),
+	  needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,2)]]->index(),
+	  needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,3)]]->index());
 
       for (unsigned int quad=0; quad<6; ++quad)
         {
@@ -1120,57 +1024,20 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // bounded by these lines;
 					   // these are then the faces
 					   // of the present cell
-	  std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell] = {
-                                                 // note the order of the vertices
-                                                 // front face
-	      std::make_pair (cells[c].vertices[0], cells[c].vertices[1]),
-	      std::make_pair (cells[c].vertices[1], cells[c].vertices[2]),
-	      std::make_pair (cells[c].vertices[3], cells[c].vertices[2]),
-	      std::make_pair (cells[c].vertices[0], cells[c].vertices[3]),
-					       // back face
-	      std::make_pair (cells[c].vertices[4], cells[c].vertices[5]),
-	      std::make_pair (cells[c].vertices[5], cells[c].vertices[6]),
-	      std::make_pair (cells[c].vertices[7], cells[c].vertices[6]),
-	      std::make_pair (cells[c].vertices[4], cells[c].vertices[7]),
-					       // connects of front and back face
-	      std::make_pair (cells[c].vertices[0], cells[c].vertices[4]),
-	      std::make_pair (cells[c].vertices[1], cells[c].vertices[5]),
-	      std::make_pair (cells[c].vertices[2], cells[c].vertices[6]),
-	      std::make_pair (cells[c].vertices[3], cells[c].vertices[7])
-	      };
+	  std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell];
+	  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+	    line_list[line]=std::make_pair(
+	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
+	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
 
-	  Quad faces[GeometryInfo<dim>::faces_per_cell]
-	    = {
-						   // front face
-		  Quad (needed_lines[line_list[0]]->index(),
-			needed_lines[line_list[1]]->index(),
-			needed_lines[line_list[2]]->index(),
-			needed_lines[line_list[3]]->index()),
-						   // back face
-		  Quad (needed_lines[line_list[4]]->index(),
-			needed_lines[line_list[5]]->index(),
-			needed_lines[line_list[6]]->index(),
-			needed_lines[line_list[7]]->index()),
-						   // bottom face
-		  Quad (needed_lines[line_list[0]]->index(),
-			needed_lines[line_list[9]]->index(),
-			needed_lines[line_list[4]]->index(),
-			needed_lines[line_list[8]]->index()),
-						   // right face
-		  Quad (needed_lines[line_list[9]]->index(),
-			needed_lines[line_list[5]]->index(),
-			needed_lines[line_list[10]]->index(),
-			needed_lines[line_list[1]]->index()),
-						   // top face
-		  Quad (needed_lines[line_list[2]]->index(),
-			needed_lines[line_list[10]]->index(),
-			needed_lines[line_list[6]]->index(),
-			needed_lines[line_list[11]]->index()),
-						   // left face
-		  Quad (needed_lines[line_list[8]]->index(),
-			needed_lines[line_list[7]]->index(),
-			needed_lines[line_list[11]]->index(),
-			needed_lines[line_list[3]]->index())    };
+	  
+	  Quad faces[GeometryInfo<dim>::faces_per_cell];
+	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	    faces[face]=Quad (
+	      needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,0)]]->index(),
+	      needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,1)]]->index(),
+	      needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,2)]]->index(),
+	      needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,3)]]->index());
 
 					   // get the iterators
 					   // corresponding to the
@@ -1217,13 +1084,13 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 
                                            // set orientation flag for
                                            // each of the faces
-	  for (unsigned int quad=0; quad<6; ++quad)
+	  for (unsigned int quad=0; quad<GeometryInfo<dim>::faces_per_cell; ++quad)
             cell->set_face_orientation (quad, face_orientation[quad]);
           
 					   // note that this cell is
 					   // adjacent to the six
 					   // quads
-	  for (unsigned int quad=0; quad<6; ++quad)
+	  for (unsigned int quad=0; quad<GeometryInfo<dim>::faces_per_cell; ++quad)
 	    adjacent_cells[face_iterator[quad]->index()].push_back (cell);
 
           
@@ -1232,6 +1099,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // ordering; if the lines
 					   // are right, so are the
 					   // vertices
+					   // TODO: simplify this
 	  Assert (face_iterator[0]->line(face_orientation[0] ? 0 : 3) ==
                   face_iterator[2]->line(face_orientation[2] ? 0 : 3),
 		  ExcInternalErrorOnCell(c));
@@ -1397,7 +1265,6 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
     {
       quad_iterator quad;
       line_iterator line[4];
-      std::vector <int> quad_vertices(4);
  
 				       // first find the lines that
 				       // are made up of the given
@@ -1406,35 +1273,33 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // finally use the find
 				       // function of the map template
 				       // to find the quad
-      std::pair <int, int> line_vertices[4]
-	= {   std::make_pair (boundary_quad->vertices[0], boundary_quad->vertices[1]),
-	      std::make_pair (boundary_quad->vertices[1], boundary_quad->vertices[2]),
-	      std::make_pair (boundary_quad->vertices[3], boundary_quad->vertices[2]),
-	      std::make_pair (boundary_quad->vertices[0], boundary_quad->vertices[3]) };
-       
       for (unsigned int i=0; i<4; ++i)
 	{
+	  std::pair<int, int> line_vertices(
+	    boundary_quad->vertices[GeometryInfo<dim-1>::line_to_cell_vertices(i,0)],
+	    boundary_quad->vertices[GeometryInfo<dim-1>::line_to_cell_vertices(i,1)]);
+	  
 					   // check whether line
 					   // already exists
-	  if (needed_lines.find(line_vertices[i]) != needed_lines.end())
-	    line[i] = needed_lines[line_vertices[i]];
+	  if (needed_lines.find(line_vertices) != needed_lines.end())
+	    line[i] = needed_lines[line_vertices];
 	  else
 					     // look wether it exists
 					     // in reverse direction
 	    {
-	      std::swap (line_vertices[i].first, line_vertices[i].second);
-	      if (needed_lines.find(line_vertices[i]) != needed_lines.end())
-		line[i] = needed_lines[line_vertices[i]];
+	      std::swap (line_vertices.first, line_vertices.second);
+	      if (needed_lines.find(line_vertices) != needed_lines.end())
+		line[i] = needed_lines[line_vertices];
 	      else
 		{
 						   // line does not
 						   // exist
-		  AssertThrow (false, ExcLineInexistant(line_vertices[i].first,
-							line_vertices[i].second));
+		  AssertThrow (false, ExcLineInexistant(line_vertices.first,
+							line_vertices.second));
 		  line[i] = end_line();
-		};
-	    };
-	};  
+		}
+	    }
+	}
       
  
 				       // Set up 2 quads that are
@@ -1450,7 +1315,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // orientation does not carry
 				       // any information.
       Quad quad_compare_1(line[0]->index(), line[1]->index(), line[2]->index(), line[3]->index());
-      Quad quad_compare_2(line[3]->index(), line[2]->index(), line[1]->index(), line[0]->index());      
+      Quad quad_compare_2(line[3]->index(), line[2]->index(), line[1]->index(), line[0]->index());
       
 				       // try to find the quad with
 				       // lines situated as
@@ -1509,8 +1374,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                      ExcMessage ("Duplicate boundary quads are only allowed "
                                  "if they carry the same boundary indicator."));
       quad->set_boundary_indicator (boundary_quad->material_id); 
-    };
-        						    			       
+    }
 
 
 				   /////////////////////////////////////////
