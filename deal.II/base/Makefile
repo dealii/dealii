@@ -50,7 +50,7 @@ maybe-define-dimension  = $(patsubst %,-Ddata_out_dimension=%,$(maybe-define-dim
 lib/go/%.go :
 	@echo =================== Compiling with debugging information:   $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
 lib/o/%.o :
 	@echo =================== Compiling with optimization:   $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
@@ -87,7 +87,7 @@ clean:
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@perl $D/common/scripts/Make_dep_2.pl $(INCLUDE) $(cc-files) \
-		| perl -p -e 's!(lib/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2!g;' \
+		| perl -p -e 's!(lib/g?o/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2!g;' \
 		> lib/Makefile.dep
 
 
