@@ -670,22 +670,23 @@
       <li>
       <p>
       <acronym>deal.II</acronym> can interface to the <a
-      href="http://www.mcs.anl.gov/petsc/">PETSc</a> library. PETSc's 
-      main strength is to provide lots of functions for linear algebra, among
-      several other things. It comes with implementations of a variety of
-      linear solvers, as well as various different sparse and dense matrix and
-      vector formats, for which <acronym>deal.II</acronym> has wrapper classes
-      that provide almost the same interfaces as the built-in
-      <acronym>deal.II</acronym> linear algebra classes. The main advantage of
-      PETSc is the variety of its algorithms, and that all of them can work in
-      a parallel setting, i.e. matrices and vectors can be distributed across
-      a cluster of computers that communicate via MPI. This makes PETSc the
-      choice of linear algrebra implementations for very large problems that
-      do not fit into a single computer's memory or have run-times that are
-      too long for a single computer. At present, our interfaces are only
-      wrappers for vector and matrix formats, as well as to their solver and
-      preconditioner classes. However, we plan to extend this to a tighter
-      coupling in the future.
+      href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a>
+      library. PETSc's main strength is to provide lots of functions for
+      linear algebra, among several other things. It comes with
+      implementations of a variety of linear solvers, as well as various
+      different sparse and dense matrix and vector formats, for which
+      <acronym>deal.II</acronym> has wrapper classes that provide almost the
+      same interfaces as the built-in <acronym>deal.II</acronym> linear
+      algebra classes. The main advantage of PETSc is the variety of its
+      algorithms, and that all of them can work in a parallel setting,
+      i.e. matrices and vectors can be distributed across a cluster of
+      computers that communicate via MPI. This makes PETSc the choice of
+      linear algrebra implementations for very large problems that do not fit
+      into a single computer's memory or have run-times that are too long for
+      a single computer. At present, our interfaces are only wrappers for
+      vector and matrix formats, as well as to their solver and preconditioner
+      classes. However, we plan to extend this to a tighter coupling in the
+      future.
       </p>
 
       <p>
@@ -714,6 +715,31 @@
       useless. All these problems have been reported and are supposed to be
       fixed in 2.2.0. Versions prior to 2.1.6 are likely not to work, but have
       not been tested.
+      </p>
+
+
+      <li>
+      <p>
+      In order to generate partitionings of triangulations, we have functions
+      that call <a href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
+      target="_top">METIS</a> library. METIS is a function that provides
+      various methods to partition graphs, which we use to define which cell
+      belongs to which part of a triangulation. The main point in using METIS
+      is to generate partitions so that the interfaces between cell blocks are
+      as small as possible. This data can, in turn, be used to distribute
+      degrees of freedom onto different processors when using PETSc in
+      parallel mode.
+      </p>
+
+      <p>
+      As with PETSc, the use of METIS is optional. If you wish to use it, you
+      can do so by having a METIS installation around at the time of calling
+      <code>./configure</code>. You can let <code>./configure</code> know
+      about this by either setting a <code>METIS_DIR</code> environment
+      variable denoting the path to the METIS library, or by transmitting this
+      information to <code>./configure</code> using the
+      <code>--with-metis</code> flag. We have tested our interface code with
+      METIS version 4.0.1, and newer versions should presumable work as well.
       </p>
       
 
