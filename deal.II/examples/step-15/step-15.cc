@@ -799,8 +799,7 @@ void MinimizationProblem<dim>::do_step ()
     hanging_node_constraints.distribute (update);
   }
 
-  const double step_length = line_search (update);
-  present_solution.add (step_length, update);
+  present_solution.add (line_search (update), update);
 }
 
 
@@ -1018,9 +1017,8 @@ void MinimizationProblem<dim>::run ()
   while (true)
     {
       setup_system_on_mesh ();
-
-      unsigned int iteration=0;
-      for (; iteration<5; ++iteration)
+      
+      for (unsigned int iteration=0; iteration<5; ++iteration)
         do_step ();
 
       const double this_energy = energy (dof_handler, present_solution);
