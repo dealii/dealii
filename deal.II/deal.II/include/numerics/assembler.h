@@ -1,8 +1,19 @@
-/*----------------------------   problem_assembler.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __problem_assembler_H
-#define __problem_assembler_H
+//----------------------------  assembler.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  assembler.h  ---------------------------
+#ifndef __deal2__assembler_h
+#define __deal2__assembler_h
+
+
 /*----------------------------   problem_assembler.h     ---------------------------*/
 
 #include <base/exceptions.h>
@@ -10,9 +21,6 @@
 #include <dofs/dof_accessor.h>
 #include <fe/fe_values.h>
 #include <vector>
-
-
-
 
 
 /**
@@ -121,9 +129,6 @@ class Equation {
 };
 
 
-
-
-
 /**
  * An #Assembler# is a specialized version of a #DoFCellAccessor# which adds
  * functionality to assemble global matrices and vectors from cell base ones.
@@ -200,10 +205,9 @@ class Assembler : public DoFCellAccessor<dim> {
 					  */
 	const UpdateFlags       update_flags;
     };
-    
 
-    
-				     /**
+
+/**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
@@ -295,11 +299,8 @@ class Assembler : public DoFCellAccessor<dim> {
     FEValues<dim>     fe_values;
 };
 
-    
-    
-
 
 /*----------------------------   problem_assembler.h     ---------------------------*/
-/* end of #ifndef __problem_assembler_H */
+
 #endif
 /*----------------------------   problem_assembler.h     ---------------------------*/

@@ -1,13 +1,20 @@
-/*----------------------------   tria_boundary_lib.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __tria_boundary_lib_H
-#define __tria_boundary_lib_H
-/*----------------------------   tria_boundary_lib.h     ---------------------------*/
+//----------------------------  tria_boundary_lib.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_boundary_lib.h  ---------------------------
+#ifndef __deal2__tria_boundary_lib_h
+#define __deal2__tria_boundary_lib_h
 
 
 #include <grid/tria_boundary.h>
-
-
 
 
 /**
@@ -73,7 +80,6 @@ class HyperBallBoundary : public StraightBoundary<dim> {
 };
 
 
-
 /**
  * Variant of #HyperBallBoundary# which denotes a half hyper ball
  * where the first coordinate is restricted to the range $x>=0$ (or
@@ -107,8 +113,6 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim> {
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 };
-
-    
 
 
 /**
@@ -150,9 +154,4 @@ class HyperShellBoundary : public StraightBoundary<dim>
 };
 
 
-
-
-/*----------------------------   tria_boundary_lib.h     ---------------------------*/
-/* end of #ifndef __tria_boundary_lib_H */
 #endif
-/*----------------------------   tria_boundary_lib.h     ---------------------------*/

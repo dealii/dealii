@@ -1,8 +1,19 @@
-/*----------------------------   dof.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __dof_H
-#define __dof_H
+//----------------------------  dof_handler.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_handler.h  ---------------------------
+#ifndef __deal2__dof_handler_h
+#define __deal2__dof_handler_h
+
+
 /*----------------------------   dof.h     ---------------------------*/
 
 #include <vector>
@@ -14,11 +25,6 @@
 #include <lac/forward_declarations.h>
 
 
-
-
-
-
-
 /**
  * Define some types which differ between the dimensions. This class
  * is analogous to the \Ref{TriaDimensionInfo} class hierarchy.
@@ -28,9 +34,6 @@
  */
 template <int dim>
 class DoFDimensionInfo;
-
-
-
 
 
 /**
@@ -62,10 +65,6 @@ class DoFDimensionInfo<1> {
 };
 
 
-
-
-
-
 /**
  * Define some types for the DoF handling in two dimensions.
  *
@@ -95,7 +94,6 @@ class DoFDimensionInfo<2> {
 };
 
 
-
 /**
  * Define some types for the DoF handling in two dimensions.
  *
@@ -123,11 +121,6 @@ class DoFDimensionInfo<3> {
     typedef quad_iterator        face_iterator;
     typedef active_quad_iterator active_face_iterator;    
 };
-
-
-
-
-
 
 
 /**
@@ -726,8 +719,8 @@ class DoFHandler  :  public Subscriptor,
     active_face_iterator last_active_face (const unsigned int level) const;
 				     //@}
 
-    
-				     /*---------------------------------------*/
+
+/*---------------------------------------*/
 
 				     /**
 				      *  @name Line iterator functions
@@ -786,7 +779,7 @@ class DoFHandler  :  public Subscriptor,
     active_line_iterator end_active_line (const unsigned int level) const;
 
 
-				     /**
+/**
 				      *  Return an iterator pointing to the
 				      *  last line, used or not.
 				      */
@@ -883,7 +876,7 @@ class DoFHandler  :  public Subscriptor,
     active_quad_iterator end_active_quad (const unsigned int level) const;
 
 
-				     /**
+/**
 				      *  Return an iterator pointing to the
 				      *  last quad, used or not.
 				      */
@@ -1030,7 +1023,7 @@ class DoFHandler  :  public Subscriptor,
 				     /*---------------------------------------*/
 
 
-				     /**
+/**
 				      * Return number of degrees of freedom.
 				      * Included in this number are those
 				      * DoFs which are constrained by
@@ -1205,8 +1198,8 @@ class DoFHandler  :  public Subscriptor,
 				      * of freedom located at vertices.
 				      */
     vector<unsigned int>      vertex_dofs;
-    
-    
+
+
 #if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
 				     // this seems to be disallowed
 				     // by the standard, so gcc2.95
@@ -1223,10 +1216,6 @@ class DoFHandler  :  public Subscriptor,
 };
 
 
-
-
-
-
 /* ----------------------- Inline functions ---------------------------------- */
 
 
@@ -1238,7 +1227,6 @@ unsigned int DoFHandler<dim>::n_dofs () const
 };
 
 
-
 template <int dim>
 inline
 const FiniteElement<dim> & DoFHandler<dim>::get_fe () const
@@ -1247,11 +1235,7 @@ const FiniteElement<dim> & DoFHandler<dim>::get_fe () const
 };
 
 
-
-
-
-
 /*----------------------------   dof.h     ---------------------------*/
-/* end of #ifndef __dof_H */
+
 #endif
 /*----------------------------   dof.h     ---------------------------*/

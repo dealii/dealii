@@ -1,10 +1,20 @@
-/*----------------------------   tria-iterator.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __tria_iterator_H
-#define __tria_iterator_H
-/*----------------------------   tria-iterator.h     ---------------------------*/
+//----------------------------  tria_iterator.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_iterator.h  ---------------------------
+#ifndef __deal2__tria_iterator_h
+#define __deal2__tria_iterator_h
 
+
+/*----------------------------   tria-iterator.h     ---------------------------*/
 
 
 #include <iterator>
@@ -19,9 +29,6 @@
 // this includes a lot of templates and thus makes compilation
 // slower, but at the same time allows for more aggressive
 // inlining and thus faster code.
-
-
-
 
 
 /**
@@ -446,9 +453,8 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
 				      */
     void print (ostream &out) const;
 
-    
-    
-				     /**@name Exceptions*/
+
+/**@name Exceptions*/
 				     /*@{*/
 				     /**
 				      *  Exception
@@ -471,7 +477,7 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
     Accessor accessor;
 
 
-				     /**
+/**
 				      * Make all other iterator class templates
 				      * friends of this class. This is
 				      * necessary for the implementation of
@@ -488,11 +494,6 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
     template <int anydim, typename SomeAccessor> friend class TriaIterator;
     template <int anydim, typename SomeAccessor> friend class TriaActiveIterator;
 };
-
-
-
-
-
 
 
 /**
@@ -638,11 +639,6 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
 				      */
     DeclException0 (ExcAssignmentOfUnusedObject);
 };
-
-
-
-
-
 
 
 /**
@@ -811,12 +807,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
 };
 
 
-
-
-
-
 /*----------------------- Inline functions -------------------*/
-
 
 
 template <int dim, typename Accessor>
@@ -826,14 +817,12 @@ TriaRawIterator<dim,Accessor>::TriaRawIterator (const Accessor &a) :
 {};
 
 
-
 template <int dim, typename Accessor>
 template <typename OtherAccessor>
 inline
 TriaRawIterator<dim,Accessor>::TriaRawIterator (const TriaRawIterator<dim,OtherAccessor> &i)
 		: accessor (i.accessor)
 {};
-
 
 
 template <int dim, typename Accessor>
@@ -845,8 +834,6 @@ TriaRawIterator<dim,Accessor>::operator * () const {
 };
 
 
-
-
 template <int dim, typename Accessor>
 inline
 Accessor &
@@ -854,7 +841,6 @@ TriaRawIterator<dim,Accessor>::operator * () {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return accessor;
 };
-
 
 
 template <int dim, typename Accessor>
@@ -865,7 +851,6 @@ TriaRawIterator<dim,Accessor>::operator -> () const {
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 Accessor *
@@ -874,15 +859,12 @@ TriaRawIterator<dim,Accessor>::operator -> () {
 };
 
 
-
-
 template <int dim, typename Accessor>
 inline
 IteratorState
 TriaRawIterator<dim,Accessor>::state () const {
   return accessor.state ();
 };
-
 
 
 // sorry that the declaration of this function looks so ragged; I had
@@ -905,7 +887,6 @@ TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const {
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaRawIterator<dim,Accessor> &
@@ -915,7 +896,6 @@ TriaRawIterator<dim,Accessor>::operator ++ () {
   ++accessor;
   return *this;
 };
-
 
 
 template <int dim, typename Accessor>
@@ -929,7 +909,6 @@ TriaRawIterator<dim,Accessor>::operator -- () {
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 void
@@ -938,14 +917,12 @@ TriaRawIterator<dim,Accessor>::print (ostream &out) const {
 };
 
 
-
 template <int dim, typename Accessor>
 template <typename OtherAccessor>
 inline
 TriaIterator<dim,Accessor>::TriaIterator (const TriaIterator<dim,OtherAccessor> &i)
 		: TriaRawIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
 {};
-
 
 
 template <int dim, typename Accessor>
@@ -968,14 +945,12 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,OtherAccesso
 };
 
 
-
 template <int dim, typename Accessor>
 template <typename OtherAccessor>
 inline
 TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i)
 		: TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
 {};
-
 
 
 template <int dim, typename Accessor>
@@ -998,16 +973,12 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 };
 
 
-
-
-
 template <int dim, typename Accessor>
 inline
 ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i) {
   i.print(out);
   return out;
 };
-
 
 
 template <int dim, typename Accessor>
@@ -1018,14 +989,12 @@ ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i) {
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 ostream & operator << (ostream &out, const TriaActiveIterator<dim,Accessor> &i) {
   i.print(out);
   return out;
 };
-
 
 
 // if in optimized mode: include more templates
@@ -1035,7 +1004,7 @@ ostream & operator << (ostream &out, const TriaActiveIterator<dim,Accessor> &i) 
 
 
 /*----------------------------   tria-iterator.h     ---------------------------*/
-/* end of #ifndef __tria_iterator_H */
+
 #endif
 /*----------------------------   tria-iterator.h     ---------------------------*/
 

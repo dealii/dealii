@@ -1,9 +1,18 @@
-/*----------------------------   tria_iterator.templates.h     ---------------------------*/
-/*      Copyright W. Bangerth, University of Heidelberg, 1998                             */
-/*      $Id$                 */
-#ifndef __tria_iterator_templates_H
-#define __tria_iterator_templates_H
-/*----------------------------   tria_iterator.templates.h     ---------------------------*/
+//----------------------------  tria_iterator.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_iterator.templates.h  ---------------------------
+#ifndef __deal2__tria_iterator_templates_h
+#define __deal2__tria_iterator_templates_h
+
 
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -15,7 +24,6 @@
 */
 
 
-
 /*------------------------ Functions: TriaRawIterator ------------------*/
 
 
@@ -25,12 +33,10 @@ TriaRawIterator<dim,Accessor>::TriaRawIterator () :
 		accessor (0, -2, -2, 0) {};
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaRawIterator<dim,Accessor>::TriaRawIterator (const TriaRawIterator<dim,Accessor> &i) :
 		accessor (i.accessor) {};
-
 
 
 template <int dim, typename Accessor>
@@ -40,7 +46,6 @@ TriaRawIterator<dim,Accessor>::TriaRawIterator (Triangulation<dim> *parent,
 						const int           index,
 						const typename Accessor::AccessorData *local_data) :
 		accessor (parent, level, index, local_data) {};
-
 
 
 template <int dim, typename Accessor>
@@ -53,14 +58,12 @@ TriaRawIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 bool
 TriaRawIterator<dim,Accessor>::operator == (const TriaRawIterator<dim,Accessor> &i) const {
   return accessor == i.accessor;
 };
-
 
 
 template <int dim, typename Accessor>
@@ -82,7 +85,6 @@ TriaRawIterator<dim,Accessor>::operator != (const TriaRawIterator<dim,Accessor> 
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaRawIterator<dim,Accessor>
@@ -94,7 +96,6 @@ TriaRawIterator<dim,Accessor>::operator ++ (int) {
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaRawIterator<dim,Accessor>
@@ -104,8 +105,6 @@ TriaRawIterator<dim,Accessor>::operator -- (int) {
   
   return tmp;
 };
-
-
 
 
 /*-----------------------  functions: TriaIterator ---------------*/
@@ -121,7 +120,6 @@ template <int dim, typename Accessor>
 inline
 TriaIterator<dim,Accessor>::TriaIterator (const TriaIterator<dim,Accessor> &i) :
 		TriaRawIterator<dim,Accessor> (static_cast<TriaRawIterator<dim,Accessor> >(i)) {};
-
 
 
 template <int dim, typename Accessor>
@@ -141,7 +139,6 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,Accessor> &i
 	    ExcAssignmentOfUnusedObject());
 #endif  
 };
-
 
 
 template <int dim, typename Accessor>
@@ -164,7 +161,6 @@ TriaIterator<dim,Accessor>::TriaIterator (Triangulation<dim> *parent,
 	    ExcAssignmentOfUnusedObject());
 #endif  
 };
-
 
 
 template <int dim, typename Accessor>
@@ -196,7 +192,6 @@ TriaIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) 
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaIterator<dim,Accessor> & TriaIterator<dim,Accessor>::operator ++ () {
@@ -208,7 +203,6 @@ TriaIterator<dim,Accessor> & TriaIterator<dim,Accessor>::operator ++ () {
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaIterator<dim,Accessor>  TriaIterator<dim,Accessor>::operator ++ (int) {
@@ -217,7 +211,6 @@ TriaIterator<dim,Accessor>  TriaIterator<dim,Accessor>::operator ++ (int) {
   
   return tmp;
 };
-
 
 
 template <int dim, typename Accessor>
@@ -243,7 +236,6 @@ TriaIterator<dim,Accessor>::operator -- (int) {
 };
 
 
-
 /*-----------------------  functions: TriaActiveIterator ---------------*/
 
 
@@ -253,12 +245,10 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator () :
 		TriaIterator<dim,Accessor> () {};
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaActiveIterator<dim,Accessor> &i) :
 		TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,Accessor> >(i)) {};
-
 
 
 template <int dim, typename Accessor>
@@ -299,7 +289,6 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaIterator<dim,Acc
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor>::TriaActiveIterator (Triangulation<dim> *parent,
@@ -322,7 +311,6 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (Triangulation<dim> *parent
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor> &
@@ -330,7 +318,6 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaActiveIterator<dim,Acces
   accessor.copy_from (i.accessor);
   return *this;
 };
-
 
 
 template <int dim, typename Accessor>
@@ -353,7 +340,6 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor> &
@@ -374,7 +360,6 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor> &
@@ -387,7 +372,6 @@ TriaActiveIterator<dim,Accessor>::operator ++ () {
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor>
@@ -397,7 +381,6 @@ TriaActiveIterator<dim,Accessor>::operator ++ (int) {
   
   return tmp;
 };
-
 
 
 template <int dim, typename Accessor>
@@ -412,7 +395,6 @@ TriaActiveIterator<dim,Accessor>::operator -- () {
 };
 
 
-
 template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor> TriaActiveIterator<dim,Accessor>::operator -- (int) {
@@ -423,9 +405,4 @@ TriaActiveIterator<dim,Accessor> TriaActiveIterator<dim,Accessor>::operator -- (
 };
 
 
-
-
-/*----------------------------   tria_iterator.templates.h     ---------------------------*/
-/* end of #ifndef __tria_iterator_templates_H */
 #endif
-/*----------------------------   tria_iterator.templates.h     ---------------------------*/

@@ -1,17 +1,24 @@
-/*----------------------------   data_io.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __data_io_H
-#define __data_io_H
-/*----------------------------   data_io.h     ---------------------------*/
+//----------------------------  data_io.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  data_io.h  ---------------------------
+#ifndef __deal2__data_io_h
+#define __deal2__data_io_h
+
 
 #include <base/exceptions.h>
 #include <grid/forward_declarations.h>
 #include <lac/forward_declarations.h>
 #include <vector>
 #include <string>
-
-
 
 
 /**
@@ -476,7 +483,7 @@ class DataOut_Old {
     vector<DataEntry>  cell_data;
 
 
-				     /**
+/**
 				      * Return the number of faces in the
 				      * triangulation which have a boundary
 				      * indicator not equal to zero. Only
@@ -590,8 +597,6 @@ class DataOut_Old {
 	bool operator < (const EpsCellData &) const;
     };
 };
-
-
 
 
 /**
@@ -715,8 +720,5 @@ class EpsOutputData{
 };
 
 
-/*----------------------------   data_io.h     ---------------------------*/
-/* end of #ifndef __data_io_H */
 #endif
-/*----------------------------   data_io.h     ---------------------------*/
 

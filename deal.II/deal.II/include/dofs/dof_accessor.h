@@ -1,8 +1,19 @@
-/*----------------------------   dof_iterator.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __dof_iterator_H
-#define __dof_iterator_H
+//----------------------------  dof_accessor.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_accessor.h  ---------------------------
+#ifndef __deal2__dof_accessor_h
+#define __deal2__dof_accessor_h
+
+
 /*----------------------------   dof_iterator.h     ---------------------------*/
 
 
@@ -16,7 +27,6 @@
 // this includes a lot of templates and thus makes compilation
 // slower, but at the same time allows for more aggressive
 // inlining and thus faster code.
-
 
 
 /**
@@ -113,8 +123,6 @@ class DoFAccessor
 };
 
 
-
-
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -142,7 +150,6 @@ class DoFObjectAccessor_Inheritance
 };
 
 
-
 /**
  * This is a switch class which only declares a #typedef#. It is meant to
  * determine which class a #DoFObjectAccessor# class is to be derived
@@ -168,10 +175,7 @@ class DoFObjectAccessor_Inheritance<dim,dim>
 };
 
 
-
-
 /* -------------------------------------------------------------------------- */
-
 
 
 /**
@@ -387,7 +391,6 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 };
 
 
-
 /**
  * Closure class.
  */
@@ -410,7 +413,6 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
 	Assert (false, ExcInternalError());
       }
 };
-
 
 
 /**
@@ -603,7 +605,6 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 };
 
 
-
 /**
  * Grant access to the degrees of freedom located on quads.
  *
@@ -777,9 +778,6 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      */
     void copy_from (const DoFObjectAccessor<2, dim> &a);
 };
-
-
-
 
 
 /**
@@ -961,7 +959,6 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      */
     void copy_from (const DoFObjectAccessor<3, dim> &a);
 };
-
 
 
 /**
@@ -1154,19 +1151,13 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 };
 
 
-
-
-
 // if in optimized mode: include more templates
 #ifndef DEBUG
 #  include "dof_accessor.templates.h"
 #endif
 
 
-
-
-
 /*----------------------------   dof_iterator.h     ---------------------------*/
-/* end of #ifndef __dof_iterator_H */
+
 #endif
 /*----------------------------   dof_iterator.h     ---------------------------*/

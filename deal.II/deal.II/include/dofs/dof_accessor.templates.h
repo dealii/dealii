@@ -1,8 +1,17 @@
-/*----------------------------   dof_accessor.templates.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __dof_accessor_templates_H
-#define __dof_accessor_templates_H
-/*----------------------------   dof_accessor.templates.h     ---------------------------*/
+//----------------------------  dof_accessor.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_accessor.templates.h  ---------------------------
+#ifndef __deal2__dof_accessor_templates_h
+#define __deal2__dof_accessor_templates_h
 
 
 #include <dofs/dof_accessor.h>
@@ -34,8 +43,6 @@ DoFObjectAccessor<1,dim>::dof_index (const unsigned int i) const
 };
 
 
-
-
 template <int dim>
 inline
 unsigned int
@@ -53,7 +60,6 @@ DoFObjectAccessor<1,dim>::vertex_dof_index (const unsigned int vertex,
 				   i);
   return dof_handler->vertex_dofs[dof_number];
 };
-
 
 
 template <int dim>
@@ -78,7 +84,6 @@ DoFObjectAccessor<1,dim>::get_dof_indices (vector<unsigned int> &dof_indices) co
 };
 
 
-
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<1,dim> >
@@ -97,7 +102,6 @@ DoFObjectAccessor<1,dim>::child (const unsigned int i) const
 };
 
 
-
 template <int dim>
 inline
 void
@@ -106,8 +110,6 @@ DoFObjectAccessor<1,dim>::copy_from (const DoFObjectAccessor<1,dim> &a)
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
-
-
 
 
 /*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
@@ -126,7 +128,6 @@ unsigned int DoFObjectAccessor<2,dim>::dof_index (const unsigned int i) const
   return dof_handler->levels[present_level]
     ->quad_dofs[present_index*dof_handler->selected_fe->dofs_per_quad+i];
 };
-
 
 
 template <int dim>
@@ -148,7 +149,6 @@ DoFObjectAccessor<2,dim>::vertex_dof_index (const unsigned int vertex,
 };
 
 
-  
 template <int dim>
 inline
 void
@@ -176,7 +176,6 @@ DoFObjectAccessor<2,dim>::get_dof_indices (vector<unsigned int> &dof_indices) co
 };
 
 
-
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<1,dim> >
@@ -192,7 +191,6 @@ DoFObjectAccessor<2,dim>::line (const unsigned int i) const
       dof_handler
     );
 };
-
 
 
 template <int dim>
@@ -213,7 +211,6 @@ DoFObjectAccessor<2,dim>::child (const unsigned int i) const
 };
 
 
-
 template <int dim>
 inline
 void
@@ -222,8 +219,6 @@ DoFObjectAccessor<2,dim>::copy_from (const DoFObjectAccessor<2,dim> &a)
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
-
-
 
 
 /*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
@@ -246,7 +241,6 @@ DoFObjectAccessor<3,dim>::dof_index (const unsigned int i) const
 };
 
 
-
 template <int dim>
 inline
 unsigned int
@@ -266,7 +260,6 @@ DoFObjectAccessor<3,dim>::vertex_dof_index (const unsigned int vertex,
 };
 
 
-  
 template <int dim>
 inline
 void
@@ -299,7 +292,6 @@ DoFObjectAccessor<3,dim>::get_dof_indices (vector<unsigned int> &dof_indices) co
 };
 
 
-
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<1,dim> >
@@ -314,7 +306,6 @@ DoFObjectAccessor<3,dim>::line (const unsigned int i) const
       dof_handler
     );
 };
-
 
 
 template <int dim>
@@ -332,7 +323,6 @@ DoFObjectAccessor<3,dim>::quad (const unsigned int i) const
       dof_handler
     );
 };
-
 
 
 template <int dim>
@@ -353,15 +343,12 @@ DoFObjectAccessor<3,dim>::child (const unsigned int i) const
 };
 
 
-
 template <int dim>
 void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a)
 {
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
-
-
 
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
@@ -385,7 +372,6 @@ DoFCellAccessor<dim>::neighbor (const unsigned int i) const
 };
 
 
-
 template <int dim>
 inline
 TriaIterator<dim,DoFCellAccessor<dim> >
@@ -404,12 +390,4 @@ DoFCellAccessor<dim>::child (const unsigned int i) const
 };
 
 
-
-
-
-
-
-/*----------------------------   dof_accessor.templates.h     ---------------------------*/
-/* end of #ifndef __dof_accessor_templates_H */
 #endif
-/*----------------------------   dof_accessor.templates.h     ---------------------------*/

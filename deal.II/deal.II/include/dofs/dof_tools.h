@@ -1,14 +1,24 @@
-/*----------------------------   dof_tools.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __dof_tools_H
-#define __dof_tools_H
-/*----------------------------   dof_tools.h     ---------------------------*/
+//----------------------------  dof_tools.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_tools.h  ---------------------------
+#ifndef __deal2__dof_tools_h
+#define __deal2__dof_tools_h
+
+
 // Copyright Wolfgang Bangerth, Guido Kanschat, and others 1999
 
 
 #include <lac/forward_declarations.h>
 #include <vector>
-
 
 
 /**
@@ -378,9 +388,4 @@ class DoFTools
 };
 
 
-
-
-/*----------------------------   dof_tools.h     ---------------------------*/
-/* end of #ifndef __dof_tools_H */
 #endif
-/*----------------------------   dof_tools.h     ---------------------------*/

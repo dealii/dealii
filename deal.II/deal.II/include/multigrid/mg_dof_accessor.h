@@ -1,14 +1,20 @@
-/*----------------------------   mg_dof_accessor.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __mg_dof_accessor_H
-#define __mg_dof_accessor_H
-/*----------------------------   mg_dof_accessor.h     ---------------------------*/
+//----------------------------  mg_dof_accessor.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  mg_dof_accessor.h  ---------------------------
+#ifndef __deal2__mg_dof_accessor_h
+#define __deal2__mg_dof_accessor_h
 
 
 #include <dofs/dof_accessor.h>
-
-
 
 
 /**
@@ -116,7 +122,6 @@ class MGDoFObjectAccessor_Inheritance
 };
 
 
-
 /**
  * This is a switch class which only declares a #typdef#. It is meant to
  * determine which class a #DoFObjectAccessor# class is to be derived
@@ -142,10 +147,7 @@ class MGDoFObjectAccessor_Inheritance<dim,dim>
 };
 
 
-
-
 /* -------------------------------------------------------------------------- */
-
 
 
 /**
@@ -159,7 +161,6 @@ template <int celldim, int dim>
 class MGDoFObjectAccessor :  public MGDoFAccessor<dim>,
 			     public MGDoFObjectAccessor_Inheritance<celldim, dim>::BaseClass
 {};
-
 
 
 /**
@@ -183,7 +184,6 @@ class MGDoFObjectAccessor<0, dim>
 	Assert (false, ExcInternalError());
       }
 };
-
 
 
 /**
@@ -326,10 +326,6 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 };
 
 
-
-
-
-
 /**
  * Grant access to the multilevel degrees of freedom located on quads.
  *
@@ -453,8 +449,6 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				      */
     void copy_from (const MGDoFObjectAccessor<2, dim> &a);
 };
-
-
 
 
 /**
@@ -588,7 +582,6 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 };
 
 
-
 /**
  * Grant access to the degrees of freedom on a cell. In fact, since all
  * access to the degrees of freedom has been enabled by the classes
@@ -662,12 +655,4 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
 };
 
 
-
-
-
-
-
-/*----------------------------   mg_dof_accessor.h     ---------------------------*/
-/* end of #ifndef __mg_dof_accessor_H */
 #endif
-/*----------------------------   mg_dof_accessor.h     ---------------------------*/

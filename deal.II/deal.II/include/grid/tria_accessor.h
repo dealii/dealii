@@ -1,9 +1,17 @@
-/*----------------------------   tria_accessor.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __tria_accessor_H
-#define __tria_accessor_H
-/*----------------------------   tria_accessor.h     ---------------------------*/
+//----------------------------  tria_accessor.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_accessor.h  ---------------------------
+#ifndef __deal2__tria_accessor_h
+#define __deal2__tria_accessor_h
 
 
 #include <base/exceptions.h>
@@ -17,10 +25,6 @@
 // this includes a lot of templates and thus makes compilation
 // slower, but at the same time allows for more aggressive
 // inlining and thus faster code.
-
-
-
-
 
 
 /**
@@ -62,8 +66,7 @@ class TriaAccessor
 		    tria (parent) {};
 
 
-	
-				     /**
+/**
 				      *  Copy operator. Since this is only
 				      *  called from iterators, do not
 				      *  return anything, since the
@@ -237,7 +240,6 @@ class TriaAccessor
     template <int anydim, typename Accessor> friend class TriaIterator;
     template <int anydim, typename Accessor> friend class TriaActiveIterator;
 };
-
 
 
 /**
@@ -616,7 +618,6 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 };
 
 
-
 /**
  * Closure class to stop induction of classes. Should never be called and thus
  * producesan error when created.
@@ -644,8 +645,6 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
 	Assert (false, ExcInternalError());
       };
 };
-
-
 
 
 /**
@@ -933,9 +932,8 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      */
     void operator = (const TriaObjectAccessor<1, dim> &);
 
-    
 
-  protected:
+protected:
     
 				     /**@name Advancement of iterators*/
 				     /*@{*/
@@ -969,7 +967,6 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      */
     template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
-
 
 
 /**
@@ -1332,7 +1329,6 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      */
     template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
-
 
 
 /**
@@ -1699,10 +1695,6 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 };
 
 
-
-
-
-
 /**
  * This class allows access to a cell: a line in one dimension, a quad
  * in two dimension, etc.
@@ -1826,7 +1818,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     void clear_refine_flag () const;
 
 
-    				     /**
+/**
 				      *  Return whether the coarsen flag
 				      *  is set or not.
 				      */
@@ -1912,19 +1904,12 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 };
 
 
-
 // if in optimized mode: include more templates
 #ifndef DEBUG
 #  include "tria_accessor.templates.h"
 #endif
 
 
-/*----------------------------   tria_accessor.h     ---------------------------*/
-/* end of #ifndef __tria_accessor_H */
 #endif
-/*----------------------------   tria_accessor.h     ---------------------------*/
-
-
-
 
 

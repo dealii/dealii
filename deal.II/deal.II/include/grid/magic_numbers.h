@@ -1,9 +1,17 @@
-/*----------------------------   magic_numbers.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __magic_numbers_H
-#define __magic_numbers_H
-/*----------------------------   magic_numbers.h     ---------------------------*/
+//----------------------------  magic_numbers.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  magic_numbers.h  ---------------------------
+#ifndef __deal2__magic_numbers_h
+#define __deal2__magic_numbers_h
 
 
 // This is a list of magic numbers used throughout the library.
@@ -26,8 +34,4 @@ const unsigned int mn_persistent_tria_flags_begin= 0xa200;
 const unsigned int mn_persistent_tria_flags_end  = 0xa201;
 
 
-
-/*----------------------------   magic_numbers.h     ---------------------------*/
-/* end of #ifndef __magic_numbers_H */
 #endif
-/*----------------------------   magic_numbers.h     ---------------------------*/

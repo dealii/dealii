@@ -1,15 +1,23 @@
-/*----------------------------   histogram.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __histogram_H
-#define __histogram_H
-/*----------------------------   histogram.h     ---------------------------*/
+//----------------------------  histogram.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  histogram.h  ---------------------------
+#ifndef __deal2__histogram_h
+#define __deal2__histogram_h
 
 
 #include <base/exceptions.h>
 #include <lac/forward_declarations.h>
 #include <vector>
 #include <string>
-
 
 
 /**
@@ -62,9 +70,9 @@ class Histogram
     enum IntervalSpacing {
 	  linear, logarithmic
     };
-    
 
-				     /**
+
+/**
 				      * Take several lists of values, each on
 				      * to produce one histogram that will
 				      * then be arrange one behind each other.
@@ -241,9 +249,4 @@ class Histogram
 };
 
 
-
-
-/*----------------------------   histogram.h     ---------------------------*/
-/* end of #ifndef __histogram_H */
 #endif
-/*----------------------------   histogram.h     ---------------------------*/

@@ -1,8 +1,17 @@
-/*----------------------------   tria_iterator_base.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __tria_iterator_base_H
-#define __tria_iterator_base_H
-/*----------------------------   tria_iterator_base.h     ---------------------------*/
+//----------------------------  tria_iterator_base.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_iterator_base.h  ---------------------------
+#ifndef __deal2__tria_iterator_base_h
+#define __deal2__tria_iterator_base_h
 
 
 /**
@@ -16,8 +25,4 @@ enum IteratorState {
 };
 
 
-
-/*----------------------------   tria_iterator_base.h     ---------------------------*/
-/* end of #ifndef __tria_iterator_base_H */
 #endif
-/*----------------------------   tria_iterator_base.h     ---------------------------*/

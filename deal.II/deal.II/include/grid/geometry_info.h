@@ -1,9 +1,17 @@
-/*----------------------------   geometry_info.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __geometry_info_H
-#define __geometry_info_H
-/*----------------------------   geometry_info.h     ---------------------------*/
+//----------------------------  geometry_info.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  geometry_info.h  ---------------------------
+#ifndef __deal2__geometry_info_h
+#define __deal2__geometry_info_h
 
 
 #include <base/exceptions.h>
@@ -182,7 +190,6 @@ struct GeometryInfo
 };
 
 
-
 /*---------------------------- Inline functions --------------------------------*/
 
 template<>
@@ -219,8 +226,4 @@ unsigned int GeometryInfo<3>::child_cell_on_face (const unsigned int face,
 };
 
 
-
-/*----------------------------   geometry_info.h     ---------------------------*/
-/* end of #ifndef __geometry_info_H */
 #endif
-/*----------------------------   geometry_info.h     ---------------------------*/

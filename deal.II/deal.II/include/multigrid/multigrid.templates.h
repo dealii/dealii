@@ -1,8 +1,17 @@
-/*----------------------------   multigrid.templates.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __multigrid_templates_H
-#define __multigrid_templates_H
-/*----------------------------   multigrid.templates.h     ---------------------------*/
+//----------------------------  multigrid.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  multigrid.templates.h  ---------------------------
+#ifndef __deal2__multigrid_templates_h
+#define __deal2__multigrid_templates_h
 
 
 #include <dofs/dof_constraints.h>
@@ -156,9 +165,4 @@ Multigrid<dim>::copy_from_mg(Vector<number> &dst) const
 }
 
 
-
-
-/*----------------------------   multigrid.templates.h     ---------------------------*/
-/* end of #ifndef __multigrid.templates_H */
 #endif
-/*----------------------------   multigrid.templates.h     ---------------------------*/

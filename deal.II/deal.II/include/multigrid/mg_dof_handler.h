@@ -1,13 +1,23 @@
-/*----------------------------   mg_dof.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __mg_dof_H
-#define __mg_dof_H
+//----------------------------  mg_dof_handler.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  mg_dof_handler.h  ---------------------------
+#ifndef __deal2__mg_dof_handler_h
+#define __deal2__mg_dof_handler_h
+
+
 /*----------------------------   mg_dof.h     ---------------------------*/
 
 
 #include <dofs/dof_handler.h>
-
 
 
 /**
@@ -19,9 +29,6 @@
  */
 template <int dim>
 class MGDoFDimensionInfo;
-
-
-
 
 
 /**
@@ -53,10 +60,6 @@ class MGDoFDimensionInfo<1> {
 };
 
 
-
-
-
-
 /**
  * Define some types for the DoF handling in two dimensions.
  *
@@ -86,8 +89,6 @@ class MGDoFDimensionInfo<2> {
 };
 
 
-
-
 /**
  * Define some types for the DoF handling in two dimensions.
  *
@@ -115,8 +116,6 @@ class MGDoFDimensionInfo<3> {
     typedef quad_iterator        face_iterator;
     typedef active_quad_iterator active_face_iterator;    
 };
-
-
 
 
 /**
@@ -450,8 +449,8 @@ class MGDoFHandler : public DoFHandler<dim>
     active_face_iterator last_active_face (const unsigned int level) const;
 				     //@}
 
-    
-				     /*---------------------------------------*/
+
+/*---------------------------------------*/
 
 				     /**
 				      *  @name Line iterator functions
@@ -510,7 +509,7 @@ class MGDoFHandler : public DoFHandler<dim>
     active_line_iterator end_active_line (const unsigned int level) const;
 
 
-				     /**
+/**
 				      *  Return an iterator pointing to the
 				      *  last line, used or not.
 				      */
@@ -607,7 +606,7 @@ class MGDoFHandler : public DoFHandler<dim>
     active_quad_iterator end_active_quad (const unsigned int level) const;
 
 
-				     /**
+/**
 				      *  Return an iterator pointing to the
 				      *  last quad, used or not.
 				      */
@@ -704,7 +703,7 @@ class MGDoFHandler : public DoFHandler<dim>
     active_hex_iterator end_active_hex (const unsigned int level) const;
 
 
-				     /**
+/**
 				      *  Return an iterator pointing to the
 				      *  last hex, used or not.
 				      */
@@ -896,7 +895,7 @@ class MGDoFHandler : public DoFHandler<dim>
     };
 
 
-				     /**
+/**
 				      * Distribute dofs on the given cell,
 				      * with new dofs starting with index
 				      * #next_free_dof#. Return the next
@@ -962,11 +961,6 @@ class MGDoFHandler : public DoFHandler<dim>
 #endif
 };
 
-    
-
-
-
-
 
 /* ----------------------- Inline functions of MGVertexDoFs -------------------*/
 
@@ -986,8 +980,6 @@ void MGDoFHandler<dim>::MGVertexDoFs::set_index  (const unsigned int level,
 };
 
 
-
-
 template <int dim>
 inline
 unsigned int
@@ -1003,8 +995,7 @@ MGDoFHandler<dim>::MGVertexDoFs::get_index  (const unsigned int level,
 };
 
 
-
 /*----------------------------   mg_dof.h     ---------------------------*/
-/* end of #ifndef __mg_dof_H */
+
 #endif
 /*----------------------------   mg_dof.h     ---------------------------*/

@@ -1,9 +1,17 @@
-/*----------------------------   dof_constraints.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __dof_constraints_H
-#define __dof_constraints_H
-/*----------------------------   dof_constraints.h     ---------------------------*/
+//----------------------------  dof_constraints.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_constraints.h  ---------------------------
+#ifndef __deal2__dof_constraints_h
+#define __deal2__dof_constraints_h
 
 
 #include <vector>
@@ -11,7 +19,6 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <lac/forward_declarations.h>
-
 
 
 /**
@@ -101,7 +108,7 @@ class ConstraintMatrix : public Subscriptor
     ConstraintMatrix ();
 
 
-				     /**
+/**
 				      * Add a new line to the matrix.
 				      */
     void add_line (const unsigned int line);
@@ -187,7 +194,7 @@ class ConstraintMatrix : public Subscriptor
 		   SparsityPattern       &condensed) const;
 
 
-				     /**
+/**
 				      * This function does much the same as
 				      * the above one, except that it condenses
 				      * the matrix struct 'in-place'. It does
@@ -274,8 +281,8 @@ class ConstraintMatrix : public Subscriptor
     template<typename number>
     void set_zero (Vector<number> &vec) const;
 
-    
-				     /**
+
+/**
 				      * Print the constraint lines. Mainly for
 				      * debugging purposes.
 				      *
@@ -290,7 +297,7 @@ class ConstraintMatrix : public Subscriptor
     void print (ostream &) const;
 
 
-				     /**
+/**
 				      * Exception
 				      */
     DeclException0 (ExcMatrixIsClosed);
@@ -397,9 +404,4 @@ class ConstraintMatrix : public Subscriptor
 };
 
 
-
-
-/*----------------------------   dof_constraints.h     ---------------------------*/
-/* end of #ifndef __dof_constraints_H */
 #endif
-/*----------------------------   dof_constraints.h     ---------------------------*/

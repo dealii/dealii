@@ -1,16 +1,21 @@
-/*----------------------------   matrices.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __matrices_H
-#define __matrices_H
-/*----------------------------   matrices.h     ---------------------------*/
-
+//----------------------------  matrices.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  matrices.h  ---------------------------
+#ifndef __deal2__matrices_h
+#define __deal2__matrices_h
 
 
 #include <base/exceptions.h>
 #include <map>
-
-
 
 
 /**
@@ -339,9 +344,6 @@ class MatrixCreator
 };
 
 
-
-
-
 /**
  * Provide a collection of functions operating on matrices. These include
  * the application of boundary conditions to a linear system of equations
@@ -433,8 +435,6 @@ class MatrixTools : public MatrixCreator<dim>
 		    << "The dimensions " << arg1 << " and " << arg2
 		    << " don't match.");
 };
-
-
 
 
 /**
@@ -589,9 +589,6 @@ class MassMatrix :  public Equation<dim> {
 };
 
 
-
-
-
 /**
  * Equation class to be passed to the #Assembler# if you want to make up the
  * laplace matrix for your problem. The laplace matrix is the matrix with
@@ -692,13 +689,4 @@ class LaplaceMatrix :  public Equation<dim> {
 };
 
 
-
-
-
-
-
-
-/*----------------------------   matrices.h     ---------------------------*/
-/* end of #ifndef __matrices_H */
 #endif
-/*----------------------------   matrices.h     ---------------------------*/

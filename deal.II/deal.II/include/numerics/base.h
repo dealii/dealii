@@ -1,8 +1,19 @@
-/*----------------------------   problem_base.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __problem_base_H
-#define __problem_base_H
+//----------------------------  base.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  base.h  ---------------------------
+#ifndef __deal2__base_h
+#define __deal2__base_h
+
+
 /*----------------------------   problem_base.h     ---------------------------*/
 
 
@@ -12,8 +23,6 @@
 #include <fe/fe_update_flags.h>
 #include <map>
 #include <string>
-
-
 
 
 /**
@@ -177,7 +186,7 @@ class ProblemBase {
     virtual void fill_data (DataOut<dim> &) const;
 
 
-				     /**
+/**
 				      * Return the name of the solution as a
 				      * #string#. The default implementation
 				      * returns #"solution"#.
@@ -236,10 +245,8 @@ class ProblemBase {
     friend class Assembler<dim>;
 };
 
-    
-
 
 /*----------------------------   problem_base.h     ---------------------------*/
-/* end of #ifndef __problem_base_H */
+
 #endif
 /*----------------------------   problem_base.h     ---------------------------*/

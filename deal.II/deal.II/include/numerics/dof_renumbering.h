@@ -1,14 +1,21 @@
-/*----------------------------   dof_renumbering.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __dof_renumbering_H
-#define __dof_renumbering_H
-/*----------------------------   dof_renumbering.h     ---------------------------*/
+//----------------------------  dof_renumbering.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_renumbering.h  ---------------------------
+#ifndef __deal2__dof_renumbering_h
+#define __deal2__dof_renumbering_h
 
 
 #include <base/exceptions.h>
 #include <grid/forward_declarations.h>
-
-
 
 
 /**
@@ -238,8 +245,8 @@ class DoFRenumbering
     static void component_wise (DoFHandler<dim>            &dof_handler,
 				const vector<unsigned int> &component_order = vector<unsigned int>());
 
-    
-    				     /**
+
+/**
 				      * Exception
 				      */
     DeclException0 (ExcRenumberingIncomplete);
@@ -250,13 +257,4 @@ class DoFRenumbering
 };
 
 
-
-
-
-
-
-
-/*----------------------------   dof_renumbering.h     ---------------------------*/
-/* end of #ifndef __dof_renumbering_H */
 #endif
-/*----------------------------   dof_renumbering.h     ---------------------------*/

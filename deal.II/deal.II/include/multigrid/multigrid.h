@@ -1,8 +1,18 @@
-/*----------------------------   multigrid.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __multigrid_H
-#define __multigrid_H
-/*----------------------------   multigrid.h     ---------------------------*/
+//----------------------------  multigrid.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  multigrid.h  ---------------------------
+#ifndef __deal2__multigrid_h
+#define __deal2__multigrid_h
+
 
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
@@ -13,7 +23,6 @@
 #include <multigrid/mg_base.h>
 
 #include <vector>
-
 
 
 /**
@@ -108,7 +117,7 @@ class Multigrid : public MGBase
     SmartPointer<const MGDoFHandler<dim> > mg_dof_handler;
 
 
-				     /**
+/**
 				      * Sparsity patterns for each level.
 				      */
     SmartPointer<const MGLevelObject<SparsityPattern> > level_sparsities;
@@ -128,9 +137,6 @@ class Multigrid : public MGBase
 				      */
     SmartPointer<const ConstraintMatrix>                 constraints;
 };
-
-
-
 
 
 /**
@@ -219,8 +225,6 @@ class MGTransferPrebuilt : public MGTransferBase
 };
 
 
-
-
 /* --------------------------- inline functions --------------------- */
 
 
@@ -236,7 +240,4 @@ Multigrid<dim>::get_matrix (const unsigned int level) const
 }
 
 
-/*----------------------------   multigrid.h     ---------------------------*/
-/* end of #ifndef __multigrid_H */
 #endif
-/*----------------------------   multigrid.h     ---------------------------*/

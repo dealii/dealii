@@ -1,9 +1,18 @@
-/*----------------------------   tria_line.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __tria_line_H
-#define __tria_line_H
-/*----------------------------   tria_line.h     ---------------------------*/
+//----------------------------  tria_line.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_line.h  ---------------------------
+#ifndef __deal2__tria_line_h
+#define __deal2__tria_line_h
+
 
 #include <base/exceptions.h>
 
@@ -58,8 +67,6 @@ class Line {
 };
 
 
-
-
 /*----------------------------- Inline Function: Line ------------------------*/
 
 
@@ -86,8 +93,4 @@ void Line::set_vertex (const int i, const int index) {
 };
 
 
-
-/*----------------------------   tria_line.h     ---------------------------*/
-/* end of #ifndef __tria_line_H */
 #endif
-/*----------------------------   tria_line.h     ---------------------------*/

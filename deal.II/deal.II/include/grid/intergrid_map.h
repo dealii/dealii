@@ -1,9 +1,17 @@
-/*----------------------------   intergrid_map.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __intergrid_map_H
-#define __intergrid_map_H
-/*----------------------------   intergrid_map.h     ---------------------------*/
-
+//----------------------------  intergrid_map.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  intergrid_map.h  ---------------------------
+#ifndef __deal2__intergrid_map_h
+#define __deal2__intergrid_map_h
 
 
 /**
@@ -194,8 +202,4 @@ class InterGridMap
 };
 
 
-
-/*----------------------------   intergrid_map.h     ---------------------------*/
-/* end of #ifndef __intergrid_map_H */
 #endif
-/*----------------------------   intergrid_map.h     ---------------------------*/

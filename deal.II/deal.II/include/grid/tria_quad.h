@@ -1,14 +1,20 @@
-/*----------------------------   tria_quad.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __tria_quad_H
-#define __tria_quad_H
-/*----------------------------   tria_quad.h     ---------------------------*/
+//----------------------------  tria_quad.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_quad.h  ---------------------------
+#ifndef __deal2__tria_quad_h
+#define __deal2__tria_quad_h
 
 
 #include <base/exceptions.h>
-
-
 
 
 /**
@@ -65,8 +71,6 @@ class Quad {
 };
 
 
-
-
 /*----------------------------- Inline Function: Quad ------------------------*/
 
 
@@ -79,14 +83,12 @@ Quad::Quad (const int i0, const int i1, const int i2, const int i3) {
 };
 
 
-
 inline
 int Quad::line (const int i) const {
   Assert ((i>=0) && (i<4),
 	  ExcRange(i));
   return lines[i];
 };
-
 
 
 inline
@@ -97,8 +99,4 @@ void Quad::set_line (const int i, const int index) {
 };
 
 
-
-/*----------------------------   tria_quad.h     ---------------------------*/
-/* end of #ifndef __tria_quad_H */
 #endif
-/*----------------------------   tria_quad.h     ---------------------------*/

@@ -1,8 +1,17 @@
-/*----------------------------   mg_dof_tools.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __mg_dof_tools_H
-#define __mg_dof_tools_H
-/*----------------------------   mg_dof_tools.h     ---------------------------*/
+//----------------------------  mg_dof_tools.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  mg_dof_tools.h  ---------------------------
+#ifndef __deal2__mg_dof_tools_h
+#define __deal2__mg_dof_tools_h
 
 
 #include <lac/forward_declarations.h>
@@ -62,8 +71,4 @@ class MGDoFTools
 };
 
 
-
-/*----------------------------   mg_dof_tools.h     ---------------------------*/
-/* end of #ifndef __mg_dof_tools_H */
 #endif
-/*----------------------------   mg_dof_tools.h     ---------------------------*/

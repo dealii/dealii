@@ -1,10 +1,17 @@
-/*----------------------------   dof_levels.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __dof_levels_H
-#define __dof_levels_H
-/*----------------------------   dof_levels.h     ---------------------------*/
-
+//----------------------------  dof_levels.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_levels.h  ---------------------------
+#ifndef __deal2__dof_levels_h
+#define __deal2__dof_levels_h
 
 
 #include <vector>
@@ -25,9 +32,6 @@ class DoFLevel
 				      */
     DoFLevel ();
 };
-
-
-
 
 
 /**
@@ -85,8 +89,6 @@ class DoFLevel<1>
 };
 
 
-
-
 /**
  * Store the indices of the degrees of freedom which are located on quads.
  * See \Ref{DoFLevel<1>} for more information.
@@ -100,7 +102,6 @@ class DoFLevel<2> : public DoFLevel<1> {
 				      */
     vector<unsigned int> quad_dofs;
 };
-
 
 
 /**
@@ -118,8 +119,4 @@ class DoFLevel<3> : public DoFLevel<2> {
 };
 
 
-
-/*----------------------------   dof_levels.h     ---------------------------*/
-/* end of #ifndef __dof_levels_H */
 #endif
-/*----------------------------   dof_levels.h     ---------------------------*/

@@ -1,13 +1,22 @@
-/*----------------------------   data_out.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __data_out_H
-#define __data_out_H
-/*----------------------------   data_out.h     ---------------------------*/
+//----------------------------  data_out.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  data_out.h  ---------------------------
+#ifndef __deal2__data_out_h
+#define __deal2__data_out_h
+
 
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
 #include <base/data_out_base.h>
-
 
 
 /**
@@ -312,8 +321,6 @@ class DataOut_DoFData : public DataOutInterface<dim>
 };
 
 
-
-
 /**
  * This class is an actual implementation of the functionality proposed by
  * the #DataOut_DoFData# class. It offers a function #build_patches# that
@@ -388,9 +395,9 @@ class DataOut : public DataOut_DoFData<dim>
 				      */
     virtual void build_patches (const unsigned int n_subdivisions = 1,
 				const unsigned int n_threads_     = 1);
-    
 
-   				     /**
+
+/**
 				      * Return the first cell which we
 				      * want output for. The default
 				      * implementation returns the first
@@ -457,10 +464,4 @@ class DataOut : public DataOut_DoFData<dim>
 };
 
 
-
-
-
-/*----------------------------   data_out.h     ---------------------------*/
-/* end of #ifndef __data_out_H */
 #endif
-/*----------------------------   data_out.h     ---------------------------*/

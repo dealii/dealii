@@ -1,13 +1,22 @@
-/*----------------------------   grid_out.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __grid_out_H
-#define __grid_out_H
-/*----------------------------   grid_out.h     ---------------------------*/
+//----------------------------  grid_out.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  grid_out.h  ---------------------------
+#ifndef __deal2__grid_out_h
+#define __deal2__grid_out_h
+
 
 #include <grid/forward_declarations.h>
 #include <base/exceptions.h>
 #include <string>
-
 
 
 /**
@@ -204,7 +213,7 @@ class GridOut
     };
 
 
-				     /**
+/**
 				      * Flags describing the details of
 				      * output in GNUPLOT format.
 				      */
@@ -302,9 +311,9 @@ class GridOut
 		      const unsigned int size       = 300,
 		      const double       line_width = 0.5);
     };
-    
-	
-				     /**
+
+
+/**
 				      * Flags describing the details of
 				      * output for encapsulated postscript
 				      * for all dimensions not explicitely
@@ -360,10 +369,9 @@ class GridOut
 //#else
 //#   warning Not implemented for gcc2.95
 //#endif
-    
-	
-    
-				     /**
+
+
+/**
 				      * Declaration of a name for each of the
 				      * different output formats.
 				      */
@@ -490,7 +498,7 @@ class GridOut
     static string get_output_format_names ();
 
 
-				     /**
+/**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidState);
@@ -538,10 +546,9 @@ class GridOut
 				      * function.
 				      */
     EpsFlags<3>  eps_flags_3;
-    
-    
 
-				     /**
+
+/**
 				      * Write the grid information about
 				      * faces to #out#. Only those faces
 				      * are printed which are on the boundary
@@ -593,9 +600,4 @@ class GridOut
 };
 
 
-
-
-/*----------------------------   grid_out.h     ---------------------------*/
-/* end of #ifndef __grid_out_H */
 #endif
-/*----------------------------   grid_out.h     ---------------------------*/

@@ -1,8 +1,19 @@
-/*----------------------------   solutiontransfer.h     ----------------------*/
-/*      $Id$      */
-/*           Ralf Hartmann, University of Heidelberg                          */
-#ifndef __solutiontransfer_H
-#define __solutiontransfer_H
+//----------------------------  solution_transfer.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solution_transfer.h  ---------------------------
+#ifndef __deal2__solution_transfer_h
+#define __deal2__solution_transfer_h
+
+
 /*----------------------------   solutiontransfer.h     ----------------------*/
 
 
@@ -11,8 +22,6 @@
 
 #include <base/exceptions.h>
 #include <vector>
-
-
 
 
 /**
@@ -341,7 +350,7 @@ class SolutionTransfer
     PreparationState prepared_for;
 
 
-				     /**
+/**
 				      * Is used for #prepare_for_refining#
 				      * (of course also for
 				      * #repare_for_refining_and_coarsening#)
@@ -396,11 +405,7 @@ class SolutionTransfer
 };
 
 
-
-
-
-
 /*----------------------------   solutiontransfer.h     ---------------------------*/
-/* end of #ifndef __solutiontransfer_H */
+
 #endif
 /*----------------------------   solutiontransfer.h     ---------------------------*/

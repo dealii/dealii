@@ -16,7 +16,6 @@ MGSmootherRelaxation<number>::MGSmootherRelaxation (const MGDoFHandler<dim>     
 {};
 
 
-
 template<typename number>
 void
 MGSmootherRelaxation<number>::smooth (const unsigned int   level,

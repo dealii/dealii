@@ -1,7 +1,19 @@
-/*----------------------------   time-dependent.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __time_dependent_H
-#define __time_dependent_H
+//----------------------------  time_dependent.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  time_dependent.h  ---------------------------
+#ifndef __deal2__time_dependent_h
+#define __deal2__time_dependent_h
+
+
 /*----------------------------   time-dependent.h     ---------------------------*/
 
 
@@ -12,8 +24,6 @@
 
 #include <vector>
 #include <utility>
-
-
 
 
 /**
@@ -422,9 +432,9 @@ class TimeDependent
     TimeDependent (const TimeSteppingData &data_primal,
 		   const TimeSteppingData &data_dual,
 		   const TimeSteppingData &data_postprocess);
-    
-    
-				     /**
+
+
+/**
 				      * Destructor. This will delete the
 				      * objects pointed to by the pointers
 				      * given to the #insert_*# and
@@ -592,9 +602,9 @@ class TimeDependent
 		  LoopFunctionObject      loop_function,
 		  const TimeSteppingData &timestepping_data,
 		  const Direction         direction);
-    
-		  
-				     /**
+
+
+/**
 				      * Initialize the objects for the next
 				      * sweep. This function specifically does
 				      * the following: assign each time
@@ -716,11 +726,6 @@ class TimeDependent
     void end_sweep (const unsigned int begin_timestep,
 		    const unsigned int end_timestep);
 };
-
-
-
-
-
 
 
 /**
@@ -1065,9 +1070,9 @@ class TimeStepBase : public Subscriptor
 				      * sweep.
 				      */
     void set_sweep_no (const unsigned int sweep_no);
-    
 
-				     /**
+
+/**
 				      * Copy constructor. I can see no reason
 				      * why someone might want to use it, so
 				      * I don't provide it. Since this class
@@ -1092,10 +1097,6 @@ class TimeStepBase : public Subscriptor
 				     // make the manager object a friend
     friend class TimeDependent;
 };
-
-	
-
-
 
 
 /**
@@ -1132,10 +1133,9 @@ class TimeStepBase_Tria :  public TimeStepBase
     enum SolutionState {
 	  grid_refinement = 0x1000
     };
-    
-    
-    
-				     /**
+
+
+/**
 				      * Default constructor. Does nothing but
 				      * throws an exception. We need to have
 				      * such a constructor in order to satisfy
@@ -1378,8 +1378,6 @@ class TimeStepBase_Tria :  public TimeStepBase
 };
 
 
-
-
 /**
  * This structure is used to tell the #TimeStepBase_Tria# class how grids should
  * be handled. It has flags defining the moments where grids shall be
@@ -1453,8 +1451,6 @@ struct TimeStepBase_Tria<dim>::Flags
 		    int,
 		    << "The parameter " << arg1 << " has an invalid value.");
 };
-
-
 
 
 /**
@@ -1634,7 +1630,7 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
     const unsigned int  first_sweep_with_correction;
 
 
-				     /**
+/**
 				      * Apply cell number correction with the
 				      * previous time level only if there are
 				      * more than this number of cells.
@@ -1710,8 +1706,6 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 };
 
 
-
-
 /**
  * Structure given to the actual refinement function, telling it which
  * thresholds to take for coarsening and refinement. The actual refinement
@@ -1754,8 +1748,6 @@ struct TimeStepBase_Tria<dim>::RefinementData
 };
 
 
-
-
 /*----------------------------- template functions ------------------------------*/
 
 template <typename InitFunctionObject, typename LoopFunctionObject>
@@ -1791,9 +1783,9 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 			     (timesteps[n_timesteps-step-1]));
 	      break;
       };
-  
 
-				   // wake up the first few time levels
+
+// wake up the first few time levels
   for (int step=-timestepping_data.look_ahead; step<0; ++step)
     for (int look_ahead=0;
 	 look_ahead<=static_cast<int>(timestepping_data.look_ahead); ++look_ahead)
@@ -1808,9 +1800,9 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 		  timesteps[n_timesteps-(step+look_ahead)]->wake_up(look_ahead);
 		break;
 	};
-  
-  
-  for (unsigned int step=0; step<n_timesteps; ++step)
+
+
+for (unsigned int step=0; step<n_timesteps; ++step)
     {
 				       // first thing: wake up the
 				       // timesteps ahead as necessary
@@ -1827,9 +1819,9 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 		    timesteps[n_timesteps-(step+look_ahead)-1]->wake_up(look_ahead);
 		  break;
 	  };
-      
-      
-				       // actually do the work
+
+
+// actually do the work
       switch (direction)
 	{
 	  case forward:
@@ -1881,9 +1873,7 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 };
 
 
-
-
 /*----------------------------   time-dependent.h     ---------------------------*/
-/* end of #ifndef __time_dependent_H */
+
 #endif
 /*----------------------------   time-dependent.h     ---------------------------*/

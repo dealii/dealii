@@ -1,9 +1,18 @@
-/*----------------------------   tria.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998, 1999 */
-#ifndef __tria_H
-#define __tria_H
-/*----------------------------   tria.h     ---------------------------*/
+//----------------------------  tria.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria.h  ---------------------------
+#ifndef __deal2__tria_h
+#define __deal2__tria_h
+
 
 #include <vector>
 #include <grid/forward_declarations.h>
@@ -35,16 +44,6 @@ enum MeshSmoothing {
       maximum_smoothing                  = 0xffff
 };
 
-				       
-
-
-
-    
-
-
-
-
-
 
 /*------------------------------------------------------------------------*/
 
@@ -63,9 +62,6 @@ struct CellData {
 #endif
     unsigned char material_id;
 };
-
-
-
 
 
 /**
@@ -123,13 +119,7 @@ struct SubCellData {
 };
 
 
-
-
 /*------------------------------------------------------------------------*/
-
-
-
-
 
 
 /**
@@ -139,7 +129,6 @@ struct SubCellData {
  */
 template <int dim>
 class TriaDimensionInfo;
-
 
 
 /**
@@ -250,8 +239,6 @@ class TriaDimensionInfo<2> {
 };
 
 
-
-
 /**
  *  This class implements some types which differ between the dimensions.
  *  These are the declararions for the 3D case only.
@@ -292,7 +279,6 @@ class TriaDimensionInfo<3> {
     typedef quad_iterator        face_iterator;
     typedef active_quad_iterator active_face_iterator;    
 };
-
 
 
 /*------------------------------------------------------------------------*/
@@ -367,7 +353,6 @@ struct TriaNumberCache<1>
 };
 
 
-
 /**
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
@@ -421,7 +406,6 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
 };
 
 
-
 /**
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
@@ -473,8 +457,6 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
 				      */
     TriaNumberCache ();
 };
-
-
 
 
 /*------------------------------------------------------------------------*/
@@ -1796,9 +1778,9 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      */
     void distort_random (const double factor,
 			 const bool   keep_boundary=true);
-    
-				      
-				     /**
+
+
+/**
 				      *  @name Mesh refinement
 				      */
 				     /*@{*/
@@ -2059,7 +2041,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     				     /*@}*/
 
 
-				     /**
+/**
 				      *  @name User flag handling
 				      */
 				     /*@{*/
@@ -2242,8 +2224,8 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      */
     active_cell_iterator end_active (const unsigned int level) const;
 
-    
-				     /**
+
+/**
 				      *  Return an iterator pointing to the
 				      *  last cell, used or not.
 				      *
@@ -2424,8 +2406,8 @@ class Triangulation : public TriaDimensionInfo<dim>,
     active_face_iterator last_active_face (const unsigned int level) const;
 				     /*@}*/
 
-    
-				     /*---------------------------------------*/
+
+/*---------------------------------------*/
 
 				     /**
 				      *  @name Line iterator functions
@@ -2905,7 +2887,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     				     /*@}*/
 
 
-				     /**
+/**
 				      *  @name Exceptions
 				      */
 				     /*@{*/
@@ -3131,8 +3113,8 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      */
     void update_number_cache_hexes ();
 
-    
-				     /**
+
+/**
 				      *  Array of pointers pointing to the
 				      *  #TriangulationLevel<dim># objects
 				      *  storing the data on the different
@@ -3223,15 +3205,6 @@ class Triangulation : public TriaDimensionInfo<dim>,
 };
 
 
-
-
-
-
-/*----------------------------   tria.h     ---------------------------*/
-/* end of #ifndef __tria_H */
 #endif
-/*----------------------------   tria.h     ---------------------------*/
-
-
 
 

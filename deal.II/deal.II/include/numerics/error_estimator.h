@@ -1,9 +1,17 @@
-/*----------------------------   error_estimator.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __error_estimator_H
-#define __error_estimator_H
-/*----------------------------   error_estimator.h     ---------------------------*/
+//----------------------------  error_estimator.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  error_estimator.h  ---------------------------
+#ifndef __deal2__error_estimator_h
+#define __deal2__error_estimator_h
 
 
 #include <base/exceptions.h>
@@ -199,8 +207,8 @@ class KellyErrorEstimator
 				      */    
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
 
-    
-				     /**
+
+/**
 				      * Implementation of the error
 				      * estimator described above. You
 				      * may give a coefficient, but
@@ -273,13 +281,12 @@ class KellyErrorEstimator
 				      * Exception
 				      */
     DeclException0 (ExcInvalidBoundaryFunction);
-    
 
 
-  private:
+private:
 
 
-    				     /**
+/**
 				      * Declare a data type to represent the
 				      * mapping between faces and integrated
 				      * jumps of gradients. See the general
@@ -288,14 +295,14 @@ class KellyErrorEstimator
     typedef map<typename DoFHandler<dim>::face_iterator,double> FaceIntegrals;
 
 
-				     /**
+/**
 				      * Redeclare an active cell iterator.
 				      * This is simply for convenience.
 				      */
     typedef DoFHandler<dim>::active_cell_iterator active_cell_iterator;
 
 
-    				     /**
+/**
 				      * All data needed by the several functions
 				      * of the error estimator is gathered in
 				      * this struct. It is passed as a reference
@@ -414,8 +421,8 @@ class KellyErrorEstimator
 	     unsigned int             n_threads);
     };
 
-    
-				     /**
+
+/**
 				      * Computates the error on all cells
 				      * of the domain with the number n,
 				      * satisfying
@@ -453,15 +460,15 @@ class KellyErrorEstimator
 				      */
 
 
-    static void integrate_over_regular_face (Data                       &data,
+static void integrate_over_regular_face (Data                       &data,
 					     const unsigned int          this_thread,
 					     const active_cell_iterator &cell,
 					     const unsigned int          face_no,
 					     FEFaceValues<dim>          &fe_face_values_cell,
 					     FEFaceValues<dim>          &fe_face_values_neighbor);
-    
-    
-				     /**
+
+
+/**
 				      * The same applies as for the function
 				      * above, except that integration is
 				      * over face #face_no# of #cell#, where
@@ -478,12 +485,6 @@ class KellyErrorEstimator
 };
 
 
-
-
-
-/*----------------------------   error_estimator.h     ---------------------------*/
-/* end of #ifndef __error_estimator_H */
 #endif
-/*----------------------------   error_estimator.h     ---------------------------*/
 
 

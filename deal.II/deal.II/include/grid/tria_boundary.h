@@ -1,15 +1,25 @@
-/*----------------------------   boundary-function.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __tria_boundary_H
-#define __tria_boundary_H
+//----------------------------  tria_boundary.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_boundary.h  ---------------------------
+#ifndef __deal2__tria_boundary_h
+#define __deal2__tria_boundary_h
+
+
 /*----------------------------   boundary-function.h     ---------------------------*/
 
 #include <base/point.h>
 #include <base/subscriptor.h>
 #include <grid/geometry_info.h>
 #include <grid/forward_declarations.h>
-
 
 
 /**
@@ -113,9 +123,6 @@ class Boundary : public Subscriptor {
 };
 
 
-
-
-
 /**
  *   Specialisation of \Ref{Boundary}<dim>, which places the new point right
  *   into the middle of the given points. The middle is defined as the
@@ -156,10 +163,7 @@ class StraightBoundary : public Boundary<dim> {
 };
 
 
-
-
-
 /*----------------------------   boundary-function.h     ---------------------------*/
-/* end of #ifndef __tria_boundary_H */
+
 #endif
 /*----------------------------   boundary-function.h     ---------------------------*/

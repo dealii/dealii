@@ -1,15 +1,22 @@
-/*----------------------------   grid_generator.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __grid_generator_H
-#define __grid_generator_H
-/*----------------------------   grid_generator.h     ---------------------------*/
+//----------------------------  grid_generator.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  grid_generator.h  ---------------------------
+#ifndef __deal2__grid_generator_h
+#define __deal2__grid_generator_h
 
 
 #include <base/forward_declarations.h>
 #include <grid/forward_declarations.h>
 #include <base/exceptions.h>
-
-
 
 
 /**
@@ -178,9 +185,4 @@ class GridGenerator
 };
 
 
-
-
-/*----------------------------   grid_generator.h     ---------------------------*/
-/* end of #ifndef __grid_generator_H */
 #endif
-/*----------------------------   grid_generator.h     ---------------------------*/

@@ -1,9 +1,17 @@
-/*----------------------------   grid_in.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __grid_in_H
-#define __grid_in_H
-/*----------------------------   grid_in.h     ---------------------------*/
-
+//----------------------------  grid_in.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  grid_in.h  ---------------------------
+#ifndef __deal2__grid_in_h
+#define __deal2__grid_in_h
 
 
 #include <base/exceptions.h>
@@ -12,7 +20,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
 
 
 /**
@@ -178,11 +185,4 @@ class GridIn
 };
 
 
-
-
-
-
-/*----------------------------   grid_in.h     ---------------------------*/
-/* end of #ifndef __grid_in_H */
 #endif
-/*----------------------------   grid_in.h     ---------------------------*/

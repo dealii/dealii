@@ -1,9 +1,17 @@
-/*----------------------------   tria_hex.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __tria_hex_H
-#define __tria_hex_H
-/*----------------------------   tria_hex.h     ---------------------------*/
-
+//----------------------------  tria_hex.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_hex.h  ---------------------------
+#ifndef __deal2__tria_hex_h
+#define __deal2__tria_hex_h
 
 
 #include <base/exceptions.h>
@@ -67,8 +75,6 @@ class Hexahedron {
 };
 
 
-
-
 /*----------------------------- Inline Function: Hexahedron ------------------------*/
 
 
@@ -85,14 +91,12 @@ Hexahedron::Hexahedron (const int i0, const int i1,
 };
 
 
-
 inline
 int Hexahedron::quad (const int i) const {
   Assert ((i>=0) && (i<6),
 	  ExcRange(i));
   return quads[i];
 };
-
 
 
 inline
@@ -103,9 +107,4 @@ void Hexahedron::set_quad (const int i, const int index) {
 };
 
 
-
-
-/*----------------------------   tria_hex.h     ---------------------------*/
-/* end of #ifndef __tria_hex_H */
 #endif
-/*----------------------------   tria_hex.h     ---------------------------*/

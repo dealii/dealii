@@ -1,8 +1,17 @@
-/*----------------------------   mg_smoother.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __mg_smoother_H
-#define __mg_smoother_H
-/*----------------------------   mg_smoother.h     ---------------------------*/
+//----------------------------  mg_smoother.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  mg_smoother.h  ---------------------------
+#ifndef __deal2__mg_smoother_h
+#define __deal2__mg_smoother_h
 
 
 #include <lac/forward_declarations.h>
@@ -10,7 +19,6 @@
 #include <grid/forward_declarations.h>
 #include <base/smartpointer.h>
 #include <vector>
-
 
 
 /**
@@ -54,9 +62,6 @@ class MGSmootherBase :  public Subscriptor
 };
 
 
-
-
-
 /**
  * Smoother doing nothing. This class is not useful for many applications other
  * than for testing some multigrid procedures. Also some applications might
@@ -82,7 +87,6 @@ class MGSmootherIdentity : public MGSmootherBase
 			 Vector<double>       &u,
 			 const Vector<double> &rhs) const;
 };
-
 
 
 /**
@@ -185,8 +189,6 @@ class MGSmoother : public MGSmootherBase
 };
 
 
-
-
 /**
  * Implementation of a smoother using matrix builtin relaxation methods.
  * 
@@ -264,7 +266,6 @@ class MGSmootherRelaxation : public MGSmoother
 };
 
 
-
 /* ------------------------------- Inline functions -------------------------- */
 
 inline
@@ -281,8 +282,6 @@ MGSmoother::get_steps() const
   return steps;
 }
 
-/*----------------------------   mg_smoother.h     ---------------------------*/
-/* end of #ifndef __mg_smoother_H */
+
 #endif
-/*----------------------------   mg_smoother.h     ---------------------------*/
 			 

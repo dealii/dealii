@@ -1,9 +1,20 @@
-/*----------------------------   mgbase.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __mgbase_H
-#define __mgbase_H
-/*----------------------------   mgbase.h     ---------------------------*/
+//----------------------------  mg_base.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  mg_base.h  ---------------------------
+#ifndef __deal2__mg_base_h
+#define __deal2__mg_base_h
 
+
+/*----------------------------   mgbase.h     ---------------------------*/
 
 
 #include <base/subscriptor.h>
@@ -14,8 +25,6 @@
 #include <grid/forward_declarations.h>
 
 #include <vector>
-
-
 
 
 /**
@@ -99,9 +108,6 @@ class MGLevelObject : public Subscriptor
 };
 
 
-
-
-
 /**
  * Abstract base class for coarse grid solvers.  The interface of a
  * function call operator is defined to execute coarse grid solution
@@ -134,7 +140,6 @@ class MGCoarseGridSolver : public Subscriptor
 			     Vector<double>       &dst,
 			     const Vector<double> &src) const = 0;
 };
-
 
 
 /**
@@ -188,11 +193,6 @@ class MGCoarseGridLACIteration :  public MGCoarseGridSolver
 				      */
     const PRECOND& precondition;
 };
-
-
-
-
-
 
 
 /**
@@ -258,12 +258,6 @@ class MGTransferBase : public Subscriptor
 				   Vector<double>       &dst,
 				   const Vector<double> &src) const = 0;
 };
-
-
-
-
-
-
 
 
 /**
@@ -406,7 +400,6 @@ class MGBase : public Subscriptor
 };
 
 
-
 /**
  * Multi-level preconditioner.
  * Here, we collect all information needed for multi-level preconditioning
@@ -469,8 +462,6 @@ class PreconditionMG
 };
 
 
-
-
 /* ------------------------------------------------------------------- */
 
 
@@ -482,7 +473,6 @@ MGLevelObject<Object>::MGLevelObject(const unsigned int min,
 {
   resize (min, max);
 };
-
 
 
 template<class Object>
@@ -505,7 +495,6 @@ MGLevelObject<Object>::operator[] (const unsigned int i) const
 }
 
 
-
 template<class Object>
 void
 MGLevelObject<Object>::resize (const unsigned int new_minlevel,
@@ -517,7 +506,6 @@ MGLevelObject<Object>::resize (const unsigned int new_minlevel,
   minlevel = new_minlevel;
   objects.resize (new_maxlevel - new_minlevel + 1);
 };
-
 
 
 template<class Object>
@@ -538,14 +526,12 @@ MGLevelObject<Object>::get_minlevel () const
 };
 
 
-
 template<class Object>
 unsigned int
 MGLevelObject<Object>::get_maxlevel () const
 {
   return minlevel + objects.size() - 1;
 };
-
 
 
 /* ------------------ Functions for MGCoarseGridLACIteration ------------ */
@@ -562,7 +548,6 @@ MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::MGCoarseGridLACIteration(SOLVER
 {};
 
 
-
 template<class SOLVER, class MATRIX, class PRECOND>
 void
 MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::operator() (const unsigned int    /* level */,
@@ -571,10 +556,6 @@ MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::operator() (const unsigned int 
 {
   solver.solve(*matrix, dst, src, precondition);
 }
-
-
-
-
 
 
 /* ------------------------------------------------------------------- */
@@ -593,7 +574,6 @@ PreconditionMG<MG, VECTOR>::PreconditionMG(MG                       &mg,
 {}
 
 
-
 template<class MG, class VECTOR>
 void
 PreconditionMG<MG,VECTOR>::operator() (VECTOR       &dst,
@@ -605,8 +585,7 @@ PreconditionMG<MG,VECTOR>::operator() (VECTOR       &dst,
 }
 
 
-
 /*----------------------------   mgbase.h     ---------------------------*/
-/* end of #ifndef __mgbase_H */
+
 #endif
 /*----------------------------   mgbase.h     ---------------------------*/

@@ -1,8 +1,17 @@
-/*----------------------------   dof_constraints.templates.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __dof_constraints_templates_H
-#define __dof_constraints_templates_H
-/*----------------------------   dof_constraints.templates.h     ---------------------------*/
+//----------------------------  dof_constraints.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_constraints.templates.h  ---------------------------
+#ifndef __deal2__dof_constraints_templates_h
+#define __deal2__dof_constraints_templates_h
 
 
 #include <dofs/dof_constraints.h>
@@ -63,8 +72,8 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
       else
 	new_line.push_back (row-shift);
 
- 
-  next_constraint = lines.begin();
+
+next_constraint = lines.begin();
 				   // note: in this loop we need not check
 				   // whether #next_constraint# is a valid
 				   // iterator, since #next_constraint# is
@@ -132,7 +141,6 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	++next_constraint;
       };
 };
-
 
 
 template<typename number>
@@ -251,10 +259,6 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 };
 
 
-
-
-
-
 template<typename number>
 void
 ConstraintMatrix::condense (const Vector<number> &uncondensed,
@@ -301,8 +305,8 @@ ConstraintMatrix::condense (const Vector<number> &uncondensed,
       else
 	new_line.push_back (row-shift);
 
- 
-  next_constraint = lines.begin();
+
+next_constraint = lines.begin();
 				   // note: in this loop we need not check
 				   // whether #next_constraint# is a valid
 				   // iterator, since #next_constraint# is
@@ -356,7 +360,6 @@ ConstraintMatrix::condense (Vector<number> &vec) const
 	  break;
       };
 };
-  
 
 
 template<typename number>
@@ -382,7 +385,6 @@ ConstraintMatrix::set_zero (Vector<number> &vec) const
 	  break;
       };
 };
-  
 
 
 template<typename number>
@@ -431,8 +433,8 @@ ConstraintMatrix::distribute (const Vector<number> &condensed,
       else
 	old_line.push_back (row-shift);
 
- 
-  next_constraint = lines.begin();
+
+next_constraint = lines.begin();
 				   // note: in this loop we need not check
 				   // whether #next_constraint# is a valid
 				   // iterator, since #next_constraint# is
@@ -477,10 +479,4 @@ ConstraintMatrix::distribute (Vector<number> &vec) const
 };
 
 
-
-
-
-/*----------------------------   dof_constraints.templates.h     ---------------------------*/
-/* end of #ifndef __dof_constraints_templates_H */
 #endif
-/*----------------------------   dof_constraints.templates.h     ---------------------------*/

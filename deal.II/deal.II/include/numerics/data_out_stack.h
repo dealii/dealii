@@ -1,8 +1,17 @@
-/*----------------------------   data_out_stack.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __data_out_stack_H
-#define __data_out_stack_H
-/*----------------------------   data_out_stack.h     ---------------------------*/
+//----------------------------  data_out_stack.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  data_out_stack.h  ---------------------------
+#ifndef __deal2__data_out_stack_h
+#define __deal2__data_out_stack_h
 
 
 #include <base/data_out_base.h>
@@ -12,7 +21,6 @@
 
 #include <string>
 #include <vector>
-
 
 
 /**
@@ -168,9 +176,9 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      */
     void declare_data_vector (const vector<string> &name,
 			      const VectorType      vector_type);
-    
 
-				     /**
+
+/**
 				      * Add a data vector for the presently
 				      * set value of the parameter.
 				      *
@@ -383,7 +391,7 @@ class DataOutStack : public DataOutInterface<dim+1>
     virtual const vector<DataOutBase::Patch<dim+1> > & get_patches () const;
 
 
-				     /**
+/**
 				      * Virtual function through
 				      * which the names of data sets are
 				      * obtained by the output functions
@@ -393,8 +401,4 @@ class DataOutStack : public DataOutInterface<dim+1>
 };
 
 
-
-/*----------------------------   data_out_stack.h     ---------------------------*/
-/* end of #ifndef __data_out_stack_H */
 #endif
-/*----------------------------   data_out_stack.h     ---------------------------*/

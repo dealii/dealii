@@ -1,10 +1,17 @@
-/*----------------------------   tria_levels.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __tria_levels_H
-#define __tria_levels_H
-/*----------------------------   tria_levels.h     ---------------------------*/
-
+//----------------------------  tria_levels.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_levels.h  ---------------------------
+#ifndef __deal2__tria_levels_h
+#define __deal2__tria_levels_h
 
 
 #include <vector>
@@ -168,7 +175,6 @@ class TriangulationLevel<0> {
 };
 
 
-
 /**
  *  Store all information which belongs to one level of the multilevel hierarchy.
  *  
@@ -314,8 +320,6 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 };
 
 
-
-
 /**
  *  Store all information which belongs to one level of the multilevel hierarchy.
  *
@@ -388,8 +392,8 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 					  */
 	vector<unsigned char> material_id;
 
-    
-					 /**
+
+/**
 					  * Pointer which is not used by the
 					  * library but may be accessed an set
 					  * by the user to handle data local to
@@ -420,8 +424,6 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
 };
-
-
 
 
 /**
@@ -496,8 +498,8 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 					  */
 	vector<unsigned char> material_id;
 
-    
-					 /**
+
+/**
 					  * Pointer which is not used by the
 					  * library but may be accessed an set
 					  * by the user to handle data local to
@@ -530,9 +532,4 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 };
 
 
-
-
-/*----------------------------   tria_levels.h     ---------------------------*/
-/* end of #ifndef __tria_levels_H */
 #endif
-/*----------------------------   tria_levels.h     ---------------------------*/

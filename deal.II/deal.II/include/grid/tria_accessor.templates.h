@@ -1,8 +1,17 @@
-/*----------------------------   tria_accessor.templates.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __tria_accessor_templates_H
-#define __tria_accessor_templates_H
-/*----------------------------   tria_accessor.templates.h     ---------------------------*/
+//----------------------------  tria_accessor.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_accessor.templates.h  ---------------------------
+#ifndef __deal2__tria_accessor_templates_h
+#define __deal2__tria_accessor_templates_h
 
 
 #include <grid/tria.h>
@@ -27,7 +36,6 @@ TriaAccessor<dim>::copy_from (const TriaAccessor<dim> &a) {
   tria = a.tria;
 };
 
- 
 
 template <int dim>
 inline
@@ -37,7 +45,6 @@ TriaAccessor<dim>::operator == (const TriaAccessor<dim> &a) const {
   return ((present_index == a.present_index) &&
 	  (present_level == a.present_level));
 };
-
 
 
 template <int dim>
@@ -50,7 +57,6 @@ TriaAccessor<dim>::operator != (const TriaAccessor<dim> &a) const {
 };
 
 
-
 template <int dim>
 inline
 int
@@ -59,14 +65,12 @@ TriaAccessor<dim>::level () const {
 };
 
 
-  
 template <int dim>
 inline
 int
 TriaAccessor<dim>::index () const {
   return present_index;
 };
-  
 
 
 template <int dim>
@@ -83,7 +87,6 @@ TriaAccessor<dim>::state () const {
 };
 
 
-
 template <int dim>
 inline
 const Triangulation<dim> &
@@ -93,10 +96,7 @@ TriaAccessor<dim>::get_triangulation () const
 };
 
 
-
 /*------------------------ Functions: LineAccessor ---------------------------*/
-
-
 
 
 template <int dim>
@@ -108,8 +108,6 @@ TriaObjectAccessor<1,dim>::used () const {
 };
 
 
-
-
 template <int dim>
 inline
 bool
@@ -117,7 +115,6 @@ TriaObjectAccessor<1,dim>::user_flag_set () const {
   Assert (used(), ExcCellNotUsed());
   return tria->levels[present_level]->lines.user_flags[present_index];
 };
-
 
 
 template <int dim>
@@ -129,7 +126,6 @@ TriaObjectAccessor<1,dim>::set_user_flag () const {
 };
 
 
-
 template <int dim>
 inline
 void
@@ -137,8 +133,6 @@ TriaObjectAccessor<1,dim>::clear_user_flag () const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->lines.user_flags[present_index] = false;
 };
-
-
 
 
 template <int dim>
@@ -157,7 +151,6 @@ TriaObjectAccessor<1,dim>::child (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 inline
 int
@@ -167,8 +160,6 @@ TriaObjectAccessor<1,dim>::child_index (unsigned int i) const {
 };
 
 
-
-
 template <int dim>
 inline
 bool
@@ -176,7 +167,6 @@ TriaObjectAccessor<1,dim>::has_children () const {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->lines.children[present_index] != -1);
 }
-
 
 
 template <int dim>
@@ -191,8 +181,6 @@ TriaObjectAccessor<1,dim>::max_refinement_depth () const
 				   child(1)->max_refinement_depth() + 1  };
   return max (depths[0], depths[1]);
 };
-      
-	    
 
 
 template <int dim>
@@ -221,7 +209,6 @@ TriaObjectAccessor<1,dim>::operator ++ () {
 };
 
 
-
 template <int dim>
 inline
 void
@@ -246,10 +233,7 @@ TriaObjectAccessor<1,dim>::operator -- () {
 };
 
 
-
-
 /*------------------------ Functions: QuadAccessor ---------------------------*/
-
 
 
 template <int dim>
@@ -261,8 +245,6 @@ TriaObjectAccessor<2,dim>::used () const {
 };
 
 
-
-
 template <int dim>
 inline
 bool
@@ -270,7 +252,6 @@ TriaObjectAccessor<2,dim>::user_flag_set () const {
   Assert (used(), ExcCellNotUsed());
   return tria->levels[present_level]->quads.user_flags[present_index];
 };
-
 
 
 template <int dim>
@@ -282,7 +263,6 @@ TriaObjectAccessor<2,dim>::set_user_flag () const {
 };
 
 
-
 template <int dim>
 inline
 void
@@ -290,8 +270,6 @@ TriaObjectAccessor<2,dim>::clear_user_flag () const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->quads.user_flags[present_index] = false;
 };
-
-
 
 
 template <int dim>
@@ -308,7 +286,6 @@ TriaObjectAccessor<2,dim>::line (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 inline
 unsigned int
@@ -317,7 +294,6 @@ TriaObjectAccessor<2,dim>::line_index (unsigned int i) const {
 
   return tria->levels[present_level]->quads.quads[present_index].line(i);
 };
-
 
 
 template <int dim>
@@ -336,15 +312,12 @@ TriaObjectAccessor<2,dim>::child (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 inline
 int TriaObjectAccessor<2,dim>::child_index (unsigned int i) const {
   Assert (i<4, ExcIndexRange(i,0,4));
   return tria->levels[present_level]->quads.children[present_index]+i;
 };
-
-
 
 
 template <int dim>
@@ -354,7 +327,6 @@ TriaObjectAccessor<2,dim>::has_children () const {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->quads.children[present_index] != -1);
 };
-
 
 
 template <int dim>
@@ -372,7 +344,6 @@ TriaObjectAccessor<2,dim>::max_refinement_depth () const
   return max (max (depths[0], depths[1]),
 	      max (depths[2], depths[3]));
 };
-
 
 
 template <int dim>
@@ -400,7 +371,6 @@ TriaObjectAccessor<2,dim>::operator ++ () {
 };
 
 
-
 template <int dim>
 inline
 void
@@ -425,10 +395,7 @@ TriaObjectAccessor<2,dim>::operator -- () {
 };
 
 
-
-
 /*------------------------ Functions: HexAccessor ---------------------------*/
-
 
 
 template <int dim>
@@ -440,7 +407,6 @@ TriaObjectAccessor<3,dim>::used () const {
 };
 
 
-
 template <int dim>
 inline
 bool
@@ -448,7 +414,6 @@ TriaObjectAccessor<3,dim>::user_flag_set () const {
   Assert (used(), ExcCellNotUsed());
   return tria->levels[present_level]->hexes.user_flags[present_index];
 };
-
 
 
 template <int dim>
@@ -460,15 +425,12 @@ TriaObjectAccessor<3,dim>::set_user_flag () const {
 };
 
 
-
 template <int dim>
 inline
 void TriaObjectAccessor<3,dim>::clear_user_flag () const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_flags[present_index] = false;
 };
-
-
 
 
 template <int dim>
@@ -508,7 +470,6 @@ TriaObjectAccessor<3,dim>::line (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<2,dim> >
@@ -522,7 +483,6 @@ TriaObjectAccessor<3,dim>::quad (const unsigned int i) const {
       quad_index (i)
     );
 };
-
 
 
 template <int dim>
@@ -553,7 +513,6 @@ TriaObjectAccessor<3,dim>::line_index (unsigned int i) const {
 };
 
 
-
 template <int dim>
 inline
 unsigned int
@@ -562,7 +521,6 @@ TriaObjectAccessor<3,dim>::quad_index (unsigned int i) const {
 
   return tria->levels[present_level]->hexes.hexes[present_index].quad(i);
 };
-
 
 
 template <int dim>
@@ -581,7 +539,6 @@ TriaObjectAccessor<3,dim>::child (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 inline
 int TriaObjectAccessor<3,dim>::child_index (unsigned int i) const {
@@ -590,13 +547,11 @@ int TriaObjectAccessor<3,dim>::child_index (unsigned int i) const {
 };
 
 
-
 template <int dim>
 bool TriaObjectAccessor<3,dim>::has_children () const {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->hexes.children[present_index] != -1);
 };
-
 
 
 template <int dim>
@@ -620,7 +575,6 @@ TriaObjectAccessor<3,dim>::max_refinement_depth () const
 	      max (max (depths[4], depths[5]),
 		   max (depths[6], depths[7])));
 };
-
 
 
 template <int dim>
@@ -648,7 +602,6 @@ TriaObjectAccessor<3,dim>::operator ++ () {
 };
 
 
-
 template <int dim>
 inline
 void
@@ -673,10 +626,7 @@ TriaObjectAccessor<3,dim>::operator -- () {
 };
 
 
-
-
 /*------------------------ Functions: TriaObjectAccessor ---------------------------*/
-
 
 
 template <int celldim, int dim>
@@ -689,7 +639,6 @@ TriaObjectAccessor<celldim,dim>::used () const
 };
 
 
-
 template<int celldim, int dim>
 inline
 bool
@@ -698,7 +647,6 @@ TriaObjectAccessor<celldim,dim>::user_flag_set () const
   Assert (used(), ExcCellNotUsed());
   return tria->levels[present_level]->hexes.user_flags[present_index];
 };
-
 
 
 template<int celldim, int dim>
@@ -711,7 +659,6 @@ TriaObjectAccessor<celldim,dim>::set_user_flag () const
 };
 
 
-
 template<int celldim, int dim>
 inline
 void TriaObjectAccessor<celldim,dim>::clear_user_flag () const
@@ -719,8 +666,6 @@ void TriaObjectAccessor<celldim,dim>::clear_user_flag () const
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_flags[present_index] = false;
 };
-
-
 
 
 template<int celldim, int dim>
@@ -769,7 +714,6 @@ TriaObjectAccessor<celldim,dim>::line (const unsigned int i) const
 };
 
 
-
 template<int celldim, int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<2,dim> >
@@ -786,7 +730,6 @@ TriaObjectAccessor<celldim,dim>::quad (const unsigned int i) const
       quad_index (i)
     );
 };
-
 
 
 template<int celldim, int dim>
@@ -828,7 +771,6 @@ TriaObjectAccessor<celldim,dim>::line_index (unsigned int i) const
 };
 
 
-
 template<int celldim, int dim>
 inline
 unsigned int
@@ -839,7 +781,6 @@ TriaObjectAccessor<celldim,dim>::quad_index (unsigned int i) const
 
   return tria->levels[present_level]->hexes.hexes[present_index].quad(i);
 };
-
 
 
 template<int celldim, int dim>
@@ -860,7 +801,6 @@ TriaObjectAccessor<celldim,dim>::child (const unsigned int i) const
 };
 
 
-
 template<int celldim, int dim>
 inline
 int TriaObjectAccessor<celldim,dim>::child_index (unsigned int i) const
@@ -871,14 +811,12 @@ int TriaObjectAccessor<celldim,dim>::child_index (unsigned int i) const
 };
 
 
-
 template<int celldim, int dim>
 bool TriaObjectAccessor<celldim,dim>::has_children () const
 {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->hexes.children[present_index] != -1);
 };
-
 
 
 template<int celldim, int dim>
@@ -902,7 +840,6 @@ TriaObjectAccessor<celldim,dim>::max_refinement_depth () const
 	      max (max (depths[4], depths[5]),
 		   max (depths[6], depths[7])));
 };
-
 
 
 template<int celldim, int dim>
@@ -930,7 +867,6 @@ TriaObjectAccessor<celldim,dim>::operator ++ () {
 };
 
 
-
 template<int celldim, int dim>
 inline
 void
@@ -956,8 +892,6 @@ TriaObjectAccessor<celldim,dim>::operator -- ()
 };
 
 
-
-
 /*------------------------ Functions: CellAccessor<dim> -----------------------*/
 
 
@@ -970,7 +904,6 @@ CellAccessor<1>::face (const unsigned int) const {
 };
 
 
-
 template <>
 inline
 Triangulation<2>::face_iterator
@@ -979,14 +912,12 @@ CellAccessor<2>::face (const unsigned int i) const {
 };
 
 
-
 template <>
 inline
 Triangulation<3>::face_iterator
 CellAccessor<3>::face (const unsigned int i) const {
   return quad(i);
 };
-
 
 
 template <int dim>
@@ -1000,7 +931,6 @@ CellAccessor<dim>::neighbor_index (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 inline
 int
@@ -1010,8 +940,6 @@ CellAccessor<dim>::neighbor_level (const unsigned int i) const {
   return tria->levels[present_level]->
     neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first;
 };
-
-
 
 
 template <int dim>
@@ -1030,7 +958,6 @@ CellAccessor<dim>::refine_flag_set () const {
 };
 
 
-
 template <int dim>
 inline
 void
@@ -1042,7 +969,6 @@ CellAccessor<dim>::set_refine_flag () const {
 };
 
 
-
 template <int dim>
 inline
 void
@@ -1050,7 +976,6 @@ CellAccessor<dim>::clear_refine_flag () const {
   Assert (used() && active(), ExcRefineCellNotActive());
   tria->levels[present_level]->refine_flags[present_index] = false;
 };
-
 
 
 template <int dim>
@@ -1069,7 +994,6 @@ CellAccessor<dim>::coarsen_flag_set () const {
 };
 
 
-
 template <int dim>
 inline
 void
@@ -1081,7 +1005,6 @@ CellAccessor<dim>::set_coarsen_flag () const {
 };
 
 
-
 template <int dim>
 inline
 void
@@ -1089,7 +1012,6 @@ CellAccessor<dim>::clear_coarsen_flag () const {
   Assert (used() && active(), ExcRefineCellNotActive());
   tria->levels[present_level]->coarsen_flags[present_index] = false;
 };
-
 
 
 template <int dim>
@@ -1106,7 +1028,6 @@ CellAccessor<dim>::neighbor (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 inline
 TriaIterator<dim,CellAccessor<dim> >
@@ -1121,7 +1042,6 @@ CellAccessor<dim>::child (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 inline
 bool
@@ -1130,11 +1050,4 @@ CellAccessor<dim>::active () const {
 };
 
 
-
-
-
-
-/*----------------------------   tria_accessor.templates.h     ---------------------------*/
-/* end of #ifndef __tria_accessor_templates_H */
 #endif
-/*----------------------------   tria_accessor.templates.h     ---------------------------*/

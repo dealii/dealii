@@ -1,9 +1,17 @@
-/*----------------------------   vectors.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __vectors_H
-#define __vectors_H
-/*----------------------------   vectors.h     ---------------------------*/
+//----------------------------  vectors.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  vectors.h  ---------------------------
+#ifndef __deal2__vectors_h
+#define __deal2__vectors_h
 
 
 #include <base/forward_declarations.h>
@@ -33,8 +41,6 @@ enum NormType {
       H1_seminorm,
       H1_norm
 };
-
-
 
 
 /**
@@ -503,9 +509,9 @@ class VectorTools
 				      */
     static void subtract_mean_value(Vector<double>     &v,
 				    const vector<bool> &p_select);
-    
 
-				     /**
+
+/**
 				      * Exception
 				      */
     DeclException0 (ExcNotUseful);
@@ -524,8 +530,4 @@ class VectorTools
 };
 
 
-
-/*----------------------------   vectors.h     ---------------------------*/
-/* end of #ifndef __vectors_H */
 #endif
-/*----------------------------   vectors.h     ---------------------------*/
