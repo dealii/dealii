@@ -1,14 +1,22 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  q1_mapping.jacobians.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  q1_mapping.jacobians.cc  ---------------------------
 
-// moved from file fe_linear_mapping_jacobians.cc
 
 #include <fe/q1_mapping.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 
 #include <cmath>
-
 
 
 /**
@@ -19,7 +27,6 @@
  * allows to compile this file with less optimization without affecting the other
  * files.
  */
-
 
 
 #if deal_II_dimension == 1
@@ -39,7 +46,6 @@ void FEQ1Mapping<1>::compute_jacobian_matrices (const DoFHandler<1>::cell_iterat
 };
 
 
-
 template <>
 void FEQ1Mapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_iterator &,
 						     const vector<Point<1> > &unit_points,
@@ -57,7 +63,6 @@ void FEQ1Mapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_itera
 
 
 #endif
-
 
 
 #if deal_II_dimension == 2
@@ -112,7 +117,6 @@ void FEQ1Mapping<2>::compute_jacobian_matrices (const DoFHandler<2>::cell_iterat
 				vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
     };
 };
-
 
 
 template <>
@@ -194,7 +198,6 @@ void FEQ1Mapping<2>::compute_jacobian_gradients (const DoFHandler<2>::cell_itera
 
 
 #endif
-
 
 
 #if deal_II_dimension == 3
@@ -1333,7 +1336,6 @@ void FEQ1Mapping<3>::compute_jacobian_matrices (const DoFHandler<3>::cell_iterat
       jacobians[point][2][2] = -(t4707+t4711+t4716+t4725+t4737+t4742+t4747+t4755+t4768+t4780+t4791+t4805+t4816+t4827+t4838+t4844)*t3454;
     };
 };
-
 
 
 template <>

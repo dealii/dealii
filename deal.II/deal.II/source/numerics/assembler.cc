@@ -1,5 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  assembler.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  assembler.cc  ---------------------------
 
 
 #include <numerics/assembler.h>
@@ -29,8 +39,6 @@ Assembler<dim>::AssemblerData::AssemblerData (const DoFHandler<dim>    &dof,
 {};
 
 
-
-
 template <int dim>
 Assembler<dim>::Assembler (Triangulation<dim>  *tria,
 			   const int            level,
@@ -56,7 +64,6 @@ Assembler<dim>::Assembler (Triangulation<dim>  *tria,
 };
 
 
-
 template <int dim>
 void Assembler<dim>::assemble (const Equation<dim> &equation) {
 				   // re-init fe values for this cell
@@ -67,9 +74,9 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
     cell_matrix.clear ();
   if (assemble_rhs)
     cell_vector.clear ();
-  
 
-				   // fill cell matrix and vector if required
+
+// fill cell matrix and vector if required
   DoFHandler<dim>::cell_iterator this_cell (*this);
   if (assemble_matrix && assemble_rhs) 
     equation.assemble (cell_matrix, cell_vector, fe_values, this_cell);
@@ -83,7 +90,7 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 	Assert (false, ExcNoAssemblingRequired());
 
 
-				   // get indices of dofs
+// get indices of dofs
   vector<unsigned int> dofs (n_dofs);
   get_dof_indices (dofs);
 
@@ -104,9 +111,6 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
     for (unsigned int j=0; j<n_dofs; ++j)
       rhs_vector(dofs[j]) += cell_vector(j);
 };
-
-		
-
 
 
 // explicit instantiations

@@ -1,5 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  base.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  base.cc  ---------------------------
 
 
 #include <numerics/assembler.h>
@@ -24,7 +34,6 @@
 #include <cmath>
 
 
-
 template <int dim>
 ProblemBase<dim>::ProblemBase () :
 		tria(0),
@@ -32,7 +41,6 @@ ProblemBase<dim>::ProblemBase () :
 		system_sparsity(),        // dummy initialisation, is later reinit'd
 		system_matrix()           // dummy initialisation, is later reinit'd
 {};
-
 
 
 template <int dim>
@@ -53,7 +61,6 @@ void ProblemBase<dim>::set_tria_and_dof (Triangulation<dim> *t,
 };
 
 
-
 template <int dim>
 void ProblemBase<dim>::clear () {
   if (tria)        { delete tria;         tria        = 0; };
@@ -66,10 +73,8 @@ void ProblemBase<dim>::clear () {
 };
 
 
-
 template <int dim>
 ProblemBase<dim>::~ProblemBase () {};
-
 
 
 template <int dim>
@@ -139,8 +144,6 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 };
 
 
-
-
 template <int dim>
 void ProblemBase<dim>::solve ()
 {
@@ -162,8 +165,6 @@ void ProblemBase<dim>::solve ()
 };
 
 
-
-
 template <int dim>
 void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
@@ -175,16 +176,10 @@ void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
 };
 
 
-
 template <int dim>
 string ProblemBase<dim>::get_solution_name () const {
   return "solution";
 };
-
-
-
-
-  
 
 
 // explicit instantiations

@@ -1,11 +1,20 @@
-/* $Id$ */
+//----------------------------  grid_generator.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  grid_generator.cc  ---------------------------
 
 
 #include <grid/grid_generator.h>
 #include <grid/tria.h>
 #include <cmath>
-
-
 
 
 #if deal_II_dimension == 1
@@ -26,14 +35,12 @@ void GridGenerator::hyper_cube<> (Triangulation<1> &tria,
 };
 
 
-
 template <>
 void GridGenerator::hyper_cube_slit<> (Triangulation<1> &,
 				       const double,
 				       const double) {
   Assert (false, ExcInternalError());
 };
-
 
 
 template <>
@@ -44,14 +51,12 @@ void GridGenerator::hyper_L<> (Triangulation<1> &,
 };
 
 
-
 template <>
 void GridGenerator::hyper_ball<> (Triangulation<1> &,
 				  const Point<1> &,
 				  const double) {
   Assert (false, ExcInternalError());
 };
-
 
 
 template <>
@@ -64,7 +69,6 @@ void GridGenerator::hyper_shell<> (Triangulation<1> &,
 };
 
 #endif
-
 
 
 #if deal_II_dimension == 2
@@ -87,7 +91,6 @@ void GridGenerator::hyper_cube<> (Triangulation<2> &tria,
 			     cells,
 			     SubCellData());       // no boundary information
 };
-
 
 
 template <>
@@ -122,7 +125,6 @@ void GridGenerator::hyper_cube_slit<> (Triangulation<2> &tria,
 };
 
 
-
 template <>
 void GridGenerator::hyper_L<> (Triangulation<2> &tria,
 			       const double a,
@@ -153,7 +155,6 @@ void GridGenerator::hyper_L<> (Triangulation<2> &tria,
 			     cells,
 			     SubCellData());       // no boundary information
 };
-
 
 
 template <>
@@ -191,7 +192,6 @@ void GridGenerator::hyper_ball<> (Triangulation<2> &tria,
 			     cells,
 			     SubCellData());       // no boundary information
 };
-
 
 
 template <>
@@ -283,14 +283,12 @@ void GridGenerator::hyper_cube<> (Triangulation<3> &tria,
 };
 
 
-
 template <>
 void GridGenerator::hyper_cube_slit<> (Triangulation<3> &,
 				       const double,
 				       const double) {
   Assert (false, ExcNotImplemented());
 };
-
 
 
 template <>
@@ -356,7 +354,6 @@ void GridGenerator::hyper_L<> (Triangulation<3> &tria,
 };
 
 
-
 template <>
 void GridGenerator::hyper_ball<> (Triangulation<3> &tria,
 				  const Point<3> &p,
@@ -415,7 +412,6 @@ void GridGenerator::hyper_ball<> (Triangulation<3> &tria,
 };
 
 
-
 template <>
 void GridGenerator::hyper_shell<> (Triangulation<3>   &,
 				   const Point<3>     &,
@@ -428,8 +424,6 @@ void GridGenerator::hyper_shell<> (Triangulation<3>   &,
 
 
 #endif
-
-
 
 
 // explicit instantiations

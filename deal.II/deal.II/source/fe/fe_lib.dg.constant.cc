@@ -1,4 +1,15 @@
-/*            Ralf Hartmann, University of Heidelberg, Dez 98               */
+//----------------------------  fe_lib.dg.constant.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_lib.dg.constant.cc  ---------------------------
 
 
 #include <fe/fe_lib.dg.h>
@@ -6,9 +17,6 @@
 #include <dofs/dof_accessor.h>
 #include <grid/geometry_info.h>
 #include <algorithm>
-
-
-
 
 
 template <int dim>
@@ -26,7 +34,6 @@ FEDG_Q0<dim>::FEDG_Q0 () :
       prolongation[i](0,0) = 1.0;
     }
 };
-
 
 
 #if deal_II_dimension == 1
@@ -53,7 +60,6 @@ FEDG_Q0<dim>::shape_value (const unsigned int i,
 };
 
 
-
 template <int dim>
 inline
 Tensor<1,dim>
@@ -63,7 +69,6 @@ FEDG_Q0<dim>::shape_grad (const unsigned int i,
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
   return Tensor<1,dim> ();
 };
-
 
 
 template <int dim>
@@ -78,7 +83,6 @@ FEDG_Q0<dim>::shape_grad_grad (const unsigned int i,
 };
 
 
-
 template <int dim>
 void FEDG_Q0<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					       FullMatrix<double> &local_mass_matrix) const {
@@ -91,7 +95,6 @@ void FEDG_Q0<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &
 };
 
 
-
 template <int dim>
 void
 FEDG_Q0<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) const {
@@ -100,7 +103,7 @@ FEDG_Q0<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) const {
   for (unsigned int d=0; d<dim; ++d)
     unit_points[0](d) = 0.5;
 };
-  
+
 
 template <int dim>
 void
@@ -120,7 +123,6 @@ FEDG_Q0<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iter
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
 };
-
 
 
 // explicit instantiations

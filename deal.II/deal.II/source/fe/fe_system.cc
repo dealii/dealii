@@ -1,11 +1,18 @@
-/* $Id$ */
-/* Copyright W. Bangerth, G. Kanschat University of Heidelberg, 1999 */
+//----------------------------  fe_system.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_system.cc  ---------------------------
 
 
 #include <fe/fe_system.h>
-
-
-
 
 
 template <int dim>
@@ -262,7 +269,6 @@ FESystem<dim>::build_face_table()
 }
 
 
-
 template <int dim>
 void FESystem<dim>::build_interface_constraints () 
 {
@@ -457,9 +463,6 @@ void FESystem<dim>::build_interface_constraints ()
 };
 
 
-
-
-
 template <int dim>
 void FESystem<dim>::initialize ()
 {
@@ -486,13 +489,11 @@ void FESystem<dim>::initialize ()
 	  };
 
 
-				   // now set up the interface constraints.
+// now set up the interface constraints.
 				   // this is kind'o hairy, so don't try
 				   // to do it dimension independent
   build_interface_constraints ();
 };
-
-
 
 
 #if deal_II_dimension == 1
@@ -717,8 +718,6 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
   return tmp;
 };
 
-		
-
 
 template <int dim>
 double
@@ -732,7 +731,6 @@ FESystem<dim>::shape_value (const unsigned int i,
   return base_element(component_to_base_table[comp.first])
     .shape_value(comp.second, p);
 };
-
 
 
 template <int dim>
@@ -749,7 +747,6 @@ FESystem<dim>::shape_grad (const unsigned int  i,
 };
 
 
-
 template <int dim>
 Tensor<2,dim>
 FESystem<dim>::shape_grad_grad (const unsigned int  i,
@@ -758,12 +755,11 @@ FESystem<dim>::shape_grad_grad (const unsigned int  i,
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
 
-  pair<unsigned,unsigned> comp = system_to_component_index(i);
+pair<unsigned,unsigned> comp = system_to_component_index(i);
   
   return base_element(component_to_base_table[comp.first])
     .shape_grad_grad(comp.second, p);
 };
-
 
 
 template <int dim>
@@ -817,7 +813,6 @@ void FESystem<dim>::get_unit_support_points (
 };
 
 
-
 template <int dim>
 void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &cell,
 					vector<Point<dim> > &support_points) const
@@ -847,7 +842,6 @@ void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &ce
 };
 
 
-
 template <int dim>
 void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterator & face,
 					     vector<Point<dim> > & support_points) const
@@ -873,7 +867,6 @@ void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterato
 	}
     }
 }
-
 
 
 template <int dim>
@@ -918,7 +911,6 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 };
 
 
-
 template <int dim>
 double FESystem<dim>::shape_value_transform (const unsigned int i,
 					     const Point<dim>  &p) const
@@ -935,7 +927,6 @@ Tensor<1,dim> FESystem<dim>::shape_grad_transform (const unsigned int i,
 };
 
 
-
 template <int dim>
 void FESystem<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
 					const vector<Point<dim-1> > &unit_points,
@@ -944,7 +935,6 @@ void FESystem<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &fa
   base_elements[0].first->get_face_jacobians (face, unit_points,
 					      face_jacobi_determinants);
 };
-
 
 
 template <int dim>
@@ -958,8 +948,6 @@ void FESystem<dim>::get_subface_jacobians (const DoFHandler<dim>::face_iterator 
 };
 
 
-
-
 template <int dim>
 void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 					const unsigned int          face_no,
@@ -969,7 +957,6 @@ void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &ce
   base_elements[0].first->get_normal_vectors (cell, face_no, unit_points,
 					normal_vectors);
 };
-
 
 
 template <int dim>
@@ -1036,10 +1023,8 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
     }
 }
 
-    
 
 // explicit instantiations
 template class FESystem<deal_II_dimension>;
-
 
 

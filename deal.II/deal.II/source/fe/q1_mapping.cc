@@ -1,7 +1,16 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  q1_mapping.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  q1_mapping.cc  ---------------------------
 
-// moved from file fe_linear_mapping.cc
 
 #include <fe/q1_mapping.h>
 #include <base/quadrature.h>
@@ -11,9 +20,7 @@
 #include <cmath>
 
 
-
 /*---------------------------- FEQ1Mapping ----------------------------------*/
-
 
 
 #if deal_II_dimension == 1
@@ -36,7 +43,6 @@ FEQ1Mapping<1>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 };
 
 
-
 template <>
 inline
 double
@@ -52,7 +58,6 @@ FEQ1Mapping<1>::shape_value_transform (const unsigned int i,
     }
   return 0.;
 };
-
 
 
 template <>
@@ -71,14 +76,12 @@ FEQ1Mapping<1>::shape_grad_transform(const unsigned int i,
 };
 
 
-
 template <>
 void FEQ1Mapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 					     const vector<Point<0> > &,
 					     vector<double>      &) const {
   Assert (false, ExcInternalError());
 };
-
 
 
 template <>
@@ -90,7 +93,6 @@ void FEQ1Mapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &
 };
 
 
-
 template <>
 void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					     const unsigned int,
@@ -98,7 +100,6 @@ void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					     vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
-
 
 
 template <>
@@ -109,7 +110,6 @@ void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					 vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
-
 
 
 template <>
@@ -135,9 +135,7 @@ void FEQ1Mapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 };
 
 
-
 #endif
-
 
 
 #if deal_II_dimension == 2
@@ -160,7 +158,6 @@ FEQ1Mapping<2>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 };
 
 
-
 template <>
 inline
 double
@@ -177,7 +174,6 @@ FEQ1Mapping<2>::shape_value_transform (const unsigned int i,
     }
   return 0.;
 };
-
 
 
 template <>
@@ -198,7 +194,6 @@ FEQ1Mapping<2>::shape_grad_transform (const unsigned int i,
 };
 
 
-
 template <>
 void FEQ1Mapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
 					     const vector<Point<1> > &unit_points,
@@ -217,7 +212,6 @@ void FEQ1Mapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &fac
 	  unit_points.size(),
 	  h);  
 };
-
 
 
 template <>
@@ -241,7 +235,6 @@ void FEQ1Mapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &
 	  unit_points.size(),
 	  h/2);
 };
-
 
 
 template <>
@@ -272,7 +265,6 @@ void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cel
     fill (normal_vectors.begin(), normal_vectors.end(),
 	  normal_direction / (-sqrt(normal_direction.square())));
 };
-
 
 
 template <>
@@ -313,7 +305,6 @@ void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cel
 #endif
 
 
-
 #if deal_II_dimension == 3
 
 template <>
@@ -331,7 +322,6 @@ FEQ1Mapping<3>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 							n_components),
 				  restriction_is_additive_flags)
 {};
-
 
 
 template <>
@@ -354,7 +344,6 @@ FEQ1Mapping<3>::shape_value_transform (const unsigned int i,
     }
   return 0.;
 };
-
 
 
 template <>
@@ -393,7 +382,6 @@ FEQ1Mapping<3>::shape_grad_transform (const unsigned int i,
     }
   return Point<3> ();
 };
-
 
 
 template <>
@@ -467,7 +455,6 @@ void FEQ1Mapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &fac
 };
 
 
-
 template <>
 void FEQ1Mapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &/*face*/,
 						const unsigned int           ,
@@ -476,7 +463,6 @@ void FEQ1Mapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &
   Assert (false,
 	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
 };
-
 
 
 template <>
@@ -533,7 +519,6 @@ void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cel
 };
 
 
-
 template <>
 void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*cell*/,
 					     const unsigned int       /*face_no*/,
@@ -550,7 +535,6 @@ void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*c
 };
 
 #endif
-
 
 
 template <int dim>
@@ -576,15 +560,15 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
   Assert ((!compute_support_points) || (support_points.size() == dofs_per_cell),
 	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 
-  
-  unsigned int n_points=unit_points.size();
+
+unsigned int n_points=unit_points.size();
 
   Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
   for (unsigned int l=0; l<GeometryInfo<dim>::vertices_per_cell; ++l)
     vertices[l] = cell->vertex(l);
-  
 
-  if (compute_q_points) 
+
+if (compute_q_points) 
     {
 				       // initialize points to zero
       for (unsigned int i=0; i<n_points; ++i)
@@ -606,7 +590,7 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
 	for (unsigned int l=0; l<n_points; ++l) 
 	  q_points[l] += vertices[j] * shape_values_transform(j, l);
     };
-  
+
 
 /* jacobi matrices: compute d(x)/d(xi) and invert this
    Let M(l) be the inverse of J at the quadrature point l, then
@@ -651,8 +635,8 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
 	};
     };
 
-    
-  One last note regarding whether we have to invert M or M transposed: it is
+
+One last note regarding whether we have to invert M or M transposed: it is
   easy to try out, by computing the gradients of a function on a distorted
   cell (just move one vertex) where the nodal values for linear elements
   are one for the moved vertex and zero otherwise. Please also note that
@@ -687,9 +671,9 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
     QTrapez<2> q;
     FEValues<2> fevalues(fe,q,update_gradients);
     fevalues.reinit (dof.begin_active(),b);
-  
-  
-    Vector<double> val(4);
+
+
+Vector<double> val(4);
     val(2) = 1;
 
     vector<Point<2> > grads(4);
@@ -726,8 +710,6 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
   if (compute_support_points)
     get_support_points (cell, support_points);
 };
-
-
 
 
 /*------------------------------- Explicit Instantiations -------------*/

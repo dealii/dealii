@@ -1,6 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
-
+//----------------------------  dof_accessor.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_accessor.cc  ---------------------------
 
 
 #include <dofs/dof_accessor.h>
@@ -17,11 +26,7 @@
 #include <vector>
 
 
-
-
-
 /*------------------------- Functions: DoFLineAccessor -----------------------*/
-
 
 
 template <int dim>
@@ -40,8 +45,6 @@ void DoFObjectAccessor<1, dim>::set_dof_index (const unsigned int i,
 };
 
 
-
-
 template <int dim>
 void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i,
@@ -58,7 +61,6 @@ void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   i);
   dof_handler->vertex_dofs[dof_number] = index;
 };
-
 
 
 template <int dim>
@@ -83,7 +85,6 @@ distribute_local_to_global (const Vector<double> &local_source,
   for (unsigned int j=0; j<n_dofs; ++j)
     global_destination(dofs[j]) += local_source(j);
 };
-
 
 
 template <int dim>
@@ -113,7 +114,6 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
     for (unsigned int j=0; j<n_dofs; ++j)
       global_destination.add(dofs[i], dofs[j], local_source(i,j));
 };
-
 
 
 template <int dim>
@@ -146,7 +146,6 @@ DoFObjectAccessor<1,dim>::get_dof_values (const Vector<number> &values,
 };
 
 
-
 template <int dim>
 template <typename number>
 void
@@ -176,8 +175,6 @@ DoFObjectAccessor<1,dim>::set_dof_values (const Vector<number> &local_values,
 };
 
 
-
-
 /*------------------------- Functions: DoFQuadAccessor -----------------------*/
 
 
@@ -197,7 +194,6 @@ void DoFObjectAccessor<2, dim>::set_dof_index (const unsigned int i,
 };
 
 
-
 template <int dim>
 void
 DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
@@ -215,7 +211,6 @@ DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   i);
   dof_handler->vertex_dofs[dof_number] = index;
 };
-
 
 
 template <int dim>
@@ -241,7 +236,6 @@ distribute_local_to_global (const Vector<double> &local_source,
   for (unsigned int j=0; j<n_dofs; ++j)
     global_destination(dofs[j]) += local_source(j);
 };
-
 
 
 template <int dim>
@@ -272,7 +266,6 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
     for (unsigned int j=0; j<n_dofs; ++j)
       global_destination.add(dofs[i], dofs[j], local_source(i,j));
 };
-
 
 
 template <int dim>
@@ -309,7 +302,6 @@ DoFObjectAccessor<2,dim>::get_dof_values (const Vector<number> &values,
 };
 
 
-
 template <int dim>
 template <typename number>
 void
@@ -344,10 +336,6 @@ DoFObjectAccessor<2,dim>::set_dof_values (const Vector<number> &local_values,
 };
 
 
-
-
-
-
 /*------------------------- Functions: DoFHexAccessor -----------------------*/
 
 
@@ -367,7 +355,6 @@ void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
 };
 
 
-
 template <int dim>
 void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i,
@@ -384,7 +371,6 @@ void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   i);
   dof_handler->vertex_dofs[dof_number] = index;
 };
-
 
 
 template <int dim>
@@ -411,7 +397,6 @@ distribute_local_to_global (const Vector<double> &local_source,
   for (unsigned int j=0; j<n_dofs; ++j)
     global_destination(dofs[j]) += local_source(j);
 };
-
 
 
 template <int dim>
@@ -444,7 +429,6 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
     for (unsigned int j=0; j<n_dofs; ++j)
       global_destination.add(dofs[i], dofs[j], local_source(i,j));
 };
-
 
 
 template <int dim>
@@ -485,7 +469,6 @@ DoFObjectAccessor<3,dim>::get_dof_values (const Vector<number> &values,
 };
 
 
-
 template <int dim>
 template <typename number>
 void
@@ -524,11 +507,7 @@ DoFObjectAccessor<3,dim>::set_dof_values (const Vector<number> &local_values,
 };
 
 
-
-
-
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
-
 
 
 #if deal_II_dimension == 1
@@ -544,7 +523,6 @@ DoFCellAccessor<1>::face (const unsigned int) const
 #endif
 
 
-
 #if deal_II_dimension == 2
 
 template <>
@@ -557,7 +535,6 @@ DoFCellAccessor<2>::face (const unsigned int i) const
 #endif
 
 
-
 #if deal_II_dimension == 3
 
 template <>
@@ -568,8 +545,6 @@ DoFCellAccessor<3>::face (const unsigned int i) const
 };
 
 #endif
-
-
 
 
 template <int dim>
@@ -634,7 +609,6 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
 };
 
 
-
 template <int dim>
 template <typename number>
 void
@@ -669,11 +643,6 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
 	};
     };
 };
-
-
-
-
-
 
 
 // explicit instantiations
@@ -793,7 +762,6 @@ set_dof_values_by_interpolation(const Vector<float> &,
 				Vector<float>       &) const;
 
 
-
 #if deal_II_dimension == 1
 template class DoFObjectAccessor<1, 1>;
 #endif
@@ -806,7 +774,6 @@ template class TriaRawIterator   <2,DoFObjectAccessor<1, 2> >;
 template class TriaIterator      <2,DoFObjectAccessor<1, 2> >;
 template class TriaActiveIterator<2,DoFObjectAccessor<1, 2> >;
 #endif
-
 
 
 #if deal_II_dimension == 3

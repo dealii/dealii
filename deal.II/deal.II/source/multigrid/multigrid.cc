@@ -1,4 +1,15 @@
-// $Id$
+//----------------------------  multigrid.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  multigrid.cc  ---------------------------
 
 
 #include <grid/tria.h>
@@ -10,7 +21,6 @@
 #include <multigrid/multigrid.templates.h>
 #include <multigrid/mg_smoother.h>
 #include <lac/vector.h>
-
 
 
 /* --------------------------------- MG ------------------------------------ */
@@ -34,7 +44,6 @@ Multigrid<dim>::Multigrid (const MGDoFHandler<dim>                       &mg_dof
 {};
 
 
-
 template <int dim>
 void
 Multigrid<dim>::level_vmult (const unsigned int    level,
@@ -47,17 +56,11 @@ Multigrid<dim>::level_vmult (const unsigned int    level,
 }
 
 
-
-
-
-
 /* ----------------------------- MGTransferPrebuilt ------------------------ */
-
 
 
 MGTransferPrebuilt::~MGTransferPrebuilt () 
 {};
-
 
 
 template <int dim>
@@ -72,9 +75,9 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
   prolongation_matrices.clear ();
   prolongation_sparsities.reserve (n_levels-1);
   prolongation_matrices.reserve (n_levels-1);
-  
 
-				   // two fields which will store the
+
+// two fields which will store the
 				   // indices of the multigrid dofs
 				   // for a cell and one of its children
   vector<unsigned int> dof_indices_mother (dofs_per_cell);
@@ -136,7 +139,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
       prolongation_matrices[level].reinit (prolongation_sparsities[level]);
 
 
-				       // now actually build the matrices
+// now actually build the matrices
       for (MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	if (cell->has_children())
@@ -171,7 +174,6 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 };
 
 
-
 void MGTransferPrebuilt::prolongate (const unsigned int   to_level,
 				     Vector<double>       &dst,
 				     const Vector<double> &src) const 
@@ -183,7 +185,6 @@ void MGTransferPrebuilt::prolongate (const unsigned int   to_level,
 };
 
 
-
 void MGTransferPrebuilt::restrict_and_add (const unsigned int   from_level,
 					   Vector<double>       &dst,
 					   const Vector<double> &src) const 
@@ -193,7 +194,6 @@ void MGTransferPrebuilt::restrict_and_add (const unsigned int   from_level,
 
   prolongation_matrices[from_level-1].Tvmult_add (dst, src);
 };
-
 
 
 // explicit instatations
@@ -213,4 +213,4 @@ void Multigrid<deal_II_dimension>::copy_from_mg (Vector<float>& src) const;
 template
 void Multigrid<deal_II_dimension>::copy_from_mg (Vector<double>& src) const;
 
-  
+

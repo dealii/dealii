@@ -1,4 +1,16 @@
-/* $Id$ */
+//----------------------------  grid_out.all_dimensions.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  grid_out.all_dimensions.cc  ---------------------------
+
 
 #include <grid/grid_out.h>
 
@@ -10,13 +22,11 @@ GridOut::UcdFlags::UcdFlags (const bool write_preamble,
 {};
 
 
-
 GridOut::GnuplotFlags::GnuplotFlags (const bool write_cell_numbers,
 				     const bool write_level) :
 		write_cell_numbers (write_cell_numbers),
 		write_level (write_level)
 {};
-
 
 
 GridOut::EpsFlagsBase::EpsFlagsBase (const SizeType     size_type,
@@ -26,7 +36,6 @@ GridOut::EpsFlagsBase::EpsFlagsBase (const SizeType     size_type,
 		size (size),
 		line_width (line_width)
 {};
-
 
 
 // egcs 1.1.2 does not understand this, so I made it inlined in the
@@ -40,12 +49,10 @@ GridOut::EpsFlagsBase::EpsFlagsBase (const SizeType     size_type,
 // {};
 
 
-
 void GridOut::set_flags (const UcdFlags &flags) 
 {
   ucd_flags = flags;
 };
-
 
 
 void GridOut::set_flags (const GnuplotFlags &flags) 
@@ -54,12 +61,10 @@ void GridOut::set_flags (const GnuplotFlags &flags)
 };
 
 
-
 void GridOut::set_flags (const EpsFlags<1> &flags) 
 {
   eps_flags_1 = flags;
 };
-
 
 
 void GridOut::set_flags (const EpsFlags<2> &flags) 
@@ -68,12 +73,10 @@ void GridOut::set_flags (const EpsFlags<2> &flags)
 };
 
 
-
 void GridOut::set_flags (const EpsFlags<3> &flags) 
 {
   eps_flags_3 = flags;
 };
-
 
 
 string GridOut::default_suffix (const OutputFormat output_format) 
@@ -94,8 +97,6 @@ string GridOut::default_suffix (const OutputFormat output_format)
 	    return "";
     };
 };
-  
-
 
 
 GridOut::OutputFormat
@@ -114,7 +115,6 @@ GridOut::parse_output_format (const string &format_name)
 				   // return something weird
   return OutputFormat(-1);
 };
-
 
 
 string GridOut::get_output_format_names () {

@@ -1,5 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  fe.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe.cc  ---------------------------
 
 
 #include <fe/fe.h>
@@ -10,7 +20,6 @@
 #include <grid/tria_boundary.h>
 
 
-
 /*------------------------------- FiniteElementData ----------------------*/
 
 template <int dim>
@@ -18,8 +27,6 @@ FiniteElementData<dim>::FiniteElementData ()
 {
   Assert (false, ExcNotImplemented());
 };
-
-
 
 
 template <int dim>
@@ -57,7 +64,6 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 };
 
 
-
 template <int dim>
 FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_line,
@@ -88,7 +94,6 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 };
 
 
-
 template <int dim>
 FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_line,
@@ -117,12 +122,9 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 };
 
 
-
 template <int dim>
 FiniteElementData<dim>::~FiniteElementData ()
 {};
-
-
 
 
 template<int dim>
@@ -137,9 +139,7 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 };
 
 
-
 /*------------------------------- FiniteElementBase ----------------------*/
-
 
 
 template <int dim>
@@ -204,7 +204,6 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 };
 
 
-
 template <int dim>
 const FullMatrix<double> &
 FiniteElementBase<dim>::restrict (const unsigned int child) const
@@ -215,7 +214,6 @@ FiniteElementBase<dim>::restrict (const unsigned int child) const
 };
 
 
-
 template <int dim>
 const FullMatrix<double> &
 FiniteElementBase<dim>::prolongate (const unsigned int child) const
@@ -224,7 +222,6 @@ FiniteElementBase<dim>::prolongate (const unsigned int child) const
 	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
   return prolongation[child];
 };
-
 
 
 template <int dim>
@@ -240,7 +237,6 @@ FiniteElementBase<dim>::constraints () const
 };
 
 
-
 template <int dim>
 bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 {
@@ -248,7 +244,6 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 	   static_cast<const FiniteElementData<dim>&>(f)) &&
 	  (interface_constraints == f.interface_constraints));
 };
-
 
 
 /*------------------------------- FiniteElement ----------------------*/
@@ -290,7 +285,7 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 
 
-				   // local mesh width
+// local mesh width
   const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
 
   for (unsigned int i=0; i<q_points.size(); ++i) 
@@ -316,7 +311,6 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
   if (compute_support_points)
     get_support_points (cell, support_points);
 };
-
 
 
 template <>
@@ -364,7 +358,6 @@ void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterato
 };
 
 
-
 template <>
 void FiniteElement<1>::get_unit_support_points (vector<Point<1> > &support_points) const {
   Assert (support_points.size() == dofs_per_cell,
@@ -384,7 +377,6 @@ void FiniteElement<1>::get_unit_support_points (vector<Point<1> > &support_point
   for (unsigned int i=0; i<dofs_per_line; ++i) 
     support_points[next++] = Point<1>((i+1.0)/(dofs_per_line+1.0));
 };
-
 
 
 template <>
@@ -413,7 +405,6 @@ void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &c
 #endif
 
 
-
 template <int dim>
 void FiniteElement<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
 					 const vector<Point<dim> > &,
@@ -429,7 +420,6 @@ void FiniteElement<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
 					 const vector<vector<Tensor<1,dim> > > &) const {
   Assert (false, ExcPureFunctionCalled());
 };
-
 
 
 template <int dim>
@@ -482,8 +472,6 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 };
 
 
-
-
 template <int dim>
 void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_iterator &cell,
 						 const unsigned int           face_no,
@@ -527,14 +515,12 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 };
 
 
-
 template <int dim>
 void
 FiniteElement<dim>::get_unit_support_points (vector<Point<dim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 };
-
 
 
 template <int dim>
@@ -566,6 +552,5 @@ FiniteElement<dim>::base_element(unsigned index) const
 template class FiniteElementData<deal_II_dimension>;
 template class FiniteElementBase<deal_II_dimension>;
 template class FiniteElement<deal_II_dimension>;
-
 
 

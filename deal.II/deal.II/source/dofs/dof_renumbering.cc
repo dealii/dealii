@@ -1,4 +1,16 @@
-/* $Id$ */
+//----------------------------  dof_renumbering.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_renumbering.cc  ---------------------------
+
 
 #include <lac/sparsity_pattern.h>
 #include <dofs/dof_accessor.h>
@@ -14,7 +26,6 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-
 
 
 template <int dim>
@@ -100,9 +111,9 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>            &dof_handler,
 				       // initialize the first dof
       last_round_dofs.push_back (starting_point);
     };
-  
 
-				   // store next free dof index
+
+// store next free dof index
   unsigned int next_free_number = 0;
 
 				   // enumerate the first round dofs
@@ -150,9 +161,9 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>            &dof_handler,
       if (all_dofs_renumbered)
 					 // end loop if possible
 	continue;
-      
 
-				       // store for each coordination
+
+// store for each coordination
 				       // number the dofs with these
 				       // coordination number
       multimap<unsigned int, int> dofs_by_coordination;
@@ -205,8 +216,6 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>            &dof_handler,
 				   // thus needs an own function
   dof_handler.renumber_dofs (new_number);
 };
-
-
 
 
 template <int dim>
@@ -265,9 +274,9 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
 				       // initialize the first dof
       last_round_dofs.push_back (starting_point);
     };
-  
 
-				   // store next free dof index
+
+// store next free dof index
   unsigned int next_free_number = 0;
 
 				   // enumerate the first round dofs
@@ -315,9 +324,9 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
       if (all_dofs_renumbered)
 					 // end loop if possible
 	continue;
-      
 
-				       // store for each coordination
+
+// store for each coordination
 				       // number the dofs with these
 				       // coordination number
       multimap<unsigned int, int> dofs_by_coordination;
@@ -371,7 +380,6 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
 				   // thus needs an own function
   dof_handler.renumber_dofs (level, new_number);
 };
-
 
 
 template <int dim>
@@ -467,10 +475,6 @@ void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 
   dof_handler.renumber_dofs (new_indices);
 };
-
-  
-  
-
 
 
 // explicit instantiations

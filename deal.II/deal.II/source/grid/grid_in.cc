@@ -1,4 +1,16 @@
-/* $Id$ */
+//----------------------------  grid_in.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  grid_in.cc  ---------------------------
+
 
 #include <grid/grid_in.h>
 #include <grid/tria.h>
@@ -6,11 +18,9 @@
 #include <map>
 
 
-
 template <int dim>
 GridIn<dim>::GridIn () :
 		tria(0) {};
-
 
 
 template <int dim>
@@ -18,7 +28,6 @@ void GridIn<dim>::attach_triangulation (Triangulation<dim> &t)
 {
   tria = &t;
 };
-
 
 
 template <int dim>
@@ -41,9 +50,9 @@ void GridIn<dim>::read_ucd (istream &in)
 				   // put back first character of
 				   // first non-comment line
   in.putback (c);
-  
-  
-  unsigned int n_vertices;
+
+
+unsigned int n_vertices;
   unsigned int n_cells;
   int dummy;
 
@@ -152,7 +161,6 @@ void GridIn<dim>::read_ucd (istream &in)
 
   tria->create_triangulation (vertices, cells, subcelldata);
 };
-
 
 
 //explicit instantiations

@@ -1,4 +1,16 @@
-/* $Id$ */
+//----------------------------  persistent_tria.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  persistent_tria.cc  ---------------------------
+
 
 #include <grid/persistent_tria.h>
 #include <grid/magic_numbers.h>
@@ -27,11 +39,9 @@ PersistentTriangulation (const PersistentTriangulation<dim> &old_tria) :
 };
 
 
-
 template <int dim>
 PersistentTriangulation<dim>::~PersistentTriangulation () 
 {};
-
 
 
 template <int dim>
@@ -47,7 +57,6 @@ PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
 				   // then refine triangulation
   Triangulation<dim>::execute_coarsening_and_refinement ();
 };
-
 
 
 template <int dim>
@@ -72,7 +81,6 @@ PersistentTriangulation<dim>::restore () {
 };
 
 
-
 template <int dim>
 void
 PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_grid) 
@@ -92,7 +100,6 @@ PersistentTriangulation<dim>::create_triangulation (const vector<Point<dim> >   
 {
   Assert (false, ExcFunctionNotUseful());
 };
-
 
 
 template <int dim>
@@ -117,7 +124,6 @@ PersistentTriangulation<dim>::write_flags(ostream &out) const
 
   AssertThrow (out, ExcIO());
 }
-
 
 
 template <int dim>

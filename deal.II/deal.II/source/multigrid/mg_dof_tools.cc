@@ -1,4 +1,15 @@
-/* $Id$ */
+//----------------------------  mg_dof_tools.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  mg_dof_tools.cc  ---------------------------
 
 
 #include <lac/sparsity_pattern.h>
@@ -68,7 +79,8 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 	   face < GeometryInfo<dim>::faces_per_cell;
 	   ++face)
 	{
-	  if ( (! cell->at_boundary(face)) && (cell->neighbor_level(face) == level) )
+	  if ( (! cell->at_boundary(face)) &&
+	       (static_cast<unsigned int>(cell->neighbor_level(face)) == level) )
 	    {
 	      DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face);
 	      neighbor->get_dof_indices (dofs_on_other_cell);

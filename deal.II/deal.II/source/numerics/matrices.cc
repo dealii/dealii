@@ -1,4 +1,16 @@
-/*      $Id$                 */
+//----------------------------  matrices.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  matrices.cc  ---------------------------
+
 
 #include <base/function.h>
 #include <dofs/dof_handler.h>
@@ -16,7 +28,6 @@
 #include <algorithm>
 #include <set>
 #include <cmath>
-
 
 
 template <int dim>
@@ -44,8 +55,6 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
     }
   while ((++assembler).state() == valid);
 };
-
-
 
 
 template <int dim>
@@ -76,7 +85,6 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 };
 
 
-
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     SparseMatrix<double>     &matrix) {
@@ -102,7 +110,6 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 };
 
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -117,7 +124,6 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 };
 
 #endif
-
 
 
 template <int dim>
@@ -159,9 +165,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_vector(dofs_per_cell);
-  
-  
-  UpdateFlags update_flags = UpdateFlags (update_values     |
+
+
+UpdateFlags update_flags = UpdateFlags (update_values     |
 					  update_JxW_values |
 					  update_q_points);
   FEFaceValues<dim> fe_values (fe, q, update_flags);
@@ -284,10 +290,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 					weights[point];
 		    };
 	    };
-	  
 
 
-					   // now transfer cell matrix and vector
+// now transfer cell matrix and vector
 					   // to the whole boundary matrix
 					   //
 					   // in the following: dof[i] holds the
@@ -399,7 +404,6 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 };
 
 
-
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
@@ -496,10 +500,6 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 };
 
 
-
-
-
-
 template <int dim>
 void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
 					      SparseMatrix<double>  &matrix,
@@ -515,9 +515,9 @@ void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &bo
 				   // simply return
   if (boundary_values.size() == 0)
     return;
-  
-  
-  map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
+
+
+map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
 					    endd = boundary_values.end();
   const unsigned int n_dofs             = matrix.m();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
@@ -543,8 +543,8 @@ void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &bo
       for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
 	matrix.global_entry(j) = 0.;
 
-      
-				       // set right hand side to
+
+// set right hand side to
 				       // wanted value: if main diagonal
 				       // entry nonzero, don't touch it
 				       // and scale rhs accordingly. If
@@ -630,21 +630,12 @@ void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &bo
 	      matrix.global_entry(global_entry) = 0.;
 	    };
 	};
-      
-      
-      
-				       // preset solution vector
+
+
+// preset solution vector
       solution(dof_number) = dof->second;
     };
 };
-
-
-
-
-
-
-
-
 
 
 template <int dim>
@@ -653,7 +644,6 @@ MassMatrix<dim>::MassMatrix (const Function<dim> * const rhs,
 		Equation<dim> (1),
 		right_hand_side (rhs),
 		coefficient (a)   {};
-
 
 
 template <int dim>
@@ -675,8 +665,8 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
   const FullMatrix<double> &values    = fe_values.get_shape_values ();
   const vector<double>     &weights   = fe_values.get_JxW_values ();
 
-  
-  if (coefficient != 0)
+
+if (coefficient != 0)
     {
       if (coefficient->n_components == 1)
 					 // scalar coefficient given
@@ -738,7 +728,6 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
 				   weights[point]);
 	  };
 };
-
 
 
 template <int dim>
@@ -806,7 +795,6 @@ void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 };
 
 
-
 template <int dim>
 void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 				const FEValues<dim> &fe_values,
@@ -838,9 +826,6 @@ void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 		rhs_values[point] *
 		weights[point];
 };
-
-
-
 
 
 template <int dim>
@@ -919,7 +904,6 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
 };
 
 
-
 template <int dim>
 void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 				   const FEValues<dim> &fe_values,
@@ -974,7 +958,6 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 };
 
 
-
 template <int dim>
 void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 				   const FEValues<dim> &fe_values,
@@ -1009,7 +992,6 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 };
 
 
-
 template<int dim>
 void
 MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
@@ -1025,7 +1007,7 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
 	  ExcDimensionMismatch(result.n(), high.dofs_per_cell));
 
 
-				   // Initialize FEValues at the support points
+// Initialize FEValues at the support points
 				   // of the low element.
   vector<double> phantom_weights(low.dofs_per_cell,1.);
   vector<Point<dim> > support_points(low.dofs_per_cell);
@@ -1043,8 +1025,6 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
 	  high.system_to_component_index(j).first)
 	result(i,j) = fe.shape_value(j,i);
 }
-
-
 
 
 template class MatrixCreator<deal_II_dimension>;

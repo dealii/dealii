@@ -1,6 +1,16 @@
-/*----------------------------   solutiontransfer.cc     ---------------------*/
-/*      $Id$     */
-/*           Ralf Hartmann, University of Heidelberg                          */
+//----------------------------  solution_transfer.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  solution_transfer.cc  ---------------------------
+
 
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
@@ -12,7 +22,6 @@
 #include <numerics/solution_transfer.h>
 
 
-
 template<int dim, typename number>
 SolutionTransfer<dim, number>::SolutionTransfer(const DoFHandler<dim> &dof):
 		dof_handler(&dof),
@@ -21,13 +30,11 @@ SolutionTransfer<dim, number>::SolutionTransfer(const DoFHandler<dim> &dof):
 {}
 
 
-
 template<int dim, typename number>
 SolutionTransfer<dim, number>::~SolutionTransfer()
 {
   clear ();
 }
-
 
 
 template<int dim, typename number>
@@ -42,7 +49,6 @@ void SolutionTransfer<dim, number>::clear ()
 
   prepared_for=none;
 }
-
 
 
 template<int dim, typename number>
@@ -87,7 +93,6 @@ void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
 }
 
 
-
 template<int dim, typename number>  
 void
 SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
@@ -125,7 +130,6 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
 }
 
 
-
 template<int dim, typename number>  
 void SolutionTransfer<dim, number>::refine_interpolate (Vector<number> &vec) const
 {
@@ -136,7 +140,6 @@ void SolutionTransfer<dim, number>::refine_interpolate (Vector<number> &vec) con
   
   refine_interpolate(vec_old, vec);
 }
-
 
 
 template<int dim, typename number>
@@ -199,7 +202,7 @@ prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
 					      n_coarsen_fathers);
 
 
-				   // we need counters for
+// we need counters for
 				   // the 'to_stay_or_refine' cells 'n_sr',
 				   // the 'coarsen_fathers' cells 'n_cf',
 				   // and all the cells where a
@@ -256,7 +259,6 @@ prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
 }
 
 
-
 template<int dim, typename number>
 void
 SolutionTransfer<dim, number>::prepare_for_coarsening_and_refinement(const Vector<number> &in)
@@ -264,7 +266,6 @@ SolutionTransfer<dim, number>::prepare_for_coarsening_and_refinement(const Vecto
   vector<Vector<number> > all_in=vector<Vector<number> >(1, in);
   prepare_for_coarsening_and_refinement(all_in);
 }
-
 
 
 template<int dim, typename number>
@@ -290,8 +291,8 @@ interpolate (const vector<Vector<number> > &all_in,
 	  all_out[i].reinit (dof_handler->n_dofs());
     };
 
-  
-  const unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
+
+const unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
   Vector<number> local_values(dofs_per_cell);
 
   vector<unsigned int>    *indexptr;
@@ -351,7 +352,6 @@ interpolate (const vector<Vector<number> > &all_in,
 }
 
 
-
 template<int dim, typename number>
 void SolutionTransfer<dim, number>::interpolate(const Vector<number> &in,
 						Vector<number>       &out) const
@@ -364,8 +364,6 @@ void SolutionTransfer<dim, number>::interpolate(const Vector<number> &in,
 	      all_out);
   out=all_out[0];
 }
-
-
 
 
 template class SolutionTransfer<deal_II_dimension, float>;

@@ -1,4 +1,15 @@
-/* $Id$ */
+//----------------------------  data_out.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  data_out.cc  ---------------------------
 
 
 #include <base/quadrature_lib.h>
@@ -80,7 +91,6 @@ void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 };
 
 
-
 template <int dim>
 void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 					    const string         &name)
@@ -97,8 +107,6 @@ void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 //TODO: Murks hier
   add_data_vector (vec, vector<string>(1,name));
 }
-
-
 
 
 template <int dim>
@@ -119,7 +127,6 @@ void DataOut_DoFData<dim>::clear ()
 };
 
 
-
 template <int dim>
 vector<string> DataOut_DoFData<dim>::get_dataset_names () const 
 {
@@ -137,7 +144,6 @@ vector<string> DataOut_DoFData<dim>::get_dataset_names () const
 
   return names;
 };
-
 
 
 template <int dim>
@@ -223,8 +229,6 @@ void * DataOut<dim>::build_some_patches (Data data)
 }
 
 
-
-
 template <int dim>
 void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				  const unsigned int n_threads_) 
@@ -240,7 +244,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 #endif
 
 
-				   // before we start the loop:
+// before we start the loop:
 				   // create a quadrature rule that
 				   // actually has the points on this
 				   // patch
@@ -321,14 +325,12 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 };
 
 
-
 template <int dim>
 typename DoFHandler<dim>::cell_iterator
 DataOut<dim>::first_cell () 
 {
   return dofs->begin_active ();
 };
-
 
 
 template <int dim>
@@ -344,10 +346,8 @@ DataOut<dim>::next_cell (const typename DoFHandler<dim>::cell_iterator &cell)
 };
 
 
-
 // explicit instantiations
 template class DataOut_DoFData<deal_II_dimension>;
 template class DataOut<deal_II_dimension>;
-
 
 

@@ -1,6 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
-
+//----------------------------  dof_constraints.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_constraints.cc  ---------------------------
 
 
 #include <dofs/dof_constraints.h>
@@ -11,7 +20,6 @@
 #include <numeric>
 
 
-
 inline
 bool
 ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
@@ -20,11 +28,8 @@ ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 };
 
 
-
-
 ConstraintMatrix::ConstraintMatrix () :
 		lines(), sorted(false) {};
-
 
 
 void ConstraintMatrix::add_line (const unsigned int line) {
@@ -41,7 +46,6 @@ void ConstraintMatrix::add_line (const unsigned int line) {
   lines.push_back (ConstraintLine());
   lines.back().line = line;
 };
-  
 
 
 void ConstraintMatrix::add_entry (const unsigned int line,
@@ -85,8 +89,6 @@ void ConstraintMatrix::add_entry (const unsigned int line,
 };
 
 
-
-
 void ConstraintMatrix::close () {
   Assert (sorted==false, ExcMatrixIsClosed());
 
@@ -113,13 +115,11 @@ void ConstraintMatrix::close () {
   sorted = true;
 };
 
-	  
 
 void ConstraintMatrix::clear () {
   lines = vector<ConstraintLine>();
   sorted = false;
 };
-
 
 
 void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
@@ -129,8 +129,8 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
   Assert (uncondensed.n_rows() == uncondensed.n_cols(),
 	  ExcMatrixNotSquare());
 
-  
-				   // store for each line of the matrix
+
+// store for each line of the matrix
 				   // its new line number
 				   // after compression. If the shift is
 				   // -1, this line will be condensed away
@@ -167,8 +167,8 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
       else
 	new_line.push_back (row-shift);
 
- 
-  next_constraint = lines.begin();
+
+next_constraint = lines.begin();
 				   // note: in this loop we need not check
 				   // whether #next_constraint# is a valid
 				   // iterator, since #next_constraint# is
@@ -228,7 +228,6 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 
   condensed.compress();
 };
-
 
 
 void ConstraintMatrix::condense (SparsityPattern &sparsity) const {
@@ -309,12 +308,10 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const {
 };
 
 
-
 unsigned int ConstraintMatrix::n_constraints () const
 {
   return lines.size();
 };
-
 
 
 bool ConstraintMatrix::is_constrained (const unsigned int index) const 
@@ -339,7 +336,6 @@ bool ConstraintMatrix::is_constrained (const unsigned int index) const
       return false;
     };
 };
-
 
 
 void ConstraintMatrix::print (ostream &out) const {

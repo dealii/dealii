@@ -1,4 +1,15 @@
-/* $Id$ */
+//----------------------------  grid_out.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  grid_out.cc  ---------------------------
 
 
 #include <base/point.h>
@@ -12,7 +23,6 @@
 #include <list>
 #include <ctime>
 #include <cmath>
-
 
 
 template <int dim>
@@ -42,9 +52,9 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 	  vertices[cell->vertex_index(vertex)] = cell->vertex(vertex);
 	  ++n_vertices;
 	};
-  
 
-				   // write preamble
+
+// write preamble
   if (ucd_flags.write_preamble)
     {
 				       // block this to have local
@@ -137,7 +147,6 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 };
 
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -147,7 +156,6 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
 };
 
 #endif
-
 
 
 template <int dim>
@@ -166,7 +174,6 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim> &tria) const
 };
 
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -178,7 +185,6 @@ void GridOut::write_ucd_faces (const Triangulation<1> &,
 };
 
 #endif
-
 
 
 template <int dim>
@@ -211,7 +217,6 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 	++index;
       };	  
 };
-
 
 
 template <int dim>
@@ -280,7 +285,6 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
   
   AssertThrow (out, ExcIO());
 };
-
 
 
 template <int dim>
@@ -409,10 +413,9 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
       default:
 	    Assert (false, ExcNotImplemented());
     };
-  
-  
 
-				   // find out minimum and maximum x and
+
+// find out minimum and maximum x and
 				   // y coordinates to compute offsets
 				   // and scaling factors
   double x_min = tria.begin_active_line()->vertex(0)(0);
@@ -445,9 +448,9 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 			(eps_flags_base.size_type==EpsFlagsBase::width ?
 			 x_max - x_min :
 			 y_min - y_max));
-  
-  
-				   // now write preamble
+
+
+// now write preamble
   if (true) 
     {
 				       // block this to have local
@@ -502,8 +505,6 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 };
 
 
-
-
 template <int dim>
 void GridOut::write (const Triangulation<dim> &tria,
 		     ostream                  &out,
@@ -526,8 +527,6 @@ void GridOut::write (const Triangulation<dim> &tria,
 
   Assert (false, ExcInternalError());
 };
-
-
 
 
 // explicit instantiations. note that write instantiates all the other

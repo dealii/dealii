@@ -1,12 +1,21 @@
-/* $Id$ */
+//----------------------------  histogram.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  histogram.cc  ---------------------------
+
 
 #include <lac/vector.h>
 #include <numerics/histogram.h>
 #include <algorithm>
 #include <cmath>
-
-
-
 
 
 template <typename number>
@@ -20,14 +29,12 @@ bool Histogram::logarithmic_less (const number n1,
 };
 
 
-
 Histogram::Interval::Interval (const double left_point,
 			       const double right_point) :
 		left_point (left_point),
 		right_point (right_point),
 		content (0)
 {};
-
 
 
 template <typename number>
@@ -87,9 +94,9 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
 				     &Histogram::template logarithmic_less<number>
 #endif
 	    );
-	    
 
-	    for (unsigned int i=1; i<values.size(); ++i)
+
+for (unsigned int i=1; i<values.size(); ++i)
 	      {
 		min_value = min (min_value,
 				 *min_element(values[i].begin(),
@@ -139,10 +146,9 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
 				   // precision.
   if (max_value <= min_value)
     max_value = min_value+1;
-  
 
 
-				   // now set up the intervals based on
+// now set up the intervals based on
 				   // the min and max values
   intervals.clear ();
 				   // set up one list of intervals
@@ -185,7 +191,7 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
     intervals.push_back (intervals[0]);
 
 
-				   // finally fill the intervals
+// finally fill the intervals
   for (unsigned int i=0; i<values.size(); ++i)
     for (Vector<number>::const_iterator p=values[i].begin();
 	 p < values[i].end(); ++p)
@@ -206,7 +212,6 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
 };
 
 
-
 template <typename number>
 void Histogram::evaluate (const Vector<number>    &values,
 			  const unsigned int       n_intervals,
@@ -216,7 +221,6 @@ void Histogram::evaluate (const Vector<number>    &values,
 				       values);
   evaluate (values_list, vector<double>(1,0.), n_intervals, interval_spacing);
 };
-
 
 
 void Histogram::write_gnuplot (ostream &out) const
@@ -290,12 +294,10 @@ void Histogram::write_gnuplot (ostream &out) const
 };
 
 
-
 string Histogram::get_interval_spacing_names () 
 {
   return "linear|logarithmic";
 };
-
 
 
 Histogram::IntervalSpacing
@@ -313,8 +315,6 @@ Histogram::parse_interval_spacing (const string &name)
 	return linear;
       };
 };
-
-
 
 
 // explicit instantiations for float

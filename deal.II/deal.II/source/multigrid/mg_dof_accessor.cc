@@ -1,6 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
-
+//----------------------------  mg_dof_accessor.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  mg_dof_accessor.cc  ---------------------------
 
 
 #include <dofs/dof_levels.h>
@@ -15,10 +24,6 @@
 #include <lac/sparse_matrix.h>
 
 
-
-
-
-
 /* ------------------------ MGDoFLineAccessor --------------------------- */
 
 template <int dim>
@@ -29,7 +34,6 @@ MGDoFObjectAccessor<1, dim>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 		MGDoFAccessor<dim> (local_data),
 		MGDoFObjectAccessor_Inheritance<1,dim>::BaseClass(tria,level,index,local_data)
 {};
-
 
 
 template <int dim>
@@ -46,9 +50,6 @@ unsigned int MGDoFObjectAccessor<1, dim>::mg_dof_index (const unsigned int i) co
   return mg_dof_handler->mg_levels[present_level]
     ->line_dofs[present_index*dof_handler->get_fe().dofs_per_line+i];
 };
-
-
-
 
 
 template <int dim>
@@ -68,8 +69,6 @@ void MGDoFObjectAccessor<1, dim>::set_mg_dof_index (const unsigned int i,
 };
 
 
-
-
 template <int dim>
 unsigned int MGDoFObjectAccessor<1, dim>::mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i) const
@@ -86,7 +85,6 @@ unsigned int MGDoFObjectAccessor<1, dim>::mg_vertex_dof_index (const unsigned in
 };
 
 
-  
 template <int dim>
 void MGDoFObjectAccessor<1, dim>::set_mg_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
@@ -102,7 +100,6 @@ void MGDoFObjectAccessor<1, dim>::set_mg_vertex_dof_index (const unsigned int ve
   mg_dof_handler->mg_vertex_dofs[vertex_index(vertex)]
     .set_index (present_level, i, dof_handler->get_fe().dofs_per_vertex, index);
 };
-
 
 
 template <int dim>
@@ -128,7 +125,6 @@ MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indic
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
 };
-
 
 
 template <int dim>
@@ -159,7 +155,6 @@ MGDoFObjectAccessor<1,dim>::get_mg_dof_values (const Vector<number> &values,
 };
 
 
-
 template <int dim>
 TriaIterator<dim,MGDoFObjectAccessor<1, dim> >
 MGDoFObjectAccessor<1, dim>::child (const unsigned int i) const
@@ -177,7 +172,6 @@ MGDoFObjectAccessor<1, dim>::child (const unsigned int i) const
 };
 
 
-
 template <int dim>
 void
 MGDoFObjectAccessor<1, dim>::copy_from (const MGDoFObjectAccessor<1, dim> &a)
@@ -185,8 +179,6 @@ MGDoFObjectAccessor<1, dim>::copy_from (const MGDoFObjectAccessor<1, dim> &a)
   DoFObjectAccessor<1, dim>::copy_from (a);
   set_mg_dof_handler (a.mg_dof_handler);
 };
-
-
 
 
 /* ------------------------ MGDoFQuadAccessor --------------------------- */
@@ -199,7 +191,6 @@ MGDoFObjectAccessor<2, dim>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 		MGDoFAccessor<dim> (local_data),
 		MGDoFObjectAccessor_Inheritance<2,dim>::BaseClass(tria,level,index,local_data)
 {};
-
 
 
 template <int dim>
@@ -219,7 +210,6 @@ unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) co
 };
 
 
-
 template <int dim>
 void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
@@ -235,7 +225,6 @@ void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
   mg_dof_handler->mg_levels[present_level]
     ->quad_dofs[present_index*dof_handler->get_fe().dofs_per_quad+i] = index;
 };
-
 
 
 template <int dim>
@@ -255,7 +244,6 @@ unsigned int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned in
 };
 
 
-  
 template <int dim>
 void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
@@ -271,7 +259,6 @@ void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int ve
   mg_dof_handler->mg_vertex_dofs[vertex_index(vertex)]
     .set_index (present_level, i, dof_handler->get_fe().dofs_per_vertex, index);
 };
-
 
 
 template <int dim>
@@ -302,7 +289,6 @@ MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indic
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
 };
-
 
 
 template <int dim>
@@ -337,7 +323,6 @@ MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
 };
 
 
-
 template <int dim>
 TriaIterator<dim,MGDoFObjectAccessor<1, dim> >
 MGDoFObjectAccessor<2, dim>::line (const unsigned int i) const
@@ -352,7 +337,6 @@ MGDoFObjectAccessor<2, dim>::line (const unsigned int i) const
       mg_dof_handler
     );
 };
-
 
 
 template <int dim>
@@ -372,7 +356,6 @@ MGDoFObjectAccessor<2, dim>::child (const unsigned int i) const
 };
 
 
-
 template <int dim>
 void
 MGDoFObjectAccessor<2, dim>::copy_from (const MGDoFObjectAccessor<2, dim> &a)
@@ -380,8 +363,6 @@ MGDoFObjectAccessor<2, dim>::copy_from (const MGDoFObjectAccessor<2, dim> &a)
   DoFObjectAccessor<2, dim>::copy_from (a);
   set_mg_dof_handler (a.mg_dof_handler);
 };
-
-
 
 
 /* ------------------------ MGDoFHexAccessor --------------------------- */
@@ -394,7 +375,6 @@ MGDoFObjectAccessor<3, dim>::MGDoFObjectAccessor (Triangulation<dim> *tria,
 		MGDoFAccessor<dim> (local_data),
 		MGDoFObjectAccessor_Inheritance<3,dim>::BaseClass(tria,level,index,local_data)
 {};
-
 
 
 template <int dim>
@@ -414,7 +394,6 @@ unsigned int MGDoFObjectAccessor<3, dim>::mg_dof_index (const unsigned int i) co
 };
 
 
-
 template <int dim>
 void MGDoFObjectAccessor<3, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
@@ -430,7 +409,6 @@ void MGDoFObjectAccessor<3, dim>::set_mg_dof_index (const unsigned int i,
   mg_dof_handler->mg_levels[present_level]
     ->hex_dofs[present_index*dof_handler->get_fe().dofs_per_hex+i] = index;
 };
-
 
 
 template <int dim>
@@ -450,7 +428,6 @@ unsigned int MGDoFObjectAccessor<3, dim>::mg_vertex_dof_index (const unsigned in
 };
 
 
-  
 template <int dim>
 void MGDoFObjectAccessor<3, dim>::set_mg_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
@@ -466,7 +443,6 @@ void MGDoFObjectAccessor<3, dim>::set_mg_vertex_dof_index (const unsigned int ve
   mg_dof_handler->mg_vertex_dofs[vertex_index(vertex)]
     .set_index (present_level, i, dof_handler->get_fe().dofs_per_vertex, index);
 };
-
 
 
 template <int dim>
@@ -502,7 +478,6 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (vector<unsigned int> &dof_indic
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
 };
-
 
 
 template <int dim>
@@ -541,7 +516,6 @@ MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const Vector<number> &values,
 };
 
 
-
 template <int dim>
 TriaIterator<dim,MGDoFObjectAccessor<1, dim> >
 MGDoFObjectAccessor<3, dim>::line (const unsigned int i) const {
@@ -557,7 +531,6 @@ MGDoFObjectAccessor<3, dim>::line (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 TriaIterator<dim,MGDoFObjectAccessor<2, dim> >
 MGDoFObjectAccessor<3, dim>::quad (const unsigned int i) const {
@@ -571,7 +544,6 @@ MGDoFObjectAccessor<3, dim>::quad (const unsigned int i) const {
       mg_dof_handler
     );
 };
-
 
 
 template <int dim>
@@ -590,16 +562,12 @@ MGDoFObjectAccessor<3, dim>::child (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 void
 MGDoFObjectAccessor<3, dim>::copy_from (const MGDoFObjectAccessor<3, dim> &a) {
   DoFObjectAccessor<3, dim>::copy_from (a);
   set_mg_dof_handler (a.mg_dof_handler);
 };
-
-
-
 
 
 /*------------------------- Functions: MGDoFCellAccessor -----------------------*/
@@ -620,7 +588,6 @@ MGDoFCellAccessor<dim>::neighbor (const unsigned int i) const {
 };
 
 
-
 template <int dim>
 TriaIterator<dim,MGDoFCellAccessor<dim> >
 MGDoFCellAccessor<dim>::child (const unsigned int i) const {
@@ -637,7 +604,6 @@ MGDoFCellAccessor<dim>::child (const unsigned int i) const {
 };
 
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -649,7 +615,6 @@ MGDoFCellAccessor<1>::face (const unsigned int) const
 };
 
 #endif
-
 
 
 #if deal_II_dimension == 2
@@ -664,8 +629,6 @@ MGDoFCellAccessor<2>::face (const unsigned int i) const
 #endif
 
 
-
-
 #if deal_II_dimension == 3
 
 template <>
@@ -676,9 +639,6 @@ MGDoFCellAccessor<3>::face (const unsigned int i) const
 };
 
 #endif
-
-
-
 
 
 // explicit instantiations
@@ -694,7 +654,6 @@ void
 MGDoFObjectAccessor<1,deal_II_dimension>::
 get_mg_dof_values (const Vector<float> &values,
 		   Vector<float>       &dof_values) const;
-
 
 
 #if deal_II_dimension >= 2

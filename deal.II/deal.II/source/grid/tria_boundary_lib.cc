@@ -1,5 +1,16 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  tria_boundary_lib.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  tria_boundary_lib.cc  ---------------------------
+
 
 #include <grid/tria_boundary_lib.h>
 #include <grid/tria.h>
@@ -8,14 +19,11 @@
 #include <cmath>
 
 
-
-
 template <int dim>
 HyperBallBoundary<dim>::HyperBallBoundary (const Point<dim> p,
 					   const double     radius) :
 		center(p), radius(radius)
 {};
-
 
 
 template <int dim>
@@ -33,7 +41,6 @@ HyperBallBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>
 };
 
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -46,7 +53,6 @@ get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
 };
 
 #endif
-
 
 
 template <int dim>
@@ -65,14 +71,12 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 };
 
 
-
 template <int dim>
 Point<dim>
 HyperBallBoundary<dim>::get_center () const 
 {
   return center;
 };
-
 
 
 template <int dim>
@@ -83,14 +87,11 @@ HyperBallBoundary<dim>::get_radius () const
 };
 
 
-
-
 template <int dim>
 HalfHyperBallBoundary<dim>::HalfHyperBallBoundary (const Point<dim> center,
 						   const double     radius) :
 		HyperBallBoundary<dim> (center, radius)
 {};
-
 
 
 template <int dim>
@@ -104,8 +105,6 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
   else
     return HyperBallBoundary<dim>::get_new_point_on_line (line);
 };
-
-
 
 
 #if deal_II_dimension == 1
@@ -135,7 +134,6 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 };
 
 
-
 template <int dim>
 HyperShellBoundary<dim>::HyperShellBoundary (const Point<dim> &center) :
 		center (center) 
@@ -163,7 +161,6 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 };
 
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -176,7 +173,6 @@ get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
 };
 
 #endif
-
 
 
 template <int dim>
@@ -198,9 +194,6 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 				   // original coordinate system
   return (middle_relative * (radius / sqrt(middle_relative.square()))) + center;
 };
-
-
-
 
 
 // explicit instantiations

@@ -1,5 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  fe_values.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_values.cc  ---------------------------
 
 
 #include <fe/fe.h>
@@ -45,8 +55,6 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 {};
 
 
-
-
 template <int dim>
 double FEValuesBase<dim>::shape_value (const unsigned int i,
 				       const unsigned int j) const {
@@ -60,7 +68,6 @@ double FEValuesBase<dim>::shape_value (const unsigned int i,
 
   return shape_values[selected_dataset](i,j);
 };
-
 
 
 template <int dim>
@@ -127,7 +134,6 @@ void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_functi
 };
 
 
-
 template <int dim>
 const Tensor<1,dim> &
 FEValuesBase<dim>::shape_grad (const unsigned int i,
@@ -141,7 +147,6 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 
   return shape_gradients[i][j];
 };
-
 
 
 template <int dim>
@@ -226,7 +231,6 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 };
 
 
-
 template <int dim>
 void FEValuesBase<dim>::get_function_2nd_derivatives (const Vector<double>   &fe_function,
 						      vector<Tensor<2,dim> > &second_derivatives) const
@@ -259,7 +263,6 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const Vector<double>   &fe
 };
 
 
-
 template <int dim>
 const Point<dim> &
 FEValuesBase<dim>::quadrature_point (const unsigned int i) const
@@ -269,7 +272,6 @@ FEValuesBase<dim>::quadrature_point (const unsigned int i) const
   
   return quadrature_points[i];
 };
-
 
 
 template <int dim>
@@ -283,7 +285,6 @@ FEValuesBase<dim>::support_point (const unsigned int i) const
 };
 
 
-
 template <int dim>
 double FEValuesBase<dim>::JxW (const unsigned int i) const
 {
@@ -292,8 +293,6 @@ double FEValuesBase<dim>::JxW (const unsigned int i) const
   
   return JxW_values[i];
 };
-
-
 
 
 /*------------------------------- FEValues -------------------------------*/
@@ -342,11 +341,6 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
   
   weights = quadrature.get_weights ();
 };
-
-
-
-
-
 
 
 template <int dim>
@@ -404,7 +398,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
 
 
-					   // second part:
+// second part:
 					   // tmp1 := (d_k J_lj) (d_l phi)
 	  contract (tmp1, jacobi_matrices_grad[j], 2, unit_shape_gradients[i][j]);
 					   // tmp1_kj J_ki
@@ -415,9 +409,9 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 					   // add up first contribution
 	  shape_2nd_derivatives[i][j] += tmp2;
 	};
-  
-  
-				   // compute Jacobi determinants in
+
+
+// compute Jacobi determinants in
 				   // quadrature points.
 				   // refer to the general doc for
 				   // why we take the inverse of the
@@ -426,9 +420,6 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
     for (unsigned int i=0; i<n_quadrature_points; ++i)
       JxW_values[i] = weights[i] / determinant(jacobi_matrices[i]);
 };
-
-
-
 
 
 /*------------------------------- FEFaceValuesBase --------------------------*/
@@ -467,7 +458,6 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 {};
 
 
-
 template <int dim>
 const Point<dim> &
 FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const {
@@ -477,10 +467,6 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const {
   
   return normal_vectors[i];
 };
-
-
-
-
 
 
 /*------------------------------- FEFaceValues -------------------------------*/
@@ -532,7 +518,6 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 	    = fe.shape_grad_transform(i, unit_quadrature_points[face][j]);
 	};
 };
-
 
 
 template <int dim>
@@ -592,7 +577,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       };
 
 
-  Tensor<2,dim> tmp1, tmp2;
+Tensor<2,dim> tmp1, tmp2;
   if (update_flags & update_second_derivatives)
     for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
@@ -603,7 +588,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
 
 
-					   // second part:
+// second part:
 					   // tmp1 := (d_k J_lj) (d_l phi)
 	  contract (tmp1,
 		    jacobi_matrices_grad[j], 2,
@@ -616,9 +601,9 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 					   // add up first contribution
 	  shape_2nd_derivatives[i][j] += tmp2;
 	};
-  
-  
-				   // compute Jacobi determinants in
+
+
+// compute Jacobi determinants in
 				   // quadrature points.
 				   // refer to the general doc for
 				   // why we take the inverse of the
@@ -627,10 +612,6 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
     for (unsigned int i=0; i<n_quadrature_points; ++i)
       JxW_values[i] = weights[i] * face_jacobi_determinants[i];
 };
-
-
-
-
 
 
 /*------------------------------- FESubFaceValues -------------------------------*/
@@ -705,7 +686,6 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 };
 
 
-
 template <int dim>
 void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				   const unsigned int         face_no,
@@ -778,7 +758,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 	  contract (tmp2, tmp1, 1, jacobi_matrices[j], 1);
 
 
-					   // second part:
+// second part:
 					   // tmp1 := (d_k J_lj) (d_l phi)
 	  contract (tmp1,
 		    jacobi_matrices_grad[j], 2,
@@ -791,9 +771,9 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 					   // add up first contribution
 	  shape_2nd_derivatives[i][j] += tmp2;
 	};
-  
-  
-				   // compute Jacobi determinants in
+
+
+// compute Jacobi determinants in
 				   // quadrature points.
 				   // refer to the general doc for
 				   // why we take the inverse of the
@@ -802,9 +782,6 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
     for (unsigned int i=0; i<n_quadrature_points; ++i)
       JxW_values[i] = weights[i] * face_jacobi_determinants[i];
 };
-
-
-
 
 
 /*------------------------------- Explicit Instantiations -------------*/

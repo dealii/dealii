@@ -1,4 +1,16 @@
-/* $Id$ */
+//----------------------------  data_out_stack.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  data_out_stack.cc  ---------------------------
+
 
 #include <numerics/data_out_stack.h>
 #include <base/quadrature_lib.h>
@@ -13,7 +25,6 @@
 template <int dim>
 DataOutStack<dim>::~DataOutStack ()
 {};
-
 
 
 template <int dim>
@@ -45,7 +56,6 @@ void DataOutStack<dim>::attach_dof_handler (const DoFHandler<dim> &dof)
 };
 
 
-
 template <int dim>
 void DataOutStack<dim>::declare_data_vector (const string     &name,
 					     const VectorType  vector_type)
@@ -54,7 +64,6 @@ void DataOutStack<dim>::declare_data_vector (const string     &name,
   names.push_back (name);
   declare_data_vector (names, vector_type);
 };
-
 
 
 template <int dim>
@@ -108,8 +117,6 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 };
 
 
-
-
 template <int dim>
 template <typename number>
 void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
@@ -161,7 +168,6 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 };
 
 
-
 template <int dim>
 void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions) 
 {
@@ -183,7 +189,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
     ++n_patches;
 
 
-				   // before we start the loop:
+// before we start the loop:
 				   // create a quadrature rule that
 				   // actually has the points on this
 				   // patch, and an object that
@@ -231,9 +237,9 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
-      
 
-				       // now fill in the the data values.
+
+// now fill in the the data values.
 				       // note that the required order is
 				       // with highest coordinate running
 				       // fastest, we need to enter each
@@ -282,7 +288,6 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 };
 
 
-
 template <int dim>
 void DataOutStack<dim>::finish_parameter_value ()
 {
@@ -296,14 +301,12 @@ void DataOutStack<dim>::finish_parameter_value ()
 };
 
 
-
 template <int dim>
 const vector<DataOutBase::Patch<dim+1> > &
 DataOutStack<dim>::get_patches () const
 {
   return patches;
 };
-
 
 
 template <int dim>
@@ -319,8 +322,6 @@ vector<string> DataOutStack<dim>::get_dataset_names () const
   
   return names;
 };
-
-
 
 
 // explicit instantiations

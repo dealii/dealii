@@ -1,4 +1,16 @@
-/* $Id$ */
+//----------------------------  intergrid_map.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  intergrid_map.cc  ---------------------------
+
 
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
@@ -8,7 +20,6 @@
 #include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
-
 
 
 // helper function to aquire the number of levels within a grid
@@ -38,18 +49,15 @@ get_n_levels (const Triangulation<dim> &grid)
 };
 
 
-
-
-
 template <template <int> class GridClass, int dim>
 void InterGridMap<GridClass,dim>::make_mapping (const GridClass<dim> &source_grid,
 						const GridClass<dim> &destination_grid) 
 {
 				   // first delete all contents
   clear ();
-  
 
-				   // then set up the containers from
+
+// then set up the containers from
 				   // scratch and fill them with end-iterators
   const unsigned int n_levels = get_n_levels(source_grid);
   mapping.resize (n_levels);
@@ -94,7 +102,6 @@ void InterGridMap<GridClass,dim>::make_mapping (const GridClass<dim> &source_gri
 };
 
 
-
 template <template <int> class GridClass, int dim>
 void
 InterGridMap<GridClass,dim>::set_mapping (const cell_iterator &src_cell,
@@ -125,7 +132,6 @@ InterGridMap<GridClass,dim>::set_mapping (const cell_iterator &src_cell,
 };
 
 
-
 template <template <int> class GridClass, int dim>
 void
 InterGridMap<GridClass,dim>::set_entries_to_cell (const cell_iterator &src_cell,
@@ -143,7 +149,6 @@ InterGridMap<GridClass,dim>::set_entries_to_cell (const cell_iterator &src_cell,
 };
 
 
-
 template <template <int> class GridClass, int dim>
 typename InterGridMap<GridClass,dim>::cell_iterator
 InterGridMap<GridClass,dim>::operator [] (const cell_iterator &source_cell) const
@@ -159,7 +164,6 @@ InterGridMap<GridClass,dim>::operator [] (const cell_iterator &source_cell) cons
 };
 
 
-
 template <template <int> class GridClass, int dim>
 void InterGridMap<GridClass,dim>::clear () 
 {
@@ -167,11 +171,9 @@ void InterGridMap<GridClass,dim>::clear ()
 };
 
 
-
-
 // explicit instantiations
 template class InterGridMap<Triangulation, deal_II_dimension>;
 template class InterGridMap<DoFHandler, deal_II_dimension>;
 template class InterGridMap<MGDoFHandler, deal_II_dimension>;
 
-  
+

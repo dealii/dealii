@@ -1,4 +1,15 @@
-// $Id$
+//----------------------------  dof_tools.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_tools.cc  ---------------------------
 
 
 #include <grid/tria.h>
@@ -74,9 +85,9 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>       &dof,
       dof_mask[i][j] = mask
 		       [dof.get_fe().system_to_component_index(i).first]
 		       [dof.get_fe().system_to_component_index(j).first];
-  
-  
-  vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+
+
+vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 		       endc = dof.end();
   for (; cell!=endc; ++cell) 
@@ -103,7 +114,6 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
 };
 
 
-
 template <>
 void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
@@ -115,7 +125,6 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
 }
 
 #endif
-
 
 
 template <int dim>
@@ -157,7 +166,6 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
       };
 };
-
 
 
 template <int dim>
@@ -211,8 +219,6 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
       };
 };
-
-
 
 
 //TODO: Check this function for potential of optimization. (G)
@@ -269,7 +275,6 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 }
 
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -280,7 +285,6 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<1> &,
 };
 
 #endif
-
 
 
 #if deal_II_dimension == 2
@@ -311,11 +315,9 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
       if (cell->face(face)->has_children()) 
 	cell->face(face)->set_user_flag();
-	  
-  
 
-  
-				   // loop over all lines; only on lines
+
+// loop over all lines; only on lines
 				   // there can be constraints.
   for (line = dof_handler.begin_line(); line != endl; ++line)
 				     // if dofs on this line are subject
@@ -376,7 +378,6 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
 #endif
 
 
-
 #if deal_II_dimension == 3
 
 template <>
@@ -405,9 +406,9 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
       if (cell->face(face)->has_children()) 
 	cell->face(face)->set_user_flag();
-	  
-  
-				   // loop over all faces; only on faces
+
+
+// loop over all faces; only on faces
 				   // there can be constraints.
   for (face=dof_handler.begin_face(); face != endf; ++face)
 				     // if dofs on this line are subject
@@ -533,8 +534,6 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 #endif
 
 
-
-
 template <int dim, typename Number>
 void DoFTools::distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler,
 					      const Vector<Number>  &cell_data,
@@ -605,7 +604,6 @@ void DoFTools::distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler
 };
 
 
-
 template<int dim>
 void
 DoFTools::extract_dofs(const DoFHandler<dim> &dof,
@@ -638,7 +636,6 @@ DoFTools::extract_dofs(const DoFHandler<dim> &dof,
 }
 
 
-
 template<int dim>
 void
 DoFTools::extract_level_dofs(const unsigned int       level,
@@ -669,7 +666,6 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 	}
     }
 }
-
 
 
 // explicit instantiations
@@ -708,7 +704,6 @@ void
 DoFTools::distribute_cell_to_dof_vector (const DoFHandler<deal_II_dimension> &dof_handler,
 					 const Vector<double> &cell_data,
 					 Vector<double>       &dof_data) const;
-
 
 
 template void DoFTools::extract_dofs(const DoFHandler<deal_II_dimension>& dof,

@@ -1,6 +1,16 @@
-/* $Id$ */
-/* Copyright W. Bangerth, Guido Kanschat, Stefan Nauber  */
-/* University of Heidelberg, 1998, 1999                  */
+//----------------------------  data_io.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  data_io.cc  ---------------------------
+
 
 #include <numerics/data_io.h>
 #include <dofs/dof_handler.h>
@@ -21,12 +31,9 @@
 #include <cmath>
 
 
-
-
 template <int dim>
 DataOut_Old<dim>::DataEntry::DataEntry () :
 		data(0), name(""), units("") {};
-
 
 
 template <int dim>
@@ -36,19 +43,15 @@ DataOut_Old<dim>::DataEntry::DataEntry (const Vector<double> *data,
 			data(data), name(name), units(units) {};
 
 
-
-
 template <int dim>
 DataOut_Old<dim>::DataOut_Old () :
 		dofs(0) {};
-
 
 
 template <int dim>
 void DataOut_Old<dim>::attach_dof_handler (const DoFHandler<dim> &d) {
   dofs = &d;
 };
-
 
 
 template <int dim>
@@ -79,13 +82,11 @@ void DataOut_Old<dim>::add_data_vector (const Vector<double> &vec,
 };
 
 
-
 template <int dim>
 void DataOut_Old<dim>::clear_data_vectors () {
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());
 };
-
 
 
 template <int dim>
@@ -118,9 +119,9 @@ void DataOut_Old<dim>::write_ucd (ostream &out) const {
 	if (is_vertex_dof[i] == true)
 	  ++n_vertex_dofs;
     };
-  
 
-				   // write preamble
+
+// write preamble
   if (true)
     {
 /*      
@@ -304,7 +305,6 @@ void DataOut_Old<dim>::write_ucd (ostream &out) const {
 };
 
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -313,7 +313,6 @@ unsigned int DataOut_Old<1>::n_boundary_faces () const {
 };
 
 #endif
-
 
 
 template <int dim>
@@ -329,8 +328,6 @@ unsigned int DataOut_Old<dim>::n_boundary_faces () const {
 
   return n_faces;
 };
-
-
 
 
 #if deal_II_dimension == 1
@@ -373,9 +370,6 @@ void DataOut_Old<dim>::write_ucd_faces (ostream &out,
 
   AssertThrow (out, ExcIO());
 };
-
-      
-
 
 
 template <int dim>
@@ -438,7 +432,7 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
     };
 
 
-  DoFHandler<dim>::active_cell_iterator cell;
+DoFHandler<dim>::active_cell_iterator cell;
   DoFHandler<dim>::active_cell_iterator endc = dofs->end();
 
   QTrapez<1>     q_trapez;
@@ -547,9 +541,9 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		      }
 		    out << endl;
 		  };
-		
-		
-		break;
+
+
+break;
 
 	  default:
 		Assert (false, ExcNotImplemented());
@@ -559,7 +553,6 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 
   AssertThrow (out, ExcIO());
 }
-
 
 
 template <int dim>
@@ -617,7 +610,7 @@ void DataOut_Old<dim>::write_gnuplot_draft (ostream &out) const
     };
 
 
-  DoFHandler<dim>::active_cell_iterator cell;
+DoFHandler<dim>::active_cell_iterator cell;
   DoFHandler<dim>::active_cell_iterator endc = dofs->end();
 
   unsigned int cell_index=0;
@@ -753,9 +746,9 @@ void DataOut_Old<dim>::write_gnuplot_draft (ostream &out) const
 		  };
 						 // again: stop drawing
 		out << endl << endl;
-		
-		
-		break;
+
+
+break;
 		
 	  default:
 		Assert (false, ExcNotImplemented());
@@ -820,9 +813,9 @@ void DataOut_Old<2>::write_povray_mesh (ostream &out) const {
       << "  <20, 20, -20> White"        << endl
       << "}"                         << endl
       << endl;
-      
-      
-				       // write frame object
+
+
+// write frame object
   out << "mesh {" << endl;
   
   DoFHandler<2>::active_cell_iterator cell;
@@ -874,15 +867,12 @@ void DataOut_Old<2>::write_povray_mesh (ostream &out) const {
 #endif
 
 
-
 template <int dim>
 void DataOut_Old<dim>::write_povray_mesh (ostream &) const {
 				   // this is for all other dimensions that
 				   // are not explicitely specialized
   Assert (false, ExcNotImplemented());
 };
-
-
 
 
 #if deal_II_dimension == 2
@@ -911,8 +901,8 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 	<< "%%BoundingBox: -5 -5 305 305" << endl;
   };  
 
-   
-				    // Make output values local by
+
+// Make output values local by
 				    // copying them to a multiset.
 				    // Perform the necessary turn.
    const DoFHandler<2>::active_cell_iterator endc = dofs->end();
@@ -1018,7 +1008,7 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
    cells2.clear();
 
 
-				    // If we want shaded output we can
+// If we want shaded output we can
 				    // do the shading now.
    if (cell_shade_p)
      {
@@ -1069,10 +1059,9 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 				      // more, we use a trick for copying
 				      // that is significantly faster
      cells2.swap (cells);
-   
 
 
-				    // Next we have to shift and scale
+// Next we have to shift and scale
 				    // a bit so that everything still
 				    // arrives in our bounding box of
 				    // 310x310.
@@ -1099,7 +1088,7 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
      };
 
 
-				    //  Now we are ready to output...
+//  Now we are ready to output...
    for (multiset<DataOut_Old<2>::EpsCellData>::iterator c=cells.begin();
 	c!=cells.end(); ++c)
      {
@@ -1140,8 +1129,6 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 #endif
 
 
-
-
 template <int dim>
 void DataOut_Old<dim>::write_eps (ostream &,
 			      const EpsOutputData &) const{
@@ -1149,8 +1136,6 @@ void DataOut_Old<dim>::write_eps (ostream &,
 				   // are not explicitely specialized
   Assert (false, ExcNotImplemented());
 };
-
-
 
 
 template <int dim>
@@ -1173,7 +1158,7 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
       << endl;
 
 
-				   ///////////////////////////////
+///////////////////////////////
 				   // first make up a list of used
 				   // vertices along with their
 				   // coordinates. since dofs have
@@ -1263,9 +1248,9 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
             
       out << endl;
     };
-  
 
-				   /////////////////////////////////////
+
+/////////////////////////////////////
 				   // now for the cells. this is simpler
 				   // than the above task
   if (true)
@@ -1290,7 +1275,7 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
     };
 
 
-				   ///////////////////////////////////////
+///////////////////////////////////////
 				   // data output.
   out << "variable" << endl;
 
@@ -1348,7 +1333,7 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
     };
 
 
-				   // Cell data is the simplest since the order
+// Cell data is the simplest since the order
 				   // already is correct
   if (true)
     {
@@ -1373,9 +1358,6 @@ void DataOut_Old<dim>::write_gmv (ostream &out) const
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
 };
-
-  
-
 
 
 template <int dim>
@@ -1413,7 +1395,6 @@ void DataOut_Old<dim>::write (ostream &out,
 };
 
 
-
 template <int dim>
 string DataOut_Old<dim>::default_suffix (const OutputFormat output_format) 
 {
@@ -1440,7 +1421,6 @@ string DataOut_Old<dim>::default_suffix (const OutputFormat output_format)
 	    return "";
     };
 };
-  
 
 
 template <int dim>
@@ -1477,7 +1457,6 @@ string DataOut_Old<dim>::get_output_format_names () {
 };
 
 
-
 template<int dim>
 bool DataOut_Old<dim>::EpsCellData::operator < (const EpsCellData &other) const
 {
@@ -1493,7 +1472,6 @@ bool DataOut_Old<dim>::EpsCellData::operator < (const EpsCellData &other) const
 
   return maxz > othermaxz;
 };
-
 
 
 template <int dim>
@@ -1527,7 +1505,6 @@ void DataOut_Old<dim>::EpsVertexData::turn(double azi, double ele)
 //	 (  0   0 1 )( 0 sx  cx )(z)   (  0*x+	*(cx*y-sx*z)+1*(sx*y+cx*z) )
 
 
-
 template <int dim>
 void DataOut_Old<dim>::EpsCellData::turn(double azi, double ele)
 {
@@ -1549,7 +1526,6 @@ EpsOutputData::EpsOutputData()
   light[1]=-1;
   light[2]=1;
 };
-
 
 
 void EpsOutputData::color(const float x,
@@ -1630,7 +1606,6 @@ void EpsOutputData::color(const float x,
       b=1;
     };
 };
-
 
 
 //explicit instantiations

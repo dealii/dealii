@@ -1,5 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  fe_lib.criss_cross.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_lib.criss_cross.cc  ---------------------------
 
 
 #include <fe/fe_lib.criss_cross.h>
@@ -8,7 +18,6 @@
 #include <grid/geometry_info.h>
 
 #include <cmath>
-
 
 
 /*-----------------------------------2d------------------------------------
@@ -106,8 +115,8 @@
     od:
   od:
 
-  
-  # these are the basis functions differentiated with respect to
+
+# these are the basis functions differentiated with respect to
   # xi and eta. we need them for the computation of the jacobi
   # matrix, since we can't just differentiate a function.
   phi_xi[0] := proc(x,y) if(y<1-x) then -1;  else 0; fi; end:
@@ -159,7 +168,7 @@
           end:
 
 
-  # Now for the mass matrix: we divide the entire cell into four
+# Now for the mass matrix: we divide the entire cell into four
   # sectors:
   #
   # *-------*
@@ -299,11 +308,6 @@
 -----------------------------------------------------------------------------*/
 
 
-
-
-
-
-
 #if deal_II_dimension == 1
 
 
@@ -317,13 +321,11 @@ FECrissCross<1>::FECrissCross () :
 };
 
 
-
 template <>
 double FECrissCross<1>::shape_value (const unsigned int, const Point<1> &) const {
   Assert (false, ExcNotUseful());
   return 0;
 };
-
 
 
 template <>
@@ -333,7 +335,6 @@ Tensor<1,1> FECrissCross<1>::shape_grad (const unsigned int, const Point<1> &) c
 };
 
 
-
 template <>
 Tensor<2,1> FECrissCross<1>::shape_grad_grad (const unsigned int, const Point<1> &) const {
   Assert (false, ExcNotUseful());
@@ -341,12 +342,10 @@ Tensor<2,1> FECrissCross<1>::shape_grad_grad (const unsigned int, const Point<1>
 };
 
 
-
 template <>
 void FECrissCross<1>::get_unit_support_points (vector<Point<1> >&) const {
   Assert (false, ExcNotUseful());
 };
-
 
 
 template <>
@@ -356,7 +355,6 @@ void FECrissCross<1>::get_support_points (const DoFHandler<1>::cell_iterator &,
 };
 
 
-
 template <>
 void FECrissCross<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 					       vector<Point<1> > &) const {
@@ -364,13 +362,11 @@ void FECrissCross<1>::get_face_support_points (const DoFHandler<1>::face_iterato
 };
 
 
-
 template <>
 void FECrissCross<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &,
 					     FullMatrix<double> &) const {
   Assert (false, ExcNotUseful());
 };
-
 
 
 template <>
@@ -381,7 +377,6 @@ double  FECrissCross<1>::shape_value_transform (const unsigned int,
 };
 
 
-
 template <>
 Tensor<1,1> FECrissCross<1>::shape_grad_transform (const unsigned int,
 						   const Point<1> &) const {
@@ -390,14 +385,12 @@ Tensor<1,1> FECrissCross<1>::shape_grad_transform (const unsigned int,
 };
 
 
-
 template <>
 void FECrissCross<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 					  const vector<Point<0> > &,
 					  vector<double>      &) const {
   Assert (false, ExcNotUseful());
 };
-
 
 
 template <>
@@ -409,7 +402,6 @@ void FECrissCross<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator 
 };
 
 
-
 template <>
 void FECrissCross<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					  const unsigned int,
@@ -419,7 +411,6 @@ void FECrissCross<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 };
 
 
-
 template <>
 void FECrissCross<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					  const unsigned int,
@@ -428,7 +419,6 @@ void FECrissCross<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					  vector<Point<1> >       &) const {
   Assert (false, ExcNotUseful());
 };
-
 
 
 template <>
@@ -448,10 +438,6 @@ void FECrissCross<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &,
 };
 
 #endif
-
-
-
-
 
 
 #if deal_II_dimension == 2
@@ -509,8 +495,6 @@ FECrissCross<2>::FECrissCross () :
 };
 
 
-
-
 template <>
 inline
 double FECrissCross<2>::shape_value (const unsigned int i,
@@ -537,7 +521,6 @@ double FECrissCross<2>::shape_value (const unsigned int i,
     }
   return 0.;
 };
-
 
 
 template <>
@@ -582,7 +565,6 @@ FECrissCross<2>::shape_grad_grad (const unsigned int i,
 };
 
 
-
 template <>
 void FECrissCross<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   Assert(unit_points.size()==dofs_per_cell,
@@ -594,7 +576,6 @@ void FECrissCross<2>::get_unit_support_points (vector<Point<2> > &unit_points) c
   unit_points[3] = Point<2> (0,1);
   unit_points[4] = Point<2> (0.5, 0.5);
 };
-
 
 
 template <>
@@ -633,7 +614,6 @@ void FECrissCross<2>::get_support_points (const DoFHandler<2>::cell_iterator &ce
 };
 
 
-
 template <>
 void FECrissCross<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 					       vector<Point<2> > &support_points) const {
@@ -647,7 +627,6 @@ void FECrissCross<2>::get_face_support_points (const DoFHandler<2>::face_iterato
   for (unsigned int vertex=0; vertex<dofs_per_face; ++vertex)
     support_points[vertex] = face->vertex(vertex);
 };
-
 
 
 template <>
@@ -791,7 +770,6 @@ void FECrissCross<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator 
 };
 
 
-
 template <>
 inline
 double FECrissCross<2>::shape_value_transform (const unsigned int i,
@@ -801,14 +779,12 @@ double FECrissCross<2>::shape_value_transform (const unsigned int i,
 };
 
 
-
 template <>
 Tensor<1,2> FECrissCross<2>::shape_grad_transform (const unsigned int i,
 						   const Point<2> &p) const {
 				   // use an isoparametric ansatz
   return shape_grad(i,p);  
 };
-
 
 
 template <>
@@ -829,7 +805,6 @@ void FECrissCross<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &fa
 	  unit_points.size(),
 	  h);  
 };
-
 
 
 template <>
@@ -853,7 +828,6 @@ void FECrissCross<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator 
 	  unit_points.size(),
 	  h/2);
 };
-
 
 
 template <>
@@ -884,7 +858,6 @@ void FECrissCross<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &ce
     fill (normal_vectors.begin(), normal_vectors.end(),
 	  normal_direction / (-sqrt(normal_direction.square())));
 };
-
 
 
 template <>
@@ -923,7 +896,6 @@ void FECrissCross<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &ce
 };
 
 
-
 template <int dim>
 void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 					const vector<Point<dim> >            &unit_points,
@@ -944,8 +916,8 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
   Assert (support_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
 
-  
-  unsigned int n_points=unit_points.size();
+
+unsigned int n_points=unit_points.size();
 
 				   // we need the support points in any
 				   // way, wanted or not by the user
@@ -970,7 +942,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 	for (unsigned int l=0; l<n_points; ++l) 
 	  q_points[l] += support_points[j] * shape_values_transform(j, l);
     };
-  
+
 
 /* jacobi matrices: compute d(x)/d(xi) and invert this
    Let M(l) be the inverse of J at the quadrature point l, then
@@ -1055,7 +1027,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
       };
 
 
-  if (compute_jacobians_grad)
+if (compute_jacobians_grad)
     switch (dim) 
       {
 	case 1:
@@ -1144,7 +1116,6 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 #endif
 
 
-
 #if deal_II_dimension == 3
 
 // provide dummy implementations of the functions above. the reason is
@@ -1161,7 +1132,6 @@ FECrissCross<3>::FECrissCross () :
 };
 
 
-
 template <>
 double
 FECrissCross<3>::shape_value (const unsigned int,
@@ -1170,7 +1140,6 @@ FECrissCross<3>::shape_value (const unsigned int,
   Assert (false, ExcNotImplemented());
   return 0;
 };
-
 
 
 template <>
@@ -1183,7 +1152,6 @@ FECrissCross<3>::shape_grad (const unsigned int,
 };
 
 
-
 template <>
 Tensor<2,3>
 FECrissCross<3>::shape_grad_grad (const unsigned int,
@@ -1192,7 +1160,6 @@ FECrissCross<3>::shape_grad_grad (const unsigned int,
   Assert (false, ExcNotImplemented());
   return Tensor<2,3>();
 };
-
 
 
 template <>
@@ -1204,13 +1171,11 @@ FECrissCross<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 };
 
 
-
 template <>
 void FECrissCross<3>::get_unit_support_points (vector<Point<3> > &) const
 {
   Assert (false, ExcNotImplemented());
 };
-
 
 
 template <>
@@ -1221,7 +1186,6 @@ void FECrissCross<3>::get_support_points (const DoFHandler<3>::cell_iterator &,
 };
 
 
-
 template <>
 void FECrissCross<3>::get_face_support_points (const DoFHandler<3>::face_iterator &,
 				       vector<Point<3> >  &) const
@@ -1230,15 +1194,12 @@ void FECrissCross<3>::get_face_support_points (const DoFHandler<3>::face_iterato
 };
 
 
-
-
 template <>
 void FECrissCross<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &,
 					  const vector<Point<2> > &,
 					  vector<double>      &) const {
   Assert (false, ExcNotImplemented());
 };
-
 
 
 template <>
@@ -1259,7 +1220,6 @@ void FECrissCross<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &,
 };
 
 
-
 template <>
 void FECrissCross<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &,
 					  const unsigned int,
@@ -1268,7 +1228,6 @@ void FECrissCross<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &,
 					  vector<Point<3> >       &) const {
   Assert (false, ExcNotImplemented());
 };
-
 
 
 template <>
@@ -1288,7 +1247,6 @@ void FECrissCross<3>::fill_fe_values (const DoFHandler<3>::cell_iterator &,
 };
 
 
-
 template <>
 double FECrissCross<3>::shape_value_transform (const unsigned int,
 					       const Point<3> &) const
@@ -1296,7 +1254,6 @@ double FECrissCross<3>::shape_value_transform (const unsigned int,
   Assert (false, ExcNotImplemented());
   return 0;
 };
-
 
 
 template <>
@@ -1309,8 +1266,6 @@ Tensor<1,3> FECrissCross<3>::shape_grad_transform (const unsigned int,
 
 
 #endif // deal_II_dimension == 3
-
-
 
 
 /*--------------------------- QCrissCross* ------------------------------------*/
@@ -1326,7 +1281,6 @@ QCrissCross1<1>::QCrissCross1 () :
 };
 
 #endif
-
 
 
 #if deal_II_dimension == 2
@@ -1349,7 +1303,6 @@ QCrissCross1<2>::QCrissCross1 () :
 };
 
 #endif
-
 
 
 // explicit instantiations

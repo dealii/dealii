@@ -1,6 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
-
+//----------------------------  vectors.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  vectors.cc  ---------------------------
 
 
 #include <base/function.h>
@@ -27,8 +36,6 @@
 #include <cmath>
 
 
-
-
 inline double sqr (const double x) {
   return x*x;
 };
@@ -38,8 +45,6 @@ template <int dim>
 inline double sqr_point (const Tensor<1,dim> &p) {
   return p * p;
 };
-
-
 
 
 template <int dim>
@@ -237,8 +242,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
       cell->get_dof_indices (dofs_on_cell);
 
 
-				       
-      if (fe_is_system)
+if (fe_is_system)
 	{
 					   // get function values at
 					   // these points. Here: get
@@ -272,7 +276,6 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 	};
     }
 }
-
 
 
 template <int dim> void
@@ -325,7 +328,6 @@ VectorTools::interpolate (const DoFHandler<dim>           &dof_1,
 }
 
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -347,8 +349,6 @@ void VectorTools::project (const DoFHandler<1>    &,
 };
 
 #endif
-
-
 
 
 template <int dim>
@@ -407,9 +407,8 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
 				 boundary_values);
       };
 
-  
-      
-				   // set up mass matrix and right hand side
+
+// set up mass matrix and right hand side
   vec.reinit (dof.n_dofs());
   SparsityPattern sparsity(dof.n_dofs(),
 			   dof.n_dofs(),
@@ -456,7 +455,6 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
 };
 
 
-
 template <int dim>
 void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof,
 					  const Quadrature<dim>    &quadrature,
@@ -486,8 +484,6 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof,
     }
   while ((++assembler).state() == valid);
 };
-
-
 
 
 #if deal_II_dimension == 1
@@ -574,7 +570,6 @@ VectorTools::interpolate_boundary_values (const DoFHandler<1>      &dof,
 #endif
 
 
-
 template <int dim>
 void
 VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
@@ -657,7 +652,6 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 }
 
 
-
 template <int dim>
 void
 VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
@@ -697,14 +691,14 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
     sparsity.compress();
   else
     Assert (false, ExcNotImplemented());
-  
 
-				   // make mass matrix and right hand side
+
+// make mass matrix and right hand side
   SparseMatrix<double> mass_matrix(sparsity);
   Vector<double>       rhs(sparsity.n_rows());
-  
 
-  MatrixTools<dim>::create_boundary_mass_matrix (dof, q, 
+
+MatrixTools<dim>::create_boundary_mass_matrix (dof, q, 
 						 mass_matrix, boundary_functions,
 						 rhs, dof_to_boundary_mapping);
 
@@ -712,8 +706,8 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				   // to consider constraints
   Assert (dim<3, ExcNotImplemented());
 
-  
-  Vector<double> boundary_projection (rhs.size());
+
+Vector<double> boundary_projection (rhs.size());
 
   SolverControl           control(1000, 1e-16);
   PrimitiveVectorMemory<> memory;
@@ -738,7 +732,6 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				       // thus in the solution vector
       boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
 };
-
 
 
 template <int dim>
@@ -969,14 +962,12 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
  		Assert (false, ExcNotImplemented());
  	};
 
-      
- 				       // append result of this cell
+
+// append result of this cell
  				       // to the end of the vector
       difference(index) = diff;
     };
 };
-
-
 
 
 // explicit instantiations

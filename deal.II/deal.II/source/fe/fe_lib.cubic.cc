@@ -1,5 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  fe_lib.cubic.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_lib.cubic.cc  ---------------------------
 
 
 #include <fe/fe_lib.lagrange.h>
@@ -9,12 +19,8 @@
 #include <algorithm>
 
 
-
-
 // declare explicit specializations before use:
 template <> void FEQ3<deal_II_dimension>::initialize_matrices ();
-
-
 
 
 #if deal_II_dimension == 1
@@ -27,7 +33,6 @@ FEQ3<1>::FEQ3 () :
 };
 
 
-
 template <>
 FEQ3<1>::FEQ3 (const int) :
 		FEQ1Mapping<1> (0, 4, 0, 0, 1,
@@ -35,7 +40,6 @@ FEQ3<1>::FEQ3 (const int) :
 {
   initialize_matrices ();
 };
-
 
 
 template <>
@@ -109,7 +113,6 @@ void FEQ3<1>::initialize_matrices () {
 };
 
 
-
 template <>
 double
 FEQ3<1>::shape_value (const unsigned int i,
@@ -126,7 +129,6 @@ FEQ3<1>::shape_value (const unsigned int i,
     }
   return 0.;
 };
-
 
 
 template <>
@@ -152,7 +154,6 @@ FEQ3<1>::shape_grad (const unsigned int i,
 };
 
 
-
 template <>
 Tensor<2,1>
 FEQ3<1>::shape_grad_grad (const unsigned int i,
@@ -174,12 +175,10 @@ FEQ3<1>::shape_grad_grad (const unsigned int i,
 };
 
 
-
 template <>
 void FEQ3<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
   FiniteElement<1>::get_unit_support_points (unit_points);
 };
-
 
 
 template <>
@@ -189,13 +188,11 @@ void FEQ3<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
 };
 
 
-
 template <>
 void FEQ3<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 				       vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
-
 
 
 template <>
@@ -236,8 +233,6 @@ void FEQ3<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 #endif
 
 
-
-
 #if deal_II_dimension == 2
 
 template <>
@@ -264,7 +259,6 @@ FEQ3<2>::FEQ3 () :
 };
 
 
-
 template <>
 FEQ3<2>::FEQ3 (const int) :
 		FEQ1Mapping<2> (0, 0, 16, 0, 1,
@@ -272,7 +266,6 @@ FEQ3<2>::FEQ3 (const int) :
 {
   initialize_matrices ();
 };
-
 
 
 template <>
@@ -697,7 +690,6 @@ void FEQ3<2>::initialize_matrices () {
 };
 
 
-
 template <>
 double
 FEQ3<2>::shape_value (const unsigned int i,
@@ -763,7 +755,6 @@ xi*xi)*eta*eta*eta;
 };
 
 
-
 template <>
 Tensor<1,2>
 FEQ3<2>::shape_grad (const unsigned int i,
@@ -815,7 +806,6 @@ FEQ3<2>::shape_grad (const unsigned int i,
     };
   return Point<2> ();
 };
-
 
 
 template <>
@@ -918,7 +908,6 @@ FEQ3<2>::shape_grad_grad (const unsigned int i,
     };
   return return_value;
 };
-
 
 
 template <>
@@ -1482,7 +1471,6 @@ void FEQ3<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 };
 
 
-
 template <>
 void FEQ3<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == dofs_per_cell,
@@ -1505,7 +1493,6 @@ void FEQ3<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   unit_points[14]= Point<2>(2./3,2./3);
   unit_points[15]= Point<2>(1./3,2./3);
 };
-
 
 
 template <>
@@ -1581,7 +1568,6 @@ void FEQ3<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
 };
 
 
-
 template <>
 void FEQ3<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 				       vector<Point<2> >  &support_points) const {
@@ -1595,10 +1581,7 @@ void FEQ3<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 };
 
 
-
 #endif
-
-
 
 
 #if deal_II_dimension == 3
@@ -1871,7 +1854,6 @@ FEQ3<3>::FEQ3 () :
 };
 
 
-
 template <>
 FEQ3<3>::FEQ3 (const int) :
 		FEQ1Mapping<3> (0, 0, 0, 64, 1,
@@ -1879,7 +1861,6 @@ FEQ3<3>::FEQ3 (const int) :
 {
   initialize_matrices ();
 };
-
 
 
 template <>
@@ -9887,7 +9868,7 @@ void FEQ3<3>::initialize_matrices ()
       prolongation[7](63,62) = 225.0/256.0;
 
 
-      restriction[0](0,0) = 1.0;
+restriction[0](0,0) = 1.0;
       restriction[0](8,9) = 1.0;
       restriction[0](14,15) = 1.0;
       restriction[0](24,25) = 1.0;
@@ -9952,7 +9933,6 @@ void FEQ3<3>::initialize_matrices ()
       restriction[7](55,52) = 1.0;
       restriction[7](62,57) = 1.0;
 };
-
 
 
 template <>
@@ -10567,7 +10547,6 @@ xi*xi+6561.0/2.0*xi*xi*xi)*eta*eta+(-6561.0/8.0*xi+6561.0/2.0*xi*xi-19683.0/8.0
 };
 
 
-
 template <>
 Tensor<1,3>
 FEQ3<3>::shape_grad (const unsigned int i,
@@ -10780,7 +10759,6 @@ FEQ3<3>::shape_grad (const unsigned int i,
     };
   return Point<3> ();
 };
-
 
 
 template <>
@@ -11398,7 +11376,6 @@ return_value[2][2] = 2.0*(729.0/2.0*xi-1458.0*xi*xi+2187.0/2.0*xi*xi*xi)*eta+2.0
 };
 
 
-
 template <>
 void
 FEQ3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
@@ -11411,7 +11388,6 @@ FEQ3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 
   AssertThrow (false, ExcComputationNotUseful(3));
 };
-
 
 
 template <>
@@ -11484,7 +11460,6 @@ void FEQ3<3>::get_unit_support_points (vector<Point<3> > &unit_points) const
   unit_points[62] = Point<3>(1/3, 2/3, 2/3);
   unit_points[63] = Point<3>(2/3, 2/3, 2/3);
 };
-
 
 
 template <>
@@ -11865,7 +11840,6 @@ void FEQ3<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &c
 };
 
 
-
 template <>
 void FEQ3<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &face,
 				       vector<Point<3> >  &support_points) const
@@ -11904,7 +11878,6 @@ void FEQ3<3>::get_face_support_points (const typename DoFHandler<3>::face_iterat
 };
 
 
-
 #else  // 0
 
 // provide dummy implementations of the functions above. for the
@@ -11919,7 +11892,6 @@ FEQ3<3>::FEQ3 () :
 };
 
 
-
 template <>
 FEQ3<3>::FEQ3 (const int) :
 		FEQ1Mapping<3> (0, 0, 0, 64, 1,
@@ -11929,13 +11901,11 @@ FEQ3<3>::FEQ3 (const int) :
 };
 
 
-
 template <>
 void FEQ3<3>::initialize_matrices ()
 {
   Assert (false, ExcNotImplemented());
 };
-
 
 
 template <>
@@ -11948,7 +11918,6 @@ FEQ3<3>::shape_value (const unsigned int,
 };
 
 
-
 template <>
 Tensor<1,3>
 FEQ3<3>::shape_grad (const unsigned int,
@@ -11957,7 +11926,6 @@ FEQ3<3>::shape_grad (const unsigned int,
   Assert (false, ExcNotImplemented());
   return Tensor<1,3>();
 };
-
 
 
 template <>
@@ -11970,7 +11938,6 @@ FEQ3<3>::shape_grad_grad (const unsigned int,
 };
 
 
-
 template <>
 void
 FEQ3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
@@ -11980,13 +11947,11 @@ FEQ3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 };
 
 
-
 template <>
 void FEQ3<3>::get_unit_support_points (vector<Point<3> > &) const
 {
   Assert (false, ExcNotImplemented());
 };
-
 
 
 template <>
@@ -11997,14 +11962,12 @@ void FEQ3<3>::get_support_points (const DoFHandler<3>::cell_iterator &,
 };
 
 
-
 template <>
 void FEQ3<3>::get_face_support_points (const DoFHandler<3>::face_iterator &,
 				       vector<Point<3> >  &) const
 {
   Assert (false, ExcNotImplemented());
 };
-
 
 
 #endif // 0
