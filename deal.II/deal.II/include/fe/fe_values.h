@@ -962,13 +962,6 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 		      const FiniteElement<dim> &fe);
     
 				     /**
-				      * Virtual destructor needed for
-				      * the virtual @p{get_face}
-				      * function.
-				      */
-    virtual ~FEFaceValuesBase ();
-    
-				     /**
 				      * Return the outward normal vector to
 				      * the cell at the @p{i}th quadrature
 				      * point. The length of the vector
@@ -985,10 +978,9 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 
 				     /**
 				      * Return the present
-				      * face. Implemented in the
-				      * derived classes.
+				      * face.
 				      */
-    virtual DoFHandler<dim>::face_iterator get_face() const=0;
+    DoFHandler<dim>::face_iterator get_face() const;
 
 
   protected:
@@ -1059,6 +1051,15 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * in by the finite element class.
 				      */
     vector<Point<dim> >  normal_vectors;
+
+				     /**
+				      * Stores the face or subface,
+				      * resp., that was selected the
+				      * last time the @p{reinit}
+				      * function was called. Is used
+				      * by the @p{get_face} function.
+				      */
+    DoFHandler<dim>::face_iterator present_face;
 };
 
 
@@ -1130,12 +1131,6 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no);
-
-    
-				     /**
-				      * Return the present face.
-				      */
-    virtual DoFHandler<dim>::face_iterator get_face() const;
 };
 
 
@@ -1274,11 +1269,6 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 		 const unsigned int                    subface_no);
 
 				     /**
-				      * Return the present face.
-				      */
-    virtual DoFHandler<dim>::face_iterator get_face() const;
-
-				     /**
 				      * Exception
 				      */
     DeclException0 (ExcReinitCalledWithBoundaryFace);
@@ -1287,16 +1277,6 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * Exception
 				      */
     DeclException0 (ExcFaceHasNoSubfaces);
-
-  protected:
-    
-				     /**
-				      * Store the subface selected
-				      * last time the @p{reinit}
-				      * function was called. Is used
-				      * by the @p{get_face} fuction.
-				      */
-    DoFHandler<dim>::face_iterator present_subface;
 };
 
 
@@ -1391,13 +1371,6 @@ FEValuesBase<dim>::get_cell() const
 
 /*------------------------ Inline functions: FEFaceValuesBase --------------------*/
 
-
-template <int dim>
-inline
-FEFaceValuesBase<dim>::~FEFaceValuesBase()
-{};
-
-
 template <int dim>
 inline
 const vector<Point<dim> > &
@@ -1409,24 +1382,11 @@ FEFaceValuesBase<dim>::get_normal_vectors () const
 };
 
 
-/*------------------------ Inline functions: FEFaceValues ------------------------*/
-
 template <int dim>
 inline
 DoFHandler<dim>::face_iterator
-FEFaceValues<dim>::get_face() const {
-  return present_cell->face(selected_dataset);
-};
-
-
-
-/*------------------------ Inline functions: FESubfaceValues ------------------------*/
-
-template <int dim>
-inline
-DoFHandler<dim>::face_iterator
-FESubfaceValues<dim>::get_face() const {
-  return present_subface;
+FEFaceValuesBase<dim>::get_face() const {
+  return present_face;
 };
 
 

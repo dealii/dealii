@@ -561,6 +561,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				const unsigned int                             face_no)
 {
   present_cell  = cell;
+  present_face  = cell->face(face_no);
   selected_dataset = face_no;
 
 				   // assert that the finite elements
@@ -752,7 +753,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 	  ExcFaceHasNoSubfaces());
   
   present_cell  = cell;
-  present_subface = cell->face(face_no)->child(subface_no);
+  present_face = cell->face(face_no)->child(subface_no);
   selected_dataset = face_no*(1<<(dim-1)) + subface_no;
 
 				   // assert that the finite elements
