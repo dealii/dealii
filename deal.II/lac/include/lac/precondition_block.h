@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,13 +33,15 @@ class PreconditionBlockJacobi;
 
 
 /**
- * Base class for @p PreconditionBlockJacobi,
- * @p PreconditionBlockSOR, ...  This class assumes the
- * <tt>SparseMatrix<number></tt> consisting of invertible blocks of
- * @p blocksize on the diagonal and provides the inversion of the
- * diagonal blocks of the matrix. NOT only block diagonal matrices are
- * allowed but all matrices of arbitrary structure with the minimal
- * property of having invertible blocks on the diagonal!
+ * Base class for @p PreconditionBlockJacobi, @p PreconditionBlockSOR,
+ * ...  This class assumes the <tt>MATRIX</tt> consisting of
+ * invertible blocks of @p blocksize on the diagonal and provides the
+ * inversion of the diagonal blocks of the matrix. NOT only block
+ * diagonal matrices are allowed but all matrices of arbitrary
+ * structure with the minimal property of having invertible blocks on
+ * the diagonal! Still the matrix must have access to single matrix
+ * entries. therefore, BlockMatrixArray is not a possible matrix
+ * class.
  *
  * This block matrix structure is given e.g. for the DG method for the
  * transport equation. For a downstream numbering the matrices even
