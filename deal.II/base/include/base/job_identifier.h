@@ -3,16 +3,15 @@
 #ifndef __jobidentifier_H
 #define __jobidentifier_H
 
-#include <ctime>
 #include <string>
 
-/** Identification of a program run. #JobIdentifier# determines the
-    start time of a program run and stores it as a program
-    identifier. There exists a library object #dealjobid# of this
-    class. This object can be accessed by all output functions to
-    provide an id for the current job.
-*/
-
+/**
+ * Identification of a program run. #JobIdentifier# determines the
+ * start time of a program run and stores it as a program
+ * identifier. There exists a library object #dealjobid# of this
+ * class. This object can be accessed by all output functions to
+ * provide an id for the current job.
+ */
 class JobIdentifier
 {
 public:

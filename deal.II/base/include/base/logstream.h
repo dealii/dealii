@@ -1,20 +1,25 @@
-// $Id$
-
+/*----------------------------   logstream.h     ---------------------------*/
+/*      $Id$                 */
 #ifndef __logstream_H
 #define __logstream_H
+/*----------------------------   logstream.h     ---------------------------*/
+
 
 #include <stack>
 #include <string>
 #include <iostream>
 
+
+
 /**
-   A class that simplifies the process of execution logging by
-   providing
-<UL><LI>a push and pop mechanism for prefixes and
-<LI>the possibility of distributing information to files and the
-console.
-</UL>
-*/
+ * A class that simplifies the process of execution logging by
+ * providing
+ * \begin{itemize}
+ * \item a push and pop mechanism for prefixes and
+ * \item the possibility of distributing information to files and the
+ *   console.
+ * \end{itemize}
+ */
 class LogStream
 {
 public:
@@ -23,81 +28,107 @@ public:
   ostream* file;
 
   bool was_endl;
-  unsigned std_depth, fil_depth;
+  unsigned std_depth, file_depth;
   
 public:
-				   /** Standard constructor, since we
-				       intend to provide an object
-				       clog in the library.
-				   */
+				   /**
+				    * Standard constructor, since we
+				    * intend to provide an object
+				    * clog in the library.
+				    */
   LogStream();
-  				   /** Enable output to a second
-				       stream.
-				   */
+    
+  				   /**
+				    * Enable output to a second
+				    * stream.
+				    */
   void attach(ostream& o);
-				   /** Disable output to the second
-				       stream. 
-				   */
+    
+				   /**
+				    * Disable output to the second
+				    * stream. 
+				    */
   void detach()
       {
 	file = 0;
       }
-				   /** Push another prefix on the
-				       stack. Prefixes are
-				       automatically separated by a
-				       colon and there is a double
-				       colon after the last prefix.
-				   */
-  void push(const string& text)
+    
+				     /**
+				      * Push another prefix on the
+				      * stack. Prefixes are
+				      * automatically separated by a
+				      * colon and there is a double
+				      * colon after the last prefix.
+				      */
+    void push(const string& text)
       {
 	string pre=prefixes.top();
 	pre += text;
 	pre += string(":");
 	prefixes.push(pre);
       }
-				   /** Remove the last prefix.
-				    */
-  void pop()
+    
+				     /**
+				      * Remove the last prefix.
+				      */
+    void pop()
       {
-	prefixes.pop();
+  	prefixes.pop();
       }
-				   /** Maximum number of levels to be
-				       printed on the console. This
-				       function allows to restrict
-				       console output to the upmost
-				       levels of iterations. Only
-				       output with less than #n#
-				       prefixes is printed. By calling
-				       this function with #n=0#, no
-				       console output will be written.
-				   */
-  void depth_console(unsigned n)
+     
+				     /**
+				      * Maximum number of levels to be
+				      * printed on the console. This
+				      * function allows to restrict
+				      * console output to the upmost
+				      * levels of iterations. Only
+				      * output with less than #n#
+				      * prefixes is printed. By calling
+				      * this function with #n=0#, no
+				      * console output will be written.
+				      */
+    void depth_console(unsigned n)
       {
-	std_depth = n;
+  	std_depth = n;
       }
-				   /** Maximum number of levels to be
-				       written to the log file. The
-				       functionality is the same as
-				       #depth_console#, nevertheless,
-				       this function should be used
-				       with care, since it may spoile
-				       the value of a log file.
-				   */
-  void depth_file(unsigned n)
+     
+				     /**
+				      * Maximum number of levels to be
+				      * written to the log file. The
+				      * functionality is the same as
+				      * #depth_console#, nevertheless,
+				      * this function should be used
+				      * with care, since it may spoile
+				      * the value of a log file.
+				      */
+    void depth_file(unsigned n)
       {
-	fil_depth = n;
+ 	file_depth = n;
       }
+
+    ostream & get_std_stream () const {
+      return std;
+    };
 };
+
+
+
+
+/* ----------------------------- Inline functions and templates ---------------- */
+
 
 template <class T>
 inline void
 writestuff(LogStream& s, const T& t)
 {
   if (s.prefixes.size()<=s.std_depth)
-    s.std << t;
-  if (s.file && (s.prefixes.size()<=s.fil_depth))
+    s.get_std_stream () << t;
+  if (s.file && (s.prefixes.size()<=s.file_depth))
     *(s.file) << t;
 }
+
+
+
 
 template <class T>
 inline LogStream&
@@ -143,4 +174,10 @@ operator << (LogStream& s, void (*f)(LogStream&))
 
 extern LogStream deallog;
 
+
+
+
+/*----------------------------   logstream.h     ---------------------------*/
+/* end of #ifndef __logstream_H */
 #endif
+/*----------------------------   logstream.h     ---------------------------*/

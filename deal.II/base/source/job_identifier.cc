@@ -1,6 +1,8 @@
 // $Id$
 
 #include <base/jobidentifier.h>
+#include <ctime>
+
 
 JobIdentifier dealjobid;
 
