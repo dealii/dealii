@@ -154,6 +154,7 @@
  * algorithm and afterwards renumbering component-wise. This will bring out the
  * matrix structure and additionally have a good numbering within each block.
  *
+ *
  * @sect2{Cell-wise numbering for Discontinuous Galerkin FEM}
  *
  * One advantage of DGFEM is the fact, that it yields invertible
@@ -168,6 +169,7 @@
  * Given an ordered vector of cells, the function @p{cell_wise_dg}
  * accomplishes this. Inside the cells, the previous ordering will be
  * preserved, so it may be useful to apply @component_wise} first.
+ *
  *
  * @sect2{Multigrid DoF numbering}
  *
@@ -191,10 +193,11 @@ class DoFRenumbering
 				      * different methods.
 				      */
     template <int dim>
-    static void Cuthill_McKee (DoFHandler<dim>            &dof_handler,
-			       const bool                  reversed_numbering = false,
-			       const bool                  use_constraints    = false,
-			       const vector<unsigned int> &starting_indices   = vector<unsigned int>());
+    static void 
+    Cuthill_McKee (DoFHandler<dim>            &dof_handler,
+		   const bool                  reversed_numbering = false,
+		   const bool                  use_constraints    = false,
+		   const vector<unsigned int> &starting_indices   = vector<unsigned int>());
 
 				     /**
 				      * Renumber the degrees of freedom
@@ -216,10 +219,11 @@ class DoFRenumbering
 				      * different methods.
 				      */
     template <int dim>
-    static void Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
-			       const unsigned int          level,
-			       const bool                  reversed_numbering = false,
-			       const vector<unsigned int> &starting_indices   = vector<unsigned int> ());
+    static void 
+    Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
+		   const unsigned int          level,
+		   const bool                  reversed_numbering = false,
+		   const vector<unsigned int> &starting_indices   = vector<unsigned int> ());
 
 				     /**
 				      * Sort the degrees of freedom by
@@ -368,11 +372,11 @@ class DoFRenumbering
 				      * Exception
 				      */
     DeclException0 (ExcInvalidComponentOrder);
-
 				     /**
-				      * The function is only
-				      * implemented for Discontinuous
-				      * Galerkin Finite elements.
+				      * Exception. The function is
+				      * only implemented for
+				      * Discontinuous Galerkin Finite
+				      * elements.
 				      */
     DeclException0 (ExcNotDGFEM);
 };

@@ -103,25 +103,29 @@ template <int dim> class DoFHandler;
  *
  * @sect3{Information for derived classes}
  *
- * What is actually missing this class is a way to produce the patched for
- * output itself, from the stored data and degree of freedom information.
- * Since this task is often application dependent it is left to derived
- * classes. For example, in many applications, it might be wanted to limit
- * the depth of output to a certain number of refinement levels and write
- * data from finer cells only in a way interpolated to coarser cells, to
- * reduce the amount of output. Also, it might be wanted to use different
- * numbers of subdivisions on different cells when forming a patch, for example
- * to accomplish for different polynomial degrees of the trial space on
- * different cells.
+ * What is actually missing this class is a way to produce the patches
+ * for output itself, from the stored data and degree of freedom
+ * information.  Since this task is often application dependent it is
+ * left to derived classes. For example, in many applications, it
+ * might be wanted to limit the depth of output to a certain number of
+ * refinement levels and write data from finer cells only in a way
+ * interpolated to coarser cells, to reduce the amount of
+ * output. Also, it might be wanted to use different numbers of
+ * subdivisions on different cells when forming a patch, for example
+ * to accomplish for different polynomial degrees of the trial space
+ * on different cells. Also, the output need not necessarily consist
+ * of a patch for each cell, but might be made up of patches for
+ * faces, of other things. Take a look at derived classes to what is
+ * possible in this respect.
  *
- * For this reason, it is left to a derived class to provide a function, named
- * usually @p{build_patches} or the like, which fills the @p{patches} array of
- * this class.
+ * For this reason, it is left to a derived class to provide a
+ * function, named usually @p{build_patches} or the like, which fills
+ * the @p{patches} array of this class.
  *
- * Regarding the templates of this class, it needs two values: first
+ * Regarding the templates of this class, it needs three values: first
  * the space dimension in which the triangulation and the DoF handler
- * operate, second the space dimension of the output to be
- * generated. Although in most cases they are equal, there are also
+ * operate, second the dimension of the objects which the patches
+ * represent.  Although in most cases they are equal, there are also
  * classes for which this does not hold, for example if one outputs
  * the result of a computation exploiting rotational symmetry in the
  * original domain (in which the space dimension of the output would
@@ -129,7 +133,20 @@ template <int dim> class DoFHandler;
  * @ref{DataOut_Rotation} class), or one might conceive that one could
  * write a class that only outputs the solution on a cut through the
  * domain, in which case the space dimension of the output is less
- * than that of the DoF handler.
+ * than that of the DoF handler. The last template argument denotes
+ * the dimension of the space into which the patches are embedded;
+ * usually, this dimension is the same as the dimensio of the patches
+ * themselves (which is also the default value of the template
+ * parameter), but there might be cases where this is not so. For
+ * example, in the @ref{DataOut_Faces} class, patches are generated
+ * from faces of the triangulation. Thus, the dimension of the patch
+ * is one less than the dimension of the embedding space, which is, in
+ * this case, equal to the dimension of the triangulation and DoF
+ * handler. However, for the cut through the domain mentioned above,
+ * if the cut is a straight one, then the cut can be embedded into a
+ * space of one dimension lower than the dimension of the
+ * triangulation, so that the last template parameter has the same
+ * value as the second one.
  *
  * @author Wolfgang Bangerth, 1999
  */

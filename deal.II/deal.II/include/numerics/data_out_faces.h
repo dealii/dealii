@@ -23,16 +23,56 @@ template <int dim> class DoFHandler;
 
 
 /**
+ * This class generates output from faces of a triangulation rather
+ * than from cells, as do for example the @ref{DataOut} and
+ * @ref{DataOut_Rotation} classes. It might be used to generate output
+ * only for the surface of the triangulation (this is the default of
+ * this class), or for another arbitrary set of faces. The output of
+ * this class is a set of patches (as defined by the class
+ * @ref{DataOutBase::Patch}), one for each face for which output is to
+ * be generated. These patches can then be written in several
+ * graphical data formats by the functions of the underlying classes.
  *
  * @sect3{Interface}
  *
  * The interface of this class is copied from the @ref{DataOut}
  * class. Furthermore, they share the common parent class
  * @ref{DataOut_DoFData}. See the reference of these two classes for a
- * discussion of the interface and how to extend it by deriving
- * further classes from this class.
+ * discussion of the interface.
  *
  *
+ * @sect3{Extending this class}
+ *
+ * The sequence of faces to generate patches from is generated in the
+ * same way as in the @ref{DataOut} class, see there for a description
+ * of the respective interface. For obvious reasons, the functions
+ * generating the sequence of faces which shall be used to generate
+ * output, are called @p{first_face} and @p{next_face} in this class,
+ * rather than @p{first_cell} and @p{next_cell}.
+ *
+ * Since we need to initialize objects of type @ref{FEValues} with the
+ * faces generated from these functions, it is not sufficient that
+ * they only return face iterators. Rather, we need a pair of cell and
+ * the number of the face, as the values of finite element fields need
+ * not necessarily be unique on a face (think of discontinuous finite
+ * elements, where the value of the finite element field depend on the
+ * direction from which you approach a face, thus it is necessary to
+ * use a pair of cell and face, rather than only a face
+ * iterator). Therefore, this class defines a @p{typedef} which
+ * creates a type @p{FaceDescriptor} that is an abbreviation for a
+ * pair of cell iterator and face number. The functions @p{first_face}
+ * and @p{next_face} operate on objects of this type.
+ *
+ * Extending this class might, for example, be useful if you only want
+ * output from certain portions of the boundary, e.g. as indicated by
+ * the boundary indicator of the respective faces. However, it is also
+ * conceivable that one generates patches not from boundary faces, but
+ * from interior faces that are selected due to other criteria; one
+ * application might be to use only those faces where one component of
+ * the solution attains a certain value, in order to display the
+ * values of other solution components on these faces. Other
+ * applications certainly exist, for which the author is not
+ * imaginative enough.
  *
  * @author Wolfgang Bangerth, 2000
  */

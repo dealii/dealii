@@ -23,13 +23,22 @@
 
 
 /**
- * Print intermediate solutions in solvers.
- * This is derived from a solver class provided as template argument.
- * It implements the @p{print_vector} function of the solver using a
- * @ref{DoFHandler}. This way, the intermediate vectors can be viewed as
- * finite element functions.
+ * Print intermediate solutions in solvers.  This is derived from a
+ * solver class provided as template argument.  It implements the
+ * @p{print_vector} function of the solver using a
+ * @ref{DoFHandler}. This way, the intermediate vectors can be viewed
+ * as finite element functions. This class might be used first to
+ * understand how solvers work (for example to visualize the smoothing
+ * properties of various solvers, e.g. in a multigrid context), and
+ * second to investigate why and how a solver fails to solve certain
+ * classes of problems.
  *
- * This class may produce enormous amounts of data!
+ * Objects of this class are provided with a solver class through a
+ * template argument, and with a file name (as a string), with which a
+ * new file is constructed in each iteration (named
+ * @p{basename.[step].[suffix]}) and into which the solution is
+ * written as a finite element field using the @ref{DataOut} class.
+ * Please note that this class may produce enormous amounts of data!
  *
  * @author Guido Kanschat, 2000
  */
@@ -75,6 +84,7 @@ class DoFPrintSolverStep : public SOLVER
 };
 
 
+/* ----------------------- template functions --------------- */
 
 template<int dim, class SOLVER, class VECTOR>
 DoFPrintSolverStep<dim, SOLVER, VECTOR>::DoFPrintSolverStep (SolverControl& control,
