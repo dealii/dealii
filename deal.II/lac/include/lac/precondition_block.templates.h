@@ -226,8 +226,9 @@ PreconditionBlock<number,inverse_type>::memory_consumption () const
 template <typename number, typename inverse_type>
 template <typename number2>
 void PreconditionBlockJacobi<number,inverse_type>
-::vmult (Vector<number2>       &dst,
-	 const Vector<number2> &src) const
+::do_vmult (Vector<number2>       &dst,
+	    const Vector<number2> &src,
+	    bool adding) const
 {
 				   // introduce the following typedef
 				   // since in the use of exceptions,
@@ -278,7 +279,10 @@ void PreconditionBlockJacobi<number,inverse_type>
 	  M_cell.backward(x_cell,b_cell);
 					   // distribute x_cell to dst
 	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
-	    dst(row)=x_cell(row_cell);
+	    if (adding)
+	      dst(row)+=x_cell(row_cell);
+	    else
+	      dst(row)=x_cell(row_cell);
 	  
 	  begin_diag_block+=blocksize;
 	}
@@ -293,7 +297,10 @@ void PreconditionBlockJacobi<number,inverse_type>
 	inverse(cell).vmult(x_cell, b_cell);
 					 // distribute x_cell to dst
 	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
-	  dst(row)=x_cell(row_cell);
+	  if (adding)
+	    dst(row)+=x_cell(row_cell);
+	  else
+	    dst(row)=x_cell(row_cell);
 	
 	begin_diag_block+=blocksize;
       }
@@ -304,10 +311,40 @@ void PreconditionBlockJacobi<number,inverse_type>
 template <typename number, typename inverse_type>
 template <typename number2>
 void PreconditionBlockJacobi<number,inverse_type>
-::Tvmult (Vector<number2>       &dst,
+::vmult (Vector<number2>       &dst,
 	 const Vector<number2> &src) const
 {
-  vmult(dst, src);
+  do_vmult(dst, src, false);
+}
+
+
+template <typename number, typename inverse_type>
+template <typename number2>
+void PreconditionBlockJacobi<number,inverse_type>
+::Tvmult (Vector<number2>       &dst,
+	  const Vector<number2> &src) const
+{
+  do_vmult(dst, src, false);
+}
+
+
+template <typename number, typename inverse_type>
+template <typename number2>
+void PreconditionBlockJacobi<number,inverse_type>
+::vmult_add (Vector<number2>       &dst,
+	     const Vector<number2> &src) const
+{
+  do_vmult(dst, src, true);
+}
+
+
+template <typename number, typename inverse_type>
+template <typename number2>
+void PreconditionBlockJacobi<number,inverse_type>
+::Tvmult_add (Vector<number2>       &dst,
+	      const Vector<number2> &src) const
+{
+  do_vmult(dst, src, true);
 }
 
 

@@ -338,6 +338,36 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
+				     /**
+				      * Execute block Jacobi
+				      * preconditioning, adding to @p{dst}.
+				      *
+				      * This function will
+				      * automatically use the inverse
+				      * matrices if they exist, if not
+				      * then BlockJacobi will need
+				      * much time inverting the
+				      * diagonal block matrices in
+				      * each preconditioning step.
+				      */
+    template <typename number2>
+    void vmult_add (Vector<number2>&, const Vector<number2>&) const;
+
+				     /**
+				      * Same as @p{vmult_add}, since Jacobi is symmetric.
+				      */
+    template <typename number2>
+    void Tvmult_add (Vector<number2>&, const Vector<number2>&) const;
+
+  private:
+				   /**
+				    * Actual implementation of the
+				    * preconditioner.
+				    */
+    template <typename number2>
+    void do_vmult (Vector<number2>&,
+		   const Vector<number2>&,
+		   bool adding) const;
 };
 
 

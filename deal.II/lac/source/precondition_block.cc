@@ -43,6 +43,14 @@ template void PreconditionBlockJacobi<float, float>::Tvmult
 (Vector<float> &, const Vector<float> &) const;
 template void PreconditionBlockJacobi<float, float>::Tvmult
 (Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockJacobi<float, float>::vmult_add
+(Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockJacobi<float, float>::vmult_add
+(Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockJacobi<float, float>::Tvmult_add
+(Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockJacobi<float, float>::Tvmult_add
+(Vector<double> &, const Vector<double> &) const;
 
 template class PreconditionBlockJacobi<double, float>;
 
@@ -54,6 +62,14 @@ template void PreconditionBlockJacobi<double, float>::Tvmult
 (Vector<float> &, const Vector<float> &) const;
 template void PreconditionBlockJacobi<double, float>::Tvmult
 (Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockJacobi<double, float>::vmult_add
+(Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockJacobi<double, float>::vmult_add
+(Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockJacobi<double, float>::Tvmult_add
+(Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockJacobi<double, float>::Tvmult_add
+(Vector<double> &, const Vector<double> &) const;
 
 template class PreconditionBlockJacobi<double, double>;
 
@@ -64,6 +80,14 @@ template void PreconditionBlockJacobi<double, double>::vmult
 template void PreconditionBlockJacobi<double, double>::Tvmult
 (Vector<float> &, const Vector<float> &) const;
 template void PreconditionBlockJacobi<double, double>::Tvmult
+(Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockJacobi<double, double>::vmult_add
+(Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockJacobi<double, double>::vmult_add
+(Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockJacobi<double, double>::Tvmult_add
+(Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockJacobi<double, double>::Tvmult_add
 (Vector<double> &, const Vector<double> &) const;
 
 /*--------------------- PreconditionBlockGaussSeidel -----------------------*/
