@@ -24,6 +24,8 @@
 
 
 /**
+ * The use of this class is now deprecated!
+ *
  * This is the base class for equation objects. Equations objects describe the
  * finite element discretisation of one or more equations.
  *
@@ -34,7 +36,8 @@
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class Equation {
+class Equation
+{
   public:
 				     /**
 				      * Constructor. You have to pass the number
@@ -129,14 +132,18 @@ class Equation {
 };
 
 
+
 /**
+ * The use of this class is now deprecated!
+ *
  * An #Assembler# is a specialized version of a #DoFCellAccessor# which adds
  * functionality to assemble global matrices and vectors from cell base ones.
  *
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class Assembler : public DoFCellAccessor<dim> {
+class Assembler : public DoFCellAccessor<dim>
+{
   public:
 
 				     /**
@@ -207,7 +214,7 @@ class Assembler : public DoFCellAccessor<dim> {
     };
 
 
-/**
+				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
