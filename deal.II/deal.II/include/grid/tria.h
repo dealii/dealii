@@ -627,6 +627,46 @@ class TriaDimensionInfo<2> {
     \end{verbatim}
 
     
+    {\bf Creating a triangulation}
+
+    There are several possibilities to create a triangulation:
+    \begin{itemize}
+      \item Hypercube triangulations: a hypercube triangulation is a
+         domain which is the tensor product of an interval $[a,b]$ in
+         the given number of spatial dimensions. If you want to create such
+         a domain, which is a common test case for model problems, call
+         #Triangulation<dim>::create_hypercube (a,b)#, which produces a
+         hypercube domain triangulated with exactly one element. You can
+         get tensor product meshes by successive refinement of this cell.
+    
+      \item Reading in a triangulation: By using an object of the \Ref{#DataIn#}
+         class, you can read in fairly general triangulations. See there for
+         more information. The mentionned class uses the interface described
+         directly below to transfer the data into the triangulation.
+    
+      \item Explicitely creating a triangulation: you can create a triangulation
+         by providing a list of vertices and a list of cells. Each such cell
+         consists of a vector storing the indices of the vertices of this cell
+         in the vertex list. To see how this works, you can take a look at the
+         #DataIn<dim>::read_*# functions. The appropriate function to be
+         called is #Triangulation<dim>::create_triangulation (2)#.
+
+         Creating the hierarchical information needed for this library from
+         cells storing only vertex information can be a quite complex task.
+         For example in 2d, we have to create lines between vertices (but only
+         once, though there are two cells which link these two vertices) and
+         we have to create neighborship information. Grids being read in
+         should therefore not be too large, reading refined grids would be
+         inefficient. Apart from the performance aspect, refined grids do not
+         lend too well to multigrid algorithms, since solving on the coarsest
+         level is expensive. It is wiser in any case to read in a grid as coarse
+         as possible and then do the needed refinement steps.
+
+	 It is your duty to guarantee that  cells have the correct orientation.
+    \end{itemize}
+
+
+
     {\bf History of a triangulation}
     
     It is possible to reconstruct a grid from its refinement history, which
@@ -803,17 +843,35 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  is called the last time.
 				      */
     void set_boundary (const Boundary<dim> *boundary_object);
+
+				     /**
+				      * Create a triangulation from a list
+				      * of vertices and a list of cells, each of
+				      * the latter being a list of #1<<dim#
+				      * vertex indices. The triangulation must
+				      * be empty upon calling this function and
+				      * the cell list should be useful (connected
+				      * domain, etc.).
+				      */
+    void create_triangulation (const vector<Point<dim> >  &vertices,
+			       const vector<vector<int> > &cells);
     
 				     /**
 				      * Initialize the triangulation with a
-				      * unit hypercube (unit line in 1D,
-				      * unit square in 2D, etc) consisting
-				      * of exactly one cell.
+				      * hypercube (line in 1D, square in 2D, etc)
+				      * consisting of exactly one cell. The
+				      * hypercube volume is the tensor product
+				      * of the intervall $[left,right]$ in the
+				      * present number of dimensions, where
+				      * the limits are given as arguments. They
+				      * default to zero and unity, then producing
+				      * the unit hypercube.
 				      *
 				      * The triangulation needs to be void
 				      * upon calling this function.
 				      */
-    void create_unit_hypercube ();
+    void create_hypercube (const double left = 0.,
+			   const double right= 1.);
 
 
 
@@ -1366,7 +1424,18 @@ class Triangulation : public TriaDimensionInfo<dim> {
 		    int, int,
 		    << "The present grid has " << arg1 << " active cells, "
 		    << "but the one in the file had " << arg2);
+				     /**
+				      *  Exception
+				      */
     DeclException0 (ExcGridReadError);
+				     /**
+				      *  Exception
+				      */
+    DeclException0 (ExcTriangulationNotEmpty);
+				     /**
+				      *  Exception
+				      */
+    DeclException0 (ExcInternalError);
 				     //@}
   protected:
 				     /**

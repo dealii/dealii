@@ -34,9 +34,114 @@ void Triangulation<dim>::set_boundary (const Boundary<dim> *boundary_object) {
 
 
 
-void Triangulation<1>::create_unit_hypercube () {
-  vertices.push_back (Point<1> (0.0));
-  vertices.push_back (Point<1> (1.0));
+
+void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
+					     const vector<vector<int> > &cells) {
+  const unsigned int dim=1;
+  
+  Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
+  Assert (n_lines() == 0, ExcTriangulationNotEmpty());
+
+				   // copy vertices
+  vertices = v;
+  vertices_used = vector<bool> (v.size(), true);
+    
+				   // store the indices of the lines which
+				   // are adjacent to a given vertex
+  vector<vector<int> > lines_at_vertex (v.size());
+
+				   // reserve enough space
+  levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
+  levels[0]->TriangulationLevel<1>::reserve_space (cells.size());
+  
+				   // make up cells
+  raw_line_iterator next_free_line = begin_raw_line ();
+  for (unsigned int cell=0; cell<cells.size(); ++cell) 
+    {
+      while (next_free_line->used())
+	++next_free_line;
+      
+      next_free_line->set (Line (cells[cell][0], cells[cell][1]));
+      next_free_line->set_used_flag ();
+      
+				       // note that this cell
+				       // is adjacent to these vertices
+      lines_at_vertex[cells[cell][0]].push_back (cell);
+      lines_at_vertex[cells[cell][1]].push_back (cell);
+    };
+
+
+#ifdef DEBUG
+				   // some security tests
+  unsigned int boundary_nodes = 0;
+  for (unsigned int i=0; i<lines_at_vertex.size(); ++i)
+    switch (lines_at_vertex[i].size()) 
+      {
+	case 1:      // this vertex has only one adjacent line
+	      ++boundary_nodes;
+	      break;
+	case 2:
+	      break;
+	default:     // a node must have one or two adjacent lines
+	      Assert (false, ExcInternalError());
+      };
+
+				   // assert there are no more than two boundary
+				   // nodes
+  Assert (boundary_nodes == 2, ExcInternalError());
+#endif
+
+
+  				   // update neighborship info
+  active_line_iterator line = begin_active_line ();
+				   // for all lines
+  for (; line!=end(); ++line)
+				     // for each of the two vertices
+    for (unsigned int vertex=0; vertex<(1<<dim); ++vertex)
+				       // if first cell adjacent to this
+				       // vertex is the present one, then
+				       // the neighbor is the second adjacent
+				       // cell and vice versa
+      if (lines_at_vertex[line->vertex_index(vertex)][0] == line->index())
+	if (lines_at_vertex[line->vertex_index(vertex)].size() == 2) 
+	  {
+	    const cell_iterator neighbor ((Triangulation<1>*)this,
+					  0,              // level
+					  lines_at_vertex[line->vertex_index(vertex)][1]);
+	    line->set_neighbor (vertex, neighbor);
+	  }
+	else
+					   // no second adjacent cell entered
+					   // -> cell at boundary
+	  line->set_neighbor (vertex, end());
+      else
+					 // present line is not first adjacent
+					 // one -> first adjacent one is neighbor
+	{
+	  const cell_iterator neighbor ((Triangulation<1>*)this,
+					0,              // level
+					lines_at_vertex[line->vertex_index(vertex)][0]);
+	  line->set_neighbor (vertex, neighbor);
+	};
+};
+
+
+
+void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
+					     const vector<vector<int> > &cells) {
+  const unsigned int dim=1;
+  Assert (false, ExcInternalError());
+};
+
+
+
+void Triangulation<1>::create_hypercube (const double left,
+					 const double right) {
+  Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
+  Assert (n_lines() == 0, ExcTriangulationNotEmpty());
+  
+  vertices.push_back (Point<1> (left));
+  vertices.push_back (Point<1> (right));
 
   vertices_used.insert (vertices_used.end(), 2, true);
   
@@ -53,12 +158,17 @@ void Triangulation<1>::create_unit_hypercube () {
 
 
   
-void Triangulation<2>::create_unit_hypercube () {
+void Triangulation<2>::create_hypercube (const double left,
+					 const double right) {
+  Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
+  Assert (n_lines() == 0, ExcTriangulationNotEmpty());
+  Assert (n_quads() == 0, ExcTriangulationNotEmpty());
+  
 				   // create vertices
-  vertices.push_back (Point<2> (0,0));
-  vertices.push_back (Point<2> (1,0));
-  vertices.push_back (Point<2> (1,1));
-  vertices.push_back (Point<2> (0,1));
+  vertices.push_back (Point<2> (left,left));
+  vertices.push_back (Point<2> (right,left));
+  vertices.push_back (Point<2> (right,right));
+  vertices.push_back (Point<2> (left,right));
   vertices_used.insert (vertices_used.end(), 4, true);
  
 				   // create lines

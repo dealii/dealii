@@ -5,6 +5,7 @@
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
+#include <map.h>
 #include <iostream.h>
 #include <algo.h>
 #include <time.h>
@@ -12,6 +13,116 @@
 
 extern TriaActiveIterator<1,DoFCellAccessor<1> > __dummy566; // wait for gcc2.8
 extern TriaActiveIterator<2,DoFCellAccessor<2> > __dummy567;
+
+
+
+
+
+
+template <int dim>
+DataIn<dim>::DataIn () :
+		tria(0) {};
+
+
+
+template <int dim>
+void DataIn<dim>::attach_triangulation (Triangulation<dim> *t) {
+  tria = t;
+};
+
+
+
+template <int dim>
+void DataIn<dim>::read_ucd (istream &in) {
+  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert ((1<=dim) && (dim<=2), ExcNotImplemented());
+
+
+				   // skip comments at start of file
+  char c;
+  while (in.get(c), c=='#') 
+    {
+      char line[256];
+      in.get (line, 255, '\n'); // ignore rest of line, at most 256 chars
+      in.get (c);         // ignore '\n' at end of line.
+    };
+  
+				   // put back first character of
+				   // first non-comment line
+  in.putback (c);
+  
+  
+  unsigned int n_vertices;
+  unsigned int n_cells;
+  int dummy;
+
+  in >> n_vertices
+     >> n_cells
+     >> dummy         // number of data vectors
+     >> dummy         // cell data
+     >> dummy;        // model data
+
+				   // set up array of vertices
+  vector<Point<dim> >     vertices (n_vertices);
+				   // set up mapping between numbering
+				   // in ucd-file (key) and in the
+				   // vertices vector
+  map<int,int,less<int> > vertex_indices;
+  
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+    {
+      int vertex_number;
+      double x[3];
+
+				       // read vertex
+      in >> vertex_number
+	 >> x[0] >> x[1] >> x[2];
+
+				       // store vertex
+      for (unsigned int d=0; d<dim; ++d)
+	vertices[vertex](d) = x[d];
+				       // store mapping; note that
+				       // vertices_indices[i] is automatically
+				       // created upon first usage
+      vertex_indices[vertex_number] = vertex;
+    };
+
+				   // set up array of cells
+  vector<vector<int> > cells;
+
+  for (unsigned int cell=0; cell<n_cells; ++cell) 
+    {
+      String cell_type;
+
+      in >> dummy          // cell number
+	 >> dummy;         // material id
+      in >> cell_type;
+
+      if (((cell_type = "line") && (dim == 1)) ||
+	  ((cell_type = "quad") && (dim == 2)))
+					 // ignore lines in more than one
+					 // dimension, quads in more than
+					 // two, and triangles in any dimension
+	{
+					   // allocate and read indices
+	  cells.push_back (vector<int> (1<<dim));
+	  for (unsigned int i=0; i<(1<<dim); ++i)
+	    in >> cells.back()[i];
+
+					   // transform from ucd to
+					   // consecutive numbering
+	  for (unsigned int i=0; i<(1<<dim); ++i)
+	    cells.back()[i] = vertex_indices[cells.back()[i]];
+	};
+    };
+
+  tria->create_triangulation (vertices, cells);
+};
+
+
+
+
+
 
 
 template <int dim>
@@ -227,5 +338,7 @@ void DataOut<dim>::write_gnuplot (ostream &out) const {
 
 
 //explicite instantiations
+template class DataIn<1>;
+template class DataIn<2>;
 template class DataOut<1>;
 template class DataOut<2>;

@@ -16,10 +16,74 @@
 #endif
 
 
-template <int dim>
-class DoFHandler;
+template <int dim> class Triangulation;
+template <int dim> class DoFHandler;
 
 class dVector;
+
+template <class Key, class T, class Compare> class map;
+template <class T> struct less;
+
+
+/**
+  This class implements an input mechanism for grid data. It allows to
+  read a grid structure into a triangulation object. Future versions
+  will also allow to read data on this grid into vectors.
+
+  At present, only UCD (unstructured cell data) is supported as input
+  format for grid data. Any numerical data after the block of topological
+  information is ignored.
+
+  To read grid data, the triangulation to be fed with has to be empty.
+  When giving a file which does not contain the assumed information or
+  which does not keep to the right format, the state of the triangulation
+  will be undefined afterwards. Upon input, only lines in one dimension
+  and quads in two dimensions are accepted. All other cell types (e.g. lines
+  or triangles in two dimensions, quads and hexes in 3d) are ignored. No
+  warning is issued. The vertex and cell numbering in the UCD file, which
+  need not be consecutively, is lost upon transfer to the triangulation
+  object, since this one needs consecutively numbered elements.
+  */
+template <int dim>
+class DataIn {
+  public:
+				     /**
+				      * Constructor.
+				      */
+    DataIn ();
+    
+				     /**
+				      * Attach this triangulation
+				      * to be fed with the grid data.
+				      */
+    void attach_triangulation (Triangulation<dim> *tria);
+
+				     /**
+				      * Read grid data from an ucd file.
+				      * Numerical data is ignored.
+				      */
+    void read_ucd (istream &);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotImplemented);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNoTriangulationSelected);
+    
+  private:
+				     /**
+				      * Store address of the triangulation to
+				      * be fed with the data read in.
+				      */
+    Triangulation<dim> *tria;
+};
+
+
+
+
 
 
 
