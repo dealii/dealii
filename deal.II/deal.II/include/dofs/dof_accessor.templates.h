@@ -75,7 +75,7 @@ DoFAccessor<dim>::operator = (const DoFAccessor<dim> &da)
 
 
 
-/*------------------------- Functions: DoFLineAccessor -----------------------*/
+/*------------------------- Functions: DoFObjectAccessor<1,dim> -----------------------*/
 
 template <int dim>
 inline
@@ -344,7 +344,7 @@ DoFObjectAccessor<2,dim>::copy_from (const DoFObjectAccessor<2,dim> &a)
 };
 
 
-/*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
+/*------------------------- Functions: DoFObjectAccessor<3,dim> -----------------------*/
 
 
 template <int dim>

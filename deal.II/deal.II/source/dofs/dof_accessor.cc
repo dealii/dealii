@@ -27,7 +27,7 @@
 #include <vector>
 
 
-/*------------------------- Functions: DoFLineAccessor -----------------------*/
+/*------------------------- Functions: DoFObjectAccessor<1,dim> -----------------------*/
 
 
 template <int dim>
@@ -224,7 +224,7 @@ DoFObjectAccessor<1,dim>::set_dof_values (const Vector<number> &local_values,
 };
 
 
-/*------------------------- Functions: DoFQuadAccessor -----------------------*/
+/*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
 
 
 template <int dim>
@@ -404,7 +404,7 @@ DoFObjectAccessor<2,dim>::set_dof_values (const Vector<number> &local_values,
 };
 
 
-/*------------------------- Functions: DoFHexAccessor -----------------------*/
+/*------------------------- Functions: DoFObjectAccessor<3,dim> -----------------------*/
 
 
 template <int dim>
