@@ -188,7 +188,7 @@ class MGDoFObjectAccessor<0, dim>
 				      * Constructor. Should never be called
 				      * and thus throws an error.
 				      */
-    MGDoFObjectAccessor (Triangulation<dim> *,
+    MGDoFObjectAccessor (const Triangulation<dim> *,
 			 const int,
 			 const int,
 			 const AccessorData *)
@@ -250,7 +250,7 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 				      * argument is assumed to be a pointer
 				      * to a @p{MGDoFHandler<dim>} object.
 				      */
-    MGDoFObjectAccessor (Triangulation<dim> *tria,
+    MGDoFObjectAccessor (const Triangulation<dim> *tria,
 			 const int           level,
 			 const int           index,
 			 const AccessorData *local_data);
@@ -366,7 +366,7 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				      * argument is assumed to be a pointer
 				      * to a @ref{DoFHandler} object.
 				      */
-    MGDoFObjectAccessor (Triangulation<dim> *tria,
+    MGDoFObjectAccessor (const Triangulation<dim> *tria,
 			 const int           level,
 			 const int           index,
 			 const AccessorData *local_data);
@@ -491,7 +491,7 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 				      * argument is assumed to be a pointer
 				      * to a @ref{DoFHandler} object.
 				      */
-    MGDoFObjectAccessor (Triangulation<dim> *tria,
+    MGDoFObjectAccessor (const Triangulation<dim> *tria,
 			 const int           level,
 			 const int           index,
 			 const AccessorData *local_data);
@@ -626,7 +626,7 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
     				     /**
 				      * Constructor
 				      */
-    MGDoFCellAccessor (Triangulation<dim> *tria,
+    MGDoFCellAccessor (const Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
 		       const AccessorData *local_data) :

@@ -46,7 +46,7 @@ template <int dim>
 Point<dim> &
 TriaObjectAccessor<1, dim>::vertex (const unsigned int i) const
 {
-  return this->tria->vertices[vertex_index(i)];
+  return const_cast<Point<dim> &> (this->tria->vertices[vertex_index(i)]);
 };
 
 
@@ -247,7 +247,7 @@ template <int dim>
 Point<dim> &
 TriaObjectAccessor<2, dim>::vertex (const unsigned int i) const
 {
-  return this->tria->vertices[vertex_index(i)];
+  return const_cast<Point<dim> &> (this->tria->vertices[vertex_index(i)]);
 };
 
 
@@ -643,7 +643,7 @@ template <int dim>
 Point<dim> &
 TriaObjectAccessor<3, dim>::vertex (const unsigned int i) const
 {
-  return this->tria->vertices[vertex_index(i)];
+  return const_cast<Point<dim> &> (this->tria->vertices[vertex_index(i)]);
 };
 
 

@@ -257,7 +257,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * argument is assumed to be a pointer
 				      * to a @ref{DoFHandler} object.
 				      */
-    DoFObjectAccessor (Triangulation<dim> *tria,
+    DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
 		       const AccessorData *local_data) :
@@ -511,7 +511,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * argument is assumed to be a pointer
 				      * to a @ref{DoFHandler} object.
 				      */
-    DoFObjectAccessor (Triangulation<dim> *tria,
+    DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
 		       const AccessorData *local_data) :
@@ -699,7 +699,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * argument is assumed to be a pointer
 				      * to a @ref{DoFHandler} object.
 				      */
-    DoFObjectAccessor (Triangulation<dim> *tria,
+    DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
 		       const AccessorData *local_data) :
@@ -896,7 +896,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * argument is assumed to be a pointer
 				      * to a @ref{DoFHandler} object.
 				      */
-    DoFObjectAccessor (Triangulation<dim> *tria,
+    DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
 		       const AccessorData *local_data) :
@@ -1098,7 +1098,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
     				     /**
 				      * Constructor
 				      */
-    DoFCellAccessor (Triangulation<dim> *tria,
+    DoFCellAccessor (const Triangulation<dim> *tria,
 		     const int           level,
 		     const int           index,
 		     const AccessorData *local_data) :

@@ -42,7 +42,7 @@ TriaRawIterator<dim,Accessor>::TriaRawIterator (const TriaRawIterator<dim,Access
 
 template <int dim, typename Accessor>
 inline
-TriaRawIterator<dim,Accessor>::TriaRawIterator (Triangulation<dim> *parent,
+TriaRawIterator<dim,Accessor>::TriaRawIterator (const Triangulation<dim> *parent,
 						const int           level,
 						const int           index,
 						const typename Accessor::AccessorData *local_data) :
@@ -144,7 +144,7 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,Accessor> &i
 
 template <int dim, typename Accessor>
 inline
-TriaIterator<dim,Accessor>::TriaIterator (Triangulation<dim> *parent,
+TriaIterator<dim,Accessor>::TriaIterator (const Triangulation<dim> *parent,
 					  const int           level,
 					  const int           index,
 					  const typename Accessor::AccessorData *local_data) :
@@ -292,7 +292,7 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaIterator<dim,Acc
 
 template <int dim, typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>::TriaActiveIterator (Triangulation<dim> *parent,
+TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const Triangulation<dim> *parent,
 						      const int           level,
 						      const int           index,
 						      const typename Accessor::AccessorData *local_data) :

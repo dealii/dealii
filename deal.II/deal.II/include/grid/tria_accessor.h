@@ -80,7 +80,7 @@ class TriaAccessor
 				      *  only callable from friend
 				      *  classes.
 				      */
-    TriaAccessor (Triangulation<dim> *parent     = 0,
+    TriaAccessor (const Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
 		  const int           index      = -1,
 		  const AccessorData * = 0) :
@@ -261,7 +261,7 @@ class TriaAccessor
 				      *  Pointer to the triangulation which
 				      *  we act on.
 				      */
-    Triangulation<dim> *tria;
+    const Triangulation<dim> *tria;
 
     template <int anydim, typename Accessor> friend class TriaRawIterator;
     template <int anydim, typename Accessor> friend class TriaIterator;
@@ -295,7 +295,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * By default, an illegal
 				      * accessor is constructed.
 				      */
-    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
+    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
 			const int           level      = -1,
 			const int           index      = -1,
 			const AccessorData *local_data = 0) :
@@ -329,7 +329,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     int vertex_index (const unsigned int i) const;
 
     				     /**
-				      *  Reference (not an iterator!)
+				      *  Const reference (not an iterator!)
 				      *  to the @p{i}th vertex.
 				      */
     Point<dim> & vertex (const unsigned int i) const;
@@ -683,7 +683,7 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
 				      * Constructor. Should never be called and
 				      * thus produces an error.
 				      */
-    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
+    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
 			const int           level      = -1,
 			const int           index      = -1,
 			const AccessorData *local_data = 0) :
@@ -716,7 +716,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Constructor.
 				      */
-    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
+    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
 			const int           level      = -1,
 			const int           index      = -1,
 			const AccessorData *local_data = 0) :
@@ -1059,7 +1059,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Constructor.
 				      */
-    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
+    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
 			const int           level      = -1,
 			const int           index      = -1,
 			const AccessorData *local_data = 0) :
@@ -1436,7 +1436,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Constructor.
 				      */
-    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
+    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
 			const int           level      = -1,
 			const int           index      = -1,
 			const AccessorData *local_data = 0) :
@@ -1822,7 +1822,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				     /**
 				      *  Constructor.
 				      */
-    CellAccessor (Triangulation<dim> *parent     = 0,
+    CellAccessor (const Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
 		  const int           index      = -1,
 		  const AccessorData *local_data = 0) :

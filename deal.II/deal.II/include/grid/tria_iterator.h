@@ -285,7 +285,7 @@ class TriaRawIterator :
 				      *  of a type declared by the accessor
 				      *  class.
 				      */
-    TriaRawIterator (Triangulation<dim> *parent,
+    TriaRawIterator (const Triangulation<dim> *parent,
 		     const int           level,
 		     const int           index,
 		     const typename AccessorType::AccessorData *local_data = 0);
@@ -568,7 +568,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  used, the debug version raises
 				      *  an error!
 				      */
-    TriaIterator (Triangulation<dim> *parent,
+    TriaIterator (const Triangulation<dim> *parent,
 		  const int           level,
 		  const int           index,
 		  const typename Accessor::AccessorData *local_data = 0);
@@ -727,7 +727,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  active, the debug version raises
 				      *  an error!
 				      */
-    TriaActiveIterator (Triangulation<dim> *parent,
+    TriaActiveIterator (const Triangulation<dim> *parent,
 			const int           level,
 			const int           index,
 			const typename Accessor::AccessorData *local_data = 0);
