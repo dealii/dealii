@@ -404,16 +404,78 @@ void ElasticProblem<dim>::setup_system ()
 }
 
 
+                                 // The third step is to actually assemble the
+                                 // matrix and right hand side of the
+                                 // problem. There are some things worth
+                                 // mentioning before we go into
+                                 // detail. First, we will be assembling the
+                                 // system in parallel, i.e. each process will
+                                 // be responsible for assembling on cells
+                                 // that belong to this particular
+                                 // processor. Note that the degrees of
+                                 // freedom are split in a way such that all
+                                 // DoFs in the interior of cells and between
+                                 // cells belonging to the same subdomain
+                                 // belong to the process that ``owns'' the
+                                 // cell. However, even then we sometimes need
+                                 // to assemble on a cell with a neighbor that
+                                 // belongs to a different process, and in
+                                 // these cases when we write the local
+                                 // contributions into the global matrix or
+                                 // right hand side vector, we actually have
+                                 // to transfer these entries to the other
+                                 // process. Furtunately, we don't have to do
+                                 // this by hand, PETSc does all this for us
+                                 // by caching these elements locally, and
+                                 // sending them to the other processes as
+                                 // necessary when we call the ``compress()''
+                                 // functions on the matrix and vector at the
+                                 // end of this function.
+                                 //
+                                 // The second point is that once we have
+                                 // handed over matrix and vector
+                                 // contributions to PETSc, it is a) hard, and
+                                 // b) very inefficient to get them back for
+                                 // modifications. This is not only the fault
+                                 // of PETSc, it is also a consequence of the
+                                 // distributed nature of this program: if an
+                                 // entry resides on another processor, then
+                                 // it is necessarily expensive to get it. The
+                                 // consequence of this is that where we
+                                 // previously first assembled the matrix and
+                                 // right hand side as if there were not
+                                 // hanging node constraints and boundary
+                                 // values, and then eliminated these in a
+                                 // second step, we now have to do that while
+                                 // still assembling the local systems, and
+                                 // before handing these entries over to
+                                 // PETSc. Fortunately, deal.II provides
+                                 // functions to do so, so that we do not have
+                                 // to touch any entries of the linear system
+                                 // later on any more.
+                                 //
+                                 // So, here is the actual implementation:
 template <int dim>
 void ElasticProblem<dim>::assemble_system () 
 {
-                                   // xxx move to front
+                                   // As mentioned we have to treat boundary
+                                   // values while still assembling local
+                                   // systems. Therefore, we have to have
+                                   // their values available at the beginning
+                                   // of the assembly function, not only after
+                                   // looping over all cells:
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(dim),
 					    boundary_values);
 
+                                   // The infrastructure to assemble linear
+                                   // systems is the same as in all the other
+                                   // programs, and in particular unchanged
+                                   // from step-8. Note that we still use the
+                                   // deal.II full matrix and vector types for
+                                   // the local systems.
   QGauss2<dim>  quadrature_formula;
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   UpdateFlags(update_values    |
@@ -439,10 +501,11 @@ void ElasticProblem<dim>::assemble_system ()
 					   Vector<double>(dim));
 
 
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
                                      // xxx
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
     if (cell->subdomain_id() == this_mpi_process)
       {
         cell_matrix.clear ();
