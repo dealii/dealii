@@ -119,7 +119,8 @@
  * Hartmann, 2003
  */
 template <typename number>
-class SparseLUDecomposition : protected SparseMatrix<number>
+class SparseLUDecomposition : protected SparseMatrix<number>, 
+                              public virtual Subscriptor
 {
   public:
 
@@ -283,6 +284,7 @@ class SparseLUDecomposition : protected SparseMatrix<number>
 				      * compability. It will be removed
 				      * in later versions.
 				      */
+
     void reinit ();
 
 				     /**
@@ -310,6 +312,13 @@ class SparseLUDecomposition : protected SparseMatrix<number>
 				      * in later versions.
                                       */ 
     virtual bool is_decomposed () const;	
+
+				     /**
+				      * Return whether the object is
+				      * empty. It calls the inherited
+				      * SparseMatrix::empty() function.
+				      */
+    bool empty () const;
 
 				     /**
 				      * Determine an estimate for the
@@ -447,6 +456,15 @@ inline bool
 SparseLUDecomposition<number>::is_decomposed () const
 {
   return decomposed;
+}
+
+
+
+template <typename number>
+inline bool 
+SparseLUDecomposition<number>::empty () const 
+{
+  return SparseMatrix<number>::empty(); 
 }
 
 
