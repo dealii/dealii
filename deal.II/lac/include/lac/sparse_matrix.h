@@ -182,7 +182,10 @@ namespace internals
                                              /**
                                               * Make the accessor class a
                                               * friend so as to allow it to
-                                              * generate objects of this type.
+                                              * generate objects of this
+                                              * type. To avoid trouble with
+                                              * some compilers simply mark all
+                                              * accessor classes as friends.
                                               */
             template <typename, bool> friend class Accessor;
         };
