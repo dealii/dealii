@@ -13,6 +13,7 @@
 #ifndef __deal2__precondition_h
 #define __deal2__precondition_h
 
+#include <lac/vector_memory.h>
 
 /**
  * No preconditioning.
@@ -254,6 +255,59 @@ class PreconditionLACSolver
 };
 
 
+/**
+ * Matrix with preconditioner.
+ * Given a matrix $A$ and a preconditioner $P$, this class implements a new matrix
+ * with the matrix-vector product $PA$. It needs an auxiliary vector for that.
+ *
+ * By this time, this is considered a temporary object to be plugged
+ * into eigenvalue solvers. Therefore, no @p SmartPointer is used for
+ * @p A and @p P.
+ *
+ * @author Guido Kanschat, 2000
+ */
+template<class MATRIX, class PRECOND, class VECTOR>
+class PreconditionedMatrix
+{
+  public:
+				     /**
+				      * Constructor. Provide matrix,
+				      * preconditioner and a memory
+				      * pool to obtain the auxiliary
+				      * vector.
+				      */
+    PreconditionedMatrix (const MATRIX&          A,
+			  const PRECOND&         P,
+			  VectorMemory<VECTOR>&  mem);
+
+				     /**
+				      * Preconditioned matrix-vector-product.
+				      */
+    void vmult (VECTOR& dst, const VECTOR& src) const;
+
+				     /**
+				      * Residual $b-PAx$.
+				      */
+    double residual (VECTOR& dst, const VECTOR& src, const VECTOR& rhs) const;
+
+  private:
+				     /**
+				      * Storage for the matrix.
+				      */
+    const MATRIX& A;
+				     /**
+				      * Storage for preconditioner.
+				      */
+    const PRECOND& P;
+				     /**
+				      * Memory pool for vectors.
+				      */
+    VectorMemory<VECTOR>& mem;
+};
+
+
+    
+
 /* ---------------------------------- Inline functions ------------------- */
 
 template<class VECTOR>
@@ -316,5 +370,46 @@ PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::operator() (VECTOR& dst,
   solver.solve(matrix, dst, src, precondition);
 }
 
+//////////////////////////////////////////////////////////////////////
+
+
+template<class MATRIX, class PRECOND, class VECTOR>
+inline
+PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
+::PreconditionedMatrix (const MATRIX&  A,
+			const PRECOND& P,
+			VectorMemory<VECTOR>&  mem):
+		A(A), P(P), mem(mem)
+{}
+
+
+template<class MATRIX, class PRECOND, class VECTOR>
+inline void
+PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
+::vmult (VECTOR& dst,
+	 const VECTOR& src) const
+{
+  VECTOR* h = mem.alloc();
+  h->reinit(src);
+  A.vmult(*h, src);
+  P(dst, *h);
+  mem.free(h);
+}
+
+template<class MATRIX, class PRECOND, class VECTOR>
+inline double
+PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
+::residual (VECTOR& dst,
+	    const VECTOR& src,
+	    const VECTOR& rhs) const
+{
+  VECTOR* h = mem.alloc();
+  h->reinit(src);
+  A.vmult(*h, src);
+  P(dst, *h);
+  mem.free(h);
+  dst.sadd(-1.,1.,rhs);
+  return dst.l2_norm ();
+}
 
 #endif

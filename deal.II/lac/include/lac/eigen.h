@@ -17,7 +17,62 @@
 #include <lac/forward_declarations.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>
+#include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
+#include <lac/precondition.h>
+
+/**
+ * Matrix with shifted diagonal values.
+ *
+ * Given a matrix $A$, this class implements a matrix-vector product with
+ * $A+\sigma I$, where sigma is a provided shift parameter.
+ *
+ * @author Guido Kanschat, 2000
+ */
+template<class MATRIX>
+class ShiftedMatrix
+{
+  public:
+				     /**
+				      * Constructor.
+				      * Provide the base matrix and a shift parameter.
+				      */
+    ShiftedMatrix (const MATRIX& A, const double sigma);
+
+				     /**
+				      * Set the shift parameter.
+				      */
+    void shift (const double sigma);
+
+				     /**
+				      * Access to the shift parameter.
+				      */
+    double shift () const;
+
+				     /**
+				      * Matrix-vector-product.
+				      */
+    template <class VECTOR>
+    void vmult (VECTOR& dst, const VECTOR& src) const;
+
+				     /**
+				      * Residual.
+				      */
+    template <class VECTOR>
+    double residual (VECTOR& dst, const VECTOR& src, const VECTOR& rhs) const;
+    
+  private:
+				     /**
+				      * Storage for base matrix.
+				      */
+    const MATRIX& A;
+
+				     /**
+				      * Shift parameter.
+				      */
+    double sigma;
+};
+    
 
 /**
  * Power method (von Mises).
@@ -36,14 +91,13 @@
  */
 template <class MATRIX = SparseMatrix<double>,
           class VECTOR = Vector<double> >
-class EigenPower : public Solver<MATRIX,VECTOR>
+class EigenPower : private Solver<MATRIX,VECTOR>
 {
   public:
     				     /**
 				      * Standardized data struct to
 				      * pipe additional data to the
-				      * solver. This solver does not
-				      * need additional data yet.
+				      * solver.
 				      */
     struct AdditionalData
     {
@@ -57,7 +111,7 @@ class EigenPower : public Solver<MATRIX,VECTOR>
 					 /**
 					  * Constructor. Set the shift parameter.
 					  */
-	AdditionalData (const double shift):
+	AdditionalData (const double shift = 0.):
 			shift(shift)
 	  {}
 	
@@ -97,7 +151,121 @@ class EigenPower : public Solver<MATRIX,VECTOR>
     AdditionalData additional_data;
 };
 
+//TODO: Finish documentation after fixing parameters.
+
+/**
+ * Inverse iteration (Wieland).
+ *
+ * This class implements an adaptive version of the inverse iteration by Wieland.
+ *
+ * @author Guido Kanschat, 2000
+ */
+template <class MATRIX = SparseMatrix<double>,
+          class VECTOR = Vector<double> >
+class EigenInverse : private Solver<MATRIX, VECTOR>
+{
+  public:
+      				     /**
+				      * Standardized data struct to
+				      * pipe additional data to the
+				      * solver. This solver does not
+				      * need additional data yet.
+				      */
+    struct AdditionalData
+    {};
+    
+  				     /**
+				      * Constructor.
+				      */
+    EigenInverse (SolverControl &cn,
+		  VectorMemory<VECTOR> &mem,
+		  const AdditionalData &data=AdditionalData());
+
+
+				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~EigenInverse ();
+
+				     /**
+				      * Inverse method. @p value is
+				      * the start guess for the
+				      * eigenvalue and @p x is the
+				      * (not necessarily normalized)
+				      * start vector for the power
+				      * method. After the iteration,
+				      * @p value is the approximated
+				      * eigenvalue and @p x is the
+				      * corresponding eigenvector,
+				      * normalized with respect to the
+				      * l2-norm.
+				      */
+    typename Solver<MATRIX,VECTOR>::ReturnState
+    solve (double       &value,
+	   const MATRIX &A,
+	   VECTOR       &x);
+
+  protected:
+				     /**
+				      * Shift parameter.
+				      */
+    AdditionalData additional_data;
+};
+
 //----------------------------------------------------------------------//
+
+template <class MATRIX>
+inline
+ShiftedMatrix<MATRIX>::ShiftedMatrix (const MATRIX& A, const double sigma)
+		:
+		A(A), sigma(sigma)
+{}
+
+
+
+template <class MATRIX>
+inline void
+ShiftedMatrix<MATRIX>::shift (const double s)
+{
+  sigma = s;
+}
+
+
+template <class MATRIX>
+inline double
+ShiftedMatrix<MATRIX>::shift () const
+{
+  return sigma;
+}
+
+
+
+template <class MATRIX>
+template <class VECTOR>
+inline void
+ShiftedMatrix<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
+{
+  A.vmult(dst, src);
+  dst.add(sigma, src);
+}
+
+
+template <class MATRIX>
+template <class VECTOR>
+inline double
+ShiftedMatrix<MATRIX>::residual (VECTOR& dst,
+				 const VECTOR& src,
+				 const VECTOR& rhs) const
+{
+  A.vmult(dst, src);
+  dst.add(sigma, src);
+  dst.sadd(-1.,1.,rhs);
+  return dst.l2_norm ();
+}
+
+
+//----------------------------------------------------------------------
+
 
 template <class MATRIX, class VECTOR>
 EigenPower<MATRIX, VECTOR>::EigenPower (SolverControl &cn,
@@ -124,16 +292,17 @@ EigenPower<MATRIX, VECTOR>::solve (double       &value,
   deallog.push("Power method");
 
   VECTOR* Vy = memory.alloc (); VECTOR& y = *Vy; y.reinit (x);
+  VECTOR* Vr = memory.alloc (); VECTOR& r = *Vr; r.reinit (x);
   
   double length = x.l2_norm ();
   double old_length = 0.;
   x.scale(1./length);
   
+  A.vmult (y,x);
   
 				   // Main loop
   for(int iter=0; conv==SolverControl::iterate; iter++)
     {
-      A.vmult (y,x);
       y.add(additional_data.shift, x);
       
 				       // Compute absolute value of eigenvalue
@@ -141,7 +310,7 @@ EigenPower<MATRIX, VECTOR>::solve (double       &value,
       length = y.l2_norm ();
 
 				       // do a little trick to compute the sign
-				       // with not too much round-off errors.
+				       // with not too much effect of round-off errors.
       double entry = 0.;
       unsigned int i = 0;
       double thresh = length/x.size();
@@ -161,6 +330,11 @@ EigenPower<MATRIX, VECTOR>::solve (double       &value,
 				       // Update normalized eigenvector
       x.equ (1/length, y);
 
+				       // Compute residual
+      A.vmult (y,x);
+
+				       // Check the change of the eigenvalue
+				       // Brrr, this is not really a good criterion
       conv = control().check (iter, fabs(1.-length/old_length));
     }
   
@@ -172,8 +346,113 @@ EigenPower<MATRIX, VECTOR>::solve (double       &value,
     return exceeded;
   else
     return success;
-
 }
 
+//----------------------------------------------------------------------//
+
+template <class MATRIX, class VECTOR>
+EigenInverse<MATRIX, VECTOR>::EigenInverse (SolverControl &cn,
+					    VectorMemory<VECTOR> &mem,
+					    const AdditionalData &data):
+		Solver<MATRIX, VECTOR>(cn, mem),
+		additional_data(data)
+{}
+
+
+template <class MATRIX, class VECTOR>
+EigenInverse<MATRIX, VECTOR>::~EigenInverse ()
+{}
+
+
+template <class MATRIX, class VECTOR>
+typename Solver<MATRIX,VECTOR>::ReturnState
+EigenInverse<MATRIX, VECTOR>::solve (double       &value,
+				     const MATRIX &A,
+				     VECTOR       &x)
+{
+  deallog.push("Wieland");
+
+  SolverControl::State conv=SolverControl::iterate;
+
+				   // Prepare matrix for solver
+  ShiftedMatrix <MATRIX> A_s(A, -value);
+
+				   // Define solver
+  ReductionControl inner_control (100, 1.e-16, 1.e-8, false, false);
+  PreconditionIdentity prec;
+  SolverQMRS<ShiftedMatrix <MATRIX>, VECTOR>
+    solver(inner_control, memory);
+
+				   // Next step for recomputing the shift
+  unsigned int goal = 10;
+  
+				   // Auxiliary vector
+  VECTOR* Vy = memory.alloc (); VECTOR& y = *Vy; y.reinit (x);
+  VECTOR* Vr = memory.alloc (); VECTOR& r = *Vr; r.reinit (x);
+  
+  double length = x.l2_norm ();
+  double old_length = 0.;
+  double old_value = value;
+  
+  x.scale(1./length);
+  
+				   // Main loop
+  for (unsigned int iter=0; conv==SolverControl::iterate; iter++)
+    {
+      solver.solve (A_s, y, x, prec);
+      
+				       // Compute absolute value of eigenvalue
+      old_length = length;
+      length = y.l2_norm ();
+
+				       // do a little trick to compute the sign
+				       // with not too much effect of round-off errors.
+      double entry = 0.;
+      unsigned int i = 0;
+      double thresh = length/x.size();
+      do 
+	{
+	  Assert (i<x.size(), ExcInternalError());
+	  entry = y (i++);
+	}
+      while (fabs(entry) < thresh);
+
+      --i;
+
+				       // Compute unshifted eigenvalue
+      value = (entry * x (i) < 0.) ? -length : length;
+      value = 1./value;      
+      value -= A_s.shift ();
+
+      if (iter==goal)
+	{
+	  A_s.shift(-value);
+	  ++goal;
+	}
+      
+				       // Update normalized eigenvector
+      x.equ (1./length, y);
+				       // Compute residual
+      y.equ (value, x);
+      double res = A.residual (r,x,y);
+
+				       // Check the residual
+      conv = control().check (iter, res);
+      old_value = value;
+    }
+
+  memory.free(Vy);
+
+  deallog.pop();
+
+				   // Output
+  if (conv == SolverControl::failure)
+    return exceeded;
+  else
+    return success;
+}
 
 #endif
+
+
+
