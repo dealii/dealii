@@ -465,6 +465,45 @@ GridGenerator::cylinder (Triangulation<2> &tria,
 
 
 void
+GridGenerator::half_hyper_ball (Triangulation<2> &tria,
+				const Point<2>   &p,
+				const double      radius)
+{
+				   // equilibrate cell sizes at
+				   // transition from the inner part
+				   // to the radial cells
+  const double a = 1./(1+std::sqrt(2.0));
+  const Point<2> vertices[8] = { p+Point<2>(0,-1)*radius,
+				   p+Point<2>(+1,-1)*(radius/std::sqrt(2.0)),
+				   p+Point<2>(0,-1)*(radius/std::sqrt(2.0)*a),
+				   p+Point<2>(+1,-1)*(radius/std::sqrt(2.0)*a),
+				   p+Point<2>(0,+1)*(radius/std::sqrt(2.0)*a),
+				   p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)*a),
+				   p+Point<2>(0,+1)*radius,
+				   p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)) };
+  
+  const int cell_vertices[5][4] = {{0, 1, 3, 2},
+				   {2, 3, 5, 4},
+				   {1, 7, 5, 3},
+				   {6, 4, 5, 7}};
+
+  std::vector<CellData<2> > cells (4, CellData<2>());
+  
+  for (unsigned int i=0; i<4; ++i) 
+    {
+      for (unsigned int j=0; j<4; ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
+    };
+  
+  tria.create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[8]),
+			     cells,
+			     SubCellData());       // no boundary information
+};
+
+
+
+void
 GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
 				 const Point<2>     &center,
 				 const double        inner_radius,
