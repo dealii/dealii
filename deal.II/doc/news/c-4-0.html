@@ -32,6 +32,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3 style="color:red">Incompatibilities</h3>
 
 <ol>
+  <li> <p>
+  Changed: the template parameter of <code
+  class="class">MGTransferPrebuilt</code> is now the complete vector type, not
+  just the value type of the vector. This allows to operate on <code
+  class="class">Vector</code> as well as on <code
+  class="class">BlockVector</code>. Unfortunately, the untested class <code
+  class="class">MGTransferBlock</code> 
+  <br>
+  (GK 2004/04/01)
+  </p>
+
   <li> <p> Changed: The <code class="class">FiniteElement</code> classes had a
        function <code class="member">restrict</code> that returns the
        restriction matrix from children to the mother cell. Unfortunately,
@@ -515,6 +526,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+  Changed: <code
+  class="class">MGTransferSelect</code> uses target components
+  correctly. Unfortunately, the untested class <code
+  class="class">MGTransferBlock</code> does not work anymore. Since its
+  usefulness was not clear anyway, this state may continue for a while.
+  <br>
+  (GK 2004/04/01)
+  </p>
+
   <li> <p>
        New: There is now a new <code class="class">FE_Poly</code>
        class which is templatized for polynomial spaces like <code
