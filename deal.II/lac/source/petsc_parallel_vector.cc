@@ -105,7 +105,7 @@ namespace PETScWrappers
     {
       communicator = v.communicator;
       
-      reinit (v.size(), v.local_size(), fast);
+      reinit (communicator, v.size(), v.local_size(), fast);
     }
 
 
