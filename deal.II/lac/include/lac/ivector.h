@@ -90,6 +90,11 @@ protected:
 				      * on fast=0 vector is filled by 0.
 				      */
     void reinit(const iVector& V, int fast = 0);
+
+				     /**
+				      * Set all elements to zero.
+				      */
+    void clear ();
     
 				     /**
 				      *  Inquire Dimension. returns Dimension ,
@@ -168,15 +173,21 @@ inline int iVector::n() const
   return dim;
 }
 
+
+
 inline int iVector::operator() (int i) const
 {
   Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
   return val[i];
 }
 
+
+
 inline int& iVector::operator() (int i)
 {
   Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
   return val[i];
 }
+
+
 #endif

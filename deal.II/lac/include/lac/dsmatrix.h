@@ -1,5 +1,5 @@
 /*----------------------------   dsmatrix.h     ---------------------------*/
-/*      <Id:>                 */
+/*      $Id$                 */
 #ifndef __dsmatrix_H
 #define __dsmatrix_H
 /*----------------------------   dsmatrix.h     ---------------------------*/
@@ -9,9 +9,6 @@
 // DEAL is Copyright(1995) by
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
 
-
-#ifndef __lac_dsmatrix_h
-#define __lac_dsmatrix_h
 
 #include <math.h>
 #ifndef __lac_dvector_h

@@ -7,12 +7,14 @@
 #include <lac/dvector.h>
 #include <math.h>
 
-dVector::dVector() : val(0)
-{
-  dim=maxdim=0;
-}
+dVector::dVector() :
+		dim(0),
+		maxdim(0),
+		val(0)
+{}
 
-dVector::dVector(int n) : val(0)
+
+dVector::dVector(int n)
 {
   Assert (n>0, ExcInvalidNumber(n));
 
@@ -22,11 +24,14 @@ dVector::dVector(int n) : val(0)
     {
       val = new double[maxdim];
       Assert (val != 0, ExcOutOfMemory());
-      (*this) = 0.;
+      clear ();
     }
+  else
+    val = 0;
 }
 
-dVector::dVector(const dVector& v) : val(0)
+
+dVector::dVector(const dVector& v)
 {
   dim = v.n();
   maxdim = v.n();
@@ -35,9 +40,14 @@ dVector::dVector(const dVector& v) : val(0)
     {
       val = new double[maxdim];
       Assert (val != 0, ExcOutOfMemory());
-      for (int i=0;i<dim;i++) val[i] = v.val[i];
+      for (int i=0; i<dim; i++)
+	val[i] = v.val[i];
     }
+  else
+    val = 0;
 }
+
+
 
 void dVector::reinit(int n, int fast)
 {
@@ -50,8 +60,11 @@ void dVector::reinit(int n, int fast)
     maxdim = n;
   }
   dim = n;
-  if (!fast) (*this) = 0.;
+  if (!fast)
+    clear ();
 }
+
+
 
 void dVector::reinit(const dVector& v, int fast)
 {
@@ -67,6 +80,8 @@ void dVector::reinit(const dVector& v, int fast)
   if (!fast)
     clear ();
 }
+
+
 
 dVector::~dVector()
 {
@@ -245,6 +260,7 @@ dVector& dVector::operator = (const dVector& v)
 }
 
 
+
 void dVector::cadd(int i, const VectorBase& V, double s, int j)
 {
   const dVector& v = (const dVector&) V;
@@ -254,6 +270,8 @@ void dVector::cadd(int i, const VectorBase& V, double s, int j)
 
   val[i] += s*v.val[j];
 }
+
+
 
 void dVector::cadd(int i, const VectorBase& V, double s, int j, double t, int k)
 {
@@ -282,11 +300,15 @@ void dVector::cadd(int i, const VectorBase& V, double s, int j,
   val[i] += s*v.val[j] + t*v.val[k] + q*v.val[l] + r*v.val[m];
 }
 
+
+
 void dVector::czero(int i)
 {
   Assert ((i>=0) && (i<dim), ExcInvalidIndex(i,dim));
   val[i] = 0.;
 }
+
+
 
 void dVector::cequ(int i, const VectorBase& V, double s, int j)
 {
@@ -298,6 +320,8 @@ void dVector::cequ(int i, const VectorBase& V, double s, int j)
   val[i] = s*v.val[j];
 }
 
+
+
 void dVector::cequ(int i, const VectorBase& V, double s, int j, double t, int k)
 {
   const dVector& v = (const dVector&) V;
@@ -308,6 +332,8 @@ void dVector::cequ(int i, const VectorBase& V, double s, int j, double t, int k)
 
   val[i] = s*v.val[j] + t*v.val[k];
 }
+
+
 
 void dVector::cequ(int i, const VectorBase& V, double s, int j,
 		   double t, int k, double q, int l, double r, int m)
@@ -323,22 +349,30 @@ void dVector::cequ(int i, const VectorBase& V, double s, int j,
   val[i] = s*v.val[j] + t*v.val[k] + q*v.val[l] + r*v.val[m];
 }
 
+
+
 const char* dVector::name() const
 {
   return "dVector";
 }
 
+
+
 void dVector::print(FILE* f, const char* format) const
 {
   if (!format) format = " %5.2f";
-  for (int j=0;j<n();j++) fprintf(f, format, val[j]);
+  for (int j=0;j<n();j++)
+    fprintf(f, format, val[j]);
   fputc('\n',f);
 }
+
+
 
 void dVector::print(const char* format) const
 {
   if (!format) format = " %5.2f";
-  for (int j=0;j<n();j++) printf (format, val[j]);
+  for (int j=0;j<n();j++)
+    printf (format, val[j]);
   printf ("\n");
 }
 

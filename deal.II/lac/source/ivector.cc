@@ -13,7 +13,7 @@ iVector::iVector()
   dim=maxdim=1;
   val = new int[1];
   Assert (val != 0, ExcOutOfMemory());
-  val[0] = 0;
+  clear ();
 }
 
 iVector::iVector(int n)
@@ -24,15 +24,19 @@ iVector::iVector(int n)
   maxdim = n;
   val = new int[maxdim];
   Assert (val != 0, ExcOutOfMemory());
-  (*this) = 0;
+  clear ();
 }
+
 
 iVector::iVector(const iVector& v)
 {
   reinit(v.dim,1);
   int i;
-  for (i=0;i<dim;i++) val[i] = v.val[i];
+  for (i=0; i<dim; i++)
+    val[i] = v.val[i];
 }
+
+
 
 void iVector::reinit(int n, int fast)
 {
@@ -45,8 +49,11 @@ void iVector::reinit(int n, int fast)
     maxdim = n;
   }
   dim = n;
-  if (!fast) (*this) = 0;
+  if (!fast)
+    clear ();
 }
+
+
 
 void iVector::reinit(const iVector& v, int fast)
 {
@@ -59,45 +66,59 @@ void iVector::reinit(const iVector& v, int fast)
     maxdim = n;
   }
   dim = n;
-  if (!fast) (*this) = 0;
+  if (!fast)
+    clear ();
 }
+
+
 
 iVector::~iVector()
 {
-  delete[] val;
+  if (val)
+    delete[] val;
 }
+
+
+
+void iVector::clear () {
+  for (int i=0; i<dim; ++i)
+    val[i] = 0;
+}
+
 
 void iVector::add(const iVector& v)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] += v(i);
+  for (int i=0; i<dim; ++i) val[i] += v(i);
 }
+
+
 
 void iVector::add(int a, const iVector& v)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] += a * v(i);
+  for (int i=0; i<dim; ++i) val[i] += a * v(i);
 }
+
+
 
 void iVector::equ(int a, const iVector& u)
 {
-  int i;
-  for (i=0;i<dim;i++) val[i] = a*u.val[i];
+  for (int i=0; i<dim; ++i) val[i] = a*u.val[i];
 }
+
+
 
 iVector& iVector::operator = (int s)
 {
-  int i;
 //  if (s==0.) memset(val,sizeof(*val) * dim, 0);
-  for (i=0;i<dim;i++) val[i] = s;
+  for (int i=0; i<dim; ++i) val[i] = s;
   return *this;
 }
+
 
 iVector& iVector::operator = (const iVector& v)
 {
   if (v.dim != dim) reinit(v,1);
 
-  int i;
-  for (i=0;i<dim;i++) val[i] = v.val[i];
+  for (int i=0; i<dim; ++i) val[i] = v.val[i];
   return *this;
 }
