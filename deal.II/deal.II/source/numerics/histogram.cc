@@ -200,28 +200,17 @@ void Histogram::write_gnuplot (ostream &out) const
 				     // otherwise create a whole 3d plot
 				     // for the data. use th patch method
 				     // of gnuplot for this
-    for (unsigned int i=0; i<intervals.size(); ++i)
+				     //
+				     // run this loop backwards since otherwise
+				     // gnuplot thinks the upper side is the
+				     // lower side and draws the diagram in
+				     // strange colors
+    for (int i=intervals.size()-1; i>=0; --i)
       {
 	for (unsigned int n=0; n<intervals[i].size(); ++n)
 	  out << intervals[i][n].left_point
 	      << ' '
-	      << y_values[i]
-	      << ' '
-	      << intervals[i][n].content
-	      << endl
-	      << intervals[i][n].right_point
-	      << ' '
-	      << y_values[i]
-	      << ' '
-	      << intervals[i][n].content
-	      << endl;
-	
-	out << endl;
-	
-	for (unsigned int n=0; n<intervals[i].size(); ++n)
-	  out << intervals[i][n].left_point
-	      << ' '
-	      << (i<intervals.size()-1 ?
+	      << (i<static_cast<int>(intervals.size())-1 ?
 		  y_values[i+1] :
 		  y_values[i] + (y_values[i]-y_values[i-1]))
 	      << ' '
@@ -229,7 +218,7 @@ void Histogram::write_gnuplot (ostream &out) const
 	      << endl
 	      << intervals[i][n].right_point
 	      << ' '
-	      << (i<intervals.size()-1 ?
+	      << (i<static_cast<int>(intervals.size())-1 ?
 		  y_values[i+1] :
 		  y_values[i] + (y_values[i]-y_values[i-1]))
 	      << ' '
@@ -237,6 +226,22 @@ void Histogram::write_gnuplot (ostream &out) const
 	      << endl;
 
 	out << endl;
+	for (unsigned int n=0; n<intervals[i].size(); ++n)
+	  out << intervals[i][n].left_point
+	      << ' '
+	      << y_values[i]
+	      << ' '
+	      << intervals[i][n].content
+	      << endl
+	      << intervals[i][n].right_point
+	      << ' '
+	      << y_values[i]
+	      << ' '
+	      << intervals[i][n].content
+	      << endl;
+	
+	out << endl;
+	
       };
 
   AssertThrow (out, ExcIO());
