@@ -1219,6 +1219,7 @@ FE_Q<2>::initialize_constraints ()
 				   // in 3d we still have the
 				   // constraint matrices, so make the
 				   // check
+//TODO[WB]: get rid of this, the check has worked a long time, so it's time to get rid of the file in which constraint_matrices are actually declared.  
   if (dim == 3)
     if (this->degree < Matrices::n_constraint_matrices+1)
       {
