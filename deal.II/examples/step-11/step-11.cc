@@ -306,6 +306,19 @@ void LaplaceProblem<dim>::setup_system ()
 				   // ``SparsityPattern'', which we
 				   // generate by copying from the
 				   // intermediate object.
+				   //
+				   // As a further sidenote, you will
+				   // notice that we do not explicitly
+				   // have to ``compress'' the
+				   // sparsity pattern here. This, of
+				   // course, is due to the fact that
+				   // the ``copy_from'' function
+				   // generates a compressed object
+				   // right from the start, to which
+				   // you cannot add new entries
+				   // anymore. The ``compress'' call
+				   // is therefore implicit in the
+				   // ``copy_from'' call.
   sparsity_pattern.copy_from (csp);
   system_matrix.reinit (sparsity_pattern);
 };
