@@ -326,10 +326,10 @@ while (state == SolverControl::iterate)
       A.vmult(t,q);
 				       // Step 2
       sigma = q*t;
-
+      
 //TODO: Find a really good breakdown criterion
 // The absolute one detects breakdown instead of convergence
-      if (fabs(sigma) < additional_data.breakdown)
+      if (fabs(sigma/rho) < additional_data.breakdown)
 	return breakdown;
 				       // Step 3
       alpha = rho/sigma;
