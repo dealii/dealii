@@ -1,7 +1,7 @@
 /*----------------------------   multigrid.templates.h     ---------------------------*/
 /*      $Id$                 */
-#ifndef __multigrid.templates_H
-#define __multigrid.templates_H
+#ifndef __multigrid_templates_H
+#define __multigrid_templates_H
 /*----------------------------   multigrid.templates.h     ---------------------------*/
 
 
