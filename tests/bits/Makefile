@@ -65,7 +65,8 @@ tests_x = anna_? \
 	  point_difference_* \
 	  umfpack_* \
 	  fe_q_3d* \
-          rt_*
+          rt_* \
+	  nedelec_*
 
 # tests for the hp branch:
 #	  fe_collection_*

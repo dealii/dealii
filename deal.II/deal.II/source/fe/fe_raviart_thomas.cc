@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1658,6 +1658,8 @@ FE_RaviartThomas<dim>::fill_fe_face_values (const Mapping<dim>                  
 				   // number of conversions
   if (flags & update_values)
     {
+      Assert (fe_data.shape_values.size() == dofs_per_cell,
+              ExcInternalError());
       Assert (fe_data.shape_values[0].size() ==
               GeometryInfo<dim>::faces_per_cell * n_q_points *
 	      (dim == 3 ? 2 : 1),
@@ -1688,8 +1690,11 @@ FE_RaviartThomas<dim>::fill_fe_face_values (const Mapping<dim>                  
       
   if (flags & update_gradients)
     {
-      Assert (fe_data.shape_gradients.size() ==
-              GeometryInfo<dim>::faces_per_cell * n_q_points,
+      Assert (fe_data.shape_values.size() == dofs_per_cell,
+              ExcInternalError());
+      Assert (fe_data.shape_gradients[0].size() ==
+              GeometryInfo<dim>::faces_per_cell * n_q_points *
+	      (dim == 3 ? 2 : 1),
               ExcInternalError());
 
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
