@@ -264,7 +264,7 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
           {
             const double val1 = fe_values.shape_value_component(i,x,c),
                          val2 = fe.shape_value_component(i,q.point(x),c);
-            Assert (fabs(val1-val2) < 1e-13, ExcInternalError());
+            Assert (std::fabs(val1-val2) < 1e-13, ExcInternalError());
           };
 
                                          // test something about the
@@ -290,7 +290,7 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
           {
             Tensor<1,dim> tmp=fe_values.shape_grad_component(i,x,c);
             tmp -= fe.shape_grad_component (i,q.point(x), c);
-            Assert (sqrt(tmp*tmp)<1e-14, ExcInternalError());
+            Assert (std::sqrt(tmp*tmp)<1e-14, ExcInternalError());
           };
 
         if (fe.is_primitive(i))
@@ -315,9 +315,9 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
             for (unsigned int j=0; j<dim; ++j)
               for (unsigned int k=0; k<dim; ++k)
                 {
-                  const double diff=fabs(tmp[j][k]);
+                  const double diff=std::fabs(tmp[j][k]);
                   if (diff>max_diff) max_diff=diff;
-                  Assert (fabs(tmp[j][k]) < 1e-6, ExcInternalError());
+                  Assert (std::fabs(tmp[j][k]) < 1e-6, ExcInternalError());
                 }
           };
 
