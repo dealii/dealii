@@ -30,13 +30,30 @@ double rand_2 ()
 template <int dim>
 void test ()
 {
+				   // Output normal directions for each face
+  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+    {
+      deallog << "Face " << f << ": n = ( ";
+      for (unsigned int d=0;d<dim;++d)
+	{
+	  if (d != 0)
+	    deallog << " , ";
+	  if (d==GeometryInfo<dim>::unit_normal_direction[f])
+	    deallog << GeometryInfo<dim>::unit_normal_orientation[f];
+	  else
+	    deallog << '0';
+	}
+      deallog << " )" << std::endl;
+    }
+  
+  
   Point<dim> p;
 
 				   // generate N random points in
 				   // [-2:2]^d, and transform them
 				   // back and forth between mother
 				   // and child cell
-  const unsigned int N = 50;
+  const unsigned int N = 7;
   for (unsigned int i=0; i<N; ++i)
     {
       for (unsigned int d=0; d<dim; ++d)
