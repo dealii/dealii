@@ -16,13 +16,12 @@
 <ol>
   <li> <p> 
        Removed: The explicite instantiations of <code
-       class="class">SparseMatrix<long double></code> are removed as a
-       prerelease of gcc3.0 fails to compile it. Despite of this
-       SparseMatrix<long double></code> still can be used if the user
-       includes <code>lac/include/lac/sparse_matrix.templates.h</code>
-       into his source file and uses a different compiler, e.g. gcc
-       2.95.2 or a future version of gcc3.0 (that will then hopefully
-       fixed).
+       class="class">SparseMatrix&lt;long double&gt;</code> are removed as a
+       prerelease of gcc3.0 fails to compile it. Now the user of <code
+       class="class">SparseMatrix&lt;long double&gt;</code> needs to include
+       <code>lac/include/lac/sparse_matrix.templates.h</code> into his
+       source file and to use a different compiler, e.g. gcc 2.95.2 or
+       a future version of gcc3.0 (that will then hopefully be fixed).
        <br>
        (RH 2001/03/14)
        </p>
