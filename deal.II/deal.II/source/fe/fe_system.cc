@@ -253,6 +253,8 @@ FESystem<dim>::update_each (const UpdateFlags flags) const
 				   // that are necessary
   for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
     out |= base_element(base_no).update_each(flags);
+  if (flags & update_second_derivatives)
+    out |= update_second_derivatives;
   return out;
 }
 
