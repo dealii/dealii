@@ -13,6 +13,7 @@
 
 
 #include <lac/petsc_matrix_base.h>
+#include <lac/petsc_full_matrix.h>
 #include <lac/petsc_sparse_matrix.h>
 #include <lac/petsc_parallel_sparse_matrix.h>
 #include <lac/petsc_vector.h>
@@ -48,7 +49,9 @@ namespace PETScWrappers
                                        // actually stores (remember that
                                        // matrices can be distributed)
       signed int local_row = -1;
-      if (dynamic_cast<const PETScWrappers::SparseMatrix *>(matrix) != 0)
+      if ((dynamic_cast<const PETScWrappers::SparseMatrix *>(matrix) != 0)
+	  ||
+	  (dynamic_cast<const PETScWrappers::FullMatrix *>(matrix) != 0))
         {
           local_row = this->a_row;
         }
