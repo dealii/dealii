@@ -83,6 +83,14 @@
  *	           vanka);
  * \end{verbatim}
  *
+ *
+ * \subsubsection{Implementor's remark}
+ * At present, the local matrices are built up such that the degree of freedom
+ * associated with the local Lagrange multiplier is the first one. Thus, usually
+ * the upper left entry in the local matrix is zero. It is not clear to me (W.B.)
+ * whether this might pose some problems in the inversion of the local matrices.
+ * Maybe someone would like to check this.
+ *
  * @author Guido Kanschat, 1999
  */
 template<typename number>
