@@ -21,6 +21,9 @@ DEAL:ssor:QMRS::Starting
 DEAL:ssor:QMRS::Convergence step 4 
 DEAL:sor:Richardson::Starting 
 DEAL:sor:Richardson::Convergence step 7 
+DEAL:sor:cg::Starting 
+DEAL:sor:cg::Failure step 100 
+DEAL:sor::Iterative method reported convergence failure in step 100 with residual 0.25
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 5 
 DEAL:sor:GMRES::Starting 
@@ -47,9 +50,12 @@ DEAL:ssor:QMRS::Starting
 DEAL:ssor:QMRS::Convergence step 9 
 DEAL:sor:Richardson::Starting 
 DEAL:sor:Richardson::Convergence step 88 
+DEAL:sor:cg::Starting 
+DEAL:sor:cg::Failure step 100 
+DEAL:sor::Iterative method reported convergence failure in step 100 with residual 5.64
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 14 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Convergence step 20 
-DEAL::GrowingVectorMemory:Overall allocated vectors: 212
+DEAL::GrowingVectorMemory:Overall allocated vectors: 220
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 20
