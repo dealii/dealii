@@ -955,10 +955,10 @@ TriaObjectAccessor<celldim, dim>::operator -- ()
 
 template <>
 inline
-Triangulation<1>::face_iterator
+TriaIterator<1,TriaObjectAccessor<0, 1> >
 CellAccessor<1>::face (const unsigned int) const {
   Assert (false, ExcNotUsefulForThisDimension());
-  return 0;
+  return TriaIterator<1,TriaObjectAccessor<0, 1> >();
 };
 
 
@@ -986,7 +986,7 @@ inline
 int
 CellAccessor<dim>::neighbor_index (const unsigned int i) const {
   Assert (i<GeometryInfo<dim>::faces_per_cell,
-	  typename TriaSubstructAccessor<dim>::ExcInvalidNeighbor(i));
+	  ExcInvalidNeighbor(i));
   return tria->levels[present_level]->
     neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second;
 };
@@ -998,7 +998,7 @@ inline
 int
 CellAccessor<dim>::neighbor_level (const unsigned int i) const {
   Assert (i<GeometryInfo<dim>::faces_per_cell,
-	  typename TriaSubstructAccessor<dim>::ExcInvalidNeighbor(i));
+	  ExcInvalidNeighbor(i));
   return tria->levels[present_level]->
     neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first;
 };
@@ -1010,7 +1010,7 @@ template <int dim>
 inline
 bool
 CellAccessor<dim>::refine_flag_set () const {
-  Assert (used(), typename TriaSubstructAccessor<dim>::ExcCellNotUsed());
+  Assert (used(), ExcCellNotUsed());
 				   // cells flagged for refinement must be active
 				   // (the #set_refine_flag# function checks this,
 				   // but activity may change when refinement is
@@ -1049,7 +1049,7 @@ template <int dim>
 inline
 bool
 CellAccessor<dim>::coarsen_flag_set () const {
-  Assert (used(), typename TriaSubstructAccessor<dim>::ExcCellNotUsed());
+  Assert (used(), ExcCellNotUsed());
 				   // cells flagged for coarsening must be active
 				   // (the #set_refine_flag# function checks this,
 				   // but activity may change when refinement is
@@ -1092,8 +1092,7 @@ CellAccessor<dim>::neighbor (const unsigned int i) const {
 
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(),
-	    typename TriaSubstructAccessor<dim>::ExcUnusedCellAsNeighbor());
+    Assert (q->used(), ExcUnusedCellAsNeighbor());
 #endif
   return q;
 };
@@ -1108,8 +1107,7 @@ CellAccessor<dim>::child (const unsigned int i) const {
 
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(),
-	    typename TriaSubstructAccessor<dim>::ExcUnusedCellAsChild());
+    Assert (q->used(), ExcUnusedCellAsChild());
 #endif
   return q;
 };

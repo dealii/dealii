@@ -608,11 +608,26 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 
 
 /**
- * Closure class to stop induction of classes.
+ * Closure class to stop induction of classes. Should never be called and thus
+ * producesan error when created.
  */
 template<int dim>
 class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
-{};
+{
+  public:
+				     /**
+				      * Constructor. Should never be called and
+				      * thus produces an error.
+				      */
+    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
+			const int           level      = -1,
+			const int           index      = -1,
+			const AccessorData *local_data = 0) :
+		    TriaAccessor<dim> (parent, level, index, local_data)
+      {
+	Assert (false, ExcInternalError());
+      };
+};
 
 
 
@@ -633,9 +648,9 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  Constructor.
 				      */
     TriaObjectAccessor (Triangulation<dim> *parent     = 0,
-		  const int           level      = -1,
-		  const int           index      = -1,
-		  const AccessorData *local_data = 0) :
+			const int           level      = -1,
+			const int           index      = -1,
+			const AccessorData *local_data = 0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -1654,136 +1669,6 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 
 
 
-
-/**
- * Intermediate, "typedef"-class, not for public use.
- */
-template <int dim>
-class TriaSubstructAccessor;
-
-
-
-/**
- * Intermediate, "typedef"-class, not for public use.
- *
- * \subsection{Rationale}
- *
- * This class is only a wrapper class used to do kind of a typedef
- * with template parameters. This class and #TriaSubstructAccessor<2>#
- * wrap the following names:
- * \begin{verbatim}
- *   TriaSubstructAccessor<1> := TriaObjectAccessor<1, 1>;
- *   TriaSubstructAccessor<2> := TriaObjectAccessor<2, 2>;
- *   TriaSubstructAccessor<3> := TriaObjectAccessor<3, 3>;
- * \end{verbatim}
- * We do this rather complex (and needless, provided C++ the needed constructs!)
- * class hierarchy manipulation, since this way we can declare and implement
- * the \Ref{CellAccessor} dimension independent as an inheritance from
- * #TriaSubstructAccessor<dim>#. If we had not declared these
- * types, we would have to write two class declarations, one for
- * #CellAccessor<1>#, derived from #TriaObjectAccessor<1, 1>#
- * and one for #CellAccessor<2>#, derived from
- * #TriaObjectAccessor<2, 2>#.
- */
-template <>
-class TriaSubstructAccessor<1> :  public TriaObjectAccessor<1, 1> {
-  public:
-				     /**
-				      * Propagate the AccessorData type
-				      * into the present class.
-				      */
-    typedef TriaObjectAccessor<1, 1>::AccessorData AccessorData;
-    				     /**
-				      * Constructor
-				      */
-    TriaSubstructAccessor (Triangulation<1> *tria,
-			   const int         level,
-			   const int         index,
-			   const AccessorData *local_data) :
-		    TriaObjectAccessor<1, 1> (tria,level,index,local_data) {};
-
-    				     // do this here, since this way the
-				     // CellAccessor has the possibility to know
-				     // what a substruct_iterator is. Otherwise
-				     // it would have to ask the DoFHandler<dim>
-				     // which would need another big include
-				     // file and maybe cyclic interdependence
-    typedef void * substruct_iterator;
-};
-
-
-
-/**
- * Intermediate, "typedef"-class, not for public use.
- *
- * @see TriaSubstructAccessor<1>
- */
-template <>
-class TriaSubstructAccessor<2> : public TriaObjectAccessor<2, 2> {
-  public:
-				     /**
-				      * Propagate the AccessorData type
-				      * into the present class.
-				      */
-    typedef TriaObjectAccessor<2, 2>::AccessorData AccessorData;
-    				     /**
-				      * Constructor
-				      */
-    TriaSubstructAccessor (Triangulation<2> *tria,
-			   const int         level,
-			   const int         index,
-			   const AccessorData *local_data) :
-		    TriaObjectAccessor<2, 2> (tria,level,index,local_data) {};
-
-    				     // do this here, since this way the
-				     // CellAccessor has the possibility to know
-				     // what a substruct_iterator is. Otherwise
-				     // it would have to ask the DoFHandler<dim>
-				     // which would need another big include
-				     // file and maybe cyclic interdependence
-    typedef TriaIterator<2,TriaObjectAccessor<1, 2> > substruct_iterator;
-};
-
-
-
-
-/**
- * Intermediate, "typedef"-class, not for public use.
- *
- * @see TriaSubstructAccessor<1>
- */
-template <>
-class TriaSubstructAccessor<3> : public TriaObjectAccessor<3, 3> {
-  public:
-				     /**
-				      * Propagate the AccessorData type
-				      * into the present class.
-				      */
-    typedef TriaObjectAccessor<3, 3>::AccessorData AccessorData;
-    
-    				     /**
-				      * Constructor
-				      */
-    TriaSubstructAccessor (Triangulation<3> *tria,
-			   const int         level,
-			   const int         index,
-			   const AccessorData *local_data) :
-		    TriaObjectAccessor<3, 3> (tria,level,index,local_data) {};
-
-    				     // do this here, since this way the
-				     // CellAccessor has the possibility to know
-				     // what a substruct_iterator is. Otherwise
-				     // it would have to ask the DoFHandler<dim>
-				     // which would need another big include
-				     // file and maybe cyclic interdependence
-    typedef TriaIterator<3,TriaObjectAccessor<2, 3> > substruct_iterator;
-};
-
-
-
-
-
-
 /**
  * This class allows access to a cell: a line in one dimension, a quad
  * in two dimension, etc.
@@ -1799,13 +1684,13 @@ class TriaSubstructAccessor<3> : public TriaObjectAccessor<3, 3> {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class CellAccessor :  public TriaSubstructAccessor<dim> {
+class CellAccessor :  public TriaObjectAccessor<dim,dim> {
   public:
 				     /**
 				      * Propagate the AccessorData type
 				      * into the present class.
 				      */
-    typedef typename TriaSubstructAccessor<dim>::AccessorData AccessorData;
+    typedef typename TriaObjectAccessor<dim,dim>::AccessorData AccessorData;
     
 				     /**
 				      *  Constructor.
@@ -1814,7 +1699,7 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
 		  const int           level      = -1,
 		  const int           index      = -1,
 		  const AccessorData *local_data = 0) :
-		    TriaSubstructAccessor<dim> (parent, level, index, local_data) {};
+		    TriaObjectAccessor<dim,dim> (parent, level, index, local_data) {};
 
 				     /**
 				      *  Return a pointer to the #i#th
@@ -1911,7 +1796,7 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
 				      * This function is not implemented in 1D,
 				      * and maps to QuadAccessor::line in 2D.
 				      */
-    typename TriaSubstructAccessor<dim>::substruct_iterator
+    TriaIterator<dim,TriaObjectAccessor<dim-1, dim> >
     face (const unsigned int i) const;
     
 				     /**
