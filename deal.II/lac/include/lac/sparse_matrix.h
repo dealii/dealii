@@ -27,19 +27,92 @@ class ostream;
 
 /**
  * Structure representing the sparsity pattern of a sparse matrix.
+ * 
+ * The following picture will illustrate the relation between the
+ * #SparceMatrixStructure# an the #SparceMatrix#.
  *
- * @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth
+ * \begin{verbatim}
+ *  SparseMatrixStructure:                        \
+ *                                                 |
+ *              _________________________          |
+ *  rowstart   |0 | 4| 8|11|13|....                |
+ *             |__|__|__|__|__|__________          | 
+ *              |   \  \                           |
+ *              |    \  \__                        | 
+ *              |     \    \                       |
+ *              |      \    \__                    |
+ *             \ /      \      \                   |
+ *              |        \      \__                |     
+ *              |         \        \               |
+ *              |          \        \__            |   
+ *              |           \	       \	   |            
+ *              0___________4___________8____       \ Position         
+ *  colnums    |3 | 2| 9|17| 1| 4| 6| 8| 4|..       /         
+ *             /__|/_|__|__|__|__|__|__|__|__      |         
+ *            /   /                                |        
+ *           / \______  _____/ \_____  _____/      |         
+ *          /         \/             \/            |                 
+ *         /   /  row = 0        row = 1           |    
+ *        /   /                                    |
+ *       /   /                                     |
+ *      /   /                                      | 
+ *     /   /___colnums[1]                          |  
+ *    /                                            |
+ *   /_________colnums[0]                          |
+ *                                                 |                    
+ *                                                /                    
+ * \end{verbatim}
+ *
+ * \begin{verbatim}
+ * For row = 0
+ *   
+ * it exists: (0| 3) = colnums[0]
+ *            (0| 2) = colnums[1]
+ *            (0| 9) = colnums[2]
+ *            (0|17) = colnums[3]
+ *
+ * For row = 1
+ *   
+ * it exists: (1| 1) = colnums[4]
+ *            (1| 4) = colnums[5]
+ * ....
+ *
+ * \end{verbatim}
+ *
+ * \begin{verbatim}
+ * SparseMatrix:                                  \
+ *                                                 |
+ *              _____________________________      |
+ *  val        |  |  |  |  |  |  |  |  | 3|..       \ Value
+ *             |__|__|__|__|__|__|__|__|__|__       /
+ *                                                 |
+ *                                                 |
+ *                                                /
+ * \end{verbatim}
+ *
+ * If you want to get the #3# you need to get its position in the
+ * table above and its value by returning the value of the element on
+ * which the pointer shows, using #*val#.  For example #val[8]=3#. Its
+ * position is #colnums[8]# so #row=2#. In other words, if you want to get
+ * the element #a_{24}# you know that #row=2#. To get the element, a
+ * search of #4# form #colnums[rowstart[2]]# to #colnums[rowstart[3]]# is
+ * needed. Then #a_{24}=val[number of the found element] = 3#.
+ *
+ *
+ * @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth; some documentation by Rasched Zamni
  */
 class SparseMatrixStruct : public Subscriptor
 {
   public:
 				     /**
-				      * Initialize the matrix empty, i.e. with
-				      * no memory allocated. This is useful if
-				      * you want such objects as member
-				      * variables in other classes. You can make
-				      * the structure usable by calling the
-				      * #reinit# function.
+				      * Initialize the matrix empty,
+				      * that is with no memory
+				      * allocated. This is useful if
+				      * you want such objects as
+				      * member variables in other
+				      * classes. You can make the
+				      * structure usable by calling
+				      * the #reinit# function.
 				      */
     SparseMatrixStruct ();
     
@@ -332,7 +405,7 @@ class SparseMatrixStruct : public Subscriptor
     unsigned int row_length (const unsigned int row) const;
 
 				     /**
-				      * Access to column nuber field.
+				      * Access to column number field.
 				      * Return the column number of
 				      * the #index#th entry in #row#.
 				      */
@@ -364,15 +437,15 @@ class SparseMatrixStruct : public Subscriptor
     unsigned int n_nonzero_elements () const;
 
 				     /**
-				      * Return whether the structure is
+				      * Return whether the structure is 
 				      * compressed or not.
 				      */
     bool is_compressed () const;
     
 				     /**
-				      * This is kind of an expert mode. Get
+				      * This is kind of an expert mode. Get 
 				      * access to the rowstart array, but
-				      * readonly.
+				      * read-only.
 				      *
 				      * Use of this function is highly
 				      * deprecated. Use #row_length#
@@ -949,7 +1022,7 @@ class SparseMatrix : public Subscriptor
     somenumber matrix_norm (const Vector<somenumber> &v) const;
 
     				     /**
-				      * Return the l1-norm of the matrix, i.e.
+				      * Return the l1-norm of the matrix, that is
 				      * $|M|_1=max_{all columns j}\sum_{all 
 				      * rows i} |M_ij|$,
 				      * (max. sum of columns).
@@ -957,13 +1030,13 @@ class SparseMatrix : public Subscriptor
 				      * natural matrix norm that is compatible
 				      * to the l1-norm for vectors, i.e.
 				      * $|Mv|_1\leq |M|_1 |v|_1$.
-				      * (cf. Rannacher Numerik0)
+				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
 				      */
     number l1_norm () const;
 
     				     /**
 				      * Return the linfty-norm of the
-				      * matrix, i.e.
+				      * matrix, that is
 				      * $|M|_infty=max_{all rows i}\sum_{all 
 				      * columns j} |M_ij|$,
 				      * (max. sum of rows).
@@ -971,7 +1044,7 @@ class SparseMatrix : public Subscriptor
 				      * natural matrix norm that is compatible
 				      * to the linfty-norm of vectors, i.e.
 				      * $|Mv|_infty \leq |M|_infty |v|_infty$.
-				      * (cf. Rannacher Numerik0)
+				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
 				      */
     number linfty_norm () const;
 
@@ -1167,13 +1240,16 @@ class SparseMatrix : public Subscriptor
     SmartPointer<const SparseMatrixStruct> cols;
 
 				     /**
-				      * Array of values for all the nonzero
-				      * entries. The position within the matrix,
-				      * i.e. the row and column number for a
-				      * given entry can only be deduced using
-				      * the sparsity pattern. The same holds
-				      * for the more common operation of
-				      * finding an entry by its coordinates.
+				      * Array of values for all the
+				      * nonzero entries. The position
+				      * within the matrix, i.e.
+				      * the row and column number for
+				      * a given entry can only be
+				      * deduced using the sparsity
+				      * pattern. The same holds for
+				      * the more common operation of
+				      * finding an entry by its
+				      * coordinates.
 				      */
     number *val;
 
