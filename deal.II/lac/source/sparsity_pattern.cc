@@ -534,7 +534,7 @@ SparsityPattern::print_gnuplot (ostream &out) const
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
       if (colnums[j] != invalid_entry)
-	out << i << " " << -colnums[j] << endl;
+	out << i << " " << -static_cast<int>(colnums[j]) << endl;
 
   AssertThrow (out, ExcIO());
 }
@@ -551,7 +551,7 @@ SparsityPattern::bandwidth () const
       if (colnums[j] != invalid_entry)
 	{
 	  if (static_cast<unsigned int>(abs(static_cast<int>(i-colnums[j]))) > b)
-	    b = abs(static_cast<int>(i-colnums[j]));
+	    b = abs(static_cast<signed int>(i-colnums[j]));
 	}
       else
 					 // leave if at the end of
