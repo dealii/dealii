@@ -195,29 +195,6 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
           cells.push_back (cell);
         }
     }
-
-
-                                     // finally top the building
-                                     // with four closing cells and
-                                     // the vertex at the top
-    {
-      vertices.push_back (Point<3> (0,0,PhantomGeometry::r1));
-
-      const unsigned int connectivity[4][8]
-        = { { 59, 60, 61, 67,   51, 52, 53, 50 },
-            { 61, 62, 63, 67,   53, 54, 55, 50 },
-            { 67, 63, 64, 65,   50, 55, 56, 57 },
-            { 59, 67, 65, 66,   51, 50, 57, 58 }};
-      
-      for (unsigned int i=0; i<4; ++i)
-        {
-          CellData<3> cell;
-          for (unsigned int j=0; j<8; ++j)
-            cell.vertices[j]   = connectivity[i][j];
-          cell.material_id   = 0;
-          cells.push_back (cell);
-        }
-    }
   }
   
 
