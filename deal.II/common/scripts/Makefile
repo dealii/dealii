@@ -17,7 +17,7 @@ endif
 make_dependencies : make_dependencies.cc
 	@echo ============================ Compiling $@
 	@$(CXX) $(CXXFLAGS.o) -c $<
-	@$(CXX) $(XLDFLAGS) -o $@ make_dependencies.o
+	@$(CXX) $(LDFLAGS) -o $@ make_dependencies.o
 
 clean:
 	-rm -f make_dependencies
