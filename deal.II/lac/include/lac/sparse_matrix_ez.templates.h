@@ -72,20 +72,11 @@ SparseMatrixEZ<number>::reinit(const unsigned int n_rows,
 {
   clear();
 
-                                   // replace (invalid) default values
-                                   // by true defaults; note that
-                                   // these defaults are also
-                                   // documented in the docs of this
-                                   // function as well as in the docs
-                                   // of the constructor!
-  if (default_row_length == Entry::invalid)
-    default_row_length = 5;
-  if (default_increment == Entry::invalid)
-    default_increment = 4;
   increment = default_increment;
   
   n_columns = n_cols;
   row_info.resize(n_rows);
+//TODO:[GK] allow for flexible memory reservation in later version
   data.reserve(default_row_length * n_rows + n_rows * increment);
   data.resize(default_row_length * n_rows);
 

@@ -362,15 +362,11 @@ class SparseMatrixEZ : public Subscriptor
 				      * properly is essential for an
 				      * efficient assembling of the
 				      * matrix.
-				      *
-				      * The default values are
-				      * @p{default_row_length=5},
-				      * @p{default_increment=4}.
 				      */
     explicit SparseMatrixEZ (const unsigned int n_rows,
 			     const unsigned int n_columns,
-			     const unsigned int default_row_length = Entry::invalid,
-			     const unsigned int default_increment = Entry::invalid);
+			     const unsigned int default_row_length = 0,
+			     const unsigned int default_increment = 1);
     
 				     /**
 				      * Destructor. Free all memory, but do not
@@ -398,15 +394,11 @@ class SparseMatrixEZ : public Subscriptor
 				      * properly is essential for an
 				      * efficient assembling of the
 				      * matrix.
-				      *
-				      * The default values are
-				      * @p{default_row_length=5},
-				      * @p{default_increment=4}.
 				      */
     void reinit (const unsigned int n_rows,
 		 const unsigned int n_columns,
-		 unsigned int default_row_length = Entry::invalid,
-		 unsigned int default_increment = Entry::invalid);
+		 unsigned int default_row_length = 0,
+		 unsigned int default_increment = 1);
 
 				     /**
 				      * Release all memory and return

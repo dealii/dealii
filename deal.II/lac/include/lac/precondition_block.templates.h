@@ -1,4 +1,4 @@
-//----------------------------  precondition_block.templates.h  ---------------------------
+//----------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  precondition_block.templates.h  ---------------------------
+//----------------------------------------------------------------------
 #ifndef __deal2__precondition_block_templates_h
 #define __deal2__precondition_block_templates_h
 
@@ -21,7 +21,6 @@
 #include <lac/precondition_block.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
 
 
 template <class MATRIX, typename inverse_type>

@@ -1,4 +1,4 @@
-//----------------------------  precondition_block.cc  ---------------------------
+//----------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,10 +9,11 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  precondition_block.cc  ---------------------------
+//----------------------------------------------------------------------
 
 
 #include <lac/precondition_block.templates.h>
+#include <lac/sparse_matrix.h>
 
 
 // explicit instantiations for "float" PreconditionBlock

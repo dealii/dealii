@@ -1,4 +1,4 @@
-//----------------------------  precondition_block.h  ---------------------------
+//----------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  precondition_block.h  ---------------------------
+//----------------------------------------------------------------------
 #ifndef __deal2__precondition_block_h
 #define __deal2__precondition_block_h
 
@@ -22,7 +22,6 @@
 #include <vector>
 
 template <typename number> class FullMatrix;
-template <typename number> class SparseMatrix;
 template <typename number> class Vector;
 
 
