@@ -18,6 +18,7 @@
 #include <base/tensor_base.h>
 
 template <int rank_, int dim> class Tensor;
+template <int dim> class Tensor<1,dim>;
 
 /**
  * Provide a general tensor class with an arbitrary rank, i.e. with

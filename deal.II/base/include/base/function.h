@@ -22,6 +22,7 @@
 
 template <int dim> class Point;
 template <int rank_, int dim> class Tensor;
+template <int dim> class Tensor<1,dim>;
 template<typename number> class Vector;
 
 /**

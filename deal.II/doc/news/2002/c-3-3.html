@@ -79,6 +79,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: When forward declaring the <code
+       class="class">Tensor</code> class, we now also forward declare
+       its partial specialization for a rank one tensor. Not doing so
+       confused Sun's Forte compiler.
+       <br>
+       (WB 2002/03/22)
+       </p>
+
+  <li> <p> 
        Fixed: The class <code class="class">TensorFunction</code>
        now uses local types <code class="class">value_type</code> and
        <code class="class">gradient_type</code> as return values of

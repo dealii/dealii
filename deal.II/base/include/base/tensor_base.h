@@ -38,6 +38,7 @@ template <int dim> class Point;
 // general template; specialized for rank==1; the general template is in
 // tensor.h
 template <int rank, int dim> class Tensor;
+template <int dim> class Tensor<1,dim>;
 
 
 /**
