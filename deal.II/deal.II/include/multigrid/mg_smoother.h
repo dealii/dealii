@@ -53,7 +53,8 @@ class MGSmoother
 				      * and the following one for all other
 				      * dimensions.
 				      */
-    MGSmoother (const MGDoFHandler<1> &mg_dof);
+    MGSmoother (const MGDoFHandler<1> &mg_dof,
+		unsigned int           steps);
 
 				     /**
 				      * Constructor. This one collects
@@ -67,7 +68,8 @@ class MGSmoother
 				      * steps to be executed by #smooth#.
 				      */
     template <int dim>
-    MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps);    
+    MGSmoother (const MGDoFHandler<dim> &mg_dof,
+		unsigned int             steps);    
 
 				     /**
 				      * Reset the values of the degrees of
