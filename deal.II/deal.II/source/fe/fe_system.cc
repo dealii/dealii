@@ -1224,6 +1224,18 @@ FESystem<dim>::build_face_tables()
 template <int dim>
 void FESystem<dim>::build_interface_constraints () 
 {
+                                   // check whether all base elements
+                                   // implement their interface
+                                   // constraint matrices. if this is
+                                   // not the case, then leave the
+                                   // interface costraints of this
+                                   // composed element empty as well;
+                                   // however, the rest of the element
+                                   // is usable
+  for (unsigned int base=0; base<n_base_elements(); ++base)
+    if (base_element(base).constraints_are_implemented() == false)
+      return;
+  
   this->interface_constraints.
     TableBase<2,double>::reinit (this->interface_constraints_size());
   
