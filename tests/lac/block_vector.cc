@@ -35,7 +35,18 @@ void test ()
   
   BlockIndices i1(ivector);
   BlockIndices i2 = i1;
-  BlockIndices i3(0);
+  BlockIndices i3;
+				   // no output expected here
+  deallog.push("empty constructor");
+  for (unsigned int i=0 ; i<i3.size() ; ++i)
+    deallog << i << '\t' << i3.local_to_global(i,0) << endl;
+  for (unsigned int i=0 ; i<i3.total_size() ; ++i)
+    deallog << i
+	    << '\t' << i3.global_to_local(i).first
+	    << '\t' << i3.global_to_local(i).second
+	    << endl;
+  deallog.pop();
+
   i3.reinit(ivector);
 
   deallog.push("global->local");
