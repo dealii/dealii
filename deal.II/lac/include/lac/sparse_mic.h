@@ -49,7 +49,8 @@ class SparseMIC : public SparseLUDecomposition<number>
                                       * argument.
                                       */
     SparseMIC (const SparsityPattern &sparsity);
-
+    
+    typedef SparseLUDecomposition<number>::AdditionalData AdditionalData;
 
 				     /**
 				      * Reinitialize the object but
@@ -86,6 +87,13 @@ class SparseMIC : public SparseLUDecomposition<number>
 				      * base class.
 				      */
     void reinit (const SparsityPattern &sparsity);
+
+				     /**
+				      * Same as @p{decompose}.
+				      */
+    template <typename somenumber>
+    void initialize (const SparseMatrix<somenumber> &matrix,
+		     const AdditionalData parameters);
 
     				     /**
 				      * Perform the incomplete LU
@@ -146,7 +154,7 @@ class SparseMIC : public SparseLUDecomposition<number>
                                      /**
                                       * Exception
                                       */
-    DeclException0 (ExcInternal);
+    DeclException0 (ExcStrengthenDiagonalTooSmall);
                                      /**
                                       * Exception
                                       */
@@ -195,6 +203,17 @@ class SparseMIC : public SparseLUDecomposition<number>
                                       */
     number get_rowsum (const unsigned int row) const;
 };
+
+
+
+template <typename number>
+template <typename somenumber>
+inline
+void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
+				    const AdditionalData data)
+{
+  decompose(matrix, data.strengthen_diagonal);
+}
 
 
 
