@@ -281,6 +281,12 @@ class FilteredMatrix : public Subscriptor
 				      * @p{std::map<unsigned,value_type>},
 				      * this is automatically the
 				      * case.
+				      *
+				      * Note that we do not check
+				      * whether the input range is
+				      * sorted, as this would be too
+				      * expensive. You have to ensure
+				      * this yourself.
 				      */
     template <class ConstraintList>
     void add_constraints (const ConstraintList &new_constraints);
@@ -588,7 +594,6 @@ add_constraints (const ConstraintList &new_constraints)
 		      constraints.begin()+old_size,
 		      constraints.end(),
 		      PairComparison());
-//TODO:[WB] Use equal_range etc to assert that the array is indeed sorted  
 };
 
 
