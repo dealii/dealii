@@ -514,6 +514,67 @@ FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe1,
 #endif
 
 
+#if deal_II_dimension == 3
+
+template <>
+FiniteElementData<3>
+FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe_data,
+				   const unsigned int          N)
+{
+  return FiniteElementData<3> (fe_data.dofs_per_vertex * N,
+			       fe_data.dofs_per_line * N,
+			       fe_data.dofs_per_quad * N,
+			       fe_data.dofs_per_hex * N,
+			       fe_data.n_transform_functions,
+			       fe_data.n_components * N);
+};
+
+template <>
+FiniteElementData<3>
+FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe1,
+				   const unsigned int          N1,
+				   const FiniteElementData<3> &fe2,
+				   const unsigned int          N2)
+{
+  return FiniteElementData<3> (fe1.dofs_per_vertex * N1 + fe2.dofs_per_vertex * N2 ,
+			       fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2 ,
+			       fe1.dofs_per_quad * N1 + fe2.dofs_per_quad * N2 ,
+			       fe1.dofs_per_hex * N1 + fe2.dofs_per_hex * N2 ,
+			       fe1.n_transform_functions,
+			       fe1.n_components * N1 + fe2.n_components * N2 );
+};
+
+
+template <>
+FiniteElementData<3>
+FESystem<3>::multiply_dof_numbers (const FiniteElementData<3> &fe1,
+				   const unsigned int          N1,
+				   const FiniteElementData<3> &fe2,
+				   const unsigned int          N2,
+				   const FiniteElementData<3> &fe3,
+				   const unsigned int          N3)
+{
+  return FiniteElementData<3> (fe1.dofs_per_vertex * N1
+			       + fe2.dofs_per_vertex * N2
+			       + fe3.dofs_per_vertex * N3 ,
+			       fe1.dofs_per_line * N1
+			       + fe2.dofs_per_line * N2
+			       + fe3.dofs_per_line * N3 ,
+			       fe1.dofs_per_quad * N1
+			       + fe2.dofs_per_quad * N2
+			       + fe3.dofs_per_quad * N3 ,
+			       fe1.dofs_per_hex * N1
+			       + fe2.dofs_per_hex * N2
+			       + fe3.dofs_per_hex * N3 ,
+			       fe1.n_transform_functions,
+			       fe1.n_components * N1
+			       + fe2.n_components * N2
+			       + fe3.n_components * N3 );
+};
+
+#endif
+
+
 template <int dim>
 vector<bool>
 FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
