@@ -220,8 +220,7 @@ GeometryInfo<dim>::face_to_cell_vertices (const unsigned int face,
 
 
 
-template class GeometryInfo<0>;
 template class GeometryInfo<1>;
 template class GeometryInfo<2>;
 template class GeometryInfo<3>;
-template class GeometryInfo<4>;
+
