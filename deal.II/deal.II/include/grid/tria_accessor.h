@@ -28,6 +28,14 @@ template <int dim, typename Accessor> class TriaActiveIterator;
 class Line;
 class Quad;
 class Hexahedron;
+
+template <int celldim, int dim> class TriaObjectAccessor;
+template <int dim>              class TriaObjectAccessor<0, dim>;
+template <int dim>              class TriaObjectAccessor<1, dim>;
+template <int dim>              class TriaObjectAccessor<2, dim>;
+template <int dim>              class TriaObjectAccessor<3, dim>;
+
+
 namespace std
 {
   template<class T1, class T2>
@@ -272,7 +280,7 @@ class TriaAccessor
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-template<int celldim, int dim>
+template <int celldim, int dim>
 class TriaObjectAccessor :  public TriaAccessor<dim>
 {
   public:
