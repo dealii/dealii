@@ -11,26 +11,11 @@
 //
 //----------------------------------------------------------------
 
-//  #include <base/quadrature.h>
-//  #include <base/polynomial.h>
-//  #include <base/tensor_product_polynomials.h>
-//  #include <grid/tria.h>
-//  #include <grid/tria_iterator.h>
-//  #include <dofs/dof_accessor.h>
 #include <base/quadrature.h>
 #include <base/tensor_product_polynomials.h>
 #include <base/polynomials_p.h>
 #include <fe/fe_poly.h>
-//#include <fe/fe.h>
-//  #include <fe/mapping.h>
-//  #include <fe/fe_q.h>
 #include <fe/fe_values.h>
-
-//  #ifdef HAVE_STD_STRINGSTREAM
-//  #  include <sstream>
-//  #else
-//  #  include <strstream>
-//  #endif
 
 
 template <class POLY, int dim>
