@@ -46,14 +46,6 @@ In VectorTools::project_boundary_values, no condensation of sparsity
   acceptable for higher dimensions. Fix this.
 
 
-Triangulation prepare_* functions:
-  Document that multiple loops of preparation for refinement and
-  coarsening do not interact, so smoothing may only be optimal if
-  #prepare_*# are called intermittently until nothing more changed.
-
-  Document the behaviour of #prepare_*# and of the return value.
-
-
 Check all places where condensation of matrices/vectors and
   application of boundary values takes place. I am not sure about
   the right order in which they have to be applied, but in 2D there
