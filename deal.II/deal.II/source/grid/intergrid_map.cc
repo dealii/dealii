@@ -7,7 +7,7 @@
 #include <dofs/dof_accessor.h>
 #include <dofs/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid//intergrid_map.h>
+#include <grid/intergrid_map.h>
 
 
 
