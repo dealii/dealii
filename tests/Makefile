@@ -23,7 +23,7 @@ report:
 	done
 
 
-clean: clean-base clean-lac clean-deal.II clean-fe clean-big
+clean: clean-base clean-lac clean-deal.II clean-fe
 
 clean-base:
 	cd base ; $(MAKE) clean
