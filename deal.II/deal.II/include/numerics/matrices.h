@@ -483,6 +483,10 @@ class MatrixTools : public MatrixCreator<dim>
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotBlockSquare);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcBlocksDontMatch);
 };
 
 

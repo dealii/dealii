@@ -698,6 +698,13 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
   Assert (matrix.get_sparsity_pattern().get_row_indices() == 
 	  matrix.get_sparsity_pattern().get_column_indices(),
 	  ExcMatrixNotBlockSquare());
+  Assert (matrix.get_sparsity_pattern().get_column_indices() ==
+	  solution.get_block_indices (),
+	  ExcBlocksDontMatch ());
+  Assert (matrix.get_sparsity_pattern().get_row_indices() ==
+	  right_hand_side.get_block_indices (),
+	  ExcBlocksDontMatch ());
+  
   
 				   // if no boundary values are to be applied
 				   // simply return
