@@ -57,15 +57,15 @@ main()
   FEQ1<2> q1;
   DoFHandler<2> dof(tr);
 
-  GridGenerator::hyper_cube(tr, -1., 1.);
+  GridGenerator::hyper_cube(tr, 1., 3.);
   dof.distribute_dofs(q1);
   
   DoFHandler<2>::cell_iterator c = dof.begin();
 
   Point<2>& v = c->vertex(2);
   
-  v(0) = 3.;
-  v(1) = 2.;
+  v(0) = 5.;
+  v(1) = 4.;
   
   plot_transformation(q1,c,"Transform-Q1");
 

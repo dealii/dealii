@@ -41,7 +41,7 @@ plot_shape_functions(FiniteElement<dim>& finel, const char* name)
 	  
 	  for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 	    {
-	      gnuplot << " "<< fe.shape_value(i,k);
+	      gnuplot << " "<< fe.shape_value(i,k) + 1.;
 	    }
 	  gnuplot << endl;
 	  k++;
