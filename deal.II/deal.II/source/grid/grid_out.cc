@@ -44,18 +44,6 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
   typename Triangulation<dim>::active_cell_iterator       cell=tria.begin_active();
   const typename Triangulation<dim>::active_cell_iterator endc=tria.end();
 
-  for (cell=tria.begin_active(); cell!=endc; ++cell)
-    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-	 ++vertex)
-				       // if not yet copied
-      if (vertex_used[cell->vertex_index(vertex)] == false)
-	{
-	  vertex_used[cell->vertex_index(vertex)] = true;
-	  vertices[cell->vertex_index(vertex)] = cell->vertex(vertex);
-	  ++n_vertices;
-	};
-
-
 				   // write preamble
   if (ucd_flags.write_preamble)
     {
