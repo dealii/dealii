@@ -34,6 +34,13 @@ clean:
 	rm -f *.o *.go *~ Makefile.dep ../lib/lib*
 
 
+# rule how to make the file containing all the forward declarations
+../include/lac/forward-declarations.h: $(filter-out %forward-declarations.h,$(h-files))
+	@echo ============================ Generating $@
+	@perl ../../deal.II/Make_forward_declarations $(filter-out %forward-declarations.h,$(h-files)) > $@
+
+
+
 
 .PHONY: lib lib.a lib.g.a clean
 
