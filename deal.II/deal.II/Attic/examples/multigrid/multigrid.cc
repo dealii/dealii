@@ -88,7 +88,7 @@ class PoissonProblem {
     typedef TriaActiveIterator<dim, Assembler<dim> > active_assemble_iterator;
 
     PoissonProblem (unsigned int order);
-    virtual ~PoissonProblem () {};
+    virtual ~PoissonProblem ();
     
     void clear ();
     void create_new ();
@@ -291,6 +291,13 @@ PoissonProblem<dim>::PoissonProblem (unsigned int order) :
 		tria(0), dof(0), rhs(0),
 		boundary_values(0), order(order) {};
 
+
+
+template <int dim>
+PoissonProblem<dim>::~PoissonProblem () 
+{
+  clear ();
+};
 
 
 
