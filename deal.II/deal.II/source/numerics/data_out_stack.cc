@@ -158,7 +158,10 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 				       "0123456789_<>()") == std::string::npos,
-	    ExcInvalidCharacter (names[i]));
+	    ExcInvalidCharacter (names[i],
+				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+							    "0123456789_<>()")));
   
   if (vec.size() == dof_handler->n_dofs())
     {

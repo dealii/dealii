@@ -169,7 +169,10 @@ add_data_vector (const VECTOR                   &vec,
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 				       "0123456789_<>()") == std::string::npos,
-	    ExcInvalidCharacter (names[i]));
+	    ExcInvalidCharacter (names[i],
+				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+							    "0123456789_<>()")));
   
   DataEntry new_entry (&vec, names);
   if (actual_type == type_dof_data)
@@ -210,8 +213,8 @@ add_data_vector (const VECTOR         &vec,
 #else
 	  std::ostrstream namebuf;
 #endif
-	  namebuf << name << '_' << i << std::ends;
-  	  names[i] = namebuf.str();
+	  namebuf << '_' << i << std::ends;
+  	  names[i] = name + namebuf.str().c_str();
   	};
     };
   

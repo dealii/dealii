@@ -380,12 +380,14 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				     /**
 				      * Exception
 				      */
-    DeclException1 (ExcInvalidCharacter,
-		    std::string,
+    DeclException2 (ExcInvalidCharacter,
+		    std::string, size_t,
 		    << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
 		    << "description strings since some graphics formats will only accept these."
 		    << std::endl
-		    << "The string you gave was <" << arg1 << ">.");
+		    << "The string you gave was <" << arg1
+		    << ">, the invalid character is <" << arg1[arg2]
+		    << ">." << std::endl);
 				     /**
 				      * Exception
 				      */
