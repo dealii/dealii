@@ -86,8 +86,10 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 			   ((AssemblerData<dim>*)local_data)->update_flags),
 		boundary(((AssemblerData<dim>*)local_data)->boundary)
 {
-  Assert (matrix.m() == dof_handler->n_dofs(), ExcInvalidData());
-  Assert (matrix.n() == dof_handler->n_dofs(), ExcInvalidData());
+  Assert (!assemble_matrix || (matrix.m() == dof_handler->n_dofs()),
+	  ExcInvalidData());
+  Assert (!assemble_matrix || (matrix.n() == dof_handler->n_dofs()),
+	  ExcInvalidData());
   Assert (((AssemblerData<dim>*)local_data)->fe == dof_handler->get_selected_fe(),
 	  ExcInvalidData());
   Assert (!assemble_rhs || (rhs_vector.size()==dof_handler->n_dofs()),
