@@ -123,6 +123,14 @@ template void PreconditionBlockSOR<SparseMatrix<double>, float>::Tvmult<float> (
   Vector<float> &, const Vector<float> &) const;
 template void PreconditionBlockSOR<SparseMatrix<double>, float>::Tvmult<double> (
   Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSOR<SparseMatrix<double>, float>::vmult_add<float> (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSOR<SparseMatrix<double>, float>::vmult_add<double> (
+  Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSOR<SparseMatrix<double>, float>::Tvmult_add<float> (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSOR<SparseMatrix<double>, float>::Tvmult_add<double> (
+  Vector<double> &, const Vector<double> &) const;
 
 template class PreconditionBlockSOR<SparseMatrix<double>, double>;
 
@@ -133,6 +141,14 @@ template void PreconditionBlockSOR<SparseMatrix<double>, double>::vmult<double> 
 template void PreconditionBlockSOR<SparseMatrix<double>, double>::Tvmult<float> (
   Vector<float> &, const Vector<float> &) const;
 template void PreconditionBlockSOR<SparseMatrix<double>, double>::Tvmult<double> (
+  Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSOR<SparseMatrix<double>, double>::vmult_add<float> (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSOR<SparseMatrix<double>, double>::vmult_add<double> (
+  Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSOR<SparseMatrix<double>, double>::Tvmult_add<float> (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSOR<SparseMatrix<double>, double>::Tvmult_add<double> (
   Vector<double> &, const Vector<double> &) const;
 
 
