@@ -4715,7 +4715,7 @@ FEDG_Q1<3>::FEDG_Q1():
 
 template<>
 FEDG_Q2<3>::FEDG_Q2():
-		FEQ<3>(1)
+		FEQ2<3>(1)
 {
   Assert (false, ExcNotImplemented());
 };
