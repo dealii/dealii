@@ -135,9 +135,12 @@ class BlockIndices
     
   private:
 				     /**
-				      * Number of blocks. This is made
-				      * constant to avoid accidental
-				      * changes during lifetime.
+				      * Number of blocks. While this
+				      * value could be obtained
+				      * through
+				      * <tt>start_indices.size()-1</tt>,
+				      * we cache this value for faster
+				      * access.
 				      */
     unsigned int n_blocks;
 
