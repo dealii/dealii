@@ -2355,7 +2355,7 @@ DoFTools::compute_intergrid_weights_1 (
       for (unsigned int row=0; row<n_coarse_dofs; ++row)
 	if (weights[row].find(col) != weights[row].end())
 	  sum += weights[row][col];
-      Assert ((sum==1) ||
+      Assert ((std::fabs(sum-1) < 1.e-12) ||
 	      ((coarse_fe.n_components()>1) && (sum==0)), ExcInternalError());
     };
 #endif
