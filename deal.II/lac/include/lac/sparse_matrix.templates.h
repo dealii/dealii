@@ -904,24 +904,41 @@ void SparseMatrix<number>::print (ostream &out) const {
 
 
 template <typename number>
-void SparseMatrix<number>::print_formatted (ostream &out, const unsigned int precision) const {
+void SparseMatrix<number>::print_formatted (ostream &out,
+					    const unsigned int precision,
+					    bool scientific,
+					    unsigned int width,
+					    const char* zero_string) const
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
+
   out.precision (precision);
-  out.setf (ios::scientific, ios::floatfield);   // set output format
-  
-  for (unsigned int i=0; i<m(); ++i) 
+  if (scientific)
+    {
+      out.setf (ios::scientific, ios::floatfield);
+      if (!width)
+	width = precision+7;
+    } else {
+      out.setf (ios::fixed, ios::floatfield);
+      if (!width)
+	width = precision+2;
+    }
+
+  for (unsigned int i=0; i<m(); ++i)
     {
       for (unsigned int j=0; j<n(); ++j)
 	if ((*cols)(i,j) != -1)
-	  out << setw(precision+7)
+	  out << setw(width)
 	      << val[cols->operator()(i,j)] << ' ';
 	else
-	  out << setw(precision+8) << " ";
+	  out << setw(width) << zero_string << ' ';
       out << endl;
     };
   AssertThrow (out, ExcIO());
 
-  out.setf (0, ios::floatfield);                 // reset output format
+// see above
+
+//  out.setf (0, ios::floatfield);                 // reset output format
 };
 

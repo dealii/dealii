@@ -967,7 +967,7 @@ class SparseMatrix : public Subscriptor
     template <typename somenumber>
     void precondition_SOR (Vector<somenumber>       &dst,
 			   const Vector<somenumber> &src,
-			   const number              om = 1.) const;
+ 			   const number              om = 1.) const;
     
 				     /**
 				      * Perform SSOR preconditioning in-place.
@@ -1048,24 +1048,27 @@ class SparseMatrix : public Subscriptor
 				      * matrix elements which are explicitely
 				      * set to zero are displayed as such.
 				      *
-				      * Each entry is printed in scientific
-				      * format, with one pre-comma digit and
-				      * the number of digits given by
-				      * #precision# after the comma, with one
-				      * space following.
-				      * The precision defaults to four, which
-				      * suffices for most cases. The precision
-				      * and output format are {\it not}
-				      * properly reset to the old values
-				      * when the function exits.
+				      * The parameters allow for a flexible setting of
+				      * the output format: #precision# and #scientific#
+				      * are used to determine the number format, where
+				      * #scientific# = #false# means fixed point notation.
+				      * A zero entry for #width# makes the function compute a
+				      * width, but it may be changed to a positive value,
+				      * if output is crude.
 				      *
-				      * You should be aware that this function
+				      * Additionally, a character for an empty value
+				      * may be specified.
+				      *
+				      * This function
 				      * may produce {\bf large} amounts of
 				      * output if applied to a large matrix!
 				      * Be careful with it.
 				      */
     void print_formatted (ostream &out,
-			  const unsigned int presicion=3) const;
+			  const unsigned int presicion=3,
+			  bool scientific=true,
+			  unsigned int width=0,
+			  const char * zero_string = " ") const;
     
 				     /**
 				      * Exception

@@ -579,11 +579,29 @@ void Vector<Number>::print (const char* format) const
 
 
 template <typename Number>
-void Vector<Number>::print (ostream &out) const {
+void Vector<Number>::print (ostream &out,
+			    unsigned int precision,
+			    bool scientific,
+			    bool across) const
+{
   Assert (dim!=0, ExcEmptyVector());
-  for (unsigned int i=0; i<size(); ++i)
-    out << val[i] << endl;
 
+  out.precision (precision);
+  if (scientific)
+    {
+      out.setf (ios::scientific, ios::floatfield);
+    } else {
+      out.setf (ios::fixed, ios::floatfield);
+    }
+
+  if (across)
+    for (unsigned int i=0; i<size(); ++i)
+      out << val[i] << ' ';
+  else
+    for (unsigned int i=0; i<size(); ++i)
+      out << val[i] << endl;
+  out << endl;
+  
   AssertThrow (out, ExcIO());
 };
 

@@ -375,9 +375,12 @@ class Vector {
     void print (const char* format = 0) const;
 
 				     /**
-				      * Print to given stream, one element per line.
+				      * Print to a stream.
+				      * 
 				      */
-    void print (ostream &) const;
+    void print (ostream &, unsigned int precision = 3,
+		bool scientific = true,
+		bool across = true) const;
 
 				     /**
 				      * Write the vector en bloc to a file. This
