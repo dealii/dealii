@@ -69,7 +69,7 @@ class SolverMinRes : public Solver<Matrix,Vector>
 				     /**
 				      * Virtual destructor.
 				      */
-    ~SolverMinRes ();
+    virtual ~SolverMinRes ();
     
 				     /**
 				      * Solver method.
