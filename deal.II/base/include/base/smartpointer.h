@@ -315,7 +315,13 @@ template <typename T>
 inline
 void SmartPointer<T>::swap (SmartPointer<T> &tt)
 {
-  swap (t, tt.t);
+#ifdef DEBUG
+  SmartPointer<T> aux(t,id);
+  *this = tt;
+  tt = aux;
+#else
+  std::swap (t, tt.t);
+#endif
 }
 
 
