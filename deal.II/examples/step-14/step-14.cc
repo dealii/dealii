@@ -2759,6 +2759,12 @@ namespace LaplaceSolver
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler (PrimalSolver<dim>::dof_handler);
+
+				     // Add the data vectors for which
+				     // we want output. Add them both,
+				     // the ``DataOut'' functions can
+				     // handle as many data vectors as
+				     // you wish to write to output:
     data_out.add_data_vector (PrimalSolver<dim>::solution,
 			      "primal_solution");
     data_out.add_data_vector (dual_solution,
@@ -3940,7 +3946,7 @@ int main ()
 				       // ``Exercise_2_3'', but you
 				       // can also use
 				       // ``CurvedRidges<dim>'':
-      descriptor.data = new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
+      descriptor.data = new Data::SetUp<Data::CurvedRidges<dim>,dim> ();
       
 				       // Next set first a dual
 				       // functional, then a list of
@@ -3971,7 +3977,7 @@ int main ()
 				       // One such additional
 				       // evaluation is to output the
 				       // grid in each step.
-      const Point<dim> evaluation_point (0.75, 0.75);
+      const Point<dim> evaluation_point (0.5, 0.5);
       descriptor.dual_functional
 	= new DualFunctional::PointValueEvaluation<dim> (evaluation_point);
       
