@@ -28,7 +28,7 @@
 
 
 template <int dim>
-const unsigned int invalid_dof_index = static_cast<unsigned int>(-1);
+const unsigned int DoFHandler<dim>::invalid_dof_index = static_cast<unsigned int>(-1);
 
 
 
