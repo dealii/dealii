@@ -53,12 +53,12 @@ private:
 				   /**
 				    * Field of indices.
 				    */
-  unsigned index[4];
+  unsigned int index[4];
 public:
 				   /**
 				    * Constructor taking #rank# indices.
 				    */
-  TensorIndex(unsigned i0, unsigned i1, unsigned i2, unsigned i3)
+  TensorIndex(unsigned int i0, unsigned int i1, unsigned int i2, unsigned int i3)
       {
 	index[0] = i0;
 	index[1] = i1;
@@ -77,7 +77,7 @@ public:
 	return index[n];
 
       }
-  DeclException1(ExcRank, unsigned,
+  DeclException1(ExcRank, unsigned int,
 		 << "Index " << arg1 << " higher than maximum 3");  
 };
 
@@ -88,12 +88,12 @@ private:
 				   /**
 				    * Field of indices.
 				    */
-    unsigned index[3];
+    unsigned int index[3];
   public:
 				     /**
 				      * Constructor taking #rank# indices.
 				      */
-    TensorIndex(unsigned i0, unsigned i1, unsigned i2)
+    TensorIndex(unsigned int i0, unsigned int i1, unsigned int i2)
       {
 	index[0] = i0;
 	index[1] = i1;
@@ -106,14 +106,14 @@ private:
 				      * in #n#th component
 				      *
 				      */
-    unsigned operator () (unsigned n) const
+    unsigned int operator () (unsigned int n) const
       {
 	Assert(n<3, ExcRank(n));
 	return index[n];
 
       }
   
-    DeclException1(ExcRank, unsigned,
+    DeclException1(ExcRank, unsigned int,
 		   << "Index " << arg1 << " higher than maximum 2");  
 };
 
@@ -124,12 +124,12 @@ class TensorIndex<2>
 				     /**
 				      * Field of indices.
 				      */
-    unsigned index[4];
+    unsigned int index[4];
   public:
 				     /**
 				      * Constructor taking #rank# indices.
 				      */
-    TensorIndex(unsigned i0, unsigned i1)
+    TensorIndex(unsigned int i0, unsigned int i1)
       {
 	index[0] = i0;
 	index[1] = i1;
@@ -140,13 +140,13 @@ class TensorIndex<2>
 				      * Access operator returning index
 				      * in #n#th component
 				      */
-    unsigned operator () (unsigned n) const
+    unsigned int operator () (unsigned int n) const
       {
 	Assert(n<2, ExcRank(n));
 	return index[n];
 
       }
-    DeclException1(ExcRank, unsigned,
+    DeclException1(ExcRank, unsigned int,
 		   << "Index " << arg1 << " higher than maximum 1");  
 };
 
@@ -157,12 +157,12 @@ class TensorIndex<1>
 				     /**
 				      * Field of indices.
 				      */
-    unsigned index[1];
+    unsigned int index[1];
   public:
 				     /**
 				      * Constructor taking #rank# indices.
 				      */
-    TensorIndex(unsigned i0)
+    TensorIndex(unsigned int i0)
       {
 	index[0] = i0;
       }
@@ -172,22 +172,22 @@ class TensorIndex<1>
 				      * Access operator returning index
 				      * in #n#th component
 				      */
-    unsigned operator () (unsigned n) const
+    unsigned int operator () (unsigned int n) const
       {
 	Assert(n<1, ExcRank(n));
 	return index[n];
 
       }
-    DeclException1(ExcRank, unsigned,
+    DeclException1(ExcRank, unsigned int,
 		   << "Index " << arg1 << " higher than maximum 0");  
 };
 
 
 
 template<int rank>
-inline unsigned
+inline unsigned int
 TensorIndex<rank>::
-operator() (unsigned n) const
+operator() (unsigned int n) const
 {
   Assert(n<rank, ExcRank(n));
   return index[n];

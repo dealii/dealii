@@ -572,7 +572,7 @@ namespace StandardExceptions
 		  << "Dimension " << arg1 << " not equal to " << arg2);
   DeclException3 (ExcIndexRange, int, int, int,
 		  << "Index " << arg1 << " is not in ["
-		  << arg2 << "," << arg3 << ")");
+		  << arg2 << "," << arg3 << "[");
   
 };
 

@@ -25,6 +25,7 @@ extern string cvs_id;
 NAME  [_a-zA-Z][_a-zA-Z0-9]*
 INT   [+-]?[0-9]+
 WHITE [ \t\n\f\v]
+ID    "$"Id[^\$]*
 CLASS (class)|(struct)|(union)
 ACCESS (public)|(protected)|(private)
 OP \+|\-|\/|\||\^|(==)|(!=)|(<<)|(>>)|(->)|(\+\+)|(\-\-)
@@ -56,9 +57,9 @@ DeclException[0-9]  { yylval = string("@") + string(yytext); return(DECLEXCEPTIO
 
  /* scan CVS id in file preamble */
 
-"$Id$]*"$" { cvs_id = string(yytext); }
-<LINECOMMENT>"$Id$]*"$" { cvs_id = string(yytext); }
-<COMMENT>"$Id$]*"$" { cvs_id = string(yytext); }
+{ID} { cvs_id = string(yytext); }
+<LINECOMMENT>{ID} { cvs_id = string(yytext); }
+<COMMENT>{ID} { cvs_id = string(yytext); }
 
 
  /* Ignore function bodies */

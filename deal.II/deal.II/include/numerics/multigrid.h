@@ -101,13 +101,11 @@ class MG
  */
 class MGTransferPrebuilt : public MGTransferBase 
 {
-    const MGSmoother& smoother;
   public:
 				     /**
 				      * Preliminary constructor
 				      */
-    MGTransferPrebuilt(const MGSmoother& smoother) :
-		    smoother(smoother)
+    MGTransferPrebuilt()
       {}
     
     

@@ -176,7 +176,11 @@ class MGSmootherRelaxation : public MGSmoother
 				     /**
 				      * Auxiliary vector.
 				      */
-    mutable Vector<double> h1, h2;
+    mutable Vector<double> h1;
+				     /**
+				      * Auxiliary vector.
+				      */
+    mutable Vector<double> h2;
 };
 
 inline

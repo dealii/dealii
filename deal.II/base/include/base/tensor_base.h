@@ -66,7 +66,7 @@ class Tensor<1,dim> {
 				      * but egcs1.1.2 chokes on that so
 				      * we need it presently.
 				      */
-    static const unsigned int array_size = (dim>0 ? dim : 1);
+    static const unsigned int array_size = ((dim!=0) ? (dim) : 1);
     
 				     /**
 				      * Declare an array type which can
@@ -195,7 +195,7 @@ class Tensor<1,dim> {
 				      * to disallow the creation of such
 				      * an object.
 				      */
-    double values[dim>0 ? dim : 1];
+    double values[(dim!=0) ? (dim) : 1];
 
 				     /**
 				      * Help function for unroll.

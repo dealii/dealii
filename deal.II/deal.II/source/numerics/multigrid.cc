@@ -154,7 +154,6 @@ void MGTransferPrebuilt::restrict (const unsigned int   from_level,
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
-//  smoother.set_zero_interior_boundary(from_level, src);
   prolongation_matrices[from_level-1].Tvmult_add (dst, src);
 };
 

@@ -36,6 +36,15 @@ class DoFTools
     static void extract_dofs(const DoFHandler<dim>& dof,
 			     const bit_vector& select,
 			     bit_vector& selected_dofs);
+
+				     /**
+				      * Same as #extract_dofs# for multi-level.
+				      */
+    template<int dim>
+    static void extract_level_dofs(unsigned int level,
+				   const MGDoFHandler<dim>& dof,
+				   const bit_vector& select,
+				   bit_vector& selected_dofs);
 };
 
 

@@ -528,7 +528,12 @@ class DataOutBase
 					  * Structure keeping the three color
 					  * values in the RGB system.
 					  */
-	struct RgbValues { float red, green, blue; };
+	struct RgbValues
+	{
+	    float red;
+	    float green;
+	    float blue;
+	};
 
 					 /**
 					  * Definition of a function pointer

@@ -38,7 +38,6 @@ void yyerror(const char* s)
 %token TYPEDEF
 %token ACCESS
 %token IDENTIFIER
-%token FARG
 %token CONST
 %token STATIC
 %token EXTERN
@@ -156,7 +155,7 @@ typedef_declaration:
 
 array_dimensions:
   '[' ']' { $$ = string("[]"); }
-  | '[' identifier ']' { $$ = string("[") + $2 + string("]"); }
+  | '[' expression ']' { $$ = string("[") + $2 + string("]"); }
   | '[' INT ']' { $$ = string("[") + $2 + string("]"); }
   | array_dimensions array_dimensions { $$ = $1 + $2; }
 ;
@@ -342,8 +341,10 @@ identifier:
 expression:
   literal
   | identifier
+  | '&' expression { $$ = string("&") + $2; }
   | OP expression { $$ = $1 + $2; }
   | expression OP expression { $$ = $1 + $2 + $3; }
+  | expression '?' expression ':' expression { $$ = string("Conditional"); }
   | expression '*' expression { $$ = $1 + $2 + $3; }
   | expression INT { $$ = $1 + $2; }
   | identifier argument_declaration { $$ = $1 + $2; }
@@ -393,22 +394,6 @@ deal_exception_declaration:
   }
 ;
 
-deal_exception_arglist: /* empty */
-  | deal_exception_arglist ',' deal_exception_arg
-;
-
-deal_exception_arg:
-  vartype
-  | deal_exception_output_declaration
-  | literal
-;
-
-deal_exception_output_declaration: OP
-  | expression
-/*  | deal_exception_output_declaration vartype
-  | deal_exception_output_declaration literal
-  | deal_exception_output_declaration OP */
-;
 
 %%
 
