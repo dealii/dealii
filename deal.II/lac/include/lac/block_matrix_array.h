@@ -78,13 +78,6 @@ class BlockMatrixArray : public Subscriptor
 {
   public:
 				     /**
-				      * Inherit the value_type from
-				      * the class over which we build
-				      * the array.
-				      */
-    typedef typename MATRIX::value_type value_type;
-    
-				     /**
 				      * Constructor fixing the
 				      * dimensions.
 				      */
