@@ -121,5 +121,8 @@
   C(local_mass_matrix,      filename=linear3d_massmatrix):
   C(interface_constraints,  filename=linear3d_constraints):
   C(real_points, optimized, filename=linear3d_real_points):
-  C(inverseJacobian,        filename=linear3d_inverse_jacobian):
-  C(grad_inverseJacobian,   filename=linear3d_inverse_jacobian_grad):
+  # the following two files get much smaller and faster when processed using 'optimized'
+  C(inverseJacobian,        optimized, filename=linear3d_inverse_jacobian):
+  C(grad_inverseJacobian,   optimized, filename=linear3d_inverse_jacobian_grad):
+
+

@@ -433,6 +433,453 @@ void FELinear<2>::get_unit_support_points (vector<Point<2> > &unit_points) const
 #endif
 
 
+#if deal_II_dimension == 3
+
+template <>
+FELinear<3>::FELinear () :
+		FELinearMapping<3> (1, 0, 0, 0)
+{
+  interface_constraints(0,0) = 1.0/4.0;
+  interface_constraints(0,1) = 1.0/4.0;
+  interface_constraints(0,2) = 1.0/4.0;
+  interface_constraints(0,3) = 1.0/4.0;
+  interface_constraints(1,0) = 1.0/2.0;
+  interface_constraints(1,1) = 1.0/2.0;
+  interface_constraints(2,1) = 1.0/2.0;
+  interface_constraints(2,2) = 1.0/2.0;
+  interface_constraints(3,2) = 1.0/2.0;
+  interface_constraints(3,3) = 1.0/2.0;
+  interface_constraints(4,0) = 1.0/2.0;
+  interface_constraints(4,3) = 1.0/2.0;
+
+  initialize_matrices ();
+};
+
+
+
+template <>
+FELinear<3>::FELinear (const int) :
+		FELinearMapping<3> (0, 0, 0, 8)
+{
+  initialize_matrices ();
+};
+
+
+
+template <>
+void FELinear<3>::initialize_matrices () {
+  restriction[0](0,0) = 1.0;
+  restriction[1](1,1) = 1.0;
+  restriction[2](2,2) = 1.0;
+  restriction[3](3,3) = 1.0;
+  restriction[4](4,4) = 1.0;
+  restriction[5](5,5) = 1.0;
+  restriction[6](6,6) = 1.0;
+  restriction[7](7,7) = 1.0;
+
+  prolongation[0](0,0) = 1.0;
+  prolongation[0](1,0) = 1.0/2.0;
+  prolongation[0](1,1) = 1.0/2.0;
+  prolongation[0](2,0) = 1.0/4.0;
+  prolongation[0](2,1) = 1.0/4.0;
+  prolongation[0](2,2) = 1.0/4.0;
+  prolongation[0](2,3) = 1.0/4.0;
+  prolongation[0](3,0) = 1.0/2.0;
+  prolongation[0](3,3) = 1.0/2.0;
+  prolongation[0](4,0) = 1.0/2.0;
+  prolongation[0](4,4) = 1.0/2.0;
+  prolongation[0](5,0) = 1.0/4.0;
+  prolongation[0](5,1) = 1.0/4.0;
+  prolongation[0](5,4) = 1.0/4.0;
+  prolongation[0](5,5) = 1.0/4.0;
+  prolongation[0](6,0) = 1.0/8.0;
+  prolongation[0](6,1) = 1.0/8.0;
+  prolongation[0](6,2) = 1.0/8.0;
+  prolongation[0](6,3) = 1.0/8.0;
+  prolongation[0](6,4) = 1.0/8.0;
+  prolongation[0](6,5) = 1.0/8.0;
+  prolongation[0](6,6) = 1.0/8.0;
+  prolongation[0](6,7) = 1.0/8.0;
+  prolongation[0](7,0) = 1.0/4.0;
+  prolongation[0](7,3) = 1.0/4.0;
+  prolongation[0](7,4) = 1.0/4.0;
+  prolongation[0](7,7) = 1.0/4.0;
+  prolongation[1](0,0) = 1.0/2.0;
+  prolongation[1](0,1) = 1.0/2.0;
+  prolongation[1](1,1) = 1.0;
+  prolongation[1](2,1) = 1.0/2.0;
+  prolongation[1](2,2) = 1.0/2.0;
+  prolongation[1](3,0) = 1.0/4.0;
+  prolongation[1](3,1) = 1.0/4.0;
+  prolongation[1](3,2) = 1.0/4.0;
+  prolongation[1](3,3) = 1.0/4.0;
+  prolongation[1](4,0) = 1.0/4.0;
+  prolongation[1](4,1) = 1.0/4.0;
+  prolongation[1](4,4) = 1.0/4.0;
+  prolongation[1](4,5) = 1.0/4.0;
+  prolongation[1](5,1) = 1.0/2.0;
+  prolongation[1](5,5) = 1.0/2.0;
+  prolongation[1](6,1) = 1.0/4.0;
+  prolongation[1](6,2) = 1.0/4.0;
+  prolongation[1](6,5) = 1.0/4.0;
+  prolongation[1](6,6) = 1.0/4.0;
+  prolongation[1](7,0) = 1.0/8.0;
+  prolongation[1](7,1) = 1.0/8.0;
+  prolongation[1](7,2) = 1.0/8.0;
+  prolongation[1](7,3) = 1.0/8.0;
+  prolongation[1](7,4) = 1.0/8.0;
+  prolongation[1](7,5) = 1.0/8.0;
+  prolongation[1](7,6) = 1.0/8.0;
+  prolongation[1](7,7) = 1.0/8.0;
+  prolongation[2](0,0) = 1.0/4.0;
+  prolongation[2](0,1) = 1.0/4.0;
+  prolongation[2](0,2) = 1.0/4.0;
+  prolongation[2](0,3) = 1.0/4.0;
+  prolongation[2](1,1) = 1.0/2.0;
+  prolongation[2](1,2) = 1.0/2.0;
+  prolongation[2](2,2) = 1.0;
+  prolongation[2](3,2) = 1.0/2.0;
+  prolongation[2](3,3) = 1.0/2.0;
+  prolongation[2](4,0) = 1.0/8.0;
+  prolongation[2](4,1) = 1.0/8.0;
+  prolongation[2](4,2) = 1.0/8.0;
+  prolongation[2](4,3) = 1.0/8.0;
+  prolongation[2](4,4) = 1.0/8.0;
+  prolongation[2](4,5) = 1.0/8.0;
+  prolongation[2](4,6) = 1.0/8.0;
+  prolongation[2](4,7) = 1.0/8.0;
+  prolongation[2](5,1) = 1.0/4.0;
+  prolongation[2](5,2) = 1.0/4.0;
+  prolongation[2](5,5) = 1.0/4.0;
+  prolongation[2](5,6) = 1.0/4.0;
+  prolongation[2](6,2) = 1.0/2.0;
+  prolongation[2](6,6) = 1.0/2.0;
+  prolongation[2](7,2) = 1.0/4.0;
+  prolongation[2](7,3) = 1.0/4.0;
+  prolongation[2](7,6) = 1.0/4.0;
+  prolongation[2](7,7) = 1.0/4.0;
+  prolongation[3](0,0) = 1.0/2.0;
+  prolongation[3](0,3) = 1.0/2.0;
+  prolongation[3](1,0) = 1.0/4.0;
+  prolongation[3](1,1) = 1.0/4.0;
+  prolongation[3](1,2) = 1.0/4.0;
+  prolongation[3](1,3) = 1.0/4.0;
+  prolongation[3](2,2) = 1.0/2.0;
+  prolongation[3](2,3) = 1.0/2.0;
+  prolongation[3](3,3) = 1.0;
+  prolongation[3](4,0) = 1.0/4.0;
+  prolongation[3](4,3) = 1.0/4.0;
+  prolongation[3](4,4) = 1.0/4.0;
+  prolongation[3](4,7) = 1.0/4.0;
+  prolongation[3](5,0) = 1.0/8.0;
+  prolongation[3](5,1) = 1.0/8.0;
+  prolongation[3](5,2) = 1.0/8.0;
+  prolongation[3](5,3) = 1.0/8.0;
+  prolongation[3](5,4) = 1.0/8.0;
+  prolongation[3](5,5) = 1.0/8.0;
+  prolongation[3](5,6) = 1.0/8.0;
+  prolongation[3](5,7) = 1.0/8.0;
+  prolongation[3](6,2) = 1.0/4.0;
+  prolongation[3](6,3) = 1.0/4.0;
+  prolongation[3](6,6) = 1.0/4.0;
+  prolongation[3](6,7) = 1.0/4.0;
+  prolongation[3](7,3) = 1.0/2.0;
+  prolongation[3](7,7) = 1.0/2.0;
+  prolongation[4](0,0) = 1.0/2.0;
+  prolongation[4](0,4) = 1.0/2.0;
+  prolongation[4](1,0) = 1.0/4.0;
+  prolongation[4](1,1) = 1.0/4.0;
+  prolongation[4](1,4) = 1.0/4.0;
+  prolongation[4](1,5) = 1.0/4.0;
+  prolongation[4](2,0) = 1.0/8.0;
+  prolongation[4](2,1) = 1.0/8.0;
+  prolongation[4](2,2) = 1.0/8.0;
+  prolongation[4](2,3) = 1.0/8.0;
+  prolongation[4](2,4) = 1.0/8.0;
+  prolongation[4](2,5) = 1.0/8.0;
+  prolongation[4](2,6) = 1.0/8.0;
+  prolongation[4](2,7) = 1.0/8.0;
+  prolongation[4](3,0) = 1.0/4.0;
+  prolongation[4](3,3) = 1.0/4.0;
+  prolongation[4](3,4) = 1.0/4.0;
+  prolongation[4](3,7) = 1.0/4.0;
+  prolongation[4](4,4) = 1.0;
+  prolongation[4](5,4) = 1.0/2.0;
+  prolongation[4](5,5) = 1.0/2.0;
+  prolongation[4](6,4) = 1.0/4.0;
+  prolongation[4](6,5) = 1.0/4.0;
+  prolongation[4](6,6) = 1.0/4.0;
+  prolongation[4](6,7) = 1.0/4.0;
+  prolongation[4](7,4) = 1.0/2.0;
+  prolongation[4](7,7) = 1.0/2.0;
+  prolongation[5](0,0) = 1.0/4.0;
+  prolongation[5](0,1) = 1.0/4.0;
+  prolongation[5](0,4) = 1.0/4.0;
+  prolongation[5](0,5) = 1.0/4.0;
+  prolongation[5](1,1) = 1.0/2.0;
+  prolongation[5](1,5) = 1.0/2.0;
+  prolongation[5](2,1) = 1.0/4.0;
+  prolongation[5](2,2) = 1.0/4.0;
+  prolongation[5](2,5) = 1.0/4.0;
+  prolongation[5](2,6) = 1.0/4.0;
+  prolongation[5](3,0) = 1.0/8.0;
+  prolongation[5](3,1) = 1.0/8.0;
+  prolongation[5](3,2) = 1.0/8.0;
+  prolongation[5](3,3) = 1.0/8.0;
+  prolongation[5](3,4) = 1.0/8.0;
+  prolongation[5](3,5) = 1.0/8.0;
+  prolongation[5](3,6) = 1.0/8.0;
+  prolongation[5](3,7) = 1.0/8.0;
+  prolongation[5](4,4) = 1.0/2.0;
+  prolongation[5](4,5) = 1.0/2.0;
+  prolongation[5](5,5) = 1.0;
+  prolongation[5](6,5) = 1.0/2.0;
+  prolongation[5](6,6) = 1.0/2.0;
+  prolongation[5](7,4) = 1.0/4.0;
+  prolongation[5](7,5) = 1.0/4.0;
+  prolongation[5](7,6) = 1.0/4.0;
+  prolongation[5](7,7) = 1.0/4.0;
+  prolongation[6](0,0) = 1.0/8.0;
+  prolongation[6](0,1) = 1.0/8.0;
+  prolongation[6](0,2) = 1.0/8.0;
+  prolongation[6](0,3) = 1.0/8.0;
+  prolongation[6](0,4) = 1.0/8.0;
+  prolongation[6](0,5) = 1.0/8.0;
+  prolongation[6](0,6) = 1.0/8.0;
+  prolongation[6](0,7) = 1.0/8.0;
+  prolongation[6](1,1) = 1.0/4.0;
+  prolongation[6](1,2) = 1.0/4.0;
+  prolongation[6](1,5) = 1.0/4.0;
+  prolongation[6](1,6) = 1.0/4.0;
+  prolongation[6](2,2) = 1.0/2.0;
+  prolongation[6](2,6) = 1.0/2.0;
+  prolongation[6](3,2) = 1.0/4.0;
+  prolongation[6](3,3) = 1.0/4.0;
+  prolongation[6](3,6) = 1.0/4.0;
+  prolongation[6](3,7) = 1.0/4.0;
+  prolongation[6](4,4) = 1.0/4.0;
+  prolongation[6](4,5) = 1.0/4.0;
+  prolongation[6](4,6) = 1.0/4.0;
+  prolongation[6](4,7) = 1.0/4.0;
+  prolongation[6](5,5) = 1.0/2.0;
+  prolongation[6](5,6) = 1.0/2.0;
+  prolongation[6](6,6) = 1.0;
+  prolongation[6](7,6) = 1.0/2.0;
+  prolongation[6](7,7) = 1.0/2.0;
+  prolongation[7](0,0) = 1.0/4.0;
+  prolongation[7](0,3) = 1.0/4.0;
+  prolongation[7](0,4) = 1.0/4.0;
+  prolongation[7](0,7) = 1.0/4.0;
+  prolongation[7](1,0) = 1.0/8.0;
+  prolongation[7](1,1) = 1.0/8.0;
+  prolongation[7](1,2) = 1.0/8.0;
+  prolongation[7](1,3) = 1.0/8.0;
+  prolongation[7](1,4) = 1.0/8.0;
+  prolongation[7](1,5) = 1.0/8.0;
+  prolongation[7](1,6) = 1.0/8.0;
+  prolongation[7](1,7) = 1.0/8.0;
+  prolongation[7](2,2) = 1.0/4.0;
+  prolongation[7](2,3) = 1.0/4.0;
+  prolongation[7](2,6) = 1.0/4.0;
+  prolongation[7](2,7) = 1.0/4.0;
+  prolongation[7](3,3) = 1.0/2.0;
+  prolongation[7](3,7) = 1.0/2.0;
+  prolongation[7](4,4) = 1.0/2.0;
+  prolongation[7](4,7) = 1.0/2.0;
+  prolongation[7](5,4) = 1.0/4.0;
+  prolongation[7](5,5) = 1.0/4.0;
+  prolongation[7](5,6) = 1.0/4.0;
+  prolongation[7](5,7) = 1.0/4.0;
+  prolongation[7](6,6) = 1.0/2.0;
+  prolongation[7](6,7) = 1.0/2.0;
+  prolongation[7](7,7) = 1.0;
+};
+
+
+
+
+template <>
+inline
+double
+FELinear<3>::shape_value (const unsigned int i,
+			  const Point<3>& p) const
+{
+  Assert((i<total_dofs), ExcInvalidIndex(i));
+  switch (i)
+    {
+      case 0: return 1.0-p(0)+(-1.0+p(0))*p(1)+(-1.0+p(0)+(1.0-p(0))*p(1))*p(2);
+      case 1: return p(0)-p(0)*p(1)+(-p(0)+p(0)*p(1))*p(2);
+      case 2: return (p(0)-p(0)*p(1))*p(2);
+      case 3: return (1.0-p(0)+(-1.0+p(0))*p(1))*p(2);
+      case 4: return (1.0-p(0))*p(1)+(-1.0+p(0))*p(1)*p(2);
+      case 5: return p(0)*p(1)-p(0)*p(1)*p(2);
+      case 6: return p(0)*p(1)*p(2);
+      case 7: return (1.0-p(0))*p(1)*p(2);
+    }
+  return 0.;
+};
+
+
+
+template <>
+inline
+Tensor<1,3>
+FELinear<3>::shape_grad (const unsigned int i,
+			 const Point<3>& p) const
+{
+  Assert((i<total_dofs), ExcInvalidIndex(i));
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
+  switch (i)
+    {
+      case 0: return Point<3>(-1.0+p(1)+(1.0-p(1))*p(2),
+			      -1.0+p(0)+(1.0-p(0))*p(2),
+			      -1.0+p(0)+(1.0-p(0))*p(1));
+      case 1: return Point<3>(1.0-p(1)+(-1.0+p(1))*p(2),
+			      -p(0)+p(0)*p(2),
+			      -p(0)+p(0)*p(1));
+      case 2: return Point<3>((1.0-p(1))*p(2),
+			      -p(0)*p(2),
+			      p(0)-p(0)*p(1));
+      case 3: return Point<3>((-1.0+p(1))*p(2),
+			      (-1.0+p(0))*p(2),
+			      1.0-p(0)+(-1.0+p(0))*p(1));
+      case 4: return Point<3>(-p(1)+p(1)*p(2),
+			      1.0-p(0)+(-1.0+p(0))*p(2),
+			      (-1.0+p(0))*p(1));
+      case 5: return Point<3>(p(1)-p(1)*p(2),
+			      p(0)-p(0)*p(2),
+			      -p(0)*p(1));
+      case 6: return Point<3>(p(1)*p(2),
+			      p(0)*p(2),
+			      p(0)*p(1));
+      case 7: return Point<3>(-p(1)*p(2),
+			      (1.0-p(0))*p(2),
+			      (1.0-p(0))*p(1));
+    }
+  return Point<3> ();
+};
+
+
+
+template <>
+inline
+Tensor<2,3>
+FELinear<3>::shape_grad_grad (const unsigned int i,
+			      const Point<3> &p) const
+{
+  Assert((i<total_dofs), ExcInvalidIndex(i));
+
+  Tensor<2,3> return_value;
+  
+  switch (i) 
+    {
+      case 0:
+	    return_value[0][1] = 1.0-p(2);
+	    return_value[0][2] = 1.0-p(1);
+	    return_value[1][0] = 1.0-p(2);
+	    return_value[1][2] = 1.0-p(0);
+	    return_value[2][0] = 1.0-p(1);
+	    return_value[2][1] = 1.0-p(0);
+	    break;
+      case 1:
+	    return_value[0][1] = -1.0+p(2);
+	    return_value[0][2] = -1.0+p(1);
+	    return_value[1][0] = -1.0+p(2);
+	    return_value[1][2] = p(0);
+	    return_value[2][0] = -1.0+p(1);
+	    return_value[2][1] = p(0);
+	    break;
+      case 2:
+	    return_value[0][1] = -p(2);
+	    return_value[0][2] = 1.0-p(1);
+	    return_value[1][0] = -p(2);
+	    return_value[1][2] = -p(0);
+	    return_value[2][0] = 1.0-p(1);
+	    return_value[2][1] = -p(0);
+	    break;
+      case 3:
+	    return_value[0][1] = p(2);
+	    return_value[0][2] = -1.0+p(1);
+	    return_value[1][0] = p(2);
+	    return_value[1][2] = -1.0+p(0);
+	    return_value[2][0] = -1.0+p(1);
+	    return_value[2][1] = -1.0+p(0);
+	    break;
+      case 4:
+	    return_value[0][1] = -1.0+p(2);
+	    return_value[0][2] = p(1);
+	    return_value[1][0] = -1.0+p(2);
+	    return_value[1][2] = -1.0+p(0);
+	    return_value[2][0] = p(1);
+	    return_value[2][1] = -1.0+p(0);
+	    break;
+      case 5:
+	    return_value[0][1] = 1.0-p(2);
+	    return_value[0][2] = -p(1);
+	    return_value[1][0] = 1.0-p(2);
+	    return_value[1][2] = -p(0);
+	    return_value[2][0] = -p(1);
+	    return_value[2][1] = -p(0);
+	    break;
+      case 6:
+	    return_value[0][1] = p(2);
+	    return_value[0][2] = p(1);
+	    return_value[1][0] = p(2);
+	    return_value[1][2] = p(0);
+	    return_value[2][0] = p(1);
+	    return_value[2][1] = p(0);
+	    break;
+      case 7:
+	    return_value[0][1] = -p(2);
+	    return_value[0][2] = -p(1);
+	    return_value[1][0] = -p(2);
+	    return_value[1][2] = 1.0-p(0);
+	    return_value[2][0] = -p(1);
+	    return_value[2][1] = 1.0-p(0);
+    };
+  
+  return return_value;
+};
+
+
+
+template <>
+void FELinear<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
+					 const Boundary<3> &,
+					 dFMatrix &local_mass_matrix) const {
+  Assert (local_mass_matrix.n() == total_dofs,
+	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
+  Assert (local_mass_matrix.m() == total_dofs,
+	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
+
+  AssertThrow (false, ExcComputationNotUseful(3));
+};
+
+
+
+template <>
+void FELinear<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
+  Assert (unit_points.size() == total_dofs,
+	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
+
+  unit_points[0] = Point<3> (0,0,0);
+  unit_points[1] = Point<3> (1,0,0);
+  unit_points[2] = Point<3> (1,0,1);
+  unit_points[3] = Point<3> (0,0,1);
+  unit_points[4] = Point<3> (0,1,0);
+  unit_points[5] = Point<3> (1,1,0);
+  unit_points[6] = Point<3> (1,1,1);
+  unit_points[7] = Point<3> (0,1,1);
+};
+  
+
+#endif
+
+
 
 template <int dim>
 void

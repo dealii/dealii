@@ -38,10 +38,11 @@ bool SubCellData::check_consistency (const unsigned int dim) const {
 template <int dim>
 Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 		Subscriptor (),
+		boundary (0),
 		smooth_grid(smooth_grid)
 {
-  static StraightBoundary<dim> default_boundary;
-  boundary = &default_boundary;
+				   // set default boundary
+  set_boundary (0);
   
   levels.push_back (new TriangulationLevel<dim>);
 };
@@ -63,6 +64,7 @@ Triangulation<dim>::~Triangulation () {
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
 
+  boundary->unsubscribe ();
   levels.clear ();
 };
 
@@ -70,7 +72,17 @@ Triangulation<dim>::~Triangulation () {
 
 template <int dim>
 void Triangulation<dim>::set_boundary (const Boundary<dim> *boundary_object) {
-  boundary = boundary_object;
+  static StraightBoundary<dim> default_boundary;
+
+  if (boundary != 0)
+    boundary->unsubscribe ();
+
+  if (boundary_object != 0)
+    boundary = boundary_object;
+  else
+    boundary = &default_boundary;
+
+  boundary->subscribe ();
 };
 
 
@@ -114,6 +126,29 @@ Triangulation<2>::end () const {
 
 #endif
 
+
+
+#if deal_II_dimension == 3
+
+template <>
+TriaDimensionInfo<3>::cell_iterator
+Triangulation<3>::begin (const unsigned int level) const {
+  return begin_hex (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::raw_cell_iterator
+Triangulation<3>::end () const {
+  return end_hex ();
+};
+
+#endif
+
+
+
+
 /*-----------------------------------------------------------------*/
 
 
@@ -127,8 +162,12 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 				   // copy normal elements
   vertices      = old_tria.vertices;
   vertices_used = old_tria.vertices_used;
-  boundary      = old_tria.boundary;
   smooth_grid   = old_tria.smooth_grid;
+
+  if (boundary)
+    boundary->unsubscribe ();
+  boundary      = old_tria.boundary;
+  boundary->subscribe ();
 
 				   // delete only level previously existing,
 				   // reserve space for new and copy
@@ -191,7 +230,6 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
     };
 
 
-#ifdef DEBUG
 				   // some security tests
   unsigned int boundary_nodes = 0;
   for (unsigned int i=0; i<lines_at_vertex.size(); ++i)
@@ -203,13 +241,12 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 	case 2:
 	      break;
 	default:     // a node must have one or two adjacent lines
-	      Assert (false, ExcInternalError());
+	      AssertThrow (false, ExcInternalError());
       };
 
 				   // assert there are no more than two boundary
 				   // nodes
-  Assert (boundary_nodes == 2, ExcInternalError());
-#endif
+  AssertThrow (boundary_nodes == 2, ExcInternalError());
 
 
   				   // update neighborship info
@@ -319,14 +356,10 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
   map<pair<int,int>,line_iterator> needed_lines;
   for (unsigned int cell=0; cell<cells.size(); ++cell)
     {
-#ifdef DEBUG
-				       // in debug mode: check whether vertex
-				       // indices are valid ones
       for (unsigned int vertex=0; vertex<4; ++vertex)
-	Assert ((0<=cells[cell].vertices[vertex]) &&
-		(cells[cell].vertices[vertex]<(signed int)vertices.size()),
-		ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex], vertices.size()));
-#endif
+	AssertThrow ((0<=cells[cell].vertices[vertex]) &&
+		     (cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size())),
+		     ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex], vertices.size()));
       
       pair<int,int> line_vertices[4] = {   // note the order of the vertices
 	    make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
@@ -396,11 +429,11 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 					   // direction 1->4, while in
 					   // the second it would be 4->1.
 					   // This will cause the exception.
-	  Assert (needed_lines.find(make_pair(line_vertices[line].second,
-					      line_vertices[line].first))
-		  ==
-		  needed_lines.end(),
-		  ExcGridHasInvalidCell(cell));
+	  AssertThrow (needed_lines.find(make_pair(line_vertices[line].second,
+						   line_vertices[line].first))
+		       ==
+		       needed_lines.end(),
+		       ExcGridHasInvalidCell(cell));
 		  
 					   // insert line, with invalid iterator
 					   // if line already exists, then
@@ -410,8 +443,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
     };
   
 
-#ifdef DEBUG
-				   // in debug mode: check the every vertex has
+				   // check the every vertex has
 				   // at least two adjacent lines
   if (true) 
     {
@@ -426,11 +458,10 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 
 				       // assert minimum touch count is at
 				       // least two
-      Assert (* (min_element(vertex_touch_count.begin(),
-			     vertex_touch_count.end())) >= 2,
-	      ExcGridHasInvalidVertices());
+      AssertThrow (* (min_element(vertex_touch_count.begin(),
+				  vertex_touch_count.end())) >= 2,
+		   ExcGridHasInvalidVertices());
     };
-#endif
 	
   				   // reserve enough space
   levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
@@ -446,6 +477,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	{
 	  line->set (Line(i->first.first, i->first.second));
 	  line->set_used_flag ();
+	  line->clear_user_flag ();
 	  line->clear_user_pointer ();
 	  i->second = line;
 	};
@@ -501,9 +533,9 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
       const unsigned int n_adj_cells = adjacent_cells[line->index()].size();
 				       // assert that every line has one or
 				       // two adjacent cells
-      Assert ((n_adj_cells >= 1) &&
-	      (n_adj_cells <= 2),
-	      ExcInternalError());
+      AssertThrow ((n_adj_cells >= 1) &&
+		   (n_adj_cells <= 2),
+		   ExcInternalError());
 
 				       // if only one cell: line is at
 				       // boundary -> give it the boundary
@@ -538,16 +570,16 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	  else 
 	    {
 					       // line does not exist
-	      Assert (false, ExcLineInexistant(line_vertices.first,
-					       line_vertices.second));
+	      AssertThrow (false, ExcLineInexistant(line_vertices.first,
+						    line_vertices.second));
 	      line = end_line();
 	    };
 	};
 
 				       // Assert that only exterior lines
-				       // are sgiven a boundary indicator
-      Assert (line->boundary_indicator() == 0,
-	      ExcInteriorLineCantBeBoundary());
+				       // are given a boundary indicator
+      AssertThrow (line->boundary_indicator() == 0,
+		   ExcInteriorLineCantBeBoundary());
 
       line->set_boundary_indicator (boundary_line->material_id);
     };
@@ -667,6 +699,660 @@ void Triangulation<2>::create_hyper_ball (const Point<2> &p, const double radius
 };
 
 #endif
+
+
+#if deal_II_dimension == 3
+
+/**
+ * Invent an object which compares two Quads against each other. This
+ * comparison is needed in order to establish a map of Quads to iterators
+ * in the Triangulation<3>::create_triangulation function.
+ *
+ * Since this comparison is not canonical, we do not include it into the
+ * general Quad class.
+ */
+struct QuadComparator {
+    bool operator () (const Quad &q1, const Quad &q2) {
+				       // here is room to optimize the
+				       // repeated equality test of
+				       // the previous lines, but I don't
+				       // care at present
+      if ((q1.line(0) < q2.line(0))          ||
+	  ((q1.line(0) == q2.line(0)) &&
+	   (q1.line(1) <  q2.line(1)))       ||
+	  ((q1.line(0) == q2.line(0)) &&
+	   (q1.line(1) == q2.line(1)) &&
+	   (q1.line(2) <  q2.line(2)))       ||
+	  ((q1.line(0) == q2.line(0)) &&
+	   (q1.line(1) == q2.line(1)) &&
+	   (q1.line(2) == q2.line(2)) &&
+	   (q1.line(3) <  q2.line(3))))
+	return true;
+      else
+	return false;
+    };
+};
+
+
+
+template <>
+void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
+					     const vector<CellData<3> > &c,
+					     const SubCellData          &subcelldata) {
+  const unsigned int dim=3;
+
+  Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
+  Assert (n_lines() == 0, ExcTriangulationNotEmpty());
+  Assert (n_quads() == 0, ExcTriangulationNotEmpty());
+  Assert (n_hexs() == 0, ExcTriangulationNotEmpty());
+				   // check that no forbidden arrays are used
+  Assert (subcelldata.check_consistency(dim), ExcInternalError());
+
+				   // copy vertices
+  vertices = v;
+  vertices_used = vector<bool> (v.size(), true);
+
+				   // copy cells. This is needed since we
+				   // may need to change entries
+  vector<CellData<3> > cells(c);
+
+				   ///////////////////////////////////////
+				   // first set up some collections of data
+				   //
+				   // make up a list of the needed lines
+				   //
+				   // each line is a pair of vertices. The list
+				   // is kept sorted and it is guaranteed
+				   // that each line is inserted only once.
+				   // While the key of such an entry is the
+				   // pair of vertices, the thing it points
+				   // to is an iterator pointing to the line
+				   // object itself. In the first run, these
+				   // iterators are all invalid ones, but they
+				   // are filled afterwards
+				   // same applies for the quads
+  map<pair<int,int>,line_iterator> needed_lines;
+  for (unsigned int cell=0; cell<cells.size(); ++cell)
+    {
+
+				       // check whether vertex
+				       // indices are valid ones
+      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+	AssertThrow ((0<=cells[cell].vertices[vertex]) &&
+		     (cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size())),
+		     ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex], vertices.size()));
+      
+      pair<int,int> line_vertices[12] = {   // note the order of the vertices
+					     // front face
+	    make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
+	    make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
+	    make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
+	    make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
+					     // back face
+	    make_pair (cells[cell].vertices[4], cells[cell].vertices[5]),
+	    make_pair (cells[cell].vertices[5], cells[cell].vertices[6]),
+	    make_pair (cells[cell].vertices[7], cells[cell].vertices[6]),
+	    make_pair (cells[cell].vertices[4], cells[cell].vertices[7]),
+					     // connects of front and back face
+	    make_pair (cells[cell].vertices[0], cells[cell].vertices[4]),
+	    make_pair (cells[cell].vertices[1], cells[cell].vertices[5]),
+	    make_pair (cells[cell].vertices[2], cells[cell].vertices[6]),
+	    make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
+      };
+
+				       // in the 2d code, some tests were performed
+				       // which may heal a problem with quads that
+				       // are rotated such that the lines don't
+				       // fit snuggly any more. I don't know how
+				       // to do this in 3d also, so I leve it for
+				       // future student generations.
+				       //
+				       // however, check that the line does not
+				       // exist in the other direction
+      for (unsigned int line=0; line<12; ++line)
+	{
+					   // assert that the line was not
+					   // already inserted in reverse
+					   // order.
+	  AssertThrow (needed_lines.find(make_pair(line_vertices[line].second,
+						   line_vertices[line].first))
+		       ==
+		       needed_lines.end(),
+		       ExcGridHasInvalidCell(cell));
+		  
+					   // insert line, with invalid iterator
+					   // if line already exists, then
+					   // nothing bad happens here
+	  needed_lines[line_vertices[line]] = end_line();
+	};
+    };
+  
+
+				   /////////////////////////////////
+				   // now for some sanity-checks:
+				   //
+				   // check the every vertex has
+				   // at least two adjacent lines
+  if (true) 
+    {
+      vector<unsigned short int> vertex_touch_count (v.size(), 0);
+      map<pair<int,int>,line_iterator>::iterator i;
+      for (i=needed_lines.begin(); i!=needed_lines.end(); i++) 
+	{
+					   // touch the vertices of this line
+	  ++vertex_touch_count[i->first.first];
+	  ++vertex_touch_count[i->first.second];
+	};
+
+				       // assert minimum touch count is at
+				       // least two
+      AssertThrow (* (min_element(vertex_touch_count.begin(),
+			     vertex_touch_count.end())) >= 2,
+	      ExcGridHasInvalidVertices());
+    };
+
+
+				   ///////////////////////////////////
+				   // actually set up data structures
+				   // for the lines
+  				   // reserve enough space
+  levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
+  levels[0]->TriangulationLevel<1>::reserve_space (needed_lines.size());
+
+				   // make up lines
+  if (true) 
+    {
+      raw_line_iterator line = begin_raw_line();
+      map<pair<int,int>,line_iterator>::iterator i;
+      for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
+	{
+	  line->set (Line(i->first.first, i->first.second));
+	  line->set_used_flag ();
+	  line->clear_user_flag ();
+	  line->clear_user_pointer ();
+
+					   // now set the iterator for this
+					   // line
+	  i->second = line;
+	};
+    };
+
+
+				   ///////////////////////////////////////////
+				   // make up the quads of this triangulation
+				   //
+				   // same thing: the iterators are set
+				   // to the invalid value at first, we only
+				   // collect the data now
+
+				   // note that QuadComparator is a class
+				   // declared and defined in this file
+  map<Quad,quad_iterator,QuadComparator> needed_quads;
+  for (unsigned int cell=0; cell<cells.size(); ++cell) 
+    {
+				       // the faces are quads which consist
+				       // of four numbers denoting the index
+				       // of the four lines bounding th
+				       // quad. we can get this index by
+				       // asking #needed_lines# for an
+				       // iterator to this line, dereferencing
+				       // it and thus return an iterator into
+				       // the #lines# array of the
+				       // triangulation, which is already set
+				       // up. we can then ask this iterator
+				       // for its index within the present
+				       // level (the level is zero, of course)
+				       //
+				       // to make things easier, we don't
+				       // creare the lines (pairs of their
+				       // vertex indices) in place, but before
+				       // they are really needed. This is just
+				       // copied from above.
+      pair<int,int> line_list[12] = {   // note the order of the vertices
+					     // front face
+	    make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
+	    make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
+	    make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
+	    make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
+					     // back face
+	    make_pair (cells[cell].vertices[4], cells[cell].vertices[5]),
+	    make_pair (cells[cell].vertices[5], cells[cell].vertices[6]),
+	    make_pair (cells[cell].vertices[7], cells[cell].vertices[6]),
+	    make_pair (cells[cell].vertices[4], cells[cell].vertices[7]),
+					     // connects of front and back face
+	    make_pair (cells[cell].vertices[0], cells[cell].vertices[4]),
+	    make_pair (cells[cell].vertices[1], cells[cell].vertices[5]),
+	    make_pair (cells[cell].vertices[2], cells[cell].vertices[6]),
+	    make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
+      };
+
+      Quad faces[6]
+	= {
+					       // front face
+	      Quad (needed_lines[line_list[0]]->index(),
+		    needed_lines[line_list[1]]->index(),
+		    needed_lines[line_list[2]]->index(),
+		    needed_lines[line_list[3]]->index()),
+					       // back face
+	      Quad (needed_lines[line_list[4]]->index(),
+		    needed_lines[line_list[5]]->index(),
+		    needed_lines[line_list[6]]->index(),
+		    needed_lines[line_list[7]]->index()),
+					       // bottom face
+	      Quad (needed_lines[line_list[0]]->index(),
+		    needed_lines[line_list[9]]->index(),
+		    needed_lines[line_list[4]]->index(),
+		    needed_lines[line_list[8]]->index()),
+					       // right face
+	      Quad (needed_lines[line_list[9]]->index(),
+		    needed_lines[line_list[5]]->index(),
+		    needed_lines[line_list[10]]->index(),
+		    needed_lines[line_list[1]]->index()),
+					       // top face
+	      Quad (needed_lines[line_list[2]]->index(),
+		    needed_lines[line_list[10]]->index(),
+		    needed_lines[line_list[6]]->index(),
+		    needed_lines[line_list[11]]->index()),
+					       // left face
+	      Quad (needed_lines[line_list[8]]->index(),
+		    needed_lines[line_list[7]]->index(),
+		    needed_lines[line_list[11]]->index(),
+		    needed_lines[line_list[3]]->index())    };
+
+				       // in the 2d code, some tests were performed
+				       // which may heal a problem with hexes that
+				       // are rotated such that the quads don't
+				       // fit snuggly any more. I don't know how
+				       // to do this in here, so I leve it for
+				       // future student generations.
+      for (unsigned int quad=0; quad<6; ++quad)
+					 // insert quad, with invalid iterator
+					 // if quad already exists, then
+					 // nothing bad happens here
+	  needed_quads[faces[quad]] = end_quad();
+    };
+  
+
+				   /////////////////////////////////
+				   // enter the resulting quads into
+				   // the arrays of the Triangulation
+				   //
+				   // first reserve enough space
+  levels[0]->TriangulationLevel<2>::reserve_space (needed_quads.size());
+  if (true) 
+    {
+      raw_quad_iterator quad = begin_raw_quad();
+      map<Quad,quad_iterator>::iterator q;
+      for (q = needed_quads.begin(); quad!=end_quad(); ++quad, ++q)
+	{
+	  quad->set (q->first);
+	  quad->set_used_flag ();
+	  quad->clear_user_flag ();
+	  quad->clear_user_pointer ();
+
+					   // now set the iterator for this
+					   // quad
+	  q->second = quad;
+	};
+    };
+
+				   /////////////////////////////////
+				   // finally create the cells
+  levels[0]->TriangulationLevel<3>::reserve_space (cells.size());  
+
+				   // store for each quad index
+				   // the adjacent cells
+  map<int,vector<cell_iterator> > adjacent_cells;
+
+				   // finally make up cells
+  if (true) 
+    {
+      raw_cell_iterator cell = begin_raw_hex();
+      for (unsigned int c=0; c<cells.size(); ++c, ++cell)
+	{
+					   // first find for each of the
+					   // cells the quad iterator of
+					   // the respective faces.
+					   //
+					   // to this end, set up the
+					   // lines of this cell and find
+					   // the quads that are bounded by
+					   // these lines; these are then
+					   // the faces of the present cell
+	  pair<int,int> line_list[12] = {   // note the order of the vertices
+						 // front face
+		make_pair (cells[c].vertices[0], cells[c].vertices[1]),
+		make_pair (cells[c].vertices[1], cells[c].vertices[2]),
+		make_pair (cells[c].vertices[3], cells[c].vertices[2]),
+		make_pair (cells[c].vertices[0], cells[c].vertices[3]),
+						 // back face
+		make_pair (cells[c].vertices[4], cells[c].vertices[5]),
+		make_pair (cells[c].vertices[5], cells[c].vertices[6]),
+		make_pair (cells[c].vertices[7], cells[c].vertices[6]),
+		make_pair (cells[c].vertices[4], cells[c].vertices[7]),
+						 // connects of front and back face
+		make_pair (cells[c].vertices[0], cells[c].vertices[4]),
+		make_pair (cells[c].vertices[1], cells[c].vertices[5]),
+		make_pair (cells[c].vertices[2], cells[c].vertices[6]),
+		make_pair (cells[c].vertices[3], cells[c].vertices[7])
+	  };
+
+	  Quad faces[6]
+	    = {
+						   // front face
+		  Quad (needed_lines[line_list[0]]->index(),
+			needed_lines[line_list[1]]->index(),
+			needed_lines[line_list[2]]->index(),
+			needed_lines[line_list[3]]->index()),
+						   // back face
+		  Quad (needed_lines[line_list[4]]->index(),
+			needed_lines[line_list[5]]->index(),
+			needed_lines[line_list[6]]->index(),
+			needed_lines[line_list[7]]->index()),
+						   // bottom face
+		  Quad (needed_lines[line_list[0]]->index(),
+			needed_lines[line_list[9]]->index(),
+			needed_lines[line_list[4]]->index(),
+			needed_lines[line_list[8]]->index()),
+						   // right face
+		  Quad (needed_lines[line_list[9]]->index(),
+			needed_lines[line_list[5]]->index(),
+			needed_lines[line_list[10]]->index(),
+			needed_lines[line_list[1]]->index()),
+						   // top face
+		  Quad (needed_lines[line_list[2]]->index(),
+			needed_lines[line_list[10]]->index(),
+			needed_lines[line_list[6]]->index(),
+			needed_lines[line_list[11]]->index()),
+						   // left face
+		  Quad (needed_lines[line_list[8]]->index(),
+			needed_lines[line_list[7]]->index(),
+			needed_lines[line_list[11]]->index(),
+			needed_lines[line_list[3]]->index())    };
+
+					   // get the iterators corresponding
+					   // to the faces
+	  const quad_iterator face_iterator[6] = {
+		needed_quads[faces[0]],
+		needed_quads[faces[1]],
+		needed_quads[faces[2]],
+		needed_quads[faces[3]],
+		needed_quads[faces[4]],
+		needed_quads[faces[5]]};
+
+					   // make the cell out of these
+					   // iterators
+	  cell->set (Hexahedron(face_iterator[0]->index(),
+				face_iterator[1]->index(),
+				face_iterator[2]->index(),
+				face_iterator[3]->index(),
+				face_iterator[4]->index(),
+				face_iterator[5]->index()));
+	  
+	  cell->set_used_flag ();
+	  cell->set_material_id (cells[c].material_id);
+	  cell->clear_user_flag ();
+	  cell->clear_user_pointer ();
+					   // note that this cell is adjacent
+					   // to the four lines
+	  for (unsigned int quad=0; quad<6; ++quad)
+	    adjacent_cells[face_iterator[quad]->index()].push_back (cell);
+	  
+					   // make some checks on the lines
+					   // and their ordering; if the
+					   // lines are right, so are the
+					   // vertices
+	  Assert (face_iterator[0]->line(0) == face_iterator[2]->line(0),
+		  ExcInternalErrorOnCell(c));
+	  Assert (face_iterator[0]->line(1) == face_iterator[3]->line(3),
+		  ExcInternalErrorOnCell(c));
+	  Assert (face_iterator[0]->line(2) == face_iterator[4]->line(0),
+		  ExcInternalErrorOnCell(c));
+	  Assert (face_iterator[0]->line(3) == face_iterator[5]->line(3),
+		  ExcInternalErrorOnCell(c));
+
+	  Assert (face_iterator[1]->line(0) == face_iterator[2]->line(2),
+		  ExcInternalErrorOnCell(c));
+	  Assert (face_iterator[1]->line(1) == face_iterator[3]->line(1),
+		  ExcInternalErrorOnCell(c));
+	  Assert (face_iterator[1]->line(2) == face_iterator[4]->line(2),
+		  ExcInternalErrorOnCell(c));
+	  Assert (face_iterator[1]->line(3) == face_iterator[5]->line(1),
+		  ExcInternalErrorOnCell(c));
+
+	  Assert (face_iterator[2]->line(1) == face_iterator[3]->line(0),
+		  ExcInternalErrorOnCell(c));
+	  Assert (face_iterator[3]->line(2) == face_iterator[4]->line(1),
+		  ExcInternalErrorOnCell(c));
+	  Assert (face_iterator[4]->line(3) == face_iterator[5]->line(2),
+		  ExcInternalErrorOnCell(c));
+	  Assert (face_iterator[5]->line(0) == face_iterator[2]->line(3),
+		  ExcInternalErrorOnCell(c));
+	};
+    };
+  
+
+				   /////////////////////////////////////////
+				   // find those quads which are at the
+				   // boundary and mark them appropriately
+  for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+    {
+      const unsigned int n_adj_cells = adjacent_cells[quad->index()].size();
+				       // assert that every quad has one or
+				       // two adjacent cells
+      AssertThrow ((n_adj_cells >= 1) &&
+		   (n_adj_cells <= 2),
+		   ExcInternalError());
+
+				       // if only one cell: quad is at
+				       // boundary -> give it the boundary
+				       // indicator zero by default
+      if (n_adj_cells == 1)
+	quad->set_boundary_indicator (0);
+      else
+					 // interior quad -> 255
+      	quad->set_boundary_indicator (255);
+    };
+
+				   /////////////////////////////////////////
+				   // next find those lines which are at
+				   // the boundary and mark all others as
+				   // interior ones
+				   //
+				   // for this: first mark all lines as
+				   // interior
+  for (line_iterator line=begin_line(); line!=end_line(); ++line)
+    line->set_boundary_indicator (255);
+				   // next reset all lines bounding boundary
+				   // quads as on the boundary also
+  for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+    if (quad->at_boundary())
+      for (unsigned int l=0; l<4; ++l)
+	quad->line(l)->set_boundary_indicator (0);
+  
+
+				   ///////////////////////////////////////
+				   // now set boundary indicators
+				   // where given
+				   //
+				   // not yet implemented
+  AssertThrow ((subcelldata.boundary_lines.size() == 0) &&
+	       (subcelldata.boundary_quads.size() == 0),
+	       ExcInternalError());
+  
+
+				   /////////////////////////////////////////
+				   // finally update neighborship info
+  for (cell_iterator cell=begin(); cell!=end(); ++cell)
+    for (unsigned int face=0; face<6; ++face)
+      if (adjacent_cells[cell->quad(face)->index()][0] == cell)
+					 // first adjacent cell is this one
+	{
+	  if (adjacent_cells[cell->quad(face)->index()].size() == 2)
+					     // there is another adjacent cell
+	    cell->set_neighbor (face,
+				adjacent_cells[cell->quad(face)->index()][1]);
+	}
+				   // first adjacent cell is not this one,
+				   // -> it must be the neighbor we are
+				   // looking for
+      else
+	cell->set_neighbor (face,
+			    adjacent_cells[cell->quad(face)->index()][0]);
+};
+
+
+
+template <>
+void Triangulation<3>::create_hypercube (const double left,
+					 const double right) {
+  Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
+  Assert (n_lines() == 0, ExcTriangulationNotEmpty());
+  Assert (n_quads() == 0, ExcTriangulationNotEmpty());
+  Assert (n_hexs() == 0, ExcTriangulationNotEmpty());
+
+  const Point<3> vertices[8] = { Point<3>(left,left,left),
+				 Point<3>(right,left,left),
+				 Point<3>(right,right,left),
+				 Point<3>(left,right,left),
+				 Point<3>(left,left,right),
+				 Point<3>(right,left,right),
+				 Point<3>(right,right,right),
+				 Point<3>(left,right,right)};
+  const int cell_vertices[1][8] = { { 0,1,2,3,4,5,6,7 } };
+  vector<CellData<3> > cells (1, CellData<3>());
+  for (unsigned int j=0; j<8; ++j)
+    cells[0].vertices[j] = cell_vertices[0][j];
+  cells[0].material_id = 0;
+  
+  create_triangulation (vector<Point<3> >(&vertices[0], &vertices[8]),
+			cells,
+			SubCellData());       // no boundary information
+};
+
+
+
+template <>
+void Triangulation<3>::create_hyper_L (const double a, const double b) {
+  const unsigned int dim=3;
+				   // we slice out the top back right
+				   // part of the cube
+  const Point<dim> vertices[26]
+    = {
+					   // front face of the big cube
+	  Point<dim> (a,      a,a),
+	  Point<dim> ((a+b)/2,a,a),
+	  Point<dim> (b,      a,a),
+	  Point<dim> (a,      a,(a+b)/2),
+	  Point<dim> ((a+b)/2,a,(a+b)/2),
+	  Point<dim> (b,      a,(a+b)/2),
+	  Point<dim> (a,      a,b),
+	  Point<dim> ((a+b)/2,a,b),
+	  Point<dim> (b,      a,b),
+					   // middle face of the big cube
+	  Point<dim> (a,      (a+b)/2,a),
+	  Point<dim> ((a+b)/2,(a+b)/2,a),
+	  Point<dim> (b,      (a+b)/2,a),
+	  Point<dim> (a,      (a+b)/2,(a+b)/2),
+	  Point<dim> ((a+b)/2,(a+b)/2,(a+b)/2),
+	  Point<dim> (b,      (a+b)/2,(a+b)/2),
+	  Point<dim> (a,      (a+b)/2,b),
+	  Point<dim> ((a+b)/2,(a+b)/2,b),
+	  Point<dim> (b,      (a+b)/2,b),
+					   // back face of the big cube
+					   // last (top right) point is missing
+	  Point<dim> (a,      b,a),
+	  Point<dim> ((a+b)/2,b,a),
+	  Point<dim> (b,      b,a),
+	  Point<dim> (a,      b,(a+b)/2),
+	  Point<dim> ((a+b)/2,b,(a+b)/2),
+	  Point<dim> (b,      b,(a+b)/2),
+	  Point<dim> (a,      b,b),
+	  Point<dim> ((a+b)/2,b,b)
+    };
+  const int cell_vertices[7][8] = {{0, 1, 4, 3, 9, 10, 13, 12},
+				   {1, 2, 5, 4, 10, 11, 14, 13},
+				   {3, 4, 7, 6, 12, 13, 16, 15},
+				   {4, 5, 8, 7, 13, 14, 17, 16},
+				   {9, 10, 13, 12, 18, 19, 22, 21},
+				   {10, 11, 14, 13, 19, 20, 23, 22},
+				   {12, 13, 16, 15, 21, 22, 25, 24}};
+
+  vector<CellData<3> > cells (7, CellData<3>());
+  
+  for (unsigned int i=0; i<7; ++i) 
+    {
+      for (unsigned int j=0; j<8; ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
+    };
+  
+  create_triangulation (vector<Point<dim> >(&vertices[0], &vertices[26]),
+			cells,
+			SubCellData());       // no boundary information
+};
+
+
+
+template <>
+void Triangulation<3>::create_hyper_ball (const Point<3> &p, const double radius) {
+  const double a = 1./(1+sqrt(3)); // equilibrate cell sizes at transition
+				   // from the inner part to the radial
+				   // cells
+  const unsigned int n_vertices = 16;
+  const Point<3> vertices[n_vertices]
+    = {
+					   // first the vertices of the inner
+					   // cell
+	  p+Point<3>(-1,-1,-1)*(radius/sqrt(3)*a),
+	  p+Point<3>(+1,-1,-1)*(radius/sqrt(3)*a),
+	  p+Point<3>(+1,+1,-1)*(radius/sqrt(3)*a),
+	  p+Point<3>(-1,+1,-1)*(radius/sqrt(3)*a),
+	  p+Point<3>(-1,-1,+1)*(radius/sqrt(3)*a),
+	  p+Point<3>(+1,-1,+1)*(radius/sqrt(3)*a),
+	  p+Point<3>(+1,+1,+1)*(radius/sqrt(3)*a),
+	  p+Point<3>(-1,+1,+1)*(radius/sqrt(3)*a),
+					   // now the eight vertices at
+					   // the outer sphere
+	  p+Point<3>(-1,-1,-1)*(radius/sqrt(3)),
+	  p+Point<3>(+1,-1,-1)*(radius/sqrt(3)),
+	  p+Point<3>(+1,+1,-1)*(radius/sqrt(3)),
+	  p+Point<3>(-1,+1,-1)*(radius/sqrt(3)),
+	  p+Point<3>(-1,-1,+1)*(radius/sqrt(3)),
+	  p+Point<3>(+1,-1,+1)*(radius/sqrt(3)),
+	  p+Point<3>(+1,+1,+1)*(radius/sqrt(3)),
+	  p+Point<3>(-1,+1,+1)*(radius/sqrt(3))
+    };
+
+				   // one needs to draw the seven cubes to
+				   // understand what's going on here
+  const unsigned int n_cells = 7;
+  const int cell_vertices[n_cells][8] = {{0, 1, 2, 3, 4, 5, 6, 7},
+					 {8, 9, 10, 11, 0, 1, 2, 3},
+					 {9, 13, 14, 10, 1, 5, 6, 2},
+					 {12, 4, 7, 15, 13, 5, 6, 14},
+					 {8, 0, 3, 11, 12, 4, 7, 15},
+					 {11, 10,14, 15, 3, 2, 6, 7},
+					 {8, 9, 13, 12, 0, 1, 5, 4}};
+
+  vector<CellData<3> > cells (n_cells, CellData<3>());
+  
+  for (unsigned int i=0; i<n_cells; ++i) 
+    {
+      for (unsigned int j=0; j<GeometryInfo<3>::vertices_per_cell; ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
+    };
+  
+  create_triangulation (vector<Point<3> >(&vertices[0], &vertices[n_vertices]),
+			cells,
+			SubCellData());       // no boundary information
+};
+
+
+
+#endif
+
 
 
 
@@ -1033,6 +1719,70 @@ void Triangulation<2>::save_user_flags (vector<bool> &v) const {
 
 
 
+
+#if deal_II_dimension == 3
+
+template <>
+void Triangulation<3>::clear_user_pointers () {
+  line_iterator line = begin_line(),
+		endl = end_line();
+  for (; line!=endl; ++line)
+    line->clear_user_pointer ();
+
+  quad_iterator quad = begin_quad(),
+		endq = end_quad();
+  for (; quad!=endq; ++quad)
+    quad->clear_user_pointer ();
+
+  cell_iterator cell = begin(),
+		endc = end();
+  for (; cell!=endc; ++cell)
+    cell->clear_user_pointer ();
+};
+
+
+
+template <>
+void Triangulation<3>::clear_user_flags () {
+  line_iterator line = begin_line(),
+		endl = end_line();
+  for (; line!=endl; ++line)
+    line->clear_user_flag ();
+
+  quad_iterator quad = begin_quad(),
+		endq = end_quad();
+  for (; quad!=endq; ++quad)
+    quad->clear_user_flag ();
+
+  cell_iterator cell = begin(),
+		endc = end();
+  for (; cell!=endc; ++cell)
+    cell->clear_user_flag ();
+};
+
+
+
+template <>
+void Triangulation<3>::save_user_flags (ostream &out) const {
+  save_user_flags_line (out);
+  save_user_flags_quad (out);
+  save_user_flags_hex (out);
+};
+
+
+
+template <>
+void Triangulation<3>::save_user_flags (vector<bool> &v) const {
+  save_user_flags_line (v);
+  save_user_flags_quad (v);
+  save_user_flags_hex (v);
+};
+
+
+#endif
+
+
+
 template <int dim>
 void Triangulation<dim>::save_user_flags_line (vector<bool> &v) const {
   v.resize (n_lines(), false);
@@ -1067,7 +1817,7 @@ void Triangulation<dim>::load_user_flags_line (istream &in) {
 
 template <int dim>
 void Triangulation<dim>::load_user_flags_line (const vector<bool> &v) {
-  Assert (v.size() == n_active_cells(), ExcGridReadError());
+  Assert (v.size() == n_lines(), ExcGridReadError());
   
   line_iterator line = begin_line(),
 		endl = end_line();
@@ -1104,6 +1854,31 @@ void Triangulation<1>::load_user_flags_quad (istream &) {
 
 template <>
 void Triangulation<1>::load_user_flags_quad (const vector<bool> &) {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+template <>
+void Triangulation<1>::save_user_flags_hex (ostream &) const {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+
+template <>
+void Triangulation<1>::save_user_flags_hex (vector<bool> &) const {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+template <>
+void Triangulation<1>::load_user_flags_hex (istream &) {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+template <>
+void Triangulation<1>::load_user_flags_hex (const vector<bool> &) {
   Assert (false, ExcFunctionNotUseful());
 };
 
@@ -1146,7 +1921,7 @@ void Triangulation<dim>::load_user_flags_quad (istream &in) {
 
 template <int dim>
 void Triangulation<dim>::load_user_flags_quad (const vector<bool> &v) {
-  Assert (v.size() == n_active_cells(), ExcGridReadError());
+  Assert (v.size() == n_quads(), ExcGridReadError());
   
   quad_iterator quad = begin_quad(),
 		endq = end_quad();
@@ -1158,6 +1933,85 @@ void Triangulation<dim>::load_user_flags_quad (const vector<bool> &v) {
       quad->clear_user_flag();
 };
 
+
+
+#if deal_II_dimension == 2
+
+template <>
+void Triangulation<2>::save_user_flags_hex (ostream &) const {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+
+template <>
+void Triangulation<2>::save_user_flags_hex (vector<bool> &) const {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+template <>
+void Triangulation<2>::load_user_flags_hex (istream &) {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+template <>
+void Triangulation<2>::load_user_flags_hex (const vector<bool> &) {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+#endif
+
+
+
+
+template <int dim>
+void Triangulation<dim>::save_user_flags_hex (vector<bool> &v) const {
+  v.resize (n_hexs(), false);
+  vector<bool>::iterator  i = v.begin();
+  hex_iterator hex = begin_hex(),
+	      endh = end_hex();
+  for (; hex!=endh; ++hex, ++i)
+    *i = hex->user_flag_set();
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::save_user_flags_hex (ostream &out) const {
+  vector<bool> v;
+  save_user_flags_hex (v);
+  write_bool_vector (mn_tria_hex_user_flags_begin, v, mn_tria_hex_user_flags_end,
+		     out);
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_flags_hex (istream &in) {
+  vector<bool> v;
+  read_bool_vector (mn_tria_hex_user_flags_begin, v, mn_tria_hex_user_flags_end,
+		    in);
+  load_user_flags_hex (v);
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_flags_hex (const vector<bool> &v) {
+  Assert (v.size() == n_hexs(), ExcGridReadError());
+  
+  hex_iterator hex = begin_hex(),
+	      endh = end_hex();
+  vector<bool>::const_iterator i = v.begin();
+  for (; hex!=endh; ++hex, ++i)
+    if (*i == true)
+      hex->set_user_flag();
+    else
+      hex->clear_user_flag();
+};
 
 
 
@@ -1407,6 +2261,96 @@ Triangulation<1>::last_active_quad () const {
   return 0;
 };
 
+
+
+template <>
+TriaDimensionInfo<1>::raw_hex_iterator
+Triangulation<1>::begin_raw_hex (unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::hex_iterator
+Triangulation<1>::begin_hex (unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::active_hex_iterator
+Triangulation<1>::begin_active_hex (unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::raw_hex_iterator
+Triangulation<1>::end_hex () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::raw_hex_iterator
+Triangulation<1>::last_raw_hex (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::raw_hex_iterator
+Triangulation<1>::last_raw_hex () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::hex_iterator
+Triangulation<1>::last_hex (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::hex_iterator
+Triangulation<1>::last_hex () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::active_hex_iterator
+Triangulation<1>::last_active_hex (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::active_hex_iterator
+Triangulation<1>::last_active_hex () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
 #endif
 
 
@@ -1560,6 +2504,250 @@ Triangulation<2>::last_active_face (const unsigned int level) const {
   return last_active_line (level);
 };
 
+
+template <>
+TriaDimensionInfo<2>::raw_hex_iterator
+Triangulation<2>::begin_raw_hex (unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::hex_iterator
+Triangulation<2>::begin_hex (unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::active_hex_iterator
+Triangulation<2>::begin_active_hex (unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::raw_hex_iterator
+Triangulation<2>::end_hex () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::raw_hex_iterator
+Triangulation<2>::last_raw_hex (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::raw_hex_iterator
+Triangulation<2>::last_raw_hex () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::hex_iterator
+Triangulation<2>::last_hex (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::hex_iterator
+Triangulation<2>::last_hex () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::active_hex_iterator
+Triangulation<2>::last_active_hex (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::active_hex_iterator
+Triangulation<2>::last_active_hex () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+TriaDimensionInfo<3>::raw_cell_iterator
+Triangulation<3>::begin_raw (const unsigned int level) const {
+  return begin_raw_hex (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::active_cell_iterator
+Triangulation<3>::begin_active (const unsigned int level) const {
+  return begin_active_hex (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::raw_cell_iterator
+Triangulation<3>::last_raw () const {
+  return last_raw_hex ();
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::raw_cell_iterator
+Triangulation<3>::last_raw (const unsigned int level) const {
+  return last_raw_hex (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::cell_iterator
+Triangulation<3>::last () const {
+  return last_hex ();
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::cell_iterator
+Triangulation<3>::last (const unsigned int level) const {
+  return last_hex (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::active_cell_iterator
+Triangulation<3>::last_active () const {
+  return last_active_hex ();
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::active_cell_iterator
+Triangulation<3>::last_active (const unsigned int level) const {
+  return last_active_hex (level);
+};
+
+
+
+
+
+
+
+template <>
+TriaDimensionInfo<3>::raw_face_iterator
+Triangulation<3>::begin_raw_face (const unsigned int level) const {
+  return begin_raw_quad (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::face_iterator
+Triangulation<3>::begin_face (const unsigned int level) const {
+  return begin_quad (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::active_face_iterator
+Triangulation<3>::begin_active_face (const unsigned int level) const {
+  return begin_active_quad (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::raw_face_iterator
+Triangulation<3>::end_face () const {
+  return end_quad ();
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::raw_face_iterator
+Triangulation<3>::last_raw_face () const {
+  return last_raw_quad ();
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::raw_face_iterator
+Triangulation<3>::last_raw_face (const unsigned int level) const {
+  return last_raw_quad (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::face_iterator
+Triangulation<3>::last_face () const {
+  return last_quad ();
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::face_iterator
+Triangulation<3>::last_face (const unsigned int level) const {
+  return last_quad (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::active_face_iterator
+Triangulation<3>::last_active_face () const {
+  return last_active_quad ();
+};
+
+
+
+template <>
+TriaDimensionInfo<3>::active_face_iterator
+Triangulation<3>::last_active_face (const unsigned int level) const {
+  return last_active_quad (level);
+};
+
+
+
 #endif
 
 
@@ -1596,6 +2784,21 @@ Triangulation<dim>::begin_raw_quad (unsigned int level) const {
 
 
 
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_hex_iterator
+Triangulation<dim>::begin_raw_hex (unsigned int level) const {
+  Assert (level<levels.size(), ExcInvalidLevel(level));
+
+  if (levels[level]->hexes.hexes.size() == 0)
+    return end_hex();
+  
+  return raw_hex_iterator (const_cast<Triangulation<dim>*>(this),
+			   level,
+			   0);
+};
+
+
+
 
 template <int dim>
 typename TriaDimensionInfo<dim>::line_iterator
@@ -1618,6 +2821,21 @@ typename TriaDimensionInfo<dim>::quad_iterator
 Triangulation<dim>::begin_quad (unsigned int level) const {
   				   // level is checked in begin_raw
   raw_quad_iterator ri = begin_raw_quad (level);
+  if (ri.state() != valid)
+    return ri;
+  while (ri->used() == false)
+    if ((++ri).state() != valid)
+      return ri;
+  return ri;
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::hex_iterator
+Triangulation<dim>::begin_hex (unsigned int level) const {
+  				   // level is checked in begin_raw
+  raw_hex_iterator ri = begin_raw_hex (level);
   if (ri.state() != valid)
     return ri;
   while (ri->used() == false)
@@ -1658,6 +2876,22 @@ Triangulation<dim>::begin_active_quad (unsigned int level) const {
 };
 
 
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_hex_iterator
+Triangulation<dim>::begin_active_hex (unsigned int level) const {
+  				   // level is checked in begin_raw
+  hex_iterator i = begin_hex (level);
+  if (i.state() != valid)
+    return i;
+  while (i->has_children())
+    if ((++i).state() != valid)
+      return i;
+  return i;
+};
+
+
+
 template <int dim>
 typename TriaDimensionInfo<dim>::raw_line_iterator
 Triangulation<dim>::end_line () const {
@@ -1680,6 +2914,16 @@ Triangulation<dim>::end_quad () const {
 
 
 template <int dim>
+typename TriaDimensionInfo<dim>::raw_hex_iterator
+Triangulation<dim>::end_hex () const {
+  return raw_hex_iterator (const_cast<Triangulation<dim>*>(this),
+			   -1,
+			   -1);
+};
+
+
+
+template <int dim>
 typename TriaDimensionInfo<dim>::raw_line_iterator
 Triangulation<dim>::last_raw_line (const unsigned int level) const {
   Assert (level<levels.size(), ExcInvalidLevel(level));
@@ -1690,8 +2934,6 @@ Triangulation<dim>::last_raw_line (const unsigned int level) const {
 			    level,
 			    levels[level]->lines.lines.size()-1);
 };
-
-
 
 
 
@@ -1706,6 +2948,21 @@ Triangulation<dim>::last_raw_quad (const unsigned int level) const {
   return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
 			    level,
 			    levels[level]->quads.quads.size()-1);
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_hex_iterator
+Triangulation<dim>::last_raw_hex (const unsigned int level) const {
+  Assert (level<levels.size(),
+	  ExcInvalidLevel(level));
+  Assert (levels[level]->hexes.hexes.size() != 0,
+	  ExcEmptyLevel (level));
+
+  return raw_hex_iterator (const_cast<Triangulation<dim>*>(this),
+			   level,
+			   levels[level]->hexes.hexes.size()-1);
 };
 
 
@@ -1728,6 +2985,14 @@ Triangulation<dim>::last_raw_quad () const {
 
 
 template <int dim>
+typename TriaDimensionInfo<dim>::raw_hex_iterator
+Triangulation<dim>::last_raw_hex () const {
+  return last_raw_hex (levels.size()-1);
+};
+
+
+
+template <int dim>
 typename TriaDimensionInfo<dim>::line_iterator
 Triangulation<dim>::last_line (const unsigned int level) const {
   				   // level is checked in begin_raw
@@ -1742,12 +3007,26 @@ Triangulation<dim>::last_line (const unsigned int level) const {
 
 
 
-
 template <int dim>
 typename TriaDimensionInfo<dim>::quad_iterator
 Triangulation<dim>::last_quad (const unsigned int level) const {
   				   // level is checked in begin_raw
   raw_quad_iterator ri = last_raw_quad(level);
+  if (ri->used()==true)
+    return ri;
+  while ((--ri).state() == valid)
+    if (ri->used()==true)
+      return ri;
+  return ri;
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::hex_iterator
+Triangulation<dim>::last_hex (const unsigned int level) const {
+  				   // level is checked in begin_raw
+  raw_hex_iterator ri = last_raw_hex(level);
   if (ri->used()==true)
     return ri;
   while ((--ri).state() == valid)
@@ -1770,6 +3049,14 @@ template <int dim>
 typename TriaDimensionInfo<dim>::quad_iterator
 Triangulation<dim>::last_quad () const {
   return last_quad (levels.size()-1);
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::hex_iterator
+Triangulation<dim>::last_hex () const {
+  return last_hex (levels.size()-1);
 };
 
 
@@ -1805,6 +3092,21 @@ Triangulation<dim>::last_active_quad (const unsigned int level) const {
 
 
 
+template <int dim>
+typename TriaDimensionInfo<dim>::active_hex_iterator
+Triangulation<dim>::last_active_hex (const unsigned int level) const {
+				   // level is checked in begin_raw
+  hex_iterator i = last_hex(level);
+  if (i->has_children()==false)
+    return i;
+  while ((--i).state() == valid)
+    if (i->has_children()==false)
+      return i;
+  return i;
+};
+
+
+
 
 template <int dim>
 typename TriaDimensionInfo<dim>::active_line_iterator
@@ -1819,6 +3121,14 @@ template <int dim>
 typename TriaDimensionInfo<dim>::active_quad_iterator
 Triangulation<dim>::last_active_quad () const {
   return last_active_quad (levels.size()-1);
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_hex_iterator
+Triangulation<dim>::last_active_hex () const {
+  return last_active_hex (levels.size()-1);
 };
 
 
@@ -1947,6 +3257,36 @@ Triangulation<dim>::end_active_quad (const unsigned int level) const {
 
 
 
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_hex_iterator
+Triangulation<dim>::end_raw_hex (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  end_hex() :
+	  begin_raw_hex (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::hex_iterator
+Triangulation<dim>::end_hex (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  hex_iterator(end_hex()) :
+	  begin_hex (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_hex_iterator
+Triangulation<dim>::end_active_hex (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  active_hex_iterator(end_hex()) :
+	  begin_active_hex (level+1));
+};
+
+
+
 
 
 template <int dim>
@@ -1998,6 +3338,24 @@ unsigned int Triangulation<2>::n_cells (const unsigned int level) const {
 template <>
 unsigned int Triangulation<2>::n_active_cells (const unsigned int level) const {
   return n_active_quads (level);
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+unsigned int Triangulation<3>::n_cells (const unsigned int level) const {
+  return n_hexs (level);
+};
+
+
+
+template <>
+unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const {
+  return n_active_hexs (level);
 };
 
 #endif
@@ -2063,16 +3421,6 @@ unsigned int Triangulation<dim>::n_active_lines (const unsigned int level) const
 
 
 
-template <int dim>
-unsigned int Triangulation<dim>::n_quads () const {
-  unsigned int n=0;
-  for (unsigned int l=0; l<levels.size(); ++l)
-    n += n_quads (l);
-  return n;
-};
-
-
-
 #if deal_II_dimension == 1
 
 template <>
@@ -2094,6 +3442,16 @@ unsigned int Triangulation<1>::n_active_quads (const unsigned int) const {
 
 
 template <int dim>
+unsigned int Triangulation<dim>::n_quads () const {
+  unsigned int n=0;
+  for (unsigned int l=0; l<levels.size(); ++l)
+    n += n_quads (l);
+  return n;
+};
+
+
+
+template <int dim>
 unsigned int Triangulation<dim>::n_quads (const unsigned int level) const {
   if (levels[level]->quads.quads.size() == 0)
     return 0;
@@ -2103,7 +3461,7 @@ unsigned int Triangulation<dim>::n_quads (const unsigned int level) const {
   quad_iterator quad = begin_quad (level),
 		endc = (level == levels.size()-1 ?
 			quad_iterator(end_quad()) :
-			begin (level+1));
+			begin_quad (level+1));
   unsigned int n=0;
   for (; quad!=endc; ++quad)
     ++n;
@@ -2135,6 +3493,101 @@ unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const
 			       begin_active_quad (level+1));
   unsigned int n=0;
   for (; quad!=endc; ++quad)
+    ++n;
+  return n;
+};
+
+
+
+#if deal_II_dimension < 3
+
+template <>
+unsigned int Triangulation<1>::n_hexs (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+unsigned int Triangulation<1>::n_active_hexs (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+unsigned int Triangulation<2>::n_hexs (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <>
+unsigned int Triangulation<2>::n_active_hexs (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+#endif
+
+
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_hexs () const {
+  unsigned int n=0;
+  for (unsigned int l=0; l<levels.size(); ++l)
+    n += n_hexs (l);
+  return n;
+};
+
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_hexs (const unsigned int level) const {
+  if (levels[level]->hexes.hexes.size() == 0)
+    return 0;
+
+				   // only evaluate begin_/end_hex if there
+				   // are hexs.
+  hex_iterator hex = begin_hex (level),
+	      endc = (level == levels.size()-1 ?
+		      hex_iterator(end_hex()) :
+		      begin_hex (level+1));
+  unsigned int n=0;
+  for (; hex!=endc; ++hex)
+    ++n;
+  return n;
+};
+
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_active_hexs () const {
+  unsigned int n=0;
+  for (unsigned int l=0; l<levels.size(); ++l)
+    n += n_active_hexs (l);
+  return n;
+};
+
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_active_hexs (const unsigned int level) const {
+  if (levels[level]->hexes.hexes.size() == 0)
+    return 0;
+
+				   // only evaluate begin_/end_hex if there
+				   // are hexs.
+  active_hex_iterator hex = begin_active_hex (level),
+		     endc = (level == levels.size()-1 ?
+			     active_hex_iterator(end_hex()) :
+			     begin_active_hex (level+1));
+  unsigned int n=0;
+  for (; hex!=endc; ++hex)
     ++n;
   return n;
 };
@@ -2273,6 +3726,49 @@ void Triangulation<2>::print_gnuplot (ostream &out,
 };
 
 #endif
+
+
+#if deal_II_dimension == 3
+
+template <>
+void Triangulation<3>::print_gnuplot (ostream &out,
+				      const active_cell_iterator & cell) const {
+  AssertThrow (out, ExcIO());
+
+				   // front face
+  out << cell->vertex(0) << " " << cell->level() << endl
+      << cell->vertex(1) << " " << cell->level() << endl
+      << cell->vertex(2) << " " << cell->level() << endl
+      << cell->vertex(3) << " " << cell->level() << endl
+      << cell->vertex(0) << " " << cell->level() << endl
+      << endl;
+				   // back face
+  out << cell->vertex(4) << " " << cell->level() << endl
+      << cell->vertex(5) << " " << cell->level() << endl
+      << cell->vertex(6) << " " << cell->level() << endl
+      << cell->vertex(7) << " " << cell->level() << endl
+      << cell->vertex(4) << " " << cell->level() << endl
+      << endl;
+
+				   // now for the four connecting lines
+  out << cell->vertex(0) << " " << cell->level() << endl
+      << cell->vertex(4) << " " << cell->level() << endl
+      << endl;
+  out << cell->vertex(1) << " " << cell->level() << endl
+      << cell->vertex(5) << " " << cell->level() << endl
+      << endl;
+  out << cell->vertex(2) << " " << cell->level() << endl
+      << cell->vertex(6) << " " << cell->level() << endl
+      << endl;
+  out << cell->vertex(3) << " " << cell->level() << endl
+      << cell->vertex(7) << " " << cell->level() << endl
+      << endl;
+
+  AssertThrow (out, ExcIO());
+};
+
+#endif
+
 
 
 
@@ -2712,9 +4208,9 @@ void Triangulation<2>::execute_refinement () {
 	    
 					     // for all neighbors of
 					     // this cell
-	    for (unsigned int nb=0; nb<4; ++nb) 
+	    for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb) 
 	      {
-		cell_iterator neighbor = acell->neighbor(nb);
+		const cell_iterator neighbor = acell->neighbor(nb);
 						 // if cell is at boundary
 		if (neighbor.state() != valid) 
 		  {
@@ -2799,7 +4295,7 @@ void Triangulation<2>::execute_refinement () {
       levels[level+1]->
 	TriangulationLevel<1>::reserve_space (needed_lines);
       				       // reserve space for 4*flagged_cells
-				       // new lines on the next higher
+				       // new quads on the next higher
 				       // level
       levels[level+1]->
 	TriangulationLevel<2>::reserve_space (4*flagged_cells);
@@ -3264,6 +4760,1223 @@ void Triangulation<2>::execute_refinement () {
 
 
 
+#if deal_II_dimension == 3
+
+template <>
+void Triangulation<3>::execute_refinement () {
+  const unsigned int dim = 3;
+
+				   // do some grid smoothing
+  prepare_refinement ();
+  
+				   // check whether a new level is needed
+				   // we have to check for this on the
+				   // highest level only (on this, all
+				   // used cells are also active, so we
+				   // only have to check for this)
+  if (true)
+    {
+      raw_cell_iterator cell = begin_active (levels.size()-1),
+			endc = end();
+      for (; cell != endc; ++cell)
+	if (cell->used())
+	  if (cell->refine_flag_set()) 
+	    {
+	      levels.push_back (new TriangulationLevel<dim>);
+	      break;
+	    };
+    };
+
+
+				   // first clear user flags for
+				   // quads and lines; we're gonna
+				   // use them to flag which lines
+				   // and quads need refinement
+  for (line_iterator line=begin_line(); line!=end_line(); ++line)
+    line->clear_user_flag();
+  for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+    quad->clear_user_flag();
+  
+
+
+				   // check how much space is needed
+				   // on every level
+				   // we need not check the highest
+				   // level since either
+				   // - on the highest level no cells
+				   //   are flagged for refinement
+				   // - there are, but prepare_refinement
+				   //   added another empty level which
+				   //   then is the highest level
+  unsigned int needed_vertices = 0;
+  for (int level=levels.size()-2; level>=0; --level)
+    {
+      				       // count number of flagged cells on
+				       // this level and compute how many
+				       // new vertices and new lines will
+				       // be needed
+      unsigned int flagged_cells = 0;
+      unsigned int needed_lines  = 0;
+      unsigned int needed_quads  = 0;
+      
+      active_cell_iterator acell = begin_active(level),
+			   aendc = begin_active(level+1);
+      for (; acell!=aendc; ++acell) 
+	if (acell->refine_flag_set()) 
+	  {
+	    ++flagged_cells;
+
+					     // new vertex at center of cell
+					     // is needed in any case
+	    ++needed_vertices;
+					     //	also the six inner lines
+	    needed_lines += 6;
+					     // and the 12 inner quads
+	    needed_quads += 12;
+	    
+					     // mark all faces and lines for
+					     // refinement; checking locally
+					     // whether the neighbor would
+					     // also like to refine them is
+					     // rather difficult for lines
+					     // so we only flag them and after
+					     // visiting all cells, we decide
+					     // which lines need refinement;
+					     // same for the quads
+	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
+		 ++face)
+	      {
+		face_iterator aface = acell->face(face);
+		
+		if (aface->has_children() == false) 
+		  {
+		    aface->set_user_flag ();
+		    for (unsigned int line=0; line<4; ++line)
+		      if (aface->line(line)->has_children() == false)
+			aface->line(line)->set_user_flag ();
+		  };
+	      };
+	  };
+
+				       // now count the quads and lines which
+				       // were flagged for refinement
+      for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+	if (quad->user_flag_set())
+	  {
+	    Assert (quad->has_children() == false, ExcInternalError());
+	    needed_quads    += 4;
+	    needed_lines    += 4;
+	    needed_vertices += 1;
+	  };
+
+      for (line_iterator line=begin_line(); line!=end_line(); ++line)
+	if (line->user_flag_set())
+	  {
+	    Assert (line->has_children() == false, ExcInternalError());
+	    needed_lines += 2;
+	    needed_vertices += 1;
+	  };
+      
+      
+      				       // count number of used cells on
+				       // the next higher level
+      const unsigned int used_cells
+	= count_if (levels[level+1]->quads.used.begin(),
+		levels[level+1]->quads.used.end(),
+		bind2nd (equal_to<bool>(), true));
+      
+      
+				       // reserve space for the used_cells
+				       // cells already existing on the next
+				       // higher level as well as for the
+				       // 8*flagged_cells that will be created
+				       // on that level
+      levels[level+1]->
+	TriangulationLevel<0>::reserve_space (used_cells+8*flagged_cells, 3);
+				       // reserve space for needed_lines
+				       // new lines
+      levels[level+1]->
+	TriangulationLevel<1>::reserve_space (needed_lines);
+				       // reserve space for needed_quads
+				       // new quads
+      levels[level+1]->
+	TriangulationLevel<2>::reserve_space (needed_quads);
+      				       // reserve space for 8*flagged_cells
+				       // new hexes on the next higher
+				       // level
+      levels[level+1]->
+	TriangulationLevel<3>::reserve_space (8*flagged_cells);
+    };
+
+				   // add to needed vertices how
+				   // many vertices are already in use
+  needed_vertices += count_if (vertices_used.begin(), vertices_used.end(),
+			       bind2nd (equal_to<bool>(), true));
+				   // if we need more vertices: create them,
+				   // if not: leave the array as is, since
+				   // shrinking is not really possible because
+				   // some of the vertices at the end may be
+				   // in use
+  if (needed_vertices > vertices.size())
+    {
+      vertices.resize (needed_vertices, Point<dim>());
+      vertices_used.resize (needed_vertices, false);
+    };
+
+
+				   ///////////////////////////////////////////
+				   // Do refinement on every level
+				   //
+				   // To make life a bit easier, we first
+				   // refine those lines and quads that were
+				   // flagged for refinement and then compose
+				   // the newly to be created cells.
+				   //
+				   //  index of next unused vertex
+  unsigned int next_unused_vertex = 0;
+
+				   // first for lines
+  for (unsigned int level=0; level!=levels.size()-1; ++level)
+    {
+				       // only active objects can be refined
+				       // further; remember that we won't
+				       // operate on the finest level, so
+				       // begin_*(level+1) is allowed
+      active_line_iterator line = begin_active_line(level),
+			   endl = begin_active_line(level+1);
+      raw_line_iterator next_unused_line = begin_raw_line (level+1);
+
+      for (; line!=endl; ++line)
+	if (line->user_flag_set())
+	  {
+					     // this line needs to be refined
+
+					     // find the next unused vertex
+					     // and set it appropriately
+	    while (vertices_used[next_unused_vertex] == true)
+	      ++next_unused_vertex;
+	    Assert (next_unused_vertex < vertices.size(),
+		    ExcTooFewVerticesAllocated());
+	    vertices_used[next_unused_vertex] = true;
+
+	    if (line->at_boundary()) 
+	      {
+		const Boundary<dim>::PointArray surrounding_points
+		  = { &line->vertex(0),
+		      &line->vertex(0),
+		      &line->vertex(1),
+		      &line->vertex(1) 
+		  };
+		vertices[next_unused_vertex]
+		  = boundary->in_between (surrounding_points);
+	      }
+	    else
+	      vertices[next_unused_vertex]
+		= (line->vertex(0) + line->vertex(1)) / 2;
+	  
+					     // now that we created the right
+					     // point, make up the two child
+					     // lines
+					     // (++ takes care of the end of
+					     // the vector)
+	    while (next_unused_line->used() == true)
+	      ++next_unused_line;
+					     // there should always be two
+					     // consecutive unused lines, such
+					     // that the children of a line
+					     // will be consecutive.
+					     // then set the child pointer of
+					     // the present line
+	    line->set_children (next_unused_line->index());
+	  
+					     // set the two new lines
+	    raw_line_iterator children[2] = { next_unused_line,
+					      ++next_unused_line };
+					     // some tests; if any of the
+					     // iterators should be invalid,
+					     // then already dereferencing
+					     // will fail
+	    Assert (children[0]->used() == false, ExcCellShouldBeUnused());
+	    Assert (children[1]->used() == false, ExcCellShouldBeUnused());
+	  
+	    children[0]->set (Line(line->vertex_index(0),
+				   next_unused_vertex));
+	    children[1]->set (Line(next_unused_vertex,
+				   line->vertex_index(1)));
+    
+	    children[0]->set_used_flag();
+	    children[1]->set_used_flag();
+	    children[0]->clear_children();
+	    children[1]->clear_children();
+	    children[0]->clear_user_pointer();
+	    children[1]->clear_user_pointer();
+	    children[0]->clear_user_flag();
+	    children[1]->clear_user_flag();
+
+	    children[0]->set_boundary_indicator (line->boundary_indicator());
+	    children[1]->set_boundary_indicator (line->boundary_indicator());
+	    
+					     // finally clear flag indicating
+					     // the need for refinement
+	    line->clear_user_flag ();
+	  };
+    };
+
+
+				   ///////////////////////////////////////
+				   // now refine marked quads
+  for (unsigned int level=0; level!=levels.size()-1; ++level)
+    {
+				       // only active objects can be refined
+				       // further; remember that we won't
+				       // operate on the finest level, so
+				       // begin_*(level+1) is allowed
+      active_quad_iterator quad = begin_active_quad(level),
+			   endq = begin_active_quad(level+1);
+      raw_line_iterator next_unused_line = begin_raw_line (level+1);
+      raw_quad_iterator next_unused_quad = begin_raw_quad (level+1);
+
+      for (; quad!=endq; ++quad)
+	if (quad->user_flag_set())
+	  {
+					     // this quad needs to be refined
+
+					     // find the next unused vertex
+					     // and set it appropriately
+	    while (vertices_used[next_unused_vertex] == true)
+	      ++next_unused_vertex;
+	    Assert (next_unused_vertex < vertices.size(),
+		    ExcTooFewVerticesAllocated());
+	    vertices_used[next_unused_vertex] = true;
+	    
+	    if (quad->at_boundary()) 
+	      {
+		const Boundary<dim>::PointArray surrounding_points
+		  = { &quad->vertex(0),
+		      &quad->vertex(1),
+		      &quad->vertex(2),
+		      &quad->vertex(3) 
+		  };
+		vertices[next_unused_vertex]
+		  = boundary->in_between (surrounding_points);
+	      }
+	    else
+	      vertices[next_unused_vertex]
+		= (quad->vertex(0) + quad->vertex(1) +
+		   quad->vertex(2) + quad->vertex(3)) / 4;
+	  
+					     // now that we created the right
+					     // point, make up the four
+					     // lines interior to the quad
+					     // (++ takes care of the end of
+					     // the vector)
+	    raw_line_iterator new_lines[4];
+
+	    for (unsigned int i=0; i<4; ++i)
+	      {
+		while (next_unused_line->used() == true)
+		  ++next_unused_line;
+		new_lines[i] = next_unused_line;
+		++next_unused_line;
+
+		Assert (new_lines[i]->used() == false, ExcCellShouldBeUnused());
+	      };
+
+					     // set the data of the four lines.
+					     // first collect the indices of
+					     // the five vertices:
+					     // *--2--*
+					     // |  |  |
+					     // 3--4--1
+					     // |  |  |
+					     // *--0--*
+					     // the lines are numbered as follows:
+					     // *--*--*
+					     // |  2  |
+					     // *3-*-1*
+					     // |  0  |
+					     // *--*--*
+	    const unsigned int vertex_indices[5]
+	      = { quad->line(0)->child(0)->vertex_index(1),
+		  quad->line(1)->child(0)->vertex_index(1),
+		  quad->line(2)->child(0)->vertex_index(1),
+		  quad->line(3)->child(0)->vertex_index(1),
+		  next_unused_vertex 
+	      };
+	    
+	    new_lines[0]->set (Line(vertex_indices[0], vertex_indices[4]));
+	    new_lines[1]->set (Line(vertex_indices[4], vertex_indices[1]));
+	    new_lines[2]->set (Line(vertex_indices[4], vertex_indices[2]));
+	    new_lines[3]->set (Line(vertex_indices[3], vertex_indices[4]));
+
+	    for (unsigned int i=0; i<4; ++i)
+	      {
+		new_lines[i]->set_used_flag();
+		new_lines[i]->clear_user_flag();
+		new_lines[i]->clear_user_pointer();
+		new_lines[i]->clear_children();
+		new_lines[i]->set_boundary_indicator(quad->boundary_indicator());
+	      };
+
+
+
+					     // now for the quads. again, first
+					     // collect some data about the
+					     // indices of the lines, with
+					     // the following numbering:
+					     // *5-*-4*
+					     // 6  10 3
+					     // *11*-9*
+					     // 7  8  2
+					     // *0-*-1*
+	    const unsigned int line_indices[12]
+	      = { quad->line(0)->child(0)->index(),
+		  quad->line(0)->child(1)->index(),
+		  quad->line(1)->child(0)->index(),
+		  quad->line(1)->child(1)->index(),
+		  quad->line(2)->child(1)->index(),
+		  quad->line(2)->child(0)->index(),
+		  quad->line(3)->child(1)->index(),
+		  quad->line(3)->child(0)->index(),
+		  new_lines[0]->index(),
+		  new_lines[1]->index(),
+		  new_lines[2]->index(),
+		  new_lines[3]->index() 
+	      };
+	    
+					     // find some space for the four
+					     // newly to be created quads.
+					     // note that there should
+					     // always be four consecutive
+					     // free slots for them
+	    raw_quad_iterator new_quads[4];
+
+	    while (next_unused_quad->used() == true)
+	      ++next_unused_quad;
+
+	    new_quads[0] = next_unused_quad;
+	    Assert (new_quads[0]->used() == false, ExcCellShouldBeUnused());
+
+	    ++next_unused_quad;
+	    new_quads[1] = next_unused_quad;
+	    Assert (new_quads[1]->used() == false, ExcCellShouldBeUnused());
+
+	    ++next_unused_quad;
+	    new_quads[2] = next_unused_quad;
+	    Assert (new_quads[2]->used() == false, ExcCellShouldBeUnused());
+
+	    ++next_unused_quad;
+	    new_quads[3] = next_unused_quad;
+	    Assert (new_quads[3]->used() == false, ExcCellShouldBeUnused());
+
+					     // note these quads as children
+					     // to the present one
+	    quad->set_children (new_quads[0]->index());
+
+	    new_quads[0]->set (Quad(line_indices[0],
+				    line_indices[8],
+				    line_indices[11],
+				    line_indices[7]));
+	    new_quads[1]->set (Quad(line_indices[1],
+				    line_indices[2],
+				    line_indices[9],
+				    line_indices[8]));
+	    new_quads[2]->set (Quad(line_indices[9],
+				    line_indices[3],
+				    line_indices[4],
+				    line_indices[10]));
+	    new_quads[3]->set (Quad(line_indices[11],
+				    line_indices[10],
+				    line_indices[5],
+				    line_indices[6]));
+	    for (unsigned int i=0; i<4; ++i)
+	      {
+		new_quads[i]->set_used_flag();
+		new_quads[i]->clear_user_flag();
+		new_quads[i]->clear_user_pointer();
+		new_quads[i]->clear_children();
+		new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
+	      };  
+	    
+					     // finally clear flag indicating
+					     // the need for refinement
+	    quad->clear_user_flag ();
+	  };
+    };
+
+
+				   ///////////////////////////////////
+				   // Now, finally, set up the new
+				   // cells
+  for (unsigned int level=0; level!=levels.size()-1; ++level)
+    {
+				       // only active objects can be refined
+				       // further; remember that we won't
+				       // operate on the finest level, so
+				       // begin_*(level+1) is allowed
+      active_hex_iterator hex  = begin_active_hex(level),
+			  endh = begin_active_hex(level+1);
+      raw_line_iterator next_unused_line = begin_raw_line (level+1);
+      raw_quad_iterator next_unused_quad = begin_raw_quad (level+1);
+      raw_hex_iterator  next_unused_hex  = begin_raw_hex (level+1);
+
+      for (; hex!=endh; ++hex)
+	if (hex->refine_flag_set())
+	  {
+					     // this hex needs to be refined
+	    
+					     // clear flag indicating
+					     // the need for refinement. do it
+					     // here already, since we can't
+					     // do it anymore once the cell
+					     // has children
+	    hex->clear_refine_flag ();
+
+					     // find the next unused vertex
+					     // and set it appropriately
+	    while (vertices_used[next_unused_vertex] == true)
+	      ++next_unused_vertex;
+	    Assert (next_unused_vertex < vertices.size(),
+		    ExcTooFewVerticesAllocated());
+	    vertices_used[next_unused_vertex] = true;
+	    
+					     // the new vertex is definitely in
+					     // the interior, so we need not
+					     // worry about the boundary.
+					     // let it be the average of
+					     // the 26 vertices surrounding
+					     // it
+	    vertices[next_unused_vertex] = Point<dim>();
+					     // first add corners of hex
+	    for (unsigned int vertex=0;
+		 vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+	      vertices[next_unused_vertex] += hex->vertex(vertex);
+					     // now add center of lines
+	    for (unsigned int line=0; line<12; ++line)
+	      vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1);
+					     // finally add centers of faces
+	    for (unsigned int face=0;
+		 face<GeometryInfo<dim>::faces_per_cell; ++face)
+	      vertices[next_unused_vertex] += hex->face(face)->child(0)->vertex(2);
+
+					     // compute average
+	    vertices[next_unused_vertex] /= 26;
+	    
+	  
+					     // now that we created the right
+					     // point, make up the six
+					     // lines interior to the quad
+					     // (++ takes care of the end of
+					     // the vector)
+	    raw_line_iterator new_lines[6];
+
+	    for (unsigned int i=0; i<6; ++i)
+	      {
+		while (next_unused_line->used() == true)
+		  ++next_unused_line;
+		new_lines[i] = next_unused_line;
+		++next_unused_line;
+
+		Assert (new_lines[i]->used() == false, ExcCellShouldBeUnused());
+	      };
+
+					     // set the data of the six lines.
+					     // first collect the indices of
+					     // the seven vertices (consider
+					     // the two planes to be crossed
+					     // to form the planes cutting
+					     // the hex in two vertically
+					     // and horizontally)
+					     //     *--2--*   *--5--*
+					     //    /  /  /    |  |  |
+					     //   3--6--1     3--6--1
+					     //  /  /  /      |  |  |
+					     // *--0--*       *--4--*
+					     // the lines are numbered as follows:
+					     //     *--*--*   *--*--*
+					     //    /  2  /    |  5  |
+					     //   *3-*-1*     *3-*-1*
+					     //  /  0  /      |  4  |
+					     // *--*--*       *--*--*
+	    const unsigned int vertex_indices[7]
+	      = { hex->face(0)->child(0)->vertex_index(2),
+		  hex->face(3)->child(0)->vertex_index(2),
+		  hex->face(1)->child(0)->vertex_index(2),
+		  hex->face(5)->child(0)->vertex_index(2),
+		  hex->face(2)->child(0)->vertex_index(2),
+		  hex->face(4)->child(0)->vertex_index(2),
+		  next_unused_vertex 
+	      };
+	    
+	    new_lines[0]->set (Line(vertex_indices[0], vertex_indices[6]));
+	    new_lines[1]->set (Line(vertex_indices[6], vertex_indices[1]));
+	    new_lines[2]->set (Line(vertex_indices[6], vertex_indices[2]));
+	    new_lines[3]->set (Line(vertex_indices[3], vertex_indices[6]));
+	    new_lines[4]->set (Line(vertex_indices[4], vertex_indices[6]));
+	    new_lines[5]->set (Line(vertex_indices[6], vertex_indices[5]));
+
+	    for (unsigned int i=0; i<6; ++i)
+	      {
+		new_lines[i]->set_used_flag();
+		new_lines[i]->clear_user_flag();
+		new_lines[i]->clear_user_pointer();
+		new_lines[i]->clear_children();
+						 // interior line
+		new_lines[i]->set_boundary_indicator(255);
+	      };
+
+
+
+					     // now for the quads. again, first
+					     // collect some data about the
+					     // indices of the lines, with
+					     // the following numbering:
+					     // front plane    *---*---*
+					     //                |   2   |
+					     //                *3--*--1*
+					     //                |   0   |
+					     //                *---*---*
+					     //
+					     // middle plane   *9--*--8*
+					     //                10  14  7 
+					     //                *15-*-13*
+					     //                11  12  6 
+					     //                *4--*--5*
+					     //
+					     // back plane     *---*---*
+					     //                |   18  | 
+					     //                *19-*-17*
+					     //                |   16  | 
+					     //                *---*---*
+					     //
+					     // left plane (the left-to-right
+					     // planes are displayed twice each,
+					     // for better readability of the
+					     // indices; the left part is
+					     // already determined by the
+					     // pictures above)
+					     //                  *            *
+					     //                 /|           /| 
+					     //                * |          * |
+					     //               /| *         /| *
+					     //              *10/|        * |21
+					     //              | * |        | * |
+					     //              |/| *        |20 *
+					     //              *11/         * |/
+					     //              | *          | *
+					     //              |/           |/ 
+					     //              *            *
+					     //
+					     // middle plane
+					     //                  *            *
+					     //                 /|          23| 
+					     //                * 18         * |
+					     //               /| *        22| *
+					     //              *14/16       * |25
+					     //              | * |        | * |
+					     //              2/| *        |24 *
+					     //              *12/         * |27
+					     //              | *          | *
+					     //              0/           |26
+					     //              *            *
+					     //
+					     //
+					     // right plane
+					     //                  *            *
+					     //                 /|           /| 
+					     //                * |          * |
+					     //               /| *         /| *
+					     //              * 6/|        * |29
+					     //              | * |        | * |
+					     //              |/| *        |28 *
+					     //              * 7/         * |/
+					     //              | *          | *
+					     //              |/           |/
+					     //              *            *
+	       
+	    const unsigned int line_indices[30]
+	      = {
+		    hex->face(0)->child(0)->line_index(1),   //0
+		    hex->face(0)->child(1)->line_index(2),   //1
+		    hex->face(0)->child(2)->line_index(3),   //2
+		    hex->face(0)->child(3)->line_index(0),   //3
+
+		    hex->face(2)->child(0)->line_index(2),   //4
+		    hex->face(2)->child(1)->line_index(2),   //5
+		    hex->face(3)->child(0)->line_index(1),   //6
+		    hex->face(3)->child(3)->line_index(1),   //7
+
+		    hex->face(4)->child(1)->line_index(2),   //8
+		    hex->face(4)->child(0)->line_index(2),   //9
+		    hex->face(5)->child(3)->line_index(1),   //10
+		    hex->face(5)->child(0)->line_index(1),   //11
+
+		    new_lines[4]->index(),                   //12
+		    new_lines[1]->index(),                   //13
+		    new_lines[5]->index(),                   //14
+		    new_lines[3]->index(),                   //15
+
+		    hex->face(1)->child(0)->line_index(1),   //16
+		    hex->face(1)->child(1)->line_index(2),   //17
+		    hex->face(1)->child(2)->line_index(3),   //18
+		    hex->face(1)->child(3)->line_index(0),   //19
+
+		    hex->face(5)->child(0)->line_index(2),   //20
+		    hex->face(5)->child(1)->line_index(2),   //21
+		    hex->face(4)->child(0)->line_index(1),   //22
+		    hex->face(4)->child(3)->line_index(1),   //23
+
+		    new_lines[0]->index(),                   //24
+		    new_lines[2]->index(),                   //25
+		    hex->face(2)->child(0)->line_index(1),   //26
+		    hex->face(2)->child(3)->line_index(1),   //27
+
+		    hex->face(3)->child(0)->line_index(2),   //28
+		    hex->face(3)->child(1)->line_index(2)    //29
+	      };
+	    
+					     // find some space for the 12
+					     // newly to be created quads.
+	    raw_quad_iterator new_quads[12];
+
+	    for (unsigned int i=0; i<12; ++i)
+	      {
+		while (next_unused_quad->used() == true)
+		  ++next_unused_quad;
+		new_quads[i] = next_unused_quad;
+		++next_unused_quad;
+
+		Assert (new_quads[i]->used() == false, ExcCellShouldBeUnused());
+	      };
+
+					     // set up the 12 quads, numbered
+					     // as follows (shown are the three
+					     // planes cutting the hex in two):
+					     //
+					     //  *-----*-----*
+					     //  |  3  |  2  |
+					     //  |     |     |
+					     //  *-----*-----*
+					     //  |     |     |
+					     //  |  0  |  1  |
+					     //  *-----*-----*
+					     //
+					     //       *----*----*
+					     //      / 7  / 6  /
+					     //     *----*----*
+					     //    / 4  / 5  /
+					     //   *----*----*
+					     //
+					     //
+					     //             *
+					     //            /|
+					     //           / |
+					     //          *10|
+					     //         /|  *
+					     //        / | /|
+					     //       *  |/ |
+					     //       |11*  |
+					     //       | /| 9*
+					     //       |/ | /
+					     //       *  |/
+					     //       |8 *
+					     //       | /
+					     //       |/
+					     //       *
+	    new_quads[0]->set (Quad(line_indices[4],
+				    line_indices[12],
+				    line_indices[15],
+				    line_indices[11]));
+	    new_quads[1]->set (Quad(line_indices[5],
+				    line_indices[6],
+				    line_indices[13],
+				    line_indices[12]));
+	    new_quads[2]->set (Quad(line_indices[13],
+				    line_indices[7],
+				    line_indices[8],
+				    line_indices[14]));
+	    new_quads[3]->set (Quad(line_indices[15],
+				    line_indices[14],
+				    line_indices[9],
+				    line_indices[10]));
+	    new_quads[4]->set (Quad(line_indices[3],
+				    line_indices[24],
+				    line_indices[15],
+				    line_indices[20]));
+	    new_quads[5]->set (Quad(line_indices[1],
+				    line_indices[28],
+				    line_indices[13],
+				    line_indices[24]));
+	    new_quads[6]->set (Quad(line_indices[13],
+				    line_indices[29],
+				    line_indices[17],
+				    line_indices[25]));
+	    new_quads[7]->set (Quad(line_indices[15],
+				    line_indices[25],
+				    line_indices[19],
+				    line_indices[21]));
+	    new_quads[8]->set (Quad(line_indices[26],
+				    line_indices[12],
+				    line_indices[24],
+				    line_indices[0]));
+	    new_quads[9]->set (Quad(line_indices[27],
+				    line_indices[16],
+				    line_indices[25],
+				    line_indices[12]));
+	    new_quads[10]->set (Quad(line_indices[25],
+				    line_indices[18],
+				    line_indices[23],
+				    line_indices[14]));
+	    new_quads[11]->set (Quad(line_indices[24],
+				    line_indices[14],
+				    line_indices[22],
+				    line_indices[2]));
+	    for (unsigned int i=0; i<12; ++i)
+	      {
+		new_quads[i]->set_used_flag();
+		new_quads[i]->clear_user_flag();
+		new_quads[i]->clear_user_pointer();
+		new_quads[i]->clear_children();
+						 // interior quad
+		new_quads[i]->set_boundary_indicator (255);
+	      };  
+
+
+					     /////////////////////////////////
+					     // create the eight new hexes
+					     //
+					     // again first collect some data.
+					     // here, we need the indices of a
+					     // whole lotta quads. they are
+					     // numbered as follows:
+					     //
+					     // planes in the interior of
+					     // the old hex:
+					     //  *-----*-----*
+					     //  |  3  |  2  |
+					     //  |     |     |
+					     //  *-----*-----*
+					     //  |     |     |
+					     //  |  0  |  1  |
+					     //  *-----*-----*
+					     //
+					     //       *----*----*
+					     //      / 7  / 6  /
+					     //     *----*----*
+					     //    / 4  / 5  /
+					     //   *----*----*
+					     //
+					     //
+					     //             *
+					     //            /|
+					     //           / |
+					     //          *10|
+					     //         /|  *
+					     //        / | /|
+					     //       *  |/ |
+					     //       |11*  |
+					     //       | /| 9*
+					     //       |/ | /
+					     //       *  |/
+					     //       |8 *
+					     //       | /
+					     //       |/
+					     //       *
+					     //
+					     // children of the faces of the
+					     // old hex
+					     //      *-------*        *-------*
+					     //     /|19   18|       /31   30/|
+					     //    34|       |      /       /26
+					     //   /  |       |     /28   29/  |
+					     //  *   |16   17|    *-------*27 |
+					     //  3533*-------*    |15   14| 25*
+					     //  |  /23   22/     |       |  /
+					     //  32/       /      |       |24
+					     //  |/20   21/       |12   13|/
+					     //  *-------*        *-------*
+	    const unsigned int quad_indices[36]
+	      = {
+		    new_quads[0]->index(),     //0
+		    new_quads[1]->index(),
+		    new_quads[2]->index(),
+		    new_quads[3]->index(),
+		    new_quads[4]->index(),
+		    new_quads[5]->index(),
+		    new_quads[6]->index(),
+		    new_quads[7]->index(),
+		    new_quads[8]->index(),
+		    new_quads[9]->index(),
+		    new_quads[10]->index(),
+		    new_quads[11]->index(),    //11
+
+		    hex->face(0)->child_index(0),  //12
+		    hex->face(0)->child_index(1),
+		    hex->face(0)->child_index(2),
+		    hex->face(0)->child_index(3),
+
+		    hex->face(1)->child_index(0),  //16
+		    hex->face(1)->child_index(1),
+		    hex->face(1)->child_index(2),
+		    hex->face(1)->child_index(3),
+
+		    hex->face(2)->child_index(0),  //20
+		    hex->face(2)->child_index(1),
+		    hex->face(2)->child_index(2),
+		    hex->face(2)->child_index(3),
+
+		    hex->face(3)->child_index(0),  //24
+		    hex->face(3)->child_index(1),
+		    hex->face(3)->child_index(2),
+		    hex->face(3)->child_index(3),
+
+		    hex->face(4)->child_index(0),  //28
+		    hex->face(4)->child_index(1),
+		    hex->face(4)->child_index(2),
+		    hex->face(4)->child_index(3),
+
+		    hex->face(5)->child_index(0),  //32
+		    hex->face(5)->child_index(1),
+		    hex->face(5)->child_index(2),
+		    hex->face(5)->child_index(3)
+	      };
+	    
+	    
+					     // find some space for the eight
+					     // newly to be created hexes.
+					     // note that there should
+					     // always be eight consecutive
+					     // free slots for them
+	    raw_hex_iterator new_hexes[8];
+
+	    while (next_unused_hex->used() == true)
+	      ++next_unused_hex;
+
+	    for (unsigned int i=0; i<8; ++i)
+	      {
+		new_hexes[i] = next_unused_hex;
+		Assert (new_hexes[i]->used() == false, ExcCellShouldBeUnused());
+		++next_unused_hex;
+	      };
+
+					     // note these hexes as children
+					     // to the present cell
+	    hex->set_children (new_hexes[0]->index());
+
+					     // front children
+	    new_hexes[0]->set (Hexahedron(quad_indices[12],
+					  quad_indices[0],
+					  quad_indices[20],
+					  quad_indices[8],
+					  quad_indices[4],
+					  quad_indices[32]));
+	    new_hexes[1]->set (Hexahedron(quad_indices[13],
+					  quad_indices[1],
+					  quad_indices[21],
+					  quad_indices[24],
+					  quad_indices[5],
+					  quad_indices[8]));
+	    new_hexes[2]->set (Hexahedron(quad_indices[14],
+					  quad_indices[2],
+					  quad_indices[5],
+					  quad_indices[27],
+					  quad_indices[29],
+					  quad_indices[11]));
+	    new_hexes[3]->set (Hexahedron(quad_indices[15],
+					  quad_indices[3],
+					  quad_indices[4],
+					  quad_indices[11],
+					  quad_indices[28],
+					  quad_indices[35]));
+	    
+					     // back children
+	    new_hexes[4]->set (Hexahedron(quad_indices[0],
+					  quad_indices[16],
+					  quad_indices[23],
+					  quad_indices[9],
+					  quad_indices[7],
+					  quad_indices[33]));
+	    new_hexes[5]->set (Hexahedron(quad_indices[1],
+					  quad_indices[17],
+					  quad_indices[22],
+					  quad_indices[25],
+					  quad_indices[6],
+					  quad_indices[9]));
+	    new_hexes[6]->set (Hexahedron(quad_indices[2],
+					  quad_indices[18],
+					  quad_indices[6],
+					  quad_indices[26],
+					  quad_indices[30],
+					  quad_indices[10]));
+	    new_hexes[7]->set (Hexahedron(quad_indices[3],
+					  quad_indices[19],
+					  quad_indices[7],
+					  quad_indices[10],
+					  quad_indices[31],
+					  quad_indices[34]));
+	    
+	    
+	    for (unsigned int i=0; i<8; ++i)
+	      {
+		new_hexes[i]->set_used_flag();
+		new_hexes[i]->clear_user_flag();
+		new_hexes[i]->clear_user_pointer();
+		new_hexes[i]->clear_children();
+						 // inherit material properties
+		new_hexes[i]->set_material_id (hex->material_id());
+	      };
+
+
+					     /////////////////////////////////
+					     // now the only thing still to be
+					     // done is setting neighborship
+					     // information.
+					     //
+					     // to do so, first collect the
+					     // iterators pointing to
+					     // the 6x4 neighbors of this
+					     // cell.
+					     //
+					     // note that in case the
+					     // neighboring cell is not refined,
+					     // the neighbor iterators point
+					     // to the common moter cell. the
+					     // same applies if there is no
+					     // neighbor: the iterators are
+					     // past the end
+	    cell_iterator neighbor_cells[6][4];
+	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
+		 ++face)
+	      {
+		cell_iterator neighbor = hex->neighbor(face);
+
+						 // if no neighbor
+		if (neighbor.state() != valid)
+		  for (unsigned int child_face=0;
+		       child_face<GeometryInfo<dim>::subfaces_per_face;
+		       ++child_face)
+		    neighbor_cells[face][child_face] = neighbor;
+		
+		else
+						   // neighbor exists
+		  {
+						     // neighbor's level must
+						     // not be higher (else
+						     // something went wrong
+						     // when constructing
+						     // either of the two
+						     // cells) and not
+						     // lower since then
+						     // this cell should not
+						     // have been refined.
+		    Assert (neighbor->level() == hex->level(),
+			    ExcInternalError());
+
+						     // now there are two
+						     // possibilities: either
+						     // the nieghbor has no
+						     // children or it has
+						     // children. these
+						     // must be terminal then.
+		    if (!neighbor->has_children())
+		      for (unsigned int child_face=0;
+			   child_face<GeometryInfo<dim>::subfaces_per_face;
+			   ++child_face)
+			neighbor_cells[face][child_face] = neighbor;
+		    else
+						       // neighbor has
+						       // children; now it's
+						       // getting complicated
+		      {
+							 // first find the face
+							 // of the neighbor
+							 // adjacent to which
+							 // the present cell is
+			unsigned int nb_nb;
+			for (nb_nb=0; nb_nb<GeometryInfo<dim>::faces_per_cell;
+			     ++nb_nb)
+			  if (neighbor->neighbor(nb_nb) == hex)
+			    break;
+			Assert (nb_nb<GeometryInfo<dim>::faces_per_cell,
+				ExcInternalError());
+
+							 // now the four child
+							 // cells of neighbor
+							 // adjacent to the
+							 // present cell can
+							 // be obtained by a
+							 // function of
+							 // GeometryInfo
+			for (unsigned int c=0;
+			     c<GeometryInfo<dim>::subfaces_per_face; ++c)
+			  {
+			    neighbor_cells[face][c]
+			      = neighbor->child(GeometryInfo<dim>::child_cell_on_face(nb_nb, c));
+			    
+			    Assert (neighbor_cells[face][c].state() == valid,
+				    ExcInternalError());
+			    Assert (!neighbor_cells[face][c]->has_children(),
+				    ExcInternalError());
+			  };
+		      };
+		  };
+	      };
+
+					     // now we've got all neighbors, so set
+					     // them in the new cells
+	    new_hexes[0]->set_neighbor (0, neighbor_cells[0][0]);
+	    new_hexes[0]->set_neighbor (1, new_hexes[4]);
+	    new_hexes[0]->set_neighbor (2, neighbor_cells[2][0]);
+	    new_hexes[0]->set_neighbor (3, new_hexes[1]);
+	    new_hexes[0]->set_neighbor (4, new_hexes[3]);
+	    new_hexes[0]->set_neighbor (5, neighbor_cells[5][0]);
+
+	    new_hexes[1]->set_neighbor (0, neighbor_cells[0][1]);
+	    new_hexes[1]->set_neighbor (1, new_hexes[5]);
+	    new_hexes[1]->set_neighbor (2, neighbor_cells[2][1]);
+	    new_hexes[1]->set_neighbor (3, neighbor_cells[3][0]);
+	    new_hexes[1]->set_neighbor (4, new_hexes[2]);
+	    new_hexes[1]->set_neighbor (5, new_hexes[0]);
+
+	    new_hexes[2]->set_neighbor (0, neighbor_cells[0][2]);
+	    new_hexes[2]->set_neighbor (1, new_hexes[6]);
+	    new_hexes[2]->set_neighbor (2, new_hexes[1]);
+	    new_hexes[2]->set_neighbor (3, neighbor_cells[3][3]);
+	    new_hexes[2]->set_neighbor (4, neighbor_cells[4][1]);
+	    new_hexes[2]->set_neighbor (5, new_hexes[3]);
+
+	    new_hexes[3]->set_neighbor (0, neighbor_cells[0][3]);
+	    new_hexes[3]->set_neighbor (1, new_hexes[7]);
+	    new_hexes[3]->set_neighbor (2, new_hexes[0]);
+	    new_hexes[3]->set_neighbor (3, new_hexes[2]);
+	    new_hexes[3]->set_neighbor (4, neighbor_cells[4][0]);
+	    new_hexes[3]->set_neighbor (5, neighbor_cells[5][3]);
+
+	    new_hexes[4]->set_neighbor (0, new_hexes[0]);
+	    new_hexes[4]->set_neighbor (1, neighbor_cells[1][0]);
+	    new_hexes[4]->set_neighbor (2, neighbor_cells[2][3]);
+	    new_hexes[4]->set_neighbor (3, new_hexes[5]);
+	    new_hexes[4]->set_neighbor (4, new_hexes[7]);
+	    new_hexes[4]->set_neighbor (5, neighbor_cells[5][1]);
+
+	    new_hexes[5]->set_neighbor (0, new_hexes[1]);
+	    new_hexes[5]->set_neighbor (1, neighbor_cells[1][1]);
+	    new_hexes[5]->set_neighbor (2, neighbor_cells[2][2]);
+	    new_hexes[5]->set_neighbor (3, neighbor_cells[3][1]);
+	    new_hexes[5]->set_neighbor (4, new_hexes[6]);
+	    new_hexes[5]->set_neighbor (5, new_hexes[4]);
+
+	    new_hexes[6]->set_neighbor (0, new_hexes[2]);
+	    new_hexes[6]->set_neighbor (1, neighbor_cells[1][2]);
+	    new_hexes[6]->set_neighbor (2, new_hexes[5]);
+	    new_hexes[6]->set_neighbor (3, neighbor_cells[3][2]);
+	    new_hexes[6]->set_neighbor (4, neighbor_cells[4][2]);
+	    new_hexes[6]->set_neighbor (5, new_hexes[7]);
+
+	    new_hexes[7]->set_neighbor (0, new_hexes[3]);
+	    new_hexes[7]->set_neighbor (1, neighbor_cells[1][3]);
+	    new_hexes[7]->set_neighbor (2, new_hexes[4]);
+	    new_hexes[7]->set_neighbor (3, new_hexes[6]);
+	    new_hexes[7]->set_neighbor (4, neighbor_cells[4][3]);
+	    new_hexes[7]->set_neighbor (5, neighbor_cells[5][2]);
+
+
+					     // now we need to set the neighbors
+					     // neighborship information; this
+					     // is only necessary if the
+					     // neighboring cell is refined,
+					     // i.e. is on the same level as
+					     // the new children of the
+					     // present cell
+	    for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb)
+	      for (unsigned int subface=0;
+		   subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
+		if ((neighbor_cells[nb][subface].state() == valid) &&
+		    (neighbor_cells[nb][subface]->level() ==
+		     hex->level()+1))
+		  {
+						     // ok, the neighbor is
+						     // a refined one and we
+						     // need to set one of
+						     // the new children as
+						     // its neighbor
+		    cell_iterator neighbor = neighbor_cells[nb][subface];
+
+						     // find which neighbor
+						     // pointer is to be reset;
+						     // this pointer still
+						     // points to the present
+						     // cell
+		    unsigned int face;
+		    for (face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+		      if (neighbor->neighbor(face) == hex)
+			break;
+
+		    Assert (face<GeometryInfo<dim>::faces_per_cell,
+			    ExcInternalError());
+
+						     // now neighbor->neighbor(face)
+						     // needs to be reset. do a
+						     // large switch statement to
+						     // find out which of the
+						     // eight children is next
+						     // to the face/subface we
+						     // are presently at
+		    static const unsigned int child_on_face_and_subface[6][4]
+		      = {  
+			    {0, 1, 2, 3},
+			    {4, 5, 6, 7},
+			    {0, 1, 5, 4},
+			    {1, 5, 6, 2},
+			    {3, 2, 6, 7},
+			    {0, 4, 7, 3}
+		      };
+		    neighbor->set_neighbor(face,
+					   new_hexes[child_on_face_and_subface[nb][subface]]);
+		  };
+
+		    
+	    
+					     // note that the refinement
+					     // flag was already cleared at
+					     // the beginning of this loop
+	  };
+    };
+
+
+#ifdef DEBUG
+  for (unsigned int level=0; level<levels.size(); ++level) 
+    levels[level]->monitor_memory (3);
+
+				   // check whether really all refinement flags
+				   // are reset (also of previously non-active
+				   // cells which we may not have touched. If
+				   // the refinement flag of a non-active cell
+				   // is set, something went wrong since the
+				   // cell-accessors should have caught this)
+  line_iterator line = begin_line(),
+		endl = end_line();
+  while (line != endl)
+    Assert (!(line++)->user_flag_set(), ExcInternalError ());
+
+  quad_iterator quad = begin_quad(),
+		endq = end_quad();
+  while (quad != endq)
+    Assert (!(quad++)->user_flag_set(), ExcInternalError ());
+
+  cell_iterator cell = begin(),
+		endc = end();
+  while (cell != endc)
+    Assert (!(cell++)->refine_flag_set(), ExcInternalError ());
+#endif
+};
+
+
+
+#endif
+
+
+
 
 template <int dim>
 void Triangulation<dim>::execute_coarsening () {
@@ -3352,7 +6065,10 @@ bool Triangulation<dim>::prepare_refinement () {
       do
 	{
 	  mesh_changed_in_this_loop = false;
-      
+
+					   // do some dimension dependent stuff
+	  mesh_changed_in_this_loop |= prepare_refinement_dim_dependent ();
+	  
 					   // store highest level one of the cells
 					   // adjacent to a vertex belongs to; do
 					   // so only if mesh smoothing is
@@ -3481,6 +6197,117 @@ bool Triangulation<dim>::prepare_refinement () {
   return cells_changed;
 };
 
+
+
+template <int dim>
+bool Triangulation<dim>::prepare_refinement_dim_dependent () 
+{
+  return false;
+};
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+bool Triangulation<3>::prepare_refinement_dim_dependent () 
+{
+  const unsigned int dim = 3;
+  
+				   // first clear flags on lines, since
+				   // we need them to determine which
+				   // lines will be refined
+  for (line_iterator line=begin_line(); line!=end_line(); ++line)
+    line->clear_user_flag();
+
+				   // variables to store whether the mesh was
+				   // changed in the present loop and in the
+				   // whole process
+  bool mesh_changed      = false,
+       mesh_changed_once = false;
+
+  do
+    {
+      mesh_changed = false;
+
+				       // flag those lines that will be refined
+      for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
+	if (cell->refine_flag_set())
+	  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+					     // if the line is not yet refined,
+					     // it will be in the process
+	    if (!cell->line(line)->has_children())
+	      cell->line(line)->set_user_flag();
+
+
+				       // now check whether there are cell with
+				       // lines that are more than once refined
+				       // or that will be more than once
+				       // refined. The first thing should never
+				       // be the case, in the second case we
+				       // flag the cell for refinement
+      for (active_cell_iterator cell=last_active(); cell!=end(); --cell)
+	for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+	  if (cell->line(line)->has_children())
+	    {
+					       // if this line is refined, its
+					       // children should not have
+					       // further children
+					       //
+					       // however, if any of the
+					       // children is flagged for
+					       // further refinement, we need
+					       // to refine this cell also
+					       // (at least, if the cell is
+					       // not already flagged)
+	      bool offending_line_found = false;
+	      
+	      for (unsigned int c=0; c<2; ++c)
+		{
+		  Assert (cell->line(line)->child(c)->has_children() == false,
+			  ExcInternalError());
+
+		  if (cell->line(line)->child(c)->user_flag_set () &&
+		      !cell->refine_flag_set())
+		    {
+		      cell->set_refine_flag();
+		      offending_line_found = true;
+
+						       // it may save us several
+						       // loop iterations if we
+						       // flag all lines of
+						       // this cell now (and not
+						       // at the outset of the
+						       // next iteration) for
+						       // refinement
+		      for (unsigned int line=0;
+			   line<GeometryInfo<dim>::lines_per_cell; ++line)
+			if (!cell->line(line)->has_children())
+			  cell->line(line)->set_user_flag();
+		      
+		      break;
+		    };
+		};
+
+	      if (offending_line_found)
+		{
+		  mesh_changed = true;
+		  break;
+		};
+	      
+	    };
+      
+		  
+
+      
+      mesh_changed_once |= mesh_changed;
+    }
+  while (mesh_changed == true);
+
+  return mesh_changed_once;
+};
+
+#endif
 
 
 
@@ -3795,6 +6622,12 @@ void Triangulation<2>::delete_cell (cell_iterator &cell) {
   cell->child(2)->line(0)->clear_user_pointer();
   cell->child(2)->line(3)->clear_user_pointer();
   
+				   // same for user flags
+  cell->child(0)->line(1)->clear_user_flag();
+  cell->child(0)->line(2)->clear_user_flag();
+  cell->child(2)->line(0)->clear_user_flag();
+  cell->child(2)->line(3)->clear_user_flag();
+  
 				   // delete the four interior lines
   cell->child(0)->line(1)->clear_used_flag();
   cell->child(0)->line(2)->clear_used_flag();
@@ -3820,6 +6653,7 @@ void Triangulation<2>::delete_cell (cell_iterator &cell) {
 	     subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
 	  {
 	    cell->face(face)->child(subface)->clear_user_pointer ();
+	    cell->face(face)->child(subface)->clear_user_flag ();
 	    cell->face(face)->child(subface)->clear_used_flag ();
 	  };
 	
@@ -3830,6 +6664,7 @@ void Triangulation<2>::delete_cell (cell_iterator &cell) {
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     {
       cell->child(child)->clear_user_pointer();
+      cell->child(child)->clear_user_flag();
       cell->child(child)->clear_used_flag();
     };
   
@@ -3837,6 +6672,330 @@ void Triangulation<2>::delete_cell (cell_iterator &cell) {
 				   // delete pointer to children
   cell->set_children (-1);
   cell->clear_user_flag();
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+
+template <>
+void Triangulation<3>::delete_cell (cell_iterator &cell) {
+  const unsigned int dim=3;
+				   // first we need to reset the
+				   // neighbor pointers of the neighbors
+				   // of this cell's children to this
+				   // cell. This is different for one
+				   // dimension, since there neighbors
+				   // can have a refinement level
+				   // differing from that of this cell's
+				   // children by more than one level.
+				   // For two or more dimensions, the
+				   // neighbors of the children may only
+				   // be on the same level or on the level
+				   // of this cell (the case that the
+				   // neighbors are more refined than
+				   // the children was eliminated in
+				   // #prepare_coarsening#
+  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+    for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
+      {
+	const cell_iterator neighbor = cell->child(child)->neighbor(n);
+					 // do nothing if at boundary
+	if (neighbor.state() != valid)
+	  continue;
+	
+	Assert ((neighbor->level()==cell->level()) ||
+		(neighbor->level()==cell->level()+1),
+		ExcInternalError());
+	
+					 // if the neighbor's level is the
+					 // same as that of #cell#, then
+					 // it's neighbor pointers points
+					 // to this cell rather than to
+					 // this cell's child. In that
+					 // case we need not do anything.
+					 // If the neighbor is refined
+					 // as often as are the children,
+					 // we need to reset those neigbor
+					 // pointers that point to the
+					 // child of this cell; when
+					 // resetting the neighbor
+					 // pointers of neighbors of one
+					 // of the children, we will also
+					 // reset the neighbor pointers
+					 // other children to the present
+					 // cell, but this does no harm
+					 // since we delete the children
+					 // afterwards anyway
+	if (neighbor->level() == cell->level()+1)
+	  for (unsigned int neighbor_neighbor=0;
+	       neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
+	       ++neighbor_neighbor)
+	    if (neighbor->neighbor(neighbor_neighbor) == cell->child(child))
+	      neighbor->set_neighbor(neighbor_neighbor, cell);
+      };
+
+				   // delete the vertex which will not be
+				   // needed anymore. This vertex is the
+				   // vertex at the heart of this cell,
+				   // which is the sixth of the 
+				   // first child
+  vertices_used[cell->child(0)->vertex_index(6)] = false;
+
+				   ///////////////////////////////////////
+				   // delete interior quads and lines
+				   //
+				   // first set up a list of these
+				   // line's and quad's indices
+  const quad_iterator interior_quads[12]
+    = {  cell->child(0)->face(1),
+	 cell->child(1)->face(1),
+	 cell->child(2)->face(1),
+	 cell->child(3)->face(1),
+
+	 cell->child(0)->face(3),
+	 cell->child(3)->face(3),
+	 cell->child(4)->face(3),
+	 cell->child(7)->face(3),
+
+	 cell->child(0)->face(4),
+	 cell->child(1)->face(4),
+	 cell->child(4)->face(4),
+	 cell->child(5)->face(4) 
+    };
+
+  const line_iterator interior_lines[6]
+    = {  cell->child(0)->line(10),
+	 cell->child(4)->line(10),
+
+	 cell->child(0)->line(6),
+	 cell->child(1)->line(6),
+
+	 cell->child(0)->line(5),
+	 cell->child(3)->line(5) 
+    };
+
+  				   // clear user pointers, to avoid that
+				   // they may appear at unwanted places
+				   // later on...
+				   // same for user flags, then finally
+				   // delete thes quads and lines
+  for (unsigned int q=0; q<12; ++q)
+    {
+      interior_quads[q]->clear_user_pointer();
+      interior_quads[q]->clear_user_flag();
+      interior_quads[q]->clear_used_flag();
+    };
+
+  for (unsigned int l=0; l<6; ++l)
+    {
+      interior_lines[l]->clear_user_pointer();
+      interior_lines[l]->clear_user_flag();
+      interior_lines[l]->clear_used_flag();
+    };
+
+				   // for the six faces: if the neighbor
+				   // does not itself need the subfaces,
+				   // delete them. note that since dim>1
+				   // the level of a neighbor is either
+				   // one less or the same as that of
+				   // cell
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face) 
+    if ((cell->neighbor(face).state() != valid) ||
+	(cell->neighbor(face)->level() == cell->level()-1) ||
+	((cell->neighbor(face)->level() == cell->level()) &&
+	 !cell->neighbor(face)->has_children()))
+      {
+	quad_iterator quad = cell->face(face);
+	
+					 // delete middle vertex
+	vertices_used[quad->child(0)->vertex_index(2)] = false;
+
+	const line_iterator interior_lines[4]
+	  = { quad->child(0)->line(1),
+	      quad->child(0)->line(2),
+	      quad->child(2)->line(0),
+	      quad->child(2)->line(3) 
+	  };
+
+					 // delete interior lines
+	for (unsigned int l=0; l<4; ++l)
+	  {
+	    interior_lines[l]->clear_user_pointer ();
+	    interior_lines[l]->clear_user_flag ();
+	    interior_lines[l]->clear_used_flag ();
+	  };
+	
+					 // delete the four subfaces
+	for (unsigned int subface=0;
+	     subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
+	  {
+	    quad->child(subface)->clear_user_pointer ();
+	    quad->child(subface)->clear_user_flag ();
+	    quad->child(subface)->clear_used_flag ();
+	  };
+	
+	quad->clear_children();
+      };
+
+				   // invalidate children
+  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+    {
+      cell->child(child)->clear_user_pointer();
+      cell->child(child)->clear_user_flag();
+      cell->child(child)->clear_used_flag();
+    };
+  
+  
+				   // delete pointer to children
+  cell->clear_children ();
+  cell->clear_user_flag();
+
+				   // now there still are the 12 lines of
+				   // this hex which are refined and which
+				   // may need coarsening. however, it is not
+				   // so easy to decide whether they are still
+				   // needed, since it does not suffice to
+				   // ask the neighbors. we also need to ask
+				   // those cells, which are "around the
+				   // corner".
+				   //
+				   // to do so: first set up a list of 12 pairs
+				   // of line_iterators and flags which denote
+				   // whether the line's children are still
+				   // needed
+				   //
+				   // we default to: "is not needed" because in
+				   // this case, if we make an error in the code
+				   // below, some lines will be deleted that in
+				   // fact are needed. this will eventually be
+				   // caught somewhen, because there are many
+				   // checks whether an iterator points to
+				   // something used. the opposite case, that
+				   // we do not delete lines that are no more
+				   // used, is more severe and causes a memory
+				   // leak which is probably impossible to
+				   // find.
+  const pair<line_iterator,bool> line_is_needed_pairs[12]
+    = { make_pair(cell->line(0), false),
+	make_pair(cell->line(1), false),
+	make_pair(cell->line(2), false),
+	make_pair(cell->line(3), false),
+	make_pair(cell->line(4), false),
+	make_pair(cell->line(5), false),
+	make_pair(cell->line(6), false),
+	make_pair(cell->line(7), false),
+	make_pair(cell->line(8), false),
+	make_pair(cell->line(9), false),
+	make_pair(cell->line(0), false),
+	make_pair(cell->line(11), false)  };
+				   // next make a map out of this for simpler
+				   // access to the flag associated with a
+				   // line
+  map<line_iterator,bool> line_is_needed (&line_is_needed_pairs[0],
+					  &line_is_needed_pairs[12]);
+  
+				   // then ask each neighbor and their neighbors
+  for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb) 
+    {
+      const cell_iterator neighbor = cell->neighbor(nb);
+					 // do nothing if at boundary
+      if (neighbor.state() != valid)
+	continue;
+
+      Assert (neighbor->level() == cell->level(),
+	      ExcInternalError());
+
+				       // if the neighbor itself has
+				       // children, then the four lines
+				       // of the common face are definitely
+				       // needed
+      if (neighbor->has_children())
+	{
+	  for (unsigned int i=0; i<4; ++i)
+	    {
+	      Assert (line_is_needed.find(cell->face(nb)->line(i))
+		      != line_is_needed.end(),
+		      ExcInternalError());
+	      
+	      line_is_needed[cell->face(nb)->line(i)] = true;
+	    };
+					   // ok for this neighbor
+	  break;
+	};
+
+				       // if the neighbor is not refined,
+				       // then it may still be that one of
+				       // his neighbors may need one of our
+				       // lines. the present cell is also
+				       // one of his neighbors, but this one
+				       // is not any more refined
+      for (unsigned int nb_nb=0; nb_nb<GeometryInfo<dim>::faces_per_cell;
+	   ++nb_nb)
+	{
+	  const cell_iterator neighbor_neighbor = neighbor->neighbor(nb_nb);
+					   // do nothing if at boundary
+	  if (neighbor_neighbor.state() != valid)
+	    continue;
+
+	  Assert ((neighbor_neighbor->level() == cell->level()) ||
+		  (neighbor_neighbor->level() == cell->level()-1),
+		  ExcInternalError());
+	  
+					   // also do nothing if the neighbor
+					   // is at a lower level (but then it
+					   // should not be refined)
+	  if (neighbor_neighbor->level() == cell->level()-1)
+	    {
+	      Assert (!neighbor_neighbor->has_children(),
+		      ExcInternalError());
+	      continue;
+	    };
+
+					   // neighbor's neighbor is on
+					   // same level. if it has children,
+					   // then look closer
+	  if (neighbor_neighbor->has_children())
+					     // if any of those cell's lines
+					     // is one of those that we are
+					     // interested in, then flag it
+	    for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+	      {
+		line_iterator line = neighbor_neighbor->line(l);
+
+		if (line_is_needed.find(line) != line_is_needed.end())
+		  line_is_needed[line] = true;
+	      };
+	};
+    };
+
+  Assert (line_is_needed.size()==12, ExcInternalError());
+
+  
+				   // now, if the lines are not marked as
+				   // needed, we may delete their children
+				   // and the midpoint
+  map<line_iterator,bool>::iterator line_and_flag;
+  for (line_and_flag=line_is_needed.begin();
+       line_and_flag!=line_is_needed.end(); ++line_and_flag)
+    if  (line_and_flag->second == false)
+      {
+	line_iterator line = line_and_flag->first;
+
+	vertices_used[line->child(0)->vertex_index(1)] = false;
+
+	for (unsigned int child=0; child<2; ++child)
+	  {
+	    line->child(child)->clear_user_pointer();
+	    line->child(child)->clear_user_flag();
+	    line->child(child)->clear_used_flag();
+	  };
+
+	line->clear_children();
+      };
 };
 
 #endif
@@ -4113,6 +7272,78 @@ void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) c
 	  ExcMemoryInexact (quads.quads.size(), quads.user_pointers.size()));
 
   TriangulationLevel<1>::monitor_memory (true_dimension);
+};
+
+#endif
+
+
+#if deal_II_dimension >= 3
+
+void TriangulationLevel<3>::reserve_space (const unsigned int new_hexes) {
+  const unsigned int new_size = new_hexes +
+				count_if (hexes.used.begin(),
+					  hexes.used.end(),
+					  bind2nd (equal_to<bool>(), true));
+
+				   // see above...
+  if (new_size>hexes.hexes.size())
+    {
+      hexes.hexes.reserve (new_size);
+      hexes.hexes.insert (hexes.hexes.end(), new_size-hexes.hexes.size(), Hexahedron());
+      
+      hexes.used.reserve (new_size);
+      hexes.used.insert (hexes.used.end(), new_size-hexes.used.size(), false);
+  
+      hexes.user_flags.reserve (new_size);
+      hexes.user_flags.insert (hexes.user_flags.end(),
+			       new_size-hexes.user_flags.size(), false);
+  
+      hexes.children.reserve (new_size);
+      hexes.children.insert (hexes.children.end(), new_size-hexes.children.size(),
+			     -1);
+
+      hexes.material_id.reserve (new_size);
+      hexes.material_id.insert (hexes.material_id.end(),
+				new_size-hexes.material_id.size(),
+				255);
+
+      hexes.user_pointers.reserve (new_size);
+      hexes.user_pointers.insert (hexes.user_pointers.end(),
+				  new_size-hexes.user_pointers.size(), 0);
+    };
+};
+
+
+
+void TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) const {
+//  Assert (hexes.hexes.size() == hexes.hexes.capacity() ||
+//	  hexes.hexes.size()<256,
+//	  ExcMemoryWasted ("hexes",
+//			   hexes.hexes.size(), hexes.hexes.capacity()));
+//  Assert (hexes.children.size() == hexes.children.capacity() ||
+//	  hexes.children.size()<256,
+//	  ExcMemoryWasted ("children",
+//			   hexes.children.size(), hexes.children.capacity()));
+//  Assert (hexes.used.size() == hexes.used.capacity() ||
+//	  hexes.used.size()<256,
+//	  ExcMemoryWasted ("used",
+//			   hexes.used.size(), hexes.used.capacity()));
+//  Assert (hexes.user_flags.size() == hexes.user_flags.capacity() ||
+//	  hexes.user_flags.size()<256,
+//	  ExcMemoryWasted ("user_flags",
+//			   hexes.user_flags.size(), hexes.user_flags.capacity()));
+  Assert (hexes.hexes.size() == hexes.used.size(),
+	  ExcMemoryInexact (hexes.hexes.size(), hexes.used.size()));
+  Assert (hexes.hexes.size() == hexes.user_flags.size(),
+	  ExcMemoryInexact (hexes.hexes.size(), hexes.user_flags.size()));
+  Assert (hexes.hexes.size() == hexes.children.size(),
+	  ExcMemoryInexact (hexes.hexes.size(), hexes.children.size()));
+  Assert (hexes.hexes.size() == hexes.material_id.size(),
+	  ExcMemoryInexact (hexes.hexes.size(), hexes.material_id.size()));
+  Assert (hexes.hexes.size() == hexes.user_pointers.size(),
+	  ExcMemoryInexact (hexes.hexes.size(), hexes.user_pointers.size()));
+
+  TriangulationLevel<2>::monitor_memory (true_dimension);
 };
 
 #endif

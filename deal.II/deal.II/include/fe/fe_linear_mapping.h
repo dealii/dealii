@@ -25,11 +25,15 @@ class FELinearMapping : public FiniteElement<dim> {
 				      * Constructor. Simply passes through
 				      * its arguments to the base class. For
 				      * one space dimension, #dofs_per_quad#
+				      * shall be zero; similarly, for one and
+				      * two space dimensions, #dofs_per_hex#
 				      * shall be zero.
 				      */
     FELinearMapping (const unsigned int dofs_per_vertex,
 		     const unsigned int dofs_per_line,
-		     const unsigned int dofs_per_quad=0);
+		     const unsigned int dofs_per_quad=0,
+		     const unsigned int dofs_per_hex =0,
+		     const unsigned int n_components =1);
 
     				     /**
 				      * Return the value of the #i#th shape
@@ -146,6 +150,31 @@ class FELinearMapping : public FiniteElement<dim> {
 				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
 				 const Boundary<dim> &boundary) const;
 
+				     /**
+				      * Compute the jacobian matrices
+				      * of the mapping between unit
+				      * and real cell at the given
+				      * points on the unit cell.
+				      */
+    static void compute_jacobian_matrices (const DoFHandler<dim>::cell_iterator &cell,
+					   const vector<Point<dim> >            &unit_points,
+					   vector<Tensor<2,dim> >               &jacobians);
+
+    				     /**
+				      * Compute the gradients of the jacobian
+				      * matrices of the mapping between unit
+				      * and real cell at the given
+				      * points on the unit cell.
+				      */
+    static void compute_jacobian_gradients (const DoFHandler<dim>::cell_iterator &cell,
+					    const vector<Point<dim> >            &unit_points,
+					    vector<Tensor<3,dim> >               &jacobians);
+
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
 				     /**
 				      * Exception
 				      */

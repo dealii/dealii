@@ -22,7 +22,10 @@
  * with the $j$th corner point, on the unit cell at point $\vec \xi$. The sum
  * over $j$ runs over all corner points.
  *
- * @author Wolfgang Bangerth, 1998
+ * The number of degrees of freedom equal the number of the respective vertex
+ * of the cell
+ *
+ * @author Wolfgang Bangerth, 1998, 1999
  */
 
 template <int dim>
@@ -95,6 +98,15 @@ class FELinear : public FELinearMapping<dim> {
     				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
+				      *
+				      * Please note that as allowed in the
+				      * documentation of the base class,
+				      * this function does not implement
+				      * the setting up of the local mass
+				      * matrix in three space dimensions
+				      * because of too high computational
+				      * costs. The specified exception
+				      * is thrown instead.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
@@ -121,7 +133,82 @@ class FELinear : public FELinearMapping<dim> {
  * A linear (subparametric) mapping from the unit cell
  * to the real cell is implemented.
  *
- * @author Wolfgang Bangerth, 1998
+ * The numbering of the degrees of freedom is as follows:
+ * \begin{itemize}
+ * \item 1D case:
+ *   \begin{verbatim}
+ *      0---2---1
+ *   \end{verbatim}
+ *
+ * \item 2D case:
+ *   \begin{verbatim}
+ *      3---6---2
+ *      |       |
+ *      7   8   5
+ *      |       |
+ *      0---4---1
+ *   \end{verbatim}
+ *
+ * \item 3D case:
+ *   \begin{verbatim}
+ *         7--14---6        7--14---6
+ *        /|       |       /       /|
+ *      19 |       13     19      1813
+ *      /  15      |     /       /  |
+ *     3   |       |    3---10--2   |
+ *     |   4--12---5    |       |   5
+ *     |  /       /     |       9  /
+ *    11 16      17     11      | 17
+ *     |/       /       |       |/
+ *     0---8---1        0---8---1
+ *
+ *         *-------*        *-------*
+ *        /|       |       /       /|
+ *       / |  21   |      /  24   / |
+ *      /  |       |     /       /  |
+ *     *   |       |    *-------*   |
+ *     |25 *-------*    |       |23 *
+ *     |  /       /     |   20  |  /
+ *     | /  22   /      |       | /
+ *     |/       /       |       |/
+ *     *-------*        *-------* 
+ *   \end{verbatim}
+ *   The center vertex has number 26.
+ *
+ *   The respective coordinate values of the support points of the degrees
+ *   of freedom are as follows:
+ *   \begin{itemize}
+ *   \item Index 0: #[0, 0, 0]#;
+ *   \item Index 1: #[1, 0, 0]#;
+ *   \item Index 2: #[1, 0, 1]#;
+ *   \item Index 3: #[0, 0, 1]#;
+ *   \item Index 4: #[0, 1, 0]#;
+ *   \item Index 5: #[1, 1, 0]#;
+ *   \item Index 6: #[1, 1, 1]#;
+ *   \item Index 7: #[0, 1, 1]#;
+ *   \item Index 8: #[1/2, 0, 0]#;
+ *   \item Index 9: #[1, 0, 1/2]#;
+ *   \item Index 10: # [1/2, 0, 1]#;
+ *   \item Index 11: # [0, 0, 1/2]#;
+ *   \item Index 12: # [1/2, 1, 0]#;
+ *   \item Index 13: # [1, 1, 1/2]#;
+ *   \item Index 14: # [1/2, 1, 1]#;
+ *   \item Index 15: # [0, 1, 1/2]#;
+ *   \item Index 16: # [0, 1/2, 0]#;
+ *   \item Index 17: # [1, 1/2, 0]#;
+ *   \item Index 18: # [1, 1/2, 1]#;
+ *   \item Index 19: # [0, 1/2, 1]#;
+ *   \item Index 20: # [1/2, 0, 1/2]#;
+ *   \item Index 21: # [1/2, 1, 1/2]#;
+ *   \item Index 22: # [1/2, 1/2, 0]#;
+ *   \item Index 23: # [1, 1/2, 1/2]#;
+ *   \item Index 24: # [1/2, 1/2, 1]#;
+ *   \item Index 25: # [0, 1/2, 1/2]#;
+ *   \item Index 26: # [1/2, 1/2, 1/2]#; 
+ *   \end{itemize}
+ * \end{itemize}
+ *
+ * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
 class FEQuadraticSub : public FELinearMapping<dim> {
@@ -192,6 +279,15 @@ class FEQuadraticSub : public FELinearMapping<dim> {
     				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
+				      *
+				      * Please note that as allowed in the
+				      * documentation of the base class,
+				      * this function does not implement
+				      * the setting up of the local mass
+				      * matrix in three space dimensions
+				      * because of too high computational
+				      * costs. The specified exception
+				      * is thrown instead.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
@@ -308,6 +404,15 @@ class FECubicSub : public FELinearMapping<dim> {
     				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
+				      *
+				      * Please note that as allowed in the
+				      * documentation of the base class,
+				      * this function does not implement
+				      * the setting up of the local mass
+				      * matrix in three space dimensions
+				      * because of too high computational
+				      * costs. The specified exception
+				      * is thrown instead.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
@@ -424,7 +529,16 @@ class FEQuarticSub : public FELinearMapping<dim> {
 
     				     /**
 				      * Refer to the base class for detailed
-				      * information on this function.
+				      * information on what this function does.
+				      *
+				      * Please note that as allowed in the
+				      * documentation of the base class,
+				      * this function does not implement
+				      * the setting up of the local mass
+				      * matrix in three space dimensions
+				      * because of too high computational
+				      * costs. The specified exception
+				      * is thrown instead.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,

@@ -13,10 +13,12 @@
 template <int dim> class TriaAccessor;
 template <int dim> class LineAccessor;
 template <int dim> class QuadAccessor;
+template <int dim> class HexAccessor;
 template <int dim> class CellAccessor;
 
 template <int dim, class BaseClass> class DoFLineAccessor;
 template <int dim, class BaseClass> class DoFQuadAccessor;
+template <int dim, class BaseClass> class DoFHexAccessor;
 template <int dim> class DoFCellAccessor;
 
 template <int dim> class DoFLevel;
@@ -73,6 +75,10 @@ class DoFDimensionInfo<1> {
     typedef void * quad_iterator;
     typedef void * active_quad_iterator;
 
+    typedef void * raw_hex_iterator;
+    typedef void * hex_iterator;
+    typedef void * active_hex_iterator;
+
     typedef raw_line_iterator    raw_cell_iterator;
     typedef line_iterator        cell_iterator;
     typedef active_line_iterator active_cell_iterator;
@@ -102,6 +108,10 @@ class DoFDimensionInfo<2> {
     typedef TriaIterator<2,DoFCellAccessor<2> >                  quad_iterator;
     typedef TriaActiveIterator<2,DoFCellAccessor<2> >            active_quad_iterator;
 
+    typedef void * raw_hex_iterator;
+    typedef void * hex_iterator;
+    typedef void * active_hex_iterator;
+
     typedef raw_quad_iterator    raw_cell_iterator;
     typedef quad_iterator        cell_iterator;
     typedef active_quad_iterator active_cell_iterator;
@@ -109,6 +119,36 @@ class DoFDimensionInfo<2> {
     typedef raw_line_iterator    raw_face_iterator;
     typedef line_iterator        face_iterator;
     typedef active_line_iterator active_face_iterator;    
+};
+
+
+
+/**
+ * Define some types for the DoF handling in two dimensions.
+ *
+ * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<3>}.
+ */
+class DoFDimensionInfo<3> {
+  public:
+    typedef TriaRawIterator<3,DoFLineAccessor<3,LineAccessor<3> > >    raw_line_iterator;
+    typedef TriaIterator<3,DoFLineAccessor<3,LineAccessor<3> > >       line_iterator;
+    typedef TriaActiveIterator<3,DoFLineAccessor<3,LineAccessor<3> > > active_line_iterator;
+
+    typedef TriaRawIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >    raw_quad_iterator;
+    typedef TriaIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >       quad_iterator;
+    typedef TriaActiveIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > > active_quad_iterator;
+
+    typedef TriaRawIterator<3,DoFCellAccessor<3> >               raw_hex_iterator;
+    typedef TriaIterator<3,DoFCellAccessor<3> >                  hex_iterator;
+    typedef TriaActiveIterator<3,DoFCellAccessor<3> >            active_hex_iterator;
+
+    typedef raw_hex_iterator    raw_cell_iterator;
+    typedef hex_iterator        cell_iterator;
+    typedef active_hex_iterator active_cell_iterator;
+
+    typedef raw_quad_iterator    raw_face_iterator;
+    typedef quad_iterator        face_iterator;
+    typedef active_quad_iterator active_face_iterator;    
 };
 
 
@@ -472,6 +512,10 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     typedef typename DoFDimensionInfo<dim>::raw_quad_iterator raw_quad_iterator;
     typedef typename DoFDimensionInfo<dim>::quad_iterator quad_iterator;
     typedef typename DoFDimensionInfo<dim>::active_quad_iterator active_quad_iterator;
+
+    typedef typename DoFDimensionInfo<dim>::raw_hex_iterator raw_hex_iterator;
+    typedef typename DoFDimensionInfo<dim>::hex_iterator hex_iterator;
+    typedef typename DoFDimensionInfo<dim>::active_hex_iterator active_hex_iterator;
 
     typedef typename DoFDimensionInfo<dim>::raw_cell_iterator raw_cell_iterator;
     typedef typename DoFDimensionInfo<dim>::cell_iterator cell_iterator;
@@ -1269,6 +1313,113 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				     /*---------------------------------------*/
 
 				     /**
+				      *  @name Hex iterator functions*/
+    				     /*@{
+				      */
+    				     /**
+				      *  Return iterator to the first hex, used
+				      *  or not, on level #level#. If a level
+				      *  has no hexs, a past-the-end iterator
+				      *  is returned.
+				      */
+    raw_hex_iterator
+    begin_raw_hex   (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first used hex
+				      *  on level #level#.
+				      */
+    hex_iterator
+    begin_hex       (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first active
+				      *  hex on level #level#.
+				      */
+    active_hex_iterator
+    begin_active_hex(const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator past the end; this
+				      *  iterator serves for comparisons of
+				      *  iterators with past-the-end or
+				      *  before-the-beginning states.
+				      */
+    raw_hex_iterator
+    end_hex () const;
+
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    hex_iterator        end_hex (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_hex_iterator    end_raw_hex (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_hex_iterator end_active_hex (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the
+				      *  last hex, used or not.
+				      */
+    raw_hex_iterator
+    last_raw_hex () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  hex of the level #level#, used or not.
+
+				      */
+    raw_hex_iterator
+    last_raw_hex (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used hex.
+				      */
+    hex_iterator
+    last_hex () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used hex on level #level#.
+				      */
+    hex_iterator
+    last_hex (const unsigned int level) const;
+
+    				     /**
+				      *  Return an iterator pointing to the last
+				      *  active hex.
+				      */
+    active_hex_iterator
+    last_active_hex () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  active hex on level #level#.
+				      */
+    active_hex_iterator
+    last_active_hex (const unsigned int level) const;
+				     /*@}*/
+
+				     /*---------------------------------------*/
+
+
+				     /**
 				      * Return number of degrees of freedom.
 				      * Included in this number are those
 				      * DoFs which are constrained by
@@ -1466,6 +1617,8 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     friend class DoFLineAccessor<dim, CellAccessor<dim> >;
     friend class DoFQuadAccessor<dim, QuadAccessor<dim> >;
     friend class DoFQuadAccessor<dim, CellAccessor<dim> >;
+    friend class DoFHexAccessor<dim, HexAccessor<dim> >;
+    friend class DoFHexAccessor<dim, CellAccessor<dim> >;
 };
 
 

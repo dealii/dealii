@@ -46,6 +46,8 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
   Assert(dim==3, ExcDimensionMismatch(3,dim));
 };
 
+
+
 template <int dim>
 FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_line,
@@ -69,6 +71,8 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 {
   Assert(dim==2, ExcDimensionMismatch(2,dim));
 };
+
+
 
 template <int dim>
 FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
@@ -106,7 +110,7 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 
 
 template<int dim>
-bool FiniteElementData<dim>::operator== (const FiniteElementData<2> &f) const
+bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
 	  (dofs_per_line == f.dofs_per_line) &&
@@ -137,6 +141,10 @@ FiniteElementBase<1>::FiniteElementBase (const FiniteElementData<1> &fe_data) :
   interface_constraints.reinit (1,1);
   interface_constraints(0,0)=1.;
 
+  				   // this is the default way, if there is only
+				   // one component; if there are several, then
+				   // the constructor of the derived class needs
+				   // to fill these arrays
   for (unsigned int j=0 ; j<total_dofs ; ++j)
     {
       system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
@@ -162,7 +170,44 @@ FiniteElementBase<2>::FiniteElementBase (const FiniteElementData<2> &fe_data) :
       prolongation[i].reinit (total_dofs, total_dofs);
     };
   interface_constraints.reinit (dofs_per_vertex+2*dofs_per_line,
-				2*dofs_per_vertex+dofs_per_line);
+				dofs_per_face);
+
+  				   // this is the default way, if there is only
+				   // one component; if there are several, then
+				   // the constructor of the derived class needs
+				   // to fill these arrays
+  for (unsigned int j=0 ; j<total_dofs ; ++j)
+    {
+      system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
+      component_to_system_table[0][j] = j;
+    }
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+FiniteElementBase<3>::FiniteElementBase (const FiniteElementData<3> &fe_data) :
+		FiniteElementData<3> (fe_data),
+		system_to_component_table(total_dofs),
+		component_to_system_table(n_components, vector<unsigned>(total_dofs))
+{
+  const unsigned int dim=3;
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
+    {
+      restriction[i].reinit (total_dofs, total_dofs);
+      prolongation[i].reinit (total_dofs, total_dofs);
+    };
+  interface_constraints.reinit (5*dofs_per_vertex+12*dofs_per_line+4*dofs_per_quad,
+				dofs_per_face);
+
+				   // this is the default way, if there is only
+				   // one component; if there are several, then
+				   // the constructor of the derived class needs
+				   // to fill these arrays
   for (unsigned int j=0 ; j<total_dofs ; ++j)
     {
       system_to_component_table[j] = pair<unsigned,unsigned>(0,j);

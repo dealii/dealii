@@ -8,6 +8,10 @@
 
 #include <base/exceptions.h>
 
+
+template <int dim> class Triangulation;
+
+
 /**
  *   #Quad#s denote the fundamental entities of triangulations in two dimensions
  *   and the boundaries of hexaeders in three dimensions. They are

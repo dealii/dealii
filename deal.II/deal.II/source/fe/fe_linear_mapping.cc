@@ -8,7 +8,7 @@
 #include <grid/dof_accessor.h>
 #include <grid/tria_boundary.h>
 
-
+#include <cmath>
 
 
 
@@ -21,13 +21,16 @@
 template <>
 FELinearMapping<1>::FELinearMapping (const unsigned int dofs_per_vertex,
 				     const unsigned int dofs_per_line,
-				     const unsigned int dofs_per_quad) :
+				     const unsigned int dofs_per_quad,
+				     const unsigned int dofs_per_hex,
+				     const unsigned int n_components) :
 		FiniteElement<1> (FiniteElementData<1> (dofs_per_vertex,
 							dofs_per_line,
 							GeometryInfo<1>::vertices_per_cell,
-							1))
+							n_components))
 {
   Assert (dofs_per_quad==0, ExcInvalidData());
+  Assert (dofs_per_hex==0,  ExcInvalidData());
 };
 
 
@@ -143,13 +146,17 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 template <>
 FELinearMapping<2>::FELinearMapping (const unsigned int dofs_per_vertex,
 				     const unsigned int dofs_per_line,
-				     const unsigned int dofs_per_quad) :
+				     const unsigned int dofs_per_quad,
+				     const unsigned int dofs_per_hex,
+				     const unsigned int n_components) :
 		FiniteElement<2> (FiniteElementData<2> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,
 							GeometryInfo<2>::vertices_per_cell,
-							1))
-{};
+							n_components))
+{
+  Assert (dofs_per_hex == 0, ExcInvalidData());
+};
 
 
 
@@ -302,6 +309,245 @@ void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator 
 				     // vector
     fill (normal_vectors.begin(), normal_vectors.end(),
 	  normal_direction / (-sqrt(normal_direction.square())));
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+FELinearMapping<3>::FELinearMapping (const unsigned int dofs_per_vertex,
+				     const unsigned int dofs_per_line,
+				     const unsigned int dofs_per_quad,
+				     const unsigned int dofs_per_hex,
+				     const unsigned int n_components) :
+		FiniteElement<3> (FiniteElementData<3> (dofs_per_vertex,
+							dofs_per_line,
+							dofs_per_quad,
+							dofs_per_hex,
+							GeometryInfo<3>::vertices_per_cell,
+							n_components))
+{};
+
+
+
+template <>
+inline
+double
+FELinearMapping<3>::shape_value_transform (const unsigned int i,
+					   const Point<3>& p) const
+{
+  Assert((i<8), ExcInvalidIndex(i));
+  switch (i)
+    {
+      case 0: return 1.0-p(0)+(-1.0+p(0))*p(1)+(-1.0+p(0)+(1.0-p(0))*p(1))*p(2);
+      case 1: return p(0)-p(0)*p(1)+(-p(0)+p(0)*p(1))*p(2);
+      case 2: return (p(0)-p(0)*p(1))*p(2);
+      case 3: return (1.0-p(0)+(-1.0+p(0))*p(1))*p(2);
+      case 4: return (1.0-p(0))*p(1)+(-1.0+p(0))*p(1)*p(2);
+      case 5: return p(0)*p(1)-p(0)*p(1)*p(2);
+      case 6: return p(0)*p(1)*p(2);
+      case 7: return (1.0-p(0))*p(1)*p(2);
+    }
+  return 0.;
+};
+
+
+
+template <>
+inline
+Tensor<1,3>
+FELinearMapping<3>::shape_grad_transform (const unsigned int i,
+					  const Point<3>& p) const
+{
+  Assert((i<8), ExcInvalidIndex(i));
+  switch (i)
+    {
+      case 0: return Point<3>(-1.0+p(1)+(1.0-p(1))*p(2),
+			      -1.0+p(0)+(1.0-p(0))*p(2),
+			      -1.0+p(0)+(1.0-p(0))*p(1));
+      case 1: return Point<3>(1.0-p(1)+(-1.0+p(1))*p(2),
+			      -p(0)+p(0)*p(2),
+			      -p(0)+p(0)*p(1));
+      case 2: return Point<3>((1.0-p(1))*p(2),
+			      -p(0)*p(2),
+			      p(0)-p(0)*p(1));
+      case 3: return Point<3>((-1.0+p(1))*p(2),
+			      (-1.0+p(0))*p(2),
+			      1.0-p(0)+(-1.0+p(0))*p(1));
+      case 4: return Point<3>(-p(1)+p(1)*p(2),
+			      1.0-p(0)+(-1.0+p(0))*p(2),
+			      (-1.0+p(0))*p(1));
+      case 5: return Point<3>(p(1)-p(1)*p(2),
+			      p(0)-p(0)*p(2),
+			      -p(0)*p(1));
+      case 6: return Point<3>(p(1)*p(2),
+			      p(0)*p(2),
+			      p(0)*p(1));
+      case 7: return Point<3>(-p(1)*p(2),
+			      (1.0-p(0))*p(2),
+			      (1.0-p(0))*p(1));
+    }
+  return Point<3> ();
+};
+
+
+
+template <>
+void FELinearMapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &face,
+					     const Boundary<3>         &,
+					     const vector<Point<2> > &unit_points,
+					     vector<double> &face_jacobians) const {
+  Assert (unit_points.size() == face_jacobians.size(),
+	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
+
+				   // the computation of the face jacobians is
+				   // along the following lines: let x_i be
+				   // the four vertices of a face, then the
+				   // unit point (xi,eta) is mapped to the
+				   // point vec x(xi,eta)=\sum x_i phi_i(xi,eta),
+				   // with phi_i being the shape functions
+				   // of this face
+				   //
+				   // now, while d(xi) d(eta) is the area
+				   // element on the unit face,
+				   // abs(dx dy) is the respective element
+				   // of the real face. to compute it, we
+				   // compute the image of the elements d(xi)
+				   // and d(eta):
+				   // (\vec x(xi+dxi,eta) - \vec x(xi,eta) )
+  				   // (\vec x(xi,eta+deta) - \vec x(xi,eta) )
+				   // the area then is the norm of the
+				   // cross product of these two vectors
+				   // and the determinant is the area
+				   // divided by d(xi)d(eta)
+				   //
+				   // written down, we remark that the
+				   // determinant we are looking for is
+				   // the cross product of the following
+				   // two vectors:
+				   // d/d(xi)  vec x(xi,eta)
+				   // d/d(eta) vec x(xi,eta)
+				   // we then arrive at:
+				   //
+				   // detJ =
+				   // || \sum_l \sum_k \phi_{l,xi} \phi_{k,eta}
+				   //        x_l \times x_k ||
+				   //
+				   // a maple script doing this computation is
+				   // in the <scripts> directory
+  const Point<3> vertices[4] = { face->vertex(0),
+				 face->vertex(1),
+				 face->vertex(2),
+				 face->vertex(3)   };
+
+  for (unsigned int point=0; point<unit_points.size(); ++point)
+    {
+      const double xi  = unit_points[point](0),
+		   eta = unit_points[point](1);
+
+      const double t1 = 1.0-eta;
+      const double t6 = -vertices[0](1)*t1+vertices[1](1)*t1+vertices[2](1)*eta-vertices[3](1)*eta;
+      const double t7 = 1.0-xi;
+      const double t12 = -vertices[0](2)*t7-vertices[1](2)*xi+vertices[2](2)*xi+vertices[3](2)*t7;
+      const double t18 = -vertices[0](2)*t1+vertices[1](2)*t1+vertices[2](2)*eta-vertices[3](2)*eta;
+      const double t23 = -vertices[0](1)*t7-vertices[1](1)*xi+vertices[2](1)*xi+vertices[3](1)*t7;
+      const double t26 = fabs(t6*t12-t18*t23);
+      const double t27 = t26*t26;
+      const double t32 = -vertices[0](0)*t7-vertices[1](0)*xi+vertices[2](0)*xi+vertices[3](0)*t7;
+      const double t38 = -vertices[0](0)*t1+vertices[1](0)*t1+vertices[2](0)*eta-vertices[3](0)*eta;
+      const double t41 = fabs(t18*t32-t38*t12);
+      const double t42 = t41*t41;
+      const double t46 = fabs(t38*t23-t6*t32);
+      const double t47 = t46*t46;
+      face_jacobians[point] = sqrt(t27+t42+t47);
+    };
+};
+
+
+
+template <>
+void FELinearMapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &/*face*/,
+						const unsigned int           ,
+						const vector<Point<2> > &unit_points,
+						vector<double> &face_jacobians) const {
+  Assert (false,
+	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
+};
+
+
+
+template <>
+void FELinearMapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cell,
+					     const unsigned int       face_no,
+					     const Boundary<3>       &,
+					     const vector<Point<2> > &unit_points,
+					     vector<Point<3> > &normal_vectors) const {
+  Assert (unit_points.size() == normal_vectors.size(),
+	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
+  
+				   // taken from the same script as is
+				   // the computation of the jacobian
+				   // determinant above
+
+  const Point<3> vertices[4] = { cell->face(face_no)->vertex(0),
+				 cell->face(face_no)->vertex(1),
+				 cell->face(face_no)->vertex(2),
+				 cell->face(face_no)->vertex(3)   };
+
+  for (unsigned int point=0; point<unit_points.size(); ++point)
+    {
+      const double xi  = unit_points[point](0),
+		   eta = unit_points[point](1);
+      
+      const double t1 = 1.0-eta;
+      const double t6 = -vertices[0](1)*t1+vertices[1](1)*t1+vertices[2](1)*eta-vertices[3](1)*eta;
+      const double t7 = 1.0-xi;
+      const double t12 = -vertices[0](2)*t7-vertices[1](2)*xi+vertices[2](2)*xi+vertices[3](2)*t7;
+      const double t18 = -vertices[0](2)*t1+vertices[1](2)*t1+vertices[2](2)*eta-vertices[3](2)*eta;
+      const double t23 = -vertices[0](1)*t7-vertices[1](1)*xi+vertices[2](1)*xi+vertices[3](1)*t7;
+      const double t25 = t6*t12-t18*t23;
+      const double t26 = fabs(t25);
+      const double t27 = t26*t26;
+      const double t32 = -vertices[0](0)*t7-vertices[1](0)*xi+vertices[2](0)*xi+vertices[3](0)*t7;
+      const double t38 = -vertices[0](0)*t1+vertices[1](0)*t1+vertices[2](0)*eta-vertices[3](0)*eta;
+      const double t40 = t18*t32-t38*t12;
+      const double t41 = fabs(t40);
+      const double t42 = t41*t41;
+      const double t45 = t38*t23-t6*t32;
+      const double t46 = fabs(t45);
+      const double t47 = t46*t46;
+      const double t49 = sqrt(t27+t42+t47);
+      const double t50 = 1/t49;
+      
+      normal_vectors[point](0) = t25*t50;
+      normal_vectors[point](1) = t40*t50;
+      normal_vectors[point](2) = t45*t50;
+
+      if ((face_no == 1) ||
+	  (face_no == 2) ||
+	  (face_no == 5))
+	normal_vectors[point] *= -1;
+    };  
+};
+
+
+
+template <>
+void FELinearMapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*cell*/,
+					     const unsigned int       /*face_no*/,
+					     const unsigned int,
+					     const vector<Point<2> > &unit_points,
+					     vector<Point<3> > &normal_vectors) const {
+				   // more or less copied from the linear
+				   // finite element
+				   // note, that in 2D the normal vectors to the
+				   // subface have the same direction as that
+				   // for the face
+  Assert (false,
+	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
 };
 
 #endif
@@ -471,147 +717,10 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 */
 
   if (compute_jacobians)
-    switch (dim)
-      {
-	case 1:
-	      for (unsigned int point=0; point<n_points; ++point)
-		jacobians[point][0][0] = 1./(vertices[1](0)-vertices[0](0));
-	      break;
-		
-	case 2:
-	{
-	  for (unsigned int point=0; point<n_points; ++point)
-	    {	    
-	      const double xi = unit_points[point](0);
-	      const double eta= unit_points[point](1);
-	
-	      const double t6 = vertices[0](0)*vertices[3](1);
-	      const double t8 = vertices[2](0)*xi;
-	      const double t10 = vertices[1](0)*eta;
-	      const double t12 = vertices[3](0)*vertices[1](1);
-	      const double t16 = vertices[3](0)*xi;
-	      const double t20 = vertices[0](0)*vertices[1](1);
-	      const double t22 = vertices[0](0)*vertices[2](1);
-	      const double t24 = t6*xi-t8*vertices[1](1)-t10*vertices[3](1)+
-				 t12*eta-vertices[3](0)*vertices[2](1)*eta-
-				 t16*vertices[0](1)+t16*vertices[1](1)-t12+
-				 vertices[3](0)*vertices[0](1)-t20*eta+t22*eta;
-	      const double t28 = vertices[1](0)*vertices[3](1);
-	      const double t31 = vertices[2](0)*eta;
-	      const double t36 = t8*vertices[0](1)+vertices[1](0)*vertices[2](1)*xi-
-				 t28*xi+t10*vertices[0](1)-t31*vertices[0](1)+
-				 t31*vertices[3](1)+t20-t6-vertices[1](0)*
-				 vertices[0](1)+t28-t22*xi;
-	      const double t38 = 1/(t24+t36);
-
-	      jacobians[point][0][0] = (-vertices[0](1)+vertices[0](1)*xi-
-					vertices[1](1)*xi+vertices[2](1)*xi+
-					vertices[3](1)-vertices[3](1)*xi)*t38;
-	      jacobians[point][0][1] = -(-vertices[0](0)+vertices[0](0)*xi-
-					 vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
-	      jacobians[point][1][0] = -(-vertices[0](1)+vertices[0](1)*eta+
-					 vertices[1](1)-vertices[1](1)*eta+
-					 vertices[2](1)*eta-vertices[3](1)*eta)*t38;
-	      jacobians[point][1][1] = (-vertices[0](0)+vertices[0](0)*eta+
-					vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
-	    };
-	  
-	  break;
-	};
-
-	default:
-					       // not implemented at present
-	      Assert (false, ExcNotImplemented());
-      };
-
+    compute_jacobian_matrices (cell, unit_points, jacobians);
   
   if (compute_jacobians_grad)
-    switch (dim) 
-      {
-	case 1:
-	{
-					   // derivative of the
-					   // jacobian is always zero
-					   // for a linear mapping in 1d
-	  for (unsigned int point=0; point<n_points; ++point)
-	    jacobians_grad[point][0][0][0] = 0;
-	  break;
-	};
-
-	case 2:
-	{
-	  for (unsigned int point=0; point<n_points; ++point)
-	    {
-	      const double xi = unit_points[point](0);
-	      const double eta= unit_points[point](1);
-	
-	      const double t2 = vertices[1](0)*eta;
-	      const double t4 = vertices[3](0)*vertices[2](1);
-	      const double t6 = vertices[0](0)*vertices[2](1);
-	      const double t8 = vertices[0](0)*vertices[3](1);
-	      const double t10 = vertices[3](0)*xi;
-	      const double t13 = vertices[2](0)*xi;
-	      const double t16 = vertices[3](0)*vertices[1](1);
-	      const double t18 = vertices[0](0)*vertices[1](1);
-	      const double t19 = vertices[3](0)*vertices[0](1);
-	      const double t20 = -t2*vertices[3](1)-t4*eta-t6*xi+t8*xi-
-				 t10*vertices[0](1)+t10*vertices[1](1)+
-				 t13*vertices[0](1)-t13*vertices[1](1)+t16
-				 *eta+t18+t19;
-	      const double t23 = vertices[1](0)*vertices[3](1);
-	      const double t26 = vertices[2](0)*eta;
-	      const double t29 = vertices[1](0)*vertices[0](1);
-	      const double t30 = vertices[1](0)*vertices[2](1);
-	      const double t32 = -t16-t18*eta+t6*eta-t23*xi+t2*vertices[0](1)-
-				 t26*vertices[0](1)+t26*vertices[3](1)-
-				 t8-t29+t23+t30
-				 *xi;
-	      const double t33 = t20+t32;
-	      const double t34 = 1/t33;
-	      const double t35 = (vertices[0](1)-vertices[1](1)+
-				  vertices[2](1)-vertices[3](1))*t34;
-	      const double t41 = t33*t33;
-	      const double t42 = 1/t41;
-	      const double t43 = (-vertices[0](1)+vertices[0](1)*xi-
-				  vertices[1](1)*xi+vertices[2](1)*xi+
-				  vertices[3](1)-vertices[3](1)*xi)*t42;
-	      const double t44 = vertices[2](0)*vertices[0](1);
-	      const double t46 = -t6+t8-t19+t16+t44-
-				 vertices[2](0)*vertices[1](1)-
-				 t23+t30;
-	      const double t50 = (vertices[0](0)-vertices[1](0)+
-				  vertices[2](0)-vertices[3](0))*t34;
-	      const double t54 = (-vertices[0](0)+vertices[0](0)*xi-
-				  vertices[1](0)*xi+t13+
-				  vertices[3](0)-t10)*t42;
-	      const double t62 = (-vertices[0](1)+vertices[0](1)*eta+
-				  vertices[1](1)-vertices[1](1)*eta+
-				  vertices[2](1)*eta-
-				  vertices[3](1)*eta)*t42;
-	      const double t67 = (-vertices[0](0)+vertices[0](0)*eta+
-				  vertices[1](0)-t2+t26-vertices[3](0)*eta)*t42;
-	      const double t70 = -t23-t4+t16-t18+t6+t29-t44+
-				 vertices[2](0)*vertices[3](1);
-	      jacobians_grad[point][0][0][0] = t35-t43*t46;
-	      jacobians_grad[point][0][0][1] = -t50+t54*t46;
-	      jacobians_grad[point][0][1][0] = t62*t46;
-	      jacobians_grad[point][0][1][1] = -t67*t46;
-	      jacobians_grad[point][1][0][0] = -t43*t70;
-	      jacobians_grad[point][1][0][1] = t54*t70;
-	      jacobians_grad[point][1][1][0] = -t35+t62*t70;
-	      jacobians_grad[point][1][1][1] = t50-t67*t70;
-	    };
-	  break;
-	  
-	};
-	
-	default:
-					       // not implemented at present
-	      Assert (false, ExcNotImplemented());
-      };
-	
-	      
-  
+    compute_jacobian_gradients (cell, unit_points, jacobians_grad);
     
   if (compute_support_points)
     get_support_points (cell, boundary, support_points);

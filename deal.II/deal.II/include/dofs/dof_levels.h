@@ -93,6 +93,22 @@ class DoFLevel<2> : public DoFLevel<1> {
 
 
 
+/**
+ * Store the indices of the degrees of freedom which are located on hexhedra.
+ * See \Ref{DoFLevel<1>} for more information.
+ */
+class DoFLevel<3> : public DoFLevel<2> {
+  public:
+				     /**
+				      * Store the global indices of the degrees
+				      * of freedom. See \Ref{DoFLevel} for
+				      * detailed information.
+				      */
+    vector<int> hex_dofs;
+};
+
+
+
 /*----------------------------   dof_levels.h     ---------------------------*/
 /* end of #ifndef __dof_levels_H */
 #endif

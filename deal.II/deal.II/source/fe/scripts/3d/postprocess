@@ -35,16 +35,20 @@ perl -pi -e 's/.*= 0.0;\n//g;' *3d_restriction
 perl -pi -e 's/\[(\d+)\]\[(\d+)\]/($1,$2)/g;' *3d_constraints
 perl -pi -e 's/.*= 0.0;\n//g;' *3d_constraints
 
-perl -pi -e 's/^\s*t/const double t/g;' *3d_inverse_jacobian
+perl -pi -e 's/([^;])\n/$1/g;' *3d_inverse_jacobian
+perl -pi -e 's/^\s*t/              const double t/g;' *3d_inverse_jacobian
 perl -pi -e 's/x\[(\d)\]/vertices[$1](0)/g;' *3d_inverse_jacobian
 perl -pi -e 's/y\[(\d)\]/vertices[$1](1)/g;' *3d_inverse_jacobian
-perl -pi -e 's/inverseJacobian/jacobians[point]/g;' *3d_inverse_jacobian
+perl -pi -e 's/z\[(\d)\]/vertices[$1](2)/g;' *3d_inverse_jacobian
+perl -pi -e 's/^s*inverseJacobian/              jacobians[point]/g;' *3d_inverse_jacobian
 perl -pi -e 's/\[(\d)\]\[(\d)\] =/($1,$2) =/g;' *3d_inverse_jacobian
 
-perl -pi -e 's/^\s*t/const double t/g;' *3d_inverse_jacobian_grad
+perl -pi -e 's/([^;])\n/$1/g;' *3d_inverse_jacobian_grad
+perl -pi -e 's/^\s*t/              const double t/g;' *3d_inverse_jacobian_grad
 perl -pi -e 's/x\[(\d)\]/vertices[$1](0)/g;' *3d_inverse_jacobian_grad
 perl -pi -e 's/y\[(\d)\]/vertices[$1](1)/g;' *3d_inverse_jacobian_grad
-perl -pi -e 's/inverseJacobian/jacobians_grad[point]/g;' *3d_inverse_jacobian_grad
+perl -pi -e 's/z\[(\d)\]/vertices[$1](2)/g;' *3d_inverse_jacobian_grad
+perl -pi -e 's/^\s*grad_inverseJacobian/              jacobians_grad[point]/g;' *3d_inverse_jacobian_grad
 
 
 perl -pi -e 's/^array.*\n//g; s/^\s*\]\)//g; s/^\n//g;' *3d_unit_support_points

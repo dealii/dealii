@@ -90,7 +90,7 @@ struct GeometryInfo
 				      *
 				      * 1. Duplicated it in the new coordinate direction.
 				      *
-				      * 2. Connect all corrsponding
+				      * 2. Connect all corresponding
 				      * vertices of the original
 				      * hypercube and the copy by
 				      * lines.
@@ -150,6 +150,11 @@ struct GeometryInfo
 				      * are (ordered in the direction of the
 				      * face) 0 and 1, on face 2 they are
 				      * 3 and 2, etc.
+				      *
+				      * For three spatial dimensions,
+				      * the exact order of the children is
+				      * laid down in the documentation of
+				      * the #Triangulation# class.
 				      */
     static unsigned int child_cell_on_face (unsigned int face,
 					    unsigned int subface);
@@ -184,13 +189,22 @@ GeometryInfo<2>::child_cell_on_face (const unsigned int face,
 
 
 template<>
-inline unsigned int
-GeometryInfo<3>::child_cell_on_face (const unsigned int,
-				     const unsigned int)
-{
-  Assert(false, ExcNotImplemented());
-  return 0;
-}
+inline
+unsigned int GeometryInfo<3>::child_cell_on_face (const unsigned int face,
+						  const unsigned int subface) {
+  Assert (face<faces_per_cell, ExcInvalidIndex(face,faces_per_cell));
+  Assert (subface<subfaces_per_face, ExcInvalidIndex(subface,subfaces_per_face));
+  
+  static const unsigned subcells[faces_per_cell][subfaces_per_face] = {{0, 1, 2, 3},
+								       {4, 5, 6, 7},
+								       {0, 1, 5, 4},
+								       {1, 5, 6, 2},
+								       {3, 2, 6, 7},
+								       {0, 4, 7, 3}};
+  return subcells[face][subface];
+};
+
+
 
 /*----------------------------   geometry_info.h     ---------------------------*/
 /* end of #ifndef __geometry_info_H */

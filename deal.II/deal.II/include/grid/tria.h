@@ -17,6 +17,7 @@ template <int dim> class Boundary;
 template <int dim> class TriaAccessor;
 template <int dim> class LineAccessor;
 template <int dim> class QuadAccessor;
+template <int dim> class HexAccessor;
 template <int dim> class CellAccessor;
 
 template <int dim> class TriangulationLevel;
@@ -27,9 +28,6 @@ template <int dim, class Accessor> class TriaActiveIterator;
 
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
-
-template <int dim> struct CellData;
-struct SubCellData;
 
 class dVector;
 
@@ -163,6 +161,7 @@ class TriaDimensionInfo;
 
 /**
  *  This class implements some types which differ between the dimensions.
+ *  These are the declararions for the 1D case only.
  *
  *  A #line_iterator# is typdef'd to an iterator operating on the
  *  #lines# member variable of a #Triangulation<1># object. An
@@ -179,7 +178,8 @@ class TriaDimensionInfo;
  *  To enable the declaration of #begin_quad# and the like in
  *  #Triangulation<1>#, the #quad_iterator#s are declared as
  *  #void *#. Thus these types exist, but are useless and will
- *  certainly make any involuntary use visible.
+ *  certainly make any involuntary use visible. The same holds
+ *  for hexahedron iterators.
  *
  *  The same applies for the #face_iterator# types, since lines
  *  have no substructures apart from vertices, which are handled in
@@ -196,6 +196,10 @@ class TriaDimensionInfo<1> {
     typedef void * quad_iterator;
     typedef void * active_quad_iterator;
 
+    typedef void * raw_hex_iterator;
+    typedef void * hex_iterator;
+    typedef void * active_hex_iterator;
+
     typedef raw_line_iterator    raw_cell_iterator;
     typedef line_iterator        cell_iterator;
     typedef active_line_iterator active_cell_iterator;
@@ -208,19 +212,25 @@ class TriaDimensionInfo<1> {
 
 /**
  *  This class implements some types which differ between the dimensions.
+ *  These are the declararions for the 2D case only.
  *
  *  A #line_iterator# is typdef'd to an iterator operating on the
- *  #lines# member variable of a #Triangulation<1># object. An
+ *  #lines# member variable of a #Triangulation<2># object. An
  *  #active_line_iterator# only operates on the active lines.
  *  #raw_line_iterator# objects operate on all lines, used or not.
- *  Using #active_line_iterator#s may not be particularly useful since it
+ *  Using #active_line_iterator#s may not be particularly in 2D useful since it
  *  only operates on unrefined lines. However, also refined lines may bound
  *  unrefined cells if the neighboring cell is refined once more than the
  *  present one.
  *
- *  Similarly, #quad_iterator#, #raw_quad_iterator# and
+ *  Similarly to line iterators, #quad_iterator#, #raw_quad_iterator# and
  *  #active_quad_iterator# are declared.
  *  
+ *  To enable the declaration of #begin_hex# and the like in
+ *  #Triangulation<[12]>#, the #hex_iterator#s are declared as
+ *  #void *#. Thus these types exist, but are useless and will
+ *  certainly make any involuntary use visible.
+ *
  *  Since we are in two dimension, the following identities are declared:
  *  \begin{verbatim}
  *    typedef raw_quad_iterator    raw_cell_iterator;
@@ -243,6 +253,10 @@ class TriaDimensionInfo<2> {
     typedef TriaIterator<2,CellAccessor<2> >       quad_iterator;
     typedef TriaActiveIterator<2,CellAccessor<2> > active_quad_iterator;
 
+    typedef void * raw_hex_iterator;
+    typedef void * hex_iterator;
+    typedef void * active_hex_iterator;
+
     typedef raw_quad_iterator    raw_cell_iterator;
     typedef quad_iterator        cell_iterator;
     typedef active_quad_iterator active_cell_iterator;
@@ -254,6 +268,47 @@ class TriaDimensionInfo<2> {
 
 
 
+
+/**
+ *  This class implements some types which differ between the dimensions.
+ *  These are the declararions for the 3D case only.
+ *
+ *  For the declarations of the data types, more or less the same holds
+ *  as for lower dimensions (see #TriaDimensionInfo<[12]>#). The
+ *  dimension specific data types are here, since we are in three dimensions:
+ *  \begin{verbatim}
+ *    typedef raw_hex_iterator    raw_cell_iterator;
+ *    typedef hex_iterator        cell_iterator;
+ *    typedef active_hex_iterator active_cell_iterator;
+ *
+ *    typedef raw_quad_iterator    raw_face_iterator;
+ *    typedef quad_iterator        face_iterator;
+ *    typedef active_quad_iterator active_face_iterator;    
+ *  \end{verbatim}
+ */
+template <>
+class TriaDimensionInfo<3> {
+  public:
+    typedef TriaRawIterator<3,LineAccessor<3> >    raw_line_iterator;
+    typedef TriaIterator<3,LineAccessor<3> >       line_iterator;
+    typedef TriaActiveIterator<3,LineAccessor<3> > active_line_iterator;
+    
+    typedef TriaRawIterator<3,QuadAccessor<3> >    raw_quad_iterator;
+    typedef TriaIterator<3,QuadAccessor<3> >       quad_iterator;
+    typedef TriaActiveIterator<3,QuadAccessor<3> > active_quad_iterator;
+
+    typedef TriaRawIterator<3,CellAccessor<3> >    raw_hex_iterator;
+    typedef TriaIterator<3,CellAccessor<3> >       hex_iterator;
+    typedef TriaActiveIterator<3,CellAccessor<3> > active_hex_iterator;
+
+    typedef raw_hex_iterator    raw_cell_iterator;
+    typedef hex_iterator        cell_iterator;
+    typedef active_hex_iterator active_cell_iterator;
+
+    typedef raw_quad_iterator    raw_face_iterator;
+    typedef quad_iterator        face_iterator;
+    typedef active_quad_iterator active_face_iterator;    
+};
 
 
 
@@ -1131,6 +1186,22 @@ class TriaDimensionInfo<2> {
  *   Similarly we define, that the four children of a quad are adjacent to the
  *   vertex with the same number of the old quad.
  *
+ *   \subsubsection{Coordinate systems}
+ *
+ *   When explicit coordinates are required for points in a cell (e.g for
+ *   quadrature formulae or the point of definition of trial functions), we
+ *   define the following coordinate system for the unit cell:
+ *   \begin{verbatim}
+ *    y^   3-------2
+ *     |   |       |
+ *     |   |       |
+ *     |   |       |
+ *     |   0-------1
+ *     *-------------->x
+ *   \end{verbatim}
+ *   with vertex 0 being the origin of the coordinate system, vertex 1 having
+ *   coordinates #(1,0)#, vertex 2 at #(1,1)# and vertex 3 at #(0,1)#.
+ *
  *
  *   \subsection{Implementational conventions for three spatial dimensions}
  *
@@ -1212,15 +1283,143 @@ class TriaDimensionInfo<2> {
  *   \begin{verbatim}
  *         *-------*        *-------*
  *        /|       |       /       /|
- *       / |   2   |      /  5    / |
+ *       / |   1   |      /   4   / |
  *      /  |       |     /       /  |
  *     *   |       |    *-------*   |
- *     | 6 *-------*    |       | 4 *
+ *     | 5 *-------*    |       | 3 *
  *     |  /       /     |       |  /
- *     | /   3   /      |   1   | /
+ *     | /   2   /      |   0   | /
  *     |/       /       |       |/
  *     *-------*        *-------*
  *   \end{verbatim}
+ *
+ *   The direction of the faces is determined by the numbers the lines have within
+ *   a given face. This is like follows:
+ *   \begin{itemize}
+ *   \item Faces 0 and 1:
+ *    \begin{verbatim}
+ *          *---2---*        *-------*
+ *         /|       |       /       /|
+ *        / |       1      /       / |
+ *       /  3       |     /       /  |
+ *      *   |       |    *---2---*   |
+ *      |   *---0---*    |       |   *
+ *      |  /       /     |       1  /
+ *      | /       /      3       | /
+ *      |/       /       |       |/
+ *      *-------*        *---0---*
+ *    \end{verbatim}
+ * 
+ *   \item Faces 2 and 4:
+ *    \begin{verbatim}
+ *          *-------*        *---2---*
+ *         /|       |       /       /|
+ *        / |       |      3       1 |
+ *       /  |       |     /       /  |
+ *      *   |       |    *---0---*   |
+ *      |   *---2---*    |       |   *
+ *      |  /       /     |       |  /
+ *      | 3       1      |       | /
+ *      |/       /       |       |/
+ *      *---0---*        *-------*
+ *    \end{verbatim} 
+ * 
+ *   \item Faces 3 and 5:
+ *    \begin{verbatim}
+ *          *-------*        *-------*
+ *         /|       |       /       /|
+ *        2 1       |      /       2 1
+ *       /  |       |     /       /  |
+ *      *   |       |    *-------*   |
+ *      |   *-------*    |       |   *
+ *      3  /       /     |       3  /
+ *      | 0       /      |       | 0
+ *      |/       /       |       |/
+ *      *-------*        *-------*
+ *    \end{verbatim}
+ *   \end{itemize}
+ * 
+ *   Due to this numbering, the following lines are identical:
+ *   \begin{itemize}
+ *   \item Line 0 of face 0, and line 0 of face 2;
+ *   \item Line 1 of face 0, and line 3 of face 3;
+ *   \item Line 2 of face 0, and line 0 of face 4;
+ *   \item Line 3 of face 0, and line 3 of face 5;
+ *   \item Line 0 of face 1, and line 2 of face 2;
+ *   \item Line 1 of face 1, and line 1 of face 3;
+ *   \item Line 2 of face 1, and line 2 of face 4;
+ *   \item Line 3 of face 1, and line 1 of face 5;
+ *   \item Line 3 of face 2, and line 0 of face 5;
+ *   \item Line 1 of face 2, and line 0 of face 3;
+ *   \item Line 1 of face 4, and line 2 of face 3;
+ *   \item Line 3 of face 4, and line 2 of face 5.
+ *   \end{itemize}
+ *
+ *
+ *   \subsubsection{Children}
+ *
+ *   The eight children of a cell are numbered as follows:
+ *   \begin{verbatim}
+ *         *-------*        *-------*
+ *        /| 7   6 |       / 7   6 /|
+ *       /7|       |      /       /6|
+ *      /  |       |     / 3   2 /  |
+ *     *   | 4   5 |    *-------*2 5|
+ *     |3 4*-------*    | 3   2 |   *
+ *     |  / 4   5 /     |       |  /
+ *     |0/       /      |       |1/
+ *     |/0    1 /       | 0   1 |/
+ *     *-------*        *-------*
+ *   \end{verbatim}
+ *
+ *   Taking into account the orientation of the faces, the following
+ *   children are adjacent to the respective faces:
+ *   \begin{itemize}
+ *   \item Face 0: children 0, 1, 2, 3;
+ *   \item Face 1: children 4, 5, 6, 7;
+ *   \item Face 2: children 0, 1, 5, 4;
+ *   \item Face 3: children 1, 5, 6, 2;
+ *   \item Face 4: children 3, 2, 6, 7;
+ *   \item Face 5: children 0, 4, 7, 3.
+ *   \end{itemize}
+ *   You can get these numbers using the #GeometryInfo<3>::child_cell_on_face#
+ *   function. Each child is adjacent to the vertex with the same number.
+ *
+ *
+ *   \subsubsection{Coordinate systems}
+ *
+ *   We define the following coordinate system for the explicit coordinates of
+ *   the vertices of the unit cell:
+ *   \begin{verbatim}
+ *                         7-------6        7-------6
+ *                        /|       |       /       /|
+ *                       / |       |      /       / |
+ *    z                 /  |       |     /       /  |
+ *    ^                3   |       |    3-------2   |
+ *    |   ^y           |   4-------5    |       |   5
+ *    |  /             |  /       /     |       |  /
+ *    | /              | /       /      |       | /
+ *    |/               |/       /       |       |/
+ *    *------>x        0-------1        0-------1
+ *   \end{verbatim}
+ *   This convention in conjunction with the numbering of the vertices is a bit
+ *   unfortunate, since the vertices 0 through 3 have the coordinates #(x,0,z)#
+ *   with #x# and #z# being the same as the #x# and #y# coordinates of a quad
+ *   in the plane; more intuitive would have been if they had the coordinates
+ *   #(x,y,0)#. However, the vertex numbering was historically chosen as shown.
+ *
+ *   By the convention laid down as above, the vertices have the following
+ *   coordinates:
+ *   \begin{itemize}
+ *      \item Vertex 0: #(0,0,0)#;
+ *      \item Vertex 1: #(1,0,0)#;
+ *      \item Vertex 2: #(1,0,1)#;
+ *      \item Vertex 3: #(0,0,1)#;
+ *      \item Vertex 4: #(0,1,0)#;
+ *      \item Vertex 5: #(1,1,0)#;
+ *      \item Vertex 6: #(1,1,1)#;
+ *      \item Vertex 7: #(0,1,1)#.
+ *   \end{itemize}
  *
  *
  *   \subsection{Warning}
@@ -1237,9 +1436,6 @@ class TriaDimensionInfo<2> {
 template <int dim>
 class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
   public:
-				     // insert these definitions for gcc2.8,
-				     // since it can't inherit typedefs (I
-				     // believe it should, but it can't)
     typedef typename TriaDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
     typedef typename TriaDimensionInfo<dim>::line_iterator line_iterator;
     typedef typename TriaDimensionInfo<dim>::active_line_iterator active_line_iterator;
@@ -1247,6 +1443,10 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
     typedef typename TriaDimensionInfo<dim>::raw_quad_iterator raw_quad_iterator;
     typedef typename TriaDimensionInfo<dim>::quad_iterator quad_iterator;
     typedef typename TriaDimensionInfo<dim>::active_quad_iterator active_quad_iterator;
+
+    typedef typename TriaDimensionInfo<dim>::raw_hex_iterator raw_hex_iterator;
+    typedef typename TriaDimensionInfo<dim>::hex_iterator hex_iterator;
+    typedef typename TriaDimensionInfo<dim>::active_hex_iterator active_hex_iterator;
 
     typedef typename TriaDimensionInfo<dim>::raw_cell_iterator raw_cell_iterator;
     typedef typename TriaDimensionInfo<dim>::cell_iterator cell_iterator;
@@ -1294,7 +1494,10 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      *  function, i.e. you have to make sure
 				      *  that it is not destroyed before
 				      *  #Triangulation<>::execute_refinement()#
-				      *  is called the last time.
+				      *  is called the last time. Checking this
+				      *  is mostly done by the library by
+				      *  using a #Subscriptor# object as base
+				      *  class for boundary objects.
 				      *
 				      *  If you copy this triangulation to
 				      *  another one using the
@@ -1302,6 +1505,26 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      *  make sure that the lifetime of boundary
 				      *  object extends to the lifetime of the
 				      *  new triangulation as well.
+				      *
+				      *  Because of the use of the #Subscriptor#
+				      *  base class, you must wait for the
+				      *  #Triangulation# object to release the
+				      *  lock to the boundary object before
+				      *  destroying that. This usually happens
+				      *  when the destructor of the
+				      *  triangulation is executed, but you may
+				      *  manually do so by calling
+				      *  #set_boundary(0)#, passing a Null
+				      *  pointer as new boundary object. This
+				      *  is the interpreted as "take the
+				      *  default boundary object", which
+				      *  actually is a #StraightBoundary#
+				      *  object.
+				      *
+				      *  You are allowed to remove or replace
+				      *  the boundary object during the lifetime
+				      *  of a non-empty triangulation, but
+				      *  you should be sure about what you do.
 				      */
     void set_boundary (const Boundary<dim> *boundary_object);
 
@@ -1524,7 +1747,10 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      *  were previously flagged for refinement.
 				      *
 				      *  The function resets all refinement
-				      *  flags to false.
+				      *  flags to false. In three spatial
+				      *  dimensions, the user flag is used
+				      *  for lines and quads, but not for
+				      *  cells.
 				      *
                                       *  See the general docs for more
                                       *  information.
@@ -1550,7 +1776,9 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      *  doc of this class for more information.
 				      *
 				      *  This function is mostly dimension
-				      *  independent.
+				      *  independent. However, for some
+				      *  dimension dependent things, it calls
+				      *  #prepare_refinement_dim_dependent#.
 				      */
     bool prepare_refinement ();
 
@@ -1744,6 +1972,27 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * Load the user flags located on quads.
 				      */
     void load_user_flags_quad (const vector<bool> &v);
+
+				     /**
+				      * Save the user flags on hexs.
+				      */
+    void save_user_flags_hex (ostream &out) const;
+
+				     /**
+				      * Same as above, but store the flags to
+				      * a bitvector rather than to a file.
+				      */
+    void save_user_flags_hex (vector<bool> &v) const;
+
+				     /**
+				      * Load the user flags located on hexs.
+				      */
+    void load_user_flags_hex (istream &in);
+
+				     /**
+				      * Load the user flags located on hexs.
+				      */
+    void load_user_flags_hex (const vector<bool> &v);
 				     /*@}*/
 
 				     /* ------------------------------------ */
@@ -2214,6 +2463,112 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				     /*---------------------------------------*/
 
 				     /**
+				      *  @name Hex iterator functions*/
+    				     /*@{
+				      */
+    				     /**
+				      *  Return iterator to the first hex, used
+				      *  or not, on level #level#. If a level
+				      *  has no hexs, a past-the-end iterator
+				      *  is returned.
+				      */
+    raw_hex_iterator
+    begin_raw_hex   (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first used hex
+				      *  on level #level#.
+				      */
+    hex_iterator
+    begin_hex       (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first active
+				      *  hex on level #level#.
+				      */
+    active_hex_iterator
+    begin_active_hex(const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator past the end; this
+				      *  iterator serves for comparisons of
+				      *  iterators with past-the-end or
+				      *  before-the-beginning states.
+				      */
+    raw_hex_iterator
+    end_hex () const;
+
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    hex_iterator        end_hex (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_hex_iterator    end_raw_hex (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_hex_iterator end_active_hex (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the
+				      *  last hex, used or not.
+				      */
+    raw_hex_iterator
+    last_raw_hex () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  hex of the level #level#, used or not.
+
+				      */
+    raw_hex_iterator
+    last_raw_hex (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used hex.
+				      */
+    hex_iterator
+    last_hex () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used hex on level #level#.
+				      */
+    hex_iterator
+    last_hex (const unsigned int level) const;
+
+    				     /**
+				      *  Return an iterator pointing to the last
+				      *  active hex.
+				      */
+    active_hex_iterator
+    last_active_hex () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  active hex on level #level#.
+				      */
+    active_hex_iterator
+    last_active_hex (const unsigned int level) const;
+				     /*@}*/
+
+				     /*---------------------------------------*/
+
+				     /**
 				      *  @name Input/Output functions
 				      */
 				     /*@{*/
@@ -2291,7 +2646,7 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * for the #n_cells()# function.
 				      */
     unsigned int n_quads () const;
-    
+
 				     /**
 				      *  Return total number of used quads,
 				      *  active or not on level #level#.
@@ -2322,6 +2677,46 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      */
     unsigned int n_active_quads (const unsigned int level) const;
     
+				     /**
+				      *  Return total number of used hexahedra,
+				      *  active or not.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
+				      */
+    unsigned int n_hexs() const;
+
+				     /**
+				      *  Return total number of used hexahedra,
+				      *  active or not on level #level#.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
+				      */
+    unsigned int n_hexs(const unsigned int level) const;
+    
+				     /**
+				      *  Return total number of active hexahedra,
+				      *  active or not.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
+				      */
+    unsigned int n_active_hexs() const;
+    
+				     /**
+				      *  Return total number of active hexahedra,
+				      *  active or not on level #level#.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
+				      */
+    unsigned int n_active_hexs(const unsigned int level) const;
+
 				     /**
 				      *  Return total number of used cells,
 				      *  active or not.
@@ -2564,6 +2959,26 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * of #execute_coarsening#.
 				      */
     void delete_cell (cell_iterator &cell);
+
+				     /**
+				      * Some dimension dependent stuff for
+				      * mesh smoothing. This function returns
+				      * whether some flags were changed.
+				      *
+				      * At present, this function does nothing
+				      * in 1d and 2d, but makes sure no two
+				      * cells with a level difference greater
+				      * than one share one line in 3d. This
+				      * is a requirement needed for the
+				      * interpolation of hanging nodes, since
+				      * otherwise to steps of interpolation
+				      * would be necessary. This would make
+				      * the processes implemented in the
+				      * #ConstraintMatrix# class much more
+				      * complex, since these two steps of
+				      * interpolation do not commute.
+				      */
+    bool prepare_refinement_dim_dependent ();
     
 				     /**
 				      *  Array of pointers pointing to the
@@ -2604,15 +3019,21 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
     friend class TriaAccessor<dim>;
     friend class LineAccessor<dim>;
     friend class QuadAccessor<dim>;
+    friend class HexAccessor<dim>;
 
-    friend class CellAccessor<1>;
-    friend class CellAccessor<2>;
+    friend class CellAccessor<dim>;
     
     friend class TriaRawIterator<1,LineAccessor<1> >;
     friend class TriaRawIterator<1,CellAccessor<1> >;
+
     friend class TriaRawIterator<2,LineAccessor<2> >;
     friend class TriaRawIterator<2,QuadAccessor<2> >;
     friend class TriaRawIterator<2,CellAccessor<2> >;
+
+    friend class TriaRawIterator<3,LineAccessor<3> >;
+    friend class TriaRawIterator<3,QuadAccessor<3> >;
+    friend class TriaRawIterator<3,HexAccessor<3> >;
+    friend class TriaRawIterator<3,CellAccessor<3> >;
 
     friend class DoFHandler<dim>;
     friend class MGDoFHandler<dim>;

@@ -47,6 +47,10 @@ class MGDoFDimensionInfo<1> {
     typedef void * quad_iterator;
     typedef void * active_quad_iterator;
 
+    typedef void * raw_hex_iterator;
+    typedef void * hex_iterator;
+    typedef void * active_hex_iterator;
+
     typedef raw_line_iterator    raw_cell_iterator;
     typedef line_iterator        cell_iterator;
     typedef active_line_iterator active_cell_iterator;
@@ -76,6 +80,10 @@ class MGDoFDimensionInfo<2> {
     typedef TriaIterator<2,MGDoFCellAccessor<2> >                  quad_iterator;
     typedef TriaActiveIterator<2,MGDoFCellAccessor<2> >            active_quad_iterator;
 
+    typedef void * raw_hex_iterator;
+    typedef void * hex_iterator;
+    typedef void * active_hex_iterator;
+
     typedef raw_quad_iterator    raw_cell_iterator;
     typedef quad_iterator        cell_iterator;
     typedef active_quad_iterator active_cell_iterator;
@@ -83,6 +91,37 @@ class MGDoFDimensionInfo<2> {
     typedef raw_line_iterator    raw_face_iterator;
     typedef line_iterator        face_iterator;
     typedef active_line_iterator active_face_iterator;    
+};
+
+
+
+
+/**
+ * Define some types for the DoF handling in two dimensions.
+ *
+ * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ */
+class MGDoFDimensionInfo<3> {
+  public:
+    typedef TriaRawIterator<3,MGDoFLineAccessor<3,LineAccessor<3> > >    raw_line_iterator;
+    typedef TriaIterator<3,MGDoFLineAccessor<3,LineAccessor<3> > >       line_iterator;
+    typedef TriaActiveIterator<3,MGDoFLineAccessor<3,LineAccessor<3> > > active_line_iterator;
+
+    typedef TriaRawIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > >    raw_quad_iterator;
+    typedef TriaIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > >       quad_iterator;
+    typedef TriaActiveIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > > active_quad_iterator;
+
+    typedef TriaRawIterator<3,MGDoFCellAccessor<3> >               raw_hex_iterator;
+    typedef TriaIterator<3,MGDoFCellAccessor<3> >                  hex_iterator;
+    typedef TriaActiveIterator<3,MGDoFCellAccessor<3> >            active_hex_iterator;
+
+    typedef raw_hex_iterator    raw_cell_iterator;
+    typedef hex_iterator        cell_iterator;
+    typedef active_hex_iterator active_cell_iterator;
+
+    typedef raw_quad_iterator    raw_face_iterator;
+    typedef quad_iterator        face_iterator;
+    typedef active_quad_iterator active_face_iterator;    
 };
 
 

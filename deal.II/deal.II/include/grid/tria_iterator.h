@@ -216,7 +216,7 @@ template <int dim> class Triangulation;
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim, typename Accessor>
-class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
+class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
   public:
 				     /**
 				      * Declare the type of the Accessor for

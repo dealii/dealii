@@ -23,7 +23,6 @@
 
 
 
-
 template <int dim>
 ProblemBase<dim>::ProblemBase () :
 		tria(0),

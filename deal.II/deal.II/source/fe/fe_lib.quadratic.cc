@@ -1119,7 +1119,1828 @@ void FEQuadraticSub<2>::get_face_support_points (const typename DoFHandler<2>::f
   support_points[2] = (support_points[0] + support_points[1]) / 2;
 };
 
+#endif
 
+
+
+#if deal_II_dimension == 3
+
+template <>
+FEQuadraticSub<3>::FEQuadraticSub () :
+		FELinearMapping<3> (1, 1, 1, 1)
+{
+  interface_constraints(0,8) = 1.0;
+  interface_constraints(1,4) = 1.0;
+  interface_constraints(2,5) = 1.0;
+  interface_constraints(3,6) = 1.0;
+  interface_constraints(4,7) = 1.0;
+  interface_constraints(5,4) = 3.0/8.0;
+  interface_constraints(5,6) = -1.0/8.0;
+  interface_constraints(5,8) = 3.0/4.0;
+  interface_constraints(6,5) = 3.0/8.0;
+  interface_constraints(6,7) = -1.0/8.0;
+  interface_constraints(6,8) = 3.0/4.0;
+  interface_constraints(7,4) = -1.0/8.0;
+  interface_constraints(7,6) = 3.0/8.0;
+  interface_constraints(7,8) = 3.0/4.0;
+  interface_constraints(8,5) = -1.0/8.0;
+  interface_constraints(8,7) = 3.0/8.0;
+  interface_constraints(8,8) = 3.0/4.0;
+  interface_constraints(9,0) = 3.0/8.0;
+  interface_constraints(9,1) = -1.0/8.0;
+  interface_constraints(9,4) = 3.0/4.0;
+  interface_constraints(10,0) = -1.0/8.0;
+  interface_constraints(10,1) = 3.0/8.0;
+  interface_constraints(10,4) = 3.0/4.0;
+  interface_constraints(11,1) = 3.0/8.0;
+  interface_constraints(11,2) = -1.0/8.0;
+  interface_constraints(11,5) = 3.0/4.0;
+  interface_constraints(12,1) = -1.0/8.0;
+  interface_constraints(12,2) = 3.0/8.0;
+  interface_constraints(12,5) = 3.0/4.0;
+  interface_constraints(13,2) = -1.0/8.0;
+  interface_constraints(13,3) = 3.0/8.0;
+  interface_constraints(13,6) = 3.0/4.0;
+  interface_constraints(14,2) = 3.0/8.0;
+  interface_constraints(14,3) = -1.0/8.0;
+  interface_constraints(14,6) = 3.0/4.0;
+  interface_constraints(15,0) = 3.0/8.0;
+  interface_constraints(15,3) = -1.0/8.0;
+  interface_constraints(15,7) = 3.0/4.0;
+  interface_constraints(16,0) = -1.0/8.0;
+  interface_constraints(16,3) = 3.0/8.0;
+  interface_constraints(16,7) = 3.0/4.0;
+  interface_constraints(17,0) = 9.0/64.0;
+  interface_constraints(17,1) = -3.0/64.0;
+  interface_constraints(17,2) = 1.0/64.0;
+  interface_constraints(17,3) = -3.0/64.0;
+  interface_constraints(17,4) = 9.0/32.0;
+  interface_constraints(17,5) = -3.0/32.0;
+  interface_constraints(17,6) = -3.0/32.0;
+  interface_constraints(17,7) = 9.0/32.0;
+  interface_constraints(17,8) = 9.0/16.0;
+  interface_constraints(18,0) = -3.0/64.0;
+  interface_constraints(18,1) = 9.0/64.0;
+  interface_constraints(18,2) = -3.0/64.0;
+  interface_constraints(18,3) = 1.0/64.0;
+  interface_constraints(18,4) = 9.0/32.0;
+  interface_constraints(18,5) = 9.0/32.0;
+  interface_constraints(18,6) = -3.0/32.0;
+  interface_constraints(18,7) = -3.0/32.0;
+  interface_constraints(18,8) = 9.0/16.0;
+  interface_constraints(19,0) = 1.0/64.0;
+  interface_constraints(19,1) = -3.0/64.0;
+  interface_constraints(19,2) = 9.0/64.0;
+  interface_constraints(19,3) = -3.0/64.0;
+  interface_constraints(19,4) = -3.0/32.0;
+  interface_constraints(19,5) = 9.0/32.0;
+  interface_constraints(19,6) = 9.0/32.0;
+  interface_constraints(19,7) = -3.0/32.0;
+  interface_constraints(19,8) = 9.0/16.0;
+  interface_constraints(20,0) = -3.0/64.0;
+  interface_constraints(20,1) = 1.0/64.0;
+  interface_constraints(20,2) = -3.0/64.0;
+  interface_constraints(20,3) = 9.0/64.0;
+  interface_constraints(20,4) = -3.0/32.0;
+  interface_constraints(20,5) = -3.0/32.0;
+  interface_constraints(20,6) = 9.0/32.0;
+  interface_constraints(20,7) = 9.0/32.0;
+  interface_constraints(20,8) = 9.0/16.0;
+
+  initialize_matrices ();
+};
+
+
+
+template <>
+FEQuadraticSub<3>::FEQuadraticSub (const int) :
+		FELinearMapping<3> (0, 0, 0, 27)
+{
+  initialize_matrices ();
+};
+
+
+
+template <>
+void FEQuadraticSub<3>::initialize_matrices () {
+  prolongation[0](0,0) = 1.0;
+  prolongation[0](1,8) = 1.0;
+  prolongation[0](2,20) = 1.0;
+  prolongation[0](3,11) = 1.0;
+  prolongation[0](4,16) = 1.0;
+  prolongation[0](5,22) = 1.0;
+  prolongation[0](6,26) = 1.0;
+  prolongation[0](7,25) = 1.0;
+  prolongation[0](8,0) = 3.0/8.0;
+  prolongation[0](8,1) = -1.0/8.0;
+  prolongation[0](8,8) = 3.0/4.0;
+  prolongation[0](9,8) = 3.0/8.0;
+  prolongation[0](9,10) = -1.0/8.0;
+  prolongation[0](9,20) = 3.0/4.0;
+  prolongation[0](10,9) = -1.0/8.0;
+  prolongation[0](10,11) = 3.0/8.0;
+  prolongation[0](10,20) = 3.0/4.0;
+  prolongation[0](11,0) = 3.0/8.0;
+  prolongation[0](11,3) = -1.0/8.0;
+  prolongation[0](11,11) = 3.0/4.0;
+  prolongation[0](12,16) = 3.0/8.0;
+  prolongation[0](12,17) = -1.0/8.0;
+  prolongation[0](12,22) = 3.0/4.0;
+  prolongation[0](13,22) = 3.0/8.0;
+  prolongation[0](13,24) = -1.0/8.0;
+  prolongation[0](13,26) = 3.0/4.0;
+  prolongation[0](14,23) = -1.0/8.0;
+  prolongation[0](14,25) = 3.0/8.0;
+  prolongation[0](14,26) = 3.0/4.0;
+  prolongation[0](15,16) = 3.0/8.0;
+  prolongation[0](15,19) = -1.0/8.0;
+  prolongation[0](15,25) = 3.0/4.0;
+  prolongation[0](16,0) = 3.0/8.0;
+  prolongation[0](16,4) = -1.0/8.0;
+  prolongation[0](16,16) = 3.0/4.0;
+  prolongation[0](17,8) = 3.0/8.0;
+  prolongation[0](17,12) = -1.0/8.0;
+  prolongation[0](17,22) = 3.0/4.0;
+  prolongation[0](18,20) = 3.0/8.0;
+  prolongation[0](18,21) = -1.0/8.0;
+  prolongation[0](18,26) = 3.0/4.0;
+  prolongation[0](19,11) = 3.0/8.0;
+  prolongation[0](19,15) = -1.0/8.0;
+  prolongation[0](19,25) = 3.0/4.0;
+  prolongation[0](20,0) = 9.0/64.0;
+  prolongation[0](20,1) = -3.0/64.0;
+  prolongation[0](20,2) = 1.0/64.0;
+  prolongation[0](20,3) = -3.0/64.0;
+  prolongation[0](20,8) = 9.0/32.0;
+  prolongation[0](20,9) = -3.0/32.0;
+  prolongation[0](20,10) = -3.0/32.0;
+  prolongation[0](20,11) = 9.0/32.0;
+  prolongation[0](20,20) = 9.0/16.0;
+  prolongation[0](21,16) = 9.0/64.0;
+  prolongation[0](21,17) = -3.0/64.0;
+  prolongation[0](21,18) = 1.0/64.0;
+  prolongation[0](21,19) = -3.0/64.0;
+  prolongation[0](21,22) = 9.0/32.0;
+  prolongation[0](21,23) = -3.0/32.0;
+  prolongation[0](21,24) = -3.0/32.0;
+  prolongation[0](21,25) = 9.0/32.0;
+  prolongation[0](21,26) = 9.0/16.0;
+  prolongation[0](22,0) = 9.0/64.0;
+  prolongation[0](22,1) = -3.0/64.0;
+  prolongation[0](22,4) = -3.0/64.0;
+  prolongation[0](22,5) = 1.0/64.0;
+  prolongation[0](22,8) = 9.0/32.0;
+  prolongation[0](22,12) = -3.0/32.0;
+  prolongation[0](22,16) = 9.0/32.0;
+  prolongation[0](22,17) = -3.0/32.0;
+  prolongation[0](22,22) = 9.0/16.0;
+  prolongation[0](23,8) = 9.0/64.0;
+  prolongation[0](23,10) = -3.0/64.0;
+  prolongation[0](23,12) = -3.0/64.0;
+  prolongation[0](23,14) = 1.0/64.0;
+  prolongation[0](23,20) = 9.0/32.0;
+  prolongation[0](23,21) = -3.0/32.0;
+  prolongation[0](23,22) = 9.0/32.0;
+  prolongation[0](23,24) = -3.0/32.0;
+  prolongation[0](23,26) = 9.0/16.0;
+  prolongation[0](24,9) = -3.0/64.0;
+  prolongation[0](24,11) = 9.0/64.0;
+  prolongation[0](24,13) = 1.0/64.0;
+  prolongation[0](24,15) = -3.0/64.0;
+  prolongation[0](24,20) = 9.0/32.0;
+  prolongation[0](24,21) = -3.0/32.0;
+  prolongation[0](24,23) = -3.0/32.0;
+  prolongation[0](24,25) = 9.0/32.0;
+  prolongation[0](24,26) = 9.0/16.0;
+  prolongation[0](25,0) = 9.0/64.0;
+  prolongation[0](25,3) = -3.0/64.0;
+  prolongation[0](25,4) = -3.0/64.0;
+  prolongation[0](25,7) = 1.0/64.0;
+  prolongation[0](25,11) = 9.0/32.0;
+  prolongation[0](25,15) = -3.0/32.0;
+  prolongation[0](25,16) = 9.0/32.0;
+  prolongation[0](25,19) = -3.0/32.0;
+  prolongation[0](25,25) = 9.0/16.0;
+  prolongation[0](26,0) = 27.0/512.0;
+  prolongation[0](26,1) = -9.0/512.0;
+  prolongation[0](26,2) = 3.0/512.0;
+  prolongation[0](26,3) = -9.0/512.0;
+  prolongation[0](26,4) = -9.0/512.0;
+  prolongation[0](26,5) = 3.0/512.0;
+  prolongation[0](26,6) = -1.0/512.0;
+  prolongation[0](26,7) = 3.0/512.0;
+  prolongation[0](26,8) = 27.0/256.0;
+  prolongation[0](26,9) = -9.0/256.0;
+  prolongation[0](26,10) = -9.0/256.0;
+  prolongation[0](26,11) = 27.0/256.0;
+  prolongation[0](26,12) = -9.0/256.0;
+  prolongation[0](26,13) = 3.0/256.0;
+  prolongation[0](26,14) = 3.0/256.0;
+  prolongation[0](26,15) = -9.0/256.0;
+  prolongation[0](26,16) = 27.0/256.0;
+  prolongation[0](26,17) = -9.0/256.0;
+  prolongation[0](26,18) = 3.0/256.0;
+  prolongation[0](26,19) = -9.0/256.0;
+  prolongation[0](26,20) = 27.0/128.0;
+  prolongation[0](26,21) = -9.0/128.0;
+  prolongation[0](26,22) = 27.0/128.0;
+  prolongation[0](26,23) = -9.0/128.0;
+  prolongation[0](26,24) = -9.0/128.0;
+  prolongation[0](26,25) = 27.0/128.0;
+  prolongation[0](26,26) = 27.0/64.0;
+  prolongation[1](0,8) = 1.0;
+  prolongation[1](1,1) = 1.0;
+  prolongation[1](2,9) = 1.0;
+  prolongation[1](3,20) = 1.0;
+  prolongation[1](4,22) = 1.0;
+  prolongation[1](5,17) = 1.0;
+  prolongation[1](6,23) = 1.0;
+  prolongation[1](7,26) = 1.0;
+  prolongation[1](8,0) = -1.0/8.0;
+  prolongation[1](8,1) = 3.0/8.0;
+  prolongation[1](8,8) = 3.0/4.0;
+  prolongation[1](9,1) = 3.0/8.0;
+  prolongation[1](9,2) = -1.0/8.0;
+  prolongation[1](9,9) = 3.0/4.0;
+  prolongation[1](10,9) = 3.0/8.0;
+  prolongation[1](10,11) = -1.0/8.0;
+  prolongation[1](10,20) = 3.0/4.0;
+  prolongation[1](11,8) = 3.0/8.0;
+  prolongation[1](11,10) = -1.0/8.0;
+  prolongation[1](11,20) = 3.0/4.0;
+  prolongation[1](12,16) = -1.0/8.0;
+  prolongation[1](12,17) = 3.0/8.0;
+  prolongation[1](12,22) = 3.0/4.0;
+  prolongation[1](13,17) = 3.0/8.0;
+  prolongation[1](13,18) = -1.0/8.0;
+  prolongation[1](13,23) = 3.0/4.0;
+  prolongation[1](14,23) = 3.0/8.0;
+  prolongation[1](14,25) = -1.0/8.0;
+  prolongation[1](14,26) = 3.0/4.0;
+  prolongation[1](15,22) = 3.0/8.0;
+  prolongation[1](15,24) = -1.0/8.0;
+  prolongation[1](15,26) = 3.0/4.0;
+  prolongation[1](16,8) = 3.0/8.0;
+  prolongation[1](16,12) = -1.0/8.0;
+  prolongation[1](16,22) = 3.0/4.0;
+  prolongation[1](17,1) = 3.0/8.0;
+  prolongation[1](17,5) = -1.0/8.0;
+  prolongation[1](17,17) = 3.0/4.0;
+  prolongation[1](18,9) = 3.0/8.0;
+  prolongation[1](18,13) = -1.0/8.0;
+  prolongation[1](18,23) = 3.0/4.0;
+  prolongation[1](19,20) = 3.0/8.0;
+  prolongation[1](19,21) = -1.0/8.0;
+  prolongation[1](19,26) = 3.0/4.0;
+  prolongation[1](20,0) = -3.0/64.0;
+  prolongation[1](20,1) = 9.0/64.0;
+  prolongation[1](20,2) = -3.0/64.0;
+  prolongation[1](20,3) = 1.0/64.0;
+  prolongation[1](20,8) = 9.0/32.0;
+  prolongation[1](20,9) = 9.0/32.0;
+  prolongation[1](20,10) = -3.0/32.0;
+  prolongation[1](20,11) = -3.0/32.0;
+  prolongation[1](20,20) = 9.0/16.0;
+  prolongation[1](21,16) = -3.0/64.0;
+  prolongation[1](21,17) = 9.0/64.0;
+  prolongation[1](21,18) = -3.0/64.0;
+  prolongation[1](21,19) = 1.0/64.0;
+  prolongation[1](21,22) = 9.0/32.0;
+  prolongation[1](21,23) = 9.0/32.0;
+  prolongation[1](21,24) = -3.0/32.0;
+  prolongation[1](21,25) = -3.0/32.0;
+  prolongation[1](21,26) = 9.0/16.0;
+  prolongation[1](22,0) = -3.0/64.0;
+  prolongation[1](22,1) = 9.0/64.0;
+  prolongation[1](22,4) = 1.0/64.0;
+  prolongation[1](22,5) = -3.0/64.0;
+  prolongation[1](22,8) = 9.0/32.0;
+  prolongation[1](22,12) = -3.0/32.0;
+  prolongation[1](22,16) = -3.0/32.0;
+  prolongation[1](22,17) = 9.0/32.0;
+  prolongation[1](22,22) = 9.0/16.0;
+  prolongation[1](23,1) = 9.0/64.0;
+  prolongation[1](23,2) = -3.0/64.0;
+  prolongation[1](23,5) = -3.0/64.0;
+  prolongation[1](23,6) = 1.0/64.0;
+  prolongation[1](23,9) = 9.0/32.0;
+  prolongation[1](23,13) = -3.0/32.0;
+  prolongation[1](23,17) = 9.0/32.0;
+  prolongation[1](23,18) = -3.0/32.0;
+  prolongation[1](23,23) = 9.0/16.0;
+  prolongation[1](24,9) = 9.0/64.0;
+  prolongation[1](24,11) = -3.0/64.0;
+  prolongation[1](24,13) = -3.0/64.0;
+  prolongation[1](24,15) = 1.0/64.0;
+  prolongation[1](24,20) = 9.0/32.0;
+  prolongation[1](24,21) = -3.0/32.0;
+  prolongation[1](24,23) = 9.0/32.0;
+  prolongation[1](24,25) = -3.0/32.0;
+  prolongation[1](24,26) = 9.0/16.0;
+  prolongation[1](25,8) = 9.0/64.0;
+  prolongation[1](25,10) = -3.0/64.0;
+  prolongation[1](25,12) = -3.0/64.0;
+  prolongation[1](25,14) = 1.0/64.0;
+  prolongation[1](25,20) = 9.0/32.0;
+  prolongation[1](25,21) = -3.0/32.0;
+  prolongation[1](25,22) = 9.0/32.0;
+  prolongation[1](25,24) = -3.0/32.0;
+  prolongation[1](25,26) = 9.0/16.0;
+  prolongation[1](26,0) = -9.0/512.0;
+  prolongation[1](26,1) = 27.0/512.0;
+  prolongation[1](26,2) = -9.0/512.0;
+  prolongation[1](26,3) = 3.0/512.0;
+  prolongation[1](26,4) = 3.0/512.0;
+  prolongation[1](26,5) = -9.0/512.0;
+  prolongation[1](26,6) = 3.0/512.0;
+  prolongation[1](26,7) = -1.0/512.0;
+  prolongation[1](26,8) = 27.0/256.0;
+  prolongation[1](26,9) = 27.0/256.0;
+  prolongation[1](26,10) = -9.0/256.0;
+  prolongation[1](26,11) = -9.0/256.0;
+  prolongation[1](26,12) = -9.0/256.0;
+  prolongation[1](26,13) = -9.0/256.0;
+  prolongation[1](26,14) = 3.0/256.0;
+  prolongation[1](26,15) = 3.0/256.0;
+  prolongation[1](26,16) = -9.0/256.0;
+  prolongation[1](26,17) = 27.0/256.0;
+  prolongation[1](26,18) = -9.0/256.0;
+  prolongation[1](26,19) = 3.0/256.0;
+  prolongation[1](26,20) = 27.0/128.0;
+  prolongation[1](26,21) = -9.0/128.0;
+  prolongation[1](26,22) = 27.0/128.0;
+  prolongation[1](26,23) = 27.0/128.0;
+  prolongation[1](26,24) = -9.0/128.0;
+  prolongation[1](26,25) = -9.0/128.0;
+  prolongation[1](26,26) = 27.0/64.0;
+  prolongation[2](0,20) = 1.0;
+  prolongation[2](1,9) = 1.0;
+  prolongation[2](2,2) = 1.0;
+  prolongation[2](3,10) = 1.0;
+  prolongation[2](4,26) = 1.0;
+  prolongation[2](5,23) = 1.0;
+  prolongation[2](6,18) = 1.0;
+  prolongation[2](7,24) = 1.0;
+  prolongation[2](8,9) = 3.0/8.0;
+  prolongation[2](8,11) = -1.0/8.0;
+  prolongation[2](8,20) = 3.0/4.0;
+  prolongation[2](9,1) = -1.0/8.0;
+  prolongation[2](9,2) = 3.0/8.0;
+  prolongation[2](9,9) = 3.0/4.0;
+  prolongation[2](10,2) = 3.0/8.0;
+  prolongation[2](10,3) = -1.0/8.0;
+  prolongation[2](10,10) = 3.0/4.0;
+  prolongation[2](11,8) = -1.0/8.0;
+  prolongation[2](11,10) = 3.0/8.0;
+  prolongation[2](11,20) = 3.0/4.0;
+  prolongation[2](12,23) = 3.0/8.0;
+  prolongation[2](12,25) = -1.0/8.0;
+  prolongation[2](12,26) = 3.0/4.0;
+  prolongation[2](13,17) = -1.0/8.0;
+  prolongation[2](13,18) = 3.0/8.0;
+  prolongation[2](13,23) = 3.0/4.0;
+  prolongation[2](14,18) = 3.0/8.0;
+  prolongation[2](14,19) = -1.0/8.0;
+  prolongation[2](14,24) = 3.0/4.0;
+  prolongation[2](15,22) = -1.0/8.0;
+  prolongation[2](15,24) = 3.0/8.0;
+  prolongation[2](15,26) = 3.0/4.0;
+  prolongation[2](16,20) = 3.0/8.0;
+  prolongation[2](16,21) = -1.0/8.0;
+  prolongation[2](16,26) = 3.0/4.0;
+  prolongation[2](17,9) = 3.0/8.0;
+  prolongation[2](17,13) = -1.0/8.0;
+  prolongation[2](17,23) = 3.0/4.0;
+  prolongation[2](18,2) = 3.0/8.0;
+  prolongation[2](18,6) = -1.0/8.0;
+  prolongation[2](18,18) = 3.0/4.0;
+  prolongation[2](19,10) = 3.0/8.0;
+  prolongation[2](19,14) = -1.0/8.0;
+  prolongation[2](19,24) = 3.0/4.0;
+  prolongation[2](20,0) = 1.0/64.0;
+  prolongation[2](20,1) = -3.0/64.0;
+  prolongation[2](20,2) = 9.0/64.0;
+  prolongation[2](20,3) = -3.0/64.0;
+  prolongation[2](20,8) = -3.0/32.0;
+  prolongation[2](20,9) = 9.0/32.0;
+  prolongation[2](20,10) = 9.0/32.0;
+  prolongation[2](20,11) = -3.0/32.0;
+  prolongation[2](20,20) = 9.0/16.0;
+  prolongation[2](21,16) = 1.0/64.0;
+  prolongation[2](21,17) = -3.0/64.0;
+  prolongation[2](21,18) = 9.0/64.0;
+  prolongation[2](21,19) = -3.0/64.0;
+  prolongation[2](21,22) = -3.0/32.0;
+  prolongation[2](21,23) = 9.0/32.0;
+  prolongation[2](21,24) = 9.0/32.0;
+  prolongation[2](21,25) = -3.0/32.0;
+  prolongation[2](21,26) = 9.0/16.0;
+  prolongation[2](22,9) = 9.0/64.0;
+  prolongation[2](22,11) = -3.0/64.0;
+  prolongation[2](22,13) = -3.0/64.0;
+  prolongation[2](22,15) = 1.0/64.0;
+  prolongation[2](22,20) = 9.0/32.0;
+  prolongation[2](22,21) = -3.0/32.0;
+  prolongation[2](22,23) = 9.0/32.0;
+  prolongation[2](22,25) = -3.0/32.0;
+  prolongation[2](22,26) = 9.0/16.0;
+  prolongation[2](23,1) = -3.0/64.0;
+  prolongation[2](23,2) = 9.0/64.0;
+  prolongation[2](23,5) = 1.0/64.0;
+  prolongation[2](23,6) = -3.0/64.0;
+  prolongation[2](23,9) = 9.0/32.0;
+  prolongation[2](23,13) = -3.0/32.0;
+  prolongation[2](23,17) = -3.0/32.0;
+  prolongation[2](23,18) = 9.0/32.0;
+  prolongation[2](23,23) = 9.0/16.0;
+  prolongation[2](24,2) = 9.0/64.0;
+  prolongation[2](24,3) = -3.0/64.0;
+  prolongation[2](24,6) = -3.0/64.0;
+  prolongation[2](24,7) = 1.0/64.0;
+  prolongation[2](24,10) = 9.0/32.0;
+  prolongation[2](24,14) = -3.0/32.0;
+  prolongation[2](24,18) = 9.0/32.0;
+  prolongation[2](24,19) = -3.0/32.0;
+  prolongation[2](24,24) = 9.0/16.0;
+  prolongation[2](25,8) = -3.0/64.0;
+  prolongation[2](25,10) = 9.0/64.0;
+  prolongation[2](25,12) = 1.0/64.0;
+  prolongation[2](25,14) = -3.0/64.0;
+  prolongation[2](25,20) = 9.0/32.0;
+  prolongation[2](25,21) = -3.0/32.0;
+  prolongation[2](25,22) = -3.0/32.0;
+  prolongation[2](25,24) = 9.0/32.0;
+  prolongation[2](25,26) = 9.0/16.0;
+  prolongation[2](26,0) = 3.0/512.0;
+  prolongation[2](26,1) = -9.0/512.0;
+  prolongation[2](26,2) = 27.0/512.0;
+  prolongation[2](26,3) = -9.0/512.0;
+  prolongation[2](26,4) = -1.0/512.0;
+  prolongation[2](26,5) = 3.0/512.0;
+  prolongation[2](26,6) = -9.0/512.0;
+  prolongation[2](26,7) = 3.0/512.0;
+  prolongation[2](26,8) = -9.0/256.0;
+  prolongation[2](26,9) = 27.0/256.0;
+  prolongation[2](26,10) = 27.0/256.0;
+  prolongation[2](26,11) = -9.0/256.0;
+  prolongation[2](26,12) = 3.0/256.0;
+  prolongation[2](26,13) = -9.0/256.0;
+  prolongation[2](26,14) = -9.0/256.0;
+  prolongation[2](26,15) = 3.0/256.0;
+  prolongation[2](26,16) = 3.0/256.0;
+  prolongation[2](26,17) = -9.0/256.0;
+  prolongation[2](26,18) = 27.0/256.0;
+  prolongation[2](26,19) = -9.0/256.0;
+  prolongation[2](26,20) = 27.0/128.0;
+  prolongation[2](26,21) = -9.0/128.0;
+  prolongation[2](26,22) = -9.0/128.0;
+  prolongation[2](26,23) = 27.0/128.0;
+  prolongation[2](26,24) = 27.0/128.0;
+  prolongation[2](26,25) = -9.0/128.0;
+  prolongation[2](26,26) = 27.0/64.0;
+  prolongation[3](0,11) = 1.0;
+  prolongation[3](1,20) = 1.0;
+  prolongation[3](2,10) = 1.0;
+  prolongation[3](3,3) = 1.0;
+  prolongation[3](4,25) = 1.0;
+  prolongation[3](5,26) = 1.0;
+  prolongation[3](6,24) = 1.0;
+  prolongation[3](7,19) = 1.0;
+  prolongation[3](8,9) = -1.0/8.0;
+  prolongation[3](8,11) = 3.0/8.0;
+  prolongation[3](8,20) = 3.0/4.0;
+  prolongation[3](9,8) = -1.0/8.0;
+  prolongation[3](9,10) = 3.0/8.0;
+  prolongation[3](9,20) = 3.0/4.0;
+  prolongation[3](10,2) = -1.0/8.0;
+  prolongation[3](10,3) = 3.0/8.0;
+  prolongation[3](10,10) = 3.0/4.0;
+  prolongation[3](11,0) = -1.0/8.0;
+  prolongation[3](11,3) = 3.0/8.0;
+  prolongation[3](11,11) = 3.0/4.0;
+  prolongation[3](12,23) = -1.0/8.0;
+  prolongation[3](12,25) = 3.0/8.0;
+  prolongation[3](12,26) = 3.0/4.0;
+  prolongation[3](13,22) = -1.0/8.0;
+  prolongation[3](13,24) = 3.0/8.0;
+  prolongation[3](13,26) = 3.0/4.0;
+  prolongation[3](14,18) = -1.0/8.0;
+  prolongation[3](14,19) = 3.0/8.0;
+  prolongation[3](14,24) = 3.0/4.0;
+  prolongation[3](15,16) = -1.0/8.0;
+  prolongation[3](15,19) = 3.0/8.0;
+  prolongation[3](15,25) = 3.0/4.0;
+  prolongation[3](16,11) = 3.0/8.0;
+  prolongation[3](16,15) = -1.0/8.0;
+  prolongation[3](16,25) = 3.0/4.0;
+  prolongation[3](17,20) = 3.0/8.0;
+  prolongation[3](17,21) = -1.0/8.0;
+  prolongation[3](17,26) = 3.0/4.0;
+  prolongation[3](18,10) = 3.0/8.0;
+  prolongation[3](18,14) = -1.0/8.0;
+  prolongation[3](18,24) = 3.0/4.0;
+  prolongation[3](19,3) = 3.0/8.0;
+  prolongation[3](19,7) = -1.0/8.0;
+  prolongation[3](19,19) = 3.0/4.0;
+  prolongation[3](20,0) = -3.0/64.0;
+  prolongation[3](20,1) = 1.0/64.0;
+  prolongation[3](20,2) = -3.0/64.0;
+  prolongation[3](20,3) = 9.0/64.0;
+  prolongation[3](20,8) = -3.0/32.0;
+  prolongation[3](20,9) = -3.0/32.0;
+  prolongation[3](20,10) = 9.0/32.0;
+  prolongation[3](20,11) = 9.0/32.0;
+  prolongation[3](20,20) = 9.0/16.0;
+  prolongation[3](21,16) = -3.0/64.0;
+  prolongation[3](21,17) = 1.0/64.0;
+  prolongation[3](21,18) = -3.0/64.0;
+  prolongation[3](21,19) = 9.0/64.0;
+  prolongation[3](21,22) = -3.0/32.0;
+  prolongation[3](21,23) = -3.0/32.0;
+  prolongation[3](21,24) = 9.0/32.0;
+  prolongation[3](21,25) = 9.0/32.0;
+  prolongation[3](21,26) = 9.0/16.0;
+  prolongation[3](22,9) = -3.0/64.0;
+  prolongation[3](22,11) = 9.0/64.0;
+  prolongation[3](22,13) = 1.0/64.0;
+  prolongation[3](22,15) = -3.0/64.0;
+  prolongation[3](22,20) = 9.0/32.0;
+  prolongation[3](22,21) = -3.0/32.0;
+  prolongation[3](22,23) = -3.0/32.0;
+  prolongation[3](22,25) = 9.0/32.0;
+  prolongation[3](22,26) = 9.0/16.0;
+  prolongation[3](23,8) = -3.0/64.0;
+  prolongation[3](23,10) = 9.0/64.0;
+  prolongation[3](23,12) = 1.0/64.0;
+  prolongation[3](23,14) = -3.0/64.0;
+  prolongation[3](23,20) = 9.0/32.0;
+  prolongation[3](23,21) = -3.0/32.0;
+  prolongation[3](23,22) = -3.0/32.0;
+  prolongation[3](23,24) = 9.0/32.0;
+  prolongation[3](23,26) = 9.0/16.0;
+  prolongation[3](24,2) = -3.0/64.0;
+  prolongation[3](24,3) = 9.0/64.0;
+  prolongation[3](24,6) = 1.0/64.0;
+  prolongation[3](24,7) = -3.0/64.0;
+  prolongation[3](24,10) = 9.0/32.0;
+  prolongation[3](24,14) = -3.0/32.0;
+  prolongation[3](24,18) = -3.0/32.0;
+  prolongation[3](24,19) = 9.0/32.0;
+  prolongation[3](24,24) = 9.0/16.0;
+  prolongation[3](25,0) = -3.0/64.0;
+  prolongation[3](25,3) = 9.0/64.0;
+  prolongation[3](25,4) = 1.0/64.0;
+  prolongation[3](25,7) = -3.0/64.0;
+  prolongation[3](25,11) = 9.0/32.0;
+  prolongation[3](25,15) = -3.0/32.0;
+  prolongation[3](25,16) = -3.0/32.0;
+  prolongation[3](25,19) = 9.0/32.0;
+  prolongation[3](25,25) = 9.0/16.0;
+  prolongation[3](26,0) = -9.0/512.0;
+  prolongation[3](26,1) = 3.0/512.0;
+  prolongation[3](26,2) = -9.0/512.0;
+  prolongation[3](26,3) = 27.0/512.0;
+  prolongation[3](26,4) = 3.0/512.0;
+  prolongation[3](26,5) = -1.0/512.0;
+  prolongation[3](26,6) = 3.0/512.0;
+  prolongation[3](26,7) = -9.0/512.0;
+  prolongation[3](26,8) = -9.0/256.0;
+  prolongation[3](26,9) = -9.0/256.0;
+  prolongation[3](26,10) = 27.0/256.0;
+  prolongation[3](26,11) = 27.0/256.0;
+  prolongation[3](26,12) = 3.0/256.0;
+  prolongation[3](26,13) = 3.0/256.0;
+  prolongation[3](26,14) = -9.0/256.0;
+  prolongation[3](26,15) = -9.0/256.0;
+  prolongation[3](26,16) = -9.0/256.0;
+  prolongation[3](26,17) = 3.0/256.0;
+  prolongation[3](26,18) = -9.0/256.0;
+  prolongation[3](26,19) = 27.0/256.0;
+  prolongation[3](26,20) = 27.0/128.0;
+  prolongation[3](26,21) = -9.0/128.0;
+  prolongation[3](26,22) = -9.0/128.0;
+  prolongation[3](26,23) = -9.0/128.0;
+  prolongation[3](26,24) = 27.0/128.0;
+  prolongation[3](26,25) = 27.0/128.0;
+  prolongation[3](26,26) = 27.0/64.0;
+  prolongation[4](0,16) = 1.0;
+  prolongation[4](1,22) = 1.0;
+  prolongation[4](2,26) = 1.0;
+  prolongation[4](3,25) = 1.0;
+  prolongation[4](4,4) = 1.0;
+  prolongation[4](5,12) = 1.0;
+  prolongation[4](6,21) = 1.0;
+  prolongation[4](7,15) = 1.0;
+  prolongation[4](8,16) = 3.0/8.0;
+  prolongation[4](8,17) = -1.0/8.0;
+  prolongation[4](8,22) = 3.0/4.0;
+  prolongation[4](9,22) = 3.0/8.0;
+  prolongation[4](9,24) = -1.0/8.0;
+  prolongation[4](9,26) = 3.0/4.0;
+  prolongation[4](10,23) = -1.0/8.0;
+  prolongation[4](10,25) = 3.0/8.0;
+  prolongation[4](10,26) = 3.0/4.0;
+  prolongation[4](11,16) = 3.0/8.0;
+  prolongation[4](11,19) = -1.0/8.0;
+  prolongation[4](11,25) = 3.0/4.0;
+  prolongation[4](12,4) = 3.0/8.0;
+  prolongation[4](12,5) = -1.0/8.0;
+  prolongation[4](12,12) = 3.0/4.0;
+  prolongation[4](13,12) = 3.0/8.0;
+  prolongation[4](13,14) = -1.0/8.0;
+  prolongation[4](13,21) = 3.0/4.0;
+  prolongation[4](14,13) = -1.0/8.0;
+  prolongation[4](14,15) = 3.0/8.0;
+  prolongation[4](14,21) = 3.0/4.0;
+  prolongation[4](15,4) = 3.0/8.0;
+  prolongation[4](15,7) = -1.0/8.0;
+  prolongation[4](15,15) = 3.0/4.0;
+  prolongation[4](16,0) = -1.0/8.0;
+  prolongation[4](16,4) = 3.0/8.0;
+  prolongation[4](16,16) = 3.0/4.0;
+  prolongation[4](17,8) = -1.0/8.0;
+  prolongation[4](17,12) = 3.0/8.0;
+  prolongation[4](17,22) = 3.0/4.0;
+  prolongation[4](18,20) = -1.0/8.0;
+  prolongation[4](18,21) = 3.0/8.0;
+  prolongation[4](18,26) = 3.0/4.0;
+  prolongation[4](19,11) = -1.0/8.0;
+  prolongation[4](19,15) = 3.0/8.0;
+  prolongation[4](19,25) = 3.0/4.0;
+  prolongation[4](20,16) = 9.0/64.0;
+  prolongation[4](20,17) = -3.0/64.0;
+  prolongation[4](20,18) = 1.0/64.0;
+  prolongation[4](20,19) = -3.0/64.0;
+  prolongation[4](20,22) = 9.0/32.0;
+  prolongation[4](20,23) = -3.0/32.0;
+  prolongation[4](20,24) = -3.0/32.0;
+  prolongation[4](20,25) = 9.0/32.0;
+  prolongation[4](20,26) = 9.0/16.0;
+  prolongation[4](21,4) = 9.0/64.0;
+  prolongation[4](21,5) = -3.0/64.0;
+  prolongation[4](21,6) = 1.0/64.0;
+  prolongation[4](21,7) = -3.0/64.0;
+  prolongation[4](21,12) = 9.0/32.0;
+  prolongation[4](21,13) = -3.0/32.0;
+  prolongation[4](21,14) = -3.0/32.0;
+  prolongation[4](21,15) = 9.0/32.0;
+  prolongation[4](21,21) = 9.0/16.0;
+  prolongation[4](22,0) = -3.0/64.0;
+  prolongation[4](22,1) = 1.0/64.0;
+  prolongation[4](22,4) = 9.0/64.0;
+  prolongation[4](22,5) = -3.0/64.0;
+  prolongation[4](22,8) = -3.0/32.0;
+  prolongation[4](22,12) = 9.0/32.0;
+  prolongation[4](22,16) = 9.0/32.0;
+  prolongation[4](22,17) = -3.0/32.0;
+  prolongation[4](22,22) = 9.0/16.0;
+  prolongation[4](23,8) = -3.0/64.0;
+  prolongation[4](23,10) = 1.0/64.0;
+  prolongation[4](23,12) = 9.0/64.0;
+  prolongation[4](23,14) = -3.0/64.0;
+  prolongation[4](23,20) = -3.0/32.0;
+  prolongation[4](23,21) = 9.0/32.0;
+  prolongation[4](23,22) = 9.0/32.0;
+  prolongation[4](23,24) = -3.0/32.0;
+  prolongation[4](23,26) = 9.0/16.0;
+  prolongation[4](24,9) = 1.0/64.0;
+  prolongation[4](24,11) = -3.0/64.0;
+  prolongation[4](24,13) = -3.0/64.0;
+  prolongation[4](24,15) = 9.0/64.0;
+  prolongation[4](24,20) = -3.0/32.0;
+  prolongation[4](24,21) = 9.0/32.0;
+  prolongation[4](24,23) = -3.0/32.0;
+  prolongation[4](24,25) = 9.0/32.0;
+  prolongation[4](24,26) = 9.0/16.0;
+  prolongation[4](25,0) = -3.0/64.0;
+  prolongation[4](25,3) = 1.0/64.0;
+  prolongation[4](25,4) = 9.0/64.0;
+  prolongation[4](25,7) = -3.0/64.0;
+  prolongation[4](25,11) = -3.0/32.0;
+  prolongation[4](25,15) = 9.0/32.0;
+  prolongation[4](25,16) = 9.0/32.0;
+  prolongation[4](25,19) = -3.0/32.0;
+  prolongation[4](25,25) = 9.0/16.0;
+  prolongation[4](26,0) = -9.0/512.0;
+  prolongation[4](26,1) = 3.0/512.0;
+  prolongation[4](26,2) = -1.0/512.0;
+  prolongation[4](26,3) = 3.0/512.0;
+  prolongation[4](26,4) = 27.0/512.0;
+  prolongation[4](26,5) = -9.0/512.0;
+  prolongation[4](26,6) = 3.0/512.0;
+  prolongation[4](26,7) = -9.0/512.0;
+  prolongation[4](26,8) = -9.0/256.0;
+  prolongation[4](26,9) = 3.0/256.0;
+  prolongation[4](26,10) = 3.0/256.0;
+  prolongation[4](26,11) = -9.0/256.0;
+  prolongation[4](26,12) = 27.0/256.0;
+  prolongation[4](26,13) = -9.0/256.0;
+  prolongation[4](26,14) = -9.0/256.0;
+  prolongation[4](26,15) = 27.0/256.0;
+  prolongation[4](26,16) = 27.0/256.0;
+  prolongation[4](26,17) = -9.0/256.0;
+  prolongation[4](26,18) = 3.0/256.0;
+  prolongation[4](26,19) = -9.0/256.0;
+  prolongation[4](26,20) = -9.0/128.0;
+  prolongation[4](26,21) = 27.0/128.0;
+  prolongation[4](26,22) = 27.0/128.0;
+  prolongation[4](26,23) = -9.0/128.0;
+  prolongation[4](26,24) = -9.0/128.0;
+  prolongation[4](26,25) = 27.0/128.0;
+  prolongation[4](26,26) = 27.0/64.0;
+  prolongation[5](0,22) = 1.0;
+  prolongation[5](1,17) = 1.0;
+  prolongation[5](2,23) = 1.0;
+  prolongation[5](3,26) = 1.0;
+  prolongation[5](4,12) = 1.0;
+  prolongation[5](5,5) = 1.0;
+  prolongation[5](6,13) = 1.0;
+  prolongation[5](7,21) = 1.0;
+  prolongation[5](8,16) = -1.0/8.0;
+  prolongation[5](8,17) = 3.0/8.0;
+  prolongation[5](8,22) = 3.0/4.0;
+  prolongation[5](9,17) = 3.0/8.0;
+  prolongation[5](9,18) = -1.0/8.0;
+  prolongation[5](9,23) = 3.0/4.0;
+  prolongation[5](10,23) = 3.0/8.0;
+  prolongation[5](10,25) = -1.0/8.0;
+  prolongation[5](10,26) = 3.0/4.0;
+  prolongation[5](11,22) = 3.0/8.0;
+  prolongation[5](11,24) = -1.0/8.0;
+  prolongation[5](11,26) = 3.0/4.0;
+  prolongation[5](12,4) = -1.0/8.0;
+  prolongation[5](12,5) = 3.0/8.0;
+  prolongation[5](12,12) = 3.0/4.0;
+  prolongation[5](13,5) = 3.0/8.0;
+  prolongation[5](13,6) = -1.0/8.0;
+  prolongation[5](13,13) = 3.0/4.0;
+  prolongation[5](14,13) = 3.0/8.0;
+  prolongation[5](14,15) = -1.0/8.0;
+  prolongation[5](14,21) = 3.0/4.0;
+  prolongation[5](15,12) = 3.0/8.0;
+  prolongation[5](15,14) = -1.0/8.0;
+  prolongation[5](15,21) = 3.0/4.0;
+  prolongation[5](16,8) = -1.0/8.0;
+  prolongation[5](16,12) = 3.0/8.0;
+  prolongation[5](16,22) = 3.0/4.0;
+  prolongation[5](17,1) = -1.0/8.0;
+  prolongation[5](17,5) = 3.0/8.0;
+  prolongation[5](17,17) = 3.0/4.0;
+  prolongation[5](18,9) = -1.0/8.0;
+  prolongation[5](18,13) = 3.0/8.0;
+  prolongation[5](18,23) = 3.0/4.0;
+  prolongation[5](19,20) = -1.0/8.0;
+  prolongation[5](19,21) = 3.0/8.0;
+  prolongation[5](19,26) = 3.0/4.0;
+  prolongation[5](20,16) = -3.0/64.0;
+  prolongation[5](20,17) = 9.0/64.0;
+  prolongation[5](20,18) = -3.0/64.0;
+  prolongation[5](20,19) = 1.0/64.0;
+  prolongation[5](20,22) = 9.0/32.0;
+  prolongation[5](20,23) = 9.0/32.0;
+  prolongation[5](20,24) = -3.0/32.0;
+  prolongation[5](20,25) = -3.0/32.0;
+  prolongation[5](20,26) = 9.0/16.0;
+  prolongation[5](21,4) = -3.0/64.0;
+  prolongation[5](21,5) = 9.0/64.0;
+  prolongation[5](21,6) = -3.0/64.0;
+  prolongation[5](21,7) = 1.0/64.0;
+  prolongation[5](21,12) = 9.0/32.0;
+  prolongation[5](21,13) = 9.0/32.0;
+  prolongation[5](21,14) = -3.0/32.0;
+  prolongation[5](21,15) = -3.0/32.0;
+  prolongation[5](21,21) = 9.0/16.0;
+  prolongation[5](22,0) = 1.0/64.0;
+  prolongation[5](22,1) = -3.0/64.0;
+  prolongation[5](22,4) = -3.0/64.0;
+  prolongation[5](22,5) = 9.0/64.0;
+  prolongation[5](22,8) = -3.0/32.0;
+  prolongation[5](22,12) = 9.0/32.0;
+  prolongation[5](22,16) = -3.0/32.0;
+  prolongation[5](22,17) = 9.0/32.0;
+  prolongation[5](22,22) = 9.0/16.0;
+  prolongation[5](23,1) = -3.0/64.0;
+  prolongation[5](23,2) = 1.0/64.0;
+  prolongation[5](23,5) = 9.0/64.0;
+  prolongation[5](23,6) = -3.0/64.0;
+  prolongation[5](23,9) = -3.0/32.0;
+  prolongation[5](23,13) = 9.0/32.0;
+  prolongation[5](23,17) = 9.0/32.0;
+  prolongation[5](23,18) = -3.0/32.0;
+  prolongation[5](23,23) = 9.0/16.0;
+  prolongation[5](24,9) = -3.0/64.0;
+  prolongation[5](24,11) = 1.0/64.0;
+  prolongation[5](24,13) = 9.0/64.0;
+  prolongation[5](24,15) = -3.0/64.0;
+  prolongation[5](24,20) = -3.0/32.0;
+  prolongation[5](24,21) = 9.0/32.0;
+  prolongation[5](24,23) = 9.0/32.0;
+  prolongation[5](24,25) = -3.0/32.0;
+  prolongation[5](24,26) = 9.0/16.0;
+  prolongation[5](25,8) = -3.0/64.0;
+  prolongation[5](25,10) = 1.0/64.0;
+  prolongation[5](25,12) = 9.0/64.0;
+  prolongation[5](25,14) = -3.0/64.0;
+  prolongation[5](25,20) = -3.0/32.0;
+  prolongation[5](25,21) = 9.0/32.0;
+  prolongation[5](25,22) = 9.0/32.0;
+  prolongation[5](25,24) = -3.0/32.0;
+  prolongation[5](25,26) = 9.0/16.0;
+  prolongation[5](26,0) = 3.0/512.0;
+  prolongation[5](26,1) = -9.0/512.0;
+  prolongation[5](26,2) = 3.0/512.0;
+  prolongation[5](26,3) = -1.0/512.0;
+  prolongation[5](26,4) = -9.0/512.0;
+  prolongation[5](26,5) = 27.0/512.0;
+  prolongation[5](26,6) = -9.0/512.0;
+  prolongation[5](26,7) = 3.0/512.0;
+  prolongation[5](26,8) = -9.0/256.0;
+  prolongation[5](26,9) = -9.0/256.0;
+  prolongation[5](26,10) = 3.0/256.0;
+  prolongation[5](26,11) = 3.0/256.0;
+  prolongation[5](26,12) = 27.0/256.0;
+  prolongation[5](26,13) = 27.0/256.0;
+  prolongation[5](26,14) = -9.0/256.0;
+  prolongation[5](26,15) = -9.0/256.0;
+  prolongation[5](26,16) = -9.0/256.0;
+  prolongation[5](26,17) = 27.0/256.0;
+  prolongation[5](26,18) = -9.0/256.0;
+  prolongation[5](26,19) = 3.0/256.0;
+  prolongation[5](26,20) = -9.0/128.0;
+  prolongation[5](26,21) = 27.0/128.0;
+  prolongation[5](26,22) = 27.0/128.0;
+  prolongation[5](26,23) = 27.0/128.0;
+  prolongation[5](26,24) = -9.0/128.0;
+  prolongation[5](26,25) = -9.0/128.0;
+  prolongation[5](26,26) = 27.0/64.0;
+  prolongation[6](0,26) = 1.0;
+  prolongation[6](1,23) = 1.0;
+  prolongation[6](2,18) = 1.0;
+  prolongation[6](3,24) = 1.0;
+  prolongation[6](4,21) = 1.0;
+  prolongation[6](5,13) = 1.0;
+  prolongation[6](6,6) = 1.0;
+  prolongation[6](7,14) = 1.0;
+  prolongation[6](8,23) = 3.0/8.0;
+  prolongation[6](8,25) = -1.0/8.0;
+  prolongation[6](8,26) = 3.0/4.0;
+  prolongation[6](9,17) = -1.0/8.0;
+  prolongation[6](9,18) = 3.0/8.0;
+  prolongation[6](9,23) = 3.0/4.0;
+  prolongation[6](10,18) = 3.0/8.0;
+  prolongation[6](10,19) = -1.0/8.0;
+  prolongation[6](10,24) = 3.0/4.0;
+  prolongation[6](11,22) = -1.0/8.0;
+  prolongation[6](11,24) = 3.0/8.0;
+  prolongation[6](11,26) = 3.0/4.0;
+  prolongation[6](12,13) = 3.0/8.0;
+  prolongation[6](12,15) = -1.0/8.0;
+  prolongation[6](12,21) = 3.0/4.0;
+  prolongation[6](13,5) = -1.0/8.0;
+  prolongation[6](13,6) = 3.0/8.0;
+  prolongation[6](13,13) = 3.0/4.0;
+  prolongation[6](14,6) = 3.0/8.0;
+  prolongation[6](14,7) = -1.0/8.0;
+  prolongation[6](14,14) = 3.0/4.0;
+  prolongation[6](15,12) = -1.0/8.0;
+  prolongation[6](15,14) = 3.0/8.0;
+  prolongation[6](15,21) = 3.0/4.0;
+  prolongation[6](16,20) = -1.0/8.0;
+  prolongation[6](16,21) = 3.0/8.0;
+  prolongation[6](16,26) = 3.0/4.0;
+  prolongation[6](17,9) = -1.0/8.0;
+  prolongation[6](17,13) = 3.0/8.0;
+  prolongation[6](17,23) = 3.0/4.0;
+  prolongation[6](18,2) = -1.0/8.0;
+  prolongation[6](18,6) = 3.0/8.0;
+  prolongation[6](18,18) = 3.0/4.0;
+  prolongation[6](19,10) = -1.0/8.0;
+  prolongation[6](19,14) = 3.0/8.0;
+  prolongation[6](19,24) = 3.0/4.0;
+  prolongation[6](20,16) = 1.0/64.0;
+  prolongation[6](20,17) = -3.0/64.0;
+  prolongation[6](20,18) = 9.0/64.0;
+  prolongation[6](20,19) = -3.0/64.0;
+  prolongation[6](20,22) = -3.0/32.0;
+  prolongation[6](20,23) = 9.0/32.0;
+  prolongation[6](20,24) = 9.0/32.0;
+  prolongation[6](20,25) = -3.0/32.0;
+  prolongation[6](20,26) = 9.0/16.0;
+  prolongation[6](21,4) = 1.0/64.0;
+  prolongation[6](21,5) = -3.0/64.0;
+  prolongation[6](21,6) = 9.0/64.0;
+  prolongation[6](21,7) = -3.0/64.0;
+  prolongation[6](21,12) = -3.0/32.0;
+  prolongation[6](21,13) = 9.0/32.0;
+  prolongation[6](21,14) = 9.0/32.0;
+  prolongation[6](21,15) = -3.0/32.0;
+  prolongation[6](21,21) = 9.0/16.0;
+  prolongation[6](22,9) = -3.0/64.0;
+  prolongation[6](22,11) = 1.0/64.0;
+  prolongation[6](22,13) = 9.0/64.0;
+  prolongation[6](22,15) = -3.0/64.0;
+  prolongation[6](22,20) = -3.0/32.0;
+  prolongation[6](22,21) = 9.0/32.0;
+  prolongation[6](22,23) = 9.0/32.0;
+  prolongation[6](22,25) = -3.0/32.0;
+  prolongation[6](22,26) = 9.0/16.0;
+  prolongation[6](23,1) = 1.0/64.0;
+  prolongation[6](23,2) = -3.0/64.0;
+  prolongation[6](23,5) = -3.0/64.0;
+  prolongation[6](23,6) = 9.0/64.0;
+  prolongation[6](23,9) = -3.0/32.0;
+  prolongation[6](23,13) = 9.0/32.0;
+  prolongation[6](23,17) = -3.0/32.0;
+  prolongation[6](23,18) = 9.0/32.0;
+  prolongation[6](23,23) = 9.0/16.0;
+  prolongation[6](24,2) = -3.0/64.0;
+  prolongation[6](24,3) = 1.0/64.0;
+  prolongation[6](24,6) = 9.0/64.0;
+  prolongation[6](24,7) = -3.0/64.0;
+  prolongation[6](24,10) = -3.0/32.0;
+  prolongation[6](24,14) = 9.0/32.0;
+  prolongation[6](24,18) = 9.0/32.0;
+  prolongation[6](24,19) = -3.0/32.0;
+  prolongation[6](24,24) = 9.0/16.0;
+  prolongation[6](25,8) = 1.0/64.0;
+  prolongation[6](25,10) = -3.0/64.0;
+  prolongation[6](25,12) = -3.0/64.0;
+  prolongation[6](25,14) = 9.0/64.0;
+  prolongation[6](25,20) = -3.0/32.0;
+  prolongation[6](25,21) = 9.0/32.0;
+  prolongation[6](25,22) = -3.0/32.0;
+  prolongation[6](25,24) = 9.0/32.0;
+  prolongation[6](25,26) = 9.0/16.0;
+  prolongation[6](26,0) = -1.0/512.0;
+  prolongation[6](26,1) = 3.0/512.0;
+  prolongation[6](26,2) = -9.0/512.0;
+  prolongation[6](26,3) = 3.0/512.0;
+  prolongation[6](26,4) = 3.0/512.0;
+  prolongation[6](26,5) = -9.0/512.0;
+  prolongation[6](26,6) = 27.0/512.0;
+  prolongation[6](26,7) = -9.0/512.0;
+  prolongation[6](26,8) = 3.0/256.0;
+  prolongation[6](26,9) = -9.0/256.0;
+  prolongation[6](26,10) = -9.0/256.0;
+  prolongation[6](26,11) = 3.0/256.0;
+  prolongation[6](26,12) = -9.0/256.0;
+  prolongation[6](26,13) = 27.0/256.0;
+  prolongation[6](26,14) = 27.0/256.0;
+  prolongation[6](26,15) = -9.0/256.0;
+  prolongation[6](26,16) = 3.0/256.0;
+  prolongation[6](26,17) = -9.0/256.0;
+  prolongation[6](26,18) = 27.0/256.0;
+  prolongation[6](26,19) = -9.0/256.0;
+  prolongation[6](26,20) = -9.0/128.0;
+  prolongation[6](26,21) = 27.0/128.0;
+  prolongation[6](26,22) = -9.0/128.0;
+  prolongation[6](26,23) = 27.0/128.0;
+  prolongation[6](26,24) = 27.0/128.0;
+  prolongation[6](26,25) = -9.0/128.0;
+  prolongation[6](26,26) = 27.0/64.0;
+  prolongation[7](0,25) = 1.0;
+  prolongation[7](1,26) = 1.0;
+  prolongation[7](2,24) = 1.0;
+  prolongation[7](3,19) = 1.0;
+  prolongation[7](4,15) = 1.0;
+  prolongation[7](5,21) = 1.0;
+  prolongation[7](6,14) = 1.0;
+  prolongation[7](7,7) = 1.0;
+  prolongation[7](8,23) = -1.0/8.0;
+  prolongation[7](8,25) = 3.0/8.0;
+  prolongation[7](8,26) = 3.0/4.0;
+  prolongation[7](9,22) = -1.0/8.0;
+  prolongation[7](9,24) = 3.0/8.0;
+  prolongation[7](9,26) = 3.0/4.0;
+  prolongation[7](10,18) = -1.0/8.0;
+  prolongation[7](10,19) = 3.0/8.0;
+  prolongation[7](10,24) = 3.0/4.0;
+  prolongation[7](11,16) = -1.0/8.0;
+  prolongation[7](11,19) = 3.0/8.0;
+  prolongation[7](11,25) = 3.0/4.0;
+  prolongation[7](12,13) = -1.0/8.0;
+  prolongation[7](12,15) = 3.0/8.0;
+  prolongation[7](12,21) = 3.0/4.0;
+  prolongation[7](13,12) = -1.0/8.0;
+  prolongation[7](13,14) = 3.0/8.0;
+  prolongation[7](13,21) = 3.0/4.0;
+  prolongation[7](14,6) = -1.0/8.0;
+  prolongation[7](14,7) = 3.0/8.0;
+  prolongation[7](14,14) = 3.0/4.0;
+  prolongation[7](15,4) = -1.0/8.0;
+  prolongation[7](15,7) = 3.0/8.0;
+  prolongation[7](15,15) = 3.0/4.0;
+  prolongation[7](16,11) = -1.0/8.0;
+  prolongation[7](16,15) = 3.0/8.0;
+  prolongation[7](16,25) = 3.0/4.0;
+  prolongation[7](17,20) = -1.0/8.0;
+  prolongation[7](17,21) = 3.0/8.0;
+  prolongation[7](17,26) = 3.0/4.0;
+  prolongation[7](18,10) = -1.0/8.0;
+  prolongation[7](18,14) = 3.0/8.0;
+  prolongation[7](18,24) = 3.0/4.0;
+  prolongation[7](19,3) = -1.0/8.0;
+  prolongation[7](19,7) = 3.0/8.0;
+  prolongation[7](19,19) = 3.0/4.0;
+  prolongation[7](20,16) = -3.0/64.0;
+  prolongation[7](20,17) = 1.0/64.0;
+  prolongation[7](20,18) = -3.0/64.0;
+  prolongation[7](20,19) = 9.0/64.0;
+  prolongation[7](20,22) = -3.0/32.0;
+  prolongation[7](20,23) = -3.0/32.0;
+  prolongation[7](20,24) = 9.0/32.0;
+  prolongation[7](20,25) = 9.0/32.0;
+  prolongation[7](20,26) = 9.0/16.0;
+  prolongation[7](21,4) = -3.0/64.0;
+  prolongation[7](21,5) = 1.0/64.0;
+  prolongation[7](21,6) = -3.0/64.0;
+  prolongation[7](21,7) = 9.0/64.0;
+  prolongation[7](21,12) = -3.0/32.0;
+  prolongation[7](21,13) = -3.0/32.0;
+  prolongation[7](21,14) = 9.0/32.0;
+  prolongation[7](21,15) = 9.0/32.0;
+  prolongation[7](21,21) = 9.0/16.0;
+  prolongation[7](22,9) = 1.0/64.0;
+  prolongation[7](22,11) = -3.0/64.0;
+  prolongation[7](22,13) = -3.0/64.0;
+  prolongation[7](22,15) = 9.0/64.0;
+  prolongation[7](22,20) = -3.0/32.0;
+  prolongation[7](22,21) = 9.0/32.0;
+  prolongation[7](22,23) = -3.0/32.0;
+  prolongation[7](22,25) = 9.0/32.0;
+  prolongation[7](22,26) = 9.0/16.0;
+  prolongation[7](23,8) = 1.0/64.0;
+  prolongation[7](23,10) = -3.0/64.0;
+  prolongation[7](23,12) = -3.0/64.0;
+  prolongation[7](23,14) = 9.0/64.0;
+  prolongation[7](23,20) = -3.0/32.0;
+  prolongation[7](23,21) = 9.0/32.0;
+  prolongation[7](23,22) = -3.0/32.0;
+  prolongation[7](23,24) = 9.0/32.0;
+  prolongation[7](23,26) = 9.0/16.0;
+  prolongation[7](24,2) = 1.0/64.0;
+  prolongation[7](24,3) = -3.0/64.0;
+  prolongation[7](24,6) = -3.0/64.0;
+  prolongation[7](24,7) = 9.0/64.0;
+  prolongation[7](24,10) = -3.0/32.0;
+  prolongation[7](24,14) = 9.0/32.0;
+  prolongation[7](24,18) = -3.0/32.0;
+  prolongation[7](24,19) = 9.0/32.0;
+  prolongation[7](24,24) = 9.0/16.0;
+  prolongation[7](25,0) = 1.0/64.0;
+  prolongation[7](25,3) = -3.0/64.0;
+  prolongation[7](25,4) = -3.0/64.0;
+  prolongation[7](25,7) = 9.0/64.0;
+  prolongation[7](25,11) = -3.0/32.0;
+  prolongation[7](25,15) = 9.0/32.0;
+  prolongation[7](25,16) = -3.0/32.0;
+  prolongation[7](25,19) = 9.0/32.0;
+  prolongation[7](25,25) = 9.0/16.0;
+  prolongation[7](26,0) = 3.0/512.0;
+  prolongation[7](26,1) = -1.0/512.0;
+  prolongation[7](26,2) = 3.0/512.0;
+  prolongation[7](26,3) = -9.0/512.0;
+  prolongation[7](26,4) = -9.0/512.0;
+  prolongation[7](26,5) = 3.0/512.0;
+  prolongation[7](26,6) = -9.0/512.0;
+  prolongation[7](26,7) = 27.0/512.0;
+  prolongation[7](26,8) = 3.0/256.0;
+  prolongation[7](26,9) = 3.0/256.0;
+  prolongation[7](26,10) = -9.0/256.0;
+  prolongation[7](26,11) = -9.0/256.0;
+  prolongation[7](26,12) = -9.0/256.0;
+  prolongation[7](26,13) = -9.0/256.0;
+  prolongation[7](26,14) = 27.0/256.0;
+  prolongation[7](26,15) = 27.0/256.0;
+  prolongation[7](26,16) = -9.0/256.0;
+  prolongation[7](26,17) = 3.0/256.0;
+  prolongation[7](26,18) = -9.0/256.0;
+  prolongation[7](26,19) = 27.0/256.0;
+  prolongation[7](26,20) = -9.0/128.0;
+  prolongation[7](26,21) = 27.0/128.0;
+  prolongation[7](26,22) = -9.0/128.0;
+  prolongation[7](26,23) = -9.0/128.0;
+  prolongation[7](26,24) = 27.0/128.0;
+  prolongation[7](26,25) = 27.0/128.0;
+  prolongation[7](26,26) = 27.0/64.0;
+
+  restriction[0](0,0) = 1.0;
+  restriction[0](8,1) = 1.0;
+  restriction[0](11,3) = 1.0;
+  restriction[0](16,4) = 1.0;
+  restriction[0](20,2) = 1.0;
+  restriction[0](22,5) = 1.0;
+  restriction[0](25,7) = 1.0;
+  restriction[0](26,6) = 1.0;
+  restriction[1](1,1) = 1.0;
+  restriction[1](8,0) = 1.0;
+  restriction[1](9,2) = 1.0;
+  restriction[1](17,5) = 1.0;
+  restriction[1](20,3) = 1.0;
+  restriction[1](22,4) = 1.0;
+  restriction[1](23,6) = 1.0;
+  restriction[1](26,7) = 1.0;
+  restriction[2](2,2) = 1.0;
+  restriction[2](9,1) = 1.0;
+  restriction[2](10,3) = 1.0;
+  restriction[2](18,6) = 1.0;
+  restriction[2](20,0) = 1.0;
+  restriction[2](23,5) = 1.0;
+  restriction[2](24,7) = 1.0;
+  restriction[2](26,4) = 1.0;
+  restriction[3](3,3) = 1.0;
+  restriction[3](10,2) = 1.0;
+  restriction[3](11,0) = 1.0;
+  restriction[3](19,7) = 1.0;
+  restriction[3](20,1) = 1.0;
+  restriction[3](24,6) = 1.0;
+  restriction[3](25,4) = 1.0;
+  restriction[3](26,5) = 1.0;
+  restriction[4](4,4) = 1.0;
+  restriction[4](12,5) = 1.0;
+  restriction[4](15,7) = 1.0;
+  restriction[4](16,0) = 1.0;
+  restriction[4](21,6) = 1.0;
+  restriction[4](22,1) = 1.0;
+  restriction[4](25,3) = 1.0;
+  restriction[4](26,2) = 1.0;
+  restriction[5](5,5) = 1.0;
+  restriction[5](12,4) = 1.0;
+  restriction[5](13,6) = 1.0;
+  restriction[5](17,1) = 1.0;
+  restriction[5](21,7) = 1.0;
+  restriction[5](22,0) = 1.0;
+  restriction[5](23,2) = 1.0;
+  restriction[5](26,3) = 1.0;
+  restriction[6](6,6) = 1.0;
+  restriction[6](13,5) = 1.0;
+  restriction[6](14,7) = 1.0;
+  restriction[6](18,2) = 1.0;
+  restriction[6](21,4) = 1.0;
+  restriction[6](23,1) = 1.0;
+  restriction[6](24,3) = 1.0;
+  restriction[6](26,0) = 1.0;
+  restriction[7](7,7) = 1.0;
+  restriction[7](14,6) = 1.0;
+  restriction[7](15,4) = 1.0;
+  restriction[7](19,3) = 1.0;
+  restriction[7](21,5) = 1.0;
+  restriction[7](24,2) = 1.0;
+  restriction[7](25,0) = 1.0;
+  restriction[7](26,1) = 1.0;
+};
+
+
+
+template <>
+double
+FEQuadraticSub<3>::shape_value (const unsigned int i,
+				const Point<3>    &p) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+
+  const double xi  = p(0),
+	       eta = p(1),
+	       zeta=p(2);
+  switch (i)
+    {
+      case 0: return 1.0-3.0*xi+2.0*xi*xi+(-3.0+9.0*xi-6.0*xi*xi)*eta+(2.0
+-6.0*xi+4.0*xi*xi)*eta*eta+(-3.0+9.0*xi-6.0*xi*xi+(9.0-27.0*xi+18.0*xi*xi)*eta+
+(-6.0+18.0*xi-12.0*xi*xi)*eta*eta)*zeta+(2.0-6.0*xi+4.0*xi*xi+(-6.0+18.0*xi
+-12.0*xi*xi)*eta+(4.0-12.0*xi+8.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 1: return -xi+2.0*xi*xi+(3.0*xi-6.0*xi*xi)*eta+(-2.0*xi+4.0*xi*xi)
+*eta*eta+(3.0*xi-6.0*xi*xi+(-9.0*xi+18.0*xi*xi)*eta+(6.0*xi-12.0*xi*xi)*eta*eta
+)*zeta+(-2.0*xi+4.0*xi*xi+(6.0*xi-12.0*xi*xi)*eta+(-4.0*xi+8.0*xi*xi)*eta*eta)*
+zeta*zeta;
+      case 2: return (xi-2.0*xi*xi+(-3.0*xi+6.0*xi*xi)*eta+(2.0*xi-4.0*xi*xi)
+*eta*eta)*zeta+(-2.0*xi+4.0*xi*xi+(6.0*xi-12.0*xi*xi)*eta+(-4.0*xi+8.0*xi*xi)*
+eta*eta)*zeta*zeta;
+      case 3: return (-1.0+3.0*xi-2.0*xi*xi+(3.0-9.0*xi+6.0*xi*xi)*eta+(-2.0+
+6.0*xi-4.0*xi*xi)*eta*eta)*zeta+(2.0-6.0*xi+4.0*xi*xi+(-6.0+18.0*xi-12.0*xi*xi)
+*eta+(4.0-12.0*xi+8.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 4: return (-1.0+3.0*xi-2.0*xi*xi)*eta+(2.0-6.0*xi+4.0*xi*xi)*eta*
+eta+((3.0-9.0*xi+6.0*xi*xi)*eta+(-6.0+18.0*xi-12.0*xi*xi)*eta*eta)*zeta+((-2.0+
+6.0*xi-4.0*xi*xi)*eta+(4.0-12.0*xi+8.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 5: return (xi-2.0*xi*xi)*eta+(-2.0*xi+4.0*xi*xi)*eta*eta+((-3.0*xi
++6.0*xi*xi)*eta+(6.0*xi-12.0*xi*xi)*eta*eta)*zeta+((2.0*xi-4.0*xi*xi)*eta+(-4.0
+*xi+8.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 6: return ((-xi+2.0*xi*xi)*eta+(2.0*xi-4.0*xi*xi)*eta*eta)*zeta+((
+2.0*xi-4.0*xi*xi)*eta+(-4.0*xi+8.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 7: return ((1.0-3.0*xi+2.0*xi*xi)*eta+(-2.0+6.0*xi-4.0*xi*xi)*eta*
+eta)*zeta+((-2.0+6.0*xi-4.0*xi*xi)*eta+(4.0-12.0*xi+8.0*xi*xi)*eta*eta)*zeta*
+zeta;
+      case 8: return 4.0*xi-4.0*xi*xi+(-12.0*xi+12.0*xi*xi)*eta+(8.0*xi-8.0*
+xi*xi)*eta*eta+(-12.0*xi+12.0*xi*xi+(36.0*xi-36.0*xi*xi)*eta+(-24.0*xi+24.0*xi*
+xi)*eta*eta)*zeta+(8.0*xi-8.0*xi*xi+(-24.0*xi+24.0*xi*xi)*eta+(16.0*xi-16.0*xi*
+xi)*eta*eta)*zeta*zeta;
+      case 9: return (-4.0*xi+8.0*xi*xi+(12.0*xi-24.0*xi*xi)*eta+(-8.0*xi+
+16.0*xi*xi)*eta*eta)*zeta+(4.0*xi-8.0*xi*xi+(-12.0*xi+24.0*xi*xi)*eta+(8.0*xi
+-16.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 10: return (-4.0*xi+4.0*xi*xi+(12.0*xi-12.0*xi*xi)*eta+(-8.0*xi+
+8.0*xi*xi)*eta*eta)*zeta+(8.0*xi-8.0*xi*xi+(-24.0*xi+24.0*xi*xi)*eta+(16.0*xi
+-16.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 11: return (4.0-12.0*xi+8.0*xi*xi+(-12.0+36.0*xi-24.0*xi*xi)*eta+(
+8.0-24.0*xi+16.0*xi*xi)*eta*eta)*zeta+(-4.0+12.0*xi-8.0*xi*xi+(12.0-36.0*xi+
+24.0*xi*xi)*eta+(-8.0+24.0*xi-16.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 12: return (-4.0*xi+4.0*xi*xi)*eta+(8.0*xi-8.0*xi*xi)*eta*eta+((
+12.0*xi-12.0*xi*xi)*eta+(-24.0*xi+24.0*xi*xi)*eta*eta)*zeta+((-8.0*xi+8.0*xi*xi
+)*eta+(16.0*xi-16.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 13: return ((4.0*xi-8.0*xi*xi)*eta+(-8.0*xi+16.0*xi*xi)*eta*eta)*
+zeta+((-4.0*xi+8.0*xi*xi)*eta+(8.0*xi-16.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 14: return ((4.0*xi-4.0*xi*xi)*eta+(-8.0*xi+8.0*xi*xi)*eta*eta)*
+zeta+((-8.0*xi+8.0*xi*xi)*eta+(16.0*xi-16.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 15: return ((-4.0+12.0*xi-8.0*xi*xi)*eta+(8.0-24.0*xi+16.0*xi*xi)*
+eta*eta)*zeta+((4.0-12.0*xi+8.0*xi*xi)*eta+(-8.0+24.0*xi-16.0*xi*xi)*eta*eta)*
+zeta*zeta;
+      case 16: return (4.0-12.0*xi+8.0*xi*xi)*eta+(-4.0+12.0*xi-8.0*xi*xi)*
+eta*eta+((-12.0+36.0*xi-24.0*xi*xi)*eta+(12.0-36.0*xi+24.0*xi*xi)*eta*eta)*zeta
++((8.0-24.0*xi+16.0*xi*xi)*eta+(-8.0+24.0*xi-16.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 17: return (-4.0*xi+8.0*xi*xi)*eta+(4.0*xi-8.0*xi*xi)*eta*eta+((
+12.0*xi-24.0*xi*xi)*eta+(-12.0*xi+24.0*xi*xi)*eta*eta)*zeta+((-8.0*xi+16.0*xi*
+xi)*eta+(8.0*xi-16.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 18: return ((4.0*xi-8.0*xi*xi)*eta+(-4.0*xi+8.0*xi*xi)*eta*eta)*
+zeta+((-8.0*xi+16.0*xi*xi)*eta+(8.0*xi-16.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 19: return ((-4.0+12.0*xi-8.0*xi*xi)*eta+(4.0-12.0*xi+8.0*xi*xi)*
+eta*eta)*zeta+((8.0-24.0*xi+16.0*xi*xi)*eta+(-8.0+24.0*xi-16.0*xi*xi)*eta*eta)*
+zeta*zeta;
+      case 20: return (16.0*xi-16.0*xi*xi+(-48.0*xi+48.0*xi*xi)*eta+(32.0*xi
+-32.0*xi*xi)*eta*eta)*zeta+(-16.0*xi+16.0*xi*xi+(48.0*xi-48.0*xi*xi)*eta+(-32.0
+*xi+32.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 21: return ((-16.0*xi+16.0*xi*xi)*eta+(32.0*xi-32.0*xi*xi)*eta*eta
+)*zeta+((16.0*xi-16.0*xi*xi)*eta+(-32.0*xi+32.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 22: return (16.0*xi-16.0*xi*xi)*eta+(-16.0*xi+16.0*xi*xi)*eta*eta+
+((-48.0*xi+48.0*xi*xi)*eta+(48.0*xi-48.0*xi*xi)*eta*eta)*zeta+((32.0*xi-32.0*xi
+*xi)*eta+(-32.0*xi+32.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 23: return ((-16.0*xi+32.0*xi*xi)*eta+(16.0*xi-32.0*xi*xi)*eta*eta
+)*zeta+((16.0*xi-32.0*xi*xi)*eta+(-16.0*xi+32.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 24: return ((-16.0*xi+16.0*xi*xi)*eta+(16.0*xi-16.0*xi*xi)*eta*eta
+)*zeta+((32.0*xi-32.0*xi*xi)*eta+(-32.0*xi+32.0*xi*xi)*eta*eta)*zeta*zeta;
+      case 25: return ((16.0-48.0*xi+32.0*xi*xi)*eta+(-16.0+48.0*xi-32.0*xi*
+xi)*eta*eta)*zeta+((-16.0+48.0*xi-32.0*xi*xi)*eta+(16.0-48.0*xi+32.0*xi*xi)*eta
+*eta)*zeta*zeta;
+      case 26: return ((64.0*xi-64.0*xi*xi)*eta+(-64.0*xi+64.0*xi*xi)*eta*eta
+)*zeta+((-64.0*xi+64.0*xi*xi)*eta+(64.0*xi-64.0*xi*xi)*eta*eta)*zeta*zeta;
+    };
+  return 0;
+};
+
+
+
+template <>
+Tensor<1,3>
+FEQuadraticSub<3>::shape_grad (const unsigned int i,
+			       const Point<3>    &p) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+
+  const double xi  = p(0),
+	       eta = p(1),
+	       zeta=p(2);
+				   // originally, the return type of the
+				   // function was Point<dim>, so we
+				   // still construct it as that. it should
+				   // make no difference in practice,
+				   // however
+  switch (i)
+    {
+      case 0: return Point<3>(-3.0+4.0*xi+(9.0-12.0*xi)*eta+(-6.0+8.0*xi)*eta*eta+(9.0-12.0*xi+(-27.0+36.0*xi)*eta+(18.0-24.0*xi)*eta*eta)*zeta+(-6.0+8.0*xi+(18.0-24.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta*zeta,
+      -3.0+9.0*xi-6.0*xi*xi+2.0*(2.0-6.0*xi+4.0*xi*xi)*eta+(9.0-27.0*xi+18.0*xi*xi+2.0*(-6.0+18.0*xi-12.0*xi*xi)*eta)*zeta+(-6.0+18.0*xi-12.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta*zeta,
+      -3.0+9.0*xi-6.0*xi*xi+(9.0-27.0*xi+18.0*xi*xi)*eta+(-6.0+18.0*xi-12.0*xi*xi)*eta*eta+2.0*(2.0-6.0*xi+4.0*xi*xi+(-6.0+18.0*xi-12.0*xi*xi)*eta+(4.0-12.0*xi+8.0*xi*xi)*eta*eta)*zeta);
+      case 1: return Point<3>(-1.0+4.0*xi+(3.0-12.0*xi)*eta+(-2.0+8.0*xi)*eta*eta+(3.0-12.0*xi+(-9.0+36.0*xi)*eta+(6.0-24.0*xi)*eta*eta)*zeta+(-2.0+8.0*xi+(6.0-24.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta*zeta,
+      3.0*xi-6.0*xi*xi+2.0*(-2.0*xi+4.0*xi*xi)*eta+(-9.0*xi+18.0*xi*xi+2.0*(6.0*xi-12.0*xi*xi)*eta)*zeta+(6.0*xi-12.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta*zeta,
+      3.0*xi-6.0*xi*xi+(-9.0*xi+18.0*xi*xi)*eta+(6.0*xi-12.0*xi*xi)*eta*eta+2.0*(-2.0*xi+4.0*xi*xi+(6.0*xi-12.0*xi*xi)*eta+(-4.0*xi+8.0*xi*xi)*eta*eta)*zeta);
+      case 2: return Point<3>((1.0-4.0*xi+(-3.0+12.0*xi)*eta+(2.0-8.0*xi)*eta*eta)*zeta+(-2.0+8.0*xi+(6.0-24.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta*zeta,
+      (-3.0*xi+6.0*xi*xi+2.0*(2.0*xi-4.0*xi*xi)*eta)*zeta+(6.0*xi-12.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta*zeta,
+      xi-2.0*xi*xi+(-3.0*xi+6.0*xi*xi)*eta+(2.0*xi-4.0*xi*xi)*eta*eta+2.0*(-2.0*xi+4.0*xi*xi+(6.0*xi-12.0*xi*xi)*eta+(-4.0*xi+8.0*xi*xi)*eta*eta)*zeta);
+      case 3: return Point<3>((3.0-4.0*xi+(-9.0+12.0*xi)*eta+(6.0-8.0*xi)*eta*eta)*zeta+(-6.0+8.0*xi+(18.0-24.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta*zeta,
+      (3.0-9.0*xi+6.0*xi*xi+2.0*(-2.0+6.0*xi-4.0*xi*xi)*eta)*zeta+(-6.0+18.0*xi-12.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta*zeta,
+      -1.0+3.0*xi-2.0*xi*xi+(3.0-9.0*xi+6.0*xi*xi)*eta+(-2.0+6.0*xi-4.0*xi*xi)*eta*eta+2.0*(2.0-6.0*xi+4.0*xi*xi+(-6.0+18.0*xi-12.0*xi*xi)*eta+(4.0-12.0*xi+8.0*xi*xi)*eta*eta)*zeta);
+      case 4: return Point<3>((3.0-4.0*xi)*eta+(-6.0+8.0*xi)*eta*eta+((-9.0+12.0*xi)*eta+(18.0-24.0*xi)*eta*eta)*zeta+((6.0-8.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta*zeta,
+      -1.0+3.0*xi-2.0*xi*xi+2.0*(2.0-6.0*xi+4.0*xi*xi)*eta+(3.0-9.0*xi+6.0*xi*xi+2.0*(-6.0+18.0*xi-12.0*xi*xi)*eta)*zeta+(-2.0+6.0*xi-4.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta*zeta,
+      (3.0-9.0*xi+6.0*xi*xi)*eta+(-6.0+18.0*xi-12.0*xi*xi)*eta*eta+2.0*((-2.0+6.0*xi-4.0*xi*xi)*eta+(4.0-12.0*xi+8.0*xi*xi)*eta*eta)*zeta);
+      case 5: return Point<3>((1.0-4.0*xi)*eta+(-2.0+8.0*xi)*eta*eta+((-3.0+12.0*xi)*eta+(6.0-24.0*xi)*eta*eta)*zeta+((2.0-8.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta*zeta,
+      xi-2.0*xi*xi+2.0*(-2.0*xi+4.0*xi*xi)*eta+(-3.0*xi+6.0*xi*xi+2.0*(6.0*xi-12.0*xi*xi)*eta)*zeta+(2.0*xi-4.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta*zeta,
+      (-3.0*xi+6.0*xi*xi)*eta+(6.0*xi-12.0*xi*xi)*eta*eta+2.0*((2.0*xi-4.0*xi*xi)*eta+(-4.0*xi+8.0*xi*xi)*eta*eta)*zeta);
+      case 6: return Point<3>(((-1.0+4.0*xi)*eta+(2.0-8.0*xi)*eta*eta)*zeta+((2.0-8.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta*zeta,
+      (-xi+2.0*xi*xi+2.0*(2.0*xi-4.0*xi*xi)*eta)*zeta+(2.0*xi-4.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta*zeta,
+      (-xi+2.0*xi*xi)*eta+(2.0*xi-4.0*xi*xi)*eta*eta+2.0*((2.0*xi-4.0*xi*xi)*eta+(-4.0*xi+8.0*xi*xi)*eta*eta)*zeta);
+      case 7: return Point<3>(((-3.0+4.0*xi)*eta+(6.0-8.0*xi)*eta*eta)*zeta+((6.0-8.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta*zeta,
+      (1.0-3.0*xi+2.0*xi*xi+2.0*(-2.0+6.0*xi-4.0*xi*xi)*eta)*zeta+(-2.0+6.0*xi-4.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta*zeta,
+      (1.0-3.0*xi+2.0*xi*xi)*eta+(-2.0+6.0*xi-4.0*xi*xi)*eta*eta+2.0*((-2.0+6.0*xi-4.0*xi*xi)*eta+(4.0-12.0*xi+8.0*xi*xi)*eta*eta)*zeta);
+      case 8: return Point<3>(4.0-8.0*xi+(-12.0+24.0*xi)*eta+(8.0-16.0*xi)*eta*eta+(-12.0+24.0*xi+(36.0-72.0*xi)*eta+(-24.0+48.0*xi)*eta*eta)*zeta+(8.0-16.0*xi+(-24.0+48.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta*zeta,
+      -12.0*xi+12.0*xi*xi+2.0*(8.0*xi-8.0*xi*xi)*eta+(36.0*xi-36.0*xi*xi+2.0*(-24.0*xi+24.0*xi*xi)*eta)*zeta+(-24.0*xi+24.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      -12.0*xi+12.0*xi*xi+(36.0*xi-36.0*xi*xi)*eta+(-24.0*xi+24.0*xi*xi)*eta*eta+2.0*(8.0*xi-8.0*xi*xi+(-24.0*xi+24.0*xi*xi)*eta+(16.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 9: return Point<3>((-4.0+16.0*xi+(12.0-48.0*xi)*eta+(-8.0+32.0*xi)*eta*eta)*zeta+(4.0-16.0*xi+(-12.0+48.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta*zeta,
+      (12.0*xi-24.0*xi*xi+2.0*(-8.0*xi+16.0*xi*xi)*eta)*zeta+(-12.0*xi+24.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      -4.0*xi+8.0*xi*xi+(12.0*xi-24.0*xi*xi)*eta+(-8.0*xi+16.0*xi*xi)*eta*eta+2.0*(4.0*xi-8.0*xi*xi+(-12.0*xi+24.0*xi*xi)*eta+(8.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 10: return Point<3>((-4.0+8.0*xi+(12.0-24.0*xi)*eta+(-8.0+16.0*xi)*eta*eta)*zeta+(8.0-16.0*xi+(-24.0+48.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta*zeta,
+      (12.0*xi-12.0*xi*xi+2.0*(-8.0*xi+8.0*xi*xi)*eta)*zeta+(-24.0*xi+24.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      -4.0*xi+4.0*xi*xi+(12.0*xi-12.0*xi*xi)*eta+(-8.0*xi+8.0*xi*xi)*eta*eta+2.0*(8.0*xi-8.0*xi*xi+(-24.0*xi+24.0*xi*xi)*eta+(16.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 11: return Point<3>((-12.0+16.0*xi+(36.0-48.0*xi)*eta+(-24.0+32.0*xi)*eta*eta)*zeta+(12.0-16.0*xi+(-36.0+48.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta*zeta,
+      (-12.0+36.0*xi-24.0*xi*xi+2.0*(8.0-24.0*xi+16.0*xi*xi)*eta)*zeta+(12.0-36.0*xi+24.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      4.0-12.0*xi+8.0*xi*xi+(-12.0+36.0*xi-24.0*xi*xi)*eta+(8.0-24.0*xi+16.0*xi*xi)*eta*eta+2.0*(-4.0+12.0*xi-8.0*xi*xi+(12.0-36.0*xi+24.0*xi*xi)*eta+(-8.0+24.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 12: return Point<3>((-4.0+8.0*xi)*eta+(8.0-16.0*xi)*eta*eta+((12.0-24.0*xi)*eta+(-24.0+48.0*xi)*eta*eta)*zeta+((-8.0+16.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta*zeta,
+      -4.0*xi+4.0*xi*xi+2.0*(8.0*xi-8.0*xi*xi)*eta+(12.0*xi-12.0*xi*xi+2.0*(-24.0*xi+24.0*xi*xi)*eta)*zeta+(-8.0*xi+8.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      (12.0*xi-12.0*xi*xi)*eta+(-24.0*xi+24.0*xi*xi)*eta*eta+2.0*((-8.0*xi+8.0*xi*xi)*eta+(16.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 13: return Point<3>(((4.0-16.0*xi)*eta+(-8.0+32.0*xi)*eta*eta)*zeta+((-4.0+16.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta*zeta,
+      (4.0*xi-8.0*xi*xi+2.0*(-8.0*xi+16.0*xi*xi)*eta)*zeta+(-4.0*xi+8.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      (4.0*xi-8.0*xi*xi)*eta+(-8.0*xi+16.0*xi*xi)*eta*eta+2.0*((-4.0*xi+8.0*xi*xi)*eta+(8.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 14: return Point<3>(((4.0-8.0*xi)*eta+(-8.0+16.0*xi)*eta*eta)*zeta+((-8.0+16.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta*zeta,
+      (4.0*xi-4.0*xi*xi+2.0*(-8.0*xi+8.0*xi*xi)*eta)*zeta+(-8.0*xi+8.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      (4.0*xi-4.0*xi*xi)*eta+(-8.0*xi+8.0*xi*xi)*eta*eta+2.0*((-8.0*xi+8.0*xi*xi)*eta+(16.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 15: return Point<3>(((12.0-16.0*xi)*eta+(-24.0+32.0*xi)*eta*eta)*zeta+((-12.0+16.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta*zeta,
+      (-4.0+12.0*xi-8.0*xi*xi+2.0*(8.0-24.0*xi+16.0*xi*xi)*eta)*zeta+(4.0-12.0*xi+8.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      (-4.0+12.0*xi-8.0*xi*xi)*eta+(8.0-24.0*xi+16.0*xi*xi)*eta*eta+2.0*((4.0-12.0*xi+8.0*xi*xi)*eta+(-8.0+24.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 16: return Point<3>((-12.0+16.0*xi)*eta+(12.0-16.0*xi)*eta*eta+((36.0-48.0*xi)*eta+(-36.0+48.0*xi)*eta*eta)*zeta+((-24.0+32.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta*zeta,
+      4.0-12.0*xi+8.0*xi*xi+2.0*(-4.0+12.0*xi-8.0*xi*xi)*eta+(-12.0+36.0*xi-24.0*xi*xi+2.0*(12.0-36.0*xi+24.0*xi*xi)*eta)*zeta+(8.0-24.0*xi+16.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      (-12.0+36.0*xi-24.0*xi*xi)*eta+(12.0-36.0*xi+24.0*xi*xi)*eta*eta+2.0*((8.0-24.0*xi+16.0*xi*xi)*eta+(-8.0+24.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 17: return Point<3>((-4.0+16.0*xi)*eta+(4.0-16.0*xi)*eta*eta+((12.0-48.0*xi)*eta+(-12.0+48.0*xi)*eta*eta)*zeta+((-8.0+32.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta*zeta,
+      -4.0*xi+8.0*xi*xi+2.0*(4.0*xi-8.0*xi*xi)*eta+(12.0*xi-24.0*xi*xi+2.0*(-12.0*xi+24.0*xi*xi)*eta)*zeta+(-8.0*xi+16.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      (12.0*xi-24.0*xi*xi)*eta+(-12.0*xi+24.0*xi*xi)*eta*eta+2.0*((-8.0*xi+16.0*xi*xi)*eta+(8.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 18: return Point<3>(((4.0-16.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta+((-8.0+32.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta*zeta,
+      (4.0*xi-8.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta+(-8.0*xi+16.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      (4.0*xi-8.0*xi*xi)*eta+(-4.0*xi+8.0*xi*xi)*eta*eta+2.0*((-8.0*xi+16.0*xi*xi)*eta+(8.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 19: return Point<3>(((12.0-16.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta+((-24.0+32.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta*zeta,
+      (-4.0+12.0*xi-8.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta+(8.0-24.0*xi+16.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta*zeta,
+      (-4.0+12.0*xi-8.0*xi*xi)*eta+(4.0-12.0*xi+8.0*xi*xi)*eta*eta+2.0*((8.0-24.0*xi+16.0*xi*xi)*eta+(-8.0+24.0*xi-16.0*xi*xi)*eta*eta)*zeta);
+      case 20: return Point<3>((16.0-32.0*xi+(-48.0+96.0*xi)*eta+(32.0-64.0*xi)*eta*eta)*zeta+(-16.0+32.0*xi+(48.0-96.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta*zeta,
+      (-48.0*xi+48.0*xi*xi+2.0*(32.0*xi-32.0*xi*xi)*eta)*zeta+(48.0*xi-48.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta*zeta,
+      16.0*xi-16.0*xi*xi+(-48.0*xi+48.0*xi*xi)*eta+(32.0*xi-32.0*xi*xi)*eta*eta+2.0*(-16.0*xi+16.0*xi*xi+(48.0*xi-48.0*xi*xi)*eta+(-32.0*xi+32.0*xi*xi)*eta*eta)*zeta);
+      case 21: return Point<3>(((-16.0+32.0*xi)*eta+(32.0-64.0*xi)*eta*eta)*zeta+((16.0-32.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta*zeta,
+      (-16.0*xi+16.0*xi*xi+2.0*(32.0*xi-32.0*xi*xi)*eta)*zeta+(16.0*xi-16.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta*zeta,
+      (-16.0*xi+16.0*xi*xi)*eta+(32.0*xi-32.0*xi*xi)*eta*eta+2.0*((16.0*xi-16.0*xi*xi)*eta+(-32.0*xi+32.0*xi*xi)*eta*eta)*zeta);
+      case 22: return Point<3>((16.0-32.0*xi)*eta+(-16.0+32.0*xi)*eta*eta+((-48.0+96.0*xi)*eta+(48.0-96.0*xi)*eta*eta)*zeta+((32.0-64.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta*zeta,
+      16.0*xi-16.0*xi*xi+2.0*(-16.0*xi+16.0*xi*xi)*eta+(-48.0*xi+48.0*xi*xi+2.0*(48.0*xi-48.0*xi*xi)*eta)*zeta+(32.0*xi-32.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta*zeta,
+      (-48.0*xi+48.0*xi*xi)*eta+(48.0*xi-48.0*xi*xi)*eta*eta+2.0*((32.0*xi-32.0*xi*xi)*eta+(-32.0*xi+32.0*xi*xi)*eta*eta)*zeta);
+      case 23: return Point<3>(((-16.0+64.0*xi)*eta+(16.0-64.0*xi)*eta*eta)*zeta+((16.0-64.0*xi)*eta+(-16.0+64.0*xi)*eta*eta)*zeta*zeta,
+      (-16.0*xi+32.0*xi*xi+2.0*(16.0*xi-32.0*xi*xi)*eta)*zeta+(16.0*xi-32.0*xi*xi+2.0*(-16.0*xi+32.0*xi*xi)*eta)*zeta*zeta,
+      (-16.0*xi+32.0*xi*xi)*eta+(16.0*xi-32.0*xi*xi)*eta*eta+2.0*((16.0*xi-32.0*xi*xi)*eta+(-16.0*xi+32.0*xi*xi)*eta*eta)*zeta);
+      case 24: return Point<3>(((-16.0+32.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta+((32.0-64.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta*zeta,
+      (-16.0*xi+16.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta+(32.0*xi-32.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta*zeta,
+      (-16.0*xi+16.0*xi*xi)*eta+(16.0*xi-16.0*xi*xi)*eta*eta+2.0*((32.0*xi-32.0*xi*xi)*eta+(-32.0*xi+32.0*xi*xi)*eta*eta)*zeta);
+      case 25: return Point<3>(((-48.0+64.0*xi)*eta+(48.0-64.0*xi)*eta*eta)*zeta+((48.0-64.0*xi)*eta+(-48.0+64.0*xi)*eta*eta)*zeta*zeta,
+      (16.0-48.0*xi+32.0*xi*xi+2.0*(-16.0+48.0*xi-32.0*xi*xi)*eta)*zeta+(-16.0+48.0*xi-32.0*xi*xi+2.0*(16.0-48.0*xi+32.0*xi*xi)*eta)*zeta*zeta,
+      (16.0-48.0*xi+32.0*xi*xi)*eta+(-16.0+48.0*xi-32.0*xi*xi)*eta*eta+2.0*((-16.0+48.0*xi-32.0*xi*xi)*eta+(16.0-48.0*xi+32.0*xi*xi)*eta*eta)*zeta);
+      case 26: return Point<3>(((64.0-128.0*xi)*eta+(-64.0+128.0*xi)*eta*eta)*zeta+((-64.0+128.0*xi)*eta+(64.0-128.0*xi)*eta*eta)*zeta*zeta,
+      (64.0*xi-64.0*xi*xi+2.0*(-64.0*xi+64.0*xi*xi)*eta)*zeta+(-64.0*xi+64.0*xi*xi+2.0*(64.0*xi-64.0*xi*xi)*eta)*zeta*zeta,
+      (64.0*xi-64.0*xi*xi)*eta+(-64.0*xi+64.0*xi*xi)*eta*eta+2.0*((-64.0*xi+64.0*xi*xi)*eta+(64.0*xi-64.0*xi*xi)*eta*eta)*zeta);
+    };
+  return Point<3> ();
+};
+
+
+
+template <>
+Tensor<2,3>
+FEQuadraticSub<3>::shape_grad_grad (const unsigned int i,
+				    const Point<3>    &p) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+
+  const double xi  = p(0),
+	       eta = p(1),
+	       zeta=p(2);
+  Tensor<2,3> return_value;
+  
+  switch (i)
+    {
+case 0:
+return_value[0][0] = 4.0-12.0*eta+8.0*eta*eta+(-12.0+36.0*eta-24.0*eta*eta)*zeta+(8.0-24.0*eta+16.0*eta*eta)*zeta*zeta;
+return_value[0][1] = 9.0-12.0*xi+2.0*(-6.0+8.0*xi)*eta+(-27.0+36.0*xi+2.0*(18.0-24.0*xi)*eta)*zeta+(18.0-24.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = 9.0-12.0*xi+(-27.0+36.0*xi)*eta+(18.0-24.0*xi)*eta*eta+2.0*(-6.0+8.0*xi+(18.0-24.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta;
+return_value[1][0] = 9.0-12.0*xi+2.0*(-6.0+8.0*xi)*eta+(-27.0+36.0*xi+2.0*(18.0-24.0*xi)*eta)*zeta+(18.0-24.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = 4.0-12.0*xi+8.0*xi*xi+(-12.0+36.0*xi-24.0*xi*xi)*zeta+(8.0-24.0*xi+16.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 9.0-27.0*xi+18.0*xi*xi+2.0*(-6.0+18.0*xi-12.0*xi*xi)*eta+2.0*(-6.0+18.0*xi-12.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][0] = 9.0-12.0*xi+(-27.0+36.0*xi)*eta+(18.0-24.0*xi)*eta*eta+2.0*(-6.0+8.0*xi+(18.0-24.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 9.0-27.0*xi+18.0*xi*xi+2.0*(-6.0+18.0*xi-12.0*xi*xi)*eta+2.0*(-6.0+18.0*xi-12.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 4.0-12.0*xi+8.0*xi*xi+2.0*(-6.0+18.0*xi-12.0*xi*xi)*eta+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta*eta;
+break;
+case 1:
+return_value[0][0] = 4.0-12.0*eta+8.0*eta*eta+(-12.0+36.0*eta-24.0*eta*eta)*zeta+(8.0-24.0*eta+16.0*eta*eta)*zeta*zeta;
+return_value[0][1] = 3.0-12.0*xi+2.0*(-2.0+8.0*xi)*eta+(-9.0+36.0*xi+2.0*(6.0-24.0*xi)*eta)*zeta+(6.0-24.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = 3.0-12.0*xi+(-9.0+36.0*xi)*eta+(6.0-24.0*xi)*eta*eta+2.0*(-2.0+8.0*xi+(6.0-24.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta;
+return_value[1][0] = 3.0-12.0*xi+2.0*(-2.0+8.0*xi)*eta+(-9.0+36.0*xi+2.0*(6.0-24.0*xi)*eta)*zeta+(6.0-24.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = -4.0*xi+8.0*xi*xi+(12.0*xi-24.0*xi*xi)*zeta+(-8.0*xi+16.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -9.0*xi+18.0*xi*xi+2.0*(6.0*xi-12.0*xi*xi)*eta+2.0*(6.0*xi-12.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][0] = 3.0-12.0*xi+(-9.0+36.0*xi)*eta+(6.0-24.0*xi)*eta*eta+2.0*(-2.0+8.0*xi+(6.0-24.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -9.0*xi+18.0*xi*xi+2.0*(6.0*xi-12.0*xi*xi)*eta+2.0*(6.0*xi-12.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][2] = -4.0*xi+8.0*xi*xi+2.0*(6.0*xi-12.0*xi*xi)*eta+2.0*(-4.0*xi+8.0*xi*xi)*eta*eta;
+break;
+case 2:
+return_value[0][0] = (-4.0+12.0*eta-8.0*eta*eta)*zeta+(8.0-24.0*eta+16.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (-3.0+12.0*xi+2.0*(2.0-8.0*xi)*eta)*zeta+(6.0-24.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = 1.0-4.0*xi+(-3.0+12.0*xi)*eta+(2.0-8.0*xi)*eta*eta+2.0*(-2.0+8.0*xi+(6.0-24.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (-3.0+12.0*xi+2.0*(2.0-8.0*xi)*eta)*zeta+(6.0-24.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (4.0*xi-8.0*xi*xi)*zeta+(-8.0*xi+16.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -3.0*xi+6.0*xi*xi+2.0*(2.0*xi-4.0*xi*xi)*eta+2.0*(6.0*xi-12.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][0] = 1.0-4.0*xi+(-3.0+12.0*xi)*eta+(2.0-8.0*xi)*eta*eta+2.0*(-2.0+8.0*xi+(6.0-24.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -3.0*xi+6.0*xi*xi+2.0*(2.0*xi-4.0*xi*xi)*eta+2.0*(6.0*xi-12.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][2] = -4.0*xi+8.0*xi*xi+2.0*(6.0*xi-12.0*xi*xi)*eta+2.0*(-4.0*xi+8.0*xi*xi)*eta*eta;
+break;
+case 3:
+return_value[0][0] = (-4.0+12.0*eta-8.0*eta*eta)*zeta+(8.0-24.0*eta+16.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (-9.0+12.0*xi+2.0*(6.0-8.0*xi)*eta)*zeta+(18.0-24.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = 3.0-4.0*xi+(-9.0+12.0*xi)*eta+(6.0-8.0*xi)*eta*eta+2.0*(-6.0+8.0*xi+(18.0-24.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (-9.0+12.0*xi+2.0*(6.0-8.0*xi)*eta)*zeta+(18.0-24.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (-4.0+12.0*xi-8.0*xi*xi)*zeta+(8.0-24.0*xi+16.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 3.0-9.0*xi+6.0*xi*xi+2.0*(-2.0+6.0*xi-4.0*xi*xi)*eta+2.0*(-6.0+18.0*xi-12.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][0] = 3.0-4.0*xi+(-9.0+12.0*xi)*eta+(6.0-8.0*xi)*eta*eta+2.0*(-6.0+8.0*xi+(18.0-24.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 3.0-9.0*xi+6.0*xi*xi+2.0*(-2.0+6.0*xi-4.0*xi*xi)*eta+2.0*(-6.0+18.0*xi-12.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 4.0-12.0*xi+8.0*xi*xi+2.0*(-6.0+18.0*xi-12.0*xi*xi)*eta+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta*eta;
+break;
+case 4:
+return_value[0][0] = -4.0*eta+8.0*eta*eta+(12.0*eta-24.0*eta*eta)*zeta+(-8.0*eta+16.0*eta*eta)*zeta*zeta;
+return_value[0][1] = 3.0-4.0*xi+2.0*(-6.0+8.0*xi)*eta+(-9.0+12.0*xi+2.0*(18.0-24.0*xi)*eta)*zeta+(6.0-8.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (-9.0+12.0*xi)*eta+(18.0-24.0*xi)*eta*eta+2.0*((6.0-8.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta;
+return_value[1][0] = 3.0-4.0*xi+2.0*(-6.0+8.0*xi)*eta+(-9.0+12.0*xi+2.0*(18.0-24.0*xi)*eta)*zeta+(6.0-8.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = 4.0-12.0*xi+8.0*xi*xi+(-12.0+36.0*xi-24.0*xi*xi)*zeta+(8.0-24.0*xi+16.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 3.0-9.0*xi+6.0*xi*xi+2.0*(-6.0+18.0*xi-12.0*xi*xi)*eta+2.0*(-2.0+6.0*xi-4.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (-9.0+12.0*xi)*eta+(18.0-24.0*xi)*eta*eta+2.0*((6.0-8.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 3.0-9.0*xi+6.0*xi*xi+2.0*(-6.0+18.0*xi-12.0*xi*xi)*eta+2.0*(-2.0+6.0*xi-4.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(-2.0+6.0*xi-4.0*xi*xi)*eta+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta*eta;
+break;
+case 5:
+return_value[0][0] = -4.0*eta+8.0*eta*eta+(12.0*eta-24.0*eta*eta)*zeta+(-8.0*eta+16.0*eta*eta)*zeta*zeta;
+return_value[0][1] = 1.0-4.0*xi+2.0*(-2.0+8.0*xi)*eta+(-3.0+12.0*xi+2.0*(6.0-24.0*xi)*eta)*zeta+(2.0-8.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (-3.0+12.0*xi)*eta+(6.0-24.0*xi)*eta*eta+2.0*((2.0-8.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta;
+return_value[1][0] = 1.0-4.0*xi+2.0*(-2.0+8.0*xi)*eta+(-3.0+12.0*xi+2.0*(6.0-24.0*xi)*eta)*zeta+(2.0-8.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = -4.0*xi+8.0*xi*xi+(12.0*xi-24.0*xi*xi)*zeta+(-8.0*xi+16.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -3.0*xi+6.0*xi*xi+2.0*(6.0*xi-12.0*xi*xi)*eta+2.0*(2.0*xi-4.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (-3.0+12.0*xi)*eta+(6.0-24.0*xi)*eta*eta+2.0*((2.0-8.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -3.0*xi+6.0*xi*xi+2.0*(6.0*xi-12.0*xi*xi)*eta+2.0*(2.0*xi-4.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(2.0*xi-4.0*xi*xi)*eta+2.0*(-4.0*xi+8.0*xi*xi)*eta*eta;
+break;
+case 6:
+return_value[0][0] = (4.0*eta-8.0*eta*eta)*zeta+(-8.0*eta+16.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (-1.0+4.0*xi+2.0*(2.0-8.0*xi)*eta)*zeta+(2.0-8.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (-1.0+4.0*xi)*eta+(2.0-8.0*xi)*eta*eta+2.0*((2.0-8.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (-1.0+4.0*xi+2.0*(2.0-8.0*xi)*eta)*zeta+(2.0-8.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (4.0*xi-8.0*xi*xi)*zeta+(-8.0*xi+16.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -xi+2.0*xi*xi+2.0*(2.0*xi-4.0*xi*xi)*eta+2.0*(2.0*xi-4.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (-1.0+4.0*xi)*eta+(2.0-8.0*xi)*eta*eta+2.0*((2.0-8.0*xi)*eta+(-4.0+16.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -xi+2.0*xi*xi+2.0*(2.0*xi-4.0*xi*xi)*eta+2.0*(2.0*xi-4.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(2.0*xi-4.0*xi*xi)*eta+2.0*(-4.0*xi+8.0*xi*xi)*eta*eta;
+break;
+case 7:
+return_value[0][0] = (4.0*eta-8.0*eta*eta)*zeta+(-8.0*eta+16.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (-3.0+4.0*xi+2.0*(6.0-8.0*xi)*eta)*zeta+(6.0-8.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (-3.0+4.0*xi)*eta+(6.0-8.0*xi)*eta*eta+2.0*((6.0-8.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (-3.0+4.0*xi+2.0*(6.0-8.0*xi)*eta)*zeta+(6.0-8.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (-4.0+12.0*xi-8.0*xi*xi)*zeta+(8.0-24.0*xi+16.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 1.0-3.0*xi+2.0*xi*xi+2.0*(-2.0+6.0*xi-4.0*xi*xi)*eta+2.0*(-2.0+6.0*xi-4.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (-3.0+4.0*xi)*eta+(6.0-8.0*xi)*eta*eta+2.0*((6.0-8.0*xi)*eta+(-12.0+16.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 1.0-3.0*xi+2.0*xi*xi+2.0*(-2.0+6.0*xi-4.0*xi*xi)*eta+2.0*(-2.0+6.0*xi-4.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(-2.0+6.0*xi-4.0*xi*xi)*eta+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta*eta;
+break;
+case 8:
+return_value[0][0] = -8.0+24.0*eta-16.0*eta*eta+(24.0-72.0*eta+48.0*eta*eta)*zeta+(-16.0+48.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = -12.0+24.0*xi+2.0*(8.0-16.0*xi)*eta+(36.0-72.0*xi+2.0*(-24.0+48.0*xi)*eta)*zeta+(-24.0+48.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = -12.0+24.0*xi+(36.0-72.0*xi)*eta+(-24.0+48.0*xi)*eta*eta+2.0*(8.0-16.0*xi+(-24.0+48.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = -12.0+24.0*xi+2.0*(8.0-16.0*xi)*eta+(36.0-72.0*xi+2.0*(-24.0+48.0*xi)*eta)*zeta+(-24.0+48.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = 16.0*xi-16.0*xi*xi+(-48.0*xi+48.0*xi*xi)*zeta+(32.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 36.0*xi-36.0*xi*xi+2.0*(-24.0*xi+24.0*xi*xi)*eta+2.0*(-24.0*xi+24.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = -12.0+24.0*xi+(36.0-72.0*xi)*eta+(-24.0+48.0*xi)*eta*eta+2.0*(8.0-16.0*xi+(-24.0+48.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 36.0*xi-36.0*xi*xi+2.0*(-24.0*xi+24.0*xi*xi)*eta+2.0*(-24.0*xi+24.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 16.0*xi-16.0*xi*xi+2.0*(-24.0*xi+24.0*xi*xi)*eta+2.0*(16.0*xi-16.0*xi*xi)*eta*eta;
+break;
+case 9:
+return_value[0][0] = (16.0-48.0*eta+32.0*eta*eta)*zeta+(-16.0+48.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (12.0-48.0*xi+2.0*(-8.0+32.0*xi)*eta)*zeta+(-12.0+48.0*xi+2.0*(8.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = -4.0+16.0*xi+(12.0-48.0*xi)*eta+(-8.0+32.0*xi)*eta*eta+2.0*(4.0-16.0*xi+(-12.0+48.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (12.0-48.0*xi+2.0*(-8.0+32.0*xi)*eta)*zeta+(-12.0+48.0*xi+2.0*(8.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (-16.0*xi+32.0*xi*xi)*zeta+(16.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 12.0*xi-24.0*xi*xi+2.0*(-8.0*xi+16.0*xi*xi)*eta+2.0*(-12.0*xi+24.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = -4.0+16.0*xi+(12.0-48.0*xi)*eta+(-8.0+32.0*xi)*eta*eta+2.0*(4.0-16.0*xi+(-12.0+48.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 12.0*xi-24.0*xi*xi+2.0*(-8.0*xi+16.0*xi*xi)*eta+2.0*(-12.0*xi+24.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 8.0*xi-16.0*xi*xi+2.0*(-12.0*xi+24.0*xi*xi)*eta+2.0*(8.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = (8.0-24.0*eta+16.0*eta*eta)*zeta+(-16.0+48.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (12.0-24.0*xi+2.0*(-8.0+16.0*xi)*eta)*zeta+(-24.0+48.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = -4.0+8.0*xi+(12.0-24.0*xi)*eta+(-8.0+16.0*xi)*eta*eta+2.0*(8.0-16.0*xi+(-24.0+48.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (12.0-24.0*xi+2.0*(-8.0+16.0*xi)*eta)*zeta+(-24.0+48.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (-16.0*xi+16.0*xi*xi)*zeta+(32.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 12.0*xi-12.0*xi*xi+2.0*(-8.0*xi+8.0*xi*xi)*eta+2.0*(-24.0*xi+24.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = -4.0+8.0*xi+(12.0-24.0*xi)*eta+(-8.0+16.0*xi)*eta*eta+2.0*(8.0-16.0*xi+(-24.0+48.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 12.0*xi-12.0*xi*xi+2.0*(-8.0*xi+8.0*xi*xi)*eta+2.0*(-24.0*xi+24.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 16.0*xi-16.0*xi*xi+2.0*(-24.0*xi+24.0*xi*xi)*eta+2.0*(16.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = (16.0-48.0*eta+32.0*eta*eta)*zeta+(-16.0+48.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (36.0-48.0*xi+2.0*(-24.0+32.0*xi)*eta)*zeta+(-36.0+48.0*xi+2.0*(24.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = -12.0+16.0*xi+(36.0-48.0*xi)*eta+(-24.0+32.0*xi)*eta*eta+2.0*(12.0-16.0*xi+(-36.0+48.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (36.0-48.0*xi+2.0*(-24.0+32.0*xi)*eta)*zeta+(-36.0+48.0*xi+2.0*(24.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (16.0-48.0*xi+32.0*xi*xi)*zeta+(-16.0+48.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -12.0+36.0*xi-24.0*xi*xi+2.0*(8.0-24.0*xi+16.0*xi*xi)*eta+2.0*(12.0-36.0*xi+24.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = -12.0+16.0*xi+(36.0-48.0*xi)*eta+(-24.0+32.0*xi)*eta*eta+2.0*(12.0-16.0*xi+(-36.0+48.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -12.0+36.0*xi-24.0*xi*xi+2.0*(8.0-24.0*xi+16.0*xi*xi)*eta+2.0*(12.0-36.0*xi+24.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = -8.0+24.0*xi-16.0*xi*xi+2.0*(12.0-36.0*xi+24.0*xi*xi)*eta+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = 8.0*eta-16.0*eta*eta+(-24.0*eta+48.0*eta*eta)*zeta+(16.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = -4.0+8.0*xi+2.0*(8.0-16.0*xi)*eta+(12.0-24.0*xi+2.0*(-24.0+48.0*xi)*eta)*zeta+(-8.0+16.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (12.0-24.0*xi)*eta+(-24.0+48.0*xi)*eta*eta+2.0*((-8.0+16.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = -4.0+8.0*xi+2.0*(8.0-16.0*xi)*eta+(12.0-24.0*xi+2.0*(-24.0+48.0*xi)*eta)*zeta+(-8.0+16.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = 16.0*xi-16.0*xi*xi+(-48.0*xi+48.0*xi*xi)*zeta+(32.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 12.0*xi-12.0*xi*xi+2.0*(-24.0*xi+24.0*xi*xi)*eta+2.0*(-8.0*xi+8.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (12.0-24.0*xi)*eta+(-24.0+48.0*xi)*eta*eta+2.0*((-8.0+16.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 12.0*xi-12.0*xi*xi+2.0*(-24.0*xi+24.0*xi*xi)*eta+2.0*(-8.0*xi+8.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(-8.0*xi+8.0*xi*xi)*eta+2.0*(16.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = (-16.0*eta+32.0*eta*eta)*zeta+(16.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (4.0-16.0*xi+2.0*(-8.0+32.0*xi)*eta)*zeta+(-4.0+16.0*xi+2.0*(8.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (4.0-16.0*xi)*eta+(-8.0+32.0*xi)*eta*eta+2.0*((-4.0+16.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (4.0-16.0*xi+2.0*(-8.0+32.0*xi)*eta)*zeta+(-4.0+16.0*xi+2.0*(8.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (-16.0*xi+32.0*xi*xi)*zeta+(16.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 4.0*xi-8.0*xi*xi+2.0*(-8.0*xi+16.0*xi*xi)*eta+2.0*(-4.0*xi+8.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (4.0-16.0*xi)*eta+(-8.0+32.0*xi)*eta*eta+2.0*((-4.0+16.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 4.0*xi-8.0*xi*xi+2.0*(-8.0*xi+16.0*xi*xi)*eta+2.0*(-4.0*xi+8.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(-4.0*xi+8.0*xi*xi)*eta+2.0*(8.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = (-8.0*eta+16.0*eta*eta)*zeta+(16.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (4.0-8.0*xi+2.0*(-8.0+16.0*xi)*eta)*zeta+(-8.0+16.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (4.0-8.0*xi)*eta+(-8.0+16.0*xi)*eta*eta+2.0*((-8.0+16.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (4.0-8.0*xi+2.0*(-8.0+16.0*xi)*eta)*zeta+(-8.0+16.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (-16.0*xi+16.0*xi*xi)*zeta+(32.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 4.0*xi-4.0*xi*xi+2.0*(-8.0*xi+8.0*xi*xi)*eta+2.0*(-8.0*xi+8.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (4.0-8.0*xi)*eta+(-8.0+16.0*xi)*eta*eta+2.0*((-8.0+16.0*xi)*eta+(16.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 4.0*xi-4.0*xi*xi+2.0*(-8.0*xi+8.0*xi*xi)*eta+2.0*(-8.0*xi+8.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(-8.0*xi+8.0*xi*xi)*eta+2.0*(16.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = (-16.0*eta+32.0*eta*eta)*zeta+(16.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (12.0-16.0*xi+2.0*(-24.0+32.0*xi)*eta)*zeta+(-12.0+16.0*xi+2.0*(24.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (12.0-16.0*xi)*eta+(-24.0+32.0*xi)*eta*eta+2.0*((-12.0+16.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (12.0-16.0*xi+2.0*(-24.0+32.0*xi)*eta)*zeta+(-12.0+16.0*xi+2.0*(24.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (16.0-48.0*xi+32.0*xi*xi)*zeta+(-16.0+48.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -4.0+12.0*xi-8.0*xi*xi+2.0*(8.0-24.0*xi+16.0*xi*xi)*eta+2.0*(4.0-12.0*xi+8.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (12.0-16.0*xi)*eta+(-24.0+32.0*xi)*eta*eta+2.0*((-12.0+16.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -4.0+12.0*xi-8.0*xi*xi+2.0*(8.0-24.0*xi+16.0*xi*xi)*eta+2.0*(4.0-12.0*xi+8.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(4.0-12.0*xi+8.0*xi*xi)*eta+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = 16.0*eta-16.0*eta*eta+(-48.0*eta+48.0*eta*eta)*zeta+(32.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = -12.0+16.0*xi+2.0*(12.0-16.0*xi)*eta+(36.0-48.0*xi+2.0*(-36.0+48.0*xi)*eta)*zeta+(-24.0+32.0*xi+2.0*(24.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (36.0-48.0*xi)*eta+(-36.0+48.0*xi)*eta*eta+2.0*((-24.0+32.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = -12.0+16.0*xi+2.0*(12.0-16.0*xi)*eta+(36.0-48.0*xi+2.0*(-36.0+48.0*xi)*eta)*zeta+(-24.0+32.0*xi+2.0*(24.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = -8.0+24.0*xi-16.0*xi*xi+(24.0-72.0*xi+48.0*xi*xi)*zeta+(-16.0+48.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -12.0+36.0*xi-24.0*xi*xi+2.0*(12.0-36.0*xi+24.0*xi*xi)*eta+2.0*(8.0-24.0*xi+16.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (36.0-48.0*xi)*eta+(-36.0+48.0*xi)*eta*eta+2.0*((-24.0+32.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -12.0+36.0*xi-24.0*xi*xi+2.0*(12.0-36.0*xi+24.0*xi*xi)*eta+2.0*(8.0-24.0*xi+16.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(8.0-24.0*xi+16.0*xi*xi)*eta+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = 16.0*eta-16.0*eta*eta+(-48.0*eta+48.0*eta*eta)*zeta+(32.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = -4.0+16.0*xi+2.0*(4.0-16.0*xi)*eta+(12.0-48.0*xi+2.0*(-12.0+48.0*xi)*eta)*zeta+(-8.0+32.0*xi+2.0*(8.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (12.0-48.0*xi)*eta+(-12.0+48.0*xi)*eta*eta+2.0*((-8.0+32.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = -4.0+16.0*xi+2.0*(4.0-16.0*xi)*eta+(12.0-48.0*xi+2.0*(-12.0+48.0*xi)*eta)*zeta+(-8.0+32.0*xi+2.0*(8.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = 8.0*xi-16.0*xi*xi+(-24.0*xi+48.0*xi*xi)*zeta+(16.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 12.0*xi-24.0*xi*xi+2.0*(-12.0*xi+24.0*xi*xi)*eta+2.0*(-8.0*xi+16.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (12.0-48.0*xi)*eta+(-12.0+48.0*xi)*eta*eta+2.0*((-8.0+32.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 12.0*xi-24.0*xi*xi+2.0*(-12.0*xi+24.0*xi*xi)*eta+2.0*(-8.0*xi+16.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(-8.0*xi+16.0*xi*xi)*eta+2.0*(8.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = (-16.0*eta+16.0*eta*eta)*zeta+(32.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (4.0-16.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta+(-8.0+32.0*xi+2.0*(8.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (4.0-16.0*xi)*eta+(-4.0+16.0*xi)*eta*eta+2.0*((-8.0+32.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (4.0-16.0*xi+2.0*(-4.0+16.0*xi)*eta)*zeta+(-8.0+32.0*xi+2.0*(8.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (-8.0*xi+16.0*xi*xi)*zeta+(16.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 4.0*xi-8.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta+2.0*(-8.0*xi+16.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (4.0-16.0*xi)*eta+(-4.0+16.0*xi)*eta*eta+2.0*((-8.0+32.0*xi)*eta+(8.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 4.0*xi-8.0*xi*xi+2.0*(-4.0*xi+8.0*xi*xi)*eta+2.0*(-8.0*xi+16.0*xi*xi+2.0*(8.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(-8.0*xi+16.0*xi*xi)*eta+2.0*(8.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = (-16.0*eta+16.0*eta*eta)*zeta+(32.0*eta-32.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (12.0-16.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta+(-24.0+32.0*xi+2.0*(24.0-32.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (12.0-16.0*xi)*eta+(-12.0+16.0*xi)*eta*eta+2.0*((-24.0+32.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (12.0-16.0*xi+2.0*(-12.0+16.0*xi)*eta)*zeta+(-24.0+32.0*xi+2.0*(24.0-32.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (8.0-24.0*xi+16.0*xi*xi)*zeta+(-16.0+48.0*xi-32.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -4.0+12.0*xi-8.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta+2.0*(8.0-24.0*xi+16.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (12.0-16.0*xi)*eta+(-12.0+16.0*xi)*eta*eta+2.0*((-24.0+32.0*xi)*eta+(24.0-32.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -4.0+12.0*xi-8.0*xi*xi+2.0*(4.0-12.0*xi+8.0*xi*xi)*eta+2.0*(8.0-24.0*xi+16.0*xi*xi+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(8.0-24.0*xi+16.0*xi*xi)*eta+2.0*(-8.0+24.0*xi-16.0*xi*xi)*eta*eta;
+return_value[0][0] = (-32.0+96.0*eta-64.0*eta*eta)*zeta+(32.0-96.0*eta+64.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (-48.0+96.0*xi+2.0*(32.0-64.0*xi)*eta)*zeta+(48.0-96.0*xi+2.0*(-32.0+64.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = 16.0-32.0*xi+(-48.0+96.0*xi)*eta+(32.0-64.0*xi)*eta*eta+2.0*(-16.0+32.0*xi+(48.0-96.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (-48.0+96.0*xi+2.0*(32.0-64.0*xi)*eta)*zeta+(48.0-96.0*xi+2.0*(-32.0+64.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (64.0*xi-64.0*xi*xi)*zeta+(-64.0*xi+64.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -48.0*xi+48.0*xi*xi+2.0*(32.0*xi-32.0*xi*xi)*eta+2.0*(48.0*xi-48.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][0] = 16.0-32.0*xi+(-48.0+96.0*xi)*eta+(32.0-64.0*xi)*eta*eta+2.0*(-16.0+32.0*xi+(48.0-96.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -48.0*xi+48.0*xi*xi+2.0*(32.0*xi-32.0*xi*xi)*eta+2.0*(48.0*xi-48.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][2] = -32.0*xi+32.0*xi*xi+2.0*(48.0*xi-48.0*xi*xi)*eta+2.0*(-32.0*xi+32.0*xi*xi)*eta*eta;
+return_value[0][0] = (32.0*eta-64.0*eta*eta)*zeta+(-32.0*eta+64.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (-16.0+32.0*xi+2.0*(32.0-64.0*xi)*eta)*zeta+(16.0-32.0*xi+2.0*(-32.0+64.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (-16.0+32.0*xi)*eta+(32.0-64.0*xi)*eta*eta+2.0*((16.0-32.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (-16.0+32.0*xi+2.0*(32.0-64.0*xi)*eta)*zeta+(16.0-32.0*xi+2.0*(-32.0+64.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (64.0*xi-64.0*xi*xi)*zeta+(-64.0*xi+64.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -16.0*xi+16.0*xi*xi+2.0*(32.0*xi-32.0*xi*xi)*eta+2.0*(16.0*xi-16.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (-16.0+32.0*xi)*eta+(32.0-64.0*xi)*eta*eta+2.0*((16.0-32.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -16.0*xi+16.0*xi*xi+2.0*(32.0*xi-32.0*xi*xi)*eta+2.0*(16.0*xi-16.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(16.0*xi-16.0*xi*xi)*eta+2.0*(-32.0*xi+32.0*xi*xi)*eta*eta;
+return_value[0][0] = -32.0*eta+32.0*eta*eta+(96.0*eta-96.0*eta*eta)*zeta+(-64.0*eta+64.0*eta*eta)*zeta*zeta;
+return_value[0][1] = 16.0-32.0*xi+2.0*(-16.0+32.0*xi)*eta+(-48.0+96.0*xi+2.0*(48.0-96.0*xi)*eta)*zeta+(32.0-64.0*xi+2.0*(-32.0+64.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (-48.0+96.0*xi)*eta+(48.0-96.0*xi)*eta*eta+2.0*((32.0-64.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta;
+return_value[1][0] = 16.0-32.0*xi+2.0*(-16.0+32.0*xi)*eta+(-48.0+96.0*xi+2.0*(48.0-96.0*xi)*eta)*zeta+(32.0-64.0*xi+2.0*(-32.0+64.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = -32.0*xi+32.0*xi*xi+(96.0*xi-96.0*xi*xi)*zeta+(-64.0*xi+64.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -48.0*xi+48.0*xi*xi+2.0*(48.0*xi-48.0*xi*xi)*eta+2.0*(32.0*xi-32.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (-48.0+96.0*xi)*eta+(48.0-96.0*xi)*eta*eta+2.0*((32.0-64.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -48.0*xi+48.0*xi*xi+2.0*(48.0*xi-48.0*xi*xi)*eta+2.0*(32.0*xi-32.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(32.0*xi-32.0*xi*xi)*eta+2.0*(-32.0*xi+32.0*xi*xi)*eta*eta;
+return_value[0][0] = (64.0*eta-64.0*eta*eta)*zeta+(-64.0*eta+64.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (-16.0+64.0*xi+2.0*(16.0-64.0*xi)*eta)*zeta+(16.0-64.0*xi+2.0*(-16.0+64.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (-16.0+64.0*xi)*eta+(16.0-64.0*xi)*eta*eta+2.0*((16.0-64.0*xi)*eta+(-16.0+64.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (-16.0+64.0*xi+2.0*(16.0-64.0*xi)*eta)*zeta+(16.0-64.0*xi+2.0*(-16.0+64.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (32.0*xi-64.0*xi*xi)*zeta+(-32.0*xi+64.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -16.0*xi+32.0*xi*xi+2.0*(16.0*xi-32.0*xi*xi)*eta+2.0*(16.0*xi-32.0*xi*xi+2.0*(-16.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (-16.0+64.0*xi)*eta+(16.0-64.0*xi)*eta*eta+2.0*((16.0-64.0*xi)*eta+(-16.0+64.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -16.0*xi+32.0*xi*xi+2.0*(16.0*xi-32.0*xi*xi)*eta+2.0*(16.0*xi-32.0*xi*xi+2.0*(-16.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(16.0*xi-32.0*xi*xi)*eta+2.0*(-16.0*xi+32.0*xi*xi)*eta*eta;
+return_value[0][0] = (32.0*eta-32.0*eta*eta)*zeta+(-64.0*eta+64.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (-16.0+32.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta+(32.0-64.0*xi+2.0*(-32.0+64.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (-16.0+32.0*xi)*eta+(16.0-32.0*xi)*eta*eta+2.0*((32.0-64.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (-16.0+32.0*xi+2.0*(16.0-32.0*xi)*eta)*zeta+(32.0-64.0*xi+2.0*(-32.0+64.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (32.0*xi-32.0*xi*xi)*zeta+(-64.0*xi+64.0*xi*xi)*zeta*zeta;
+return_value[1][2] = -16.0*xi+16.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta+2.0*(32.0*xi-32.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (-16.0+32.0*xi)*eta+(16.0-32.0*xi)*eta*eta+2.0*((32.0-64.0*xi)*eta+(-32.0+64.0*xi)*eta*eta)*zeta;
+return_value[2][1] = -16.0*xi+16.0*xi*xi+2.0*(16.0*xi-16.0*xi*xi)*eta+2.0*(32.0*xi-32.0*xi*xi+2.0*(-32.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(32.0*xi-32.0*xi*xi)*eta+2.0*(-32.0*xi+32.0*xi*xi)*eta*eta;
+return_value[0][0] = (64.0*eta-64.0*eta*eta)*zeta+(-64.0*eta+64.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (-48.0+64.0*xi+2.0*(48.0-64.0*xi)*eta)*zeta+(48.0-64.0*xi+2.0*(-48.0+64.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (-48.0+64.0*xi)*eta+(48.0-64.0*xi)*eta*eta+2.0*((48.0-64.0*xi)*eta+(-48.0+64.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (-48.0+64.0*xi+2.0*(48.0-64.0*xi)*eta)*zeta+(48.0-64.0*xi+2.0*(-48.0+64.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (-32.0+96.0*xi-64.0*xi*xi)*zeta+(32.0-96.0*xi+64.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 16.0-48.0*xi+32.0*xi*xi+2.0*(-16.0+48.0*xi-32.0*xi*xi)*eta+2.0*(-16.0+48.0*xi-32.0*xi*xi+2.0*(16.0-48.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (-48.0+64.0*xi)*eta+(48.0-64.0*xi)*eta*eta+2.0*((48.0-64.0*xi)*eta+(-48.0+64.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 16.0-48.0*xi+32.0*xi*xi+2.0*(-16.0+48.0*xi-32.0*xi*xi)*eta+2.0*(-16.0+48.0*xi-32.0*xi*xi+2.0*(16.0-48.0*xi+32.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(-16.0+48.0*xi-32.0*xi*xi)*eta+2.0*(16.0-48.0*xi+32.0*xi*xi)*eta*eta;
+return_value[0][0] = (-128.0*eta+128.0*eta*eta)*zeta+(128.0*eta-128.0*eta*eta)*zeta*zeta;
+return_value[0][1] = (64.0-128.0*xi+2.0*(-64.0+128.0*xi)*eta)*zeta+(-64.0+128.0*xi+2.0*(64.0-128.0*xi)*eta)*zeta*zeta;
+return_value[0][2] = (64.0-128.0*xi)*eta+(-64.0+128.0*xi)*eta*eta+2.0*((-64.0+128.0*xi)*eta+(64.0-128.0*xi)*eta*eta)*zeta;
+return_value[1][0] = (64.0-128.0*xi+2.0*(-64.0+128.0*xi)*eta)*zeta+(-64.0+128.0*xi+2.0*(64.0-128.0*xi)*eta)*zeta*zeta;
+return_value[1][1] = (-128.0*xi+128.0*xi*xi)*zeta+(128.0*xi-128.0*xi*xi)*zeta*zeta;
+return_value[1][2] = 64.0*xi-64.0*xi*xi+2.0*(-64.0*xi+64.0*xi*xi)*eta+2.0*(-64.0*xi+64.0*xi*xi+2.0*(64.0*xi-64.0*xi*xi)*eta)*zeta;
+return_value[2][0] = (64.0-128.0*xi)*eta+(-64.0+128.0*xi)*eta*eta+2.0*((-64.0+128.0*xi)*eta+(64.0-128.0*xi)*eta*eta)*zeta;
+return_value[2][1] = 64.0*xi-64.0*xi*xi+2.0*(-64.0*xi+64.0*xi*xi)*eta+2.0*(-64.0*xi+64.0*xi*xi+2.0*(64.0*xi-64.0*xi*xi)*eta)*zeta;
+return_value[2][2] = 2.0*(-64.0*xi+64.0*xi*xi)*eta+2.0*(64.0*xi-64.0*xi*xi)*eta*eta;
+ break;
+ 
+    };
+  return return_value;
+};
+
+
+
+template <>
+void FEQuadraticSub<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
+					       const Boundary<3> &,
+					       dFMatrix &local_mass_matrix) const {
+  Assert (local_mass_matrix.n() == total_dofs,
+	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
+  Assert (local_mass_matrix.m() == total_dofs,
+	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
+
+  AssertThrow (false, ExcComputationNotUseful(3));
+};
+
+
+
+template <>
+void FEQuadraticSub<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
+  Assert (unit_points.size() == total_dofs,
+	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
+  
+  unit_points[0] = Point<3>(0, 0, 0);
+  unit_points[1] = Point<3>(1, 0, 0);
+  unit_points[2] = Point<3>(1, 0, 1);
+  unit_points[3] = Point<3>(0, 0, 1);
+  unit_points[4] = Point<3>(0, 1, 0);
+  unit_points[5] = Point<3>(1, 1, 0);
+  unit_points[6] = Point<3>(1, 1, 1);
+  unit_points[7] = Point<3>(0, 1, 1);
+  unit_points[8] = Point<3>(1/2, 0, 0);
+  unit_points[9] = Point<3>(1, 0, 1/2);
+  unit_points[10] = Point<3>(1/2, 0, 1);
+  unit_points[11] = Point<3>(0, 0, 1/2);
+  unit_points[12] = Point<3>(1/2, 1, 0);
+  unit_points[13] = Point<3>(1, 1, 1/2);
+  unit_points[14] = Point<3>(1/2, 1, 1);
+  unit_points[15] = Point<3>(0, 1, 1/2);
+  unit_points[16] = Point<3>(0, 1/2, 0);
+  unit_points[17] = Point<3>(1, 1/2, 0);
+  unit_points[18] = Point<3>(1, 1/2, 1);
+  unit_points[19] = Point<3>(0, 1/2, 1);
+  unit_points[20] = Point<3>(1/2, 0, 1/2);
+  unit_points[21] = Point<3>(1/2, 1, 1/2);
+  unit_points[22] = Point<3>(1/2, 1/2, 0);
+  unit_points[23] = Point<3>(1, 1/2, 1/2);
+  unit_points[24] = Point<3>(1/2, 1/2, 1);
+  unit_points[25] = Point<3>(0, 1/2, 1/2);
+  unit_points[26] = Point<3>(1/2, 1/2, 1/2);
+};
+
+  
+
+template <>
+void FEQuadraticSub<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &cell,
+					    const Boundary<3>&,
+					    vector<Point<3> >  &support_points) const {
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension (support_points.size(), total_dofs));
+
+  const Point<3> vertices[8] = { cell->vertex(0),
+				 cell->vertex(1),
+				 cell->vertex(2),
+				 cell->vertex(3),
+				 cell->vertex(4),
+				 cell->vertex(5),
+				 cell->vertex(6),
+				 cell->vertex(7)  };
+  
+  support_points[0](0) = vertices[0](0);
+  support_points[0](1) = vertices[0](1);
+  support_points[0](2) = vertices[0](2);
+  support_points[1](0) = vertices[1](0);
+  support_points[1](1) = vertices[1](1);
+  support_points[1](2) = vertices[1](2);
+  support_points[2](0) = vertices[2](0);
+  support_points[2](1) = vertices[2](1);
+  support_points[2](2) = vertices[2](2);
+  support_points[3](0) = vertices[3](0);
+  support_points[3](1) = vertices[3](1);
+  support_points[3](2) = vertices[3](2);
+  support_points[4](0) = vertices[4](0);
+  support_points[4](1) = vertices[4](1);
+  support_points[4](2) = vertices[4](2);
+  support_points[5](0) = vertices[5](0);
+  support_points[5](1) = vertices[5](1);
+  support_points[5](2) = vertices[5](2);
+  support_points[6](0) = vertices[6](0);
+  support_points[6](1) = vertices[6](1);
+  support_points[6](2) = vertices[6](2);
+  support_points[7](0) = vertices[7](0);
+  support_points[7](1) = vertices[7](1);
+  support_points[7](2) = vertices[7](2);
+  support_points[8](0) = vertices[0](0)/2.0+vertices[1](0)/2.0;
+  support_points[8](1) = vertices[0](1)/2.0+vertices[1](1)/2.0;
+  support_points[8](2) = vertices[0](2)/2.0+vertices[1](2)/2.0;
+  support_points[9](0) = vertices[1](0)/2.0+vertices[2](0)/2.0;
+  support_points[9](1) = vertices[1](1)/2.0+vertices[2](1)/2.0;
+  support_points[9](2) = vertices[1](2)/2.0+vertices[2](2)/2.0;
+  support_points[10](0) = vertices[2](0)/2.0+vertices[3](0)/2.0;
+  support_points[10](1) = vertices[2](1)/2.0+vertices[3](1)/2.0;
+  support_points[10](2) = vertices[2](2)/2.0+vertices[3](2)/2.0;
+  support_points[11](0) = vertices[0](0)/2.0+vertices[3](0)/2.0;
+  support_points[11](1) = vertices[0](1)/2.0+vertices[3](1)/2.0;
+  support_points[11](2) = vertices[0](2)/2.0+vertices[3](2)/2.0;
+  support_points[12](0) = vertices[4](0)/2.0+vertices[5](0)/2.0;
+  support_points[12](1) = vertices[4](1)/2.0+vertices[5](1)/2.0;
+  support_points[12](2) = vertices[4](2)/2.0+vertices[5](2)/2.0;
+  support_points[13](0) = vertices[5](0)/2.0+vertices[6](0)/2.0;
+  support_points[13](1) = vertices[5](1)/2.0+vertices[6](1)/2.0;
+  support_points[13](2) = vertices[5](2)/2.0+vertices[6](2)/2.0;
+  support_points[14](0) = vertices[6](0)/2.0+vertices[7](0)/2.0;
+  support_points[14](1) = vertices[6](1)/2.0+vertices[7](1)/2.0;
+  support_points[14](2) = vertices[6](2)/2.0+vertices[7](2)/2.0;
+  support_points[15](0) = vertices[4](0)/2.0+vertices[7](0)/2.0;
+  support_points[15](1) = vertices[4](1)/2.0+vertices[7](1)/2.0;
+  support_points[15](2) = vertices[4](2)/2.0+vertices[7](2)/2.0;
+  support_points[16](0) = vertices[0](0)/2.0+vertices[4](0)/2.0;
+  support_points[16](1) = vertices[0](1)/2.0+vertices[4](1)/2.0;
+  support_points[16](2) = vertices[0](2)/2.0+vertices[4](2)/2.0;
+  support_points[17](0) = vertices[1](0)/2.0+vertices[5](0)/2.0;
+  support_points[17](1) = vertices[1](1)/2.0+vertices[5](1)/2.0;
+  support_points[17](2) = vertices[1](2)/2.0+vertices[5](2)/2.0;
+  support_points[18](0) = vertices[2](0)/2.0+vertices[6](0)/2.0;
+  support_points[18](1) = vertices[2](1)/2.0+vertices[6](1)/2.0;
+  support_points[18](2) = vertices[2](2)/2.0+vertices[6](2)/2.0;
+  support_points[19](0) = vertices[3](0)/2.0+vertices[7](0)/2.0;
+  support_points[19](1) = vertices[3](1)/2.0+vertices[7](1)/2.0;
+  support_points[19](2) = vertices[3](2)/2.0+vertices[7](2)/2.0;
+  support_points[20](0) = vertices[0](0)/4.0+vertices[1](0)/4.0+vertices[2](0)/4.0+vertices[3](0)/4.0;
+  support_points[20](1) = vertices[0](1)/4.0+vertices[1](1)/4.0+vertices[2](1)/4.0+vertices[3](1)/4.0;
+  support_points[20](2) = vertices[0](2)/4.0+vertices[1](2)/4.0+vertices[2](2)/4.0+vertices[3](2)/4.0;
+  support_points[21](0) = vertices[4](0)/4.0+vertices[5](0)/4.0+vertices[6](0)/4.0+vertices[7](0)/4.0;
+  support_points[21](1) = vertices[4](1)/4.0+vertices[5](1)/4.0+vertices[6](1)/4.0+vertices[7](1)/4.0;
+  support_points[21](2) = vertices[4](2)/4.0+vertices[5](2)/4.0+vertices[6](2)/4.0+vertices[7](2)/4.0;
+  support_points[22](0) = vertices[0](0)/4.0+vertices[1](0)/4.0+vertices[4](0)/4.0+vertices[5](0)/4.0;
+  support_points[22](1) = vertices[0](1)/4.0+vertices[1](1)/4.0+vertices[4](1)/4.0+vertices[5](1)/4.0;
+  support_points[22](2) = vertices[0](2)/4.0+vertices[1](2)/4.0+vertices[4](2)/4.0+vertices[5](2)/4.0;
+  support_points[23](0) = vertices[1](0)/4.0+vertices[2](0)/4.0+vertices[5](0)/4.0+vertices[6](0)/4.0;
+  support_points[23](1) = vertices[1](1)/4.0+vertices[2](1)/4.0+vertices[5](1)/4.0+vertices[6](1)/4.0;
+  support_points[23](2) = vertices[1](2)/4.0+vertices[2](2)/4.0+vertices[5](2)/4.0+vertices[6](2)/4.0;
+  support_points[24](0) = vertices[2](0)/4.0+vertices[3](0)/4.0+vertices[6](0)/4.0+vertices[7](0)/4.0;
+  support_points[24](1) = vertices[2](1)/4.0+vertices[3](1)/4.0+vertices[6](1)/4.0+vertices[7](1)/4.0;
+  support_points[24](2) = vertices[2](2)/4.0+vertices[3](2)/4.0+vertices[6](2)/4.0+vertices[7](2)/4.0;
+  support_points[25](0) = vertices[0](0)/4.0+vertices[3](0)/4.0+vertices[4](0)/4.0+vertices[7](0)/4.0;
+  support_points[25](1) = vertices[0](1)/4.0+vertices[3](1)/4.0+vertices[4](1)/4.0+vertices[7](1)/4.0;
+  support_points[25](2) = vertices[0](2)/4.0+vertices[3](2)/4.0+vertices[4](2)/4.0+vertices[7](2)/4.0;
+  support_points[26](0) = vertices[0](0)/8.0+vertices[1](0)/8.0+vertices[2](0)/8.0+vertices[3](0)/8.0+vertices[4](0)/8.0+vertices[5](0)/8.0+vertices[6](0)/8.0+vertices[7](0)/8.0;
+  support_points[26](1) = vertices[0](1)/8.0+vertices[1](1)/8.0+vertices[2](1)/8.0+vertices[3](1)/8.0+vertices[4](1)/8.0+vertices[5](1)/8.0+vertices[6](1)/8.0+vertices[7](1)/8.0;
+  support_points[26](2) = vertices[0](2)/8.0+vertices[1](2)/8.0+vertices[2](2)/8.0+vertices[3](2)/8.0+vertices[4](2)/8.0+vertices[5](2)/8.0+vertices[6](2)/8.0+vertices[7](2)/8.0;
+};
+
+
+
+template <>
+void FEQuadraticSub<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &face,
+						 const Boundary<3>  &,
+						 vector<Point<3> >  &support_points) const {
+  Assert (support_points.size() == dofs_per_face,
+	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
+
+  for (unsigned int vertex=0; vertex<4; ++vertex)
+    support_points[vertex] = face->vertex(vertex);
+  for (unsigned int line=0; line<4; ++line)
+    support_points[4+line] = (support_points[line] + support_points[(line+4)%4]) / 2;
+  support_points[8] = (support_points[0] +
+		       support_points[1] +
+		       support_points[2] +
+		       support_points[3]) / 4;
+};
 
 #endif
 

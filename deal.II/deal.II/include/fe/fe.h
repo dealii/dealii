@@ -147,7 +147,7 @@ class FiniteElementData
 				      * me why we have to declare and implement
 				      * this one explicitely.
 				      */
-    bool operator == (const FiniteElementData<2> &) const;
+    bool operator == (const FiniteElementData<dim> &) const;
 
 				     /**
 				      * Exception
@@ -472,7 +472,7 @@ class FiniteElementBase :
  * is needed in case two quads meet at a common line of which one is refined
  * once more than the other one. Then there are constraints referring to the
  * hanging nodes on that side of the line which is refined. These constraints
- * are represented by a $n\times m$-matrix #line_constraints#, where $n$ is the
+ * are represented by a $n\times m$-matrix #interface_constraints#, where $n$ is the
  * number of degrees of freedom on the refined side (those dofs on the middle
  * vertex plus those on the two lines), and $m$ is that of the unrefined side
  * (those dofs on the two vertices plus those on the line). The matrix is thus
@@ -496,6 +496,178 @@ class FiniteElementBase :
  * degree of freedom to other degrees of freedom which are themselves
  * constrained. Only one level of indirection is allowed. It is not known
  * at the time of this writing whether this is a constraint itself.
+ *
+ *
+ * \subsection{Finite elements in three dimensions}
+ *
+ * For the interface constraints, almost the same holds as for the 2D case.
+ * The numbering for the indices $m$ on the mother face is obvious and keeps
+ * to the usual numbering of degrees of freedom on quadrilaterals.
+ *
+ * The numbering of the degrees of freedom on the interior of the refined
+ * faces for the index $n$ is as follows: let $d_v$ and $d_l$ be as above,
+ * and $d_q$ be the number of degrees of freedom per quadrilateral (and
+ * therefore per face), then $n=0...d_v-1$ denote the dofs on the vertex at
+ * the center, $n=d_v...5d_v-1$ for the dofs on the vertices at the center
+ * of the bounding lines of the quadrilateral,
+ * $n=5d_v..5d_v+4*d_l-1$ are for the degrees of freedom on
+ * the four lines connecting the center vertex to the outer boundary of the
+ * mother face, n=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1# for the degrees of freedom
+ * on the small lines surrounding the quad,
+ * and $n=5d_v+12*d_l...5d_v+12*d_l+4*d_q-1$ for the dofs on the
+ * four child faces. Note the direction of the lines at the boundary of the
+ * quads, as shown below.
+ *
+ * The order of the twelve lines and the four child faces can be extracted
+ * from the following sketch, where the overall order of the different
+ * dof groups is depicted:
+ * \begin{verbatim}
+ *    *--13--3--14--*
+ *    |      |      |
+ *    16 20  7  19  12
+ *    |      |      |
+ *    4--8---0--6---2
+ *    |      |      |
+ *    15 17  5  18  11
+ *    |      |      |
+ *    *--9---1--10--*
+ * \end{verbatim}
+ * It should be noted that the face as shown here is in the standard form,
+ * i.e. with vertex zero at the bottom left, and the other vertices numbered
+ * counter clockwise. This explains the numbering of the lines labeled 13 and
+ * 14, as well as those labeled 15 and 16. The dofs on the lines need to
+ * be numbered in the direction of the lines, which is as follows:
+ * \begin{verbatim}
+ *    *-->---*-->---*
+ *    |      |      |
+ *    ^      ^      ^ 
+ *    |      |      |
+ *    *-->---*-->---*
+ *    |      |      |
+ *    ^      ^      ^ 
+ *    |      |      |
+ *    *-->---*-->---*
+ * \end{verbatim}
+ * The orientation of the quads should be obvious.
+ *
+ * The faces of a hexahedron are arranged in a way such that
+ * some must be viewed from the inside and some from the outside of the cell to
+ * show this order; refer to the documentation of the #Triangulation# class for
+ * the definition of this.
+ *
+ * If of the cells adjacent to one line more than one is refined and there is
+ * at least one unrefined cell, then the degrees of freedom on the refined line
+ * are constrained from two cells. For example, consider the cell behind the
+ * face shown above is refined, while the one in front of the face is not
+ * refined; then the dofs on the lines numbered 9 and 10 are constrained. If
+ * there are two more cells below the ones just introduced, with a common face
+ * right below the one shown, and of these is one refined and one unrefined one,
+ * then the degrees on the two mentioned small lines are constrained a second
+ * time. Since these constraints must be unique, it follows that the constraints
+ * for the degrees of freedom on refined lines may only be in terms of the
+ * degrees of freedom on the unrefined line, not in terms of the other
+ * degrees of freedom on a face.
+ *
+ * Since the handling of constraints on degrees of freedom is mostly done
+ * by the #ConstraintMatrix# class, this class checks whether the constraints
+ * introduced from the two sides are unique; it is able to handle the fact
+ * that the constraints for some of the dofs are entered more than once.
+ *
+ *
+ * \subsection{Notes on three space dimensions}
+ *
+ * In three space dimensions, using locally refined elements involves
+ * a difficulty not found in one or two spatial dimensions: the common
+ * face of two cells need not match exactly, if one of the cells is
+ * refined and the two cells are at the boundary. To understand this,
+ * look at the following sketch:
+ * \begin{verbatim}
+ *         *---------*---------*
+ *        /         /         /|
+ *       /         /         / |
+ *      /         /         /  |
+ *     *---------*---------*   |
+ *     |         |         |   |
+ *     |         |         |   *
+ *     |         |         |  /
+ *     |         |         | /
+ *     |         |         |/
+ *     *---------*---------*
+ * \end{verbatim}
+ *
+ * Assume the two top faces represent the boundary of the
+ * triangulation; assume further that the boundary of the original
+ * domain is curved here. Then, refining one of the two cells will
+ * lead to refinement of the top line of the common face of the two
+ * cells with the new mid-point being raised or lowered, i.e. the two
+ * children of this line will not take the same place as their mother
+ * line did (this is not properly drawable using only ASCII characters,
+ * use some imagination):
+ * \begin{verbatim}
+ *       ..*--.*---..*---------*
+ *      *----*----* /         /|
+ *      :    :    :/         / |
+ *     :    :    :/         /  |
+ *     *----*----*---------*   |
+ *     |    |    |         |   |
+ *     |    |    |         |   *
+ *     *----*----*         |  /
+ *     |    |    |         | /
+ *     |    |    |         |/
+ *     *----*----*---------*
+ * \end{verbatim}
+ * While this is the case with boundary faces in two spatial
+ * dimensions also, it here leads to the fact that the four child
+ * faces of the common face of the two cells will not coincide with
+ * their mother face as well.
+ *
+ * Before proceeding to the consequences of this, we should note that
+ * this problem occurs only for cells exactly at the boundary and if
+ * exactly one of the two cells is refined once. If one of the two is
+ * refined once and the other one twice, the problem again occurs only
+ * for the outermost layer of cells, not for the others.
+ *
+ * Now for the consequences. Because most finite elements, at least
+ * those implemented at present (February 1999) are implemented by
+ * interpolation to certain Lagrange points, and because the Lagrange
+ * points do not match, there is no easy way to obtain continuity or
+ * any other constraint on the finite element functions at this
+ * face. This is rather obvious since parts of the child faces of the
+ * left, refined cell do not match any face of the right, unrefined
+ * cell at all. This problem seems unsolvable using the usual finite
+ * elements with trial functions computed on the unit cell without
+ * taking into consideration the actual cell, so we do not even
+ * attempt to solve it.
+ *
+ * A second, but related problem comes into play when trying to
+ * compute integrals over faces which are refined from one side. For
+ * this problem, the #FESubfaceValues# class exists, and it evaluates
+ * certain functions of the finite element class involving the
+ * Jacobian determinant of the mapping of unit face to real face,
+ * restricted to a subface, and the normal vectors to the subfaces. We
+ * should note that here, we talk only about evaluating the finite
+ * element in the right cell, but on the common face; evaluating the
+ * finite element in the small cells on the left poses no problem. The
+ * question here is: what are the subfaces? It could either be the
+ * four subfaces of the refined cell to the left, or the four subfaces
+ * of the large face if it were refined with no curved boundary being
+ * near it. In the first case, points where we evaluate jacobians as
+ * well as normal vectors would match from both sides of the faces;
+ * however, the points at which the finite element function is
+ * evaluated, would not match, which needs to be that way because for
+ * some points of the small faces of the left cell there are no
+ * matching points on the right.
+ *
+ * The other possibility would be to totally ignore the existence of
+ * the boundary and evaluate the finite element in the right cell at
+ * subfaces which would be generated if the new vertex of the top line
+ * of the common face was the midpoint of the line. This approach is
+ * simpler from the implementational view point, but is also more
+ * appropriate, since we evaluate on the right cell and do not want to
+ * let this evaluation depend on the state of the left cell or its
+ * children.
+ *
+ * Within this library, the present implementation uses the second way.
  *
  *
  * \subsection{Notes on extending the finite element library}
@@ -1110,6 +1282,33 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * contents of the matrix, so it need not
 				      * be necessary to clear the matrix before
 				      * use with this function.
+				      *
+				      * Some finite elements, especially in
+				      * higher dimensions, may chose not to
+				      * implement this function because the
+				      * computational effort is growing
+				      * rapidly, for the in-time computation
+				      * of the matrix as well as for the
+				      * setting up using a script. For
+				      * example, the size of the generated
+				      * #C++# code for the local mass
+				      * matrix in 3d is 4.383.656 bytes
+				      * already for the trilinear element.
+				      * Higher order elements would
+				      * produce even larger code.
+				      *
+				      * In the case of a finite element chosing
+				      * not to implement the functionality of
+				      * this function, that function is supposed
+				      * to throw an exception of class
+				      * #ExcComputationNotUseful# declared
+				      * in this class, for example through the
+				      * #AssertThrow# mechanism; you can catch
+				      * this exception and compute the mass matrix
+				      * by quadrature instead. Finite element
+				      * classes not implementing this function
+				      * are assumed to state this in their
+				      * documentation.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary, 
@@ -1131,6 +1330,14 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * Exception
 				      */
     DeclException0 (ExcJacobiDeterminantHasWrongSign);
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcComputationNotUseful,
+		    int,
+		    << "The computation you required from this function is not "
+		    << "feasable or not probable in the present dimension ("
+		    << arg1 << ") because it would be prohibitively expensive.");
 };
 
 template <int dim>

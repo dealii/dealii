@@ -390,6 +390,226 @@ void DoFQuadAccessor<dim,BaseClass>::copy_from (const DoFQuadAccessor<dim,BaseCl
 
 
 
+/*------------------------- Functions: DoFHexAccessor -----------------------*/
+
+
+template <int dim, typename BaseClass>
+inline
+int DoFHexAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (i<dof_handler->selected_fe->dofs_per_hex,
+	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_hex));
+
+  return dof_handler->levels[present_level]
+    ->hex_dofs[present_index*dof_handler->selected_fe->dofs_per_hex+i];
+};
+
+
+
+template <int dim, typename BaseClass>
+void DoFHexAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
+						    const int index) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (i<dof_handler->selected_fe->dofs_per_hex,
+	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_hex));
+
+  dof_handler->levels[present_level]
+    ->hex_dofs[present_index*dof_handler->selected_fe->dofs_per_hex+i] = index;
+};
+
+
+
+template <int dim, typename BaseClass>
+inline
+int DoFHexAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
+						      const unsigned int i) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (vertex<8, ExcInvalidIndex (i,0,8));
+  Assert (i<dof_handler->selected_fe->dofs_per_vertex,
+	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+
+  const unsigned int dof_number = (vertex_index(vertex) *
+				   dof_handler->selected_fe->dofs_per_vertex +
+				   i);
+  return dof_handler->vertex_dofs[dof_number];
+};
+
+
+  
+template <int dim, typename BaseClass>
+void DoFHexAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
+							   const unsigned int i,
+							   const int index) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (vertex<8, ExcInvalidIndex (i,0,8));
+  Assert (i<dof_handler->selected_fe->dofs_per_vertex,
+	  ExcInvalidIndex (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+
+  const unsigned int dof_number = (vertex_index(vertex) *
+				   dof_handler->selected_fe->dofs_per_vertex +
+				   i);
+  dof_handler->vertex_dofs[dof_number] = index;
+};
+
+
+
+template <int dim, typename BaseClass>
+void
+DoFHexAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_indices.size() == (8*dof_handler->get_fe().dofs_per_vertex +
+				 12*dof_handler->get_fe().dofs_per_line +
+				 6*dof_handler->get_fe().dofs_per_quad +
+				 dof_handler->get_fe().dofs_per_hex),
+	  ExcVectorDoesNotMatch());
+
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
+  vector<int>::iterator next = dof_indices.begin();
+  for (unsigned int vertex=0; vertex<8; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next++ = vertex_dof_index(vertex,d);
+  for (unsigned int line=0; line<12; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      *next++ = this->line(line)->dof_index(d);
+  for (unsigned int quad=0; quad<6; ++quad)
+    for (unsigned int d=0; d<dofs_per_quad; ++d)
+      *next++ = this->quad(quad)->dof_index(d);
+  for (unsigned int d=0; d<dofs_per_hex; ++d)
+    *next++ = dof_index(d);
+};
+
+
+
+template <int dim, typename BaseClass>
+TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
+DoFHexAccessor<dim,BaseClass>::line (const unsigned int i) const {
+  TriaIterator<dim,LineAccessor<dim> > l = BaseClass::line(i);
+  return TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
+    (
+      tria,
+      present_level,
+      l->index(),
+      dof_handler
+    );
+};
+
+
+
+template <int dim, typename BaseClass>
+TriaIterator<dim,DoFQuadAccessor<dim,QuadAccessor<dim> > >
+DoFHexAccessor<dim,BaseClass>::quad (const unsigned int i) const {
+  Assert (i<6, ExcInvalidIndex (i, 0, 6));
+
+  return TriaIterator<dim,DoFQuadAccessor<dim,QuadAccessor<dim> > >
+    (
+      tria,
+      present_level,
+      quad_index (i),
+      dof_handler
+    );
+};
+
+
+
+template <int dim, typename BaseClass>
+TriaIterator<dim,DoFHexAccessor<dim,BaseClass> >
+DoFHexAccessor<dim,BaseClass>::child (const unsigned int i) const {
+  TriaIterator<dim,DoFHexAccessor<dim,BaseClass> > q (tria,
+						      present_level+1,
+						      child_index (i),
+						      dof_handler);
+  
+#ifdef DEBUG
+  if (q.state() != past_the_end)
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+#endif
+  return q;
+};
+
+
+
+template <int dim, typename BaseClass>
+void DoFHexAccessor<dim,BaseClass>::
+distribute_local_to_global (const dVector &local_source,
+			    dVector       &global_destination) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (local_source.size() == (8*dof_handler->get_fe().dofs_per_vertex +
+				  12*dof_handler->get_fe().dofs_per_line +
+				  6*dof_handler->get_fe().dofs_per_quad +
+				  dof_handler->get_fe().dofs_per_hex),
+	  ExcVectorDoesNotMatch());
+  Assert (dof_handler->n_dofs() == global_destination.size(),
+	  ExcVectorDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.size();
+
+				   // get indices of dofs
+  vector<int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell vector
+  for (unsigned int j=0; j<n_dofs; ++j)
+    global_destination(dofs[j]) += local_source(j);
+};
+
+
+
+template <int dim, typename BaseClass>
+void DoFHexAccessor<dim,BaseClass>::
+distribute_local_to_global (const dFMatrix &local_source,
+			    dSMatrix       &global_destination) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (local_source.m() == (8*dof_handler->get_fe().dofs_per_vertex +
+			       12*dof_handler->get_fe().dofs_per_line +
+			       6*dof_handler->get_fe().dofs_per_quad +
+			       dof_handler->get_fe().dofs_per_hex),
+	  ExcMatrixDoesNotMatch());
+  Assert (local_source.m() == local_source.n(),
+	  ExcMatrixDoesNotMatch());
+  Assert (dof_handler->n_dofs() == global_destination.m(),
+	  ExcMatrixDoesNotMatch());
+  Assert (global_destination.m() == global_destination.n(),
+	  ExcMatrixDoesNotMatch());
+  
+  const unsigned int n_dofs = local_source.m();
+
+				   // get indices of dofs
+  vector<int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell matrix
+  for (unsigned int i=0; i<n_dofs; ++i)
+    for (unsigned int j=0; j<n_dofs; ++j)
+      global_destination.add(dofs[i], dofs[j], local_source(i,j));
+};
+
+
+
+template <int dim, typename BaseClass>
+void DoFHexAccessor<dim,BaseClass>::copy_from (const DoFHexAccessor<dim,BaseClass> &a) {
+  BaseClass::copy_from (a);
+  set_dof_handler (a.dof_handler);
+};
+
+
+
+
+
+
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
 
@@ -560,6 +780,84 @@ DoFCellAccessor<2>::set_dof_values (const dVector &local_values,
 
 
 
+#if deal_II_dimension == 3
+
+template <>
+DoFSubstructAccessor<3>::face_iterator
+DoFCellAccessor<3>::face (const unsigned int i) const {
+  return quad(i);
+};
+
+
+
+template <>
+void
+DoFCellAccessor<3>::get_dof_values (const dVector &values,
+				    dVector       &local_values) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+	  ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  ExcVectorDoesNotMatch());
+  Assert (active(), ExcNotActive());
+  
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
+  vector<double>::iterator next_local_value=local_values.begin();
+  for (unsigned int vertex=0; vertex<8; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next_local_value++ = values(vertex_dof_index(vertex,d));
+  for (unsigned int line=0; line<12; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      *next_local_value++ = values(this->line(line)->dof_index(d));
+  for (unsigned int quad=0; quad<6; ++quad)
+    for (unsigned int d=0; d<dofs_per_quad; ++d)
+      *next_local_value++ = values(this->quad(quad)->dof_index(d));
+  for (unsigned int d=0; d<dofs_per_hex; ++d)
+    *next_local_value++ = values(dof_index(d));
+};
+
+
+
+template <>
+void
+DoFCellAccessor<3>::set_dof_values (const dVector &local_values,
+				    dVector       &values) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+	  ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  ExcVectorDoesNotMatch());
+  Assert (active(), ExcNotActive());
+  
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
+  vector<double>::const_iterator next_local_value=local_values.begin();
+  for (unsigned int vertex=0; vertex<8; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      values(vertex_dof_index(vertex,d)) = *next_local_value++;
+  for (unsigned int line=0; line<12; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      values(this->line(line)->dof_index(d)) = *next_local_value++;
+  for (unsigned int quad=0; quad<6; ++quad)
+    for (unsigned int d=0; d<dofs_per_quad; ++d)
+      values(this->quad(quad)->dof_index(d)) = *next_local_value++;
+  for (unsigned int d=0; d<dofs_per_hex; ++d)
+    values(dof_index(d)) = *next_local_value++;
+};
+
+
+
+#endif
+
+
+
 
 template <int dim>
 void
@@ -676,6 +974,27 @@ template class TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
 template class TriaIterator<2,DoFCellAccessor<2> >;
 template class TriaActiveIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
 template class TriaActiveIterator<2,DoFCellAccessor<2> >;
+#endif
+
+
+
+#if deal_II_dimension == 3
+template class DoFLineAccessor<3,LineAccessor<3> >;
+template class DoFQuadAccessor<3,QuadAccessor<3> >;
+template class DoFHexAccessor<3,HexAccessor<3> >;
+template class DoFHexAccessor<3,CellAccessor<3> >;
+template class DoFCellAccessor<3>;
+
+template class TriaRawIterator<3,DoFLineAccessor<3,LineAccessor<3> > >;
+template class TriaRawIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >;
+template class TriaRawIterator<3,DoFHexAccessor<3,HexAccessor<3> > >;
+template class TriaRawIterator<3,DoFCellAccessor<3> >;
+template class TriaIterator<3,DoFLineAccessor<3,LineAccessor<3> > >;
+template class TriaIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >;
+template class TriaIterator<3,DoFCellAccessor<3> >;
+template class TriaActiveIterator<3,DoFLineAccessor<3,LineAccessor<3> > >;
+template class TriaActiveIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >;
+template class TriaActiveIterator<3,DoFCellAccessor<3> >;
 #endif
 
 

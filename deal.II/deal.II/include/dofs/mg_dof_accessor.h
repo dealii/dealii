@@ -333,6 +333,115 @@ class MGDoFQuadAccessor :  public MGDoFAccessor<dim>, public DoFQuadAccessor<dim
 
 
 
+/**
+ * Grant access to the multilevel degrees of freedom located on hexhedra.
+ *
+ * @see DoFLineAccessor
+ */
+template <int dim, typename BaseClass>
+class MGDoFHexAccessor :  public MGDoFAccessor<dim>, public DoFHexAccessor<dim, BaseClass> {
+  public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef MGDoFHandler<dim> AccessorData;
+
+				     /**
+				      * Default constructor, unused thus
+				      * not implemented.
+				      */
+    MGDoFHexAccessor ();
+
+    				     /**
+				      * Constructor. The #local_data#
+				      * argument is assumed to be a pointer
+				      * to a #DoFHandler<dim># object.
+				      */
+    MGDoFHexAccessor (Triangulation<dim> *tria,
+		      const int           level,
+		      const int           index,
+		      const AccessorData *local_data);
+    
+				     /**
+				      * Return the index of the #i#th degree
+				      * of freedom of this hex on the level
+				      * this quad lives on.
+				      */
+    int mg_dof_index (const unsigned int i) const;
+
+    				     /**
+				      * Set the index of the #i#th degree
+				      * of freedom of this hex on the
+				      * level this hex lives on to #index#.
+				      */
+    void set_mg_dof_index (const unsigned int i, const int index) const;
+
+				     /**
+				      * Return the index of the #i#th degree
+				      * on the #vertex#th vertex for the level
+				      * this hex lives on.
+				      */
+    int mg_vertex_dof_index (const unsigned int vertex,
+			     const unsigned int i) const;
+
+				     /**
+				      * Set the index of the #i#th degree
+				      * on the #vertex#th vertex for the
+				      * level this hex lives on to #index#.
+				      */
+    void set_mg_vertex_dof_index (const unsigned int vertex,
+				  const unsigned int i,
+				  const int          index) const;
+
+    				     /**
+				      * Return the indices of the dofs of this
+				      * hex in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand. The
+				      * indices refer to the local numbering
+				      * for the level this hex lives on.
+				      */
+    void get_mg_dof_indices (vector<int> &dof_indices) const;
+
+    				     /**
+				      * Return a pointer to the #i#th line
+				      * bounding this #Hex#.
+				      */
+    TriaIterator<dim,MGDoFLineAccessor<dim,LineAccessor<dim> > >
+    line (const unsigned int i) const;
+
+				     /**
+				      * Return a pointer to the #i#th quad
+				      * bounding this #Hex#.
+				      */
+    TriaIterator<dim,MGDoFLineAccessor<dim,QuadAccessor<dim> > >
+    quad (const unsigned int i) const;
+
+				     /**
+				      * Return the #i#th child as a DoF quad
+				      * iterator. This function is needed since
+				      * the child function of the base
+				      * class returns a hex accessor without
+				      * access to the DoF data.
+				      */
+    TriaIterator<dim,MGDoFHexAccessor<dim,BaseClass> > child (const unsigned int) const;
+    
+				     /**
+				      * Implement the copy operator needed
+				      * for the iterator classes.
+				      */
+    void copy_from (const MGDoFHexAccessor<dim,BaseClass> &a);
+};
+
+
+
+
 
 /**
  * Intermediate, "typedef"-class, not for public use.
@@ -441,6 +550,40 @@ class MGDoFSubstructAccessor<2> : public MGDoFQuadAccessor<2,CellAccessor<2> > {
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
     typedef TriaIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > > face_iterator;
+};
+
+
+
+/**
+ * Intermediate, "typedef"-class, not for public use.
+ *
+ * @see MGDoFSubstructAccessor<1>
+ */
+template <>
+class MGDoFSubstructAccessor<3> : public MGDoFHexAccessor<3,CellAccessor<3> > {
+  public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef MGDoFHexAccessor<3,CellAccessor<3> >::AccessorData AccessorData;
+    
+    				     /**
+				      * Constructor
+				      */
+    MGDoFSubstructAccessor (Triangulation<3> *tria,
+			    const int         level,
+			    const int         index,
+			    const AccessorData *local_data) :
+		    MGDoFHexAccessor<3,CellAccessor<3> > (tria,level,index,local_data) {};
+				     // do this here, since this way the
+				     // CellAccessor has the possibility to know
+				     // what a face_iterator is. Otherwise
+				     // it would have to ask the DoFHandler<dim>
+				     // which would need another big include
+				     // file and maybe cyclic interdependence
+    typedef TriaIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > > face_iterator;
 };
 
 

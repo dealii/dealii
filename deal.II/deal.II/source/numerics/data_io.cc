@@ -506,6 +506,10 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 	  case 2:
 		out << "<x> <y> ";
 		break;
+	  case 3:
+		out << "<x> <y> <z>";
+		break;
+		
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
@@ -543,7 +547,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 	{
 	  case 1:
 						 // one dimension: write
-						 // left vertex, right vertex
+						 // each vertex, right vertex
 						 // and data values
 		for (supp_pt = 0; supp_pt<points.n_quadrature_points; ++supp_pt) 
 		  {
@@ -560,8 +564,8 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 	  case 2:
 						 // two dimension: output
 						 // grid and data as a sequence
-						 // of lines in 3d
-		
+						 // of points in 3d forming
+						 // a tensor mesh on each cell
 		for (unsigned xpt = 0, supp_pt = 0;
 		     xpt <= accuracy; ++xpt)
 		{
@@ -577,6 +581,41 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		  }
 		  out << endl;
 		}
+		
+		break;
+
+	  case 3:
+						 // three dimension: output
+						 // grid and data as a tensor
+						 // mesh in 4d. we very
+						 // obviously have a problem
+						 // here since humans can watch
+						 // 4d lines properly. but one
+						 // can at least view cuts
+						 // through this hypercube,
+						 // which is possible this
+						 // way
+		
+		for (unsigned xpt = 0, supp_pt = 0;
+		     xpt <= accuracy; ++xpt)
+		  {
+		    for(unsigned ypt = 0; ypt <= accuracy; ++ypt)
+		      {
+			for(unsigned zpt = 0; zpt <= accuracy; ++zpt, ++supp_pt)
+			  {
+			    Point<dim> pt = fe.quadrature_point(supp_pt);
+			    out << pt << "  ";
+			    
+			    for (unsigned int i=0; i!=data.size(); ++i)
+			      out << values[i][supp_pt]
+				  << ' ';
+			    out << endl;
+			  }
+			out << endl;
+		      }
+		    out << endl;
+		  };
+		
 		
 		break;
 
@@ -701,6 +740,7 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 };
 
 
+#if deal_II_dimension == 2
 
 template <>
 void DataOut<2>::write_povray_mesh (ostream &out) const {
@@ -804,6 +844,24 @@ void DataOut<2>::write_povray_mesh (ostream &out) const {
   AssertThrow (out, ExcIO());
 };
 
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+void DataOut<3>::write_povray_mesh (ostream &out) const {
+  Assert (false, ExcNotImplemented());
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 2
+
 template <>
 void DataOut<2>::write_epsgrid (ostream &out) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
@@ -872,7 +930,9 @@ void DataOut<2>::write_epsgrid (ostream &out) const {
 
   AssertThrow (out, ExcIO());
 };
-      
+
+
+
 template <>
 void DataOut<2>::write_eps (ostream &out) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
@@ -964,6 +1024,24 @@ void DataOut<2>::write_eps (ostream &out) const {
 
   AssertThrow (out, ExcIO());
 };
+
+#endif
+
+
+#if deal_II_dimension == 3
+
+template <>
+void DataOut<3>::write_epsgrid (ostream &/*out*/) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+template <>
+void DataOut<3>::write_eps (ostream &/*out*/) const {
+  Assert (false, ExcNotImplemented());
+};
+
+#endif
 
 
 template <int dim>

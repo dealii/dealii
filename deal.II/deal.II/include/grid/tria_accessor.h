@@ -12,6 +12,8 @@
 // forward declaration needed
 class Line;
 class Quad;
+class Hexahedron;
+
 template <int dim> class Point;
 
 
@@ -191,6 +193,14 @@ class TriaAccessor {
 				     /**
 				      *  Exception
 				      */
+    DeclException1 (ExcCantSetChildren,
+		    int,
+		    << "You can only set the child index if the cell has no "
+		    << "children, or clear it. The given "
+		    << "index was " << arg1 << " (-1 means: clear children)");
+				     /**
+				      * Exception
+				      */
     DeclException0 (ExcUnusedCellAsNeighbor);
 				     /**
 				      *  Exception
@@ -240,29 +250,11 @@ class TriaAccessor {
 				      */
     Triangulation<dim> *tria;
 
-    friend class TriaRawIterator<1,LineAccessor<1> >;
-    friend class TriaRawIterator<1,CellAccessor<1> >;
-    friend class TriaRawIterator<2,LineAccessor<2> >;
-    friend class TriaRawIterator<2,QuadAccessor<2> >;
-    friend class TriaRawIterator<2,CellAccessor<2> >;
+    template <int dim, typename Accessor> friend class TriaRawIterator<dim,Accessor>;
+    template <int dim, typename Accessor> friend class TriaIterator<dim,Accessor>;
+    template <int dim, typename Accessor> friend class TriaActiveIterator<dim,Accessor>;
 
-    friend class TriaIterator<1,LineAccessor<1> >;
-    friend class TriaIterator<1,CellAccessor<1> >;
-    friend class TriaIterator<2,LineAccessor<2> >;
-    friend class TriaIterator<2,QuadAccessor<2> >;
-    friend class TriaIterator<2,CellAccessor<2> >;
-
-    friend class TriaActiveIterator<1,LineAccessor<1> >;
-    friend class TriaActiveIterator<1,CellAccessor<1> >;
-    friend class TriaActiveIterator<2,LineAccessor<2> >;
-    friend class TriaActiveIterator<2,QuadAccessor<2> >;
-    friend class TriaActiveIterator<2,CellAccessor<2> >;
-
-    friend class TriaRawIterator<1,DoFCellAccessor<1> >;
-    friend class TriaRawIterator<2,DoFCellAccessor<2> >;
     friend class TriaRawIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
-    friend class TriaIterator<1,DoFCellAccessor<1> >;
-    friend class TriaIterator<2,DoFCellAccessor<2> >;
     friend class TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
 };
 
@@ -276,7 +268,7 @@ class TriaAccessor {
  *   Accessor to dereference the data of lines. This accessor is used to
  *   point to lines in #dim# space dimensions. There is a derived class
  *   for lines in one space dimension, in which case a line is also a cell
- *   and thus has much more functionality than in lower dimensions.
+ *   and thus has much more functionality than in other dimensions.
  *
  *   @author Wolfgang Bangerth, 1998
  */
@@ -541,12 +533,7 @@ class LineAccessor :  public TriaAccessor<dim> {
 
     
 
-  public:
-//  protected:
-				     // would be better to make this private,
-				     // but that would require making all
-				     // TriaRawIterator<...>s friend.->wait for
-				     // gcc 2.30687
+  protected:
     
 				     /**@name Advancement of iterators*/
 				     /*@{*/
@@ -574,6 +561,12 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      */
     void operator -- ();
 				     /*@}*/
+
+				     /**
+				      * Declare some friends.
+				      */
+    template <int dim> friend class TriaRawIterator<dim,LineAccessor<dim> >;
+    template <>        friend class TriaRawIterator<1,CellAccessor<1> >;
 };
 
 
@@ -583,7 +576,7 @@ class LineAccessor :  public TriaAccessor<dim> {
  *   point to quads in #dim# space dimensions (only #dim>=2# seems reasonable
  *   to me). There is a derived class
  *   for quads in two space dimension, in which case a quad is also a cell
- *   and thus has much more functionality than in lower dimensions.
+ *   and thus has much more functionality than in other dimensions.
  *
  *   @author Wolfgang Bangerth, 1998
  */
@@ -685,20 +678,20 @@ class QuadAccessor :  public TriaAccessor<dim> {
     void recursively_clear_user_flag () const;
 
 				     /**
-				      * Set the user pointer of this line
+				      * Set the user pointer of this quad
 				      * to #p#.
 				      */
     void set_user_pointer (void *p) const;
 
 				     /**
-				      * Reset the user pointer of this line
+				      * Reset the user pointer of this quad
 				      * to a #NULL# pointer.
 				      */
     void clear_user_pointer () const;
 
 				     /**
 				      * Access the value of the user pointer
-				      * of this line. It is in the
+				      * of this quad. It is in the
 				      * responsibility of the user to make
 				      * sure that the pointer points to
 				      * something useful. You should use the
@@ -748,18 +741,18 @@ class QuadAccessor :  public TriaAccessor<dim> {
 
 				     /**
 				      * Return the boundary indicator of this
-				      * line. Since boundary data is only useful
+				      * quad. Since boundary data is only useful
 				      * for structures with a dimension less
 				      * than the dimension of a cell, this
 				      * function issues an error if #dim<3#.
 				      *
 				      * If the return value is 255, then this
-				      * line is in the interior of the domain.
+				      * quad is in the interior of the domain.
 				      */
     unsigned char boundary_indicator () const;
 
 				     /**
-				      * Set the boundary indicator of this line.
+				      * Set the boundary indicator of this quad.
 				      * The same applies as for the
 				      * #boundary_indicator()# function.
 				      *
@@ -780,9 +773,9 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      * Return whether this line is at the
 				      * boundary. This is checked via the
 				      * the boundary indicator field, which
-				      * is always 255 if the line is in the
+				      * is always 255 if the quad is in the
 				      * interior of the domain. Obviously,
-				      * this is only possible for #dim>2#;
+				      * this function is only useful for #dim>2#;
 				      * however, for #dim==2#, a quad is
 				      * a cell and the #CellAccessor# class
 				      * offers another possibility to
@@ -832,9 +825,8 @@ class QuadAccessor :  public TriaAccessor<dim> {
     Point<dim> center () const;
 
 				     /**
-				      * Return the barycenter of the aud,
-				      * which is the midpoint. The same
-				      * applies as for the #center# function
+				      * Return the barycenter of the qaud. The
+				      * same applies as for the #center# function
 				      * with regard to quads at the boundary.
 				      */
     Point<dim> barycenter () const;
@@ -888,13 +880,7 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      */
     void operator = (const QuadAccessor &);
 
-  public:
-//  protected:
-				     // would be better to make this private,
-				     // but that would require making all
-				     // TriaRawIterator<...>s friend.->wait for
-				     // gcc 2.30687
-
+  protected:
 				     /**@name Advancement of iterators*/
 				     /*@{*/
 				     /**
@@ -921,7 +907,364 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      */
     void operator -- ();
 				     /*@}*/
+
+				     /**
+				      * Declare some friends.
+				      */
+    template <int dim> friend class TriaRawIterator<dim,QuadAccessor<dim> >;
+    template <>        friend class TriaRawIterator<2,CellAccessor<2> >;
 };
+
+
+
+/**
+ *   Accessor to dereference the data of hexahedra. This accessor is used to
+ *   point to hexs in #dim# space dimensions (only #dim>=3# seems reasonable
+ *   to me). There is a derived class
+ *   for hexs in three space dimension, in which case a hex is also a cell
+ *   and thus has much more functionality than in other dimensions.
+ *
+ *   @author Wolfgang Bangerth, 1998
+ */
+template <int dim>
+class HexAccessor :  public TriaAccessor<dim> {
+  public:
+				     /**
+				      *  Constructor.
+				      */
+    HexAccessor (Triangulation<dim> *parent     = 0,
+		 const int           level      = -1,
+		 const int           index      = -1,
+		 const void         *local_data = 0) :
+		    TriaAccessor<dim> (parent, level, index, local_data) {};
+
+				     /**
+				      *  Copy the data of the given hex.
+				      */
+    void set (const Hexahedron &h) const;
+    
+				     /**
+				      *  Return index of vertex #i=0,...,7# of
+				      *  a hex. The convention regarding the
+				      *  numbering of vertices is laid down
+				      *  in the documentation of the
+				      *  #Triangulation# class.
+				      */ 
+    int vertex_index (const unsigned int i) const;
+
+    				     /**
+				      *  Return a reference (not an iterator!)
+				      *  to the #i#th vertex.
+				      */
+    Point<dim> & vertex (const unsigned int i) const;
+
+				     /**
+				      *  Return a pointer to the #i#th line
+				      *  bounding this #Hex#.
+				      */
+    TriaIterator<dim,LineAccessor<dim> > line (const unsigned int i) const;
+
+				     /**
+				      * Return the line index of the #i#th
+				      * line. The level is naturally
+				      * the same as that of the hex.
+				      */
+    unsigned int line_index (const unsigned int i) const;
+    
+    				     /**
+				      *  Return a pointer to the #i#th quad
+				      *  bounding this #Hex#.
+				      */
+    TriaIterator<dim,QuadAccessor<dim> > quad (const unsigned int i) const;
+
+				     /**
+				      * Return the quad index of the #i#th
+				      * side (a quad). The level is naturally
+				      * the same as that of the hex.
+				      */
+    unsigned int quad_index (const unsigned int i) const;
+
+				     /**
+				      *  Test for the element being used
+				      *  or not.
+				      */
+    bool used () const;
+
+				     /**
+				      *  Set the #used# flag. You should know
+				      *  quite exactly what you are doing of you
+				      *  touch this function. It is exclusively
+				      *  for internal use in the library.
+				      */
+    void set_used_flag () const;
+
+				     /**
+				      *  Clear the #used# flag. You should know
+				      *  quite exactly what you are doing of you
+				      *  touch this function. It is exclusively
+				      *  for internal use in the library.
+				      */
+    void clear_used_flag () const;
+
+    				     /**
+				      *  Return whether the user flag
+				      *  is set or not.
+				      */
+    bool user_flag_set () const;
+
+				     /**
+				      *  Flag the user flag for this cell.
+				      */
+    void set_user_flag () const;
+
+				     /**
+				      *  Clear the user flag.
+				      */
+    void clear_user_flag () const;
+
+				     /**
+				      *  set the user flag of this object
+				      *  and of all its children and their
+				      *  children, etc.
+				      */
+    void recursively_set_user_flag () const;
+
+    				     /**
+				      *  Clear the user flag of this object
+				      *  and of all its children and their
+				      *  children, etc.
+				      */
+    void recursively_clear_user_flag () const;
+
+				     /**
+				      * Set the user pointer of this hex
+				      * to #p#.
+				      */
+    void set_user_pointer (void *p) const;
+
+				     /**
+				      * Reset the user pointer of this hex
+				      * to a #NULL# pointer.
+				      */
+    void clear_user_pointer () const;
+
+				     /**
+				      * Access the value of the user pointer
+				      * of this hex. It is in the
+				      * responsibility of the user to make
+				      * sure that the pointer points to
+				      * something useful. You should use the
+				      * new style cast operator to maintain
+				      * a minimum of typesafety, e.g.
+				      * #A *a=static_cast<A*>(cell->user_pointer());#.
+				      */
+    void * user_pointer () const;
+
+				     /**
+				      *  Return a pointer to the #i#th
+				      *  child.
+				      */
+    TriaIterator<dim,HexAccessor<dim> > child (const unsigned int i) const;
+
+				     /**
+				      *  Return the index of the #i#th child.
+				      *  The level of the child is one higher
+				      *  than that of the present cell.
+				      *  If the child does not exist, -1
+				      *  is returned.
+				      */
+    int child_index (const unsigned int i) const;
+
+				     /**
+				      *  Set the child field. Since we
+				      *  only store the index of the first
+				      *  child (the others follow directly)
+				      *  only one child index is to be
+				      *  given. The level of the child is
+				      *  one level up of the level of the
+				      *  cell to which this iterator points.
+				      */
+    void set_children (const int index) const;
+	
+				     /**
+				      *  Clear the child field, i.e. set
+				      *  it to a value which indicates
+				      *  that this cell has no children.
+				      */
+    void clear_children () const;
+    
+				     /**
+				      *  Test whether the hex has children.
+				      */
+    bool has_children () const;
+
+				     /**
+				      * Return the boundary indicator of this
+				      * hex. Since boundary data is only useful
+				      * for structures with a dimension less
+				      * than the dimension of a cell, this
+				      * function issues an error if #dim<4#.
+				      *
+				      * If the return value is 255, then this
+				      * line is in the interior of the domain.
+				      */
+    unsigned char boundary_indicator () const;
+
+				     /**
+				      * Set the boundary indicator of this hex.
+				      * The same applies as for the
+				      * #boundary_indicator()# function.
+				      *
+				      * You should be careful with this function
+				      * and especially never try to set the
+				      * boundary indicator to 255, unless
+				      * you exactly know what you are doing,
+				      * since this value is reserved for
+				      * another purpose and algorithms may
+				      * not work if boundary cells have have
+				      * this boundary indicator or if interior
+				      * cells have boundary indicators other
+				      * than 255.
+				      */
+    void set_boundary_indicator (unsigned char) const;
+
+				     /**
+				      * Return whether this hex is at the
+				      * boundary. This is checked via
+				      * the boundary indicator field, which
+				      * is always 255 if the hex is in the
+				      * interior of the domain. Obviously,
+				      * the use of this function is only
+				      * possible for #dim>3#;
+				      * however, for #dim==3#, a hex is
+				      * a cell and the #CellAccessor# class
+				      * offers another possibility to
+				      * determine whether a cell is at the
+				      * boundary or not.
+				      */
+    bool at_boundary () const;
+
+				     /**
+				      * Return the diameter of the hex.
+				      *
+				      * The diameter of a hex is computed to
+				      * be the largest diagonal. You
+				      * should absolutely be clear about the
+				      * fact that this definitely is not the
+				      * diameter of all hexahedra; however
+				      * it may serve as an approximation and
+				      * is exact in many cases, especially
+				      * if the hexahedron is not too much
+				      * distorted.
+				      */
+    double diameter () const;
+
+    				     /**
+				      * Return the center of the hex. The
+				      * center of a hex is defined to be
+				      * the average of the vertices,
+				      * which is also the point where the
+				      * trilinear mapping places the midpoint
+				      * of the unit hex in real space.
+				      * However, this may not be the point
+				      * of the barycenter of the hex.
+				      */
+    Point<dim> center () const;
+
+				     /**
+				      * Return the barycenter of the hex.
+				      */
+    Point<dim> barycenter () const;
+
+				     /**
+				      * Return the volume of the hex. With
+				      * volume, we mean the area included by
+				      * the hexahedron if its faces are
+				      * supposed to be derived by a trilinear
+				      * mapping from the unit cell, only using
+				      * the location of the vertices.
+				      * Therefore, no information
+				      * about the boundary is used; if
+				      * you want other than trilinearly
+				      * mapped unit hexahedra, ask the
+				      * appropriate finite element class
+				      * for the volume.
+				      */
+    double measure () const;
+
+				     /**
+				      * Compute and return the number of
+				      * children of this hex. Actually,
+				      * this function only counts the number
+				      * of active children, i.e. the number
+				      * if hexs which are not further
+				      * refined. Thus, if all of the eight
+				      * children of a hex are further
+				      * refined exactly once, the returned
+				      * number will be 64, not 80.
+				      *
+				      * If the present cell is not refined,
+				      * one is returned.
+				      */
+    unsigned int number_of_children () const;
+
+  private:
+    				     /**
+				      *  Copy operator. This is normally
+				      *  used in a context like
+				      *  #iterator a,b;  *a=*b;#. Since
+				      *  the meaning is to copy the object
+				      *  pointed to by #b# to the object
+				      *  pointed to by #a# and since
+				      *  accessors are not real but
+				      *  virtual objects, this operation
+				      *  is not useful for iterators on
+				      *  triangulations. We declare this
+				      *  function here private, thus it may
+				      *  not be used from outside.
+				      *  Furthermore it is not implemented
+				      *  and will give a linker error if
+				      *  used anyway.
+				      */
+    void operator = (const HexAccessor &);
+
+  protected:
+				     /**@name Advancement of iterators*/
+				     /*@{*/
+				     /**
+				      *  This operator advances the iterator to
+				      *  the next element.
+				      *
+				      *  The next element is next on this
+				      *  level if there are more. If the
+				      *  present element is the last on
+				      *  this level, the first on the
+				      *  next level is accessed.
+				      */
+    void operator ++ ();
+
+    				     /**
+				      *  This operator moves the iterator to
+				      *  the previous element.
+				      *
+				      *  The previous element is previous on
+				      *  this level if #index>0#. If the
+				      *  present element is the first on
+				      *  this level, the last on the
+				      *  previous level is accessed.
+				      */
+    void operator -- ();
+				     /*@}*/
+
+				     /**
+				      * Declare some friends.
+				      */
+    template <int dim> friend class TriaRawIterator<dim,HexAccessor<dim> >;
+    template <>        friend class TriaRawIterator<3,CellAccessor<3> >;
+};
+
+
+
 
 
 
@@ -945,6 +1288,7 @@ class TriaSubstructAccessor;
  * \begin{verbatim}
  *   TriaSubstructAccessor<1> := LineAccessor<1>;
  *   TriaSubstructAccessor<2> := QuadAccessor<2>;
+ *   TriaSubstructAccessor<3> := HexAccessor<3>;
  * \end{verbatim}
  * We do this rather complex (and needless, provided C++ the needed constructs!)
  * class hierarchy manipulation, since this way we can declare and implement
@@ -1004,6 +1348,34 @@ class TriaSubstructAccessor<2> : public QuadAccessor<2> {
     typedef TriaIterator<2,LineAccessor<2> > substruct_iterator;
 };
 
+
+
+
+/**
+ * Intermediate, "typedef"-class, not for public use.
+ *
+ * @see TriaSubstructAccessor<1>
+ */
+template <>
+class TriaSubstructAccessor<3> : public HexAccessor<3> {
+  public:
+    				     /**
+				      * Constructor
+				      */
+    TriaSubstructAccessor (Triangulation<3> *tria,
+			   const int         level,
+			   const int         index,
+			   const void       *local_data) :
+		    HexAccessor<3> (tria,level,index,local_data) {};
+
+    				     // do this here, since this way the
+				     // CellAccessor has the possibility to know
+				     // what a substruct_iterator is. Otherwise
+				     // it would have to ask the DoFHandler<dim>
+				     // which would need another big include
+				     // file and maybe cyclic interdependence
+    typedef TriaIterator<3,QuadAccessor<3> > substruct_iterator;
+};
 
 
 

@@ -31,6 +31,24 @@ go-files-2d = $(addprefix ../lib/2d/go/, $(tmp1:.cc=_2d.go))
 o-files-3d  = $(addprefix ../lib/3d/o/,  $(tmp1:.cc=_3d.o) )
 go-files-3d = $(addprefix ../lib/3d/go/, $(tmp1:.cc=_3d.go))
 
+
+
+
+
+default: 2d
+all: 1d 2d 3d
+
+1d: ../lib/libdeal_II_1d.g.a ../lib/libdeal_II_1d.a
+
+2d: ../lib/libdeal_II_2d.g.a ../lib/libdeal_II_2d.a
+
+3d: ../lib/libdeal_II_3d.g.a ../lib/libdeal_II_3d.a
+
+
+
+# rules how to generate object files from source files. note that
+# there are some files which needs exceptional rules; these are
+# listed immediately below
 ../lib/1d/go/%.go :
 	@echo ==============1d======debug============= $<
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
@@ -52,17 +70,11 @@ go-files-3d = $(addprefix ../lib/3d/go/, $(tmp1:.cc=_3d.go))
 	@echo ==============3d======optimized========= $<
 	@$(CXX) $(CXXFLAGS) -Ddeal_II_dimension=3 -c $< -o $@
 
+# special rules for exceptional files
+../lib/3d/o/fe_linear_mapping.jacobians_3d.o:
+	@echo "==============3d======opt==(special)====" $<
+	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS)) -Ddeal_II_dimension=3 -c $< -o $@
 
-
-
-default: 2d
-all: 1d 2d 3d
-
-1d: ../lib/libdeal_II_1d.g.a ../lib/libdeal_II_1d.a
-
-2d: ../lib/libdeal_II_2d.g.a ../lib/libdeal_II_2d.a
-
-3d: ../lib/libdeal_II_3d.g.a ../lib/libdeal_II_3d.a
 
 
 

@@ -408,6 +408,137 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 
 
 
+/**
+ * Grant access to the degrees of freedom located on quads.
+ *
+ * @see DoFLineAccessor
+ */
+template <int dim, typename BaseClass>
+class DoFHexAccessor :  public DoFAccessor<dim>, public BaseClass {
+  public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef DoFHandler<dim> AccessorData;
+    
+				     /**
+				      * Default constructor, unused thus
+				      * not implemented.
+				      */
+    DoFHexAccessor ();
+
+    				     /**
+				      * Constructor. The #local_data#
+				      * argument is assumed to be a pointer
+				      * to a #DoFHandler<dim># object.
+				      */
+    DoFHexAccessor (Triangulation<dim> *tria,
+		    const int           level,
+		    const int           index,
+		    const AccessorData *local_data) :
+		    DoFAccessor<dim> (local_data),
+		    BaseClass        (tria,level,index) {};
+    
+				     /**
+				      * Return the index of the #i#th degree
+				      * of freedom of this quad.
+				      */
+    int dof_index (const unsigned int i) const;
+
+    				     /**
+				      * Set the index of the #i#th degree
+				      * of freedom of this quad to #index#.
+				      */
+    void set_dof_index (const unsigned int i, const int index) const;
+
+				     /**
+				      * Return the index of the #i#th degree
+				      * on the #vertex#th vertex.
+				      */
+    int vertex_dof_index (const unsigned int vertex,
+			  const unsigned int i) const;
+
+				     /**
+				      * Set the index of the #i#th degree
+				      * on the #vertex#th vertex to #index#.
+				      */
+    void set_vertex_dof_index (const unsigned int vertex,
+			       const unsigned int i,
+			       const int          index) const;
+
+    				     /**
+				      * Return the indices of the dofs of this
+				      * quad in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand.
+				      */
+    void get_dof_indices (vector<int> &dof_indices) const;
+
+    				     /**
+				      *  Return a pointer to the #i#th line
+				      *  bounding this #Hex#.
+				      */
+    TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
+    line (const unsigned int i) const;
+
+    				     /**
+				      *  Return a pointer to the #i#th quad
+				      *  bounding this #Hex#.
+				      */
+    TriaIterator<dim,DoFQuadAccessor<dim,QuadAccessor<dim> > >
+    quad (const unsigned int i) const;
+    
+				     /**
+				      * Return the #i#th child as a DoF hex
+				      * iterator. This function is needed since
+				      * the child function of the base
+				      * class returns a hex accessor without
+				      * access to the DoF data.
+				      */
+    TriaIterator<dim,DoFHexAccessor<dim,BaseClass> > child (const unsigned int) const;
+
+				     /**
+				      * Distribute a local (cell based) vector
+				      * to a global one by mapping the local
+				      * numbering of the degrees of freedom
+				      * to the global one and entering the
+				      * local values into the global vector.
+				      *
+				      * The elements are {\it added} up to
+				      * the elements in the global vector,
+				      * rather than just set, since this is
+				      * usually what one wants.
+				      */
+    void distribute_local_to_global (const dVector &local_source,
+				     dVector       &global_destination) const;
+
+				     /**
+				      * This function does much the same as the
+				      * #distribute_local_to_global(dVector,dVector)#
+				      * function, but operates on matrices
+				      * instead of vectors. The sparse matrix
+				      * is supposed to have non-zero entry
+				      * slots where required.
+				      */
+    void distribute_local_to_global (const dFMatrix &local_source,
+				     dSMatrix       &global_destination) const;
+    
+				     /**
+				      * Implement the copy operator needed
+				      * for the iterator classes.
+				      */
+    void copy_from (const DoFHexAccessor<dim,BaseClass> &a);
+};
+
+
+
+
 
 
 
@@ -503,6 +634,7 @@ class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
 				      * iterator classes.
 				      */
     typedef typename DoFQuadAccessor<2,CellAccessor<2> >::AccessorData AccessorData;
+    
     				     /**
 				      * Constructor
 				      */
@@ -518,6 +650,41 @@ class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
     typedef TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > > face_iterator;
+};
+
+
+
+
+/**
+ * Intermediate, "typedef"-class, not for public use.
+ *
+ * @see DoFSubstructAccessor<1>
+ */
+template <>
+class DoFSubstructAccessor<3> : public DoFHexAccessor<3,CellAccessor<3> > {
+  public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef typename DoFQuadAccessor<3,CellAccessor<3> >::AccessorData AccessorData;
+    
+    				     /**
+				      * Constructor
+				      */
+    DoFSubstructAccessor (Triangulation<3> *tria,
+			  const int         level,
+			  const int         index,
+			  const AccessorData *local_data) :
+		    DoFHexAccessor<3,CellAccessor<3> > (tria,level,index,local_data) {};
+				     // do this here, since this way the
+				     // CellAccessor has the possibility to know
+				     // what a face_iterator is. Otherwise
+				     // it would have to ask the DoFHandler<dim>
+				     // which would need another big include
+				     // file and maybe cyclic interdependence
+    typedef TriaIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > > face_iterator;
 };
 
 
