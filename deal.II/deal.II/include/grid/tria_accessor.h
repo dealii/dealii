@@ -130,9 +130,6 @@ class TriaAccessor
     bool operator != (const TriaAccessor &) const;
     
   public:
-
-    double ind_value;
-    
 				     /**
 				      * Data type to be used for passing
 				      * parameters from iterators to the
