@@ -175,10 +175,12 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
 				   // an entry for this column already
 				   // exists, since we don't want to
 				   // enter it twice
-  for (std::vector<std::pair<unsigned int,double> >::const_iterator col_val_pair = col_val_pairs.begin();
+  for (std::vector<std::pair<unsigned int,double> >::const_iterator
+         col_val_pair = col_val_pairs.begin();
        col_val_pair!=col_val_pairs.end(); ++col_val_pair)
     {
-      for (std::vector<std::pair<unsigned int,double> >::const_iterator p=line_ptr->entries.begin();
+      for (std::vector<std::pair<unsigned int,double> >::const_iterator
+             p=line_ptr->entries.begin();
 	   p != line_ptr->entries.end(); ++p)
 	if (p->first == col_val_pair->first)
 	  {
@@ -623,13 +625,15 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcMatrixNotSquare());
   
-				   // store for each index whether it
-				   // must be distributed or not. If entry
-				   // is -1, no distribution is necessary.
-				   // otherwise, the number states which
-				   // line in the constraint matrix handles
-				   // this index
-  std::vector<int> distribute(sparsity.n_rows(), -1);
+				   // store for each index whether it must be
+				   // distributed or not. If entry is
+				   // deal_II_numbers::invalid_unsigned_int,
+				   // no distribution is necessary.
+				   // otherwise, the number states which line
+				   // in the constraint matrix handles this
+				   // index
+  std::vector<unsigned int> distribute(sparsity.n_rows(),
+                                       deal_II_numbers::invalid_unsigned_int);
   
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -637,34 +641,30 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
   const unsigned int n_rows = sparsity.n_rows();
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      if (distribute[row] == -1)
+      if (distribute[row] == deal_II_numbers::invalid_unsigned_int)
 	{
 					   // regular line. loop over
-					   // cols. note that this
-					   // changes the line we are
-					   // presently working on: we
-					   // add additional
-					   // entries. these are put to
-					   // the end of the
-					   // row. however, as
-					   // constrained nodes cannot
-					   // be constrained to other
-					   // constrained nodes, nothing
-					   // will happen if we run into
-					   // these added nodes, as they
-					   // can't be distributed
-					   // further. we might store
-					   // the position of the last
-					   // old entry and stop work
-					   // there, but since operating
-					   // on the newly added ones
-					   // only takes two comparisons
+					   // cols. note that this changes the
+					   // line we are presently working
+					   // on: we add additional
+					   // entries. these are put to the
+					   // end of the row. however, as
+					   // constrained nodes cannot be
+					   // constrained to other constrained
+					   // nodes, nothing will happen if we
+					   // run into these added nodes, as
+					   // they can't be distributed
+					   // further. we might store the
+					   // position of the last old entry
+					   // and stop work there, but since
+					   // operating on the newly added
+					   // ones only takes two comparisons
 					   // (column index valid,
-					   // distribute[column]
-					   // necessarily ==-1), it is
-					   // cheaper to not do so and
-					   // run right until the end of
-					   // the line
+					   // distribute[column] necessarily
+					   // ==deal_II_numbers::invalid_unsigned_int),
+					   // it is cheaper to not do so and
+					   // run right until the end of the
+					   // line
 	  const unsigned int row_end = sparsity.get_rowstart_indices()[row+1];
 	  for (unsigned int j=sparsity.get_rowstart_indices()[row]; j<row_end; ++j)
 	    {
@@ -674,7 +674,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 	      if (column == SparsityPattern::invalid_entry)
 		break;
 	      else
-		if (distribute[column] != -1)
+		if (distribute[column] != deal_II_numbers::invalid_unsigned_int)
 		  {
 						     // distribute entry
 						     // at regular row
@@ -702,7 +702,8 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 	      break;
 	    else
 	      {
-		if (distribute[sparsity.get_column_numbers()[j]] == -1)
+		if (distribute[sparsity.get_column_numbers()[j]] ==
+                    deal_II_numbers::invalid_unsigned_int)
 						   // distribute entry at irregular
 						   // row @p{row} and regular column
 						   // sparsity.colnums[j]
@@ -736,13 +737,15 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcMatrixNotSquare());
   
-				   // store for each index whether it
-				   // must be distributed or not. If entry
-				   // is -1, no distribution is necessary.
-				   // otherwise, the number states which
-				   // line in the constraint matrix handles
-				   // this index
-  std::vector<int> distribute(sparsity.n_rows(), -1);
+				   // store for each index whether it must be
+				   // distributed or not. If entry is
+				   // deal_II_numbers::invalid_unsigned_int,
+				   // no distribution is necessary.
+				   // otherwise, the number states which line
+				   // in the constraint matrix handles this
+				   // index
+  std::vector<unsigned int> distribute(sparsity.n_rows(),
+                                       deal_II_numbers::invalid_unsigned_int);
   
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -750,7 +753,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
   const unsigned int n_rows = sparsity.n_rows();
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      if (distribute[row] == -1)
+      if (distribute[row] == deal_II_numbers::invalid_unsigned_int)
 					 // regular line. loop over
 					 // cols. note that as we
 					 // proceed to distribute
@@ -760,7 +763,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
 	  {
 	    const unsigned int column = sparsity.column_number(row,j);
 
- 	    if (distribute[column] != -1)
+ 	    if (distribute[column] != deal_II_numbers::invalid_unsigned_int)
 	      {
 						 // distribute entry
 						 // at regular row
@@ -838,7 +841,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
 	  {
 	    const unsigned int column = sparsity.column_number(row,j);
 
-	    if (distribute[column] == -1)
+	    if (distribute[column] == deal_II_numbers::invalid_unsigned_int)
 					       // distribute entry at irregular
 					       // row @p{row} and regular column
 					       // sparsity.colnums[j]
