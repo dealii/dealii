@@ -32,7 +32,7 @@
  * set in relation to the number of cells or the number of DoFs. The
  * implementations of these non-standard methods is left to a user.
  *
- * @section ConvergenceTable::Usage Usage
+ * @section ConvergenceTableUsage Usage
  * The number of cells and the number of DoFs may be added to the table by
  * calling e.g.  <tt>add_value("n cells", n_cells)</tt>. The table
  * data is also added by calling add_value().
