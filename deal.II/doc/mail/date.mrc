@@ -150,7 +150,7 @@ SubjectHeader>
 
 <HeadBodySep>
 <p>
-<strong>$FROMNAME$</strong> ($FROMADDRNAME$ at $FROMADDRDOMAIN$)
+<strong>$FROMNAME$</strong> ($FROMADDRNAME$ <I>at</I> $FROMADDRDOMAIN$)
 <BR>
 <strong>$GMTDATE$</strong></p>
 <HR>
