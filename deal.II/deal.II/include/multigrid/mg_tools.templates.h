@@ -24,6 +24,8 @@
 #include <fstream>
 
 
+//TODO[GK]: this file must really be changed: it contains #if's for deal_II_dimension, but we can't use this in headers, since application programs might not use this way to select the dimension. the only way in header files is to have proper template specializations
+
 
 //TODO:[?] This function needs to be specially implemented, since in 2d mode we use faces
 #if deal_II_dimension == 1
@@ -138,7 +140,7 @@ MGTransferPrebuilt<number>::copy_to_mg (
 	  restrict_and_add (level+1, dst[level], dst[level+1]);
 	}
     };
-};
+}
 
 #endif
 
@@ -365,7 +367,7 @@ MGTransferSelect<number>::copy_to_mg (
 	  restrict_and_add (level+1, dst[level], dst[level+1]);
 	}
     };
-};
+}
 
 #endif
 
@@ -586,7 +588,7 @@ MGTransferBlock<number>::copy_to_mg (
 	  restrict_and_add (level+1, dst[level], dst[level+1]);
 	}
     };
-};
+}
 
 #endif
 
