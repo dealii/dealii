@@ -365,7 +365,27 @@ struct FiniteElementBase :
 				      * information; when using discontinuous
 				      * elements, this assumption is violated.
 				      *
-				      * SOLUTION? NOT YET MADE UP!
+				      * One way to get the whole thing working
+				      * nonetheless would be to use a flag which
+				      * tells us when the 'write' and when to
+				      * 'add'. Adding is possible when we have
+				      * only interior degrees of freedom, i.e.
+				      * dofs that are not shared between cells.
+				      * This is certainly the way to go for the
+				      * DG(r) elements. However, this scheme
+				      * does not work for discontinuous elements
+				      * with degrees of freedom on the faces,
+				      * such as the rotated bilinear
+				      * (Rannacher-Turek) element or elements
+				      * like the Crouzeix-Raviart one. The latter
+				      * have degrees of freedom on the faces,
+				      * e.g. mean values on a face, and these
+				      * values are the same from both sides of
+				      * the face, but the solutions are
+				      * discontinuous there nevertheless, such
+				      * that interpolation is not possible here.
+				      *
+				      * FINAL SOLUTION? NOT YET MADE UP!
 				      *
 				      * To compute the interpolation of a
 				      * finite element field to a cell, you
