@@ -187,6 +187,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p> New: 
+       <code class="class">SolverFGMRES</code> implements the flexible
+       GMRES method with varying preconditioner from the right. It is
+       also accessible in <code
+       class="class">SolverSelector</code> by choosing <tt>fgmres</tt>.
+       <br>
+       (GK 2002/10/07)
+       </p>
+
   <li> <p> Changed: The <code class="class">SparseDirectMA27</code>
        class used to store a pointer to the sparsity pattern of the
        matrix. It now releases this as soon as it doesn't need it any
