@@ -34,14 +34,23 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   # have now centralized this part to one single place, and are back to where
   # we want to be: have different libraries for debug and optimized mode,
   # but in the same directory. And, voila, our build system works again :-)
+  #
+  # There is one gotcha: PETSc has a habit of making incompatible changes by
+  # simply changing the names of libraries between different versions. That
+  # really is too bad, so we have to conditionalize things.
   lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
   lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
-  xlib.g = $(lib-contrib-petsc-path.g)/libpetscsles.so \
+ifeq (DEAL_II_PETSC_VERSION_MINOR,1)
+  xlib-ksp=libpetscsles
+else
+  xlib-ksp=libpetscksp
+endif
+  xlib.g = $(lib-contrib-petsc-path.g)/$(xlib-ksp).so \
            $(lib-contrib-petsc-path.g)/libpetscdm.so \
            $(lib-contrib-petsc-path.g)/libpetscmat.so \
            $(lib-contrib-petsc-path.g)/libpetscvec.so \
            $(lib-contrib-petsc-path.g)/libpetsc.so
-  xlib.o = $(lib-contrib-petsc-path.o)/libpetscsles.so \
+  xlib.o = $(lib-contrib-petsc-path.o)/$(xlib-ksp).so \
            $(lib-contrib-petsc-path.o)/libpetscdm.so \
            $(lib-contrib-petsc-path.o)/libpetscmat.so \
            $(lib-contrib-petsc-path.o)/libpetscvec.so \

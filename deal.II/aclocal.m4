@@ -3675,47 +3675,87 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   fi
 
 
-  dnl Secondly, check for the PETSc architecture, since that determines
-  dnl where object and configuration files will be found. Do so only
-  dnl if we are interested in this information at all.
+  dnl If we have found PETSc, determine additional pieces of data
   if test "$USE_CONTRIB_PETSC" = "yes" ; then
-    AC_MSG_CHECKING(for PETSc library architecture)
+    DEAL_II_CONFIGURE_PETSC_ARCH
+    DEAL_II_CONFIGURE_PETSC_VERSION
+  fi
+])
 
-    AC_ARG_WITH(petsc-arch,
-    [  --with-petsc-arch=architecture  Specify the architecture for your PETSc
+
+
+dnl ------------------------------------------------------------
+dnl Figure out the architecture used for PETSc, since that determines
+dnl where object and configuration files will be found.
+dnl
+dnl Usage: DEAL_II_CONFIGURE_PETSC_ARCH
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
+[
+  AC_MSG_CHECKING(for PETSc library architecture)
+
+  AC_ARG_WITH(petsc-arch,
+  [  --with-petsc-arch=architecture  Specify the architecture for your PETSc
                                      installation; use this if you want to
                                      override the PETSC_ARCH environment
                                      variable],
-       [
-          DEAL_II_PETSC_ARCH=$withval
+     [
+        DEAL_II_PETSC_ARCH=$withval
+	AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
+
+        dnl Make sure that what was specified is actually correct
+        if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
+             ; then
+          AC_MSG_ERROR([PETSc has not been compiled for the architecture
+                        specified with --with-petsc-arch])
+	fi
+     ],
+     [
+        dnl Take something from the environment variables, if it is there
+        if test "x$PETSC_ARCH" != "x" ; then
+          DEAL_II_PETSC_ARCH="$PETSC_ARCH"
 	  AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
 
-          dnl Make sure that what was specified is actually correct
+          dnl Make sure that what this is actually correct
           if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
-               ; then
+             ; then
             AC_MSG_ERROR([PETSc has not been compiled for the architecture
-                          specified with --with-petsc-arch])
-	  fi
-       ],
-       [
-          dnl Take something from the environment variables, if it is there
-          if test "x$PETSC_ARCH" != "x" ; then
-            DEAL_II_PETSC_ARCH="$PETSC_ARCH"
-	    AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
-
-            dnl Make sure that what this is actually correct
-            if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
-               ; then
-              AC_MSG_ERROR([PETSc has not been compiled for the architecture
-                            specified in the PETSC_ARCH environment variable])
-            fi
-          else
-    	    AC_MSG_ERROR([If PETSc is used, you must specify the architectur
-                          either through the PETSC_ARCH environment variable,
-                          or through the --with-petsc-arch flag])
+                          specified in the PETSC_ARCH environment variable])
           fi
-       ])
-  fi
+        else
+    	  AC_MSG_ERROR([If PETSc is used, you must specify the architectur
+                        either through the PETSC_ARCH environment variable,
+                        or through the --with-petsc-arch flag])
+        fi
+     ])
+])
+
+
+
+dnl ------------------------------------------------------------
+dnl Figure out the version numbers of PETSc. This is unfortunately
+dnl necessary since PETSc has a habit to change function signatures,
+dnl library names, etc, in random ways between versions...
+dnl
+dnl Usage: DEAL_II_CONFIGURE_PETSC_VERSION
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
+[
+  AC_MSG_CHECKING(for PETSc version)
+
+  DEAL_II_PETSC_VERSION_MAJOR=`cat $DEAL_II_PETSC_DIR/include/petscversion.h \
+                               | grep "#define PETSC_VERSION_MAJOR" \
+                               | perl -pi -e 's/.*MAJOR\s+//g;'`
+  DEAL_II_PETSC_VERSION_MINOR=`cat $DEAL_II_PETSC_DIR/include/petscversion.h \
+                               | grep "#define PETSC_VERSION_MINOR" \
+                               | perl -pi -e 's/.*MINOR\s+//g;'`
+  DEAL_II_PETSC_VERSION_SUBMINOR=`cat $DEAL_II_PETSC_DIR/include/petscversion.h \
+                               | grep "#define PETSC_VERSION_SUBMINOR" \
+                               | perl -pi -e 's/.*MINOR\s+//g;'`
+  PETSC_VERSION="$DEAL_II_PETSC_VERSION_MAJOR.$DEAL_II_PETSC_VERSION_MINOR.$DEAL_II_PETSC_VERSION_SUBMINOR"
+  AC_MSG_RESULT($PETSC_VERSION)
 ])
 
 

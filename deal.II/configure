@@ -273,7 +273,7 @@ PACKAGE_BUGREPORT=
 
 ac_unique_file="deal.II"
 ac_subdirs_all="$ac_subdirs_all contrib tests"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS DEAL_II_VERSION DEAL_II_MAJOR DEAL_II_MINOR DEAL_II_PATH DEAL2_DIR build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSPIC SHLIBLD LDFLAGSPIC enablemultithreading withmultithreading F77 F77_VERSION F77FLAGSO F77FLAGSG F77FLAGSPIC F77LIBS enableshared lib_suffix AR RANLIB ac_ct_RANLIB enablemultigrid TECPLOT_LIBRARY_PATH TECPLOT_INCLUDE_PATH USE_CONTRIB_HSL USE_CONTRIB_PETSC DEAL_II_PETSC_DIR DEAL_II_PETSC_ARCH USE_CONTRIB_METIS DEAL_II_METIS_DIR kdocdir kdocversion DOXYGEN PERL subdirs LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS DEAL_II_VERSION DEAL_II_MAJOR DEAL_II_MINOR DEAL_II_PATH DEAL2_DIR build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSPIC SHLIBLD LDFLAGSPIC enablemultithreading withmultithreading F77 F77_VERSION F77FLAGSO F77FLAGSG F77FLAGSPIC F77LIBS enableshared lib_suffix AR RANLIB ac_ct_RANLIB enablemultigrid TECPLOT_LIBRARY_PATH TECPLOT_INCLUDE_PATH USE_CONTRIB_HSL USE_CONTRIB_PETSC DEAL_II_PETSC_DIR DEAL_II_PETSC_ARCH DEAL_II_PETSC_VERSION_MAJOR DEAL_II_PETSC_VERSION_MINOR DEAL_II_PETSC_VERSION_SUBMINOR USE_CONTRIB_METIS DEAL_II_METIS_DIR kdocdir kdocversion DOXYGEN PERL subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -7758,8 +7758,9 @@ _ACEOF
   fi
 
 
-        if test "$USE_CONTRIB_PETSC" = "yes" ; then
-    echo "$as_me:$LINENO: checking for PETSc library architecture" >&5
+    if test "$USE_CONTRIB_PETSC" = "yes" ; then
+
+  echo "$as_me:$LINENO: checking for PETSc library architecture" >&5
 echo $ECHO_N "checking for PETSc library architecture... $ECHO_C" >&6
 
 
@@ -7767,46 +7768,67 @@ echo $ECHO_N "checking for PETSc library architecture... $ECHO_C" >&6
 if test "${with_petsc_arch+set}" = set; then
   withval="$with_petsc_arch"
 
-          DEAL_II_PETSC_ARCH=$withval
+        DEAL_II_PETSC_ARCH=$withval
+	echo "$as_me:$LINENO: result: $DEAL_II_PETSC_ARCH" >&5
+echo "${ECHO_T}$DEAL_II_PETSC_ARCH" >&6
+
+                if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
+             ; then
+          { { echo "$as_me:$LINENO: error: PETSc has not been compiled for the architecture
+                        specified with --with-petsc-arch" >&5
+echo "$as_me: error: PETSc has not been compiled for the architecture
+                        specified with --with-petsc-arch" >&2;}
+   { (exit 1); exit 1; }; }
+	fi
+
+else
+
+                if test "x$PETSC_ARCH" != "x" ; then
+          DEAL_II_PETSC_ARCH="$PETSC_ARCH"
 	  echo "$as_me:$LINENO: result: $DEAL_II_PETSC_ARCH" >&5
 echo "${ECHO_T}$DEAL_II_PETSC_ARCH" >&6
 
                     if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
-               ; then
+             ; then
             { { echo "$as_me:$LINENO: error: PETSc has not been compiled for the architecture
-                          specified with --with-petsc-arch" >&5
+                          specified in the PETSC_ARCH environment variable" >&5
 echo "$as_me: error: PETSc has not been compiled for the architecture
-                          specified with --with-petsc-arch" >&2;}
-   { (exit 1); exit 1; }; }
-	  fi
-
-else
-
-                    if test "x$PETSC_ARCH" != "x" ; then
-            DEAL_II_PETSC_ARCH="$PETSC_ARCH"
-	    echo "$as_me:$LINENO: result: $DEAL_II_PETSC_ARCH" >&5
-echo "${ECHO_T}$DEAL_II_PETSC_ARCH" >&6
-
-                        if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
-               ; then
-              { { echo "$as_me:$LINENO: error: PETSc has not been compiled for the architecture
-                            specified in the PETSC_ARCH environment variable" >&5
-echo "$as_me: error: PETSc has not been compiled for the architecture
-                            specified in the PETSC_ARCH environment variable" >&2;}
-   { (exit 1); exit 1; }; }
-            fi
-          else
-    	    { { echo "$as_me:$LINENO: error: If PETSc is used, you must specify the architectur
-                          either through the PETSC_ARCH environment variable,
-                          or through the --with-petsc-arch flag" >&5
-echo "$as_me: error: If PETSc is used, you must specify the architectur
-                          either through the PETSC_ARCH environment variable,
-                          or through the --with-petsc-arch flag" >&2;}
+                          specified in the PETSC_ARCH environment variable" >&2;}
    { (exit 1); exit 1; }; }
           fi
+        else
+    	  { { echo "$as_me:$LINENO: error: If PETSc is used, you must specify the architectur
+                        either through the PETSC_ARCH environment variable,
+                        or through the --with-petsc-arch flag" >&5
+echo "$as_me: error: If PETSc is used, you must specify the architectur
+                        either through the PETSC_ARCH environment variable,
+                        or through the --with-petsc-arch flag" >&2;}
+   { (exit 1); exit 1; }; }
+        fi
 
 fi;
+
+
+  echo "$as_me:$LINENO: checking for PETSc version" >&5
+echo $ECHO_N "checking for PETSc version... $ECHO_C" >&6
+
+  DEAL_II_PETSC_VERSION_MAJOR=`cat $DEAL_II_PETSC_DIR/include/petscversion.h \
+                               | grep "#define PETSC_VERSION_MAJOR" \
+                               | perl -pi -e 's/.*MAJOR\s+//g;'`
+  DEAL_II_PETSC_VERSION_MINOR=`cat $DEAL_II_PETSC_DIR/include/petscversion.h \
+                               | grep "#define PETSC_VERSION_MINOR" \
+                               | perl -pi -e 's/.*MINOR\s+//g;'`
+  DEAL_II_PETSC_VERSION_SUBMINOR=`cat $DEAL_II_PETSC_DIR/include/petscversion.h \
+                               | grep "#define PETSC_VERSION_SUBMINOR" \
+                               | perl -pi -e 's/.*MINOR\s+//g;'`
+  PETSC_VERSION="$DEAL_II_PETSC_VERSION_MAJOR.$DEAL_II_PETSC_VERSION_MINOR.$DEAL_II_PETSC_VERSION_SUBMINOR"
+  echo "$as_me:$LINENO: result: $PETSC_VERSION" >&5
+echo "${ECHO_T}$PETSC_VERSION" >&6
+
   fi
+
+
+
 
 
 
@@ -8826,6 +8848,9 @@ s,@USE_CONTRIB_HSL@,$USE_CONTRIB_HSL,;t t
 s,@USE_CONTRIB_PETSC@,$USE_CONTRIB_PETSC,;t t
 s,@DEAL_II_PETSC_DIR@,$DEAL_II_PETSC_DIR,;t t
 s,@DEAL_II_PETSC_ARCH@,$DEAL_II_PETSC_ARCH,;t t
+s,@DEAL_II_PETSC_VERSION_MAJOR@,$DEAL_II_PETSC_VERSION_MAJOR,;t t
+s,@DEAL_II_PETSC_VERSION_MINOR@,$DEAL_II_PETSC_VERSION_MINOR,;t t
+s,@DEAL_II_PETSC_VERSION_SUBMINOR@,$DEAL_II_PETSC_VERSION_SUBMINOR,;t t
 s,@USE_CONTRIB_METIS@,$USE_CONTRIB_METIS,;t t
 s,@DEAL_II_METIS_DIR@,$DEAL_II_METIS_DIR,;t t
 s,@kdocdir@,$kdocdir,;t t
