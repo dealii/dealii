@@ -1076,9 +1076,6 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
   const unsigned int        n_components = fe.n_components();
   const bool                fe_is_system = (n_components != 1);
 
-  Assert( !((n_components == 1) && (norm == mean)),
-	  ExcNotUseful());
-
   if (weight!=0)
     {
       Assert ((weight->n_components==1) || (weight->n_components==n_components),
