@@ -59,6 +59,7 @@ AC_DEFINE_UNQUOTED(DEAL_II_MINOR, $DEAL_II_MINOR,
 AC_DEFINE_UNQUOTED(DEAL_II_PATH, "$DEAL_II_PATH",
                    [Path to the deal.II directory])
 AC_MSG_RESULT(Configuring deal.II version $DEAL_II_VERSION)
+AC_SUBST(DEAL_II_VERSION)
 AC_SUBST(DEAL_II_MAJOR)
 AC_SUBST(DEAL_II_MINOR)
 AC_SUBST(DEAL_II_PATH)
@@ -496,7 +497,8 @@ AC_OUTPUT([common/Make.global_options
            common/scripts/make_dependencies.pl
            doc/Makefile 
            doc/auto/Makefile 
-           doc/auto/kdoc/Makefile])
+           doc/auto/kdoc/Makefile
+           doc/doxygen/options.dox])
 
 
 echo
