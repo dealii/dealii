@@ -1255,9 +1255,209 @@ namespace Functions
     return val;
   };
   
+
+
+
+/* ---------------------- FourierSineSum ----------------------- */
   
   
   
+  template <int dim>
+  FourierSineSum<dim>::
+  FourierSineSum (const std::vector<Point<dim> > &fourier_coefficients,
+		  const std::vector<double>      &weights)
+		  :
+		  Function<dim> (1),
+    fourier_coefficients (fourier_coefficients),
+    weights (weights)
+  {
+    Assert (fourier_coefficients.size() > 0, ExcInvalidArraySize());
+    Assert (fourier_coefficients.size() == weights.size(),
+	    ExcInvalidArraySize());
+  };
+  
+  
+  
+  template <int dim>
+  double
+  FourierSineSum<dim>::value (const Point<dim>   &p,
+			      const unsigned int  component) const
+  {
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    const unsigned int n = weights.size();
+    double sum = 0;
+    for (unsigned int s=0; s<n; ++s)
+      {
+	double val=1;
+	for (unsigned int i=0; i<dim; ++i)
+	  val *= std::sin(fourier_coefficients[s][i] * p[i]);
+	sum += weights[s] * val;
+      };
+    
+    return sum;
+  };
+  
+  
+  
+  template <int dim>
+  Tensor<1,dim>
+  FourierSineSum<dim>::gradient (const Point<dim>   &p,
+				 const unsigned int  component) const
+  {
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    const unsigned int n = weights.size();
+    Tensor<1,dim> sum;
+    for (unsigned int s=0; s<n; ++s)
+      {
+	Tensor<1,dim> grad;
+	for (unsigned int i=0; i<dim; ++i)
+	  grad[i] = 1;
+    
+	for (unsigned int i=0; i<dim; ++i)
+	  {
+	    const double cos_i = std::cos(fourier_coefficients[s][i] * p[i]);
+	    const double sin_i = std::sin(fourier_coefficients[s][i] * p[i]);
+	    
+	    for (unsigned int d=0; d<dim; ++d)
+	      if (d==i)
+		grad[d] *= fourier_coefficients[s][i] * cos_i;
+	      else
+		grad[d] *= sin_i;
+	  };
+	
+	grad *= weights[s];
+	sum += grad;
+      };
+    
+    return sum;
+  };
+  
+  
+  
+  template <int dim>
+  double
+  FourierSineSum<dim>::laplacian (const Point<dim>   &p,
+				  const unsigned int  component) const
+  {
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    const unsigned int n = weights.size();
+    double sum = 0;
+    for (unsigned int s=0; s<n; ++s)
+      {
+	double val = -(fourier_coefficients[s]*fourier_coefficients[s]);
+	for (unsigned int i=0; i<dim; ++i)
+	  val *= std::sin(fourier_coefficients[s][i] * p[i]);
+	sum += val * weights[s];
+      };
+    
+    return sum;
+  };
+
+
+
+/* ---------------------- FourierCosineSum ----------------------- */
+  
+  
+  
+  template <int dim>
+  FourierCosineSum<dim>::
+  FourierCosineSum (const std::vector<Point<dim> > &fourier_coefficients,
+		  const std::vector<double>      &weights)
+		  :
+		  Function<dim> (1),
+    fourier_coefficients (fourier_coefficients),
+    weights (weights)
+  {
+    Assert (fourier_coefficients.size() > 0, ExcInvalidArraySize());
+    Assert (fourier_coefficients.size() == weights.size(),
+	    ExcInvalidArraySize());
+  };
+  
+  
+  
+  template <int dim>
+  double
+  FourierCosineSum<dim>::value (const Point<dim>   &p,
+				const unsigned int  component) const
+  {
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    const unsigned int n = weights.size();
+    double sum = 0;
+    for (unsigned int s=0; s<n; ++s)
+      {
+	double val=1;
+	for (unsigned int i=0; i<dim; ++i)
+	  val *= std::cos(fourier_coefficients[s][i] * p[i]);
+	sum += weights[s] * val;
+      };
+    
+    return sum;
+  };
+  
+  
+  
+  template <int dim>
+  Tensor<1,dim>
+  FourierCosineSum<dim>::gradient (const Point<dim>   &p,
+				   const unsigned int  component) const
+  {
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    const unsigned int n = weights.size();
+    Tensor<1,dim> sum;
+    for (unsigned int s=0; s<n; ++s)
+      {
+	Tensor<1,dim> grad;
+	for (unsigned int i=0; i<dim; ++i)
+	  grad[i] = 1;
+    
+	for (unsigned int i=0; i<dim; ++i)
+	  {
+	    const double cos_i = std::cos(fourier_coefficients[s][i] * p[i]);
+	    const double sin_i = std::sin(fourier_coefficients[s][i] * p[i]);
+	    
+	    for (unsigned int d=0; d<dim; ++d)
+	      if (d==i)
+		grad[d] *= -fourier_coefficients[s][i] * sin_i;
+	      else
+		grad[d] *= cos_i;
+	  };
+	
+	grad *= weights[s];
+	sum += grad;
+      };
+    
+    return sum;
+  };
+  
+  
+  
+  template <int dim>
+  double
+  FourierCosineSum<dim>::laplacian (const Point<dim>   &p,
+				    const unsigned int  component) const
+  {
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    const unsigned int n = weights.size();
+    double sum = 0;
+    for (unsigned int s=0; s<n; ++s)
+      {
+	double val = -(fourier_coefficients[s]*fourier_coefficients[s]);
+	for (unsigned int i=0; i<dim; ++i)
+	  val *= std::cos(fourier_coefficients[s][i] * p[i]);
+	sum += val * weights[s];
+      };
+    
+    return sum;
+  };
+  
+  
+// explicit instantiations  
   template class SquareFunction<1>;
   template class SquareFunction<2>;
   template class SquareFunction<3>;
@@ -1282,6 +1482,10 @@ namespace Functions
   template class FourierSineFunction<1>;
   template class FourierSineFunction<2>;
   template class FourierSineFunction<3>;
-  
-  
+  template class FourierCosineSum<1>;
+  template class FourierCosineSum<2>;
+  template class FourierCosineSum<3>;
+  template class FourierSineSum<1>;
+  template class FourierSineSum<2>;
+  template class FourierSineSum<3>;
 };

@@ -652,6 +652,137 @@ namespace Functions
       const Point<dim> fourier_coefficients;
   };
   
+
+/**
+ * Given a sequence of wavenumber vectors and weights generate a sum
+ * of sine functions. Each wavenumber coefficient is given as a
+ * @p{d}-dimensional point @p{k} in Fourier space, and the entire
+ * function is then recovered as
+ * @p{f(x) = \sum_j w_j \prod_i sin(k_i x_i) = Im(\sum_j w_j \exp(i k.x))}.
+ *
+ * @author Wolfgang Bangerth, 2001
+ */
+  template <int dim>
+  class FourierSineSum : public Function<dim> 
+  {
+    public:
+				       /**
+					* Constructor. Take the Fourier
+					* coefficients in each space
+					* direction as argument.
+					*/
+      FourierSineSum (const std::vector<Point<dim> > &fourier_coefficients,
+		      const std::vector<double>      &weights);
+      
+				       /**
+					* Return the value of the
+					* function at the given
+					* point. Unless there is only
+					* one component (i.e. the
+					* function is scalar), you
+					* should state the component you
+					* want to have evaluated; it
+					* defaults to zero, i.e. the
+					* first component.
+					*/
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+      
+				       /**
+					* Return the gradient of the
+					* specified component of the
+					* function at the given point.
+					*/
+      virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				      const unsigned int  component = 0) const;
+      
+				       /**
+					* Compute the Laplacian of a
+					* given component at point @p{p}.
+					*/
+      virtual double laplacian (const Point<dim>   &p,
+				const unsigned int  component = 0) const;
+
+				       /**
+					* Exception
+					*/
+      DeclException0 (ExcInvalidArraySize);
+      
+    private:
+				       /**
+					* Stored Fourier coefficients
+					* and weights.
+					*/
+      const std::vector<Point<dim> > fourier_coefficients;
+      const std::vector<double>      weights;
+  };
+
+
+
+/**
+ * Given a sequence of wavenumber vectors and weights generate a sum
+ * of cosine functions. Each wavenumber coefficient is given as a
+ * @p{d}-dimensional point @p{k} in Fourier space, and the entire
+ * function is then recovered as
+ * @p{f(x) = \sum_j w_j \prod_i cos(k_i x_i) = Re(\sum_j w_j \exp(i k.x))}.
+ *
+ * @author Wolfgang Bangerth, 2001
+ */
+  template <int dim>
+  class FourierCosineSum : public Function<dim> 
+  {
+    public:
+				       /**
+					* Constructor. Take the Fourier
+					* coefficients in each space
+					* direction as argument.
+					*/
+      FourierCosineSum (const std::vector<Point<dim> > &fourier_coefficients,
+			const std::vector<double>      &weights);
+      
+				       /**
+					* Return the value of the
+					* function at the given
+					* point. Unless there is only
+					* one component (i.e. the
+					* function is scalar), you
+					* should state the component you
+					* want to have evaluated; it
+					* defaults to zero, i.e. the
+					* first component.
+					*/
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+      
+				       /**
+					* Return the gradient of the
+					* specified component of the
+					* function at the given point.
+					*/
+      virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				      const unsigned int  component = 0) const;
+      
+				       /**
+					* Compute the Laplacian of a
+					* given component at point @p{p}.
+					*/
+      virtual double laplacian (const Point<dim>   &p,
+				const unsigned int  component = 0) const;
+
+				       /**
+					* Exception
+					*/
+      DeclException0 (ExcInvalidArraySize);
+      
+    private:
+				       /**
+					* Stored Fourier coefficients
+					* and weights.
+					*/
+      const std::vector<Point<dim> > fourier_coefficients;
+      const std::vector<double>      weights;
+  };
+  
   
 };
 
