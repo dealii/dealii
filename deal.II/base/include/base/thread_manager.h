@@ -824,7 +824,7 @@ int ThreadManager::spawn (Mem_Fun_Data1<ObjectClass,Arg> *mem_fun_data,
 			  void *stack,
 			  size_t stack_size)
 {
-  return ACE_Thread_Manager::spawn (&thread_entry_point1<ObjectClass,Arg>,
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point1<ObjectClass,Arg>,
 				    (void*)mem_fun_data,
 				    flags,
 				    t,
@@ -847,7 +847,7 @@ int ThreadManager::spawn (Mem_Fun_Data2<ObjectClass,Arg1,Arg2> *mem_fun_data,
 			  void *stack,
 			  size_t stack_size)
 {
-  return ACE_Thread_Manager::spawn (&thread_entry_point2<ObjectClass,Arg1,Arg2>,
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point2<ObjectClass,Arg1,Arg2>,
 				    (void*)mem_fun_data,
 				    flags,
 				    t,
@@ -870,7 +870,7 @@ int ThreadManager::spawn (Mem_Fun_Data3<ObjectClass,Arg1,Arg2,Arg3> *mem_fun_dat
 			  void *stack,
 			  size_t stack_size)
 {
-  return ACE_Thread_Manager::spawn (&thread_entry_point3<ObjectClass,Arg1,Arg2,Arg3>,
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point3<ObjectClass,Arg1,Arg2,Arg3>,
 				    (void*)mem_fun_data,
 				    flags,
 				    t,
@@ -893,7 +893,7 @@ int ThreadManager::spawn (Mem_Fun_Data4<ObjectClass,Arg1,Arg2,Arg3,Arg4> *mem_fu
 			  void *stack,
 			  size_t stack_size)
 {
-  return ACE_Thread_Manager::spawn (&thread_entry_point4<ObjectClass,Arg1,Arg2,Arg3,Arg4>,
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point4<ObjectClass,Arg1,Arg2,Arg3,Arg4>,
 				    (void*)mem_fun_data,
 				    flags,
 				    t,
@@ -918,7 +918,7 @@ int ThreadManager::spawn (Mem_Fun_Data5<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5> *m
 			  void *stack,
 			  size_t stack_size)
 {
-  return ACE_Thread_Manager::spawn (&thread_entry_point5<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5>,
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point5<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5>,
 				    (void*)mem_fun_data,
 				    flags,
 				    t,
@@ -943,7 +943,7 @@ int ThreadManager::spawn (Mem_Fun_Data6<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,Arg
 			  void *stack,
 			  size_t stack_size)
 {
-  return ACE_Thread_Manager::spawn (&thread_entry_point6<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6>,
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point6<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6>,
 				    (void*)mem_fun_data,
 				    flags,
 				    t,
@@ -968,7 +968,7 @@ int ThreadManager::spawn_n (size_t n,
 			    size_t stack_size[]) 
 {
   return ACE_Thread_Manager::spawn_n (n,
-				      &thread_entry_point1<ObjectClass,Arg>,
+				      &ThreadManager::template thread_entry_point1<ObjectClass,Arg>,
 				      (void*)mem_fun_data,
 				      flags,
 				      priority,
@@ -993,7 +993,7 @@ int ThreadManager::spawn_n (size_t n,
 			    size_t stack_size[]) 
 {
   return ACE_Thread_Manager::spawn_n (n,
-				      &thread_entry_point2<ObjectClass,Arg1,Arg2>,
+				      &ThreadManager::template thread_entry_point2<ObjectClass,Arg1,Arg2>,
 				      (void*)mem_fun_data,
 				      flags,
 				      priority,
@@ -1018,7 +1018,7 @@ int ThreadManager::spawn_n (size_t n,
 			    size_t stack_size[]) 
 {
   return ACE_Thread_Manager::spawn_n (n,
-				      &thread_entry_point3<ObjectClass,Arg1,Arg2,Arg3>,
+				      &ThreadManager::template thread_entry_point3<ObjectClass,Arg1,Arg2,Arg3>,
 				      (void*)mem_fun_data,
 				      flags,
 				      priority,
@@ -1043,7 +1043,7 @@ int ThreadManager::spawn_n (size_t n,
 			    size_t stack_size[]) 
 {
   return ACE_Thread_Manager::spawn_n (n,
-				      &thread_entry_point4<ObjectClass,Arg1,Arg2,Arg3,Arg4>,
+				      &ThreadManager::template thread_entry_point4<ObjectClass,Arg1,Arg2,Arg3,Arg4>,
 				      (void*)mem_fun_data,
 				      flags,
 				      priority,
@@ -1070,7 +1070,7 @@ int ThreadManager::spawn_n (size_t n,
 			    size_t stack_size[]) 
 {
   return ACE_Thread_Manager::spawn_n (n,
-				      &thread_entry_point5<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5>,
+				      &ThreadManager::template thread_entry_point5<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5>,
 				      (void*)mem_fun_data,
 				      flags,
 				      priority,
@@ -1097,7 +1097,7 @@ int ThreadManager::spawn_n (size_t n,
 			    size_t stack_size[]) 
 {
   return ACE_Thread_Manager::spawn_n (n,
-				      &thread_entry_point6<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6>,
+				      &ThreadManager::template thread_entry_point6<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6>,
 				      (void*)mem_fun_data,
 				      flags,
 				      priority,
