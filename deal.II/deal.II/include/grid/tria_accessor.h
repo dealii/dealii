@@ -420,7 +420,7 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      * The same applies as for the
 				      * #boundary_indicator()# function.
 				      *
-				      * Should be careful with this function
+				      * You should be careful with this function
 				      * and especially never try to set the
 				      * boundary indicator to 255, unless
 				      * you exactly know what you are doing,
@@ -717,7 +717,7 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      * The same applies as for the
 				      * #boundary_indicator()# function.
 				      *
-				      * Should be careful with this function
+				      * You should be careful with this function
 				      * and especially never try to set the
 				      * boundary indicator to 255, unless
 				      * you exactly know what you are doing,
