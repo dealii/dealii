@@ -664,7 +664,7 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 				   update_default,
 				   mapping,
 				   fe),
-  quadrature(quadrature)
+                quadrature(quadrature)
 {}
 
 
