@@ -274,7 +274,6 @@ PreconditionBlockSOR<number,inverse_type>::set_omega(number om)
 }
 
 
-//TODO: implement Tvmult
 
 template <typename number, typename inverse_type>
 template <typename number2>
@@ -364,6 +363,107 @@ void PreconditionBlockSOR<number,inverse_type>::vmult (Vector<number2>       &ds
 	  dst(row)=omega*x_cell(row_cell);
 	
 	begin_diag_block+=blocksize;
+      }
+}
+
+
+template <typename number, typename inverse_type>
+template <typename number2>
+void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &dst,
+						       const Vector<number2> &src) const
+{
+				   // introduce the following typedef
+				   // since in the use of exceptions,
+				   // strict C++ requires us to
+				   // specify them fully as they are
+				   // from a template dependent base
+				   // class. thus, we'd have to write
+				   // PreconditionBlock<number,inverse_type>::ExcNoMatrixGivenToUse,
+				   // which is lengthy, but also poses
+				   // some problems to the
+				   // preprocessor due to the comma in
+				   // the template arg list. we could
+				   // then wrap the whole thing into
+				   // parentheses, but that creates a
+				   // parse error for gcc for the
+				   // exceptions that do not take
+				   // args...
+  typedef PreconditionBlock<number,inverse_type> BaseClass;
+
+  Assert (A!=0, ExcNotInitialized());
+  
+  const SparseMatrix<number> &M=*A;
+  const unsigned int n_cells=M.m()/blocksize;
+
+  const SparsityPattern &spars    = M.get_sparsity_pattern();
+  const unsigned int    *rowstart = spars.get_rowstart_indices();
+  const unsigned int    *columns  = spars.get_column_numbers();
+
+  Vector<number2> b_cell(blocksize), x_cell(blocksize);
+
+				       // cell_row, cell_column are the
+				       // numbering of the blocks (cells).
+				       // row_cell, column_cell are the local
+				       // numbering of the unknowns in the
+				       // blocks.
+				       // row, column are the global numbering
+				       // of the unkowns.
+  unsigned int row, column, row_cell, end_diag_block=blocksize *n_cells;
+  number2 b_cell_row;
+
+  if (!inverses_ready())
+    {
+      FullMatrix<number> M_cell(blocksize);
+      for (int icell=n_cells-1; icell>=0 ; --icell)
+	{
+	  unsigned int cell = (unsigned int) icell;
+					   // Collect upper triangle
+	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	    {
+	      b_cell_row=src(row);
+	      for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
+		{
+		  column=columns[j];
+		  if (column >= end_diag_block)
+		    b_cell_row -= M.global_entry(j) * dst(column);
+		}
+	      
+	      b_cell(row_cell)=b_cell_row;
+					       // Collect diagonal block
+	      for (unsigned int column_cell=0, column=cell*blocksize;
+		   column_cell<blocksize; ++column_cell, ++column)
+		  M_cell(row_cell,column_cell)=M(row,column);
+	    }
+	  M_cell.householder(b_cell);
+	  M_cell.backward(x_cell,b_cell);
+					   // distribute x_cell to dst
+	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	    dst(row)=omega*x_cell(row_cell);
+	  
+	  end_diag_block-=blocksize;
+	}
+    }
+  else
+    for (int icell=n_cells-1; icell >=0 ; --icell)
+      {
+	unsigned int cell = (unsigned int) icell;
+	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	  {
+	    b_cell_row=src(row);
+	    for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
+	      {
+		column=columns[j];
+		if (column >= end_diag_block)
+		  b_cell_row -= M.global_entry(j) * dst(column);
+	      }
+	    b_cell(row_cell)=b_cell_row;
+	  }
+	inverse(cell).vmult(x_cell, b_cell);
+					 // distribute x_cell to dst
+	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	  dst(row)=omega*x_cell(row_cell);
+	
+	end_diag_block-=blocksize;
       }
 }
 

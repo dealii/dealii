@@ -76,6 +76,10 @@ template void PreconditionBlockSOR<float, float>::vmult (
   Vector<float> &, const Vector<float> &) const;
 template void PreconditionBlockSOR<float, float>::vmult (
   Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSOR<float, float>::Tvmult (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSOR<float, float>::Tvmult (
+  Vector<double> &, const Vector<double> &) const;
 
 
 // the instantiation for class PreconditionBlockSOR<float, double> is skipped
@@ -91,12 +95,20 @@ template void PreconditionBlockSOR<double, float>::vmult (
   Vector<float> &, const Vector<float> &) const;
 template void PreconditionBlockSOR<double, float>::vmult (
   Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSOR<double, float>::Tvmult (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSOR<double, float>::Tvmult (
+  Vector<double> &, const Vector<double> &) const;
 
 template class PreconditionBlockSOR<double, double>;
 
 template void PreconditionBlockSOR<double, double>::vmult (
   Vector<float> &, const Vector<float> &) const;
 template void PreconditionBlockSOR<double, double>::vmult (
+  Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSOR<double, double>::Tvmult (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSOR<double, double>::Tvmult (
   Vector<double> &, const Vector<double> &) const;
 
 

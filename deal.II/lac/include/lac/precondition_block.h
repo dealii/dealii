@@ -365,6 +365,12 @@ class PreconditionBlockSOR : public  Subscriptor,
     template <typename number2>
     void vmult (Vector<number2>&, const Vector<number2>&) const;
 
+				     /**
+				      * Transpose of @ref{vmult}
+				      */
+    template <typename number2>
+    void Tvmult (Vector<number2>&, const Vector<number2>&) const;
+
   private:
 				     /**
 				      * Relaxation parameter.
