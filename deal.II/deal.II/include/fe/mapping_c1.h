@@ -18,12 +18,13 @@
 
 
 /**
- * Mapping class that uses C1 (continuous) cubic mappings of the
- * boundary. This class is built atop of @ref{MappingQ} by simply
- * determining the interpolation points for a cubic mapping of the
- * boundary differently: @ref{MappingQ} chooses them such that they
- * interpolate the boundary, while this class chooses them such that
- * the discretized boundary is globally continuous.
+ * Mapping class that uses C1 (continuously differentiable) cubic
+ * mappings of the boundary. This class is built atop of
+ * @ref{MappingQ} by simply determining the interpolation points for a
+ * cubic mapping of the boundary differently: @ref{MappingQ} chooses
+ * them such that they interpolate the boundary, while this class
+ * chooses them such that the discretized boundary is globally
+ * continuous.
  *  
  * @author Wolfgang Bangerth, 2001
  */
