@@ -12,20 +12,40 @@
 #include <fstream>
 #include <string>
 
+#include <unistd.h>
+
 using namespace std;
 
-int main(int argc, const char** argv)
+int main(int argc, char** argv)
 {
   if (argc<2)
     {
-      cerr << "Usage: " << argv[0] << " <filename>" << endl;
+      cerr << "Usage: " << argv[0]
+	   << " -i informat -o outformat <filename>" << endl;
       exit(1);
     }
 
-  string iname =argv[1];
+  GridOut::OutputFormat oformat;
+  int c;
+  const char* optstring="i:o:";
+  while((c=getopt(argc, argv, optstring)) != -1)
+  {
+      switch (c)
+      {
+	  case 'i':
+	      break;
+	  case 'o':
+	      oformat = GridOut::parse_output_format(optarg);
+	      break;
+      }
+  }
+  string iname =argv[optind];
 //  if (iname.find_last_of('.') <= 0)
 //    iname.append(".inp");
   
+  GridOutFlags::XFig xfig_flags;
+  xfig_flags.level_depth = false;
+
   Triangulation<2> tr;
 
    ifstream in (iname.c_str());
@@ -36,13 +56,14 @@ int main(int argc, const char** argv)
    gin.read_ucd(in);
 
    GridOut gout;
+   gout.set_flags(xfig_flags);
    
    string oname(iname, 0, iname.find_last_of('.'));  
-   oname.append(".eps");
+   oname.append(GridOut::default_suffix(oformat));
    cout << iname << " -> " << oname << endl;
    ofstream out(oname.c_str());
 
-   gout.write_eps(tr, out);
+   gout.write(tr, out, oformat);
    
 //  GridOut
 }
