@@ -102,7 +102,7 @@ namespace
 	p[i](1)=points3d[start_index3d[k]+i][1];
 	p[i](2)=points3d[start_index3d[k]+i][2];
       }
-  }  
+  }
 }
 
 
@@ -176,34 +176,49 @@ FE_DGPMonomial<dim>::clone() const
 template <int dim>
 void
 FE_DGPMonomial<dim>::
-get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
+get_interpolation_matrix (const FiniteElementBase<dim> &source_fe,
 			  FullMatrix<double>           &interpolation_matrix) const
-{
-				   // this is only implemented, if the
-				   // source FE is also a
-				   // DGPMonomial element
-  AssertThrow ((x_source_fe.get_name().find ("FE_DGPMonomial<") == 0)
-               ||
-               (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != 0),
-               typename FiniteElementBase<dim>::
-               ExcInterpolationNotImplemented());
-  
-				   // ok, source is a Q element, so
-				   // we will be able to do the work
-  const FE_DGPMonomial<dim> &source_fe
-    = dynamic_cast<const FE_DGPMonomial<dim>&>(x_source_fe);
+{  
+  const FE_DGPMonomial<dim> *source_dgp_monomial
+    = dynamic_cast<const FE_DGPMonomial<dim> *>(&source_fe);
 
-  const unsigned int m=interpolation_matrix.m();
-  const unsigned int n=interpolation_matrix.n();
-  Assert (m == this->dofs_per_cell, ExcDimensionMismatch (m, this->dofs_per_cell));
-  Assert (n == source_fe.dofs_per_cell, ExcDimensionMismatch (n, source_fe.dofs_per_cell));
+  if (source_dgp_monomial)
+    {
+      				   // ok, source_fe is a DGP_Monomial
+      				   // element. Then, the interpolation
+      				   // matrix is simple
+      const unsigned int m=interpolation_matrix.m();
+      const unsigned int n=interpolation_matrix.n();
+      Assert (m == this->dofs_per_cell, ExcDimensionMismatch (m, this->dofs_per_cell));
+      Assert (n == source_dgp_monomial->dofs_per_cell,
+	      ExcDimensionMismatch (n, source_dgp_monomial->dofs_per_cell));
+      
+      const unsigned int min_mn=
+	interpolation_matrix.m()<interpolation_matrix.n() ?
+	interpolation_matrix.m() : interpolation_matrix.n();
+      
+      for (unsigned int i=0; i<min_mn; ++i)
+	interpolation_matrix(i,i)=1.;
+    }
+  else
+    {
+      std::vector<Point<dim> > unit_points(this->dofs_per_cell);
+      generate_unit_points(this->degree, unit_points);
 
-  const unsigned int min_mn=
-    interpolation_matrix.m()<interpolation_matrix.n() ?
-    interpolation_matrix.m() : interpolation_matrix.n();
+      FullMatrix<double> source_fe_matrix(unit_points.size(), source_fe.dofs_per_cell);
+      for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
+	for (unsigned int k=0; k<unit_points.size(); ++k)
+	  source_fe_matrix(k,j)=source_fe.shape_value(j, unit_points[k]);
 
-  for (unsigned int i=0; i<min_mn; ++i)
-    interpolation_matrix(i,i)=1.;
+      FullMatrix<double> this_matrix(this->dofs_per_cell, this->dofs_per_cell);
+      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+	for (unsigned int k=0; k<unit_points.size(); ++k)
+	  this_matrix(k,j)=this->poly_space.compute_value (j, unit_points[k]);
+
+      this_matrix.gauss_jordan();
+      
+      this_matrix.mmult(interpolation_matrix, source_fe_matrix);
+    }
 }
 
 
