@@ -1228,6 +1228,8 @@ SparseDirectMA47::get_synchronisation_lock () const
 void
 SparseDirectMA47::fill_A (const SparseMatrix<double> &matrix)
 {
+  Assert (n_nonzero_elements <= A.size(), ExcInternalError());
+
   const SparsityPattern &sparsity_pattern = matrix.get_sparsity_pattern ();
   
   const unsigned int n_rows = sparsity_pattern.n_rows();
